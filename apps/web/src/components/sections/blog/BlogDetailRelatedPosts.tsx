@@ -48,7 +48,7 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
             </span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/blog-detail/icon-see-all-arrow.svg"
+              src="/images/shared/icon-see-all-arrow.svg"
               alt=""
               aria-hidden
               width={40}
@@ -132,7 +132,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
               return (
                 <div className="flex items-center gap-1">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/images/blogs/icon-calendar-grey.svg" alt="" aria-hidden width={18} height={18} className="shrink-0 w-3.5 h-3.5 md:w-[18px] md:h-[18px]" />
+                  <img src="/images/shared/icon-calendar-grey.svg" alt="" aria-hidden width={18} height={18} className="shrink-0 w-3.5 h-3.5 md:w-[18px] md:h-[18px]" />
                   <span className="font-medium leading-normal whitespace-nowrap" style={{ fontSize: "var(--fs-body-sm)", color: "#666" }}>
                     {formatBlogDate(displayDate)}
                   </span>
@@ -142,7 +142,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
             {post.readingMinutes != null && (
               <div className="flex items-center gap-1">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/blogs/icon-clock-grey.svg" alt="" aria-hidden width={18} height={18} className="shrink-0 w-3.5 h-3.5 md:w-[18px] md:h-[18px]" />
+                <img src="/images/shared/icon-clock-grey.svg" alt="" aria-hidden width={18} height={18} className="shrink-0 w-3.5 h-3.5 md:w-[18px] md:h-[18px]" />
                 <span className="font-medium leading-normal whitespace-nowrap" style={{ fontSize: "var(--fs-caption)", color: "#666" }}>
                   {post.readingMinutes} min read
                 </span>
@@ -179,7 +179,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
             </span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/blogs/icon-arrow-read-more.svg"
+              src="/images/shared/icon-arrow-read-more.svg"
               alt=""
               aria-hidden
               width={24}

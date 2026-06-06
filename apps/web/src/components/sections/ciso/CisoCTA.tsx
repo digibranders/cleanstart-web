@@ -100,7 +100,7 @@ export function CisoCTA(): React.ReactElement {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
-          src="/images/ciso/cta-cube-noise.png"
+          src="/images/ciso/cta-cube-noise.webp"
           alt=""
           className="absolute pointer-events-none select-none"
           style={{

@@ -77,7 +77,7 @@ export function LatestBlogs({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/blogs/latest-blogs-gridlines.svg"
+          src="/images/shared/listing-gridlines.svg"
           alt=""
           aria-hidden
           className="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none select-none"

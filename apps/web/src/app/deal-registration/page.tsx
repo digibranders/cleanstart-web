@@ -37,7 +37,7 @@ export default function DealRegistrationPage() {
           />
 
           <Image
-            src="/images/book-a-demo/hero-cube-left.png"
+            src="/images/book-a-demo/hero-cube-left.webp"
             alt=""
             width={332}
             height={313}
@@ -56,7 +56,7 @@ export default function DealRegistrationPage() {
           />
 
           <Image
-            src="/images/book-a-demo/hero-cube-right.png"
+            src="/images/book-a-demo/hero-cube-right.webp"
             alt=""
             width={294}
             height={298}

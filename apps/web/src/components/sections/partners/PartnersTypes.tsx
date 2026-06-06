@@ -10,17 +10,17 @@ interface PartnerType {
 
 const TYPES: PartnerType[] = [
   {
-    image: "/images/partners/technology.png",
+    image: "/images/partners/technology.webp",
     title: "Technology Partners",
     body: "Integrate CleanStart assurance into your platform to deliver verified, zero-vulnerability software.",
   },
   {
-    image: "/images/partners/sys.png",
+    image: "/images/partners/sys.webp",
     title: "Value Sellers",
     body: "Provide verified, compliance-ready infrastructure for customers who need secure and trusted delivery.",
   },
   {
-    image: "/images/partners/value.png",
+    image: "/images/partners/value.webp",
     title: "System Integrators and MSPs",
     body: "Embed CleanStart into managed services to simplify compliance and strengthen customer trust.",
   },

@@ -23,7 +23,7 @@ export function AuthorHero({ author }: AuthorHeroProps): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/blogs/hero-orb-top.png"
+        src="/images/blogs/hero-orb-top.webp"
         alt=""
         className="pointer-events-none select-none absolute top-32 right-0 hidden xl:block"
         style={{
@@ -38,7 +38,7 @@ export function AuthorHero({ author }: AuthorHeroProps): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/blogs/hero-orb-top.png"
+        src="/images/blogs/hero-orb-top.webp"
         alt=""
         className="pointer-events-none select-none absolute top-40 left-0 hidden xl:block"
         style={{

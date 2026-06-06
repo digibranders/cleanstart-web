@@ -12,27 +12,27 @@ interface Office {
 
 const OFFICES: Office[] = [
   {
-    flag: "/images/contact/flags/flag-sg.png",
+    flag: "/images/contact/flags/flag-sg.webp",
     flagAlt: "Singapore flag",
     name: "Singapore",
     address: "1003 Bukit Merah Central, #07-23, Singapore 159836",
   },
   {
-    flag: "/images/contact/flags/flag-in.png",
+    flag: "/images/contact/flags/flag-in.webp",
     flagAlt: "India flag",
     name: "India (Bengaluru)",
     address:
       "Bhive Platinum Address Maker, 114/5, Old Madras Road, Halasuru, Bengaluru, Karnataka, India – 560008",
   },
   {
-    flag: "/images/contact/flags/flag-in.png",
+    flag: "/images/contact/flags/flag-in.webp",
     flagAlt: "India flag",
     name: "India (Ahmedabad)",
     address:
       "Block C, 9th floor Navratna Business Park, NR Sindhu Bhavan Rd, opp. Gtpl House, Bodakdev, Ahmedabad, Gujarat 380059",
   },
   {
-    flag: "/images/contact/flags/flag-us.png",
+    flag: "/images/contact/flags/flag-us.webp",
     flagAlt: "United States flag",
     name: "North America (HQ)",
     address:

@@ -5,25 +5,25 @@ const CARDS: readonly [WhyCard, WhyCard, WhyCard, WhyCard] = [
   {
     title: 'Incomplete Visibility',
     desc: 'Missing packages and dependencies hide risk.',
-    imgSrc: '/images/sbom/risk-icon-incomplete.png',
+    imgSrc: '/images/sbom/risk-icon-incomplete.webp',
     imgAlt: 'Incomplete Visibility icon',
   },
   {
     title: 'Broken Traceability',
     desc: 'Disconnected inventories weaken provenance tracking.',
-    imgSrc: '/images/sbom/risk-icon-traceability.png',
+    imgSrc: '/images/sbom/risk-icon-traceability.webp',
     imgAlt: 'Broken Traceability icon',
   },
   {
     title: 'Stale Data',
     desc: 'Static SBOMs quickly become outdated.',
-    imgSrc: '/images/sbom/risk-icon-stale.png',
+    imgSrc: '/images/sbom/risk-icon-stale.webp',
     imgAlt: 'Stale Data icon',
   },
   {
     title: 'Compliance Exposure',
     desc: 'Incomplete inventories increase audit complexity.',
-    imgSrc: '/images/sbom/risk-icon-compliance.png',
+    imgSrc: '/images/sbom/risk-icon-compliance.webp',
     imgAlt: 'Compliance Exposure icon',
   },
 ];

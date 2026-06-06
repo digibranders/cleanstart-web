@@ -49,7 +49,7 @@ export function GuideDetailRelatedGuides({
             </span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/guide-detail/icon-see-all-arrow.svg"
+              src="/images/shared/icon-see-all-arrow.svg"
               alt=""
               aria-hidden
               width={40}
@@ -119,7 +119,7 @@ function RelatedGuideCard({ guide }: { guide: Guide }): React.ReactElement {
             return (
               <div className="flex items-center gap-1">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/guides/icon-calendar-grey.svg" alt="" aria-hidden width={18} height={18} className="shrink-0 w-3.5 h-3.5 md:w-[18px] md:h-[18px]" />
+                <img src="/images/shared/icon-calendar-grey.svg" alt="" aria-hidden width={18} height={18} className="shrink-0 w-3.5 h-3.5 md:w-[18px] md:h-[18px]" />
                 <span className="font-medium leading-normal whitespace-nowrap" style={{ fontSize: "var(--fs-body-sm)", color: "#666" }}>
                   {formatGuideDate(displayDate)}
                 </span>
@@ -129,7 +129,7 @@ function RelatedGuideCard({ guide }: { guide: Guide }): React.ReactElement {
           {guide.readingMinutes != null && (
             <div className="flex items-center gap-1">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/guides/icon-clock-grey.svg" alt="" aria-hidden width={18} height={18} className="shrink-0 w-3.5 h-3.5 md:w-[18px] md:h-[18px]" />
+              <img src="/images/shared/icon-clock-grey.svg" alt="" aria-hidden width={18} height={18} className="shrink-0 w-3.5 h-3.5 md:w-[18px] md:h-[18px]" />
               <span className="font-medium leading-normal whitespace-nowrap" style={{ fontSize: "var(--fs-caption)", color: "#666" }}>
                 {guide.readingMinutes} min read
               </span>
@@ -166,7 +166,7 @@ function RelatedGuideCard({ guide }: { guide: Guide }): React.ReactElement {
           </span>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/guides/icon-arrow-read-more.svg"
+            src="/images/shared/icon-arrow-read-more.svg"
             alt=""
             aria-hidden
             width={24}

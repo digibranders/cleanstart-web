@@ -63,7 +63,7 @@ export function PlatformHero() {
 
         {/* Cube sits above the grid + glow */}
         <Image
-          src="/images/cleanstart-platform/hero-cube.png"
+          src="/images/cleanstart-platform/hero-cube.webp"
           alt="CleanStart Platform Architecture"
           width={426}
           height={443}

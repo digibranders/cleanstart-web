@@ -64,7 +64,7 @@ export function EventCard({ event }: EventCardProps): React.ReactElement {
           <div className="flex items-center" style={{ gap: "4px" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/blogs/icon-calendar-grey.svg"
+              src="/images/shared/icon-calendar-grey.svg"
               alt=""
               aria-hidden
               width={18}

@@ -8,7 +8,7 @@ export function RadarScanner(): React.ReactElement {
       data-component="RadarScanner"
     >
       <Image
-        src="/images/cleansight/scanner-bg.png"
+        src="/images/cleansight/scanner-bg.webp"
         alt=""
         fill
         priority={false}

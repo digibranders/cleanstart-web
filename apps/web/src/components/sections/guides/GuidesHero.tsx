@@ -34,7 +34,7 @@ export function GuidesHero({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/guides/hero-glow-left.png"
+          src="/images/guides/hero-glow-left.webp"
           alt=""
           loading="lazy"
           decoding="async"

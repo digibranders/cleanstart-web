@@ -467,7 +467,7 @@ export function DeveloperSecureFoundations(): React.ReactElement {
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/images/for-developers/secure/badge-seal.png"
+                  src="/images/for-developers/secure/badge-seal.webp"
                   alt=""
                   style={{
                     position: 'absolute',
@@ -507,7 +507,7 @@ export function DeveloperSecureFoundations(): React.ReactElement {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/for-developers/secure/badge-seal.png"
+              src="/images/for-developers/secure/badge-seal.webp"
               alt=""
               style={{
                 position: 'absolute',

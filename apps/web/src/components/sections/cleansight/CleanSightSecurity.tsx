@@ -124,7 +124,7 @@ export function CleanSightSecurity(): React.ReactElement {
       <img
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
-        src="/images/cleansight/security-crystal.png"
+        src="/images/cleansight/security-crystal.webp"
         alt=""
         style={{
           right: "-80px",
@@ -141,7 +141,7 @@ export function CleanSightSecurity(): React.ReactElement {
       <img
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
-        src="/images/cleansight/security-crystal.png"
+        src="/images/cleansight/security-crystal.webp"
         alt=""
         style={{
           left: "-163px",
@@ -219,7 +219,7 @@ export function CleanSightSecurity(): React.ReactElement {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/cleansight/security-shield-complete.png"
+              src="/images/cleansight/security-shield-complete.webp"
               alt="CleanSight security shield"
               style={{
                 width: "100%",

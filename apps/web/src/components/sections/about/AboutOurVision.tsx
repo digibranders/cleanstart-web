@@ -227,7 +227,7 @@ export function AboutOurVision() {
               </div>
 
               <Image
-                src="/images/about/vision-target.png"
+                src="/images/about/vision-target.webp"
                 alt="Our Vision target illustration"
                 width={418}
                 height={353}

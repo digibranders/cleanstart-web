@@ -122,7 +122,7 @@ export function CleanStartImagesHero(): React.ReactElement {
 
           <div className="relative flex-1 hidden lg:flex items-center justify-center lg:justify-end">
             <Image
-              src="/images/cleanstart-images/hero-3d-container.png"
+              src="/images/cleanstart-images/hero-3d-container.webp"
               alt="3D isometric container image illustrating CleanStart's hardened, FIPS-compliant image pipeline with security shield and code modules."
               width={523}
               height={455}

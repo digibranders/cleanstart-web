@@ -120,7 +120,7 @@ export function ContactForm() {
                 style={{
                   backgroundColor: "#3A1FA3",
                   backgroundImage:
-                    "url('/images/contact/form/header-bg.png')",
+                    "url('/images/contact/form/header-bg.webp')",
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   backgroundRepeat: "no-repeat",

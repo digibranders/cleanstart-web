@@ -45,7 +45,7 @@ export function NewsDetailRelated({
             </span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/blog-detail/icon-see-all-arrow.svg"
+              src="/images/shared/icon-see-all-arrow.svg"
               alt=""
               aria-hidden
               width={40}

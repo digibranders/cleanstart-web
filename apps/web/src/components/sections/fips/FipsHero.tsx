@@ -45,7 +45,7 @@ export function FipsHero(): React.ReactElement {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
-          src="/images/fips/shield-glow.png"
+          src="/images/fips/shield-glow.webp"
           alt=""
           className="pointer-events-none select-none absolute hidden md:block"
           style={{
@@ -78,7 +78,7 @@ export function FipsHero(): React.ReactElement {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
-          src="/images/fips/shield-only.png"
+          src="/images/fips/shield-only.webp"
           alt=""
           className="pointer-events-none select-none absolute hidden md:block"
           style={{
@@ -169,7 +169,7 @@ export function FipsHero(): React.ReactElement {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
-          src="/images/fips/shield-only.png"
+          src="/images/fips/shield-only.webp"
           alt=""
           className="pointer-events-none select-none hidden mx-auto relative z-[2]"
           style={{

@@ -33,13 +33,13 @@ const CARD_SPRING = { type: "spring", stiffness: 280, damping: 30, mass: 0.8 } a
 
 const PARTNERS: Record<Region, Partner[]> = {
   "Asia Pacific": [
-    { name: "Hitachi Systems", country: "India", logo: "/images/partners/global/hitachi.png" },
-    { name: "Citius Cloud", country: "India", logo: "/images/partners/global/citius.png" },
-    { name: "CyberNx", country: "India", logo: "/images/partners/global/cybernx.png" },
-    { name: "eCaps", country: "India", logo: "/images/partners/global/ecaps.png" },
-    { name: "SEESEC", country: "India", logo: "/images/partners/global/seesec.png" },
-    { name: "Imperium", country: "Singapore", logo: "/images/partners/global/imperium.png" },
-    { name: "R-Tech", country: "Indonesia", logo: "/images/partners/global/rtech.png" },
+    { name: "Hitachi Systems", country: "India", logo: "/images/partners/global/hitachi.webp" },
+    { name: "Citius Cloud", country: "India", logo: "/images/partners/global/citius.webp" },
+    { name: "CyberNx", country: "India", logo: "/images/partners/global/cybernx.webp" },
+    { name: "eCaps", country: "India", logo: "/images/partners/global/ecaps.webp" },
+    { name: "SEESEC", country: "India", logo: "/images/partners/global/seesec.webp" },
+    { name: "Imperium", country: "Singapore", logo: "/images/partners/global/imperium.webp" },
+    { name: "R-Tech", country: "Indonesia", logo: "/images/partners/global/rtech.webp" },
     { name: "eSec Forte", country: "India", logo: "/images/partners/global/sec-forte.webp" },
     { name: "Raksha Technologies", country: "India", logo: "/images/partners/global/raksha.webp" },
   ],
@@ -56,7 +56,7 @@ const PARTNERS: Record<Region, Partner[]> = {
     {
       name: "Fortifire",
       country: "North America",
-      logo: "/images/partners/global/fortifire-icon.png",
+      logo: "/images/partners/global/fortifire-icon.webp",
       wordmark: "FORTIFIRE",
     },
     {

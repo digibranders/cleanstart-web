@@ -32,19 +32,19 @@ const TAB_CONTENT: Record<TabId, TabContent> = {
         title: "Continuous Compliance Readiness",
         description:
           "Automate evidence collection and simplify compliance across modern software environments.",
-        icon: "/images/home/help-icon1.png",
+        icon: "/images/home/help-icon1.webp",
       },
       {
         title: "Verifiable Software Governance",
         description:
           "Improve visibility across software provenance, dependencies, and runtime foundations.",
-        icon: "/images/home/help-icon2.png",
+        icon: "/images/home/help-icon2.webp",
       },
       {
         title: "Centralized Visibility & Control",
         description:
           "Unify software trust, compliance, and delivery insights across teams and environments.",
-        icon: "/images/home/help-icon3.png",
+        icon: "/images/home/help-icon3.webp",
       },
     ],
   },
@@ -59,19 +59,19 @@ const TAB_CONTENT: Record<TabId, TabContent> = {
         title: "Verifiable Software Foundations",
         description:
           "Minimal, source-built runtime images designed to reduce inherited vulnerabilities.",
-        icon: "/images/home/help-icon2.png",
+        icon: "/images/home/help-icon2.webp",
       },
       {
         title: "Built for Existing Workflows",
         description:
           "Integrate with CI/CD pipelines, registries, Kubernetes environments, and developer tooling.",
-        icon: "/images/home/help-icon1.png",
+        icon: "/images/home/help-icon1.webp",
       },
       {
         title: "Accelerate Secure Delivery",
         description:
           "Improve release confidence with reproducible builds and trusted runtime foundations.",
-        icon: "/images/home/help-icon3.png",
+        icon: "/images/home/help-icon3.webp",
       },
     ],
   },

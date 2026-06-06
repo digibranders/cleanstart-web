@@ -33,7 +33,7 @@ export function ContactHero() {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/contact/hero-cube.png"
+            src="/images/contact/hero-cube.webp"
             alt=""
             width={294}
             height={298}
@@ -72,7 +72,7 @@ export function ContactHero() {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/contact/hero-cube.png"
+            src="/images/contact/hero-cube.webp"
             alt=""
             width={294}
             height={298}

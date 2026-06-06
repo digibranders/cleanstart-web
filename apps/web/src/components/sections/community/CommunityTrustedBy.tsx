@@ -2,11 +2,11 @@ import Image from 'next/image';
 import { Reveal } from "@/components/ui/Reveal";
 
 const LOGOS = [
-  { src: '/images/community/logo-loteria.png', alt: 'Livlong Insurance', w: 217, h: 55 },
-  { src: '/images/community/logo-hitachi.png', alt: 'Hitachi', w: 138, h: 55 },
-  { src: '/images/community/logo-purestorage.png', alt: 'Aurascape', w: 157, h: 55 },
-  { src: '/images/community/logo-vi.png', alt: 'Vi', w: 61, h: 55 },
-  { src: '/images/community/logo-encora.png', alt: 'Encora', w: 140, h: 40 },
+  { src: '/images/community/logo-loteria.webp', alt: 'Livlong Insurance', w: 217, h: 55 },
+  { src: '/images/community/logo-hitachi.webp', alt: 'Hitachi', w: 138, h: 55 },
+  { src: '/images/community/logo-purestorage.webp', alt: 'Aurascape', w: 157, h: 55 },
+  { src: '/images/community/logo-vi.webp', alt: 'Vi', w: 61, h: 55 },
+  { src: '/images/community/logo-encora.webp', alt: 'Encora', w: 140, h: 40 },
 ];
 
 export function CommunityTrustedBy() {

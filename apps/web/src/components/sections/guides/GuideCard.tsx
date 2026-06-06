@@ -141,7 +141,7 @@ export function GuideCard({ guide }: GuideCardProps): React.ReactElement {
             </span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/guides/icon-arrow-read-more.svg"
+              src="/images/shared/icon-arrow-read-more.svg"
               alt=""
               aria-hidden
               width={18}

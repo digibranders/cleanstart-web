@@ -58,7 +58,7 @@ export function EventsCTA(): React.ReactElement {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/blogs/cta-cube-left2.png"
+          src="/images/blogs/cta-cube-left2.webp"
           alt=""
           loading="lazy"
           decoding="async"
@@ -79,7 +79,7 @@ export function EventsCTA(): React.ReactElement {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/blogs/cta-cube-right2.png"
+          src="/images/blogs/cta-cube-right2.webp"
           alt=""
           loading="lazy"
           decoding="async"

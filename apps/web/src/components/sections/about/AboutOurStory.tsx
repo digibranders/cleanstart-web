@@ -14,7 +14,7 @@ export function AboutOurStory() {
       {/* Mobile: portrait photo (founders in the lower half, centered). */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/images/about/founders-new.png"
+        src="/images/about/founders-new.webp"
         alt="CleanStart founders"
         className="absolute inset-0 h-full w-full object-cover object-center lg:hidden"
         loading="lazy"
@@ -26,7 +26,7 @@ export function AboutOurStory() {
           right portion of the section behind the left-aligned text overlay. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/images/about/founders-photo2.png"
+        src="/images/about/founders-photo2.webp"
         alt="CleanStart founders"
         className="absolute inset-0 h-full w-full object-cover object-[80%_center] hidden lg:block"
         loading="lazy"

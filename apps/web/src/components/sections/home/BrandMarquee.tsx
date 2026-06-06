@@ -20,7 +20,7 @@ export function BrandMarquee() {
 
   return (
     <div className="flex flex-col items-center gap-8">
-      <p className="text-body-md font-normal leading-[1.5] text-white/85">
+      <p className="text-body-md font-normal leading-[1.5] text-white/85 sm:[font-size:var(--fs-lead-sm)]">
         Supporting Modern Engineering Teams
       </p>
 
