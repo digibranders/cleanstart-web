@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
-import { BuiltForTeams } from "@/components/sections/home/BuiltForTeams";
+import { Testimonials } from "@/components/sections/home/Testimonials";
 import { CaseStudiesHero } from "@/components/sections/case-studies/CaseStudiesHero";
 import { CaseStudiesGrid } from "@/components/sections/case-studies/CaseStudiesGrid";
 import { FadeUp } from "@/components/ui/FadeUp";
@@ -69,7 +69,7 @@ export default async function CaseStudiesPage({
         </FadeUp>
 
         <FadeUp>
-          <BuiltForTeams />
+          <Testimonials />
         </FadeUp>
       </main>
       <Footer />

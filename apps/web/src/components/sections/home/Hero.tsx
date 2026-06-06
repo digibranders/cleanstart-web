@@ -1,5 +1,5 @@
 import { ArrowRightShort } from "@/components/icons/ArrowRightShort";
-import { TrustedByMarquee } from "@/components/sections/home/TrustedByMarquee";
+import { BrandMarquee } from "@/components/sections/home/BrandMarquee";
 import { HeroReveal } from "@/components/ui/Reveal";
 
 export function Hero() {
@@ -42,7 +42,7 @@ export function Hero() {
         </div>
 
         <div className="pb-2 pt-24">
-          <TrustedByMarquee />
+          <BrandMarquee />
         </div>
       </div>
 

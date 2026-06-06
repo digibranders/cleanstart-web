@@ -14,7 +14,7 @@ function getTrustedLogos(): string[] {
   }
 }
 
-export function TrustedByMarquee() {
+export function BrandMarquee() {
   const logos = getTrustedLogos();
   const doubled = [...logos, ...logos];
 
