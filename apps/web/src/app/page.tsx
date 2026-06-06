@@ -41,7 +41,7 @@ export default function Home() {
               of the bg-cs-hero wrapper. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/home/mask-group.svg"
+            src="/images/home/hero-top-grid-glow.svg"
             alt=""
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-0 w-full select-none"

@@ -15,19 +15,19 @@ const CARDS: Card[] = [
     title: "Accelerates Development",
     description:
       "Security should accelerate innovation, not slow it down. CleanStart automates compliance and hardens builds at source, helping teams move faster confidently..",
-    iconSrc: "/images/about/n1.webp",
+    iconSrc: "/images/about/powering-icon-accelerate.webp",
   },
   {
     title: "End-to-End Transparency",
     description:
       "Every build is fully verifiable. CleanStart delivers complete provenance and cryptographic trust from source to production across open source and AI infrastructure. ",
-    iconSrc: "/images/about/n2.webp",
+    iconSrc: "/images/about/powering-icon-transparency.webp",
   },
   {
     title: "Secure by Design",
     description:
       "Trust starts at the foundation. CleanStart embeds security, compliance, and provenance into every build, making every release secure by default.",
-    iconSrc: "/images/about/n3.webp",
+    iconSrc: "/images/about/powering-icon-secure.webp",
   },
 ];
 

@@ -10,22 +10,22 @@ interface BenefitCard {
 
 const CARDS: BenefitCard[] = [
   {
-    iconSrc: "/images/partners/Ball.webp",
+    iconSrc: "/images/partners/benefit-orb-1.webp",
     title: "Differentiate Through Trust",
     body: "Deliver verified, zero-vulnerability components that strengthen your product.",
   },
   {
-    iconSrc: "/images/partners/Ball2.webp",
+    iconSrc: "/images/partners/benefit-orb-2.webp",
     title: "Accelerate Compliance Wins",
     body: "Help customers achieve FIPS, FedRAMP, and CIS goals faster through built-in automation.",
   },
   {
-    iconSrc: "/images/partners/Ball3.webp",
+    iconSrc: "/images/partners/benefit-orb-3.webp",
     title: "Drive Revenue with Confidence",
     body: "Win new business in regulated markets with a foundation customers can prove.",
   },
   {
-    iconSrc: "/images/partners/Ball4.webp",
+    iconSrc: "/images/partners/benefit-orb-4.webp",
     title: "Partner for Lasting Growth",
     body: "Gain enablement, co-marketing, and support that scale your business and impact.",
   },

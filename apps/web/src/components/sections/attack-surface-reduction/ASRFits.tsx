@@ -14,7 +14,7 @@ const INTEGRATIONS: Integration[] = [
   {
     title: 'Drop-in Images',
     desc: 'Works with existing workflows.',
-    icon: '/images/attack-surface-reduction/image 583136.webp',
+    icon: '/images/attack-surface-reduction/dropin-images-icon.webp',
     iconAlt: 'Monitor icon',
     iconWidth: 96,
     iconHeight: 96,
@@ -31,7 +31,7 @@ const INTEGRATIONS: Integration[] = [
   {
     title: 'Deploy Anywhere',
     desc: 'Cloud, on-prem, or regulated environments.',
-    icon: '/images/attack-surface-reduction/Point.webp',
+    icon: '/images/attack-surface-reduction/deploy-icon.webp',
     iconAlt: 'Deploy icon',
     iconWidth: 96,
     iconHeight: 96,

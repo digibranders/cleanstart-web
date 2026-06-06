@@ -74,7 +74,7 @@ export function CaseStudiesHero(): React.ReactElement {
             />
             <Image
               src="/images/case-studies/hero-illustration.webp"
-              alt=""
+              alt="Case study illustration: a magnifying glass over a book"
               width={575}
               height={347}
               priority
