@@ -17,7 +17,7 @@ export interface Testimonial {
   name: string;
   role: string;
   company: string;
-  /** Optional logo asset (same files served from TrustedByMarquee). When
+  /** Optional logo asset (same files served from BrandMarquee). When
    *  provided, `CompanyMark` renders the wordmark image instead of the
    *  text-only orb placeholder. */
   logoSrc?: string;
@@ -80,7 +80,7 @@ function offsetFor(i: number, active: number, total: number) {
 
 const TRANSITION_MS = 640;
 
-export interface BuiltForTeamsProps {
+export interface TestimonialsProps {
   /** Override the testimonial list. Defaults to the home-page testimonials. */
   testimonials?: Testimonial[];
   /** Optional override for the section heading (JSX). */
@@ -97,13 +97,13 @@ export interface BuiltForTeamsProps {
   reserveFooterCtaSpace?: boolean;
 }
 
-export function BuiltForTeams({
+export function Testimonials({
   testimonials,
   heading,
   description,
   hideHeader = false,
   reserveFooterCtaSpace = false,
-}: BuiltForTeamsProps = {}) {
+}: TestimonialsProps = {}) {
   const TESTIMONIALS = testimonials ?? HOME_TESTIMONIALS;
   const [active, setActive] = useState(0);
   const [direction, setDirection] = useState<Direction>("next");

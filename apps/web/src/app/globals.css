@@ -29,7 +29,7 @@
   /* Card-title scale — fills the gap between display-sm and text-3xl.
      Use per the role->token map in apps/web/docs/design-tokens.md. */
   --text-card-title-xl: clamp(1.5rem, 2vw, 2.0625rem);     /* 24→33px — FactoryCard, AboutPowering hero feature cards */
-  --text-card-title-lg: clamp(1.375rem, 1.8vw, 2rem);      /* 22→32px — Security headers, HowCleanStartHelp, AsrApproach, AsrFitsBuilt, AboutWhoWeAre pillars */
+  --text-card-title-lg: clamp(1.375rem, 1.8vw, 2rem);      /* 22→32px — Security headers, AudienceTabs, AsrApproach, AsrFitsBuilt, AboutWhoWeAre pillars */
   --text-card-title-md: clamp(1.125rem, 1.4vw, 1.5rem);    /* 18→24px — Blog/News/Resource/Event/Webinar/PodcastEpisode card titles */
   --text-card-title-sm: clamp(1rem, 1.1vw, 1.3125rem);     /* 16→21px — pill/tab labels */
 
@@ -1087,7 +1087,7 @@ body {
 }
 
 /* Rocket flame beam */
-/* Testimonial card fade+slide animation (used by BuiltForTeams carousel) */
+/* Testimonial card fade+slide animation (used by Testimonials carousel) */
 @keyframes cs-fade-slide-in {
   from {
     opacity: 0;
@@ -1762,7 +1762,7 @@ body {
 }
 
 /* =============================================================================
-   Shared-element morph carousel (BuiltForTeams).
+   Shared-element morph carousel (Testimonials).
    One unified card component renders in 3 slots (data-pos: -1, 0, 1). All
    cards share a single base size; only `transform` (translate + scale),
    `opacity`, and `filter` are animated — never `width`/`height`, which

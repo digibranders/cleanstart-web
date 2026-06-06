@@ -5,7 +5,7 @@ import Image from "next/image";
 import {
   HOME_TESTIMONIALS,
   type Testimonial,
-} from "@/components/sections/home/BuiltForTeams";
+} from "@/components/sections/home/Testimonials";
 import { Reveal } from "@/components/ui/Reveal";
 
 /**

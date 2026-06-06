@@ -16,11 +16,6 @@ const CARDS: CardData[] = [
     icon: "/images/cleanstart-factory/factory-images.png",
   },
   {
-    title: "Clean\nPackages",
-    blurb: "Curated. Verified. No\nhidden risk.",
-    icon: "/images/cleanstart-factory/factory-packages.png",
-  },
-  {
     title: "Clean AI\nModels",
     blurb: "Scanned. Signed. Safe\nby design.",
     icon: "/images/cleanstart-factory/factory-models.png",
@@ -29,6 +24,11 @@ const CARDS: CardData[] = [
     title: "Clean\nLibraries",
     blurb: "Complete. Signed.\nContinuously verified.",
     icon: "/images/cleanstart-factory/factory-libraries.png",
+  },
+  {
+    title: "Clean\nPackages",
+    blurb: "Curated. Verified. No\nhidden risk.",
+    icon: "/images/cleanstart-factory/factory-packages.png",
   },
 ];
 
@@ -55,9 +55,11 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
         containerType: "inline-size",
       }}
     >
-      {/* Rendered first so it paints behind the card body: the card-bg <Image>
-          below covers the upper portion of the flare, leaving only the part
-          below the card's bottom edge visible. */}
+      {/* Card → platform-bar exhaust flare. Its top is pinned 57cqw above the
+          card's bottom edge (top:100% + marginTop:-57cqw), so `clipPath` insets
+          that same 57cqw off the top to hide the portion overlapping the card
+          body. Only the glow below the card — in the gap toward the platform
+          bar — stays visible; nothing bleeds inside the card. */}
       <Image
         src="/images/cleanstart-factory/flare.webp"
         alt=""
@@ -71,6 +73,7 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
           height: "auto",
           top: "100%",
           marginTop: "-57cqw",
+          clipPath: "inset(57cqw 0 0 0)",
           mixBlendMode: "screen",
           filter: "saturate(1.15) brightness(1.1)",
         }}
@@ -623,7 +626,7 @@ function FactoryMobileBottomBlock() {
 
 // Mobile root: left rail (vertical line + horizontal flares entering each card
 // from the left) + cards column + connector flares + bottom block.
-function CleanStartFactoryMobile() {
+function PlatformPipelineMobile() {
   const RAIL_WIDTH = 56;
   const CARDS_GAP = 16;
   const FLARE_WIDTH = 130;
@@ -747,397 +750,290 @@ function CleanStartFactoryMobile() {
   );
 }
 
-// Desktop bottom block. Uses pre-rendered SVGs for the visually complex layers
-// (outer card, orb glows, arrow, accent path, flares) and pure CSS for the
-// structural pieces (panels, text, pill buttons). All dimensions in cqw via
-// CQW() so the block scales with its container width.
+// Desktop factory enclosure. One rounded container (same dark-gradient +
+// lavender-stroke + diagonal-pattern treatment as the cards) wraps a full-height
+// CleanSight rail on the left and a right column holding the 4 cards on top and
+// the thin "CleanStart Platform" pill bar below. Every interior dimension is in
+// cqw via FQW() against the FW reference width, so the whole block scales as one
+// unit from md up through xl.
 
-const BB_W = 1276;
-// Tightened below the panel height so the outer-frame top/bottom margins are
-// symmetric. The panels keep their original size; only the dark frame thins.
-const BB_H = 240.72;
-/** Convert a reference px (relative to the BB_W-wide bottom block) to cqw. */
-const CQW = (px: number) => `${(px / BB_W) * 100}cqw`;
+/** Reference width of the outer enclosure (border-box), in px. */
+const FW = 1340;
+/** Convert a reference px (relative to the FW-wide enclosure) to cqw. */
+const FQW = (px: number) => `${(px / FW) * 100}cqw`;
 
-function FactoryPill({ label }: { label: string }) {
+/** Platform-stage labels. These are static tags — not interactive controls. */
+const PLATFORM_PILLS = [
+  "Plan",
+  "Analyze",
+  "Orchestrate",
+  "Spec",
+  "Build",
+  "Attest",
+  "Handoff",
+] as const;
+
+// Non-interactive capsule. Rendered as a <span> (not a button) because the
+// platform stages are labels, not controls.
+function PlatformPill({ label }: { label: string }) {
   return (
-    <button
-      type="button"
-      className="group inline-flex shrink-0 cursor-pointer items-center justify-center text-white outline-none transition-[opacity,box-shadow] duration-150 hover:opacity-100 focus-visible:ring-2 focus-visible:ring-white/70"
+    <span
+      className="inline-flex shrink-0 items-center justify-center text-white"
       style={{
         background:
           "radial-gradient(113.85% 132% at 15.93% 50%, #000000 19.71%, #1E5AFF 100%)",
-        border: `${CQW(1.293)} solid #CDE4FF`,
-        boxShadow: `0 0 ${CQW(5.713)} rgba(30, 90, 255, 0.34)`,
-        backdropFilter: `blur(${CQW(3.23373)})`,
-        WebkitBackdropFilter: `blur(${CQW(3.23373)})`,
+        border: `${FQW(1.1)} solid #CDE4FF`,
+        boxShadow: `0 0 ${FQW(5)} rgba(30, 90, 255, 0.34)`,
         // Radius exceeds the height, so the pill is always a perfect capsule.
-        borderRadius: CQW(118.997),
-        padding: `${CQW(5.35835)} ${CQW(16.0751)}`,
-        height: CQW(30.72),
+        borderRadius: FQW(99),
+        padding: `${FQW(5)} ${FQW(15)}`,
+        height: FQW(28),
         fontFamily: "var(--font-manrope), Manrope, sans-serif",
-        fontSize: CQW(18),
+        fontSize: FQW(15),
         fontWeight: 400,
         lineHeight: 1.1,
         letterSpacing: "-0.04em",
-        opacity: 0.85,
+        opacity: 0.9,
       }}
     >
       {label}
-    </button>
+    </span>
   );
 }
 
-function FactoryPanel({
-  side,
-  title,
-  desc,
-  pills,
-  children,
-}: {
-  side: "left" | "right";
-  title: string;
-  desc: string;
-  pills: string[];
-  /** Extra layers (orb glow + optional flare) painted inside the panel */
-  children?: React.ReactNode;
-}) {
+// Tall iridescent rail on the left of the enclosure. Decorative diagonal hatch
+// + sheen behind the static "CleanSight" wordmark. Stretches to the row height
+// (align-items: stretch on the parent), so it is always as tall as the cards +
+// platform-bar column to its right.
+function CleanSightRail() {
   return (
     <div
-      className="absolute flex flex-col items-center justify-center overflow-hidden"
+      className="relative shrink-0 overflow-hidden"
       style={{
-        // The left panel sits at the wrapper origin; the caller positions the
-        // wrapper itself. The two panels and the arrow gap between them are
-        // laid out so all four outer margins are equal.
-        left: side === "left" ? 0 : CQW(736),
-        top: side === "left" ? 0 : CQW(28),
-        width: CQW(512),
-        height: CQW(184.72),
-        padding: CQW(24),
-        gap: CQW(10),
+        width: FQW(210),
+        borderRadius: FQW(20),
+        border: `${FQW(1)} solid rgba(218, 182, 243, 0.55)`,
         background:
-          "linear-gradient(90deg, rgba(217, 217, 217, 0.25) 0%, rgba(50, 50, 50, 0) 100%)",
-        backdropFilter: `blur(${CQW(0.804984)})`,
-        WebkitBackdropFilter: `blur(${CQW(0.804984)})`,
-        borderRadius: CQW(24),
-        border: `${CQW(1)} solid #dab6f3`,
-        isolation: "isolate",
+          "linear-gradient(168deg, #2f57c6 0%, #2f6ad6 27%, #3a55cc 52%, #5733bd 80%, #6a3fd0 100%)",
       }}
     >
-      {/* Glow + optional flare slot, rendered first so text paints on top. */}
-      {children}
-
+      {/* Diagonal hatch — the Figma CleanSight pattern (the diagonal-lines.png
+          tile), flipped to the design's "\" orientation (the source rotates the
+          tile 90deg). Same tile + scale the enclosure uses, so the whole factory
+          reads as one texture family. */}
       <div
-        className="relative flex flex-row items-center"
-        style={{ width: CQW(464), height: CQW(136.72), zIndex: 1 }}
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage: "url(/images/cleanstart-factory/diagonal-lines.png)",
+          backgroundRepeat: "repeat",
+          backgroundSize: `${FQW(14 * 1.6233)} ${FQW(14 * 1.6233)}`,
+          transform: "scaleX(-1)",
+          opacity: 0.6,
+          mixBlendMode: "luminosity",
+        }}
+      />
+
+      {/* Edge glows — the same flare.webp bloom used at the base of the 4 cards,
+          rotated 90deg into a horizontal edge glow and pinned to this card's top
+          and bottom edges. Screen-blended so it reads as light over the hatch. */}
+      <Image
+        src="/images/cleanstart-factory/flare.webp"
+        alt=""
+        aria-hidden
+        width={267}
+        height={358}
+        sizes="160px"
+        className="pointer-events-none absolute left-1/2 top-0 select-none"
+        style={{
+          width: FQW(150),
+          height: "auto",
+          transform: "translate(-50%, -50%) rotate(90deg)",
+          mixBlendMode: "screen",
+          filter: "saturate(1.35) brightness(1.4)",
+        }}
+      />
+      <Image
+        src="/images/cleanstart-factory/flare.webp"
+        alt=""
+        aria-hidden
+        width={267}
+        height={358}
+        sizes="160px"
+        className="pointer-events-none absolute bottom-0 left-1/2 select-none"
+        style={{
+          width: FQW(150),
+          height: "auto",
+          transform: "translate(-50%, 50%) rotate(90deg)",
+          mixBlendMode: "screen",
+          filter: "saturate(1.35) brightness(1.4)",
+        }}
+      />
+
+      {/* Wordmark — vertically and horizontally centered. */}
+      <span
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap font-display text-white"
+        style={{
+          fontSize: FQW(28),
+          fontWeight: 600,
+          lineHeight: 1,
+          letterSpacing: "-0.04em",
+        }}
       >
-        <div
-          className="flex flex-col items-start"
-          style={{ width: CQW(343), gap: CQW(18) }}
-        >
-          <div
-            className="flex w-full flex-col items-start"
-            style={{ gap: CQW(16) }}
-          >
-            <h3
-              className="font-display text-white"
-              style={{
-                width: CQW(343),
-                fontSize: CQW(36),
-                fontWeight: 500,
-                lineHeight: 1,
-                letterSpacing: "-0.05em",
-              }}
-            >
-              {title}
-            </h3>
-            <p
-              className="text-white"
-              style={{
-                width: side === "left" ? CQW(343) : CQW(300),
-                fontFamily: "var(--font-sora), Sora, sans-serif",
-                fontSize: CQW(16),
-                fontWeight: 400,
-                lineHeight: 1.1,
-                letterSpacing: "-0.04em",
-                opacity: 0.8,
-              }}
-            >
-              {desc}
-            </p>
-          </div>
-          <div
-            className="flex flex-row items-center"
-            style={{ height: CQW(30.72), gap: CQW(16) }}
-          >
-            {pills.map((p) => (
-              <FactoryPill key={p} label={p} />
-            ))}
-          </div>
-        </div>
+        CleanSight
+      </span>
+    </div>
+  );
+}
+
+// Thin glass bar under the cards: centered "CleanStart Platform" title over a
+// single row of static stage pills.
+function PlatformBar() {
+  return (
+    <div
+      className="relative flex flex-col items-center overflow-hidden"
+      style={{
+        borderRadius: FQW(18),
+        border: `${FQW(1)} solid #dab6f3`,
+        // Opaque (no alpha) so the card flares and the connecting flare painted
+        // behind it are fully occluded — only the glow in the gap above the bar
+        // shows, nothing bleeds through into the bar interior.
+        background:
+          "linear-gradient(180deg, #1c1455 0%, #321fa3 100%)",
+        padding: `${FQW(16)} ${FQW(24)}`,
+        gap: FQW(12),
+      }}
+    >
+      {/* Diagonal pattern, matching the enclosure. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage: "url(/images/cleanstart-factory/diagonal-lines.png)",
+          backgroundRepeat: "repeat",
+          backgroundSize: `${FQW(14 * 1.6233)} ${FQW(14 * 1.6233)}`,
+          mixBlendMode: "luminosity",
+          opacity: 0.6,
+        }}
+      />
+      <h3
+        className="relative font-display text-white"
+        style={{
+          fontSize: FQW(20),
+          fontWeight: 600,
+          lineHeight: 1,
+          letterSpacing: "-0.04em",
+        }}
+      >
+        CleanStart Platform
+      </h3>
+      <div
+        className="relative flex flex-row flex-wrap items-center justify-center"
+        style={{ gap: FQW(12) }}
+      >
+        {PLATFORM_PILLS.map((p) => (
+          <PlatformPill key={p} label={p} />
+        ))}
       </div>
     </div>
   );
 }
 
-function FactoryBottomBlock() {
+function FactoryEnclosure() {
   return (
     <div
       className="relative mx-auto"
       style={{
         width: "100%",
-        maxWidth: BB_W,
-        aspectRatio: `${BB_W} / ${BB_H}`,
+        maxWidth: 1200,
         containerType: "inline-size",
       }}
     >
-      {/* Rocket-exhaust flares rendered first so they paint behind the outer
-          card body, sized and pulled up so the bright shaft lands at the card's
-          bottom edge with the tapered halo visible below. */}
-      {[510, 590, 670, 750].map((cx) => (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          key={cx}
-          src="/images/cleanstart-factory/flare.webp"
-          alt=""
-          aria-hidden
-          className="pointer-events-none absolute -translate-x-1/2 select-none"
-          style={{
-            left: CQW(cx),
-            top: "100%",
-            width: CQW(320),
-            height: "auto",
-            // Empirically tuned: the bright core of flare.webp sits ~50% from
-            // the top, so this marginTop lands the bright crown at the card's
-            // bottom edge with the tapered exhaust trailing below.
-            marginTop: CQW(-180),
-            mixBlendMode: "screen",
-            filter: "saturate(1.3) brightness(1.2)",
-          }}
-        />
-      ))}
-
-      {/* Outer card body: factory-card-mask.svg bakes in the gradient fill,
-          lavender stroke, drop shadow, and radius.
-          The SVG uses `width="100%" height="100%"` with no fixed intrinsic
-          size, so the browser would default to a 2:1 natural aspect; an
-          explicit pixel height is required to force the correct viewBox aspect.
-          The SVG's card-body region is fixed at the reference 285px height, so
-          when BB_H is shrunk below 285 the rendered mask must scale down in
-          lockstep on the y-axis (the SVG is preserveAspectRatio="none"),
-          otherwise the chrome paints past the block's bottom edge. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/images/cleanstart-factory/factory-card-mask.svg"
-        alt=""
-        aria-hidden
-        className="pointer-events-none absolute select-none"
-        style={{
-          left: CQW(-190),
-          top: CQW(-21 * (BB_H / 285)),
-          width: CQW(1478),
-          height: CQW(430 * (BB_H / 285)),
-          maxWidth: "none",
-        }}
-      />
-
-      {/* Content layer clipped to the inner rounded rect so the diagonal
-          pattern and the panel glows that overflow each panel stay inside the
-          card silhouette. The outer card SVG above paints the visible chrome. */}
       <div
-        className="absolute inset-0"
+        className="relative overflow-hidden"
         style={{
-          borderRadius: CQW(24),
-          overflow: "hidden",
+          borderRadius: FQW(28),
+          padding: FQW(30),
+          background:
+            "linear-gradient(180deg, #151021 0%, #131E8F 71.2%, #551ECE 100%)",
+          border: `${FQW(1.5)} solid #dab6f3`,
+          boxShadow:
+            "-8px 4px 20px rgba(0,0,0,0.23), -33px 16px 37px rgba(0,0,0,0.2), -74px 37px 49px rgba(0,0,0,0.12), -131px 65px 59px rgba(0,0,0,0.03)",
         }}
       >
-        {/* Diagonal lines pattern. */}
+        {/* Diagonal pattern across the whole enclosure (matches the cards). */}
         <div
           aria-hidden
-          className="pointer-events-none absolute"
+          className="pointer-events-none absolute inset-0"
           style={{
-            left: CQW(3),
-            top: CQW(2),
-            width: CQW(1271),
-            // Leaves a 2px gap at the top and bottom of the block, expressed
-            // relative to BB_H so it scales automatically when BB_H changes.
-            height: `${((BB_H - 4) / BB_H) * 100}%`,
-            borderRadius: CQW(20),
             backgroundImage:
               "url(/images/cleanstart-factory/diagonal-lines.png)",
             backgroundRepeat: "repeat",
-            backgroundSize: `${CQW(14 * 1.6233)} ${CQW(14 * 1.6233)}`,
+            backgroundSize: `${FQW(14 * 1.6233)} ${FQW(14 * 1.6233)}`,
             mixBlendMode: "luminosity",
           }}
         />
 
-        <FactoryPanel
-          side="right"
-          title="CleanCompile Factory"
-          desc="Hermetic, deterministic builds. Only what you specify."
-          pills={["Spec", "Build", "Attest", "Handoff"]}
-        >
-          {/* Pre-rendered orb glow SVG, rotated 180deg. The inner inset offsets
-              the blur-expanded SVG canvas back to its visual bounds. */}
-          <div
+        <div className="relative flex items-stretch" style={{ gap: FQW(40) }}>
+          {/* Connecting flare bridging the CleanSight card and the platform bar.
+              Painted FIRST so the opaque rail (left) and opaque platform bar
+              (right) occlude its sides — only the slice in the gap between them
+              shows, with no bleed into either element. */}
+          <Image
+            src="/images/cleanstart-factory/flare.webp"
+            alt=""
             aria-hidden
-            className="pointer-events-none absolute"
+            width={267}
+            height={358}
+            sizes="160px"
+            className="pointer-events-none absolute select-none"
             style={{
-              left: CQW(447),
-              top: CQW(40),
-              width: CQW(357.324),
-              height: CQW(312.198),
-              transform: "rotate(180deg)",
-              zIndex: 0,
+              left: FQW(230),
+              bottom: FQW(47),
+              width: FQW(120),
+              height: "auto",
+              transform: "translate(-50%, 50%) rotate(90deg)",
+              mixBlendMode: "screen",
+              filter: "saturate(1.35) brightness(1.4)",
             }}
-          >
-            <div
-              className="absolute"
-              style={{
-                inset: "-46.12% -40.3%",
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/cleanstart-factory/factory-glow-right.svg"
-                alt=""
-                aria-hidden
-                className="block size-full select-none"
-                style={{ maxWidth: "none" }}
-              />
-            </div>
-          </div>
-        </FactoryPanel>
+          />
 
-        {/* Left wrapper hosting, in paint order: the arrow, the left panel
-            (which covers the arrow's left half), and the small accent. The
-            arrow + accent live inside this wrapper with wrapper-local offsets
-            so they move as one rigid unit and the accent-on-arrow-tail
-            alignment is preserved. The arrow tail merges into the left panel
-            and the tip stops just short of the right panel. */}
-        <div
-          className="absolute"
-          style={{
-            left: CQW(28),
-            top: CQW(28),
-            width: CQW(666),
-            height: CQW(184.717),
-          }}
-        >
-          {/* Arrow (factory-arrow.svg) bridging the gap between the two panels.
-              Width and height are scaled together to preserve the arrow path's
-              aspect, which keeps the inner inset calibration below valid. It is
-              vertically centered in the wrapper and pulled left so the rounded
-              tail merges into the left panel while the tip stops short of the
-              right panel. */}
+          <CleanSightRail />
+
+          {/* Right column: 4 cards on top, platform bar below. The cards' own
+              base flares rise into the gap above the bar (the bar paints over
+              the rest), giving the connected-glint look from the design. */}
           <div
-            aria-hidden
-            className="pointer-events-none absolute"
-            style={{
-              left: CQW(512 - 8),
-              top: CQW(47.47),
-              width: CQW(196),
-              height: CQW(89.78),
-            }}
+            className="flex min-w-0 flex-1 flex-col"
+            style={{ gap: FQW(22) }}
           >
             <div
-              className="absolute"
+              className="grid"
               style={{
-                inset: "-29.77% -5.54% -175.79% -123.38%",
+                gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+                columnGap: FQW(24),
               }}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/cleanstart-factory/factory-arrow.svg"
-                alt=""
-                aria-hidden
-                className="block size-full select-none"
-                style={{ maxWidth: "none" }}
-              />
-            </div>
-          </div>
-
-          <FactoryPanel
-            side="left"
-            title="AI Logic Engine"
-            desc="Multi-agent orchestration that plans, analyzes, and optimizes every build."
-            pills={["Plan", "Analyze", "Orchestrate"]}
-          >
-            {/* Left-panel orb glow SVG (not rotated). Same inset technique as
-                the right panel. */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute"
-              style={{
-                left: CQW(395),
-                top: CQW(10),
-                width: CQW(357.324),
-                height: CQW(312.198),
-                zIndex: 0,
-              }}
-            >
-              <div
-                className="absolute"
-                style={{
-                  inset: "-46.12% -40.3%",
-                }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/cleanstart-factory/factory-glow-left.svg"
-                  alt=""
-                  aria-hidden
-                  className="block size-full select-none"
-                  style={{ maxWidth: "none" }}
-                />
-              </div>
+              {CARDS.map((c, i) => (
+                <FactoryCard key={c.title} data={c} isFirst={i === 0} />
+              ))}
             </div>
 
-          </FactoryPanel>
-
-          {/* Small dark-blue blurred accent path. The inner inset positions the
-              blur-expanded SVG canvas within its container. */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute"
-            style={{
-              left: CQW(497),
-              top: CQW(55),
-              width: CQW(27),
-              height: CQW(65.5),
-            }}
-          >
-            <div
-              className="absolute"
-              style={{
-                inset: "-6.11% -14.81% -6.11% 9.96%",
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/cleanstart-factory/factory-accent.svg"
-                alt=""
-                aria-hidden
-                className="block size-full select-none"
-                style={{ maxWidth: "none" }}
-              />
-            </div>
+            <PlatformBar />
           </div>
         </div>
       </div>
-
     </div>
   );
 }
 
-export function CleanStartFactory() {
+export function PlatformPipeline() {
   // Background is inherited from the parent `bg-cs-hero` wrapper in page.tsx so
   // the Hero and Factory sections share one continuous backdrop.
   //
-  // The cards row, bottom block, fonts, and inter-section spacing are all
-  // compressed so the whole factory fits inside a single 1440x900 laptop
-  // viewport without scrolling. Card/block caps shrink only the rendered scale
-  // (the CQW reference widths are unchanged), so interior layout is unaffected.
+  // Desktop (md+) renders the new enclosed layout: a single container holding
+  // the full-height CleanSight rail, the 4 cards, and the CleanStart Platform
+  // pill bar. Mobile keeps the existing stacked factory as a fallback.
   return (
     <Section padding="none" className="relative overflow-hidden">
       <Container>
@@ -1164,52 +1060,24 @@ export function CleanStartFactory() {
                 letterSpacing: "-0.04em",
               }}
             >
-              The CleanStart Factory
+              Build for trusted software delivery
             </h2>
           </Reveal>
 
-          {/* Tablet + desktop: 4 cards locked in a single horizontal row,
-              md through xl. The `minmax(0, 1fr)` columns may shrink below their
-              content's intrinsic min-width rather than forcing the row to
-              overflow, and the gap is fluid. The row is intentionally narrower
-              than the bottom block below it (a "5 -> 4 -> 2" funnel). All
-              interior dimensions use cqw so the card contents shrink together
-              with the column width; the row never wraps or overflows. */}
-          <div
-            className="relative mx-auto mt-[32px] hidden md:grid"
-            style={{
-              gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-              columnGap: "clamp(8px, 2.2vw, 28px)",
-              maxWidth: 884,
-            }}
-          >
-            {CARDS.map((c, i) => (
-              <FactoryCard key={c.title} data={c} isFirst={i === 0} />
-            ))}
+          {/* Desktop + tablet (md+): the enclosed factory container. */}
+          <div className="mt-[40px] hidden md:block">
+            <FactoryEnclosure />
           </div>
 
-          {/* Mobile: horizontal cards stacked vertically, shown below md. */}
-          <div className="mt-[64px] md:hidden">
-            <CleanStartFactoryMobile />
-          </div>
-
-          {/* Bottom factory block. Sized in cqw via its own container query so
-              every interior layer scales as one with the block width. The width
-              cap matches the cards row above; the BB_W reference is unchanged,
-              so interior positions stay fixed and only the rendered scale
-              shrinks. */}
-          <div
-            className="mx-auto mt-[32px] hidden md:block"
-            style={{ width: "100%", maxWidth: 1112 }}
-          >
-            <FactoryBottomBlock />
+          {/* Mobile: existing stacked factory fallback, shown below md. */}
+          <div className="mt-[40px] md:hidden">
+            <PlatformPipelineMobile />
           </div>
 
           {/* Reserves room for the rocket-exhaust flares that extend below the
-              block, sized to show the bright cores plus most of the halo
-              without pushing the section past the 1440x900 viewport budget. */}
+              cards into the platform bar without pushing the section past the
+              1440x900 viewport budget. */}
           <div className="pb-[96px]" />
-
         </div>
       </Container>
     </Section>

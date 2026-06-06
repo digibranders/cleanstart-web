@@ -3,13 +3,13 @@ import dynamic from "next/dynamic";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { Header } from "@/components/nav/Header";
 import { Hero } from "@/components/sections/home/Hero";
-import { CleanStartFactory } from "@/components/sections/home/CleanStartFactory";
-import { HowCleanStartHelp } from "@/components/sections/home/HowCleanStartHelp";
+import { PlatformPipeline } from "@/components/sections/home/PlatformPipeline";
+import { AudienceTabs } from "@/components/sections/home/AudienceTabs";
 import { SecurityNotPatching } from "@/components/sections/home/SecurityNotPatching";
-// BuiltForTeams (~480L "use client" testimonial carousel) sits below the fold;
+// Testimonials (~480L "use client" testimonial carousel) sits below the fold;
 // code-split so it does not ship in the initial home-page client bundle.
-const BuiltForTeams = dynamic(() =>
-  import("@/components/sections/home/BuiltForTeams").then((m) => ({ default: m.BuiltForTeams })),
+const Testimonials = dynamic(() =>
+  import("@/components/sections/home/Testimonials").then((m) => ({ default: m.Testimonials })),
 );
 import { FrequentlyAskedQuestions } from "@/components/sections/home/FrequentlyAskedQuestions";
 import { ResourcesInsights } from "@/components/sections/home/ResourcesInsights";
@@ -101,7 +101,7 @@ export default function Home() {
           <div className="relative">
             <Hero />
             <FadeUp>
-              <CleanStartFactory />
+              <PlatformPipeline />
             </FadeUp>
           </div>
           {/* Bottom fade removed (2026-05) — the white-to-transparent
@@ -116,10 +116,10 @@ export default function Home() {
           <SecurityNotPatching />
         </FadeUp>
         <FadeUp>
-          <BuiltForTeams />
+          <Testimonials />
         </FadeUp>
         <FadeUp>
-          <HowCleanStartHelp />
+          <AudienceTabs />
         </FadeUp>
         <FadeUp>
           <CleanStartAdvantage />

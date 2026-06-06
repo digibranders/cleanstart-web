@@ -2,7 +2,7 @@ import {
   HomeTestimonialsInsiders,
   type HomeTestimonialsInsidersProps,
 } from "@/components/sections/_shared/HomeTestimonialsInsiders";
-import type { Testimonial } from "@/components/sections/home/BuiltForTeams";
+import type { Testimonial } from "@/components/sections/home/Testimonials";
 
 export const INSIDERS_TESTIMONIALS: Testimonial[] = [
   {

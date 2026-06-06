@@ -77,7 +77,7 @@ const TAB_CONTENT: Record<TabId, TabContent> = {
   },
 };
 
-export function HowCleanStartHelp() {
+export function AudienceTabs() {
   const [activeTab, setActiveTab] = useState<TabId>("developers");
   const content = TAB_CONTENT[activeTab];
 
