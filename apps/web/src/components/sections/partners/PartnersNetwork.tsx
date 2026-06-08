@@ -124,7 +124,7 @@ export function PartnersNetwork(): React.ReactElement {
                 letterSpacing: "-0.02em",
               }}
             >
-              Why Partner with{" "}
+              A Global Network of Trusted{" "}
               <span
                 style={{
                   background:
@@ -134,7 +134,7 @@ export function PartnersNetwork(): React.ReactElement {
                   backgroundClip: "text",
                 }}
               >
-                CleanStart
+                Innovators
               </span>
             </h2>
           </Reveal>
