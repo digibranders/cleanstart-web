@@ -76,6 +76,9 @@ jobs:
       - name: Typecheck
         run: pnpm --filter @cleanstart/web typecheck
 
+      - name: Test (unit)
+        run: pnpm --filter @cleanstart/web test
+
       - name: Build
         run: pnpm --filter @cleanstart/web build
 
