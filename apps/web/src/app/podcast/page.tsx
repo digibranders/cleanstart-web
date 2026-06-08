@@ -63,7 +63,9 @@ export default async function PodcastPage(): Promise<React.ReactElement> {
   const limit = page?.latestEpisodesLimit ?? 6;
 
   const [latestData, featured] = await Promise.all([
-    getPodcastEpisodes({ limit }).catch(() => ({
+    // Fetch one extra so dropping the featured hero below still leaves up to
+    // `limit` cards in the Latest Episodes grid.
+    getPodcastEpisodes({ limit: limit + 1 }).catch(() => ({
       docs: [],
       hasNextPage: false,
       hasPrevPage: false,
@@ -78,6 +80,14 @@ export default async function PodcastPage(): Promise<React.ReactElement> {
     page && isHydratedEpisode(page.featuredHeroEpisode)
       ? page.featuredHeroEpisode
       : (latestData.docs[0] ?? null);
+
+  // The featured hero (e.g. the channel Introduction) already plays in the hero
+  // above, so exclude it from the Latest Episodes grid to avoid a duplicate.
+  const latestEpisodes = (
+    featuredHero
+      ? latestData.docs.filter((ep) => ep.id !== featuredHero.id)
+      : latestData.docs
+  ).slice(0, limit);
 
   const ctaCards =
     page?.ctaCards && page.ctaCards.length > 0
@@ -100,7 +110,7 @@ export default async function PodcastPage(): Promise<React.ReactElement> {
         <FadeUp>
           <PodcastLatestEpisodes
             title={page?.latestEpisodesTitle ?? "Latest Episodes"}
-            episodes={latestData.docs}
+            episodes={latestEpisodes}
           />
         </FadeUp>
 
