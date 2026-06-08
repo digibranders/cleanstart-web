@@ -123,9 +123,9 @@ export function LatestBlogs({
           <h2
             className="font-display font-bold"
             style={{
-              fontSize: "var(--fs-h1)",
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              fontSize: "var(--fs-h2)",
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
               color: "#111",
               paddingTop: "var(--spacing-section-sm)",
               paddingBottom: "clamp(28px, 3.5vw, 56px)",

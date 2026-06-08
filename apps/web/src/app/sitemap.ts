@@ -91,7 +91,8 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: "/privacy-policy" },
   { path: "/resource-center" },
   { path: "/software-bill-materials" },
-  { path: "/software-composition-analysis" },
+  // `/software-composition-analysis` is intentionally de-listed — the page code
+  // is kept (reachable by direct URL) but excluded from sitemap and site nav.
   { path: "/teams" },
   { path: "/vulnerability-remediation" },
   { path: "/webinars" },

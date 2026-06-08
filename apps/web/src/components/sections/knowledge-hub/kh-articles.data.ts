@@ -577,9 +577,7 @@ export const GENERATED_ARTICLES: Record<string, Article> = {
       { type: "ol", items: ["Artifact Attestation on Action Runner Controller \u00b7 community \u00b7 Discussion #151472 - GitHub, accessed on January 23, 2026, https://github.com/orgs/community/discussions/151472"] },
       { type: "ol", items: ["SLSA, it's all about provenance attestation | by R\u00e9mi Rey - Medium, accessed on January 23, 2026, https://medium.com/@rrey94/slsa-its-all-about-provenance-attestation-09a83b7b9de7"] },
       { type: "ol", items: ["Cleanstart - Images repository, accessed on January 23, 2026, https://images.cleanstart.com/"] },
-      { type: "ol", items: ["Solution Document - Cleanstart, accessed on January 23, 2026, https://cdn.prod.website-files.com/688cb1df5bbf5068ddce4492/68d65d47051e1b0ca7a66228_Solution%20Document%20-%20Cleanstart.pdf"] },
-      { type: "ol", items: ["Enhance SCA - CleanStart, accessed on January 23, 2026, https://www.cleanstart.com/software-composition-analysis"] },
-      { type: "ol", items: ["OpenSSF Welcomes New Members and Presents Golden Egg Award, accessed on January 23, 2026, https://openssf.org/press-release/2025/06/26/openssf-welcomes-new-members-and-presents-golden-egg-award/"] },
+      { type: "ol", items: ["Solution Document - Cleanstart, accessed on January 23, 2026, https://cdn.prod.website-files.com/688cb1df5bbf5068ddce4492/68d65d47051e1b0ca7a66228_Solution%20Document%20-%20Cleanstart.pdf"] },      { type: "ol", items: ["OpenSSF Welcomes New Members and Presents Golden Egg Award, accessed on January 23, 2026, https://openssf.org/press-release/2025/06/26/openssf-welcomes-new-members-and-presents-golden-egg-award/"] },
     ],
   },
   "runtime-evidence": {
