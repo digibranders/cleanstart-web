@@ -115,64 +115,6 @@ export function ContactForm() {
             }}
           >
             <div className="overflow-hidden rounded-[13px] bg-white px-3 py-[18px] sm:px-3">
-              <div
-                className="relative overflow-hidden rounded-[19px] px-6 py-6 sm:px-[60px] sm:py-[26px]"
-                style={{
-                  backgroundColor: "#3A1FA3",
-                  backgroundImage:
-                    "url('/images/contact/form/header-bg.webp')",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                  minHeight: "123px",
-                }}
-              >
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute hidden sm:block"
-                  style={{
-                    right: "0px",
-                    top: "9px",
-                    width: "190px",
-                    height: "176px",
-                    mixBlendMode: "soft-light",
-                  }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/images/contact/form/cube-decor.svg"
-                    alt=""
-                    className="block h-full w-full"
-                  />
-                </div>
-
-                <div className="relative max-w-[452px]">
-                  <h2
-                    className="font-display font-semibold text-white"
-                    style={{
-                      fontSize: "var(--fs-h3)",
-                      lineHeight: 1.1,
-                      letterSpacing: "-0.5px",
-                    }}
-                  >
-                    Send us a message
-                  </h2>
-                  <p
-                    className="mt-3 text-white"
-                    style={{
-                      fontFamily: "var(--font-sans)",
-                      fontSize: "var(--fs-input)",
-                      fontWeight: 400,
-                      lineHeight: 1.5,
-                      letterSpacing: "-0.5px",
-                    }}
-                  >
-                    Fill in the form and our team will be in touch within 24
-                    hours.
-                  </p>
-                </div>
-              </div>
-
               <form
                 onSubmit={onSubmit}
                 className="px-3 pt-6 pb-3 sm:px-[24px] sm:pt-[30px] sm:pb-[18px]"
