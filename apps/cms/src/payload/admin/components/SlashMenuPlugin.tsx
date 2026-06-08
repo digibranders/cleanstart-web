@@ -96,6 +96,13 @@ const ICON = {
       <path {...stroke} d="M6 5L3 8l3 3M10 5l3 3-3 3" />
     </svg>
   ),
+  cta: (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <rect x="1.5" y="3.5" width="13" height="9" rx="1.5" {...stroke} />
+      <path {...stroke} d="M4 7h5" />
+      <rect x="9.5" y="9" width="4" height="2" rx="1" fill="currentColor" />
+    </svg>
+  ),
 } as const;
 
 const ITEMS: ReadonlyArray<SlashItem> = [
@@ -181,6 +188,21 @@ const ITEMS: ReadonlyArray<SlashItem> = [
         language: 'bash',
         content: '',
         showLineNumbers: true,
+      }),
+  },
+  {
+    id: 'cta',
+    label: 'CTA card',
+    icon: ICON.cta,
+    keywords: ['cta', 'call to action', 'card', 'button', 'demo', 'walkthrough', 'banner'],
+    run: (editor) =>
+      editor.dispatchCommand(INSERT_BLOCK_COMMAND, {
+        blockName: '',
+        blockType: 'inlineCta',
+        heading: '',
+        buttonLabel: '',
+        buttonUrl: '',
+        variant: 'soft',
       }),
   },
 ];

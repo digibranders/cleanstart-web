@@ -57,21 +57,18 @@ export function NewsDetailRelated({
           </Link>
         </Reveal>
 
-        {/* Below sm, a scroll-snap row lets cards peek at the right edge to hint
-            scrollability; sm+ switches to a grid. */}
-        <div className="flex sm:hidden overflow-x-auto snap-x snap-mandatory gap-4 mt-[40px] pb-[40px] -mx-6 pl-10 pr-6 [scroll-padding-left:2.5rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {items.map((item) => (
-            <div key={item.id} className="snap-start shrink-0 w-[80%] min-w-[260px] max-w-[320px]">
-              <NewsroomCard item={item} />
-            </div>
-          ))}
-        </div>
+        {/* Single render across breakpoints — a scroll-snap carousel below sm
+            (cards peek at the right edge to hint scrollability), a stagger grid
+            at sm+ — so each card's heading appears once in the document outline.
+            The negative -mx-6 + pl-10 aligns the first card with the heading. */}
         <RevealStagger
-          className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 mt-[60px] pb-[40px]"
-          style={{ gap: "24px" }}
+          className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 overflow-x-auto sm:overflow-visible snap-x snap-mandatory sm:snap-none gap-4 sm:gap-6 mt-[40px] sm:mt-[60px] pb-[40px] -mx-6 sm:mx-0 pl-10 sm:pl-0 pr-6 sm:pr-0 [scroll-padding-left:2.5rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {items.map((item) => (
-            <RevealItem key={item.id}>
+            <RevealItem
+              key={item.id}
+              className="snap-start shrink-0 w-[80%] min-w-[260px] max-w-[320px] sm:w-auto sm:min-w-0 sm:max-w-none"
+            >
               <NewsroomCard item={item} />
             </RevealItem>
           ))}

@@ -97,7 +97,17 @@ export function GuideDetailContent({
 
 /* ─── Table of Contents ─────────────────────────────────────────────────── */
 
-const HEADER_OFFSET = 88; // fixed header height (72px) + 16px buffer
+// Fixed-header height varies by viewport (72px mobile, 108px desktop where the
+// utility strip shows). Read --cs-header-h (single source of truth) so TOC jumps
+// land just below the header instead of under it.
+function getHeaderOffset(): number {
+  if (typeof window === "undefined") return 88;
+  const raw = getComputedStyle(document.documentElement)
+    .getPropertyValue("--cs-header-h")
+    .trim();
+  const h = Number.parseInt(raw, 10);
+  return (Number.isFinite(h) ? h : 72) + 16;
+}
 
 type RenderedTocEntry = TocEntry & { level: number; text: string };
 
@@ -134,7 +144,7 @@ function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): Reac
       for (const entry of entries) {
         const el = findTargetEl(entry.slug);
         if (!el) continue;
-        if (el.getBoundingClientRect().top <= HEADER_OFFSET) current = entry.slug;
+        if (el.getBoundingClientRect().top <= getHeaderOffset()) current = entry.slug;
       }
       setActiveId(current);
     };
@@ -163,7 +173,7 @@ function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): Reac
         ).find((h) => slugifyText(h.textContent ?? "") === slug) ?? null;
     const target = byId ?? fallback;
     if (!target) return;
-    const top = target.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
+    const top = target.getBoundingClientRect().top + window.scrollY - getHeaderOffset();
     window.scrollTo({ top, behavior: "smooth" });
   };
 
@@ -260,7 +270,7 @@ function MobileTableOfContents({
         ).find((h) => slugifyText(h.textContent ?? "") === slug) ?? null;
     const target = byId ?? fallback;
     if (!target) return;
-    const top = target.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
+    const top = target.getBoundingClientRect().top + window.scrollY - getHeaderOffset();
     window.scrollTo({ top, behavior: "smooth" });
     setOpen(false);
   };

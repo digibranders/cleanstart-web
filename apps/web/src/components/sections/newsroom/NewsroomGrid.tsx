@@ -145,6 +145,9 @@ export function NewsroomGrid({
       />
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
+        {/* Section heading for the document outline — the hero <h1> is followed
+            by card <h3>s, so this fills the h2 level. Visually hidden. */}
+        <h2 className="sr-only">News articles</h2>
         {items.length === 0 ? (
           loadFailed ? (
             <EmptyState variant="load-failed" />

@@ -99,6 +99,10 @@ export default async function ResourceCenterPage({
                 paddingRight: "24px",
               }}
             >
+              {/* Section heading for the document outline — the hero <h1> is
+                  followed by the sidebar "Categories" <h3> and card <h3>s, so
+                  this fills the h2 level. Visually hidden. */}
+              <h2 className="sr-only">Resources</h2>
               <div className="flex flex-col lg:flex-row items-stretch lg:items-start gap-6 lg:gap-8">
                 <ResourceCenterSidebar
                   activeType={activeType}

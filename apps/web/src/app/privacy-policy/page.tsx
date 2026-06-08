@@ -25,7 +25,7 @@ export default function PrivacyPolicyPage() {
       />
       <Header />
       <main>
-        <LegalHero title="Privacy Policy" />
+        <LegalHero title="Privacy Policy" as="h1" />
         <FadeUp>
           <LegalProse>
             <p className="article-paragraph"><strong>Last Updated:</strong> 31-03-2026</p>

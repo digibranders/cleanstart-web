@@ -87,7 +87,7 @@ export function CaseStudiesHero(): React.ReactElement {
 
       <Container className="relative">
         <div
-          className="flex flex-col items-start gap-6 pt-[clamp(96px,11vw,168px)] pb-[clamp(56px,7vw,96px)]"
+          className="flex flex-col items-start gap-6 pt-[calc(clamp(96px,11vw,168px)+var(--cs-header-extra))] pb-[clamp(56px,7vw,96px)]"
           style={{ maxWidth: "640px" }}
         >
           <HeroReveal y={50} duration={1.0}>

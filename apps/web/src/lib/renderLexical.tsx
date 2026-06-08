@@ -2,6 +2,7 @@ import React from "react";
 import Image from "next/image";
 import type { LexicalNode, LexicalRoot, LexicalTableNode } from "@/lib/blog";
 import { CodeBlock } from "@/components/code/CodeBlock";
+import { InlineCtaCard } from "@/components/article/InlineCtaCard";
 
 type LexicalBlockNode = {
   type: "block";
@@ -19,6 +20,14 @@ type CodeBlockFields = {
   content?: string | null;
   showLineNumbers?: boolean | null;
   highlightLines?: string | null;
+};
+
+type InlineCtaFields = {
+  blockType: "inlineCta";
+  heading?: string | null;
+  buttonLabel?: string | null;
+  buttonUrl?: string | null;
+  variant?: "soft" | "solid" | null;
 };
 
 type LexicalCodeNodeWithLines = Extract<LexicalNode, { type: "code" }> & {
@@ -177,6 +186,18 @@ function renderNode(node: LexicalNode, key: string): React.ReactNode {
             lines={bNode._lines}
             showLineNumbers={cb.showLineNumbers}
             highlightLines={cb.highlightLines}
+          />
+        );
+      }
+      if (fields?.blockType === "inlineCta") {
+        const cta = fields as InlineCtaFields;
+        return (
+          <InlineCtaCard
+            key={key}
+            heading={cta.heading ?? ""}
+            buttonLabel={cta.buttonLabel ?? ""}
+            buttonUrl={cta.buttonUrl ?? "#"}
+            variant={cta.variant ?? "soft"}
           />
         );
       }

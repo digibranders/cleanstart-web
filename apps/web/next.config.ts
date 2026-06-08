@@ -41,6 +41,22 @@ const nextConfig: NextConfig = {
         destination: "/guide/:slug*",
         permanent: true,
       },
+      // Canonical detail routes are singular `/event/[slug]` and `/job/[slug]`
+      // (matching the indexed Webflow URLs). The redesign also shipped plural
+      // aliases that rendered the same content and self-canonicalled to
+      // themselves — duplicate content. 308 them to the primary so there is one
+      // indexable URL per event/job. Listing pages (`/events`, `/careers`)
+      // use a single segment match and are untouched.
+      {
+        source: "/events/:slug",
+        destination: "/event/:slug",
+        permanent: true,
+      },
+      {
+        source: "/careers/:slug",
+        destination: "/job/:slug",
+        permanent: true,
+      },
     ];
   },
   images: {

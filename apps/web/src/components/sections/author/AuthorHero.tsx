@@ -53,7 +53,7 @@ export function AuthorHero({ author }: AuthorHeroProps): React.ReactElement {
       />
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        <div className="flex flex-col items-center gap-6 pt-[calc(72px+env(safe-area-inset-top)+clamp(40px,6vw,80px))] pb-10 text-center">
+        <div className="flex flex-col items-center gap-6 pt-[calc(72px+env(safe-area-inset-top)+clamp(40px,6vw,80px)+var(--cs-header-extra))] pb-10 text-center">
           <div
             className="relative shrink-0"
             style={{

@@ -62,7 +62,7 @@ export function ASRHero(): React.ReactElement {
           className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-6 lg:gap-10"
           style={{
             // Match FipsHero top padding so the H1 baseline lines up across product heroes.
-            paddingTop: 'clamp(112px, 12.92vw, 200px)',
+            paddingTop: 'calc(clamp(112px, 12.92vw, 200px) + var(--cs-header-extra))',
             // Fixed bottom space below the cards/CTA at every viewport so the
             // gap doesn't shift with width.
             paddingBottom: '96px',

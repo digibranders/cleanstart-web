@@ -46,7 +46,7 @@ export function SCAHero(): React.ReactElement {
 
       <div
         className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 text-center lg:text-left"
-        style={{ paddingTop: "clamp(112px, 11vw, 160px)", paddingBottom: "clamp(56px, 7vw, 100px)" }}
+        style={{ paddingTop: "calc(clamp(112px, 11vw, 160px) + var(--cs-header-extra))", paddingBottom: "clamp(56px, 7vw, 100px)" }}
       >
         <HeroReveal y={50} duration={1.0}>
           <h1

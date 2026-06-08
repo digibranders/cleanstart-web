@@ -15,7 +15,7 @@ export function CleanSightHero(): React.ReactElement {
       <div
         className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10"
         style={{
-          paddingTop: "clamp(96px, 9.5vw, 138px)",
+          paddingTop: "calc(clamp(96px, 9.5vw, 138px) + var(--cs-header-extra))",
           paddingBottom: "0px",
           zIndex: 2,
         }}

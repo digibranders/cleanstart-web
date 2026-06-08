@@ -89,7 +89,7 @@ export function ContactHero() {
       </div>
 
       <Container className="relative">
-        <div className="mx-auto flex flex-col items-center gap-5 pt-[clamp(112px,9vw,128px)] pb-[200px] text-center">
+        <div className="mx-auto flex flex-col items-center gap-5 pt-[calc(clamp(112px,9vw,128px)+var(--cs-header-extra))] pb-[200px] text-center">
           <HeroReveal y={50} duration={1.0}>
             <h1
               className="text-white"

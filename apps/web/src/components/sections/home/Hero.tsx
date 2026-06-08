@@ -4,7 +4,7 @@ import { HeroReveal } from "@/components/ui/Reveal";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pt-[clamp(104px,9vw,128px)]">
+    <section className="relative overflow-hidden pt-[calc(clamp(104px,9vw,128px)+var(--cs-header-extra))]">
 
       <div className="mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div className="mx-auto flex max-w-[1201px] flex-col items-center gap-6 text-center sm:gap-8">

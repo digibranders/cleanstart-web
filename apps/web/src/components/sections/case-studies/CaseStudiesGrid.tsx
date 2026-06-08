@@ -27,6 +27,9 @@ export function CaseStudiesGrid({
   return (
     <Section padding="md" style={{ background: "#f6f6f6" }}>
       <Container>
+        {/* Section heading for the document outline — the hero <h1> is followed
+            by card <h3>s, so this fills the h2 level. Visually hidden. */}
+        <h2 className="sr-only">Case studies</h2>
         {caseStudies.length === 0 ? (
           loadFailed ? (
             <EmptyState variant="load-failed" />

@@ -71,7 +71,7 @@ export function UpcomingEventHero({
 
 <div
         className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10"
-        style={{ paddingTop: "clamp(96px, 11vw, 160px)", paddingBottom: "clamp(48px, 6vw, 80px)" }}
+        style={{ paddingTop: "calc(clamp(96px, 11vw, 160px) + var(--cs-header-extra))", paddingBottom: "clamp(48px, 6vw, 80px)" }}
       >
         <HeroReveal y={50} duration={1.0}>
           <h1

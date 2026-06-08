@@ -82,7 +82,7 @@ export function AboutHero() {
       </div>
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        <div className="pt-[clamp(112px,8vw,128px)] pb-[clamp(40px,5vw,80px)]">
+        <div className="pt-[calc(clamp(112px,8vw,128px)+var(--cs-header-extra))] pb-[clamp(40px,5vw,80px)]">
           <div className="flex flex-col items-center text-center lg:items-start lg:text-left gap-10 lg:max-w-[540px]">
             <div className="flex flex-col gap-5">
               <HeroReveal y={50} duration={1.0}>

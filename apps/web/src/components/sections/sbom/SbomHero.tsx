@@ -55,7 +55,7 @@ export function SbomHero(): React.ReactElement {
       <div
         className="relative mx-auto z-[2] flex w-full max-w-[var(--container-default)] flex-col items-center px-6 sm:px-10 text-center"
         style={{
-          paddingTop: "clamp(112px, 8vw, 128px)",
+          paddingTop: "calc(clamp(112px, 8vw, 128px) + var(--cs-header-extra))",
           paddingBottom: "clamp(40px, 5vw, 80px)",
         }}
       >

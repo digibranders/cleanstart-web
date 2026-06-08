@@ -200,9 +200,9 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
   );
 }
 
-// Mobile factory: 5 horizontal cards stacked vertically (icon-left layout),
-// then a portrait bottom block with AI Logic Engine on top and CleanCompile
-// Factory below, an arrow between them, and 4 rocket-exhaust flares below.
+// Mobile factory (Pipeline Tower): 4 icon-left product cards fed by a left
+// light-rail, then a full-width "CleanStart Platform" card, then a CleanSight
+// band — the same content as the desktop enclosure, stacked vertically.
 
 // Sized in container queries where cqw = 1% of card width.
 function FactoryMobileCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
@@ -327,132 +327,84 @@ function FactoryMobileCard({ data, isFirst }: { data: CardData; isFirst: boolean
   );
 }
 
-// Mobile bottom block, portrait orientation: AI Logic Engine panel on top,
-// downward arrow in the middle, CleanCompile Factory panel on bottom. Uses the
-// same gradient + diagonal pattern + lavender stroke as desktop, but the panels
-// stack vertically and the pills wrap to two rows. All values sized via
-// container queries; MB_W is the reference width.
-
-const MB_W = 328;
-const MB_H = 507;
-const MCQW = (px: number) => `${(px / MB_W) * 100}cqw`;
-
+// Non-interactive platform-stage capsule — the mobile twin of the desktop
+// PlatformPill, sized in cqw against the platform card it lives in. Rendered as
+// a <span> because the stages are labels, not controls.
 function MobileFactoryPill({ label }: { label: string }) {
   return (
-    <button
-      type="button"
-      className="group inline-flex shrink-0 cursor-pointer items-center justify-center text-white outline-none transition-opacity duration-150 hover:opacity-100 focus-visible:ring-2 focus-visible:ring-white/70"
+    <span
+      className="inline-flex shrink-0 items-center justify-center rounded-full text-white"
       style={{
         background:
           "radial-gradient(113.85% 132% at 15.93% 50%, #000000 19.71%, #1E5AFF 100%)",
-        boxShadow: `0 0 ${MCQW(4.78)} rgba(30, 90, 255, 0.34)`,
-        backdropFilter: `blur(${MCQW(2.71)})`,
-        WebkitBackdropFilter: `blur(${MCQW(2.71)})`,
-        border: `${MCQW(1.083)} solid #CDE4FF`,
-        borderRadius: MCQW(99),
-        padding: `${MCQW(4.48)} ${MCQW(13.45)}`,
-        height: MCQW(25.7),
+        boxShadow: "0 0 6px rgba(30, 90, 255, 0.34)",
+        border: "1px solid #CDE4FF",
+        padding: "0 13px",
+        height: "clamp(24px, 8.5cqw, 32px)",
         fontFamily: "var(--font-manrope), Manrope, sans-serif",
-        fontSize: MCQW(15),
+        fontSize: "clamp(13px, 4.57cqw, 16px)",
         fontWeight: 400,
-        lineHeight: 1.1,
+        lineHeight: 1,
         letterSpacing: "-0.04em",
-        opacity: 0.85,
+        opacity: 0.9,
       }}
     >
       {label}
-    </button>
+    </span>
   );
 }
 
-function MobileFactoryPanel({
-  top,
-  title,
-  desc,
-  pills,
-  glowVariant,
-}: {
-  /** y-offset within the bottom block's reference frame. */
-  top: number;
-  title: string;
-  desc: string;
-  pills: string[];
-  glowVariant: "left" | "right";
-}) {
+// CleanStart Platform card — the single consolidated bar from the desktop
+// enclosure, ported to mobile as a full-width card. Its own container-query
+// root so the title and the 7 stage pills scale with the card width and wrap
+// across rows. The opaque gradient lets it occlude the connector flare that
+// bleeds up from the cards column above.
+function MobilePlatformCard() {
   return (
     <div
-      className="absolute flex flex-col overflow-hidden"
+      className="relative w-full overflow-hidden"
       style={{
-        left: MCQW(10),
-        top: MCQW(top),
-        width: MCQW(308),
-        padding: MCQW(24),
-        gap: MCQW(10),
-        background:
-          "linear-gradient(90deg, rgba(217, 217, 217, 0.25) 0%, rgba(50, 50, 50, 0) 100%)",
-        backdropFilter: `blur(${MCQW(0.805)})`,
-        WebkitBackdropFilter: `blur(${MCQW(0.805)})`,
-        borderRadius: MCQW(24),
-        border: `${MCQW(1)} solid #dab6f3`,
-        isolation: "isolate",
+        containerType: "inline-size",
+        borderRadius: 18,
+        border: "1px solid #dab6f3",
+        background: "linear-gradient(180deg, #1c1455 0%, #321fa3 100%)",
+        boxShadow:
+          "-8px 4px 20px rgba(0,0,0,0.23), -33px 16px 37px rgba(0,0,0,0.2)",
       }}
     >
-      {/* Orb glow halo — pre-rendered SVG, positioned to bleed out one side. */}
+      {/* Diagonal pattern, matching the desktop platform bar + enclosure. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute"
+        className="pointer-events-none absolute inset-0"
         style={{
-          left: MCQW(120),
-          top: MCQW(20),
-          width: MCQW(220),
-          height: MCQW(170),
-          zIndex: 0,
+          backgroundImage: "url(/images/cleanstart-factory/diagonal-lines.png)",
+          backgroundRepeat: "repeat",
+          backgroundSize: "22px 22px",
+          mixBlendMode: "luminosity",
+          opacity: 0.6,
         }}
-      >
-        <div className="absolute" style={{ inset: "-46.12% -40.3%" }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={`/images/cleanstart-factory/factory-glow-${glowVariant}.svg`}
-            alt=""
-            aria-hidden
-            className="block size-full select-none"
-            style={{ maxWidth: "none" }}
-          />
-        </div>
-      </div>
+      />
 
-      <div className="relative flex flex-col" style={{ gap: MCQW(18), zIndex: 1 }}>
-        <div className="flex flex-col" style={{ gap: MCQW(8) }}>
-          <h3
-            className="font-display text-white"
-            style={{
-              fontSize: MCQW(20),
-              fontWeight: 500,
-              lineHeight: 1,
-              letterSpacing: "-0.04em",
-            }}
-          >
-            {title}
-          </h3>
-          <p
-            className="text-white"
-            style={{
-              fontFamily: "var(--font-sora), Sora, sans-serif",
-              fontSize: MCQW(13),
-              fontWeight: 400,
-              lineHeight: 1.25,
-              letterSpacing: "-0.04em",
-              opacity: 0.8,
-            }}
-          >
-            {desc}
-          </p>
-        </div>
-        <div
-          className="flex flex-row flex-wrap items-center"
-          style={{ gap: MCQW(13) }}
+      <div
+        className="relative flex flex-col items-center"
+        style={{ padding: "20px 18px", gap: 14 }}
+      >
+        <h3
+          className="text-center font-display text-white"
+          style={{
+            fontSize: "clamp(17px, 5.6cqw, 20px)",
+            fontWeight: 600,
+            lineHeight: 1,
+            letterSpacing: "-0.04em",
+          }}
         >
-          {pills.map((p) => (
+          CleanStart Platform
+        </h3>
+        <div
+          className="flex flex-row flex-wrap items-center justify-center"
+          style={{ gap: 10 }}
+        >
+          {PLATFORM_PILLS.map((p) => (
             <MobileFactoryPill key={p} label={p} />
           ))}
         </div>
@@ -461,171 +413,76 @@ function MobileFactoryPanel({
   );
 }
 
-function FactoryMobileBottomBlock() {
+// CleanSight band — the desktop CleanSight rail rotated into a landscape card.
+// Same iridescent gradient and flipped "\" diagonal hatch as the rail, with the
+// wordmark + a supporting tagline centered. Its own container-query root so the
+// type scales with the card width. The card carries no flares of its own —
+// flares live only in the gaps between cards (see PlatformPipelineMobile).
+function MobileCleanSightCard() {
   return (
     <div
-      className="relative mx-auto"
+      className="relative w-full overflow-hidden"
       style={{
-        width: "100%",
-        // Grows in lockstep with the cards wrapper (preserving the original
-        // cards-to-bottom-block ratio) so the block's slight visual inset from
-        // the cards-column edges is unchanged. MB_W stays the reference width
-        // that all MCQW() interior positions are computed against; those
-        // percentages auto-scale to whatever width the container lands at.
-        maxWidth: 437,
-        aspectRatio: `${MB_W} / ${MB_H}`,
         containerType: "inline-size",
+        borderRadius: 20,
+        border: "1px solid rgba(218, 182, 243, 0.55)",
+        background:
+          "linear-gradient(110deg, #2f57c6 0%, #2f6ad6 27%, #3a55cc 52%, #5733bd 80%, #6a3fd0 100%)",
+        boxShadow:
+          "-8px 4px 20px rgba(0,0,0,0.23), -33px 16px 37px rgba(0,0,0,0.2)",
       }}
     >
+      {/* Diagonal hatch — flipped to the "\" orientation, matching the desktop
+          CleanSight rail. */}
       <div
-        className="absolute inset-0 overflow-hidden"
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
         style={{
-          borderRadius: MCQW(24),
-          background:
-            "linear-gradient(180deg, #151021 0%, #131E8F 71.2%, #551ECE 100%)",
-          border: `${MCQW(2)} solid #dab6f3`,
-          boxShadow:
-            "-8px 4px 20px rgba(0,0,0,0.23), -33px 16px 37px rgba(0,0,0,0.2), -74px 37px 49px rgba(0,0,0,0.12), -131px 65px 59px rgba(0,0,0,0.03)",
+          backgroundImage: "url(/images/cleanstart-factory/diagonal-lines.png)",
+          backgroundRepeat: "repeat",
+          backgroundSize: "22px 22px",
+          transform: "scaleX(-1)",
+          opacity: 0.55,
+          mixBlendMode: "luminosity",
         }}
+      />
+
+      {/* Wordmark + tagline, centered. */}
+      <div
+        className="relative flex flex-col items-center text-center"
+        style={{ padding: "30px 24px", gap: 8 }}
       >
-        {/* Diagonal pattern. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute"
+        <span
+          className="font-display text-white"
           style={{
-            left: MCQW(2),
-            top: MCQW(2),
-            width: MCQW(324),
-            height: `${(503 / MB_H) * 100}%`,
-            borderRadius: MCQW(20),
-            backgroundImage:
-              "url(/images/cleanstart-factory/diagonal-lines.png)",
-            backgroundRepeat: "repeat",
-            backgroundSize: `${MCQW(14 * 1.6233)} ${MCQW(14 * 1.6233)}`,
-            mixBlendMode: "luminosity",
-          }}
-        />
-
-        {/* Mobile arrow — the desktop factory-arrow.svg rotated 90deg. The
-            tail is pulled up to overlap the engine card's bottom edge so its
-            fade-out gradient blends into the card instead of butting against
-            it. `zIndex: 2` lifts the arrow above both panels so that tail
-            gradient paints over the engine card — without it the panel would
-            clip the gradient and reintroduce a hard seam. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute"
-          style={{
-            left: MCQW(118),
-            top: MCQW(224),
-            width: MCQW(92),
-            height: MCQW(42.14),
-            transform: "rotate(90deg)",
-            transformOrigin: "center",
-            zIndex: 2,
+            fontSize: "clamp(24px, 8cqw, 30px)",
+            fontWeight: 600,
+            lineHeight: 1,
+            letterSpacing: "-0.04em",
           }}
         >
-          <div
-            className="absolute"
-            style={{
-              inset: "-29.77% -5.54% -175.79% -123.38%",
-            }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/cleanstart-factory/factory-arrow.svg"
-              alt=""
-              aria-hidden
-              className="block size-full select-none"
-              style={{ maxWidth: "none" }}
-            />
-          </div>
-        </div>
-
-        {/* Mobile arrow accent — small dark blurred crescent at the arrow's
-            tail that adds a depth highlight at the back of the rotated shaft.
-            Same `zIndex: 2` as the main arrow so the accent's tail blur sits
-            over the engine card edge instead of being clipped. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute"
+          CleanSight
+        </span>
+        <p
+          className="text-white/80"
           style={{
-            left: MCQW(156),
-            top: MCQW(178),
-            width: MCQW(20),
-            height: MCQW(48.519),
-            transform: "rotate(90deg)",
-            transformOrigin: "center",
-            zIndex: 2,
+            fontFamily: "var(--font-sora), Sora, sans-serif",
+            fontSize: "clamp(12px, 3.9cqw, 14px)",
+            lineHeight: 1.35,
+            letterSpacing: "-0.04em",
+            maxWidth: 280,
           }}
         >
-          <div
-            className="absolute"
-            style={{
-              inset: "-6.11% -14.81% -6.11% 9.96%",
-            }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/cleanstart-factory/factory-arrow-mobile-accent.svg"
-              alt=""
-              aria-hidden
-              className="block size-full select-none"
-              style={{ maxWidth: "none" }}
-            />
-          </div>
-        </div>
-
-        {/* AI Logic Engine panel — top half. Rendered after the arrow + accent
-            so it paints over their upper edges for a smooth blended attachment. */}
-        <MobileFactoryPanel
-          top={10}
-          title="AI Logic Engine"
-          desc="Multi-agent orchestration that plans, analyzes, and optimizes every build."
-          pills={["Plan", "Analyze", "Orchestrate"]}
-          glowVariant="left"
-        />
-
-
-        {/* CleanCompile Factory panel — pushed down so the block has visually
-            equal top/bottom card insets. */}
-        <MobileFactoryPanel
-          top={304}
-          title="CleanCompile Factory"
-          desc="Hermetic, deterministic builds. Only what you specify."
-          pills={["Spec", "Build", "Attest", "Handoff"]}
-          glowVariant="right"
-        />
+          Continuous visibility across every image and cluster.
+        </p>
       </div>
-
-      {/* Rocket-exhaust flares emerging from the bottom edge. Rendered as a
-          sibling of the inset content so they are not clipped. */}
-      {[110, 160, 210, 260].map((cx) => (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          key={cx}
-          src="/images/cleanstart-factory/flare.webp"
-          alt=""
-          aria-hidden
-          className="pointer-events-none absolute -translate-x-1/2 select-none"
-          style={{
-            left: MCQW(cx),
-            top: "100%",
-            width: MCQW(120),
-            height: "auto",
-            marginTop: MCQW(-65),
-            mixBlendMode: "screen",
-            filter: "saturate(1.3) brightness(1.2)",
-            zIndex: -1,
-          }}
-        />
-      ))}
     </div>
   );
 }
 
 // Mobile root: left rail (vertical line + horizontal flares entering each card
-// from the left) + cards column + connector flares + bottom block.
+// from the left) + cards column + connector flares, then the CleanStart
+// Platform card and the CleanSight band, bridged by connector flares.
 function PlatformPipelineMobile() {
   const RAIL_WIDTH = 56;
   const CARDS_GAP = 16;
@@ -653,17 +510,22 @@ function PlatformPipelineMobile() {
         className="relative flex flex-col"
         style={{ gap: CARDS_GAP, paddingLeft: RAIL_WIDTH }}
       >
-        {/* Vertical light line spanning from the first flare center to the last
-            flare center, passing through the center of each horizontal flare. */}
+        {/* Vertical light line: starts at the first card's center, runs down the
+            left rail through every card, then extends past the cards column into
+            the platform card below. The opaque platform card (a later sibling)
+            paints over the tail, so the rail reads as plugging straight into it
+            — replacing the old floating connector flares. */}
         <div
           aria-hidden
           className="pointer-events-none absolute"
           style={{
             left: `${LINE_X}px`,
-            // Offset from container top/bottom = half a card's height, so the
-            // line starts at the first card's center and ends at the last's.
+            // Top offset = half a card's height, so the line starts at the first
+            // card's center. The bottom extends 60px below the cards column —
+            // past the 44px gap and a little under the platform card's top edge
+            // — so the solid portion connects into the card before being clipped.
             top: "calc((100% / 4 - 16px * 3 / 4) / 2)",
-            bottom: "calc((100% / 4 - 16px * 3 / 4) / 2)",
+            bottom: -60,
             width: 2,
             transform: "translateX(-50%)",
             background:
@@ -673,45 +535,6 @@ function PlatformPipelineMobile() {
             mixBlendMode: "screen",
           }}
         />
-
-        {/* Center flares rendered before the cards in DOM so the cards paint
-            over any overlapping portion. Their vertical center lands at the
-            midpoint of the gap below the cards column; the bottom block (next
-            sibling) paints after and hides the part extending into its area. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute"
-          style={{
-            top: "calc(100% - 71px)",
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: 200,
-            height: 182,
-          }}
-        >
-          {[
-            { offset: -26 },
-            { offset: 26 },
-          ].map((p) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={p.offset}
-              src="/images/cleanstart-factory/flare.webp"
-              alt=""
-              aria-hidden
-              className="pointer-events-none absolute select-none"
-              style={{
-                top: 0,
-                left: "50%",
-                transform: `translateX(calc(-50% + ${p.offset}px))`,
-                width: 136,
-                height: 182,
-                mixBlendMode: "screen",
-                filter: "saturate(1.3) brightness(1.2)",
-              }}
-            />
-          ))}
-        </div>
 
         {CARDS.map((c, i) => (
           <div key={c.title} className="relative">
@@ -742,10 +565,61 @@ function PlatformPipelineMobile() {
         ))}
       </div>
 
-      {/* Gap spacer between the cards column and the bottom block. */}
-      <div aria-hidden style={{ height: 40 }} />
+      {/* Gap between the cards column and the platform card. The cards-column
+          connector flares (above) bleed down into here; the opaque platform
+          card paints over the lower portion. */}
+      <div aria-hidden style={{ height: 44 }} />
 
-      <FactoryMobileBottomBlock />
+      {/* CleanStart Platform + the connector flares feeding the CleanSight band.
+          The flares are rendered BEFORE the card and pinned to the gap below it
+          (top: 100% - 71px), so the opaque platform card paints over their upper
+          half (no bleed into the card) and the CleanSight band (next sibling)
+          paints over their lower half — only the gap slice glows. Geometrically
+          identical to the cards → platform connector above. */}
+      <div className="relative">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute"
+          style={{
+            top: "calc(100% - 71px)",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: 200,
+            height: 182,
+          }}
+        >
+          {[-26, 26].map((offset) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={offset}
+              src="/images/cleanstart-factory/flare.webp"
+              alt=""
+              aria-hidden
+              loading="lazy"
+              decoding="async"
+              className="pointer-events-none absolute select-none"
+              style={{
+                top: 0,
+                left: "50%",
+                transform: `translateX(calc(-50% + ${offset}px))`,
+                width: 136,
+                height: 182,
+                mixBlendMode: "screen",
+                filter: "saturate(1.3) brightness(1.2)",
+              }}
+            />
+          ))}
+        </div>
+
+        <MobilePlatformCard />
+      </div>
+
+      {/* Gap between the platform card and the CleanSight band — mirrors the
+          cards → platform gap so both connectors read identically. */}
+      <div aria-hidden style={{ height: 44 }} />
+
+      {/* CleanSight band — the desktop rail rotated into a landscape card. */}
+      <MobileCleanSightCard />
     </div>
   );
 }

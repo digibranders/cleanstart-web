@@ -92,4 +92,29 @@ describe('htmlToLexical', () => {
     const out = htmlToLexical(html);
     expect(out.root.children.map((c) => c.type)).toEqual(['paragraph', 'heading', 'list']);
   });
+
+  it('promotes a Webflow .artcileCtaBox into an inlineCta block', () => {
+    const html =
+      '<p>Body before.</p>' +
+      "<div data-rt-embed-type='true'><div class=\"artcileCtaBox\">" +
+      '<h3>Need to see how this looks in practice?<a href="https://www.cleanstart.com/book-a-demo">Book a quick walkthrough</a></h3>' +
+      '</div></div><p>Body after.</p>';
+    const out = htmlToLexical(html);
+    expect(out.root.children.map((c) => c.type)).toEqual(['paragraph', 'block', 'paragraph']);
+    const block = out.root.children[1];
+    if (block?.type !== 'block') throw new Error('not block');
+    expect(block.fields).toMatchObject({
+      blockType: 'inlineCta',
+      heading: 'Need to see how this looks in practice?',
+      buttonLabel: 'Book a quick walkthrough',
+      buttonUrl: 'https://www.cleanstart.com/book-a-demo',
+      variant: 'soft',
+    });
+  });
+
+  it('leaves a non-CTA div heading-with-link as a plain heading', () => {
+    const html = '<div><h3>Read the <a href="/docs">documentation</a></h3></div>';
+    const out = htmlToLexical(html);
+    expect(out.root.children[0]?.type).toBe('heading');
+  });
 });
