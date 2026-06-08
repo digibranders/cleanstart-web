@@ -91,18 +91,7 @@ export function PlatformHero() {
               lineHeight: 1.05,
             }}
           >
-            Inside the CleanStart{" "}
-            <span
-              className="bg-clip-text"
-              style={{
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundImage:
-                  "linear-gradient(99deg, #9a51ff 42.8%, #2cc1eb 98.8%)",
-              }}
-            >
-              Platform
-            </span>
+            Inside the CleanStart Platform
           </h1>
           <p
             className="text-white/80"

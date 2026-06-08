@@ -87,16 +87,7 @@ export function DemoHero(): React.ReactElement {
               letterSpacing: "-0.04em",
             }}
           >
-            Get a{" "}
-            <span
-              className="inline-block bg-clip-text text-transparent"
-              style={{
-                backgroundImage:
-                  "linear-gradient(99deg, rgba(154, 81, 255, 1) 0%, rgba(44, 193, 235, 1) 100%)",
-              }}
-            >
-              Demo
-            </span>
+            Get a Demo
           </h1>
         </HeroReveal>
       </div>

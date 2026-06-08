@@ -61,8 +61,7 @@ export function SCAHero(): React.ReactElement {
               margin: 0,
             }}
           >
-            Smarter Software Composition{" "}
-            <span className="cs-text-gradient-impact">Analysis</span>
+            Smarter Software Composition Analysis
           </h1>
         </HeroReveal>
 

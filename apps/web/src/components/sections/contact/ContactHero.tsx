@@ -101,16 +101,7 @@ export function ContactHero() {
                 fontWeight: 600,
               }}
             >
-              Talk to a software{" "}
-              <span
-                className="bg-clip-text text-transparent"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(110.276deg, rgb(154, 81, 255) 1.7578%, rgb(44, 193, 235) 98.781%)",
-                }}
-              >
-                trust expert
-              </span>
+              Talk to a software trust expert
             </h1>
           </HeroReveal>
           <HeroReveal y={30} delay={0.15} duration={0.8}>

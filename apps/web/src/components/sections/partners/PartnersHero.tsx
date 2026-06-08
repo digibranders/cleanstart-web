@@ -46,18 +46,7 @@ export function PartnersHero(): React.ReactElement {
                 maxWidth: "860px",
               }}
             >
-              Join the Clean Software{" "}
-              <span
-                style={{
-                  background:
-                    "linear-gradient(90deg, #B68CFF 0%, #7A59FF 50%, #4E2DEB 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
-              >
-                Movement.
-              </span>
+              Join the Clean Software Movement.
             </h1>
           </HeroReveal>
 

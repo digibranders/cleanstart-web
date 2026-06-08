@@ -34,10 +34,7 @@ export function CleanSightHero(): React.ReactElement {
               }}
             >
               <span className="block">Continuous Visibility.</span>
-              <span className="block">
-                Continuous{" "}
-                <span className="cs-text-gradient-impact">Remediation.</span>
-              </span>
+              <span className="block">Continuous Remediation.</span>
             </h1>
           </HeroReveal>
 

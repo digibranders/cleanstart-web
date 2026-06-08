@@ -73,8 +73,7 @@ export function SbomHero(): React.ReactElement {
               textTransform: "capitalize",
             }}
           >
-            Continuously Verifiable{" "}
-            <span className="cs-text-gradient-impact">SBOMs</span>
+            Continuously Verifiable SBOMs
           </h1>
         </HeroReveal>
 

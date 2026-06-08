@@ -78,8 +78,7 @@ export function CleanStartImagesHero(): React.ReactElement {
                   fontWeight: 600,
                 }}
               >
-                Trusted Container{" "}
-                <span className="cs-text-gradient-impact">Foundations</span>
+                Trusted Container Foundations
               </h1>
             </HeroReveal>
 

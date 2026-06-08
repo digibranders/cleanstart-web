@@ -54,8 +54,7 @@ export function CommunityHero() {
                   letterSpacing: '-0.04em',
                 }}
               >
-                Let&apos;s work together towards{" "}
-                <span className="cs-text-gradient-impact">secure development</span>
+                Let&apos;s work together towards secure development
               </h1>
             </HeroReveal>
 

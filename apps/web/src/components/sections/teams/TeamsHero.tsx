@@ -137,16 +137,7 @@ export function TeamsHero() {
                 letterSpacing: "-0.04em",
               }}
             >
-              {"United by "}
-              <span
-                className="bg-clip-text text-transparent"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(120.16deg, rgb(154,81,255) 1.7578%, rgb(44,193,235) 98.781%)",
-                }}
-              >
-                Purpose
-              </span>
+              United by Purpose
             </h1>
           </HeroReveal>
           <HeroReveal y={30} delay={0.2} duration={0.8}>
