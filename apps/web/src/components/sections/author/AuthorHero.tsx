@@ -108,13 +108,23 @@ export function AuthorHero({ author }: AuthorHeroProps): React.ReactElement {
                 />
               ) : (
                 <div
-                  className="w-full h-full"
+                  className="flex w-full h-full items-center justify-center"
                   style={{
                     background:
                       "linear-gradient(135deg, #9A51FF 0%, #2CC1EB 100%)",
                   }}
                   aria-hidden
-                />
+                >
+                  <span
+                    className="font-display font-semibold text-white select-none"
+                    style={{
+                      fontSize: "clamp(3.5rem, 9vw, 5.5rem)",
+                      letterSpacing: "0.01em",
+                    }}
+                  >
+                    {getInitials(author.name)}
+                  </span>
+                </div>
               )}
             </div>
           </div>
@@ -212,6 +222,15 @@ export function AuthorHero({ author }: AuthorHeroProps): React.ReactElement {
       </div>
     </section>
   );
+}
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  const first = parts[0];
+  if (!first) return "?";
+  if (parts.length === 1) return first.slice(0, 2).toUpperCase();
+  const last = parts[parts.length - 1] ?? "";
+  return (first.charAt(0) + last.charAt(0)).toUpperCase();
 }
 
 function buildStats(

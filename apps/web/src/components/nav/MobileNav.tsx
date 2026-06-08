@@ -37,9 +37,6 @@ export function MobileNav() {
         side="right"
         className="w-[88vw] max-w-[360px] sm:max-w-[360px] !border-l-white/8 flex flex-col gap-0 p-0"
       >
-        <div className="flex justify-center pt-2" aria-hidden>
-          <div className="h-1 w-10 rounded-full bg-white/15" />
-        </div>
         <SheetTitle className="sr-only">CleanStart navigation</SheetTitle>
         <SheetDescription className="sr-only">
           Browse CleanStart products, solutions, resources, and company links.
@@ -120,33 +117,20 @@ export function MobileNav() {
         </div>
 
         <div className="flex flex-col gap-3 border-t border-white/8 p-4">
-          <div className="flex items-center gap-2">
-            <Link
-              href="https://academy.cleanstart.com"
-              target="_blank"
-              rel="noreferrer"
-              onClick={close}
-              className="flex flex-1 items-center justify-center rounded-[10px] border border-white/15 bg-white/[0.04] py-2.5 text-sm font-medium text-white/85 transition-colors hover:bg-white/[0.08] hover:text-white"
-            >
-              Academy
-            </Link>
-            <Link
-              href="https://images.cleanstart.com"
-              target="_blank"
-              rel="noreferrer"
-              onClick={close}
-              className="flex flex-1 items-center justify-center rounded-[10px] border border-white/15 bg-white/[0.04] py-2.5 text-sm font-medium text-white/85 transition-colors hover:bg-white/[0.08] hover:text-white"
-            >
-              Images
-            </Link>
-            <Link
-              href="#"
-              onClick={close}
-              className="flex flex-1 items-center justify-center rounded-[10px] border border-white/15 bg-white/[0.04] py-2.5 text-sm font-medium text-white/85 transition-colors hover:bg-white/[0.08] hover:text-white"
-            >
-              Login
-            </Link>
-          </div>
+          <Link
+            href="https://academy.cleanstart.com"
+            target="_blank"
+            rel="noreferrer"
+            onClick={close}
+            className="flex w-full items-center justify-center rounded-[10px] border py-2.5 text-sm font-semibold transition-colors"
+            style={{
+              color: "#59c5ed",
+              borderColor: "rgba(89,197,237,0.35)",
+              backgroundColor: "rgba(89,197,237,0.08)",
+            }}
+          >
+            CleanStart Academy
+          </Link>
           <Link
             href="/book-a-demo"
             onClick={close}
