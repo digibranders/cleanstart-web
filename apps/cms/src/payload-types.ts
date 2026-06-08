@@ -1402,6 +1402,7 @@ export interface News {
       | boolean
       | null;
   };
+  featured?: boolean | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -3075,6 +3076,10 @@ export interface Event {
    */
   slug: string;
   venue: string;
+  /**
+   * Country where the event is held. Powers the country filter on the /events listing page — set it to match the venue.
+   */
+  country?: ('india' | 'united-states' | 'uae' | 'thailand') | null;
   abstract?: string | null;
   heroImage?: (number | null) | Media;
   body?: {
@@ -7849,6 +7854,7 @@ export interface NewsSelect<T extends boolean = true> {
             };
         additionalSchema?: T;
       };
+  featured?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -8406,6 +8412,7 @@ export interface EventsSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   venue?: T;
+  country?: T;
   abstract?: T;
   heroImage?: T;
   body?: T;
