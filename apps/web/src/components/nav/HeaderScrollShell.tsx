@@ -19,7 +19,7 @@ export function HeaderScrollShell({
     >
       <div className="mx-auto max-w-[var(--container-default)] ps-[max(1.5rem,env(safe-area-inset-left))] pe-[max(1.5rem,env(safe-area-inset-right))] sm:ps-[max(2.5rem,env(safe-area-inset-left))] sm:pe-[max(2.5rem,env(safe-area-inset-right))]">
         {utilityStrip ? (
-          <div className="hidden h-9 items-center justify-end gap-5 border-b border-white/[0.07] lg:flex">
+          <div className="hidden h-9 items-center justify-end gap-5 border-b border-white/[0.07] pe-[140px] lg:flex">
             {utilityStrip}
           </div>
         ) : null}
