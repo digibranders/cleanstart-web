@@ -31,9 +31,10 @@ import { resolve } from 'node:path';
 
 import { type Payload, getPayload } from 'payload';
 
-import { GENERATED_ARTICLES } from '../../web/src/components/sections/knowledge-hub/kh-articles.data.ts';
+import { GENERATED_ARTICLES } from './data/kb-generated-articles.ts';
 import config from '../src/payload.config.ts';
 import { htmlToLexical } from '../src/payload/lib/webflow-import/html-to-lexical';
+import { cleanAcademyHtml } from './data/clean-academy-html.ts';
 import { CATEGORY_TO_GROUP_SLUG, LEGACY_GROUPS, VEX_HTML } from './data/kb-legacy-articles.ts';
 import { SECTION_NAMES, SECTION_ORDER, humanizeLabel } from './data/kb-taxonomy.ts';
 import { videoUrlForPath } from './data/kb-videos.ts';
@@ -304,12 +305,13 @@ async function run(): Promise<void> {
       payload.logger.info(`slug collision: ${a.slug} -> ${slug}`);
     }
     usedSlugs.add(slug);
+    const cleanedHtml = cleanAcademyHtml(a.bodyHtml);
     await upsertArticle(payload, {
       title: a.title,
       slug,
-      abstract: deriveAbstract(a.bodyHtml),
+      abstract: deriveAbstract(cleanedHtml),
       category: catId,
-      body: htmlToLexical(a.bodyHtml),
+      body: htmlToLexical(cleanedHtml),
       videoUrl: videoUrlForPath(a.path),
     });
     const done = counters.artCreated + counters.artUpdated + counters.artSkipped;
