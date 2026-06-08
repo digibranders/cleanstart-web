@@ -48,9 +48,9 @@ const DEFAULT_CTA_CARDS: PodcastCtaCard[] = [
     ctaHref: "/blogs",
   },
   {
-    title: "Get Updates",
-    body: "Join our mailing list for curated insights and upcoming sessions.",
-    ctaLabel: "Sign Up",
+    title: "Book a Demo",
+    body: "See CleanStart in action with a personalized walkthrough from our team.",
+    ctaLabel: "Book a Demo",
     ctaHref: "/book-a-demo",
   },
   {
