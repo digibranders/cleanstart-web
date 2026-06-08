@@ -240,6 +240,10 @@
     {
       "type": "ui",
       "name": "seoAdvanced"
+    },
+    {
+      "type": "number",
+      "name": "displayOrder"
     }
   ],
   "hooks": {
