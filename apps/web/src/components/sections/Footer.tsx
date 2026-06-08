@@ -244,9 +244,9 @@ export function Footer({
 
               <div className="flex flex-col gap-10">
                 <div>
-                  <h3 className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white text-center sm:text-left">
+                  <p className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white text-center sm:text-left">
                     Members of
-                  </h3>
+                  </p>
                   <ul className="mt-6 flex flex-wrap items-center justify-center sm:justify-start gap-x-8 gap-y-5">
                     {MEMBERS.map((m) => (
                       <li key={m.src} className="flex">
@@ -341,9 +341,9 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
         <summary
           className="flex items-center justify-between cursor-pointer list-none py-3"
         >
-          <h3 className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white">
+          <p className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white">
             {title}
-          </h3>
+          </p>
           <svg
             width="16"
             height="16"
@@ -390,9 +390,9 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
 
       {/* Desktop column (always expanded) */}
       <div className="hidden sm:block">
-        <h3 className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white">
+        <p className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white">
           {title}
-        </h3>
+        </p>
         <ul className="mt-6 flex flex-col gap-3">
           {links.map((link) => (
             <li key={link.href} className="flex leading-none">
@@ -426,9 +426,9 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
 function CredentialGroup({ group }: { group: (typeof CREDENTIALS)[number] }) {
   return (
     <div className="flex flex-col gap-4 items-center sm:items-start">
-      <h3 className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white text-center sm:text-left">
+      <p className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white text-center sm:text-left">
         {group.title}
-      </h3>
+      </p>
       <div className="flex flex-wrap items-start justify-center sm:justify-start gap-3">
         {group.badges.map((badge) => (
           <ShieldBadge key={badge.src} badge={badge} />
