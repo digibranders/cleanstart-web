@@ -5,7 +5,7 @@ import { BlogsCTA } from "@/components/sections/blogs/BlogsCTA";
 import { NewsroomHero } from "@/components/sections/newsroom/NewsroomHero";
 import { NewsroomGrid } from "@/components/sections/newsroom/NewsroomGrid";
 import { FadeUp } from "@/components/ui/FadeUp";
-import { getNews } from "@/lib/news";
+import { getNews, getFeaturedNews, getNewsCategories } from "@/lib/news";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
@@ -44,21 +44,25 @@ export default async function NewsPage({
   const searchQuery = params.q ?? "";
 
   let loadFailed = false;
-  const newsData = await getNews({
-    page,
-    ...(activeCategory ? { category: activeCategory } : {}),
-    ...(searchQuery ? { search: searchQuery } : {}),
-  }).catch(() => {
-    loadFailed = true;
-    return {
-      docs: [],
-      hasNextPage: false,
-      hasPrevPage: false,
-      page: 1,
-      totalDocs: 0,
-      totalPages: 1,
-    };
-  });
+  const [featuredPost, newsData, categories] = await Promise.all([
+    getFeaturedNews().catch(() => null),
+    getNews({
+      page,
+      ...(activeCategory ? { category: activeCategory } : {}),
+      ...(searchQuery ? { search: searchQuery } : {}),
+    }).catch(() => {
+      loadFailed = true;
+      return {
+        docs: [],
+        hasNextPage: false,
+        hasPrevPage: false,
+        page: 1,
+        totalDocs: 0,
+        totalPages: 1,
+      };
+    }),
+    getNewsCategories().catch(() => []),
+  ]);
 
   return (
     <>
@@ -72,7 +76,12 @@ export default async function NewsPage({
       <Header />
       <main style={{ background: "#f6f6f6" }}>
         <div className="relative overflow-hidden">
-          <NewsroomHero />
+          <NewsroomHero
+            featuredPost={featuredPost}
+            categories={categories}
+            activeCategory={activeCategory}
+            searchQuery={searchQuery}
+          />
         </div>
 
         <FadeUp>

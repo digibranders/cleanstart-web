@@ -32,6 +32,7 @@ export type News = {
   externalUrl?: string | null;
   publicationDate?: string | null;
   readingMinutes?: number | null;
+  featured?: boolean | null;
   seo?: CmsSeo | null;
 };
 
@@ -56,6 +57,18 @@ export type NewsListResponse = PayloadListResponse<News>;
 
 const PUBLISHED_FILTER =
   "where[_status][equals]=published&where[publicationDate][exists]=true";
+
+export async function getFeaturedNews(): Promise<News | null> {
+  const featured = await fetchCMS<NewsListResponse>(
+    `/api/news?${PUBLISHED_FILTER}&where[featured][equals]=true&depth=2&limit=1&sort=-publicationDate`,
+  );
+  if (featured.docs[0]) return featured.docs[0];
+
+  const latest = await fetchCMS<NewsListResponse>(
+    `/api/news?${PUBLISHED_FILTER}&depth=2&limit=1&sort=-publicationDate`,
+  );
+  return latest.docs[0] ?? null;
+}
 
 export async function getNews({
   page = 1,
