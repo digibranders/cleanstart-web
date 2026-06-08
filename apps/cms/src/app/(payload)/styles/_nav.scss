@@ -136,18 +136,24 @@
     background: var(--cs-surface-raised);
   }
 
-  // Active item — Payload sets `.nav__link--active`. A 3px brand stripe
-  // plus a faint bloom so the active state registers peripherally even
-  // without reading the item text (Linear/Vercel pattern).
+  // Active item — Payload sets `.nav__link--active` / `.active`. A 2px
+  // brand-cyan left-stripe over a brand-tinted background, identical to
+  // the Dashboard link (`.cs-sidebar-dashboard--active`) so every active
+  // nav row reads the same way.
   &--active,
   &.active,
   &[aria-current='page'] {
     color: var(--cs-text-primary);
     font-weight: 600;
     background: var(--cs-tint-brand-soft);
-    box-shadow:
-      inset 3px 0 0 0 var(--cs-cyan-500),
-      inset 8px 0 12px -6px rgba(6, 199, 242, 0.15);
+    box-shadow: inset 2px 0 0 0 var(--cs-cyan-500);
+  }
+
+  // Payload's own active marker is a 2px pill in `var(--theme-text)`
+  // (white) pinned to the far-left sidebar edge. We replace it with the
+  // brand-cyan stripe above, so suppress the default white indicator.
+  .nav__link-indicator {
+    display: none;
   }
 
   &:focus-visible {
