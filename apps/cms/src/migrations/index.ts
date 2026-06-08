@@ -12,6 +12,8 @@ import * as migration_20260604_063039_add_application_extra_fields from './20260
 import * as migration_20260605_094837_add_legal_documents from './20260605_094837_add_legal_documents';
 import * as migration_20260608_114736_add_news_featured from './20260608_114736_add_news_featured';
 import * as migration_20260608_121245_add_event_country from './20260608_121245_add_event_country';
+import * as migration_20260608_140513_add_news_region from './20260608_140513_add_news_region';
+import * as migration_20260608_144837_add_kb_category_display_order from './20260608_144837_add_kb_category_display_order';
 
 export const migrations = [
   {
@@ -82,6 +84,16 @@ export const migrations = [
   {
     up: migration_20260608_121245_add_event_country.up,
     down: migration_20260608_121245_add_event_country.down,
-    name: '20260608_121245_add_event_country'
+    name: '20260608_121245_add_event_country',
+  },
+  {
+    up: migration_20260608_140513_add_news_region.up,
+    down: migration_20260608_140513_add_news_region.down,
+    name: '20260608_140513_add_news_region',
+  },
+  {
+    up: migration_20260608_144837_add_kb_category_display_order.up,
+    down: migration_20260608_144837_add_kb_category_display_order.down,
+    name: '20260608_144837_add_kb_category_display_order',
   },
 ];

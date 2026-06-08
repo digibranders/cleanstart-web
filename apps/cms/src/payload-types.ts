@@ -630,7 +630,6 @@ export interface Media {
    * Photographer / source attribution.
    */
   credit?: string | null;
-  prefix?: string | null;
   /**
    * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
    */
@@ -638,6 +637,7 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -1101,6 +1101,10 @@ export interface News {
    * Dateline city, e.g. "Lewes, DE" — rendered before the body opener.
    */
   location?: string | null;
+  /**
+   * Region this story belongs to. Powers the region filter on the /news listing page.
+   */
+  region?: ('asia-pacific' | 'europe-middle-east' | 'usa-north-america') | null;
   body?: {
     root: {
       type: string;
@@ -2536,6 +2540,10 @@ export interface KnowledgeCategory {
       | boolean
       | null;
   };
+  /**
+   * Lower sorts higher in the Knowledge Hub sidebar. Legacy groups use 0–9; Academy sections 10+.
+   */
+  displayOrder?: number | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -4587,6 +4595,7 @@ export interface CareerApplication {
  */
 export interface Resume {
   id: number;
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -7720,6 +7729,7 @@ export interface NewsSelect<T extends boolean = true> {
   publisherLogo?: T;
   pressType?: T;
   location?: T;
+  region?: T;
   body?: T;
   authors?: T;
   newsCategories?: T;
@@ -9053,13 +9063,13 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   credit?: T;
-  prefix?: T;
   focalPoint?:
     | T
     | {
         x?: T;
         y?: T;
       };
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -10286,6 +10296,7 @@ export interface KnowledgeCategoriesSelect<T extends boolean = true> {
             };
         additionalSchema?: T;
       };
+  displayOrder?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -10537,6 +10548,7 @@ export interface CareerApplicationsSelect<T extends boolean = true> {
  * via the `definition` "resumes_select".
  */
 export interface ResumesSelect<T extends boolean = true> {
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
