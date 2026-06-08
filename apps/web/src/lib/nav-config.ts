@@ -77,12 +77,6 @@ export const NAV_TREE: NavItem[] = [
             icon: "container",
           },
           {
-            label: "CleanStart SBOM",
-            href: "/software-bill-materials",
-            description: "Signed SBOMs. Provenance for every artifact.",
-            icon: "doc-signed",
-          },
-          {
             label: "CleanSight",
             href: "/cleansight",
             description: "Runtime visibility into vulnerabilities and drift.",
@@ -113,10 +107,10 @@ export const NAV_TREE: NavItem[] = [
             icon: "shield-check",
           },
           {
-            label: "Enhance SCA",
-            href: "/software-composition-analysis",
-            description: "Cleaner base images. Less SCA noise.",
-            icon: "gears",
+            label: "Verifiable SBOMs",
+            href: "/software-bill-materials",
+            description: "Signed SBOMs. Provenance for every artifact.",
+            icon: "doc-signed",
           },
           {
             label: "Vulnerability Remediation",
@@ -179,7 +173,7 @@ export const NAV_TREE: NavItem[] = [
       {
         title: "Events",
         items: [
-          { label: "In-Person Events", href: "/events", icon: "calendar" },
+          { label: "Events", href: "/events", icon: "calendar" },
           { label: "Webinars", href: "/webinars", icon: "play" },
           { label: "Podcast", href: "/podcast", icon: "mic" },
         ],

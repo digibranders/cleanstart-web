@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 
-import { MenuIcon } from "lucide-react";
+import { MenuIcon, GraduationCap } from "lucide-react";
 import { Logo } from "@/components/icons/Logo";
 import {
   Sheet,
@@ -117,20 +117,30 @@ export function MobileNav() {
         </div>
 
         <div className="flex flex-col gap-3 border-t border-white/8 p-4">
-          <Link
-            href="https://academy.cleanstart.com"
-            target="_blank"
-            rel="noreferrer"
-            onClick={close}
-            className="flex w-full items-center justify-center rounded-[10px] border py-2.5 text-sm font-semibold transition-colors"
-            style={{
-              color: "#59c5ed",
-              borderColor: "rgba(89,197,237,0.35)",
-              backgroundColor: "rgba(89,197,237,0.08)",
-            }}
-          >
-            CleanStart Academy
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="https://academy.cleanstart.com"
+              target="_blank"
+              rel="noreferrer"
+              onClick={close}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-[10px] border py-2.5 text-sm font-semibold transition-colors"
+              style={{
+                color: "#59c5ed",
+                borderColor: "rgba(89,197,237,0.35)",
+                backgroundColor: "rgba(89,197,237,0.08)",
+              }}
+            >
+              <GraduationCap className="size-4 shrink-0" aria-hidden />
+              CleanStart Academy
+            </Link>
+            <Link
+              href="/contact-us"
+              onClick={close}
+              className="flex flex-1 items-center justify-center rounded-[10px] border border-white/15 bg-white/[0.04] py-2.5 text-sm font-medium text-white/85 transition-colors hover:bg-white/[0.08] hover:text-white"
+            >
+              Contact Us
+            </Link>
+          </div>
           <Link
             href="/book-a-demo"
             onClick={close}

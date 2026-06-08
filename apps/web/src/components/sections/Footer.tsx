@@ -22,7 +22,7 @@ const COL_CONTACT: FooterLink[] = [
   { label: "Events", href: "/events" },
 ];
 const COL_SOLUTIONS: FooterLink[] = [
-  { label: "Enhance SCA", href: "/software-composition-analysis" },
+  { label: "Verifiable SBOMs", href: "/software-bill-materials" },
   { label: "FIPS Compliance", href: "/fips" },
   { label: "Vulnerability", href: "/vulnerability-remediation" },
 ];

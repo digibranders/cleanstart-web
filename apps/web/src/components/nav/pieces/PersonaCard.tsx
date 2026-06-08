@@ -31,8 +31,8 @@ export function PersonaCard({ href, icon, label, description, cta }: Props) {
         <NavIcon id={icon} size={128} />
       </div>
 
-      <div className="cs-chip flex h-10 w-10 items-center justify-center rounded-[9px] text-white/75">
-        <NavIcon id={icon} size={20} />
+      <div className="cs-chip flex h-10 w-10 items-center justify-center rounded-[9px]">
+        <NavIcon id={icon} size={20} className="cs-nav-glyph" />
       </div>
       <div className="mt-3.5 text-[15px] font-semibold leading-tight text-white/95">
         {label}
