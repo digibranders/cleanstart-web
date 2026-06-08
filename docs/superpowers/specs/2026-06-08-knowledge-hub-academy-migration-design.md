@@ -57,6 +57,11 @@ pinned at the top of the sidebar.
    its subcategories as child categories (`parent`). Articles attach to their
    leaf subcategory. The existing 8 articles keep their current 4 groups, pinned
    **at the top** of the sidebar.
+6. **No numbers in CMS content:** the Academy's `NN`/`NN-` numeric prefixes are
+   source ordering only. CMS category **names and slugs are de-numbered**
+   ("Understand" / `understand`, not "01 Understand" / `01-understand`). Ordering
+   comes from `displayOrder`, never from numbers embedded in names, slugs, or
+   article body text.
 3. **Fidelity:** High — extend the HTML→Lexical converter to emit proper Payload
    **table** nodes and real **code-block** nodes, matching the shapes
    `renderLexical.tsx` already consumes.
@@ -127,7 +132,11 @@ A seed script `apps/cms/scripts/seed-knowledge-base.ts` following the
 
 - **Categories:** upsert 8 section categories + their subcategory child
   categories (with `parent` + `displayOrder`), plus the 4 legacy groups as
-  top-level categories with the lowest `displayOrder` (pinned first).
+  top-level categories with the lowest `displayOrder` (pinned first). Category
+  names/slugs are **de-numbered** — strip the Academy `NN ` / `NN-` prefix
+  (e.g. "01 Understand" → name "Understand", slug `understand`). The numeric
+  `section` token from the URL is retained only internally for slug-collision
+  prefixing and `displayOrder` derivation, never surfaced in content.
 - **Legacy 8 articles:** convert the existing `kh-articles.data.ts` `Block[]`
   to Lexical and seed them into their 4 legacy categories so they survive the
   web switch. (VEX uses a custom React body today — migrate its source HTML/blocks
