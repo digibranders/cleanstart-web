@@ -25,6 +25,12 @@ const BUTTON_BG = "#3960F9";
 const BUTTON_SHADOW =
   "0 1px 2px -1px rgba(9,6,63,0.4), 0 0 0 1px #3960F9, inset 0 1px 0 rgba(255,255,255,0.16)";
 
+// Tinted band behind the card row: fades in from transparent at the top (so it
+// blends out of the video area) into a soft lavender→blue brand tint, making the
+// cards read as their own band while staying inside the one section.
+const CARD_BAND_BG =
+  "linear-gradient(180deg, rgba(244,242,255,0) 0%, rgba(241,238,255,0.92) 22%, rgba(235,240,255,0.96) 100%)";
+
 function ArrowRight(): React.ReactElement {
   return (
     <svg
@@ -289,47 +295,50 @@ export function PodcastChannelVideos({
         <rect width="100%" height="100%" fill="url(#cta-grid)" mask="url(#cta-grid-fade)" />
       </svg>
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-[clamp(60px,7vw,100px)]">
-        {videos.length > 0 && (
-          <>
-            <Reveal header>
-              <h2
-                className="text-left text-[#111111] font-bold"
-                style={{
-                  fontSize: "var(--fs-h2)",
-                  lineHeight: 1.1,
-                  letterSpacing: "-0.04em",
-                }}
-              >
-                {videoHeading}
-              </h2>
-            </Reveal>
-            <RevealStagger className="mt-[44px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-[32px] gap-y-[40px]">
-              {videos.map((video) => (
-                <RevealItem key={video.videoId}>
-                  <ChannelVideoCard video={video} />
-                </RevealItem>
-              ))}
-            </RevealStagger>
-          </>
-        )}
+      {videos.length > 0 && (
+        <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[clamp(60px,7vw,100px)] pb-[clamp(48px,5vw,80px)]">
+          <Reveal header>
+            <h2
+              className="text-left text-[#111111] font-bold"
+              style={{
+                fontSize: "var(--fs-h2)",
+                lineHeight: 1.1,
+                letterSpacing: "-0.04em",
+              }}
+            >
+              {videoHeading}
+            </h2>
+          </Reveal>
+          <RevealStagger className="mt-[44px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-[32px] gap-y-[40px]">
+            {videos.map((video) => (
+              <RevealItem key={video.videoId}>
+                <ChannelVideoCard video={video} />
+              </RevealItem>
+            ))}
+          </RevealStagger>
+        </div>
+      )}
 
-        <RevealStagger
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-stretch"
-          style={{
-            gap: "clamp(16px, 1.8vw, 24px)",
-            marginTop: videos.length > 0 ? "clamp(48px, 5vw, 72px)" : "0",
-          }}
-        >
-          {visibleCards.map((card, i) => (
-            <RevealItem key={card.title}>
-              <CompactResourceCard
-                card={card}
-                iconSrc={CARD_ICONS[i] ?? CARD_ICONS[0]}
-              />
-            </RevealItem>
-          ))}
-        </RevealStagger>
+      {/* Full-bleed tinted band so the card row reads as its own section. */}
+      <div
+        className="relative"
+        style={videos.length > 0 ? { background: CARD_BAND_BG } : undefined}
+      >
+        <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-[clamp(48px,6vw,88px)]">
+          <RevealStagger
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-stretch"
+            style={{ gap: "clamp(16px, 1.8vw, 24px)" }}
+          >
+            {visibleCards.map((card, i) => (
+              <RevealItem key={card.title}>
+                <CompactResourceCard
+                  card={card}
+                  iconSrc={CARD_ICONS[i] ?? CARD_ICONS[0]}
+                />
+              </RevealItem>
+            ))}
+          </RevealStagger>
+        </div>
       </div>
     </section>
   );
