@@ -8,6 +8,8 @@ import { FadeUp } from "@/components/ui/FadeUp";
 import {
   getUpcomingEvents,
   getPastEvents,
+  parseCountryParam,
+  parseYearParam,
   type EventsListResponse,
 } from "@/lib/events";
 import { buildPageMetadata } from "@/lib/seo/canonical";
@@ -18,7 +20,7 @@ const DESCRIPTION =
   "Explore CleanStart's past and upcoming events including DevOps, DevSecOps, and cybersecurity conferences, summits, and meetups across India and beyond.";
 
 interface EventsPageProps {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; country?: string; year?: string }>;
 }
 
 export async function generateMetadata({
@@ -49,17 +51,24 @@ export default async function EventsPage({
 }: EventsPageProps): Promise<React.ReactElement> {
   const params = await searchParams;
   const page = Math.max(1, Number.parseInt(params.page ?? "1", 10));
+  const activeCountry = parseCountryParam(params.country);
+  const activeYear = parseYearParam(params.year);
 
   let pastFailed = false;
   const [upcoming, past] = await Promise.all([
-    getUpcomingEvents({ limit: 1 }).catch(emptyList),
-    getPastEvents({ page, limit: 9 }).catch(() => {
+    getUpcomingEvents({ limit: 10 }).catch(emptyList),
+    getPastEvents({
+      page,
+      limit: 9,
+      ...(activeCountry ? { country: activeCountry } : {}),
+      ...(activeYear ? { year: activeYear } : {}),
+    }).catch(() => {
       pastFailed = true;
       return emptyList();
     }),
   ]);
 
-  const upcomingEvent = upcoming.docs[0] ?? null;
+  const upcomingEvents = upcoming.docs;
 
   return (
     <>
@@ -72,12 +81,14 @@ export default async function EventsPage({
       />
       <Header />
       <main style={{ background: "#f6f6f6" }}>
-        <UpcomingEventHero event={upcomingEvent} />
+        <UpcomingEventHero events={upcomingEvents} />
         <FadeUp>
           <PastEventsGrid
             events={past.docs}
             currentPage={past.page}
             totalPages={past.totalPages}
+            activeCountry={activeCountry}
+            activeYear={activeYear}
             loadFailed={pastFailed}
           />
         </FadeUp>

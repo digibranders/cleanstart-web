@@ -8,12 +8,14 @@ export type EventImage = BlogImage;
 
 export type EventStatus = "scheduled" | "postponed" | "cancelled";
 export type RegistrationMode = "internal" | "external";
+export type EventCountry = "india" | "united-states" | "uae" | "thailand";
 
 export type Event = {
   id: string;
   title: string;
   slug: string;
   venue: string;
+  country?: EventCountry | null;
   abstract?: string | null;
   heroImage?: EventImage | null;
   startsAt?: string | null;
@@ -54,6 +56,16 @@ type PayloadListResponse<T> = {
 
 export type EventsListResponse = PayloadListResponse<Event>;
 
+// Client-safe helpers live in `events-utils.ts`. Re-exported for convenience.
+export {
+  COUNTRY_LABEL,
+  FILTERABLE_COUNTRIES,
+  FILTERABLE_YEARS,
+  countryLabel,
+  parseCountryParam,
+  parseYearParam,
+} from "./events-utils";
+
 const PUBLISHED_FILTER =
   "where[_status][equals]=published&where[publishedAt][exists]=true";
 
@@ -73,10 +85,19 @@ export async function getUpcomingEvents({
   return fetchCMS<EventsListResponse>(`/api/events?${params.toString()}`);
 }
 
+export interface PastEventsParams {
+  page?: number;
+  limit?: number;
+  country?: EventCountry;
+  year?: number;
+}
+
 export async function getPastEvents({
   page = 1,
   limit = 9,
-}: { page?: number; limit?: number } = {}): Promise<EventsListResponse> {
+  country,
+  year,
+}: PastEventsParams = {}): Promise<EventsListResponse> {
   const nowIso = new Date().toISOString();
   const params = new URLSearchParams({
     "where[_status][equals]": "published",
@@ -87,6 +108,13 @@ export async function getPastEvents({
     page: String(page),
     sort: "-startsAt",
   });
+  if (country) params.set("where[country][equals]", country);
+  if (year) {
+    // Year window intersects the existing `<= now` past-events constraint,
+    // so the current year correctly yields only events up to today.
+    params.set("where[startsAt][greater_than_equal]", `${year}-01-01T00:00:00.000Z`);
+    params.set("where[startsAt][less_than]", `${year + 1}-01-01T00:00:00.000Z`);
+  }
   return fetchCMS<EventsListResponse>(`/api/events?${params.toString()}`);
 }
 
