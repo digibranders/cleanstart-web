@@ -78,6 +78,19 @@ export const News: CollectionConfig = {
         description: 'Dateline city, e.g. "Lewes, DE" — rendered before the body opener.',
       },
     },
+    {
+      name: 'region',
+      type: 'select',
+      options: [
+        { label: 'Asia Pacific', value: 'asia-pacific' },
+        { label: 'Europe & Middle East', value: 'europe-middle-east' },
+        { label: 'North America', value: 'usa-north-america' },
+      ],
+      admin: {
+        description:
+          'Region this story belongs to. Powers the region filter on the /news listing page.',
+      },
+    },
     { name: 'body', type: 'richText' },
     {
       name: 'authors',

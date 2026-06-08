@@ -1,15 +1,23 @@
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import type { News } from "@/lib/news";
+import type { News, NewsCategory, NewsRegion } from "@/lib/news";
 import { EmptyState } from "@/components/feedback";
 import { Pagination } from "@/components/ui/Pagination";
 import { RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import { NewsroomCard } from "./NewsroomCard";
+// Code-split the interactive client sidebar out of the initial /news bundle.
+const NewsroomFilters = dynamic(() =>
+  import("./NewsroomFilters").then((m) => ({ default: m.NewsroomFilters })),
+);
 
 interface NewsroomGridProps {
   items: News[];
   currentPage: number;
   totalPages: number;
+  categories: NewsCategory[];
   activeCategory: string;
+  activeRegion?: NewsRegion | undefined;
+  activeYear?: number | undefined;
   searchQuery: string;
   /** True when the CMS fetch failed (vs. a genuinely empty result). */
   loadFailed?: boolean;
@@ -18,10 +26,14 @@ interface NewsroomGridProps {
 function buildPageHref(
   page: number,
   activeCategory: string,
+  activeRegion: NewsRegion | undefined,
+  activeYear: number | undefined,
   searchQuery: string,
 ): string {
   const params = new URLSearchParams();
   if (activeCategory) params.set("category", activeCategory);
+  if (activeRegion) params.set("region", activeRegion);
+  if (activeYear) params.set("year", String(activeYear));
   if (searchQuery) params.set("q", searchQuery);
   if (page > 1) params.set("page", String(page));
   const qs = params.toString();
@@ -32,15 +44,28 @@ export function NewsroomGrid({
   items,
   currentPage,
   totalPages,
+  categories,
   activeCategory,
+  activeRegion,
+  activeYear,
   searchQuery,
   loadFailed = false,
 }: NewsroomGridProps): React.ReactElement {
-  const hasFilters = Boolean(activeCategory || searchQuery);
+  const hasFilters = Boolean(
+    activeCategory || activeRegion || activeYear || searchQuery,
+  );
   return (
     <section
-      className="relative overflow-hidden"
-      style={{ background: "#f6f6f6", paddingTop: "clamp(48px, 6vw, 80px)", paddingBottom: "var(--spacing-section-cta)" }}
+      className="relative"
+      style={{
+        background: "#f6f6f6",
+        paddingTop: "clamp(48px, 6vw, 80px)",
+        paddingBottom: "var(--spacing-section-cta)",
+        // `overflow: clip` clips the decorative layers like `hidden` but does
+        // not establish a scroll container, so the sticky sidebar tracks the
+        // window scroll.
+        overflow: "clip",
+      }}
       data-section="NewsroomGrid"
     >
       {/* Bottom blob pair anchors to section bottom so it tracks the listing height regardless of page count. */}
@@ -148,85 +173,116 @@ export function NewsroomGrid({
         {/* Section heading for the document outline — the hero <h1> is followed
             by card <h3>s, so this fills the h2 level. Visually hidden. */}
         <h2 className="sr-only">News articles</h2>
-        {items.length === 0 ? (
-          loadFailed ? (
-            <EmptyState variant="load-failed" />
-          ) : hasFilters ? (
-            <EmptyState
-              variant="no-results"
-              actions={
-                <Link
-                  href="/news"
-                  className="font-sans font-medium text-[#4a3bf1] underline underline-offset-4"
-                  style={{ fontSize: "var(--fs-body)" }}
-                >
-                  Clear filters
-                </Link>
-              }
+        <div className="flex flex-col lg:flex-row lg:items-start lg:gap-8">
+          <aside
+            className="shrink-0 lg:sticky lg:max-h-[calc(100vh-112px)] lg:overflow-y-auto"
+            style={{ top: "96px", alignSelf: "flex-start" }}
+          >
+            <NewsroomFilters
+              categories={categories}
+              activeCategory={activeCategory || undefined}
+              activeRegion={activeRegion}
+              activeYear={activeYear}
             />
-          ) : (
-            <EmptyState
-              variant="empty"
-              title="No news yet"
-              description="Check back soon. New stories are on the way."
-            />
-          )
-        ) : (
-          <>
-            <RevealStagger
-              className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
-              style={{ gap: "32px", justifyItems: "center" }}
-            >
-              {items.map((item) => (
-                <RevealItem key={item.id}>
-                  <NewsroomCard item={item} />
-                </RevealItem>
-              ))}
-            </RevealStagger>
+          </aside>
 
-            {totalPages > 1 && currentPage < totalPages && (
-              <div
-                className="flex lg:hidden justify-center"
-                style={{ marginTop: "40px" }}
-              >
-                <Link
-                  href={buildPageHref(currentPage + 1, activeCategory, searchQuery)}
-                  rel="next"
-                  className="font-sans inline-flex items-center gap-2"
-                  style={{
-                    height: "44px",
-                    padding: "0 20px",
-                    borderRadius: "10px",
-                    background: "white",
-                    color: "#4a3bf1",
-                    fontSize: "var(--fs-body-sm)",
-                    fontWeight: 500,
-                    border: "1px solid rgba(74,59,241,0.25)",
-                  }}
+          <div className="flex-1 min-w-0">
+            {items.length === 0 ? (
+              loadFailed ? (
+                <EmptyState variant="load-failed" />
+              ) : hasFilters ? (
+                <EmptyState
+                  variant="no-results"
+                  title="No news matches these filters"
+                  actions={
+                    <Link
+                      href="/news"
+                      className="font-sans font-medium text-[#4a3bf1] underline underline-offset-4"
+                      style={{ fontSize: "var(--fs-body)" }}
+                    >
+                      Clear filters
+                    </Link>
+                  }
+                />
+              ) : (
+                <EmptyState
+                  variant="empty"
+                  title="No news yet"
+                  description="Check back soon. New stories are on the way."
+                />
+              )
+            ) : (
+              <>
+                <RevealStagger
+                  className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 justify-items-center lg:justify-items-stretch"
+                  style={{ gap: "32px" }}
                 >
-                  View More
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
-                    <path
-                      d="M3.5 8h9M8.5 4l4 4-4 4"
-                      stroke="#4a3bf1"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </Link>
-              </div>
+                  {items.map((item) => (
+                    <RevealItem key={item.id} className="w-full flex justify-center">
+                      <NewsroomCard item={item} />
+                    </RevealItem>
+                  ))}
+                </RevealStagger>
+
+                {totalPages > 1 && currentPage < totalPages && (
+                  <div
+                    className="flex lg:hidden justify-center"
+                    style={{ marginTop: "40px" }}
+                  >
+                    <Link
+                      href={buildPageHref(
+                        currentPage + 1,
+                        activeCategory,
+                        activeRegion,
+                        activeYear,
+                        searchQuery,
+                      )}
+                      rel="next"
+                      className="font-sans inline-flex items-center gap-2"
+                      style={{
+                        height: "44px",
+                        padding: "0 20px",
+                        borderRadius: "10px",
+                        background: "white",
+                        color: "#4a3bf1",
+                        fontSize: "var(--fs-body-sm)",
+                        fontWeight: 500,
+                        border: "1px solid rgba(74,59,241,0.25)",
+                      }}
+                    >
+                      View More
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+                        <path
+                          d="M3.5 8h9M8.5 4l4 4-4 4"
+                          stroke="#4a3bf1"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </Link>
+                  </div>
+                )}
+
+                <div className="hidden lg:block">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    buildHref={(p) =>
+                      buildPageHref(
+                        p,
+                        activeCategory,
+                        activeRegion,
+                        activeYear,
+                        searchQuery,
+                      )
+                    }
+                  />
+                </div>
+              </>
             )}
-
-            <div className="hidden lg:block">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                buildHref={(p) => buildPageHref(p, activeCategory, searchQuery)}
-              />
-            </div>
-          </>
-        )}
+          </div>
+        </div>
       </div>
     </section>
   );

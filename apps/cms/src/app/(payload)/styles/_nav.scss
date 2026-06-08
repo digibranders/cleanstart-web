@@ -136,10 +136,14 @@
     background: var(--cs-surface-raised);
   }
 
-  // Active item — Payload sets `.nav__link--active` / `.active`. A 2px
-  // brand-cyan left-stripe over a brand-tinted background, identical to
-  // the Dashboard link (`.cs-sidebar-dashboard--active`) so every active
-  // nav row reads the same way.
+  // Active item — Payload marks the current link by rendering a
+  // `.nav__link-indicator` child (it does NOT add an `--active`/`.active`
+  // class), so `:has()` is the reliable active selector. A 2px brand-cyan
+  // left-stripe over a brand-tinted background, identical to the Dashboard
+  // link (`.cs-sidebar-dashboard--active`) so every active nav row reads
+  // the same way. The class selectors are kept as fallbacks for any nav
+  // item that does surface an explicit active class.
+  &:has(.nav__link-indicator),
   &--active,
   &.active,
   &[aria-current='page'] {
@@ -186,6 +190,7 @@
   user-select: none;
 }
 
+.nav__link:has(.nav__link-indicator) .cs-nav-badge,
 .nav__link--active .cs-nav-badge,
 .nav__link.active .cs-nav-badge {
   background: var(--cs-tint-brand-medium);

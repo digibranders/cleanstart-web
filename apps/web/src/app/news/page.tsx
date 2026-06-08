@@ -5,7 +5,13 @@ import { BlogsCTA } from "@/components/sections/blogs/BlogsCTA";
 import { NewsroomHero } from "@/components/sections/newsroom/NewsroomHero";
 import { NewsroomGrid } from "@/components/sections/newsroom/NewsroomGrid";
 import { FadeUp } from "@/components/ui/FadeUp";
-import { getNews, getFeaturedNews, getNewsCategories } from "@/lib/news";
+import {
+  getNews,
+  getFeaturedNews,
+  getNewsCategories,
+  parseRegionParam,
+  parseYearParam,
+} from "@/lib/news";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
@@ -17,6 +23,8 @@ interface NewsPageProps {
   searchParams: Promise<{
     page?: string;
     category?: string;
+    region?: string;
+    year?: string;
     q?: string;
   }>;
 }
@@ -41,6 +49,8 @@ export default async function NewsPage({
   const params = await searchParams;
   const page = Math.max(1, Number.parseInt(params.page ?? "1", 10));
   const activeCategory = params.category ?? "";
+  const activeRegion = parseRegionParam(params.region);
+  const activeYear = parseYearParam(params.year);
   const searchQuery = params.q ?? "";
 
   let loadFailed = false;
@@ -49,6 +59,8 @@ export default async function NewsPage({
     getNews({
       page,
       ...(activeCategory ? { category: activeCategory } : {}),
+      ...(activeRegion ? { region: activeRegion } : {}),
+      ...(activeYear ? { year: activeYear } : {}),
       ...(searchQuery ? { search: searchQuery } : {}),
     }).catch(() => {
       loadFailed = true;
@@ -78,8 +90,6 @@ export default async function NewsPage({
         <div className="relative overflow-hidden">
           <NewsroomHero
             featuredPost={featuredPost}
-            categories={categories}
-            activeCategory={activeCategory}
             searchQuery={searchQuery}
           />
         </div>
@@ -89,7 +99,10 @@ export default async function NewsPage({
             items={newsData.docs}
             currentPage={newsData.page}
             totalPages={newsData.totalPages}
+            categories={categories}
             activeCategory={activeCategory}
+            activeRegion={activeRegion}
+            activeYear={activeYear}
             searchQuery={searchQuery}
             loadFailed={loadFailed}
           />

@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { mediaUrl } from "@/lib/blog";
-import type { News, NewsCategory } from "@/lib/news";
+import type { News } from "@/lib/news";
 import { SearchBar } from "@/components/sections/_shared/SearchBar";
 import { HeroReveal, Reveal } from "@/components/ui/Reveal";
 
@@ -11,15 +11,11 @@ const HERO_GRADIENT =
 
 interface NewsroomHeroProps {
   featuredPost: News | null;
-  categories: NewsCategory[];
-  activeCategory: string;
   searchQuery: string;
 }
 
 export function NewsroomHero({
   featuredPost,
-  categories,
-  activeCategory,
   searchQuery,
 }: NewsroomHeroProps): React.ReactElement {
   return (
@@ -105,27 +101,6 @@ export function NewsroomHero({
               />
             </Suspense>
           </div>
-
-          {/* Below lg the pills are a single horizontally-scrollable row; at lg+
-              they wrap to multiple centered rows. */}
-          <nav
-            className="-mx-6 sm:mx-0 lg:flex-wrap lg:justify-center flex items-center gap-[10px] overflow-x-auto lg:overflow-visible px-6 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden w-screen sm:w-auto"
-            aria-label="News categories"
-          >
-            <CategoryPill
-              label="All"
-              href="/news"
-              active={activeCategory === ""}
-            />
-            {categories.map((cat) => (
-              <CategoryPill
-                key={cat.id}
-                label={cat.name}
-                href={`/news?category=${cat.slug}`}
-                active={activeCategory === cat.slug}
-              />
-            ))}
-          </nav>
         </div>
 
         {featuredPost ? (
@@ -251,38 +226,5 @@ export function NewsroomHero({
         ) : null}
       </div>
     </section>
-  );
-}
-
-function CategoryPill({
-  label,
-  href,
-  active,
-}: {
-  label: string;
-  href: string;
-  active: boolean;
-}): React.ReactElement {
-  return (
-    <Link
-      href={href}
-      className="cs-category-pill flex items-center justify-center font-sans font-normal text-white shrink-0"
-      style={{
-        height: "32px",
-        padding: "6px 16px",
-        borderRadius: "30px",
-        background: active
-          ? "rgba(196,70,239,0.6)"
-          : "rgba(196,70,239,0.2)",
-        // eslint-disable-next-line no-restricted-syntax -- v3 exception: anchored Figma spec inside a constrained component (button/pill/badge/card internal). See RESPONSIVE-AUDIT.md §14.3.
-        fontSize: "var(--fs-body-sm)",
-        lineHeight: "1.0",
-        letterSpacing: "-0.02em",
-        whiteSpace: "nowrap",
-      }}
-      aria-current={active ? "page" : undefined}
-    >
-      {label}
-    </Link>
   );
 }
