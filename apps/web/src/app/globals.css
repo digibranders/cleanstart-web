@@ -97,6 +97,15 @@
   --container-wide:    1600px;
   --container-cs: var(--container-default);
 
+  /* Fixed-header height, single source of truth. The header is a fixed
+     translucent overlay with no global spacer — each hero clears it via
+     its own top padding plus var(--cs-header-extra). Base = 72px main bar
+     only; on lg+ the desktop utility strip adds 36px (see media query
+     after @theme). Heroes add var(--cs-header-extra) so mobile is unchanged
+     and desktop content drops exactly the strip's height. */
+  --cs-header-h: 72px;
+  --cs-header-extra: 0px;
+
   --radius-cs-card: 24px;
   --radius-cs-card-lg: 40px;
   --radius-cs-pill: 8px;
@@ -355,6 +364,15 @@
   --btn-fs-md:           var(--fs-button);
   --btn-fs-sm:           var(--fs-button-sm);
   --btn-fs-xs:           var(--fs-button-sm);
+}
+
+/* Desktop (lg+) adds the utility strip above the main nav bar, growing the
+   fixed header by 36px. --cs-header-extra is the per-hero clearance delta. */
+@media (min-width: 1024px) {
+  :root {
+    --cs-header-h: 108px;
+    --cs-header-extra: 36px;
+  }
 }
 
 :root {
@@ -2368,17 +2386,16 @@ body {
 }
 .article-body .article-paragraph:last-child { margin-bottom: 0; }
 
-/* Sticky-header offset for TOC anchor jumps. Matches the 96px sticky
-   contract (Header row is 72px tall; 24px breathing room). Applied to
-   every in-article heading so #anchor links don't land under the
-   fixed Header. */
+/* Sticky-header offset for TOC anchor jumps. Header-aware via
+   --cs-header-h (72px mobile, 108px desktop where the utility strip shows)
+   plus breathing room, so #anchor links never land under the fixed Header. */
 .article-body .article-h1,
 .article-body .article-h2,
 .article-body .article-h3,
 .article-body .article-h4,
 .article-body .article-h5,
 .article-body .article-h6 {
-  scroll-margin-top: clamp(80px, 10vw, 120px);
+  scroll-margin-top: calc(var(--cs-header-h) + 16px);
   text-wrap: balance;
   letter-spacing: -0.02em;
   color: #111111;
@@ -2469,6 +2486,61 @@ body {
   font-style: italic;
   color: rgba(17,17,17,0.75);
   line-height: 1.55;
+}
+
+/* ── Inline CTA card ──────────────────────────────────────────────────────────
+ * Rendered from an `inlineCta` Lexical block (apps/web/src/components/article/
+ * InlineCtaCard.tsx). Heading + button sit on one row at ≥640px and stack
+ * below it. The button itself reuses .cs-btn-blue / .cs-btn-glass.
+ */
+.article-body .article-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  margin: 2rem 0;
+  padding: clamp(20px, 3.5vw, 28px) clamp(20px, 3.5vw, 32px);
+  border-radius: var(--radius-cs-card);
+}
+@media (min-width: 640px) {
+  .article-body .article-cta {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+}
+.article-body .article-cta__heading {
+  margin: 0;
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--fs-h4);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.article-body .article-cta__button {
+  flex-shrink: 0;
+}
+
+/* Soft — light brand-tinted panel with the solid-blue CTA. */
+.article-body .article-cta--soft {
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(51, 186, 236, 0.10) 0%, rgba(51, 186, 236, 0) 55%),
+    #eef2fe;
+  border: 1px solid rgba(57, 96, 249, 0.16);
+}
+.article-body .article-cta--soft .article-cta__heading {
+  color: #111111;
+}
+
+/* Solid — bold gradient panel with the frosted-glass CTA. */
+.article-body .article-cta--solid {
+  background: linear-gradient(120deg, #471ec0 0%, #131e8f 100%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+.article-body .article-cta--solid .article-cta__heading {
+  color: #ffffff;
 }
 
 /* ── CleanStart code block ───────────────────────────────────────────────────

@@ -10,6 +10,9 @@
  *   horizontalrule | link | text with inline marks (bold/italic/
  *   underline/strikethrough/inline-code/sub/sup)
  *
+ * Webflow `.artcileCtaBox` inline CTAs are promoted to `inlineCta` block
+ * nodes (see ./cta-cards) rather than left as flattened headings.
+ *
  * Images (`<img>`) are intentionally NOT serialized as Lexical upload
  * nodes here — those need a resolved Media doc ID, which the import
  * step assigns post-asset-upload. The migration's body-url rewriter
@@ -19,6 +22,13 @@
  */
 
 import { parseFragment } from 'parse5';
+
+import {
+  extractCtaFromHeading,
+  isCtaHeading,
+  makeInlineCtaBlock,
+  type InlineCtaBlockNode,
+} from './cta-cards';
 
 // Lexical text-format bitflags. Match
 // `@lexical/code` / `@lexical/rich-text` constants.
@@ -126,7 +136,8 @@ type LexicalBlockNode =
   | LexicalHeadingNode
   | LexicalQuoteNode
   | LexicalListNode
-  | LexicalHorizontalRuleNode;
+  | LexicalHorizontalRuleNode
+  | InlineCtaBlockNode;
 
 export interface LexicalRoot {
   readonly root: {
@@ -400,6 +411,25 @@ const convertBlock = (el: ParseElement): LexicalBlockNode[] => {
       for (const child of el.childNodes ?? []) {
         if (!isElement(child)) continue;
         out.push(...convertBlock(child));
+      }
+      // Webflow inline CTA: `<div class="artcileCtaBox"><h3>prompt <a>label</a></h3></div>`.
+      // Once unwrapped it is a heading-with-link; promote it to an `inlineCta`
+      // block so it renders as a card instead of a stray heading. Gated on the
+      // class so only genuine CTA boxes are rewritten.
+      const className = getAttr(el, 'class') ?? '';
+      if (className.includes('artcileCtaBox')) {
+        return out.map((block) => {
+          if (!isCtaHeading(block)) return block;
+          const cta = extractCtaFromHeading(block);
+          // Defer mid-sentence-link CTAs (leave as a heading) — same rule as the
+          // DB backfill: the prompt + button fragment don't split cleanly.
+          if (!cta || cta.midSentence) return block;
+          return makeInlineCtaBlock({
+            heading: cta.heading,
+            buttonLabel: cta.buttonLabel,
+            buttonUrl: cta.buttonUrl,
+          });
+        });
       }
       return out;
     }
