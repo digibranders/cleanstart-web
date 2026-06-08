@@ -34,7 +34,7 @@ export function PartnersHero(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[clamp(112px,10vw,140px)] pb-[clamp(60px,8vw,110px)]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[calc(clamp(112px,10vw,140px)+var(--cs-header-extra))] pb-[clamp(60px,8vw,110px)]">
         <div className="flex flex-col items-center text-center gap-7">
           <HeroReveal y={50} duration={1.0}>
             <h1

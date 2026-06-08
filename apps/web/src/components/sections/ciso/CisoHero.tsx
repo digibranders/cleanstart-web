@@ -137,7 +137,7 @@ export function CisoHero(): React.ReactElement {
       <div
         className="relative mx-auto z-[2] w-full max-w-[var(--container-default)] px-6 sm:px-10"
         style={{
-          paddingTop: "clamp(112px, 8.23vw, 158px)",
+          paddingTop: "calc(clamp(112px, 8.23vw, 158px) + var(--cs-header-extra))",
           paddingBottom: "80px",
           minHeight: "751px",
         }}

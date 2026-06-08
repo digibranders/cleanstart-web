@@ -142,7 +142,7 @@ function Breadcrumb({ title }: { title: string }): React.ReactElement {
   return (
     <nav
       aria-label="Breadcrumb"
-      className="flex flex-wrap items-center gap-y-1 gap-0 pt-[clamp(28px,5vw,58px)]"
+      className="flex flex-wrap items-center gap-y-1 gap-0 pt-[calc(var(--cs-header-h)+env(safe-area-inset-top)+clamp(8px,2vw,24px))]"
     >
       <Link
         href="/"

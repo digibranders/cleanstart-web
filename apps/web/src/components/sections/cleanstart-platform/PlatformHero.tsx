@@ -77,7 +77,7 @@ export function PlatformHero() {
       <div
         className="relative z-10 mx-auto flex w-full max-w-[680px] flex-col items-center gap-8 px-6 text-center sm:px-10 lg:mx-0 lg:ml-[max(24px,calc(50%-640px))] lg:items-start lg:gap-10 lg:text-left"
         style={{
-          paddingTop: "clamp(116px, 11.5vw, 166px)",
+          paddingTop: "calc(clamp(116px, 11.5vw, 166px) + var(--cs-header-extra))",
           paddingBottom: "clamp(32px, 8vw, 120px)",
         }}
       >

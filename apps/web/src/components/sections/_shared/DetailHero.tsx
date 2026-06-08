@@ -132,7 +132,7 @@ function Breadcrumb({ items }: { items: DetailHeroCrumb[] }): React.ReactElement
   return (
     <nav
       aria-label="Breadcrumb"
-      className="flex flex-nowrap items-center gap-0 overflow-x-auto pt-[calc(72px+env(safe-area-inset-top)+clamp(16px,3vw,40px))] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible sm:gap-y-1"
+      className="flex flex-nowrap items-center gap-0 overflow-x-auto pt-[calc(72px+env(safe-area-inset-top)+clamp(16px,3vw,40px)+var(--cs-header-extra))] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible sm:gap-y-1"
     >
       <Link
         href="/"

@@ -23,7 +23,7 @@ interface Partner {
   wordmark?: string;
 }
 
-const REGIONS = ["Asia Pacific", "Europe & Middle East", "North America"] as const;
+const REGIONS = ["Asia Pacific", "Europe", "Middle East", "North America"] as const;
 type Region = (typeof REGIONS)[number];
 
 const INITIAL_VISIBLE = 8;
@@ -43,14 +43,16 @@ const PARTNERS: Record<Region, Partner[]> = {
     { name: "eSec Forte", country: "India", logo: "/images/partners/global/sec-forte.webp" },
     { name: "Raksha Technologies", country: "India", logo: "/images/partners/global/raksha.webp" },
   ],
-  "Europe & Middle East": [
+  Europe: [
+    { name: "NGIT", country: "Nordics", logo: "/images/partners/global/ngit.webp" },
+  ],
+  "Middle East": [
     {
       name: "Surakshate",
       country: "UAE",
       logo: "/images/partners/global/surakshate.webp",
       invertOnLight: true,
     },
-    { name: "NGIT", country: "Nordics", logo: "/images/partners/global/ngit.webp" },
   ],
   "North America": [
     {

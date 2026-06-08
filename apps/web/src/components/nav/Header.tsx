@@ -2,6 +2,7 @@ import Link from "next/link";
 import { DesktopNav } from "@/components/nav/DesktopNav";
 import { MobileNav } from "@/components/nav/MobileNav";
 import { HeaderScrollShell } from "@/components/nav/HeaderScrollShell";
+import { HeaderUtilityStrip } from "@/components/nav/HeaderUtilityStrip";
 import { fetchLatestImages } from "@/components/nav/data/latest-images";
 import { fetchLatestUpdates } from "@/components/nav/data/latest-updates-feed";
 import {
@@ -26,7 +27,7 @@ export async function Header() {
   ]);
 
   return (
-    <HeaderScrollShell>
+    <HeaderScrollShell utilityStrip={<HeaderUtilityStrip />}>
       <Link
         href="/"
         aria-label="CleanStart home"

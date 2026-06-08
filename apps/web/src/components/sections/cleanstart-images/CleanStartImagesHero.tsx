@@ -57,7 +57,7 @@ export function CleanStartImagesHero(): React.ReactElement {
         style={{ minHeight: "inherit" }}
       >
         <div
-          className="mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 flex flex-col lg:flex-row items-center pt-[112px] lg:pt-[clamp(48px,5vw,80px)]"
+          className="mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 flex flex-col lg:flex-row items-center pt-[112px] lg:pt-[calc(clamp(48px,5vw,80px)+var(--cs-header-extra))]"
           style={{
             paddingBottom: "clamp(48px, 5vw, 80px)",
             gap: "clamp(40px, 4vw, 60px)",

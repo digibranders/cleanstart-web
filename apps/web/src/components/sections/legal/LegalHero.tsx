@@ -57,7 +57,7 @@ export function LegalHero({ title, as: Tag = "p" }: LegalHeroProps): React.React
         decoding="async"
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[clamp(80px,10vw,140px)] pb-[clamp(60px,8vw,100px)]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[calc(clamp(80px,10vw,140px)+var(--cs-header-extra))] pb-[clamp(60px,8vw,100px)]">
         <HeroReveal y={50} duration={1.0}>
           {/* Defaults to a <p> banner: on /legal/* the single <h1> is the
               document title (LegalDocHeader), so a heading here would duplicate

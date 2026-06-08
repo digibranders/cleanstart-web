@@ -45,7 +45,7 @@ export function GuidesHero({
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pb-[clamp(56px,7vw,96px)]">
         <div
           className="flex flex-col items-center gap-10 mx-auto"
-          style={{ paddingTop: "clamp(72px, 9vw, 122px)", maxWidth: "702px" }}
+          style={{ paddingTop: "calc(clamp(72px, 9vw, 122px) + var(--cs-header-extra))", maxWidth: "702px" }}
         >
           <div className="flex flex-col items-center gap-8 w-full">
             <HeroReveal y={50} duration={1.0}>

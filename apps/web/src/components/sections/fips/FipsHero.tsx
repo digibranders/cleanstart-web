@@ -38,7 +38,7 @@ export function FipsHero(): React.ReactElement {
         className="relative mx-auto z-[2] px-6 md:min-h-[clamp(658px,46.32vw,667px)]"
         style={{
           maxWidth: "1276px",
-          paddingTop: "clamp(112px, 12.92vw, 200px)",
+          paddingTop: "calc(clamp(112px, 12.92vw, 200px) + var(--cs-header-extra))",
           paddingBottom: "0",
         }}
       >

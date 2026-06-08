@@ -119,7 +119,34 @@ export function MobileNav() {
           </Accordion>
         </div>
 
-        <div className="border-t border-white/8 p-4">
+        <div className="flex flex-col gap-3 border-t border-white/8 p-4">
+          <div className="flex items-center gap-2">
+            <Link
+              href="https://academy.cleanstart.com"
+              target="_blank"
+              rel="noreferrer"
+              onClick={close}
+              className="flex flex-1 items-center justify-center rounded-[10px] border border-white/15 bg-white/[0.04] py-2.5 text-sm font-medium text-white/85 transition-colors hover:bg-white/[0.08] hover:text-white"
+            >
+              Academy
+            </Link>
+            <Link
+              href="https://images.cleanstart.com"
+              target="_blank"
+              rel="noreferrer"
+              onClick={close}
+              className="flex flex-1 items-center justify-center rounded-[10px] border border-white/15 bg-white/[0.04] py-2.5 text-sm font-medium text-white/85 transition-colors hover:bg-white/[0.08] hover:text-white"
+            >
+              Images
+            </Link>
+            <Link
+              href="#"
+              onClick={close}
+              className="flex flex-1 items-center justify-center rounded-[10px] border border-white/15 bg-white/[0.04] py-2.5 text-sm font-medium text-white/85 transition-colors hover:bg-white/[0.08] hover:text-white"
+            >
+              Login
+            </Link>
+          </div>
           <Link
             href="/book-a-demo"
             onClick={close}
