@@ -22,6 +22,24 @@
       "required": true
     },
     {
+      "type": "select",
+      "name": "country",
+      "options": [
+        {
+          "value": "india"
+        },
+        {
+          "value": "united-states"
+        },
+        {
+          "value": "uae"
+        },
+        {
+          "value": "thailand"
+        }
+      ]
+    },
+    {
       "type": "textarea",
       "name": "abstract"
     },

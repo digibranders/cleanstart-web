@@ -26,6 +26,10 @@
       "relationTo": "media"
     },
     {
+      "type": "text",
+      "name": "videoUrl"
+    },
+    {
       "type": "relationship",
       "name": "category",
       "required": true,

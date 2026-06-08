@@ -57,6 +57,21 @@
       "name": "location"
     },
     {
+      "type": "select",
+      "name": "region",
+      "options": [
+        {
+          "value": "asia-pacific"
+        },
+        {
+          "value": "europe-middle-east"
+        },
+        {
+          "value": "usa-north-america"
+        }
+      ]
+    },
+    {
       "type": "richText",
       "name": "body"
     },
@@ -557,6 +572,10 @@
     {
       "type": "ui",
       "name": "seoAdvanced"
+    },
+    {
+      "type": "checkbox",
+      "name": "featured"
     }
   ],
   "hooks": {
