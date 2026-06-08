@@ -176,6 +176,15 @@ export const News: CollectionConfig = {
       admin: { readOnly: true, hidden: true },
     },
     ...seoFieldsForSidebar('news'),
+    {
+      // Editorial flag mirroring Blogs. When set, the news item is shown in
+      // the listing hero's featured card; the web loader falls back to the
+      // latest published item when nothing is flagged.
+      name: 'featured',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: { position: 'sidebar' },
+    },
   ],
   hooks: {
     // News uses `publicationDate` as its canonical first-publish
