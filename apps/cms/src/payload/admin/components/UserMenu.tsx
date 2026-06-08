@@ -1,6 +1,7 @@
 'use client';
 
-import { useAuth, useTheme, type Theme } from '@payloadcms/ui';
+import { useAuth, useTheme } from '@payloadcms/ui';
+import type { Theme } from '@payloadcms/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
