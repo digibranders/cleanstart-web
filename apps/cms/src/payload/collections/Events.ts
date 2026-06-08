@@ -42,6 +42,20 @@ export const Events: CollectionConfig = {
     contentTitleField,
     slugField({ source: 'title' }),
     { name: 'venue', type: 'text', required: true },
+    {
+      name: 'country',
+      type: 'select',
+      options: [
+        { label: 'India', value: 'india' },
+        { label: 'United States', value: 'united-states' },
+        { label: 'United Arab Emirates', value: 'uae' },
+        { label: 'Thailand', value: 'thailand' },
+      ],
+      admin: {
+        description:
+          'Country where the event is held. Powers the country filter on the /events listing page — set it to match the venue.',
+      },
+    },
     { name: 'abstract', type: 'textarea' },
     mediaUploadField({ name: 'heroImage', folderHint: 'web/event' }),
     { name: 'body', type: 'richText' },

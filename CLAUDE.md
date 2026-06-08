@@ -454,6 +454,12 @@ These are one-shot operations that **must** run against the prod Postgres on the
    - From inside the `cms` container: `pnpm exec tsx --env-file=.env scripts/migrate-guide-cta-cards.ts --dry-run` then `pnpm exec tsx --env-file=.env scripts/migrate-guide-cta-cards.ts` (no flag).
    - After the run, spot-check a guide (e.g. `/guide/nist-800-53-kubernetes-control-mapping`) — the inline CTA should render as a tinted card with a button, and its prompt should no longer appear in the CONTENTS sidebar.
 
+8. **Event `country` backfill.** The new `country` select field on the `events` collection powers the country filter on the `/events` listing page, but events imported from Webflow only have a free-text `venue` — so existing rows have a null `country`. `apps/cms/scripts/backfill-event-country.ts` maps each event's `venue` to a country enum value (`india` / `united-states` / `uae` / `thailand`) via a substring table and sets `country`. The column is created by the `20260608_121245_add_event_country` migration (runs via CI on deploy to `main`), so run this **after** the migration on go-live.
+   - Idempotent / re-runnable (only writes when the mapped country differs from what's stored). `--dry-run` previews. Venues that match no rule are logged, never guessed — add a `COUNTRY_RULES` entry + an Events collection enum option if a new country appears.
+   - Writes via `payload.update`, which re-fires the events afterChange hooks. The Teams (`webhooks-publish`) and IndexNow hooks are publish-transition-gated, so a re-save of an already-published event does NOT fire them; the only afterChange effects are a Meilisearch re-sync and a version row per event. **Run in a quiet window.**
+   - From inside the `cms` container: `pnpm exec tsx --env-file=.env scripts/backfill-event-country.ts --dry-run` then `pnpm exec tsx --env-file=.env scripts/backfill-event-country.ts` (no flag). Local-dev blast radius: 21 scanned, 21 updated, 0 unmapped.
+   - After the run, spot-check `/events` — the COUNTRY filter should partition the past-events grid (e.g. `?country=united-states` shows only the US events).
+
 (Add new one-shot production tasks under this list as they come up — Phase H imports, Meilisearch initial index, etc.)
 
 ---
