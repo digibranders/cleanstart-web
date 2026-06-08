@@ -150,6 +150,7 @@ export interface KhArticle {
   slug: string;
   title: string;
   abstract?: string | null;
+  videoUrl?: string | null;
   category?: { name: string } | null;
   body?: LexicalRoot | null;
   tableOfContents?: TocEntry[] | null;

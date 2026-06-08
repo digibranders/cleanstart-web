@@ -36,6 +36,7 @@ import config from '../src/payload.config.ts';
 import { htmlToLexical } from '../src/payload/lib/webflow-import/html-to-lexical';
 import { CATEGORY_TO_GROUP_SLUG, LEGACY_GROUPS, VEX_HTML } from './data/kb-legacy-articles.ts';
 import { SECTION_NAMES, SECTION_ORDER, humanizeLabel } from './data/kb-taxonomy.ts';
+import { videoUrlForPath } from './data/kb-videos.ts';
 
 interface ManifestArticle {
   slug: string;
@@ -159,6 +160,7 @@ async function upsertArticle(
     abstract?: string;
     category: number;
     body: ReturnType<typeof htmlToLexical>;
+    videoUrl?: string;
   },
 ): Promise<void> {
   const existing = await payload.find({
@@ -308,6 +310,7 @@ async function run(): Promise<void> {
       abstract: deriveAbstract(a.bodyHtml),
       category: catId,
       body: htmlToLexical(a.bodyHtml),
+      videoUrl: videoUrlForPath(a.path),
     });
     const done = counters.artCreated + counters.artUpdated + counters.artSkipped;
     if (done % 50 === 0) payload.logger.info(`articles processed: ${done}`);

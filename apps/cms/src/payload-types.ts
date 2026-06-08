@@ -2051,6 +2051,10 @@ export interface KnowledgeBase {
   abstract?: string | null;
   heroImage?: (number | null) | Media;
   /**
+   * Optional lesson video (direct MP4 URL). When set, a "Watch the Lesson" player renders above the article body on /knowledge-hub.
+   */
+  videoUrl?: string | null;
+  /**
    * Editorial taxonomy — drives the sidebar grouping on /knowledge-hub. Pick the most-specific leaf category; ancestors are inferred via the category parent chain.
    */
   category: number | KnowledgeCategory;
@@ -8092,6 +8096,7 @@ export interface KnowledgeBaseSelect<T extends boolean = true> {
   slug?: T;
   abstract?: T;
   heroImage?: T;
+  videoUrl?: T;
   category?: T;
   body?: T;
   faqs?:

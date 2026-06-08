@@ -41,6 +41,29 @@ export function KnowledgeHubArticle({
         </Reveal>
       )}
 
+      {article.videoUrl && (
+        <Reveal header delay={0.2} y={20}>
+          <div className="mt-10">
+            <p
+              className="mb-3 font-medium uppercase tracking-[0.08em] text-cs-purple-1"
+              style={{ fontSize: 'var(--fs-eyebrow)' }}
+            >
+              Watch the Lesson
+            </p>
+            <div className="overflow-hidden rounded-2xl bg-black" style={{ aspectRatio: '16 / 9' }}>
+              {/* biome-ignore lint/a11y/useMediaCaption: Academy lesson videos ship without a caption track. */}
+              <video
+                controls
+                preload="metadata"
+                playsInline
+                className="h-full w-full"
+                src={article.videoUrl}
+              />
+            </div>
+          </div>
+        </Reveal>
+      )}
+
       <div className="article-body mt-12">
         <RenderLexical content={article.body} />
       </div>
