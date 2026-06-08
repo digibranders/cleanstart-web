@@ -87,10 +87,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Lint
-        run: pnpm lint
+        run: pnpm --filter @cleanstart/cms lint
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: pnpm --filter @cleanstart/cms typecheck
 
       - name: Test (with coverage)
         run: pnpm --filter @cleanstart/cms test:coverage
@@ -111,7 +111,7 @@ jobs:
         run: pnpm --filter @cleanstart/cms verify:payload-ui
 
       - name: Build
-        run: pnpm build
+        run: pnpm --filter @cleanstart/cms build
 
       - name: Verify admin first-load bundle budget (Wave 8 part 2)
         run: pnpm --filter @cleanstart/cms verify:bundle-budget
