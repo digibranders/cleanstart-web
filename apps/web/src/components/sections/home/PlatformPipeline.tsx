@@ -510,17 +510,22 @@ function PlatformPipelineMobile() {
         className="relative flex flex-col"
         style={{ gap: CARDS_GAP, paddingLeft: RAIL_WIDTH }}
       >
-        {/* Vertical light line spanning from the first flare center to the last
-            flare center, passing through the center of each horizontal flare. */}
+        {/* Vertical light line: starts at the first card's center, runs down the
+            left rail through every card, then extends past the cards column into
+            the platform card below. The opaque platform card (a later sibling)
+            paints over the tail, so the rail reads as plugging straight into it
+            — replacing the old floating connector flares. */}
         <div
           aria-hidden
           className="pointer-events-none absolute"
           style={{
             left: `${LINE_X}px`,
-            // Offset from container top/bottom = half a card's height, so the
-            // line starts at the first card's center and ends at the last's.
+            // Top offset = half a card's height, so the line starts at the first
+            // card's center. The bottom extends 60px below the cards column —
+            // past the 44px gap and a little under the platform card's top edge
+            // — so the solid portion connects into the card before being clipped.
             top: "calc((100% / 4 - 16px * 3 / 4) / 2)",
-            bottom: "calc((100% / 4 - 16px * 3 / 4) / 2)",
+            bottom: -60,
             width: 2,
             transform: "translateX(-50%)",
             background:
@@ -530,45 +535,6 @@ function PlatformPipelineMobile() {
             mixBlendMode: "screen",
           }}
         />
-
-        {/* Center flares rendered before the cards in DOM so the cards paint
-            over any overlapping portion. Their vertical center lands at the
-            midpoint of the gap below the cards column; the bottom block (next
-            sibling) paints after and hides the part extending into its area. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute"
-          style={{
-            top: "calc(100% - 71px)",
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: 200,
-            height: 182,
-          }}
-        >
-          {[
-            { offset: -26 },
-            { offset: 26 },
-          ].map((p) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={p.offset}
-              src="/images/cleanstart-factory/flare.webp"
-              alt=""
-              aria-hidden
-              className="pointer-events-none absolute select-none"
-              style={{
-                top: 0,
-                left: "50%",
-                transform: `translateX(calc(-50% + ${p.offset}px))`,
-                width: 136,
-                height: 182,
-                mixBlendMode: "screen",
-                filter: "saturate(1.3) brightness(1.2)",
-              }}
-            />
-          ))}
-        </div>
 
         {CARDS.map((c, i) => (
           <div key={c.title} className="relative">
