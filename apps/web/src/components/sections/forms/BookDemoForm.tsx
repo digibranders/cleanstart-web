@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useRef, useState } from "react";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
+import { LeadConsent } from "@/components/forms/LeadConsent";
 import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
 import { submitLead } from "@/lib/leads/submitLead";
 import { SubmitButton } from "./FormCard";
@@ -115,39 +115,7 @@ export function BookDemoForm(): React.ReactElement {
                 label="How did you hear about CleanStart?"
               />
 
-              <ConsentText>
-                CleanStart is committed to protecting and respecting your privacy, and we&rsquo;ll
-                only use your personal information to administer your account and to provide the
-                products and services you requested from us. From time to time, we would like to
-                contact you about our products and services, as well as other content that may be
-                of interest to you. If you consent to us contacting you for this purpose, please
-                tick below to say how you would like us to contact you:
-              </ConsentText>
-              <FigmaCheckbox
-                name="consent_marketing"
-                label="I agree to receive other communications from CleanStart."
-              />
-
-              <ConsentText>
-                In order to provide you the content requested, we need to store and process your
-                personal data. If you consent to us storing your personal data for this purpose,
-                please tick the checkbox below.
-              </ConsentText>
-              <FigmaCheckbox
-                name="consent_storage"
-                label="I agree to allow CleanStart to store and process my personal data."
-                required
-              />
-
-              <ConsentText>
-                You can unsubscribe from these communications at any time. For more information on
-                how to unsubscribe, our privacy practices, and how we are committed to protecting
-                and respecting your privacy, please review our{" "}
-                <Link href="/privacy-policy" className="underline" style={{ color: "#2F49E5" }}>
-                  Privacy Policy
-                </Link>
-                .
-              </ConsentText>
+              <LeadConsent />
 
               <TurnstileWidget />
               <SubmitButton busy={submitting} busyLabel="Submitting…">
@@ -208,77 +176,6 @@ function FigmaTextInput({
           height: "40px",
         }}
       />
-    </label>
-  );
-}
-
-function ConsentText({ children }: { children: React.ReactNode }): React.ReactElement {
-  return (
-    <p
-      style={{
-        fontFamily: "var(--font-sans), 'Sora', sans-serif",
-        fontWeight: 400,
-        fontSize: "var(--fs-caption)",
-        lineHeight: 1.5,
-        letterSpacing: "-0.02em",
-        color: "#111111",
-        opacity: 0.75,
-        textAlign: "justify",
-      }}
-    >
-      {children}
-    </p>
-  );
-}
-
-interface CheckboxProps {
-  name: string;
-  label: string;
-  required?: boolean;
-}
-
-function FigmaCheckbox({ name, label, required }: CheckboxProps): React.ReactElement {
-  return (
-    <label className="flex items-center cursor-pointer" style={{ gap: "8px" }}>
-      <span className="relative inline-flex shrink-0" style={{ width: "18px", height: "18px" }}>
-        <input
-          type="checkbox"
-          name={name}
-          required={required}
-          aria-required={required || undefined}
-          className="peer w-full h-full appearance-none cursor-pointer rounded-[4px] bg-[#FBFBFB] border-[1.5px] border-[#DDDDDD] checked:bg-[#3960F9] checked:border-[#3960F9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3960F9]"
-        />
-        <svg
-          aria-hidden
-          viewBox="0 0 16 16"
-          className="pointer-events-none absolute inset-0 m-auto hidden peer-checked:block"
-          width="12"
-          height="12"
-        >
-          <path
-            d="M3 8.5l3 3 7-7"
-            fill="none"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </span>
-      <span
-        style={{
-          fontFamily: "var(--font-sans), 'Sora', sans-serif",
-          fontWeight: 400,
-          fontSize: "var(--fs-caption)",
-          lineHeight: 1.4,
-          letterSpacing: "-0.02em",
-          color: "#111111",
-          opacity: 0.85,
-        }}
-      >
-        {label}
-        {required && <span className="ml-0.5 text-[#D14343]">*</span>}
-      </span>
     </label>
   );
 }
