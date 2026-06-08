@@ -40,6 +40,7 @@ export function parseYouTubeFeed(xml: string, limit: number): ChannelVideo[] {
   for (const match of xml.matchAll(ENTRY_RE)) {
     if (videos.length >= limit) break;
     const block = match[1];
+    if (block === undefined) continue;
     const videoId = VIDEO_ID_RE.exec(block)?.[1];
     if (!videoId) continue;
     const title = decodeEntities(TITLE_RE.exec(block)?.[1] ?? "");

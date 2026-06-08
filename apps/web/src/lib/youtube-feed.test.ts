@@ -22,12 +22,12 @@ describe("parseYouTubeFeed", () => {
 
   it("decodes XML entities in titles", () => {
     const videos = parseYouTubeFeed(fixture, 10);
-    expect(videos[1].title).toBe("Supply chain & SBOM: what's changed");
+    expect(videos[1]?.title).toBe("Supply chain & SBOM: what's changed");
   });
 
   it("derives the thumbnail from the videoId (ignores feed media:thumbnail host)", () => {
     const videos = parseYouTubeFeed(fixture, 1);
-    expect(videos[0].thumbnailUrl).toContain(
+    expect(videos[0]?.thumbnailUrl).toContain(
       "https://i.ytimg.com/vi/GqFPH4KKqpA/",
     );
   });

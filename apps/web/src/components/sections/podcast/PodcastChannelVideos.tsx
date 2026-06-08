@@ -1,9 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { PodcastCtaCard } from "@/lib/podcast";
-import { RevealStagger, RevealItem } from "@/components/ui/Reveal";
+import type { ChannelVideo } from "@/lib/youtube-feed";
+import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
+import { YouTubeEmbed } from "./_components/YouTubeEmbed";
 
 type Props = {
+  videoHeading: string;
+  videos: ChannelVideo[];
   cards: PodcastCtaCard[];
 };
 
@@ -11,6 +15,7 @@ const CARD_ICONS = [
   "/images/podcast/cta-card-icon-explore.webp",
   "/images/podcast/cta-card-icon-news.webp",
   "/images/podcast/cta-card-icon-updates.webp",
+  "/images/podcast/cta-card-icon-subscribe.webp",
 ] as const;
 
 const RING_BG =
@@ -19,14 +24,6 @@ const RING_BG =
 const BUTTON_BG = "#3960F9";
 const BUTTON_SHADOW =
   "0 1px 2px -1px rgba(9,6,63,0.4), 0 0 0 1px #3960F9, inset 0 1px 0 rgba(255,255,255,0.16)";
-
-const GLOW_GRADIENT =
-  "linear-gradient(90deg, #06b6d4 0%, #6366f1 75%, #6366f1 100%)";
-
-const VERTICAL_LINE_FADE =
-  "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 100%)";
-const HORIZONTAL_LINE_FADE =
-  "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 100%)";
 
 function ArrowRight(): React.ReactElement {
   return (
@@ -50,7 +47,48 @@ function ArrowRight(): React.ReactElement {
   );
 }
 
-function ResourceCard({
+function ChannelVideoCard({
+  video,
+}: {
+  video: ChannelVideo;
+}): React.ReactElement {
+  return (
+    <article className="flex flex-col w-full">
+      <div
+        className="relative overflow-hidden bg-white"
+        style={{
+          borderRadius: "16px",
+          boxShadow:
+            "0 4px 8px -4px rgba(22,34,51,0.08), 0 16px 24px rgba(22,34,51,0.08)",
+        }}
+      >
+        <YouTubeEmbed
+          videoId={video.videoId}
+          title={video.title}
+          thumbnailUrl={video.thumbnailUrl}
+          rounded="16px"
+        />
+      </div>
+      <h3
+        className="font-display font-medium text-[#111111]"
+        style={{
+          fontSize: "var(--fs-h4)",
+          lineHeight: 1.3,
+          letterSpacing: "-0.01em",
+          marginTop: "16px",
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
+        }}
+      >
+        {video.title}
+      </h3>
+    </article>
+  );
+}
+
+function CompactResourceCard({
   card,
   iconSrc,
 }: {
@@ -60,38 +98,22 @@ function ResourceCard({
   return (
     <div className="relative flex w-full h-full">
       <div
-        aria-hidden
-        className="pointer-events-none absolute"
-        style={{
-          left: "8%",
-          top: "38%",
-          width: "84%",
-          height: "42%",
-          borderRadius: "9999px",
-          background: GLOW_GRADIENT,
-          opacity: 0.25,
-          filter: "blur(48px)",
-        }}
-      />
-
-      <div
         className="relative flex w-full"
         style={{
-          borderRadius: "clamp(28px, 2.8vw, 40px)",
+          borderRadius: "clamp(20px, 2vw, 28px)",
           background: RING_BG,
-          padding: "clamp(6px, 0.6vw, 8px)",
+          padding: "clamp(5px, 0.5vw, 6px)",
         }}
       >
         <div
           className="relative flex w-full flex-col overflow-hidden bg-white"
           style={{
-            borderRadius: "clamp(22px, 2.2vw, 32px)",
+            borderRadius: "clamp(16px, 1.6vw, 22px)",
             boxShadow:
-              "0 3px 4px rgba(22,34,51,0.04), 0 12px 24px rgba(22,34,51,0.06), 0 30px 60px rgba(22,34,51,0.08)",
-            padding:
-              "clamp(28px, 3vw, 40px) clamp(28px, 3vw, 40px) clamp(32px, 3.2vw, 40px)",
-            gap: "clamp(16px, 1.6vw, 24px)",
-            minHeight: "clamp(360px, 30vw, 435px)",
+              "0 3px 4px rgba(22,34,51,0.04), 0 12px 24px rgba(22,34,51,0.06)",
+            padding: "clamp(18px, 1.8vw, 24px)",
+            gap: "clamp(10px, 1vw, 14px)",
+            minHeight: "clamp(220px, 18vw, 260px)",
           }}
         >
           <div
@@ -99,91 +121,37 @@ function ResourceCard({
             className="pointer-events-none absolute"
             style={{
               left: "4%",
-              top: "10%",
+              top: "6%",
               width: "92%",
-              height: "35%",
+              height: "30%",
               background: "#df9bff",
-              opacity: 0.45,
-              filter: "blur(64px)",
+              opacity: 0.35,
+              filter: "blur(48px)",
               borderRadius: "50%",
             }}
           />
 
-          {[20, 40, 56, 80].map((pct) => (
-            <div
-              key={pct}
-              aria-hidden
-              className="pointer-events-none absolute"
-              style={{
-                left: `${pct}%`,
-                top: "2%",
-                width: "1px",
-                height: "55%",
-                background: VERTICAL_LINE_FADE,
-                opacity: 0.6,
-              }}
-            />
-          ))}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute"
-            style={{
-              left: "-6%",
-              top: "20%",
-              width: "112%",
-              height: "1px",
-              background: HORIZONTAL_LINE_FADE,
-              opacity: 0.4,
-            }}
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute"
-            style={{
-              left: "-6%",
-              top: "44%",
-              width: "112%",
-              height: "1px",
-              background: HORIZONTAL_LINE_FADE,
-              opacity: 0.4,
-            }}
-          />
-
-          <div
-            className="relative"
-            style={{
-              width: "clamp(96px, 9.5vw, 140px)",
-              height: "clamp(96px, 9.5vw, 140px)",
-            }}
-          >
+          <div className="relative" style={{ width: "56px", height: "56px" }}>
             <Image
               src={iconSrc}
               alt=""
-              width={200}
-              height={200}
+              width={120}
+              height={120}
               aria-hidden
               className="select-none pointer-events-none object-contain"
-              style={{
-                width: "120%",
-                height: "120%",
-                marginLeft: "-10%",
-                marginTop: "-10%",
-              }}
+              style={{ width: "100%", height: "100%" }}
             />
           </div>
 
-          <div
-            className="relative flex flex-col"
-            style={{ gap: "clamp(10px, 1.1vw, 16px)" }}
-          >
+          <div className="relative flex flex-col" style={{ gap: "6px" }}>
             <h3
               className="text-[#111111]"
               style={{
                 fontFamily: "var(--font-display), sans-serif",
                 fontWeight: 700,
-                fontSize: "var(--fs-h3)",
-                lineHeight: 1.1,
-                letterSpacing: "-0.04em",
+                fontSize: "var(--fs-h4)",
+                lineHeight: 1.15,
+                letterSpacing: "-0.03em",
               }}
             >
               {card.title}
@@ -193,9 +161,9 @@ function ResourceCard({
               style={{
                 fontFamily: "var(--font-display), sans-serif",
                 fontWeight: 400,
-                fontSize: "var(--fs-body)",
+                fontSize: "var(--fs-body-sm)",
                 lineHeight: 1.4,
-                letterSpacing: "-0.03em",
+                letterSpacing: "-0.02em",
               }}
             >
               {card.body}
@@ -203,21 +171,21 @@ function ResourceCard({
           </div>
 
           {/* Pin the CTA to the card bottom so buttons align across the row regardless of body length. */}
-          <div className="relative mt-auto">
+          <div className="relative mt-auto pt-2">
             <Link
               href={card.ctaHref}
               className="inline-flex items-center text-white transition-transform duration-200 hover:-translate-y-px active:translate-y-0"
               style={{
-                height: "clamp(36px, 3vw, 44px)",
-                paddingLeft: "14px",
-                paddingRight: "14px",
-                gap: "8px",
+                height: "clamp(36px, 2.6vw, 40px)",
+                paddingLeft: "12px",
+                paddingRight: "12px",
+                gap: "6px",
                 background: BUTTON_BG,
                 borderRadius: "8px",
                 boxShadow: BUTTON_SHADOW,
                 fontFamily: "Inter, sans-serif",
                 fontWeight: 500,
-                fontSize: "var(--fs-body)",
+                fontSize: "var(--fs-body-sm)",
                 letterSpacing: "-0.01em",
                 width: "fit-content",
               }}
@@ -232,14 +200,18 @@ function ResourceCard({
   );
 }
 
-export function PodcastCTACards({ cards }: Props): React.ReactElement | null {
-  const visible = cards.slice(0, 3);
-  if (visible.length === 0) return null;
+export function PodcastChannelVideos({
+  videoHeading,
+  videos,
+  cards,
+}: Props): React.ReactElement | null {
+  const visibleCards = cards.slice(0, 4);
+  if (visibleCards.length === 0 && videos.length === 0) return null;
 
   return (
     <section
       className="relative overflow-hidden bg-white"
-      aria-label="Explore more from CleanStart"
+      aria-label="From the CleanStart channel"
     >
       <div
         aria-hidden
@@ -318,13 +290,40 @@ export function PodcastCTACards({ cards }: Props): React.ReactElement | null {
       </svg>
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-[clamp(60px,7vw,100px)]">
+        {videos.length > 0 && (
+          <>
+            <Reveal header>
+              <h2
+                className="text-left text-[#111111] font-bold"
+                style={{
+                  fontSize: "var(--fs-h2)",
+                  lineHeight: 1.1,
+                  letterSpacing: "-0.04em",
+                }}
+              >
+                {videoHeading}
+              </h2>
+            </Reveal>
+            <RevealStagger className="mt-[44px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-[32px] gap-y-[40px]">
+              {videos.map((video) => (
+                <RevealItem key={video.videoId}>
+                  <ChannelVideoCard video={video} />
+                </RevealItem>
+              ))}
+            </RevealStagger>
+          </>
+        )}
+
         <RevealStagger
-          className="grid grid-cols-1 md:grid-cols-3 items-stretch"
-          style={{ gap: "clamp(20px, 2.3vw, 33px)" }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-stretch"
+          style={{
+            gap: "clamp(16px, 1.8vw, 24px)",
+            marginTop: videos.length > 0 ? "clamp(48px, 5vw, 72px)" : "0",
+          }}
         >
-          {visible.map((card, i) => (
+          {visibleCards.map((card, i) => (
             <RevealItem key={card.title}>
-              <ResourceCard
+              <CompactResourceCard
                 card={card}
                 iconSrc={CARD_ICONS[i] ?? CARD_ICONS[0]}
               />

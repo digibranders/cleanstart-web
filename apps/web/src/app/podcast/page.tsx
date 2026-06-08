@@ -7,10 +7,12 @@ import { FadeUp } from "@/components/ui/FadeUp";
 import { PodcastHero } from "@/components/sections/podcast/PodcastHero";
 import { PodcastLatestEpisodes } from "@/components/sections/podcast/PodcastLatestEpisodes";
 import { PodcastFeaturedContent } from "@/components/sections/podcast/PodcastFeaturedContent";
-// PodcastCTACards sits below all the listing content; code-split out of the
-// initial podcast client bundle.
-const PodcastCTACards = nextDynamic(() =>
-  import("@/components/sections/podcast/PodcastCTACards").then((m) => ({ default: m.PodcastCTACards })),
+// PodcastChannelVideos sits below all the listing content; code-split out of
+// the initial podcast client bundle.
+const PodcastChannelVideos = nextDynamic(() =>
+  import("@/components/sections/podcast/PodcastChannelVideos").then((m) => ({
+    default: m.PodcastChannelVideos,
+  })),
 );
 import {
   getFeaturedPodcastEpisodes,
@@ -19,6 +21,10 @@ import {
   isHydratedEpisode,
   type PodcastCtaCard,
 } from "@/lib/podcast";
+import {
+  CLEANSTART_YOUTUBE_HANDLE_URL,
+  getChannelVideos,
+} from "@/lib/youtube-feed";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
@@ -47,6 +53,12 @@ const DEFAULT_CTA_CARDS: PodcastCtaCard[] = [
     ctaLabel: "Sign Up",
     ctaHref: "/book-a-demo",
   },
+  {
+    title: "Subscribe on YouTube",
+    body: "Get every new episode the moment it drops on our channel.",
+    ctaLabel: "Subscribe",
+    ctaHref: CLEANSTART_YOUTUBE_HANDLE_URL,
+  },
 ];
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -62,7 +74,7 @@ export default async function PodcastPage(): Promise<React.ReactElement> {
   const page = await getPodcastPage();
   const limit = page?.latestEpisodesLimit ?? 6;
 
-  const [latestData, featured] = await Promise.all([
+  const [latestData, featured, channelVideos] = await Promise.all([
     // Fetch one extra so dropping the featured hero below still leaves up to
     // `limit` cards in the Latest Episodes grid.
     getPodcastEpisodes({ limit: limit + 1 }).catch(() => ({
@@ -74,6 +86,7 @@ export default async function PodcastPage(): Promise<React.ReactElement> {
       totalPages: 1,
     })),
     getFeaturedPodcastEpisodes(2).catch(() => []),
+    getChannelVideos(6).catch(() => []),
   ]);
 
   const featuredHero =
@@ -123,7 +136,11 @@ export default async function PodcastPage(): Promise<React.ReactElement> {
         </FadeUp>
 
         <FadeUp>
-          <PodcastCTACards cards={ctaCards} />
+          <PodcastChannelVideos
+            videoHeading="From the CleanStart channel"
+            videos={channelVideos}
+            cards={ctaCards}
+          />
         </FadeUp>
       </main>
       <Footer />
