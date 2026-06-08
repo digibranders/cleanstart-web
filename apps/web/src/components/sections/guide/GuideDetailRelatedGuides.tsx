@@ -61,20 +61,16 @@ export function GuideDetailRelatedGuides({
           </Link>
         </Reveal>
 
-        {/* Below md the row scrolls horizontally with snap points; the negative
-            -mx-6 + px lets the first card align with the heading above. */}
-        <div
-          className="flex md:hidden overflow-x-auto snap-x snap-mandatory gap-4 mt-[40px] -mx-6 pl-10 pr-6 pb-2 [scroll-padding-left:2.5rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
+        {/* Single render across breakpoints — a horizontal scroll-snap carousel
+            below md, a stagger grid at md+ — so each card's heading appears once
+            in the document outline. The negative -mx-6 + pl-10 lets the first
+            card align with the heading above on mobile. */}
+        <RevealStagger className="flex md:grid md:grid-cols-2 xl:grid-cols-3 overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none gap-4 md:gap-8 mt-[40px] md:mt-[60px] -mx-6 md:mx-0 pl-10 md:pl-0 pr-6 md:pr-0 pb-2 md:pb-0 [scroll-padding-left:2.5rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {guides.map((guide) => (
-            <div key={guide.id} className="snap-start shrink-0 w-[80%] min-w-[260px] max-w-[320px]">
-              <RelatedGuideCard guide={guide} />
-            </div>
-          ))}
-        </div>
-        <RevealStagger className="hidden md:grid md:grid-cols-2 xl:grid-cols-3 gap-8 mt-[60px]">
-          {guides.map((guide) => (
-            <RevealItem key={guide.id}>
+            <RevealItem
+              key={guide.id}
+              className="snap-start shrink-0 w-[80%] min-w-[260px] max-w-[320px] md:w-auto md:min-w-0 md:max-w-none"
+            >
               <RelatedGuideCard guide={guide} />
             </RevealItem>
           ))}
