@@ -630,7 +630,6 @@ export interface Media {
    * Photographer / source attribution.
    */
   credit?: string | null;
-  prefix?: string | null;
   /**
    * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
    */
@@ -638,6 +637,7 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -1101,6 +1101,10 @@ export interface News {
    * Dateline city, e.g. "Lewes, DE" — rendered before the body opener.
    */
   location?: string | null;
+  /**
+   * Region this story belongs to. Powers the region filter on the /news listing page.
+   */
+  region?: ('asia-pacific' | 'europe-middle-east' | 'usa-north-america') | null;
   body?: {
     root: {
       type: string;
@@ -1402,6 +1406,7 @@ export interface News {
       | boolean
       | null;
   };
+  featured?: boolean | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -2046,6 +2051,10 @@ export interface KnowledgeBase {
   abstract?: string | null;
   heroImage?: (number | null) | Media;
   /**
+   * Optional lesson video (direct MP4 URL). When set, a "Watch the Lesson" player renders above the article body on /knowledge-hub.
+   */
+  videoUrl?: string | null;
+  /**
    * Editorial taxonomy — drives the sidebar grouping on /knowledge-hub. Pick the most-specific leaf category; ancestors are inferred via the category parent chain.
    */
   category: number | KnowledgeCategory;
@@ -2535,6 +2544,10 @@ export interface KnowledgeCategory {
       | boolean
       | null;
   };
+  /**
+   * Lower sorts higher in the Knowledge Hub sidebar. Legacy groups use 0–9; Academy sections 10+.
+   */
+  displayOrder?: number | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -3075,6 +3088,10 @@ export interface Event {
    */
   slug: string;
   venue: string;
+  /**
+   * Country where the event is held. Powers the country filter on the /events listing page — set it to match the venue.
+   */
+  country?: ('india' | 'united-states' | 'uae' | 'thailand') | null;
   abstract?: string | null;
   heroImage?: (number | null) | Media;
   body?: {
@@ -4582,6 +4599,7 @@ export interface CareerApplication {
  */
 export interface Resume {
   id: number;
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -7715,6 +7733,7 @@ export interface NewsSelect<T extends boolean = true> {
   publisherLogo?: T;
   pressType?: T;
   location?: T;
+  region?: T;
   body?: T;
   authors?: T;
   newsCategories?: T;
@@ -7849,6 +7868,7 @@ export interface NewsSelect<T extends boolean = true> {
             };
         additionalSchema?: T;
       };
+  featured?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -8076,6 +8096,7 @@ export interface KnowledgeBaseSelect<T extends boolean = true> {
   slug?: T;
   abstract?: T;
   heroImage?: T;
+  videoUrl?: T;
   category?: T;
   body?: T;
   faqs?:
@@ -8406,6 +8427,7 @@ export interface EventsSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   venue?: T;
+  country?: T;
   abstract?: T;
   heroImage?: T;
   body?: T;
@@ -9046,13 +9068,13 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   credit?: T;
-  prefix?: T;
   focalPoint?:
     | T
     | {
         x?: T;
         y?: T;
       };
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -10279,6 +10301,7 @@ export interface KnowledgeCategoriesSelect<T extends boolean = true> {
             };
         additionalSchema?: T;
       };
+  displayOrder?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -10530,6 +10553,7 @@ export interface CareerApplicationsSelect<T extends boolean = true> {
  * via the `definition` "resumes_select".
  */
 export interface ResumesSelect<T extends boolean = true> {
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;

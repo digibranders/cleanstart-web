@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
+import { copyText } from "@/lib/clipboard";
 
 interface EventDetailMobileCardProps {
   title: string;
@@ -48,6 +49,10 @@ export function EventDetailMobileCard({
   const shareUrl = `${siteUrl}/event/${slug}`;
   const isCancelled = eventStatus === "cancelled";
 
+  const [shareState, setShareState] = useState<"idle" | "copied" | "failed">(
+    "idle",
+  );
+
   const handleShare = useCallback(async (): Promise<void> => {
     if (typeof navigator === "undefined") return;
     if (navigator.share) {
@@ -58,13 +63,9 @@ export function EventDetailMobileCard({
         // Share sheet dismissed; fall through to clipboard copy.
       }
     }
-    if (navigator.clipboard) {
-      try {
-        await navigator.clipboard.writeText(shareUrl);
-      } catch {
-        // Clipboard access blocked; nothing more we can do.
-      }
-    }
+    const ok = await copyText(shareUrl);
+    setShareState(ok ? "copied" : "failed");
+    window.setTimeout(() => setShareState("idle"), 2000);
   }, [title, shareUrl]);
 
   return (
@@ -228,6 +229,7 @@ export function EventDetailMobileCard({
           <button
             type="button"
             onClick={handleShare}
+            aria-live="polite"
             className="font-sans inline-flex items-center justify-center gap-2 mt-5 w-full"
             style={{
               height: "40px",
@@ -241,8 +243,12 @@ export function EventDetailMobileCard({
               cursor: "pointer",
             }}
           >
-            Share
-            <ShareIcon />
+            {shareState === "copied"
+              ? "Link copied"
+              : shareState === "failed"
+                ? "Copy failed"
+                : "Share"}
+            {shareState === "copied" ? <CheckIcon /> : <ShareIcon />}
           </button>
         </div>
 
@@ -361,6 +367,20 @@ function ShareIcon(): React.ReactElement {
         d="M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6M16 6l-4-4-4 4M12 2v13"
         stroke="white"
         strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function CheckIcon(): React.ReactElement {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M5 12.5l4.5 4.5L19 7"
+        stroke="white"
+        strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
       />

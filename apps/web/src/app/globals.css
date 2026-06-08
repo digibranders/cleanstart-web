@@ -81,6 +81,7 @@
   --color-cs-cyan: #2cc1eb;
   --color-cs-cyan-2: #33baec;
   --color-cs-lavender: #dab6f3;
+  --color-cs-neon-cyan: #22e0ff;
   --color-cs-text-dark: #111111;
 
   /* Container family — see RESPONSIVE-SYSTEM-AUDIT.md §6.3.
@@ -366,12 +367,13 @@
   --btn-fs-xs:           var(--fs-button-sm);
 }
 
-/* Desktop (lg+) adds the utility strip above the main nav bar, growing the
-   fixed header by 36px. --cs-header-extra is the per-hero clearance delta. */
+/* Desktop (lg+) adds the 36px utility strip above the main nav bar, while the
+   main bar itself shrinks 72px → 60px, so the full header is 96px (24px taller
+   than mobile's 72px). --cs-header-extra is that 24px per-hero clearance delta. */
 @media (min-width: 1024px) {
   :root {
-    --cs-header-h: 108px;
-    --cs-header-extra: 36px;
+    --cs-header-h: 96px;
+    --cs-header-extra: 24px;
   }
 }
 
@@ -2980,6 +2982,13 @@ body {
 /* Quiet metadata chip — icon tiles and tags. A flat tonal square, borderless. */
 .cs-chip {
   background: var(--cs-chip);
+}
+
+/* Neon-cyan glyph color for mega-menu item icons. NavIcon glyphs render with
+   currentColor, so this is all it takes. Clean fill, no glow/shadow. Shade lives
+   in one place: --color-cs-neon-cyan. */
+.cs-nav-glyph {
+  color: var(--color-cs-neon-cyan);
 }
 
 .cs-cta-glass {

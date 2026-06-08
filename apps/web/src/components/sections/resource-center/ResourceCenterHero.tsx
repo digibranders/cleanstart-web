@@ -92,17 +92,7 @@ export function ResourceCenterHero({
                   lineHeight: "var(--text-hero-lh)",
                 }}
               >
-                {"Resource "}
-                <span
-                  className="bg-clip-text"
-                  style={{
-                    WebkitTextFillColor: "transparent",
-                    backgroundImage:
-                      "linear-gradient(105.93deg, #9a51ff 1.76%, #2cc1eb 98.78%)",
-                  }}
-                >
-                  Center
-                </span>
+                Resource Center
               </h1>
             </HeroReveal>
             <HeroReveal y={30} delay={0.15} duration={0.8}>

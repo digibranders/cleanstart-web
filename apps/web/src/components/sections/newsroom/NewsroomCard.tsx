@@ -17,9 +17,9 @@ export function NewsroomCard({ item }: NewsroomCardProps): React.ReactElement {
 
   return (
     <article
-      className="relative flex w-full max-w-[404px] flex-col bg-white overflow-hidden"
+      className="relative flex w-full max-w-[340px] flex-col bg-white overflow-hidden"
       style={{
-        minHeight: "clamp(360px, 38vw, 521px)",
+        minHeight: "clamp(380px, 30vw, 470px)",
         borderRadius: "32px",
         boxShadow:
           "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01), 0px 52px 21px 0px rgba(0,0,0,0), 0px 81px 23px 0px rgba(0,0,0,0)",

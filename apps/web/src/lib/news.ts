@@ -18,6 +18,8 @@ export type PressType =
   | "announcement"
   | "feature";
 
+export type NewsRegion = "asia-pacific" | "europe-middle-east" | "usa-north-america";
+
 export type News = {
   id: string;
   title: string;
@@ -28,10 +30,12 @@ export type News = {
   publisherLogo?: NewsImage | null;
   pressType?: PressType | null;
   location?: string | null;
+  region?: NewsRegion | null;
   newsCategories?: NewsCategory[] | null;
   externalUrl?: string | null;
   publicationDate?: string | null;
   readingMinutes?: number | null;
+  featured?: boolean | null;
   seo?: CmsSeo | null;
 };
 
@@ -57,16 +61,32 @@ export type NewsListResponse = PayloadListResponse<News>;
 const PUBLISHED_FILTER =
   "where[_status][equals]=published&where[publicationDate][exists]=true";
 
+export async function getFeaturedNews(): Promise<News | null> {
+  const featured = await fetchCMS<NewsListResponse>(
+    `/api/news?${PUBLISHED_FILTER}&where[featured][equals]=true&depth=2&limit=1&sort=-publicationDate`,
+  );
+  if (featured.docs[0]) return featured.docs[0];
+
+  const latest = await fetchCMS<NewsListResponse>(
+    `/api/news?${PUBLISHED_FILTER}&depth=2&limit=1&sort=-publicationDate`,
+  );
+  return latest.docs[0] ?? null;
+}
+
 export async function getNews({
   page = 1,
   limit = 9,
   category,
   search,
+  region,
+  year,
 }: {
   page?: number;
   limit?: number;
   category?: string;
   search?: string;
+  region?: NewsRegion;
+  year?: number;
 } = {}): Promise<NewsListResponse> {
   const params = new URLSearchParams({
     "where[_status][equals]": "published",
@@ -81,6 +101,13 @@ export async function getNews({
   }
   if (search) {
     params.set("where[title][contains]", search);
+  }
+  if (region) {
+    params.set("where[region][equals]", region);
+  }
+  if (year) {
+    params.set("where[publicationDate][greater_than_equal]", `${year}-01-01T00:00:00.000Z`);
+    params.set("where[publicationDate][less_than]", `${year + 1}-01-01T00:00:00.000Z`);
   }
   return fetchCMS<NewsListResponse>(`/api/news?${params.toString()}`);
 }
@@ -142,4 +169,13 @@ export async function getRelatedNews(
 }
 
 // Client-safe helpers live in `news-utils.ts`. Re-exported for backward compat.
-export { formatNewsDate, pressTypeLabel } from "./news-utils";
+export {
+  formatNewsDate,
+  pressTypeLabel,
+  REGION_LABEL,
+  FILTERABLE_REGIONS,
+  FILTERABLE_YEARS,
+  regionLabel,
+  parseRegionParam,
+  parseYearParam,
+} from "./news-utils";

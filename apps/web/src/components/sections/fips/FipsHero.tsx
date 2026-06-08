@@ -107,8 +107,7 @@ export function FipsHero(): React.ReactElement {
                 marginBottom: "clamp(16px, 1.67vw, 24px)",
               }}
             >
-              FIPS-Validated. Always{" "}
-              <span className="cs-text-gradient-impact">Verified.</span>
+              FIPS-Validated. Always Verified.
             </h1>
           </HeroReveal>
 

@@ -23,7 +23,7 @@ export function HeaderScrollShell({
             {utilityStrip}
           </div>
         ) : null}
-        <div className="flex h-[72px] items-center justify-between gap-6">
+        <div className="flex h-[72px] items-center justify-between gap-6 lg:h-[60px]">
           {children}
         </div>
       </div>

@@ -77,7 +77,7 @@ export function PodcastFeaturedContent({
             id="podcast-featured-title"
             className="text-center text-white font-bold"
             style={{
-              fontSize: "var(--fs-h1)",
+              fontSize: "var(--fs-h2)",
               lineHeight: 1,
               letterSpacing: "-0.05em",
             }}

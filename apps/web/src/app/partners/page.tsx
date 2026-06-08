@@ -4,7 +4,7 @@ import { PartnersHero } from "@/components/sections/partners/PartnersHero";
 import { PartnersWhy } from "@/components/sections/partners/PartnersWhy";
 import { PartnersNetwork } from "@/components/sections/partners/PartnersNetwork";
 import { PartnersTypes } from "@/components/sections/partners/PartnersTypes";
-import { TeamsInsiders } from "@/components/sections/teams/TeamsInsiders";
+import { PartnersTestimonials } from "@/components/sections/partners/PartnersTestimonials";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
@@ -37,7 +37,7 @@ export default function PartnersPage() {
           <PartnersNetwork />
         </FadeUp>
         <FadeUp>
-          <TeamsInsiders />
+          <PartnersTestimonials />
         </FadeUp>
         <FadeUp>
           <PartnersTypes />

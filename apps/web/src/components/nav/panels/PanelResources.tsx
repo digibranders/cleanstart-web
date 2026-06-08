@@ -69,7 +69,7 @@ function BrowseColumn({ groups }: { groups: NavMegaItem["groups"] }) {
                   href={leaf.href}
                   className="flex items-center gap-2.5 rounded-[6px] px-2 py-1.5 text-[13px] font-medium text-white/90 transition-colors hover:bg-white/[0.035]"
                 >
-                  <NavIcon id={leaf.icon ?? "folder"} size={14} className="opacity-70" />
+                  <NavIcon id={leaf.icon ?? "folder"} size={14} className="cs-nav-glyph" />
                   {leaf.label}
                 </Link>
               ),

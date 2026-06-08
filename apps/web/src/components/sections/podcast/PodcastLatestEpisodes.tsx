@@ -49,9 +49,9 @@ export function PodcastLatestEpisodes({
             id="podcast-latest-title"
             className="text-left text-[#111111] font-bold"
             style={{
-              fontSize: "var(--fs-h1)",
+              fontSize: "var(--fs-h2)",
               lineHeight: 1.1,
-              letterSpacing: "-0.02em",
+              letterSpacing: "-0.04em",
             }}
           >
             {title}

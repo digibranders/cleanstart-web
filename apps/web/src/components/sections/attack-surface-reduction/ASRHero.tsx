@@ -87,17 +87,7 @@ export function ASRHero(): React.ReactElement {
                   }}
                 >
                   <span className="block">Bigger Images,</span>
-                  <span
-                    style={{
-                      background: 'linear-gradient(96.33deg, #9A51FF 1.76%, #2CC1EB 98.78%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
-                      color: 'transparent',
-                    }}
-                  >
-                    Bigger Risk
-                  </span>
+                  <span className="block">Bigger Risk</span>
                 </h1>
               </HeroReveal>
 

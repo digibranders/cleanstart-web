@@ -94,8 +94,7 @@ export function AboutHero() {
                     letterSpacing: "-0.04em",
                   }}
                 >
-                  Building the Foundation for{" "}
-                  <span className="cs-text-gradient-impact">Trusted Software</span>
+                  Building the Foundation for Trusted Software
                 </h1>
               </HeroReveal>
 

@@ -348,7 +348,7 @@ export function Testimonials({
                 <>
                   Chosen by{" "}
                   <span className="cs-text-gradient-impact">
-                    Engineering Leaders
+                    Industry Leaders
                   </span>
                 </>
               )}

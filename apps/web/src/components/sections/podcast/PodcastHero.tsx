@@ -20,17 +20,6 @@ const VIDEO_MAX_WIDTH_PX = 720;
 const VIDEO_HEIGHT_PX = Math.round(VIDEO_MAX_WIDTH_PX * (9 / 16));
 const VIDEO_OVERLAP_PX = Math.round(VIDEO_HEIGHT_PX / 2);
 
-function splitHighlight(title: string, highlight: string): [string, string, string] {
-  if (!highlight) return [title, "", ""];
-  const idx = title.indexOf(highlight);
-  if (idx === -1) return [title, "", ""];
-  return [
-    title.slice(0, idx),
-    title.slice(idx, idx + highlight.length),
-    title.slice(idx + highlight.length),
-  ];
-}
-
 type Props = {
   page: PodcastPage | null;
   featuredHero: PodcastEpisode | null;
@@ -38,7 +27,6 @@ type Props = {
 
 export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
   const title = page?.heroTitle ?? "Leadership Exchange";
-  const highlight = page?.heroTitleHighlight ?? "Exchange";
   const subtitle =
     page?.heroSubtitle ??
     "Where industry leaders decode container security and define the future of the software supply chain.";
@@ -50,8 +38,6 @@ export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
       ? page.featuredHeroEpisode
       : null);
   const heroVideoId = heroEpisode ? resolveVideoId(heroEpisode) : null;
-
-  const [before, mark, after] = splitHighlight(title, highlight);
 
   return (
     <section
@@ -114,18 +100,7 @@ export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
                 letterSpacing: "var(--text-hero-utility-ls)",
               }}
             >
-              {before}
-              <span
-                className="bg-clip-text"
-                style={{
-                  WebkitTextFillColor: "transparent",
-                  backgroundImage:
-                    "linear-gradient(105.93deg, #9a51ff 1.76%, #2cc1eb 98.78%)",
-                }}
-              >
-                {mark}
-              </span>
-              {after}
+              {title}
             </h1>
           </HeroReveal>
           <HeroReveal y={30} delay={0.2} duration={0.8}>

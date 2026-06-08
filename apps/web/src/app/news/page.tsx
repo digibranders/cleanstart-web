@@ -5,7 +5,13 @@ import { BlogsCTA } from "@/components/sections/blogs/BlogsCTA";
 import { NewsroomHero } from "@/components/sections/newsroom/NewsroomHero";
 import { NewsroomGrid } from "@/components/sections/newsroom/NewsroomGrid";
 import { FadeUp } from "@/components/ui/FadeUp";
-import { getNews } from "@/lib/news";
+import {
+  getNews,
+  getFeaturedNews,
+  getNewsCategories,
+  parseRegionParam,
+  parseYearParam,
+} from "@/lib/news";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
@@ -17,6 +23,8 @@ interface NewsPageProps {
   searchParams: Promise<{
     page?: string;
     category?: string;
+    region?: string;
+    year?: string;
     q?: string;
   }>;
 }
@@ -41,24 +49,32 @@ export default async function NewsPage({
   const params = await searchParams;
   const page = Math.max(1, Number.parseInt(params.page ?? "1", 10));
   const activeCategory = params.category ?? "";
+  const activeRegion = parseRegionParam(params.region);
+  const activeYear = parseYearParam(params.year);
   const searchQuery = params.q ?? "";
 
   let loadFailed = false;
-  const newsData = await getNews({
-    page,
-    ...(activeCategory ? { category: activeCategory } : {}),
-    ...(searchQuery ? { search: searchQuery } : {}),
-  }).catch(() => {
-    loadFailed = true;
-    return {
-      docs: [],
-      hasNextPage: false,
-      hasPrevPage: false,
-      page: 1,
-      totalDocs: 0,
-      totalPages: 1,
-    };
-  });
+  const [featuredPost, newsData, categories] = await Promise.all([
+    getFeaturedNews().catch(() => null),
+    getNews({
+      page,
+      ...(activeCategory ? { category: activeCategory } : {}),
+      ...(activeRegion ? { region: activeRegion } : {}),
+      ...(activeYear ? { year: activeYear } : {}),
+      ...(searchQuery ? { search: searchQuery } : {}),
+    }).catch(() => {
+      loadFailed = true;
+      return {
+        docs: [],
+        hasNextPage: false,
+        hasPrevPage: false,
+        page: 1,
+        totalDocs: 0,
+        totalPages: 1,
+      };
+    }),
+    getNewsCategories().catch(() => []),
+  ]);
 
   return (
     <>
@@ -72,7 +88,10 @@ export default async function NewsPage({
       <Header />
       <main style={{ background: "#f6f6f6" }}>
         <div className="relative overflow-hidden">
-          <NewsroomHero />
+          <NewsroomHero
+            featuredPost={featuredPost}
+            searchQuery={searchQuery}
+          />
         </div>
 
         <FadeUp>
@@ -80,7 +99,10 @@ export default async function NewsPage({
             items={newsData.docs}
             currentPage={newsData.page}
             totalPages={newsData.totalPages}
+            categories={categories}
             activeCategory={activeCategory}
+            activeRegion={activeRegion}
+            activeYear={activeYear}
             searchQuery={searchQuery}
             loadFailed={loadFailed}
           />

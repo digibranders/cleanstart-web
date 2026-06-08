@@ -24,10 +24,10 @@
 import { parseFragment } from 'parse5';
 
 import {
+  type InlineCtaBlockNode,
   extractCtaFromHeading,
   isCtaHeading,
   makeInlineCtaBlock,
-  type InlineCtaBlockNode,
 } from './cta-cards';
 
 // Lexical text-format bitflags. Match
@@ -131,12 +131,63 @@ interface LexicalHorizontalRuleNode {
   readonly version: 1;
 }
 
+// @lexical/table serialized shapes (all extend SerializedElementNode).
+// `headerState`: 0 = body cell, 1 = row header, 2 = column header.
+interface LexicalTableCellNode {
+  readonly type: 'tablecell';
+  readonly version: 1;
+  readonly headerState: 0 | 1 | 2;
+  readonly colSpan: 1;
+  readonly rowSpan: 1;
+  readonly format: '';
+  readonly indent: 0;
+  readonly direction: 'ltr';
+  readonly children: readonly LexicalParagraphNode[];
+}
+
+interface LexicalTableRowNode {
+  readonly type: 'tablerow';
+  readonly version: 1;
+  readonly format: '';
+  readonly indent: 0;
+  readonly direction: 'ltr';
+  readonly children: readonly LexicalTableCellNode[];
+}
+
+interface LexicalTableNode {
+  readonly type: 'table';
+  readonly version: 1;
+  readonly format: '';
+  readonly indent: 0;
+  readonly direction: 'ltr';
+  readonly children: readonly LexicalTableRowNode[];
+}
+
+// The CodeBlock Payload block (editor-config.ts), serialized as a Lexical
+// `block` node — the same wrapper shape as InlineCtaBlockNode. Mirrors the
+// `codeBlock` field schema in payload/blocks/CodeBlock.ts.
+interface LexicalCodeBlockNode {
+  readonly type: 'block';
+  readonly version: 2;
+  readonly format: '';
+  readonly fields: {
+    readonly blockType: 'codeBlock';
+    readonly blockName: string;
+    readonly id: string;
+    readonly language: string;
+    readonly content: string;
+    readonly showLineNumbers: boolean;
+  };
+}
+
 type LexicalBlockNode =
   | LexicalParagraphNode
   | LexicalHeadingNode
   | LexicalQuoteNode
   | LexicalListNode
   | LexicalHorizontalRuleNode
+  | LexicalTableNode
+  | LexicalCodeBlockNode
   | InlineCtaBlockNode;
 
 export interface LexicalRoot {
@@ -336,10 +387,7 @@ const listItem = (children: LexicalInlineNode[]): LexicalListItemNode => ({
   children,
 });
 
-const list = (
-  ordered: boolean,
-  items: LexicalListItemNode[],
-): LexicalListNode => ({
+const list = (ordered: boolean, items: LexicalListItemNode[]): LexicalListNode => ({
   type: 'list',
   version: 1,
   listType: ordered ? 'number' : 'bullet',
@@ -351,10 +399,139 @@ const list = (
   children: items,
 });
 
+const tableCell = (
+  headerState: 0 | 1 | 2,
+  children: LexicalInlineNode[],
+): LexicalTableCellNode => ({
+  type: 'tablecell',
+  version: 1,
+  headerState,
+  colSpan: 1,
+  rowSpan: 1,
+  format: '',
+  indent: 0,
+  direction: 'ltr',
+  // A Lexical table cell holds block children, not raw inline runs.
+  children: [paragraph(children)],
+});
+
+const tableRow = (cells: LexicalTableCellNode[]): LexicalTableRowNode => ({
+  type: 'tablerow',
+  version: 1,
+  format: '',
+  indent: 0,
+  direction: 'ltr',
+  children: cells,
+});
+
+const tableNode = (rows: LexicalTableRowNode[]): LexicalTableNode => ({
+  type: 'table',
+  version: 1,
+  format: '',
+  indent: 0,
+  direction: 'ltr',
+  children: rows,
+});
+
+/** ObjectId-shaped 24-hex id (matches Payload row-id format), for block nodes. */
+const makeBlockId = (): string => {
+  const bytes = new Uint8Array(12);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+};
+
+// Languages the CodeBlock select accepts (payload/blocks/CodeBlock.ts).
+const CODE_LANGUAGES = new Set([
+  'bash',
+  'dockerfile',
+  'yaml',
+  'json',
+  'typescript',
+  'javascript',
+  'python',
+  'go',
+  'rust',
+  'sql',
+  'hcl',
+  'text',
+]);
+
+const LANGUAGE_ALIASES: Record<string, string> = {
+  sh: 'bash',
+  shell: 'bash',
+  console: 'bash',
+  zsh: 'bash',
+  docker: 'dockerfile',
+  yml: 'yaml',
+  js: 'javascript',
+  jsx: 'javascript',
+  ts: 'typescript',
+  tsx: 'typescript',
+  py: 'python',
+  golang: 'go',
+  rs: 'rust',
+  terraform: 'hcl',
+  tf: 'hcl',
+  plaintext: 'text',
+  txt: 'text',
+  plain: 'text',
+};
+
+/** Resolve a raw language hint to a CodeBlock select value, defaulting to `text`. */
+const resolveLanguage = (raw: string | undefined): string => {
+  const lower = (raw ?? '').trim().toLowerCase();
+  if (CODE_LANGUAGES.has(lower)) return lower;
+  const aliased = LANGUAGE_ALIASES[lower];
+  return aliased ?? 'text';
+};
+
+/** Concatenate descendant text verbatim — preserves whitespace for code. */
+const rawText = (nodes: readonly ParseNode[] | undefined): string => {
+  if (!nodes) return '';
+  let out = '';
+  for (const n of nodes) {
+    if (isText(n)) out += n.value;
+    else if (isElement(n)) out += rawText(n.childNodes);
+  }
+  return out;
+};
+
+const codeBlock = (language: string, content: string): LexicalCodeBlockNode => ({
+  type: 'block',
+  version: 2,
+  format: '',
+  fields: {
+    blockType: 'codeBlock',
+    blockName: '',
+    id: makeBlockId(),
+    language,
+    content,
+    showLineNumbers: false,
+  },
+});
+
 /** Heading tag clamp: h5/h6 fall back to h4 (editor only enables h1–h4). */
 const headingTag = (raw: string): 'h1' | 'h2' | 'h3' | 'h4' => {
   if (raw === 'h1' || raw === 'h2' || raw === 'h3' || raw === 'h4') return raw;
   return 'h4';
+};
+
+/** Collect `<tr>` rows from a table section (thead/tbody/tfoot) or a bare table. */
+const collectTableRows = (parent: ParseElement, columnHeaders: boolean): LexicalTableRowNode[] => {
+  const rows: LexicalTableRowNode[] = [];
+  for (const tr of parent.childNodes ?? []) {
+    if (!isElement(tr) || (tr.tagName ?? tr.nodeName) !== 'tr') continue;
+    const cells: LexicalTableCellNode[] = [];
+    for (const cell of tr.childNodes ?? []) {
+      if (!isElement(cell)) continue;
+      const cellTag = cell.tagName ?? cell.nodeName;
+      if (cellTag !== 'td' && cellTag !== 'th') continue;
+      const headerState: 0 | 1 | 2 = cellTag === 'th' ? (columnHeaders ? 2 : 1) : 0;
+      cells.push(tableCell(headerState, trimEdges(collectInline(cell.childNodes, 0))));
+    }
+    if (cells.length > 0) rows.push(tableRow(cells));
+  }
+  return rows;
 };
 
 /**
@@ -433,13 +610,43 @@ const convertBlock = (el: ParseElement): LexicalBlockNode[] => {
       }
       return out;
     }
+    case 'table': {
+      const rows: LexicalTableRowNode[] = [];
+      let sawSection = false;
+      for (const section of el.childNodes ?? []) {
+        if (!isElement(section)) continue;
+        const sectionTag = section.tagName ?? section.nodeName;
+        if (sectionTag === 'thead') {
+          sawSection = true;
+          rows.push(...collectTableRows(section, true));
+        } else if (sectionTag === 'tbody' || sectionTag === 'tfoot') {
+          sawSection = true;
+          rows.push(...collectTableRows(section, false));
+        }
+      }
+      // Tables whose `<tr>` sit directly under `<table>` (no thead/tbody).
+      if (!sawSection) rows.push(...collectTableRows(el, false));
+      if (rows.length === 0) return [];
+      return [tableNode(rows)];
+    }
     case 'pre': {
-      // Render as a quote so the formatting is preserved as a styled
-      // block. CodeBlock would need a Payload Block instance which the
-      // migration doesn't construct here.
-      const inline = trimEdges(collectInline(el.childNodes, FORMAT.CODE));
-      if (inline.length === 0) return [];
-      return [quote(inline)];
+      // Real code block. Language hint comes from the `data-lang` attribute
+      // (set by the Academy extractor) or a `language-xxx` class; falls back
+      // to `text`. Text is taken verbatim to preserve indentation/newlines.
+      const langAttr =
+        getAttr(el, 'data-lang') ??
+        (getAttr(el, 'class') ?? '').match(/language-([a-z0-9+#]+)/i)?.[1] ??
+        (() => {
+          const codeChild = (el.childNodes ?? []).find(
+            (c): c is ParseElement => isElement(c) && (c.tagName ?? c.nodeName) === 'code',
+          );
+          return codeChild
+            ? (getAttr(codeChild, 'class') ?? '').match(/language-([a-z0-9+#]+)/i)?.[1]
+            : undefined;
+        })();
+      const content = rawText(el.childNodes).replace(/\r/g, '').replace(/\s+$/, '');
+      if (content.trim().length === 0) return [];
+      return [codeBlock(resolveLanguage(langAttr), content)];
     }
     default: {
       // Anything else: treat as paragraph fallback if it has inline

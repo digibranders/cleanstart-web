@@ -56,6 +56,14 @@ export const KnowledgeBase: CollectionConfig = {
     },
     mediaUploadField({ name: 'heroImage', folderHint: 'web/general' }),
     {
+      name: 'videoUrl',
+      type: 'text',
+      admin: {
+        description:
+          'Optional lesson video (direct MP4 URL). When set, a "Watch the Lesson" player renders above the article body on /knowledge-hub.',
+      },
+    },
+    {
       name: 'category',
       type: 'relationship',
       relationTo: 'knowledgeCategories',

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Container } from "@/components/layout";
+import { BrandMarquee } from "@/components/sections/home/BrandMarquee";
 import { HeroReveal } from "@/components/ui/Reveal";
 
 // Artboard hero gradient (179.99deg dark → indigo → violet → fade), shared with
@@ -87,7 +88,7 @@ export function CaseStudiesHero(): React.ReactElement {
 
       <Container className="relative">
         <div
-          className="flex flex-col items-start gap-6 pt-[calc(clamp(96px,11vw,168px)+var(--cs-header-extra))] pb-[clamp(56px,7vw,96px)]"
+          className="flex flex-col items-start gap-6 pt-[calc(clamp(96px,11vw,168px)+var(--cs-header-extra))]"
           style={{ maxWidth: "640px" }}
         >
           <HeroReveal y={50} duration={1.0}>
@@ -118,6 +119,12 @@ export function CaseStudiesHero(): React.ReactElement {
               <span className="block">Measurable impact for our customers.</span>
             </p>
           </HeroReveal>
+        </div>
+
+        {/* Trusted-brand logo marquee — reuses the home-page <BrandMarquee/>
+            verbatim, sitting at the bottom of the (dark) hero. */}
+        <div className="relative pt-[clamp(72px,9vw,128px)] pb-[clamp(40px,6vw,80px)]">
+          <BrandMarquee />
         </div>
       </Container>
     </section>
