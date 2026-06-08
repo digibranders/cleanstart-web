@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import {
   youtubeEmbedUrl,
   youtubeThumbnail,
@@ -47,6 +47,40 @@ export function YouTubeEmbed({
   const [thumbSrc, setThumbSrc] = useState(
     thumbnailUrl ?? youtubeThumbnail(videoId, "maxresdefault"),
   );
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // When a video has no maxresdefault.jpg, YouTube serves a 120×90 gray
+  // placeholder as a *valid* JPEG (HTTP 404, content-type image/jpeg). The
+  // browser decodes it fine, so `onError` never fires — detect the placeholder
+  // by its dimensions instead and fall back to the always-present hqdefault.
+  const fallbackToHq = () => {
+    setThumbSrc((current) =>
+      current.includes("maxresdefault")
+        ? youtubeThumbnail(videoId, "hqdefault")
+        : current,
+    );
+  };
+
+  const handleThumbLoad = (
+    event: React.SyntheticEvent<HTMLImageElement>,
+  ): void => {
+    const img = event.currentTarget;
+    if (img.naturalWidth > 0 && img.naturalWidth <= 120) fallbackToHq();
+  };
+
+  // If the maxres image already finished loading before hydration, neither
+  // onLoad nor onError will fire — re-check the resolved dimensions on mount.
+  useEffect(() => {
+    const img = imgRef.current;
+    if (!img?.complete) return;
+    if (img.naturalWidth === 0 || img.naturalWidth <= 120) {
+      setThumbSrc((current) =>
+        current.includes("maxresdefault")
+          ? youtubeThumbnail(videoId, "hqdefault")
+          : current,
+      );
+    }
+  }, [videoId]);
 
   return (
     <div
@@ -72,17 +106,15 @@ export function YouTubeEmbed({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
+            ref={imgRef}
             src={thumbSrc}
             alt=""
             aria-hidden
             loading="lazy"
             decoding="async"
             className="absolute inset-0 w-full h-full object-cover"
-            onError={() => {
-              if (thumbSrc.includes("maxresdefault")) {
-                setThumbSrc(youtubeThumbnail(videoId, "hqdefault"));
-              }
-            }}
+            onLoad={handleThumbLoad}
+            onError={fallbackToHq}
           />
           <span
             aria-hidden
