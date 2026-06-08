@@ -21,7 +21,7 @@ export default async function KnowledgeHubLayout({
           <section className="bg-white">
             <div className="mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-16 lg:pt-24 pb-section-cta">
               <div className="grid gap-10 lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-16">
-                <aside className="lg:sticky lg:top-24 lg:self-start">
+                <aside className="lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:overscroll-contain lg:pr-3 [scrollbar-width:thin]">
                   <KnowledgeHubSidebar groups={groups} />
                 </aside>
 

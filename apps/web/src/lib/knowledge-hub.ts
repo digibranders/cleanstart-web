@@ -70,20 +70,25 @@ export interface KhGroup {
   articles: KhArticleLink[];
 }
 
-const byTitle = (a: KhArticleLink, b: KhArticleLink): number => a.title.localeCompare(b.title);
+// Ordering: `displayOrder` is primary; `id` (ascending = the order the seed
+// created docs, which mirrors the Academy's authored sequence) is the
+// tiebreaker — so the sidebar matches the Academy exactly even on a CMS
+// instance whose API predates the displayOrder field.
+const byOrder = (a: CmsCategory, b: CmsCategory): number => orderOf(a) - orderOf(b) || a.id - b.id;
 
 /** Fetch categories + article metadata and assemble the ordered sidebar tree. */
 export async function getKnowledgeTree(): Promise<KhGroup[]> {
   const [cats, arts] = await Promise.all([
     fetchCMS<CmsList<CmsCategory>>(
-      `/api/knowledgeCategories?${PUBLISHED}&depth=0&limit=200&select[name]=true&select[slug]=true&select[displayOrder]=true&select[parent]=true`,
+      `/api/knowledgeCategories?${PUBLISHED}&depth=0&limit=200&sort=id&select[name]=true&select[slug]=true&select[displayOrder]=true&select[parent]=true`,
     ),
     fetchCMS<CmsList<CmsArticleMeta>>(
-      `/api/knowledgeBase?${PUBLISHED}&depth=0&limit=400&select[title]=true&select[slug]=true&select[category]=true`,
+      `/api/knowledgeBase?${PUBLISHED}&depth=0&limit=400&sort=id&select[title]=true&select[slug]=true&select[category]=true`,
     ),
   ]);
 
-  // Bucket articles by their (leaf) category id.
+  // Bucket articles by their (leaf) category id, preserving Academy order
+  // (articles arrive sorted by id ascending = the seed's manifest order).
   const articlesByCat = new Map<number, KhArticleLink[]>();
   for (const a of arts.docs) {
     if (a.category == null) continue;
@@ -92,19 +97,15 @@ export async function getKnowledgeTree(): Promise<KhGroup[]> {
     articlesByCat.set(a.category, list);
   }
 
-  const topLevel = cats.docs
-    .filter((c) => c.parent == null)
-    .sort((a, b) => orderOf(a) - orderOf(b));
+  const topLevel = cats.docs.filter((c) => c.parent == null).sort(byOrder);
 
   return topLevel.map((group) => {
-    const children = cats.docs
-      .filter((c) => c.parent === group.id)
-      .sort((a, b) => orderOf(a) - orderOf(b));
+    const children = cats.docs.filter((c) => c.parent === group.id).sort(byOrder);
 
     const subcategories: KhSubcategory[] = children.map((sub) => ({
       slug: sub.slug,
       name: sub.name,
-      articles: (articlesByCat.get(sub.id) ?? []).sort(byTitle),
+      articles: articlesByCat.get(sub.id) ?? [],
     }));
 
     return {
@@ -112,7 +113,7 @@ export async function getKnowledgeTree(): Promise<KhGroup[]> {
       name: group.name,
       subcategories,
       // Legacy groups attach articles directly; sections have none of their own.
-      articles: (articlesByCat.get(group.id) ?? []).sort(byTitle),
+      articles: articlesByCat.get(group.id) ?? [],
     };
   });
 }
