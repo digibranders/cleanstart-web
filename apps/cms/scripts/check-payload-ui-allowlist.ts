@@ -116,6 +116,13 @@ const ALLOW_LIST = new Set<string>([
   // `payload-jobs` row shape stays identical to Payload's stock drawer
   // (correct input shape + `waitUntil`). No render surface touched.
   'useServerFunctions',
+  // `useTheme` is a pure data-layer hook — it reads/sets the admin theme
+  // (light/dark/auto, backed by Payload's theme cookie) and renders
+  // nothing. There is no @cleanstart/ui equivalent because the theme
+  // state is Payload-admin-specific. UserMenu's theme toggle calls it.
+  // `Theme` is its companion type. Same shape as the other context hooks.
+  'useTheme',
+  'Theme',
 ]);
 
 const TARGET = '@payloadcms/ui';
