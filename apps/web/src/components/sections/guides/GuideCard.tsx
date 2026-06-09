@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { type Guide, formatGuideDate, guideMediaUrl } from "@/lib/guides";
 import { effectivePublishedAt } from "@/lib/published-date";
+import { CardCoverFallback } from "@/components/ui/CardCoverFallback";
 
 interface GuideCardProps {
   guide: Guide;
@@ -39,13 +40,7 @@ export function GuideCard({ guide }: GuideCardProps): React.ReactElement {
             sizes="(min-width: 1280px) 300px, (min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
           />
         ) : (
-          <div
-            className="w-full h-full"
-            style={{
-              background:
-                "linear-gradient(135deg, #1a1a4e 0%, #2d1b9e 50%, #471ec0 100%)",
-            }}
-          />
+          <CardCoverFallback />
         )}
       </div>
 
