@@ -10,7 +10,7 @@ const CARDS: readonly [WhyCard, WhyCard, WhyCard, WhyCard] = [
   },
   {
     title: 'Broken Traceability',
-    desc: 'Disconnected inventories weaken provenance tracking.',
+    desc: 'Disconnected inventories weaken provenance and software integrity.',
     imgSrc: '/images/sbom/risk-icon-traceability.webp',
     imgAlt: 'Broken Traceability icon',
   },
@@ -21,10 +21,10 @@ const CARDS: readonly [WhyCard, WhyCard, WhyCard, WhyCard] = [
     imgAlt: 'Stale Data icon',
   },
   {
-    title: 'Compliance Exposure',
+    title: 'Governance Gaps',
     desc: 'Incomplete inventories increase audit complexity.',
     imgSrc: '/images/sbom/risk-icon-compliance.webp',
-    imgAlt: 'Compliance Exposure icon',
+    imgAlt: 'Governance Gaps icon',
   },
 ];
 
@@ -35,10 +35,7 @@ export function SbomRisks(): React.ReactElement {
       heading={
         <>
           <span className="block">Static SBOMs Create</span>
-          <span className="block">
-            {'Blind '}
-            <span className="cs-text-gradient-impact">Spots</span>
-          </span>
+          <span className="cs-text-gradient-impact block">Blind Spots</span>
         </>
       }
       cards={CARDS}

@@ -5,28 +5,28 @@ const CARDS = [
   {
     id: 'cicd',
     title: 'CI/CD Pipelines',
-    body: 'Integrate into existing workflows.',
+    body: 'Integrate continuously verifiable SBOMs into existing delivery workflows.',
     cornerRadius: '8px 8px 62px 8px',
     mobileBg: 'a',
   },
   {
     id: 'container',
     title: 'Container Environments',
-    body: 'Track software inventories across images.',
+    body: 'Track software inventories across container images and deployments.',
     cornerRadius: '8px 8px 8px 62px',
     mobileBg: 'c',
   },
   {
     id: 'compliance',
     title: 'Compliance Programs',
-    body: 'Support modern regulatory requirements.',
+    body: 'Support audit readiness and modern compliance requirements.',
     cornerRadius: '8px 62px 8px 8px',
     mobileBg: 'b',
   },
   {
     id: 'security',
-    title: 'Enterprise Security Teams',
-    body: 'Improve software supply chain visibility.',
+    title: 'Security & Compliance Teams',
+    body: 'Improve software supply chain visibility and integrity.',
     cornerRadius: '62px 8px 8px 8px',
     mobileBg: 'a',
   },
@@ -270,20 +270,20 @@ export function SbomAdvantage(): React.ReactElement {
           <div className="flex flex-col items-center" style={{ width: '328px', gap: '16px' }}>
             <MobileBuiltForCard
               title="CI/CD Pipelines"
-              body="Integrate into existing workflows."
+              body="Integrate continuously verifiable SBOMs into existing delivery workflows."
               bgSvg="/images/sbom/mobile-builtfor-card-a.svg"
-              height={122}
+              height={150}
               titleW={169}
-              bodyW={149}
+              bodyW={264}
             />
 
             <MobileBuiltForCard
               title="Compliance Programs"
-              body="Support modern regulatory requirements."
+              body="Support audit readiness and modern compliance requirements."
               bgSvg="/images/sbom/mobile-builtfor-card-c.svg"
-              height={145}
+              height={150}
               titleW={243}
-              bodyW={169}
+              bodyW={264}
             />
 
             <div
@@ -314,20 +314,20 @@ export function SbomAdvantage(): React.ReactElement {
 
             <MobileBuiltForCard
               title="Container Environments"
-              body="Track software inventories across images."
+              body="Track software inventories across container images and deployments."
               bgSvg="/images/sbom/mobile-builtfor-card-b.svg"
-              height={145}
+              height={150}
               titleW={249}
-              bodyW={205}
+              bodyW={264}
             />
 
             <MobileBuiltForCard
-              title="Enterprise Security Teams"
-              body="Improve software supply chain visibility."
+              title="Security & Compliance Teams"
+              body="Improve software supply chain visibility and integrity."
               bgSvg="/images/sbom/mobile-builtfor-card-a.svg"
-              height={122}
-              titleW={255}
-              bodyW={205}
+              height={150}
+              titleW={264}
+              bodyW={264}
             />
           </div>
         </div>

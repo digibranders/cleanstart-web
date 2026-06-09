@@ -9,23 +9,23 @@ type TrustCard = {
 
 const TRUST_CARDS: TrustCard[] = [
   {
-    title: "Trusted Source Components",
-    body: "Build from verified upstream sources.",
+    title: "Source-Built Foundations",
+    body: "Built directly from trusted upstream software sources.",
     iconSrc: "/images/cleanstart-images/trust-icon-trusted-source.svg",
   },
   {
-    title: "Minimal Runtime Images",
-    body: "Only required components included.",
+    title: "Minimal Container Foundations",
+    body: "Reduced software complexity and lower inherited software risk.",
     iconSrc: "/images/cleanstart-images/trust-icon-minimal-runtime.svg",
   },
   {
-    title: "Deterministic Builds",
-    body: "Reproducible and verifiable pipelines.",
+    title: "Verifiable Software Foundations",
+    body: "Deterministic builds designed for software provenance and integrity.",
     iconSrc: "/images/cleanstart-images/trust-icon-deterministic.svg",
   },
   {
-    title: "Continuous Rebuilds",
-    body: "Rapid response to newly disclosed vulnerabilities.",
+    title: "Security & Compliance Ready",
+    body: "Built to support enterprise security and compliance requirements.",
     iconSrc: "/images/cleanstart-images/trust-icon-continuous-rebuild.svg",
   },
 ];
@@ -374,8 +374,8 @@ export function CleanStartImagesBrowse(): React.ReactElement {
               color: "#111",
             }}
           >
-            Built from Trusted{" "}
-            <span className="cs-text-gradient-impact">Sources</span>
+            Built from{" "}
+            <span className="cs-text-gradient-impact">Trusted Sources</span>
           </h2>
         </Reveal>
 

@@ -107,8 +107,7 @@ export function SbomCTA(): React.ReactElement {
               margin: 0,
             }}
           >
-            Continuously updated, cryptographically verifiable software inventories built for modern
-            software supply chains.
+            Continuously verifiable SBOMs built for modern software delivery.
           </p>
           <Link
             href="/resource-center"
@@ -218,8 +217,7 @@ export function SbomCTA(): React.ReactElement {
               marginTop: '17px',
             }}
           >
-            Continuously updated, cryptographically verifiable software inventories built for modern
-            software supply chains.
+            Continuously verifiable SBOMs built for modern software delivery.
           </p>
           <Link
             href="/resource-center"
