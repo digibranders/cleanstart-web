@@ -207,7 +207,7 @@ export function SearchAutocomplete({
                 style={{ position: 'fixed', left: rect.left, top: rect.top, width: rect.width }}
                 className="z-[80] flex max-h-[min(64vh,460px)] flex-col overflow-hidden rounded-[18px] border border-black/[0.06] bg-white text-left shadow-[0_24px_70px_-18px_rgba(15,16,35,0.32),0_8px_22px_-12px_rgba(15,16,35,0.18)] ring-1 ring-black/[0.02]"
               >
-                <div className="min-h-0 flex-1 overflow-y-auto py-1.5 [scrollbar-color:rgba(15,16,35,0.18)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-black/15 [&::-webkit-scrollbar]:w-2">
+                <div className="scrollbar-premium min-h-0 flex-1 overflow-y-auto py-1.5">
                   {status === 'loading' && hits.length === 0 && <SkeletonRows />}
 
                   {status === 'done' && hits.length === 0 && (

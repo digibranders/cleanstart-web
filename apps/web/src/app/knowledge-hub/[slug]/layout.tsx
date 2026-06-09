@@ -6,6 +6,7 @@ import { KnowledgeHubMobileNav } from '@/components/sections/knowledge-hub/Knowl
 import { KnowledgeHubSidebar } from '@/components/sections/knowledge-hub/KnowledgeHubSidebar';
 import { FadeUp } from '@/components/ui/FadeUp';
 import { getKnowledgeTree } from '@/lib/knowledge-hub';
+import { premiumScrollbar } from '@/lib/scrollbar';
 
 export default async function KnowledgeHubLayout({
   children,
@@ -29,7 +30,7 @@ export default async function KnowledgeHubLayout({
               <div className="grid gap-10 lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-16">
                 <aside
                   data-lenis-prevent
-                  className="hidden lg:block lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:overscroll-contain lg:pr-3 [scrollbar-width:thin]"
+                  className={`hidden lg:block lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:overscroll-contain lg:pr-3 ${premiumScrollbar}`}
                 >
                   <KnowledgeHubSidebar groups={groups} />
                 </aside>

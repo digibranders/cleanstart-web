@@ -2,6 +2,7 @@
 
 import { Sheet, SheetClose, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { type KhGroup, findActiveLocation } from '@/lib/knowledge-hub-shared';
+import { premiumScrollbar } from '@/lib/scrollbar';
 import { ChevronDown, Menu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -70,7 +71,9 @@ export function KnowledgeHubMobileNav({ groups }: { groups: KhGroup[] }): React.
           >
             <X className="size-5" aria-hidden />
           </SheetClose>
-          <div className="overflow-y-auto overscroll-contain px-4 pt-3 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+          <div
+            className={`overflow-y-auto overscroll-contain px-4 pt-3 pb-[max(1.5rem,env(safe-area-inset-bottom))] ${premiumScrollbar}`}
+          >
             <KnowledgeHubSidebar groups={groups} />
           </div>
         </SheetContent>
