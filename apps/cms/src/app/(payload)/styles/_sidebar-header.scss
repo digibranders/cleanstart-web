@@ -382,6 +382,22 @@
   display: none !important;
 }
 
+// ─── Suppress Payload's stock mobile app-header hamburger ─────────────
+//
+// The Default template renders a SECOND toggler in the AppHeader —
+// `.app-header__mobile-nav-toggler` (a NavToggler + Hamburger) — which
+// Payload reveals at `small-break` to open the nav drawer on mobile.
+// Stock Payload hides the desktop collapse toggle on mobile so only this
+// hamburger shows, but our CleanStart panel toggle
+// (`.template-default__nav-toggler-wrapper`) is `position: fixed` and
+// stays visible at every width — so on mobile both stack in the same
+// top-left corner (two toggles). Our fixed toggle drives the same
+// NavContext, so hide the stock hamburger and keep the one branded
+// control across all viewports.
+.app-header__mobile-nav-toggler {
+  display: none !important;
+}
+
 // ─── Sidebar auto-collapse policy (visual layer) ──────────────────────
 //
 // `.template-default` is a CSS grid whose first column is the nav rail:
