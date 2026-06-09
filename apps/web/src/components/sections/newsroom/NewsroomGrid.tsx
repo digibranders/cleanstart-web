@@ -173,7 +173,7 @@ export function NewsroomGrid({
         {/* Section heading for the document outline — the hero <h1> is followed
             by card <h3>s, so this fills the h2 level. Visually hidden. */}
         <h2 className="sr-only">News articles</h2>
-        <div className="flex flex-col lg:flex-row lg:items-start lg:gap-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
           <aside
             className="shrink-0 lg:sticky lg:max-h-[calc(100vh-112px)] lg:overflow-y-auto"
             style={{ top: "96px", alignSelf: "flex-start" }}
