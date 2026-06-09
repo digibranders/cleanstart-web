@@ -124,6 +124,12 @@ import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc056
 import { Dashboard as Dashboard_99a124d7b5ab83228ca0a3f897256570 } from '../../../payload/admin/components/Dashboard/Dashboard.tsx'
 import { CmsAccountView as CmsAccountView_e25882c99036df42ce1493c03452d7e3 } from '../../../payload/admin/components/auth/CmsAccountView.tsx'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
+import { PointField as PointField_dc800e7ca3d2eb7ea39fd4bc6138c687 } from '@/payload/admin/components/fields/PointField.tsx'
+import { RadioField as RadioField_31aae9b520654e49d40e444571bafe41 } from '@/payload/admin/components/fields/RadioField.tsx'
+import { CollapsibleField as CollapsibleField_e8aff66100db6bf10de9866e9f9ca5a8 } from '@/payload/admin/components/fields/CollapsibleField.tsx'
+import { TabsField as TabsField_c014faddfba6da88b9efedda256f4990 } from '@/payload/admin/components/fields/TabsField.tsx'
+import { RowField as RowField_1ef7316c3d3f9450222b0eb086a8e243 } from '@/payload/admin/components/fields/RowField.tsx'
+import { CodeField as CodeField_4aa85fbd783c4d26c5c89ebf383941c1 } from '@/payload/admin/components/fields/CodeField.tsx'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
@@ -252,5 +258,11 @@ export const importMap = {
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "./payload/admin/components/Dashboard/Dashboard.tsx#Dashboard": Dashboard_99a124d7b5ab83228ca0a3f897256570,
   "./payload/admin/components/auth/CmsAccountView.tsx#CmsAccountView": CmsAccountView_e25882c99036df42ce1493c03452d7e3,
-  "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
+  "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
+  "@/payload/admin/components/fields/PointField.tsx#PointField": PointField_dc800e7ca3d2eb7ea39fd4bc6138c687,
+  "@/payload/admin/components/fields/RadioField.tsx#RadioField": RadioField_31aae9b520654e49d40e444571bafe41,
+  "@/payload/admin/components/fields/CollapsibleField.tsx#CollapsibleField": CollapsibleField_e8aff66100db6bf10de9866e9f9ca5a8,
+  "@/payload/admin/components/fields/TabsField.tsx#TabsField": TabsField_c014faddfba6da88b9efedda256f4990,
+  "@/payload/admin/components/fields/RowField.tsx#RowField": RowField_1ef7316c3d3f9450222b0eb086a8e243,
+  "@/payload/admin/components/fields/CodeField.tsx#CodeField": CodeField_4aa85fbd783c4d26c5c89ebf383941c1
 }
