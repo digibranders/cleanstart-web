@@ -66,7 +66,14 @@ export interface SearchClient {
   search: (
     indexUid: string,
     query: string,
-    opts?: { limit?: number; filter?: string; sort?: readonly string[] },
+    opts?: {
+      limit?: number;
+      filter?: string;
+      sort?: readonly string[];
+      /** Restrict the fields each hit carries back — keeps the heavy
+       * `body` attribute off the wire when only metadata is needed. */
+      attributesToRetrieve?: readonly string[];
+    },
   ) => Promise<{ hits: unknown[]; estimatedTotalHits: number; processingTimeMs: number } | null>;
 }
 
@@ -157,6 +164,9 @@ export const createSearchClient = (config: SearchClientConfig): SearchClient => 
           limit: opts?.limit ?? 20,
           ...(opts?.filter ? { filter: opts.filter } : {}),
           ...(opts?.sort ? { sort: opts.sort } : {}),
+          ...(opts?.attributesToRetrieve
+            ? { attributesToRetrieve: opts.attributesToRetrieve }
+            : {}),
         }),
       }).catch(() => null);
       if (!res || !res.ok) return null;

@@ -1,6 +1,5 @@
-import { SearchBar } from '@/components/sections/_shared/SearchBar';
+import { SearchTriggerBar } from '@/components/search/SearchTriggerBar';
 import { HeroReveal } from '@/components/ui/Reveal';
-import { Suspense } from 'react';
 
 const HERO_GRADIENT =
   'linear-gradient(180deg, #151021 0%, #10123e 38%, #131e8f 67%, #471ec0 80%, #471fc3 100%)';
@@ -71,15 +70,10 @@ export function KnowledgeHubArticleHero(): React.ReactElement {
             duration={0.8}
             className="mt-7 lg:mt-10 w-full flex justify-center"
           >
-            <Suspense
-              fallback={<div className="h-10 sm:h-11 w-full max-w-[674px]" />}
-            >
-              <SearchBar
-                initialQuery=""
-                placeholder="Search blogs..."
-                ariaLabel="Search knowledge hub"
-              />
-            </Suspense>
+            <SearchTriggerBar
+              placeholder="Search the Knowledge Hub…"
+              ariaLabel="Search the Knowledge Hub"
+            />
           </HeroReveal>
         </div>
       </div>
