@@ -145,10 +145,7 @@ export function SearchCommandPalette({
             </Dialog.Close>
           </div>
 
-          <div
-            ref={listRef}
-            className="min-h-0 flex-1 overflow-y-auto py-1.5 [scrollbar-color:rgba(15,16,35,0.18)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-black/15 [&::-webkit-scrollbar]:w-2"
-          >
+          <div ref={listRef} className="scrollbar-premium min-h-0 flex-1 overflow-y-auto py-1.5">
             {status === 'idle' && (
               <p className="px-4 py-10 text-center text-sm text-[#9A9DB0]">
                 Search the Knowledge Hub, guides, blogs, news and more.

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Manrope, Sora } from "next/font/google";
 import "./globals.css";
+import "./scrollbar.css";
 import { cn } from "@/lib/utils";
 import { PreviewBanner } from "@/components/PreviewBanner";
 import { SearchProvider } from "@/components/search/SearchProvider";
