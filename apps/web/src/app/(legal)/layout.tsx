@@ -5,7 +5,7 @@ import { LegalHero } from '@/components/sections/legal/LegalHero';
 import { LegalMobileNav } from '@/components/sections/legal/LegalMobileNav';
 import { LegalSidebar } from '@/components/sections/legal/LegalSidebar';
 import { FadeUp } from '@/components/ui/FadeUp';
-import { getLegalList } from '@/lib/legal';
+import { getLegalList, legalHref } from '@/lib/legal';
 
 /**
  * Persistent shell for every /legal document. Header, hero, sidebar and footer
@@ -26,7 +26,7 @@ export default async function LegalSectionLayout({
   const docs = await getLegalList().catch(() => []);
   const navItems = docs.map((d) => ({
     label: d.title,
-    href: `/legal/${d.slug}`,
+    href: legalHref(d.slug),
     icon: d.icon,
   }));
 
