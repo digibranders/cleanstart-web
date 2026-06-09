@@ -28,9 +28,10 @@ describe("deriveCoverKeyword", () => {
 });
 
 describe("guideCoverPath", () => {
-  it("builds an encoded cover URL", () => {
-    expect(guideCoverPath("hardened-container-image", "Hardened Images")).toBe(
-      "/guide-cover/hardened-container-image?kw=Hardened%20Images",
-    );
+  it("builds a path-encoded cover URL (no query string)", () => {
+    expect(guideCoverPath("Hardened Images")).toBe("/guide-cover/Hardened%20Images");
+  });
+  it("drops forward slashes to avoid encoded-slash path segments", () => {
+    expect(guideCoverPath("TLS/SSL Basics")).toBe("/guide-cover/TLS%20SSL%20Basics");
   });
 });

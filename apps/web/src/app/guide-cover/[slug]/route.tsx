@@ -20,9 +20,11 @@ export async function GET(
   ctx: { params: Promise<{ slug: string }> },
 ): Promise<ImageResponse> {
   const { slug } = await ctx.params;
-  const url = new URL(req.url);
-  const keyword = (url.searchParams.get("kw") || slug.replace(/-/g, " ")).slice(0, 80);
-  const markUrl = new URL("/images/logo-cleanstart-mark.svg", url.origin).toString();
+  // Keyword travels in the path (no query string) so Next's image optimizer
+  // accepts the URL — local images WITH a query string are rejected by
+  // default, which would force `unoptimized` and ship the full PNG.
+  const keyword = decodeURIComponent(slug).slice(0, 80) || "CleanStart Guide";
+  const markUrl = new URL("/images/logo-cleanstart-mark.svg", req.url).toString();
 
   return new ImageResponse(
     (

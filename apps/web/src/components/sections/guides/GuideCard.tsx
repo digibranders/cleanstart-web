@@ -42,10 +42,9 @@ export function GuideCard({ guide }: GuideCardProps): React.ReactElement {
           />
         ) : (
           <Image
-            src={guideCoverPath(guide.slug, coverKeyword)}
+            src={guideCoverPath(coverKeyword)}
             alt={`${coverKeyword} — CleanStart Guide`}
             fill
-            unoptimized
             className="object-cover"
             sizes="(min-width: 1280px) 300px, (min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
           />

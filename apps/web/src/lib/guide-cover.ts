@@ -26,7 +26,12 @@ export function deriveCoverKeyword(title: string | null | undefined): string {
   return s.trim() || "CleanStart Guide";
 }
 
-/** URL for the generated cover image of a guide. */
-export function guideCoverPath(slug: string, keyword: string): string {
-  return `/guide-cover/${encodeURIComponent(slug)}?kw=${encodeURIComponent(keyword)}`;
+/**
+ * URL for the generated cover image. The keyword is carried in the PATH
+ * (not a query string) so Next's image optimizer accepts and downsizes it
+ * — local images with a query string are rejected by default. Forward
+ * slashes are dropped to avoid an encoded-slash path segment.
+ */
+export function guideCoverPath(keyword: string): string {
+  return `/guide-cover/${encodeURIComponent(keyword.replace(/\//g, " "))}`;
 }

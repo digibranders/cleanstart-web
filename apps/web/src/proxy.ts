@@ -44,6 +44,10 @@ function shouldRedirectTrailingSlash(pathname: string) {
 function shouldLowercase(pathname: string) {
   // Only enforce on non-file paths.
   if (/\.[a-z0-9]+$/i.test(pathname)) return false;
+  // Generated guide covers carry a mixed-case keyword in the path
+  // (`/guide-cover/Container%20Networking`); lowercasing it would mangle the
+  // rendered text and break next/image optimization of the upstream fetch.
+  if (pathname.startsWith("/guide-cover/")) return false;
   return pathname !== pathname.toLowerCase();
 }
 
