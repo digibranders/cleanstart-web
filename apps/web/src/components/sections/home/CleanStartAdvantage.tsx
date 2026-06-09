@@ -23,7 +23,7 @@ export function CleanStartAdvantage() {
     >
       {/* Mobile portrait below md, full-bleed photo above. */}
       <Image
-        src="/images/home/advantage-bg-mobile.png"
+        src="/images/home/advantage-bg-mobile.webp"
         alt=""
         fill
         sizes="100vw"
@@ -32,7 +32,7 @@ export function CleanStartAdvantage() {
         priority={false}
       />
       <Image
-        src="/images/advantage-bg.jpg"
+        src="/images/advantage-bg.webp"
         alt=""
         fill
         sizes="100vw"

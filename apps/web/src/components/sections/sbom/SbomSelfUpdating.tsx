@@ -120,8 +120,8 @@ export function SbomSelfUpdating(): React.ReactElement {
         }}
       >
         <Image
-          src="/images/sbom/platforms-3d.png"
-          alt="Generate, Verify, Track, Validate — four-step SBOM lifecycle"
+          src="/images/sbom/platforms-3d.webp"
+          alt="Generate, Verify, Track, Validate: four-step SBOM lifecycle"
           width={872}
           height={468}
           sizes="(min-width: 1280px) 872px, 100vw"

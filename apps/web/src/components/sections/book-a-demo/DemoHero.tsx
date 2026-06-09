@@ -45,7 +45,7 @@ export function DemoHero(): React.ReactElement {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/contact/hero-cube.png"
+            src="/images/contact/hero-cube.webp"
             alt=""
             width={294}
             height={298}
@@ -85,7 +85,7 @@ export function DemoHero(): React.ReactElement {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/contact/hero-cube.png"
+            src="/images/contact/hero-cube.webp"
             alt=""
             width={294}
             height={298}
@@ -108,7 +108,7 @@ export function DemoHero(): React.ReactElement {
           maxWidth: "var(--container-default)",
           paddingLeft: "24px",
           paddingRight: "24px",
-          paddingTop: "clamp(80px, 10vw, 176px)",
+          paddingTop: "calc(clamp(80px, 10vw, 176px) + var(--cs-header-extra))",
           paddingBottom: "clamp(60px, 8vw, 200px)",
         }}
       >
@@ -123,16 +123,7 @@ export function DemoHero(): React.ReactElement {
               letterSpacing: "-0.04em",
             }}
           >
-            Get a{" "}
-            <span
-              className="inline-block bg-clip-text text-transparent"
-              style={{
-                backgroundImage:
-                  "linear-gradient(99deg, rgba(154, 81, 255, 1) 0%, rgba(44, 193, 235, 1) 100%)",
-              }}
-            >
-              Demo
-            </span>
+            Get a Demo
           </h1>
         </HeroReveal>
       </div>

@@ -5,25 +5,25 @@ const CARDS: readonly [WhyCard, WhyCard, WhyCard, WhyCard] = [
   {
     title: 'Shadow Containers',
     desc: 'Untracked workloads increase exposure.',
-    imgSrc: '/images/cleansight/problem-shadow-containers.png',
+    imgSrc: '/images/cleansight/problem-shadow-containers.webp',
     imgAlt: 'Shadow container illustration',
   },
   {
     title: 'Fragmented Views',
     desc: 'Disconnected tools create operational gaps.',
-    imgSrc: '/images/cleansight/problem-fragmented-views.png',
+    imgSrc: '/images/cleansight/problem-fragmented-views.webp',
     imgAlt: 'Fragmented views illustration',
   },
   {
     title: 'Unknown Image Contents',
     desc: 'Inherited dependencies hide risk.',
-    imgSrc: '/images/cleansight/problem-unknown-image.png',
+    imgSrc: '/images/cleansight/problem-unknown-image.webp',
     imgAlt: 'Unknown image contents illustration',
   },
   {
     title: 'Audit Complexity',
     desc: 'Incomplete visibility slows compliance efforts.',
-    imgSrc: '/images/cleansight/problem-audit-complexity.png',
+    imgSrc: '/images/cleansight/problem-audit-complexity.webp',
     imgAlt: 'Audit complexity illustration',
   },
 ];

@@ -55,7 +55,7 @@ export function CisoHero(): React.ReactElement {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/ciso/hero-photo.png"
+              src="/images/ciso/hero-photo.webp"
               alt=""
               style={{
                 position: "absolute",
@@ -98,7 +98,7 @@ export function CisoHero(): React.ReactElement {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/ciso/hero-photo.png"
+            src="/images/ciso/hero-photo.webp"
             alt=""
             style={{
               position: "absolute",
@@ -137,7 +137,7 @@ export function CisoHero(): React.ReactElement {
       <div
         className="relative mx-auto z-[2] w-full max-w-[var(--container-default)] px-6 sm:px-10"
         style={{
-          paddingTop: "clamp(112px, 8.23vw, 158px)",
+          paddingTop: "calc(clamp(112px, 8.23vw, 158px) + var(--cs-header-extra))",
           paddingBottom: "80px",
           minHeight: "751px",
         }}
@@ -159,8 +159,7 @@ export function CisoHero(): React.ReactElement {
                 marginBottom: "clamp(16px, 1.67vw, 32px)",
               }}
             >
-              Trusted Software Foundations for{" "}
-              <span className="cs-text-gradient-impact">CISOs</span>
+              Trusted Software Foundations for CISOs
             </h1>
           </HeroReveal>
 

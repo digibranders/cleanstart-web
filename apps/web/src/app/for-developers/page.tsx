@@ -12,9 +12,9 @@ import { buildPageMetadata } from '@/lib/seo/canonical';
 import { JsonLd, breadcrumbSchema } from '@/lib/seo/jsonld';
 
 export const metadata = buildPageMetadata({
-  title: 'For Developers — Trusted Container Foundations',
+  title: 'For Developers',
   description:
-    'Build and ship with pre-hardened, verifiable container foundations. Eliminate inherited vulnerabilities, automate SBOMs, and meet compliance requirements without changing your workflow.',
+    "See how CleanStart integrates seamlessly into CI/CD pipelines so developers can ship faster using pre hardened, zero vulnerability container images without changing their workflow.",
   path: '/for-developers',
   eyebrow: 'Solutions',
 });

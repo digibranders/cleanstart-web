@@ -5,6 +5,7 @@
 import { cache } from "react";
 import { fetchCMS } from "./cms-fetch";
 import type { LexicalRoot } from "./blog";
+import type { CmsSeo } from "./seo/cms-seo";
 
 export type JobDepartment =
   | "engineering"
@@ -46,6 +47,7 @@ export type Job = {
   department?: JobDepartment | null;
   employmentType?: JobEmploymentType | null;
   experienceLevel?: JobExperienceLevel | null;
+  experienceRange?: string | null;
   locations?: (JobLocation | number)[] | null;
   remote?: boolean | null;
   applyUrl?: string | null;
@@ -59,6 +61,7 @@ export type Job = {
     currency?: "USD" | "EUR" | "GBP" | "INR" | null;
   };
   body?: LexicalRoot | null;
+  seo?: CmsSeo | null;
   publishedAt?: string | null;
   updatedAt?: string | null;
 };
@@ -184,6 +187,12 @@ export function locationDisplay(job: Job): string {
 }
 
 export function experienceDisplay(job: Job): string | null {
+  // Prefer the human-readable year range from the original data
+  // (e.g. "3-10 Years"); fall back to the bucketed enum label for
+  // CMS-native jobs created without a range.
+  if (job.experienceRange && job.experienceRange.trim().length > 0) {
+    return job.experienceRange;
+  }
   if (!job.experienceLevel) return null;
   return `${EXPERIENCE_LABEL[job.experienceLevel]} experience`;
 }

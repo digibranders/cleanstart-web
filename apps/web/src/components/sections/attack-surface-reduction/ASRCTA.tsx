@@ -102,7 +102,7 @@ export function ASRCTA(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/attack-surface-reduction/cta-union.png"
+        src="/images/shared/cta-union.webp"
         alt=""
         width={378}
         height={378}
@@ -131,7 +131,7 @@ export function ASRCTA(): React.ReactElement {
             textWrap: "balance",
           }}
         >
-          Reduce Attack Surface At The Source
+          What&rsquo;s Actually Inside Your Container Images?
         </p>
       </Reveal>
 
@@ -148,11 +148,12 @@ export function ASRCTA(): React.ReactElement {
             lineHeight: "var(--cta-card-desc-lh)",
           }}
         >
-          Build with only what production needs.
+          See how hardened images reduce unnecessary components, inherited CVEs, and operational
+          overhead.
         </p>
 
         <Link
-          href="/book-a-demo"
+          href="/software-bill-materials"
           className="inline-flex items-center gap-2 font-sans font-medium text-white shrink-0"
           style={{
             background: "#3960F9",
@@ -167,7 +168,7 @@ export function ASRCTA(): React.ReactElement {
               "0px 1px 2px -1px rgba(9,6,63,0.4), 0px 0px 0px 1px #3960F9, inset 0px 1px 0px 0px rgba(255,255,255,0.16)",
           }}
         >
-          <span>Attack Surface Reduction</span>
+          <span>See What&rsquo;s Inside Your Images</span>
           <svg
             width="18"
             height="18"

@@ -1,14 +1,18 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Manrope, Sora } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { PreviewBanner } from "@/components/PreviewBanner";
 import { SmoothScrollProvider } from "@/components/SmoothScrollProvider";
 import { AgentationDev } from "@/components/dev/AgentationDev";
-import { WebVitals } from "@/components/observability/WebVitals";
+import {
+  ConsentProvider,
+  ConsentModeScript,
+  GatedAnalytics,
+  CookieBanner,
+} from "@/components/consent";
 import { SITE_NAME, SITE_URL } from "@/lib/seo/canonical";
+import { isIndexingAllowed } from "@/lib/seo/indexing";
 import { ogImageUrl } from "@/lib/seo/og";
 import { JsonLd, organizationSchema } from "@/lib/seo/jsonld";
 import Script from 'next/script';
@@ -42,16 +46,20 @@ const jetbrainsMono = JetBrains_Mono({
   preload: false,
 });
 
-const isProduction = process.env.VERCEL_ENV === "production";
+// Statically prerendered, so this metadata is baked at BUILD time — to open a
+// non-prod deploy (e.g. staging) for an SEO audit, ALLOW_INDEXING=1 must be set
+// during the build (redeploy). robots.txt + the X-Robots-Tag header read it
+// per-request. See lib/seo/indexing.ts.
+const allowIndexing = isIndexingAllowed();
 
-const TITLE = "CleanStart — Secure by Design. Built from Source.";
+const TITLE = "Verified & Secure Container Images | CleanStart";
 const DESCRIPTION =
-  "Verified container images. Built from source, hardened, signed, and continuously verified.";
+  "Build on verified, near-zero-vulnerability container images with cryptographic provenance and compliance alignment.";
 
 const HOME_OG = ogImageUrl({
   variant: "hero",
-  title: "Secure by Design. Built from Source.",
-  titleAccent: "Built from Source.",
+  title: "Verified & Secure Container Images",
+  titleAccent: "Secure Container Images",
   sub: DESCRIPTION,
 });
 
@@ -65,7 +73,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
-  robots: isProduction
+  robots: allowIndexing
     ? {
       index: true,
       follow: true,
@@ -117,20 +125,23 @@ export default function RootLayout({
         ["--font-display" as string]: "var(--font-manrope)",
       }}
     >
+      <head>
+        <ConsentModeScript />
+      </head>
       <body suppressHydrationWarning>
-        {children}
+        <ConsentProvider>
+          <JsonLd id="org-jsonld" data={organizationSchema()} />
+          <PreviewBanner />
+          <SmoothScrollProvider>{children}</SmoothScrollProvider>
+          <GatedAnalytics />
+          <CookieBanner />
+          <AgentationDev />
+        </ConsentProvider>
         <Script
           src="https://cdn.oyechats.com/oyechats-widget.js"
-          data-bot-key="bot-d255b910fa83"
+          data-bot-key="bot-1a48d5dc6d4f"
           strategy="lazyOnload"
         />
-        <JsonLd id="org-jsonld" data={organizationSchema()} />
-        <WebVitals />
-        <PreviewBanner />
-        <SmoothScrollProvider>{children}</SmoothScrollProvider>
-        <Analytics />
-        <SpeedInsights />
-        <AgentationDev />
       </body>
     </html>
   );

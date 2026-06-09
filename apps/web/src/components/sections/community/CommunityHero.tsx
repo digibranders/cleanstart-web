@@ -15,7 +15,7 @@ export function CommunityHero() {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/community/hero-photo.png"
+          src="/images/community/hero-photo.webp"
           alt=""
           width={1960}
           height={496}
@@ -43,7 +43,7 @@ export function CommunityHero() {
       </div>
 
       <Container className="relative z-10">
-        <div className="mx-auto w-full max-w-[1200px] pt-[clamp(112px,10vw,172px)] pb-[clamp(40px,5vw,80px)]">
+        <div className="mx-auto w-full max-w-[1200px] pt-[calc(clamp(112px,10vw,172px)+var(--cs-header-extra))] pb-[clamp(40px,5vw,80px)]">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-8">
             <HeroReveal y={50} duration={1.0} className="lg:w-[48%]">
               <h1
@@ -54,8 +54,7 @@ export function CommunityHero() {
                   letterSpacing: '-0.04em',
                 }}
               >
-                Let&apos;s work together towards{" "}
-                <span className="cs-text-gradient-impact">secure development</span>
+                Let&apos;s work together towards secure development
               </h1>
             </HeroReveal>
 
@@ -95,11 +94,11 @@ export function CommunityHero() {
         </div>
       </Container>
 
-      <div className="relative z-0 lg:hidden">
+      <div className="hidden">
         <div className="relative h-[clamp(220px,55vw,360px)] overflow-hidden">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/community/hero-photo.png"
+            src="/images/community/hero-photo.webp"
             alt=""
             aria-hidden
             loading="eager"

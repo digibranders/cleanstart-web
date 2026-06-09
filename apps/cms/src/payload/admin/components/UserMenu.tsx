@@ -1,6 +1,7 @@
 'use client';
 
-import { useAuth } from '@payloadcms/ui';
+import { useAuth, useTheme } from '@payloadcms/ui';
+import type { Theme } from '@payloadcms/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -32,6 +33,79 @@ type AuthUser = {
   name?: string | null;
 };
 
+// Payload's `setTheme` accepts 'auto' at runtime (it clears the theme
+// cookie so the admin follows the OS `prefers-color-scheme`), but its
+// published type narrows the argument to 'light' | 'dark'. Widen it
+// here so the Auto segment type-checks without an `any`.
+type ThemePreference = Theme | 'auto';
+
+const THEME_OPTIONS: ReadonlyArray<{
+  value: ThemePreference;
+  label: string;
+  icon: ReactElement;
+}> = [
+  {
+    value: 'light',
+    label: 'Light',
+    icon: (
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 16 16"
+        fill="none"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <circle cx="8" cy="8" r="3" stroke="currentColor" strokeWidth="1.4" />
+        <path
+          d="M8 1.5V3M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1 1M11.6 11.6l1 1M12.6 3.4l-1 1M4.4 11.6l-1 1"
+          stroke="currentColor"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+        />
+      </svg>
+    ),
+  },
+  {
+    value: 'dark',
+    label: 'Dark',
+    icon: (
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 16 16"
+        fill="none"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path
+          d="M13 9.5A5.5 5.5 0 0 1 6.5 3a5.5 5.5 0 1 0 6.5 6.5Z"
+          stroke="currentColor"
+          strokeWidth="1.4"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
+  {
+    value: 'auto',
+    label: 'Auto',
+    icon: (
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 16 16"
+        fill="none"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <circle cx="8" cy="8" r="5.5" stroke="currentColor" strokeWidth="1.4" />
+        <path d="M8 2.5a5.5 5.5 0 0 1 0 11Z" fill="currentColor" />
+      </svg>
+    ),
+  },
+];
+
 /**
  * Sidebar UserMenu — replaces both Payload's default top-right avatar
  * AND the bottom-left logout link. Mounted via
@@ -48,9 +122,13 @@ type AuthUser = {
  */
 export const UserMenu = (): ReactElement => {
   const { user, logOut } = useAuth<AuthUser>();
+  const { theme, autoMode, setTheme } = useTheme();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+
+  const setThemePreference = setTheme as (theme: ThemePreference) => void;
+  const activePreference: ThemePreference = autoMode ? 'auto' : theme;
 
   const close = useCallback(() => setOpen(false), []);
 
@@ -166,6 +244,35 @@ export const UserMenu = (): ReactElement => {
             </svg>
             <span>Account</span>
           </Link>
+
+          <div className="cs-user-menu__divider" aria-hidden="true" />
+
+          <fieldset className="cs-user-menu__theme">
+            <legend className="cs-user-menu__theme-label">Theme</legend>
+            <div className="cs-user-menu__segmented">
+              {THEME_OPTIONS.map((option) => {
+                const isActive = activePreference === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className={
+                      isActive
+                        ? 'cs-user-menu__seg cs-user-menu__seg--active'
+                        : 'cs-user-menu__seg'
+                    }
+                    aria-pressed={isActive}
+                    onClick={() => setThemePreference(option.value)}
+                  >
+                    {option.icon}
+                    <span>{option.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
+
+          <div className="cs-user-menu__divider" aria-hidden="true" />
 
           <button
             type="button"

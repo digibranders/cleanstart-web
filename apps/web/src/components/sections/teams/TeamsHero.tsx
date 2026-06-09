@@ -127,7 +127,7 @@ export function TeamsHero() {
       />
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        <div className="flex flex-col items-center gap-6 pb-[80px] pt-[clamp(112px,8vw,128px)] text-center">
+        <div className="flex flex-col items-center gap-6 pb-[80px] pt-[calc(clamp(112px,8vw,128px)+var(--cs-header-extra))] text-center">
           <HeroReveal y={50} duration={1.0}>
             <h1
               className="w-full font-display font-semibold text-white"
@@ -137,16 +137,7 @@ export function TeamsHero() {
                 letterSpacing: "-0.04em",
               }}
             >
-              {"United by "}
-              <span
-                className="bg-clip-text text-transparent"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(120.16deg, rgb(154,81,255) 1.7578%, rgb(44,193,235) 98.781%)",
-                }}
-              >
-                Purpose
-              </span>
+              United by Purpose
             </h1>
           </HeroReveal>
           <HeroReveal y={30} delay={0.2} duration={0.8}>

@@ -28,6 +28,35 @@ const nextConfig: NextConfig = {
         destination: "/blogs",
         permanent: true,
       },
+      // Guides use a singular hub (`/guide`) matching the indexed detail path
+      // `/guide/[slug]`. Courtesy 301s catch the plural variant a user or bot
+      // might guess, including any pluralized sub-path.
+      {
+        source: "/guides",
+        destination: "/guide",
+        permanent: true,
+      },
+      {
+        source: "/guides/:slug*",
+        destination: "/guide/:slug*",
+        permanent: true,
+      },
+      // Canonical detail routes are singular `/event/[slug]` and `/job/[slug]`
+      // (matching the indexed Webflow URLs). The redesign also shipped plural
+      // aliases that rendered the same content and self-canonicalled to
+      // themselves — duplicate content. 308 them to the primary so there is one
+      // indexable URL per event/job. Listing pages (`/events`, `/careers`)
+      // use a single segment match and are untouched.
+      {
+        source: "/events/:slug",
+        destination: "/event/:slug",
+        permanent: true,
+      },
+      {
+        source: "/careers/:slug",
+        destination: "/job/:slug",
+        permanent: true,
+      },
     ];
   },
   images: {
@@ -41,13 +70,7 @@ const nextConfig: NextConfig = {
         pathname: "/api/media/**",
       },
       {
-        // Payload CMS media — dev tunnel (cms-dev.cleanstart.com)
-        protocol: "https",
-        hostname: "cms-dev.cleanstart.com",
-        pathname: "/api/media/**",
-      },
-      {
-        // Payload CMS media — production (cms.cleanstart.com)
+        // Payload CMS media — cms.cleanstart.com (the CMS droplet)
         protocol: "https",
         hostname: "cms.cleanstart.com",
         pathname: "/api/media/**",

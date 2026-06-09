@@ -4,15 +4,16 @@ import { PartnersHero } from "@/components/sections/partners/PartnersHero";
 import { PartnersWhy } from "@/components/sections/partners/PartnersWhy";
 import { PartnersNetwork } from "@/components/sections/partners/PartnersNetwork";
 import { PartnersTypes } from "@/components/sections/partners/PartnersTypes";
-import { TeamsInsiders } from "@/components/sections/teams/TeamsInsiders";
+import { PartnersTestimonials } from "@/components/sections/partners/PartnersTestimonials";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "Partners",
+  title: "CleanStart Partners | Collaborate on Secure Software Supply Chains",
+  absoluteTitle: true,
   description:
-    "Join the Clean Software Movement. CleanStart partners ship verified, compliant, zero-vulnerability software to customers worldwide.",
+    "Explore CleanStart's global partner network of technology providers, system integrators, and cloud platforms delivering hardened, compliance ready container images worldwide.",
   path: "/partners",
 });
 
@@ -36,7 +37,7 @@ export default function PartnersPage() {
           <PartnersNetwork />
         </FadeUp>
         <FadeUp>
-          <TeamsInsiders />
+          <PartnersTestimonials />
         </FadeUp>
         <FadeUp>
           <PartnersTypes />

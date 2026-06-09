@@ -1,4 +1,6 @@
-export type CspMode = "report-only" | "enforce";
+import { CONSENT_MODE_SNIPPET_HASH } from '@/lib/consent/consent-mode-snippet';
+
+export type CspMode = 'report-only' | 'enforce';
 
 export interface BuildCspOptions {
   nonce: string;
@@ -12,20 +14,16 @@ export interface BuildCspOptions {
   isPreviewPath?: boolean;
 }
 
-const SENTRY_INGEST = "https://*.ingest.sentry.io";
-const VERCEL_INSIGHTS = "https://vitals.vercel-insights.com";
-const VERCEL_SCRIPTS = "https://va.vercel-scripts.com";
-const GA4_COLLECT = "https://www.google-analytics.com";
-const GA4_REGION = "https://*.analytics.google.com";
+const SENTRY_INGEST = 'https://*.ingest.sentry.io';
+const VERCEL_INSIGHTS = 'https://vitals.vercel-insights.com';
+const VERCEL_SCRIPTS = 'https://va.vercel-scripts.com';
+const GA4_COLLECT = 'https://www.google-analytics.com';
+const GA4_REGION = 'https://*.analytics.google.com';
 
 // Frame-ancestors override applied to preview surfaces (cookie-based
 // draft mode AND the new token-based `/preview/*` route). In every
 // other case, embedding is denied.
-const PREVIEW_FRAME_ANCESTORS = [
-  "'self'",
-  "http://localhost:3000",
-  "https://cms.cleanstart.com",
-];
+const PREVIEW_FRAME_ANCESTORS = ["'self'", 'http://localhost:3000', 'https://cms.cleanstart.com'];
 
 export function buildCsp({
   nonce,
@@ -36,8 +34,12 @@ export function buildCsp({
   const scriptSrc = [
     "'self'",
     `'nonce-${nonce}'`,
+    // Static, hash-pinned GA4 Consent Mode bootstrap (consent-mode-snippet.ts).
+    // Cleared by hash (honoured under strict-dynamic) so the inline consent
+    // script needs no per-request nonce — keeps the marketing site static.
+    `'${CONSENT_MODE_SNIPPET_HASH}'`,
     "'strict-dynamic'",
-    "https:",
+    'https:',
     "'unsafe-inline'",
   ];
 
@@ -45,21 +47,29 @@ export function buildCsp({
 
   const imgSrc = [
     "'self'",
-    "data:",
-    "blob:",
-    "https://cdn.cleanstart.com",
-    "https://cms.cleanstart.com",
+    'data:',
+    'blob:',
+    'https://cdn.cleanstart.com',
+    'https://cms.cleanstart.com',
     // Public CleanStart community-images logos served by GCS
-    "https://storage.googleapis.com",
+    'https://storage.googleapis.com',
     // Brand-colored stack logos (devicons) served via jsDelivr CDN
-    "https://cdn.jsdelivr.net",
+    'https://cdn.jsdelivr.net',
   ];
 
-  const fontSrc = ["'self'", "https://fonts.gstatic.com", "data:"];
+  const fontSrc = ["'self'", 'https://fonts.gstatic.com', 'data:'];
+
+  const mediaSrc = [
+    "'self'",
+    'data:',
+    'blob:',
+    // Academy lesson videos (Knowledge Hub) served from the public GCS bucket.
+    'https://storage.googleapis.com',
+  ];
 
   const connectSrc = [
     "'self'",
-    "https://cms.cleanstart.com",
+    'https://cms.cleanstart.com',
     SENTRY_INGEST,
     VERCEL_INSIGHTS,
     VERCEL_SCRIPTS,
@@ -71,73 +81,71 @@ export function buildCsp({
   if (!isProduction) {
     // Local dev: web (3010/3001) calls the CMS at localhost:3000 for
     // /api/leads/submit and /api/resources/:slug/{token,download}.
-    connectSrc.push("http://localhost:3000");
+    connectSrc.push('http://localhost:3000');
     // Local dev: OyeChats chatbot — widget script (4173), backend API (8000),
     // and embedded chat frontend iframe (5174).
     connectSrc.push(
-      "http://localhost:4173",
-      "http://localhost:5174",
-      "http://localhost:8000",
-      "ws://localhost:8000",
+      'http://localhost:4173',
+      'http://localhost:5174',
+      'http://localhost:8000',
+      'ws://localhost:8000',
     );
-    frameSrc.push("http://localhost:5174", "http://localhost:4173");
+    frameSrc.push('http://localhost:5174', 'http://localhost:4173');
   }
 
-  const frameAncestors =
-    isDraftMode || isPreviewPath ? PREVIEW_FRAME_ANCESTORS : ["'none'"];
+  const frameAncestors = isDraftMode || isPreviewPath ? PREVIEW_FRAME_ANCESTORS : ["'none'"];
 
   const directives: Array<[string, string]> = [
-    ["default-src", "'self'"],
-    ["script-src", scriptSrc.join(" ")],
-    ["style-src", styleSrc.join(" ")],
-    ["img-src", imgSrc.join(" ")],
-    ["font-src", fontSrc.join(" ")],
-    ["connect-src", connectSrc.join(" ")],
-    ["frame-src", frameSrc.join(" ")],
-    ["frame-ancestors", frameAncestors.join(" ")],
-    ["base-uri", "'self'"],
-    ["form-action", "'self'"],
-    ["object-src", "'none'"],
-    ["upgrade-insecure-requests", ""],
-    ["report-uri", "/api/csp-report"],
-    ["report-to", "csp-endpoint"],
+    ['default-src', "'self'"],
+    ['script-src', scriptSrc.join(' ')],
+    ['style-src', styleSrc.join(' ')],
+    ['img-src', imgSrc.join(' ')],
+    ['font-src', fontSrc.join(' ')],
+    ['media-src', mediaSrc.join(' ')],
+    ['connect-src', connectSrc.join(' ')],
+    ['frame-src', frameSrc.join(' ')],
+    ['frame-ancestors', frameAncestors.join(' ')],
+    ['base-uri', "'self'"],
+    ['form-action', "'self'"],
+    ['object-src', "'none'"],
+    ['upgrade-insecure-requests', ''],
+    ['report-uri', '/api/csp-report'],
+    ['report-to', 'csp-endpoint'],
   ];
 
   if (isProduction) {
-    directives.push(["require-trusted-types-for", "'script'"]);
-    directives.push(["trusted-types", "nextjs default"]);
+    directives.push(['require-trusted-types-for', "'script'"]);
+    directives.push(['trusted-types', 'nextjs default']);
   }
 
-  return directives
-    .map(([name, value]) => (value ? `${name} ${value}` : name))
-    .join("; ");
+  return directives.map(([name, value]) => (value ? `${name} ${value}` : name)).join('; ');
 }
 
 export const PERMISSIONS_POLICY = [
-  "camera=()",
-  "microphone=()",
-  "geolocation=()",
-  "payment=()",
-  "usb=()",
-  "magnetometer=()",
-  "accelerometer=()",
-  "gyroscope=()",
-  "interest-cohort=()",
-  "browsing-topics=()",
-  "attribution-reporting=()",
-  "shared-storage=()",
-  "join-ad-interest-group=()",
-  "run-ad-auction=()",
-  "private-state-token-issuance=()",
-  "private-state-token-redemption=()",
-].join(", ");
+  'camera=()',
+  'microphone=()',
+  'geolocation=()',
+  'payment=()',
+  'usb=()',
+  'magnetometer=()',
+  'accelerometer=()',
+  'gyroscope=()',
+  'interest-cohort=()',
+  'browsing-topics=()',
+  'attribution-reporting=()',
+  'shared-storage=()',
+  'join-ad-interest-group=()',
+  'run-ad-auction=()',
+  'private-state-token-issuance=()',
+  'private-state-token-redemption=()',
+].join(', ');
 
 export const REPORTING_ENDPOINTS = 'csp-endpoint="/api/csp-report"';
 
 export function generateNonce(): string {
   const bytes = new Uint8Array(16);
   crypto.getRandomValues(bytes);
-  let binary = "";
+  let binary = '';
   for (const byte of bytes) binary += String.fromCharCode(byte);
   return btoa(binary);
 }

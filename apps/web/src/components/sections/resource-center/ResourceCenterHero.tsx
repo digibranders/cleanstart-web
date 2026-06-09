@@ -42,7 +42,7 @@ export function ResourceCenterHero({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/resource-center/hero-cube.png"
+          src="/images/resource-center/hero-cube.webp"
           alt=""
           className="w-full h-full object-cover"
           style={{ transform: "rotate(-46.54deg)", opacity: 0.4 }}
@@ -65,7 +65,7 @@ export function ResourceCenterHero({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/resource-center/hero-glow-left.png"
+          src="/images/resource-center/hero-glow-left.webp"
           alt=""
           className="w-full h-full object-cover"
           loading="lazy"
@@ -75,7 +75,7 @@ export function ResourceCenterHero({
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div
-          className="flex flex-col items-center gap-6 lg:gap-8 mx-auto pt-[clamp(72px,8vw,128px)]"
+          className="flex flex-col items-center gap-6 lg:gap-8 mx-auto pt-[calc(clamp(72px,8vw,128px)+var(--cs-header-extra))]"
           style={{ maxWidth: "955px" }}
         >
           <div
@@ -92,17 +92,7 @@ export function ResourceCenterHero({
                   lineHeight: "var(--text-hero-lh)",
                 }}
               >
-                {"Resource "}
-                <span
-                  className="bg-clip-text"
-                  style={{
-                    WebkitTextFillColor: "transparent",
-                    backgroundImage:
-                      "linear-gradient(105.93deg, #9a51ff 1.76%, #2cc1eb 98.78%)",
-                  }}
-                >
-                  Center
-                </span>
+                Resource Center
               </h1>
             </HeroReveal>
             <HeroReveal y={30} delay={0.15} duration={0.8}>

@@ -62,7 +62,7 @@ export function ASRHero(): React.ReactElement {
           className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-6 lg:gap-10"
           style={{
             // Match FipsHero top padding so the H1 baseline lines up across product heroes.
-            paddingTop: 'clamp(112px, 12.92vw, 200px)',
+            paddingTop: 'calc(clamp(112px, 12.92vw, 200px) + var(--cs-header-extra))',
             // Fixed bottom space below the cards/CTA at every viewport so the
             // gap doesn't shift with width.
             paddingBottom: '96px',
@@ -87,17 +87,7 @@ export function ASRHero(): React.ReactElement {
                   }}
                 >
                   <span className="block">Bigger Images,</span>
-                  <span
-                    style={{
-                      background: 'linear-gradient(96.33deg, #9A51FF 1.76%, #2CC1EB 98.78%)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
-                      color: 'transparent',
-                    }}
-                  >
-                    Bigger Risk
-                  </span>
+                  <span className="block">Bigger Risk</span>
                 </h1>
               </HeroReveal>
 
@@ -189,7 +179,7 @@ export function ASRHero(): React.ReactElement {
             ].join(' ')}
             style={{
               width: 'calc(650px * var(--asr-card-scale))',
-              // Height excludes the ≈26px drop-shadow padding baked into hero-cards.png
+              // Height excludes the ≈26px drop-shadow padding baked into hero-cards.webp
               // so the wrapper's bottom edge = the cards' VISIBLE bottom. items-end on
               // the parent flex row then pins that to the CTA's bottom on md+.
               height: 'calc(414px * var(--asr-card-scale))',
@@ -209,7 +199,7 @@ export function ASRHero(): React.ReactElement {
             {/* BLOATED card — larger, bottom-aligned, on the left. */}
             <div style={{ position: 'absolute', left: 0, bottom: 0 }}>
               <Image
-                src="/images/attack-surface-reduction/hero-cards.png"
+                src="/images/attack-surface-reduction/hero-cards.webp"
                 alt="BLOATED image: 1.2 GB, 247 packages, 89 HIGH CVEs"
                 width={484}
                 height={493}
@@ -220,7 +210,7 @@ export function ASRHero(): React.ReactElement {
             </div>
 
             {/* CLEAN card — smaller, visually bottom-aligned with BLOATED. The
-                hero-cards.png carries ~26px of drop-shadow padding below its
+                hero-cards.webp carries ~26px of drop-shadow padding below its
                 visible frame at the rendered width, so CLEAN's bottom:26px
                 matches BLOATED's visible bottom exactly. */}
             <div

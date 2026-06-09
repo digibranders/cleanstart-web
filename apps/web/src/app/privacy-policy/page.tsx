@@ -9,7 +9,7 @@ import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 export const metadata = buildPageMetadata({
   title: "Privacy Policy",
   description:
-    "CleanStart's Privacy Policy describes how we collect, use, and protect your personal information across our website, software, and services.",
+    "Read CleanStart's Privacy Policy detailing how personal and organizational data is collected, used, stored, and protected across its platform and services.",
   path: "/privacy-policy",
 });
 
@@ -25,7 +25,7 @@ export default function PrivacyPolicyPage() {
       />
       <Header />
       <main>
-        <LegalHero title="Privacy Policy" />
+        <LegalHero title="Privacy Policy" as="h1" />
         <FadeUp>
           <LegalProse>
             <p className="article-paragraph"><strong>Last Updated:</strong> 31-03-2026</p>
@@ -320,7 +320,9 @@ export default function PrivacyPolicyPage() {
               <li className="article-li"><strong>Right to nominate:</strong> You have the right to nominate another individual to exercise your rights under the DPDP Act in the event of your death or incapacity.</li>
             </ul>
 
-            <h2 className="article-h2">6. Information We Collect Automatically</h2>
+            <h2 id="cookies" className="article-h2 scroll-mt-24">
+              6. Information We Collect Automatically
+            </h2>
             <p className="article-paragraph">
               When you access or interact with our website, we automatically gather certain limited
               technical and usage-related information. This data does not directly identify you

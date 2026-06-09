@@ -139,7 +139,7 @@ export function ErrorHero({ title, referenceId }: ErrorHeroProps) {
       />
 
       <Container variant="default" className="relative">
-        <div className="flex flex-col items-center pt-[clamp(80px,10vw,140px)] pb-[clamp(48px,6vw,96px)] text-center">
+        <div className="flex flex-col items-center pt-[calc(clamp(80px,10vw,140px)+var(--cs-header-extra))] pb-[clamp(48px,6vw,96px)] text-center">
           <h1 className="font-display text-balance" style={TITLE_STYLE}>
             {title}
           </h1>
@@ -152,7 +152,7 @@ export function ErrorHero({ title, referenceId }: ErrorHeroProps) {
             style={{ maxWidth: "clamp(260px, 42vw, 520px)" }}
           >
             <Image
-              src="/images/error/page-not-found-illustration.png"
+              src="/images/error/page-not-found-illustration.webp"
               alt=""
               width={1120}
               height={928}

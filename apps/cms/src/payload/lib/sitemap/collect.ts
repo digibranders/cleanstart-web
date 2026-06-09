@@ -44,6 +44,9 @@ export const SITEMAP_COLLECTIONS: ReadonlyArray<{
   // Taxonomy collections (categories / newsCategories / knowledgeCategories) have
   // no web detail routes — removed to prevent 404-able sitemap entries.
   { collection: 'pages', defaultPriority: 0.6, defaultChangeFreq: 'monthly', listingPath: null },
+  // Legal documents change rarely; low priority, yearly cadence. Detail route
+  // is /legal/[slug]; the bare /legal redirects to the first doc (no own entry).
+  { collection: 'legalDocuments', defaultPriority: 0.4, defaultChangeFreq: 'yearly', listingPath: null },
 ];
 
 const PER_PAGE = 200;

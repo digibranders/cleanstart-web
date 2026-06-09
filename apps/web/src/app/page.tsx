@@ -3,30 +3,31 @@ import dynamic from "next/dynamic";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { Header } from "@/components/nav/Header";
 import { Hero } from "@/components/sections/home/Hero";
-import { CleanStartFactory } from "@/components/sections/home/CleanStartFactory";
-import { HowCleanStartHelp } from "@/components/sections/home/HowCleanStartHelp";
-// BuiltForTeams (~480L "use client" testimonial carousel) sits below the fold;
+import { PlatformPipeline } from "@/components/sections/home/PlatformPipeline";
+import { AudienceTabs } from "@/components/sections/home/AudienceTabs";
+import { SecurityNotPatching } from "@/components/sections/home/SecurityNotPatching";
+// Testimonials (~480L "use client" testimonial carousel) sits below the fold;
 // code-split so it does not ship in the initial home-page client bundle.
-const BuiltForTeams = dynamic(() =>
-  import("@/components/sections/home/BuiltForTeams").then((m) => ({ default: m.BuiltForTeams })),
+const Testimonials = dynamic(() =>
+  import("@/components/sections/home/Testimonials").then((m) => ({ default: m.Testimonials })),
 );
 import { FrequentlyAskedQuestions } from "@/components/sections/home/FrequentlyAskedQuestions";
 import { ResourcesInsights } from "@/components/sections/home/ResourcesInsights";
 import { ReadyToSecureCTA } from "@/components/sections/home/ReadyToSecureCTA";
 import { Footer } from "@/components/sections/Footer";
-import { SecurityNotPatching } from "@/components/sections/home/SecurityNotPatching";
 import { CleanStartAdvantage } from "@/components/sections/home/CleanStartAdvantage";
 import { FadeUp } from "@/components/ui/FadeUp";
 import Image from "next/image";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "CleanStart — Secure by Design. Built from Source.",
+  title: "Verified & Secure Container Images | CleanStart",
+  absoluteTitle: true,
   description:
-    "Verified container images. Built from source, hardened, signed, and continuously verified.",
+    "Build on verified, near zero vulnerability container images with cryptographic provenance. CleanStart delivers hardened, FIPS compliant, SBOM backed images for trusted software delivery.",
   path: "/",
   variant: "hero",
-  ogTitle: "Secure by Design. Built from Source.",
-  titleAccent: "Built from Source.",
+  ogTitle: "Verified & Secure Container Images",
+  titleAccent: "Secure Container Images",
 });
 
 export default function Home() {
@@ -40,11 +41,18 @@ export default function Home() {
               of the bg-cs-hero wrapper. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/home/mask-group.svg"
+            src="/images/home/hero-top-grid-glow.svg"
             alt=""
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-0 w-full select-none"
-            style={{ height: "auto", maxWidth: "none" }}
+            style={{
+              height: "auto",
+              maxWidth: "none",
+              WebkitMaskImage:
+                "linear-gradient(to bottom, #000 46%, transparent 62%)",
+              maskImage:
+                "linear-gradient(to bottom, #000 46%, transparent 62%)",
+            }}
             loading="eager"
             decoding="async"
           />
@@ -93,7 +101,7 @@ export default function Home() {
           <div className="relative">
             <Hero />
             <FadeUp>
-              <CleanStartFactory />
+              <PlatformPipeline />
             </FadeUp>
           </div>
           {/* Bottom fade removed (2026-05) — the white-to-transparent
@@ -108,10 +116,10 @@ export default function Home() {
           <SecurityNotPatching />
         </FadeUp>
         <FadeUp>
-          <BuiltForTeams />
+          <Testimonials />
         </FadeUp>
         <FadeUp>
-          <HowCleanStartHelp />
+          <AudienceTabs />
         </FadeUp>
         <FadeUp>
           <CleanStartAdvantage />

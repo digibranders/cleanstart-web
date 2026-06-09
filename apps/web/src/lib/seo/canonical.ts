@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { isIndexingAllowed } from "./indexing";
 import { ogImageUrl, type OgVariant } from "./og";
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.cleanstart.com";
@@ -14,6 +15,12 @@ export type PageImage = {
 interface BuildPageMetadataInput {
   title: string;
   description: string;
+  /**
+   * When true, `title` is used as the absolute document `<title>` and the
+   * root layout's `%s | CleanStart` template is bypassed. Use for pages whose
+   * title already carries the brand suffix (e.g. exact-matched legacy titles).
+   */
+  absoluteTitle?: boolean | undefined;
   /** Path-only canonical, e.g. `/blogs` or `/blogs/${slug}`. Always with a leading slash. */
   path: string;
   image?: PageImage | undefined;
@@ -48,6 +55,7 @@ interface BuildPageMetadataInput {
 export function buildPageMetadata({
   title,
   description,
+  absoluteTitle,
   path,
   image,
   type = "website",
@@ -62,8 +70,8 @@ export function buildPageMetadata({
   ogTitle,
 }: BuildPageMetadataInput): Metadata {
   const url = `${SITE_URL}${path}`;
-  const isProduction = process.env.VERCEL_ENV === "production";
-  const robotsBlocked = noindex || !isProduction;
+  // Build-time gate (no request host) — the per-host backstop is proxy.ts.
+  const robotsBlocked = noindex || !isIndexingAllowed();
 
   const dynamicOg = {
     url: ogImageUrl({
@@ -82,7 +90,7 @@ export function buildPageMetadata({
   const ogUrl = canonicalUrl ?? url;
 
   return {
-    title,
+    title: absoluteTitle ? { absolute: title } : title,
     description,
     alternates: { canonical },
     openGraph: {

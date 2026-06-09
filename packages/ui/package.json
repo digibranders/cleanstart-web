@@ -11,6 +11,7 @@
   "scripts": {
     "lint": "biome lint src",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "ladle": "ladle serve",
     "ladle:build": "ladle build"
   },
@@ -25,6 +26,7 @@
     "@types/react-dom": "^19.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
   }
 }

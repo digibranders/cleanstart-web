@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Job, JobStatusFilter } from "@/lib/jobs";
+import type { Job } from "@/lib/jobs";
 import { Pagination } from "@/components/ui/Pagination";
 import { JobCard } from "./JobCard";
 import { RevealStagger, RevealItem } from "@/components/ui/Reveal";
@@ -11,7 +11,6 @@ interface JobsListProps {
   totalPages: number;
   activeDepartment: string;
   activeLocation: string;
-  activeStatus: JobStatusFilter;
   searchQuery: string;
 }
 
@@ -19,13 +18,11 @@ function buildPageHref(
   page: number,
   activeDepartment: string,
   activeLocation: string,
-  activeStatus: JobStatusFilter,
   searchQuery: string,
 ): string {
   const params = new URLSearchParams();
   if (activeDepartment) params.set("department", activeDepartment);
   if (activeLocation) params.set("location", activeLocation);
-  if (activeStatus !== "open") params.set("status", activeStatus);
   if (searchQuery) params.set("q", searchQuery);
   if (page > 1) params.set("page", String(page));
   const qs = params.toString();
@@ -39,7 +36,6 @@ export function JobsList({
   totalPages,
   activeDepartment,
   activeLocation,
-  activeStatus,
   searchQuery,
 }: JobsListProps): React.ReactElement {
   if (jobs.length === 0) {
@@ -81,13 +77,7 @@ export function JobsList({
         currentPage={currentPage}
         totalPages={totalPages}
         buildHref={(p) =>
-          buildPageHref(
-            p,
-            activeDepartment,
-            activeLocation,
-            activeStatus,
-            searchQuery,
-          )
+          buildPageHref(p, activeDepartment, activeLocation, searchQuery)
         }
       />
     </div>

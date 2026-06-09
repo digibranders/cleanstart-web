@@ -27,7 +27,7 @@ export function CareerDetailHero({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/blogs/cta-cube-right.png"
+        src="/images/blogs/cta-cube-right.webp"
         alt=""
         className="pointer-events-none select-none absolute hidden md:block"
         style={{
@@ -45,7 +45,7 @@ export function CareerDetailHero({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/blogs/cta-cube-left.png"
+        src="/images/blogs/cta-cube-left.webp"
         alt=""
         className="pointer-events-none select-none absolute hidden md:block"
         style={{
@@ -142,7 +142,7 @@ function Breadcrumb({ title }: { title: string }): React.ReactElement {
   return (
     <nav
       aria-label="Breadcrumb"
-      className="flex flex-wrap items-center gap-y-1 gap-0 pt-[clamp(28px,5vw,58px)]"
+      className="flex flex-wrap items-center gap-y-1 gap-0 pt-[calc(var(--cs-header-h)+env(safe-area-inset-top)+clamp(8px,2vw,24px))]"
     >
       <Link
         href="/"

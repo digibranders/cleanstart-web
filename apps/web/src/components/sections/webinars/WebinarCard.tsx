@@ -10,7 +10,7 @@ interface WebinarCardProps {
   item: Webinar;
 }
 
-const FALLBACK_IMAGE = "/images/blogs/hero-orb-top.png";
+const FALLBACK_IMAGE = "/images/blogs/hero-orb-top.webp";
 
 export function WebinarCard({ item }: WebinarCardProps): React.ReactElement {
   const href = item.registrationUrl ?? "";

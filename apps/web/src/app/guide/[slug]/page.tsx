@@ -2,14 +2,26 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
-import { FadeUp } from "@/components/ui/FadeUp";
-import { Section, Container } from "@/components/layout";
-import { DetailHero } from "@/components/sections/_shared/DetailHero";
-import { RenderLexical } from "@/lib/renderLexical";
+import { GuideScrollReset } from "@/components/sections/guide/GuideScrollReset";
+import { GuideDetailHero } from "@/components/sections/guide/GuideDetailHero";
+import { GuideDetailContent } from "@/components/sections/guide/GuideDetailContent";
+import { GuideDetailAuthor } from "@/components/sections/guide/GuideDetailAuthor";
+import { GuideDetailJourneyNav } from "@/components/sections/guide/GuideDetailJourneyNav";
+import type { GuideJourneyNavTarget } from "@/components/sections/guide/GuideDetailJourneyNav";
+import { GuideDetailFAQ } from "@/components/sections/guide/GuideDetailFAQ";
+import { GuideDetailRelatedGuides } from "@/components/sections/guide/GuideDetailRelatedGuides";
+import { GuidesCTA } from "@/components/sections/guides/GuidesCTA";
 import { highlightLexical } from "@/lib/highlightLexical";
-import { mediaUrl } from "@/lib/blog";
-import { getGuideBySlug, getGuideBySlugDraft } from "@/lib/guides";
-import { buildPageMetadata } from "@/lib/seo/canonical";
+import {
+  getGuideBySlug,
+  getGuideBySlugDraft,
+  getRelatedGuides,
+  getGuideJourneyTargets,
+  guideMediaUrl,
+} from "@/lib/guides";
+import type { Guide } from "@/lib/guides";
+import { effectivePublishedAt } from "@/lib/published-date";
+import { absoluteUrl, buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 import {
   JsonLd,
@@ -36,8 +48,8 @@ export async function generateMetadata({
     });
   }
 
-  const heroAbsolute = mediaUrl(guide.heroImage?.url);
-  const seo = resolveCmsSeo(guide.seo, { absolutize: mediaUrl });
+  const heroAbsolute = guideMediaUrl(guide.heroImage?.url);
+  const seo = resolveCmsSeo(guide.seo, { absolutize: guideMediaUrl });
 
   return buildPageMetadata({
     title: seo.title ?? guide.title,
@@ -48,7 +60,7 @@ export async function generateMetadata({
       "In-depth guides on container security, compliance, and software supply-chain integrity from CleanStart.",
     path: `/guide/${guide.slug}`,
     type: "article",
-    publishedTime: guide.publishedAt ?? undefined,
+    publishedTime: effectivePublishedAt(guide) ?? guide.publishedAt ?? undefined,
     modifiedTime: guide.updatedAt ?? undefined,
     authors: guide.authors?.map((a) => a.name),
     ...(seo.noindex ? { noindex: true } : {}),
@@ -80,17 +92,42 @@ export async function renderGuideDetail({
     : await getGuideBySlug(slug).catch(() => null);
   if (!guide) notFound();
 
-  const highlightedBody = await highlightLexical(guide.body ?? null);
-  const heroAbsolute = mediaUrl(guide.heroImage?.url);
+  const publishedAt = effectivePublishedAt(guide);
+
+  // Editorial picks win; missing sides fall back to chronological neighbors.
+  // The auto fetch is skipped entirely when both sides are manually pinned.
+  const manualPrevious = toGuideJourneyTarget(guide.previousGuide);
+  const manualNext = toGuideJourneyTarget(guide.nextGuide);
+  const needAutoJourney = !manualPrevious || !manualNext;
+
+  const [relatedGuides, highlightedBody, autoJourney] = await Promise.all([
+    getRelatedGuides(String(guide.id), guide.relatedGuides, { draft }),
+    highlightLexical(guide.body ?? null),
+    needAutoJourney
+      ? getGuideJourneyTargets(String(guide.id), publishedAt ?? undefined, { draft })
+      : Promise.resolve({ previous: null, next: null }),
+  ]);
+
+  const previousTarget = manualPrevious ?? toGuideJourneyTarget(autoJourney.previous);
+  const nextTarget = manualNext ?? toGuideJourneyTarget(autoJourney.next);
+
+  const heroAbsolute = guideMediaUrl(guide.heroImage?.url);
   const faqs = (guide.faqs ?? []).filter((f) => f.question && f.answer);
 
   return (
     <>
+      <GuideScrollReset />
+      {previousTarget ? (
+        <link rel="prev" href={absoluteUrl(`/guide/${previousTarget.slug}`)} />
+      ) : null}
+      {nextTarget ? (
+        <link rel="next" href={absoluteUrl(`/guide/${nextTarget.slug}`)} />
+      ) : null}
       <JsonLd
         id={`guide-breadcrumbs-${guide.slug}`}
         data={breadcrumbSchema([
           { name: "Home", path: "/" },
-          { name: "Knowledge Hub", path: "/knowledge-hub" },
+          { name: "Guides", path: "/guide" },
           { name: guide.title },
         ])}
       />
@@ -100,7 +137,7 @@ export async function renderGuideDetail({
           title: guide.title,
           description: guide.abstract ?? undefined,
           path: `/guide/${guide.slug}`,
-          publishedAt: guide.publishedAt ?? undefined,
+          publishedAt: publishedAt ?? guide.publishedAt ?? undefined,
           modifiedAt: guide.updatedAt ?? undefined,
           imageUrl: heroAbsolute,
         })}
@@ -115,55 +152,58 @@ export async function renderGuideDetail({
       ) : null}
       <Header />
       <main>
-        <DetailHero
-          breadcrumb={[
-            { label: "Home", href: "/" },
-            { label: "Knowledge Hub", href: "/knowledge-hub" },
-            { label: guide.title },
-          ]}
+        <GuideDetailHero
           title={guide.title}
+          slug={guide.slug}
+          authors={guide.authors}
+          publishedAt={publishedAt ?? undefined}
+          updatedAt={guide.updatedAt ?? undefined}
+          readingMinutes={guide.readingMinutes ?? undefined}
+          heroImage={guide.heroImage}
         />
 
-        <FadeUp>
-          <Section padding="lg">
-            <Container variant="prose">
-              <div className="article-body">
-                <RenderLexical content={highlightedBody} />
-              </div>
+        <GuideDetailContent
+          body={highlightedBody}
+          tableOfContents={guide.tableOfContents}
+          heroImage={guide.heroImage}
+          abstract={guide.abstract ?? undefined}
+        />
 
-              {faqs.length > 0 ? (
-                <section className="mt-16">
-                  <h2
-                    className="mb-6 font-semibold text-cs-text-dark"
-                    style={{ fontSize: "var(--fs-h2)" }}
-                  >
-                    Frequently asked questions
-                  </h2>
-                  <dl>
-                    {faqs.map((f, i) => (
-                      <div key={f.id ?? `${guide.slug}-faq-${i}`} className="mb-8">
-                        <dt
-                          className="mb-2 font-semibold text-cs-text-dark"
-                          style={{ fontSize: "var(--fs-h4)" }}
-                        >
-                          {f.question}
-                        </dt>
-                        <dd
-                          className="text-black/70"
-                          style={{ fontSize: "var(--fs-body)" }}
-                        >
-                          {f.answer}
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-                </section>
-              ) : null}
-            </Container>
-          </Section>
-        </FadeUp>
+        {faqs.length > 0 ? <GuideDetailFAQ faqs={faqs} /> : null}
+
+        <GuideDetailAuthor authors={guide.authors} />
+
+        <GuideDetailJourneyNav previous={previousTarget} next={nextTarget} />
+
+        {/* Trailing buffer keeps a consistent gap before the CTA card.
+            `--spacing-section-cta` holds the per-breakpoint clearance; each
+            branch subtracts the inner pb of the last rendered section, in the
+            section order: Content → FAQ → Author → Journey. */}
+        {relatedGuides.length > 0 ? (
+          <div
+            style={{
+              background:
+                "linear-gradient(180deg, #151021 0%, #131E8F 62%, #471EC0 100%)",
+              paddingBottom: "calc(var(--spacing-section-cta) - 20px)",
+            }}
+          >
+            <GuideDetailRelatedGuides guides={relatedGuides} />
+          </div>
+        ) : previousTarget || nextTarget ? (
+          /* JourneyNav (py-6/8 → 32px bottom) is last. */
+          <div aria-hidden className="bg-white" style={{ height: "calc(var(--spacing-section-cta) - 32px)" }} />
+        ) : guide.authors && guide.authors.length > 0 ? (
+          /* Author (pb-16 → 64px) is last. */
+          <div aria-hidden className="bg-white" style={{ height: "calc(var(--spacing-section-cta) - 64px)" }} />
+        ) : faqs.length > 0 ? (
+          /* FAQ (pb-20 → 80px) is last. */
+          <div aria-hidden className="bg-white" style={{ height: "calc(var(--spacing-section-cta) - 80px)" }} />
+        ) : (
+          /* Content (pb-28 → 112px) is last. */
+          <div aria-hidden className="bg-white" style={{ height: "calc(var(--spacing-section-cta) - 112px)" }} />
+        )}
       </main>
-      <Footer />
+      <Footer cta={<GuidesCTA />} />
     </>
   );
 }
@@ -173,4 +213,18 @@ export default async function GuideDetailPage({
 }: GuideDetailPageProps): Promise<React.ReactElement> {
   const { slug } = await params;
   return renderGuideDetail({ slug });
+}
+
+/**
+ * Normalize a Payload relationship value (id or hydrated doc) into a
+ * GuideJourneyNavTarget. Returns null when unset, a bare id (cannot render
+ * without a title), or missing slug/title.
+ */
+function toGuideJourneyTarget(
+  value: Guide | string | number | null | undefined,
+): GuideJourneyNavTarget | null {
+  if (value == null) return null;
+  if (typeof value !== "object") return null;
+  if (!value.slug || !value.title) return null;
+  return { slug: value.slug, title: value.title };
 }

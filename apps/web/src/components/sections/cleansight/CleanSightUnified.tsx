@@ -4,22 +4,22 @@ const CARDS = [
   {
     title: "Continuous Discovery",
     body: "Continuously inventory container environments.",
-    iconSrc: "/images/cleansight/Ball1.png",
+    iconSrc: "/images/cleansight/Ball1.webp",
   },
   {
     title: "Risk Assessment",
     body: "Identify inherited vulnerabilities and runtime exposure.",
-    iconSrc: "/images/cleansight/Ball2.png",
+    iconSrc: "/images/cleansight/Ball2.webp",
   },
   {
     title: "Enterprise SBOM Generation",
     body: "Generate software inventories automatically.",
-    iconSrc: "/images/cleansight/Ball3.png",
+    iconSrc: "/images/cleansight/Ball3.webp",
   },
   {
     title: "Integrated Remediation",
     body: "Reduce remediation complexity and operational effort.",
-    iconSrc: "/images/cleansight/Ball4.png",
+    iconSrc: "/images/cleansight/Ball4.webp",
   },
 ];
 

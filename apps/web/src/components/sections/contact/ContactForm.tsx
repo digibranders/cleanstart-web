@@ -3,6 +3,7 @@
 import { Container } from "@/components/layout";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { LeadConsent } from "@/components/forms/LeadConsent";
+import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
 import { submitLead } from "@/lib/leads/submitLead";
 import { useRef, useState } from "react";
 
@@ -41,7 +42,7 @@ export function ContactForm() {
   const [values, setValues] = useState<FieldState>(initialState);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [topError, setTopError] = useState<string | null>(null);
+  const { status, setStatus, statusRef } = useFormStatus();
   const inFlightRef = useRef(false);
 
   const onChange =
@@ -53,7 +54,7 @@ export function ContactForm() {
     e.preventDefault();
     if (inFlightRef.current) return;
     inFlightRef.current = true;
-    setTopError(null);
+    setStatus(null);
     setSubmitting(true);
 
     const fd = new FormData(e.currentTarget);
@@ -82,14 +83,27 @@ export function ContactForm() {
     if (result.ok) {
       setSubmitted(true);
       setValues(initialState);
-      window.setTimeout(() => setSubmitted(false), 5000);
+      setStatus({
+        tone: "success",
+        title: "Message sent",
+        message:
+          "Thanks, we've received your message and will reply within 24 hours.",
+      });
+      window.setTimeout(() => {
+        setSubmitted(false);
+        setStatus(null);
+      }, 5000);
     } else {
-      setTopError("We couldn't send your message. Please try again.");
+      setStatus({
+        tone: "error",
+        title: "Couldn't send message",
+        message: "We couldn't send your message. Please try again.",
+      });
     }
   };
 
   return (
-    <section className="relative -mt-[140px] pb-4 sm:pb-6">
+    <section className="relative -mt-[140px]">
       <Container>
         <div className="mx-auto w-full max-w-[860px]">
           <div
@@ -101,76 +115,16 @@ export function ContactForm() {
             }}
           >
             <div className="overflow-hidden rounded-[13px] bg-white px-3 py-[18px] sm:px-3">
-              <div
-                className="relative overflow-hidden rounded-[19px] px-6 py-6 sm:px-[60px] sm:py-[26px]"
-                style={{
-                  backgroundColor: "#3A1FA3",
-                  backgroundImage:
-                    "url('/images/contact/form/header-bg.png')",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                  minHeight: "123px",
-                }}
-              >
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute hidden sm:block"
-                  style={{
-                    right: "0px",
-                    top: "9px",
-                    width: "190px",
-                    height: "176px",
-                    mixBlendMode: "soft-light",
-                  }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/images/contact/form/cube-decor.svg"
-                    alt=""
-                    className="block h-full w-full"
-                  />
-                </div>
-
-                <div className="relative max-w-[452px]">
-                  <h2
-                    className="font-display font-semibold text-white"
-                    style={{
-                      fontSize: "var(--fs-h3)",
-                      lineHeight: 1.1,
-                      letterSpacing: "-0.5px",
-                    }}
-                  >
-                    Send us a message
-                  </h2>
-                  <p
-                    className="mt-3 text-white"
-                    style={{
-                      fontFamily: "var(--font-sans)",
-                      fontSize: "var(--fs-input)",
-                      fontWeight: 400,
-                      lineHeight: 1.5,
-                      letterSpacing: "-0.5px",
-                    }}
-                  >
-                    Fill in the form and our team will be in touch within 24
-                    hours.
-                  </p>
-                </div>
-              </div>
-
               <form
                 onSubmit={onSubmit}
                 className="px-3 pt-6 pb-3 sm:px-[24px] sm:pt-[30px] sm:pb-[18px]"
               >
-                <SuccessBanner
-                  show={submitted}
-                  message="Thanks — we've received your message and will reply within 24 hours."
-                />
+                {status ? <StatusBanner ref={statusRef} {...status} /> : null}
                 <div className="grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2">
                   <Field
                     id="firstName"
                     label="First Name"
+                    placeholder="Jane"
                     required
                     autoComplete="given-name"
                     minLength={2}
@@ -183,6 +137,7 @@ export function ContactForm() {
                   <Field
                     id="lastName"
                     label="Last Name"
+                    placeholder="Doe"
                     autoComplete="family-name"
                     minLength={2}
                     maxLength={50}
@@ -194,6 +149,7 @@ export function ContactForm() {
                   <Field
                     id="email"
                     label="Email"
+                    placeholder="jane@company.com"
                     type="email"
                     required
                     autoComplete="email"
@@ -206,6 +162,7 @@ export function ContactForm() {
                   <Field
                     id="company"
                     label="Company"
+                    placeholder="Acme Inc."
                     autoComplete="organization"
                     maxLength={100}
                     value={values.company}
@@ -215,6 +172,7 @@ export function ContactForm() {
                     <Field
                       id="phone"
                       label="Phone"
+                      placeholder="+1 (555) 000-0000"
                       type="tel"
                       autoComplete="tel"
                       inputMode="tel"
@@ -230,6 +188,7 @@ export function ContactForm() {
                     <Field
                       id="brief"
                       label="Brief Requirement"
+                      placeholder="Tell us how we can help…"
                       required
                       multiline
                       minLength={10}
@@ -248,22 +207,6 @@ export function ContactForm() {
                 <div className="mt-7 flex justify-start">
                   <TurnstileWidget />
                 </div>
-
-                {topError && (
-                  <p
-                    role="alert"
-                    className="mt-4"
-                    style={{
-                      fontFamily: "var(--font-sans), 'Sora', sans-serif",
-                      fontSize: "var(--fs-input-label)",
-                      fontWeight: 500,
-                      lineHeight: 1.45,
-                      color: "#B42318",
-                    }}
-                  >
-                    {topError}
-                  </p>
-                )}
 
                 <button
                   type="submit"
@@ -355,6 +298,7 @@ export function ContactForm() {
 interface FieldProps {
   id: string;
   label: string;
+  placeholder?: string;
   required?: boolean;
   type?: string;
   multiline?: boolean;
@@ -374,6 +318,7 @@ interface FieldProps {
 function Field({
   id,
   label,
+  placeholder,
   required = false,
   type = "text",
   multiline = false,
@@ -389,7 +334,7 @@ function Field({
 }: FieldProps) {
   // Font size is fixed at 16px inline to prevent iOS Safari zoom-on-focus.
   const sharedClass =
-    "block w-full rounded-[8px] bg-[#FBFBFB] text-[#111111] placeholder:text-transparent outline-none transition-colors focus:border-[#3960F9]";
+    "block w-full rounded-[8px] bg-[#FBFBFB] text-[#111111] placeholder:text-[#A3A3A3] outline-none transition-colors focus:border-[#3960F9]";
   const baseStyle: React.CSSProperties = {
     background: "#FBFBFB",
     border: "1.5px solid #DDDDDD",
@@ -423,6 +368,7 @@ function Field({
           name={id}
           required={required}
           rows={4}
+          placeholder={placeholder}
           value={value}
           onChange={onChange}
           minLength={minLength}
@@ -437,6 +383,7 @@ function Field({
           name={id}
           type={type}
           required={required}
+          placeholder={placeholder}
           value={value}
           onChange={(e) => {
             if (filterInput) {
@@ -456,45 +403,5 @@ function Field({
         />
       )}
     </label>
-  );
-}
-
-interface SuccessBannerProps {
-  show: boolean;
-  message: string;
-}
-
-function SuccessBanner({ show, message }: SuccessBannerProps) {
-  return (
-    <output
-      aria-live="polite"
-      className="block overflow-hidden transition-all duration-300 ease-out"
-      style={{
-        maxHeight: show ? "120px" : "0px",
-        opacity: show ? 1 : 0,
-        marginBottom: show ? "20px" : "0px",
-      }}
-    >
-      <div
-        className="flex items-start gap-3 rounded-[10px] px-4 py-3"
-        style={{ background: "#ECFDF3", border: "1px solid #ABEFC6" }}
-      >
-        <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden className="shrink-0" style={{ marginTop: "2px" }}>
-          <circle cx="10" cy="10" r="9" fill="#12B76A" />
-          <path d="M6 10.5l2.5 2.5L14 7.5" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-        <span
-          style={{
-            fontFamily: "var(--font-sans), 'Sora', sans-serif",
-            fontSize: "var(--fs-input-label)",
-            fontWeight: 500,
-            lineHeight: 1.45,
-            color: "#054F31",
-          }}
-        >
-          {message}
-        </span>
-      </div>
-    </output>
   );
 }

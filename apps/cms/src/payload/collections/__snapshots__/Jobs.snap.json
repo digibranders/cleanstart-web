@@ -103,6 +103,10 @@
       ]
     },
     {
+      "type": "text",
+      "name": "experienceRange"
+    },
+    {
       "type": "relationship",
       "name": "locations",
       "hasMany": true,
@@ -187,6 +191,10 @@
     {
       "type": "date",
       "name": "closedAt"
+    },
+    {
+      "type": "join",
+      "name": "applications"
     },
     {
       "type": "ui",

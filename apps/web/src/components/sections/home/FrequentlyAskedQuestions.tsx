@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Reveal } from "@/components/ui/Reveal";
+import { cn } from "@/lib/cn";
 
 /**
  * Frequently Asked Questions section: two columns of toggleable FAQ items.
@@ -68,7 +69,17 @@ const RIGHT_FAQS: FaqItem[] = [
   },
 ];
 
-export function FrequentlyAskedQuestions() {
+export function FrequentlyAskedQuestions({
+  className,
+}: {
+  /**
+   * Overrides the section's vertical spacing. Defaults to the home-page
+   * treatment (asymmetric padding + `mb-[-50px]` footer overlap). Pages that
+   * follow a `Section padding`-spaced block (e.g. contact-us, after
+   * ContactOffices) pass a balanced value so top/bottom spacing matches.
+   */
+  className?: string;
+}) {
   const [openId, setOpenId] = useState<string | null>(null);
 
   return (
@@ -76,7 +87,10 @@ export function FrequentlyAskedQuestions() {
       // No overflow-hidden, so the decorative blobs can bleed across the
       // top/bottom section boundaries. Horizontal scroll is still prevented by
       // overflow-x: hidden on the body.
-      className="relative w-full pt-8 pb-14 sm:pt-10 sm:pb-16 lg:pt-12 lg:pb-20 mb-[-50px]"
+      className={cn(
+        "relative w-full",
+        className ?? "pt-8 pb-14 sm:pt-10 sm:pb-16 lg:pt-12 lg:pb-20 mb-[-50px]",
+      )}
       aria-labelledby="faq-title"
     >
       {/* Cyan glow at the top-right of the FAQ section. */}
@@ -111,11 +125,8 @@ export function FrequentlyAskedQuestions() {
       />
 
       <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
-        {/* Title flush-left, separator centered, description right-aligned —
-            the same 1fr_auto_1fr grid used by SecurityNotPatching and
-            HowCleanStartHelp for visual parity. */}
-        <div className="mb-8 flex flex-col items-start gap-5 md:mb-10 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
-          <Reveal header className="justify-self-start" style={{ maxWidth: "493px" }}>
+        <div className="mb-8 flex flex-col items-start md:mb-10">
+          <Reveal header style={{ maxWidth: "720px" }}>
             <h2
               id="faq-title"
               className="font-display text-[#111111]"
@@ -128,36 +139,6 @@ export function FrequentlyAskedQuestions() {
             >
               Frequently Asked Questions
             </h2>
-          </Reveal>
-          <div
-            aria-hidden
-            className="hidden h-[90px] w-px shrink-0 justify-self-center md:block"
-            style={{
-              background:
-                "linear-gradient(180deg, rgba(204,204,204,0) 0%, rgba(204,204,204,1) 47.2%, rgba(204,204,204,0) 100%)",
-            }}
-          />
-          <Reveal
-            header
-            delay={0.15}
-            y={20}
-            className="md:justify-self-end"
-            style={{ maxWidth: "585px" }}
-          >
-            <p
-              className="text-[#111111] md:text-right"
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "var(--fs-lead)",
-                fontWeight: 400,
-                lineHeight: 1.4,
-                letterSpacing: "-0.02em",
-                opacity: 0.8,
-              }}
-            >
-              Common questions about CleanStart&apos;s hardened container images,
-              security, and integrations.
-            </p>
           </Reveal>
         </div>
 

@@ -5,6 +5,7 @@ import { hasRole } from '../access/typed-user';
 import { validateOverrideForCollection } from '../lib/jsonld/override-validator';
 import { clientIpFromHeaders } from '../lib/client-ip';
 import { type RateLimitConfig, checkAndRecord } from '../lib/rate-limit';
+import { resolveSiteUrl } from '../lib/site-url';
 
 const JSONLD_RATE_LIMITS: RateLimitConfig = {
   perMinute: 20,
@@ -139,7 +140,7 @@ export const jsonLdEndpoint: Endpoint = {
     const ctx = buildJsonLdContext({
       siteSettings: {
         siteName: (siteSettings as { siteName?: string }).siteName ?? 'CleanStart',
-        baseUrl: (siteSettings as { baseUrl?: string }).baseUrl ?? 'https://cleanstart.com',
+        baseUrl: resolveSiteUrl((siteSettings as { baseUrl?: string }).baseUrl),
         defaultLocale: (siteSettings as { defaultLocale?: string }).defaultLocale ?? 'en-US',
       },
       seoDefaults: seoDefaults as Parameters<typeof buildJsonLdContext>[0]['seoDefaults'],
@@ -265,7 +266,7 @@ export const jsonLdPreviewEndpoint: Endpoint = {
     const ctx = buildJsonLdContext({
       siteSettings: {
         siteName: (siteSettings as { siteName?: string }).siteName ?? 'CleanStart',
-        baseUrl: (siteSettings as { baseUrl?: string }).baseUrl ?? 'https://cleanstart.com',
+        baseUrl: resolveSiteUrl((siteSettings as { baseUrl?: string }).baseUrl),
         defaultLocale: (siteSettings as { defaultLocale?: string }).defaultLocale ?? 'en-US',
       },
       seoDefaults: seoDefaults as Parameters<typeof buildJsonLdContext>[0]['seoDefaults'],

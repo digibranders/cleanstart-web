@@ -20,9 +20,10 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "CleanSight — Continuous Container Visibility & Remediation",
+  title: "CleanSight Container Visibility | SBOM, Risk Scoring, Compliance Mapping & Remediation Paths",
+  absoluteTitle: true,
   description:
-    "Continuously discover, assess, and remediate container risk across modern environments. CleanSight delivers unified visibility with integrated remediation.",
+    "Discover CleanSight, CleanStart's container visibility tool that continuously discovers images across registries and Kubernetes clusters, maps vulnerabilities, and recommends hardened replacements.",
   path: "/cleansight",
   variant: "hero",
   eyebrow: "CleanSight",
@@ -45,7 +46,7 @@ export default function CleanSightPage(): React.ReactElement {
         data={softwareApplicationSchema({
           name: "CleanSight",
           description:
-            "Continuously discover, assess, and remediate container risk across modern environments — unified visibility with integrated remediation.",
+            "Continuously discover, assess, and remediate container risk across modern environments. Unified visibility with integrated remediation.",
           path: "/cleansight",
         })}
       />

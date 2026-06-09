@@ -1,24 +1,40 @@
 import Image from 'next/image';
 import { Reveal } from '@/components/ui/Reveal';
 
-const INTEGRATIONS: { title: string; desc: string; icon: string; iconAlt: string }[] = [
+interface Integration {
+  title: string;
+  desc: string;
+  icon: string;
+  iconAlt: string;
+  iconWidth: number;
+  iconHeight: number;
+}
+
+const INTEGRATIONS: Integration[] = [
   {
     title: 'Drop-in Images',
     desc: 'Works with existing workflows.',
-    icon: '/images/attack-surface-reduction/image 583136.png',
+    icon: '/images/attack-surface-reduction/dropin-images-icon.webp',
     iconAlt: 'Monitor icon',
+    iconWidth: 96,
+    iconHeight: 96,
   },
   {
     title: 'Pipeline Compatible',
     desc: 'Integrates into CI/CD environments.',
-    icon: '/images/attack-surface-reduction/image 583137.png',
-    iconAlt: 'Pipeline icon',
+    icon: '/images/attack-surface-reduction/pipeline.webp',
+    iconAlt: 'CI/CD pipeline icon',
+    // Cropped landscape artwork (~2.1:1) — intrinsic ratio for the reserved box.
+    iconWidth: 201,
+    iconHeight: 96,
   },
   {
     title: 'Deploy Anywhere',
     desc: 'Cloud, on-prem, or regulated environments.',
-    icon: '/images/attack-surface-reduction/Point.png',
+    icon: '/images/attack-surface-reduction/deploy-icon.webp',
     iconAlt: 'Deploy icon',
+    iconWidth: 96,
+    iconHeight: 96,
   },
 ];
 
@@ -44,21 +60,6 @@ export function ASRFits(): React.ReactElement {
               Fits into what you've <span className="cs-text-gradient-impact">already built</span>
             </h2>
           </Reveal>
-          <Reveal header delay={0.15} y={20} style={{ maxWidth: '480px' }}>
-            <p
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: 'var(--fs-lead)',
-                fontWeight: 400,
-                letterSpacing: 'var(--text-t-subhead-ls)',
-                lineHeight: 'var(--text-t-subhead-lh)',
-                color: '#555555',
-              }}
-            >
-              Stay informed with the latest research, threat intelligence reports, and expert analysis
-              from our security team.
-            </p>
-          </Reveal>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3" style={{ gap: '24px' }}>
@@ -77,10 +78,11 @@ export function ASRFits(): React.ReactElement {
               <Image
                 src={item.icon}
                 alt={item.iconAlt}
-                width={96}
-                height={96}
-                sizes="96px"
+                width={item.iconWidth}
+                height={item.iconHeight}
+                sizes={`${item.iconWidth}px`}
                 className="object-contain"
+                style={{ height: '112px', width: 'auto' }}
               />
               <h3
                 style={{

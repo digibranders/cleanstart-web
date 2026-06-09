@@ -6,6 +6,81 @@ interface ResourceCenterSidebarProps {
   searchQuery: string;
 }
 
+/**
+ * One distinct, on-theme line icon per category. Keyed by the resource-type
+ * value ("" = the "All" entry). Each icon strokes `currentColor`, so the
+ * active/inactive colour is set once on the parent link and inherited.
+ */
+function CategoryIcon({ type }: { type: string }): React.ReactElement {
+  const common = {
+    width: 22,
+    height: 22,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.75,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    "aria-hidden": true,
+    className: "pointer-events-none select-none shrink-0",
+  };
+
+  switch (type) {
+    case "whitepaper":
+      return (
+        <svg {...common}>
+          <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+          <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+          <path d="M10 9H8" />
+          <path d="M16 13H8" />
+          <path d="M16 17H8" />
+        </svg>
+      );
+    case "ebook":
+      return (
+        <svg {...common}>
+          <path d="M12 7v14" />
+          <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
+        </svg>
+      );
+    case "datasheet":
+      return (
+        <svg {...common}>
+          <rect width="18" height="18" x="3" y="3" rx="2" />
+          <path d="M12 3v18" />
+          <path d="M3 9h18" />
+          <path d="M3 15h18" />
+        </svg>
+      );
+    case "architecture-insights":
+      return (
+        <svg {...common}>
+          <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z" />
+          <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+          <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
+        </svg>
+      );
+    case "report":
+      return (
+        <svg {...common}>
+          <path d="M3 3v16a2 2 0 0 0 2 2h16" />
+          <path d="M18 17V9" />
+          <path d="M13 17V5" />
+          <path d="M8 17v-3" />
+        </svg>
+      );
+    default:
+      return (
+        <svg {...common}>
+          <rect width="7" height="7" x="3" y="3" rx="1" />
+          <rect width="7" height="7" x="14" y="3" rx="1" />
+          <rect width="7" height="7" x="14" y="14" rx="1" />
+          <rect width="7" height="7" x="3" y="14" rx="1" />
+        </svg>
+      );
+  }
+}
+
 export function ResourceCenterSidebar({
   activeType,
   searchQuery,
@@ -86,32 +161,16 @@ export function ResourceCenterSidebar({
           }}
         />
 
-        <ul className="flex flex-col" style={{ gap: "20px" }}>
+        <ul className="flex flex-col" style={{ gap: "16px" }}>
           <li>
             <Link
               href={hrefFor("")}
-              className="flex items-center gap-4 no-underline"
+              className="flex items-center gap-3 no-underline"
               aria-current={!activeType ? "page" : undefined}
+              style={{ color: !activeType ? "#4a3bf1" : "#111" }}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={
-                  !activeType
-                    ? "/images/resource-center/sidebar-icon-active.svg"
-                    : "/images/resource-center/sidebar-icon.svg"
-                }
-                alt=""
-                aria-hidden
-                width={40}
-                height={40}
-                className="pointer-events-none select-none shrink-0"
-                loading="lazy"
-                decoding="async"
-              />
-              <span
-                className="font-display text-xl font-semibold leading-none tracking-[-0.05em] whitespace-nowrap"
-                style={{ color: !activeType ? "#4a3bf1" : "#111" }}
-              >
+              <CategoryIcon type="" />
+              <span className="font-display text-base font-semibold leading-none tracking-[-0.05em] whitespace-nowrap">
                 All
               </span>
             </Link>
@@ -123,28 +182,12 @@ export function ResourceCenterSidebar({
               <li key={value}>
                 <Link
                   href={hrefFor(value)}
-                  className="flex items-center gap-4 no-underline"
+                  className="flex items-center gap-3 no-underline"
                   aria-current={isActive ? "page" : undefined}
+                  style={{ color: isActive ? "#4a3bf1" : "#111" }}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={
-                      isActive
-                        ? "/images/resource-center/sidebar-icon-active.svg"
-                        : "/images/resource-center/sidebar-icon.svg"
-                    }
-                    alt=""
-                    aria-hidden
-                    width={40}
-                    height={40}
-                    className="pointer-events-none select-none shrink-0"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <span
-                    className="font-display text-xl font-semibold leading-none tracking-[-0.05em] whitespace-nowrap"
-                    style={{ color: isActive ? "#4a3bf1" : "#111" }}
-                  >
+                  <CategoryIcon type={value} />
+                  <span className="font-display text-base font-semibold leading-none tracking-[-0.05em] whitespace-nowrap">
                     {label}
                   </span>
                 </Link>

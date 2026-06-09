@@ -33,7 +33,7 @@ export function ContactHero() {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/contact/hero-cube.png"
+            src="/images/contact/hero-cube.webp"
             alt=""
             width={294}
             height={298}
@@ -72,7 +72,7 @@ export function ContactHero() {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/contact/hero-cube.png"
+            src="/images/contact/hero-cube.webp"
             alt=""
             width={294}
             height={298}
@@ -89,10 +89,10 @@ export function ContactHero() {
       </div>
 
       <Container className="relative">
-        <div className="mx-auto flex flex-col items-center gap-5 pt-[clamp(112px,9vw,128px)] pb-[200px] text-center">
+        <div className="mx-auto flex flex-col items-center gap-5 pt-[calc(clamp(112px,9vw,128px)+var(--cs-header-extra))] pb-[200px] text-center">
           <HeroReveal y={50} duration={1.0}>
             <h1
-              className="text-white whitespace-nowrap"
+              className="text-white"
               style={{
                 fontFamily: "var(--font-display), sans-serif",
                 fontSize: "var(--fs-display)",
@@ -101,16 +101,7 @@ export function ContactHero() {
                 fontWeight: 600,
               }}
             >
-              Contact{" "}
-              <span
-                className="bg-clip-text text-transparent"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(110.276deg, rgb(154, 81, 255) 1.7578%, rgb(44, 193, 235) 98.781%)",
-                }}
-              >
-                US
-              </span>
+              Talk to a software trust expert
             </h1>
           </HeroReveal>
           <HeroReveal y={30} delay={0.15} duration={0.8}>
@@ -118,14 +109,18 @@ export function ContactHero() {
               className="text-white/80"
               style={{
                 fontFamily: "var(--font-sans)",
-                fontSize: "var(--fs-body)",
+                fontSize: "var(--fs-lead-sm)",
                 fontWeight: 400,
                 lineHeight: 1.3,
                 letterSpacing: "-0.04em",
-                maxWidth: "730px",
+                maxWidth: "1040px",
+                textWrap: "balance",
               }}
             >
-              We would be happy to hear from you about any feedback or questions.
+              Whether you&apos;re securing container environments, improving
+              software supply chain visibility, or preparing for compliance
+              initiatives, CleanStart helps you build and deliver software with
+              confidence.
             </p>
           </HeroReveal>
         </div>

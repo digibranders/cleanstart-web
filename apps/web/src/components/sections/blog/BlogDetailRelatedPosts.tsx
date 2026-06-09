@@ -48,7 +48,7 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
             </span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/blog-detail/icon-see-all-arrow.svg"
+              src="/images/shared/icon-see-all-arrow.svg"
               alt=""
               aria-hidden
               width={40}
@@ -66,18 +66,16 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
           scrollability. The negative -mx-6 with px-6 lets the row bleed into the
           page gutter so the first card aligns with the heading above.
         */}
-        <div
-          className="flex md:hidden overflow-x-auto snap-x snap-mandatory gap-4 mt-[40px] -mx-6 pl-10 pr-6 pb-2 [scroll-padding-left:2.5rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
+        {/* Single render across breakpoints — a scroll-snap carousel below md, a
+            stagger grid at md+ — so each card's heading appears once in the
+            document outline. The negative -mx-6 + pl-10 aligns the first card
+            with the heading above on mobile. */}
+        <RevealStagger className="flex md:grid md:grid-cols-2 xl:grid-cols-3 overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none gap-4 md:gap-8 mt-[40px] md:mt-[60px] -mx-6 md:mx-0 pl-10 md:pl-0 pr-6 md:pr-0 pb-2 md:pb-0 [scroll-padding-left:2.5rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {posts.map((post) => (
-            <div key={post.id} className="snap-start shrink-0 w-[80%] min-w-[260px] max-w-[320px]">
-              <RelatedPostCard post={post} />
-            </div>
-          ))}
-        </div>
-        <RevealStagger className="hidden md:grid md:grid-cols-2 xl:grid-cols-3 gap-8 mt-[60px]">
-          {posts.map((post) => (
-            <RevealItem key={post.id}>
+            <RevealItem
+              key={post.id}
+              className="snap-start shrink-0 w-[80%] min-w-[260px] max-w-[320px] md:w-auto md:min-w-0 md:max-w-none"
+            >
               <RelatedPostCard post={post} />
             </RevealItem>
           ))}
@@ -132,7 +130,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
               return (
                 <div className="flex items-center gap-1">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/images/blogs/icon-calendar-grey.svg" alt="" aria-hidden width={18} height={18} className="shrink-0 w-3.5 h-3.5 md:w-[18px] md:h-[18px]" />
+                  <img src="/images/shared/icon-calendar-grey.svg" alt="" aria-hidden width={18} height={18} className="shrink-0 w-3.5 h-3.5 md:w-[18px] md:h-[18px]" />
                   <span className="font-medium leading-normal whitespace-nowrap" style={{ fontSize: "var(--fs-body-sm)", color: "#666" }}>
                     {formatBlogDate(displayDate)}
                   </span>
@@ -142,7 +140,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
             {post.readingMinutes != null && (
               <div className="flex items-center gap-1">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/blogs/icon-clock-grey.svg" alt="" aria-hidden width={18} height={18} className="shrink-0 w-3.5 h-3.5 md:w-[18px] md:h-[18px]" />
+                <img src="/images/shared/icon-clock-grey.svg" alt="" aria-hidden width={18} height={18} className="shrink-0 w-3.5 h-3.5 md:w-[18px] md:h-[18px]" />
                 <span className="font-medium leading-normal whitespace-nowrap" style={{ fontSize: "var(--fs-caption)", color: "#666" }}>
                   {post.readingMinutes} min read
                 </span>
@@ -179,7 +177,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
             </span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/blogs/icon-arrow-read-more.svg"
+              src="/images/shared/icon-arrow-read-more.svg"
               alt=""
               aria-hidden
               width={24}

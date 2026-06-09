@@ -74,6 +74,9 @@ export function WebinarsGrid({
       </div>
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
+        {/* Section heading for the document outline — the hero <h1> is followed
+            by card <h3>s, so this fills the h2 level. Visually hidden. */}
+        <h2 className="sr-only">All webinars</h2>
         <div className="flex flex-col lg:flex-row lg:items-start lg:gap-8">
           <aside
             className="shrink-0 lg:sticky lg:max-h-[calc(100vh-112px)] lg:overflow-y-auto"
@@ -107,7 +110,7 @@ export function WebinarsGrid({
                 <EmptyState
                   variant="empty"
                   title="No webinars yet"
-                  description="Check back soon — new sessions are on the way."
+                  description="Check back soon. New sessions are on the way."
                 />
               )
             ) : (

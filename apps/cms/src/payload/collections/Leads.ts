@@ -68,8 +68,9 @@ const writeLeadDeletionAudit: CollectionAfterDeleteHook = async ({ req, doc, id 
 
 /**
  * Append-only submission record. Every form submission lands here via the
- * LeadHandler adapter chain (db primary + Brevo / Teams / R2-fallback
- * secondaries). Editor-facing fields are limited to filterable metadata;
+ * LeadHandler adapter chain (db primary + HubSpot / company-from-domain
+ * secondaries, R2 fallback queue). Editor-facing fields are limited to
+ * filterable metadata;
  * the actual answers live as JSON in `fields`.
  *
  * PII fields (email-typed keys + phone-named keys inside `fields`,
@@ -83,7 +84,7 @@ export const Leads: CollectionConfig = {
   labels: { singular: 'Lead', plural: 'Leads' },
   admin: {
     useAsTitle: 'id',
-    defaultColumns: ['form', 'source', 'syncedTo', 'createdAt'],
+    defaultColumns: ['form', 'contact', 'source', 'syncedTo', 'createdAt'],
     group: 'Marketing',
     description:
       'Form submissions (append-only). Editing is disabled — leads are immutable once captured. Use the CSV export for bulk handoff.',
@@ -132,6 +133,16 @@ export const Leads: CollectionConfig = {
           "Captured at submit time — preserves this record's field key meaning even after the form's fields[] is renamed.",
         readOnly: true,
         position: 'sidebar',
+      },
+    },
+    {
+      name: 'contact',
+      type: 'ui',
+      label: 'Contact',
+      admin: {
+        components: {
+          Cell: '@/payload/admin/components/LeadContactCell.tsx#LeadContactCell',
+        },
       },
     },
     {

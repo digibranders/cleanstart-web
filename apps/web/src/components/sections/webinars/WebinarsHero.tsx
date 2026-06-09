@@ -106,7 +106,7 @@ export function WebinarsHero(): React.ReactElement {
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div
           className="flex flex-col items-center gap-6 mx-auto text-center"
-          style={{ paddingTop: "140px", paddingBottom: "80px", maxWidth: "864px" }}
+          style={{ paddingTop: "calc(140px + var(--cs-header-extra))", paddingBottom: "80px", maxWidth: "864px" }}
         >
           <HeroReveal y={50} duration={1.0}>
             <h1
@@ -118,16 +118,7 @@ export function WebinarsHero(): React.ReactElement {
                 letterSpacing: "var(--text-hero-utility-ls)",
               }}
             >
-              CleanStart{" "}
-              <span
-                className="bg-clip-text text-transparent"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(101.688deg, #9A51FF 1.758%, #2CC1EB 98.781%)",
-                }}
-              >
-                Webinar
-              </span>
+              CleanStart Webinar
             </h1>
           </HeroReveal>
           <HeroReveal y={30} delay={0.2} duration={0.8}>

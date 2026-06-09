@@ -98,7 +98,7 @@ export function CleanSightCTA(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/vulnerability-remediation/cta-cube.png"
+        src="/images/vulnerability-remediation/cta-cube.webp"
         alt=""
         className="absolute pointer-events-none select-none hidden lg:block"
         style={{
@@ -216,7 +216,7 @@ export function CleanSightCTA(): React.ReactElement {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
-          src="/images/vulnerability-remediation/cta-cube.png"
+          src="/images/vulnerability-remediation/cta-cube.webp"
           alt=""
           className="absolute pointer-events-none select-none"
           style={{

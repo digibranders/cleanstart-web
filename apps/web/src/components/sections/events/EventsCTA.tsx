@@ -8,7 +8,7 @@ import { useNewsletterSignup } from "@/lib/leads/useNewsletterSignup";
  * Mirrors BlogsCTA structure and styling for visual consistency.
  */
 export function EventsCTA(): React.ReactElement {
-  const { emailRef, submitted, error, handleSubmit } = useNewsletterSignup();
+  const { emailRef, submitted, submitting, error, handleSubmit } = useNewsletterSignup();
 
   return (
     <div
@@ -58,7 +58,7 @@ export function EventsCTA(): React.ReactElement {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/blogs/cta-cube-left2.png"
+          src="/images/blogs/cta-cube-left2.webp"
           alt=""
           loading="lazy"
           decoding="async"
@@ -79,7 +79,7 @@ export function EventsCTA(): React.ReactElement {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/blogs/cta-cube-right2.png"
+          src="/images/blogs/cta-cube-right2.webp"
           alt=""
           loading="lazy"
           decoding="async"
@@ -157,7 +157,9 @@ export function EventsCTA(): React.ReactElement {
 
                 <button
                   type="submit"
-                  className="cs-btn-glass cs-btn-glass--no-lift shrink-0"
+                  disabled={submitting}
+                  aria-busy={submitting || undefined}
+                  className="cs-btn-glass cs-btn-glass--no-lift shrink-0 disabled:cursor-not-allowed disabled:opacity-70"
                   style={{
                     ["--cs-btn-px" as string]: "16px",
                     ["--cs-btn-fs" as string]: "16px",
@@ -165,7 +167,7 @@ export function EventsCTA(): React.ReactElement {
                     borderLeft: "none",
                   }}
                 >
-                  Subscribe
+                  {submitting ? "Subscribing…" : "Subscribe"}
                 </button>
               </form>
             )}

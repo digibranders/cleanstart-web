@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import { copyText } from "@/lib/clipboard";
 import type { PressType } from "@/lib/news";
 import { formatNewsDate, pressTypeLabel } from "@/lib/news-utils";
 import { DetailHero, DetailHeroMetaSeparator } from "@/components/sections/_shared/DetailHero";
@@ -27,15 +28,14 @@ export function NewsDetailHero({
   const handleInstagramClick = useCallback(
     async (event: React.MouseEvent) => {
       // Instagram has no public share-intent URL; copy the post URL so the
-      // editor can paste it into the IG composer manually. Falls through
-      // to the default href if the clipboard API is unavailable.
-      if (typeof navigator !== "undefined" && navigator.clipboard) {
-        event.preventDefault();
-        try {
-          await navigator.clipboard.writeText(shareUrl);
-        } catch {
-          // Clipboard blocked; let the default href open Instagram.
-        }
+      // editor can paste it into the IG composer manually. `copyText` adds an
+      // execCommand fallback for non-secure / iframe contexts where the async
+      // Clipboard API is blocked. Only open the default href if even that
+      // fails, so the editor still has a path to share.
+      event.preventDefault();
+      const ok = await copyText(shareUrl);
+      if (!ok && typeof window !== "undefined") {
+        window.open(shareUrl, "_blank", "noopener,noreferrer");
       }
     },
     [shareUrl],

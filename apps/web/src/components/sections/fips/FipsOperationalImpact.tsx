@@ -117,7 +117,7 @@ export function FipsOperationalImpact(): React.ReactElement {
               <CubeGridBackdrop />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/fips/cube-impact-transparent.png"
+                src="/images/fips/cube-impact-transparent.webp"
                 alt=""
                 aria-hidden
                 className="pointer-events-none select-none relative"

@@ -19,7 +19,19 @@ export const KnowledgeCategories: CollectionConfig = {
     update: isAdminOrEditor,
     delete: isAdminOrEditor,
   },
-  fields: buildTaxonomyFields('knowledgeCategories'),
+  fields: [
+    ...buildTaxonomyFields('knowledgeCategories'),
+    {
+      name: 'displayOrder',
+      type: 'number',
+      defaultValue: 100,
+      admin: {
+        position: 'sidebar',
+        description:
+          'Lower sorts higher in the Knowledge Hub sidebar. Legacy groups use 0–9; Academy sections 10+.',
+      },
+    },
+  ],
   hooks: {
     beforeChange: [taxonomyParentCycleGuardHook('knowledgeCategories')],
     afterChange: [slugChangeRedirectHook('knowledgeCategories')],

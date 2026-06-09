@@ -12,9 +12,9 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "For CISOs — Trusted Software Foundations",
+  title: "For CISOs",
   description:
-    "Reduce inherited software risk with minimal, hardened, verifiable container foundations built for modern enterprise environments. Purpose-built for CISOs.",
+    "Discover how CISOs use CleanStart to reduce vulnerability exposure, automate compliance reporting, and gain real time risk visibility across their software supply chain.",
   path: "/for-ciso",
   eyebrow: "Solutions",
 });

@@ -12,9 +12,10 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "CleanStart Images — CVE-Free Container & VM Images",
+  title: "CleanStart Platform | Secure, Verified Software Foundations",
+  absoluteTitle: true,
   description:
-    "Hardened, near-zero-CVE container and virtual machine images. Replace your base image with CleanStart for smaller, faster, FIPS-ready builds — no code changes required.",
+    "Explore CleanStart's library of secure, minimal container and VM images, continuously scanned, pre hardened, FIPS compliant, and 60 to 80% lighter than standard public images.",
   path: "/cleanstart-images",
   variant: "hero",
   eyebrow: "CleanStart Images",
@@ -37,7 +38,7 @@ export default function CleanStartImagesPage(): React.ReactElement {
         data={softwareApplicationSchema({
           name: "CleanStart Images",
           description:
-            "Hardened, near-zero-CVE container and virtual machine images — a drop-in replacement for your base image with smaller, faster, FIPS-ready builds.",
+            "Hardened, near-zero-CVE container and virtual machine images. A drop-in replacement for your base image with smaller, faster, FIPS-ready builds.",
           path: "/cleanstart-images",
         })}
       />

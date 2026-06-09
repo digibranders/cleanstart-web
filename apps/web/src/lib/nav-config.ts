@@ -1,7 +1,7 @@
 // Single source of truth for the marketing nav. Mirrors cleanstart.com production IA.
 // Consumed by both DesktopNav and MobileNav so the desktop bar and mobile sheet never drift.
 //
-// Slug authority: docs/WEB-PAGES.md. All items carry their real final slug regardless of
+// Slug authority: docs/web/WEB-PAGES.md. All items carry their real final slug regardless of
 // build status. Unbuilt items are rendered as <span> (non-clickable) — not <Link> — so
 // the href is data-only until the page exists. When a page is marked ✅ in WEB-PAGES.md,
 // switch its renderer from <span> to <Link> in MegaMenu / MobileNav.
@@ -77,12 +77,6 @@ export const NAV_TREE: NavItem[] = [
             icon: "container",
           },
           {
-            label: "CleanStart SBOM",
-            href: "/software-bill-materials",
-            description: "Signed SBOMs. Provenance for every artifact.",
-            icon: "doc-signed",
-          },
-          {
             label: "CleanSight",
             href: "/cleansight",
             description: "Runtime visibility into vulnerabilities and drift.",
@@ -101,16 +95,22 @@ export const NAV_TREE: NavItem[] = [
       {
         items: [
           {
+            label: "CleanStart Platform",
+            href: "/cleanstart-platform",
+            description: "AI-native trust architecture, source to runtime.",
+            icon: "network",
+          },
+          {
             label: "FIPS Compliance",
             href: "/fips",
             description: "Drop-in FIPS 140-3 validated crypto.",
             icon: "shield-check",
           },
           {
-            label: "Enhance SCA",
-            href: "/software-composition-analysis",
-            description: "Cleaner base images. Less SCA noise.",
-            icon: "gears",
+            label: "Verifiable SBOMs",
+            href: "/software-bill-materials",
+            description: "Signed SBOMs. Provenance for every artifact.",
+            icon: "doc-signed",
           },
           {
             label: "Vulnerability Remediation",
@@ -163,7 +163,9 @@ export const NAV_TREE: NavItem[] = [
         title: "Insights",
         items: [
           { label: "Blogs", href: "/blogs", icon: "book" },
+          { label: "Guides", href: "/guide", icon: "tools" },
           { label: "Resource Center", href: "/resource-center", icon: "folder" },
+          { label: "Case Studies", href: "/case-studies", icon: "doc-signed" },
           { label: "Newsroom", href: "/news", icon: "newspaper" },
           { label: "Knowledge Hub", href: "/knowledge-hub/vex-documents", icon: "book-open" },
         ],
@@ -171,7 +173,7 @@ export const NAV_TREE: NavItem[] = [
       {
         title: "Events",
         items: [
-          { label: "In-Person Events", href: "/events", icon: "calendar" },
+          { label: "Events", href: "/events", icon: "calendar" },
           { label: "Webinars", href: "/webinars", icon: "play" },
           { label: "Podcast", href: "/podcast", icon: "mic" },
         ],

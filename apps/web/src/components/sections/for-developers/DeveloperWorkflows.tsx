@@ -12,14 +12,14 @@ interface PipelineStep {
 }
 
 const PIPELINE_STEPS_LEFT: PipelineStep[] = [
-  { label: 'Code', icon: `${ASSET_BASE}/logo-code.png`, iconSize: 60 },
-  { label: 'Git', icon: `${ASSET_BASE}/logo-git.png`, iconSize: 56 },
+  { label: 'Code', icon: `${ASSET_BASE}/logo-code.webp`, iconSize: 60 },
+  { label: 'Git', icon: `${ASSET_BASE}/logo-git.webp`, iconSize: 56 },
   { label: 'CI/CD', icon: `${ASSET_BASE}/logo-cicd.svg`, iconSize: 56 },
   { label: 'Build', icon: `${ASSET_BASE}/logo-build.svg`, iconSize: 60 },
 ];
 
 const PIPELINE_STEPS_RIGHT: PipelineStep[] = [
-  { label: 'Registry', icon: `${ASSET_BASE}/logo-registry.png`, iconSize: 60 },
+  { label: 'Registry', icon: `${ASSET_BASE}/logo-registry.webp`, iconSize: 60 },
   { label: 'Deploy', icon: `${ASSET_BASE}/logo-deploy.svg`, iconSize: 56 },
   { label: 'Runtime', icon: `${ASSET_BASE}/logo-runtime.svg`, iconSize: 56 },
 ];
@@ -189,7 +189,7 @@ function CleanStartCard(): React.ReactElement {
       />
 
       <Image
-        src={`${ASSET_BASE}/cube-image.png`}
+        src={`${ASSET_BASE}/cube-image.webp`}
         alt=""
         aria-hidden
         width={77}
@@ -370,7 +370,7 @@ function MobileCleanStartCard(): React.ReactElement {
       />
 
       <Image
-        src={`${ASSET_BASE}/cube-image.png`}
+        src={`${ASSET_BASE}/cube-image.webp`}
         alt=""
         aria-hidden
         width={48}
@@ -639,8 +639,8 @@ export function DeveloperWorkflows(): React.ReactElement {
 
           <div className="md:hidden flex flex-col items-center gap-2">
             {[
-              { label: 'Code', icon: `${ASSET_BASE}/logo-code.png`, iconSize: 52 },
-              { label: 'Git', icon: `${ASSET_BASE}/logo-git.png`, iconSize: 48 },
+              { label: 'Code', icon: `${ASSET_BASE}/logo-code.webp`, iconSize: 52 },
+              { label: 'Git', icon: `${ASSET_BASE}/logo-git.webp`, iconSize: 48 },
               { label: 'CI/CD', icon: `${ASSET_BASE}/logo-cicd.svg`, iconSize: 48 },
               { label: 'Build', icon: `${ASSET_BASE}/logo-build.svg`, iconSize: 52 },
             ].map((step) => (
@@ -652,7 +652,7 @@ export function DeveloperWorkflows(): React.ReactElement {
             <MobileCleanStartCard />
             <MobilePipelineArrow />
             {[
-              { label: 'Registry', icon: `${ASSET_BASE}/logo-registry.png`, iconSize: 52 },
+              { label: 'Registry', icon: `${ASSET_BASE}/logo-registry.webp`, iconSize: 52 },
               { label: 'Deploy', icon: `${ASSET_BASE}/logo-deploy.svg`, iconSize: 48 },
               { label: 'Runtime', icon: `${ASSET_BASE}/logo-runtime.svg`, iconSize: 48 },
             ].map((step, i, arr) => (

@@ -58,6 +58,8 @@ const PASSTHROUGH_MIME_TO_EXT: Record<string, string> = {
   'video/mp4': 'mp4',
   'application/zip': 'zip',
   'application/x-zip-compressed': 'zip',
+  'application/msword': 'doc',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
 };
 
 /**

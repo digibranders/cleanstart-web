@@ -57,6 +57,21 @@ const collectionFromHref = (href: string): string | null => {
   return m?.[1] ?? null;
 };
 
+const listSlugFromPath = (): string | null => {
+  const m = window.location.pathname.match(
+    /^\/admin\/collections\/([^/?#]+)\/?$/,
+  );
+  return m?.[1] ?? null;
+};
+
+type CountBucket = { draft?: number; published?: number; total?: number };
+
+// Module-level cache so the badges survive the action component
+// re-mounting on every admin navigation. On remount we paint the last
+// known counts synchronously (instant) and refresh in the background,
+// instead of flashing empty until a fresh fetch lands.
+let cachedCounts: Record<string, CountBucket> = {};
+
 /**
  * Mounts globally via `admin.components.actions` and renders nothing.
  * On mount + every 60s it fetches draft counts for every versioned
@@ -85,11 +100,17 @@ export const NavBadges = (): ReactElement | null => {
     //     `total` (the entire row count)
     // Sidebar badge uses `draft` only (versioned). List-page header
     // chips use whichever apply.
-    let counts: Record<
-      string,
-      { draft?: number; published?: number; total?: number }
-    > = {};
+    // Seed from the module cache so a remount paints immediately.
+    let counts: Record<string, CountBucket> = cachedCounts;
     let cancelled = false;
+    // Tracks the collection list slug whose header count we last fetched,
+    // so a navigation triggers exactly one header fetch for the new page.
+    let headerSlug: string | null = null;
+
+    const setCount = (slug: string, partial: CountBucket): void => {
+      counts = { ...counts, [slug]: { ...counts[slug], ...partial } };
+      cachedCounts = counts;
+    };
 
     const slugForLink = (link: Element): string | null => {
       // <a> with href — derive slug from URL
@@ -190,60 +211,85 @@ export const NavBadges = (): ReactElement | null => {
       injectListBadge();
     };
 
-    const fetchAndInject = async (): Promise<void> => {
-      const next: Record<
-        string,
-        { draft?: number; published?: number; total?: number }
-      > = {};
-      const fetchCount = async (
-        slug: string,
-        status?: 'draft' | 'published',
-      ): Promise<number> => {
-        try {
-          const url = new URL(`/api/${slug}`, window.location.origin);
-          if (status) url.searchParams.set('where[_status][equals]', status);
-          url.searchParams.set('limit', '1');
-          url.searchParams.set('depth', '0');
-          // `draft: true` is needed so unpublished versioned docs are
-          // included in the count. Harmless on non-versioned collections.
-          url.searchParams.set('draft', 'true');
-          const res = await fetch(url.toString(), { credentials: 'include' });
-          if (!res.ok) return 0;
-          const json = (await res.json()) as { totalDocs?: number };
-          return typeof json?.totalDocs === 'number' ? json.totalDocs : 0;
-        } catch {
-          return 0;
-        }
-      };
-
-      // Versioned: parallel draft + published fetches per slug.
-      const versionedWork = VERSIONED_CONTENT.map(async (slug) => {
-        const [draft, published] = await Promise.all([
-          fetchCount(slug, 'draft'),
-          fetchCount(slug, 'published'),
-        ]);
-        next[slug] = { draft, published };
-      });
-
-      // Non-versioned: single total fetch per slug.
-      const totalWork = TOTAL_CHIP_CONTENT.map(async (slug) => {
-        const total = await fetchCount(slug);
-        next[slug] = { total };
-      });
-
-      await Promise.all([...versionedWork, ...totalWork]);
-      if (cancelled) return;
-      counts = next;
-      inject();
+    const fetchCount = async (
+      slug: string,
+      status?: 'draft' | 'published',
+    ): Promise<number> => {
+      try {
+        const url = new URL(`/api/${slug}`, window.location.origin);
+        if (status) url.searchParams.set('where[_status][equals]', status);
+        url.searchParams.set('limit', '1');
+        url.searchParams.set('depth', '0');
+        // `draft: true` is needed so unpublished versioned docs are
+        // included in the count. Harmless on non-versioned collections.
+        url.searchParams.set('draft', 'true');
+        const res = await fetch(url.toString(), { credentials: 'include' });
+        if (!res.ok) return 0;
+        const json = (await res.json()) as { totalDocs?: number };
+        return typeof json?.totalDocs === 'number' ? json.totalDocs : 0;
+      } catch {
+        return 0;
+      }
     };
 
+    // The list-page header chips need `published` (versioned) or `total`
+    // (non-versioned) for the collection currently on screen. Fetching
+    // only the visible slug — not all ~16 collections — is what trims the
+    // request fan-out from ~25 down to ~10.
+    const fetchHeaderCount = async (slug: string): Promise<void> => {
+      if ((VERSIONED_CONTENT as readonly string[]).includes(slug)) {
+        const published = await fetchCount(slug, 'published');
+        if (cancelled) return;
+        setCount(slug, { published });
+        inject();
+      } else if ((TOTAL_CHIP_CONTENT as readonly string[]).includes(slug)) {
+        const total = await fetchCount(slug);
+        if (cancelled) return;
+        setCount(slug, { total });
+        inject();
+      }
+    };
+
+    const fetchAndInject = async (): Promise<void> => {
+      const listSlug = listSlugFromPath();
+      headerSlug = listSlug;
+
+      // Sidebar badges only consume the `draft` tally, so fetch those
+      // first and inject each as it resolves — badges appear
+      // progressively instead of all-or-nothing after the slowest
+      // request.
+      const draftWork = VERSIONED_CONTENT.map(async (slug) => {
+        const draft = await fetchCount(slug, 'draft');
+        if (cancelled) return;
+        setCount(slug, { draft });
+        inject();
+      });
+
+      const headerWork = listSlug ? [fetchHeaderCount(listSlug)] : [];
+
+      await Promise.all([...draftWork, ...headerWork]);
+    };
+
+    // Re-inject on a timer so the badges survive Payload's route
+    // re-renders, and lazily fetch the header count when the visible
+    // list page changes (covers navigations where this component does
+    // NOT remount, so `fetchAndInject` wouldn't otherwise re-run).
+    const tick = (): void => {
+      inject();
+      const listSlug = listSlugFromPath();
+      if (!listSlug || listSlug === headerSlug) return;
+      headerSlug = listSlug;
+      void fetchHeaderCount(listSlug);
+    };
+
+    // Paint cached counts synchronously on (re)mount so the badges never
+    // flash empty during navigation, then refresh in the background.
+    if (Object.keys(counts).length > 0) inject();
     void fetchAndInject();
     const fetchTimer = window.setInterval(() => {
       void fetchAndInject();
     }, POLL_INTERVAL_MS);
-    // Re-inject more frequently so the badges survive route re-renders
-    // (Payload's nav re-mounts on some navigations). Idempotent + cheap.
-    const injectTimer = window.setInterval(inject, INJECT_INTERVAL_MS);
+    const injectTimer = window.setInterval(tick, INJECT_INTERVAL_MS);
 
     return () => {
       cancelled = true;

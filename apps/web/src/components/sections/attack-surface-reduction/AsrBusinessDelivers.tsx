@@ -30,7 +30,7 @@ export function AsrBusinessDelivers(): React.ReactElement {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
-          src="/images/attack-surface-reduction/business-photo.jpg"
+          src="/images/attack-surface-reduction/business-photo.webp"
           alt=""
           className="absolute inset-0 w-full h-full pointer-events-none select-none"
           style={{ objectFit: 'cover', objectPosition: 'center top' }}

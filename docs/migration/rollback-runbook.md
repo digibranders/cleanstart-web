@@ -7,7 +7,7 @@ This runbook covers the H10 rollback procedure for reverting to Webflow after a 
 - Access to Cloudflare dashboard (DNS)
 - SSH access to the production droplet (`root@<droplet-ip>`)
 - `ALLOW_RESTORE=yes` and R2 credentials available in the terminal session
-- The timestamp of the pre-migration Postgres backup (should be recorded in `docs/RESTORE-LOG.md`)
+- The timestamp of the pre-migration Postgres backup (should be recorded in `docs/operations/RESTORE-LOG.md`)
 
 ---
 
@@ -38,7 +38,7 @@ export R2_BUCKET="cleanstart-backups"
 # List available backups to find the pre-migration snapshot
 ALLOW_RESTORE=yes ./infra/scripts/restore.sh
 
-# Restore the pre-migration snapshot (use the timestamp from docs/RESTORE-LOG.md)
+# Restore the pre-migration snapshot (use the timestamp from docs/operations/RESTORE-LOG.md)
 ALLOW_RESTORE=yes ./infra/scripts/restore.sh 2026-05-12T02:00:00Z
 ```
 
@@ -71,7 +71,7 @@ psql "$DATABASE_URI" -c "SELECT count(*) FROM payload_collections_blogs;"
 
 ## Step 5 — Log the incident (5 min)
 
-Add an entry to `docs/RESTORE-LOG.md`:
+Add an entry to `docs/operations/RESTORE-LOG.md`:
 
 ```
 | {date} | {backup timestamp} | {duration} | {operator} | Rollback after cutover attempt on {date} |

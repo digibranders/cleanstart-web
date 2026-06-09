@@ -27,6 +27,7 @@ export const PREVIEWABLE_COLLECTIONS = [
   'knowledgeBase',
   'podcastEpisodes',
   'resources',
+  'legalDocuments',
 ] as const;
 
 export type PreviewableCollection = (typeof PREVIEWABLE_COLLECTIONS)[number];

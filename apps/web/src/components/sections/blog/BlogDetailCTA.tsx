@@ -7,7 +7,7 @@ import { useNewsletterSignup } from "@/lib/leads/useNewsletterSignup";
  * in the corners, plus a blue→teal "Subscribe" gradient button.
  */
 export function BlogDetailCTA(): React.ReactElement {
-  const { emailRef, submitted, error, handleSubmit } = useNewsletterSignup();
+  const { emailRef, submitted, submitting, error, handleSubmit } = useNewsletterSignup();
 
   return (
     <div className="absolute inset-0 overflow-hidden" style={{ background: "#fff" }}>
@@ -70,7 +70,7 @@ export function BlogDetailCTA(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/blog-detail/cta/cta-cube.png"
+        src="/images/blog-detail/cta/cta-cube.webp"
         alt=""
         className="absolute pointer-events-none select-none hidden xl:block object-contain"
         style={{ left: "-63px", top: "-63px", width: "206px", height: "207px" , opacity: 0.75,}}
@@ -82,7 +82,7 @@ export function BlogDetailCTA(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/blog-detail/cta/cta-cube.png"
+        src="/images/blog-detail/cta/cta-cube.webp"
         alt=""
         className="absolute pointer-events-none select-none hidden xl:block object-contain"
         style={{ left: "1130px", top: "-63px", width: "259px", height: "260px" , opacity: 0.75,}}
@@ -159,7 +159,9 @@ export function BlogDetailCTA(): React.ReactElement {
                 </div>
                 <button
                   type="submit"
-                  className="shrink-0 inline-flex cursor-pointer items-center justify-center font-medium text-white"
+                  disabled={submitting}
+                  aria-busy={submitting || undefined}
+                  className="shrink-0 inline-flex cursor-pointer items-center justify-center font-medium text-white disabled:cursor-not-allowed disabled:opacity-70"
                   style={{
                     height: "44px",
                     padding: "0 18px",
@@ -173,7 +175,7 @@ export function BlogDetailCTA(): React.ReactElement {
                       "0 0 0 1px #3960F9, 0 1px 2px -1px rgba(9,6,63,0.4), inset 0 1px 0 0 rgba(255,255,255,0.16)",
                   }}
                 >
-                  Subscribe
+                  {submitting ? "Subscribing…" : "Subscribe"}
                 </button>
               </form>
             )}

@@ -3,13 +3,11 @@ import {
   DEPARTMENT_LABEL,
   type JobDepartment,
   type JobLocation,
-  type JobStatusFilter,
 } from "@/lib/jobs";
 
 interface CareersSidebarProps {
   activeDepartment: string;
   activeLocation: string;
-  activeStatus: JobStatusFilter;
   searchQuery: string;
   /** Department slugs that have at least one open role — others are hidden. */
   availableDepartments: JobDepartment[];
@@ -17,16 +15,9 @@ interface CareersSidebarProps {
   availableLocations: JobLocation[];
 }
 
-const STATUS_OPTIONS: Array<{ value: JobStatusFilter; label: string }> = [
-  { value: "open", label: "Open roles" },
-  { value: "closed", label: "Closed roles" },
-  { value: "all", label: "All roles" },
-];
-
 export function CareersSidebar({
   activeDepartment,
   activeLocation,
-  activeStatus,
   searchQuery,
   availableDepartments,
   availableLocations,
@@ -34,16 +25,13 @@ export function CareersSidebar({
   const hrefFor = ({
     department,
     location,
-    status,
   }: {
     department?: string;
     location?: string;
-    status?: JobStatusFilter;
   }): string => {
     const params = new URLSearchParams();
     if (department) params.set("department", department);
     if (location) params.set("location", location);
-    if (status && status !== "open") params.set("status", status);
     if (searchQuery) params.set("q", searchQuery);
     return `/careers${params.size ? `?${params.toString()}` : ""}`;
   };
@@ -54,21 +42,6 @@ export function CareersSidebar({
       className="shrink-0 w-full lg:w-[295px]"
     >
       <div className="lg:hidden flex flex-col gap-4">
-        <MobileTabStrip
-          label="Status"
-          items={STATUS_OPTIONS.map((opt) => ({
-            value: opt.value,
-            label: opt.label,
-            active: activeStatus === opt.value,
-          }))}
-          buildHref={(value) =>
-            hrefFor({
-              department: activeDepartment,
-              location: activeLocation,
-              status: (value || "open") as JobStatusFilter,
-            })
-          }
-        />
         <MobileTabStrip
           label="Position"
           items={[
@@ -83,7 +56,6 @@ export function CareersSidebar({
             hrefFor({
               department: value,
               location: activeLocation,
-              status: activeStatus,
             })
           }
         />
@@ -101,60 +73,36 @@ export function CareersSidebar({
             hrefFor({
               department: activeDepartment,
               location: value,
-              status: activeStatus,
             })
           }
         />
       </div>
 
-      {/* Sticks below the 80px header with 16px breathing room. Scrollbar is
-          hidden but vertical scrolling remains possible if the filter list
-          overflows the viewport (Firefox `scrollbar-width:none` + WebKit
-          pseudo-element). */}
+      {/* Sticks below the 80px header with 16px breathing room. When the filter
+          list overflows the viewport (short screens / many locations), the card
+          scrolls internally — a slim, subtle scrollbar is shown so the overflow
+          is discoverable and the cut-off items stay reachable. */}
       <div
-        className="relative hidden lg:block lg:sticky [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="relative hidden lg:block lg:sticky [scrollbar-width:thin] [scrollbar-color:rgba(17,17,17,0.2)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-black/15 hover:[&::-webkit-scrollbar-thumb]:bg-black/25"
         style={{
           top: "96px",
           maxHeight: "calc(100vh - 112px)",
           overflowY: "auto",
           background: "white",
           borderRadius: "16px",
-          padding: "24px 16px",
+          padding: "18px 16px",
           boxShadow:
             "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01)",
         }}
       >
         <FilterGroup
-          heading="STATUS"
-          items={STATUS_OPTIONS.map((opt) => ({
-            key: opt.value,
-            label: opt.label,
-            href: hrefFor({
-              department: activeDepartment,
-              location: activeLocation,
-              status: opt.value,
-            }),
-            active: activeStatus === opt.value,
-          }))}
-        />
-
-        <div
-          style={{
-            height: "1px",
-            background: "rgba(17,17,17,0.12)",
-            margin: "20px 0",
-          }}
-        />
-
-        <FilterGroup
-          heading="POSITION"
+          heading="DEPARTMENT"
           items={[
             {
               key: "all-departments",
               label: "All Departments",
               href: hrefFor({
                 location: activeLocation,
-                status: activeStatus,
               }),
               active: !activeDepartment,
             },
@@ -164,7 +112,6 @@ export function CareersSidebar({
               href: hrefFor({
                 department: d,
                 location: activeLocation,
-                status: activeStatus,
               }),
               active: activeDepartment === d,
             })),
@@ -175,7 +122,7 @@ export function CareersSidebar({
           style={{
             height: "1px",
             background: "rgba(17,17,17,0.12)",
-            margin: "20px 0",
+            margin: "14px 0",
           }}
         />
 
@@ -187,7 +134,6 @@ export function CareersSidebar({
               label: "All Locations",
               href: hrefFor({
                 department: activeDepartment,
-                status: activeStatus,
               }),
               active: !activeLocation,
               icon: <PinIcon />,
@@ -198,7 +144,6 @@ export function CareersSidebar({
               href: hrefFor({
                 department: activeDepartment,
                 location: l.slug,
-                status: activeStatus,
               }),
               active: activeLocation === l.slug,
               icon: <PinIcon />,
@@ -234,12 +179,12 @@ function FilterGroup({
           letterSpacing: "0.08em",
           color: "rgba(17,17,17,0.6)",
           fontWeight: 500,
-          marginBottom: "12px",
+          marginBottom: "8px",
         }}
       >
         {heading}
       </p>
-      <ul className="flex flex-col" style={{ gap: "10px" }}>
+      <ul className="flex flex-col" style={{ gap: "6px" }}>
         {items.map((item) => (
           <li key={item.key}>
             <Link
@@ -247,7 +192,7 @@ function FilterGroup({
               aria-current={item.active ? "page" : undefined}
               className="flex items-center gap-2 no-underline transition-colors"
               style={{
-                height: "40px",
+                height: "34px",
                 padding: "0 12px",
                 borderRadius: "10px",
                 background: item.active ? "rgba(74,59,241,0.08)" : "#ffffff",

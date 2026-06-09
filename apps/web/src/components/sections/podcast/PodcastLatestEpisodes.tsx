@@ -49,9 +49,9 @@ export function PodcastLatestEpisodes({
             id="podcast-latest-title"
             className="text-left text-[#111111] font-bold"
             style={{
-              fontSize: "var(--fs-h1)",
+              fontSize: "var(--fs-h2)",
               lineHeight: 1.1,
-              letterSpacing: "-0.02em",
+              letterSpacing: "-0.04em",
             }}
           >
             {title}
@@ -61,7 +61,7 @@ export function PodcastLatestEpisodes({
           <EmptyState
             variant="empty"
             title="No episodes yet"
-            description="New episodes are coming soon — check back shortly."
+            description="New episodes are coming soon. Check back shortly."
           />
         ) : (
           <RevealStagger className="mt-[44px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-[32px] gap-y-[32px]">

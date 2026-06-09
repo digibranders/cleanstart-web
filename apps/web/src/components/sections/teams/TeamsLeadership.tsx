@@ -12,19 +12,19 @@ const EXECUTIVES: TeamMember[] = [
   {
     name: "Nilesh Jain",
     role: "CO-FOUNDER & CEO",
-    photo: "/images/teams/nilesh-jain.png",
+    photo: "/images/teams/nilesh-jain.webp",
     linkedIn: "https://www.linkedin.com/in/nilesh-jain-80243520/",
   },
   {
     name: "Vijendra Katiyar",
     role: "CO-FOUNDER & CRO",
-    photo: "/images/teams/vijendra-katiyar.png",
+    photo: "/images/teams/vijendra-katiyar.webp",
     linkedIn: "https://www.linkedin.com/in/vijendra-katiyar-55456ba/",
   },
   {
     name: "Biswajit De",
     role: "CO-FOUNDER & CTO",
-    photo: "/images/teams/biswajit-de.png",
+    photo: "/images/teams/biswajit-de.webp",
     linkedIn: "https://www.linkedin.com/in/biswajitde/",
   },
 ];
@@ -32,7 +32,7 @@ const EXECUTIVES: TeamMember[] = [
 const ADVISORS: TeamMember[] = [
   {
     name: "Anandamoy Roychowdhary",
-    photo: "/images/teams/anandamoy-roychowdhary.png",
+    photo: "/images/teams/anandamoy-roychowdhary.webp",
     linkedIn: "https://www.linkedin.com/in/anandamoy/",
   },
 ];

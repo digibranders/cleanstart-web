@@ -1,0 +1,273 @@
+<!--
+  CleanStart - Careers HR notification (Brevo transactional template)
+  ------------------------------------------------------------------
+  Paste into Brevo: Campaigns -> Templates -> Create a template ->
+  (Transactional) -> "Code your own / Paste your code".
+
+  Suggested SUBJECT (set in Brevo's subject field, not here):
+    New application: <job title> - <applicant full name>
+
+  Dynamic values use Brevo templating: params.X output tags plus
+  conditional if-blocks. The code sends these params
+  (see docs/features/careers-applications.md):
+    jobTitle, jobLocation, fullName, firstName, lastName, email,
+    phone, location, howDidYouHear, linkedinUrl, coverLetter,
+    coverLetterAttached, submittedAt
+  jobLocation is the ROLE's location; location is where the APPLICANT is
+  based. The resume (and a cover-letter file, if the applicant uploaded
+  one) are real ATTACHMENTS added by the API call (not the template); the
+  "Resume attached" note below refers to them.
+
+  Email-client safe: 600px table layout, inline CSS, web-safe fonts.
+  IMPORTANT: never write literal Brevo tag syntax in this comment.
+  Brevo parses comments too, so a bare/incomplete tag here aborts the
+  whole template with a parser error.
+-->
+<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>New application</title>
+  <!--[if mso]>
+      <style>table, td, div, p, a { font-family: Arial, Helvetica, sans-serif !important; }</style>
+    <![endif]-->
+</head>
+
+<body
+  style="margin:0; padding:0; width:100%; background-color:#f1f5f9; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
+  <!-- Preheader (hidden preview text) -->
+  <div
+    style="display:none; max-height:0; overflow:hidden; mso-hide:all; font-size:1px; line-height:1px; color:#f1f5f9;">
+    {{ params.fullName }} applied for {{ params.jobTitle }}. Résumé attached.
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f1f5f9;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+        <!-- Card -->
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"
+          style="width:600px; max-width:600px; background-color:#ffffff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden;">
+
+          <!-- Header -->
+          <tr>
+            <td style="padding:28px 32px 20px 32px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="font-family:Arial,Helvetica,sans-serif;">
+                    <img src="https://cdn.cleanstart.com/emails/social-icons/cleanstart-logo.png" alt="CleanStart"
+                      width="140"
+                      style="display:inline-block; width:140px; height:auto; border:0; outline:none; text-decoration:none; -ms-interpolation-mode:bicubic; vertical-align:middle;" />
+                    <span
+                      style="display:inline-block; margin-left:10px; padding:2px 8px; background-color:#eef2ff; color:#3960f9; font-size:11px; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; border-radius:9999px; vertical-align:middle;">Careers</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Title -->
+          <tr>
+            <td style="padding:0 32px 8px 32px;">
+              <p
+                style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:22px; line-height:1.3; font-weight:700; color:#0f172a;">
+                New job application
+              </p>
+              <p
+                style="margin:8px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:15px; line-height:1.5; color:#475569;">
+                A candidate applied for <strong style="color:#0f172a;">{{ params.jobTitle }}</strong>.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Position callout -->
+          <tr>
+            <td style="padding:20px 32px 4px 32px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                style="background-color:#f8fafc; border:1px solid #e2e8f0; border-radius:10px;">
+                <tr>
+                  <td style="padding:16px 18px;">
+                    <p
+                      style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#94a3b8;">
+                      Position</p>
+                    <p
+                      style="margin:4px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:16px; font-weight:600; color:#0f172a;">
+                      {{ params.jobTitle }}</p>
+                    {% if params.jobLocation %}
+                    <p style="margin:4px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:13px; color:#64748b;">
+                      📍 {{ params.jobLocation }}</p>
+                    {% endif %}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Applicant details -->
+          <tr>
+            <td style="padding:18px 32px 4px 32px;">
+              <p
+                style="margin:0 0 10px 0; font-family:Arial,Helvetica,sans-serif; font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#94a3b8;">
+                Applicant</p>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                style="font-family:Arial,Helvetica,sans-serif; font-size:15px; color:#0f172a;">
+                <tr>
+                  <td width="120" style="padding:7px 0; color:#64748b; vertical-align:top;">Name</td>
+                  <td style="padding:7px 0; font-weight:600;">{{ params.fullName }}</td>
+                </tr>
+                <tr>
+                  <td width="120"
+                    style="padding:7px 0; color:#64748b; vertical-align:top; border-top:1px solid #f1f5f9;">Email</td>
+                  <td style="padding:7px 0; border-top:1px solid #f1f5f9;">
+                    <a href="mailto:{{ params.email }}" style="color:#3960f9; text-decoration:none;">{{ params.email
+                      }}</a>
+                  </td>
+                </tr>
+                {% if params.phone %}
+                <tr>
+                  <td width="120"
+                    style="padding:7px 0; color:#64748b; vertical-align:top; border-top:1px solid #f1f5f9;">Phone</td>
+                  <td style="padding:7px 0; border-top:1px solid #f1f5f9;">{{ params.phone }}</td>
+                </tr>
+                {% endif %}
+                {% if params.location %}
+                <tr>
+                  <td width="120"
+                    style="padding:7px 0; color:#64748b; vertical-align:top; border-top:1px solid #f1f5f9;">Based in</td>
+                  <td style="padding:7px 0; border-top:1px solid #f1f5f9;">{{ params.location }}</td>
+                </tr>
+                {% endif %}
+                {% if params.howDidYouHear %}
+                <tr>
+                  <td width="120"
+                    style="padding:7px 0; color:#64748b; vertical-align:top; border-top:1px solid #f1f5f9;">Heard via</td>
+                  <td style="padding:7px 0; border-top:1px solid #f1f5f9;">{{ params.howDidYouHear }}</td>
+                </tr>
+                {% endif %}
+                {% if params.linkedinUrl %}
+                <tr>
+                  <td width="120"
+                    style="padding:7px 0; color:#64748b; vertical-align:top; border-top:1px solid #f1f5f9;">LinkedIn
+                  </td>
+                  <td style="padding:7px 0; border-top:1px solid #f1f5f9;">
+                    <a href="{{ params.linkedinUrl }}" style="color:#3960f9; text-decoration:none;">{{
+                      params.linkedinUrl }}</a>
+                  </td>
+                </tr>
+                {% endif %}
+                {% if params.submittedAt %}
+                <tr>
+                  <td width="120"
+                    style="padding:7px 0; color:#64748b; vertical-align:top; border-top:1px solid #f1f5f9;">Submitted
+                  </td>
+                  <td style="padding:7px 0; border-top:1px solid #f1f5f9; color:#475569;">{{ params.submittedAt }}</td>
+                </tr>
+                {% endif %}
+              </table>
+            </td>
+          </tr>
+
+          <!-- Attachments note (résumé always; cover-letter file when uploaded) -->
+          <tr>
+            <td style="padding:18px 32px 4px 32px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                style="background-color:#eef2ff; border-radius:10px;">
+                <tr>
+                  <td style="padding:14px 18px; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#1e293b;">
+                    📎 &nbsp;<strong>Résumé attached</strong> to this email.{% if params.coverLetterAttached %} A <strong>cover-letter file</strong> is attached too.{% endif %}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          {% if params.coverLetter %}
+          <!-- Cover letter -->
+          <tr>
+            <td style="padding:18px 32px 4px 32px;">
+              <p
+                style="margin:0 0 8px 0; font-family:Arial,Helvetica,sans-serif; font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#94a3b8;">
+                Cover letter</p>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                style="border-left:3px solid #cbd5e1;">
+                <tr>
+                  <td
+                    style="padding:2px 0 2px 16px; font-family:Arial,Helvetica,sans-serif; font-size:14px; line-height:1.6; color:#334155; white-space:pre-wrap;">
+                    {{ params.coverLetter }}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          {% endif %}
+
+          <!-- CTA: reply to applicant -->
+          <tr>
+            <td style="padding:24px 32px 28px 32px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="border-radius:8px; background-color:#3960f9;">
+                    <a href="mailto:{{ params.email }}"
+                      style="display:inline-block; padding:12px 22px; font-family:Arial,Helvetica,sans-serif; font-size:15px; font-weight:600; color:#ffffff; text-decoration:none; border-radius:8px;">
+                      Reply to {{ params.firstName }}
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr>
+            <td style="padding:0 32px;">
+              <div style="height:1px; background-color:#e2e8f0; line-height:1px; font-size:1px;">&nbsp;</div>
+            </td>
+          </tr>
+
+          <!-- Footer (logo + socials reused from the CleanStart HubSpot email) -->
+          <tr>
+            <td align="center" style="padding:18px 32px 26px 32px;">
+              <p
+                style="margin:0 0 14px 0; font-family:Arial,Helvetica,sans-serif; font-size:12px; line-height:1.5; color:#94a3b8;">
+                Automated notification from the CleanStart careers site. Reply directly to reach the applicant — the
+                reply-to is set to their email address.
+              </p>
+              <!-- Social icons -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"
+                style="margin:0 auto 10px; border-collapse:collapse;">
+                <tr>
+                  <td style="padding:0 8px;">
+                    <a href="https://www.linkedin.com/company/cleanstart-official/"
+                      style="display:inline-block; text-decoration:none;">
+                      <img src="https://cdn.cleanstart.com/emails/social-icons/icon-linkedin.png" width="24" height="24"
+                        alt="LinkedIn"
+                        style="display:block; border:0; outline:none; text-decoration:none; width:24px; height:24px; -ms-interpolation-mode:bicubic;" />
+                    </a>
+                  </td>
+                  <td style="padding:0 8px;">
+                    <a href="https://github.com/cleanstart-dev" style="display:inline-block; text-decoration:none;">
+                      <img src="https://cdn.cleanstart.com/emails/social-icons/icon-github.png" width="24" height="24"
+                        alt="GitHub"
+                        style="display:block; border:0; outline:none; text-decoration:none; width:24px; height:24px; -ms-interpolation-mode:bicubic;" />
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <!-- Company address (hardcoded). No unsubscribe link: this is an
+                     INTERNAL transactional notification to HR, not marketing. -->
+              <p
+                style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:11px; font-weight:400; line-height:1.6; color:#888888;">
+                Cleanstart Inc. &middot; 16192 Coastal Highway, Lewes, Delware 19958, US
+              </p>
+            </td>
+          </tr>
+
+        </table>
+        <!-- /Card -->
+      </td>
+    </tr>
+  </table>
+</body>
+
+</html>

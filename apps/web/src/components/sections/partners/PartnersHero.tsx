@@ -34,7 +34,7 @@ export function PartnersHero(): React.ReactElement {
         }}
       />
 
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[clamp(112px,10vw,140px)] pb-[clamp(60px,8vw,110px)]">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[calc(clamp(112px,10vw,140px)+var(--cs-header-extra))] pb-[clamp(60px,8vw,110px)]">
         <div className="flex flex-col items-center text-center gap-7">
           <HeroReveal y={50} duration={1.0}>
             <h1
@@ -46,18 +46,7 @@ export function PartnersHero(): React.ReactElement {
                 maxWidth: "860px",
               }}
             >
-              Join the Clean Software{" "}
-              <span
-                style={{
-                  background:
-                    "linear-gradient(90deg, #B68CFF 0%, #7A59FF 50%, #4E2DEB 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
-              >
-                Movement.
-              </span>
+              Join the Clean Software Movement.
             </h1>
           </HeroReveal>
 
@@ -65,7 +54,7 @@ export function PartnersHero(): React.ReactElement {
             <p
               className="text-white/80 mx-auto"
               style={{
-                fontSize: "var(--fs-body)",
+                fontSize: "var(--fs-lead-sm)",
                 lineHeight: 1.5,
                 maxWidth: "560px",
               }}

@@ -39,7 +39,7 @@ export function CareersHero({ initialQuery }: CareersHeroProps): React.ReactElem
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/resource-center/hero-cube.png"
+          src="/images/resource-center/hero-cube.webp"
           alt=""
           className="w-full h-full object-cover"
           style={{ transform: "rotate(-46.54deg)", opacity: 0.4 }}
@@ -62,7 +62,7 @@ export function CareersHero({ initialQuery }: CareersHeroProps): React.ReactElem
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/resource-center/hero-glow-left.png"
+          src="/images/resource-center/hero-glow-left.webp"
           alt=""
           className="w-full h-full object-cover"
           loading="lazy"
@@ -72,7 +72,7 @@ export function CareersHero({ initialQuery }: CareersHeroProps): React.ReactElem
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div
-          className="flex flex-col items-center gap-6 lg:gap-8 mx-auto pt-[clamp(112px,8vw,128px)]"
+          className="flex flex-col items-center gap-6 lg:gap-8 mx-auto pt-[calc(clamp(112px,8vw,128px)+var(--cs-header-extra))]"
           style={{ maxWidth: "955px" }}
         >
           <div
@@ -102,8 +102,8 @@ export function CareersHero({ initialQuery }: CareersHeroProps): React.ReactElem
                   opacity: 0.8,
                 }}
               >
-                Help us empower the world&rsquo;s largest enterprises to secure their
-                applications. Are you ready to join?
+                Trusted software starts at the foundation. Be part of the mission
+                redefining security and trust for modern software delivery.
               </p>
             </HeroReveal>
           </div>

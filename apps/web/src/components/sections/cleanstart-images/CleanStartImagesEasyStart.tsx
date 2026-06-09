@@ -18,21 +18,21 @@ type FeatureItem = {
 const YOUR_STACK: StackItem[] = [
   {
     label: "Docker",
-    iconSrc: "/images/cleanstart-images/workflows-docker.png",
+    iconSrc: "/images/cleanstart-images/workflows-docker.webp",
     bg: "rgba(36,150,237,0.2)",
     iconW: 21,
     iconH: 21,
   },
   {
     label: "GitHub Actions",
-    iconSrc: "/images/cleanstart-images/workflows-github.png",
+    iconSrc: "/images/cleanstart-images/workflows-github.webp",
     bg: "rgba(255,255,255,0.1)",
     iconW: 21,
     iconH: 21,
   },
   {
     label: "Jenkins",
-    iconSrc: "/images/cleanstart-images/workflows-jenkins.png",
+    iconSrc: "/images/cleanstart-images/workflows-jenkins.webp",
     bg: "rgba(255,255,255,0.1)",
     iconW: 27,
     iconH: 22,
@@ -49,14 +49,14 @@ const YOUR_STACK: StackItem[] = [
 const YOUR_DEPLOYMENTS: StackItem[] = [
   {
     label: "Kubernetes",
-    iconSrc: "/images/cleanstart-images/workflows-kubernetes.png",
+    iconSrc: "/images/cleanstart-images/workflows-kubernetes.webp",
     bg: "rgba(50,108,229,0.2)",
     iconW: 22,
     iconH: 22,
   },
   {
     label: "Cloud Providers",
-    iconSrc: "/images/cleanstart-images/workflows-cloud.png",
+    iconSrc: "/images/cleanstart-images/workflows-cloud.webp",
     bg: "rgba(255,255,255,0.1)",
     iconW: 21,
     iconH: 21,
@@ -85,7 +85,7 @@ const FEATURES: FeatureItem[] = [
   },
   {
     title: "Minimal Workflow Changes",
-    body: "Drop-in replacement — just change your base image tag.",
+    body: "Replace base images without major refactoring.",
     iconSrc: "/images/cleanstart-images/workflows-feat-minimal-workflow.svg",
   },
   {
@@ -119,7 +119,7 @@ function ConnectorBeam({
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/images/cleanstart-images/workflows-mobile-rod.png"
+        src="/images/cleanstart-images/workflows-mobile-rod.webp"
         alt=""
         aria-hidden
         width={131}
@@ -347,7 +347,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/cleanstart-images/workflows-mobile-rod.png"
+                src="/images/cleanstart-images/workflows-mobile-rod.webp"
                 alt=""
                 aria-hidden
                 width={131}
@@ -449,7 +449,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                     />
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src="/images/cleanstart-images/workflows-center-cube.png"
+                      src="/images/cleanstart-images/workflows-center-cube.webp"
                       alt=""
                       aria-hidden
                       width={77}
@@ -545,7 +545,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/cleanstart-images/workflows-mobile-rod.png"
+                src="/images/cleanstart-images/workflows-mobile-rod.webp"
                 alt=""
                 aria-hidden
                 width={131}
@@ -636,7 +636,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/cleanstart-images/workflows-mobile-rod.png"
+                src="/images/cleanstart-images/workflows-mobile-rod.webp"
                 alt=""
                 aria-hidden
                 width={131}

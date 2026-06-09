@@ -20,12 +20,21 @@
 // `collections: [...]` array in payload.config.ts). The editorial
 // priority we want for the sidebar is content-first, ops-last:
 //
-//   Content       — what editors touch every day
-//   Globals       — site-wide settings (always near the top)
-//   Taxonomies    — categories the content references
-//   People        — author records
-//   System        — user accounts, media, redirects, audit
-//   Marketing     — forms, leads (occasional admin)
+//   Content       — what editors publish every day (articles lead; Media here)
+//   Taxonomies    — categories the content references (assigned while authoring)
+//   Marketing     — leads inbox + forms (checked frequently by marketing/SEO)
+//   SEO           — SEO defaults + redirects + broken-link reports (SEO toolkit)
+//   Globals       — site-wide config + nav chrome (set-and-forget, periodic)
+//   Recruiting    — jobs intake: applications, resumes (HR-only)
+//   System        — user accounts, ops + machine logs (rarely visited)
+//
+// Ordered by frequency-of-use then workflow proximity, from the daily
+// content/SEO editor's perspective: live work on top, config and
+// ops/logs at the bottom.
+//
+// Every group MUST be listed below — a group with no `order` rule
+// defaults to `order: 0` and floats above everything else (this is what
+// previously pushed Recruiting to the top of the sidebar).
 //
 // `.nav__wrap` is `display: flex; flex-direction: column` (see
 // _user-menu.scss), so flex `order` reshuffles the rendered sequence
@@ -33,11 +42,12 @@
 .cs-sidebar-header { order: 0; }
 .nav-group {
   &.Content    { order: 1; }
-  &.Globals    { order: 2; }
-  &.Taxonomies { order: 3; }
-  &.People     { order: 4; }
-  &.System     { order: 5; }
-  &.Marketing  { order: 6; }
+  &.Taxonomies { order: 2; }
+  &.Marketing  { order: 3; }
+  &.SEO        { order: 4; }
+  &.Globals    { order: 5; }
+  &.Recruiting { order: 6; }
+  &.System     { order: 7; }
 }
 .cs-user-menu { order: 100; }
 
@@ -126,18 +136,28 @@
     background: var(--cs-surface-raised);
   }
 
-  // Active item — Payload sets `.nav__link--active`. A 3px brand stripe
-  // plus a faint bloom so the active state registers peripherally even
-  // without reading the item text (Linear/Vercel pattern).
+  // Active item — Payload marks the current link by rendering a
+  // `.nav__link-indicator` child (it does NOT add an `--active`/`.active`
+  // class), so `:has()` is the reliable active selector. A 2px brand-cyan
+  // left-stripe over a brand-tinted background, identical to the Dashboard
+  // link (`.cs-sidebar-dashboard--active`) so every active nav row reads
+  // the same way. The class selectors are kept as fallbacks for any nav
+  // item that does surface an explicit active class.
+  &:has(.nav__link-indicator),
   &--active,
   &.active,
   &[aria-current='page'] {
     color: var(--cs-text-primary);
     font-weight: 600;
     background: var(--cs-tint-brand-soft);
-    box-shadow:
-      inset 3px 0 0 0 var(--cs-cyan-500),
-      inset 8px 0 12px -6px rgba(6, 199, 242, 0.15);
+    box-shadow: inset 2px 0 0 0 var(--cs-cyan-500);
+  }
+
+  // Payload's own active marker is a 2px pill in `var(--theme-text)`
+  // (white) pinned to the far-left sidebar edge. We replace it with the
+  // brand-cyan stripe above, so suppress the default white indicator.
+  .nav__link-indicator {
+    display: none;
   }
 
   &:focus-visible {
@@ -170,6 +190,7 @@
   user-select: none;
 }
 
+.nav__link:has(.nav__link-indicator) .cs-nav-badge,
 .nav__link--active .cs-nav-badge,
 .nav__link.active .cs-nav-badge {
   background: var(--cs-tint-brand-medium);

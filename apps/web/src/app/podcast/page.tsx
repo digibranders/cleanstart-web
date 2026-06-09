@@ -7,10 +7,12 @@ import { FadeUp } from "@/components/ui/FadeUp";
 import { PodcastHero } from "@/components/sections/podcast/PodcastHero";
 import { PodcastLatestEpisodes } from "@/components/sections/podcast/PodcastLatestEpisodes";
 import { PodcastFeaturedContent } from "@/components/sections/podcast/PodcastFeaturedContent";
-// PodcastCTACards sits below all the listing content; code-split out of the
-// initial podcast client bundle.
-const PodcastCTACards = nextDynamic(() =>
-  import("@/components/sections/podcast/PodcastCTACards").then((m) => ({ default: m.PodcastCTACards })),
+// PodcastChannelVideos sits below all the listing content; code-split out of
+// the initial podcast client bundle.
+const PodcastChannelVideos = nextDynamic(() =>
+  import("@/components/sections/podcast/PodcastChannelVideos").then((m) => ({
+    default: m.PodcastChannelVideos,
+  })),
 );
 import {
   getFeaturedPodcastEpisodes,
@@ -19,6 +21,10 @@ import {
   isHydratedEpisode,
   type PodcastCtaCard,
 } from "@/lib/podcast";
+import {
+  CLEANSTART_YOUTUBE_HANDLE_URL,
+  getChannelVideos,
+} from "@/lib/youtube-feed";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
@@ -26,7 +32,7 @@ export const dynamic = "force-dynamic";
 
 const FALLBACK_TITLE = "Leadership Exchange";
 const FALLBACK_DESCRIPTION =
-  "Where industry leaders decode container security and define the future of the software supply chain.";
+  "Listen to CleanStart's podcast where industry leaders decode container security, software supply chain risk, and the future of trusted software delivery.";
 
 const DEFAULT_CTA_CARDS: PodcastCtaCard[] = [
   {
@@ -42,10 +48,16 @@ const DEFAULT_CTA_CARDS: PodcastCtaCard[] = [
     ctaHref: "/blogs",
   },
   {
-    title: "Get Updates",
-    body: "Join our mailing list for curated insights and upcoming sessions.",
-    ctaLabel: "Sign Up",
+    title: "Book a Demo",
+    body: "See CleanStart in action with a personalized walkthrough from our team.",
+    ctaLabel: "Book a Demo",
     ctaHref: "/book-a-demo",
+  },
+  {
+    title: "Subscribe on YouTube",
+    body: "Get every new episode the moment it drops on our channel.",
+    ctaLabel: "Subscribe",
+    ctaHref: CLEANSTART_YOUTUBE_HANDLE_URL,
   },
 ];
 
@@ -62,8 +74,10 @@ export default async function PodcastPage(): Promise<React.ReactElement> {
   const page = await getPodcastPage();
   const limit = page?.latestEpisodesLimit ?? 6;
 
-  const [latestData, featured] = await Promise.all([
-    getPodcastEpisodes({ limit }).catch(() => ({
+  const [latestData, featured, channelVideos] = await Promise.all([
+    // Fetch one extra so dropping the featured hero below still leaves up to
+    // `limit` cards in the Latest Episodes grid.
+    getPodcastEpisodes({ limit: limit + 1 }).catch(() => ({
       docs: [],
       hasNextPage: false,
       hasPrevPage: false,
@@ -72,12 +86,21 @@ export default async function PodcastPage(): Promise<React.ReactElement> {
       totalPages: 1,
     })),
     getFeaturedPodcastEpisodes(2).catch(() => []),
+    getChannelVideos(6).catch(() => []),
   ]);
 
   const featuredHero =
     page && isHydratedEpisode(page.featuredHeroEpisode)
       ? page.featuredHeroEpisode
       : (latestData.docs[0] ?? null);
+
+  // The featured hero (e.g. the channel Introduction) already plays in the hero
+  // above, so exclude it from the Latest Episodes grid to avoid a duplicate.
+  const latestEpisodes = (
+    featuredHero
+      ? latestData.docs.filter((ep) => ep.id !== featuredHero.id)
+      : latestData.docs
+  ).slice(0, limit);
 
   const ctaCards =
     page?.ctaCards && page.ctaCards.length > 0
@@ -100,7 +123,7 @@ export default async function PodcastPage(): Promise<React.ReactElement> {
         <FadeUp>
           <PodcastLatestEpisodes
             title={page?.latestEpisodesTitle ?? "Latest Episodes"}
-            episodes={latestData.docs}
+            episodes={latestEpisodes}
           />
         </FadeUp>
 
@@ -113,7 +136,11 @@ export default async function PodcastPage(): Promise<React.ReactElement> {
         </FadeUp>
 
         <FadeUp>
-          <PodcastCTACards cards={ctaCards} />
+          <PodcastChannelVideos
+            videoHeading="From the CleanStart channel"
+            videos={channelVideos}
+            cards={ctaCards}
+          />
         </FadeUp>
       </main>
       <Footer />

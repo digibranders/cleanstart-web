@@ -15,7 +15,7 @@ export function CleanSightHero(): React.ReactElement {
       <div
         className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10"
         style={{
-          paddingTop: "clamp(96px, 9.5vw, 138px)",
+          paddingTop: "calc(clamp(96px, 9.5vw, 138px) + var(--cs-header-extra))",
           paddingBottom: "0px",
           zIndex: 2,
         }}
@@ -34,10 +34,7 @@ export function CleanSightHero(): React.ReactElement {
               }}
             >
               <span className="block">Continuous Visibility.</span>
-              <span className="block">
-                Continuous{" "}
-                <span className="cs-text-gradient-impact">Remediation.</span>
-              </span>
+              <span className="block">Continuous Remediation.</span>
             </h1>
           </HeroReveal>
 
@@ -122,7 +119,7 @@ export function CleanSightHero(): React.ReactElement {
             }}
           >
             <Image
-              src="/images/cleansight/hero-dashboard-v2.png"
+              src="/images/cleansight/hero-dashboard-v2.webp"
               alt="CleanSight dashboard showing container visibility metrics, vulnerability breakdown, and ecosystem package distribution"
               width={1018}
               height={581}

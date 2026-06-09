@@ -14,7 +14,7 @@ export function FipsCTA(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/fips/cta-cube.png"
+        src="/images/fips/cta-cube.webp"
         alt=""
         className="pointer-events-none select-none absolute hidden md:block"
         style={{

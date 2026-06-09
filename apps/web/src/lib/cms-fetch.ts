@@ -1,4 +1,4 @@
-import { draftMode } from "next/headers";
+import { draftMode } from 'next/headers';
 
 /**
  * Central CMS REST fetcher that is draft-aware.
@@ -28,14 +28,14 @@ export class CmsFetchError extends Error {
   readonly status: number;
   constructor(status: number, path: string) {
     super(`CMS fetch failed: ${status} ${path}`);
-    this.name = "CmsFetchError";
+    this.name = 'CmsFetchError';
     this.status = status;
   }
 }
 
-const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:3000";
+const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? 'http://localhost:3000';
 const CMS_API_KEY = process.env.CMS_API_KEY;
-const CMS_API_KEY_COLLECTION = process.env.CMS_API_KEY_COLLECTION ?? "users";
+const CMS_API_KEY_COLLECTION = process.env.CMS_API_KEY_COLLECTION ?? 'users';
 
 const DEFAULT_REVALIDATE_SECONDS = 60;
 
@@ -43,12 +43,12 @@ const stripPublishedFilter = (path: string): string => {
   // Path is of the form `/api/<coll>?...querystring...`. Parse the
   // querystring and remove any `where[_status]...` keys so drafts
   // are surfaced.
-  const [base, query = ""] = path.split("?", 2);
+  const [base, query = ''] = path.split('?', 2);
   if (query.length === 0) return path;
   const params = new URLSearchParams(query);
   const keysToDelete: string[] = [];
   params.forEach((_, key) => {
-    if (key.startsWith("where[_status]") || key.startsWith("where[publishedAt][exists]")) {
+    if (key.startsWith('where[_status]') || key.startsWith('where[publishedAt][exists]')) {
       keysToDelete.push(key);
     }
   });
@@ -57,9 +57,9 @@ const stripPublishedFilter = (path: string): string => {
 };
 
 const withDraftFlag = (path: string): string => {
-  const [base, query = ""] = path.split("?", 2);
+  const [base, query = ''] = path.split('?', 2);
   const params = new URLSearchParams(query);
-  params.set("draft", "true");
+  params.set('draft', 'true');
   return `${base}?${params.toString()}`;
 };
 
@@ -76,10 +76,7 @@ export interface CmsFetchOptions {
   draft?: boolean;
 }
 
-export async function fetchCMS<T>(
-  path: string,
-  options: CmsFetchOptions = {},
-): Promise<T> {
+export async function fetchCMS<T>(path: string, options: CmsFetchOptions = {}): Promise<T> {
   let isDraft = false;
   if (options.draft !== undefined) {
     isDraft = options.draft;
@@ -108,14 +105,29 @@ export async function fetchCMS<T>(
     headers,
   };
   if (isDraft || options.noStore) {
-    init.cache = "no-store";
+    init.cache = 'no-store';
   } else {
     init.next = {
       revalidate: options.revalidateSeconds ?? DEFAULT_REVALIDATE_SECONDS,
     };
   }
 
-  const res = await fetch(`${CMS_URL}${effectivePath}`, init);
+  // Retry transient network failures (the CMS can briefly refuse connections
+  // under load — e.g. when many pages prerender at once, or during an ISR
+  // regeneration while the CMS restarts). Only `fetch()` throwing is retried;
+  // a real HTTP error status is surfaced immediately.
+  let res: Response | undefined;
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      res = await fetch(`${CMS_URL}${effectivePath}`, init);
+      break;
+    } catch (error) {
+      lastError = error;
+      if (attempt < 2) await new Promise((resolve) => setTimeout(resolve, 300 * (attempt + 1)));
+    }
+  }
+  if (!res) throw lastError instanceof Error ? lastError : new CmsFetchError(0, effectivePath);
   if (!res.ok) {
     throw new CmsFetchError(res.status, effectivePath);
   }

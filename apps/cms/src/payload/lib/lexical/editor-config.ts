@@ -25,6 +25,7 @@ import {
 } from '@payloadcms/richtext-lexical';
 
 import { CodeBlock } from '../../blocks/CodeBlock';
+import { InlineCtaBlock } from '../../blocks/InlineCtaBlock';
 import { cleanstartAddMenuFeature } from './add-menu-feature';
 import { cleanstartCodeBlockFeature } from './code-block-feature';
 import { cleanstartEmbedFeature } from './embed-feature';
@@ -77,11 +78,11 @@ export const cleanstartLexicalEditor = () =>
       cleanstartEmbedFeature(),
       cleanstartAddMenuFeature(),
 
-      // Embedded blocks inside rich text. CodeBlock is the only block
-      // exposed here; the page-builder block schema is reused 1:1 so
-      // authoring is identical whether the block sits inline in a body
-      // field or as a top-level page section.
-      BlocksFeature({ blocks: [CodeBlock] }),
+      // Embedded blocks inside rich text. CodeBlock reuses the page-builder
+      // block schema 1:1; InlineCtaBlock is body-only and inserted via the
+      // slash menu (see SlashMenuPlugin). Both render through the `block`
+      // branch of the web renderLexical.
+      BlocksFeature({ blocks: [CodeBlock, InlineCtaBlock] }),
 
       // Single `<>` toolbar button that inserts the CodeBlock above. It
       // takes the slot the inline-code button used to occupy and stands in

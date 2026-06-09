@@ -77,7 +77,7 @@ export function LatestBlogs({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/blogs/latest-blogs-gridlines.svg"
+          src="/images/shared/listing-gridlines.svg"
           alt=""
           aria-hidden
           className="absolute top-0 left-1/2 -translate-x-1/2 pointer-events-none select-none"
@@ -123,9 +123,9 @@ export function LatestBlogs({
           <h2
             className="font-display font-bold"
             style={{
-              fontSize: "var(--fs-h1)",
-              letterSpacing: "var(--text-t-display-2-ls)",
-              lineHeight: "var(--text-t-display-2-lh)",
+              fontSize: "var(--fs-h2)",
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
               color: "#111",
               paddingTop: "var(--spacing-section-sm)",
               paddingBottom: "clamp(28px, 3.5vw, 56px)",
@@ -153,7 +153,7 @@ export function LatestBlogs({
             <EmptyState
               variant="empty"
               title="No posts yet"
-              description="Check back soon — new articles are on the way."
+              description="Check back soon. New articles are on the way."
             />
           )
         ) : (
@@ -216,8 +216,7 @@ function CompactMobilePagination({
     >
       {prevDisabled ? (
         <span
-          aria-disabled
-          aria-label="Previous page"
+          aria-hidden
           className="inline-flex items-center justify-center select-none"
           style={{ width: "24px", height: "24px", opacity: 0.32 }}
         >
@@ -249,8 +248,7 @@ function CompactMobilePagination({
       </span>
       {nextDisabled ? (
         <span
-          aria-disabled
-          aria-label="Next page"
+          aria-hidden
           className="inline-flex items-center justify-center select-none"
           style={{ width: "24px", height: "24px", opacity: 0.32 }}
         >

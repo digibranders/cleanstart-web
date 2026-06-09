@@ -3,24 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { LeadConsent } from "@/components/forms/LeadConsent";
+import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
 import {
   FormCard,
   SubmitButton,
   TextArea,
   TextInput,
 } from "@/components/sections/forms/FormCard";
-import { submitLead } from "@/lib/leads/submitLead";
-
-/** Web input name → HubSpot internal property name (the `forms` field names). */
-const NAME_MAP: Record<string, string> = {
-  firstName: "firstname",
-  lastName: "lastname",
-  phone: "phone",
-  email: "email",
-  company: "company",
-  website: "website",
-  partnerReason: "enter_message",
-};
+import { submitPartner } from "@/lib/partners/submitPartner";
 
 const STORAGE_CONSENT_TEXT =
   "I agree to allow CleanStart to store and process my personal data.";
@@ -30,8 +20,8 @@ const STORAGE_CONSENT_TEXT =
  * ("Join Forces with CleanStart") from this CTA; this reproduces it on the
  * new site using the shared FormCard design language (white card / blue
  * border) so it matches its sibling, the Deal Registration form. Submissions
- * post through the shared `submitLead` helper to `/api/leads/submit` (form
- * slug `become-a-partner`), which relays to the HubSpot `website-partner` form.
+ * post through the `submitPartner` helper to the dedicated CMS endpoint
+ * `/api/partner-applications/apply`.
  */
 export function BecomePartnerCta(): React.ReactElement {
   const [open, setOpen] = useState(false);
@@ -63,9 +53,20 @@ interface PartnerModalProps {
 
 function PartnerModal({ open, onClose }: PartnerModalProps): React.ReactElement {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
-  const [submitted, setSubmitted] = useState(false);
-  const [topError, setTopError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const { status, setStatus, statusRef } = useFormStatus();
   const inFlightRef = useRef(false);
+  // Pending auto-close timer: on success the modal flashes the confirmation
+  // banner, then closes itself. Tracked so it can be cancelled on manual
+  // close/reopen or unmount.
+  const closeTimerRef = useRef<number | null>(null);
+
+  useEffect(
+    () => () => {
+      if (closeTimerRef.current != null) window.clearTimeout(closeTimerRef.current);
+    },
+    [],
+  );
 
   useEffect(() => {
     const dlg = dialogRef.current;
@@ -78,54 +79,99 @@ function PartnerModal({ open, onClose }: PartnerModalProps): React.ReactElement 
           /* already open */
         }
       }
-      setSubmitted(false);
-      setTopError(null);
+      if (closeTimerRef.current != null) {
+        window.clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+      setStatus(null);
+      setSubmitting(false);
       inFlightRef.current = false;
     } else if (dlg.open) {
       dlg.close();
     }
-  }, [open]);
+  }, [open, setStatus]);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     if (inFlightRef.current) return;
-    setTopError(null);
+    setStatus(null);
 
     const form = e.currentTarget;
     const fd = new FormData(form);
     // The form is noValidate, so the required consent checkbox isn't enforced
     // by the browser — gate on it here before sending.
     if (fd.get("consent_storage") == null) {
-      setTopError("Please agree to the storage & processing of your data to continue.");
+      setStatus({
+        tone: "error",
+        title: "Consent required",
+        message:
+          "Please agree to the storage & processing of your data to continue.",
+      });
       return;
     }
     inFlightRef.current = true;
+    setSubmitting(true);
 
-    const fields: Record<string, string> = {};
-    for (const [inputName, hsName] of Object.entries(NAME_MAP)) {
-      const value = fd.get(inputName);
-      if (typeof value === "string" && value.trim()) fields[hsName] = value.trim();
-    }
+    const readField = (name: string): string | undefined => {
+      const value = fd.get(name);
+      if (typeof value !== "string") return undefined;
+      const trimmed = value.trim();
+      return trimmed ? trimmed : undefined;
+    };
+
+    const firstName = readField("firstName") ?? "";
+    const lastName = readField("lastName") ?? "";
+    const email = readField("email") ?? "";
+    const company = readField("company") ?? "";
+    const phone = readField("phone");
+    const website = readField("website");
+    const partnerReason = readField("partnerReason");
     const categories = ["storage", ...(fd.get("consent_marketing") != null ? ["marketing"] : [])];
     const turnstileToken = fd.get("cf-turnstile-response");
+    const hp = fd.get("hp");
 
-    const result = await submitLead({
-      formSlug: "become-a-partner",
-      fields,
-      consent: {
-        snapshot: STORAGE_CONSENT_TEXT,
-        givenAt: new Date().toISOString(),
-        categories,
-      },
-      ...(typeof turnstileToken === "string" ? { turnstileToken } : {}),
-      ...(typeof window !== "undefined" ? { source: window.location.href } : {}),
-    });
+    try {
+      const result = await submitPartner({
+        firstName,
+        lastName,
+        email,
+        company,
+        ...(phone != null ? { phone } : {}),
+        ...(website != null ? { website } : {}),
+        ...(partnerReason != null ? { partnerReason } : {}),
+        consent: {
+          snapshot: STORAGE_CONSENT_TEXT,
+          givenAt: new Date().toISOString(),
+          categories,
+        },
+        ...(typeof turnstileToken === "string" ? { turnstileToken } : {}),
+        ...(typeof hp === "string" ? { hp } : {}),
+        ...(typeof window !== "undefined"
+          ? { source: window.location.href }
+          : {}),
+      });
 
-    if (result.ok) {
-      setSubmitted(true);
-    } else {
-      setTopError("We couldn't submit your request. Please try again.");
+      if (result.ok) {
+        form.reset();
+        setStatus({
+          tone: "success",
+          title: "Request received",
+          message:
+            "Thanks, your partnership request has been received. Our team will be in touch within one business day.",
+        });
+        // Modal UX: show the confirmation briefly, then close the popup.
+        if (closeTimerRef.current != null) window.clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = window.setTimeout(onClose, 2500);
+      } else {
+        setStatus({
+          tone: "error",
+          title: "Couldn't submit",
+          message: "We couldn't submit your request. Please try again.",
+        });
+      }
+    } finally {
       inFlightRef.current = false;
+      setSubmitting(false);
     }
   };
 
@@ -225,54 +271,42 @@ function PartnerModal({ open, onClose }: PartnerModalProps): React.ReactElement 
               </button>
             </div>
 
-            {submitted ? (
-              <p
-                className="text-[#0F123E]"
-                style={{ fontSize: "var(--fs-body)", lineHeight: 1.5 }}
-              >
-                Thanks — your partnership request has been received. Our team
-                will be in touch within one business day.
-              </p>
-            ) : (
-              <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <TextInput name="firstName" placeholder="First Name" label="First Name" required />
-                  <TextInput name="lastName" placeholder="Last Name" label="Last Name" required />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <TextInput name="phone" type="tel" placeholder="Phone number" label="Phone number" />
-                  <TextInput name="email" type="email" placeholder="Business Email" label="Business Email" required />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <TextInput name="company" placeholder="Company Name" label="Company Name" required />
-                  <TextInput name="website" placeholder="Website" label="Website" />
-                </div>
-                <TextArea
-                  name="partnerReason"
-                  placeholder="Why are you interested in partnering with us?"
-                  label="Why are you interested in partnering with us?"
-                />
-                <LeadConsent />
-                <div className="flex justify-start">
-                  <TurnstileWidget />
-                </div>
-                {topError && (
-                  <p
-                    role="alert"
-                    style={{
-                      fontFamily: "var(--font-sans), 'Sora', sans-serif",
-                      fontSize: "var(--fs-body-sm)",
-                      fontWeight: 500,
-                      lineHeight: 1.45,
-                      color: "#B42318",
-                    }}
-                  >
-                    {topError}
-                  </p>
-                )}
-                <SubmitButton>Join Now</SubmitButton>
-              </form>
-            )}
+            <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+              {status ? <StatusBanner ref={statusRef} {...status} /> : null}
+              <input
+                type="text"
+                name="hp"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                defaultValue=""
+                style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", opacity: 0 }}
+              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <TextInput name="firstName" placeholder="First Name" label="First Name" required />
+                <TextInput name="lastName" placeholder="Last Name" label="Last Name" required />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <TextInput name="phone" type="tel" placeholder="Phone number" label="Phone number" />
+                <TextInput name="email" type="email" placeholder="Business Email" label="Business Email" required />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <TextInput name="company" placeholder="Company Name" label="Company Name" required />
+                <TextInput name="website" placeholder="Website" label="Website" />
+              </div>
+              <TextArea
+                name="partnerReason"
+                placeholder="Why are you interested in partnering with us?"
+                label="Why are you interested in partnering with us?"
+              />
+              <LeadConsent />
+              <div className="flex justify-start">
+                <TurnstileWidget />
+              </div>
+              <SubmitButton busy={submitting} busyLabel="Submitting…">
+                Join Now
+              </SubmitButton>
+            </form>
           </FormCard>
         </div>
       </dialog>

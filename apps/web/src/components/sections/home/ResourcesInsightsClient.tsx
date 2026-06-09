@@ -25,6 +25,30 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "events", label: "Events" },
 ];
 
+/**
+ * Per-tab card config.
+ *
+ * - `titleLines` is reserved (min-height) so headlines align across a row and
+ *   1-line titles don't pull their card's layout up.
+ * - `descLines` only caps the abstract (line-clamp); it is NOT reserved. The
+ *   CTA is pinned to the card bottom (`mt-auto`) and the grid equalizes card
+ *   heights, so CTAs align without per-line bookkeeping. `null` drops the
+ *   abstract entirely (events carry none).
+ * - `ctaLabel` is tab-appropriate: an event is attended, a resource is
+ *   downloaded, an article is read.
+ */
+const TAB_CONFIG: Record<
+  TabId,
+  { titleLines: number; descLines: number | null; ctaLabel: string }
+> = {
+  blogs: { titleLines: 2, descLines: 3, ctaLabel: "Read More" },
+  resource: { titleLines: 2, descLines: 3, ctaLabel: "Download" },
+  newsroom: { titleLines: 2, descLines: 3, ctaLabel: "Read More" },
+  events: { titleLines: 2, descLines: null, ctaLabel: "View Event" },
+};
+
+const TITLE_LINE_HEIGHT = 1.25;
+
 export function ResourcesInsightsClient({
   articlesByTab,
 }: {
@@ -124,7 +148,7 @@ export function ResourcesInsightsClient({
               animationDelay: `${idx * 70}ms`,
             }}
           >
-            <ArticleCard article={article} />
+            <ArticleCard article={article} tab={activeTab} />
           </div>
         ))}
       </div>
@@ -132,31 +156,46 @@ export function ResourcesInsightsClient({
   );
 }
 
-function ArticleCard({ article }: { article: ResourceCard }) {
+function ArticleCard({
+  article,
+  tab,
+}: {
+  article: ResourceCard;
+  tab: TabId;
+}) {
+  const { titleLines, descLines, ctaLabel } = TAB_CONFIG[tab];
+  const showDesc = descLines !== null && article.description.trim().length > 0;
+  const eventMeta =
+    tab === "events"
+      ? [article.dateLabel, article.location].filter(
+          (v): v is string => Boolean(v),
+        )
+      : [];
   return (
-    <a
-      href={article.href}
-      className="group flex flex-col gap-4 cursor-pointer transition-transform duration-300 ease-out hover:-translate-y-1"
-    >
-      <div
-        className="relative h-[231px] w-full overflow-hidden rounded-[40px]"
-        style={{ containerType: "inline-size" }}
-      >
-        <Image
-          src={article.image}
-          alt=""
-          fill
-          sizes="(max-width: 768px) 100vw, 33vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-        {article.isCoverPoster && (
-          <CoverTitleOverlay title={article.title} />
-        )}
-      </div>
+    <div className="flex h-full flex-col gap-4">
+      {article.variant === "newsroom" ? (
+        <NewsroomCover article={article} />
+      ) : (
+        <div
+          className="relative h-[231px] w-full overflow-hidden rounded-[40px]"
+          style={{ containerType: "inline-size" }}
+        >
+          <Image
+            src={article.image}
+            alt=""
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover"
+          />
+          {article.isCoverPoster && (
+            <CoverTitleOverlay title={article.title} />
+          )}
+        </div>
+      )}
       {/* Intentionally <p>, not <h3>: matches the parent section's
           no-heading-tag decision (least priority). */}
       <p
-        className="text-[#1a1a1a] transition-colors duration-200 group-hover:text-[#1B1F4F]"
+        className="text-[#1a1a1a]"
         style={{
           fontFamily: "var(--font-display)",
           fontSize: "var(--fs-lead)",
@@ -165,40 +204,127 @@ function ArticleCard({ article }: { article: ResourceCard }) {
           letterSpacing: "-0.02em",
           margin: 0,
           display: "-webkit-box",
-          WebkitLineClamp: 2,
+          WebkitLineClamp: titleLines,
           WebkitBoxOrient: "vertical",
           overflow: "hidden",
+          minHeight: `${titleLines * TITLE_LINE_HEIGHT}em`,
         }}
       >
         {article.title}
       </p>
-      {/* Abstract clamped to 3 lines so card heights stay reasonable. */}
-      <p
-        className="text-[#666]"
-        style={{
-          fontFamily: "var(--font-sans)",
-          fontSize: "var(--fs-body)",
-          fontWeight: 400,
-          lineHeight: 1.5,
-          letterSpacing: "-0.02em",
-          display: "-webkit-box",
-          WebkitLineClamp: 3,
-          WebkitBoxOrient: "vertical",
-          overflow: "hidden",
-        }}
+      {/* Abstract is line-clamped (max only) — not height-reserved. The CTA is
+          pinned to the card bottom, so alignment doesn't depend on this height.
+          Events carry no abstract, so the block is dropped entirely. */}
+      {showDesc && (
+        <p
+          className="text-[#666]"
+          style={{
+            fontFamily: "var(--font-sans)",
+            fontSize: "var(--fs-body)",
+            fontWeight: 400,
+            lineHeight: 1.5,
+            letterSpacing: "-0.02em",
+            display: "-webkit-box",
+            WebkitLineClamp: descLines,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
+          {article.description}
+        </p>
+      )}
+      {eventMeta.length > 0 && (
+        <div
+          className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[#555]"
+          style={{
+            fontFamily: "var(--font-sans)",
+            fontSize: "var(--fs-body-sm)",
+            fontWeight: 500,
+            letterSpacing: "-0.02em",
+          }}
+        >
+          {eventMeta.map((value, i) => (
+            <span key={value} className="inline-flex items-center gap-2">
+              {i > 0 && (
+                <span aria-hidden className="opacity-40">
+                  ·
+                </span>
+              )}
+              {value}
+            </span>
+          ))}
+        </div>
+      )}
+      <a
+        href={article.href}
+        aria-label={article.title}
+        className="group/cta mt-auto inline-flex w-fit self-start items-center gap-2 text-base font-bold text-black transition-colors duration-200 hover:text-[#1B1F4F] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-400/60"
       >
-        {article.description}
-      </p>
-      <span className="inline-flex items-center gap-2 text-base font-bold text-black transition-transform duration-200 group-hover:translate-x-1">
-        <span>Explore</span>
-        <svg width="8" height="16" viewBox="0 0 8 16" fill="none" aria-hidden>
+        <span>{ctaLabel}</span>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden
+          className="transition-transform duration-200 group-hover/cta:translate-x-1"
+        >
           <path
-            d="M6.71 7.29 2.94 11.06 1.79 9.91l3.16-2.88 1.09-.92-1.09-.93-3.16-2.85L2.94 2 6.71 5.77a1.06 1.06 0 0 1 .31.75 1.06 1.06 0 0 1-.31.77Z"
-            fill="currentColor"
+            d="m9 6 6 6-6 6"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
         </svg>
-      </span>
-    </a>
+      </a>
+    </div>
+  );
+}
+
+/**
+ * Cover panel for Newsroom-tab cards. Adopts the `/news` listing card's
+ * branded purple gradient panel so the homepage matches the Newsroom page.
+ *
+ * The art (publisher logo when present, otherwise the hero image) is
+ * `object-contain`-ed inside a padded inner box rather than `object-cover`-ed
+ * full-bleed. Newsroom hero assets are publisher brand marks (AP, OSV, Cyber
+ * Defense Magazine, …) with transparent backgrounds — `object-cover` blew
+ * them up and clipped their edges (the bug). Containing them on the gradient
+ * keeps every mark whole and centred. Outer geometry (231px tall, 40px
+ * radius) is kept so the Newsroom tab stays consistent with the other tabs.
+ */
+function NewsroomCover({ article }: { article: ResourceCard }) {
+  const art = article.logo ?? (article.image || null);
+  return (
+    <div
+      className="relative flex h-[231px] w-full items-center justify-center overflow-hidden"
+      style={{
+        borderRadius: "40px",
+        background:
+          "linear-gradient(180deg, #10123e 0%, #131e8f 38%, #421ebc 100%)",
+      }}
+    >
+      {art ? (
+        <Image
+          src={art}
+          alt={article.publisher ?? article.title}
+          fill
+          sizes="(max-width: 768px) 100vw, 33vw"
+          className="object-contain pointer-events-none select-none"
+        />
+      ) : (
+        <span
+          className="font-display font-bold text-center text-white"
+          style={{
+            fontSize: "var(--fs-h3)",
+            letterSpacing: "-0.03em",
+          }}
+        >
+          {article.publisher ?? "CleanStart"}
+        </span>
+      )}
+    </div>
   );
 }
 

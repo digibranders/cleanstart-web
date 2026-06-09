@@ -10,7 +10,7 @@ import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 export const metadata = buildPageMetadata({
   title: "Deal Registration",
   description:
-    "Register a deal with CleanStart. Submit partner and prospect details to protect your opportunity.",
+    "Register your CleanStart deal to protect your pipeline, access partner pricing, and collaborate with the CleanStart team on enterprise opportunities in secure software supply chain.",
   path: "/deal-registration",
 });
 
@@ -37,7 +37,7 @@ export default function DealRegistrationPage() {
           />
 
           <Image
-            src="/images/book-a-demo/hero-cube-left.png"
+            src="/images/book-a-demo/hero-cube-left.webp"
             alt=""
             width={332}
             height={313}
@@ -56,7 +56,7 @@ export default function DealRegistrationPage() {
           />
 
           <Image
-            src="/images/book-a-demo/hero-cube-right.png"
+            src="/images/book-a-demo/hero-cube-right.webp"
             alt=""
             width={294}
             height={298}
@@ -89,24 +89,11 @@ export default function DealRegistrationPage() {
                 fontFamily: "var(--font-display), sans-serif",
                 fontWeight: 600,
                 fontSize: "var(--fs-display)",
-                // Generous line-height plus the inline-block span's bottom
-                // padding keep bg-clip-text from clipping the descender on the
-                // "g" in "Registration".
-                lineHeight: 1.2,
+                lineHeight: 1.05,
                 letterSpacing: "-0.04em",
               }}
             >
-              Deal{" "}
-              <span
-                className="inline-block bg-clip-text text-transparent"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(99deg, rgba(154, 81, 255, 1) 0%, rgba(44, 193, 235, 1) 100%)",
-                  paddingBottom: "0.12em",
-                }}
-              >
-                Registration
-              </span>
+              Deal Registration
             </h1>
           </div>
         </section>

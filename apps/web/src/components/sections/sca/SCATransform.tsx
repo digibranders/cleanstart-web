@@ -10,10 +10,10 @@ interface ChipItem {
 }
 
 const OUTCOME_CHIPS: ChipItem[] = [
-  { id: "c1", line1: "Cleaner software",  line2: "foundations",  icon: "/images/sca/outcome-ball-cleaner.png", iconAlt: "Cleaner software foundations" },
-  { id: "c2", line1: "Better SCA signal", line2: "quality",      icon: "/images/sca/outcome-ball-signal.png",  iconAlt: "Better SCA signal quality" },
-  { id: "c3", line1: "Faster, focused",   line2: "remediation",  icon: "/images/sca/outcome-ball-target.png",  iconAlt: "Faster, focused remediation" },
-  { id: "c4", line1: "Stronger security", line2: "outcomes",     icon: "/images/sca/outcome-ball-shield.png",  iconAlt: "Stronger security outcomes" },
+  { id: "c1", line1: "Cleaner software",  line2: "foundations",  icon: "/images/sca/outcome-ball-cleaner.webp", iconAlt: "Cleaner software foundations" },
+  { id: "c2", line1: "Better SCA signal", line2: "quality",      icon: "/images/sca/outcome-ball-signal.webp",  iconAlt: "Better SCA signal quality" },
+  { id: "c3", line1: "Faster, focused",   line2: "remediation",  icon: "/images/sca/outcome-ball-target.webp",  iconAlt: "Faster, focused remediation" },
+  { id: "c4", line1: "Stronger security", line2: "outcomes",     icon: "/images/sca/outcome-ball-shield.webp",  iconAlt: "Stronger security outcomes" },
 ];
 
 const STATS = [
@@ -476,7 +476,7 @@ function CenterCard(): React.ReactElement {
 
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/images/sca/center-card-cube.png"
+        src="/images/sca/center-card-cube.webp"
         alt=""
         aria-hidden
         width={91}

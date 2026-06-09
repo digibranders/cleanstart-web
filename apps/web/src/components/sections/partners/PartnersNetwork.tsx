@@ -23,7 +23,7 @@ interface Partner {
   wordmark?: string;
 }
 
-const REGIONS = ["Asia Pacific", "Europe & Middle East", "North America"] as const;
+const REGIONS = ["Asia Pacific", "Europe", "Middle East", "North America"] as const;
 type Region = (typeof REGIONS)[number];
 
 const INITIAL_VISIBLE = 8;
@@ -33,31 +33,39 @@ const CARD_SPRING = { type: "spring", stiffness: 280, damping: 30, mass: 0.8 } a
 
 const PARTNERS: Record<Region, Partner[]> = {
   "Asia Pacific": [
-    { name: "Hitachi Systems", country: "India", logo: "/images/partners/global/hitachi.png" },
-    { name: "Citius Cloud", country: "India", logo: "/images/partners/global/citius.png" },
-    { name: "CyberNx", country: "India", logo: "/images/partners/global/cybernx.png" },
-    { name: "eCaps", country: "India", logo: "/images/partners/global/ecaps.png" },
-    { name: "SEESEC", country: "India", logo: "/images/partners/global/seesec.png" },
-    { name: "Imperium", country: "Singapore", logo: "/images/partners/global/imperium.png" },
-    { name: "R-Tech", country: "Indonesia", logo: "/images/partners/global/rtech.png" },
+    { name: "Hitachi Systems", country: "India", logo: "/images/partners/global/hitachi.webp" },
+    { name: "Citius Cloud", country: "India", logo: "/images/partners/global/citius.webp" },
+    { name: "CyberNx", country: "India", logo: "/images/partners/global/cybernx.webp" },
+    { name: "eCaps", country: "India", logo: "/images/partners/global/ecaps.webp" },
+    { name: "SEESEC", country: "India", logo: "/images/partners/global/seesec.webp" },
+    { name: "Imperium", country: "Singapore", logo: "/images/partners/global/imperium.webp" },
+    { name: "R-Tech", country: "Indonesia", logo: "/images/partners/global/rtech.webp" },
     { name: "eSec Forte", country: "India", logo: "/images/partners/global/sec-forte.webp" },
     { name: "Raksha Technologies", country: "India", logo: "/images/partners/global/raksha.webp" },
   ],
-  "Europe & Middle East": [
+  Europe: [
+    { name: "NGIT", country: "Nordics", logo: "/images/partners/global/ngit.webp" },
+  ],
+  "Middle East": [
     {
       name: "Surakshate",
       country: "UAE",
       logo: "/images/partners/global/surakshate.webp",
       invertOnLight: true,
     },
-    { name: "NGIT", country: "Nordics", logo: "/images/partners/global/ngit.webp" },
   ],
   "North America": [
     {
       name: "Fortifire",
       country: "North America",
-      logo: "/images/partners/global/fortifire-icon.png",
+      logo: "/images/partners/global/fortifire-icon.webp",
       wordmark: "FORTIFIRE",
+    },
+    {
+      name: "Zensar",
+      country: "San Jose, USA",
+      logo: "/images/partners/global/zensar.svg",
+      invertOnLight: true,
     },
   ],
 };
@@ -118,7 +126,7 @@ export function PartnersNetwork(): React.ReactElement {
                 letterSpacing: "-0.02em",
               }}
             >
-              Why Partner with{" "}
+              A Global Network of Trusted{" "}
               <span
                 style={{
                   background:
@@ -128,7 +136,7 @@ export function PartnersNetwork(): React.ReactElement {
                   backgroundClip: "text",
                 }}
               >
-                CleanStart
+                Innovators
               </span>
             </h2>
           </Reveal>
@@ -187,31 +195,40 @@ export function PartnersNetwork(): React.ReactElement {
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {partners.length === 0 ? (
               <div className="col-span-full text-center text-white/70 py-12" style={{ fontSize: "var(--fs-body)" }}>
-                We&apos;re actively expanding in this region — check back soon.
+                We&apos;re actively expanding in this region. Check back soon.
               </div>
             ) : (
               basePartners.map((p) => <PartnerCard key={`${p.name}-${p.country}`} partner={p} />)
             )}
-            <AnimatePresence initial={false}>
-              {expanded &&
-                extraPartners.map((p, i) => (
-                  <m.div
-                    key={`${p.name}-${p.country}`}
-                    initial={reduce ? false : { opacity: 0, y: 18, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={reduce ? { opacity: 0 } : { opacity: 0, y: 18, scale: 0.96 }}
-                    transition={
-                      reduce ? { duration: 0.15, ease: EASE_SOFT } : { ...CARD_SPRING, delay: i * 0.06 }
-                    }
-                  >
-                    <PartnerCard partner={p} />
-                  </m.div>
-                ))}
-            </AnimatePresence>
+            {/* Mobile/tablet: show every partner up front — no View More toggle below lg. */}
+            <div className="contents lg:hidden">
+              {extraPartners.map((p) => (
+                <PartnerCard key={`${p.name}-${p.country}`} partner={p} />
+              ))}
+            </div>
+            {/* Desktop (lg+): reveal the remaining partners via View More, with the spring entrance. */}
+            <div className="hidden lg:contents">
+              <AnimatePresence initial={false}>
+                {expanded &&
+                  extraPartners.map((p, i) => (
+                    <m.div
+                      key={`${p.name}-${p.country}`}
+                      initial={reduce ? false : { opacity: 0, y: 18, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={reduce ? { opacity: 0 } : { opacity: 0, y: 18, scale: 0.96 }}
+                      transition={
+                        reduce ? { duration: 0.15, ease: EASE_SOFT } : { ...CARD_SPRING, delay: i * 0.06 }
+                      }
+                    >
+                      <PartnerCard partner={p} />
+                    </m.div>
+                  ))}
+              </AnimatePresence>
+            </div>
           </div>
 
           {partners.length > INITIAL_VISIBLE && (
-            <div className="mt-10 flex justify-center">
+            <div className="mt-10 hidden justify-center lg:flex">
               <button
                 type="button"
                 onClick={() => setExpanded((prev) => !prev)}
@@ -236,15 +253,31 @@ function PartnerCard({ partner }: { partner: Partner }): React.ReactElement {
       style={{ border: "1px solid rgba(255,255,255,0.12)" }}
     >
       <div className="flex h-9 items-center gap-2">
-        <Image
-          src={partner.logo}
-          alt={`${partner.name} logo`}
-          width={partner.wordmark ? 36 : 160}
-          height={36}
-          sizes={partner.wordmark ? "36px" : "160px"}
-          className="h-full w-auto object-contain object-left"
-          style={partner.invertOnLight ? { filter: "brightness(0)" } : undefined}
-        />
+        {partner.logo.endsWith(".svg") ? (
+          // SVG logos render via plain <img> — next/image needs dangerouslyAllowSVG, and
+          // vectors gain nothing from the optimizer.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={partner.logo}
+            alt={`${partner.name} logo`}
+            width={partner.wordmark ? 36 : 160}
+            height={36}
+            loading="lazy"
+            decoding="async"
+            className="h-full w-auto object-contain object-left"
+            style={partner.invertOnLight ? { filter: "brightness(0)" } : undefined}
+          />
+        ) : (
+          <Image
+            src={partner.logo}
+            alt={`${partner.name} logo`}
+            width={partner.wordmark ? 36 : 160}
+            height={36}
+            sizes={partner.wordmark ? "36px" : "160px"}
+            className="h-full w-auto object-contain object-left"
+            style={partner.invertOnLight ? { filter: "brightness(0)" } : undefined}
+          />
+        )}
         {partner.wordmark ? (
           <span
             className="font-display font-bold text-[#0F123E] tracking-tight"

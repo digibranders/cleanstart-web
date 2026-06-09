@@ -368,6 +368,20 @@
   }
 }
 
+// ─── Suppress Payload's stock mobile-close toggler ────────────────────
+//
+// At ≤768px Payload reveals a SECOND toggler — `.nav__mobile-close`, a
+// Hamburger inside the nav drawer's `.nav__header` — to close the drawer.
+// It stacks in the same top-left corner as our fixed CleanStart panel
+// toggle (`.template-default__nav-toggler-wrapper`), so two togglers show
+// on mobile. Our toggle drives the same NavContext and already closes the
+// drawer, so hide Payload's stock one. `.nav__header` only ever contains
+// this button (it's `position: absolute`, so removing it shifts nothing),
+// so hide the whole container to also drop its empty top-of-drawer bar.
+.nav__header {
+  display: none !important;
+}
+
 // ─── Sidebar auto-collapse policy (visual layer) ──────────────────────
 //
 // `.template-default` is a CSS grid whose first column is the nav rail:

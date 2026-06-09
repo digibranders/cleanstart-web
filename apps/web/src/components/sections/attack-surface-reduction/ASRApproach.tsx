@@ -5,25 +5,25 @@ const CARDS: readonly [WhyCard, WhyCard, WhyCard, WhyCard] = [
   {
     title: 'Minimal Foundations',
     desc: 'Only required runtime components',
-    imgSrc: '/images/attack-surface-reduction/approach-icon-minimal.png',
+    imgSrc: '/images/attack-surface-reduction/approach-icon-minimal.webp',
     imgAlt: 'Minimal foundations icon',
   },
   {
     title: 'Bloat Removed',
     desc: 'No shells or unused tooling.',
-    imgSrc: '/images/attack-surface-reduction/approach-icon-bloat.png',
+    imgSrc: '/images/attack-surface-reduction/approach-icon-bloat.webp',
     imgAlt: 'Bloat removed icon',
   },
   {
     title: 'Deterministic Builds',
     desc: 'Reproducible and verifiable.',
-    imgSrc: '/images/attack-surface-reduction/approach-icon-deterministic.png',
+    imgSrc: '/images/attack-surface-reduction/approach-icon-deterministic.webp',
     imgAlt: 'Deterministic builds icon',
   },
   {
     title: 'Secure Defaults',
     desc: 'Hardened by default.',
-    imgSrc: '/images/attack-surface-reduction/approach-icon-secure.png',
+    imgSrc: '/images/attack-surface-reduction/approach-icon-secure.webp',
     imgAlt: 'Secure defaults icon',
   },
 ];

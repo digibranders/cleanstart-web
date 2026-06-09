@@ -57,7 +57,7 @@ export function ResourceDetailHero({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/resource-center/hero-cube.png"
+            src="/images/resource-center/hero-cube.webp"
             alt=""
             style={{ width: "294px", height: "298px", opacity: 0.4 }}
             loading="lazy"
@@ -80,7 +80,7 @@ export function ResourceDetailHero({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/resource-center/hero-glow-left.png"
+          src="/images/resource-center/hero-glow-left.webp"
           alt=""
           className="w-full h-full object-cover"
           loading="lazy"
@@ -98,7 +98,7 @@ export function ResourceDetailHero({
             `hidden sm:flex`. */}
         <nav
           aria-label="Breadcrumb"
-          className="flex flex-nowrap items-center overflow-x-auto pt-[120px] lg:pt-[138px] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible"
+          className="flex flex-nowrap items-center overflow-x-auto pt-[120px] lg:pt-[calc(138px+var(--cs-header-extra))] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible"
         >
           <Link
             href="/"

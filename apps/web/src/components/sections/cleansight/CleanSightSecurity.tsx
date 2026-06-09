@@ -62,6 +62,9 @@ function FeatureCard({
   const isStack = variant === "stack";
   // On mobile/stack we render the title with no forced break so \n collapses to a space.
   const displayTitle = isStack ? title.replace(/\n/g, " ") : title;
+  // Left-column cards mirror their text to the inner edge so all four cards'
+  // content reads toward the centered shield.
+  const shieldAlign = side === "left" ? "right" : "left";
   return (
     <div
       className="bg-white flex flex-col justify-center"
@@ -73,7 +76,7 @@ function FeatureCard({
         paddingRight: isStack ? pad : paddingRight,
         gap: "12px",
         minHeight: isStack ? undefined : "clamp(180px, 15vw, 220px)",
-        textAlign: isStack ? "center" : "left",
+        textAlign: isStack ? "center" : shieldAlign,
         alignItems: isStack ? "center" : "stretch",
       }}
     >
@@ -121,7 +124,7 @@ export function CleanSightSecurity(): React.ReactElement {
       <img
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
-        src="/images/cleansight/security-crystal.png"
+        src="/images/cleansight/security-crystal.webp"
         alt=""
         style={{
           right: "-80px",
@@ -138,7 +141,7 @@ export function CleanSightSecurity(): React.ReactElement {
       <img
         aria-hidden
         className="pointer-events-none select-none absolute hidden lg:block"
-        src="/images/cleansight/security-crystal.png"
+        src="/images/cleansight/security-crystal.webp"
         alt=""
         style={{
           left: "-163px",
@@ -216,7 +219,7 @@ export function CleanSightSecurity(): React.ReactElement {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/cleansight/security-shield-complete.png"
+              src="/images/cleansight/security-shield-complete.webp"
               alt="CleanSight security shield"
               style={{
                 width: "100%",

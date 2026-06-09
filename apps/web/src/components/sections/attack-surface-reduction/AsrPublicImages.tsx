@@ -138,7 +138,7 @@ export function AsrPublicImages(): React.ReactElement {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             aria-hidden
-            src="/images/attack-surface-reduction/bloated-container2.png"
+            src="/images/attack-surface-reduction/bloated-container2.webp"
             alt=""
             className="absolute pointer-events-none select-none"
             style={{
@@ -176,7 +176,7 @@ export function AsrPublicImages(): React.ReactElement {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
-          src="/images/attack-surface-reduction/bloated-container2.png"
+          src="/images/attack-surface-reduction/bloated-container2.webp"
           alt=""
           className="pointer-events-none select-none"
           style={{ width: 'min(320px, 90%)', height: 'auto' }}

@@ -35,6 +35,7 @@
  */
 
 import { cmsBaseUrl } from "./cms-fetch";
+import { formatEventDate } from "./events";
 import type { ResourceType } from "./resources";
 import { resourceCoverPoster } from "./resources-utils";
 
@@ -52,6 +53,20 @@ export interface ResourceCard {
   href: string;
   /** When true, render the cover poster with the title overlaid (resource booklet style). */
   isCoverPoster?: boolean;
+  /**
+   * When `"newsroom"`, render the cover as a branded gradient panel with the
+   * publisher logo (or hero) contained inside — mirrors the `/news` listing
+   * card so publisher logos are never cropped by `object-cover`.
+   */
+  variant?: "newsroom";
+  /** Publisher logo URL — preferred art inside the newsroom gradient panel. */
+  logo?: string | null;
+  /** Publisher name — text fallback inside the newsroom panel when no art exists. */
+  publisher?: string | null;
+  /** Events only: formatted date label (e.g. "15 May 2026") for the card meta row. */
+  dateLabel?: string | null;
+  /** Events only: venue / location for the card meta row. */
+  location?: string | null;
 }
 
 export type ResourceCardsByTab = Record<TabId, ResourceCard[]>;
@@ -96,6 +111,8 @@ interface CmsNews {
   title: string;
   abstract?: string | null;
   heroImage?: CmsImage | null;
+  publisher?: string | null;
+  publisherLogo?: CmsImage | null;
 }
 
 interface CmsEvent {
@@ -103,6 +120,10 @@ interface CmsEvent {
   title: string;
   abstract?: string | null;
   heroImage?: CmsImage | null;
+  venue?: string | null;
+  startsAt?: string | null;
+  timezone?: string | null;
+  customDateLabel?: string | null;
 }
 
 /**
@@ -176,7 +197,7 @@ async function loadBlogs(): Promise<ResourceCard[]> {
       const image = pickImage(d.heroImage);
       if (!d.slug || !d.title) return null;
       return {
-        image: image ?? "/images/resource-1.png",
+        image: image ?? "/images/resource-1.webp",
         title: d.title,
         description: d.abstract?.trim() ?? "",
         href: `/blogs/${d.slug}`,
@@ -208,15 +229,21 @@ async function loadResources(): Promise<ResourceCard[]> {
 async function loadNews(): Promise<ResourceCard[]> {
   const data = await fetchCollection<CmsNews>(
     "news",
-    `${NEWS_PUBLISHED_FILTER}&depth=1&limit=3&sort=-publicationDate&select[title]=true&select[slug]=true&select[abstract]=true&select[heroImage]=true`,
+    `${NEWS_PUBLISHED_FILTER}&depth=1&limit=3&sort=-publicationDate&select[title]=true&select[slug]=true&select[abstract]=true&select[heroImage]=true&select[publisher]=true&select[publisherLogo]=true`,
   );
   if (!data) return [];
   return data.docs
     .map((d): ResourceCard | null => {
-      const image = pickImage(d.heroImage);
       if (!d.slug || !d.title) return null;
+      const hero = pickImage(d.heroImage);
+      const logo = pickImage(d.publisherLogo);
       return {
-        image: image ?? "/images/resource-3.png",
+        // Hero is the in-panel fallback only — when neither logo nor hero
+        // exists the card renders the publisher name on the gradient.
+        image: hero ?? "",
+        logo,
+        publisher: d.publisher ?? null,
+        variant: "newsroom",
         title: d.title,
         description: d.abstract?.trim() ?? "",
         href: `/news/${d.slug}`,
@@ -228,18 +255,26 @@ async function loadNews(): Promise<ResourceCard[]> {
 async function loadEvents(): Promise<ResourceCard[]> {
   const data = await fetchCollection<CmsEvent>(
     "events",
-    `${PUBLISHED_FILTER}&depth=1&limit=3&sort=-publishedAt&select[title]=true&select[slug]=true&select[abstract]=true&select[heroImage]=true`,
+    `${PUBLISHED_FILTER}&depth=1&limit=3&sort=-publishedAt&select[title]=true&select[slug]=true&select[abstract]=true&select[heroImage]=true&select[venue]=true&select[startsAt]=true&select[timezone]=true&select[customDateLabel]=true`,
   );
   if (!data) return [];
   return data.docs
     .map((d): ResourceCard | null => {
       const image = pickImage(d.heroImage);
       if (!d.slug || !d.title) return null;
+      const dateLabel = formatEventDate(
+        d.startsAt,
+        d.timezone,
+        d.customDateLabel,
+        "short",
+      );
       return {
-        image: image ?? "/images/resource-1.png",
+        image: image ?? "/images/resource-1.webp",
         title: d.title,
         description: d.abstract?.trim() ?? "",
         href: `/event/${d.slug}`,
+        dateLabel: dateLabel || null,
+        location: d.venue?.trim() || null,
       };
     })
     .filter((c): c is ResourceCard => c !== null);

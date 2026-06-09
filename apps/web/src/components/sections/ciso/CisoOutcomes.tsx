@@ -214,9 +214,9 @@ function BottomFlare({ left }: { left: string }): React.ReactElement {
             height: "200%",
             objectFit: "fill",
             maskImage:
-              "url('/images/ciso/outcomes-flare-mask1.svg'), url('/images/ciso/outcomes-flare-mask2.png')",
+              "url('/images/ciso/outcomes-flare-mask1.svg'), url('/images/ciso/outcomes-flare-mask2.webp')",
             WebkitMaskImage:
-              "url('/images/ciso/outcomes-flare-mask1.svg'), url('/images/ciso/outcomes-flare-mask2.png')",
+              "url('/images/ciso/outcomes-flare-mask1.svg'), url('/images/ciso/outcomes-flare-mask2.webp')",
             maskMode: "alpha",
             maskComposite: "intersect",
             maskRepeat: "no-repeat",
@@ -422,13 +422,13 @@ export function CisoOutcomes(): React.ReactElement {
         {/* Track and per-column flares only fit the 4-wide row, so they are xl-only and hidden in the md-lg 2x2 grid. */}
         <div className="hidden xl:block">
           <GlowBar
-            src="/images/ciso/outcomes-glow-bar1.png"
+            src="/images/ciso/outcomes-glow-bar1.webp"
             height={131}
             opacity={0.4}
             top={633}
           />
           <GlowBar
-            src="/images/ciso/outcomes-glow-bar2.png"
+            src="/images/ciso/outcomes-glow-bar2.webp"
             height={51}
             opacity={0.3}
             top={633}

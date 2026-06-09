@@ -9,9 +9,10 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "Contact Us",
+  title: "Contact CleanStart | Talk to a Secure Software Expert",
+  absoluteTitle: true,
   description:
-    "Talk to CleanStart about hardened container images, compliance, and integrations. Reach our Singapore, India, and North America offices.",
+    "Contact CleanStart for enterprise consultations on verified container images, FIPS compliance, SBOM generation, and software supply chain security for your organization.",
   path: "/contact-us",
 });
 
@@ -38,7 +39,10 @@ export default function ContactUsPage() {
         </FadeUp>
 
         <FadeUp>
-          <FrequentlyAskedQuestions />
+          {/* Balanced top/bottom: ContactOffices (Section md) already pads
+              above, so drop the FAQ's own top padding + footer-overlap margin
+              and match the bottom to the same section rhythm. */}
+          <FrequentlyAskedQuestions className="pb-section-md" />
         </FadeUp>
       </main>
       <Footer />

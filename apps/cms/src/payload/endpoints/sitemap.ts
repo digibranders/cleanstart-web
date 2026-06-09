@@ -11,6 +11,7 @@ import {
   renderNewsUrlsetXml,
   renderUrlsetXml,
 } from '../lib/sitemap/xml';
+import { resolveSiteUrl } from '../lib/site-url';
 
 const xmlResponse = (xml: string): Response =>
   new Response(xml, {
@@ -25,7 +26,7 @@ const readBaseUrl = async (payload: Payload): Promise<string> => {
   const settings = (await payload.findGlobal({ slug: 'siteSettings' })) as {
     baseUrl?: string;
   };
-  return (settings.baseUrl ?? 'https://cleanstart.com').replace(/\/+$/, '');
+  return resolveSiteUrl(settings.baseUrl);
 };
 
 interface NewsContext {

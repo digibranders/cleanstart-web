@@ -5,8 +5,7 @@ export function FipsHero(): React.ReactElement {
   return (
     <section
       data-section="FipsHero"
-      className="relative overflow-hidden bg-cs-hero"
-      style={{ minHeight: "clamp(658px, 46.32vw, 667px)" }}
+      className="relative overflow-hidden bg-cs-hero md:min-h-[clamp(658px,46.32vw,667px)]"
     >
       {/* Bottom fade blends the hero gradient into the white section below. */}
       <div
@@ -22,7 +21,7 @@ export function FipsHero(): React.ReactElement {
       {/* Mobile-only purple radial glow behind the shield. */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute md:hidden"
+        className="pointer-events-none select-none absolute hidden"
         style={{
           left: "50%",
           transform: "translateX(-50%)",
@@ -36,18 +35,17 @@ export function FipsHero(): React.ReactElement {
       />
 
       <div
-        className="relative mx-auto z-[2] px-6"
+        className="relative mx-auto z-[2] px-6 md:min-h-[clamp(658px,46.32vw,667px)]"
         style={{
           maxWidth: "1276px",
-          paddingTop: "clamp(112px, 12.92vw, 200px)",
+          paddingTop: "calc(clamp(112px, 12.92vw, 200px) + var(--cs-header-extra))",
           paddingBottom: "0",
-          minHeight: "clamp(658px, 46.32vw, 667px)",
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
-          src="/images/fips/shield-glow.png"
+          src="/images/fips/shield-glow.webp"
           alt=""
           className="pointer-events-none select-none absolute hidden md:block"
           style={{
@@ -80,7 +78,7 @@ export function FipsHero(): React.ReactElement {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
-          src="/images/fips/shield-only.png"
+          src="/images/fips/shield-only.webp"
           alt=""
           className="pointer-events-none select-none absolute hidden md:block"
           style={{
@@ -109,8 +107,7 @@ export function FipsHero(): React.ReactElement {
                 marginBottom: "clamp(16px, 1.67vw, 24px)",
               }}
             >
-              FIPS-Validated. Always{" "}
-              <span className="cs-text-gradient-impact">Verified.</span>
+              FIPS-Validated. Always Verified.
             </h1>
           </HeroReveal>
 
@@ -171,9 +168,9 @@ export function FipsHero(): React.ReactElement {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
-          src="/images/fips/shield-only.png"
+          src="/images/fips/shield-only.webp"
           alt=""
-          className="pointer-events-none select-none md:hidden mx-auto block relative z-[2]"
+          className="pointer-events-none select-none hidden mx-auto relative z-[2]"
           style={{
             width: "200px",
             height: "auto",

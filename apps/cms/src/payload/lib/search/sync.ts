@@ -10,6 +10,7 @@ import {
   createSearchClient,
   searchClientConfigFromEnv,
 } from './client';
+import { resolveSiteUrl } from '../site-url';
 
 /**
  * Loose Payload subset we depend on. Keeps the sync layer easy to
@@ -54,11 +55,11 @@ const readBaseUrl = async (payload: SyncPayload): Promise<string> => {
     const settings = (await payload.findGlobal({ slug: 'siteSettings' })) as {
       baseUrl?: string;
     };
-    const url = (settings.baseUrl ?? 'https://cleanstart.com').replace(/\/+$/, '');
+    const url = resolveSiteUrl(settings.baseUrl);
     cachedBaseUrl = url;
     return url;
   } catch {
-    return 'https://cleanstart.com';
+    return resolveSiteUrl();
   }
 };
 

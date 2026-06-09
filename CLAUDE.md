@@ -2,7 +2,7 @@
 
 This file tells Claude Code *how* to work in this repo. It does not duplicate the architecture doc, which tells you *what* to build.
 
-**Source of truth for *what*:** `docs/cleanstart-cms-architecture.html`. Every ticket, every design call, every schema decision references an anchor in that file (e.g. `#new-fields`, `#blocks`, `#publishing-checklist`). If this CLAUDE.md and the arch doc disagree, the arch doc wins for product/architecture decisions; this file wins for code conventions.
+**Source of truth for *what*:** `docs/architecture/cleanstart-cms-architecture.html`. Every ticket, every design call, every schema decision references an anchor in that file (e.g. `#new-fields`, `#blocks`, `#publishing-checklist`). If this CLAUDE.md and the arch doc disagree, the arch doc wins for product/architecture decisions; this file wins for code conventions.
 
 **Plan of record:** `~/.claude/plans/lets-review-the-doc-curried-feigenbaum.md` (CMS-only Phase A–I sequence). The current backlog is at `docs/BACKLOG.md`. Phases A–I are substantially done (see backlog for remaining ops-only gaps). **Currently active scope: Phase J — Integrations dashboard** (`apps/cms` Integrations collection + editor self-serve UI). `apps/web` marketing site is also active as of Phase J (see below).
 
@@ -32,7 +32,7 @@ The repo has **exactly three long-lived branches**. All three are kept in sync a
 |---|---|---|---|
 | `main` | — | Production truth. Deploys go from here. | Everything |
 | `development` | Primary dev branch on this device (`admin@digibranders.com`) | Day-to-day development for both `apps/cms` and `apps/web`. | Everything |
-| `farheen` | Farheen's primary device | Web-only contributions, **scoped to the page being worked on**. | **`apps/web/` ONLY** — no edits to `apps/cms/`, `packages/`, `migrations/`, `infra/`, `docs/cleanstart-cms-architecture.html`, or shared config. Touching CMS code on `farheen` is a hard rule violation. |
+| `farheen` | Farheen's primary device | Web-only contributions, **scoped to the page being worked on**. | **`apps/web/` ONLY** — no edits to `apps/cms/`, `packages/`, `migrations/`, `infra/`, `docs/architecture/cleanstart-cms-architecture.html`, or shared config. Touching CMS code on `farheen` is a hard rule violation. |
 
 ### No other long-lived branches
 
@@ -47,7 +47,7 @@ Every commit on `farheen` must be **scoped to the page or feature being worked o
 - **Working on `/for-developers`?** Only touch `apps/web/src/app/for-developers/`, `apps/web/src/components/sections/for-developers/`, and `apps/web/public/images/for-developers/`. Do not edit `/community`, `/sbom`, `/teams`, etc., nor `globals.css`, `nav-config.ts`, layout primitives, or `tsconfig`/`eslint`/`prettier`/`biome` config.
 - **Adding a new page?** New route under `apps/web/src/app/<page>/`, new sections under `apps/web/src/components/sections/<page>/`, new assets under `apps/web/public/images/<page>/`. The only allowed cross-page edits are:
   - One line in `apps/web/src/lib/nav-config.ts` to add the nav entry.
-  - One row in `docs/WEB-PAGES.md` for the page inventory.
+  - One row in `docs/web/WEB-PAGES.md` for the page inventory.
 - **Typography comes from the global config — NOT from Figma.** For any new or existing page, **ignore Figma's font sizes, font family, font weights, letter-spacing, and line-heights**. The canonical typography spec is **[`apps/web/docs/TYPOGRAPHY-SYSTEM.md`](apps/web/docs/TYPOGRAPHY-SYSTEM.md)** (v2/v4, 2026-05-27). Consume the role tokens defined there:
   - Hero H1 (marketing/product) → `var(--fs-display)` (36 → 64 px).
   - Listing / detail / legal H1 → `var(--fs-h1)` (32 → 56 px).
@@ -65,7 +65,7 @@ Every commit on `farheen` must be **scoped to the page or feature being worked o
   Inline `text-[clamp(...)]`, `text-[Xpx]`, `fontSize: "Xpx"`, or any other ad-hoc type sizing is forbidden. **Legacy `--text-hero-*` / `--text-display-*` / `--text-card-title-*` / `--text-body-*` / `--text-t-*` tokens are aliased to the new `--fs-*` family** in `globals.css` for backward compatibility but should not be used in new code. If a role token doesn't exist for what Figma shows, **stop and ask** — adding a new token is a shared change that goes through `development`, not `farheen`.
 - **No bulk formatter sweeps.** Prettier/Biome reflows that touch dozens of unrelated files are forbidden. If formatter config changes, raise it for discussion before applying — never bundle a formatter pass with feature work.
 - **No "while I'm here" cleanups.** Renaming a shared variable, tweaking a layout primitive, or "fixing" an unrelated page in the same commit is out of scope.
-- **Shared files that ARE allowed to change** when justified by the in-scope work: `apps/web/src/lib/nav-config.ts` (nav entry only) and `docs/WEB-PAGES.md` (inventory row only). Anything else is out of scope.
+- **Shared files that ARE allowed to change** when justified by the in-scope work: `apps/web/src/lib/nav-config.ts` (nav entry only) and `docs/web/WEB-PAGES.md` (inventory row only). Anything else is out of scope.
 
 If a page genuinely needs a shared change (e.g. a new design token, a new layout primitive, a CSP allow-list entry), pause and coordinate — that work lands separately on `development` first, then `farheen` rebases.
 
@@ -105,7 +105,7 @@ cleanstart-website/                  monorepo · pnpm workspaces + Turborepo
 
 **`apps/web`** was re-bootstrapped at commit `ac5a0d0` as a purpose-built Next.js 16.2.5 / React 19 / Tailwind v4 marketing site. It currently has a hero page and Figma Code Connect wired (`figma.config.json`; component stubs live at `src/components/**/*.figma.tsx`). It is **early-stage** — no production deployment yet, no separate CI gate yet. The design/token/routing contracts from the prior wipe are gone; everything in `apps/web` now is built from Figma ground up. When touching `apps/web`, preserve the Code Connect setup: do not delete `figma.config.json` or restructure `src/components/` without understanding the connected Figma component mapping.
 
-**Full page inventory:** `docs/WEB-PAGES.md` — canonical list of all 31 pages, their URL slugs, types (Static / CMS Listing / CMS Detail / Legal / Utility), build status, and recommended build order. Update the status column there whenever a page is completed.
+**Full page inventory:** `docs/web/WEB-PAGES.md` — canonical list of all 31 pages, their URL slugs, types (Static / CMS Listing / CMS Detail / Legal / Utility), build status, and recommended build order. Update the status column there whenever a page is completed.
 
 **`packages/ui`** hosts the custom React primitives (`Drawer`, `Dialog`, `Popover`, `Combobox`, `ConfirmDialog`, `Spinner`, `Tooltip`, `DropdownMenu`, `ContextMenu`, `DateTimePicker`, `Toast`) plus design tokens. Consumed by both `apps/cms` and `apps/web` — no duplication between the two apps.
 
@@ -343,7 +343,7 @@ These resolved the open forks from arch doc §`#decisions`. Build accordingly:
 
 ## Background jobs
 
-Six Payload cron tasks run in `apps/cms/src/payload/jobs/`. All are gated by `PAYLOAD_AUTO_RUN=true` — set this in `.env` to enable; omitting it (e.g. in test runs) prevents spurious fires.
+Seven Payload cron tasks run in `apps/cms/src/payload/jobs/`. All are gated by `PAYLOAD_AUTO_RUN=true` — set this in `.env` to enable; omitting it (e.g. in test runs) prevents spurious fires.
 
 | Job | Schedule (UTC) | File |
 |-----|----------------|------|
@@ -351,6 +351,7 @@ Six Payload cron tasks run in `apps/cms/src/payload/jobs/`. All are gated by `PA
 | Webhook retry | every 5 min | `retry-webhook.ts` |
 | Search-log purge (90-day retention) | daily 03:00 | `purge-search-log.ts` |
 | Leads PII redaction (365-day retention) | daily 03:15 | `purge-leads-pii.ts` |
+| Career-applications purge (resume delete + PII redaction, 365-day) | daily 03:45 | `purge-career-applications.ts` |
 | Broken-links scan | daily 04:30 | `check-broken-links.ts` |
 | Meilisearch reindex (drift check + self-heal) | daily 05:00 | `reindex-meili.ts` |
 
@@ -365,15 +366,16 @@ These channels are wired and active (env-var configured). See `apps/cms/.env.exa
 | Integration | Purpose | Key env vars |
 |---|---|---|
 | Cloudflare R2 | Media storage + lead fallback queue | `R2_BUCKET`, `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_PUBLIC_BASE` |
-| HubSpot | Lead relay (secondary handler) → Forms Submissions API; owns all lead email (follow-up + notifications). Forms keyed by `forms.hubspotFormGuid`. See `docs/forms-hubspot-verification.md`. | `HUBSPOT_PORTAL_ID` (relay), `HUBSPOT_PRIVATE_APP_TOKEN` (GDPR erasure only) |
+| HubSpot | Lead relay (secondary handler) → Forms Submissions API; owns all lead email (follow-up + notifications). Forms keyed by `forms.hubspotFormGuid`. See `docs/integrations/forms-hubspot-verification.md`. | `HUBSPOT_PORTAL_ID` (relay), `HUBSPOT_PRIVATE_APP_TOKEN` (GDPR erasure only) |
 | Microsoft Teams (Workflows) | Publish + lead notifications via Adaptive Cards | `WEBHOOK_TEAMS_URL`, `WEBHOOK_TEAMS_EVENTS` |
 | Standard Webhooks | Generic HMAC-signed outbound webhook | `WEBHOOK_GENERIC_URL`, `WEBHOOK_GENERIC_EVENTS`, `WEBHOOK_GENERIC_SIGNING_SECRET` |
 | Meilisearch | Full-text search + analytics | `MEILISEARCH_URL`, `MEILISEARCH_MASTER_KEY`, `MEILISEARCH_API_KEY` |
 | Cloudflare Turnstile | Bot protection on `/api/leads/submit` | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` |
 | Sentry | Error tracking + PII redaction | `SENTRY_DSN` (+ auth token, org, project) |
 | IndexNow | Bing/Yandex ping on publish (7 collections) | `INDEXNOW_KEY` |
+| Brevo | Careers/partner transactional email — HR notification (with resume attachment) on each job application, plus the partner-form pair (applicant confirmation + internal team notification) on each partner inquiry. Distinct from HubSpot, which owns lead-pipeline email and never receives careers/partner data. | `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `CAREERS_HR_EMAIL`, `PARTNER_USER_TEMPLATE_ID`, `PARTNER_ADMIN_TEMPLATE_ID`, `PARTNERS_NOTIFY_EMAIL` |
 
-**Phase J2 planned:** Zoho CRM (OAuth 2.0 — primary CRM, build first), GA4 Measurement Protocol, Google Search Console. See `docs/INTEGRATIONS-RESEARCH-V2.md` for the full J1/J2/J3 milestone breakdown.
+**Phase J2 planned:** Zoho CRM (OAuth 2.0 — primary CRM, build first), GA4 Measurement Protocol, Google Search Console. See `docs/integrations/INTEGRATIONS-RESEARCH-V2.md` for the full J1/J2/J3 milestone breakdown.
 
 The `Integrations` collection (Phase J1) provides editor self-serve config for channels that don't require env-var changes (Teams channels, generic webhooks). The env-var channels above remain env-var-only until a J2 row migrates them.
 
@@ -390,7 +392,7 @@ The `Integrations` collection (Phase J1) provides editor self-serve config for c
 
 ## Deploy rules
 
-- `apps/cms` deploys via **GitHub Actions** (`.github/workflows/deploy-cms.yml`) on push to `main` (production). The workflow builds the Docker image, ships it to the droplet over SSH, and runs `docker compose up -d --wait`. Caddy on the droplet handles TLS termination. Staging tracks `development` on a separate droplet at `cms-dev.cleanstart.com`.
+- `apps/cms` deploys via **GitHub Actions** (`.github/workflows/deploy-cms.yml`) on push to `main` (production). The workflow builds the Docker image, ships it to the droplet over SSH, and runs `docker compose up -d --wait`. Caddy on the droplet handles TLS termination. There is a **single CMS droplet** (`cleanstart-cms`, served at `cms.cleanstart.com`) — it is the staging server today and will become production later. There is no separate staging machine.
 - `apps/web` has no production deployment yet.
 - Postgres lives on the same droplet, localhost-bound. Migrations run via Payload's migration runner, never raw SQL.
 - Cloudflare WAF sits in front of `cms.cleanstart.com`. Admin access is password-only at v1 — 2FA enrollment is deferred to a later hardening phase (see `docs/BACKLOG.md` A9, and the TOTP backend reserved in `apps/cms/src/payload/admin/components/auth/`). Once the TOTP backend lands, 2FA becomes mandatory for every admin user.
@@ -418,6 +420,59 @@ These are one-shot operations that **must** run against the prod Postgres on the
    - Re-runnable. Already-clean docs are skipped via `needsListMerge`.
    - After the run, spot-check one blog and one guide on the live site — bullet lists should render as a single `<ul>`, not one `<ul>` per bullet.
 
+2. **Job `experienceRange` backfill.** The Webflow→Payload import bucketed the free-text `experience` year range into the `experienceLevel` enum and dropped the original string, so the careers site showed "Mid experience" instead of "3-10 Years". `apps/cms/scripts/backfill-job-experience-range.ts` restores `jobs.experienceRange` from `migrations/webflow-export/raw/jobs.jsonl` (matched by slug). The import transform now preserves it going forward; this one-shot covers jobs already in prod.
+   - From inside the `cms` container: `pnpm exec tsx --env-file=.env scripts/backfill-job-experience-range.ts`
+   - Re-runnable / idempotent (skips rows whose range already matches). Note: `payload.update` re-fires the jobs afterChange hooks (search sync, IndexNow, webhooks) and creates a version row per job — run in a quiet window.
+   - After the run, spot-check the careers list on the live site — experience should read e.g. "3-10 Years", not "Mid experience".
+
+3. **Job `department` backfill.** The Webflow import read department from a non-existent `department` field — the value actually lives in `job-summary` ("Sales", "Engineering", "Human Resource", …) — so every prod job has a null department: no department pill on the careers card and an empty POSITION filter. `apps/cms/scripts/backfill-job-department.ts` restores `jobs.department` (mapped to the enum via `normalizeDepartment`, matched by slug). The import transform now reads the right field going forward.
+   - From inside the `cms` container: `pnpm exec tsx --env-file=.env scripts/backfill-job-department.ts`
+   - Re-runnable / idempotent. Same afterChange-hook / version-row caveat as above — run in a quiet window. Watch the log for "unmapped" warnings (a new Webflow department value that needs a `DEPARTMENT_MAP` entry).
+   - After the run, spot-check the careers list — each job should show its department pill and the POSITION filter should list the departments.
+
+4. **Job `hiringStatus` (open/closed) backfill.** Webflow has no open/closed field — a role's status is its draft state (`_meta.isDraft`/`isArchived`: draft = closed, live = open). The local/prod jobs were populated without that, so every job is `open`. `apps/cms/scripts/backfill-job-hiring-status.ts` restores it from the export by slug, **keeping every job published** (closed roles stay visible under the careers "Closed roles" filter — the decision was to show them, not hide them). Does not touch `_status`. The import transform already publishes jobs with the correct `hiringStatus` going forward.
+   - From inside the `cms` container: `pnpm exec tsx --env-file=.env scripts/backfill-job-hiring-status.ts`
+   - Re-runnable / idempotent. Closing a role stamps `closedAt = now` (the real Webflow close date isn't in the export). Same afterChange-hook / version-row caveat — run in a quiet window.
+   - After the run, spot-check the careers list — the STATUS filter (Open / Closed / All roles) should partition correctly, with OPEN/CLOSED badges per card.
+
+5. **Guide inline-FAQ strip.** The Webflow import stored guide FAQs twice — in the structured `faqs` field AND inline in the body rich-text (an "FAQs" heading + Q&A) — so the detail page rendered them as both an accordion and a stray heading/list, and the auto `tableOfContents` / word count included the FAQ text. `apps/cms/scripts/strip-guide-inline-faqs.ts` removes the inline copy from `body` and recomputes `tableOfContents`/`readingMinutes`/`wordCount`. The import transform (`migrations/webflow-import/transform/guides.ts`) now strips it going forward; this one-shot covers guides already in prod. Strip logic + tests: `apps/cms/src/payload/lib/webflow-import/strip-faqs.ts`.
+   - Writes via `payload.update` (not the raw db adapter) so the relational `tableOfContents` sub-table is handled and `bodyStatsHook` recomputes the derived fields. The Teams (`webhooks-publish`) and IndexNow hooks are **transition-gated** — a re-save of an already-published guide does not fire them — so the only afterChange effects are a Meilisearch re-sync (desired) and a version row per guide. **Run in a quiet window**, same caveat as tasks 2–4.
+   - From inside the `cms` container: `pnpm exec tsx --env-file=.env scripts/strip-guide-inline-faqs.ts --dry-run` then `… ` (no flag).
+   - Re-runnable / idempotent. Only strips guides whose structured `faqs` field is populated (so the Q&A are never lost) and that still have an inline FAQ heading; also recomputes the TOC for any guide whose stored `tableOfContents` is empty while its body has headings (self-heals a half-applied run). Local-dev blast radius: 52 scanned, 47 stripped, 3 skipped(no-faqs), 2 skipped(clean).
+   - After the run, spot-check a guide — FAQs should appear once (the accordion only), and "FAQs" should be gone from the CONTENTS sidebar.
+
+6. **Legal documents seed.** The `legalDocuments` collection (the public `/legal/*` pages — Third-Party Terms, DPA, Limited Use Agreement, Policies & Commitments, Pre-GA Terms, Trademark Usage Policy, Vulnerability Disclosure Policies, Acceptable Use Policy) is populated from `apps/cms/scripts/data/legal-seed.ts` (the 8 launch documents) via `apps/cms/scripts/seed-legal.ts`, which converts each HTML body to Lexical with `htmlToLexical`. The collection's tables are created by the `20260605_094837_add_legal_documents` migration (runs via CI on deploy to `main`), so run the seed **after** the migration on first go-live. Distinct from the GDPR `Legal` *global* (`globals/legal.ts`, slug `legal`, `policyVersion`) — different thing, leave it alone.
+   - **Skip-safe by default:** a document whose `slug` already exists is skipped, so a re-run never overwrites content editors have since customized in the admin. Pass `--force` to overwrite existing docs with the seed content (intentional refresh only); `--dry-run` to preview the plan without writing.
+   - First run publishes 8 docs → IndexNow pings the 8 `/legal/<slug>` URLs and Meilisearch indexes them (both desired); the Teams publish webhook (`webhooks-publish`) fires once per doc (8 notifications) and a version row is created per doc. **Run in a quiet window.**
+   - From inside the `cms` container: `pnpm exec tsx --env-file=.env scripts/seed-legal.ts --dry-run` then `pnpm exec tsx --env-file=.env scripts/seed-legal.ts` (no flag).
+   - After the run, spot-check the live site: `/legal` redirects to `/legal/additional-third-party-terms`, the left sidebar lists all 8 documents (each with its icon), every document renders its body and an "Effective" date, and switching documents is inline (no full page reload). Going forward, editors manage this content in the CMS admin (Content → Legal Documents) — the seed is initial population only.
+
+7. **Guide inline-CTA card backfill.** The Webflow import flattened inline CTA boxes (`<div class="artcileCtaBox"><h3>prompt <a>label</a></h3></div>`) to plain headings, so the web detail page rendered them as stray headings instead of cards. The new `inlineCta` Lexical block (registered in `editor-config.ts`, inserted via the slash menu, rendered by `apps/web/.../article/InlineCtaCard.tsx`) restores them. `apps/cms/scripts/migrate-guide-cta-cards.ts` converts the existing flattened CTAs in prod guide bodies into `inlineCta` blocks. Detection + conversion logic and tests: `apps/cms/src/payload/lib/webflow-import/cta-cards.ts`. The import transform (`html-to-lexical.ts`) now emits the block for `.artcileCtaBox` going forward; this one-shot covers guides already in prod. (Local-dev blast radius: 52 scanned, 45 cards converted across 27 guides, 18 deferred, 1 skipped.)
+   - **Default converts only clean "prompt? + button" CTAs** (the link is the trailing element). CTAs whose link sits mid-sentence are deferred and logged for manual handling — pass `--include-mid-sentence` to convert those too (reworded heading text; give each a glance in the admin afterwards). Link-only headings (no prompt) are skipped.
+   - Writes via `payload.update` so the richText block validation runs and `bodyStatsHook` recomputes TOC/word count (converted headings correctly drop out of the table-of-contents — a CTA card is not a section). The Teams (`webhooks-publish`) and IndexNow hooks are transition-gated, so a re-save of an already-published guide does NOT fire them; the only afterChange effects are a Meilisearch re-sync and a version row per guide. **Run in a quiet window**, same as tasks 1–6.
+   - Re-runnable / idempotent (a converted block is no longer a heading, so a second pass is a no-op).
+   - From inside the `cms` container: `pnpm exec tsx --env-file=.env scripts/migrate-guide-cta-cards.ts --dry-run` then `pnpm exec tsx --env-file=.env scripts/migrate-guide-cta-cards.ts` (no flag).
+   - After the run, spot-check a guide (e.g. `/guide/nist-800-53-kubernetes-control-mapping`) — the inline CTA should render as a tinted card with a button, and its prompt should no longer appear in the CONTENTS sidebar.
+
+8. **Event `country` backfill.** The new `country` select field on the `events` collection powers the country filter on the `/events` listing page, but events imported from Webflow only have a free-text `venue` — so existing rows have a null `country`. `apps/cms/scripts/backfill-event-country.ts` maps each event's `venue` to a country enum value (`india` / `united-states` / `uae` / `thailand`) via a substring table and sets `country`. The column is created by the `20260608_121245_add_event_country` migration (runs via CI on deploy to `main`), so run this **after** the migration on go-live.
+   - Idempotent / re-runnable (only writes when the mapped country differs from what's stored). `--dry-run` previews. Venues that match no rule are logged, never guessed — add a `COUNTRY_RULES` entry + an Events collection enum option if a new country appears.
+   - Writes via `payload.update`, which re-fires the events afterChange hooks. The Teams (`webhooks-publish`) and IndexNow hooks are publish-transition-gated, so a re-save of an already-published event does NOT fire them; the only afterChange effects are a Meilisearch re-sync and a version row per event. **Run in a quiet window.**
+   - From inside the `cms` container: `pnpm exec tsx --env-file=.env scripts/backfill-event-country.ts --dry-run` then `pnpm exec tsx --env-file=.env scripts/backfill-event-country.ts` (no flag). Local-dev blast radius: 21 scanned, 21 updated, 0 unmapped.
+   - After the run, spot-check `/events` — the COUNTRY filter should partition the past-events grid (e.g. `?country=united-states` shows only the US events).
+
+9. **News `region` placeholder backfill.** The new `region` select on the `news` collection powers the region filter on the `/news` listing page. News has no `location`/region data to derive from, so `apps/cms/scripts/backfill-news-region.ts` assigns **PLACEHOLDER** regions round-robin across the enum (`asia-pacific`/`europe-middle-east`/`usa-north-america`) so the filter is functional. The column is created by the `20260608_140513_add_news_region` migration (runs via CI on deploy to `main`); run this after the migration.
+   - ⚠ **Placeholder data — not accurate.** Replace per-item in the CMS admin once real regions are known. The script only fills rows whose `region` is null, so it never clobbers a real value set later (re-run-safe).
+   - Same afterChange-hook caveat as tasks 1–8 (Teams/IndexNow are publish-transition-gated and won't fire on re-save of a published item; Meilisearch re-syncs + a version row per item). **Run in a quiet window.**
+   - From inside the `cms` container: `pnpm exec tsx --env-file=.env scripts/backfill-news-region.ts --dry-run` then `pnpm exec tsx --env-file=.env scripts/backfill-news-region.ts` (no flag). Local-dev blast radius: 33 scanned, 33 filled (placeholder).
+   - After the run, spot-check `/news` — the REGION filter should partition the grid (e.g. `?region=emea`).
+
+10. **Knowledge Hub seed (Academy import).** Populates the `knowledgeBase` + `knowledgeCategories` collections from the committed manifest `apps/cms/scripts/data/academy-kb.json` (245 Academy articles) plus the 8 legacy articles. `apps/cms/scripts/seed-knowledge-base.ts` creates **50 categories** (4 legacy groups pinned via `displayOrder` 0–3; 8 de-numbered sections 10–80; 38 subcategories) and **253 published articles**, converting each HTML body to Lexical (tables → table nodes, code → `codeBlock` blocks). The `display_order` column is created by the `20260608_144837_add_kb_category_display_order` migration (runs via CI on deploy to `main`); run the seed **after** the migration. The web `/knowledge-hub` reads from these collections.
+   - **Skip-safe by default** (a doc whose `slug` already exists is skipped, so editor edits are never clobbered); `--force` overwrites; `--dry-run` previews. Re-runnable / idempotent.
+   - Publishing 253 docs fires the search-sync / Teams (`webhooks-publish`) / IndexNow afterChange hooks **per doc** (these are first-publish, so they DO fire — not transition-gated re-saves). Expect a Meilisearch index of all 253 (desired), an IndexNow ping per `/knowledge-hub/<slug>` URL, and a Teams publish notification per doc, plus a version row per doc. **Run in a quiet window** (consider temporarily unsetting `WEBHOOK_TEAMS_URL` to avoid 253 channel notifications).
+   - From inside the `cms` container: `pnpm exec tsx --env-file=.env scripts/seed-knowledge-base.ts --dry-run` then `pnpm exec tsx --env-file=.env scripts/seed-knowledge-base.ts` (no flag). Local-dev blast radius: 50 categories + 253 articles, 2 slug collisions auto-prefixed (`secure-vendor-risk-assessment`, `secure-vex-documents`).
+   - After the run, spot-check `/knowledge-hub` — the sidebar should show the 4 legacy groups on top, then the 8 sections (Understand…Reference) each expanding to subcategories → articles; an article with tables/code (e.g. `/knowledge-hub/dev-vs-prod-images`) should render styled tables and monospace code blocks.
+   - **Lesson videos:** after the seed (and the `20260608_153417_add_kb_video_url` migration), run `pnpm exec tsx --env-file=.env scripts/backfill-knowledge-video.ts` to set `videoUrl` on the 24 Understand articles that have a lesson MP4 (the seed sets it on a fresh import; the backfill covers rows seeded before the field existed). Videos are hotlinked from the public bucket `storage.googleapis.com/cleanstart-academy-videos/<path>.mp4` (allow-listed in web CSP `media-src`). `scripts/data/kb-videos.ts` is the authoritative listing — if the Academy publishes more videos (sections 02–08 currently have none), re-list the bucket and extend it. Spot-check `/knowledge-hub/images-and-containers` — a "Watch the Lesson" player should appear above the body.
+
 (Add new one-shot production tasks under this list as they come up — Phase H imports, Meilisearch initial index, etc.)
 
 ---
@@ -429,8 +484,8 @@ These are one-shot operations that **must** run against the prod Postgres on the
 - **Editor workflow question?** Arch doc §`#authoring`, §`#publishing-checklist`, §`#preview-workflow`.
 - **Ops/security question?** Arch doc §`#security-headers`, §`#rate-limiting`, §`#privacy-gdpr`.
 - **Migration question?** Arch doc §`#migration` (and the seven subsections under it).
-- **Integration question?** Read `docs/INTEGRATIONS-RESEARCH.md` (Teams/webhook deep-dive, Standard Webhooks signing) and `docs/INTEGRATIONS-RESEARCH-V2.md` (analytics read-back, inbound webhooks, J1/J2/J3 milestones).
+- **Integration question?** Read `docs/integrations/INTEGRATIONS-RESEARCH.md` (Teams/webhook deep-dive, Standard Webhooks signing) and `docs/integrations/INTEGRATIONS-RESEARCH-V2.md` (analytics read-back, inbound webhooks, J1/J2/J3 milestones).
 - **Background job question?** Arch doc §`#cron-jobs` + the job file and its co-located test.
-- **Which apps/web page to build next, or what slug/category a page uses?** `docs/WEB-PAGES.md`.
-- **`apps/web` production question?** (deploy strategy, security headers, CSP, SEO, sitemap, JSON-LD, AI bots, cookie consent, DNS, rollback) → **`docs/WEB-PRODUCTION.md`** (canonical for everything web-prod). The HTML arch doc remains canonical for CMS prod only.
+- **Which apps/web page to build next, or what slug/category a page uses?** `docs/web/WEB-PAGES.md`.
+- **`apps/web` production question?** (deploy strategy, security headers, CSP, SEO, sitemap, JSON-LD, AI bots, cookie consent, DNS, rollback) → **`docs/web/WEB-PRODUCTION.md`** (canonical for everything web-prod). The HTML arch doc remains canonical for CMS prod only.
 - **Decision not in arch doc and not in this file?** Stop and ask. Don't invent.

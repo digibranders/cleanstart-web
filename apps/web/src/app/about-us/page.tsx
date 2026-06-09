@@ -12,9 +12,10 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "About Us",
+  title: "About CleanStart | Building Trusted Software Foundations",
+  absoluteTitle: true,
   description:
-    "CleanStart builds trusted software delivery by integrating security, compliance, and provenance into every build.",
+    "Learn how CleanStart is building the foundation for trusted software delivery, integrating security, compliance, and provenance into every build from source to production.",
   path: "/about-us",
 });
 
@@ -32,7 +33,7 @@ export default function AboutPage() {
       <main>
         {/* overflow stays visible below lg so the mobile cube in AboutHero can
             break out and overlap into AboutWhoWeAre. */}
-        <div className="bg-cs-hero bg-cs-grid relative overflow-visible lg:overflow-hidden">
+        <div className="bg-cs-hero relative overflow-visible lg:overflow-hidden">
           <div className="relative">
             <AboutHero />
           </div>

@@ -238,7 +238,7 @@ function DesktopVsBadge(): React.ReactElement {
       }}
     >
       <Image
-        src="/images/ciso/comp-vs-badge.png"
+        src="/images/ciso/comp-vs-badge.webp"
         alt=""
         width={252}
         height={252}

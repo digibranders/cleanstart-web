@@ -19,6 +19,9 @@
           "value": "lead_exported"
         },
         {
+          "value": "partner_exported"
+        },
+        {
           "value": "dsar_export"
         },
         {

@@ -41,7 +41,7 @@ export function BlogsHero({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/blogs/hero-glow-left.png"
+          src="/images/blogs/hero-glow-left.webp"
           alt=""
           loading="lazy"
           decoding="async"
@@ -52,7 +52,7 @@ export function BlogsHero({
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pb-[clamp(56px,7vw,96px)]">
         <div
           className="flex flex-col items-center gap-10 mx-auto"
-          style={{ paddingTop: "clamp(72px, 9vw, 122px)", maxWidth: "864px" }}
+          style={{ paddingTop: "calc(clamp(72px, 9vw, 122px) + var(--cs-header-extra))", maxWidth: "864px" }}
         >
           <div
             className="flex flex-col items-center gap-10 w-full mx-auto"

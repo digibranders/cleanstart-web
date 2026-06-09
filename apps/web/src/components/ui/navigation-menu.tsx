@@ -95,10 +95,11 @@ function NavigationMenuContent({
 function NavigationMenuPositioner({
   className,
   side = "bottom",
-  // Panel attaches flush to the bottom edge of the 72px navbar: the trigger is
-  // centred in the bar, sitting 18px above its bottom, so an 18px offset lands
-  // the panel top on the bar edge with no visible gap (Stripe/Vercel feel).
-  sideOffset = 18,
+  // Panel attaches flush to the bottom edge of the desktop navbar (60px tall,
+  // since the utility strip sits above it): the ~36px trigger is centred, so it
+  // sits ~12px above the bar's bottom — a 12px offset lands the panel top on the
+  // bar edge with no visible gap (Stripe/Vercel feel).
+  sideOffset = 12,
   align = "start",
   alignOffset = 0,
   // Keep every panel inside the site's content frame: 40px matches the header's

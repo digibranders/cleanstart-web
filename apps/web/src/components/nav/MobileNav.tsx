@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 
-import { MenuIcon } from "lucide-react";
+import { MenuIcon, GraduationCap } from "lucide-react";
 import { Logo } from "@/components/icons/Logo";
 import {
   Sheet,
@@ -21,14 +21,7 @@ import {
 import { NAV_TREE } from "@/lib/nav-config";
 import { NavIcon } from "@/components/nav/icons/NavIcon";
 
-const MOBILE_CTA: Record<string, { headline: string; ctaLabel: string; ctaHref: string } | undefined> = {
-  Products: { headline: "Try CleanStart", ctaLabel: "Browse Images", ctaHref: "/cleanstart-images" },
-  Solutions: { headline: "Map your compliance", ctaLabel: "Talk to SE", ctaHref: "/book-a-demo?intent=se" },
-  Resources: { headline: "Get the Bulletin", ctaLabel: "Subscribe", ctaHref: "/subscribe" },
-  Company: { headline: "We're hiring", ctaLabel: "See Careers", ctaHref: "/careers" },
-};
-
-export function MobileNav({ openRolesCount = 0 }: { openRolesCount?: number }) {
+export function MobileNav() {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
 
@@ -44,9 +37,6 @@ export function MobileNav({ openRolesCount = 0 }: { openRolesCount?: number }) {
         side="right"
         className="w-[88vw] max-w-[360px] sm:max-w-[360px] !border-l-white/8 flex flex-col gap-0 p-0"
       >
-        <div className="flex justify-center pt-2" aria-hidden>
-          <div className="h-1 w-10 rounded-full bg-white/15" />
-        </div>
         <SheetTitle className="sr-only">CleanStart navigation</SheetTitle>
         <SheetDescription className="sr-only">
           Browse CleanStart products, solutions, resources, and company links.
@@ -119,29 +109,6 @@ export function MobileNav({ openRolesCount = 0 }: { openRolesCount?: number }) {
                         )
                       )}
                     </ul>
-                    {MOBILE_CTA[item.label] && (
-                      <Link
-                        href={MOBILE_CTA[item.label]!.ctaHref}
-                        onClick={close}
-                        className="mx-3 mb-3 mt-2 flex items-center justify-between rounded-[10px] border border-white/[0.06] bg-white/[0.03] px-3 py-2.5 no-underline"
-                      >
-                        <span className="text-xs font-semibold text-white">
-                          {item.label === "Company" && openRolesCount > 0
-                            ? `${openRolesCount} open roles`
-                            : MOBILE_CTA[item.label]!.headline}
-                        </span>
-                        <span
-                          className="cs-btn-glass inline-flex items-center justify-center"
-                          style={{
-                            ["--cs-btn-h" as string]: "30px",
-                            ["--cs-btn-px" as string]: "12px",
-                            ["--cs-btn-fs" as string]: "11px",
-                          }}
-                        >
-                          {MOBILE_CTA[item.label]!.ctaLabel}
-                        </span>
-                      </Link>
-                    )}
                   </AccordionContent>
                 </AccordionItem>
               );
@@ -149,7 +116,31 @@ export function MobileNav({ openRolesCount = 0 }: { openRolesCount?: number }) {
           </Accordion>
         </div>
 
-        <div className="border-t border-white/8 p-4">
+        <div className="flex flex-col gap-3 border-t border-white/8 p-4">
+          <div className="flex items-center gap-2">
+            <Link
+              href="https://academy.cleanstart.com"
+              target="_blank"
+              rel="noreferrer"
+              onClick={close}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-[10px] border py-2.5 text-sm font-semibold transition-colors"
+              style={{
+                color: "#59c5ed",
+                borderColor: "rgba(89,197,237,0.35)",
+                backgroundColor: "rgba(89,197,237,0.08)",
+              }}
+            >
+              <GraduationCap className="size-4 shrink-0" aria-hidden />
+              CleanStart Academy
+            </Link>
+            <Link
+              href="/contact-us"
+              onClick={close}
+              className="flex flex-1 items-center justify-center rounded-[10px] border border-white/15 bg-white/[0.04] py-2.5 text-sm font-medium text-white/85 transition-colors hover:bg-white/[0.08] hover:text-white"
+            >
+              Contact Us
+            </Link>
+          </div>
           <Link
             href="/book-a-demo"
             onClick={close}

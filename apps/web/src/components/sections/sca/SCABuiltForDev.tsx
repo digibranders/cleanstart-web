@@ -127,7 +127,7 @@ export function SCABuiltForDev(): React.ReactElement {
             }}
           >
             <Image
-              src="/images/sca/workflows-hero.png"
+              src="/images/sca/workflows-hero.webp"
               alt="CleanStart integrated into modern development workflows"
               fill
               sizes="(min-width: 1280px) 712px, (min-width: 768px) 60vw, 100vw"
