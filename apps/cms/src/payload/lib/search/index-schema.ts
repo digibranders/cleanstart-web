@@ -174,7 +174,10 @@ interface IndexableDoc {
 const onlyResolvedNamed = (
   list: readonly (AuthorLite | CategoryLite | number | null | undefined)[] | null | undefined,
 ): string[] => {
-  if (!list) return [];
+  // Payload returns an array for `hasMany` relationships, but a non-iterable
+  // shape can slip through (a single related object, or a partially-resolved
+  // value); guard with Array.isArray so indexing never throws on one doc.
+  if (!Array.isArray(list)) return [];
   const out: string[] = [];
   for (const entry of list) {
     if (entry == null || typeof entry === 'number') continue;

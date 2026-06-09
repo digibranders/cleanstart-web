@@ -141,8 +141,13 @@ export const createSearchClient = (config: SearchClientConfig): SearchClient => 
         'DELETE',
         `/indexes/${encodeURIComponent(indexUid)}/documents/${encodeURIComponent(id)}`,
       ),
-    updateSettings: (indexUid, settings) =>
-      request('PATCH', `/indexes/${encodeURIComponent(indexUid)}/settings`, settings),
+    updateSettings: (indexUid, settings) => {
+      // `primaryKey` is an index-creation property, not a settings field —
+      // Meilisearch's PATCH /settings rejects it (400 "Unknown field
+      // `primaryKey`") and drops the whole update, so strip it here.
+      const { primaryKey: _primaryKey, ...body } = settings;
+      return request('PATCH', `/indexes/${encodeURIComponent(indexUid)}/settings`, body);
+    },
     getStats: async (indexUid): Promise<IndexStats | null> => {
       try {
         const res = await f(`${baseUrl}/indexes/${encodeURIComponent(indexUid)}/stats`, {

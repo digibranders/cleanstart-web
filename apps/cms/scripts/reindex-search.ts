@@ -21,6 +21,7 @@ import {
   searchClientConfigFromEnv,
 } from '../src/payload/lib/search/client.ts';
 import {
+  INDEX_SETTINGS,
   INDEX_UID,
   SEARCH_INDEXED_COLLECTIONS,
   buildSearchDocument,
@@ -37,6 +38,12 @@ const run = async (): Promise<void> => {
     payload.logger.error('Meilisearch client not configured (MEILISEARCH_URL / keys); aborting.');
     process.exit(1);
   }
+
+  // Ensure the index is configured (searchable + filterable + ranking) before
+  // pushing documents — a fresh Meili instance has no filterable attributes,
+  // so the public /api/search endpoint's `isPublished`/`collection` filter
+  // would error until these are applied. Idempotent.
+  await client.updateSettings(INDEX_UID, INDEX_SETTINGS);
 
   let baseUrl: string;
   try {
