@@ -83,7 +83,7 @@ describe('searchSyncAfterDeleteHook', () => {
       id: 99,
       req: makeReq(),
     } as unknown as Parameters<ReturnType<typeof searchSyncAfterDeleteHook>>[0]);
-    expect(client.deleteDocument).toHaveBeenCalledWith('content', 'blogs:99');
+    expect(client.deleteDocument).toHaveBeenCalledWith('content', 'blogs_99');
   });
 
   it('swallows thrown errors', async () => {

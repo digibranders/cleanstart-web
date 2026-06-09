@@ -97,7 +97,7 @@ describe('buildSearchDocument', () => {
       categories: [{ slug: 'sec', name: 'Container security' }],
     });
     expect(doc).toMatchObject({
-      id: 'blogs:42',
+      id: 'blogs_42',
       collection: 'blogs',
       title: 'My Post',
       description: 'A short lede.',
@@ -197,9 +197,9 @@ describe('buildSearchDocument', () => {
 });
 
 describe('buildSearchDocumentId', () => {
-  it('composes <collection>:<id>', () => {
-    expect(buildSearchDocumentId('blogs', 42)).toBe('blogs:42');
-    expect(buildSearchDocumentId('pages', 'home')).toBe('pages:home');
+  it('composes <collection>_<id>', () => {
+    expect(buildSearchDocumentId('blogs', 42)).toBe('blogs_42');
+    expect(buildSearchDocumentId('pages', 'home')).toBe('pages_home');
   });
 });
 

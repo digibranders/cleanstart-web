@@ -70,7 +70,7 @@ describe('syncDocument', () => {
     expect(result).toEqual({ skipped: false });
     expect(client.upsertDocuments).toHaveBeenCalledWith(
       'content',
-      expect.arrayContaining([expect.objectContaining({ id: 'blogs:42', collection: 'blogs' })]),
+      expect.arrayContaining([expect.objectContaining({ id: 'blogs_42', collection: 'blogs' })]),
     );
   });
 
@@ -86,7 +86,7 @@ describe('syncDocument', () => {
     });
     expect(result).toEqual({ skipped: false });
     expect(client.upsertDocuments).not.toHaveBeenCalled();
-    expect(client.deleteDocument).toHaveBeenCalledWith('content', 'blogs:42');
+    expect(client.deleteDocument).toHaveBeenCalledWith('content', 'blogs_42');
   });
 
   it('drops a noindex doc as well', async () => {
@@ -175,7 +175,7 @@ describe('dropDocument', () => {
     __setSearchClientForTests(client);
     const result = await dropDocument(makePayload(), 'blogs', 42);
     expect(result).toEqual({ skipped: false });
-    expect(client.deleteDocument).toHaveBeenCalledWith('content', 'blogs:42');
+    expect(client.deleteDocument).toHaveBeenCalledWith('content', 'blogs_42');
   });
 
   it('logs a warning when the delete errors', async () => {
