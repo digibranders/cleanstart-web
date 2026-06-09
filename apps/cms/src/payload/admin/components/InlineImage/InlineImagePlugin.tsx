@@ -83,7 +83,7 @@ export const InlineImagePlugin = (): ReactElement => {
   const [editor] = useLexicalComposerContext();
   const { collectionSlug, id, title } = useDocumentInfo();
   const folder = inlineImageFolderForCollection(collectionSlug);
-  const contextHint = buildInlineMediaContextHint(collectionSlug, title, id);
+  const contextHint = buildInlineMediaContextHint(title, id);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   // When non-null the insert dialog runs in "swap" mode: a successful

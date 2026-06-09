@@ -61,6 +61,21 @@ export async function getLegalBySlugDraft(slug: string): Promise<LegalDocDetail 
 }
 
 /**
+ * Slug of the Privacy Policy document. It lives in the `legalDocuments`
+ * collection like every other legal doc, but its canonical public URL is the
+ * standalone `/privacy-policy` (preserved from before the CMS migration — it is
+ * indexed and linked from the footer, cookie banner, and consent forms), not
+ * `/legal/privacy-policy`. The `/legal/privacy-policy` route permanently
+ * redirects to it.
+ */
+export const PRIVACY_POLICY_SLUG = "privacy-policy";
+
+/** Public URL for a legal document by slug (Privacy Policy keeps its own URL). */
+export function legalHref(slug: string): string {
+  return slug === PRIVACY_POLICY_SLUG ? "/privacy-policy" : `/legal/${slug}`;
+}
+
+/**
  * The legally operative date shown publicly as "Effective". Prefers the
  * editor-set `effectiveDate`; falls back to the publish-date chain so the hero
  * still renders a date for any legacy doc that predates the field.

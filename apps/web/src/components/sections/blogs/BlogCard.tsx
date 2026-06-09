@@ -3,6 +3,7 @@ import Link from "next/link";
 import { type Blog, formatBlogDate, mediaUrl } from "@/lib/blog";
 import { effectivePublishedAt } from "@/lib/published-date";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
+import { CardCoverFallback } from "@/components/ui/CardCoverFallback";
 
 interface BlogCardProps {
   post: Blog;
@@ -43,13 +44,7 @@ export function BlogCard({ post }: BlogCardProps): React.ReactElement {
               sizes="(min-width: 1280px) 380px, (min-width: 768px) 45vw, 90vw"
             />
           ) : (
-            <div
-              className="w-full h-full"
-              style={{
-                background:
-                  "linear-gradient(135deg, #1a1a4e 0%, #2d1b9e 50%, #471ec0 100%)",
-              }}
-            />
+            <CardCoverFallback />
           )}
         </div>
 

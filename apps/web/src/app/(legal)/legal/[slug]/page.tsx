@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { LegalDocHeader } from "@/components/sections/legal/LegalDocHeader";
 import { RenderLexical } from "@/lib/renderLexical";
 import {
@@ -7,6 +7,7 @@ import {
   getLegalBySlugDraft,
   getLegalList,
   legalEffectiveDate,
+  PRIVACY_POLICY_SLUG,
 } from "@/lib/legal";
 import { cmsBaseUrl } from "@/lib/cms-fetch";
 import { buildPageMetadata } from "@/lib/seo/canonical";
@@ -22,7 +23,11 @@ interface LegalPageProps {
 
 export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
   const docs = await getLegalList().catch(() => []);
-  return docs.map((d) => ({ slug: d.slug }));
+  // Privacy Policy is served from its own canonical `/privacy-policy` route;
+  // `/legal/privacy-policy` only redirects there, so it is not prerendered here.
+  return docs
+    .filter((d) => d.slug !== PRIVACY_POLICY_SLUG)
+    .map((d) => ({ slug: d.slug }));
 }
 
 export async function generateMetadata({ params }: LegalPageProps): Promise<Metadata> {
@@ -53,6 +58,8 @@ export default async function LegalDocumentPage({
   params,
 }: LegalPageProps): Promise<React.ReactElement> {
   const { slug } = await params;
+  // Privacy Policy keeps its pre-migration canonical URL.
+  if (slug === PRIVACY_POLICY_SLUG) permanentRedirect("/privacy-policy");
   const doc = await getLegalBySlug(slug).catch(() => null);
   if (!doc) notFound();
 

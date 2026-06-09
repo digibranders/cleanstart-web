@@ -78,22 +78,6 @@ const COLLECTION_TO_FOLDER: Record<string, string> = {
 const folderForCollection = (collection: string): string =>
   COLLECTION_TO_FOLDER[collection] ?? 'web/general';
 
-const COLLECTION_SHORT: Record<string, string> = {
-  authors: 'author',
-  blogs: 'blog',
-  news: 'news',
-  guides: 'guide',
-  resources: 'resource',
-  events: 'event',
-  webinars: 'webinar',
-  jobs: 'job',
-  aboutGalleries: 'about',
-  pages: 'page',
-};
-
-const shortCollection = (collection: string): string =>
-  COLLECTION_SHORT[collection] ?? 'general';
-
 const loadContextMap = (): Map<string, AssetContext> => {
   const map = new Map<string, AssetContext>();
   if (!fs.existsSync(CONTEXT_FILE)) {
@@ -118,10 +102,14 @@ const slugSourceForContext = (
   url: string,
 ): string => {
   if (ctx) {
-    return `${shortCollection(ctx.primary.collection)}-${ctx.primary.docSlug}-${ctx.primary.role}`;
+    // No collection prefix: the asset already lands in the
+    // `web/<collection>/` R2 folder (see `folderForCollection`), so a
+    // `blog-`/`news-` stem would only duplicate the path segment.
+    return `${ctx.primary.docSlug}-${ctx.primary.role}`;
   }
   // No context — best effort: use the original Webflow filename so at
-  // least the basename carries some meaning.
+  // least the basename carries some meaning. `buildMediaFilename` strips
+  // Webflow's leading 24-char asset-id prefix from it.
   const basename = path.basename(new URL(url).pathname).replace(/\.[^.]+$/, '');
   return basename || 'webflow-asset';
 };

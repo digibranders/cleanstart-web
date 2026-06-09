@@ -238,8 +238,11 @@ export function CookieBanner() {
           including cookies, to — among other things — view and retain your site
           interactions, improve your experience and help us advertise. Further
           information is available in our{" "}
+          {/* Deep-links to the "Information We Collect Automatically" section.
+              The id is the slugified heading text (RenderLexical derives heading
+              ids this way); keep it in sync if that CMS heading is renamed. */}
           <Link
-            href="/privacy-policy#cookies"
+            href="/privacy-policy#6-information-we-collect-automatically"
             className="font-medium underline underline-offset-2 hover:text-white"
           >
             Privacy&nbsp;Notice

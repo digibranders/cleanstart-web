@@ -1,10 +1,11 @@
-import { Container, Section } from "@/components/layout";
-import { Header } from "@/components/nav/Header";
-import { Footer } from "@/components/sections/Footer";
-import { LegalHero } from "@/components/sections/legal/LegalHero";
-import { LegalSidebar } from "@/components/sections/legal/LegalSidebar";
-import { FadeUp } from "@/components/ui/FadeUp";
-import { getLegalList } from "@/lib/legal";
+import { Container, Section } from '@/components/layout';
+import { Header } from '@/components/nav/Header';
+import { Footer } from '@/components/sections/Footer';
+import { LegalHero } from '@/components/sections/legal/LegalHero';
+import { LegalMobileNav } from '@/components/sections/legal/LegalMobileNav';
+import { LegalSidebar } from '@/components/sections/legal/LegalSidebar';
+import { FadeUp } from '@/components/ui/FadeUp';
+import { getLegalList, legalHref } from '@/lib/legal';
 
 /**
  * Persistent shell for every /legal document. Header, hero, sidebar and footer
@@ -25,7 +26,7 @@ export default async function LegalSectionLayout({
   const docs = await getLegalList().catch(() => []);
   const navItems = docs.map((d) => ({
     label: d.title,
-    href: `/legal/${d.slug}`,
+    href: legalHref(d.slug),
     icon: d.icon,
   }));
 
@@ -35,10 +36,16 @@ export default async function LegalSectionLayout({
       <main>
         <LegalHero title="Legal" />
         <FadeUp>
-          <Section padding="sm" className="bg-white">
-            <Container variant="default">
+          <Section padding="none" className="bg-white pb-section-sm pt-0 sm:pt-section-sm">
+            {/* flow-root establishes a BFC so the mobile nav bar's negative
+                top margin (-mt-7, straddling the hero edge) doesn't collapse
+                up through this container and drag the white section's
+                background over the purple hero — without it the bar reads as
+                sitting below the edge instead of centred on it. */}
+            <Container variant="default" className="flow-root">
+              <LegalMobileNav items={navItems} />
               <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-10 lg:gap-16">
-                <aside>
+                <aside className="hidden lg:block">
                   <LegalSidebar items={navItems} />
                 </aside>
                 <article className="article-body min-w-0">{children}</article>

@@ -1,6 +1,7 @@
 import type { TaskConfig } from 'payload';
 
 import {
+  INDEX_SETTINGS,
   INDEX_UID,
   SEARCH_INDEXED_COLLECTIONS,
   buildSearchDocument,
@@ -65,6 +66,13 @@ export const reindexMeiliTask: TaskConfig<'meiliReindex'> = {
         },
       };
     }
+
+    // --- 0. Ensure index settings (searchable + filterable + ranking). ---
+    // Idempotent and cheap; applied on every run so a fresh or drifted index
+    // always has the filterable attributes (`isPublished`, `collection`) the
+    // public /api/search endpoint relies on — without this the filtered
+    // search errors and returns nothing even when documents are present.
+    await client.updateSettings(INDEX_UID, INDEX_SETTINGS);
 
     // --- 1. Query Meilisearch for current index doc count ---
     const stats = await client.getStats(INDEX_UID);

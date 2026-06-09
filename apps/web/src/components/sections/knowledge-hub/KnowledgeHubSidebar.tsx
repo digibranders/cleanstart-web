@@ -1,6 +1,6 @@
 'use client';
 
-import type { KhArticleLink, KhGroup } from '@/lib/knowledge-hub';
+import { type KhArticleLink, type KhGroup, findActiveLocation } from '@/lib/knowledge-hub-shared';
 import { EASE_SOFT } from '@/lib/motion';
 import { AnimatePresence, LazyMotion, domAnimation, m, useReducedMotion } from 'motion/react';
 import Link from 'next/link';
@@ -14,15 +14,9 @@ export function KnowledgeHubSidebar({ groups }: { groups: KhGroup[] }): React.Re
   const activeSlug = pathname.split('/').filter(Boolean).pop() ?? '';
   const reduceMotion = useReducedMotion();
 
-  const hasSlug = (items: KhArticleLink[]): boolean => items.some((a) => a.slug === activeSlug);
-
-  // Which group / subcategory contains the active article.
-  const activeGroup = groups.find(
-    (g) => hasSlug(g.articles) || g.subcategories.some((s) => hasSlug(s.articles)),
-  );
-  const activeSubKey = activeGroup
-    ? activeGroup.subcategories.find((s) => hasSlug(s.articles))?.slug
-    : undefined;
+  // Which group / subcategory contains the active article (shared with the mobile nav).
+  const { group: activeGroup, sub: activeSub } = findActiveLocation(groups, activeSlug);
+  const activeSubKey = activeSub?.slug;
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(groups.map((g) => [g.slug, g.slug === activeGroup?.slug])),

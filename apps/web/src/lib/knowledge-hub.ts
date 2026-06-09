@@ -1,5 +1,6 @@
 import type { LexicalRoot, TocEntry } from '@/lib/blog';
 import { fetchCMS } from '@/lib/cms-fetch';
+import type { KhArticleLink, KhGroup, KhSubcategory } from './knowledge-hub-shared';
 
 /**
  * Knowledge Hub data layer — fetches the CMS `knowledgeBase` /
@@ -51,24 +52,10 @@ const FALLBACK_ORDER: Record<string, number> = {
 const orderOf = (c: CmsCategory): number =>
   typeof c.displayOrder === 'number' ? c.displayOrder : (FALLBACK_ORDER[c.slug] ?? 999);
 
-export interface KhArticleLink {
-  slug: string;
-  title: string;
-}
-
-export interface KhSubcategory {
-  slug: string;
-  name: string;
-  articles: KhArticleLink[];
-}
-
-/** A top-level sidebar group: a legacy group (articles) or a section (subcategories). */
-export interface KhGroup {
-  slug: string;
-  name: string;
-  subcategories: KhSubcategory[];
-  articles: KhArticleLink[];
-}
+// Client-safe types + helpers live in ./knowledge-hub-shared (no server deps).
+// Re-export the types so existing server-side consumers keep importing them
+// from this module.
+export type { KhArticleLink, KhGroup, KhSubcategory } from './knowledge-hub-shared';
 
 // Ordering: `displayOrder` is primary; `id` (ascending = the order the seed
 // created docs, which mirrors the Academy's authored sequence) is the

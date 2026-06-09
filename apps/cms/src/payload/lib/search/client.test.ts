@@ -129,6 +129,21 @@ describe('createSearchClient', () => {
     expect(calls[0]?.[1]?.body).toBe(JSON.stringify(settings));
   });
 
+  it('updateSettings strips primaryKey (Meili /settings rejects it)', async () => {
+    const fetchMock = vi.fn(async () => new Response(null, { status: 202 }));
+    const client = createSearchClient(
+      baseConfig({ fetch: fetchMock as unknown as typeof fetch }),
+    );
+    await client.updateSettings('content', {
+      primaryKey: 'id',
+      filterableAttributes: ['collection'] as const,
+    });
+    const calls = fetchMock.mock.calls as unknown as Array<[string, RequestInit]>;
+    const body = JSON.parse(String(calls[0]?.[1]?.body));
+    expect(body.primaryKey).toBeUndefined();
+    expect(body.filterableAttributes).toEqual(['collection']);
+  });
+
   it('search returns the parsed body on 2xx, null on failure', async () => {
     const okResponse = new Response(
       JSON.stringify({ hits: [{ id: 'x' }], estimatedTotalHits: 1, processingTimeMs: 3 }),

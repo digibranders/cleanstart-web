@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { type Guide, formatGuideDate, guideMediaUrl } from "@/lib/guides";
 import { effectivePublishedAt } from "@/lib/published-date";
+import { deriveCoverKeyword, guideCoverPath } from "@/lib/guide-cover";
 
 interface GuideCardProps {
   guide: Guide;
@@ -13,6 +14,7 @@ export function GuideCard({ guide }: GuideCardProps): React.ReactElement {
     guide.updatedAt ?? effectivePublishedAt(guide),
   );
   const imageUrl = guideMediaUrl(guide.heroImage?.url);
+  const coverKeyword = deriveCoverKeyword(guide.title);
   // The Webflow import left `abstract` empty on guides; fall back to the SEO
   // description (the same lede text) so the card still shows a summary.
   const lede = guide.abstract ?? guide.seo?.description ?? null;
@@ -39,12 +41,13 @@ export function GuideCard({ guide }: GuideCardProps): React.ReactElement {
             sizes="(min-width: 1280px) 300px, (min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
           />
         ) : (
-          <div
-            className="w-full h-full"
-            style={{
-              background:
-                "linear-gradient(135deg, #1a1a4e 0%, #2d1b9e 50%, #471ec0 100%)",
-            }}
+          <Image
+            src={guideCoverPath(guide.slug, coverKeyword)}
+            alt={`${coverKeyword} — CleanStart Guide`}
+            fill
+            unoptimized
+            className="object-cover"
+            sizes="(min-width: 1280px) 300px, (min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
           />
         )}
       </div>

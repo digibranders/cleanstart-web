@@ -6,6 +6,7 @@ import {
   mediaUrl,
 } from "@/lib/case-studies";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
+import { CardCoverFallback } from "@/components/ui/CardCoverFallback";
 
 interface CaseStudyCardProps {
   caseStudy: CaseStudy;
@@ -69,13 +70,7 @@ export function CaseStudyCard({ caseStudy }: CaseStudyCardProps): React.ReactEle
               sizes="(min-width: 1280px) 380px, (min-width: 768px) 45vw, 90vw"
             />
           ) : (
-            <div
-              className="w-full h-full"
-              style={{
-                background:
-                  "linear-gradient(135deg, #1a1a4e 0%, #2d1b9e 50%, #471ec0 100%)",
-              }}
-            />
+            <CardCoverFallback />
           )}
         </div>
 

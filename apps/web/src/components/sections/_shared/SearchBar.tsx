@@ -83,7 +83,6 @@ export function SearchBar({
   );
 
   const inputWrapperStyle: React.CSSProperties = {
-    height: "44px",
     background: "rgba(255,255,255,0.2)",
     border: "1px solid rgba(237,203,255,0.6)",
     borderRight: "none",
@@ -94,7 +93,7 @@ export function SearchBar({
     <search aria-label={ariaLabel} className="contents w-full">
       <form onSubmit={handleSubmit} className="flex items-center w-full max-w-[674px] mx-auto">
         <div
-          className={`relative overflow-hidden flex-1 min-w-0${
+          className={`relative overflow-hidden flex-1 min-w-0 h-10 sm:h-11${
             inputWidthClassName ? ` ${inputWidthClassName}` : ""
           }`}
           style={inputWrapperStyle}
@@ -113,10 +112,9 @@ export function SearchBar({
         <button
           type="submit"
           aria-label="Search"
-          className="shrink-0 flex items-center justify-center cursor-pointer"
+          className="shrink-0 flex items-center justify-center cursor-pointer h-10 sm:h-11"
           style={{
             width: "52px",
-            height: "44px",
             background: "rgba(255,255,255,0.15)",
             border: "1px solid rgba(237,203,255,0.6)",
             borderLeft: "none",

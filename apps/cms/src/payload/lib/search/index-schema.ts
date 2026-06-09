@@ -174,7 +174,10 @@ interface IndexableDoc {
 const onlyResolvedNamed = (
   list: readonly (AuthorLite | CategoryLite | number | null | undefined)[] | null | undefined,
 ): string[] => {
-  if (!list) return [];
+  // Payload returns an array for `hasMany` relationships, but a non-iterable
+  // shape can slip through (a single related object, or a partially-resolved
+  // value); guard with Array.isArray so indexing never throws on one doc.
+  if (!Array.isArray(list)) return [];
   const out: string[] = [];
   for (const entry of list) {
     if (entry == null || typeof entry === 'number') continue;
@@ -246,7 +249,7 @@ export const buildSearchDocument = (
   const categories = collectCategoryNames(doc);
 
   const out: Record<string, unknown> = {
-    id: `${collection}:${doc.id}`,
+    id: buildSearchDocumentId(collection, doc.id),
     collection,
     collectionWeight: COLLECTION_WEIGHT[collection] ?? 50,
     title,
@@ -269,10 +272,16 @@ export const buildSearchDocument = (
 };
 
 /**
- * The search-document ID format we use throughout the system.
- * Derived from `<collection>:<docId>`.
+ * The search-document ID format we use throughout the system,
+ * `<collection>_<docId>`.
+ *
+ * Meilisearch only accepts document ids composed of `[a-zA-Z0-9_-]` — a
+ * colon makes every `documentAdditionOrUpdate` task fail and silently
+ * leaves the index empty. Collection slugs are alphanumeric (no
+ * underscore), so `_` joins safely and unambiguously. `collection` is
+ * also stored as its own field, so the id is never parsed back.
  */
 export const buildSearchDocumentId = (
   collection: string,
   id: number | string,
-): string => `${collection}:${id}`;
+): string => `${collection}_${id}`;
