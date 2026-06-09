@@ -124,11 +124,6 @@ export function NewsroomFilters({
     [activeYear, setYear],
   );
 
-  const activeCount =
-    (activeCategory ? 1 : 0) +
-    (activeRegion !== undefined ? 1 : 0) +
-    (activeYear !== undefined ? 1 : 0);
-
   const sections = (
     <>
       <FilterSectionLabel>CATEGORY</FilterSectionLabel>
@@ -161,47 +156,14 @@ export function NewsroomFilters({
   return (
     <aside
       aria-label="Filter news"
-      className="w-full lg:w-[299px] rounded-[24px] bg-white lg:p-6 lg:border lg:border-[#E5E7EB] lg:shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
+      className="w-full lg:w-[299px] lg:rounded-[24px] lg:bg-white lg:p-6 lg:border lg:border-[#E5E7EB] lg:shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
     >
-      <details className="lg:hidden group rounded-[24px] border border-[#E5E7EB] bg-white">
-        <summary className="flex items-center justify-between gap-2 px-4 py-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-          <span className="flex items-center gap-2">
-            <FilterIcon />
-            <span
-              className="font-display font-semibold text-body-md"
-              style={{ color: "#0F172A", letterSpacing: "-0.01em" }}
-            >
-              Filter
-            </span>
-            {activeCount > 0 && (
-              <span
-                aria-label={`${activeCount} active filter${activeCount === 1 ? "" : "s"}`}
-                className="flex items-center justify-center rounded-full bg-[#5B33F3] text-white text-body-xs"
-                style={{ width: "20px", height: "20px", fontWeight: 600 }}
-              >
-                {activeCount}
-              </span>
-            )}
-          </span>
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            aria-hidden
-            className="transition-transform group-open:rotate-180"
-          >
-            <path
-              d="M4 6l4 4 4-4"
-              stroke="#0F172A"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </summary>
-        <div className="px-4 pb-4 pt-2">{sections}</div>
-      </details>
+      {/* Mobile: full-bleed horizontal chip strips at the top (career-page style). */}
+      <div className="lg:hidden flex flex-col" style={{ gap: "16px" }}>
+        <MobileChipStrip label="Category" rows={categoryRows} />
+        <MobileChipStrip label="Region" rows={regionRows} />
+        <MobileChipStrip label="Year" rows={yearRows} />
+      </div>
 
       <div className="hidden lg:block">
         <div className="flex items-center gap-2" style={{ marginBottom: "24px" }}>
@@ -288,6 +250,63 @@ function FilterRow({
       </span>
       <Checkbox checked={selected} />
     </button>
+  );
+}
+
+interface ChipRow {
+  key: string;
+  label: string;
+  selected: boolean;
+  onClick: () => void;
+}
+
+function MobileChipStrip({
+  label,
+  rows,
+}: {
+  label: string;
+  rows: ChipRow[];
+}): React.ReactElement {
+  return (
+    <div>
+      <p
+        className="font-sans uppercase px-1"
+        style={{
+          fontSize: "11px",
+          letterSpacing: "0.08em",
+          color: "rgba(17,17,17,0.6)",
+          fontWeight: 500,
+          marginBottom: "8px",
+        }}
+      >
+        {label}
+      </p>
+      {/* Full-bleed to the container's mobile gutter, scrollbar hidden. */}
+      <div className="-mx-6 px-6 sm:-mx-10 sm:px-10 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex items-center gap-2 min-w-max">
+          {rows.map((row) => (
+            <button
+              key={row.key}
+              type="button"
+              onClick={row.onClick}
+              aria-pressed={row.selected}
+              className="block whitespace-nowrap font-sans shrink-0 cursor-pointer transition-colors"
+              style={{
+                fontSize: "var(--fs-body-sm)",
+                fontWeight: 500,
+                padding: "8px 14px",
+                borderRadius: "999px",
+                border: `1px solid ${row.selected ? "#4a3bf1" : "rgba(17,17,17,0.12)"}`,
+                color: row.selected ? "#4a3bf1" : "rgba(17,17,17,0.78)",
+                background: row.selected ? "rgba(74,59,241,0.08)" : "white",
+              }}
+            >
+              {row.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
