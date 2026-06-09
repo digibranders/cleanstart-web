@@ -1,4 +1,4 @@
-import { SearchTriggerBar } from '@/components/search/SearchTriggerBar';
+import { SearchAutocomplete } from '@/components/search/SearchAutocomplete';
 import { HeroReveal } from '@/components/ui/Reveal';
 
 const HERO_GRADIENT =
@@ -70,7 +70,7 @@ export function KnowledgeHubArticleHero(): React.ReactElement {
             duration={0.8}
             className="mt-7 lg:mt-10 w-full flex justify-center"
           >
-            <SearchTriggerBar
+            <SearchAutocomplete
               placeholder="Search the Knowledge Hub…"
               ariaLabel="Search the Knowledge Hub"
             />

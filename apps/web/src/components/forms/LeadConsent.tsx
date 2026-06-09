@@ -21,7 +21,7 @@ export function LeadConsent(): React.ReactElement {
         required
         label={
           <>
-            I agree to the storage &amp; processing of my data per the{" "}
+            I have read and agree to the{" "}
             <Link
               href="/privacy-policy"
               className="underline"
@@ -29,7 +29,6 @@ export function LeadConsent(): React.ReactElement {
             >
               Privacy Policy
             </Link>
-            .
           </>
         }
       />
