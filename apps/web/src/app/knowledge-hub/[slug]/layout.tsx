@@ -20,7 +20,7 @@ export default async function KnowledgeHubLayout({
         <KnowledgeHubArticleHero />
         <FadeUp>
           <section className="bg-white">
-            <div className="mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-8 sm:pt-16 lg:pt-24 pb-section-cta">
+            <div className="mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-0 sm:pt-16 lg:pt-24 pb-section-cta">
               <KnowledgeHubMobileNav groups={groups} />
               <div className="grid gap-10 lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-16">
                 <aside

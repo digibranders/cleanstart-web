@@ -32,13 +32,17 @@ export function KnowledgeHubMobileNav({ groups }: { groups: KhGroup[] }): React.
     : 'Browse the Knowledge Hub';
 
   return (
-    <div className="mb-6 lg:hidden">
+    // Fragment (not a wrapping div) so the bar is a direct child of the tall
+    // content container — position:sticky pins within the parent's box, so a
+    // short wrapper would let it scroll away. The negative top margin straddles
+    // it onto the hero's bottom edge on phones; it stays sticky on scroll.
+    <>
       <button
         type="button"
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
         aria-expanded={open}
-        className="sticky top-[calc(var(--cs-header-h)+0.5rem)] z-30 flex w-full items-center justify-between gap-3 rounded-xl border border-[#EDEEF4] bg-white px-4 py-3 text-left shadow-[0_4px_16px_-8px_rgba(15,16,35,0.18)]"
+        className="-mt-7 mb-6 sm:mt-0 lg:hidden sticky top-[calc(var(--cs-header-h)+0.5rem)] z-30 flex w-full items-center justify-between gap-3 rounded-xl border border-[#EDEEF4] bg-white px-4 py-3 text-left shadow-[0_4px_16px_-8px_rgba(15,16,35,0.18)]"
       >
         <span className="flex min-w-0 items-center gap-2.5">
           <Menu className="size-[18px] shrink-0" style={{ color: '#471EC0' }} aria-hidden />
@@ -71,6 +75,6 @@ export function KnowledgeHubMobileNav({ groups }: { groups: KhGroup[] }): React.
           </div>
         </SheetContent>
       </Sheet>
-    </div>
+    </>
   );
 }
