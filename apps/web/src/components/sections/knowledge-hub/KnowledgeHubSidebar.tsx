@@ -56,11 +56,19 @@ export function KnowledgeHubSidebar({ groups }: { groups: KhGroup[] }): React.Re
         </h2>
 
         <div className="mt-3 flex flex-col gap-0.5">
-          {groups.map((group) => {
+          {groups.map((group, i) => {
             const open = openGroups[group.slug] ?? false;
             const isActiveGroup = group.slug === activeGroup?.slug;
+            // Divider between the legacy CleanStart groups (which hold articles
+            // directly) and the first Academy section (which has subcategories).
+            const isFirstSection =
+              group.subcategories.length > 0 &&
+              (i === 0 || groups[i - 1]?.subcategories.length === 0);
             return (
               <div key={group.slug}>
+                {isFirstSection && i > 0 && (
+                  <div className="mx-3 my-2 border-t border-[#EDEEF4]" aria-hidden />
+                )}
                 <button
                   type="button"
                   onClick={() => toggleGroup(group.slug)}
