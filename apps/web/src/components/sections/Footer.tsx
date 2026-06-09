@@ -4,11 +4,11 @@ import Link from "next/link";
 import { CookiePreferencesButton } from "@/components/consent";
 
 /**
- * Footer layout (top → bottom): tagline + social icons, then a band with three
- * nav columns (Contact / Solutions / Connect) on the left and a "Members of"
- * logo strip stacked over the credential groups (Awarded with / Docker verified
- * / Certifications) on the right, and a bottom row with logo, copyright, and
- * legal links.
+ * Footer layout (top → bottom): brand logo + social icons, then a band with
+ * three nav columns (Contact / Solutions / Connect) on the left and a single
+ * right-aligned "Trusted & Certified" credential cluster (the award + Docker +
+ * SOC 2 + ISO badges) on the right, and a bottom row with copyright and legal
+ * links.
  */
 
 interface FooterLink {
@@ -32,23 +32,6 @@ const COL_CONNECT: FooterLink[] = [
   { label: "Newsroom", href: "/news" },
   { label: "Legal", href: "/legal" },
 ];
-// White wordmark logos sit bare on the dark footer; each links to the org.
-interface FooterLogo {
-  name: string;
-  src: string;
-  w: number;
-  h: number;
-  /** Rendered height in px; width scales to preserve aspect ratio. */
-  renderH: number;
-  href: string;
-}
-
-const MEMBERS: FooterLogo[] = [
-  { name: "OpenSSF (Open Source Security Foundation)", src: "/images/footer/openssf.webp", w: 134, h: 52, renderH: 36, href: "https://openssf.org/about/members/" },
-  { name: "The Linux Foundation", src: "/images/footer/linux-foundation.webp", w: 126, h: 43, renderH: 34, href: "https://www.linuxfoundation.org/about/members" },
-  { name: "Cloud Native Computing Foundation", src: "/images/footer/cloud-native.webp", w: 174, h: 29, renderH: 24, href: "https://www.cncf.io/about/members/" },
-];
-
 // `hoverColor` is each platform's brand color, applied to the glyph on hover.
 // X and GitHub are brand-black; on the dark footer they stay white (a darkening
 // would vanish), so their hover color is the same white — the scale lift is the
@@ -70,6 +53,8 @@ interface Badge {
   h: number;
 }
 
+// Right-anchored credential cluster, grouped under its own labels: the award,
+// the Docker-verified badge, and the two certifications (SOC 2 + ISO).
 const CREDENTIALS: { title: string; badges: Badge[] }[] = [
   {
     title: "Awarded with",
@@ -229,56 +214,27 @@ export function Footer({
               </ul>
             </div>
 
-            {/* Nav band — three collapsible text columns (left) and the
-            "Members of" logo strip stacked over the credential groups (right).
-            Columns are an accordion stack on mobile, a row on desktop. */}
+            {/* Nav band — three collapsible text columns and the credential
+            cluster (three labelled groups: Awarded with / Docker verified /
+            Certifications). On mobile they stack (columns as an accordion);
+            from sm+ all four blocks become direct flex children spread
+            edge-to-edge with `justify-between`, so the whitespace is shared
+            evenly rather than pooling in the centre. The columns group is
+            `sm:contents` so its children join the flex row. */}
             <nav
-              className="mt-[28px] flex flex-col gap-12 sm:mt-[36px] sm:flex-row sm:items-start sm:gap-x-10 lg:gap-x-12"
+              className="mt-[28px] flex flex-col gap-12 sm:mt-[36px] sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-x-8 sm:gap-y-12 lg:gap-x-12"
               aria-label="Footer navigation"
             >
-              <div className="flex flex-col sm:flex-row sm:gap-10 lg:gap-14">
+              <div className="flex flex-col sm:contents">
                 <FooterColumn title="Contact" links={COL_CONTACT} />
                 <FooterColumn title="Solutions" links={COL_SOLUTIONS} />
                 <FooterColumn title="Connect" links={COL_CONNECT} />
               </div>
 
-              <div className="flex flex-col gap-10">
-                <div>
-                  <p className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white text-center sm:text-left">
-                    Members of
-                  </p>
-                  <ul className="mt-6 flex flex-wrap items-center justify-center sm:justify-start gap-x-8 gap-y-5">
-                    {MEMBERS.map((m) => (
-                      <li key={m.src} className="flex">
-                        <a
-                          href={m.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={m.name}
-                          className="inline-flex items-center transition-opacity duration-200 hover:opacity-80 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300/70"
-                        >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={m.src}
-                            alt={m.name}
-                            width={m.w}
-                            height={m.h}
-                            loading="lazy"
-                            decoding="async"
-                            className="w-auto object-contain"
-                            style={{ height: `${m.renderH}px` }}
-                          />
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="flex flex-wrap justify-center sm:justify-start gap-x-6 gap-y-8 [--shield-scale:0.72] xl:[--shield-scale:1]">
-                  {CREDENTIALS.map((group) => (
-                    <CredentialGroup key={group.title} group={group} />
-                  ))}
-                </div>
+              <div className="flex flex-wrap items-start justify-center sm:justify-end gap-x-6 gap-y-8 [--shield-scale:0.72] xl:[--shield-scale:0.85]">
+                {CREDENTIALS.map((group) => (
+                  <CredentialGroup key={group.title} group={group} />
+                ))}
               </div>
             </nav>
 
@@ -423,13 +379,16 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
   );
 }
 
+// One labelled credential group: a heading centered over its badge(s) at every
+// breakpoint; the parent wrapper packs the groups to the footer's right edge
+// (`sm:justify-end`).
 function CredentialGroup({ group }: { group: (typeof CREDENTIALS)[number] }) {
   return (
-    <div className="flex flex-col gap-4 items-center sm:items-start">
-      <p className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white text-center sm:text-left">
+    <div className="flex flex-col gap-4 items-center">
+      <p className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white text-center">
         {group.title}
       </p>
-      <div className="flex flex-wrap items-start justify-center sm:justify-start gap-3">
+      <div className="flex flex-wrap items-start justify-center gap-3">
         {group.badges.map((badge) => (
           <ShieldBadge key={badge.src} badge={badge} />
         ))}
