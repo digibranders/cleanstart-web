@@ -1,5 +1,6 @@
 import type React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Reveal } from "@/components/ui/Reveal";
 
 /**
@@ -79,7 +80,7 @@ export function CleanStartImagesCta(): React.ReactElement {
               maxWidth: "354px",
             }}
           >
-            Start with Trusted Foundations
+            From Public Images to Trusted Foundations
           </h2>
         </Reveal>
 
@@ -99,10 +100,8 @@ export function CleanStartImagesCta(): React.ReactElement {
             infrastructure and reduced inherited risk.
           </p>
 
-          <a
-            href="https://images.cleanstart.com"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/resources/enterprise-grade-hardened-container-images"
             className="cs-btn-glass"
           >
             <span>Explore Hardened Images</span>
@@ -122,7 +121,7 @@ export function CleanStartImagesCta(): React.ReactElement {
                 strokeLinejoin="round"
               />
             </svg>
-          </a>
+          </Link>
         </Reveal>
       </div>
     </div>
