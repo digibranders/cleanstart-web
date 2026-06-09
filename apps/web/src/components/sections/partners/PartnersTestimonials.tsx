@@ -309,19 +309,26 @@ function NavButton({
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="flex size-10 items-center justify-center rounded-full bg-[#111] text-white transition-colors hover:bg-[#222] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9A51FF]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f6f6f6]"
+      // Same glassy nav-button style as the home testimonials carousel
+      // (`cs-tt-nav`). That style is authored for a dark backdrop with a white
+      // arrow; this section is light, so the arrow colour is overridden to the
+      // section's dark ink to stay legible.
+      className="cs-tt-nav"
+      data-direction={direction}
+      style={{ color: "#250800" }}
     >
+      <span className="cs-tt-nav__glow cs-tt-nav__glow--tr" aria-hidden />
+      <span className="cs-tt-nav__glow cs-tt-nav__glow--bottom" aria-hidden />
       <svg
-        width="18"
-        height="18"
-        viewBox="0 0 20 20"
+        className="cs-tt-nav__arrow"
+        width="20"
+        height="14"
+        viewBox="0 0 20 14"
         fill="none"
         aria-hidden
-        style={{ transform: direction === "prev" ? "scaleX(-1)" : undefined }}
       >
-        <title>{direction === "prev" ? "Previous" : "Next"}</title>
         <path
-          d="M7.5 5L12.5 10L7.5 15"
+          d="M1 7h17m0 0l-5-5m5 5l-5 5"
           stroke="currentColor"
           strokeWidth="1.75"
           strokeLinecap="round"
