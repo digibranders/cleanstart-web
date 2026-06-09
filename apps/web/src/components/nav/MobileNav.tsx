@@ -123,15 +123,25 @@ export function MobileNav() {
               target="_blank"
               rel="noreferrer"
               onClick={close}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-[10px] border py-2.5 text-sm font-semibold transition-colors"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-[10px] border py-2.5 text-sm font-semibold text-white transition-colors"
               style={{
-                color: "#59c5ed",
                 borderColor: "rgba(89,197,237,0.35)",
                 backgroundColor: "rgba(89,197,237,0.08)",
               }}
             >
-              <GraduationCap className="size-4 shrink-0" aria-hidden />
-              CleanStart Academy
+              <GraduationCap className="size-4 shrink-0 text-[#59C5ED]" aria-hidden />
+              <span
+                style={{
+                  backgroundImage:
+                    "linear-gradient(135deg, #59C5ED 0%, #4168DB 50%, #5D04D8 100%)",
+                  backgroundClip: "text",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                CleanStart
+              </span>
+              <span>Academy</span>
             </Link>
             <Link
               href="/contact-us"

@@ -263,6 +263,21 @@
   text-align: center;
 }
 
+// Center the HEADER label over its centered cells. Payload wraps each column
+// label in `.sort-column`, a flex container — `text-align: center` on the `th`
+// centers inline text but does nothing to a flex child, so the label stayed
+// pinned left while the cell content centered below it. Centering the flex
+// container realigns the label directly over the pill / checkmark.
+.table thead th[id='heading-_status'],
+.table thead th[id='heading-enabled'],
+.table thead th[id='heading-gated'],
+.table thead th[id='heading-featured'],
+.table thead th[id='heading-acceptingNewBylines'] {
+  .sort-column {
+    justify-content: center;
+  }
+}
+
 // Numeric columns — right-aligned (tabular-nums treatment lives below).
 .table tbody td.cell-hitCount,
 .table tbody td.cell-resultsCount,
