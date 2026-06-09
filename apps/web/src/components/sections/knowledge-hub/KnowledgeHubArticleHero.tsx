@@ -72,9 +72,7 @@ export function KnowledgeHubArticleHero(): React.ReactElement {
             className="mt-7 lg:mt-10 w-full flex justify-center"
           >
             <Suspense
-              fallback={
-                <div className="flex items-center" style={{ height: '42px', width: '674px' }} />
-              }
+              fallback={<div className="h-10 sm:h-11 w-full max-w-[674px]" />}
             >
               <SearchBar
                 initialQuery=""

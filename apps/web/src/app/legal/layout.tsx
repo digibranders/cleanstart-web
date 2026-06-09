@@ -37,7 +37,12 @@ export default async function LegalSectionLayout({
         <LegalHero title="Legal" />
         <FadeUp>
           <Section padding="none" className="bg-white pb-section-sm pt-0 sm:pt-section-sm">
-            <Container variant="default">
+            {/* flow-root establishes a BFC so the mobile nav bar's negative
+                top margin (-mt-7, straddling the hero edge) doesn't collapse
+                up through this container and drag the white section's
+                background over the purple hero — without it the bar reads as
+                sitting below the edge instead of centred on it. */}
+            <Container variant="default" className="flow-root">
               <LegalMobileNav items={navItems} />
               <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-10 lg:gap-16">
                 <aside className="hidden lg:block">
