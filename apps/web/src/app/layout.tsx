@@ -10,7 +10,6 @@ import {
   GatedAnalytics,
   CookieBanner,
 } from "@/components/consent";
-import { SearchProvider } from "@/components/search/SearchProvider";
 import { SITE_NAME, SITE_URL } from "@/lib/seo/canonical";
 import { isIndexingAllowed } from "@/lib/seo/indexing";
 import { ogImageUrl } from "@/lib/seo/og";
@@ -131,9 +130,7 @@ export default function RootLayout({
         <ConsentProvider>
           <JsonLd id="org-jsonld" data={organizationSchema()} />
           <PreviewBanner />
-          <SearchProvider>
-            <SmoothScrollProvider>{children}</SmoothScrollProvider>
-          </SearchProvider>
+          <SmoothScrollProvider>{children}</SmoothScrollProvider>
           <GatedAnalytics />
           <CookieBanner />
         </ConsentProvider>
