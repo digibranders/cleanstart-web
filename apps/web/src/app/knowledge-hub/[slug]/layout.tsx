@@ -27,7 +27,7 @@ export default async function KnowledgeHubLayout({
                 hero — without it the bar reads as sitting below the edge. */}
             <div className="flow-root mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-0 sm:pt-section-sm pb-section-cta">
               <KnowledgeHubMobileNav groups={groups} />
-              <div className="grid gap-10 lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-16">
+              <div className="grid gap-10 lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-12">
                 <aside
                   data-lenis-prevent
                   className={`hidden lg:block lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:overscroll-contain lg:pr-3 ${premiumScrollbar}`}
