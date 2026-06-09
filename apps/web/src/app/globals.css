@@ -949,30 +949,34 @@ body {
    PRIMARY NAVIGATION — dark-glass header + mega-menu surfaces
    ============================================================ */
 
-/* Scrolled header — dark glass band with backdrop blur.
-   Chromium re-tiles the backdrop-filter across compositor tiles on every
-   scroll frame, and the tile seams flash through as random vertical /
-   horizontal bands across the navbar. Mitigation stack:
-     1. Smaller blur radius (8px instead of 14px) keeps the kernel well
-        below the typical 64-tile boundary, so seams don't show.
-     2. `contain: paint` forces the browser to allocate its own paint
-        surface for the navbar — seams from sibling tiles can't leak in.
-     3. `translate3d(0,0,0)` + `backface-visibility: hidden` pin the
-        navbar to a single GPU layer so the blur isn't re-tiled mid-scroll.
-     4. `isolation: isolate` + `will-change: transform` prevent the blur
-        sampling from leaking through stacking contexts. */
-.cs-nav-shadow {
-  background-color: rgba(21, 16, 33, 0.78);
+/* Navbar surface — frosted-glass backdrop blur.
+   A `backdrop-filter` on a `position: fixed` element must NOT also carry GPU
+   layer-promotion / containment hints (`will-change: transform`,
+   `transform: translateZ/translate3d`, `backface-visibility`, `isolation`,
+   `contain: paint`). On many GPU/driver combos those force the navbar onto its
+   own compositor layer whose backdrop snapshot excludes the page content, so
+   the filter samples black and paints a random dark blob / band behind the
+   nav — the artifact this element used to show. The blur composites correctly
+   on its own; the browser handles fixed-element backdrops natively.
+   Two rules keep it stable: (a) the blur radius is CONSTANT across the top and
+   scrolled states — a changing radius forces a re-rasterise — and (b) the
+   radius is never animated; only background / border colour transitions (see
+   HeaderScrollShell). */
+.cs-nav-surface {
+  border-bottom: 1px solid transparent;
   -webkit-backdrop-filter: blur(8px) saturate(140%);
   backdrop-filter: blur(8px) saturate(140%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  transform: translate3d(0, 0, 0);
-  -webkit-transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  will-change: transform;
-  isolation: isolate;
-  contain: paint;
+}
+
+/* Top-of-page state — lighter translucent band, divider hidden. */
+.cs-nav-surface-top {
+  background-color: rgba(11, 8, 22, 0.35);
+}
+
+/* Scrolled state — darker glass band with a hairline bottom divider. */
+.cs-nav-shadow {
+  background-color: rgba(21, 16, 33, 0.78);
+  border-bottom-color: rgba(255, 255, 255, 0.04);
 }
 
 /* Mega-menu / compact dropdown surface — dark glass card */
@@ -1041,7 +1045,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cs-nav-shadow,
+  .cs-nav-surface,
   .cs-mega-item,
   .cs-mega-item::before,
   .cs-nav-link::after {
