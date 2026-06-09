@@ -166,77 +166,78 @@ export function Footer({
         />
         <div className="relative">
           <div className={`relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 pb-[80px] ${hasCta ? "pt-[var(--footer-cta-pt)]" : "pt-[80px]"}`}>
-            {/* Top row — brand logo (left) + social icons (right). */}
-            <div className="flex flex-wrap items-center justify-between gap-8">
-              <div className="relative h-[32px] w-[153px]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/logo-cleanstart-footer.png"
-                  alt="CleanStart"
-                  width={153}
-                  height={32}
-                  loading="eager"
-                  decoding="async"
-                  className="h-full w-full object-contain object-left"
-                />
+            {/* Main row — three balanced zones: a brand anchor (logo with the
+            social icons stacked beneath), the nav columns, and the
+            right-anchored credential cluster (Awarded with / Docker verified /
+            Certifications). Stacks vertically below lg; becomes a single
+            edge-to-edge row at lg+. */}
+            <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between lg:gap-x-8 xl:gap-x-12">
+              {/* Brand anchor — logo over social icons. */}
+              <div className="flex shrink-0 flex-col gap-7">
+                <div className="relative h-[32px] w-[153px]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/images/logo-cleanstart-footer.png"
+                    alt="CleanStart"
+                    width={153}
+                    height={32}
+                    loading="eager"
+                    decoding="async"
+                    className="h-full w-full object-contain object-left"
+                  />
+                </div>
+
+                <ul className="flex items-center gap-[19px]" aria-label="Social media">
+                  {SOCIAL_ICONS.map((s) => (
+                    <li key={s.name}>
+                      <a
+                        href={s.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={s.name}
+                        className="cs-social-link flex h-10 w-10 items-center justify-center rounded-full text-white transition-[transform,color] duration-200 hover:scale-105 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300/70"
+                        style={{
+                          backgroundColor: "rgba(217, 217, 217, 0.15)",
+                          backdropFilter: "blur(5px)",
+                          boxShadow:
+                            "inset 2.67px 2.67px 13.33px 4px rgba(168, 108, 252, 0.4)",
+                          "--social-hover": s.hoverColor,
+                        } as React.CSSProperties}
+                      >
+                        <span className="sr-only">{s.name}</span>
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          aria-hidden
+                        >
+                          <path d={s.path} />
+                        </svg>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </div>
 
-              <ul className="flex items-center gap-[19px]" aria-label="Social media">
-                {SOCIAL_ICONS.map((s) => (
-                  <li key={s.name}>
-                    <a
-                      href={s.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={s.name}
-                      className="cs-social-link flex h-10 w-10 items-center justify-center rounded-full text-white transition-[transform,color] duration-200 hover:scale-105 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300/70"
-                      style={{
-                        backgroundColor: "rgba(217, 217, 217, 0.15)",
-                        backdropFilter: "blur(5px)",
-                        boxShadow:
-                          "inset 2.67px 2.67px 13.33px 4px rgba(168, 108, 252, 0.4)",
-                        "--social-hover": s.hoverColor,
-                      } as React.CSSProperties}
-                    >
-                      <span className="sr-only">{s.name}</span>
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        aria-hidden
-                      >
-                        <path d={s.path} />
-                      </svg>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Nav band — three collapsible text columns and the credential
-            cluster (three labelled groups: Awarded with / Docker verified /
-            Certifications). On mobile they stack (columns as an accordion);
-            from sm+ all four blocks become direct flex children spread
-            edge-to-edge with `justify-between`, so the whitespace is shared
-            evenly rather than pooling in the centre. The columns group is
-            `sm:contents` so its children join the flex row. */}
-            <nav
-              className="mt-[28px] flex flex-col gap-12 sm:mt-[36px] sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-x-8 sm:gap-y-12 lg:gap-x-12"
-              aria-label="Footer navigation"
-            >
-              <div className="flex flex-col sm:contents">
+              {/* Nav columns — accordion stack on mobile, a row from sm+. */}
+              <nav
+                className="flex flex-col sm:flex-row sm:gap-10 lg:gap-12"
+                aria-label="Footer navigation"
+              >
                 <FooterColumn title="Contact" links={COL_CONTACT} />
                 <FooterColumn title="Solutions" links={COL_SOLUTIONS} />
                 <FooterColumn title="Connect" links={COL_CONNECT} />
-              </div>
+              </nav>
 
-              <div className="flex flex-wrap items-start justify-center sm:justify-end gap-x-6 gap-y-8 [--shield-scale:0.72] xl:[--shield-scale:0.85]">
+              {/* Right-anchored credential cluster — each heading centered over
+              its badge(s). */}
+              <div className="flex flex-wrap items-start justify-center lg:justify-end gap-x-6 gap-y-8 [--shield-scale:0.72] xl:[--shield-scale:0.85]">
                 {CREDENTIALS.map((group) => (
                   <CredentialGroup key={group.title} group={group} />
                 ))}
               </div>
-            </nav>
+            </div>
 
             {/* Bottom row — copyright (left) + legal links (right), divided
             from the nav band above. */}
