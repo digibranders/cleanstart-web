@@ -98,12 +98,11 @@
   --container-wide:    1600px;
   --container-cs: var(--container-default);
 
-  /* Fixed-header height, single source of truth. The header is a fixed
-     translucent overlay with no global spacer — each hero clears it via
-     its own top padding plus var(--cs-header-extra). Base = 72px main bar
-     only; on lg+ the desktop utility strip adds 36px (see media query
-     after @theme). Heroes add var(--cs-header-extra) so mobile is unchanged
-     and desktop content drops exactly the strip's height. */
+  /* Fixed-header height, single source of truth. The header is a fixed 72px
+     translucent overlay with no global spacer — each hero clears it via its own
+     top padding plus var(--cs-header-extra). --cs-header-extra is a per-hero
+     clearance delta (0 today) kept as a hook for any future header-height
+     change; heroes consume it as `calc(<pad> + var(--cs-header-extra))`. */
   --cs-header-h: 72px;
   --cs-header-extra: 0px;
 
@@ -365,16 +364,6 @@
   --btn-fs-md:           var(--fs-button);
   --btn-fs-sm:           var(--fs-button-sm);
   --btn-fs-xs:           var(--fs-button-sm);
-}
-
-/* Desktop (lg+) adds the 36px utility strip above the main nav bar, while the
-   main bar itself shrinks 72px → 60px, so the full header is 96px (24px taller
-   than mobile's 72px). --cs-header-extra is that 24px per-hero clearance delta. */
-@media (min-width: 1024px) {
-  :root {
-    --cs-header-h: 96px;
-    --cs-header-extra: 24px;
-  }
 }
 
 :root {
@@ -2388,9 +2377,9 @@ body {
 }
 .article-body .article-paragraph:last-child { margin-bottom: 0; }
 
-/* Sticky-header offset for TOC anchor jumps. Header-aware via
-   --cs-header-h (72px mobile, 108px desktop where the utility strip shows)
-   plus breathing room, so #anchor links never land under the fixed Header. */
+/* Sticky-header offset for TOC anchor jumps. Header-aware via --cs-header-h
+   (72px) plus breathing room, so #anchor links never land under the fixed
+   Header. */
 .article-body .article-h1,
 .article-body .article-h2,
 .article-body .article-h3,

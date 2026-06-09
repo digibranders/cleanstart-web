@@ -309,24 +309,22 @@ function NavButton({
       type="button"
       onClick={onClick}
       aria-label={label}
-      // Same glassy nav-button style as the home testimonials carousel
-      // (`cs-tt-nav`). That style is authored for a dark backdrop with a white
-      // arrow; this section is light, so the arrow colour is overridden to the
-      // section's dark ink to stay legible.
-      className="cs-tt-nav"
-      data-direction={direction}
-      style={{ color: "#250800" }}
+      // Solid black button — reads cleaner than the glassy lavender treatment
+      // on the light section bg. Keeps the home carousel's tactile micro-
+      // interaction: springy lift + scale-up on hover, press-in on click
+      // (matching `cs-tt-nav`'s transform timing). Glow/outline dropped so the
+      // button stays clean black.
+      className="flex size-10 items-center justify-center rounded-full bg-[#111] text-white transition-[transform,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-px hover:scale-105 hover:shadow-[0_10px_24px_-10px_rgba(17,17,17,0.55)] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9A51FF]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f6f6f6] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100"
     >
-      <span className="cs-tt-nav__glow cs-tt-nav__glow--tr" aria-hidden />
-      <span className="cs-tt-nav__glow cs-tt-nav__glow--bottom" aria-hidden />
       <svg
-        className="cs-tt-nav__arrow"
-        width="20"
-        height="14"
+        width="18"
+        height="13"
         viewBox="0 0 20 14"
         fill="none"
         aria-hidden
+        style={{ transform: direction === "prev" ? "scaleX(-1)" : undefined }}
       >
+        <title>{direction === "prev" ? "Previous" : "Next"}</title>
         <path
           d="M1 7h17m0 0l-5-5m5 5l-5 5"
           stroke="currentColor"

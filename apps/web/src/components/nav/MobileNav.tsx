@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 
-import { MenuIcon, GraduationCap } from "lucide-react";
+import { MenuIcon } from "lucide-react";
 import { Logo } from "@/components/icons/Logo";
 import {
   Sheet,
@@ -116,48 +116,24 @@ export function MobileNav() {
           </Accordion>
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-white/8 p-4">
-          <div className="flex items-center gap-2">
-            <Link
-              href="https://academy.cleanstart.com"
-              target="_blank"
-              rel="noreferrer"
-              onClick={close}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-[10px] border py-2.5 text-sm font-semibold text-white transition-colors"
-              style={{
-                borderColor: "rgba(89,197,237,0.35)",
-                backgroundColor: "rgba(89,197,237,0.08)",
-              }}
-            >
-              <GraduationCap className="size-4 shrink-0 text-[#59C5ED]" aria-hidden />
-              <span
-                style={{
-                  backgroundImage:
-                    "linear-gradient(135deg, #59C5ED 0%, #4168DB 50%, #5D04D8 100%)",
-                  backgroundClip: "text",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
-                CleanStart
-              </span>
-              <span>Academy</span>
-            </Link>
-            <Link
-              href="/contact-us"
-              onClick={close}
-              className="flex flex-1 items-center justify-center rounded-[10px] border border-white/15 bg-white/[0.04] py-2.5 text-sm font-medium text-white/85 transition-colors hover:bg-white/[0.08] hover:text-white"
-            >
-              Contact Us
-            </Link>
-          </div>
+        <div className="flex items-center gap-2 border-t border-white/8 p-4">
+          <Link
+            href="/contact-us"
+            onClick={close}
+            className="cs-btn-blue flex-1 justify-center"
+            style={{
+              ["--cs-btn-h" as string]: "40px",
+              ["--cs-btn-fs" as string]: "13px",
+            }}
+          >
+            Contact Us
+          </Link>
           <Link
             href="/book-a-demo"
             onClick={close}
-            className="cs-btn-glass w-full justify-center"
+            className="cs-btn-glass flex-1 justify-center"
             style={{
               ["--cs-btn-h" as string]: "40px",
-              ["--cs-btn-px" as string]: "18px",
               ["--cs-btn-fs" as string]: "13px",
             }}
           >

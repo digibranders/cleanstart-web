@@ -2,7 +2,6 @@ import Link from "next/link";
 import { DesktopNav } from "@/components/nav/DesktopNav";
 import { MobileNav } from "@/components/nav/MobileNav";
 import { HeaderScrollShell } from "@/components/nav/HeaderScrollShell";
-import { HeaderUtilityStrip } from "@/components/nav/HeaderUtilityStrip";
 import { fetchLatestImages } from "@/components/nav/data/latest-images";
 import { fetchLatestUpdates } from "@/components/nav/data/latest-updates-feed";
 import {
@@ -27,7 +26,7 @@ export async function Header() {
   ]);
 
   return (
-    <HeaderScrollShell utilityStrip={<HeaderUtilityStrip />}>
+    <HeaderScrollShell>
       <Link
         href="/"
         aria-label="CleanStart home"
@@ -54,17 +53,34 @@ export async function Header() {
       />
 
       <div className="flex items-center gap-3">
-        <Link
-          href="/book-a-demo"
-          className="cs-btn-glass hidden lg:inline-flex"
-          style={{
-            ["--cs-btn-h" as string]: "36px",
-            ["--cs-btn-px" as string]: "16px",
-            ["--cs-btn-fs" as string]: "13px",
-          }}
-        >
-          Book a Demo
-        </Link>
+        {/* Wrapper hides the CTAs below lg: .cs-btn-* set display:inline-flex as
+            unlayered CSS that overrides Tailwind's `hidden`, so the parent's
+            display:none is what actually hides them on mobile (CTAs live in the
+            mobile menu footer instead). */}
+        <div className="hidden items-center gap-3 lg:flex">
+          <Link
+            href="/contact-us"
+            className="cs-btn-blue"
+            style={{
+              ["--cs-btn-h" as string]: "36px",
+              ["--cs-btn-px" as string]: "16px",
+              ["--cs-btn-fs" as string]: "13px",
+            }}
+          >
+            Contact Us
+          </Link>
+          <Link
+            href="/book-a-demo"
+            className="cs-btn-glass"
+            style={{
+              ["--cs-btn-h" as string]: "36px",
+              ["--cs-btn-px" as string]: "16px",
+              ["--cs-btn-fs" as string]: "13px",
+            }}
+          >
+            Book a Demo
+          </Link>
+        </div>
         <MobileNav />
       </div>
     </HeaderScrollShell>
