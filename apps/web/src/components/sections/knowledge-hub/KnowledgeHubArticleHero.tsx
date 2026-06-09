@@ -8,7 +8,7 @@ const HERO_GRADIENT =
 export function KnowledgeHubArticleHero(): React.ReactElement {
   return (
     <section
-      className="relative w-full overflow-hidden min-h-[188px] sm:min-h-[300px] lg:min-h-[418px]"
+      className="relative w-full overflow-hidden min-h-[250px] sm:min-h-[330px] lg:min-h-[418px]"
       style={{ background: HERO_GRADIENT }}
       aria-labelledby="knowledge-hub-hero-title"
     >
@@ -50,7 +50,7 @@ export function KnowledgeHubArticleHero(): React.ReactElement {
       />
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        <div className="flex flex-col items-center mx-auto max-w-[864px] pt-[calc(64px+var(--cs-header-extra))] pb-9 sm:pt-[calc(96px+var(--cs-header-extra))] sm:pb-14 lg:pt-[calc(120px+var(--cs-header-extra))] lg:pb-20">
+        <div className="flex flex-col items-center mx-auto max-w-[864px] pt-[calc(92px+var(--cs-header-extra))] pb-10 sm:pt-[calc(104px+var(--cs-header-extra))] sm:pb-14 lg:pt-[calc(120px+var(--cs-header-extra))] lg:pb-20">
           <HeroReveal y={50} duration={1.0}>
             <h1
               id="knowledge-hub-hero-title"
@@ -69,7 +69,7 @@ export function KnowledgeHubArticleHero(): React.ReactElement {
             y={30}
             delay={0.2}
             duration={0.8}
-            className="mt-8 lg:mt-10 w-full justify-center hidden sm:flex"
+            className="mt-7 lg:mt-10 w-full flex justify-center"
           >
             <Suspense
               fallback={
