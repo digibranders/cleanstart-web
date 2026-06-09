@@ -3,6 +3,7 @@ import { JetBrains_Mono, Manrope, Sora } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { PreviewBanner } from "@/components/PreviewBanner";
+import { SearchProvider } from "@/components/search/SearchProvider";
 import { SmoothScrollProvider } from "@/components/SmoothScrollProvider";
 import {
   ConsentProvider,
@@ -130,7 +131,9 @@ export default function RootLayout({
         <ConsentProvider>
           <JsonLd id="org-jsonld" data={organizationSchema()} />
           <PreviewBanner />
-          <SmoothScrollProvider>{children}</SmoothScrollProvider>
+          <SearchProvider>
+            <SmoothScrollProvider>{children}</SmoothScrollProvider>
+          </SearchProvider>
           <GatedAnalytics />
           <CookieBanner />
         </ConsentProvider>
