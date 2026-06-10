@@ -89,8 +89,10 @@ gh pr create --base development --fill
 | `cleanstart.com` | TXT (SPF) | `v=spf1 -all` | — | 86400 |
 | `_dmarc` | TXT | `v=DMARC1; p=reject; rua=mailto:dmarc@cleanstart.com; adkim=s; aspf=s` | — | 86400 |
 | `*._domainkey` | TXT | `v=DKIM1; p=` (empty placeholder) | — | 86400 |
+| `_index._agents` | HTTPS | `1 www.cleanstart.com. alpn="h2,h3" port="443" mandatory="alpn,port"` | — | 3600 |
+| `_index._agents` | SVCB | `1 www.cleanstart.com. alpn="h2,h3" port="443" mandatory="alpn,port"` | — | 3600 |
 
-**DNSSEC:** enabled at Cloudflare. Verify chain at registrar.
+**DNSSEC:** must be enabled at Cloudflare **and** completed at the registrar (GoDaddy) by adding the DS record Cloudflare generates. ⚠ As verified 2026-06-10, the DS record is **missing at the parent** (`dig DS cleanstart.com +short` is empty, resolvers return `AD: false`) — Cloudflare-side signing without the registrar DS step does nothing. See the DNS-AID subsection below for the completion runbook; DNS-AID requires a signed discovery zone.
 
 **TLS:** Vercel-managed Let's Encrypt. Min TLS 1.2 (Vercel default). Auto-renewal. Verify CA list with `vercel certs ls` before writing CAA — if Vercel ever moves off LE, update CAA accordingly.
 
@@ -108,6 +110,66 @@ gh pr create --base development --fill
 
 **Vercel Firewall rules:**
 - Block requests where `User-Agent` matches `/Bytespider/i` → action: `deny` (HTTP 403)
+
+### DNS-AID (DNS for AI Discovery) — agent discovery records
+
+Agents discover an organization's machine-readable entry points via SVCB/HTTPS records under the `_agents` namespace ([draft-mozleywilliams-dnsop-dnsaid](https://datatracker.ietf.org/doc/draft-mozleywilliams-dnsop-dnsaid/), record format per [RFC 9460](https://www.rfc-editor.org/rfc/rfc9460)). We publish the **organizational index** record only — `_index._agents` is the well-known entry point that points agents at the site, where the HTTP-layer discovery takes over (homepage `Link: rel="api-catalog"` header → `/.well-known/api-catalog`, §4/§17).
+
+**Do NOT publish `_a2a._agents` or `_mcp._agents`** — those advertise live A2A/MCP protocol endpoints, which we don't run. Advertising a protocol endpoint that doesn't exist sends agents to a dead socket. Add them only if/when an actual A2A or MCP server ships.
+
+**Status: PUBLISHED 2026-06-10.** Both records are live in the Cloudflare zone (TTL 1 h, DNS-only) and resolve via DoH (`Status:0`, Answer present for type 65 and type 64). DNSSEC is still incomplete — `AD:false`, `dig DS cleanstart.com` empty — so the GoDaddy DS step below remains outstanding.
+
+**Records (zone-file form):**
+
+```
+_index._agents.cleanstart.com. 3600 IN HTTPS 1 www.cleanstart.com. alpn="h2,h3" port="443" mandatory="alpn,port"
+_index._agents.cleanstart.com. 3600 IN SVCB  1 www.cleanstart.com. alpn="h2,h3" port="443" mandatory="alpn,port"
+```
+
+ServiceMode (priority 1) with an explicit target — the owner name has no address records, so the target must name a resolvable host. Both RR types are published because scanners variously query SVCB (the draft's type) or HTTPS (the type for HTTPS endpoints). The draft's `well-known` SvcParam (would point at `/.well-known/api-catalog`) is not yet IANA-registered; until it is, custom params would need private-use `keyNNNNN` form — we omit it and let the HTTP `Link` header carry that pointer instead.
+
+**Publish via Cloudflare API** (token needs `Zone.DNS:Edit` on the cleanstart.com zone; from the operator secrets store — never committed):
+
+```bash
+export CF_API_TOKEN=<token>
+ZONE_ID=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+  "https://api.cloudflare.com/client/v4/zones?name=cleanstart.com" | jq -r '.result[0].id')
+
+for TYPE in HTTPS SVCB; do
+  curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" \
+    -H "Authorization: Bearer $CF_API_TOKEN" -H "Content-Type: application/json" \
+    --data "{
+      \"type\": \"$TYPE\",
+      \"name\": \"_index._agents\",
+      \"ttl\": 3600,
+      \"data\": {
+        \"priority\": 1,
+        \"target\": \"www.cleanstart.com\",
+        \"value\": \"alpn=\\\"h2,h3\\\" port=\\\"443\\\" mandatory=\\\"alpn,port\\\"\"
+      }
+    }" | jq '{success, errors}'
+done
+```
+
+(Dashboard alternative: DNS → Records → Add record → type `HTTPS` / `SVCB`, name `_index._agents`, priority `1`, target `www.cleanstart.com`, value `alpn="h2,h3" port="443" mandatory="alpn,port"`.)
+
+**DNSSEC completion runbook** (required — DNS-AID specifies signed discovery zones; as of 2026-06-10 the chain is broken at the parent):
+
+1. Cloudflare dashboard → cleanstart.com → DNS → Settings → DNSSEC → Enable (if not already) → copy the **DS record** values (Key Tag, Algorithm 13/ECDSAP256SHA256, Digest Type 2, Digest).
+2. GoDaddy → Domain Settings for cleanstart.com → DNSSEC → **Add DS record** with those four values. (GoDaddy is the registrar; Cloudflare is DNS-host only, so the DS does not propagate automatically.)
+3. Wait up to 24 h for the `.com` zone to publish the DS, then verify:
+   ```bash
+   dig DS cleanstart.com +short          # must return the DS record
+   dig +dnssec A www.cleanstart.com      # must include RRSIG, ad flag set
+   ```
+
+**Verify what scanners see** (DNS-over-HTTPS via Cloudflare, same resolver path the isitagentready.com scanner uses):
+
+```bash
+curl -s -H "accept: application/dns-json" \
+  "https://cloudflare-dns.com/dns-query?name=_index._agents.cleanstart.com&type=HTTPS"
+# expect: "Status":0 with an Answer array, and "AD":true once DNSSEC chain is complete
+```
 
 ---
 
@@ -133,6 +195,7 @@ All headers emitted from `apps/web/src/proxy.ts`. Next 16 renamed `middleware.ts
 | `Reporting-Endpoints` | `csp-endpoint="/api/csp-report"` | Pairs with CSP `report-to` |
 | `X-Robots-Tag` (non-prod or draft) | `noindex, nofollow` | Defence-in-depth backstop |
 | `X-Robots-Tag` (prod) | `max-image-preview:large, max-snippet:-1` | Google Discover eligibility |
+| `Link` (HTML pages) | `</.well-known/api-catalog>; rel="api-catalog"; …, </sitemap.xml>; rel="sitemap"; …, </api/search>; rel="service-desc"; …` | Agent discovery (RFC 8288 / 9727). Appended to the framework's preload `Link` values; non-`/api` paths only. Source: `src/lib/security/agent-discovery.ts` |
 
 **Permissions-Policy** (full string):
 ```
@@ -198,11 +261,14 @@ And set `X-Frame-Options: SAMEORIGIN` (overridden from default `DENY`). All othe
 - Lowercase enforcement on path segments
 - `next.config.ts` keeps `/blog → /blogs` (308 from earlier work)
 
-### robots.ts
+### robots.txt (route handler)
+
+Served by `apps/web/src/app/robots.txt/route.ts` from the pure builder in `src/lib/seo/robots.ts` (a plain-text route handler, not Next's `robots.ts` metadata route, because `MetadataRoute.Robots` cannot emit the `Content-Signal` directive).
 
 - Production: `Allow: /` for `*` + explicit `Disallow: /` only for `Bytespider`. List allowed AI bots as documentation comments (no rules needed since `*` already allows them).
+- **Content Signals** ([contentsignals.org](https://contentsignals.org/)): `Content-Signal: search=yes, ai-input=yes, ai-train=yes` inside the `*` group — the machine-readable form of the §8 allow-all decision. Non-production declares `search=no, ai-input=no, ai-train=no`.
 - Non-production: `Disallow: /` for `*` (defence-in-depth backstop is the `X-Robots-Tag` set by `proxy.ts` in §4).
-- `sitemap: https://www.cleanstart.com/sitemap.xml`, `host: https://www.cleanstart.com` on production only.
+- `Sitemap: https://www.cleanstart.com/sitemap.xml`, `Host: https://www.cleanstart.com` on production only.
 
 ### sitemap.ts
 
@@ -299,6 +365,29 @@ Payload Live Preview opens `apps/web` URLs with the Next.js draft-mode bypass co
 - `apps/web/public/ai.txt` — Spawning spec mirror.
 
 **Cloudflare:** "Block AI Scrapers and Crawlers" toggle must be **DISABLED** in dashboard.
+
+### Markdown for agents (content negotiation)
+
+Requests with an explicit `Accept: text/markdown` on any HTML page receive a markdown rendering of that page (`Content-Type: text/markdown; charset=utf-8` + `x-markdown-tokens` estimate header). HTML stays the default — browsers never send `text/markdown`, and `text/*`/wildcard Accept values deliberately do NOT trigger it. Implemented in-app (Cloudflare's hosted "Markdown for Agents" requires orange-cloud proxying, which §3 forbids):
+
+- `apps/web/src/lib/agent-markdown.ts` — Accept parsing (q-value aware), HTML→markdown conversion (`node-html-markdown`, scoped to `<main>`, scripts/styles/SVG stripped), token estimate (~4 chars/token).
+- `apps/web/src/app/api/markdown/route.ts` — converter; self-fetches the page's HTML same-origin (path is validated root-relative — not a proxy) and converts. Inner fetch carries `x-agent-markdown-internal` so the proxy never re-rewrites it (no loops).
+- `proxy.ts` — rewrites matching GET page requests to the converter, passing the original path via the `x-agent-markdown-path` request-header override (query params do not survive a middleware rewrite into the handler's `nextUrl`). Appends `Vary: Accept` on page responses — note Next.js overwrites `Vary` on prerendered **HTML** responses so only the markdown variant actually carries it; harmless on Vercel because the middleware rewrite re-keys the cache by path before any cache lookup, but an external shared cache in front would need its own Accept-aware keying. `/api/*` and preview paths excluded.
+
+**Known limitations:** pages whose content streams behind a Suspense/loading boundary (e.g. `/knowledge-hub`) convert only the fallback shell; and the responsive double-render pattern (mobile + desktop branches both in the DOM) duplicates headings in the markdown output, same as it does in the SEO outline.
+
+### Agent-readiness scanner — items deliberately NOT implemented
+
+The isitagentready.com scanner flags eleven capabilities. Five are implemented (`Link` discovery headers §4, DNS-AID records §3, markdown negotiation above, Content Signals §5, API catalog §4). The remaining six are **intentionally skipped** — each would advertise infrastructure that does not exist, sending agents to dead endpoints. Do not add them to chase the score; revisit only when the underlying capability ships.
+
+| Scanner item | Decision | Why |
+|---|---|---|
+| OAuth/OIDC discovery (`/.well-known/openid-configuration`, `/.well-known/oauth-authorization-server`) | Skip | The marketing site has no protected APIs and is not an identity provider. Publishing issuer metadata without an authorization server is false advertising. |
+| OAuth Protected Resource Metadata (`/.well-known/oauth-protected-resource`, RFC 9728) | Skip | Same — `/api/search` and `/api/health` are public; there is no token-protected resource to describe. |
+| `auth.md` agent registration | Skip | Depends on the two OAuth items above; there is no agent registration flow. |
+| MCP Server Card (`/.well-known/mcp/server-card.json`) | Skip | No MCP server runs on this origin. The card's `transport.endpoint` would point at nothing. If an MCP server ever ships, also add `_mcp._agents` DNS records (§3). |
+| Agent Skills index (`/.well-known/agent-skills/index.json`) | Skip for now | No published skills. A legitimate future skill could document the search API / markdown negotiation; until one is written, an empty index is noise. |
+| WebMCP (`navigator.modelContext.provideContext()`) | Skip for now | Experimental Chrome-only API (origin trial, spec in flux). The site is read-only content; search is already exposed via `service-desc` in the API catalog. Revisit when the API stabilizes. |
 
 ---
 
@@ -577,6 +666,8 @@ Cookie banner copy links to `/privacy-policy#cookies` (§11).
 
 `security.txt` at `/.well-known/security.txt` (§4 / RFC 9116 — covered in §18 verification).
 
+`api-catalog` at `/.well-known/api-catalog` (RFC 9727 §3 / RFC 9264 link-set, `application/linkset+json`) lists the site's machine-readable entry points (search API, health probe, sitemap) for automated agents. It is the `rel="api-catalog"` target of the homepage `Link` header (§6 header matrix). Body is a static file; its Content-Type is set in `next.config.ts` `headers()`. Source of truth: `apps/web/src/lib/security/agent-discovery.ts`.
+
 ---
 
 ## 18. Pre-launch verification checklist
@@ -602,9 +693,12 @@ Run on `staging.cleanstart.com` before flipping production DNS to `www.cleanstar
 17. **Banner gates GA4:** load homepage with fresh cookies → DevTools shows zero `google-analytics.com` requests until "Accept all"; after accept, `_ga` set + GA4 collect fires
 18. **Consent Mode v2 default:** all 4 signals `denied` on first paint
 19. **security.txt:** `curl https://www.cleanstart.com/.well-known/security.txt` returns 200 with `Contact:` and `Expires:` fields
+19a. **Agent discovery:** `curl -I https://www.cleanstart.com/` shows a `Link:` header with `rel="api-catalog"`, `rel="sitemap"`, and `rel="service-desc"`; `curl https://www.cleanstart.com/.well-known/api-catalog` returns 200 valid link-set JSON with `Content-Type: application/linkset+json`
+19b. **DNS-AID:** DoH query for `_index._agents.cleanstart.com` type `HTTPS` (and `SVCB`) returns `Status: 0` with an Answer, `AD: true` (§3 DNS-AID subsection has the exact curl)
+19c. **Markdown for agents:** `curl -H "Accept: text/markdown" https://www.cleanstart.com/` returns `Content-Type: text/markdown` + `x-markdown-tokens`; without the header, `text/html` (§8)
 20. **Mozilla Observatory + securityheaders.com:** scan returns A+ from both
 21. **Sitemap accuracy:** `<lastmod>` matches the most recent CMS publish for at least one blog and one resource entry
-22. **CAA / DNSSEC:** `dig CAA cleanstart.com +short` returns the three records; `dig +dnssec www.cleanstart.com` returns RRSIG
+22. **CAA / DNSSEC:** `dig CAA cleanstart.com +short` returns the three records; `dig DS cleanstart.com +short` returns the DS (registrar step — see §3 DNSSEC runbook; missing as of 2026-06-10); `dig +dnssec www.cleanstart.com` returns RRSIG with `ad` flag
 
 Only after all 22 pass: switch Vercel Production Domain to `www.cleanstart.com` (apex auto-redirects via §5).
 

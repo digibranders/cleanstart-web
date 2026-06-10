@@ -21,6 +21,23 @@ const nextConfig: NextConfig = {
     }
     return config;
   },
+  async headers() {
+    return [
+      {
+        // RFC 9727 §3 API catalog — extension-less static file in
+        // `public/.well-known/`. Override the default static Content-Type with
+        // the RFC 9264 link-set media type so agents parse it correctly.
+        source: "/.well-known/api-catalog",
+        headers: [
+          { key: "Content-Type", value: "application/linkset+json" },
+          {
+            key: "Cache-Control",
+            value: "public, max-age=3600, must-revalidate",
+          },
+        ],
+      },
+    ];
+  },
   async redirects() {
     return [
       {
