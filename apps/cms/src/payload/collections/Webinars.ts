@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload';
 
-import { isAdminOrEditor } from '../access';
+import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 
 const validateEndsAfterStarts = (
   value: Date | string | null | undefined,
@@ -52,7 +52,7 @@ export const Webinars: CollectionConfig = {
     },
   },
   access: {
-    read: () => true,
+    read: publishedOrAuthenticated,
     create: isAdminOrEditor,
     update: isAdminOrEditor,
     delete: isAdminOrEditor,

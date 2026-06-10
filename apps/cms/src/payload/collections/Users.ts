@@ -27,7 +27,13 @@ export const Users: CollectionConfig = {
     tokenExpiration: 60 * 60 * 8,
     maxLoginAttempts: 5,
     lockTime: 10 * 60 * 1000,
-    useAPIKey: false,
+    // Enables per-user API keys. The web app's draft-preview fetch authenticates
+    // as a dedicated read-only `preview-bot` user (Authorization: `users API-Key
+    // <CMS_API_KEY>`), which is what lets `publishedOrAuthenticated` (see
+    // access/index.ts) return drafts to preview while anonymous reads stay
+    // scoped to published. The preview-bot holds NO write roles, so create/
+    // update/delete (isAdminOrEditor) remain denied — least privilege.
+    useAPIKey: true,
     cookies: {
       sameSite: 'Lax',
       secure: process.env.NODE_ENV === 'production',

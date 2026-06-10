@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload';
 
-import { isAdminOrEditor } from '../access';
+import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { ROUTE_PREFIX } from '../lib/route-prefixes';
 import { mediaUploadField } from '../fields/media-upload';
@@ -38,7 +38,7 @@ export const Guides: CollectionConfig = {
     },
   },
   access: {
-    read: () => true,
+    read: publishedOrAuthenticated,
     create: isAdminOrEditor,
     update: isAdminOrEditor,
     delete: isAdminOrEditor,

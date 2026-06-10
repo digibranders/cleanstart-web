@@ -14,6 +14,25 @@ export const isAdminFieldLevel: FieldAccess = ({ req: { user } }) => hasRole(use
 export const isAdminOrEditor: Access = ({ req: { user } }) =>
   hasAnyRole(user, ['admin', 'editor']);
 
+/**
+ * Public read access for draft-enabled content collections.
+ *
+ * Authenticated requests (admin/editor/author sessions AND the read-only
+ * `preview-bot` API-key user the web app sends for draft preview) see every
+ * version, including drafts. Anonymous requests are constrained to published
+ * docs via a `Where` filter — so an unauthenticated `?draft=true` /
+ * `?where[_status][equals]=draft` query can never surface unpublished content.
+ *
+ * Returning `true` (rather than a role check) for any logged-in user preserves
+ * the prior authenticated behaviour exactly; the only change is that anonymous
+ * reads are now scoped to published. Write access stays governed separately by
+ * `isAdminOrEditor`, so a role-less preview-bot can read drafts but not mutate.
+ */
+export const publishedOrAuthenticated: Access = ({ req: { user } }) => {
+  if (user) return true;
+  return { _status: { equals: 'published' } };
+};
+
 export const isAdminOrSelf: Access = ({ req: { user } }) => {
   if (!user) return false;
   if (hasRole(user, 'admin')) return true;
