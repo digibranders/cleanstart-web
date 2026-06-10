@@ -79,7 +79,7 @@ page slugs, categories, types, and build status across the dev journey.
 | 6 | CleanSight | `/cleansight` | Static | ✅ | All 8 sections built |
 | 7 | CleanStart SBOM | `/software-bill-materials` | Static | ✅ | All 4 sections built |
 | 8 | CleanStart Images | `/cleanstart-images` | Static | ✅ | All 5 sections built (Hero, Browse, EasyStart, UVP, Environment) |
-| 8b | CleanStart Platform | `/cleanstart-platform` | Static | ✅ | Route at `src/app/cleanstart-platform/`. Platform overview ("AI-native trust architecture, source to runtime"). Linked from nav-config (`network` icon). In sitemap STATIC_ROUTES. ⚠ Title/entity collides with `/cleanstart-images` (both render "CleanStart Platform") — see SEO audit Metadata #7 / GEO G5. |
+| 8b | CleanStart Platform | `/cleanstart-platform` | Static | ✅ | Route at `src/app/cleanstart-platform/`. Platform overview ("AI-native trust architecture, source to runtime"); title "Inside the CleanStart Platform". Linked from nav-config (`network` icon). In sitemap STATIC_ROUTES. (Entity distinct from `/cleanstart-images`, which titles itself "CleanStart Images" — the prior brand-title collision is resolved.) |
 
 ---
 
