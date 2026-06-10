@@ -609,6 +609,9 @@ gtag('consent', 'update', {
 
 **Standard:** WCAG 2.2 Level AA. EAA enforcement live since 28 Jun 2025.
 
+**Implemented:**
+- **Skip-to-content link** (WCAG 2.4.1 / 2.1 A) — a hidden-until-focused `<a href="#main-content">` is the first focusable element in `src/app/layout.tsx` (`sr-only focus:not-sr-only`); every route's `<main>` landmark carries `id="main-content"` (all 40 routes), so keyboard users tab once and jump past the nav to the content.
+
 **WCAG 2.2 new SCs that apply:**
 - 2.4.11 Focus Not Obscured — sticky header risk; add `scroll-margin-top` on focusable elements.
 - 2.5.8 Target Size (Minimum) — interactive ≥ 24×24 CSS px (inline link exception).
