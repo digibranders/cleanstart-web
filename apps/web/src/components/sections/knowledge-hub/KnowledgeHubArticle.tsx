@@ -1,6 +1,7 @@
 import { Reveal } from '@/components/ui/Reveal';
 import type { KhArticle } from '@/lib/knowledge-hub';
 import { RenderLexical } from '@/lib/renderLexical';
+import Link from 'next/link';
 
 export function KnowledgeHubArticle({
   article,
@@ -10,7 +11,7 @@ export function KnowledgeHubArticle({
   return (
     <>
       <Reveal header>
-        {article.category?.name && <CategoryBadge>{article.category.name}</CategoryBadge>}
+        <Breadcrumb category={article.category?.name} />
 
         <h1
           className="font-display font-semibold mt-4"
@@ -71,23 +72,39 @@ export function KnowledgeHubArticle({
   );
 }
 
-function CategoryBadge({
-  children,
-}: {
-  children: React.ReactNode;
-}): React.ReactElement {
+function Breadcrumb({ category }: { category?: string | null | undefined }): React.ReactElement {
   return (
-    <span
-      className="inline-flex items-center font-medium"
-      style={{
-        fontSize: 'var(--fs-body-sm)',
-        lineHeight: 1.4,
-        letterSpacing: '-0.01em',
-        color: '#471EC0',
-      }}
-    >
-      <span style={{ color: '#5A5F75', marginRight: '6px' }}>Category:</span>
-      {children}
-    </span>
+    <nav aria-label="Breadcrumb">
+      <ol
+        className="flex flex-wrap items-center gap-x-1.5 gap-y-1 font-medium"
+        style={{ fontSize: 'var(--fs-body-sm)', lineHeight: 1.4, letterSpacing: '-0.01em' }}
+      >
+        <li>
+          <Link href="/" className="transition-colors hover:text-cs-purple-1" style={{ color: '#5A5F75' }}>
+            Home
+          </Link>
+        </li>
+        <li aria-hidden style={{ color: '#9094A8' }}>
+          /
+        </li>
+        <li>
+          <Link
+            href="/knowledge-hub"
+            className="transition-colors hover:text-cs-purple-1"
+            style={{ color: '#5A5F75' }}
+          >
+            Knowledge Hub
+          </Link>
+        </li>
+        {category && (
+          <>
+            <li aria-hidden style={{ color: '#9094A8' }}>
+              /
+            </li>
+            <li style={{ color: '#471EC0' }}>{category}</li>
+          </>
+        )}
+      </ol>
+    </nav>
   );
 }

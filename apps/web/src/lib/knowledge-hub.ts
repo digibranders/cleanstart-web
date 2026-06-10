@@ -1,5 +1,6 @@
 import type { LexicalRoot, TocEntry } from '@/lib/blog';
 import { fetchCMS } from '@/lib/cms-fetch';
+import type { CmsSeo } from '@/lib/seo/cms-seo';
 import { academyOrderOf } from './kb-academy-order';
 import type { KhArticleLink, KhGroup, KhSubcategory } from './knowledge-hub-shared';
 
@@ -169,12 +170,15 @@ export interface KhArticle {
   category?: { name: string } | null;
   body?: LexicalRoot | null;
   tableOfContents?: TocEntry[] | null;
+  seo?: CmsSeo | null;
+  publishedAt?: string | null;
+  updatedAt?: string | null;
 }
 
-/** Fetch a single published article by slug (depth 1 for the category name). */
+/** Fetch a single published article by slug (depth 1 for the category name and seo.ogImage). */
 export async function getKnowledgeArticle(slug: string): Promise<KhArticle | null> {
   const res = await fetchCMS<CmsList<KhArticle & { category?: { name: string } | number | null }>>(
-    `/api/knowledgeBase?${PUBLISHED}&depth=1&limit=1&where[slug][equals]=${encodeURIComponent(slug)}`,
+    `/api/knowledgeBase?${PUBLISHED}&depth=1&limit=1&where[slug][equals]=${encodeURIComponent(slug)}&select[title]=true&select[slug]=true&select[abstract]=true&select[videoUrl]=true&select[body]=true&select[tableOfContents]=true&select[category]=true&select[seo]=true&select[publishedAt]=true&select[updatedAt]=true`,
   );
   const doc = res.docs[0];
   if (!doc) return null;

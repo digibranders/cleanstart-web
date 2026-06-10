@@ -1,0 +1,27 @@
+{
+  "linkset": [
+    {
+      "anchor": "/",
+      "service-desc": [
+        {
+          "href": "/api/search",
+          "type": "application/json",
+          "title": "CleanStart content search — GET ?q=<query>&type=<collection>&limit=<n> returns JSON hits"
+        }
+      ],
+      "status": [
+        {
+          "href": "/api/health",
+          "type": "application/json",
+          "title": "Service health probe"
+        }
+      ],
+      "sitemap": [
+        {
+          "href": "/sitemap.xml",
+          "type": "application/xml"
+        }
+      ]
+    }
+  ]
+}

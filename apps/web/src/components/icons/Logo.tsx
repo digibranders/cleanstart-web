@@ -6,7 +6,7 @@ import { cn } from "@/lib/cn";
 export function Logo({ className = "" }: { className?: string }) {
   return (
     <Image
-      src="/images/logo-cleanstart-footer.png"
+      src="/images/cleanstart-logo.png"
       alt="CleanStart"
       width={153}
       height={32}
