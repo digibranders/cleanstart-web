@@ -80,7 +80,7 @@ export default async function EventsPage({
         ])}
       />
       <Header />
-      <main style={{ background: "#f6f6f6" }}>
+      <main id="main-content" style={{ background: "#f6f6f6" }}>
         <UpcomingEventHero events={upcomingEvents} />
         <FadeUp>
           <PastEventsGrid

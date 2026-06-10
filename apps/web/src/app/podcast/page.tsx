@@ -117,7 +117,7 @@ export default async function PodcastPage(): Promise<React.ReactElement> {
         ])}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <PodcastHero page={page} featuredHero={featuredHero} />
 
         <FadeUp>

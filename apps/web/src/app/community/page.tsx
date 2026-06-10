@@ -24,7 +24,7 @@ export default function CommunityPage() {
         data={breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Community' }])}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <div className="bg-cs-hero bg-cs-grid relative overflow-hidden">
           <CommunityHero />
         </div>

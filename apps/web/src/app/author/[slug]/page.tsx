@@ -96,7 +96,7 @@ export default async function AuthorPage({
         })}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <AuthorHero author={author} />
         <AuthorBio author={author} />
         <AuthorDetails author={author} />

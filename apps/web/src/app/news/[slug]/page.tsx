@@ -106,7 +106,7 @@ export async function renderNewsDetail({
         })}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <NewsDetailHero
           title={item.title}
           pressType={item.pressType}

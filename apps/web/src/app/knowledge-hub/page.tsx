@@ -26,7 +26,7 @@ export default async function KnowledgeHubPage(): Promise<React.ReactElement> {
         data={breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Knowledge Hub' }])}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <DetailHero
           breadcrumb={[{ label: 'Home', href: '/' }, { label: 'Knowledge Hub' }]}
           title="Knowledge Hub"

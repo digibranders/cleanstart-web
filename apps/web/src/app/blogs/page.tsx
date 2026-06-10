@@ -70,7 +70,7 @@ export default async function BlogsPage({
         ])}
       />
       <Header />
-      <main style={{ background: "#f6f6f6" }}>
+      <main id="main-content" style={{ background: "#f6f6f6" }}>
         <div className="relative overflow-hidden">
           <BlogsHero
             featuredPost={featuredPost}

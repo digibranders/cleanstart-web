@@ -27,7 +27,7 @@ export default function ContactUsPage() {
         ])}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <ContactHero />
 
         <FadeUp>

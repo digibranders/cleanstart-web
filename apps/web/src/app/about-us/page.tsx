@@ -30,7 +30,7 @@ export default function AboutPage() {
         ])}
       />
       <Header />
-      <main>
+      <main id="main-content">
         {/* overflow stays visible below lg so the mobile cube in AboutHero can
             break out and overlap into AboutWhoWeAre. */}
         <div className="bg-cs-hero relative overflow-visible lg:overflow-hidden">

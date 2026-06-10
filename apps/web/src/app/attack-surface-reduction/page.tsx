@@ -30,7 +30,7 @@ export default function AttackSurfaceReductionPage(): React.ReactElement {
         ])}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <ASRHero />
         {/* Wrapper owns the shared #F6F6F6 backdrop so ASRBloated + ASRApproach
             read as one continuous canvas with no visible seam between them. */}

@@ -34,7 +34,7 @@ export default function Home() {
   return (
     <>
       <Header />
-      <main>
+      <main id="main-content">
         <div className="bg-cs-hero relative overflow-hidden">
           {/* Decorative hero-top mask: dark-navy tech grid, two purple ellipse
               glows, and four line accents baked into one SVG pinned to the top

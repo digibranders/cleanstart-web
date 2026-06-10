@@ -43,7 +43,7 @@ export default function CleanStartImagesPage(): React.ReactElement {
         })}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <CleanStartImagesHero />
         <FadeUp>
           <CleanStartImagesBrowse />

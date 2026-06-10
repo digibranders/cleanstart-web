@@ -144,7 +144,7 @@ export default async function CareerDetailPage({
         />
       ) : null}
       <Header />
-      <main>
+      <main id="main-content">
         <CareerDetailHero title={job.title} meta={meta} />
         <CareerDetailContent body={bodyWithoutDeptLine} />
         {/* CMS-native, open roles accept applications on-site. ATS roles keep

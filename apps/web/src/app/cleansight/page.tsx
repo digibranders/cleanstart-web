@@ -51,7 +51,7 @@ export default function CleanSightPage(): React.ReactElement {
         })}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <CleanSightHero />
         <FadeUp>
           <CleanSightProblems />
