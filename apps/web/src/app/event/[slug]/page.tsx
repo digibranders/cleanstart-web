@@ -153,7 +153,7 @@ export async function renderEventDetail({
       />
       <JsonLd id={`event-schema-${event.slug}`} data={eventJsonLd(event)} />
       <Header />
-      <main style={{ background: "#f6f6f6" }}>
+      <main id="main-content" style={{ background: "#f6f6f6" }}>
         {/* Mobile: compact card-style layout. */}
         <EventDetailMobileCard
           title={event.title}

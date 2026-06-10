@@ -152,7 +152,7 @@ export async function renderBlogDetail({
         })}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <BlogDetailHero
           title={post.title}
           slug={post.slug}

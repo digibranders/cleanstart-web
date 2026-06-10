@@ -14,7 +14,7 @@ export default function NotFound() {
   return (
     <>
       <Header />
-      <main>
+      <main id="main-content">
         <StateView
           variant="not-found"
           actions={

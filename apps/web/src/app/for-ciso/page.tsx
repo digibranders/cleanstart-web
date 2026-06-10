@@ -30,7 +30,7 @@ export default function ForCisoPage(): React.ReactElement {
         ])}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <CisoHero />
         <FadeUp>
           <CisoRisks />

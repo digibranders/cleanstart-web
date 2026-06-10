@@ -17,7 +17,7 @@ export default async function KnowledgeHubLayout({
   return (
     <>
       <Header />
-      <main>
+      <main id="main-content">
         <KnowledgeHubArticleHero />
         <FadeUp>
           <section className="bg-white">

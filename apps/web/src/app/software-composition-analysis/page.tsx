@@ -31,7 +31,7 @@ export default function SCAPage(): React.ReactElement {
         ])}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <SCAHero />
         <FadeUp>
           <SCAProblems />

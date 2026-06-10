@@ -28,7 +28,7 @@ export default function PartnersPage() {
         ])}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <PartnersHero />
         <FadeUp>
           <PartnersWhy />

@@ -84,6 +84,7 @@ const renderers: Record<string, (args: { slug: string; draft?: boolean }) => Pro
 function ErrorPage({ message }: { message: string }): React.ReactElement {
   return (
     <main
+      id="main-content"
       style={{
         display: "grid",
         placeItems: "center",

@@ -120,6 +120,7 @@ export async function renderResourceDetail({
       />
       <Header />
       <main
+        id="main-content"
         style={{
           background:
             "linear-gradient(180deg, #151021 0%, #10123E 22%, #131E8F 48%, #471EC0 72%, #471FC3 100%)",

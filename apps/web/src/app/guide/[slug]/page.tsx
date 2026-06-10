@@ -151,7 +151,7 @@ export async function renderGuideDetail({
         />
       ) : null}
       <Header />
-      <main>
+      <main id="main-content">
         <GuideDetailHero
           title={guide.title}
           slug={guide.slug}

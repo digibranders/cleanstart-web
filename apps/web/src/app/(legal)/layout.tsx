@@ -33,7 +33,7 @@ export default async function LegalSectionLayout({
   return (
     <>
       <Header />
-      <main>
+      <main id="main-content">
         <LegalHero title="Legal" />
         <FadeUp>
           <Section padding="none" className="bg-white pb-section-sm pt-0 sm:pt-section-sm">

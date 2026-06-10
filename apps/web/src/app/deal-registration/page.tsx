@@ -25,7 +25,7 @@ export default function DealRegistrationPage() {
         ])}
       />
       <Header />
-      <main style={{ background: "#f3f3f6" }}>
+      <main id="main-content" style={{ background: "#f3f3f6" }}>
         <section className="relative w-full overflow-hidden">
           <div
             aria-hidden

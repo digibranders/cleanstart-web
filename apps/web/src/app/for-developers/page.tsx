@@ -27,7 +27,7 @@ export default function ForDevelopersPage(): React.ReactElement {
         data={breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'For Developers' }])}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <DeveloperHero />
         <FadeUp>
           <DeveloperWhyItMatters />
