@@ -240,6 +240,22 @@ report-to csp-endpoint;
 
 **Strength posture:** `'unsafe-inline'` on `script-src`/`style-src` is the realistic ceiling for a statically-prerendered site with pervasive inline styles — it allows inline JS, so a successful unescaped-HTML injection could execute. The XSS defence-in-depth therefore comes from the **structural directives** — `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`, and **Trusted Types** (`require-trusted-types-for 'script'`, prod only) — plus disciplined output escaping (the one unescaped sink, `JsonLd`, manually escapes `<`). `https:` on `script-src` keeps GA4 / Vercel third-party scripts working without enumerating hosts.
 
+#### Why `'unsafe-inline'` cannot be removed (analyzed — this is the floor)
+
+A common instinct is to "tighten" `style-src`/`script-src` to a nonce/hash policy. **It is not safely possible on this architecture, and the analysis below is the reason — do not attempt it without first switching to full dynamic rendering.** Three independent sources of inline content each require `'unsafe-inline'`:
+
+1. **Inline `style=` *attributes* (the Figma-exact-values convention).** `style={{}}` is everywhere (exact gradients/radii/shadows that aren't Tailwind-expressible). CSP **nonces and hashes only apply to `<style>`/`<script>` *elements*, never to `style=` *attributes*** — the only source expression that clears a `style=` attribute is `'unsafe-inline'` (or `style-src-attr 'unsafe-inline'`). No amount of refactoring the *elements* changes this.
+2. **Inline `<style>` *elements*.** `next/font/google` (Manrope/Sora/JetBrains Mono in `layout.tsx`) injects an `@font-face` + CSS-variable `<style>` block on **every** page, and Next inlines error/critical CSS (verified in the build output). These need `'unsafe-inline'`, a nonce, or a per-build hash.
+3. **Inline `<script>`.** Next's bootstrap + RSC streaming (`self.__next_f.push(...)`) emit inline scripts on every page, and `JsonLd` renders `<script type="application/ld+json">` site-wide.
+
+Why the two tightening paths both fail here:
+
+- **Nonces** would cover the `<style>`/`<script>` *elements* (2 and 3) — but Next only applies a nonce when the middleware sets it on the *request* CSP header AND the page is **dynamically rendered** (`headers()` opts out of static). That re-introduces the exact dynamic-rendering cost we removed (§15 / §20 #7). And nonces still never cover the `style=` *attributes* (1).
+- **Hashes** are static, but `next/font` and the Next bootstrap emit content whose hashes **change every build**; maintaining a build-time hash-injection pipeline for a static export is fragile and unsupported — and hashes also never cover `style=` attributes (1).
+- A **`style-src-attr` / `style-src-elem` split** buys nothing: `style-src-elem` still needs `'unsafe-inline'` for `next/font`, so the `'unsafe-inline'` cannot be scoped down to attributes only.
+
+**Conclusion:** `'self' 'unsafe-inline'` is the floor for a statically-prerendered Next site that uses `next/font` and the Figma inline-style convention. The *only* route to a strict nonce/hash CSP is to accept **fully dynamic rendering** (losing the static-prerender perf model). Revisit this section only if that tradeoff is ever deliberately taken; until then, the structural directives above are where the real protection lives.
+
 **Side effect — PPR unblocked:** the "no PPR / `cacheComponents`" decision (§15 / §20 #7) was justified *solely* by nonce-CSP forcing dynamic rendering. With nonces gone, that specific blocker no longer applies; enabling PPR is now a separate, independent call (not yet taken).
 
 ### Burn-in plan (report-only → enforce)
