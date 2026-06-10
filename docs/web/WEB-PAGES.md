@@ -52,6 +52,7 @@ page slugs, categories, types, and build status across the dev journey.
 |---|-----------|----------|------|--------|-------|
 | 22 | About Us | `/about-us` | Static | ✅ | Route at `src/app/about-us/` |
 | 23 | Careers | `/careers` | CMS Listing | ✅ | Backed by Payload `jobs` + `jobLocations` collections; published roles only. Apply form is live on CMS-native open jobs → `POST /api/career-applications/apply` (resume to private R2, application row, Brevo HR notification). |
+| 23b | Job – Single | `/job/[slug]` | CMS Detail | ✅ | Route at `src/app/job/[slug]/` (singular — sibling to the `/careers` listing). Emits JobPosting + BreadcrumbList JSON-LD (open roles only). |
 | 24 | Community | `/community` | Static | ✅ | Built 2026-05-22 from Figma 732:3192 |
 | 25 | Contact Us | `/contact-us` | Static | ✅ | Built 2026-05-23 from Figma 817:14719 |
 | 26 | Teams | `/teams` | Static | ✅ | All 5 sections built (farheen integration 2026-05-20) |
@@ -66,8 +67,8 @@ page slugs, categories, types, and build status across the dev journey.
 | 4 | FIPS Compliance | `/fips` | Static | ✅ | All 7 sections built |
 | 5 | Vulnerability Remediation | `/vulnerability-remediation` | Static | ✅ | All 7 sections built |
 | 9 | For CISO | `/for-ciso` | Static | ✅ | All 8 sections built (farheen integration 2026-05-20) |
-| 10 | For Developers | `/for-developers` | Static | ⬜ | |
-| 3 | Enhance SCA | `/software-composition-analysis` | Static | ✅ | All 7 sections built (farheen integration 2026-05-20) |
+| 10 | For Developers | `/for-developers` | Static | ✅ | Route at `src/app/for-developers/`. Linked from the homepage AudienceTabs and the nav (`nav-config.ts`). |
+| 3 | Enhance SCA | `/software-composition-analysis` | Static | ✅ (de-listed) | All 7 sections built (farheen integration 2026-05-20). **Page kept but intentionally de-listed** — excluded from the sitemap (`sitemap.ts:93` comment) and absent from nav-config per product decision. Reachable by direct URL only. |
 
 ---
 
@@ -78,6 +79,7 @@ page slugs, categories, types, and build status across the dev journey.
 | 6 | CleanSight | `/cleansight` | Static | ✅ | All 8 sections built |
 | 7 | CleanStart SBOM | `/software-bill-materials` | Static | ✅ | All 4 sections built |
 | 8 | CleanStart Images | `/cleanstart-images` | Static | ✅ | All 5 sections built (Hero, Browse, EasyStart, UVP, Environment) |
+| 8b | CleanStart Platform | `/cleanstart-platform` | Static | ✅ | Route at `src/app/cleanstart-platform/`. Platform overview ("AI-native trust architecture, source to runtime"). Linked from nav-config (`network` icon). In sitemap STATIC_ROUTES. ⚠ Title/entity collides with `/cleanstart-images` (both render "CleanStart Platform") — see SEO audit Metadata #7 / GEO G5. |
 
 ---
 
@@ -86,16 +88,17 @@ page slugs, categories, types, and build status across the dev journey.
 | # | Page Name | URL Slug | Type | Status | Notes |
 |---|-----------|----------|------|--------|-------|
 | 13 | Blogs (Listing) | `/blogs` | CMS Listing | ✅ | Route at `src/app/blogs/` |
-| 12 | Blog – Single Post | `/blog/[slug]` | CMS Detail | ✅ | Route at `src/app/blog/[slug]/` |
+| 12 | Blog – Single Post | `/blogs/[slug]` | CMS Detail | ✅ | Route at `src/app/blogs/[slug]/` (plural — sibling to the `/blogs` listing). Emits BlogPosting + BreadcrumbList JSON-LD; authors link to `/author/[slug]`. |
 | 13b | Guides (Listing) | `/guide` | CMS Listing | ✅ | Route at `src/app/guide/page.tsx` (singular hub, sibling to `/guide/[slug]` — matches the indexed detail path for clean hub-and-spoke SEO). Payload `guides` collection. Compact 4×4 grid (16/page), search-only (collection has no category). Built 2026-06-04 from Figma 1248:8204. |
 | 13c | Guide – Single | `/guide/[slug]` | CMS Detail | ✅ | Route at `src/app/guide/[slug]/` |
-| 14 | Knowledge Hub | `/knowledge-hub` | CMS Listing | ⬜ | Payload `knowledgeBase` collection |
-| 15 | Newsroom | `/news` | CMS Listing | ✅ | Route at `src/app/news/`; press-release detail at `src/app/news/[slug]/` |
+| 14 | Knowledge Hub | `/knowledge-hub` | CMS Listing | ✅ | Route at `src/app/knowledge-hub/`; landing + `[slug]` detail with full sidebar tree. Payload `knowledgeBase` collection (253 articles). Detail emits Article/BreadcrumbList/VideoObject JSON-LD + resolveCmsSeo. Sidebar renders all article links in SSR HTML (crawlable link graph); every article carries a Home → Knowledge Hub → Category breadcrumb. Nav points at `/knowledge-hub`. |
+| 15 | Newsroom | `/news` | CMS Listing | ✅ | Route at `src/app/news/`. REGION filter. |
+| 15b | News – Single | `/news/[slug]` | CMS Detail | ✅ | Route at `src/app/news/[slug]/`. Emits NewsArticle + BreadcrumbList JSON-LD; authors link to `/author/[slug]`. |
 | 16 | Podcast | `/podcast` | CMS Listing | ✅ | Route at `src/app/podcast/`; Payload `podcastEpisodes` collection + `podcastPage` global (YT embeds) |
 | 17 | Resource Center | `/resource-center` | CMS Listing | ✅ | Route at `src/app/resource-center/` |
-| 17b | Resource Detail | `/resource/[slug]` | CMS Detail | ✅ | Route at `src/app/resource/[slug]/` |
+| 17b | Resource Detail | `/resources/[slug]` | CMS Detail | ✅ | Route at `src/app/resources/[slug]/` (plural). Emits Article + BreadcrumbList JSON-LD. Optional `gateForm` gates the download. |
 | 17c | Case Studies | `/case-studies` | CMS Listing | ✅ | Payload `case-studies` collection (listing-only, no detail). Cards link straight to the public R2 PDF download. Reuses home `BuiltForTeams` (no CMS). Built 2026-06-03 from Figma 1198:1231. |
-| — | Author Page | `/author/[slug]` | CMS Detail | ⬜ | Dynamic route, Payload `authors` |
+| — | Author Page | `/author/[slug]` | CMS Detail | ✅ | Dynamic route at `src/app/author/[slug]/`, Payload `authors`. AuthorHero + AuthorBio + AuthorDetails + AuthorPosts ("More from {author}" — crawlable blog grid via `getPostsByAuthor`). Emits ProfilePage/Person + BreadcrumbList JSON-LD. |
 
 ---
 
@@ -103,8 +106,9 @@ page slugs, categories, types, and build status across the dev journey.
 
 | # | Page Name | URL Slug | Type | Status | Notes |
 |---|-----------|----------|------|--------|-------|
-| 18 | In-Person Events | `/events` | CMS Listing | ✅ | Payload `events` collection |
-| 19 | Webinars | `/webinars` | CMS Listing | ✅ | Payload `webinars` collection |
+| 18 | In-Person Events | `/events` | CMS Listing | ✅ | Payload `events` collection. COUNTRY filter on past events. |
+| 18b | Event – Single | `/event/[slug]` | CMS Detail | ✅ | Route at `src/app/event/[slug]/` (singular — sibling to the `/events` listing). Emits Event + BreadcrumbList JSON-LD. |
+| 19 | Webinars | `/webinars` | CMS Listing | ✅ | Payload `webinars` collection. No detail route by design (registration is external/in-house form). |
 
 ---
 
@@ -123,7 +127,9 @@ page slugs, categories, types, and build status across the dev journey.
 
 | # | Page Name | URL Slug | Type | Status | Notes |
 |---|-----------|----------|------|--------|-------|
-| 27 | 404 Error Page | `/404` | Utility | ⬜ | Next.js `not-found.tsx` |
+| 27 | 404 Error Page | `/404` | Utility | ✅ | Next.js `not-found.tsx` (noindex, full header/footer nav). |
+| — | Guide OG Cover | `/guide-cover/[slug]` | Utility | ✅ | `ImageResponse` route — generated 1200×630 branded OG/social cover for guides without a hero image (`?kw=` keyword). Not a page; not in nav or sitemap. |
+| — | Draft Preview | `/preview/[collection]/[slug]` | Utility | ✅ | Draft-mode preview route at `src/app/preview/[collection]/[slug]/`. Renders unpublished CMS docs for editors via Payload draft preview; noindex, not in nav or sitemap. |
 
 ---
 
@@ -149,10 +155,10 @@ Homepage ✅ → About Us ✅ → Book a Demo → Contact Us → Pricing → Pro
 Partners → Careers → Teams → Community → Deal Registration
 
 **Wave 3 — CMS listing pages** (needs CMS live)
-Blogs ✅ → Knowledge Hub → Newsroom ✅ → Resource Center ✅ → Webinars ✅ → Events ✅ → Podcast ✅
+Blogs ✅ → Knowledge Hub ✅ → Newsroom ✅ → Resource Center ✅ → Webinars ✅ → Events ✅ → Podcast ✅
 
 **Wave 4 — CMS detail / dynamic routes**
-Blog Single Post ✅ → Author Page
+Blog Single Post ✅ → Author Page ✅ → Event Single ✅ → Job Single ✅ → Resource Detail ✅ → News Detail ✅ → Knowledge Hub Article ✅
 
 **Wave 5 — Legal + Utility**
 Legal Hub → Privacy Policy → 404 Page  (Terms & Conditions dropped)

@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
     type: "article",
     publishedTime: effectivePublishedAt(post) ?? post.publishedAt,
     modifiedTime: post.updatedAt,
-    authors: post.authors?.map((a) => a.name),
+    authors: post.authors?.map((a) => a.name), // metadata authors (plain string[])
     ...(seo.noindex ? { noindex: true } : {}),
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
     ...(seo.image
@@ -146,7 +146,7 @@ export async function renderBlogDetail({
           publishedAt,
           modifiedAt: post.updatedAt,
           imageUrl: heroAbsolute,
-          authors: post.authors?.map((a) => ({ name: a.name })),
+          authors: post.authors?.map((a) => ({ name: a.name, slug: a.slug })),
           category: post.categories?.name,
           relatedLinks: journeyLinks.length > 0 ? journeyLinks : undefined,
         })}

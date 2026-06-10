@@ -34,7 +34,7 @@ export async function Header() {
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/logo-cleanstart-footer.png"
+          src="/images/cleanstart-logo.png"
           alt="CleanStart"
           width={153}
           height={32}

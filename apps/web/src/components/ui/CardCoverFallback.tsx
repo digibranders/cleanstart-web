@@ -17,7 +17,7 @@ export function CardCoverFallback(): React.ReactElement {
       aria-hidden
     >
       <Image
-        src="/images/logo-cleanstart-footer.png"
+        src="/images/cleanstart-logo.png"
         alt=""
         width={153}
         height={32}

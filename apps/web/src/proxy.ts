@@ -10,7 +10,6 @@ import {
   PERMISSIONS_POLICY,
   REPORTING_ENDPOINTS,
   buildCsp,
-  generateNonce,
 } from "@/lib/security/csp";
 import {
   lookupRedirect,
@@ -107,9 +106,7 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  const nonce = generateNonce();
   const requestHeaders = new Headers(headers);
-  requestHeaders.set("x-nonce", nonce);
 
   // Markdown for agents: an explicit `Accept: text/markdown` on an HTML page
   // is rewritten to the converter route (which self-fetches the page's HTML —
@@ -123,8 +120,8 @@ export async function proxy(request: NextRequest) {
     acceptsMarkdown(headers.get("accept"));
 
   if (wantsMarkdown) {
-    // Query params on the rewrite URL don't reach the handler's nextUrl;
-    // request-header overrides do (same mechanism as x-nonce above).
+    // Query params on the rewrite URL don't reach the handler's nextUrl, but
+    // request-header overrides do — carry the original path+search this way.
     requestHeaders.set(MARKDOWN_PATH_HEADER, nextUrl.pathname + nextUrl.search);
   }
 
@@ -136,7 +133,7 @@ export async function proxy(request: NextRequest) {
         request: { headers: requestHeaders },
       });
 
-  const csp = buildCsp({ nonce, isProduction, isDraftMode, isPreviewPath });
+  const csp = buildCsp({ isProduction, isDraftMode, isPreviewPath });
   const cspHeaderName =
     CSP_MODE === "enforce"
       ? "Content-Security-Policy"

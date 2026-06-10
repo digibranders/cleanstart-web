@@ -12,7 +12,7 @@
 
 CleanStart is shipping a Next.js 16.2.5 / React 19 / Tailwind v4 marketing site at `www.cleanstart.com`. CMS deploys 2–3 days after web. The plan owner is `admin@digibranders.com`; release captain rotates weekly among the 3-dev team.
 
-**In scope for v1 launch (P0):** branch & env strategy, DNS/TLS via Cloudflare, security headers + strict nonce-CSP, error boundaries, SEO (sitemap, canonical, JSON-LD, og:image), CMS draft-mode noindex, Sentry + Vercel Analytics + GA4 with Consent Mode v2, cookie banner, ISR + revalidate webhook, accessibility (WCAG 2.2 AA), Lighthouse CI, axe-core CI, security.txt, legal pages, rollback runbook.
+**In scope for v1 launch (P0):** branch & env strategy, DNS/TLS via Cloudflare, security headers + CSP (report-only → enforce, see §4), error boundaries, SEO (sitemap, canonical, JSON-LD, og:image), CMS draft-mode noindex, Sentry + Vercel Analytics + GA4 with Consent Mode v2, cookie banner, ISR + revalidate webhook, accessibility (WCAG 2.2 AA), Lighthouse CI, axe-core CI, security.txt, legal pages, rollback runbook.
 
 **Out of scope for v1 (P1+):** llms.txt/ai.txt (post-launch), UptimeRobot wiring (post-launch), HSTS preload submission (+7 days), DMARC progression, status page (BetterStack v1.5).
 
@@ -191,7 +191,7 @@ All headers emitted from `apps/web/src/proxy.ts`. Next 16 renamed `middleware.ts
 | `Cross-Origin-Resource-Policy` | `same-site` | Skip COEP — would break YouTube/HubSpot embeds |
 | `X-XSS-Protection` | _(not set)_ | OWASP 2024+ classifies as harmful |
 | `Permissions-Policy` | (full opt-out — see below) | Includes Privacy Sandbox |
-| `Content-Security-Policy[-Report-Only]` | (strict nonce — see below) | Report-Only for week 1, then enforce |
+| `Content-Security-Policy[-Report-Only]` | (pragmatic inline-permitting — see §4 CSP) | Report-Only until burn-in clean, then enforce |
 | `Reporting-Endpoints` | `csp-endpoint="/api/csp-report"` | Pairs with CSP `report-to` |
 | `X-Robots-Tag` (non-prod or draft) | `noindex, nofollow` | Defence-in-depth backstop |
 | `X-Robots-Tag` (prod) | `max-image-preview:large, max-snippet:-1` | Google Discover eligibility |
@@ -208,36 +208,47 @@ private-state-token-issuance=(), private-state-token-redemption=()
 
 ### CSP
 
-**Strict, nonce-based, `'strict-dynamic'`** (allowlist CSPs are bypassable per OWASP/web.dev 2024+):
+**Pragmatic, statically-prerender-compatible** (revised 2026-06-10). The earlier design was a strict per-request **nonce + `'strict-dynamic'`** CSP. It was abandoned because it was **architecturally incompatible with this site** and could never be enforced as written:
+
+1. **Nonces require dynamic rendering.** Next.js only auto-applies a nonce to its bootstrap scripts when the middleware sets the CSP on the *request* header AND the page is dynamically rendered (the nonce is read via `headers()`). The marketing site is **statically prerendered** at build time — a per-request nonce in the response can never match build-time HTML. Forcing every route dynamic to enable nonces is the wrong trade for a marketing site.
+2. **Inline `style=` attributes can never carry a nonce.** The Figma-exact-values convention puts inline `style={{}}` everywhere; CSP nonces only clear `<style>`/`<script>` *elements*, not `style=` *attributes*. So `style-src` **must** allow `'unsafe-inline'` regardless.
+3. The old machinery generated a nonce in `proxy.ts` that **nothing read** (CSP was only on the response, never the request; no layout consumed `x-nonce`). Flipping `CSP_ENFORCE=1` would have white-screened the site (blocked Next's scripts under `strict-dynamic`, and every inline style under `style-src`).
+
+The current policy (`lib/security/csp.ts`, exercised by `csp.test.ts`):
 
 ```
 default-src 'self';
-script-src 'self' 'nonce-{NONCE}' 'strict-dynamic' https: 'unsafe-inline';
-style-src 'self' 'nonce-{NONCE}';
-img-src 'self' data: blob: https://cdn.cleanstart.com https://cms.cleanstart.com;
-font-src 'self' https://fonts.gstatic.com;
+script-src 'self' 'unsafe-inline' https:;
+style-src 'self' 'unsafe-inline';
+img-src 'self' data: blob: https://cdn.cleanstart.com https://cms.cleanstart.com
+        https://storage.googleapis.com https://cdn.jsdelivr.net;
+font-src 'self' https://fonts.gstatic.com data:;
+media-src 'self' data: blob: https://storage.googleapis.com;
 connect-src 'self' https://cms.cleanstart.com https://*.ingest.sentry.io
             https://vitals.vercel-insights.com https://va.vercel-scripts.com
             https://www.google-analytics.com https://*.analytics.google.com;
-frame-ancestors 'none';
+frame-ancestors 'none';            (preview surfaces override to self + cms.cleanstart.com)
 base-uri 'self';
 form-action 'self';
 object-src 'none';
 upgrade-insecure-requests;
-require-trusted-types-for 'script';
-trusted-types nextjs default;
+require-trusted-types-for 'script'; (production only)
+trusted-types nextjs default;       (production only)
 report-uri /api/csp-report;
 report-to csp-endpoint;
 ```
 
-`'unsafe-inline'` after the nonce is a no-op when modern browsers see `'strict-dynamic'`; it's there as a fallback for old browsers. `https:` likewise is only honoured by browsers that don't understand `'strict-dynamic'`.
+**Strength posture:** `'unsafe-inline'` on `script-src`/`style-src` is the realistic ceiling for a statically-prerendered site with pervasive inline styles — it allows inline JS, so a successful unescaped-HTML injection could execute. The XSS defence-in-depth therefore comes from the **structural directives** — `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`, and **Trusted Types** (`require-trusted-types-for 'script'`, prod only) — plus disciplined output escaping (the one unescaped sink, `JsonLd`, manually escapes `<`). `https:` on `script-src` keeps GA4 / Vercel third-party scripts working without enumerating hosts.
 
-**Trade-off accepted:** strict nonce CSP forces dynamic rendering on every page → **no PPR / `cacheComponents`** (locked decision in §20 #7). Revisit when we move to hash-based CSP + `experimental.sri`.
+**Side effect — PPR unblocked:** the "no PPR / `cacheComponents`" decision (§15 / §20 #7) was justified *solely* by nonce-CSP forcing dynamic rendering. With nonces gone, that specific blocker no longer applies; enabling PPR is now a separate, independent call (not yet taken).
 
-### Burn-in plan
+### Burn-in plan (report-only → enforce)
 
-- **Week 1 (post-launch):** `Content-Security-Policy-Report-Only`. Monitor Sentry CSP-violation feed.
-- **Week 2:** flip to enforcing once 24h clean.
+`CSP_MODE` defaults to **report-only**; set `CSP_ENFORCE=1` to flip. Do NOT flip until the burn-in is clean:
+
+- **Report-only (current):** ships `Content-Security-Policy-Report-Only`. Monitor `/api/csp-report` → Sentry for violations against real traffic across all page archetypes.
+- **⚠ Trusted-Types gate before enforce:** `require-trusted-types-for 'script'` is enforced in production. React's `dangerouslySetInnerHTML` (used by `JsonLd` on **every** page and `ConsentModeScript`) writes raw HTML to a Trusted-Types sink — under enforcement this can throw unless a Trusted Types policy is registered for those sinks. The report-only feed will surface these as `trusted-types` violations. **Resolve them (register a TT policy for the JSON-LD/consent sinks, or drop `require-trusted-types-for`) before flipping `CSP_ENFORCE=1`** — otherwise enforcement breaks the JSON-LD site-wide.
+- **Flip to enforcing** once the report-only feed is 24h clean (zero script/style/trusted-types violations).
 - **+7 days enforce:** submit HSTS preload.
 
 ### Live Preview iframe carve-out
@@ -273,9 +284,23 @@ Served by `apps/web/src/app/robots.txt/route.ts` from the pure builder in `src/l
 ### sitemap.ts
 
 - **Single `sitemap.xml`** (no index — we're 3+ orders of magnitude below the 50k cap).
-- Generated from CMS published-only content (`where: { _status: { equals: 'published' } }`) + static routes.
+- Generated from CMS published-only content + static routes. When indexing is disallowed the sitemap returns `[]` — this prevents scrapers from learning URLs before go-live.
 - **Drop `<priority>` and `<changefreq>`** — Google ignores both per Search Central.
 - **`<lastmod>` matters again** since 2023. Wire to CMS document `updatedAt`. **Never auto-touch on every build** — Google deprioritises unreliable sitemaps.
+
+**Per-collection CMS filters** (each mirrors that collection's lifecycle fields — do not apply `BLOG_FILTER` to collections that lack `publishedAt`):
+
+| Constant | Filter | Collections |
+|---|---|---|
+| `BLOG_FILTER` | `_status=published & publishedAt[exists]=true` | `blogs`, `resources`, `events`, `guides`, `knowledgeBase`, `legalDocuments` |
+| `AUTHORS_FILTER` | `_status=published` | `authors` — has versions/drafts but **no `publishedAt` field**; applying `BLOG_FILTER` causes Payload to return HTTP 400 (unqueryable path), which `fetchDocs` swallows as `[]` silently emptying the collection |
+| `NEWS_FILTER` | `_status=published & publicationDate[exists]=true` | `news` — uses `publicationDate` not `publishedAt` |
+| `JOBS_FILTER` | `_status=published & hiringStatus=open` | `jobs` |
+
+**Static routes list** (`STATIC_ROUTES` in `sitemap.ts`) — every built non-dynamic route. Keep in sync with `docs/web/WEB-PAGES.md`. Intentional exclusions are commented in the file:
+- `/pricing` — not built yet.
+- `/legal` — a 308 redirect, not a page; individual `/legal/<slug>` docs come from the CMS.
+- `/software-composition-analysis` — intentionally de-listed (page kept, excluded from sitemap and nav per product decision).
 
 ### Per-page metadata (Next.js Metadata API)
 
@@ -331,22 +356,47 @@ Payload Live Preview opens `apps/web` URLs with the Next.js draft-mode bypass co
 
 **Convention:** server component `<JsonLd>` rendering `<script type="application/ld+json">`. Field source is the CMS — see `docs/architecture/cms-jsonld-system.html` for canonical field mappings.
 
-**Schema map:**
+**Schema map** (current as of 2026-06-10, maintained in `apps/web/src/lib/seo/jsonld.tsx`):
 
-| Page type | Schemas emitted |
+| Page / route | Schemas emitted |
 |---|---|
 | Root layout (every page) | `Organization` (logo, sameAs LinkedIn/GitHub/X) |
 | `/` (homepage) | + nothing extra (no `WebSite`/`SearchAction` — see below) |
-| `/blogs` (listing) | `BreadcrumbList` |
-| `/blog/[slug]` | `BreadcrumbList`, `BlogPosting` |
-| `/resource-center` (listing) | `BreadcrumbList` |
-| `/resource/[slug]` | `BreadcrumbList`, `Article` |
-| `/about-us`, static pages | `BreadcrumbList` |
-| `/products/*` (when built) | `BreadcrumbList`, `Product` or `SoftwareApplication` |
+| **Content listings** | |
+| `/blogs` | `BreadcrumbList` |
+| `/guide` | `BreadcrumbList` |
+| `/resource-center` | `BreadcrumbList` |
+| `/news` | `BreadcrumbList` |
+| `/events` | `BreadcrumbList` |
+| `/careers` | `BreadcrumbList` |
+| `/podcast` | `BreadcrumbList` |
+| `/webinars` | `BreadcrumbList` |
+| `/knowledge-hub` | `BreadcrumbList` |
+| **Content detail pages** | |
+| `/blogs/[slug]` | `BreadcrumbList`, `BlogPosting` — authors include `url` → `/author/[slug]` (E-E-A-T) |
+| `/guide/[slug]` | `BreadcrumbList`, `Article`, optional `FAQPage` (emitted when guide has structured FAQs) |
+| `/resources/[slug]` | `BreadcrumbList`, `Article` |
+| `/news/[slug]` | `BreadcrumbList`, `NewsArticle` — authors include `url` → `/author/[slug]` |
+| `/event/[slug]` | `BreadcrumbList`, `Event` |
+| `/job/[slug]` | `BreadcrumbList`, optional `JobPosting` (emitted when job is published and open) |
+| `/knowledge-hub/[slug]` | `BreadcrumbList`, `Article`, optional `VideoObject` (emitted when `videoUrl` is set) |
+| `/author/[slug]` | `BreadcrumbList`, `ProfilePage` (with `mainEntity: Person`, sameAs social links) |
+| **Product pages** | |
+| `/cleansight` | `BreadcrumbList`, `SoftwareApplication` |
+| `/cleanstart-images` | `BreadcrumbList`, `SoftwareApplication` |
+| `/fips`, `/software-bill-materials`, `/vulnerability-remediation`, `/attack-surface-reduction`, `/for-ciso`, `/for-developers`, `/cleanstart-platform`, `/software-composition-analysis` | `BreadcrumbList` — `SoftwareApplication` not yet wired (these pages pre-date the schema helpers) |
+| **Legal & utility pages** | |
+| `/legal/[slug]` | `BreadcrumbList` |
+| `/privacy-policy` | `BreadcrumbList` |
+| `/about-us`, `/teams`, `/community`, `/partners`, `/contact-us`, `/book-a-demo`, `/deal-registration`, `/case-studies` | `BreadcrumbList` |
+
+**New schema helpers added (2026-06-10):**
+- `videoObjectSchema()` — `VideoObject` for Knowledge Hub lesson videos
+- `profilePageSchema()` — `ProfilePage` with `mainEntity: Person` for author bio pages; disambiguates author identity for Google E-E-A-T
 
 **Do NOT emit:**
 - `WebSite` + `SearchAction` — Google killed sitelinks searchbox 2024-11-21. Dead code.
-- `FAQPage` / `HowTo` — Google heavily restricted both Aug 2023; most sites no longer get rich results. Default off; emit only if Search Console verifies eligibility for our domain.
+- `FAQPage` / `HowTo` on non-guide pages — Google heavily restricted both Aug 2023; most sites no longer get rich results. Default off; emit only when structured `faqs` data is present (guides) and only if Search Console verifies eligibility for our domain.
 
 ---
 
@@ -360,9 +410,9 @@ Payload Live Preview opens `apps/web` URLs with the Next.js draft-mode bypass co
 **Blocked:**
 - `Bytespider` (ByteDance) — symbolic `Disallow: /` in `robots.ts` + Vercel Firewall rule on User-Agent (it ignores robots.txt).
 
-**Files:**
-- `apps/web/public/llms.txt` — Markdown-format site index per [llmstxt.org](https://llmstxt.org).
-- `apps/web/public/ai.txt` — Spawning spec mirror.
+**Files:** (P1 — deferred to post-launch)
+- `apps/web/public/llms.txt` — Markdown-format site index per [llmstxt.org](https://llmstxt.org). **Not yet created** — add post-launch once content is stable.
+- `apps/web/public/ai.txt` — Spawning spec mirror. **Not yet created** — add post-launch.
 
 **Cloudflare:** "Block AI Scrapers and Crawlers" toggle must be **DISABLED** in dashboard.
 
@@ -427,7 +477,7 @@ Mobile = Moto G Power emulation. 0.90 mobile is unrealistic with hero + GA4 + cu
 - `next/image` v16: explicit `formats: ['image/avif', 'image/webp']` in config. `qualities` defaults to `[75]` only. `minimumCacheTTL` is now 4h.
 - Decorative SVGs: plain `<img>` per existing CLAUDE.md rule.
 - Move `shadcn` to `devDependencies`.
-- **No PPR** — incompatible with nonce-CSP (§4 trade-off).
+- **No PPR (currently)** — the original blocker (nonce-CSP forcing dynamic rendering) was **removed 2026-06-10** when the CSP dropped nonces (§4). PPR is now technically unblocked but remains off pending a separate decision.
 - Fonts: `next/font` Google Fonts with `display: 'swap'`. `preload: true` for primary (Figtree), `preload: false` for secondary (Inter). `adjustFontFallback: true`.
 
 ---
@@ -739,7 +789,7 @@ Append future decisions here. Never silently change a row — supersede with a d
 | 4 | 2026-05-15 | Analytics stack | Vercel Analytics + Speed Insights + GA4 | Triggers cookie banner (§11) |
 | 5 | 2026-05-15 | Web alert channel | Email only — `admin@digibranders.com` | Single recipient at launch |
 | 6 | 2026-05-15 | Legal copy | User-provided final copy | Indexable from day 1 |
-| 7 | 2026-05-15 | Rendering strategy | No PPR / `cacheComponents` | Strict nonce-CSP forces dynamic rendering |
+| 7 | 2026-05-15 | Rendering strategy | No PPR / `cacheComponents` | ~~Strict nonce-CSP forces dynamic rendering~~ — **superseded 2026-06-10**: CSP dropped nonces (§4), so this rationale no longer holds; PPR now off by separate choice, not forced |
 | 8 | 2026-05-15 | Cloudflare proxy mode | DNS-only (grey cloud) | Orange-cloud breaks Vercel cert renewal |
 | 9 | 2026-05-15 | Lighthouse gate | 0.85 mobile / 0.95 desktop | Industry-realistic; trend toward 0.90 mobile |
 | 10 | 2026-05-15 | Sitemaps | Single `sitemap.xml`; no priority/changefreq; accurate `lastmod` | Google ignores priority/changefreq |

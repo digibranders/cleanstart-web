@@ -2,7 +2,7 @@
 
 import { type KhArticleLink, type KhGroup, findActiveLocation } from '@/lib/knowledge-hub-shared';
 import { EASE_SOFT } from '@/lib/motion';
-import { AnimatePresence, LazyMotion, domAnimation, m, useReducedMotion } from 'motion/react';
+import { LazyMotion, domAnimation, m, useReducedMotion } from 'motion/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -77,70 +77,62 @@ export function KnowledgeHubSidebar({ groups }: { groups: KhGroup[] }): React.Re
                   <Chevron open={open} />
                 </button>
 
-                <AnimatePresence initial={false}>
-                  {open && (
-                    <m.div
-                      key="panel"
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: reduceMotion ? 0 : 0.26, ease: EASE_SOFT }}
-                      className="overflow-hidden"
-                    >
-                      <div className="flex flex-col gap-0.5 pt-0.5 pb-2 pl-2">
-                        {/* Legacy groups: articles directly. */}
-                        {group.articles.length > 0 && (
-                          <ArticleList items={group.articles} activeSlug={activeSlug} />
-                        )}
+                {/* Panel stays mounted (height-collapsed when closed) so every
+                    article link is present in the server-rendered HTML — the
+                    full 253-article link graph is crawlable from any KB page,
+                    not just the active subcategory. `inert` drops collapsed
+                    links out of the tab order / a11y tree. */}
+                <m.div
+                  initial={false}
+                  animate={{ height: open ? 'auto' : 0, opacity: open ? 1 : 0 }}
+                  transition={{ duration: reduceMotion ? 0 : 0.26, ease: EASE_SOFT }}
+                  className="overflow-hidden"
+                  inert={!open}
+                >
+                  <div className="flex flex-col gap-0.5 pt-0.5 pb-2 pl-2">
+                    {/* Legacy groups: articles directly. */}
+                    {group.articles.length > 0 && (
+                      <ArticleList items={group.articles} activeSlug={activeSlug} />
+                    )}
 
-                        {/* Sections: subcategories → articles. */}
-                        {group.subcategories.map((sub) => {
-                          const key = `${group.slug}/${sub.slug}`;
-                          const subOpen = openSubs[key] ?? false;
-                          const subActive = sub.articles.some((a) => a.slug === activeSlug);
-                          return (
-                            <div key={sub.slug}>
-                              <button
-                                type="button"
-                                onClick={() => toggleSub(key)}
-                                aria-expanded={subOpen}
-                                className="flex w-full items-center justify-between gap-2 rounded-[10px] px-3 py-2 text-left font-display transition-colors duration-150 hover:bg-[#F8F7FC]"
-                                style={{
-                                  fontSize: 'var(--fs-body-sm)',
-                                  letterSpacing: '-0.01em',
-                                  color: subActive ? '#471EC0' : '#3A3F55',
-                                  fontWeight: subActive ? 600 : 500,
-                                }}
-                              >
-                                <span>{sub.name}</span>
-                                <Chevron open={subOpen} small />
-                              </button>
-                              <AnimatePresence initial={false}>
-                                {subOpen && (
-                                  <m.div
-                                    key="subpanel"
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: 'auto', opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    transition={{
-                                      duration: reduceMotion ? 0 : 0.24,
-                                      ease: EASE_SOFT,
-                                    }}
-                                    className="overflow-hidden"
-                                  >
-                                    <div className="pl-2">
-                                      <ArticleList items={sub.articles} activeSlug={activeSlug} />
-                                    </div>
-                                  </m.div>
-                                )}
-                              </AnimatePresence>
+                    {/* Sections: subcategories → articles. */}
+                    {group.subcategories.map((sub) => {
+                      const key = `${group.slug}/${sub.slug}`;
+                      const subOpen = openSubs[key] ?? false;
+                      const subActive = sub.articles.some((a) => a.slug === activeSlug);
+                      return (
+                        <div key={sub.slug}>
+                          <button
+                            type="button"
+                            onClick={() => toggleSub(key)}
+                            aria-expanded={subOpen}
+                            className="flex w-full items-center justify-between gap-2 rounded-[10px] px-3 py-2 text-left font-display transition-colors duration-150 hover:bg-[#F8F7FC]"
+                            style={{
+                              fontSize: 'var(--fs-body-sm)',
+                              letterSpacing: '-0.01em',
+                              color: subActive ? '#471EC0' : '#3A3F55',
+                              fontWeight: subActive ? 600 : 500,
+                            }}
+                          >
+                            <span>{sub.name}</span>
+                            <Chevron open={subOpen} small />
+                          </button>
+                          <m.div
+                            initial={false}
+                            animate={{ height: subOpen ? 'auto' : 0, opacity: subOpen ? 1 : 0 }}
+                            transition={{ duration: reduceMotion ? 0 : 0.24, ease: EASE_SOFT }}
+                            className="overflow-hidden"
+                            inert={!subOpen}
+                          >
+                            <div className="pl-2">
+                              <ArticleList items={sub.articles} activeSlug={activeSlug} />
                             </div>
-                          );
-                        })}
-                      </div>
-                    </m.div>
-                  )}
-                </AnimatePresence>
+                          </m.div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </m.div>
               </div>
             );
           })}

@@ -19,7 +19,7 @@ export const MARKDOWN_INTERNAL_HEADER = "x-agent-markdown-internal";
 /**
  * Carries the originally-requested path through the proxy rewrite. A query
  * param on the rewrite URL does not survive into the route handler's
- * `nextUrl`, but request-header overrides do (same mechanism as `x-nonce`).
+ * `nextUrl`, but request-header overrides set on the forwarded request do.
  */
 export const MARKDOWN_PATH_HEADER = "x-agent-markdown-path";
 

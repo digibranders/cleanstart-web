@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RiskProfiler.io — AI Agent Readiness &amp; SEO Audit Report</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:       #0b1120;
+      --navy-2:     #111827;
+      --navy-3:     #1f2937;
+      --orange:     #f97316;
+      --orange-bg:  #fff7ed;
+      --green:      #16a34a;
+      --green-lt:   #bbf7d0;
+      --green-bg:   #f0fdf4;
+      --red:        #dc2626;
+      --red-lt:     #fecaca;
+      --red-bg:     #fef2f2;
+      --yellow:     #d97706;
+      --yellow-lt:  #fde68a;
+      --yellow-bg:  #fffbeb;
+      --blue:       #2563eb;
+      --blue-lt:    #bfdbfe;
+      --blue-bg:    #eff6ff;
+      --slate:      #64748b;
+      --slate-lt:   #e2e8f0;
+      --border:     #e2e8f0;
+      --body:       #1e293b;
+      --muted:      #64748b;
+      --font:       'Segoe UI', system-ui, -apple-system, sans-serif;
+      --mono:       'Cascadia Code', 'Fira Code', 'Courier New', monospace;
+      --r-sm:       6px; --r-md: 10px; --r-lg: 16px;
+      --shadow:     0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); color: var(--body); background: #f8fafc; line-height: 1.6; font-size: 15px; }
+
+    /* Sidebar */
+    .sidebar { position: fixed; top: 0; left: 0; width: 240px; height: 100vh; background: var(--navy); padding: 24px 0; overflow-y: auto; z-index: 100; }
+    .sidebar-logo { padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,.08); margin-bottom: 16px; }
+    .sidebar-logo .brand { font-size: 13px; font-weight: 700; color: var(--orange); letter-spacing: .05em; text-transform: uppercase; }
+    .sidebar-logo .sub  { font-size: 11px; color: rgba(255,255,255,.4); margin-top: 2px; }
+    .sidebar nav a { display: block; padding: 7px 20px; font-size: 12.5px; color: rgba(255,255,255,.55); text-decoration: none; transition: all .15s; border-left: 3px solid transparent; }
+    .sidebar nav a:hover { color: #fff; background: rgba(255,255,255,.06); border-left-color: var(--orange); }
+    .sidebar nav .nav-group { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.25); padding: 16px 20px 4px; }
+
+    .main { margin-left: 240px; }
+
+    /* Hero */
+    .hero { background: linear-gradient(135deg, var(--navy) 0%, #1a2744 100%); color: #fff; padding: 56px 60px 44px; }
+    .hero-tag { display: inline-block; background: rgba(249,115,22,.15); border: 1px solid rgba(249,115,22,.3); color: var(--orange); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 18px; }
+    .hero h1 { font-size: 32px; font-weight: 800; line-height: 1.2; margin-bottom: 12px; }
+    .hero h1 span { color: var(--orange); }
+    .hero-meta { font-size: 13px; color: rgba(255,255,255,.45); margin-top: 6px; }
+    .hero-meta b { color: rgba(255,255,255,.7); }
+    .hero-desc { font-size: 15px; color: rgba(255,255,255,.65); margin-top: 16px; max-width: 720px; line-height: 1.7; }
+
+    /* Score dashboard */
+    .score-dashboard { display: grid; grid-template-columns: 220px 1fr; gap: 28px; padding: 36px 60px 52px; background: var(--navy-2); }
+    .score-ring-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px 20px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: var(--r-lg); }
+    .score-ring { position: relative; width: 130px; height: 130px; }
+    .score-ring svg { transform: rotate(-90deg); }
+    .score-ring .ring-bg  { fill: none; stroke: rgba(255,255,255,.08); stroke-width: 10; }
+    .score-ring .ring-val { fill: none; stroke: var(--orange); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 345; stroke-dashoffset: 148; }
+    .score-ring .ring-num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 38px; font-weight: 800; color: #fff; }
+    .score-level { margin-top: 12px; text-align: center; }
+    .score-level .badge { display: inline-block; background: var(--orange); color: #fff; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; }
+    .score-level .label { font-size: 12px; color: rgba(255,255,255,.5); margin-top: 6px; }
+    .score-cats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; align-content: center; }
+    .cat-card { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: var(--r-md); padding: 16px 14px; text-align: center; }
+    .cat-card .cat-icon { font-size: 22px; margin-bottom: 8px; }
+    .cat-card .cat-score { font-size: 22px; font-weight: 800; color: #fff; line-height: 1; }
+    .cat-card .cat-score.green { color: #4ade80; }
+    .cat-card .cat-score.orange { color: var(--orange); }
+    .cat-card .cat-score.grey { color: rgba(255,255,255,.3); }
+    .cat-card .cat-name { font-size: 11px; color: rgba(255,255,255,.45); margin-top: 6px; line-height: 1.4; }
+    .cat-card .cat-sub  { font-size: 10px; color: rgba(255,255,255,.25); margin-top: 3px; }
+
+    /* Content */
+    .content { padding: 52px 60px; max-width: 1000px; }
+    section { margin-bottom: 56px; }
+    section:last-child { margin-bottom: 0; }
+    .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 14px; border-bottom: 2px solid var(--border); }
+    .section-num { width: 34px; height: 34px; background: var(--navy); color: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+    .section-num.critical { background: var(--red); }
+    .section-header h2 { font-size: 22px; font-weight: 700; color: var(--navy); }
+    h3 { font-size: 17px; font-weight: 700; color: var(--navy); margin: 24px 0 12px; }
+    h4 { font-size: 14px; font-weight: 700; color: var(--navy-3); margin: 18px 0 8px; }
+    p  { color: var(--body); margin-bottom: 12px; line-height: 1.7; }
+    p:last-child { margin-bottom: 0; }
+    ul, ol { margin: 8px 0 14px 22px; }
+    li { margin-bottom: 4px; line-height: 1.6; }
+
+    /* Badges */
+    .badge-pass { display: inline-flex; align-items: center; gap: 4px; background: var(--green-bg); color: var(--green); border: 1px solid var(--green-lt); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+    .badge-fail { display: inline-flex; align-items: center; gap: 4px; background: var(--red-bg); color: var(--red); border: 1px solid var(--red-lt); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+    .badge-warn { display: inline-flex; align-items: center; gap: 4px; background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow-lt); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+    .badge-info { display: inline-flex; align-items: center; gap: 4px; background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-lt); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+    .badge-skip { display: inline-flex; align-items: center; gap: 4px; background: #f1f5f9; color: var(--slate); border: 1px solid var(--slate-lt); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+
+    /* Step boxes */
+    .steps { counter-reset: step; }
+    .step { position: relative; padding: 14px 16px 14px 52px; margin-bottom: 10px; background: #f8fafc; border: 1px solid var(--border); border-radius: var(--r-sm); }
+    .step::before { counter-increment: step; content: counter(step); position: absolute; left: 14px; top: 14px; width: 24px; height: 24px; background: var(--navy); color: #fff; font-size: 12px; font-weight: 700; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .step strong { font-size: 13.5px; font-weight: 700; color: var(--navy); display: block; margin-bottom: 4px; }
+    .step p, .step li { font-size: 13px; color: var(--body); }
+    .step ul { margin-top: 6px; }
+
+    /* Code blocks */
+    pre { background: var(--navy); color: #e2e8f0; border-radius: var(--r-md); padding: 18px 20px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.7; margin: 12px 0; }
+    pre .cm { color: #6b7280; }
+    pre .kw { color: #c084fc; }
+    pre .st { color: #86efac; }
+    pre .fn { color: #60a5fa; }
+    pre .nu { color: #fb923c; }
+    pre .at { color: #fbbf24; }
+    pre .err { color: #f87171; font-weight: 700; background: rgba(220,38,38,.15); padding: 1px 4px; border-radius: 2px; }
+    pre .ok  { color: #4ade80; }
+    .code-label { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--slate); background: #f1f5f9; border: 1px solid var(--border); border-bottom: none; padding: 6px 14px; border-radius: var(--r-sm) var(--r-sm) 0 0; margin-top: 12px; display: inline-block; }
+    .code-label + pre { margin-top: 0; border-radius: 0 var(--r-md) var(--r-md) var(--r-md); }
+    code { font-family: var(--mono); font-size: 12px; background: #f1f5f9; border: 1px solid #dde3ec; padding: 1px 6px; border-radius: 4px; color: var(--navy); }
+
+    /* Tables */
+    .table-wrap { overflow-x: auto; margin: 14px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    th { background: var(--navy); color: #fff; text-align: left; padding: 10px 14px; font-size: 12px; font-weight: 700; letter-spacing: .04em; }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: #f8fafc; }
+    td:first-child { font-weight: 600; color: var(--navy); }
+
+    /* Soft 404 list */
+    .soft404-list { background: #fff; border: 2px solid var(--red); border-radius: var(--r-md); padding: 20px 22px; margin: 16px 0; }
+    .soft404-list h4 { color: var(--red); margin: 0 0 6px; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
+    .soft404-list .group { margin-bottom: 12px; }
+    .soft404-list .group:last-child { margin-bottom: 0; }
+    .soft404-list code { background: var(--red-bg); border-color: var(--red-lt); color: var(--red); font-size: 12px; display: inline-block; margin: 2px 4px 2px 0; padding: 2px 8px; }
+
+    /* Callout */
+    .callout { display: flex; gap: 14px; padding: 16px 18px; border-radius: var(--r-md); margin: 16px 0; font-size: 13.5px; }
+    .callout-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+    .callout p { margin: 0; }
+    .callout.tip   { background: var(--blue-bg);    border: 1px solid var(--blue-lt); }
+    .callout.warn  { background: var(--yellow-bg);  border: 1px solid var(--yellow-lt); }
+    .callout.good  { background: var(--green-bg);   border: 1px solid var(--green-lt); }
+    .callout.danger{ background: var(--red-bg);     border: 1px solid var(--red-lt); }
+    .callout.note  { background: #f1f5f9;           border: 1px solid var(--slate-lt); }
+
+    /* Check list */
+    .check-list { list-style: none; padding: 0; margin: 0; }
+    .check-list li { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+    .check-list li:last-child { border-bottom: none; }
+    .check-list .ci { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .check-list .cn { font-weight: 600; color: var(--navy); }
+    .check-list .cd { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+
+    /* Priority cells */
+    .p1 { color: var(--red); font-weight: 700; }
+    .p2 { color: var(--yellow); font-weight: 700; }
+    .p3 { color: var(--blue); font-weight: 600; }
+    .p4 { color: var(--slate); }
+
+    hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+    @media print {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .hero, .score-dashboard { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .content { padding: 24px; }
+      section { page-break-inside: avoid; }
+      pre { white-space: pre-wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">RiskProfiler.io</div>
+    <div class="sub">AI Agent &amp; SEO Audit</div>
+  </div>
+  <nav>
+    <div class="nav-group">Overview</div>
+    <a href="#summary">Executive Summary</a>
+    <a href="#scores">AI Agent Score Breakdown</a>
+
+    <div class="nav-group">What's Working</div>
+    <a href="#good-og">Open Graph + Twitter Cards</a>
+    <a href="#good-jsonld">JSON-LD Structured Data</a>
+    <a href="#good-canonical">Canonical URLs</a>
+    <a href="#good-other">Markdown / Sitemap / robots</a>
+
+    <div class="nav-group">Critical Issues</div>
+    <a href="#crit-soft404">P0 — Soft-404 Pages</a>
+    <a href="#crit-schema">P0 — Broken BlogPosting Schema</a>
+
+    <div class="nav-group">AI Agent Readiness Fixes</div>
+    <a href="#fix-link-headers">P2 — Link Headers</a>
+    <a href="#fix-content-signals">P2 — Content Signals</a>
+    <a href="#fix-ai-bots">P3 — Explicit AI Bots</a>
+    <a href="#fix-dns-aid">P4 — DNS-AID</a>
+
+    <div class="nav-group">Polish &amp; Enhancements</div>
+    <a href="#enh-viewport">Viewport Meta</a>
+    <a href="#enh-og-extras">OG Extras (site_name, locale)</a>
+    <a href="#enh-author">Blog Author Attribution</a>
+
+    <div class="nav-group">Plan</div>
+    <a href="#roadmap">Priority Roadmap</a>
+  </nav>
+</nav>
+
+<div class="main">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-tag">Technical Audit Report</div>
+    <h1>RiskProfiler.io — <span>AI Agent Readiness</span><br>&amp; SEO Audit Report</h1>
+    <div class="hero-meta">
+      Prepared for the <b>RiskProfiler Engineering &amp; Marketing Team</b> &nbsp;·&nbsp;
+      Audit date: <b>June 10, 2026</b> &nbsp;·&nbsp;
+      Sources: <b>isitagentready.com + raw HTML inspection of 35 pages</b>
+    </div>
+    <p class="hero-desc">
+      This audit covers two dimensions of web readiness for riskprofiler.io: <strong style="color:#fff">AI Agent Discoverability</strong> (how well AI agents and LLM-powered systems can find, read, and interact with the site) and <strong style="color:#fff">Technical SEO</strong> (structured data, social metadata, canonical URLs, sitemap integrity). Findings are based on direct inspection of HTML <code style="color:#fff;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);">&lt;head&gt;</code> contents across 35 URLs plus Cloudflare's AI Agent Readiness scanner output. All fixes are tailored to the site's <strong style="color:#fff">Framer + Cloudflare</strong> stack.
+    </p>
+  </div>
+
+  <!-- Score dashboard -->
+  <div class="score-dashboard">
+    <div class="score-ring-wrap">
+      <div class="score-ring">
+        <svg width="130" height="130" viewBox="0 0 130 130">
+          <circle class="ring-bg" cx="65" cy="65" r="55"/>
+          <circle class="ring-val" cx="65" cy="65" r="55"/>
+        </svg>
+        <div class="ring-num">57</div>
+      </div>
+      <div class="score-level">
+        <span class="badge">Level 1</span>
+        <div class="label">Basic Web Presence</div>
+      </div>
+    </div>
+    <div class="score-cats">
+      <div class="cat-card">
+        <div class="cat-icon">🔍</div>
+        <div class="cat-score orange">50</div>
+        <div class="cat-name">Discoverability</div>
+        <div class="cat-sub">2 / 4 checks</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-icon">📄</div>
+        <div class="cat-score green">100</div>
+        <div class="cat-name">Content</div>
+        <div class="cat-sub">1 / 1 checks</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-icon">🤖</div>
+        <div class="cat-score orange">50</div>
+        <div class="cat-name">Bot Access Control</div>
+        <div class="cat-sub">1 / 2 checks</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-icon">🔌</div>
+        <div class="cat-score grey">—</div>
+        <div class="cat-name">API / Auth / MCP</div>
+        <div class="cat-sub">Not checked</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-icon">💳</div>
+        <div class="cat-score grey">—</div>
+        <div class="cat-name">Commerce</div>
+        <div class="cat-sub">Not applicable</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ EXECUTIVE SUMMARY ══ -->
+    <section id="summary">
+      <div class="section-header">
+        <div class="section-num">01</div>
+        <h2>Executive Summary</h2>
+      </div>
+
+      <p>RiskProfiler.io is built on a strong SEO foundation. Every working page has Open Graph metadata, Twitter Card metadata, canonical URLs, and rich JSON-LD structured data — including the <code>@graph</code> pattern with Organization, SoftwareApplication, and FAQPage entities on product pages, plus BlogPosting on articles. The site uses Framer with Cloudflare in front, with a valid robots.txt and a 145-URL sitemap. Cloudflare proxying provides automatic Markdown content negotiation for AI agents at no extra cost.</p>
+
+      <p>However, the audit surfaced <strong>two critical issues</strong> that are causing measurable SEO damage right now:</p>
+
+      <div class="callout danger">
+        <span class="callout-icon">🚨</span>
+        <p><strong>Issue #1 — 17 URLs in the sitemap return a soft-404 page.</strong> URLs like <code>/cyber-threat-intelligence</code>, <code>/ai-agents</code>, <code>/comparison/bitsight-alternatives</code>, and <code>/blog/github-breach-ciso-playbook</code> return HTTP 200 — but the HTML body is byte-for-byte identical (87,834 bytes) to a generic Framer fallback page. The titles, descriptions, and content of all 17 pages say "External Threats, Managed by AI Agents" — the homepage copy. Google sees 17 promised pages that duplicate the homepage; this is the classic <a href="https://developers.google.com/search/docs/crawling-indexing/http-network-errors#soft-404-errors" target="_blank">soft-404 anti-pattern</a> that Google explicitly penalizes.</p>
+      </div>
+
+      <div class="callout danger">
+        <span class="callout-icon">🚨</span>
+        <p><strong>Issue #2 — Every working blog post has broken BlogPosting schema.</strong> The schema contains unreplaced Liquid-style template variables: <code>"{{author_name}}"</code>, <code>"{{author_url}}"</code>, <code>"{{author_image}}"</code>, <code>"{{primary_topic}}"</code>, <code>"{{mentioned_brand_1}}"</code>, and more. Google's Rich Results Test will fail validation; blog articles cannot earn Article rich snippets in SERPs. Additionally, <code>BlogPosting.@id</code> is incorrectly set to the Organization's <code>@id</code> URI, and <code>mainEntityOfPage.@id</code> is a bare slug instead of a full URL — both violate Schema.org specs.</p>
+      </div>
+
+      <p>The AI Agent Readiness score of <strong>57/100 (Level 1)</strong> can be raised to Level 2 by addressing three agent-discoverability checks: Link headers, Content Signals in robots.txt, and DNS-AID. All three can be implemented through Cloudflare without any changes to Framer.</p>
+
+      <h3>Audit scope</h3>
+      <ul>
+        <li>Direct HTTPS GET of 35 URLs with desktop Chrome User-Agent</li>
+        <li>Programmatic parsing of <code>&lt;meta&gt;</code>, <code>&lt;link&gt;</code>, and <code>&lt;script type="application/ld+json"&gt;</code> elements</li>
+        <li>JSON-LD validation to detect <code>@type</code>, <code>@id</code> integrity and unreplaced template variables</li>
+        <li>Byte-length analysis to detect Framer's soft-404 fallback fingerprint</li>
+        <li>Cloudflare <a href="https://isitagentready.com" target="_blank">isitagentready.com</a> scanner output (content profile)</li>
+        <li>Coverage: homepage, 6 product pages, blog index, 5 blog posts, trust center, about, careers, team, partners, contact, book-a-demo, privacy, terms, 10 competitor comparison pages, 7 solutions sub-pages, robots.txt, sitemap.xml</li>
+      </ul>
+    </section>
+
+    <!-- ══ AI AGENT SCORE BREAKDOWN ══ -->
+    <section id="scores">
+      <div class="section-header">
+        <div class="section-num">02</div>
+        <h2>AI Agent Readiness — Score Breakdown</h2>
+      </div>
+
+      <h3>Discoverability — 2 / 4</h3>
+      <ul class="check-list" style="background:#fff;border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;">
+        <li><span class="ci">✅</span><div><div class="cn">robots.txt</div><div class="cd">Valid (200 text/plain). User-agent: * Allow: / + sitemap directive.</div></div></li>
+        <li><span class="ci">✅</span><div><div class="cn">Sitemap</div><div class="cd">sitemap.xml exists (200 text/xml), 145 URLs. ⚠️ But 17 of those URLs return soft-404s — see Section 06.</div></div></li>
+        <li><span class="ci">❌</span><div><div class="cn">Link Headers (RFC 8288)</div><div class="cd">Framer outputs 2 preconnect headers for its own CDN — none with agent-useful rel types. Fix in Section 08.</div></div></li>
+        <li><span class="ci">❌</span><div><div class="cn">DNS for AI Discovery (DNS-AID)</div><div class="cd">No SVCB/HTTPS records at well-known agent entrypoints. Fix in Section 11.</div></div></li>
+      </ul>
+
+      <h3>Content — 1 / 1</h3>
+      <ul class="check-list" style="background:#fff;border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;">
+        <li><span class="ci">✅</span><div><div class="cn">Markdown Negotiation</div><div class="cd">Cloudflare automatically returns text/markdown when agents request it. No action required.</div></div></li>
+      </ul>
+
+      <h3>Bot Access Control — 1 / 2</h3>
+      <ul class="check-list" style="background:#fff;border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;">
+        <li><span class="ci">✅</span><div><div class="cn">AI bot rules in robots.txt</div><div class="cd">Wildcard rule applies. Best practice is explicit rules — see Section 10.</div></div></li>
+        <li><span class="ci">❌</span><div><div class="cn">Content Signals in robots.txt</div><div class="cd">No Content-Signal directives declared. Fix in Section 09.</div></div></li>
+      </ul>
+    </section>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- WHAT'S WORKING -->
+    <!-- ══════════════════════════════════════ -->
+
+    <section id="good-og">
+      <div class="section-header">
+        <div class="section-num">03</div>
+        <h2>What's Working — Open Graph &amp; Twitter Cards</h2>
+      </div>
+      <span class="badge-pass">✅ Correctly implemented on all real pages</span>
+
+      <p>Every real page on riskprofiler.io has complete Open Graph and Twitter Card metadata. Below is actual output from <code>/attack-surface-management</code>:</p>
+
+      <div class="code-label">Actual &lt;head&gt; output from riskprofiler.io</div>
+      <pre>&lt;<span class="fn">meta</span> <span class="at">property</span>=<span class="st">"og:type"</span>        <span class="at">content</span>=<span class="st">"website"</span>&gt;
+&lt;<span class="fn">meta</span> <span class="at">property</span>=<span class="st">"og:title"</span>       <span class="at">content</span>=<span class="st">"RiskProfiler - External Attack Surface Management"</span>&gt;
+&lt;<span class="fn">meta</span> <span class="at">property</span>=<span class="st">"og:description"</span> <span class="at">content</span>=<span class="st">"Eliminate blind spots with AI-powered..."</span>&gt;
+&lt;<span class="fn">meta</span> <span class="at">property</span>=<span class="st">"og:image"</span>       <span class="at">content</span>=<span class="st">"https://framerusercontent.com/assets/spJkprLi24u65nt4pS11lAex1A.png"</span>&gt;
+&lt;<span class="fn">meta</span> <span class="at">property</span>=<span class="st">"og:url"</span>         <span class="at">content</span>=<span class="st">"https://riskprofiler.io/attack-surface-management"</span>&gt;
+
+&lt;<span class="fn">meta</span> <span class="at">name</span>=<span class="st">"twitter:card"</span>        <span class="at">content</span>=<span class="st">"summary_large_image"</span>&gt;
+&lt;<span class="fn">meta</span> <span class="at">name</span>=<span class="st">"twitter:title"</span>       <span class="at">content</span>=<span class="st">"RiskProfiler - External Attack Surface Management"</span>&gt;
+&lt;<span class="fn">meta</span> <span class="at">name</span>=<span class="st">"twitter:description"</span> <span class="at">content</span>=<span class="st">"Eliminate blind spots with AI-powered..."</span>&gt;
+&lt;<span class="fn">meta</span> <span class="at">name</span>=<span class="st">"twitter:image"</span>       <span class="at">content</span>=<span class="st">"https://framerusercontent.com/assets/spJkprLi24u65nt4pS11lAex1A.png"</span>&gt;</pre>
+
+      <h3>Verified across these pages</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Page</th><th>OG tags</th><th>Twitter tags</th><th>Per-page OG image</th></tr></thead>
+          <tbody>
+            <tr><td>/ (Homepage)</td><td>✅ 5</td><td>✅ 4</td><td>✅ ZAvfMeuPv9Twb0jEgBWxWluTVKA.png</td></tr>
+            <tr><td>/attack-surface-management</td><td>✅ 5</td><td>✅ 4</td><td>✅ spJkprLi24u65nt4pS11lAex1A.png</td></tr>
+            <tr><td>/third-party-risk-management</td><td>✅ 5</td><td>✅ 4</td><td>✅ j3gaeEkoLKUNHP4wBzhdaN5XZg.png</td></tr>
+            <tr><td>/deep-dark-web-monitoring</td><td>✅ 5</td><td>✅ 4</td><td>✅ lFxASQscRLJ1A4TIaky0Ivg0s4Y.png</td></tr>
+            <tr><td>/digital-brand-risk-protection</td><td>✅ 5</td><td>✅ 4</td><td>✅ h6EUQR924TAAqMiRE9tWJwUxjO4.png</td></tr>
+            <tr><td>/trust-center</td><td>✅ 5</td><td>✅ 4</td><td>✅ EC2S29dX0VVtZ0LD2BG9ydl2E8.png</td></tr>
+            <tr><td>/blog</td><td>✅ 5</td><td>✅ 4</td><td>✅ ZAvfMeuPv9Twb0jEgBWxWluTVKA.png</td></tr>
+            <tr><td>/blog/dark-web-monitoring-guide</td><td>✅ 5</td><td>✅ 4</td><td>✅ SAVFfT5UjxxPp7siwYaqFauchB0.png</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>The only sub-optimal aspect: OG images are hosted on <code>framerusercontent.com</code> (Framer's CDN), not on the riskprofiler.io domain. This is not strictly wrong but means LinkedIn / Twitter caches are tied to Framer URLs that change if assets are re-uploaded. See Section 13 for minor enhancements.</p>
+    </section>
+
+    <section id="good-jsonld">
+      <div class="section-header">
+        <div class="section-num">04</div>
+        <h2>What's Working — JSON-LD Structured Data</h2>
+      </div>
+      <span class="badge-pass">✅ Rich structured data on all real pages</span>&nbsp;
+      <span class="badge-warn">⚠️ With one critical bug on blog posts (see §07)</span>
+
+      <p>Every real page has well-structured JSON-LD using the <code>@graph</code> pattern (linking multiple entities). This is more sophisticated than typical Framer marketing sites.</p>
+
+      <h3>Homepage — Organization + SoftwareApplication + FAQPage</h3>
+      <div class="code-label">Actual JSON-LD from / (3,953 chars)</div>
+      <pre>{
+  <span class="at">"@context"</span>: <span class="st">"https://schema.org"</span>,
+  <span class="at">"@graph"</span>: [
+    {
+      <span class="at">"@type"</span>: <span class="st">"Organization"</span>,
+      <span class="at">"name"</span>: <span class="st">"RiskProfiler"</span>,
+      <span class="at">"url"</span>: <span class="st">"https://riskprofiler.io"</span>,
+      <span class="at">"@id"</span>: <span class="st">"https://riskprofiler.io/#organization"</span>,
+      <span class="at">"logo"</span>: <span class="st">"https://framerusercontent.com/images/4kJJDCBy2nN0F5Eq2WVIX1Euw.png"</span>,
+      <span class="at">"sameAs"</span>: [
+        <span class="st">"https://www.linkedin.com/company/riskprofilerio"</span>,
+        <span class="st">"https://x.com/riskprofilerio"</span>,
+        <span class="st">"https://www.instagram.com/riskprofilerio"</span>,
+        <span class="st">"https://www.facebook.com/riskprofilerio"</span>
+      ]
+    },
+    {
+      <span class="at">"@type"</span>: <span class="st">"SoftwareApplication"</span>,
+      <span class="at">"name"</span>: <span class="st">"RiskProfiler"</span>,
+      <span class="at">"applicationCategory"</span>: <span class="st">"SecurityApplication"</span>,
+      <span class="at">"operatingSystem"</span>: <span class="st">"Web"</span>,
+      <span class="at">"publisher"</span>: { <span class="at">"@id"</span>: <span class="st">"https://riskprofiler.io/#organization"</span> }
+    },
+    {
+      <span class="at">"@type"</span>: <span class="st">"FAQPage"</span>,
+      <span class="at">"mainEntity"</span>: [ <span class="cm">/* 6+ Q&amp;A pairs about the platform */</span> ]
+    }
+  ]
+}</pre>
+
+      <h3>Product pages — SoftwareApplication + FAQPage</h3>
+      <p>Each working product page has its own <code>SoftwareApplication</code> entity with a page-specific name (e.g., <em>"RiskProfiler Attack Surface Management"</em>, <em>"RiskProfiler Third-Party Risk Management"</em>) plus a <code>FAQPage</code> with multiple Q&amp;A pairs. Publisher references the Organization <code>@id</code> correctly. This is excellent.</p>
+
+      <h3>Blog posts — BlogPosting (but broken)</h3>
+      <p>Each blog post has BlogPosting schema with author, publisher, datePublished, dateModified. But the implementation has a <strong>critical bug</strong> — see Section 07.</p>
+    </section>
+
+    <section id="good-canonical">
+      <div class="section-header">
+        <div class="section-num">05</div>
+        <h2>What's Working — Canonical URLs &amp; Other SEO Basics</h2>
+      </div>
+
+      <h3>Canonical URLs</h3>
+      <p>Every working page has a self-referencing canonical link. Verified samples:</p>
+      <div class="code-label">Canonical URLs verified</div>
+      <pre><span class="ok">✅</span> /                              → <span class="st">https://riskprofiler.io/</span>
+<span class="ok">✅</span> /attack-surface-management     → <span class="st">https://riskprofiler.io/attack-surface-management</span>
+<span class="ok">✅</span> /third-party-risk-management   → <span class="st">https://riskprofiler.io/third-party-risk-management</span>
+<span class="ok">✅</span> /deep-dark-web-monitoring      → <span class="st">https://riskprofiler.io/deep-dark-web-monitoring</span>
+<span class="ok">✅</span> /digital-brand-risk-protection → <span class="st">https://riskprofiler.io/digital-brand-risk-protection</span>
+<span class="ok">✅</span> /trust-center                  → <span class="st">https://riskprofiler.io/trust-center</span>
+<span class="ok">✅</span> /blog                          → <span class="st">https://riskprofiler.io/blog</span>
+<span class="ok">✅</span> /blog/dark-web-monitoring-guide → <span class="st">https://riskprofiler.io/blog/dark-web-monitoring-guide</span></pre>
+
+      <h3 id="good-other">Other SEO basics — all correct</h3>
+      <ul class="check-list" style="background:#fff;border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;">
+        <li><span class="ci">✅</span><div><div class="cn">Unique title tags per page</div><div class="cd">All real pages have distinct keyword-rich titles.</div></div></li>
+        <li><span class="ci">✅</span><div><div class="cn">Unique meta descriptions per real page</div><div class="cd">Verified: every working page has a unique, on-topic 150–160-char description.</div></div></li>
+        <li><span class="ci">✅</span><div><div class="cn">Meta robots: max-image-preview:large</div><div class="cd">Correct setting — allows large image previews in Google SERPs and Discover.</div></div></li>
+        <li><span class="ci">✅</span><div><div class="cn">HTML lang attribute</div><div class="cd">html lang="en" set on every page.</div></div></li>
+        <li><span class="ci">✅</span><div><div class="cn">Generator meta</div><div class="cd">Framer fe01371 — confirms Framer build version.</div></div></li>
+        <li><span class="ci">✅</span><div><div class="cn">robots.txt + sitemap.xml</div><div class="cd">Both valid; sitemap correctly referenced.</div></div></li>
+        <li><span class="ci">✅</span><div><div class="cn">Cloudflare proxying with Markdown negotiation</div><div class="cd">Automatic markdown output for AI agents.</div></div></li>
+        <li><span class="ci">✅</span><div><div class="cn">Google Tag Manager + GA4</div><div class="cd">GTM-N7QT69TX and GT-NNVJGLF wired correctly in head.</div></div></li>
+      </ul>
+    </section>
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- CRITICAL ISSUES -->
+    <!-- ════════════════════════════════════════ -->
+
+    <section id="crit-soft404">
+      <div class="section-header">
+        <div class="section-num critical">06</div>
+        <h2>🚨 P0 Critical — 17 Sitemap URLs Return Soft-404</h2>
+      </div>
+      <span class="badge-fail">❌ Critical SEO penalty risk</span>&nbsp;
+      <span class="badge-info">Effort: 2–4 hrs (audit + remediate)</span>&nbsp;
+      <span class="badge-info">Tool: Framer admin + sitemap regeneration</span>
+
+      <div class="callout danger" style="margin-top:20px;">
+        <span class="callout-icon">🚨</span>
+        <p><strong>The problem:</strong> Of the 145 URLs in <code>sitemap.xml</code>, 17 return HTTP 200 but serve byte-for-byte identical fallback HTML (87,834 bytes) with the homepage's title, meta description, and content. The pages don't actually exist as published Framer routes — Framer's SPA fallback returns the homepage instead of a proper 404. Google calls this a <strong><a href="https://developers.google.com/search/docs/crawling-indexing/http-network-errors#soft-404-errors" target="_blank">soft-404</a></strong> and explicitly states it harms site quality scores.</p>
+      </div>
+
+      <h3>The complete list of broken URLs</h3>
+      <div class="soft404-list">
+        <h4>Product pages (2) — highest impact</h4>
+        <div class="group">
+          <code>/ai-agents</code>
+          <code>/cyber-threat-intelligence</code>
+        </div>
+
+        <h4>Comparison pages (7 of 10)</h4>
+        <div class="group">
+          <code>/comparison/bitsight-alternatives</code>
+          <code>/comparison/cyble-alternatives</code>
+          <code>/comparison/assetnote-alternatives</code>
+          <code>/comparison/securityscorecard-alternatives</code>
+          <code>/comparison/socradar-alternatives</code>
+          <code>/comparison/darktrace-alternative</code>
+          <code>/comparison/group-ib-alternatives</code>
+        </div>
+
+        <h4>Solutions sub-pages (5 of 7)</h4>
+        <div class="group">
+          <code>/solutions/physical-security-intelligence</code>
+          <code>/solutions/takedown-management</code>
+          <code>/solutions/executive-monitoring</code>
+          <code>/solutions/cloud-attack-surface-management</code>
+          <code>/solutions/identity-intelligence</code>
+        </div>
+
+        <h4>Legal (1)</h4>
+        <div class="group">
+          <code>/terms-conditions</code>
+        </div>
+
+        <h4>Blog posts (at least 2 confirmed — full audit needed across 120 posts)</h4>
+        <div class="group">
+          <code>/blog/github-breach-ciso-playbook</code>
+          <code>/blog/anti-ransomware-day</code>
+        </div>
+      </div>
+
+      <h3>Why this is critical, not cosmetic</h3>
+      <ol>
+        <li><strong>Direct ranking penalty.</strong> Google's documentation explicitly states soft-404s "negatively affect a site's reputation in Search". Pages returning HTTP 200 for non-existent content are treated as a quality signal.</li>
+        <li><strong>Crawl budget waste.</strong> Googlebot wastes crawl budget on 17 URLs that look identical, deferring crawls of pages that actually changed.</li>
+        <li><strong>Duplicate content signals.</strong> 17 URLs serving the homepage HTML appear to Google as 17 duplicates of the homepage. Risk of de-indexing.</li>
+        <li><strong>Lost competitor-comparison traffic.</strong> "Bitsight alternatives", "Recorded Future alternatives", "SecurityScorecard alternatives" are extremely high-intent commercial queries. The pages are advertised in your sitemap but don't exist — every click from a competitor query lands on a homepage that doesn't address what the visitor searched for.</li>
+        <li><strong>Lost product-page conversions.</strong> <code>/cyber-threat-intelligence</code> is a named main-nav product page. Anyone clicking the CTI nav link or finding it via "cyber threat intelligence platform" Google query lands on a homepage with no product-specific content.</li>
+      </ol>
+
+      <h3>How to verify the bug</h3>
+      <div class="code-label">Reproduce with curl (or any HTTP client)</div>
+      <pre><span class="cm"># Compare a real page with a broken one — both return 200 but identical body</span>
+curl -sI https://riskprofiler.io/attack-surface-management | head -1
+<span class="ok">  HTTP/2 200</span>
+curl -s  https://riskprofiler.io/attack-surface-management | wc -c
+<span class="ok">  1173970</span>   <span class="cm"># real page — ~1.17 MB unique HTML</span>
+
+curl -sI https://riskprofiler.io/cyber-threat-intelligence | head -1
+<span class="err">  HTTP/2 200</span>   <span class="cm"># ❌ should be 404 — page does not exist</span>
+curl -s  https://riskprofiler.io/cyber-threat-intelligence | wc -c
+<span class="err">  87834</span>     <span class="cm"># ❌ Framer fallback fingerprint — 87,834 bytes identical for ALL missing pages</span>
+
+<span class="cm"># Prove they're byte-for-byte identical</span>
+diff &lt;(curl -s https://riskprofiler.io/cyber-threat-intelligence) \
+     &lt;(curl -s https://riskprofiler.io/comparison/bitsight-alternatives)
+<span class="ok">  # (no output = identical)</span></pre>
+
+      <h3>How to fix — step by step</h3>
+      <div class="steps">
+        <div class="step">
+          <strong>Inventory: which broken URLs were intentional vs. unintentional?</strong>
+          <p>Open the Framer admin. For each URL in the list above, check: does the page exist as a Framer page (published, not draft)?</p>
+          <ul>
+            <li>If the page <strong>should exist but doesn't</strong> — create it in Framer and publish. (Examples: <code>/cyber-threat-intelligence</code> and <code>/ai-agents</code> are clearly meant to exist — they're main-nav items and have JSON-LD content suggesting they were planned.)</li>
+            <li>If the page <strong>was intentionally removed or never built</strong> — remove it from sitemap.xml (see step 3) and set up proper 404 handling (see step 4).</li>
+          </ul>
+        </div>
+
+        <div class="step">
+          <strong>Rebuild missing high-priority pages first</strong>
+          <p>These three should be top priority because they are explicit product/nav destinations:</p>
+          <ul>
+            <li><code>/cyber-threat-intelligence</code> — main product page (has rich CTI content referenced in nav)</li>
+            <li><code>/ai-agents</code> — the KnyX agent suite landing</li>
+            <li><code>/comparison/bitsight-alternatives</code> — Bitsight is the largest competitor; this is highest-intent commercial keyword</li>
+          </ul>
+          <p>Comparison pages can use a template — duplicate the working <code>/comparison/cloudsek-alternatives</code> page in Framer as a starting point.</p>
+        </div>
+
+        <div class="step">
+          <strong>Regenerate the sitemap to exclude any URL you decide not to rebuild</strong>
+          <p>If <code>sitemap.xml</code> is auto-generated by Framer from published pages, simply un-publishing a page should remove it from the sitemap automatically. Verify after the next publish that no broken URL remains in <a href="https://riskprofiler.io/sitemap.xml" target="_blank">sitemap.xml</a>.</p>
+          <p>If the sitemap is hand-maintained or generated by an external script, edit it directly and remove the broken entries.</p>
+        </div>
+
+        <div class="step">
+          <strong>Configure proper 404 handling in Framer</strong>
+          <p>Framer supports a custom 404 page. Make sure one is configured and that requests for non-existent URLs return HTTP 404 instead of 200 with homepage content. In Framer: <strong>Site Settings → Pages → 404 Page</strong>.</p>
+          <p>If Framer cannot return a 404 status code for non-existent routes (limitation of static-site builds), use a Cloudflare Worker as a fallback — see step 5.</p>
+        </div>
+
+        <div class="step">
+          <strong>Cloudflare Worker safety net for proper 404 responses</strong>
+          <p>If you can't fix the status code at the Framer layer, use Cloudflare to detect the soft-404 fingerprint and override the status code:</p>
+          <div class="code-label">cf-soft-404-fix.js</div>
+          <pre><span class="kw">export default</span> {
+  <span class="kw">async</span> <span class="fn">fetch</span>(request) {
+    <span class="kw">const</span> response = <span class="kw">await</span> <span class="fn">fetch</span>(request);
+    <span class="kw">const</span> contentLength = response.headers.<span class="fn">get</span>(<span class="st">'content-length'</span>);
+
+    <span class="cm">// Detect Framer's soft-404 fingerprint (~87,834 bytes)</span>
+    <span class="kw">if</span> (response.status === <span class="nu">200</span> &amp;&amp; contentLength === <span class="st">'87834'</span>) {
+      <span class="kw">const</span> body = <span class="kw">await</span> response.<span class="fn">text</span>();
+      <span class="cm">// Optionally serve a real 404 page from a CDN URL or inline HTML</span>
+      <span class="kw">return new</span> <span class="fn">Response</span>(body, {
+        status: <span class="nu">404</span>,
+        statusText: <span class="st">'Not Found'</span>,
+        headers: response.headers
+      });
+    }
+    <span class="kw">return</span> response;
+  }
+};</pre>
+          <p>Wire this Worker to <code>riskprofiler.io/*</code> as a route. It only triggers on the specific 87,834-byte fallback; all real pages pass through unchanged.</p>
+        </div>
+
+        <div class="step">
+          <strong>Submit updated sitemap to Google Search Console + request re-crawl</strong>
+          <p>Once the broken URLs are either fixed or removed:</p>
+          <ul>
+            <li>Go to <strong>Google Search Console → Sitemaps → submit sitemap.xml again</strong> (forces re-processing).</li>
+            <li>For each URL you rebuilt: <strong>URL Inspection → Request Indexing</strong>.</li>
+            <li>For each URL you removed: <strong>Removals → New Request → Temporarily remove URL</strong> (until Google's natural deindexing catches up).</li>
+            <li>Monitor <strong>Coverage Report</strong> over 2–4 weeks — "Submitted URL not found (404)" errors should clear and "Soft 404" should drop to zero.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <p><strong>Action required for blog posts:</strong> 2 broken blog URLs were confirmed in a sample of 5. The blog has 120 articles. Before submitting an updated sitemap, audit ALL 120 to find every broken post. Script: <code>for url in $(curl -s sitemap.xml | grep -oE 'https://[^&lt;]+blog/[^&lt;]+'); do echo "$url $(curl -s -o /dev/null -w '%{size_download}' $url)"; done</code> — any line where the second column is exactly <code>87834</code> is broken.</p>
+      </div>
+    </section>
+
+    <!-- BLOG SCHEMA -->
+    <section id="crit-schema">
+      <div class="section-header">
+        <div class="section-num critical">07</div>
+        <h2>🚨 P0 Critical — Broken BlogPosting Schema on Every Article</h2>
+      </div>
+      <span class="badge-fail">❌ Will fail Google Rich Results validation</span>&nbsp;
+      <span class="badge-info">Effort: 30 min (fix Framer template once)</span>&nbsp;
+      <span class="badge-info">Tool: Framer CMS template</span>
+
+      <p>Every working blog post has BlogPosting schema, but the template variables were never replaced when the page rendered. The schema literally contains the strings <code>{{author_name}}</code>, <code>{{primary_topic}}</code>, etc., instead of real values. This is from <code>/blog/dark-web-monitoring-guide</code> — every other blog post has the identical bug:</p>
+
+      <div class="code-label">Actual JSON-LD from production</div>
+      <pre>{
+  <span class="at">"@context"</span>: <span class="st">"https://schema.org"</span>,
+  <span class="at">"@type"</span>: <span class="st">"BlogPosting"</span>,
+  <span class="at">"@id"</span>: <span class="err">"https://riskprofiler.io/#organization"</span>,            <span class="cm">// ❌ Wrong — this is Organization's @id</span>
+  <span class="at">"headline"</span>: <span class="st">"What Is Dark Web Monitoring and How It Works"</span>,
+  <span class="at">"description"</span>: <span class="st">"Stolen credentials are sold on the dark web daily..."</span>,
+  <span class="at">"image"</span>: <span class="st">"https://framerusercontent.com/images/SAVFfT5UjxxPp7siwYaqFauchB0.png"</span>,
+  <span class="at">"datePublished"</span>: <span class="st">"2026-06-09T00:00:00.000Z"</span>,
+  <span class="at">"dateModified"</span>: <span class="st">"2026-06-09T11:28:46.318Z"</span>,
+  <span class="at">"inLanguage"</span>: <span class="st">"en"</span>,
+  <span class="at">"articleSection"</span>: <span class="err">""</span>,                                    <span class="cm">// ❌ Empty string</span>
+  <span class="at">"keywords"</span>: <span class="err">""</span>,                                          <span class="cm">// ❌ Empty string</span>
+  <span class="at">"mainEntityOfPage"</span>: {
+    <span class="at">"@type"</span>: <span class="st">"WebPage"</span>,
+    <span class="at">"@id"</span>: <span class="err">"dark-web-monitoring-guide"</span>                       <span class="cm">// ❌ Slug, not a URL — schema spec violation</span>
+  },
+  <span class="at">"author"</span>: {
+    <span class="at">"@type"</span>: <span class="st">"Person"</span>,
+    <span class="at">"name"</span>:  <span class="err">"{{author_name}}"</span>,                              <span class="cm">// ❌ Unreplaced placeholder</span>
+    <span class="at">"url"</span>:   <span class="err">"{{author_url}}"</span>,                               <span class="cm">// ❌ Unreplaced placeholder</span>
+    <span class="at">"image"</span>: <span class="err">"{{author_image}}"</span>                              <span class="cm">// ❌ Unreplaced placeholder</span>
+  },
+  <span class="at">"publisher"</span>: { <span class="cm">/* this part is correct */</span> },
+  <span class="at">"about"</span>: {
+    <span class="at">"@type"</span>: <span class="st">"Thing"</span>,
+    <span class="at">"name"</span>: <span class="err">"{{primary_topic}}"</span>                              <span class="cm">// ❌ Unreplaced</span>
+  },
+  <span class="at">"mentions"</span>: [
+    <span class="err">"{{mentioned_brand_1}}"</span>,                                  <span class="cm">// ❌ Unreplaced</span>
+    <span class="err">"{{mentioned_brand_2}}"</span>,                                  <span class="cm">// ❌ Unreplaced</span>
+    <span class="err">"{{mentioned_tool_1}}"</span>                                    <span class="cm">// ❌ Unreplaced</span>
+  ]
+}</pre>
+
+      <h3>What's broken — exact bug list</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Field</th><th>What it says now</th><th>Why it's wrong</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>BlogPosting.@id</td>
+              <td><code>"https://riskprofiler.io/#organization"</code></td>
+              <td>Reuses the Organization's @id. Should be the article's own URL with a fragment, e.g. <code>"https://riskprofiler.io/blog/dark-web-monitoring-guide#article"</code></td>
+            </tr>
+            <tr>
+              <td>mainEntityOfPage.@id</td>
+              <td><code>"dark-web-monitoring-guide"</code></td>
+              <td>Per Schema.org, <code>@id</code> must be an IRI (full URL). A bare slug is invalid.</td>
+            </tr>
+            <tr>
+              <td>author.name</td>
+              <td><code>"{{author_name}}"</code></td>
+              <td>Literal template placeholder string — never resolved at render time</td>
+            </tr>
+            <tr>
+              <td>author.url</td>
+              <td><code>"{{author_url}}"</code></td>
+              <td>Same — template variable in output</td>
+            </tr>
+            <tr>
+              <td>author.image</td>
+              <td><code>"{{author_image}}"</code></td>
+              <td>Same — template variable in output</td>
+            </tr>
+            <tr>
+              <td>about.name</td>
+              <td><code>"{{primary_topic}}"</code></td>
+              <td>Same — template variable in output</td>
+            </tr>
+            <tr>
+              <td>mentions[]</td>
+              <td><code>["{{mentioned_brand_1}}", ...]</code></td>
+              <td>Three unreplaced placeholders in array</td>
+            </tr>
+            <tr>
+              <td>articleSection</td>
+              <td><code>""</code></td>
+              <td>Empty string — should be the article category (e.g., "Dark Web", "Threat Intelligence")</td>
+            </tr>
+            <tr>
+              <td>keywords</td>
+              <td><code>""</code></td>
+              <td>Empty string — should be a comma-separated list of keywords</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Impact</h3>
+      <ul>
+        <li><strong>Google's Rich Results Test will fail</strong> on every blog post. Article rich results — image + headline + date in SERPs — will not render.</li>
+        <li><strong>E-E-A-T signal lost.</strong> Author information is the most important E-E-A-T signal for YMYL content (security advice qualifies). Google sees a literal <code>"{{author_name}}"</code> string for the author of every article.</li>
+        <li><strong>Knowledge Graph confusion.</strong> The wrong <code>@id</code> tells Google the article and the company are the same entity.</li>
+        <li><strong>120 articles affected.</strong> The bug is in the Framer CMS template, so it affects every single blog post.</li>
+      </ul>
+
+      <h3>How to fix</h3>
+      <div class="steps">
+        <div class="step">
+          <strong>Find the BlogPosting template in Framer</strong>
+          <p>Go to the Framer project. The blog template is likely under <strong>CMS → Blog → Template / Detail Page Custom Code → &lt;head&gt;</strong>. The JSON-LD <code>&lt;script&gt;</code> block lives there.</p>
+        </div>
+
+        <div class="step">
+          <strong>Replace template placeholders with real Framer CMS bindings</strong>
+          <p>Framer's templating uses different syntax than Liquid (<code>{{...}}</code>) — most likely the schema was copied from a Hugo or Jekyll example without swapping the syntax. In Framer, CMS fields are referenced via the Framer bindings UI (or via the Framer Sites code component API). The script needs to be wired up to Framer's actual CMS variables.</p>
+
+          <p>If the blog post CMS collection doesn't yet have fields for author info / primary topic / mentions, add them now:</p>
+          <ul>
+            <li><strong>Author</strong> (relation to Authors collection, or a single Author CMS collection with name/url/image fields)</li>
+            <li><strong>Category / Section</strong> (e.g., "Dark Web", "EASM", "Vendor Risk")</li>
+            <li><strong>Keywords</strong> (comma-separated string, or multi-tag field)</li>
+            <li><strong>Primary topic</strong> (free text — what the article is about)</li>
+          </ul>
+        </div>
+
+        <div class="step">
+          <strong>Use this corrected JSON-LD template</strong>
+          <div class="code-label">corrected BlogPosting JSON-LD for Framer template</div>
+          <pre>&lt;<span class="fn">script</span> <span class="at">type</span>=<span class="st">"application/ld+json"</span>&gt;
+{
+  <span class="at">"@context"</span>: <span class="st">"https://schema.org"</span>,
+  <span class="at">"@type"</span>: <span class="st">"BlogPosting"</span>,
+  <span class="at">"@id"</span>: <span class="st">"https://riskprofiler.io/blog/{{slug}}#article"</span>,
+  <span class="at">"headline"</span>: <span class="st">"{{title}}"</span>,
+  <span class="at">"description"</span>: <span class="st">"{{description}}"</span>,
+  <span class="at">"image"</span>: <span class="st">"{{cover_image_url}}"</span>,
+  <span class="at">"datePublished"</span>: <span class="st">"{{date_published_iso}}"</span>,
+  <span class="at">"dateModified"</span>: <span class="st">"{{date_modified_iso}}"</span>,
+  <span class="at">"inLanguage"</span>: <span class="st">"en"</span>,
+  <span class="at">"articleSection"</span>: <span class="st">"{{category}}"</span>,
+  <span class="at">"keywords"</span>: <span class="st">"{{keywords_csv}}"</span>,
+  <span class="at">"wordCount"</span>: {{word_count}},
+  <span class="at">"timeRequired"</span>: <span class="st">"PT{{read_minutes}}M"</span>,
+  <span class="at">"mainEntityOfPage"</span>: {
+    <span class="at">"@type"</span>: <span class="st">"WebPage"</span>,
+    <span class="at">"@id"</span>: <span class="st">"https://riskprofiler.io/blog/{{slug}}"</span>
+  },
+  <span class="at">"author"</span>: {
+    <span class="at">"@type"</span>: <span class="st">"Person"</span>,
+    <span class="at">"name"</span>: <span class="st">"{{author.name}}"</span>,
+    <span class="at">"url"</span>: <span class="st">"{{author.profile_url}}"</span>,
+    <span class="at">"image"</span>: <span class="st">"{{author.photo_url}}"</span>,
+    <span class="at">"sameAs"</span>: [<span class="st">"{{author.linkedin_url}}"</span>]
+  },
+  <span class="at">"publisher"</span>: {
+    <span class="at">"@id"</span>: <span class="st">"https://riskprofiler.io/#organization"</span>
+  },
+  <span class="at">"about"</span>: {
+    <span class="at">"@type"</span>: <span class="st">"Thing"</span>,
+    <span class="at">"name"</span>: <span class="st">"{{primary_topic}}"</span>
+  }
+}
+&lt;/<span class="fn">script</span>&gt;</pre>
+          <p>The double-braces here are <em>placeholders for Framer CMS bindings</em> — each one needs to be wired up in Framer's binding UI, NOT left as a literal string. Verify with <strong>View Page Source</strong> after publishing: real values should appear, not <code>{{...}}</code> strings.</p>
+        </div>
+
+        <div class="step">
+          <strong>Validate with Google's Rich Results Test</strong>
+          <p>After fixing one article and publishing:</p>
+          <ul>
+            <li>Open <a href="https://search.google.com/test/rich-results" target="_blank">https://search.google.com/test/rich-results</a></li>
+            <li>Paste the article URL</li>
+            <li>Confirm <strong>Article</strong> rich result is detected with no errors or warnings</li>
+            <li>Check the parsed author/headline/datePublished — they should be real values, not placeholder strings</li>
+          </ul>
+          <p>Then republish all 120 articles (Framer will re-render with the fixed template). The fix propagates automatically — no need to touch each article individually.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- AI AGENT READINESS FIXES -->
+    <!-- ════════════════════════════════════════ -->
+
+    <section id="fix-link-headers">
+      <div class="section-header">
+        <div class="section-num">08</div>
+        <h2>P2 — Fix: Link Response Headers</h2>
+      </div>
+      <span class="badge-fail">❌ Currently failing the agent scan</span>&nbsp;
+      <span class="badge-info">Effort: 10 min</span>&nbsp;
+      <span class="badge-info">Tool: Cloudflare Transform Rule</span>
+
+      <p>The Cloudflare scanner found two <code>Link:</code> response headers on the homepage, but both are Framer's preconnect hints to its own CDN, not agent-useful relations. Adding a Link header for the sitemap turns this check green.</p>
+
+      <h3>Steps (Cloudflare Dashboard, no code)</h3>
+      <div class="steps">
+        <div class="step">
+          <strong>Cloudflare Dashboard → riskprofiler.io zone → Rules → Transform Rules → Modify Response Headers</strong>
+          <p>Click <strong>Create rule</strong>. Name: <em>Add Agent Link Headers</em></p>
+        </div>
+        <div class="step">
+          <strong>Matching condition</strong>
+          <ul>
+            <li>Field <strong>Hostname</strong> equals <code>riskprofiler.io</code></li>
+            <li>AND Field <strong>URI Path</strong> equals <code>/</code></li>
+          </ul>
+        </div>
+        <div class="step">
+          <strong>Action — Add response header</strong>
+          <ul>
+            <li>Header name: <code>Link</code></li>
+            <li>Header value (verbatim):</li>
+          </ul>
+          <div class="code-label">Link header value</div>
+          <pre>&lt;https://riskprofiler.io/sitemap.xml&gt;; rel="sitemap"</pre>
+        </div>
+        <div class="step">
+          <strong>Save &amp; deploy. Verify:</strong>
+          <p><code>curl -I https://riskprofiler.io | grep -i ^link</code> — the new Link header should appear alongside Framer's preconnect headers.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="fix-content-signals">
+      <div class="section-header">
+        <div class="section-num">09</div>
+        <h2>P2 — Fix: Content Signals in robots.txt</h2>
+      </div>
+      <span class="badge-fail">❌ Currently failing</span>&nbsp;
+      <span class="badge-info">Effort: 30 min</span>&nbsp;
+      <span class="badge-info">Tool: Cloudflare Worker</span>
+
+      <p>The IETF <a href="https://contentsignals.org" target="_blank">Content Signals draft</a> lets you declare what AI systems may do with your content. Framer owns <code>/robots.txt</code> output and you can't edit it directly. A Cloudflare Worker intercepts the route and appends directives.</p>
+
+      <h3>Steps</h3>
+      <div class="steps">
+        <div class="step">
+          <strong>Cloudflare → Workers &amp; Pages → Create Worker</strong>
+          <p>Name: <em>riskprofiler-robots</em></p>
+        </div>
+        <div class="step">
+          <strong>Replace default code with this</strong>
+          <div class="code-label">robots-worker.js</div>
+          <pre><span class="kw">export default</span> {
+  <span class="kw">async</span> <span class="fn">fetch</span>(request) {
+    <span class="kw">const</span> url = <span class="kw">new</span> <span class="fn">URL</span>(request.url);
+    <span class="kw">if</span> (url.pathname !== <span class="st">'/robots.txt'</span>) <span class="kw">return</span> <span class="fn">fetch</span>(request);
+
+    <span class="kw">const</span> original = <span class="kw">await</span> <span class="fn">fetch</span>(request);
+    <span class="kw">const</span> base = (<span class="kw">await</span> original.<span class="fn">text</span>()).<span class="fn">trimEnd</span>();
+
+    <span class="kw">const</span> appended = base + <span class="st">`
+
+# ── Explicit AI crawler rules ──
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Googlebot-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+# ── Content Signals (https://contentsignals.org) ──
+# ai-train=no   : Do not use our content to train AI models
+# search=yes    : AI search engines may surface our content
+# ai-input=yes  : Agents may use our content as RAG context
+Content-Signal: ai-train=no, search=yes, ai-input=yes
+`</span>;
+
+    <span class="kw">return new</span> <span class="fn">Response</span>(appended, {
+      headers: {
+        <span class="st">'Content-Type'</span>: <span class="st">'text/plain; charset=utf-8'</span>,
+        <span class="st">'Cache-Control'</span>: <span class="st">'public, max-age=3600'</span>
+      }
+    });
+  }
+};</pre>
+        </div>
+        <div class="step">
+          <strong>Save &amp; deploy. Wire route</strong>
+          <p>Worker → <strong>Triggers → Routes → Add Route</strong>: <code>riskprofiler.io/robots.txt*</code></p>
+        </div>
+        <div class="step">
+          <strong>Verify</strong>
+          <p>Visit <a href="https://riskprofiler.io/robots.txt" target="_blank">riskprofiler.io/robots.txt</a>. The original 3 Framer lines should still be there, followed by the AI bot rules and Content-Signal line.</p>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <p><strong>Choose Content-Signal values deliberately:</strong> For a security intelligence company, the recommended setting is <code>ai-train=no</code> (don't let competitors train on proprietary framing), <code>search=yes</code> (be visible in Perplexity / ChatGPT Search), <code>ai-input=yes</code> (be a citable RAG source). For a stricter policy — e.g. <code>ai-input=no</code> — change before deploying. This is a policy decision, not a technical one.</p>
+      </div>
+    </section>
+
+    <section id="fix-ai-bots">
+      <div class="section-header">
+        <div class="section-num">10</div>
+        <h2>P3 — Enhancement: Explicit AI Bot Rules</h2>
+      </div>
+      <span class="badge-warn">⚠️ Passes but weak — wildcard only</span>&nbsp;
+      <span class="badge-info">Effort: 0 min (included in Fix above)</span>
+
+      <p>Currently robots.txt has a wildcard <code>User-agent: *</code> rule that applies to all crawlers. The scanner passed this check, but explicit AI bot user-agents are best practice — they show enterprise security maturity and allow allowing/disallowing specific bots independently in the future. The Worker in Section 09 already adds these — no extra work.</p>
+    </section>
+
+    <section id="fix-dns-aid">
+      <div class="section-header">
+        <div class="section-num">11</div>
+        <h2>P4 — Enhancement: DNS for AI Discovery (DNS-AID)</h2>
+      </div>
+      <span class="badge-fail">❌ Currently failing</span>&nbsp;
+      <span class="badge-info">Effort: 45 min</span>&nbsp;
+      <span class="badge-info">Tool: Cloudflare DNS + Worker</span>
+
+      <div class="callout note" style="margin-top:18px;">
+        <span class="callout-icon">ℹ️</span>
+        <p><strong>Forward-looking standard:</strong> DNS-AID is an IETF draft, not yet RFC. No major AI system uses it in production today. Implement after the higher-priority fixes — it's cheap insurance for when the standard matures.</p>
+      </div>
+
+      <h3>Steps</h3>
+      <div class="steps">
+        <div class="step">
+          <strong>Extend the existing robots-worker.js to serve the discovery endpoint</strong>
+          <div class="code-label">add to the Worker's fetch handler</div>
+          <pre><span class="kw">if</span> (url.pathname === <span class="st">'/.well-known/agent-index.json'</span>) {
+  <span class="kw">return new</span> <span class="fn">Response</span>(<span class="fn">JSON.stringify</span>({
+    version: <span class="st">"1"</span>,
+    domain: <span class="st">"riskprofiler.io"</span>,
+    name: <span class="st">"RiskProfiler"</span>,
+    description: <span class="st">"AI-powered external threat management platform"</span>,
+    capabilities: [<span class="st">"content"</span>, <span class="st">"threat-intelligence"</span>],
+    contact: <span class="st">"security@riskprofiler.io"</span>
+  }, null, <span class="nu">2</span>), {
+    headers: { <span class="st">'Content-Type'</span>: <span class="st">'application/json'</span> }
+  });
+}</pre>
+        </div>
+        <div class="step">
+          <strong>Cloudflare DNS → Add Record</strong>
+          <ul>
+            <li>Type: <strong>HTTPS</strong></li>
+            <li>Name: <code>_index._agents</code></li>
+            <li>Target: <code>riskprofiler.io</code></li>
+            <li>Priority: <code>1</code></li>
+            <li>Params: <code>alpn="h2,h3" port=443</code></li>
+          </ul>
+        </div>
+        <div class="step">
+          <strong>Verify</strong>
+          <p><code>dig HTTPS _index._agents.riskprofiler.io</code></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════ -->
+    <!-- ENHANCEMENTS -->
+    <!-- ════════════════════════════════════════ -->
+
+    <section id="enh-viewport">
+      <div class="section-header">
+        <div class="section-num">12</div>
+        <h2>Polish — Viewport Meta Tag</h2>
+      </div>
+      <span class="badge-warn">⚠️ Missing initial-scale</span>&nbsp;
+      <span class="badge-info">Effort: 1 min</span>
+
+      <p>Current viewport meta:</p>
+      <div class="code-label">Current — verified on all pages</div>
+      <pre>&lt;<span class="fn">meta</span> <span class="at">name</span>=<span class="st">"viewport"</span> <span class="at">content</span>=<span class="st">"width=device-width"</span>&gt;</pre>
+
+      <p>Should be:</p>
+      <div class="code-label">Recommended</div>
+      <pre>&lt;<span class="fn">meta</span> <span class="at">name</span>=<span class="st">"viewport"</span> <span class="at">content</span>=<span class="st">"width=device-width, initial-scale=1"</span>&gt;</pre>
+
+      <p>The missing <code>initial-scale=1</code> can cause some mobile browsers to load the page zoomed (especially after rotating from landscape to portrait). It's a Framer-generated tag — check Framer's <strong>Site Settings → Custom Code</strong> for an override, or contact Framer support since this is a build-output default.</p>
+    </section>
+
+    <section id="enh-og-extras">
+      <div class="section-header">
+        <div class="section-num">13</div>
+        <h2>Polish — Optional Open Graph Enhancements</h2>
+      </div>
+      <span class="badge-info">Effort: 15 min</span>&nbsp;
+      <span class="badge-info">Tool: Framer Custom Code &lt;head&gt;</span>
+
+      <p>The existing OG tags are correct, but a few additions improve previews on LinkedIn, Slack, and iMessage:</p>
+
+      <div class="code-label">Add to Framer Site Settings → Custom Code → &lt;head&gt;</div>
+      <pre><span class="cm">&lt;!-- Sitewide OG extras (Framer's per-page tags continue to override title/desc/image) --&gt;</span>
+&lt;<span class="fn">meta</span> <span class="at">property</span>=<span class="st">"og:site_name"</span>      <span class="at">content</span>=<span class="st">"RiskProfiler"</span>&gt;
+&lt;<span class="fn">meta</span> <span class="at">property</span>=<span class="st">"og:locale"</span>         <span class="at">content</span>=<span class="st">"en_US"</span>&gt;
+&lt;<span class="fn">meta</span> <span class="at">property</span>=<span class="st">"og:image:width"</span>    <span class="at">content</span>=<span class="st">"1200"</span>&gt;
+&lt;<span class="fn">meta</span> <span class="at">property</span>=<span class="st">"og:image:height"</span>   <span class="at">content</span>=<span class="st">"630"</span>&gt;
+&lt;<span class="fn">meta</span> <span class="at">property</span>=<span class="st">"og:image:alt"</span>      <span class="at">content</span>=<span class="st">"RiskProfiler — External Threats, Managed by AI Agents"</span>&gt;
+
+<span class="cm">&lt;!-- Twitter handle (enables "by @riskprofilerio" in card) --&gt;</span>
+&lt;<span class="fn">meta</span> <span class="at">name</span>=<span class="st">"twitter:site"</span>        <span class="at">content</span>=<span class="st">"@riskprofilerio"</span>&gt;
+&lt;<span class="fn">meta</span> <span class="at">name</span>=<span class="st">"twitter:creator"</span>     <span class="at">content</span>=<span class="st">"@riskprofilerio"</span>&gt;</pre>
+
+      <h3>OG image hosting — recommendation</h3>
+      <p>OG images currently live on <code>framerusercontent.com</code>. This works but creates a fragility: if Framer migrates assets or re-uploads happen, the URL changes and LinkedIn/Twitter card caches (which last weeks) keep serving the old URL → broken cards. Consider:</p>
+      <ul>
+        <li>Host the canonical OG images on <code>riskprofiler.io/og/</code> or <code>cdn.riskprofiler.io</code> (Cloudflare R2 / Pages)</li>
+        <li>Stable URL that doesn't depend on Framer's CDN structure</li>
+        <li>Easy to bulk-regenerate / re-cache via LinkedIn Post Inspector + Twitter Card Validator</li>
+      </ul>
+    </section>
+
+    <section id="enh-author">
+      <div class="section-header">
+        <div class="section-num">14</div>
+        <h2>Polish — Blog Author Attribution (E-E-A-T)</h2>
+      </div>
+      <span class="badge-warn">⚠️ Missing visible attribution + Person schema</span>&nbsp;
+      <span class="badge-info">Effort: 2–3 hrs</span>
+
+      <p>Currently blog articles show no visible author byline on the page, and the Person schema in JSON-LD is broken (Section 07). Google's E-E-A-T guidelines heavily weight author credentials for YMYL content — and security advice qualifies as YMYL.</p>
+
+      <h3>Recommended structure</h3>
+      <ol>
+        <li>Create an <strong>Authors</strong> CMS collection in Framer with: name, photo, bio, role, LinkedIn URL, Twitter URL</li>
+        <li>Link the Blog Posts collection to Authors (single-author per post is fine)</li>
+        <li>Add a visible byline component to the blog template: photo + name + role + publish date</li>
+        <li>Build dedicated author profile pages at <code>/author/{slug}</code> — these aggregate all posts by that author and add Person schema</li>
+        <li>Wire the BlogPosting <code>author</code> field (Section 07's corrected schema) to the actual Author CMS record</li>
+      </ol>
+    </section>
+
+    <!-- ROADMAP -->
+    <section id="roadmap">
+      <div class="section-header">
+        <div class="section-num">15</div>
+        <h2>Priority Roadmap</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Fix</th><th>Priority</th><th>Effort</th><th>Tool</th><th>What it changes</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Audit + rebuild 17 soft-404 URLs (Section 06)</td>
+              <td><span class="p1">P0 — Critical</span></td>
+              <td>2–4 hrs</td>
+              <td>Framer admin + Cloudflare Worker</td>
+              <td>Removes Google's #1 quality penalty; restores 7 competitor comparison pages + 2 main product pages</td>
+            </tr>
+            <tr>
+              <td>Fix BlogPosting schema template (Section 07)</td>
+              <td><span class="p1">P0 — Critical</span></td>
+              <td>30 min</td>
+              <td>Framer CMS template</td>
+              <td>Article rich results work; author E-E-A-T signal; all 120 articles fixed in one template edit</td>
+            </tr>
+            <tr>
+              <td>Audit blog sitemap for additional broken posts</td>
+              <td><span class="p1">P0 — Critical</span></td>
+              <td>15 min</td>
+              <td>Script + Search Console</td>
+              <td>Found 2 in a sample of 5 — likely more across 120 posts</td>
+            </tr>
+            <tr>
+              <td>Link headers Transform Rule (Section 08)</td>
+              <td><span class="p2">P2 — High</span></td>
+              <td>10 min</td>
+              <td>Cloudflare Transform Rule</td>
+              <td>AI Agent score: 57 → 64</td>
+            </tr>
+            <tr>
+              <td>Content Signals Worker (Section 09)</td>
+              <td><span class="p2">P2 — High</span></td>
+              <td>30 min</td>
+              <td>Cloudflare Worker</td>
+              <td>AI Agent score: 64 → 71; declares AI content policy</td>
+            </tr>
+            <tr>
+              <td>Explicit AI bot rules (Section 10)</td>
+              <td><span class="p2">P2 — High</span></td>
+              <td>0 min (in #5)</td>
+              <td>Same Worker as #5</td>
+              <td>Enterprise security signal — included free</td>
+            </tr>
+            <tr>
+              <td>Viewport initial-scale (Section 12)</td>
+              <td><span class="p3">P3 — Medium</span></td>
+              <td>1 min</td>
+              <td>Framer custom code</td>
+              <td>Prevents mobile zoom bug on rotation</td>
+            </tr>
+            <tr>
+              <td>OG extras: site_name, locale, image dims (Section 13)</td>
+              <td><span class="p3">P3 — Medium</span></td>
+              <td>15 min</td>
+              <td>Framer custom code</td>
+              <td>Cleaner LinkedIn / Slack / iMessage previews</td>
+            </tr>
+            <tr>
+              <td>Author CMS + visible bylines (Section 14)</td>
+              <td><span class="p3">P3 — Medium</span></td>
+              <td>2–3 hrs</td>
+              <td>Framer CMS + template</td>
+              <td>E-E-A-T improvement for YMYL content</td>
+            </tr>
+            <tr>
+              <td>Host OG images on riskprofiler.io domain (Section 13)</td>
+              <td><span class="p3">P3 — Medium</span></td>
+              <td>1 hr</td>
+              <td>Cloudflare R2 / Pages</td>
+              <td>Stable image URLs immune to Framer CDN changes</td>
+            </tr>
+            <tr>
+              <td>DNS-AID records (Section 11)</td>
+              <td><span class="p4">P4 — Future</span></td>
+              <td>45 min</td>
+              <td>Cloudflare DNS + Worker</td>
+              <td>AI Agent score: 71 → 78; forward-looking</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Sequence recommendation</h3>
+      <ol>
+        <li><strong>Day 1 (high impact, low effort):</strong> Fix the BlogPosting schema template (one Framer edit fixes 120 articles). Deploy the Cloudflare Worker for robots.txt (Content Signals + AI bot rules). Add the Link header Transform Rule. Add viewport + OG extras. <em>Total: ~90 minutes for the highest-ROI changes.</em></li>
+        <li><strong>Week 1:</strong> Audit + rebuild missing product pages (<code>/cyber-threat-intelligence</code>, <code>/ai-agents</code> first). Audit all 120 blog posts for soft-404s. Decide what to rebuild vs. remove. Republish sitemap.</li>
+        <li><strong>Week 2:</strong> Complete competitor comparison pages (Bitsight, Recorded Future, SecurityScorecard — high-intent commercial traffic).</li>
+        <li><strong>Month 1:</strong> Authors CMS + visible bylines + E-E-A-T improvements. DNS-AID. OG image migration to riskprofiler.io domain.</li>
+      </ol>
+
+      <hr />
+      <p style="font-size:13px;color:var(--muted);text-align:center;margin-top:24px;">
+        Audit conducted via raw HTML inspection of 35 URLs on 2026-06-10.
+        Sources: isitagentready.com (Cloudflare), direct HTTPS fetches with desktop UA, JSON-LD parsing.
+        Stack-specific guidance for Framer + Cloudflare.
+      </p>
+    </section>
+
+  </div>
+</div>
+
+</body>
+</html>
