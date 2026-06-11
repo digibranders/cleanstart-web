@@ -41,7 +41,8 @@ CleanStart is shipping a Next.js 16.2.5 / React 19 / Tailwind v4 marketing site 
 > 2. Remove `ALLOW_INDEXING`.
 > 3. Point the Vercel Production domain at `cleanstart.com` (Vercel auto-redirects apex → `www` at the platform level too; the `proxy.ts` 308 is the app-level backstop).
 > 4. **Trigger a fresh build** (push / redeploy) so the new host bakes in — never "Promote to Production" the existing staging artifact for this cutover.
-> 5. Verify: `curl -I https://cleanstart.com/` 308s to `www`; view-source on `https://www.cleanstart.com/` shows `<link rel="canonical" href="https://www.cleanstart.com/...">` and the sitemap URLs use `www`.
+> 5. **Seed the 26 legacy Webflow 301s** so old inbound links don't 404 (CMS-side, `scripts/seed-redirects.ts` — see CLAUDE.md production checklist #14). Run before/at cutover.
+> 6. Verify: `curl -I https://cleanstart.com/` 308s to `www`; `curl -I https://www.cleanstart.com/jobs` 301s to `/careers` (redirect seed live); view-source on `https://www.cleanstart.com/` shows `<link rel="canonical" href="https://www.cleanstart.com/...">` and the sitemap URLs use `www`.
 
 **Branch naming:** `<type>/<scope>-<short-kebab-desc>` — e.g. `feat/web-pricing-page`, `fix/cms-lead-form`. `<scope>` is `web|cms|ui|types|infra|docs`. One concern per branch.
 

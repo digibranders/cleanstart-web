@@ -490,6 +490,12 @@ These are one-shot operations that **must** run against the prod Postgres on the
    - Verify: open an editor preview link → the page renders the **draft** (not the published) version; then, unauthenticated, confirm `curl '<cms>/api/blogs?draft=true&where[_status][equals]=draft'` returns **zero** draft docs.
    - Re-runnable: rotating the key = regenerate it on the user and update `CMS_API_KEY`. No data migration; the only schema change is the three `users` API-key columns from the migration above.
 
+14. **Legacy Webflow 301 redirects — seed before DNS cutover.** The old Webflow site at `cleanstart.com` is live now with 26 accumulated 301 redirects; the new site's `Redirects` collection (consumed by `apps/web/src/proxy.ts`) starts empty. **Run this BEFORE the DNS cutover** or every inbound link / bookmark to an old URL (`/about`, `/jobs`, `/resources`, …) 404s on the new site — permanent link-equity loss. Data + invariant guard: `apps/cms/src/payload/lib/webflow-import/redirects-seed.ts` (typed, unit-tested); seeder: `apps/cms/scripts/seed-redirects.ts`.
+   - 18 targets point at a live static route, 3 at `https://www.cleanstart.com` (verbatim); 4 whose Webflow target no longer exists are **remapped** to the nearest live page (`/cleansight-campaign`→`/cleansight`; `/cleanstart-hitachi`,`/cleanstart-survey`→`/community`; `/new-year-event`→`/events`) — the `notes` field records the original target; review in admin (Content → SEO → Redirects) and adjust if a better destination exists.
+   - 1 row targets a CMS blog slug `/blogs/busybox-container-security-risk` — **confirm that blog is published**, else the 301 lands on a 404.
+   - From inside the `cms` container: `pnpm exec tsx --env-file=.env scripts/seed-redirects.ts --dry-run` then `… ` (no flag). Each row is `source: 'migration-seed'`. Idempotent / skip-safe (re-run skips existing `from`s; `--force` overwrites). Writes fire **no** publish/IndexNow/search hooks (the collection has none), so safe any time. Verified locally: 26 created, re-run skips all 26.
+   - After the run, spot-check: `curl -I https://www.cleanstart.com/jobs` → `301`/`308` to `/careers`; the legacy URLs resolve instead of 404.
+
 (Add new one-shot production tasks under this list as they come up — Phase H imports, Meilisearch initial index, etc.)
 
 ---
