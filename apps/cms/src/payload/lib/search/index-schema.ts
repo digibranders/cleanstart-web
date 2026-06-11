@@ -1,3 +1,4 @@
+import { mergeKeywordSources } from '../seo/keywords';
 import { absoluteUrl } from '../jsonld/url';
 import { collectionUrlFromDoc } from '../route-prefixes';
 import type { IndexSettings, SearchDocument } from './client';
@@ -120,8 +121,8 @@ export const isSearchIndexedCollection = (slug: string): boolean =>
  */
 export const INDEX_SETTINGS: IndexSettings = {
   primaryKey: 'id',
-  searchableAttributes: ['title', 'description', 'body', 'authors', 'categories'],
-  filterableAttributes: ['collection', 'categories', 'isPublished'],
+  searchableAttributes: ['title', 'description', 'body', 'authors', 'categories', 'keywords'],
+  filterableAttributes: ['collection', 'categories', 'keywords', 'isPublished'],
   sortableAttributes: ['publishedAt', 'updatedAt', 'collectionWeight'],
   rankingRules: [
     'words',
@@ -168,7 +169,8 @@ interface IndexableDoc {
   categories?: readonly (CategoryLite | number | null | undefined)[] | null;
   newsCategories?: readonly (CategoryLite | number | null | undefined)[] | null;
   category?: CategoryLite | number | null;
-  seo?: { indexable?: string | null } | null;
+  keywords?: readonly { keyword?: string | null }[] | null;
+  seo?: { indexable?: string | null; keywords?: unknown } | null;
 }
 
 const onlyResolvedNamed = (
@@ -223,6 +225,15 @@ const collectCategoryNames = (doc: IndexableDoc): string[] => {
   return names;
 };
 
+const collectKeywords = (doc: IndexableDoc): string[] => {
+  const legacy = Array.isArray(doc.keywords)
+    ? doc.keywords
+        .map((k) => k?.keyword ?? '')
+        .filter((s): s is string => s.length > 0)
+    : [];
+  return mergeKeywordSources(doc.seo?.keywords, legacy);
+};
+
 /**
  * Reduce a Payload-resolved doc into the flat document shape we
  * store in Meilisearch. Empty / null fields are dropped so the
@@ -267,6 +278,9 @@ export const buildSearchDocument = (
 
   if (authors.length > 0) out.authors = authors;
   if (categories.length > 0) out.categories = categories;
+
+  const keywords = collectKeywords(doc);
+  if (keywords.length > 0) out.keywords = keywords;
 
   return out as SearchDocument;
 };

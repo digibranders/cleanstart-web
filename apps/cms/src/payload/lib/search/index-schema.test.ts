@@ -209,6 +209,26 @@ describe('buildSearchDocument', () => {
     expect(doc?.authors).toBeUndefined();
     expect(doc?.categories).toBeUndefined();
   });
+
+  it('indexes seo.keywords (preferring it over legacy keywords[])', () => {
+    const doc = buildSearchDocument('https://cleanstart.com', 'blogs', {
+      id: 7,
+      slug: 'sbom-signing',
+      title: 'SBOM signing',
+      seo: { indexable: 'index', keywords: ['SBOM', 'FIPS'] },
+    });
+    expect(doc?.keywords).toEqual(['SBOM', 'FIPS']);
+  });
+
+  it('falls back to legacy guides keywords[] when seo.keywords is empty', () => {
+    const doc = buildSearchDocument('https://cleanstart.com', 'guides', {
+      id: 8,
+      slug: 'nist-mapping',
+      title: 'NIST mapping',
+      keywords: [{ keyword: 'NIST' }, { keyword: 'k8s' }],
+    } as never);
+    expect(doc?.keywords).toEqual(['NIST', 'k8s']);
+  });
 });
 
 describe('buildSearchDocumentId', () => {
