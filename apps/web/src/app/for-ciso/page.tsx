@@ -3,8 +3,6 @@ import { Footer } from "@/components/sections/Footer";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { CisoHero } from "@/components/sections/ciso/CisoHero";
 import { CisoRisks } from "@/components/sections/ciso/CisoRisks";
-import { CisoSolution } from "@/components/sections/ciso/CisoSolution";
-import { CisoComparison } from "@/components/sections/ciso/CisoComparison";
 import { CisoOutcomes } from "@/components/sections/ciso/CisoOutcomes";
 import { CisoEnterprise } from "@/components/sections/ciso/CisoEnterprise";
 import { CisoCTA } from "@/components/sections/ciso/CisoCTA";
@@ -34,12 +32,6 @@ export default function ForCisoPage(): React.ReactElement {
         <CisoHero />
         <FadeUp>
           <CisoRisks />
-        </FadeUp>
-        <FadeUp>
-          <CisoSolution />
-        </FadeUp>
-        <FadeUp>
-          <CisoComparison />
         </FadeUp>
         <FadeUp>
           <CisoOutcomes />

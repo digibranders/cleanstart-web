@@ -159,7 +159,7 @@ export function CisoHero(): React.ReactElement {
                 marginBottom: "clamp(16px, 1.67vw, 32px)",
               }}
             >
-              Trusted Software Foundations for CISOs
+              AI Scales Code Velocity. Security Can’t Keep Up.
             </h1>
           </HeroReveal>
 
@@ -175,16 +175,14 @@ export function CisoHero(): React.ReactElement {
                 marginBottom: "clamp(24px, 1.67vw, 32px)",
               }}
             >
-              Reduce inherited software risk with minimal, hardened, verifiable
-              container foundations built for modern enterprise environments.
+              Reduce inherited software risk while strengthening compliance
+              readiness across modern software delivery.
             </p>
           </HeroReveal>
 
           <HeroReveal y={30} delay={0.3} duration={0.8} className="self-center md:self-start">
             <Link
-              href="https://images.cleanstart.com"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/book-a-demo"
               className="cs-btn-glass"
               style={
                 {
@@ -194,7 +192,7 @@ export function CisoHero(): React.ReactElement {
                 } as React.CSSProperties
               }
             >
-              Explore Free Secure Image
+              Request a Risk Assessment
             </Link>
           </HeroReveal>
         </div>

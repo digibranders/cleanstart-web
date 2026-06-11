@@ -176,6 +176,21 @@ describe('buildArticleBlob', () => {
       { '@type': 'Thing', name: 'VEX' },
     ]);
   });
+
+  it('emits a keywords Text property and mentions[] from source.keywords', () => {
+    const blob = buildArticleBlob(ctx, {
+      variant: 'Article',
+      url: 'https://cleanstart.com/blogs/sbom-signing',
+      title: 'SBOM signing',
+      keywords: ['SBOM', 'FIPS'],
+    }) as Record<string, unknown>;
+
+    expect(blob.keywords).toEqual(['SBOM', 'FIPS']);
+    expect(blob.mentions).toEqual([
+      { '@type': 'Thing', name: 'SBOM' },
+      { '@type': 'Thing', name: 'FIPS' },
+    ]);
+  });
 });
 
 describe('inlineByline', () => {

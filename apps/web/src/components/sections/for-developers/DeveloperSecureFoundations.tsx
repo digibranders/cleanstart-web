@@ -15,20 +15,21 @@ interface PillarDef {
 const PILLARS: PillarDef[] = [
   {
     title: 'Drop-In Compatible',
-    desc: 'Replace existing base images with minimal changes.',
+    desc: 'Integrate with existing developer workflows and CI/CD pipelines.',
     titleMaxCh: 12,
   },
   {
-    title: 'Minimal Runtime Images',
-    desc: 'Reduce unnecessary packages and dependencies.',
+    title: 'Minimal Artifacts',
+    desc: 'Reduce unnecessary dependencies and runtime complexity.',
+    titleMaxCh: 9,
   },
   {
-    title: 'Continuously Updated',
-    desc: 'Rapidly address newly disclosed vulnerabilities.',
+    title: 'Continuously Rebuilt',
+    desc: 'Rapidly address newly disclosed vulnerabilities and upstream changes.',
   },
   {
     title: 'Verifiable Components',
-    desc: 'Build from trusted sources with reproducible pipelines.',
+    desc: 'Built from trusted sources with reproducible build pipelines.',
   },
 ];
 
@@ -260,41 +261,43 @@ export function DeveloperSecureFoundations(): React.ReactElement {
           paddingBottom: 'clamp(60px, 5.2vw, 100px)',
         }}
       >
-        <Reveal header>
-          <h2
-            className="text-white text-center mx-auto"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'var(--fs-h2)',
-              fontWeight: 700,
-              letterSpacing: '-0.04em',
-              lineHeight: 1.1,
-              maxWidth: '740px',
-              marginBottom: '24px',
-            }}
-          >
-            Secure Foundations Without Workflow Changes
-          </h2>
-        </Reveal>
+        <div
+          className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between lg:gap-12"
+          style={{ marginBottom: 'clamp(40px, 3.65vw, 70px)' }}
+        >
+          <Reveal header className="lg:max-w-[600px] lg:shrink-0">
+            <h2
+              className="text-white text-left"
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 'var(--fs-h2)',
+                fontWeight: 700,
+                letterSpacing: '-0.04em',
+                lineHeight: 1.1,
+              }}
+            >
+              Secure Foundations Without Workflow Changes
+            </h2>
+          </Reveal>
 
-        <Reveal header delay={0.15} y={20}>
-          <p
-            className="text-center mx-auto"
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: 'var(--fs-lead)',
-              fontWeight: 400,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.4,
-              color: 'rgba(255,255,255,0.8)',
-              maxWidth: '600px',
-              marginBottom: 'clamp(40px, 3.65vw, 70px)',
-            }}
-          >
-            Replace public base images with hardened alternatives without disrupting existing
-            workflows
-          </p>
-        </Reveal>
+          <Reveal header delay={0.15} y={20} className="lg:min-w-0 lg:max-w-[560px]">
+            <p
+              className="text-left lg:text-right"
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--fs-lead)',
+                fontWeight: 400,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.4,
+                color: 'rgba(255,255,255,0.8)',
+                textWrap: 'balance',
+              }}
+            >
+              Replace public software artifacts with verified, minimal, and continuously rebuilt
+              alternatives without disrupting developer workflows.
+            </p>
+          </Reveal>
+        </div>
 
         <div
           className="relative"

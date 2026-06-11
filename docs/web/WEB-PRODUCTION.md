@@ -34,7 +34,15 @@ CleanStart is shipping a Next.js 16.2.5 / React 19 / Tailwind v4 marketing site 
 >
 > **To open staging for a pre-launch SEO/security audit:** set Vercel env `ALLOW_INDEXING=1` (overrides all five layers) + `NEXT_PUBLIC_SITE_URL=https://staging.cleanstart.com` (self-consistent canonicals/sitemap), then **redeploy** (meta + sitemap bake at build time). Remove `ALLOW_INDEXING` to re-block — staging reverts to noindex automatically.
 >
-> **At go-live:** point the Vercel Production domain at `cleanstart.com` (replacing the legacy site), remove `ALLOW_INDEXING`, and set `NEXT_PUBLIC_SITE_URL` to the live host. ⚠️ The code currently treats **`www.cleanstart.com`** as the canonical host: `proxy.ts` 308-redirects the apex `cleanstart.com` → `www.cleanstart.com`, and `robots.ts` / canonical fall back to `www`. Decide apex-vs-`www` as the canonical and align `PRODUCTION_HOST`/`NEXT_PUBLIC_SITE_URL` (and the apex redirect) before launch.
+> **Canonical host — DECIDED: `www.cleanstart.com`** (apex `cleanstart.com` 308-redirects → `www`). This is already wired in code (`proxy.ts` `PRODUCTION_HOST = "www.cleanstart.com"` + apex redirect; `canonical.ts` `SITE_URL` defaults to `https://www.cleanstart.com`), so **no code change is needed** — only the env flip below.
+>
+> **At go-live (env flip + REBUILD — do NOT reuse the staging artifact):** Because `NEXT_PUBLIC_*` is inlined at `next build` time, the production canonicals / `og:url` / sitemap host is frozen into the bundle. The pre-launch build bakes `staging.cleanstart.com` — promoting that artifact to the live domain would publish `canonical → https://staging.cleanstart.com` (a noindexed host) on every page and de-index the site. So go-live is a **fresh production build**, not the normal artifact-reuse promotion. Steps:
+> 1. Flip the GitHub Actions variables (used by the CMS deploy render step; mirror in Vercel for `apps/web`): `NEXT_PUBLIC_SITE_URL=https://www.cleanstart.com`, `NEXT_PUBLIC_SITE_ORIGIN=https://www.cleanstart.com`, `NEXT_PUBLIC_SITE_HOSTS=www.cleanstart.com` (currently all `staging.cleanstart.com`).
+> 2. Remove `ALLOW_INDEXING`.
+> 3. Point the Vercel Production domain at `cleanstart.com` (Vercel auto-redirects apex → `www` at the platform level too; the `proxy.ts` 308 is the app-level backstop).
+> 4. **Trigger a fresh build** (push / redeploy) so the new host bakes in — never "Promote to Production" the existing staging artifact for this cutover.
+> 5. **Seed the 26 legacy Webflow 301s** so old inbound links don't 404 (CMS-side, `scripts/seed-redirects.ts` — see CLAUDE.md production checklist #14). Run before/at cutover.
+> 6. Verify: `curl -I https://cleanstart.com/` 308s to `www`; `curl -I https://www.cleanstart.com/jobs` 301s to `/careers` (redirect seed live); view-source on `https://www.cleanstart.com/` shows `<link rel="canonical" href="https://www.cleanstart.com/...">` and the sitemap URLs use `www`.
 
 **Branch naming:** `<type>/<scope>-<short-kebab-desc>` — e.g. `feat/web-pricing-page`, `fix/cms-lead-form`. `<scope>` is `web|cms|ui|types|infra|docs`. One concern per branch.
 
@@ -51,6 +59,8 @@ gh pr create --base development --fill
 ```
 
 **Production promotion:** `development` → `main` via weekly **release PR** (rotating release captain). Title: `release: <YYYY-MM-DD>`. Vercel "Promote to Production" reuses the staging artifact (no rebuild, <30s, instant rollback by re-promoting previous). Tag `main` post-merge: `web-vYYYY.MM.DD`.
+
+> ⚠️ **The one-time go-live cutover is the exception:** the canonical host changes from `staging.cleanstart.com` → `www.cleanstart.com`, and that host is **baked at build time** (`NEXT_PUBLIC_*`). So the cutover **must be a fresh build**, not the artifact-reuse "Promote to Production". Reusing the staging artifact would ship `staging.cleanstart.com` canonicals/sitemap on the live domain and de-index the site. See the go-live env-flip steps in the branch/env section above. After the first correct production build, normal artifact-reuse promotion resumes.
 
 **Hotfix lane:** off `main`, label `hotfix`, one reviewer + green CI → merge → auto-promote → back-merge to `development`. Reserved for production fires.
 
@@ -608,6 +618,9 @@ gtag('consent', 'update', {
 ## 13. Accessibility
 
 **Standard:** WCAG 2.2 Level AA. EAA enforcement live since 28 Jun 2025.
+
+**Implemented:**
+- **Skip-to-content link** (WCAG 2.4.1 / 2.1 A) — a hidden-until-focused `<a href="#main-content">` is the first focusable element in `src/app/layout.tsx` (`sr-only focus:not-sr-only`); every route's `<main>` landmark carries `id="main-content"` (all 40 routes), so keyboard users tab once and jump past the nav to the content.
 
 **WCAG 2.2 new SCs that apply:**
 - 2.4.11 Focus Not Obscured — sticky header risk; add `scroll-margin-top` on focusable elements.

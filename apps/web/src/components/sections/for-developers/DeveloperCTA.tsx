@@ -111,7 +111,7 @@ export function DeveloperCTA(): React.ReactElement {
           </p>
 
           <Link
-            href="/resource-center"
+            href="/guide"
             className="cs-btn-blue self-start"
             style={
               {
@@ -173,7 +173,7 @@ export function DeveloperCTA(): React.ReactElement {
           development workflows.
         </p>
         <Link
-          href="/resource-center"
+          href="/guide"
           className="cs-btn-blue"
           style={
             {

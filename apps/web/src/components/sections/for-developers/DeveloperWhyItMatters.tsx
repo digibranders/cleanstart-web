@@ -20,8 +20,8 @@ const CARDS: [CardDef, CardDef, CardDef, CardDef] = [
     desktopImgStyle: { left: '8.15%', top: '-2.03%', width: '86.53%', height: '104.52%' },
     mobileIcon: '/images/for-developers/why/icon-bloated.webp',
     mobileIconStyle: { left: '12px', top: '2px', width: '84px', height: '84px' },
-    title: 'Bloated Base Images',
-    desc: 'Public images include unnecessary packages and dependencies.',
+    title: 'Bloated Software Artifacts',
+    desc: 'Large software artifacts increase dependency complexity and runtime overhead.',
   },
   {
     desktopImg: '/images/for-developers/why/card-vulnerabilities.webp',
@@ -29,23 +29,23 @@ const CARDS: [CardDef, CardDef, CardDef, CardDef] = [
     mobileIcon: '/images/for-developers/why/icon-vulnerabilities.webp',
     mobileIconStyle: { left: '-3px', top: '8px', width: '115px', height: '71px' },
     title: 'Inherited Vulnerabilities',
-    desc: 'Most CVEs originate from upstream components.',
+    desc: 'Public software components often inherit vulnerable upstream dependencies.',
   },
   {
     desktopImg: '/images/for-developers/why/card-remediation.webp',
     desktopImgStyle: { left: '8.45%', top: '-8.18%', width: '87.16%', height: '117.27%' },
     mobileIcon: '/images/for-developers/why/icon-remediation.webp',
     mobileIconStyle: { left: '8px', top: '-3px', width: '93px', height: '93px' },
-    title: 'Remediation Overload',
-    desc: 'Teams spend time triaging inherited issues.',
+    title: 'Slow Remediation Cycles',
+    desc: 'Manual patching and rebuild workflows slow software delivery.',
   },
   {
     desktopImg: '/images/for-developers/why/card-development.webp',
     desktopImgStyle: { left: '15.93%', top: '1.36%', width: '72.54%', height: '96.83%' },
     mobileIcon: '/images/for-developers/why/icon-development.webp',
     mobileIconStyle: { left: '17px', top: '2px', width: '74px', height: '83px' },
-    title: 'Slower Development Cycles',
-    desc: 'Security bottlenecks delay releases and deployments.',
+    title: 'Workflow Disruption',
+    desc: 'Security tooling should not disrupt developer productivity or CI/CD workflows.',
   },
 ];
 
@@ -304,7 +304,7 @@ export function DeveloperWhyItMatters(): React.ReactElement {
               marginBottom: 'clamp(32px, 4.17vw, 80px)',
             }}
           >
-            Why Does It Matter
+            Why It Matters
           </h2>
         </Reveal>
 
