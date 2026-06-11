@@ -73,7 +73,7 @@ const run = async (): Promise<void> => {
     await payload.update({
       collection: 'guides',
       id,
-      data: { seo: { keywords: merged } } as never,
+      data: { seo: { keywords: merged } } as { seo: { keywords: string[] } },
       depth: 0,
       overrideAccess: true,
     });

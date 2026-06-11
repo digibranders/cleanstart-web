@@ -80,8 +80,8 @@ export const SeoKeywordsField = (): ReactElement => {
     setPending('');
   }, [pending, keywords, commit]);
 
-  const removeAt = useCallback(
-    (idx: number) => commit(keywords.filter((_, i) => i !== idx)),
+  const removeKeyword = useCallback(
+    (kw: string) => commit(keywords.filter((k) => k !== kw)),
     [keywords, commit],
   );
 
@@ -116,14 +116,14 @@ export const SeoKeywordsField = (): ReactElement => {
             padding: 0,
           }}
         >
-          {keywords.map((kw, idx) => (
+          {keywords.map((kw) => (
             // normalizeKeywords guarantees case-insensitive uniqueness, so
             // kw is a stable, unique key for this list.
             <li key={kw} style={chipStyle}>
               <span>{kw}</span>
               <button
                 type="button"
-                onClick={() => removeAt(idx)}
+                onClick={() => removeKeyword(kw)}
                 aria-label={`Remove ${kw}`}
                 style={removeBtnStyle}
               >
