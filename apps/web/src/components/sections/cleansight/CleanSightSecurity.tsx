@@ -23,20 +23,20 @@ const FEATURE_CARDS = [
 
 const WORKFLOW = [
   {
-    label: "Continuous\nVisibility",
-    body: "Maintain real-time awareness across environments.",
+    label: "Continuous\nDiscovery",
+    body: "Continuously discover software assets across modern environments.",
   },
   {
-    label: "Risk Prioritization",
-    body: "Focus on exploitable inherited vulnerabilities.",
+    label: "Inherited Risk\nAnalysis",
+    body: "Correlate inherited software risk across dependencies, artifacts, and environments.",
   },
   {
-    label: "Built-In\nCompliance",
-    body: "Support audit readiness and policy enforcement.",
+    label: "Verified\nInventories",
+    body: "Maintain continuously verified inventories, SBOMs, and software provenance.",
   },
   {
-    label: "Faster Remediation",
-    body: "Reduce operational response time and effort.",
+    label: "Verified\nRemediation",
+    body: "Prioritize and remediate inherited software risk with verified alternatives.",
   },
 ] as const;
 
@@ -51,20 +51,17 @@ function FeatureCard({
   /** "left" / "right" puts extra padding on the inner edge (the shield side).
       Omit for symmetric padding when the card stands alone. */
   side?: "left" | "right";
-  /** "shield": desktop card under the floating shield (2-line title, left-aligned).
+  /** "shield": desktop card under the floating shield (2-line title, centered).
       "stack":  mobile/standalone card (1-line title, centered, no shield interaction). */
   variant?: "shield" | "stack";
 }) {
   const pad = "clamp(24px, 2.6vw, 44px)";
-  const innerPad = "clamp(80px, 8vw, 140px)";
+  const innerPad = "clamp(64px, 6.5vw, 116px)";
   const paddingLeft = side === "left" ? pad : side === "right" ? innerPad : pad;
   const paddingRight = side === "left" ? innerPad : side === "right" ? pad : pad;
   const isStack = variant === "stack";
   // On mobile/stack we render the title with no forced break so \n collapses to a space.
   const displayTitle = isStack ? title.replace(/\n/g, " ") : title;
-  // Left-column cards mirror their text to the inner edge so all four cards'
-  // content reads toward the centered shield.
-  const shieldAlign = side === "left" ? "right" : "left";
   return (
     <div
       className="bg-white flex flex-col justify-center"
@@ -76,8 +73,8 @@ function FeatureCard({
         paddingRight: isStack ? pad : paddingRight,
         gap: "12px",
         minHeight: isStack ? undefined : "clamp(180px, 15vw, 220px)",
-        textAlign: isStack ? "center" : shieldAlign,
-        alignItems: isStack ? "center" : "stretch",
+        textAlign: "center",
+        alignItems: "center",
       }}
     >
       <h3
@@ -212,7 +209,7 @@ export function CleanSightSecurity(): React.ReactElement {
               left: "50%",
               top: "50%",
               transform: "translate(-50%, -50%)",
-              width: "clamp(240px, 26vw, 360px)",
+              width: "clamp(210px, 22vw, 310px)",
               aspectRatio: "444 / 470",
               zIndex: 10,
             }}
@@ -323,8 +320,8 @@ export function CleanSightSecurity(): React.ReactElement {
                 lineHeight: 1.1,
               }}
             >
-              From Visibility to{" "}
-              <span className="cs-text-gradient-impact">Action</span>
+              Continuous Visibility with{" "}
+              <span className="cs-text-gradient-impact">Verified Remediation</span>
             </h2>
           </Reveal>
           <Reveal header delay={0.15} y={20}>
@@ -337,8 +334,8 @@ export function CleanSightSecurity(): React.ReactElement {
                 lineHeight: 1.4,
               }}
             >
-              Move beyond fragmented visibility with continuous remediation and
-              operational security workflows.
+              Correlate inherited software risk across environments and
+              prioritize remediation with confidence.
             </p>
           </Reveal>
         </div>
@@ -397,13 +394,16 @@ export function CleanSightSecurity(): React.ReactElement {
             label={WORKFLOW[0].label}
             body={WORKFLOW[0].body}
           />
-          {/* Step 2 — Risk Prioritization. Dot 26%, label 12% (gap 14%, above). */}
+          {/* Step 2 — Inherited Risk Analysis. Dot 26%; label anchored above the
+              dot (labelAnchorY="bottom" → labelY is the BOTTOM edge, label grows
+              upward) so the longer 4-line body never runs down over the peak node. */}
           <WorkflowStep
             x="29%"
             nodeSrc="security-node-2.svg"
             nodeY="26%"
-            labelY="12%"
+            labelY="22%"
             labelAlign="left"
+            labelAnchorY="bottom"
             label={WORKFLOW[1].label}
             body={WORKFLOW[1].body}
           />
