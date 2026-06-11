@@ -562,6 +562,15 @@ export interface Blog {
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
     keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -889,6 +898,15 @@ export interface Author {
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
     keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -1046,6 +1064,15 @@ export interface Category {
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
     keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -1384,6 +1411,15 @@ export interface News {
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
     keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -1542,6 +1578,15 @@ export interface NewsCategory {
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
     keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -1966,6 +2011,15 @@ export interface Guide {
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
     keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -2365,6 +2419,15 @@ export interface KnowledgeBase {
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
     keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -2522,6 +2585,15 @@ export interface KnowledgeCategory {
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
     keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -2928,6 +3000,15 @@ export interface Resource {
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
     keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -3435,6 +3516,15 @@ export interface Event {
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
     keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -3791,6 +3881,15 @@ export interface Webinar {
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
     keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -4119,6 +4218,15 @@ export interface PodcastEpisode {
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
     keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -4487,6 +4595,15 @@ export interface Job {
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
     keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -6460,6 +6577,15 @@ export interface Page {
      * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
      */
     keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
     /**
      * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
      */
@@ -7708,6 +7834,7 @@ export interface BlogsSelect<T extends boolean = true> {
         alternates?: T;
         customTags?: T;
         keywordTarget?: T;
+        keywords?: T;
         speakablePath?:
           | T
           | {
@@ -7862,6 +7989,7 @@ export interface NewsSelect<T extends boolean = true> {
         alternates?: T;
         customTags?: T;
         keywordTarget?: T;
+        keywords?: T;
         speakablePath?:
           | T
           | {
@@ -8059,6 +8187,7 @@ export interface GuidesSelect<T extends boolean = true> {
         alternates?: T;
         customTags?: T;
         keywordTarget?: T;
+        keywords?: T;
         speakablePath?:
           | T
           | {
@@ -8242,6 +8371,7 @@ export interface KnowledgeBaseSelect<T extends boolean = true> {
         alternates?: T;
         customTags?: T;
         keywordTarget?: T;
+        keywords?: T;
         speakablePath?:
           | T
           | {
@@ -8409,6 +8539,7 @@ export interface ResourcesSelect<T extends boolean = true> {
         alternates?: T;
         customTags?: T;
         keywordTarget?: T;
+        keywords?: T;
         speakablePath?:
           | T
           | {
@@ -8580,6 +8711,7 @@ export interface EventsSelect<T extends boolean = true> {
         alternates?: T;
         customTags?: T;
         keywordTarget?: T;
+        keywords?: T;
         speakablePath?:
           | T
           | {
@@ -8738,6 +8870,7 @@ export interface WebinarsSelect<T extends boolean = true> {
         alternates?: T;
         customTags?: T;
         keywordTarget?: T;
+        keywords?: T;
         speakablePath?:
           | T
           | {
@@ -8885,6 +9018,7 @@ export interface PodcastEpisodesSelect<T extends boolean = true> {
         alternates?: T;
         customTags?: T;
         keywordTarget?: T;
+        keywords?: T;
         speakablePath?:
           | T
           | {
@@ -9048,6 +9182,7 @@ export interface JobsSelect<T extends boolean = true> {
         alternates?: T;
         customTags?: T;
         keywordTarget?: T;
+        keywords?: T;
         speakablePath?:
           | T
           | {
@@ -10010,6 +10145,7 @@ export interface PagesSelect<T extends boolean = true> {
         alternates?: T;
         customTags?: T;
         keywordTarget?: T;
+        keywords?: T;
         speakablePath?:
           | T
           | {
@@ -10130,6 +10266,7 @@ export interface AuthorsSelect<T extends boolean = true> {
         alternates?: T;
         customTags?: T;
         keywordTarget?: T;
+        keywords?: T;
         speakablePath?:
           | T
           | {
@@ -10185,6 +10322,7 @@ export interface CategoriesSelect<T extends boolean = true> {
         alternates?: T;
         customTags?: T;
         keywordTarget?: T;
+        keywords?: T;
         speakablePath?:
           | T
           | {
@@ -10240,6 +10378,7 @@ export interface NewsCategoriesSelect<T extends boolean = true> {
         alternates?: T;
         customTags?: T;
         keywordTarget?: T;
+        keywords?: T;
         speakablePath?:
           | T
           | {
@@ -10295,6 +10434,7 @@ export interface KnowledgeCategoriesSelect<T extends boolean = true> {
         alternates?: T;
         customTags?: T;
         keywordTarget?: T;
+        keywords?: T;
         speakablePath?:
           | T
           | {
