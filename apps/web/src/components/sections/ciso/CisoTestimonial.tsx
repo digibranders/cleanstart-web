@@ -19,6 +19,8 @@ export function CisoTestimonial(): React.ReactElement {
   return (
     <Testimonials
       testimonials={CISO_TESTIMONIALS}
+      theme="light"
+      centerHeader
       heading={
         <>
           Customer{" "}

@@ -81,7 +81,8 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/for-ciso' },
   { path: '/for-developers' },
   { path: '/guide' },
-  { path: '/knowledge-hub' },
+  // `/knowledge-hub` is a redirect to the first article (no standalone listing) —
+  // excluded here. The individual /knowledge-hub/<slug> articles are emitted below.
   // `/legal` is a 308 redirect (not a page) — excluded here. The individual
   // /legal/<slug> docs are emitted dynamically from the legalDocuments CMS.
   { path: '/news' },
