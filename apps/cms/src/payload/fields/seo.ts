@@ -7,6 +7,7 @@ import {
   validateOverrideForFieldOnCollection,
 } from '../lib/jsonld/override-validator';
 import { normaliseText } from '../lib/normalise-text';
+import { normalizeKeywords } from '../lib/seo/keywords';
 import { mediaUploadField } from './media-upload';
 
 const TITLE_CHAR_HINT = 60;
@@ -410,6 +411,30 @@ const keywordTargetField: Field = {
   },
 };
 
+// Topic keywords — a normalized list of entity terms for this page.
+// Distinct from `keywordTarget` (the single focus keyword that drives
+// the density readout): this is the *entity set* surfaced as schema.org
+// `keywords` + `mentions[]` (AEO/GEO signal) and indexed as a search
+// facet. Stored as a `json` blob (a `string[]`) — same storage choice
+// as `alternates` / `customTags`, because the parent `seo` group is
+// `admin.hidden` and Payload's `array` row-registry needs an in-form
+// render surface. The `SeoKeywordsField` sidebar card reads/writes the
+// blob via `useField` + `setValue`. Normalized on every save so the
+// stored shape is always a clean, de-duped, capped array (or null).
+const keywordsField: Field = {
+  name: 'keywords',
+  type: 'json',
+  admin: { hidden: true },
+  hooks: {
+    beforeChange: [
+      ({ value }) => {
+        const cleaned = normalizeKeywords(value);
+        return cleaned.length > 0 ? cleaned : null;
+      },
+    ],
+  },
+};
+
 const speakablePathField: Field = {
   name: 'speakablePath',
   type: 'array',
@@ -460,6 +485,7 @@ const seoField: GroupField = {
     alternatesField,
     customTagsField,
     keywordTargetField,
+    keywordsField,
     speakablePathField,
     additionalSchemaField,
   ],
