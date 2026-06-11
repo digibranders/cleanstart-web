@@ -651,6 +651,21 @@ export const seoSidebarFields = (args: {
       },
     },
     {
+      // Topic keywords — entity terms surfaced in JSON-LD (`keywords` +
+      // `mentions[]`) and indexed as a search facet. Sits in the
+      // "what indexes / entities" cluster next to the Schema preview.
+      name: 'seoKeywords',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/SeoKeywordsField.tsx#SeoKeywordsField',
+          },
+        },
+      },
+    },
+    {
       // Canonical-URL card — surfaces the self-canonical that JSON-LD
       // emits by default, and lets editors override with an off-domain
       // canonical when content was originally published elsewhere.
