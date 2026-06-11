@@ -8,7 +8,7 @@
  */
 
 /** Max keywords stored per document. Beyond this is stuffing, not signal. */
-export const MAX_KEYWORDS = 20;
+export const MAX_KEYWORDS = 10;
 /** Max characters per keyword. A "keyword" longer than this is a sentence. */
 export const MAX_KEYWORD_LEN = 60;
 
