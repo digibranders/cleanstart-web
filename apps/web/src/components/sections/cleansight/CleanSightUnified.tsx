@@ -3,22 +3,22 @@ import { Reveal } from "@/components/ui/Reveal";
 const CARDS = [
   {
     title: "Continuous Discovery",
-    body: "Continuously inventory container environments.",
+    body: "Continuously discover software assets across modern environments.",
     iconSrc: "/images/cleansight/Ball1.webp",
   },
   {
-    title: "Risk Assessment",
-    body: "Identify inherited vulnerabilities and runtime exposure.",
+    title: "Inherited Risk Analysis",
+    body: "Correlate inherited software risk across dependencies, artifacts, and environments.",
     iconSrc: "/images/cleansight/Ball2.webp",
   },
   {
-    title: "Enterprise SBOM Generation",
-    body: "Generate software inventories automatically.",
+    title: "Verified Inventories",
+    body: "Maintain continuously verified inventories, SBOMs, and software provenance.",
     iconSrc: "/images/cleansight/Ball3.webp",
   },
   {
-    title: "Integrated Remediation",
-    body: "Reduce remediation complexity and operational effort.",
+    title: "Verified Remediation",
+    body: "Prioritize and remediate inherited software risk with verified alternatives.",
     iconSrc: "/images/cleansight/Ball4.webp",
   },
 ];
@@ -28,7 +28,6 @@ export function CleanSightUnified(): React.ReactElement {
     <section
       data-section="CleanSightUnified"
       className="relative overflow-hidden bg-white"
-      style={{ minHeight: "792px" }}
     >
       {/* Decorative vector — top-left, partially off-screen. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -86,8 +85,8 @@ export function CleanSightUnified(): React.ReactElement {
                 color: "#111",
               }}
             >
-              Unified Visibility and{" "}
-              <span className="cs-text-gradient-impact">Remediation</span>
+              Continuous Visibility with{" "}
+              <span className="cs-text-gradient-impact">Verified Remediation</span>
             </h2>
           </Reveal>
 
@@ -104,8 +103,8 @@ export function CleanSightUnified(): React.ReactElement {
                 opacity: 0.8,
               }}
             >
-              CleanSight continuously identifies, assesses, and recommends
-              remediation actions to reduce container risk across environments.
+              Correlate inherited software risk across environments and
+              prioritize remediation with confidence.
             </p>
           </Reveal>
         </div>

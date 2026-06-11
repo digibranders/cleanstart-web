@@ -54,7 +54,7 @@ import { SeoDescriptionField as SeoDescriptionField_9696c1be1903d357f63d23951e79
 import { SeoIndexableField as SeoIndexableField_ff3cc07c91d10b5899370ac0f262f1fb } from '@/payload/admin/components/SeoIndexableField.tsx'
 import { SerpPreviewField as SerpPreviewField_243778961d714dd69072cd09f703a734 } from '@/payload/admin/components/SerpPreviewField.tsx'
 import { SchemaPreviewField as SchemaPreviewField_2ca2f49f868221997f9932607223d89a } from '@/payload/admin/components/SchemaPreviewField.tsx'
-import { SeoKeywordsField as SeoKeywordsField_25a2b260405fa6f989c83407120051cc } from '@/payload/admin/components/SeoKeywordsField.tsx'
+import { KeywordsField as KeywordsField_a0283e5157e7833147898bc706890b37 } from '@/payload/admin/components/KeywordsField.tsx'
 import { CanonicalField as CanonicalField_26fe47d21538483cc802b09672dbd7f6 } from '@/payload/admin/components/CanonicalField.tsx'
 import { SocialCardField as SocialCardField_b319a069c95a65e993e5d5cd482bdc69 } from '@/payload/admin/components/SocialCardField.tsx'
 import { OutboundRedirectField as OutboundRedirectField_6ddb1aebe33d308a1f37b1ba8879601c } from '@/payload/admin/components/OutboundRedirectField.tsx'
@@ -125,6 +125,12 @@ import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc056
 import { Dashboard as Dashboard_99a124d7b5ab83228ca0a3f897256570 } from '../../../payload/admin/components/Dashboard/Dashboard.tsx'
 import { CmsAccountView as CmsAccountView_e25882c99036df42ce1493c03452d7e3 } from '../../../payload/admin/components/auth/CmsAccountView.tsx'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
+import { PointField as PointField_dc800e7ca3d2eb7ea39fd4bc6138c687 } from '@/payload/admin/components/fields/PointField.tsx'
+import { RadioField as RadioField_31aae9b520654e49d40e444571bafe41 } from '@/payload/admin/components/fields/RadioField.tsx'
+import { CollapsibleField as CollapsibleField_e8aff66100db6bf10de9866e9f9ca5a8 } from '@/payload/admin/components/fields/CollapsibleField.tsx'
+import { TabsField as TabsField_c014faddfba6da88b9efedda256f4990 } from '@/payload/admin/components/fields/TabsField.tsx'
+import { RowField as RowField_1ef7316c3d3f9450222b0eb086a8e243 } from '@/payload/admin/components/fields/RowField.tsx'
+import { CodeField as CodeField_4aa85fbd783c4d26c5c89ebf383941c1 } from '@/payload/admin/components/fields/CodeField.tsx'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
@@ -184,7 +190,7 @@ export const importMap = {
   "@/payload/admin/components/SeoIndexableField.tsx#SeoIndexableField": SeoIndexableField_ff3cc07c91d10b5899370ac0f262f1fb,
   "@/payload/admin/components/SerpPreviewField.tsx#SerpPreviewField": SerpPreviewField_243778961d714dd69072cd09f703a734,
   "@/payload/admin/components/SchemaPreviewField.tsx#SchemaPreviewField": SchemaPreviewField_2ca2f49f868221997f9932607223d89a,
-  "@/payload/admin/components/SeoKeywordsField.tsx#SeoKeywordsField": SeoKeywordsField_25a2b260405fa6f989c83407120051cc,
+  "@/payload/admin/components/KeywordsField.tsx#KeywordsField": KeywordsField_a0283e5157e7833147898bc706890b37,
   "@/payload/admin/components/CanonicalField.tsx#CanonicalField": CanonicalField_26fe47d21538483cc802b09672dbd7f6,
   "@/payload/admin/components/SocialCardField.tsx#SocialCardField": SocialCardField_b319a069c95a65e993e5d5cd482bdc69,
   "@/payload/admin/components/OutboundRedirectField.tsx#OutboundRedirectField": OutboundRedirectField_6ddb1aebe33d308a1f37b1ba8879601c,
@@ -254,5 +260,11 @@ export const importMap = {
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "./payload/admin/components/Dashboard/Dashboard.tsx#Dashboard": Dashboard_99a124d7b5ab83228ca0a3f897256570,
   "./payload/admin/components/auth/CmsAccountView.tsx#CmsAccountView": CmsAccountView_e25882c99036df42ce1493c03452d7e3,
-  "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
+  "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
+  "@/payload/admin/components/fields/PointField.tsx#PointField": PointField_dc800e7ca3d2eb7ea39fd4bc6138c687,
+  "@/payload/admin/components/fields/RadioField.tsx#RadioField": RadioField_31aae9b520654e49d40e444571bafe41,
+  "@/payload/admin/components/fields/CollapsibleField.tsx#CollapsibleField": CollapsibleField_e8aff66100db6bf10de9866e9f9ca5a8,
+  "@/payload/admin/components/fields/TabsField.tsx#TabsField": TabsField_c014faddfba6da88b9efedda256f4990,
+  "@/payload/admin/components/fields/RowField.tsx#RowField": RowField_1ef7316c3d3f9450222b0eb086a8e243,
+  "@/payload/admin/components/fields/CodeField.tsx#CodeField": CodeField_4aa85fbd783c4d26c5c89ebf383941c1
 }

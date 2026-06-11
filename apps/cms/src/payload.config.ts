@@ -65,6 +65,7 @@ import { redirectsImportEndpoint } from './payload/endpoints/redirects-import';
 import { robotsEndpoint } from './payload/endpoints/robots';
 import { searchAnalyticsEndpoint } from './payload/endpoints/search-analytics';
 import { searchQueryEndpoint } from './payload/endpoints/search-query';
+import { topicSuggestionsEndpoint } from './payload/endpoints/topic-suggestions';
 import {
   imageSitemapEndpoint,
   newsSitemapEndpoint,
@@ -400,6 +401,7 @@ export default buildConfig({
     canonicalCheckEndpoint,
     searchQueryEndpoint,
     searchAnalyticsEndpoint,
+    topicSuggestionsEndpoint,
     userReassignContentEndpoint,
     publishChecklistEndpoint,
     dsarFindEndpoint,

@@ -35,6 +35,10 @@ describe('normalizeKeywords', () => {
     const many = Array.from({ length: MAX_KEYWORDS + 10 }, (_, i) => `kw-${i}`);
     expect(normalizeKeywords(many)).toHaveLength(MAX_KEYWORDS);
   });
+
+  it('caps at 10 keywords (the recommended hard ceiling)', () => {
+    expect(MAX_KEYWORDS).toBe(10);
+  });
 });
 
 describe('mergeKeywordSources', () => {

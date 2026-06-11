@@ -144,9 +144,9 @@ export function Testimonials({
   }, [transitioning]);
 
   // Auto-advance — paused when hovered, focused, tab hidden, or user prefers
-  // reduced motion.
+  // reduced motion. Skipped entirely for a single testimonial (nothing to rotate).
   useEffect(() => {
-    if (paused) return;
+    if (paused || total <= 1) return;
     const reduced =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -449,58 +449,64 @@ export function Testimonials({
             })}
           </div>
 
-          {/* Auto-rotation progress bar — shows how long until the next slide. */}
-          <div
-            aria-hidden
-            className="mx-auto mt-8 h-[3px] w-[280px] overflow-hidden rounded-full"
-            style={{ background: "rgba(255,255,255,0.10)" }}
-          >
-            <div
-              key={`prog-${active}`}
-              className="h-full rounded-full"
-              style={{
-                background:
-                  "linear-gradient(90deg, #33BAEC 0%, #6F8DFF 50%, #B19CFF 100%)",
-                animation: paused
-                  ? "none"
-                  : `cs-tt-progress ${AUTO_ADVANCE_MS}ms linear forwards`,
-              }}
-            />
-          </div>
+          {/* Carousel chrome (progress, dots, prev/next) is meaningless for a
+              single testimonial, so it only renders when there are 2+. */}
+          {total > 1 && (
+            <>
+              {/* Auto-rotation progress bar — shows how long until the next slide. */}
+              <div
+                aria-hidden
+                className="mx-auto mt-8 h-[3px] w-[280px] overflow-hidden rounded-full"
+                style={{ background: "rgba(255,255,255,0.10)" }}
+              >
+                <div
+                  key={`prog-${active}`}
+                  className="h-full rounded-full"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, #33BAEC 0%, #6F8DFF 50%, #B19CFF 100%)",
+                    animation: paused
+                      ? "none"
+                      : `cs-tt-progress ${AUTO_ADVANCE_MS}ms linear forwards`,
+                  }}
+                />
+              </div>
 
-          <div className="mt-6 flex items-center justify-center gap-6">
-            <NavButton direction="prev" onClick={goPrev} label="Previous testimonial" />
-            <div
-              role="tablist"
-              aria-label="Select testimonial"
-              className="flex items-center gap-2"
-            >
-              {TESTIMONIALS.map((t, i) => {
-                const isActive = i === active;
-                return (
-                  <button
-                    key={t.name}
-                    type="button"
-                    role="tab"
-                    aria-selected={isActive}
-                    aria-label={`Show testimonial from ${t.name}`}
-                    onClick={() => {
-                      setDirection(i > active ? "next" : "prev");
-                      setActive(i);
-                    }}
-                    className="group block h-2.5 rounded-full transition-all duration-300"
-                    style={{
-                      width: isActive ? 28 : 10,
-                      background: isActive
-                        ? "linear-gradient(90deg, #33BAEC 0%, #B19CFF 100%)"
-                        : "rgba(255,255,255,0.25)",
-                    }}
-                  />
-                );
-              })}
-            </div>
-            <NavButton direction="next" onClick={goNext} label="Next testimonial" />
-          </div>
+              <div className="mt-6 flex items-center justify-center gap-6">
+                <NavButton direction="prev" onClick={goPrev} label="Previous testimonial" />
+                <div
+                  role="tablist"
+                  aria-label="Select testimonial"
+                  className="flex items-center gap-2"
+                >
+                  {TESTIMONIALS.map((t, i) => {
+                    const isActive = i === active;
+                    return (
+                      <button
+                        key={t.name}
+                        type="button"
+                        role="tab"
+                        aria-selected={isActive}
+                        aria-label={`Show testimonial from ${t.name}`}
+                        onClick={() => {
+                          setDirection(i > active ? "next" : "prev");
+                          setActive(i);
+                        }}
+                        className="group block h-2.5 rounded-full transition-all duration-300"
+                        style={{
+                          width: isActive ? 28 : 10,
+                          background: isActive
+                            ? "linear-gradient(90deg, #33BAEC 0%, #B19CFF 100%)"
+                            : "rgba(255,255,255,0.25)",
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+                <NavButton direction="next" onClick={goNext} label="Next testimonial" />
+              </div>
+            </>
+          )}
         </section>
       </div>
     </section>

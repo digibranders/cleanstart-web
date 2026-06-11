@@ -164,6 +164,27 @@ describe('createSearchClient', () => {
     );
     expect(await failing.search('content', 'foo')).toBeNull();
   });
+
+  it('forwards facets and returns facetDistribution', async () => {
+    let sentBody: Record<string, unknown> = {};
+    const fetchMock = (async (_url: string, init?: RequestInit) => {
+      sentBody = JSON.parse(String(init?.body ?? '{}'));
+      return new Response(
+        JSON.stringify({
+          hits: [],
+          estimatedTotalHits: 0,
+          processingTimeMs: 1,
+          facetDistribution: { keywords: { SBOM: 4 } },
+        }),
+        { status: 200 },
+      );
+    }) as unknown as typeof fetch;
+
+    const client = createSearchClient({ url: 'http://meili.test', apiKey: 'k', fetch: fetchMock });
+    const res = await client.search('content', '', { limit: 0, facets: ['keywords'] });
+    expect(sentBody.facets).toEqual(['keywords']);
+    expect(res?.facetDistribution?.keywords).toEqual({ SBOM: 4 });
+  });
 });
 
 describe('searchClientConfigFromEnv', () => {

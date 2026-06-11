@@ -397,8 +397,8 @@ const additionalSchemaField: Field = {
   }) as JSONFieldValidation,
 };
 
-// Optional target keyword the editor is writing for. Drives the
-// `KeywordTargetField` sidebar density readout. Free-text — we don't
+// Optional primary topic the editor is writing for. Drives the
+// `KeywordsField` sidebar density readout. Free-text — we don't
 // validate against an external keyword tool. Hidden from the in-form
 // renderer; the sidebar UI is the editing surface.
 const keywordTargetField: Field = {
@@ -412,15 +412,16 @@ const keywordTargetField: Field = {
 };
 
 // Topic keywords — a normalized list of entity terms for this page.
-// Distinct from `keywordTarget` (the single focus keyword that drives
+// Distinct from `keywordTarget` (the single primary topic that drives
 // the density readout): this is the *entity set* surfaced as schema.org
 // `keywords` + `mentions[]` (AEO/GEO signal) and indexed as a search
 // facet. Stored as a `json` blob (a `string[]`) — same storage choice
 // as `alternates` / `customTags`, because the parent `seo` group is
 // `admin.hidden` and Payload's `array` row-registry needs an in-form
-// render surface. The `SeoKeywordsField` sidebar card reads/writes the
-// blob via `useField` + `setValue`. Normalized on every save so the
-// stored shape is always a clean, de-duped, capped array (or null).
+// render surface. The `KeywordsField` sidebar card reads/writes both
+// this and `keywordTarget` via `useField` + `setValue`. Normalized on
+// every save so the stored shape is always a clean, de-duped, capped
+// array (or null).
 const keywordsField: Field = {
   name: 'keywords',
   type: 'json',
@@ -651,16 +652,17 @@ export const seoSidebarFields = (args: {
       },
     },
     {
-      // Topic keywords — entity terms surfaced in JSON-LD (`keywords` +
-      // `mentions[]`) and indexed as a search facet. Sits in the
-      // "what indexes / entities" cluster next to the Schema preview.
-      name: 'seoKeywords',
+      // Unified Keywords card — primary topic (keywordTarget) + density
+      // writing-aid, plus supporting topics (seo.keywords) chips with
+      // autosuggest. Sits in the "what indexes / entities" cluster.
+      name: 'keywords',
       type: 'ui',
       admin: {
         position: 'sidebar',
         components: {
           Field: {
-            path: '@/payload/admin/components/SeoKeywordsField.tsx#SeoKeywordsField',
+            path: '@/payload/admin/components/KeywordsField.tsx#KeywordsField',
+            clientProps: { titleSource, descriptionSource },
           },
         },
       },

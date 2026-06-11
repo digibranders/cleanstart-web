@@ -16,33 +16,33 @@ interface CardDef {
 const CARDS: CardDef[] = [
   {
     icon: "/images/ciso/enterprise-icon-cloud.svg",
-    title: "Multi-Cloud Environments",
-    desc: "Support modern infrastructure deployments.",
+    title: "Exposure Visibility",
+    desc: "Continuously identify inherited software risk across dependencies, artifacts, and environments.",
     titleSize: 32,
   },
   {
     icon: "/images/ciso/enterprise-icon-devsecops.svg",
-    title: "DevSecOps Teams",
-    desc: "Reduce remediation overhead across teams.",
+    title: "Provenance Verification",
+    desc: "Validate software origin, integrity, and ownership across the delivery lifecycle.",
     titleSize: 32,
   },
   {
     icon: "/images/ciso/enterprise-icon-compliance.svg",
-    title: "Compliance Programs",
-    desc: "Support software supply chain governance.",
+    title: "Policy Governance",
+    desc: "Continuously enforce software security and compliance standards across environments.",
     titleSize: 32,
   },
   {
     icon: "/images/ciso/enterprise-icon-security-ops.svg",
-    title: "Enterprise Security Operations",
-    desc: "Improve visibility into inherited software risk.",
-    titleSize: 29,
+    title: "Verified Remediation",
+    desc: "Reduce operational exposure with verified software artifacts and remediation guidance.",
+    titleSize: 32,
   },
 ];
 
 function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactElement {
   return (
-    <div className="relative flex-shrink-0" style={{ width: "295px", height: "324px" }}>
+    <div className="relative flex-shrink-0" style={{ width: "295px", height: "372px" }}>
       {/* Outer cyan glow — creates the border halo effect. */}
       <div
         aria-hidden
@@ -172,7 +172,7 @@ export function CisoEnterprise(): React.ReactElement {
     <section
       data-section="CisoEnterprise"
       className="relative overflow-hidden bg-white"
-      style={{ paddingTop: "120px", paddingBottom: "var(--spacing-section-cta)" }}
+      style={{ paddingTop: "120px", paddingBottom: "120px" }}
     >
       {/* Corner Union — top-right. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -262,7 +262,7 @@ export function CisoEnterprise(): React.ReactElement {
               marginBottom: "74px",
             }}
           >
-            Built for Enterprise{" "}
+            Continuous Governance Across the{" "}
             <span
               style={{
                 background:
@@ -272,7 +272,7 @@ export function CisoEnterprise(): React.ReactElement {
                 backgroundClip: "text",
               }}
             >
-              Environments
+              Software Lifecycle
             </span>
           </h2>
         </Reveal>

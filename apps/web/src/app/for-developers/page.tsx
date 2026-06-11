@@ -5,8 +5,6 @@ import { FadeUp } from '@/components/ui/FadeUp';
 import { DeveloperHero } from '@/components/sections/for-developers/DeveloperHero';
 import { DeveloperWhyItMatters } from '@/components/sections/for-developers/DeveloperWhyItMatters';
 import { DeveloperSecureFoundations } from '@/components/sections/for-developers/DeveloperSecureFoundations';
-import { DeveloperWorkflows } from '@/components/sections/for-developers/DeveloperWorkflows';
-import { DeveloperEliminateRisk } from '@/components/sections/for-developers/DeveloperEliminateRisk';
 import { DeveloperCTA } from '@/components/sections/for-developers/DeveloperCTA';
 import { buildPageMetadata } from '@/lib/seo/canonical';
 import { JsonLd, breadcrumbSchema } from '@/lib/seo/jsonld';
@@ -34,12 +32,6 @@ export default function ForDevelopersPage(): React.ReactElement {
         </FadeUp>
         <FadeUp>
           <DeveloperSecureFoundations />
-        </FadeUp>
-        <FadeUp>
-          <DeveloperWorkflows />
-        </FadeUp>
-        <FadeUp>
-          <DeveloperEliminateRisk />
         </FadeUp>
       </main>
       <Footer cta={<DeveloperCTA />} />
