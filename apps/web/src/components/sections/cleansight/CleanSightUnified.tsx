@@ -28,7 +28,6 @@ export function CleanSightUnified(): React.ReactElement {
     <section
       data-section="CleanSightUnified"
       className="relative overflow-hidden bg-white"
-      style={{ minHeight: "792px" }}
     >
       {/* Decorative vector — top-left, partially off-screen. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
