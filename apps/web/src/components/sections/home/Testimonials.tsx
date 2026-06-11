@@ -95,6 +95,17 @@ export interface TestimonialsProps {
    * pages whose `<Footer>` receives a `cta` prop (e.g. /community).
    */
   reserveFooterCtaSpace?: boolean;
+  /**
+   * Section tone. "dark" (default) = the home gradient band with white header
+   * text. "light" = a soft white→lavender band with dark header text, used to
+   * break up adjacent dark sections (the self-contained card pops on both).
+   */
+  theme?: "dark" | "light";
+  /**
+   * Center the header heading instead of the default left-aligned grid. Used
+   * for single-testimonial sections that have no side description.
+   */
+  centerHeader?: boolean;
 }
 
 export function Testimonials({
@@ -103,8 +114,11 @@ export function Testimonials({
   description,
   hideHeader = false,
   reserveFooterCtaSpace = false,
+  theme = "dark",
+  centerHeader = false,
 }: TestimonialsProps = {}) {
   const TESTIMONIALS = testimonials ?? HOME_TESTIMONIALS;
+  const isLight = theme === "light";
   const [active, setActive] = useState(0);
   const [direction, setDirection] = useState<Direction>("next");
   const [paused, setPaused] = useState(false);
@@ -321,22 +335,33 @@ export function Testimonials({
 
   return (
     <section
-      className="relative w-full overflow-hidden text-white"
+      className={`relative w-full overflow-hidden ${isLight ? "text-[#111]" : "text-white"}`}
       aria-labelledby="testimonials-title"
       style={{
-        background:
-          "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)",
+        background: isLight
+          ? "linear-gradient(180deg, #ffffff 0%, #f4f1fb 100%)"
+          : "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)",
       }}
     >
       <div
         className={`relative z-[2] mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 ${reserveFooterCtaSpace ? "pt-section-sm pb-[var(--spacing-section-cta)]" : "py-section-sm"}`}
       >
         {!hideHeader && (
-        <header className="flex flex-col items-start gap-6 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
-          <Reveal header className="justify-self-start" style={{ maxWidth: "560px" }}>
+        <header
+          className={
+            centerHeader
+              ? "flex flex-col items-center text-center"
+              : "flex flex-col items-start gap-6 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12"
+          }
+        >
+          <Reveal
+            header
+            className={centerHeader ? "mx-auto" : "justify-self-start"}
+            style={{ maxWidth: "560px" }}
+          >
             <h2
               id="testimonials-title"
-              className="font-display text-white"
+              className="font-display"
               style={{
                 fontSize: "var(--fs-h2)",
                 fontWeight: 700,
@@ -372,7 +397,7 @@ export function Testimonials({
                 style={{ maxWidth: "604px" }}
               >
                 <p
-                  className="text-white md:text-right"
+                  className="md:text-right"
                   style={{
                     fontFamily: "var(--font-sans)",
                     fontSize: "var(--fs-lead)",
