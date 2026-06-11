@@ -214,8 +214,12 @@ export const Guides: CollectionConfig = {
       type: 'array',
       labels: { singular: 'Keyword', plural: 'Keywords' },
       admin: {
+        // Superseded by the shared `seo.keywords` sidebar card. Kept as a
+        // hidden data field for back-compat reads (dispatch/search merge
+        // it as a fallback) until a later migration drops the column.
+        hidden: true,
         description:
-          'Replaces Webflow Article keyword 1…10. Surfaced in JSON-LD mentions[] as Thing entities (AEO/GEO signal).',
+          'Legacy — edit topic keywords in the SEO sidebar (Topic keywords). Retained for back-compat.',
       },
       fields: [{ name: 'keyword', type: 'text', required: true }],
     },

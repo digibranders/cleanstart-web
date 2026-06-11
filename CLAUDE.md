@@ -496,6 +496,11 @@ These are one-shot operations that **must** run against the prod Postgres on the
    - From inside the `cms` container: `pnpm exec tsx --env-file=.env scripts/seed-redirects.ts --dry-run` then `… ` (no flag). Each row is `source: 'migration-seed'`. Idempotent / skip-safe (re-run skips existing `from`s; `--force` overwrites). Writes fire **no** publish/IndexNow/search hooks (the collection has none), so safe any time. Verified locally: 26 created, re-run skips all 26.
    - After the run, spot-check: `curl -I https://www.cleanstart.com/jobs` → `301`/`308` to `/careers`; the legacy URLs resolve instead of 404.
 
+15. **SEO keywords consolidation + reindex.** The new shared `seo.keywords` field (string[] json on every content collection's `seo` group) supersedes the guides-only `keywords[]`. The `20260611_061406_add_seo_keywords` migration (in `src/migrations/`) adds the column (runs via CI on deploy to `main`); run the backfill **after** it applies.
+    - **Backfill (guides only):** from inside the `cms` container, `pnpm exec tsx --env-file=.env scripts/backfill-seo-keywords-from-guides.ts --dry-run` then `pnpm exec tsx --env-file=.env scripts/backfill-seo-keywords-from-guides.ts` (no flag). Idempotent / re-runnable; copies each guide's legacy `keywords[]` into `seo.keywords`. Same afterChange caveat as tasks 1–13 (Teams/IndexNow are publish-transition-gated and won't fire on re-save of a published guide; Meilisearch re-syncs + a version row per guide). Run in a quiet window.
+    - **Reindex (settings + facet):** the `content` index gains `keywords` as a searchable + filterable attribute. After deploy, push settings + reindex with the same `scripts/reindex-search.ts` used in checklist item 12. Verify the index's `filterableAttributes` includes `keywords`.
+    - After the run, spot-check: a guide's `seo.keywords` chips (SEO sidebar → Topic keywords) match its old keyword list; a `?q=<a-keyword>` ⌘K search surfaces docs that only carry the term in keywords; a guide page's JSON-LD shows both `keywords` and `mentions[]`.
+
 (Add new one-shot production tasks under this list as they come up — Phase H imports, Meilisearch initial index, etc.)
 
 ---
