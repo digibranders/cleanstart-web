@@ -70,11 +70,18 @@ export interface SearchClient {
       limit?: number;
       filter?: string;
       sort?: readonly string[];
+      /** Request facet distribution for the given attributes. */
+      facets?: readonly string[];
       /** Restrict the fields each hit carries back — keeps the heavy
        * `body` attribute off the wire when only metadata is needed. */
       attributesToRetrieve?: readonly string[];
     },
-  ) => Promise<{ hits: unknown[]; estimatedTotalHits: number; processingTimeMs: number } | null>;
+  ) => Promise<{
+    hits: unknown[];
+    estimatedTotalHits: number;
+    processingTimeMs: number;
+    facetDistribution?: Record<string, Record<string, number>>;
+  } | null>;
 }
 
 const trimTrailingSlash = (s: string): string => (s.endsWith('/') ? s.slice(0, -1) : s);
@@ -169,6 +176,7 @@ export const createSearchClient = (config: SearchClientConfig): SearchClient => 
           limit: opts?.limit ?? 20,
           ...(opts?.filter ? { filter: opts.filter } : {}),
           ...(opts?.sort ? { sort: opts.sort } : {}),
+          ...(opts?.facets ? { facets: opts.facets } : {}),
           ...(opts?.attributesToRetrieve
             ? { attributesToRetrieve: opts.attributesToRetrieve }
             : {}),
