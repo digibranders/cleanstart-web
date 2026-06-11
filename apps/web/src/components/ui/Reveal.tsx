@@ -117,10 +117,19 @@ export function Reveal({
 }
 
 /**
- * Above-the-fold reveal — fires immediately on mount (no IntersectionObserver),
- * matching the sample's hero pattern. Use for hero titles and CTAs.
+ * Above-the-fold entrance reveal — for hero titles and CTAs.
+ *
+ * LCP-safe by design: the content renders **visible** in the server HTML and the
+ * fade-up runs via a CSS animation (`cs-hero-reveal` in globals.css) that fires
+ * at first paint. This deliberately does NOT use Framer Motion — the old
+ * implementation rendered `opacity:0` in the SSR markup and only animated after
+ * React hydrated, which stranded the LCP element behind JS hydration on every
+ * page. Pure CSS keeps the same fade-up visual without gating the paint.
+ *
+ * `prefers-reduced-motion` is honoured by the CSS rule (animation disabled).
+ * Offset/timing map to the `--cs-hr-*` CSS variables.
  */
-interface HeroRevealProps extends Omit<HTMLMotionProps<"div">, "children"> {
+interface HeroRevealProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
   children: ReactNode;
   y?: number;
   delay?: number;
@@ -132,29 +141,25 @@ export function HeroReveal({
   y = 40,
   delay = 0,
   duration = 0.9,
+  className,
+  style,
   ...rest
 }: HeroRevealProps) {
-  const reduce = useReducedMotion();
-
-  if (reduce) {
-    return (
-      <div {...(rest as unknown as React.HTMLAttributes<HTMLDivElement>)}>
-        {children}
-      </div>
-    );
-  }
-
   return (
-    <LazyMotion features={domAnimation} strict>
-      <m.div
-        initial={{ opacity: 0, y }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration, delay, ease: EASE_OUT }}
-        {...rest}
-      >
-        {children}
-      </m.div>
-    </LazyMotion>
+    <div
+      className={className ? `cs-hero-reveal ${className}` : "cs-hero-reveal"}
+      style={
+        {
+          "--cs-hr-y": `${y}px`,
+          "--cs-hr-delay": `${delay}s`,
+          "--cs-hr-duration": `${duration}s`,
+          ...style,
+        } as React.CSSProperties
+      }
+      {...rest}
+    >
+      {children}
+    </div>
   );
 }
 

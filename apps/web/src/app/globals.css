@@ -1138,6 +1138,33 @@ body {
   }
 }
 
+/* Hero entrance — LCP-safe. The hero (typically the LCP element) renders
+   VISIBLE in the SSR HTML and this CSS animation runs at first paint, instead
+   of the old Framer-Motion HeroReveal that rendered opacity:0 and only animated
+   after JS hydration (which stranded LCP behind hydration on every page). The
+   fade-up is now purely presentational; offset/timing come from CSS vars set by
+   the HeroReveal component. */
+@keyframes cs-hero-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(var(--cs-hr-y, 40px));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.cs-hero-reveal {
+  animation: cs-hero-reveal var(--cs-hr-duration, 0.9s) cubic-bezier(0.16, 1, 0.3, 1)
+    var(--cs-hr-delay, 0s) both;
+  will-change: opacity, transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-hero-reveal {
+    animation: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   [style*="cs-fade-slide-in"]   { animation: none !important; }
   [style*="cs-tab-card-in"]     { animation: none !important; }
