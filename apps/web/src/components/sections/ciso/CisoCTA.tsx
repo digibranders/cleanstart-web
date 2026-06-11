@@ -42,7 +42,7 @@ export function CisoCTA(): React.ReactElement {
             letterSpacing: "-0.04em",
           }}
         >
-          Strengthen Your Software Supply Chain Foundations
+          Reduce Software Risk With Continuous Governance
         </p>
 
         <p
@@ -60,8 +60,8 @@ export function CisoCTA(): React.ReactElement {
             opacity: 0.8,
           }}
         >
-          Reduce inherited software risk with minimal, hardened, verifiable
-          container images built for enterprise environments.
+          Strengthen software trust, accelerate compliance readiness, and reduce
+          inherited software exposure across modern delivery environments.
         </p>
 
         <div
@@ -69,7 +69,7 @@ export function CisoCTA(): React.ReactElement {
           style={{ top: "262px", left: "50%", transform: "translateX(-50%)" }}
         >
           <Link
-            href="/resource-center"
+            href="/book-a-demo"
             className="cs-btn-glass"
             style={
               {
@@ -85,7 +85,7 @@ export function CisoCTA(): React.ReactElement {
               } as React.CSSProperties
             }
           >
-            Read the Executive Brief
+            Talk to an Expert
           </Link>
         </div>
       </div>
@@ -94,7 +94,7 @@ export function CisoCTA(): React.ReactElement {
         className="hidden sm:flex absolute inset-0 flex-row items-center overflow-hidden"
         style={{
           padding: "0 clamp(32px, 6.35vw, 122px)",
-          gap: "clamp(32px, 5.99vw, 115px)",
+          gap: "clamp(24px, 2.2vw, 32px)",
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -124,15 +124,16 @@ export function CisoCTA(): React.ReactElement {
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
-            maxWidth: "min(462px, 100%)",
+            maxWidth: "min(360px, 100%)",
+            textWrap: "balance",
           }}
         >
-          Strengthen Your Software Supply Chain Foundations
+          Reduce Software Risk With Continuous Governance
         </p>
 
         <div
           className="relative flex flex-col"
-          style={{ maxWidth: "min(493px, 100%)", gap: "clamp(16px, 1.25vw, 24px)" }}
+          style={{ maxWidth: "min(540px, 100%)", gap: "clamp(16px, 1.25vw, 24px)" }}
         >
           <p
             style={{
@@ -142,14 +143,15 @@ export function CisoCTA(): React.ReactElement {
               letterSpacing: "-0.02em",
               lineHeight: 1.4,
               color: "rgba(255, 255, 255, 0.8)",
+              textWrap: "balance",
             }}
           >
-            Reduce inherited software risk with minimal, hardened, verifiable
-            container images built for enterprise environments.
+            Strengthen software trust, accelerate compliance readiness, and reduce
+            inherited software exposure across modern delivery environments.
           </p>
 
           <Link
-            href="/resource-center"
+            href="/book-a-demo"
             className="cs-btn-glass self-start"
             style={
               {
@@ -158,7 +160,7 @@ export function CisoCTA(): React.ReactElement {
               } as React.CSSProperties
             }
           >
-            <span>Read the Executive Brief</span>
+            <span>Talk to an Expert</span>
             <svg
               className="cs-cta-arrow"
               width="18"
