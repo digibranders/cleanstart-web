@@ -94,7 +94,9 @@ export function DeveloperSecureFoundations(): React.ReactElement {
           paddingLeft: 'clamp(16px, 4vw, 48px)',
           paddingRight: 'clamp(16px, 4vw, 48px)',
           paddingTop: 'clamp(48px, 4.17vw, 80px)',
-          paddingBottom: 'clamp(60px, 5.2vw, 100px)',
+          /* Now the last section before <Footer cta>; reserve the card-overlap
+             space per the Footer layout contract. */
+          paddingBottom: 'var(--spacing-section-cta)',
         }}
       >
         <div
