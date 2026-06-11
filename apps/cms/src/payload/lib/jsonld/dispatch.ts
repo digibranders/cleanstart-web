@@ -13,6 +13,7 @@ import {
 } from './job-posting';
 import { buildOrganizationBlob } from './organization';
 import { buildPersonBlob, type AuthorSource } from './person';
+import { mergeKeywordSources } from '../seo/keywords';
 import { onlyResolved, pickResolved, type ResolvedMedia } from './shared';
 import type { JsonLdBlob } from './types';
 import { docCanonicalUrl } from './url';
@@ -136,12 +137,18 @@ const readFaqs = (doc: AnyDoc) =>
   ((doc as { faqs?: { question?: string | null; answer?: string | null }[] | null }).faqs ?? null);
 
 const readKeywords = (doc: AnyDoc): string[] | null => {
-  const list = (doc as { keywords?: { keyword?: string | null }[] | null }).keywords;
-  if (!list) return null;
-  const out = list
-    .map((k) => k.keyword ?? '')
-    .filter((s): s is string => s.length > 0);
-  return out.length > 0 ? out : null;
+  // Canonical source is `seo.keywords` (string[] json). Legacy guides
+  // carry a top-level `keywords[]` array of `{ keyword }` until the
+  // backfill consolidates them — read both, prefer seo.keywords.
+  const seoKeywords = (doc as { seo?: { keywords?: unknown } }).seo?.keywords;
+  const legacyRaw = (doc as { keywords?: { keyword?: string | null }[] | null }).keywords;
+  const legacy = Array.isArray(legacyRaw)
+    ? legacyRaw
+        .map((k) => k?.keyword ?? '')
+        .filter((s): s is string => s.length > 0)
+    : [];
+  const merged = mergeKeywordSources(seoKeywords, legacy);
+  return merged.length > 0 ? merged : null;
 };
 
 interface CitationRow {
@@ -259,7 +266,7 @@ const dispatchArticleLike = (
     dateReviewed: readDateReviewed(doc),
     about,
     wordCount: readWordCount(doc),
-    keywords: collection === 'guides' ? readKeywords(doc) : null,
+    keywords: readKeywords(doc),
     citations: collection === 'guides' ? readCitations(doc) : null,
     speakablePath: seo.speakablePath ?? null,
     seoTitle: seo.title ?? null,
