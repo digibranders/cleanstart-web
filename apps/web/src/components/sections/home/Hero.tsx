@@ -107,8 +107,8 @@ export function Hero() {
                 className="pointer-events-none absolute select-none"
                 style={{
                   width: "40%",
-                  left: "88%",
-                  top: "9%",
+                  left: "98%",
+                  top: "4%",
                   transform: "translate(-50%, -50%)",
                   mixBlendMode: "lighten",
                 }}
@@ -123,8 +123,8 @@ export function Hero() {
                 className="pointer-events-none absolute select-none"
                 style={{
                   width: "40%",
-                  left: "6%",
-                  top: "86%",
+                  left: "2%",
+                  top: "93%",
                   transform: "translate(-50%, -50%)",
                   mixBlendMode: "lighten",
                 }}
