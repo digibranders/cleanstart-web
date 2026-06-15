@@ -167,7 +167,7 @@ export function Testimonials({
     if (reduced) return;
     const id = window.setInterval(goNext, AUTO_ADVANCE_MS);
     return () => window.clearInterval(id);
-  }, [paused, goNext]);
+  }, [paused, total, goNext]);
 
   useEffect(() => {
     const handler = () => setPaused(document.hidden);

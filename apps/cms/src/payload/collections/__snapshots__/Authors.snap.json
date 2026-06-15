@@ -192,6 +192,10 @@
     },
     {
       "type": "ui",
+      "name": "keywords"
+    },
+    {
+      "type": "ui",
       "name": "canonicalUrl"
     },
     {
@@ -355,6 +359,10 @@
         {
           "type": "text",
           "name": "keywordTarget"
+        },
+        {
+          "type": "json",
+          "name": "keywords"
         },
         {
           "type": "array",
