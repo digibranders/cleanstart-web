@@ -393,7 +393,14 @@ function Connectors(): React.ReactElement {
       <rect width={VB.w} height={VB.h} fill="url(#cisoGrid)" />
 
       {/* Orbital nucleus: a glowing core with three tilted orbit rings (atom
-          motif) framing the cluster. */}
+          motif) that slowly rotate. Radius is capped so the vertical sweep
+          stays below the eyebrow; no glow so the rings can't bleed into the
+          top edge. Spin honours prefers-reduced-motion. */}
+      <style>{
+        "@keyframes cisoOrbitSpin{to{transform:rotate(360deg)}}" +
+        ".ciso-orbit{animation:cisoOrbitSpin 100s linear infinite;transform-box:fill-box;transform-origin:center}" +
+        "@media (prefers-reduced-motion:reduce){.ciso-orbit{animation:none}}"
+      }</style>
       <ellipse
         cx={MESH.cx}
         cy={MESH.cy}
@@ -403,16 +410,16 @@ function Connectors(): React.ReactElement {
         className="cs-flow-pulse"
         style={{ transformOrigin: `${MESH.cx}px ${MESH.cy}px` }}
       />
-      <g fill="none" stroke="url(#meshGrad)" filter="url(#cisoGlow)">
+      <g className="ciso-orbit" fill="none" stroke="url(#meshGrad)">
         {[0, 60, 120].map((a) => (
           <ellipse
             key={a}
             cx={MESH.cx}
             cy={MESH.cy}
-            rx={224}
-            ry={92}
-            strokeWidth={1.3}
-            opacity={0.28}
+            rx={206}
+            ry={90}
+            strokeWidth={1.4}
+            opacity={0.3}
             transform={`rotate(${a} ${MESH.cx} ${MESH.cy})`}
           />
         ))}
