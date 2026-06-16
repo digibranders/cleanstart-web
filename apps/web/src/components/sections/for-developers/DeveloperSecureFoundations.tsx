@@ -4,24 +4,16 @@ import { Reveal } from '@/components/ui/Reveal';
 interface PillarDef {
   title: string;
   desc: string;
-  /**
-   * Optional title max-width (in `ch`) to force a deliberate two-line wrap on the
-   * desktop grid, keeping every card's description baseline aligned. Scales with
-   * the font, so the break holds across the fluid `--fs-h3` range.
-   */
-  titleMaxCh?: number;
 }
 
 const PILLARS: PillarDef[] = [
   {
     title: 'Drop-In Compatible',
     desc: 'Integrate with existing developer workflows and CI/CD pipelines.',
-    titleMaxCh: 12,
   },
   {
     title: 'Minimal Artifacts',
     desc: 'Reduce unnecessary dependencies and runtime complexity.',
-    titleMaxCh: 9,
   },
   {
     title: 'Continuously Rebuilt',
@@ -213,13 +205,12 @@ export function DeveloperSecureFoundations(): React.ReactElement {
                   <p
                     style={{
                       fontFamily: 'var(--font-display)',
-                      fontSize: 'var(--fs-h3)',
+                      fontSize: 'var(--fs-h4)',
                       fontWeight: 600,
                       letterSpacing: '-0.04em',
                       lineHeight: 1.1,
                       color: '#ffffff',
                       marginBottom: '12px',
-                      maxWidth: pillar.titleMaxCh ? `${pillar.titleMaxCh}ch` : undefined,
                     }}
                   >
                     {pillar.title}

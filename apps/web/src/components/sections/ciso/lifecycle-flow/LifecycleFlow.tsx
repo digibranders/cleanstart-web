@@ -8,16 +8,16 @@ import {
   RING_LINKS,
   MESH,
   MESH_BBOX,
-  MESH_DATA,
+  HEX_POINTS,
   LEFT_ICON,
   LEFT_ITEMS,
   LEFT_FANS,
   LEFT_SOURCE_DOTS,
-  LEFT_PORTS,
+  LEFT_MERGE,
   RIGHT_ITEMS,
   RIGHT_FANS,
   RIGHT_TARGET_DOTS,
-  RIGHT_PORTS,
+  RIGHT_BRANCH,
   CARD,
   GOV_PANEL,
   GOV_ITEMS,
@@ -342,11 +342,17 @@ function Connectors(): React.ReactElement {
           <stop offset="1" stopColor="#2CC1EB" />
         </linearGradient>
 
-        <radialGradient id="meshGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0" stopColor="rgba(124,108,255,0.30)" />
-          <stop offset="55%" stopColor="rgba(96,84,210,0.10)" />
-          <stop offset="100%" stopColor="rgba(96,84,210,0)" />
+        {/* Glass body for the system sphere — lit from the upper-left, dimmest
+            mid-body, then a slight fresnel lift at the rim for 3D volume. */}
+        <radialGradient id="orbBody" cx="46%" cy="32%" r="72%">
+          <stop offset="0%" stopColor="rgba(150,134,255,0.26)" />
+          <stop offset="44%" stopColor="rgba(74,64,150,0.13)" />
+          <stop offset="80%" stopColor="rgba(20,22,60,0.07)" />
+          <stop offset="100%" stopColor="rgba(104,86,210,0.17)" />
         </radialGradient>
+        <filter id="orbSoft" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="7" />
+        </filter>
 
         {SPOKES.map((s, i) => (
           <linearGradient
@@ -374,32 +380,31 @@ function Connectors(): React.ReactElement {
 
       <rect width={VB.w} height={VB.h} fill="url(#cisoGrid)" />
 
-      {/* Central energy glow behind the ecosystem. */}
-      <ellipse
-        cx={MESH.cx}
-        cy={MESH.cy}
-        rx={MESH.rx * 1.16}
-        ry={MESH.ry * 1.2}
-        fill="url(#meshGlow)"
-      />
-
-      {/* Orbit rings around the registry. */}
-      <g fill="none" stroke="url(#meshGrad)">
-        <ellipse cx={MESH.cx} cy={MESH.cy} rx={MESH.rx * 0.52} ry={MESH.ry * 0.52} opacity={0.16} />
-        <ellipse cx={MESH.cx} cy={MESH.cy} rx={MESH.rx * 0.82} ry={MESH.ry * 0.84} opacity={0.1} />
-      </g>
-
-      {/* Mesh web. */}
-      <g stroke="url(#meshGrad)" strokeWidth={1}>
-        {MESH_DATA.edges.map((e, i) => (
-          <line key={`me${i}`} x1={e.x1} y1={e.y1} x2={e.x2} y2={e.y2} opacity={e.o} />
-        ))}
-      </g>
-      <g fill="url(#meshGrad)">
-        {MESH_DATA.dots.map((d, i) => (
-          <circle key={`md${i}`} cx={d.x} cy={d.y} r={d.r} opacity={d.o} />
-        ))}
-      </g>
+      {(() => {
+        const hex = HEX_POINTS.map((p) => p.join(",")).join(" ");
+        const inner = HEX_POINTS.map(
+          ([x, y]) =>
+            `${(MESH.cx + (x - MESH.cx) * 0.95).toFixed(1)},${(MESH.cy + (y - MESH.cy) * 0.95).toFixed(1)}`,
+        ).join(" ");
+        // Top-left lit edges: left point → top-left → top-right.
+        const rimLight = [HEX_POINTS[5], HEX_POINTS[0], HEX_POINTS[1]]
+          .map((p) => (p ? p.join(",") : ""))
+          .join(" ");
+        return (
+          <>
+            {/* Secure enclave: soft bloom, glass fill, glowing rim, inner
+                frame, top-left rim light, and corner accent nodes. */}
+            <polygon points={hex} fill="none" stroke="url(#meshGrad)" strokeWidth={6} strokeLinejoin="round" opacity={0.32} filter="url(#orbSoft)" />
+            <polygon points={hex} fill="url(#orbBody)" strokeLinejoin="round" />
+            <polygon points={hex} fill="none" stroke="url(#meshGrad)" strokeWidth={2.2} strokeLinejoin="round" opacity={0.95} filter="url(#cisoGlow)" />
+            <polygon points={inner} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={1} strokeLinejoin="round" />
+            <polyline points={rimLight} fill="none" stroke="rgba(214,224,255,0.5)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" opacity={0.5} filter="url(#orbSoft)" />
+            {[HEX_POINTS[0], HEX_POINTS[1], HEX_POINTS[3], HEX_POINTS[4]].map((p, i) =>
+              p ? <circle key={`hc${i}`} cx={p[0]} cy={p[1]} r={2.8} fill="#cbb6ff" filter="url(#cisoGlow)" /> : null,
+            )}
+          </>
+        );
+      })()}
 
       {/* Labeled-node ring (interconnection). */}
       <g fill="none" stroke="url(#meshGrad)" strokeWidth={1.4} strokeLinecap="round" opacity={0.55}>
@@ -438,8 +443,8 @@ function Connectors(): React.ReactElement {
         ))}
       </g>
 
-      {/* Rail dots: source/target ends + the ports where each rail plugs into
-          the constellation. */}
+      {/* Rail source/target dots + the I/O ports where the rails meet the
+          system sphere's rim. */}
       <g stroke="none">
         {LEFT_SOURCE_DOTS.map((d, i) => (
           <circle key={`ls${i}`} cx={d.x} cy={d.y} r={3.4} fill={LEFT_DASH_COLOR} />
@@ -447,12 +452,8 @@ function Connectors(): React.ReactElement {
         {RIGHT_TARGET_DOTS.map((d, i) => (
           <circle key={`rt${i}`} cx={d.x} cy={d.y} r={3.4} fill={RIGHT_DASH_COLOR} />
         ))}
-        {LEFT_PORTS.map((d, i) => (
-          <circle key={`lp${i}`} cx={d.x} cy={d.y} r={3.8} fill={LEFT_DASH_COLOR} />
-        ))}
-        {RIGHT_PORTS.map((d, i) => (
-          <circle key={`rp${i}`} cx={d.x} cy={d.y} r={3.8} fill={RIGHT_DASH_COLOR} />
-        ))}
+        <circle cx={LEFT_MERGE.x} cy={LEFT_MERGE.y} r={4.6} fill={LEFT_DASH_COLOR} filter="url(#cisoGlow)" />
+        <circle cx={RIGHT_BRANCH.x} cy={RIGHT_BRANCH.y} r={4.6} fill={RIGHT_DASH_COLOR} filter="url(#cisoGlow)" />
       </g>
     </svg>
   );
