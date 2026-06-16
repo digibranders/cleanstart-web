@@ -112,10 +112,7 @@ function TestimonialCard({
   active: number;
 }) {
   return (
-    <div
-      className="relative w-full max-w-[904px] overflow-hidden rounded-[32px] border-[1.5px] border-[#da89ef] bg-[#fefeff] px-6 py-8 sm:px-12"
-      style={{ minHeight: 312 }}
-    >
+    <div className="relative w-full max-w-[904px] overflow-hidden rounded-[32px] border-[1.5px] border-[#da89ef] bg-[#fefeff] px-6 py-8 sm:px-12">
       {/* Decorative closing quote mark, top-right. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
@@ -127,19 +124,19 @@ function TestimonialCard({
         className="pointer-events-none absolute right-6 top-6 size-[42px] rotate-180 select-none"
       />
 
-      {/* Crossfade stack — every testimonial is mounted; only the active one is
-          visible, so the card height is stable across slides. */}
-      {items.map((t, i) => (
-        <div
-          key={t.name}
-          aria-hidden={i !== active}
-          className={`flex flex-col items-center gap-6 text-center transition-opacity duration-500 ${
-            i === active
-              ? "relative opacity-100"
-              : "pointer-events-none absolute inset-0 px-6 py-8 opacity-0 sm:px-12"
-          }`}
-        >
-          <CompanyMark t={t} />
+      {/* Stacking grid — every slide shares one grid cell, so the card always
+          sizes to the TALLEST testimonial (IIFL) and its height never shifts
+          when the active slide changes. */}
+      <div className="grid">
+        {items.map((t, i) => (
+          <div
+            key={t.name}
+            aria-hidden={i !== active}
+            className={`col-start-1 row-start-1 flex flex-col items-center gap-6 text-center transition-opacity duration-500 ${
+              i === active ? "opacity-100" : "pointer-events-none opacity-0"
+            }`}
+          >
+            <CompanyMark t={t} />
           <p
             className="max-w-[668px] font-display font-medium text-[#111]"
             style={{
@@ -160,8 +157,9 @@ function TestimonialCard({
           >
             {t.role}
           </p>
-        </div>
-      ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

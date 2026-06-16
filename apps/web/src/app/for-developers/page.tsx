@@ -4,6 +4,7 @@ import { Footer } from '@/components/sections/Footer';
 import { FadeUp } from '@/components/ui/FadeUp';
 import { DeveloperHero } from '@/components/sections/for-developers/DeveloperHero';
 import { DeveloperWhyItMatters } from '@/components/sections/for-developers/DeveloperWhyItMatters';
+import { DeveloperTrustedArtifacts } from '@/components/sections/for-developers/DeveloperTrustedArtifacts';
 import { DeveloperSecureFoundations } from '@/components/sections/for-developers/DeveloperSecureFoundations';
 import { DeveloperCTA } from '@/components/sections/for-developers/DeveloperCTA';
 import { buildPageMetadata } from '@/lib/seo/canonical';
@@ -30,6 +31,7 @@ export default function ForDevelopersPage(): React.ReactElement {
         <FadeUp>
           <DeveloperWhyItMatters />
         </FadeUp>
+        <DeveloperTrustedArtifacts />
         <FadeUp>
           <DeveloperSecureFoundations />
         </FadeUp>

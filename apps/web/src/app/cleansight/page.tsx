@@ -3,7 +3,7 @@ import { Footer } from "@/components/sections/Footer";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { CleanSightHero } from "@/components/sections/cleansight/CleanSightHero";
 import { CleanSightProblems } from "@/components/sections/cleansight/CleanSightProblems";
-import { CleanSightBlindSpots } from "@/components/sections/cleansight/CleanSightBlindSpots";
+import { CleanSightRemediation } from "@/components/sections/cleansight/CleanSightRemediation";
 import { CleanSightUnified } from "@/components/sections/cleansight/CleanSightUnified";
 import { CleanSightStats } from "@/components/sections/cleansight/CleanSightStats";
 import { CleanSightCTA } from "@/components/sections/cleansight/CleanSightCTA";
@@ -48,7 +48,7 @@ export default function CleanSightPage(): React.ReactElement {
           <CleanSightProblems />
         </FadeUp>
         <FadeUp>
-          <CleanSightBlindSpots />
+          <CleanSightRemediation />
         </FadeUp>
         <FadeUp>
           <CleanSightUnified />

@@ -14,7 +14,7 @@ interface Tier {
 
 const TOP_TIERS: Tier[] = [
   {
-    orb: "/images/pricing/orb-rings.png",
+    orb: "/images/pricing/orb-community.png",
     title: "Community Images",
     body: "Free, verified base images curated by CleanStart for developers and open-source users.",
     ctaLabel: "View Images",
@@ -22,14 +22,14 @@ const TOP_TIERS: Tier[] = [
     ctaExternal: true,
   },
   {
-    orb: "/images/pricing/orb-gear.png",
+    orb: "/images/pricing/orb-custom.png",
     title: "Custom Images",
     body: "Pre-built, optimized base images with near-zero CVEs and automatic versioned updates.",
     ctaLabel: "Contact Sales",
     ctaHref: "/contact-us",
   },
   {
-    orb: "/images/pricing/orb-gear.png",
+    orb: "/images/pricing/orb-libraries.png",
     title: "Clean Libraries",
     body: "Pre-built, optimized base images with near-zero CVEs and automatic versioned updates.",
     ctaLabel: "Contact Sales",
@@ -38,8 +38,8 @@ const TOP_TIERS: Tier[] = [
 ];
 
 const BOTTOM_TIER: Tier = {
-  orb: "/images/pricing/orb-window.png",
-  title: "Custom Images",
+  orb: "/images/pricing/orb-cleansight.png",
+  title: "Clean Sight",
   body: "Pre-built, optimized base images with near-zero CVEs and automatic versioned updates.",
   ctaLabel: "Contact Sales",
   ctaHref: "/contact-us",
@@ -207,6 +207,7 @@ function TierCard({ tier }: { tier: Tier }): React.ReactElement {
           src={tier.orb}
           alt=""
           fill
+          unoptimized
           sizes="150px"
           className="object-contain object-left select-none pointer-events-none"
         />
@@ -240,7 +241,8 @@ function TierCard({ tier }: { tier: Tier }): React.ReactElement {
             "--cs-btn-fs": "var(--fs-button)",
             "--cs-btn-px": "20px",
             gap: "8px",
-            marginTop: "auto",
+            // Consistent breathing room above the CTA across all offering cards.
+            marginTop: "clamp(20px, 2.6vw, 30px)",
           } as React.CSSProperties
         }
       >
@@ -255,7 +257,8 @@ function BottomCustomCard({ tier }: { tier: Tier }): React.ReactElement {
   return (
     <div className={`${CARD_FRAME} p-6 sm:p-8`}>
       <CardDecor />
-      {/* Orb floats top-right; content anchors to the bottom-left. */}
+      {/* Orb floats top-right; title + text sit at the top (matches the
+          Additional Services card), with the CTA pinned to the bottom. */}
       <div
         aria-hidden
         className="absolute right-5 top-5 h-[140px] w-[140px] sm:right-7"
@@ -264,46 +267,46 @@ function BottomCustomCard({ tier }: { tier: Tier }): React.ReactElement {
           src={tier.orb}
           alt=""
           fill
+          unoptimized
           sizes="140px"
           className="object-contain select-none pointer-events-none"
         />
       </div>
 
-      <div className="relative mt-auto">
-        <h3
-          className="font-display"
-          style={{
-            fontSize: "var(--fs-h3)",
-            fontWeight: 700,
-            letterSpacing: "-0.03em",
-            lineHeight: 1.15,
-            color: "#111",
-          }}
-        >
-          {tier.title}
-        </h3>
-        <p
-          className="mt-3 text-[#555]"
-          style={{ fontSize: "var(--fs-body)", lineHeight: 1.5 }}
-        >
-          {tier.body}
-        </p>
-        <Link
-          href={tier.ctaHref}
-          className="cs-btn-blue mt-6"
-          style={
-            {
-              "--cs-btn-fs": "var(--fs-button)",
-              "--cs-btn-px": "20px",
-              gap: "8px",
-              width: "min(100%, 300px)",
-            } as React.CSSProperties
-          }
-        >
-          <span>{tier.ctaLabel}</span>
-          <Arrow />
-        </Link>
-      </div>
+      <h3
+        className="relative font-display pr-[120px] sm:pr-[150px]"
+        style={{
+          fontSize: "var(--fs-h3)",
+          fontWeight: 700,
+          letterSpacing: "-0.03em",
+          lineHeight: 1.15,
+          color: "#111",
+        }}
+      >
+        {tier.title}
+      </h3>
+      <p
+        className="relative mt-3 text-[#555] pr-[120px] sm:pr-[150px]"
+        style={{ fontSize: "var(--fs-body)", lineHeight: 1.5 }}
+      >
+        {tier.body}
+      </p>
+      <Link
+        href={tier.ctaHref}
+        className="cs-btn-blue relative"
+        style={
+          {
+            "--cs-btn-fs": "var(--fs-button)",
+            "--cs-btn-px": "20px",
+            gap: "8px",
+            width: "min(100%, 300px)",
+            marginTop: "auto",
+          } as React.CSSProperties
+        }
+      >
+        <span>{tier.ctaLabel}</span>
+        <Arrow />
+      </Link>
     </div>
   );
 }
@@ -317,9 +320,10 @@ function AdditionalServicesCard(): React.ReactElement {
         className="absolute right-5 top-5 h-[130px] w-[130px]"
       >
         <Image
-          src="/images/pricing/orb-rings.png"
+          src="/images/pricing/orb-services.png"
           alt=""
           fill
+          unoptimized
           sizes="130px"
           className="object-contain select-none pointer-events-none"
         />

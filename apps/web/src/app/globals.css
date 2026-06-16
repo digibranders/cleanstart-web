@@ -964,18 +964,39 @@ body {
    HeaderScrollShell). */
 .cs-nav-surface {
   border-bottom: 1px solid transparent;
-  -webkit-backdrop-filter: blur(8px) saturate(140%);
-  backdrop-filter: blur(8px) saturate(140%);
 }
 
-/* Top-of-page state — lighter translucent band, divider hidden. */
-.cs-nav-surface-top {
+/* Frosted backdrop lives on an absolutely-positioned pseudo-element, NOT on the
+   fixed <header> itself. Chrome has a long-standing bug where `backdrop-filter`
+   on a `position: fixed` element renders a black rectangle over part of the
+   element — the dark band that used to appear on the left of the nav. Moving the
+   filter onto a non-fixed child sidesteps that code path entirely; the blur
+   still samples the page content behind the header. The tint colour lives here
+   too (so it composites over the blur in the right order) and transitions
+   between the top and scrolled states. */
+.cs-nav-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: rgba(11, 8, 22, 0.35);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  backdrop-filter: blur(8px) saturate(140%);
+  transition: background-color 200ms ease-out;
+}
+
+/* Top-of-page state — lighter translucent band, divider hidden. The
+   compound `.cs-nav-surface.cs-nav-*` selector outranks the base
+   `.cs-nav-surface::before` so the state tint deterministically wins. */
+.cs-nav-surface.cs-nav-surface-top::before {
   background-color: rgba(11, 8, 22, 0.35);
 }
 
 /* Scrolled state — darker glass band with a hairline bottom divider. */
-.cs-nav-shadow {
+.cs-nav-surface.cs-nav-shadow::before {
   background-color: rgba(21, 16, 33, 0.78);
+}
+.cs-nav-shadow {
   border-bottom-color: rgba(255, 255, 255, 0.04);
 }
 
@@ -1046,6 +1067,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .cs-nav-surface,
+  .cs-nav-surface::before,
   .cs-mega-item,
   .cs-mega-item::before,
   .cs-nav-link::after {
@@ -1194,6 +1216,116 @@ body {
   50% {
     opacity: 1;
   }
+}
+
+/* Remediation-flow diagram (CleanSight). Dashed connectors flow toward the
+   card; node halos breathe. Both disabled under reduced-motion. */
+@keyframes cs-flow-dash {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -32; }
+}
+@keyframes cs-flow-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.96); }
+  50% { opacity: 0.9; transform: scale(1.04); }
+}
+.cs-flow-dash {
+  animation: cs-flow-dash 0.9s linear infinite;
+}
+.cs-flow-pulse {
+  animation: cs-flow-pulse 3.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-flow-dash,
+  .cs-flow-pulse {
+    animation: none !important;
+  }
+}
+
+/* "Security Isn't Just Patching" — Verification Current.
+   Build-in one-shots fire when the section gains `.cs-sec-on`; ambient loops
+   (beam packets, shield halos, light streak) run only while `.cs-sec-anim` is
+   present (on-screen). All disabled under reduced-motion. */
+@keyframes cs-sec-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes cs-sec-pop {
+  0% { opacity: 0; transform: scale(0.5); }
+  60% { opacity: 1; transform: scale(1.12); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes cs-sec-draw {
+  from { stroke-dashoffset: 30; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes cs-sec-beam-flow {
+  to { background-position: 0 var(--cs-beam-period, 18px); }
+}
+@keyframes cs-sec-breathe {
+  0%, 100% { opacity: 0.3; transform: scale(0.9); }
+  50% { opacity: 0.62; transform: scale(1.08); }
+}
+@keyframes cs-sec-sheen {
+  0% { transform: translateX(0) rotate(9deg); }
+  100% { transform: translateX(340%) rotate(9deg); }
+}
+@keyframes cs-sec-arrow-flow {
+  0%, 100% { opacity: 0.4; transform: translateX(-2px); }
+  50% { opacity: 0.95; transform: translateX(2px); }
+}
+
+/* Pre-trigger hidden states (motion allowed). */
+.cs-sec-rise { opacity: 0; }
+.cs-sec-shield { opacity: 0; }
+.cs-sec-check { stroke-dasharray: 30; stroke-dashoffset: 30; }
+.cs-sec-shield-halo {
+  opacity: 0;
+  background: radial-gradient(circle, rgba(45,224,166,0.55) 0%, rgba(45,224,166,0) 68%);
+}
+
+/* Build-in one-shots. */
+.cs-sec-on .cs-sec-rise {
+  animation: cs-sec-rise 0.6s ease-out both;
+  animation-delay: var(--d, 0s);
+}
+.cs-sec-on .cs-sec-shield {
+  animation: cs-sec-pop 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: var(--d, 0s);
+}
+.cs-sec-on .cs-sec-check {
+  animation: cs-sec-draw 0.5s ease-out both;
+  animation-delay: calc(var(--d, 0s) + 0.25s);
+}
+
+/* Ambient loops (on-screen only). */
+.cs-sec-anim .cs-sec-beam {
+  animation: cs-sec-beam-flow 0.8s linear infinite;
+  animation-delay: var(--ld, 0s);
+}
+.cs-sec-anim .cs-sec-shield-halo {
+  animation: cs-sec-breathe 3.4s ease-in-out infinite;
+  animation-delay: var(--ld, 0s);
+}
+.cs-sec-anim .cs-sec-sheen {
+  animation: cs-sec-sheen 7.5s linear infinite;
+}
+.cs-sec-anim .cs-sec-arrow {
+  animation: cs-sec-arrow-flow 2.2s ease-in-out infinite;
+  animation-delay: var(--af, 0s);
+}
+
+/* Hover lane-linking. */
+.cs-sec-dim { opacity: 0.4; filter: saturate(0.7); transition: opacity 0.25s, filter 0.25s; }
+.cs-sec-lit { transition: opacity 0.25s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-sec-rise,
+  .cs-sec-shield { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .cs-sec-check { animation: none !important; stroke-dashoffset: 0 !important; }
+  .cs-sec-shield-halo { animation: none !important; opacity: 0.4 !important; }
+  .cs-sec-beam { animation: none !important; }
+  .cs-sec-sheen { display: none !important; }
+  .cs-sec-arrow { animation: none !important; }
 }
 
 /* FAQ answer drawer — kept minimal; height + opacity are driven by inline

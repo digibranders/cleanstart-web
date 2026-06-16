@@ -100,11 +100,7 @@ export function ProblemsToday() {
               <div className="relative z-10 p-7 sm:p-8">
                 <h3
                   className="font-display font-bold text-[#111]"
-                  style={{
-                    fontSize: "var(--fs-h2)",
-                    lineHeight: 1.1,
-                    letterSpacing: "-0.03em",
-                  }}
+                  style={cardTitleStyle}
                 >
                   AI-Generated Software Risk
                 </h3>
