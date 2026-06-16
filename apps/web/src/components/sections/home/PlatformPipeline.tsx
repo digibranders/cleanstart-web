@@ -245,7 +245,9 @@ function FactoryEnclosure() {
           {/* Connector beams — flush band between the cards and the bar, one
               per card (25/50/75%), each a flowing dashed "current" tucked behind
               the cards (above) and the bar (below). Phase-offset per lane for
-              life. Always shown: the layout never collapses to a single column. */}
+              life. `reverse` makes the current flow bottom-up (Intelligence
+              Centre → cards). Always shown: the layout never collapses to a
+              single column. */}
           <div
             aria-hidden
             className="relative h-[38px] overflow-hidden"
@@ -253,6 +255,7 @@ function FactoryEnclosure() {
             {["25%", "50%", "75%"].map((x, i) => (
               <FlowBeam
                 key={x}
+                reverse
                 className="absolute inset-y-0 -translate-x-1/2"
                 style={{ left: x, ["--beam-delay" as string]: `${i * 0.12}s` }}
               />

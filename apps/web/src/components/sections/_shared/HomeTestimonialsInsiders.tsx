@@ -178,7 +178,7 @@ export function HomeTestimonialsInsiders({
             className="mb-2 lg:mb-[80px] text-center font-display text-[#111]"
             style={{
               fontSize: "var(--fs-h2)",
-              fontWeight: 700,
+              fontWeight: 600,
               lineHeight: 1.1,
               letterSpacing: "-0.04em",
             }}

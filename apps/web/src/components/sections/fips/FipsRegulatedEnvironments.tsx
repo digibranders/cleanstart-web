@@ -69,7 +69,7 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
               className="font-display text-white"
               style={{
                 fontSize: "var(--fs-h2)",
-                fontWeight: 700,
+                fontWeight: 600,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.1,
               }}

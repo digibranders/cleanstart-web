@@ -8,19 +8,19 @@ const STEPS: Step[] = [
   {
     icon: "icon-discover.svg",
     title: "Discover",
-    tagline: "with CleanSight™",
+    tagline: "with CleanSight",
     desc: "Continuously identify inherited software risk across your environments.",
   },
   {
     icon: "icon-eliminate.svg",
     title: "Eliminate",
-    tagline: "with CleanStart Image™",
+    tagline: "with CleanStart Image",
     desc: "Replace vulnerable software with verified, zero-CVE alternatives.",
   },
   {
     icon: "icon-prove.svg",
     title: "Prove",
-    tagline: "with CleanSight™",
+    tagline: "with CleanSight",
     desc: "Continuously validate software integrity and compliance readiness.",
   },
 ];
@@ -39,7 +39,7 @@ function StepItem({ step }: { step: Step }) {
       />
       <div className="flex flex-col gap-2.5">
         <h3
-          className="font-display font-bold text-white"
+          className="font-display font-semibold text-white"
           style={{ fontSize: "var(--fs-h3)", lineHeight: 1, letterSpacing: "-0.03em" }}
         >
           {step.title}

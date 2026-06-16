@@ -121,7 +121,7 @@ export function LatestBlogs({
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <Reveal header>
           <h2
-            className="font-display font-bold"
+            className="font-display font-semibold"
             style={{
               fontSize: "var(--fs-h2)",
               letterSpacing: "-0.04em",

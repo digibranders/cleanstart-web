@@ -255,7 +255,7 @@ export function AboutOurVision() {
                   className="font-display"
                   style={{
                     fontSize: "var(--fs-h2)",
-                    fontWeight: 700,
+                    fontWeight: 600,
                     lineHeight: 1.1,
                     letterSpacing: "-0.04em",
                     color: "#111",

@@ -108,7 +108,7 @@ export function AboutPowering() {
               className="font-display"
               style={{
                 fontSize: "var(--fs-h2)",
-                fontWeight: 700,
+                fontWeight: 600,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.1,
               }}

@@ -21,7 +21,7 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
     >
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <Reveal header className="flex items-center justify-between pt-[60px]">
-          <h2 className="font-display text-display-md font-bold leading-[1.05] tracking-[-0.05em]">
+          <h2 className="font-display text-display-md font-semibold leading-[1.05] tracking-[-0.05em]">
             <span className="text-white">Related </span>
             <span
               style={{

@@ -30,7 +30,7 @@ export function WhatsSetsUsApart(): React.ReactElement {
           <h2
             style={{
               fontFamily: "var(--font-display), 'Manrope', sans-serif",
-              fontWeight: 700,
+              fontWeight: 600,
               fontSize: "var(--fs-h2)",
               lineHeight: 1,
               letterSpacing: "-0.05em",

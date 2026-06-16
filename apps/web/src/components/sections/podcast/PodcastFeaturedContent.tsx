@@ -75,7 +75,7 @@ export function PodcastFeaturedContent({
         <Reveal header>
           <h2
             id="podcast-featured-title"
-            className="text-center text-white font-bold"
+            className="text-center text-white font-semibold"
             style={{
               fontSize: "var(--fs-h2)",
               lineHeight: 1,

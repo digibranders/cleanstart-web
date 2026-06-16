@@ -252,7 +252,7 @@ function CardHeader({ title, icon }: { title: string; icon: LucideIcon }): React
     <div className="flex items-center gap-3">
       <BlueBall icon={icon} />
       <h3
-        className="font-display font-bold text-[#111]"
+        className="font-display font-semibold text-[#111]"
         style={{ fontSize: "var(--fs-h4)", lineHeight: "32px" }}
       >
         {title}

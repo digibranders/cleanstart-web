@@ -42,7 +42,7 @@ export function CommunityTrustedBy() {
       <div className="relative py-[clamp(48px,7vw,100px)]">
         <Reveal header>
           <h2
-            className="font-display font-bold text-center mb-[clamp(32px,4vw,56px)]"
+            className="font-display font-semibold text-center mb-[clamp(32px,4vw,56px)]"
             style={{
               fontSize: 'var(--fs-h2)',
               lineHeight: '1.05',

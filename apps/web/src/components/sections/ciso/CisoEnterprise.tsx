@@ -255,7 +255,7 @@ export function CisoEnterprise(): React.ReactElement {
               maxWidth: "654px",
               fontFamily: "var(--font-display)",
               fontSize: "var(--fs-h2)",
-              fontWeight: 700,
+              fontWeight: 600,
               letterSpacing: "-0.05em",
               lineHeight: 1,
               color: "#111",

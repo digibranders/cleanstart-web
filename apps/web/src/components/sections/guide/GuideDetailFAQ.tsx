@@ -26,7 +26,7 @@ export function GuideDetailFAQ({
           <div className="min-w-0 flex-1 mx-auto xl:mx-0" style={{ maxWidth: "680px" }}>
             <Reveal header>
               <h2
-                className="font-display font-bold leading-[1.1] tracking-[-0.04em]"
+                className="font-display font-semibold leading-[1.1] tracking-[-0.04em]"
                 style={{ fontSize: "var(--fs-h3)", color: "#111111", marginBottom: "24px" }}
               >
                 Frequently Asked Questions

@@ -10,17 +10,27 @@ interface FlowBeamProps {
   className?: string;
   /** Caller styles — `left`, `--beam-delay`, width override, etc. */
   style?: CSSProperties;
+  /**
+   * Reverse the flow so the dashes travel upward instead of downward. The dash
+   * pattern is periodic, so reversing stays seamless; `prefers-reduced-motion`
+   * still wins (its `animation: none !important` disables either direction).
+   */
+  reverse?: boolean;
 }
 
 /**
  * Vertical "current" beam: a thick dashed cyan line whose dashes flow downward
- * on a seamless loop. The dashed track is translated by exactly one dash period
- * and the wrapper clips the overflow, so the loop has no visible seam; using
- * `transform` (not `background-position`) keeps it GPU-composited and jank-free.
- * Shared by the home Platform pipeline and the Security section. Honors
- * `prefers-reduced-motion` (renders a static dashed beam).
+ * (or upward, with `reverse`) on a seamless loop. The dashed track is translated
+ * by exactly one dash period and the wrapper clips the overflow, so the loop has
+ * no visible seam; using `transform` (not `background-position`) keeps it
+ * GPU-composited and jank-free. Shared by the home Platform pipeline and the
+ * Security section. Honors `prefers-reduced-motion` (renders a static dashed beam).
  */
-export function FlowBeam({ className, style }: FlowBeamProps): React.ReactElement {
+export function FlowBeam({
+  className,
+  style,
+  reverse = false,
+}: FlowBeamProps): React.ReactElement {
   return (
     <div
       aria-hidden
@@ -40,6 +50,7 @@ export function FlowBeam({ className, style }: FlowBeamProps): React.ReactElemen
             "repeating-linear-gradient(180deg, rgba(130,225,255,0) 0px, rgba(130,225,255,0.95) 4px, rgba(130,225,255,0.95) 9px, rgba(130,225,255,0) 13px, rgba(130,225,255,0) 18px)",
           boxShadow: "0 0 9px rgba(120,220,255,0.7)",
           mixBlendMode: "screen",
+          ...(reverse ? { animationDirection: "reverse" } : null),
         }}
       />
     </div>

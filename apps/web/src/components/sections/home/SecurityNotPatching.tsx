@@ -32,7 +32,7 @@ export function SecurityNotPatching() {
         <Reveal header>
           <div className="mx-auto flex max-w-[820px] flex-col items-center gap-5 text-center">
             <h2
-              className="font-display font-bold text-white"
+              className="font-display font-semibold text-white"
               style={{
                 fontSize: "var(--fs-h2)",
                 lineHeight: 1.1,

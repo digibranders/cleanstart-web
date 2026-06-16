@@ -1,20 +1,17 @@
 import { Reveal } from "@/components/ui/Reveal";
 
-type Problem = { n: string; title: string; desc: string };
+type Problem = { title: string; desc: string };
 
 const PROBLEMS: Problem[] = [
   {
-    n: "01",
     title: "Reactive CVE Operations",
     desc: "Security teams spend cycles prioritizing vulnerabilities without verified remediation paths.",
   },
   {
-    n: "02",
     title: "Inherited Software Risk",
     desc: "Modern applications inherit vulnerabilities, malicious packages, and unknown dependencies across the software lifecycle.",
   },
   {
-    n: "03",
     title: "Continuous Compliance Pressure",
     desc: "Regulated environments demand verifiable software, continuous evidence, and trusted delivery across every release.",
   },
@@ -45,15 +42,8 @@ function ProblemCard({ problem }: { problem: Problem }) {
             "radial-gradient(circle at 100% 0%, rgba(154,81,255,0.07), transparent 65%)",
         }}
       />
-      <span
-        aria-hidden
-        className="absolute right-7 top-4 font-sans text-[rgba(102,102,102,0.35)] sm:right-8"
-        style={{ fontSize: "var(--fs-h3)", letterSpacing: "-0.04em" }}
-      >
-        {problem.n}
-      </span>
       <h3
-        className="relative max-w-[80%] font-display font-bold text-[#111]"
+        className="relative font-display font-semibold text-[#111]"
         style={cardTitleStyle}
       >
         {problem.title}
@@ -72,7 +62,7 @@ export function ProblemsToday() {
         {/* Heading */}
         <Reveal header>
           <h2
-            className="mx-auto max-w-[720px] text-center font-display font-bold text-[#111]"
+            className="mx-auto max-w-[720px] text-center font-display font-semibold text-[#111]"
             style={{
               fontSize: "var(--fs-h2)",
               lineHeight: 1.1,
@@ -92,14 +82,14 @@ export function ProblemsToday() {
           </h2>
         </Reveal>
 
-        {/* Left feature card + right column of numbered problems */}
+        {/* Left feature card + right column of problems */}
         <Reveal>
           <div className="mt-12 flex flex-col items-stretch gap-6 lg:flex-row lg:gap-8">
             {/* Left: AI-Generated Software Risk + illustration */}
             <div className="relative flex min-h-[440px] flex-col overflow-hidden rounded-[32px] border border-black/[0.06] bg-white lg:min-h-0 lg:w-[40%]">
               <div className="relative z-10 p-7 sm:p-8">
                 <h3
-                  className="font-display font-bold text-[#111]"
+                  className="font-display font-semibold text-[#111]"
                   style={cardTitleStyle}
                 >
                   AI-Generated Software Risk
@@ -122,10 +112,10 @@ export function ProblemsToday() {
               />
             </div>
 
-            {/* Right: 3 numbered problem cards */}
+            {/* Right: 3 problem cards */}
             <div className="flex flex-1 flex-col gap-6 lg:gap-8">
               {PROBLEMS.map((p) => (
-                <ProblemCard key={p.n} problem={p} />
+                <ProblemCard key={p.title} problem={p} />
               ))}
             </div>
           </div>

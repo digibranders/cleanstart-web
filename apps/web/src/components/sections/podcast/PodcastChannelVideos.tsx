@@ -299,7 +299,7 @@ export function PodcastChannelVideos({
         <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[clamp(60px,7vw,100px)] pb-[clamp(48px,5vw,80px)]">
           <Reveal header>
             <h2
-              className="text-left text-[#111111] font-bold"
+              className="text-left text-[#111111] font-semibold"
               style={{
                 fontSize: "var(--fs-h2)",
                 lineHeight: 1.1,

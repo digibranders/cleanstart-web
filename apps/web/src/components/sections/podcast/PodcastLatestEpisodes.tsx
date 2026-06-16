@@ -47,7 +47,7 @@ export function PodcastLatestEpisodes({
         <Reveal header>
           <h2
             id="podcast-latest-title"
-            className="text-left text-[#111111] font-bold"
+            className="text-left text-[#111111] font-semibold"
             style={{
               fontSize: "var(--fs-h2)",
               lineHeight: 1.1,

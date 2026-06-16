@@ -29,6 +29,23 @@ const GUARANTEES: Guarantee[] = [
   { title: "Proven Integrity", desc: "Continuously verified integrity from build to runtime" },
 ];
 
+const LANE_COUNT = STAGES.length;
+
+/* Cascade timing (ms). One cycle ≈ 10s — deliberately slow and SEQUENTIAL: each
+   lane fully resolves before the next begins. Per lane: the stage glows, a trust
+   comet glides down (TRAVEL), the guarantee card BUILDS (box ignites, interior
+   materialises, shield draws), then a persistent dashed "current" lights and
+   stays. LANE_GAP > TRAVEL so the card has landed and its current is established
+   before the next stage fires. After the sixth card the wordmark ignites and the
+   enclosure floods (climax), holds, then everything resets and the cycle loops. */
+const LANE_GAP = 1200;
+const TRAVEL = 1000;
+const START_DELAY = 450;
+const POP_HOLD = 700;
+const CLIMAX_AT = (LANE_COUNT - 1) * LANE_GAP + TRAVEL + 400;
+const RESET_AT = CLIMAX_AT + 1900;
+const CYCLE = RESET_AT + 800;
+
 const titleStyle = {
   fontSize: "var(--fs-h3)",
   lineHeight: 1.1,
@@ -53,31 +70,36 @@ type LaneState = {
 function StageItem({
   stage,
   index,
+  lit,
   hovered,
   setHovered,
-}: { stage: Stage; index: number } & LaneState): React.ReactElement {
+}: { stage: Stage; index: number; lit: boolean } & LaneState): React.ReactElement {
   const dimmed = hovered !== null && hovered !== index;
   return (
     <div
       onMouseEnter={() => setHovered(index)}
       onMouseLeave={() => setHovered(null)}
+      data-lit={lit ? "true" : undefined}
       className={cn(
-        "cs-sec-rise flex w-[166px] flex-col items-center gap-4 text-center",
+        "cs-sec-rise cs-sec-stage flex w-[166px] flex-col items-center gap-4 text-center",
         dimmed && "cs-sec-dim",
       )}
       style={{ ["--d" as string]: `${index * 0.07}s` }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={`/images/security/${stage.icon}`}
-        alt=""
-        aria-hidden
-        loading="lazy"
-        decoding="async"
-        className="size-12 select-none"
-      />
+      <div className="relative grid size-12 place-items-center">
+        <div className="cs-sec-stage-halo pointer-events-none absolute -inset-2 rounded-full" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`/images/security/${stage.icon}`}
+          alt=""
+          aria-hidden
+          loading="lazy"
+          decoding="async"
+          className="relative size-12 select-none"
+        />
+      </div>
       <div className="flex flex-col gap-2">
-        <h3 className="font-display font-bold text-white" style={titleStyle}>
+        <h3 className="font-display font-semibold text-white" style={titleStyle}>
           {stage.title}
         </h3>
         <p className="text-white/70" style={descStyle}>
@@ -88,37 +110,45 @@ function StageItem({
   );
 }
 
-function GuaranteeItem({
+function GuaranteeCard({
   item,
   index,
+  built,
+  pop,
   hovered,
   setHovered,
-}: { item: Guarantee; index: number } & LaneState): React.ReactElement {
+}: {
+  item: Guarantee;
+  index: number;
+  built: boolean;
+  pop: boolean;
+} & LaneState): React.ReactElement {
   const dimmed = hovered !== null && hovered !== index;
   return (
     <div
       onMouseEnter={() => setHovered(index)}
       onMouseLeave={() => setHovered(null)}
+      data-built={built ? "true" : undefined}
+      data-pop={pop ? "true" : undefined}
       className={cn(
-        "cs-sec-rise relative z-10 flex w-[176px] flex-col items-center gap-4 text-center",
+        "cs-sec-rise cs-sec-card relative z-10 flex w-[182px] flex-col items-center justify-center px-4 py-6 text-center",
         dimmed && "cs-sec-dim",
       )}
-      style={{
-        ["--d" as string]: `${0.5 + index * 0.09}s`,
-        ["--ld" as string]: `${index * 0.12}s`,
-      }}
+      style={{ ["--d" as string]: `${0.5 + index * 0.09}s` }}
     >
-      <div className="relative grid place-items-center" style={{ width: 68, height: 68 }}>
-        <div className="cs-sec-shield-halo pointer-events-none absolute inset-0 rounded-full" />
-        <ShieldCheck className="cs-sec-shield relative size-[68px] select-none" />
-      </div>
-      <div className="flex flex-col gap-2">
-        <h3 className="font-display font-bold text-white" style={titleStyle}>
-          {item.title}
-        </h3>
-        <p className="text-white/70" style={descStyle}>
-          {item.desc}
-        </p>
+      <div className="cs-sec-card-inner flex flex-col items-center gap-4">
+        <div className="relative grid place-items-center" style={{ width: 68, height: 68 }}>
+          <div className="cs-sec-shield-halo pointer-events-none absolute inset-0 rounded-full" />
+          <ShieldCheck className="cs-sec-shield relative size-[68px] select-none" />
+        </div>
+        <div className="flex flex-col gap-2">
+          <h3 className="font-display font-semibold text-white" style={titleStyle}>
+            {item.title}
+          </h3>
+          <p className="text-white/70" style={descStyle}>
+            {item.desc}
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -130,6 +160,16 @@ export function SecurityDiagram(): React.ReactElement {
   const inView = useInView(ref, { margin: "0px 0px -80px 0px", amount: 0.05 });
   const [started, setStarted] = useState(false);
   const [hovered, setHovered] = useState<number | null>(null);
+
+  // Cascade state, driven by the JS master clock below.
+  const [litCount, setLitCount] = useState(reduce ? LANE_COUNT : 0);
+  const [climax, setClimax] = useState<boolean>(!!reduce);
+  const [flying, setFlying] = useState<ReadonlySet<number>>(() => new Set());
+  const [dotted, setDotted] = useState<ReadonlySet<number>>(() =>
+    reduce ? new Set(Array.from({ length: LANE_COUNT }, (_, i) => i)) : new Set(),
+  );
+  const [landing, setLanding] = useState<ReadonlySet<number>>(() => new Set());
+  const [popping, setPopping] = useState<ReadonlySet<number>>(() => new Set());
 
   useEffect(() => {
     if (inView) {
@@ -150,13 +190,84 @@ export function SecurityDiagram(): React.ReactElement {
   }, [inView]);
 
   // `on`   → build-in one-shots have fired (or reduced-motion shows final state)
-  // `anim` → ambient loops run only while the section is on-screen
+  // `anim` → the verification cascade runs only while the section is on-screen
   const on = started || reduce;
   const anim = inView && !reduce;
+
+  useEffect(() => {
+    if (reduce) {
+      setLitCount(LANE_COUNT);
+      setClimax(true);
+      setFlying(new Set());
+      setDotted(new Set(Array.from({ length: LANE_COUNT }, (_, i) => i)));
+      setLanding(new Set());
+      setPopping(new Set());
+      return;
+    }
+    if (!anim) return;
+
+    const timers: number[] = [];
+    let cancelled = false;
+    const at = (delay: number, fn: () => void): void => {
+      timers.push(window.setTimeout(fn, delay));
+    };
+
+    const toggle = (
+      set: typeof setFlying,
+      i: number,
+      add: boolean,
+    ): void =>
+      set((s) => {
+        const next = new Set(s);
+        if (add) next.add(i);
+        else next.delete(i);
+        return next;
+      });
+
+    const runCycle = (): void => {
+      if (cancelled) return;
+      setLitCount(0);
+      setClimax(false);
+      setFlying(new Set());
+      setDotted(new Set());
+      setLanding(new Set());
+      setPopping(new Set());
+
+      for (let i = 0; i < LANE_COUNT; i += 1) {
+        // Launch the trust comet down lane i.
+        at(i * LANE_GAP, () => toggle(setFlying, i, true));
+        // Comet lands: build the card, flash + pop, retire the comet, and light
+        // the persistent dashed current (which stays until the cycle resets).
+        at(i * LANE_GAP + TRAVEL, () => {
+          setLitCount((c) => Math.max(c, i + 1));
+          toggle(setFlying, i, false);
+          toggle(setLanding, i, true);
+          toggle(setPopping, i, true);
+        });
+        at(i * LANE_GAP + TRAVEL + 220, () => toggle(setDotted, i, true));
+        at(i * LANE_GAP + TRAVEL + 600, () => toggle(setLanding, i, false));
+        at(i * LANE_GAP + TRAVEL + POP_HOLD, () => toggle(setPopping, i, false));
+      }
+      at(CLIMAX_AT, () => setClimax(true));
+      at(RESET_AT, () => {
+        setLitCount(0);
+        setClimax(false);
+        setDotted(new Set());
+      });
+      at(CYCLE, runCycle);
+    };
+
+    at(START_DELAY, runCycle);
+    return () => {
+      cancelled = true;
+      for (const t of timers) window.clearTimeout(t);
+    };
+  }, [anim, reduce]);
 
   return (
     <div
       ref={ref}
+      data-climax={climax ? "true" : undefined}
       className={cn(
         "relative mt-14 w-full",
         on && "cs-sec-on",
@@ -187,7 +298,13 @@ export function SecurityDiagram(): React.ReactElement {
         <div className="relative z-10 flex flex-nowrap items-start justify-between gap-x-3">
           {STAGES.map((stage, i) => (
             <Fragment key={stage.title}>
-              <StageItem stage={stage} index={i} hovered={hovered} setHovered={setHovered} />
+              <StageItem
+                stage={stage}
+                index={i}
+                lit={flying.has(i)}
+                hovered={hovered}
+                setHovered={setHovered}
+              />
               {i < STAGES.length - 1 && (
                 <FlowArrow
                   className="mt-3 flex h-7 shrink-0"
@@ -200,7 +317,13 @@ export function SecurityDiagram(): React.ReactElement {
       </div>
 
       {/* Verification current */}
-      <VerifyBeams hovered={hovered} />
+      <VerifyBeams
+        flying={flying}
+        dotted={dotted}
+        landing={landing}
+        hovered={hovered}
+        durMs={TRAVEL}
+      />
 
       {/* Trust enclosure */}
       <div
@@ -249,29 +372,31 @@ export function SecurityDiagram(): React.ReactElement {
               "radial-gradient(60% 100% at 50% 100%, rgba(60,150,255,0.28) 0%, rgba(60,150,255,0) 70%)",
           }}
         />
+        {/* Climax flood — aurora bloom once all six lanes verify. */}
+        <div
+          aria-hidden
+          className="cs-sec-flood pointer-events-none absolute inset-0"
+        />
 
         <div className="relative flex flex-col gap-6 px-10 pb-6 pt-9">
-          <div className="flex flex-nowrap items-start justify-between gap-x-2">
+          <div className="flex flex-nowrap items-stretch justify-between gap-x-3">
             {GUARANTEES.map((item, i) => (
-              <Fragment key={item.title}>
-                <GuaranteeItem item={item} index={i} hovered={hovered} setHovered={setHovered} />
-                {i < GUARANTEES.length - 1 && (
-                  <div
-                    aria-hidden
-                    className="block h-[120px] w-px shrink-0 self-center"
-                    style={{
-                      background:
-                        "linear-gradient(to bottom, transparent, rgba(255,255,255,0.18), transparent)",
-                    }}
-                  />
-                )}
-              </Fragment>
+              <GuaranteeCard
+                key={item.title}
+                item={item}
+                index={i}
+                built={i < litCount}
+                pop={popping.has(i)}
+                hovered={hovered}
+                setHovered={setHovered}
+              />
             ))}
           </div>
 
           <div
+            data-climax={climax ? "true" : undefined}
             aria-hidden
-            className="pointer-events-none flex select-none items-center justify-center gap-3"
+            className="cs-sec-wordmark pointer-events-none flex select-none items-center justify-center gap-3"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
