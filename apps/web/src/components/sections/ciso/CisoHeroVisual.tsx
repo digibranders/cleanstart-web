@@ -286,24 +286,6 @@ export function CisoHeroVisual(): React.ReactElement {
         <path d="M14 -17.5 V-12" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" />
         <circle cx="14" cy="-10" r="1" fill="#fff" />
       </g>
-
-      {/* Stage captions — name the three steps so the flow is legible at a
-          glance. Anchored above each zone (risk / gate / hardened), with
-          chevrons implying left → right process. */}
-      <g className="cs-civ-cap" textAnchor="middle">
-        <text x="150" y="62" fill="#ffb0b0">INHERITED</text>
-        <text x="150" y="79" fill="#ffb0b0">RISK</text>
-
-        <text x="300" y="62" fill="#8fe9ff">CLEANSTART</text>
-        <text x="300" y="79" fill="#8fe9ff">VERIFICATION</text>
-
-        <text x="480" y="62" fill="#b9f3ff">HARDENED &amp;</text>
-        <text x="480" y="79" fill="#b9f3ff">COMPLIANT</text>
-      </g>
-      <g stroke="#7fd9f0" strokeWidth="1.5" strokeOpacity="0.55" fill="none" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M216 67 l5 5 l-5 5" />
-        <path d="M396 67 l5 5 l-5 5" />
-      </g>
     </svg>
   );
 }

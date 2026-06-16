@@ -3378,14 +3378,6 @@ body {
   overflow: visible;
 }
 
-/* Stage captions — small uppercase eyebrow labels naming each step of the flow. */
-.cs-civ-cap text {
-  font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 1.3px;
-}
-
 /* Secure core — slow breathing scale + brightness. */
 @keyframes cs-civ-core-breathe {
   0%, 100% { transform: scale(1);     filter: brightness(1); }
