@@ -22,7 +22,7 @@ export const Resumes: CollectionConfig = {
   },
   access: {
     read: isAdminOrEditor,
-    create: isAdminOrEditor,
+    create: () => false,
     update: isAdminOrEditor,
     delete: isAdminOrEditor,
   },
