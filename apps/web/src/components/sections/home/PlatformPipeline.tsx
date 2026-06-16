@@ -109,7 +109,7 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
           className="mt-[5cqw] whitespace-pre-line text-white/80"
           style={{
             fontFamily: "var(--font-sora), Sora, sans-serif",
-            fontSize: "clamp(12px, 5.4cqw, 15px)",
+            fontSize: "var(--fs-body)",
             lineHeight: 1.3,
             letterSpacing: "-0.02em",
           }}
@@ -167,7 +167,7 @@ function IntelligenceBar() {
           "linear-gradient(180deg, #151021 0%, #131E8F 71.2%, #551ECE 100%)",
         border: "1px solid #dab6f3",
         borderRadius: 18,
-        padding: "clamp(20px, 3.2cqw, 36px) 24px",
+        padding: "clamp(16px, 2.2cqw, 26px) 24px",
         gap: "clamp(8px, 1cqw, 14px)",
         boxShadow:
           "-8px 4px 20px rgba(0,0,0,0.23), -33px 16px 37px rgba(0,0,0,0.2)",
@@ -177,7 +177,7 @@ function IntelligenceBar() {
       <h3
         className="relative font-display font-normal text-white"
         style={{
-          fontSize: "clamp(20px, 2.7cqw, 30px)",
+          fontSize: "clamp(20px, 3.05cqw, 30px)",
           lineHeight: 1.05,
           letterSpacing: "-0.04em",
         }}
@@ -188,7 +188,7 @@ function IntelligenceBar() {
         className="relative text-white/80"
         style={{
           fontFamily: "var(--font-sora), Sora, sans-serif",
-          fontSize: "clamp(13px, 1.5cqw, 16px)",
+          fontSize: "var(--fs-body)",
           lineHeight: 1.2,
           letterSpacing: "-0.02em",
         }}
@@ -233,7 +233,7 @@ function FactoryEnclosure() {
         <div className="relative flex flex-col p-[30px]">
           {/* Cards — a centered group, narrower than the bar below it. */}
           <div className="relative mx-auto w-full max-w-[732px]">
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-7">
               {CARDS.map((c, i) => (
                 <div key={c.title} className="w-full">
                   <FactoryCard data={c} isFirst={i === 0} />
@@ -243,26 +243,30 @@ function FactoryEnclosure() {
           </div>
 
           {/* Connector beams — flush band between the cards and the bar, one
-              per card (25/50/75%), each a flowing dashed "current" tucked behind
-              the cards (above) and the bar (below). Phase-offset per lane for
-              life. `reverse` makes the current flow bottom-up (Intelligence
-              Centre → cards). Always shown: the layout never collapses to a
-              single column. */}
-          <div
-            aria-hidden
-            className="relative h-[38px] overflow-hidden"
-          >
-            {["25%", "50%", "75%"].map((x, i) => (
-              <FlowBeam
-                key={x}
-                reverse
-                className="absolute inset-y-0 -translate-x-1/2"
-                style={{ left: x, ["--beam-delay" as string]: `${i * 0.12}s` }}
-              />
-            ))}
+              per card. Mirrors the card grid (same width + gap) so each beam
+              stays centred on its card whatever the gap. Each is a flowing
+              dashed "current"; `reverse` makes it flow bottom-up (Intelligence
+              Centre → cards). Phase-offset per lane for life. Always shown: the
+              layout never collapses to a single column. */}
+          <div className="relative mx-auto w-full max-w-[732px]">
+            <div className="grid h-[38px] grid-cols-3 gap-7">
+              {[0, 1, 2].map((i) => (
+                <div key={i} aria-hidden className="relative overflow-hidden">
+                  <FlowBeam
+                    reverse
+                    className="absolute inset-y-0 left-1/2 -translate-x-1/2"
+                    style={{ ["--beam-delay" as string]: `${i * 0.12}s` }}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
 
-          <IntelligenceBar />
+          {/* Bar — centered and narrower than the full enclosure interior, while
+              still wider than the 732px cards group above it. */}
+          <div className="mx-auto w-full max-w-[880px]">
+            <IntelligenceBar />
+          </div>
         </div>
       </div>
     </div>

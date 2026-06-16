@@ -37,7 +37,8 @@ export function Hero() {
                   letterSpacing: "-0.02em",
                 }}
               >
-                Build AI-native applications with verified, zero-CVE container
+                Build AI-native applications with verified,{" "}
+                <span className="whitespace-nowrap">zero-CVE</span> container
                 images and libraries
               </p>
             </HeroReveal>
@@ -67,9 +68,9 @@ export function Hero() {
             y={40}
             delay={0.15}
             duration={1.0}
-            className="w-full max-w-[520px] shrink-0 lg:w-[44%]"
+            className="w-full max-w-[490px] shrink-0 lg:mr-[60px] lg:w-[42%]"
           >
-            <div className="relative mx-auto w-full max-w-[520px]">
+            <div className="relative mx-auto w-full max-w-[490px]">
               {/* Soft purple/blue bloom behind the panel (Figma ellipse glow). */}
               <div
                 aria-hidden
