@@ -4,18 +4,20 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { Header } from "@/components/nav/Header";
 import { Hero } from "@/components/sections/home/Hero";
 import { PlatformPipeline } from "@/components/sections/home/PlatformPipeline";
-import { AudienceTabs } from "@/components/sections/home/AudienceTabs";
+import { ProblemsToday } from "@/components/sections/home/ProblemsToday";
 import { SecurityNotPatching } from "@/components/sections/home/SecurityNotPatching";
-// Testimonials (~480L "use client" testimonial carousel) sits below the fold;
+// TestimonialsStats (V4 testimonial carousel + stats band) sits below the fold;
 // code-split so it does not ship in the initial home-page client bundle.
-const Testimonials = dynamic(() =>
-  import("@/components/sections/home/Testimonials").then((m) => ({ default: m.Testimonials })),
+const TestimonialsStats = dynamic(() =>
+  import("@/components/sections/home/TestimonialsStats").then((m) => ({
+    default: m.TestimonialsStats,
+  })),
 );
 import { FrequentlyAskedQuestions } from "@/components/sections/home/FrequentlyAskedQuestions";
 import { ResourcesInsights } from "@/components/sections/home/ResourcesInsights";
 import { ReadyToSecureCTA } from "@/components/sections/home/ReadyToSecureCTA";
 import { Footer } from "@/components/sections/Footer";
-import { CleanStartAdvantage } from "@/components/sections/home/CleanStartAdvantage";
+import { ProcessBand } from "@/components/sections/home/ProcessBand";
 import { FadeUp } from "@/components/ui/FadeUp";
 import Image from "next/image";
 
@@ -31,6 +33,7 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default function Home() {
+  // V4 redesign: hero + factory + testimonials/stats section.
   return (
     <>
       <Header />
@@ -113,16 +116,16 @@ export default function Home() {
         </div>
 
         <FadeUp>
+          <TestimonialsStats />
+        </FadeUp>
+        <FadeUp>
           <SecurityNotPatching />
         </FadeUp>
         <FadeUp>
-          <Testimonials />
+          <ProblemsToday />
         </FadeUp>
         <FadeUp>
-          <AudienceTabs />
-        </FadeUp>
-        <FadeUp>
-          <CleanStartAdvantage />
+          <ProcessBand />
         </FadeUp>
         {/* FAQ + Resources share one continuous #F6F6F6 canvas so their
             transparent backgrounds and decorative blobs/grids bleed across

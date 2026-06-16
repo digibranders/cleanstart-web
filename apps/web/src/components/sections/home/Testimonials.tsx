@@ -43,7 +43,7 @@ export const HOME_TESTIMONIALS: Testimonial[] = [
     name: "Shanker Ramrakhiani",
     role: "CISO & Head of BCP, IIFL Finance",
     company: "IIFL Finance",
-    logoSrc: "/images/trusted/03-iifl-finance.webp",
+    logoSrc: "/images/testimonials/iifl-finance.png",
     photoSrc: "/images/testimonials/shanker-ramrakhiani.webp",
     quote:
       "CleanStart helped us standardize our container foundations without slowing development. Tasks that previously required significant manual effort are now eliminated, deployments are faster, and our security team has greater confidence in the images we use.",
@@ -53,7 +53,7 @@ export const HOME_TESTIMONIALS: Testimonial[] = [
     name: "Mr. Moinul Khan",
     role: "CEO, Aurascape",
     company: "Aurascape",
-    logoSrc: "/images/trusted/08-aurascape.webp",
+    logoSrc: "/images/testimonials/aurascape-logo.png",
     photoSrc: "/images/testimonials/moinul-khan.webp",
     quote:
       "Standardizing on verified container foundations gave us confidence in the base of every service we deploy and allowed us to shift security much earlier in the build process.",

@@ -2,48 +2,30 @@ import type React from 'react';
 import { Reveal } from '@/components/ui/Reveal';
 
 interface CardDef {
-  /** Desktop side-by-side illustration (large 3D render). */
-  desktopImg: string;
-  /** Absolute-percentage positioning for the desktop image inside its overflow container. */
-  desktopImgStyle: React.CSSProperties;
-  /** Mobile centered icon (smaller, standalone). */
-  mobileIcon: string;
-  /** Mobile icon sizing inside the 108x87 frame, positioned per card. */
-  mobileIconStyle: React.CSSProperties;
+  /** Standalone transparent 3D icon (Figma export). */
+  icon: string;
   title: string;
   desc: string;
 }
 
 const CARDS: [CardDef, CardDef, CardDef, CardDef] = [
   {
-    desktopImg: '/images/for-developers/why/card-bloated.webp',
-    desktopImgStyle: { left: '8.15%', top: '-2.03%', width: '86.53%', height: '104.52%' },
-    mobileIcon: '/images/for-developers/why/icon-bloated.webp',
-    mobileIconStyle: { left: '12px', top: '2px', width: '84px', height: '84px' },
+    icon: '/images/for-developers/why/bloated.webp',
     title: 'Bloated Software Artifacts',
     desc: 'Large software artifacts increase dependency complexity and runtime overhead.',
   },
   {
-    desktopImg: '/images/for-developers/why/card-vulnerabilities.webp',
-    desktopImgStyle: { left: '9.12%', top: '-0.71%', width: '83.45%', height: '100.71%' },
-    mobileIcon: '/images/for-developers/why/icon-vulnerabilities.webp',
-    mobileIconStyle: { left: '-3px', top: '8px', width: '115px', height: '71px' },
+    icon: '/images/for-developers/why/vulnerabilities.webp',
     title: 'Inherited Vulnerabilities',
     desc: 'Public software components often inherit vulnerable upstream dependencies.',
   },
   {
-    desktopImg: '/images/for-developers/why/card-remediation.webp',
-    desktopImgStyle: { left: '8.45%', top: '-8.18%', width: '87.16%', height: '117.27%' },
-    mobileIcon: '/images/for-developers/why/icon-remediation.webp',
-    mobileIconStyle: { left: '8px', top: '-3px', width: '93px', height: '93px' },
+    icon: '/images/for-developers/why/remediation.webp',
     title: 'Slow Remediation Cycles',
     desc: 'Manual patching and rebuild workflows slow software delivery.',
   },
   {
-    desktopImg: '/images/for-developers/why/card-development.webp',
-    desktopImgStyle: { left: '15.93%', top: '1.36%', width: '72.54%', height: '96.83%' },
-    mobileIcon: '/images/for-developers/why/icon-development.webp',
-    mobileIconStyle: { left: '17px', top: '2px', width: '74px', height: '83px' },
+    icon: '/images/for-developers/why/development.webp',
     title: 'Workflow Disruption',
     desc: 'Security tooling should not disrupt developer productivity or CI/CD workflows.',
   },
@@ -57,20 +39,20 @@ const DIVIDER_H =
 const DIVIDER_V =
   'linear-gradient(to bottom, transparent 0%, #d9d9d9 20%, #d9d9d9 80%, transparent 100%)';
 
-function DesktopWhyCard({ desktopImg, desktopImgStyle, title, desc }: CardDef): React.ReactElement {
+function DesktopWhyCard({ icon, title, desc }: CardDef): React.ReactElement {
   return (
     <div className="flex items-center" style={{ gap: 'clamp(16px, 1.67vw, 24px)' }}>
       <div
         className="relative shrink-0"
         style={{
-          width: 'clamp(160px, 15.4vw, 222px)',
-          height: 'clamp(120px, 11.46vw, 165px)',
+          width: 'clamp(120px, 11.5vw, 156px)',
+          height: 'clamp(108px, 10vw, 140px)',
         }}
       >
         <div
           aria-hidden
           className="pointer-events-none select-none absolute"
-          style={{ left: '24px', top: '9px', width: '56%', height: '75%' }}
+          style={{ inset: '6%' }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -79,17 +61,15 @@ function DesktopWhyCard({ desktopImg, desktopImgStyle, title, desc }: CardDef): 
             style={{ display: 'block', width: '100%', height: '100%' }}
           />
         </div>
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={desktopImg}
-            alt=""
-            className="absolute max-w-none"
-            style={desktopImgStyle}
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={icon}
+          alt=""
+          aria-hidden
+          className="pointer-events-none select-none absolute inset-0 h-full w-full object-contain"
+          loading="lazy"
+          decoding="async"
+        />
       </div>
 
       <div className="flex flex-col min-w-0" style={{ flex: '1 1 0', gap: '17px' }}>
@@ -122,7 +102,7 @@ function DesktopWhyCard({ desktopImg, desktopImgStyle, title, desc }: CardDef): 
   );
 }
 
-function MobileWhyCard({ mobileIcon, mobileIconStyle, title, desc }: CardDef): React.ReactElement {
+function MobileWhyCard({ icon, title, desc }: CardDef): React.ReactElement {
   return (
     <div
       className="relative bg-white flex flex-col items-center"
@@ -133,19 +113,16 @@ function MobileWhyCard({ mobileIcon, mobileIconStyle, title, desc }: CardDef): R
           '0 1px 2px rgba(17, 17, 17, 0.04), 0 12px 32px -8px rgba(17, 17, 17, 0.06)',
       }}
     >
-      <div
-        className="relative shrink-0"
-        aria-hidden
-        style={{ width: '108px', height: '87px' }}
-      >
+      <div className="relative shrink-0" style={{ width: '96px', height: '88px' }}>
         <div
           aria-hidden
           className="pointer-events-none select-none absolute"
           style={{
-            left: '-1.45px',
-            top: '0.24px',
-            width: '79.75px',
-            height: '79.75px',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '80px',
+            height: '80px',
             background: '#DF9BFF',
             opacity: 0.35,
             filter: 'blur(20.78px)',
@@ -154,10 +131,10 @@ function MobileWhyCard({ mobileIcon, mobileIconStyle, title, desc }: CardDef): R
         />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={mobileIcon}
+          src={icon}
           alt=""
-          className="absolute max-w-none"
-          style={{ ...mobileIconStyle, objectFit: 'contain' }}
+          aria-hidden
+          className="pointer-events-none select-none absolute inset-0 h-full w-full object-contain"
           loading="lazy"
           decoding="async"
         />

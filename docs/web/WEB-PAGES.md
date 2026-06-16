@@ -41,7 +41,7 @@ page slugs, categories, types, and build status across the dev journey.
 | 1 | Homepage | `/` | Static | ✅ | Built |
 | 11 | Book a Demo | `/book-a-demo` | Static | ✅ | Lead capture form page (form is static UI; LeadHandler wiring pending) |
 | 20 | Partners | `/partners` | Static | ✅ | Hero, Why Partner, Global Network (region tabs), Testimonials, Partner Types. Become-a-Partner form posts to the dedicated CMS endpoint `/api/partner-applications/apply` (off HubSpot/`forms`). |
-| 21 | Pricing | `/pricing` | Static | ⬜ | |
+| 21 | Pricing | `/pricing` | Static | ✅ | Hero ("Choose Your Plan"), two plan cards (For Developers / Enterprise Image with FIPS + SLSA L3), and an offerings grid (Community Images, Custom Images, Clean Libraries, Custom Images, Additional Services). All sales CTAs → `/contact-us`; "View Images" → images.cleanstart.com. Built 2026-06-15 from Figma 1458:3571. Nav: standalone flat item beside Partners. |
 | 31 | Deal Registration | `/deal-registration` | Static | ✅ | Form is static UI; LeadHandler wiring pending |
 
 ---

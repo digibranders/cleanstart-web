@@ -112,12 +112,11 @@ export function SearchBar({
         <button
           type="submit"
           aria-label="Search"
-          className="shrink-0 flex items-center justify-center cursor-pointer h-10 sm:h-11"
+          className="shrink-0 flex items-center justify-center cursor-pointer h-10 sm:h-11 transition-colors hover:brightness-110"
           style={{
             width: "52px",
-            background: "rgba(255,255,255,0.15)",
+            background: "var(--color-cs-purple-1)",
             border: "1px solid rgba(237,203,255,0.6)",
-            borderLeft: "none",
             borderRadius: "0 12px 12px 0",
           }}
         >

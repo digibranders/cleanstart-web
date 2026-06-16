@@ -201,4 +201,5 @@ export const NAV_TREE: NavItem[] = [
     width: 760,
   },
   { kind: "flat", label: "Partners", href: "/partners" },
+  { kind: "flat", label: "Pricing", href: "/pricing" },
 ];
