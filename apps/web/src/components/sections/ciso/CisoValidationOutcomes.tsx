@@ -29,6 +29,17 @@ const CISO_VOICE = HOME_TESTIMONIALS.find((t) => t.role.includes("CISO"));
 // (orange mandala + white "IIFL FINANCE") reads cleanly here.
 const IIFL_WHITE_LOGO = "/images/testimonials/iifl-finance-white.webp";
 
+// Shared style for the opening/closing quote marks framing the testimonial.
+const QUOTE_MARK_STYLE: React.CSSProperties = {
+  fontSize: "clamp(44px, 4.5vw, 68px)",
+  fontWeight: 700,
+  background: "linear-gradient(135deg, #4FD1F5 0%, #6F8DFF 55%, #B19CFF 100%)",
+  WebkitBackgroundClip: "text",
+  backgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  opacity: 0.55,
+};
+
 interface Stat {
   value: string;
   label: string;
@@ -56,7 +67,10 @@ export function CisoValidationOutcomes(): React.ReactElement {
 
 function ValidationSpotlight(): React.ReactElement | null {
   if (!CISO_VOICE) return null;
-  const { name, role, quote, photoSrc, caseStudyHref } = CISO_VOICE;
+  const { role, quote, caseStudyHref } = CISO_VOICE;
+  // Attribute by role, not by person (name + photo removed). The IIFL wordmark
+  // carries the company, so trim the ", IIFL Finance" tail off the role title.
+  const roleTitle = role.split(",")[0]?.trim() ?? role;
 
   return (
     <section
@@ -96,7 +110,7 @@ function ValidationSpotlight(): React.ReactElement | null {
           {/* Gradient-stroked glass card. The ::before hairline is painted via
               the mask-composite trick (see globals .cs-grad-border). */}
           <figure
-            className="cs-grad-border relative overflow-hidden rounded-[28px] px-7 py-9 sm:px-12 sm:py-12"
+            className="cs-grad-border relative overflow-hidden rounded-[28px] px-7 py-8 text-center sm:px-14 sm:py-10"
             style={{
               background:
                 "linear-gradient(155deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.025) 48%, rgba(255,255,255,0.05) 100%)",
@@ -106,141 +120,112 @@ function ValidationSpotlight(): React.ReactElement | null {
                 "0 40px 90px -30px rgba(8,4,24,0.85), inset 0 1px 0 rgba(255,255,255,0.10)",
             }}
           >
-            {/* Oversized editorial quote glyph — decorative anchor. */}
-            <span
-              aria-hidden
-              className="pointer-events-none absolute -top-2 left-5 select-none font-display sm:left-9"
-              style={{
-                fontSize: "clamp(72px, 9vw, 124px)",
-                lineHeight: 1,
-                fontWeight: 700,
-                background:
-                  "linear-gradient(135deg, #33BAEC 0%, #6F8DFF 50%, #B19CFF 100%)",
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                opacity: 0.22,
-              }}
-            >
-              &ldquo;
-            </span>
+            {/* Quote framed by an opening mark (top-left) and a closing mark
+                (bottom-right). Cyan-led brand gradient — cyan reads clearly
+                against the purple center of the card, where a violet mark would
+                disappear; kept semi-transparent so it ornaments, not shouts. */}
+            <div className="relative mx-auto max-w-[900px] px-3 py-2 sm:px-10">
+              <span
+                aria-hidden
+                className="pointer-events-none absolute left-0 top-0 select-none font-display leading-none sm:-left-2"
+                style={QUOTE_MARK_STYLE}
+              >
+                &ldquo;
+              </span>
 
-            <blockquote
-              className="relative mt-5 font-display sm:mt-7"
-              style={{
-                fontSize: "var(--fs-h3)",
-                fontWeight: 600,
-                lineHeight: 1.42,
-                letterSpacing: "-0.02em",
-                color: "rgba(255,255,255,0.96)",
-                textWrap: "balance",
-              }}
-            >
-              {quote}
-            </blockquote>
+              <blockquote
+                className="relative font-display"
+                style={{
+                  fontSize: "var(--fs-h3)",
+                  fontWeight: 600,
+                  lineHeight: 1.45,
+                  letterSpacing: "-0.02em",
+                  color: "rgba(255,255,255,0.96)",
+                  textWrap: "balance",
+                }}
+              >
+                {quote}
+              </blockquote>
 
-            {/* Hairline divider above the attribution row. */}
+              <span
+                aria-hidden
+                className="pointer-events-none absolute -bottom-5 right-0 select-none font-display leading-none sm:-right-2"
+                style={QUOTE_MARK_STYLE}
+              >
+                &rdquo;
+              </span>
+            </div>
+
+            {/* Centered hairline divider. */}
             <div
               aria-hidden
-              className="mt-8 h-px w-full sm:mt-10"
+              className="mx-auto mt-8 h-px w-full max-w-[440px]"
               style={{
                 background:
-                  "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0) 100%)",
+                  "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.22) 50%, rgba(255,255,255,0) 100%)",
               }}
             />
 
-            <figcaption className="mt-7 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-4">
-                {/* Portrait with gradient ring. */}
+            <figcaption className="mt-6 flex flex-col items-center gap-4">
+              {/* Role-based attribution + company wordmark, centered. */}
+              <div className="flex items-center justify-center gap-4">
                 <span
-                  aria-hidden
-                  className="inline-flex shrink-0 rounded-full p-[2px]"
+                  className="font-sans"
                   style={{
-                    background:
-                      "linear-gradient(135deg, #33BAEC 0%, #6F8DFF 50%, #B19CFF 100%)",
+                    fontSize: "var(--fs-body-sm)",
+                    fontWeight: 500,
+                    letterSpacing: "0.01em",
+                    color: "rgba(255,255,255,0.66)",
                   }}
                 >
-                  <span className="block overflow-hidden rounded-full bg-[#151021]">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={photoSrc ?? "/images/testimonial-photo.webp"}
-                      alt={`${name}, ${role}`}
-                      width={64}
-                      height={64}
-                      decoding="async"
-                      loading="lazy"
-                      className="h-16 w-16 object-cover"
-                      style={{ aspectRatio: "1 / 1" }}
-                    />
-                  </span>
+                  {roleTitle}
                 </span>
-
-                <div className="not-italic">
-                  <div
-                    className="font-display text-white"
-                    style={{
-                      fontSize: "var(--fs-h4)",
-                      fontWeight: 600,
-                      lineHeight: 1.2,
-                      letterSpacing: "-0.01em",
-                    }}
-                  >
-                    {name}
-                  </div>
-                  <div
-                    className="font-sans"
-                    style={{
-                      fontSize: "var(--fs-body-sm)",
-                      fontWeight: 400,
-                      color: "rgba(255,255,255,0.62)",
-                    }}
-                  >
-                    {role}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col items-start gap-5 sm:items-end">
+                <span
+                  aria-hidden
+                  className="h-4 w-px shrink-0"
+                  style={{ background: "rgba(255,255,255,0.22)" }}
+                />
                 <Image
                   src={IIFL_WHITE_LOGO}
                   alt="IIFL Finance"
                   width={132}
                   height={26}
                   sizes="132px"
-                  className="h-[26px] w-auto max-w-[140px] object-contain"
+                  className="h-[24px] w-auto max-w-[140px] object-contain"
                 />
-                {caseStudyHref && (
-                  <a
-                    href={caseStudyHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group inline-flex items-center gap-2 font-sans transition-colors"
-                    style={{
-                      fontSize: "var(--fs-button)",
-                      fontWeight: 500,
-                      color: "rgba(255,255,255,0.92)",
-                    }}
-                  >
-                    <span className="cs-text-gradient-impact">Read Case study</span>
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      aria-hidden
-                      className="text-[#6F8DFF] transition-transform duration-300 group-hover:translate-x-1"
-                    >
-                      <path
-                        d="M4 10h12m0 0l-4-4m4 4l-4 4"
-                        stroke="currentColor"
-                        strokeWidth="1.75"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </a>
-                )}
               </div>
+
+              {caseStudyHref && (
+                <a
+                  href={caseStudyHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex items-center gap-2 font-sans transition-colors"
+                  style={{
+                    fontSize: "var(--fs-button)",
+                    fontWeight: 500,
+                    color: "rgba(255,255,255,0.92)",
+                  }}
+                >
+                  <span className="cs-text-gradient-impact">Read Case study</span>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    aria-hidden
+                    className="text-[#6F8DFF] transition-transform duration-300 group-hover:translate-x-1"
+                  >
+                    <path
+                      d="M4 10h12m0 0l-4-4m4 4l-4 4"
+                      stroke="currentColor"
+                      strokeWidth="1.75"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </a>
+              )}
             </figcaption>
           </figure>
         </Reveal>

@@ -423,7 +423,7 @@ function Connectors(): React.ReactElement {
             rx={206}
             ry={90}
             strokeWidth={1.4}
-            opacity={0.3}
+            opacity={0.16}
             transform={`rotate(${a} ${MESH.cx} ${MESH.cy})`}
           />
         ))}
