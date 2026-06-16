@@ -12,9 +12,11 @@ import {
   LEFT_ITEMS,
   LEFT_FANS,
   LEFT_SOURCE_DOTS,
+  LEFT_MERGE,
   RIGHT_ITEMS,
   RIGHT_FANS,
   RIGHT_TARGET_DOTS,
+  RIGHT_BRANCH,
   CARD,
   GOV_PANEL,
   GOV_ITEMS,
@@ -339,17 +341,31 @@ function Connectors(): React.ReactElement {
           <stop offset="1" stopColor="#2CC1EB" />
         </linearGradient>
 
-        {/* Glass body for the system sphere — lit from the upper-left, dimmest
-            mid-body, then a slight fresnel lift at the rim for 3D volume. */}
-        <radialGradient id="orbBody" cx="46%" cy="32%" r="72%">
-          <stop offset="0%" stopColor="rgba(150,134,255,0.26)" />
-          <stop offset="44%" stopColor="rgba(74,64,150,0.13)" />
-          <stop offset="80%" stopColor="rgba(20,22,60,0.07)" />
-          <stop offset="100%" stopColor="rgba(104,86,210,0.17)" />
+        {/* Plasma nebula layers — purple bias on the left, cyan on the right,
+            a brighter nucleus, all fading to transparent (no hard edge). */}
+        <radialGradient id="plasmaPurple" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stopColor="rgba(128,88,244,0.42)" />
+          <stop offset="55%" stopColor="rgba(110,80,220,0.12)" />
+          <stop offset="100%" stopColor="rgba(110,80,220,0)" />
         </radialGradient>
-        <filter id="orbSoft" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="7" />
-        </filter>
+        <radialGradient id="plasmaCyan" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stopColor="rgba(42,158,236,0.36)" />
+          <stop offset="55%" stopColor="rgba(42,158,236,0.10)" />
+          <stop offset="100%" stopColor="rgba(42,158,236,0)" />
+        </radialGradient>
+        <radialGradient id="plasmaCore" cx="50%" cy="42%" r="50%">
+          <stop offset="0" stopColor="rgba(170,158,255,0.48)" />
+          <stop offset="58%" stopColor="rgba(140,128,240,0.12)" />
+          <stop offset="100%" stopColor="rgba(140,128,240,0)" />
+        </radialGradient>
+        <radialGradient id="dissolveL" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stopColor="rgba(179,107,255,0.55)" />
+          <stop offset="100%" stopColor="rgba(179,107,255,0)" />
+        </radialGradient>
+        <radialGradient id="dissolveR" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stopColor="rgba(44,193,235,0.55)" />
+          <stop offset="100%" stopColor="rgba(44,193,235,0)" />
+        </radialGradient>
 
         {SPOKES.map((s, i) => (
           <linearGradient
@@ -377,47 +393,20 @@ function Connectors(): React.ReactElement {
 
       <rect width={VB.w} height={VB.h} fill="url(#cisoGrid)" />
 
-      {(() => {
-        const L = MESH.cx - MESH.rx;
-        const R = MESH.cx + MESH.rx;
-        const T = MESH.cy - MESH.ry;
-        const B = MESH.cy + MESH.ry;
-        const rad = 16;
-        const arm = 44;
-        // L-shaped corner brackets that hug the rounded corners.
-        const brackets = [
-          `M ${L} ${T + arm} L ${L} ${T + rad} Q ${L} ${T} ${L + rad} ${T} L ${L + arm} ${T}`,
-          `M ${R - arm} ${T} L ${R - rad} ${T} Q ${R} ${T} ${R} ${T + rad} L ${R} ${T + arm}`,
-          `M ${R} ${B - arm} L ${R} ${B - rad} Q ${R} ${B} ${R - rad} ${B} L ${R - arm} ${B}`,
-          `M ${L + arm} ${B} L ${L + rad} ${B} Q ${L} ${B} ${L} ${B - rad} L ${L} ${B - arm}`,
-        ];
-        const ticks = [0.3, 0.42, 0.58, 0.7];
-        return (
-          <>
-            {/* HUD console frame: glass fill, faint full outline, edge ticks,
-                glowing corner brackets, and side I/O port jacks. */}
-            <rect x={L} y={T} width={R - L} height={B - T} rx={rad} fill="url(#orbBody)" />
-            <rect x={L} y={T} width={R - L} height={B - T} rx={rad} fill="none" stroke="rgba(150,170,230,0.16)" strokeWidth={1} />
-            <g stroke="rgba(150,170,230,0.32)" strokeWidth={1}>
-              {ticks.map((f) => (
-                <g key={`tk${f}`}>
-                  <line x1={L + (R - L) * f} y1={T} x2={L + (R - L) * f} y2={T + 6} />
-                  <line x1={L + (R - L) * f} y1={B} x2={L + (R - L) * f} y2={B - 6} />
-                </g>
-              ))}
-            </g>
-            <g fill="none" stroke="url(#meshGrad)" strokeWidth={2.6} strokeLinecap="round" filter="url(#cisoGlow)">
-              {brackets.map((d, i) => (
-                <path key={`br${i}`} d={d} />
-              ))}
-            </g>
-            <rect x={L - 5} y={MESH.cy - 6} width={11} height={12} rx={2} fill="#0c1030" stroke={LEFT_DASH_COLOR} strokeWidth={1.6} filter="url(#cisoGlow)" />
-            <rect x={R - 6} y={MESH.cy - 6} width={11} height={12} rx={2} fill="#0c1030" stroke={RIGHT_DASH_COLOR} strokeWidth={1.6} filter="url(#cisoGlow)" />
-            <circle cx={L + 0.5} cy={MESH.cy} r={2.3} fill={LEFT_DASH_COLOR} filter="url(#cisoGlow)" />
-            <circle cx={R - 0.5} cy={MESH.cy} r={2.3} fill={RIGHT_DASH_COLOR} filter="url(#cisoGlow)" />
-          </>
-        );
-      })()}
+      {/* Plasma core: a soft purple→cyan nebula with a breathing nucleus and
+          no hard boundary — the cluster floats inside and the rails dissolve
+          into the glow. */}
+      <ellipse cx={MESH.cx - 66} cy={MESH.cy} rx={MESH.rx * 1.04} ry={MESH.ry * 0.98} fill="url(#plasmaPurple)" />
+      <ellipse cx={MESH.cx + 80} cy={MESH.cy} rx={MESH.rx * 0.98} ry={MESH.ry * 0.94} fill="url(#plasmaCyan)" />
+      <ellipse
+        cx={MESH.cx}
+        cy={MESH.cy - 8}
+        rx={MESH.rx * 0.62}
+        ry={MESH.ry * 0.62}
+        fill="url(#plasmaCore)"
+        className="cs-flow-pulse"
+        style={{ transformOrigin: `${MESH.cx}px ${MESH.cy}px` }}
+      />
 
       {/* Labeled-node ring (interconnection). */}
       <g fill="none" stroke="url(#meshGrad)" strokeWidth={1.4} strokeLinecap="round" opacity={0.55}>
@@ -456,8 +445,11 @@ function Connectors(): React.ReactElement {
         ))}
       </g>
 
-      {/* Rail source/target dots (the cluster ends terminate at the frame's
-          side I/O port jacks). */}
+      {/* Soft glow where the rails dissolve into the plasma core. */}
+      <ellipse cx={LEFT_MERGE.x} cy={LEFT_MERGE.y} rx={42} ry={42} fill="url(#dissolveL)" />
+      <ellipse cx={RIGHT_BRANCH.x} cy={RIGHT_BRANCH.y} rx={42} ry={42} fill="url(#dissolveR)" />
+
+      {/* Rail source/target dots (the outer ends at the rail items / cards). */}
       <g stroke="none">
         {LEFT_SOURCE_DOTS.map((d, i) => (
           <circle key={`ls${i}`} cx={d.x} cy={d.y} r={3.4} fill={LEFT_DASH_COLOR} />
