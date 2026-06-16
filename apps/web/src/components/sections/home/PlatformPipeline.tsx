@@ -1,7 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Section, Container } from "@/components/layout";
+import { FlowBeam } from "@/components/ui/FlowBeam";
 import { Reveal } from "@/components/ui/Reveal";
+import { ScaleToFit } from "@/components/ui/ScaleToFit";
+
+// Natural desktop width of the enclosure; ScaleToFit renders at this width and
+// scales the whole block down to fit narrower viewports (never stacks).
+const ENCLOSURE_DESIGN_WIDTH = 1058;
 
 type CardData = {
   /** Two-line title, split on the newline. */
@@ -198,7 +204,7 @@ function IntelligenceBar() {
 // Intelligence Centre bar.
 function FactoryEnclosure() {
   return (
-    <div className="relative mx-auto w-full max-w-[1058px]">
+    <div className="relative w-full">
       <div
         className="relative overflow-hidden"
         style={{
@@ -224,46 +230,31 @@ function FactoryEnclosure() {
 
         <DiagonalHatch opacity={0.3} />
 
-        <div className="relative flex flex-col p-4 sm:p-6 lg:p-[30px]">
+        <div className="relative flex flex-col p-[30px]">
           {/* Cards — a centered group, narrower than the bar below it. */}
           <div className="relative mx-auto w-full max-w-[732px]">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="grid grid-cols-3 gap-4">
               {CARDS.map((c, i) => (
-                <div
-                  key={c.title}
-                  className="mx-auto w-full max-w-[280px] sm:max-w-none"
-                >
+                <div key={c.title} className="w-full">
                   <FactoryCard data={c} isFirst={i === 0} />
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Connector flares — flush band between the cards and the bar (no
-              gap), so each beam's bright core spans edge-to-edge and reads as a
-              connection: the tapered ends tuck behind the cards (above) and the
-              bar (below). Hidden on mobile (single column). Columns at 25/50/75%. */}
+          {/* Connector beams — flush band between the cards and the bar, one
+              per card (25/50/75%), each a flowing dashed "current" tucked behind
+              the cards (above) and the bar (below). Phase-offset per lane for
+              life. Always shown: the layout never collapses to a single column. */}
           <div
             aria-hidden
-            className="relative hidden h-[38px] overflow-hidden sm:block"
+            className="relative h-[38px] overflow-hidden"
           >
-            {["25%", "50%", "75%"].map((x) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+            {["25%", "50%", "75%"].map((x, i) => (
+              <FlowBeam
                 key={x}
-                src="/images/cleanstart-factory/factory-beam.png"
-                alt=""
-                loading="lazy"
-                decoding="async"
-                className="pointer-events-none absolute top-1/2 select-none"
-                style={{
-                  left: x,
-                  width: 172,
-                  height: "auto",
-                  transform: "translate(-50%, -50%) scaleX(1.4)",
-                  mixBlendMode: "screen",
-                  filter: "brightness(1.4) saturate(1.25)",
-                }}
+                className="absolute inset-y-0 -translate-x-1/2"
+                style={{ left: x, ["--beam-delay" as string]: `${i * 0.12}s` }}
               />
             ))}
           </div>
@@ -309,7 +300,9 @@ export function PlatformPipeline() {
           </Reveal>
 
           <div className="mt-[44px]">
-            <FactoryEnclosure />
+            <ScaleToFit designWidth={ENCLOSURE_DESIGN_WIDTH}>
+              <FactoryEnclosure />
+            </ScaleToFit>
           </div>
 
           <div className="pb-[96px]" />

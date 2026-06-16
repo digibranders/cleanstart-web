@@ -3,9 +3,9 @@ import { Footer } from "@/components/sections/Footer";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { CisoHero } from "@/components/sections/ciso/CisoHero";
 import { CisoRisks } from "@/components/sections/ciso/CisoRisks";
-import { CisoOutcomes } from "@/components/sections/ciso/CisoOutcomes";
+import { CisoLifecycle } from "@/components/sections/ciso/CisoLifecycle";
 import { CisoEnterprise } from "@/components/sections/ciso/CisoEnterprise";
-import { CisoTestimonial } from "@/components/sections/ciso/CisoTestimonial";
+import { CisoTestimonialSpotlight } from "@/components/sections/ciso/CisoTestimonialSpotlight";
 import { CisoMetrics } from "@/components/sections/ciso/CisoMetrics";
 import { CisoCTA } from "@/components/sections/ciso/CisoCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
@@ -36,13 +36,13 @@ export default function ForCisoPage(): React.ReactElement {
           <CisoRisks />
         </FadeUp>
         <FadeUp>
-          <CisoOutcomes />
+          <CisoLifecycle />
         </FadeUp>
         <FadeUp>
           <CisoEnterprise />
         </FadeUp>
         <FadeUp>
-          <CisoTestimonial />
+          <CisoTestimonialSpotlight />
         </FadeUp>
         <FadeUp>
           <CisoMetrics />

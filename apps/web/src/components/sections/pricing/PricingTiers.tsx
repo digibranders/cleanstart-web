@@ -39,7 +39,7 @@ const TOP_TIERS: Tier[] = [
 
 const BOTTOM_TIER: Tier = {
   orb: "/images/pricing/orb-cleansight.png",
-  title: "Clean Sight",
+  title: "CleanSight",
   body: "Pre-built, optimized base images with near-zero CVEs and automatic versioned updates.",
   ctaLabel: "Contact Sales",
   ctaHref: "/contact-us",

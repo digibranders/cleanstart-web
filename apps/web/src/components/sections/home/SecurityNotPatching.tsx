@@ -1,5 +1,10 @@
 import { Reveal } from "@/components/ui/Reveal";
+import { ScaleToFit } from "@/components/ui/ScaleToFit";
 import { SecurityDiagram } from "./security/SecurityDiagram";
+
+// Natural desktop width of the diagram; ScaleToFit renders at this width and
+// scales the whole block down to fit narrower viewports (never stacks/wraps).
+const DIAGRAM_DESIGN_WIDTH = 1240;
 
 export function SecurityNotPatching() {
   return (
@@ -55,7 +60,9 @@ export function SecurityNotPatching() {
           </div>
         </Reveal>
 
-        <SecurityDiagram />
+        <ScaleToFit designWidth={DIAGRAM_DESIGN_WIDTH}>
+          <SecurityDiagram />
+        </ScaleToFit>
       </div>
     </section>
   );

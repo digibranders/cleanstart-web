@@ -4,6 +4,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { useInView, useReducedMotion } from "motion/react";
 
 import { cn } from "@/lib/cn";
+import { FlowArrow } from "@/components/ui/FlowArrow";
 import { ShieldCheck } from "./ShieldCheck";
 import { VerifyBeams } from "./VerifyBeams";
 
@@ -61,7 +62,7 @@ function StageItem({
       onMouseEnter={() => setHovered(index)}
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "cs-sec-rise flex w-[44%] flex-col items-center gap-4 text-center sm:w-[150px] lg:w-[166px]",
+        "cs-sec-rise flex w-[166px] flex-col items-center gap-4 text-center",
         dimmed && "cs-sec-dim",
       )}
       style={{ ["--d" as string]: `${index * 0.07}s` }}
@@ -99,7 +100,7 @@ function GuaranteeItem({
       onMouseEnter={() => setHovered(index)}
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "cs-sec-rise relative z-10 flex w-[44%] flex-col items-center gap-4 text-center sm:w-[160px] lg:w-[176px]",
+        "cs-sec-rise relative z-10 flex w-[176px] flex-col items-center gap-4 text-center",
         dimmed && "cs-sec-dim",
       )}
       style={{
@@ -157,7 +158,7 @@ export function SecurityDiagram(): React.ReactElement {
     <div
       ref={ref}
       className={cn(
-        "relative mx-auto mt-14 max-w-[1240px]",
+        "relative mt-14 w-full",
         on && "cs-sec-on",
         anim && "cs-sec-anim",
       )}
@@ -167,7 +168,7 @@ export function SecurityDiagram(): React.ReactElement {
           frame while the arrows/stages animate, which produced GPU tile-seam
           lines on real hardware (invisible in the software-rendered preview). */}
       <div
-        className="relative isolate overflow-hidden rounded-[24px] border border-[#dab6f3] px-5 py-7 sm:px-8 sm:py-8"
+        className="relative isolate overflow-hidden rounded-[24px] border border-[#dab6f3] px-8 py-8"
         style={{
           background:
             "linear-gradient(100deg, rgba(217,217,217,0.22) 0%, rgba(80,80,80,0.04) 100%)",
@@ -183,20 +184,14 @@ export function SecurityDiagram(): React.ReactElement {
             mixBlendMode: "overlay",
           }}
         />
-        <div className="relative z-10 flex flex-wrap items-start justify-center gap-x-3 gap-y-9 lg:flex-nowrap lg:justify-between">
+        <div className="relative z-10 flex flex-nowrap items-start justify-between gap-x-3">
           {STAGES.map((stage, i) => (
             <Fragment key={stage.title}>
               <StageItem stage={stage} index={i} hovered={hovered} setHovered={setHovered} />
               {i < STAGES.length - 1 && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src="/images/security/icon-arrow.svg"
-                  alt=""
-                  aria-hidden
-                  loading="lazy"
-                  decoding="async"
-                  className="cs-sec-arrow mt-3 hidden size-7 shrink-0 select-none opacity-70 lg:block"
-                  style={{ ["--af" as string]: `${i * 0.18}s` }}
+                <FlowArrow
+                  className="mt-3 flex h-7 shrink-0"
+                  style={{ ["--arrow-delay" as string]: `${i * 0.12}s` }}
                 />
               )}
             </Fragment>
@@ -228,19 +223,22 @@ export function SecurityDiagram(): React.ReactElement {
             mixBlendMode: "screen",
           }}
         />
+        {/* Specular sheen — a soft diagonal glint that eases across, then rests.
+            The gradient is pre-softened (no filter: blur) so the sweep animates
+            on transform/opacity only and stays GPU-composited (no stutter). */}
         <div
           aria-hidden
           className="cs-sec-sheen pointer-events-none absolute"
           style={{
             top: "-25%",
             bottom: "-25%",
-            left: "-40%",
-            width: "42%",
+            left: "-48%",
+            width: "52%",
             background:
-              "linear-gradient(100deg, transparent 0%, rgba(150,190,255,0.18) 46%, rgba(196,220,255,0.30) 50%, rgba(150,190,255,0.18) 54%, transparent 100%)",
-            filter: "blur(7px)",
+              "linear-gradient(100deg, transparent 0%, rgba(178,206,255,0.09) 38%, rgba(212,230,255,0.20) 50%, rgba(178,206,255,0.09) 62%, transparent 100%)",
             mixBlendMode: "screen",
             transform: "rotate(9deg)",
+            willChange: "transform, opacity",
           }}
         />
         <div
@@ -252,15 +250,15 @@ export function SecurityDiagram(): React.ReactElement {
           }}
         />
 
-        <div className="relative flex flex-col gap-5 px-6 pb-6 pt-7 sm:px-8 sm:pb-6 sm:pt-8 lg:gap-6 lg:px-10 lg:pb-6 lg:pt-9">
-          <div className="flex flex-wrap items-start justify-center gap-x-2 gap-y-10 lg:flex-nowrap lg:justify-between">
+        <div className="relative flex flex-col gap-6 px-10 pb-6 pt-9">
+          <div className="flex flex-nowrap items-start justify-between gap-x-2">
             {GUARANTEES.map((item, i) => (
               <Fragment key={item.title}>
                 <GuaranteeItem item={item} index={i} hovered={hovered} setHovered={setHovered} />
                 {i < GUARANTEES.length - 1 && (
                   <div
                     aria-hidden
-                    className="hidden h-[120px] w-px shrink-0 self-center lg:block"
+                    className="block h-[120px] w-px shrink-0 self-center"
                     style={{
                       background:
                         "linear-gradient(to bottom, transparent, rgba(255,255,255,0.18), transparent)",

@@ -1258,20 +1258,27 @@ body {
   from { stroke-dashoffset: 30; }
   to { stroke-dashoffset: 0; }
 }
-@keyframes cs-sec-beam-flow {
-  to { background-position: 0 var(--cs-beam-period, 18px); }
+/* Flowing "current" beam (Platform pipeline + Security). The dashed track is
+   translated by exactly one dash period (18px), so the loop is seamless; using
+   transform keeps it GPU-composited and free of stutter/jerk. */
+@keyframes cs-flow-beam {
+  to { transform: translateY(18px); }
 }
 @keyframes cs-sec-breathe {
   0%, 100% { opacity: 0.3; transform: scale(0.9); }
   50% { opacity: 0.62; transform: scale(1.08); }
 }
 @keyframes cs-sec-sheen {
-  0% { transform: translateX(0) rotate(9deg); }
-  100% { transform: translateX(340%) rotate(9deg); }
+  0% { transform: translateX(0) rotate(9deg); opacity: 0; }
+  9% { opacity: 1; }
+  40% { opacity: 1; }
+  48% { transform: translateX(320%) rotate(9deg); opacity: 0; }
+  100% { transform: translateX(320%) rotate(9deg); opacity: 0; }
 }
-@keyframes cs-sec-arrow-flow {
-  0%, 100% { opacity: 0.4; transform: translateX(-2px); }
-  50% { opacity: 0.95; transform: translateX(2px); }
+/* Lifecycle arrow tail — dots flow rightward by one dot period (seamless,
+   GPU-composited) toward a static chevron head. See FlowArrow.tsx. */
+@keyframes cs-flow-arrow {
+  to { transform: translateX(6px); }
 }
 
 /* Pre-trigger hidden states (motion allowed). */
@@ -1297,21 +1304,27 @@ body {
   animation-delay: calc(var(--d, 0s) + 0.25s);
 }
 
-/* Ambient loops (on-screen only). */
-.cs-sec-anim .cs-sec-beam {
-  animation: cs-sec-beam-flow 0.8s linear infinite;
-  animation-delay: var(--ld, 0s);
+/* Shared flowing-beam track (see FlowBeam.tsx). Always on; GPU-composited. */
+.cs-flow-beam {
+  animation: cs-flow-beam 0.8s linear infinite;
+  animation-delay: var(--beam-delay, 0s);
+  will-change: transform;
 }
+
+/* Ambient loops (on-screen only). */
 .cs-sec-anim .cs-sec-shield-halo {
   animation: cs-sec-breathe 3.4s ease-in-out infinite;
   animation-delay: var(--ld, 0s);
 }
 .cs-sec-anim .cs-sec-sheen {
-  animation: cs-sec-sheen 7.5s linear infinite;
+  animation: cs-sec-sheen 8s ease-in-out infinite;
 }
-.cs-sec-anim .cs-sec-arrow {
-  animation: cs-sec-arrow-flow 2.2s ease-in-out infinite;
-  animation-delay: var(--af, 0s);
+
+/* Shared flowing-arrow tail (see FlowArrow.tsx). Always on; GPU-composited. */
+.cs-flow-arrow {
+  animation: cs-flow-arrow 0.7s linear infinite;
+  animation-delay: var(--arrow-delay, 0s);
+  will-change: transform;
 }
 
 /* Hover lane-linking. */
@@ -1323,9 +1336,9 @@ body {
   .cs-sec-shield { animation: none !important; opacity: 1 !important; transform: none !important; }
   .cs-sec-check { animation: none !important; stroke-dashoffset: 0 !important; }
   .cs-sec-shield-halo { animation: none !important; opacity: 0.4 !important; }
-  .cs-sec-beam { animation: none !important; }
+  .cs-flow-beam { animation: none !important; }
+  .cs-flow-arrow { animation: none !important; }
   .cs-sec-sheen { display: none !important; }
-  .cs-sec-arrow { animation: none !important; }
 }
 
 /* FAQ answer drawer — kept minimal; height + opacity are driven by inline
@@ -2411,6 +2424,34 @@ body {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
+}
+
+/* 1px gradient hairline border. Paints the brand cyan→blue→violet stroke as
+   a ring around any rounded element via the mask-composite trick — the
+   gradient fills a padded box, then content-box and border-box masks are
+   XOR-composited so only the 1px frame survives. Pairs with a translucent
+   glass fill on the host element. */
+.cs-grad-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(51, 186, 236, 0.6) 0%,
+    rgba(111, 141, 255, 0.28) 50%,
+    rgba(177, 156, 255, 0.6) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 /* Brand-cyan stroke for icon-only SVG glyphs (Lucide, Heroicons, etc.).

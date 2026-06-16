@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { FlowArrow } from "@/components/ui/FlowArrow";
 import { Reveal } from "@/components/ui/Reveal";
 
 type Step = { icon: string; title: string; tagline: string; desc: string };
@@ -111,14 +112,10 @@ export function ProcessBand() {
               <Fragment key={step.title}>
                 <StepItem step={step} />
                 {i < STEPS.length - 1 && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src="/images/process/icon-arrow.svg"
-                    alt=""
-                    aria-hidden
-                    loading="lazy"
-                    decoding="async"
-                    className="hidden size-9 shrink-0 select-none self-center opacity-80 lg:block"
+                  <FlowArrow
+                    scale={1.4}
+                    className="hidden shrink-0 self-center lg:flex"
+                    style={{ ["--arrow-delay" as string]: `${i * 0.12}s` }}
                   />
                 )}
               </Fragment>
