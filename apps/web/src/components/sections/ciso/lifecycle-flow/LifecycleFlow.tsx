@@ -5,7 +5,6 @@ import {
   PALETTE,
   NODES,
   SPOKES,
-  RING_LINKS,
   MESH,
   MESH_BBOX,
   LEFT_ICON,
@@ -393,25 +392,29 @@ function Connectors(): React.ReactElement {
 
       <rect width={VB.w} height={VB.h} fill="url(#cisoGrid)" />
 
-      {/* Plasma core: a soft purple→cyan nebula with a breathing nucleus and
-          no hard boundary — the cluster floats inside and the rails dissolve
-          into the glow. */}
-      <ellipse cx={MESH.cx - 66} cy={MESH.cy} rx={MESH.rx * 1.04} ry={MESH.ry * 0.98} fill="url(#plasmaPurple)" />
-      <ellipse cx={MESH.cx + 80} cy={MESH.cy} rx={MESH.rx * 0.98} ry={MESH.ry * 0.94} fill="url(#plasmaCyan)" />
+      {/* Orbital nucleus: a glowing core with three tilted orbit rings (atom
+          motif) framing the cluster. */}
       <ellipse
         cx={MESH.cx}
-        cy={MESH.cy - 8}
-        rx={MESH.rx * 0.62}
-        ry={MESH.ry * 0.62}
+        cy={MESH.cy}
+        rx={172}
+        ry={150}
         fill="url(#plasmaCore)"
         className="cs-flow-pulse"
         style={{ transformOrigin: `${MESH.cx}px ${MESH.cy}px` }}
       />
-
-      {/* Labeled-node ring (interconnection). */}
-      <g fill="none" stroke="url(#meshGrad)" strokeWidth={1.4} strokeLinecap="round" opacity={0.55}>
-        {RING_LINKS.map((d, i) => (
-          <path key={`rl${i}`} d={d} />
+      <g fill="none" stroke="url(#meshGrad)" filter="url(#cisoGlow)">
+        {[0, 60, 120].map((a) => (
+          <ellipse
+            key={a}
+            cx={MESH.cx}
+            cy={MESH.cy}
+            rx={224}
+            ry={92}
+            strokeWidth={1.3}
+            opacity={0.28}
+            transform={`rotate(${a} ${MESH.cx} ${MESH.cy})`}
+          />
         ))}
       </g>
 
