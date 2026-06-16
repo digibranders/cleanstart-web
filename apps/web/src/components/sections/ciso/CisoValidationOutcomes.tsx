@@ -9,12 +9,19 @@ import { HOME_TESTIMONIALS } from "@/components/sections/home/Testimonials";
 
 /*
  * "Customer Validation" + "Outcomes That Matter" — the CISO page's proof block,
- * merged into one component. Two semantic <section>s flow as a single dark
- * gradient run: the testimonial spotlight (#120D1F → #151021) hands off to the
- * outcomes stats band (#151021 → #471EC0) with no seam. The outcomes section is
- * the last section before <Footer cta>, so it owns the card-overlap reservation
- * (`paddingBottom: var(--spacing-section-cta)`) and its gradient fills it.
+ * merged into one component. A single wrapper paints ONE continuous dark
+ * gradient (#120D1F → #151021 → #131E8F → #471EC0) spanning both semantic
+ * <section>s, so there is no seam where two separately-scaled gradients meet.
+ * The inner sections are transparent; the wrapper's gradient also fills the
+ * outcomes section's `paddingBottom: var(--spacing-section-cta)` card-overlap
+ * reservation (this is the last block before <Footer cta>).
  */
+
+// One gradient for the whole block. Stops are tuned so the deep #151021 sits
+// around the testimonial card, ramping to brand violet through the stats/CTA
+// zone at the bottom where the Footer card overlaps.
+const BLOCK_BACKGROUND =
+  "linear-gradient(180deg, #120D1F 0%, #151021 50%, #131E8F 82%, #471EC0 100%)";
 
 const CISO_VOICE = HOME_TESTIMONIALS.find((t) => t.role.includes("CISO"));
 
@@ -37,10 +44,13 @@ const STATS: Stat[] = [
 
 export function CisoValidationOutcomes(): React.ReactElement {
   return (
-    <>
+    <div
+      className="relative w-full overflow-hidden"
+      style={{ background: BLOCK_BACKGROUND }}
+    >
       {CISO_VOICE && <ValidationSpotlight />}
       <OutcomesBand />
-    </>
+    </div>
   );
 }
 
@@ -52,9 +62,6 @@ function ValidationSpotlight(): React.ReactElement | null {
     <section
       aria-label="Customer validation"
       className="relative w-full overflow-hidden pt-section-sm text-white"
-      style={{
-        background: "linear-gradient(180deg, #120D1F 0%, #150F23 55%, #151021 100%)",
-      }}
     >
       {/* Ambient aura — cyan→violet radial glow behind the card. Pure CSS,
           screen-blended so it lifts the deep band without a hard edge. */}
@@ -249,8 +256,6 @@ function OutcomesBand(): React.ReactElement {
       data-section="CisoOutcomes"
       className="relative overflow-hidden text-white"
       style={{
-        background:
-          "linear-gradient(180deg, #151021 0%, #131e8f 62.497%, #471ec0 100%)",
         paddingTop: "clamp(64px, 6.25vw, 120px)",
         paddingBottom: "var(--spacing-section-cta)",
       }}

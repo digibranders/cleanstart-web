@@ -53,6 +53,15 @@ const titleStyle = {
   letterSpacing: "-0.03em",
 } as const;
 
+/* Guarantee-card titles use the smaller h4 role: the cards are boxed and dense,
+   so the longest words ("Dependencies", "Reproducible") would otherwise overrun
+   the card walls at the h3 size. Stage titles above keep h3 (they aren't boxed). */
+const cardTitleStyle = {
+  fontSize: "var(--fs-h4)",
+  lineHeight: 1.12,
+  letterSpacing: "-0.02em",
+} as const;
+
 const descStyle = {
   fontFamily: "var(--font-sora), Sora, sans-serif",
   fontSize: "var(--fs-body)",
@@ -129,7 +138,7 @@ function GuaranteeCard({
       onMouseLeave={() => setHovered(null)}
       data-built={built ? "true" : undefined}
       className={cn(
-        "cs-sec-rise cs-sec-card relative z-10 flex w-[182px] flex-col items-center justify-center px-4 py-6 text-center",
+        "cs-sec-rise cs-sec-card relative z-10 flex flex-col items-center justify-center px-3 py-6 text-center",
         dimmed && "cs-sec-dim",
       )}
       style={{ ["--d" as string]: `${0.5 + index * 0.09}s` }}
@@ -140,7 +149,7 @@ function GuaranteeCard({
           <ShieldCheck className="cs-sec-shield relative size-[68px] select-none" />
         </div>
         <div className="flex flex-col gap-2">
-          <h3 className="font-display font-semibold text-white" style={titleStyle}>
+          <h3 className="font-display font-semibold text-white" style={cardTitleStyle}>
             {item.title}
           </h3>
           <p className="text-white/70" style={descStyle}>
@@ -388,8 +397,11 @@ export function SecurityDiagram(): React.ReactElement {
           className="cs-sec-flood pointer-events-none absolute inset-0"
         />
 
-        <div className="relative flex flex-col gap-6 px-10 pb-6 pt-9">
-          <div className="flex flex-nowrap items-stretch justify-between gap-x-3">
+        <div className="relative flex flex-col gap-6 px-[18px] pb-6 pt-9">
+          {/* 6-up grid: even columns with gap === the container's side padding,
+              so the left gutter, every inter-card gap, and the right gutter are
+              all identical (18px). Cards auto-size equally to fill. */}
+          <div className="grid grid-cols-6 items-stretch gap-[18px]">
             {GUARANTEES.map((item, i) => (
               <GuaranteeCard
                 key={item.title}

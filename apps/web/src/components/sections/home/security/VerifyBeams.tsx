@@ -46,7 +46,7 @@ export function VerifyBeams({
 }: VerifyBeamsProps): React.ReactElement {
   return (
     <div aria-hidden className="relative w-full" style={{ height: STRIP_H }}>
-      <div className="absolute inset-0 flex flex-nowrap justify-between px-10">
+      <div className="absolute inset-0 grid grid-cols-6 gap-[18px] px-[18px]">
         {LANES.map((i) => {
           const dimmed = hovered !== null && hovered !== i;
           const established = dotted.has(i);
@@ -54,7 +54,7 @@ export function VerifyBeams({
             <div
               key={i}
               className={cn(
-                "relative flex w-[182px] justify-center transition-opacity duration-300",
+                "relative flex justify-center transition-opacity duration-300",
                 dimmed && "cs-sec-dim",
               )}
             >
