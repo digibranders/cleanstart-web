@@ -399,7 +399,11 @@ function Connectors(): React.ReactElement {
       <style>{
         "@keyframes cisoOrbitSpin{to{transform:rotate(360deg)}}" +
         ".ciso-orbit{animation:cisoOrbitSpin 100s linear infinite;transform-box:fill-box;transform-origin:center}" +
-        "@media (prefers-reduced-motion:reduce){.ciso-orbit{animation:none}}"
+        // Rail "current": slower than the shared cs-flow-dash; offset -33 is a
+        // whole multiple of the 11-unit dash period so the slow loop stays seamless.
+        "@keyframes cisoRailFlow{from{stroke-dashoffset:0}to{stroke-dashoffset:-33}}" +
+        ".ciso-rail{animation:cisoRailFlow 2.6s linear infinite}" +
+        "@media (prefers-reduced-motion:reduce){.ciso-orbit,.ciso-rail{animation:none}}"
       }</style>
       <ellipse
         cx={MESH.cx}
@@ -448,10 +452,10 @@ function Connectors(): React.ReactElement {
       {/* Flowing dashed fans (sources → merge, branch → cards). */}
       <g fill="none" strokeWidth={2.2} strokeLinecap="round" filter="url(#cisoGlow)">
         {LEFT_FANS.map((d, i) => (
-          <path key={`lf${i}`} d={d} stroke={LEFT_DASH_COLOR} strokeDasharray="2 9" className="cs-flow-dash" />
+          <path key={`lf${i}`} d={d} stroke={LEFT_DASH_COLOR} strokeDasharray="2 9" className="ciso-rail" />
         ))}
         {RIGHT_FANS.map((d, i) => (
-          <path key={`rf${i}`} d={d} stroke={RIGHT_DASH_COLOR} strokeDasharray="2 9" className="cs-flow-dash" />
+          <path key={`rf${i}`} d={d} stroke={RIGHT_DASH_COLOR} strokeDasharray="2 9" className="ciso-rail" />
         ))}
       </g>
 

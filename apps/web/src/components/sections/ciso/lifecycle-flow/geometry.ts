@@ -187,8 +187,10 @@ export const LEFT_SOURCE_DOTS: Pt[] = LEFT_ITEMS.map((item, i) => ({
   x: LEFT_SOURCE_X[i] ?? 332,
   y: item.cy,
 }));
-export const LEFT_MERGE: Pt = { x: MESH.cx - MESH.rx, y: MESH.cy };
-export const RIGHT_BRANCH: Pt = { x: MESH.cx + MESH.rx, y: MESH.cy };
+/** Rail convergence points — pulled in close to the inner graph (just outside
+ *  the orbit edge / side nodes) rather than at the far cloud edge. */
+export const LEFT_MERGE: Pt = { x: MESH.cx - 230, y: MESH.cy };
+export const RIGHT_BRANCH: Pt = { x: MESH.cx + 230, y: MESH.cy };
 export const LEFT_FANS: string[] = LEFT_SOURCE_DOTS.map((s) => sCurve(s, LEFT_MERGE));
 
 export const RIGHT_TARGET_DOTS: Pt[] = RIGHT_ITEMS.map((item) => ({
