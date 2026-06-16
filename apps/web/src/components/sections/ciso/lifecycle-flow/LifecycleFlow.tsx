@@ -8,16 +8,13 @@ import {
   RING_LINKS,
   MESH,
   MESH_BBOX,
-  HEX_POINTS,
   LEFT_ICON,
   LEFT_ITEMS,
   LEFT_FANS,
   LEFT_SOURCE_DOTS,
-  LEFT_MERGE,
   RIGHT_ITEMS,
   RIGHT_FANS,
   RIGHT_TARGET_DOTS,
-  RIGHT_BRANCH,
   CARD,
   GOV_PANEL,
   GOV_ITEMS,
@@ -381,27 +378,43 @@ function Connectors(): React.ReactElement {
       <rect width={VB.w} height={VB.h} fill="url(#cisoGrid)" />
 
       {(() => {
-        const hex = HEX_POINTS.map((p) => p.join(",")).join(" ");
-        const inner = HEX_POINTS.map(
-          ([x, y]) =>
-            `${(MESH.cx + (x - MESH.cx) * 0.95).toFixed(1)},${(MESH.cy + (y - MESH.cy) * 0.95).toFixed(1)}`,
-        ).join(" ");
-        // Top-left lit edges: left point → top-left → top-right.
-        const rimLight = [HEX_POINTS[5], HEX_POINTS[0], HEX_POINTS[1]]
-          .map((p) => (p ? p.join(",") : ""))
-          .join(" ");
+        const L = MESH.cx - MESH.rx;
+        const R = MESH.cx + MESH.rx;
+        const T = MESH.cy - MESH.ry;
+        const B = MESH.cy + MESH.ry;
+        const rad = 16;
+        const arm = 44;
+        // L-shaped corner brackets that hug the rounded corners.
+        const brackets = [
+          `M ${L} ${T + arm} L ${L} ${T + rad} Q ${L} ${T} ${L + rad} ${T} L ${L + arm} ${T}`,
+          `M ${R - arm} ${T} L ${R - rad} ${T} Q ${R} ${T} ${R} ${T + rad} L ${R} ${T + arm}`,
+          `M ${R} ${B - arm} L ${R} ${B - rad} Q ${R} ${B} ${R - rad} ${B} L ${R - arm} ${B}`,
+          `M ${L + arm} ${B} L ${L + rad} ${B} Q ${L} ${B} ${L} ${B - rad} L ${L} ${B - arm}`,
+        ];
+        const ticks = [0.3, 0.42, 0.58, 0.7];
         return (
           <>
-            {/* Secure enclave: soft bloom, glass fill, glowing rim, inner
-                frame, top-left rim light, and corner accent nodes. */}
-            <polygon points={hex} fill="none" stroke="url(#meshGrad)" strokeWidth={6} strokeLinejoin="round" opacity={0.32} filter="url(#orbSoft)" />
-            <polygon points={hex} fill="url(#orbBody)" strokeLinejoin="round" />
-            <polygon points={hex} fill="none" stroke="url(#meshGrad)" strokeWidth={2.2} strokeLinejoin="round" opacity={0.95} filter="url(#cisoGlow)" />
-            <polygon points={inner} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={1} strokeLinejoin="round" />
-            <polyline points={rimLight} fill="none" stroke="rgba(214,224,255,0.5)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" opacity={0.5} filter="url(#orbSoft)" />
-            {[HEX_POINTS[0], HEX_POINTS[1], HEX_POINTS[3], HEX_POINTS[4]].map((p, i) =>
-              p ? <circle key={`hc${i}`} cx={p[0]} cy={p[1]} r={2.8} fill="#cbb6ff" filter="url(#cisoGlow)" /> : null,
-            )}
+            {/* HUD console frame: glass fill, faint full outline, edge ticks,
+                glowing corner brackets, and side I/O port jacks. */}
+            <rect x={L} y={T} width={R - L} height={B - T} rx={rad} fill="url(#orbBody)" />
+            <rect x={L} y={T} width={R - L} height={B - T} rx={rad} fill="none" stroke="rgba(150,170,230,0.16)" strokeWidth={1} />
+            <g stroke="rgba(150,170,230,0.32)" strokeWidth={1}>
+              {ticks.map((f) => (
+                <g key={`tk${f}`}>
+                  <line x1={L + (R - L) * f} y1={T} x2={L + (R - L) * f} y2={T + 6} />
+                  <line x1={L + (R - L) * f} y1={B} x2={L + (R - L) * f} y2={B - 6} />
+                </g>
+              ))}
+            </g>
+            <g fill="none" stroke="url(#meshGrad)" strokeWidth={2.6} strokeLinecap="round" filter="url(#cisoGlow)">
+              {brackets.map((d, i) => (
+                <path key={`br${i}`} d={d} />
+              ))}
+            </g>
+            <rect x={L - 5} y={MESH.cy - 6} width={11} height={12} rx={2} fill="#0c1030" stroke={LEFT_DASH_COLOR} strokeWidth={1.6} filter="url(#cisoGlow)" />
+            <rect x={R - 6} y={MESH.cy - 6} width={11} height={12} rx={2} fill="#0c1030" stroke={RIGHT_DASH_COLOR} strokeWidth={1.6} filter="url(#cisoGlow)" />
+            <circle cx={L + 0.5} cy={MESH.cy} r={2.3} fill={LEFT_DASH_COLOR} filter="url(#cisoGlow)" />
+            <circle cx={R - 0.5} cy={MESH.cy} r={2.3} fill={RIGHT_DASH_COLOR} filter="url(#cisoGlow)" />
           </>
         );
       })()}
@@ -443,8 +456,8 @@ function Connectors(): React.ReactElement {
         ))}
       </g>
 
-      {/* Rail source/target dots + the I/O ports where the rails meet the
-          system sphere's rim. */}
+      {/* Rail source/target dots (the cluster ends terminate at the frame's
+          side I/O port jacks). */}
       <g stroke="none">
         {LEFT_SOURCE_DOTS.map((d, i) => (
           <circle key={`ls${i}`} cx={d.x} cy={d.y} r={3.4} fill={LEFT_DASH_COLOR} />
@@ -452,8 +465,6 @@ function Connectors(): React.ReactElement {
         {RIGHT_TARGET_DOTS.map((d, i) => (
           <circle key={`rt${i}`} cx={d.x} cy={d.y} r={3.4} fill={RIGHT_DASH_COLOR} />
         ))}
-        <circle cx={LEFT_MERGE.x} cy={LEFT_MERGE.y} r={4.6} fill={LEFT_DASH_COLOR} filter="url(#cisoGlow)" />
-        <circle cx={RIGHT_BRANCH.x} cy={RIGHT_BRANCH.y} r={4.6} fill={RIGHT_DASH_COLOR} filter="url(#cisoGlow)" />
       </g>
     </svg>
   );

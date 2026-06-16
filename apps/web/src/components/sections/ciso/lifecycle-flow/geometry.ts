@@ -206,17 +206,20 @@ export interface GovItemDef {
 }
 
 /** Bottom "Continuous Governance Layer" panel box. */
-export const GOV_PANEL = { x: 60, y: 488, w: 1156, h: 142 } as const;
+/** Spans the diagram's full width (left-rail edge → right-card edge). */
+export const GOV_PANEL = { x: 32, y: 488, w: 1242, h: 142 } as const;
 
+/** Four 252-wide item cells on an even 299 pitch, with the left/right edge
+ *  margins (~47) equal to the inter-item gaps (~47) — fully equispaced. */
 export const GOV_ITEMS: GovItemDef[] = [
-  { cx: 150, title: "Continuous Visibility", desc: ["See everything.", "Continuously."] },
-  { cx: 432, title: "Provenance & Integrity", desc: ["Know the origin.", "Trust the path."] },
-  { cx: 714, title: "Policy Enforcement", desc: ["Enforce standards.", "Reduce risk."] },
-  { cx: 988, title: "Compliance Evidence", desc: ["Generate audit-ready", "proof. Instantly."] },
+  { cx: 79, title: "Continuous Visibility", desc: ["See everything.", "Continuously."] },
+  { cx: 378, title: "Provenance & Integrity", desc: ["Know the origin.", "Trust the path."] },
+  { cx: 677, title: "Policy Enforcement", desc: ["Enforce standards.", "Reduce risk."] },
+  { cx: 976, title: "Compliance Evidence", desc: ["Generate audit-ready", "proof. Instantly."] },
 ];
 
 /** Vertical dividers between the four governance items (view-box X). */
-export const GOV_DIVIDERS = [294, 576, 852] as const;
+export const GOV_DIVIDERS = [354, 653, 952] as const;
 
 export const GOV_TITLE_Y = 522;
 export const GOV_ROW_Y = 582;
