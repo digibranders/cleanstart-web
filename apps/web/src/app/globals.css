@@ -1275,17 +1275,14 @@ body {
   86% { opacity: 1; }
   100% { transform: translateY(var(--travel, 60px)); opacity: 0; }
 }
-/* Brief flash on the lane rail as the packet lands on its card. */
+/* Fixed-position glow that blooms exactly where the comet lands — centred on
+   the landing point via margins, so it only scales (from its own centre) and
+   never drifts off the comet's stop position. */
 @keyframes cs-sec-land {
-  0% { opacity: 0; transform: translateX(-50%) scale(0.4); }
-  40% { opacity: 1; }
-  100% { opacity: 0; transform: translateX(-50%) scale(1.6); }
-}
-/* Guarantee card "pops" the instant its trust packet lands. */
-@keyframes cs-sec-card-pop {
-  0% { transform: translateY(-4px) scale(1); }
-  45% { transform: translateY(-9px) scale(1.035); }
-  100% { transform: translateY(-4px) scale(1); }
+  0% { opacity: 0; transform: scale(0.6); }
+  22% { opacity: 1; transform: scale(1.08); }
+  60% { opacity: 0.95; transform: scale(0.96); }
+  100% { opacity: 0; transform: scale(1.05); }
 }
 /* Wordmark ignition at the cascade climax. */
 @keyframes cs-sec-ignite {
@@ -1322,30 +1319,20 @@ body {
 }
 .cs-sec-stage[data-lit="true"] .cs-sec-stage-halo { opacity: 0.9; transform: scale(1.15); }
 
-/* Guarantee card (B) — a real box that BUILDS IN on cue. At rest it's a faint
-   empty frame (layout-stable, no CLS); when its trust packet lands the frame
-   ignites, the interior materialises (cs-sec-card-inner) and the shield draws
-   its check. `data-built` is the persistent activated state; `data-pop` fires a
-   one-shot bounce the instant the packet lands. */
+/* Guarantee card (B) — a PERMANENT, STABLE box. The frame never moves, lifts or
+   recolours: it's a fixed backdrop. Only its interior (cs-sec-card-inner) changes
+   — the content fades in when its lane is verified, fades out at cycle reset. No
+   transform on the box itself, so the grid is rock-steady the whole cycle. */
 .cs-sec-card {
   border-radius: 20px;
-  border: 1px solid rgba(150, 185, 255, 0.10);
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.022) 0%, rgba(255, 255, 255, 0.004) 100%);
-  transition: transform 0.6s cubic-bezier(0.2,0.7,0.2,1), border-color 0.55s ease, background 0.55s ease, box-shadow 0.6s ease;
-}
-.cs-sec-card[data-built="true"] {
-  transform: translateY(-4px);
-  border-color: rgba(120, 200, 255, 0.55);
-  background: linear-gradient(160deg, rgba(96, 156, 255, 0.16) 0%, rgba(45, 224, 166, 0.06) 100%);
-  box-shadow: 0 14px 38px -12px rgba(60, 150, 255, 0.55), inset 0 0 0 1px rgba(150, 210, 255, 0.20);
-}
-.cs-sec-card[data-pop="true"] {
-  animation: cs-sec-card-pop 0.7s cubic-bezier(0.2,0.7,0.2,1);
+  border: 1px solid rgba(150, 185, 255, 0.16);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.012) 100%);
+  box-shadow: inset 0 0 0 1px rgba(150, 210, 255, 0.05);
 }
 .cs-sec-card-inner {
   opacity: 0;
-  transform: translateY(12px) scale(0.97);
-  transition: opacity 0.55s ease, transform 0.6s cubic-bezier(0.2,0.7,0.2,1);
+  transform: translateY(8px);
+  transition: opacity 0.45s ease, transform 0.5s cubic-bezier(0.2,0.7,0.2,1);
 }
 .cs-sec-card[data-built="true"] .cs-sec-card-inner { opacity: 1; transform: none; }
 
@@ -1398,7 +1385,7 @@ body {
   will-change: transform, opacity;
 }
 .cs-sec-land {
-  animation: cs-sec-land 0.6s ease-out forwards;
+  animation: cs-sec-land 0.85s ease-out forwards;
   will-change: transform, opacity;
 }
 
@@ -1408,6 +1395,24 @@ body {
   to { opacity: 1; }
 }
 .cs-sec-thread { animation: cs-sec-thread-in 0.5s ease both; }
+
+/* Lifecycle arrows fire sequentially as the verification wave moves forward:
+   faint at rest, each brightens with a one-shot surge as its stage is reached,
+   then holds lit until the cycle resets. */
+@keyframes cs-sec-arrow-surge {
+  0% { filter: drop-shadow(0 0 0 rgba(160, 210, 255, 0)); }
+  40% { filter: drop-shadow(0 0 12px rgba(190, 228, 255, 0.95)); }
+  100% { filter: drop-shadow(0 0 6px rgba(150, 205, 255, 0.65)); }
+}
+.cs-sec-arrow {
+  opacity: 0.3;
+  transition: opacity 0.5s ease, filter 0.5s ease;
+}
+.cs-sec-arrow-on {
+  opacity: 1;
+  filter: drop-shadow(0 0 6px rgba(150, 205, 255, 0.65));
+  animation: cs-sec-arrow-surge 0.6s ease-out;
+}
 
 /* Shared flowing-beam track (see FlowBeam.tsx — Platform pipeline). */
 .cs-flow-beam {
@@ -1451,6 +1456,8 @@ body {
   .cs-sec-packet,
   .cs-sec-land { display: none !important; }
   .cs-sec-thread { animation: none !important; opacity: 1 !important; }
+  .cs-sec-arrow { opacity: 1 !important; filter: none !important; }
+  .cs-sec-arrow-on { animation: none !important; }
   .cs-flow-beam,
   .cs-flow-arrow { animation: none !important; }
   .cs-sec-sheen { display: none !important; }

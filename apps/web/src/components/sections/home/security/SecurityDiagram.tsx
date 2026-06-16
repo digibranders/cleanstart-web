@@ -41,7 +41,8 @@ const LANE_COUNT = STAGES.length;
 const LANE_GAP = 1200;
 const TRAVEL = 1000;
 const START_DELAY = 450;
-const POP_HOLD = 700;
+/* Beat between the landing glow and the dotted-current + card-content reveal. */
+const GLOW_LEAD = 150;
 const CLIMAX_AT = (LANE_COUNT - 1) * LANE_GAP + TRAVEL + 400;
 const RESET_AT = CLIMAX_AT + 1900;
 const CYCLE = RESET_AT + 800;
@@ -114,14 +115,12 @@ function GuaranteeCard({
   item,
   index,
   built,
-  pop,
   hovered,
   setHovered,
 }: {
   item: Guarantee;
   index: number;
   built: boolean;
-  pop: boolean;
 } & LaneState): React.ReactElement {
   const dimmed = hovered !== null && hovered !== index;
   return (
@@ -129,7 +128,6 @@ function GuaranteeCard({
       onMouseEnter={() => setHovered(index)}
       onMouseLeave={() => setHovered(null)}
       data-built={built ? "true" : undefined}
-      data-pop={pop ? "true" : undefined}
       className={cn(
         "cs-sec-rise cs-sec-card relative z-10 flex w-[182px] flex-col items-center justify-center px-4 py-6 text-center",
         dimmed && "cs-sec-dim",
@@ -169,7 +167,9 @@ export function SecurityDiagram(): React.ReactElement {
     reduce ? new Set(Array.from({ length: LANE_COUNT }, (_, i) => i)) : new Set(),
   );
   const [landing, setLanding] = useState<ReadonlySet<number>>(() => new Set());
-  const [popping, setPopping] = useState<ReadonlySet<number>>(() => new Set());
+  const [arrowOn, setArrowOn] = useState<ReadonlySet<number>>(() =>
+    reduce ? new Set(Array.from({ length: LANE_COUNT - 1 }, (_, i) => i)) : new Set(),
+  );
 
   useEffect(() => {
     if (inView) {
@@ -201,7 +201,7 @@ export function SecurityDiagram(): React.ReactElement {
       setFlying(new Set());
       setDotted(new Set(Array.from({ length: LANE_COUNT }, (_, i) => i)));
       setLanding(new Set());
-      setPopping(new Set());
+      setArrowOn(new Set(Array.from({ length: LANE_COUNT - 1 }, (_, i) => i)));
       return;
     }
     if (!anim) return;
@@ -231,28 +231,35 @@ export function SecurityDiagram(): React.ReactElement {
       setFlying(new Set());
       setDotted(new Set());
       setLanding(new Set());
-      setPopping(new Set());
+      setArrowOn(new Set());
 
       for (let i = 0; i < LANE_COUNT; i += 1) {
-        // Launch the trust comet down lane i.
+        const land = i * LANE_GAP + TRAVEL;
+        // 1. Launch the trust comet down lane i. As the wave reaches this stage,
+        //    surge the outgoing lifecycle arrow toward the next stage.
         at(i * LANE_GAP, () => toggle(setFlying, i, true));
-        // Comet lands: build the card, flash + pop, retire the comet, and light
-        // the persistent dashed current (which stays until the cycle resets).
-        at(i * LANE_GAP + TRAVEL, () => {
-          setLitCount((c) => Math.max(c, i + 1));
+        if (i < LANE_COUNT - 1) {
+          at(i * LANE_GAP + 150, () => toggle(setArrowOn, i, true));
+        }
+        // 2. Comet reaches the end: retire it and bloom the fixed landing glow.
+        at(land, () => {
           toggle(setFlying, i, false);
           toggle(setLanding, i, true);
-          toggle(setPopping, i, true);
         });
-        at(i * LANE_GAP + TRAVEL + 220, () => toggle(setDotted, i, true));
-        at(i * LANE_GAP + TRAVEL + 600, () => toggle(setLanding, i, false));
-        at(i * LANE_GAP + TRAVEL + POP_HOLD, () => toggle(setPopping, i, false));
+        // 3. Instantly after the glow: light the persistent dashed current AND
+        //    reveal the card's content together.
+        at(land + GLOW_LEAD, () => {
+          toggle(setDotted, i, true);
+          setLitCount((c) => Math.max(c, i + 1));
+        });
+        at(land + 700, () => toggle(setLanding, i, false));
       }
       at(CLIMAX_AT, () => setClimax(true));
       at(RESET_AT, () => {
         setLitCount(0);
         setClimax(false);
         setDotted(new Set());
+        setArrowOn(new Set());
       });
       at(CYCLE, runCycle);
     };
@@ -307,7 +314,10 @@ export function SecurityDiagram(): React.ReactElement {
               />
               {i < STAGES.length - 1 && (
                 <FlowArrow
-                  className="mt-3 flex h-7 shrink-0"
+                  className={cn(
+                    "cs-sec-arrow mt-3 flex h-7 shrink-0",
+                    arrowOn.has(i) && "cs-sec-arrow-on",
+                  )}
                   style={{ ["--arrow-delay" as string]: `${i * 0.12}s` }}
                 />
               )}
@@ -386,7 +396,6 @@ export function SecurityDiagram(): React.ReactElement {
                 item={item}
                 index={i}
                 built={i < litCount}
-                pop={popping.has(i)}
                 hovered={hovered}
                 setHovered={setHovered}
               />

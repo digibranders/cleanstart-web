@@ -126,17 +126,23 @@ export function VerifyBeams({
                   </Fragment>
                 )}
 
-                {/* Landing flash — a soft burst where the packet meets its card. */}
+                {/* Landing glow — centred exactly on the comet head's final
+                    position (x = column centre, y = TRAVEL), so the bloom sits
+                    precisely where the comet stops. Centred via negative margins
+                    (half the size) so the keyframe only needs to scale. */}
                 {landing.has(i) && (
                   <div
-                    className="cs-sec-land absolute left-1/2 -translate-x-1/2"
+                    className="cs-sec-land absolute"
                     style={{
-                      bottom: -10,
+                      left: "50%",
+                      top: TRAVEL,
                       width: 30,
                       height: 30,
+                      marginLeft: -15,
+                      marginTop: -15,
                       borderRadius: "50%",
                       background:
-                        "radial-gradient(circle, rgba(190,235,255,0.9) 0%, rgba(140,210,255,0) 70%)",
+                        "radial-gradient(circle, rgba(205,242,255,0.95) 0%, rgba(140,210,255,0) 70%)",
                       mixBlendMode: "screen",
                     }}
                   />
