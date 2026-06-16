@@ -5,19 +5,17 @@ import {
   PALETTE,
   NODES,
   SPOKES,
-  RING_LINKS,
   MESH,
   MESH_BBOX,
-  MESH_DATA,
   LEFT_ICON,
   LEFT_ITEMS,
   LEFT_FANS,
   LEFT_SOURCE_DOTS,
-  LEFT_PORTS,
+  LEFT_MERGE,
   RIGHT_ITEMS,
   RIGHT_FANS,
   RIGHT_TARGET_DOTS,
-  RIGHT_PORTS,
+  RIGHT_BRANCH,
   CARD,
   GOV_PANEL,
   GOV_ITEMS,
@@ -342,10 +340,30 @@ function Connectors(): React.ReactElement {
           <stop offset="1" stopColor="#2CC1EB" />
         </linearGradient>
 
-        <radialGradient id="meshGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0" stopColor="rgba(124,108,255,0.30)" />
-          <stop offset="55%" stopColor="rgba(96,84,210,0.10)" />
-          <stop offset="100%" stopColor="rgba(96,84,210,0)" />
+        {/* Plasma nebula layers — purple bias on the left, cyan on the right,
+            a brighter nucleus, all fading to transparent (no hard edge). */}
+        <radialGradient id="plasmaPurple" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stopColor="rgba(128,88,244,0.42)" />
+          <stop offset="55%" stopColor="rgba(110,80,220,0.12)" />
+          <stop offset="100%" stopColor="rgba(110,80,220,0)" />
+        </radialGradient>
+        <radialGradient id="plasmaCyan" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stopColor="rgba(42,158,236,0.36)" />
+          <stop offset="55%" stopColor="rgba(42,158,236,0.10)" />
+          <stop offset="100%" stopColor="rgba(42,158,236,0)" />
+        </radialGradient>
+        <radialGradient id="plasmaCore" cx="50%" cy="42%" r="50%">
+          <stop offset="0" stopColor="rgba(170,158,255,0.48)" />
+          <stop offset="58%" stopColor="rgba(140,128,240,0.12)" />
+          <stop offset="100%" stopColor="rgba(140,128,240,0)" />
+        </radialGradient>
+        <radialGradient id="dissolveL" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stopColor="rgba(179,107,255,0.55)" />
+          <stop offset="100%" stopColor="rgba(179,107,255,0)" />
+        </radialGradient>
+        <radialGradient id="dissolveR" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stopColor="rgba(44,193,235,0.55)" />
+          <stop offset="100%" stopColor="rgba(44,193,235,0)" />
         </radialGradient>
 
         {SPOKES.map((s, i) => (
@@ -374,37 +392,40 @@ function Connectors(): React.ReactElement {
 
       <rect width={VB.w} height={VB.h} fill="url(#cisoGrid)" />
 
-      {/* Central energy glow behind the ecosystem. */}
+      {/* Orbital nucleus: a glowing core with three tilted orbit rings (atom
+          motif) that slowly rotate. Radius is capped so the vertical sweep
+          stays below the eyebrow; no glow so the rings can't bleed into the
+          top edge. Spin honours prefers-reduced-motion. */}
+      <style>{
+        "@keyframes cisoOrbitSpin{to{transform:rotate(360deg)}}" +
+        ".ciso-orbit{animation:cisoOrbitSpin 100s linear infinite;transform-box:fill-box;transform-origin:center}" +
+        // Rail "current": slower than the shared cs-flow-dash; offset -33 is a
+        // whole multiple of the 11-unit dash period so the slow loop stays seamless.
+        "@keyframes cisoRailFlow{from{stroke-dashoffset:0}to{stroke-dashoffset:-33}}" +
+        ".ciso-rail{animation:cisoRailFlow 2.6s linear infinite}" +
+        "@media (prefers-reduced-motion:reduce){.ciso-orbit,.ciso-rail{animation:none}}"
+      }</style>
       <ellipse
         cx={MESH.cx}
         cy={MESH.cy}
-        rx={MESH.rx * 1.16}
-        ry={MESH.ry * 1.2}
-        fill="url(#meshGlow)"
+        rx={172}
+        ry={150}
+        fill="url(#plasmaCore)"
+        className="cs-flow-pulse"
+        style={{ transformOrigin: `${MESH.cx}px ${MESH.cy}px` }}
       />
-
-      {/* Orbit rings around the registry. */}
-      <g fill="none" stroke="url(#meshGrad)">
-        <ellipse cx={MESH.cx} cy={MESH.cy} rx={MESH.rx * 0.52} ry={MESH.ry * 0.52} opacity={0.16} />
-        <ellipse cx={MESH.cx} cy={MESH.cy} rx={MESH.rx * 0.82} ry={MESH.ry * 0.84} opacity={0.1} />
-      </g>
-
-      {/* Mesh web. */}
-      <g stroke="url(#meshGrad)" strokeWidth={1}>
-        {MESH_DATA.edges.map((e, i) => (
-          <line key={`me${i}`} x1={e.x1} y1={e.y1} x2={e.x2} y2={e.y2} opacity={e.o} />
-        ))}
-      </g>
-      <g fill="url(#meshGrad)">
-        {MESH_DATA.dots.map((d, i) => (
-          <circle key={`md${i}`} cx={d.x} cy={d.y} r={d.r} opacity={d.o} />
-        ))}
-      </g>
-
-      {/* Labeled-node ring (interconnection). */}
-      <g fill="none" stroke="url(#meshGrad)" strokeWidth={1.4} strokeLinecap="round" opacity={0.55}>
-        {RING_LINKS.map((d, i) => (
-          <path key={`rl${i}`} d={d} />
+      <g className="ciso-orbit" fill="none" stroke="url(#meshGrad)">
+        {[0, 60, 120].map((a) => (
+          <ellipse
+            key={a}
+            cx={MESH.cx}
+            cy={MESH.cy}
+            rx={206}
+            ry={90}
+            strokeWidth={1.4}
+            opacity={0.3}
+            transform={`rotate(${a} ${MESH.cx} ${MESH.cy})`}
+          />
         ))}
       </g>
 
@@ -431,27 +452,24 @@ function Connectors(): React.ReactElement {
       {/* Flowing dashed fans (sources → merge, branch → cards). */}
       <g fill="none" strokeWidth={2.2} strokeLinecap="round" filter="url(#cisoGlow)">
         {LEFT_FANS.map((d, i) => (
-          <path key={`lf${i}`} d={d} stroke={LEFT_DASH_COLOR} strokeDasharray="2 9" className="cs-flow-dash" />
+          <path key={`lf${i}`} d={d} stroke={LEFT_DASH_COLOR} strokeDasharray="2 9" className="ciso-rail" />
         ))}
         {RIGHT_FANS.map((d, i) => (
-          <path key={`rf${i}`} d={d} stroke={RIGHT_DASH_COLOR} strokeDasharray="2 9" className="cs-flow-dash" />
+          <path key={`rf${i}`} d={d} stroke={RIGHT_DASH_COLOR} strokeDasharray="2 9" className="ciso-rail" />
         ))}
       </g>
 
-      {/* Rail dots: source/target ends + the ports where each rail plugs into
-          the constellation. */}
+      {/* Soft glow where the rails dissolve into the plasma core. */}
+      <ellipse cx={LEFT_MERGE.x} cy={LEFT_MERGE.y} rx={42} ry={42} fill="url(#dissolveL)" />
+      <ellipse cx={RIGHT_BRANCH.x} cy={RIGHT_BRANCH.y} rx={42} ry={42} fill="url(#dissolveR)" />
+
+      {/* Rail source/target dots (the outer ends at the rail items / cards). */}
       <g stroke="none">
         {LEFT_SOURCE_DOTS.map((d, i) => (
           <circle key={`ls${i}`} cx={d.x} cy={d.y} r={3.4} fill={LEFT_DASH_COLOR} />
         ))}
         {RIGHT_TARGET_DOTS.map((d, i) => (
           <circle key={`rt${i}`} cx={d.x} cy={d.y} r={3.4} fill={RIGHT_DASH_COLOR} />
-        ))}
-        {LEFT_PORTS.map((d, i) => (
-          <circle key={`lp${i}`} cx={d.x} cy={d.y} r={3.8} fill={LEFT_DASH_COLOR} />
-        ))}
-        {RIGHT_PORTS.map((d, i) => (
-          <circle key={`rp${i}`} cx={d.x} cy={d.y} r={3.8} fill={RIGHT_DASH_COLOR} />
         ))}
       </g>
     </svg>

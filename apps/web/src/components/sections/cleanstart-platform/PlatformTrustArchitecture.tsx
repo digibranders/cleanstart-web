@@ -155,7 +155,7 @@ function StageRow({ stage, isLast }: { stage: Stage; isLast: boolean }) {
         />
         <div className="relative flex shrink-0 flex-col gap-1.5 md:w-[300px] lg:w-[330px]">
           <h3
-            className="font-bold text-white"
+            className="font-semibold text-white"
             style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h3)", letterSpacing: "-0.03em", lineHeight: 1.2 }}
           >
             {stage.name}
@@ -204,7 +204,7 @@ export function PlatformTrustArchitecture() {
           style={{ maxWidth: "949px", paddingTop: "clamp(64px, 6.9vw, 100px)", paddingBottom: "clamp(40px, 4.2vw, 60px)" }}
         >
           <h2
-            className="w-full font-bold"
+            className="w-full font-semibold"
             style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-display)", letterSpacing: "-0.05em", lineHeight: 1.1 }}
           >
             The CleanStart Trust{" "}

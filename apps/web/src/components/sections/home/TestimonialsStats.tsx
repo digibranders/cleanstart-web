@@ -252,7 +252,7 @@ export function TestimonialsStats() {
       <Container>
         <Reveal header>
           <h2
-            className="mx-auto max-w-[867px] text-center font-display font-bold text-[#111]"
+            className="mx-auto max-w-[867px] text-center font-display font-semibold text-[#111]"
             style={{
               fontSize: "var(--fs-h2)",
               lineHeight: 1.1,

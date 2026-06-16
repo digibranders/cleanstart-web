@@ -1,21 +1,27 @@
 "use client";
 
 import type React from "react";
+import { Fragment } from "react";
 import Image from "next/image";
-import { Section, Container } from "@/components/layout";
+import { Container } from "@/components/layout";
 import { Reveal } from "@/components/ui/Reveal";
 import { HOME_TESTIMONIALS } from "@/components/sections/home/Testimonials";
 
 /*
- * "Customer Validation" — a single-voice premium spotlight for the CISO page.
- *
- * Replaces the reused home testimonial carousel (which rendered the lone CISO
- * quote as a small flat card on a light band). This is a purpose-built dark
- * immersive treatment: an editorial pull-quote on a deep-space band with an
- * ambient aura, a gradient-stroked glass card, a gradient-ringed portrait, and
- * the white IIFL wordmark. The band closes on #151021 so it flows seamlessly
- * into the dark CisoMetrics section directly below.
+ * "Customer Validation" + "Outcomes That Matter" — the CISO page's proof block,
+ * merged into one component. A single wrapper paints ONE continuous dark
+ * gradient (#120D1F → #151021 → #131E8F → #471EC0) spanning both semantic
+ * <section>s, so there is no seam where two separately-scaled gradients meet.
+ * The inner sections are transparent; the wrapper's gradient also fills the
+ * outcomes section's `paddingBottom: var(--spacing-section-cta)` card-overlap
+ * reservation (this is the last block before <Footer cta>).
  */
+
+// One gradient for the whole block. Stops are tuned so the deep #151021 sits
+// around the testimonial card, ramping to brand violet through the stats/CTA
+// zone at the bottom where the Footer card overlaps.
+const BLOCK_BACKGROUND =
+  "linear-gradient(180deg, #120D1F 0%, #151021 50%, #131E8F 82%, #471EC0 100%)";
 
 const CISO_VOICE = HOME_TESTIMONIALS.find((t) => t.role.includes("CISO"));
 
@@ -23,18 +29,39 @@ const CISO_VOICE = HOME_TESTIMONIALS.find((t) => t.role.includes("CISO"));
 // (orange mandala + white "IIFL FINANCE") reads cleanly here.
 const IIFL_WHITE_LOGO = "/images/testimonials/iifl-finance-white.webp";
 
-export function CisoTestimonialSpotlight(): React.ReactElement | null {
+interface Stat {
+  value: string;
+  label: string;
+}
+
+const STATS: Stat[] = [
+  { value: "88,000+", label: "CVEs remediated" },
+  { value: "~90%", label: "Average CVE reduction" },
+  { value: "352,000+", label: "Engineering hours saved" },
+  { value: "10M+", label: "Packages from verified source" },
+  { value: "100%", label: "Deterministic builds" },
+];
+
+export function CisoValidationOutcomes(): React.ReactElement {
+  return (
+    <div
+      className="relative w-full overflow-hidden"
+      style={{ background: BLOCK_BACKGROUND }}
+    >
+      {CISO_VOICE && <ValidationSpotlight />}
+      <OutcomesBand />
+    </div>
+  );
+}
+
+function ValidationSpotlight(): React.ReactElement | null {
   if (!CISO_VOICE) return null;
   const { name, role, quote, photoSrc, caseStudyHref } = CISO_VOICE;
 
   return (
-    <Section
-      padding="none"
-      ariaLabel="Customer validation"
-      className="overflow-hidden pt-section-sm text-white"
-      style={{
-        background: "linear-gradient(180deg, #120D1F 0%, #150F23 55%, #151021 100%)",
-      }}
+    <section
+      aria-label="Customer validation"
+      className="relative w-full overflow-hidden pt-section-sm text-white"
     >
       {/* Ambient aura — cyan→violet radial glow behind the card. Pure CSS,
           screen-blended so it lifts the deep band without a hard edge. */}
@@ -55,7 +82,7 @@ export function CisoTestimonialSpotlight(): React.ReactElement | null {
             className="text-center font-display"
             style={{
               fontSize: "var(--fs-h2)",
-              fontWeight: 700,
+              fontWeight: 600,
               lineHeight: 1.1,
               letterSpacing: "-0.04em",
             }}
@@ -218,6 +245,115 @@ export function CisoTestimonialSpotlight(): React.ReactElement | null {
           </figure>
         </Reveal>
       </Container>
-    </Section>
+    </section>
+  );
+}
+
+function OutcomesBand(): React.ReactElement {
+  return (
+    <section
+      aria-label="Outcomes that matter"
+      data-section="CisoOutcomes"
+      className="relative overflow-hidden text-white"
+      style={{
+        paddingTop: "clamp(64px, 6.25vw, 120px)",
+        paddingBottom: "var(--spacing-section-cta)",
+      }}
+    >
+      <Container>
+        <Reveal header>
+          <h2
+            className="mx-auto text-center font-display text-white"
+            style={{
+              maxWidth: "654px",
+              fontSize: "var(--fs-h2)",
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+              marginBottom: "clamp(48px, 6vw, 84px)",
+            }}
+          >
+            <span className="cs-text-gradient-impact">Outcomes</span> That Matter
+          </h2>
+        </Reveal>
+
+        {/* Desktop — inline figures separated by vertical dividers. */}
+        <div className="hidden lg:flex lg:items-start lg:justify-between lg:gap-6">
+          {STATS.map((stat, i) => (
+            <Fragment key={stat.value}>
+              <StatBlock stat={stat} />
+              {i < STATS.length - 1 && <VerticalDivider />}
+            </Fragment>
+          ))}
+        </div>
+
+        {/* Mobile / tablet — centered vertical stack. */}
+        <div className="flex flex-col items-center gap-6 lg:hidden">
+          {STATS.map((stat, i) => (
+            <Fragment key={stat.value}>
+              <StatBlock stat={stat} mobile />
+              {i < STATS.length - 1 && <HorizontalDivider />}
+            </Fragment>
+          ))}
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+function StatBlock({ stat, mobile = false }: { stat: Stat; mobile?: boolean }): React.ReactElement {
+  return (
+    <div className={`flex shrink-0 flex-col ${mobile ? "items-center text-center" : ""}`}>
+      <div
+        className="font-display text-white"
+        style={{
+          whiteSpace: "nowrap",
+          fontSize: mobile ? "var(--fs-h3)" : "32px",
+          fontWeight: 700,
+          lineHeight: 1.1,
+          letterSpacing: "-0.04em",
+        }}
+      >
+        {stat.value}
+      </div>
+      <div
+        className="mt-5 max-w-[180px] text-white"
+        style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: mobile ? "var(--fs-lead)" : "20px",
+          fontWeight: 400,
+          lineHeight: 1.3,
+          letterSpacing: "-0.02em",
+        }}
+      >
+        {stat.label}
+      </div>
+    </div>
+  );
+}
+
+function VerticalDivider(): React.ReactElement {
+  return (
+    <div
+      aria-hidden
+      className="h-[109px] w-px shrink-0 self-stretch"
+      style={{
+        background:
+          "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 49.3%, rgba(153,153,153,0) 99.2%)",
+      }}
+    />
+  );
+}
+
+function HorizontalDivider(): React.ReactElement {
+  return (
+    <div
+      aria-hidden
+      className="h-px w-[147px] shrink-0"
+      style={{
+        background:
+          "linear-gradient(90deg, rgba(255,255,255,0) 0%, #FFFFFF 49.32%, rgba(153,153,153,0) 99.18%)",
+      }}
+    />
   );
 }

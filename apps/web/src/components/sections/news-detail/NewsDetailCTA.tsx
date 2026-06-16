@@ -120,10 +120,10 @@ export function NewsDetailCTA(): React.ReactElement {
       <div className="absolute inset-0 flex flex-col items-center justify-center px-6 gap-5 text-center">
         <h2
           id="news-cta-title"
-          className="font-display font-bold relative z-10"
+          className="font-display font-semibold relative z-10"
           style={{
             fontSize: "var(--cta-card-title)",
-            fontWeight: 700,
+            fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
             color: "#111111",

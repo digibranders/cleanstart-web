@@ -119,7 +119,7 @@ export function NewsroomHero({
                 </p>
                 <div className="flex flex-col gap-4 w-full">
                   <h2
-                    className="font-display font-bold leading-tight tracking-[-0.05em] text-white overflow-hidden"
+                    className="font-display font-semibold leading-tight tracking-[-0.05em] text-white overflow-hidden"
                     style={{
                       /* Featured-tier card title — explicit 32px, sized between
                          the standard card title (--fs-h3 = 28) and section H2

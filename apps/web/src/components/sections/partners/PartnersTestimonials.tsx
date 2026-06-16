@@ -138,7 +138,7 @@ export function PartnersTestimonials() {
             className="text-center font-display text-[#111]"
             style={{
               fontSize: "var(--fs-h2)",
-              fontWeight: 700,
+              fontWeight: 600,
               lineHeight: 1.1,
               letterSpacing: "-0.04em",
             }}

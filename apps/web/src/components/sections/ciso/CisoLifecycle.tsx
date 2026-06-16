@@ -33,7 +33,7 @@ export function CisoLifecycle(): React.ReactElement {
       style={{
         background:
           "linear-gradient(180deg, #151021 23.15%, #131e8f 53.815%, #471ec0 100%)",
-        // Match the page's hand-built sections (CisoRisks / CisoMetrics) so the
+        // Match the page's hand-built sections (CisoRisks / CisoValidationOutcomes) so the
         // top gap above the heading reads consistently across the page.
         paddingTop: "clamp(64px, 6.25vw, 120px)",
         paddingBottom: "clamp(64px, 6.25vw, 120px)",

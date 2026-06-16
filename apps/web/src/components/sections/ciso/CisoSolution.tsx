@@ -61,7 +61,7 @@ export function CisoSolution(): React.ReactElement {
           style={{
             fontFamily: "var(--font-display)",
             fontSize: "var(--fs-h2)",
-            fontWeight: 700,
+            fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.15,
             marginBottom: "16px",
