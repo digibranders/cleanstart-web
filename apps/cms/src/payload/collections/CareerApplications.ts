@@ -22,7 +22,7 @@ export const CareerApplications: CollectionConfig = {
   },
   access: {
     read: isAdminOrEditor,
-    create: isAdmin,
+    create: () => false,
     update: () => false,
     delete: isAdmin,
   },
