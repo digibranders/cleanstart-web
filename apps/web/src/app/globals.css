@@ -3362,3 +3362,120 @@ body {
 /* Surfaces are now fully solid — no backdrop-filter to fall back from.
    The @supports block stays as a no-op marker in case we ever bring
    translucency back. */
+
+/* ============================================================
+   CISO HERO — "Interception Field" (CisoHeroVisual.tsx).
+   Chaotic inherited dependencies (left) flow through a glowing
+   verification membrane (centre) and dock, hardened, into a calm
+   cyan lattice around the secure core (right). All motion is CSS;
+   prefers-reduced-motion collapses to the resolved frame.
+   ============================================================ */
+
+.cs-civ {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Stage captions — small uppercase eyebrow labels naming each step of the flow. */
+.cs-civ-cap text {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.3px;
+}
+
+/* Secure core — slow breathing scale + brightness. */
+@keyframes cs-civ-core-breathe {
+  0%, 100% { transform: scale(1);     filter: brightness(1); }
+  50%      { transform: scale(1.035); filter: brightness(1.12); }
+}
+.cs-civ-core {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cs-civ-core-breathe 6s ease-in-out infinite;
+  will-change: transform, filter;
+}
+
+/* Membrane scan sweep — bright node travels top → bottom of the gate. */
+@keyframes cs-civ-sweep {
+  0%       { transform: translateY(0);     opacity: 0; }
+  12%      { opacity: 0.95; }
+  88%      { opacity: 0.95; }
+  100%     { transform: translateY(372px); opacity: 0; }
+}
+.cs-civ-sweep {
+  animation: cs-civ-sweep 3.6s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Chaotic dependency nodes — restless flicker + tiny drift. */
+@keyframes cs-civ-chaos {
+  0%, 100% { transform: translate(0, 0);       opacity: 0.55; }
+  30%      { transform: translate(2px, -3px);  opacity: 0.9; }
+  60%      { transform: translate(-2px, 2px);  opacity: 0.5; }
+}
+.cs-civ-chaos {
+  transform-box: fill-box;
+  animation: cs-civ-chaos 3.1s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Verified lattice dots — calm pulse. */
+@keyframes cs-civ-pulse {
+  0%, 100% { transform: scale(1);    opacity: 0.7; }
+  50%      { transform: scale(1.28); opacity: 1; }
+}
+.cs-civ-pulse {
+  animation: cs-civ-pulse 3.4s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Convergence beams — energy flowing along each stream. */
+@keyframes cs-civ-beam {
+  to { stroke-dashoffset: -36; }
+}
+.cs-civ-beams line {
+  stroke-dasharray: 4 10;
+  animation: cs-civ-beam 1.4s linear infinite;
+}
+
+/* Radar scope — slow continuous sweep around the secure core. */
+@keyframes cs-civ-scope {
+  to { transform: rotate(360deg); }
+}
+.cs-civ-scope {
+  transform-box: fill-box;
+  animation: cs-civ-scope 18s linear infinite;
+  will-change: transform;
+}
+
+/* Traveling packets — launch from chaos (offset via --civ-fx/--civ-fy),
+   harden red → cyan as they cross the membrane, dock at translate(0). The
+   var() is resolved per-element, so one keyframe serves every packet. */
+@keyframes cs-civ-packet {
+  0%   { transform: translate(var(--civ-fx), var(--civ-fy)); fill: #ff6c6c; opacity: 0; }
+  8%   { opacity: 1; }
+  48%  { fill: #ff8a6c; }
+  62%  { fill: #6fe8ff; }
+  100% { transform: translate(0, 0); fill: #a8efff; opacity: 1; }
+}
+.cs-civ-packet {
+  animation: cs-civ-packet 5.4s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-civ-core,
+  .cs-civ-sweep,
+  .cs-civ-scope,
+  .cs-civ-chaos,
+  .cs-civ-pulse,
+  .cs-civ-beams line,
+  .cs-civ-packet {
+    animation: none !important;
+  }
+  /* Resolved frame: hide the moving sweep; packets rest docked + cyan. */
+  .cs-civ-sweep { opacity: 0; }
+}
