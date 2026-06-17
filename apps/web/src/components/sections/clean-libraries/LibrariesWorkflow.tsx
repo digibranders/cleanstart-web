@@ -11,17 +11,17 @@ interface WorkflowCard {
 
 const TOP_CARDS: WorkflowCard[] = [
   {
-    orb: "/images/clean-libraries/wf-developers.png",
+    orb: "/images/clean-libraries/icon-developers.png",
     title: "Developers & AI Coding Tools",
     bullets: ["Cursor", "Claude Code", "GitHub Copilot"],
   },
   {
-    orb: "/images/clean-libraries/wf-clean-library.png",
+    orb: "/images/clean-libraries/icon-clean-library.png",
     title: "Clean Library",
     bullets: ["Dependency visibility", "validation", "policy enforcement"],
   },
   {
-    orb: "/images/clean-libraries/wf-validated.png",
+    orb: "/images/clean-libraries/icon-validated.png",
     title: "Validated Library Repository",
     body: "Approved packages and trusted dependencies.",
   },
@@ -29,12 +29,12 @@ const TOP_CARDS: WorkflowCard[] = [
 
 const BOTTOM_CARDS: WorkflowCard[] = [
   {
-    orb: "/images/clean-libraries/wf-cicd.png",
+    orb: "/images/clean-libraries/icon-cicd.png",
     title: "CI/CD Gates",
     body: "Automated enforcement before deployment.",
   },
   {
-    orb: "/images/clean-libraries/wf-production.png",
+    orb: "/images/clean-libraries/icon-production.png",
     title: "Production Artifacts",
     body: "Only approved dependencies reach production.",
   },
@@ -47,19 +47,19 @@ const CARD_FRAME_BG =
 function Orb({ src, alt, size }: { src: string; alt: string; size: number }): React.ReactElement {
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
-      {/* Cyan glow under the orb. */}
+      {/* Soft purple glow behind the icon. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 select-none rounded-full opacity-25"
-        style={{ background: "#06b6d4", filter: "blur(28px)" }}
+        className="pointer-events-none absolute inset-0 select-none rounded-full opacity-30"
+        style={{ background: "#9a51ff", filter: "blur(26px)" }}
       />
       <Image
         src={src}
         alt={alt}
-        width={160}
-        height={178}
+        width={200}
+        height={200}
         sizes={`${size}px`}
-        className="relative h-auto w-full select-none"
+        className="relative h-full w-full select-none object-contain"
         draggable={false}
       />
     </div>
