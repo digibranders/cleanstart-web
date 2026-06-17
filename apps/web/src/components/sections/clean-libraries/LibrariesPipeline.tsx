@@ -4,7 +4,7 @@ import { Reveal } from "@/components/ui/Reveal";
 /** Top-of-orb-or-side corner card describing one dependency entry path. */
 interface EntryCard {
   title: string;
-  body: string;
+  items: string[];
   border: string;
   tint: string;
 }
@@ -12,25 +12,25 @@ interface EntryCard {
 const ENTRY_CARDS: EntryCard[] = [
   {
     title: "Developer Added",
-    body: "Libraries developers explicitly add to their projects.",
+    items: ["requests", "numpy", "axios"],
     border: "#c071f8",
     tint: "rgba(192,113,248,0.1)",
   },
   {
-    title: "Open Source packages",
-    body: "Direct dependencies from public registries.",
+    title: "Open-Source",
+    items: ["react", "express", "lodash"],
     border: "#14f2e4",
     tint: "rgba(20,240,230,0.1)",
   },
   {
-    title: "AI-Introduced Dependencies",
-    body: "Libraries introduced by AI coding assistants.",
+    title: "AI-Introduced",
+    items: ["helper-sdk", "analytics-plus", "agent-framework"],
     border: "#57d5fb",
     tint: "rgba(87,213,251,0.1)",
   },
   {
-    title: "Transitive Dependencies",
-    body: "Hidden dependencies pulled in automatically.",
+    title: "Transitive",
+    items: ["dep-a", "dep-b", "dep-c"],
     border: "#fc856f",
     tint: "rgba(253,148,110,0.1)",
   },
@@ -71,12 +71,24 @@ function CardBody({ card }: { card: EntryCard }): React.ReactElement {
       >
         {card.title}
       </p>
-      <p
-        className="font-sans opacity-80"
-        style={{ fontSize: "var(--fs-body-sm)", letterSpacing: "-0.01em", lineHeight: 1.2 }}
-      >
-        {card.body}
-      </p>
+      <ul className="flex flex-wrap items-center justify-center gap-2">
+        {card.items.map((item) => (
+          <li
+            key={item}
+            className="rounded-full border font-mono leading-none"
+            style={{
+              borderColor: card.border,
+              backgroundColor: card.tint,
+              color: "rgba(255,255,255,0.92)",
+              fontSize: "var(--fs-caption)",
+              letterSpacing: "-0.01em",
+              padding: "5px 10px",
+            }}
+          >
+            {item}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -262,51 +274,61 @@ export function LibrariesPipeline(): React.ReactElement {
           <MobileDiagram />
         </div>
 
-        {/* "No review" banner. */}
+        {/* "No review" banner — width matches the diagram canvas above. */}
         <Reveal>
           <div
-            className="mt-12 flex flex-col items-center gap-6 rounded-[24px] border px-6 py-7 text-center md:flex-row md:gap-8 md:px-10 md:text-left lg:mt-16"
-            style={{
-              borderColor: "rgba(154,81,255,0.4)",
-              background:
-                "linear-gradient(125.6deg, rgba(154,81,255,0.12) 0%, rgba(44,193,235,0.08) 100%)",
-            }}
+            className="mx-auto mt-12 lg:mt-16 lg:w-[calc(1276px*var(--lib-scale))]"
+            style={
+              {
+                "--lib-scale":
+                  "min(1, calc((min(100vw, 1440px) - 80px) / 1276px))",
+              } as React.CSSProperties
+            }
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              aria-hidden
-              src="/images/clean-libraries/banner-hex.svg"
-              alt=""
-              className="pointer-events-none size-[84px] shrink-0 select-none"
-              loading="lazy"
-              decoding="async"
-            />
-            <p
-              className="font-display font-bold text-white"
-              style={{
-                fontSize: "var(--fs-h3)",
-                letterSpacing: "-0.03em",
-                lineHeight: 1.1,
-              }}
-            >
-              No review. No approval. No visibility.
-            </p>
             <div
-              aria-hidden
-              className="hidden h-[100px] w-px shrink-0 md:block"
-              style={{ background: DIVIDER }}
-            />
-            <p
-              className="max-w-[420px] font-sans text-white/80"
+              className="flex flex-col items-center gap-5 rounded-[24px] border px-6 py-5 text-center md:flex-row md:gap-8 md:px-10 md:text-left"
               style={{
-                fontSize: "var(--fs-body-sm)",
-                letterSpacing: "-0.02em",
-                lineHeight: 1.2,
+                borderColor: "rgba(154,81,255,0.4)",
+                background:
+                  "linear-gradient(125.6deg, rgba(154,81,255,0.12) 0%, rgba(44,193,235,0.08) 100%)",
               }}
             >
-              Dependencies can become a permanent part of your software before
-              anyone knows they exist.
-            </p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                aria-hidden
+                src="/images/clean-libraries/banner-hex.svg"
+                alt=""
+                className="pointer-events-none size-[84px] shrink-0 select-none"
+                loading="lazy"
+                decoding="async"
+              />
+              <p
+                className="font-display font-bold text-white"
+                style={{
+                  fontSize: "var(--fs-h3)",
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1.1,
+                }}
+              >
+                No review. No approval. No visibility.
+              </p>
+              <div
+                aria-hidden
+                className="hidden h-[64px] w-px shrink-0 md:block"
+                style={{ background: DIVIDER }}
+              />
+              <p
+                className="max-w-[420px] font-sans text-white/80"
+                style={{
+                  fontSize: "var(--fs-body)",
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.3,
+                }}
+              >
+                Dependencies can become a permanent part of your software before
+                anyone knows they exist.
+              </p>
+            </div>
           </div>
         </Reveal>
 

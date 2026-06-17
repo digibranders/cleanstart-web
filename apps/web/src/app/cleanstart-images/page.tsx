@@ -6,7 +6,8 @@ import { CleanStartImagesBrowse } from "@/components/sections/cleanstart-images/
 import { CleanStartImagesEasyStart } from "@/components/sections/cleanstart-images/CleanStartImagesEasyStart";
 import { CleanStartImagesUVP } from "@/components/sections/cleanstart-images/CleanStartImagesUVP";
 import { CleanStartImagesEnvironment } from "@/components/sections/cleanstart-images/CleanStartImagesEnvironment";
-import { CleanStartImagesMeasure } from "@/components/sections/cleanstart-images/CleanStartImagesMeasure";
+// Hidden for now (calculator section):
+// import { CleanStartImagesMeasure } from "@/components/sections/cleanstart-images/CleanStartImagesMeasure";
 import { CleanStartImagesCta } from "@/components/sections/cleanstart-images/CleanStartImagesCta";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/jsonld";
@@ -57,9 +58,13 @@ export default function CleanStartImagesPage(): React.ReactElement {
         <FadeUp>
           <CleanStartImagesEnvironment />
         </FadeUp>
-        <FadeUp>
+        {/* "Measure the Difference" calculator section — hidden for now.
+            Restore by uncommenting this block and its import above; when you do,
+            also revert CleanStartImagesEnvironment's paddingBottom back to its
+            clamp value, since Measure then becomes the CTA-reserve last section. */}
+        {/* <FadeUp>
           <CleanStartImagesMeasure />
-        </FadeUp>
+        </FadeUp> */}
       </main>
       <Footer cta={<CleanStartImagesCta />} />
     </>

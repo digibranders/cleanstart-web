@@ -74,7 +74,7 @@ function ValidationSpotlight(): React.ReactElement | null {
 
   return (
     <section
-      aria-label="Customer validation"
+      aria-label="Trusted by security leaders"
       className="relative w-full overflow-hidden pt-section-sm text-white"
     >
       {/* Ambient aura — cyan→violet radial glow behind the card. Pure CSS,
@@ -101,8 +101,8 @@ function ValidationSpotlight(): React.ReactElement | null {
               letterSpacing: "-0.04em",
             }}
           >
-            Customer{" "}
-            <span className="cs-text-gradient-impact">Validation</span>
+            Trusted by{" "}
+            <span className="cs-text-gradient-impact">Security Leaders</span>
           </h2>
         </Reveal>
 
@@ -207,7 +207,7 @@ function ValidationSpotlight(): React.ReactElement | null {
                     color: "rgba(255,255,255,0.92)",
                   }}
                 >
-                  <span className="cs-text-gradient-impact">Read Case study</span>
+                  <span className="cs-text-shine">Read Case study</span>
                   <svg
                     width="20"
                     height="20"

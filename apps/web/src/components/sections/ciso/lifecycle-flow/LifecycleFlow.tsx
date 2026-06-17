@@ -53,7 +53,7 @@ const RIGHT_DASH_COLOR = "#2CC1EB";
 /* ------------------------------- primitives ------------------------------- */
 
 /** Glowing circular node that fills its positioned wrapper. */
-function NodeBubble({
+export function NodeBubble({
   palette,
   Icon,
   pulse = false,
@@ -153,7 +153,7 @@ function ClusterNode({
   );
 }
 
-type NodeKeyT = keyof typeof NODES;
+export type NodeKeyT = keyof typeof NODES;
 
 /** Plain tracked-uppercase column eyebrow (no pill), centred at `cx`. */
 function Eyebrow({
@@ -299,7 +299,7 @@ function RightCard({
 
 /* --------------------------------- icon maps ------------------------------ */
 
-const CLUSTER_ICONS: Record<NodeKeyT, IconCmp> = {
+export const CLUSTER_ICONS: Record<NodeKeyT, IconCmp> = {
   hub: RegistryIcon,
   codeRepo: CodeIcon,
   build: CubeIcon,
@@ -308,9 +308,9 @@ const CLUSTER_ICONS: Record<NodeKeyT, IconCmp> = {
   runtime: ServerStackIcon,
 };
 
-const LEFT_ICONS: IconCmp[] = [CodeIcon, AiIcon, BoxesIcon];
-const RIGHT_ICONS: IconCmp[] = [ShieldAlertIcon, TargetIcon, ServerStackIcon];
-const GOV_ICONS: IconCmp[] = [EyeIcon, FingerprintIcon, ShieldCheckIcon, DocumentIcon];
+export const LEFT_ICONS: IconCmp[] = [CodeIcon, AiIcon, BoxesIcon];
+export const RIGHT_ICONS: IconCmp[] = [ShieldAlertIcon, TargetIcon, ServerStackIcon];
+export const GOV_ICONS: IconCmp[] = [EyeIcon, FingerprintIcon, ShieldCheckIcon, DocumentIcon];
 
 /* ------------------------------- connectors ------------------------------- */
 

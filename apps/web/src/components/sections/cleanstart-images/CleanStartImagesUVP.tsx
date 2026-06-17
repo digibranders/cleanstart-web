@@ -44,7 +44,7 @@ export function CleanStartImagesUVP(): React.ReactElement {
       heading={
         <>
           {'Minimal Foundations. '}
-          <span className="cs-text-gradient-impact">Reduced Inherited Risk.</span>
+          <span className="cs-text-gradient-impact">Measurable Impact.</span>
         </>
       }
       cards={CARDS}

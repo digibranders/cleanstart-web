@@ -20,10 +20,10 @@ interface StatDef {
 }
 
 const STATS: StatDef[] = [
-  { prefix: "",  end: 85,  suffix: "%",   label: "Container coverage",   labelSize: "clamp(13px,1.198vw,23px)", labelTracking: "-1.15px" },
-  { prefix: "<", end: 24,  suffix: " hr", label: "Remediation cycles",   labelSize: "clamp(12px,1.042vw,20px)", labelTracking: "-1px"    },
-  { prefix: "",  end: 85,  suffix: "%",   label: "Risk reduction",        labelSize: "clamp(12px,1.042vw,20px)", labelTracking: "-1px"    },
-  { prefix: "",  end: 100, suffix: "%",   label: "Compliance visibility", labelSize: "clamp(12px,1.042vw,20px)", labelTracking: "-1px"    },
+  { prefix: "", end: 85, suffix: "%", label: "Container coverage", labelSize: "clamp(13px,1.198vw,23px)", labelTracking: "-1.15px" },
+  { prefix: "<", end: 24, suffix: " hr", label: "Remediation cycles", labelSize: "clamp(12px,1.042vw,20px)", labelTracking: "-1px" },
+  { prefix: "", end: 85, suffix: "%", label: "Risk reduction", labelSize: "clamp(12px,1.042vw,20px)", labelTracking: "-1px" },
+  { prefix: "", end: 100, suffix: "%", label: "Compliance visibility", labelSize: "clamp(12px,1.042vw,20px)", labelTracking: "-1px" },
 ];
 
 /** Counts from 0 → end when `active` flips true. Fires once. Honors
@@ -134,7 +134,7 @@ export function CleanSightStats(): React.ReactElement {
               }}
             >
               From Visibility to{" "}
-              <span className="cs-text-gradient-impact">Results</span>
+              <span className="cs-text-gradient-impact">Remediation</span>
             </h2>
           </Reveal>
         </div>

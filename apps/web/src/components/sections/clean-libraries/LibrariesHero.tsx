@@ -60,7 +60,7 @@ export function LibrariesHero(): React.ReactElement {
                   margin: 0,
                 }}
               >
-                Your Codebase Now Has Dependencies You Never{" "}
+                Trusted Software{" "}
                 <span
                   className="bg-clip-text text-transparent"
                   style={{
@@ -68,7 +68,7 @@ export function LibrariesHero(): React.ReactElement {
                       "linear-gradient(96.29deg, #9a51ff 42.8%, #2cc1eb 98.78%)",
                   }}
                 >
-                  Chose
+                  Dependencies
                 </span>
               </h1>
             </HeroReveal>
@@ -86,9 +86,7 @@ export function LibrariesHero(): React.ReactElement {
                   margin: 0,
                 }}
               >
-                Continuously discover, validate, and govern software
-                dependencies across your development lifecycle, including
-                libraries introduced by AI coding assistants.
+                Reduce dependency sprawl across your software supply chain.
               </p>
             </HeroReveal>
 

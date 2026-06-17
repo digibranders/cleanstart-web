@@ -1184,7 +1184,8 @@ body {
 .cs-hero-reveal {
   animation: cs-hero-reveal var(--cs-hr-duration, 0.9s) cubic-bezier(0.16, 1, 0.3, 1)
     var(--cs-hr-delay, 0s) both;
-  will-change: opacity, transform;
+  /* No persistent will-change: this is a one-shot entrance, so a permanent
+     compositor-layer hint would hold GPU memory long after it finishes. */
 }
 @media (prefers-reduced-motion: reduce) {
   .cs-hero-reveal {
@@ -1228,7 +1229,9 @@ body {
     cs-hh-reveal 0.9s steps(17) 0.15s both,
     cs-hh-snap 0.5s ease-out 1.05s both,
     cs-hh-shine 6s linear 1.6s infinite;
-  will-change: clip-path, filter, background-position;
+  /* No will-change: the clip/blur entrance is one-shot, and the looping
+     background-position shine is a paint (not a compositable) property, so a
+     layer hint buys nothing while holding memory on the LCP heading. */
 }
 @keyframes cs-hh-reveal {
   from {
@@ -1289,7 +1292,7 @@ body {
 .cs-hh-phrase {
   display: inline-block;
   animation: cs-hh-focus 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.25s both;
-  will-change: opacity, transform, filter;
+  /* One-shot focus-settle — no persistent compositor-layer hint. */
 }
 @keyframes cs-hh-focus {
   from {
@@ -1373,11 +1376,18 @@ body {
 .cs-flow-dash {
   animation: cs-flow-dash 0.9s linear infinite;
 }
+/* Slow, calm dotted drift for the CleanSight posture-loop arrows. Reuses the
+   cs-flow-dash keyframe (offset -32, a multiple of the 8px dot period, so the
+   loop is seamless). Paint-only stroke-dashoffset — no layout / CLS. */
+.cs-posture-flow {
+  animation: cs-flow-dash 2.6s linear infinite;
+}
 .cs-flow-pulse {
   animation: cs-flow-pulse 3.6s ease-in-out infinite;
 }
 @media (prefers-reduced-motion: reduce) {
   .cs-flow-dash,
+  .cs-posture-flow,
   .cs-flow-pulse {
     animation: none !important;
   }
@@ -2711,6 +2721,31 @@ body {
   color: transparent;
 }
 
+/* Continuously-drifting brand gradient — the same color animation as the home
+   hero "Verified. Secure." line (the periodic cyan→purple gradient scrolled by
+   the cs-hh-shine keyframe), minus the one-shot typewriter entrance. Use on
+   inline text that should carry the looping shine. */
+.cs-text-shine {
+  background-image: linear-gradient(
+    100deg,
+    #2cc1eb 0%,
+    #9a51ff 50%,
+    #2cc1eb 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: cs-hh-shine 6s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-text-shine {
+    animation: none;
+    background-position: 0 0;
+  }
+}
+
 /* 1px gradient hairline border. Paints the brand cyan→blue→violet stroke as
    a ring around any rounded element via the mask-composite trick — the
    gradient fills a padded box, then content-box and border-box masks are
@@ -3650,17 +3685,18 @@ body {
   initial-value: 0;
 }
 
-/* Rows — un-blur + rise, staggered by --cs-i. */
+/* Rows — a single smooth scale + rise (no blur, no overshoot), staggered by
+   --cs-i so they "deal" onto the panel one by one. One continuous ease-out
+   curve keeps velocity smooth from start to settle (no mid-keyframe hitch). */
 .cs-lpr-row {
-  animation: cs-lpr-row-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: cs-lpr-row-in 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
   animation-delay: calc(0.3s + var(--cs-i, 0) * 0.13s);
-  will-change: opacity, transform, filter;
+  /* One-shot row cascade — no persistent compositor-layer hint (6 rows). */
 }
 @keyframes cs-lpr-row-in {
   from {
     opacity: 0;
-    filter: blur(6px);
-    transform: translateY(10px);
+    transform: translateY(8px) scale(0.97);
   }
 }
 
@@ -3695,12 +3731,33 @@ body {
   }
 }
 
-/* Verified checkmark draws on, then the wrap gives a soft pop. */
+/* Verified checkmark: the wrap springs in from scale 0, then the tick strokes
+   itself on — so each image visibly gets certified as its row lands. */
+.cs-lpr-checkwrap {
+  display: inline-flex;
+  transform-origin: center;
+  animation: cs-lpr-check-pop 0.44s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  animation-delay: calc(0.5s + var(--cs-i, 0) * 0.13s);
+}
+@keyframes cs-lpr-check-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 .cs-lpr-check path {
   stroke-dasharray: 16;
   stroke-dashoffset: 0;
-  animation: cs-lpr-draw 0.45s ease-out both;
-  animation-delay: calc(0.7s + var(--cs-i, 0) * 0.13s);
+  animation: cs-lpr-draw 0.4s ease-out both;
+  animation-delay: calc(0.78s + var(--cs-i, 0) * 0.13s);
 }
 @keyframes cs-lpr-draw {
   from {
@@ -3720,10 +3777,10 @@ body {
   );
   border-bottom: 1px solid rgba(180, 150, 255, 0.5);
   opacity: 0;
-  /* One long cycle: ~1.7s sweep, then idle off-screen for the rest — the panel
-     re-scans itself on a loop. transform + opacity only, so it stays on the
-     compositor (no layout/paint thrash, no CWV impact). */
-  animation: cs-lpr-scan 9s cubic-bezier(0.5, 0, 0.5, 1) 0.2s infinite;
+  /* Holds off until the rows have assembled + certified (~2.3s), then re-scans
+     on a loop: ~1.7s sweep, idle off-screen for the rest. transform + opacity
+     only, so it stays on the compositor (no layout/paint thrash, no CWV impact). */
+  animation: cs-lpr-scan 9s cubic-bezier(0.5, 0, 0.5, 1) 2.6s infinite;
 }
 @keyframes cs-lpr-scan {
   0% {
@@ -3783,17 +3840,30 @@ body {
   }
 }
 
-/* Status dots pulse. */
+/* Status dots pulse. The expanding ring is a pseudo-element: its box-shadow is
+   static (rasterized once) and only transform + opacity animate, so the loop
+   stays on the compositor instead of repainting an animated box-shadow every
+   frame (lower paint / INP cost, no CWV impact). */
 .cs-lpr-dot {
-  animation: cs-lpr-dot 2.4s ease-in-out infinite;
+  position: relative;
+}
+.cs-lpr-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.5px rgba(52, 216, 163, 0.5);
+  animation: cs-lpr-dot 2.4s ease-out infinite;
 }
 @keyframes cs-lpr-dot {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(52, 216, 163, 0.55);
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
   }
-  50% {
-    box-shadow: 0 0 0 5px rgba(52, 216, 163, 0);
+  70%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
   }
 }
 
@@ -3825,15 +3895,21 @@ body {
   .cs-lpr-row,
   .cs-lpr-bar,
   .cs-lpr-num,
+  .cs-lpr-checkwrap,
   .cs-lpr-check path,
   .cs-lpr-beam,
   .cs-lpr-sheen,
   .cs-lpr-bloom,
   .cs-lpr-dot,
+  .cs-lpr-dot::after,
   .cs-lpr-float {
     animation: none !important;
   }
   .cs-lpr-beam {
+    opacity: 0;
+  }
+  /* No resting ring around the dots when motion is off. */
+  .cs-lpr-dot::after {
     opacity: 0;
   }
 }

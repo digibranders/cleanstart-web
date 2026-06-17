@@ -11,7 +11,7 @@ interface ImpactCardProps {
 }
 
 /**
- * The "Remediation Recommendation" glass card. Every interior dimension is in
+ * The "Verified Remediation" glass card. Every interior dimension is in
  * `em`, so the caller scales the whole card by setting one `fontSize`.
  */
 export function ImpactCard({ className, style }: ImpactCardProps): React.ReactElement {
@@ -37,8 +37,8 @@ export function ImpactCard({ className, style }: ImpactCardProps): React.ReactEl
         aria-hidden
         className="grid place-items-center"
         style={{
-          width: "4.6em",
-          height: "4.6em",
+          width: "6em",
+          height: "6em",
           color: PALETTE.impact.icon,
           filter: "drop-shadow(0 0 10px rgba(45,224,166,0.6))",
         }}
@@ -57,11 +57,13 @@ export function ImpactCard({ className, style }: ImpactCardProps): React.ReactEl
             lineHeight: 1.22,
             letterSpacing: "-0.02em",
             color: "#fff",
+            textAlign: "center",
+            // Cap below the one-line width so "Verified" / "Remediation" wrap to
+            // two lines (em keeps it proportional as the card scales).
+            maxWidth: "7em",
           }}
         >
-          Remediation
-          <br />
-          Recommendation
+          Verified Remediation
         </p>
 
         <div
