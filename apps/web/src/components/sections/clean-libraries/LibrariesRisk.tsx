@@ -1,6 +1,5 @@
 import { Container, Section } from "@/components/layout";
 import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
-import { CardShell } from "./CardShell";
 
 interface RiskCard {
   icon: string;
@@ -56,8 +55,44 @@ function Ball({ icon }: { icon: string }): React.ReactElement {
 
 function Card({ card }: { card: RiskCard }): React.ReactElement {
   return (
-    <CardShell minHeight="372px">
-      <div className="flex h-full flex-col p-6">
+    <div
+      className="relative h-full min-h-[372px] overflow-hidden rounded-[28px] border-[1.5px] bg-white"
+      style={{ borderColor: "rgba(44,193,235,0.45)" }}
+    >
+      {/* Top purple wash. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-7 h-[153px] w-[263px] -translate-x-1/2 select-none opacity-30"
+        style={{ background: "#df9bff", filter: "blur(66.5px)" }}
+      />
+      {/* Horizontal grid lines. */}
+      {[68, 184].map((y) => (
+        <div
+          key={y}
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 h-px select-none opacity-30"
+          style={{
+            top: `${y}px`,
+            background:
+              "linear-gradient(90deg, transparent 0%, #fff 50.77%, transparent 100%)",
+          }}
+        />
+      ))}
+      {/* Vertical accent lines — proportional so they scale with card width. */}
+      {[16.9, 41.8, 56.6, 81.5].map((x) => (
+        <div
+          key={x}
+          aria-hidden
+          className="pointer-events-none absolute top-0 h-[264px] w-px select-none opacity-80"
+          style={{
+            left: `${x}%`,
+            background:
+              "linear-gradient(180deg, transparent 0%, #fff 50.77%, transparent 100%)",
+          }}
+        />
+      ))}
+
+      <div className="relative z-10 flex h-full flex-col p-6">
         <Ball icon={card.icon} />
         <div className="mt-8 flex flex-col gap-3">
           <h3
@@ -84,7 +119,7 @@ function Card({ card }: { card: RiskCard }): React.ReactElement {
           </p>
         </div>
       </div>
-    </CardShell>
+    </div>
   );
 }
 
@@ -132,7 +167,7 @@ export function LibrariesRisk(): React.ReactElement {
           </h2>
         </Reveal>
 
-        <RevealStagger className="mx-auto mt-12 grid max-w-[1180px] grid-cols-1 gap-6 sm:grid-cols-2 lg:mt-16 lg:grid-cols-4">
+        <RevealStagger className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:mt-16 lg:grid-cols-4">
           {CARDS.map((card) => (
             <RevealItem key={card.title}>
               <Card card={card} />

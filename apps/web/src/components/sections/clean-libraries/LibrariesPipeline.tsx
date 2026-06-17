@@ -55,8 +55,8 @@ const BALL_SHADOW =
 const DIVIDER =
   "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0) 100%)";
 
-/** Corner card content — `scaled` keeps Figma px for the scaled desktop canvas. */
-function CardBody({ card, scaled }: { card: EntryCard; scaled: boolean }): React.ReactElement {
+/** Corner card content — fonts come from the role-token system, not Figma px. */
+function CardBody({ card }: { card: EntryCard }): React.ReactElement {
   return (
     <div
       className="flex h-full w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-[24px] border px-6 text-center text-white"
@@ -67,21 +67,13 @@ function CardBody({ card, scaled }: { card: EntryCard; scaled: boolean }): React
     >
       <p
         className="font-display font-bold"
-        style={
-          scaled
-            ? { fontSize: "32px", letterSpacing: "-0.05em", lineHeight: 1 }
-            : { fontSize: "var(--fs-h3)", letterSpacing: "-0.03em", lineHeight: 1.05 }
-        }
+        style={{ fontSize: "var(--fs-h3)", letterSpacing: "-0.03em", lineHeight: 1.05 }}
       >
         {card.title}
       </p>
       <p
         className="font-sans opacity-80"
-        style={
-          scaled
-            ? { fontSize: "16px", letterSpacing: "-0.04em", lineHeight: 1.1 }
-            : { fontSize: "var(--fs-body-sm)", letterSpacing: "-0.01em", lineHeight: 1.2 }
-        }
+        style={{ fontSize: "var(--fs-body-sm)", letterSpacing: "-0.01em", lineHeight: 1.2 }}
       >
         {card.body}
       </p>
@@ -175,7 +167,7 @@ function DesktopDiagram(): React.ReactElement {
               height: "176px",
             }}
           >
-            <CardBody card={card} scaled />
+            <CardBody card={card} />
           </div>
         ))}
       </div>
@@ -199,7 +191,7 @@ function MobileDiagram(): React.ReactElement {
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {ENTRY_CARDS.map((card) => (
           <div key={card.title} className="min-h-[160px]">
-            <CardBody card={card} scaled={false} />
+            <CardBody card={card} />
           </div>
         ))}
       </div>

@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { Container, Section } from "@/components/layout";
 import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
-import { CardShell } from "./CardShell";
 
 interface WorkflowCard {
   orb: string;
@@ -41,10 +40,56 @@ const BOTTOM_CARDS: WorkflowCard[] = [
   },
 ];
 
+/** White card chrome — full border, top purple wash, and a faint grid that fills the card. */
+function Shell({
+  children,
+  minHeight,
+}: {
+  children: React.ReactNode;
+  minHeight: string;
+}): React.ReactElement {
+  return (
+    <div
+      className="relative h-full overflow-hidden rounded-[28px] border-[1.5px] bg-white"
+      style={{ borderColor: "rgba(44,193,235,0.45)", minHeight }}
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-7 h-[153px] w-[263px] -translate-x-1/2 select-none opacity-30"
+        style={{ background: "#df9bff", filter: "blur(66.5px)" }}
+      />
+      {[68, 184].map((y) => (
+        <div
+          key={y}
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 h-px select-none opacity-30"
+          style={{
+            top: `${y}px`,
+            background:
+              "linear-gradient(90deg, transparent 0%, #fff 50.77%, transparent 100%)",
+          }}
+        />
+      ))}
+      {[16.9, 41.8, 56.6, 81.5].map((x) => (
+        <div
+          key={x}
+          aria-hidden
+          className="pointer-events-none absolute top-0 h-[264px] w-px select-none opacity-80"
+          style={{
+            left: `${x}%`,
+            background:
+              "linear-gradient(180deg, transparent 0%, #fff 50.77%, transparent 100%)",
+          }}
+        />
+      ))}
+      <div className="relative z-10 flex h-full flex-col">{children}</div>
+    </div>
+  );
+}
+
 function Orb({ src, alt, size }: { src: string; alt: string; size: number }): React.ReactElement {
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
-      {/* Soft purple glow behind the icon. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 select-none rounded-full opacity-25"
@@ -124,7 +169,7 @@ function Bullets({ items }: { items: string[] }): React.ReactElement {
 
 function VerticalCard({ card }: { card: WorkflowCard }): React.ReactElement {
   return (
-    <CardShell minHeight="300px">
+    <Shell minHeight="300px">
       <div className="flex h-full flex-col gap-6 p-6">
         <Orb src={card.orb} alt={card.title} size={84} />
         <div className="flex flex-col gap-3">
@@ -132,13 +177,13 @@ function VerticalCard({ card }: { card: WorkflowCard }): React.ReactElement {
           {card.bullets ? <Bullets items={card.bullets} /> : <Body>{card.body}</Body>}
         </div>
       </div>
-    </CardShell>
+    </Shell>
   );
 }
 
 function HorizontalCard({ card }: { card: WorkflowCard }): React.ReactElement {
   return (
-    <CardShell minHeight="180px">
+    <Shell minHeight="180px">
       <div className="flex h-full w-full items-center justify-between gap-6 px-8 py-7">
         <div className="flex max-w-[62%] flex-col gap-3">
           <Title>{card.title}</Title>
@@ -146,7 +191,7 @@ function HorizontalCard({ card }: { card: WorkflowCard }): React.ReactElement {
         </div>
         <Orb src={card.orb} alt={card.title} size={104} />
       </div>
-    </CardShell>
+    </Shell>
   );
 }
 
