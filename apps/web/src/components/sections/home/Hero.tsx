@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { ArrowRightShort } from "@/components/icons/ArrowRightShort";
 import { BrandMarquee } from "@/components/sections/home/BrandMarquee";
+import { HeroHeading } from "@/components/sections/home/HeroHeading";
 import { HeroReveal } from "@/components/ui/Reveal";
 
 // CleanStart V4 hero: left-aligned headline + lead + glass CTA on the left,
@@ -16,18 +17,7 @@ export function Hero() {
         <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
           {/* Left column — copy */}
           <div className="flex w-full max-w-[620px] flex-col items-center text-center lg:items-start lg:text-left">
-            <HeroReveal y={50} duration={1.0}>
-              <h1
-                className="font-display font-semibold text-white"
-                style={{
-                  fontSize: "var(--fs-display-home)",
-                  letterSpacing: "var(--fs-display-ls)",
-                  lineHeight: 1.05,
-                }}
-              >
-                Verified. Secure. Built for the AI Era.
-              </h1>
-            </HeroReveal>
+            <HeroHeading />
 
             <HeroReveal y={36} delay={0.12} duration={0.85}>
               <p
