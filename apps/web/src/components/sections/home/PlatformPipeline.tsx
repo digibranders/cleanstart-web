@@ -22,19 +22,19 @@ const CARDS: CardData[] = [
   {
     title: "Clean\nImages",
     blurb: "Reduce inherited risk with verified zero-CVE container foundations.",
-    icon: "/images/cleanstart-factory/clean-images.webp",
+    icon: "/images/cleanstart-factory/clean-images-2.webp",
     href: "/cleanstart-images",
   },
   {
     title: "Clean\nLibraries",
     blurb: "Govern dependencies with trusted open-source libraries.",
-    icon: "/images/cleanstart-factory/clean-libraries.webp",
+    icon: "/images/cleanstart-factory/clean-libraries-2.webp",
     href: "/cleanstart-platform",
   },
   {
     title: "Clean\nSight",
     blurb: "Continuously identify inherited software supply chain risk.",
-    icon: "/images/cleanstart-factory/cleansight.webp",
+    icon: "/images/cleanstart-factory/cleansight-2.webp",
     href: "/cleansight",
   },
 ];
