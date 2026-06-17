@@ -1211,10 +1211,27 @@ body {
 }
 .cs-hh-type {
   display: inline-block;
+  /* White letters painted via background-clip so a soft cyan glint can sweep
+     across the glyphs once after focus — a text-clipped shine, never a box. */
+  background-image: linear-gradient(
+    100deg,
+    #ffffff 0%,
+    #ffffff 42%,
+    #c9f3ff 50%,
+    #ffffff 58%,
+    #ffffff 100%
+  );
+  background-size: 220% 100%;
+  background-position: 130% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
   animation:
     cs-hh-reveal 0.9s steps(17) 0.15s both,
-    cs-hh-snap 0.5s ease-out 1.05s both;
-  will-change: clip-path, filter;
+    cs-hh-snap 0.5s ease-out 1.05s both,
+    cs-hh-typeshine 1.5s ease-in-out 1.5s 1 both;
+  will-change: clip-path, filter, background-position;
 }
 @keyframes cs-hh-reveal {
   from {
@@ -1230,6 +1247,14 @@ body {
   }
   to {
     filter: blur(0);
+  }
+}
+@keyframes cs-hh-typeshine {
+  from {
+    background-position: 130% 0;
+  }
+  to {
+    background-position: -30% 0;
   }
 }
 
@@ -1319,37 +1344,14 @@ body {
   }
 }
 
-/* 3 · Settle glint — one soft white sheen sweeps the whole heading after the
-   phrases land, then stays out of the way. */
-.cs-hero-h1::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(
-    105deg,
-    transparent 42%,
-    rgba(255, 255, 255, 0.32) 50%,
-    transparent 58%
-  );
-  background-size: 220% 100%;
-  background-position: 130% 0;
-  mix-blend-mode: screen;
-  animation: cs-hh-sweep 1.1s ease-out 2.1s 1 both;
-}
-@keyframes cs-hh-sweep {
-  from {
-    background-position: 130% 0;
-  }
-  to {
-    background-position: -30% 0;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .cs-hh-type,
   .cs-hh-phrase {
     animation: none;
+  }
+  /* Keep the heading crisp white when motion is off (no resting glint tint). */
+  .cs-hh-type {
+    -webkit-text-fill-color: #ffffff;
   }
   .cs-hh-typewrap::after {
     display: none;
@@ -1357,9 +1359,6 @@ body {
   .cs-hh-accent {
     animation: none;
     background-position: 0 0;
-  }
-  .cs-hero-h1::after {
-    display: none;
   }
 }
 
