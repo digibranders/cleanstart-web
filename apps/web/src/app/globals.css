@@ -238,6 +238,11 @@
      pulled 28→56 back to 28→48 — marketing hierarchy is now H1 56 / H2 48
      (hero display & --fs-h1 share the 56 cap; section H2 sits one step below). */
   --fs-display:  clamp(2.25rem, 1.5rem + 2.22vw, 3.5rem);    /* 36 → 56  hero H1 */
+  /* Homepage hero only — restores the larger 36 → 64 cap (consumed by
+     sections/home/Hero.tsx). Other marketing/product heroes keep --fs-display
+     (36 → 56). Same lower lock-point as --fs-display (~540px) so only the
+     desktop end grows. */
+  --fs-display-home: clamp(2.25rem, 1.2rem + 3.11vw, 4rem);  /* 36 → 64  home hero H1 */
   --fs-h1:       clamp(2rem, 1.5rem + 2.22vw, 3.5rem);       /* 32 → 56  listing/detail/legal H1 */
   --fs-h2:       clamp(1.75rem, 1.375rem + 1.81vw, 3rem);    /* 28 → 48  section H2 */
   --fs-h3:       clamp(1.375rem, 1.25rem + 0.56vw, 1.75rem); /* 22 → 28  subsection / card title */
