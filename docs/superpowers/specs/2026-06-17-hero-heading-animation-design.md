@@ -10,16 +10,20 @@ Replace the home hero H1's plain fade-up entrance with a richer, on-brand motion
 combination that reads as premium rather than gimmicky, **without regressing LCP**
 (the H1 is the LCP element) and **without a new dependency**.
 
-Combo **D** = two layered effects:
+The sequence (updated 2026-06-17 — "type-on → true-focus" added per follow-up):
 
-1. **Focus Settle (entrance, one-shot):** the three phrases — "Verified.",
-   "Secure.", "Built for the AI Era." — rise + un-blur + fade in, staggered
-   left→right (the "True Focus" feel).
-2. **Living Accent (persistent, gentle):** the phrase "AI Era" carries a static
-   brand cyan→purple gradient with a soft white shimmer that sweeps through it
-   periodically (~every 5 s) — the "Shiny Text" feel, scoped to two words.
-3. A single soft white **glint** sweeps the whole heading once, right after the
-   phrases settle (the "settle shimmer").
+1. **Type-on → true-focus (line 1):** "Verified. Secure." reveals via a stepped
+   `clip-path` wipe with a blinking caret (reads as typing) while held in soft
+   blur, then snaps `blur→sharp` once fully revealed — the "TextType → TrueFocus"
+   combo, done as a *reveal* (full text in the DOM) not character insertion, so
+   it stays LCP/SEO/screen-reader safe. Web research (web.dev LCP, CSS-Tricks,
+   DEV) confirms real character-insertion typewriters regress LCP on the LCP
+   element; the clip reveal is the field-standard fix.
+2. **Focus settle (line 2):** "Built for the AI Era." rises + un-blurs + fades in
+   after line 1 lands.
+3. **Living accent (persistent, gentle):** "AI Era" carries a brand cyan→purple
+   gradient with a soft white shimmer sweeping through periodically (~5.5 s).
+4. A single soft white **glint** sweeps the whole heading once after it settles.
 
 ## LCP / SSR safety (the hard constraint)
 
@@ -61,9 +65,21 @@ One new presentational server component:
 
 ## CSS (added to `globals.css`, beside `cs-hero-reveal`)
 
-- `.cs-hh-phrase` — `display: inline-block`; `animation: cs-hh-focus 0.8s
-  cubic-bezier(0.16,1,0.3,1) both`. Per-phrase `animation-delay` via `:nth-child`
-  (≈0.05s / 0.22s / 0.39s).
+Timeline: 0.15s type-on starts → ~1.05s revealed → focus snap → 1.25s line 2
+focus-settles → ~2.2s accent shimmer + settle glint.
+
+- `.cs-hh-typewrap` — `inline-block; position: relative; white-space: nowrap`;
+  holds the caret so the inner `clip-path` can't crop it.
+- `.cs-hh-type` — `animation: cs-hh-reveal 0.9s steps(17) 0.15s both,
+  cs-hh-snap 0.5s ease-out 1.05s both`. `cs-hh-reveal` steps `clip-path:
+  inset(0 100% 0 0) → inset(0 0 0 0)` (the type-on); `cs-hh-snap` eases
+  `filter: blur(5px) → blur(0)` (the focus), back-filled during the reveal so
+  the line types in soft and snaps sharp.
+- `.cs-hh-typewrap::after` — the caret: a `0.06em × 0.82em` `currentColor` bar,
+  `cs-hh-caret-move` (`left 0→100%`, `steps(17)`, synced to the reveal) +
+  `cs-hh-blink` (infinite) + `cs-hh-caret-hide` (fades out as focus runs).
+- `.cs-hh-phrase` (line 2) — `animation: cs-hh-focus 0.8s
+  cubic-bezier(0.16,1,0.3,1) 1.25s both`.
 - `@keyframes cs-hh-focus` — `from { opacity:0; filter:blur(12px);
   transform:translateY(0.18em); } to { opacity:1; filter:blur(0);
   transform:none; }`.
@@ -89,10 +105,12 @@ filter` on phrases) and dropped after; the accent shimmer animates
   (compile phase; CMS-prerender ETIMEDOUT is the known environmental failure).
 - **No unit test** — this is pure CSS + static JSX with no logic to assert; a
   snapshot of marble-in-motion CSS would be brittle and low-value.
-- **Preview (1440×900):** confirm (1) the H1 text is present in the initial DOM
-  (LCP-safe), (2) the three phrases carry `cs-hh-phrase` and the accent carries
-  the gradient (`color: transparent` + background-clip), (3) a screenshot shows
-  "AI Era" rendered in the cyan→purple gradient. The entrance/shimmer timing
+- **Preview (1440×900):** confirm (1) the full H1 text is present in the initial
+  DOM (`Verified. Secure. Built for the AI Era.` — LCP/SEO safe), (2) the type
+  unit (`.cs-hh-type`), caret (`.cs-hh-typewrap::after`), line-2 phrase, and
+  gradient accent are wired, (3) a forced end-state screenshot shows the line
+  revealed/sharp and "AI Era" in the cyan→purple gradient. The entrance/shimmer
+  timing
   itself can't be auto-driven in the hidden preview (rAF/animation throttling),
   same limitation noted for ClickSpark — verify structure + the static gradient
   paint, which is what proves the wiring.
