@@ -95,9 +95,8 @@ export function ProblemsToday() {
                   AI-Generated Software Risk
                 </h3>
                 <p className="mt-5 max-w-[420px] text-[#333]" style={descStyle}>
-                  AI-assisted development accelerates software delivery but
-                  introduces unverified dependencies, unknown provenance, and
-                  inherited software risk at machine scale.
+                  AI-assisted development introduces unverified dependencies,
+                  unknown provenance, and inherited risk at scale.
                 </p>
               </div>
               {/* Cube + arcs illustration (exported from Figma). */}

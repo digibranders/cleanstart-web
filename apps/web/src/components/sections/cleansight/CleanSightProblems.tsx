@@ -4,27 +4,27 @@ import { WhyMattersGrid, type WhyCard } from '../_shared/WhyMattersGrid';
 const CARDS: readonly [WhyCard, WhyCard, WhyCard, WhyCard] = [
   {
     title: 'Software Sprawl',
-    desc: 'Modern environments inherit thousands of software components across images, dependencies, and registries.',
+    desc: 'Modern environments accumulate software across images, dependencies, and registries.',
     imgSrc: '/images/cleansight/problem-shadow-containers.webp',
     imgAlt: 'Software sprawl illustration',
   },
   {
     title: 'Fragmented Visibility',
-    desc: 'Disconnected tooling creates operational blind spots across software delivery environments.',
+    desc: 'Disconnected tooling creates visibility gaps across software delivery environments.',
     imgSrc: '/images/cleansight/problem-fragmented-views.webp',
     imgAlt: 'Fragmented visibility illustration',
   },
   {
     title: 'Unverified Dependencies',
-    desc: 'Limited dependency visibility increases inherited software risk across modern infrastructure.',
+    desc: 'Unverified dependencies increase inherited software risk across modern environments.',
     imgSrc: '/images/cleansight/problem-unknown-image.webp',
     imgAlt: 'Unverified dependencies illustration',
   },
   {
-    title: 'Continuous Compliance Pressure',
-    desc: 'Incomplete software inventories increase audit complexity across regulated environments.',
+    title: 'Compliance Pressure',
+    desc: 'Incomplete software inventories increase compliance and audit complexity.',
     imgSrc: '/images/cleansight/problem-audit-complexity.webp',
-    imgAlt: 'Continuous compliance pressure illustration',
+    imgAlt: 'Compliance pressure illustration',
   },
 ];
 

@@ -20,21 +20,21 @@ type CardData = {
 
 const CARDS: CardData[] = [
   {
-    title: "CleanStart\nImages",
-    blurb: "Verified zero-CVE container foundations for modern software delivery.",
-    icon: "/images/cleanstart-factory/factory-images.webp",
+    title: "Clean\nImages",
+    blurb: "Reduce inherited risk with verified zero-CVE container foundations.",
+    icon: "/images/cleanstart-factory/clean-images.webp",
     href: "/cleanstart-images",
   },
   {
-    title: "CleanStart\nLibraries",
-    blurb: "Trusted open-source dependencies built from verified sources.",
-    icon: "/images/cleanstart-factory/factory-libraries.webp",
+    title: "Clean\nLibraries",
+    blurb: "Govern dependencies with trusted open-source libraries.",
+    icon: "/images/cleanstart-factory/clean-libraries.webp",
     href: "/cleanstart-platform",
   },
   {
     title: "Clean\nSight",
-    blurb: "Continuous visibility into inherited software supply chain risk.",
-    icon: "/images/cleanstart-factory/factory-models.webp",
+    blurb: "Continuously identify inherited software supply chain risk.",
+    icon: "/images/cleanstart-factory/cleansight.webp",
     href: "/cleansight",
   },
 ];
@@ -87,11 +87,11 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
           alt=""
           aria-hidden
           width={200}
-          height={210}
+          height={200}
           sizes="(min-width: 1024px) 140px, 22vw"
           priority={isFirst}
           className="pointer-events-none select-none"
-          style={{ width: "44cqw", height: "auto" }}
+          style={{ width: "53cqw", height: "auto" }}
         />
 
         <h3
@@ -118,9 +118,9 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
         </p>
 
         <Link
-          href="#"
+          href={data.href}
           aria-label={`Learn more about ${plainTitle}`}
-          className="mt-auto inline-flex cursor-pointer items-center justify-center rounded-full outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-white/70"
+          className="mt-[9cqw] inline-flex cursor-pointer items-center justify-center rounded-full outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-white/70"
           style={{ width: "clamp(24px, 11cqw, 30px)", height: "clamp(24px, 11cqw, 30px)" }}
         >
           <svg
@@ -232,8 +232,8 @@ function FactoryEnclosure() {
 
         <div className="relative flex flex-col p-[30px]">
           {/* Cards — a centered group, narrower than the bar below it. */}
-          <div className="relative mx-auto w-full max-w-[732px]">
-            <div className="grid grid-cols-3 gap-7">
+          <div className="relative mx-auto w-full max-w-[780px]">
+            <div className="grid grid-cols-3 gap-11">
               {CARDS.map((c, i) => (
                 <div key={c.title} className="w-full">
                   <FactoryCard data={c} isFirst={i === 0} />
@@ -248,8 +248,8 @@ function FactoryEnclosure() {
               dashed "current"; `reverse` makes it flow bottom-up (Intelligence
               Centre → cards). Phase-offset per lane for life. Always shown: the
               layout never collapses to a single column. */}
-          <div className="relative mx-auto w-full max-w-[732px]">
-            <div className="grid h-[38px] grid-cols-3 gap-7">
+          <div className="relative mx-auto w-full max-w-[780px]">
+            <div className="grid h-[38px] grid-cols-3 gap-11">
               {[0, 1, 2].map((i) => (
                 <div key={i} aria-hidden className="relative overflow-hidden">
                   <FlowBeam
@@ -274,10 +274,10 @@ function FactoryEnclosure() {
 }
 
 // Chevron-in-circle "learn more" affordance, shared by the mobile cards.
-function CardChevron({ title, size }: { title: string; size: string }) {
+function CardChevron({ title, href, size }: { title: string; href: string; size: string }) {
   return (
     <Link
-      href="#"
+      href={href}
       aria-label={`Learn more about ${title}`}
       className="inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-white/70"
       style={{ width: size, height: size }}
@@ -358,11 +358,11 @@ function FactoryMobileCard({ data, isFirst }: { data: CardData; isFirst: boolean
           alt=""
           aria-hidden
           width={200}
-          height={210}
+          height={200}
           sizes="(max-width: 480px) 96px, 110px"
           priority={isFirst}
           className="pointer-events-none shrink-0 select-none"
-          style={{ width: "21cqw", height: "auto" }}
+          style={{ width: "25cqw", height: "auto" }}
         />
 
         <div className="flex min-w-0 flex-1 flex-col" style={{ gap: "1.4cqw" }}>
@@ -389,7 +389,7 @@ function FactoryMobileCard({ data, isFirst }: { data: CardData; isFirst: boolean
           </p>
         </div>
 
-        <CardChevron title={plainTitle} size="clamp(24px, 7cqw, 30px)" />
+        <CardChevron title={plainTitle} href={data.href} size="clamp(24px, 7cqw, 30px)" />
       </div>
 
       <figcaption className="sr-only">

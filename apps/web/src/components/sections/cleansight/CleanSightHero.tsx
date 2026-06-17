@@ -33,7 +33,7 @@ export function CleanSightHero(): React.ReactElement {
                 textWrap: "balance",
               }}
             >
-              Continuous Visibility for Modern Software Supply Chains
+              Continuous Software Visibility
             </h1>
           </HeroReveal>
 
@@ -50,9 +50,8 @@ export function CleanSightHero(): React.ReactElement {
                 textWrap: "balance",
               }}
             >
-              Software Supply Chain Posture Management that continuously
-              identifies inherited software risk, prioritizes exposure, and
-              accelerates remediation with verified software alternatives.
+              Discover software assets, dependencies, and inherited risk across
+              modern environments.
             </p>
           </HeroReveal>
 

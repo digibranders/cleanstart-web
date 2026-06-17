@@ -3,22 +3,22 @@ import { Reveal } from "@/components/ui/Reveal";
 const CARDS = [
   {
     title: "Continuous Discovery",
-    body: "Continuously discover software assets across modern environments.",
+    body: "Continuously discover software assets across environments.",
     iconSrc: "/images/cleansight/Ball1.webp",
   },
   {
     title: "Inherited Risk Analysis",
-    body: "Correlate inherited software risk across dependencies, artifacts, and environments.",
+    body: "Correlate inherited software risk across environments.",
     iconSrc: "/images/cleansight/Ball2.webp",
   },
   {
     title: "Verified Inventories",
-    body: "Maintain continuously verified inventories, SBOMs, and software provenance.",
+    body: "Maintain verified inventories, SBOMs, and provenance.",
     iconSrc: "/images/cleansight/Ball3.webp",
   },
   {
     title: "Verified Remediation",
-    body: "Prioritize and remediate inherited software risk with verified alternatives.",
+    body: "Prioritize inherited risk with verified alternatives.",
     iconSrc: "/images/cleansight/Ball4.webp",
   },
 ];
@@ -122,7 +122,7 @@ export function CleanSightUnified(): React.ReactElement {
                 borderRadius: "36px",
                 /* Cyan glow border at 30% opacity. */
                 boxShadow: "0 0 0 4px rgba(44, 193, 235, 0.30)",
-                minHeight: "346px",
+                minHeight: "312px",
               }}
             >
               {/* Purple glow blob — top of card. */}
@@ -178,19 +178,19 @@ export function CleanSightUnified(): React.ReactElement {
                 />
               ))}
 
-              <div className="relative flex flex-col flex-1 z-10" style={{ padding: "24px", paddingTop: "54px", gap: "12px" }}>
+              <div className="relative flex flex-col flex-1 z-10" style={{ padding: "24px", paddingTop: "36px", paddingBottom: "20px", gap: "12px" }}>
                 {/* Per-card PNG sphere with embedded glyph. */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={card.iconSrc}
                   alt=""
                   aria-hidden
-                  width={96}
-                  height={96}
+                  width={112}
+                  height={112}
                   loading="lazy"
                   decoding="async"
                   className="flex-shrink-0 pointer-events-none select-none"
-                  style={{ width: "96px", height: "96px", objectFit: "contain" }}
+                  style={{ width: "112px", height: "112px", objectFit: "contain" }}
                 />
 
                 <h3
@@ -201,6 +201,15 @@ export function CleanSightUnified(): React.ReactElement {
                     letterSpacing: "-0.04em",
                     lineHeight: 1.1,
                     color: "#111",
+                    /* Constrain width so every title wraps to two balanced
+                       lines — keeps the four card titles visually consistent.
+                       7.2em (~202px at --fs-h3) sits below the narrowest full
+                       title (~243px) so the 2-word titles break, yet above the
+                       widest wrapped line ("Risk Analysis", ~162px) so none
+                       spill to a third line. em keeps it proportional to the
+                       fluid font size. */
+                    maxWidth: "7.2em",
+                    textWrap: "balance",
                   }}
                 >
                   {card.title}

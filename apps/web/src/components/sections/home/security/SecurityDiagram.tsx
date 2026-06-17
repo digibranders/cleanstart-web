@@ -12,21 +12,21 @@ type Stage = { icon: string; title: string; desc: string };
 type Guarantee = { title: string; desc: string };
 
 const STAGES: Stage[] = [
-  { icon: "icon-open-source.svg", title: "Open Source", desc: "External sources and repositories" },
-  { icon: "icon-dependencies.svg", title: "Dependencies", desc: "Direct and transitive dependencies" },
-  { icon: "icon-build.svg", title: "Build", desc: "Your build environment" },
-  { icon: "icon-registry.svg", title: "Public Registry", desc: "Images & packages in public registries" },
-  { icon: "icon-deploy.svg", title: "Deploy", desc: "Deployed across environments" },
-  { icon: "icon-runtime.svg", title: "Runtime", desc: "Running in production at scale" },
+  { icon: "icon-open-source.svg", title: "Source", desc: "Curated upstream software" },
+  { icon: "icon-dependencies.svg", title: "Dependencies", desc: "Direct and transitive packages" },
+  { icon: "icon-build.svg", title: "Build", desc: "Controlled build environments" },
+  { icon: "icon-registry.svg", title: "Registry", desc: "Published software artifacts" },
+  { icon: "icon-deploy.svg", title: "Deploy", desc: "Managed deployment environments" },
+  { icon: "icon-runtime.svg", title: "Runtime", desc: "Running production workloads" },
 ];
 
 const GUARANTEES: Guarantee[] = [
-  { title: "Verified Sources", desc: "Curated and verified upstream sources" },
-  { title: "Trusted Dependencies", desc: "Scanned, curated, and continuously validated" },
-  { title: "Reproducible Pipelines", desc: "Deterministic, repeatable, and auditable builds" },
-  { title: "Verified Artifacts", desc: "Zero-CVE images, signed and attested" },
-  { title: "Continuous Visibility", desc: "Posture, drift, and risk visibility across your environment" },
-  { title: "Proven Integrity", desc: "Continuously verified integrity from build to runtime" },
+  { title: "Verified Sources", desc: "Curated upstream sources" },
+  { title: "Trusted Dependencies", desc: "Continuously validated dependencies" },
+  { title: "Reproducible Pipelines", desc: "Deterministic build pipelines" },
+  { title: "Verified Artifacts", desc: "Signed and attested artifacts" },
+  { title: "Continuous Visibility", desc: "Posture and drift visibility" },
+  { title: "Proven Integrity", desc: "Continuously verified integrity" },
 ];
 
 const LANE_COUNT = STAGES.length;
