@@ -220,9 +220,9 @@ export function LibrariesPipeline(): React.ReactElement {
       />
       <Container className="relative">
         <Reveal header>
-          <div className="mx-auto max-w-[900px] text-center">
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:items-center lg:gap-12">
             <h2
-              className="font-display text-white"
+              className="text-center font-display text-white lg:text-left"
               style={{
                 fontSize: "var(--fs-h2)",
                 fontWeight: 700,
@@ -242,7 +242,7 @@ export function LibrariesPipeline(): React.ReactElement {
               </span>
             </h2>
             <p
-              className="mx-auto mt-5 max-w-[760px] font-sans text-white/80"
+              className="text-center font-sans text-white/80 lg:text-left"
               style={{
                 fontSize: "var(--fs-lead)",
                 fontWeight: 400,

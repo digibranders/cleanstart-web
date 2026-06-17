@@ -12,7 +12,7 @@ import { Reveal } from "@/components/ui/Reveal";
 export function LibrariesCTA(): React.ReactElement {
   return (
     <div
-      className="absolute inset-0 flex flex-col items-center justify-center gap-5 overflow-hidden px-8 text-center md:px-12 lg:grid lg:grid-cols-[minmax(0,460px)_minmax(0,540px)] lg:items-center lg:justify-center lg:gap-x-[clamp(40px,6vw,68px)] lg:p-[clamp(32px,4vw,56px)_clamp(40px,6vw,100px)] lg:text-left"
+      className="absolute inset-0 flex flex-col items-center justify-center gap-5 overflow-hidden px-8 text-center md:px-12 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.7fr)] lg:content-center lg:items-start lg:justify-center lg:gap-x-[clamp(32px,4vw,56px)] lg:p-[clamp(32px,4vw,56px)_clamp(40px,5vw,72px)] lg:text-left"
       style={{
         background:
           "linear-gradient(180deg, #131e8f 0%, #471ec0 111.05%)",
@@ -103,7 +103,7 @@ export function LibrariesCTA(): React.ReactElement {
           className="text-center font-sans text-white lg:text-left"
           style={{
             opacity: 0.8,
-            maxWidth: "540px",
+            maxWidth: "660px",
             fontSize: "var(--cta-card-desc)",
             fontWeight: 400,
             letterSpacing: "var(--cta-card-desc-ls)",
