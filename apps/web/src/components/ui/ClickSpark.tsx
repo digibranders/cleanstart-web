@@ -14,7 +14,10 @@ import { useEffect, useRef } from "react";
  *
  * Cost profile: no external dependency, a viewport-sized backing store (not the
  * document height), and a lazy rAF loop that runs only while a spark is alive —
- * an idle page does zero per-frame work. Honors `prefers-reduced-motion`.
+ * an idle page does zero per-frame work. Honors `prefers-reduced-motion`, and
+ * is disabled on touch-primary devices (phones/tablets) — the canvas is hidden
+ * via `pointer-coarse:hidden` and the draw handler bails on a coarse pointer —
+ * so the full-viewport blend layer never costs paint/scroll there.
  */
 
 export type SparkEasing = "linear" | "ease-in" | "ease-out" | "ease-in-out";
@@ -78,6 +81,9 @@ export function ClickSpark({
     if (!ctx) return;
 
     const reduceQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    // Touch-primary devices (phones, tablets) get no sparks — the canvas is
+    // also hidden via CSS on coarse pointers, so this just skips the work.
+    const touchQuery = window.matchMedia("(pointer: coarse)");
     const sparks: Spark[] = [];
     let frameId = 0;
     let resizeFrame = 0;
@@ -130,7 +136,7 @@ export function ClickSpark({
     };
 
     const onPointerDown = (event: PointerEvent): void => {
-      if (reduceQuery.matches) return;
+      if (reduceQuery.matches || touchQuery.matches) return;
       sparks.push({
         x: event.clientX,
         y: event.clientY,
@@ -165,7 +171,7 @@ export function ClickSpark({
     <canvas
       ref={canvasRef}
       aria-hidden
-      className="pointer-events-none fixed inset-0 z-[100] mix-blend-difference"
+      className="pointer-events-none fixed inset-0 z-[100] mix-blend-difference pointer-coarse:hidden"
     />
   );
 }

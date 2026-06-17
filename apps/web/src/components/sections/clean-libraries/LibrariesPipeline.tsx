@@ -141,7 +141,7 @@ function DesktopDiagram(): React.ReactElement {
           aria-hidden
           src="/images/clean-libraries/pipeline-orb.png"
           alt=""
-          className="pointer-events-none absolute left-1/2 top-1/2 w-[589px] max-w-none -translate-x-1/2 -translate-y-1/2 select-none"
+          className="pointer-events-none absolute left-1/2 top-1/2 w-[480px] max-w-none -translate-x-1/2 -translate-y-1/2 select-none"
           loading="lazy"
           decoding="async"
         />

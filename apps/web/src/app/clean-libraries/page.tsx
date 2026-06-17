@@ -4,6 +4,7 @@ import { FadeUp } from "@/components/ui/FadeUp";
 import { LibrariesHero } from "@/components/sections/clean-libraries/LibrariesHero";
 import { LibrariesRisk } from "@/components/sections/clean-libraries/LibrariesRisk";
 import { LibrariesPipeline } from "@/components/sections/clean-libraries/LibrariesPipeline";
+import { LibrariesGovernance } from "@/components/sections/clean-libraries/LibrariesGovernance";
 import { LibrariesWorkflow } from "@/components/sections/clean-libraries/LibrariesWorkflow";
 import { LibrariesCTA } from "@/components/sections/clean-libraries/LibrariesCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
@@ -49,6 +50,9 @@ export default function CleanLibrariesPage(): React.ReactElement {
         </FadeUp>
         <FadeUp>
           <LibrariesPipeline />
+        </FadeUp>
+        <FadeUp>
+          <LibrariesGovernance />
         </FadeUp>
         <FadeUp>
           <LibrariesWorkflow />
