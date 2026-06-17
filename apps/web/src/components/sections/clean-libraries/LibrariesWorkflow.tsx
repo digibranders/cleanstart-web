@@ -40,7 +40,7 @@ const BOTTOM_CARDS: WorkflowCard[] = [
   },
 ];
 
-const CARD_FRAME = "rounded-[40px] p-[3px]";
+const CARD_FRAME = "rounded-[36px] p-[3px]";
 const CARD_FRAME_BG =
   "linear-gradient(135deg, rgba(44,193,235,0.4) 0%, rgba(44,193,235,0.1) 60%, rgba(255,255,255,0.6) 100%)";
 
@@ -128,9 +128,9 @@ function Bullets({ items }: { items: string[] }): React.ReactElement {
 function VerticalCard({ card }: { card: WorkflowCard }): React.ReactElement {
   return (
     <div className={CARD_FRAME} style={{ background: CARD_FRAME_BG }}>
-      <div className="flex h-full min-h-[clamp(340px,34vw,400px)] flex-col gap-6 rounded-[37px] bg-white p-7">
-        <Orb src={card.orb} alt={card.title} size={104} />
-        <div className="mt-auto flex flex-col gap-4">
+      <div className="flex h-full min-h-[clamp(228px,23vw,260px)] flex-col gap-5 rounded-[33px] bg-white p-6">
+        <Orb src={card.orb} alt={card.title} size={84} />
+        <div className="mt-auto flex flex-col gap-3">
           <Title>{card.title}</Title>
           {card.bullets ? <Bullets items={card.bullets} /> : <Body>{card.body}</Body>}
         </div>
@@ -142,12 +142,12 @@ function VerticalCard({ card }: { card: WorkflowCard }): React.ReactElement {
 function HorizontalCard({ card }: { card: WorkflowCard }): React.ReactElement {
   return (
     <div className={CARD_FRAME} style={{ background: CARD_FRAME_BG }}>
-      <div className="flex min-h-[clamp(220px,22vw,270px)] items-center justify-between gap-6 rounded-[37px] bg-white p-8">
-        <div className="flex max-w-[60%] flex-col gap-4">
+      <div className="flex min-h-[clamp(150px,15vw,176px)] items-center justify-between gap-6 rounded-[33px] bg-white px-8 py-7">
+        <div className="flex max-w-[62%] flex-col gap-3">
           <Title>{card.title}</Title>
           <Body>{card.body}</Body>
         </div>
-        <Orb src={card.orb} alt={card.title} size={132} />
+        <Orb src={card.orb} alt={card.title} size={116} />
       </div>
     </div>
   );

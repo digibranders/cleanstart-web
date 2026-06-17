@@ -36,13 +36,13 @@ export function LibrariesCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Rotated product illustration — far right. */}
+      {/* Rotated product illustration — pinned to the extreme bottom-right corner. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
         src="/images/clean-libraries/cta-illustration.png"
         alt=""
-        className="pointer-events-none absolute right-[40px] top-1/2 hidden h-[210px] w-[210px] -translate-y-1/2 -rotate-[15deg] select-none object-contain opacity-90 xl:block"
+        className="pointer-events-none absolute -bottom-[28px] -right-[18px] hidden h-[180px] w-[180px] -rotate-[15deg] select-none object-contain opacity-90 lg:block"
         loading="lazy"
         decoding="async"
       />
