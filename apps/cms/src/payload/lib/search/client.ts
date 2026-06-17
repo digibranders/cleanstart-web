@@ -66,8 +66,22 @@ export interface SearchClient {
   search: (
     indexUid: string,
     query: string,
-    opts?: { limit?: number; filter?: string; sort?: readonly string[] },
-  ) => Promise<{ hits: unknown[]; estimatedTotalHits: number; processingTimeMs: number } | null>;
+    opts?: {
+      limit?: number;
+      filter?: string;
+      sort?: readonly string[];
+      /** Request facet distribution for the given attributes. */
+      facets?: readonly string[];
+      /** Restrict the fields each hit carries back — keeps the heavy
+       * `body` attribute off the wire when only metadata is needed. */
+      attributesToRetrieve?: readonly string[];
+    },
+  ) => Promise<{
+    hits: unknown[];
+    estimatedTotalHits: number;
+    processingTimeMs: number;
+    facetDistribution?: Record<string, Record<string, number>>;
+  } | null>;
 }
 
 const trimTrailingSlash = (s: string): string => (s.endsWith('/') ? s.slice(0, -1) : s);
@@ -134,8 +148,13 @@ export const createSearchClient = (config: SearchClientConfig): SearchClient => 
         'DELETE',
         `/indexes/${encodeURIComponent(indexUid)}/documents/${encodeURIComponent(id)}`,
       ),
-    updateSettings: (indexUid, settings) =>
-      request('PATCH', `/indexes/${encodeURIComponent(indexUid)}/settings`, settings),
+    updateSettings: (indexUid, settings) => {
+      // `primaryKey` is an index-creation property, not a settings field —
+      // Meilisearch's PATCH /settings rejects it (400 "Unknown field
+      // `primaryKey`") and drops the whole update, so strip it here.
+      const { primaryKey: _primaryKey, ...body } = settings;
+      return request('PATCH', `/indexes/${encodeURIComponent(indexUid)}/settings`, body);
+    },
     getStats: async (indexUid): Promise<IndexStats | null> => {
       try {
         const res = await f(`${baseUrl}/indexes/${encodeURIComponent(indexUid)}/stats`, {
@@ -157,6 +176,10 @@ export const createSearchClient = (config: SearchClientConfig): SearchClient => 
           limit: opts?.limit ?? 20,
           ...(opts?.filter ? { filter: opts.filter } : {}),
           ...(opts?.sort ? { sort: opts.sort } : {}),
+          ...(opts?.facets ? { facets: opts.facets } : {}),
+          ...(opts?.attributesToRetrieve
+            ? { attributesToRetrieve: opts.attributesToRetrieve }
+            : {}),
         }),
       }).catch(() => null);
       if (!res || !res.ok) return null;

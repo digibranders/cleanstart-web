@@ -32,9 +32,11 @@ type CmsList<T> = { docs: T[] };
 const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? 'http://localhost:3000';
 
 // Per-collection published filters mirror each collection's lifecycle field:
-// blogs/resources/events/authors use `publishedAt`, news uses `publicationDate`,
-// jobs surface only open + published roles.
+// blogs/resources/events/guides/knowledgeBase/legalDocuments use `publishedAt`,
+// news uses `publicationDate`, jobs surface only open + published roles.
+// Authors has no `publishedAt` field — status-only filter is correct.
 const BLOG_FILTER = 'where[_status][equals]=published&where[publishedAt][exists]=true';
+const AUTHORS_FILTER = 'where[_status][equals]=published';
 const NEWS_FILTER = 'where[_status][equals]=published&where[publicationDate][exists]=true';
 const JOBS_FILTER = 'where[_status][equals]=published&where[hiringStatus][equals]=open';
 
@@ -67,8 +69,10 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/blogs' },
   { path: '/book-a-demo' },
   { path: '/careers' },
+  { path: '/case-studies' },
   { path: '/cleansight' },
   { path: '/cleanstart-images' },
+  { path: '/cleanstart-platform' },
   { path: '/community' },
   { path: '/contact-us' },
   { path: '/deal-registration' },
@@ -77,12 +81,14 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/for-ciso' },
   { path: '/for-developers' },
   { path: '/guide' },
-  { path: '/knowledge-hub' },
+  // `/knowledge-hub` is a redirect to the first article (no standalone listing) —
+  // excluded here. The individual /knowledge-hub/<slug> articles are emitted below.
   // `/legal` is a 308 redirect (not a page) — excluded here. The individual
   // /legal/<slug> docs are emitted dynamically from the legalDocuments CMS.
   { path: '/news' },
   { path: '/partners' },
   { path: '/podcast' },
+  { path: '/pricing' },
   { path: '/privacy-policy' },
   { path: '/resource-center' },
   { path: '/software-bill-materials' },
@@ -107,7 +113,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     await Promise.all([
       fetchDocs('blogs', BLOG_FILTER),
       fetchDocs('resources', BLOG_FILTER),
-      fetchDocs('authors', BLOG_FILTER),
+      fetchDocs('authors', AUTHORS_FILTER),
       fetchDocs('news', NEWS_FILTER),
       fetchDocs('events', BLOG_FILTER),
       fetchDocs('jobs', JOBS_FILTER),

@@ -6,6 +6,7 @@ import {
   looksLikeJunkSlug,
   pickSlugSource,
   shortHash,
+  stripVendorAssetIdPrefix,
 } from './media-filename';
 import { ALLOWED_MIME_TYPES } from './upload-limits';
 
@@ -123,6 +124,78 @@ describe('buildMediaFilename', () => {
       ext: '',
     });
     expect(name.endsWith('.bin')).toBe(true);
+  });
+
+  it('strips a leading Webflow asset-id prefix from the slug source', () => {
+    // Webflow prepends a 24-char ObjectID; the humanised form arrives
+    // space-separated, so the strip must survive slugification.
+    const name = buildMediaFilename({
+      slugSource: '6a102c0f3f256301e63ecc97 chart 20 53',
+      bytes,
+      ext: 'webp',
+      hashOverride: 'deadbeef',
+    });
+    expect(name).toBe('chart-20-53-deadbeef.webp');
+  });
+
+  it('strips the asset-id prefix from an already-hyphenated source', () => {
+    const name = buildMediaFilename({
+      slugSource: '6a0d3888875b7180df53d767-chart-20-49',
+      bytes,
+      ext: 'webp',
+      hashOverride: 'cafebabe',
+    });
+    expect(name).toBe('chart-20-49-cafebabe.webp');
+  });
+
+  it('does not strip when the id is the entire slug (nothing meaningful would remain)', () => {
+    const name = buildMediaFilename({
+      slugSource: '6a102c0f3f256301e63ecc97',
+      bytes,
+      ext: 'webp',
+      hashOverride: 'deadbeef',
+    });
+    expect(name).toBe('6a102c0f3f256301e63ecc97-deadbeef.webp');
+  });
+
+  it('leaves a normal slug that merely starts with hex untouched', () => {
+    // 12 hex chars is not the 24-char ObjectID shape — must not strip.
+    const name = buildMediaFilename({
+      slugSource: 'abc123def456-overview',
+      bytes,
+      ext: 'webp',
+      hashOverride: 'deadbeef',
+    });
+    expect(name).toBe('abc123def456-overview-deadbeef.webp');
+  });
+});
+
+describe('stripVendorAssetIdPrefix', () => {
+  it('removes a leading 24-char hex ObjectID followed by a separator', () => {
+    expect(stripVendorAssetIdPrefix('6a102c0f3f256301e63ecc97-chart-20-53')).toBe('chart-20-53');
+  });
+
+  it('returns the input unchanged when no id prefix is present', () => {
+    expect(stripVendorAssetIdPrefix('attack-surface-diagram')).toBe('attack-surface-diagram');
+  });
+
+  it('returns the input unchanged when stripping would leave nothing', () => {
+    expect(stripVendorAssetIdPrefix('6a102c0f3f256301e63ecc97')).toBe('6a102c0f3f256301e63ecc97');
+  });
+
+  it('strips two stacked 24-char ids (re-uploaded Webflow assets)', () => {
+    expect(
+      stripVendorAssetIdPrefix(
+        '6895e798224f3706e5dd9cec-6895e713b5dac976bd052796-p1273410-min-s-f6954462',
+      ),
+    ).toBe('p1273410-min-s-f6954462');
+  });
+
+  it('does not strip a hex run that is not exactly 24 chars', () => {
+    expect(stripVendorAssetIdPrefix('abc123-overview')).toBe('abc123-overview');
+    expect(stripVendorAssetIdPrefix('6a102c0f3f256301e63ecc9-chart')).toBe(
+      '6a102c0f3f256301e63ecc9-chart',
+    );
   });
 });
 

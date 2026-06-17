@@ -43,7 +43,7 @@ export const HOME_TESTIMONIALS: Testimonial[] = [
     name: "Shanker Ramrakhiani",
     role: "CISO & Head of BCP, IIFL Finance",
     company: "IIFL Finance",
-    logoSrc: "/images/trusted/03-iifl-finance.webp",
+    logoSrc: "/images/testimonials/iifl-finance.png",
     photoSrc: "/images/testimonials/shanker-ramrakhiani.webp",
     quote:
       "CleanStart helped us standardize our container foundations without slowing development. Tasks that previously required significant manual effort are now eliminated, deployments are faster, and our security team has greater confidence in the images we use.",
@@ -53,7 +53,7 @@ export const HOME_TESTIMONIALS: Testimonial[] = [
     name: "Mr. Moinul Khan",
     role: "CEO, Aurascape",
     company: "Aurascape",
-    logoSrc: "/images/trusted/08-aurascape.webp",
+    logoSrc: "/images/testimonials/aurascape-logo.png",
     photoSrc: "/images/testimonials/moinul-khan.webp",
     quote:
       "Standardizing on verified container foundations gave us confidence in the base of every service we deploy and allowed us to shift security much earlier in the build process.",
@@ -95,6 +95,17 @@ export interface TestimonialsProps {
    * pages whose `<Footer>` receives a `cta` prop (e.g. /community).
    */
   reserveFooterCtaSpace?: boolean;
+  /**
+   * Section tone. "dark" (default) = the home gradient band with white header
+   * text. "light" = a soft white→lavender band with dark header text, used to
+   * break up adjacent dark sections (the self-contained card pops on both).
+   */
+  theme?: "dark" | "light";
+  /**
+   * Center the header heading instead of the default left-aligned grid. Used
+   * for single-testimonial sections that have no side description.
+   */
+  centerHeader?: boolean;
 }
 
 export function Testimonials({
@@ -103,8 +114,11 @@ export function Testimonials({
   description,
   hideHeader = false,
   reserveFooterCtaSpace = false,
+  theme = "dark",
+  centerHeader = false,
 }: TestimonialsProps = {}) {
   const TESTIMONIALS = testimonials ?? HOME_TESTIMONIALS;
+  const isLight = theme === "light";
   const [active, setActive] = useState(0);
   const [direction, setDirection] = useState<Direction>("next");
   const [paused, setPaused] = useState(false);
@@ -144,16 +158,16 @@ export function Testimonials({
   }, [transitioning]);
 
   // Auto-advance — paused when hovered, focused, tab hidden, or user prefers
-  // reduced motion.
+  // reduced motion. Skipped entirely for a single testimonial (nothing to rotate).
   useEffect(() => {
-    if (paused) return;
+    if (paused || total <= 1) return;
     const reduced =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) return;
     const id = window.setInterval(goNext, AUTO_ADVANCE_MS);
     return () => window.clearInterval(id);
-  }, [paused, goNext]);
+  }, [paused, total, goNext]);
 
   useEffect(() => {
     const handler = () => setPaused(document.hidden);
@@ -321,25 +335,36 @@ export function Testimonials({
 
   return (
     <section
-      className="relative w-full overflow-hidden text-white"
+      className={`relative w-full overflow-hidden ${isLight ? "text-[#111]" : "text-white"}`}
       aria-labelledby="testimonials-title"
       style={{
-        background:
-          "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)",
+        background: isLight
+          ? "linear-gradient(180deg, #ffffff 0%, #f4f1fb 100%)"
+          : "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)",
       }}
     >
       <div
         className={`relative z-[2] mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 ${reserveFooterCtaSpace ? "pt-section-sm pb-[var(--spacing-section-cta)]" : "py-section-sm"}`}
       >
         {!hideHeader && (
-        <header className="flex flex-col items-start gap-6 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12">
-          <Reveal header className="justify-self-start" style={{ maxWidth: "560px" }}>
+        <header
+          className={
+            centerHeader
+              ? "flex flex-col items-center text-center"
+              : "flex flex-col items-start gap-6 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12"
+          }
+        >
+          <Reveal
+            header
+            className={centerHeader ? "mx-auto" : "justify-self-start"}
+            style={{ maxWidth: "560px" }}
+          >
             <h2
               id="testimonials-title"
-              className="font-display text-white"
+              className="font-display"
               style={{
                 fontSize: "var(--fs-h2)",
-                fontWeight: 700,
+                fontWeight: 600,
                 lineHeight: 1.1,
                 letterSpacing: "-0.04em",
               }}
@@ -372,7 +397,7 @@ export function Testimonials({
                 style={{ maxWidth: "604px" }}
               >
                 <p
-                  className="text-white md:text-right"
+                  className="md:text-right"
                   style={{
                     fontFamily: "var(--font-sans)",
                     fontSize: "var(--fs-lead)",
@@ -449,58 +474,64 @@ export function Testimonials({
             })}
           </div>
 
-          {/* Auto-rotation progress bar — shows how long until the next slide. */}
-          <div
-            aria-hidden
-            className="mx-auto mt-8 h-[3px] w-[280px] overflow-hidden rounded-full"
-            style={{ background: "rgba(255,255,255,0.10)" }}
-          >
-            <div
-              key={`prog-${active}`}
-              className="h-full rounded-full"
-              style={{
-                background:
-                  "linear-gradient(90deg, #33BAEC 0%, #6F8DFF 50%, #B19CFF 100%)",
-                animation: paused
-                  ? "none"
-                  : `cs-tt-progress ${AUTO_ADVANCE_MS}ms linear forwards`,
-              }}
-            />
-          </div>
+          {/* Carousel chrome (progress, dots, prev/next) is meaningless for a
+              single testimonial, so it only renders when there are 2+. */}
+          {total > 1 && (
+            <>
+              {/* Auto-rotation progress bar — shows how long until the next slide. */}
+              <div
+                aria-hidden
+                className="mx-auto mt-8 h-[3px] w-[280px] overflow-hidden rounded-full"
+                style={{ background: "rgba(255,255,255,0.10)" }}
+              >
+                <div
+                  key={`prog-${active}`}
+                  className="h-full rounded-full"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, #33BAEC 0%, #6F8DFF 50%, #B19CFF 100%)",
+                    animation: paused
+                      ? "none"
+                      : `cs-tt-progress ${AUTO_ADVANCE_MS}ms linear forwards`,
+                  }}
+                />
+              </div>
 
-          <div className="mt-6 flex items-center justify-center gap-6">
-            <NavButton direction="prev" onClick={goPrev} label="Previous testimonial" />
-            <div
-              role="tablist"
-              aria-label="Select testimonial"
-              className="flex items-center gap-2"
-            >
-              {TESTIMONIALS.map((t, i) => {
-                const isActive = i === active;
-                return (
-                  <button
-                    key={t.name}
-                    type="button"
-                    role="tab"
-                    aria-selected={isActive}
-                    aria-label={`Show testimonial from ${t.name}`}
-                    onClick={() => {
-                      setDirection(i > active ? "next" : "prev");
-                      setActive(i);
-                    }}
-                    className="group block h-2.5 rounded-full transition-all duration-300"
-                    style={{
-                      width: isActive ? 28 : 10,
-                      background: isActive
-                        ? "linear-gradient(90deg, #33BAEC 0%, #B19CFF 100%)"
-                        : "rgba(255,255,255,0.25)",
-                    }}
-                  />
-                );
-              })}
-            </div>
-            <NavButton direction="next" onClick={goNext} label="Next testimonial" />
-          </div>
+              <div className="mt-6 flex items-center justify-center gap-6">
+                <NavButton direction="prev" onClick={goPrev} label="Previous testimonial" />
+                <div
+                  role="tablist"
+                  aria-label="Select testimonial"
+                  className="flex items-center gap-2"
+                >
+                  {TESTIMONIALS.map((t, i) => {
+                    const isActive = i === active;
+                    return (
+                      <button
+                        key={t.name}
+                        type="button"
+                        role="tab"
+                        aria-selected={isActive}
+                        aria-label={`Show testimonial from ${t.name}`}
+                        onClick={() => {
+                          setDirection(i > active ? "next" : "prev");
+                          setActive(i);
+                        }}
+                        className="group block h-2.5 rounded-full transition-all duration-300"
+                        style={{
+                          width: isActive ? 28 : 10,
+                          background: isActive
+                            ? "linear-gradient(90deg, #33BAEC 0%, #B19CFF 100%)"
+                            : "rgba(255,255,255,0.25)",
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+                <NavButton direction="next" onClick={goNext} label="Next testimonial" />
+              </div>
+            </>
+          )}
         </section>
       </div>
     </section>

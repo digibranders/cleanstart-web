@@ -390,7 +390,7 @@ export function DeveloperHero(): React.ReactElement {
               marginBottom: '32px',
             }}
           >
-            Trusted Container Foundations
+            Trusted Software Starts Here
           </h1>
         </HeroReveal>
 
@@ -407,8 +407,8 @@ export function DeveloperHero(): React.ReactElement {
               marginBottom: '32px',
             }}
           >
-            Minimal, hardened, verifiable container images that fit directly into existing developer
-            workflows.
+            Reliable, zero-CVE container images, libraries, and models built for modern cloud and AI
+            applications.
           </p>
         </HeroReveal>
 
@@ -426,7 +426,7 @@ export function DeveloperHero(): React.ReactElement {
               } as React.CSSProperties
             }
           >
-            Explore CleanStart Images
+            Get Started with Community Images
           </Link>
         </HeroReveal>
       </div>

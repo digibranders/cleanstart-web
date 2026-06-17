@@ -47,7 +47,7 @@ export function ContactOffices() {
         <Reveal header className="mb-10 flex items-center gap-4 sm:mb-12 sm:gap-6">
           <Hairline />
           <h2
-            className="font-display font-bold text-[#111111] whitespace-nowrap"
+            className="font-display font-semibold text-[#111111] whitespace-nowrap"
             style={{
               fontSize: "var(--fs-h2)",
               lineHeight: 1,

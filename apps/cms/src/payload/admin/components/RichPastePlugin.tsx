@@ -412,7 +412,7 @@ export const RichPastePlugin = (): null => {
   const [editor] = useLexicalComposerContext();
   const { collectionSlug, id, title } = useDocumentInfo();
   const folder = inlineImageFolderForCollection(collectionSlug);
-  const contextHint = buildInlineMediaContextHint(collectionSlug, title, id);
+  const contextHint = buildInlineMediaContextHint(title, id);
 
   useEffect(() => {
     const handler = (event: ClipboardEvent): void => {

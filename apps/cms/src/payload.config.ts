@@ -64,6 +64,8 @@ import { mediaIngestUrlEndpoint } from './payload/endpoints/media-ingest-url';
 import { redirectsImportEndpoint } from './payload/endpoints/redirects-import';
 import { robotsEndpoint } from './payload/endpoints/robots';
 import { searchAnalyticsEndpoint } from './payload/endpoints/search-analytics';
+import { searchQueryEndpoint } from './payload/endpoints/search-query';
+import { topicSuggestionsEndpoint } from './payload/endpoints/topic-suggestions';
 import {
   imageSitemapEndpoint,
   newsSitemapEndpoint,
@@ -397,7 +399,9 @@ export default buildConfig({
     mediaRenameEndpoint,
     redirectsImportEndpoint,
     canonicalCheckEndpoint,
+    searchQueryEndpoint,
     searchAnalyticsEndpoint,
+    topicSuggestionsEndpoint,
     userReassignContentEndpoint,
     publishChecklistEndpoint,
     dsarFindEndpoint,

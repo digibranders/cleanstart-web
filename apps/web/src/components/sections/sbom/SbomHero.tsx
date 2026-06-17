@@ -90,7 +90,8 @@ export function SbomHero(): React.ReactElement {
               marginBottom: "clamp(24px, 2.5vw, 32px)",
             }}
           >
-            Know what you ship with continuously updated, cryptographically verifiable software inventories.
+            Software transparency and provenance visibility designed for modern software supply
+            chains.
           </p>
         </HeroReveal>
 

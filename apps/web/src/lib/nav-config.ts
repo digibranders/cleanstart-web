@@ -167,7 +167,7 @@ export const NAV_TREE: NavItem[] = [
           { label: "Resource Center", href: "/resource-center", icon: "folder" },
           { label: "Case Studies", href: "/case-studies", icon: "doc-signed" },
           { label: "Newsroom", href: "/news", icon: "newspaper" },
-          { label: "Knowledge Hub", href: "/knowledge-hub/vex-documents", icon: "book-open" },
+          { label: "Knowledge Hub", href: "/knowledge-hub", icon: "book-open" },
         ],
       },
       {
@@ -201,4 +201,5 @@ export const NAV_TREE: NavItem[] = [
     width: 760,
   },
   { kind: "flat", label: "Partners", href: "/partners" },
+  { kind: "flat", label: "Pricing", href: "/pricing" },
 ];

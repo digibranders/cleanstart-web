@@ -1,9 +1,6 @@
-import { CONSENT_MODE_SNIPPET_HASH } from '@/lib/consent/consent-mode-snippet';
-
 export type CspMode = 'report-only' | 'enforce';
 
 export interface BuildCspOptions {
-  nonce: string;
   isProduction: boolean;
   isDraftMode: boolean;
   /**
@@ -26,24 +23,23 @@ const GA4_REGION = 'https://*.analytics.google.com';
 const PREVIEW_FRAME_ANCESTORS = ["'self'", 'http://localhost:3000', 'https://cms.cleanstart.com'];
 
 export function buildCsp({
-  nonce,
   isProduction,
   isDraftMode,
   isPreviewPath = false,
 }: BuildCspOptions): string {
-  const scriptSrc = [
-    "'self'",
-    `'nonce-${nonce}'`,
-    // Static, hash-pinned GA4 Consent Mode bootstrap (consent-mode-snippet.ts).
-    // Cleared by hash (honoured under strict-dynamic) so the inline consent
-    // script needs no per-request nonce — keeps the marketing site static.
-    `'${CONSENT_MODE_SNIPPET_HASH}'`,
-    "'strict-dynamic'",
-    'https:',
-    "'unsafe-inline'",
-  ];
+  // Pragmatic, statically-prerender-compatible policy (WEB-PRODUCTION.md §4).
+  // A per-request nonce / `strict-dynamic` is intentionally NOT used: the
+  // marketing site is statically prerendered, and a nonce would force every
+  // route into dynamic rendering (Next reads it from `headers()`), while inline
+  // `style=` attributes — pervasive per the Figma-exact-values convention —
+  // can never carry a nonce at all. `'unsafe-inline'` covers Next's inline
+  // bootstrap, the JSON-LD, and the consent snippet; `https:` covers GA4 /
+  // Vercel third-party scripts. XSS defence-in-depth comes from the structural
+  // directives below (object-src none, base-uri, form-action, frame-ancestors,
+  // Trusted Types) rather than from inline-source pinning.
+  const scriptSrc = ["'self'", "'unsafe-inline'", 'https:'];
 
-  const styleSrc = ["'self'", `'nonce-${nonce}'`];
+  const styleSrc = ["'self'", "'unsafe-inline'"];
 
   const imgSrc = [
     "'self'",
@@ -141,11 +137,3 @@ export const PERMISSIONS_POLICY = [
 ].join(', ');
 
 export const REPORTING_ENDPOINTS = 'csp-endpoint="/api/csp-report"';
-
-export function generateNonce(): string {
-  const bytes = new Uint8Array(16);
-  crypto.getRandomValues(bytes);
-  let binary = '';
-  for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary);
-}

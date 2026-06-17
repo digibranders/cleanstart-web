@@ -137,7 +137,7 @@ export function FipsEnables(): React.ReactElement {
               style={{
                 fontFamily: "var(--font-display)",
                 fontSize: "var(--fs-h2)",
-                fontWeight: 700,
+                fontWeight: 600,
                 letterSpacing: "-0.05em",
                 lineHeight: 1.1,
                 maxWidth: "41.5rem",

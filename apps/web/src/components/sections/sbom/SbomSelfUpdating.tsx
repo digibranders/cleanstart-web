@@ -88,7 +88,7 @@ export function SbomSelfUpdating(): React.ReactElement {
               lineHeight: 1.1,
             }}
           >
-            Generate. Verify. Validate.
+            Generate. Verify. Track.
           </h2>
         </Reveal>
         <Reveal header delay={0.15} y={20}>
@@ -103,8 +103,8 @@ export function SbomSelfUpdating(): React.ReactElement {
               width: '100%',
             }}
           >
-            Automated SBOM generation with cryptographic signing and continuous validation across
-            build and runtime environments.
+            Automated SBOM generation with cryptographic signing and continuous software integrity
+            tracking across build and delivery workflows.
           </p>
         </Reveal>
       </div>
@@ -217,7 +217,7 @@ export function SbomSelfUpdating(): React.ReactElement {
               textTransform: 'capitalize',
             }}
           >
-            Generate. Verify. Validate.
+            Generate. Verify. Track.
           </h2>
         </Reveal>
 
@@ -236,8 +236,8 @@ export function SbomSelfUpdating(): React.ReactElement {
               marginBottom: '24px',
             }}
           >
-            Automated SBOM generation with cryptographic signing and continuous validation across
-            build and runtime environments.
+            Automated SBOM generation with cryptographic signing and continuous software integrity
+            tracking across build and delivery workflows.
           </p>
         </Reveal>
 

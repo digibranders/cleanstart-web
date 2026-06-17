@@ -31,7 +31,7 @@ export default function FipsCompliancePage(): React.ReactElement {
         ])}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <FipsHero />
         <FadeUp>
           <FipsWhyMatters />

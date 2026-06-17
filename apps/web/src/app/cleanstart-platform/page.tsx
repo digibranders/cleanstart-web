@@ -31,7 +31,7 @@ export default function CleanStartPlatformPage() {
         ])}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <PlatformHero />
 
         <FadeUp>

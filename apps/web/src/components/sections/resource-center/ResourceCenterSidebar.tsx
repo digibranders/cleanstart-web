@@ -147,7 +147,7 @@ export function ResourceCenterSidebar({
         }}
       >
         <h3
-          className="font-display text-2xl font-bold leading-[1.2] tracking-[-0.05em] mb-4"
+          className="font-display text-2xl font-semibold leading-[1.2] tracking-[-0.05em] mb-4"
           style={{ color: "#111" }}
         >
           Categories

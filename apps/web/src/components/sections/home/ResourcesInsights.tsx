@@ -195,7 +195,7 @@ export async function ResourcesInsights() {
             className="font-display text-[#111111]"
             style={{
               fontSize: "var(--fs-h2)",
-              fontWeight: 700,
+              fontWeight: 600,
               letterSpacing: "-0.04em",
               lineHeight: 1.05,
               margin: 0,

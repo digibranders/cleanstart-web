@@ -129,6 +129,21 @@ describe('createSearchClient', () => {
     expect(calls[0]?.[1]?.body).toBe(JSON.stringify(settings));
   });
 
+  it('updateSettings strips primaryKey (Meili /settings rejects it)', async () => {
+    const fetchMock = vi.fn(async () => new Response(null, { status: 202 }));
+    const client = createSearchClient(
+      baseConfig({ fetch: fetchMock as unknown as typeof fetch }),
+    );
+    await client.updateSettings('content', {
+      primaryKey: 'id',
+      filterableAttributes: ['collection'] as const,
+    });
+    const calls = fetchMock.mock.calls as unknown as Array<[string, RequestInit]>;
+    const body = JSON.parse(String(calls[0]?.[1]?.body));
+    expect(body.primaryKey).toBeUndefined();
+    expect(body.filterableAttributes).toEqual(['collection']);
+  });
+
   it('search returns the parsed body on 2xx, null on failure', async () => {
     const okResponse = new Response(
       JSON.stringify({ hits: [{ id: 'x' }], estimatedTotalHits: 1, processingTimeMs: 3 }),
@@ -148,6 +163,27 @@ describe('createSearchClient', () => {
       baseConfig({ fetch: failingFetch as unknown as typeof fetch }),
     );
     expect(await failing.search('content', 'foo')).toBeNull();
+  });
+
+  it('forwards facets and returns facetDistribution', async () => {
+    let sentBody: Record<string, unknown> = {};
+    const fetchMock = (async (_url: string, init?: RequestInit) => {
+      sentBody = JSON.parse(String(init?.body ?? '{}'));
+      return new Response(
+        JSON.stringify({
+          hits: [],
+          estimatedTotalHits: 0,
+          processingTimeMs: 1,
+          facetDistribution: { keywords: { SBOM: 4 } },
+        }),
+        { status: 200 },
+      );
+    }) as unknown as typeof fetch;
+
+    const client = createSearchClient({ url: 'http://meili.test', apiKey: 'k', fetch: fetchMock });
+    const res = await client.search('content', '', { limit: 0, facets: ['keywords'] });
+    expect(sentBody.facets).toEqual(['keywords']);
+    expect(res?.facetDistribution?.keywords).toEqual({ SBOM: 4 });
   });
 });
 

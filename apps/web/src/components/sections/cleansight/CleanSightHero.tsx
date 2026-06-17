@@ -33,14 +33,13 @@ export function CleanSightHero(): React.ReactElement {
                 textWrap: "balance",
               }}
             >
-              <span className="block">Continuous Visibility.</span>
-              <span className="block">Continuous Remediation.</span>
+              Continuous Visibility for Modern Software Supply Chains
             </h1>
           </HeroReveal>
 
           <HeroReveal y={30} delay={0.2} duration={0.8}>
             <p
-              className="text-white max-w-[640px]"
+              className="text-white max-w-[760px]"
               style={{
                 fontFamily: "var(--font-sans)",
                 fontSize: "var(--fs-lead)",
@@ -48,10 +47,12 @@ export function CleanSightHero(): React.ReactElement {
                 letterSpacing: "-0.02em",
                 lineHeight: 1.4,
                 opacity: 0.8,
+                textWrap: "balance",
               }}
             >
-              Continuously discover, assess, and remediate container risk across
-              modern environments.
+              Software Supply Chain Posture Management that continuously
+              identifies inherited software risk, prioritizes exposure, and
+              accelerates remediation with verified software alternatives.
             </p>
           </HeroReveal>
 

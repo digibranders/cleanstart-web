@@ -12,7 +12,7 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "CleanStart Platform | Secure, Verified Software Foundations",
+  title: "CleanStart Images | Secure, Verified Container & VM Images",
   absoluteTitle: true,
   description:
     "Explore CleanStart's library of secure, minimal container and VM images, continuously scanned, pre hardened, FIPS compliant, and 60 to 80% lighter than standard public images.",
@@ -43,7 +43,7 @@ export default function CleanStartImagesPage(): React.ReactElement {
         })}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <CleanStartImagesHero />
         <FadeUp>
           <CleanStartImagesBrowse />

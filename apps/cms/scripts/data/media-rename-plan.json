@@ -1,0 +1,1645 @@
+{
+  "count": 205,
+  "entries": [
+    {
+      "id": 1,
+      "from": "69b7d896f2c4a3f9df52bb67-whatsapp-20image-202026-03-16-20at-201-96512e28.webp",
+      "to": "hustle-10-96512e28.webp",
+      "alt": "Hustle 10",
+      "kind": "doc",
+      "note": "Hustle 10 · image"
+    },
+    {
+      "id": 2,
+      "from": "69b7d7c35a8c6748814e2bce-whatsapp-20image-202026-03-16-20at-201-d68e5b2c.webp",
+      "to": "hustle-7-d68e5b2c.webp",
+      "alt": "Hustle 7",
+      "kind": "doc",
+      "note": "Hustle 7 · image"
+    },
+    {
+      "id": 3,
+      "from": "69b7d7e41c40602ff2a8464e-whatsapp-20image-202026-03-16-20at-201-a2f57bb7.webp",
+      "to": "hustle-8-a2f57bb7.webp",
+      "alt": "Hustle 8",
+      "kind": "doc",
+      "note": "Hustle 8 · image"
+    },
+    {
+      "id": 4,
+      "from": "69b7d8016e451ff6748872b6-img20260107154155-jpg-0a4e6322.webp",
+      "to": "hustle-9-0a4e6322.webp",
+      "alt": "Hustle 9",
+      "kind": "doc",
+      "note": "Hustle 9 · image"
+    },
+    {
+      "id": 5,
+      "from": "69b7d7a5977afaad0ba1aa9d-whatsapp-20image-202026-03-16-20at-201-f60be5bd.webp",
+      "to": "hustle-6-f60be5bd.webp",
+      "alt": "Hustle 6",
+      "kind": "doc",
+      "note": "Hustle 6 · image"
+    },
+    {
+      "id": 6,
+      "from": "69b7d7551b01f2b70544a2c3-whatsapp-20image-202026-03-16-20at-201-8a772a0f.webp",
+      "to": "hustle-3-8a772a0f.webp",
+      "alt": "Hustle 3",
+      "kind": "doc",
+      "note": "Hustle 3 · image"
+    },
+    {
+      "id": 7,
+      "from": "69b7d78de8da5acc779641f5-whatsapp-20image-202026-03-16-20at-201-fc38f896.webp",
+      "to": "hustle-5-fc38f896.webp",
+      "alt": "Hustle 5",
+      "kind": "doc",
+      "note": "Hustle 5 · image"
+    },
+    {
+      "id": 8,
+      "from": "69b7d76dd2c68a0d88054d2f-whatsapp-20image-202026-03-16-20at-201-582293df.webp",
+      "to": "hustle-4-582293df.webp",
+      "alt": "Hustle 4",
+      "kind": "doc",
+      "note": "Hustle 4 · image"
+    },
+    {
+      "id": 9,
+      "from": "69b7d72ce555db55f1f8651a-whatsapp-20image-202026-03-16-20at-201-8fe2b70b.webp",
+      "to": "hustle-2-8fe2b70b.webp",
+      "alt": "Hustle 2",
+      "kind": "doc",
+      "note": "Hustle 2 · image"
+    },
+    {
+      "id": 10,
+      "from": "69157a35fdb4810d5055ab81-whatsapp-20image-202025-11-12-20at-2017-e7c09104.webp",
+      "to": "gallery-8-e7c09104.webp",
+      "alt": "Gallery 8",
+      "kind": "doc",
+      "note": "Gallery 8 · image"
+    },
+    {
+      "id": 11,
+      "from": "69b7d6d8950da72618d0e23d-whatsapp-20image-202026-03-16-20at-201-f9b230ba.webp",
+      "to": "hustle-1-f9b230ba.webp",
+      "alt": "Hustle 1",
+      "kind": "doc",
+      "note": "Hustle 1 · image"
+    },
+    {
+      "id": 12,
+      "from": "69157a640afb8ab6c18f6fa0-whatsapp-20image-202025-11-12-20at-2017-e3950cc1.webp",
+      "to": "gallery-9-e3950cc1.webp",
+      "alt": "Gallery 9",
+      "kind": "doc",
+      "note": "Gallery 9 · image"
+    },
+    {
+      "id": 13,
+      "from": "69157a0cd69ef7fa61ec5641-whatsapp-20image-202025-11-12-20at-2017-15e861f3.webp",
+      "to": "gallery-7-15e861f3.webp",
+      "alt": "Gallery 7",
+      "kind": "doc",
+      "note": "Gallery 7 · image"
+    },
+    {
+      "id": 14,
+      "from": "69157970b8d3eea6581394da-whatsapp-20image-202025-10-14-20at-2022-4fddb042.webp",
+      "to": "gallery-4-4fddb042.webp",
+      "alt": "Gallery 4",
+      "kind": "doc",
+      "note": "Gallery 4 · image"
+    },
+    {
+      "id": 15,
+      "from": "6915797ec379af623996a488-whatsapp-20image-202025-10-15-20at-2013-c7c55a60.webp",
+      "to": "gallery-5-c7c55a60.webp",
+      "alt": "Gallery 5",
+      "kind": "doc",
+      "note": "Gallery 5 · image"
+    },
+    {
+      "id": 16,
+      "from": "69157996be08102b70d164a5-whatsapp-20image-202025-10-15-20at-2013-f1ad74de.webp",
+      "to": "gallery-6-f1ad74de.webp",
+      "alt": "Gallery 6",
+      "kind": "doc",
+      "note": "Gallery 6 · image"
+    },
+    {
+      "id": 17,
+      "from": "68f07ee71b1b81d9eb21ccc3-whatsapp-20image-202025-10-08-20at-2017-54e64a18.webp",
+      "to": "gallery-3-54e64a18.webp",
+      "alt": "Gallery 3",
+      "kind": "doc",
+      "note": "Gallery 3 · image"
+    },
+    {
+      "id": 18,
+      "from": "692534a7d60a4abb9dc682b4-1517758894691-c3096cff.webp",
+      "to": "sanket-modi-c3096cff.webp",
+      "alt": "Sanket Modi",
+      "kind": "doc",
+      "note": "Sanket Modi · photo"
+    },
+    {
+      "id": 19,
+      "from": "6915794369ad89fca728c279-image-20-1-8d45155d.webp",
+      "to": "galler-1-8d45155d.webp",
+      "alt": "Galler 1",
+      "kind": "doc",
+      "note": "Galler 1 · image"
+    },
+    {
+      "id": 20,
+      "from": "69157954dbdeb475a09de6ee-image-80de9d1e.webp",
+      "to": "gallery-2-80de9d1e.webp",
+      "alt": "Gallery 2",
+      "kind": "doc",
+      "note": "Gallery 2 · image"
+    },
+    {
+      "id": 21,
+      "from": "6a16eb988036c41f2751cf0c-chart-20-55-a8e6e428.webp",
+      "to": "why-vulnerability-scanning-alone-is-not-enough-a8e6e428.webp",
+      "alt": "Why Vulnerability Scanning Alone Is Not Enough",
+      "kind": "doc",
+      "note": "Why Vulnerability Scanning Alone Is Not Enough · heroImage"
+    },
+    {
+      "id": 22,
+      "from": "6a16ea8426b22fa10e19c7cc-chart-20-54-80870456.webp",
+      "to": "trapdoor-malware-shows-80870456.webp",
+      "alt": "TrapDoor Malware Shows How Developer Workstations Are Becoming Critical Infrastructure",
+      "kind": "doc",
+      "note": "TrapDoor Malware Shows How Developer Workstations Are Becoming Critical Infrastructure · heroImage"
+    },
+    {
+      "id": 23,
+      "from": "6a1d80f28584d11bceb4ecea-chart-20-54-dd7ab96d.webp",
+      "to": "what-if-mythos-claims-to-be-true-dd7ab96d.webp",
+      "alt": "What If Mythos Claims to Be True?",
+      "kind": "doc",
+      "note": "What If Mythos Claims to Be True? · heroImage"
+    },
+    {
+      "id": 24,
+      "from": "68c293b3d221a98d7fca3bdc-whatsapp-20image-202025-09-01-20at-2011-01b07563.webp",
+      "to": "dhanush-vm-01b07563.webp",
+      "alt": "Dhanush VM",
+      "kind": "doc",
+      "note": "Dhanush VM · photo"
+    },
+    {
+      "id": 25,
+      "from": "6a0ed812bfbd50e40a4c9492-chart-20-50-a62b40bc.webp",
+      "to": "sbom-101-a62b40bc.webp",
+      "alt": "SBOM 101: What It Is, How It Works, and Where It Falls Short",
+      "kind": "doc",
+      "note": "SBOM 101: What It Is, How It Works, and Where It Falls Short · heroImage"
+    },
+    {
+      "id": 26,
+      "from": "6a10236203aeb2af4cee40c5-chart-20-51-3101c3b0.webp",
+      "to": "githubs-internal-breach-3101c3b0.webp",
+      "alt": "GitHub’s Internal Breach via a Malicious VS Code Extension Exposes a Growing Developer Trust Problem",
+      "kind": "doc",
+      "note": "GitHub’s Internal Breach via a Malicious VS Code Extension Exposes a Growing Developer Trust Problem · heroImage"
+    },
+    {
+      "id": 27,
+      "from": "6a1025825aff78cd702939bc-chart-20-52-812468f8.webp",
+      "to": "nginx-rift-exposes-812468f8.webp",
+      "alt": "NGINX Rift Exposes the Hidden Risk of Long-Lived Infrastructure Code",
+      "kind": "doc",
+      "note": "NGINX Rift Exposes the Hidden Risk of Long-Lived Infrastructure Code · heroImage"
+    },
+    {
+      "id": 28,
+      "from": "6a102c0f3f256301e63ecc97-chart-20-53-af8cc43f.webp",
+      "to": "software-supply-chain-a-practical-guide-for-security-teams-af8cc43f.webp",
+      "alt": "What Is a Software Supply Chain? A Practical Guide for Security Teams",
+      "kind": "doc",
+      "note": "What Is a Software Supply Chain? A Practical Guide for Security Teams · heroImage"
+    },
+    {
+      "id": 29,
+      "from": "6a0d3888875b7180df53d767-chart-20-49-54abc2a7.webp",
+      "to": "the-n8n-vulnerabilities-highlight-a-growing-execution-chain-trus-54abc2a7.webp",
+      "alt": "The n8n Vulnerabilities Highlight a Growing Execution-Chain Trust Problem",
+      "kind": "doc",
+      "note": "The n8n Vulnerabilities Highlight a Growing Execution-Chain Trust Problem · heroImage"
+    },
+    {
+      "id": 30,
+      "from": "6a0adeedb8bf694922d8f8cb-chart-20-48-e59336de.webp",
+      "to": "openclaw-vulnerabilities-reveal-about-execution-chain-trust-e59336de.webp",
+      "alt": "What the OpenClaw Vulnerabilities Reveal About Execution-Chain Trust",
+      "kind": "doc",
+      "note": "What the OpenClaw Vulnerabilities Reveal About Execution-Chain Trust · heroImage"
+    },
+    {
+      "id": 31,
+      "from": "6a0479e19dc424d1638e97f5-chart-20-33-b337e56c.webp",
+      "to": "the-tanstack-npm-compromise-proves-official-packages-are-no-long-b337e56c.webp",
+      "alt": "The TanStack npm Compromise Proves Official Packages Are No Longer Enough",
+      "kind": "doc",
+      "note": "The TanStack npm Compromise Proves Official Packages Are No Longer Enough · heroImage"
+    },
+    {
+      "id": 32,
+      "from": "6a04720104267f301189db9a-chart-20-32-da78d571.webp",
+      "to": "ai-supply-chains-are-repeating-open-source-security-mistakes-da78d571.webp",
+      "alt": "AI Supply Chains Are Repeating Open Source Security Mistakes",
+      "kind": "doc",
+      "note": "AI Supply Chains Are Repeating Open Source Security Mistakes · heroImage"
+    },
+    {
+      "id": 33,
+      "from": "6a04671d089239079b22e8c8-chart-20-29-0404c51e.webp",
+      "to": "container-security-101-concepts-threats-and-best-practices-0404c51e.webp",
+      "alt": "Container Security 101 (Concepts, Threats, and Best Practices)",
+      "kind": "doc",
+      "note": "Container Security 101 (Concepts, Threats, and Best Practices) · heroImage"
+    },
+    {
+      "id": 34,
+      "from": "6a04717412abec248dd20424-chart-20-31-66f5f5d1.webp",
+      "to": "modern-supply-chain-attacks-are-becoming-self-propagating-66f5f5d1.webp",
+      "alt": "Modern Supply Chain Attacks Are Becoming Self-Propagating",
+      "kind": "doc",
+      "note": "Modern Supply Chain Attacks Are Becoming Self-Propagating · heroImage"
+    },
+    {
+      "id": 35,
+      "from": "69f9f064276d687778b96f0b-chart-20-28-914df7cc.webp",
+      "to": "attack-surface-reduction-in-containers-measuring-914df7cc.webp",
+      "alt": "Attack Surface Reduction in Containers: Measuring What Actually Matters",
+      "kind": "doc",
+      "note": "Attack Surface Reduction in Containers: Measuring What Actually Matters · heroImage"
+    },
+    {
+      "id": 36,
+      "from": "6a046a2701e4b34e8bafc040-chart-20-30-808aaddb.webp",
+      "to": "when-security-infrastructure-becomes-the-attack-surface-808aaddb.webp",
+      "alt": "When Security Infrastructure Becomes the Attack Surface",
+      "kind": "doc",
+      "note": "When Security Infrastructure Becomes the Attack Surface · heroImage"
+    },
+    {
+      "id": 37,
+      "from": "69f9d7831b714d3c474ceaac-chart-20-27-07f493f3.webp",
+      "to": "from-bitwarden-to-sap-07f493f3.webp",
+      "alt": "From Bitwarden to SAP: How npm Supply Chain Attacks Are Evolving",
+      "kind": "doc",
+      "note": "From Bitwarden to SAP: How npm Supply Chain Attacks Are Evolving · heroImage"
+    },
+    {
+      "id": 38,
+      "from": "69f5a21c242d65bf4b80d23e-chart-20-23-c69cb56a.webp",
+      "to": "hardened-container-images-fit-c69cb56a.webp",
+      "alt": "Where Do Hardened Container Images Fit in Your CI/CD Pipeline?",
+      "kind": "doc",
+      "note": "Where Do Hardened Container Images Fit in Your CI/CD Pipeline? · heroImage"
+    },
+    {
+      "id": 39,
+      "from": "69f9d40a59916835869f261d-chart-20-25-e640a97d.webp",
+      "to": "lightning-python-package-hack-e640a97d.webp",
+      "alt": "Lightning Python Package Hack: What a PyPI Supply Chain Attack Reveals About Dependency Trust",
+      "kind": "doc",
+      "note": "Lightning Python Package Hack: What a PyPI Supply Chain Attack Reveals About Dependency Trust · heroImage"
+    },
+    {
+      "id": 40,
+      "from": "69f9d5e1c5b1402db4b5d4fa-chart-20-26-6b07be65.webp",
+      "to": "security-doesnt-start-at-runtime-6b07be65.webp",
+      "alt": "Security Doesn’t Start at Runtime. It Starts With What You Include",
+      "kind": "doc",
+      "note": "Security Doesn’t Start at Runtime. It Starts With What You Include · heroImage"
+    },
+    {
+      "id": 41,
+      "from": "69d64eb1d1a9afefc50eb7ed-chart-20-18-ef9547db.webp",
+      "to": "cve-2026-34040-when-container-security-fails-before-it-even-star-ef9547db.webp",
+      "alt": "CVE-2026-34040: When Container Security Fails Before It Even Starts",
+      "kind": "doc",
+      "note": "CVE-2026-34040: When Container Security Fails Before It Even Starts · heroImage"
+    },
+    {
+      "id": 42,
+      "from": "69d4e5a4fa16a994e5dba5c8-thumbnail-3-918c62d6.webp",
+      "to": "container-security-beyond-scanning-shell-less-and-read-only-runt-918c62d6.webp",
+      "alt": "Container Security Beyond Scanning: Shell-less and Read-Only Runtime Explained",
+      "kind": "doc",
+      "note": "Container Security Beyond Scanning: Shell-less and Read-Only Runtime Explained · heroImage"
+    },
+    {
+      "id": 43,
+      "from": "69d61fdbc54036685fffb5df-chart-20-17-370555d2.webp",
+      "to": "why-sboms-alone-do-not-establish-container-trust-370555d2.webp",
+      "alt": "Why SBOMs Alone Do Not Establish Container Trust",
+      "kind": "doc",
+      "note": "Why SBOMs Alone Do Not Establish Container Trust · heroImage"
+    },
+    {
+      "id": 44,
+      "from": "69cce0056f7833dc22a75ecd-chart-20-15-44749487.webp",
+      "to": "trivy-supply-chain-attack-how-a-security-tool-compromised-ci-cd-44749487.webp",
+      "alt": "Trivy Supply Chain Attack: How a Security Tool Compromised CI/CD Pipelines",
+      "kind": "doc",
+      "note": "Trivy Supply Chain Attack: How a Security Tool Compromised CI/CD Pipelines · heroImage"
+    },
+    {
+      "id": 45,
+      "from": "69ca0c34f82c86e6a772bf9e-69c3c77b2fd37856ada00261-chart-20-25-4dd07eae.webp",
+      "to": "busybox-container-security-risk-4dd07eae.webp",
+      "alt": "The Hidden Risk Inside Most Container Images: Why BusyBox Still Ships in Production",
+      "kind": "doc",
+      "note": "The Hidden Risk Inside Most Container Images: Why BusyBox Still Ships in Production · heroImage"
+    },
+    {
+      "id": 46,
+      "from": "699f1bcce7b556ab68555938-csxsysdig-20-1-cc7a9f78.webp",
+      "to": "eliminating-runtime-blind-spots-how-cleanstart-and-sysdig-build-cc7a9f78.webp",
+      "alt": "Eliminating Runtime Blind Spots: How CleanStart and Sysdig Build Continuous Trust Across the Container Lifecycle",
+      "kind": "doc",
+      "note": "Eliminating Runtime Blind Spots: How CleanStart and Sysdig Build Continuous Trust Across the Container Lifecycle · heroImage"
+    },
+    {
+      "id": 47,
+      "from": "69cb9933c3c93e5351dad3ab-chart-20-10-e5a61726.webp",
+      "to": "litellm-supply-chain-attack-how-two-malicious-versions-compromis-e5a61726.webp",
+      "alt": "LiteLLM Supply Chain Attack: How Two Malicious Versions Compromised AI Infrastructure",
+      "kind": "doc",
+      "note": "LiteLLM Supply Chain Attack: How Two Malicious Versions Compromised AI Infrastructure · heroImage"
+    },
+    {
+      "id": 48,
+      "from": "69a7b750d5aada0bf156e0bc-chart-20-13-2c7f88ed.webp",
+      "to": "why-you-cannot-trust-prebuilt-container-images-from-official-reg-2c7f88ed.webp",
+      "alt": "Why You Cannot Trust Prebuilt Container Images from Official Registries",
+      "kind": "doc",
+      "note": "Why You Cannot Trust Prebuilt Container Images from Official Registries · heroImage"
+    },
+    {
+      "id": 49,
+      "from": "69609bd6c9189f798fa4ed18-chart-20-7-d05fe620.webp",
+      "to": "cve-fatigue-why-most-container-vulnerabilities-never-get-fixed-d05fe620.webp",
+      "alt": "CVE Fatigue: Why Most Container Vulnerabilities Never Get Fixed",
+      "kind": "doc",
+      "note": "CVE Fatigue: Why Most Container Vulnerabilities Never Get Fixed · heroImage"
+    },
+    {
+      "id": 50,
+      "from": "6985c230e9df41ac08be23fc-chart-20-8-8ed6095e.webp",
+      "to": "when-everyone-can-code-the-new-business-differentiation-paradigm-8ed6095e.webp",
+      "alt": "When Everyone Can Code: The New Business Differentiation Paradigm",
+      "kind": "doc",
+      "note": "When Everyone Can Code: The New Business Differentiation Paradigm · heroImage"
+    },
+    {
+      "id": 51,
+      "from": "697d82d1b38eb68fe876ec2b-chart-20-2-de36b4ca.webp",
+      "to": "minimal-vs-hardened-vs-secure-container-images-whats-the-differe-de36b4ca.webp",
+      "alt": "Minimal vs Hardened vs Secure Container Images: What’s the Difference and Why It Matters",
+      "kind": "doc",
+      "note": "Minimal vs Hardened vs Secure Container Images: What’s the Difference and Why It Matters · heroImage"
+    },
+    {
+      "id": 52,
+      "from": "697d88543344fe586aaaf275-chart-20-3-396c407c.webp",
+      "to": "why-zero-critical-cves-is-a-misleading-security-metric-for-conta-396c407c.webp",
+      "alt": "Why “Zero Critical CVEs” Is a Misleading Security Metric for Container Security",
+      "kind": "doc",
+      "note": "Why “Zero Critical CVEs” Is a Misleading Security Metric for Container Security · heroImage"
+    },
+    {
+      "id": 53,
+      "from": "6957a2113af842eaf08d96dc-docker-20hub-2010000-f7369566.webp",
+      "to": "over-10-000-docker-hub-images-exposed-credentials-why-it-happene-f7369566.webp",
+      "alt": "Over 10,000 Docker Hub Images Exposed Credentials. Why It Happened and How CleanStart Prevents It at the Source",
+      "kind": "doc",
+      "note": "Over 10,000 Docker Hub Images Exposed Credentials. Why It Happened and How CleanStart Prevents It at the Source · heroImage"
+    },
+    {
+      "id": 54,
+      "from": "693fb57a94ae793d5d944a4d-chart-20-1-064ca6cf.webp",
+      "to": "your-container-images-are-ticking-time-bombs-and-you-dont-even-k-064ca6cf.webp",
+      "alt": "Your Container Images Are Ticking Time Bombs (And You Don’t Even Know It)",
+      "kind": "doc",
+      "note": "Your Container Images Are Ticking Time Bombs (And You Don’t Even Know It) · heroImage"
+    },
+    {
+      "id": 55,
+      "from": "6931773eceb344b432bae6d1-whatsapp-20image-202025-12-04-20at-205-ee396093.webp",
+      "to": "shai-hulud-revisited-evolution-of-the-november-npm-activity-ee396093.webp",
+      "alt": "Shai-Hulud, Revisited: Evolution of the November NPM Activity",
+      "kind": "doc",
+      "note": "Shai-Hulud, Revisited: Evolution of the November NPM Activity · heroImage"
+    },
+    {
+      "id": 56,
+      "from": "693ba443b181f20998a366ca-chart-9865b199.webp",
+      "to": "supply-chain-security-is-now-a-business-variable-9865b199.webp",
+      "alt": "Supply Chain Security Is Now a Business Variable",
+      "kind": "doc",
+      "note": "Supply Chain Security Is Now a Business Variable · heroImage"
+    },
+    {
+      "id": 57,
+      "from": "69254ce37511b7f3a29c557e-chart-20-7-50e32c1b.webp",
+      "to": "reflections-from-kubecon-2025-50e32c1b.webp",
+      "alt": "Reflections from KubeCon 2025",
+      "kind": "doc",
+      "note": "Reflections from KubeCon 2025 · heroImage"
+    },
+    {
+      "id": 58,
+      "from": "692548afd17a7cc0800e58f9-chart-20-6-cfb8c235.webp",
+      "to": "software-supply-chain-in-2026-cfb8c235.webp",
+      "alt": "Software Supply Chain in 2026",
+      "kind": "doc",
+      "note": "Software Supply Chain in 2026 · heroImage"
+    },
+    {
+      "id": 59,
+      "from": "690c257e3eff2a9300714135-chart-6a55b255.webp",
+      "to": "from-awareness-to-assurance-building-trust-in-a-cloud-native-ai-6a55b255.webp",
+      "alt": "From Awareness to Assurance: Building Trust in a Cloud-Native, AI-Driven World",
+      "kind": "doc",
+      "note": "From Awareness to Assurance: Building Trust in a Cloud-Native, AI-Driven World · heroImage"
+    },
+    {
+      "id": 60,
+      "from": "691717bf1bf73279c61033f1-chart-20-3-aa0c342b.webp",
+      "to": "built-in-compliance-cleanstarts-fips-foundations-series-aa0c342b.webp",
+      "alt": "Built-In Compliance: CleanStart’s FIPS Foundations Series",
+      "kind": "doc",
+      "note": "Built-In Compliance: CleanStart’s FIPS Foundations Series · heroImage"
+    },
+    {
+      "id": 61,
+      "from": "690b42360354159e399f4aa3-7487-20-2-4205771c.webp",
+      "to": "graboid-worm-the-docker-container-nightmare-that-taught-us-secur-4205771c.webp",
+      "alt": "Graboid Worm: The Docker Container Nightmare That Taught Us Security Lessons",
+      "kind": "doc",
+      "note": "Graboid Worm: The Docker Container Nightmare That Taught Us Security Lessons · heroImage"
+    },
+    {
+      "id": 62,
+      "from": "68ecea8f4cf4c5b1fde2ef35-cleanstart-blog-thumbnails-03-ddd56014.webp",
+      "to": "software-supply-chain-security-a-technical-imperative-for-modern-ddd56014.webp",
+      "alt": "Software Supply Chain Security: A Technical Imperative for Modern CTOs",
+      "kind": "doc",
+      "note": "Software Supply Chain Security: A Technical Imperative for Modern CTOs · heroImage"
+    },
+    {
+      "id": 63,
+      "from": "68ef87f736261f4fa95a80d9-typosquatting-20v2-83f17087.webp",
+      "to": "typosquatted-alpine-a-devops-cautionary-tale-83f17087.webp",
+      "alt": "Typosquatted Alpine: A DevOps Cautionary Tale",
+      "kind": "doc",
+      "note": "Typosquatted Alpine: A DevOps Cautionary Tale · heroImage"
+    },
+    {
+      "id": 64,
+      "from": "68fb6f1ddbc47a1e53890345-hacker-20with-20laptop-20v2-20-1-e4abd853.webp",
+      "to": "20m-malicious-pulls-when-automation-went-wrong-e4abd853.webp",
+      "alt": "20M Malicious Pulls: When Automation Went Wrong",
+      "kind": "doc",
+      "note": "20M Malicious Pulls: When Automation Went Wrong · heroImage"
+    },
+    {
+      "id": 65,
+      "from": "68c24cb8fe74567ee56af277-1757398001646-fb724c67.webp",
+      "to": "how-attackers-weaponized-trust-the-billion-download-npm-breach-fb724c67.webp",
+      "alt": "How Attackers Weaponized Trust: The Billion-Download npm Breach",
+      "kind": "doc",
+      "note": "How Attackers Weaponized Trust: The Billion-Download npm Breach · heroImage"
+    },
+    {
+      "id": 66,
+      "from": "689dc5b55a324249f3758ae2-github-post-2048x1140-f67241db.webp",
+      "to": "codeql-compromised-how-public-secret-exposure-led-to-an-attack-9-f67241db.webp",
+      "alt": "CodeQL Compromised: How Public Secret Exposure Led to an Attack",
+      "kind": "doc",
+      "note": "CodeQL Compromised: How Public Secret Exposure Led to an Attack · heroImage"
+    },
+    {
+      "id": 67,
+      "from": "68ad9436532db4e79e50425f-68ad931d4b8c436be6f24a7e-blog-20-1-e4e4bf50.webp",
+      "to": "securing-the-software-supply-chain-how-distroless-containers-def-e4e4bf50.webp",
+      "alt": "Securing the Software Supply Chain: How Distroless Containers Defend Against npm Malware Attacks",
+      "kind": "doc",
+      "note": "Securing the Software Supply Chain: How Distroless Containers Defend Against npm Malware Attacks · heroImage"
+    },
+    {
+      "id": 68,
+      "from": "68ad93d8d2298aafc5c6543b-68ad936b36f0ab1d3b07d608-4-202535-980a561a.webp",
+      "to": "widespread-open-source-attack-malicious-code-identified-in-npm-p-980a561a.webp",
+      "alt": "Widespread Open Source Attack: Malicious Code Identified in npm, PyPI, and RubyGems Repositories",
+      "kind": "doc",
+      "note": "Widespread Open Source Attack: Malicious Code Identified in npm, PyPI, and RubyGems Repositories · heroImage"
+    },
+    {
+      "id": 69,
+      "from": "691c0d61afcfe74681dd15dd-cs-blog-20thumbnail-20design-dac1e7e3.webp",
+      "to": "addressing-rbis-guidelines-for-digital-payment-applications-with-dac1e7e3.webp",
+      "alt": "Addressing RBI's Guidelines for Digital Payment Applications with CleanStart",
+      "kind": "doc",
+      "note": "Addressing RBI's Guidelines for Digital Payment Applications with CleanStart · heroImage"
+    },
+    {
+      "id": 70,
+      "from": "689dc4f15c6a9239a55b4f22-blog-images-05-1-e6c8bb01.webp",
+      "to": "the-evolution-of-cisos-from-network-guardians-to-product-securit-e6c8bb01.webp",
+      "alt": "The Evolution of CISOs: From Network Guardians to Product Security Leaders",
+      "kind": "doc",
+      "note": "The Evolution of CISOs: From Network Guardians to Product Security Leaders · heroImage"
+    },
+    {
+      "id": 71,
+      "from": "689dc42eaeed49380e47cdec-javascript-1-2048x1365-6a1a1125.webp",
+      "to": "supply-chain-attack-on-lottie-player-a-wake-up-call-for-javascri-6a1a1125.webp",
+      "alt": "Supply Chain Attack on lottie-player: A Wake-up Call for JavaScript Security",
+      "kind": "doc",
+      "note": "Supply Chain Attack on lottie-player: A Wake-up Call for JavaScript Security · heroImage"
+    },
+    {
+      "id": 72,
+      "from": "689dc48c82c9b89ea9599bf5-triam-nvidia-01-2-e2df1777.webp",
+      "to": "critical-nvidia-container-toolkit-vulnerability-cve-2025-23359-e2df1777.webp",
+      "alt": "Critical NVIDIA Container Toolkit Vulnerability: CVE-2025-23359",
+      "kind": "doc",
+      "note": "Critical NVIDIA Container Toolkit Vulnerability: CVE-2025-23359 · heroImage"
+    },
+    {
+      "id": 73,
+      "from": "689dc0171d95aa8f911e8e04-open-source-logos-01-1-scaled-1-2048x11-e5c2b6f3.webp",
+      "to": "the-evolution-of-open-source-software-past-present-and-future-nb-e5c2b6f3.webp",
+      "alt": "The Evolution of Open-Source Software: Past, Present, and Future",
+      "kind": "doc",
+      "note": "The Evolution of Open-Source Software: Past, Present, and Future · heroImage"
+    },
+    {
+      "id": 74,
+      "from": "689b33dd9e8c80ce95b9dc94-facts-myths-vs-scaled-1-2048x1152-6a3440be.webp",
+      "to": "busting-myths-about-open-source-and-containers-6a3440be.webp",
+      "alt": "Busting Myths About Open Source and Containers",
+      "kind": "doc",
+      "note": "Busting Myths About Open Source and Containers · heroImage"
+    },
+    {
+      "id": 75,
+      "from": "689dc34c873a609139069e62-freepik-expand-45776-1-6fe061e6.webp",
+      "to": "hidden-dangers-why-vulnerable-container-images-cost-more-than-yo-6fe061e6.webp",
+      "alt": "Hidden Dangers: Why Vulnerable Container Images Cost More Than You Think",
+      "kind": "doc",
+      "note": "Hidden Dangers: Why Vulnerable Container Images Cost More Than You Think · heroImage"
+    },
+    {
+      "id": 76,
+      "from": "689b340b2ae10f1ac5e42ac8-container-security-scaled-1-2048x1152-5d8d8545.webp",
+      "to": "container-image-signing-enhancing-security-in-the-software-suppl-5d8d8545.webp",
+      "alt": "Container Image Signing: Enhancing Security in the Software Supply Chain",
+      "kind": "doc",
+      "note": "Container Image Signing: Enhancing Security in the Software Supply Chain · heroImage"
+    },
+    {
+      "id": 77,
+      "from": "689b19d13f2769c839e4c2ed-664d8dd5b6585daf4334e47a-6627-43ff14c5.webp",
+      "to": "empowering-development-securing-software-supply-chain-with-clean-43ff14c5.webp",
+      "alt": "Empowering Development: Securing Software Supply Chain with CleanStart",
+      "kind": "doc",
+      "note": "Empowering Development: Securing Software Supply Chain with CleanStart · heroImage"
+    },
+    {
+      "id": 78,
+      "from": "689b334c646c0ef291d74c5b-slsa-v1-2048x1152-79fb2d4c.webp",
+      "to": "strengthening-software-supply-chain-security-with-slsa-79fb2d4c.webp",
+      "alt": "Strengthening Software Supply Chain Security with SLSA",
+      "kind": "doc",
+      "note": "Strengthening Software Supply Chain Security with SLSA · heroImage"
+    },
+    {
+      "id": 79,
+      "from": "689b3311d13f40cf59ff3ca5-f83ef691-d8c7-4658-bfec-f4f13225ed68-3a60d672.webp",
+      "to": "the-recent-discovery-of-a-critical-vulnerability-in-nvidia-3a60d672.webp",
+      "alt": "The recent discovery of a critical vulnerability in NVIDIA",
+      "kind": "doc",
+      "note": "The recent discovery of a critical vulnerability in NVIDIA · heroImage"
+    },
+    {
+      "id": 80,
+      "from": "689b187eb54cdd87a89e875c-image16-f760e547.webp",
+      "to": "application-security-f760e547.webp",
+      "alt": "Application Security icon",
+      "kind": "doc",
+      "note": "Application Security · icon"
+    },
+    {
+      "id": 81,
+      "from": "689b187eb54cdd87a89e875f-image9-68b04779.webp",
+      "to": "network-security-68b04779.webp",
+      "alt": "Network Security icon",
+      "kind": "doc",
+      "note": "Network Security · icon"
+    },
+    {
+      "id": 82,
+      "from": "689b187eb54cdd87a89e8767-image4-31e8188e.webp",
+      "to": "product-security-31e8188e.webp",
+      "alt": "Product Security icon",
+      "kind": "doc",
+      "note": "Product Security · icon"
+    },
+    {
+      "id": 83,
+      "from": "689b187eb54cdd87a89e8762-image6-75a9e4c5.webp",
+      "to": "data-protection-75a9e4c5.webp",
+      "alt": "Data Protection icon",
+      "kind": "doc",
+      "note": "Data Protection · icon"
+    },
+    {
+      "id": 84,
+      "from": "689b187eb54cdd87a89e8759-image4-31e8188e.webp",
+      "to": "cyber-security-31e8188e.webp",
+      "alt": "Cyber Security icon",
+      "kind": "doc",
+      "note": "Cyber Security · icon"
+    },
+    {
+      "id": 85,
+      "from": "6a0ed2d87463a24344286cfd-gemini-generated-image-oz64hyoz64hyoz64-e7275397.webp",
+      "to": "3rd-edition-india-devsec-show-2026-e7275397.webp",
+      "alt": "3rd Edition India DevSec Show 2026",
+      "kind": "doc",
+      "note": "3rd Edition India DevSec Show 2026 · heroImage"
+    },
+    {
+      "id": 86,
+      "from": "6a0ed0fc41411b5069094df2-data-file-1772451370928-97610-b5117aff.webp",
+      "to": "etcio-annual-conclave-2026-8th-edition-b5117aff.webp",
+      "alt": "ETCIO Annual Conclave 2026 8th Edition",
+      "kind": "doc",
+      "note": "ETCIO Annual Conclave 2026 8th Edition · heroImage"
+    },
+    {
+      "id": 87,
+      "from": "69e7054a37d101da95ef2db1-chart-20-19-698d3858.webp",
+      "to": "cleanstart-at-great-international-developer-summit-gids-2026-698d3858.webp",
+      "alt": "CleanStart at Great International Developer Summit (GIDS) 2026",
+      "kind": "doc",
+      "note": "CleanStart at Great International Developer Summit (GIDS) 2026 · heroImage"
+    },
+    {
+      "id": 88,
+      "from": "69f327d63acd2fde5d7d8071-banner-5559c89d.webp",
+      "to": "devops-namma-core-5559c89d.webp",
+      "alt": "DevOps Namma Core",
+      "kind": "doc",
+      "note": "DevOps Namma Core · heroImage"
+    },
+    {
+      "id": 89,
+      "from": "690c30b70665498fddaf0070-website-banner-1-1-20-2-0b158bea.webp",
+      "to": "9th-edition-india-devops-show-2025-0b158bea.webp",
+      "alt": "9th Edition India DevOps Show 2025",
+      "kind": "doc",
+      "note": "9th Edition India DevOps Show 2025 · heroImage"
+    },
+    {
+      "id": 90,
+      "from": "6967401788060c848b502fad-da481e68-32bc-43c8-ba02-cf6d8c7f71e6-c2fd5da1.webp",
+      "to": "techsparks-2025-16th-edition-c2fd5da1.webp",
+      "alt": "TechSparks 2025. 16th Edition",
+      "kind": "doc",
+      "note": "TechSparks 2025. 16th Edition · heroImage"
+    },
+    {
+      "id": 91,
+      "from": "6989aee1580fbb674224427c-whatsapp-20image-202026-02-09-20at-202-f1c17918.webp",
+      "to": "kcd-delhi-2026-f1c17918.webp",
+      "alt": "KCD Delhi 2026",
+      "kind": "doc",
+      "note": "KCD Delhi 2026 · heroImage"
+    },
+    {
+      "id": 92,
+      "from": "6981ac9f567b2f5679d89e52-data-file-17642390368858-57545-20-1-61bfce9f.svg",
+      "to": "secufest-61bfce9f.svg",
+      "alt": "SecuFest",
+      "kind": "doc",
+      "note": "SecuFest · heroImage"
+    },
+    {
+      "id": 93,
+      "from": "6896f15917bd728a07fb5e37-chart-20-3-02012f7e.webp",
+      "to": "2nd-edition-india-devsec-show-2025-02012f7e.webp",
+      "alt": "2nd Edition INDIA DEVSEC SHOW 2025",
+      "kind": "doc",
+      "note": "2nd Edition INDIA DEVSEC SHOW 2025 · heroImage"
+    },
+    {
+      "id": 94,
+      "from": "68e35ace3d8034229f3a428a-aiss-202025-5bd487e3.webp",
+      "to": "aiss-2025-5bd487e3.webp",
+      "alt": "AISS 2025",
+      "kind": "doc",
+      "note": "AISS 2025 · heroImage"
+    },
+    {
+      "id": 95,
+      "from": "68ee3564008f19fb9707870b-banner-470007b0.webp",
+      "to": "sundown-with-devops-470007b0.webp",
+      "alt": "Sundown with DevOps",
+      "kind": "doc",
+      "note": "Sundown with DevOps · heroImage"
+    },
+    {
+      "id": 96,
+      "from": "68998c60eeb0c80cb8401b86-image-20-93-50db4b12.webp",
+      "to": "kubecon-cloudnativecon-north-america-2025-50db4b12.webp",
+      "alt": "Kubecon + CloudNativeCon North America 2025",
+      "kind": "doc",
+      "note": "Kubecon + CloudNativeCon North America 2025 · heroImage"
+    },
+    {
+      "id": 97,
+      "from": "68999007d7ce61d8b00f6b70-image-20-99-64384ac2.webp",
+      "to": "7th-edition-devops-conclave-awards-2025-64384ac2.webp",
+      "alt": "7th Edition DevOps Conclave & Awards 2025",
+      "kind": "doc",
+      "note": "7th Edition DevOps Conclave & Awards 2025 · heroImage"
+    },
+    {
+      "id": 98,
+      "from": "6899938fbb853e01ecf77225-for-the-event-page-min-2048x1279-1-c91dc311.webp",
+      "to": "cyber-security-conclave-check-c91dc311.webp",
+      "alt": "Cyber Security Conclave",
+      "kind": "doc",
+      "note": "Cyber Security Conclave · heroImage"
+    },
+    {
+      "id": 99,
+      "from": "6899957ab856928cc95ec45b-image-20-100-8efcd10c.webp",
+      "to": "cyber-ai-summit-2025-8efcd10c.webp",
+      "alt": "Cyber AI Summit 2025",
+      "kind": "doc",
+      "note": "Cyber AI Summit 2025 · heroImage"
+    },
+    {
+      "id": 100,
+      "from": "689741a7b0abb7cfdd08e4d0-image-20-90-3e78ce6e.webp",
+      "to": "dine-with-devops-iv-3e78ce6e.webp",
+      "alt": "Dine with Devops IV",
+      "kind": "doc",
+      "note": "Dine with Devops IV · heroImage"
+    },
+    {
+      "id": 101,
+      "from": "6895e798224f3706e5dd9cec-6895e713b5dac976bd052796-p1273410-min-s-f6954462.webp",
+      "to": "p1273410-min-scaled-f6954462.webp",
+      "alt": "P1273410 min scaled",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 102,
+      "from": "6895e79db34fb4c7682fb12a-6895e713415234da57261d81-p1273373-min-s-1ffaf266.webp",
+      "to": "p1273373-min-scaled-1ffaf266.webp",
+      "alt": "P1273373 min scaled",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 103,
+      "from": "6895e79ee0567c67fe614cb5-6895e71413ceedce19fbff76-p1273317-min-s-0117b7e1.webp",
+      "to": "p1273317-min-scaled-0117b7e1.webp",
+      "alt": "P1273317 min scaled",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 104,
+      "from": "6895e79e74b48c77144e75c4-6895e713d0d03983fc5db914-for-the-inside-f8f1fa29.webp",
+      "to": "for-the-inside-post-min-2048x1343-f8f1fa29.webp",
+      "alt": "For the inside post min 2048x1343",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 105,
+      "from": "6895e79ee40cb9a9889b8db4-6895e714c7ac39d4fa3a861b-p1273322-min-s-1cc31194.webp",
+      "to": "p1273322-min-scaled-1cc31194.webp",
+      "alt": "P1273322 min scaled",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 106,
+      "from": "6895e6a197c7b8a66ac8b910-shared-image-5-1-scaled-9e0f99dc.webp",
+      "to": "shared-image-5-1-scaled-9e0f99dc.webp",
+      "alt": "Shared image 5 1 scaled",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 107,
+      "from": "689993da378a3ad63bf6a1a1-background-4-1-55ee2f6d.webp",
+      "to": "et-ciso-55ee2f6d.webp",
+      "alt": "ET CISO",
+      "kind": "doc",
+      "note": "ET CISO · heroImage"
+    },
+    {
+      "id": 108,
+      "from": "6895e79e29df08457f2e1e2f-6895e71403bfd0387b20195a-p1273346-min-s-b39a3ec5.webp",
+      "to": "p1273346-min-scaled-b39a3ec5.webp",
+      "alt": "P1273346 min scaled",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 109,
+      "from": "6895e6ab301ec67713406b0c-shared-image-2-1-scaled-9bfa466b.webp",
+      "to": "shared-image-2-1-scaled-9bfa466b.webp",
+      "alt": "Shared image 2 1 scaled",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 110,
+      "from": "6895e6ab1e0bfc788b155345-shared-image-4-1-scaled-120f9e86.webp",
+      "to": "shared-image-4-1-scaled-120f9e86.webp",
+      "alt": "Shared image 4 1 scaled",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 111,
+      "from": "6895e6abc22181bd8c0fe813-shared-image-3-1-scaled-98a9b2e2.webp",
+      "to": "shared-image-3-1-scaled-98a9b2e2.webp",
+      "alt": "Shared image 3 1 scaled",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 112,
+      "from": "6895e6ab29df08457f2daece-shared-image-6-1-201bc17a.webp",
+      "to": "shared-image-6-1-201bc17a.webp",
+      "alt": "Shared image 6 1",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 113,
+      "from": "6895e65921aca60089661b3b-dsc-1303-scaled-510ac0b0.webp",
+      "to": "dsc-1303-scaled-510ac0b0.webp",
+      "alt": "Dsc 1303 scaled",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 114,
+      "from": "68999ceaae2feee944e83d44-event-poster-8bde96a0.webp",
+      "to": "shori-2025-sales-kickoff-driving-the-future-of-cybersecurity-8bde96a0.webp",
+      "alt": "Shori 2025 & Sales Kickoff: Driving the Future of Cybersecurity",
+      "kind": "doc",
+      "note": "Shori 2025 & Sales Kickoff: Driving the Future of Cybersecurity · heroImage"
+    },
+    {
+      "id": 115,
+      "from": "6895e65912f642e0ea5463cf-dsc-1294-scaled-9b769cc9.webp",
+      "to": "dsc-1294-scaled-9b769cc9.webp",
+      "alt": "Dsc 1294 scaled",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 116,
+      "from": "6895e6595515165b6f9642b6-dsc-1305-scaled-45f4a220.webp",
+      "to": "dsc-1305-scaled-45f4a220.webp",
+      "alt": "Dsc 1305 scaled",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 117,
+      "from": "6895a6c5697e4d5da4e3ec9b-appdevsec-20show-202025-20-20gallery-20-9dd00c1a.webp",
+      "to": "appdevsec-show-2025-gallery-image-2-9dd00c1a.webp",
+      "alt": "Appdevsec show 2025 gallery image 2",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 118,
+      "from": "6895a6c5a50b60f400159737-appdevsec-20show-202025-20-20gallery-20-4449e89e.webp",
+      "to": "appdevsec-show-2025-gallery-image-1-4449e89e.webp",
+      "alt": "Appdevsec show 2025 gallery image 1",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 119,
+      "from": "68999d2213b17fb818cd6333-whatsapp-image-2025-05-03-at-11-17-45-5-2950c9ee.webp",
+      "to": "executive-roundtable-secure-by-design-redefining-application-sec-2950c9ee.webp",
+      "alt": "Executive Roundtable: Secure By Design – Redefining Application Security",
+      "kind": "doc",
+      "note": "Executive Roundtable: Secure By Design – Redefining Application Security · heroImage"
+    },
+    {
+      "id": 120,
+      "from": "6895a6c5aba8da8e36136b40-appdevsec-20show-202025-20-20gallery-20-7655f40f.webp",
+      "to": "appdevsec-show-2025-gallery-image-3-7655f40f.webp",
+      "alt": "Appdevsec show 2025 gallery image 3",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 121,
+      "from": "69d79d0072e79f7503beda4e-image-20-10-20-2-31dd501d.webp",
+      "to": "recognition-meets-real-world-detection-31dd501d.webp",
+      "alt": "Recognition Meets Real-World Detection",
+      "kind": "doc",
+      "note": "Recognition Meets Real-World Detection · heroImage"
+    },
+    {
+      "id": 122,
+      "from": "69d4e65ddacdb61259f451e9-ap-logo-176-by-208-a3de0a2a.svg",
+      "to": "cleanstart-launches-busybox-free-container-foundation-for-secure-a3de0a2a.svg",
+      "alt": "CleanStart Launches BusyBox-Free Container Foundation for Secure, Deterministic Production",
+      "kind": "doc",
+      "note": "CleanStart Launches BusyBox-Free Container Foundation for Secure, Deterministic Production · heroImage"
+    },
+    {
+      "id": 123,
+      "from": "6895e60a57bd21a43bbeca7d-appdevsec-20show-202025-a6706c6e.webp",
+      "to": "appdevsec-show-2025-a6706c6e.webp",
+      "alt": "Appdevsec Show 2025",
+      "kind": "doc",
+      "note": "Appdevsec Show 2025 · heroImage"
+    },
+    {
+      "id": 124,
+      "from": "694e3f9f7624aaa5fc5b1d8b-secured-file-folder-futuristic-data-net-f7bd9c6e.webp",
+      "to": "hardened-container-image-f7bd9c6e.webp",
+      "alt": "Hardened Images: Definition, Docker Hardened Images, Benefits & Hardening",
+      "kind": "doc",
+      "note": "Hardened Images: Definition, Docker Hardened Images, Benefits & Hardening · heroImage"
+    },
+    {
+      "id": 125,
+      "from": "68e73780ed26b2388ea43926-prn-cision-logo-desktop-d72a3dea.webp",
+      "to": "cleanstart-announces-strategic-partnership-with-sysdig-to-delive-d72a3dea.webp",
+      "alt": "CleanStart Announces Strategic Partnership with Sysdig to Deliver Continuous Software Supply Chain Verification from Build to Runtime",
+      "kind": "doc",
+      "note": "CleanStart Announces Strategic Partnership with Sysdig to Deliver Continuous Software Supply Chain Verification from Build to Runtime · heroImage"
+    },
+    {
+      "id": 126,
+      "from": "697842a40ea6d8a6ba5f30ba-cyberdefensemagazine-logo-08c94569.webp",
+      "to": "ai-driven-code-and-the-expanding-challenge-of-release-trust-08c94569.webp",
+      "alt": "AI-Driven Code And The Expanding Challenge Of Release Trust",
+      "kind": "doc",
+      "note": "AI-Driven Code And The Expanding Challenge Of Release Trust · heroImage"
+    },
+    {
+      "id": 127,
+      "from": "69cb783e3f1e806322dd5b6d-award-20-1-9a521a58.webp",
+      "to": "cleanstart-wins-three-gold-awards-at-the-2026-cybersecurity-exce-9a521a58.webp",
+      "alt": "CleanStart Wins Three Gold Awards at the 2026 Cybersecurity Excellence Awards",
+      "kind": "doc",
+      "note": "CleanStart Wins Three Gold Awards at the 2026 Cybersecurity Excellence Awards · heroImage"
+    },
+    {
+      "id": 128,
+      "from": "69cb77ee19baf907a8ef3774-cleansight-hires-20-1-590e165c.webp",
+      "to": "cleanstart-launches-cleansight-to-give-enterprises-complete-visi-590e165c.webp",
+      "alt": "CleanStart Launches CleanSight to Give Enterprises Complete Visibility into Container Risk",
+      "kind": "doc",
+      "note": "CleanStart Launches CleanSight to Give Enterprises Complete Visibility into Container Risk · heroImage"
+    },
+    {
+      "id": 129,
+      "from": "697845390a67870a2a6a436c-techbullionlogo-3-a9b6ca38.webp",
+      "to": "why-container-images-have-become-a-trust-boundary-a9b6ca38.webp",
+      "alt": "Why container images have become a trust boundary",
+      "kind": "doc",
+      "note": "Why container images have become a trust boundary · heroImage"
+    },
+    {
+      "id": 130,
+      "from": "697843ee92ba58cd1650d7f6-svgviewer-output-8d154e5e.svg",
+      "to": "where-ai-fits-in-cybersecurity-8d154e5e.svg",
+      "alt": "Where AI Fits in Cybersecurity",
+      "kind": "doc",
+      "note": "Where AI Fits in Cybersecurity · heroImage"
+    },
+    {
+      "id": 131,
+      "from": "691bf67d382dcf2310d6e0a2-logo-dark-reading-20-1-394f8fed.webp",
+      "to": "sboms-in-2026-some-love-some-hate-much-ambivalence-394f8fed.webp",
+      "alt": "SBOMs in 2026: Some Love, Some Hate, Much Ambivalence",
+      "kind": "doc",
+      "note": "SBOMs in 2026: Some Love, Some Hate, Much Ambivalence · heroImage"
+    },
+    {
+      "id": 132,
+      "from": "691eacbb9897938e69a8ba23-headerv3-ys-95cbad27.svg",
+      "to": "inside-cleanstarts-mission-to-make-software-safer-from-the-groun-95cbad27.svg",
+      "alt": "Inside CleanStart’s mission to make software safer from the ground up",
+      "kind": "doc",
+      "note": "Inside CleanStart’s mission to make software safer from the ground up · heroImage"
+    },
+    {
+      "id": 133,
+      "from": "691c517951593b1dfc040610-standard-250px-d5b47cbc.webp",
+      "to": "zero-common-vulnerabilities-and-exposures-is-secure-by-default-t-d5b47cbc.webp",
+      "alt": "Zero Common Vulnerabilities and Exposures: Is secure by default the future of cybersecurity?",
+      "kind": "doc",
+      "note": "Zero Common Vulnerabilities and Exposures: Is secure by default the future of cybersecurity? · heroImage"
+    },
+    {
+      "id": 134,
+      "from": "69171b1dd266be946986303e-images-20-4-a6c9ec2b.webp",
+      "to": "why-containers-drive-supply-chain-breaches-a6c9ec2b.webp",
+      "alt": "Why Containers Drive Supply Chain Breaches",
+      "kind": "doc",
+      "note": "Why Containers Drive Supply Chain Breaches · heroImage"
+    },
+    {
+      "id": 135,
+      "from": "68fb6698401c242f86a43aa3-image-20-27-77b6c16c.webp",
+      "to": "enisa-warns-of-escalating-ot-threats-77b6c16c.webp",
+      "alt": "ENISA Warns of Escalating OT Threats",
+      "kind": "doc",
+      "note": "ENISA Warns of Escalating OT Threats · heroImage"
+    },
+    {
+      "id": 136,
+      "from": "691b01e267c2865bc81bbd3f-logo-20-2-20-1-c1df78ed.webp",
+      "to": "kolaborasi-baru-untuk-perkuat-keamanan-perangkat-lunak-di-indone-c1df78ed.webp",
+      "alt": "Kolaborasi Baru untuk Perkuat Keamanan Perangkat Lunak di Indonesia dan ASEAN",
+      "kind": "doc",
+      "note": "Kolaborasi Baru untuk Perkuat Keamanan Perangkat Lunak di Indonesia dan ASEAN · heroImage"
+    },
+    {
+      "id": 137,
+      "from": "68fb63ff48f9641e39abab90-screenshot-2024-06-01-at-14-53-04-06f8ad98.webp",
+      "to": "ai-that-fixes-flaws-before-they-ship-06f8ad98.webp",
+      "alt": "AI That Fixes Flaws Before They Ship",
+      "kind": "doc",
+      "note": "AI That Fixes Flaws Before They Ship · heroImage"
+    },
+    {
+      "id": 138,
+      "from": "68ad9829523f69f53b269677-68ad97af139c43f6c59d3a73-ciso-forum-2-d6fb1c12.webp",
+      "to": "beyond-zero-trust-redefining-software-security-in-the-age-of-com-d6fb1c12.webp",
+      "alt": "Beyond Zero Trust: Redefining Software Security in the Age of Compromised Code",
+      "kind": "doc",
+      "note": "Beyond Zero Trust: Redefining Software Security in the Age of Compromised Code · heroImage"
+    },
+    {
+      "id": 139,
+      "from": "68f082874b2688b01e24faea-talkdevnew-5475b2a02f794d8effa0-7b3b31c5.webp",
+      "to": "cleanstart-expands-vulnerability-free-container-image-library-7b3b31c5.webp",
+      "alt": "CleanStart Expands Vulnerability-Free Container Image Library",
+      "kind": "doc",
+      "note": "CleanStart Expands Vulnerability-Free Container Image Library · heroImage"
+    },
+    {
+      "id": 140,
+      "from": "68f080d4e70ebf63cfa1ccc2-masthead-db274d5b.webp",
+      "to": "cleanstart-expands-docker-hub-community-with-free-daily-updated-db274d5b.webp",
+      "alt": "CleanStart Expands Docker Hub Community with Free Daily-Updated Images",
+      "kind": "doc",
+      "note": "CleanStart Expands Docker Hub Community with Free Daily-Updated Images · heroImage"
+    },
+    {
+      "id": 141,
+      "from": "68db8e4bf4ca7c9fc02f655f-3bo5lx4bnennijz3hbb7-8b0cb4e7.webp",
+      "to": "ecaps-to-distribute-cleanstart-products-to-strengthen-software-s-8b0cb4e7.webp",
+      "alt": "eCAPS to Distribute CleanStart products to Strengthen Software Supply Chain Security",
+      "kind": "doc",
+      "note": "eCAPS to Distribute CleanStart products to Strengthen Software Supply Chain Security · heroImage"
+    },
+    {
+      "id": 142,
+      "from": "68e7347a982fba3aba720bb9-tam-logo-cdr-pdf-1-photoroom-1-e1722580-602fe4ac.webp",
+      "to": "why-software-supply-chain-security-is-the-next-big-cyber-threat-602fe4ac.webp",
+      "alt": "Why Software Supply Chain Security is the Next Big Cyber Threat",
+      "kind": "doc",
+      "note": "Why Software Supply Chain Security is the Next Big Cyber Threat · heroImage"
+    },
+    {
+      "id": 143,
+      "from": "68ad97fc0cc8b26ead9c0db3-68ad97afb04bf90be8680637-sme-4b655b3c.webp",
+      "to": "triam-security-rebrands-as-cleanstart-to-focus-on-software-suppl-4b655b3c.webp",
+      "alt": "TRIAM Security Rebrands as CleanStart to Focus on Software Supply Chain",
+      "kind": "doc",
+      "note": "TRIAM Security Rebrands as CleanStart to Focus on Software Supply Chain · heroImage"
+    },
+    {
+      "id": 144,
+      "from": "68ee369a0a755218f0e5fbb5-left-shift-logo-785d9061.webp",
+      "to": "cleanstart-expands-docker-hub-offerings-with-daily-updated-secur-785d9061.webp",
+      "alt": "CleanStart Expands Docker Hub Offerings with Daily-Updated Secure Images for Developers",
+      "kind": "doc",
+      "note": "CleanStart Expands Docker Hub Offerings with Daily-Updated Secure Images for Developers · heroImage"
+    },
+    {
+      "id": 145,
+      "from": "689c519923ba315541b3cd21-689c507559d3330af1277f0c-ein-claim-colo-6d2b21ad.webp",
+      "to": "cleanstart-wins-2025-cybersecurity-excellence-award-6d2b21ad.webp",
+      "alt": "CleanStart wins 2025 Cybersecurity Excellence Award",
+      "kind": "doc",
+      "note": "CleanStart wins 2025 Cybersecurity Excellence Award · heroImage"
+    },
+    {
+      "id": 146,
+      "from": "68ad981f2b8177c9904f6abc-68ad97af3e22423f132aa4b9-apn-821e8f39.webp",
+      "to": "triam-security-rebrands-as-cleanstart-to-reflect-product-led-foc-821e8f39.webp",
+      "alt": "TRIAM Security Rebrands as CleanStart to Reflect Product-Led Focus on Securing the Software Supply Chain",
+      "kind": "doc",
+      "note": "TRIAM Security Rebrands as CleanStart to Reflect Product-Led Focus on Securing the Software Supply Chain · heroImage"
+    },
+    {
+      "id": 147,
+      "from": "68ad9836143ee0195b1b50f0-68ad97af887e7e23cb431550-cxotoday-28461096.webp",
+      "to": "triam-security-rebrands-as-cleanstart-to-reflect-product-led-foc-28461096.webp",
+      "alt": "TRIAM Security Rebrands as CleanStart to Reflect Product-Led Focus on Securing the Software Supply Chain",
+      "kind": "doc",
+      "note": "TRIAM Security Rebrands as CleanStart to Reflect Product-Led Focus on Securing the Software Supply Chain · heroImage"
+    },
+    {
+      "id": 148,
+      "from": "68a866b4c4b355c4acce9072-yahoo-20finance-w-9c39f497.svg",
+      "to": "cleanstart-achieves-350-hardened-vulnerability-free-container-im-9c39f497.svg",
+      "alt": "CleanStart Achieves 350+ Hardened, Vulnerability-Free Container Images, Accelerating U.S. Expansion",
+      "kind": "doc",
+      "note": "CleanStart Achieves 350+ Hardened, Vulnerability-Free Container Images, Accelerating U.S. Expansion · heroImage"
+    },
+    {
+      "id": 149,
+      "from": "69cca24888fd128ab230393c-shell-less-20and-20read-only-20containe-06f46139.webp",
+      "to": "shell-less-and-read-only-container-architecture-06f46139.webp",
+      "alt": "Shell less and read only container architecture",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 150,
+      "from": "689c7da6d3a631a34f8e7637-689c50758c7820151c7e48cb-image-20401-6abccf0b.webp",
+      "to": "triam-securitys-cleanstart-wins-2025-cybersecurity-excellence-aw-6abccf0b.webp",
+      "alt": "Triam Security’s CleanStart Wins 2025 Cybersecurity Excellence Award",
+      "kind": "doc",
+      "note": "Triam Security’s CleanStart Wins 2025 Cybersecurity Excellence Award · heroImage"
+    },
+    {
+      "id": 151,
+      "from": "68ad98490a9b0bee5789cda8-68ad97af50fe0f24c407f852-pr-20nw-b892cf23.webp",
+      "to": "openssf-welcomes-new-members-and-presents-golden-egg-award-kqrhu-b892cf23.webp",
+      "alt": "OpenSSF Welcomes New Members and Presents Golden Egg Award",
+      "kind": "doc",
+      "note": "OpenSSF Welcomes New Members and Presents Golden Egg Award · heroImage"
+    },
+    {
+      "id": 152,
+      "from": "69ccd65b8ff4a65244f132b9-shell-less-20and-20read-only-20containe-3b5af36b.pdf",
+      "to": "shell-less-and-read-only-container-architecture-3b5af36b.pdf",
+      "alt": "Shell-less and Read-Only Container Architecture",
+      "kind": "doc",
+      "note": "Shell-less and Read-Only Container Architecture · asset"
+    },
+    {
+      "id": 153,
+      "from": "69c1238dfe8a63306fb7ad11-busybox-replacement-24391485.webp",
+      "to": "busybox-replacement-24391485.webp",
+      "alt": "Busybox replacement",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 154,
+      "from": "69cca1e28cc544932a2dfcae-new-thumbnail-2894b0cc.webp",
+      "to": "new-thumbnail-2894b0cc.webp",
+      "alt": "New thumbnail",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 155,
+      "from": "69c1235bb422f1aa3b9642dd-busy-20box-20replacement-compressed-38e2c39b.pdf",
+      "to": "busybox-replacement-38e2c39b.pdf",
+      "alt": "BusyBox Replacement",
+      "kind": "doc",
+      "note": "BusyBox Replacement · asset"
+    },
+    {
+      "id": 156,
+      "from": "69cca11a29827cb977aa2278-replacing-20busybox-20in-20container-20-32d1ef69.pdf",
+      "to": "replacing-busybox-in-container-images-32d1ef69.pdf",
+      "alt": "Replacing BusyBox in Container Images",
+      "kind": "doc",
+      "note": "Replacing BusyBox in Container Images · asset"
+    },
+    {
+      "id": 157,
+      "from": "69ba956f729ae31a4cd7ea2c-isolated-package-compilation-552879e1.webp",
+      "to": "isolated-package-compilation-552879e1.webp",
+      "alt": "Isolated package compilation",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 158,
+      "from": "69bd2640c7acd24e43e438f4-retrofitting-security-vs-building-it-in-8ae2b0fa.webp",
+      "to": "retrofitting-security-vs-building-it-in-8ae2b0fa.webp",
+      "alt": "Retrofitting security vs building it in",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 159,
+      "from": "69ba953bad70b70ab58b6271-isolated-20package-20compilation-64dfa211.pdf",
+      "to": "isolated-package-compilation-64dfa211.pdf",
+      "alt": "Isolated Package Compilation",
+      "kind": "doc",
+      "note": "Isolated Package Compilation · asset"
+    },
+    {
+      "id": 160,
+      "from": "69bd25d8d5b947949284e0d3-retrofitting-20security-20vs-20building-230eaaf0.pdf",
+      "to": "retrofitting-security-vs-building-it-in-230eaaf0.pdf",
+      "alt": "Retrofitting Security vs Building It In",
+      "kind": "doc",
+      "note": "Retrofitting Security vs Building It In · asset"
+    },
+    {
+      "id": 161,
+      "from": "69b7ac438c5278a314429436-cleansight-20-2-bc6886a7.webp",
+      "to": "cleansight-2-bc6886a7.webp",
+      "alt": "Cleansight 2",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 162,
+      "from": "69a97466bc6b4282e7152deb-cover-thumbnail-dcdf3cc3.webp",
+      "to": "cover-thumbnail-dcdf3cc3.webp",
+      "alt": "Cover thumbnail",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 163,
+      "from": "69cca0e1fc4b76b7403c322f-cleansight-20-1-b174e030.pdf",
+      "to": "cleansight-b174e030.pdf",
+      "alt": "CleanSight",
+      "kind": "doc",
+      "note": "CleanSight · asset"
+    },
+    {
+      "id": 164,
+      "from": "69a970417f4b34db2cf7faaa-the-20binary-20trust-20problem-20-20-20-c25c85d7.pdf",
+      "to": "the-binary-trust-problem-c25c85d7.pdf",
+      "alt": "The Binary Trust Problem",
+      "kind": "doc",
+      "note": "The Binary Trust Problem · asset"
+    },
+    {
+      "id": 165,
+      "from": "696b1e69d14ea138829d7e8a-architectural-insight-752fd628.webp",
+      "to": "architectural-insight-752fd628.webp",
+      "alt": "Architectural insight",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 166,
+      "from": "6969ef8b983f81c6c0a1682e-vex-and-the-shift-from-vulnerability-pr-5ffe568f.webp",
+      "to": "vex-and-the-shift-from-vulnerability-presence-to-exploitability-5ffe568f.webp",
+      "alt": "Vex and the shift from vulnerability presence to exploitability",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 167,
+      "from": "696a2817a592216762c9b08b-vex-20and-20the-20shift-20from-20vulner-7e6ae128.pdf",
+      "to": "vex-and-the-shift-from-vulnerability-presence-to-exploitability-7e6ae128.pdf",
+      "alt": "VEX and the Shift From Vulnerability Presence to Exploitability",
+      "kind": "doc",
+      "note": "VEX and the Shift From Vulnerability Presence to Exploitability · asset"
+    },
+    {
+      "id": 168,
+      "from": "6969ef3f70a26337f6b1f335-slsa-levels-as-architectural-states-of-bf627a39.webp",
+      "to": "slsa-levels-as-architectural-states-of-trust-bf627a39.webp",
+      "alt": "Slsa levels as architectural states of trust",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 169,
+      "from": "69416481723e448071330e51-whatsapp-20image-202025-12-16-20at-2019-05b05caf.webp",
+      "to": "whatsapp-image-2025-12-16-at-19-06-33-f20eef54-05b05caf.webp",
+      "alt": "Whatsapp image 2025 12 16 at 19 06 33",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 170,
+      "from": "696a28170d66004fc66c2f0c-slsa-20levels-20as-20architectural-20st-ff306f61.pdf",
+      "to": "slsa-levels-as-architectural-states-of-trust-ff306f61.pdf",
+      "alt": "SLSA Levels as Architectural States of Trust",
+      "kind": "doc",
+      "note": "SLSA Levels as Architectural States of Trust · asset"
+    },
+    {
+      "id": 171,
+      "from": "694a39eaf9d90683f5b41506-compressed-81b000ca.pdf",
+      "to": "securing-the-software-supply-chain-in-2026-81b000ca.pdf",
+      "alt": "Securing the Software Supply Chain in 2026",
+      "kind": "doc",
+      "note": "Securing the Software Supply Chain in 2026 · asset"
+    },
+    {
+      "id": 172,
+      "from": "69369fa0630ff1603836a7b8-stig-20hardening-37a29f56.webp",
+      "to": "stig-hardening-37a29f56.webp",
+      "alt": "Stig hardening",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 173,
+      "from": "69369ee8160e44a6b6bfd14a-stig-20-26-20openscap-815533c2.webp",
+      "to": "stig-openscap-815533c2.webp",
+      "alt": "Stig openscap",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 174,
+      "from": "69369dff1137f5a906e190ec-stig-20-26-20openscap-20compliance-20ar-6467035a.pdf",
+      "to": "stig-openscap-compliance-architecture-6467035a.pdf",
+      "alt": "STIG & OpenSCAP Compliance Architecture",
+      "kind": "doc",
+      "note": "STIG & OpenSCAP Compliance Architecture · asset"
+    },
+    {
+      "id": 175,
+      "from": "69369e016623e6df2164442a-d05f45ad7ce41ee78522355063665d0f-stig-2-1bcbb151.pdf",
+      "to": "stig-hardening-by-design-1bcbb151.pdf",
+      "alt": "STIG Hardening by Design",
+      "kind": "doc",
+      "note": "STIG Hardening by Design · asset"
+    },
+    {
+      "id": 176,
+      "from": "69291fdef4ebeb0091b9364e-dependency-20management-20-26-20attack-bd3c5d2e.webp",
+      "to": "dependency-management-attack-surface-reduction-bd3c5d2e.webp",
+      "alt": "Dependency management attack surface reduction",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 177,
+      "from": "6927f82dfd02a70270694e4f-breaking-20the-20migration-8b2ea3c8.webp",
+      "to": "breaking-the-migration-8b2ea3c8.webp",
+      "alt": "Breaking the migration",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 178,
+      "from": "6927e5fa2cd01afb755e1d1f-breaking-20the-20migration-20barrier-efafccdb.pdf",
+      "to": "breaking-the-migration-barrier-efafccdb.pdf",
+      "alt": "Breaking the Migration Barrier",
+      "kind": "doc",
+      "note": "Breaking the Migration Barrier · asset"
+    },
+    {
+      "id": 179,
+      "from": "69291e5528936084df5c6611-dependency-20management-20and-20attack-fcd0df53.pdf",
+      "to": "dependency-management-attack-surface-reduction-fcd0df53.pdf",
+      "alt": "Dependency Management & Attack Surface Reduction",
+      "kind": "doc",
+      "note": "Dependency Management & Attack Surface Reduction · asset"
+    },
+    {
+      "id": 180,
+      "from": "69297d67e30a03c6fe293f32-eliminating-20the-20security-e50a01ad.webp",
+      "to": "eliminating-the-security-e50a01ad.webp",
+      "alt": "Eliminating the security",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 181,
+      "from": "6927e6dfda3c69f983ae20c9-ai-sbom-aae3b736.webp",
+      "to": "ai-sbom-aae3b736.webp",
+      "alt": "Ai sbom",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 182,
+      "from": "6926fe43fccfe805905e168a-cleanstart-20ai-20sbom-16ccf218.pdf",
+      "to": "cleanstart-ai-sbom-16ccf218.pdf",
+      "alt": "CleanStart AI-SBOM",
+      "kind": "doc",
+      "note": "CleanStart AI-SBOM · asset"
+    },
+    {
+      "id": 183,
+      "from": "697b53fb764f4310b15b9684-eliminating-20the-20security-velocity-2-c1425761.pdf",
+      "to": "eliminating-the-security-velocity-trade-off-c1425761.pdf",
+      "alt": "Eliminating the Security-Velocity Trade - off",
+      "kind": "doc",
+      "note": "Eliminating the Security-Velocity Trade - off · asset"
+    },
+    {
+      "id": 184,
+      "from": "69131490f3f3be92f4091974-4-20-2-beec633a.webp",
+      "to": "4-2-beec633a.webp",
+      "alt": "4 2",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 185,
+      "from": "691318eef44dbe50af1b59bd-2-20fips-20compliance-20building-20gove-e3c663de.pdf",
+      "to": "fips-compliance-e3c663de.pdf",
+      "alt": "FIPS Compliance",
+      "kind": "doc",
+      "note": "FIPS Compliance · asset"
+    },
+    {
+      "id": 186,
+      "from": "69131152ca7b918fef3cda79-2-34e17343.webp",
+      "to": "2-34e17343.webp",
+      "alt": "2",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 187,
+      "from": "691317ecbc844518ff104710-4-20fips-traces-20automating-20cryptogr-749732fa.pdf",
+      "to": "fips-traces-749732fa.pdf",
+      "alt": "FIPS Traces",
+      "kind": "doc",
+      "note": "FIPS Traces · asset"
+    },
+    {
+      "id": 188,
+      "from": "691311842a2714ee412d783b-3-20-1-4b482f6a.webp",
+      "to": "3-1-4b482f6a.webp",
+      "alt": "3 1",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 189,
+      "from": "691311ad2f27a22b80081000-1-eb4d920f.webp",
+      "to": "1-eb4d920f.webp",
+      "alt": "1",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 190,
+      "from": "6911e41622fa1bd46bce92f8-fips-140-2-compliance-foundation-b33307f4.pdf",
+      "to": "embedding-fips-140-2-compliance-at-the-foundation-b33307f4.pdf",
+      "alt": "Embedding FIPS 140-2 Compliance at the Foundation",
+      "kind": "doc",
+      "note": "Embedding FIPS 140-2 Compliance at the Foundation · asset"
+    },
+    {
+      "id": 191,
+      "from": "691318541a9c59ea88fc0038-3-20cs-20-20fips-20guides-20-1-d95c114d.pdf",
+      "to": "fips-140-3-and-the-quantum-imperative-d95c114d.pdf",
+      "alt": "FIPS 140-3 and the Quantum Imperative",
+      "kind": "doc",
+      "note": "FIPS 140-3 and the Quantum Imperative · asset"
+    },
+    {
+      "id": 192,
+      "from": "68f23ffda0617c2174436763-rethinking-20container-20builds-20for-2-bc1da09e.webp",
+      "to": "rethinking-container-builds-for-security-bscale-bc1da09e.webp",
+      "alt": "Rethinking container builds for security bscale",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 193,
+      "from": "68f23fdd39ac4d03966cfa4c-software-20bill-20of-20materials-915f76e8.webp",
+      "to": "software-bill-of-materials-915f76e8.webp",
+      "alt": "Software bill of materials",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 194,
+      "from": "68f2390e42f9aa29d6ffb300-cleanstart-20whitepaper-20-20sbom-5b3dc4fc.pdf",
+      "to": "software-bill-of-materials-5b3dc4fc.pdf",
+      "alt": "Software Bill of Materials",
+      "kind": "doc",
+      "note": "Software Bill of Materials · asset"
+    },
+    {
+      "id": 195,
+      "from": "68f23918a0617c217441110e-rethinking-20container-20builds-20for-2-deaef3b4.pdf",
+      "to": "rethinking-container-builds-for-security-and-scale-deaef3b4.pdf",
+      "alt": "Rethinking Container Builds for Security and Scale",
+      "kind": "doc",
+      "note": "Rethinking Container Builds for Security and Scale · asset"
+    },
+    {
+      "id": 196,
+      "from": "68f23ae6814856515b88f2aa-secure-20lightweight-f4f3ae52.webp",
+      "to": "secure-lightweight-f4f3ae52.webp",
+      "alt": "Secure lightweight",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 197,
+      "from": "68f2401b6900d3f30229b0ec-the-20real-20cost-20of-20public-20conta-9ac3029b.webp",
+      "to": "the-real-cost-of-public-container-images-9ac3029b.webp",
+      "alt": "The real cost of public container images",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 198,
+      "from": "68f23916cea6ef3774af79f6-secure-20lightweight-20container-20imag-a5ced44e.pdf",
+      "to": "secure-lightweight-container-images-a5ced44e.pdf",
+      "alt": "Secure Lightweight Container Images",
+      "kind": "doc",
+      "note": "Secure Lightweight Container Images · asset"
+    },
+    {
+      "id": 199,
+      "from": "68f23925477b97e8b0a19016-the-20real-20cost-20of-20public-20conta-6c61b081.pdf",
+      "to": "the-real-cost-of-public-container-images-6c61b081.pdf",
+      "alt": "The Real Cost of Public Container Images",
+      "kind": "doc",
+      "note": "The Real Cost of Public Container Images · asset"
+    },
+    {
+      "id": 200,
+      "from": "68f2390ee1c9c30442154fdd-enterprise-grade-20hardened-20container-2a4ee8c8.pdf",
+      "to": "enterprise-grade-hardened-container-images-2a4ee8c8.pdf",
+      "alt": "Enterprise-Grade Hardened Container Images",
+      "kind": "doc",
+      "note": "Enterprise-Grade Hardened Container Images · asset"
+    },
+    {
+      "id": 201,
+      "from": "68f23b412e74b21304850921-enterprise-20grade-20hardened-20contain-1d4d70c7.webp",
+      "to": "enterprise-grade-hardened-container-images-1d4d70c7.webp",
+      "alt": "Enterprise grade hardened container images",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 202,
+      "from": "68f23b99816aeb3eb9f532d4-containing-20vulnerabilities-20in-20you-336d5701.webp",
+      "to": "containing-vulnerabilities-in-your-container-336d5701.webp",
+      "alt": "Containing vulnerabilities in your container",
+      "kind": "orphan-source",
+      "note": "unused / no document"
+    },
+    {
+      "id": 203,
+      "from": "69e8775dcd3b6208218ab7e3-cleanstart-version2-1bb14c7e.pdf",
+      "to": "containing-vulnerabilities-in-your-containers-1bb14c7e.pdf",
+      "alt": "Containing Vulnerabilities in your Containers",
+      "kind": "doc",
+      "note": "Containing Vulnerabilities in your Containers · asset"
+    },
+    {
+      "id": 204,
+      "from": "69c1182f2ddb6a7bb86bc063-69707b205a0f10988d719b08-8bf1b0092020fb-00e0e4a0.webp",
+      "to": "secure-containers-end-to-end-from-trusted-images-to-runtime-visi-00e0e4a0.webp",
+      "alt": "Secure Containers, End to End From trusted images to runtime visibility with CleanStart and Sysdig",
+      "kind": "doc",
+      "note": "Secure Containers, End to End From trusted images to runtime visibility with CleanStart and Sysdig · heroImage"
+    },
+    {
+      "id": 205,
+      "from": "69707b205a0f10988d719b08-8bf1b0092020fb4b57efa12c0cd8ac4afa9385b-a07cfb9b.webp",
+      "to": "building-secure-software-supply-chains-with-sbom-copy-a07cfb9b.webp",
+      "alt": "Building Secure Software Supply Chains with SBOM Copy",
+      "kind": "doc",
+      "note": "Building Secure Software Supply Chains with SBOM Copy · heroImage"
+    }
+  ]
+}

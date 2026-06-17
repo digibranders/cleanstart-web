@@ -67,6 +67,17 @@ describe('buildJsonLdBlobs', () => {
       ]);
     });
 
+    it('emits Article keywords from seo.keywords for blogs (not just guides)', () => {
+      const blobs = buildJsonLdBlobs(ctx, 'blogs', {
+        id: 1,
+        slug: 'sbom-signing',
+        title: 'SBOM signing',
+        seo: { keywords: ['SBOM', 'FIPS'] },
+      });
+      const article = blobs.find((b) => b['@type'] === 'Article') as Record<string, unknown>;
+      expect(article?.keywords).toEqual(['SBOM', 'FIPS']);
+    });
+
     it('promotes the first resolved category into about{}', () => {
       const blobs = buildJsonLdBlobs(ctx, 'blogs', {
         slug: 'example',

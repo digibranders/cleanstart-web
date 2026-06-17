@@ -89,7 +89,7 @@ export function PlatformTrustSource() {
           style={{ maxWidth: "1122px", paddingTop: "clamp(64px, 5.5vw, 80px)" }}
         >
           <h2
-            className="w-full font-bold text-[#111]"
+            className="w-full font-semibold text-[#111]"
             style={{
               fontFamily: "var(--font-display)",
               fontSize: "var(--fs-display)",
@@ -150,7 +150,7 @@ export function PlatformTrustSource() {
                 />
               </div>
               <h3
-                className="font-bold text-[#111]"
+                className="font-semibold text-[#111]"
                 style={{
                   fontFamily: "var(--font-display)",
                   fontSize: "var(--fs-h3)",

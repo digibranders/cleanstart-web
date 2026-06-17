@@ -56,7 +56,7 @@ export async function GET(req: Request): Promise<ImageResponse> {
 
         <div style={{ display: "flex" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={`${origin}/images/logo-cleanstart-footer.png`} width={191} height={40} alt="CleanStart" />
+          <img src={`${origin}/images/cleanstart-logo.png`} width={191} height={40} alt="CleanStart" />
         </div>
 
         <div style={{ display: "flex", flexDirection: "column" }}>

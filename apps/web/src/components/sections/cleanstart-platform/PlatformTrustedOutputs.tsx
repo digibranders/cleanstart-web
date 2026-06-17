@@ -135,7 +135,7 @@ export function PlatformTrustedOutputs() {
       <div className="mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Title */}
         <h2
-          className="mb-[clamp(48px,5.5vw,80px)] mt-[clamp(64px,6.9vw,100px)] text-center font-bold text-[#111]"
+          className="mb-[clamp(48px,5.5vw,80px)] mt-[clamp(64px,6.9vw,100px)] text-center font-semibold text-[#111]"
           style={{
             fontFamily: "var(--font-display)",
             fontSize: "var(--fs-display)",

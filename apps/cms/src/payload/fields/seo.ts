@@ -7,6 +7,7 @@ import {
   validateOverrideForFieldOnCollection,
 } from '../lib/jsonld/override-validator';
 import { normaliseText } from '../lib/normalise-text';
+import { normalizeKeywords } from '../lib/seo/keywords';
 import { mediaUploadField } from './media-upload';
 
 const TITLE_CHAR_HINT = 60;
@@ -396,8 +397,8 @@ const additionalSchemaField: Field = {
   }) as JSONFieldValidation,
 };
 
-// Optional target keyword the editor is writing for. Drives the
-// `KeywordTargetField` sidebar density readout. Free-text — we don't
+// Optional primary topic the editor is writing for. Drives the
+// `KeywordsField` sidebar density readout. Free-text — we don't
 // validate against an external keyword tool. Hidden from the in-form
 // renderer; the sidebar UI is the editing surface.
 const keywordTargetField: Field = {
@@ -407,6 +408,31 @@ const keywordTargetField: Field = {
     hidden: true,
     description:
       'Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.',
+  },
+};
+
+// Topic keywords — a normalized list of entity terms for this page.
+// Distinct from `keywordTarget` (the single primary topic that drives
+// the density readout): this is the *entity set* surfaced as schema.org
+// `keywords` + `mentions[]` (AEO/GEO signal) and indexed as a search
+// facet. Stored as a `json` blob (a `string[]`) — same storage choice
+// as `alternates` / `customTags`, because the parent `seo` group is
+// `admin.hidden` and Payload's `array` row-registry needs an in-form
+// render surface. The `KeywordsField` sidebar card reads/writes both
+// this and `keywordTarget` via `useField` + `setValue`. Normalized on
+// every save so the stored shape is always a clean, de-duped, capped
+// array (or null).
+const keywordsField: Field = {
+  name: 'keywords',
+  type: 'json',
+  admin: { hidden: true },
+  hooks: {
+    beforeChange: [
+      ({ value }) => {
+        const cleaned = normalizeKeywords(value);
+        return cleaned.length > 0 ? cleaned : null;
+      },
+    ],
   },
 };
 
@@ -460,6 +486,7 @@ const seoField: GroupField = {
     alternatesField,
     customTagsField,
     keywordTargetField,
+    keywordsField,
     speakablePathField,
     additionalSchemaField,
   ],
@@ -620,6 +647,22 @@ export const seoSidebarFields = (args: {
           Field: {
             path: '@/payload/admin/components/SchemaPreviewField.tsx#SchemaPreviewField',
             clientProps: { pathPrefix, sourceField: urlSource },
+          },
+        },
+      },
+    },
+    {
+      // Unified Keywords card — primary topic (keywordTarget) + density
+      // writing-aid, plus supporting topics (seo.keywords) chips with
+      // autosuggest. Sits in the "what indexes / entities" cluster.
+      name: 'keywords',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/KeywordsField.tsx#KeywordsField',
+            clientProps: { titleSource, descriptionSource },
           },
         },
       },

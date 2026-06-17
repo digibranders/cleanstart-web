@@ -30,7 +30,7 @@ export default function TeamsPage() {
         ])}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <div className="bg-cs-hero bg-cs-grid relative overflow-hidden">
           <TeamsHero />
         </div>

@@ -70,7 +70,7 @@ export default function ErrorBoundary({
   return (
     <>
       <MinimalHeader />
-      <main>
+      <main id="main-content">
         <StateView
           variant={resolveVariant(error)}
           referenceId={error.digest}

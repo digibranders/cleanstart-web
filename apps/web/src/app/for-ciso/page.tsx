@@ -3,10 +3,9 @@ import { Footer } from "@/components/sections/Footer";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { CisoHero } from "@/components/sections/ciso/CisoHero";
 import { CisoRisks } from "@/components/sections/ciso/CisoRisks";
-import { CisoSolution } from "@/components/sections/ciso/CisoSolution";
-import { CisoComparison } from "@/components/sections/ciso/CisoComparison";
-import { CisoOutcomes } from "@/components/sections/ciso/CisoOutcomes";
+import { CisoLifecycle } from "@/components/sections/ciso/CisoLifecycle";
 import { CisoEnterprise } from "@/components/sections/ciso/CisoEnterprise";
+import { CisoValidationOutcomes } from "@/components/sections/ciso/CisoValidationOutcomes";
 import { CisoCTA } from "@/components/sections/ciso/CisoCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
@@ -30,22 +29,19 @@ export default function ForCisoPage(): React.ReactElement {
         ])}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <CisoHero />
         <FadeUp>
           <CisoRisks />
         </FadeUp>
         <FadeUp>
-          <CisoSolution />
-        </FadeUp>
-        <FadeUp>
-          <CisoComparison />
-        </FadeUp>
-        <FadeUp>
-          <CisoOutcomes />
+          <CisoLifecycle />
         </FadeUp>
         <FadeUp>
           <CisoEnterprise />
+        </FadeUp>
+        <FadeUp>
+          <CisoValidationOutcomes />
         </FadeUp>
       </main>
       <Footer cta={<CisoCTA />} />

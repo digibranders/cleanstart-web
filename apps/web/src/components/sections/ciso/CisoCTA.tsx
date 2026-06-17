@@ -5,10 +5,9 @@ export function CisoCTA(): React.ReactElement {
   return (
     <div
       className="relative w-full h-full overflow-hidden"
-      style={{
-        background: "linear-gradient(180deg, #131e8f 0%, #471ec0 111.05%)",
-      }}
+      style={{ background: "#ffffff" }}
     >
+      {/* Soft purple corner glows — give the white card a warm brand tint. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute"
@@ -18,8 +17,21 @@ export function CisoCTA(): React.ReactElement {
           width: "320px",
           height: "320px",
           borderRadius: "50%",
-          background: "rgba(44, 193, 235, 0.12)",
-          filter: "blur(80px)",
+          background: "rgba(223, 155, 255, 0.35)",
+          filter: "blur(90px)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute hidden sm:block"
+        style={{
+          right: "-120px",
+          bottom: "-150px",
+          width: "360px",
+          height: "360px",
+          borderRadius: "50%",
+          background: "rgba(223, 155, 255, 0.28)",
+          filter: "blur(110px)",
         }}
       />
 
@@ -29,7 +41,7 @@ export function CisoCTA(): React.ReactElement {
             images at this breakpoint, only the gradient and gridlines. */}
 
         <p
-          className="absolute text-center text-white"
+          className="absolute text-center"
           style={{
             top: "32px",
             left: "50%",
@@ -40,13 +52,14 @@ export function CisoCTA(): React.ReactElement {
             fontWeight: 600,
             lineHeight: 1.1,
             letterSpacing: "-0.04em",
+            color: "#111",
           }}
         >
-          Strengthen Your Software Supply Chain Foundations
+          Reduce Software Risk With Continuous Governance
         </p>
 
         <p
-          className="absolute text-center text-white"
+          className="absolute text-center"
           style={{
             top: "150px",
             left: "50%",
@@ -57,11 +70,11 @@ export function CisoCTA(): React.ReactElement {
             fontWeight: 400,
             lineHeight: 1.4,
             letterSpacing: "-0.02em",
-            opacity: 0.8,
+            color: "rgba(17, 17, 17, 0.8)",
           }}
         >
-          Reduce inherited software risk with minimal, hardened, verifiable
-          container images built for enterprise environments.
+          Strengthen software trust, accelerate compliance readiness, and reduce
+          inherited software exposure across modern delivery environments.
         </p>
 
         <div
@@ -69,23 +82,18 @@ export function CisoCTA(): React.ReactElement {
           style={{ top: "262px", left: "50%", transform: "translateX(-50%)" }}
         >
           <Link
-            href="/resource-center"
-            className="cs-btn-glass"
+            href="/contact-us"
+            className="cs-btn-blue"
             style={
               {
                 "--cs-btn-px": "24px",
                 "--cs-btn-fs": "16px",
                 "--cs-btn-h": "44px",
-                fontFamily: "var(--font-display)",
-                fontWeight: 500,
-                letterSpacing: "-0.8px",
-                color: "#111",
-                border: "1px solid #dab6f3",
                 whiteSpace: "nowrap",
               } as React.CSSProperties
             }
           >
-            Read the Executive Brief
+            Talk to an Expert
           </Link>
         </div>
       </div>
@@ -94,45 +102,46 @@ export function CisoCTA(): React.ReactElement {
         className="hidden sm:flex absolute inset-0 flex-row items-center overflow-hidden"
         style={{
           padding: "0 clamp(32px, 6.35vw, 122px)",
-          gap: "clamp(32px, 5.99vw, 115px)",
+          gap: "clamp(24px, 2.2vw, 32px)",
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
-          src="/images/ciso/cta-cube-noise.webp"
+          src="/images/vulnerability-remediation/cta-cube.webp"
           alt=""
           className="absolute pointer-events-none select-none"
           style={{
-            right: "-60px",
-            bottom: "-80px",
+            right: "-44px",
+            bottom: "-44px",
             width: "190px",
-            height: "193px",
+            height: "190px",
             objectFit: "contain",
-            opacity: 0.8,
-            transform: "rotate(-0.15deg)",
+            opacity: 0.5,
           }}
           loading="lazy"
           decoding="async"
         />
 
         <p
-          className="relative text-white flex-shrink-0"
+          className="relative flex-shrink-0"
           style={{
             fontFamily: "var(--font-display)",
             fontSize: "var(--cta-card-title)",
             fontWeight: 600,
             letterSpacing: "-0.04em",
             lineHeight: 1.1,
-            maxWidth: "min(462px, 100%)",
+            maxWidth: "min(360px, 100%)",
+            textWrap: "balance",
+            color: "#111",
           }}
         >
-          Strengthen Your Software Supply Chain Foundations
+          Reduce Software Risk With Continuous Governance
         </p>
 
         <div
           className="relative flex flex-col"
-          style={{ maxWidth: "min(493px, 100%)", gap: "clamp(16px, 1.25vw, 24px)" }}
+          style={{ maxWidth: "min(540px, 100%)", gap: "clamp(16px, 1.25vw, 24px)" }}
         >
           <p
             style={{
@@ -141,16 +150,17 @@ export function CisoCTA(): React.ReactElement {
               fontWeight: 400,
               letterSpacing: "-0.02em",
               lineHeight: 1.4,
-              color: "rgba(255, 255, 255, 0.8)",
+              color: "rgba(17, 17, 17, 0.8)",
+              textWrap: "balance",
             }}
           >
-            Reduce inherited software risk with minimal, hardened, verifiable
-            container images built for enterprise environments.
+            Strengthen software trust, accelerate compliance readiness, and reduce
+            inherited software exposure across modern delivery environments.
           </p>
 
           <Link
-            href="/resource-center"
-            className="cs-btn-glass self-start"
+            href="/contact-us"
+            className="cs-btn-blue self-start"
             style={
               {
                 "--cs-btn-px": "18px",
@@ -158,9 +168,9 @@ export function CisoCTA(): React.ReactElement {
               } as React.CSSProperties
             }
           >
-            <span>Read the Executive Brief</span>
+            <span>Talk to an Expert</span>
             <svg
-              className="cs-cta-arrow"
+              className="cs-cta-arrow ml-2"
               width="18"
               height="18"
               viewBox="0 0 18 18"

@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Manrope, Sora } from "next/font/google";
 import "./globals.css";
+import "./scrollbar.css";
 import { cn } from "@/lib/utils";
 import { PreviewBanner } from "@/components/PreviewBanner";
+import { SearchProvider } from "@/components/search/SearchProvider";
 import { SmoothScrollProvider } from "@/components/SmoothScrollProvider";
-import { AgentationDev } from "@/components/dev/AgentationDev";
 import {
   ConsentProvider,
   ConsentModeScript,
@@ -129,13 +130,22 @@ export default function RootLayout({
         <ConsentModeScript />
       </head>
       <body suppressHydrationWarning>
+        {/* Skip-to-content link (WCAG 2.1 A): first focusable element; hidden
+            until focused, then jumps keyboard users past the nav to <main>. */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[#471EC0] focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#471EC0]"
+        >
+          Skip to main content
+        </a>
         <ConsentProvider>
           <JsonLd id="org-jsonld" data={organizationSchema()} />
           <PreviewBanner />
-          <SmoothScrollProvider>{children}</SmoothScrollProvider>
+          <SearchProvider>
+            <SmoothScrollProvider>{children}</SmoothScrollProvider>
+          </SearchProvider>
           <GatedAnalytics />
           <CookieBanner />
-          <AgentationDev />
         </ConsentProvider>
         <Script
           src="https://cdn.oyechats.com/oyechats-widget.js"

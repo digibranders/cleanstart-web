@@ -74,7 +74,7 @@ export default async function WebinarsPage({
         ])}
       />
       <Header />
-      <main style={{ background: "#F6F6F6" }}>
+      <main id="main-content" style={{ background: "#F6F6F6" }}>
         <div className="relative overflow-hidden">
           <WebinarsHero />
         </div>

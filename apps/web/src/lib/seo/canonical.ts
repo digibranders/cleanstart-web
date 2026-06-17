@@ -5,6 +5,24 @@ import { ogImageUrl, type OgVariant } from "./og";
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.cleanstart.com";
 export const SITE_NAME = "CleanStart";
 
+// Trailing " | CleanStart" (and `-`/`–`/`—`/`:` separator variants). Webflow-
+// imported `seo.title` values often already carry the brand, which the root
+// layout's `%s | CleanStart` template would then append a second time
+// ("… | CleanStart | CleanStart"). Stripped before the template is applied.
+const BRAND_SUFFIX = /\s*[|–—\-:]\s*CleanStart\s*$/i;
+
+/**
+ * Remove any trailing brand suffix(es) from a title so the layout title
+ * template adds exactly one. Idempotent and loop-safe — collapses an
+ * already-doubled title down to the bare title. Never strips a title that is
+ * only "CleanStart" (no separator), so a legitimately brand-named page survives.
+ */
+export function stripBrandSuffix(title: string): string {
+  let t = title.trim();
+  while (BRAND_SUFFIX.test(t)) t = t.replace(BRAND_SUFFIX, "").trim();
+  return t || title.trim();
+}
+
 export type PageImage = {
   url: string;
   width?: number | undefined;
@@ -73,28 +91,33 @@ export function buildPageMetadata({
   // Build-time gate (no request host) — the per-host backstop is proxy.ts.
   const robotsBlocked = noindex || !isIndexingAllowed();
 
+  // `absoluteTitle` callers own the full <title> (brand included) and bypass the
+  // layout template, so leave theirs untouched. Everyone else gets the brand
+  // stripped here so the `%s | CleanStart` template can't double it.
+  const cleanTitle = absoluteTitle ? title : stripBrandSuffix(title);
+
   const dynamicOg = {
     url: ogImageUrl({
       variant,
-      title: ogTitle ?? title,
+      title: ogTitle ?? cleanTitle,
       eyebrow,
       titleAccent,
       sub: description,
     }),
     width: 1200,
     height: 630,
-    alt: image?.alt ?? title,
+    alt: image?.alt ?? cleanTitle,
   };
   const ogImage = image ?? dynamicOg;
   const canonical = canonicalUrl ?? path;
   const ogUrl = canonicalUrl ?? url;
 
   return {
-    title: absoluteTitle ? { absolute: title } : title,
+    title: absoluteTitle ? { absolute: title } : cleanTitle,
     description,
     alternates: { canonical },
     openGraph: {
-      title,
+      title: cleanTitle,
       description,
       url: ogUrl,
       siteName: SITE_NAME,
@@ -118,7 +141,7 @@ export function buildPageMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: cleanTitle,
       description,
       images: [{ url: ogImage.url, alt: ogImage.alt }],
     },

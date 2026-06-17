@@ -155,6 +155,10 @@ export const buildArticleBlob = (
   }
 
   if (source.keywords && source.keywords.length > 0) {
+    // `keywords` (Text[]) is the standard schema.org property; `mentions`
+    // (Thing[]) gives each term entity status for Knowledge-Graph / AI
+    // answer-engine understanding. Emitting both is the strongest signal.
+    blob.keywords = [...source.keywords];
     blob.mentions = source.keywords.map((name) => ({ '@type': 'Thing', name }));
   }
 

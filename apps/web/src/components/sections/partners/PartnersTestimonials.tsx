@@ -138,7 +138,7 @@ export function PartnersTestimonials() {
             className="text-center font-display text-[#111]"
             style={{
               fontSize: "var(--fs-h2)",
-              fontWeight: 700,
+              fontWeight: 600,
               lineHeight: 1.1,
               letterSpacing: "-0.04em",
             }}
@@ -309,19 +309,24 @@ function NavButton({
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="flex size-10 items-center justify-center rounded-full bg-[#111] text-white transition-colors hover:bg-[#222] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9A51FF]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f6f6f6]"
+      // Solid black button — reads cleaner than the glassy lavender treatment
+      // on the light section bg. Keeps the home carousel's tactile micro-
+      // interaction: springy lift + scale-up on hover, press-in on click
+      // (matching `cs-tt-nav`'s transform timing). Glow/outline dropped so the
+      // button stays clean black.
+      className="flex size-10 items-center justify-center rounded-full bg-[#111] text-white transition-[transform,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-px hover:scale-105 hover:shadow-[0_10px_24px_-10px_rgba(17,17,17,0.55)] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9A51FF]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f6f6f6] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100"
     >
       <svg
         width="18"
-        height="18"
-        viewBox="0 0 20 20"
+        height="13"
+        viewBox="0 0 20 14"
         fill="none"
         aria-hidden
         style={{ transform: direction === "prev" ? "scaleX(-1)" : undefined }}
       >
         <title>{direction === "prev" ? "Previous" : "Next"}</title>
         <path
-          d="M7.5 5L12.5 10L7.5 15"
+          d="M1 7h17m0 0l-5-5m5 5l-5 5"
           stroke="currentColor"
           strokeWidth="1.75"
           strokeLinecap="round"

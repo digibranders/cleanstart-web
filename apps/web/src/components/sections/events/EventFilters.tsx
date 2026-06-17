@@ -92,93 +92,29 @@ export function EventFilters({
     [activeYear, setYear],
   );
 
-  const activeCount =
-    (activeCountry !== undefined ? 1 : 0) + (activeYear !== undefined ? 1 : 0);
-
   return (
     <aside
       aria-label="Filter events"
-      className="w-full lg:w-[299px] rounded-[24px] bg-white lg:p-6 lg:border lg:border-[#E5E7EB] lg:shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
+      className="w-full lg:w-[295px] lg:rounded-[16px] lg:bg-white lg:px-4 lg:py-[18px] lg:shadow-[0px_3px_7px_0px_rgba(0,0,0,0.02),0px_13px_13px_0px_rgba(0,0,0,0.01),0px_29px_17px_0px_rgba(0,0,0,0.01)]"
     >
-      <details className="lg:hidden group rounded-[24px] border border-[#E5E7EB] bg-white">
-        <summary className="flex items-center justify-between gap-2 px-4 py-3 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-          <span className="flex items-center gap-2">
-            <FilterIcon />
-            <span
-              className="font-display font-semibold text-body-md"
-              style={{ color: "#0F172A", letterSpacing: "-0.01em" }}
-            >
-              Filter
-            </span>
-            {activeCount > 0 && (
-              <span
-                aria-label={`${activeCount} active filter${activeCount === 1 ? "" : "s"}`}
-                className="flex items-center justify-center rounded-full bg-[#5B33F3] text-white text-body-xs"
-                style={{ width: "20px", height: "20px", fontWeight: 600 }}
-              >
-                {activeCount}
-              </span>
-            )}
-          </span>
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            aria-hidden
-            className="transition-transform group-open:rotate-180"
-          >
-            <path
-              d="M4 6l4 4 4-4"
-              stroke="#0F172A"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </summary>
-
-        <div className="px-4 pb-4 pt-2">
-          <FilterSectionLabel>COUNTRY</FilterSectionLabel>
-          <div className="flex flex-col" style={{ gap: "10px" }}>
-            {countryRows.map(({ key, ...row }) => (
-              <FilterRow key={key} {...row} />
-            ))}
-          </div>
-
-          <div style={{ height: "1px", background: "#E5E7EB", margin: "20px 0" }} />
-
-          <FilterSectionLabel>YEAR</FilterSectionLabel>
-          <div className="flex flex-col" style={{ gap: "10px" }}>
-            {yearRows.map(({ key, ...row }) => (
-              <FilterRow key={key} {...row} />
-            ))}
-          </div>
-        </div>
-      </details>
+      {/* Mobile: full-bleed horizontal chip strips at the top (career-page style). */}
+      <div className="lg:hidden flex flex-col" style={{ gap: "16px" }}>
+        <MobileChipStrip label="Country" rows={countryRows} />
+        <MobileChipStrip label="Year" rows={yearRows} />
+      </div>
 
       <div className="hidden lg:block">
-        <div className="flex items-center gap-2" style={{ marginBottom: "24px" }}>
-          <FilterIcon />
-          <span
-            className="font-display font-semibold text-body-lg"
-            style={{ color: "#0F172A", letterSpacing: "-0.01em" }}
-          >
-            Filter BY
-          </span>
-        </div>
-
         <FilterSectionLabel>COUNTRY</FilterSectionLabel>
-        <div className="flex flex-col" style={{ gap: "10px" }}>
+        <div className="flex flex-col" style={{ gap: "6px" }}>
           {countryRows.map(({ key, ...row }) => (
             <FilterRow key={key} {...row} />
           ))}
         </div>
 
-        <div style={{ height: "1px", background: "#E5E7EB", margin: "20px 0" }} />
+        <div style={{ height: "1px", background: "rgba(17,17,17,0.12)", margin: "14px 0" }} />
 
         <FilterSectionLabel>YEAR</FilterSectionLabel>
-        <div className="flex flex-col" style={{ gap: "10px" }}>
+        <div className="flex flex-col" style={{ gap: "6px" }}>
           {yearRows.map(({ key, ...row }) => (
             <FilterRow key={key} {...row} />
           ))}
@@ -195,11 +131,12 @@ function FilterSectionLabel({
 }): React.ReactElement {
   return (
     <p
-      className="font-sans uppercase text-body-xs"
+      className="font-sans uppercase"
       style={{
+        fontSize: "var(--fs-badge)",
         letterSpacing: "0.08em",
-        color: "#1A1A1A",
-        marginBottom: "12px",
+        color: "rgba(17,17,17,0.6)",
+        marginBottom: "8px",
         fontWeight: 500,
       }}
     >
@@ -226,82 +163,95 @@ function FilterRow({
       type="button"
       onClick={onClick}
       aria-pressed={selected}
-      className="flex items-center justify-between transition-colors w-full cursor-pointer"
+      className="flex items-center gap-2 w-full cursor-pointer transition-colors"
       style={{
-        height: "44px",
+        height: "34px",
         padding: "0 12px",
         borderRadius: "10px",
-        background: selected ? "#EDE9FE" : "#FFFFFF",
-        border: `1px solid ${selected ? "#C4B5FD" : "#E5E7EB"}`,
-        color: selected ? "#5B33F3" : "#0F172A",
+        background: selected ? "rgba(74,59,241,0.08)" : "#ffffff",
+        border: `1px solid ${selected ? "rgba(74,59,241,0.35)" : "rgba(17,17,17,0.08)"}`,
+        color: selected ? "#4a3bf1" : "#111",
+        fontWeight: 500,
       }}
     >
-      <span className="flex items-center gap-2.5">
-        <span
-          aria-hidden
-          className="flex items-center justify-center"
-          style={{
-            width: "20px",
-            height: "20px",
-            color: selected ? "#5B33F3" : "#0F172A",
-          }}
-        >
-          {icon}
-        </span>
-        <span
-          className="font-sans text-body-sm"
-          style={{ fontWeight: 500, lineHeight: 1 }}
-        >
-          {label}
-        </span>
+      <span
+        aria-hidden
+        className="flex items-center justify-center shrink-0"
+        style={{
+          width: "18px",
+          height: "18px",
+          color: selected ? "#4a3bf1" : "rgba(17,17,17,0.55)",
+        }}
+      >
+        {icon}
       </span>
-      <Checkbox checked={selected} />
+      <span
+        className="font-sans"
+        style={{ fontSize: "var(--fs-body-sm)", lineHeight: 1.2 }}
+      >
+        {label}
+      </span>
     </button>
   );
 }
 
-function Checkbox({ checked }: { checked: boolean }): React.ReactElement {
+interface ChipRow {
+  key: string;
+  label: string;
+  selected: boolean;
+  onClick: () => void;
+}
+
+function MobileChipStrip({
+  label,
+  rows,
+}: {
+  label: string;
+  rows: ChipRow[];
+}): React.ReactElement {
   return (
-    <span
-      aria-hidden
-      className="flex items-center justify-center"
-      style={{
-        width: "20px",
-        height: "20px",
-        borderRadius: "4px",
-        background: checked ? "#5B33F3" : "transparent",
-        border: `1.5px solid ${checked ? "#5B33F3" : "#C7B8FE"}`,
-        transition: "background 120ms",
-      }}
-    >
-      {checked && (
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
-          <path
-            d="M2.5 6.5l2.4 2.4 5-5"
-            stroke="white"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      )}
-    </span>
+    <div>
+      <p
+        className="font-sans uppercase px-1"
+        style={{
+          fontSize: "11px",
+          letterSpacing: "0.08em",
+          color: "rgba(17,17,17,0.6)",
+          fontWeight: 500,
+          marginBottom: "8px",
+        }}
+      >
+        {label}
+      </p>
+      {/* Full-bleed to the container's mobile gutter, scrollbar hidden. */}
+      <div className="-mx-6 px-6 sm:-mx-10 sm:px-10 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex items-center gap-2 min-w-max">
+          {rows.map((row) => (
+            <button
+              key={row.key}
+              type="button"
+              onClick={row.onClick}
+              aria-pressed={row.selected}
+              className="block whitespace-nowrap font-sans shrink-0 cursor-pointer transition-colors"
+              style={{
+                fontSize: "var(--fs-body-sm)",
+                fontWeight: 500,
+                padding: "5px 12px",
+                borderRadius: "999px",
+                border: `1px solid ${row.selected ? "#4a3bf1" : "rgba(17,17,17,0.12)"}`,
+                color: row.selected ? "#4a3bf1" : "rgba(17,17,17,0.78)",
+                background: row.selected ? "rgba(74,59,241,0.08)" : "white",
+              }}
+            >
+              {row.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
-function FilterIcon(): React.ReactElement {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path
-        d="M3 5h18l-7 8.5V20l-4-2v-4.5L3 5z"
-        stroke="#0F172A"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-        fill="none"
-      />
-    </svg>
-  );
-}
 function CalendarIcon(): React.ReactElement {
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden>

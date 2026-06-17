@@ -15,6 +15,8 @@ import * as migration_20260608_121245_add_event_country from './20260608_121245_
 import * as migration_20260608_140513_add_news_region from './20260608_140513_add_news_region';
 import * as migration_20260608_144837_add_kb_category_display_order from './20260608_144837_add_kb_category_display_order';
 import * as migration_20260608_153417_add_kb_video_url from './20260608_153417_add_kb_video_url';
+import * as migration_20260610_085422_add_users_api_key from './20260610_085422_add_users_api_key';
+import * as migration_20260611_061406_add_seo_keywords from './20260611_061406_add_seo_keywords';
 
 export const migrations = [
   {
@@ -100,6 +102,16 @@ export const migrations = [
   {
     up: migration_20260608_153417_add_kb_video_url.up,
     down: migration_20260608_153417_add_kb_video_url.down,
-    name: '20260608_153417_add_kb_video_url'
+    name: '20260608_153417_add_kb_video_url',
+  },
+  {
+    up: migration_20260610_085422_add_users_api_key.up,
+    down: migration_20260610_085422_add_users_api_key.down,
+    name: '20260610_085422_add_users_api_key',
+  },
+  {
+    up: migration_20260611_061406_add_seo_keywords.up,
+    down: migration_20260611_061406_add_seo_keywords.down,
+    name: '20260611_061406_add_seo_keywords'
   },
 ];

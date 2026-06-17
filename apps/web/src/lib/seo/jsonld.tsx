@@ -36,7 +36,9 @@ export function organizationSchema() {
     url: SITE_URL,
     logo: {
       "@type": "ImageObject",
-      url: `${SITE_URL}/cleanstart-logo.svg`,
+      url: `${SITE_URL}/images/cleanstart-logo.png`,
+      width: 459,
+      height: 96,
     },
     sameAs: [
       "https://www.linkedin.com/company/cleanstart",
@@ -72,7 +74,8 @@ export interface BlogPostingSchemaInput {
   publishedAt?: string | undefined;
   modifiedAt?: string | undefined;
   imageUrl?: string | undefined;
-  authors?: Array<{ name: string }> | undefined;
+  /** Provide `slug` to emit `url: /author/<slug>` on each Person node (E-E-A-T signal). */
+  authors?: Array<{ name: string; slug?: string | undefined }> | undefined;
   category?: string | undefined;
   /** Site-relative paths (`/blogs/foo`) for editorially-linked sibling posts. */
   relatedLinks?: string[] | undefined;
@@ -105,7 +108,11 @@ export function blogPostingSchema({
     ...(lastModified ? { dateModified: lastModified } : {}),
     ...(authors && authors.length > 0
       ? {
-          author: authors.map((a) => ({ "@type": "Person", name: a.name })),
+          author: authors.map((a) => ({
+            "@type": "Person",
+            name: a.name,
+            ...(a.slug ? { url: absoluteUrl(`/author/${a.slug}`) } : {}),
+          })),
         }
       : {}),
     ...(category ? { articleSection: category } : {}),
@@ -157,8 +164,8 @@ export interface NewsArticleSchemaInput {
   imageUrl?: string | undefined;
   /** Section (e.g. "Press release", "Product update") — maps to schema.org/articleSection. */
   section?: string | undefined;
-  /** Author names — added as a `Person[]` array per Google news rich-result guidance. */
-  authors?: Array<{ name: string }> | undefined;
+  /** Authors — provide `slug` to emit `url: /author/<slug>` on each Person node. */
+  authors?: Array<{ name: string; slug?: string | undefined }> | undefined;
 }
 
 /**
@@ -190,7 +197,11 @@ export function newsArticleSchema({
     ...(section ? { articleSection: section } : {}),
     ...(authors && authors.length > 0
       ? {
-          author: authors.map((a) => ({ "@type": "Person", name: a.name })),
+          author: authors.map((a) => ({
+            "@type": "Person",
+            name: a.name,
+            ...(a.slug ? { url: absoluteUrl(`/author/${a.slug}`) } : {}),
+          })),
         }
       : {}),
     publisher: { "@id": ORGANIZATION_ID },
@@ -350,5 +361,87 @@ export function jobPostingSchema({
         }
       : {}),
     url: absoluteUrl(path),
+  };
+}
+
+export interface VideoObjectSchemaInput {
+  name: string;
+  description?: string | undefined;
+  contentUrl: string;
+  /** ISO-8601 date string. Required by Google for VideoObject rich results. */
+  uploadDate?: string | undefined;
+  /** Thumbnail image URL. Required by Google for VideoObject rich results. */
+  thumbnailUrl?: string | undefined;
+  /** Page path where the video appears, e.g. `/knowledge-hub/my-article`. */
+  embedPath?: string | undefined;
+}
+
+/**
+ * VideoObject for lesson videos (Knowledge Hub "Watch the Lesson" player).
+ * `thumbnailUrl` and `uploadDate` are required for Google's video rich results —
+ * callers should provide them when available.
+ */
+export function videoObjectSchema({
+  name,
+  description,
+  contentUrl,
+  uploadDate,
+  thumbnailUrl,
+  embedPath,
+}: VideoObjectSchemaInput) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name,
+    ...(description ? { description } : {}),
+    contentUrl,
+    ...(uploadDate ? { uploadDate } : {}),
+    ...(thumbnailUrl ? { thumbnailUrl } : {}),
+    ...(embedPath ? { embedUrl: absoluteUrl(embedPath) } : {}),
+    publisher: { "@id": ORGANIZATION_ID },
+  };
+}
+
+export interface ProfilePageSchemaInput {
+  name: string;
+  slug: string;
+  /** Job title / role. */
+  jobTitle?: string | undefined;
+  /** Absolute URL of the author's profile photo. */
+  imageUrl?: string | undefined;
+  /** Plain-text short bio. */
+  description?: string | undefined;
+  /** Canonical profile URLs on external platforms (LinkedIn, Twitter, etc.). */
+  sameAs?: string[] | undefined;
+}
+
+/**
+ * ProfilePage wrapping a Person mainEntity — Google's recommended type for
+ * author bio pages. Emitting this enables E-E-A-T author disambiguation and
+ * links back from Article/BlogPosting Person nodes via the `url` property.
+ */
+export function profilePageSchema({
+  name,
+  slug,
+  jobTitle,
+  imageUrl,
+  description,
+  sameAs,
+}: ProfilePageSchemaInput) {
+  const profileUrl = absoluteUrl(`/author/${slug}`);
+  return {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    url: profileUrl,
+    mainEntity: {
+      "@type": "Person",
+      "@id": `${profileUrl}#person`,
+      name,
+      url: profileUrl,
+      ...(jobTitle ? { jobTitle } : {}),
+      ...(imageUrl ? { image: imageUrl } : {}),
+      ...(description ? { description } : {}),
+      ...(sameAs && sameAs.length > 0 ? { sameAs } : {}),
+    },
   };
 }

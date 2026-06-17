@@ -7,6 +7,7 @@ import {
   isAdminOrEditor,
   isAdminOrSelf,
   isAuthenticated,
+  publishedOrAuthenticated,
 } from './index';
 
 const callAccess = (fn: Access, user: unknown): ReturnType<Access> =>
@@ -70,5 +71,28 @@ describe('isAdminOrSelf', () => {
   it('denies a non-admin whose id cannot be resolved (no silent widening)', () => {
     expect(callAccess(isAdminOrSelf, { roles: ['editor'] })).toBe(false);
     expect(callAccess(isAdminOrSelf, { id: 'not-a-number', roles: ['editor'] })).toBe(false);
+  });
+});
+
+describe('publishedOrAuthenticated', () => {
+  it('returns full access (true) for any authenticated user', () => {
+    expect(callAccess(publishedOrAuthenticated, admin)).toBe(true);
+    expect(callAccess(publishedOrAuthenticated, editor)).toBe(true);
+    expect(callAccess(publishedOrAuthenticated, author)).toBe(true);
+  });
+
+  it('grants the role-less preview-bot API-key user full read (drafts included)', () => {
+    // The preview-bot user holds no roles — write access is denied elsewhere
+    // (isAdminOrEditor), but it must still read drafts for editor preview.
+    expect(callAccess(publishedOrAuthenticated, { id: 9, roles: [] })).toBe(true);
+  });
+
+  it('constrains anonymous requests to published docs only', () => {
+    expect(callAccess(publishedOrAuthenticated, null)).toEqual({
+      _status: { equals: 'published' },
+    });
+    expect(callAccess(publishedOrAuthenticated, undefined)).toEqual({
+      _status: { equals: 'published' },
+    });
   });
 });

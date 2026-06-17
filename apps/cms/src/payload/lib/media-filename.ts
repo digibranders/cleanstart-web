@@ -89,6 +89,34 @@ const truncateSlug = (slug: string, max: number): string => {
 export const shortHash = (bytes: Buffer | Uint8Array): string =>
   crypto.createHash('sha256').update(bytes).digest('hex').slice(0, SHORT_HASH_LEN);
 
+/**
+ * Webflow prepends a 24-char Mongo ObjectID to every uploaded file's
+ * name (`6a102c0f3f256301e63ecc97-chart-20-53.png`). That id carries no
+ * meaning and, because it's a hex run *with a real name after it*, slips
+ * past `looksLikeJunkSlug` (which only flags a *bare* hex string). Strip
+ * it from the slug so the canonical R2 key reads `chart-20-53-<hash>`.
+ *
+ * Operates on an already-slugified value (lowercase, `-`-separated), so
+ * the prefix is matched as `<24-hex>-`. We only strip when a non-empty
+ * remainder survives — a name that is *just* the id keeps it, leaving
+ * the existing bare-hex junk handling untouched.
+ */
+const VENDOR_ASSET_ID_SLUG_PREFIX = /^[0-9a-f]{24}-/;
+
+export const stripVendorAssetIdPrefix = (slug: string): string => {
+  // Strip iteratively: Webflow sometimes stacks two ObjectIDs
+  // (`<id>-<id>-name`) when an asset was re-uploaded. Stop before the
+  // remainder would be empty so a name that is *only* id(s) keeps the
+  // last one for the bare-hex junk handling to catch.
+  let next = slug;
+  while (VENDOR_ASSET_ID_SLUG_PREFIX.test(next)) {
+    const stripped = next.replace(VENDOR_ASSET_ID_SLUG_PREFIX, '');
+    if (stripped.length === 0) break;
+    next = stripped;
+  }
+  return next;
+};
+
 export interface SlugSourceInputs {
   /** Alt text supplied with the upload, if any. Editor's words win. */
   alt?: string | null | undefined;
@@ -150,7 +178,7 @@ export const buildMediaFilename = ({
   maxSlugLen = DEFAULT_MAX_SLUG_LEN,
   hashOverride,
 }: BuildMediaFilenameOptions): string => {
-  const rawSlug = slugify(slugSource);
+  const rawSlug = stripVendorAssetIdPrefix(slugify(slugSource));
   const slug = truncateSlug(rawSlug, maxSlugLen) || FALLBACK_SLUG;
   const hash = hashOverride ?? shortHash(bytes);
   const cleanExt = ext.replace(/^\.+/, '').toLowerCase() || 'bin';

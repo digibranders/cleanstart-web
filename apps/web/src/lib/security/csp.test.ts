@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { CONSENT_MODE_SNIPPET_HASH } from '@/lib/consent/consent-mode-snippet';
-
-import { PERMISSIONS_POLICY, REPORTING_ENDPOINTS, buildCsp, generateNonce } from './csp';
+import { PERMISSIONS_POLICY, REPORTING_ENDPOINTS, buildCsp } from './csp';
 
 const parse = (csp: string): Record<string, string> =>
   Object.fromEntries(
@@ -17,22 +15,22 @@ const parse = (csp: string): Record<string, string> =>
   );
 
 const base = {
-  nonce: 'abc123',
   isProduction: true,
   isDraftMode: false,
 };
 
 describe('buildCsp', () => {
-  it('embeds the per-request nonce in script-src and style-src', () => {
+  it('allows inline script and style (static-prerender-compatible policy)', () => {
     const d = parse(buildCsp(base));
-    expect(d['script-src']).toContain("'nonce-abc123'");
-    expect(d['style-src']).toContain("'nonce-abc123'");
+    expect(d['script-src']).toContain("'unsafe-inline'");
+    expect(d['style-src']).toContain("'unsafe-inline'");
+    expect(d['style-src']).toContain("'self'");
   });
 
-  it('pins the consent-mode snippet hash and strict-dynamic', () => {
-    const d = parse(buildCsp(base));
-    expect(d['script-src']).toContain(`'${CONSENT_MODE_SNIPPET_HASH}'`);
-    expect(d['script-src']).toContain("'strict-dynamic'");
+  it('does not use a per-request nonce or strict-dynamic (would force dynamic rendering)', () => {
+    const csp = buildCsp(base);
+    expect(csp).not.toContain('nonce-');
+    expect(csp).not.toContain('strict-dynamic');
   });
 
   it('allows the GCS bucket in media-src for lesson videos', () => {
@@ -79,16 +77,6 @@ describe('buildCsp', () => {
     const csp = buildCsp(base);
     expect(csp).toContain('upgrade-insecure-requests');
     expect(csp).not.toContain('upgrade-insecure-requests ;');
-  });
-});
-
-describe('generateNonce', () => {
-  it('returns distinct base64 values', () => {
-    const a = generateNonce();
-    const b = generateNonce();
-    expect(a).not.toBe(b);
-    // 16 random bytes -> 24-char base64 (with padding)
-    expect(Buffer.from(a, 'base64').length).toBe(16);
   });
 });
 

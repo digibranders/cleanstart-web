@@ -129,7 +129,7 @@ export function PastEventsGrid({
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <Reveal header>
           <h2
-            className="font-display font-bold"
+            className="font-display font-semibold"
             style={{
               fontSize: "var(--fs-h2)",
               lineHeight: "1.1",
@@ -143,7 +143,7 @@ export function PastEventsGrid({
           </h2>
         </Reveal>
 
-        <div className="flex flex-col lg:flex-row lg:items-start lg:gap-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
           <aside
             className="shrink-0 lg:sticky lg:max-h-[calc(100vh-112px)] lg:overflow-y-auto"
             style={{ top: "96px", alignSelf: "flex-start" }}

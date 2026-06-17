@@ -26,7 +26,7 @@ export default function BookDemoPage() {
         ])}
       />
       <Header />
-      <main className="bg-white">
+      <main id="main-content" className="bg-white">
         <DemoHero />
 
         <BookDemoBody>

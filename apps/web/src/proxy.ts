@@ -1,10 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import {
+  MARKDOWN_INTERNAL_HEADER,
+  MARKDOWN_PATH_HEADER,
+  acceptsMarkdown,
+} from "@/lib/agent-markdown";
+import { AGENT_DISCOVERY_LINK_HEADER } from "@/lib/security/agent-discovery";
+import {
   PERMISSIONS_POLICY,
   REPORTING_ENDPOINTS,
   buildCsp,
-  generateNonce,
 } from "@/lib/security/csp";
 import {
   lookupRedirect,
@@ -44,6 +49,10 @@ function shouldRedirectTrailingSlash(pathname: string) {
 function shouldLowercase(pathname: string) {
   // Only enforce on non-file paths.
   if (/\.[a-z0-9]+$/i.test(pathname)) return false;
+  // Generated guide covers carry a mixed-case keyword in the path
+  // (`/guide-cover/Container%20Networking`); lowercasing it would mangle the
+  // rendered text and break next/image optimization of the upstream fetch.
+  if (pathname.startsWith("/guide-cover/")) return false;
   return pathname !== pathname.toLowerCase();
 }
 
@@ -97,15 +106,34 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  const nonce = generateNonce();
   const requestHeaders = new Headers(headers);
-  requestHeaders.set("x-nonce", nonce);
 
-  const response = NextResponse.next({
-    request: { headers: requestHeaders },
-  });
+  // Markdown for agents: an explicit `Accept: text/markdown` on an HTML page
+  // is rewritten to the converter route (which self-fetches the page's HTML —
+  // its inner request carries the internal marker so it can't loop). Browsers
+  // never send text/markdown, so HTML stays the default.
+  const wantsMarkdown =
+    request.method === "GET" &&
+    !isPreviewPath &&
+    !nextUrl.pathname.startsWith("/api/") &&
+    !headers.has(MARKDOWN_INTERNAL_HEADER) &&
+    acceptsMarkdown(headers.get("accept"));
 
-  const csp = buildCsp({ nonce, isProduction, isDraftMode, isPreviewPath });
+  if (wantsMarkdown) {
+    // Query params on the rewrite URL don't reach the handler's nextUrl, but
+    // request-header overrides do — carry the original path+search this way.
+    requestHeaders.set(MARKDOWN_PATH_HEADER, nextUrl.pathname + nextUrl.search);
+  }
+
+  const response = wantsMarkdown
+    ? NextResponse.rewrite(new URL("/api/markdown", nextUrl.origin), {
+        request: { headers: requestHeaders },
+      })
+    : NextResponse.next({
+        request: { headers: requestHeaders },
+      });
+
+  const csp = buildCsp({ isProduction, isDraftMode, isPreviewPath });
   const cspHeaderName =
     CSP_MODE === "enforce"
       ? "Content-Security-Policy"
@@ -151,6 +179,17 @@ export async function proxy(request: NextRequest) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
   } else {
     response.headers.set("X-Robots-Tag", "max-image-preview:large, max-snippet:-1");
+  }
+
+  // Advertise machine-readable entry points (API catalog, sitemap, search) to
+  // agents via RFC 8288 `Link` relations. Append so the framework's preload
+  // `Link` headers survive. HTML navigations only — JSON API responses don't
+  // need self-referential discovery hints.
+  if (!nextUrl.pathname.startsWith("/api/")) {
+    response.headers.append("Link", AGENT_DISCOVERY_LINK_HEADER);
+    // Page URLs serve HTML or markdown depending on Accept — caches must key
+    // on it.
+    response.headers.append("Vary", "Accept");
   }
 
   return response;

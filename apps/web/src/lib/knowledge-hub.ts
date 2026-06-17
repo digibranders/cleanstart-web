@@ -1,5 +1,8 @@
 import type { LexicalRoot, TocEntry } from '@/lib/blog';
 import { fetchCMS } from '@/lib/cms-fetch';
+import type { CmsSeo } from '@/lib/seo/cms-seo';
+import { academyOrderOf } from './kb-academy-order';
+import type { KhArticleLink, KhGroup, KhSubcategory } from './knowledge-hub-shared';
 
 /**
  * Knowledge Hub data layer — fetches the CMS `knowledgeBase` /
@@ -51,30 +54,25 @@ const FALLBACK_ORDER: Record<string, number> = {
 const orderOf = (c: CmsCategory): number =>
   typeof c.displayOrder === 'number' ? c.displayOrder : (FALLBACK_ORDER[c.slug] ?? 999);
 
-export interface KhArticleLink {
-  slug: string;
-  title: string;
-}
+// Client-safe types + helpers live in ./knowledge-hub-shared (no server deps).
+// Re-export the types so existing server-side consumers keep importing them
+// from this module.
+export type { KhArticleLink, KhGroup, KhSubcategory } from './knowledge-hub-shared';
 
-export interface KhSubcategory {
-  slug: string;
-  name: string;
-  articles: KhArticleLink[];
-}
-
-/** A top-level sidebar group: a legacy group (articles) or a section (subcategories). */
-export interface KhGroup {
-  slug: string;
-  name: string;
-  subcategories: KhSubcategory[];
-  articles: KhArticleLink[];
-}
-
-// Ordering: `displayOrder` is primary; `id` (ascending = the order the seed
-// created docs, which mirrors the Academy's authored sequence) is the
-// tiebreaker — so the sidebar matches the Academy exactly even on a CMS
-// instance whose API predates the displayOrder field.
+// Category ordering: `displayOrder` is primary; `id` ascending is the
+// tiebreaker. (Top-level groups: legacy groups 0–3 stay pinned above the 8
+// Academy sections 10–80.)
 const byOrder = (a: CmsCategory, b: CmsCategory): number => orderOf(a) - orderOf(b) || a.id - b.id;
+
+// Article ordering within a category follows the live Academy sidebar
+// (kb-academy-order). Unmapped articles (legacy / post-snapshot) keep their
+// incoming id order. The `oa === ob` guard avoids `Infinity - Infinity = NaN`
+// for two unmapped articles.
+const byAcademyOrder = (a: KhArticleLink, b: KhArticleLink): number => {
+  const oa = academyOrderOf(a.slug);
+  const ob = academyOrderOf(b.slug);
+  return oa === ob ? 0 : oa - ob;
+};
 
 /** Fetch categories + article metadata and assemble the ordered sidebar tree. */
 export async function getKnowledgeTree(): Promise<KhGroup[]> {
@@ -87,8 +85,8 @@ export async function getKnowledgeTree(): Promise<KhGroup[]> {
     ),
   ]);
 
-  // Bucket articles by their (leaf) category id, preserving Academy order
-  // (articles arrive sorted by id ascending = the seed's manifest order).
+  // Bucket articles by their (leaf) category id, then order each bucket by the
+  // live Academy sidebar sequence (kb-academy-order).
   const articlesByCat = new Map<number, KhArticleLink[]>();
   for (const a of arts.docs) {
     if (a.category == null) continue;
@@ -96,11 +94,29 @@ export async function getKnowledgeTree(): Promise<KhGroup[]> {
     list.push({ slug: a.slug, title: a.title });
     articlesByCat.set(a.category, list);
   }
+  for (const list of articlesByCat.values()) list.sort(byAcademyOrder);
+
+  // A subcategory's position is the Academy position of its first article, so
+  // subcategories line up with the Academy too (falls back to `displayOrder`
+  // for legacy/empty categories where no article is mapped).
+  const academyMinOf = (catId: number): number => {
+    let min = Number.POSITIVE_INFINITY;
+    for (const a of articlesByCat.get(catId) ?? []) {
+      const o = academyOrderOf(a.slug);
+      if (o < min) min = o;
+    }
+    return min;
+  };
+  const bySubcategoryOrder = (a: CmsCategory, b: CmsCategory): number => {
+    const ma = academyMinOf(a.id);
+    const mb = academyMinOf(b.id);
+    return ma === mb ? byOrder(a, b) : ma - mb;
+  };
 
   const topLevel = cats.docs.filter((c) => c.parent == null).sort(byOrder);
 
   return topLevel.map((group) => {
-    const children = cats.docs.filter((c) => c.parent === group.id).sort(byOrder);
+    const children = cats.docs.filter((c) => c.parent === group.id).sort(bySubcategoryOrder);
 
     const subcategories: KhSubcategory[] = children.map((sub) => ({
       slug: sub.slug,
@@ -154,12 +170,15 @@ export interface KhArticle {
   category?: { name: string } | null;
   body?: LexicalRoot | null;
   tableOfContents?: TocEntry[] | null;
+  seo?: CmsSeo | null;
+  publishedAt?: string | null;
+  updatedAt?: string | null;
 }
 
-/** Fetch a single published article by slug (depth 1 for the category name). */
+/** Fetch a single published article by slug (depth 1 for the category name and seo.ogImage). */
 export async function getKnowledgeArticle(slug: string): Promise<KhArticle | null> {
   const res = await fetchCMS<CmsList<KhArticle & { category?: { name: string } | number | null }>>(
-    `/api/knowledgeBase?${PUBLISHED}&depth=1&limit=1&where[slug][equals]=${encodeURIComponent(slug)}`,
+    `/api/knowledgeBase?${PUBLISHED}&depth=1&limit=1&where[slug][equals]=${encodeURIComponent(slug)}&select[title]=true&select[slug]=true&select[abstract]=true&select[videoUrl]=true&select[body]=true&select[tableOfContents]=true&select[category]=true&select[seo]=true&select[publishedAt]=true&select[updatedAt]=true`,
   );
   const doc = res.docs[0];
   if (!doc) return null;

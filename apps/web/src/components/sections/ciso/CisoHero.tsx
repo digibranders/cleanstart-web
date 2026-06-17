@@ -1,11 +1,14 @@
 import type React from "react";
 import Link from "next/link";
 import { HeroReveal } from "@/components/ui/Reveal";
+import { CisoHeroVisual } from "./CisoHeroVisual";
 
 /*
- * CISO hero — dark gradient band with a background texture overlay, a masked
- * person photo on the right (desktop) / behind the content (mobile), and a
- * left-aligned headline + glass CTA.
+ * CISO hero — dark gradient band with a background texture overlay, a custom
+ * SVG "Interception Field" visual on the right (desktop), and a left-aligned
+ * headline + glass CTA. The visual replaces the old hand-masked stock photo:
+ * it dramatises inherited software risk being intercepted and hardened, and —
+ * being vector + container-relative — never drifts across viewports.
  */
 export function CisoHero(): React.ReactElement {
   return (
@@ -13,7 +16,7 @@ export function CisoHero(): React.ReactElement {
       data-section="CisoHero"
       className="relative overflow-hidden bg-cs-hero"
       style={{
-        minHeight: "751px",
+        minHeight: "clamp(480px, 40vw, 652px)",
         backgroundImage:
           "linear-gradient(180deg, #151021 25.702%, #10123e 31.159%, #131e8f 51.006%, #471ec0 68.711%, #471fc3 79.832%, rgba(70,30,191,0.85) 85.018%, rgba(66,30,188,0.4) 93.72%, rgba(66,30,188,0) 98.921%)",
       }}
@@ -30,118 +33,31 @@ export function CisoHero(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Person photo — DESKTOP ONLY (lg+), right side. Mirrored horizontally;
-          a radial-gradient SVG mask fades the edges for a soft blend. */}
-      <div
-        aria-hidden
-        className="absolute pointer-events-none select-none hidden lg:block"
-        style={{ left: "249px", top: "32px", width: "1440px", height: "823px" }}
-      >
-        <div style={{ transform: "rotate(180deg) scaleY(-1)", width: "1440px", height: "823px" }}>
-          <div
-            style={{
-              position: "relative",
-              width: "1440px",
-              height: "823px",
-              maskImage: "url('/images/ciso/hero-photo-mask.svg')",
-              WebkitMaskImage: "url('/images/ciso/hero-photo-mask.svg')",
-              maskSize: "1491px 855px",
-              WebkitMaskSize: "1491px 855px",
-              maskPosition: "207px -32px",
-              WebkitMaskPosition: "207px -32px",
-              maskRepeat: "no-repeat",
-              WebkitMaskRepeat: "no-repeat",
-            }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/ciso/hero-photo.webp"
-              alt=""
-              style={{
-                position: "absolute",
-                inset: 0,
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                objectPosition: "center",
-              }}
-              loading="eager"
-              decoding="async"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Person photo — MOBILE ONLY (< lg). Mirrored; the section's
-          overflow:hidden clips it to the viewport, and a blue gradient overlay
-          fades it into the background. */}
-      <div
-        aria-hidden
-        className="absolute pointer-events-none select-none lg:hidden"
-        style={{
-          left: 0,
-          right: 0,
-          top: "423px",
-          height: "462px",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            left: "50%",
-            top: 0,
-            width: "809px",
-            height: "462px",
-            transform: "translateX(-50%) scaleX(-1)",
-          }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/ciso/hero-photo.webp"
-            alt=""
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              objectPosition: "center top",
-            }}
-            loading="eager"
-            decoding="async"
-          />
-          {/* Blue gradient overlay — fades the photo into the section background. */}
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              background:
-                "linear-gradient(180deg, #281fa3 0%, rgba(40,31,163,0) 51.511%)",
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Bottom fade — blends the hero into the white section below. */}
-      <div
-        aria-hidden
-        className="pointer-events-none select-none absolute inset-x-0 bottom-0 z-[1]"
-        style={{
-          height: "160px",
-          background:
-            "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.45) 55%, rgba(255,255,255,0.92) 88%, #ffffff 100%)",
-        }}
-      />
-
       <div
         className="relative mx-auto z-[2] w-full max-w-[var(--container-default)] px-6 sm:px-10"
         style={{
-          paddingTop: "calc(clamp(112px, 8.23vw, 158px) + var(--cs-header-extra))",
-          paddingBottom: "80px",
-          minHeight: "751px",
+          paddingTop: "calc(clamp(96px, 7vw, 140px) + var(--cs-header-extra))",
+          paddingBottom: "72px",
+          minHeight: "clamp(480px, 40vw, 652px)",
         }}
       >
+        {/* "Interception Field" visual — DESKTOP ONLY (lg+), right side.
+            Lives inside the container so its right edge respects the site gutter
+            (right-6 sm:right-10 = the container's px-6 sm:px-10) and the 1440 cap.
+            Vector + container-relative, so it scales cleanly at every viewport
+            (no hand-tuned mask math). Hidden below lg. */}
+        <div
+          className="absolute pointer-events-none select-none hidden lg:block right-6 sm:right-10 z-[1]"
+          style={{
+            top: "54%",
+            transform: "translateY(-50%)",
+            width: "clamp(420px, 40vw, 600px)",
+            aspectRatio: "600 / 478",
+          }}
+        >
+          <CisoHeroVisual />
+        </div>
+
         {/* Text column — centered on mobile, left-aligned md+. */}
         <div
           className="relative flex flex-col items-center text-center md:items-start md:text-left"
@@ -159,7 +75,7 @@ export function CisoHero(): React.ReactElement {
                 marginBottom: "clamp(16px, 1.67vw, 32px)",
               }}
             >
-              Trusted Software Foundations for CISOs
+              AI Scales Code Velocity. Security Can’t Keep Up.
             </h1>
           </HeroReveal>
 
@@ -175,16 +91,14 @@ export function CisoHero(): React.ReactElement {
                 marginBottom: "clamp(24px, 1.67vw, 32px)",
               }}
             >
-              Reduce inherited software risk with minimal, hardened, verifiable
-              container foundations built for modern enterprise environments.
+              Reduce inherited software risk while strengthening compliance
+              readiness across modern software delivery.
             </p>
           </HeroReveal>
 
           <HeroReveal y={30} delay={0.3} duration={0.8} className="self-center md:self-start">
             <Link
-              href="https://images.cleanstart.com"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/book-a-demo"
               className="cs-btn-glass"
               style={
                 {
@@ -194,7 +108,7 @@ export function CisoHero(): React.ReactElement {
                 } as React.CSSProperties
               }
             >
-              Explore Free Secure Image
+              Request a Risk Assessment
             </Link>
           </HeroReveal>
         </div>

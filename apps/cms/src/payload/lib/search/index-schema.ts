@@ -1,3 +1,4 @@
+import { mergeKeywordSources } from '../seo/keywords';
 import { absoluteUrl } from '../jsonld/url';
 import { collectionUrlFromDoc } from '../route-prefixes';
 import type { IndexSettings, SearchDocument } from './client';
@@ -120,8 +121,8 @@ export const isSearchIndexedCollection = (slug: string): boolean =>
  */
 export const INDEX_SETTINGS: IndexSettings = {
   primaryKey: 'id',
-  searchableAttributes: ['title', 'description', 'body', 'authors', 'categories'],
-  filterableAttributes: ['collection', 'categories', 'isPublished'],
+  searchableAttributes: ['title', 'description', 'body', 'authors', 'categories', 'keywords'],
+  filterableAttributes: ['collection', 'categories', 'keywords', 'isPublished'],
   sortableAttributes: ['publishedAt', 'updatedAt', 'collectionWeight'],
   rankingRules: [
     'words',
@@ -168,13 +169,17 @@ interface IndexableDoc {
   categories?: readonly (CategoryLite | number | null | undefined)[] | null;
   newsCategories?: readonly (CategoryLite | number | null | undefined)[] | null;
   category?: CategoryLite | number | null;
-  seo?: { indexable?: string | null } | null;
+  keywords?: readonly { keyword?: string | null }[] | null;
+  seo?: { indexable?: string | null; keywords?: unknown } | null;
 }
 
 const onlyResolvedNamed = (
   list: readonly (AuthorLite | CategoryLite | number | null | undefined)[] | null | undefined,
 ): string[] => {
-  if (!list) return [];
+  // Payload returns an array for `hasMany` relationships, but a non-iterable
+  // shape can slip through (a single related object, or a partially-resolved
+  // value); guard with Array.isArray so indexing never throws on one doc.
+  if (!Array.isArray(list)) return [];
   const out: string[] = [];
   for (const entry of list) {
     if (entry == null || typeof entry === 'number') continue;
@@ -220,6 +225,15 @@ const collectCategoryNames = (doc: IndexableDoc): string[] => {
   return names;
 };
 
+const collectKeywords = (doc: IndexableDoc): string[] => {
+  const legacy = Array.isArray(doc.keywords)
+    ? doc.keywords
+        .map((k) => k?.keyword ?? '')
+        .filter((s): s is string => s.length > 0)
+    : [];
+  return mergeKeywordSources(doc.seo?.keywords, legacy);
+};
+
 /**
  * Reduce a Payload-resolved doc into the flat document shape we
  * store in Meilisearch. Empty / null fields are dropped so the
@@ -246,7 +260,7 @@ export const buildSearchDocument = (
   const categories = collectCategoryNames(doc);
 
   const out: Record<string, unknown> = {
-    id: `${collection}:${doc.id}`,
+    id: buildSearchDocumentId(collection, doc.id),
     collection,
     collectionWeight: COLLECTION_WEIGHT[collection] ?? 50,
     title,
@@ -265,14 +279,23 @@ export const buildSearchDocument = (
   if (authors.length > 0) out.authors = authors;
   if (categories.length > 0) out.categories = categories;
 
+  const keywords = collectKeywords(doc);
+  if (keywords.length > 0) out.keywords = keywords;
+
   return out as SearchDocument;
 };
 
 /**
- * The search-document ID format we use throughout the system.
- * Derived from `<collection>:<docId>`.
+ * The search-document ID format we use throughout the system,
+ * `<collection>_<docId>`.
+ *
+ * Meilisearch only accepts document ids composed of `[a-zA-Z0-9_-]` — a
+ * colon makes every `documentAdditionOrUpdate` task fail and silently
+ * leaves the index empty. Collection slugs are alphanumeric (no
+ * underscore), so `_` joins safely and unambiguously. `collection` is
+ * also stored as its own field, so the id is never parsed back.
  */
 export const buildSearchDocumentId = (
   collection: string,
   id: number | string,
-): string => `${collection}:${id}`;
+): string => `${collection}_${id}`;

@@ -30,7 +30,7 @@ export default function SoftwareBillOfMaterialsPage(): React.ReactElement {
         ])}
       />
       <Header />
-      <main>
+      <main id="main-content">
         <SbomHero />
         <FadeUp>
           <SbomRisks />

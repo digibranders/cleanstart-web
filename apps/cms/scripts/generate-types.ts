@@ -45,6 +45,21 @@ const childEnv: NodeJS.ProcessEnv = {
   PAYLOAD_SECRET: process.env.PAYLOAD_SECRET ?? 'stub',
 };
 
+// Renaming `.env*` files aside is not enough: `@payloadcms/storage-s3`
+// gates on `process.env.R2_*` (see payload.config.ts `r2EnvComplete`), and
+// when those four are present it splices/re-pushes the upload `prefix`
+// field — shifting its position in the generated types. A dev with R2
+// creds exported via their shell / direnv (not a `.env` file) would still
+// trigger the plugin and produce output that mismatches CI (which has no
+// R2 vars), causing the recurring `Media.prefix` drift. Strip every R2_*
+// var from the child env so the plugin is consistently disabled during
+// generation, matching CI byte-for-byte regardless of the local shell.
+for (const key of Object.keys(childEnv)) {
+  if (key.startsWith('R2_')) {
+    delete childEnv[key];
+  }
+}
+
 try {
   execFileSync('npx', ['payload', 'generate:types'], {
     stdio: 'inherit',

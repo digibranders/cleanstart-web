@@ -98,12 +98,11 @@
   --container-wide:    1600px;
   --container-cs: var(--container-default);
 
-  /* Fixed-header height, single source of truth. The header is a fixed
-     translucent overlay with no global spacer — each hero clears it via
-     its own top padding plus var(--cs-header-extra). Base = 72px main bar
-     only; on lg+ the desktop utility strip adds 36px (see media query
-     after @theme). Heroes add var(--cs-header-extra) so mobile is unchanged
-     and desktop content drops exactly the strip's height. */
+  /* Fixed-header height, single source of truth. The header is a fixed 72px
+     translucent overlay with no global spacer — each hero clears it via its own
+     top padding plus var(--cs-header-extra). --cs-header-extra is a per-hero
+     clearance delta (0 today) kept as a hook for any future header-height
+     change; heroes consume it as `calc(<pad> + var(--cs-header-extra))`. */
   --cs-header-h: 72px;
   --cs-header-extra: 0px;
 
@@ -365,16 +364,6 @@
   --btn-fs-md:           var(--fs-button);
   --btn-fs-sm:           var(--fs-button-sm);
   --btn-fs-xs:           var(--fs-button-sm);
-}
-
-/* Desktop (lg+) adds the 36px utility strip above the main nav bar, while the
-   main bar itself shrinks 72px → 60px, so the full header is 96px (24px taller
-   than mobile's 72px). --cs-header-extra is that 24px per-hero clearance delta. */
-@media (min-width: 1024px) {
-  :root {
-    --cs-header-h: 96px;
-    --cs-header-extra: 24px;
-  }
 }
 
 :root {
@@ -960,30 +949,55 @@ body {
    PRIMARY NAVIGATION — dark-glass header + mega-menu surfaces
    ============================================================ */
 
-/* Scrolled header — dark glass band with backdrop blur.
-   Chromium re-tiles the backdrop-filter across compositor tiles on every
-   scroll frame, and the tile seams flash through as random vertical /
-   horizontal bands across the navbar. Mitigation stack:
-     1. Smaller blur radius (8px instead of 14px) keeps the kernel well
-        below the typical 64-tile boundary, so seams don't show.
-     2. `contain: paint` forces the browser to allocate its own paint
-        surface for the navbar — seams from sibling tiles can't leak in.
-     3. `translate3d(0,0,0)` + `backface-visibility: hidden` pin the
-        navbar to a single GPU layer so the blur isn't re-tiled mid-scroll.
-     4. `isolation: isolate` + `will-change: transform` prevent the blur
-        sampling from leaking through stacking contexts. */
-.cs-nav-shadow {
-  background-color: rgba(21, 16, 33, 0.78);
+/* Navbar surface — frosted-glass backdrop blur.
+   A `backdrop-filter` on a `position: fixed` element must NOT also carry GPU
+   layer-promotion / containment hints (`will-change: transform`,
+   `transform: translateZ/translate3d`, `backface-visibility`, `isolation`,
+   `contain: paint`). On many GPU/driver combos those force the navbar onto its
+   own compositor layer whose backdrop snapshot excludes the page content, so
+   the filter samples black and paints a random dark blob / band behind the
+   nav — the artifact this element used to show. The blur composites correctly
+   on its own; the browser handles fixed-element backdrops natively.
+   Two rules keep it stable: (a) the blur radius is CONSTANT across the top and
+   scrolled states — a changing radius forces a re-rasterise — and (b) the
+   radius is never animated; only background / border colour transitions (see
+   HeaderScrollShell). */
+.cs-nav-surface {
+  border-bottom: 1px solid transparent;
+}
+
+/* Frosted backdrop lives on an absolutely-positioned pseudo-element, NOT on the
+   fixed <header> itself. Chrome has a long-standing bug where `backdrop-filter`
+   on a `position: fixed` element renders a black rectangle over part of the
+   element — the dark band that used to appear on the left of the nav. Moving the
+   filter onto a non-fixed child sidesteps that code path entirely; the blur
+   still samples the page content behind the header. The tint colour lives here
+   too (so it composites over the blur in the right order) and transitions
+   between the top and scrolled states. */
+.cs-nav-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: rgba(11, 8, 22, 0.35);
   -webkit-backdrop-filter: blur(8px) saturate(140%);
   backdrop-filter: blur(8px) saturate(140%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  transform: translate3d(0, 0, 0);
-  -webkit-transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  will-change: transform;
-  isolation: isolate;
-  contain: paint;
+  transition: background-color 200ms ease-out;
+}
+
+/* Top-of-page state — lighter translucent band, divider hidden. The
+   compound `.cs-nav-surface.cs-nav-*` selector outranks the base
+   `.cs-nav-surface::before` so the state tint deterministically wins. */
+.cs-nav-surface.cs-nav-surface-top::before {
+  background-color: rgba(11, 8, 22, 0.35);
+}
+
+/* Scrolled state — darker glass band with a hairline bottom divider. */
+.cs-nav-surface.cs-nav-shadow::before {
+  background-color: rgba(21, 16, 33, 0.78);
+}
+.cs-nav-shadow {
+  border-bottom-color: rgba(255, 255, 255, 0.04);
 }
 
 /* Mega-menu / compact dropdown surface — dark glass card */
@@ -1052,7 +1066,8 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cs-nav-shadow,
+  .cs-nav-surface,
+  .cs-nav-surface::before,
   .cs-mega-item,
   .cs-mega-item::before,
   .cs-nav-link::after {
@@ -1145,6 +1160,33 @@ body {
   }
 }
 
+/* Hero entrance — LCP-safe. The hero (typically the LCP element) renders
+   VISIBLE in the SSR HTML and this CSS animation runs at first paint, instead
+   of the old Framer-Motion HeroReveal that rendered opacity:0 and only animated
+   after JS hydration (which stranded LCP behind hydration on every page). The
+   fade-up is now purely presentational; offset/timing come from CSS vars set by
+   the HeroReveal component. */
+@keyframes cs-hero-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(var(--cs-hr-y, 40px));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.cs-hero-reveal {
+  animation: cs-hero-reveal var(--cs-hr-duration, 0.9s) cubic-bezier(0.16, 1, 0.3, 1)
+    var(--cs-hr-delay, 0s) both;
+  will-change: opacity, transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-hero-reveal {
+    animation: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   [style*="cs-fade-slide-in"]   { animation: none !important; }
   [style*="cs-tab-card-in"]     { animation: none !important; }
@@ -1174,6 +1216,251 @@ body {
   50% {
     opacity: 1;
   }
+}
+
+/* Remediation-flow diagram (CleanSight). Dashed connectors flow toward the
+   card; node halos breathe. Both disabled under reduced-motion. */
+@keyframes cs-flow-dash {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -32; }
+}
+@keyframes cs-flow-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.96); }
+  50% { opacity: 0.9; transform: scale(1.04); }
+}
+.cs-flow-dash {
+  animation: cs-flow-dash 0.9s linear infinite;
+}
+.cs-flow-pulse {
+  animation: cs-flow-pulse 3.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-flow-dash,
+  .cs-flow-pulse {
+    animation: none !important;
+  }
+}
+
+/* "Security Isn't Just Patching" — Verification Cascade.
+   Entrance: cards/stages rise once when the section gains `.cs-sec-on`. The
+   ambient loop is orchestrated in JS (SecurityDiagram) which toggles
+   `data-lit` per lane and `data-climax` on the wordmark; CSS only describes
+   the lit/resting transitions plus the one-shot beam packet. The shared
+   `.cs-flow-beam`/`.cs-flow-arrow` tracks belong to the Platform pipeline and
+   are left untouched. All motion is disabled under reduced-motion. */
+@keyframes cs-sec-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+/* Flowing "current" beam (Platform pipeline). The dashed track is translated
+   by exactly one dash period (18px), so the loop is seamless; using transform
+   keeps it GPU-composited and free of stutter/jerk. */
+@keyframes cs-flow-beam {
+  to { transform: translateY(18px); }
+}
+@keyframes cs-sec-sheen {
+  0% { transform: translateX(0) rotate(9deg); opacity: 0; }
+  9% { opacity: 1; }
+  40% { opacity: 1; }
+  48% { transform: translateX(320%) rotate(9deg); opacity: 0; }
+  100% { transform: translateX(320%) rotate(9deg); opacity: 0; }
+}
+/* Single trust packet (comet head + tail) gliding down a verification lane.
+   Mounts on cue, plays once, unmounts on landing — see VerifyBeams.tsx. The
+   travel distance is passed per-lane via --travel so the strip height can vary
+   without touching the keyframe. */
+@keyframes cs-sec-packet {
+  0% { transform: translateY(-18px); opacity: 0; }
+  16% { opacity: 1; }
+  86% { opacity: 1; }
+  100% { transform: translateY(var(--travel, 60px)); opacity: 0; }
+}
+/* Fixed-position glow that blooms exactly where the comet lands — centred on
+   the landing point via margins, so it only scales (from its own centre) and
+   never drifts off the comet's stop position. */
+@keyframes cs-sec-land {
+  0% { opacity: 0; transform: scale(0.6); }
+  22% { opacity: 1; transform: scale(1.08); }
+  60% { opacity: 0.95; transform: scale(0.96); }
+  100% { opacity: 0; transform: scale(1.05); }
+}
+/* Wordmark ignition at the cascade climax. */
+@keyframes cs-sec-ignite {
+  0% { transform: scale(0.992); }
+  45% { transform: scale(1.035); }
+  100% { transform: scale(1.018); }
+}
+/* Lifecycle arrow tail — dots flow rightward by one dot period (seamless,
+   GPU-composited) toward a static chevron head. See FlowArrow.tsx. */
+@keyframes cs-flow-arrow {
+  to { transform: translateX(6px); }
+}
+
+/* Entrance build-in. */
+.cs-sec-rise { opacity: 0; }
+.cs-sec-on .cs-sec-rise {
+  animation: cs-sec-rise 0.6s ease-out both;
+  animation-delay: var(--d, 0s);
+}
+
+/* Lifecycle stage (A) — flares brightly as its trust packet launches, visibly
+   driving the lane below it. A soft halo behind the icon pulses on cue. */
+.cs-sec-stage { transition: transform 0.5s cubic-bezier(0.2,0.7,0.2,1), filter 0.45s ease; }
+.cs-sec-stage img { transition: filter 0.45s ease; }
+.cs-sec-stage[data-lit="true"] { transform: translateY(-3px) scale(1.07); }
+.cs-sec-stage[data-lit="true"] img {
+  filter: drop-shadow(0 0 14px rgba(120, 200, 255, 0.85)) brightness(1.28);
+}
+.cs-sec-stage-halo {
+  opacity: 0;
+  background: radial-gradient(circle, rgba(120, 200, 255, 0.55) 0%, rgba(120, 200, 255, 0) 70%);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  transform: scale(0.7);
+}
+.cs-sec-stage[data-lit="true"] .cs-sec-stage-halo { opacity: 0.9; transform: scale(1.15); }
+
+/* Guarantee card (B) — a PERMANENT, STABLE box. The frame never moves, lifts or
+   recolours: it's a fixed backdrop. Only its interior (cs-sec-card-inner) changes
+   — the content fades in when its lane is verified, fades out at cycle reset. No
+   transform on the box itself, so the grid is rock-steady the whole cycle. */
+.cs-sec-card {
+  border-radius: 20px;
+  border: 1px solid rgba(150, 185, 255, 0.16);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.012) 100%);
+  box-shadow: inset 0 0 0 1px rgba(150, 210, 255, 0.05);
+}
+.cs-sec-card-inner {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.45s ease, transform 0.5s cubic-bezier(0.2,0.7,0.2,1);
+}
+.cs-sec-card[data-built="true"] .cs-sec-card-inner { opacity: 1; transform: none; }
+
+/* Shield — green bloom + halo + draws its check as the lane is verified. */
+.cs-sec-shield { transition: filter 0.45s ease, transform 0.45s ease; }
+.cs-sec-card[data-built="true"] .cs-sec-shield {
+  filter: drop-shadow(0 0 12px rgba(45, 224, 166, 0.7));
+  transform: scale(1.04);
+}
+.cs-sec-check {
+  stroke-dasharray: 30;
+  stroke-dashoffset: 30;
+  transition: stroke-dashoffset 0.55s ease 0.18s;
+}
+.cs-sec-card[data-built="true"] .cs-sec-check { stroke-dashoffset: 0; }
+.cs-sec-shield-halo {
+  opacity: 0;
+  background: radial-gradient(circle, rgba(45, 224, 166, 0.6) 0%, rgba(45, 224, 166, 0) 68%);
+  transition: opacity 0.5s ease;
+}
+.cs-sec-card[data-built="true"] .cs-sec-shield-halo { opacity: 0.7; }
+
+/* Climax flood — a blue aurora that blooms across the enclosure once all six
+   lanes are verified. Driven by data-climax on the diagram root. */
+.cs-sec-flood {
+  opacity: 0;
+  background:
+    radial-gradient(80% 120% at 50% 118%, rgba(60, 150, 255, 0.45) 0%, rgba(60, 150, 255, 0) 60%),
+    linear-gradient(180deg, rgba(120, 200, 255, 0) 40%, rgba(96, 156, 255, 0.14) 100%);
+  transition: opacity 1s ease;
+}
+[data-climax="true"] .cs-sec-flood { opacity: 1; }
+
+/* Wordmark — ignites once all six lanes are verified (cascade climax). */
+.cs-sec-wordmark {
+  opacity: 0.7;
+  transform: scale(0.992);
+  transition: opacity 0.9s ease, filter 0.9s ease, transform 0.9s ease;
+}
+.cs-sec-wordmark[data-climax="true"] {
+  opacity: 1;
+  filter: drop-shadow(0 0 22px rgba(120, 200, 255, 0.6));
+  animation: cs-sec-ignite 1.5s cubic-bezier(0.2,0.7,0.2,1) forwards;
+}
+
+/* Beam packet + landing flash (one-shot on mount). Duration is set inline to
+   match the JS travel time. */
+.cs-sec-packet {
+  animation: cs-sec-packet var(--dur, 0.9s) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  will-change: transform, opacity;
+}
+.cs-sec-land {
+  animation: cs-sec-land 0.85s ease-out forwards;
+  will-change: transform, opacity;
+}
+
+/* Persistent dashed "current" fades in once its lane is verified, then stays. */
+@keyframes cs-sec-thread-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.cs-sec-thread { animation: cs-sec-thread-in 0.5s ease both; }
+
+/* Lifecycle arrows fire sequentially as the verification wave moves forward:
+   faint at rest, each brightens with a one-shot surge as its stage is reached,
+   then holds lit until the cycle resets. */
+@keyframes cs-sec-arrow-surge {
+  0% { filter: drop-shadow(0 0 0 rgba(160, 210, 255, 0)); }
+  40% { filter: drop-shadow(0 0 12px rgba(190, 228, 255, 0.95)); }
+  100% { filter: drop-shadow(0 0 6px rgba(150, 205, 255, 0.65)); }
+}
+.cs-sec-arrow {
+  opacity: 0.3;
+  transition: opacity 0.5s ease, filter 0.5s ease;
+}
+.cs-sec-arrow-on {
+  opacity: 1;
+  filter: drop-shadow(0 0 6px rgba(150, 205, 255, 0.65));
+  animation: cs-sec-arrow-surge 0.6s ease-out;
+}
+
+/* Shared flowing-beam track (see FlowBeam.tsx — Platform pipeline). */
+.cs-flow-beam {
+  animation: cs-flow-beam 0.8s linear infinite;
+  animation-delay: var(--beam-delay, 0s);
+  will-change: transform;
+}
+
+/* Sheen ambient (on-screen only). */
+.cs-sec-anim .cs-sec-sheen {
+  animation: cs-sec-sheen 8s ease-in-out infinite;
+}
+
+/* Shared flowing-arrow tail (see FlowArrow.tsx). Always on; GPU-composited. */
+.cs-flow-arrow {
+  animation: cs-flow-arrow 0.7s linear infinite;
+  animation-delay: var(--arrow-delay, 0s);
+  will-change: transform;
+}
+
+/* Hover lane-linking. */
+.cs-sec-dim { opacity: 0.4; filter: saturate(0.7); transition: opacity 0.25s, filter 0.25s; }
+.cs-sec-lit { transition: opacity 0.25s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-sec-rise { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .cs-sec-stage,
+  .cs-sec-stage img,
+  .cs-sec-card,
+  .cs-sec-card-inner,
+  .cs-sec-shield,
+  .cs-sec-shield-halo,
+  .cs-sec-stage-halo,
+  .cs-sec-flood,
+  .cs-sec-wordmark { transition: none !important; animation: none !important; }
+  /* Show the fully-verified resting state, no motion. */
+  .cs-sec-stage[data-lit="true"],
+  .cs-sec-card[data-built="true"] { transform: none !important; }
+  .cs-sec-card-inner { opacity: 1 !important; transform: none !important; }
+  .cs-sec-check { stroke-dashoffset: 0 !important; }
+  .cs-sec-packet,
+  .cs-sec-land { display: none !important; }
+  .cs-sec-thread { animation: none !important; opacity: 1 !important; }
+  .cs-sec-arrow { opacity: 1 !important; filter: none !important; }
+  .cs-sec-arrow-on { animation: none !important; }
+  .cs-flow-beam,
+  .cs-flow-arrow { animation: none !important; }
+  .cs-sec-sheen { display: none !important; }
 }
 
 /* FAQ answer drawer — kept minimal; height + opacity are driven by inline
@@ -2261,6 +2548,34 @@ body {
   color: transparent;
 }
 
+/* 1px gradient hairline border. Paints the brand cyan→blue→violet stroke as
+   a ring around any rounded element via the mask-composite trick — the
+   gradient fills a padded box, then content-box and border-box masks are
+   XOR-composited so only the 1px frame survives. Pairs with a translucent
+   glass fill on the host element. */
+.cs-grad-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(51, 186, 236, 0.6) 0%,
+    rgba(111, 141, 255, 0.28) 50%,
+    rgba(177, 156, 255, 0.6) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
 /* Brand-cyan stroke for icon-only SVG glyphs (Lucide, Heroicons, etc.).
    `currentColor` flows through to the icon's stroke. A true linear gradient
    on the stroke would require an inline <defs> in the same SVG — for the
@@ -2388,9 +2703,9 @@ body {
 }
 .article-body .article-paragraph:last-child { margin-bottom: 0; }
 
-/* Sticky-header offset for TOC anchor jumps. Header-aware via
-   --cs-header-h (72px mobile, 108px desktop where the utility strip shows)
-   plus breathing room, so #anchor links never land under the fixed Header. */
+/* Sticky-header offset for TOC anchor jumps. Header-aware via --cs-header-h
+   (72px) plus breathing room, so #anchor links never land under the fixed
+   Header. */
 .article-body .article-h1,
 .article-body .article-h2,
 .article-body .article-h3,
@@ -2404,7 +2719,7 @@ body {
 }
 .article-body .article-h1 {
   font-size: var(--prose-h1);
-  font-weight: 700;
+  font-weight: 600;
   line-height: var(--prose-h1-lh);
   margin-top: 3rem;
   margin-bottom: 1rem;
@@ -2895,6 +3210,17 @@ body {
   h1, h2, h3, h4 {
     text-wrap: balance;
   }
+  /* Heading weight roles: section <h2> and subsection/card <h3> default to 600
+     site-wide (matches --fs-h2-weight / --fs-h3-weight and the article-body
+     rules). No heading uses 700 — components no longer need a per-instance
+     weight class; an explicit Tailwind weight utility can still override where
+     a specific design genuinely calls for it. */
+  h2 {
+    font-weight: var(--fs-h2-weight);
+  }
+  h3 {
+    font-weight: var(--fs-h3-weight);
+  }
   html {
     @apply font-sans;
     /* Reserve scrollbar space so route changes that add/remove a scrollable
@@ -3036,3 +3362,112 @@ body {
 /* Surfaces are now fully solid — no backdrop-filter to fall back from.
    The @supports block stays as a no-op marker in case we ever bring
    translucency back. */
+
+/* ============================================================
+   CISO HERO — "Interception Field" (CisoHeroVisual.tsx).
+   Chaotic inherited dependencies (left) flow through a glowing
+   verification membrane (centre) and dock, hardened, into a calm
+   cyan lattice around the secure core (right). All motion is CSS;
+   prefers-reduced-motion collapses to the resolved frame.
+   ============================================================ */
+
+.cs-civ {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Secure core — slow breathing scale + brightness. */
+@keyframes cs-civ-core-breathe {
+  0%, 100% { transform: scale(1);     filter: brightness(1); }
+  50%      { transform: scale(1.035); filter: brightness(1.12); }
+}
+.cs-civ-core {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cs-civ-core-breathe 6s ease-in-out infinite;
+  will-change: transform, filter;
+}
+
+/* Membrane scan sweep — bright node travels top → bottom of the gate. */
+@keyframes cs-civ-sweep {
+  0%       { transform: translateY(0);     opacity: 0; }
+  12%      { opacity: 0.95; }
+  88%      { opacity: 0.95; }
+  100%     { transform: translateY(372px); opacity: 0; }
+}
+.cs-civ-sweep {
+  animation: cs-civ-sweep 3.6s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Chaotic dependency nodes — restless flicker + tiny drift. */
+@keyframes cs-civ-chaos {
+  0%, 100% { transform: translate(0, 0);       opacity: 0.55; }
+  30%      { transform: translate(2px, -3px);  opacity: 0.9; }
+  60%      { transform: translate(-2px, 2px);  opacity: 0.5; }
+}
+.cs-civ-chaos {
+  transform-box: fill-box;
+  animation: cs-civ-chaos 3.1s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Verified lattice dots — calm pulse. */
+@keyframes cs-civ-pulse {
+  0%, 100% { transform: scale(1);    opacity: 0.7; }
+  50%      { transform: scale(1.28); opacity: 1; }
+}
+.cs-civ-pulse {
+  animation: cs-civ-pulse 3.4s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Convergence beams — energy flowing along each stream. */
+@keyframes cs-civ-beam {
+  to { stroke-dashoffset: -36; }
+}
+.cs-civ-beams line {
+  stroke-dasharray: 4 10;
+  animation: cs-civ-beam 1.4s linear infinite;
+}
+
+/* Radar scope — slow continuous sweep around the secure core. */
+@keyframes cs-civ-scope {
+  to { transform: rotate(360deg); }
+}
+.cs-civ-scope {
+  transform-box: fill-box;
+  animation: cs-civ-scope 18s linear infinite;
+  will-change: transform;
+}
+
+/* Traveling packets — launch from chaos (offset via --civ-fx/--civ-fy),
+   harden red → cyan as they cross the membrane, dock at translate(0). The
+   var() is resolved per-element, so one keyframe serves every packet. */
+@keyframes cs-civ-packet {
+  0%   { transform: translate(var(--civ-fx), var(--civ-fy)); fill: #ff6c6c; opacity: 0; }
+  8%   { opacity: 1; }
+  48%  { fill: #ff8a6c; }
+  62%  { fill: #6fe8ff; }
+  100% { transform: translate(0, 0); fill: #a8efff; opacity: 1; }
+}
+.cs-civ-packet {
+  animation: cs-civ-packet 5.4s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-civ-core,
+  .cs-civ-sweep,
+  .cs-civ-scope,
+  .cs-civ-chaos,
+  .cs-civ-pulse,
+  .cs-civ-beams line,
+  .cs-civ-packet {
+    animation: none !important;
+  }
+  /* Resolved frame: hide the moving sweep; packets rest docked + cyan. */
+  .cs-civ-sweep { opacity: 0; }
+}

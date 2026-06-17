@@ -96,7 +96,7 @@ export default async function CareersPage({
         ])}
       />
       <Header />
-      <main style={{ background: "#f6f6f6" }}>
+      <main id="main-content" style={{ background: "#f6f6f6" }}>
         <div className="relative overflow-hidden">
           <Suspense>
             <CareersHero initialQuery={searchQuery} />

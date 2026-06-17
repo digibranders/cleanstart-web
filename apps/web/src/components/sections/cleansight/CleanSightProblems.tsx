@@ -3,28 +3,28 @@ import { WhyMattersGrid, type WhyCard } from '../_shared/WhyMattersGrid';
 
 const CARDS: readonly [WhyCard, WhyCard, WhyCard, WhyCard] = [
   {
-    title: 'Shadow Containers',
-    desc: 'Untracked workloads increase exposure.',
+    title: 'Software Sprawl',
+    desc: 'Modern environments inherit thousands of software components across images, dependencies, and registries.',
     imgSrc: '/images/cleansight/problem-shadow-containers.webp',
-    imgAlt: 'Shadow container illustration',
+    imgAlt: 'Software sprawl illustration',
   },
   {
-    title: 'Fragmented Views',
-    desc: 'Disconnected tools create operational gaps.',
+    title: 'Fragmented Visibility',
+    desc: 'Disconnected tooling creates operational blind spots across software delivery environments.',
     imgSrc: '/images/cleansight/problem-fragmented-views.webp',
-    imgAlt: 'Fragmented views illustration',
+    imgAlt: 'Fragmented visibility illustration',
   },
   {
-    title: 'Unknown Image Contents',
-    desc: 'Inherited dependencies hide risk.',
+    title: 'Unverified Dependencies',
+    desc: 'Limited dependency visibility increases inherited software risk across modern infrastructure.',
     imgSrc: '/images/cleansight/problem-unknown-image.webp',
-    imgAlt: 'Unknown image contents illustration',
+    imgAlt: 'Unverified dependencies illustration',
   },
   {
-    title: 'Audit Complexity',
-    desc: 'Incomplete visibility slows compliance efforts.',
+    title: 'Continuous Compliance Pressure',
+    desc: 'Incomplete software inventories increase audit complexity across regulated environments.',
     imgSrc: '/images/cleansight/problem-audit-complexity.webp',
-    imgAlt: 'Audit complexity illustration',
+    imgAlt: 'Continuous compliance pressure illustration',
   },
 ];
 
@@ -34,14 +34,13 @@ export function CleanSightProblems(): React.ReactElement {
       dataSection="CleanSightProblems"
       heading={
         <>
-          <span className="block">When Container Visibility</span>
+          <span className="block">When Visibility Alone</span>
           <span className="block">
-            {'Falls Short, '}
-            <span className="cs-text-gradient-impact">Risk Grows</span>
+            {'Isn’t '}
+            <span className="cs-text-gradient-impact">Enough</span>
           </span>
         </>
       }
-      subheading="And remediation falls even further behind"
       cards={CARDS}
       showCornerGlows={false}
     />

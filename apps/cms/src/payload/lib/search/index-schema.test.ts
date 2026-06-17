@@ -97,7 +97,7 @@ describe('buildSearchDocument', () => {
       categories: [{ slug: 'sec', name: 'Container security' }],
     });
     expect(doc).toMatchObject({
-      id: 'blogs:42',
+      id: 'blogs_42',
       collection: 'blogs',
       title: 'My Post',
       description: 'A short lede.',
@@ -194,12 +194,47 @@ describe('buildSearchDocument', () => {
     });
     expect(doc?.categories).toEqual(['Emerging Standards']);
   });
+
+  it('does not throw when a relationship field is a non-iterable shape', () => {
+    // Payload can hand back a single related object (or a partially-resolved
+    // value) where the type says array; indexing must not crash one doc.
+    const doc = buildSearchDocument('https://cleanstart.com', 'blogs', {
+      id: 7,
+      slug: 'x',
+      title: 'X',
+      authors: { name: 'Solo Author' } as never,
+      categories: { name: 'Lone Category' } as never,
+    });
+    expect(doc?.title).toBe('X');
+    expect(doc?.authors).toBeUndefined();
+    expect(doc?.categories).toBeUndefined();
+  });
+
+  it('indexes seo.keywords (preferring it over legacy keywords[])', () => {
+    const doc = buildSearchDocument('https://cleanstart.com', 'blogs', {
+      id: 7,
+      slug: 'sbom-signing',
+      title: 'SBOM signing',
+      seo: { indexable: 'index', keywords: ['SBOM', 'FIPS'] },
+    });
+    expect(doc?.keywords).toEqual(['SBOM', 'FIPS']);
+  });
+
+  it('falls back to legacy guides keywords[] when seo.keywords is empty', () => {
+    const doc = buildSearchDocument('https://cleanstart.com', 'guides', {
+      id: 8,
+      slug: 'nist-mapping',
+      title: 'NIST mapping',
+      keywords: [{ keyword: 'NIST' }, { keyword: 'k8s' }],
+    } as never);
+    expect(doc?.keywords).toEqual(['NIST', 'k8s']);
+  });
 });
 
 describe('buildSearchDocumentId', () => {
-  it('composes <collection>:<id>', () => {
-    expect(buildSearchDocumentId('blogs', 42)).toBe('blogs:42');
-    expect(buildSearchDocumentId('pages', 'home')).toBe('pages:home');
+  it('composes <collection>_<id>', () => {
+    expect(buildSearchDocumentId('blogs', 42)).toBe('blogs_42');
+    expect(buildSearchDocumentId('pages', 'home')).toBe('pages_home');
   });
 });
 

@@ -263,11 +263,34 @@ export async function getBlogs({
   const params = new URLSearchParams({
     "where[_status][equals]": "published",
     "where[publishedAt][exists]": "true",
-    depth: "2",
+    // depth=1 hydrates heroImage + categories (all a card/nav item reads);
+    // depth=2 also pulled each post's full Lexical `body` and the
+    // related/next/previous post chains, ballooning a limit=4 response past
+    // 2 MB — over Next's data-cache ceiling, so it could never be cached and
+    // was re-fetched on every static page that renders the nav/listing.
+    depth: "1",
     limit: String(limit),
     page: String(page),
     sort: "-publishedAt",
   });
+  // Whitelist the `Blog` (list) field surface so the response excludes
+  // detail-only fields (`body`, `relatedPosts`, `faqs`, `tableOfContents`).
+  for (const field of [
+    "title",
+    "slug",
+    "abstract",
+    "heroImage",
+    "categories",
+    "authors",
+    "publishedAt",
+    "displayPublishedAt",
+    "updatedAt",
+    "readingMinutes",
+    "featured",
+    "seo",
+  ]) {
+    params.set(`select[${field}]`, "true");
+  }
   if (category) {
     params.set("where[categories.slug][in][0]", category);
   }
