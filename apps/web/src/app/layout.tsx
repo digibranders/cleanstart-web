@@ -4,6 +4,7 @@ import "./globals.css";
 import "./scrollbar.css";
 import { cn } from "@/lib/utils";
 import { PreviewBanner } from "@/components/PreviewBanner";
+import { ClickSpark } from "@/components/ui/ClickSpark";
 import { SearchProvider } from "@/components/search/SearchProvider";
 import { SmoothScrollProvider } from "@/components/SmoothScrollProvider";
 import {
@@ -145,6 +146,7 @@ export default function RootLayout({
           </SearchProvider>
           <GatedAnalytics />
           <CookieBanner />
+          <ClickSpark />
         </ConsentProvider>
       </body>
     </html>

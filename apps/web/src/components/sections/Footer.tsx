@@ -174,7 +174,11 @@ export function Footer({
             <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between lg:gap-x-8 xl:gap-x-12">
               {/* Brand anchor — logo over social icons. */}
               <div className="flex shrink-0 flex-col gap-7">
-                <div className="relative h-[32px] w-[153px]">
+                <Link
+                  href="/"
+                  aria-label="CleanStart home"
+                  className="relative block h-[32px] w-[153px] rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300/70"
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/images/cleanstart-logo.png"
@@ -185,7 +189,7 @@ export function Footer({
                     decoding="async"
                     className="h-full w-full object-contain object-left"
                   />
-                </div>
+                </Link>
 
                 <ul className="flex items-center gap-[19px]" aria-label="Social media">
                   {SOCIAL_ICONS.map((s) => (
