@@ -21,6 +21,13 @@ import { ProcessBand } from "@/components/sections/home/ProcessBand";
 import { FadeUp } from "@/components/ui/FadeUp";
 import Image from "next/image";
 
+// The hero-top grid/glow SVG is the home page's measured LCP element. By default
+// it is discovered late and fetched at Low priority, which on mobile produced a
+// 1.1–2.4s "load delay" (the dominant, highly variable share of a ~3.5s LCP).
+// A high-priority preload <link> (hoisted to <head> by React) starts the fetch
+// immediately and removes that delay.
+const HERO_TOP_GLOW = "/images/home/hero-top-grid-glow.svg";
+
 export const metadata: Metadata = buildPageMetadata({
   title: "Verified & Secure Container Images | CleanStart",
   absoluteTitle: true,
@@ -36,6 +43,14 @@ export default function Home() {
   // V4 redesign: hero + factory + testimonials/stats section.
   return (
     <>
+      {/* High-priority preload of the LCP hero SVG — React hoists this to
+          <head>. See HERO_TOP_GLOW note above. */}
+      <link
+        rel="preload"
+        as="image"
+        href={HERO_TOP_GLOW}
+        fetchPriority="high"
+      />
       <Header />
       <main id="main-content">
         <div className="bg-cs-hero relative overflow-hidden">
@@ -44,7 +59,7 @@ export default function Home() {
               of the bg-cs-hero wrapper. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/home/hero-top-grid-glow.svg"
+            src={HERO_TOP_GLOW}
             alt=""
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-0 w-full select-none"
@@ -57,6 +72,7 @@ export default function Home() {
                 "linear-gradient(to bottom, #000 46%, transparent 62%)",
             }}
             loading="eager"
+            fetchPriority="high"
             decoding="async"
           />
 
