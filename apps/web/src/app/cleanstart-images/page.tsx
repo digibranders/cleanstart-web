@@ -12,10 +12,10 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "CleanStart Images | Secure, Verified Container & VM Images",
+  title: "Hardened Images Built from Source | CleanStart Images",
   absoluteTitle: true,
   description:
-    "Explore CleanStart's library of secure, minimal container and VM images, continuously scanned, pre hardened, FIPS compliant, and 60 to 80% lighter than standard public images.",
+    "Source-built Trusted Hardened Images with reduced attack surface, verifiable provenance, and near-zero CVEs. Reduce inherited software risk with trusted container foundations.",
   path: "/cleanstart-images",
   variant: "hero",
   eyebrow: "CleanStart Images",

@@ -71,7 +71,7 @@ export const NAV_TREE: NavItem[] = [
       {
         items: [
           {
-            label: "CleanStart Images",
+            label: "Clean Images",
             href: "/cleanstart-images",
             description: "Hardened base images. Near-zero CVEs.",
             icon: "container",
@@ -81,6 +81,12 @@ export const NAV_TREE: NavItem[] = [
             href: "/cleansight",
             description: "Runtime visibility into vulnerabilities and drift.",
             icon: "radar",
+          },
+          {
+            label: "Clean Libraries",
+            href: "/clean-libraries",
+            description: "Govern every dependency, including AI-introduced libraries.",
+            icon: "folder",
           },
         ],
       },

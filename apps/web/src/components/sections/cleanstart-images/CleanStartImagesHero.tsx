@@ -94,8 +94,8 @@ export function CleanStartImagesHero(): React.ReactElement {
                     color: "rgba(255,255,255,0.8)",
                   }}
                 >
-                  Minimal, source-built container images designed to reduce
-                  inherited software risk.
+                  Source-built Trusted Hardened Images with reduced attack
+                  surface and verifiable provenance.
                 </p>
               </HeroReveal>
 

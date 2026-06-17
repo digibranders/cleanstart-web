@@ -9,19 +9,19 @@ const STEPS: Step[] = [
     icon: "icon-discover.svg",
     title: "Discover",
     tagline: "with CleanSight",
-    desc: "Continuously identify inherited software risk across your environments.",
+    desc: "Continuously identify inherited risks across your environments.",
   },
   {
     icon: "icon-eliminate.svg",
     title: "Eliminate",
-    tagline: "with CleanStart Image",
-    desc: "Replace vulnerable software with verified, zero-CVE alternatives.",
+    tagline: "with Clean Images & Libraries",
+    desc: "Replace vulnerable components with verified, zero-CVE alternatives.",
   },
   {
     icon: "icon-prove.svg",
     title: "Prove",
     tagline: "with CleanSight",
-    desc: "Continuously validate software integrity and compliance readiness.",
+    desc: "Continuously validate integrity and compliance readiness.",
   },
 ];
 
@@ -45,7 +45,7 @@ function StepItem({ step }: { step: Step }) {
           {step.title}
         </h3>
         <p
-          className="text-[#9a51ff]"
+          className="whitespace-nowrap text-[#9a51ff]"
           style={{
             fontFamily: "var(--font-sora), Sora, sans-serif",
             fontSize: "var(--fs-body)",

@@ -84,7 +84,7 @@ const FEATURES: FeatureItem[] = [
     iconSrc: "/images/cleanstart-images/workflows-feat-registry-compatible.svg",
   },
   {
-    title: "Minimal Workflow Changes",
+    title: "Minimal Changes",
     body: "Replace base images without major refactoring.",
     iconSrc: "/images/cleanstart-images/workflows-feat-minimal-workflow.svg",
   },
@@ -152,22 +152,33 @@ function StackPanel({
       className="flex flex-col relative"
       style={{ flex: "1 1 0", minWidth: 0, zIndex: 10 }}
     >
-      <p
+      {/* Header reserves the same height as the centre card's two-line
+          CLEANSTART / Clean Images title so all three box tops align. */}
+      <div
         style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "var(--fs-caption)",
-          fontWeight: 700,
-          color: "#9ca3af",
-          letterSpacing: "1.2858px",
-          textTransform: "uppercase",
-          lineHeight: 1,
-          marginBottom: "22.042px",
-          whiteSpace: "nowrap",
-          textAlign: "center",
+          minHeight: "52px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-end",
+          paddingBottom: "8px",
         }}
       >
-        {label}
-      </p>
+        <p
+          style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "var(--fs-caption)",
+            fontWeight: 700,
+            color: "#9ca3af",
+            letterSpacing: "1.2858px",
+            textTransform: "uppercase",
+            lineHeight: 1,
+            whiteSpace: "nowrap",
+            textAlign: "center",
+          }}
+        >
+          {label}
+        </p>
+      </div>
 
       <div
         style={{
@@ -179,6 +190,9 @@ function StackPanel({
           display: "flex",
           flexDirection: "column",
           gap: "14.694px",
+          /* Grow to fill the stretched column so the box bottom aligns with
+             the centre card. */
+          flex: "1 1 auto",
         }}
       >
         {items.map((item) => (
@@ -327,7 +341,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
            * The center column holds only the card; the callout sits in its own
            * row below the grid, wider than the card.
            */}
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_66px_255px_66px_1fr] items-start">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_66px_1fr_66px_1fr] items-stretch">
 
             <StackPanel label="YOUR EXISTING STACK" items={YOUR_STACK} />
 
@@ -369,7 +383,16 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
               className="flex flex-col items-center mt-2 md:mt-0 relative w-full max-w-[288px] md:max-w-none mx-auto"
               style={{ zIndex: 10 }}
             >
-              <div className="text-center" style={{ paddingBottom: "8px" }}>
+              <div
+                className="text-center"
+                style={{
+                  minHeight: "52px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "flex-end",
+                  paddingBottom: "8px",
+                }}
+              >
                 <p
                   style={{
                     fontFamily: "var(--font-display)",
@@ -394,7 +417,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                     lineHeight: 1.55,
                   }}
                 >
-                  HARDENED IMAGES
+                  Clean Images
                 </p>
               </div>
 
@@ -409,6 +432,8 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                   display: "flex",
                   flexDirection: "column",
                   gap: "36.483px",
+                  /* Grow to match the stretched side panels' height. */
+                  flex: "1 1 auto",
                 }}
               >
                 <div
@@ -568,52 +593,8 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
             </div>
           </div>
 
-          {/* Callout row. The vector paths start at the grid bottom and extend downward into the callout box to create the visual connection. */}
+          {/* Callout row. The vertical rod connects the hardened card down into the callout box. */}
           <div className="flex flex-col relative">
-            {/* Left curve, positioned so its right edge meets the callout's left edge. Desktop only. */}
-            <div
-              aria-hidden
-              className="absolute pointer-events-none select-none hidden md:block"
-              style={{
-                left: "193px",
-                top: "0",
-                width: "176px",
-                height: "122px",
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/cleanstart-images/workflows-callout-curve-left.svg"
-                alt=""
-                aria-hidden
-                className="block size-full max-w-none select-none pointer-events-none"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-
-            {/* Right curve, positioned so its left edge meets the callout's right edge. Desktop only. */}
-            <div
-              aria-hidden
-              className="absolute pointer-events-none select-none hidden md:block"
-              style={{
-                left: "689px",
-                top: "0",
-                width: "171px",
-                height: "121px",
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/cleanstart-images/workflows-callout-curve-right.svg"
-                alt=""
-                aria-hidden
-                className="block size-full max-w-none select-none pointer-events-none"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-
             {/* Mobile beam: deployments → callout, centered. Margins match the ~80px gap on either side of the hardened card. z-index:0 so the callout border paints over the beam's bottom tail. */}
             <div
               className="md:hidden relative"
@@ -834,6 +815,7 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                   <div
                     key={f.title}
                     className={[
+                      "text-center",
                       i > 0 ? "sm:pl-6 md:pl-12" : "",
                       i < FEATURES.length - 1 ? "sm:pr-6 md:pr-12" : "",
                     ]
@@ -852,6 +834,8 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
+                        marginLeft: "auto",
+                        marginRight: "auto",
                         marginBottom: "20px",
                         overflow: "hidden",
                       }}

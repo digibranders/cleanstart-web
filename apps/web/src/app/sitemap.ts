@@ -70,6 +70,7 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/book-a-demo' },
   { path: '/careers' },
   { path: '/case-studies' },
+  { path: '/clean-libraries' },
   { path: '/cleansight' },
   { path: '/cleanstart-images' },
   { path: '/cleanstart-platform' },

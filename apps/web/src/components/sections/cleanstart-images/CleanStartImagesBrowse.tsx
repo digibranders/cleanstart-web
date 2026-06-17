@@ -9,23 +9,23 @@ type TrustCard = {
 
 const TRUST_CARDS: TrustCard[] = [
   {
-    title: "Source-Built Foundations",
-    body: "Built directly from trusted upstream software sources.",
+    title: "Source Built",
+    body: "Rebuilt from trusted upstream software.",
     iconSrc: "/images/cleanstart-images/trust-icon-trusted-source.svg",
   },
   {
-    title: "Minimal Container Foundations",
-    body: "Reduced software complexity and lower inherited software risk.",
+    title: "Reduced Risk",
+    body: "Minimal foundations with fewer dependencies.",
     iconSrc: "/images/cleanstart-images/trust-icon-minimal-runtime.svg",
   },
   {
-    title: "Verifiable Software Foundations",
-    body: "Deterministic builds designed for software provenance and integrity.",
+    title: "Verifiable Integrity",
+    body: "Deterministic builds with software provenance.",
     iconSrc: "/images/cleanstart-images/trust-icon-deterministic.svg",
   },
   {
-    title: "Security & Compliance Ready",
-    body: "Built to support enterprise security and compliance requirements.",
+    title: "Compliance Ready",
+    body: "Built for enterprise security requirements.",
     iconSrc: "/images/cleanstart-images/trust-icon-continuous-rebuild.svg",
   },
 ];

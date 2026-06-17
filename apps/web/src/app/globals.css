@@ -238,6 +238,11 @@
      pulled 28→56 back to 28→48 — marketing hierarchy is now H1 56 / H2 48
      (hero display & --fs-h1 share the 56 cap; section H2 sits one step below). */
   --fs-display:  clamp(2.25rem, 1.5rem + 2.22vw, 3.5rem);    /* 36 → 56  hero H1 */
+  /* Homepage hero only — restores the larger 36 → 64 cap (consumed by
+     sections/home/Hero.tsx). Other marketing/product heroes keep --fs-display
+     (36 → 56). Same lower lock-point as --fs-display (~540px) so only the
+     desktop end grows. */
+  --fs-display-home: clamp(2.25rem, 1.2rem + 3.11vw, 4rem);  /* 36 → 64  home hero H1 */
   --fs-h1:       clamp(2rem, 1.5rem + 2.22vw, 3.5rem);       /* 32 → 56  listing/detail/legal H1 */
   --fs-h2:       clamp(1.75rem, 1.375rem + 1.81vw, 3rem);    /* 28 → 48  section H2 */
   --fs-h3:       clamp(1.375rem, 1.25rem + 0.56vw, 1.75rem); /* 22 → 28  subsection / card title */
@@ -1257,6 +1262,27 @@ body {
    keeps it GPU-composited and free of stutter/jerk. */
 @keyframes cs-flow-beam {
   to { transform: translateY(18px); }
+}
+/* Home Platform-pipeline mobile spine: a single comet (head + tail) falling
+   down the off-white rail on an infinite, seamless loop. `top` is animated as a
+   percentage so the comet spans the full rail height whatever it resolves to;
+   the opacity ramp fades it in just above the rail and out just below, so the
+   loop has no hard cut. Decorative — hidden under reduced-motion (the static
+   off-white rail stays). */
+@keyframes cs-home-comet {
+  0% { top: 106%; opacity: 0; }
+  12% { opacity: 1; }
+  86% { opacity: 1; }
+  100% { top: -6%; opacity: 0; }
+}
+.cs-home-comet {
+  animation: cs-home-comet 3.4s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-home-comet {
+    animation: none;
+    opacity: 0;
+  }
 }
 @keyframes cs-sec-sheen {
   0% { transform: translateX(0) rotate(9deg); opacity: 0; }

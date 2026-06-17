@@ -6,8 +6,9 @@ import { HeroReveal } from "@/components/ui/Reveal";
 // CleanStart V4 hero: left-aligned headline + lead + glass CTA on the left,
 // the CleanSight "Posture Report" panel (exported flat from Figma) floating on
 // the right, with the brand marquee spanning below. Typography consumes the
-// role tokens (--fs-display / --fs-lead) per the typography system — NOT the
-// Figma px values (88 / 30) which exceed the role scale.
+// role tokens (--fs-display-home / --fs-lead) per the typography system — NOT
+// the Figma px values (88 / 30) which exceed the role scale. The home hero uses
+// the larger 36 → 64 --fs-display-home cap; other heroes keep --fs-display.
 export function Hero() {
   return (
     <section className="relative overflow-hidden pt-[calc(clamp(96px,8vw,120px)+var(--cs-header-extra))]">
@@ -19,7 +20,7 @@ export function Hero() {
               <h1
                 className="font-display font-semibold text-white"
                 style={{
-                  fontSize: "var(--fs-display)",
+                  fontSize: "var(--fs-display-home)",
                   letterSpacing: "var(--fs-display-ls)",
                   lineHeight: 1.05,
                 }}
