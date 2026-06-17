@@ -1315,18 +1315,17 @@ body {
   }
 }
 
-/* 3 · Living accent — "AI Era" holds a brand cyan→purple gradient that drifts
-   continuously (no pause). The gradient is periodic — identical color at 0% and
-   100% — so the tiled background loops seamlessly with no snap as
-   background-position scrolls. */
+/* 3 · Living accent — "AI Era" uses the shared brand H2 gradient stops
+   (cyan #2CC1EB → purple #9A51FF, the .cs-text-gradient-impact source of truth)
+   so it reads consistently with the section H2s. Mirrored to cyan→purple→cyan
+   (identical color at 0%/100%) so the tiled background drifts continuously and
+   loops seamlessly with no pause or snap. */
 .cs-hh-accent {
   background-image: linear-gradient(
     100deg,
-    #471ec0 0%,
-    #22e0ff 25%,
-    #ffffff 50%,
-    #22e0ff 75%,
-    #471ec0 100%
+    #2cc1eb 0%,
+    #9a51ff 50%,
+    #2cc1eb 100%
   );
   background-size: 200% 100%;
   -webkit-background-clip: text;
@@ -1412,6 +1411,27 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .cs-flow-dash,
   .cs-flow-pulse {
+    animation: none !important;
+  }
+}
+
+/* Posture-loop diagram (CleanSight "Software Supply Chain Posture
+   Management"). The center hub's dashed orbit rotates slowly to reinforce the
+   "continuous" lifecycle; the arc connectors reuse `.cs-flow-dash`/`.cs-flow-pulse`
+   above. Rotation is about the element's own bounding-box center so it works on
+   an SVG node. Disabled under reduced-motion. */
+@keyframes cs-posture-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.cs-posture-spin {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cs-posture-spin 24s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-posture-spin {
     animation: none !important;
   }
 }
