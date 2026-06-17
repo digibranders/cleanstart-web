@@ -1258,6 +1258,27 @@ body {
 @keyframes cs-flow-beam {
   to { transform: translateY(18px); }
 }
+/* Home Platform-pipeline mobile spine: a single comet (head + tail) falling
+   down the off-white rail on an infinite, seamless loop. `top` is animated as a
+   percentage so the comet spans the full rail height whatever it resolves to;
+   the opacity ramp fades it in just above the rail and out just below, so the
+   loop has no hard cut. Decorative — hidden under reduced-motion (the static
+   off-white rail stays). */
+@keyframes cs-home-comet {
+  0% { top: 106%; opacity: 0; }
+  12% { opacity: 1; }
+  86% { opacity: 1; }
+  100% { top: -6%; opacity: 0; }
+}
+.cs-home-comet {
+  animation: cs-home-comet 3.4s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-home-comet {
+    animation: none;
+    opacity: 0;
+  }
+}
 @keyframes cs-sec-sheen {
   0% { transform: translateX(0) rotate(9deg); opacity: 0; }
   9% { opacity: 1; }
