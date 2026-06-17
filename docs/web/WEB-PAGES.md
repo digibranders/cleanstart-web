@@ -80,6 +80,7 @@ page slugs, categories, types, and build status across the dev journey.
 | 7 | CleanStart SBOM | `/software-bill-materials` | Static | ✅ | All 4 sections built |
 | 8 | CleanStart Images | `/cleanstart-images` | Static | ✅ | All 5 sections built (Hero, Browse, EasyStart, UVP, Environment) |
 | 8b | CleanStart Platform | `/cleanstart-platform` | Static | ✅ | Route at `src/app/cleanstart-platform/`. Platform overview ("AI-native trust architecture, source to runtime"); title "Inside the CleanStart Platform". Linked from nav-config (`network` icon). In sitemap STATIC_ROUTES. (Entity distinct from `/cleanstart-images`, which titles itself "CleanStart Images" — the prior brand-title collision is resolved.) |
+| 8c | Clean Libraries | `/clean-libraries` | Static | ✅ | Built 2026-06-17 from Figma 1512:988. 4 sections (Hero, Dependency-Risk cards, Invisible-Pipeline diagram, Built-Into-Workflow cards) + Govern-Every-Dependency CTA. Linked from Products nav (`folder` icon) and from the Pricing "Clean Libraries" offering. |
 
 ---
 

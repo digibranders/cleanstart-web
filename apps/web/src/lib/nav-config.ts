@@ -82,6 +82,12 @@ export const NAV_TREE: NavItem[] = [
             description: "Runtime visibility into vulnerabilities and drift.",
             icon: "radar",
           },
+          {
+            label: "Clean Libraries",
+            href: "/clean-libraries",
+            description: "Govern every dependency, including AI-introduced libraries.",
+            icon: "folder",
+          },
         ],
       },
     ],
