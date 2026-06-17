@@ -1,5 +1,6 @@
 import { Container, Section } from "@/components/layout";
 import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
+import { CardShell } from "./CardShell";
 
 interface RiskCard {
   icon: string;
@@ -33,7 +34,7 @@ const CARDS: RiskCard[] = [
 function Ball({ icon }: { icon: string }): React.ReactElement {
   return (
     <div
-      className="relative flex size-[88px] items-center justify-center overflow-hidden rounded-full"
+      className="flex size-[96px] items-center justify-center overflow-hidden rounded-full"
       style={{
         background: "linear-gradient(180deg, #239cff 0%, #005be3 100%)",
         boxShadow:
@@ -45,7 +46,7 @@ function Ball({ icon }: { icon: string }): React.ReactElement {
         aria-hidden
         src={icon}
         alt=""
-        className="pointer-events-none size-[50px] select-none"
+        className="pointer-events-none size-[54px] select-none"
         loading="lazy"
         decoding="async"
       />
@@ -55,31 +56,17 @@ function Ball({ icon }: { icon: string }): React.ReactElement {
 
 function Card({ card }: { card: RiskCard }): React.ReactElement {
   return (
-    <div
-      className="rounded-[40px] p-[2px]"
-      style={{
-        background:
-          "linear-gradient(180deg, rgba(44,193,235,0.45) 0%, rgba(44,193,235,0.15) 100%)",
-      }}
-    >
-      <div className="relative flex min-h-[clamp(360px,38vw,442px)] flex-col overflow-hidden rounded-[36px] bg-white p-7">
-        {/* Top pink wash. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-1/2 top-7 h-[153px] w-[262px] -translate-x-1/2 select-none opacity-30"
-          style={{ background: "#df9bff", filter: "blur(66.5px)" }}
-        />
-        <div className="relative">
-          <Ball icon={card.icon} />
-        </div>
-        <div className="relative mt-auto flex flex-col gap-3 pt-12">
+    <CardShell minHeight="372px">
+      <div className="flex h-full flex-col p-6">
+        <Ball icon={card.icon} />
+        <div className="mt-8 flex flex-col gap-3">
           <h3
             className="font-display text-[#111]"
             style={{
               fontSize: "var(--fs-h3)",
               fontWeight: 700,
-              letterSpacing: "-0.03em",
-              lineHeight: 1.2,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.05,
             }}
           >
             {card.title}
@@ -87,9 +74,9 @@ function Card({ card }: { card: RiskCard }): React.ReactElement {
           <p
             className="font-sans text-[#555]"
             style={{
-              fontSize: "var(--fs-body-sm)",
+              fontSize: "var(--fs-body)",
               fontWeight: 400,
-              letterSpacing: "-0.01em",
+              letterSpacing: "-0.02em",
               lineHeight: 1.4,
             }}
           >
@@ -97,7 +84,7 @@ function Card({ card }: { card: RiskCard }): React.ReactElement {
           </p>
         </div>
       </div>
-    </div>
+    </CardShell>
   );
 }
 
@@ -145,7 +132,7 @@ export function LibrariesRisk(): React.ReactElement {
           </h2>
         </Reveal>
 
-        <RevealStagger className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:mt-16 lg:grid-cols-4">
+        <RevealStagger className="mx-auto mt-12 grid max-w-[1180px] grid-cols-1 gap-6 sm:grid-cols-2 lg:mt-16 lg:grid-cols-4">
           {CARDS.map((card) => (
             <RevealItem key={card.title}>
               <Card card={card} />

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Container, Section } from "@/components/layout";
 import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
+import { CardShell } from "./CardShell";
 
 interface WorkflowCard {
   orb: string;
@@ -40,18 +41,14 @@ const BOTTOM_CARDS: WorkflowCard[] = [
   },
 ];
 
-const CARD_FRAME = "rounded-[36px] p-[3px]";
-const CARD_FRAME_BG =
-  "linear-gradient(135deg, rgba(44,193,235,0.4) 0%, rgba(44,193,235,0.1) 60%, rgba(255,255,255,0.6) 100%)";
-
 function Orb({ src, alt, size }: { src: string; alt: string; size: number }): React.ReactElement {
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
       {/* Soft purple glow behind the icon. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 select-none rounded-full opacity-30"
-        style={{ background: "#9a51ff", filter: "blur(26px)" }}
+        className="pointer-events-none absolute inset-0 select-none rounded-full opacity-25"
+        style={{ background: "#9a51ff", filter: "blur(24px)" }}
       />
       <Image
         src={src}
@@ -73,7 +70,7 @@ function Title({ children }: { children: React.ReactNode }): React.ReactElement 
       style={{
         fontSize: "var(--fs-h3)",
         fontWeight: 700,
-        letterSpacing: "-0.03em",
+        letterSpacing: "-0.04em",
         lineHeight: 1.1,
       }}
     >
@@ -87,9 +84,9 @@ function Body({ children }: { children: React.ReactNode }): React.ReactElement {
     <p
       className="font-sans text-[#555]"
       style={{
-        fontSize: "var(--fs-body-sm)",
+        fontSize: "var(--fs-body)",
         fontWeight: 400,
-        letterSpacing: "-0.01em",
+        letterSpacing: "-0.02em",
         lineHeight: 1.4,
       }}
     >
@@ -127,35 +124,38 @@ function Bullets({ items }: { items: string[] }): React.ReactElement {
 
 function VerticalCard({ card }: { card: WorkflowCard }): React.ReactElement {
   return (
-    <div className={CARD_FRAME} style={{ background: CARD_FRAME_BG }}>
-      <div className="flex h-full min-h-[clamp(228px,23vw,260px)] flex-col gap-6 rounded-[33px] bg-white p-6">
+    <CardShell minHeight="300px">
+      <div className="flex h-full flex-col gap-6 p-6">
         <Orb src={card.orb} alt={card.title} size={84} />
         <div className="flex flex-col gap-3">
           <Title>{card.title}</Title>
           {card.bullets ? <Bullets items={card.bullets} /> : <Body>{card.body}</Body>}
         </div>
       </div>
-    </div>
+    </CardShell>
   );
 }
 
 function HorizontalCard({ card }: { card: WorkflowCard }): React.ReactElement {
   return (
-    <div className={CARD_FRAME} style={{ background: CARD_FRAME_BG }}>
-      <div className="flex min-h-[clamp(150px,15vw,176px)] items-center justify-between gap-6 rounded-[33px] bg-white px-8 py-7">
+    <CardShell minHeight="180px">
+      <div className="flex h-full w-full items-center justify-between gap-6 px-8 py-7">
         <div className="flex max-w-[62%] flex-col gap-3">
           <Title>{card.title}</Title>
           <Body>{card.body}</Body>
         </div>
-        <Orb src={card.orb} alt={card.title} size={116} />
+        <Orb src={card.orb} alt={card.title} size={104} />
       </div>
-    </div>
+    </CardShell>
   );
 }
 
 export function LibrariesWorkflow(): React.ReactElement {
   return (
-    <Section padding="none" className="overflow-hidden bg-white pt-section-lg pb-section-cta">
+    <Section
+      padding="none"
+      className="overflow-hidden bg-white pt-section-lg pb-section-cta"
+    >
       {/* Decorative corner washes. */}
       <div
         aria-hidden
@@ -173,7 +173,7 @@ export function LibrariesWorkflow(): React.ReactElement {
             "radial-gradient(closest-side, rgba(44,193,235,0.14) 0%, rgba(44,193,235,0) 70%)",
         }}
       />
-      <Container variant="wide" className="relative">
+      <Container className="relative">
         <Reveal header>
           <h2
             className="mx-auto max-w-[760px] text-center font-display text-[#111]"
@@ -197,7 +197,7 @@ export function LibrariesWorkflow(): React.ReactElement {
           </h2>
         </Reveal>
 
-        <RevealStagger className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:mt-16 lg:grid-cols-3">
+        <RevealStagger className="mx-auto mt-12 grid max-w-[1180px] grid-cols-1 gap-6 sm:grid-cols-2 lg:mt-16 lg:grid-cols-3">
           {TOP_CARDS.map((card) => (
             <RevealItem key={card.title}>
               <VerticalCard card={card} />
@@ -205,7 +205,7 @@ export function LibrariesWorkflow(): React.ReactElement {
           ))}
         </RevealStagger>
 
-        <RevealStagger className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <RevealStagger className="mx-auto mt-6 grid max-w-[1180px] grid-cols-1 gap-6 lg:grid-cols-2">
           {BOTTOM_CARDS.map((card) => (
             <RevealItem key={card.title}>
               <HorizontalCard card={card} />
