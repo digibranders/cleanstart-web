@@ -181,7 +181,7 @@ export function CleanSightCTA(): React.ReactElement {
               } as React.CSSProperties
             }
           >
-            <span>Book a Demo</span>
+            <span>Book a Container Scan</span>
             <svg
               className="cs-cta-arrow ml-2"
               width="18"
