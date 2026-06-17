@@ -1,122 +1,157 @@
+import { Fragment } from "react";
 import Image from "next/image";
 import { Container, Section } from "@/components/layout";
-import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
+import { Reveal, RevealItem, RevealStagger } from "@/components/ui/Reveal";
 
-interface WorkflowCard {
-  orb: string;
-  title: string;
-  bullets?: string[];
-  body?: string;
+type FeatureIcon = "visibility" | "validation" | "policy";
+
+interface FeatureRow {
+  icon: FeatureIcon;
+  label: string;
 }
 
-const TOP_CARDS: WorkflowCard[] = [
+interface Stage {
+  /** Path to the stage's 3D glass icon (transparent PNG, 1024²). */
+  image: string;
+  title: string;
+  accent: string;
+  tint: string;
+  /** Bullet list (devtools) or single description (repository, cicd, production). */
+  bullets?: string[];
+  body?: string;
+  /** Icon-led feature rows — only the prominent Clean Library stage. */
+  features?: FeatureRow[];
+  featured?: boolean;
+}
+
+const STAGES: Stage[] = [
   {
-    orb: "/images/clean-libraries/icon-developers.png",
+    image: "/images/clean-libraries/flow-developers.png",
     title: "Developers & AI Coding Tools",
+    accent: "#5b9bff",
+    tint: "rgba(91,155,255,0.14)",
     bullets: ["Cursor", "Claude Code", "GitHub Copilot"],
   },
   {
-    orb: "/images/clean-libraries/icon-clean-library.png",
+    image: "/images/clean-libraries/flow-clean-library.png",
     title: "Clean Library",
-    bullets: ["Dependency visibility", "validation", "policy enforcement"],
+    accent: "#a974ff",
+    tint: "rgba(169,116,255,0.18)",
+    featured: true,
+    features: [
+      { icon: "visibility", label: "Dependency visibility" },
+      { icon: "validation", label: "Validation" },
+      { icon: "policy", label: "Policy enforcement" },
+    ],
   },
   {
-    orb: "/images/clean-libraries/icon-validated.png",
+    image: "/images/clean-libraries/flow-repository.png",
     title: "Validated Library Repository",
-    body: "Approved packages and trusted dependencies.",
+    accent: "#2dd4bf",
+    tint: "rgba(45,212,191,0.14)",
+    body: "Approved packages and trusted sources.",
   },
-];
-
-const BOTTOM_CARDS: WorkflowCard[] = [
   {
-    orb: "/images/clean-libraries/icon-cicd.png",
+    image: "/images/clean-libraries/flow-cicd.png",
     title: "CI/CD Gates",
-    body: "Automated enforcement before deployment.",
+    accent: "#f7a35c",
+    tint: "rgba(247,163,92,0.14)",
+    body: "Automated policy enforcement.",
   },
   {
-    orb: "/images/clean-libraries/icon-production.png",
+    image: "/images/clean-libraries/flow-production.png",
     title: "Production Artifacts",
+    accent: "#5b9bff",
+    tint: "rgba(91,155,255,0.14)",
     body: "Only approved dependencies reach production.",
   },
 ];
 
-/** White card chrome — full border, top purple wash, and a faint grid that fills the card. */
-function Shell({
-  children,
-  minHeight,
-}: {
-  children: React.ReactNode;
-  minHeight: string;
-}): React.ReactElement {
-  return (
-    <div
-      className="relative h-full overflow-hidden rounded-[28px] border-[1.5px] bg-white"
-      style={{ borderColor: "rgba(44,193,235,0.45)", minHeight }}
-    >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-7 h-[153px] w-[263px] -translate-x-1/2 select-none opacity-30"
-        style={{ background: "#df9bff", filter: "blur(66.5px)" }}
-      />
-      {[68, 184].map((y) => (
-        <div
-          key={y}
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 h-px select-none opacity-30"
-          style={{
-            top: `${y}px`,
-            background:
-              "linear-gradient(90deg, transparent 0%, #fff 50.77%, transparent 100%)",
-          }}
-        />
-      ))}
-      {[16.9, 41.8, 56.6, 81.5].map((x) => (
-        <div
-          key={x}
-          aria-hidden
-          className="pointer-events-none absolute top-0 h-[264px] w-px select-none opacity-80"
-          style={{
-            left: `${x}%`,
-            background:
-              "linear-gradient(180deg, transparent 0%, #fff 50.77%, transparent 100%)",
-          }}
-        />
-      ))}
-      <div className="relative z-10 flex h-full flex-col">{children}</div>
-    </div>
-  );
+const STROKE = {
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.75,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+  "aria-hidden": true,
+};
+
+/** Mini glyphs for the Clean Library feature rows. */
+function FeatureGlyph({ icon }: { icon: FeatureIcon }): React.ReactElement {
+  const common = { ...STROKE, width: 18, height: 18, viewBox: "0 0 24 24" };
+  switch (icon) {
+    case "visibility":
+      return (
+        <svg {...common}>
+          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      );
+    case "validation":
+      return (
+        <svg {...common}>
+          <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1Z" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+      );
+    case "policy":
+      return (
+        <svg {...common}>
+          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+          <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+          <path d="m9 14 2 2 4-4" />
+        </svg>
+      );
+  }
 }
 
-function Orb({ src, alt, size }: { src: string; alt: string; size: number }): React.ReactElement {
+/** Self-contained 3D glass stage icon, lifted on a soft accent-tinted glow. */
+function Medallion({
+  image,
+  alt,
+  tint,
+  size,
+}: {
+  image: string;
+  alt: string;
+  tint: string;
+  size: number;
+}): React.ReactElement {
   return (
-    <div className="relative shrink-0" style={{ width: size, height: size }}>
-      <div
+    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
+      <span
         aria-hidden
-        className="pointer-events-none absolute inset-0 select-none rounded-full opacity-25"
-        style={{ background: "#9a51ff", filter: "blur(24px)" }}
+        className="pointer-events-none absolute inset-[-22%] rounded-full"
+        style={{ background: `radial-gradient(closest-side, ${tint} 0%, transparent 72%)` }}
       />
       <Image
-        src={src}
+        src={image}
         alt={alt}
-        width={200}
-        height={200}
+        width={size}
+        height={size}
         sizes={`${size}px`}
-        className="relative h-full w-full select-none object-contain"
+        className="relative select-none object-contain"
         draggable={false}
       />
     </div>
   );
 }
 
-function Title({ children }: { children: React.ReactNode }): React.ReactElement {
+function Title({
+  children,
+  featured,
+}: {
+  children: React.ReactNode;
+  featured?: boolean;
+}): React.ReactElement {
   return (
     <h3
-      className="font-display text-[#111]"
+      className="font-display text-white"
       style={{
-        fontSize: "var(--fs-h3)",
+        fontSize: featured ? "var(--fs-h3)" : "var(--fs-h4)",
         fontWeight: 700,
-        letterSpacing: "-0.04em",
-        lineHeight: 1.1,
+        letterSpacing: "-0.03em",
+        lineHeight: 1.12,
       }}
     >
       {children}
@@ -124,15 +159,25 @@ function Title({ children }: { children: React.ReactNode }): React.ReactElement 
   );
 }
 
+function AccentBar({ accent }: { accent: string }): React.ReactElement {
+  return (
+    <span
+      aria-hidden
+      className="mx-auto block h-[3px] w-8 rounded-full"
+      style={{ backgroundColor: accent }}
+    />
+  );
+}
+
 function Body({ children }: { children: React.ReactNode }): React.ReactElement {
   return (
     <p
-      className="font-sans text-[#555]"
+      className="mx-auto max-w-[220px] text-center font-sans text-white/60"
       style={{
-        fontSize: "var(--fs-body)",
+        fontSize: "var(--fs-body-sm)",
         fontWeight: 400,
-        letterSpacing: "-0.02em",
-        lineHeight: 1.4,
+        letterSpacing: "-0.01em",
+        lineHeight: 1.55,
       }}
     >
       {children}
@@ -140,18 +185,14 @@ function Body({ children }: { children: React.ReactNode }): React.ReactElement {
   );
 }
 
-function Bullets({ items }: { items: string[] }): React.ReactElement {
+function Bullets({ items, accent }: { items: string[]; accent: string }): React.ReactElement {
   return (
-    <ul className="flex flex-col gap-3">
+    <ul className="mx-auto flex w-fit flex-col gap-2.5 text-left">
       {items.map((item) => (
-        <li key={item} className="flex items-center gap-3">
+        <li key={item} className="flex items-center gap-2.5">
+          <span aria-hidden className="size-1.5 shrink-0 rounded-full" style={{ background: accent }} />
           <span
-            aria-hidden
-            className="size-1.5 shrink-0 rounded-full"
-            style={{ background: "#9a51ff" }}
-          />
-          <span
-            className="font-sans text-[#333]"
+            className="font-sans text-white/75"
             style={{
               fontSize: "var(--fs-body-sm)",
               fontWeight: 400,
@@ -167,31 +208,118 @@ function Bullets({ items }: { items: string[] }): React.ReactElement {
   );
 }
 
-function VerticalCard({ card }: { card: WorkflowCard }): React.ReactElement {
+function FeatureList({
+  features,
+  accent,
+}: {
+  features: FeatureRow[];
+  accent: string;
+}): React.ReactElement {
   return (
-    <Shell minHeight="300px">
-      <div className="flex h-full flex-col gap-6 p-6">
-        <Orb src={card.orb} alt={card.title} size={84} />
-        <div className="flex flex-col gap-3">
-          <Title>{card.title}</Title>
-          {card.bullets ? <Bullets items={card.bullets} /> : <Body>{card.body}</Body>}
-        </div>
-      </div>
-    </Shell>
+    <ul className="mx-auto flex w-fit flex-col gap-3.5 text-left">
+      {features.map((feature) => (
+        <li key={feature.label} className="flex items-center gap-3">
+          <span
+            aria-hidden
+            className="flex size-8 shrink-0 items-center justify-center rounded-[10px] border"
+            style={{
+              color: accent,
+              borderColor: `color-mix(in srgb, ${accent} 40%, transparent)`,
+              backgroundColor: `color-mix(in srgb, ${accent} 12%, transparent)`,
+            }}
+          >
+            <FeatureGlyph icon={feature.icon} />
+          </span>
+          <span
+            className="font-sans text-white/85"
+            style={{
+              fontSize: "var(--fs-body-sm)",
+              fontWeight: 500,
+              letterSpacing: "-0.01em",
+              lineHeight: 1.3,
+            }}
+          >
+            {feature.label}
+          </span>
+        </li>
+      ))}
+    </ul>
   );
 }
 
-function HorizontalCard({ card }: { card: WorkflowCard }): React.ReactElement {
+/**
+ * One stage card. Content is centred. Every non-featured card shares one fixed
+ * height so the four reference stages read as a uniform set; the featured
+ * (Clean Library) card is taller, wider, and carries the brand glow.
+ */
+function StageCard({ stage }: { stage: Stage }): React.ReactElement {
+  const featured = stage.featured ?? false;
   return (
-    <Shell minHeight="180px">
-      <div className="flex h-full w-full items-center justify-between gap-6 px-8 py-7">
-        <div className="flex max-w-[62%] flex-col gap-3">
-          <Title>{card.title}</Title>
-          <Body>{card.body}</Body>
-        </div>
-        <Orb src={card.orb} alt={card.title} size={104} />
+    <div
+      className={`relative flex h-full flex-col items-center rounded-[22px] border text-center ${
+        featured ? "gap-5 px-8 py-9 xl:min-h-[376px]" : "gap-4 px-6 py-8 xl:min-h-[324px]"
+      }`}
+      style={{
+        borderColor: featured
+          ? `color-mix(in srgb, ${stage.accent} 55%, transparent)`
+          : "rgba(255,255,255,0.08)",
+        background: `linear-gradient(160deg, ${stage.tint} 0%, rgba(9,8,18,0.62) 60%)`,
+        boxShadow: featured
+          ? `inset 0 1px 0 rgba(255,255,255,0.06), 0 28px 64px -34px ${stage.accent}`
+          : "inset 0 1px 0 rgba(255,255,255,0.05)",
+      }}
+    >
+      {featured ? (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 -top-px mx-auto h-px w-2/3 rounded-full"
+          style={{ background: `linear-gradient(90deg, transparent, ${stage.accent}, transparent)` }}
+        />
+      ) : null}
+      <Medallion
+        image={stage.image}
+        alt=""
+        tint={stage.tint}
+        size={featured ? 104 : 84}
+      />
+      <div className="flex flex-col items-center gap-3">
+        <Title featured={featured}>{stage.title}</Title>
+        <AccentBar accent={stage.accent} />
       </div>
-    </Shell>
+      {stage.features ? (
+        <FeatureList features={stage.features} accent={stage.accent} />
+      ) : stage.bullets ? (
+        <Bullets items={stage.bullets} accent={stage.accent} />
+      ) : (
+        <Body>{stage.body}</Body>
+      )}
+    </div>
+  );
+}
+
+/** Flow arrow between two stages. Horizontal in the desktop row, rotated down when stacked. */
+function Connector({ accent, vertical }: { accent: string; vertical?: boolean }): React.ReactElement {
+  return (
+    <div
+      aria-hidden
+      className={`flex shrink-0 items-center justify-center ${vertical ? "h-7 w-full" : "w-7"}`}
+      style={{ color: accent }}
+    >
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={vertical ? "rotate-90" : undefined}
+      >
+        <path d="M5 12h14" />
+        <path d="m13 6 6 6-6 6" />
+      </svg>
+    </div>
   );
 }
 
@@ -199,29 +327,32 @@ export function LibrariesWorkflow(): React.ReactElement {
   return (
     <Section
       padding="none"
-      className="overflow-hidden bg-white pt-section-lg pb-section-cta"
+      className="overflow-hidden pt-section-lg pb-section-cta"
+      style={{
+        background: "linear-gradient(180deg, #08060f 0%, #0a0a1c 50%, #08060f 100%)",
+      }}
     >
       {/* Decorative corner washes. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-24 -top-12 h-[360px] w-[360px] select-none rounded-full"
+        className="pointer-events-none absolute -right-24 -top-12 h-[420px] w-[420px] select-none rounded-full"
         style={{
           background:
-            "radial-gradient(closest-side, rgba(154,81,255,0.16) 0%, rgba(154,81,255,0) 70%)",
+            "radial-gradient(closest-side, rgba(169,116,255,0.16) 0%, rgba(169,116,255,0) 70%)",
         }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-24 bottom-0 h-[360px] w-[360px] select-none rounded-full"
+        className="pointer-events-none absolute -left-24 bottom-0 h-[420px] w-[420px] select-none rounded-full"
         style={{
           background:
-            "radial-gradient(closest-side, rgba(44,193,235,0.14) 0%, rgba(44,193,235,0) 70%)",
+            "radial-gradient(closest-side, rgba(45,212,191,0.12) 0%, rgba(45,212,191,0) 70%)",
         }}
       />
       <Container className="relative">
         <Reveal header>
           <h2
-            className="mx-auto max-w-[760px] text-center font-display text-[#111]"
+            className="mx-auto max-w-[860px] text-center font-display text-white"
             style={{
               fontSize: "var(--fs-h2)",
               fontWeight: 700,
@@ -232,28 +363,39 @@ export function LibrariesWorkflow(): React.ReactElement {
             Built Into Your Existing{" "}
             <span
               className="bg-clip-text text-transparent"
-              style={{
-                backgroundImage:
-                  "linear-gradient(102deg, #9a51ff 0%, #2cc1eb 100%)",
-              }}
+              style={{ backgroundImage: "linear-gradient(102deg, #9a51ff 0%, #2cc1eb 100%)" }}
             >
-              Workflow
+              Software Delivery Workflow
             </span>
           </h2>
         </Reveal>
 
-        <RevealStagger className="mx-auto mt-12 grid max-w-[1180px] grid-cols-1 gap-6 sm:grid-cols-2 lg:mt-16 lg:grid-cols-3">
-          {TOP_CARDS.map((card) => (
-            <RevealItem key={card.title}>
-              <VerticalCard card={card} />
-            </RevealItem>
-          ))}
-        </RevealStagger>
+        {/* Desktop — horizontal flow with the Clean Library stage prominent.
+            Cards and connectors are siblings so every non-featured card keeps an
+            identical flex basis (equal width); connectors never steal width. */}
+        <Reveal className="mt-14 hidden xl:block">
+          <div className="flex items-center justify-center gap-2">
+            {STAGES.map((stage, i) => (
+              <Fragment key={stage.title}>
+                <div className={`${stage.featured ? "flex-[1.32]" : "flex-1"} min-w-0`}>
+                  <StageCard stage={stage} />
+                </div>
+                {i < STAGES.length - 1 ? (
+                  <Connector accent={STAGES[i + 1]?.accent ?? stage.accent} />
+                ) : null}
+              </Fragment>
+            ))}
+          </div>
+        </Reveal>
 
-        <RevealStagger className="mx-auto mt-6 grid max-w-[1180px] grid-cols-1 gap-6 lg:grid-cols-2">
-          {BOTTOM_CARDS.map((card) => (
-            <RevealItem key={card.title}>
-              <HorizontalCard card={card} />
+        {/* Stacked — vertical flow for < xl. */}
+        <RevealStagger className="mx-auto mt-12 flex max-w-[440px] flex-col items-stretch gap-3 xl:hidden">
+          {STAGES.map((stage, i) => (
+            <RevealItem key={stage.title} className="flex flex-col items-stretch gap-3">
+              <StageCard stage={stage} />
+              {i < STAGES.length - 1 ? (
+                <Connector accent={STAGES[i + 1]?.accent ?? stage.accent} vertical />
+              ) : null}
             </RevealItem>
           ))}
         </RevealStagger>

@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { HeroReveal } from "@/components/ui/Reveal";
+import { CleanSightHeroDeck } from "./CleanSightHeroDeck";
 
 export function CleanSightHero(): React.ReactElement {
   return (
@@ -16,119 +16,101 @@ export function CleanSightHero(): React.ReactElement {
         className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10"
         style={{
           paddingTop: "calc(clamp(96px, 9.5vw, 138px) + var(--cs-header-extra))",
-          paddingBottom: "0px",
+          paddingBottom: "clamp(72px, 8vw, 120px)",
           zIndex: 2,
         }}
       >
-        <div className="flex flex-col items-center text-center gap-6">
-          <HeroReveal y={50} duration={1.0}>
-            <h1
-              className="text-white"
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "var(--fs-display)",
-                fontWeight: 700,
-                letterSpacing: "-0.04em",
-                lineHeight: 1.05,
-                textWrap: "balance",
-              }}
-            >
-              Continuous Software Visibility
-            </h1>
-          </HeroReveal>
+        <div className="grid items-center gap-12 lg:grid-cols-[1.02fr_1fr] lg:gap-16">
+          <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+            <HeroReveal y={50} duration={1.0}>
+              <h1
+                className="text-white"
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: "var(--fs-display)",
+                  fontWeight: 700,
+                  letterSpacing: "-0.04em",
+                  lineHeight: 1.05,
+                  textWrap: "balance",
+                }}
+              >
+                Continuous Software Visibility
+              </h1>
+            </HeroReveal>
 
-          <HeroReveal y={30} delay={0.2} duration={0.8}>
-            <p
-              className="text-white max-w-[760px]"
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "var(--fs-lead)",
-                fontWeight: 400,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.4,
-                opacity: 0.8,
-                textWrap: "balance",
-              }}
-            >
-              Discover software assets, dependencies, and inherited risk across
-              modern environments.
-            </p>
-          </HeroReveal>
+            <HeroReveal y={30} delay={0.2} duration={0.8}>
+              <p
+                className="mt-5 max-w-[540px] text-white"
+                style={{
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "var(--fs-lead)",
+                  fontWeight: 400,
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.4,
+                  opacity: 0.8,
+                  textWrap: "balance",
+                }}
+              >
+                Discover software assets, dependencies, and inherited risk across
+                modern environments.
+              </p>
+            </HeroReveal>
 
-          <HeroReveal y={30} delay={0.35} duration={0.8}>
-            <Link
-              href="/contact-us"
-              className="cs-btn-glass"
-              style={
-                {
-                  "--cs-btn-px": "20px",
-                  "--cs-btn-fs": "15px",
-                } as React.CSSProperties
-              }
-            >
-              <span>Contact Us</span>
-            </Link>
-          </HeroReveal>
-        </div>
-
-        <div
-          className="relative mx-auto"
-          style={{
-            marginTop: "56px",
-            maxWidth: "min(960px, 100%)",
-            paddingBottom: "0px",
-          }}
-        >
-          <div
-            aria-hidden
-            className="pointer-events-none select-none absolute hidden md:block"
-            style={{
-              left: "-180px",
-              top: "-12px",
-              width: "320px",
-              height: "320px",
-              borderRadius: "50%",
-              background:
-                "radial-gradient(closest-side, rgba(192, 59, 255, 0.45) 0%, rgba(192, 59, 255, 0) 70%)",
-              filter: "blur(40px)",
-              zIndex: 0,
-            }}
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none select-none absolute hidden md:block"
-            style={{
-              right: "-180px",
-              bottom: "-40px",
-              width: "320px",
-              height: "320px",
-              borderRadius: "50%",
-              background:
-                "radial-gradient(closest-side, rgba(44, 193, 235, 0.40) 0%, rgba(44, 193, 235, 0) 70%)",
-              filter: "blur(40px)",
-              zIndex: 0,
-            }}
-          />
-
-          <div
-            className="relative overflow-hidden"
-            style={{
-              borderRadius: "11px",
-              boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
-              zIndex: 2,
-            }}
-          >
-            <Image
-              src="/images/cleansight/hero-dashboard-v2.webp"
-              alt="CleanSight dashboard showing container visibility metrics, vulnerability breakdown, and ecosystem package distribution"
-              width={1018}
-              height={581}
-              sizes="(min-width: 1024px) 960px, 100vw"
-              className="block w-full h-auto select-none"
-              priority
-              draggable={false}
-            />
+            <HeroReveal y={30} delay={0.35} duration={0.8}>
+              <Link
+                href="/contact-us"
+                className="cs-btn-glass mt-8"
+                style={
+                  {
+                    "--cs-btn-px": "22px",
+                    "--cs-btn-fs": "15px",
+                  } as React.CSSProperties
+                }
+              >
+                <span>Contact Us</span>
+              </Link>
+            </HeroReveal>
           </div>
+
+          <HeroReveal y={40} delay={0.24} duration={1.0} className="w-full">
+            <div
+              className="relative mx-auto w-full"
+              style={{ maxWidth: "620px" }}
+            >
+              <div
+                aria-hidden
+                className="pointer-events-none absolute hidden select-none md:block"
+                style={{
+                  left: "-90px",
+                  top: "-40px",
+                  width: "320px",
+                  height: "320px",
+                  borderRadius: "50%",
+                  background:
+                    "radial-gradient(closest-side, rgba(192,59,255,0.45) 0%, rgba(192,59,255,0) 70%)",
+                  filter: "blur(44px)",
+                }}
+              />
+              <div
+                aria-hidden
+                className="pointer-events-none absolute hidden select-none md:block"
+                style={{
+                  right: "-90px",
+                  bottom: "-60px",
+                  width: "320px",
+                  height: "320px",
+                  borderRadius: "50%",
+                  background:
+                    "radial-gradient(closest-side, rgba(44,193,235,0.42) 0%, rgba(44,193,235,0) 70%)",
+                  filter: "blur(44px)",
+                }}
+              />
+
+              <div className="relative">
+                <CleanSightHeroDeck />
+              </div>
+            </div>
+          </HeroReveal>
         </div>
       </div>
     </section>

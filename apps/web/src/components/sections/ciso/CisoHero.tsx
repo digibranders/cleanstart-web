@@ -34,10 +34,13 @@ export function CisoHero(): React.ReactElement {
       />
 
       <div
-        className="relative mx-auto z-[2] w-full max-w-[var(--container-default)] px-6 sm:px-10"
+        className="relative mx-auto z-[2] flex w-full max-w-[var(--container-default)] flex-col justify-center px-6 sm:px-10"
         style={{
-          paddingTop: "calc(clamp(96px, 7vw, 140px) + var(--cs-header-extra))",
-          paddingBottom: "72px",
+          // Fixed header is 72px tall and overlays the hero. Clearing it at the
+          // top and centring the in-flow text column (the visual is absolute)
+          // makes the gap above the heading equal the gap below the CTA.
+          paddingTop: "calc(72px + var(--cs-header-extra))",
+          paddingBottom: "0px",
           minHeight: "clamp(480px, 40vw, 652px)",
         }}
       >

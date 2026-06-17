@@ -1,7 +1,8 @@
 /**
  * Clean Libraries CTA card — rendered inside the Footer's locked CTA slot.
- * Dark blue→purple gradient card with a union grid, glow blobs, a rotated
- * product illustration, and a glass "Request a Demo" button.
+ * Light (white) card matching the CleanSight CTA: a purple union grid, soft
+ * #DF9BFF glow gradients, a rotated product illustration, dark text, and a
+ * solid blue "Request a Demo" button.
  */
 
 "use client";
@@ -13,10 +14,7 @@ export function LibrariesCTA(): React.ReactElement {
   return (
     <div
       className="absolute inset-0 flex flex-col items-center justify-center gap-5 overflow-hidden px-8 text-center md:px-12 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.7fr)] lg:content-center lg:items-start lg:justify-center lg:gap-x-[clamp(32px,4vw,56px)] lg:p-[clamp(32px,4vw,56px)_clamp(40px,5vw,72px)] lg:text-left"
-      style={{
-        background:
-          "linear-gradient(180deg, #131e8f 0%, #471ec0 111.05%)",
-      }}
+      style={{ background: "#ffffff" }}
     >
       {/* Union wireframe grid — center-right, behind content. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -57,9 +55,9 @@ export function LibrariesCTA(): React.ReactElement {
           width: "320px",
           height: "320px",
           borderRadius: "50%",
-          background: "#9a51ff",
-          opacity: 0.5,
-          filter: "blur(120px)",
+          background: "#DF9BFF",
+          opacity: 0.8,
+          filter: "blur(121.5px)",
         }}
       />
       {/* Bottom-right glow blob. */}
@@ -72,20 +70,21 @@ export function LibrariesCTA(): React.ReactElement {
           width: "320px",
           height: "320px",
           borderRadius: "50%",
-          background: "#2cc1eb",
-          opacity: 0.35,
-          filter: "blur(120px)",
+          background: "#DF9BFF",
+          opacity: 0.7,
+          filter: "blur(121.5px)",
         }}
       />
 
       <Reveal header className="relative z-10" style={{ maxWidth: "min(460px, 100%)" }}>
         <p
-          className="font-display text-white"
+          className="font-display"
           style={{
             fontSize: "var(--cta-card-title)",
             fontWeight: 600,
             letterSpacing: "var(--cta-card-title-ls)",
             lineHeight: "var(--cta-card-title-lh)",
+            color: "#111111",
             textWrap: "balance",
           }}
         >
@@ -100,9 +99,9 @@ export function LibrariesCTA(): React.ReactElement {
         className="relative z-10 flex flex-col items-center gap-[18px] lg:items-start"
       >
         <p
-          className="text-center font-sans text-white lg:text-left"
+          className="text-center font-sans lg:text-left"
           style={{
-            opacity: 0.8,
+            color: "rgba(17, 17, 17, 0.8)",
             maxWidth: "660px",
             fontSize: "var(--cta-card-desc)",
             fontWeight: 400,
@@ -116,9 +115,10 @@ export function LibrariesCTA(): React.ReactElement {
 
         <Link
           href="/book-a-demo"
-          className="cs-btn-glass"
+          className="cs-btn-blue"
           style={
             {
+              "--cs-btn-h": "44px",
               "--cs-btn-px": "18px",
               "--cs-btn-fs": "16px",
             } as React.CSSProperties
