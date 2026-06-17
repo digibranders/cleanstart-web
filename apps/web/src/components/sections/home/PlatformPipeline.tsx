@@ -91,7 +91,7 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
           sizes="(min-width: 1024px) 140px, 22vw"
           priority={isFirst}
           className="pointer-events-none select-none"
-          style={{ width: "53cqw", height: "auto" }}
+          style={{ width: "63cqw", height: "auto" }}
         />
 
         <h3
@@ -362,7 +362,7 @@ function FactoryMobileCard({ data, isFirst }: { data: CardData; isFirst: boolean
           sizes="(max-width: 480px) 96px, 110px"
           priority={isFirst}
           className="pointer-events-none shrink-0 select-none"
-          style={{ width: "25cqw", height: "auto" }}
+          style={{ width: "30cqw", height: "auto" }}
         />
 
         <div className="flex min-w-0 flex-1 flex-col" style={{ gap: "1.4cqw" }}>

@@ -421,10 +421,10 @@ export function SecurityDiagram(): React.ReactElement {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/security/cube-mark.svg"
+              src="/images/security/cs-logomark.png"
               alt=""
               className="w-auto"
-              style={{ height: "var(--fs-h1)", aspectRatio: "53.86 / 62" }}
+              style={{ height: "var(--fs-h1)", aspectRatio: "54 / 62" }}
             />
             <span
               className="font-display font-normal"

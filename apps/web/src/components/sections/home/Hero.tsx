@@ -1,15 +1,16 @@
-import Image from "next/image";
 import { ArrowRightShort } from "@/components/icons/ArrowRightShort";
 import { BrandMarquee } from "@/components/sections/home/BrandMarquee";
 import { HeroHeading } from "@/components/sections/home/HeroHeading";
+import { LivePostureReport } from "@/components/sections/home/LivePostureReport";
 import { HeroReveal } from "@/components/ui/Reveal";
 
 // CleanStart V4 hero: left-aligned headline + lead + glass CTA on the left,
-// the CleanSight "Posture Report" panel (exported flat from Figma) floating on
-// the right, with the brand marquee spanning below. Typography consumes the
-// role tokens (--fs-display-home / --fs-lead) per the typography system — NOT
-// the Figma px values (88 / 30) which exceed the role scale. The home hero uses
-// the larger 36 → 64 --fs-display-home cap; other heroes keep --fs-display.
+// the CleanSight "Posture Report" panel — now a live, code-built component
+// (LivePostureReport) that scans/animates itself — floating on the right, with
+// the brand marquee spanning below. Typography consumes the role tokens
+// (--fs-display-home / --fs-lead) per the typography system — NOT the Figma px
+// values (88 / 30) which exceed the role scale. The home hero uses the larger
+// 36 → 64 --fs-display-home cap; other heroes keep --fs-display.
 export function Hero() {
   return (
     <section className="relative overflow-hidden pt-[calc(clamp(96px,8vw,120px)+var(--cs-header-extra))]">
@@ -54,74 +55,14 @@ export function Hero() {
             </HeroReveal>
           </div>
 
-          {/* Right column — CleanSight posture-report panel */}
+          {/* Right column — live CleanSight posture-report panel */}
           <HeroReveal
             y={40}
             delay={0.15}
             duration={1.0}
-            className="w-full max-w-[490px] shrink-0 lg:mr-[60px] lg:w-[42%]"
+            className="w-full max-w-[560px] shrink-0 lg:mr-[40px] lg:w-[48%]"
           >
-            <div className="relative mx-auto w-full max-w-[490px]">
-              {/* Soft purple/blue bloom behind the panel (Figma ellipse glow). */}
-              <div
-                aria-hidden
-                className="pointer-events-none absolute select-none"
-                style={{
-                  left: "8%",
-                  top: "16%",
-                  width: "92%",
-                  height: "92%",
-                  background:
-                    "radial-gradient(closest-side, rgba(100, 13, 251, 0.55) 0%, rgba(100, 13, 251, 0) 100%)",
-                  filter: "blur(8px)",
-                }}
-              />
-              <Image
-                src="/images/home/hero-dashboard-panel.png"
-                alt="CleanSight posture report comparing CVE counts across standard and CleanStart-verified container images"
-                width={859}
-                height={1024}
-                sizes="(min-width: 1024px) 520px, (min-width: 640px) 70vw, 90vw"
-                priority
-                className="relative h-auto w-full"
-              />
-
-              {/* Lens flares at the panel's top-right and bottom-left corners
-                  (Figma 光斑 flare), screen/lighten-blended so only the glow
-                  shows. */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/home/hero-flare.png"
-                alt=""
-                aria-hidden
-                loading="lazy"
-                decoding="async"
-                className="pointer-events-none absolute select-none"
-                style={{
-                  width: "40%",
-                  left: "98%",
-                  top: "4%",
-                  transform: "translate(-50%, -50%)",
-                  mixBlendMode: "lighten",
-                }}
-              />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/home/hero-flare.png"
-                alt=""
-                aria-hidden
-                loading="lazy"
-                decoding="async"
-                className="pointer-events-none absolute select-none"
-                style={{
-                  width: "40%",
-                  left: "2%",
-                  top: "93%",
-                  transform: "translate(-50%, -50%)",
-                  mixBlendMode: "lighten",
-                }}
-              />
-            </div>
+            <LivePostureReport />
           </HeroReveal>
         </div>
 
