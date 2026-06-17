@@ -128,9 +128,9 @@ function Bullets({ items }: { items: string[] }): React.ReactElement {
 function VerticalCard({ card }: { card: WorkflowCard }): React.ReactElement {
   return (
     <div className={CARD_FRAME} style={{ background: CARD_FRAME_BG }}>
-      <div className="flex h-full min-h-[clamp(228px,23vw,260px)] flex-col gap-5 rounded-[33px] bg-white p-6">
+      <div className="flex h-full min-h-[clamp(228px,23vw,260px)] flex-col gap-6 rounded-[33px] bg-white p-6">
         <Orb src={card.orb} alt={card.title} size={84} />
-        <div className="mt-auto flex flex-col gap-3">
+        <div className="flex flex-col gap-3">
           <Title>{card.title}</Title>
           {card.bullets ? <Bullets items={card.bullets} /> : <Body>{card.body}</Body>}
         </div>
@@ -173,7 +173,7 @@ export function LibrariesWorkflow(): React.ReactElement {
             "radial-gradient(closest-side, rgba(44,193,235,0.14) 0%, rgba(44,193,235,0) 70%)",
         }}
       />
-      <Container className="relative">
+      <Container variant="wide" className="relative">
         <Reveal header>
           <h2
             className="mx-auto max-w-[760px] text-center font-display text-[#111]"
