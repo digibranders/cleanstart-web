@@ -396,19 +396,6 @@ export function CleanStartImagesEasyStart(): React.ReactElement {
                 <p
                   style={{
                     fontFamily: "var(--font-display)",
-                    fontSize: "var(--fs-caption)",
-                    fontWeight: 700,
-                    color: "#a855f7",
-                    letterSpacing: "2.2042px",
-                    textTransform: "uppercase",
-                    lineHeight: 1.25,
-                  }}
-                >
-                  CLEANSTART
-                </p>
-                <p
-                  style={{
-                    fontFamily: "var(--font-display)",
                     fontSize: "var(--fs-body)",
                     fontWeight: 700,
                     color: "#fff",

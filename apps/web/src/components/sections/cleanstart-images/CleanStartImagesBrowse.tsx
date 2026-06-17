@@ -15,7 +15,7 @@ const TRUST_CARDS: TrustCard[] = [
   },
   {
     title: "Reduced Risk",
-    body: "Minimal foundations with fewer dependencies.",
+    body: "Minimal foundations with near-zero CVEs.",
     iconSrc: "/images/cleanstart-images/trust-icon-minimal-runtime.svg",
   },
   {
@@ -374,8 +374,8 @@ export function CleanStartImagesBrowse(): React.ReactElement {
               color: "#111",
             }}
           >
-            Built from{" "}
-            <span className="cs-text-gradient-impact">Trusted Sources</span>
+            Build from{" "}
+            <span className="cs-text-gradient-impact">Verified Sources</span>
           </h2>
         </Reveal>
 

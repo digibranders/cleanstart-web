@@ -1,235 +1,367 @@
-import { Reveal } from "@/components/ui/Reveal";
+import { ClipboardCheck, Radar, RefreshCw, ShieldAlert } from 'lucide-react';
 
-const CARDS = [
+import { Reveal } from '@/components/ui/Reveal';
+
+/** Minimal structural type for the lucide glyphs we render. */
+type IconComponent = React.ComponentType<{
+  size?: number;
+  strokeWidth?: number;
+  className?: string;
+  'aria-hidden'?: boolean;
+}>;
+
+type LoopNode = {
+  title: string;
+  body: string;
+  /** Position on the loop, in screen-space degrees (-90 = top, 0 = right, 90 = bottom). */
+  angle: number;
+  /** Disc gradient: from → to. `from` is also the outgoing connector's colour. */
+  from: string;
+  to: string;
+  Icon: IconComponent;
+};
+
+/* Clockwise from the top: Discover → Inventory → Remediate → Analyse → repeat. */
+const NODES: readonly [LoopNode, LoopNode, LoopNode, LoopNode] = [
   {
-    title: "Continuous Discovery",
-    body: "Continuously discover software assets across environments.",
-    iconSrc: "/images/cleansight/Ball1.webp",
+    title: 'Continuous Discovery',
+    body: 'Discover software assets across modern environments.',
+    angle: -90,
+    from: '#1E6FE8',
+    to: '#4B92F5',
+    Icon: Radar,
   },
   {
-    title: "Inherited Risk Analysis",
-    body: "Correlate inherited software risk across environments.",
-    iconSrc: "/images/cleansight/Ball2.webp",
+    title: 'Verified Inventories',
+    body: 'Maintain verified inventories, SBOMs, and provenance.',
+    angle: 0,
+    from: '#14A18E',
+    to: '#1FC0A6',
+    Icon: ClipboardCheck,
   },
   {
-    title: "Verified Inventories",
-    body: "Maintain verified inventories, SBOMs, and provenance.",
-    iconSrc: "/images/cleansight/Ball3.webp",
+    title: 'Verified Remediation',
+    body: 'Prioritize remediation with verified alternatives.',
+    angle: 90,
+    from: '#7C5CF7',
+    to: '#9A7CFF',
+    Icon: RefreshCw,
   },
   {
-    title: "Verified Remediation",
-    body: "Prioritize inherited risk with verified alternatives.",
-    iconSrc: "/images/cleansight/Ball4.webp",
+    title: 'Inherited Risk Analysis',
+    body: 'Correlate inherited software risk across environments.',
+    angle: 180,
+    from: '#F43F5E',
+    to: '#FB7185',
+    Icon: ShieldAlert,
   },
 ];
+
+/* Diagram geometry, in a 400×400 user-space box. */
+const SIZE = 400;
+const C = SIZE / 2;
+const R_NODE = 150; // radius the disc centres sit on
+const R_ARC = 150; // arcs ride the same circle, so the four hops trace one true ring
+const INSET = 24; // degrees trimmed off each end to clear the disc and leave a gap
+
+const rad = (deg: number): number => (deg * Math.PI) / 180;
+const point = (deg: number, r: number): { x: number; y: number } => ({
+  x: C + r * Math.cos(rad(deg)),
+  y: C + r * Math.sin(rad(deg)),
+});
+
+type Connector = { id: string; d: string; arrow: string; color: string };
+
+/* One quarter-circle arrow per clockwise hop, riding the disc ring so the four
+   together trace a single circle. The discs sit ON the ring (arcs touch each at
+   its tangent points), which keeps the radial label directions free. Coloured by
+   origin node; the arrowhead points clockwise along the ring into the next disc. */
+const LOOP_SEGMENTS: readonly { fromAngle: number; toAngle: number; color: string }[] = [
+  { fromAngle: -90, toAngle: 0, color: NODES[0].from },
+  { fromAngle: 0, toAngle: 90, color: NODES[1].from },
+  { fromAngle: 90, toAngle: 180, color: NODES[2].from },
+  { fromAngle: 180, toAngle: 270, color: NODES[3].from },
+];
+
+const CONNECTORS: readonly Connector[] = LOOP_SEGMENTS.map((seg, i) => {
+  const aStart = seg.fromAngle + INSET;
+  const aEnd = seg.toAngle - INSET;
+  const start = point(aStart, R_ARC);
+  const end = point(aEnd, R_ARC);
+
+  // Clockwise tangent (heading) and outward radial (perp) at the arc's end.
+  const hx = -Math.sin(rad(aEnd));
+  const hy = Math.cos(rad(aEnd));
+  const rx = Math.cos(rad(aEnd));
+  const ry = Math.sin(rad(aEnd));
+  const tip = { x: end.x + hx * 1.5, y: end.y + hy * 1.5 };
+  const back = { x: end.x - hx * 9, y: end.y - hy * 9 };
+  const left = { x: back.x + rx * 5, y: back.y + ry * 5 };
+  const right = { x: back.x - rx * 5, y: back.y - ry * 5 };
+
+  return {
+    id: `posture-arc-${i}`,
+    d: `M ${start.x.toFixed(2)} ${start.y.toFixed(2)} A ${R_ARC} ${R_ARC} 0 0 1 ${end.x.toFixed(2)} ${end.y.toFixed(2)}`,
+    arrow: `M ${tip.x.toFixed(2)} ${tip.y.toFixed(2)} L ${left.x.toFixed(2)} ${left.y.toFixed(2)} L ${right.x.toFixed(2)} ${right.y.toFixed(2)} Z`,
+    color: seg.color,
+  };
+});
+
+/** Premium ring-icon disc: a glossy "sphere" (off-centre radial highlight) inside
+    a soft frosted halo. Shared by the loop diagram and the mobile stepper. */
+function NodeBadge({ node, size }: { node: LoopNode; size: number }): React.ReactElement {
+  const { Icon } = node;
+  return (
+    <div
+      className="relative flex shrink-0 items-center justify-center"
+      style={{ width: size, height: size }}
+    >
+      {/* Frosted halo — a larger, softly tinted ring sitting behind the disc. */}
+      <span
+        aria-hidden
+        className="absolute inset-0 rounded-full"
+        style={{
+          transform: 'scale(1.34)',
+          background: `radial-gradient(circle, ${node.from}24 0%, ${node.from}0D 55%, transparent 72%)`,
+        }}
+      />
+      {/* The disc — spherical light source top-left, glossy top, soft inner depth. */}
+      <span
+        className="relative flex h-full w-full items-center justify-center rounded-full"
+        style={{
+          background: `radial-gradient(130% 130% at 32% 24%, ${node.to} 0%, ${node.from} 70%)`,
+          boxShadow: [
+            `0 0 0 1.25px ${node.from}33`,
+            `0 0 0 7px ${node.from}14`,
+            `0 16px 30px -12px ${node.from}99`,
+            'inset 0 2px 3px rgba(255,255,255,0.4)',
+            'inset 0 -5px 9px rgba(0,0,0,0.12)',
+          ].join(', '),
+        }}
+      >
+        <Icon
+          size={Math.round(size * 0.44)}
+          strokeWidth={1.75}
+          className="text-white"
+          aria-hidden
+        />
+      </span>
+    </div>
+  );
+}
 
 export function CleanSightUnified(): React.ReactElement {
   return (
     <section
       data-section="CleanSightUnified"
-      className="relative overflow-hidden bg-white"
+      className="relative overflow-hidden"
+      style={{
+        background:
+          'radial-gradient(120% 90% at 85% 10%, rgba(124,92,247,0.06) 0%, transparent 55%), radial-gradient(110% 80% at 8% 90%, rgba(30,111,232,0.06) 0%, transparent 50%), #ffffff',
+      }}
     >
-      {/* Decorative vector — top-left, partially off-screen. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        aria-hidden
-        className="pointer-events-none select-none absolute hidden lg:block"
-        src="/images/cleansight/unified-vector-bg.svg"
-        alt=""
-        style={{ left: "171px", top: "-115px", width: "568px", height: "551px" }}
-        loading="lazy"
-        decoding="async"
-      />
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-sm">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] items-center gap-12 lg:gap-16">
+          {/* ── Left: copy ───────────────────────────────────────────── */}
+          <div className="max-w-[560px]">
+            <Reveal header>
+              <h2
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 'var(--fs-h2)',
+                  fontWeight: 600,
+                  letterSpacing: '-0.04em',
+                  lineHeight: 1.1,
+                  color: '#111',
+                }}
+              >
+                Software Supply Chain{' '}
+                <span className="cs-text-gradient-impact">Posture Management</span>
+              </h2>
+            </Reveal>
 
-      {/* Decorative union — bottom-right, rotated, partially off-screen. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        aria-hidden
-        className="pointer-events-none select-none absolute hidden lg:block"
-        src="/images/cleansight/unified-union-bg.svg"
-        alt=""
-        style={{
-          left: "1617px",
-          top: "537px",
-          width: "488px",
-          height: "497px",
-          transform: "scaleY(-1) rotate(141.39deg)",
-        }}
-        loading="lazy"
-        decoding="async"
-      />
-
-      {/* Decorative ellipse glow — bottom-right. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        aria-hidden
-        className="pointer-events-none select-none absolute hidden lg:block"
-        src="/images/cleansight/unified-ellipse-glow.svg"
-        alt=""
-        style={{ left: "1732px", top: "656px", width: "315px", height: "315px" }}
-        loading="lazy"
-        decoding="async"
-      />
-
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md">
-        {/* Heading row. */}
-        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 lg:gap-[60px]">
-          <Reveal header style={{ maxWidth: "654px", flexShrink: 0 }}>
-            <h2
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "var(--fs-h2)",
-                fontWeight: 600,
-                letterSpacing: "-0.04em",
-                lineHeight: 1.1,
-                color: "#111",
-              }}
-            >
-              Continuous Visibility with{" "}
-              <span className="cs-text-gradient-impact">Verified Remediation</span>
-            </h2>
-          </Reveal>
-
-          <Reveal header delay={0.15} y={20} style={{ maxWidth: "571px" }}>
-            <p
-              className="lg:pt-2"
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "var(--fs-lead)",
-                fontWeight: 400,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.4,
-                color: "#111",
-                opacity: 0.8,
-              }}
-            >
-              Correlate inherited software risk across environments and
-              prioritize remediation with confidence.
-            </p>
-          </Reveal>
-        </div>
-
-        {/* Feature cards. */}
-        <div className="mt-10 lg:mt-[72px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-8">
-          {CARDS.map((card) => (
-            <div
-              key={card.title}
-              /* `max-sm:!min-h-0` drops the 346px floor on mobile (1-col)
-                 where content-hug is wanted; sm+ keeps the floor so the
-                 2-col / 4-col grid rows stay aligned. */
-              className="relative flex flex-col bg-white overflow-hidden max-sm:!min-h-0"
-              style={{
-                borderRadius: "36px",
-                /* Cyan glow border at 30% opacity. */
-                boxShadow: "0 0 0 4px rgba(44, 193, 235, 0.30)",
-                minHeight: "312px",
-              }}
-            >
-              {/* Purple glow blob — top of card. */}
+            <Reveal header delay={0.16} y={20}>
               <div
                 aria-hidden
-                className="pointer-events-none select-none absolute"
+                className="mt-6 h-[3px] w-40 rounded-full"
                 style={{
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  top: "28px",
-                  width: "263px",
-                  height: "153px",
-                  background: "#df9bff",
-                  opacity: 0.30,
-                  filter: "blur(66.5px)",
-                  borderRadius: "50%",
+                  background: 'linear-gradient(90deg, #2CC1EB 0%, #9A51FF 100%)',
                 }}
               />
+            </Reveal>
 
-              {/* Decorative vertical gradient lines. */}
-              {[16.9, 41.8, 56.6, 81.5].map((pct) => (
-                <div
-                  key={pct}
-                  aria-hidden
-                  className="pointer-events-none select-none absolute"
-                  style={{
-                    left: `${pct}%`,
-                    top: 0,
-                    width: "1px",
-                    height: "76%",
-                    background:
-                      "linear-gradient(to bottom, transparent 0%, white 50.77%, transparent 100%)",
-                    opacity: 0.8,
-                  }}
-                />
-              ))}
+            <Reveal header delay={0.22} y={20}>
+              <p
+                className="mt-6"
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--fs-lead)',
+                  fontWeight: 400,
+                  letterSpacing: '-0.01em',
+                  lineHeight: 1.5,
+                  color: '#3f3f46',
+                }}
+              >
+                Continuously discover software assets, correlate inherited software risk, maintain
+                verified inventories, and accelerate remediation with verified software
+                alternatives.
+              </p>
+            </Reveal>
+          </div>
 
-              {/* Decorative horizontal gradient lines. */}
-              {[25.6, 69.5].map((pct) => (
-                <div
-                  key={pct}
-                  aria-hidden
-                  className="pointer-events-none select-none absolute"
-                  style={{
-                    left: 0,
-                    top: `${pct}%`,
-                    width: "100%",
-                    height: "1px",
-                    background:
-                      "linear-gradient(to right, transparent 0%, white 50.77%, transparent 100%)",
-                    opacity: 0.30,
-                  }}
-                />
-              ))}
+          {/* ── Right: continuous-loop diagram (tablet / desktop) ────── */}
+          {/* `pb` reserves room for the bottom disc's label so it stays inside the
+              diagram box instead of spilling into the section's bottom padding —
+              which is what made the loop sit too high. `pt-2` evens the top. */}
+          <Reveal
+            delay={0.1}
+            className="relative mx-auto hidden w-full max-w-[680px] pt-2 pb-[132px] sm:block"
+          >
+            {/* The ring lives in a centred square; the wider wrapper leaves side
+                margins so the left/right labels can sit OUTSIDE the circle, clear
+                of the arrows. */}
+            <div className="relative mx-auto aspect-square w-full max-w-[408px]">
+              {/* Connector layer. */}
+              <svg
+                viewBox={`0 0 ${SIZE} ${SIZE}`}
+                className="absolute inset-0 h-full w-full overflow-visible"
+                fill="none"
+                aria-hidden
+              >
+                {CONNECTORS.map((c) => (
+                  <g key={c.id}>
+                    <path
+                      className="cs-posture-flow"
+                      d={c.d}
+                      stroke={c.color}
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeDasharray="0.5 7.5"
+                      fill="none"
+                    />
+                    <path d={c.arrow} fill={c.color} />
+                  </g>
+                ))}
+              </svg>
 
-              <div className="relative flex flex-col flex-1 z-10" style={{ padding: "24px", paddingTop: "36px", paddingBottom: "20px", gap: "12px" }}>
-                {/* Per-card PNG sphere with embedded glyph. */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={card.iconSrc}
-                  alt=""
-                  aria-hidden
-                  width={112}
-                  height={112}
-                  loading="lazy"
-                  decoding="async"
-                  className="flex-shrink-0 pointer-events-none select-none"
-                  style={{ width: "112px", height: "112px", objectFit: "contain" }}
-                />
-
-                <h3
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "var(--fs-h3)",
-                    fontWeight: 700,
-                    letterSpacing: "-0.04em",
-                    lineHeight: 1.1,
-                    color: "#111",
-                    /* Constrain width so every title wraps to two balanced
-                       lines — keeps the four card titles visually consistent.
-                       7.2em (~202px at --fs-h3) sits below the narrowest full
-                       title (~243px) so the 2-word titles break, yet above the
-                       widest wrapped line ("Risk Analysis", ~162px) so none
-                       spill to a third line. em keeps it proportional to the
-                       fluid font size. */
-                    maxWidth: "7.2em",
-                    textWrap: "balance",
-                  }}
-                >
-                  {card.title}
-                </h3>
-
-                <p
-                  style={{
-                    fontFamily: "var(--font-sans)",
-                    fontSize: "var(--fs-body)",
-                    fontWeight: 400,
-                    letterSpacing: "-0.02em",
-                    lineHeight: 1.4,
-                    color: "#555",
-                  }}
-                >
-                  {card.body}
-                </p>
-              </div>
+              {/* Nodes. The disc is centred exactly on the loop point. Top and
+                  bottom labels hang below their disc; the left/right labels sit
+                  OUTSIDE the ring (in the wrapper's side margins) so the vertical
+                  arcs never run through them. */}
+              {NODES.map((node) => {
+                const p = point(node.angle, R_NODE);
+                const placement =
+                  node.angle === 0 ? 'right' : node.angle === 180 ? 'left' : 'below';
+                const labelClass =
+                  placement === 'right'
+                    ? 'absolute left-full top-1/2 -translate-y-1/2 pl-3 text-left'
+                    : placement === 'left'
+                      ? 'absolute right-full top-1/2 -translate-y-1/2 pr-3 text-right'
+                      : 'absolute left-1/2 top-full -translate-x-1/2 pt-3.5 text-center';
+                return (
+                  <div
+                    key={node.title}
+                    className="absolute"
+                    style={{
+                      left: `${(p.x / SIZE) * 100}%`,
+                      top: `${(p.y / SIZE) * 100}%`,
+                      width: 76,
+                      height: 76,
+                      transform: 'translate(-50%, -50%)',
+                    }}
+                  >
+                    <NodeBadge node={node} size={76} />
+                    <div
+                      className={labelClass}
+                      style={{ width: placement === 'below' ? 168 : 120 }}
+                    >
+                      <p
+                        className="font-display font-semibold"
+                        style={{
+                          fontSize: '17px',
+                          letterSpacing: '-0.02em',
+                          lineHeight: 1.2,
+                          color: '#111',
+                        }}
+                      >
+                        {node.title}
+                      </p>
+                      <p
+                        className="mt-1.5"
+                        style={{
+                          fontFamily: 'var(--font-sans)',
+                          fontSize: '13.5px',
+                          lineHeight: 1.45,
+                          color: '#52525b',
+                        }}
+                      >
+                        {node.body}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          ))}
+          </Reveal>
+
+          {/* ── Right: vertical stepper (mobile) ─────────────────────── */}
+          <div className="relative sm:hidden">
+            {/* Rail behind the discs. */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute bottom-7 left-[37px] top-7 w-[2px] rounded-full"
+              style={{
+                background:
+                  'linear-gradient(180deg, #1E6FE8 0%, #14A18E 33%, #7C5CF7 66%, #F43F5E 100%)',
+                opacity: 0.5,
+              }}
+            />
+            <ul className="flex flex-col gap-8">
+              {NODES.map((node) => (
+                <li key={node.title} className="relative flex items-start gap-5">
+                  <NodeBadge node={node} size={56} />
+                  <div className="pt-1.5">
+                    <p
+                      className="font-display font-semibold"
+                      style={{
+                        fontSize: '16px',
+                        letterSpacing: '-0.02em',
+                        lineHeight: 1.2,
+                        color: '#111',
+                      }}
+                    >
+                      {node.title}
+                    </p>
+                    <p
+                      className="mt-1"
+                      style={{
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--fs-body-sm)',
+                        lineHeight: 1.45,
+                        color: '#52525b',
+                      }}
+                    >
+                      {node.body}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            {/* Loop-back indicator. */}
+            <div className="mt-8 flex items-center gap-2 pl-[10px]">
+              <RefreshCw size={15} strokeWidth={2} className="text-[#7c3aed]" aria-hidden />
+              <span
+                className="font-display font-semibold uppercase"
+                style={{
+                  fontSize: 'var(--fs-eyebrow)',
+                  letterSpacing: '0.1em',
+                  color: '#7c3aed',
+                }}
+              >
+                Continuous loop
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </section>

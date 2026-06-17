@@ -17,32 +17,32 @@ const CARDS: CardDef[] = [
   {
     icon: "/images/ciso/enterprise-icon-cloud.svg",
     title: "Exposure Visibility",
-    desc: "Continuously identify inherited software risk across dependencies, artifacts, and environments.",
+    desc: "Continuously identify inherited software risk.",
     titleSize: 32,
   },
   {
     icon: "/images/ciso/enterprise-icon-devsecops.svg",
     title: "Provenance Verification",
-    desc: "Validate software origin, integrity, and ownership across the delivery lifecycle.",
+    desc: "Validate software origin, integrity, and ownership.",
     titleSize: 32,
   },
   {
     icon: "/images/ciso/enterprise-icon-compliance.svg",
     title: "Policy Governance",
-    desc: "Continuously enforce software security and compliance standards across environments.",
+    desc: "Enforce software security and compliance policies.",
     titleSize: 32,
   },
   {
     icon: "/images/ciso/enterprise-icon-security-ops.svg",
     title: "Verified Remediation",
-    desc: "Reduce operational exposure with verified software artifacts and remediation guidance.",
+    desc: "Reduce inherited risk with verified alternatives.",
     titleSize: 32,
   },
 ];
 
 function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactElement {
   return (
-    <div className="relative flex-shrink-0" style={{ width: "295px", height: "372px" }}>
+    <div className="relative flex-shrink-0" style={{ width: "295px", height: "300px" }}>
       {/* Outer cyan glow — creates the border halo effect. */}
       <div
         aria-hidden
@@ -172,7 +172,7 @@ export function CisoEnterprise(): React.ReactElement {
     <section
       data-section="CisoEnterprise"
       className="relative overflow-hidden bg-white"
-      style={{ paddingTop: "120px", paddingBottom: "64px" }}
+      style={{ paddingTop: "80px", paddingBottom: "64px" }}
     >
       {/* Corner Union — top-right. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -262,7 +262,7 @@ export function CisoEnterprise(): React.ReactElement {
               marginBottom: "74px",
             }}
           >
-            Continuous Governance Across the{" "}
+            Continuous Control Across the{" "}
             <span
               style={{
                 background:

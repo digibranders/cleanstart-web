@@ -1,6 +1,7 @@
 import type React from "react";
 import { Section, Container } from "@/components/layout";
 import { LifecycleFlow } from "@/components/sections/ciso/lifecycle-flow/LifecycleFlow";
+import { LifecycleMobile } from "@/components/sections/ciso/lifecycle-flow/LifecycleMobile";
 
 /** Ambient mesh-grid glow, anchored to the centred 1440 design frame. xl-only. */
 function Glow({
@@ -74,7 +75,15 @@ export function CisoLifecycle(): React.ReactElement {
         </div>
 
         <div className="mx-auto mt-[clamp(12px,2vw,32px)] flex max-w-[1276px] flex-col items-center">
-          <LifecycleFlow />
+          {/* Tablet + desktop (≥ md): the hub-and-spoke canvas scaled down.
+              Phones (< md): a portrait re-flow of the same diagram (the wide
+              canvas can't shrink legibly to phone width). */}
+          <div className="hidden w-full justify-center md:flex">
+            <LifecycleFlow />
+          </div>
+          <div className="w-full md:hidden">
+            <LifecycleMobile />
+          </div>
         </div>
       </Container>
     </Section>

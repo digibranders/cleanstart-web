@@ -203,9 +203,12 @@ export function LivePostureReport() {
           top: "10%",
           width: "94%",
           height: "88%",
+          // The radial gradient is already soft-edged, so no filter:blur is
+          // needed for the glow. Dropping it keeps the forever-looping
+          // scale/opacity bloom on the compositor instead of re-rasterizing a
+          // 10px blur every frame (cheaper paint, no CWV/INP cost).
           background:
             "radial-gradient(closest-side, rgba(100, 13, 251, 0.5) 0%, rgba(100, 13, 251, 0) 100%)",
-          filter: "blur(10px)",
         }}
       />
 

@@ -39,7 +39,11 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
       style={{
         background: "linear-gradient(180deg, #151021 0%, #131e8f 67.14%, #471ec0 107.43%)",
         paddingTop: "clamp(56px, 7vw, 100px)",
-        paddingBottom: "clamp(56px, 7vw, 100px)",
+        /* Last section before the Footer CTA: reserve a card-half so the
+           overlapping CTA card sits on clear gradient, not on the logo row
+           (Footer layout contract). If the Measure section is restored as the
+           last section, move this back to clamp(56px, 7vw, 100px). */
+        paddingBottom: "var(--spacing-section-cta)",
       }}
     >
       {/* Subtle grid pattern */}
@@ -176,7 +180,7 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
 
       <div className="relative flex flex-col items-center">
 
-        {/* Heading max-width forces the "Images for Modern" / "Stacks" wrap */}
+        {/* Heading max-width forces the "Deploy Anywhere" / "Containers Run" wrap */}
         <Reveal header>
           <h2
             className="font-display text-white text-center"
@@ -186,11 +190,11 @@ export function CleanStartImagesEnvironment(): React.ReactElement {
               letterSpacing: "-0.04em",
               lineHeight: 1.1,
               maxWidth: "clamp(280px, 43vw, 623px)",
-              textWrap: "wrap" as const,
+              textWrap: "balance" as const,
             }}
           >
-            {"Images for Modern "}
-            <span className="cs-text-gradient-impact">Stacks</span>
+            {"Deploy Anywhere "}
+            <span className="cs-text-gradient-impact">Containers Run</span>
           </h2>
         </Reveal>
 

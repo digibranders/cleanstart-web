@@ -1,8 +1,8 @@
 // Home hero H1 with a layered, on-brand motion sequence:
-//   1. "Verified. Secure." reveals via a stepped clip "type-on" + blinking caret,
-//      then snaps from soft blur into sharp focus (the "type then true-focus").
-//   2. "Built for the AI Era." focus-settles in after, with "AI Era" holding a
-//      living cyan→purple gradient + periodic shimmer.
+//   1. "Verified. Secure." (brand cyan→purple gradient) reveals via a stepped
+//      clip "type-on" + blinking caret, then snaps from soft blur into sharp
+//      focus, and drifts continuously thereafter.
+//   2. "Built for the AI Era." (white) focus-settles in after.
 //
 // Server component (no "use client") — the effect is pure CSS, so zero client JS
 // ships for it and the FULL heading text is present in the server HTML (the
@@ -26,9 +26,7 @@ export function HeroHeading() {
       <span className="cs-hh-typewrap">
         <span className="cs-hh-type">Verified. Secure.</span>
       </span>{" "}
-      <span className="cs-hh-phrase">
-        Built for the <span className="cs-hh-accent">AI&nbsp;Era</span>.
-      </span>
+      <span className="cs-hh-phrase">Built for the AI&nbsp;Era.</span>
     </h1>
   );
 }
