@@ -82,7 +82,7 @@ export function PricingPlans(): React.ReactElement {
 
           {/* White panel that holds both plan cards. */}
           <div className="relative rounded-[28px] bg-white p-3 sm:p-4 lg:p-5 shadow-[0_30px_80px_-40px_rgba(70,30,191,0.45)]">
-            <div className="grid grid-cols-1 items-stretch gap-3 sm:gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+            <div className="grid grid-cols-1 items-stretch gap-8 sm:gap-10 lg:gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
               <DeveloperCard />
               <EnterpriseCard />
             </div>
@@ -130,7 +130,7 @@ function DeveloperCard(): React.ReactElement {
       <Flare src="/images/pricing/flare2.svg" style={{ left: "82%", top: "-6px" }} />
       <Flare
         src="/images/pricing/flare.svg"
-        style={{ left: "24px", top: "62%" }}
+        style={{ left: "16px", bottom: "16px" }}
       />
 
       <div className="relative flex items-center gap-3">

@@ -6,9 +6,8 @@ export function PlatformHero() {
   return (
     <section
       aria-label="Inside the CleanStart Platform"
-      className="relative w-full overflow-hidden"
+      className="relative w-full overflow-hidden lg:min-h-[clamp(560px,51.3vw,739px)]"
       style={{
-        minHeight: "clamp(560px, 51.3vw, 739px)",
         background:
           "linear-gradient(180deg, #151021 25.7%, #10123e 39.4%, #131e8f 62.1%, #471ec0 82.4%, #471fc3 95.1%, rgba(70,30,191,0.85) 101%, rgba(66,30,188,0.4) 111%, rgba(66,30,188,0) 117%)",
       }}

@@ -138,7 +138,7 @@ function GuaranteeCard({
       onMouseLeave={() => setHovered(null)}
       data-built={built ? "true" : undefined}
       className={cn(
-        "cs-sec-rise cs-sec-card relative z-10 flex flex-col items-center justify-center px-3 py-6 text-center",
+        "cs-sec-rise cs-sec-card relative z-10 flex flex-col items-center justify-start px-3 py-6 text-center",
         dimmed && "cs-sec-dim",
       )}
       style={{ ["--d" as string]: `${0.5 + index * 0.09}s` }}
