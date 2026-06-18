@@ -63,17 +63,6 @@ const PARTNERS: Record<Region, Partner[]> = {
       country: "Dubai, UAE",
       logo: "/images/partners/global/help-ag-logo-2048x603.png",
     },
-    {
-      name: "Syscort",
-      country: "UAE",
-      logo: "/images/partners/global/logo_syscort-300x85.png",
-    },
-    {
-      name: "Sandbox Security",
-      country: "Saudi Arabia",
-      logo: "/images/partners/global/sandbox-security.png",
-      invertOnLight: true,
-    },
   ],
   "North America": [
     {
