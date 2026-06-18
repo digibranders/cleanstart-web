@@ -7,9 +7,11 @@ import { deriveCoverKeyword, guideCoverPath } from "@/lib/guide-cover";
 
 interface GuideCardProps {
   guide: Guide;
+  /** Preload the image (set true for cards in the first two rows). */
+  priority?: boolean;
 }
 
-export function GuideCard({ guide }: GuideCardProps): React.ReactElement {
+export function GuideCard({ guide, priority = false }: GuideCardProps): React.ReactElement {
   const authorName = guide.authors?.[0]?.name ?? null;
   const updatedDate = formatGuideDate(
     guide.updatedAt ?? effectivePublishedAt(guide),
@@ -40,6 +42,7 @@ export function GuideCard({ guide }: GuideCardProps): React.ReactElement {
             fill
             className="object-cover"
             sizes="(min-width: 1280px) 300px, (min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
+            priority={priority}
           />
         ) : (
           <Image
@@ -48,6 +51,7 @@ export function GuideCard({ guide }: GuideCardProps): React.ReactElement {
             fill
             className="object-cover"
             sizes="(min-width: 1280px) 300px, (min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
+            priority={priority}
           />
         )}
       </div>
