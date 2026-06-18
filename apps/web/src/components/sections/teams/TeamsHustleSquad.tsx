@@ -9,9 +9,9 @@ interface Slide {
   alt: string;
 }
 
-const SLIDES: Slide[] = Array.from({ length: 9 }, (_, i) => ({
-  src: `/images/teams/squad/${i + 1}.webp`,
-  alt: `CleanStart Hustle Squad, moment ${i + 1}`,
+const SLIDES: Slide[] = [1, 2, 3].map((n) => ({
+  src: `/images/teams/squad/${n}.webp`,
+  alt: `CleanStart Hustle Squad, moment ${n}`,
 }));
 
 const AUTOPLAY_MS = 5000;

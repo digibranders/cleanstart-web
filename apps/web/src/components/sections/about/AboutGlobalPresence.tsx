@@ -15,27 +15,7 @@ const OFFICES: Office[] = [
     address: "8 The Green, Suite A, Dover, DE 19901",
     color: "amber",
     coordinates: [-75.5, 38.9],
-    imageSrc: "/images/about/global/landmark-delaware.jpg",
-  },
-  {
-    id: "ahmedabad",
-    city: "Ahmedabad",
-    country: "India",
-    role: "Engineering Hub",
-    address: "SG Highway, Ahmedabad, Gujarat 380054",
-    color: "cyan",
-    coordinates: [72.6, 23.0],
-    imageSrc: "/images/about/global/landmark-ahmedabad.jpg",
-  },
-  {
-    id: "bengaluru",
-    city: "Bengaluru",
-    country: "India",
-    role: "Engineering Hub",
-    address: "Whitefield, Bengaluru, Karnataka 560066",
-    color: "cyan",
-    coordinates: [77.6, 13.0],
-    imageSrc: "/images/about/global/landmark-bengaluru.jpg",
+    imageSrc: "/images/about/global/landmark-delaware.webp",
   },
   {
     id: "singapore",
@@ -45,11 +25,31 @@ const OFFICES: Office[] = [
     address: "One Raffles Place, Singapore 048616",
     color: "cyan",
     coordinates: [103.8, 1.4],
-    imageSrc: "/images/about/global/landmark-singapore.jpg",
+    imageSrc: "/images/about/global/landmark-singapore.webp",
+  },
+  {
+    id: "ahmedabad",
+    city: "Ahmedabad",
+    country: "India",
+    role: "Engineering Hub",
+    address: "SG Highway, Ahmedabad, Gujarat 380054",
+    color: "cyan",
+    coordinates: [72.6, 23.0],
+    imageSrc: "/images/about/global/landmark-ahmedabad.webp",
+  },
+  {
+    id: "bengaluru",
+    city: "Bengaluru",
+    country: "India",
+    role: "Engineering Hub",
+    address: "Whitefield, Bengaluru, Karnataka 560066",
+    color: "cyan",
+    coordinates: [77.6, 13.0],
+    imageSrc: "/images/about/global/landmark-bengaluru.webp",
   },
 ];
 
-const CYAN = "#2cc1eb";
+const CYAN = "#FFFFFF";
 const AMBER = "#f59e0b";
 
 function markerColor(color: "amber" | "cyan"): string {
@@ -158,16 +158,16 @@ export function AboutGlobalPresence() {
             return (
               <div
                 key={o.id}
-                className="flex flex-1 flex-col gap-1"
+                className="flex flex-1 flex-col gap-2"
                 style={{
-                  padding: "18px 22px",
+                  padding: "20px 24px",
                   borderRight:
                     i < OFFICES.length - 1
                       ? "1px solid rgba(255,255,255,0.07)"
                       : "none",
                 }}
               >
-                {/* Dot + city */}
+                {/* Role — heading with dot */}
                 <div className="flex items-center gap-2">
                   <span
                     style={{
@@ -183,35 +183,33 @@ export function AboutGlobalPresence() {
                   <p
                     className="font-display"
                     style={{
-                      fontSize: "13px",
+                      fontSize: "15px",
                       fontWeight: 700,
                       color: "#fff",
                       lineHeight: 1.2,
                     }}
                   >
-                    {o.city}
+                    {o.role}
                   </p>
                 </div>
 
-                {/* Role */}
+                {/* City */}
                 <p
                   style={{
-                    fontSize: "10px",
-                    fontWeight: 600,
-                    color: c,
+                    fontSize: "13px",
+                    fontWeight: 500,
+                    color: "rgba(255,255,255,0.7)",
                     fontFamily: "var(--font-sans)",
-                    letterSpacing: "0.09em",
-                    textTransform: "uppercase",
                     paddingLeft: "16px",
                   }}
                 >
-                  {o.role}
+                  {o.city}
                 </p>
 
                 {/* Address */}
                 <p
                   style={{
-                    fontSize: "11px",
+                    fontSize: "12px",
                     fontWeight: 400,
                     color: "rgba(255,255,255,0.45)",
                     fontFamily: "var(--font-sans)",

@@ -74,12 +74,6 @@ export function NewsDetailHero({
           <DetailHeroMetaSeparator />
 
           <div className="flex items-center gap-2">
-            <span
-              className="text-body-lg font-medium leading-[1.3] text-white whitespace-nowrap"
-              style={{ letterSpacing: "-0.01em" }}
-            >
-              Share
-            </span>
             <div className="flex items-center gap-2">
               <ShareIcon
                 href={`https://wa.me/?text=${encodedTitle}%20${encodedUrl}`}

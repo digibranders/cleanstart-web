@@ -4,7 +4,7 @@ import { Reveal } from "@/components/ui/Reveal";
 export function AboutOurVision() {
   return (
     <section
-      className="relative overflow-hidden py-section-md"
+      className="relative overflow-hidden py-section-sm"
       style={{
         background:
           "linear-gradient(180deg, #ffffff 0%, #f3f0ff 35%, #eaf1ff 100%)",

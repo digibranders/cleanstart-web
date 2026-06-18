@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { Reveal } from "@/components/ui/Reveal";
+
 /**
  * Inner content for the Teams page CTA, rendered inside the Footer's
  * 1276×330 slot (overflow-hidden, border-radius 40px). The 3-D cube overflows
@@ -5,7 +8,10 @@
  */
 export function TeamsCTA() {
   return (
-    <div className="absolute inset-0 overflow-hidden bg-white">
+    <div
+      className="absolute inset-0 overflow-hidden"
+      style={{ background: "linear-gradient(180deg, #131E8F 0%, #471EC0 100%)" }}
+    >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -17,6 +23,7 @@ export function TeamsCTA() {
           top: "-220px",
           width: "1101px",
           height: "1101px",
+          opacity: 0.08,
         }}
         loading="lazy"
         decoding="async"
@@ -55,93 +62,155 @@ export function TeamsCTA() {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/teams/cta-cube.webp"
+        src="/images/cleanstart-platform/cta-cube-textured.webp"
         alt=""
-        className="pointer-events-none select-none absolute hidden md:block"
+        className="absolute pointer-events-none select-none hidden lg:block"
         style={{
-          left: "clamp(20px, 3vw, 50px)",
-          bottom: "-120px",
-          height: "130%",
-          width: "auto",
-         opacity: 0.75,}}
+          left: "-40px",
+          bottom: "-140px",
+          width: "260px",
+          height: "260px",
+          objectFit: "contain",
+          zIndex: 0,
+          opacity: 0.85,
+        }}
         loading="lazy"
         decoding="async"
       />
 
-      <div className="absolute inset-x-6 inset-y-0 flex flex-col items-center justify-center gap-4 text-center md:inset-auto md:left-[clamp(24px,45%,547px)] md:top-1/2 md:-translate-y-1/2 md:items-start md:text-left md:w-[min(607px,calc(100%-clamp(24px,45%,547px)-24px))]">
-        <p
-          className="font-display font-bold text-[#111]"
-          style={{
-            fontSize: "var(--cta-card-title)",
-            fontWeight: 600,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.1,
-          }}
+      <div
+        className="hidden md:flex absolute inset-0 items-center justify-center"
+        style={{
+          paddingLeft: "clamp(28px, 4vw, 64px)",
+          paddingRight: "clamp(28px, 4vw, 64px)",
+          paddingTop: "clamp(20px, 3vw, 32px)",
+          paddingBottom: "clamp(20px, 3vw, 32px)",
+        }}
+      >
+        <Reveal
+          header
+          className="flex flex-col items-center text-center"
+          style={{ gap: "clamp(12px, 1.5vw, 20px)", zIndex: 1, maxWidth: "600px" }}
         >
-          Join the Team
-        </p>
-
-        <div className="flex flex-col gap-10 items-center md:items-start">
           <p
-            className="font-sans text-[#111]/80 whitespace-normal md:whitespace-nowrap"
+            className="font-display font-bold text-white"
+            style={{
+              fontSize: "var(--cta-card-title)",
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.1,
+              textWrap: "balance",
+              margin: 0,
+            }}
+          >
+            Join the Team
+          </p>
+          <p
+            className="font-display"
             style={{
               fontSize: "var(--cta-card-desc)",
               fontWeight: 400,
               letterSpacing: "-0.02em",
               lineHeight: 1.4,
+              color: "rgba(255,255,255,0.8)",
+              margin: 0,
             }}
           >
-            Visit our career page to explore open opportunities
+            Visit our career page to explore open opportunities.
           </p>
-
-          <a
+          <Link
             href="/careers"
-            className="relative inline-flex cursor-pointer items-center justify-center gap-2 overflow-hidden font-medium text-white"
-            style={{
-              width: "136px",
-              height: "44px",
-              fontSize: "var(--fs-lead)",
-              letterSpacing: "-0.01em",
-              borderRadius: "8px",
-              background:
-                "linear-gradient(180deg, #3960F9 0%, #2B97D1 100%)",
-              boxShadow:
-                "0 0 0 1px #3960F9, 0 1px 2px -1px rgba(9,6,63,0.4), inset 0 1px 0 0 rgba(255,255,255,0.16)",
-            }}
+            className="cs-btn-glass"
+            style={
+              {
+                "--cs-btn-h": "40px",
+                "--cs-btn-px": "24px",
+                "--cs-btn-fs": "16px",
+              } as React.CSSProperties
+            }
           >
-            {/* Bottom-center white glow */}
-            <span
-              aria-hidden
-              className="pointer-events-none select-none absolute"
-              style={{
-                width: "30.07px",
-                height: "30.07px",
-                left: "calc(50% - 30.07px/2 - 2.3px)",
-                top: "41.1px",
-                borderRadius: "50%",
-                background: "rgba(255,255,255,0.6)",
-                filter: "blur(20.0489px)",
-              }}
-            />
-            <span style={{ position: "relative", zIndex: 1 }}>Careers</span>
+            <span>Explore Careers</span>
             <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
+              className="cs-cta-arrow"
+              width="18"
+              height="18"
+              viewBox="0 0 18 18"
               fill="none"
               aria-hidden
-              style={{ position: "relative", zIndex: 1 }}
             >
               <path
-                d="M3 8h10M9 4l4 4-4 4"
+                d="M3 9h11m0 0l-4-4m4 4l-4 4"
                 stroke="currentColor"
-                strokeWidth="1.5"
+                strokeWidth="1.75"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
             </svg>
-          </a>
-        </div>
+          </Link>
+        </Reveal>
+      </div>
+
+      <div className="md:hidden absolute inset-0 flex flex-col items-center justify-center text-center px-6 py-8" style={{ gap: "16px" }}>
+        <p
+          className="relative font-display text-white"
+          style={{
+            fontSize: "var(--fs-h2)",
+            fontWeight: 600,
+            letterSpacing: "-0.04em",
+            lineHeight: 1.1,
+            margin: 0,
+            zIndex: 1,
+            maxWidth: "297px",
+          }}
+        >
+          Join the Team
+        </p>
+        <p
+          className="relative font-sans"
+          style={{
+            fontSize: "var(--fs-body-sm)",
+            fontWeight: 400,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.5,
+            color: "rgba(255,255,255,0.8)",
+            margin: 0,
+            zIndex: 1,
+            maxWidth: "257px",
+          }}
+        >
+          Visit our career page to explore open opportunities.
+        </p>
+        <Link
+          href="/careers"
+          className="cs-btn-glass relative w-full justify-center"
+          style={
+            {
+              "--cs-btn-h": "42px",
+              "--cs-btn-px": "24px",
+              "--cs-btn-fs": "14px",
+              maxWidth: "296px",
+              zIndex: 1,
+            } as React.CSSProperties
+          }
+        >
+          <span>Explore Careers</span>
+          <svg
+            className="cs-cta-arrow"
+            width="18"
+            height="18"
+            viewBox="0 0 18 18"
+            fill="none"
+            aria-hidden
+          >
+            <path
+              d="M3 9h11m0 0l-4-4m4 4l-4 4"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </Link>
       </div>
     </div>
   );

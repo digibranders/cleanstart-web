@@ -12,6 +12,13 @@ interface Office {
 
 const OFFICES: Office[] = [
   {
+    flag: "/images/contact/flags/flag-us.webp",
+    flagAlt: "United States flag",
+    name: "North America (HQ)",
+    address:
+      "CleanStart Security Inc. 16192 Coastal Highway, Lewes, Delaware 19958, County Of Sussex",
+  },
+  {
     flag: "/images/contact/flags/flag-sg.webp",
     flagAlt: "Singapore flag",
     name: "Singapore",
@@ -30,13 +37,6 @@ const OFFICES: Office[] = [
     name: "India (Ahmedabad)",
     address:
       "Block C, 9th floor Navratna Business Park, NR Sindhu Bhavan Rd, opp. Gtpl House, Bodakdev, Ahmedabad, Gujarat 380059",
-  },
-  {
-    flag: "/images/contact/flags/flag-us.webp",
-    flagAlt: "United States flag",
-    name: "North America (HQ)",
-    address:
-      "CleanStart Security Inc. 16192 Coastal Highway, Lewes, Delaware 19958, County Of Sussex",
   },
 ];
 

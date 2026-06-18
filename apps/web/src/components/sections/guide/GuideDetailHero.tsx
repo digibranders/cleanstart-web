@@ -1,4 +1,5 @@
-import { formatGuideDate, guidePickImageUrl } from "@/lib/guides";
+import Link from "next/link";
+import { formatGuideDate } from "@/lib/guides";
 import type { GuideAuthor, GuideImage } from "@/lib/guides";
 import { DetailHero, DetailHeroMetaSeparator } from "@/components/sections/_shared/DetailHero";
 import { CalendarIcon, ClockIcon } from "@/components/sections/_shared/DetailHeroIcons";
@@ -54,67 +55,56 @@ export function GuideDetailHero({
           <div className="basis-full lg:hidden flex flex-col items-stretch w-full gap-[10px]">
             {primaryAuthor && (
               <div className="flex items-center justify-center gap-[7px]">
-                {primaryAuthor.photo ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={guidePickImageUrl(primaryAuthor.photo, ["thumb", "card", "hero"])}
-                    alt={primaryAuthor.name}
-                    className="rounded-full object-cover shrink-0"
-                    style={{ width: "28px", height: "28px", display: "block" }}
-                  />
-                ) : (
-                  <div
-                    className="rounded-full bg-gradient-to-br from-[#9A51FF] to-[#2CC1EB] shrink-0"
-                    style={{ width: "28px", height: "28px" }}
-                    aria-hidden
-                  />
-                )}
                 <span className="text-white whitespace-nowrap text-sm font-medium leading-[1.3]">
-                  By {primaryAuthor.name}
+                  {"By "}
+                  {primaryAuthor.slug ? (
+                    <Link
+                      href={`/author/${primaryAuthor.slug}`}
+                      className="hover:underline underline-offset-2"
+                    >
+                      {primaryAuthor.name}
+                    </Link>
+                  ) : (
+                    primaryAuthor.name
+                  )}
                 </span>
               </div>
             )}
 
             {(readingMinutes != null || publishedAt) && (
-              <div className="flex items-center justify-between w-full">
-                {readingMinutes != null ? (
+              <div className="flex items-center justify-center gap-[10px]">
+                {readingMinutes != null && (
                   <div className="flex items-center gap-[6px] text-white">
                     <ClockIcon />
                     <span className="whitespace-nowrap text-sm font-normal leading-none tracking-[-0.02em]">
                       {readingMinutes} min read
                     </span>
                   </div>
-                ) : <span aria-hidden />}
+                )}
 
-                {publishedAt ? (
+                {readingMinutes != null && publishedAt && (
+                  <span
+                    aria-hidden
+                    className="shrink-0 rounded-full"
+                    style={{ width: "3px", height: "3px", background: "rgba(255,255,255,0.5)", display: "inline-block" }}
+                  />
+                )}
+
+                {publishedAt && (
                   <div className="flex items-center gap-[6px] text-white">
                     <CalendarIcon />
-                    <span className="whitespace-nowrap leading-none tracking-[-0.02em]">
-                      <span
-                        className="text-xs font-normal"
-                        style={{ color: "rgba(255,255,255,0.65)" }}
-                      >
-                        {showUpdated && updatedAt ? "Updated" : "Published"}
-                      </span>{" "}
-                      <time
-                        dateTime={showUpdated && updatedAt ? updatedAt : publishedAt}
-                        className="text-white text-sm font-normal"
-                      >
-                        {formatGuideDate(showUpdated && updatedAt ? updatedAt : publishedAt)}
-                      </time>
-                    </span>
+                    <time
+                      dateTime={showUpdated && updatedAt ? updatedAt : publishedAt}
+                      className="text-white text-sm font-normal whitespace-nowrap leading-none tracking-[-0.02em]"
+                    >
+                      {formatGuideDate(showUpdated && updatedAt ? updatedAt : publishedAt)}
+                    </time>
                   </div>
-                ) : <span aria-hidden />}
+                )}
               </div>
             )}
 
             <div className="flex items-center justify-center gap-3 mt-1">
-              <span
-                className="font-sans text-white whitespace-nowrap"
-                style={{ fontSize: "var(--fs-body-sm)", fontWeight: 500, opacity: 0.85 }}
-              >
-                Share
-              </span>
               <ShareIconLink
                 href={`https://wa.me/?text=${encodedTitle}%20${encodedUrl}`}
                 label="Share on WhatsApp"
@@ -155,24 +145,19 @@ export function GuideDetailHero({
           {readingMinutes != null && (primaryAuthor ?? publishedAt) && <DetailHeroMetaSeparator />}
 
           {primaryAuthor && (
-            <div className="hidden lg:flex items-center gap-[7px] shrink-0">
-              {primaryAuthor.photo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={guidePickImageUrl(primaryAuthor.photo, ["thumb", "card", "hero"])}
-                  alt={primaryAuthor.name}
-                  className="rounded-full object-cover shrink-0"
-                  style={{ width: "32px", height: "32px", display: "block" }}
-                />
-              ) : (
-                <div
-                  className="rounded-full bg-gradient-to-br from-[#9A51FF] to-[#2CC1EB] shrink-0"
-                  style={{ width: "32px", height: "32px" }}
-                  aria-hidden
-                />
-              )}
-              <span className="text-white whitespace-nowrap font-normal leading-[1.3]" style={{ fontSize: "var(--fs-body)" }}>
-                By {primaryAuthor.name}
+            <div className="hidden lg:flex items-center gap-[7px] shrink-0 text-white">
+              <span className="whitespace-nowrap font-normal leading-[1.3]" style={{ fontSize: "var(--fs-body)" }}>
+                {"By "}
+                {primaryAuthor.slug ? (
+                  <Link
+                    href={`/author/${primaryAuthor.slug}`}
+                    className="hover:underline underline-offset-2"
+                  >
+                    {primaryAuthor.name}
+                  </Link>
+                ) : (
+                  primaryAuthor.name
+                )}
               </span>
             </div>
           )}

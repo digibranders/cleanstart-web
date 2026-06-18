@@ -4,7 +4,6 @@ import { FadeUp } from "@/components/ui/FadeUp";
 import { TeamsHero } from "@/components/sections/teams/TeamsHero";
 import { TeamsLeadership } from "@/components/sections/teams/TeamsLeadership";
 import { TeamsHustleSquad } from "@/components/sections/teams/TeamsHustleSquad";
-import { TeamsInsiders } from "@/components/sections/teams/TeamsInsiders";
 import { TeamsHowWeWork } from "@/components/sections/teams/TeamsHowWeWork";
 import { TeamsCTA } from "@/components/sections/teams/TeamsCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
@@ -41,10 +40,6 @@ export default function TeamsPage() {
 
         <FadeUp>
           <TeamsHustleSquad />
-        </FadeUp>
-
-        <FadeUp>
-          <TeamsInsiders />
         </FadeUp>
 
         <FadeUp>
