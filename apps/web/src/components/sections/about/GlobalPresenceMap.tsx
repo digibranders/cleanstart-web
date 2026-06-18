@@ -166,10 +166,6 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
         style={{ width: "100%", height: "auto" }}
       >
         <defs>
-          {/* Dark ocean background — rounded to soften edges */}
-          <clipPath id="map-clip">
-            <rect x={0} y={0} width={1100} height={500} rx={18} ry={18} />
-          </clipPath>
           {/* Amber glow filter */}
           <filter id="glow-amber" x="-80%" y="-80%" width="260%" height="260%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
@@ -188,45 +184,27 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
-          {/* Land glow filter */}
-          <filter id="land-glow" x="-5%" y="-5%" width="110%" height="110%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
         </defs>
 
-        {/* Ocean — very dark rect clipped to soft rounded rect */}
-        <rect
-          x={0} y={0} width={1100} height={500}
-          rx={18} ry={18}
-          fill="#07102e"
-          opacity={0.72}
-        />
-
-        {/* Land masses — brighter blue-indigo with subtle glow */}
-        <g filter="url(#land-glow)">
-          <Geographies geography={GEO_URL}>
-            {({ geographies }) =>
-              geographies.map((geo) => (
-                <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
-                  fill="#2952c8"
-                  stroke="#3d66e0"
-                  strokeWidth={0.4}
-                  style={{
-                    default: { outline: "none" },
-                    hover: { outline: "none" },
-                    pressed: { outline: "none" },
-                  }}
-                />
-              ))
-            }
-          </Geographies>
-        </g>
+        {/* Land masses */}
+        <Geographies geography={GEO_URL}>
+          {({ geographies }) =>
+            geographies.map((geo) => (
+              <Geography
+                key={geo.rsmKey}
+                geography={geo}
+                fill="#2952c8"
+                stroke="#3d66e0"
+                strokeWidth={0.4}
+                style={{
+                  default: { outline: "none" },
+                  hover: { outline: "none" },
+                  pressed: { outline: "none" },
+                }}
+              />
+            ))
+          }
+        </Geographies>
 
         {/* Curved dotted arcs — rendered inside ComposableMap so projection works */}
         <ConnectionArcs offices={offices} />

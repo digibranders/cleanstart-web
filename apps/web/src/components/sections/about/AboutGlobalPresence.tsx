@@ -49,8 +49,6 @@ const OFFICES: Office[] = [
   },
 ];
 
-const GUIDE_LINES_X = [323, 726, 759, 1164, 1195, 1599] as const;
-
 const CYAN = "#2cc1eb";
 const AMBER = "#f59e0b";
 
@@ -99,10 +97,7 @@ export function AboutGlobalPresence() {
   return (
     <section
       className="relative w-full overflow-hidden"
-      style={{
-        background:
-          "linear-gradient(180deg, #151021 0%, #131e8f 62.497%, #471ec0 100%)",
-      }}
+      style={{ background: "#07102e" }}
     >
       {/* ── Decorative ellipse blobs ─────────────────────────────────────── */}
       {[130.75, 1306.73].map((leftPx) => (
@@ -149,20 +144,6 @@ export function AboutGlobalPresence() {
         />
       ))}
 
-      {/* ── Vertical guide lines ─────────────────────────────────────────── */}
-      {GUIDE_LINES_X.map((x) => (
-        <div
-          key={x}
-          aria-hidden
-          className="pointer-events-none absolute top-[180px] hidden h-[1335px] w-px lg:block"
-          style={{
-            left: `calc(${x}px / 1920 * 100%)`,
-            opacity: 0.9,
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0) 13.67%, #ffffff 39.101%, rgba(255,255,255,0) 64.532%)",
-          }}
-        />
-      ))}
 
       {/* ── Content ──────────────────────────────────────────────────────── */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[48px] pb-16">
