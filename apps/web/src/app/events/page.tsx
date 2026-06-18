@@ -16,6 +16,11 @@ import {
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
+// Re-render hourly so the upcoming/past split and country data stay fresh
+// without requiring a new deploy. On-demand revalidation (CMS afterChange hook
+// on the Events collection) handles instant updates when an event is published.
+export const revalidate = 3600;
+
 const TITLE = "Events";
 const DESCRIPTION =
   "Explore CleanStart's past and upcoming events including DevOps, DevSecOps, and cybersecurity conferences, summits, and meetups across India and beyond.";
