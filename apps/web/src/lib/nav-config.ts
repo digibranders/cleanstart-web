@@ -97,7 +97,7 @@ export const NAV_TREE: NavItem[] = [
     label: "Solutions",
     tagline: "FIPS compliance, vulnerability remediation, minimal attack surface.",
     accent: "green",
-    width: 860,
+    width: 760,
     groups: [
       {
         title: "Capability",

@@ -1636,6 +1636,53 @@ body {
   .cs-sec-sheen { display: none !important; }
 }
 
+/* ───────────────────────────────────────────────────────────────────────────
+   Clean Libraries — "Built Into Your Workflow" motion.
+   Only the featured Clean Library card carries a softly pulsing accent glow
+   ring; the dotted accent arrows stream continuously. Both run only while the
+   section is on-screen (.wf-anim) and honor reduced-motion. The featured card's
+   accent drives the ring colour through its per-card --accent custom prop.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Glow ring — the featured (Clean Library) card only. */
+.wf-card[data-featured="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.4;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent) 38%, transparent),
+    0 16px 44px -34px var(--accent);
+}
+.wf-anim .wf-card[data-featured="true"]::after {
+  animation: wf-ring-pulse 3.2s ease-in-out infinite;
+}
+@keyframes wf-ring-pulse {
+  0%, 100% { opacity: 0.28; }
+  50% { opacity: 0.55; }
+}
+
+/* Flowing dotted arrow track — colour inherits the connector's accent. */
+.wf-arrow-track {
+  width: 18px;
+  height: 2px;
+  border-radius: 1px;
+  opacity: 0.7;
+  background-image: repeating-linear-gradient(90deg, currentColor 0 2px, transparent 2px 6px);
+}
+.wf-arrow svg { opacity: 0.8; }
+.wf-anim .wf-arrow-track { animation: wf-dots 0.6s linear infinite; }
+@keyframes wf-dots {
+  to { background-position: 6px 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wf-card[data-featured="true"]::after { animation: none !important; }
+  .wf-arrow-track { animation: none !important; }
+}
+
 /* FAQ answer drawer — kept minimal; height + opacity are driven by inline
    styles in the React component for reliable transition behavior across
    browsers. Per Google Core Web Vitals, the resulting section growth

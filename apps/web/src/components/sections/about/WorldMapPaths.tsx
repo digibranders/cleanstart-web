@@ -13,14 +13,30 @@
  * All four points verified inside their respective landmass paths.
  */
 
-export function WorldMapPaths() {
+interface WorldMapPathsProps {
+  fill?: string;
+  stroke?: string;
+  strokeWidth?: number;
+  filter?: string;
+  opacity?: number;
+}
+
+export function WorldMapPaths({
+  fill = "rgba(44,193,235,0.09)",
+  stroke = "rgba(44,193,235,0.22)",
+  strokeWidth = 0.8,
+  filter,
+  opacity,
+}: WorldMapPathsProps) {
   return (
     <g
-      fill="rgba(44,193,235,0.09)"
-      stroke="rgba(44,193,235,0.22)"
-      strokeWidth={0.8}
+      fill={fill}
+      stroke={stroke}
+      strokeWidth={strokeWidth}
       strokeLinejoin="round"
       strokeLinecap="round"
+      filter={filter}
+      opacity={opacity}
     >
       {/* ── North America + Central America ─────────────────────────────── */}
       <path d="M 42,66 L 75,51 L 194,46 L 264,43 L 311,69 L 353,95 L 322,118 L 306,118 L 306,123 L 292,130 L 289,141 L 275,166 L 258,153 L 231,164 L 256,176 L 244,189 L 286,207 L 208,182 L 194,171 L 156,133 L 156,110 L 144,102 L 117,79 L 78,82 L 50,84 Z" />

@@ -100,7 +100,7 @@ export function SbomReportWindow(): React.ReactElement {
 
       {/* Body — line numbers + syntax-coloured SPDX text. Long lines clip; a
           bottom fade implies the document continues. */}
-      <div style={{ position: "relative", padding: "16px 0 18px" }}>
+      <div style={{ position: "relative", padding: "16px 0 32px" }}>
         <div
           style={{
             fontFamily: "var(--font-mono)",
@@ -125,6 +125,9 @@ export function SbomReportWindow(): React.ReactElement {
               </span>
               <span style={{ minWidth: 0 }}>
                 <LineTokens line={line} />
+                {i === LINES.length - 1 && (
+                  <span className="cs-sbom-cursor" aria-hidden />
+                )}
               </span>
             </div>
           ))}

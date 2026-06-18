@@ -187,9 +187,9 @@ export function PartnersTestimonials() {
                     className="text-[#250800]"
                     style={{
                       fontFamily: "var(--font-sans)",
-                      fontSize: "var(--fs-lead)",
+                      fontSize: "var(--fs-body)",
                       fontWeight: 500,
-                      lineHeight: 1.5,
+                      lineHeight: 1.6,
                       letterSpacing: "-0.02em",
                     }}
                   >
