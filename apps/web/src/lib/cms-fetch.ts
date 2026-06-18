@@ -119,7 +119,14 @@ export async function fetchCMS<T>(path: string, options: CmsFetchOptions = {}): 
   // restarts. Without the 5xx retry, one transient blip fails an entire
   // static build. Non-transient statuses (4xx, 500) surface immediately.
   const RETRYABLE_STATUS = new Set([502, 503, 504]);
-  const MAX_ATTEMPTS = 5;
+  // Retry only outside local dev. In production / build the single CMS droplet
+  // briefly refuses connections or 502s under prerender load, so 5 attempts
+  // with backoff (~6 s) is the right resilience trade. In `next dev`, a refused
+  // connection means "the local CMS isn't running" — not transient — so the
+  // same backoff would stall EVERY page ~6 s per failed fetch (the Header alone
+  // fans out 5×). Fail fast there; the page renders immediately with empty CMS
+  // data, and the dev just starts the CMS when they need it.
+  const MAX_ATTEMPTS = process.env.NODE_ENV === 'development' ? 1 : 5;
   // Exponential backoff with jitter: ~0.4s, 0.8s, 1.6s, 3.2s between tries.
   // Long enough to ride out a single CMS droplet briefly saturating under the
   // build's prerender burst, short enough not to stall a healthy request.
