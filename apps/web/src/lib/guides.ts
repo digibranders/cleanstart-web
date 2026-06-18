@@ -62,11 +62,28 @@ export async function getGuides({
   const params = new URLSearchParams({
     "where[_status][equals]": "published",
     "where[publishedAt][exists]": "true",
-    depth: "2",
+    // depth=1 + a card-field whitelist. depth=2 with no select pulled every
+    // guide's full Lexical `body` (guides run 8–13 MB each) — a single listing
+    // page ballooned past 80 MB / 12 s, far over Next's 2 MB data-cache ceiling,
+    // so it was never cached and re-fetched on every request (the ~6 s /guide
+    // load). Cards only read these fields.
+    depth: "1",
     limit: String(limit),
     page: String(page),
     sort: "-publishedAt",
   });
+  for (const field of [
+    "title",
+    "slug",
+    "abstract",
+    "heroImage",
+    "publishedAt",
+    "updatedAt",
+    "readingMinutes",
+    "seo",
+  ]) {
+    params.set(`select[${field}]`, "true");
+  }
   if (search) params.set("where[title][contains]", search);
   return fetchCMS<PayloadListResponse<Guide>>(`/api/guides?${params.toString()}`);
 }

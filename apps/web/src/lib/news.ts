@@ -99,11 +99,29 @@ export async function getNews({
   const params = new URLSearchParams({
     "where[_status][equals]": "published",
     "where[publicationDate][exists]": "true",
-    depth: "2",
+    // depth=1 + card-field whitelist — excludes the Lexical `body` and the
+    // depth-2 relationship chains the listing never renders, keeping the
+    // response small enough to stay in Next's data cache (see getGuides/getBlogs).
+    depth: "1",
     limit: String(limit),
     page: String(page),
     sort: "-publicationDate",
   });
+  for (const field of [
+    "title",
+    "slug",
+    "abstract",
+    "heroImage",
+    "publicationDate",
+    "updatedAt",
+    "newsCategories",
+    "publisher",
+    "publisherLogo",
+    "region",
+    "seo",
+  ]) {
+    params.set(`select[${field}]`, "true");
+  }
   if (category) {
     params.set("where[newsCategories.slug][in][0]", category);
   }
