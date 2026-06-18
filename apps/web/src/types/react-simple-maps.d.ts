@@ -52,9 +52,16 @@ declare module "react-simple-maps" {
     children?: ReactNode;
   }
 
+  interface MapContextType {
+    projection: (coords: [number, number]) => [number, number] | null;
+    width: number;
+    height: number;
+  }
+
   export function ComposableMap(props: ComposableMapProps): JSX.Element;
   export function Geographies(props: GeographiesProps): JSX.Element;
   export function Geography(props: GeographyProps): JSX.Element;
   export function Marker(props: MarkerProps): JSX.Element;
   export function Line(props: LineProps): JSX.Element;
+  export function useMapContext(): MapContextType;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { ComposableMap, Geographies, Geography, Marker, Line } from "react-simple-maps";
+import { ComposableMap, Geographies, Geography, Marker, useMapContext } from "react-simple-maps";
 import Image from "next/image";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -33,7 +33,7 @@ const PIN_FILL: Record<"amber" | "cyan", string> = {
   cyan: "#2CC1EB",
 };
 
-// Staggered pulse delays — deterministic to avoid hydration mismatch
+// Staggered pulse delays — deterministic, no hydration mismatch
 const PULSE_DELAY: Record<LocationId, string> = {
   hq: "0s",
   ahmedabad: "0.7s",
@@ -41,30 +41,103 @@ const PULSE_DELAY: Record<LocationId, string> = {
   singapore: "0.35s",
 };
 
-// Country centroid labels — only for the 3 countries with offices
+// Country centroid labels — only office countries
 const COUNTRY_LABELS: { name: string; coords: [number, number] }[] = [
   { name: "UNITED STATES", coords: [-97, 40] },
   { name: "INDIA", coords: [80, 22] },
-  { name: "SINGAPORE", coords: [103.8, 3.0] },
+  { name: "SINGAPORE", coords: [103.8, 3.4] },
 ];
 
-function buildConnections(
-  offices: Office[],
-): { from: [number, number]; to: [number, number]; key: string }[] {
-  const hq = offices.find((o) => o.id === "hq");
-  if (!hq) return [];
-  const lines: { from: [number, number]; to: [number, number]; key: string }[] = [];
-  for (const o of offices) {
-    if (o.id !== "hq") {
-      lines.push({ from: hq.coordinates, to: o.coordinates, key: `hq-${o.id}` });
-    }
-  }
-  const ahm = offices.find((o) => o.id === "ahmedabad");
-  const ben = offices.find((o) => o.id === "bengaluru");
-  if (ahm && ben) {
-    lines.push({ from: ahm.coordinates, to: ben.coordinates, key: "ahm-ben" });
-  }
-  return lines;
+// Connection pairs:
+// HQ → each offshore office, India cities ↔ each other, Bengaluru → Singapore
+const CONNECTION_PAIRS: [LocationId, LocationId][] = [
+  ["hq", "ahmedabad"],
+  ["hq", "bengaluru"],
+  ["hq", "singapore"],
+  ["ahmedabad", "bengaluru"],
+  ["bengaluru", "singapore"],
+];
+
+// ─── Curved arc (quadratic Bezier) using the map projection ──────────────────
+
+interface CurvedArcProps {
+  from: [number, number];
+  to: [number, number];
+  stroke?: string;
+  strokeWidth?: number;
+  strokeDasharray?: string;
+  opacity?: number;
+}
+
+function CurvedArc({
+  from,
+  to,
+  stroke = "rgba(44,193,235,0.45)",
+  strokeWidth = 1,
+  strokeDasharray = "4 5",
+  opacity = 1,
+}: CurvedArcProps) {
+  // useMapContext provides the d3-geo projection function
+  const ctx = useMapContext() as {
+    projection: (c: [number, number]) => [number, number] | null;
+  };
+
+  const p1 = ctx.projection(from);
+  const p2 = ctx.projection(to);
+  if (!p1 || !p2) return null;
+
+  const [x1, y1] = p1;
+  const [x2, y2] = p2;
+
+  // Control point: mid-chord raised proportionally to chord length
+  const mx = (x1 + x2) / 2;
+  const my = (y1 + y2) / 2;
+  const dist = Math.hypot(x2 - x1, y2 - y1);
+  const lift = Math.max(28, dist * 0.28);
+  // Perpendicular direction (always arc "above" / toward north on screen)
+  const cy = my - lift;
+
+  return (
+    <path
+      d={`M ${x1},${y1} Q ${mx},${cy} ${x2},${y2}`}
+      stroke={stroke}
+      strokeWidth={strokeWidth}
+      strokeDasharray={strokeDasharray}
+      strokeLinecap="round"
+      fill="none"
+      opacity={opacity}
+    />
+  );
+}
+
+// ─── All arcs — rendered inside ComposableMap so useMapContext works ──────────
+
+function ConnectionArcs({ offices }: { offices: Office[] }) {
+  const byId = Object.fromEntries(offices.map((o) => [o.id, o])) as Record<
+    LocationId,
+    Office
+  >;
+
+  return (
+    <>
+      {CONNECTION_PAIRS.map(([a, b]) => {
+        const oA = byId[a];
+        const oB = byId[b];
+        if (!oA || !oB) return null;
+        // Use a slightly different opacity for the short India-India arc
+        const isShort = a === "ahmedabad" && b === "bengaluru";
+        return (
+          <CurvedArc
+            key={`${a}-${b}`}
+            from={oA.coordinates}
+            to={oB.coordinates}
+            stroke={isShort ? "rgba(44,193,235,0.30)" : "rgba(44,193,235,0.45)"}
+            opacity={isShort ? 0.8 : 1}
+          />
+        );
+      })}
+    </>
+  );
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -73,15 +146,10 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
   const [hoveredOffice, setHoveredOffice] = useState<Office | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
 
-  const connections = buildConnections(offices);
-
-  const handleEnter = useCallback(
-    (office: Office, e: React.MouseEvent) => {
-      setHoveredOffice(office);
-      setTooltipPos({ x: e.clientX, y: e.clientY });
-    },
-    [],
-  );
+  const handleEnter = useCallback((office: Office, e: React.MouseEvent) => {
+    setHoveredOffice(office);
+    setTooltipPos({ x: e.clientX, y: e.clientY });
+  }, []);
 
   const handleLeave = useCallback(() => {
     setHoveredOffice(null);
@@ -98,59 +166,72 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
         style={{ width: "100%", height: "auto" }}
       >
         <defs>
-          {/* Glow filters for each dot colour */}
+          {/* Dark ocean background — rounded to soften edges */}
+          <clipPath id="map-clip">
+            <rect x={0} y={0} width={1100} height={500} rx={18} ry={18} />
+          </clipPath>
+          {/* Amber glow filter */}
           <filter id="glow-amber" x="-80%" y="-80%" width="260%" height="260%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
+          {/* Cyan glow filter */}
           <filter id="glow-cyan" x="-80%" y="-80%" width="260%" height="260%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          {/* Land glow filter */}
+          <filter id="land-glow" x="-5%" y="-5%" width="110%" height="110%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur" />
+            <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
         </defs>
 
-        {/* Land masses — dark indigo, slightly lighter than the section bg */}
-        <Geographies geography={GEO_URL}>
-          {({ geographies }) =>
-            geographies.map((geo) => (
-              <Geography
-                key={geo.rsmKey}
-                geography={geo}
-                fill="#1c2d82"
-                stroke="#2a3ea0"
-                strokeWidth={0.35}
-                style={{
-                  default: { outline: "none" },
-                  hover: { outline: "none" },
-                  pressed: { outline: "none" },
-                }}
-              />
-            ))
-          }
-        </Geographies>
+        {/* Ocean — very dark rect clipped to soft rounded rect */}
+        <rect
+          x={0} y={0} width={1100} height={500}
+          rx={18} ry={18}
+          fill="#07102e"
+          opacity={0.72}
+        />
 
-        {/* Connection arcs between HQ and each office (+ Ahmedabad–Bengaluru) */}
-        {connections.map(({ from, to, key }) => (
-          <Line
-            key={key}
-            from={from}
-            to={to}
-            stroke="rgba(44,193,235,0.28)"
-            strokeWidth={1}
-            strokeDasharray="3 5"
-            strokeLinecap="round"
-          />
-        ))}
+        {/* Land masses — brighter blue-indigo with subtle glow */}
+        <g filter="url(#land-glow)">
+          <Geographies geography={GEO_URL}>
+            {({ geographies }) =>
+              geographies.map((geo) => (
+                <Geography
+                  key={geo.rsmKey}
+                  geography={geo}
+                  fill="#2952c8"
+                  stroke="#3d66e0"
+                  strokeWidth={0.4}
+                  style={{
+                    default: { outline: "none" },
+                    hover: { outline: "none" },
+                    pressed: { outline: "none" },
+                  }}
+                />
+              ))
+            }
+          </Geographies>
+        </g>
 
-        {/* Country name labels — SVG text, no tile font dependency */}
+        {/* Curved dotted arcs — rendered inside ComposableMap so projection works */}
+        <ConnectionArcs offices={offices} />
+
+        {/* Country name labels */}
         {COUNTRY_LABELS.map(({ name, coords }) => (
           <Marker key={name} coordinates={coords}>
             <text
@@ -159,7 +240,7 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
                 fontSize: 7,
                 fontWeight: 700,
                 letterSpacing: "0.1em",
-                fill: "rgba(255,255,255,0.28)",
+                fill: "rgba(255,255,255,0.32)",
                 pointerEvents: "none",
                 userSelect: "none",
               }}
@@ -182,7 +263,7 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
               onMouseLeave={handleLeave}
               style={{ cursor: "pointer" }}
             >
-              {/* Outermost pulse ring — animated */}
+              {/* Outer pulse ring */}
               <circle
                 r={22}
                 fill="none"
@@ -191,7 +272,7 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
                 className="gp-svg-pulse"
                 style={{ animationDelay: PULSE_DELAY[office.id] }}
               />
-              {/* Secondary ring */}
+              {/* Secondary pulse ring */}
               <circle
                 r={14}
                 fill="none"
@@ -199,13 +280,13 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
                 strokeWidth={0.8}
                 className="gp-svg-pulse"
                 style={{
-                  animationDelay: `calc(${PULSE_DELAY[office.id]} + 0.4s)`,
-                  animationDuration: "2s",
+                  animationDelay: `calc(${PULSE_DELAY[office.id]} + 0.5s)`,
+                  animationDuration: "2.1s",
                 }}
               />
               {/* Static halo disc */}
-              <circle r={8} fill={`${fill}22`} stroke={fill} strokeWidth={0.6} opacity={0.7} />
-              {/* Core dot */}
+              <circle r={8} fill={`${fill}20`} stroke={fill} strokeWidth={0.7} opacity={0.75} />
+              {/* Core dot with glow */}
               <circle
                 r={isHovered ? 5.5 : 4}
                 fill={fill}
@@ -232,7 +313,8 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
             borderRadius: 14,
             border: "1px solid rgba(255,255,255,0.1)",
             overflow: "hidden",
-            boxShadow: "0 24px 64px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.04) inset",
+            boxShadow:
+              "0 24px 64px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.04) inset",
             zIndex: 9999,
             pointerEvents: "none",
           }}
@@ -283,7 +365,14 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
           </div>
           {/* Address */}
           <div style={{ padding: "10px 12px 13px" }}>
-            <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.5)", lineHeight: 1.6 }}>
+            <p
+              style={{
+                margin: 0,
+                fontSize: 11,
+                color: "rgba(255,255,255,0.5)",
+                lineHeight: 1.6,
+              }}
+            >
               {hoveredOffice.address}
             </p>
             <p
