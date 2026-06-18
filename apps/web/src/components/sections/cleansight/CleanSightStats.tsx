@@ -204,11 +204,12 @@ export function CleanSightStats(): React.ReactElement {
               <p
                 style={{
                   fontFamily: "var(--font-sans)",
-                  fontSize: "var(--fs-h3)",
+                  fontSize: s.labelSize,
                   fontWeight: 500,
-                  letterSpacing: "-0.02em",
+                  letterSpacing: s.labelTracking,
                   lineHeight: 1.3,
                   opacity: 0.9,
+                  whiteSpace: "nowrap",
                 }}
               >
                 {s.label}
