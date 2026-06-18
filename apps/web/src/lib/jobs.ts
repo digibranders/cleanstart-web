@@ -128,11 +128,30 @@ export async function getJobs({
 }: GetJobsArgs = {}): Promise<PayloadListResponse<Job>> {
   const params = new URLSearchParams({
     "where[_status][equals]": "published",
-    depth: "2",
+    // depth=1 + card-field whitelist. depth=2 with no select pulled every job's
+    // full Lexical `body` + nested location chains (~723 KB / ~2 s); the cards
+    // only read these fields. Filters use server-side `where` clauses, so the
+    // filtered relationships don't need selecting.
+    depth: "1",
     limit: String(limit),
     page: String(page),
     sort: "-updatedAt",
   });
+  for (const field of [
+    "title",
+    "slug",
+    "department",
+    "employmentType",
+    "hiringStatus",
+    "experienceRange",
+    "experienceLevel",
+    "locations",
+    "country",
+    "seo",
+    "updatedAt",
+  ]) {
+    params.set(`select[${field}]`, "true");
+  }
   if (status === "open") {
     params.set("where[hiringStatus][equals]", "open");
   } else if (status === "closed") {

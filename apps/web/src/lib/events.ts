@@ -69,6 +69,28 @@ export {
 const PUBLISHED_FILTER =
   "where[_status][equals]=published&where[publishedAt][exists]=true";
 
+// Card-field whitelist for the events listing — excludes the Lexical `body`
+// and depth-2 relationship chains the cards never render, keeping the response
+// in Next's data cache (see getGuides/getBlogs).
+const EVENT_CARD_SELECT_FIELDS = [
+  "title",
+  "slug",
+  "heroImage",
+  "startsAt",
+  "endsAt",
+  "venue",
+  "country",
+  "timezone",
+  "customDateLabel",
+  "eventStatus",
+  "registrationMode",
+  "seo",
+] as const;
+
+const applyEventCardSelect = (params: URLSearchParams): void => {
+  for (const field of EVENT_CARD_SELECT_FIELDS) params.set(`select[${field}]`, "true");
+};
+
 export async function getUpcomingEvents({
   limit = 1,
 }: { limit?: number } = {}): Promise<EventsListResponse> {
@@ -78,10 +100,11 @@ export async function getUpcomingEvents({
     "where[publishedAt][exists]": "true",
     "where[startsAt][greater_than]": nowIso,
     "where[eventStatus][not_equals]": "cancelled",
-    depth: "2",
+    depth: "1",
     limit: String(limit),
     sort: "startsAt",
   });
+  applyEventCardSelect(params);
   return fetchCMS<EventsListResponse>(`/api/events?${params.toString()}`);
 }
 
@@ -103,11 +126,12 @@ export async function getPastEvents({
     "where[_status][equals]": "published",
     "where[publishedAt][exists]": "true",
     "where[startsAt][less_than_equal]": nowIso,
-    depth: "2",
+    depth: "1",
     limit: String(limit),
     page: String(page),
     sort: "-startsAt",
   });
+  applyEventCardSelect(params);
   if (country) params.set("where[country][equals]", country);
   if (year) {
     // Year window intersects the existing `<= now` past-events constraint,
