@@ -41,6 +41,14 @@ const PIN_FILL: Record<"amber" | "cyan", string> = {
   cyan: "#2CC1EB",
 };
 
+// HTML-based country labels rendered via Marker — avoids tile glyph font dependency.
+// Positioned at each country's geographic centre (not the office city).
+const OFFICE_COUNTRY_LABELS: { name: string; coordinates: [number, number] }[] = [
+  { name: "United States", coordinates: [-98.0, 39.5] },
+  { name: "India", coordinates: [80.0, 22.5] },
+  { name: "Singapore", coordinates: [103.8, 1.35] },
+];
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
@@ -95,6 +103,27 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
     setTooltipPos(null);
   }, []);
 
+  // Hide every country label that the Liberty tile style renders, then overlay
+  // our own labels so only office countries are visible.
+  const handleMapLoad = useCallback(() => {
+    const map = mapRef.current?.getMap();
+    if (!map) return;
+    const style = map.getStyle();
+    if (!style?.layers) return;
+    for (const layer of style.layers) {
+      if (layer.type !== "symbol") continue;
+      const id = layer.id.toLowerCase();
+      if (
+        id.includes("country") ||
+        id.includes("state-label") ||
+        id.includes("place-state") ||
+        id.includes("place-country")
+      ) {
+        map.setLayoutProperty(layer.id, "visibility", "none");
+      }
+    }
+  }, []);
+
   return (
     /* Outer wrapper — position:relative so the fixed tooltip aligns correctly */
     <div className="relative" ref={containerRef}>
@@ -119,8 +148,37 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
           attributionControl={false}
           doubleClickZoom={false}
           scrollZoom={false}
+          onLoad={handleMapLoad}
         >
           <NavigationControl position="top-right" visualizePitch />
+
+          {/* Country name labels — HTML Markers so they don't depend on tile fonts */}
+          {!activeId &&
+            OFFICE_COUNTRY_LABELS.map((label) => (
+              <Marker
+                key={label.name}
+                longitude={label.coordinates[0]}
+                latitude={label.coordinates[1]}
+                anchor="center"
+              >
+                <span
+                  style={{
+                    fontSize: "10px",
+                    fontWeight: 700,
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "#444",
+                    textShadow:
+                      "0 0 3px #fff, 0 0 5px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff",
+                    pointerEvents: "none",
+                    userSelect: "none",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {label.name}
+                </span>
+              </Marker>
+            ))}
 
           {offices.map((office) => {
             const fill = PIN_FILL[office.color];
