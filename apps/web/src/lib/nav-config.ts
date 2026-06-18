@@ -97,27 +97,11 @@ export const NAV_TREE: NavItem[] = [
     label: "Solutions",
     tagline: "FIPS compliance, vulnerability remediation, minimal attack surface.",
     accent: "green",
+    width: 1000,
     groups: [
       {
+        title: "Capability",
         items: [
-          {
-            label: "CleanStart Platform",
-            href: "/cleanstart-platform",
-            description: "AI-native trust architecture, source to runtime.",
-            icon: "network",
-          },
-          {
-            label: "FIPS Compliance",
-            href: "/fips",
-            description: "Drop-in FIPS 140-3 validated crypto.",
-            icon: "shield-check",
-          },
-          {
-            label: "Verifiable SBOMs",
-            href: "/software-bill-materials",
-            description: "Signed SBOMs. Provenance for every artifact.",
-            icon: "doc-signed",
-          },
           {
             label: "Vulnerability Remediation",
             href: "/vulnerability-remediation",
@@ -132,15 +116,25 @@ export const NAV_TREE: NavItem[] = [
           },
         ],
       },
-    ],
-  },
-  {
-    kind: "mega",
-    label: "Audience",
-    tagline: "Built for the people who ship and the people who sign off.",
-    accent: "purple",
-    groups: [
       {
+        title: "Compliance",
+        items: [
+          {
+            label: "FIPS Compliance",
+            href: "/fips",
+            description: "Drop-in FIPS 140-3 validated crypto.",
+            icon: "shield-check",
+          },
+          {
+            label: "Verifiable SBOMs",
+            href: "/software-bill-materials",
+            description: "Signed SBOMs. Provenance for every artifact.",
+            icon: "doc-signed",
+          },
+        ],
+      },
+      {
+        title: "By role",
         items: [
           {
             label: "For Developers",
@@ -157,7 +151,6 @@ export const NAV_TREE: NavItem[] = [
         ],
       },
     ],
-    width: 640,
   },
   {
     kind: "mega",

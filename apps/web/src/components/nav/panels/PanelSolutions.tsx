@@ -1,8 +1,9 @@
-import { PanelRow } from "@/components/nav/pieces/PanelRow";
+import Link from "next/link";
+import { NavIcon } from "@/components/nav/icons/NavIcon";
 import { PanelShell } from "@/components/nav/panels/PanelShell";
 import { HeroTile } from "@/components/nav/pieces/HeroTile";
 import { ComplianceProof } from "@/components/nav/pieces/ComplianceProof";
-import { CopyableCommand } from "@/components/nav/pieces/CopyableCommand";
+import type { NavGroup } from "@/lib/nav-config";
 import type { NavMegaItem } from "@/lib/nav-config";
 
 type Props = { item: NavMegaItem };
@@ -10,40 +11,60 @@ type Props = { item: NavMegaItem };
 // Brand-family atmosphere for Solutions: a low cyan-teal wash in the top-right.
 const ATMOSPHERE = "rgba(44, 193, 235, 0.05)";
 
+// Grouped, label-only columns (Capability / Compliance / By role). Descriptions
+// live in nav-config for the mobile sheet; the desktop panel stays scannable and
+// lets the group header + featured tile carry the narrative — same grammar as the
+// Resources BrowseColumn.
+function GroupColumn({ group }: { group: NavGroup }) {
+  return (
+    <div>
+      {group.title && (
+        <div className="mb-1.5 px-2 text-[9px] font-bold uppercase tracking-[0.14em] text-white/45">
+          {group.title}
+        </div>
+      )}
+      <div className="flex flex-col">
+        {group.items.map((leaf) =>
+          leaf.built === false ? null : (
+            <Link
+              key={leaf.label}
+              href={leaf.href}
+              className="flex items-center gap-2.5 rounded-[6px] px-2 py-1.5 text-[13px] font-medium text-white/90 transition-colors hover:bg-white/[0.035]"
+            >
+              <NavIcon
+                id={leaf.icon ?? "shield-check"}
+                size={14}
+                className="cs-nav-glyph"
+              />
+              {leaf.label}
+            </Link>
+          ),
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function PanelSolutions({ item }: Props) {
-  const solutions = item.groups[0]?.items ?? [];
   return (
     <PanelShell
-      width={item.width ?? 760}
+      width={item.width ?? 1000}
       eyebrow={item.label}
       tagline={item.tagline}
       atmosphere={ATMOSPHERE}
     >
-      <div className="grid grid-cols-[1.3fr_1fr] gap-3.5">
-        <div className="flex flex-col gap-0.5">
-          {solutions.map((s) => (
-            <PanelRow
-              key={s.label}
-              href={s.href}
-              label={s.label}
-              {...(s.description ? { description: s.description } : {})}
-              icon={s.icon ?? "shield-check"}
-              built={s.built !== false}
-            />
-          ))}
-        </div>
+      <div className="grid grid-cols-[repeat(3,minmax(0,1fr))_minmax(0,1.15fr)] gap-4">
+        {item.groups.map((group, gi) => (
+          <GroupColumn key={group.title ?? gi} group={group} />
+        ))}
 
         <HeroTile
           headline="FIPS, drop-in."
-          sub="Validated crypto, no code change. Inherit compliance from the base."
           ctaLabel="Inherit FIPS compliance"
           ctaHref="/fips"
-          minHeight={262}
+          minHeight={0}
         >
           <ComplianceProof />
-          <div className="mt-3">
-            <CopyableCommand command="$ docker pull cleanstart/python-fips" />
-          </div>
         </HeroTile>
       </div>
     </PanelShell>
