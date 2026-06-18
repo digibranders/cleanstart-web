@@ -94,6 +94,19 @@ const nextConfig: NextConfig = {
   },
   images: {
     formats: ["image/avif", "image/webp"],
+    // Cache optimized image variants for 1 year at Vercel's edge. The default
+    // is 60 seconds, which means every cold visitor re-triggers full
+    // optimization (fetch source → resize → encode AVIF/WebP). Guide cover
+    // images are 1200×630 OG-image-generator PNGs — expensive to re-optimize.
+    // With a 1-year TTL, optimization runs once per source URL and the result
+    // is served from the edge cache on every subsequent request.
+    minimumCacheTTL: 31_536_000,
+    // Add 384 px between the default 256 (imageSizes) and 640 (deviceSizes)
+    // steps. Guide cards render at max 300 px wide; without this, the optimizer
+    // serves the next-available 640 px variant — 2× the needed bytes.
+    // 384 covers 300 px at 1.28× (fine for most screens) and 2× retina at 192
+    // device-pixel-ratio, while 640 covers the 2× case for the next breakpoint.
+    deviceSizes: [384, 640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     remotePatterns: [
       {
         // Payload CMS media — local dev
