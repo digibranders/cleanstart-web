@@ -136,9 +136,9 @@ function ValidationSpotlight(): React.ReactElement | null {
               <blockquote
                 className="relative font-display"
                 style={{
-                  fontSize: "var(--fs-h3)",
+                  fontSize: "var(--fs-lead)",
                   fontWeight: 600,
-                  lineHeight: 1.45,
+                  lineHeight: 1.5,
                   letterSpacing: "-0.02em",
                   color: "rgba(255,255,255,0.96)",
                   textWrap: "balance",

@@ -86,6 +86,20 @@ function NavButton({
 
 function CompanyMark({ t }: { t: Testimonial }) {
   if (t.logoSrc) {
+    if (t.logoSrc.endsWith(".svg")) {
+      return (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={t.logoSrc}
+          alt={t.company}
+          width={210}
+          height={42}
+          loading="lazy"
+          decoding="async"
+          className="h-[42px] w-auto object-contain"
+        />
+      );
+    }
     return (
       <Image
         src={t.logoSrc}

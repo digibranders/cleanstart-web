@@ -180,6 +180,26 @@ interface LexicalCodeBlockNode {
   };
 }
 
+/**
+ * Payload `UploadFeature` node — a block-level image referencing a Media doc by
+ * id. `value` is the numeric Media id (Postgres adapter); `fields` carries the
+ * per-placement UploadFeature fields (alt/alignment/size). Only emitted when an
+ * image resolver maps the `<img src>` to an uploaded Media doc; otherwise the
+ * converter falls back to alt text (its prior behavior).
+ */
+interface LexicalUploadNode {
+  readonly type: 'upload';
+  readonly version: 3;
+  readonly format: '';
+  readonly relationTo: 'media';
+  readonly value: number | string;
+  readonly fields: {
+    readonly alt?: string;
+    readonly alignment: 'center';
+    readonly size: 'large';
+  };
+}
+
 type LexicalBlockNode =
   | LexicalParagraphNode
   | LexicalHeadingNode
@@ -188,6 +208,7 @@ type LexicalBlockNode =
   | LexicalHorizontalRuleNode
   | LexicalTableNode
   | LexicalCodeBlockNode
+  | LexicalUploadNode
   | InlineCtaBlockNode;
 
 export interface LexicalRoot {
@@ -233,6 +254,39 @@ const textNode = (text: string, format = 0): LexicalTextNode => ({
 const linebreakNode = (): LexicalLinebreakNode => ({ type: 'linebreak', version: 1 });
 
 /**
+ * Elements whose text content is markup, not prose — they must be dropped
+ * entirely, never harvested as body text. A Webflow rich-text field can carry
+ * an embedded `<style>` block (custom CSS for HTML embeds); without this the
+ * CSS rules leak into the body as a visible paragraph.
+ */
+const DROP_TAGS = new Set([
+  'style',
+  'script',
+  'noscript',
+  'template',
+  'head',
+  'link',
+  'meta',
+  'title',
+]);
+
+/**
+ * Resolves a Webflow `<img src>` to an uploaded Media doc. Provided by the
+ * caller (e.g. the body-image backfill, which uploads each image to R2 first).
+ * Returns `null` for an image that hasn't been uploaded — the converter then
+ * falls back to alt text, exactly as it behaved before image support.
+ */
+export type ImageResolver = (
+  src: string,
+) => { id: number | string; alt?: string } | null;
+
+// Module-scoped so the recursive block/inline walkers can read it without
+// threading an extra arg through every call. Safe because `htmlToLexical` runs
+// fully synchronously (no `await` between set and reset) — set on entry,
+// cleared in `finally`.
+let activeImageResolver: ImageResolver | null = null;
+
+/**
  * Collect inline children from an element, applying the cumulative
  * format bitmask through nested inline marks.
  */
@@ -253,6 +307,7 @@ const collectInline = (
     }
     if (!isElement(n)) continue;
     const tag = n.tagName ?? n.nodeName;
+    if (DROP_TAGS.has(tag)) continue;
     switch (tag) {
       case 'br':
         out.push(linebreakNode());
@@ -510,6 +565,18 @@ const codeBlock = (language: string, content: string): LexicalCodeBlockNode => (
   },
 });
 
+const uploadNode = (
+  value: number | string,
+  alt: string | undefined,
+): LexicalUploadNode => ({
+  type: 'upload',
+  version: 3,
+  format: '',
+  relationTo: 'media',
+  value,
+  fields: { ...(alt ? { alt } : {}), alignment: 'center', size: 'large' },
+});
+
 /** Heading tag clamp: h5/h6 fall back to h4 (editor only enables h1–h4). */
 const headingTag = (raw: string): 'h1' | 'h2' | 'h3' | 'h4' => {
   if (raw === 'h1' || raw === 'h2' || raw === 'h3' || raw === 'h4') return raw;
@@ -540,6 +607,7 @@ const collectTableRows = (parent: ParseElement, columnHeaders: boolean): Lexical
  */
 const convertBlock = (el: ParseElement): LexicalBlockNode[] => {
   const tag = el.tagName ?? el.nodeName;
+  if (DROP_TAGS.has(tag)) return [];
   switch (tag) {
     case 'p': {
       const inline = trimEdges(collectInline(el.childNodes, 0));
@@ -648,6 +716,16 @@ const convertBlock = (el: ParseElement): LexicalBlockNode[] => {
       if (content.trim().length === 0) return [];
       return [codeBlock(resolveLanguage(langAttr), content)];
     }
+    case 'img': {
+      const src = getAttr(el, 'src');
+      const alt = getAttr(el, 'alt');
+      const resolved = src ? activeImageResolver?.(src) : null;
+      if (resolved) return [uploadNode(resolved.id, alt ?? resolved.alt)];
+      // No uploaded Media for this image → keep the alt text as a paragraph so
+      // the descriptive content survives (prior behavior).
+      if (alt && alt.trim().length > 0) return [paragraph([textNode(alt, 0)])];
+      return [];
+    }
     default: {
       // Anything else: treat as paragraph fallback if it has inline
       // text, otherwise drop.
@@ -674,9 +752,21 @@ const EMPTY_ROOT: LexicalRoot = {
  * Returns the empty root shape for null/empty inputs so callers can
  * assign it unconditionally to a richText field.
  */
-export const htmlToLexical = (html: unknown): LexicalRoot => {
+export const htmlToLexical = (
+  html: unknown,
+  opts: { resolveImage?: ImageResolver } = {},
+): LexicalRoot => {
   if (typeof html !== 'string' || html.trim().length === 0) return EMPTY_ROOT;
 
+  activeImageResolver = opts.resolveImage ?? null;
+  try {
+    return convertFragment(html);
+  } finally {
+    activeImageResolver = null;
+  }
+};
+
+const convertFragment = (html: string): LexicalRoot => {
   const fragment = parseFragment(html) as { childNodes?: ParseNode[] };
   const children: LexicalBlockNode[] = [];
 
@@ -708,6 +798,7 @@ export const htmlToLexical = (html: unknown): LexicalRoot => {
     'article',
     'pre',
     'table',
+    'img',
   ]);
 
   for (const node of fragment.childNodes ?? []) {

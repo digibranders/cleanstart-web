@@ -2,15 +2,14 @@ import type React from "react";
 import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 
 /*
- * "Built for Enterprise Environments" — four feature cards in a row on xl,
- * stacked on mobile, with corner Union + ellipse decorations.
+ * "Continuous Control" — four feature cards.
+ * Breakpoints: 1-col mobile → 2×2 tablet (sm) → 4-col desktop (lg).
  */
 
 interface CardDef {
   icon: string;
   title: string;
   desc: string;
-  titleSize: number;
 }
 
 const CARDS: CardDef[] = [
@@ -18,44 +17,44 @@ const CARDS: CardDef[] = [
     icon: "/images/ciso/enterprise-icon-cloud.svg",
     title: "Exposure Visibility",
     desc: "Continuously identify inherited software risk.",
-    titleSize: 32,
   },
   {
     icon: "/images/ciso/enterprise-icon-devsecops.svg",
     title: "Provenance Verification",
     desc: "Validate software origin, integrity, and ownership.",
-    titleSize: 32,
   },
   {
     icon: "/images/ciso/enterprise-icon-compliance.svg",
     title: "Policy Governance",
     desc: "Enforce software security and compliance policies.",
-    titleSize: 32,
   },
   {
     icon: "/images/ciso/enterprise-icon-security-ops.svg",
     title: "Verified Remediation",
     desc: "Reduce inherited risk with verified alternatives.",
-    titleSize: 32,
   },
 ];
 
-function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactElement {
+function EnterpriseCard({ icon, title, desc }: CardDef): React.ReactElement {
   return (
-    <div className="relative flex-shrink-0" style={{ width: "295px", height: "300px" }}>
-      {/* Outer cyan glow — creates the border halo effect. */}
+    <div className="relative w-full h-full" style={{ borderRadius: "40px", padding: "4px" }}>
+      {/* Outer cyan glow border */}
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none"
         style={{ borderRadius: "40px", background: "#2cc1eb", opacity: 0.3 }}
       />
 
-      {/* Inner white card — 4px inset on each side. */}
+      {/* Inner white card — flex col so text is always at the bottom */}
       <div
-        className="absolute overflow-hidden bg-white"
-        style={{ inset: "4px", borderRadius: "36px" }}
+        className="relative overflow-hidden bg-white flex flex-col h-full"
+        style={{
+          borderRadius: "36px",
+          padding: "clamp(20px, 2vw, 28px)",
+          minHeight: "clamp(240px, 18vw, 300px)",
+        }}
       >
-        {/* Purple blur at top */}
+        {/* Purple blur decoration */}
         <div
           aria-hidden
           className="absolute pointer-events-none"
@@ -63,7 +62,7 @@ function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactE
             top: "28px",
             left: "50%",
             transform: "translateX(-50%)",
-            width: "263px",
+            width: "80%",
             height: "153px",
             background: "#df9bff",
             filter: "blur(66.5px)",
@@ -71,7 +70,7 @@ function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactE
           }}
         />
 
-        {/* Horizontal grid lines. */}
+        {/* Horizontal grid lines */}
         {([68, 184] as const).map((y) => (
           <div
             key={y}
@@ -87,7 +86,7 @@ function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactE
           />
         ))}
 
-        {/* Vertical accent lines. */}
+        {/* Vertical accent lines */}
         {([48.47, 120.03, 162.38, 233.94] as const).map((x) => (
           <div
             key={x}
@@ -105,14 +104,12 @@ function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactE
           />
         ))}
 
-        {/* Blue gradient ball — left-aligned with the text block below. */}
+        {/* Blue gradient ball */}
         <div
-          className="absolute flex items-center justify-center overflow-hidden"
+          className="relative flex items-center justify-center overflow-hidden flex-shrink-0"
           style={{
-            left: "24px",
-            top: "33px",
-            width: "96px",
-            height: "96px",
+            width: "clamp(72px, 6vw, 96px)",
+            height: "clamp(72px, 6vw, 96px)",
             borderRadius: "50%",
             background: "linear-gradient(180deg, #239cff 0%, #005be3 100%)",
             boxShadow:
@@ -124,24 +121,24 @@ function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactE
             src={icon}
             alt=""
             aria-hidden
-            style={{ width: "54px", height: "54px", objectFit: "contain" }}
+            style={{ width: "56%", height: "56%", objectFit: "contain" }}
             loading="lazy"
             decoding="async"
           />
         </div>
 
-        {/* Text block. */}
+        {/* Text — mt-auto pushes it to the card bottom */}
         <div
-          className="absolute flex flex-col"
-          style={{ top: "152px", left: "24px", width: "251px", gap: "12px" }}
+          className="relative mt-auto flex flex-col"
+          style={{ paddingTop: "16px", gap: "10px" }}
         >
           <h3
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: `${titleSize}px`,
+              fontSize: "clamp(20px, 1.8vw, 32px)",
               fontWeight: 700,
               letterSpacing: "-0.05em",
-              lineHeight: 1,
+              lineHeight: 1.05,
               color: "#111",
               margin: 0,
             }}
@@ -153,7 +150,7 @@ function EnterpriseCard({ icon, title, desc, titleSize }: CardDef): React.ReactE
               fontFamily: "var(--font-sans)",
               fontSize: "var(--fs-body)",
               fontWeight: 400,
-              letterSpacing: "-0.05em",
+              letterSpacing: "-0.02em",
               lineHeight: 1.4,
               color: "#555",
               margin: 0,
@@ -246,8 +243,8 @@ export function CisoEnterprise(): React.ReactElement {
         </div>
       </div>
 
-      {/* Heading — padded container so text has safe margins. */}
       <div className="relative mx-auto px-6 sm:px-10" style={{ maxWidth: "1276px" }}>
+        {/* Heading */}
         <Reveal header>
           <h2
             className="text-center mx-auto"
@@ -259,7 +256,7 @@ export function CisoEnterprise(): React.ReactElement {
               letterSpacing: "-0.05em",
               lineHeight: 1,
               color: "#111",
-              marginBottom: "74px",
+              marginBottom: "clamp(40px, 5vw, 74px)",
             }}
           >
             Continuous Control Across the{" "}
@@ -276,126 +273,15 @@ export function CisoEnterprise(): React.ReactElement {
             </span>
           </h2>
         </Reveal>
-      </div>
 
-      {/* Card container — no horizontal padding so the 4 cards + gaps fill the
-          1276px width exactly. */}
-      <div className="relative mx-auto" style={{ maxWidth: "1276px" }}>
-
-        {/* DESKTOP — 4 cards in a centred flex row. */}
-        <RevealStagger
-          className="hidden xl:flex items-start justify-center"
-          style={{ gap: "32px" }}
-        >
+        {/* Responsive grid: 1-col → 2×2 tablet → 4-col desktop */}
+        <RevealStagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {CARDS.map((card) => (
             <RevealItem key={card.title}>
               <EnterpriseCard {...card} />
             </RevealItem>
           ))}
         </RevealStagger>
-
-        {/* MOBILE — single-column stack. */}
-        <div className="xl:hidden flex flex-col gap-4 px-4">
-          {CARDS.map((card) => (
-            <div
-              key={card.title}
-              className="relative flex-shrink-0"
-              style={{ height: "238px" }}
-            >
-              {/* Outer cyan glow border */}
-              <div
-                aria-hidden
-                className="absolute inset-0 pointer-events-none"
-                style={{ borderRadius: "40px", background: "#2cc1eb", opacity: 0.3 }}
-              />
-              {/* Inner white card — 6px inset. */}
-              <div
-                className="absolute overflow-hidden bg-white"
-                style={{ inset: "6px", borderRadius: "34px" }}
-              >
-                {/* Purple blur at top */}
-                <div
-                  aria-hidden
-                  className="absolute pointer-events-none"
-                  style={{
-                    top: "16px",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    width: "180px",
-                    height: "100px",
-                    background: "#df9bff",
-                    filter: "blur(50px)",
-                    opacity: 0.3,
-                  }}
-                />
-
-                {/* Blue gradient ball — centered near the top. */}
-                <div
-                  className="absolute flex items-center justify-center overflow-hidden"
-                  style={{
-                    left: "50%",
-                    top: "20px",
-                    transform: "translateX(-50%)",
-                    width: "70px",
-                    height: "70px",
-                    borderRadius: "50%",
-                    background: "linear-gradient(180deg, #239cff 0%, #005be3 100%)",
-                    boxShadow:
-                      "0px 4.5px 10.6px 0px rgba(28,60,142,0.33), inset 0px -0.17px 0.21px 0px rgba(0,44,179,0.5), inset 0px 0.085px 0.425px 0px rgba(255,255,255,0.81)",
-                  }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={card.icon}
-                    alt=""
-                    aria-hidden
-                    style={{ width: "40px", height: "40px", objectFit: "contain" }}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </div>
-
-                {/* Text block — centered. */}
-                <div
-                  className="absolute flex flex-col items-center text-center"
-                  style={{
-                    top: "108px",
-                    left: "16px",
-                    right: "16px",
-                    gap: "10px",
-                  }}
-                >
-                  <h3
-                    style={{
-                      fontFamily: "var(--font-display)",
-                      fontSize: `${card.titleSize > 30 ? 20 : 18}px`,
-                      fontWeight: 700,
-                      letterSpacing: "-0.05em",
-                      lineHeight: 1.1,
-                      color: "#111",
-                      margin: 0,
-                    }}
-                  >
-                    {card.title}
-                  </h3>
-                  <p
-                    style={{
-                      fontFamily: "var(--font-sans)",
-                      fontSize: "var(--fs-body-sm)",
-                      fontWeight: 400,
-                      letterSpacing: "-0.03em",
-                      lineHeight: 1.4,
-                      color: "#555",
-                      margin: 0,
-                    }}
-                  >
-                    {card.desc}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
     </section>
   );

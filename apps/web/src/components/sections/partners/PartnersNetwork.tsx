@@ -45,12 +45,33 @@ const PARTNERS: Record<Region, Partner[]> = {
   ],
   Europe: [
     { name: "NGIT", country: "Nordics", logo: "/images/partners/global/ngit.webp" },
+    {
+      name: "Mactech Consultants",
+      country: "London, UK",
+      logo: "/images/partners/global/MactechProperties_logo.png",
+    },
   ],
   "Middle East": [
     {
       name: "Surakshate",
       country: "UAE",
       logo: "/images/partners/global/surakshate.webp",
+      invertOnLight: true,
+    },
+    {
+      name: "Help AG",
+      country: "Dubai, UAE",
+      logo: "/images/partners/global/help-ag-logo-2048x603.png",
+    },
+    {
+      name: "Syscort",
+      country: "UAE",
+      logo: "/images/partners/global/logo_syscort-300x85.png",
+    },
+    {
+      name: "Sandbox Security",
+      country: "Saudi Arabia",
+      logo: "/images/partners/global/sandbox-security.png",
       invertOnLight: true,
     },
   ],

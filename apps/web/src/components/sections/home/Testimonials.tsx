@@ -59,6 +59,14 @@ export const HOME_TESTIMONIALS: Testimonial[] = [
       "Standardizing on verified container foundations gave us confidence in the base of every service we deploy and allowed us to shift security much earlier in the build process.",
     caseStudyHref: "https://cdn.cleanstart.com/case-studies/aurascape-case-study.pdf",
   },
+  {
+    name: "Ankit Agarwal",
+    role: "VP, Coforge",
+    company: "Coforge",
+    logoSrc: "/images/testimonials/coforge-logo.svg",
+    quote:
+      "Open-source security has become a critical business need. The biggest challenge is not adoption, but ensuring software components are verified, trusted, and secure before deployment. With CleanStart, organizations can embrace innovation confidently while maintaining strong security controls across the software supply chain.",
+  },
 ];
 
 const AUTO_ADVANCE_MS = 7000;
@@ -719,6 +727,19 @@ function CompanyMark({
   if (logoSrc) {
     const h = small ? 18 : 24;
     const maxW = small ? 80 : 110;
+    const style: React.CSSProperties = {
+      height: h,
+      maxWidth: maxW,
+      width: "auto",
+      objectFit: "contain",
+      opacity: 1,
+    };
+    if (logoSrc.endsWith(".svg")) {
+      return (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={logoSrc} alt={company} width={maxW} height={h} loading="lazy" decoding="async" style={style} />
+      );
+    }
     return (
       <Image
         src={logoSrc}
@@ -726,13 +747,7 @@ function CompanyMark({
         width={maxW}
         height={h}
         sizes="110px"
-        style={{
-          height: h,
-          maxWidth: maxW,
-          width: "auto",
-          objectFit: "contain",
-          opacity: 1,
-        }}
+        style={style}
       />
     );
   }
