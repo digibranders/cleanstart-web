@@ -4,6 +4,7 @@ import {
   getAutoJourneyTargets,
   getBlogBySlug,
   getBlogBySlugDraft,
+  getBlogSlugs,
   getRelatedBlogs,
   mediaUrl,
 } from "@/lib/blog";
@@ -31,6 +32,23 @@ import {
 
 interface BlogDetailPageProps {
   params: Promise<{ slug: string }>;
+}
+
+// Slugs not returned here still render on first request, then cache (ISR).
+export const dynamicParams = true;
+
+/**
+ * Pre-render every published blog at build time so navigation is a static
+ * cache hit instead of a live CMS render. A build-time CMS outage degrades
+ * gracefully to on-demand rendering (returns []) rather than failing the build.
+ */
+export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
+  try {
+    const slugs = await getBlogSlugs();
+    return slugs.map((slug) => ({ slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: BlogDetailPageProps): Promise<Metadata> {

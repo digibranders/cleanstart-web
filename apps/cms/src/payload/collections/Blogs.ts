@@ -21,6 +21,10 @@ import {
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
 import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
+import {
+  revalidateWebAfterDeleteHook,
+  revalidateWebPublishAfterChangeHook,
+} from '../hooks/revalidate-web-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
@@ -305,8 +309,12 @@ export const Blogs: CollectionConfig = {
       searchSyncAfterChangeHook('blogs'),
       webhooksPublishAfterChangeHook('blogs'),
       indexNowPublishAfterChangeHook('blogs'),
+      revalidateWebPublishAfterChangeHook('blogs'),
     ],
-    afterDelete: [searchSyncAfterDeleteHook('blogs')],
+    afterDelete: [
+      searchSyncAfterDeleteHook('blogs'),
+      revalidateWebAfterDeleteHook('blogs'),
+    ],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

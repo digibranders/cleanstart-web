@@ -15,6 +15,7 @@ import { highlightLexical } from "@/lib/highlightLexical";
 import {
   getGuideBySlug,
   getGuideBySlugDraft,
+  getGuideSlugs,
   getRelatedGuides,
   getGuideJourneyTargets,
   guideMediaUrl,
@@ -32,6 +33,19 @@ import {
 
 interface GuideDetailPageProps {
   params: Promise<{ slug: string }>;
+}
+
+// Slugs not returned here still render on first request, then cache (ISR).
+export const dynamicParams = true;
+
+/** Pre-render every published guide; degrade to on-demand if CMS is down at build. */
+export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
+  try {
+    const slugs = await getGuideSlugs();
+    return slugs.map((slug) => ({ slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({

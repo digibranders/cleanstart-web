@@ -10,6 +10,22 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(process.cwd(), "..", ".."),
   },
+  // ISR / static-generation resilience. Content detail routes pre-render every
+  // published doc at build time (so a published page is cached from deploy and
+  // survives a later CMS outage via stale-while-revalidate). That means the
+  // build fires hundreds of CMS reads — uncapped, 13 workers overwhelm the
+  // single CMS droplet and a transient 502 fails the whole build. Cap the
+  // concurrency to a trickle the droplet can serve, and retry a page whose
+  // data fetch blips. Pairs with the 5xx retry in `lib/cms-fetch.ts`.
+  experimental: {
+    staticGenerationRetryCount: 3,
+    staticGenerationMaxConcurrency: 4,
+  },
+  // ISR pages may be served stale for up to a year while the CMS is
+  // unreachable, instead of forcing a blocking (failing) regeneration. This is
+  // the Next default; pinned here to make the "content survives CMS death"
+  // guarantee explicit and immune to a default change.
+  expireTime: 31_536_000,
   webpack: (config, { dev }) => {
     if (dev) {
       // Force polling on OneDrive/network drives where native fs events don't fire.

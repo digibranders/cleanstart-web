@@ -110,6 +110,14 @@ export function guidePickImageUrl(
 const PUBLISHED_FILTER =
   "where[_status][equals]=published&where[publishedAt][exists]=true";
 
+/** All published guide slugs, for `generateStaticParams` (scalar-only query). */
+export async function getGuideSlugs(): Promise<string[]> {
+  const res = await fetchCMS<PayloadListResponse<{ slug: string }>>(
+    `/api/guides?${PUBLISHED_FILTER}&depth=0&limit=1000&select[slug]=true`,
+  );
+  return res.docs.map((d) => d.slug).filter((s): s is string => Boolean(s));
+}
+
 // Shared loader. In draft mode the published filter is dropped so the preview
 // route can render unpublished edits (cms-fetch authenticates the draft read).
 async function loadGuideBySlug(
@@ -118,7 +126,7 @@ async function loadGuideBySlug(
 ): Promise<GuideDetail | null> {
   const filter = draft ? "" : `&${PUBLISHED_FILTER}`;
   const data = await fetchCMS<PayloadListResponse<GuideDetail>>(
-    `/api/guides?where[slug][equals]=${encodeURIComponent(slug)}${filter}&depth=3&limit=1`,
+    `/api/guides?where[slug][equals]=${encodeURIComponent(slug)}${filter}&depth=1&limit=1`,
     { draft },
   );
   const guide = data.docs[0] ?? null;
@@ -151,6 +159,14 @@ const RELATED_TARGET = 3;
 // already-picked ids has headroom without a second round-trip.
 const RELATED_FILL_OVERSHOOT = 5;
 
+// Card-only field projection for related/journey list queries. Excludes the
+// Lexical `body` — a guide body can be multiple MB, and 6 of them exceed
+// Next's 2 MB Data-Cache ceiling (the response is then never cached, so every
+// ISR regen re-fetches it). Cards only render these fields.
+const RELATED_CARD_SELECT =
+  "select[title]=true&select[slug]=true&select[heroImage]=true&select[abstract]=true&select[readingMinutes]=true";
+const JOURNEY_SELECT = "select[title]=true&select[slug]=true";
+
 /**
  * Builds the Related Guides grid: curated `relatedGuides` picks first (in
  * editor order, published-only), then site-wide fill with the most-recent
@@ -179,7 +195,7 @@ export async function getRelatedGuides(
       .map((id, i) => `where[id][in][${i}]=${encodeURIComponent(id)}`)
       .join("&");
     const data = await fetchCMS<PayloadListResponse<Guide>>(
-      `/api/guides?${filter}${idParams}&depth=2&limit=${curatedIds.length}`,
+      `/api/guides?${filter}${idParams}&depth=1&${RELATED_CARD_SELECT}&limit=${curatedIds.length}`,
       { draft },
     );
     const byId = new Map(data.docs.map((d) => [String(d.id), d]));
@@ -198,7 +214,7 @@ export async function getRelatedGuides(
   // Site-wide fill (no category stage for guides).
   const remaining = RELATED_TARGET - picked.length;
   const data = await fetchCMS<PayloadListResponse<Guide>>(
-    `/api/guides?${filter}where[id][not_equals]=${encodeURIComponent(guideId)}&depth=2&limit=${remaining + RELATED_FILL_OVERSHOOT}&sort=-publishedAt`,
+    `/api/guides?${filter}where[id][not_equals]=${encodeURIComponent(guideId)}&depth=1&${RELATED_CARD_SELECT}&limit=${remaining + RELATED_FILL_OVERSHOOT}&sort=-publishedAt`,
     { draft },
   );
   for (const doc of data.docs) {
@@ -234,11 +250,11 @@ export async function getGuideJourneyTargets(
 
   const [prev, next] = await Promise.all([
     fetchCMS<PayloadListResponse<Guide>>(
-      `/api/guides?${filter}${notSelf}&where[publishedAt][less_than]=${anchor}&depth=2&limit=1&sort=-publishedAt`,
+      `/api/guides?${filter}${notSelf}&where[publishedAt][less_than]=${anchor}&depth=1&${JOURNEY_SELECT}&limit=1&sort=-publishedAt`,
       { draft },
     ),
     fetchCMS<PayloadListResponse<Guide>>(
-      `/api/guides?${filter}${notSelf}&where[publishedAt][greater_than]=${anchor}&depth=2&limit=1&sort=publishedAt`,
+      `/api/guides?${filter}${notSelf}&where[publishedAt][greater_than]=${anchor}&depth=1&${JOURNEY_SELECT}&limit=1&sort=publishedAt`,
       { draft },
     ),
   ]);

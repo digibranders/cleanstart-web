@@ -237,14 +237,26 @@ export function pickImageUrl(
 const PUBLISHED_FILTER =
   "where[_status][equals]=published&where[publishedAt][exists]=true";
 
+/**
+ * All published blog slugs, for `generateStaticParams`. `depth=0` +
+ * `select[slug]` keeps this a tiny scalar-only query so build-time
+ * pre-rendering enumerates the route cheaply.
+ */
+export async function getBlogSlugs(): Promise<string[]> {
+  const res = await fetchCMS<PayloadListResponse<{ slug: string }>>(
+    `/api/blogs?${PUBLISHED_FILTER}&depth=0&limit=1000&select[slug]=true`,
+  );
+  return res.docs.map((d) => d.slug).filter((s): s is string => Boolean(s));
+}
+
 export async function getFeaturedBlog(): Promise<Blog | null> {
   const featured = await fetchCMS<PayloadListResponse<Blog>>(
-    `/api/blogs?${PUBLISHED_FILTER}&where[featured][equals]=true&depth=2&limit=1&sort=-publishedAt`,
+    `/api/blogs?${PUBLISHED_FILTER}&where[featured][equals]=true&depth=1&limit=1&sort=-publishedAt`,
   );
   if (featured.docs[0]) return featured.docs[0];
 
   const latest = await fetchCMS<PayloadListResponse<Blog>>(
-    `/api/blogs?${PUBLISHED_FILTER}&depth=2&limit=1&sort=-publishedAt`,
+    `/api/blogs?${PUBLISHED_FILTER}&depth=1&limit=1&sort=-publishedAt`,
   );
   return latest.docs[0] ?? null;
 }
@@ -314,8 +326,14 @@ async function loadBlogBySlug(slug: string, draft = false): Promise<BlogDetail |
   // `cms-fetch` strips it, but to keep the URL identical between modes we just
   // omit it here. Published reads still get the filter from PUBLISHED_FILTER.
   const filter = draft ? "" : `&${PUBLISHED_FILTER}`;
+  // depth=1 hydrates the blog's own upload/relationship fields one level deep
+  // (heroImage + its `sizes`, categories.name, and previous/next/relatedPosts
+  // as id-bearing docs — everything the detail page reads). depth=2/3
+  // additionally pulled each related/prev/next post's full Lexical body and
+  // nested authors, ballooning the single-doc response to ~540 KB / ~1.8 s for
+  // no rendered benefit (related + journey are re-fetched by their own queries).
   const data = await fetchCMS<PayloadListResponse<BlogDetail>>(
-    `/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}${filter}&depth=3&limit=1`,
+    `/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}${filter}&depth=1&limit=1`,
     { draft },
   );
   const post = data.docs[0] ?? null;
@@ -401,7 +419,7 @@ export async function getRelatedBlogs(
       .map((id, i) => `where[id][in][${i}]=${encodeURIComponent(id)}`)
       .join("&");
     const data = await fetchCMS<PayloadListResponse<Blog>>(
-      `/api/blogs?${filter}${idParams}&depth=2&limit=${curatedIds.length}`,
+      `/api/blogs?${filter}${idParams}&depth=1&limit=${curatedIds.length}`,
       { draft },
     );
     const byId = new Map(data.docs.map((d) => [String(d.id), d]));
@@ -425,7 +443,7 @@ export async function getRelatedBlogs(
       .join("&");
     const remaining = RELATED_TARGET - picked.length;
     const data = await fetchCMS<PayloadListResponse<Blog>>(
-      `/api/blogs?${filter}where[id][not_equals]=${encodeURIComponent(blogId)}&${catParam}&depth=2&limit=${remaining + RELATED_FILL_OVERSHOOT}&sort=-publishedAt`,
+      `/api/blogs?${filter}where[id][not_equals]=${encodeURIComponent(blogId)}&${catParam}&depth=1&limit=${remaining + RELATED_FILL_OVERSHOOT}&sort=-publishedAt`,
       { draft },
     );
     for (const doc of data.docs) {
@@ -442,7 +460,7 @@ export async function getRelatedBlogs(
   // 3. Site-wide fill.
   const remaining = RELATED_TARGET - picked.length;
   const data = await fetchCMS<PayloadListResponse<Blog>>(
-    `/api/blogs?${filter}where[id][not_equals]=${encodeURIComponent(blogId)}&depth=2&limit=${remaining + RELATED_FILL_OVERSHOOT}&sort=-publishedAt`,
+    `/api/blogs?${filter}where[id][not_equals]=${encodeURIComponent(blogId)}&depth=1&limit=${remaining + RELATED_FILL_OVERSHOOT}&sort=-publishedAt`,
     { draft },
   );
   for (const doc of data.docs) {
@@ -499,11 +517,11 @@ export async function getAutoJourneyTargets(
   if (categoryIds.length > 0) {
     const [prevCat, nextCat] = await Promise.all([
       fetchCMS<PayloadListResponse<Blog>>(
-        `/api/blogs?${filter}${notSelf}&where[publishedAt][less_than]=${anchor}${catParam}&depth=2&limit=1&sort=-publishedAt`,
+        `/api/blogs?${filter}${notSelf}&where[publishedAt][less_than]=${anchor}${catParam}&depth=1&limit=1&sort=-publishedAt`,
         { draft },
       ),
       fetchCMS<PayloadListResponse<Blog>>(
-        `/api/blogs?${filter}${notSelf}&where[publishedAt][greater_than]=${anchor}${catParam}&depth=2&limit=1&sort=publishedAt`,
+        `/api/blogs?${filter}${notSelf}&where[publishedAt][greater_than]=${anchor}${catParam}&depth=1&limit=1&sort=publishedAt`,
         { draft },
       ),
     ]);
@@ -516,7 +534,7 @@ export async function getAutoJourneyTargets(
   if (!previous) {
     fillTasks.push(
       fetchCMS<PayloadListResponse<Blog>>(
-        `/api/blogs?${filter}${notSelf}&where[publishedAt][less_than]=${anchor}&depth=2&limit=1&sort=-publishedAt`,
+        `/api/blogs?${filter}${notSelf}&where[publishedAt][less_than]=${anchor}&depth=1&limit=1&sort=-publishedAt`,
         { draft },
       ).then((d) => {
         previous = d.docs[0] ?? null;
@@ -526,7 +544,7 @@ export async function getAutoJourneyTargets(
   if (!next) {
     fillTasks.push(
       fetchCMS<PayloadListResponse<Blog>>(
-        `/api/blogs?${filter}${notSelf}&where[publishedAt][greater_than]=${anchor}&depth=2&limit=1&sort=publishedAt`,
+        `/api/blogs?${filter}${notSelf}&where[publishedAt][greater_than]=${anchor}&depth=1&limit=1&sort=publishedAt`,
         { draft },
       ).then((d) => {
         next = d.docs[0] ?? null;

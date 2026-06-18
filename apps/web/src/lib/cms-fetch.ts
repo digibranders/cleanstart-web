@@ -112,19 +112,35 @@ export async function fetchCMS<T>(path: string, options: CmsFetchOptions = {}): 
     };
   }
 
-  // Retry transient network failures (the CMS can briefly refuse connections
-  // under load — e.g. when many pages prerender at once, or during an ISR
-  // regeneration while the CMS restarts). Only `fetch()` throwing is retried;
-  // a real HTTP error status is surfaced immediately.
+  // Retry transient failures — both `fetch()` throwing (connection refused)
+  // AND transient gateway statuses (502/503/504). The CMS briefly returns
+  // these under load: when hundreds of pages prerender against the single
+  // droplet at build time, or during an ISR regeneration while the CMS
+  // restarts. Without the 5xx retry, one transient blip fails an entire
+  // static build. Non-transient statuses (4xx, 500) surface immediately.
+  const RETRYABLE_STATUS = new Set([502, 503, 504]);
+  const MAX_ATTEMPTS = 5;
+  // Exponential backoff with jitter: ~0.4s, 0.8s, 1.6s, 3.2s between tries.
+  // Long enough to ride out a single CMS droplet briefly saturating under the
+  // build's prerender burst, short enough not to stall a healthy request.
+  const backoffMs = (attempt: number): number =>
+    400 * 2 ** attempt + Math.floor(Math.random() * 200);
   let res: Response | undefined;
   let lastError: unknown;
-  for (let attempt = 0; attempt < 3; attempt += 1) {
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt += 1) {
+    const isLast = attempt === MAX_ATTEMPTS - 1;
     try {
-      res = await fetch(`${CMS_URL}${effectivePath}`, init);
+      const candidate = await fetch(`${CMS_URL}${effectivePath}`, init);
+      if (RETRYABLE_STATUS.has(candidate.status) && !isLast) {
+        lastError = new CmsFetchError(candidate.status, effectivePath);
+        await new Promise((resolve) => setTimeout(resolve, backoffMs(attempt)));
+        continue;
+      }
+      res = candidate;
       break;
     } catch (error) {
       lastError = error;
-      if (attempt < 2) await new Promise((resolve) => setTimeout(resolve, 300 * (attempt + 1)));
+      if (!isLast) await new Promise((resolve) => setTimeout(resolve, backoffMs(attempt)));
     }
   }
   if (!res) throw lastError instanceof Error ? lastError : new CmsFetchError(0, effectivePath);

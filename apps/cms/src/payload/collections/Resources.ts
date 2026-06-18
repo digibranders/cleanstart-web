@@ -23,6 +23,10 @@ import {
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
 import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
+import {
+  revalidateWebAfterDeleteHook,
+  revalidateWebPublishAfterChangeHook,
+} from '../hooks/revalidate-web-publish';
 import { normalizeLexicalHook } from '../hooks/normalize-lexical';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
@@ -167,8 +171,12 @@ export const Resources: CollectionConfig = {
       searchSyncAfterChangeHook('resources'),
       webhooksPublishAfterChangeHook('resources'),
       indexNowPublishAfterChangeHook('resources'),
+      revalidateWebPublishAfterChangeHook('resources'),
     ],
-    afterDelete: [searchSyncAfterDeleteHook('resources')],
+    afterDelete: [
+      searchSyncAfterDeleteHook('resources'),
+      revalidateWebAfterDeleteHook('resources'),
+    ],
   },
   endpoints: [resourceDownloadEndpoint, resourceTokenEndpoint],
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
