@@ -201,6 +201,40 @@ describe('htmlToLexical', () => {
     expect((block.fields as { content: string }).content).toBe('key: value');
   });
 
+  it('emits an upload node for an <img> the resolver maps to a Media doc', () => {
+    const html =
+      '<figure class="w-richtext-figure-type-image"><div><img alt="SBOM Coverage" src="https://cdn.example.com/sbom.png"></div></figure>';
+    const out = htmlToLexical(html, {
+      resolveImage: (src) => (src.includes('sbom.png') ? { id: 42 } : null),
+    });
+    const node = out.root.children[0] as {
+      type: string;
+      relationTo?: string;
+      value?: number;
+      fields?: { alt?: string; alignment?: string; size?: string };
+    };
+    expect(node.type).toBe('upload');
+    expect(node.relationTo).toBe('media');
+    expect(node.value).toBe(42);
+    expect(node.fields?.alt).toBe('SBOM Coverage');
+    expect(node.fields?.alignment).toBe('center');
+  });
+
+  it('falls back to alt-text when no resolver maps the image (prior behavior)', () => {
+    const html = '<figure><div><img alt="A diagram" src="https://cdn.example.com/x.png"></div></figure>';
+    const out = htmlToLexical(html); // no resolver
+    const json = JSON.stringify(out);
+    expect(json).not.toContain('upload');
+    expect(json).toContain('A diagram');
+  });
+
+  it('handles a top-level <img> as a block upload node', () => {
+    const out = htmlToLexical('<img alt="hero" src="https://cdn.example.com/h.png">', {
+      resolveImage: () => ({ id: 7 }),
+    });
+    expect((out.root.children[0] as { type: string }).type).toBe('upload');
+  });
+
   it('drops <style>/<script> content instead of leaking it as body text', () => {
     const json = (html: string): string => JSON.stringify(htmlToLexical(html));
 
