@@ -362,7 +362,7 @@ export function LivePostureReport() {
             className="font-display font-semibold text-white"
             style={{ fontSize: "clamp(15px, 1.5vw, 19px)", letterSpacing: "-0.02em" }}
           >
-            100% CVEs
+            CVEs
           </span>
           <span
             className="font-mono"
