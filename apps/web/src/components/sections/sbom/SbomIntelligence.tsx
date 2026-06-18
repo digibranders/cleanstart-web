@@ -4,7 +4,7 @@ const CARDS = [
   {
     id: "coverage",
     title: "Continuous Coverage",
-    body: "Continuously updated software inventories across environments.",
+    body: "Continuously updated software inventories.",
     icon: "/images/sbom/mobile-adv-1.svg",
     mobileIcon: "/images/sbom/mobile-adv-1.svg",
     mobileTitleW: 175,
@@ -13,7 +13,7 @@ const CARDS = [
   {
     id: "dependency",
     title: "Dependency Mapping",
-    body: "Track transitive and inherited software dependencies.",
+    body: "Track software dependencies and relationships.",
     icon: "/images/sbom/mobile-adv-2.svg",
     mobileIcon: "/images/sbom/mobile-adv-2.svg",
     mobileTitleW: 175,
@@ -22,7 +22,7 @@ const CARDS = [
   {
     id: "compliance",
     title: "Compliance Readiness",
-    body: "Support audit, governance, and regulatory requirements.",
+    body: "Support audit and regulatory requirements.",
     icon: "/images/sbom/mobile-adv-3.svg",
     mobileIcon: "/images/sbom/mobile-adv-3.svg",
     mobileTitleW: 175,
@@ -31,7 +31,7 @@ const CARDS = [
   {
     id: "visibility",
     title: "Supply Chain Visibility",
-    body: "Improve visibility across software components and dependencies.",
+    body: "Understand software components and origins.",
     icon: "/images/sbom/mobile-adv-4.svg",
     mobileIcon: "/images/sbom/mobile-adv-4.svg",
     mobileTitleW: 175,

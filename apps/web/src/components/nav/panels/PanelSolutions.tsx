@@ -46,6 +46,10 @@ function GroupColumn({ group }: { group: NavGroup }) {
 }
 
 export function PanelSolutions({ item }: Props) {
+  const capability = item.groups.find((g) => g.title === "Capability");
+  const compliance = item.groups.find((g) => g.title === "Compliance");
+  const byRole = item.groups.find((g) => g.title === "By role");
+
   return (
     <PanelShell
       width={item.width ?? 1000}
@@ -53,11 +57,22 @@ export function PanelSolutions({ item }: Props) {
       tagline={item.tagline}
       atmosphere={ATMOSPHERE}
     >
-      <div className="grid grid-cols-[repeat(3,minmax(0,1fr))_minmax(0,1.15fr)] gap-4">
-        {item.groups.map((group, gi) => (
-          <GroupColumn key={group.title ?? gi} group={group} />
-        ))}
+      <div className="grid grid-cols-3 gap-3">
+        {/* Col 1: Capability stacked above Compliance */}
+        <div className="flex flex-col gap-3">
+          {capability && <GroupColumn group={capability} />}
+          {compliance && (
+            <>
+              <div className="h-px bg-white/[0.05]" />
+              <GroupColumn group={compliance} />
+            </>
+          )}
+        </div>
 
+        {/* Col 2: By Role */}
+        {byRole && <GroupColumn group={byRole} />}
+
+        {/* Col 3: FIPS featured tile */}
         <HeroTile
           headline="FIPS, drop-in."
           ctaLabel="Inherit FIPS compliance"

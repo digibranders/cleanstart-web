@@ -164,7 +164,7 @@ export function PanelResources({ item, latestUpdates, spotlight }: Props) {
       tagline={item.tagline}
       atmosphere={ATMOSPHERE}
     >
-      <div className="grid grid-cols-[168px_minmax(0,1.5fr)_minmax(0,1.05fr)] gap-4">
+      <div className="grid grid-cols-[168px_minmax(0,1.5fr)_minmax(0,1.05fr)] gap-3">
         <BrowseColumn groups={item.groups} />
         <LatestUpdatesColumn items={latestUpdates} />
         <SpotlightColumn spotlight={spotlight} />

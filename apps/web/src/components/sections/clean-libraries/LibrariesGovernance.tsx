@@ -92,6 +92,31 @@ function PillarIcon({ icon }: { icon: IconKey }): React.ReactElement {
   }
 }
 
+/** Thin hairline divider — a CSS gradient line that fades at both ends, the
+ *  same approach as the Pipeline section's dividers (renders in every browser),
+ *  toned for the light section. */
+function Hairline({
+  width = 72,
+  color = "#1e293b",
+  className,
+}: {
+  width?: number;
+  color?: string;
+  className?: string;
+}): React.ReactElement {
+  return (
+    <div
+      aria-hidden
+      className={className}
+      style={{
+        width: `${width}px`,
+        height: "1.5px",
+        background: `linear-gradient(90deg, transparent 0%, ${color} 50%, transparent 100%)`,
+      }}
+    />
+  );
+}
+
 /* ---- Jigsaw geometry --------------------------------------------------- *
  * 550×554 canvas, four quadrants. Each interior seam carries one tab. To open
  * a uniform channel, every seam edge is offset by GAP/2 into its own piece and
@@ -175,7 +200,7 @@ const PAINT_ORDER = [1, 3, 2, 0] as const;
 
 function PuzzleDesktop(): React.ReactElement {
   return (
-    <div className="relative ml-auto w-full max-w-[600px]">
+    <div className="relative mx-auto w-full max-w-[560px]">
       <svg
         viewBox={`-2 -2 ${W + 4} ${H + 4}`}
         className="block h-auto w-full"
@@ -233,11 +258,7 @@ function PuzzleDesktop(): React.ReactElement {
               >
                 {card.title}
               </h3>
-              <span
-                aria-hidden
-                className="block h-[3px] w-9 rounded-full"
-                style={{ backgroundColor: card.accent }}
-              />
+              <Hairline width={56} />
               <p
                 className="max-w-[190px] font-sans text-[#555]"
                 style={{
@@ -288,11 +309,7 @@ function MobileCard({ card }: { card: GovernanceCard }): React.ReactElement {
       >
         {card.title}
       </h3>
-      <span
-        aria-hidden
-        className="block h-[3px] w-9 rounded-full"
-        style={{ backgroundColor: card.accent }}
-      />
+      <Hairline width={56} />
       <p
         className="font-sans text-[#555]"
         style={{
@@ -366,7 +383,7 @@ export function LibrariesGovernance(): React.ReactElement {
         decoding="async"
       />
       <Container className="relative">
-        <div className="grid gap-12 lg:grid-cols-[0.8fr_1.5fr] lg:items-center lg:gap-16">
+        <div className="mx-auto grid max-w-[1180px] gap-10 lg:grid-cols-[0.85fr_1fr] lg:items-center lg:gap-12">
           <Reveal>
             <div className="text-center lg:text-left">
               <h2
@@ -380,13 +397,10 @@ export function LibrariesGovernance(): React.ReactElement {
               >
                 Trusted Dependency Governance
               </h2>
-              <span
-                aria-hidden
-                className="mx-auto mt-6 block h-1 w-16 rounded-full lg:mx-0"
-                style={{
-                  background:
-                    "linear-gradient(102deg, #9a51ff 0%, #2cc1eb 100%)",
-                }}
+              <Hairline
+                width={132}
+                color="#000000"
+                className="mx-auto mt-7 lg:mx-0"
               />
               <p
                 className="mx-auto mt-6 max-w-[420px] font-sans text-[#555] lg:mx-0"
