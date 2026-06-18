@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useCallback } from "react";
-import MapGL, { Marker, NavigationControl } from "react-map-gl/maplibre";
+import MapGL, { Marker, NavigationControl, Source, Layer } from "react-map-gl/maplibre";
 import type { MapRef } from "react-map-gl/maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
 import Image from "next/image";
@@ -39,6 +39,29 @@ const INITIAL_VIEW = {
 const PIN_FILL: Record<"amber" | "cyan", string> = {
   amber: "#FBB824",
   cyan: "#2CC1EB",
+};
+
+// GeoJSON labels for the 3 countries where CleanStart has offices.
+// Positioned at each country's geographic centre (not the office city).
+const OFFICE_COUNTRY_GEOJSON = {
+  type: "FeatureCollection" as const,
+  features: [
+    {
+      type: "Feature" as const,
+      geometry: { type: "Point" as const, coordinates: [-98.0, 39.5] as [number, number] },
+      properties: { name: "United States" },
+    },
+    {
+      type: "Feature" as const,
+      geometry: { type: "Point" as const, coordinates: [80.0, 22.5] as [number, number] },
+      properties: { name: "India" },
+    },
+    {
+      type: "Feature" as const,
+      geometry: { type: "Point" as const, coordinates: [103.8, 1.35] as [number, number] },
+      properties: { name: "Singapore" },
+    },
+  ],
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -95,6 +118,27 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
     setTooltipPos(null);
   }, []);
 
+  // Hide every country label that the Liberty tile style renders, then overlay
+  // our own labels so only office countries are visible.
+  const handleMapLoad = useCallback(() => {
+    const map = mapRef.current?.getMap();
+    if (!map) return;
+    const style = map.getStyle();
+    if (!style?.layers) return;
+    for (const layer of style.layers) {
+      if (layer.type !== "symbol") continue;
+      const id = layer.id.toLowerCase();
+      if (
+        id.includes("country") ||
+        id.includes("state-label") ||
+        id.includes("place-state") ||
+        id.includes("place-country")
+      ) {
+        map.setLayoutProperty(layer.id, "visibility", "none");
+      }
+    }
+  }, []);
+
   return (
     /* Outer wrapper — position:relative so the fixed tooltip aligns correctly */
     <div className="relative" ref={containerRef}>
@@ -119,8 +163,31 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
           attributionControl={false}
           doubleClickZoom={false}
           scrollZoom={false}
+          onLoad={handleMapLoad}
         >
           <NavigationControl position="top-right" visualizePitch />
+
+          {/* Custom country labels — only for the 3 countries with offices */}
+          <Source id="office-country-labels" type="geojson" data={OFFICE_COUNTRY_GEOJSON}>
+            <Layer
+              id="office-country-names"
+              type="symbol"
+              layout={{
+                "text-field": ["get", "name"],
+                "text-font": ["Noto Sans Bold"],
+                "text-size": 11,
+                "text-letter-spacing": 0.08,
+                "text-transform": "uppercase",
+                "text-anchor": "center",
+                "text-max-width": 6,
+              }}
+              paint={{
+                "text-color": "#444444",
+                "text-halo-color": "rgba(255,255,255,0.9)",
+                "text-halo-width": 1.5,
+              }}
+            />
+          </Source>
 
           {offices.map((office) => {
             const fill = PIN_FILL[office.color];
