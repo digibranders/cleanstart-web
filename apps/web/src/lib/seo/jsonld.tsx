@@ -402,6 +402,99 @@ export function videoObjectSchema({
   };
 }
 
+export interface PodcastSeriesSchemaInput {
+  name: string;
+  description?: string | undefined;
+  path: string;
+}
+
+export function podcastSeriesSchema({ name, description, path }: PodcastSeriesSchemaInput) {
+  const url = absoluteUrl(path);
+  return {
+    "@context": "https://schema.org",
+    "@type": "PodcastSeries",
+    "@id": `${url}#series`,
+    name,
+    ...(description ? { description } : {}),
+    url,
+    publisher: { "@id": ORGANIZATION_ID },
+  };
+}
+
+export interface WebinarListItem {
+  title: string;
+  abstract?: string | null | undefined;
+  startsAt?: string | null | undefined;
+  endsAt?: string | null | undefined;
+  eventStatus: string;
+  registrationUrl?: string | null | undefined;
+}
+
+const WEBINAR_EVENT_STATUS: Record<string, string> = {
+  scheduled: "https://schema.org/EventScheduled",
+  postponed: "https://schema.org/EventPostponed",
+  cancelled: "https://schema.org/EventCancelled",
+};
+
+export function webinarListSchema(webinars: WebinarListItem[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "CleanStart Webinars",
+    url: absoluteUrl("/webinars"),
+    numberOfItems: webinars.length,
+    itemListElement: webinars.slice(0, 20).map((w, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      item: {
+        "@type": "Event",
+        name: w.title,
+        ...(w.abstract ? { description: w.abstract } : {}),
+        ...(w.startsAt ? { startDate: w.startsAt } : {}),
+        ...(w.endsAt ? { endDate: w.endsAt } : {}),
+        eventStatus: WEBINAR_EVENT_STATUS[w.eventStatus] ?? WEBINAR_EVENT_STATUS.scheduled,
+        eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
+        location: {
+          "@type": "VirtualLocation",
+          url: w.registrationUrl ?? absoluteUrl("/webinars"),
+        },
+        url: w.registrationUrl ?? absoluteUrl("/webinars"),
+        organizer: { "@id": ORGANIZATION_ID },
+      },
+    })),
+  };
+}
+
+export interface CaseStudyListItem {
+  title: string;
+  summary: string;
+  company: string;
+  publishedAt?: string | null | undefined;
+}
+
+export function caseStudyListSchema(items: CaseStudyListItem[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "CleanStart Customer Case Studies",
+    url: absoluteUrl("/case-studies"),
+    numberOfItems: items.length,
+    itemListElement: items.slice(0, 20).map((s, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      item: {
+        "@type": "Article",
+        headline: s.title,
+        description: s.summary,
+        about: s.company,
+        url: absoluteUrl("/case-studies"),
+        publisher: { "@id": ORGANIZATION_ID },
+        ...(s.publishedAt ? { datePublished: s.publishedAt } : {}),
+      },
+    })),
+  };
+}
+
 export interface ProfilePageSchemaInput {
   name: string;
   slug: string;

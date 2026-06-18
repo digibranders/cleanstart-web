@@ -11,8 +11,8 @@ import { CaseStudiesHero } from "@/components/sections/case-studies/CaseStudiesH
 import { Testimonials } from "@/components/sections/home/Testimonials";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { getCaseStudies } from "@/lib/case-studies";
-import { buildPageMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { buildListingMetadata } from "@/lib/seo/canonical";
+import { JsonLd, breadcrumbSchema, caseStudyListSchema } from "@/lib/seo/jsonld";
 
 export const revalidate = 3600;
 
@@ -20,13 +20,14 @@ const TITLE = "Case Studies";
 const DESCRIPTION =
   "Real challenges and the measurable impact CleanStart delivered. Download customer case studies across healthcare, telecom, finance, and more.";
 
-export function generateMetadata(): Metadata {
-  return buildPageMetadata({
-    title: TITLE,
-    description: DESCRIPTION,
-    path: "/case-studies",
-    eyebrow: "Resources",
-  });
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const params = await searchParams;
+  const page = Math.max(1, Number.parseInt(String(params.page ?? "1"), 10) || 1);
+  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/case-studies", eyebrow: "Resources" }, page);
 }
 
 /**
@@ -55,6 +56,19 @@ export default async function CaseStudiesPage(): Promise<React.ReactElement> {
           { name: "Case Studies" },
         ])}
       />
+      {allCaseStudies.length > 0 && (
+        <JsonLd
+          id="case-studies-list"
+          data={caseStudyListSchema(
+            allCaseStudies.map((s) => ({
+              title: s.title,
+              summary: s.summary,
+              company: s.company,
+              publishedAt: s.publishedAt,
+            })),
+          )}
+        />
+      )}
       <Header />
       <main id="main-content" style={{ background: "#f6f6f6" }}>
         <div className="relative overflow-hidden">

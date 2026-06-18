@@ -6,7 +6,7 @@ import { GuidesBrowser } from "@/components/sections/guides/GuidesBrowser";
 import { GuidesContent, selectGuides } from "@/components/sections/guides/GuidesContent";
 import { GuidesCTA } from "@/components/sections/guides/GuidesCTA";
 import { getGuides } from "@/lib/guides";
-import { buildPageMetadata } from "@/lib/seo/canonical";
+import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const revalidate = 3600;
@@ -15,13 +15,14 @@ const TITLE = "Guides";
 const DESCRIPTION =
   "A curated collection of writings, research, and solutions on container security, DevOps, and compliance.";
 
-export function generateMetadata(): Metadata {
-  return buildPageMetadata({
-    title: TITLE,
-    description: DESCRIPTION,
-    path: "/guide",
-    eyebrow: "Guide",
-  });
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const params = await searchParams;
+  const page = Math.max(1, Number.parseInt(String(params.page ?? "1"), 10) || 1);
+  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/guide", eyebrow: "Guide" }, page);
 }
 
 /**

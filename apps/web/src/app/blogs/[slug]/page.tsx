@@ -28,6 +28,7 @@ import {
   JsonLd,
   blogPostingSchema,
   breadcrumbSchema,
+  faqPageSchema,
 } from "@/lib/seo/jsonld";
 
 interface BlogDetailPageProps {
@@ -133,6 +134,7 @@ export async function renderBlogDetail({
   const nextTarget = manualNext ?? toJourneyTarget(autoJourney.next);
 
   const heroAbsolute = mediaUrl(post.heroImage?.url);
+  const faqs = (post.faqs ?? []).filter((f) => f.question && f.answer);
   const journeyLinks = [
     ...(previousTarget ? [`/blogs/${previousTarget.slug}`] : []),
     ...(nextTarget ? [`/blogs/${nextTarget.slug}`] : []),
@@ -169,6 +171,14 @@ export async function renderBlogDetail({
           relatedLinks: journeyLinks.length > 0 ? journeyLinks : undefined,
         })}
       />
+      {faqs.length > 0 ? (
+        <JsonLd
+          id={`blog-faq-${post.slug}`}
+          data={faqPageSchema(
+            faqs.map((f) => ({ question: f.question, answer: f.answer })),
+          )}
+        />
+      ) : null}
       <Header />
       <main id="main-content">
         <BlogDetailHero

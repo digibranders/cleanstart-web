@@ -165,3 +165,45 @@ export function absoluteUrl(path: string): string {
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 }
+
+interface ListingMetadataInput {
+  title: string;
+  description: string;
+  /** Clean base path, e.g. `/blogs` — no trailing slash, no query string. */
+  basePath: string;
+  eyebrow?: string | undefined;
+  variant?: OgVariant | undefined;
+}
+
+/**
+ * Metadata for paginated listing pages. Rules:
+ *   page 1 (or absent) → canonical = basePath, fully indexed
+ *   pages 2–5          → self-canonical with ?page=N, fully indexed
+ *   pages 6+           → self-canonical + noindex, follow:true (too deep to index,
+ *                         but crawlers should still follow links to discover articles)
+ */
+export function buildListingMetadata(
+  input: ListingMetadataInput,
+  page: number,
+): Metadata {
+  const p = Math.max(1, Number.isFinite(page) ? page : 1);
+  const canonicalPath = p <= 1 ? input.basePath : `${input.basePath}?page=${p}`;
+  const isDeepPage = p >= 6;
+
+  const metadata = buildPageMetadata({
+    title: input.title,
+    description: input.description,
+    path: canonicalPath,
+    eyebrow: input.eyebrow,
+    variant: input.variant,
+    noindex: isDeepPage,
+  });
+
+  if (isDeepPage) {
+    // buildPageMetadata sets follow:false when noindex:true; override to
+    // follow:true so crawlers can still reach article URLs on deep pages.
+    return { ...metadata, robots: { index: false, follow: true } };
+  }
+
+  return metadata;
+}

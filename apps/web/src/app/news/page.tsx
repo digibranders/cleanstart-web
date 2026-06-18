@@ -6,7 +6,7 @@ import { BlogsCTA } from "@/components/sections/blogs/BlogsCTA";
 import { NewsBrowser } from "@/components/sections/newsroom/NewsBrowser";
 import { NewsContent, selectNews } from "@/components/sections/newsroom/NewsContent";
 import { getNews, getFeaturedNews, getNewsCategories } from "@/lib/news";
-import { buildPageMetadata } from "@/lib/seo/canonical";
+import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const revalidate = 3600;
@@ -15,13 +15,14 @@ const TITLE = "Newsroom";
 const DESCRIPTION =
   "Stay current with CleanStart's latest press releases, partnership announcements, product launches, and milestones in secure container image and software supply chain security.";
 
-export function generateMetadata(): Metadata {
-  return buildPageMetadata({
-    title: TITLE,
-    description: DESCRIPTION,
-    path: "/news",
-    eyebrow: "Newsroom",
-  });
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const params = await searchParams;
+  const page = Math.max(1, Number.parseInt(String(params.page ?? "1"), 10) || 1);
+  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/news", eyebrow: "Newsroom" }, page);
 }
 
 /**

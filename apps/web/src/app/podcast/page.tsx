@@ -26,7 +26,7 @@ import {
   getChannelVideos,
 } from "@/lib/youtube-feed";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLd, breadcrumbSchema, podcastSeriesSchema } from "@/lib/seo/jsonld";
 
 // Static + ISR. All fetches are cacheable: the CMS reads via fetchCMS
 // (revalidate 60) and the YouTube RSS feed via `getChannelVideos`
@@ -119,6 +119,14 @@ export default async function PodcastPage(): Promise<React.ReactElement> {
           { name: "Home", path: "/" },
           { name: page?.heroTitle ?? FALLBACK_TITLE },
         ])}
+      />
+      <JsonLd
+        id="podcast-series"
+        data={podcastSeriesSchema({
+          name: page?.heroTitle ?? FALLBACK_TITLE,
+          description: page?.heroSubtitle ?? FALLBACK_DESCRIPTION,
+          path: "/podcast",
+        })}
       />
       <Header />
       <main id="main-content">

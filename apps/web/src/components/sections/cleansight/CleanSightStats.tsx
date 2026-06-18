@@ -20,10 +20,10 @@ interface StatDef {
 }
 
 const STATS: StatDef[] = [
-  { prefix: "", end: 85, suffix: "%", label: "Container coverage", labelSize: "clamp(13px,1.198vw,23px)", labelTracking: "-1.15px" },
-  { prefix: "<", end: 24, suffix: " hr", label: "Remediation cycles", labelSize: "clamp(12px,1.042vw,20px)", labelTracking: "-1px" },
-  { prefix: "", end: 85, suffix: "%", label: "Risk reduction", labelSize: "clamp(12px,1.042vw,20px)", labelTracking: "-1px" },
-  { prefix: "", end: 100, suffix: "%", label: "Compliance visibility", labelSize: "clamp(12px,1.042vw,20px)", labelTracking: "-1px" },
+  { prefix: "", end: 85, suffix: "%", label: "Container coverage", labelSize: "clamp(15px,1.198vw,23px)", labelTracking: "-0.02em" },
+  { prefix: "<", end: 24, suffix: " hr", label: "Remediation cycles", labelSize: "clamp(15px,1.042vw,20px)", labelTracking: "-0.02em" },
+  { prefix: "", end: 85, suffix: "%", label: "Risk reduction", labelSize: "clamp(15px,1.042vw,20px)", labelTracking: "-0.02em" },
+  { prefix: "", end: 100, suffix: "%", label: "Compliance visibility", labelSize: "clamp(14px,1.042vw,20px)", labelTracking: "-0.02em" },
 ];
 
 /** Counts from 0 → end when `active` flips true. Fires once. Honors
@@ -130,11 +130,12 @@ export function CleanSightStats(): React.ReactElement {
                 fontWeight: 600,
                 letterSpacing: "-0.04em",
                 lineHeight: 1.1,
-                whiteSpace: "nowrap",
               }}
             >
-              From Visibility to{" "}
-              <span className="cs-text-gradient-impact">Remediation</span>
+              From Visibility{" "}
+              <span style={{ whiteSpace: "nowrap" }}>
+                to <span className="cs-text-gradient-impact">Remediation</span>
+              </span>
             </h2>
           </Reveal>
         </div>

@@ -28,9 +28,15 @@ interface GlobalPresenceMapProps {
 
 const GEO_URL = "/data/world-110m.json";
 
+// Countries with offices — highlighted with a brighter fill
+const OFFICE_COUNTRIES = new Set([
+  "United States of America",
+  "India",
+]);
+
 const PIN_FILL: Record<"amber" | "cyan", string> = {
   amber: "#FBB824",
-  cyan: "#2CC1EB",
+  cyan: "#FFFFFF",
 };
 
 // Staggered pulse delays — deterministic, no hydration mismatch
@@ -48,14 +54,11 @@ const COUNTRY_LABELS: { name: string; coords: [number, number] }[] = [
   { name: "SINGAPORE", coords: [103.8, 3.4] },
 ];
 
-// Connection pairs:
-// HQ → each offshore office, India cities ↔ each other, Bengaluru → Singapore
-const CONNECTION_PAIRS: [LocationId, LocationId][] = [
-  ["hq", "ahmedabad"],
-  ["hq", "bengaluru"],
-  ["hq", "singapore"],
-  ["ahmedabad", "bengaluru"],
-  ["bengaluru", "singapore"],
+// Each arc gets its own lift factor so they fan out vertically instead of bundling
+const CONNECTION_ARCS: { from: LocationId; to: LocationId; liftFactor: number }[] = [
+  { from: "hq",       to: "bengaluru", liftFactor: 0.42 }, // high sweep over N. Atlantic
+  { from: "hq",       to: "singapore", liftFactor: 0.18 }, // flatter path, clearly below
+  { from: "bengaluru",to: "singapore", liftFactor: 0.30 }, // medium hop
 ];
 
 // ─── Curved arc (quadratic Bezier) using the map projection ──────────────────
@@ -63,6 +66,7 @@ const CONNECTION_PAIRS: [LocationId, LocationId][] = [
 interface CurvedArcProps {
   from: [number, number];
   to: [number, number];
+  liftFactor?: number;
   stroke?: string;
   strokeWidth?: number;
   strokeDasharray?: string;
@@ -72,12 +76,12 @@ interface CurvedArcProps {
 function CurvedArc({
   from,
   to,
+  liftFactor = 0.28,
   stroke = "rgba(44,193,235,0.45)",
   strokeWidth = 1,
   strokeDasharray = "4 5",
   opacity = 1,
 }: CurvedArcProps) {
-  // useMapContext provides the d3-geo projection function
   const ctx = useMapContext() as {
     projection: (c: [number, number]) => [number, number] | null;
   };
@@ -89,12 +93,10 @@ function CurvedArc({
   const [x1, y1] = p1;
   const [x2, y2] = p2;
 
-  // Control point: mid-chord raised proportionally to chord length
   const mx = (x1 + x2) / 2;
   const my = (y1 + y2) / 2;
   const dist = Math.hypot(x2 - x1, y2 - y1);
-  const lift = Math.max(28, dist * 0.28);
-  // Perpendicular direction (always arc "above" / toward north on screen)
+  const lift = Math.max(20, dist * liftFactor);
   const cy = my - lift;
 
   return (
@@ -120,19 +122,16 @@ function ConnectionArcs({ offices }: { offices: Office[] }) {
 
   return (
     <>
-      {CONNECTION_PAIRS.map(([a, b]) => {
-        const oA = byId[a];
-        const oB = byId[b];
+      {CONNECTION_ARCS.map(({ from, to, liftFactor }) => {
+        const oA = byId[from];
+        const oB = byId[to];
         if (!oA || !oB) return null;
-        // Use a slightly different opacity for the short India-India arc
-        const isShort = a === "ahmedabad" && b === "bengaluru";
         return (
           <CurvedArc
-            key={`${a}-${b}`}
+            key={`${from}-${to}`}
             from={oA.coordinates}
             to={oB.coordinates}
-            stroke={isShort ? "rgba(44,193,235,0.30)" : "rgba(44,193,235,0.45)"}
-            opacity={isShort ? 0.8 : 1}
+            liftFactor={liftFactor}
           />
         );
       })}
@@ -160,9 +159,9 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
     <div className="relative w-full" style={{ maxWidth: 1100, margin: "0 auto" }}>
       <ComposableMap
         width={1100}
-        height={500}
+        height={480}
         projection="geoNaturalEarth1"
-        projectionConfig={{ scale: 170, center: [12, 10] }}
+        projectionConfig={{ scale: 275, center: [5, 10] }}
         style={{ width: "100%", height: "auto" }}
       >
         <defs>
@@ -189,20 +188,23 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
         {/* Land masses */}
         <Geographies geography={GEO_URL}>
           {({ geographies }) =>
-            geographies.map((geo) => (
-              <Geography
-                key={geo.rsmKey}
-                geography={geo}
-                fill="#2952c8"
-                stroke="#3d66e0"
-                strokeWidth={0.4}
-                style={{
-                  default: { outline: "none" },
-                  hover: { outline: "none" },
-                  pressed: { outline: "none" },
-                }}
-              />
-            ))
+            geographies.map((geo) => {
+              const highlighted = OFFICE_COUNTRIES.has(geo.properties?.name as string);
+              return (
+                <Geography
+                  key={geo.rsmKey}
+                  geography={geo}
+                  fill={highlighted ? "#3a6fef" : "#1d3e96"}
+                  stroke={highlighted ? "#5585ff" : "#2a52c0"}
+                  strokeWidth={highlighted ? 0.6 : 0.3}
+                  style={{
+                    default: { outline: "none" },
+                    hover: { outline: "none" },
+                    pressed: { outline: "none" },
+                  }}
+                />
+              );
+            })
           }
         </Geographies>
 

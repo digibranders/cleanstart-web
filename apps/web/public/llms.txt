@@ -1,0 +1,37 @@
+# CleanStart
+> CleanStart provides hardened, near-zero CVE container base images and a software supply chain security platform — helping engineering and security teams ship trusted software faster.
+
+## Product Pages
+- [CleanStart Images](https://www.cleanstart.com/cleanstart-images): Pre-built, hardened container base images with near-zero CVEs and automatic versioned updates.
+- [CleanSight](https://www.cleanstart.com/cleansight): Continuous vulnerability visibility across your entire container estate.
+- [CleanStart Platform](https://www.cleanstart.com/cleanstart-platform): Full platform overview — images, scanning, SBOM, and integrations.
+- [FIPS Compliance](https://www.cleanstart.com/fips): FIPS 140-2/3 validated container images for regulated industries.
+- [Software Bill of Materials (SBOM)](https://www.cleanstart.com/software-bill-materials): Automated SBOM generation and management for every image.
+- [Attack Surface Reduction](https://www.cleanstart.com/attack-surface-reduction): Shrink your container attack surface by removing unnecessary packages and layers.
+- [Vulnerability Remediation](https://www.cleanstart.com/vulnerability-remediation): Automated CVE remediation workflows for container images.
+- [Clean Libraries](https://www.cleanstart.com/clean-libraries): Hardened open-source library builds with security patches backported.
+
+## Solutions by Role
+- [For CISOs](https://www.cleanstart.com/for-ciso): Executive-level container security posture, compliance reporting, and risk reduction metrics.
+- [For Developers](https://www.cleanstart.com/for-developers): Drop-in hardened base images with zero workflow changes — fewer CVEs, faster builds.
+
+## Company
+- [About CleanStart](https://www.cleanstart.com/about-us): Mission, team, and the story behind the platform.
+- [Partners](https://www.cleanstart.com/partners): Technology and channel partner ecosystem.
+- [Community](https://www.cleanstart.com/community): Open-source projects, forums, and contributor resources.
+- [Careers](https://www.cleanstart.com/careers): Open roles across engineering, security, and go-to-market.
+
+## Resources
+- [Blog](https://www.cleanstart.com/blogs): Expert insights on container security, CVE management, SBOM, and software supply chain threats.
+- [Guides](https://www.cleanstart.com/guide): In-depth technical guides on Kubernetes security, NIST controls, SBOM generation, and more.
+- [Resource Center](https://www.cleanstart.com/resource-center): Whitepapers, ebooks, datasheets, and architecture reports.
+- [Case Studies](https://www.cleanstart.com/case-studies): Customer outcomes across healthcare, finance, telecom, and enterprise.
+- [Newsroom](https://www.cleanstart.com/news): Press releases, product launches, and company milestones.
+- [Events](https://www.cleanstart.com/events): DevSecOps and cybersecurity conference appearances and meetups.
+- [Webinars](https://www.cleanstart.com/webinars): On-demand and upcoming webinars on container security topics.
+- [Podcast](https://www.cleanstart.com/podcast): Leadership Exchange — industry leaders on container security and software supply chain risk.
+- [Knowledge Hub](https://www.cleanstart.com/knowledge-hub): Academy-style articles covering container fundamentals through advanced supply chain security.
+
+## Legal & Trust
+- [Privacy Policy](https://www.cleanstart.com/privacy-policy): How CleanStart collects, uses, and protects data.
+- [Legal Documents](https://www.cleanstart.com/legal/additional-third-party-terms): Third-party terms, DPA, acceptable use policy, and more.

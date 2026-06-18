@@ -306,10 +306,10 @@ export function CleanSightUnified(): React.ReactElement {
 
           {/* ── Right: vertical stepper (mobile) ─────────────────────── */}
           <div className="relative sm:hidden">
-            {/* Rail behind the discs. */}
+            {/* Rail behind the discs — centred on the 56 px badge (28 px from left). */}
             <div
               aria-hidden
-              className="pointer-events-none absolute bottom-7 left-[37px] top-7 w-[2px] rounded-full"
+              className="pointer-events-none absolute bottom-7 left-[28px] top-7 w-[2px] rounded-full"
               style={{
                 background:
                   'linear-gradient(180deg, #1E6FE8 0%, #14A18E 33%, #7C5CF7 66%, #F43F5E 100%)',
@@ -347,20 +347,6 @@ export function CleanSightUnified(): React.ReactElement {
                 </li>
               ))}
             </ul>
-            {/* Loop-back indicator. */}
-            <div className="mt-8 flex items-center gap-2 pl-[10px]">
-              <RefreshCw size={15} strokeWidth={2} className="text-[#7c3aed]" aria-hidden />
-              <span
-                className="font-display font-semibold uppercase"
-                style={{
-                  fontSize: 'var(--fs-eyebrow)',
-                  letterSpacing: '0.1em',
-                  color: '#7c3aed',
-                }}
-              >
-                Continuous loop
-              </span>
-            </div>
           </div>
         </div>
       </div>

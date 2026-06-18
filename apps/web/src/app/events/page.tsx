@@ -13,7 +13,7 @@ import {
   getPastEvents,
   type EventsListResponse,
 } from "@/lib/events";
-import { buildPageMetadata } from "@/lib/seo/canonical";
+import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 // Re-render hourly so the upcoming/past split and country data stay fresh
@@ -25,13 +25,14 @@ const TITLE = "Events";
 const DESCRIPTION =
   "Explore CleanStart's past and upcoming events including DevOps, DevSecOps, and cybersecurity conferences, summits, and meetups across India and beyond.";
 
-export function generateMetadata(): Metadata {
-  return buildPageMetadata({
-    title: TITLE,
-    description: DESCRIPTION,
-    path: "/events",
-    eyebrow: "Events",
-  });
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const params = await searchParams;
+  const page = Math.max(1, Number.parseInt(String(params.page ?? "1"), 10) || 1);
+  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/events", eyebrow: "Events" }, page);
 }
 
 const emptyList = (): EventsListResponse => ({

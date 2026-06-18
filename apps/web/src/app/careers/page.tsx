@@ -8,7 +8,7 @@ import {
   selectJobs,
 } from "@/components/sections/careers/CareersContent";
 import { getJobLocations, getJobs, type JobLocation } from "@/lib/jobs";
-import { buildPageMetadata } from "@/lib/seo/canonical";
+import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const revalidate = 3600;
@@ -17,13 +17,14 @@ const TITLE = "Careers";
 const DESCRIPTION =
   "Join CleanStart and help build the next generation of secure software supply chains. Explore open roles in security, engineering, and compliance at a fast growing cybersecurity company.";
 
-export function generateMetadata(): Metadata {
-  return buildPageMetadata({
-    title: TITLE,
-    description: DESCRIPTION,
-    path: "/careers",
-    eyebrow: "Careers",
-  });
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const params = await searchParams;
+  const page = Math.max(1, Number.parseInt(String(params.page ?? "1"), 10) || 1);
+  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/careers", eyebrow: "Careers" }, page);
 }
 
 /**

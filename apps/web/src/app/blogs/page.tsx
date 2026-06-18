@@ -6,7 +6,7 @@ import { BlogsBrowser } from "@/components/sections/blogs/BlogsBrowser";
 import { BlogsContent, selectBlogs } from "@/components/sections/blogs/BlogsContent";
 import { BlogsCTA } from "@/components/sections/blogs/BlogsCTA";
 import { getFeaturedBlog, getBlogs, getBlogCategories } from "@/lib/blog";
-import { buildPageMetadata } from "@/lib/seo/canonical";
+import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const revalidate = 3600;
@@ -15,13 +15,14 @@ const TITLE = "Blogs";
 const DESCRIPTION =
   "Explore CleanStart's blog expert insights on container security, software supply chain threats, CVE management, SBOM, and building trust in cloud-native environments.";
 
-export function generateMetadata(): Metadata {
-  return buildPageMetadata({
-    title: TITLE,
-    description: DESCRIPTION,
-    path: "/blogs",
-    eyebrow: "Blog",
-  });
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const params = await searchParams;
+  const page = Math.max(1, Number.parseInt(String(params.page ?? "1"), 10) || 1);
+  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/blogs", eyebrow: "Blog" }, page);
 }
 
 /**

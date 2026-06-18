@@ -9,7 +9,7 @@ import {
 } from "@/components/sections/resource-center/ResourceCenterContent";
 import { ResourceCenterCTA } from "@/components/sections/resource-center/ResourceCenterCTA";
 import { getResources } from "@/lib/resources";
-import { buildPageMetadata } from "@/lib/seo/canonical";
+import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const revalidate = 3600;
@@ -18,13 +18,14 @@ const TITLE = "Resource Center";
 const DESCRIPTION =
   "A curated collection of whitepapers, ebooks, datasheets, architecture insights, and reports on container security.";
 
-export function generateMetadata(): Metadata {
-  return buildPageMetadata({
-    title: TITLE,
-    description: DESCRIPTION,
-    path: "/resource-center",
-    eyebrow: "Resources",
-  });
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const params = await searchParams;
+  const page = Math.max(1, Number.parseInt(String(params.page ?? "1"), 10) || 1);
+  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/resource-center", eyebrow: "Resources" }, page);
 }
 
 /**

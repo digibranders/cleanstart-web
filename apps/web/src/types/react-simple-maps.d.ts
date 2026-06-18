@@ -9,6 +9,7 @@ declare module "react-simple-maps" {
 
   interface GeoObject {
     rsmKey: string;
+    properties: Record<string, unknown>;
     [key: string]: unknown;
   }
 

@@ -99,52 +99,6 @@ export function AboutGlobalPresence() {
       className="relative w-full overflow-hidden"
       style={{ background: "#07102e" }}
     >
-      {/* ── Decorative ellipse blobs ─────────────────────────────────────── */}
-      {[130.75, 1306.73].map((leftPx) => (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          key={leftPx}
-          aria-hidden
-          src="/images/about/powering-ellipse-blob.svg"
-          alt=""
-          className="pointer-events-none absolute hidden select-none lg:block"
-          style={{
-            left: `calc(${leftPx}px / 1920 * 100%)`,
-            top: "246px",
-            width: "432px",
-            height: "432px",
-            transform: "rotate(8.58deg) scale(2.0687)",
-          }}
-          loading="lazy"
-          decoding="async"
-        />
-      ))}
-
-      {(
-        [
-          [-525, 394],
-          [1521, -210],
-        ] as const
-      ).map(([x, y]) => (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          key={`${x}-${y}`}
-          aria-hidden
-          src="/images/about/powering-bg-vector.svg"
-          alt=""
-          className="pointer-events-none absolute hidden select-none lg:block"
-          style={{
-            left: `calc(${x}px / 1920 * 100%)`,
-            top: `${y}px`,
-            width: "979px",
-            height: "979px",
-          }}
-          loading="lazy"
-          decoding="async"
-        />
-      ))}
-
-
       {/* ── Content ──────────────────────────────────────────────────────── */}
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[48px] pb-16">
 

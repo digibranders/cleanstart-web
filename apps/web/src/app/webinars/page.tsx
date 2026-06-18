@@ -9,8 +9,8 @@ import {
 } from "@/components/sections/webinars/WebinarsContent";
 import { WebinarsCTA } from "@/components/sections/webinars/WebinarsCTA";
 import { getWebinars } from "@/lib/webinars";
-import { buildPageMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { buildListingMetadata } from "@/lib/seo/canonical";
+import { JsonLd, breadcrumbSchema, webinarListSchema } from "@/lib/seo/jsonld";
 
 export const revalidate = 3600;
 
@@ -18,13 +18,14 @@ const TITLE = "CleanStart Webinar";
 const DESCRIPTION =
   "Live and on-demand webinars on hardened container images, software supply-chain security, and CleanStart product deep-dives.";
 
-export function generateMetadata(): Metadata {
-  return buildPageMetadata({
-    title: TITLE,
-    description: DESCRIPTION,
-    path: "/webinars",
-    eyebrow: "Webinar",
-  });
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const params = await searchParams;
+  const page = Math.max(1, Number.parseInt(String(params.page ?? "1"), 10) || 1);
+  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/webinars", eyebrow: "Webinar" }, page);
 }
 
 /**
@@ -64,6 +65,21 @@ export default async function WebinarsPage(): Promise<React.ReactElement> {
           { name: "Webinars" },
         ])}
       />
+      {allWebinars.length > 0 && (
+        <JsonLd
+          id="webinars-list"
+          data={webinarListSchema(
+            allWebinars.map((w) => ({
+              title: w.title,
+              abstract: w.abstract,
+              startsAt: w.startsAt,
+              endsAt: w.endsAt,
+              eventStatus: w.eventStatus,
+              registrationUrl: w.registrationUrl,
+            })),
+          )}
+        />
+      )}
       <Header />
       <Suspense
         fallback={
