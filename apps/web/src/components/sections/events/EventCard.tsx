@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { type Event, formatEventDate } from "@/lib/events";
-import { mediaUrl } from "@/lib/blog";
+import type { Event } from "@/lib/events";
+import { formatEventDate } from "@/lib/events-utils";
+import { mediaUrl } from "@/lib/blog-utils";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
 
 interface EventCardProps {

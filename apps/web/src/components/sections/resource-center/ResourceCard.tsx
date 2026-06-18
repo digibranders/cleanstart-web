@@ -1,10 +1,10 @@
 import Link from "next/link";
+import type { Resource } from "@/lib/resources";
 import {
-  type Resource,
   resourceTypeLabel,
   resourceCtaLabel,
   resourceCoverPoster,
-} from "@/lib/resources";
+} from "@/lib/resources-utils";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
 
 interface ResourceCardProps {

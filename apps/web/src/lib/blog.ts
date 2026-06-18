@@ -1,6 +1,6 @@
 import { cache } from "react";
 
-import { cmsBaseUrl, fetchCMS } from "./cms-fetch";
+import { fetchCMS } from "./cms-fetch";
 import type { CmsSeo } from "./seo/cms-seo";
 
 export type BlogCategory = {
@@ -209,30 +209,10 @@ type PayloadListResponse<T> = {
   totalPages: number;
 };
 
-// Payload returns relative URLs (e.g. /api/media/file/...) when serverURL isn't set.
-// Prefix them so Next.js Image can resolve them against the CMS host, not the web app.
-export function mediaUrl(url: string | undefined | null): string | undefined {
-  if (!url) return undefined;
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  return `${cmsBaseUrl()}${url}`;
-}
-
-// Prefer a generated size variant when present. Payload's Media collection
-// can drift between its `url`/`filename` and the underlying R2 object (e.g. a
-// slug/sanitize hook renames the doc but the storage object is not moved),
-// leaving the canonical `url` 404'ing while the size variants — derived at
-// upload time and never renamed — remain correct.
-export function pickImageUrl(
-  image: BlogImage | undefined | null,
-  preferred: ReadonlyArray<"thumb" | "card" | "hero"> = ["card", "thumb", "hero"],
-): string | undefined {
-  if (!image) return undefined;
-  for (const key of preferred) {
-    const sized = image.sizes?.[key]?.url;
-    if (sized) return mediaUrl(sized);
-  }
-  return mediaUrl(image.url);
-}
+// `mediaUrl` / `pickImageUrl` / `formatBlogDate` live in `blog-utils.ts` (no
+// `cms-fetch` / `next/headers` dependency) so client components can import them
+// without pulling server-only code. Re-exported here for server-side callers.
+export { formatBlogDate, mediaUrl, pickImageUrl } from "./blog-utils";
 
 const PUBLISHED_FILTER =
   "where[_status][equals]=published&where[publishedAt][exists]=true";
@@ -554,13 +534,4 @@ export async function getAutoJourneyTargets(
   if (fillTasks.length > 0) await Promise.all(fillTasks);
 
   return { previous, next };
-}
-
-export function formatBlogDate(iso?: string): string {
-  if (!iso) return "";
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
 }

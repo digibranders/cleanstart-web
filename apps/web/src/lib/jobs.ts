@@ -6,37 +6,13 @@ import { cache } from "react";
 import { fetchCMS } from "./cms-fetch";
 import type { LexicalRoot } from "./blog";
 import type { CmsSeo } from "./seo/cms-seo";
-
-export type JobDepartment =
-  | "engineering"
-  | "sales"
-  | "marketing"
-  | "customer-success"
-  | "operations"
-  | "finance"
-  | "legal"
-  | "people";
-
-export type JobEmploymentType =
-  | "full-time"
-  | "part-time"
-  | "contract"
-  | "internship";
-
-export type JobExperienceLevel =
-  | "entry"
-  | "mid"
-  | "senior"
-  | "staff"
-  | "principal";
-
-export type JobLocation = {
-  id: number;
-  name: string;
-  slug: string;
-  type: "country" | "region" | "city";
-  isoCountry: string;
-};
+import type {
+  JobDepartment,
+  JobEmploymentType,
+  JobExperienceLevel,
+  JobLocation,
+  JobStatusFilter,
+} from "./jobs-utils";
 
 export type Job = {
   id: number;
@@ -74,34 +50,6 @@ type PayloadListResponse<T> = {
   totalPages: number;
 };
 
-export const DEPARTMENT_LABEL: Record<JobDepartment, string> = {
-  engineering: "Engineering",
-  sales: "Sales",
-  marketing: "Marketing",
-  "customer-success": "Customer Success",
-  operations: "Operations",
-  finance: "Finance",
-  legal: "Legal",
-  people: "People",
-};
-
-export const EMPLOYMENT_TYPE_LABEL: Record<JobEmploymentType, string> = {
-  "full-time": "Full-Time",
-  "part-time": "Part-Time",
-  contract: "Contract",
-  internship: "Internship",
-};
-
-export const EXPERIENCE_LABEL: Record<JobExperienceLevel, string> = {
-  entry: "Entry",
-  mid: "Mid",
-  senior: "Senior",
-  staff: "Staff",
-  principal: "Principal",
-};
-
-export type JobStatusFilter = "open" | "closed" | "all";
-
 interface GetJobsArgs {
   page?: number;
   limit?: number;
@@ -128,11 +76,30 @@ export async function getJobs({
 }: GetJobsArgs = {}): Promise<PayloadListResponse<Job>> {
   const params = new URLSearchParams({
     "where[_status][equals]": "published",
-    depth: "2",
+    // depth=1 + card-field whitelist. depth=2 with no select pulled every job's
+    // full Lexical `body` + nested location chains (~723 KB / ~2 s); the cards
+    // only read these fields. Filters use server-side `where` clauses, so the
+    // filtered relationships don't need selecting.
+    depth: "1",
     limit: String(limit),
     page: String(page),
     sort: "-updatedAt",
   });
+  for (const field of [
+    "title",
+    "slug",
+    "department",
+    "employmentType",
+    "hiringStatus",
+    "experienceRange",
+    "experienceLevel",
+    "locations",
+    "country",
+    "seo",
+    "updatedAt",
+  ]) {
+    params.set(`select[${field}]`, "true");
+  }
   if (status === "open") {
     params.set("where[hiringStatus][equals]", "open");
   } else if (status === "closed") {
@@ -171,62 +138,25 @@ export async function getJobLocations(): Promise<JobLocation[]> {
   return res.docs;
 }
 
-/** Resolved locations array, ignoring any unresolved relationship IDs. */
-export function resolvedLocations(job: Job): JobLocation[] {
-  if (!job.locations) return [];
-  return job.locations.filter(
-    (entry): entry is JobLocation =>
-      typeof entry === "object" && entry !== null && "name" in entry,
-  );
-}
-
-export function locationDisplay(job: Job): string {
-  const locs = resolvedLocations(job);
-  if (locs.length === 0) return job.remote ? "Remote (Global)" : "—";
-  return locs.map((l) => l.name).join(", ");
-}
-
-export function experienceDisplay(job: Job): string | null {
-  // Prefer the human-readable year range from the original data
-  // (e.g. "3-10 Years"); fall back to the bucketed enum label for
-  // CMS-native jobs created without a range.
-  if (job.experienceRange && job.experienceRange.trim().length > 0) {
-    return job.experienceRange;
-  }
-  if (!job.experienceLevel) return null;
-  return `${EXPERIENCE_LABEL[job.experienceLevel]} experience`;
-}
-
-export function applyHref(job: Job): string {
-  if (job.source === "ats" && job.atsUrl) return job.atsUrl;
-  if (job.applyUrl) return job.applyUrl;
-  return `/job/${job.slug}`;
-}
-
-export type JobStatusBadge = "open" | "closing-soon" | "closed";
-
-const CLOSING_SOON_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
-
-/**
- * Returns the public-facing status badge for a job. Mirrors the patterns used
- * by mainstream career sites: open is implicit/green, "closing soon" surfaces
- * urgency when the application deadline is ≤14 days away, and closed roles
- * are explicitly marked.
- */
-export function jobStatusBadge(job: Job): JobStatusBadge {
-  if (job.hiringStatus === "closed") return "closed";
-  if (job.applicationDeadline) {
-    const dl = new Date(job.applicationDeadline).getTime();
-    if (!Number.isNaN(dl)) {
-      const delta = dl - Date.now();
-      if (delta > 0 && delta <= CLOSING_SOON_WINDOW_MS) return "closing-soon";
-    }
-  }
-  return "open";
-}
-
-export const JOB_STATUS_LABEL: Record<JobStatusBadge, string> = {
-  open: "Open",
-  "closing-soon": "Closing soon",
-  closed: "Closed",
-};
+// Client-safe types + display helpers live in `jobs-utils.ts` (no `cms-fetch`
+// / `next/headers`). Re-exported here for backward compat so existing
+// server-side imports from `@/lib/jobs` keep resolving.
+export type {
+  JobDepartment,
+  JobEmploymentType,
+  JobExperienceLevel,
+  JobLocation,
+  JobStatusFilter,
+  JobStatusBadge,
+} from "./jobs-utils";
+export {
+  DEPARTMENT_LABEL,
+  EMPLOYMENT_TYPE_LABEL,
+  EXPERIENCE_LABEL,
+  JOB_STATUS_LABEL,
+  resolvedLocations,
+  locationDisplay,
+  experienceDisplay,
+  applyHref,
+  jobStatusBadge,
+} from "./jobs-utils";

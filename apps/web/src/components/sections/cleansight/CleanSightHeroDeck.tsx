@@ -33,30 +33,40 @@ const CARDS: readonly DeckCard[] = [
 const STACK_Y = 16;
 const ROTATE_MS = 6500;
 
-// Visual state for each stack position (0 = front).
+// Visual state for each stack position (0 = front). Only transform + opacity
+// are animated — both GPU-composited, so the deck never blocks the main thread.
 const POSITIONS = [
-  { y: 0, scale: 1, opacity: 1, blur: 0, z: 30 },
-  { y: -STACK_Y, scale: 0.95, opacity: 0.72, blur: 2, z: 20 },
-  { y: -2 * STACK_Y, scale: 0.9, opacity: 0.45, blur: 3.5, z: 10 },
+  { y: 0, scale: 1, opacity: 1, z: 30 },
+  { y: -STACK_Y, scale: 0.95, opacity: 0.72, z: 20 },
+  { y: -2 * STACK_Y, scale: 0.9, opacity: 0.45, z: 10 },
 ] as const;
 
 export function CleanSightHeroDeck(): React.ReactElement {
   const reduce = useReducedMotion();
   const [active, setActive] = useState(0);
+  const [ready, setReady] = useState(false);
 
   const advance = useCallback(
     () => setActive((a) => (a + 1) % CARDS.length),
     [],
   );
 
+  // Defer the non-LCP dashboard images and the auto-cycle until just after the
+  // page settles, so the first (LCP) image is not competing for bandwidth on
+  // load and the LCP target stays stable.
+  useEffect(() => {
+    const t = window.setTimeout(() => setReady(true), 1500);
+    return () => window.clearTimeout(t);
+  }, []);
+
   // Auto-advance. The timer is keyed on `active`, so a manual click (which
   // changes `active`) also resets the countdown before the next auto-advance.
   // biome-ignore lint/correctness/useExhaustiveDependencies: `active` intentionally restarts the timer on every change
   useEffect(() => {
-    if (reduce) return;
+    if (reduce || !ready) return;
     const id = window.setTimeout(advance, ROTATE_MS);
     return () => window.clearTimeout(id);
-  }, [active, reduce, advance]);
+  }, [active, reduce, ready, advance]);
 
   return (
     <LazyMotion features={domAnimation} strict>
@@ -92,7 +102,6 @@ export function CleanSightHeroDeck(): React.ReactElement {
                   y: pos.y,
                   scale: pos.scale,
                   opacity: pos.opacity,
-                  filter: `blur(${pos.blur}px)`,
                 }}
                 transition={{ duration: 1.0, ease: EASE_OUT }}
               >
@@ -109,16 +118,18 @@ export function CleanSightHeroDeck(): React.ReactElement {
                   <span className="block h-[10px] w-[10px] rounded-full" style={{ background: "#28c840" }} />
                 </div>
                 <div className="relative flex-1 overflow-hidden">
-                  <Image
-                    src={card.src}
-                    alt={card.alt}
-                    fill
-                    sizes="(min-width: 1024px) 600px, 90vw"
-                    priority={i === 0}
-                    loading={i === 0 ? undefined : "lazy"}
-                    draggable={false}
-                    className="select-none object-cover object-top"
-                  />
+                  {(i === 0 || ready) && (
+                    <Image
+                      src={card.src}
+                      alt={card.alt}
+                      fill
+                      sizes="(min-width: 1024px) 600px, 90vw"
+                      priority={i === 0}
+                      loading={i === 0 ? undefined : "lazy"}
+                      draggable={false}
+                      className="select-none object-cover object-top"
+                    />
+                  )}
                 </div>
               </m.div>
             );

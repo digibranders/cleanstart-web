@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { RESOURCE_TYPES } from "@/lib/resources";
+import { RESOURCE_TYPES } from "@/lib/resources-utils";
 
 interface ResourceCenterSidebarProps {
   activeType: string;

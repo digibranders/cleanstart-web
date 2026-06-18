@@ -93,16 +93,16 @@ function CardBody({ card }: { card: EntryCard }): React.ReactElement {
   );
 }
 
-/** Diagram geometry in the 1276×544 design canvas. */
-const ORB = { cx: 638, cy: 272, r: 222 } as const; // r=222 → tips meet the sphere, just inside the 480px glow halo
-const CARD = { w: 295, h: 176 } as const;
+/** Diagram geometry in the 1276×480 design canvas. */
+const ORB = { cx: 638, cy: 240, r: 194 } as const; // r=194 → tips meet the sphere, just inside the 420px glow halo
+const CARD = { w: 295, h: 150 } as const;
 
-/** Card corner positions in the 1276×544 design space, paired by index with ENTRY_CARDS. */
+/** Card corner positions in the 1276×480 design space, paired by index with ENTRY_CARDS. */
 const CARD_POSITIONS = [
-  { left: 0, top: 2 }, // Developer Added (TL)
-  { left: 981, top: 2 }, // Open Source (TR)
-  { left: 0, top: 338 }, // AI-Introduced (BL)
-  { left: 981, top: 338 }, // Transitive (BR)
+  { left: 0, top: 0 }, // Developer Added (TL)
+  { left: 981, top: 0 }, // Open Source (TR)
+  { left: 0, top: 330 }, // AI-Introduced (BL)
+  { left: 981, top: 330 }, // Transitive (BR)
 ] as const;
 
 /** Per-card connector accent colour, paired by index with ENTRY_CARDS / CARD_POSITIONS. */
@@ -116,7 +116,7 @@ const CONNECTOR_META = [
 // The orb dock sits on the orb's near side, offset ATTACH_DY above/below centre —
 // matching the original artwork, where arrows entered the orb roughly horizontally
 // rather than along the 45° diagonal.
-const ATTACH_DY = 105;
+const ATTACH_DY = 96;
 const ATTACH_DX = Math.sqrt(ORB.r ** 2 - ATTACH_DY ** 2); // x on the perimeter at that height
 
 interface CardPos {
@@ -170,7 +170,7 @@ function DesktopDiagram(): React.ReactElement {
         {
           "--lib-scale": "min(1, calc((min(100vw, 1440px) - 80px) / 1276px))",
           width: "calc(1276px * var(--lib-scale))",
-          height: "calc(544px * var(--lib-scale))",
+          height: "calc(480px * var(--lib-scale))",
         } as React.CSSProperties
       }
     >
@@ -178,7 +178,7 @@ function DesktopDiagram(): React.ReactElement {
         className="relative"
         style={{
           width: "1276px",
-          height: "544px",
+          height: "480px",
           transform: "scale(var(--lib-scale))",
           transformOrigin: "top left",
         }}
@@ -187,9 +187,9 @@ function DesktopDiagram(): React.ReactElement {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           aria-hidden
-          src="/images/clean-libraries/pipeline-orb.png"
+          src="/images/clean-libraries/pipeline-orb.webp"
           alt=""
-          className="pointer-events-none absolute left-1/2 top-1/2 w-[480px] max-w-none -translate-x-1/2 -translate-y-1/2 select-none"
+          className="pointer-events-none absolute left-1/2 top-1/2 w-[420px] max-w-none -translate-x-1/2 -translate-y-1/2 select-none"
           loading="lazy"
           decoding="async"
         />
@@ -198,7 +198,7 @@ function DesktopDiagram(): React.ReactElement {
         <svg
           aria-hidden
           className="pointer-events-none absolute inset-0 h-full w-full select-none"
-          viewBox="0 0 1276 544"
+          viewBox="0 0 1276 480"
           fill="none"
         >
           <defs>
@@ -259,15 +259,15 @@ function MobileDiagram(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/clean-libraries/pipeline-orb.png"
+        src="/images/clean-libraries/pipeline-orb.webp"
         alt=""
-        className="pointer-events-none mx-auto block w-full max-w-[420px] select-none"
+        className="pointer-events-none mx-auto block w-full max-w-[360px] select-none"
         loading="lazy"
         decoding="async"
       />
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {ENTRY_CARDS.map((card) => (
-          <div key={card.title} className="min-h-[160px]">
+          <div key={card.title} className="min-h-[140px]">
             <CardBody card={card} />
           </div>
         ))}

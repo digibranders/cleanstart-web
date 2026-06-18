@@ -129,6 +129,7 @@ function ArtifactCardView({ glyph, title, desc }: ArtifactCard): React.ReactElem
               lineHeight: 1.4,
               color: '#333333',
               maxWidth: '300px',
+              minHeight: '4.2em',
             }}
           >
             {desc}

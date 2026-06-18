@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-import { type Blog, type BlogCategory, formatBlogDate, mediaUrl } from "@/lib/blog";
+import type { Blog, BlogCategory } from "@/lib/blog";
+import { formatBlogDate, mediaUrl } from "@/lib/blog-utils";
 import { SearchBar } from "@/components/sections/_shared/SearchBar";
 import { HeroReveal, Reveal } from "@/components/ui/Reveal";
 

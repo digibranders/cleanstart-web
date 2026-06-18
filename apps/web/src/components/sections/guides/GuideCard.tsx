@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { type Guide, formatGuideDate, guideMediaUrl } from "@/lib/guides";
+import type { Guide } from "@/lib/guides";
+import { formatGuideDate, guideMediaUrl } from "@/lib/guides-utils";
 import { effectivePublishedAt } from "@/lib/published-date";
 import { deriveCoverKeyword, guideCoverPath } from "@/lib/guide-cover";
 

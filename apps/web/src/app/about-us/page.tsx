@@ -3,7 +3,7 @@ import { AboutHero } from "@/components/sections/about/AboutHero";
 import { AboutWhoWeAre } from "@/components/sections/about/AboutWhoWeAre";
 import { AboutOurStory } from "@/components/sections/about/AboutOurStory";
 import { AboutOurVision } from "@/components/sections/about/AboutOurVision";
-import { AboutPowering } from "@/components/sections/about/AboutPowering";
+import { AboutGlobalPresence } from "@/components/sections/about/AboutGlobalPresence";
 import { AboutEcosystems } from "@/components/sections/about/AboutEcosystems";
 import { AboutCTA } from "@/components/sections/about/AboutCTA";
 import { Footer } from "@/components/sections/Footer";
@@ -60,7 +60,7 @@ export default function AboutPage() {
         </FadeUp>
 
         <FadeUp>
-          <AboutPowering />
+          <AboutGlobalPresence />
         </FadeUp>
 
         <FadeUp>

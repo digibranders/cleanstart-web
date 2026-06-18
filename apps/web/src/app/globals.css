@@ -1636,6 +1636,53 @@ body {
   .cs-sec-sheen { display: none !important; }
 }
 
+/* ───────────────────────────────────────────────────────────────────────────
+   Clean Libraries — "Built Into Your Workflow" motion.
+   Only the featured Clean Library card carries a softly pulsing accent glow
+   ring; the dotted accent arrows stream continuously. Both run only while the
+   section is on-screen (.wf-anim) and honor reduced-motion. The featured card's
+   accent drives the ring colour through its per-card --accent custom prop.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Glow ring — the featured (Clean Library) card only. */
+.wf-card[data-featured="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.4;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent) 38%, transparent),
+    0 16px 44px -34px var(--accent);
+}
+.wf-anim .wf-card[data-featured="true"]::after {
+  animation: wf-ring-pulse 3.2s ease-in-out infinite;
+}
+@keyframes wf-ring-pulse {
+  0%, 100% { opacity: 0.28; }
+  50% { opacity: 0.55; }
+}
+
+/* Flowing dotted arrow track — colour inherits the connector's accent. */
+.wf-arrow-track {
+  width: 18px;
+  height: 2px;
+  border-radius: 1px;
+  opacity: 0.7;
+  background-image: repeating-linear-gradient(90deg, currentColor 0 2px, transparent 2px 6px);
+}
+.wf-arrow svg { opacity: 0.8; }
+.wf-anim .wf-arrow-track { animation: wf-dots 0.6s linear infinite; }
+@keyframes wf-dots {
+  to { background-position: 6px 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wf-card[data-featured="true"]::after { animation: none !important; }
+  .wf-arrow-track { animation: none !important; }
+}
+
 /* FAQ answer drawer — kept minimal; height + opacity are driven by inline
    styles in the React component for reliable transition behavior across
    browsers. Per Google Core Web Vitals, the resulting section growth
@@ -1887,6 +1934,49 @@ body {
   0%, 100% { transform: translate3d(0, 0, 0); }
   50%      { transform: translate3d(0, -3px, 0); }
 }
+/* ── SBOM hero report window animations ─────────────────────────────────── */
+/* Entrance: opacity only — does NOT touch transform so it doesn't fight the
+   positioning wrapper's translateY(-50%). Float is on the same inner element
+   but targets translateY only → no property conflict, composes cleanly. */
+@keyframes cs-sbom-enter {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+/* Gentle float — same feel as cs-tt-float but slightly more travel (6px) and
+   a faster period (4s) to match the tighter hero viewport. */
+@keyframes cs-sbom-float {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(0, -6px, 0); }
+}
+/* Terminal cursor blink — step-end gives the authentic cursor pulse. */
+@keyframes cs-sbom-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.cs-sbom-window-animate {
+  /* enter fires once (0.45s delay so headline paints first).
+     float starts exactly when enter ends (0.45 + 0.9 = 1.35s). */
+  animation:
+    cs-sbom-enter 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both,
+    cs-sbom-float 4s ease-in-out 1.35s infinite alternate;
+}
+.cs-sbom-cursor {
+  display: inline-block;
+  width: 0.5em;
+  height: 1em;
+  background: rgba(79, 209, 245, 0.75);
+  vertical-align: text-bottom;
+  border-radius: 1px;
+  margin-left: 2px;
+  animation: cs-sbom-blink 1s step-end infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-sbom-window-animate { animation: none; opacity: 1; }
+  .cs-sbom-cursor          { animation: none; opacity: 0.75; }
+}
+/* ── end SBOM animations ─────────────────────────────────────────────────── */
+
 @keyframes cs-tt-progress {
   from { transform: scaleX(0); transform-origin: left; }
   to   { transform: scaleX(1); transform-origin: left; }
@@ -3912,4 +4002,34 @@ body {
   .cs-lpr-dot::after {
     opacity: 0;
   }
+}
+
+/* ─── Global Presence Map animations ──────────────────────────────────────── */
+
+@keyframes cs-map-pulse {
+  0%   { transform: scale(1);   opacity: 0.65; }
+  70%  { transform: scale(2.6); opacity: 0; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+@keyframes cs-map-arc-draw {
+  from { stroke-dashoffset: 600; }
+  to   { stroke-dashoffset: 0; }
+}
+
+@keyframes cs-map-marker-in {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+@keyframes cs-map-tooltip-in {
+  from { opacity: 0; transform: translate(-50%, calc(-100% - 20px)); }
+  to   { opacity: 1; transform: translate(-50%, calc(-100% - 12px)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-map-pulse-ring   { animation: none !important; opacity: 0 !important; }
+  .cs-map-arc          { animation: none !important; stroke-dashoffset: 0 !important; }
+  .cs-map-marker       { animation: none !important; }
+  .cs-map-tooltip      { animation: none !important; }
 }

@@ -82,10 +82,13 @@ export function SbomHero(): React.ReactElement {
             transform: "translateY(-50%)",
             width: "clamp(440px, 37vw, 520px)",
             filter: "blur(1px)",
-            opacity: 0.9,
           }}
         >
-          <SbomReportWindow />
+          {/* animate wrapper: opacity entrance + float. Kept separate from the
+              positioning div so translateY(-50%) is never overwritten. */}
+          <div className="cs-sbom-window-animate">
+            <SbomReportWindow />
+          </div>
         </div>
 
         {/* Text column — centered on mobile, left-aligned md+. */}

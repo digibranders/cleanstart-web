@@ -1,10 +1,6 @@
 import Image from "next/image";
-import {
-  type CaseStudy,
-  formatFileMeta,
-  industryLabel,
-  mediaUrl,
-} from "@/lib/case-studies";
+import type { CaseStudy } from "@/lib/case-studies";
+import { formatFileMeta, industryLabel, mediaUrl } from "@/lib/case-studies-utils";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
 import { CardCoverFallback } from "@/components/ui/CardCoverFallback";
 

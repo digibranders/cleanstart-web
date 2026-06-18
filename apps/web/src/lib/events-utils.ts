@@ -53,3 +53,30 @@ export function parseYearParam(value: string | undefined): number | undefined {
   const year = Number.parseInt(value, 10);
   return FILTERABLE_YEARS.includes(year) ? year : undefined;
 }
+
+type FormatStyle = "long" | "short";
+
+function intlDate(iso: string, timezone: string, style: FormatStyle): string {
+  const opts: Intl.DateTimeFormatOptions =
+    style === "long"
+      ? { day: "numeric", month: "long", year: "numeric", timeZone: timezone }
+      : { day: "2-digit", month: "short", year: "numeric", timeZone: timezone };
+  try {
+    return new Intl.DateTimeFormat("en-GB", opts).format(new Date(iso));
+  } catch {
+    return new Intl.DateTimeFormat("en-GB", { ...opts, timeZone: "UTC" }).format(
+      new Date(iso),
+    );
+  }
+}
+
+export function formatEventDate(
+  iso: string | null | undefined,
+  timezone: string | null | undefined,
+  customDateLabel: string | null | undefined,
+  style: FormatStyle = "long",
+): string {
+  if (customDateLabel && customDateLabel.trim().length > 0) return customDateLabel;
+  if (!iso) return "";
+  return intlDate(iso, timezone ?? "UTC", style);
+}

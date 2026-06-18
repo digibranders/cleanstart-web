@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { type Event, formatEventDate } from "@/lib/events";
-import { mediaUrl } from "@/lib/blog";
+import type { Event } from "@/lib/events";
+import { formatEventDate } from "@/lib/events-utils";
+import { mediaUrl } from "@/lib/blog-utils";
 
 const DATE_CHIP_GRADIENT =
   "linear-gradient(93.21deg, #9A51FF 18.08%, #2CC1EB 286.32%)";

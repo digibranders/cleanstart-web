@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { type Blog, formatBlogDate, mediaUrl } from "@/lib/blog";
+import type { Blog } from "@/lib/blog";
+import { formatBlogDate, mediaUrl } from "@/lib/blog-utils";
 import { effectivePublishedAt } from "@/lib/published-date";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
 import { CardCoverFallback } from "@/components/ui/CardCoverFallback";

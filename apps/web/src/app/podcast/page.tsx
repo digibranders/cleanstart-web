@@ -28,7 +28,11 @@ import {
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
-export const dynamic = "force-dynamic";
+// Static + ISR. All fetches are cacheable: the CMS reads via fetchCMS
+// (revalidate 60) and the YouTube RSS feed via `getChannelVideos`
+// (revalidate 3600, regex-parsed, returns [] on error). No searchParams /
+// cookies, so nothing forces dynamic rendering — the page is served from the
+// edge like the rest of the site, refreshing the video list hourly.
 
 const FALLBACK_TITLE = "Leadership Exchange";
 const FALLBACK_DESCRIPTION =

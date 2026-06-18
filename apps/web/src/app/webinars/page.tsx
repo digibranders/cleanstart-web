@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
-import { WebinarsHero } from "@/components/sections/webinars/WebinarsHero";
-import { WebinarsGrid } from "@/components/sections/webinars/WebinarsGrid";
-import { WebinarsCTA } from "@/components/sections/webinars/WebinarsCTA";
-import { FadeUp } from "@/components/ui/FadeUp";
+import { WebinarsBrowser } from "@/components/sections/webinars/WebinarsBrowser";
 import {
-  getWebinars,
-  parseRegionParam,
-  parseTypeParam,
-} from "@/lib/webinars";
+  WebinarsContent,
+  selectWebinars,
+} from "@/components/sections/webinars/WebinarsContent";
+import { WebinarsCTA } from "@/components/sections/webinars/WebinarsCTA";
+import { getWebinars } from "@/lib/webinars";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
@@ -17,42 +16,25 @@ const TITLE = "CleanStart Webinar";
 const DESCRIPTION =
   "Live and on-demand webinars on hardened container images, software supply-chain security, and CleanStart product deep-dives.";
 
-interface WebinarsPageProps {
-  searchParams: Promise<{
-    page?: string;
-    type?: string;
-    region?: string;
-  }>;
-}
-
-export async function generateMetadata({
-  searchParams,
-}: WebinarsPageProps): Promise<Metadata> {
-  const params = await searchParams;
-  const page = Math.max(1, Number.parseInt(params.page ?? "1", 10));
+export function generateMetadata(): Metadata {
   return buildPageMetadata({
     title: TITLE,
     description: DESCRIPTION,
     path: "/webinars",
     eyebrow: "Webinar",
-    noindex: page >= 6,
   });
 }
 
-export default async function WebinarsPage({
-  searchParams,
-}: WebinarsPageProps): Promise<React.ReactElement> {
-  const params = await searchParams;
-  const page = Math.max(1, Number.parseInt(params.page ?? "1", 10));
-  const activeType = parseTypeParam(params.type);
-  const activeRegion = parseRegionParam(params.region);
-
+/**
+ * Static listing. Fetches the full card set once (cacheable, no `searchParams`
+ * on the server) and renders statically; type/region filtering and pagination
+ * run on the client (`WebinarsBrowser`). The Suspense fallback is the
+ * server-rendered default (unfiltered, page 1) view, so the static HTML carries
+ * the first page for crawlers. See /blogs for the pattern.
+ */
+export default async function WebinarsPage(): Promise<React.ReactElement> {
   let loadFailed = false;
-  const data = await getWebinars({
-    page,
-    ...(activeType ? { type: activeType } : {}),
-    ...(activeRegion ? { region: activeRegion } : {}),
-  }).catch(() => {
+  const data = await getWebinars({ limit: 1000 }).catch(() => {
     loadFailed = true;
     return {
       docs: [],
@@ -62,6 +44,13 @@ export default async function WebinarsPage({
       totalDocs: 0,
       totalPages: 1,
     };
+  });
+
+  const allWebinars = data.docs;
+  const initial = selectWebinars(allWebinars, {
+    type: undefined,
+    region: undefined,
+    page: 1,
   });
 
   return (
@@ -74,23 +63,20 @@ export default async function WebinarsPage({
         ])}
       />
       <Header />
-      <main id="main-content" style={{ background: "#F6F6F6" }}>
-        <div className="relative overflow-hidden">
-          <WebinarsHero />
-        </div>
-
-        <FadeUp>
-          <WebinarsGrid
-            items={data.docs}
-            currentPage={data.page}
-            totalPages={data.totalPages}
-            activeType={activeType}
-            activeRegion={activeRegion}
+      <Suspense
+        fallback={
+          <WebinarsContent
+            items={initial.items}
+            currentPage={1}
+            totalPages={initial.totalPages}
+            activeType={undefined}
+            activeRegion={undefined}
             loadFailed={loadFailed}
           />
-        </FadeUp>
-
-      </main>
+        }
+      >
+        <WebinarsBrowser allWebinars={allWebinars} loadFailed={loadFailed} />
+      </Suspense>
       <Footer cta={<WebinarsCTA />} />
     </>
   );

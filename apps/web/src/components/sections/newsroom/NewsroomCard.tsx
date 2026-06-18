@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { mediaUrl } from "@/lib/blog";
-import { type News, formatNewsDate, pressTypeLabel } from "@/lib/news";
+import { mediaUrl } from "@/lib/blog-utils";
+import type { News } from "@/lib/news";
+import { formatNewsDate, pressTypeLabel } from "@/lib/news-utils";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
 
 interface NewsroomCardProps {

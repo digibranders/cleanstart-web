@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
-import { UpcomingEventHero } from "@/components/sections/events/UpcomingEventHero";
-import { PastEventsGrid } from "@/components/sections/events/PastEventsGrid";
+import { EventsBrowser } from "@/components/sections/events/EventsBrowser";
+import {
+  EventsContent,
+  selectPastEvents,
+} from "@/components/sections/events/EventsContent";
 import { EventsCTA } from "@/components/sections/events/EventsCTA";
-import { FadeUp } from "@/components/ui/FadeUp";
 import {
   getUpcomingEvents,
   getPastEvents,
-  parseCountryParam,
-  parseYearParam,
   type EventsListResponse,
 } from "@/lib/events";
 import { buildPageMetadata } from "@/lib/seo/canonical";
@@ -19,21 +20,12 @@ const TITLE = "Events";
 const DESCRIPTION =
   "Explore CleanStart's past and upcoming events including DevOps, DevSecOps, and cybersecurity conferences, summits, and meetups across India and beyond.";
 
-interface EventsPageProps {
-  searchParams: Promise<{ page?: string; country?: string; year?: string }>;
-}
-
-export async function generateMetadata({
-  searchParams,
-}: EventsPageProps): Promise<Metadata> {
-  const params = await searchParams;
-  const page = Math.max(1, Number.parseInt(params.page ?? "1", 10));
+export function generateMetadata(): Metadata {
   return buildPageMetadata({
     title: TITLE,
     description: DESCRIPTION,
     path: "/events",
     eyebrow: "Events",
-    noindex: page >= 6,
   });
 }
 
@@ -46,53 +38,52 @@ const emptyList = (): EventsListResponse => ({
   totalPages: 1,
 });
 
-export default async function EventsPage({
-  searchParams,
-}: EventsPageProps): Promise<React.ReactElement> {
-  const params = await searchParams;
-  const page = Math.max(1, Number.parseInt(params.page ?? "1", 10));
-  const activeCountry = parseCountryParam(params.country);
-  const activeYear = parseYearParam(params.year);
-
+/**
+ * Static listing. Upcoming events and the full past-events set are fetched once
+ * (cacheable, no `searchParams` on the server) and the country/year/page filters
+ * for past events run on the client (`EventsBrowser`), so the route is served as
+ * static HTML instead of rendered per request. The Suspense fallback is the
+ * server-rendered default (unfiltered, page 1) view — that's what lands in the
+ * static HTML, so crawlers and no-JS clients still get the first page. See
+ * /blogs for the pattern.
+ */
+export default async function EventsPage(): Promise<React.ReactElement> {
   let pastFailed = false;
   const [upcoming, past] = await Promise.all([
     getUpcomingEvents({ limit: 10 }).catch(emptyList),
-    getPastEvents({
-      page,
-      limit: 9,
-      ...(activeCountry ? { country: activeCountry } : {}),
-      ...(activeYear ? { year: activeYear } : {}),
-    }).catch(() => {
+    getPastEvents({ limit: 1000 }).catch(() => {
       pastFailed = true;
       return emptyList();
     }),
   ]);
 
   const upcomingEvents = upcoming.docs;
+  const allPastEvents = past.docs;
+  const initial = selectPastEvents(allPastEvents, { page: 1 });
 
   return (
     <>
       <JsonLd
         id="events-breadcrumbs"
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Events" },
-        ])}
+        data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Events" }])}
       />
       <Header />
-      <main id="main-content" style={{ background: "#f6f6f6" }}>
-        <UpcomingEventHero events={upcomingEvents} />
-        <FadeUp>
-          <PastEventsGrid
-            events={past.docs}
-            currentPage={past.page}
-            totalPages={past.totalPages}
-            activeCountry={activeCountry}
-            activeYear={activeYear}
+      <Suspense
+        fallback={
+          <EventsContent
+            upcomingEvents={upcomingEvents}
+            pastEvents={initial.events}
+            currentPage={1}
+            totalPages={initial.totalPages}
             loadFailed={pastFailed}
           />
-        </FadeUp>
-      </main>
+        }
+      >
+        <EventsBrowser
+          upcomingEvents={upcomingEvents}
+          allPastEvents={allPastEvents}
+        />
+      </Suspense>
       <Footer cta={<EventsCTA />} />
     </>
   );

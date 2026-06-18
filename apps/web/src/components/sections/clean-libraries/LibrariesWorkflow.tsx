@@ -1,5 +1,9 @@
-import { Fragment } from "react";
+"use client";
+
+import { Fragment, useRef } from "react";
+import { useInView, useReducedMotion } from "motion/react";
 import Image from "next/image";
+import { cn } from "@/lib/cn";
 import { Container, Section } from "@/components/layout";
 import { Reveal, RevealItem, RevealStagger } from "@/components/ui/Reveal";
 
@@ -121,7 +125,7 @@ function Medallion({
     <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-[-22%] rounded-full"
+        className="wf-icon-glow pointer-events-none absolute inset-[-22%] rounded-full"
         style={{ background: `radial-gradient(closest-side, ${tint} 0%, transparent 72%)` }}
       />
       <Image
@@ -256,10 +260,13 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
   const featured = stage.featured ?? false;
   return (
     <div
-      className={`relative flex h-full flex-col items-center rounded-[22px] border text-center ${
-        featured ? "gap-5 px-8 py-9 xl:min-h-[376px]" : "gap-4 px-6 py-8 xl:min-h-[324px]"
-      }`}
+      data-featured={featured ? "true" : undefined}
+      className={cn(
+        "wf-card relative flex h-full flex-col items-center rounded-[22px] border text-center",
+        featured ? "gap-5 px-8 py-9 xl:min-h-[420px]" : "gap-4 px-6 py-8 xl:min-h-[356px]",
+      )}
       style={{
+        ["--accent" as string]: stage.accent,
         borderColor: featured
           ? `color-mix(in srgb, ${stage.accent} 55%, transparent)`
           : "rgba(255,255,255,0.08)",
@@ -280,7 +287,7 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
         image={stage.image}
         alt=""
         tint={stage.tint}
-        size={featured ? 104 : 84}
+        size={featured ? 132 : 108}
       />
       <div className="flex flex-col items-center gap-3">
         <Title featured={featured}>{stage.title}</Title>
@@ -297,33 +304,54 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
   );
 }
 
-/** Flow arrow between two stages. Horizontal in the desktop row, rotated down when stacked. */
-function Connector({ accent, vertical }: { accent: string; vertical?: boolean }): React.ReactElement {
+/**
+ * Flow arrow between two stages: a flowing dotted accent track running into a
+ * chevron. The dots stream continuously while the section is on-screen.
+ * Horizontal in the desktop row, rotated down when stacked.
+ */
+function Connector({
+  accent,
+  vertical,
+}: {
+  accent: string;
+  vertical?: boolean;
+}): React.ReactElement {
   return (
     <div
       aria-hidden
-      className={`flex shrink-0 items-center justify-center ${vertical ? "h-7 w-full" : "w-7"}`}
+      className={cn(
+        "wf-arrow flex shrink-0 items-center justify-center",
+        vertical ? "h-8 w-full" : "w-9",
+      )}
       style={{ color: accent }}
     >
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className={vertical ? "rotate-90" : undefined}
-      >
-        <path d="M5 12h14" />
-        <path d="m13 6 6 6-6 6" />
-      </svg>
+      <div className={cn("flex items-center gap-1", vertical && "rotate-90")}>
+        <span className="wf-arrow-track" />
+        <svg
+          width="11"
+          height="14"
+          viewBox="0 0 11 14"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M2 2l5 5-5 5" />
+        </svg>
+      </div>
     </div>
   );
 }
 
 export function LibrariesWorkflow(): React.ReactElement {
+  const flowRef = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
+  const inView = useInView(flowRef, { amount: 0.25, margin: "0px 0px -10% 0px" });
+  // Gates the on-screen motion: the flowing arrows and the Clean Library glow
+  // ring only animate while the section is in view (and motion is allowed).
+  const anim = inView && !reduce;
+
   return (
     <Section
       padding="none"
@@ -370,35 +398,38 @@ export function LibrariesWorkflow(): React.ReactElement {
           </h2>
         </Reveal>
 
-        {/* Desktop — horizontal flow with the Clean Library stage prominent.
-            Cards and connectors are siblings so every non-featured card keeps an
-            identical flex basis (equal width); connectors never steal width. */}
-        <Reveal className="mt-14 hidden xl:block">
-          <div className="flex items-center justify-center gap-2">
-            {STAGES.map((stage, i) => (
-              <Fragment key={stage.title}>
-                <div className={`${stage.featured ? "flex-[1.32]" : "flex-1"} min-w-0`}>
-                  <StageCard stage={stage} />
-                </div>
-                {i < STAGES.length - 1 ? (
-                  <Connector accent={STAGES[i + 1]?.accent ?? stage.accent} />
-                ) : null}
-              </Fragment>
-            ))}
-          </div>
-        </Reveal>
+        {/* The flow wrapper is the in-view target that gates the cascade. */}
+        <div ref={flowRef} className={cn(anim && "wf-anim")}>
+          {/* Desktop — horizontal flow with the Clean Library stage prominent.
+              Cards and connectors are siblings so every non-featured card keeps
+              an identical flex basis (equal width); connectors never steal width. */}
+          <Reveal className="mt-14 hidden xl:block">
+            <div className="flex items-center justify-center gap-2">
+              {STAGES.map((stage, i) => (
+                <Fragment key={stage.title}>
+                  <div className={`${stage.featured ? "flex-[1.32]" : "flex-1"} min-w-0`}>
+                    <StageCard stage={stage} />
+                  </div>
+                  {i < STAGES.length - 1 ? (
+                    <Connector accent={STAGES[i + 1]?.accent ?? stage.accent} />
+                  ) : null}
+                </Fragment>
+              ))}
+            </div>
+          </Reveal>
 
-        {/* Stacked — vertical flow for < xl. */}
-        <RevealStagger className="mx-auto mt-12 flex max-w-[440px] flex-col items-stretch gap-3 xl:hidden">
-          {STAGES.map((stage, i) => (
-            <RevealItem key={stage.title} className="flex flex-col items-stretch gap-3">
-              <StageCard stage={stage} />
-              {i < STAGES.length - 1 ? (
-                <Connector accent={STAGES[i + 1]?.accent ?? stage.accent} vertical />
-              ) : null}
-            </RevealItem>
-          ))}
-        </RevealStagger>
+          {/* Stacked — vertical flow for < xl. */}
+          <RevealStagger className="mx-auto mt-12 flex max-w-[440px] flex-col items-stretch gap-3 xl:hidden">
+            {STAGES.map((stage, i) => (
+              <RevealItem key={stage.title} className="flex flex-col items-stretch gap-3">
+                <StageCard stage={stage} />
+                {i < STAGES.length - 1 ? (
+                  <Connector accent={STAGES[i + 1]?.accent ?? stage.accent} vertical />
+                ) : null}
+              </RevealItem>
+            ))}
+          </RevealStagger>
+        </div>
       </Container>
     </Section>
   );

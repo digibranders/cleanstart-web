@@ -2,10 +2,11 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
-import { FadeUp } from "@/components/ui/FadeUp";
-import { ResourceCenterHero } from "@/components/sections/resource-center/ResourceCenterHero";
-import { ResourceCenterSidebar } from "@/components/sections/resource-center/ResourceCenterSidebar";
-import { ResourceGrid } from "@/components/sections/resource-center/ResourceGrid";
+import { ResourceCenterBrowser } from "@/components/sections/resource-center/ResourceCenterBrowser";
+import {
+  ResourceCenterContent,
+  selectResources,
+} from "@/components/sections/resource-center/ResourceCenterContent";
 import { ResourceCenterCTA } from "@/components/sections/resource-center/ResourceCenterCTA";
 import { getResources } from "@/lib/resources";
 import { buildPageMetadata } from "@/lib/seo/canonical";
@@ -15,42 +16,27 @@ const TITLE = "Resource Center";
 const DESCRIPTION =
   "A curated collection of whitepapers, ebooks, datasheets, architecture insights, and reports on container security.";
 
-interface ResourceCenterPageProps {
-  searchParams: Promise<{
-    page?: string;
-    type?: string;
-    q?: string;
-  }>;
-}
-
-export async function generateMetadata({
-  searchParams,
-}: ResourceCenterPageProps): Promise<Metadata> {
-  const params = await searchParams;
-  const page = Math.max(1, Number.parseInt(params.page ?? "1", 10));
+export function generateMetadata(): Metadata {
   return buildPageMetadata({
     title: TITLE,
     description: DESCRIPTION,
     path: "/resource-center",
     eyebrow: "Resources",
-    noindex: page >= 6,
   });
 }
 
-export default async function ResourceCenterPage({
-  searchParams,
-}: ResourceCenterPageProps): Promise<React.ReactElement> {
-  const params = await searchParams;
-  const page = Math.max(1, Number.parseInt(params.page ?? "1", 10));
-  const activeType = params.type ?? "";
-  const searchQuery = params.q ?? "";
-
+/**
+ * Static listing. The full card set is fetched once (cacheable, no
+ * `searchParams` on the server) and type-filtering/search/pagination run on the
+ * client (`ResourceCenterBrowser`), so the route is served as static HTML
+ * instead of rendered per request. The Suspense fallback is the server-rendered
+ * default (unfiltered, page 1) view — that's what lands in the static HTML, so
+ * crawlers and no-JS clients still get the full first page of resources. See
+ * /blogs for the pattern.
+ */
+export default async function ResourceCenterPage(): Promise<React.ReactElement> {
   let loadFailed = false;
-  const resourcesData = await getResources({
-    page,
-    ...(activeType ? { type: activeType } : {}),
-    ...(searchQuery ? { search: searchQuery } : {}),
-  }).catch(() => {
+  const resourcesData = await getResources({ limit: 1000 }).catch(() => {
     loadFailed = true;
     return {
       docs: [],
@@ -59,6 +45,13 @@ export default async function ResourceCenterPage({
       totalDocs: 0,
       totalPages: 1,
     };
+  });
+
+  const allResources = resourcesData.docs;
+  const initial = selectResources(allResources, {
+    type: "",
+    search: "",
+    page: 1,
   });
 
   return (
@@ -71,58 +64,20 @@ export default async function ResourceCenterPage({
         ])}
       />
       <Header />
-      <main id="main-content" style={{ background: "#f6f6f6" }}>
-        <div className="relative overflow-hidden">
-          <Suspense>
-            <ResourceCenterHero initialQuery={searchQuery} />
-          </Suspense>
-        </div>
-
-        <FadeUp>
-          <section
-            className="relative"
-            style={{
-              background: "#f6f6f6",
-              borderRadius: "32px 32px 0 0",
-              marginTop: "-32px",
-              zIndex: 1,
-              paddingTop: "52px",
-              paddingBottom: "var(--spacing-section-cta)",
-            }}
-            aria-label="Resources listing"
-          >
-            <div
-              className="mx-auto"
-              style={{
-                maxWidth: "1276px",
-                paddingLeft: "24px",
-                paddingRight: "24px",
-              }}
-            >
-              {/* Section heading for the document outline — the hero <h1> is
-                  followed by the sidebar "Categories" <h3> and card <h3>s, so
-                  this fills the h2 level. Visually hidden. */}
-              <h2 className="sr-only">Resources</h2>
-              <div className="flex flex-col lg:flex-row items-stretch lg:items-start gap-6 lg:gap-8">
-                <ResourceCenterSidebar
-                  activeType={activeType}
-                  searchQuery={searchQuery}
-                />
-
-                <ResourceGrid
-                  resources={resourcesData.docs}
-                  currentPage={page}
-                  totalPages={resourcesData.totalPages}
-                  activeType={activeType}
-                  searchQuery={searchQuery}
-                  loadFailed={loadFailed}
-                />
-              </div>
-            </div>
-          </section>
-        </FadeUp>
-
-      </main>
+      <Suspense
+        fallback={
+          <ResourceCenterContent
+            resources={initial.resources}
+            activeType=""
+            searchQuery=""
+            currentPage={1}
+            totalPages={initial.totalPages}
+            loadFailed={loadFailed}
+          />
+        }
+      >
+        <ResourceCenterBrowser allResources={allResources} />
+      </Suspense>
       <Footer cta={<ResourceCenterCTA />} />
     </>
   );

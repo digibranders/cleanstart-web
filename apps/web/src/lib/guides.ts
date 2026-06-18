@@ -2,7 +2,8 @@ import { cache } from "react";
 import type { BlogAuthor, BlogImage, LexicalRoot, TocEntry } from "@/lib/blog";
 import type { CmsSeo } from "@/lib/seo/cms-seo";
 
-import { cmsBaseUrl, fetchCMS } from "./cms-fetch";
+import { fetchCMS } from "./cms-fetch";
+import { formatGuideDate, guideMediaUrl } from "./guides-utils";
 
 export type { LexicalRoot, TocEntry } from "@/lib/blog";
 
@@ -62,33 +63,35 @@ export async function getGuides({
   const params = new URLSearchParams({
     "where[_status][equals]": "published",
     "where[publishedAt][exists]": "true",
-    depth: "2",
+    // depth=1 + a card-field whitelist. depth=2 with no select pulled every
+    // guide's full Lexical `body` (guides run 8–13 MB each) — a single listing
+    // page ballooned past 80 MB / 12 s, far over Next's 2 MB data-cache ceiling,
+    // so it was never cached and re-fetched on every request (the ~6 s /guide
+    // load). Cards only read these fields.
+    depth: "1",
     limit: String(limit),
     page: String(page),
     sort: "-publishedAt",
   });
+  for (const field of [
+    "title",
+    "slug",
+    "abstract",
+    "heroImage",
+    "publishedAt",
+    "updatedAt",
+    "readingMinutes",
+    "seo",
+  ]) {
+    params.set(`select[${field}]`, "true");
+  }
   if (search) params.set("where[title][contains]", search);
   return fetchCMS<PayloadListResponse<Guide>>(`/api/guides?${params.toString()}`);
 }
 
-/** Guide-local date formatter — renders "07 Jan 2026". */
-export function formatGuideDate(iso?: string | null): string {
-  if (!iso) return "";
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-/** Guide-local media URL resolver — prefixes the CMS origin for relative paths. */
-export function guideMediaUrl(
-  url: string | undefined | null,
-): string | undefined {
-  if (!url) return undefined;
-  if (url.startsWith("http")) return url;
-  return `${cmsBaseUrl()}${url}`;
-}
+// `formatGuideDate` / `guideMediaUrl` live in `guides-utils.ts` (no cms-fetch /
+// next/headers) so client components can import them. Re-exported for server callers.
+export { formatGuideDate, guideMediaUrl };
 
 /**
  * Prefer a generated size variant when present, falling back to the canonical
