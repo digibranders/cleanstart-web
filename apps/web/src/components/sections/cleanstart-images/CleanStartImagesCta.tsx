@@ -1,64 +1,137 @@
 import type React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * CTA card content for the Footer's CTA slot.
  *
- * Two-column layout at lg+: heading (left) | body copy + glass button (right).
- * Stacks vertically on smaller screens. The 3D cube image anchored top-right
- * intentionally bleeds below the card's overflow-hidden boundary.
+ * White card styled to match the CleanSight CTA: decorative radial-faded grid,
+ * purple corner glow ellipses, a bottom-left cube, dark text, and a solid blue
+ * button. Two-column layout at lg+: heading (left) | body copy + button (right);
+ * stacks vertically on smaller screens.
  */
 export function CleanStartImagesCta(): React.ReactElement {
   return (
     <div
       className="relative h-full w-full overflow-hidden"
-      style={{
-        background: "linear-gradient(180deg, #131e8f 0%, #471ec0 111.05%)",
-      }}
+      style={{ background: "#ffffff" }}
     >
-      {/* 3D cube — desktop only; top-right anchor bleeds off the bottom edge */}
-      <div
-        aria-hidden
-        className="absolute pointer-events-none select-none hidden lg:block"
-        style={{
-          right: "0px",
-          top: "147px",
-          width: "224px",
-          height: "227px",
-          transform: "rotate(-0.15deg)",
-          opacity: 0.8,
-        }}
-      >
-        <Image
-          src="/images/shared/cta-cube-textured.webp"
-          alt=""
-          width={255}
-          height={258}
-          sizes="224px"
-          style={{ width: "100%", height: "100%", objectFit: "contain" }}
-          loading="eager"
-          decoding="async"
-        />
-      </div>
-
-      {/* Green cube — mobile only, extreme bottom-right corner, just the tip visible */}
+      {/* Decorative radial-faded purple grid. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/cleanstart-images/cta-cube-green.webp"
+        src="/images/cleansight/cta-union.svg"
+        alt=""
+        className="absolute pointer-events-none select-none hidden lg:block"
+        style={{
+          left: "547px",
+          top: "-220px",
+          width: "1101px",
+          height: "1101px",
+          opacity: 0.5,
+        }}
+        loading="lazy"
+        decoding="async"
+      />
+
+      {/* Ellipse glow — top-left. */}
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute lg:hidden"
+        style={{
+          left: "-158px",
+          top: "-134px",
+          width: "223.44px",
+          height: "223.44px",
+          borderRadius: "50%",
+          background: "#DF9BFF",
+          opacity: 0.8,
+          filter: "blur(53px)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute hidden lg:block"
+        style={{
+          left: "-139px",
+          top: "-168px",
+          width: "320px",
+          height: "320px",
+          borderRadius: "50%",
+          background: "#DF9BFF",
+          opacity: 0.8,
+          filter: "blur(121.5px)",
+          zIndex: 2,
+        }}
+      />
+
+      {/* Ellipse glow — bottom-right. */}
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute lg:hidden"
+        style={{
+          right: "-145px",
+          bottom: "-141px",
+          width: "223.44px",
+          height: "223.44px",
+          borderRadius: "50%",
+          background: "#DF9BFF",
+          opacity: 0.8,
+          filter: "blur(53px)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none select-none absolute hidden lg:block"
+        style={{
+          left: "1159px",
+          top: "244px",
+          width: "511px",
+          height: "511px",
+          borderRadius: "50%",
+          background: "#DF9BFF",
+          opacity: 0.8,
+          filter: "blur(121.5px)",
+          zIndex: 1,
+        }}
+      />
+
+      {/* Decorative pink/violet cube — bottom-left corner of the card. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        src="/images/vulnerability-remediation/cta-cube.webp"
+        alt=""
+        className="absolute pointer-events-none select-none hidden lg:block"
+        style={{
+          left: "-40px",
+          bottom: "-40px",
+          width: "220px",
+          height: "220px",
+          objectFit: "contain",
+          opacity: 0.5,
+          zIndex: 3,
+        }}
+        loading="lazy"
+        decoding="async"
+      />
+
+      {/* Mobile cube — extreme bottom-right corner, just the tip visible. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        src="/images/vulnerability-remediation/cta-cube.webp"
         alt=""
         className="pointer-events-none select-none absolute lg:hidden"
         style={{
-          right: "-60px",
-          bottom: "-60px",
-          width: "160px",
-          height: "160px",
+          right: "-40px",
+          bottom: "-40px",
+          width: "140px",
+          height: "140px",
           objectFit: "contain",
-          opacity: 0.9,
+          opacity: 0.6,
         }}
-        loading="eager"
+        loading="lazy"
         decoding="async"
       />
 
@@ -69,14 +142,16 @@ export function CleanStartImagesCta(): React.ReactElement {
           paddingRight: "clamp(32px, 5.2vw, 60px)",
         }}
       >
-        <Reveal header className="shrink-0">
+        <Reveal header className="relative shrink-0" style={{ zIndex: 2 }}>
           <h2
-            className="font-display text-white"
+            className="font-display"
             style={{
               fontSize: "var(--cta-card-title)",
               fontWeight: 600,
               letterSpacing: "var(--cta-card-title-ls)",
               lineHeight: "var(--cta-card-title-lh)",
+              color: "#111111",
+              textWrap: "balance",
               maxWidth: "354px",
             }}
           >
@@ -84,7 +159,13 @@ export function CleanStartImagesCta(): React.ReactElement {
           </h2>
         </Reveal>
 
-        <Reveal header delay={0.15} y={20} className="flex flex-col items-start gap-6">
+        <Reveal
+          header
+          delay={0.15}
+          y={20}
+          className="relative flex flex-col items-start gap-6"
+          style={{ zIndex: 2 }}
+        >
           <p
             className="font-sans"
             style={{
@@ -92,7 +173,7 @@ export function CleanStartImagesCta(): React.ReactElement {
               fontWeight: 400,
               lineHeight: "var(--cta-card-desc-lh)",
               letterSpacing: "var(--cta-card-desc-ls)",
-              color: "rgba(255, 255, 255, 0.8)",
+              color: "rgba(17, 17, 17, 0.8)",
               maxWidth: "440px",
             }}
           >
@@ -102,11 +183,18 @@ export function CleanStartImagesCta(): React.ReactElement {
 
           <Link
             href="/resources/enterprise-grade-hardened-container-images"
-            className="cs-btn-glass"
+            className="cs-btn-blue self-start"
+            style={
+              {
+                "--cs-btn-h": "44px",
+                "--cs-btn-px": "16px",
+                "--cs-btn-fs": "16px",
+              } as React.CSSProperties
+            }
           >
             <span>Explore Hardened Images</span>
             <svg
-              className="cs-cta-arrow"
+              className="cs-cta-arrow ml-2"
               width="18"
               height="18"
               viewBox="0 0 18 18"

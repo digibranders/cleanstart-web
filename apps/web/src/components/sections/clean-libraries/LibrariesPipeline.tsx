@@ -93,20 +93,64 @@ function CardBody({ card }: { card: EntryCard }): React.ReactElement {
   );
 }
 
-const CONNECTORS = [
-  { src: "/images/clean-libraries/conn-tl.svg", left: 297, top: 61, flip: true },
-  { src: "/images/clean-libraries/conn-tr.svg", left: 873, top: 56, flip: false },
-  { src: "/images/clean-libraries/conn-bl.svg", left: 295, top: 404, flip: false },
-  { src: "/images/clean-libraries/conn-br.svg", left: 874, top: 407, flip: true },
-];
+/** Diagram geometry in the 1276×544 design canvas. */
+const ORB = { cx: 638, cy: 272, r: 222 } as const; // r=222 → tips meet the sphere, just inside the 480px glow halo
+const CARD = { w: 295, h: 176 } as const;
 
 /** Card corner positions in the 1276×544 design space, paired by index with ENTRY_CARDS. */
 const CARD_POSITIONS = [
   { left: 0, top: 2 }, // Developer Added (TL)
   { left: 981, top: 2 }, // Open Source (TR)
   { left: 0, top: 338 }, // AI-Introduced (BL)
-  { left: 981, top: 330 }, // Transitive (BR)
+  { left: 981, top: 338 }, // Transitive (BR)
 ] as const;
+
+/** Per-card connector accent colour, paired by index with ENTRY_CARDS / CARD_POSITIONS. */
+const CONNECTOR_META = [
+  { color: "#c071f8" }, // Developer Added (TL)
+  { color: "#14f2e4" }, // Open-Source (TR)
+  { color: "#57d5fb" }, // AI-Introduced (BL)
+  { color: "#fc856f" }, // Transitive (BR)
+] as const;
+
+// The orb dock sits on the orb's near side, offset ATTACH_DY above/below centre —
+// matching the original artwork, where arrows entered the orb roughly horizontally
+// rather than along the 45° diagonal.
+const ATTACH_DY = 105;
+const ATTACH_DX = Math.sqrt(ORB.r ** 2 - ATTACH_DY ** 2); // x on the perimeter at that height
+
+interface CardPos {
+  left: number;
+  top: number;
+}
+
+interface ConnectorPath {
+  d: string;
+  color: string;
+}
+
+/**
+ * Build an ogee (S-shaped) cubic from a card's inner edge to the orb's near side.
+ * Both control points sit on the horizontal midline, so the curve leaves the card
+ * and enters the orb on horizontal tangents with a vertical sweep between — the
+ * shape of the original connector artwork. Endpoints are exact, so there is no gap.
+ */
+function buildConnector(pos: CardPos, meta: (typeof CONNECTOR_META)[number]): ConnectorPath {
+  const onLeft = pos.left < ORB.cx;
+  const startX = onLeft ? pos.left + CARD.w : pos.left;
+  const startY = pos.top + CARD.h / 2;
+
+  const endX = ORB.cx + (onLeft ? -ATTACH_DX : ATTACH_DX);
+  const endY = ORB.cy + (startY < ORB.cy ? -ATTACH_DY : ATTACH_DY);
+
+  const midX = (startX + endX) / 2;
+
+  const r = (n: number): string => n.toFixed(1);
+  return {
+    color: meta.color,
+    d: `M ${r(startX)} ${r(startY)} C ${r(midX)} ${r(startY)}, ${r(midX)} ${r(endY)}, ${r(endX)} ${r(endY)}`,
+  };
+}
 
 /** Desktop diagram — a 1276×544 design canvas scaled uniformly to fit. */
 function DesktopDiagram(): React.ReactElement {
@@ -114,6 +158,10 @@ function DesktopDiagram(): React.ReactElement {
     card,
     pos: CARD_POSITIONS[i] ?? { left: 0, top: 0 },
   }));
+
+  const connectors = CARD_POSITIONS.map((pos, i) =>
+    buildConnector(pos, CONNECTOR_META[i] ?? CONNECTOR_META[0]),
+  );
 
   return (
     <div
@@ -146,26 +194,43 @@ function DesktopDiagram(): React.ReactElement {
           decoding="async"
         />
 
-        {/* Connectors. */}
-        {CONNECTORS.map((c) => (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            key={c.src}
-            aria-hidden
-            src={c.src}
-            alt=""
-            className="pointer-events-none absolute select-none"
-            style={{
-              left: `${c.left}px`,
-              top: `${c.top}px`,
-              width: "107px",
-              height: "77px",
-              transform: c.flip ? "scaleX(-1)" : undefined,
-            }}
-            loading="lazy"
-            decoding="async"
-          />
-        ))}
+        {/* Curved connectors: card inner edge → orb perimeter, computed for a flush fit. */}
+        <svg
+          aria-hidden
+          className="pointer-events-none absolute inset-0 h-full w-full select-none"
+          viewBox="0 0 1276 544"
+          fill="none"
+        >
+          <defs>
+            {CONNECTOR_META.map((m) => (
+              <marker
+                key={m.color}
+                id={`lib-arrow${m.color.slice(1)}`}
+                viewBox="0 0 10 10"
+                refX="9"
+                refY="5"
+                markerWidth="14"
+                markerHeight="14"
+                markerUnits="userSpaceOnUse"
+                orient="auto"
+              >
+                <path d="M1 1 L9 5 L1 9 Z" fill={m.color} />
+              </marker>
+            ))}
+          </defs>
+          {connectors.map((c) => (
+            <path
+              key={c.color}
+              d={c.d}
+              stroke={c.color}
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeDasharray="1 8"
+              markerEnd={`url(#lib-arrow${c.color.slice(1)})`}
+              style={{ filter: `drop-shadow(0 0 3px ${c.color}99)` }}
+            />
+          ))}
+        </svg>
 
         {/* Corner cards. */}
         {positionedCards.map(({ card, pos }) => (

@@ -60,16 +60,7 @@ export function LibrariesHero(): React.ReactElement {
                   margin: 0,
                 }}
               >
-                Trusted Software{" "}
-                <span
-                  className="bg-clip-text text-transparent"
-                  style={{
-                    backgroundImage:
-                      "linear-gradient(96.29deg, #9a51ff 42.8%, #2cc1eb 98.78%)",
-                  }}
-                >
-                  Dependencies
-                </span>
+                Trusted Software Dependencies
               </h1>
             </HeroReveal>
 

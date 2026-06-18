@@ -60,6 +60,14 @@ export function mediaUrl(url: string | undefined | null): string | undefined {
 const PUBLISHED_FILTER =
   "where[_status][equals]=published&where[publishedAt][exists]=true";
 
+/** All published resource slugs, for `generateStaticParams` (scalar-only query). */
+export async function getResourceSlugs(): Promise<string[]> {
+  const res = await fetchCMS<PayloadListResponse<{ slug: string }>>(
+    `/api/resources?${PUBLISHED_FILTER}&depth=0&limit=1000&select[slug]=true`,
+  );
+  return res.docs.map((d) => d.slug).filter((s): s is string => Boolean(s));
+}
+
 export async function getResources({
   page = 1,
   limit = 9,
@@ -89,7 +97,7 @@ export async function getResources({
 async function loadResourceBySlug(slug: string, draft = false): Promise<ResourceDetail | null> {
   const filter = draft ? "" : `&${PUBLISHED_FILTER}`;
   const data = await fetchCMS<PayloadListResponse<ResourceDetail>>(
-    `/api/resources?where[slug][equals]=${encodeURIComponent(slug)}${filter}&depth=3&limit=1`,
+    `/api/resources?where[slug][equals]=${encodeURIComponent(slug)}${filter}&depth=1&limit=1`,
     { draft },
   );
   return data.docs[0] ?? null;

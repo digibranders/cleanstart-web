@@ -10,17 +10,17 @@ interface ArtifactCard {
 const CARDS: ArtifactCard[] = [
   {
     glyph: '/images/for-developers/trusted-artifacts/glyph-images.svg',
-    title: 'CleanStart Images',
+    title: 'Clean Images',
     desc: 'Minimal, verified, zero-CVE container foundations.',
   },
   {
     glyph: '/images/for-developers/trusted-artifacts/glyph-libraries.svg',
-    title: 'CleanStart Libraries',
+    title: 'Clean Libraries',
     desc: 'Trusted open-source dependencies built from verified upstream sources.',
   },
   {
     glyph: '/images/for-developers/trusted-artifacts/glyph-models.svg',
-    title: 'CleanStart Models',
+    title: 'Clean Models',
     desc: 'Verified ML and AI software artifacts for modern AI applications.',
   },
 ];
@@ -169,7 +169,7 @@ export function DeveloperTrustedArtifacts(): React.ReactElement {
                 lineHeight: 1.1,
                 color: '#111111',
                 maxWidth: '700px',
-                marginBottom: 'clamp(40px, 4.17vw, 80px)',
+                marginBottom: 'clamp(16px, 1.5vw, 24px)',
                 textWrap: 'balance',
               }}
             >
@@ -185,6 +185,25 @@ export function DeveloperTrustedArtifacts(): React.ReactElement {
                 Development
               </span>
             </h2>
+          </Reveal>
+
+          <Reveal header>
+            <p
+              className="mx-auto text-center"
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--fs-lead)',
+                fontWeight: 400,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.45,
+                color: '#555555',
+                maxWidth: '640px',
+                marginBottom: 'clamp(40px, 4.17vw, 80px)',
+                textWrap: 'balance',
+              }}
+            >
+              Verified software foundations for containers, dependencies, and AI applications.
+            </p>
           </Reveal>
 
           <RevealStagger className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">

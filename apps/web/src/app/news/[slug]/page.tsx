@@ -4,6 +4,7 @@ import { mediaUrl } from "@/lib/blog";
 import {
   getNewsBySlug,
   getNewsBySlugDraft,
+  getNewsSlugs,
   getRelatedNews,
 } from "@/lib/news";
 import { highlightLexical } from "@/lib/highlightLexical";
@@ -19,6 +20,19 @@ import { JsonLd, breadcrumbSchema, newsArticleSchema } from "@/lib/seo/jsonld";
 
 interface NewsDetailPageProps {
   params: Promise<{ slug: string }>;
+}
+
+// Slugs not returned here still render on first request, then cache (ISR).
+export const dynamicParams = true;
+
+/** Pre-render every published news item; degrade to on-demand if CMS is down at build. */
+export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
+  try {
+    const slugs = await getNewsSlugs();
+    return slugs.map((slug) => ({ slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({

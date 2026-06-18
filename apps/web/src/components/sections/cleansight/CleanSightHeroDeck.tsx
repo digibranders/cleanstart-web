@@ -7,7 +7,7 @@ import {
   useReducedMotion,
 } from "motion/react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { EASE_OUT } from "@/lib/motion";
 
 interface DeckCard {
@@ -31,7 +31,7 @@ const CARDS: readonly DeckCard[] = [
 ];
 
 const STACK_Y = 16;
-const ROTATE_MS = 3800;
+const ROTATE_MS = 6500;
 
 // Visual state for each stack position (0 = front).
 const POSITIONS = [
@@ -44,14 +44,19 @@ export function CleanSightHeroDeck(): React.ReactElement {
   const reduce = useReducedMotion();
   const [active, setActive] = useState(0);
 
+  const advance = useCallback(
+    () => setActive((a) => (a + 1) % CARDS.length),
+    [],
+  );
+
+  // Auto-advance. The timer is keyed on `active`, so a manual click (which
+  // changes `active`) also resets the countdown before the next auto-advance.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `active` intentionally restarts the timer on every change
   useEffect(() => {
     if (reduce) return;
-    const id = window.setInterval(
-      () => setActive((a) => (a + 1) % CARDS.length),
-      ROTATE_MS,
-    );
-    return () => window.clearInterval(id);
-  }, [reduce]);
+    const id = window.setTimeout(advance, ROTATE_MS);
+    return () => window.clearTimeout(id);
+  }, [active, reduce, advance]);
 
   return (
     <LazyMotion features={domAnimation} strict>
@@ -59,8 +64,11 @@ export function CleanSightHeroDeck(): React.ReactElement {
         className="relative mx-auto w-full"
         style={{ maxWidth: "600px", paddingTop: `${2 * STACK_Y}px` }}
       >
-        <div
-          className="relative"
+        <button
+          type="button"
+          onClick={advance}
+          aria-label="Show the next CleanSight dashboard view"
+          className="relative block w-full cursor-pointer border-0 bg-transparent p-0"
           style={{ height: "clamp(300px, 40vw, 420px)" }}
         >
           {CARDS.map((card, i) => {
@@ -86,7 +94,7 @@ export function CleanSightHeroDeck(): React.ReactElement {
                   opacity: pos.opacity,
                   filter: `blur(${pos.blur}px)`,
                 }}
-                transition={{ duration: 0.7, ease: EASE_OUT }}
+                transition={{ duration: 1.0, ease: EASE_OUT }}
               >
                 <div
                   className="flex items-center gap-[7px] px-4"
@@ -115,7 +123,7 @@ export function CleanSightHeroDeck(): React.ReactElement {
               </m.div>
             );
           })}
-        </div>
+        </button>
       </div>
     </LazyMotion>
   );

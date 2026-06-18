@@ -9,6 +9,7 @@ import { ResourceDetailLeadCapture } from "@/components/sections/resource/Resour
 import {
   getResourceBySlug,
   getResourceBySlugDraft,
+  getResourceSlugs,
   mediaUrl,
   resourceTypeLabel,
 } from "@/lib/resources";
@@ -25,6 +26,19 @@ import {
 
 interface ResourceDetailPageProps {
   params: Promise<{ slug: string }>;
+}
+
+// Slugs not returned here still render on first request, then cache (ISR).
+export const dynamicParams = true;
+
+/** Pre-render every published resource; degrade to on-demand if CMS is down at build. */
+export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
+  try {
+    const slugs = await getResourceSlugs();
+    return slugs.map((slug) => ({ slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({

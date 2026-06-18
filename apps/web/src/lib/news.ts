@@ -61,14 +61,22 @@ export type NewsListResponse = PayloadListResponse<News>;
 const PUBLISHED_FILTER =
   "where[_status][equals]=published&where[publicationDate][exists]=true";
 
+/** All published news slugs, for `generateStaticParams` (scalar-only query). */
+export async function getNewsSlugs(): Promise<string[]> {
+  const res = await fetchCMS<PayloadListResponse<{ slug: string }>>(
+    `/api/news?${PUBLISHED_FILTER}&depth=0&limit=1000&select[slug]=true`,
+  );
+  return res.docs.map((d) => d.slug).filter((s): s is string => Boolean(s));
+}
+
 export async function getFeaturedNews(): Promise<News | null> {
   const featured = await fetchCMS<NewsListResponse>(
-    `/api/news?${PUBLISHED_FILTER}&where[featured][equals]=true&depth=2&limit=1&sort=-publicationDate`,
+    `/api/news?${PUBLISHED_FILTER}&where[featured][equals]=true&depth=1&limit=1&sort=-publicationDate`,
   );
   if (featured.docs[0]) return featured.docs[0];
 
   const latest = await fetchCMS<NewsListResponse>(
-    `/api/news?${PUBLISHED_FILTER}&depth=2&limit=1&sort=-publicationDate`,
+    `/api/news?${PUBLISHED_FILTER}&depth=1&limit=1&sort=-publicationDate`,
   );
   return latest.docs[0] ?? null;
 }
@@ -122,7 +130,7 @@ export async function getNewsCategories(): Promise<NewsCategory[]> {
 async function loadNewsBySlug(slug: string, draft = false): Promise<NewsDetail | null> {
   const filter = draft ? "" : `&${PUBLISHED_FILTER}`;
   const data = await fetchCMS<PayloadListResponse<NewsDetail>>(
-    `/api/news?where[slug][equals]=${encodeURIComponent(slug)}${filter}&depth=3&limit=1`,
+    `/api/news?where[slug][equals]=${encodeURIComponent(slug)}${filter}&depth=1&limit=1`,
     { draft },
   );
   return data.docs[0] ?? null;
@@ -146,7 +154,7 @@ export async function getRelatedNews(
   const filter = draft ? "" : `${PUBLISHED_FILTER}&`;
   if (categoryIds.length === 0) {
     const data = await fetchCMS<PayloadListResponse<News>>(
-      `/api/news?${filter}where[id][not_equals]=${newsId}&depth=2&limit=${limit}&sort=-publicationDate`,
+      `/api/news?${filter}where[id][not_equals]=${newsId}&depth=1&limit=${limit}&sort=-publicationDate`,
       { draft },
     );
     return data.docs;
@@ -155,12 +163,12 @@ export async function getRelatedNews(
     .map((id, i) => `where[newsCategories][in][${i}]=${encodeURIComponent(id)}`)
     .join("&");
   const data = await fetchCMS<PayloadListResponse<News>>(
-    `/api/news?${filter}where[id][not_equals]=${newsId}&${catParam}&depth=2&limit=${limit}&sort=-publicationDate`,
+    `/api/news?${filter}where[id][not_equals]=${newsId}&${catParam}&depth=1&limit=${limit}&sort=-publicationDate`,
     { draft },
   );
   if (data.docs.length < limit) {
     const fallback = await fetchCMS<PayloadListResponse<News>>(
-      `/api/news?${filter}where[id][not_equals]=${newsId}&depth=2&limit=${limit}&sort=-publicationDate`,
+      `/api/news?${filter}where[id][not_equals]=${newsId}&depth=1&limit=${limit}&sort=-publicationDate`,
       { draft },
     );
     return fallback.docs;
