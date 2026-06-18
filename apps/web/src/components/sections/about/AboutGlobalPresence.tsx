@@ -1,32 +1,8 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
-import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
+import dynamic from "next/dynamic";
 import { Reveal } from "@/components/ui/Reveal";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-type LocationId = "hq" | "ahmedabad" | "bengaluru" | "singapore";
-
-interface Office {
-  id: LocationId;
-  city: string;
-  country: string;
-  role: string;
-  address: string;
-  color: "amber" | "cyan";
-  /** [longitude, latitude] */
-  coordinates: [number, number];
-  imageSrc: string;
-}
-
-interface TooltipState {
-  office: Office;
-  /** px from container left edge */
-  left: number;
-  /** px from container top edge */
-  top: number;
-}
+import type { Office } from "./GlobalPresenceMap";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -74,36 +50,52 @@ const OFFICES: Office[] = [
 ];
 
 const GUIDE_LINES_X = [323, 726, 759, 1164, 1195, 1599] as const;
+
 const CYAN = "#2cc1eb";
 const AMBER = "#f59e0b";
-const GEO_URL = "/world-110m.json";
 
 function markerColor(color: "amber" | "cyan"): string {
   return color === "amber" ? AMBER : CYAN;
 }
 
+// ─── Dynamic map (browser-only — mapbox-gl uses browser APIs at import time) ──
+
+const GlobalPresenceMap = dynamic(
+  () =>
+    import("./GlobalPresenceMap").then((m) => ({ default: m.GlobalPresenceMap })),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        style={{
+          height: 520,
+          borderRadius: 16,
+          border: "1px solid rgba(255,255,255,0.08)",
+          background: "rgba(255,255,255,0.03)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <span
+          className="animate-spin"
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: "50%",
+            border: "2px solid rgba(255,255,255,0.15)",
+            borderTopColor: "#2CC1EB",
+            display: "block",
+          }}
+        />
+      </div>
+    ),
+  },
+);
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function AboutGlobalPresence() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [tooltip, setTooltip] = useState<TooltipState | null>(null);
-
-  const handleEnter = useCallback(
-    (office: Office, e: React.MouseEvent<SVGGElement>) => {
-      const container = containerRef.current;
-      if (!container) return;
-      const rect = container.getBoundingClientRect();
-      setTooltip({
-        office,
-        left: e.clientX - rect.left,
-        top: e.clientY - rect.top,
-      });
-    },
-    [],
-  );
-
-  const handleLeave = useCallback(() => setTooltip(null), []);
-
   return (
     <section
       className="relative w-full overflow-hidden"
@@ -173,10 +165,10 @@ export function AboutGlobalPresence() {
       ))}
 
       {/* ── Content ──────────────────────────────────────────────────────── */}
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[100px] pb-16">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[48px] pb-16">
 
         {/* Heading */}
-        <div className="mx-auto flex max-w-[840px] flex-col items-center gap-5 text-center text-white mb-12 lg:mb-16">
+        <div className="mx-auto flex max-w-[840px] flex-col items-center gap-5 text-center text-white mb-6 lg:mb-8">
           <Reveal header delay={0.1} y={20}>
             <h2
               className="font-display"
@@ -199,7 +191,7 @@ export function AboutGlobalPresence() {
                 lineHeight: 1.5,
                 letterSpacing: "-0.02em",
                 opacity: 0.7,
-                maxWidth: "600px",
+                maxWidth: "780px",
               }}
             >
               From the Americas to Southeast Asia, CleanStart&apos;s team is
@@ -208,223 +200,10 @@ export function AboutGlobalPresence() {
           </Reveal>
         </div>
 
-        {/* ── Map ──────────────────────────────────────────────────────────── */}
+        {/* ── Interactive Mapbox map ────────────────────────────────────── */}
         <Reveal delay={0.3}>
-          {/* container ref used for tooltip positioning */}
-          <div
-            ref={containerRef}
-            className="relative mx-auto w-full"
-            style={{ maxWidth: "1100px" }}
-          >
-            <ComposableMap
-              width={1000}
-              height={490}
-              projection="geoEqualEarth"
-              projectionConfig={{ scale: 195, center: [10, 5] }}
-              style={{ width: "100%", height: "auto", display: "block" }}
-            >
-              <defs>
-                {/* Pin glow */}
-                <filter
-                  id="gp-pin-glow"
-                  x="-100%"
-                  y="-100%"
-                  width="300%"
-                  height="300%"
-                >
-                  <feGaussianBlur stdDeviation="2.5" result="blur" />
-                  <feMerge>
-                    <feMergeNode in="blur" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-              </defs>
-
-              {/* ── Country fills — ghost style on section bg ──────────── */}
-              <Geographies geography={GEO_URL}>
-                {({ geographies }) =>
-                  geographies.map((geo) => (
-                    <Geography
-                      key={geo.rsmKey}
-                      geography={geo}
-                      style={{
-                        default: {
-                          fill: "rgba(255,255,255,0.05)",
-                          stroke: "rgba(255,255,255,0.18)",
-                          strokeWidth: 0.5,
-                          outline: "none",
-                        },
-                        hover: {
-                          fill: "rgba(255,255,255,0.05)",
-                          outline: "none",
-                        },
-                        pressed: {
-                          fill: "rgba(255,255,255,0.05)",
-                          outline: "none",
-                        },
-                      }}
-                    />
-                  ))
-                }
-              </Geographies>
-
-              {/* ── Office pin markers ────────────────────────────────────── */}
-              {OFFICES.map((o, i) => {
-                const c = markerColor(o.color);
-                const pulseDur = o.color === "amber" ? "2.2s" : "2s";
-                const pulseBegin = `${i * 0.45}s`;
-
-                return (
-                  <Marker
-                    key={o.id}
-                    coordinates={o.coordinates}
-                    onMouseEnter={(e) => handleEnter(o, e)}
-                    onMouseLeave={handleLeave}
-                    style={{ cursor: "pointer" }}
-                  >
-                    {/* Outer pulse ring */}
-                    <circle r={5} fill={c} opacity={0.55}>
-                      <animate
-                        attributeName="r"
-                        from="5"
-                        to="18"
-                        dur={pulseDur}
-                        begin={pulseBegin}
-                        repeatCount="indefinite"
-                      />
-                      <animate
-                        attributeName="opacity"
-                        from="0.55"
-                        to="0"
-                        dur={pulseDur}
-                        begin={pulseBegin}
-                        repeatCount="indefinite"
-                      />
-                    </circle>
-                    {/* Mid ring */}
-                    <circle
-                      r={7}
-                      fill="none"
-                      stroke={c}
-                      strokeWidth={1.2}
-                      opacity={0.4}
-                    />
-                    {/* Core dot */}
-                    <circle r={4.5} fill={c} filter="url(#gp-pin-glow)" />
-                    {/* Invisible hit area — must be last to sit on top */}
-                    <circle
-                      r={18}
-                      fill="rgba(0,0,0,0.001)"
-                      style={{ cursor: "pointer" }}
-                    />
-                  </Marker>
-                );
-              })}
-            </ComposableMap>
-
-            {/* ── Hover tooltip ─────────────────────────────────────────── */}
-            {tooltip && (() => {
-              const c = markerColor(tooltip.office.color);
-              // Flip horizontally if pin is in the right 55% of the container
-              // to prevent tooltip from overflowing right edge
-              const containerW = containerRef.current?.offsetWidth ?? 1100;
-              const flipLeft = tooltip.left > containerW * 0.55;
-              const translateX = flipLeft ? "calc(-100% + 16px)" : "-16px";
-
-              return (
-                <div
-                  className="pointer-events-none absolute z-20"
-                  style={{
-                    left: tooltip.left,
-                    top: tooltip.top,
-                    transform: `translate(${translateX}, calc(-100% - 18px))`,
-                  }}
-                >
-                  <div
-                    style={{
-                      width: "200px",
-                      background: "rgba(8, 14, 38, 0.88)",
-                      backdropFilter: "blur(18px)",
-                      WebkitBackdropFilter: "blur(18px)",
-                      border: `1px solid ${c}44`,
-                      borderRadius: "12px",
-                      overflow: "hidden",
-                      boxShadow: `0 10px 40px rgba(0,0,0,0.65), 0 0 0 1px ${c}22`,
-                    }}
-                  >
-                    {/* Location image */}
-                    <div
-                      style={{
-                        width: "100%",
-                        height: "118px",
-                        overflow: "hidden",
-                      }}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={tooltip.office.imageSrc}
-                        alt={tooltip.office.city}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                          display: "block",
-                        }}
-                      />
-                    </div>
-
-                    {/* Colored accent line below image */}
-                    <div
-                      style={{
-                        height: "1.5px",
-                        background: `linear-gradient(90deg, ${c}00, ${c}, ${c}00)`,
-                      }}
-                    />
-
-                    {/* Text */}
-                    <div style={{ padding: "10px 12px 12px" }}>
-                      <p
-                        className="font-display"
-                        style={{
-                          fontSize: "13px",
-                          fontWeight: 700,
-                          color: "#fff",
-                          marginBottom: "3px",
-                          lineHeight: 1.2,
-                        }}
-                      >
-                        {tooltip.office.city}
-                      </p>
-                      <p
-                        style={{
-                          fontSize: "10px",
-                          fontWeight: 600,
-                          color: c,
-                          fontFamily: "var(--font-sans)",
-                          letterSpacing: "0.08em",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        {tooltip.office.role}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Arrow pointing down toward pin */}
-                  <div
-                    style={{
-                      width: 0,
-                      height: 0,
-                      borderLeft: "7px solid transparent",
-                      borderRight: "7px solid transparent",
-                      borderTop: "7px solid rgba(8, 14, 38, 0.88)",
-                      marginLeft: flipLeft ? "auto" : "16px",
-                      marginRight: flipLeft ? "16px" : "auto",
-                    }}
-                  />
-                </div>
-              );
-            })()}
+          <div className="mx-auto w-full" style={{ maxWidth: "1100px" }}>
+            <GlobalPresenceMap offices={OFFICES} />
           </div>
         </Reveal>
 
@@ -433,9 +212,9 @@ export function AboutGlobalPresence() {
           className="mx-auto mt-5 hidden lg:flex"
           style={{
             maxWidth: "1100px",
-            border: "1px solid rgba(255,255,255,0.09)",
+            border: "1px solid rgba(255,255,255,0.12)",
             borderRadius: "14px",
-            background: "rgba(255,255,255,0.03)",
+            background: "rgba(10, 8, 28, 0.88)",
             overflow: "hidden",
           }}
         >

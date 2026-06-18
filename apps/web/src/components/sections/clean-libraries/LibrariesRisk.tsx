@@ -125,7 +125,11 @@ function Card({ card }: { card: RiskCard }): React.ReactElement {
 
 export function LibrariesRisk(): React.ReactElement {
   return (
-    <Section padding="lg" className="overflow-hidden bg-white">
+    <Section
+      padding="lg"
+      className="overflow-hidden bg-white"
+      style={{ paddingTop: "var(--spacing-section-sm)" }}
+    >
       {/* Decorative corner washes. */}
       <div
         aria-hidden

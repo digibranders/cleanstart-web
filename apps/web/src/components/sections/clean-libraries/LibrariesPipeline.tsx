@@ -59,7 +59,7 @@ const DIVIDER =
 function CardBody({ card }: { card: EntryCard }): React.ReactElement {
   return (
     <div
-      className="flex h-full w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-[24px] border px-6 text-center text-white"
+      className="flex h-full w-full flex-col items-center justify-center gap-2.5 overflow-hidden rounded-[20px] border px-5 text-center text-white"
       style={{
         borderColor: card.border,
         background: `linear-gradient(125.6deg, ${card.tint} 4.65%, rgba(153,153,153,0.1) 77.64%)`,
@@ -67,11 +67,11 @@ function CardBody({ card }: { card: EntryCard }): React.ReactElement {
     >
       <p
         className="font-display font-bold"
-        style={{ fontSize: "var(--fs-h3)", letterSpacing: "-0.03em", lineHeight: 1.05 }}
+        style={{ fontSize: "var(--fs-h4)", letterSpacing: "-0.03em", lineHeight: 1.05 }}
       >
         {card.title}
       </p>
-      <ul className="flex flex-wrap items-center justify-center gap-2">
+      <ul className="flex flex-wrap items-center justify-center gap-1.5">
         {card.items.map((item) => (
           <li
             key={item}
@@ -82,7 +82,7 @@ function CardBody({ card }: { card: EntryCard }): React.ReactElement {
               color: "rgba(255,255,255,0.92)",
               fontSize: "var(--fs-caption)",
               letterSpacing: "-0.01em",
-              padding: "5px 10px",
+              padding: "4px 8px",
             }}
           >
             {item}
@@ -93,16 +93,16 @@ function CardBody({ card }: { card: EntryCard }): React.ReactElement {
   );
 }
 
-/** Diagram geometry in the 1276×480 design canvas. */
-const ORB = { cx: 638, cy: 240, r: 194 } as const; // r=194 → tips meet the sphere, just inside the 420px glow halo
-const CARD = { w: 295, h: 150 } as const;
+/** Diagram geometry in the 1276×420 design canvas. */
+const ORB = { cx: 638, cy: 210, r: 194 } as const; // r=194 → tips meet the sphere, just inside the 420px glow halo
+const CARD = { w: 250, h: 128 } as const;
 
-/** Card corner positions in the 1276×480 design space, paired by index with ENTRY_CARDS. */
+/** Card corner positions in the 1276×420 design space, paired by index with ENTRY_CARDS. */
 const CARD_POSITIONS = [
-  { left: 0, top: 0 }, // Developer Added (TL)
-  { left: 981, top: 0 }, // Open Source (TR)
-  { left: 0, top: 330 }, // AI-Introduced (BL)
-  { left: 981, top: 330 }, // Transitive (BR)
+  { left: 120, top: 0 }, // Developer Added (TL)
+  { left: 906, top: 0 }, // Open Source (TR)
+  { left: 120, top: 292 }, // AI-Introduced (BL)
+  { left: 906, top: 292 }, // Transitive (BR)
 ] as const;
 
 /** Per-card connector accent colour, paired by index with ENTRY_CARDS / CARD_POSITIONS. */
@@ -116,7 +116,7 @@ const CONNECTOR_META = [
 // The orb dock sits on the orb's near side, offset ATTACH_DY above/below centre —
 // matching the original artwork, where arrows entered the orb roughly horizontally
 // rather than along the 45° diagonal.
-const ATTACH_DY = 96;
+const ATTACH_DY = 85;
 const ATTACH_DX = Math.sqrt(ORB.r ** 2 - ATTACH_DY ** 2); // x on the perimeter at that height
 
 interface CardPos {
@@ -170,7 +170,7 @@ function DesktopDiagram(): React.ReactElement {
         {
           "--lib-scale": "min(1, calc((min(100vw, 1440px) - 80px) / 1276px))",
           width: "calc(1276px * var(--lib-scale))",
-          height: "calc(480px * var(--lib-scale))",
+          height: "calc(420px * var(--lib-scale))",
         } as React.CSSProperties
       }
     >
@@ -178,7 +178,7 @@ function DesktopDiagram(): React.ReactElement {
         className="relative"
         style={{
           width: "1276px",
-          height: "480px",
+          height: "420px",
           transform: "scale(var(--lib-scale))",
           transformOrigin: "top left",
         }}
@@ -198,7 +198,7 @@ function DesktopDiagram(): React.ReactElement {
         <svg
           aria-hidden
           className="pointer-events-none absolute inset-0 h-full w-full select-none"
-          viewBox="0 0 1276 480"
+          viewBox="0 0 1276 420"
           fill="none"
         >
           <defs>
@@ -240,8 +240,8 @@ function DesktopDiagram(): React.ReactElement {
             style={{
               left: `${pos.left}px`,
               top: `${pos.top}px`,
-              width: "295px",
-              height: "176px",
+              width: `${CARD.w}px`,
+              height: `${CARD.h}px`,
             }}
           >
             <CardBody card={card} />
@@ -279,7 +279,7 @@ function MobileDiagram(): React.ReactElement {
 export function LibrariesPipeline(): React.ReactElement {
   return (
     <Section
-      padding="lg"
+      padding="sm"
       className="overflow-hidden"
       style={{
         background:
@@ -342,7 +342,7 @@ export function LibrariesPipeline(): React.ReactElement {
         {/* "No review" banner — width matches the diagram canvas above. */}
         <Reveal>
           <div
-            className="mx-auto mt-12 lg:mt-16 lg:w-[calc(1276px*var(--lib-scale))]"
+            className="mx-auto mt-12 lg:mt-16 lg:w-[calc(1036px*var(--lib-scale))]"
             style={
               {
                 "--lib-scale":

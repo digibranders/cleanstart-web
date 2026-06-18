@@ -31,6 +31,7 @@
     "lottie-react": "^2.4.1",
     "lucide-react": "^1.14.0",
     "mapbox-gl": "^3.25.0",
+    "maplibre-gl": "^5.24.0",
     "motion": "^12.38.0",
     "next": "16.2.5",
     "node-html-markdown": "^2.0.0",
