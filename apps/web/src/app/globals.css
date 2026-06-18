@@ -4033,13 +4033,18 @@ body {
   .cs-map-tooltip      { animation: none !important; }
 }
 
-/* ── GlobalPresence Mapbox map ───────────────────────────────────────────── */
-@keyframes gp-marker-pulse {
-  0%   { transform: scale(0.6); opacity: 0.7; }
-  100% { transform: scale(2.8); opacity: 0;   }
+/* ── GlobalPresence network map ──────────────────────────────────────────── */
+@keyframes gp-svg-pulse {
+  0%   { transform: scale(0.8); opacity: 0.6; }
+  100% { transform: scale(2.6); opacity: 0;   }
 }
 
+.gp-svg-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: gp-svg-pulse 2.4s ease-out infinite;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .gp-marker-pulse-ring { animation: none !important; opacity: 0 !important; }
+  .gp-svg-pulse { animation: none !important; opacity: 0 !important; }
 }

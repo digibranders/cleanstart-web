@@ -1,9 +1,7 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
-import MapGL, { Marker, NavigationControl } from "react-map-gl/maplibre";
-import type { MapRef } from "react-map-gl/maplibre";
-import "maplibre-gl/dist/maplibre-gl.css";
+import { useState, useCallback } from "react";
+import { ComposableMap, Geographies, Geography, Marker, Line } from "react-simple-maps";
 import Image from "next/image";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -28,300 +26,198 @@ interface GlobalPresenceMapProps {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const INITIAL_VIEW = {
-  longitude: 15,
-  latitude: 22,
-  zoom: 1.8,
-  pitch: 35,
-  bearing: 0,
-} as const;
+const GEO_URL = "/data/world-110m.json";
 
 const PIN_FILL: Record<"amber" | "cyan", string> = {
   amber: "#FBB824",
   cyan: "#2CC1EB",
 };
 
-// HTML-based country labels rendered via Marker — avoids tile glyph font dependency.
-// Positioned at each country's geographic centre (not the office city).
-const OFFICE_COUNTRY_LABELS: { name: string; coordinates: [number, number] }[] = [
-  { name: "United States", coordinates: [-98.0, 39.5] },
-  { name: "India", coordinates: [80.0, 22.5] },
-  { name: "Singapore", coordinates: [103.8, 1.35] },
+// Staggered pulse delays — deterministic to avoid hydration mismatch
+const PULSE_DELAY: Record<LocationId, string> = {
+  hq: "0s",
+  ahmedabad: "0.7s",
+  bengaluru: "1.4s",
+  singapore: "0.35s",
+};
+
+// Country centroid labels — only for the 3 countries with offices
+const COUNTRY_LABELS: { name: string; coords: [number, number] }[] = [
+  { name: "UNITED STATES", coords: [-97, 40] },
+  { name: "INDIA", coords: [80, 22] },
+  { name: "SINGAPORE", coords: [103.8, 3.0] },
 ];
+
+function buildConnections(
+  offices: Office[],
+): { from: [number, number]; to: [number, number]; key: string }[] {
+  const hq = offices.find((o) => o.id === "hq");
+  if (!hq) return [];
+  const lines: { from: [number, number]; to: [number, number]; key: string }[] = [];
+  for (const o of offices) {
+    if (o.id !== "hq") {
+      lines.push({ from: hq.coordinates, to: o.coordinates, key: `hq-${o.id}` });
+    }
+  }
+  const ahm = offices.find((o) => o.id === "ahmedabad");
+  const ben = offices.find((o) => o.id === "bengaluru");
+  if (ahm && ben) {
+    lines.push({ from: ahm.coordinates, to: ben.coordinates, key: "ahm-ben" });
+  }
+  return lines;
+}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
-  const mapRef = useRef<MapRef>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredOffice, setHoveredOffice] = useState<Office | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
-  const [activeId, setActiveId] = useState<LocationId | null>(null);
 
-  const flyToOffice = useCallback((office: Office) => {
-    setActiveId(office.id);
-    setHoveredOffice(null);
-    setTooltipPos(null);
-    mapRef.current?.flyTo({
-      center: office.coordinates,
-      zoom: 13,
-      pitch: 60,
-      bearing: -10,
-      duration: 1800,
-      essential: true,
-    });
-  }, []);
+  const connections = buildConnections(offices);
 
-  const resetView = useCallback(() => {
-    setActiveId(null);
-    mapRef.current?.flyTo({
-      center: [INITIAL_VIEW.longitude, INITIAL_VIEW.latitude],
-      zoom: INITIAL_VIEW.zoom,
-      pitch: INITIAL_VIEW.pitch,
-      bearing: INITIAL_VIEW.bearing,
-      duration: 1500,
-      essential: true,
-    });
-  }, []);
-
-  const handleMarkerEnter = useCallback(
-    (office: Office) => {
-      if (activeId) return;
+  const handleEnter = useCallback(
+    (office: Office, e: React.MouseEvent) => {
       setHoveredOffice(office);
-      const map = mapRef.current;
-      const container = containerRef.current;
-      if (!map || !container) return;
-      const point = map.project(office.coordinates);
-      const rect = container.getBoundingClientRect();
-      setTooltipPos({ x: rect.left + point.x, y: rect.top + point.y });
+      setTooltipPos({ x: e.clientX, y: e.clientY });
     },
-    [activeId],
+    [],
   );
 
-  const handleMarkerLeave = useCallback(() => {
+  const handleLeave = useCallback(() => {
     setHoveredOffice(null);
     setTooltipPos(null);
-  }, []);
-
-  // Hide every country label that the Liberty tile style renders, then overlay
-  // our own labels so only office countries are visible.
-  const handleMapLoad = useCallback(() => {
-    const map = mapRef.current?.getMap();
-    if (!map) return;
-    const style = map.getStyle();
-    if (!style?.layers) return;
-    for (const layer of style.layers) {
-      if (layer.type !== "symbol") continue;
-      const id = layer.id.toLowerCase();
-      if (
-        id.includes("country") ||
-        id.includes("state-label") ||
-        id.includes("place-state") ||
-        id.includes("place-country")
-      ) {
-        map.setLayoutProperty(layer.id, "visibility", "none");
-      }
-    }
   }, []);
 
   return (
-    /* Outer wrapper — position:relative so the fixed tooltip aligns correctly */
-    <div className="relative" ref={containerRef}>
-      {/* Map box with overflow:hidden restores rounded corners cleanly */}
-      <div
-        className="overflow-hidden"
-        style={{
-          height: 520,
-          borderRadius: 16,
-          border: "1px solid rgba(255,255,255,0.1)",
-          boxShadow:
-            "0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06) inset",
-        }}
+    <div className="relative w-full" style={{ maxWidth: 1100, margin: "0 auto" }}>
+      <ComposableMap
+        width={1100}
+        height={500}
+        projection="geoNaturalEarth1"
+        projectionConfig={{ scale: 170, center: [12, 10] }}
+        style={{ width: "100%", height: "auto" }}
       >
-        <MapGL
-          ref={mapRef}
-          initialViewState={INITIAL_VIEW}
-          mapStyle="https://tiles.openfreemap.org/styles/liberty"
-          style={{ width: "100%", height: "100%" }}
-          maxZoom={15}
-          minZoom={1.2}
-          attributionControl={false}
-          doubleClickZoom={false}
-          scrollZoom={false}
-          onLoad={handleMapLoad}
-        >
-          <NavigationControl position="top-right" visualizePitch />
+        <defs>
+          {/* Glow filters for each dot colour */}
+          <filter id="glow-amber" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <filter id="glow-cyan" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
 
-          {/* Country name labels — HTML Markers so they don't depend on tile fonts */}
-          {!activeId &&
-            OFFICE_COUNTRY_LABELS.map((label) => (
-              <Marker
-                key={label.name}
-                longitude={label.coordinates[0]}
-                latitude={label.coordinates[1]}
-                anchor="center"
-              >
-                <span
-                  style={{
-                    fontSize: "10px",
-                    fontWeight: 700,
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                    color: "#444",
-                    textShadow:
-                      "0 0 3px #fff, 0 0 5px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff",
-                    pointerEvents: "none",
-                    userSelect: "none",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {label.name}
-                </span>
-              </Marker>
-            ))}
+        {/* Land masses — dark indigo, slightly lighter than the section bg */}
+        <Geographies geography={GEO_URL}>
+          {({ geographies }) =>
+            geographies.map((geo) => (
+              <Geography
+                key={geo.rsmKey}
+                geography={geo}
+                fill="#1c2d82"
+                stroke="#2a3ea0"
+                strokeWidth={0.35}
+                style={{
+                  default: { outline: "none" },
+                  hover: { outline: "none" },
+                  pressed: { outline: "none" },
+                }}
+              />
+            ))
+          }
+        </Geographies>
 
-          {offices.map((office) => {
-            const fill = PIN_FILL[office.color];
-            const isActive = activeId === office.id;
+        {/* Connection arcs between HQ and each office (+ Ahmedabad–Bengaluru) */}
+        {connections.map(({ from, to, key }) => (
+          <Line
+            key={key}
+            from={from}
+            to={to}
+            stroke="rgba(44,193,235,0.28)"
+            strokeWidth={1}
+            strokeDasharray="3 5"
+            strokeLinecap="round"
+          />
+        ))}
 
-            return (
-              <Marker
-                key={office.id}
-                longitude={office.coordinates[0]}
-                latitude={office.coordinates[1]}
-                anchor="center"
-                onClick={() => flyToOffice(office)}
-              >
-                <button
-                  type="button"
-                  aria-label={`${office.city}, ${office.country} — click to zoom`}
-                  onMouseEnter={() => handleMarkerEnter(office)}
-                  onMouseLeave={handleMarkerLeave}
-                  style={{
-                    cursor: "pointer",
-                    position: "relative",
-                    width: 36,
-                    height: 36,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    background: "none",
-                    border: "none",
-                    padding: 0,
-                  }}
-                >
-                  {/* pulse ring */}
-                  <span
-                    className="gp-marker-pulse-ring"
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      borderRadius: "50%",
-                      background: `${fill}44`,
-                      animation: isActive
-                        ? "none"
-                        : "gp-marker-pulse 2.4s ease-out infinite",
-                    }}
-                  />
-                  {/* outer ring */}
-                  <span
-                    style={{
-                      position: "absolute",
-                      width: 24,
-                      height: 24,
-                      borderRadius: "50%",
-                      border: `2px solid ${fill}`,
-                      boxShadow: "0 0 0 1.5px rgba(255,255,255,0.6)",
-                      opacity: 0.85,
-                    }}
-                  />
-                  {/* core dot */}
-                  <span
-                    style={{
-                      position: "relative",
-                      width: isActive ? 14 : 11,
-                      height: isActive ? 14 : 11,
-                      borderRadius: "50%",
-                      background: fill,
-                      transition: "width 0.2s ease, height 0.2s ease",
-                      boxShadow: `0 0 0 2px rgba(255,255,255,0.9), 0 0 10px 4px ${fill}88`,
-                    }}
-                  />
-                </button>
-              </Marker>
-            );
-          })}
-        </MapGL>
-
-        {/* controls shown after zooming into a city */}
-        {activeId && (() => {
-          const activeOffice = offices.find((o) => o.id === activeId);
-          const mapsUrl = activeOffice
-            ? `https://www.google.com/maps?q=${activeOffice.coordinates[1]},${activeOffice.coordinates[0]}`
-            : null;
-          const btnStyle: React.CSSProperties = {
-            background: "rgba(8,12,24,0.88)",
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
-            border: "1px solid rgba(255,255,255,0.15)",
-            borderRadius: 24,
-            padding: "8px 18px",
-            color: "rgba(255,255,255,0.9)",
-            fontSize: 12,
-            fontWeight: 500,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: 7,
-            letterSpacing: "0.02em",
-            textDecoration: "none",
-          };
-          return (
-            <div
+        {/* Country name labels — SVG text, no tile font dependency */}
+        {COUNTRY_LABELS.map(({ name, coords }) => (
+          <Marker key={name} coordinates={coords}>
+            <text
+              textAnchor="middle"
               style={{
-                position: "absolute",
-                bottom: 20,
-                left: "50%",
-                transform: "translateX(-50%)",
-                display: "flex",
-                gap: 8,
-                zIndex: 10,
+                fontSize: 7,
+                fontWeight: 700,
+                letterSpacing: "0.1em",
+                fill: "rgba(255,255,255,0.28)",
+                pointerEvents: "none",
+                userSelect: "none",
               }}
             >
-              <button type="button" onClick={resetView} style={btnStyle}>
-                <span style={{ fontSize: 14, lineHeight: 1 }}>←</span>
-                World view
-              </button>
-              {mapsUrl && (
-                <a
-                  href={mapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={btnStyle}
-                >
-                  <svg
-                    width="13"
-                    height="13"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                    <circle cx="12" cy="10" r="3" />
-                  </svg>
-                  Navigate
-                </a>
-              )}
-            </div>
-          );
-        })()}
-      </div>
+              {name}
+            </text>
+          </Marker>
+        ))}
 
-      {/* Tooltip — position:fixed escapes every overflow container */}
+        {/* Office markers */}
+        {offices.map((office) => {
+          const fill = PIN_FILL[office.color];
+          const isHovered = hoveredOffice?.id === office.id;
+
+          return (
+            <Marker
+              key={office.id}
+              coordinates={office.coordinates}
+              onMouseEnter={(e) => handleEnter(office, e as unknown as React.MouseEvent)}
+              onMouseLeave={handleLeave}
+              style={{ cursor: "pointer" }}
+            >
+              {/* Outermost pulse ring — animated */}
+              <circle
+                r={22}
+                fill="none"
+                stroke={fill}
+                strokeWidth={0.6}
+                className="gp-svg-pulse"
+                style={{ animationDelay: PULSE_DELAY[office.id] }}
+              />
+              {/* Secondary ring */}
+              <circle
+                r={14}
+                fill="none"
+                stroke={fill}
+                strokeWidth={0.8}
+                className="gp-svg-pulse"
+                style={{
+                  animationDelay: `calc(${PULSE_DELAY[office.id]} + 0.4s)`,
+                  animationDuration: "2s",
+                }}
+              />
+              {/* Static halo disc */}
+              <circle r={8} fill={`${fill}22`} stroke={fill} strokeWidth={0.6} opacity={0.7} />
+              {/* Core dot */}
+              <circle
+                r={isHovered ? 5.5 : 4}
+                fill={fill}
+                filter={`url(#glow-${office.color})`}
+                style={{ transition: "r 0.15s ease" }}
+              />
+            </Marker>
+          );
+        })}
+      </ComposableMap>
+
+      {/* Tooltip — fixed so it escapes all overflow contexts */}
       {hoveredOffice && tooltipPos && (
         <div
           style={{
@@ -330,19 +226,18 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
             top: tooltipPos.y - 20,
             transform: "translateY(-100%)",
             width: 240,
-            background: "rgba(8,12,24,0.95)",
+            background: "rgba(8,12,24,0.96)",
             backdropFilter: "blur(20px) saturate(1.4)",
             WebkitBackdropFilter: "blur(20px) saturate(1.4)",
             borderRadius: 14,
             border: "1px solid rgba(255,255,255,0.1)",
             overflow: "hidden",
-            boxShadow:
-              "0 24px 64px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.04) inset",
+            boxShadow: "0 24px 64px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.04) inset",
             zIndex: 9999,
             pointerEvents: "none",
           }}
         >
-          {/* location image */}
+          {/* Location image */}
           <div style={{ position: "relative", height: 140 }}>
             <Image
               src={hoveredOffice.imageSrc}
@@ -359,9 +254,7 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
                   "linear-gradient(to top, rgba(8,12,24,0.92) 0%, rgba(8,12,24,0.1) 60%, transparent 100%)",
               }}
             />
-            <div
-              style={{ position: "absolute", bottom: 10, left: 12, right: 12 }}
-            >
+            <div style={{ position: "absolute", bottom: 10, left: 12, right: 12 }}>
               <p
                 style={{
                   margin: 0,
@@ -388,17 +281,9 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
               </p>
             </div>
           </div>
-
-          {/* address */}
+          {/* Address */}
           <div style={{ padding: "10px 12px 13px" }}>
-            <p
-              style={{
-                margin: 0,
-                fontSize: 11,
-                color: "rgba(255,255,255,0.5)",
-                lineHeight: 1.6,
-              }}
-            >
+            <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.5)", lineHeight: 1.6 }}>
               {hoveredOffice.address}
             </p>
             <p

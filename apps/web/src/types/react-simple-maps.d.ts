@@ -44,8 +44,17 @@ declare module "react-simple-maps" {
     children?: ReactNode;
   }
 
+  interface LineProps extends SVGProps<SVGPathElement> {
+    from: [number, number];
+    to: [number, number];
+    /** Array of [lon, lat] waypoints (alternative to from/to) */
+    coordinates?: [number, number][];
+    children?: ReactNode;
+  }
+
   export function ComposableMap(props: ComposableMapProps): JSX.Element;
   export function Geographies(props: GeographiesProps): JSX.Element;
   export function Geography(props: GeographyProps): JSX.Element;
   export function Marker(props: MarkerProps): JSX.Element;
+  export function Line(props: LineProps): JSX.Element;
 }
