@@ -126,7 +126,7 @@ export async function fetchCMS<T>(path: string, options: CmsFetchOptions = {}): 
   // same backoff would stall EVERY page ~6 s per failed fetch (the Header alone
   // fans out 5×). Fail fast there; the page renders immediately with empty CMS
   // data, and the dev just starts the CMS when they need it.
-  const MAX_ATTEMPTS = process.env.NODE_ENV === 'development' ? 1 : 5;
+  const MAX_ATTEMPTS = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test' ? 1 : 5;
   // Exponential backoff with jitter: ~0.4s, 0.8s, 1.6s, 3.2s between tries.
   // Long enough to ride out a single CMS droplet briefly saturating under the
   // build's prerender burst, short enough not to stall a healthy request.
