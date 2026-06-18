@@ -1,183 +1,101 @@
 "use client";
 
-import { useState, useEffect, useCallback, type CSSProperties } from "react";
-import Image from "next/image";
+import dynamic from "next/dynamic";
 import { Reveal } from "@/components/ui/Reveal";
-import { WorldMapPaths } from "./WorldMapPaths";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-type LocationId = "hq" | "ahmedabad" | "bengaluru" | "singapore";
-
-interface OfficeLocation {
-  id: LocationId;
-  name: string;
-  country: string;
-  address: string;
-  landmark: string;
-  landmarkAlt: string;
-  color: "cyan" | "amber";
-  /** SVG coordinate in the 1000×460 viewBox (equirectangular). */
-  x: number;
-  y: number;
-  /**
-   * CSS transform applied to the tooltip <div>.
-   * Tooltip is anchored at (x%, y%) of the map container, then shifted
-   * so it doesn't overlap the marker and stays within the container.
-   */
-  tooltipTransform: string;
-  /** SVG text offset from the marker centre (for city label). */
-  labelOffset: { x: number; y: number };
-  /** Stagger index for enter animations. */
-  index: number;
-}
+import type { Office } from "./GlobalPresenceMap";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
-const OFFICES: OfficeLocation[] = [
+const OFFICES: Office[] = [
   {
     id: "hq",
-    name: "North America (HQ)",
+    city: "Lewes, Delaware",
     country: "United States",
-    address: "CleanStart Security Inc., 16192 Coastal Highway, Lewes, Delaware 19958",
-    landmark: "/images/about/global/landmark-delaware.jpg",
-    landmarkAlt: "Cape Henlopen lighthouse, Lewes, Delaware",
+    role: "Headquarters",
+    address: "8 The Green, Suite A, Dover, DE 19901",
     color: "amber",
-    x: 290,
-    y: 131,
-    // HQ is in the upper portion — tooltip opens downward to avoid clipping
-    tooltipTransform: "translate(-10%, 20px)",
-    labelOffset: { x: 16, y: -18 },
-    index: 0,
+    coordinates: [-75.5, 38.9],
+    imageSrc: "/images/about/global/landmark-delaware.jpg",
   },
   {
     id: "ahmedabad",
-    name: "India — Ahmedabad",
+    city: "Ahmedabad",
     country: "India",
-    address: "Block C, 9th Floor Navratna Business Park, Bodakdev, Ahmedabad, Gujarat 380059",
-    landmark: "/images/about/global/landmark-ahmedabad.jpg",
-    landmarkAlt: "Sabarmati riverfront, Ahmedabad",
+    role: "Engineering Hub",
+    address: "SG Highway, Ahmedabad, Gujarat 380054",
     color: "cyan",
-    x: 702,
-    y: 171,
-    tooltipTransform: "translate(-50%, calc(-100% - 18px))",
-    labelOffset: { x: 13, y: 4 },
-    index: 1,
+    coordinates: [72.6, 23.0],
+    imageSrc: "/images/about/global/landmark-ahmedabad.jpg",
   },
   {
     id: "bengaluru",
-    name: "India — Bengaluru",
+    city: "Bengaluru",
     country: "India",
-    address: "Bhive Platinum Address Maker, 114/5, Old Madras Road, Halasuru, Bengaluru 560008",
-    landmark: "/images/about/global/landmark-bengaluru.jpg",
-    landmarkAlt: "Vidhana Soudha, Bengaluru",
+    role: "Engineering Hub",
+    address: "Whitefield, Bengaluru, Karnataka 560066",
     color: "cyan",
-    x: 716,
-    y: 197,
-    // Right-side marker — shift tooltip left so it stays in viewport
-    tooltipTransform: "translate(-85%, calc(-100% - 18px))",
-    labelOffset: { x: 13, y: 4 },
-    index: 2,
+    coordinates: [77.6, 13.0],
+    imageSrc: "/images/about/global/landmark-bengaluru.jpg",
   },
   {
     id: "singapore",
-    name: "Singapore",
+    city: "Singapore",
     country: "Singapore",
-    address: "1003 Bukit Merah Central, #07-23, Singapore 159836",
-    landmark: "/images/about/global/landmark-singapore.jpg",
-    landmarkAlt: "Marina Bay Sands skyline, Singapore",
+    role: "APAC Operations",
+    address: "One Raffles Place, Singapore 048616",
     color: "cyan",
-    x: 788,
-    y: 227,
-    tooltipTransform: "translate(-80%, calc(-100% - 18px))",
-    labelOffset: { x: 13, y: 4 },
-    index: 3,
+    coordinates: [103.8, 1.4],
+    imageSrc: "/images/about/global/landmark-singapore.jpg",
   },
 ];
 
-// Connection arcs: [fromId, toId, SVG cubic-bezier path, animation delay seconds]
-const ARCS: Array<[LocationId, LocationId, string, number]> = [
-  [
-    "hq",
-    "ahmedabad",
-    "M 290,131 C 290,60 702,60 702,171",
-    0.8,
-  ],
-  [
-    "ahmedabad",
-    "bengaluru",
-    "M 702,171 C 706,155 712,155 716,197",
-    1.3,
-  ],
-  [
-    "bengaluru",
-    "singapore",
-    "M 716,197 C 740,185 772,200 788,227",
-    1.7,
-  ],
-];
-
-// ─── Colour helpers ───────────────────────────────────────────────────────────
+const GUIDE_LINES_X = [323, 726, 759, 1164, 1195, 1599] as const;
 
 const CYAN = "#2cc1eb";
 const AMBER = "#f59e0b";
 
-function markerColor(color: "cyan" | "amber"): string {
+function markerColor(color: "amber" | "cyan"): string {
   return color === "amber" ? AMBER : CYAN;
 }
 
-// ─── Guide-line X positions (proportional, matching AbourPowering) ─────────────
+// ─── Dynamic map (browser-only — mapbox-gl uses browser APIs at import time) ──
 
-const GUIDE_LINES_X = [323, 726, 759, 1164, 1195, 1599] as const;
+const GlobalPresenceMap = dynamic(
+  () =>
+    import("./GlobalPresenceMap").then((m) => ({ default: m.GlobalPresenceMap })),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        style={{
+          height: 520,
+          borderRadius: 16,
+          border: "1px solid rgba(255,255,255,0.08)",
+          background: "rgba(255,255,255,0.03)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <span
+          className="animate-spin"
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: "50%",
+            border: "2px solid rgba(255,255,255,0.15)",
+            borderTopColor: "#2CC1EB",
+            display: "block",
+          }}
+        />
+      </div>
+    ),
+  },
+);
 
-// ─── Main component ───────────────────────────────────────────────────────────
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export function AboutGlobalPresence() {
-  const [activeId, setActiveId] = useState<LocationId | null>(null);
-  const [hoveredId, setHoveredId] = useState<LocationId | null>(null);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const visibleId: LocationId | null = hoveredId ?? activeId;
-
-  const handleMarkerClick = useCallback((id: LocationId) => {
-    setActiveId((prev) => (prev === id ? null : id));
-  }, []);
-
-  const handleSectionClick = useCallback(
-    (e: React.MouseEvent<HTMLElement>) => {
-      const target = e.target as HTMLElement;
-      if (
-        !target.closest("[data-marker]") &&
-        !target.closest("[data-pill]")
-      ) {
-        setActiveId(null);
-      }
-    },
-    [],
-  );
-
-  const handleSectionTouch = useCallback(
-    (e: React.TouchEvent<HTMLElement>) => {
-      const target = e.target as HTMLElement;
-      if (
-        !target.closest("[data-marker]") &&
-        !target.closest("[data-pill]")
-      ) {
-        setActiveId(null);
-        setHoveredId(null);
-      }
-    },
-    [],
-  );
-
-  const visibleOffice = visibleId
-    ? OFFICES.find((o) => o.id === visibleId) ?? null
-    : null;
-
   return (
     <section
       className="relative w-full overflow-hidden"
@@ -185,11 +103,6 @@ export function AboutGlobalPresence() {
         background:
           "linear-gradient(180deg, #151021 0%, #131e8f 62.497%, #471ec0 100%)",
       }}
-      onClick={handleSectionClick}
-      onKeyDown={(e) => {
-        if (e.key === "Escape") setActiveId(null);
-      }}
-      onTouchStart={handleSectionTouch}
     >
       {/* ── Decorative ellipse blobs ─────────────────────────────────────── */}
       {[130.75, 1306.73].map((leftPx) => (
@@ -252,24 +165,10 @@ export function AboutGlobalPresence() {
       ))}
 
       {/* ── Content ──────────────────────────────────────────────────────── */}
-      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[100px] pb-12 lg:pb-16">
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[48px] pb-16">
 
         {/* Heading */}
-        <div className="mx-auto flex max-w-[840px] flex-col items-center gap-5 text-center text-white mb-10 lg:mb-14">
-          <Reveal header>
-            <p
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "var(--fs-eyebrow)",
-                fontWeight: 600,
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                color: CYAN,
-              }}
-            >
-              Global Presence
-            </p>
-          </Reveal>
+        <div className="mx-auto flex max-w-[840px] flex-col items-center gap-5 text-center text-white mb-6 lg:mb-8">
           <Reveal header delay={0.1} y={20}>
             <h2
               className="font-display"
@@ -292,365 +191,169 @@ export function AboutGlobalPresence() {
                 lineHeight: 1.5,
                 letterSpacing: "-0.02em",
                 opacity: 0.7,
-                maxWidth: "600px",
+                maxWidth: "780px",
               }}
             >
-              From the Americas to Southeast Asia, CleanStart's team is building
-              trusted software foundations globally.
+              From the Americas to Southeast Asia, CleanStart&apos;s team is
+              building trusted software foundations globally.
             </p>
           </Reveal>
         </div>
 
-        {/* ── Map ──────────────────────────────────────────────────────────── */}
+        {/* ── Interactive Mapbox map ────────────────────────────────────── */}
         <Reveal delay={0.3}>
-          <div className="relative w-full" style={{ overflow: "visible" }}>
-            <svg
-              viewBox="0 0 1000 460"
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-full"
-              style={{ display: "block", overflow: "visible" }}
-              aria-hidden
-            >
-              <defs>
-                <radialGradient id="gp-glow-cyan" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor={CYAN} stopOpacity={0.55} />
-                  <stop offset="100%" stopColor={CYAN} stopOpacity={0} />
-                </radialGradient>
-                <radialGradient id="gp-glow-amber" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor={AMBER} stopOpacity={0.55} />
-                  <stop offset="100%" stopColor={AMBER} stopOpacity={0} />
-                </radialGradient>
-                <filter id="gp-core-glow" x="-50%" y="-50%" width="200%" height="200%">
-                  <feGaussianBlur stdDeviation="2.5" result="blur" />
-                  <feMerge>
-                    <feMergeNode in="blur" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-              </defs>
-
-              {/* Continent fills */}
-              <WorldMapPaths />
-
-              {/* Connection arcs */}
-              {ARCS.map(([fromId, , d, delay]) => (
-                <path
-                  key={fromId}
-                  className="cs-map-arc"
-                  d={d}
-                  fill="none"
-                  stroke="rgba(44,193,235,0.28)"
-                  strokeWidth={1.2}
-                  strokeDasharray="600 600"
-                  strokeLinecap="round"
-                  strokeDashoffset={mounted ? undefined : 600}
-                  style={
-                    mounted
-                      ? {
-                          animation: `cs-map-arc-draw 1.8s ease ${delay}s both`,
-                        }
-                      : { strokeDashoffset: 600 }
-                  }
-                />
-              ))}
-
-              {/* Office markers */}
-              {OFFICES.map((office) => {
-                const c = markerColor(office.color);
-                const isActive = activeId === office.id;
-                const isHovered = hoveredId === office.id;
-                const isDimmed =
-                  (activeId !== null || hoveredId !== null) &&
-                  !isActive &&
-                  !isHovered;
-                const pulseDelay = `${office.index * 0.5}s`;
-                const enterDelay = `${office.index * 0.15 + 0.3}s`;
-                const coreR = office.color === "amber" ? 5.5 : 4.5;
-                const midR = office.color === "amber" ? 13 : 10;
-
-                return (
-                  <g
-                    key={office.id}
-                    transform={`translate(${office.x},${office.y})`}
-                    data-marker={office.id}
-                    // biome-ignore lint/a11y/useSemanticElements: SVG <g> cannot contain a <button> element
-                    role="button"
-                    tabIndex={0}
-                    aria-label={`${office.name} office`}
-                    style={{
-                      cursor: "pointer",
-                      opacity: isDimmed ? 0.35 : 1,
-                      transition: "opacity 0.25s ease",
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleMarkerClick(office.id);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        handleMarkerClick(office.id);
-                      }
-                    }}
-                    onMouseEnter={() => setHoveredId(office.id)}
-                    onMouseLeave={() => setHoveredId(null)}
-                  >
-                    {/* Marker enter animation wrapper */}
-                    <g
-                      className="cs-map-marker"
-                      style={
-                        mounted
-                          ? {
-                              transformBox: "fill-box" as CSSProperties["transformBox"],
-                              transformOrigin: "center",
-                              animation: `cs-map-marker-in 0.45s cubic-bezier(0.34,1.56,0.64,1) ${enterDelay} both`,
-                            }
-                          : undefined
-                      }
-                    >
-                      {/* Outer glow blob */}
-                      <circle
-                        cx={0}
-                        cy={0}
-                        r={office.color === "amber" ? 26 : 22}
-                        fill={
-                          office.color === "amber"
-                            ? "url(#gp-glow-amber)"
-                            : "url(#gp-glow-cyan)"
-                        }
-                        style={{ opacity: isActive || isHovered ? 1 : 0.7 }}
-                      />
-
-                      {/* Pulse ring */}
-                      <circle
-                        cx={0}
-                        cy={0}
-                        r={midR * 0.65}
-                        fill={`${c}55`}
-                        stroke="none"
-                        className="cs-map-pulse-ring"
-                        style={{
-                          transformBox: "fill-box" as CSSProperties["transformBox"],
-                          transformOrigin: "center",
-                          animation: `cs-map-pulse 2.5s cubic-bezier(0.215,0.61,0.355,1) ${pulseDelay} infinite`,
-                        }}
-                      />
-
-                      {/* Mid ring */}
-                      <circle
-                        cx={0}
-                        cy={0}
-                        r={midR}
-                        fill={`${c}18`}
-                        stroke={c}
-                        strokeWidth={isActive || isHovered ? 1.8 : 1.2}
-                        style={{ transition: "stroke-width 0.2s ease" }}
-                      />
-
-                      {/* Core dot */}
-                      <circle
-                        cx={0}
-                        cy={0}
-                        r={isActive || isHovered ? coreR * 1.2 : coreR}
-                        fill={c}
-                        filter="url(#gp-core-glow)"
-                        style={{ transition: "r 0.2s ease" }}
-                      />
-
-                      {/* HQ badge */}
-                      {office.id === "hq" && (
-                        <>
-                          <rect
-                            x={-11}
-                            y={-29}
-                            width={22}
-                            height={13}
-                            rx={3}
-                            fill={AMBER}
-                          />
-                          <text
-                            x={0}
-                            y={-19}
-                            textAnchor="middle"
-                            fontSize={7.5}
-                            fontWeight={700}
-                            fill="#000"
-                            style={{ fontFamily: "var(--font-sans)" }}
-                          >
-                            HQ
-                          </text>
-                        </>
-                      )}
-
-                      {/* City label — hidden below md via SVG class */}
-                      <text
-                        x={office.labelOffset.x}
-                        y={office.labelOffset.y}
-                        textAnchor="start"
-                        fontSize={8.5}
-                        fill="rgba(255,255,255,0.75)"
-                        fontWeight={500}
-                        className="hidden md:block"
-                        style={{ fontFamily: "var(--font-sans)" }}
-                      >
-                        {office.name.split("—")[1]?.trim() ?? office.name}
-                      </text>
-                    </g>
-                  </g>
-                );
-              })}
-            </svg>
-
-            {/* ── Tooltip ─────────────────────────────────────────────────── */}
-            {visibleOffice && (
-              <div
-                role="tooltip"
-                aria-live="polite"
-                className="cs-map-tooltip pointer-events-none absolute z-20"
-                style={{
-                  left: `${(visibleOffice.x / 1000) * 100}%`,
-                  top: `${(visibleOffice.y / 460) * 100}%`,
-                  transform: visibleOffice.tooltipTransform,
-                  animation: "cs-map-tooltip-in 0.18s ease both",
-                }}
-                key={visibleOffice.id}
-              >
-                <div
-                  className="overflow-hidden rounded-2xl"
-                  style={{
-                    width: "220px",
-                    background: "#fff",
-                    boxShadow:
-                      "0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(44,193,235,0.25)",
-                  }}
-                >
-                  {/* Landmark photo */}
-                  <div className="relative" style={{ height: "128px" }}>
-                    <Image
-                      src={visibleOffice.landmark}
-                      alt={visibleOffice.landmarkAlt}
-                      fill
-                      sizes="220px"
-                      className="object-cover"
-                    />
-                  </div>
-
-                  {/* Text body */}
-                  <div className="px-4 pb-4 pt-3">
-                    <p
-                      style={{
-                        fontFamily: "var(--font-sans)",
-                        fontSize: "var(--fs-eyebrow)",
-                        fontWeight: 600,
-                        letterSpacing: "0.1em",
-                        textTransform: "uppercase",
-                        color: CYAN,
-                        marginBottom: "3px",
-                      }}
-                    >
-                      {visibleOffice.country}
-                    </p>
-                    <p
-                      className="font-display"
-                      style={{
-                        fontSize: "var(--fs-h4)",
-                        fontWeight: 700,
-                        color: "#111",
-                        lineHeight: 1.2,
-                        marginBottom: "6px",
-                      }}
-                    >
-                      {visibleOffice.name}
-                    </p>
-                    <p
-                      style={{
-                        fontFamily: "var(--font-sans)",
-                        fontSize: "var(--fs-caption)",
-                        color: "#64748b",
-                        lineHeight: 1.5,
-                      }}
-                    >
-                      {visibleOffice.address}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
+          <div className="mx-auto w-full" style={{ maxWidth: "1100px" }}>
+            <GlobalPresenceMap offices={OFFICES} />
           </div>
         </Reveal>
 
-        {/* ── Legend ribbon ─────────────────────────────────────────────── */}
-        <ul
-          className="mt-8 flex list-none flex-wrap justify-center gap-3 p-0"
-          aria-label="Office locations"
+        {/* ── Location ribbon (lg+) ────────────────────────────────────── */}
+        <div
+          className="mx-auto mt-5 hidden lg:flex"
+          style={{
+            maxWidth: "1100px",
+            border: "1px solid rgba(255,255,255,0.12)",
+            borderRadius: "14px",
+            background: "rgba(10, 8, 28, 0.88)",
+            overflow: "hidden",
+          }}
         >
-          {OFFICES.map((office) => {
-            const isActive = activeId === office.id;
-            const c = markerColor(office.color);
-
+          {OFFICES.map((o, i) => {
+            const c = markerColor(o.color);
             return (
-              <li key={office.id}>
-                <button
-                  type="button"
-                  data-pill={office.id}
-                  aria-pressed={isActive}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleMarkerClick(office.id);
-                  }}
-                  onMouseEnter={() => setHoveredId(office.id)}
-                  onMouseLeave={() => setHoveredId(null)}
-                  className="flex items-center gap-2 rounded-full px-4 py-2 transition-all duration-200"
-                  style={{
-                    border: `1.5px solid ${
-                      isActive ? c : "rgba(255,255,255,0.12)"
-                    }`,
-                    background: isActive
-                      ? `${c}22`
-                      : "rgba(255,255,255,0.06)",
-                    color: isActive ? "#fff" : "rgba(255,255,255,0.72)",
-                    boxShadow: isActive
-                      ? `0 0 0 3px ${c}20`
+              <div
+                key={o.id}
+                className="flex flex-1 flex-col gap-1"
+                style={{
+                  padding: "18px 22px",
+                  borderRight:
+                    i < OFFICES.length - 1
+                      ? "1px solid rgba(255,255,255,0.07)"
                       : "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  {/* Coloured dot */}
-                  <span
-                    className="block shrink-0 rounded-full"
-                    style={{ width: "8px", height: "8px", background: c }}
-                  />
-                  {/* Label */}
+                }}
+              >
+                {/* Dot + city */}
+                <div className="flex items-center gap-2">
                   <span
                     style={{
-                      fontFamily: "var(--font-sans)",
-                      fontSize: "var(--fs-body-sm)",
-                      fontWeight: 500,
+                      width: "8px",
+                      height: "8px",
+                      borderRadius: "50%",
+                      background: c,
+                      flexShrink: 0,
+                      boxShadow: `0 0 6px 1px ${c}99`,
+                      display: "inline-block",
+                    }}
+                  />
+                  <p
+                    className="font-display"
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: 700,
+                      color: "#fff",
+                      lineHeight: 1.2,
                     }}
                   >
-                    {office.name}
-                  </span>
-                  {/* HQ badge */}
-                  {office.id === "hq" && (
-                    <span
-                      style={{
-                        fontSize: "9px",
-                        fontWeight: 700,
-                        background: AMBER,
-                        color: "#000",
-                        padding: "1px 5px",
-                        borderRadius: "4px",
-                        marginLeft: "-2px",
-                      }}
-                    >
-                      HQ
-                    </span>
-                  )}
-                </button>
+                    {o.city}
+                  </p>
+                </div>
+
+                {/* Role */}
+                <p
+                  style={{
+                    fontSize: "10px",
+                    fontWeight: 600,
+                    color: c,
+                    fontFamily: "var(--font-sans)",
+                    letterSpacing: "0.09em",
+                    textTransform: "uppercase",
+                    paddingLeft: "16px",
+                  }}
+                >
+                  {o.role}
+                </p>
+
+                {/* Address */}
+                <p
+                  style={{
+                    fontSize: "11px",
+                    fontWeight: 400,
+                    color: "rgba(255,255,255,0.45)",
+                    fontFamily: "var(--font-sans)",
+                    lineHeight: 1.4,
+                    paddingLeft: "16px",
+                  }}
+                >
+                  {o.address}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ── Mobile location grid (< lg) ───────────────────────────────── */}
+        <ul className="mt-10 grid list-none grid-cols-2 gap-3 p-0 lg:hidden">
+          {OFFICES.map((o) => {
+            const c = markerColor(o.color);
+            return (
+              <li
+                key={o.id}
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: "12px",
+                  padding: "14px 16px",
+                }}
+              >
+                <div
+                  style={{
+                    width: "8px",
+                    height: "8px",
+                    borderRadius: "50%",
+                    background: c,
+                    marginBottom: "8px",
+                    boxShadow: `0 0 8px 2px ${c}66`,
+                  }}
+                />
+                <p
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "var(--fs-eyebrow)",
+                    fontWeight: 700,
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: c,
+                    marginBottom: "2px",
+                  }}
+                >
+                  {o.country}
+                </p>
+                <p
+                  className="font-display"
+                  style={{
+                    fontSize: "var(--fs-h4)",
+                    fontWeight: 700,
+                    color: "#fff",
+                    marginBottom: "3px",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {o.city}
+                </p>
+                <p
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "var(--fs-caption)",
+                    color: "rgba(255,255,255,0.5)",
+                  }}
+                >
+                  {o.role}
+                </p>
               </li>
             );
           })}
         </ul>
+
       </div>
     </section>
   );

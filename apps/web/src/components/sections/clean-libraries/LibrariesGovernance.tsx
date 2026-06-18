@@ -328,7 +328,7 @@ function MobileCard({ card }: { card: GovernanceCard }): React.ReactElement {
 export function LibrariesGovernance(): React.ReactElement {
   return (
     <Section
-      padding="lg"
+      padding="sm"
       className="overflow-hidden"
       style={{
         background: "linear-gradient(180deg, #ffffff 0%, #f5f6fb 100%)",
