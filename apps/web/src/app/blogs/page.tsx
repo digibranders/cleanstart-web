@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
-import { BlogsHero } from "@/components/sections/blogs/BlogsHero";
-import { LatestBlogs } from "@/components/sections/blogs/LatestBlogs";
+import { BlogsBrowser } from "@/components/sections/blogs/BlogsBrowser";
+import { BlogsContent, selectBlogs } from "@/components/sections/blogs/BlogsContent";
 import { BlogsCTA } from "@/components/sections/blogs/BlogsCTA";
-import { FadeUp } from "@/components/ui/FadeUp";
-import {
-  getFeaturedBlog,
-  getBlogs,
-  getBlogCategories,
-} from "@/lib/blog";
+import { getFeaturedBlog, getBlogs, getBlogCategories } from "@/lib/blog";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
@@ -17,80 +13,65 @@ const TITLE = "Blogs";
 const DESCRIPTION =
   "Explore CleanStart's blog expert insights on container security, software supply chain threats, CVE management, SBOM, and building trust in cloud-native environments.";
 
-interface BlogsPageProps {
-  searchParams: Promise<{
-    page?: string;
-    category?: string;
-    q?: string;
-  }>;
-}
-
-export async function generateMetadata({
-  searchParams,
-}: BlogsPageProps): Promise<Metadata> {
-  const params = await searchParams;
-  const page = Math.max(1, Number.parseInt(params.page ?? "1", 10));
-  // Per WEB-PRODUCTION.md §5: paginated pages 6+ → noindex, follow.
+export function generateMetadata(): Metadata {
   return buildPageMetadata({
     title: TITLE,
     description: DESCRIPTION,
     path: "/blogs",
     eyebrow: "Blog",
-    noindex: page >= 6,
   });
 }
 
-export default async function BlogsPage({
-  searchParams,
-}: BlogsPageProps): Promise<React.ReactElement> {
-  const params = await searchParams;
-  const page = Math.max(1, Number.parseInt(params.page ?? "1", 10));
-  const activeCategory = params.category ?? "";
-  const searchQuery = params.q ?? "";
-
+/**
+ * Static listing. The full card set is fetched once (cacheable, no
+ * `searchParams` on the server) and filtering/search/pagination run on the
+ * client (`BlogsBrowser`), so the route is served from the edge as static HTML
+ * instead of rendered per request. The Suspense fallback is the server-rendered
+ * default (unfiltered, page 1) view — that's what lands in the static HTML, so
+ * crawlers and no-JS clients still get the full first page of posts.
+ */
+export default async function BlogsPage(): Promise<React.ReactElement> {
   const [featuredPost, blogsData, categories] = await Promise.all([
     getFeaturedBlog().catch(() => null),
-    getBlogs({
-      page,
-      ...(activeCategory ? { category: activeCategory } : {}),
-      ...(searchQuery ? { search: searchQuery } : {}),
-    }).catch(
-      () => ({ docs: [], hasNextPage: false, page: 1, totalDocs: 0, totalPages: 1 }),
-    ),
+    getBlogs({ limit: 1000 }).catch(() => ({
+      docs: [],
+      hasNextPage: false,
+      page: 1,
+      totalDocs: 0,
+      totalPages: 1,
+    })),
     getBlogCategories().catch(() => []),
   ]);
+
+  const allPosts = blogsData.docs;
+  const initial = selectBlogs(allPosts, { category: "", search: "", page: 1 });
 
   return (
     <>
       <JsonLd
         id="blogs-breadcrumbs"
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Blogs" },
-        ])}
+        data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Blogs" }])}
       />
       <Header />
-      <main id="main-content" style={{ background: "#f6f6f6" }}>
-        <div className="relative overflow-hidden">
-          <BlogsHero
+      <Suspense
+        fallback={
+          <BlogsContent
             featuredPost={featuredPost}
             categories={categories}
-            activeCategory={activeCategory}
-            searchQuery={searchQuery}
+            posts={initial.posts}
+            activeCategory=""
+            searchQuery=""
+            currentPage={1}
+            totalPages={initial.totalPages}
           />
-        </div>
-
-        <FadeUp>
-          <LatestBlogs
-            posts={blogsData.docs}
-            currentPage={page}
-            totalPages={blogsData.totalPages}
-            activeCategory={activeCategory}
-            searchQuery={searchQuery}
-          />
-        </FadeUp>
-
-      </main>
+        }
+      >
+        <BlogsBrowser
+          allPosts={allPosts}
+          featuredPost={featuredPost}
+          categories={categories}
+        />
+      </Suspense>
       <Footer cta={<BlogsCTA />} />
     </>
   );
