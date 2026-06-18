@@ -62,6 +62,7 @@ export {
   FILTERABLE_COUNTRIES,
   FILTERABLE_YEARS,
   countryLabel,
+  formatEventDate,
   parseCountryParam,
   parseYearParam,
 } from "./events-utils";
@@ -158,31 +159,4 @@ export const getEventBySlug = cache(
 /** Draft variant for the `/preview/events/[slug]` route. Not cached. */
 export async function getEventBySlugDraft(slug: string): Promise<EventDetail | null> {
   return loadEventBySlug(slug, true);
-}
-
-type FormatStyle = "long" | "short";
-
-function intlDate(iso: string, timezone: string, style: FormatStyle): string {
-  const opts: Intl.DateTimeFormatOptions =
-    style === "long"
-      ? { day: "numeric", month: "long", year: "numeric", timeZone: timezone }
-      : { day: "2-digit", month: "short", year: "numeric", timeZone: timezone };
-  try {
-    return new Intl.DateTimeFormat("en-GB", opts).format(new Date(iso));
-  } catch {
-    return new Intl.DateTimeFormat("en-GB", { ...opts, timeZone: "UTC" }).format(
-      new Date(iso),
-    );
-  }
-}
-
-export function formatEventDate(
-  iso: string | null | undefined,
-  timezone: string | null | undefined,
-  customDateLabel: string | null | undefined,
-  style: FormatStyle = "long",
-): string {
-  if (customDateLabel && customDateLabel.trim().length > 0) return customDateLabel;
-  if (!iso) return "";
-  return intlDate(iso, timezone ?? "UTC", style);
 }

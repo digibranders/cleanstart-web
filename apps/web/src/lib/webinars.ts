@@ -52,6 +52,7 @@ export {
   FILTERABLE_TYPES,
   REGION_LABEL,
   WEBINAR_TYPE_LABEL,
+  formatWebinarDate,
   parseRegionParam,
   parseTypeParam,
   regionLabel,
@@ -100,26 +101,4 @@ export const getWebinarBySlug = cache(
     return data.docs[0] ?? null;
   },
 );
-
-export function formatWebinarDate(
-  iso: string | null | undefined,
-  timezone: string | null | undefined,
-): string {
-  if (!iso) return "";
-  try {
-    return new Intl.DateTimeFormat("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      timeZone: timezone ?? "UTC",
-    }).format(new Date(iso));
-  } catch {
-    return new Intl.DateTimeFormat("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      timeZone: "UTC",
-    }).format(new Date(iso));
-  }
-}
 

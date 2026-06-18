@@ -3,7 +3,7 @@ import {
   DEPARTMENT_LABEL,
   type JobDepartment,
   type JobLocation,
-} from "@/lib/jobs";
+} from "@/lib/jobs-utils";
 
 interface CareersSidebarProps {
   activeDepartment: string;

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Job } from "@/lib/jobs";
 import {
   applyHref,
   DEPARTMENT_LABEL,
@@ -7,9 +8,8 @@ import {
   JOB_STATUS_LABEL,
   jobStatusBadge,
   locationDisplay,
-  type Job,
   type JobStatusBadge,
-} from "@/lib/jobs";
+} from "@/lib/jobs-utils";
 
 interface JobCardProps {
   job: Job;

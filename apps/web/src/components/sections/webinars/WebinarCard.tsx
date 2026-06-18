@@ -1,9 +1,6 @@
 import Image from "next/image";
-import {
-  formatWebinarDate,
-  regionLabel,
-  type Webinar,
-} from "@/lib/webinars";
+import type { Webinar } from "@/lib/webinars";
+import { formatWebinarDate, regionLabel } from "@/lib/webinars-utils";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
 
 interface WebinarCardProps {

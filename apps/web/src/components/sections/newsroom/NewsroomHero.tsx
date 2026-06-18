@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-import { mediaUrl } from "@/lib/blog";
+import { mediaUrl } from "@/lib/blog-utils";
 import type { News } from "@/lib/news";
 import { SearchBar } from "@/components/sections/_shared/SearchBar";
 import { HeroReveal, Reveal } from "@/components/ui/Reveal";

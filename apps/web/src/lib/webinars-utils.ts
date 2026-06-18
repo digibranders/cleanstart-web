@@ -54,3 +54,25 @@ export function parseRegionParam(
     ? (value as WebinarRegion)
     : undefined;
 }
+
+export function formatWebinarDate(
+  iso: string | null | undefined,
+  timezone: string | null | undefined,
+): string {
+  if (!iso) return "";
+  try {
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      timeZone: timezone ?? "UTC",
+    }).format(new Date(iso));
+  } catch {
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(new Date(iso));
+  }
+}
