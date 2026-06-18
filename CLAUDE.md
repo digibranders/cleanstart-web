@@ -501,6 +501,11 @@ These are one-shot operations that **must** run against the prod Postgres on the
     - **Reindex (settings + facet):** the `content` index gains `keywords` as a searchable + filterable attribute. After deploy, push settings + reindex with the same `scripts/reindex-search.ts` used in checklist item 12. Verify the index's `filterableAttributes` includes `keywords`.
     - After the run, spot-check: a guide's `seo.keywords` chips (SEO sidebar → Topic keywords) match its old keyword list; a `?q=<a-keyword>` ⌘K search surfaces docs that only carry the term in keywords; a guide page's JSON-LD shows both `keywords` and `mentions[]`.
 
+16. **Leaked `<style>` CSS strip.** One Webflow-imported blog (`what-if-mythos-claims-to-be-true`) had an embedded `<style>` block whose CSS rules (`.what-is-mythos-box { … }`) leaked into the Lexical `body` as a visible paragraph, because the old HTML→Lexical converter harvested `<style>` text as prose. The converter now drops `<style>`/`<script>`/etc. (`html-to-lexical.ts` `DROP_TAGS`) going forward; this one-shot strips the already-imported leak. Detector + strip logic and tests: `apps/cms/src/payload/lib/webflow-import/strip-style-css.ts`. Conservative — only a paragraph that *is* a stylesheet is removed (prose mentioning CSS and `codeBlock` samples are untouched). Local-dev blast radius: 1 blog (the only doc with a `<style>` block; guides/news/resources/KB scanned clean).
+    - Writes via `payload.update` so `bodyStatsHook` recomputes TOC/word count. Teams (`webhooks-publish`) + IndexNow are publish-transition-gated (no fire on re-save of a published doc); the only afterChange effects are a Meilisearch re-sync, a web revalidate (desired — drops the CSS from the live page), and a version row per doc. **Run in a quiet window.**
+    - Idempotent / re-runnable (a clean doc is skipped). From inside the `cms` container: `pnpm exec tsx --env-file=.env scripts/strip-leaked-style-css.ts --dry-run` then `pnpm exec tsx --env-file=.env scripts/strip-leaked-style-css.ts` (no flag).
+    - After the run, spot-check `/blogs/what-if-mythos-claims-to-be-true` — the `.what-is-mythos-box { … }` CSS text under "What is Mythos?" should be gone.
+
 (Add new one-shot production tasks under this list as they come up — Phase H imports, Meilisearch initial index, etc.)
 
 ---

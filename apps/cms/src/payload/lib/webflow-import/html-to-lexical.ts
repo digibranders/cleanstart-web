@@ -233,6 +233,23 @@ const textNode = (text: string, format = 0): LexicalTextNode => ({
 const linebreakNode = (): LexicalLinebreakNode => ({ type: 'linebreak', version: 1 });
 
 /**
+ * Elements whose text content is markup, not prose — they must be dropped
+ * entirely, never harvested as body text. A Webflow rich-text field can carry
+ * an embedded `<style>` block (custom CSS for HTML embeds); without this the
+ * CSS rules leak into the body as a visible paragraph.
+ */
+const DROP_TAGS = new Set([
+  'style',
+  'script',
+  'noscript',
+  'template',
+  'head',
+  'link',
+  'meta',
+  'title',
+]);
+
+/**
  * Collect inline children from an element, applying the cumulative
  * format bitmask through nested inline marks.
  */
@@ -253,6 +270,7 @@ const collectInline = (
     }
     if (!isElement(n)) continue;
     const tag = n.tagName ?? n.nodeName;
+    if (DROP_TAGS.has(tag)) continue;
     switch (tag) {
       case 'br':
         out.push(linebreakNode());
@@ -540,6 +558,7 @@ const collectTableRows = (parent: ParseElement, columnHeaders: boolean): Lexical
  */
 const convertBlock = (el: ParseElement): LexicalBlockNode[] => {
   const tag = el.tagName ?? el.nodeName;
+  if (DROP_TAGS.has(tag)) return [];
   switch (tag) {
     case 'p': {
       const inline = trimEdges(collectInline(el.childNodes, 0));

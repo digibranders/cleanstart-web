@@ -200,4 +200,24 @@ describe('htmlToLexical', () => {
     expect((block.fields as { language: string; content: string }).language).toBe('yaml');
     expect((block.fields as { content: string }).content).toBe('key: value');
   });
+
+  it('drops <style>/<script> content instead of leaking it as body text', () => {
+    const json = (html: string): string => JSON.stringify(htmlToLexical(html));
+
+    // Top-level <style> (the Webflow embed case that leaked `.what-is-mythos-box`).
+    expect(json('<p>Real prose.</p><style>.box { padding: 20px; }</style>')).not.toContain(
+      'padding',
+    );
+    // <style> nested inside a wrapper div.
+    expect(json('<div><p>Keep me.</p><style>.x{color:red}</style></div>')).not.toContain(
+      'color:red',
+    );
+    // <script> likewise.
+    expect(json('<p>Hi</p><script>alert(1)</script>')).not.toContain('alert');
+
+    // Real prose around the dropped element survives.
+    expect(json('<p>Real prose.</p><style>.box { padding: 20px; }</style>')).toContain(
+      'Real prose.',
+    );
+  });
 });
