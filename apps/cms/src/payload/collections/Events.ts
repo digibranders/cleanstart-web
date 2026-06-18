@@ -20,6 +20,10 @@ import {
 import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
+import {
+  revalidateWebPublishAfterChangeHook,
+  revalidateWebAfterDeleteHook,
+} from '../hooks/revalidate-web-publish';
 
 export const Events: CollectionConfig = {
   slug: 'events',
@@ -322,8 +326,9 @@ export const Events: CollectionConfig = {
       searchSyncAfterChangeHook('events'),
       webhooksPublishAfterChangeHook('events'),
       indexNowPublishAfterChangeHook('events'),
+      revalidateWebPublishAfterChangeHook('events'),
     ],
-    afterDelete: [searchSyncAfterDeleteHook('events')],
+    afterDelete: [searchSyncAfterDeleteHook('events'), revalidateWebAfterDeleteHook('events')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

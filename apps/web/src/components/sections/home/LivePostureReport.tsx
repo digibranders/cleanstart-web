@@ -30,10 +30,10 @@ const GROUPS: readonly (readonly [Row, Row])[] = [
     {
       name: "postgres:16.5",
       base: "CleanStart verified",
-      cves: 43,
+      cves: 4,
       tone: "green",
       verified: true,
-      reduction: 78,
+      reduction: 98,
     },
   ],
   [

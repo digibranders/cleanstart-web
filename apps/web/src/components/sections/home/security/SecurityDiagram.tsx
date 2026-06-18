@@ -22,7 +22,7 @@ const STAGES: Stage[] = [
 
 const GUARANTEES: Guarantee[] = [
   { title: "Verified Sources", desc: "Curated upstream sources" },
-  { title: "Trusted Dependencies", desc: "Continuously validated dependencies" },
+  { title: "Trusted Dependencies", desc: "Continuously validated" },
   { title: "Reproducible Pipelines", desc: "Deterministic build pipelines" },
   { title: "Verified Artifacts", desc: "Signed and attested artifacts" },
   { title: "Continuous Visibility", desc: "Posture and drift visibility" },

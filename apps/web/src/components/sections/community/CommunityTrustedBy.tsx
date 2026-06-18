@@ -6,7 +6,8 @@ const LOGOS = [
   { src: '/images/community/logo-hitachi.webp', alt: 'Hitachi', w: 138, h: 55 },
   { src: '/images/community/logo-purestorage.webp', alt: 'Aurascape', w: 157, h: 55 },
   { src: '/images/community/logo-vi.webp', alt: 'Vi', w: 61, h: 55 },
-  { src: '/images/trusted/14-coforge.svg', alt: 'Coforge', w: 140, h: 40 },
+  { src: '/images/testimonials/coforge-logo.svg', alt: 'Coforge', w: 140, h: 40 },
+  { src: '/images/trusted/15-indegene.svg', alt: 'Indegene', w: 140, h: 40 },
 ];
 
 export function CommunityTrustedBy() {
