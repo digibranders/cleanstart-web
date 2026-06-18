@@ -9,6 +9,8 @@ import { getNews, getFeaturedNews, getNewsCategories } from "@/lib/news";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
+export const revalidate = 3600;
+
 const TITLE = "Newsroom";
 const DESCRIPTION =
   "Stay current with CleanStart's latest press releases, partnership announcements, product launches, and milestones in secure container image and software supply chain security.";

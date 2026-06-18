@@ -38,6 +38,10 @@ import {
 import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
+import {
+  revalidateWebPublishAfterChangeHook,
+  revalidateWebAfterDeleteHook,
+} from '../hooks/revalidate-web-publish';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 export const Webinars: CollectionConfig = {
@@ -271,8 +275,9 @@ export const Webinars: CollectionConfig = {
       searchSyncAfterChangeHook('webinars'),
       webhooksPublishAfterChangeHook('webinars'),
       indexNowPublishAfterChangeHook('webinars'),
+      revalidateWebPublishAfterChangeHook('webinars'),
     ],
-    afterDelete: [searchSyncAfterDeleteHook('webinars')],
+    afterDelete: [searchSyncAfterDeleteHook('webinars'), revalidateWebAfterDeleteHook('webinars')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

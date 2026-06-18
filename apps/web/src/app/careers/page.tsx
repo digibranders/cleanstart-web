@@ -11,6 +11,8 @@ import { getJobLocations, getJobs, type JobLocation } from "@/lib/jobs";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
+export const revalidate = 3600;
+
 const TITLE = "Careers";
 const DESCRIPTION =
   "Join CleanStart and help build the next generation of secure software supply chains. Explore open roles in security, engineering, and compliance at a fast growing cybersecurity company.";

@@ -22,6 +22,10 @@ import {
 import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
+import {
+  revalidateWebPublishAfterChangeHook,
+  revalidateWebAfterDeleteHook,
+} from '../hooks/revalidate-web-publish';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 /**
@@ -303,8 +307,9 @@ export const Jobs: CollectionConfig = {
       searchSyncAfterChangeHook('jobs'),
       webhooksPublishAfterChangeHook('jobs'),
       indexNowPublishAfterChangeHook('jobs'),
+      revalidateWebPublishAfterChangeHook('jobs'),
     ],
-    afterDelete: [searchSyncAfterDeleteHook('jobs')],
+    afterDelete: [searchSyncAfterDeleteHook('jobs'), revalidateWebAfterDeleteHook('jobs')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

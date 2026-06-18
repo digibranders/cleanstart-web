@@ -9,6 +9,8 @@ import { getGuides } from "@/lib/guides";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
+export const revalidate = 3600;
+
 const TITLE = "Guides";
 const DESCRIPTION =
   "A curated collection of writings, research, and solutions on container security, DevOps, and compliance.";

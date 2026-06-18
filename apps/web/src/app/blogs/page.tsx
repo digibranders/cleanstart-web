@@ -9,6 +9,8 @@ import { getFeaturedBlog, getBlogs, getBlogCategories } from "@/lib/blog";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
+export const revalidate = 3600;
+
 const TITLE = "Blogs";
 const DESCRIPTION =
   "Explore CleanStart's blog expert insights on container security, software supply chain threats, CVE management, SBOM, and building trust in cloud-native environments.";

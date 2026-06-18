@@ -12,6 +12,8 @@ import { getResources } from "@/lib/resources";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
+export const revalidate = 3600;
+
 const TITLE = "Resource Center";
 const DESCRIPTION =
   "A curated collection of whitepapers, ebooks, datasheets, architecture insights, and reports on container security.";

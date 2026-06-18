@@ -8,6 +8,10 @@ import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { firstPublishHook } from '../hooks/first-publish';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
+import {
+  revalidateWebPublishAfterChangeHook,
+  revalidateWebAfterDeleteHook,
+} from '../hooks/revalidate-web-publish';
 
 /**
  * Case Studies — a listing-only, download-first collection.
@@ -90,7 +94,11 @@ export const CaseStudies: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [firstPublishHook()],
-    afterChange: [webhooksPublishAfterChangeHook('case-studies')],
+    afterChange: [
+      webhooksPublishAfterChangeHook('case-studies'),
+      revalidateWebPublishAfterChangeHook('case-studies'),
+    ],
+    afterDelete: [revalidateWebAfterDeleteHook('case-studies')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

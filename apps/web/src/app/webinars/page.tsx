@@ -12,6 +12,8 @@ import { getWebinars } from "@/lib/webinars";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
+export const revalidate = 3600;
+
 const TITLE = "CleanStart Webinar";
 const DESCRIPTION =
   "Live and on-demand webinars on hardened container images, software supply-chain security, and CleanStart product deep-dives.";
