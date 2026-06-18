@@ -1419,8 +1419,8 @@ body {
 @keyframes cs-home-comet {
   0% { top: 106%; opacity: 0; }
   12% { opacity: 1; }
-  86% { opacity: 1; }
-  100% { top: -6%; opacity: 0; }
+  80% { opacity: 1; }
+  100% { top: 8%; opacity: 0; }
 }
 .cs-home-comet {
   animation: cs-home-comet 3.4s linear infinite;
