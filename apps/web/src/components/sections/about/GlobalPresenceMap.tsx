@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useCallback } from "react";
-import MapGL, { Marker, NavigationControl, Source, Layer } from "react-map-gl/maplibre";
+import MapGL, { Marker, NavigationControl } from "react-map-gl/maplibre";
 import type { MapRef } from "react-map-gl/maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
 import Image from "next/image";
@@ -41,28 +41,13 @@ const PIN_FILL: Record<"amber" | "cyan", string> = {
   cyan: "#2CC1EB",
 };
 
-// GeoJSON labels for the 3 countries where CleanStart has offices.
+// HTML-based country labels rendered via Marker — avoids tile glyph font dependency.
 // Positioned at each country's geographic centre (not the office city).
-const OFFICE_COUNTRY_GEOJSON = {
-  type: "FeatureCollection" as const,
-  features: [
-    {
-      type: "Feature" as const,
-      geometry: { type: "Point" as const, coordinates: [-98.0, 39.5] as [number, number] },
-      properties: { name: "United States" },
-    },
-    {
-      type: "Feature" as const,
-      geometry: { type: "Point" as const, coordinates: [80.0, 22.5] as [number, number] },
-      properties: { name: "India" },
-    },
-    {
-      type: "Feature" as const,
-      geometry: { type: "Point" as const, coordinates: [103.8, 1.35] as [number, number] },
-      properties: { name: "Singapore" },
-    },
-  ],
-};
+const OFFICE_COUNTRY_LABELS: { name: string; coordinates: [number, number] }[] = [
+  { name: "United States", coordinates: [-98.0, 39.5] },
+  { name: "India", coordinates: [80.0, 22.5] },
+  { name: "Singapore", coordinates: [103.8, 1.35] },
+];
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -167,27 +152,33 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
         >
           <NavigationControl position="top-right" visualizePitch />
 
-          {/* Custom country labels — only for the 3 countries with offices */}
-          <Source id="office-country-labels" type="geojson" data={OFFICE_COUNTRY_GEOJSON}>
-            <Layer
-              id="office-country-names"
-              type="symbol"
-              layout={{
-                "text-field": ["get", "name"],
-                "text-font": ["Noto Sans Bold"],
-                "text-size": 11,
-                "text-letter-spacing": 0.08,
-                "text-transform": "uppercase",
-                "text-anchor": "center",
-                "text-max-width": 6,
-              }}
-              paint={{
-                "text-color": "#444444",
-                "text-halo-color": "rgba(255,255,255,0.9)",
-                "text-halo-width": 1.5,
-              }}
-            />
-          </Source>
+          {/* Country name labels — HTML Markers so they don't depend on tile fonts */}
+          {!activeId &&
+            OFFICE_COUNTRY_LABELS.map((label) => (
+              <Marker
+                key={label.name}
+                longitude={label.coordinates[0]}
+                latitude={label.coordinates[1]}
+                anchor="center"
+              >
+                <span
+                  style={{
+                    fontSize: "10px",
+                    fontWeight: 700,
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "#444",
+                    textShadow:
+                      "0 0 3px #fff, 0 0 5px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff",
+                    pointerEvents: "none",
+                    userSelect: "none",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {label.name}
+                </span>
+              </Marker>
+            ))}
 
           {offices.map((office) => {
             const fill = PIN_FILL[office.color];
