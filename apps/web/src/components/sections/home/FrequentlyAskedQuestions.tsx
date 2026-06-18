@@ -28,7 +28,7 @@ const LEFT_FAQS: FaqItem[] = [
       <>
         CleanStart provides hardened, near-zero-CVE{" "}
         <a
-          href="#container-images"
+          href="/cleanstart-images"
           className="font-medium text-[#3960F9] underline-offset-2 hover:underline"
         >
           container base images

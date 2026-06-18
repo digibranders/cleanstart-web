@@ -2786,7 +2786,6 @@ body {
   animation: cs-marquee-rtl 60s linear infinite;
 }
 
-.cs-marquee:hover { animation-play-state: paused; }
 
 @media (prefers-reduced-motion: reduce) {
   .cs-marquee { animation: none; }
