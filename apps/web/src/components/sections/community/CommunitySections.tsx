@@ -262,11 +262,13 @@ function CardHeader({ title, icon }: { title: string; icon: LucideIcon }): React
 }
 
 function ExploreLink({ href, label = "Explore All Resources" }: { href: string; label?: string }): React.ReactElement {
+  const isExternal = href.startsWith("http");
   return (
     <Link
       href={href}
       className="flex items-center gap-3 font-display font-semibold text-[#4a3bf1]"
       style={{ fontSize: "var(--fs-body)", lineHeight: "24px" }}
+      {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
     >
       {label}
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -420,7 +422,7 @@ function CommunityImagesCard({ items }: { items: ImageItem[] }): React.ReactElem
           </div>
         ))}
       </div>
-      <ExploreLink href="/cleanstart-images" label="Explore All Images" />
+      <ExploreLink href="https://images.cleanstart.com" label="Explore All Images" />
     </div>
   );
 }
@@ -578,7 +580,7 @@ export async function CommunitySections(): Promise<React.ReactElement> {
         />
       </div>
 
-      <Container className="relative z-10 py-[clamp(48px,8vw,120px)]">
+      <Container className="relative z-10 pt-[clamp(48px,8vw,120px)] pb-section-cta">
         <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 gap-6 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <CardWrapper>
