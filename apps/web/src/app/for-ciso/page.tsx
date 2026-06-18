@@ -11,9 +11,10 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "For CISOs",
+  title: "Hardened Images & Libraries for Security and Compliance Teams | Cleanstart",
+  absoluteTitle: true,
   description:
-    "Discover how CISOs use CleanStart to reduce vulnerability exposure, automate compliance reporting, and gain real time risk visibility across their software supply chain.",
+    "Hardened images and libraries that help security and compliance teams cut inherited risk with continuous governance, provenance verification, and verified remediation.",
   path: "/for-ciso",
   eyebrow: "Solutions",
 });

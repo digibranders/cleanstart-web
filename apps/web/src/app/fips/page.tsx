@@ -12,10 +12,10 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "FIPS Compliance | CleanStart",
+  title: "FIPS-compliant hardened container images | Cleanstart",
   absoluteTitle: true,
   description:
-    "Explore CleanStart's FIPS compliant container images, built to meet NIST FIPS 140-3 standards for organizations in regulated industries requiring verified cryptographic compliance.",
+    "FIPS 140-3 validated cryptography built into hardened containers. Secure regulated workloads with automated compliance and continuous monitoring.",
   path: "/fips",
   eyebrow: "Solutions",
 });

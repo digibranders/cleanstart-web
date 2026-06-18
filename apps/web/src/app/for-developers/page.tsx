@@ -11,9 +11,10 @@ import { buildPageMetadata } from '@/lib/seo/canonical';
 import { JsonLd, breadcrumbSchema } from '@/lib/seo/jsonld';
 
 export const metadata = buildPageMetadata({
-  title: 'For Developers',
+  title: 'Hardened Container Images and Libraries For Developers | Cleanstart',
+  absoluteTitle: true,
   description:
-    "See how CleanStart integrates seamlessly into CI/CD pipelines so developers can ship faster using pre hardened, zero vulnerability container images without changing their workflow.",
+    "Hardened, zero-CVE container images and libraries built for modern developer stacks. Drop-in compatible with your existing CI/CD, minimal, and continuously rebuilt.",
   path: '/for-developers',
   eyebrow: 'Solutions',
 });

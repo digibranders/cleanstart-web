@@ -11,10 +11,10 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "CleanSight Container Visibility | SBOM, Risk Scoring, Compliance Mapping & Remediation Paths",
+  title: "Container Vulnerability Detection and Remediation | CleanSight",
   absoluteTitle: true,
   description:
-    "Discover CleanSight, CleanStart's container visibility tool that continuously discovers images across registries and Kubernetes clusters, maps vulnerabilities, and recommends hardened replacements.",
+    "Continuously discover software assets, inherited risk, and a remediation path. Move from blind spots to remediation.",
   path: "/cleansight",
   variant: "hero",
   eyebrow: "CleanSight",

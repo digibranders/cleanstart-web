@@ -15,9 +15,10 @@ import {
 } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "Clean Libraries",
+  title: "Clean Library: Verify Every Dependency Across Your Workflow",
+  absoluteTitle: true,
   description:
-    "Continuously discover, validate, and govern software dependencies across your development lifecycle — including libraries introduced by AI coding assistants — with CleanStart Clean Libraries.",
+    "Scan every library for vulnerabilities and provenance, catch dependencies AI tools add silently, and gate builds with signed verdicts across your entire workflow.",
   path: "/clean-libraries",
   variant: "hero",
   eyebrow: "Products",

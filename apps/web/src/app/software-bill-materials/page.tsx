@@ -11,11 +11,11 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "CleanStart SBOM | Complete, Verified, and Compliance-Ready",
+  title: "Cleanstart SBOM for software transparency | Cleanstart",
   absoluteTitle: true,
   eyebrow: "Solutions",
   description:
-    "Learn how CleanStart's SBOM Analyzer generates CISA compliant Software Bills of Materials for container images, mapping every component and dependency for full supply chain transparency.",
+    "CleanStart images deliver automated SBOM generation with cryptographic signing and continuous software integrity tracking across build and delivery workflows.",
   path: "/software-bill-materials",
 });
 

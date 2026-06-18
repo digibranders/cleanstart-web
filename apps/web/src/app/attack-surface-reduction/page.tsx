@@ -12,9 +12,10 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "Attack Surface Reduction",
+  title: "Reduce attack surface with Hardened Images | Cleanstart",
+  absoluteTitle: true,
   description:
-    "Learn how CleanStart reduces attack surface at the container image level by removing unnecessary packages, mapping dependencies, and delivering lean, hardened builds by default.",
+    "CleanStart shrinks your attack surface by stripping unnecessary components before production. Minimal, hardened images mean fewer inherited CVEs and less patching.",
   path: "/attack-surface-reduction",
   eyebrow: "Solutions",
 });

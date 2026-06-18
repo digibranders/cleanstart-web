@@ -29,10 +29,10 @@ import Image from "next/image";
 const HERO_TOP_GLOW = "/images/home/hero-top-grid-glow.svg";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Verified & Secure Container Images | CleanStart",
+  title: "Verified, zero-CVE container images and libraries | Cleanstart",
   absoluteTitle: true,
   description:
-    "Build on verified, near zero vulnerability container images with cryptographic provenance. CleanStart delivers hardened, FIPS compliant, SBOM backed images for trusted software delivery.",
+    "Cleanstart delivers verified, zero-CVE container images and libraries that are hardened, continuously scanned, and built for secure software supply chains.",
   path: "/",
   variant: "hero",
   ogTitle: "Verified & Secure Container Images",
