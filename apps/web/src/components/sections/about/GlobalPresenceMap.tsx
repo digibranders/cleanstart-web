@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { ComposableMap, Geographies, Geography, Marker, useMapContext } from "react-simple-maps";
+import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import Image from "next/image";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -54,91 +54,6 @@ const COUNTRY_LABELS: { name: string; coords: [number, number] }[] = [
   { name: "SINGAPORE", coords: [103.8, 3.4] },
 ];
 
-// Each arc gets its own lift factor so they fan out vertically instead of bundling
-const CONNECTION_ARCS: { from: LocationId; to: LocationId; liftFactor: number }[] = [
-  { from: "hq",       to: "bengaluru", liftFactor: 0.42 }, // high sweep over N. Atlantic
-  { from: "hq",       to: "singapore", liftFactor: 0.18 }, // flatter path, clearly below
-  { from: "bengaluru",to: "singapore", liftFactor: 0.30 }, // medium hop
-];
-
-// ─── Curved arc (quadratic Bezier) using the map projection ──────────────────
-
-interface CurvedArcProps {
-  from: [number, number];
-  to: [number, number];
-  liftFactor?: number;
-  stroke?: string;
-  strokeWidth?: number;
-  strokeDasharray?: string;
-  opacity?: number;
-}
-
-function CurvedArc({
-  from,
-  to,
-  liftFactor = 0.28,
-  stroke = "rgba(44,193,235,0.45)",
-  strokeWidth = 1,
-  strokeDasharray = "4 5",
-  opacity = 1,
-}: CurvedArcProps) {
-  const ctx = useMapContext() as {
-    projection: (c: [number, number]) => [number, number] | null;
-  };
-
-  const p1 = ctx.projection(from);
-  const p2 = ctx.projection(to);
-  if (!p1 || !p2) return null;
-
-  const [x1, y1] = p1;
-  const [x2, y2] = p2;
-
-  const mx = (x1 + x2) / 2;
-  const my = (y1 + y2) / 2;
-  const dist = Math.hypot(x2 - x1, y2 - y1);
-  const lift = Math.max(20, dist * liftFactor);
-  const cy = my - lift;
-
-  return (
-    <path
-      d={`M ${x1},${y1} Q ${mx},${cy} ${x2},${y2}`}
-      stroke={stroke}
-      strokeWidth={strokeWidth}
-      strokeDasharray={strokeDasharray}
-      strokeLinecap="round"
-      fill="none"
-      opacity={opacity}
-    />
-  );
-}
-
-// ─── All arcs — rendered inside ComposableMap so useMapContext works ──────────
-
-function ConnectionArcs({ offices }: { offices: Office[] }) {
-  const byId = Object.fromEntries(offices.map((o) => [o.id, o])) as Record<
-    LocationId,
-    Office
-  >;
-
-  return (
-    <>
-      {CONNECTION_ARCS.map(({ from, to, liftFactor }) => {
-        const oA = byId[from];
-        const oB = byId[to];
-        if (!oA || !oB) return null;
-        return (
-          <CurvedArc
-            key={`${from}-${to}`}
-            from={oA.coordinates}
-            to={oB.coordinates}
-            liftFactor={liftFactor}
-          />
-        );
-      })}
-    </>
-  );
-}
-
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
@@ -161,7 +76,7 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
         width={1100}
         height={480}
         projection="geoNaturalEarth1"
-        projectionConfig={{ scale: 275, center: [5, 10] }}
+        projectionConfig={{ scale: 340, center: [12, 14] }}
         style={{ width: "100%", height: "auto" }}
       >
         <defs>
@@ -207,9 +122,6 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
             })
           }
         </Geographies>
-
-        {/* Curved dotted arcs — rendered inside ComposableMap so projection works */}
-        <ConnectionArcs offices={offices} />
 
         {/* Country name labels */}
         {COUNTRY_LABELS.map(({ name, coords }) => (
