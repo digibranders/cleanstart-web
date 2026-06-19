@@ -130,22 +130,6 @@ export function TeamsCTA() {
             }
           >
             <span>Explore Careers</span>
-            <svg
-              className="cs-cta-arrow"
-              width="18"
-              height="18"
-              viewBox="0 0 18 18"
-              fill="none"
-              aria-hidden
-            >
-              <path
-                d="M3 9h11m0 0l-4-4m4 4l-4 4"
-                stroke="currentColor"
-                strokeWidth="1.75"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
           </Link>
         </Reveal>
       </div>
@@ -194,22 +178,6 @@ export function TeamsCTA() {
           }
         >
           <span>Explore Careers</span>
-          <svg
-            className="cs-cta-arrow"
-            width="18"
-            height="18"
-            viewBox="0 0 18 18"
-            fill="none"
-            aria-hidden
-          >
-            <path
-              d="M3 9h11m0 0l-4-4m4 4l-4 4"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
         </Link>
       </div>
     </div>

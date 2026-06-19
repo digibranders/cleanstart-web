@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRightShort } from "@/components/icons/ArrowRightShort";
 
 export function PlatformHero() {
   return (
@@ -121,7 +120,6 @@ export function PlatformHero() {
           }
         >
           <span>See the Trust Architecture in Motion</span>
-          <ArrowRightShort className="cs-cta-arrow text-[#111111]" />
         </Link>
       </div>
 

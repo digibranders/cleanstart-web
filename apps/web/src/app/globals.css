@@ -3397,12 +3397,40 @@ body {
   background: rgba(17, 17, 17, 0.12);
 }
 
-/* Callout boxes (myth-box / what-is-mythos-box). The padding/background/radius
-   ship inside the embed's own <style>, carried over in rawHtml; this only sets
-   sane spacing if that style is absent. */
+/* Callout boxes (myth-box / what-is-mythos-box). Webflow's own CSS was
+   dark-theme (translucent-white fill) and lived in the site's global
+   stylesheet, so we re-style them here for the light article surface: a soft
+   tinted panel with a brand accent border. */
 .article-body .article-embed .myth-box,
 .article-body .article-embed .what-is-mythos-box {
-  margin: 0.5rem 0;
+  margin: 1.25rem 0;
+  padding: 1.25rem 1.5rem;
+  background: rgba(74, 59, 241, 0.04);
+  border: 1px solid rgba(74, 59, 241, 0.12);
+  border-left: 4px solid #4a3bf1;
+  border-radius: 12px;
+}
+
+.article-body .article-embed .myth-box > :first-child,
+.article-body .article-embed .what-is-mythos-box > :first-child {
+  margin-top: 0;
+}
+
+.article-body .article-embed .myth-box p:last-child,
+.article-body .article-embed .what-is-mythos-box p:last-child {
+  margin-bottom: 0;
+}
+
+/* The "Myth" / "Reality" tag inside a myth-box. */
+.article-body .article-embed .myth-label {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #4a3bf1;
 }
 
 @media (max-width: 640px) {
