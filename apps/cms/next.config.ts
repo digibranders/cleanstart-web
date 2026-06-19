@@ -77,6 +77,10 @@ const securityHeaders = [
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
 ];
 
+// The admin UI should never be indexed by search engines — it is
+// authentication-gated and has no public-facing content.
+const adminNoindexHeader = { key: 'X-Robots-Tag', value: 'noindex, nofollow' };
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   // Pin Turbopack's workspace root to the monorepo root. Without this, Next
@@ -86,7 +90,12 @@ const nextConfig: NextConfig = {
     root: path.resolve(import.meta.dirname, '../..'),
   },
   async headers() {
-    return [{ source: '/(.*)', headers: securityHeaders }];
+    return [
+      { source: '/(.*)', headers: securityHeaders },
+      // Explicit noindex on every admin route — belt-and-suspenders alongside
+      // the metadata export in (payload)/layout.tsx.
+      { source: '/admin(.*)', headers: [adminNoindexHeader] },
+    ];
   },
   images: {
     remotePatterns: [
