@@ -121,23 +121,6 @@ export function SbomCTA(): React.ReactElement {
             }
           >
             Download the SBOM Datasheet
-            <svg
-              className="cs-cta-arrow"
-              width="22"
-              height="22"
-              viewBox="0 0 22 22"
-              fill="none"
-              aria-hidden="true"
-              role="presentation"
-            >
-              <path
-                d="M4 11h14M12 5l6 6-6 6"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
           </Link>
         </Reveal>
       </div>

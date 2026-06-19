@@ -39,7 +39,6 @@ export function BecomePartnerCta(): React.ReactElement {
         }
       >
         <span>Become a Partner</span>
-        <ArrowIcon className="cs-cta-arrow" />
       </button>
       <PartnerModal open={open} onClose={() => setOpen(false)} />
     </>
@@ -311,29 +310,5 @@ function PartnerModal({ open, onClose }: PartnerModalProps): React.ReactElement 
         </div>
       </dialog>
     </>
-  );
-}
-
-function ArrowIcon({ className = "" }: { className?: string }): React.ReactElement {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      role="img"
-      aria-hidden="true"
-      focusable="false"
-      className={className}
-    >
-      <title>Arrow right</title>
-      <path
-        d="M3.5 8h9m0 0L9 4.5M12.5 8 9 11.5"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }
