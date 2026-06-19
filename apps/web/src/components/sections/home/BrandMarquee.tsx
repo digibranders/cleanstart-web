@@ -2,12 +2,16 @@ import fs from "node:fs";
 import path from "node:path";
 import Image from "next/image";
 
+// Logos present on disk but intentionally excluded from the trusted marquee.
+const EXCLUDED_LOGOS = new Set(["15-indegene.svg"]);
+
 function getTrustedLogos(): string[] {
   const dir = path.join(process.cwd(), "public", "images", "trusted");
   try {
     return fs
       .readdirSync(dir)
       .filter((f) => /\.(svg|png|jpe?g|webp)$/i.test(f))
+      .filter((f) => !EXCLUDED_LOGOS.has(f))
       .sort();
   } catch {
     return [];

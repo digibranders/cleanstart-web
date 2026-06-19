@@ -14,7 +14,13 @@ export interface BuildCspOptions {
 const SENTRY_INGEST = 'https://*.ingest.sentry.io';
 const VERCEL_INSIGHTS = 'https://vitals.vercel-insights.com';
 const VERCEL_SCRIPTS = 'https://va.vercel-scripts.com';
+// gtag.js library host (loaded via script-src 'https:'); also a beacon target.
+const GTM = 'https://www.googletagmanager.com';
 const GA4_COLLECT = 'https://www.google-analytics.com';
+// Regional collect endpoints redirect to subdomains of google-analytics.com
+// (e.g. region1.google-analytics.com) — the analytics.google.com wildcard does
+// NOT cover those, so both families are listed.
+const GA4_COLLECT_REGION = 'https://*.google-analytics.com';
 const GA4_REGION = 'https://*.analytics.google.com';
 
 // Frame-ancestors override applied to preview surfaces (cookie-based
@@ -51,6 +57,9 @@ export function buildCsp({
     'https://storage.googleapis.com',
     // Brand-colored stack logos (devicons) served via jsDelivr CDN
     'https://cdn.jsdelivr.net',
+    // GA4 no-cors pixel fallback when sendBeacon/fetch is unavailable.
+    GA4_COLLECT,
+    GTM,
   ];
 
   const fontSrc = ["'self'", 'https://fonts.gstatic.com', 'data:'];
@@ -69,7 +78,9 @@ export function buildCsp({
     SENTRY_INGEST,
     VERCEL_INSIGHTS,
     VERCEL_SCRIPTS,
+    GTM,
     GA4_COLLECT,
+    GA4_COLLECT_REGION,
     GA4_REGION,
   ];
   if (!isProduction) {

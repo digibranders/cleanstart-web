@@ -3,6 +3,7 @@ import Image from "next/image";
 import { formatGuideDate, guideMediaUrl } from "@/lib/guides";
 import type { Guide } from "@/lib/guides";
 import { effectivePublishedAt } from "@/lib/published-date";
+import { deriveCoverKeyword, guideCoverPath } from "@/lib/guide-cover";
 import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 
 interface GuideDetailRelatedGuidesProps {
@@ -81,6 +82,9 @@ export function GuideDetailRelatedGuides({
 }
 
 function RelatedGuideCard({ guide }: { guide: Guide }): React.ReactElement {
+  const imageUrl = guideMediaUrl(guide.heroImage?.url);
+  const coverKeyword = deriveCoverKeyword(guide.title);
+
   return (
     <article
       className="relative overflow-hidden flex flex-col h-full"
@@ -90,19 +94,25 @@ function RelatedGuideCard({ guide }: { guide: Guide }): React.ReactElement {
         boxShadow: "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01), 0px 52px 21px 0px rgba(0,0,0,0), 0px 81px 23px 0px rgba(0,0,0,0)",
       }}
     >
-      <div className="relative shrink-0 mx-3 mt-3 rounded-[20px] md:rounded-[24px] overflow-hidden h-[150px] md:h-[200px]">
-        {guide.heroImage ? (
+      <div
+        className="relative shrink-0 mx-3 mt-3 rounded-[20px] md:rounded-[24px] overflow-hidden h-[150px] md:h-[200px]"
+        style={{ background: "#e8e8f0" }}
+      >
+        {imageUrl ? (
           <Image
-            src={guideMediaUrl(guide.heroImage.url)!}
-            alt={guide.heroImage.alt ?? guide.title}
+            src={imageUrl}
+            alt={guide.heroImage?.alt ?? guide.title}
             fill
             sizes="(min-width: 1280px) 380px, (min-width: 768px) 50vw, 100vw"
             className="object-cover"
           />
         ) : (
-          <div
-            className="w-full h-full"
-            style={{ background: "linear-gradient(135deg, #131e8f 0%, #471ec0 100%)" }}
+          <Image
+            src={guideCoverPath(coverKeyword)}
+            alt={`${coverKeyword} — CleanStart Guide`}
+            fill
+            sizes="(min-width: 1280px) 380px, (min-width: 768px) 50vw, 100vw"
+            className="object-cover"
           />
         )}
       </div>
