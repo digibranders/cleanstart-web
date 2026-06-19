@@ -78,9 +78,12 @@ describe('buildCsp', () => {
     expect(parse(buildCsp(base))['connect-src']).not.toContain('http://localhost:3000');
   });
 
-  it('enables Trusted Types only in production', () => {
-    expect(buildCsp(base)).toContain("require-trusted-types-for 'script'");
-    expect(buildCsp({ ...base, isProduction: false })).not.toContain('require-trusted-types-for');
+  it('does not emit Trusted Types (incompatible with the Turbopack chunk loader)', () => {
+    // require-trusted-types-for 'script' blocks Turbopack's `script.src` chunk
+    // loads, crashing hydration on every route. Must stay absent in both modes.
+    expect(buildCsp(base)).not.toContain('require-trusted-types-for');
+    expect(buildCsp(base)).not.toContain('trusted-types');
+    expect(buildCsp({ ...base, isProduction: false })).not.toContain('trusted-types');
   });
 
   it('emits upgrade-insecure-requests as a bare directive', () => {
