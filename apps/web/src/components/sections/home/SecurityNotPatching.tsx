@@ -9,7 +9,7 @@ const DIAGRAM_DESIGN_WIDTH = 1240;
 export function SecurityNotPatching() {
   return (
     <section
-      className="relative overflow-hidden py-section-lg"
+      className="relative overflow-hidden pt-section-sm pb-section-lg"
       style={{
         background:
           "linear-gradient(180deg, #151021 0%, #10123E 22%, #131E8F 52%, #471EC0 82%, #4A1FCB 100%)",

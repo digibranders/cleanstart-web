@@ -26,10 +26,10 @@ const CARDS: CardData[] = [
     href: "/cleanstart-images",
   },
   {
-    title: "Clean\nLibraries",
+    title: "Clean Libraries",
     blurb: "Govern dependencies with trusted open-source libraries.",
     icon: "/images/cleanstart-factory/clean-libraries-2.webp",
-    href: "/cleanstart-platform",
+    href: "/clean-libraries",
   },
   {
     title: "CleanSight",

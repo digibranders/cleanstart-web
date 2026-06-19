@@ -58,7 +58,7 @@ export function CleanSightHero(): React.ReactElement {
 
             <HeroReveal y={30} delay={0.35} duration={0.8}>
               <Link
-                href="/contact-us"
+                href="/book-a-demo"
                 className="cs-btn-glass mt-8"
                 style={
                   {
@@ -67,7 +67,7 @@ export function CleanSightHero(): React.ReactElement {
                   } as React.CSSProperties
                 }
               >
-                <span>Contact Us</span>
+                <span>Book a Demo</span>
               </Link>
             </HeroReveal>
           </div>

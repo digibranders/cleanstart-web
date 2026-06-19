@@ -80,7 +80,7 @@ export const NAV_TREE: NavItem[] = [
             label: "Clean Libraries",
             href: "/clean-libraries",
             description: "Govern every dependency, including AI-introduced libraries.",
-            icon: "folder",
+            icon: "library",
           },
           {
             label: "CleanSight",
