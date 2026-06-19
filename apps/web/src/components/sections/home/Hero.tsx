@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ArrowRightShort } from "@/components/icons/ArrowRightShort";
 import { BrandMarquee } from "@/components/sections/home/BrandMarquee";
 import { HeroHeading } from "@/components/sections/home/HeroHeading";
 import { LivePostureReport } from "@/components/sections/home/LivePostureReport";
@@ -53,6 +54,7 @@ export function Hero() {
                   }}
                 >
                   <span>Browse Images</span>
+                  <ArrowRightShort className="cs-cta-arrow text-[#111111]" />
                 </a>
 
                 <Link
@@ -66,6 +68,7 @@ export function Hero() {
                   }}
                 >
                   <span>Contact Us</span>
+                  <ArrowRightShort className="cs-cta-arrow text-white" />
                 </Link>
               </div>
             </HeroReveal>

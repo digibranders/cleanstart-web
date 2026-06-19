@@ -28,26 +28,36 @@ interface IncludedItem {
 }
 
 const DEV_FEATURES: string[] = [
-  "Latest image releases",
+  "Latest version of container images",
   "SBOM included",
-  "Free for development and testing",
+  "Free for testing and deployment",
   "Debloated architecture",
-  "SLSA-aligned builds",
-  "Community support",
+  "SLSA Level 2 build",
+  "No SLA commitment",
 ];
 
 const ENTERPRISE_INCLUDED: IncludedItem[] = [
-  { label: "Production-ready hardened images" },
-  { label: "SBOM and provenance included" },
-  { label: "SLA-backed vulnerability remediation" },
-  { label: "Enterprise support" },
+  {
+    label:
+      "CleanStart Image (both development and production versions) applied to language-based images: Python / Go etc.",
+  },
+  { label: "CleanStart versions are available in the latest three releases" },
+  { label: "Image Artifacts", sub: "SBOM • SLA Level 3 Build" },
+  {
+    label: "CVE remediation SLA",
+    sub: "7 Days for Critical • 14 Days for Medium / Low",
+  },
 ];
 
 const ENTERPRISE_ADDONS: IncludedItem[] = [
-  { label: "FIPS 140-3 variants" },
-  { label: "Additional packages and components" },
-  { label: "Custom image variants" },
-  { label: "Volume licensing" },
+  {
+    label: "All Enterprise features included",
+    note: "If additional packages or components are necessary for your use case, we will create and provide them upon request.",
+  },
+  {
+    label: "Volume Discount",
+    note: "Applicable for Enterprise images (50 images and above)",
+  },
 ];
 
 export function PricingPlans(): React.ReactElement {
@@ -135,14 +145,14 @@ function DeveloperCard(): React.ReactElement {
             color: "#111",
           }}
         >
-          Community Images
+          For Developers
         </h3>
       </div>
       <p
         className="relative mt-2 text-[#555]"
         style={{ fontSize: "var(--fs-body)", lineHeight: 1.4 }}
       >
-        For development, testing, and evaluation.
+        Perfect for testing and development
       </p>
 
       <hr className="relative my-6 border-0 border-t border-[#ECECEC]" />
@@ -210,14 +220,14 @@ function EnterpriseCard(): React.ReactElement {
               lineHeight: 1.1,
             }}
           >
-            Enterprise Images
+            Enterprise Image
           </h3>
         </div>
         <p
           className="relative z-[1] mt-1.5 text-white/70"
           style={{ fontSize: "var(--fs-body-sm)", lineHeight: 1.4 }}
         >
-          For production workloads and regulated environments.
+          (Application / build / distribution / language-base image)
         </p>
 
         <div className="relative z-[1] mt-5 flex flex-col gap-4">
@@ -227,7 +237,7 @@ function EnterpriseCard(): React.ReactElement {
             ))}
           </InnerCard>
 
-          <InnerCard label="Available Add-ons" labelIconSrc={IC.addons}>
+          <InnerCard label="Add-ons" labelIconSrc={IC.addons}>
             {ENTERPRISE_ADDONS.map((item) => (
               <IncludedRow key={item.label} item={item} />
             ))}

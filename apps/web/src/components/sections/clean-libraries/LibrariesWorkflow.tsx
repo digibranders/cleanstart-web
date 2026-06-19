@@ -109,22 +109,20 @@ function FeatureGlyph({ icon }: { icon: FeatureIcon }): React.ReactElement {
   }
 }
 
-/** Self-contained 3D glass stage icon, lifted on a soft accent-tinted glow.
- *  `sizeClass` drives a responsive footprint so the horizontal row fits from lg
- *  up; the image is loaded at the largest intrinsic size and scaled by CSS. */
+/** Self-contained 3D glass stage icon, lifted on a soft accent-tinted glow. */
 function Medallion({
   image,
   alt,
   tint,
-  sizeClass,
+  size,
 }: {
   image: string;
   alt: string;
   tint: string;
-  sizeClass: string;
+  size: number;
 }): React.ReactElement {
   return (
-    <div className={cn("relative flex items-center justify-center", sizeClass)}>
+    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
       <span
         aria-hidden
         className="wf-icon-glow pointer-events-none absolute inset-[-22%] rounded-full"
@@ -133,10 +131,10 @@ function Medallion({
       <Image
         src={image}
         alt={alt}
-        width={132}
-        height={132}
-        sizes="132px"
-        className="relative h-full w-full select-none object-contain"
+        width={size}
+        height={size}
+        sizes={`${size}px`}
+        className="relative select-none object-contain"
         draggable={false}
       />
     </div>
@@ -265,9 +263,7 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
       data-featured={featured ? "true" : undefined}
       className={cn(
         "wf-card relative flex h-full flex-col items-center rounded-[22px] border text-center",
-        featured
-          ? "gap-4 px-5 py-7 lg:min-h-[392px] lg:gap-5 xl:min-h-[420px] xl:px-8 xl:py-9"
-          : "gap-3.5 px-4 py-6 lg:min-h-[332px] lg:gap-4 xl:min-h-[356px] xl:px-6 xl:py-8",
+        featured ? "gap-5 px-8 py-9 xl:min-h-[420px]" : "gap-4 px-6 py-8 xl:min-h-[356px]",
       )}
       style={{
         ["--accent" as string]: stage.accent,
@@ -291,11 +287,7 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
         image={stage.image}
         alt=""
         tint={stage.tint}
-        sizeClass={
-          featured
-            ? "size-[104px] lg:size-[116px] xl:size-[132px]"
-            : "size-[84px] lg:size-[92px] xl:size-[108px]"
-        }
+        size={featured ? 132 : 108}
       />
       <div className="flex flex-col items-center gap-3">
         <Title featured={featured}>{stage.title}</Title>
@@ -329,7 +321,7 @@ function Connector({
       aria-hidden
       className={cn(
         "wf-arrow flex shrink-0 items-center justify-center",
-        vertical ? "h-8 w-full" : "w-6 xl:w-9",
+        vertical ? "h-8 w-full" : "w-9",
       )}
       style={{ color: accent }}
     >
@@ -411,8 +403,8 @@ export function LibrariesWorkflow(): React.ReactElement {
           {/* Desktop — horizontal flow with the Clean Library stage prominent.
               Cards and connectors are siblings so every non-featured card keeps
               an identical flex basis (equal width); connectors never steal width. */}
-          <Reveal className="mt-14 hidden lg:block">
-            <div className="flex items-center justify-center gap-1.5 xl:gap-2">
+          <Reveal className="mt-14 hidden xl:block">
+            <div className="flex items-center justify-center gap-2">
               {STAGES.map((stage, i) => (
                 <Fragment key={stage.title}>
                   <div className={`${stage.featured ? "flex-[1.32]" : "flex-1"} min-w-0`}>
@@ -427,7 +419,7 @@ export function LibrariesWorkflow(): React.ReactElement {
           </Reveal>
 
           {/* Stacked — vertical flow for < xl. */}
-          <RevealStagger className="mx-auto mt-12 flex max-w-[440px] flex-col items-stretch gap-3 lg:hidden">
+          <RevealStagger className="mx-auto mt-12 flex max-w-[440px] flex-col items-stretch gap-3 xl:hidden">
             {STAGES.map((stage, i) => (
               <RevealItem key={stage.title} className="flex flex-col items-stretch gap-3">
                 <StageCard stage={stage} />

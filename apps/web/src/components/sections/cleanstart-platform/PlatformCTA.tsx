@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRightShort } from "@/components/icons/ArrowRightShort";
 
 export function PlatformCTA() {
   return (
@@ -123,6 +124,7 @@ export function PlatformCTA() {
             }
           >
             <span>Browse Images</span>
+            <ArrowRightShort className="cs-cta-arrow text-[#111111]" />
           </Link>
         </div>
       </div>
