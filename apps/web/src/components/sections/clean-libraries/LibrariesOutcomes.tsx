@@ -1,5 +1,5 @@
 import { Container, Section } from "@/components/layout";
-import { Reveal, RevealItem, RevealStagger } from "@/components/ui/Reveal";
+import { RevealItem, RevealStagger } from "@/components/ui/Reveal";
 
 /** One measurable outcome of running dependencies through Clean Libraries. */
 interface Outcome {
@@ -133,51 +133,7 @@ export function LibrariesOutcomes(): React.ReactElement {
         }}
       />
       <Container className="relative">
-        <Reveal header>
-          <div className="mx-auto max-w-[760px] text-center">
-            <p
-              className="font-display font-semibold uppercase"
-              style={{
-                fontSize: "var(--fs-caption)",
-                letterSpacing: "0.18em",
-                color: "#57d5fb",
-              }}
-            >
-              The Outcome
-            </p>
-            <h2
-              className="mt-4 font-display text-white"
-              style={{
-                fontSize: "var(--fs-h2)",
-                fontWeight: 700,
-                letterSpacing: "-0.03em",
-                lineHeight: 1.1,
-              }}
-            >
-              Clear Results Across{" "}
-              <span
-                className="bg-clip-text text-transparent"
-                style={{ backgroundImage: "linear-gradient(102deg, #9a51ff 0%, #2cc1eb 100%)" }}
-              >
-                Every Dependency
-              </span>
-            </h2>
-            <p
-              className="mx-auto mt-5 max-w-[620px] font-sans text-white/70"
-              style={{
-                fontSize: "var(--fs-lead)",
-                fontWeight: 400,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.5,
-              }}
-            >
-              From the first install to production, Clean Libraries turns invisible
-              dependency sprawl into outcomes you can see, govern, and trust.
-            </p>
-          </div>
-        </Reveal>
-
-        <RevealStagger className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:mt-16 lg:grid-cols-3 xl:grid-cols-5">
+        <RevealStagger className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {OUTCOMES.map((outcome) => (
             <RevealItem key={outcome.title} className="h-full">
               <OutcomeCard outcome={outcome} />
