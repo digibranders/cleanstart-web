@@ -2,52 +2,9 @@
 
 import dynamic from "next/dynamic";
 import { Reveal } from "@/components/ui/Reveal";
-import type { Office } from "./GlobalPresenceMap";
+import { OFFICES } from "./offices";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
-
-const OFFICES: Office[] = [
-  {
-    id: "hq",
-    city: "Lewes, Delaware",
-    country: "United States",
-    role: "Headquarters",
-    address: "8 The Green, Suite A, Dover, DE 19901",
-    color: "amber",
-    coordinates: [-75.5, 38.9],
-    imageSrc: "/images/about/global/landmark-delaware.webp",
-  },
-  {
-    id: "singapore",
-    city: "Singapore",
-    country: "Singapore",
-    role: "APAC Operations",
-    address: "1003 Bukit Merah Central, #07-23, Singapore 159836",
-    color: "cyan",
-    coordinates: [103.8, 1.4],
-    imageSrc: "/images/about/global/landmark-singapore.webp",
-  },
-  {
-    id: "ahmedabad",
-    city: "Ahmedabad",
-    country: "India",
-    role: "Engineering Hub",
-    address: "SG Highway, Ahmedabad, Gujarat 380054",
-    color: "cyan",
-    coordinates: [72.6, 23.0],
-    imageSrc: "/images/about/global/landmark-ahmedabad.webp",
-  },
-  {
-    id: "bengaluru",
-    city: "Bengaluru",
-    country: "India",
-    role: "Engineering Hub",
-    address: "Whitefield, Bengaluru, Karnataka 560066",
-    color: "cyan",
-    coordinates: [77.6, 13.0],
-    imageSrc: "/images/about/global/landmark-bengaluru.webp",
-  },
-];
 
 const CYAN = "#FFFFFF";
 const AMBER = "#f59e0b";

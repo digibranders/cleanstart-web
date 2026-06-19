@@ -34,6 +34,12 @@ const PARTNERS: Record<Region, Partner[]> = {
   Global: [
     { name: "Nutanix", country: "San Jose, USA", logo: "/images/partners/global/nutanix.jpg" },
     { name: "Sysdig", country: "San Francisco, USA", logo: "/images/partners/global/sysdig.png" },
+    {
+      name: "Zensar",
+      country: "San Jose, USA",
+      logo: "/images/partners/global/zensar.svg",
+      invertOnLight: true,
+    },
   ],
   "Asia Pacific": [
     { name: "Hitachi Systems", country: "India", logo: "/images/partners/global/hitachi.webp" },
