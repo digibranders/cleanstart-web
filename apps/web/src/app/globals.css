@@ -3342,6 +3342,80 @@ body {
   margin: 1.75rem 0;
 }
 
+/* ── Migrated Webflow rich-text embeds ─────────────────────────────────────────
+   Rendered from EmbedNode.rawHtml via renderLexical's `embed` case. The Webflow
+   layout CSS lived in the site's global stylesheet (not in the content), so the
+   classes below re-create the embeds that were authored as grids/callouts. */
+.article-body .article-embed {
+  margin: 1.75rem 0;
+}
+
+/* Feature grid — a row of icon + label items, separated by thin dividers.
+   Wraps to a column on narrow viewports. */
+.article-body .article-embed .feature-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.5rem 1.25rem;
+}
+
+.article-body .article-embed .feature-item {
+  display: flex;
+  flex: 1 1 8rem;
+  min-width: 7rem;
+  max-width: 12rem;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+}
+
+.article-body .article-embed .feature-item img {
+  width: auto;
+  max-width: 96px;
+  height: auto;
+}
+
+.article-body .article-embed .feature-item h3,
+.article-body .article-embed .feature-item h4 {
+  margin: 0;
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.article-body .article-embed .feature-item p:last-child {
+  margin: 0;
+}
+
+/* Vertical hairline between feature items; collapses to a horizontal rule when
+   the grid wraps. */
+.article-body .article-embed .divider {
+  align-self: stretch;
+  width: 1px;
+  background: rgba(17, 17, 17, 0.12);
+}
+
+/* Callout boxes (myth-box / what-is-mythos-box). The padding/background/radius
+   ship inside the embed's own <style>, carried over in rawHtml; this only sets
+   sane spacing if that style is absent. */
+.article-body .article-embed .myth-box,
+.article-body .article-embed .what-is-mythos-box {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 640px) {
+  .article-body .article-embed .feature-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+  .article-body .article-embed .divider {
+    width: 60%;
+    height: 1px;
+  }
+}
+
 /* ── Article table ─────────────────────────────────────────────────────────── */
 .article-body .article-table-wrapper {
   margin: 1.75rem 0;
