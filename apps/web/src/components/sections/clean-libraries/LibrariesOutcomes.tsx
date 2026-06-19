@@ -12,7 +12,7 @@ interface Outcome {
 const OUTCOMES: Outcome[] = [
   {
     icon: "/images/clean-libraries/out-visibility.svg",
-    title: "Complete Dependency Visibility",
+    title: "Dependency Validation",
   },
   {
     icon: "/images/clean-libraries/out-risk.svg",
