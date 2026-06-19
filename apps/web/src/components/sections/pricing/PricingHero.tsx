@@ -45,7 +45,8 @@ export function PricingHero(): React.ReactElement {
                 maxWidth: "860px",
               }}
             >
-              Choose Your <span className="cs-text-gradient-impact">Plan</span>
+              Choose Your{" "}
+              <span className="cs-text-gradient-impact">Deployment Model</span>
             </h1>
           </HeroReveal>
 
@@ -59,7 +60,8 @@ export function PricingHero(): React.ReactElement {
               }}
             >
               Our platform is built to support a wide range of enterprise and
-              operational needs across industries.
+              operational needs across industries. From community-ready images
+              to enterprise-grade software supply chain security.
             </p>
           </HeroReveal>
 
@@ -75,22 +77,6 @@ export function PricingHero(): React.ReactElement {
               }
             >
               Talk to Sales
-              <svg
-                className="cs-cta-arrow"
-                width="18"
-                height="18"
-                viewBox="0 0 18 18"
-                fill="none"
-                aria-hidden
-              >
-                <path
-                  d="M3.75 9h10.5M9.75 4.5L14.25 9l-4.5 4.5"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
             </Link>
           </HeroReveal>
         </div>
