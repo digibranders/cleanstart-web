@@ -20,6 +20,7 @@ import * as migration_20260611_061406_add_seo_keywords from './20260611_061406_a
 import * as migration_20260619_120000_fix_kb_internal_links from './20260619_120000_fix_kb_internal_links';
 import * as migration_20260619_130000_unlink_broken_blog_guide_links from './20260619_130000_unlink_broken_blog_guide_links';
 import * as migration_20260619_140000_unlink_broken_kb_links from './20260619_140000_unlink_broken_kb_links';
+import * as migration_20260619_150000_add_impact_stats_global from './20260619_150000_add_impact_stats_global';
 
 export const migrations = [
   {
@@ -131,5 +132,10 @@ export const migrations = [
     up: migration_20260619_140000_unlink_broken_kb_links.up,
     down: migration_20260619_140000_unlink_broken_kb_links.down,
     name: '20260619_140000_unlink_broken_kb_links',
+  },
+  {
+    up: migration_20260619_150000_add_impact_stats_global.up,
+    down: migration_20260619_150000_add_impact_stats_global.down,
+    name: '20260619_150000_add_impact_stats_global',
   },
 ];

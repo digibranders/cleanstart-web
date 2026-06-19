@@ -45,7 +45,8 @@ export function PricingHero(): React.ReactElement {
                 maxWidth: "860px",
               }}
             >
-              Choose Your <span className="cs-text-gradient-impact">Plan</span>
+              Choose Your{" "}
+              <span className="cs-text-gradient-impact">Deployment Model</span>
             </h1>
           </HeroReveal>
 
@@ -59,7 +60,8 @@ export function PricingHero(): React.ReactElement {
               }}
             >
               Our platform is built to support a wide range of enterprise and
-              operational needs across industries.
+              operational needs across industries. From community-ready images
+              to enterprise-grade software supply chain security.
             </p>
           </HeroReveal>
 

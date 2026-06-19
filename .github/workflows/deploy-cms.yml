@@ -270,7 +270,18 @@ jobs:
 
       - name: Smoke probe
         run: |
+          # compose --wait already gated on the container healthcheck, but the
+          # first request after a cold boot can still exceed a single 10s curl.
+          # Retry the local probe (6 x 5s) so a slow first response does not red
+          # an otherwise-healthy deploy; a sustained failure still fails the job.
           ssh -i ~/.ssh/id_deploy \
             ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} \
-            'curl -sS -o /dev/null -w "local 127.0.0.1:3000 -> HTTP %{http_code}\n" --max-time 10 http://127.0.0.1:3000/api/health'
+            'for i in $(seq 1 6); do
+               code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 10 http://127.0.0.1:3000/api/health || echo 000)
+               echo "attempt $i: local 127.0.0.1:3000/api/health -> HTTP $code"
+               [ "$code" = "200" ] && exit 0
+               [ "$i" -lt 6 ] && sleep 5
+             done
+             echo "local health probe failed after 6 attempts"
+             exit 1'
           curl -sS -o /dev/null -w "public cms.cleanstart.com -> HTTP %{http_code}\n" --max-time 10 https://cms.cleanstart.com/api/health || true
