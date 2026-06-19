@@ -140,11 +140,18 @@ function MobileTrustCard({ card }: { card: TrustCard }): React.ReactElement {
 /**
  * Desktop card — cyan glow border wrapper, white card, grid lines,
  * left-aligned ball + text.
+ *
+ * Fluid: the inner card is a container-query context (`container-type:
+ * inline-size`) with a locked 287:346 aspect ratio, so every interior
+ * dimension is expressed in `cqi` (1cqi = 1% of the card's width). The card
+ * shrinks to fit its grid column — four-in-a-row from lg without overflow —
+ * while the whole composition scales proportionally. Type stays on the role
+ * tokens so copy remains legible at every size.
  */
 function DesktopTrustCard({ card }: { card: TrustCard }): React.ReactElement {
   return (
     <div
-      className="shrink-0"
+      className="w-full"
       style={{
         background: "rgba(44,193,235,0.3)",
         borderRadius: "40px",
@@ -153,11 +160,11 @@ function DesktopTrustCard({ card }: { card: TrustCard }): React.ReactElement {
     >
       {/* Inner white card. */}
       <div
-        className="relative bg-white overflow-hidden"
+        className="relative bg-white overflow-hidden w-full"
         style={{
-          width: "287px",
-          minHeight: "346px",
+          aspectRatio: "287 / 346",
           borderRadius: "36px",
+          containerType: "inline-size",
         }}
       >
         {/* Purple glow blob — centered near the top. */}
@@ -165,11 +172,11 @@ function DesktopTrustCard({ card }: { card: TrustCard }): React.ReactElement {
           aria-hidden
           className="absolute pointer-events-none"
           style={{
-            top: "28px",
+            top: "9.756cqi",
             left: "50%",
             transform: "translateX(-50%)",
-            width: "262.871px",
-            height: "153px",
+            width: "91.593cqi",
+            height: "53.31cqi",
             background: "#df9bff",
             filter: "blur(66.5px)",
             opacity: 0.3,
@@ -178,15 +185,15 @@ function DesktopTrustCard({ card }: { card: TrustCard }): React.ReactElement {
         />
 
         {/* Horizontal gradient lines. */}
-        {[67.54, 183.54].map((y) => (
+        {[23.531, 63.952].map((y) => (
           <div
             key={y}
             aria-hidden
             className="absolute pointer-events-none"
             style={{
-              top: `${y}px`,
-              left: "-68px",
-              right: "-68px",
+              top: `${y}cqi`,
+              left: "-23.693cqi",
+              right: "-23.693cqi",
               height: "1px",
               background:
                 "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 50.77%, rgba(255,255,255,0) 100%)",
@@ -202,10 +209,10 @@ function DesktopTrustCard({ card }: { card: TrustCard }): React.ReactElement {
             aria-hidden
             className="absolute pointer-events-none"
             style={{
-              left: `${x}px`,
+              left: `${((x / 287) * 100).toFixed(3)}cqi`,
               top: 0,
               width: "0.73px",
-              height: "264px",
+              height: "91.986cqi",
               background:
                 "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 50.77%, rgba(255,255,255,0) 100%)",
               opacity: 0.8,
@@ -217,11 +224,11 @@ function DesktopTrustCard({ card }: { card: TrustCard }): React.ReactElement {
         <div
           className="absolute flex items-center justify-center"
           style={{
-            top: "24px",
-            left: "24px",
-            width: "96px",
-            height: "96px",
-            borderRadius: "160px",
+            top: "8.362cqi",
+            left: "8.362cqi",
+            width: "33.449cqi",
+            height: "33.449cqi",
+            borderRadius: "50%",
             background: "linear-gradient(180deg, #239cff 0%, #005be3 100%)",
             boxShadow:
               "0px 6.171px 14.537px rgba(28,60,142,0.33), inset 0px 0.116px 0.582px rgba(255,255,255,0.81), inset 0px -0.233px 0.291px rgba(0,44,179,0.5)",
@@ -235,7 +242,7 @@ function DesktopTrustCard({ card }: { card: TrustCard }): React.ReactElement {
             width={54}
             height={54}
             className="select-none pointer-events-none"
-            style={{ width: "54px", height: "54px" }}
+            style={{ width: "18.815cqi", height: "18.815cqi" }}
             loading="lazy"
             decoding="async"
           />
@@ -244,7 +251,12 @@ function DesktopTrustCard({ card }: { card: TrustCard }): React.ReactElement {
         {/* Text. */}
         <div
           className="absolute flex flex-col"
-          style={{ left: "24px", top: "162px", width: "251px", gap: "12px" }}
+          style={{
+            left: "8.362cqi",
+            right: "8.362cqi",
+            top: "56.446cqi",
+            gap: "4.181cqi",
+          }}
         >
           <h3
             className="font-display"
@@ -379,8 +391,8 @@ export function CleanStartImagesBrowse(): React.ReactElement {
           </h2>
         </Reveal>
 
-        {/* Mobile card list — vertical stack, hidden at lg+. */}
-        <RevealStagger className="lg:hidden mt-10 w-full flex flex-col items-center gap-7">
+        {/* Mobile card list — vertical stack, hidden at md+. */}
+        <RevealStagger className="md:hidden mt-10 w-full flex flex-col items-center gap-7">
           {TRUST_CARDS.map((card) => (
             <RevealItem key={card.title} className="w-full max-w-[328px]">
               <MobileTrustCard card={card} />
@@ -388,13 +400,14 @@ export function CleanStartImagesBrowse(): React.ReactElement {
           ))}
         </RevealStagger>
 
-        {/* Desktop card row — 4-up horizontal, hidden below lg. */}
+        {/* Tablet/desktop card grid — 2×2 below lg, 4-up from lg.
+            Columns cap at 287px (Figma size) on wide screens and shrink to fit
+            below, so the fluid cards never overflow nor stretch oversized. */}
         <RevealStagger
-          className="hidden lg:flex flex-row flex-nowrap justify-center mt-16"
-          style={{ gap: "41px" }}
+          className="hidden md:grid justify-center mt-12 lg:mt-16 gap-y-8 gap-x-6 xl:gap-x-[41px] grid-cols-[repeat(2,minmax(0,287px))] lg:grid-cols-[repeat(4,minmax(0,287px))]"
         >
           {TRUST_CARDS.map((card) => (
-            <RevealItem key={card.title}>
+            <RevealItem key={card.title} className="w-full">
               <DesktopTrustCard card={card} />
             </RevealItem>
           ))}
