@@ -27,7 +27,6 @@ export interface Testimonial {
   caseStudyHref?: string;
 }
 
-const TESTIMONIAL_PHOTO = "/images/testimonial-photo.webp";
 
 export const HOME_TESTIMONIALS: Testimonial[] = [
   {
@@ -355,72 +354,72 @@ export function Testimonials({
         className={`relative z-[2] mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 ${reserveFooterCtaSpace ? "pt-section-sm pb-[var(--spacing-section-cta)]" : "py-section-sm"}`}
       >
         {!hideHeader && (
-        <header
-          className={
-            centerHeader
-              ? "flex flex-col items-center text-center"
-              : "flex flex-col items-start gap-6 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12"
-          }
-        >
-          <Reveal
-            header
-            className={centerHeader ? "mx-auto" : "justify-self-start"}
-            style={{ maxWidth: "560px" }}
+          <header
+            className={
+              centerHeader
+                ? "flex flex-col items-center text-center"
+                : "flex flex-col items-start gap-6 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12"
+            }
           >
-            <h2
-              id="testimonials-title"
-              className="font-display"
-              style={{
-                fontSize: "var(--fs-h2)",
-                fontWeight: 600,
-                lineHeight: 1.1,
-                letterSpacing: "-0.04em",
-              }}
+            <Reveal
+              header
+              className={centerHeader ? "mx-auto" : "justify-self-start"}
+              style={{ maxWidth: "560px" }}
             >
-              {heading ?? (
-                <>
-                  Chosen by{" "}
-                  <span className="cs-text-gradient-impact">
-                    Industry Leaders
-                  </span>
-                </>
-              )}
-            </h2>
-          </Reveal>
-          {description && (
-            <>
-              <div
-                aria-hidden
-                className="hidden h-[90px] w-px shrink-0 justify-self-center md:block"
+              <h2
+                id="testimonials-title"
+                className="font-display"
                 style={{
-                  background:
-                    "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 47.2%, rgba(255,255,255,0) 100%)",
+                  fontSize: "var(--fs-h2)",
+                  fontWeight: 600,
+                  lineHeight: 1.1,
+                  letterSpacing: "-0.04em",
                 }}
-              />
-              <Reveal
-                header
-                delay={0.15}
-                y={20}
-                className="md:justify-self-end"
-                style={{ maxWidth: "604px" }}
               >
-                <p
-                  className="md:text-right"
+                {heading ?? (
+                  <>
+                    Chosen by{" "}
+                    <span className="cs-text-gradient-impact">
+                      Industry Leaders
+                    </span>
+                  </>
+                )}
+              </h2>
+            </Reveal>
+            {description && (
+              <>
+                <div
+                  aria-hidden
+                  className="hidden h-[90px] w-px shrink-0 justify-self-center md:block"
                   style={{
-                    fontFamily: "var(--font-sans)",
-                    fontSize: "var(--fs-lead)",
-                    fontWeight: 400,
-                    lineHeight: 1.4,
-                    letterSpacing: "-0.02em",
-                    opacity: 0.8,
+                    background:
+                      "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 47.2%, rgba(255,255,255,0) 100%)",
                   }}
+                />
+                <Reveal
+                  header
+                  delay={0.15}
+                  y={20}
+                  className="md:justify-self-end"
+                  style={{ maxWidth: "604px" }}
                 >
-                  {description}
-                </p>
-              </Reveal>
-            </>
-          )}
-        </header>
+                  <p
+                    className="md:text-right"
+                    style={{
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "var(--fs-lead)",
+                      fontWeight: 400,
+                      lineHeight: 1.4,
+                      letterSpacing: "-0.02em",
+                      opacity: 0.8,
+                    }}
+                  >
+                    {description}
+                  </p>
+                </Reveal>
+              </>
+            )}
+          </header>
         )}
 
         <section
@@ -455,8 +454,8 @@ export function Testimonials({
             style={
               dragInfo
                 ? ({
-                    ["--cs-tt-drag-dx" as never]: `${dragInfo.dx}px`,
-                  } as React.CSSProperties)
+                  ["--cs-tt-drag-dx" as never]: `${dragInfo.dx}px`,
+                } as React.CSSProperties)
                 : undefined
             }
           >
@@ -603,17 +602,17 @@ function MorphCard({
         isActive || !onClick
           ? undefined
           : (e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onClick();
-              }
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onClick();
             }
+          }
       }
     >
       <div className="cs-tt-card__photo">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={testimonial.photoSrc ?? TESTIMONIAL_PHOTO}
+          src={testimonial.photoSrc}
           alt={isActive ? `${testimonial.name}, ${testimonial.role}` : ""}
           width={160}
           height={160}

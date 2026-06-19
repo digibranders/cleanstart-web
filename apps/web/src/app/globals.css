@@ -740,6 +740,7 @@ body {
    A low-emphasis outline CTA meant to sit beside the primary glass button on
    the dark hero. Translucent white hairline border + faint frosted fill so it
    reads as secondary without competing with the solid glass primary.
+   Used by: home Hero "Contact Us".
    --------------------------------------------------------------------------- */
 .cs-btn-ghost {
   position: relative;

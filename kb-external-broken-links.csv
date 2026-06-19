@@ -1,0 +1,16 @@
+article_slug,external_link,status
+linux-packages-explained,https://archive.ubuntu.com/ubuntu/pool/main/n/nginx/nginx_1.18.0-0ubuntu1.deb,BROKEN/PLACEHOLDER
+linux-packages-explained,https://mirror.example.com/ubuntu/pool/main/n/nginx/nginx_1.18.0-0ubuntu1.deb,BROKEN/PLACEHOLDER
+linux-packages-explained,https://cn.archive.ubuntu.com/ubuntu/pool/main/n/nginx/nginx_1.18.0-0ubuntu1.deb,BROKEN/PLACEHOLDER
+fips-federal-compliance,https://www.whitehouse.gov/briefing-room/presidential-actions/2021/05/12/executive-order-on-improving-the-nations-cybersecurity/,BROKEN/PLACEHOLDER
+hardening-supply-chain,https://www.whitehouse.gov/briefing-room/presidential-actions/2021/05/12/executive-order-on-improving-the-nations-cybersecurity/,BROKEN/PLACEHOLDER
+what-is-a-cve,https://api.example.com,BROKEN/PLACEHOLDER
+what-is-sbom,https://www.whitehouse.gov/briefing-room/presidential-actions/2021/05/12/executive-order-on-improving-the-nations-cybersecurity/,BROKEN/PLACEHOLDER
+the-illusion-of-the-single-artifact,http://www,BROKEN/PLACEHOLDER
+shell-less-and-initialization,http://localhost:8000/health,BROKEN/PLACEHOLDER
+observability-monitoring,http://localhost:9090,BROKEN/PLACEHOLDER
+observability-monitoring,http://localhost:9090,BROKEN/PLACEHOLDER
+api-compatibility-policy,https://docs.clnstrt.dev/releases/,BROKEN/PLACEHOLDER
+api-compatibility-policy,https://clnstrt.dev/subscribe,BROKEN/PLACEHOLDER
+api-compatibility-policy,https://status.clnstrt.dev,BROKEN/PLACEHOLDER
+defect-reporting-lifecycle,https://clnstrt.dev/security.gpg,BROKEN/PLACEHOLDER

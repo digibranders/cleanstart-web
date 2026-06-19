@@ -1,0 +1,76 @@
+category,http_status,url,appears_in_articles
+THIRD_PARTY_DEAD,404,https://archive.ubuntu.com/ubuntu/pool/main/n/nginx/nginx_1.18.0-0ubuntu1.deb,linux-packages-explained
+THIRD_PARTY_DEAD,403,https://charts.bitnami.com/bitnami,helm-fundamentals
+THIRD_PARTY_DEAD,404,https://cloud.google.com/docs/provenance,what-is-slsa
+THIRD_PARTY_DEAD,404,https://cn.archive.ubuntu.com/ubuntu/pool/main/n/nginx/nginx_1.18.0-0ubuntu1.deb,linux-packages-explained
+THIRD_PARTY_DEAD,404,https://cyclonedx.org/spec/v1.4/,hipaa-compliance-mapping
+THIRD_PARTY_DEAD,404,https://docs.sigstore.dev/cosign/installation/,lab-environment-setup
+THIRD_PARTY_DEAD,404,https://docs.sigstore.dev/cosign/overview/,hipaa-compliance-mapping; runtime-monitoring-architecture
+THIRD_PARTY_DEAD,404,https://docs.sigstore.dev/cosign/working_with_artifacts/,what-is-cosign-and-image-signing
+THIRD_PARTY_DEAD,404,https://ntia.gov/page/minimum-elements-software-bill-materials-sbom,what-is-sbom
+THIRD_PARTY_DEAD,404,https://ntia.gov/page/vex,what-is-vex
+THIRD_PARTY_DEAD,404,https://nvlpubs.nist.gov/nistpubs/Legacy/FIPS/nistfips140-2.pdf,what-is-fips
+THIRD_PARTY_DEAD,ERR:ENOTFOUND,https://openquantumcomputing.org/,post-quantum-cryptography
+THIRD_PARTY_DEAD,404,https://owasp.org/www-project-machine-learning-security/,securing-ai-ml-workloads
+THIRD_PARTY_DEAD,404,https://stigviewer.com/stig/docker_ce/,fips-federal-compliance
+THIRD_PARTY_DEAD,404,https://token.actions.githubusercontent.com,security-testing-playbook
+THIRD_PARTY_DEAD,404,https://www.fedramp.gov/continuous-monitoring-process/,fedramp-high
+THIRD_PARTY_DEAD,404,https://www.hhs.gov/hipaa/for-professionals/security/security-risk-assessment-tool,hipaa-compliance-mapping
+THIRD_PARTY_DEAD,404,https://www.whitehouse.gov/briefing-room/presidential-actions/2021/05/12/executive-order-on-improving-the-nations-cybersecurity/,fips-federal-compliance; hardening-supply-chain; what-is-sbom
+OWN_GITHUB_404,404,https://github.com/cleanstart/api/issues,threat-remediation-api
+OWN_GITHUB_404,404,https://github.com/cleanstart/clnstrt-cli/issues,clean-cli-reference
+OWN_GITHUB_404,404,https://github.com/cleanstart/container-images,security-testing-playbook
+OWN_GITHUB_404,404,https://github.com/cleanstart/discussions,release-notes
+OWN_GITHUB_404,404,https://github.com/cleanstart/feature-requests/issues/new,technology-roadmap
+OWN_GITHUB_404,404,https://github.com/cleanstart/helm-charts/issues,helm-chart-reference
+OWN_GITHUB_404,404,https://github.com/cleanstart/images/issues,migration-faq; image-catalog
+OWN_GITHUB_404,404,https://github.com/cleanstart/images/security/advisories,api-compatibility-policy
+OWN_GITHUB_404,404,https://github.com/cleanstart/intelligence-go,sdk-quickstart-go
+OWN_GITHUB_404,404,https://github.com/cleanstart/intelligence-typescript,sdk-quickstart-typescript
+OWN_GITHUB_404,404,https://github.com/cleanstart/issues,troubleshooting; release-notes
+OWN_GITHUB_404,404,https://github.com/cleanstart/releases,release-notes
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://api.cleanstart.dev/docs,developer-quickstart
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://charts.cleanstart.dev,helm-chart-reference
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://cleanstart.community/slack,getting-started-python; migration-faq; migration-overview
+OWN_INFRA_NOT_LIVE,ERR:UND_ERR_CONNECT_TIMEOUT,https://cleanstart.dev,shai-hulud-npm-attack
+OWN_INFRA_NOT_LIVE,ERR:UND_ERR_CONNECT_TIMEOUT,https://cleanstart.dev/incidents/shai-hulud-incident,shai-hulud-npm-attack
+OWN_INFRA_NOT_LIVE,ERR:UND_ERR_CONNECT_TIMEOUT,https://cleanstart.dev/incidents/shai-hulud-technical,shai-hulud-npm-attack
+OWN_INFRA_NOT_LIVE,ERR:UND_ERR_CONNECT_TIMEOUT,https://cleanstart.dev/incidents/shai-hulud-timeline,shai-hulud-npm-attack
+OWN_INFRA_NOT_LIVE,ERR:UND_ERR_CONNECT_TIMEOUT,https://cleanstart.dev/keys/cosign.pub,acceptance-testing-guide
+OWN_INFRA_NOT_LIVE,ERR:UND_ERR_CONNECT_TIMEOUT,https://cleanstart.dev/releases,release-notes
+OWN_INFRA_NOT_LIVE,ERR:UND_ERR_CONNECT_TIMEOUT,https://cleanstart.dev/releases.rss,release-notes
+OWN_INFRA_NOT_LIVE,ERR:UND_ERR_CONNECT_TIMEOUT,https://cleanstart.dev/security/feed.xml,sla-support-tiers
+OWN_INFRA_NOT_LIVE,ERR:UND_ERR_CONNECT_TIMEOUT,https://cleanstart.dev/security/subscribe,sla-support-tiers
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://compliance.cleanstart.com/baa,hipaa-compliance-mapping
+OWN_INFRA_NOT_LIVE,404,https://console.cleanstart.com/support,sla-documentation
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://dashboard.cleanstart.com,sdk-quickstart-go; sdk-quickstart-typescript; sdk-quickstart-python
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://docs.cleanstart.com/intelligence,source-intelligence-core-api-reference
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://docs.cleanstart.dev,troubleshooting
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://docs.cleanstart.dev/api,threat-remediation-api
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://docs.cleanstart.dev/cli,clean-cli-reference; developer-quickstart
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://docs.cleanstart.dev/helm,helm-chart-reference
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://docs.cleanstart.dev/images,image-catalog
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://docs.cleanstart.dev/migrate/v1-to-v2,release-notes
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://docs.cleanstart.dev/migrate/v2.0-to-v2.1,release-notes
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://docs.cleanstart.dev/portal,customer-delivery-portal
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://docs.cleanstart.dev/releases/archive,release-notes
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://help.cleanstart.dev,troubleshooting
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://images.cleanstart.dev,image-catalog; developer-quickstart
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://portal.cleanstart.dev,customer-delivery-portal; troubleshooting
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://portal.cleanstart.dev/downloads,release-notes
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://portal.cleanstart.dev/reports/share/abc123xyz789,customer-delivery-portal
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://registry.cleanstart.com/v2/,registry-authentication
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://registry.cleanstart.io,architecture-overview
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://slack.cleanstart.dev,clean-cli-reference; developer-quickstart; troubleshooting; release-notes
+OWN_INFRA_NOT_LIVE,ERR:ENOTFOUND,https://status.cleanstart.com,sla-documentation; source-intelligence-core-api-reference
+TYPO_DOMAIN,ERR:UND_ERR_CONNECT_TIMEOUT,https://clnstrt.dev/security.gpg,defect-reporting-lifecycle
+TYPO_DOMAIN,ERR:UND_ERR_CONNECT_TIMEOUT,https://clnstrt.dev/subscribe,api-compatibility-policy
+TYPO_DOMAIN,ERR:ENOTFOUND,https://docs.clnstrt.dev/releases/,api-compatibility-policy
+TYPO_DOMAIN,ERR:ENOTFOUND,https://status.clnstrt.dev,api-compatibility-policy
+PLACEHOLDER,ERR:ECONNREFUSED,http://localhost:8000/health,shell-less-and-initialization
+PLACEHOLDER,ERR:ECONNREFUSED,http://localhost:9090,observability-monitoring
+PLACEHOLDER,ERR:ENOTFOUND,http://www,the-illusion-of-the-single-artifact
+PLACEHOLDER,ERR:ENOTFOUND,https://api.example.com,what-is-a-cve
+PLACEHOLDER,404,https://github.com/cleanstart/images/issues/%5BNUMBER,defect-reporting-lifecycle
+PLACEHOLDER,404,https://github.com/YOUR-USERNAME/YOUR-REPO/actions,lab-06-cicd-pipeline
+PLACEHOLDER,ERR:ENOTFOUND,https://mirror.example.com/ubuntu/pool/main/n/nginx/nginx_1.18.0-0ubuntu1.deb,linux-packages-explained

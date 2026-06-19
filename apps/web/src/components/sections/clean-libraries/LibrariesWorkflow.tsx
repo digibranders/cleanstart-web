@@ -354,8 +354,8 @@ export function LibrariesWorkflow(): React.ReactElement {
 
   return (
     <Section
-      padding="none"
-      className="overflow-hidden pt-section-sm pb-section-cta"
+      padding="sm"
+      className="overflow-hidden"
       style={{
         background: "linear-gradient(180deg, #08060f 0%, #0a0a1c 50%, #08060f 100%)",
       }}

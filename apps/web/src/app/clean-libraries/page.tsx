@@ -6,6 +6,7 @@ import { LibrariesRisk } from "@/components/sections/clean-libraries/LibrariesRi
 import { LibrariesPipeline } from "@/components/sections/clean-libraries/LibrariesPipeline";
 import { LibrariesGovernance } from "@/components/sections/clean-libraries/LibrariesGovernance";
 import { LibrariesWorkflow } from "@/components/sections/clean-libraries/LibrariesWorkflow";
+import { LibrariesOutcomes } from "@/components/sections/clean-libraries/LibrariesOutcomes";
 import { LibrariesCTA } from "@/components/sections/clean-libraries/LibrariesCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import {
@@ -57,6 +58,9 @@ export default function CleanLibrariesPage(): React.ReactElement {
         </FadeUp>
         <FadeUp>
           <LibrariesWorkflow />
+        </FadeUp>
+        <FadeUp>
+          <LibrariesOutcomes />
         </FadeUp>
       </main>
       <Footer cta={<LibrariesCTA />} />

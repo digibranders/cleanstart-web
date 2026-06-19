@@ -161,6 +161,7 @@ export interface Config {
     siteSettings: SiteSetting;
     mainNav: MainNav;
     footerNav: FooterNav;
+    impactStats: ImpactStat;
     resourcesSpotlight: ResourcesSpotlight;
     companySpotlight: CompanySpotlight;
     announcements: Announcement;
@@ -173,6 +174,7 @@ export interface Config {
     siteSettings: SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     mainNav: MainNavSelect<false> | MainNavSelect<true>;
     footerNav: FooterNavSelect<false> | FooterNavSelect<true>;
+    impactStats: ImpactStatsSelect<false> | ImpactStatsSelect<true>;
     resourcesSpotlight: ResourcesSpotlightSelect<false> | ResourcesSpotlightSelect<true>;
     companySpotlight: CompanySpotlightSelect<false> | CompanySpotlightSelect<true>;
     announcements: AnnouncementsSelect<false> | AnnouncementsSelect<true>;
@@ -11184,6 +11186,33 @@ export interface FooterNav {
   createdAt?: string | null;
 }
 /**
+ * Headline impact metrics shown across marketing surfaces (home stats band, CISO outcomes) and consumed by the Images catalog hero. Edit here to update everywhere.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "impactStats".
+ */
+export interface ImpactStat {
+  id: number;
+  /**
+   * Each stat has a display value and a label. Drag to reorder.
+   */
+  stats?:
+    | {
+        /**
+         * Display value, e.g. "88,000+", "90%+", "10M+".
+         */
+        value: string;
+        /**
+         * Short caption, e.g. "CVEs remediated".
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * Optional spotlight card shown in the Resources mega menu. Falls back to the Bulletin evergreen when no event/webinar is upcoming and this global is empty or expired.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -11689,6 +11718,22 @@ export interface FooterNavSelect<T extends boolean = true> {
         id?: T;
       };
   newsletterSignup?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "impactStats_select".
+ */
+export interface ImpactStatsSelect<T extends boolean = true> {
+  stats?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
