@@ -90,6 +90,7 @@ import { wireCustomListView } from './payload/lib/wire-custom-list-view';
 import { wirePublishGate } from './payload/lib/wire-publish-gate';
 import { Announcements } from './payload/globals/announcements';
 import { FooterNav } from './payload/globals/footerNav';
+import { ImpactStats } from './payload/globals/impactStats';
 import { Legal } from './payload/globals/legal';
 import { MainNav } from './payload/globals/mainNav';
 import { PodcastPage } from './payload/globals/podcastPage';
@@ -386,7 +387,7 @@ export default buildConfig({
   // podcast page → legal. SeoDefaults is grouped under 'SEO' (trails
   // here; it renders in the SEO group, after the Redirects/BrokenLinks
   // collections).
-  globals: [SiteSettings, MainNav, FooterNav, ResourcesSpotlight, CompanySpotlight, Announcements, PodcastPage, Legal, SeoDefaults]
+  globals: [SiteSettings, MainNav, FooterNav, ImpactStats, ResourcesSpotlight, CompanySpotlight, Announcements, PodcastPage, Legal, SeoDefaults]
     .map(wireCustomFields),
   endpoints: [
     jsonLdEndpoint,

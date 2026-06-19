@@ -9,17 +9,28 @@ import {
   type Testimonial,
 } from "@/components/sections/home/Testimonials";
 
-type Stat = {
-  icon: string;
+type StatData = {
   value: string;
   label: string;
 };
 
-const STATS: Stat[] = [
-  { icon: "/images/home/stats/shield.svg", value: "88,000+", label: "CVEs remediated" },
-  { icon: "/images/home/stats/clock.svg", value: "90%+", label: "Average CVE reduction" },
-  { icon: "/images/home/stats/cube.svg", value: "300,000+", label: "Engineering hours saved" },
-  { icon: "/images/home/stats/trend.svg", value: "10M+", label: "Packages from verified source" },
+// Icons are positional and live with the component — the CMS `impactStats`
+// global stores only value + label. Stats beyond the icon list reuse icons
+// round-robin so the band never renders a missing image.
+const STAT_ICONS = [
+  "/images/home/stats/shield.svg",
+  "/images/home/stats/clock.svg",
+  "/images/home/stats/cube.svg",
+  "/images/home/stats/trend.svg",
+] as const;
+
+// Fallback used when no `stats` prop is supplied (kept local so this client
+// component doesn't pull in the server-only CMS fetch helper).
+const DEFAULT_STATS: StatData[] = [
+  { value: "88,000+", label: "CVEs remediated" },
+  { value: "90%+", label: "Average CVE reduction" },
+  { value: "300,000+", label: "Engineering hours saved" },
+  { value: "10M+", label: "Packages from verified source" },
 ];
 
 const AUTO_ADVANCE_MS = 7000;
@@ -177,7 +188,17 @@ function TestimonialCard({
   );
 }
 
-function StatItem({ stat, showDivider }: { stat: Stat; showDivider: boolean }) {
+function StatItem({
+  icon,
+  value,
+  label,
+  showDivider,
+}: {
+  icon: string;
+  value: string;
+  label: string;
+  showDivider: boolean;
+}) {
   return (
     <div
       className={`relative flex flex-col items-center gap-4 text-center ${showDivider
@@ -187,7 +208,7 @@ function StatItem({ stat, showDivider }: { stat: Stat; showDivider: boolean }) {
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={stat.icon}
+        src={icon}
         alt=""
         aria-hidden
         loading="lazy"
@@ -198,7 +219,7 @@ function StatItem({ stat, showDivider }: { stat: Stat; showDivider: boolean }) {
         className="font-display font-bold text-[#111]"
         style={{ fontSize: "var(--fs-h2)", lineHeight: 1, letterSpacing: "-0.03em" }}
       >
-        {stat.value}
+        {value}
       </p>
       <p
         className="max-w-[170px] text-[#666]"
@@ -209,13 +230,13 @@ function StatItem({ stat, showDivider }: { stat: Stat; showDivider: boolean }) {
           letterSpacing: "-0.02em",
         }}
       >
-        {stat.label}
+        {label}
       </p>
     </div>
   );
 }
 
-export function TestimonialsStats() {
+export function TestimonialsStats({ stats = DEFAULT_STATS }: { stats?: StatData[] }) {
   const items = HOME_TESTIMONIALS;
   const total = items.length;
   const [active, setActive] = useState(0);
@@ -327,8 +348,14 @@ export function TestimonialsStats() {
         <Reveal>
           <div className="mt-14 rounded-[32px] border-[1.5px] border-black/10 bg-[#fefeff] px-6 py-12 sm:px-12">
             <div className="grid grid-cols-2 gap-y-12 md:grid-cols-4 md:gap-y-0">
-              {STATS.map((stat, i) => (
-                <StatItem key={stat.label} stat={stat} showDivider={i > 0} />
+              {stats.map((stat, i) => (
+                <StatItem
+                  key={stat.label}
+                  icon={STAT_ICONS[i % STAT_ICONS.length] ?? STAT_ICONS[0]}
+                  value={stat.value}
+                  label={stat.label}
+                  showDivider={i > 0}
+                />
               ))}
             </div>
           </div>
