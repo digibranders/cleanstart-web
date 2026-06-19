@@ -8,12 +8,10 @@ import {
   useReducedMotion,
 } from "motion/react";
 import Image from "next/image";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Container, Section } from "@/components/layout";
 import { Reveal } from "@/components/ui/Reveal";
 import { EASE_SOFT } from "@/lib/motion";
-
-const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 interface Partner {
   name: string;
@@ -28,8 +26,9 @@ type Region = (typeof REGIONS)[number];
 
 const INITIAL_VISIBLE = 8;
 
-const PILL_SPRING = { type: "spring", stiffness: 360, damping: 32, mass: 0.9 } as const;
 const CARD_SPRING = { type: "spring", stiffness: 280, damping: 30, mass: 0.8 } as const;
+
+const tabId = (region: Region): string => `region-tab-${region.replace(/\s+/g, "-").toLowerCase()}`;
 
 const PARTNERS: Record<Region, Partner[]> = {
   Global: [
@@ -92,12 +91,21 @@ export function PartnersNetwork(): React.ReactElement {
   const basePartners = partners.slice(0, INITIAL_VISIBLE);
   const extraPartners = partners.slice(INITIAL_VISIBLE);
 
-  const tablistRef = useRef<HTMLDivElement>(null);
-  const [pill, setPill] = useState<{ left: number; width: number }>({ left: 0, width: 0 });
-
-  useIsomorphicLayoutEffect(() => {
-    const el = tablistRef.current?.querySelector<HTMLElement>('[aria-selected="true"]');
-    if (el) setPill({ left: el.offsetLeft, width: el.offsetWidth });
+  // The tab bar is a single horizontal row that scrolls (no wrap) when it overflows a
+  // narrow viewport. Auto-center the active tab so the selection is never stuck off-screen;
+  // the first tab ("Global") rests at the left edge so the bar reads from the start.
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    if (active === "Global") {
+      scroller.scrollTo({ left: 0, behavior: "smooth" });
+      return;
+    }
+    const btn = scroller.querySelector<HTMLButtonElement>(`#${tabId(active)}`);
+    if (!btn) return;
+    const target = btn.offsetLeft - (scroller.clientWidth - btn.offsetWidth) / 2;
+    scroller.scrollTo({ left: Math.max(0, target), behavior: "smooth" });
   }, [active]);
 
   const selectRegion = (region: Region): void => {
@@ -168,42 +176,52 @@ export function PartnersNetwork(): React.ReactElement {
 
         <LazyMotion features={domAnimation}>
           <div
-            ref={tablistRef}
-            className="relative mx-auto mt-10 flex w-fit items-center gap-1 rounded-full p-1"
-            style={{
-              background: "rgba(255,255,255,0.08)",
-              border: "1px solid rgba(255,255,255,0.16)",
-            }}
-            role="tablist"
-            aria-label="Partner regions"
+            ref={scrollerRef}
+            className="mt-10 -mx-6 flex overflow-x-auto px-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           >
-            {pill.width > 0 && (
-              <m.span
-                aria-hidden
-                className="absolute top-1 bottom-1 left-0 rounded-full bg-white"
-                initial={false}
-                animate={{ x: pill.left, width: pill.width }}
-                transition={reduce ? { duration: 0 } : PILL_SPRING}
-              />
-            )}
-            {REGIONS.map((region) => {
-              const isActive = region === active;
-              return (
-                <button
-                  key={region}
-                  type="button"
-                  role="tab"
-                  aria-selected={isActive}
-                  onClick={() => selectRegion(region)}
-                  className={`relative z-10 rounded-full px-4 py-2 transition-colors ${
-                    isActive ? "text-[#0F123E] font-semibold" : "text-white/80 hover:text-white"
-                  }`}
-                  style={{ fontSize: "var(--fs-body-sm)" }}
-                >
-                  {region}
-                </button>
-              );
-            })}
+            <div
+              role="tablist"
+              aria-label="Partner regions"
+              className="mx-auto inline-flex shrink-0 items-center gap-1"
+              style={{
+                background: "#fff",
+                border: "1px solid rgba(0,0,0,0.08)",
+                borderRadius: "100px",
+                padding: "4px",
+                width: "fit-content",
+              }}
+            >
+              {REGIONS.map((region) => {
+                const isActive = region === active;
+                return (
+                  <button
+                    key={region}
+                    id={tabId(region)}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    onClick={() => selectRegion(region)}
+                    className="flex shrink-0 items-center whitespace-nowrap font-semibold leading-[1.2] tracking-[-0.04em]"
+                    style={{
+                      fontSize: "var(--fs-body)",
+                      minHeight: "44px",
+                      padding: "8px 24px",
+                      borderRadius: "100px",
+                      cursor: "pointer",
+                      border: "none",
+                      background: isActive
+                        ? "linear-gradient(180deg, #151021 0%, #131E8F 100%)"
+                        : "transparent",
+                      color: isActive ? "#fff" : "#555",
+                      transition:
+                        "background 360ms cubic-bezier(0.34, 1.56, 0.64, 1), color 280ms ease-out",
+                    }}
+                  >
+                    {region}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

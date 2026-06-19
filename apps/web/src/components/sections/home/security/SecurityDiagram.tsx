@@ -26,7 +26,7 @@ const GUARANTEES: Guarantee[] = [
   { title: "Reproducible Pipelines", desc: "Deterministic build pipelines" },
   { title: "Verified Artifacts", desc: "Signed and attested artifacts" },
   { title: "Continuous Visibility", desc: "Posture and drift visibility" },
-  { title: "Proven Integrity", desc: "Continuously verified integrity" },
+  { title: "Proven Integrities", desc: "Continuously verified integrity" },
 ];
 
 const LANE_COUNT = STAGES.length;

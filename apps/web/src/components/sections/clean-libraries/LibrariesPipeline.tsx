@@ -36,22 +36,6 @@ const ENTRY_CARDS: EntryCard[] = [
   },
 ];
 
-interface Outcome {
-  icon: string;
-  label: string;
-}
-
-const OUTCOMES: Outcome[] = [
-  { icon: "/images/clean-libraries/out-visibility.svg", label: "Complete Dependency Visibility" },
-  { icon: "/images/clean-libraries/out-risk.svg", label: "Reduced Dependency Risk" },
-  { icon: "/images/clean-libraries/out-accountability.svg", label: "AI Dependency Accountability" },
-  { icon: "/images/clean-libraries/out-policy1.svg", label: "Continuous Policy Enforcement" },
-  { icon: "/images/clean-libraries/out-policy2.svg", label: "Continuous Policy Enforcement" },
-];
-
-const BALL_BG = "linear-gradient(180deg, #239cff 0%, #005be3 100%)";
-const BALL_SHADOW =
-  "0px 4.6px 10.9px 0px rgba(28,60,142,0.33), inset 0px -0.175px 0.218px 0px rgba(0,44,179,0.5), inset 0px 0.087px 0.436px 0px rgba(255,255,255,0.81)";
 const DIVIDER =
   "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0) 100%)";
 
@@ -396,55 +380,6 @@ export function LibrariesPipeline(): React.ReactElement {
             </div>
           </div>
         </Reveal>
-
-        {/* Outcome row. */}
-        <div
-          aria-hidden
-          className="mt-12 h-px w-full lg:mt-16"
-          style={{
-            background:
-              "linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0) 100%)",
-          }}
-        />
-        <div className="mt-12 grid grid-cols-2 items-start gap-x-4 gap-y-10 sm:grid-cols-3 lg:flex lg:justify-between lg:gap-0">
-          {OUTCOMES.map((o, i) => (
-            <div key={`${o.label}-${i}`} className="contents lg:flex lg:items-start">
-              <div className="flex flex-col items-center gap-5 px-2 text-center lg:w-[204px]">
-                <div
-                  className="flex size-[62px] items-center justify-center rounded-full"
-                  style={{ background: BALL_BG, boxShadow: BALL_SHADOW }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    aria-hidden
-                    src={o.icon}
-                    alt=""
-                    className="pointer-events-none size-10 select-none"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </div>
-                <p
-                  className="font-display font-bold text-white"
-                  style={{
-                    fontSize: "var(--fs-h4)",
-                    letterSpacing: "-0.02em",
-                    lineHeight: 1.1,
-                  }}
-                >
-                  {o.label}
-                </p>
-              </div>
-              {i < OUTCOMES.length - 1 && (
-                <div
-                  aria-hidden
-                  className="hidden h-[152px] w-px shrink-0 self-center lg:block"
-                  style={{ background: DIVIDER }}
-                />
-              )}
-            </div>
-          ))}
-        </div>
       </Container>
     </Section>
   );
