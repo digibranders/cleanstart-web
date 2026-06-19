@@ -40,11 +40,18 @@ const AUTHORS_FILTER = 'where[_status][equals]=published';
 const NEWS_FILTER = 'where[_status][equals]=published&where[publicationDate][exists]=true';
 const JOBS_FILTER = 'where[_status][equals]=published&where[hiringStatus][equals]=open';
 
+// Only the fields CmsDoc actually reads — keeps each response well under
+// Next's 2 MB data-cache ceiling (knowledgeBase full-body was 19.8 MB).
+const SITEMAP_SELECT =
+  'select[slug]=true&select[updatedAt]=true&select[publishedAt]=true' +
+  '&select[displayPublishedAt]=true&select[publicationDate]=true&select[seo]=true';
+
 async function fetchDocs(collection: string, filter: string): Promise<CmsDoc[]> {
   try {
-    const res = await fetch(`${CMS_URL}/api/${collection}?${filter}&depth=0&limit=1000`, {
-      next: { revalidate: 3600, tags: [`sitemap:${collection}`] },
-    });
+    const res = await fetch(
+      `${CMS_URL}/api/${collection}?${filter}&depth=0&limit=1000&${SITEMAP_SELECT}`,
+      { next: { revalidate: 3600, tags: [`sitemap:${collection}`] } },
+    );
     if (!res.ok) return [];
     const data = (await res.json()) as CmsList<CmsDoc>;
     return (data.docs ?? []).filter(isIndexable);
