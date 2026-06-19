@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { ArrowRightShort } from "@/components/icons/ArrowRightShort";
 import { BrandMarquee } from "@/components/sections/home/BrandMarquee";
 import { HeroHeading } from "@/components/sections/home/HeroHeading";
@@ -36,22 +38,39 @@ export function Hero() {
             </HeroReveal>
 
             <HeroReveal y={30} delay={0.24} duration={0.8}>
-              <a
-                href="https://images.cleanstart.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="cs-btn-glass mt-10"
-                style={{
-                  ["--cs-btn-px" as string]: "18px",
-                  ["--cs-btn-fs" as string]: "20px",
-                  color: "#111111",
-                  letterSpacing: "-0.05em",
-                  fontWeight: 500,
-                }}
-              >
-                <span>Browse Images</span>
-                <ArrowRightShort className="cs-cta-arrow text-[#111111]" />
-              </a>
+              <div className="mt-10 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+                <a
+                  href="https://images.cleanstart.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="cs-btn-glass"
+                  style={{
+                    ["--cs-btn-h" as string]: "44px",
+                    ["--cs-btn-px" as string]: "16px",
+                    ["--cs-btn-fs" as string]: "17px",
+                    color: "#111111",
+                    letterSpacing: "-0.05em",
+                    fontWeight: 500,
+                  }}
+                >
+                  <span>Browse Images</span>
+                  <ArrowRightShort className="cs-cta-arrow text-[#111111]" />
+                </a>
+
+                <Link
+                  href="/contact-us"
+                  className="cs-btn-ghost"
+                  style={{
+                    ["--cs-btn-h" as string]: "44px",
+                    ["--cs-btn-px" as string]: "16px",
+                    ["--cs-btn-fs" as string]: "17px",
+                    letterSpacing: "-0.05em",
+                  }}
+                >
+                  <span>Contact Us</span>
+                  <ArrowRightShort className="cs-cta-arrow text-white" />
+                </Link>
+              </div>
             </HeroReveal>
           </div>
 

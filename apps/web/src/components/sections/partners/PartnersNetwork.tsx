@@ -23,7 +23,7 @@ interface Partner {
   wordmark?: string;
 }
 
-const REGIONS = ["Asia Pacific", "Europe", "Middle East", "North America"] as const;
+const REGIONS = ["Global", "Asia Pacific", "Europe", "Middle East", "North America"] as const;
 type Region = (typeof REGIONS)[number];
 
 const INITIAL_VISIBLE = 8;
@@ -32,6 +32,10 @@ const PILL_SPRING = { type: "spring", stiffness: 360, damping: 32, mass: 0.9 } a
 const CARD_SPRING = { type: "spring", stiffness: 280, damping: 30, mass: 0.8 } as const;
 
 const PARTNERS: Record<Region, Partner[]> = {
+  Global: [
+    { name: "Nutanix", country: "San Jose, USA", logo: "/images/partners/global/nutanix.jpg" },
+    { name: "Sysdig", country: "San Francisco, USA", logo: "/images/partners/global/sysdig.png" },
+  ],
   "Asia Pacific": [
     { name: "Hitachi Systems", country: "India", logo: "/images/partners/global/hitachi.webp" },
     { name: "Citius Cloud", country: "India", logo: "/images/partners/global/citius.webp" },
@@ -82,7 +86,7 @@ const PARTNERS: Record<Region, Partner[]> = {
 
 export function PartnersNetwork(): React.ReactElement {
   const reduce = useReducedMotion();
-  const [active, setActive] = useState<Region>("Asia Pacific");
+  const [active, setActive] = useState<Region>("Global");
   const [expanded, setExpanded] = useState(false);
   const partners = PARTNERS[active];
   const basePartners = partners.slice(0, INITIAL_VISIBLE);
