@@ -244,15 +244,22 @@ function renderNode(node: LexicalNode, key: string): React.ReactNode {
       const uNode = node as Extract<LexicalNode, { type: "upload" }>;
       const val = uNode.value as { url?: string; alt?: string; width?: number; height?: number } | undefined;
       if (!val?.url) return null;
+      // Webflow CMS rich-text images can be small icons (e.g. 90×90). Cap the
+      // display width at the source's intrinsic pixels so they are never
+      // upscaled into a blur — larger images still fit the content column.
+      // Mirrors Webflow, which renders rich-text images at their natural size.
+      const intrinsicWidth = val.width ?? 800;
+      const intrinsicHeight = val.height ?? 450;
       return (
         <figure key={key} className="article-figure">
           <Image
             src={val.url}
             alt={val.alt ?? ""}
-            width={val.width ?? 800}
-            height={val.height ?? 450}
-            sizes="(min-width: 1024px) 680px, 100vw"
-            className="rounded-lg w-full h-auto"
+            width={intrinsicWidth}
+            height={intrinsicHeight}
+            sizes={`(min-width: 1024px) min(680px, ${intrinsicWidth}px), min(100vw, ${intrinsicWidth}px)`}
+            className="rounded-lg h-auto"
+            style={{ width: `min(100%, ${intrinsicWidth}px)` }}
           />
         </figure>
       );
