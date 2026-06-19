@@ -170,7 +170,7 @@ No feature/fix branches and no worktrees for routine work. See the **Branching p
 ## Deployment
 
 - **`apps/cms`** deploys via GitHub Actions ([`.github/workflows/deploy-cms.yml`](./.github/workflows/deploy-cms.yml)) on push to `main`. The workflow builds the Docker image, ships it to the droplet over SSH, and runs `docker compose up -d --wait`; Caddy handles TLS. Served at `cms.cleanstart.com`.
-- **`apps/web`** is pre-launch — staging is `staging.cleanstart.com`. See [`docs/web/WEB-PRODUCTION.md`](./docs/web/WEB-PRODUCTION.md) for the web production guide (deploy, CSP, SEO, rollback).
+- **`apps/web`** is live at **[www.cleanstart.com](https://www.cleanstart.com)**. See [`docs/web/WEB-PRODUCTION.md`](./docs/web/WEB-PRODUCTION.md) for the web production guide (deploy, CSP, SEO, rollback).
 
 CI runs on every push: [`ci.yml`](./.github/workflows/ci.yml) (lint / typecheck / build / test) and [`web.yml`](./.github/workflows/web.yml).
 
