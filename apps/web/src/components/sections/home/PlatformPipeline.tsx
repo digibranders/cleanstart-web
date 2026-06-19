@@ -20,7 +20,7 @@ type CardData = {
 
 const CARDS: CardData[] = [
   {
-    title: "Clean\nImages",
+    title: "Clean Images",
     blurb: "Reduce inherited risk with verified zero-CVE container foundations.",
     icon: "/images/cleanstart-factory/clean-images-2.webp",
     href: "/cleanstart-images",
@@ -32,7 +32,7 @@ const CARDS: CardData[] = [
     href: "/cleanstart-platform",
   },
   {
-    title: "Clean\nSight",
+    title: "CleanSight",
     blurb: "Continuously identify inherited software supply chain risk.",
     icon: "/images/cleanstart-factory/cleansight-2.webp",
     href: "/cleansight",

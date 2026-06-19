@@ -422,7 +422,7 @@ function CommunityImagesCard({ items }: { items: ImageItem[] }): React.ReactElem
           </div>
         ))}
       </div>
-      <ExploreLink href="https://images.cleanstart.com" label="Explore All Images" />
+      <ExploreLink href="https://images.cleanstart.com/?categoryId=__community__" label="Explore All Images" />
     </div>
   );
 }

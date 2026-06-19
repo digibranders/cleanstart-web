@@ -17,8 +17,8 @@ type Stat = {
 
 const STATS: Stat[] = [
   { icon: "/images/home/stats/shield.svg", value: "88,000+", label: "CVEs remediated" },
-  { icon: "/images/home/stats/clock.svg", value: "97.6%", label: "Average CVE reduction" },
-  { icon: "/images/home/stats/cube.svg", value: "352,000+", label: "Engineering hours saved" },
+  { icon: "/images/home/stats/clock.svg", value: "90%+", label: "Average CVE reduction" },
+  { icon: "/images/home/stats/cube.svg", value: "300,000+", label: "Engineering hours saved" },
   { icon: "/images/home/stats/trend.svg", value: "10M+", label: "Packages from verified source" },
 ];
 
@@ -146,31 +146,30 @@ function TestimonialCard({
           <div
             key={t.name}
             aria-hidden={i !== active}
-            className={`col-start-1 row-start-1 flex flex-col items-center gap-6 text-center transition-opacity duration-500 ${
-              i === active ? "opacity-100" : "pointer-events-none opacity-0"
-            }`}
+            className={`col-start-1 row-start-1 flex flex-col items-center gap-6 text-center transition-opacity duration-500 ${i === active ? "opacity-100" : "pointer-events-none opacity-0"
+              }`}
           >
             <CompanyMark t={t} />
-          <p
-            className="max-w-[668px] font-display font-medium text-[#111]"
-            style={{
-              fontSize: "var(--fs-lead)",
-              lineHeight: 1.3,
-              letterSpacing: "-0.02em",
-            }}
-          >
-            &ldquo;{t.quote}&rdquo;
-          </p>
-          <p
-            className="text-[#111]"
-            style={{
-              fontFamily: "var(--font-sora), Sora, sans-serif",
-              fontSize: "var(--fs-body-sm)",
-              letterSpacing: "-0.02em",
-            }}
-          >
-            {t.role}
-          </p>
+            <p
+              className="max-w-[668px] font-display font-medium text-[#111]"
+              style={{
+                fontSize: "var(--fs-lead)",
+                lineHeight: 1.3,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              &ldquo;{t.quote}&rdquo;
+            </p>
+            <p
+              className="text-[#111]"
+              style={{
+                fontFamily: "var(--font-sora), Sora, sans-serif",
+                fontSize: "var(--fs-body-sm)",
+                letterSpacing: "-0.02em",
+              }}
+            >
+              {t.role}
+            </p>
           </div>
         ))}
       </div>
@@ -181,11 +180,10 @@ function TestimonialCard({
 function StatItem({ stat, showDivider }: { stat: Stat; showDivider: boolean }) {
   return (
     <div
-      className={`relative flex flex-col items-center gap-4 text-center ${
-        showDivider
-          ? "md:before:absolute md:before:left-0 md:before:top-1/2 md:before:h-[120px] md:before:w-px md:before:-translate-y-1/2 md:before:bg-gradient-to-b md:before:from-transparent md:before:via-black/15 md:before:to-transparent md:before:content-['']"
-          : ""
-      }`}
+      className={`relative flex flex-col items-center gap-4 text-center ${showDivider
+        ? "md:before:absolute md:before:left-0 md:before:top-1/2 md:before:h-[120px] md:before:w-px md:before:-translate-y-1/2 md:before:bg-gradient-to-b md:before:from-transparent md:before:via-black/15 md:before:to-transparent md:before:content-['']"
+        : ""
+        }`}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
@@ -311,9 +309,8 @@ export function TestimonialsStats() {
                   onClick={() => setActive(i)}
                   aria-label={`Show testimonial ${i + 1}`}
                   aria-current={i === active}
-                  className={`h-2.5 cursor-pointer rounded-full transition-all ${
-                    i === active ? "w-6 bg-[#9a51ff]" : "w-2.5 bg-black/20 hover:bg-black/30"
-                  }`}
+                  className={`h-2.5 cursor-pointer rounded-full transition-all ${i === active ? "w-6 bg-[#9a51ff]" : "w-2.5 bg-black/20 hover:bg-black/30"
+                    }`}
                 />
               ))}
             </div>

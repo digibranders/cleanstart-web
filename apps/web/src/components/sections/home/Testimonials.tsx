@@ -61,11 +61,11 @@ export const HOME_TESTIMONIALS: Testimonial[] = [
   },
   {
     name: "Ankit Agarwal",
-    role: "VP, Coforge",
+    role: "VP Enterprise Architecture, Coforge",
     company: "Coforge",
     logoSrc: "/images/testimonials/coforge-logo.svg",
     quote:
-      "Open-source security has become a critical business need. The biggest challenge is not adoption, but ensuring software components are verified, trusted, and secure before deployment. With CleanStart, organizations can embrace innovation confidently while maintaining strong security controls across the software supply chain.",
+      "Modern software depends on open source, but every component must be trusted before deployment. CleanStart provides the verification and assurance we need to innovate confidently while maintaining strong software supply chain security.",
   },
 ];
 

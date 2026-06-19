@@ -18,7 +18,7 @@ const TOP_TIERS: Tier[] = [
     title: "Community Images",
     body: "Free, verified base images curated by CleanStart for developers and open-source users.",
     ctaLabel: "View Images",
-    ctaHref: "https://images.cleanstart.com",
+    ctaHref: "https://images.cleanstart.com/?categoryId=__community__",
     ctaExternal: true,
   },
   {
