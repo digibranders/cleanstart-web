@@ -28,21 +28,15 @@ CleanStart is shipping a Next.js 16.2.5 / React 19 / Tailwind v4 marketing site 
 |---|---|---|---|---|---|
 | `feat/*`, `fix/*` (occasional, tolerated) | Preview (auto, per push) | `*.vercel.app` | ❌ noindex | Hours–days; deleted on merge | Per-task work / per-PR preview |
 | `development` | Preview (auto, per push) | `cleanstart-git-development-…vercel.app` | ❌ noindex | Permanent | Integration branch — day-to-day dev for both apps |
-| `main` | **Production** | Pre-launch: **`staging.cleanstart.com`** · Go-live: **`cleanstart.com`** | Pre-launch: ❌ noindex · Go-live: ✅ index | Permanent | The deployed Next.js marketing site |
+| `main` | **Production** | **`www.cleanstart.com`** (live as of 2026-06-19) | ✅ index | Permanent | The deployed Next.js marketing site |
 
-> **Pre-launch domain reality (as of 2026-06):** the **legacy** site still serves the live **`cleanstart.com`**. The new Next.js site is the Vercel **Production** deployment (built from `main`) parked at **`staging.cleanstart.com`** for review/QA, held at **noindex** so this testing copy never competes with the live old site in search. The noindex is **host-aware** — `apps/web/src/lib/seo/indexing.ts` `isNoindexHost` flags `staging.cleanstart.com` and `*.vercel.app`, spanning all five layers: `robots.txt`, root + per-page `<meta robots>`, the `X-Robots-Tag` header (`proxy.ts`), and `sitemap.xml`.
+> **Go-live status (2026-06-19):** DNS has been cut over. The new Next.js site now serves **`www.cleanstart.com`** (apex `cleanstart.com` 308-redirects → `www`). `NEXT_PUBLIC_SITE_URL=https://www.cleanstart.com` is baked in the production build. Indexing is active — `VERCEL_ENV=production` + host not in `NOINDEX_HOSTS` in `indexing.ts` → all five layers (`robots.txt`, meta robots, `X-Robots-Tag`, sitemap, canonicals) serve the production-indexed state.
 >
-> **To open staging for a pre-launch SEO/security audit:** set Vercel env `ALLOW_INDEXING=1` (overrides all five layers) + `NEXT_PUBLIC_SITE_URL=https://staging.cleanstart.com` (self-consistent canonicals/sitemap), then **redeploy** (meta + sitemap bake at build time). Remove `ALLOW_INDEXING` to re-block — staging reverts to noindex automatically.
+> `staging.cleanstart.com` remains assigned to the Vercel Production target as an alias (for QA access) but is held at **noindex** by `isNoindexHost` in `indexing.ts` — it will never compete with `www` in search.
 >
-> **Canonical host — DECIDED: `www.cleanstart.com`** (apex `cleanstart.com` 308-redirects → `www`). This is already wired in code (`proxy.ts` `PRODUCTION_HOST = "www.cleanstart.com"` + apex redirect; `canonical.ts` `SITE_URL` defaults to `https://www.cleanstart.com`), so **no code change is needed** — only the env flip below.
+> **To open staging for an SEO/security audit:** set Vercel env `ALLOW_INDEXING=1` (overrides all five layers), then **redeploy**. Remove to re-block.
 >
-> **At go-live (env flip + REBUILD — do NOT reuse the staging artifact):** Because `NEXT_PUBLIC_*` is inlined at `next build` time, the production canonicals / `og:url` / sitemap host is frozen into the bundle. The pre-launch build bakes `staging.cleanstart.com` — promoting that artifact to the live domain would publish `canonical → https://staging.cleanstart.com` (a noindexed host) on every page and de-index the site. So go-live is a **fresh production build**, not the normal artifact-reuse promotion. Steps:
-> 1. Flip the GitHub Actions variables (used by the CMS deploy render step; mirror in Vercel for `apps/web`): `NEXT_PUBLIC_SITE_URL=https://www.cleanstart.com`, `NEXT_PUBLIC_SITE_ORIGIN=https://www.cleanstart.com`, `NEXT_PUBLIC_SITE_HOSTS=www.cleanstart.com` (currently all `staging.cleanstart.com`).
-> 2. Remove `ALLOW_INDEXING`.
-> 3. Point the Vercel Production domain at `cleanstart.com` (Vercel auto-redirects apex → `www` at the platform level too; the `proxy.ts` 308 is the app-level backstop).
-> 4. **Trigger a fresh build** (push / redeploy) so the new host bakes in — never "Promote to Production" the existing staging artifact for this cutover.
-> 5. **Seed the 26 legacy Webflow 301s** so old inbound links don't 404 (CMS-side, `scripts/seed-redirects.ts` — see CLAUDE.md production checklist #14). Run before/at cutover.
-> 6. Verify: `curl -I https://cleanstart.com/` 308s to `www`; `curl -I https://www.cleanstart.com/jobs` 301s to `/careers` (redirect seed live); view-source on `https://www.cleanstart.com/` shows `<link rel="canonical" href="https://www.cleanstart.com/...">` and the sitemap URLs use `www`.
+> **Canonical host:** `www.cleanstart.com` — wired in `proxy.ts` (`PRODUCTION_HOST`) and `canonical.ts` (`SITE_URL`). No code change needed for future deploys; normal artifact-reuse "Promote to Production" is safe now that the correct host is baked into the bundle.
 
 **Branch naming:** `<type>/<scope>-<short-kebab-desc>` — e.g. `feat/web-pricing-page`, `fix/cms-lead-form`. `<scope>` is `web|cms|ui|types|infra|docs`. One concern per branch.
 
@@ -58,9 +52,7 @@ gh pr create --base development --fill
 # Reviewer approves → squash-merge → branch auto-deleted
 ```
 
-**Production promotion:** `development` → `main` via weekly **release PR** (rotating release captain). Title: `release: <YYYY-MM-DD>`. Vercel "Promote to Production" reuses the staging artifact (no rebuild, <30s, instant rollback by re-promoting previous). Tag `main` post-merge: `web-vYYYY.MM.DD`.
-
-> ⚠️ **The one-time go-live cutover is the exception:** the canonical host changes from `staging.cleanstart.com` → `www.cleanstart.com`, and that host is **baked at build time** (`NEXT_PUBLIC_*`). So the cutover **must be a fresh build**, not the artifact-reuse "Promote to Production". Reusing the staging artifact would ship `staging.cleanstart.com` canonicals/sitemap on the live domain and de-index the site. See the go-live env-flip steps in the branch/env section above. After the first correct production build, normal artifact-reuse promotion resumes.
+**Production promotion:** `development` → `main` via weekly **release PR** (rotating release captain). Title: `release: <YYYY-MM-DD>`. Vercel "Promote to Production" reuses the artifact (no rebuild, <30s, instant rollback by re-promoting previous). Tag `main` post-merge: `web-vYYYY.MM.DD`.
 
 **Hotfix lane:** off `main`, label `hotfix`, one reviewer + green CI → merge → auto-promote → back-merge to `development`. Reserved for production fires.
 
@@ -68,7 +60,7 @@ gh pr create --base development --fill
 - Production Branch: `main`
 - Preview Deployments: enabled for all branches
 - `vercel.json` → `git.deploymentEnabled: { "main": true, "development": true, "feat/*": true, "fix/*": true, "chore/*": true, "hotfix/*": true }`
-- Production domain `staging.cleanstart.com` → assigned to the **Production** target (`main`) pre-launch; swaps to `cleanstart.com` at go-live
+- Production domain `www.cleanstart.com` → assigned to the **Production** target (`main`). `staging.cleanstart.com` is kept as a Vercel alias (QA access) but held at noindex by `indexing.ts`.
 - Preview Comments enabled (auto-posts URL + Lighthouse delta)
 - Deployment Protection: Vercel SSO on Preview deployments
 
@@ -749,14 +741,14 @@ Cookie banner copy links to `/privacy-policy#cookies` (§11).
 
 ---
 
-## 18. Pre-launch verification checklist
+## 18. Production verification checklist
 
-Run on `staging.cleanstart.com` before flipping production DNS to `www.cleanstart.com`. ALL must pass.
+> **Status (2026-06-19):** DNS cutover complete — site is live at `www.cleanstart.com`. Run these checks against production on every release PR.
 
 1. `pnpm --filter @cleanstart/web lint && pnpm --filter @cleanstart/web typecheck && pnpm --filter @cleanstart/web build` — clean
-2. `curl -I https://staging.cleanstart.com` — assert HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, COOP, CORP, X-Robots-Tag: noindex
-3. `curl https://staging.cleanstart.com/robots.txt` — `Disallow: /`
-4. `curl https://staging.cleanstart.com/sitemap.xml` — valid XML; no `<priority>` or `<changefreq>`
+2. `curl -I https://www.cleanstart.com` — assert HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, COOP, CORP, **no** X-Robots-Tag noindex
+3. `curl https://www.cleanstart.com/robots.txt` — `Allow: /`, sitemap URL listed
+4. `curl https://www.cleanstart.com/sitemap.xml` — valid XML; no `<priority>` or `<changefreq>`
 5. Lighthouse CI passes on `/`, `/blogs`, `/blog/<slug>`, `/resource-center`, `/about-us`, `/privacy-policy` (§9 gates)
 6. Playwright smoke green
 7. axe-core (WCAG 2.2 AA): 0 serious + 0 critical

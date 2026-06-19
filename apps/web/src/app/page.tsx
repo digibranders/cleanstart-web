@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { buildPageMetadata } from "@/lib/seo/canonical";
+import { getImpactStats } from "@/lib/impact-stats";
 import { Header } from "@/components/nav/Header";
 import { Hero } from "@/components/sections/home/Hero";
 import { PlatformPipeline } from "@/components/sections/home/PlatformPipeline";
@@ -39,8 +40,11 @@ export const metadata: Metadata = buildPageMetadata({
   titleAccent: "Secure Container Images",
 });
 
-export default function Home() {
+export default async function Home() {
   // V4 redesign: hero + factory + testimonials/stats section.
+  // Impact stats are editable in the CMS (`impactStats` global) and shared with
+  // the Images catalog hero; falls back to defaults if the CMS is unreachable.
+  const impactStats = await getImpactStats();
   return (
     <>
       {/* High-priority preload of the LCP hero SVG — React hoists this to
@@ -132,7 +136,7 @@ export default function Home() {
         </div>
 
         <FadeUp>
-          <TestimonialsStats />
+          <TestimonialsStats stats={impactStats} />
         </FadeUp>
         <FadeUp>
           <SecurityNotPatching />

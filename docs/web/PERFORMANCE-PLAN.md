@@ -83,7 +83,7 @@ resources now static) with **0 cache rejections, 0 build timeouts**.
 
 ### ⚠ Required env to activate revalidation (ops)
 `revalidateWeb` no-ops until these are set (it logs once and degrades to ISR):
-- CMS side (`/opt/cleanstart/.env`): `WEB_REVALIDATE_URL=https://staging.cleanstart.com/api/revalidate`, `WEB_REVALIDATE_SECRET=<shared>`
+- CMS side (`/opt/cleanstart/.env`): `WEB_REVALIDATE_URL=https://www.cleanstart.com/api/revalidate`, `WEB_REVALIDATE_SECRET=<shared>`
 - Web side (Vercel env): `WEB_REVALIDATE_SECRET=<same shared value>`
 
 ---
