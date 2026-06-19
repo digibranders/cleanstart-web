@@ -41,8 +41,18 @@ export function buildCsp({
   // can never carry a nonce at all. `'unsafe-inline'` covers Next's inline
   // bootstrap, the JSON-LD, and the consent snippet; `https:` covers GA4 /
   // Vercel third-party scripts. XSS defence-in-depth comes from the structural
-  // directives below (object-src none, base-uri, form-action, frame-ancestors,
-  // Trusted Types) rather than from inline-source pinning.
+  // directives below (object-src none, base-uri, form-action, frame-ancestors)
+  // rather than from inline-source pinning.
+  //
+  // `require-trusted-types-for 'script'` is intentionally NOT emitted: the
+  // marketing site is built with Turbopack, whose runtime chunk loader assigns
+  // `script.src` directly without routing through a Trusted Types policy (Next
+  // 16 + Turbopack registers no such policy, and the nonce that webpack's
+  // integration keys off was removed above for static prerendering). Under that
+  // directive the browser blocks every async chunk load, so hydration fails on
+  // every route and the global-error boundary takes the whole site down; in
+  // report-only mode it instead floods /api/csp-report with a false positive
+  // per chunk load. Re-introduce only once the framework can satisfy it.
   const scriptSrc = ["'self'", "'unsafe-inline'", 'https:'];
 
   const styleSrc = ["'self'", "'unsafe-inline'"];
@@ -107,11 +117,6 @@ export function buildCsp({
     ['report-uri', '/api/csp-report'],
     ['report-to', 'csp-endpoint'],
   ];
-
-  if (isProduction) {
-    directives.push(['require-trusted-types-for', "'script'"]);
-    directives.push(['trusted-types', 'nextjs default']);
-  }
 
   return directives.map(([name, value]) => (value ? `${name} ${value}` : name)).join('; ');
 }
