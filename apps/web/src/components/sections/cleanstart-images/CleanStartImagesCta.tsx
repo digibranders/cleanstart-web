@@ -177,8 +177,8 @@ export function CleanStartImagesCta(): React.ReactElement {
               maxWidth: "440px",
             }}
           >
-            Minimal, hardened container images designed for modern
-            infrastructure and reduced inherited risk.
+            Source-built hardened images with near-zero CVEs, verifiable
+            provenance, and enterprise-ready security.
           </p>
 
           <Link
@@ -192,7 +192,7 @@ export function CleanStartImagesCta(): React.ReactElement {
               } as React.CSSProperties
             }
           >
-            <span>Explore Hardened Images</span>
+            <span>Read the Guide</span>
             <svg
               className="cs-cta-arrow ml-2"
               width="18"

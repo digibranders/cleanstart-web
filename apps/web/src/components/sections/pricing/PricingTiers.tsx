@@ -32,7 +32,7 @@ const TOP_TIERS: Tier[] = [
     orb: "/images/pricing/orb-libraries.png",
     title: "Clean Libraries",
     body: "Pre-built, optimized base images with near-zero CVEs and automatic versioned updates.",
-    ctaLabel: "Learn More",
+    ctaLabel: "Read more",
     ctaHref: "/clean-libraries",
   },
 ];

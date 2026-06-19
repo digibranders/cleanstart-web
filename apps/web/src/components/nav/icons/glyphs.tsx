@@ -78,6 +78,16 @@ export const glyphs: Record<string, ReactNode> = {
     </>
   ),
   folder: <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />,
+  library: (
+    <>
+      {/* Books standing on the shelf — one leaning, two upright (mirrored). */}
+      <path d="m9.5 5.4-3.4 11.6" />
+      <path d="M13.5 5v12" />
+      <path d="M18 5v12" />
+      {/* Rounded shelf bar. */}
+      <rect x="3" y="18.5" width="18" height="3" rx="1.5" />
+    </>
+  ),
   newspaper: (
     <>
       <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" />

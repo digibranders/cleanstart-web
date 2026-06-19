@@ -9,7 +9,7 @@ type TrustCard = {
 
 const TRUST_CARDS: TrustCard[] = [
   {
-    title: "Source Built",
+    title: "Source Transperency",
     body: "Rebuilt from trusted upstream software.",
     iconSrc: "/images/cleanstart-images/trust-icon-trusted-source.svg",
   },
@@ -386,8 +386,8 @@ export function CleanStartImagesBrowse(): React.ReactElement {
               color: "#111",
             }}
           >
-            Build from{" "}
-            <span className="cs-text-gradient-impact">Verified Sources</span>
+            Engineered for{" "}
+            <span className="cs-text-gradient-impact"> Assurance</span>
           </h2>
         </Reveal>
 
