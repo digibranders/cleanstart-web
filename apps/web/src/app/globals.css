@@ -735,6 +735,66 @@ body {
 }
 .cs-btn-glass:hover .cs-cta-arrow { transform: translateX(4px); }
 
+/* ---------------------------------------------------------------------------
+   GHOST BUTTON (secondary, on dark)
+   A low-emphasis outline CTA meant to sit beside the primary glass button on
+   the dark hero. Translucent white hairline border + faint frosted fill so it
+   reads as secondary without competing with the solid glass primary.
+   --------------------------------------------------------------------------- */
+.cs-btn-ghost {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  text-decoration: none;
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  height: var(--cs-btn-h, 2.75rem);
+  padding: 0 var(--cs-btn-px, 18px);
+  font-size: var(--cs-btn-fs, 14px);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition:
+    transform 220ms cubic-bezier(.2, .9, .3, 1),
+    background-color 200ms ease-out,
+    border-color 200ms ease-out;
+  -webkit-tap-highlight-color: transparent;
+}
+.cs-btn-ghost:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+.cs-btn-ghost:active {
+  transform: translateY(0);
+  filter: brightness(0.92);
+  transition-duration: 80ms;
+}
+.cs-btn-ghost:focus { outline: none; }
+.cs-btn-ghost:focus-visible {
+  outline: 2px solid #33BAEC;
+  outline-offset: 3px;
+}
+.cs-btn-ghost[aria-disabled="true"],
+.cs-btn-ghost:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.cs-btn-ghost .cs-cta-arrow {
+  transition: transform 220ms cubic-bezier(.2, .9, .3, 1);
+}
+.cs-btn-ghost:hover .cs-cta-arrow { transform: translateX(4px); }
+
 /* Footer social icon — glyph shifts to its platform brand color on hover.
    Per-link color is supplied inline via the --social-hover custom property
    (set from SOCIAL_ICONS[].hoverColor in Footer.tsx). A real rule is used

@@ -1,215 +1,280 @@
-import React from "react";
-import Image from "next/image";
-import { Section, Container } from "@/components/layout";
-import { Reveal } from "@/components/ui/Reveal";
+"use client";
 
-interface Office {
-  flag: string;
-  flagAlt: string;
-  name: string;
-  address: string;
-}
+import dynamic from "next/dynamic";
+import { Reveal } from "@/components/ui/Reveal";
+import type { Office } from "../about/GlobalPresenceMap";
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
 
 const OFFICES: Office[] = [
   {
-    flag: "/images/contact/flags/flag-us.webp",
-    flagAlt: "United States flag",
-    name: "North America (HQ)",
+    id: "hq",
+    city: "Lewes, Delaware",
+    country: "United States",
+    role: "North America (HQ)",
     address:
       "CleanStart Security Inc. 16192 Coastal Highway, Lewes, Delaware 19958, County Of Sussex",
+    color: "amber",
+    coordinates: [-75.5, 38.9],
+    imageSrc: "/images/about/global/landmark-delaware.webp",
   },
   {
-    flag: "/images/contact/flags/flag-sg.webp",
-    flagAlt: "Singapore flag",
-    name: "Singapore",
+    id: "singapore",
+    city: "Singapore",
+    country: "Singapore",
+    role: "Singapore",
     address: "1003 Bukit Merah Central, #07-23, Singapore 159836",
+    color: "cyan",
+    coordinates: [103.8, 1.4],
+    imageSrc: "/images/about/global/landmark-singapore.webp",
   },
   {
-    flag: "/images/contact/flags/flag-in.webp",
-    flagAlt: "India flag",
-    name: "India (Bengaluru)",
+    id: "bengaluru",
+    city: "Bengaluru",
+    country: "India",
+    role: "India (Bengaluru)",
     address:
       "Bhive Platinum Address Maker, 114/5, Old Madras Road, Halasuru, Bengaluru, Karnataka, India – 560008",
+    color: "cyan",
+    coordinates: [77.6, 13.0],
+    imageSrc: "/images/about/global/landmark-bengaluru.webp",
   },
   {
-    flag: "/images/contact/flags/flag-in.webp",
-    flagAlt: "India flag",
-    name: "India (Ahmedabad)",
+    id: "ahmedabad",
+    city: "Ahmedabad",
+    country: "India",
+    role: "India (Ahmedabad)",
     address:
       "Block C, 9th floor Navratna Business Park, NR Sindhu Bhavan Rd, opp. Gtpl House, Bodakdev, Ahmedabad, Gujarat 380059",
+    color: "cyan",
+    coordinates: [72.6, 23.0],
+    imageSrc: "/images/about/global/landmark-ahmedabad.webp",
   },
 ];
 
-export function ContactOffices() {
-  return (
-    <Section padding="md">
-      <Container>
-        <Reveal header className="mb-10 flex items-center gap-4 sm:mb-12 sm:gap-6">
-          <Hairline />
-          <h2
-            className="font-display font-semibold text-[#111111] whitespace-nowrap"
-            style={{
-              fontSize: "var(--fs-h2)",
-              lineHeight: 1,
-              letterSpacing: "-0.05em",
-            }}
-          >
-            Our{" "}
-            <span
-              className="bg-clip-text text-transparent"
-              style={{
-                backgroundImage:
-                  "linear-gradient(180deg, #2CC1EB 0%, #9A51FF 100%)",
-              }}
-            >
-              offices
-            </span>
-          </h2>
-          <Hairline />
-        </Reveal>
+const CYAN = "#FFFFFF";
+const AMBER = "#f59e0b";
 
-        <div
-          className="relative overflow-hidden rounded-[28px] px-6 py-10 sm:px-10 sm:py-12 lg:px-14 lg:py-14"
+function markerColor(color: "amber" | "cyan"): string {
+  return color === "amber" ? AMBER : CYAN;
+}
+
+// ─── Dynamic map (browser-only) ───────────────────────────────────────────────
+
+const GlobalPresenceMap = dynamic(
+  () =>
+    import("../about/GlobalPresenceMap").then((m) => ({
+      default: m.GlobalPresenceMap,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        style={{
+          height: 480,
+          borderRadius: 16,
+          border: "1px solid rgba(255,255,255,0.08)",
+          background: "rgba(255,255,255,0.03)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <span
+          className="animate-spin"
           style={{
-            background:
-              "linear-gradient(135deg, #2A1B6B 0%, #3A22A0 45%, #5E3FE0 100%)",
-            boxShadow:
-              "0 1px 0 rgba(255,255,255,0.06) inset, 0 30px 60px -30px rgba(60,30,150,0.40)",
+            width: 36,
+            height: 36,
+            borderRadius: "50%",
+            border: "2px solid rgba(255,255,255,0.15)",
+            borderTopColor: "#2CC1EB",
+            display: "block",
           }}
-        >
-          <div
-            aria-hidden
-            className="pointer-events-none absolute"
-            style={{
-              top: "-120px",
-              right: "-80px",
-              width: "420px",
-              height: "420px",
-              borderRadius: "50%",
-              background:
-                "radial-gradient(closest-side, rgba(122,89,255,0.45) 0%, rgba(122,89,255,0) 100%)",
-              filter: "blur(40px)",
-            }}
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute"
-            style={{
-              bottom: "-120px",
-              left: "-80px",
-              width: "420px",
-              height: "420px",
-              borderRadius: "50%",
-              background:
-                "radial-gradient(closest-side, rgba(70,30,191,0.55) 0%, rgba(70,30,191,0) 100%)",
-              filter: "blur(40px)",
-            }}
-          />
-
-          <div className="relative flex flex-col gap-6 sm:grid sm:grid-cols-2 sm:gap-y-8 lg:grid lg:[grid-template-columns:1fr_1px_1fr_1px_1fr_1px_1fr] lg:gap-0">
-            {OFFICES.map((o, i) => (
-              <React.Fragment key={o.name}>
-                <OfficeCard office={o} />
-                {i < OFFICES.length - 1 && (
-                  <>
-                    <div
-                      aria-hidden
-                      className="block h-px w-full sm:hidden"
-                      style={{
-                        backgroundImage:
-                          "linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.05) 100%)",
-                        backgroundSize: "8px 1px",
-                        backgroundRepeat: "repeat-x",
-                      }}
-                    />
-                    <div
-                      aria-hidden
-                      className="hidden self-stretch lg:block"
-                      style={{
-                        width: "1px",
-                        backgroundImage:
-                          "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.05) 100%)",
-                        backgroundSize: "1px 8px",
-                        backgroundRepeat: "repeat-y",
-                      }}
-                    />
-                  </>
-                )}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-      </Container>
-    </Section>
-  );
-}
-
-function Hairline() {
-  return (
-    <div aria-hidden className="hidden flex-1 items-center sm:flex">
-      <span
-        className="block shrink-0"
-        style={{
-          width: "13px",
-          height: "12px",
-          backgroundColor: "#333333",
-          borderRadius: "1px",
-          transform: "rotate(45deg)",
-        }}
-      />
-      <span className="h-px flex-1 bg-black" />
-      <span
-        className="block shrink-0"
-        style={{
-          width: "13px",
-          height: "12px",
-          backgroundColor: "#333333",
-          borderRadius: "1px",
-          transform: "rotate(45deg)",
-        }}
-      />
-    </div>
-  );
-}
-
-function OfficeCard({ office }: { office: Office }) {
-  return (
-    <div className="flex h-full flex-col gap-5 px-2 sm:px-4 lg:px-5">
-      <div className="relative h-[51px] w-[77px] overflow-hidden rounded-[8px]">
-        <Image
-          src={office.flag}
-          alt={office.flagAlt}
-          width={77}
-          height={51}
-          sizes="77px"
-          className="block h-full w-full object-cover"
         />
       </div>
+    ),
+  },
+);
 
-      <div className="flex flex-col gap-2.5">
-        <h3
-          className="font-display font-semibold text-white"
+// ─── Component ────────────────────────────────────────────────────────────────
+
+export function ContactOffices() {
+  return (
+    <section
+      className="relative w-full overflow-hidden"
+      style={{
+        background: "#07102e",
+        marginTop: "var(--spacing-section-md)",
+        marginBottom: "var(--spacing-section-md)",
+      }}
+    >
+      <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[48px] pb-16">
+
+        {/* Heading */}
+        <div className="mx-auto flex max-w-[840px] flex-col items-center gap-5 text-center text-white mb-6 lg:mb-8">
+          <Reveal header delay={0.1} y={20}>
+            <h2
+              className="font-display"
+              style={{
+                fontSize: "var(--fs-h2)",
+                fontWeight: 600,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.1,
+              }}
+            >
+              Our Global Presence
+            </h2>
+          </Reveal>
+          <Reveal header delay={0.2} y={20}>
+            <p
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-lead)",
+                fontWeight: 400,
+                lineHeight: 1.5,
+                letterSpacing: "-0.02em",
+                opacity: 0.7,
+                maxWidth: "780px",
+              }}
+            >
+              From the Americas to Southeast Asia, CleanStart&apos;s team is
+              building trusted software foundations globally.
+            </p>
+          </Reveal>
+        </div>
+
+        {/* ── Interactive world map ──────────────────────────────────────── */}
+        <Reveal delay={0.3}>
+          <div className="mx-auto w-full" style={{ maxWidth: "1100px" }}>
+            <GlobalPresenceMap offices={OFFICES} />
+          </div>
+        </Reveal>
+
+        {/* ── Location ribbon (lg+) ────────────────────────────────────── */}
+        <div
+          className="mx-auto mt-5 hidden lg:flex"
           style={{
-            fontSize: "var(--fs-h4)",
-            lineHeight: 1.2,
-            letterSpacing: "-0.02em",
+            maxWidth: "1100px",
+            border: "1px solid rgba(255,255,255,0.12)",
+            borderRadius: "14px",
+            background: "rgba(10, 8, 28, 0.88)",
+            overflow: "hidden",
           }}
         >
-          {office.name}
-        </h3>
-        <p
-          className="text-white/75"
-          style={{
-            fontFamily: "var(--font-sans)",
-            fontSize: "var(--fs-body)",
-            fontWeight: 400,
-            lineHeight: 1.5,
-            letterSpacing: "-0.01em",
-          }}
-        >
-          {office.address}
-        </p>
+          {OFFICES.map((o, i) => {
+            const c = markerColor(o.color);
+            return (
+              <div
+                key={o.id}
+                className="flex flex-1 flex-col gap-2"
+                style={{
+                  padding: "20px 24px",
+                  borderRight:
+                    i < OFFICES.length - 1
+                      ? "1px solid rgba(255,255,255,0.07)"
+                      : "none",
+                }}
+              >
+                {/* Name — heading with dot */}
+                <div className="flex items-center gap-2">
+                  <span
+                    style={{
+                      width: "8px",
+                      height: "8px",
+                      borderRadius: "50%",
+                      background: c,
+                      flexShrink: 0,
+                      boxShadow: `0 0 6px 1px ${c}99`,
+                      display: "inline-block",
+                    }}
+                  />
+                  <p
+                    className="font-display"
+                    style={{
+                      fontSize: "15px",
+                      fontWeight: 700,
+                      color: "#fff",
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {o.role}
+                  </p>
+                </div>
+
+                {/* Address */}
+                <p
+                  style={{
+                    fontSize: "12px",
+                    fontWeight: 400,
+                    color: "rgba(255,255,255,0.45)",
+                    fontFamily: "var(--font-sans)",
+                    lineHeight: 1.4,
+                    paddingLeft: "16px",
+                  }}
+                >
+                  {o.address}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ── Mobile location grid (< lg) ───────────────────────────────── */}
+        <ul className="mt-10 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2 lg:hidden">
+          {OFFICES.map((o) => {
+            const c = markerColor(o.color);
+            return (
+              <li
+                key={o.id}
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: "12px",
+                  padding: "16px 18px",
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <span
+                    style={{
+                      width: "8px",
+                      height: "8px",
+                      borderRadius: "50%",
+                      background: c,
+                      flexShrink: 0,
+                      boxShadow: `0 0 8px 2px ${c}66`,
+                    }}
+                  />
+                  <p
+                    className="font-display"
+                    style={{
+                      fontSize: "15px",
+                      fontWeight: 700,
+                      color: "#fff",
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {o.role}
+                  </p>
+                </div>
+                <p
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "12px",
+                    fontWeight: 400,
+                    color: "rgba(255,255,255,0.45)",
+                    lineHeight: 1.4,
+                    paddingLeft: "16px",
+                    marginTop: "6px",
+                  }}
+                >
+                  {o.address}
+                </p>
+              </li>
+            );
+          })}
+        </ul>
+
       </div>
-    </div>
+    </section>
   );
 }

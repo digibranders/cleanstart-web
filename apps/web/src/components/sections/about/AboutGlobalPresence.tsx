@@ -22,7 +22,7 @@ const OFFICES: Office[] = [
     city: "Singapore",
     country: "Singapore",
     role: "APAC Operations",
-    address: "One Raffles Place, Singapore 048616",
+    address: "1003 Bukit Merah Central, #07-23, Singapore 159836",
     color: "cyan",
     coordinates: [103.8, 1.4],
     imageSrc: "/images/about/global/landmark-singapore.webp",
