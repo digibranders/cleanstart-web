@@ -15,6 +15,7 @@ import {
 } from "@/components/consent";
 import { SITE_NAME, SITE_URL } from "@/lib/seo/canonical";
 import { isIndexingAllowed } from "@/lib/seo/indexing";
+import { siteVerification } from "@/lib/seo/verification";
 import { ogImageUrl } from "@/lib/seo/og";
 import { JsonLd, organizationSchema } from "@/lib/seo/jsonld";
 
@@ -71,6 +72,10 @@ export const metadata: Metadata = {
     template: "%s | CleanStart",
   },
   description: DESCRIPTION,
+  // Google Search Console site-verification — env-scoped (prod only), set once
+  // here and inherited by every route. Omitted entirely when unset. See
+  // lib/seo/verification.ts.
+  verification: siteVerification(),
   alternates: {
     canonical: "/",
   },

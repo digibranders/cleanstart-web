@@ -6,8 +6,10 @@ import { CONSENT_MODE_SNIPPET } from "@/lib/consent/consent-mode-snippet";
  * (GDPR-safe) before any analytics tag. The ConsentProvider fires
  * `gtag('consent','update', …)` on accept.
  *
- * No GA4 script ships yet — this is the scaffold so GA4 is plug-and-play
- * and consent is provably default-denied (WEB-PRODUCTION.md §11).
+ * This runs before any analytics tag so consent is provably default-denied
+ * (WEB-PRODUCTION.md §11). The GA4 tag itself (components/analytics/Ga4Script.tsx)
+ * loads only after the Analytics category is granted; it relies on the
+ * `window.gtag` / `dataLayer` this snippet bootstraps.
  *
  * Cleared by a CSP hash (see lib/security/csp.ts), NOT a per-request
  * nonce — a nonce would require reading headers() in the root layout,

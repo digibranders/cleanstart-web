@@ -39,6 +39,16 @@ describe('buildCsp', () => {
     expect(d['media-src']).toContain("'self'");
   });
 
+  it('allows GA4 gtag.js and its collect endpoints (incl. regional)', () => {
+    const d = parse(buildCsp(base));
+    expect(d['connect-src']).toContain('https://www.googletagmanager.com');
+    expect(d['connect-src']).toContain('https://www.google-analytics.com');
+    expect(d['connect-src']).toContain('https://*.google-analytics.com');
+    expect(d['connect-src']).toContain('https://*.analytics.google.com');
+    // gtag.js library is served over https: (no per-host script-src needed).
+    expect(d['script-src']).toContain('https:');
+  });
+
   it('locks object-src, base-uri and form-action', () => {
     const d = parse(buildCsp(base));
     expect(d['object-src']).toBe("'none'");
