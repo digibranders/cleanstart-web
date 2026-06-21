@@ -34,6 +34,7 @@ export type News = {
   newsCategories?: NewsCategory[] | null;
   externalUrl?: string | null;
   publicationDate?: string | null;
+  updatedAt?: string | null;
   readingMinutes?: number | null;
   featured?: boolean | null;
   seo?: CmsSeo | null;

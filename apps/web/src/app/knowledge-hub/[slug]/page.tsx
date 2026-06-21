@@ -111,6 +111,7 @@ export default async function KnowledgeHubArticlePage({
             description: article.abstract ?? undefined,
             contentUrl: article.videoUrl,
             uploadDate: article.publishedAt ?? undefined,
+            thumbnailUrl: articleImage,
             embedPath: `/knowledge-hub/${article.slug}`,
           })}
         />

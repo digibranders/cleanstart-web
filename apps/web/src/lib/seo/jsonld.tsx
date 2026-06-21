@@ -26,6 +26,14 @@ export function JsonLd({ data, id }: JsonLdProps) {
 }
 
 const ORGANIZATION_ID = `${SITE_URL}/#organization`;
+const WEBSITE_ID = `${SITE_URL}/#website`;
+
+/** Shared schema.org event-status IRIs (Event + webinar ItemList). */
+const EVENT_STATUS_IRI: Record<string, string> = {
+  scheduled: "https://schema.org/EventScheduled",
+  postponed: "https://schema.org/EventPostponed",
+  cancelled: "https://schema.org/EventCancelled",
+};
 
 export function organizationSchema() {
   return {
@@ -34,6 +42,8 @@ export function organizationSchema() {
     "@id": ORGANIZATION_ID,
     name: SITE_NAME,
     url: SITE_URL,
+    description:
+      "CleanStart provides hardened, near-zero-CVE container base images and a software supply-chain security platform, helping engineering and security teams ship trusted software faster.",
     logo: {
       "@type": "ImageObject",
       url: `${SITE_URL}/images/cleanstart-logo.png`,
@@ -44,6 +54,26 @@ export function organizationSchema() {
       "https://www.linkedin.com/company/cleanstart",
       "https://github.com/cleanstart",
     ],
+  };
+}
+
+/**
+ * WebSite node — binds the domain to the canonical brand name/entity (the
+ * `name`/`url` Google uses for the bold site name above results) and lets other
+ * nodes reference it via `@id`. A `SearchAction`/sitelinks-searchbox is
+ * deliberately omitted: it requires a public `/search?q=` results page, and the
+ * site only exposes a JSON `/api/search` endpoint — emitting a SearchAction that
+ * points at a non-existent results page would be invalid. Add it here once a
+ * user-facing search page exists.
+ */
+export function webSiteSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": WEBSITE_ID,
+    url: SITE_URL,
+    name: SITE_NAME,
+    publisher: { "@id": ORGANIZATION_ID },
   };
 }
 
@@ -217,6 +247,63 @@ export function newsArticleSchema({
         }
       : {}),
     publisher: { "@id": ORGANIZATION_ID },
+  };
+}
+
+export interface EventSchemaInput {
+  title: string;
+  path: string;
+  startDate?: string | null | undefined;
+  endDate?: string | null | undefined;
+  /** Free-text venue name → Place.name. */
+  venue: string;
+  /** ISO 3166-1 alpha-2 (e.g. "IN"); when set, emits a PostalAddress. */
+  addressCountry?: string | undefined;
+  description?: string | null | undefined;
+  /** 'scheduled' | 'postponed' | 'cancelled'. */
+  eventStatus: string;
+  previousStartDate?: string | null | undefined;
+  imageUrl?: string | undefined;
+}
+
+/**
+ * Event structured data for `/event/[slug]`. Offline (in-person) events; emits
+ * `organizer` (→ Organization) and a structured `PostalAddress` (from the
+ * event's country) so Google's Event rich result has the location fields it
+ * recommends, not just a bare venue name.
+ */
+export function eventSchema({
+  title,
+  path,
+  startDate,
+  endDate,
+  venue,
+  addressCountry,
+  description,
+  eventStatus,
+  previousStartDate,
+  imageUrl,
+}: EventSchemaInput) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: title,
+    url: absoluteUrl(path),
+    ...(startDate ? { startDate } : {}),
+    ...(endDate ? { endDate } : {}),
+    eventStatus: EVENT_STATUS_IRI[eventStatus] ?? EVENT_STATUS_IRI.scheduled,
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    location: {
+      "@type": "Place",
+      name: venue,
+      ...(addressCountry
+        ? { address: { "@type": "PostalAddress", addressCountry } }
+        : {}),
+    },
+    ...(description ? { description } : {}),
+    ...(imageUrl ? { image: [imageUrl] } : {}),
+    ...(previousStartDate ? { previousStartDate } : {}),
+    organizer: { "@id": ORGANIZATION_ID },
   };
 }
 

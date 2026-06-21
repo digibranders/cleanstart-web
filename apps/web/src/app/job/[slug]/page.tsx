@@ -128,7 +128,13 @@ export default async function CareerDetailPage({
             description: jobDescription,
             path: `/job/${job.slug}`,
             datePosted: job.publishedAt ?? job.updatedAt ?? undefined,
-            validThrough: job.applicationDeadline ?? job.expiresAt ?? undefined,
+            // Google strongly recommends validThrough; open roles with no
+            // explicit deadline get a rolling 90-day expiry (ISR keeps it
+            // future-dated) so the posting is never dropped for a missing field.
+            validThrough:
+              job.applicationDeadline ??
+              job.expiresAt ??
+              new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
             employmentType: job.employmentType
               ? SCHEMA_EMPLOYMENT_TYPE[job.employmentType]
               : undefined,

@@ -115,6 +115,7 @@ export async function renderNewsDetail({
           description: item.abstract ?? undefined,
           path: `/news/${item.slug}`,
           publishedAt: item.publicationDate ?? undefined,
+          modifiedAt: item.updatedAt ?? undefined,
           imageUrl: heroAbsolute,
           section: item.pressType ?? undefined,
         })}
