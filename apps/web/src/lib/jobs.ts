@@ -138,6 +138,18 @@ export async function getJobLocations(): Promise<JobLocation[]> {
   return res.docs;
 }
 
+/**
+ * All published job slugs (open + closed), for generateStaticParams. Closed
+ * roles are noindexed but still reachable from the careers "Closed roles"
+ * filter, so prerender them too.
+ */
+export async function getJobSlugs(): Promise<string[]> {
+  const res = await fetchCMS<PayloadListResponse<{ slug: string }>>(
+    "/api/jobs?where[_status][equals]=published&depth=0&limit=1000&select[slug]=true",
+  );
+  return res.docs.map((d) => d.slug).filter((s): s is string => Boolean(s));
+}
+
 // Client-safe types + display helpers live in `jobs-utils.ts` (no `cms-fetch`
 // / `next/headers`). Re-exported here for backward compat so existing
 // server-side imports from `@/lib/jobs` keep resolving.

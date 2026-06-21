@@ -9,13 +9,25 @@ import { AuthorBio } from "@/components/sections/author/AuthorBio";
 import { AuthorDetails } from "@/components/sections/author/AuthorDetails";
 import { AuthorPosts } from "@/components/sections/author/AuthorPosts";
 import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
-import { getAuthorBySlug, getPostsByAuthor } from "@/lib/authors";
+import { getAuthorBySlug, getAuthorSlugs, getPostsByAuthor } from "@/lib/authors";
 import { mediaUrl } from "@/lib/blog";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, profilePageSchema } from "@/lib/seo/jsonld";
 
 interface AuthorPageProps {
   params: Promise<{ slug: string }>;
+}
+
+// Slugs not returned here still render on first request, then cache (ISR).
+export const dynamicParams = true;
+
+/** Pre-render every published author; degrade to on-demand if CMS is down at build. */
+export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
+  try {
+    return (await getAuthorSlugs()).map((slug) => ({ slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({

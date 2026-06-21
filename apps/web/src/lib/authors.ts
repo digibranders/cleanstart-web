@@ -69,6 +69,17 @@ export const getAuthorBySlug = cache(
   },
 );
 
+/**
+ * All published author slugs, for generateStaticParams (prerender at build).
+ * Authors have no `publishedAt` — status-only filter, matching the sitemap.
+ */
+export async function getAuthorSlugs(): Promise<string[]> {
+  const res = await fetchCMS<PayloadListResponse<{ slug: string }>>(
+    "/api/authors?where[_status][equals]=published&depth=0&limit=1000&select[slug]=true",
+  );
+  return res.docs.map((d) => d.slug).filter((s): s is string => Boolean(s));
+}
+
 export async function getPostsByAuthor(
   authorId: string,
   { limit = 6 }: { limit?: number } = {},

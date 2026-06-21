@@ -11,6 +11,7 @@ import {
   DEPARTMENT_LABEL,
   experienceDisplay,
   getJobBySlug,
+  getJobSlugs,
   locationDisplay,
   resolvedLocations,
   type JobEmploymentType,
@@ -28,6 +29,18 @@ const SCHEMA_EMPLOYMENT_TYPE: Record<JobEmploymentType, string> = {
 
 interface CareerDetailPageProps {
   params: Promise<{ slug: string }>;
+}
+
+// Slugs not returned here still render on first request, then cache (ISR).
+export const dynamicParams = true;
+
+/** Pre-render every published job; degrade to on-demand if CMS is down at build. */
+export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
+  try {
+    return (await getJobSlugs()).map((slug) => ({ slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({

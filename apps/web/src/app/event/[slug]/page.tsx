@@ -9,6 +9,7 @@ import {
   formatEventDate,
   getEventBySlug,
   getEventBySlugDraft,
+  getEventSlugs,
   type EventCountry,
 } from "@/lib/events";
 import { mediaUrl } from "@/lib/blog";
@@ -19,6 +20,18 @@ import { JsonLd, breadcrumbSchema, eventSchema } from "@/lib/seo/jsonld";
 
 interface EventDetailPageProps {
   params: Promise<{ slug: string }>;
+}
+
+// Slugs not returned here still render on first request, then cache (ISR).
+export const dynamicParams = true;
+
+/** Pre-render every published event; degrade to on-demand if CMS is down at build. */
+export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
+  try {
+    return (await getEventSlugs()).map((slug) => ({ slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({

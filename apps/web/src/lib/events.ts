@@ -160,3 +160,11 @@ export const getEventBySlug = cache(
 export async function getEventBySlugDraft(slug: string): Promise<EventDetail | null> {
   return loadEventBySlug(slug, true);
 }
+
+/** All published event slugs, for generateStaticParams (prerender at build). */
+export async function getEventSlugs(): Promise<string[]> {
+  const res = await fetchCMS<PayloadListResponse<{ slug: string }>>(
+    `/api/events?${PUBLISHED_FILTER}&depth=0&limit=1000&select[slug]=true`,
+  );
+  return res.docs.map((d) => d.slug).filter((s): s is string => Boolean(s));
+}
