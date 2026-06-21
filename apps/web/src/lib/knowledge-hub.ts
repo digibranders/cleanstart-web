@@ -81,7 +81,7 @@ export async function getKnowledgeTree(): Promise<KhGroup[]> {
       `/api/knowledgeCategories?${PUBLISHED}&depth=0&limit=200&sort=id&select[name]=true&select[slug]=true&select[displayOrder]=true&select[parent]=true`,
     ),
     fetchCMS<CmsList<CmsArticleMeta>>(
-      `/api/knowledgeBase?${PUBLISHED}&depth=0&limit=400&sort=id&select[title]=true&select[slug]=true&select[category]=true`,
+      `/api/knowledgeBase?${PUBLISHED}&depth=0&limit=1000&sort=id&select[title]=true&select[slug]=true&select[category]=true`,
     ),
   ]);
 
@@ -190,7 +190,7 @@ export async function getKnowledgeArticle(slug: string): Promise<KhArticle | nul
 /** All published article slugs, for generateStaticParams. */
 export async function getKnowledgeArticleSlugs(): Promise<string[]> {
   const res = await fetchCMS<CmsList<{ slug: string }>>(
-    `/api/knowledgeBase?${PUBLISHED}&depth=0&limit=400&select[slug]=true`,
+    `/api/knowledgeBase?${PUBLISHED}&depth=0&limit=1000&select[slug]=true`,
   );
   return res.docs.map((d) => d.slug);
 }

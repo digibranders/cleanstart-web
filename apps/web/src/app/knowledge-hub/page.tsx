@@ -1,5 +1,5 @@
 import { getKnowledgeLanding } from '@/lib/knowledge-hub';
-import { redirect } from 'next/navigation';
+import { permanentRedirect } from 'next/navigation';
 
 /**
  * `/knowledge-hub` has no standalone listing page — visiting it opens the first
@@ -11,5 +11,8 @@ import { redirect } from 'next/navigation';
 export default async function KnowledgeHubPage(): Promise<never> {
   const groups = await getKnowledgeLanding();
   const firstSlug = groups.find((g) => g.href)?.href ?? 'vex-documents';
-  redirect(`/knowledge-hub/${firstSlug}`);
+  // 308 (permanent) — consolidates /knowledge-hub signals onto the article and
+  // matches the sibling /legal index. The target is displayOrder-pinned, so it
+  // is stable across re-seeds.
+  permanentRedirect(`/knowledge-hub/${firstSlug}`);
 }
