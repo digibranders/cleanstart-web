@@ -47,7 +47,7 @@ export async function generateMetadata({
     type: 'article',
     publishedTime: article.publishedAt ?? undefined,
     modifiedTime: article.updatedAt ?? undefined,
-    ...(seo.noindex ? { noindex: true } : {}),
+    ...(seo.noindex ? { noindex: true, nofollow: seo.nofollow } : {}),
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
     ...(seo.image ? { image: seo.image } : {}),
   });

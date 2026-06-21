@@ -63,6 +63,7 @@ export async function generateMetadata({
     type: "article",
     modifiedTime: job.updatedAt ?? undefined,
     noindex: seo.noindex || job.hiringStatus === "closed",
+    nofollow: seo.nofollow,
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
     ...(seo.image ? { image: seo.image } : {}),
   });

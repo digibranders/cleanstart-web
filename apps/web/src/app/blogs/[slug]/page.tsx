@@ -79,7 +79,7 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
     publishedTime: effectivePublishedAt(post) ?? post.publishedAt,
     modifiedTime: post.updatedAt,
     authors: post.authors?.map((a) => a.name), // metadata authors (plain string[])
-    ...(seo.noindex ? { noindex: true } : {}),
+    ...(seo.noindex ? { noindex: true, nofollow: seo.nofollow } : {}),
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
     ...(seo.image
       ? { image: seo.image }
