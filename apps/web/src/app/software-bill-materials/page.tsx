@@ -11,7 +11,7 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "Cleanstart SBOM for software transparency | Cleanstart",
+  title: "CleanStart SBOM for software transparency | CleanStart",
   absoluteTitle: true,
   eyebrow: "Solutions",
   description:

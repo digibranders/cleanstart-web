@@ -154,6 +154,7 @@ export async function renderGuideDetail({
           publishedAt: publishedAt ?? guide.publishedAt ?? undefined,
           modifiedAt: guide.updatedAt ?? undefined,
           imageUrl: heroAbsolute,
+          authors: guide.authors?.map((a) => ({ name: a.name, slug: a.slug })),
         })}
       />
       {faqs.length > 0 ? (

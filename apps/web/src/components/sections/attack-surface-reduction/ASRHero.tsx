@@ -129,7 +129,7 @@ export function ASRHero(): React.ReactElement {
                 } as React.CSSProperties
               }
             >
-              Explore Cleanstart Images
+              Explore CleanStart Images
             </Link>
           </div>
 

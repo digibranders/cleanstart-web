@@ -98,7 +98,12 @@ function TopLevelItem({
   return (
     <NavigationMenuItem>
       <NavigationMenuTrigger data-active={active}>{item.label}</NavigationMenuTrigger>
-      <NavigationMenuContent>{body}</NavigationMenuContent>
+      {/* keepMounted renders each panel's links inline-hidden in the SSR DOM so
+          crawlers see the primary internal-nav link graph (the panels otherwise
+          only mount on hover, via the portal). Base UI swaps to the portal after
+          hydration — first client render also takes the inline branch, so there
+          is no hydration mismatch and interactive behavior is unchanged. */}
+      <NavigationMenuContent keepMounted>{body}</NavigationMenuContent>
     </NavigationMenuItem>
   );
 }

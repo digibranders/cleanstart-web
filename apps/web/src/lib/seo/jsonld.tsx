@@ -129,6 +129,8 @@ export interface ArticleSchemaInput {
   modifiedAt?: string | undefined;
   imageUrl?: string | undefined;
   type?: string | undefined;
+  /** Provide `slug` to emit `url: /author/<slug>` on each Person node (E-E-A-T signal). */
+  authors?: Array<{ name: string; slug?: string | undefined }> | undefined;
 }
 
 export function articleSchema({
@@ -139,6 +141,7 @@ export function articleSchema({
   modifiedAt,
   imageUrl,
   type,
+  authors,
 }: ArticleSchemaInput) {
   const lastModified = modifiedAt ?? publishedAt;
   return {
@@ -150,6 +153,15 @@ export function articleSchema({
     ...(imageUrl ? { image: [imageUrl] } : {}),
     ...(publishedAt ? { datePublished: publishedAt } : {}),
     ...(lastModified ? { dateModified: lastModified } : {}),
+    ...(authors && authors.length > 0
+      ? {
+          author: authors.map((a) => ({
+            "@type": "Person",
+            name: a.name,
+            ...(a.slug ? { url: absoluteUrl(`/author/${a.slug}`) } : {}),
+          })),
+        }
+      : {}),
     ...(type ? { genre: type } : {}),
     publisher: { "@id": ORGANIZATION_ID },
   };
