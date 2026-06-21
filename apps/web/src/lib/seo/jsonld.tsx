@@ -50,9 +50,15 @@ export function organizationSchema() {
       width: 459,
       height: 96,
     },
+    // Real, canonical brand profiles (mirror the footer social links) so search
+    // and generative engines can verify the CleanStart entity. Stale
+    // /company/cleanstart + /cleanstart handles replaced with the live ones.
     sameAs: [
-      "https://www.linkedin.com/company/cleanstart",
-      "https://github.com/cleanstart",
+      "https://www.linkedin.com/company/cleanstart-official",
+      "https://x.com/CleanStartX",
+      "https://github.com/cleanstart-dev",
+      "https://www.youtube.com/@CleanStartOfficial",
+      "https://hub.docker.com/u/cleanstart",
     ],
   };
 }
