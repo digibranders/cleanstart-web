@@ -10,7 +10,7 @@ import {
 import { ResourceCenterCTA } from "@/components/sections/resource-center/ResourceCenterCTA";
 import { getResources } from "@/lib/resources";
 import { buildListingMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
 
 export const revalidate = 3600;
 
@@ -66,6 +66,16 @@ export default async function ResourceCenterPage(): Promise<React.ReactElement> 
           { name: "Resource Center" },
         ])}
       />
+      {allResources.length > 0 && (
+        <JsonLd
+          id="resource-center-list"
+          data={itemListSchema(
+            "CleanStart Resource Center",
+            "/resource-center",
+            allResources.map((r) => ({ name: r.title, path: `/resources/${r.slug}` })),
+          )}
+        />
+      )}
       <Header />
       <Suspense
         fallback={

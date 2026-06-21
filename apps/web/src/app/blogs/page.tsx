@@ -7,7 +7,7 @@ import { BlogsContent, selectBlogs } from "@/components/sections/blogs/BlogsCont
 import { BlogsCTA } from "@/components/sections/blogs/BlogsCTA";
 import { getFeaturedBlog, getBlogs, getBlogCategories } from "@/lib/blog";
 import { buildListingMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
 
 export const revalidate = 3600;
 
@@ -55,6 +55,16 @@ export default async function BlogsPage(): Promise<React.ReactElement> {
         id="blogs-breadcrumbs"
         data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Blogs" }])}
       />
+      {allPosts.length > 0 && (
+        <JsonLd
+          id="blogs-list"
+          data={itemListSchema(
+            "CleanStart Blog",
+            "/blogs",
+            allPosts.map((p) => ({ name: p.title, path: `/blogs/${p.slug}` })),
+          )}
+        />
+      )}
       <Header />
       <Suspense
         fallback={

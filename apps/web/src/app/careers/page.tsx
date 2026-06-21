@@ -9,7 +9,7 @@ import {
 } from "@/components/sections/careers/CareersContent";
 import { getJobLocations, getJobs, type JobLocation } from "@/lib/jobs";
 import { buildListingMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
 
 export const revalidate = 3600;
 
@@ -65,6 +65,16 @@ export default async function CareersPage(): Promise<React.ReactElement> {
           { name: "Careers" },
         ])}
       />
+      {allJobs.length > 0 && (
+        <JsonLd
+          id="careers-list"
+          data={itemListSchema(
+            "CleanStart Open Roles",
+            "/careers",
+            allJobs.map((j) => ({ name: j.title, path: `/job/${j.slug}` })),
+          )}
+        />
+      )}
       <Header />
       <Suspense
         fallback={

@@ -594,6 +594,35 @@ export function caseStudyListSchema(items: CaseStudyListItem[]) {
   };
 }
 
+export interface ItemListEntry {
+  /** Item title (ListItem.name). */
+  name: string;
+  /** Site-relative detail path, e.g. `/blogs/foo`. */
+  path: string;
+}
+
+/**
+ * Generic ItemList for a content listing page (blogs, news, guide, events,
+ * resource-center, careers). Each ListItem points at the detail URL so crawlers
+ * and answer engines see the set + order without needing to render the
+ * client-side card grid. Capped at 30 to keep the payload lean.
+ */
+export function itemListSchema(name: string, listPath: string, items: ItemListEntry[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name,
+    url: absoluteUrl(listPath),
+    numberOfItems: items.length,
+    itemListElement: items.slice(0, 30).map((it, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: absoluteUrl(it.path),
+      name: it.name,
+    })),
+  };
+}
+
 export interface ProfilePageSchemaInput {
   name: string;
   slug: string;

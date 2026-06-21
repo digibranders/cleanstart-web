@@ -14,7 +14,7 @@ import {
   type EventsListResponse,
 } from "@/lib/events";
 import { buildListingMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
 
 // Re-render hourly so the upcoming/past split and country data stay fresh
 // without requiring a new deploy. On-demand revalidation (CMS afterChange hook
@@ -73,6 +73,19 @@ export default async function EventsPage(): Promise<React.ReactElement> {
         id="events-breadcrumbs"
         data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Events" }])}
       />
+      {(upcomingEvents.length > 0 || allPastEvents.length > 0) && (
+        <JsonLd
+          id="events-list"
+          data={itemListSchema(
+            "CleanStart Events",
+            "/events",
+            [...upcomingEvents, ...allPastEvents].map((e) => ({
+              name: e.title,
+              path: `/event/${e.slug}`,
+            })),
+          )}
+        />
+      )}
       <Header />
       <Suspense
         fallback={
