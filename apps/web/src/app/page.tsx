@@ -15,6 +15,8 @@ const TestimonialsStats = dynamic(() =>
   })),
 );
 import { FrequentlyAskedQuestions } from "@/components/sections/home/FrequentlyAskedQuestions";
+import { HOME_FAQ_ITEMS } from "@/components/sections/home/home-faqs";
+import { JsonLd, faqPageSchema } from "@/lib/seo/jsonld";
 import { ResourcesInsights } from "@/components/sections/home/ResourcesInsights";
 import { ReadyToSecureCTA } from "@/components/sections/home/ReadyToSecureCTA";
 import { Footer } from "@/components/sections/Footer";
@@ -47,6 +49,9 @@ export default async function Home() {
   const impactStats = await getImpactStats();
   return (
     <>
+      {/* FAQPage structured data for the 6 home FAQs — feeds answer engines /
+          AI Overviews. Plain-text Q&A shared with the rendered accordion. */}
+      <JsonLd id="home-faq" data={faqPageSchema([...HOME_FAQ_ITEMS])} />
       {/* High-priority preload of the LCP hero SVG — React hoists this to
           <head>. See HERO_TOP_GLOW note above. */}
       <link
