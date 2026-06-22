@@ -182,8 +182,8 @@ export interface SchemaGraph { "@context": "https://schema.org"; "@graph": Graph
 export interface AddonBlock { blockType: string; [k: string]: unknown; }
 export interface ComposeInput {
   auto: GraphNode[];
-  addons?: AddonBlock[];
-  override?: unknown; // validated before use
+  addonNodes?: GraphNode[]; // already built by the caller's builders (CMS dispatchAddons / web adapter)
+  override?: unknown; // raw paste; validated before use, dropped fail-safe if invalid
 }
 ```
 
@@ -270,8 +270,8 @@ describe("composeGraph", () => {
     expect(out["@graph"]).toHaveLength(2);
   });
 
-  it("appends validated add-on blocks after auto nodes", () => {
-    const out = composeGraph({ auto: [{ "@type": "Article" }], addons: [{ blockType: "faqPage", questions: [] }] });
+  it("appends pre-built add-on nodes after auto nodes", () => {
+    const out = composeGraph({ auto: [{ "@type": "Article" }], addonNodes: [{ "@type": "FAQPage", mainEntity: [] }] });
     expect(out["@graph"].some((n) => n["@type"] === "FAQPage")).toBe(true);
   });
 

@@ -29,23 +29,20 @@ export interface SchemaGraph {
 }
 
 /**
- * One editor-authored add-on (Layer 2). `blockType` selects the
- * Schema.org shape (faqPage, howTo, videoObject, …); the rest of the
- * keys carry that block's data.
- */
-export interface AddonBlock {
-  blockType: string;
-  [key: string]: JsonLdValue | undefined;
-}
-
-/**
- * Inputs to {@link composeGraph}. `auto` is Layer 1 (derived from
- * current doc fields + globals — always live). `addons` is Layer 2.
- * `override` is the raw Layer 3 paste; it is validated before use and
- * dropped (fail-safe to auto) if invalid. See INV-5 in the plan.
+ * Inputs to {@link composeGraph}.
+ *
+ * - `auto` — Layer 1 nodes, derived from CURRENT doc fields + globals
+ *   (always live).
+ * - `addonNodes` — Layer 2 nodes, already built by the caller's add-on
+ *   builders (CMS `dispatchAddons`, or the web adapter). composeGraph
+ *   does not know how to turn editor blocks into nodes — that mapping
+ *   stays with the builders to avoid duplication.
+ * - `override` — raw Layer 3 paste. Validated before use and dropped
+ *   (fail-safe to auto + add-ons) if invalid. Merged per-`@type`. See
+ *   INV-5 in the plan.
  */
 export interface ComposeInput {
   auto: GraphNode[];
-  addons?: AddonBlock[];
+  addonNodes?: GraphNode[];
   override?: unknown;
 }
