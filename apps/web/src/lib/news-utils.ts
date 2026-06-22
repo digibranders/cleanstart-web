@@ -15,16 +15,14 @@ export function pressTypeLabel(value: PressType | null | undefined): string {
 }
 
 export const REGION_LABEL: Record<NewsRegion, string> = {
-  "asia-pacific": "Asia Pacific",
-  "europe-middle-east": "Europe & Middle East",
-  "usa-north-america": "North America",
+  "north-america": "North America",
+  apac: "APAC",
 };
 
 /** Regions offered in the filter sidebar, in display order. */
 export const FILTERABLE_REGIONS: ReadonlyArray<NewsRegion> = [
-  "asia-pacific",
-  "europe-middle-east",
-  "usa-north-america",
+  "north-america",
+  "apac",
 ];
 
 export function regionLabel(value: string | null | undefined): string {

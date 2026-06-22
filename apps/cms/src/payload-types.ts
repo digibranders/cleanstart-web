@@ -1135,7 +1135,7 @@ export interface News {
   /**
    * Region this story belongs to. Powers the region filter on the /news listing page.
    */
-  region?: ('asia-pacific' | 'europe-middle-east' | 'usa-north-america') | null;
+  region?: ('north-america' | 'apac') | null;
   body?: {
     root: {
       type: string;

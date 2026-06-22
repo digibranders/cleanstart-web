@@ -18,7 +18,7 @@ export type PressType =
   | "announcement"
   | "feature";
 
-export type NewsRegion = "asia-pacific" | "europe-middle-east" | "usa-north-america";
+export type NewsRegion = "north-america" | "apac";
 
 export type News = {
   id: string;
