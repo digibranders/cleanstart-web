@@ -40,9 +40,13 @@ export function HeroTile({
       style={{ minHeight }}
     >
       <div>
-        <h3 className="text-[19px] font-semibold leading-[1.15] tracking-[-0.015em] text-white/95">
+        {/* Not a heading: this is a nav mega-menu promo card label, not page
+            content. Rendering it as <h3> leaked it into the document outline
+            (the nav sits above the page <h1>, so it became "the first heading is
+            not H1"). A styled <div> keeps the look without polluting the outline. */}
+        <div className="text-[19px] font-semibold leading-[1.15] tracking-[-0.015em] text-white/95">
           {headline}
-        </h3>
+        </div>
         {sub && (
           <p className="mt-1.5 text-[12.5px] leading-relaxed text-white/60">{sub}</p>
         )}

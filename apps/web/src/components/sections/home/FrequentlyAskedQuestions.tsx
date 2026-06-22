@@ -160,26 +160,33 @@ function FaqItemRow({
   const answerId = `faq-answer-${idPrefix}-${item.id}`;
   return (
     <div>
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={isOpen}
-        aria-controls={answerId}
-        className="group flex w-full items-start justify-between gap-6 text-left cursor-pointer md:gap-12"
-      >
-        <span
-          className="flex-1 font-display text-[#111111] transition-colors duration-200 group-hover:text-[#1B1F4F]"
-          style={{
-            fontSize: "var(--fs-h3)",
-            fontWeight: 600,
-            lineHeight: 1.1,
-            letterSpacing: "-0.04em",
-          }}
+      {/* APG accordion pattern: the trigger button is wrapped in a heading so
+          each question is a real H3 (one level under the section's <h2>),
+          navigable by screen-reader heading shortcuts. The <h3> is a transparent
+          wrapper — preflight zeroes its margin and it has no direct text, so the
+          inner span's styling is unchanged. */}
+      <h3 className="m-0">
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={isOpen}
+          aria-controls={answerId}
+          className="group flex w-full items-start justify-between gap-6 text-left cursor-pointer md:gap-12"
         >
-          {item.q}
-        </span>
-        <ToggleIcon isOpen={isOpen} />
-      </button>
+          <span
+            className="flex-1 font-display text-[#111111] transition-colors duration-200 group-hover:text-[#1B1F4F]"
+            style={{
+              fontSize: "var(--fs-h3)",
+              fontWeight: 600,
+              lineHeight: 1.1,
+              letterSpacing: "-0.04em",
+            }}
+          >
+            {item.q}
+          </span>
+          <ToggleIcon isOpen={isOpen} />
+        </button>
+      </h3>
 
       {/* Animating the section's natural growth is not a CLS regression:
           layout shifts within 500ms of user input are excluded from CLS.
