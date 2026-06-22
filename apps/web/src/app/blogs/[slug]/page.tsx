@@ -25,11 +25,12 @@ import { absoluteUrl, buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 import { effectivePublishedAt } from "@/lib/published-date";
 import {
-  JsonLd,
   blogPostingSchema,
   breadcrumbSchema,
   faqPageSchema,
 } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph, seoOverride } from "@/lib/seo/compose-page";
 
 interface BlogDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -149,36 +150,33 @@ export async function renderBlogDetail({
       {nextTarget ? (
         <link rel="next" href={absoluteUrl(`/blogs/${nextTarget.slug}`)} />
       ) : null}
-      <JsonLd
-        id={`blog-breadcrumbs-${post.slug}`}
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Blogs", path: "/blogs" },
-          { name: post.title },
-        ])}
-      />
-      <JsonLd
-        id={`blog-posting-${post.slug}`}
-        data={blogPostingSchema({
-          title: post.title,
-          description: post.abstract ?? undefined,
-          path: `/blogs/${post.slug}`,
-          publishedAt,
-          modifiedAt: post.updatedAt,
-          imageUrl: heroAbsolute,
-          authors: post.authors?.map((a) => ({ name: a.name, slug: a.slug })),
-          category: post.categories?.name,
-          relatedLinks: journeyLinks.length > 0 ? journeyLinks : undefined,
+      <JsonLdGraph
+        id={`blog-jsonld-${post.slug}`}
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "Blogs", path: "/blogs" },
+              { name: post.title },
+            ]),
+            blogPostingSchema({
+              title: post.title,
+              description: post.abstract ?? undefined,
+              path: `/blogs/${post.slug}`,
+              publishedAt,
+              modifiedAt: post.updatedAt,
+              imageUrl: heroAbsolute,
+              authors: post.authors?.map((a) => ({ name: a.name, slug: a.slug })),
+              category: post.categories?.name,
+              relatedLinks: journeyLinks.length > 0 ? journeyLinks : undefined,
+            }),
+            ...(faqs.length > 0
+              ? [faqPageSchema(faqs.map((f) => ({ question: f.question, answer: f.answer })))]
+              : []),
+          ],
+          override: seoOverride(post.seo),
         })}
       />
-      {faqs.length > 0 ? (
-        <JsonLd
-          id={`blog-faq-${post.slug}`}
-          data={faqPageSchema(
-            faqs.map((f) => ({ question: f.question, answer: f.answer })),
-          )}
-        />
-      ) : null}
       <Header />
       <main id="main-content">
         <BlogDetailHero

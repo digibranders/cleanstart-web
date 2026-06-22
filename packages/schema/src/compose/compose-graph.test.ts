@@ -88,6 +88,15 @@ describe("composeGraph", () => {
     expect(composeGraph(input)).toEqual(composeGraph(input));
   });
 
+  it("strips per-node @context from auto nodes (graph carries one top-level @context)", () => {
+    const out = composeGraph({
+      auto: [{ "@context": ctx, "@type": "Article", headline: "a" }],
+    });
+    expect(out["@context"]).toBe("https://schema.org");
+    expect(out["@graph"][0]?.["@context"]).toBeUndefined();
+    expect(out["@graph"][0]?.headline).toBe("a");
+  });
+
   it("de-duplicates nodes sharing an @id (last wins)", () => {
     const out = composeGraph({
       auto: [
