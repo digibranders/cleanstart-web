@@ -6871,19 +6871,37 @@ export interface BrokenLink {
 export interface PageRegistry {
   id: number;
   /**
-   * Site-relative route, e.g. /pricing or /blogs. One row per route.
+   * Site-relative route, e.g. /pricing or /blogs. Locked after creation.
    */
   path: string;
   /**
-   * Human label shown in the Schema Manager list.
+   * Human label shown in the Schema Manager list. Locked after creation.
    */
   title: string;
   /**
-   * static = hardcoded page; cms-listing = a collection’s index page; cms-template = drill into the collection’s documents.
+   * static = hardcoded page; cms-listing = a collection’s index page; cms-template = drill into the collection’s documents. Locked after creation.
    */
   kind: 'static' | 'cms-listing' | 'cms-template';
   /**
-   * For cms-listing / cms-template: the collection slug this route renders.
+   * The primary Schema.org type this page represents (the rich-result type to aim for). Locked after creation.
+   */
+  schemaType?:
+    | (
+        | 'WebPage'
+        | 'AboutPage'
+        | 'ContactPage'
+        | 'CollectionPage'
+        | 'SoftwareApplication'
+        | 'Article'
+        | 'BlogPosting'
+        | 'NewsArticle'
+        | 'Event'
+        | 'JobPosting'
+        | 'ProfilePage'
+      )
+    | null;
+  /**
+   * For cms-listing / cms-template: the collection slug this route renders. Locked after creation.
    */
   backingCollection?: string | null;
   /**
@@ -10713,6 +10731,7 @@ export interface PageRegistrySelect<T extends boolean = true> {
   path?: T;
   title?: T;
   kind?: T;
+  schemaType?: T;
   backingCollection?: T;
   additionalSchema?: T;
   notes?: T;

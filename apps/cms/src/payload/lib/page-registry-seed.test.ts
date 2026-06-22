@@ -12,6 +12,12 @@ describe('page-registry seed', () => {
     expect(new Set(paths).size).toBe(paths.length);
   });
 
+  it('every row declares a schemaType', () => {
+    for (const row of PAGE_REGISTRY_SEED) {
+      expect(row.schemaType, row.path).toBeTruthy();
+    }
+  });
+
   it('every cms-listing / cms-template row names a backing collection', () => {
     for (const row of PAGE_REGISTRY_SEED) {
       if (row.kind === 'cms-listing' || row.kind === 'cms-template') {
