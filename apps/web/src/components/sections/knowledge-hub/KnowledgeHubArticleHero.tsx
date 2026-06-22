@@ -51,7 +51,12 @@ export function KnowledgeHubArticleHero(): React.ReactElement {
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div className="flex flex-col items-center mx-auto max-w-[864px] pt-[calc(92px+var(--cs-header-extra))] pb-10 sm:pt-[calc(104px+var(--cs-header-extra))] sm:pb-14 lg:pt-[calc(120px+var(--cs-header-extra))] lg:pb-20">
           <HeroReveal y={50} duration={1.0}>
-            <h1
+            {/* Not the page <h1>: this "Knowledge Hub" masthead is identical on
+                every KB page. The page's single <h1> is the unique article title
+                (KnowledgeHubArticle.tsx) — a repeated section-label <h1> would be
+                a worse, non-unique heading. Rendered as <p> (keeps the id so the
+                section's aria-labelledby still names it); styling unchanged. */}
+            <p
               id="knowledge-hub-hero-title"
               className="font-display font-semibold text-white text-center"
               style={{
@@ -61,7 +66,7 @@ export function KnowledgeHubArticleHero(): React.ReactElement {
               }}
             >
               Knowledge <span style={{ color: '#FFFFFF' }}>Hub</span>
-            </h1>
+            </p>
           </HeroReveal>
 
           <HeroReveal
