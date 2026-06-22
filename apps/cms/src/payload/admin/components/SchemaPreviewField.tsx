@@ -146,22 +146,6 @@ const downloadGraph = (
   URL.revokeObjectURL(url);
 };
 
-/**
- * Copy the composed @graph and open schema.org's validator (Code tab).
- * schema.org has no code-via-URL param, so we copy → open → user pastes.
- * Distinct from the Rich Results link, which tests the live URL.
- */
-const openSchemaOrgValidator = (blobs: readonly Record<string, unknown>[]): void => {
-  if (typeof window === 'undefined' || blobs.length === 0) return;
-  const graph = { '@context': 'https://schema.org', '@graph': blobs };
-  try {
-    void navigator.clipboard?.writeText(JSON.stringify(graph, null, 2));
-  } catch {
-    // clipboard unavailable — still open so the user can paste manually
-  }
-  window.open('https://validator.schema.org/', '_blank', 'noopener,noreferrer');
-};
-
 export const SchemaPreviewField = (
   props: SchemaPreviewFieldProps,
 ): ReactElement => {
@@ -627,14 +611,6 @@ const SchemaBodyContent = (props: {
             Test in Rich Results ↗
           </a>
         )}
-        <button
-          type="button"
-          className="cs-schema-preview__btn"
-          onClick={() => openSchemaOrgValidator(fetchState.blobs)}
-          title="Copies this JSON-LD and opens validator.schema.org — paste into its Code tab. Validates the code itself (not the live URL)."
-        >
-          Validate code ↗
-        </button>
         {isAdmin && supported && (
           <EditOverridesButton overrideCount={overrideCount} onClick={onOpenEditor} />
         )}
