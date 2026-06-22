@@ -82,11 +82,31 @@ export async function getResources({
   const params = new URLSearchParams({
     "where[_status][equals]": "published",
     "where[publishedAt][exists]": "true",
-    depth: "2",
+    // depth=1 + a card-field whitelist. depth=2 with no projection pulled every
+    // resource's full Lexical `body` across the whole (limit=1000) card set,
+    // blowing past Next's 2 MB data-cache ceiling so the listing was never
+    // cached and re-hit the CMS on every render. The card reads only these
+    // fields; `asset` is a direct upload, fully resolved at depth=1.
+    depth: "1",
     limit: String(limit),
     page: String(page),
     sort: "-publishedAt",
   });
+  for (const field of [
+    "title",
+    "slug",
+    "type",
+    "summary",
+    "publishedAt",
+    "displayPublishedAt",
+    "updatedAt",
+    "gated",
+    "ctaButtonText",
+    "asset",
+    "seo",
+  ]) {
+    params.set(`select[${field}]`, "true");
+  }
   if (type) params.set("where[type][equals]", type);
   if (search) params.set("where[title][contains]", search);
   return fetchCMS<PayloadListResponse<Resource>>(

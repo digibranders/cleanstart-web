@@ -33,8 +33,25 @@ const PUBLISHED_FILTER =
 
 /** Sidebar + index list: published documents, ascending by `order`. */
 export const getLegalList = cache(async (): Promise<LegalDoc[]> => {
+  // Whitelist the LegalDoc scalar surface so this list (fetched on every
+  // /legal/* page for the sidebar) excludes each document's Lexical `body` —
+  // legal bodies run long. depth=0: nothing to hydrate (`icon` is a scalar).
+  // Keep in sync with the LegalDoc type.
+  const select = [
+    "title",
+    "slug",
+    "order",
+    "icon",
+    "effectiveDate",
+    "publishedAt",
+    "displayPublishedAt",
+    "updatedAt",
+    "seo",
+  ]
+    .map((f) => `select[${f}]=true`)
+    .join("&");
   const data = await fetchCMS<PayloadListResponse<LegalDoc>>(
-    `/api/legalDocuments?${PUBLISHED_FILTER}&sort=order&depth=0&limit=50`,
+    `/api/legalDocuments?${PUBLISHED_FILTER}&sort=order&depth=0&limit=50&${select}`,
   );
   return data.docs;
 });

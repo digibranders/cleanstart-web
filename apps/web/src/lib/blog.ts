@@ -358,6 +358,16 @@ const RELATED_TARGET = 3;
 // against already-picked ids has headroom without a second round-trip.
 const RELATED_FILL_OVERSHOOT = 5;
 
+// Card-only field projection for the related/journey list queries. Excludes
+// the Lexical `body` — without it these multi-doc lists pulled every post's
+// full body, blowing past Next's 2 MB Data-Cache ceiling so the response was
+// never cached and re-hit the CMS on each render. Mirrors getGuides'
+// RELATED_CARD_SELECT. The related card reads these fields; the prev/next
+// journey nav (JourneyNavTarget) only needs title + slug.
+const RELATED_CARD_SELECT =
+  "select[title]=true&select[slug]=true&select[heroImage]=true&select[abstract]=true&select[categories]=true&select[readingMinutes]=true";
+const JOURNEY_SELECT = "select[title]=true&select[slug]=true";
+
 /**
  * Builds the Related Blogs grid for the blog detail page using a merge
  * strategy that honors editor intent first, then fills with freshness:
@@ -399,7 +409,7 @@ export async function getRelatedBlogs(
       .map((id, i) => `where[id][in][${i}]=${encodeURIComponent(id)}`)
       .join("&");
     const data = await fetchCMS<PayloadListResponse<Blog>>(
-      `/api/blogs?${filter}${idParams}&depth=1&limit=${curatedIds.length}`,
+      `/api/blogs?${filter}${idParams}&depth=1&${RELATED_CARD_SELECT}&limit=${curatedIds.length}`,
       { draft },
     );
     const byId = new Map(data.docs.map((d) => [String(d.id), d]));
@@ -423,7 +433,7 @@ export async function getRelatedBlogs(
       .join("&");
     const remaining = RELATED_TARGET - picked.length;
     const data = await fetchCMS<PayloadListResponse<Blog>>(
-      `/api/blogs?${filter}where[id][not_equals]=${encodeURIComponent(blogId)}&${catParam}&depth=1&limit=${remaining + RELATED_FILL_OVERSHOOT}&sort=-publishedAt`,
+      `/api/blogs?${filter}where[id][not_equals]=${encodeURIComponent(blogId)}&${catParam}&depth=1&${RELATED_CARD_SELECT}&limit=${remaining + RELATED_FILL_OVERSHOOT}&sort=-publishedAt`,
       { draft },
     );
     for (const doc of data.docs) {
@@ -440,7 +450,7 @@ export async function getRelatedBlogs(
   // 3. Site-wide fill.
   const remaining = RELATED_TARGET - picked.length;
   const data = await fetchCMS<PayloadListResponse<Blog>>(
-    `/api/blogs?${filter}where[id][not_equals]=${encodeURIComponent(blogId)}&depth=1&limit=${remaining + RELATED_FILL_OVERSHOOT}&sort=-publishedAt`,
+    `/api/blogs?${filter}where[id][not_equals]=${encodeURIComponent(blogId)}&depth=1&${RELATED_CARD_SELECT}&limit=${remaining + RELATED_FILL_OVERSHOOT}&sort=-publishedAt`,
     { draft },
   );
   for (const doc of data.docs) {
@@ -497,11 +507,11 @@ export async function getAutoJourneyTargets(
   if (categoryIds.length > 0) {
     const [prevCat, nextCat] = await Promise.all([
       fetchCMS<PayloadListResponse<Blog>>(
-        `/api/blogs?${filter}${notSelf}&where[publishedAt][less_than]=${anchor}${catParam}&depth=1&limit=1&sort=-publishedAt`,
+        `/api/blogs?${filter}${notSelf}&where[publishedAt][less_than]=${anchor}${catParam}&depth=1&${JOURNEY_SELECT}&limit=1&sort=-publishedAt`,
         { draft },
       ),
       fetchCMS<PayloadListResponse<Blog>>(
-        `/api/blogs?${filter}${notSelf}&where[publishedAt][greater_than]=${anchor}${catParam}&depth=1&limit=1&sort=publishedAt`,
+        `/api/blogs?${filter}${notSelf}&where[publishedAt][greater_than]=${anchor}${catParam}&depth=1&${JOURNEY_SELECT}&limit=1&sort=publishedAt`,
         { draft },
       ),
     ]);
@@ -514,7 +524,7 @@ export async function getAutoJourneyTargets(
   if (!previous) {
     fillTasks.push(
       fetchCMS<PayloadListResponse<Blog>>(
-        `/api/blogs?${filter}${notSelf}&where[publishedAt][less_than]=${anchor}&depth=1&limit=1&sort=-publishedAt`,
+        `/api/blogs?${filter}${notSelf}&where[publishedAt][less_than]=${anchor}&depth=1&${JOURNEY_SELECT}&limit=1&sort=-publishedAt`,
         { draft },
       ).then((d) => {
         previous = d.docs[0] ?? null;
@@ -524,7 +534,7 @@ export async function getAutoJourneyTargets(
   if (!next) {
     fillTasks.push(
       fetchCMS<PayloadListResponse<Blog>>(
-        `/api/blogs?${filter}${notSelf}&where[publishedAt][greater_than]=${anchor}&depth=1&limit=1&sort=publishedAt`,
+        `/api/blogs?${filter}${notSelf}&where[publishedAt][greater_than]=${anchor}&depth=1&${JOURNEY_SELECT}&limit=1&sort=publishedAt`,
         { draft },
       ).then((d) => {
         next = d.docs[0] ?? null;

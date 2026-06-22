@@ -62,6 +62,26 @@ export type NewsListResponse = PayloadListResponse<News>;
 const PUBLISHED_FILTER =
   "where[_status][equals]=published&where[publicationDate][exists]=true";
 
+// Fields the NewsroomCard renders — single source shared by the listing
+// (getNews) and the related queries (getRelatedNews). Excludes the Lexical
+// `body` so related/list responses stay under Next's 2 MB Data-Cache ceiling.
+const NEWS_CARD_FIELDS = [
+  "title",
+  "slug",
+  "abstract",
+  "heroImage",
+  "publicationDate",
+  "updatedAt",
+  "newsCategories",
+  "publisher",
+  "publisherLogo",
+  "region",
+  "seo",
+] as const;
+const NEWS_CARD_SELECT = NEWS_CARD_FIELDS.map(
+  (f) => `select[${f}]=true`,
+).join("&");
+
 /** All published news slugs, for `generateStaticParams` (scalar-only query). */
 export async function getNewsSlugs(): Promise<string[]> {
   const res = await fetchCMS<PayloadListResponse<{ slug: string }>>(
@@ -108,19 +128,7 @@ export async function getNews({
     page: String(page),
     sort: "-publicationDate",
   });
-  for (const field of [
-    "title",
-    "slug",
-    "abstract",
-    "heroImage",
-    "publicationDate",
-    "updatedAt",
-    "newsCategories",
-    "publisher",
-    "publisherLogo",
-    "region",
-    "seo",
-  ]) {
+  for (const field of NEWS_CARD_FIELDS) {
     params.set(`select[${field}]`, "true");
   }
   if (category) {
@@ -173,7 +181,7 @@ export async function getRelatedNews(
   const filter = draft ? "" : `${PUBLISHED_FILTER}&`;
   if (categoryIds.length === 0) {
     const data = await fetchCMS<PayloadListResponse<News>>(
-      `/api/news?${filter}where[id][not_equals]=${newsId}&depth=1&limit=${limit}&sort=-publicationDate`,
+      `/api/news?${filter}where[id][not_equals]=${newsId}&depth=1&${NEWS_CARD_SELECT}&limit=${limit}&sort=-publicationDate`,
       { draft },
     );
     return data.docs;
@@ -182,12 +190,12 @@ export async function getRelatedNews(
     .map((id, i) => `where[newsCategories][in][${i}]=${encodeURIComponent(id)}`)
     .join("&");
   const data = await fetchCMS<PayloadListResponse<News>>(
-    `/api/news?${filter}where[id][not_equals]=${newsId}&${catParam}&depth=1&limit=${limit}&sort=-publicationDate`,
+    `/api/news?${filter}where[id][not_equals]=${newsId}&${catParam}&depth=1&${NEWS_CARD_SELECT}&limit=${limit}&sort=-publicationDate`,
     { draft },
   );
   if (data.docs.length < limit) {
     const fallback = await fetchCMS<PayloadListResponse<News>>(
-      `/api/news?${filter}where[id][not_equals]=${newsId}&depth=1&limit=${limit}&sort=-publicationDate`,
+      `/api/news?${filter}where[id][not_equals]=${newsId}&depth=1&${NEWS_CARD_SELECT}&limit=${limit}&sort=-publicationDate`,
       { draft },
     );
     return fallback.docs;
