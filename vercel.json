@@ -3,5 +3,5 @@
   "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "pnpm --filter @cleanstart/web build",
   "outputDirectory": "apps/web/.next",
-  "ignoreCommand": "npx turbo-ignore @cleanstart/web"
+  "ignoreCommand": "if [ \"$VERCEL_ENV\" = \"production\" ]; then npx turbo-ignore @cleanstart/web; else exit 0; fi"
 }
