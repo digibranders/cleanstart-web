@@ -11,6 +11,14 @@ export const isAdmin: Access = ({ req: { user } }) => hasRole(user, 'admin');
 
 export const isAdminFieldLevel: FieldAccess = ({ req: { user } }) => hasRole(user, 'admin');
 
+/**
+ * Field-level read for any authenticated principal — including the role-less
+ * `preview-bot` API-key user the web build/ISR uses. Lets the authenticated
+ * server-side fetch receive `seo.additionalSchema` (so editor schema overrides
+ * compose into the live page) while anonymous public reads never see it.
+ */
+export const isAuthenticatedFieldLevel: FieldAccess = ({ req: { user } }) => Boolean(user);
+
 export const isAdminOrEditor: Access = ({ req: { user } }) =>
   hasAnyRole(user, ['admin', 'editor']);
 

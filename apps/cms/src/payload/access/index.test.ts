@@ -7,6 +7,7 @@ import {
   isAdminOrEditor,
   isAdminOrSelf,
   isAuthenticated,
+  isAuthenticatedFieldLevel,
   publishedOrAuthenticated,
 } from './index';
 
@@ -41,6 +42,16 @@ describe('isAdminFieldLevel', () => {
     expect(callFieldAccess(isAdminFieldLevel, admin)).toBe(true);
     expect(callFieldAccess(isAdminFieldLevel, editor)).toBe(false);
     expect(callFieldAccess(isAdminFieldLevel, null)).toBe(false);
+  });
+});
+
+describe('isAuthenticatedFieldLevel', () => {
+  it('grants read to any authenticated user incl. the role-less preview-bot, denies anonymous', () => {
+    expect(callFieldAccess(isAuthenticatedFieldLevel, admin)).toBe(true);
+    expect(callFieldAccess(isAuthenticatedFieldLevel, editor)).toBe(true);
+    expect(callFieldAccess(isAuthenticatedFieldLevel, { id: 9, roles: [] })).toBe(true);
+    expect(callFieldAccess(isAuthenticatedFieldLevel, null)).toBe(false);
+    expect(callFieldAccess(isAuthenticatedFieldLevel, undefined)).toBe(false);
   });
 });
 
