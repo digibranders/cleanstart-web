@@ -1,6 +1,7 @@
 import type { Field, GroupField, JSONFieldValidation } from 'payload';
 
 import { isAdminOrSeoFieldLevel } from '../access';
+import { schemaHistoryFieldHook } from '../hooks/record-schema-history';
 import { validateCanonicalOverride } from '../lib/canonical';
 import {
   validateOverrideForField,
@@ -406,6 +407,27 @@ const additionalSchemaField: Field = {
   }) as JSONFieldValidation,
 };
 
+/**
+ * Per-@type override history (a sibling of `additionalSchema` in the seo
+ * group). System-managed by `schemaHistoryFieldHook`: each save diffs the
+ * override and appends added/changed/removed entries with timestamp + editor.
+ * Read is restricted (carries editor emails); never editable in the form.
+ * Rendered read-only by the `seoSchemaHistory` sidebar card (SchemaHistory).
+ */
+const schemaHistoryField: Field = {
+  name: 'schemaHistory',
+  type: 'json',
+  access: {
+    read: ({ req: { user } }) => Boolean(user),
+    update: () => false,
+    create: () => false,
+  },
+  admin: { hidden: true },
+  hooks: {
+    beforeChange: [schemaHistoryFieldHook],
+  },
+};
+
 // Optional primary topic the editor is writing for. Drives the
 // `KeywordsField` sidebar density readout. Free-text — we don't
 // validate against an external keyword tool. Hidden from the in-form
@@ -498,6 +520,7 @@ const seoField: GroupField = {
     keywordsField,
     speakablePathField,
     additionalSchemaField,
+    schemaHistoryField,
   ],
 };
 
@@ -548,6 +571,27 @@ export const seoFieldsForSidebar = (storageKey: string): Field[] => [
   seoFieldHidden,
   seoAdvancedSidebarField({ storageKey }),
 ];
+
+/**
+ * List-view rich-result health badge column. A `ui` field whose Cell lints the
+ * doc's server-composed JSON-LD (/api/jsonld/<collection>/<id>). Add to a
+ * content collection's `fields` and include `'schemaHealth'` in
+ * `admin.defaultColumns`. `collectionSlug` is passed so the Cell can query the
+ * right endpoint from the list (no document context there).
+ */
+export const schemaHealthListField = (collectionSlug: string): Field => ({
+  name: 'schemaHealth',
+  type: 'ui',
+  label: 'Schema',
+  admin: {
+    components: {
+      Cell: {
+        path: '@/payload/admin/components/SchemaManager/SchemaHealthListCell.tsx#SchemaHealthListCell',
+        clientProps: { collectionSlug },
+      },
+    },
+  },
+});
 
 /**
  * Returns the sidebar UI fields a content collection should splice
@@ -656,6 +700,21 @@ export const seoSidebarFields = (args: {
           Field: {
             path: '@/payload/admin/components/SchemaPreviewField.tsx#SchemaPreviewField',
             clientProps: { pathPrefix, sourceField: urlSource },
+          },
+        },
+      },
+    },
+    {
+      // Per-@type override version history (collapsed), reading the seo group's
+      // schemaHistory maintained by schemaHistoryFieldHook.
+      name: 'seoSchemaHistory',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: {
+            path: '@/payload/admin/components/SchemaManager/SchemaHistory.tsx#SchemaHistory',
+            clientProps: { path: 'seo.schemaHistory' },
           },
         },
       },

@@ -6,7 +6,7 @@ import { ROUTE_PREFIX } from '../lib/route-prefixes';
 import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
-import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
+import { schemaHealthListField, seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { eventStatusTimestampsHook } from '../hooks/event-status-timestamps';
@@ -30,7 +30,7 @@ export const Events: CollectionConfig = {
   labels: { singular: 'Event', plural: 'Events' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'venue', 'startsAt', 'registrationMode', '_status', 'updatedAt'],
+    defaultColumns: ['title', 'venue', 'startsAt', 'registrationMode', 'schemaHealth', '_status', 'updatedAt'],
     group: 'Content',
     components: {
       edit: docStatusBarEditConfig({ showStats: false, showPublishedAt: true }),
@@ -317,6 +317,7 @@ export const Events: CollectionConfig = {
     publishedAtField,
     ...seoSidebarFields({ pathPrefix: ROUTE_PREFIX.events, descriptionSource: 'abstract' }),
     ...seoFieldsForSidebar('events'),
+    schemaHealthListField('events'),
   ],
   hooks: {
     beforeChange: [normalizeLexicalHook(), firstPublishHook(), eventStatusTimestampsHook],

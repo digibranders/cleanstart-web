@@ -6,7 +6,7 @@ import { pageBuilderBlocks } from '../blocks';
 import { displayPublishedAtField } from '../fields/display-published-at';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
-import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
+import { schemaHealthListField, seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
@@ -35,7 +35,7 @@ export const Pages: CollectionConfig = {
   labels: { singular: 'Page', plural: 'Pages' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'path', 'parent', '_status', 'publishedAt', 'updatedAt'],
+    defaultColumns: ['title', 'path', 'parent', 'schemaHealth', '_status', 'publishedAt', 'updatedAt'],
     group: 'Content',
     components: {
       edit: docStatusBarEditConfig({ showStats: false, showPublishedAt: true }),
@@ -194,6 +194,7 @@ export const Pages: CollectionConfig = {
     displayPublishedAtField,
     ...seoSidebarFields({ pathPrefix: '', descriptionSource: 'abstract', urlSource: 'path' }),
     ...seoFieldsForSidebar('pages'),
+    schemaHealthListField('pages'),
   ],
   hooks: {
     beforeChange: [firstPublishHook(), displayPublishedAtBackfillHook, pagesPathBuilderHook],

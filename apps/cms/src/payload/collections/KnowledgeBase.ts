@@ -6,7 +6,7 @@ import { mediaUploadField } from '../fields/media-upload';
 import { displayPublishedAtField } from '../fields/display-published-at';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
-import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
+import { schemaHealthListField, seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { bodyStatsHook } from '../hooks/body-stats';
@@ -34,7 +34,7 @@ export const KnowledgeBase: CollectionConfig = {
   labels: { singular: 'Knowledge article', plural: 'Knowledge Hub' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'category', '_status', 'lastReviewedAt', 'updatedAt'],
+    defaultColumns: ['title', 'category', 'schemaHealth', '_status', 'lastReviewedAt', 'updatedAt'],
     group: 'Content',
     description:
       'Technical knowledge-base articles surfaced under /knowledge-hub. Each article gets its own indexable URL — replaces the single-page Webflow KB.',
@@ -215,6 +215,7 @@ export const KnowledgeBase: CollectionConfig = {
       ],
     },
     ...seoFieldsForSidebar('knowledgeBase'),
+    schemaHealthListField('knowledgeBase'),
   ],
   hooks: {
     beforeChange: [

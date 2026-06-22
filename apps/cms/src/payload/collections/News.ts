@@ -6,7 +6,7 @@ import { ROUTE_PREFIX } from '../lib/route-prefixes';
 import { mediaUploadField } from '../fields/media-upload';
 import { schemaAddonsField } from '../fields/schema-addons';
 import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
-import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
+import { schemaHealthListField, seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { bodyStatsHook } from '../hooks/body-stats';
@@ -30,7 +30,7 @@ export const News: CollectionConfig = {
   labels: { singular: 'News article', plural: 'News' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'newsCategories', 'publicationDate', '_status', 'updatedAt'],
+    defaultColumns: ['title', 'newsCategories', 'publicationDate', 'schemaHealth', '_status', 'updatedAt'],
     group: 'Content',
     components: {
       edit: docStatusBarEditConfig({ showStats: true, showPublishedAt: false }),
@@ -192,6 +192,7 @@ export const News: CollectionConfig = {
       admin: { readOnly: true, hidden: true },
     },
     ...seoFieldsForSidebar('news'),
+    schemaHealthListField('news'),
     {
       // Editorial flag mirroring Blogs. When set, the news item is shown in
       // the listing hero's featured card; the web loader falls back to the

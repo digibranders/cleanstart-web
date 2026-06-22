@@ -31,14 +31,20 @@ const summaryStyle = {
   fontWeight: 600,
 } as const;
 
+interface SchemaHistoryProps {
+  /** Field path to read history from. Defaults to the pageRegistry top-level
+   * `schemaHistory`; content collections pass `seo.schemaHistory`. */
+  path?: string;
+}
+
 /**
  * Right-rail per-@type override history (collapsed). Reads the row's
- * schemaHistory (maintained by recordSchemaHistoryHook) and groups it by
- * Schema.org @type → a timeline of added/changed/removed with timestamp,
- * editor, and the block JSON at that point. Read-only.
+ * schemaHistory (maintained by the history hook) and groups it by Schema.org
+ * @type → a timeline of added/changed/removed with timestamp, editor, and the
+ * block JSON at that point. Read-only.
  */
-export const SchemaHistory = (): ReactElement => {
-  const { value } = useField<SchemaHistoryEntry[]>({ path: 'schemaHistory' });
+export const SchemaHistory = ({ path = 'schemaHistory' }: SchemaHistoryProps = {}): ReactElement => {
+  const { value } = useField<SchemaHistoryEntry[]>({ path });
   const history = Array.isArray(value) ? value : [];
   const groups = groupHistoryByType(history);
 

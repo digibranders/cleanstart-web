@@ -7,7 +7,7 @@ import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
 import { displayPublishedAtField } from '../fields/display-published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
-import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
+import { schemaHealthListField, seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { bodyStatsHook } from '../hooks/body-stats';
@@ -35,7 +35,7 @@ export const Blogs: CollectionConfig = {
   labels: { singular: 'Blog post', plural: 'Blogs' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'authors', 'categories', '_status', 'publishedAt', 'updatedAt'],
+    defaultColumns: ['title', 'authors', 'categories', 'schemaHealth', '_status', 'publishedAt', 'updatedAt'],
     group: 'Content',
     components: {
       edit: docStatusBarEditConfig({ showStats: true, showPublishedAt: true }),
@@ -267,6 +267,7 @@ export const Blogs: CollectionConfig = {
       ],
     },
     ...seoFieldsForSidebar('blogs'),
+    schemaHealthListField('blogs'),
     {
       // Editorial flags — separated from the SEO band by a divider
       // styled in `_sidebar-seo.scss`. Payload's sidebar render places

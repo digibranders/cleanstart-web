@@ -11,7 +11,7 @@ import { mediaUploadField } from '../fields/media-upload';
 import { displayPublishedAtField } from '../fields/display-published-at';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
-import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
+import { schemaHealthListField, seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
@@ -36,7 +36,7 @@ export const Resources: CollectionConfig = {
   labels: { singular: 'Resource', plural: 'Resources' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'type', 'gated', 'accessLevel', '_status', 'updatedAt'],
+    defaultColumns: ['title', 'type', 'gated', 'accessLevel', 'schemaHealth', '_status', 'updatedAt'],
     group: 'Content',
     components: {
       edit: docStatusBarEditConfig({ showStats: false, showPublishedAt: true }),
@@ -161,6 +161,7 @@ export const Resources: CollectionConfig = {
       },
     },
     ...seoFieldsForSidebar('resources'),
+    schemaHealthListField('resources'),
   ],
   hooks: {
     beforeChange: [normalizeLexicalHook(), firstPublishHook(), displayPublishedAtBackfillHook],

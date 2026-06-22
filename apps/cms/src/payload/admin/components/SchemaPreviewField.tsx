@@ -122,6 +122,29 @@ const overrideBlobsOf = (value: unknown): Record<string, unknown>[] => {
   return [value as Record<string, unknown>];
 };
 
+/** Download the composed @graph as a .json-ld or .txt file. */
+const downloadGraph = (
+  blobs: readonly Record<string, unknown>[],
+  publicUrl: string,
+  format: 'json' | 'txt',
+): void => {
+  if (typeof document === 'undefined' || blobs.length === 0) return;
+  const graph = { '@context': 'https://schema.org', '@graph': blobs };
+  const content = JSON.stringify(graph, null, 2);
+  const slug = publicUrl.split('/').filter(Boolean).pop() ?? 'schema';
+  const blob = new Blob([content], {
+    type: format === 'json' ? 'application/ld+json' : 'text/plain',
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `schema-${slug}.${format === 'json' ? 'jsonld' : 'txt'}`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+};
+
 export const SchemaPreviewField = (
   props: SchemaPreviewFieldProps,
 ): ReactElement => {
@@ -543,6 +566,34 @@ const SchemaBodyContent = (props: {
         >
           {copied ? 'Copied!' : 'Copy JSON-LD'}
         </button>
+        <details className="cs-schema-preview__export">
+          <summary className="cs-schema-preview__btn" style={{ listStyle: 'none', cursor: 'pointer' }}>
+            Export ▾
+          </summary>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.25rem',
+              marginTop: '0.35rem',
+            }}
+          >
+            <button
+              type="button"
+              className="cs-schema-preview__btn"
+              onClick={() => downloadGraph(fetchState.blobs, publicUrl, 'json')}
+            >
+              Download .jsonld
+            </button>
+            <button
+              type="button"
+              className="cs-schema-preview__btn"
+              onClick={() => downloadGraph(fetchState.blobs, publicUrl, 'txt')}
+            >
+              Download .txt
+            </button>
+          </div>
+        </details>
         {richResultsUrl && publicUrl && (
           <a
             href={richResultsUrl}

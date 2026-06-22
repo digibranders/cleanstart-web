@@ -375,6 +375,10 @@
     },
     {
       "type": "ui",
+      "name": "seoSchemaHistory"
+    },
+    {
+      "type": "ui",
       "name": "keywords"
     },
     {
@@ -602,12 +606,20 @@
         {
           "type": "json",
           "name": "additionalSchema"
+        },
+        {
+          "type": "json",
+          "name": "schemaHistory"
         }
       ]
     },
     {
       "type": "ui",
       "name": "seoAdvanced"
+    },
+    {
+      "type": "ui",
+      "name": "schemaHealth"
     },
     {
       "type": "checkbox",

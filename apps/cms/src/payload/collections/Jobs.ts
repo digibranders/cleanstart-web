@@ -7,7 +7,7 @@ import { mediaUploadField } from '../fields/media-upload';
 import { displayPublishedAtField } from '../fields/display-published-at';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
-import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
+import { schemaHealthListField, seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
@@ -52,7 +52,7 @@ export const Jobs: CollectionConfig = {
   labels: { singular: 'Job', plural: 'Jobs' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'department', 'employmentType', 'hiringStatus', '_status', 'updatedAt'],
+    defaultColumns: ['title', 'department', 'employmentType', 'hiringStatus', 'schemaHealth', '_status', 'updatedAt'],
     group: 'Content',
     components: {
       edit: docStatusBarEditConfig({ showStats: false, showPublishedAt: true }),
@@ -297,6 +297,7 @@ export const Jobs: CollectionConfig = {
     displayPublishedAtField,
     ...seoSidebarFields({ pathPrefix: ROUTE_PREFIX.jobs, descriptionSource: 'abstract' }),
     ...seoFieldsForSidebar('jobs'),
+    schemaHealthListField('jobs'),
   ],
   hooks: {
     beforeChange: [normalizeLexicalHook(), firstPublishHook(), displayPublishedAtBackfillHook, stampClosedAtHook],
