@@ -14,6 +14,7 @@ import { Authors } from './payload/collections/Authors';
 import { Blogs } from './payload/collections/Blogs';
 import { BrokenLinks } from './payload/collections/BrokenLinks';
 import { CaseStudies } from './payload/collections/CaseStudies';
+import { PageRegistry } from './payload/collections/PageRegistry';
 import { Categories } from './payload/collections/Categories';
 import { Events } from './payload/collections/Events';
 import { Forms } from './payload/collections/Forms';
@@ -361,6 +362,7 @@ export default buildConfig({
     // array but renders in this same group.
     Redirects,
     BrokenLinks,
+    PageRegistry,
 
     // Recruiting — Applications are the primary object; Resumes are the
     // attachment on them.

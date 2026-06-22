@@ -91,6 +91,7 @@ export interface Config {
     'partner-applications': PartnerApplication;
     redirects: Redirect;
     brokenLinks: BrokenLink;
+    pageRegistry: PageRegistry;
     'career-applications': CareerApplication;
     resumes: Resume;
     users: User;
@@ -137,6 +138,7 @@ export interface Config {
     'partner-applications': PartnerApplicationsSelect<false> | PartnerApplicationsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     brokenLinks: BrokenLinksSelect<false> | BrokenLinksSelect<true>;
+    pageRegistry: PageRegistrySelect<false> | PageRegistrySelect<true>;
     'career-applications': CareerApplicationsSelect<false> | CareerApplicationsSelect<true>;
     resumes: ResumesSelect<false> | ResumesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -641,7 +643,6 @@ export interface Media {
    * Photographer / source attribution.
    */
   credit?: string | null;
-  prefix?: string | null;
   /**
    * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
    */
@@ -649,6 +650,7 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -4718,6 +4720,7 @@ export interface CareerApplication {
  */
 export interface Resume {
   id: number;
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -6860,6 +6863,49 @@ export interface BrokenLink {
   createdAt: string;
 }
 /**
+ * Every website route, including static pages. Add a Schema.org override here to compose it into that page’s JSON-LD at build time.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pageRegistry".
+ */
+export interface PageRegistry {
+  id: number;
+  /**
+   * Site-relative route, e.g. /pricing or /blogs. One row per route.
+   */
+  path: string;
+  /**
+   * Human label shown in the Schema Manager list.
+   */
+  title: string;
+  /**
+   * static = hardcoded page; cms-listing = a collection’s index page; cms-template = drill into the collection’s documents.
+   */
+  kind: 'static' | 'cms-listing' | 'cms-template';
+  /**
+   * For cms-listing / cms-template: the collection slug this route renders.
+   */
+  backingCollection?: string | null;
+  /**
+   * Raw Schema.org JSON-LD for this page (single object or array of objects, each with @context + an allow-listed @type). Validated and capped at 16 KB; composed per-@type into the page’s @graph at build time.
+   */
+  additionalSchema?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Optional internal notes (not rendered).
+   */
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
@@ -7598,6 +7644,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'brokenLinks';
         value: number | BrokenLink;
+      } | null)
+    | ({
+        relationTo: 'pageRegistry';
+        value: number | PageRegistry;
       } | null)
     | ({
         relationTo: 'career-applications';
@@ -9207,13 +9257,13 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   credit?: T;
-  prefix?: T;
   focalPoint?:
     | T
     | {
         x?: T;
         y?: T;
       };
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -10657,6 +10707,20 @@ export interface BrokenLinksSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pageRegistry_select".
+ */
+export interface PageRegistrySelect<T extends boolean = true> {
+  path?: T;
+  title?: T;
+  kind?: T;
+  backingCollection?: T;
+  additionalSchema?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "career-applications_select".
  */
 export interface CareerApplicationsSelect<T extends boolean = true> {
@@ -10697,6 +10761,7 @@ export interface CareerApplicationsSelect<T extends boolean = true> {
  * via the `definition` "resumes_select".
  */
 export interface ResumesSelect<T extends boolean = true> {
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
