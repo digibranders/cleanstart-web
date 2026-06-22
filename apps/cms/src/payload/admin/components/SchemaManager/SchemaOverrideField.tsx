@@ -5,11 +5,7 @@ import type { ChangeEvent, ReactElement } from 'react';
 import { useCallback, useId, useMemo, useState } from 'react';
 
 import { parseUploadedSchema } from '../../../lib/jsonld/override-from-file';
-import {
-  ALLOWED_OVERRIDE_TYPES,
-  buildIngestPlan,
-  type IngestPlanItem,
-} from '../../../lib/jsonld/override-validator';
+import { buildIngestPlan, type IngestPlanItem } from '../../../lib/jsonld/override-validator';
 import { auditBlob } from '../../../lib/jsonld/spec/required-fields';
 import { DEFAULT_SITE_URL } from '../_site-url';
 
@@ -59,7 +55,6 @@ export const SchemaOverrideField = ({ path }: SchemaOverrideFieldProps): ReactEl
   const [syntaxError, setSyntaxError] = useState<string | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [report, setReport] = useState<BlockReport[] | null>(null);
-  const [showAllowed, setShowAllowed] = useState(false);
 
   const liveTypes = useMemo(() => typesOf(value), [value]);
 
@@ -149,18 +144,6 @@ export const SchemaOverrideField = ({ path }: SchemaOverrideFieldProps): ReactEl
           </span>
         ) : null}
       </div>
-
-      <details open={showAllowed} onToggle={(e) => setShowAllowed((e.target as HTMLDetailsElement).open)}>
-        <summary style={{ cursor: 'pointer', fontSize: '0.8em', color: '#9ab' }}>
-          Allowed @types ({ALLOWED_OVERRIDE_TYPES.length})
-        </summary>
-        <p style={{ fontSize: '0.78em', color: '#888', margin: '0.4rem 0 0' }}>
-          {ALLOWED_OVERRIDE_TYPES.join(', ')}.
-          <br />
-          Organization, WebSite & BreadcrumbList are emitted site-wide (edit those in SEO Defaults),
-          so they can’t be overridden per page.
-        </p>
-      </details>
 
       <textarea
         id={inputId}

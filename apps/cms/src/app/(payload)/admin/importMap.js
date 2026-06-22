@@ -91,6 +91,7 @@ import { DsarActionsPanel as DsarActionsPanel_270b8398021fd191ac147b0b8d59049c }
 import { FlaggedLeadsTab as FlaggedLeadsTab_e23fb65ad956ac1ee9fd221fde0635a2 } from '@/payload/admin/components/FlaggedLeadsTab.tsx'
 import { PartnersExportButton as PartnersExportButton_bdb98055df2d18c5a1146f8080480dbe } from '@/payload/admin/components/PartnersExportButton.tsx'
 import { RedirectStalenessField as RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d } from '@/payload/admin/components/RedirectStalenessField.tsx'
+import { SchemaSidebarInfo as SchemaSidebarInfo_96468a0c8dfd7d485ad501c3f3cb5169 } from '../../../payload/admin/components/SchemaManager/SchemaSidebarInfo.tsx'
 import { CurrentSchemaView as CurrentSchemaView_eb2b5a26ddc5c1c2f69a2c0c3dd840f2 } from '../../../payload/admin/components/SchemaManager/CurrentSchemaView.tsx'
 import { SchemaOverrideField as SchemaOverrideField_c716f5511ac92ab6778c63b963e35525 } from '../../../payload/admin/components/SchemaManager/SchemaOverrideField.tsx'
 import { DisableUserAction as DisableUserAction_6c8d4d4a3960948e585eb302bcb89460 } from '@/payload/admin/components/DisableUserAction.tsx'
@@ -231,6 +232,7 @@ export const importMap = {
   "@/payload/admin/components/FlaggedLeadsTab.tsx#FlaggedLeadsTab": FlaggedLeadsTab_e23fb65ad956ac1ee9fd221fde0635a2,
   "@/payload/admin/components/PartnersExportButton.tsx#PartnersExportButton": PartnersExportButton_bdb98055df2d18c5a1146f8080480dbe,
   "@/payload/admin/components/RedirectStalenessField.tsx#RedirectStalenessField": RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d,
+  "./payload/admin/components/SchemaManager/SchemaSidebarInfo.tsx#SchemaSidebarInfo": SchemaSidebarInfo_96468a0c8dfd7d485ad501c3f3cb5169,
   "./payload/admin/components/SchemaManager/CurrentSchemaView.tsx#CurrentSchemaView": CurrentSchemaView_eb2b5a26ddc5c1c2f69a2c0c3dd840f2,
   "./payload/admin/components/SchemaManager/SchemaOverrideField.tsx#SchemaOverrideField": SchemaOverrideField_c716f5511ac92ab6778c63b963e35525,
   "@/payload/admin/components/DisableUserAction.tsx#DisableUserAction": DisableUserAction_6c8d4d4a3960948e585eb302bcb89460,

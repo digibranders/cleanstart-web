@@ -120,10 +120,23 @@ export const PageRegistry: CollectionConfig = {
       },
     },
     {
-      // Read-only viewer of the page's CURRENT live JSON-LD, block-wise.
+      // Right-rail reference: allow/block lists + override dates (collapsed).
+      name: 'schemaSidebarInfo',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field:
+            './payload/admin/components/SchemaManager/SchemaSidebarInfo.tsx#SchemaSidebarInfo',
+        },
+      },
+    },
+    {
+      // Right-rail read-only viewer of the page's CURRENT live JSON-LD, block-wise.
       name: 'currentSchemaView',
       type: 'ui',
       admin: {
+        position: 'sidebar',
         components: {
           Field:
             './payload/admin/components/SchemaManager/CurrentSchemaView.tsx#CurrentSchemaView',

@@ -2,7 +2,7 @@
 
 import { useField } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 interface LiveBlock {
   type: string;
@@ -71,17 +71,20 @@ export const CurrentSchemaView = (): ReactElement => {
     }
   }, [path]);
 
-  useEffect(() => {
-    void load();
-  }, [load]);
-
   const data = state.data;
   const blocks = data?.blocks ?? [];
 
   return (
-    <div className="field-type" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', flexWrap: 'wrap' }}>
-        <span style={{ fontWeight: 600 }}>Current schema on the live page</span>
+    <details
+      className="field-type"
+      onToggle={(e) => {
+        if ((e.currentTarget as HTMLDetailsElement).open && state.status === 'idle') void load();
+      }}
+    >
+      <summary style={{ cursor: 'pointer', fontWeight: 600, fontSize: '0.9em' }}>
+        Current schema on the live page{blocks.length ? ` (${blocks.length})` : ''}
+      </summary>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
         <button
           type="button"
           onClick={() => void load()}
@@ -139,10 +142,10 @@ export const CurrentSchemaView = (): ReactElement => {
           ))}
         </div>
       )}
-      <p style={{ fontSize: '0.74em', color: '#777', margin: 0 }}>
+      <p style={{ fontSize: '0.74em', color: '#777', margin: '0.5rem 0 0' }}>
         Read-only view of what this page actually emits. “auto” blocks are derived in the site code;
-        to change a page’s schema, add or edit an override below (composed per-@type at build time).
+        to change a page’s schema, add or edit an override (composed per-@type at build time).
       </p>
-    </div>
+    </details>
   );
 };
