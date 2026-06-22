@@ -310,6 +310,28 @@ importers:
 
   packages/config: {}
 
+  packages/schema:
+    dependencies:
+      zod:
+        specifier: ^3.24.1
+        version: 3.25.76
+    devDependencies:
+      '@cleanstart/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.2.14
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@types/node@22.19.17)(happy-dom@20.9.0)(jsdom@28.1.0(@noble/hashes@1.8.0))(lightningcss@1.32.0)(msw@2.14.5(@types/node@22.19.17)(typescript@5.9.3))(sass@1.77.4)(terser@5.46.2)
+
   packages/types:
     devDependencies:
       '@cleanstart/config':
