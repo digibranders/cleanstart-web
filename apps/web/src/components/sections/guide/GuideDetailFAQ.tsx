@@ -52,37 +52,43 @@ export function GuideDetailFAQ({
                       borderBottom: i < faqs.length - 1 ? "1px solid rgba(17,17,17,0.08)" : "none",
                     }}
                   >
-                    <button
-                      type="button"
-                      id={questionId}
-                      onClick={() => setOpenId(isOpen ? null : id)}
-                      aria-expanded={isOpen}
-                      aria-controls={answerId}
-                      className="group flex w-full items-start justify-between gap-6 text-left cursor-pointer"
-                      style={{ padding: "20px 24px" }}
-                    >
-                      <span
-                        className="flex-1 font-display font-semibold leading-[1.4] tracking-[-0.02em] transition-colors duration-200 group-hover:text-[#3960f9]"
-                        style={{ fontSize: "var(--fs-body)", color: "#111111" }}
+                    {/* APG accordion pattern: heading wraps the trigger so each
+                        question is a real H3 under the section <h2>. Transparent
+                        wrapper (preflight zeroes margin, no direct text), so the
+                        button styling is unchanged. */}
+                    <h3 className="m-0">
+                      <button
+                        type="button"
+                        id={questionId}
+                        onClick={() => setOpenId(isOpen ? null : id)}
+                        aria-expanded={isOpen}
+                        aria-controls={answerId}
+                        className="group flex w-full items-start justify-between gap-6 text-left cursor-pointer"
+                        style={{ padding: "20px 24px" }}
                       >
-                        {item.question}
-                      </span>
-                      <span
-                        aria-hidden
-                        className="relative mt-0.5 flex shrink-0 items-center justify-center"
-                        style={{
-                          width: "24px",
-                          height: "24px",
-                          transition: "transform 300ms cubic-bezier(0.22, 1, 0.36, 1)",
-                          transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
-                        }}
-                      >
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                          <rect x="2" y="7" width="12" height="2" rx="1" fill="#111111" />
-                          <rect x="7" y="2" width="2" height="12" rx="1" fill="#111111" />
-                        </svg>
-                      </span>
-                    </button>
+                        <span
+                          className="flex-1 font-display font-semibold leading-[1.4] tracking-[-0.02em] transition-colors duration-200 group-hover:text-[#3960f9]"
+                          style={{ fontSize: "var(--fs-body)", color: "#111111" }}
+                        >
+                          {item.question}
+                        </span>
+                        <span
+                          aria-hidden
+                          className="relative mt-0.5 flex shrink-0 items-center justify-center"
+                          style={{
+                            width: "24px",
+                            height: "24px",
+                            transition: "transform 300ms cubic-bezier(0.22, 1, 0.36, 1)",
+                            transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
+                          }}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <rect x="2" y="7" width="12" height="2" rx="1" fill="#111111" />
+                            <rect x="7" y="2" width="2" height="12" rx="1" fill="#111111" />
+                          </svg>
+                        </span>
+                      </button>
+                    </h3>
 
                     <section
                       id={answerId}

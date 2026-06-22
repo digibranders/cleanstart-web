@@ -79,7 +79,7 @@ export const SchemaSidebarInfo = (): ReactElement => {
         </div>
       </dl>
       <p style={{ fontSize: '0.72em', color: '#777', margin: '0.3rem 0 0' }}>
-        Per-@type edit history needs the audit log (planned).
+        Per-@type edit history is in the “History” panel below.
       </p>
       {richResultsUrl ? (
         <a

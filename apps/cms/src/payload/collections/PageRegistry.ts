@@ -4,6 +4,7 @@ import { isAdmin, isAdminEditorOrSeo, isAdminOrSeoFieldLevel } from '../access';
 import { pageLiveSchemaEndpoint } from '../endpoints/page-live-schema';
 import { filterToMergeable, validatePartialOverride } from '../lib/jsonld/filter-override';
 import { revalidatePageRegistryHook, revalidatePageRegistryDeleteHook } from '../hooks/revalidate-page-registry';
+import { recordSchemaHistoryHook } from '../hooks/record-schema-history';
 
 /**
  * Page Registry — one row per website ROUTE, so every page (including the
@@ -68,6 +69,7 @@ export const PageRegistry: CollectionConfig = {
     delete: isAdmin,
   },
   hooks: {
+    beforeChange: [recordSchemaHistoryHook],
     afterChange: [revalidatePageRegistryHook],
     afterDelete: [revalidatePageRegistryDeleteHook],
   },
@@ -168,6 +170,29 @@ export const PageRegistry: CollectionConfig = {
           Field: './payload/admin/components/SchemaManager/SchemaAllowBlock.tsx#SchemaAllowBlock',
         },
       },
+    },
+    {
+      // Right-rail per-@type version history (collapsed), below allow/block.
+      name: 'schemaHistoryView',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: './payload/admin/components/SchemaManager/SchemaHistory.tsx#SchemaHistory',
+        },
+      },
+    },
+    {
+      // Per-@type override history, maintained by recordSchemaHistoryHook.
+      // Hidden + system-managed; read restricted (carries editor emails).
+      name: 'schemaHistory',
+      type: 'json',
+      access: {
+        read: ({ req: { user } }) => Boolean(user),
+        update: () => false,
+        create: () => false,
+      },
+      admin: { hidden: true },
     },
     {
       name: 'additionalSchema',

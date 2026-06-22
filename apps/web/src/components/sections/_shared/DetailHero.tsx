@@ -28,6 +28,14 @@ interface DetailHeroProps {
   titleMaxWidth?: string;
   showDivider?: boolean;
   meta?: ReactNode;
+  /**
+   * Heading tag for the visible title. Defaults to `"h1"` — the hero is the
+   * page's primary heading on every detail page that renders ONE hero. Pass
+   * `"p"` only when the page supplies its own single `<h1>` elsewhere (e.g.
+   * event detail, which renders a viewport-independent sr-only `<h1>` because it
+   * also has a separate mobile-card title). Styling is identical either way.
+   */
+  as?: "h1" | "p";
 }
 
 export function DetailHero({
@@ -37,6 +45,7 @@ export function DetailHero({
   titleMaxWidth = "860px",
   showDivider = true,
   meta,
+  as: TitleTag = "h1",
 }: DetailHeroProps): React.ReactElement {
   return (
     <section
@@ -79,13 +88,13 @@ export function DetailHero({
 
         <div className="flex justify-center mt-10">
           <HeroReveal y={50} duration={1.0}>
-            <h1
+            <TitleTag
               id={titleId}
               className="font-display font-semibold text-white text-center"
               style={{ ...DETAIL_HERO_TITLE_STYLE, maxWidth: titleMaxWidth }}
             >
               {title}
-            </h1>
+            </TitleTag>
           </HeroReveal>
         </div>
 

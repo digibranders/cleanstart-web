@@ -2,7 +2,7 @@
 
 import { useField } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { composeGraph, type GraphNode, primaryType } from '../../../lib/jsonld/compose';
 
@@ -69,6 +69,19 @@ export const CurrentSchemaView = (): ReactElement => {
   const [copied, setCopied] = useState<number | null>(null);
   const [mode, setMode] = useState<'live' | 'preview'>('live');
   const [exportOpen, setExportOpen] = useState(false);
+  const exportRef = useRef<HTMLDivElement>(null);
+
+  // Close the export dropdown on any click outside it.
+  useEffect(() => {
+    if (!exportOpen) return;
+    const onDown = (e: MouseEvent): void => {
+      if (exportRef.current && !exportRef.current.contains(e.target as Node)) {
+        setExportOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onDown);
+    return () => document.removeEventListener('mousedown', onDown);
+  }, [exportOpen]);
 
   const copyBlock = useCallback(async (index: number, jsonText: string): Promise<void> => {
     try {
@@ -177,23 +190,40 @@ export const CurrentSchemaView = (): ReactElement => {
         >
           {mode === 'live' ? '▶ Preview merged' : '◀ Back to live'}
         </button>
-        <div style={{ position: 'relative' }}>
+        <div ref={exportRef} style={{ position: 'relative' }}>
           <button
             type="button"
             onClick={() => setExportOpen((o) => !o)}
             disabled={blocks.length === 0}
             title="Export this page's composed @graph"
             style={{
-              fontSize: '0.75em',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              fontSize: '0.82em',
               fontWeight: 600,
-              color: blocks.length === 0 ? '#666' : '#0a7',
-              background: 'none',
-              border: 'none',
+              color: blocks.length === 0 ? 'var(--theme-elevation-400, #666)' : 'var(--theme-success-500, #0a7)',
+              background: 'var(--theme-elevation-50, transparent)',
+              border: `1px solid ${blocks.length === 0 ? 'var(--theme-elevation-150, #333)' : 'var(--theme-success-500, #0a7)'}`,
+              borderRadius: 6,
               cursor: blocks.length === 0 ? 'not-allowed' : 'pointer',
-              padding: 0,
+              padding: '0.35rem 0.7rem',
             }}
           >
-            ⬇ Export ▾
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
+              <path d="M8 2.5v8M4.5 7L8 10.5 11.5 7M3 13.5h10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span>Export</span>
+            <svg
+              width="10"
+              height="10"
+              viewBox="0 0 12 12"
+              fill="none"
+              aria-hidden="true"
+              style={{ flexShrink: 0, transition: 'transform 0.15s', transform: exportOpen ? 'rotate(180deg)' : 'none' }}
+            >
+              <path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </button>
           {exportOpen ? (
             <div

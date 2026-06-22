@@ -128,7 +128,8 @@ export const Redirects: CollectionConfig = {
       access: { update: () => false },
       admin: {
         readOnly: true,
-        description: 'Incremented in apps/web middleware on every match.',
+        description:
+          'Incremented via POST /api/redirects/record-hit, called by apps/web middleware on every matched request.',
         position: 'sidebar',
       },
     },
