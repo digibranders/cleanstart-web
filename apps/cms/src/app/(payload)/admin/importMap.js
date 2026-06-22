@@ -93,6 +93,7 @@ import { PartnersExportButton as PartnersExportButton_bdb98055df2d18c5a1146f8080
 import { RedirectStalenessField as RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d } from '@/payload/admin/components/RedirectStalenessField.tsx'
 import { SchemaSidebarInfo as SchemaSidebarInfo_96468a0c8dfd7d485ad501c3f3cb5169 } from '../../../payload/admin/components/SchemaManager/SchemaSidebarInfo.tsx'
 import { CurrentSchemaView as CurrentSchemaView_eb2b5a26ddc5c1c2f69a2c0c3dd840f2 } from '../../../payload/admin/components/SchemaManager/CurrentSchemaView.tsx'
+import { SchemaAllowBlock as SchemaAllowBlock_de867732d64887918e8efa197d346b08 } from '../../../payload/admin/components/SchemaManager/SchemaAllowBlock.tsx'
 import { SchemaOverrideField as SchemaOverrideField_c716f5511ac92ab6778c63b963e35525 } from '../../../payload/admin/components/SchemaManager/SchemaOverrideField.tsx'
 import { DisableUserAction as DisableUserAction_6c8d4d4a3960948e585eb302bcb89460 } from '@/payload/admin/components/DisableUserAction.tsx'
 import { ReassignContentAction as ReassignContentAction_a770f7b61bee7b644dacc1d627c324ca } from '@/payload/admin/components/ReassignContentAction.tsx'
@@ -234,6 +235,7 @@ export const importMap = {
   "@/payload/admin/components/RedirectStalenessField.tsx#RedirectStalenessField": RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d,
   "./payload/admin/components/SchemaManager/SchemaSidebarInfo.tsx#SchemaSidebarInfo": SchemaSidebarInfo_96468a0c8dfd7d485ad501c3f3cb5169,
   "./payload/admin/components/SchemaManager/CurrentSchemaView.tsx#CurrentSchemaView": CurrentSchemaView_eb2b5a26ddc5c1c2f69a2c0c3dd840f2,
+  "./payload/admin/components/SchemaManager/SchemaAllowBlock.tsx#SchemaAllowBlock": SchemaAllowBlock_de867732d64887918e8efa197d346b08,
   "./payload/admin/components/SchemaManager/SchemaOverrideField.tsx#SchemaOverrideField": SchemaOverrideField_c716f5511ac92ab6778c63b963e35525,
   "@/payload/admin/components/DisableUserAction.tsx#DisableUserAction": DisableUserAction_6c8d4d4a3960948e585eb302bcb89460,
   "@/payload/admin/components/ReassignContentAction.tsx#ReassignContentAction": ReassignContentAction_a770f7b61bee7b644dacc1d627c324ca,

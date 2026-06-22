@@ -144,6 +144,17 @@ export const PageRegistry: CollectionConfig = {
       },
     },
     {
+      // Right-rail allow-list + site-wide blocklist (collapsed), below the viewer.
+      name: 'schemaAllowBlock',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: './payload/admin/components/SchemaManager/SchemaAllowBlock.tsx#SchemaAllowBlock',
+        },
+      },
+    },
+    {
       name: 'additionalSchema',
       type: 'json',
       access: {
