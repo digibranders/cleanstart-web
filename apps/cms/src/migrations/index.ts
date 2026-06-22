@@ -33,6 +33,8 @@ import * as migration_20260622_220000_remove_podcast_page_global from './2026062
 
 import * as migration_20260622_230000_add_seo_defaults_organization_fields from './20260622_230000_add_seo_defaults_organization_fields';
 
+import * as migration_20260622_240000_retire_dead_globals_and_fields from './20260622_240000_retire_dead_globals_and_fields';
+
 export const migrations = [
   {
     up: migration_20260602_050520_initial_baseline.up,
@@ -198,5 +200,10 @@ export const migrations = [
     up: migration_20260622_230000_add_seo_defaults_organization_fields.up,
     down: migration_20260622_230000_add_seo_defaults_organization_fields.down,
     name: '20260622_230000_add_seo_defaults_organization_fields',
+  },
+  {
+    up: migration_20260622_240000_retire_dead_globals_and_fields.up,
+    down: migration_20260622_240000_retire_dead_globals_and_fields.down,
+    name: '20260622_240000_retire_dead_globals_and_fields',
   },
 ];

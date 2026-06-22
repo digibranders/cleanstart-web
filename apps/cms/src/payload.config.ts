@@ -91,11 +91,8 @@ import { wireAnalyticsTab } from './payload/lib/wire-analytics-tab';
 import { wireCustomFields } from './payload/lib/wire-custom-fields';
 import { wireCustomListView } from './payload/lib/wire-custom-list-view';
 import { wirePublishGate } from './payload/lib/wire-publish-gate';
-import { Announcements } from './payload/globals/announcements';
-import { FooterNav } from './payload/globals/footerNav';
 import { ImpactStats } from './payload/globals/impactStats';
 import { Legal } from './payload/globals/legal';
-import { MainNav } from './payload/globals/mainNav';
 import { CompanySpotlight } from './payload/globals/companySpotlight';
 import { ResourcesSpotlight } from './payload/globals/resourcesSpotlight';
 import { SeoDefaults } from './payload/globals/seoDefaults';
@@ -385,12 +382,12 @@ export default buildConfig({
     .map(wireCustomListView)
     .map(wireAnalyticsTab)
     .map(wireCustomFields),
-  // Within-group order for the Globals group: settings → nav chrome
-  // (main/footer nav + the two mega-menu spotlights) → announcements →
-  // podcast page → legal. SeoDefaults is grouped under 'SEO' (trails
-  // here; it renders in the SEO group, after the Redirects/BrokenLinks
-  // collections).
-  globals: [SiteSettings, MainNav, FooterNav, ImpactStats, ResourcesSpotlight, CompanySpotlight, Announcements, Legal, SeoDefaults]
+  // Within-group order for the Globals group: settings → mega-menu spotlights →
+  // impact stats → legal. SeoDefaults is grouped under 'SEO' (renders in the SEO
+  // group, after the Redirects/BrokenLinks collections). (mainNav/footerNav/
+  // announcements globals were removed 2026-06-22 — the live site hardcodes
+  // nav/footer and has no banner, so they were dead.)
+  globals: [SiteSettings, ImpactStats, ResourcesSpotlight, CompanySpotlight, Legal, SeoDefaults]
     .map(wireCustomFields),
   endpoints: [
     jsonLdEndpoint,

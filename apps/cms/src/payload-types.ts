@@ -161,24 +161,18 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     siteSettings: SiteSetting;
-    mainNav: MainNav;
-    footerNav: FooterNav;
     impactStats: ImpactStat;
     resourcesSpotlight: ResourcesSpotlight;
     companySpotlight: CompanySpotlight;
-    announcements: Announcement;
     legal: Legal;
     seoDefaults: SeoDefault;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
     siteSettings: SiteSettingsSelect<false> | SiteSettingsSelect<true>;
-    mainNav: MainNavSelect<false> | MainNavSelect<true>;
-    footerNav: FooterNavSelect<false> | FooterNavSelect<true>;
     impactStats: ImpactStatsSelect<false> | ImpactStatsSelect<true>;
     resourcesSpotlight: ResourcesSpotlightSelect<false> | ResourcesSpotlightSelect<true>;
     companySpotlight: CompanySpotlightSelect<false> | CompanySpotlightSelect<true>;
-    announcements: AnnouncementsSelect<false> | AnnouncementsSelect<true>;
     legal: LegalSelect<false> | LegalSelect<true>;
     seoDefaults: SeoDefaultsSelect<false> | SeoDefaultsSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
@@ -651,6 +645,7 @@ export interface Media {
    * Photographer / source attribution.
    */
   credit?: string | null;
+  prefix?: string | null;
   /**
    * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
    */
@@ -658,7 +653,6 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
-  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -4840,7 +4834,6 @@ export interface CareerApplication {
  */
 export interface Resume {
   id: number;
-  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -9412,13 +9405,13 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   credit?: T;
+  prefix?: T;
   focalPoint?:
     | T
     | {
         x?: T;
         y?: T;
       };
-  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -10924,7 +10917,6 @@ export interface CareerApplicationsSelect<T extends boolean = true> {
  * via the `definition` "resumes_select".
  */
 export interface ResumesSelect<T extends boolean = true> {
-  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -11225,191 +11217,6 @@ export interface SiteSetting {
    * IANA timezone identifier (e.g. Asia/Kolkata, America/New_York). Default for events / webinars.
    */
   organizationTimezone?: string | null;
-  listing?: {
-    pageSize?: number | null;
-    /**
-     * Pagination beyond this depth gets noindex. Beyond ~3 pages of a listing, indexed thin pages hurt SEO.
-     */
-    paginationIndexableDepth?: number | null;
-  };
-  toc?: {
-    minHeadings?: number | null;
-    maxDepth?: number | null;
-  };
-  leads?: {
-    /**
-     * Lead-record retention. Auto-purge cron deletes ip / userAgent after this many days.
-     */
-    retentionDays?: number | null;
-  };
-  /**
-   * Public-site analytics IDs. Leave blank to disable. Consent mode delays GTM/GA4 firing until the cookie banner returns "accepted".
-   */
-  analytics?: {
-    /**
-     * Google Tag Manager container, e.g. GTM-XXXXXXX.
-     */
-    gtmContainerId?: string | null;
-    /**
-     * GA4 measurement ID, e.g. G-XXXXXXXXXX.
-     */
-    ga4MeasurementId?: string | null;
-    /**
-     * When on, GA4 / GTM tags fire only after the cookie banner returns "accepted" (Google Consent Mode v2). Required for GDPR compliance.
-     */
-    consentModeEnabled?: boolean | null;
-  };
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "mainNav".
- */
-export interface MainNav {
-  id: number;
-  /**
-   * Top-level navigation items. Drag to reorder.
-   */
-  items?:
-    | {
-        kind: 'internal-doc' | 'external-url' | 'cta';
-        label: string;
-        /**
-         * Stored as a doc ID. URL auto-resolves at render — slug changes propagate without editor action.
-         */
-        target?: (number | null) | Page;
-        /**
-         * External URL. Validated against the allowed link shapes at save.
-         */
-        href?: string | null;
-        targetBlank?: boolean | null;
-        variant?: ('primary' | 'secondary' | 'ghost') | null;
-        /**
-         * Custom analytics event id emitted on click.
-         */
-        trackingId?: string | null;
-        /**
-         * Convert this top-level item into a mega-menu with up to 4 columns. Available only at the top level — mega-menus do not nest.
-         */
-        isMegaMenu?: boolean | null;
-        megaMenu?: {
-          columns?:
-            | {
-                heading: string;
-                items?:
-                  | {
-                      kind: 'internal-doc' | 'external-url' | 'cta';
-                      label: string;
-                      /**
-                       * Stored as a doc ID. URL auto-resolves at render — slug changes propagate without editor action.
-                       */
-                      target?: (number | null) | Page;
-                      /**
-                       * External URL. Validated against the allowed link shapes at save.
-                       */
-                      href?: string | null;
-                      targetBlank?: boolean | null;
-                      variant?: ('primary' | 'secondary' | 'ghost') | null;
-                      /**
-                       * Custom analytics event id emitted on click.
-                       */
-                      trackingId?: string | null;
-                      id?: string | null;
-                    }[]
-                  | null;
-                id?: string | null;
-              }[]
-            | null;
-          /**
-           * Heading shown above the collapsed group on mobile. Defaults to the parent item label when blank.
-           */
-          mobileGroupHint?: string | null;
-          featuredCard?: {
-            kind?: ('internal-doc' | 'external-url') | null;
-            target?: (number | null) | Page;
-            href?: string | null;
-            eyebrow?: string | null;
-            title?: string | null;
-            description?: string | null;
-            image?: (number | null) | Media;
-          };
-        };
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "footerNav".
- */
-export interface FooterNav {
-  id: number;
-  columns?:
-    | {
-        heading: string;
-        items?:
-          | {
-              kind: 'internal-doc' | 'external-url' | 'cta';
-              label: string;
-              /**
-               * Stored as a doc ID. URL auto-resolves at render — slug changes propagate without editor action.
-               */
-              target?: (number | null) | Page;
-              /**
-               * External URL. Validated against the allowed link shapes at save.
-               */
-              href?: string | null;
-              targetBlank?: boolean | null;
-              variant?: ('primary' | 'secondary' | 'ghost') | null;
-              /**
-               * Custom analytics event id emitted on click.
-               */
-              trackingId?: string | null;
-              id?: string | null;
-            }[]
-          | null;
-        id?: string | null;
-      }[]
-    | null;
-  social?:
-    | {
-        platform: 'twitter' | 'linkedin' | 'github' | 'youtube' | 'mastodon' | 'bluesky';
-        url: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Bottom-strip links (Privacy / Terms / AUP / Cookie Settings). Pre-seeded from the legal global on first save.
-   */
-  legalLinks?:
-    | {
-        label: string;
-        target?: (number | null) | Page;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * {year} is replaced at render time so the line never goes stale on Jan 1.
-   */
-  copyright?: string | null;
-  /**
-   * Trust badges (SOC 2, FIPS-validated, ISO 27001) shown above the legal strip.
-   */
-  badges?:
-    | {
-        image: number | Media;
-        alt: string;
-        href?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Optional inline newsletter signup. When set, the picked form replaces the first column.
-   */
-  newsletterSignup?: (number | null) | Form;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -11487,39 +11294,6 @@ export interface CompanySpotlight {
   createdAt?: string | null;
 }
 /**
- * Optional site-wide banner. Surfaces on every page when active and within the date window.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "announcements".
- */
-export interface Announcement {
-  id: number;
-  active?: boolean | null;
-  /**
-   * Banner copy. Keep it short — single line on mobile.
-   */
-  message: string;
-  variant?: ('info' | 'warn' | 'promo') | null;
-  /**
-   * Banner appears no earlier than this. Empty = active immediately when active=true.
-   */
-  startsAt?: string | null;
-  /**
-   * Banner disappears after this. Empty = stays until active is toggled off.
-   */
-  endsAt?: string | null;
-  cta?: {
-    label?: string | null;
-    href?: string | null;
-  };
-  /**
-   * Visitors can dismiss the banner; choice persisted in localStorage.
-   */
-  dismissible?: boolean | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "legal".
  */
@@ -11529,55 +11303,6 @@ export interface Legal {
    * Date or semver tag bumped on each policy change (e.g. 2026-04-15). Snapshotted onto every lead at submit time for GDPR audit defensibility.
    */
   policyVersion: string;
-  privacy?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  terms?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  aup?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * GDPR DSAR / Data Processing Agreement inbox.
-   */
-  dpaContactEmail?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -11856,137 +11581,6 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   baseUrl?: T;
   defaultLocale?: T;
   organizationTimezone?: T;
-  listing?:
-    | T
-    | {
-        pageSize?: T;
-        paginationIndexableDepth?: T;
-      };
-  toc?:
-    | T
-    | {
-        minHeadings?: T;
-        maxDepth?: T;
-      };
-  leads?:
-    | T
-    | {
-        retentionDays?: T;
-      };
-  analytics?:
-    | T
-    | {
-        gtmContainerId?: T;
-        ga4MeasurementId?: T;
-        consentModeEnabled?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "mainNav_select".
- */
-export interface MainNavSelect<T extends boolean = true> {
-  items?:
-    | T
-    | {
-        kind?: T;
-        label?: T;
-        target?: T;
-        href?: T;
-        targetBlank?: T;
-        variant?: T;
-        trackingId?: T;
-        isMegaMenu?: T;
-        megaMenu?:
-          | T
-          | {
-              columns?:
-                | T
-                | {
-                    heading?: T;
-                    items?:
-                      | T
-                      | {
-                          kind?: T;
-                          label?: T;
-                          target?: T;
-                          href?: T;
-                          targetBlank?: T;
-                          variant?: T;
-                          trackingId?: T;
-                          id?: T;
-                        };
-                    id?: T;
-                  };
-              mobileGroupHint?: T;
-              featuredCard?:
-                | T
-                | {
-                    kind?: T;
-                    target?: T;
-                    href?: T;
-                    eyebrow?: T;
-                    title?: T;
-                    description?: T;
-                    image?: T;
-                  };
-            };
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "footerNav_select".
- */
-export interface FooterNavSelect<T extends boolean = true> {
-  columns?:
-    | T
-    | {
-        heading?: T;
-        items?:
-          | T
-          | {
-              kind?: T;
-              label?: T;
-              target?: T;
-              href?: T;
-              targetBlank?: T;
-              variant?: T;
-              trackingId?: T;
-              id?: T;
-            };
-        id?: T;
-      };
-  social?:
-    | T
-    | {
-        platform?: T;
-        url?: T;
-        id?: T;
-      };
-  legalLinks?:
-    | T
-    | {
-        label?: T;
-        target?: T;
-        id?: T;
-      };
-  copyright?: T;
-  badges?:
-    | T
-    | {
-        image?: T;
-        alt?: T;
-        href?: T;
-        id?: T;
-      };
-  newsletterSignup?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -12039,35 +11633,10 @@ export interface CompanySpotlightSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "announcements_select".
- */
-export interface AnnouncementsSelect<T extends boolean = true> {
-  active?: T;
-  message?: T;
-  variant?: T;
-  startsAt?: T;
-  endsAt?: T;
-  cta?:
-    | T
-    | {
-        label?: T;
-        href?: T;
-      };
-  dismissible?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "legal_select".
  */
 export interface LegalSelect<T extends boolean = true> {
   policyVersion?: T;
-  privacy?: T;
-  terms?: T;
-  aup?: T;
-  dpaContactEmail?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
