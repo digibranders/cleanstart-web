@@ -12,7 +12,9 @@ import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
 import { getAuthorBySlug, getAuthorSlugs, getPostsByAuthor } from "@/lib/authors";
 import { mediaUrl } from "@/lib/blog";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema, profilePageSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema, profilePageSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph, seoOverride } from "@/lib/seo/compose-page";
 
 interface AuthorPageProps {
   params: Promise<{ slug: string }>;
@@ -88,23 +90,25 @@ export default async function AuthorPage({
 
   return (
     <>
-      <JsonLd
-        id={`author-breadcrumbs-${author.slug}`}
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Authors", path: "/author" },
-          { name: author.name },
-        ])}
-      />
-      <JsonLd
-        id={`author-profile-${author.slug}`}
-        data={profilePageSchema({
-          name: author.name,
-          slug: author.slug,
-          jobTitle: author.role ?? undefined,
-          imageUrl: photoAbsolute,
-          description: author.bioShort ?? undefined,
-          sameAs: sameAs.length > 0 ? sameAs : undefined,
+      <JsonLdGraph
+        id={`author-jsonld-${author.slug}`}
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "Authors", path: "/author" },
+              { name: author.name },
+            ]),
+            profilePageSchema({
+              name: author.name,
+              slug: author.slug,
+              jobTitle: author.role ?? undefined,
+              imageUrl: photoAbsolute,
+              description: author.bioShort ?? undefined,
+              sameAs: sameAs.length > 0 ? sameAs : undefined,
+            }),
+          ],
+          override: seoOverride(author.seo),
         })}
       />
       <Header />

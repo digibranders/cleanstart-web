@@ -5,11 +5,12 @@ import { buildPageMetadata } from '@/lib/seo/canonical';
 import { resolveCmsSeo } from '@/lib/seo/cms-seo';
 import { ogImageUrl } from '@/lib/seo/og';
 import {
-  JsonLd,
   articleSchema,
   breadcrumbSchema,
   videoObjectSchema,
 } from '@/lib/seo/jsonld';
+import { JsonLdGraph } from '@/components/JsonLdGraph';
+import { buildPageGraph, seoOverride } from '@/lib/seo/compose-page';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
@@ -87,35 +88,36 @@ export default async function KnowledgeHubArticlePage({
 
   return (
     <>
-      <JsonLd
-        id={`kb-breadcrumbs-${article.slug}`}
-        data={breadcrumbSchema(crumbs)}
-      />
-      <JsonLd
-        id={`kb-article-${article.slug}`}
-        data={articleSchema({
-          title: article.title,
-          description: article.abstract ?? undefined,
-          path: `/knowledge-hub/${article.slug}`,
-          publishedAt: article.publishedAt ?? undefined,
-          modifiedAt: article.updatedAt ?? undefined,
-          imageUrl: articleImage,
-          type: article.category?.name,
+      <JsonLdGraph
+        id={`kb-jsonld-${article.slug}`}
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema(crumbs),
+            articleSchema({
+              title: article.title,
+              description: article.abstract ?? undefined,
+              path: `/knowledge-hub/${article.slug}`,
+              publishedAt: article.publishedAt ?? undefined,
+              modifiedAt: article.updatedAt ?? undefined,
+              imageUrl: articleImage,
+              type: article.category?.name,
+            }),
+            ...(article.videoUrl
+              ? [
+                  videoObjectSchema({
+                    name: article.title,
+                    description: article.abstract ?? undefined,
+                    contentUrl: article.videoUrl,
+                    uploadDate: article.publishedAt ?? undefined,
+                    thumbnailUrl: articleImage,
+                    embedPath: `/knowledge-hub/${article.slug}`,
+                  }),
+                ]
+              : []),
+          ],
+          override: seoOverride(article.seo),
         })}
       />
-      {article.videoUrl && (
-        <JsonLd
-          id={`kb-video-${article.slug}`}
-          data={videoObjectSchema({
-            name: article.title,
-            description: article.abstract ?? undefined,
-            contentUrl: article.videoUrl,
-            uploadDate: article.publishedAt ?? undefined,
-            thumbnailUrl: articleImage,
-            embedPath: `/knowledge-hub/${article.slug}`,
-          })}
-        />
-      )}
       <KnowledgeHubArticle article={article} />
     </>
   );

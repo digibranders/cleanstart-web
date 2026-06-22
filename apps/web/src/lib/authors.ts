@@ -2,6 +2,7 @@ import { cache } from "react";
 
 import type { Blog, BlogImage, LexicalRoot } from "./blog";
 import { fetchCMS } from "./cms-fetch";
+import type { CmsSeo } from "./seo/cms-seo";
 
 export type AuthorSocial = {
   twitter?: string;
@@ -48,6 +49,7 @@ export type AuthorDetail = {
   experience?: AuthorExperience[];
   skills?: { skill: string }[];
   awards?: AuthorAward[];
+  seo?: CmsSeo | null;
 };
 
 type PayloadListResponse<T> = {
