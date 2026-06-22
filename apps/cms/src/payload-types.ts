@@ -162,8 +162,7 @@ export interface Config {
   globals: {
     siteSettings: SiteSetting;
     impactStats: ImpactStat;
-    resourcesSpotlight: ResourcesSpotlight;
-    companySpotlight: CompanySpotlight;
+    spotlights: Spotlight;
     legal: Legal;
     seoDefaults: SeoDefault;
     'payload-jobs-stats': PayloadJobsStat;
@@ -171,8 +170,7 @@ export interface Config {
   globalsSelect: {
     siteSettings: SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     impactStats: ImpactStatsSelect<false> | ImpactStatsSelect<true>;
-    resourcesSpotlight: ResourcesSpotlightSelect<false> | ResourcesSpotlightSelect<true>;
-    companySpotlight: CompanySpotlightSelect<false> | CompanySpotlightSelect<true>;
+    spotlights: SpotlightsSelect<false> | SpotlightsSelect<true>;
     legal: LegalSelect<false> | LegalSelect<true>;
     seoDefaults: SeoDefaultsSelect<false> | SeoDefaultsSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
@@ -11248,48 +11246,47 @@ export interface ImpactStat {
   createdAt?: string | null;
 }
 /**
- * Optional spotlight card shown in the Resources mega menu. Falls back to the Bulletin evergreen when no event/webinar is upcoming and this global is empty or expired.
+ * Optional spotlight cards in the Resources and Company mega-menus.
  *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "resourcesSpotlight".
+ * via the `definition` "spotlights".
  */
-export interface ResourcesSpotlight {
+export interface Spotlight {
   id: number;
-  image?: (number | null) | Media;
-  headline: string;
-  sub?: string | null;
-  ctaLabel: string;
   /**
-   * Destination URL or path. Accepts `/site-path` or `https://…`.
+   * Shown in the Resources mega menu. Falls back to the Bulletin evergreen when no event/webinar is upcoming and this is empty or expired.
    */
-  ctaHref: string;
+  resources?: {
+    image?: (number | null) | Media;
+    headline?: string | null;
+    sub?: string | null;
+    ctaLabel?: string | null;
+    /**
+     * Destination URL or path. Accepts `/site-path` or `https://…`.
+     */
+    ctaHref?: string | null;
+    /**
+     * After this date, the card is skipped and the evergreen renders.
+     */
+    expiresAt?: string | null;
+  };
   /**
-   * After this date, the card is skipped and the evergreen renders.
+   * Shown in the Company mega menu when there are no open careers. Falls back to the Talent Network evergreen when empty or expired.
    */
-  expiresAt?: string | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * Optional spotlight card shown in the Company mega menu. Renders only when there are no open careers. Falls back to the Talent Network evergreen when empty or expired.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "companySpotlight".
- */
-export interface CompanySpotlight {
-  id: number;
-  image?: (number | null) | Media;
-  headline: string;
-  sub?: string | null;
-  ctaLabel: string;
-  /**
-   * Destination URL or path. Accepts `/site-path` or `https://…`.
-   */
-  ctaHref: string;
-  /**
-   * After this date, the card is skipped and the evergreen renders.
-   */
-  expiresAt?: string | null;
+  company?: {
+    image?: (number | null) | Media;
+    headline?: string | null;
+    sub?: string | null;
+    ctaLabel?: string | null;
+    /**
+     * Destination URL or path. Accepts `/site-path` or `https://…`.
+     */
+    ctaHref?: string | null;
+    /**
+     * After this date, the card is skipped and the evergreen renders.
+     */
+    expiresAt?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -11603,30 +11600,29 @@ export interface ImpactStatsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "resourcesSpotlight_select".
+ * via the `definition` "spotlights_select".
  */
-export interface ResourcesSpotlightSelect<T extends boolean = true> {
-  image?: T;
-  headline?: T;
-  sub?: T;
-  ctaLabel?: T;
-  ctaHref?: T;
-  expiresAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "companySpotlight_select".
- */
-export interface CompanySpotlightSelect<T extends boolean = true> {
-  image?: T;
-  headline?: T;
-  sub?: T;
-  ctaLabel?: T;
-  ctaHref?: T;
-  expiresAt?: T;
+export interface SpotlightsSelect<T extends boolean = true> {
+  resources?:
+    | T
+    | {
+        image?: T;
+        headline?: T;
+        sub?: T;
+        ctaLabel?: T;
+        ctaHref?: T;
+        expiresAt?: T;
+      };
+  company?:
+    | T
+    | {
+        image?: T;
+        headline?: T;
+        sub?: T;
+        ctaLabel?: T;
+        ctaHref?: T;
+        expiresAt?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

@@ -115,22 +115,29 @@ function resolveGlobal(g: CmsGlobalRaw | null): CmsSpotlightResolved | null {
   return out;
 }
 
-async function fetchResourcesSpotlightGlobal(): Promise<CmsSpotlightResolved | null> {
+type SpotlightsGlobalRaw = {
+  resources?: CmsGlobalRaw | null;
+  company?: CmsGlobalRaw | null;
+};
+
+// Single merged `spotlights` global (resources + company groups). fetchCMS
+// dedupes the two callers to one request.
+async function fetchSpotlightsGlobal(): Promise<SpotlightsGlobalRaw | null> {
   try {
-    const g = await fetchCMS<CmsGlobalRaw>('/api/globals/resourcesSpotlight');
-    return resolveGlobal(g);
+    return await fetchCMS<SpotlightsGlobalRaw>('/api/globals/spotlights');
   } catch {
     return null;
   }
 }
 
+async function fetchResourcesSpotlightGlobal(): Promise<CmsSpotlightResolved | null> {
+  const g = await fetchSpotlightsGlobal();
+  return resolveGlobal(g?.resources ?? null);
+}
+
 async function fetchCompanySpotlightGlobal(): Promise<CmsSpotlightResolved | null> {
-  try {
-    const g = await fetchCMS<CmsGlobalRaw>('/api/globals/companySpotlight');
-    return resolveGlobal(g);
-  } catch {
-    return null;
-  }
+  const g = await fetchSpotlightsGlobal();
+  return resolveGlobal(g?.company ?? null);
 }
 
 export const getResourcesSpotlight = cache(async (): Promise<SpotlightCard> => {

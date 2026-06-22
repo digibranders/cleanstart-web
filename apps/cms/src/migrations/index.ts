@@ -35,6 +35,8 @@ import * as migration_20260622_230000_add_seo_defaults_organization_fields from 
 
 import * as migration_20260622_240000_retire_dead_globals_and_fields from './20260622_240000_retire_dead_globals_and_fields';
 
+import * as migration_20260622_250000_merge_spotlights from './20260622_250000_merge_spotlights';
+
 export const migrations = [
   {
     up: migration_20260602_050520_initial_baseline.up,
@@ -205,5 +207,10 @@ export const migrations = [
     up: migration_20260622_240000_retire_dead_globals_and_fields.up,
     down: migration_20260622_240000_retire_dead_globals_and_fields.down,
     name: '20260622_240000_retire_dead_globals_and_fields',
+  },
+  {
+    up: migration_20260622_250000_merge_spotlights.up,
+    down: migration_20260622_250000_merge_spotlights.down,
+    name: '20260622_250000_merge_spotlights',
   },
 ];

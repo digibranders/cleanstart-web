@@ -93,8 +93,7 @@ import { wireCustomListView } from './payload/lib/wire-custom-list-view';
 import { wirePublishGate } from './payload/lib/wire-publish-gate';
 import { ImpactStats } from './payload/globals/impactStats';
 import { Legal } from './payload/globals/legal';
-import { CompanySpotlight } from './payload/globals/companySpotlight';
-import { ResourcesSpotlight } from './payload/globals/resourcesSpotlight';
+import { Spotlights } from './payload/globals/spotlights';
 import { SeoDefaults } from './payload/globals/seoDefaults';
 import { SiteSettings } from './payload/globals/siteSettings';
 
@@ -387,7 +386,7 @@ export default buildConfig({
   // group, after the Redirects/BrokenLinks collections). (mainNav/footerNav/
   // announcements globals were removed 2026-06-22 — the live site hardcodes
   // nav/footer and has no banner, so they were dead.)
-  globals: [SiteSettings, ImpactStats, ResourcesSpotlight, CompanySpotlight, Legal, SeoDefaults]
+  globals: [SiteSettings, ImpactStats, Spotlights, Legal, SeoDefaults]
     .map(wireCustomFields),
   endpoints: [
     jsonLdEndpoint,
