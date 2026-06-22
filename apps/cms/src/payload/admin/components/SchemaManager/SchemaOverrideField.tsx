@@ -2,38 +2,61 @@
 
 import { useField } from '@payloadcms/ui';
 import type { ChangeEvent, ReactElement } from 'react';
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useCallback, useId, useMemo, useState } from 'react';
 
 import { parseUploadedSchema } from '../../../lib/jsonld/override-from-file';
-import { validateOverrideForCollection } from '../../../lib/jsonld/override-validator';
+import { buildIngestPlan, type IngestPlanItem } from '../../../lib/jsonld/override-validator';
+import { auditBlob } from '../../../lib/jsonld/spec/required-fields';
+import { DEFAULT_SITE_URL } from '../_site-url';
 
 interface SchemaOverrideFieldProps {
   /** Field path injected by Payload (e.g. "additionalSchema"). */
   path: string;
 }
 
+interface BlockReport {
+  item: IngestPlanItem;
+  missingRequired: readonly string[];
+}
+
+const FIX_HINTS: Record<string, string> = {
+  'off-allowlist': 'Use an allowed @type (see the Allowed list in the rail), or remove this block.',
+  'duplicates-auto-emit': 'Remove it — this type is emitted site-wide; edit it in SEO Defaults.',
+  'collection-restricted': 'Not allowed on this page type — remove this block.',
+  'off-domain-id': 'Point @id at this site’s domain, or remove the @id.',
+  'nested-id': 'Remove the nested @id reference (top-level @id is fine).',
+  'oversize': 'Trim the block — it exceeds the 16 KB cap.',
+  'invalid-shape': 'This block isn’t a JSON object — fix its structure.',
+};
+
+const fixHint = (reason: string): string => FIX_HINTS[reason] ?? '';
+
 const stringify = (value: unknown): string =>
   value == null ? '' : JSON.stringify(value, null, 2);
 
-const typesOf = (value: unknown): string[] => {
-  const blobs = Array.isArray(value) ? value : value != null ? [value] : [];
-  const out: string[] = [];
-  for (const blob of blobs) {
-    if (blob != null && typeof blob === 'object') {
-      const t = (blob as { '@type'?: unknown })['@type'];
-      if (typeof t === 'string') out.push(t);
-      else if (Array.isArray(t)) for (const e of t) if (typeof e === 'string') out.push(e);
-    }
-  }
-  return out;
-};
+const toBlobs = (value: unknown): unknown[] =>
+  Array.isArray(value) ? value : value != null ? [value] : [];
+
+const typesOf = (value: unknown): string[] =>
+  toBlobs(value)
+    .map((b) => {
+      if (b != null && typeof b === 'object') {
+        const t = (b as { '@type'?: unknown })['@type'];
+        if (typeof t === 'string') return t;
+        if (Array.isArray(t) && typeof t[0] === 'string') return t[0];
+      }
+      return null;
+    })
+    .filter((t): t is string => Boolean(t));
 
 /**
  * Schema (JSON-LD) override editor for a pageRegistry row: paste raw JSON-LD OR
- * upload a .txt/.json file (multiple <script> blocks supported), with live
- * validation against the allow-list/size/@id rules and an @type preview. Stores
- * the parsed value into the `additionalSchema` json field via useField (the
- * data-layer hook). Composed into the page's @graph at build time.
+ * upload a .txt/.json file (multiple <script> blocks supported). Auto-detects
+ * the @type of every pasted block, shows the allow-list, and a Validate button
+ * runs the full check — allow-list, conflicts with the site-wide schema
+ * (Organization/WebSite/BreadcrumbList), off-domain @id, and Google
+ * required-field gaps — reporting per block. Each block overrides only its own
+ * @type; other nodes are untouched. Stored via useField; composed at build.
  */
 export const SchemaOverrideField = ({ path }: SchemaOverrideFieldProps): ReactElement => {
   const inputId = useId();
@@ -43,24 +66,24 @@ export const SchemaOverrideField = ({ path }: SchemaOverrideFieldProps): ReactEl
   const [text, setText] = useState<string>(() => stringify(value));
   const [syntaxError, setSyntaxError] = useState<string | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
+  const [report, setReport] = useState<BlockReport[] | null>(null);
 
-  // Re-sync the editor when the stored value changes elsewhere (e.g. reset).
-  useEffect(() => {
-    setText(stringify(value));
-  }, [value]);
+  const liveTypes = useMemo(() => typesOf(value), [value]);
 
-  const validation = useMemo(() => {
-    if (value == null) return { ok: true, message: '' as string };
-    const r = validateOverrideForCollection(value, 'pageRegistry');
-    return { ok: r.ok, message: r.ok ? '' : `${r.message}${r.issues[0] ? ` — ${r.issues[0].message}` : ''}` };
-  }, [value]);
-
-  const types = useMemo(() => typesOf(value), [value]);
+  const commit = useCallback(
+    (next: unknown, asText: string): void => {
+      setValue(next);
+      setText(asText);
+      setReport(null);
+    },
+    [setValue],
+  );
 
   const onTextChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
     const next = e.target.value;
     setText(next);
     setWarnings([]);
+    setReport(null);
     if (next.trim().length === 0) {
       setSyntaxError(null);
       setValue(null);
@@ -77,17 +100,35 @@ export const SchemaOverrideField = ({ path }: SchemaOverrideFieldProps): ReactEl
   const onFile = async (e: ChangeEvent<HTMLInputElement>): Promise<void> => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const raw = await file.text();
-    const result = parseUploadedSchema(raw);
+    const result = parseUploadedSchema(await file.text());
     setWarnings([...result.warnings]);
     if (result.error || result.value == null) {
       setSyntaxError(result.error ?? 'Could not parse file');
+    } else {
+      setSyntaxError(null);
+      commit(result.value, stringify(result.value));
+    }
+    e.target.value = '';
+  };
+
+  const onValidate = (): void => {
+    if (value == null) {
+      setReport([]);
       return;
     }
-    setSyntaxError(null);
-    setValue(result.value);
-    setText(stringify(result.value));
-    e.target.value = '';
+    const plan = buildIngestPlan(toBlobs(value), {
+      collectionSlug: 'pageRegistry',
+      siteOrigin: DEFAULT_SITE_URL,
+    });
+    setReport(
+      plan.items.map((item) => ({
+        item,
+        missingRequired:
+          item.action === 'merge'
+            ? auditBlob(item.blob as Record<string, unknown>).missingRequired
+            : [],
+      })),
+    );
   };
 
   return (
@@ -97,10 +138,7 @@ export const SchemaOverrideField = ({ path }: SchemaOverrideFieldProps): ReactEl
       </label>
 
       <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-        <label
-          htmlFor={fileId}
-          style={{ cursor: 'pointer', fontSize: '0.85em', color: '#0a7', fontWeight: 600 }}
-        >
+        <label htmlFor={fileId} style={{ cursor: 'pointer', fontSize: '0.85em', color: '#0a7', fontWeight: 600 }}>
           ⬆ Upload .txt / .json
         </label>
         <input
@@ -110,9 +148,9 @@ export const SchemaOverrideField = ({ path }: SchemaOverrideFieldProps): ReactEl
           onChange={onFile}
           style={{ display: 'none' }}
         />
-        {types.length > 0 ? (
+        {liveTypes.length > 0 ? (
           <span style={{ fontSize: '0.85em', color: '#555' }}>
-            @type: {types.map((t) => (
+            detected: {liveTypes.map((t) => (
               <code key={t} style={{ marginRight: 4 }}>{t}</code>
             ))}
           </span>
@@ -125,16 +163,33 @@ export const SchemaOverrideField = ({ path }: SchemaOverrideFieldProps): ReactEl
         onChange={onTextChange}
         rows={12}
         spellCheck={false}
-        placeholder='Paste JSON-LD, e.g. {"@context":"https://schema.org","@type":"WebPage", ...}'
+        placeholder='Paste JSON-LD, e.g. {"@context":"https://schema.org","@type":"SoftwareApplication", ...}'
         style={{ fontFamily: 'monospace', fontSize: '0.85em', width: '100%', padding: '0.5rem' }}
       />
 
+      <div>
+        <button
+          type="button"
+          onClick={onValidate}
+          disabled={value == null || syntaxError != null}
+          style={{
+            fontSize: '0.85em',
+            fontWeight: 600,
+            padding: '0.3rem 0.8rem',
+            borderRadius: 6,
+            border: '1px solid #0a7',
+            color: '#0a7',
+            background: 'none',
+            cursor: value == null || syntaxError != null ? 'not-allowed' : 'pointer',
+            opacity: value == null || syntaxError != null ? 0.5 : 1,
+          }}
+        >
+          ✓ Validate schema
+        </button>
+      </div>
+
       {syntaxError ? (
         <p style={{ color: '#c00', fontSize: '0.85em', margin: 0 }}>JSON error: {syntaxError}</p>
-      ) : !validation.ok ? (
-        <p style={{ color: '#c00', fontSize: '0.85em', margin: 0 }}>Invalid: {validation.message}</p>
-      ) : value != null ? (
-        <p style={{ color: '#0a7', fontSize: '0.85em', margin: 0 }}>✓ Valid override</p>
       ) : null}
 
       {warnings.length > 0 ? (
@@ -143,6 +198,37 @@ export const SchemaOverrideField = ({ path }: SchemaOverrideFieldProps): ReactEl
             <li key={w}>{w}</li>
           ))}
         </ul>
+      ) : null}
+
+      {report != null ? (
+        report.length === 0 ? (
+          <p style={{ color: '#888', fontSize: '0.85em', margin: 0 }}>Nothing to validate.</p>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+            {report.map(({ item, missingRequired }, i) => {
+              const ok = item.action === 'merge';
+              return (
+                <div
+                  key={`${item.blobType}-${i}`}
+                  style={{ fontSize: '0.82em', borderLeft: `3px solid ${ok ? '#0a7' : '#c70'}`, padding: '0.2rem 0.6rem' }}
+                >
+                  <strong>
+                    {ok ? '✓' : '⚠'} <code>{item.blobType}</code>
+                  </strong>{' '}
+                  — {ok ? 'will override this @type' : `${item.message} (dropped on save)`}
+                  {!ok && fixHint(item.reason) ? (
+                    <div style={{ color: '#0a7' }}>Fix: {fixHint(item.reason)}</div>
+                  ) : null}
+                  {ok && missingRequired.length > 0 ? (
+                    <div style={{ color: '#a70' }}>
+                      missing required for rich results: {missingRequired.join(', ')}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        )
       ) : null}
     </div>
   );

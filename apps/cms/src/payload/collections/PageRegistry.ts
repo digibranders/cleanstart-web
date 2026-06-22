@@ -2,7 +2,7 @@ import type { CollectionConfig, JSONFieldValidation } from 'payload';
 
 import { isAdmin, isAdminEditorOrSeo, isAdminOrSeoFieldLevel } from '../access';
 import { pageLiveSchemaEndpoint } from '../endpoints/page-live-schema';
-import { validateOverrideForFieldOnCollection } from '../lib/jsonld/override-validator';
+import { filterToMergeable, validatePartialOverride } from '../lib/jsonld/filter-override';
 import { revalidatePageRegistryHook, revalidatePageRegistryDeleteHook } from '../hooks/revalidate-page-registry';
 
 /**
@@ -40,12 +40,20 @@ const validatePath = (value: unknown): true | string => {
 export const PageRegistry: CollectionConfig = {
   slug: 'pageRegistry',
   labels: { singular: 'Page (Schema)', plural: 'Pages (Schema)' },
+  // List reads in live mega-menu order (seeded `order`), not alphabetically.
+  defaultSort: 'order',
   admin: {
     useAsTitle: 'path',
+    // Search matches both the path/slug AND the title (so "home" finds the Home row).
+    listSearchableFields: ['path', 'title'],
     defaultColumns: ['path', 'title', 'kind', 'updatedAt'],
     group: 'SEO',
     description:
       'Every website route, including static pages. Add a Schema.org override here to compose it into that page’s JSON-LD at build time.',
+    components: {
+      // Quick filter pills (Kind + Override status) above the list table.
+      beforeListTable: ['./payload/admin/components/SchemaManager/PageSchemaFilters.tsx#PageSchemaFilters'],
+    },
   },
   // The registry is a SEED-MANAGED catalog of real routes. Public read (the web
   // build/ISR fetches it anonymously). Create is disabled in the UI/API — rows
@@ -109,6 +117,13 @@ export const PageRegistry: CollectionConfig = {
       },
     },
     {
+      // Mega-menu display order (seed-managed). Hidden; drives the list sort.
+      name: 'order',
+      type: 'number',
+      access: { update: () => false },
+      admin: { hidden: true },
+    },
+    {
       name: 'backingCollection',
       type: 'text',
       access: { update: () => false },
@@ -120,13 +135,37 @@ export const PageRegistry: CollectionConfig = {
       },
     },
     {
-      // Read-only viewer of the page's CURRENT live JSON-LD, block-wise.
+      // Right-rail reference: allow/block lists + override dates (collapsed).
+      name: 'schemaSidebarInfo',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field:
+            './payload/admin/components/SchemaManager/SchemaSidebarInfo.tsx#SchemaSidebarInfo',
+        },
+      },
+    },
+    {
+      // Right-rail read-only viewer of the page's CURRENT live JSON-LD, block-wise.
       name: 'currentSchemaView',
       type: 'ui',
       admin: {
+        position: 'sidebar',
         components: {
           Field:
             './payload/admin/components/SchemaManager/CurrentSchemaView.tsx#CurrentSchemaView',
+        },
+      },
+    },
+    {
+      // Right-rail allow-list + site-wide blocklist (collapsed), below the viewer.
+      name: 'schemaAllowBlock',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: './payload/admin/components/SchemaManager/SchemaAllowBlock.tsx#SchemaAllowBlock',
         },
       },
     },
@@ -139,7 +178,12 @@ export const PageRegistry: CollectionConfig = {
         update: isAdminOrSeoFieldLevel,
         create: isAdminOrSeoFieldLevel,
       },
-      validate: validateOverrideForFieldOnCollection('pageRegistry') as JSONFieldValidation,
+      validate: validatePartialOverride as JSONFieldValidation,
+      hooks: {
+        // Keep-valid / drop-invalid: store only the merge-able blocks (a paste
+        // mixing a valid Article with a conflicting WebSite saves just Article).
+        beforeChange: [({ value }) => filterToMergeable(value).kept],
+      },
       admin: {
         description:
           'Raw Schema.org JSON-LD for this page (single object or array of objects, each with @context + an allow-listed @type). Validated and capped at 16 KB; composed per-@type into the page’s @graph at build time.',

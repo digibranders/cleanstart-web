@@ -2,13 +2,37 @@
 
 import { useField } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import { composeGraph, type GraphNode, primaryType } from '../../../lib/jsonld/compose';
 
 interface LiveBlock {
   type: string;
   json: string;
   provenance: 'auto' | 'override';
 }
+
+const safeParse = (json: string): Record<string, unknown> | null => {
+  try {
+    const v = JSON.parse(json);
+    return v != null && typeof v === 'object' ? (v as Record<string, unknown>) : null;
+  } catch {
+    return null;
+  }
+};
+
+const overrideTypeSet = (override: unknown): Set<string> => {
+  const blobs = Array.isArray(override) ? override : override != null ? [override] : [];
+  const out = new Set<string>();
+  for (const b of blobs) {
+    if (b != null && typeof b === 'object') {
+      const t = (b as { '@type'?: unknown })['@type'];
+      if (typeof t === 'string') out.add(t);
+      else if (Array.isArray(t)) for (const e of t) if (typeof e === 'string') out.add(e);
+    }
+  }
+  return out;
+};
 
 interface LiveSchemaResponse {
   ok: boolean;
@@ -37,11 +61,14 @@ const fmt = (iso: string | null | undefined): string => {
  */
 export const CurrentSchemaView = (): ReactElement => {
   const { value: path } = useField<string>({ path: 'path' });
+  const { value: override } = useField<unknown>({ path: 'additionalSchema' });
   const [state, setState] = useState<{ status: 'idle' | 'loading' | 'done'; data: LiveSchemaResponse | null }>({
     status: 'idle',
     data: null,
   });
   const [copied, setCopied] = useState<number | null>(null);
+  const [mode, setMode] = useState<'live' | 'preview'>('live');
+  const [exportOpen, setExportOpen] = useState(false);
 
   const copyBlock = useCallback(async (index: number, jsonText: string): Promise<void> => {
     try {
@@ -76,12 +103,53 @@ export const CurrentSchemaView = (): ReactElement => {
   }, [load]);
 
   const data = state.data;
-  const blocks = data?.blocks ?? [];
+  const liveBlocks = data?.blocks ?? [];
+
+  // Merged preview: auto-only live nodes + the UNSAVED override from the form,
+  // composed exactly as the build would (composeGraph). Updates live as you type.
+  const previewBlocks = useMemo((): LiveBlock[] => {
+    const autoNodes = liveBlocks
+      .filter((b) => b.provenance === 'auto')
+      .map((b) => safeParse(b.json))
+      .filter((n): n is Record<string, unknown> => n != null);
+    const graph = composeGraph({ auto: autoNodes as GraphNode[], override: override ?? undefined });
+    const oTypes = overrideTypeSet(override);
+    return graph['@graph'].map((node) => ({
+      type: primaryType(node),
+      json: JSON.stringify(node, null, 2),
+      provenance: oTypes.has(primaryType(node)) ? 'override' : 'auto',
+    }));
+  }, [liveBlocks, override]);
+
+  const blocks = mode === 'preview' ? previewBlocks : liveBlocks;
+
+  const downloadGraph = (format: 'json' | 'txt'): void => {
+    const nodes = blocks
+      .map((b) => safeParse(b.json))
+      .filter((n): n is Record<string, unknown> => n != null);
+    const graph = { '@context': 'https://schema.org', '@graph': nodes };
+    const content = JSON.stringify(graph, null, 2);
+    const slug = (path || '/').replace(/\//g, '-').replace(/(^-|-$)/g, '') || 'home';
+    const blob = new Blob([content], {
+      type: format === 'json' ? 'application/ld+json' : 'text/plain',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `schema-${slug}.${format}`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    setExportOpen(false);
+  };
 
   return (
     <div className="field-type" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', flexWrap: 'wrap' }}>
-        <span style={{ fontWeight: 600 }}>Current schema on the live page</span>
+        <span style={{ fontWeight: 600, fontSize: '0.9em' }}>
+          Current schema on the live page{blocks.length ? ` (${blocks.length})` : ''}
+        </span>
         <button
           type="button"
           onClick={() => void load()}
@@ -92,7 +160,78 @@ export const CurrentSchemaView = (): ReactElement => {
         {data?.fetchedAt ? (
           <span style={{ fontSize: '0.78em', color: '#888' }}>as of {fmt(data.fetchedAt)}</span>
         ) : null}
+        <button
+          type="button"
+          onClick={() => setMode((m) => (m === 'live' ? 'preview' : 'live'))}
+          title="Preview the merged @graph with your unsaved override, exactly as the build composes it"
+          style={{
+            marginLeft: 'auto',
+            fontSize: '0.75em',
+            fontWeight: 600,
+            color: mode === 'preview' ? '#0a7' : '#9ab',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 0,
+          }}
+        >
+          {mode === 'live' ? '▶ Preview merged' : '◀ Back to live'}
+        </button>
+        <div style={{ position: 'relative' }}>
+          <button
+            type="button"
+            onClick={() => setExportOpen((o) => !o)}
+            disabled={blocks.length === 0}
+            title="Export this page's composed @graph"
+            style={{
+              fontSize: '0.75em',
+              fontWeight: 600,
+              color: blocks.length === 0 ? '#666' : '#0a7',
+              background: 'none',
+              border: 'none',
+              cursor: blocks.length === 0 ? 'not-allowed' : 'pointer',
+              padding: 0,
+            }}
+          >
+            ⬇ Export ▾
+          </button>
+          {exportOpen ? (
+            <div
+              style={{
+                position: 'absolute',
+                right: 0,
+                top: '1.4em',
+                zIndex: 10,
+                background: 'var(--theme-elevation-50, #1b1b1b)',
+                border: '1px solid var(--theme-elevation-150, #333)',
+                borderRadius: 6,
+                minWidth: 130,
+                boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => downloadGraph('json')}
+                style={{ display: 'block', width: '100%', textAlign: 'left', fontSize: '0.8em', padding: '0.4rem 0.6rem', background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}
+              >
+                JSON-LD (.json)
+              </button>
+              <button
+                type="button"
+                onClick={() => downloadGraph('txt')}
+                style={{ display: 'block', width: '100%', textAlign: 'left', fontSize: '0.8em', padding: '0.4rem 0.6rem', background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}
+              >
+                Text (.txt)
+              </button>
+            </div>
+          ) : null}
+        </div>
       </div>
+      {mode === 'preview' ? (
+        <p style={{ fontSize: '0.74em', color: '#0a7', margin: 0 }}>
+          Merged result with your unsaved override (what will deploy on save).
+        </p>
+      ) : null}
 
       {state.status === 'loading' ? (
         <p style={{ color: '#888', fontSize: '0.85em', margin: 0 }}>Loading live schema…</p>
@@ -115,7 +254,7 @@ export const CurrentSchemaView = (): ReactElement => {
                 <code style={{ fontWeight: 600 }}>{b.type}</code>
                 {b.provenance === 'override' ? (
                   <span style={{ fontSize: '0.72em', color: '#0a7' }}>
-                    ✎ override · edited {fmt(data?.overrideUpdatedAt)}
+                    ✎ override · {mode === 'preview' ? 'pending (unsaved)' : `edited ${fmt(data?.overrideUpdatedAt)}`}
                   </span>
                 ) : (
                   <span style={{ fontSize: '0.72em', color: '#888' }}>auto · derived from page</span>
@@ -139,9 +278,9 @@ export const CurrentSchemaView = (): ReactElement => {
           ))}
         </div>
       )}
-      <p style={{ fontSize: '0.74em', color: '#777', margin: 0 }}>
+      <p style={{ fontSize: '0.74em', color: '#777', margin: '0.5rem 0 0' }}>
         Read-only view of what this page actually emits. “auto” blocks are derived in the site code;
-        to change a page’s schema, add or edit an override below (composed per-@type at build time).
+        to change a page’s schema, add or edit an override (composed per-@type at build time).
       </p>
     </div>
   );

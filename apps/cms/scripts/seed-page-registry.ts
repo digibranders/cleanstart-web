@@ -52,6 +52,7 @@ async function run(): Promise<void> {
       path: row.path,
       title: row.title,
       kind: row.kind,
+      order: row.order,
       ...(row.backingCollection ? { backingCollection: row.backingCollection } : {}),
     };
 
