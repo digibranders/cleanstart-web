@@ -491,6 +491,9 @@ export const AUTO_EMITTED_TYPES_BY_COLLECTION: Readonly<Record<string, ReadonlyS
   jobs: new Set(['Organization', 'WebSite', 'JobPosting', 'BreadcrumbList']),
   pages: new Set(['Organization', 'WebSite', 'WebPage', 'AboutPage', 'ContactPage', 'CollectionPage', 'BreadcrumbList']),
   resources: new Set(['Organization', 'WebSite', 'WebPage', 'DigitalDocument', 'BreadcrumbList']),
+  // pageRegistry overrides any route; the site-wide nodes (emitted on EVERY
+  // page by the global layer) always conflict, so flag them as duplicates.
+  pageRegistry: new Set(['Organization', 'WebSite', 'BreadcrumbList']),
 };
 
 export type IngestAction = 'merge' | 'skip';
