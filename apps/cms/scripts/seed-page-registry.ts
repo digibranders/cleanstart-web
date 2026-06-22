@@ -48,7 +48,8 @@ async function run(): Promise<void> {
     });
     const current = existing.docs[0];
 
-    const data = {
+    // Seed-managed identity/metadata — safe to refresh on --force.
+    const metaData = {
       path: row.path,
       title: row.title,
       kind: row.kind,
@@ -61,12 +62,13 @@ async function run(): Promise<void> {
         skipped += 1;
         continue;
       }
-      // --force updates metadata only; never clobbers an editor's override.
+      // --force refreshes metadata only; never clobbers an editor's override
+      // OR their webPageType choice (both are editor-owned after creation).
       if (!dryRun) {
         await payload.update({
           collection: 'pageRegistry',
           id: current.id,
-          data,
+          data: metaData,
           overrideAccess: true,
         });
       }
@@ -75,7 +77,12 @@ async function run(): Promise<void> {
     }
 
     if (!dryRun) {
-      await payload.create({ collection: 'pageRegistry', data, overrideAccess: true });
+      // On first creation seed the initial webPageType too.
+      await payload.create({
+        collection: 'pageRegistry',
+        data: { ...metaData, ...(row.webPageType ? { webPageType: row.webPageType } : {}) },
+        overrideAccess: true,
+      });
     }
     created += 1;
   }

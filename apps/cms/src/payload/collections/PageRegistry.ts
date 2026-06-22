@@ -25,6 +25,18 @@ const KIND_OPTIONS: { label: string; value: string }[] = [
   { label: 'CMS collection (template)', value: 'cms-template' },
 ];
 
+// Functional WebPage @type for STATIC/LISTING routes. Auto-emitted into the
+// page's @graph by the web build (apps/web reads this field at build time).
+// 'none' (the default) emits no page-level WebPage node — backward compatible.
+const WEB_PAGE_TYPE_OPTIONS: { label: string; value: string }[] = [
+  { label: 'None (no WebPage node)', value: 'none' },
+  { label: 'WebPage', value: 'WebPage' },
+  { label: 'AboutPage', value: 'AboutPage' },
+  { label: 'ContactPage', value: 'ContactPage' },
+  { label: 'CollectionPage', value: 'CollectionPage' },
+  { label: 'ProfilePage', value: 'ProfilePage' },
+];
+
 const validatePath = (value: unknown): true | string => {
   if (typeof value !== 'string' || value.trim().length === 0) {
     return 'Path is required.';
@@ -47,7 +59,7 @@ export const PageRegistry: CollectionConfig = {
     useAsTitle: 'path',
     // Search matches both the path/slug AND the title (so "home" finds the Home row).
     listSearchableFields: ['path', 'title'],
-    defaultColumns: ['path', 'title', 'kind', 'updatedAt'],
+    defaultColumns: ['path', 'title', 'schemaHealth', 'kind', 'webPageType', 'updatedAt'],
     group: 'SEO',
     description:
       'Every website route, including static pages. Add a Schema.org override here to compose it into that page’s JSON-LD at build time.',
@@ -137,6 +149,31 @@ export const PageRegistry: CollectionConfig = {
       },
     },
     {
+      // List-only rich-result health badge. Renders nothing in the edit view
+      // (no Field) — a Cell that lints the page's LIVE composed @graph and
+      // shows OK / warnings / errors. Lazy client fetch per row, so it never
+      // blocks the list server render.
+      name: 'schemaHealth',
+      type: 'ui',
+      admin: {
+        components: {
+          Cell: './payload/admin/components/SchemaManager/SchemaHealthCell.tsx#SchemaHealthCell',
+        },
+      },
+    },
+    {
+      // Functional WebPage @type for this route — editor-writable. The web
+      // build auto-emits the matching node (webPageSchema) at build time.
+      name: 'webPageType',
+      type: 'select',
+      defaultValue: 'none',
+      options: WEB_PAGE_TYPE_OPTIONS,
+      admin: {
+        description:
+          'Declares what kind of page this is. The site auto-emits the matching WebPage node (AboutPage for an about page, CollectionPage for a listing, …) into the page’s JSON-LD at build time. “None” emits no WebPage node.',
+      },
+    },
+    {
       // Right-rail reference: allow/block lists + override dates (collapsed).
       name: 'schemaSidebarInfo',
       type: 'ui',
@@ -157,6 +194,18 @@ export const PageRegistry: CollectionConfig = {
         components: {
           Field:
             './payload/admin/components/SchemaManager/CurrentSchemaView.tsx#CurrentSchemaView',
+        },
+      },
+    },
+    {
+      // Right-rail guided block-builder: pick a @type → insert a pre-filled,
+      // validated starter block into the override (no hand-written JSON-LD).
+      name: 'schemaBuilderView',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: './payload/admin/components/SchemaManager/SchemaBlockBuilder.tsx#SchemaBlockBuilder',
         },
       },
     },
