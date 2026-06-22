@@ -94,6 +94,7 @@ import { RedirectStalenessField as RedirectStalenessField_84bc6f5d8c91b849b5d672
 import { SchemaSidebarInfo as SchemaSidebarInfo_96468a0c8dfd7d485ad501c3f3cb5169 } from '../../../payload/admin/components/SchemaManager/SchemaSidebarInfo.tsx'
 import { CurrentSchemaView as CurrentSchemaView_eb2b5a26ddc5c1c2f69a2c0c3dd840f2 } from '../../../payload/admin/components/SchemaManager/CurrentSchemaView.tsx'
 import { SchemaAllowBlock as SchemaAllowBlock_de867732d64887918e8efa197d346b08 } from '../../../payload/admin/components/SchemaManager/SchemaAllowBlock.tsx'
+import { SchemaHistory as SchemaHistory_96f4b470fc1368427cec568d8e7b5a5c } from '../../../payload/admin/components/SchemaManager/SchemaHistory.tsx'
 import { SchemaOverrideField as SchemaOverrideField_c716f5511ac92ab6778c63b963e35525 } from '../../../payload/admin/components/SchemaManager/SchemaOverrideField.tsx'
 import { PageSchemaFilters as PageSchemaFilters_10ca188f5261556830c597b7add73d2c } from '../../../payload/admin/components/SchemaManager/PageSchemaFilters.tsx'
 import { DisableUserAction as DisableUserAction_6c8d4d4a3960948e585eb302bcb89460 } from '@/payload/admin/components/DisableUserAction.tsx'
@@ -235,6 +236,7 @@ export const importMap = {
   "./payload/admin/components/SchemaManager/SchemaSidebarInfo.tsx#SchemaSidebarInfo": SchemaSidebarInfo_96468a0c8dfd7d485ad501c3f3cb5169,
   "./payload/admin/components/SchemaManager/CurrentSchemaView.tsx#CurrentSchemaView": CurrentSchemaView_eb2b5a26ddc5c1c2f69a2c0c3dd840f2,
   "./payload/admin/components/SchemaManager/SchemaAllowBlock.tsx#SchemaAllowBlock": SchemaAllowBlock_de867732d64887918e8efa197d346b08,
+  "./payload/admin/components/SchemaManager/SchemaHistory.tsx#SchemaHistory": SchemaHistory_96f4b470fc1368427cec568d8e7b5a5c,
   "./payload/admin/components/SchemaManager/SchemaOverrideField.tsx#SchemaOverrideField": SchemaOverrideField_c716f5511ac92ab6778c63b963e35525,
   "./payload/admin/components/SchemaManager/PageSchemaFilters.tsx#PageSchemaFilters": PageSchemaFilters_10ca188f5261556830c597b7add73d2c,
   "@/payload/admin/components/DisableUserAction.tsx#DisableUserAction": DisableUserAction_6c8d4d4a3960948e585eb302bcb89460,
