@@ -40,6 +40,8 @@ const validatePath = (value: unknown): true | string => {
 export const PageRegistry: CollectionConfig = {
   slug: 'pageRegistry',
   labels: { singular: 'Page (Schema)', plural: 'Pages (Schema)' },
+  // List reads in live mega-menu order (seeded `order`), not alphabetically.
+  defaultSort: 'order',
   admin: {
     useAsTitle: 'path',
     // Search matches both the path/slug AND the title (so "home" finds the Home row).
@@ -48,6 +50,10 @@ export const PageRegistry: CollectionConfig = {
     group: 'SEO',
     description:
       'Every website route, including static pages. Add a Schema.org override here to compose it into that page’s JSON-LD at build time.',
+    components: {
+      // Quick filter pills (Kind + Override status) above the list table.
+      beforeListTable: ['./payload/admin/components/SchemaManager/PageSchemaFilters.tsx#PageSchemaFilters'],
+    },
   },
   // The registry is a SEED-MANAGED catalog of real routes. Public read (the web
   // build/ISR fetches it anonymously). Create is disabled in the UI/API — rows
@@ -109,6 +115,13 @@ export const PageRegistry: CollectionConfig = {
         description:
           'static = hardcoded page; cms-listing = a collection’s index page; cms-template = drill into the collection’s documents. Seed-managed (read-only).',
       },
+    },
+    {
+      // Mega-menu display order (seed-managed). Hidden; drives the list sort.
+      name: 'order',
+      type: 'number',
+      access: { update: () => false },
+      admin: { hidden: true },
     },
     {
       name: 'backingCollection',

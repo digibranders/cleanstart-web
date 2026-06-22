@@ -95,6 +95,7 @@ import { SchemaSidebarInfo as SchemaSidebarInfo_96468a0c8dfd7d485ad501c3f3cb5169
 import { CurrentSchemaView as CurrentSchemaView_eb2b5a26ddc5c1c2f69a2c0c3dd840f2 } from '../../../payload/admin/components/SchemaManager/CurrentSchemaView.tsx'
 import { SchemaAllowBlock as SchemaAllowBlock_de867732d64887918e8efa197d346b08 } from '../../../payload/admin/components/SchemaManager/SchemaAllowBlock.tsx'
 import { SchemaOverrideField as SchemaOverrideField_c716f5511ac92ab6778c63b963e35525 } from '../../../payload/admin/components/SchemaManager/SchemaOverrideField.tsx'
+import { PageSchemaFilters as PageSchemaFilters_10ca188f5261556830c597b7add73d2c } from '../../../payload/admin/components/SchemaManager/PageSchemaFilters.tsx'
 import { DisableUserAction as DisableUserAction_6c8d4d4a3960948e585eb302bcb89460 } from '@/payload/admin/components/DisableUserAction.tsx'
 import { ReassignContentAction as ReassignContentAction_a770f7b61bee7b644dacc1d627c324ca } from '@/payload/admin/components/ReassignContentAction.tsx'
 import { EventsMultiSelect as EventsMultiSelect_8bcd98a59f96a65fd684ba41f20f1e87 } from '@/payload/admin/components/integrations/EventsMultiSelect.tsx'
@@ -235,6 +236,7 @@ export const importMap = {
   "./payload/admin/components/SchemaManager/CurrentSchemaView.tsx#CurrentSchemaView": CurrentSchemaView_eb2b5a26ddc5c1c2f69a2c0c3dd840f2,
   "./payload/admin/components/SchemaManager/SchemaAllowBlock.tsx#SchemaAllowBlock": SchemaAllowBlock_de867732d64887918e8efa197d346b08,
   "./payload/admin/components/SchemaManager/SchemaOverrideField.tsx#SchemaOverrideField": SchemaOverrideField_c716f5511ac92ab6778c63b963e35525,
+  "./payload/admin/components/SchemaManager/PageSchemaFilters.tsx#PageSchemaFilters": PageSchemaFilters_10ca188f5261556830c597b7add73d2c,
   "@/payload/admin/components/DisableUserAction.tsx#DisableUserAction": DisableUserAction_6c8d4d4a3960948e585eb302bcb89460,
   "@/payload/admin/components/ReassignContentAction.tsx#ReassignContentAction": ReassignContentAction_a770f7b61bee7b644dacc1d627c324ca,
   "@/payload/admin/components/integrations/EventsMultiSelect.tsx#EventsMultiSelect": EventsMultiSelect_8bcd98a59f96a65fd684ba41f20f1e87,
