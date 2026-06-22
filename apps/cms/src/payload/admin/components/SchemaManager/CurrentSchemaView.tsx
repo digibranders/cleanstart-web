@@ -197,6 +197,9 @@ export const CurrentSchemaView = (): ReactElement => {
             disabled={blocks.length === 0}
             title="Export this page's composed @graph"
             style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
               fontSize: '0.82em',
               fontWeight: 600,
               color: blocks.length === 0 ? 'var(--theme-elevation-400, #666)' : 'var(--theme-success-500, #0a7)',
@@ -207,7 +210,20 @@ export const CurrentSchemaView = (): ReactElement => {
               padding: '0.35rem 0.7rem',
             }}
           >
-            ⬇ Export ▾
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
+              <path d="M8 2.5v8M4.5 7L8 10.5 11.5 7M3 13.5h10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span>Export</span>
+            <svg
+              width="10"
+              height="10"
+              viewBox="0 0 12 12"
+              fill="none"
+              aria-hidden="true"
+              style={{ flexShrink: 0, transition: 'transform 0.15s', transform: exportOpen ? 'rotate(180deg)' : 'none' }}
+            >
+              <path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </button>
           {exportOpen ? (
             <div
