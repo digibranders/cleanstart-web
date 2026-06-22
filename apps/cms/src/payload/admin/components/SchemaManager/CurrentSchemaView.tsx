@@ -105,6 +105,7 @@ export const CurrentSchemaView = (): ReactElement => {
   const [copied, setCopied] = useState<number | null>(null);
   const [mode, setMode] = useState<'live' | 'preview'>('live');
   const [exportOpen, setExportOpen] = useState(false);
+  const [validateCopied, setValidateCopied] = useState(false);
   const exportRef = useRef<HTMLDivElement>(null);
 
   // Close the export dropdown on any click outside it.
@@ -179,6 +180,23 @@ export const CurrentSchemaView = (): ReactElement => {
       .filter((n): n is Record<string, unknown> => n != null) as GraphNode[];
     return lintGraph(nodes);
   }, [blocks]);
+
+  // Copy the composed @graph and open schema.org's validator (Code tab).
+  // schema.org has no code-via-URL param, so we copy → open → user pastes.
+  const validateAtSchemaOrg = async (): Promise<void> => {
+    const nodes = blocks
+      .map((b) => safeParse(b.json))
+      .filter((n): n is Record<string, unknown> => n != null);
+    const graph = { '@context': 'https://schema.org', '@graph': nodes };
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(graph, null, 2));
+      setValidateCopied(true);
+      setTimeout(() => setValidateCopied(false), 2500);
+    } catch {
+      // clipboard unavailable — still open the validator so the user can paste manually
+    }
+    window.open('https://validator.schema.org/', '_blank', 'noopener,noreferrer');
+  };
 
   const downloadGraph = (format: 'json' | 'txt'): void => {
     const nodes = blocks
@@ -301,6 +319,24 @@ export const CurrentSchemaView = (): ReactElement => {
             </div>
           ) : null}
         </div>
+        <button
+          type="button"
+          onClick={() => void validateAtSchemaOrg()}
+          disabled={blocks.length === 0}
+          title="Copies this page's composed JSON-LD and opens validator.schema.org — paste into its Code tab. (Validates the schema CODE; the Google Rich Results link tests the live URL.)"
+          style={{
+            fontSize: '0.82em',
+            fontWeight: 600,
+            color: blocks.length === 0 ? 'var(--theme-elevation-400, #666)' : '#9ab',
+            background: 'none',
+            border: 'none',
+            cursor: blocks.length === 0 ? 'not-allowed' : 'pointer',
+            padding: '0.35rem 0',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {validateCopied ? '✓ copied — paste in Code tab' : '✔ Validate code ↗'}
+        </button>
       </div>
       {mode === 'preview' ? (
         <p style={{ fontSize: '0.74em', color: '#0a7', margin: 0 }}>
