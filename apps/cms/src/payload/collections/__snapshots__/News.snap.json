@@ -583,10 +583,6 @@
       "name": "seoAdvanced"
     },
     {
-      "type": "ui",
-      "name": "schemaHealth"
-    },
-    {
       "type": "checkbox",
       "name": "featured"
     }

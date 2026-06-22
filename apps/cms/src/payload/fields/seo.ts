@@ -573,27 +573,6 @@ export const seoFieldsForSidebar = (storageKey: string): Field[] => [
 ];
 
 /**
- * List-view rich-result health badge column. A `ui` field whose Cell lints the
- * doc's server-composed JSON-LD (/api/jsonld/<collection>/<id>). Add to a
- * content collection's `fields` and include `'schemaHealth'` in
- * `admin.defaultColumns`. `collectionSlug` is passed so the Cell can query the
- * right endpoint from the list (no document context there).
- */
-export const schemaHealthListField = (collectionSlug: string): Field => ({
-  name: 'schemaHealth',
-  type: 'ui',
-  label: 'Schema',
-  admin: {
-    components: {
-      Cell: {
-        path: '@/payload/admin/components/SchemaManager/SchemaHealthListCell.tsx#SchemaHealthListCell',
-        clientProps: { collectionSlug },
-      },
-    },
-  },
-});
-
-/**
  * Returns the sidebar UI fields a content collection should splice
  * into its sidebar above `Featured` / `Pinned`:
  *   - SEO Title (auto-synced from a configurable source field, char counter)

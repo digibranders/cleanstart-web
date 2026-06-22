@@ -2,7 +2,7 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
-import { schemaHealthListField, seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
+import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import {
   searchSyncAfterChangeHook,
@@ -19,7 +19,7 @@ export const Authors: CollectionConfig = {
   labels: { singular: 'Author', plural: 'Authors' },
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'role', 'acceptingNewBylines', 'schemaHealth', 'updatedAt'],
+    defaultColumns: ['name', 'role', 'acceptingNewBylines', 'updatedAt'],
     group: 'Content',
   },
   access: {
@@ -169,7 +169,6 @@ export const Authors: CollectionConfig = {
       descriptionSource: 'bioShort',
     }),
     ...seoFieldsForSidebar('authors'),
-    schemaHealthListField('authors'),
   ],
   hooks: {
     beforeChange: [normalizeLexicalHook({ fields: ['bioLong'] })],

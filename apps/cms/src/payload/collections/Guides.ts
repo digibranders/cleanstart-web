@@ -7,7 +7,7 @@ import { mediaUploadField } from '../fields/media-upload';
 import { displayPublishedAtField } from '../fields/display-published-at';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
-import { schemaHealthListField, seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
+import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { bodyStatsHook } from '../hooks/body-stats';
@@ -35,7 +35,7 @@ export const Guides: CollectionConfig = {
   labels: { singular: 'Guide', plural: 'Guides' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'authors', 'reviewedBy', 'schemaHealth', '_status', 'lastReviewedAt', 'updatedAt'],
+    defaultColumns: ['title', 'authors', 'reviewedBy', '_status', 'lastReviewedAt', 'updatedAt'],
     group: 'Content',
     components: {
       edit: docStatusBarEditConfig({ showStats: true, showPublishedAt: true }),
@@ -339,7 +339,6 @@ export const Guides: CollectionConfig = {
       ],
     },
     ...seoFieldsForSidebar('guides'),
-    schemaHealthListField('guides'),
   ],
   hooks: {
     beforeChange: [

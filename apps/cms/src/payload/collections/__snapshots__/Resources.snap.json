@@ -564,10 +564,6 @@
     {
       "type": "ui",
       "name": "seoAdvanced"
-    },
-    {
-      "type": "ui",
-      "name": "schemaHealth"
     }
   ],
   "hooks": {
