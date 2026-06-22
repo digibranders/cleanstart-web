@@ -81,6 +81,12 @@ const securityHeaders = [
 // authentication-gated and has no public-facing content.
 const adminNoindexHeader = { key: 'X-Robots-Tag', value: 'noindex, nofollow' };
 
+// The public Payload REST API (cms.cleanstart.com/api/*) serves JSON that
+// duplicates the canonical www.cleanstart.com pages. Without this, crawlers can
+// index that JSON as cross-host duplicate content. The header only affects
+// crawlers — it has no effect on the admin UI's own fetches.
+const apiNoindexHeader = { key: 'X-Robots-Tag', value: 'noindex, nofollow' };
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   // Pin Turbopack's workspace root to the monorepo root. Without this, Next
@@ -95,6 +101,9 @@ const nextConfig: NextConfig = {
       // Explicit noindex on every admin route — belt-and-suspenders alongside
       // the metadata export in (payload)/layout.tsx.
       { source: '/admin(.*)', headers: [adminNoindexHeader] },
+      // Keep the public REST API out of the search index (cross-host duplicate
+      // content of the canonical www pages).
+      { source: '/api/(.*)', headers: [apiNoindexHeader] },
     ];
   },
   images: {

@@ -7,7 +7,7 @@ import { NewsBrowser } from "@/components/sections/newsroom/NewsBrowser";
 import { NewsContent, selectNews } from "@/components/sections/newsroom/NewsContent";
 import { getNews, getFeaturedNews, getNewsCategories } from "@/lib/news";
 import { buildListingMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
 
 export const revalidate = 3600;
 
@@ -59,6 +59,16 @@ export default async function NewsPage(): Promise<React.ReactElement> {
           { name: "Newsroom" },
         ])}
       />
+      {allNews.length > 0 && (
+        <JsonLd
+          id="news-list"
+          data={itemListSchema(
+            "CleanStart Newsroom",
+            "/news",
+            allNews.map((n) => ({ name: n.title, path: `/news/${n.slug}` })),
+          )}
+        />
+      )}
       <Header />
       <Suspense
         fallback={

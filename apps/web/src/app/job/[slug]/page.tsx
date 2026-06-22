@@ -11,6 +11,7 @@ import {
   DEPARTMENT_LABEL,
   experienceDisplay,
   getJobBySlug,
+  getJobSlugs,
   locationDisplay,
   resolvedLocations,
   type JobEmploymentType,
@@ -28,6 +29,18 @@ const SCHEMA_EMPLOYMENT_TYPE: Record<JobEmploymentType, string> = {
 
 interface CareerDetailPageProps {
   params: Promise<{ slug: string }>;
+}
+
+// Slugs not returned here still render on first request, then cache (ISR).
+export const dynamicParams = true;
+
+/** Pre-render every published job; degrade to on-demand if CMS is down at build. */
+export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
+  try {
+    return (await getJobSlugs()).map((slug) => ({ slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({
@@ -63,6 +76,7 @@ export async function generateMetadata({
     type: "article",
     modifiedTime: job.updatedAt ?? undefined,
     noindex: seo.noindex || job.hiringStatus === "closed",
+    nofollow: seo.nofollow,
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
     ...(seo.image ? { image: seo.image } : {}),
   });
@@ -128,7 +142,13 @@ export default async function CareerDetailPage({
             description: jobDescription,
             path: `/job/${job.slug}`,
             datePosted: job.publishedAt ?? job.updatedAt ?? undefined,
-            validThrough: job.applicationDeadline ?? job.expiresAt ?? undefined,
+            // Google strongly recommends validThrough; open roles with no
+            // explicit deadline get a rolling 90-day expiry (ISR keeps it
+            // future-dated) so the posting is never dropped for a missing field.
+            validThrough:
+              job.applicationDeadline ??
+              job.expiresAt ??
+              new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
             employmentType: job.employmentType
               ? SCHEMA_EMPLOYMENT_TYPE[job.employmentType]
               : undefined,

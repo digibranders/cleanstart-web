@@ -7,7 +7,7 @@ import { GuidesContent, selectGuides } from "@/components/sections/guides/Guides
 import { GuidesCTA } from "@/components/sections/guides/GuidesCTA";
 import { getGuides } from "@/lib/guides";
 import { buildListingMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
 
 export const revalidate = 3600;
 
@@ -47,6 +47,16 @@ export default async function GuidesPage(): Promise<React.ReactElement> {
         id="guides-breadcrumbs"
         data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Guides" }])}
       />
+      {allGuides.length > 0 && (
+        <JsonLd
+          id="guides-list"
+          data={itemListSchema(
+            "CleanStart Guides",
+            "/guide",
+            allGuides.map((g) => ({ name: g.title, path: `/guide/${g.slug}` })),
+          )}
+        />
+      )}
       <Header />
       <Suspense
         fallback={

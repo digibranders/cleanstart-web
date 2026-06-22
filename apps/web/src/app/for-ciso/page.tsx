@@ -11,7 +11,7 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "Hardened Images & Libraries for Security and Compliance Teams | Cleanstart",
+  title: "Hardened Images & Libraries for Security and Compliance Teams | CleanStart",
   absoluteTitle: true,
   description:
     "Hardened images and libraries that help security and compliance teams cut inherited risk with continuous governance, provenance verification, and verified remediation.",

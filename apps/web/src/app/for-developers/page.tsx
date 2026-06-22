@@ -11,7 +11,7 @@ import { buildPageMetadata } from '@/lib/seo/canonical';
 import { JsonLd, breadcrumbSchema } from '@/lib/seo/jsonld';
 
 export const metadata = buildPageMetadata({
-  title: 'Hardened Container Images and Libraries For Developers | Cleanstart',
+  title: 'Hardened Container Images and Libraries For Developers | CleanStart',
   absoluteTitle: true,
   description:
     "Hardened, zero-CVE container images and libraries built for modern developer stacks. Drop-in compatible with your existing CI/CD, minimal, and continuously rebuilt.",

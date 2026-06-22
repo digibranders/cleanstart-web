@@ -116,7 +116,11 @@ function renderNode(node: LexicalNode, key: string): React.ReactNode {
 
     case "heading": {
       const hNode = node as Extract<LexicalNode, { type: "heading" }>;
-      const tag = hNode.tag ?? "h2";
+      // The page hero owns the single document <h1>; demote any body h1 from
+      // the CMS to h2 so the page keeps one top-level heading and a valid
+      // outline (some Webflow-imported bodies carry a stray h1).
+      const rawTag = hNode.tag ?? "h2";
+      const tag = rawTag === "h1" ? "h2" : rawTag;
       const children = renderNodes(hNode.children ?? [], key);
       const textContent = extractText(hNode.children ?? []);
       const id = slugifyText(textContent);

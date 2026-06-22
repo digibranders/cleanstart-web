@@ -66,7 +66,7 @@ export async function generateMetadata({
     eyebrow: resource.type ? resourceTypeLabel(resource.type) : "Resource",
     type: "article",
     publishedTime: effectivePublishedAt(resource) ?? resource.publishedAt ?? undefined,
-    ...(seo.noindex ? { noindex: true } : {}),
+    ...(seo.noindex ? { noindex: true, nofollow: seo.nofollow } : {}),
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
     ...(seo.image
       ? { image: seo.image }

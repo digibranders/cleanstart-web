@@ -77,7 +77,7 @@ export async function generateMetadata({
     publishedTime: effectivePublishedAt(guide) ?? guide.publishedAt ?? undefined,
     modifiedTime: guide.updatedAt ?? undefined,
     authors: guide.authors?.map((a) => a.name),
-    ...(seo.noindex ? { noindex: true } : {}),
+    ...(seo.noindex ? { noindex: true, nofollow: seo.nofollow } : {}),
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
     ...(seo.image
       ? { image: seo.image }
@@ -154,6 +154,7 @@ export async function renderGuideDetail({
           publishedAt: publishedAt ?? guide.publishedAt ?? undefined,
           modifiedAt: guide.updatedAt ?? undefined,
           imageUrl: heroAbsolute,
+          authors: guide.authors?.map((a) => ({ name: a.name, slug: a.slug })),
         })}
       />
       {faqs.length > 0 ? (

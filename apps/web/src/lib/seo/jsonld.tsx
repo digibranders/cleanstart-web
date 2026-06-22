@@ -26,6 +26,14 @@ export function JsonLd({ data, id }: JsonLdProps) {
 }
 
 const ORGANIZATION_ID = `${SITE_URL}/#organization`;
+const WEBSITE_ID = `${SITE_URL}/#website`;
+
+/** Shared schema.org event-status IRIs (Event + webinar ItemList). */
+const EVENT_STATUS_IRI: Record<string, string> = {
+  scheduled: "https://schema.org/EventScheduled",
+  postponed: "https://schema.org/EventPostponed",
+  cancelled: "https://schema.org/EventCancelled",
+};
 
 export function organizationSchema() {
   return {
@@ -34,16 +42,44 @@ export function organizationSchema() {
     "@id": ORGANIZATION_ID,
     name: SITE_NAME,
     url: SITE_URL,
+    description:
+      "CleanStart provides hardened, near-zero-CVE container base images and a software supply-chain security platform, helping engineering and security teams ship trusted software faster.",
     logo: {
       "@type": "ImageObject",
       url: `${SITE_URL}/images/cleanstart-logo.png`,
       width: 459,
       height: 96,
     },
+    // Real, canonical brand profiles (mirror the footer social links) so search
+    // and generative engines can verify the CleanStart entity. Stale
+    // /company/cleanstart + /cleanstart handles replaced with the live ones.
     sameAs: [
-      "https://www.linkedin.com/company/cleanstart",
-      "https://github.com/cleanstart",
+      "https://www.linkedin.com/company/cleanstart-official",
+      "https://x.com/CleanStartX",
+      "https://github.com/cleanstart-dev",
+      "https://www.youtube.com/@CleanStartOfficial",
+      "https://hub.docker.com/u/cleanstart",
     ],
+  };
+}
+
+/**
+ * WebSite node — binds the domain to the canonical brand name/entity (the
+ * `name`/`url` Google uses for the bold site name above results) and lets other
+ * nodes reference it via `@id`. A `SearchAction`/sitelinks-searchbox is
+ * deliberately omitted: it requires a public `/search?q=` results page, and the
+ * site only exposes a JSON `/api/search` endpoint — emitting a SearchAction that
+ * points at a non-existent results page would be invalid. Add it here once a
+ * user-facing search page exists.
+ */
+export function webSiteSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": WEBSITE_ID,
+    url: SITE_URL,
+    name: SITE_NAME,
+    publisher: { "@id": ORGANIZATION_ID },
   };
 }
 
@@ -129,6 +165,8 @@ export interface ArticleSchemaInput {
   modifiedAt?: string | undefined;
   imageUrl?: string | undefined;
   type?: string | undefined;
+  /** Provide `slug` to emit `url: /author/<slug>` on each Person node (E-E-A-T signal). */
+  authors?: Array<{ name: string; slug?: string | undefined }> | undefined;
 }
 
 export function articleSchema({
@@ -139,6 +177,7 @@ export function articleSchema({
   modifiedAt,
   imageUrl,
   type,
+  authors,
 }: ArticleSchemaInput) {
   const lastModified = modifiedAt ?? publishedAt;
   return {
@@ -150,6 +189,15 @@ export function articleSchema({
     ...(imageUrl ? { image: [imageUrl] } : {}),
     ...(publishedAt ? { datePublished: publishedAt } : {}),
     ...(lastModified ? { dateModified: lastModified } : {}),
+    ...(authors && authors.length > 0
+      ? {
+          author: authors.map((a) => ({
+            "@type": "Person",
+            name: a.name,
+            ...(a.slug ? { url: absoluteUrl(`/author/${a.slug}`) } : {}),
+          })),
+        }
+      : {}),
     ...(type ? { genre: type } : {}),
     publisher: { "@id": ORGANIZATION_ID },
   };
@@ -205,6 +253,63 @@ export function newsArticleSchema({
         }
       : {}),
     publisher: { "@id": ORGANIZATION_ID },
+  };
+}
+
+export interface EventSchemaInput {
+  title: string;
+  path: string;
+  startDate?: string | null | undefined;
+  endDate?: string | null | undefined;
+  /** Free-text venue name → Place.name. */
+  venue: string;
+  /** ISO 3166-1 alpha-2 (e.g. "IN"); when set, emits a PostalAddress. */
+  addressCountry?: string | undefined;
+  description?: string | null | undefined;
+  /** 'scheduled' | 'postponed' | 'cancelled'. */
+  eventStatus: string;
+  previousStartDate?: string | null | undefined;
+  imageUrl?: string | undefined;
+}
+
+/**
+ * Event structured data for `/event/[slug]`. Offline (in-person) events; emits
+ * `organizer` (→ Organization) and a structured `PostalAddress` (from the
+ * event's country) so Google's Event rich result has the location fields it
+ * recommends, not just a bare venue name.
+ */
+export function eventSchema({
+  title,
+  path,
+  startDate,
+  endDate,
+  venue,
+  addressCountry,
+  description,
+  eventStatus,
+  previousStartDate,
+  imageUrl,
+}: EventSchemaInput) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: title,
+    url: absoluteUrl(path),
+    ...(startDate ? { startDate } : {}),
+    ...(endDate ? { endDate } : {}),
+    eventStatus: EVENT_STATUS_IRI[eventStatus] ?? EVENT_STATUS_IRI.scheduled,
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    location: {
+      "@type": "Place",
+      name: venue,
+      ...(addressCountry
+        ? { address: { "@type": "PostalAddress", addressCountry } }
+        : {}),
+    },
+    ...(description ? { description } : {}),
+    ...(imageUrl ? { image: [imageUrl] } : {}),
+    ...(previousStartDate ? { previousStartDate } : {}),
+    organizer: { "@id": ORGANIZATION_ID },
   };
 }
 
@@ -491,6 +596,35 @@ export function caseStudyListSchema(items: CaseStudyListItem[]) {
         publisher: { "@id": ORGANIZATION_ID },
         ...(s.publishedAt ? { datePublished: s.publishedAt } : {}),
       },
+    })),
+  };
+}
+
+export interface ItemListEntry {
+  /** Item title (ListItem.name). */
+  name: string;
+  /** Site-relative detail path, e.g. `/blogs/foo`. */
+  path: string;
+}
+
+/**
+ * Generic ItemList for a content listing page (blogs, news, guide, events,
+ * resource-center, careers). Each ListItem points at the detail URL so crawlers
+ * and answer engines see the set + order without needing to render the
+ * client-side card grid. Capped at 30 to keep the payload lean.
+ */
+export function itemListSchema(name: string, listPath: string, items: ItemListEntry[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name,
+    url: absoluteUrl(listPath),
+    numberOfItems: items.length,
+    itemListElement: items.slice(0, 30).map((it, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: absoluteUrl(it.path),
+      name: it.name,
     })),
   };
 }

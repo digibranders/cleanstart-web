@@ -118,17 +118,6 @@ export function MobileNav() {
 
         <div className="flex items-center gap-2 border-t border-white/8 p-4">
           <Link
-            href="/contact-us"
-            onClick={close}
-            className="cs-btn-blue flex-1 justify-center"
-            style={{
-              ["--cs-btn-h" as string]: "40px",
-              ["--cs-btn-fs" as string]: "13px",
-            }}
-          >
-            Contact Us
-          </Link>
-          <Link
             href="/book-a-demo"
             onClick={close}
             className="cs-btn-glass flex-1 justify-center"

@@ -38,6 +38,8 @@ export interface CmsSeoResolution {
   description?: string;
   image?: PageImage;
   noindex?: boolean;
+  /** True only for the `noindex,nofollow` state — plain `noindex` stays follow. */
+  nofollow?: boolean;
   /** Absolute https canonical URL when the editor set a custom canonical. */
   canonicalUrl?: string;
 }
@@ -57,7 +59,12 @@ export function resolveCmsSeo(
 
   if (seo.title) resolution.title = seo.title;
   if (seo.description) resolution.description = seo.description;
-  if (seo.indexable && seo.indexable !== "index") resolution.noindex = true;
+  if (seo.indexable && seo.indexable !== "index") {
+    resolution.noindex = true;
+    // Only the explicit `noindex,nofollow` state suppresses link-following;
+    // plain `noindex` keeps follow so internal-link equity still flows.
+    if (seo.indexable === "noindex,nofollow") resolution.nofollow = true;
+  }
   if (seo.useCustomCanonical && seo.canonicalOverride) {
     resolution.canonicalUrl = seo.canonicalOverride;
   }

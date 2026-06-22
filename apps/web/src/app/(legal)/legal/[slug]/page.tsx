@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: LegalPageProps): Promise<Meta
     type: "article",
     publishedTime: legalEffectiveDate(doc),
     modifiedTime: doc.updatedAt ?? undefined,
-    ...(seo.noindex ? { noindex: true } : {}),
+    ...(seo.noindex ? { noindex: true, nofollow: seo.nofollow } : {}),
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
   });
 }

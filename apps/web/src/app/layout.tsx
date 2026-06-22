@@ -17,7 +17,7 @@ import { SITE_NAME, SITE_URL } from "@/lib/seo/canonical";
 import { isIndexingAllowed } from "@/lib/seo/indexing";
 import { siteVerification } from "@/lib/seo/verification";
 import { ogImageUrl } from "@/lib/seo/og";
-import { JsonLd, organizationSchema } from "@/lib/seo/jsonld";
+import { JsonLd, organizationSchema, webSiteSchema } from "@/lib/seo/jsonld";
 
 // Display family — headings, section titles, card titles. Preloaded for LCP.
 const manrope = Manrope({
@@ -145,6 +145,7 @@ export default function RootLayout({
         </a>
         <ConsentProvider>
           <JsonLd id="org-jsonld" data={organizationSchema()} />
+          <JsonLd id="website-jsonld" data={webSiteSchema()} />
           <PreviewBanner />
           <SearchProvider>
             <SmoothScrollProvider>{children}</SmoothScrollProvider>

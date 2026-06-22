@@ -50,6 +50,13 @@ interface BuildPageMetadataInput {
   /** Per-page noindex override. Default follows the global production gate. */
   noindex?: boolean | undefined;
   /**
+   * Add `nofollow` to the robots directive. Off by default: a per-page
+   * `noindex` still emits `follow` so crawlers pass link equity through and
+   * discover linked pages. Set true only for an explicit `noindex,nofollow`
+   * intent (the staging indexing-gate forces nofollow regardless).
+   */
+  nofollow?: boolean | undefined;
+  /**
    * Absolute canonical URL override (any domain). When set, replaces the
    * default self-canonical derived from `path`. Used for the CMS
    * `seo.canonicalOverride` field (syndication, migrated URLs, A/B variants).
@@ -81,6 +88,7 @@ export function buildPageMetadata({
   modifiedTime,
   authors,
   noindex,
+  nofollow,
   canonicalUrl,
   variant,
   eyebrow,
@@ -89,7 +97,12 @@ export function buildPageMetadata({
 }: BuildPageMetadataInput): Metadata {
   const url = `${SITE_URL}${path}`;
   // Build-time gate (no request host) — the per-host backstop is proxy.ts.
-  const robotsBlocked = noindex || !isIndexingAllowed();
+  const gateBlocked = !isIndexingAllowed();
+  const robotsBlocked = noindex || gateBlocked;
+  // A per-page noindex still follows links (equity flows, linked pages stay
+  // discoverable); the staging gate-block and an explicit nofollow are full
+  // no-follow.
+  const robotsFollow = gateBlocked ? false : !nofollow;
 
   // `absoluteTitle` callers own the full <title> (brand included) and bypass the
   // layout template, so leave theirs untouched. Everyone else gets the brand
@@ -146,7 +159,11 @@ export function buildPageMetadata({
       images: [{ url: ogImage.url, alt: ogImage.alt }],
     },
     robots: robotsBlocked
-      ? { index: false, follow: false, googleBot: { index: false, follow: false } }
+      ? {
+          index: false,
+          follow: robotsFollow,
+          googleBot: { index: false, follow: robotsFollow },
+        }
       : {
           index: true,
           follow: true,

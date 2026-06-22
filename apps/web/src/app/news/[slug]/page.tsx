@@ -62,7 +62,7 @@ export async function generateMetadata({
     eyebrow: "News",
     type: "article",
     publishedTime: item.publicationDate ?? undefined,
-    ...(seo.noindex ? { noindex: true } : {}),
+    ...(seo.noindex ? { noindex: true, nofollow: seo.nofollow } : {}),
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
     ...(seo.image
       ? { image: seo.image }
@@ -115,6 +115,7 @@ export async function renderNewsDetail({
           description: item.abstract ?? undefined,
           path: `/news/${item.slug}`,
           publishedAt: item.publicationDate ?? undefined,
+          modifiedAt: item.updatedAt ?? undefined,
           imageUrl: heroAbsolute,
           section: item.pressType ?? undefined,
         })}

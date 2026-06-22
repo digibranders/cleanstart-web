@@ -14,7 +14,7 @@ CleanStart is shipping a Next.js 16.2.5 / React 19 / Tailwind v4 marketing site 
 
 **In scope for v1 launch (P0):** branch & env strategy, DNS/TLS via Cloudflare, security headers + CSP (report-only → enforce, see §4), error boundaries, SEO (sitemap, canonical, JSON-LD, og:image), CMS draft-mode noindex, Sentry + Vercel Analytics + GA4 with Consent Mode v2, cookie banner, ISR + revalidate webhook, accessibility (WCAG 2.2 AA), Lighthouse CI, axe-core CI, security.txt, legal pages, rollback runbook.
 
-**Out of scope for v1 (P1+):** llms.txt/ai.txt (post-launch), UptimeRobot wiring (post-launch), HSTS preload submission (+7 days), DMARC progression, status page (BetterStack v1.5).
+**Out of scope for v1 (P1+):** llms.txt/ai.txt (post-launch), BetterStack browser/synthetic monitor (Team plan; HTTP uptime monitors are wired — see §10 Uptime monitoring), HSTS preload submission (+7 days), DMARC progression, status page (BetterStack v1.5).
 
 **Pages built:** 7 of 31 (see `docs/web/WEB-PAGES.md`). Legal hub + privacy + terms ship before DNS flip.
 
@@ -531,7 +531,22 @@ Single channel: email `admin@digibranders.com`. Sentry rules:
 
 ### Health endpoint
 
-`apps/web/src/app/api/health/route.ts` returns `{ status: 'ok', commit: process.env.VERCEL_GIT_COMMIT_SHA, env: process.env.VERCEL_ENV }`. Used by UptimeRobot (§16) and the rollback runbook (§15).
+`apps/web/src/app/api/health/route.ts` returns `{ status: 'ok', commit: process.env.VERCEL_GIT_COMMIT_SHA, env: process.env.VERCEL_ENV, ts }` with `Cache-Control: no-store`. It is an **edge liveness probe** — a 200 means Vercel is serving the deployment; it does **not** prove a page renders. Consumed by the BetterStack liveness monitor (below) and the rollback runbook (§15).
+
+### Uptime monitoring (BetterStack)
+
+Two HTTP monitors on the production site (`https://www.cleanstart.com`), mirroring the CMS probe (`docs/operations/CMS-DEPLOYMENT.md` row 23). BetterStack HTTP monitors fetch the raw response without executing JS, so keyword checks match against the **SSR HTML**.
+
+| # | Monitor | URL | Pass criteria | Catches |
+|---|---------|-----|----------------|---------|
+| 1 | Web — liveness | `https://www.cleanstart.com/api/health` | HTTP 200 **and** body contains `"status":"ok"` | Deploy failure, DNS/TLS break, Vercel outage |
+| 2 | Web — homepage render | `https://www.cleanstart.com/` | HTTP 200 **and** body contains `"@type":"Organization"` **and** body does NOT contain `Application Error` | SSR crash, wrong/empty deploy, server-rendered error page |
+
+Settings for both: check interval 1 min; ≥ 3 monitoring regions; request timeout 30 s; alert after 2 consecutive failures (~2 min, avoids single-region blips); recovery notification on. Alert channel `admin@digibranders.com` (same as Sentry, §10 Alerts).
+
+**Keyword rationale:** `"@type":"Organization"` is emitted server-side by the root layout's org JSON-LD (`apps/web/src/lib/seo/jsonld.ts`, rendered on every page) — structural, not marketing copy, so content edits (incl. the `farheen` branch) won't trip it, and the `global-error` boundary renders no JSON-LD, so a real SSR failure drops the keyword and fires the alert.
+
+**Known blind spot:** both are HTTP probes, so neither catches a **client-side-only hydration crash** — the page SSRs 200 with the org JSON-LD intact, then React throws in the browser (exactly the 2026-06-19 Trusted-Types/CSP incident: every page showed the `global-error` boundary while `/api/health` and the homepage both returned 200). Covering that class requires a BetterStack **browser monitor** (Team plan) that loads `/` and fails on console errors — see the post-launch watch list (§19).
 
 ---
 
@@ -780,7 +795,8 @@ Only after all 22 pass: switch Vercel Production Domain to `www.cleanstart.com` 
 | Day | Action |
 |---|---|
 | T+0 (launch) | Sentry feed open; Vercel deployment pinned |
-| T+24h | If CSP Report-Only is clean → flip to enforcing |
+| T+24h | If CSP Report-Only is clean → flip to enforcing (`CSP_ENFORCE=1`). **Prereq:** the Trusted-Types directives must be absent from `buildCsp` (removed 2026-06-19 — they crash Turbopack chunk loading; see §4 CSP). Verify the site renders + no console errors after the flip. |
+| T+24h | Add the BetterStack browser monitor on `/` (console-error check) to cover the client-side-crash blind spot in the HTTP uptime monitors (§10). |
 | T+72h | Lighthouse field data check (CrUX preview if eligible) |
 | T+7d | If no cert/header incidents → submit HSTS preload at hstspreload.org |
 | T+7d | Raise DNS TTL: 300 → 3600 |

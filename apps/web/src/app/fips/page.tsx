@@ -12,7 +12,7 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
 
 export const metadata = buildPageMetadata({
-  title: "FIPS-compliant hardened container images | Cleanstart",
+  title: "FIPS-compliant hardened container images | CleanStart",
   absoluteTitle: true,
   description:
     "FIPS 140-3 validated cryptography built into hardened containers. Secure regulated workloads with automated compliance and continuous monitoring.",

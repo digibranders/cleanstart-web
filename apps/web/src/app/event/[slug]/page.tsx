@@ -9,15 +9,29 @@ import {
   formatEventDate,
   getEventBySlug,
   getEventBySlugDraft,
+  getEventSlugs,
+  type EventCountry,
 } from "@/lib/events";
 import { mediaUrl } from "@/lib/blog";
 import { RenderLexical } from "@/lib/renderLexical";
-import { buildPageMetadata, absoluteUrl } from "@/lib/seo/canonical";
+import { buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLd, breadcrumbSchema, eventSchema } from "@/lib/seo/jsonld";
 
 interface EventDetailPageProps {
   params: Promise<{ slug: string }>;
+}
+
+// Slugs not returned here still render on first request, then cache (ISR).
+export const dynamicParams = true;
+
+/** Pre-render every published event; degrade to on-demand if CMS is down at build. */
+export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
+  try {
+    return (await getEventSlugs()).map((slug) => ({ slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({
@@ -45,7 +59,7 @@ export async function generateMetadata({
       `Join CleanStart at ${event.title}${event.venue ? `, ${event.venue}` : ""}.`,
     path: `/event/${event.slug}`,
     eyebrow: "Event",
-    ...(seo.noindex ? { noindex: true } : {}),
+    ...(seo.noindex ? { noindex: true, nofollow: seo.nofollow } : {}),
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
     ...(seo.image
       ? { image: seo.image }
@@ -62,46 +76,13 @@ export async function generateMetadata({
   });
 }
 
-const SCHEMA_EVENT_STATUS: Record<string, string> = {
-  scheduled: "https://schema.org/EventScheduled",
-  postponed: "https://schema.org/EventPostponed",
-  cancelled: "https://schema.org/EventCancelled",
+// Event country enum → ISO 3166-1 alpha-2 for the schema PostalAddress.
+const COUNTRY_ISO: Record<EventCountry, string> = {
+  india: "IN",
+  "united-states": "US",
+  uae: "AE",
+  thailand: "TH",
 };
-
-function eventJsonLd(event: {
-  title: string;
-  slug: string;
-  startsAt?: string | null;
-  endsAt?: string | null;
-  venue: string;
-  abstract?: string | null;
-  eventStatus: string;
-  previousStartDate?: string | null;
-  heroImage?: { url: string } | null;
-}) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Event",
-    name: event.title,
-    url: absoluteUrl(`/event/${event.slug}`),
-    ...(event.startsAt ? { startDate: event.startsAt } : {}),
-    ...(event.endsAt ? { endDate: event.endsAt } : {}),
-    eventStatus:
-      SCHEMA_EVENT_STATUS[event.eventStatus] ?? SCHEMA_EVENT_STATUS.scheduled,
-    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-    location: {
-      "@type": "Place",
-      name: event.venue,
-    },
-    ...(event.abstract ? { description: event.abstract } : {}),
-    ...(event.heroImage?.url
-      ? { image: [mediaUrl(event.heroImage.url)] }
-      : {}),
-    ...(event.previousStartDate
-      ? { previousStartDate: event.previousStartDate }
-      : {}),
-  };
-}
 
 export async function renderEventDetail({
   slug,
@@ -151,7 +132,21 @@ export async function renderEventDetail({
           { name: event.title },
         ])}
       />
-      <JsonLd id={`event-schema-${event.slug}`} data={eventJsonLd(event)} />
+      <JsonLd
+        id={`event-schema-${event.slug}`}
+        data={eventSchema({
+          title: event.title,
+          path: `/event/${event.slug}`,
+          startDate: event.startsAt,
+          endDate: event.endsAt,
+          venue: event.venue,
+          addressCountry: event.country ? COUNTRY_ISO[event.country] : undefined,
+          description: event.abstract,
+          eventStatus: event.eventStatus,
+          previousStartDate: event.previousStartDate,
+          imageUrl: event.heroImage?.url ? mediaUrl(event.heroImage.url) : undefined,
+        })}
+      />
       <Header />
       <main id="main-content" style={{ background: "#f6f6f6" }}>
         {/* Mobile: compact card-style layout. */}

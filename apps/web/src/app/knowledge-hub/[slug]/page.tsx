@@ -3,6 +3,7 @@ import { mediaUrl } from '@/lib/blog';
 import { getKnowledgeArticle, getKnowledgeArticleSlugs } from '@/lib/knowledge-hub';
 import { buildPageMetadata } from '@/lib/seo/canonical';
 import { resolveCmsSeo } from '@/lib/seo/cms-seo';
+import { ogImageUrl } from '@/lib/seo/og';
 import {
   JsonLd,
   articleSchema,
@@ -46,7 +47,7 @@ export async function generateMetadata({
     type: 'article',
     publishedTime: article.publishedAt ?? undefined,
     modifiedTime: article.updatedAt ?? undefined,
-    ...(seo.noindex ? { noindex: true } : {}),
+    ...(seo.noindex ? { noindex: true, nofollow: seo.nofollow } : {}),
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
     ...(seo.image ? { image: seo.image } : {}),
   });
@@ -62,6 +63,18 @@ export default async function KnowledgeHubArticlePage({
   if (!article) {
     notFound();
   }
+
+  // Article structured data requires an image. KB articles have no cover-image
+  // field, so use the editor's OG image when set, else the generated 1200x630
+  // OG card — guaranteeing every article carries a valid representative image.
+  const seo = resolveCmsSeo(article.seo, { absolutize: mediaUrl });
+  const articleImage =
+    seo.image?.url ??
+    ogImageUrl({
+      title: article.title,
+      eyebrow: article.category?.name ?? 'Knowledge Hub',
+      sub: article.abstract ?? undefined,
+    });
 
   const crumbs = [
     { name: 'Home', path: '/' },
@@ -86,6 +99,7 @@ export default async function KnowledgeHubArticlePage({
           path: `/knowledge-hub/${article.slug}`,
           publishedAt: article.publishedAt ?? undefined,
           modifiedAt: article.updatedAt ?? undefined,
+          imageUrl: articleImage,
           type: article.category?.name,
         })}
       />
@@ -97,6 +111,7 @@ export default async function KnowledgeHubArticlePage({
             description: article.abstract ?? undefined,
             contentUrl: article.videoUrl,
             uploadDate: article.publishedAt ?? undefined,
+            thumbnailUrl: articleImage,
             embedPath: `/knowledge-hub/${article.slug}`,
           })}
         />
