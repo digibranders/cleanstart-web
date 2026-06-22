@@ -37,7 +37,14 @@ const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? 'http://localhost:3000';
 const CMS_API_KEY = process.env.CMS_API_KEY;
 const CMS_API_KEY_COLLECTION = process.env.CMS_API_KEY_COLLECTION ?? 'users';
 
-const DEFAULT_REVALIDATE_SECONDS = 60;
+// Time-based ISR is only a fallback here: the CMS pushes on-demand
+// revalidation (revalidatePath / revalidateTag via /api/revalidate) the
+// instant a doc is published or edited, so pages go live in seconds without
+// waiting out this window. A long fallback keeps content correct if a webhook
+// is ever missed while avoiding a regeneration (= a billed ISR write) on every
+// CMS-backed route once a minute. Per-call overrides via `revalidateSeconds`
+// still apply for anything that needs to be fresher.
+const DEFAULT_REVALIDATE_SECONDS = 3600;
 
 const stripPublishedFilter = (path: string): string => {
   // Path is of the form `/api/<coll>?...querystring...`. Parse the
