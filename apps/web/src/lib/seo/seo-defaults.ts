@@ -30,6 +30,34 @@ export interface SeoDefaultsDoc {
     url?: string | null;
     logo?: MediaRef | null;
     sameAs?: SameAsRow[] | null;
+    alternateName?: string | null;
+    slogan?: string | null;
+    foundingDate?: string | null;
+    foundingLocation?: string | null;
+    numberOfEmployees?: number | null;
+    email?: string | null;
+    telephone?: string | null;
+    founders?: { name?: string | null; jobTitle?: string | null; url?: string | null }[] | null;
+    address?: {
+      streetAddress?: string | null;
+      addressLocality?: string | null;
+      addressRegion?: string | null;
+      postalCode?: string | null;
+      addressCountry?: string | null;
+    } | null;
+    contactPoints?: {
+      contactType?: string | null;
+      telephone?: string | null;
+      email?: string | null;
+      areaServed?: string | null;
+    }[] | null;
+    identifiers?: {
+      vatID?: string | null;
+      taxID?: string | null;
+      duns?: string | null;
+      naics?: string | null;
+      iso6523?: string | null;
+    } | null;
   } | null;
   newsMediaOrganization?: {
     enabled?: boolean | null;
@@ -82,6 +110,81 @@ export function orgConfigFromDefaults(d: SeoDefaultsDoc | null): OrganizationCon
     .map((r) => clean(r?.url))
     .filter((u): u is string => u != null);
   if (sameAs.length > 0) cfg.sameAs = sameAs;
+
+  const alternateName = clean(org?.alternateName);
+  if (alternateName) cfg.alternateName = alternateName;
+  const slogan = clean(org?.slogan);
+  if (slogan) cfg.slogan = slogan;
+  const foundingDate = clean(org?.foundingDate);
+  if (foundingDate) cfg.foundingDate = foundingDate;
+  const foundingLocation = clean(org?.foundingLocation);
+  if (foundingLocation) cfg.foundingLocation = foundingLocation;
+  if (typeof org?.numberOfEmployees === "number") cfg.numberOfEmployees = org.numberOfEmployees;
+  const email = clean(org?.email);
+  if (email) cfg.email = email;
+  const telephone = clean(org?.telephone);
+  if (telephone) cfg.telephone = telephone;
+
+  const founders = (org?.founders ?? [])
+    .map((f) => {
+      const fname = clean(f?.name);
+      if (!fname) return null;
+      const jobTitle = clean(f?.jobTitle);
+      const furl = clean(f?.url);
+      return { name: fname, ...(jobTitle ? { jobTitle } : {}), ...(furl ? { url: furl } : {}) };
+    })
+    .filter((f): f is NonNullable<typeof f> => f != null);
+  if (founders.length > 0) cfg.founders = founders;
+
+  const addr = org?.address;
+  if (addr) {
+    const a: NonNullable<OrganizationConfig["address"]> = {};
+    const street = clean(addr.streetAddress);
+    if (street) a.streetAddress = street;
+    const locality = clean(addr.addressLocality);
+    if (locality) a.addressLocality = locality;
+    const region = clean(addr.addressRegion);
+    if (region) a.addressRegion = region;
+    const postal = clean(addr.postalCode);
+    if (postal) a.postalCode = postal;
+    const country = clean(addr.addressCountry);
+    if (country) a.addressCountry = country;
+    if (Object.keys(a).length > 0) cfg.address = a;
+  }
+
+  const contactPoints = (org?.contactPoints ?? [])
+    .map((c) => {
+      const contactType = clean(c?.contactType);
+      if (!contactType) return null;
+      const tel = clean(c?.telephone);
+      const cemail = clean(c?.email);
+      const area = clean(c?.areaServed);
+      return {
+        contactType,
+        ...(tel ? { telephone: tel } : {}),
+        ...(cemail ? { email: cemail } : {}),
+        ...(area ? { areaServed: area } : {}),
+      };
+    })
+    .filter((c): c is NonNullable<typeof c> => c != null);
+  if (contactPoints.length > 0) cfg.contactPoints = contactPoints;
+
+  const ids = org?.identifiers;
+  if (ids) {
+    const i: NonNullable<OrganizationConfig["identifiers"]> = {};
+    const vatID = clean(ids.vatID);
+    if (vatID) i.vatID = vatID;
+    const taxID = clean(ids.taxID);
+    if (taxID) i.taxID = taxID;
+    const duns = clean(ids.duns);
+    if (duns) i.duns = duns;
+    const naics = clean(ids.naics);
+    if (naics) i.naics = naics;
+    const iso6523 = clean(ids.iso6523);
+    if (iso6523) i.iso6523 = iso6523;
+    if (Object.keys(i).length > 0) cfg.identifiers = i;
+  }
+
   if (news?.enabled) {
     const nm: NonNullable<OrganizationConfig["newsMedia"]> = {};
     const set = (key: keyof NonNullable<OrganizationConfig["newsMedia"]>, raw: string | null | undefined): void => {

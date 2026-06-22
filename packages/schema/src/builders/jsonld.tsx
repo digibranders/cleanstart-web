@@ -1,3 +1,4 @@
+import type { GraphNode } from "../types";
 import { SITE_NAME, SITE_URL, absoluteUrl } from "./site";
 
 interface JsonLdProps {
@@ -68,20 +69,91 @@ export interface NewsMediaConfig {
  * is optional; missing values fall back to the hardcoded brand defaults, so the
  * build still produces valid markup if the CMS is unreachable (INV-1).
  */
+export interface OrganizationFounder {
+  name: string;
+  jobTitle?: string;
+  url?: string;
+}
+
+export interface OrganizationAddress {
+  streetAddress?: string;
+  addressLocality?: string;
+  addressRegion?: string;
+  postalCode?: string;
+  addressCountry?: string;
+}
+
+export interface OrganizationContactPoint {
+  contactType: string;
+  telephone?: string;
+  email?: string;
+  areaServed?: string;
+}
+
+export interface OrganizationIdentifiers {
+  vatID?: string;
+  taxID?: string;
+  duns?: string;
+  naics?: string;
+  iso6523?: string;
+}
+
 export interface OrganizationConfig {
   name?: string;
   legalName?: string;
+  alternateName?: string;
   url?: string;
   description?: string;
   logoUrl?: string;
   sameAs?: string[];
+  slogan?: string;
+  /** Company/website founding date — ISO 8601 (e.g. 2024-01-15). */
+  foundingDate?: string;
+  foundingLocation?: string;
+  numberOfEmployees?: number;
+  email?: string;
+  telephone?: string;
+  founders?: OrganizationFounder[];
+  address?: OrganizationAddress;
+  contactPoints?: OrganizationContactPoint[];
+  identifiers?: OrganizationIdentifiers;
   /** When set, the node is emitted as a NewsMediaOrganization. */
   newsMedia?: NewsMediaConfig;
 }
 
+const hasAny = (o: object | undefined): boolean =>
+  o != null && Object.values(o).some((v) => v != null && v !== "");
+
+const founderNode = (f: OrganizationFounder): GraphNode => ({
+  "@type": "Person",
+  name: f.name,
+  ...(f.jobTitle ? { jobTitle: f.jobTitle } : {}),
+  ...(f.url ? { url: f.url } : {}),
+});
+
+const addressNode = (a: OrganizationAddress): GraphNode => ({
+  "@type": "PostalAddress",
+  ...(a.streetAddress ? { streetAddress: a.streetAddress } : {}),
+  ...(a.addressLocality ? { addressLocality: a.addressLocality } : {}),
+  ...(a.addressRegion ? { addressRegion: a.addressRegion } : {}),
+  ...(a.postalCode ? { postalCode: a.postalCode } : {}),
+  ...(a.addressCountry ? { addressCountry: a.addressCountry } : {}),
+});
+
+const contactPointNode = (c: OrganizationContactPoint): GraphNode => ({
+  "@type": "ContactPoint",
+  contactType: c.contactType,
+  ...(c.telephone ? { telephone: c.telephone } : {}),
+  ...(c.email ? { email: c.email } : {}),
+  ...(c.areaServed ? { areaServed: c.areaServed } : {}),
+});
+
 export function organizationSchema(config: OrganizationConfig = {}) {
   const sameAs = config.sameAs && config.sameAs.length > 0 ? config.sameAs : DEFAULT_SAME_AS;
   const news = config.newsMedia;
+  const founders = (config.founders ?? []).filter((f) => f.name?.trim());
+  const contactPoints = (config.contactPoints ?? []).filter((c) => c.contactType?.trim());
+  const id = config.identifiers;
   return {
     "@context": "https://schema.org",
     "@type": news ? "NewsMediaOrganization" : "Organization",
@@ -96,6 +168,25 @@ export function organizationSchema(config: OrganizationConfig = {}) {
       ...(config.logoUrl ? {} : { width: 459, height: 96 }),
     },
     sameAs,
+    ...(config.alternateName ? { alternateName: config.alternateName } : {}),
+    ...(config.slogan ? { slogan: config.slogan } : {}),
+    ...(config.foundingDate ? { foundingDate: config.foundingDate } : {}),
+    ...(config.foundingLocation
+      ? { foundingLocation: { "@type": "Place", name: config.foundingLocation } }
+      : {}),
+    ...(config.numberOfEmployees != null
+      ? { numberOfEmployees: { "@type": "QuantitativeValue", value: config.numberOfEmployees } }
+      : {}),
+    ...(config.email ? { email: config.email } : {}),
+    ...(config.telephone ? { telephone: config.telephone } : {}),
+    ...(founders.length > 0 ? { founder: founders.map(founderNode) } : {}),
+    ...(hasAny(config.address) ? { address: addressNode(config.address as OrganizationAddress) } : {}),
+    ...(contactPoints.length > 0 ? { contactPoint: contactPoints.map(contactPointNode) } : {}),
+    ...(id?.vatID ? { vatID: id.vatID } : {}),
+    ...(id?.taxID ? { taxID: id.taxID } : {}),
+    ...(id?.duns ? { duns: id.duns } : {}),
+    ...(id?.naics ? { naics: id.naics } : {}),
+    ...(id?.iso6523 ? { iso6523Code: id.iso6523 } : {}),
     ...(news
       ? {
           ...(news.foundingDate ? { foundingDate: news.foundingDate } : {}),
