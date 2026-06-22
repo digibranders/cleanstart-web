@@ -8,7 +8,10 @@ import { CisoEnterprise } from "@/components/sections/ciso/CisoEnterprise";
 import { CisoValidationOutcomes } from "@/components/sections/ciso/CisoValidationOutcomes";
 import { CisoCTA } from "@/components/sections/ciso/CisoCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph } from "@/lib/seo/compose-page";
+import { getRegistryOverride } from "@/lib/page-registry";
 
 export const metadata = buildPageMetadata({
   title: "Hardened Images & Libraries for Security and Compliance Teams | CleanStart",
@@ -19,15 +22,23 @@ export const metadata = buildPageMetadata({
   eyebrow: "Solutions",
 });
 
-export default function ForCisoPage(): React.ReactElement {
+export const revalidate = 3600;
+
+export default async function ForCisoPage(): Promise<React.ReactElement> {
+  const schemaOverride = await getRegistryOverride("/for-ciso");
   return (
     <>
-      <JsonLd
-        id="for-ciso-breadcrumbs"
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "For CISOs" },
-        ])}
+      <JsonLdGraph
+        id="for-ciso-jsonld"
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "For CISOs" },
+            ]),
+          ],
+          override: schemaOverride,
+        })}
       />
       <Header />
       <main id="main-content">

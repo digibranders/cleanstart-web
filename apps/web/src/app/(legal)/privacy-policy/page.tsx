@@ -6,7 +6,10 @@ import { getLegalBySlug, legalEffectiveDate, PRIVACY_POLICY_SLUG } from "@/lib/l
 import { RenderLexical } from "@/lib/renderLexical";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph } from "@/lib/seo/compose-page";
+import { getRegistryOverride } from "@/lib/page-registry";
 
 /**
  * Privacy Policy. The content lives in the `legalDocuments` CMS collection
@@ -52,6 +55,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PrivacyPolicyPage(): Promise<React.ReactElement> {
+  const schemaOverride = await getRegistryOverride("/privacy-policy");
   const doc = await getLegalBySlug(PRIVACY_POLICY_SLUG).catch(() => null);
   if (!doc) notFound();
 
@@ -59,13 +63,18 @@ export default async function PrivacyPolicyPage(): Promise<React.ReactElement> {
     <>
       <LegalDocHeader doc={doc} />
       {doc.body ? <RenderLexical content={doc.body} /> : null}
-      <JsonLd
-        id="privacy-breadcrumbs"
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Legal", path: "/legal" },
-          { name: doc.title },
-        ])}
+      <JsonLdGraph
+        id="privacy-policy-jsonld"
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "Legal", path: "/legal" },
+              { name: doc.title },
+            ]),
+          ],
+          override: schemaOverride,
+        })}
       />
     </>
   );

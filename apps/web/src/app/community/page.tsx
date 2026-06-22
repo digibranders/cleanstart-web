@@ -6,7 +6,10 @@ import { CommunityCTA } from '@/components/sections/community/CommunityCTA';
 import { Footer } from '@/components/sections/Footer';
 import { FadeUp } from '@/components/ui/FadeUp';
 import { buildPageMetadata } from '@/lib/seo/canonical';
-import { JsonLd, breadcrumbSchema } from '@/lib/seo/jsonld';
+import { breadcrumbSchema } from '@/lib/seo/jsonld';
+import { JsonLdGraph } from '@/components/JsonLdGraph';
+import { buildPageGraph } from '@/lib/seo/compose-page';
+import { getRegistryOverride } from '@/lib/page-registry';
 
 export const metadata = buildPageMetadata({
   title: 'Developer & Security Community',
@@ -15,12 +18,20 @@ export const metadata = buildPageMetadata({
   path: '/community',
 });
 
-export default function CommunityPage() {
+export const revalidate = 3600;
+
+export default async function CommunityPage(): Promise<React.ReactElement> {
+  const schemaOverride = await getRegistryOverride('/community');
   return (
     <>
-      <JsonLd
-        id="community-breadcrumbs"
-        data={breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Community' }])}
+      <JsonLdGraph
+        id="community-jsonld"
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Community' }]),
+          ],
+          override: schemaOverride,
+        })}
       />
       <Header />
       <main id="main-content">

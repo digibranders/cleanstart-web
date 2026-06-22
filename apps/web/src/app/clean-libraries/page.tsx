@@ -9,11 +9,10 @@ import { LibrariesWorkflow } from "@/components/sections/clean-libraries/Librari
 import { LibrariesOutcomes } from "@/components/sections/clean-libraries/LibrariesOutcomes";
 import { LibrariesCTA } from "@/components/sections/clean-libraries/LibrariesCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import {
-  JsonLd,
-  breadcrumbSchema,
-  softwareApplicationSchema,
-} from "@/lib/seo/jsonld";
+import { breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph } from "@/lib/seo/compose-page";
+import { getRegistryOverride } from "@/lib/page-registry";
 
 export const metadata = buildPageMetadata({
   title: "Clean Library: Verify Every Dependency Across Your Workflow",
@@ -25,23 +24,28 @@ export const metadata = buildPageMetadata({
   eyebrow: "Products",
 });
 
-export default function CleanLibrariesPage(): React.ReactElement {
+export const revalidate = 3600;
+
+export default async function CleanLibrariesPage(): Promise<React.ReactElement> {
+  const schemaOverride = await getRegistryOverride("/clean-libraries");
   return (
     <>
-      <JsonLd
-        id="clean-libraries-breadcrumbs"
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Clean Libraries" },
-        ])}
-      />
-      <JsonLd
-        id="clean-libraries-software"
-        data={softwareApplicationSchema({
-          name: "Clean Libraries",
-          description:
-            "Discover, validate, and govern every software dependency — including AI-introduced libraries — across the development lifecycle, with policy enforcement built into existing CI/CD and registries.",
-          path: "/clean-libraries",
+      <JsonLdGraph
+        id="clean-libraries-jsonld"
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "Clean Libraries" },
+            ]),
+            softwareApplicationSchema({
+              name: "Clean Libraries",
+              description:
+                "Discover, validate, and govern every software dependency — including AI-introduced libraries — across the development lifecycle, with policy enforcement built into existing CI/CD and registries.",
+              path: "/clean-libraries",
+            }),
+          ],
+          override: schemaOverride,
         })}
       />
       <Header />

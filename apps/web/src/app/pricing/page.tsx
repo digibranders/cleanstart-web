@@ -5,7 +5,10 @@ import { PricingPlans } from "@/components/sections/pricing/PricingPlans";
 import { PricingTiers } from "@/components/sections/pricing/PricingTiers";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph } from "@/lib/seo/compose-page";
+import { getRegistryOverride } from "@/lib/page-registry";
 
 export const metadata = buildPageMetadata({
   title: "Pricing | CleanStart",
@@ -15,15 +18,23 @@ export const metadata = buildPageMetadata({
   path: "/pricing",
 });
 
-export default function PricingPage(): React.ReactElement {
+export const revalidate = 3600;
+
+export default async function PricingPage(): Promise<React.ReactElement> {
+  const schemaOverride = await getRegistryOverride("/pricing");
   return (
     <>
-      <JsonLd
-        id="pricing-breadcrumbs"
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Pricing" },
-        ])}
+      <JsonLdGraph
+        id="pricing-jsonld"
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "Pricing" },
+            ]),
+          ],
+          override: schemaOverride,
+        })}
       />
       <Header />
       <main id="main-content">

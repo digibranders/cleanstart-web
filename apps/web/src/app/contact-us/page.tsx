@@ -6,7 +6,10 @@ import { ContactOffices } from "@/components/sections/contact/ContactOffices";
 import { FrequentlyAskedQuestions } from "@/components/sections/home/FrequentlyAskedQuestions";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph } from "@/lib/seo/compose-page";
+import { getRegistryOverride } from "@/lib/page-registry";
 
 export const metadata = buildPageMetadata({
   title: "Contact CleanStart | Talk to a Secure Software Expert",
@@ -16,15 +19,23 @@ export const metadata = buildPageMetadata({
   path: "/contact-us",
 });
 
-export default function ContactUsPage() {
+export const revalidate = 3600;
+
+export default async function ContactUsPage(): Promise<React.ReactElement> {
+  const schemaOverride = await getRegistryOverride("/contact-us");
   return (
     <>
-      <JsonLd
-        id="contact-breadcrumbs"
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Contact Us" },
-        ])}
+      <JsonLdGraph
+        id="contact-us-jsonld"
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "Contact Us" },
+            ]),
+          ],
+          override: schemaOverride,
+        })}
       />
       <Header />
       <main id="main-content">

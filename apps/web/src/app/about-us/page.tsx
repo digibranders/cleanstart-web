@@ -9,7 +9,10 @@ import { AboutCTA } from "@/components/sections/about/AboutCTA";
 import { Footer } from "@/components/sections/Footer";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph } from "@/lib/seo/compose-page";
+import { getRegistryOverride } from "@/lib/page-registry";
 
 export const metadata = buildPageMetadata({
   title: "About CleanStart | Building Trusted Software Foundations",
@@ -19,15 +22,23 @@ export const metadata = buildPageMetadata({
   path: "/about-us",
 });
 
-export default function AboutPage() {
+export const revalidate = 3600;
+
+export default async function AboutPage(): Promise<React.ReactElement> {
+  const schemaOverride = await getRegistryOverride("/about-us");
   return (
     <>
-      <JsonLd
-        id="about-breadcrumbs"
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "About Us" },
-        ])}
+      <JsonLdGraph
+        id="about-us-jsonld"
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "About Us" },
+            ]),
+          ],
+          override: schemaOverride,
+        })}
       />
       <Header />
       <main id="main-content">

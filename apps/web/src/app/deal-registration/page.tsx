@@ -5,7 +5,10 @@ import { DealRegistrationForm } from "@/components/sections/forms/DealRegistrati
 import { AboutEcosystems } from "@/components/sections/about/AboutEcosystems";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph } from "@/lib/seo/compose-page";
+import { getRegistryOverride } from "@/lib/page-registry";
 
 export const metadata = buildPageMetadata({
   title: "Deal Registration",
@@ -14,15 +17,23 @@ export const metadata = buildPageMetadata({
   path: "/deal-registration",
 });
 
-export default function DealRegistrationPage() {
+export const revalidate = 3600;
+
+export default async function DealRegistrationPage(): Promise<React.ReactElement> {
+  const schemaOverride = await getRegistryOverride("/deal-registration");
   return (
     <>
-      <JsonLd
-        id="deal-registration-breadcrumbs"
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Deal Registration" },
-        ])}
+      <JsonLdGraph
+        id="deal-registration-jsonld"
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "Deal Registration" },
+            ]),
+          ],
+          override: schemaOverride,
+        })}
       />
       <Header />
       <main id="main-content" style={{ background: "#f3f3f6" }}>

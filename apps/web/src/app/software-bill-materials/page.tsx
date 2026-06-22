@@ -8,7 +8,10 @@ import { SbomIntelligence } from "@/components/sections/sbom/SbomIntelligence";
 import { SbomAdvantage } from "@/components/sections/sbom/SbomAdvantage";
 import { SbomCTA } from "@/components/sections/sbom/SbomCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph } from "@/lib/seo/compose-page";
+import { getRegistryOverride } from "@/lib/page-registry";
 
 export const metadata = buildPageMetadata({
   title: "CleanStart SBOM for software transparency | CleanStart",
@@ -19,15 +22,23 @@ export const metadata = buildPageMetadata({
   path: "/software-bill-materials",
 });
 
-export default function SoftwareBillOfMaterialsPage(): React.ReactElement {
+export const revalidate = 3600;
+
+export default async function SoftwareBillOfMaterialsPage(): Promise<React.ReactElement> {
+  const schemaOverride = await getRegistryOverride("/software-bill-materials");
   return (
     <>
-      <JsonLd
-        id="sbom-breadcrumbs"
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Software Bill of Materials" },
-        ])}
+      <JsonLdGraph
+        id="sbom-jsonld"
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "Software Bill of Materials" },
+            ]),
+          ],
+          override: schemaOverride,
+        })}
       />
       <Header />
       <main id="main-content">
