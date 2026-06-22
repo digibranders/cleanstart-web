@@ -62,13 +62,18 @@ async function run(): Promise<void> {
         skipped += 1;
         continue;
       }
-      // --force refreshes metadata only; never clobbers an editor's override
-      // OR their webPageType choice (both are editor-owned after creation).
+      // --force refreshes seed metadata. It never clobbers an editor's override.
+      // webPageType is editor-owned, so it's only FILLED when still unset
+      // ('none'/null) — this backfills existing rows (e.g. on prod, where rows
+      // predate the field) without overwriting a real choice an editor made.
+      const currentWebPageType = (current as { webPageType?: string | null }).webPageType;
+      const fillWebPageType =
+        row.webPageType != null && (currentWebPageType == null || currentWebPageType === 'none');
       if (!dryRun) {
         await payload.update({
           collection: 'pageRegistry',
           id: current.id,
-          data: metaData,
+          data: { ...metaData, ...(fillWebPageType ? { webPageType: row.webPageType } : {}) },
           overrideAccess: true,
         });
       }
