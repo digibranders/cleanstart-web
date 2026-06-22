@@ -651,7 +651,6 @@ export interface Media {
    * Photographer / source attribution.
    */
   credit?: string | null;
-  prefix?: string | null;
   /**
    * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
    */
@@ -659,6 +658,7 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -4058,7 +4058,7 @@ export interface PodcastEpisode {
    */
   featured?: boolean | null;
   /**
-   * When on, this episode is the embedded video in the /podcast hero (e.g. the Introduction). If several are on, the most recent wins; if none, the newest episode is used.
+   * When on, this episode is the embedded video in the /podcast hero (e.g. the Introduction). Only one episode can be the hero — turning this on clears it on any other episode. If none is set, the newest episode is used.
    */
   heroEpisode?: boolean | null;
   /**
@@ -4840,6 +4840,7 @@ export interface CareerApplication {
  */
 export interface Resume {
   id: number;
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -9411,13 +9412,13 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   credit?: T;
-  prefix?: T;
   focalPoint?:
     | T
     | {
         x?: T;
         y?: T;
       };
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -10923,6 +10924,7 @@ export interface CareerApplicationsSelect<T extends boolean = true> {
  * via the `definition` "resumes_select".
  */
 export interface ResumesSelect<T extends boolean = true> {
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -11601,78 +11603,18 @@ export interface SeoDefault {
    * Used as twitter:site fallback when no author handle is set.
    */
   twitterHandle?: string | null;
-  brandIcons?: {
-    /**
-     * 32×32 favicon. Used by `<link rel="icon" sizes="32x32">`.
-     */
-    favicon32?: (number | null) | Media;
-    /**
-     * 192×192 PNG. PWA / Android home-screen icon.
-     */
-    icon192?: (number | null) | Media;
-    /**
-     * 512×512 PNG. PWA / large-tile icon.
-     */
-    icon512?: (number | null) | Media;
-    /**
-     * 180×180 PNG. iOS home-screen icon (`apple-touch-icon`).
-     */
-    appleTouchIcon?: (number | null) | Media;
-    /**
-     * Single-colour SVG for Safari pinned-tab. Will be served as `mask-icon`.
-     */
-    safariPinnedTabSvg?: (number | null) | Media;
-    /**
-     * Hex string (e.g. #0E1117). Surfaced as `<meta name="theme-color">` and as `theme_color` in manifest.json.
-     */
-    themeColor?: string | null;
-  };
   /**
-   * Site-verification tokens. Each renders as a <meta> tag in the public site head (production host only). Paste the value from each console verbatim — no quotes, no <meta> wrapper.
-   */
-  verification?: {
-    /**
-     * google-site-verification (Google Search Console → Settings → Ownership verification → HTML tag).
-     */
-    google?: string | null;
-    /**
-     * msvalidate.01 (Bing Webmaster Tools → Site Settings → Site verification → Meta tag).
-     */
-    bing?: string | null;
-    /**
-     * p:domain_verify (Pinterest → Settings → Claim → claim a website → HTML tag).
-     */
-    pinterest?: string | null;
-    /**
-     * yandex-verification (Yandex Webmaster → Settings → Site verification → Meta tag).
-     */
-    yandex?: string | null;
-    /**
-     * facebook-domain-verification (Meta Business Suite → Brand Safety → Domains → Verify → Meta-tag).
-     */
-    facebookDomain?: string | null;
-  };
-  /**
-   * Surfaced on every page as the publisher reference. Required for News content.
+   * The site-wide Organization entity, surfaced on every page as the publisher reference.
    */
   organizationJsonLd?: {
     name?: string | null;
     legalName?: string | null;
-    url?: string | null;
-    logo?: (number | null) | Media;
-    /**
-     * Authoritative profile URLs (LinkedIn, GitHub, Crunchbase, etc.).
-     */
-    sameAs?:
-      | {
-          url: string;
-          id?: string | null;
-        }[]
-      | null;
     /**
      * Alternate / short brand name (Schema.org alternateName).
      */
     alternateName?: string | null;
+    url?: string | null;
+    logo?: (number | null) | Media;
     /**
      * Company tagline (Schema.org slogan).
      */
@@ -11698,6 +11640,15 @@ export interface SeoDefault {
      */
     telephone?: string | null;
     /**
+     * Authoritative profile URLs (LinkedIn, GitHub, Crunchbase, etc.).
+     */
+    sameAs?:
+      | {
+          url: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
      * Company founders — emitted as Schema.org founder (Person[]).
      */
     founders?:
@@ -11711,9 +11662,6 @@ export interface SeoDefault {
           id?: string | null;
         }[]
       | null;
-    /**
-     * Headquarters / primary address. Emitted as Schema.org PostalAddress.
-     */
     address?: {
       streetAddress?: string | null;
       /**
@@ -11730,9 +11678,6 @@ export interface SeoDefault {
        */
       addressCountry?: string | null;
     };
-    /**
-     * Typed contact channels — emitted as Schema.org contactPoint (ContactPoint[]).
-     */
     contactPoints?:
       | {
           /**
@@ -11748,9 +11693,6 @@ export interface SeoDefault {
           id?: string | null;
         }[]
       | null;
-    /**
-     * Optional registry identifiers that help search/AI engines disambiguate the entity for the Knowledge Panel. Leave blank if unknown.
-     */
     identifiers?: {
       /**
        * VAT registration number.
@@ -11775,8 +11717,39 @@ export interface SeoDefault {
     };
   };
   /**
-   * When enabled, the site-wide Organization blob upgrades to a NewsMediaOrganization. Pairs with NewsArticle JSON-LD (isAccessibleForFree: true) and /sitemap-news.xml to satisfy Google News eligibility (signals-based since October 2025). Leave disabled until the policy URLs below are real, published pages — Google penalises NewsMediaOrganization claims that point at empty or missing policies.
+   * Raw Schema.org JSON-LD added to every page (single object or array, each with @context + an allow-listed @type). Validated + capped at 16 KB; composed per-@type into the site-wide @graph at build time.
    */
+  additionalSchema?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  verification?: {
+    /**
+     * google-site-verification (Google Search Console → Settings → Ownership verification → HTML tag).
+     */
+    google?: string | null;
+    /**
+     * msvalidate.01 (Bing Webmaster Tools → Site Settings → Site verification → Meta tag).
+     */
+    bing?: string | null;
+    /**
+     * p:domain_verify (Pinterest → Settings → Claim → claim a website → HTML tag).
+     */
+    pinterest?: string | null;
+    /**
+     * yandex-verification (Yandex Webmaster → Settings → Site verification → Meta tag).
+     */
+    yandex?: string | null;
+    /**
+     * facebook-domain-verification (Meta Business Suite → Brand Safety → Domains → Verify → Meta-tag).
+     */
+    facebookDomain?: string | null;
+  };
   newsMediaOrganization?: {
     /**
      * Toggle on once the policy pages below exist and link from the site footer.
@@ -11827,18 +11800,32 @@ export interface SeoDefault {
      */
     coveragePolicy?: string | null;
   };
-  /**
-   * Raw Schema.org JSON-LD added to every page (single object or array, each with @context + an allow-listed @type). Validated + capped at 16 KB; composed per-@type into the site-wide @graph at build time.
-   */
-  additionalSchema?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
+  brandIcons?: {
+    /**
+     * 32×32 favicon. Used by `<link rel="icon" sizes="32x32">`.
+     */
+    favicon32?: (number | null) | Media;
+    /**
+     * 192×192 PNG. PWA / Android home-screen icon.
+     */
+    icon192?: (number | null) | Media;
+    /**
+     * 512×512 PNG. PWA / large-tile icon.
+     */
+    icon512?: (number | null) | Media;
+    /**
+     * 180×180 PNG. iOS home-screen icon (`apple-touch-icon`).
+     */
+    appleTouchIcon?: (number | null) | Media;
+    /**
+     * Single-colour SVG for Safari pinned-tab. Will be served as `mask-icon`.
+     */
+    safariPinnedTabSvg?: (number | null) | Media;
+    /**
+     * Hex string (e.g. #0E1117). Surfaced as `<meta name="theme-color">` and as `theme_color` in manifest.json.
+     */
+    themeColor?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -12094,45 +12081,26 @@ export interface SeoDefaultsSelect<T extends boolean = true> {
   defaultDescription?: T;
   defaultOgImage?: T;
   twitterHandle?: T;
-  brandIcons?:
-    | T
-    | {
-        favicon32?: T;
-        icon192?: T;
-        icon512?: T;
-        appleTouchIcon?: T;
-        safariPinnedTabSvg?: T;
-        themeColor?: T;
-      };
-  verification?:
-    | T
-    | {
-        google?: T;
-        bing?: T;
-        pinterest?: T;
-        yandex?: T;
-        facebookDomain?: T;
-      };
   organizationJsonLd?:
     | T
     | {
         name?: T;
         legalName?: T;
+        alternateName?: T;
         url?: T;
         logo?: T;
-        sameAs?:
-          | T
-          | {
-              url?: T;
-              id?: T;
-            };
-        alternateName?: T;
         slogan?: T;
         foundingDate?: T;
         foundingLocation?: T;
         numberOfEmployees?: T;
         email?: T;
         telephone?: T;
+        sameAs?:
+          | T
+          | {
+              url?: T;
+              id?: T;
+            };
         founders?:
           | T
           | {
@@ -12169,6 +12137,16 @@ export interface SeoDefaultsSelect<T extends boolean = true> {
               iso6523?: T;
             };
       };
+  additionalSchema?: T;
+  verification?:
+    | T
+    | {
+        google?: T;
+        bing?: T;
+        pinterest?: T;
+        yandex?: T;
+        facebookDomain?: T;
+      };
   newsMediaOrganization?:
     | T
     | {
@@ -12185,7 +12163,16 @@ export interface SeoDefaultsSelect<T extends boolean = true> {
         ownershipFundingInfo?: T;
         coveragePolicy?: T;
       };
-  additionalSchema?: T;
+  brandIcons?:
+    | T
+    | {
+        favicon32?: T;
+        icon192?: T;
+        icon512?: T;
+        appleTouchIcon?: T;
+        safariPinnedTabSvg?: T;
+        themeColor?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

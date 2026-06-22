@@ -31,6 +31,8 @@ import * as migration_20260622_200000_add_seo_schema_history from './20260622_20
 import * as migration_20260622_210000_add_seo_defaults_additional_schema from './20260622_210000_add_seo_defaults_additional_schema';
 import * as migration_20260622_220000_remove_podcast_page_global from './20260622_220000_remove_podcast_page_global';
 
+import * as migration_20260622_230000_add_seo_defaults_organization_fields from './20260622_230000_add_seo_defaults_organization_fields';
+
 export const migrations = [
   {
     up: migration_20260602_050520_initial_baseline.up,
@@ -191,5 +193,10 @@ export const migrations = [
     up: migration_20260622_220000_remove_podcast_page_global.up,
     down: migration_20260622_220000_remove_podcast_page_global.down,
     name: '20260622_220000_remove_podcast_page_global',
+  },
+  {
+    up: migration_20260622_230000_add_seo_defaults_organization_fields.up,
+    down: migration_20260622_230000_add_seo_defaults_organization_fields.down,
+    name: '20260622_230000_add_seo_defaults_organization_fields',
   },
 ];
