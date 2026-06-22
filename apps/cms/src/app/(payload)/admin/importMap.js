@@ -109,6 +109,8 @@ import { HealthBadge as HealthBadge_89f48d3894398c6d1021775cfdeaf211 } from '@/p
 import { TestButton as TestButton_0a975e83e531dadfb4f8fa6589a5704a } from '@/payload/admin/components/integrations/TestButton.tsx'
 import { AuditTrail as AuditTrail_eca9fb91faa70a942f7e3507305e451c } from '@/payload/admin/components/integrations/AuditTrail.tsx'
 import { UploadField as UploadField_9a37057695692a15b6c8aaeb6d981611 } from '@/payload/admin/components/fields/UploadField.tsx'
+import { GlobalSchemaView as GlobalSchemaView_962751a33d0bde2910843d19f617ee83 } from '../../../payload/admin/components/SchemaManager/GlobalSchemaView.tsx'
+import { CollapsibleField as CollapsibleField_e8aff66100db6bf10de9866e9f9ca5a8 } from '@/payload/admin/components/fields/CollapsibleField.tsx'
 import { Icon as Icon_c822e198d4078a1912cce52e024df304 } from '../../../payload/admin/Icon.tsx'
 import { Logo as Logo_dcbc6ddf8fe8d700973cf459e9b44aa4 } from '../../../payload/admin/Logo.tsx'
 import { SkipLink as SkipLink_27a678dd284d4042d03686d8b9a9b8e9 } from '../../../payload/admin/components/SkipLink.tsx'
@@ -134,7 +136,6 @@ import { CmsAccountView as CmsAccountView_e25882c99036df42ce1493c03452d7e3 } fro
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { PointField as PointField_dc800e7ca3d2eb7ea39fd4bc6138c687 } from '@/payload/admin/components/fields/PointField.tsx'
 import { RadioField as RadioField_31aae9b520654e49d40e444571bafe41 } from '@/payload/admin/components/fields/RadioField.tsx'
-import { CollapsibleField as CollapsibleField_e8aff66100db6bf10de9866e9f9ca5a8 } from '@/payload/admin/components/fields/CollapsibleField.tsx'
 import { TabsField as TabsField_c014faddfba6da88b9efedda256f4990 } from '@/payload/admin/components/fields/TabsField.tsx'
 import { RowField as RowField_1ef7316c3d3f9450222b0eb086a8e243 } from '@/payload/admin/components/fields/RowField.tsx'
 import { CodeField as CodeField_4aa85fbd783c4d26c5c89ebf383941c1 } from '@/payload/admin/components/fields/CodeField.tsx'
@@ -252,6 +253,8 @@ export const importMap = {
   "@/payload/admin/components/integrations/TestButton.tsx#TestButton": TestButton_0a975e83e531dadfb4f8fa6589a5704a,
   "@/payload/admin/components/integrations/AuditTrail.tsx#AuditTrail": AuditTrail_eca9fb91faa70a942f7e3507305e451c,
   "@/payload/admin/components/fields/UploadField.tsx#UploadField": UploadField_9a37057695692a15b6c8aaeb6d981611,
+  "./payload/admin/components/SchemaManager/GlobalSchemaView.tsx#GlobalSchemaView": GlobalSchemaView_962751a33d0bde2910843d19f617ee83,
+  "@/payload/admin/components/fields/CollapsibleField.tsx#CollapsibleField": CollapsibleField_e8aff66100db6bf10de9866e9f9ca5a8,
   "./payload/admin/Icon.tsx#Icon": Icon_c822e198d4078a1912cce52e024df304,
   "./payload/admin/Logo.tsx#Logo": Logo_dcbc6ddf8fe8d700973cf459e9b44aa4,
   "./payload/admin/components/SkipLink.tsx#SkipLink": SkipLink_27a678dd284d4042d03686d8b9a9b8e9,
@@ -277,7 +280,6 @@ export const importMap = {
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@/payload/admin/components/fields/PointField.tsx#PointField": PointField_dc800e7ca3d2eb7ea39fd4bc6138c687,
   "@/payload/admin/components/fields/RadioField.tsx#RadioField": RadioField_31aae9b520654e49d40e444571bafe41,
-  "@/payload/admin/components/fields/CollapsibleField.tsx#CollapsibleField": CollapsibleField_e8aff66100db6bf10de9866e9f9ca5a8,
   "@/payload/admin/components/fields/TabsField.tsx#TabsField": TabsField_c014faddfba6da88b9efedda256f4990,
   "@/payload/admin/components/fields/RowField.tsx#RowField": RowField_1ef7316c3d3f9450222b0eb086a8e243,
   "@/payload/admin/components/fields/CodeField.tsx#CodeField": CodeField_4aa85fbd783c4d26c5c89ebf383941c1

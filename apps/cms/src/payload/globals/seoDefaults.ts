@@ -20,6 +20,20 @@ export const SeoDefaults: GlobalConfig = {
   versions: { drafts: false, max: 50 },
   fields: [
     {
+      // Right rail: live preview of the site-wide @graph this global emits on
+      // every page (Organization/WebSite from the fields below + any global
+      // override), with rich-result health + validate. Reflects unsaved edits.
+      name: 'globalSchemaView',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field:
+            './payload/admin/components/SchemaManager/GlobalSchemaView.tsx#GlobalSchemaView',
+        },
+      },
+    },
+    {
       name: 'defaultTitleTemplate',
       type: 'text',
       defaultValue: '%s — CleanStart',
@@ -47,14 +61,19 @@ export const SeoDefaults: GlobalConfig = {
       admin: { description: 'Used as twitter:site fallback when no author handle is set.' },
     },
     {
-      type: 'group',
-      name: 'brandIcons',
+      type: 'collapsible',
       label: 'Brand icons',
       admin: {
+        initCollapsed: true,
         description:
-          'Favicons + app icons rendered into the public site head. Provide PNGs at the listed sizes; the public layer wires `<link rel="icon">`, `apple-touch-icon`, and `manifest.json`. Note: web production phase — not yet consumed by apps/web.',
+          'Favicons + app icons. Stored but NOT yet wired into apps/web — favicons + theme-color are currently hardcoded in the web layout. Collapsed by design; expand only when the web favicon pipeline is wired.',
       },
       fields: [
+        {
+          type: 'group',
+          name: 'brandIcons',
+          label: false,
+          fields: [
         mediaUploadField({
           name: 'favicon32',
           folderHint: 'web/general',
@@ -89,6 +108,8 @@ export const SeoDefaults: GlobalConfig = {
               'Hex string (e.g. #0E1117). Surfaced as `<meta name="theme-color">` and as `theme_color` in manifest.json.',
           },
         },
+          ],
+        },
       ],
     },
     {
@@ -97,7 +118,7 @@ export const SeoDefaults: GlobalConfig = {
       label: 'Search engine verification',
       admin: {
         description:
-          'Site-verification tokens. Each renders as a <meta> tag in the public site head. Paste the value from each console verbatim — no quotes, no <meta> wrapper. Note: web production phase — not yet consumed by apps/web.',
+          'Site-verification tokens. Each renders as a <meta> tag in the public site head (production host only). Paste the value from each console verbatim — no quotes, no <meta> wrapper.',
       },
       fields: [
         {
