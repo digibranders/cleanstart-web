@@ -42,6 +42,8 @@ export const PageRegistry: CollectionConfig = {
   labels: { singular: 'Page (Schema)', plural: 'Pages (Schema)' },
   admin: {
     useAsTitle: 'path',
+    // Search matches both the path/slug AND the title (so "home" finds the Home row).
+    listSearchableFields: ['path', 'title'],
     defaultColumns: ['path', 'title', 'kind', 'updatedAt'],
     group: 'SEO',
     description:

@@ -125,10 +125,8 @@ import { NavOpenOnDesktop as NavOpenOnDesktop_21bf36b0db39df18e02fc9fdb6b1a47e }
 import { DocSidebarResizer as DocSidebarResizer_cb8d71363ce9ac2087ce9e8e5b3cebe2 } from '../../../payload/admin/components/DocSidebarResizer.tsx'
 import { CmsLoginHero as CmsLoginHero_32623b867969588592e72c90b3b4967a } from '../../../payload/admin/components/auth/CmsLoginHero.tsx'
 import { SidebarHeader as SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519 } from '../../../payload/admin/components/SidebarHeader.tsx'
-import { SchemaManagerNavLink as SchemaManagerNavLink_eb875cc617706591fc5da8867f286b3a } from '../../../payload/admin/components/SchemaManager/SchemaManagerNavLink.tsx'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { Dashboard as Dashboard_99a124d7b5ab83228ca0a3f897256570 } from '../../../payload/admin/components/Dashboard/Dashboard.tsx'
-import { SchemaManagerView as SchemaManagerView_117880b508b96c4e8e4b18f1c8c81546 } from '../../../payload/admin/components/SchemaManager/SchemaManagerView.tsx'
 import { CmsAccountView as CmsAccountView_e25882c99036df42ce1493c03452d7e3 } from '../../../payload/admin/components/auth/CmsAccountView.tsx'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { PointField as PointField_dc800e7ca3d2eb7ea39fd4bc6138c687 } from '@/payload/admin/components/fields/PointField.tsx'
@@ -267,10 +265,8 @@ export const importMap = {
   "./payload/admin/components/DocSidebarResizer.tsx#DocSidebarResizer": DocSidebarResizer_cb8d71363ce9ac2087ce9e8e5b3cebe2,
   "./payload/admin/components/auth/CmsLoginHero.tsx#CmsLoginHero": CmsLoginHero_32623b867969588592e72c90b3b4967a,
   "./payload/admin/components/SidebarHeader.tsx#SidebarHeader": SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519,
-  "./payload/admin/components/SchemaManager/SchemaManagerNavLink.tsx#SchemaManagerNavLink": SchemaManagerNavLink_eb875cc617706591fc5da8867f286b3a,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "./payload/admin/components/Dashboard/Dashboard.tsx#Dashboard": Dashboard_99a124d7b5ab83228ca0a3f897256570,
-  "./payload/admin/components/SchemaManager/SchemaManagerView.tsx#SchemaManagerView": SchemaManagerView_117880b508b96c4e8e4b18f1c8c81546,
   "./payload/admin/components/auth/CmsAccountView.tsx#CmsAccountView": CmsAccountView_e25882c99036df42ce1493c03452d7e3,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@/payload/admin/components/fields/PointField.tsx#PointField": PointField_dc800e7ca3d2eb7ea39fd4bc6138c687,
