@@ -23,7 +23,6 @@ const admin = { id: 1, roles: ['admin'] };
 const editor = { id: 2, roles: ['editor'] };
 const author = { id: 3, roles: ['author'] };
 const seo = { id: 4, roles: ['seo'] };
-
 describe('isAuthenticated', () => {
   it('is true for any logged-in user, false otherwise', () => {
     expect(callAccess(isAuthenticated, author)).toBe(true);
