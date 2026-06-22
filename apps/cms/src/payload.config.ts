@@ -63,6 +63,7 @@ import { calcomInboundEndpoint } from './payload/endpoints/integrations-inbound'
 import { jsonLdEndpoint, jsonLdPreviewEndpoint } from './payload/endpoints/jsonld';
 import { mediaIngestUrlEndpoint } from './payload/endpoints/media-ingest-url';
 import { redirectsImportEndpoint } from './payload/endpoints/redirects-import';
+import { redirectsRecordHitEndpoint } from './payload/endpoints/redirects-record-hit';
 import { robotsEndpoint } from './payload/endpoints/robots';
 import { searchAnalyticsEndpoint } from './payload/endpoints/search-analytics';
 import { searchQueryEndpoint } from './payload/endpoints/search-query';
@@ -401,6 +402,7 @@ export default buildConfig({
     mediaIngestUrlEndpoint,
     mediaRenameEndpoint,
     redirectsImportEndpoint,
+    redirectsRecordHitEndpoint,
     canonicalCheckEndpoint,
     searchQueryEndpoint,
     searchAnalyticsEndpoint,

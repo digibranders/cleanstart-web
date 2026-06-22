@@ -1,4 +1,8 @@
-import { NextResponse, type NextRequest } from "next/server";
+import {
+  NextResponse,
+  type NextFetchEvent,
+  type NextRequest,
+} from "next/server";
 
 import {
   MARKDOWN_INTERNAL_HEADER,
@@ -13,6 +17,7 @@ import {
 } from "@/lib/security/csp";
 import {
   lookupRedirect,
+  recordRedirectHit,
   shouldSkipRedirectLookup,
 } from "@/lib/redirects-cache";
 import { isIndexingAllowed } from "@/lib/seo/indexing";
@@ -69,7 +74,7 @@ function shouldLowercase(pathname: string) {
   return pathname !== pathname.toLowerCase();
 }
 
-export async function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest, event: NextFetchEvent) {
   const { nextUrl, headers } = request;
   const host = headers.get("host");
   const isProduction = process.env.VERCEL_ENV === "production";
@@ -112,6 +117,14 @@ export async function proxy(request: NextRequest) {
   if (!shouldSkipRedirectLookup(nextUrl.pathname)) {
     const row = await lookupRedirect(nextUrl.pathname);
     if (row) {
+      // Record the hit out-of-band so it never delays the redirect.
+      // `waitUntil` keeps the request context alive until the POST settles.
+      const hit = recordRedirectHit(nextUrl.pathname);
+      if (event?.waitUntil) {
+        event.waitUntil(hit);
+      } else {
+        void hit;
+      }
       if (row.status === "410") {
         return new NextResponse(null, { status: 410 });
       }

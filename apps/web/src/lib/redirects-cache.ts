@@ -92,6 +92,31 @@ export const lookupRedirect = async (
 };
 
 /**
+ * Fire-and-forget hit recorder. Posts the matched path to the CMS so it can
+ * bump `hitCount` / `lastHitAt` on the redirect row. Called on every matched
+ * request (cache hit or miss), so counts reflect traffic rather than the
+ * in-process cache's refresh rate.
+ *
+ * Resolves/rejects are swallowed by the caller via `event.waitUntil`; this
+ * never throws so a counting outage can't affect the redirect itself.
+ */
+export const recordRedirectHit = async (pathname: string): Promise<void> => {
+  const secret = process.env.REDIRECT_HIT_SECRET;
+  try {
+    await fetch(`${CMS_URL}/api/redirects/record-hit`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        ...(secret ? { "x-redirect-hit-secret": secret } : {}),
+      },
+      body: JSON.stringify({ from: pathname }),
+    });
+  } catch {
+    // Best-effort analytics: a counting failure must never affect the redirect.
+  }
+};
+
+/**
  * Paths the middleware should NOT even try to resolve as a redirect.
  * Matches the negative space of the existing middleware matcher plus
  * the obvious CMS-irrelevant paths.
