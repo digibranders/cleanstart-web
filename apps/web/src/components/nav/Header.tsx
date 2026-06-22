@@ -59,17 +59,6 @@ export async function Header() {
             mobile menu footer instead). */}
         <div className="hidden items-center gap-3 lg:flex">
           <Link
-            href="/contact-us"
-            className="cs-btn-blue"
-            style={{
-              ["--cs-btn-h" as string]: "36px",
-              ["--cs-btn-px" as string]: "16px",
-              ["--cs-btn-fs" as string]: "13px",
-            }}
-          >
-            Contact Us
-          </Link>
-          <Link
             href="/book-a-demo"
             className="cs-btn-glass"
             style={{
