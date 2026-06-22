@@ -2,13 +2,37 @@
 
 import { useField } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import { composeGraph, type GraphNode, primaryType } from '../../../lib/jsonld/compose';
 
 interface LiveBlock {
   type: string;
   json: string;
   provenance: 'auto' | 'override';
 }
+
+const safeParse = (json: string): Record<string, unknown> | null => {
+  try {
+    const v = JSON.parse(json);
+    return v != null && typeof v === 'object' ? (v as Record<string, unknown>) : null;
+  } catch {
+    return null;
+  }
+};
+
+const overrideTypeSet = (override: unknown): Set<string> => {
+  const blobs = Array.isArray(override) ? override : override != null ? [override] : [];
+  const out = new Set<string>();
+  for (const b of blobs) {
+    if (b != null && typeof b === 'object') {
+      const t = (b as { '@type'?: unknown })['@type'];
+      if (typeof t === 'string') out.add(t);
+      else if (Array.isArray(t)) for (const e of t) if (typeof e === 'string') out.add(e);
+    }
+  }
+  return out;
+};
 
 interface LiveSchemaResponse {
   ok: boolean;
@@ -37,11 +61,13 @@ const fmt = (iso: string | null | undefined): string => {
  */
 export const CurrentSchemaView = (): ReactElement => {
   const { value: path } = useField<string>({ path: 'path' });
+  const { value: override } = useField<unknown>({ path: 'additionalSchema' });
   const [state, setState] = useState<{ status: 'idle' | 'loading' | 'done'; data: LiveSchemaResponse | null }>({
     status: 'idle',
     data: null,
   });
   const [copied, setCopied] = useState<number | null>(null);
+  const [mode, setMode] = useState<'live' | 'preview'>('live');
 
   const copyBlock = useCallback(async (index: number, jsonText: string): Promise<void> => {
     try {
@@ -76,7 +102,25 @@ export const CurrentSchemaView = (): ReactElement => {
   }, [load]);
 
   const data = state.data;
-  const blocks = data?.blocks ?? [];
+  const liveBlocks = data?.blocks ?? [];
+
+  // Merged preview: auto-only live nodes + the UNSAVED override from the form,
+  // composed exactly as the build would (composeGraph). Updates live as you type.
+  const previewBlocks = useMemo((): LiveBlock[] => {
+    const autoNodes = liveBlocks
+      .filter((b) => b.provenance === 'auto')
+      .map((b) => safeParse(b.json))
+      .filter((n): n is Record<string, unknown> => n != null);
+    const graph = composeGraph({ auto: autoNodes as GraphNode[], override: override ?? undefined });
+    const oTypes = overrideTypeSet(override);
+    return graph['@graph'].map((node) => ({
+      type: primaryType(node),
+      json: JSON.stringify(node, null, 2),
+      provenance: oTypes.has(primaryType(node)) ? 'override' : 'auto',
+    }));
+  }, [liveBlocks, override]);
+
+  const blocks = mode === 'preview' ? previewBlocks : liveBlocks;
 
   return (
     <div className="field-type" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -94,7 +138,29 @@ export const CurrentSchemaView = (): ReactElement => {
         {data?.fetchedAt ? (
           <span style={{ fontSize: '0.78em', color: '#888' }}>as of {fmt(data.fetchedAt)}</span>
         ) : null}
+        <button
+          type="button"
+          onClick={() => setMode((m) => (m === 'live' ? 'preview' : 'live'))}
+          title="Preview the merged @graph with your unsaved override, exactly as the build composes it"
+          style={{
+            marginLeft: 'auto',
+            fontSize: '0.75em',
+            fontWeight: 600,
+            color: mode === 'preview' ? '#0a7' : '#9ab',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 0,
+          }}
+        >
+          {mode === 'live' ? '▶ Preview merged' : '◀ Back to live'}
+        </button>
       </div>
+      {mode === 'preview' ? (
+        <p style={{ fontSize: '0.74em', color: '#0a7', margin: 0 }}>
+          Merged result with your unsaved override (what will deploy on save).
+        </p>
+      ) : null}
 
       {state.status === 'loading' ? (
         <p style={{ color: '#888', fontSize: '0.85em', margin: 0 }}>Loading live schema…</p>
@@ -117,7 +183,7 @@ export const CurrentSchemaView = (): ReactElement => {
                 <code style={{ fontWeight: 600 }}>{b.type}</code>
                 {b.provenance === 'override' ? (
                   <span style={{ fontSize: '0.72em', color: '#0a7' }}>
-                    ✎ override · edited {fmt(data?.overrideUpdatedAt)}
+                    ✎ override · {mode === 'preview' ? 'pending (unsaved)' : `edited ${fmt(data?.overrideUpdatedAt)}`}
                   </span>
                 ) : (
                   <span style={{ fontSize: '0.72em', color: '#888' }}>auto · derived from page</span>
