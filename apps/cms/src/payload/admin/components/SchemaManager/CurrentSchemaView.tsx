@@ -41,6 +41,17 @@ export const CurrentSchemaView = (): ReactElement => {
     status: 'idle',
     data: null,
   });
+  const [copied, setCopied] = useState<number | null>(null);
+
+  const copyBlock = useCallback(async (index: number, jsonText: string): Promise<void> => {
+    try {
+      await navigator.clipboard.writeText(jsonText);
+      setCopied(index);
+      setTimeout(() => setCopied((c) => (c === index ? null : c)), 1500);
+    } catch {
+      // clipboard unavailable (insecure context) — no-op
+    }
+  }, []);
 
   const load = useCallback(async (): Promise<void> => {
     if (!path) return;
@@ -109,6 +120,17 @@ export const CurrentSchemaView = (): ReactElement => {
                 ) : (
                   <span style={{ fontSize: '0.72em', color: '#888' }}>auto · derived from page</span>
                 )}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    void copyBlock(i, b.json);
+                  }}
+                  title="Copy this block's JSON to paste into the override editor below"
+                  style={{ marginLeft: 'auto', fontSize: '0.72em', color: '#0a7', background: 'none', border: 'none', cursor: 'pointer' }}
+                >
+                  {copied === i ? '✓ copied' : '⧉ copy'}
+                </button>
               </summary>
               <pre style={{ fontFamily: 'monospace', fontSize: '0.78em', whiteSpace: 'pre-wrap', margin: '0.4rem 0 0' }}>
                 {b.json}
