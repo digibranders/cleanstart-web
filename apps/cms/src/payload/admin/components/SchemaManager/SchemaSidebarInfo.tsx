@@ -1,8 +1,10 @@
 'use client';
 
-import { useDocumentInfo } from '@payloadcms/ui';
+import { useDocumentInfo, useField } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
 import { useEffect, useState } from 'react';
+
+import { DEFAULT_SITE_URL } from '../_site-url';
 
 const fmt = (iso: string | null | undefined): string => {
   if (!iso) return '—';
@@ -28,7 +30,13 @@ const rowStyle = { display: 'flex', justifyContent: 'space-between', gap: '0.5re
  */
 export const SchemaSidebarInfo = (): ReactElement => {
   const { id } = useDocumentInfo();
+  const { value: path } = useField<string>({ path: 'path' });
   const [meta, setMeta] = useState<RowMeta | null>(null);
+
+  const pageUrl = path ? `${DEFAULT_SITE_URL.replace(/\/$/, '')}${path}` : null;
+  const richResultsUrl = pageUrl
+    ? `https://search.google.com/test/rich-results?url=${encodeURIComponent(pageUrl)}`
+    : null;
 
   useEffect(() => {
     if (id == null) return;
@@ -73,6 +81,16 @@ export const SchemaSidebarInfo = (): ReactElement => {
       <p style={{ fontSize: '0.72em', color: '#777', margin: '0.3rem 0 0' }}>
         Per-@type edit history needs the audit log (planned).
       </p>
+      {richResultsUrl ? (
+        <a
+          href={richResultsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ display: 'inline-block', marginTop: '0.5rem', fontSize: '0.78em', color: '#0a7', fontWeight: 600 }}
+        >
+          ↗ Test in Google Rich Results
+        </a>
+      ) : null}
     </div>
   );
 };
