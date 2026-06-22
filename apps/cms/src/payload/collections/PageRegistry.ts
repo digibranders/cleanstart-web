@@ -1,6 +1,6 @@
 import type { CollectionConfig, JSONFieldValidation } from 'payload';
 
-import { isAdminEditorOrSeo, isAdminOrSeoFieldLevel } from '../access';
+import { isAdmin, isAdminEditorOrSeo, isAdminOrSeoFieldLevel } from '../access';
 import { pageLiveSchemaEndpoint } from '../endpoints/page-live-schema';
 import { validateOverrideForFieldOnCollection } from '../lib/jsonld/override-validator';
 import { revalidatePageRegistryHook, revalidatePageRegistryDeleteHook } from '../hooks/revalidate-page-registry';
@@ -47,14 +47,18 @@ export const PageRegistry: CollectionConfig = {
     description:
       'Every website route, including static pages. Add a Schema.org override here to compose it into that page’s JSON-LD at build time.',
   },
-  // Public read: the web build/ISR fetches this anonymously to compose static
-  // page schema. Row management is admin/editor/seo; the raw override field
-  // itself is restricted to admin/seo (privileged paste) via field access.
+  // The registry is a SEED-MANAGED catalog of real routes. Public read (the web
+  // build/ISR fetches it anonymously). Create/delete are admin-only — rows come
+  // from scripts/seed-page-registry.ts (a new row for a path that isn't a real
+  // route does nothing), and the seed bypasses access via overrideAccess.
+  // Update stays admin/editor/seo so editors can edit the override + notes, but
+  // the identity/classification fields (path/title/kind/backingCollection) are
+  // locked on update at the field level below.
   access: {
     read: () => true,
-    create: isAdminEditorOrSeo,
+    create: isAdmin,
     update: isAdminEditorOrSeo,
-    delete: isAdminEditorOrSeo,
+    delete: isAdmin,
   },
   hooks: {
     afterChange: [revalidatePageRegistryHook],
@@ -62,22 +66,30 @@ export const PageRegistry: CollectionConfig = {
   },
   endpoints: [pageLiveSchemaEndpoint],
   fields: [
+    // Identity/classification fields — settable on create (admin) and by the
+    // seed, but LOCKED on update: changing a row's path silently breaks the
+    // route→override link, and changing kind can break revalidation. Editors
+    // only touch the override + notes. `access.update: () => false` enforces
+    // this server-side and renders them read-only in the edit view; the seed
+    // bypasses it via overrideAccess.
     {
       name: 'path',
       type: 'text',
       required: true,
       unique: true,
       index: true,
+      access: { update: () => false },
       validate: validatePath,
       admin: {
-        description: 'Site-relative route, e.g. /pricing or /blogs. One row per route.',
+        description: 'Site-relative route, e.g. /pricing or /blogs. Locked after creation.',
       },
     },
     {
       name: 'title',
       type: 'text',
       required: true,
-      admin: { description: 'Human label shown in the Schema Manager list.' },
+      access: { update: () => false },
+      admin: { description: 'Human label shown in the Schema Manager list. Locked after creation.' },
     },
     {
       name: 'kind',
@@ -85,16 +97,18 @@ export const PageRegistry: CollectionConfig = {
       required: true,
       defaultValue: 'static',
       options: KIND_OPTIONS,
+      access: { update: () => false },
       admin: {
         description:
-          'static = hardcoded page; cms-listing = a collection’s index page; cms-template = drill into the collection’s documents.',
+          'static = hardcoded page; cms-listing = a collection’s index page; cms-template = drill into the collection’s documents. Locked after creation.',
       },
     },
     {
       name: 'backingCollection',
       type: 'text',
+      access: { update: () => false },
       admin: {
-        description: 'For cms-listing / cms-template: the collection slug this route renders.',
+        description: 'For cms-listing / cms-template: the collection slug this route renders. Locked after creation.',
         condition: (_data, siblingData) =>
           siblingData?.kind === 'cms-template' || siblingData?.kind === 'cms-listing',
       },
