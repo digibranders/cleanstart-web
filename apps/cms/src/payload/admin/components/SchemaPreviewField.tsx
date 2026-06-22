@@ -18,6 +18,7 @@ import {
   auditBlobList,
 } from '../../lib/jsonld/spec/required-fields';
 import { ChevronDown } from './icons/Chevron';
+import { SchemaHistory } from './SchemaManager/SchemaHistory';
 import { DEFAULT_SITE_URL } from './_site-url';
 
 const CopyIcon = (): ReactElement => (
@@ -365,6 +366,11 @@ export const SchemaPreviewField = (
               {Array.from(overrideTypeSet).join(', ')}). Admin role required to edit.
             </p>
           )}
+
+          {/* Per-@type override version history, inside the Schema card. */}
+          <div style={{ marginTop: '0.75rem' }}>
+            <SchemaHistory path="seo.schemaHistory" />
+          </div>
         </div>
       )}
 

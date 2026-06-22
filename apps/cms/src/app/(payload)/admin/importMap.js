@@ -54,7 +54,6 @@ import { SeoDescriptionField as SeoDescriptionField_9696c1be1903d357f63d23951e79
 import { SeoIndexableField as SeoIndexableField_ff3cc07c91d10b5899370ac0f262f1fb } from '@/payload/admin/components/SeoIndexableField.tsx'
 import { SerpPreviewField as SerpPreviewField_243778961d714dd69072cd09f703a734 } from '@/payload/admin/components/SerpPreviewField.tsx'
 import { SchemaPreviewField as SchemaPreviewField_2ca2f49f868221997f9932607223d89a } from '@/payload/admin/components/SchemaPreviewField.tsx'
-import { SchemaHistory as SchemaHistory_12be1bceb1d59e348d9989b4dc11993e } from '@/payload/admin/components/SchemaManager/SchemaHistory.tsx'
 import { KeywordsField as KeywordsField_a0283e5157e7833147898bc706890b37 } from '@/payload/admin/components/KeywordsField.tsx'
 import { CanonicalField as CanonicalField_26fe47d21538483cc802b09672dbd7f6 } from '@/payload/admin/components/CanonicalField.tsx'
 import { SocialCardField as SocialCardField_b319a069c95a65e993e5d5cd482bdc69 } from '@/payload/admin/components/SocialCardField.tsx'
@@ -200,7 +199,6 @@ export const importMap = {
   "@/payload/admin/components/SeoIndexableField.tsx#SeoIndexableField": SeoIndexableField_ff3cc07c91d10b5899370ac0f262f1fb,
   "@/payload/admin/components/SerpPreviewField.tsx#SerpPreviewField": SerpPreviewField_243778961d714dd69072cd09f703a734,
   "@/payload/admin/components/SchemaPreviewField.tsx#SchemaPreviewField": SchemaPreviewField_2ca2f49f868221997f9932607223d89a,
-  "@/payload/admin/components/SchemaManager/SchemaHistory.tsx#SchemaHistory": SchemaHistory_12be1bceb1d59e348d9989b4dc11993e,
   "@/payload/admin/components/KeywordsField.tsx#KeywordsField": KeywordsField_a0283e5157e7833147898bc706890b37,
   "@/payload/admin/components/CanonicalField.tsx#CanonicalField": CanonicalField_26fe47d21538483cc802b09672dbd7f6,
   "@/payload/admin/components/SocialCardField.tsx#SocialCardField": SocialCardField_b319a069c95a65e993e5d5cd482bdc69,

@@ -692,6 +692,9 @@ export const seoSidebarFields = (args: {
       },
     },
     {
+      // Schema (JSON-LD) card — live preview, per-block validity, paste/upload
+      // override editor, export, AND per-@type version history (all inside the
+      // one expandable card).
       name: 'schemaPreview',
       type: 'ui',
       admin: {
@@ -700,21 +703,6 @@ export const seoSidebarFields = (args: {
           Field: {
             path: '@/payload/admin/components/SchemaPreviewField.tsx#SchemaPreviewField',
             clientProps: { pathPrefix, sourceField: urlSource },
-          },
-        },
-      },
-    },
-    {
-      // Per-@type override version history (collapsed), reading the seo group's
-      // schemaHistory maintained by schemaHistoryFieldHook.
-      name: 'seoSchemaHistory',
-      type: 'ui',
-      admin: {
-        position: 'sidebar',
-        components: {
-          Field: {
-            path: '@/payload/admin/components/SchemaManager/SchemaHistory.tsx#SchemaHistory',
-            clientProps: { path: 'seo.schemaHistory' },
           },
         },
       },

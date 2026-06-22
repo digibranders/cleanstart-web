@@ -438,10 +438,6 @@
     },
     {
       "type": "ui",
-      "name": "seoSchemaHistory"
-    },
-    {
-      "type": "ui",
       "name": "keywords"
     },
     {
