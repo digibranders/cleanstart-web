@@ -2,7 +2,7 @@ import type { CollectionConfig, JSONFieldValidation } from 'payload';
 
 import { isAdmin, isAdminEditorOrSeo, isAdminOrSeoFieldLevel } from '../access';
 import { pageLiveSchemaEndpoint } from '../endpoints/page-live-schema';
-import { validateOverrideForFieldOnCollection } from '../lib/jsonld/override-validator';
+import { filterToMergeable, validatePartialOverride } from '../lib/jsonld/filter-override';
 import { revalidatePageRegistryHook, revalidatePageRegistryDeleteHook } from '../hooks/revalidate-page-registry';
 
 /**
@@ -163,7 +163,12 @@ export const PageRegistry: CollectionConfig = {
         update: isAdminOrSeoFieldLevel,
         create: isAdminOrSeoFieldLevel,
       },
-      validate: validateOverrideForFieldOnCollection('pageRegistry') as JSONFieldValidation,
+      validate: validatePartialOverride as JSONFieldValidation,
+      hooks: {
+        // Keep-valid / drop-invalid: store only the merge-able blocks (a paste
+        // mixing a valid Article with a conflicting WebSite saves just Article).
+        beforeChange: [({ value }) => filterToMergeable(value).kept],
+      },
       admin: {
         description:
           'Raw Schema.org JSON-LD for this page (single object or array of objects, each with @context + an allow-listed @type). Validated and capped at 16 KB; composed per-@type into the page’s @graph at build time.',

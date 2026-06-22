@@ -19,6 +19,18 @@ interface BlockReport {
   missingRequired: readonly string[];
 }
 
+const FIX_HINTS: Record<string, string> = {
+  'off-allowlist': 'Use an allowed @type (see the Allowed list in the rail), or remove this block.',
+  'duplicates-auto-emit': 'Remove it — this type is emitted site-wide; edit it in SEO Defaults.',
+  'collection-restricted': 'Not allowed on this page type — remove this block.',
+  'off-domain-id': 'Point @id at this site’s domain, or remove the @id.',
+  'nested-id': 'Remove the nested @id reference (top-level @id is fine).',
+  'oversize': 'Trim the block — it exceeds the 16 KB cap.',
+  'invalid-shape': 'This block isn’t a JSON object — fix its structure.',
+};
+
+const fixHint = (reason: string): string => FIX_HINTS[reason] ?? '';
+
 const stringify = (value: unknown): string =>
   value == null ? '' : JSON.stringify(value, null, 2);
 
@@ -203,7 +215,10 @@ export const SchemaOverrideField = ({ path }: SchemaOverrideFieldProps): ReactEl
                   <strong>
                     {ok ? '✓' : '⚠'} <code>{item.blobType}</code>
                   </strong>{' '}
-                  — {ok ? 'will override this @type' : item.message}
+                  — {ok ? 'will override this @type' : `${item.message} (dropped on save)`}
+                  {!ok && fixHint(item.reason) ? (
+                    <div style={{ color: '#0a7' }}>Fix: {fixHint(item.reason)}</div>
+                  ) : null}
                   {ok && missingRequired.length > 0 ? (
                     <div style={{ color: '#a70' }}>
                       missing required for rich results: {missingRequired.join(', ')}
