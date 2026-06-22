@@ -68,6 +68,7 @@ export const CurrentSchemaView = (): ReactElement => {
   });
   const [copied, setCopied] = useState<number | null>(null);
   const [mode, setMode] = useState<'live' | 'preview'>('live');
+  const [exportOpen, setExportOpen] = useState(false);
 
   const copyBlock = useCallback(async (index: number, jsonText: string): Promise<void> => {
     try {
@@ -122,6 +123,27 @@ export const CurrentSchemaView = (): ReactElement => {
 
   const blocks = mode === 'preview' ? previewBlocks : liveBlocks;
 
+  const downloadGraph = (format: 'json' | 'txt'): void => {
+    const nodes = blocks
+      .map((b) => safeParse(b.json))
+      .filter((n): n is Record<string, unknown> => n != null);
+    const graph = { '@context': 'https://schema.org', '@graph': nodes };
+    const content = JSON.stringify(graph, null, 2);
+    const slug = (path || '/').replace(/\//g, '-').replace(/(^-|-$)/g, '') || 'home';
+    const blob = new Blob([content], {
+      type: format === 'json' ? 'application/ld+json' : 'text/plain',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `schema-${slug}.${format}`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    setExportOpen(false);
+  };
+
   return (
     <div className="field-type" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', flexWrap: 'wrap' }}>
@@ -155,6 +177,55 @@ export const CurrentSchemaView = (): ReactElement => {
         >
           {mode === 'live' ? '▶ Preview merged' : '◀ Back to live'}
         </button>
+        <div style={{ position: 'relative' }}>
+          <button
+            type="button"
+            onClick={() => setExportOpen((o) => !o)}
+            disabled={blocks.length === 0}
+            title="Export this page's composed @graph"
+            style={{
+              fontSize: '0.75em',
+              fontWeight: 600,
+              color: blocks.length === 0 ? '#666' : '#0a7',
+              background: 'none',
+              border: 'none',
+              cursor: blocks.length === 0 ? 'not-allowed' : 'pointer',
+              padding: 0,
+            }}
+          >
+            ⬇ Export ▾
+          </button>
+          {exportOpen ? (
+            <div
+              style={{
+                position: 'absolute',
+                right: 0,
+                top: '1.4em',
+                zIndex: 10,
+                background: 'var(--theme-elevation-50, #1b1b1b)',
+                border: '1px solid var(--theme-elevation-150, #333)',
+                borderRadius: 6,
+                minWidth: 130,
+                boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => downloadGraph('json')}
+                style={{ display: 'block', width: '100%', textAlign: 'left', fontSize: '0.8em', padding: '0.4rem 0.6rem', background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}
+              >
+                JSON-LD (.json)
+              </button>
+              <button
+                type="button"
+                onClick={() => downloadGraph('txt')}
+                style={{ display: 'block', width: '100%', textAlign: 'left', fontSize: '0.8em', padding: '0.4rem 0.6rem', background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}
+              >
+                Text (.txt)
+              </button>
+            </div>
+          ) : null}
+        </div>
       </div>
       {mode === 'preview' ? (
         <p style={{ fontSize: '0.74em', color: '#0a7', margin: 0 }}>
