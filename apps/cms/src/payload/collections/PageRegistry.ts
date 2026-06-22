@@ -24,22 +24,6 @@ const KIND_OPTIONS: { label: string; value: string }[] = [
   { label: 'CMS collection (template)', value: 'cms-template' },
 ];
 
-// The primary Schema.org type a page represents — the rich-result type to aim
-// for. Aligned with what the site actually emits + the override allow-list.
-const SCHEMA_TYPE_OPTIONS: { label: string; value: string }[] = [
-  { label: 'WebPage', value: 'WebPage' },
-  { label: 'AboutPage', value: 'AboutPage' },
-  { label: 'ContactPage', value: 'ContactPage' },
-  { label: 'CollectionPage', value: 'CollectionPage' },
-  { label: 'SoftwareApplication', value: 'SoftwareApplication' },
-  { label: 'Article', value: 'Article' },
-  { label: 'BlogPosting', value: 'BlogPosting' },
-  { label: 'NewsArticle', value: 'NewsArticle' },
-  { label: 'Event', value: 'Event' },
-  { label: 'JobPosting', value: 'JobPosting' },
-  { label: 'ProfilePage', value: 'ProfilePage' },
-];
-
 const validatePath = (value: unknown): true | string => {
   if (typeof value !== 'string' || value.trim().length === 0) {
     return 'Path is required.';
@@ -58,7 +42,7 @@ export const PageRegistry: CollectionConfig = {
   labels: { singular: 'Page (Schema)', plural: 'Pages (Schema)' },
   admin: {
     useAsTitle: 'path',
-    defaultColumns: ['path', 'title', 'kind', 'schemaType', 'updatedAt'],
+    defaultColumns: ['path', 'title', 'kind', 'updatedAt'],
     group: 'SEO',
     description:
       'Every website route, including static pages. Add a Schema.org override here to compose it into that page’s JSON-LD at build time.',
@@ -122,17 +106,6 @@ export const PageRegistry: CollectionConfig = {
         readOnly: true,
         description:
           'static = hardcoded page; cms-listing = a collection’s index page; cms-template = drill into the collection’s documents. Seed-managed (read-only).',
-      },
-    },
-    {
-      name: 'schemaType',
-      type: 'select',
-      options: SCHEMA_TYPE_OPTIONS,
-      access: { update: () => false },
-      admin: {
-        readOnly: true,
-        description:
-          'The primary Schema.org type this page represents (the rich-result type to aim for). Seed-managed (read-only).',
       },
     },
     {

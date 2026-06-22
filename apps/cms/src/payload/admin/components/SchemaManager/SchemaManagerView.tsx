@@ -25,7 +25,6 @@ interface RegistryRow {
   title: string;
   kind: Kind;
   backingCollection?: string | null;
-  schemaType?: string | null;
   additionalSchema?: unknown;
 }
 
@@ -123,16 +122,13 @@ export const SchemaManagerView = async (props: AdminViewServerProps): Promise<Re
   const sp = props.searchParams ?? {};
   const typeFilter = asStr(sp.type) || 'all';
   const statusFilter = asStr(sp.status) || 'all';
-  const schemaTypeFilter = asStr(sp.schemaType) || 'all';
 
-  const hrefFor = (next: { type?: string; status?: string; schemaType?: string }): string => {
+  const hrefFor = (next: { type?: string; status?: string }): string => {
     const t = next.type ?? typeFilter;
     const s = next.status ?? statusFilter;
-    const st = next.schemaType ?? schemaTypeFilter;
     const params = new URLSearchParams();
     if (t !== 'all') params.set('type', t);
     if (s !== 'all') params.set('status', s);
-    if (st !== 'all') params.set('schemaType', st);
     const qs = params.toString();
     return `/admin/schema-manager${qs ? `?${qs}` : ''}`;
   };
@@ -144,17 +140,8 @@ export const SchemaManagerView = async (props: AdminViewServerProps): Promise<Re
   if (typeFilter !== 'all') rows = rows.filter((r) => r.kind === typeFilter);
   if (statusFilter === 'customized') rows = rows.filter(hasOverride);
   else if (statusFilter === 'auto') rows = rows.filter((r) => !hasOverride(r));
-  if (schemaTypeFilter !== 'all') rows = rows.filter((r) => r.schemaType === schemaTypeFilter);
 
   const customizedCount = allRows.filter(hasOverride).length;
-
-  // Distinct schema @types present, for the filter pills (All + each present).
-  const schemaTypeFilters = [
-    { value: 'all', label: 'All' },
-    ...Array.from(new Set(allRows.map((r) => r.schemaType).filter((t): t is string => Boolean(t))))
-      .sort()
-      .map((t) => ({ value: t, label: t })),
-  ];
 
   return (
     <div style={{ padding: '2rem', maxWidth: 1100 }}>
@@ -178,16 +165,6 @@ export const SchemaManagerView = async (props: AdminViewServerProps): Promise<Re
             Schema status
           </span>
           <Pills options={STATUS_FILTERS} active={statusFilter} hrefFor={(v) => hrefFor({ status: v })} />
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-          <span style={{ fontSize: '0.72em', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#777' }}>
-            Schema @type
-          </span>
-          <Pills
-            options={schemaTypeFilters}
-            active={schemaTypeFilter}
-            hrefFor={(v) => hrefFor({ schemaType: v })}
-          />
         </div>
       </div>
 
@@ -221,13 +198,6 @@ export const SchemaManagerView = async (props: AdminViewServerProps): Promise<Re
                           <div style={{ color: '#888', fontFamily: 'monospace', fontSize: '0.85em' }}>
                             {row.path}
                           </div>
-                        </td>
-                        <td style={{ padding: '0.5rem', fontSize: '0.8em', whiteSpace: 'nowrap' }}>
-                          {row.schemaType ? (
-                            <code style={{ color: '#9ab' }}>{row.schemaType}</code>
-                          ) : (
-                            <span style={{ color: '#666' }}>—</span>
-                          )}
                         </td>
                         <td style={{ padding: '0.5rem', fontSize: '0.85em', whiteSpace: 'nowrap', textAlign: 'right' }}>
                           {isTemplate ? (

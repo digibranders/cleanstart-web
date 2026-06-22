@@ -6871,37 +6871,19 @@ export interface BrokenLink {
 export interface PageRegistry {
   id: number;
   /**
-   * Site-relative route, e.g. /pricing or /blogs. Locked after creation.
+   * Site-relative route, e.g. /pricing or /blogs. Seed-managed (read-only).
    */
   path: string;
   /**
-   * Human label shown in the Schema Manager list. Locked after creation.
+   * Human label shown in the Schema Manager list. Seed-managed (read-only).
    */
   title: string;
   /**
-   * static = hardcoded page; cms-listing = a collection’s index page; cms-template = drill into the collection’s documents. Locked after creation.
+   * static = hardcoded page; cms-listing = a collection’s index page; cms-template = drill into the collection’s documents. Seed-managed (read-only).
    */
   kind: 'static' | 'cms-listing' | 'cms-template';
   /**
-   * The primary Schema.org type this page represents (the rich-result type to aim for). Locked after creation.
-   */
-  schemaType?:
-    | (
-        | 'WebPage'
-        | 'AboutPage'
-        | 'ContactPage'
-        | 'CollectionPage'
-        | 'SoftwareApplication'
-        | 'Article'
-        | 'BlogPosting'
-        | 'NewsArticle'
-        | 'Event'
-        | 'JobPosting'
-        | 'ProfilePage'
-      )
-    | null;
-  /**
-   * For cms-listing / cms-template: the collection slug this route renders. Locked after creation.
+   * For cms-listing / cms-template: the collection slug this route renders. Seed-managed (read-only).
    */
   backingCollection?: string | null;
   /**
@@ -10731,7 +10713,6 @@ export interface PageRegistrySelect<T extends boolean = true> {
   path?: T;
   title?: T;
   kind?: T;
-  schemaType?: T;
   backingCollection?: T;
   additionalSchema?: T;
   notes?: T;
