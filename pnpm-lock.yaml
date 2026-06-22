@@ -26,6 +26,9 @@ importers:
       '@aws-sdk/client-s3':
         specifier: ^3.1042.0
         version: 3.1042.0
+      '@cleanstart/schema':
+        specifier: workspace:*
+        version: link:../../packages/schema
       '@cleanstart/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -183,6 +186,9 @@ importers:
       '@base-ui/react':
         specifier: ^1.4.1
         version: 1.4.1(@date-fns/tz@1.2.0)(@types/react@19.2.14)(date-fns@4.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@cleanstart/schema':
+        specifier: workspace:*
+        version: link:../../packages/schema
       '@cleanstart/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -319,6 +325,9 @@ importers:
       '@cleanstart/config':
         specifier: workspace:*
         version: link:../config
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.17
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.14
