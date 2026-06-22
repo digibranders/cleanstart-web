@@ -7,7 +7,6 @@ import { parseRegionParam, parseYearParam } from "@/lib/news-utils";
 
 interface NewsBrowserProps {
   allNews: News[];
-  featuredNews: News | null;
   categories: NewsCategory[];
 }
 
@@ -19,7 +18,6 @@ interface NewsBrowserProps {
  */
 export function NewsBrowser({
   allNews,
-  featuredNews,
   categories,
 }: NewsBrowserProps): React.ReactElement {
   const params = useSearchParams();
@@ -39,7 +37,6 @@ export function NewsBrowser({
 
   return (
     <NewsContent
-      featuredPost={featuredNews}
       categories={categories}
       items={items}
       activeCategory={activeCategory}

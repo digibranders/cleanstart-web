@@ -7,6 +7,7 @@ import {
   ResourceCenterContent,
   selectResources,
 } from "@/components/sections/resource-center/ResourceCenterContent";
+import { ResourceCenterHero } from "@/components/sections/resource-center/ResourceCenterHero";
 import { ResourceCenterCTA } from "@/components/sections/resource-center/ResourceCenterCTA";
 import { getResources } from "@/lib/resources";
 import { buildListingMetadata } from "@/lib/seo/canonical";
@@ -77,20 +78,25 @@ export default async function ResourceCenterPage(): Promise<React.ReactElement> 
         />
       )}
       <Header />
-      <Suspense
-        fallback={
-          <ResourceCenterContent
-            resources={initial.resources}
-            activeType=""
-            searchQuery=""
-            currentPage={1}
-            totalPages={initial.totalPages}
-            loadFailed={loadFailed}
-          />
-        }
-      >
-        <ResourceCenterBrowser allResources={allResources} />
-      </Suspense>
+      <main id="main-content" style={{ background: "#f6f6f6" }}>
+        <div className="relative overflow-hidden">
+          <ResourceCenterHero initialQuery="" />
+        </div>
+        <Suspense
+          fallback={
+            <ResourceCenterContent
+              resources={initial.resources}
+              activeType=""
+              searchQuery=""
+              currentPage={1}
+              totalPages={initial.totalPages}
+              loadFailed={loadFailed}
+            />
+          }
+        >
+          <ResourceCenterBrowser allResources={allResources} />
+        </Suspense>
+      </main>
       <Footer cta={<ResourceCenterCTA />} />
     </>
   );

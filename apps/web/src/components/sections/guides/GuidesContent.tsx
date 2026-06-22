@@ -1,4 +1,3 @@
-import { GuidesHero } from "@/components/sections/guides/GuidesHero";
 import { GuidesList } from "@/components/sections/guides/GuidesList";
 import { FadeUp } from "@/components/ui/FadeUp";
 import type { Guide } from "@/lib/guides";
@@ -11,9 +10,10 @@ export interface GuidesContentProps {
 }
 
 /**
- * Presentational body of the /guide listing (hero + search + paginated grid).
- * Pure props — renders identically on the server (static fallback) and the
- * client (`GuidesBrowser`). See `BlogsContent.tsx` for the pattern.
+ * Paginated guides grid — the body the `<Suspense>` boundary swaps (server
+ * fallback + client `GuidesBrowser`). The hero (search) is rendered once by the
+ * page OUTSIDE the boundary, so its <h1> isn't streamed twice. See
+ * `case-studies/page.tsx` for the pattern.
  */
 export function GuidesContent({
   guides,
@@ -22,19 +22,14 @@ export function GuidesContent({
   totalPages,
 }: GuidesContentProps): React.ReactElement {
   return (
-    <main id="main-content" style={{ background: "#f6f6f6" }}>
-      <div className="relative overflow-hidden">
-        <GuidesHero searchQuery={searchQuery} />
-      </div>
-      <FadeUp>
-        <GuidesList
-          guides={guides}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          searchQuery={searchQuery}
-        />
-      </FadeUp>
-    </main>
+    <FadeUp>
+      <GuidesList
+        guides={guides}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        searchQuery={searchQuery}
+      />
+    </FadeUp>
   );
 }
 

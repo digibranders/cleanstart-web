@@ -5,6 +5,7 @@ import { Footer } from "@/components/sections/Footer";
 import { BlogsCTA } from "@/components/sections/blogs/BlogsCTA";
 import { NewsBrowser } from "@/components/sections/newsroom/NewsBrowser";
 import { NewsContent, selectNews } from "@/components/sections/newsroom/NewsContent";
+import { NewsroomHero } from "@/components/sections/newsroom/NewsroomHero";
 import { getNews, getFeaturedNews, getNewsCategories } from "@/lib/news";
 import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
@@ -70,25 +71,25 @@ export default async function NewsPage(): Promise<React.ReactElement> {
         />
       )}
       <Header />
-      <Suspense
-        fallback={
-          <NewsContent
-            featuredPost={featuredNews}
-            categories={categories}
-            items={initial.items}
-            activeCategory=""
-            searchQuery=""
-            currentPage={1}
-            totalPages={initial.totalPages}
-          />
-        }
-      >
-        <NewsBrowser
-          allNews={allNews}
-          featuredNews={featuredNews}
-          categories={categories}
-        />
-      </Suspense>
+      <main id="main-content" style={{ background: "#f6f6f6" }}>
+        <div className="relative overflow-hidden">
+          <NewsroomHero featuredPost={featuredNews} searchQuery="" />
+        </div>
+        <Suspense
+          fallback={
+            <NewsContent
+              categories={categories}
+              items={initial.items}
+              activeCategory=""
+              searchQuery=""
+              currentPage={1}
+              totalPages={initial.totalPages}
+            />
+          }
+        >
+          <NewsBrowser allNews={allNews} categories={categories} />
+        </Suspense>
+      </main>
       <Footer cta={<BlogsCTA />} />
     </>
   );

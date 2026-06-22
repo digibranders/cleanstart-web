@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { EventsBrowser } from "@/components/sections/events/EventsBrowser";
+import { UpcomingEventHero } from "@/components/sections/events/UpcomingEventHero";
 import {
   EventsContent,
   selectPastEvents,
@@ -87,22 +88,21 @@ export default async function EventsPage(): Promise<React.ReactElement> {
         />
       )}
       <Header />
-      <Suspense
-        fallback={
-          <EventsContent
-            upcomingEvents={upcomingEvents}
-            pastEvents={initial.events}
-            currentPage={1}
-            totalPages={initial.totalPages}
-            loadFailed={pastFailed}
-          />
-        }
-      >
-        <EventsBrowser
-          upcomingEvents={upcomingEvents}
-          allPastEvents={allPastEvents}
-        />
-      </Suspense>
+      <main id="main-content" style={{ background: "#f6f6f6" }}>
+        <UpcomingEventHero events={upcomingEvents} />
+        <Suspense
+          fallback={
+            <EventsContent
+              pastEvents={initial.events}
+              currentPage={1}
+              totalPages={initial.totalPages}
+              loadFailed={pastFailed}
+            />
+          }
+        >
+          <EventsBrowser allPastEvents={allPastEvents} />
+        </Suspense>
+      </main>
       <Footer cta={<EventsCTA />} />
     </>
   );

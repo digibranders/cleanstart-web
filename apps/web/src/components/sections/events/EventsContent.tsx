@@ -1,10 +1,8 @@
-import { UpcomingEventHero } from "@/components/sections/events/UpcomingEventHero";
 import { PastEventsGrid } from "@/components/sections/events/PastEventsGrid";
 import { FadeUp } from "@/components/ui/FadeUp";
 import type { Event, EventCountry } from "@/lib/events";
 
 export interface EventsContentProps {
-  upcomingEvents: Event[];
   pastEvents: Event[];
   currentPage: number;
   totalPages: number;
@@ -14,15 +12,13 @@ export interface EventsContentProps {
 }
 
 /**
- * Presentational body of the /events listing — the upcoming-events hero plus the
- * filtered/paginated past-events grid. Pure props, no data fetching, so it
- * renders identically on the server (static fallback) and the client
- * (`EventsBrowser`, which drives the past-events filters from the URL). The
- * upcoming section is always the full server-fetched set. See
- * `BlogsContent.tsx` for the pattern.
+ * Filtered/paginated past-events grid — the body the `<Suspense>` boundary swaps
+ * (rendered both as the server fallback and by the client `EventsBrowser`). The
+ * upcoming-events hero is rendered once by the page OUTSIDE the boundary, so its
+ * <h1> isn't streamed twice into the static HTML. See `case-studies/page.tsx`
+ * for the hoisted-hero pattern.
  */
 export function EventsContent({
-  upcomingEvents,
   pastEvents,
   currentPage,
   totalPages,
@@ -31,19 +27,16 @@ export function EventsContent({
   loadFailed = false,
 }: EventsContentProps): React.ReactElement {
   return (
-    <main id="main-content" style={{ background: "#f6f6f6" }}>
-      <UpcomingEventHero events={upcomingEvents} />
-      <FadeUp>
-        <PastEventsGrid
-          events={pastEvents}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          activeCountry={activeCountry}
-          activeYear={activeYear}
-          loadFailed={loadFailed}
-        />
-      </FadeUp>
-    </main>
+    <FadeUp>
+      <PastEventsGrid
+        events={pastEvents}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        activeCountry={activeCountry}
+        activeYear={activeYear}
+        loadFailed={loadFailed}
+      />
+    </FadeUp>
   );
 }
 

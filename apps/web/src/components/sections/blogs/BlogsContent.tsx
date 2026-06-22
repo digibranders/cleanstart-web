@@ -1,11 +1,8 @@
-import { BlogsHero } from "@/components/sections/blogs/BlogsHero";
 import { LatestBlogs } from "@/components/sections/blogs/LatestBlogs";
 import { FadeUp } from "@/components/ui/FadeUp";
-import type { Blog, BlogCategory } from "@/lib/blog";
+import type { Blog } from "@/lib/blog";
 
 export interface BlogsContentProps {
-  featuredPost: Blog | null;
-  categories: BlogCategory[];
   posts: Blog[];
   activeCategory: string;
   searchQuery: string;
@@ -14,16 +11,12 @@ export interface BlogsContentProps {
 }
 
 /**
- * Presentational body of the /blogs listing — the hero (featured + category
- * filter + search) plus the paginated grid. Pure props, no data fetching, so it
- * renders identically on the server (static fallback) and the client
- * (`BlogsBrowser`, which drives it from the URL filters). Keeping it shared
- * means the static HTML and the hydrated view are byte-identical for the default
- * (unfiltered, page 1) state — no hydration flash.
+ * Paginated blog grid — the body the `<Suspense>` boundary swaps (server
+ * fallback + client `BlogsBrowser`). The hero (featured + category pills +
+ * search) is rendered once by the page OUTSIDE the boundary, so its <h1> isn't
+ * streamed twice. See `case-studies/page.tsx` for the pattern.
  */
 export function BlogsContent({
-  featuredPost,
-  categories,
   posts,
   activeCategory,
   searchQuery,
@@ -31,26 +24,15 @@ export function BlogsContent({
   totalPages,
 }: BlogsContentProps): React.ReactElement {
   return (
-    <main id="main-content" style={{ background: "#f6f6f6" }}>
-      <div className="relative overflow-hidden">
-        <BlogsHero
-          featuredPost={featuredPost}
-          categories={categories}
-          activeCategory={activeCategory}
-          searchQuery={searchQuery}
-        />
-      </div>
-
-      <FadeUp>
-        <LatestBlogs
-          posts={posts}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          activeCategory={activeCategory}
-          searchQuery={searchQuery}
-        />
-      </FadeUp>
-    </main>
+    <FadeUp>
+      <LatestBlogs
+        posts={posts}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        activeCategory={activeCategory}
+        searchQuery={searchQuery}
+      />
+    </FadeUp>
   );
 }
 

@@ -4,6 +4,7 @@ import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { BlogsBrowser } from "@/components/sections/blogs/BlogsBrowser";
 import { BlogsContent, selectBlogs } from "@/components/sections/blogs/BlogsContent";
+import { BlogsHero } from "@/components/sections/blogs/BlogsHero";
 import { BlogsCTA } from "@/components/sections/blogs/BlogsCTA";
 import { getFeaturedBlog, getBlogs, getBlogCategories } from "@/lib/blog";
 import { buildListingMetadata } from "@/lib/seo/canonical";
@@ -66,25 +67,28 @@ export default async function BlogsPage(): Promise<React.ReactElement> {
         />
       )}
       <Header />
-      <Suspense
-        fallback={
-          <BlogsContent
+      <main id="main-content" style={{ background: "#f6f6f6" }}>
+        <div className="relative overflow-hidden">
+          <BlogsHero
             featuredPost={featuredPost}
             categories={categories}
-            posts={initial.posts}
-            activeCategory=""
             searchQuery=""
-            currentPage={1}
-            totalPages={initial.totalPages}
           />
-        }
-      >
-        <BlogsBrowser
-          allPosts={allPosts}
-          featuredPost={featuredPost}
-          categories={categories}
-        />
-      </Suspense>
+        </div>
+        <Suspense
+          fallback={
+            <BlogsContent
+              posts={initial.posts}
+              activeCategory=""
+              searchQuery=""
+              currentPage={1}
+              totalPages={initial.totalPages}
+            />
+          }
+        >
+          <BlogsBrowser allPosts={allPosts} />
+        </Suspense>
+      </main>
       <Footer cta={<BlogsCTA />} />
     </>
   );

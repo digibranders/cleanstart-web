@@ -9,7 +9,6 @@ import type { Event } from "@/lib/events";
 import { parseCountryParam, parseYearParam } from "@/lib/events-utils";
 
 interface EventsBrowserProps {
-  upcomingEvents: Event[];
   allPastEvents: Event[];
 }
 
@@ -24,7 +23,6 @@ interface EventsBrowserProps {
  * doesn't opt the whole route into client rendering. See `BlogsBrowser.tsx`.
  */
 export function EventsBrowser({
-  upcomingEvents,
   allPastEvents,
 }: EventsBrowserProps): React.ReactElement {
   const params = useSearchParams();
@@ -40,7 +38,6 @@ export function EventsBrowser({
 
   return (
     <EventsContent
-      upcomingEvents={upcomingEvents}
       pastEvents={events}
       currentPage={Math.min(page, totalPages)}
       totalPages={totalPages}

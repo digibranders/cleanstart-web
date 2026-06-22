@@ -7,6 +7,7 @@ import {
   WebinarsContent,
   selectWebinars,
 } from "@/components/sections/webinars/WebinarsContent";
+import { WebinarsHero } from "@/components/sections/webinars/WebinarsHero";
 import { WebinarsCTA } from "@/components/sections/webinars/WebinarsCTA";
 import { getWebinars } from "@/lib/webinars";
 import { buildListingMetadata } from "@/lib/seo/canonical";
@@ -81,20 +82,25 @@ export default async function WebinarsPage(): Promise<React.ReactElement> {
         />
       )}
       <Header />
-      <Suspense
-        fallback={
-          <WebinarsContent
-            items={initial.items}
-            currentPage={1}
-            totalPages={initial.totalPages}
-            activeType={undefined}
-            activeRegion={undefined}
-            loadFailed={loadFailed}
-          />
-        }
-      >
-        <WebinarsBrowser allWebinars={allWebinars} loadFailed={loadFailed} />
-      </Suspense>
+      <main id="main-content" style={{ background: "#F6F6F6" }}>
+        <div className="relative overflow-hidden">
+          <WebinarsHero />
+        </div>
+        <Suspense
+          fallback={
+            <WebinarsContent
+              items={initial.items}
+              currentPage={1}
+              totalPages={initial.totalPages}
+              activeType={undefined}
+              activeRegion={undefined}
+              loadFailed={loadFailed}
+            />
+          }
+        >
+          <WebinarsBrowser allWebinars={allWebinars} loadFailed={loadFailed} />
+        </Suspense>
+      </main>
       <Footer cta={<WebinarsCTA />} />
     </>
   );

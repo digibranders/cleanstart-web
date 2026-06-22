@@ -158,7 +158,11 @@ export function EventDetailMobileCard({
             </div>
           )}
 
-          <h1
+          {/* Not an <h1>: the desktop EventDetailHero already supplies the page's
+              single document <h1> (it stays in the DOM under `hidden lg:block`),
+              so this mobile twin renders the same title as a styled <p> to avoid a
+              duplicate <h1> in the outline. Matches the blog/guide detail layouts. */}
+          <p
             id={`ev-detail-mobile-${slug}`}
             className="font-display text-white mt-5"
             style={{
@@ -169,7 +173,7 @@ export function EventDetailMobileCard({
             }}
           >
             {title}
-          </h1>
+          </p>
 
           {longDate && (
             <div className="flex items-center gap-2 mt-4 text-white">

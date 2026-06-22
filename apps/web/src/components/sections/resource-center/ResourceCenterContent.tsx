@@ -1,4 +1,3 @@
-import { ResourceCenterHero } from "@/components/sections/resource-center/ResourceCenterHero";
 import { ResourceCenterSidebar } from "@/components/sections/resource-center/ResourceCenterSidebar";
 import { ResourceGrid } from "@/components/sections/resource-center/ResourceGrid";
 import { FadeUp } from "@/components/ui/FadeUp";
@@ -14,11 +13,10 @@ export interface ResourceCenterContentProps {
 }
 
 /**
- * Presentational body of the /resource-center listing — the hero (search) plus
- * the sidebar type filter and paginated grid. Pure props, no data fetching, so
- * it renders identically on the server (static fallback) and the client
- * (`ResourceCenterBrowser`, which drives it from the URL filters). See
- * `BlogsContent.tsx` for the pattern.
+ * Sidebar type filter + paginated resources grid — the body the `<Suspense>`
+ * boundary swaps (server fallback + client `ResourceCenterBrowser`). The hero
+ * (search) is rendered once by the page OUTSIDE the boundary, so its <h1> isn't
+ * streamed twice. See `case-studies/page.tsx` for the pattern.
  */
 export function ResourceCenterContent({
   resources,
@@ -29,13 +27,8 @@ export function ResourceCenterContent({
   loadFailed = false,
 }: ResourceCenterContentProps): React.ReactElement {
   return (
-    <main id="main-content" style={{ background: "#f6f6f6" }}>
-      <div className="relative overflow-hidden">
-        <ResourceCenterHero initialQuery={searchQuery} />
-      </div>
-
-      <FadeUp>
-        <section
+    <FadeUp>
+      <section
           className="relative"
           style={{
             background: "#f6f6f6",
@@ -76,8 +69,7 @@ export function ResourceCenterContent({
             </div>
           </div>
         </section>
-      </FadeUp>
-    </main>
+    </FadeUp>
   );
 }
 

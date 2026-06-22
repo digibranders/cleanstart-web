@@ -4,6 +4,7 @@ import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { GuidesBrowser } from "@/components/sections/guides/GuidesBrowser";
 import { GuidesContent, selectGuides } from "@/components/sections/guides/GuidesContent";
+import { GuidesHero } from "@/components/sections/guides/GuidesHero";
 import { GuidesCTA } from "@/components/sections/guides/GuidesCTA";
 import { getGuides } from "@/lib/guides";
 import { buildListingMetadata } from "@/lib/seo/canonical";
@@ -58,18 +59,23 @@ export default async function GuidesPage(): Promise<React.ReactElement> {
         />
       )}
       <Header />
-      <Suspense
-        fallback={
-          <GuidesContent
-            guides={initial.guides}
-            searchQuery=""
-            currentPage={1}
-            totalPages={initial.totalPages}
-          />
-        }
-      >
-        <GuidesBrowser allGuides={allGuides} />
-      </Suspense>
+      <main id="main-content" style={{ background: "#f6f6f6" }}>
+        <div className="relative overflow-hidden">
+          <GuidesHero searchQuery="" />
+        </div>
+        <Suspense
+          fallback={
+            <GuidesContent
+              guides={initial.guides}
+              searchQuery=""
+              currentPage={1}
+              totalPages={initial.totalPages}
+            />
+          }
+        >
+          <GuidesBrowser allGuides={allGuides} />
+        </Suspense>
+      </main>
       <Footer cta={<GuidesCTA />} />
     </>
   );
