@@ -196,6 +196,7 @@ export interface Config {
       purgeSearchLog: TaskPurgeSearchLog;
       purgeLeadsPii: TaskPurgeLeadsPii;
       purgeCareerApplications: TaskPurgeCareerApplications;
+      purgeConsentLog: TaskPurgeConsentLog;
       purgePreviewAudit: TaskPurgePreviewAudit;
       checkBrokenLinks: TaskCheckBrokenLinks;
       retryWebhook: TaskRetryWebhook;
@@ -7610,6 +7611,7 @@ export interface PayloadJob {
           | 'purgeSearchLog'
           | 'purgeLeadsPii'
           | 'purgeCareerApplications'
+          | 'purgeConsentLog'
           | 'purgePreviewAudit'
           | 'checkBrokenLinks'
           | 'retryWebhook'
@@ -7657,6 +7659,7 @@ export interface PayloadJob {
         | 'purgeSearchLog'
         | 'purgeLeadsPii'
         | 'purgeCareerApplications'
+        | 'purgeConsentLog'
         | 'purgePreviewAudit'
         | 'checkBrokenLinks'
         | 'retryWebhook'
@@ -12176,6 +12179,14 @@ export interface TaskPurgeLeadsPii {
  * via the `definition` "TaskPurgeCareerApplications".
  */
 export interface TaskPurgeCareerApplications {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskPurgeConsentLog".
+ */
+export interface TaskPurgeConsentLog {
   input?: unknown;
   output?: unknown;
 }

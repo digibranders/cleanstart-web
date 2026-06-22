@@ -76,6 +76,7 @@ import {
 import { checkBrokenLinksTask } from './payload/jobs/check-broken-links';
 import { drainLeadQueueTask } from './payload/jobs/drain-lead-queue';
 import { purgeCareerApplicationsTask } from './payload/jobs/purge-career-applications';
+import { purgeConsentLogTask } from './payload/jobs/purge-consent-log';
 import { purgeLeadsPiiTask } from './payload/jobs/purge-leads-pii';
 import { purgePreviewAuditTask } from './payload/jobs/purge-preview-audit';
 import { purgeSearchLogTask } from './payload/jobs/purge-search-log';
@@ -95,7 +96,6 @@ import { FooterNav } from './payload/globals/footerNav';
 import { ImpactStats } from './payload/globals/impactStats';
 import { Legal } from './payload/globals/legal';
 import { MainNav } from './payload/globals/mainNav';
-import { PodcastPage } from './payload/globals/podcastPage';
 import { CompanySpotlight } from './payload/globals/companySpotlight';
 import { ResourcesSpotlight } from './payload/globals/resourcesSpotlight';
 import { SeoDefaults } from './payload/globals/seoDefaults';
@@ -390,7 +390,7 @@ export default buildConfig({
   // podcast page → legal. SeoDefaults is grouped under 'SEO' (trails
   // here; it renders in the SEO group, after the Redirects/BrokenLinks
   // collections).
-  globals: [SiteSettings, MainNav, FooterNav, ImpactStats, ResourcesSpotlight, CompanySpotlight, Announcements, PodcastPage, Legal, SeoDefaults]
+  globals: [SiteSettings, MainNav, FooterNav, ImpactStats, ResourcesSpotlight, CompanySpotlight, Announcements, Legal, SeoDefaults]
     .map(wireCustomFields),
   endpoints: [
     jsonLdEndpoint,
@@ -427,6 +427,7 @@ export default buildConfig({
       purgeSearchLogTask,
       purgeLeadsPiiTask,
       purgeCareerApplicationsTask,
+      purgeConsentLogTask,
       purgePreviewAuditTask,
       checkBrokenLinksTask,
       retryWebhookTask,
@@ -459,6 +460,10 @@ export default buildConfig({
       {
         cron: '45 3 * * *', // daily at 03:45 UTC — career-applications PII + resume 365-day purge
         queue: 'careerApplicationsPurge',
+      },
+      {
+        cron: '0 4 * * *', // daily at 04:00 UTC — consentLog 24-month retention
+        queue: 'consentLogPurge',
       },
       {
         cron: '30 4 * * *', // daily at 04:30 UTC — broken-link scan

@@ -13,8 +13,8 @@ import { handleConsentIngest } from '../endpoints/consent-ingest';
  * (`CONSENT_LOG_HMAC_SECRET`) and a coarse country code, for data
  * minimisation while preserving proof-of-consent (GDPR Art. 7(1)).
  *
- * Retention: a purge cron (Phase J3) deletes rows older than the consent
- * proof window. Out of scope here.
+ * Retention: the `purgeConsentLog` cron (jobs/purge-consent-log.ts) deletes
+ * rows older than 24 months — GDPR Art. 5(1)(e) storage limitation.
  */
 export const ConsentLog: CollectionConfig = {
   slug: 'consentLog',
@@ -27,10 +27,17 @@ export const ConsentLog: CollectionConfig = {
       'Audit trail of website cookie-consent decisions. Server-managed — written by the web CMP, never edited by hand.',
     hidden: false,
   },
+  // Append-only audit log: rows are written ONLY by the `/ingest` service
+  // endpoint via `overrideAccess: true` (which bypasses these rules), so
+  // disabling create/update here removes the misleading admin "Create"/edit
+  // affordances without blocking ingestion. Hand-authoring or editing a
+  // consent record would destroy its evidentiary value as proof of consent
+  // (GDPR Art. 7(1)). `delete` stays admin-gated for one-off erasure
+  // requests; the retention cron purges in bulk via `overrideAccess`.
   access: {
     read: isAdmin,
-    create: isAdmin,
-    update: isAdmin,
+    create: () => false,
+    update: () => false,
     delete: isAdmin,
   },
   timestamps: true,

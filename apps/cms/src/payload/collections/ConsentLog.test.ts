@@ -28,11 +28,15 @@ describe('ConsentLog collection', () => {
     expect(names).not.toContain('userAgent');
   });
 
-  it('is read-only in the admin UI (no create/update/delete buttons)', () => {
+  it('is append-only: create and update are denied in the admin UI', () => {
     expect(ConsentLog.admin?.hidden).not.toBe(true);
-    // create/update/delete are admin-gated; ingestion happens via the
-    // service endpoint with overrideAccess, never the admin UI.
+    // Ingestion happens via the `/ingest` service endpoint with
+    // overrideAccess, which bypasses these rules — so create/update can be
+    // hard-denied here to keep the audit log immutable in the admin.
+    expect(ConsentLog.access?.create?.({} as never)).toBe(false);
+    expect(ConsentLog.access?.update?.({} as never)).toBe(false);
+    // read + delete stay admin-gated (delete for one-off erasure requests).
     expect(typeof ConsentLog.access?.read).toBe('function');
-    expect(typeof ConsentLog.access?.create).toBe('function');
+    expect(typeof ConsentLog.access?.delete).toBe('function');
   });
 });
