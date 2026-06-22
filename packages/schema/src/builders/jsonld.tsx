@@ -83,6 +83,51 @@ export function webSiteSchema() {
   };
 }
 
+/**
+ * Schema.org WebPage @type and its functional subtypes. These are emitted as a
+ * page-level node for STATIC routes (driven by `pageRegistry.webPageType`) so a
+ * marketing page declares what kind of page it is — AboutPage for /about-us,
+ * ContactPage for a contact/demo page, CollectionPage for a listing index.
+ */
+export type WebPageVariant =
+  | "WebPage"
+  | "AboutPage"
+  | "ContactPage"
+  | "CollectionPage"
+  | "ProfilePage";
+
+export interface WebPageInput {
+  type: WebPageVariant;
+  /** Path-only, e.g. `/about-us`. */
+  path: string;
+  /** Page title (the `name` Google shows). */
+  name: string;
+  description?: string;
+  /** Path-only of a primary image, e.g. `/images/about/hero.png`. */
+  primaryImagePath?: string;
+}
+
+/**
+ * Page-level WebPage (or subtype) node. References the site-wide WebSite via
+ * `@id` so it joins the graph rather than duplicating site identity. `@id` is
+ * `<url>#webpage` — stable per route and distinct from any content node's @id.
+ */
+export function webPageSchema({ type, path, name, description, primaryImagePath }: WebPageInput) {
+  const url = absoluteUrl(path);
+  return {
+    "@context": "https://schema.org",
+    "@type": type,
+    "@id": `${url}#webpage`,
+    url,
+    name,
+    isPartOf: { "@id": WEBSITE_ID },
+    ...(description ? { description } : {}),
+    ...(primaryImagePath
+      ? { primaryImageOfPage: { "@type": "ImageObject", url: absoluteUrl(primaryImagePath) } }
+      : {}),
+  };
+}
+
 export type BreadcrumbCrumb = {
   /** Display label, e.g. "Blogs" */
   name: string;
