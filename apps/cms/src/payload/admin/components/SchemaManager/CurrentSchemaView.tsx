@@ -4,7 +4,7 @@ import { useField } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { lintGraph, lintNode } from '@cleanstart/schema';
+import { lintGraph, lintNode, validateOverride } from '@cleanstart/schema';
 
 import { composeGraph, type GraphNode, primaryType } from '../../../lib/jsonld/compose';
 
@@ -105,7 +105,9 @@ export const CurrentSchemaView = (): ReactElement => {
   const [copied, setCopied] = useState<number | null>(null);
   const [mode, setMode] = useState<'live' | 'preview'>('live');
   const [exportOpen, setExportOpen] = useState(false);
-  const [validateCopied, setValidateCopied] = useState(false);
+  const [validation, setValidation] = useState<
+    null | { ok: boolean; messages: string[]; warnings: number; blocks: number }
+  >(null);
   const exportRef = useRef<HTMLDivElement>(null);
 
   // Close the export dropdown on any click outside it.
@@ -181,21 +183,32 @@ export const CurrentSchemaView = (): ReactElement => {
     return lintGraph(nodes);
   }, [blocks]);
 
-  // Copy the composed @graph and open schema.org's validator (Code tab).
-  // schema.org has no code-via-URL param, so we copy → open → user pastes.
-  const validateAtSchemaOrg = async (): Promise<void> => {
-    const nodes = blocks
-      .map((b) => safeParse(b.json))
-      .filter((n): n is Record<string, unknown> => n != null);
-    const graph = { '@context': 'https://schema.org', '@graph': nodes };
-    try {
-      await navigator.clipboard.writeText(JSON.stringify(graph, null, 2));
-      setValidateCopied(true);
-      setTimeout(() => setValidateCopied(false), 2500);
-    } catch {
-      // clipboard unavailable — still open the validator so the user can paste manually
+  // In-app validation — runs instantly, no external tool. Structural check
+  // (validateOverride: allow-listed @type, no nested @id, 16 KB cap) on the
+  // unsaved override + rich-result lint of the composed graph. (schema.org's
+  // validator has no code/URL param and is cross-origin, so it can't be
+  // auto-filled — this validates the actual code in-place.)
+  const runValidation = (): void => {
+    const messages: string[] = [];
+    if (override != null) {
+      const r = validateOverride(override);
+      if (!r.ok) {
+        if (r.issues.length > 0) {
+          for (const i of r.issues) messages.push(`${i.path ? `${i.path}: ` : ''}${i.message}`);
+        } else if (r.message) {
+          messages.push(r.message);
+        }
+      }
     }
-    window.open('https://validator.schema.org/', '_blank', 'noopener,noreferrer');
+    for (const n of lint.nodes) {
+      for (const e of n.errors) messages.push(`${n.type}: missing required “${e.field}”`);
+    }
+    setValidation({
+      ok: messages.length === 0,
+      messages,
+      warnings: lint.warningCount,
+      blocks: blocks.length,
+    });
   };
 
   const downloadGraph = (format: 'json' | 'txt'): void => {
@@ -321,23 +334,54 @@ export const CurrentSchemaView = (): ReactElement => {
         </div>
         <button
           type="button"
-          onClick={() => void validateAtSchemaOrg()}
+          onClick={runValidation}
           disabled={blocks.length === 0}
-          title="Copies this page's composed JSON-LD and opens validator.schema.org — paste into its Code tab. (Validates the schema CODE; the Google Rich Results link tests the live URL.)"
+          title="Validate this page's composed JSON-LD in place — structural rules + rich-result required fields. Runs instantly, no external tool."
           style={{
             fontSize: '0.82em',
             fontWeight: 600,
-            color: blocks.length === 0 ? 'var(--theme-elevation-400, #666)' : '#9ab',
+            color: blocks.length === 0 ? 'var(--theme-elevation-400, #666)' : 'var(--theme-success-500, #0a7)',
             background: 'none',
-            border: 'none',
+            border: `1px solid ${blocks.length === 0 ? 'var(--theme-elevation-150, #333)' : 'var(--theme-success-500, #0a7)'}`,
+            borderRadius: 6,
             cursor: blocks.length === 0 ? 'not-allowed' : 'pointer',
-            padding: '0.35rem 0',
+            padding: '0.35rem 0.7rem',
             whiteSpace: 'nowrap',
           }}
         >
-          {validateCopied ? '✓ copied — paste in Code tab' : '✔ Validate code ↗'}
+          ✔ Validate code
         </button>
       </div>
+      {validation ? (
+        <div
+          style={{
+            border: `1px solid ${validation.ok ? 'var(--theme-success-500, #0a7)' : 'var(--theme-error-500, #c33)'}`,
+            borderRadius: 6,
+            padding: '0.5rem 0.7rem',
+            fontSize: '0.8em',
+          }}
+        >
+          {validation.ok ? (
+            <span style={{ color: 'var(--theme-success-500, #0a7)', fontWeight: 600 }}>
+              ✓ Valid — {validation.blocks} block(s), no errors
+              {validation.warnings > 0 ? `, ${validation.warnings} recommended-field warning(s)` : ''}.
+            </span>
+          ) : (
+            <>
+              <span style={{ color: 'var(--theme-error-500, #c33)', fontWeight: 600 }}>
+                ✕ {validation.messages.length} issue(s):
+              </span>
+              <ul style={{ margin: '0.3rem 0 0', paddingLeft: '1.1rem' }}>
+                {validation.messages.map((m) => (
+                  <li key={m} style={{ color: 'var(--theme-error-500, #c33)' }}>
+                    {m}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+      ) : null}
       {mode === 'preview' ? (
         <p style={{ fontSize: '0.74em', color: '#0a7', margin: 0 }}>
           Merged result with your unsaved override (what will deploy on save).
