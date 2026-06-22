@@ -158,10 +158,10 @@ export function EventDetailMobileCard({
             </div>
           )}
 
-          {/* Not an <h1>: the desktop EventDetailHero already supplies the page's
-              single document <h1> (it stays in the DOM under `hidden lg:block`),
-              so this mobile twin renders the same title as a styled <p> to avoid a
-              duplicate <h1> in the outline. Matches the blog/guide detail layouts. */}
+          {/* Not an <h1>: the page renders a single viewport-independent sr-only
+              <h1> with the title (see event/[slug]/page.tsx), so both visible
+              titles — this mobile card and the desktop hero — are styled <p>s.
+              This keeps exactly one <h1> in the outline on every viewport. */}
           <p
             id={`ev-detail-mobile-${slug}`}
             className="font-display text-white mt-5"

@@ -22,6 +22,10 @@ export function EventDetailHero({
   return (
     <DetailHero
       title={title}
+      // Not the page <h1>: event detail renders a single viewport-independent
+      // sr-only <h1> in the page, because it also has a separate mobile-card
+      // title. Both visible titles (this hero + the mobile card) are <p>.
+      as="p"
       breadcrumb={[
         { label: "Events", href: "/events" },
         { label: title },

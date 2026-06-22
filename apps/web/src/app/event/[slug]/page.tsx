@@ -153,6 +153,12 @@ export async function renderEventDetail({
       />
       <Header />
       <main id="main-content" style={{ background: "#f6f6f6" }}>
+        {/* The page's single, viewport-independent <h1>. Event detail renders two
+            distinct hero layouts (mobile card + desktop hero), so neither visible
+            title can be the lone <h1> without it being display:none on the other
+            breakpoint. This sr-only heading carries the title for the document
+            outline / screen readers on every viewport; both visible titles are <p>. */}
+        <h1 className="sr-only">{event.title}</h1>
         {/* Mobile: compact card-style layout. */}
         <EventDetailMobileCard
           title={event.title}
