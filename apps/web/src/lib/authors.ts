@@ -57,13 +57,13 @@ type PayloadListResponse<T> = {
   totalPages: number;
 };
 
-const PUBLISHED_FILTER =
-  "where[_status][equals]=published&where[publishedAt][exists]=true";
-
 export const getAuthorBySlug = cache(
   async (slug: string): Promise<AuthorDetail | null> => {
+    // depth=1 fully resolves the author: `photo` is a direct upload (url +
+    // sizes populate at depth=1) and every other field is a group or array of
+    // primitives, so depth=2 fetched nothing extra.
     const data = await fetchCMS<PayloadListResponse<AuthorDetail>>(
-      `/api/authors?where[slug][equals]=${encodeURIComponent(slug)}&depth=2&limit=1`,
+      `/api/authors?where[slug][equals]=${encodeURIComponent(slug)}&depth=1&limit=1`,
     );
     return data.docs[0] ?? null;
   },
@@ -80,12 +80,43 @@ export async function getAuthorSlugs(): Promise<string[]> {
   return res.docs.map((d) => d.slug).filter((s): s is string => Boolean(s));
 }
 
+/**
+ * Published posts by an author, for the "More from <author>" card grid.
+ * Returns partial `Blog` docs projected to the card field surface — see the
+ * select whitelist below.
+ */
 export async function getPostsByAuthor(
   authorId: string,
   { limit = 6 }: { limit?: number } = {},
 ): Promise<Blog[]> {
+  const params = new URLSearchParams({
+    "where[_status][equals]": "published",
+    "where[publishedAt][exists]": "true",
+    "where[authors][in][0]": authorId,
+    // depth=1 hydrates heroImage (+ its `sizes`) and the post's category — all
+    // the AuthorPosts card reads. depth=2 with no projection pulled every
+    // post's full Lexical `body` + nested relations, ballooning this 6-item
+    // response past Next's 2 MB data-cache ceiling (logged ~4.8 MB), so it
+    // could never be cached and re-hit the CMS origin on every render.
+    depth: "1",
+    limit: String(limit),
+    sort: "-publishedAt",
+  });
+  // Whitelist only the fields AuthorPosts.PostCard renders; excludes `body`
+  // and every other detail-only field. Keep in sync with that component.
+  for (const field of [
+    "title",
+    "slug",
+    "heroImage",
+    "categories",
+    "publishedAt",
+    "displayPublishedAt",
+    "readingMinutes",
+  ]) {
+    params.set(`select[${field}]`, "true");
+  }
   const data = await fetchCMS<PayloadListResponse<Blog>>(
-    `/api/blogs?${PUBLISHED_FILTER}&where[authors][in][0]=${encodeURIComponent(authorId)}&depth=2&limit=${limit}&sort=-publishedAt`,
+    `/api/blogs?${params.toString()}`,
   );
   return data.docs;
 }
