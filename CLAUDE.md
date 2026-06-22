@@ -405,6 +405,8 @@ The `Integrations` collection (Phase J1) provides editor self-serve config for c
 
 These are one-shot operations that **must** run against the prod Postgres on the droplet before / right after the first production deploy. They are not part of the normal CI deploy. Each item should be checked off in the deploy PR description.
 
+> **Bulk-run cost note:** any task below that re-saves many already-published docs fires one `revalidateWeb` ping per doc, each fanning out into a billed Vercel ISR write per affected page. For runs that touch hundreds of docs (e.g. tasks 10/17, the Webflow re-imports), export `WEB_REVALIDATE_SUPPRESS=true` for that invocation to mute the per-doc pings — the 1h ISR fallback (or one broad post-run revalidation) catches the changes up. Leave it unset for normal operation. (First-publish IndexNow/Teams/search hooks are unaffected — this only gates the apps/web cache ping.)
+
 1. **Lexical list-normalisation backfill.** `apps/cms/scripts/normalize-lexical-lists.ts` merges adjacent same-shape `list` nodes inside every Lexical body field. The `normalizeLexicalHook` only fixes docs on save — existing prod content needs this one-shot pass.
    - **Always run with `--bypass-hooks` in production.** Without it, `payload.update()` re-fires every `afterChange` hook on each updated row: Teams notifications spam the editor channel, IndexNow falsely pings Bing/Yandex, Meilisearch reindexes for nothing, `updatedAt` churn pollutes the sitemap `lastmod` and editor sort order, and a version row is created per doc.
    - Recommended sequence on the droplet (from inside the `cms` container, with `/opt/cleanstart/.env` mounted):
