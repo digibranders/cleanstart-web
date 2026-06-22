@@ -1,7 +1,8 @@
-import type { GlobalConfig } from 'payload';
+import type { GlobalConfig, JSONFieldValidation } from 'payload';
 
-import { isAdmin, isAuthenticated } from '../access';
+import { isAdmin } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
+import { filterToMergeable, validatePartialOverride } from '../lib/jsonld/filter-override';
 import { isValidExternalLink, normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 export const SeoDefaults: GlobalConfig = {
@@ -9,7 +10,11 @@ export const SeoDefaults: GlobalConfig = {
   label: 'SEO defaults',
   admin: { group: 'SEO' },
   access: {
-    read: isAuthenticated,
+    // Public read: the anonymous web build fetches this global to compose the
+    // site-wide Organization/WebSite JSON-LD, verification <meta> tags, and
+    // OG/title fallbacks. Every field here is public-facing markup by
+    // definition. Update stays admin-only.
+    read: () => true,
     update: isAdmin,
   },
   versions: { drafts: false, max: 50 },
@@ -314,6 +319,26 @@ export const SeoDefaults: GlobalConfig = {
           },
         },
       ],
+    },
+    {
+      // Site-wide custom JSON-LD — emitted on EVERY page's @graph at build time
+      // (composed per-@type alongside the auto Organization/WebSite). Use for
+      // global types not covered by the structured fields above. Same allow-list,
+      // validation, and 16 KB cap as the per-page override.
+      name: 'additionalSchema',
+      type: 'json',
+      validate: validatePartialOverride as JSONFieldValidation,
+      hooks: {
+        beforeChange: [({ value }) => filterToMergeable(value).kept],
+      },
+      admin: {
+        description:
+          'Raw Schema.org JSON-LD added to every page (single object or array, each with @context + an allow-listed @type). Validated + capped at 16 KB; composed per-@type into the site-wide @graph at build time.',
+        components: {
+          Field:
+            './payload/admin/components/SchemaManager/SchemaOverrideField.tsx#SchemaOverrideField',
+        },
+      },
     },
   ],
 };

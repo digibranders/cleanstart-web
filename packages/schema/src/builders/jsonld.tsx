@@ -35,31 +35,88 @@ const EVENT_STATUS_IRI: Record<string, string> = {
   cancelled: "https://schema.org/EventCancelled",
 };
 
-export function organizationSchema() {
+const DEFAULT_ORG_DESCRIPTION =
+  "CleanStart provides hardened, near-zero-CVE container base images and a software supply-chain security platform, helping engineering and security teams ship trusted software faster.";
+
+// Real, canonical brand profiles (mirror the footer social links) so search and
+// generative engines can verify the CleanStart entity.
+const DEFAULT_SAME_AS = [
+  "https://www.linkedin.com/company/cleanstart-official",
+  "https://x.com/CleanStartX",
+  "https://github.com/cleanstart-dev",
+  "https://www.youtube.com/@CleanStartOfficial",
+  "https://hub.docker.com/u/cleanstart",
+];
+
+/** Editor-managed NewsMediaOrganization policy URLs (from seoDefaults). */
+export interface NewsMediaConfig {
+  foundingDate?: string;
+  slogan?: string;
+  masthead?: string;
+  ethicsPolicy?: string;
+  correctionsPolicy?: string;
+  factCheckingPolicy?: string;
+  actionableFeedbackPolicy?: string;
+  unnamedSourcesPolicy?: string;
+  diversityPolicy?: string;
+  ownershipFundingInfo?: string;
+  coveragePolicy?: string;
+}
+
+/**
+ * CMS-managed Organization fields (from the `seoDefaults` global). Every field
+ * is optional; missing values fall back to the hardcoded brand defaults, so the
+ * build still produces valid markup if the CMS is unreachable (INV-1).
+ */
+export interface OrganizationConfig {
+  name?: string;
+  legalName?: string;
+  url?: string;
+  description?: string;
+  logoUrl?: string;
+  sameAs?: string[];
+  /** When set, the node is emitted as a NewsMediaOrganization. */
+  newsMedia?: NewsMediaConfig;
+}
+
+export function organizationSchema(config: OrganizationConfig = {}) {
+  const sameAs = config.sameAs && config.sameAs.length > 0 ? config.sameAs : DEFAULT_SAME_AS;
+  const news = config.newsMedia;
   return {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": news ? "NewsMediaOrganization" : "Organization",
     "@id": ORGANIZATION_ID,
-    name: SITE_NAME,
-    url: SITE_URL,
-    description:
-      "CleanStart provides hardened, near-zero-CVE container base images and a software supply-chain security platform, helping engineering and security teams ship trusted software faster.",
+    name: config.name || SITE_NAME,
+    ...(config.legalName ? { legalName: config.legalName } : {}),
+    url: config.url || SITE_URL,
+    description: config.description || DEFAULT_ORG_DESCRIPTION,
     logo: {
       "@type": "ImageObject",
-      url: `${SITE_URL}/images/cleanstart-logo.png`,
-      width: 459,
-      height: 96,
+      url: config.logoUrl || `${SITE_URL}/images/cleanstart-logo.png`,
+      ...(config.logoUrl ? {} : { width: 459, height: 96 }),
     },
-    // Real, canonical brand profiles (mirror the footer social links) so search
-    // and generative engines can verify the CleanStart entity. Stale
-    // /company/cleanstart + /cleanstart handles replaced with the live ones.
-    sameAs: [
-      "https://www.linkedin.com/company/cleanstart-official",
-      "https://x.com/CleanStartX",
-      "https://github.com/cleanstart-dev",
-      "https://www.youtube.com/@CleanStartOfficial",
-      "https://hub.docker.com/u/cleanstart",
-    ],
+    sameAs,
+    ...(news
+      ? {
+          ...(news.foundingDate ? { foundingDate: news.foundingDate } : {}),
+          ...(news.slogan ? { slogan: news.slogan } : {}),
+          ...(news.masthead ? { masthead: news.masthead } : {}),
+          ...(news.ethicsPolicy ? { ethicsPolicy: news.ethicsPolicy } : {}),
+          ...(news.correctionsPolicy ? { correctionsPolicy: news.correctionsPolicy } : {}),
+          ...(news.factCheckingPolicy
+            ? { verificationFactCheckingPolicy: news.factCheckingPolicy }
+            : {}),
+          ...(news.actionableFeedbackPolicy
+            ? { actionableFeedbackPolicy: news.actionableFeedbackPolicy }
+            : {}),
+          ...(news.unnamedSourcesPolicy ? { unnamedSourcesPolicy: news.unnamedSourcesPolicy } : {}),
+          ...(news.diversityPolicy ? { diversityPolicy: news.diversityPolicy } : {}),
+          ...(news.ownershipFundingInfo ? { ownershipFundingInfo: news.ownershipFundingInfo } : {}),
+          ...(news.coveragePolicy
+            ? { missionCoveragePrioritiesPolicy: news.coveragePolicy }
+            : {}),
+        }
+      : {}),
   };
 }
 
@@ -72,13 +129,13 @@ export function organizationSchema() {
  * points at a non-existent results page would be invalid. Add it here once a
  * user-facing search page exists.
  */
-export function webSiteSchema() {
+export function webSiteSchema(config: { name?: string; url?: string } = {}) {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "@id": WEBSITE_ID,
-    url: SITE_URL,
-    name: SITE_NAME,
+    url: config.url || SITE_URL,
+    name: config.name || SITE_NAME,
     publisher: { "@id": ORGANIZATION_ID },
   };
 }

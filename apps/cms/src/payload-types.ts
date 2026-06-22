@@ -652,7 +652,6 @@ export interface Media {
    * Photographer / source attribution.
    */
   credit?: string | null;
-  prefix?: string | null;
   /**
    * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
    */
@@ -660,6 +659,7 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -4837,6 +4837,7 @@ export interface CareerApplication {
  */
 export interface Resume {
   id: number;
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -9405,13 +9406,13 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   credit?: T;
-  prefix?: T;
   focalPoint?:
     | T
     | {
         x?: T;
         y?: T;
       };
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -10917,6 +10918,7 @@ export interface CareerApplicationsSelect<T extends boolean = true> {
  * via the `definition` "resumes_select".
  */
 export interface ResumesSelect<T extends boolean = true> {
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -11777,6 +11779,18 @@ export interface SeoDefault {
      */
     coveragePolicy?: string | null;
   };
+  /**
+   * Raw Schema.org JSON-LD added to every page (single object or array, each with @context + an allow-listed @type). Validated + capped at 16 KB; composed per-@type into the site-wide @graph at build time.
+   */
+  additionalSchema?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -12108,6 +12122,7 @@ export interface SeoDefaultsSelect<T extends boolean = true> {
         ownershipFundingInfo?: T;
         coveragePolicy?: T;
       };
+  additionalSchema?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
