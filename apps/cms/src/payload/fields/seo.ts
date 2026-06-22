@@ -1,6 +1,6 @@
 import type { Field, GroupField, JSONFieldValidation } from 'payload';
 
-import { isAdminFieldLevel, isAuthenticatedFieldLevel } from '../access';
+import { isAdminFieldLevel } from '../access';
 import { validateCanonicalOverride } from '../lib/canonical';
 import {
   validateOverrideForField,
@@ -374,11 +374,15 @@ const additionalSchemaField: Field = {
   name: 'additionalSchema',
   type: 'json',
   access: {
-    // Read widened from admin-only to any authenticated principal so the web
-    // build/ISR (preview-bot API-key user) receives the override and composes
-    // it into the live @graph. Anonymous public reads still never see it.
+    // Public read. The web build/ISR fetches content ANONYMOUSLY (no draft
+    // auth), so the override must be readable without a session for it to
+    // compose into the live @graph. This is safe: additionalSchema is
+    // public-page markup by definition (it renders in the page's JSON-LD),
+    // and drafts are already gated at the collection level
+    // (publishedOrAuthenticated) — an anonymous read only ever sees published
+    // docs, i.e. exactly the schema that is already public on the page.
     // Write stays admin-only here; Phase 3 widens it to the `seo` role.
-    read: isAuthenticatedFieldLevel,
+    read: () => true,
     update: isAdminFieldLevel,
     create: isAdminFieldLevel,
   },
