@@ -1,7 +1,8 @@
 import type { CollectionConfig, JSONFieldValidation } from 'payload';
 
-import { isAdminOrEditor } from '../access';
+import { isAdminEditorOrSeo, isAdminOrSeoFieldLevel } from '../access';
 import { validateOverrideForFieldOnCollection } from '../lib/jsonld/override-validator';
+import { revalidatePageRegistryHook, revalidatePageRegistryDeleteHook } from '../hooks/revalidate-page-registry';
 
 /**
  * Page Registry — one row per website ROUTE, so every page (including the
@@ -46,12 +47,17 @@ export const PageRegistry: CollectionConfig = {
       'Every website route, including static pages. Add a Schema.org override here to compose it into that page’s JSON-LD at build time.',
   },
   // Public read: the web build/ISR fetches this anonymously to compose static
-  // page schema. Writes are editor+ (Phase 3 adds the `seo` role).
+  // page schema. Row management is admin/editor/seo; the raw override field
+  // itself is restricted to admin/seo (privileged paste) via field access.
   access: {
     read: () => true,
-    create: isAdminOrEditor,
-    update: isAdminOrEditor,
-    delete: isAdminOrEditor,
+    create: isAdminEditorOrSeo,
+    update: isAdminEditorOrSeo,
+    delete: isAdminEditorOrSeo,
+  },
+  hooks: {
+    afterChange: [revalidatePageRegistryHook],
+    afterDelete: [revalidatePageRegistryDeleteHook],
   },
   fields: [
     {
@@ -94,6 +100,12 @@ export const PageRegistry: CollectionConfig = {
     {
       name: 'additionalSchema',
       type: 'json',
+      access: {
+        // Privileged raw paste: admin or the dedicated seo operator. Read is
+        // public (collection default) so the anonymous web build receives it.
+        update: isAdminOrSeoFieldLevel,
+        create: isAdminOrSeoFieldLevel,
+      },
       validate: validateOverrideForFieldOnCollection('pageRegistry') as JSONFieldValidation,
       admin: {
         description:

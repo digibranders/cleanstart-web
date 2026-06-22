@@ -4,5 +4,8 @@
 // importing from there is fine for cms-internal code, while this package
 // stays as the single shared module for cross-app constants.
 
-export const ROLES = ['admin', 'editor', 'author'] as const;
+// `seo` — a structured-data/SEO operator who may edit Schema.org overrides
+// (seo.additionalSchema, pageRegistry) site-wide without full admin. Sits
+// between editor and admin for SEO surfaces only.
+export const ROLES = ['admin', 'editor', 'author', 'seo'] as const;
 export type Role = (typeof ROLES)[number];

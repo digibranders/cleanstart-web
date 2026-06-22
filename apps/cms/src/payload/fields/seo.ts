@@ -1,6 +1,6 @@
 import type { Field, GroupField, JSONFieldValidation } from 'payload';
 
-import { isAdminFieldLevel } from '../access';
+import { isAdminOrSeoFieldLevel } from '../access';
 import { validateCanonicalOverride } from '../lib/canonical';
 import {
   validateOverrideForField,
@@ -381,10 +381,11 @@ const additionalSchemaField: Field = {
     // and drafts are already gated at the collection level
     // (publishedOrAuthenticated) — an anonymous read only ever sees published
     // docs, i.e. exactly the schema that is already public on the page.
-    // Write stays admin-only here; Phase 3 widens it to the `seo` role.
+    // Write is admin or the dedicated `seo` operator (privileged raw paste);
+    // editors are intentionally excluded.
     read: () => true,
-    update: isAdminFieldLevel,
-    create: isAdminFieldLevel,
+    update: isAdminOrSeoFieldLevel,
+    create: isAdminOrSeoFieldLevel,
   },
   admin: {
     description:

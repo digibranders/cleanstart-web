@@ -6919,7 +6919,7 @@ export interface User {
   /**
    * Composite roles supported. Author = own drafts only. Editor = publish content. Admin = full access.
    */
-  roles: ('admin' | 'editor' | 'author')[];
+  roles: ('admin' | 'editor' | 'author' | 'seo')[];
   preferences?:
     | {
         [k: string]: unknown;
