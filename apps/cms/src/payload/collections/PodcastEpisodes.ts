@@ -81,6 +81,40 @@ const stampYoutubeVideoIdHook: CollectionBeforeChangeHook = ({ data }) => {
   return next;
 };
 
+/**
+ * Enforce a single hero episode. When this episode is flagged `heroEpisode`,
+ * clear the flag on every other episode so at most one is ever the /podcast
+ * hero. Runs in the same request/transaction, so the switch is atomic — the
+ * previously-flagged episode is unflagged as part of the same save.
+ */
+export const enforceSingleHeroEpisodeHook: CollectionBeforeChangeHook = async ({
+  data,
+  req,
+  originalDoc,
+}) => {
+  if (data.heroEpisode !== true) return data;
+
+  const currentId = originalDoc?.id as number | string | undefined;
+  await req.payload.update({
+    collection: 'podcastEpisodes',
+    where:
+      currentId === undefined
+        ? { heroEpisode: { equals: true } }
+        : {
+            and: [
+              { heroEpisode: { equals: true } },
+              { id: { not_equals: currentId } },
+            ],
+          },
+    data: { heroEpisode: false },
+    req,
+    overrideAccess: true,
+    depth: 0,
+  });
+
+  return data;
+};
+
 export const PodcastEpisodes: CollectionConfig = {
   slug: 'podcastEpisodes',
   labels: { singular: 'Podcast episode', plural: 'Podcast episodes' },
@@ -171,6 +205,16 @@ export const PodcastEpisodes: CollectionConfig = {
       },
     },
     {
+      name: 'heroEpisode',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        description:
+          'When on, this episode is the embedded video in the /podcast hero (e.g. the Introduction). Only one episode can be the hero — turning this on clears it on any other episode. If none is set, the newest episode is used.',
+      },
+    },
+    {
       name: 'publicationDate',
       type: 'date',
       required: true,
@@ -202,7 +246,12 @@ export const PodcastEpisodes: CollectionConfig = {
     ...seoFieldsForSidebar('podcastEpisodes'),
   ],
   hooks: {
-    beforeChange: [stampYoutubeVideoIdHook, firstPublishHook(), displayPublishedAtBackfillHook],
+    beforeChange: [
+      stampYoutubeVideoIdHook,
+      enforceSingleHeroEpisodeHook,
+      firstPublishHook(),
+      displayPublishedAtBackfillHook,
+    ],
     afterChange: [
       slugChangeRedirectHook('podcastEpisodes'),
       schemaOverrideAuditHook('podcastEpisodes'),

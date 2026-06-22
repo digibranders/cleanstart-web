@@ -1,9 +1,8 @@
 import dynamic from "next/dynamic";
 import {
-  isHydratedEpisode,
+  PODCAST_TITLE,
   resolveVideoId,
   type PodcastEpisode,
-  type PodcastPage,
 } from "@/lib/podcast";
 import { HeroReveal } from "@/components/ui/Reveal";
 import { Waveform } from "./_components/Waveform";
@@ -16,28 +15,20 @@ const YouTubeEmbed = dynamic(() =>
 const HERO_GRADIENT =
   "linear-gradient(179.997deg, rgb(21, 16, 33) 25.702%, rgb(16, 18, 62) 31.159%, rgb(19, 30, 143) 51.006%, rgb(71, 30, 192) 68.711%, rgb(71, 31, 195) 79.832%, rgba(70, 30, 191, 0.85) 85.018%, rgba(66, 30, 188, 0.4) 93.72%, rgba(66, 30, 188, 0) 100.66%)";
 
+// Hero copy is owned by the web layout (the CMS only supplies episodes).
+const HERO_SUBTITLE =
+  "Where industry leaders decode container security and define the future of the software supply chain.";
+
 const VIDEO_MAX_WIDTH_PX = 720;
 const VIDEO_HEIGHT_PX = Math.round(VIDEO_MAX_WIDTH_PX * (9 / 16));
 const VIDEO_OVERLAP_PX = Math.round(VIDEO_HEIGHT_PX / 2);
 
 type Props = {
-  page: PodcastPage | null;
   featuredHero: PodcastEpisode | null;
 };
 
-export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
-  const title = page?.heroTitle ?? "Leadership Exchange";
-  const subtitle =
-    page?.heroSubtitle ??
-    "Where industry leaders decode container security and define the future of the software supply chain.";
-  const eyebrow = page?.heroEyebrow ?? null;
-
-  const heroEpisode =
-    featuredHero ??
-    (page && isHydratedEpisode(page.featuredHeroEpisode)
-      ? page.featuredHeroEpisode
-      : null);
-  const heroVideoId = heroEpisode ? resolveVideoId(heroEpisode) : null;
+export function PodcastHero({ featuredHero }: Props): React.ReactElement {
+  const heroVideoId = featuredHero ? resolveVideoId(featuredHero) : null;
 
   return (
     <section
@@ -85,11 +76,6 @@ export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
         />
         {/* Heading style and top spacing match the Resource Center hero for cross-page consistency. */}
         <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[calc(clamp(72px,8vw,128px)+var(--cs-header-extra))] pb-[260px] flex flex-col items-center text-center">
-          {eyebrow ? (
-            <span className="text-[#cdd6ff] text-[14px] tracking-[0.18em] uppercase mb-3">
-              {eyebrow}
-            </span>
-          ) : null}
           <HeroReveal y={50} duration={1.0}>
             <h1
               id="podcast-hero-title"
@@ -100,7 +86,7 @@ export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
                 letterSpacing: "var(--text-hero-utility-ls)",
               }}
             >
-              {title}
+              {PODCAST_TITLE}
             </h1>
           </HeroReveal>
           <HeroReveal y={30} delay={0.2} duration={0.8}>
@@ -114,7 +100,7 @@ export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
                 maxWidth: "674px",
               }}
             >
-              {subtitle}
+              {HERO_SUBTITLE}
             </p>
           </HeroReveal>
         </div>
@@ -131,11 +117,11 @@ export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
         }}
       >
         <div className="mx-auto w-full" style={{ maxWidth: `${VIDEO_MAX_WIDTH_PX}px` }}>
-          {heroVideoId && heroEpisode ? (
+          {heroVideoId && featuredHero ? (
             <YouTubeEmbed
               videoId={heroVideoId}
-              title={heroEpisode.title}
-              thumbnailUrl={heroEpisode.thumbnailOverride?.url ?? null}
+              title={featuredHero.title}
+              thumbnailUrl={featuredHero.thumbnailOverride?.url ?? null}
               rounded="16px"
               className="ring-1 ring-white/10 shadow-[0_30px_80px_rgba(0,0,0,0.45)]"
             />
@@ -151,7 +137,7 @@ export function PodcastHero({ page, featuredHero }: Props): React.ReactElement {
               }}
             >
               <span className="text-sm">
-                Set a featured hero episode in the Podcast page global.
+                Mark an episode as the hero in Content → Podcast episodes.
               </span>
             </div>
           )}

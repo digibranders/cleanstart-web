@@ -48,6 +48,10 @@
       "name": "featured"
     },
     {
+      "type": "checkbox",
+      "name": "heroEpisode"
+    },
+    {
       "type": "date",
       "name": "publicationDate",
       "required": true

@@ -167,7 +167,6 @@ export interface Config {
     resourcesSpotlight: ResourcesSpotlight;
     companySpotlight: CompanySpotlight;
     announcements: Announcement;
-    podcastPage: PodcastPage;
     legal: Legal;
     seoDefaults: SeoDefault;
     'payload-jobs-stats': PayloadJobsStat;
@@ -180,7 +179,6 @@ export interface Config {
     resourcesSpotlight: ResourcesSpotlightSelect<false> | ResourcesSpotlightSelect<true>;
     companySpotlight: CompanySpotlightSelect<false> | CompanySpotlightSelect<true>;
     announcements: AnnouncementsSelect<false> | AnnouncementsSelect<true>;
-    podcastPage: PodcastPageSelect<false> | PodcastPageSelect<true>;
     legal: LegalSelect<false> | LegalSelect<true>;
     seoDefaults: SeoDefaultsSelect<false> | SeoDefaultsSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
@@ -653,6 +651,7 @@ export interface Media {
    * Photographer / source attribution.
    */
   credit?: string | null;
+  prefix?: string | null;
   /**
    * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
    */
@@ -660,7 +659,6 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
-  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -4060,6 +4058,10 @@ export interface PodcastEpisode {
    */
   featured?: boolean | null;
   /**
+   * When on, this episode is the embedded video in the /podcast hero (e.g. the Introduction). If several are on, the most recent wins; if none, the newest episode is used.
+   */
+  heroEpisode?: boolean | null;
+  /**
    * Defaults to the current moment on creation. Drives sort order on /podcast (newest first).
    */
   publicationDate: string;
@@ -4838,7 +4840,6 @@ export interface CareerApplication {
  */
 export interface Resume {
   id: number;
-  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -9099,6 +9100,7 @@ export interface PodcastEpisodesSelect<T extends boolean = true> {
   abstract?: T;
   durationSeconds?: T;
   featured?: T;
+  heroEpisode?: T;
   publicationDate?: T;
   schemaAddons?:
     | T
@@ -9409,13 +9411,13 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   credit?: T;
+  prefix?: T;
   focalPoint?:
     | T
     | {
         x?: T;
         y?: T;
       };
-  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -10921,7 +10923,6 @@ export interface CareerApplicationsSelect<T extends boolean = true> {
  * via the `definition` "resumes_select".
  */
 export interface ResumesSelect<T extends boolean = true> {
-  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -11518,63 +11519,6 @@ export interface Announcement {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "podcastPage".
- */
-export interface PodcastPage {
-  id: number;
-  /**
-   * Small tag above the hero title. Optional.
-   */
-  heroEyebrow?: string | null;
-  /**
-   * Full hero title. Use heroTitleHighlight to mark the word(s) that should render in the accent colour.
-   */
-  heroTitle: string;
-  /**
-   * Substring of heroTitle that renders in the accent colour (case-sensitive match).
-   */
-  heroTitleHighlight: string;
-  /**
-   * One- or two-line subtitle shown beneath the hero title.
-   */
-  heroSubtitle?: string | null;
-  /**
-   * Episode shown in the hero embed. Leave empty to fall back to the most recent published episode.
-   */
-  featuredHeroEpisode?: (number | null) | PodcastEpisode;
-  latestEpisodesTitle?: string | null;
-  /**
-   * How many recent episodes to render on the listing grid.
-   */
-  latestEpisodesLimit?: number | null;
-  /**
-   * Heading for the Featured Content section. Pair with featuredSectionHighlight to mark the accent-coloured word(s).
-   */
-  featuredSectionTitle?: string | null;
-  /**
-   * Substring of featuredSectionTitle that renders in the accent colour (case-sensitive match).
-   */
-  featuredSectionHighlight?: string | null;
-  /**
-   * Cards rendered above the footer. Leave empty to fall back to the built-in defaults.
-   */
-  ctaCards?:
-    | {
-        title: string;
-        body: string;
-        ctaLabel: string;
-        /**
-         * Destination URL or path. Accepts `/site-path` or `https://…`.
-         */
-        ctaHref: string;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "legal".
  */
 export interface Legal {
@@ -11657,9 +11601,6 @@ export interface SeoDefault {
    * Used as twitter:site fallback when no author handle is set.
    */
   twitterHandle?: string | null;
-  /**
-   * Favicons + app icons rendered into the public site head. Provide PNGs at the listed sizes; the public layer wires `<link rel="icon">`, `apple-touch-icon`, and `manifest.json`. Note: web production phase — not yet consumed by apps/web.
-   */
   brandIcons?: {
     /**
      * 32×32 favicon. Used by `<link rel="icon" sizes="32x32">`.
@@ -11687,7 +11628,7 @@ export interface SeoDefault {
     themeColor?: string | null;
   };
   /**
-   * Site-verification tokens. Each renders as a <meta> tag in the public site head. Paste the value from each console verbatim — no quotes, no <meta> wrapper. Note: web production phase — not yet consumed by apps/web.
+   * Site-verification tokens. Each renders as a <meta> tag in the public site head (production host only). Paste the value from each console verbatim — no quotes, no <meta> wrapper.
    */
   verification?: {
     /**
@@ -11728,6 +11669,110 @@ export interface SeoDefault {
           id?: string | null;
         }[]
       | null;
+    /**
+     * Alternate / short brand name (Schema.org alternateName).
+     */
+    alternateName?: string | null;
+    /**
+     * Company tagline (Schema.org slogan).
+     */
+    slogan?: string | null;
+    /**
+     * Company / website founding date — ISO 8601 (e.g. 2024-01-15). Schema.org foundingDate.
+     */
+    foundingDate?: string | null;
+    /**
+     * City/region where the company was founded (Schema.org foundingLocation → Place).
+     */
+    foundingLocation?: string | null;
+    /**
+     * Approximate employee count (Schema.org numberOfEmployees).
+     */
+    numberOfEmployees?: number | null;
+    /**
+     * General contact email (Schema.org email).
+     */
+    email?: string | null;
+    /**
+     * General contact phone, E.164 preferred e.g. +1-555-555-5555 (Schema.org telephone).
+     */
+    telephone?: string | null;
+    /**
+     * Company founders — emitted as Schema.org founder (Person[]).
+     */
+    founders?:
+      | {
+          name: string;
+          jobTitle?: string | null;
+          /**
+           * Optional profile URL (LinkedIn, etc.).
+           */
+          url?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Headquarters / primary address. Emitted as Schema.org PostalAddress.
+     */
+    address?: {
+      streetAddress?: string | null;
+      /**
+       * City.
+       */
+      addressLocality?: string | null;
+      /**
+       * State / region.
+       */
+      addressRegion?: string | null;
+      postalCode?: string | null;
+      /**
+       * ISO 3166-1 alpha-2 (e.g. US, IN).
+       */
+      addressCountry?: string | null;
+    };
+    /**
+     * Typed contact channels — emitted as Schema.org contactPoint (ContactPoint[]).
+     */
+    contactPoints?:
+      | {
+          /**
+           * e.g. customer support, sales, technical support.
+           */
+          contactType: string;
+          telephone?: string | null;
+          email?: string | null;
+          /**
+           * e.g. US, Worldwide.
+           */
+          areaServed?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Optional registry identifiers that help search/AI engines disambiguate the entity for the Knowledge Panel. Leave blank if unknown.
+     */
+    identifiers?: {
+      /**
+       * VAT registration number.
+       */
+      vatID?: string | null;
+      /**
+       * Tax ID / EIN.
+       */
+      taxID?: string | null;
+      /**
+       * Dun & Bradstreet DUNS number.
+       */
+      duns?: string | null;
+      /**
+       * NAICS industry code.
+       */
+      naics?: string | null;
+      /**
+       * ISO 6523 ICD identifier.
+       */
+      iso6523?: string | null;
+    };
   };
   /**
    * When enabled, the site-wide Organization blob upgrades to a NewsMediaOrganization. Pairs with NewsArticle JSON-LD (isAccessibleForFree: true) and /sitemap-news.xml to satisfy Google News eligibility (signals-based since October 2025). Leave disabled until the policy URLs below are real, published pages — Google penalises NewsMediaOrganization claims that point at empty or missing policies.
@@ -12028,33 +12073,6 @@ export interface AnnouncementsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "podcastPage_select".
- */
-export interface PodcastPageSelect<T extends boolean = true> {
-  heroEyebrow?: T;
-  heroTitle?: T;
-  heroTitleHighlight?: T;
-  heroSubtitle?: T;
-  featuredHeroEpisode?: T;
-  latestEpisodesTitle?: T;
-  latestEpisodesLimit?: T;
-  featuredSectionTitle?: T;
-  featuredSectionHighlight?: T;
-  ctaCards?:
-    | T
-    | {
-        title?: T;
-        body?: T;
-        ctaLabel?: T;
-        ctaHref?: T;
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "legal_select".
  */
 export interface LegalSelect<T extends boolean = true> {
@@ -12107,6 +12125,48 @@ export interface SeoDefaultsSelect<T extends boolean = true> {
           | {
               url?: T;
               id?: T;
+            };
+        alternateName?: T;
+        slogan?: T;
+        foundingDate?: T;
+        foundingLocation?: T;
+        numberOfEmployees?: T;
+        email?: T;
+        telephone?: T;
+        founders?:
+          | T
+          | {
+              name?: T;
+              jobTitle?: T;
+              url?: T;
+              id?: T;
+            };
+        address?:
+          | T
+          | {
+              streetAddress?: T;
+              addressLocality?: T;
+              addressRegion?: T;
+              postalCode?: T;
+              addressCountry?: T;
+            };
+        contactPoints?:
+          | T
+          | {
+              contactType?: T;
+              telephone?: T;
+              email?: T;
+              areaServed?: T;
+              id?: T;
+            };
+        identifiers?:
+          | T
+          | {
+              vatID?: T;
+              taxID?: T;
+              duns?: T;
+              naics?: T;
+              iso6523?: T;
             };
       };
   newsMediaOrganization?:
