@@ -59,7 +59,7 @@ export const PageRegistry: CollectionConfig = {
     useAsTitle: 'path',
     // Search matches both the path/slug AND the title (so "home" finds the Home row).
     listSearchableFields: ['path', 'title'],
-    defaultColumns: ['path', 'title', 'schemaHealth', 'kind', 'webPageType', 'updatedAt'],
+    defaultColumns: ['path', 'title', 'kind', 'webPageType', 'updatedAt'],
     group: 'SEO',
     description:
       'Every website route, including static pages. Add a Schema.org override here to compose it into that page’s JSON-LD at build time.',
@@ -146,19 +146,6 @@ export const PageRegistry: CollectionConfig = {
         description: 'For cms-listing / cms-template: the collection slug this route renders. Seed-managed (read-only).',
         condition: (_data, siblingData) =>
           siblingData?.kind === 'cms-template' || siblingData?.kind === 'cms-listing',
-      },
-    },
-    {
-      // List-only rich-result health badge. Renders nothing in the edit view
-      // (no Field) — a Cell that lints the page's LIVE composed @graph and
-      // shows OK / warnings / errors. Lazy client fetch per row, so it never
-      // blocks the list server render.
-      name: 'schemaHealth',
-      type: 'ui',
-      admin: {
-        components: {
-          Cell: './payload/admin/components/SchemaManager/SchemaHealthCell.tsx#SchemaHealthCell',
-        },
       },
     },
     {
