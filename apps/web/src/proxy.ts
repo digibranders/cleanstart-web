@@ -22,6 +22,19 @@ const APEX_HOST = "cleanstart.com";
 
 const DRAFT_BYPASS_COOKIE = "__prerender_bypass";
 
+// Section landing pages that intentionally have no standalone index — each
+// permanently redirects to its canonical first document. The redirect is issued
+// here, before any rendering, so crawlers receive a hard 308. A server-component
+// `redirect()` can't guarantee that: once the root layout starts streaming (its
+// async Header fetches the CMS), Next downgrades the redirect to a 200 + meta
+// refresh, which search engines read as a duplicate page (it inherited the
+// default/home canonical). Targets are displayOrder-pinned, so they're stable
+// across re-seeds; the owning pages keep the same slugs as their fallback.
+const SECTION_INDEX_REDIRECTS: Record<string, string> = {
+  "/knowledge-hub": "/knowledge-hub/vex-documents",
+  "/legal": "/legal/additional-third-party-terms",
+};
+
 // Stays report-only until the CSP burn-in is complete; set CSP_ENFORCE=1 to flip.
 const CSP_MODE: "report-only" | "enforce" =
   process.env.CSP_ENFORCE === "1" ? "enforce" : "report-only";
@@ -83,6 +96,14 @@ export async function proxy(request: NextRequest) {
   if (shouldLowercase(nextUrl.pathname)) {
     const url = nextUrl.clone();
     url.pathname = nextUrl.pathname.toLowerCase();
+    return NextResponse.redirect(url, 308);
+  }
+
+  const sectionTarget = SECTION_INDEX_REDIRECTS[nextUrl.pathname];
+  if (sectionTarget) {
+    const url = nextUrl.clone();
+    url.pathname = sectionTarget;
+    url.search = "";
     return NextResponse.redirect(url, 308);
   }
 
