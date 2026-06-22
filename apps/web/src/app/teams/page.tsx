@@ -9,8 +9,7 @@ import { TeamsCTA } from "@/components/sections/teams/TeamsCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { breadcrumbSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
-import { buildPageGraph } from "@/lib/seo/compose-page";
-import { getRegistryOverride } from "@/lib/page-registry";
+import { getPageGraph } from "@/lib/seo/compose-page";
 
 export const metadata = buildPageMetadata({
   title: "Meet the Team & Leadership",
@@ -23,22 +22,16 @@ export const metadata = buildPageMetadata({
 export const revalidate = 3600;
 
 export default async function TeamsPage(): Promise<React.ReactElement> {
-  const schemaOverride = await getRegistryOverride("/teams");
+  const graph = await getPageGraph("/teams", [
+    breadcrumbSchema([
+      { name: "Home", path: "/" },
+      { name: "Company", path: "/about-us" },
+      { name: "Teams" },
+    ]),
+  ]);
   return (
     <>
-      <JsonLdGraph
-        id="teams-jsonld"
-        graph={buildPageGraph({
-          nodes: [
-            breadcrumbSchema([
-              { name: "Home", path: "/" },
-              { name: "Company", path: "/about-us" },
-              { name: "Teams" },
-            ]),
-          ],
-          override: schemaOverride,
-        })}
-      />
+      <JsonLdGraph id="teams-jsonld" graph={graph} />
       <Header />
       <main id="main-content">
         <div className="bg-cs-hero bg-cs-grid relative overflow-hidden">

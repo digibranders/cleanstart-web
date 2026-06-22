@@ -11,8 +11,7 @@ import { FipsCTA } from "@/components/sections/fips/FipsCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { breadcrumbSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
-import { buildPageGraph } from "@/lib/seo/compose-page";
-import { getRegistryOverride } from "@/lib/page-registry";
+import { getPageGraph } from "@/lib/seo/compose-page";
 
 export const metadata = buildPageMetadata({
   title: "FIPS-compliant hardened container images | CleanStart",
@@ -26,21 +25,15 @@ export const metadata = buildPageMetadata({
 export const revalidate = 3600;
 
 export default async function FipsCompliancePage(): Promise<React.ReactElement> {
-  const schemaOverride = await getRegistryOverride("/fips");
+  const graph = await getPageGraph("/fips", [
+    breadcrumbSchema([
+      { name: "Home", path: "/" },
+      { name: "FIPS Compliance" },
+    ]),
+  ]);
   return (
     <>
-      <JsonLdGraph
-        id="fips-jsonld"
-        graph={buildPageGraph({
-          nodes: [
-            breadcrumbSchema([
-              { name: "Home", path: "/" },
-              { name: "FIPS Compliance" },
-            ]),
-          ],
-          override: schemaOverride,
-        })}
-      />
+      <JsonLdGraph id="fips-jsonld" graph={graph} />
       <Header />
       <main id="main-content">
         <FipsHero />

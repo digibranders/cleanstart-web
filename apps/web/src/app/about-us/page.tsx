@@ -11,8 +11,7 @@ import { FadeUp } from "@/components/ui/FadeUp";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { breadcrumbSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
-import { buildPageGraph } from "@/lib/seo/compose-page";
-import { getRegistryOverride } from "@/lib/page-registry";
+import { getPageGraph } from "@/lib/seo/compose-page";
 
 export const metadata = buildPageMetadata({
   title: "About CleanStart | Building Trusted Software Foundations",
@@ -25,21 +24,15 @@ export const metadata = buildPageMetadata({
 export const revalidate = 3600;
 
 export default async function AboutPage(): Promise<React.ReactElement> {
-  const schemaOverride = await getRegistryOverride("/about-us");
+  const graph = await getPageGraph("/about-us", [
+    breadcrumbSchema([
+      { name: "Home", path: "/" },
+      { name: "About Us" },
+    ]),
+  ]);
   return (
     <>
-      <JsonLdGraph
-        id="about-us-jsonld"
-        graph={buildPageGraph({
-          nodes: [
-            breadcrumbSchema([
-              { name: "Home", path: "/" },
-              { name: "About Us" },
-            ]),
-          ],
-          override: schemaOverride,
-        })}
-      />
+      <JsonLdGraph id="about-us-jsonld" graph={graph} />
       <Header />
       <main id="main-content">
         {/* overflow stays visible below lg so the mobile cube in AboutHero can

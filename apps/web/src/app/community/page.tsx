@@ -8,8 +8,7 @@ import { FadeUp } from '@/components/ui/FadeUp';
 import { buildPageMetadata } from '@/lib/seo/canonical';
 import { breadcrumbSchema } from '@/lib/seo/jsonld';
 import { JsonLdGraph } from '@/components/JsonLdGraph';
-import { buildPageGraph } from '@/lib/seo/compose-page';
-import { getRegistryOverride } from '@/lib/page-registry';
+import { getPageGraph } from '@/lib/seo/compose-page';
 
 export const metadata = buildPageMetadata({
   title: 'Developer & Security Community',
@@ -21,18 +20,12 @@ export const metadata = buildPageMetadata({
 export const revalidate = 3600;
 
 export default async function CommunityPage(): Promise<React.ReactElement> {
-  const schemaOverride = await getRegistryOverride('/community');
+  const graph = await getPageGraph('/community', [
+    breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Community' }]),
+  ]);
   return (
     <>
-      <JsonLdGraph
-        id="community-jsonld"
-        graph={buildPageGraph({
-          nodes: [
-            breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Community' }]),
-          ],
-          override: schemaOverride,
-        })}
-      />
+      <JsonLdGraph id="community-jsonld" graph={graph} />
       <Header />
       <main id="main-content">
         <div className="bg-cs-hero bg-cs-grid relative overflow-hidden">

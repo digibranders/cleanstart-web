@@ -11,8 +11,7 @@ import { SCACTA } from "@/components/sections/sca/SCACTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { breadcrumbSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
-import { buildPageGraph } from "@/lib/seo/compose-page";
-import { getRegistryOverride } from "@/lib/page-registry";
+import { getPageGraph } from "@/lib/seo/compose-page";
 
 export const metadata = buildPageMetadata({
   title: "Enhance SCA | CleanStart",
@@ -26,21 +25,15 @@ export const metadata = buildPageMetadata({
 export const revalidate = 3600;
 
 export default async function SCAPage(): Promise<React.ReactElement> {
-  const schemaOverride = await getRegistryOverride("/software-composition-analysis");
+  const graph = await getPageGraph("/software-composition-analysis", [
+    breadcrumbSchema([
+      { name: "Home", path: "/" },
+      { name: "Enhance SCA" },
+    ]),
+  ]);
   return (
     <>
-      <JsonLdGraph
-        id="sca-jsonld"
-        graph={buildPageGraph({
-          nodes: [
-            breadcrumbSchema([
-              { name: "Home", path: "/" },
-              { name: "Enhance SCA" },
-            ]),
-          ],
-          override: schemaOverride,
-        })}
-      />
+      <JsonLdGraph id="sca-jsonld" graph={graph} />
       <Header />
       <main id="main-content">
         <SCAHero />

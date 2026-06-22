@@ -11,8 +11,7 @@ import { LibrariesCTA } from "@/components/sections/clean-libraries/LibrariesCTA
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
-import { buildPageGraph } from "@/lib/seo/compose-page";
-import { getRegistryOverride } from "@/lib/page-registry";
+import { getPageGraph } from "@/lib/seo/compose-page";
 
 export const metadata = buildPageMetadata({
   title: "Clean Library: Verify Every Dependency Across Your Workflow",
@@ -27,27 +26,21 @@ export const metadata = buildPageMetadata({
 export const revalidate = 3600;
 
 export default async function CleanLibrariesPage(): Promise<React.ReactElement> {
-  const schemaOverride = await getRegistryOverride("/clean-libraries");
+  const graph = await getPageGraph("/clean-libraries", [
+    breadcrumbSchema([
+      { name: "Home", path: "/" },
+      { name: "Clean Libraries" },
+    ]),
+    softwareApplicationSchema({
+      name: "Clean Libraries",
+      description:
+        "Discover, validate, and govern every software dependency — including AI-introduced libraries — across the development lifecycle, with policy enforcement built into existing CI/CD and registries.",
+      path: "/clean-libraries",
+    }),
+  ]);
   return (
     <>
-      <JsonLdGraph
-        id="clean-libraries-jsonld"
-        graph={buildPageGraph({
-          nodes: [
-            breadcrumbSchema([
-              { name: "Home", path: "/" },
-              { name: "Clean Libraries" },
-            ]),
-            softwareApplicationSchema({
-              name: "Clean Libraries",
-              description:
-                "Discover, validate, and govern every software dependency — including AI-introduced libraries — across the development lifecycle, with policy enforcement built into existing CI/CD and registries.",
-              path: "/clean-libraries",
-            }),
-          ],
-          override: schemaOverride,
-        })}
-      />
+      <JsonLdGraph id="clean-libraries-jsonld" graph={graph} />
       <Header />
       <main id="main-content">
         <LibrariesHero />

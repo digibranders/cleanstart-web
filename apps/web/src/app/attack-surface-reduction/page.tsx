@@ -11,8 +11,7 @@ import { ASRCTA } from "@/components/sections/attack-surface-reduction/ASRCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { breadcrumbSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
-import { buildPageGraph } from "@/lib/seo/compose-page";
-import { getRegistryOverride } from "@/lib/page-registry";
+import { getPageGraph } from "@/lib/seo/compose-page";
 
 export const metadata = buildPageMetadata({
   title: "Reduce attack surface with Hardened Images | CleanStart",
@@ -26,21 +25,15 @@ export const metadata = buildPageMetadata({
 export const revalidate = 3600;
 
 export default async function AttackSurfaceReductionPage(): Promise<React.ReactElement> {
-  const schemaOverride = await getRegistryOverride("/attack-surface-reduction");
+  const graph = await getPageGraph("/attack-surface-reduction", [
+    breadcrumbSchema([
+      { name: "Home", path: "/" },
+      { name: "Attack Surface Reduction" },
+    ]),
+  ]);
   return (
     <>
-      <JsonLdGraph
-        id="asr-jsonld"
-        graph={buildPageGraph({
-          nodes: [
-            breadcrumbSchema([
-              { name: "Home", path: "/" },
-              { name: "Attack Surface Reduction" },
-            ]),
-          ],
-          override: schemaOverride,
-        })}
-      />
+      <JsonLdGraph id="asr-jsonld" graph={graph} />
       <Header />
       <main id="main-content">
         <ASRHero />

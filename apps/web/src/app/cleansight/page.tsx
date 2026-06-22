@@ -10,8 +10,7 @@ import { CleanSightCTA } from "@/components/sections/cleansight/CleanSightCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
-import { buildPageGraph } from "@/lib/seo/compose-page";
-import { getRegistryOverride } from "@/lib/page-registry";
+import { getPageGraph } from "@/lib/seo/compose-page";
 
 export const metadata = buildPageMetadata({
   title: "Container Vulnerability Detection and Remediation | CleanSight",
@@ -28,27 +27,21 @@ export const metadata = buildPageMetadata({
 export const revalidate = 3600;
 
 export default async function CleanSightPage(): Promise<React.ReactElement> {
-  const schemaOverride = await getRegistryOverride("/cleansight");
+  const graph = await getPageGraph("/cleansight", [
+    breadcrumbSchema([
+      { name: "Home", path: "/" },
+      { name: "CleanSight" },
+    ]),
+    softwareApplicationSchema({
+      name: "CleanSight",
+      description:
+        "Continuously discover, assess, and remediate container risk across modern environments. Unified visibility with integrated remediation.",
+      path: "/cleansight",
+    }),
+  ]);
   return (
     <>
-      <JsonLdGraph
-        id="cleansight-jsonld"
-        graph={buildPageGraph({
-          nodes: [
-            breadcrumbSchema([
-              { name: "Home", path: "/" },
-              { name: "CleanSight" },
-            ]),
-            softwareApplicationSchema({
-              name: "CleanSight",
-              description:
-                "Continuously discover, assess, and remediate container risk across modern environments. Unified visibility with integrated remediation.",
-              path: "/cleansight",
-            }),
-          ],
-          override: schemaOverride,
-        })}
-      />
+      <JsonLdGraph id="cleansight-jsonld" graph={graph} />
       <Header />
       <main id="main-content">
         <CleanSightHero />
