@@ -1,6 +1,7 @@
 import type { CollectionConfig, JSONFieldValidation } from 'payload';
 
 import { isAdminEditorOrSeo, isAdminOrSeoFieldLevel } from '../access';
+import { pageLiveSchemaEndpoint } from '../endpoints/page-live-schema';
 import { validateOverrideForFieldOnCollection } from '../lib/jsonld/override-validator';
 import { revalidatePageRegistryHook, revalidatePageRegistryDeleteHook } from '../hooks/revalidate-page-registry';
 
@@ -59,6 +60,7 @@ export const PageRegistry: CollectionConfig = {
     afterChange: [revalidatePageRegistryHook],
     afterDelete: [revalidatePageRegistryDeleteHook],
   },
+  endpoints: [pageLiveSchemaEndpoint],
   fields: [
     {
       name: 'path',
@@ -95,6 +97,17 @@ export const PageRegistry: CollectionConfig = {
         description: 'For cms-listing / cms-template: the collection slug this route renders.',
         condition: (_data, siblingData) =>
           siblingData?.kind === 'cms-template' || siblingData?.kind === 'cms-listing',
+      },
+    },
+    {
+      // Read-only viewer of the page's CURRENT live JSON-LD, block-wise.
+      name: 'currentSchemaView',
+      type: 'ui',
+      admin: {
+        components: {
+          Field:
+            './payload/admin/components/SchemaManager/CurrentSchemaView.tsx#CurrentSchemaView',
+        },
       },
     },
     {
