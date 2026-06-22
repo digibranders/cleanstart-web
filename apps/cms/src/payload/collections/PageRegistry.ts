@@ -64,15 +64,14 @@ export const PageRegistry: CollectionConfig = {
       'Every website route, including static pages. Add a Schema.org override here to compose it into that page’s JSON-LD at build time.',
   },
   // The registry is a SEED-MANAGED catalog of real routes. Public read (the web
-  // build/ISR fetches it anonymously). Create/delete are admin-only — rows come
-  // from scripts/seed-page-registry.ts (a new row for a path that isn't a real
-  // route does nothing), and the seed bypasses access via overrideAccess.
-  // Update stays admin/editor/seo so editors can edit the override + notes, but
-  // the identity/classification fields (path/title/kind/backingCollection) are
-  // locked on update at the field level below.
+  // build/ISR fetches it anonymously). Create is disabled in the UI/API — rows
+  // come ONLY from scripts/seed-page-registry.ts (which bypasses access via
+  // overrideAccess); a hand-made row for a path that isn't a real route does
+  // nothing. Update is admin/editor/seo (edit the override + notes). Delete is
+  // admin-only (clean up a row when a page is removed from the site).
   access: {
     read: () => true,
-    create: isAdmin,
+    create: () => false,
     update: isAdminEditorOrSeo,
     delete: isAdmin,
   },
@@ -82,12 +81,13 @@ export const PageRegistry: CollectionConfig = {
   },
   endpoints: [pageLiveSchemaEndpoint],
   fields: [
-    // Identity/classification fields — settable on create (admin) and by the
-    // seed, but LOCKED on update: changing a row's path silently breaks the
-    // route→override link, and changing kind can break revalidation. Editors
-    // only touch the override + notes. `access.update: () => false` enforces
-    // this server-side and renders them read-only in the edit view; the seed
-    // bypasses it via overrideAccess.
+    // Identity/classification fields — system-managed by the seed. These are
+    // LOCKED: `admin.readOnly` makes them read-only in the admin UI, and
+    // `access.update: () => false` enforces it server-side too (a stray API
+    // update can't change them). Editing a path would silently break the
+    // route→override link; changing kind can break revalidation. The seed sets
+    // them via overrideAccess, which bypasses both. To change one, edit
+    // scripts/seed-page-registry.ts and re-run the seed.
     {
       name: 'path',
       type: 'text',
@@ -97,7 +97,8 @@ export const PageRegistry: CollectionConfig = {
       access: { update: () => false },
       validate: validatePath,
       admin: {
-        description: 'Site-relative route, e.g. /pricing or /blogs. Locked after creation.',
+        readOnly: true,
+        description: 'Site-relative route, e.g. /pricing or /blogs. Seed-managed (read-only).',
       },
     },
     {
@@ -105,7 +106,10 @@ export const PageRegistry: CollectionConfig = {
       type: 'text',
       required: true,
       access: { update: () => false },
-      admin: { description: 'Human label shown in the Schema Manager list. Locked after creation.' },
+      admin: {
+        readOnly: true,
+        description: 'Human label shown in the Schema Manager list. Seed-managed (read-only).',
+      },
     },
     {
       name: 'kind',
@@ -115,8 +119,9 @@ export const PageRegistry: CollectionConfig = {
       options: KIND_OPTIONS,
       access: { update: () => false },
       admin: {
+        readOnly: true,
         description:
-          'static = hardcoded page; cms-listing = a collection’s index page; cms-template = drill into the collection’s documents. Locked after creation.',
+          'static = hardcoded page; cms-listing = a collection’s index page; cms-template = drill into the collection’s documents. Seed-managed (read-only).',
       },
     },
     {
@@ -125,8 +130,9 @@ export const PageRegistry: CollectionConfig = {
       options: SCHEMA_TYPE_OPTIONS,
       access: { update: () => false },
       admin: {
+        readOnly: true,
         description:
-          'The primary Schema.org type this page represents (the rich-result type to aim for). Locked after creation.',
+          'The primary Schema.org type this page represents (the rich-result type to aim for). Seed-managed (read-only).',
       },
     },
     {
@@ -134,7 +140,8 @@ export const PageRegistry: CollectionConfig = {
       type: 'text',
       access: { update: () => false },
       admin: {
-        description: 'For cms-listing / cms-template: the collection slug this route renders. Locked after creation.',
+        readOnly: true,
+        description: 'For cms-listing / cms-template: the collection slug this route renders. Seed-managed (read-only).',
         condition: (_data, siblingData) =>
           siblingData?.kind === 'cms-template' || siblingData?.kind === 'cms-listing',
       },
