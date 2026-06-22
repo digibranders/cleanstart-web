@@ -218,7 +218,9 @@ export const validateOverride = (input: unknown): OverrideValidationResult => {
       issues: [],
     };
   }
-  const size = Buffer.byteLength(serialized, 'utf8');
+  // TextEncoder (not Buffer) so the validator is isomorphic — it runs in the
+  // browser too (admin field components), where Buffer is undefined.
+  const size = new TextEncoder().encode(serialized).length;
   if (size > MAX_SERIALIZED_BYTES) {
     return {
       ok: false,

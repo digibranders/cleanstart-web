@@ -110,6 +110,12 @@ export const PageRegistry: CollectionConfig = {
       admin: {
         description:
           'Raw Schema.org JSON-LD for this page (single object or array of objects, each with @context + an allow-listed @type). Validated and capped at 16 KB; composed per-@type into the page’s @graph at build time.',
+        components: {
+          // Custom editor: paste OR upload .txt/.json + live validation + @type
+          // preview. Overrides the default json CodeField (wire-custom-fields).
+          Field:
+            './payload/admin/components/SchemaManager/SchemaOverrideField.tsx#SchemaOverrideField',
+        },
       },
     },
     {

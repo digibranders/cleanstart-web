@@ -91,6 +91,7 @@ import { DsarActionsPanel as DsarActionsPanel_270b8398021fd191ac147b0b8d59049c }
 import { FlaggedLeadsTab as FlaggedLeadsTab_e23fb65ad956ac1ee9fd221fde0635a2 } from '@/payload/admin/components/FlaggedLeadsTab.tsx'
 import { PartnersExportButton as PartnersExportButton_bdb98055df2d18c5a1146f8080480dbe } from '@/payload/admin/components/PartnersExportButton.tsx'
 import { RedirectStalenessField as RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d } from '@/payload/admin/components/RedirectStalenessField.tsx'
+import { SchemaOverrideField as SchemaOverrideField_c716f5511ac92ab6778c63b963e35525 } from '../../../payload/admin/components/SchemaManager/SchemaOverrideField.tsx'
 import { DisableUserAction as DisableUserAction_6c8d4d4a3960948e585eb302bcb89460 } from '@/payload/admin/components/DisableUserAction.tsx'
 import { ReassignContentAction as ReassignContentAction_a770f7b61bee7b644dacc1d627c324ca } from '@/payload/admin/components/ReassignContentAction.tsx'
 import { EventsMultiSelect as EventsMultiSelect_8bcd98a59f96a65fd684ba41f20f1e87 } from '@/payload/admin/components/integrations/EventsMultiSelect.tsx'
@@ -229,6 +230,7 @@ export const importMap = {
   "@/payload/admin/components/FlaggedLeadsTab.tsx#FlaggedLeadsTab": FlaggedLeadsTab_e23fb65ad956ac1ee9fd221fde0635a2,
   "@/payload/admin/components/PartnersExportButton.tsx#PartnersExportButton": PartnersExportButton_bdb98055df2d18c5a1146f8080480dbe,
   "@/payload/admin/components/RedirectStalenessField.tsx#RedirectStalenessField": RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d,
+  "./payload/admin/components/SchemaManager/SchemaOverrideField.tsx#SchemaOverrideField": SchemaOverrideField_c716f5511ac92ab6778c63b963e35525,
   "@/payload/admin/components/DisableUserAction.tsx#DisableUserAction": DisableUserAction_6c8d4d4a3960948e585eb302bcb89460,
   "@/payload/admin/components/ReassignContentAction.tsx#ReassignContentAction": ReassignContentAction_a770f7b61bee7b644dacc1d627c324ca,
   "@/payload/admin/components/integrations/EventsMultiSelect.tsx#EventsMultiSelect": EventsMultiSelect_8bcd98a59f96a65fd684ba41f20f1e87,
