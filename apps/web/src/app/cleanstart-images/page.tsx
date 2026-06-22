@@ -12,8 +12,7 @@ import { CleanStartImagesCta } from "@/components/sections/cleanstart-images/Cle
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
-import { buildPageGraph } from "@/lib/seo/compose-page";
-import { getRegistryOverride } from "@/lib/page-registry";
+import { getPageGraph } from "@/lib/seo/compose-page";
 
 export const metadata = buildPageMetadata({
   title: "Zero CVE Hardened Container Images | CleanStart",
@@ -30,27 +29,21 @@ export const metadata = buildPageMetadata({
 export const revalidate = 3600;
 
 export default async function CleanStartImagesPage(): Promise<React.ReactElement> {
-  const schemaOverride = await getRegistryOverride("/cleanstart-images");
+  const graph = await getPageGraph("/cleanstart-images", [
+    breadcrumbSchema([
+      { name: "Home", path: "/" },
+      { name: "CleanStart Images" },
+    ]),
+    softwareApplicationSchema({
+      name: "CleanStart Images",
+      description:
+        "Hardened, near-zero-CVE container and virtual machine images. A drop-in replacement for your base image with smaller, faster, FIPS-ready builds.",
+      path: "/cleanstart-images",
+    }),
+  ]);
   return (
     <>
-      <JsonLdGraph
-        id="cleanstart-images-jsonld"
-        graph={buildPageGraph({
-          nodes: [
-            breadcrumbSchema([
-              { name: "Home", path: "/" },
-              { name: "CleanStart Images" },
-            ]),
-            softwareApplicationSchema({
-              name: "CleanStart Images",
-              description:
-                "Hardened, near-zero-CVE container and virtual machine images. A drop-in replacement for your base image with smaller, faster, FIPS-ready builds.",
-              path: "/cleanstart-images",
-            }),
-          ],
-          override: schemaOverride,
-        })}
-      />
+      <JsonLdGraph id="cleanstart-images-jsonld" graph={graph} />
       <Header />
       <main id="main-content">
         <CleanStartImagesHero />

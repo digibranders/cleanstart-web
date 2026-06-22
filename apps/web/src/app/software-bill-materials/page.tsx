@@ -10,8 +10,7 @@ import { SbomCTA } from "@/components/sections/sbom/SbomCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { breadcrumbSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
-import { buildPageGraph } from "@/lib/seo/compose-page";
-import { getRegistryOverride } from "@/lib/page-registry";
+import { getPageGraph } from "@/lib/seo/compose-page";
 
 export const metadata = buildPageMetadata({
   title: "CleanStart SBOM for software transparency | CleanStart",
@@ -25,21 +24,15 @@ export const metadata = buildPageMetadata({
 export const revalidate = 3600;
 
 export default async function SoftwareBillOfMaterialsPage(): Promise<React.ReactElement> {
-  const schemaOverride = await getRegistryOverride("/software-bill-materials");
+  const graph = await getPageGraph("/software-bill-materials", [
+    breadcrumbSchema([
+      { name: "Home", path: "/" },
+      { name: "Software Bill of Materials" },
+    ]),
+  ]);
   return (
     <>
-      <JsonLdGraph
-        id="sbom-jsonld"
-        graph={buildPageGraph({
-          nodes: [
-            breadcrumbSchema([
-              { name: "Home", path: "/" },
-              { name: "Software Bill of Materials" },
-            ]),
-          ],
-          override: schemaOverride,
-        })}
-      />
+      <JsonLdGraph id="sbom-jsonld" graph={graph} />
       <Header />
       <main id="main-content">
         <SbomHero />

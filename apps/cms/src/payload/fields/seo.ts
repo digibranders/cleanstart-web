@@ -1,6 +1,7 @@
 import type { Field, GroupField, JSONFieldValidation } from 'payload';
 
 import { isAdminOrSeoFieldLevel } from '../access';
+import { schemaHistoryFieldHook } from '../hooks/record-schema-history';
 import { validateCanonicalOverride } from '../lib/canonical';
 import {
   validateOverrideForField,
@@ -406,6 +407,27 @@ const additionalSchemaField: Field = {
   }) as JSONFieldValidation,
 };
 
+/**
+ * Per-@type override history (a sibling of `additionalSchema` in the seo
+ * group). System-managed by `schemaHistoryFieldHook`: each save diffs the
+ * override and appends added/changed/removed entries with timestamp + editor.
+ * Read is restricted (carries editor emails); never editable in the form.
+ * Rendered read-only by the `seoSchemaHistory` sidebar card (SchemaHistory).
+ */
+const schemaHistoryField: Field = {
+  name: 'schemaHistory',
+  type: 'json',
+  access: {
+    read: ({ req: { user } }) => Boolean(user),
+    update: () => false,
+    create: () => false,
+  },
+  admin: { hidden: true },
+  hooks: {
+    beforeChange: [schemaHistoryFieldHook],
+  },
+};
+
 // Optional primary topic the editor is writing for. Drives the
 // `KeywordsField` sidebar density readout. Free-text — we don't
 // validate against an external keyword tool. Hidden from the in-form
@@ -498,6 +520,7 @@ const seoField: GroupField = {
     keywordsField,
     speakablePathField,
     additionalSchemaField,
+    schemaHistoryField,
   ],
 };
 
@@ -648,6 +671,9 @@ export const seoSidebarFields = (args: {
       },
     },
     {
+      // Schema (JSON-LD) card — live preview, per-block validity, paste/upload
+      // override editor, export, AND per-@type version history (all inside the
+      // one expandable card).
       name: 'schemaPreview',
       type: 'ui',
       admin: {

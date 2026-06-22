@@ -7,8 +7,7 @@ import { FadeUp } from "@/components/ui/FadeUp";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { breadcrumbSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
-import { buildPageGraph } from "@/lib/seo/compose-page";
-import { getRegistryOverride } from "@/lib/page-registry";
+import { getPageGraph } from "@/lib/seo/compose-page";
 
 export const metadata = buildPageMetadata({
   title: "Pricing | CleanStart",
@@ -21,21 +20,15 @@ export const metadata = buildPageMetadata({
 export const revalidate = 3600;
 
 export default async function PricingPage(): Promise<React.ReactElement> {
-  const schemaOverride = await getRegistryOverride("/pricing");
+  const graph = await getPageGraph("/pricing", [
+    breadcrumbSchema([
+      { name: "Home", path: "/" },
+      { name: "Pricing" },
+    ]),
+  ]);
   return (
     <>
-      <JsonLdGraph
-        id="pricing-jsonld"
-        graph={buildPageGraph({
-          nodes: [
-            breadcrumbSchema([
-              { name: "Home", path: "/" },
-              { name: "Pricing" },
-            ]),
-          ],
-          override: schemaOverride,
-        })}
-      />
+      <JsonLdGraph id="pricing-jsonld" graph={graph} />
       <Header />
       <main id="main-content">
         <PricingHero />

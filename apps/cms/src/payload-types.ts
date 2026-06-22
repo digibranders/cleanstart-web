@@ -596,6 +596,15 @@ export interface Blog {
       | number
       | boolean
       | null;
+    schemaHistory?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
   };
   featured?: boolean | null;
   pinned?: boolean | null;
@@ -932,6 +941,15 @@ export interface Author {
       | number
       | boolean
       | null;
+    schemaHistory?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -1090,6 +1108,15 @@ export interface Category {
      * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    schemaHistory?:
       | {
           [k: string]: unknown;
         }
@@ -1445,6 +1472,15 @@ export interface News {
       | number
       | boolean
       | null;
+    schemaHistory?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
   };
   featured?: boolean | null;
   updatedAt: string;
@@ -1604,6 +1640,15 @@ export interface NewsCategory {
      * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    schemaHistory?:
       | {
           [k: string]: unknown;
         }
@@ -2045,6 +2090,15 @@ export interface Guide {
       | number
       | boolean
       | null;
+    schemaHistory?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -2453,6 +2507,15 @@ export interface KnowledgeBase {
       | number
       | boolean
       | null;
+    schemaHistory?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -2611,6 +2674,15 @@ export interface KnowledgeCategory {
      * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    schemaHistory?:
       | {
           [k: string]: unknown;
         }
@@ -3026,6 +3098,15 @@ export interface Resource {
      * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    schemaHistory?:
       | {
           [k: string]: unknown;
         }
@@ -3550,6 +3631,15 @@ export interface Event {
       | number
       | boolean
       | null;
+    schemaHistory?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -3915,6 +4005,15 @@ export interface Webinar {
       | number
       | boolean
       | null;
+    schemaHistory?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -4244,6 +4343,15 @@ export interface PodcastEpisode {
      * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    schemaHistory?:
       | {
           [k: string]: unknown;
         }
@@ -4621,6 +4729,15 @@ export interface Job {
      * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    schemaHistory?:
       | {
           [k: string]: unknown;
         }
@@ -6611,6 +6728,15 @@ export interface Page {
       | number
       | boolean
       | null;
+    schemaHistory?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -6886,6 +7012,10 @@ export interface PageRegistry {
    * For cms-listing / cms-template: the collection slug this route renders. Seed-managed (read-only).
    */
   backingCollection?: string | null;
+  /**
+   * Declares what kind of page this is. The site auto-emits the matching WebPage node (AboutPage for an about page, CollectionPage for a listing, …) into the page’s JSON-LD at build time. “None” emits no WebPage node.
+   */
+  webPageType?: ('none' | 'WebPage' | 'AboutPage' | 'ContactPage' | 'CollectionPage' | 'ProfilePage') | null;
   schemaHistory?:
     | {
         [k: string]: unknown;
@@ -7903,6 +8033,7 @@ export interface BlogsSelect<T extends boolean = true> {
               id?: T;
             };
         additionalSchema?: T;
+        schemaHistory?: T;
       };
   featured?: T;
   pinned?: T;
@@ -8058,6 +8189,7 @@ export interface NewsSelect<T extends boolean = true> {
               id?: T;
             };
         additionalSchema?: T;
+        schemaHistory?: T;
       };
   featured?: T;
   updatedAt?: T;
@@ -8256,6 +8388,7 @@ export interface GuidesSelect<T extends boolean = true> {
               id?: T;
             };
         additionalSchema?: T;
+        schemaHistory?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -8440,6 +8573,7 @@ export interface KnowledgeBaseSelect<T extends boolean = true> {
               id?: T;
             };
         additionalSchema?: T;
+        schemaHistory?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -8608,6 +8742,7 @@ export interface ResourcesSelect<T extends boolean = true> {
               id?: T;
             };
         additionalSchema?: T;
+        schemaHistory?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -8780,6 +8915,7 @@ export interface EventsSelect<T extends boolean = true> {
               id?: T;
             };
         additionalSchema?: T;
+        schemaHistory?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -8939,6 +9075,7 @@ export interface WebinarsSelect<T extends boolean = true> {
               id?: T;
             };
         additionalSchema?: T;
+        schemaHistory?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -9087,6 +9224,7 @@ export interface PodcastEpisodesSelect<T extends boolean = true> {
               id?: T;
             };
         additionalSchema?: T;
+        schemaHistory?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -9251,6 +9389,7 @@ export interface JobsSelect<T extends boolean = true> {
               id?: T;
             };
         additionalSchema?: T;
+        schemaHistory?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -10214,6 +10353,7 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
             };
         additionalSchema?: T;
+        schemaHistory?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -10335,6 +10475,7 @@ export interface AuthorsSelect<T extends boolean = true> {
               id?: T;
             };
         additionalSchema?: T;
+        schemaHistory?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -10391,6 +10532,7 @@ export interface CategoriesSelect<T extends boolean = true> {
               id?: T;
             };
         additionalSchema?: T;
+        schemaHistory?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -10447,6 +10589,7 @@ export interface NewsCategoriesSelect<T extends boolean = true> {
               id?: T;
             };
         additionalSchema?: T;
+        schemaHistory?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -10503,6 +10646,7 @@ export interface KnowledgeCategoriesSelect<T extends boolean = true> {
               id?: T;
             };
         additionalSchema?: T;
+        schemaHistory?: T;
       };
   displayOrder?: T;
   updatedAt?: T;
@@ -10724,6 +10868,7 @@ export interface PageRegistrySelect<T extends boolean = true> {
   kind?: T;
   order?: T;
   backingCollection?: T;
+  webPageType?: T;
   schemaHistory?: T;
   additionalSchema?: T;
   notes?: T;

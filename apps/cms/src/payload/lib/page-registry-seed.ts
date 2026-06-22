@@ -20,30 +20,45 @@
 
 export type PageKind = 'static' | 'cms-listing' | 'cms-template';
 
+/** Functional WebPage @type auto-emitted by the web build for this route. */
+export type WebPageTypeSeed =
+  | 'WebPage'
+  | 'AboutPage'
+  | 'ContactPage'
+  | 'CollectionPage'
+  | 'ProfilePage';
+
 export interface PageRegistrySeedRow {
   path: string;
   title: string;
   kind: PageKind;
   order: number;
   backingCollection?: string;
+  /**
+   * Initial functional WebPage @type. Only the composed-graph STATIC routes
+   * (those that call getPageGraph in apps/web) emit it today; listing pages
+   * still use the legacy multi-script JSON-LD and ignore it until converted.
+   * Omit → 'none' (no WebPage node). Editors can change it per row afterwards.
+   */
+  webPageType?: WebPageTypeSeed;
 }
 
 export const PAGE_REGISTRY_SEED: readonly PageRegistrySeedRow[] = [
   // Home
-  { path: '/', title: 'Home', kind: 'static', order: 0 },
+  { path: '/', title: 'Home', kind: 'static', order: 0, webPageType: 'WebPage' },
 
   // Products (mega-menu)
-  { path: '/cleanstart-images', title: 'CleanStart Images', kind: 'static', order: 1 },
-  { path: '/clean-libraries', title: 'Clean Libraries', kind: 'static', order: 2 },
-  { path: '/cleansight', title: 'CleanSight', kind: 'static', order: 3 },
+  { path: '/cleanstart-images', title: 'CleanStart Images', kind: 'static', order: 1, webPageType: 'WebPage' },
+  { path: '/clean-libraries', title: 'Clean Libraries', kind: 'static', order: 2, webPageType: 'WebPage' },
+  { path: '/cleansight', title: 'CleanSight', kind: 'static', order: 3, webPageType: 'WebPage' },
 
   // Solutions (mega-menu)
-  { path: '/vulnerability-remediation', title: 'Vulnerability Remediation', kind: 'static', order: 4 },
-  { path: '/attack-surface-reduction', title: 'Attack Surface Reduction', kind: 'static', order: 5 },
-  { path: '/fips', title: 'FIPS Compliance', kind: 'static', order: 6 },
-  { path: '/software-bill-materials', title: 'Software Bill of Materials', kind: 'static', order: 7 },
-  { path: '/for-developers', title: 'For Developers', kind: 'static', order: 8 },
-  { path: '/for-ciso', title: 'For CISO', kind: 'static', order: 9 },
+  { path: '/vulnerability-remediation', title: 'Vulnerability Remediation', kind: 'static', order: 4, webPageType: 'WebPage' },
+  { path: '/attack-surface-reduction', title: 'Attack Surface Reduction', kind: 'static', order: 5, webPageType: 'WebPage' },
+  { path: '/fips', title: 'FIPS Compliance', kind: 'static', order: 6, webPageType: 'WebPage' },
+  { path: '/software-bill-materials', title: 'Software Bill of Materials', kind: 'static', order: 7, webPageType: 'WebPage' },
+  { path: '/for-developers', title: 'For Developers', kind: 'static', order: 8, webPageType: 'WebPage' },
+  { path: '/for-ciso', title: 'For CISO', kind: 'static', order: 9, webPageType: 'WebPage' },
 
   // Resources (mega-menu)
   { path: '/blogs', title: 'Blogs', kind: 'cms-listing', order: 10, backingCollection: 'blogs' },
@@ -57,22 +72,22 @@ export const PAGE_REGISTRY_SEED: readonly PageRegistrySeedRow[] = [
   { path: '/podcast', title: 'Podcast', kind: 'cms-listing', order: 18, backingCollection: 'podcastEpisodes' },
 
   // Company (mega-menu)
-  { path: '/about-us', title: 'About Us', kind: 'static', order: 19 },
-  { path: '/teams', title: 'Teams', kind: 'static', order: 20 },
-  { path: '/community', title: 'Community', kind: 'static', order: 21 },
+  { path: '/about-us', title: 'About Us', kind: 'static', order: 19, webPageType: 'AboutPage' },
+  { path: '/teams', title: 'Teams', kind: 'static', order: 20, webPageType: 'AboutPage' },
+  { path: '/community', title: 'Community', kind: 'static', order: 21, webPageType: 'WebPage' },
   { path: '/careers', title: 'Careers', kind: 'cms-listing', order: 22, backingCollection: 'jobs' },
-  { path: '/contact-us', title: 'Contact Us', kind: 'static', order: 23 },
+  { path: '/contact-us', title: 'Contact Us', kind: 'static', order: 23, webPageType: 'ContactPage' },
 
   // Flat nav items
-  { path: '/partners', title: 'Partners', kind: 'static', order: 24 },
-  { path: '/pricing', title: 'Pricing', kind: 'static', order: 25 },
+  { path: '/partners', title: 'Partners', kind: 'static', order: 24, webPageType: 'WebPage' },
+  { path: '/pricing', title: 'Pricing', kind: 'static', order: 25, webPageType: 'WebPage' },
 
   // Off-nav static pages
-  { path: '/cleanstart-platform', title: 'CleanStart Platform', kind: 'static', order: 26 },
-  { path: '/software-composition-analysis', title: 'Software Composition Analysis', kind: 'static', order: 27 },
-  { path: '/book-a-demo', title: 'Book a Demo', kind: 'static', order: 28 },
-  { path: '/deal-registration', title: 'Deal Registration', kind: 'static', order: 29 },
-  { path: '/privacy-policy', title: 'Privacy Policy', kind: 'static', order: 30 },
+  { path: '/cleanstart-platform', title: 'CleanStart Platform', kind: 'static', order: 26, webPageType: 'WebPage' },
+  { path: '/software-composition-analysis', title: 'Software Composition Analysis', kind: 'static', order: 27, webPageType: 'WebPage' },
+  { path: '/book-a-demo', title: 'Book a Demo', kind: 'static', order: 28, webPageType: 'ContactPage' },
+  { path: '/deal-registration', title: 'Deal Registration', kind: 'static', order: 29, webPageType: 'ContactPage' },
+  { path: '/privacy-policy', title: 'Privacy Policy', kind: 'static', order: 30, webPageType: 'WebPage' },
   { path: '/legal', title: 'Legal', kind: 'cms-listing', order: 31, backingCollection: 'legalDocuments' },
 
   // CMS detail templates — schema edited per-document; row deep-links the set.

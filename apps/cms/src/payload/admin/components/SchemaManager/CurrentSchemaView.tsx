@@ -4,6 +4,8 @@ import { useField } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { lintGraph, lintNode } from '@cleanstart/schema';
+
 import { composeGraph, type GraphNode, primaryType } from '../../../lib/jsonld/compose';
 
 interface LiveBlock {
@@ -52,6 +54,40 @@ const fmt = (iso: string | null | undefined): string => {
   }
 };
 
+/** Rich-result health pill — mirrors the Pages (Schema) list column. */
+const HealthBadge = ({ errors, warnings }: { errors: number; warnings: number }): ReactElement => {
+  const { color, label, title } =
+    errors > 0
+      ? {
+          color: 'var(--theme-error-500, #c33)',
+          label: `✕ ${errors} err`,
+          title: `${errors} rich-result error(s), ${warnings} warning(s)`,
+        }
+      : warnings > 0
+        ? {
+            color: 'var(--theme-warning-500, #a70)',
+            label: `⚠ ${warnings} warn`,
+            title: `${warnings} recommended field(s) missing`,
+          }
+        : { color: 'var(--theme-success-500, #0a7)', label: '✓ healthy', title: 'No rich-result issues' };
+  return (
+    <span
+      title={title}
+      style={{
+        fontSize: '0.72em',
+        fontWeight: 600,
+        color,
+        border: `1px solid ${color}`,
+        borderRadius: 10,
+        padding: '0.05rem 0.5rem',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {label}
+    </span>
+  );
+};
+
 /**
  * Read-only viewer of a page's CURRENT live JSON-LD, block-wise. Fetches the
  * rendered page's @graph via /api/pageRegistry/live-schema and shows each node
@@ -69,6 +105,7 @@ export const CurrentSchemaView = (): ReactElement => {
   const [copied, setCopied] = useState<number | null>(null);
   const [mode, setMode] = useState<'live' | 'preview'>('live');
   const [exportOpen, setExportOpen] = useState(false);
+  const [validateCopied, setValidateCopied] = useState(false);
   const exportRef = useRef<HTMLDivElement>(null);
 
   // Close the export dropdown on any click outside it.
@@ -136,6 +173,31 @@ export const CurrentSchemaView = (): ReactElement => {
 
   const blocks = mode === 'preview' ? previewBlocks : liveBlocks;
 
+  // Rich-result health of the displayed graph (matches the list-view badge).
+  const lint = useMemo(() => {
+    const nodes = blocks
+      .map((b) => safeParse(b.json))
+      .filter((n): n is Record<string, unknown> => n != null) as GraphNode[];
+    return lintGraph(nodes);
+  }, [blocks]);
+
+  // Copy the composed @graph and open schema.org's validator (Code tab).
+  // schema.org has no code-via-URL param, so we copy → open → user pastes.
+  const validateAtSchemaOrg = async (): Promise<void> => {
+    const nodes = blocks
+      .map((b) => safeParse(b.json))
+      .filter((n): n is Record<string, unknown> => n != null);
+    const graph = { '@context': 'https://schema.org', '@graph': nodes };
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(graph, null, 2));
+      setValidateCopied(true);
+      setTimeout(() => setValidateCopied(false), 2500);
+    } catch {
+      // clipboard unavailable — still open the validator so the user can paste manually
+    }
+    window.open('https://validator.schema.org/', '_blank', 'noopener,noreferrer');
+  };
+
   const downloadGraph = (format: 'json' | 'txt'): void => {
     const nodes = blocks
       .map((b) => safeParse(b.json))
@@ -163,6 +225,7 @@ export const CurrentSchemaView = (): ReactElement => {
         <span style={{ fontWeight: 600, fontSize: '0.9em' }}>
           Current schema on the live page{blocks.length ? ` (${blocks.length})` : ''}
         </span>
+        {blocks.length > 0 ? <HealthBadge errors={lint.errorCount} warnings={lint.warningCount} /> : null}
         <button
           type="button"
           onClick={() => void load()}
@@ -256,6 +319,24 @@ export const CurrentSchemaView = (): ReactElement => {
             </div>
           ) : null}
         </div>
+        <button
+          type="button"
+          onClick={() => void validateAtSchemaOrg()}
+          disabled={blocks.length === 0}
+          title="Copies this page's composed JSON-LD and opens validator.schema.org — paste into its Code tab. (Validates the schema CODE; the Google Rich Results link tests the live URL.)"
+          style={{
+            fontSize: '0.82em',
+            fontWeight: 600,
+            color: blocks.length === 0 ? 'var(--theme-elevation-400, #666)' : '#9ab',
+            background: 'none',
+            border: 'none',
+            cursor: blocks.length === 0 ? 'not-allowed' : 'pointer',
+            padding: '0.35rem 0',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {validateCopied ? '✓ copied — paste in Code tab' : '✔ Validate code ↗'}
+        </button>
       </div>
       {mode === 'preview' ? (
         <p style={{ fontSize: '0.74em', color: '#0a7', margin: 0 }}>
@@ -275,37 +356,68 @@ export const CurrentSchemaView = (): ReactElement => {
         </p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-          {blocks.map((b, i) => (
-            <details
-              key={`${b.type}-${i}`}
-              style={{ border: '1px solid #2a2a2a', borderRadius: 6, padding: '0.4rem 0.6rem' }}
-            >
-              <summary style={{ cursor: 'pointer', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                <code style={{ fontWeight: 600 }}>{b.type}</code>
-                {b.provenance === 'override' ? (
-                  <span style={{ fontSize: '0.72em', color: '#0a7' }}>
-                    ✎ override · {mode === 'preview' ? 'pending (unsaved)' : `edited ${fmt(data?.overrideUpdatedAt)}`}
-                  </span>
-                ) : (
-                  <span style={{ fontSize: '0.72em', color: '#888' }}>auto · derived from page</span>
-                )}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    void copyBlock(i, b.json);
-                  }}
-                  title="Copy this block's JSON to paste into the override editor below"
-                  style={{ marginLeft: 'auto', fontSize: '0.72em', color: '#0a7', background: 'none', border: 'none', cursor: 'pointer' }}
-                >
-                  {copied === i ? '✓ copied' : '⧉ copy'}
-                </button>
-              </summary>
-              <pre style={{ fontFamily: 'monospace', fontSize: '0.78em', whiteSpace: 'pre-wrap', margin: '0.4rem 0 0' }}>
-                {b.json}
-              </pre>
-            </details>
-          ))}
+          {blocks.map((b, i) => {
+            const node = safeParse(b.json);
+            const nlint = node ? lintNode(node as GraphNode) : null;
+            const dot =
+              nlint == null
+                ? null
+                : nlint.errors.length > 0
+                  ? { color: 'var(--theme-error-500, #c33)', title: `${nlint.errors.length} required field(s) missing` }
+                  : nlint.warnings.length > 0
+                    ? { color: 'var(--theme-warning-500, #a70)', title: `${nlint.warnings.length} recommended field(s) missing` }
+                    : { color: 'var(--theme-success-500, #0a7)', title: 'No rich-result issues' };
+            return (
+              <details
+                key={`${b.type}-${i}`}
+                style={{ border: '1px solid #2a2a2a', borderRadius: 6, padding: '0.4rem 0.6rem' }}
+              >
+                <summary style={{ cursor: 'pointer', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  {dot ? (
+                    <span title={dot.title} style={{ color: dot.color, fontSize: '0.9em', lineHeight: 1 }}>
+                      ●
+                    </span>
+                  ) : null}
+                  <code style={{ fontWeight: 600 }}>{b.type}</code>
+                  {b.provenance === 'override' ? (
+                    <span style={{ fontSize: '0.72em', color: '#0a7' }}>
+                      ✎ override · {mode === 'preview' ? 'pending (unsaved)' : `edited ${fmt(data?.overrideUpdatedAt)}`}
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: '0.72em', color: '#888' }}>auto · derived from page</span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      void copyBlock(i, b.json);
+                    }}
+                    title="Copy this block's JSON to paste into the override editor below"
+                    style={{ marginLeft: 'auto', fontSize: '0.72em', color: '#0a7', background: 'none', border: 'none', cursor: 'pointer' }}
+                  >
+                    {copied === i ? '✓ copied' : '⧉ copy'}
+                  </button>
+                </summary>
+                {nlint && (nlint.errors.length > 0 || nlint.warnings.length > 0) ? (
+                  <ul style={{ listStyle: 'none', margin: '0.4rem 0 0', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+                    {nlint.errors.map((e) => (
+                      <li key={`e-${e.field}`} style={{ fontSize: '0.72em', color: 'var(--theme-error-500, #c33)' }}>
+                        required · <code>{e.field}</code>
+                      </li>
+                    ))}
+                    {nlint.warnings.map((w) => (
+                      <li key={`w-${w.field}`} style={{ fontSize: '0.72em', color: 'var(--theme-warning-500, #a70)' }}>
+                        recommended · <code>{w.field}</code>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                <pre style={{ fontFamily: 'monospace', fontSize: '0.78em', whiteSpace: 'pre-wrap', margin: '0.4rem 0 0' }}>
+                  {b.json}
+                </pre>
+              </details>
+            );
+          })}
         </div>
       )}
       <p style={{ fontSize: '0.74em', color: '#777', margin: '0.5rem 0 0' }}>

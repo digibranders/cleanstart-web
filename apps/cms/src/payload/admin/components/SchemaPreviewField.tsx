@@ -18,6 +18,7 @@ import {
   auditBlobList,
 } from '../../lib/jsonld/spec/required-fields';
 import { ChevronDown } from './icons/Chevron';
+import { SchemaHistory } from './SchemaManager/SchemaHistory';
 import { DEFAULT_SITE_URL } from './_site-url';
 
 const CopyIcon = (): ReactElement => (
@@ -120,6 +121,45 @@ const overrideBlobsOf = (value: unknown): Record<string, unknown>[] => {
   if (value == null) return [];
   if (Array.isArray(value)) return value as Record<string, unknown>[];
   return [value as Record<string, unknown>];
+};
+
+/** Download the composed @graph as a .json-ld or .txt file. */
+const downloadGraph = (
+  blobs: readonly Record<string, unknown>[],
+  publicUrl: string,
+  format: 'json' | 'txt',
+): void => {
+  if (typeof document === 'undefined' || blobs.length === 0) return;
+  const graph = { '@context': 'https://schema.org', '@graph': blobs };
+  const content = JSON.stringify(graph, null, 2);
+  const slug = publicUrl.split('/').filter(Boolean).pop() ?? 'schema';
+  const blob = new Blob([content], {
+    type: format === 'json' ? 'application/ld+json' : 'text/plain',
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `schema-${slug}.${format === 'json' ? 'jsonld' : 'txt'}`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+};
+
+/**
+ * Copy the composed @graph and open schema.org's validator (Code tab).
+ * schema.org has no code-via-URL param, so we copy → open → user pastes.
+ * Distinct from the Rich Results link, which tests the live URL.
+ */
+const openSchemaOrgValidator = (blobs: readonly Record<string, unknown>[]): void => {
+  if (typeof window === 'undefined' || blobs.length === 0) return;
+  const graph = { '@context': 'https://schema.org', '@graph': blobs };
+  try {
+    void navigator.clipboard?.writeText(JSON.stringify(graph, null, 2));
+  } catch {
+    // clipboard unavailable — still open so the user can paste manually
+  }
+  window.open('https://validator.schema.org/', '_blank', 'noopener,noreferrer');
 };
 
 export const SchemaPreviewField = (
@@ -342,6 +382,11 @@ export const SchemaPreviewField = (
               {Array.from(overrideTypeSet).join(', ')}). Admin role required to edit.
             </p>
           )}
+
+          {/* Per-@type override version history, inside the Schema card. */}
+          <div style={{ marginTop: '0.75rem' }}>
+            <SchemaHistory path="seo.schemaHistory" />
+          </div>
         </div>
       )}
 
@@ -543,16 +588,53 @@ const SchemaBodyContent = (props: {
         >
           {copied ? 'Copied!' : 'Copy JSON-LD'}
         </button>
+        <details className="cs-schema-preview__export">
+          <summary className="cs-schema-preview__btn" style={{ listStyle: 'none', cursor: 'pointer' }}>
+            Export ▾
+          </summary>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.25rem',
+              marginTop: '0.35rem',
+            }}
+          >
+            <button
+              type="button"
+              className="cs-schema-preview__btn"
+              onClick={() => downloadGraph(fetchState.blobs, publicUrl, 'json')}
+            >
+              Download .jsonld
+            </button>
+            <button
+              type="button"
+              className="cs-schema-preview__btn"
+              onClick={() => downloadGraph(fetchState.blobs, publicUrl, 'txt')}
+            >
+              Download .txt
+            </button>
+          </div>
+        </details>
         {richResultsUrl && publicUrl && (
           <a
             href={richResultsUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="cs-schema-preview__btn"
+            title="Tests the live published URL with Google (deployed page only)."
           >
             Test in Rich Results ↗
           </a>
         )}
+        <button
+          type="button"
+          className="cs-schema-preview__btn"
+          onClick={() => openSchemaOrgValidator(fetchState.blobs)}
+          title="Copies this JSON-LD and opens validator.schema.org — paste into its Code tab. Validates the code itself (not the live URL)."
+        >
+          Validate code ↗
+        </button>
         {isAdmin && supported && (
           <EditOverridesButton overrideCount={overrideCount} onClick={onOpenEditor} />
         )}

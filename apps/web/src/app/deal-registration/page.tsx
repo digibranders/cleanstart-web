@@ -7,8 +7,7 @@ import { FadeUp } from "@/components/ui/FadeUp";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { breadcrumbSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
-import { buildPageGraph } from "@/lib/seo/compose-page";
-import { getRegistryOverride } from "@/lib/page-registry";
+import { getPageGraph } from "@/lib/seo/compose-page";
 
 export const metadata = buildPageMetadata({
   title: "Deal Registration",
@@ -20,21 +19,15 @@ export const metadata = buildPageMetadata({
 export const revalidate = 3600;
 
 export default async function DealRegistrationPage(): Promise<React.ReactElement> {
-  const schemaOverride = await getRegistryOverride("/deal-registration");
+  const graph = await getPageGraph("/deal-registration", [
+    breadcrumbSchema([
+      { name: "Home", path: "/" },
+      { name: "Deal Registration" },
+    ]),
+  ]);
   return (
     <>
-      <JsonLdGraph
-        id="deal-registration-jsonld"
-        graph={buildPageGraph({
-          nodes: [
-            breadcrumbSchema([
-              { name: "Home", path: "/" },
-              { name: "Deal Registration" },
-            ]),
-          ],
-          override: schemaOverride,
-        })}
-      />
+      <JsonLdGraph id="deal-registration-jsonld" graph={graph} />
       <Header />
       <main id="main-content" style={{ background: "#f3f3f6" }}>
         <section className="relative w-full overflow-hidden">

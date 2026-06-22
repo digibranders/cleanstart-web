@@ -8,8 +8,7 @@ import { FadeUp } from "@/components/ui/FadeUp";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { breadcrumbSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
-import { buildPageGraph } from "@/lib/seo/compose-page";
-import { getRegistryOverride } from "@/lib/page-registry";
+import { getPageGraph } from "@/lib/seo/compose-page";
 
 export const metadata = buildPageMetadata({
   title: "Contact CleanStart | Talk to a Secure Software Expert",
@@ -22,21 +21,15 @@ export const metadata = buildPageMetadata({
 export const revalidate = 3600;
 
 export default async function ContactUsPage(): Promise<React.ReactElement> {
-  const schemaOverride = await getRegistryOverride("/contact-us");
+  const graph = await getPageGraph("/contact-us", [
+    breadcrumbSchema([
+      { name: "Home", path: "/" },
+      { name: "Contact Us" },
+    ]),
+  ]);
   return (
     <>
-      <JsonLdGraph
-        id="contact-us-jsonld"
-        graph={buildPageGraph({
-          nodes: [
-            breadcrumbSchema([
-              { name: "Home", path: "/" },
-              { name: "Contact Us" },
-            ]),
-          ],
-          override: schemaOverride,
-        })}
-      />
+      <JsonLdGraph id="contact-us-jsonld" graph={graph} />
       <Header />
       <main id="main-content">
         <ContactHero />

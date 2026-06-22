@@ -214,7 +214,7 @@ export function CookieBanner() {
       }`}
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <div className="relative mx-auto flex max-w-[1100px] flex-col gap-4 px-6 py-5">
+      <div className="relative mx-auto flex max-h-[100dvh] w-full max-w-[1100px] flex-col px-6 pt-5 pb-8">
         <button
           type="button"
           onClick={closePrompt}
@@ -225,79 +225,90 @@ export function CookieBanner() {
             <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
           </svg>
         </button>
-        <p
-          className="pr-8 text-white/80"
-          style={{ fontSize: "var(--fs-body-sm)", lineHeight: 1.55 }}
-        >
-          This website uses cookies and other tracking technologies to enhance
-          user experience and to analyze performance and traffic on our website.
-          We also share information about your use of our site with our
-          advertising and analytics partners. If we have detected an opt-out
-          preference signal then it will be honored. By clicking Allow All, you
-          understand that CleanStart and third-party partners use technology,
-          including cookies, to — among other things — view and retain your site
-          interactions, improve your experience and help us advertise. Further
-          information is available in our{" "}
-          {/* Deep-links to the "Information We Collect Automatically" section.
-              The id is the slugified heading text (RenderLexical derives heading
-              ids this way); keep it in sync if that CMS heading is renamed. */}
-          <Link
-            href="/privacy-policy#6-information-we-collect-automatically"
-            className="font-medium underline underline-offset-2 hover:text-white"
+        {/* Scrollable body — the cookie copy plus the optional preference
+            panel. The sheet is capped at 100dvh and only this region scrolls,
+            so the action row below always stays reachable on short viewports
+            (mobile landscape, zoomed displays). `min-h-0` lets a flex child
+            shrink below its content so the overflow actually scrolls. */}
+        <div className="flex min-h-0 flex-col gap-4 overflow-y-auto">
+          <p
+            className="pr-8 text-white/80"
+            style={{ fontSize: "var(--fs-body-sm)", lineHeight: 1.55 }}
           >
-            Privacy&nbsp;Notice
-          </Link>
-          .
-        </p>
+            This website uses cookies and other tracking technologies to enhance
+            user experience and to analyze performance and traffic on our website.
+            We also share information about your use of our site with our
+            advertising and analytics partners. If we have detected an opt-out
+            preference signal then it will be honored. By clicking Allow All, you
+            understand that CleanStart and third-party partners use technology,
+            including cookies, to — among other things — view and retain your site
+            interactions, improve your experience and help us advertise. Further
+            information is available in our{" "}
+            {/* Deep-links to the "Information We Collect Automatically" section.
+                The id is the slugified heading text (RenderLexical derives heading
+                ids this way); keep it in sync if that CMS heading is renamed. */}
+            <Link
+              href="/privacy-policy#6-information-we-collect-automatically"
+              className="font-medium underline underline-offset-2 hover:text-white"
+            >
+              Privacy&nbsp;Notice
+            </Link>
+            .
+          </p>
 
-        {showPrefs ? (
-          <>
-            <div>
-              <h2 className="font-semibold" style={{ fontSize: "var(--fs-body-sm)" }}>
-                Manage Consent Preferences
-              </h2>
-              <p
-                className="mt-1 text-white/65"
-                style={{ fontSize: "var(--fs-caption)", lineHeight: 1.6 }}
-              >
-                When you visit any website, it may store or retrieve information
-                on your browser, mostly in the form of cookies. Because we
-                respect your right to privacy, you can choose not to allow some
-                types of cookies. Click on the category headings to learn more
-                and change our default settings.
-              </p>
-            </div>
-            <div className="max-h-[40vh] overflow-y-auto rounded-lg bg-white/[0.03] px-4">
-              {CATEGORIES.map((meta) => (
-                <CategoryRow
-                  key={meta.key}
-                  meta={meta}
-                  checked={
-                    meta.locked
-                      ? true
-                      : selection[meta.key as OptionalCategory]
-                  }
-                  onToggle={(next) =>
-                    !meta.locked &&
-                    setCategory(meta.key as OptionalCategory, next)
-                  }
-                  open={openCategory === meta.key}
-                  onToggleOpen={() =>
-                    setOpenCategory((cur) => (cur === meta.key ? null : meta.key))
-                  }
-                />
-              ))}
-            </div>
-          </>
-        ) : null}
+          {showPrefs ? (
+            <>
+              <div>
+                <h2 className="font-semibold" style={{ fontSize: "var(--fs-body-sm)" }}>
+                  Manage Consent Preferences
+                </h2>
+                <p
+                  className="mt-1 text-white/65"
+                  style={{ fontSize: "var(--fs-caption)", lineHeight: 1.6 }}
+                >
+                  When you visit any website, it may store or retrieve information
+                  on your browser, mostly in the form of cookies. Because we
+                  respect your right to privacy, you can choose not to allow some
+                  types of cookies. Click on the category headings to learn more
+                  and change our default settings.
+                </p>
+              </div>
+              <div className="rounded-lg bg-white/[0.03] px-4">
+                {CATEGORIES.map((meta) => (
+                  <CategoryRow
+                    key={meta.key}
+                    meta={meta}
+                    checked={
+                      meta.locked
+                        ? true
+                        : selection[meta.key as OptionalCategory]
+                    }
+                    onToggle={(next) =>
+                      !meta.locked &&
+                      setCategory(meta.key as OptionalCategory, next)
+                    }
+                    open={openCategory === meta.key}
+                    onToggleOpen={() =>
+                      setOpenCategory((cur) => (cur === meta.key ? null : meta.key))
+                    }
+                  />
+                ))}
+              </div>
+            </>
+          ) : null}
+        </div>
 
-        {/* Single action row, always at the bottom. Contents switch by state
-            so no button is ever duplicated. On mobile the collapsed row stays
-            on ONE line: the text-link "Cookies Settings" sits left, the two
-            primary buttons group right (justify-between); from sm+ everything
-            right-aligns. */}
+        {/* Pinned action row — never scrolls (the body above does), so it is
+            always the last visible element. Contents switch by state so no
+            button is ever duplicated. On mobile the collapsed row stays on ONE
+            line: the text-link "Cookies Settings" sits left, the two primary
+            buttons group right (justify-between); from sm+ everything
+            right-aligns. The sheet's `pb-8` lifts this row clear of fixed
+            browser-extension toolbars (SEO bars, etc.) that shift the document
+            root and re-anchor this fixed sheet a toolbar-height below the
+            viewport. */}
         <div
-          className={`flex flex-nowrap items-center gap-2 sm:gap-3 ${
+          className={`mt-4 flex shrink-0 flex-nowrap items-center gap-2 sm:gap-3 ${
             showPrefs ? "justify-end" : "justify-between sm:justify-end"
           }`}
         >

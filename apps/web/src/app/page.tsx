@@ -18,8 +18,7 @@ import { FrequentlyAskedQuestions } from "@/components/sections/home/FrequentlyA
 import { HOME_FAQ_ITEMS } from "@/components/sections/home/home-faqs";
 import { faqPageSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
-import { buildPageGraph } from "@/lib/seo/compose-page";
-import { getRegistryOverride } from "@/lib/page-registry";
+import { getPageGraph } from "@/lib/seo/compose-page";
 import { ResourcesInsights } from "@/components/sections/home/ResourcesInsights";
 import { ReadyToSecureCTA } from "@/components/sections/home/ReadyToSecureCTA";
 import { Footer } from "@/components/sections/Footer";
@@ -52,18 +51,12 @@ export default async function Home(): Promise<React.ReactElement> {
   // Impact stats are editable in the CMS (`impactStats` global) and shared with
   // the Images catalog hero; falls back to defaults if the CMS is unreachable.
   const impactStats = await getImpactStats();
-  const schemaOverride = await getRegistryOverride("/");
+  const graph = await getPageGraph("/", [faqPageSchema([...HOME_FAQ_ITEMS])]);
   return (
     <>
       {/* FAQPage structured data for the 6 home FAQs — feeds answer engines /
           AI Overviews. Plain-text Q&A shared with the rendered accordion. */}
-      <JsonLdGraph
-        id="home-jsonld"
-        graph={buildPageGraph({
-          nodes: [faqPageSchema([...HOME_FAQ_ITEMS])],
-          override: schemaOverride,
-        })}
-      />
+      <JsonLdGraph id="home-jsonld" graph={graph} />
       {/* High-priority preload of the LCP hero SVG — React hoists this to
           <head>. See HERO_TOP_GLOW note above. */}
       <link

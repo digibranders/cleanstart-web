@@ -1,4 +1,6 @@
-import { composeGraph, type GraphNode, type SchemaGraph } from "@cleanstart/schema";
+import { composeGraph, type GraphNode, type SchemaGraph, webPageSchema } from "@cleanstart/schema";
+
+import { getRegistryEntry } from "../page-registry";
 
 /**
  * Per-page glue between the JSON-LD builders and the unified composer.
@@ -16,6 +18,25 @@ export interface PageGraphInput {
 
 export function buildPageGraph({ nodes, override }: PageGraphInput): SchemaGraph {
   return composeGraph({ auto: nodes, override });
+}
+
+/**
+ * Build a STATIC/LISTING route's JSON-LD @graph from the page registry in one
+ * step: fetch the row (override + functional WebPage @type + title), auto-emit
+ * the matching WebPage node (AboutPage, CollectionPage, …) when `webPageType`
+ * is set, then compose with the page's own Layer-1 `nodes` and the override.
+ *
+ * Build/ISR-time only — the registry fetch is cached, so nothing is added to
+ * the runtime request path (INV-1). Fails safe to auto-only when the CMS is
+ * down (getRegistryEntry returns { webPageType: 'none' }).
+ */
+export async function getPageGraph(path: string, nodes: GraphNode[]): Promise<SchemaGraph> {
+  const { override, webPageType, title } = await getRegistryEntry(path);
+  const auto =
+    webPageType !== "none"
+      ? [webPageSchema({ type: webPageType, path, name: title ?? "" }), ...nodes]
+      : nodes;
+  return composeGraph({ auto, override });
 }
 
 /**

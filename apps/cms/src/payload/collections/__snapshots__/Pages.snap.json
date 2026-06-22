@@ -3232,6 +3232,10 @@
         {
           "type": "json",
           "name": "additionalSchema"
+        },
+        {
+          "type": "json",
+          "name": "schemaHistory"
         }
       ]
     },
