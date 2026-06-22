@@ -22,7 +22,6 @@ const COL_CONTACT: FooterLink[] = [
   { label: "Events", href: "/events" },
 ];
 const COL_SOLUTIONS: FooterLink[] = [
-  { label: "Platform", href: "/cleanstart-platform" },
   { label: "Verifiable SBOMs", href: "/software-bill-materials" },
   { label: "FIPS Compliance", href: "/fips" },
   { label: "Vulnerability", href: "/vulnerability-remediation" },

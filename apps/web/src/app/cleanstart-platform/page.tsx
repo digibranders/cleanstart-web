@@ -18,6 +18,9 @@ export const metadata = buildPageMetadata({
   eyebrow: "Platform",
   ogTitle: "Inside the CleanStart Platform",
   titleAccent: "Platform",
+  // Page is not yet complete — keep it reachable by direct URL but out of the
+  // index until it ships. noindex,follow (the default) so link equity still flows.
+  noindex: true,
 });
 
 export default function CleanStartPlatformPage() {

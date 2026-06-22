@@ -80,7 +80,9 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/clean-libraries' },
   { path: '/cleansight' },
   { path: '/cleanstart-images' },
-  { path: '/cleanstart-platform' },
+  // `/cleanstart-platform` is intentionally de-listed — the page is not yet
+  // complete, so it is noindex'd and excluded from the sitemap. Re-add when it
+  // ships (and drop the `noindex` in its page metadata).
   { path: '/community' },
   { path: '/contact-us' },
   { path: '/deal-registration' },
