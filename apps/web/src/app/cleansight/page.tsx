@@ -8,7 +8,10 @@ import { CleanSightUnified } from "@/components/sections/cleansight/CleanSightUn
 import { CleanSightStats } from "@/components/sections/cleansight/CleanSightStats";
 import { CleanSightCTA } from "@/components/sections/cleansight/CleanSightCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph } from "@/lib/seo/compose-page";
+import { getRegistryOverride } from "@/lib/page-registry";
 
 export const metadata = buildPageMetadata({
   title: "Container Vulnerability Detection and Remediation | CleanSight",
@@ -22,23 +25,28 @@ export const metadata = buildPageMetadata({
   titleAccent: "Remediation.",
 });
 
-export default function CleanSightPage(): React.ReactElement {
+export const revalidate = 3600;
+
+export default async function CleanSightPage(): Promise<React.ReactElement> {
+  const schemaOverride = await getRegistryOverride("/cleansight");
   return (
     <>
-      <JsonLd
-        id="cleansight-breadcrumbs"
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "CleanSight" },
-        ])}
-      />
-      <JsonLd
-        id="cleansight-software"
-        data={softwareApplicationSchema({
-          name: "CleanSight",
-          description:
-            "Continuously discover, assess, and remediate container risk across modern environments. Unified visibility with integrated remediation.",
-          path: "/cleansight",
+      <JsonLdGraph
+        id="cleansight-jsonld"
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "CleanSight" },
+            ]),
+            softwareApplicationSchema({
+              name: "CleanSight",
+              description:
+                "Continuously discover, assess, and remediate container risk across modern environments. Unified visibility with integrated remediation.",
+              path: "/cleansight",
+            }),
+          ],
+          override: schemaOverride,
         })}
       />
       <Header />

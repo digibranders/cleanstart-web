@@ -18,7 +18,9 @@ import {
 } from "@/lib/jobs";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
-import { JsonLd, breadcrumbSchema, jobPostingSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema, jobPostingSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph, seoOverride } from "@/lib/seo/compose-page";
 
 const SCHEMA_EMPLOYMENT_TYPE: Record<JobEmploymentType, string> = {
   "full-time": "FULL_TIME",
@@ -124,45 +126,49 @@ export default async function CareerDetailPage({
 
   return (
     <>
-      <JsonLd
-        id={`career-breadcrumbs-${job.slug}`}
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Careers", path: "/careers" },
-          { name: job.title },
-        ])}
+      <JsonLdGraph
+        id={`career-jsonld-${job.slug}`}
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "Careers", path: "/careers" },
+              { name: job.title },
+            ]),
+            // Omit JobPosting on closed roles — Google penalises expired postings
+            // that linger in the index, and closed roles are already noindex.
+            ...(job.hiringStatus !== "closed"
+              ? [
+                  jobPostingSchema({
+                    title: job.title,
+                    description: jobDescription,
+                    path: `/job/${job.slug}`,
+                    datePosted: job.publishedAt ?? job.updatedAt ?? undefined,
+                    // Google strongly recommends validThrough; open roles with no
+                    // explicit deadline get a rolling 90-day expiry (ISR keeps it
+                    // future-dated) so the posting is never dropped for a missing field.
+                    validThrough:
+                      job.applicationDeadline ??
+                      job.expiresAt ??
+                      new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+                    employmentType: job.employmentType
+                      ? SCHEMA_EMPLOYMENT_TYPE[job.employmentType]
+                      : undefined,
+                    locations: resolvedLocations(job).map((l) => ({
+                      name: l.name,
+                      isoCountry: l.isoCountry,
+                      type: l.type,
+                    })),
+                    remote: job.remote ?? undefined,
+                    baseSalary: job.salaryRange ?? undefined,
+                    identifier: job.slug,
+                  }),
+                ]
+              : []),
+          ],
+          override: seoOverride(job.seo),
+        })}
       />
-      {/* Omit JobPosting on closed roles — Google penalises expired postings
-          that linger in the index, and closed roles are already noindex. */}
-      {job.hiringStatus !== "closed" ? (
-        <JsonLd
-          id={`career-jobposting-${job.slug}`}
-          data={jobPostingSchema({
-            title: job.title,
-            description: jobDescription,
-            path: `/job/${job.slug}`,
-            datePosted: job.publishedAt ?? job.updatedAt ?? undefined,
-            // Google strongly recommends validThrough; open roles with no
-            // explicit deadline get a rolling 90-day expiry (ISR keeps it
-            // future-dated) so the posting is never dropped for a missing field.
-            validThrough:
-              job.applicationDeadline ??
-              job.expiresAt ??
-              new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
-            employmentType: job.employmentType
-              ? SCHEMA_EMPLOYMENT_TYPE[job.employmentType]
-              : undefined,
-            locations: resolvedLocations(job).map((l) => ({
-              name: l.name,
-              isoCountry: l.isoCountry,
-              type: l.type,
-            })),
-            remote: job.remote ?? undefined,
-            baseSalary: job.salaryRange ?? undefined,
-            identifier: job.slug,
-          })}
-        />
-      ) : null}
       <Header />
       <main id="main-content">
         <CareerDetailHero title={job.title} meta={meta} />

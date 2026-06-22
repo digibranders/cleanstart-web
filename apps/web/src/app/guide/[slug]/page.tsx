@@ -25,11 +25,12 @@ import { effectivePublishedAt } from "@/lib/published-date";
 import { absoluteUrl, buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 import {
-  JsonLd,
   articleSchema,
   breadcrumbSchema,
   faqPageSchema,
 } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph, seoOverride } from "@/lib/seo/compose-page";
 
 interface GuideDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -137,34 +138,31 @@ export async function renderGuideDetail({
       {nextTarget ? (
         <link rel="next" href={absoluteUrl(`/guide/${nextTarget.slug}`)} />
       ) : null}
-      <JsonLd
-        id={`guide-breadcrumbs-${guide.slug}`}
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Guides", path: "/guide" },
-          { name: guide.title },
-        ])}
-      />
-      <JsonLd
-        id={`guide-article-${guide.slug}`}
-        data={articleSchema({
-          title: guide.title,
-          description: guide.abstract ?? undefined,
-          path: `/guide/${guide.slug}`,
-          publishedAt: publishedAt ?? guide.publishedAt ?? undefined,
-          modifiedAt: guide.updatedAt ?? undefined,
-          imageUrl: heroAbsolute,
-          authors: guide.authors?.map((a) => ({ name: a.name, slug: a.slug })),
+      <JsonLdGraph
+        id={`guide-jsonld-${guide.slug}`}
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "Guides", path: "/guide" },
+              { name: guide.title },
+            ]),
+            articleSchema({
+              title: guide.title,
+              description: guide.abstract ?? undefined,
+              path: `/guide/${guide.slug}`,
+              publishedAt: publishedAt ?? guide.publishedAt ?? undefined,
+              modifiedAt: guide.updatedAt ?? undefined,
+              imageUrl: heroAbsolute,
+              authors: guide.authors?.map((a) => ({ name: a.name, slug: a.slug })),
+            }),
+            ...(faqs.length > 0
+              ? [faqPageSchema(faqs.map((f) => ({ question: f.question, answer: f.answer })))]
+              : []),
+          ],
+          override: seoOverride(guide.seo),
         })}
       />
-      {faqs.length > 0 ? (
-        <JsonLd
-          id={`guide-faq-${guide.slug}`}
-          data={faqPageSchema(
-            faqs.map((f) => ({ question: f.question, answer: f.answer })),
-          )}
-        />
-      ) : null}
       <Header />
       <main id="main-content">
         <GuideDetailHero

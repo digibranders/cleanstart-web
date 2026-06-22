@@ -16,7 +16,9 @@ import { mediaUrl } from "@/lib/blog";
 import { RenderLexical } from "@/lib/renderLexical";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
-import { JsonLd, breadcrumbSchema, eventSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema, eventSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph, seoOverride } from "@/lib/seo/compose-page";
 
 interface EventDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -124,27 +126,29 @@ export async function renderEventDetail({
 
   return (
     <>
-      <JsonLd
-        id={`event-breadcrumbs-${event.slug}`}
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Events", path: "/events" },
-          { name: event.title },
-        ])}
-      />
-      <JsonLd
-        id={`event-schema-${event.slug}`}
-        data={eventSchema({
-          title: event.title,
-          path: `/event/${event.slug}`,
-          startDate: event.startsAt,
-          endDate: event.endsAt,
-          venue: event.venue,
-          addressCountry: event.country ? COUNTRY_ISO[event.country] : undefined,
-          description: event.abstract,
-          eventStatus: event.eventStatus,
-          previousStartDate: event.previousStartDate,
-          imageUrl: event.heroImage?.url ? mediaUrl(event.heroImage.url) : undefined,
+      <JsonLdGraph
+        id={`event-jsonld-${event.slug}`}
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "Events", path: "/events" },
+              { name: event.title },
+            ]),
+            eventSchema({
+              title: event.title,
+              path: `/event/${event.slug}`,
+              startDate: event.startsAt,
+              endDate: event.endsAt,
+              venue: event.venue,
+              addressCountry: event.country ? COUNTRY_ISO[event.country] : undefined,
+              description: event.abstract,
+              eventStatus: event.eventStatus,
+              previousStartDate: event.previousStartDate,
+              imageUrl: event.heroImage?.url ? mediaUrl(event.heroImage.url) : undefined,
+            }),
+          ],
+          override: seoOverride(event.seo),
         })}
       />
       <Header />

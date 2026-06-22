@@ -7,7 +7,10 @@ import { PlatformTrustArchitecture } from "@/components/sections/cleanstart-plat
 import { PlatformTrustedOutputs } from "@/components/sections/cleanstart-platform/PlatformTrustedOutputs";
 import { PlatformCTA } from "@/components/sections/cleanstart-platform/PlatformCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph } from "@/lib/seo/compose-page";
+import { getRegistryOverride } from "@/lib/page-registry";
 
 export const metadata = buildPageMetadata({
   title: "Inside the CleanStart Platform",
@@ -18,17 +21,28 @@ export const metadata = buildPageMetadata({
   eyebrow: "Platform",
   ogTitle: "Inside the CleanStart Platform",
   titleAccent: "Platform",
+  // Page is not yet complete — keep it reachable by direct URL but out of the
+  // index until it ships. noindex,follow (the default) so link equity still flows.
+  noindex: true,
 });
 
-export default function CleanStartPlatformPage() {
+export const revalidate = 3600;
+
+export default async function CleanStartPlatformPage(): Promise<React.ReactElement> {
+  const schemaOverride = await getRegistryOverride("/cleanstart-platform");
   return (
     <>
-      <JsonLd
-        id="platform-breadcrumbs"
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "CleanStart Platform" },
-        ])}
+      <JsonLdGraph
+        id="cleanstart-platform-jsonld"
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "CleanStart Platform" },
+            ]),
+          ],
+          override: schemaOverride,
+        })}
       />
       <Header />
       <main id="main-content">

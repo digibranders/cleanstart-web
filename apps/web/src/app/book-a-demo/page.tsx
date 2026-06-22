@@ -6,7 +6,10 @@ import { WhatsSetsUsApart } from "@/components/sections/book-a-demo/WhatsSetsUsA
 import { BookDemoForm } from "@/components/sections/forms/BookDemoForm";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph } from "@/lib/seo/compose-page";
+import { getRegistryOverride } from "@/lib/page-registry";
 
 export const metadata = buildPageMetadata({
   title: "Book a Demo",
@@ -15,15 +18,23 @@ export const metadata = buildPageMetadata({
   path: "/book-a-demo",
 });
 
-export default function BookDemoPage() {
+export const revalidate = 3600;
+
+export default async function BookDemoPage(): Promise<React.ReactElement> {
+  const schemaOverride = await getRegistryOverride("/book-a-demo");
   return (
     <>
-      <JsonLd
-        id="book-demo-breadcrumbs"
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Book a Demo" },
-        ])}
+      <JsonLdGraph
+        id="book-a-demo-jsonld"
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "Book a Demo" },
+            ]),
+          ],
+          override: schemaOverride,
+        })}
       />
       <Header />
       <main id="main-content" className="bg-white">

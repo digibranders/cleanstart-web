@@ -61,13 +61,10 @@
       "name": "region",
       "options": [
         {
-          "value": "asia-pacific"
+          "value": "north-america"
         },
         {
-          "value": "europe-middle-east"
-        },
-        {
-          "value": "usa-north-america"
+          "value": "apac"
         }
       ]
     },

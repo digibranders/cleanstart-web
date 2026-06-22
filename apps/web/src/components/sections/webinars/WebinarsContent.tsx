@@ -1,4 +1,3 @@
-import { WebinarsHero } from "@/components/sections/webinars/WebinarsHero";
 import { WebinarsGrid } from "@/components/sections/webinars/WebinarsGrid";
 import { FadeUp } from "@/components/ui/FadeUp";
 import type { Webinar, WebinarRegion, WebinarType } from "@/lib/webinars";
@@ -14,10 +13,10 @@ export interface WebinarsContentProps {
 }
 
 /**
- * Presentational body of the /webinars listing (hero + filter sidebar +
- * paginated grid). Pure props — renders identically on the server (static
- * fallback) and the client (`WebinarsBrowser`). See `BlogsContent.tsx` for the
- * pattern.
+ * Filter-sidebar + paginated webinar grid — the body the `<Suspense>` boundary
+ * swaps (server fallback + client `WebinarsBrowser`). The hero is rendered once
+ * by the page OUTSIDE the boundary, so its <h1> isn't streamed twice. See
+ * `case-studies/page.tsx` for the pattern.
  */
 export function WebinarsContent({
   items,
@@ -28,22 +27,16 @@ export function WebinarsContent({
   loadFailed = false,
 }: WebinarsContentProps): React.ReactElement {
   return (
-    <main id="main-content" style={{ background: "#F6F6F6" }}>
-      <div className="relative overflow-hidden">
-        <WebinarsHero />
-      </div>
-
-      <FadeUp>
-        <WebinarsGrid
-          items={items}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          activeType={activeType}
-          activeRegion={activeRegion}
-          loadFailed={loadFailed}
-        />
-      </FadeUp>
-    </main>
+    <FadeUp>
+      <WebinarsGrid
+        items={items}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        activeType={activeType}
+        activeRegion={activeRegion}
+        loadFailed={loadFailed}
+      />
+    </FadeUp>
   );
 }
 

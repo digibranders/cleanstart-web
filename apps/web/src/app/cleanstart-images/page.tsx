@@ -10,7 +10,10 @@ import { CleanStartImagesEnvironment } from "@/components/sections/cleanstart-im
 // import { CleanStartImagesMeasure } from "@/components/sections/cleanstart-images/CleanStartImagesMeasure";
 import { CleanStartImagesCta } from "@/components/sections/cleanstart-images/CleanStartImagesCta";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph } from "@/lib/seo/compose-page";
+import { getRegistryOverride } from "@/lib/page-registry";
 
 export const metadata = buildPageMetadata({
   title: "Zero CVE Hardened Container Images | CleanStart",
@@ -24,23 +27,28 @@ export const metadata = buildPageMetadata({
   titleAccent: "Foundations",
 });
 
-export default function CleanStartImagesPage(): React.ReactElement {
+export const revalidate = 3600;
+
+export default async function CleanStartImagesPage(): Promise<React.ReactElement> {
+  const schemaOverride = await getRegistryOverride("/cleanstart-images");
   return (
     <>
-      <JsonLd
-        id="cleanstart-images-breadcrumbs"
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "CleanStart Images" },
-        ])}
-      />
-      <JsonLd
-        id="cleanstart-images-software"
-        data={softwareApplicationSchema({
-          name: "CleanStart Images",
-          description:
-            "Hardened, near-zero-CVE container and virtual machine images. A drop-in replacement for your base image with smaller, faster, FIPS-ready builds.",
-          path: "/cleanstart-images",
+      <JsonLdGraph
+        id="cleanstart-images-jsonld"
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "CleanStart Images" },
+            ]),
+            softwareApplicationSchema({
+              name: "CleanStart Images",
+              description:
+                "Hardened, near-zero-CVE container and virtual machine images. A drop-in replacement for your base image with smaller, faster, FIPS-ready builds.",
+              path: "/cleanstart-images",
+            }),
+          ],
+          override: schemaOverride,
         })}
       />
       <Header />

@@ -2,12 +2,10 @@
 
 import { useSearchParams } from "next/navigation";
 import { BlogsContent, selectBlogs } from "@/components/sections/blogs/BlogsContent";
-import type { Blog, BlogCategory } from "@/lib/blog";
+import type { Blog } from "@/lib/blog";
 
 interface BlogsBrowserProps {
   allPosts: Blog[];
-  featuredPost: Blog | null;
-  categories: BlogCategory[];
 }
 
 /**
@@ -23,8 +21,6 @@ interface BlogsBrowserProps {
  */
 export function BlogsBrowser({
   allPosts,
-  featuredPost,
-  categories,
 }: BlogsBrowserProps): React.ReactElement {
   const params = useSearchParams();
   const activeCategory = params.get("category") ?? "";
@@ -39,8 +35,6 @@ export function BlogsBrowser({
 
   return (
     <BlogsContent
-      featuredPost={featuredPost}
-      categories={categories}
       posts={posts}
       activeCategory={activeCategory}
       searchQuery={searchQuery}

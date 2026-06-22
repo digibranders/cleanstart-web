@@ -86,9 +86,8 @@ export const News: CollectionConfig = {
       name: 'region',
       type: 'select',
       options: [
-        { label: 'Asia Pacific', value: 'asia-pacific' },
-        { label: 'Europe & Middle East', value: 'europe-middle-east' },
-        { label: 'North America', value: 'usa-north-america' },
+        { label: 'North America', value: 'north-america' },
+        { label: 'APAC', value: 'apac' },
       ],
       admin: {
         description:

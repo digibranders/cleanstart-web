@@ -1,6 +1,6 @@
 import type { Field, GroupField, JSONFieldValidation } from 'payload';
 
-import { isAdminFieldLevel } from '../access';
+import { isAdminOrSeoFieldLevel } from '../access';
 import { validateCanonicalOverride } from '../lib/canonical';
 import {
   validateOverrideForField,
@@ -374,13 +374,22 @@ const additionalSchemaField: Field = {
   name: 'additionalSchema',
   type: 'json',
   access: {
-    read: isAdminFieldLevel,
-    update: isAdminFieldLevel,
-    create: isAdminFieldLevel,
+    // Public read. The web build/ISR fetches content ANONYMOUSLY (no draft
+    // auth), so the override must be readable without a session for it to
+    // compose into the live @graph. This is safe: additionalSchema is
+    // public-page markup by definition (it renders in the page's JSON-LD),
+    // and drafts are already gated at the collection level
+    // (publishedOrAuthenticated) — an anonymous read only ever sees published
+    // docs, i.e. exactly the schema that is already public on the page.
+    // Write is admin or the dedicated `seo` operator (privileged raw paste);
+    // editors are intentionally excluded.
+    read: () => true,
+    update: isAdminOrSeoFieldLevel,
+    create: isAdminOrSeoFieldLevel,
   },
   admin: {
     description:
-      'Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.',
+      'Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.',
     // No custom Field renderer — the editing UI is owned by the
     // unified Schema (JSON-LD) sidebar card (SchemaPreviewField). Setting
     // `hidden: true` keeps the raw JSON field from also rendering inside

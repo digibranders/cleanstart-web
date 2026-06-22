@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1042.0",
+    "@cleanstart/schema": "workspace:*",
     "@cleanstart/types": "workspace:*",
     "@cleanstart/ui": "workspace:*",
     "@codemirror/commands": "^6.8.1",

@@ -16,7 +16,9 @@ import { NewsDetailRelated } from "@/components/sections/news-detail/NewsDetailR
 import { NewsDetailCTA } from "@/components/sections/news-detail/NewsDetailCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
-import { JsonLd, breadcrumbSchema, newsArticleSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema, newsArticleSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph, seoOverride } from "@/lib/seo/compose-page";
 
 interface NewsDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -100,24 +102,26 @@ export async function renderNewsDetail({
 
   return (
     <>
-      <JsonLd
-        id={`news-breadcrumbs-${item.slug}`}
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Newsroom", path: "/news" },
-          { name: item.title },
-        ])}
-      />
-      <JsonLd
-        id={`news-article-${item.slug}`}
-        data={newsArticleSchema({
-          title: item.title,
-          description: item.abstract ?? undefined,
-          path: `/news/${item.slug}`,
-          publishedAt: item.publicationDate ?? undefined,
-          modifiedAt: item.updatedAt ?? undefined,
-          imageUrl: heroAbsolute,
-          section: item.pressType ?? undefined,
+      <JsonLdGraph
+        id={`news-jsonld-${item.slug}`}
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "Newsroom", path: "/news" },
+              { name: item.title },
+            ]),
+            newsArticleSchema({
+              title: item.title,
+              description: item.abstract ?? undefined,
+              path: `/news/${item.slug}`,
+              publishedAt: item.publicationDate ?? undefined,
+              modifiedAt: item.updatedAt ?? undefined,
+              imageUrl: heroAbsolute,
+              section: item.pressType ?? undefined,
+            }),
+          ],
+          override: seoOverride(item.seo),
         })}
       />
       <Header />

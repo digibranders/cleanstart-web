@@ -91,6 +91,7 @@ export interface Config {
     'partner-applications': PartnerApplication;
     redirects: Redirect;
     brokenLinks: BrokenLink;
+    pageRegistry: PageRegistry;
     'career-applications': CareerApplication;
     resumes: Resume;
     users: User;
@@ -137,6 +138,7 @@ export interface Config {
     'partner-applications': PartnerApplicationsSelect<false> | PartnerApplicationsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     brokenLinks: BrokenLinksSelect<false> | BrokenLinksSelect<true>;
+    pageRegistry: PageRegistrySelect<false> | PageRegistrySelect<true>;
     'career-applications': CareerApplicationsSelect<false> | CareerApplicationsSelect<true>;
     resumes: ResumesSelect<false> | ResumesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -583,7 +585,7 @@ export interface Blog {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -919,7 +921,7 @@ export interface Author {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -1085,7 +1087,7 @@ export interface Category {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -1133,7 +1135,7 @@ export interface News {
   /**
    * Region this story belongs to. Powers the region filter on the /news listing page.
    */
-  region?: ('asia-pacific' | 'europe-middle-east' | 'usa-north-america') | null;
+  region?: ('north-america' | 'apac') | null;
   body?: {
     root: {
       type: string;
@@ -1432,7 +1434,7 @@ export interface News {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -1599,7 +1601,7 @@ export interface NewsCategory {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -2032,7 +2034,7 @@ export interface Guide {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -2440,7 +2442,7 @@ export interface KnowledgeBase {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -2606,7 +2608,7 @@ export interface KnowledgeCategory {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -3021,7 +3023,7 @@ export interface Resource {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -3537,7 +3539,7 @@ export interface Event {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -3902,7 +3904,7 @@ export interface Webinar {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -4239,7 +4241,7 @@ export interface PodcastEpisode {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -4616,7 +4618,7 @@ export interface Job {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -6598,7 +6600,7 @@ export interface Page {
         }[]
       | null;
     /**
-     * Admin-only escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
      */
     additionalSchema?:
       | {
@@ -6860,6 +6862,49 @@ export interface BrokenLink {
   createdAt: string;
 }
 /**
+ * Every website route, including static pages. Add a Schema.org override here to compose it into that page’s JSON-LD at build time.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pageRegistry".
+ */
+export interface PageRegistry {
+  id: number;
+  /**
+   * Site-relative route, e.g. /pricing or /blogs. Seed-managed (read-only).
+   */
+  path: string;
+  /**
+   * Human label shown in the Schema Manager list. Seed-managed (read-only).
+   */
+  title: string;
+  /**
+   * static = hardcoded page; cms-listing = a collection’s index page; cms-template = drill into the collection’s documents. Seed-managed (read-only).
+   */
+  kind: 'static' | 'cms-listing' | 'cms-template';
+  /**
+   * For cms-listing / cms-template: the collection slug this route renders. Seed-managed (read-only).
+   */
+  backingCollection?: string | null;
+  /**
+   * Raw Schema.org JSON-LD for this page (single object or array of objects, each with @context + an allow-listed @type). Validated and capped at 16 KB; composed per-@type into the page’s @graph at build time.
+   */
+  additionalSchema?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Optional internal notes (not rendered).
+   */
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
@@ -6873,7 +6918,7 @@ export interface User {
   /**
    * Composite roles supported. Author = own drafts only. Editor = publish content. Admin = full access.
    */
-  roles: ('admin' | 'editor' | 'author')[];
+  roles: ('admin' | 'editor' | 'author' | 'seo')[];
   preferences?:
     | {
         [k: string]: unknown;
@@ -7598,6 +7643,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'brokenLinks';
         value: number | BrokenLink;
+      } | null)
+    | ({
+        relationTo: 'pageRegistry';
+        value: number | PageRegistry;
       } | null)
     | ({
         relationTo: 'career-applications';
@@ -10652,6 +10701,20 @@ export interface BrokenLinksSelect<T extends boolean = true> {
   firstSeenAt?: T;
   lastChecked?: T;
   note?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pageRegistry_select".
+ */
+export interface PageRegistrySelect<T extends boolean = true> {
+  path?: T;
+  title?: T;
+  kind?: T;
+  backingCollection?: T;
+  additionalSchema?: T;
+  notes?: T;
   updatedAt?: T;
   createdAt?: T;
 }

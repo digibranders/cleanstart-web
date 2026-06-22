@@ -21,6 +21,9 @@ import * as migration_20260619_120000_fix_kb_internal_links from './20260619_120
 import * as migration_20260619_130000_unlink_broken_blog_guide_links from './20260619_130000_unlink_broken_blog_guide_links';
 import * as migration_20260619_140000_unlink_broken_kb_links from './20260619_140000_unlink_broken_kb_links';
 import * as migration_20260619_150000_add_impact_stats_global from './20260619_150000_add_impact_stats_global';
+import * as migration_20260622_065936_add_page_registry from './20260622_065936_add_page_registry';
+import * as migration_20260622_071500_add_seo_role from './20260622_071500_add_seo_role';
+import * as migration_20260622_130000_change_news_region_values from './20260622_130000_change_news_region_values';
 
 export const migrations = [
   {
@@ -137,5 +140,20 @@ export const migrations = [
     up: migration_20260619_150000_add_impact_stats_global.up,
     down: migration_20260619_150000_add_impact_stats_global.down,
     name: '20260619_150000_add_impact_stats_global',
+  },
+  {
+    up: migration_20260622_065936_add_page_registry.up,
+    down: migration_20260622_065936_add_page_registry.down,
+    name: '20260622_065936_add_page_registry'
+  },
+  {
+    up: migration_20260622_071500_add_seo_role.up,
+    down: migration_20260622_071500_add_seo_role.down,
+    name: '20260622_071500_add_seo_role',
+  },
+  {
+    up: migration_20260622_130000_change_news_region_values.up,
+    down: migration_20260622_130000_change_news_region_values.down,
+    name: '20260622_130000_change_news_region_values',
   },
 ];

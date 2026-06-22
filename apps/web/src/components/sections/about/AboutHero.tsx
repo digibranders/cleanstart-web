@@ -115,7 +115,7 @@ export function AboutHero() {
 
             <HeroReveal y={30} delay={0.3} duration={0.8}>
               <a
-                href="/cleanstart-platform"
+                href="https://images.cleanstart.com"
                 className="cs-btn-glass"
                 style={{
                   ["--cs-btn-px" as string]: "18px",
@@ -125,7 +125,7 @@ export function AboutHero() {
                   fontWeight: 500,
                 }}
               >
-                Explore CleanStart
+                Explore Images
               </a>
             </HeroReveal>
 

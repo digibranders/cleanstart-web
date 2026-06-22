@@ -1,10 +1,8 @@
 import type { News, NewsCategory, NewsRegion } from "@/lib/news";
 import { NewsroomGrid } from "@/components/sections/newsroom/NewsroomGrid";
-import { NewsroomHero } from "@/components/sections/newsroom/NewsroomHero";
 import { FadeUp } from "@/components/ui/FadeUp";
 
 export interface NewsContentProps {
-  featuredPost: News | null;
   categories: NewsCategory[];
   items: News[];
   activeCategory: string;
@@ -16,14 +14,12 @@ export interface NewsContentProps {
 }
 
 /**
- * Presentational body of the /news listing — the hero (featured + search) plus
- * the filtered, paginated grid with its sticky filter sidebar. Pure props, no
- * data fetching, so it renders identically on the server (static fallback) and
- * the client (`NewsBrowser`, which drives it from the URL filters). See
- * `BlogsContent.tsx` for the pattern.
+ * Filtered, paginated news grid with its sticky filter sidebar — the body the
+ * `<Suspense>` boundary swaps (server fallback + client `NewsBrowser`). The hero
+ * (featured + search) is rendered once by the page OUTSIDE the boundary, so its
+ * <h1> isn't streamed twice. See `case-studies/page.tsx` for the pattern.
  */
 export function NewsContent({
-  featuredPost,
   categories,
   items,
   activeCategory,
@@ -34,24 +30,18 @@ export function NewsContent({
   totalPages,
 }: NewsContentProps): React.ReactElement {
   return (
-    <main id="main-content" style={{ background: "#f6f6f6" }}>
-      <div className="relative overflow-hidden">
-        <NewsroomHero featuredPost={featuredPost} searchQuery={searchQuery} />
-      </div>
-
-      <FadeUp>
-        <NewsroomGrid
-          items={items}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          categories={categories}
-          activeCategory={activeCategory}
-          activeRegion={activeRegion}
-          activeYear={activeYear}
-          searchQuery={searchQuery}
-        />
-      </FadeUp>
-    </main>
+    <FadeUp>
+      <NewsroomGrid
+        items={items}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        categories={categories}
+        activeCategory={activeCategory}
+        activeRegion={activeRegion}
+        activeYear={activeYear}
+        searchQuery={searchQuery}
+      />
+    </FadeUp>
   );
 }
 

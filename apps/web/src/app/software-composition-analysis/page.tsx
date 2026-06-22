@@ -9,7 +9,10 @@ import { SCASecurityOutcomes } from "@/components/sections/sca/SCASecurityOutcom
 import { SCABuiltForDev } from "@/components/sections/sca/SCABuiltForDev";
 import { SCACTA } from "@/components/sections/sca/SCACTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph } from "@/lib/seo/compose-page";
+import { getRegistryOverride } from "@/lib/page-registry";
 
 export const metadata = buildPageMetadata({
   title: "Enhance SCA | CleanStart",
@@ -20,15 +23,23 @@ export const metadata = buildPageMetadata({
   eyebrow: "Solutions",
 });
 
-export default function SCAPage(): React.ReactElement {
+export const revalidate = 3600;
+
+export default async function SCAPage(): Promise<React.ReactElement> {
+  const schemaOverride = await getRegistryOverride("/software-composition-analysis");
   return (
     <>
-      <JsonLd
-        id="sca-breadcrumbs"
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Enhance SCA" },
-        ])}
+      <JsonLdGraph
+        id="sca-jsonld"
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "Enhance SCA" },
+            ]),
+          ],
+          override: schemaOverride,
+        })}
       />
       <Header />
       <main id="main-content">

@@ -3,8 +3,11 @@ import { describe, expect, it } from 'vitest';
 
 import {
   isAdmin,
+  isAdminEditorOrSeo,
   isAdminFieldLevel,
   isAdminOrEditor,
+  isAdminOrSeo,
+  isAdminOrSeoFieldLevel,
   isAdminOrSelf,
   isAuthenticated,
   publishedOrAuthenticated,
@@ -19,6 +22,7 @@ const callFieldAccess = (fn: FieldAccess, user: unknown): boolean =>
 const admin = { id: 1, roles: ['admin'] };
 const editor = { id: 2, roles: ['editor'] };
 const author = { id: 3, roles: ['author'] };
+const seo = { id: 4, roles: ['seo'] };
 
 describe('isAuthenticated', () => {
   it('is true for any logged-in user, false otherwise', () => {
@@ -50,6 +54,30 @@ describe('isAdminOrEditor', () => {
     expect(callAccess(isAdminOrEditor, editor)).toBe(true);
     expect(callAccess(isAdminOrEditor, author)).toBe(false);
     expect(callAccess(isAdminOrEditor, null)).toBe(false);
+  });
+});
+
+describe('seo-role schema access', () => {
+  it('isAdminOrSeo: admin + seo only', () => {
+    expect(callAccess(isAdminOrSeo, admin)).toBe(true);
+    expect(callAccess(isAdminOrSeo, seo)).toBe(true);
+    expect(callAccess(isAdminOrSeo, editor)).toBe(false);
+    expect(callAccess(isAdminOrSeo, author)).toBe(false);
+    expect(callAccess(isAdminOrSeo, null)).toBe(false);
+  });
+
+  it('isAdminOrSeoFieldLevel: admin + seo only (raw override write)', () => {
+    expect(callFieldAccess(isAdminOrSeoFieldLevel, admin)).toBe(true);
+    expect(callFieldAccess(isAdminOrSeoFieldLevel, seo)).toBe(true);
+    expect(callFieldAccess(isAdminOrSeoFieldLevel, editor)).toBe(false);
+  });
+
+  it('isAdminEditorOrSeo: admin + editor + seo (pageRegistry writers)', () => {
+    expect(callAccess(isAdminEditorOrSeo, admin)).toBe(true);
+    expect(callAccess(isAdminEditorOrSeo, editor)).toBe(true);
+    expect(callAccess(isAdminEditorOrSeo, seo)).toBe(true);
+    expect(callAccess(isAdminEditorOrSeo, author)).toBe(false);
+    expect(callAccess(isAdminEditorOrSeo, null)).toBe(false);
   });
 });
 

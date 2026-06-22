@@ -16,7 +16,10 @@ const TestimonialsStats = dynamic(() =>
 );
 import { FrequentlyAskedQuestions } from "@/components/sections/home/FrequentlyAskedQuestions";
 import { HOME_FAQ_ITEMS } from "@/components/sections/home/home-faqs";
-import { JsonLd, faqPageSchema } from "@/lib/seo/jsonld";
+import { faqPageSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph } from "@/lib/seo/compose-page";
+import { getRegistryOverride } from "@/lib/page-registry";
 import { ResourcesInsights } from "@/components/sections/home/ResourcesInsights";
 import { ReadyToSecureCTA } from "@/components/sections/home/ReadyToSecureCTA";
 import { Footer } from "@/components/sections/Footer";
@@ -42,16 +45,25 @@ export const metadata: Metadata = buildPageMetadata({
   titleAccent: "Secure Container Images",
 });
 
-export default async function Home() {
+export const revalidate = 3600;
+
+export default async function Home(): Promise<React.ReactElement> {
   // V4 redesign: hero + factory + testimonials/stats section.
   // Impact stats are editable in the CMS (`impactStats` global) and shared with
   // the Images catalog hero; falls back to defaults if the CMS is unreachable.
   const impactStats = await getImpactStats();
+  const schemaOverride = await getRegistryOverride("/");
   return (
     <>
       {/* FAQPage structured data for the 6 home FAQs — feeds answer engines /
           AI Overviews. Plain-text Q&A shared with the rendered accordion. */}
-      <JsonLd id="home-faq" data={faqPageSchema([...HOME_FAQ_ITEMS])} />
+      <JsonLdGraph
+        id="home-jsonld"
+        graph={buildPageGraph({
+          nodes: [faqPageSchema([...HOME_FAQ_ITEMS])],
+          override: schemaOverride,
+        })}
+      />
       {/* High-priority preload of the LCP hero SVG — React hoists this to
           <head>. See HERO_TOP_GLOW note above. */}
       <link

@@ -37,7 +37,7 @@ describe("fetchCMS — published mode", () => {
     fetchMock.mockResolvedValue(ok({ docs: [1] }));
     const out = await fetchCMS<{ docs: number[] }>("/api/blogs?limit=1");
     expect(out).toEqual({ docs: [1] });
-    expect(calledInit().next).toEqual({ revalidate: 60 });
+    expect(calledInit().next).toEqual({ revalidate: 3600 });
     expect(calledInit().cache).toBeUndefined();
     expect((calledInit().headers as Record<string, string>).Authorization).toBeUndefined();
   });
@@ -102,6 +102,6 @@ describe("fetchCMS — draft mode", () => {
     fetchMock.mockResolvedValue(ok({}));
     await fetchCMS("/api/blogs");
     expect(calledUrl()).not.toContain("draft=true");
-    expect(calledInit().next).toEqual({ revalidate: 60 });
+    expect(calledInit().next).toEqual({ revalidate: 3600 });
   });
 });

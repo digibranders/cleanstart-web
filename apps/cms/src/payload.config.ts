@@ -14,6 +14,7 @@ import { Authors } from './payload/collections/Authors';
 import { Blogs } from './payload/collections/Blogs';
 import { BrokenLinks } from './payload/collections/BrokenLinks';
 import { CaseStudies } from './payload/collections/CaseStudies';
+import { PageRegistry } from './payload/collections/PageRegistry';
 import { Categories } from './payload/collections/Categories';
 import { Events } from './payload/collections/Events';
 import { Forms } from './payload/collections/Forms';
@@ -281,7 +282,10 @@ export default buildConfig({
         // edit-view sidebar (`.document-fields--has-sidebar`) is present.
         './payload/admin/components/DocSidebarResizer.tsx#DocSidebarResizer',
       ],
-      beforeNavLinks: ['./payload/admin/components/SidebarHeader.tsx#SidebarHeader'],
+      beforeNavLinks: [
+        './payload/admin/components/SidebarHeader.tsx#SidebarHeader',
+        './payload/admin/components/SchemaManager/SchemaManagerNavLink.tsx#SchemaManagerNavLink',
+      ],
       // Wave 5 — branded hero injected above the stock LoginForm. Full
       // login-route replacement waits for the 2FA backend (Phase I).
       beforeLogin: ['./payload/admin/components/auth/CmsLoginHero.tsx#CmsLoginHero'],
@@ -294,6 +298,14 @@ export default buildConfig({
         dashboard: {
           Component:
             './payload/admin/components/Dashboard/Dashboard.tsx#Dashboard',
+        },
+        // Schema Manager — dedicated route listing every website page and its
+        // Schema.org override status. Detail/paste/validate lives on the
+        // pageRegistry document editor each row links to.
+        schemaManager: {
+          path: '/schema-manager',
+          Component:
+            './payload/admin/components/SchemaManager/SchemaManagerView.tsx#SchemaManagerView',
         },
         // Wave 5 — replaces the stock /admin/account screen with our
         // own profile + password + reserved-2FA layout.
@@ -361,6 +373,7 @@ export default buildConfig({
     // array but renders in this same group.
     Redirects,
     BrokenLinks,
+    PageRegistry,
 
     // Recruiting — Applications are the primary object; Resumes are the
     // attachment on them.

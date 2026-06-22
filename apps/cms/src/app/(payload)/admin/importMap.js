@@ -91,6 +91,8 @@ import { DsarActionsPanel as DsarActionsPanel_270b8398021fd191ac147b0b8d59049c }
 import { FlaggedLeadsTab as FlaggedLeadsTab_e23fb65ad956ac1ee9fd221fde0635a2 } from '@/payload/admin/components/FlaggedLeadsTab.tsx'
 import { PartnersExportButton as PartnersExportButton_bdb98055df2d18c5a1146f8080480dbe } from '@/payload/admin/components/PartnersExportButton.tsx'
 import { RedirectStalenessField as RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d } from '@/payload/admin/components/RedirectStalenessField.tsx'
+import { CurrentSchemaView as CurrentSchemaView_eb2b5a26ddc5c1c2f69a2c0c3dd840f2 } from '../../../payload/admin/components/SchemaManager/CurrentSchemaView.tsx'
+import { SchemaOverrideField as SchemaOverrideField_c716f5511ac92ab6778c63b963e35525 } from '../../../payload/admin/components/SchemaManager/SchemaOverrideField.tsx'
 import { DisableUserAction as DisableUserAction_6c8d4d4a3960948e585eb302bcb89460 } from '@/payload/admin/components/DisableUserAction.tsx'
 import { ReassignContentAction as ReassignContentAction_a770f7b61bee7b644dacc1d627c324ca } from '@/payload/admin/components/ReassignContentAction.tsx'
 import { EventsMultiSelect as EventsMultiSelect_8bcd98a59f96a65fd684ba41f20f1e87 } from '@/payload/admin/components/integrations/EventsMultiSelect.tsx'
@@ -121,8 +123,10 @@ import { NavOpenOnDesktop as NavOpenOnDesktop_21bf36b0db39df18e02fc9fdb6b1a47e }
 import { DocSidebarResizer as DocSidebarResizer_cb8d71363ce9ac2087ce9e8e5b3cebe2 } from '../../../payload/admin/components/DocSidebarResizer.tsx'
 import { CmsLoginHero as CmsLoginHero_32623b867969588592e72c90b3b4967a } from '../../../payload/admin/components/auth/CmsLoginHero.tsx'
 import { SidebarHeader as SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519 } from '../../../payload/admin/components/SidebarHeader.tsx'
+import { SchemaManagerNavLink as SchemaManagerNavLink_eb875cc617706591fc5da8867f286b3a } from '../../../payload/admin/components/SchemaManager/SchemaManagerNavLink.tsx'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { Dashboard as Dashboard_99a124d7b5ab83228ca0a3f897256570 } from '../../../payload/admin/components/Dashboard/Dashboard.tsx'
+import { SchemaManagerView as SchemaManagerView_117880b508b96c4e8e4b18f1c8c81546 } from '../../../payload/admin/components/SchemaManager/SchemaManagerView.tsx'
 import { CmsAccountView as CmsAccountView_e25882c99036df42ce1493c03452d7e3 } from '../../../payload/admin/components/auth/CmsAccountView.tsx'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { PointField as PointField_dc800e7ca3d2eb7ea39fd4bc6138c687 } from '@/payload/admin/components/fields/PointField.tsx'
@@ -227,6 +231,8 @@ export const importMap = {
   "@/payload/admin/components/FlaggedLeadsTab.tsx#FlaggedLeadsTab": FlaggedLeadsTab_e23fb65ad956ac1ee9fd221fde0635a2,
   "@/payload/admin/components/PartnersExportButton.tsx#PartnersExportButton": PartnersExportButton_bdb98055df2d18c5a1146f8080480dbe,
   "@/payload/admin/components/RedirectStalenessField.tsx#RedirectStalenessField": RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d,
+  "./payload/admin/components/SchemaManager/CurrentSchemaView.tsx#CurrentSchemaView": CurrentSchemaView_eb2b5a26ddc5c1c2f69a2c0c3dd840f2,
+  "./payload/admin/components/SchemaManager/SchemaOverrideField.tsx#SchemaOverrideField": SchemaOverrideField_c716f5511ac92ab6778c63b963e35525,
   "@/payload/admin/components/DisableUserAction.tsx#DisableUserAction": DisableUserAction_6c8d4d4a3960948e585eb302bcb89460,
   "@/payload/admin/components/ReassignContentAction.tsx#ReassignContentAction": ReassignContentAction_a770f7b61bee7b644dacc1d627c324ca,
   "@/payload/admin/components/integrations/EventsMultiSelect.tsx#EventsMultiSelect": EventsMultiSelect_8bcd98a59f96a65fd684ba41f20f1e87,
@@ -257,8 +263,10 @@ export const importMap = {
   "./payload/admin/components/DocSidebarResizer.tsx#DocSidebarResizer": DocSidebarResizer_cb8d71363ce9ac2087ce9e8e5b3cebe2,
   "./payload/admin/components/auth/CmsLoginHero.tsx#CmsLoginHero": CmsLoginHero_32623b867969588592e72c90b3b4967a,
   "./payload/admin/components/SidebarHeader.tsx#SidebarHeader": SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519,
+  "./payload/admin/components/SchemaManager/SchemaManagerNavLink.tsx#SchemaManagerNavLink": SchemaManagerNavLink_eb875cc617706591fc5da8867f286b3a,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "./payload/admin/components/Dashboard/Dashboard.tsx#Dashboard": Dashboard_99a124d7b5ab83228ca0a3f897256570,
+  "./payload/admin/components/SchemaManager/SchemaManagerView.tsx#SchemaManagerView": SchemaManagerView_117880b508b96c4e8e4b18f1c8c81546,
   "./payload/admin/components/auth/CmsAccountView.tsx#CmsAccountView": CmsAccountView_e25882c99036df42ce1493c03452d7e3,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@/payload/admin/components/fields/PointField.tsx#PointField": PointField_dc800e7ca3d2eb7ea39fd4bc6138c687,

@@ -9,7 +9,10 @@ import { FipsRegulatedEnvironments } from "@/components/sections/fips/FipsRegula
 import { FipsOperationalImpact } from "@/components/sections/fips/FipsOperationalImpact";
 import { FipsCTA } from "@/components/sections/fips/FipsCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph } from "@/lib/seo/compose-page";
+import { getRegistryOverride } from "@/lib/page-registry";
 
 export const metadata = buildPageMetadata({
   title: "FIPS-compliant hardened container images | CleanStart",
@@ -20,15 +23,23 @@ export const metadata = buildPageMetadata({
   eyebrow: "Solutions",
 });
 
-export default function FipsCompliancePage(): React.ReactElement {
+export const revalidate = 3600;
+
+export default async function FipsCompliancePage(): Promise<React.ReactElement> {
+  const schemaOverride = await getRegistryOverride("/fips");
   return (
     <>
-      <JsonLd
-        id="fips-breadcrumbs"
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "FIPS Compliance" },
-        ])}
+      <JsonLdGraph
+        id="fips-jsonld"
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "FIPS Compliance" },
+            ]),
+          ],
+          override: schemaOverride,
+        })}
       />
       <Header />
       <main id="main-content">

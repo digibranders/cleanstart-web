@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(process.cwd(), "..", ".."),
   },
+  // Compile the shared @cleanstart/schema workspace package from TS source
+  // (it ships no build step, like the other @cleanstart/* packages). Required
+  // for the webpack production build to parse it; harmless under Turbopack.
+  transpilePackages: ["@cleanstart/schema"],
   // ISR / static-generation resilience. Content detail routes pre-render every
   // published doc at build time (so a published page is cached from deploy and
   // survives a later CMS outage via stale-while-revalidate). That means the

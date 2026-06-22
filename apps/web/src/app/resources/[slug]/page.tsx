@@ -19,10 +19,11 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 import { effectivePublishedAt } from "@/lib/published-date";
 import {
-  JsonLd,
   articleSchema,
   breadcrumbSchema,
 } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { buildPageGraph, seoOverride } from "@/lib/seo/compose-page";
 
 interface ResourceDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -113,23 +114,25 @@ export async function renderResourceDetail({
 
   return (
     <>
-      <JsonLd
-        id={`resource-breadcrumbs-${resource.slug}`}
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Resource Center", path: "/resource-center" },
-          { name: resource.title },
-        ])}
-      />
-      <JsonLd
-        id={`resource-article-${resource.slug}`}
-        data={articleSchema({
-          title: resource.title,
-          description: resource.summary ?? undefined,
-          path: `/resources/${resource.slug}`,
-          publishedAt: effectivePublishedAt(resource) ?? resource.publishedAt ?? undefined,
-          imageUrl: assetAbsolute,
-          type: resourceTypeLabel(resource.type),
+      <JsonLdGraph
+        id={`resource-jsonld-${resource.slug}`}
+        graph={buildPageGraph({
+          nodes: [
+            breadcrumbSchema([
+              { name: "Home", path: "/" },
+              { name: "Resource Center", path: "/resource-center" },
+              { name: resource.title },
+            ]),
+            articleSchema({
+              title: resource.title,
+              description: resource.summary ?? undefined,
+              path: `/resources/${resource.slug}`,
+              publishedAt: effectivePublishedAt(resource) ?? resource.publishedAt ?? undefined,
+              imageUrl: assetAbsolute,
+              type: resourceTypeLabel(resource.type),
+            }),
+          ],
+          override: seoOverride(resource.seo),
         })}
       />
       <Header />

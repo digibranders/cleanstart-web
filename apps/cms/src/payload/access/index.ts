@@ -15,6 +15,21 @@ export const isAdminOrEditor: Access = ({ req: { user } }) =>
   hasAnyRole(user, ['admin', 'editor']);
 
 /**
+ * Schema/SEO write access: admin or the dedicated `seo` operator. Used for the
+ * raw `seo.additionalSchema` override and the pageRegistry, so the SEO team can
+ * self-serve structured data without full admin. Editors are intentionally NOT
+ * granted raw-override write on content docs (privileged paste).
+ */
+export const isAdminOrSeo: Access = ({ req: { user } }) => hasAnyRole(user, ['admin', 'seo']);
+
+export const isAdminOrSeoFieldLevel: FieldAccess = ({ req: { user } }) =>
+  hasAnyRole(user, ['admin', 'seo']);
+
+/** pageRegistry writers: content editors plus admin/seo. */
+export const isAdminEditorOrSeo: Access = ({ req: { user } }) =>
+  hasAnyRole(user, ['admin', 'editor', 'seo']);
+
+/**
  * Public read access for draft-enabled content collections.
  *
  * Authenticated requests (admin/editor/author sessions AND the read-only
