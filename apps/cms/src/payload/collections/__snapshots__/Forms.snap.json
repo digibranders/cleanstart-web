@@ -231,6 +231,10 @@
     {
       "type": "text",
       "name": "hubspotFormGuid"
+    },
+    {
+      "type": "text",
+      "name": "hubspotSubscriptionTypeId"
     }
   ],
   "hooks": {
