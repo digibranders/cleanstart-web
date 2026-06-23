@@ -27,7 +27,7 @@ beforeEach(() => { createHubspotDeal.mockResolvedValue({ status: 'synced', dealI
 afterEach(() => { vi.clearAllMocks(); });
 
 describe('retryDealSync', () => {
-  it('retries failed rows and updates them to synced', async () => {
+  it('retries failed rows, updates them to synced, and leaves attempts unchanged on success', async () => {
     const payload = makePayload();
     const result = await retryDealSync(payload as never, { pipeline: 'default', stage: 's', maxAttempts: 5 });
     expect(result.retried).toBe(1);
@@ -36,7 +36,31 @@ describe('retryDealSync', () => {
     expect(upd.collection).toBe('deal-registrations');
     expect(upd.id).toBe(7);
     expect(upd.data.hubspotSync.status).toBe('synced');
+    expect(upd.data.hubspotSync.attempts).toBe(1);
+  });
+
+  it('increments attempts when the result is failed', async () => {
+    createHubspotDeal.mockResolvedValue({ status: 'failed', error: 'boom' });
+    const payload = makePayload();
+    const result = await retryDealSync(payload as never, { pipeline: 'p', stage: 's', maxAttempts: 5 });
+    expect(result.failed).toBe(1);
+    const upd = payload.update.mock.calls[0]?.[0];
+    expect(upd.data.hubspotSync.status).toBe('failed');
+    expect(upd.data.hubspotSync.error).toBe('boom');
     expect(upd.data.hubspotSync.attempts).toBe(2);
+  });
+
+  it('does not increment attempts when the result is skipped (unprovisioned)', async () => {
+    createHubspotDeal.mockResolvedValue({ status: 'skipped', reason: 'no-active-hubspot-integration' });
+    const payload = makePayload();
+    payload.find.mockResolvedValue({ docs: [{ ...row, hubspotSync: { status: 'skipped', attempts: 3 } }] });
+    const result = await retryDealSync(payload as never, { pipeline: 'p', stage: 's', maxAttempts: 5 });
+    expect(result.retried).toBe(1);
+    expect(result.synced).toBe(0);
+    expect(result.failed).toBe(0);
+    const upd = payload.update.mock.calls[0]?.[0];
+    expect(upd.data.hubspotSync.status).toBe('skipped');
+    expect(upd.data.hubspotSync.attempts).toBe(3);
   });
 
   it('skips rows that already hit maxAttempts', async () => {

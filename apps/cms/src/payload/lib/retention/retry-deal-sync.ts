@@ -67,6 +67,10 @@ export const retryDealSync = async (
     });
     if (result.status === 'synced') synced += 1;
     else if (result.status === 'failed') failed += 1;
+    // Only genuine HubSpot failures count toward the attempt cap. A 'skipped'
+    // result means the integration isn't provisioned yet (no API call made), so
+    // the row must keep retrying cheaply until provisioning lands — see CLAUDE.md task #19.
+    const nextAttempts = result.status === 'failed' ? attempts + 1 : attempts;
     await payload.update({
       collection: 'deal-registrations',
       id: row.id,
@@ -75,7 +79,7 @@ export const retryDealSync = async (
           status: result.status,
           dealId: result.status === 'synced' ? result.dealId : null,
           error: result.status === 'failed' ? result.error : null,
-          attempts: attempts + 1,
+          attempts: nextAttempts,
           lastAttemptAt: new Date().toISOString(),
         },
       },
