@@ -4,8 +4,8 @@ import { absoluteUrl } from './url';
 
 export interface BreadcrumbCrumb {
   readonly name: string;
-  /** Path or absolute URL. Path is preferred — gets resolved against baseUrl. */
-  readonly path: string;
+  /** Path or absolute URL. Omit for the current-page (last) crumb — emits no `item`. */
+  readonly path?: string;
 }
 
 const toAbsolute = (ctx: JsonLdContext, pathOrUrl: string): string => {
@@ -28,7 +28,7 @@ export const buildBreadcrumbBlob = (
     '@type': 'ListItem',
     position: index + 1,
     name: crumb.name,
-    item: toAbsolute(ctx, crumb.path),
+    ...(crumb.path ? { item: toAbsolute(ctx, crumb.path) } : {}),
   }));
 
   return {

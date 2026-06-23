@@ -16,7 +16,7 @@ import { NewsDetailRelated } from "@/components/sections/news-detail/NewsDetailR
 import { NewsDetailCTA } from "@/components/sections/news-detail/NewsDetailCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
-import { breadcrumbSchema, newsArticleSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema, breadcrumbTrail, newsArticleSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
 import { buildPageGraph, seoOverride } from "@/lib/seo/compose-page";
 
@@ -106,11 +106,7 @@ export async function renderNewsDetail({
         id={`news-jsonld-${item.slug}`}
         graph={buildPageGraph({
           nodes: [
-            breadcrumbSchema([
-              { name: "Home", path: "/" },
-              { name: "Newsroom", path: "/news" },
-              { name: item.title },
-            ]),
+            breadcrumbSchema(breadcrumbTrail("news", { title: item.title })),
             newsArticleSchema({
               title: item.title,
               description: item.abstract ?? undefined,

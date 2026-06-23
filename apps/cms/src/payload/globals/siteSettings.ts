@@ -29,28 +29,11 @@ export const SiteSettings: GlobalConfig = {
       defaultValue: 'en-US',
       required: true,
     },
-    {
-      name: 'organizationTimezone',
-      type: 'text',
-      defaultValue: 'Asia/Kolkata',
-      admin: { description: 'IANA timezone identifier (e.g. Asia/Kolkata, America/New_York). Default for events / webinars.' },
-      validate: (value: string | string[] | null | undefined): true | string => {
-        if (value == null || (typeof value === 'string' && value.trim().length === 0)) {
-          return true;
-        }
-        if (typeof value !== 'string') return 'Timezone must be a string.';
-        const trimmed = value.trim();
-        // Reject strings containing spaces or obvious non-IANA characters.
-        if (/\s/.test(trimmed) || !/^[A-Za-z][A-Za-z0-9/_+-]*$/.test(trimmed)) {
-          return 'Expected a valid IANA timezone identifier (e.g. Asia/Kolkata, America/New_York).';
-        }
-        return true;
-      },
-    },
-    // Pruned 2026-06-22: the `listing`, `toc`, `leads`, and `analytics`
-    // sub-groups were never read by code (web hardcodes pagination/TOC; GA4/GTM
-    // fire from NEXT_PUBLIC_* env vars; lead retention is a job constant).
-    // Removed to declutter. Only siteName/baseUrl/defaultLocale/timezone remain
-    // (consumed by robots.ts, sitemap.ts, jsonld.ts).
+    // Pruned 2026-06-22: `listing`/`toc`/`leads`/`analytics` sub-groups and
+    // `organizationTimezone` were never read by code (web hardcodes
+    // pagination/TOC; GA4/GTM fire from NEXT_PUBLIC_* env vars; lead retention
+    // is a job constant; the event/webinar "timezone fallback" was never wired).
+    // Only siteName/baseUrl/defaultLocale remain — consumed server-side by
+    // robots.ts, sitemap.ts, and jsonld.ts.
   ],
 };

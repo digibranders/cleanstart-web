@@ -87,6 +87,20 @@ describe('buildJsonLdBlobs', () => {
       const article = blobs.find((b) => b['@type'] === 'Article');
       expect(article?.about).toEqual({ '@type': 'Thing', name: 'Container security' });
     });
+
+    it('breadcrumb: listing is Blogs (/blogs); last crumb has no item', () => {
+      const blobs = buildJsonLdBlobs(ctx, 'blogs', {
+        slug: 'example',
+        title: 'Example post',
+      });
+      const breadcrumb = blobs.find((b) => b['@type'] === 'BreadcrumbList') as
+        | { itemListElement: { name: string; item?: string; position: number }[] }
+        | undefined;
+      expect(breadcrumb?.itemListElement[1]).toMatchObject({ name: 'Blogs', item: 'https://cleanstart.com/blogs' });
+      const last = breadcrumb?.itemListElement.at(-1);
+      expect(last?.name).toBe('Example post');
+      expect(last).not.toHaveProperty('item');
+    });
   });
 
   describe('news', () => {
@@ -105,6 +119,20 @@ describe('buildJsonLdBlobs', () => {
         isAccessibleForFree: true,
         about: { '@type': 'Thing', name: 'Press' },
       });
+    });
+
+    it('breadcrumb: listing is Newsroom (/news); last crumb has no item', () => {
+      const blobs = buildJsonLdBlobs(ctx, 'news', {
+        slug: 'launch',
+        title: 'CleanStart launches v1',
+      });
+      const breadcrumb = blobs.find((b) => b['@type'] === 'BreadcrumbList') as
+        | { itemListElement: { name: string; item?: string }[] }
+        | undefined;
+      expect(breadcrumb?.itemListElement[1]).toMatchObject({ name: 'Newsroom', item: 'https://cleanstart.com/news' });
+      const last = breadcrumb?.itemListElement.at(-1);
+      expect(last?.name).toBe('CleanStart launches v1');
+      expect(last).not.toHaveProperty('item');
     });
   });
 
@@ -226,11 +254,18 @@ describe('buildJsonLdBlobs', () => {
         '@type': 'TechArticle',
         about: { '@type': 'Thing', name: 'Emerging Standards' },
       });
-      // breadcrumb should target the KB landing page
+      // breadcrumb: Home › Knowledge Hub (/knowledge-hub) › category (no item) › title (no item)
       const breadcrumb = blobs.find((b) => b['@type'] === 'BreadcrumbList') as
-        | { itemListElement: { item: string }[] }
+        | { itemListElement: { name: string; item?: string }[] }
         | undefined;
-      expect(breadcrumb?.itemListElement[1]?.item).toBe('https://cleanstart.com/knowledge-hub');
+      expect(breadcrumb?.itemListElement[1]).toMatchObject({ name: 'Knowledge Hub', item: 'https://cleanstart.com/knowledge-hub' });
+      // category crumb sits at index 2 when present — intentionally unlinked
+      expect(breadcrumb?.itemListElement[2]).toMatchObject({ name: 'Emerging Standards' });
+      expect(breadcrumb?.itemListElement[2]).not.toHaveProperty('item');
+      // last crumb (title) has no item
+      const last = breadcrumb?.itemListElement.at(-1);
+      expect(last?.name).toBe('How to use VEX documents');
+      expect(last).not.toHaveProperty('item');
     });
   });
 
@@ -256,6 +291,15 @@ describe('buildJsonLdBlobs', () => {
       expect(person?.knowsAbout).toEqual([
         expect.objectContaining({ '@type': 'DefinedTerm', name: 'Container security' }),
       ]);
+
+      // breadcrumb: Home › Jane Doe (no intermediate /author crumb, no item on last crumb)
+      const breadcrumb = blobs.find((b) => b['@type'] === 'BreadcrumbList') as
+        | { itemListElement: { name: string; item?: string; position: number }[] }
+        | undefined;
+      expect(breadcrumb?.itemListElement).toHaveLength(2);
+      expect(breadcrumb?.itemListElement[0]).toMatchObject({ position: 1, name: 'Home', item: 'https://cleanstart.com/' });
+      expect(breadcrumb?.itemListElement[1]).toMatchObject({ position: 2, name: 'Jane Doe' });
+      expect(breadcrumb?.itemListElement[1]).not.toHaveProperty('item');
     });
 
     it('returns [] when an author has no slug or name', () => {
@@ -398,6 +442,17 @@ describe('buildJsonLdBlobs', () => {
         expect.objectContaining({ '@type': 'Person', name: 'Jane Doe' }),
       ]);
     });
+
+    it('breadcrumb: Home › Events(/events) › title (no item on last crumb)', () => {
+      const blobs = buildJsonLdBlobs(ctx, 'events', baseEvent);
+      const breadcrumb = blobs.find((b) => b['@type'] === 'BreadcrumbList') as
+        | { itemListElement: { name: string; item?: string; position: number }[] }
+        | undefined;
+      expect(breadcrumb?.itemListElement[1]).toMatchObject({ name: 'Events', item: 'https://cleanstart.com/events' });
+      const last = breadcrumb?.itemListElement.at(-1);
+      expect(last?.name).toBe(baseEvent.title);
+      expect(last).not.toHaveProperty('item');
+    });
   });
 
   describe('pages', () => {
@@ -512,5 +567,53 @@ describe('buildJsonLdBlobs', () => {
         | undefined;
       expect(event?.eventStatus).toBe('https://schema.org/EventCancelled');
     });
+
+    it('breadcrumb: Home › Webinars(/webinars) › title (no item on last crumb; listing is /webinars not /webinar)', () => {
+      const blobs = buildJsonLdBlobs(ctx, 'webinars', baseWebinar);
+      const breadcrumb = blobs.find((b) => b['@type'] === 'BreadcrumbList') as
+        | { itemListElement: { name: string; item?: string; position: number }[] }
+        | undefined;
+      expect(breadcrumb?.itemListElement[1]).toMatchObject({ name: 'Webinars', item: 'https://cleanstart.com/webinars' });
+      const last = breadcrumb?.itemListElement.at(-1);
+      expect(last?.name).toBe(baseWebinar.title);
+      expect(last).not.toHaveProperty('item');
+    });
+  });
+
+  describe('jobs', () => {
+    const baseJob = {
+      slug: 'senior-engineer',
+      title: 'Senior Software Engineer',
+      abstract: 'Join our security engineering team.',
+      createdAt: '2026-01-10T09:00:00Z',
+    };
+
+    it('breadcrumb: Home › Careers(/careers) › title (not Jobs//job; last crumb has no item)', () => {
+      const blobs = buildJsonLdBlobs(ctx, 'jobs', baseJob);
+      const breadcrumb = blobs.find((b) => b['@type'] === 'BreadcrumbList') as
+        | { itemListElement: { name: string; item?: string; position: number }[] }
+        | undefined;
+      expect(breadcrumb?.itemListElement[1]).toMatchObject({ name: 'Careers', item: 'https://cleanstart.com/careers' });
+      const last = breadcrumb?.itemListElement.at(-1);
+      expect(last?.name).toBe(baseJob.title);
+      expect(last).not.toHaveProperty('item');
+    });
+  });
+});
+
+describe('resources breadcrumb', () => {
+  it('breadcrumb: Home › Resource Center(/resource-center) › title (not Resources//resources; last crumb has no item)', () => {
+    const blobs = buildJsonLdBlobs(ctx, 'resources', {
+      slug: 'sbom-whitepaper',
+      title: 'SBOM whitepaper',
+      summary: 'Why SBOMs matter.',
+    });
+    const breadcrumb = blobs.find((b) => b['@type'] === 'BreadcrumbList') as
+      | { itemListElement: { name: string; item?: string; position: number }[] }
+      | undefined;
+    expect(breadcrumb?.itemListElement[1]).toMatchObject({ name: 'Resource Center', item: 'https://cleanstart.com/resource-center' });
+    const last = breadcrumb?.itemListElement.at(-1);
+    expect(last?.name).toBe('SBOM whitepaper');
+    expect(last).not.toHaveProperty('item');
   });
 });

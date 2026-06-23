@@ -110,8 +110,7 @@ export const Events: CollectionConfig = {
       name: 'timezone',
       type: 'text',
       admin: {
-        description:
-          'IANA timezone string (e.g. Asia/Kolkata). Falls back to siteSettings.organizationTimezone.',
+        description: 'IANA timezone string (e.g. Asia/Kolkata).',
       },
     },
     {

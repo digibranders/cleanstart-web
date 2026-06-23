@@ -423,6 +423,8 @@ export function SecurityDiagram(): React.ReactElement {
             <img
               src="/images/security/cs-logomark.png"
               alt=""
+              width={54}
+              height={62}
               className="w-auto"
               style={{ height: "var(--fs-h1)", aspectRatio: "54 / 62" }}
             />

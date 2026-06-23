@@ -15,7 +15,7 @@ import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 
 const absolutizeCmsUrl = (url: string | null | undefined): string | undefined =>
   !url ? undefined : url.startsWith("http") ? url : `${cmsBaseUrl()}${url}`;
-import { JsonLd, breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLd, breadcrumbSchema, breadcrumbTrail } from "@/lib/seo/jsonld";
 
 interface LegalPageProps {
   params: Promise<{ slug: string }>;
@@ -72,11 +72,7 @@ export default async function LegalDocumentPage({
       {doc.body ? <RenderLexical content={doc.body} /> : null}
       <JsonLd
         id={`legal-breadcrumbs-${doc.slug}`}
-        data={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Legal", path: "/legal" },
-          { name: doc.title },
-        ])}
+        data={breadcrumbSchema(breadcrumbTrail("legal", { title: doc.title }))}
       />
     </>
   );

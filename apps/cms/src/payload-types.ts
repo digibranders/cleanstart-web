@@ -3269,7 +3269,7 @@ export interface Event {
   startsAt: string;
   endsAt?: string | null;
   /**
-   * IANA timezone string (e.g. Asia/Kolkata). Falls back to siteSettings.organizationTimezone.
+   * IANA timezone string (e.g. Asia/Kolkata).
    */
   timezone?: string | null;
   /**
@@ -3669,7 +3669,7 @@ export interface Webinar {
   startsAt?: string | null;
   endsAt?: string | null;
   /**
-   * Falls back to siteSettings.organizationTimezone.
+   * IANA timezone string (e.g. Asia/Kolkata).
    */
   timezone?: string | null;
   registrationMode: 'internal' | 'external';
@@ -11211,10 +11211,6 @@ export interface SiteSetting {
    */
   baseUrl: string;
   defaultLocale: string;
-  /**
-   * IANA timezone identifier (e.g. Asia/Kolkata, America/New_York). Default for events / webinars.
-   */
-  organizationTimezone?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -11522,32 +11518,6 @@ export interface SeoDefault {
      */
     coveragePolicy?: string | null;
   };
-  brandIcons?: {
-    /**
-     * 32×32 favicon. Used by `<link rel="icon" sizes="32x32">`.
-     */
-    favicon32?: (number | null) | Media;
-    /**
-     * 192×192 PNG. PWA / Android home-screen icon.
-     */
-    icon192?: (number | null) | Media;
-    /**
-     * 512×512 PNG. PWA / large-tile icon.
-     */
-    icon512?: (number | null) | Media;
-    /**
-     * 180×180 PNG. iOS home-screen icon (`apple-touch-icon`).
-     */
-    appleTouchIcon?: (number | null) | Media;
-    /**
-     * Single-colour SVG for Safari pinned-tab. Will be served as `mask-icon`.
-     */
-    safariPinnedTabSvg?: (number | null) | Media;
-    /**
-     * Hex string (e.g. #0E1117). Surfaced as `<meta name="theme-color">` and as `theme_color` in manifest.json.
-     */
-    themeColor?: string | null;
-  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -11577,7 +11547,6 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   siteName?: T;
   baseUrl?: T;
   defaultLocale?: T;
-  organizationTimezone?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -11727,16 +11696,6 @@ export interface SeoDefaultsSelect<T extends boolean = true> {
         diversityPolicy?: T;
         ownershipFundingInfo?: T;
         coveragePolicy?: T;
-      };
-  brandIcons?:
-    | T
-    | {
-        favicon32?: T;
-        icon192?: T;
-        icon512?: T;
-        appleTouchIcon?: T;
-        safariPinnedTabSvg?: T;
-        themeColor?: T;
       };
   updatedAt?: T;
   createdAt?: T;

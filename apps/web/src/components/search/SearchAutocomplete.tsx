@@ -60,12 +60,24 @@ export function SearchAutocomplete({
   useEffect(() => {
     if (!open) return undefined;
     reposition();
-    const onMove = (): void => reposition();
-    window.addEventListener('scroll', onMove, true);
+    // Capture phase catches scrolls on any ancestor scroll container (the panel
+    // is portaled and fixed to the input). Mark passive and coalesce to one
+    // measure per frame so the scroll thread isn't blocked while the panel is open.
+    let rafId = 0;
+    const onMove = (): void => {
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(() => {
+        rafId = 0;
+        reposition();
+      });
+    };
+    const scrollOpts: AddEventListenerOptions = { capture: true, passive: true };
+    window.addEventListener('scroll', onMove, scrollOpts);
     window.addEventListener('resize', onMove);
     return () => {
-      window.removeEventListener('scroll', onMove, true);
+      window.removeEventListener('scroll', onMove, scrollOpts);
       window.removeEventListener('resize', onMove);
+      if (rafId) window.cancelAnimationFrame(rafId);
     };
   }, [open, reposition]);
 

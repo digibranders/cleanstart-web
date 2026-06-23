@@ -38,7 +38,7 @@ export function LibrariesCTA(): React.ReactElement {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/clean-libraries/cta-illustration.png"
+        src="/images/clean-libraries/cta-illustration.webp"
         alt=""
         className="pointer-events-none absolute -bottom-[28px] -right-[18px] hidden h-[180px] w-[180px] -rotate-[15deg] select-none object-contain opacity-90 lg:block"
         loading="lazy"

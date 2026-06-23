@@ -112,7 +112,7 @@ export const Webinars: CollectionConfig = {
       name: 'timezone',
       type: 'text',
       admin: {
-        description: 'Falls back to siteSettings.organizationTimezone.',
+        description: 'IANA timezone string (e.g. Asia/Kolkata).',
       },
     },
     {

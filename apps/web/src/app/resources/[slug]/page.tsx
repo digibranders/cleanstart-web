@@ -21,6 +21,7 @@ import { effectivePublishedAt } from "@/lib/published-date";
 import {
   articleSchema,
   breadcrumbSchema,
+  breadcrumbTrail,
 } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
 import { buildPageGraph, seoOverride } from "@/lib/seo/compose-page";
@@ -118,11 +119,7 @@ export async function renderResourceDetail({
         id={`resource-jsonld-${resource.slug}`}
         graph={buildPageGraph({
           nodes: [
-            breadcrumbSchema([
-              { name: "Home", path: "/" },
-              { name: "Resource Center", path: "/resource-center" },
-              { name: resource.title },
-            ]),
+            breadcrumbSchema(breadcrumbTrail("resource", { title: resource.title })),
             articleSchema({
               title: resource.title,
               description: resource.summary ?? undefined,

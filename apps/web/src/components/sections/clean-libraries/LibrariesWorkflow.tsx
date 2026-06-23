@@ -30,14 +30,14 @@ interface Stage {
 
 const STAGES: Stage[] = [
   {
-    image: "/images/clean-libraries/flow-developers.png",
+    image: "/images/clean-libraries/flow-developers.webp",
     title: "Developers & AI Coding Tools",
     accent: "#5b9bff",
     tint: "rgba(91,155,255,0.14)",
     bullets: ["Cursor", "Claude Code", "GitHub Copilot"],
   },
   {
-    image: "/images/clean-libraries/flow-clean-library.png",
+    image: "/images/clean-libraries/flow-clean-library.webp",
     title: "Clean Library",
     accent: "#a974ff",
     tint: "rgba(169,116,255,0.18)",
@@ -49,21 +49,21 @@ const STAGES: Stage[] = [
     ],
   },
   {
-    image: "/images/clean-libraries/flow-repository.png",
+    image: "/images/clean-libraries/flow-repository.webp",
     title: "Validated Library Repository",
     accent: "#2dd4bf",
     tint: "rgba(45,212,191,0.14)",
     body: "Approved packages and trusted sources.",
   },
   {
-    image: "/images/clean-libraries/flow-cicd.png",
+    image: "/images/clean-libraries/flow-cicd.webp",
     title: "CI/CD Gates",
     accent: "#f7a35c",
     tint: "rgba(247,163,92,0.14)",
     body: "Automated policy enforcement.",
   },
   {
-    image: "/images/clean-libraries/flow-production.png",
+    image: "/images/clean-libraries/flow-production.webp",
     title: "Production Artifacts",
     accent: "#5b9bff",
     tint: "rgba(91,155,255,0.14)",

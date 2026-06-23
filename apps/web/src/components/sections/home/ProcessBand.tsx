@@ -77,7 +77,7 @@ export function ProcessBand() {
       {/* Blended office photo behind the band. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/images/process/bg-photo.png"
+        src="/images/process/bg-photo.webp"
         alt=""
         aria-hidden
         loading="lazy"

@@ -18,7 +18,7 @@ import {
 } from "@/lib/jobs";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
-import { breadcrumbSchema, jobPostingSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema, breadcrumbTrail, jobPostingSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
 import { buildPageGraph, seoOverride } from "@/lib/seo/compose-page";
 
@@ -130,11 +130,7 @@ export default async function CareerDetailPage({
         id={`career-jsonld-${job.slug}`}
         graph={buildPageGraph({
           nodes: [
-            breadcrumbSchema([
-              { name: "Home", path: "/" },
-              { name: "Careers", path: "/careers" },
-              { name: job.title },
-            ]),
+            breadcrumbSchema(breadcrumbTrail("job", { title: job.title })),
             // Omit JobPosting on closed roles — Google penalises expired postings
             // that linger in the index, and closed roles are already noindex.
             ...(job.hiringStatus !== "closed"

@@ -27,6 +27,7 @@ import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 import {
   articleSchema,
   breadcrumbSchema,
+  breadcrumbTrail,
   faqPageSchema,
 } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
@@ -142,11 +143,7 @@ export async function renderGuideDetail({
         id={`guide-jsonld-${guide.slug}`}
         graph={buildPageGraph({
           nodes: [
-            breadcrumbSchema([
-              { name: "Home", path: "/" },
-              { name: "Guides", path: "/guide" },
-              { name: guide.title },
-            ]),
+            breadcrumbSchema(breadcrumbTrail("guide", { title: guide.title })),
             articleSchema({
               title: guide.title,
               description: guide.abstract ?? undefined,

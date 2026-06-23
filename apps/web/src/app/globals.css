@@ -1478,12 +1478,17 @@ body {
    loop has no hard cut. Decorative — hidden under reduced-motion (the static
    off-white rail stays). */
 @keyframes cs-home-comet {
-  0% { top: 106%; opacity: 0; }
+  0% { transform: translateX(-50%) translateY(106%); opacity: 0; }
   12% { opacity: 1; }
   80% { opacity: 1; }
-  100% { top: 8%; opacity: 0; }
+  100% { transform: translateX(-50%) translateY(8%); opacity: 0; }
 }
 .cs-home-comet {
+  /* Full-height track so translateY(%) maps 1:1 to the old top(%) — same motion,
+     now GPU-composited (was animating `top`, forcing layout every frame). */
+  top: 0;
+  bottom: 0;
+  will-change: transform;
   animation: cs-home-comet 3.4s linear infinite;
 }
 @media (prefers-reduced-motion: reduce) {

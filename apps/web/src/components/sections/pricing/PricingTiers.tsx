@@ -14,7 +14,7 @@ interface Tier {
 
 const TOP_TIERS: Tier[] = [
   {
-    orb: "/images/pricing/orb-community.png",
+    orb: "/images/pricing/orb-community.webp",
     title: "Community Images",
     body: "Free, verified base images curated by CleanStart for developers and open-source users.",
     ctaLabel: "View Images",
@@ -22,14 +22,14 @@ const TOP_TIERS: Tier[] = [
     ctaExternal: true,
   },
   {
-    orb: "/images/pricing/orb-custom.png",
+    orb: "/images/pricing/orb-custom.webp",
     title: "Custom Images",
     body: "Pre-built, optimized base images with near-zero CVEs and automatic versioned updates.",
     ctaLabel: "Contact Sales",
     ctaHref: "/contact-us",
   },
   {
-    orb: "/images/pricing/orb-libraries.png",
+    orb: "/images/pricing/orb-libraries.webp",
     title: "Clean Libraries",
     body: "Pre-built, optimized base images with near-zero CVEs and automatic versioned updates.",
     ctaLabel: "Read more",
@@ -38,7 +38,7 @@ const TOP_TIERS: Tier[] = [
 ];
 
 const BOTTOM_TIER: Tier = {
-  orb: "/images/pricing/orb-cleansight.png",
+  orb: "/images/pricing/orb-cleansight.webp",
   title: "CleanSight",
   body: "Pre-built, optimized base images with near-zero CVEs and automatic versioned updates.",
   ctaLabel: "Contact Sales",
@@ -320,7 +320,7 @@ function AdditionalServicesCard(): React.ReactElement {
         className="absolute right-5 top-5 h-[130px] w-[130px]"
       >
         <Image
-          src="/images/pricing/orb-services.png"
+          src="/images/pricing/orb-services.webp"
           alt=""
           fill
           unoptimized

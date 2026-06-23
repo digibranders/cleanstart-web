@@ -431,57 +431,5 @@ export const SeoDefaults: GlobalConfig = {
         },
       ],
     },
-    {
-      type: 'collapsible',
-      label: 'Brand icons',
-      admin: {
-        initCollapsed: true,
-        description:
-          'Favicons + app icons. Stored but NOT yet wired into apps/web — favicons + theme-color are currently hardcoded in the web layout. Collapsed by design; expand only when the web favicon pipeline is wired. (Removal candidate — see Phase-2 cleanup.)',
-      },
-      fields: [
-        {
-          type: 'group',
-          name: 'brandIcons',
-          label: false,
-          fields: [
-            mediaUploadField({
-              name: 'favicon32',
-              folderHint: 'web/general',
-              description: '32×32 favicon. Used by `<link rel="icon" sizes="32x32">`.',
-            }),
-            mediaUploadField({
-              name: 'icon192',
-              folderHint: 'web/general',
-              description: '192×192 PNG. PWA / Android home-screen icon.',
-            }),
-            mediaUploadField({
-              name: 'icon512',
-              folderHint: 'web/general',
-              description: '512×512 PNG. PWA / large-tile icon.',
-            }),
-            mediaUploadField({
-              name: 'appleTouchIcon',
-              folderHint: 'web/general',
-              description: '180×180 PNG. iOS home-screen icon (`apple-touch-icon`).',
-            }),
-            mediaUploadField({
-              name: 'safariPinnedTabSvg',
-              folderHint: 'web/general',
-              description:
-                'Single-colour SVG for Safari pinned-tab. Will be served as `mask-icon`.',
-            }),
-            {
-              name: 'themeColor',
-              type: 'text',
-              admin: {
-                description:
-                  'Hex string (e.g. #0E1117). Surfaced as `<meta name="theme-color">` and as `theme_color` in manifest.json.',
-              },
-            },
-          ],
-        },
-      ],
-    },
   ],
 };

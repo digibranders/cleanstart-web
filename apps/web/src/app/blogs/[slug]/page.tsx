@@ -27,6 +27,7 @@ import { effectivePublishedAt } from "@/lib/published-date";
 import {
   blogPostingSchema,
   breadcrumbSchema,
+  breadcrumbTrail,
   faqPageSchema,
 } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
@@ -154,11 +155,7 @@ export async function renderBlogDetail({
         id={`blog-jsonld-${post.slug}`}
         graph={buildPageGraph({
           nodes: [
-            breadcrumbSchema([
-              { name: "Home", path: "/" },
-              { name: "Blogs", path: "/blogs" },
-              { name: post.title },
-            ]),
+            breadcrumbSchema(breadcrumbTrail("blog", { title: post.title })),
             blogPostingSchema({
               title: post.title,
               description: post.abstract ?? undefined,

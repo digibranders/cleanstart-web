@@ -16,7 +16,7 @@ import { mediaUrl } from "@/lib/blog";
 import { RenderLexical } from "@/lib/renderLexical";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
-import { breadcrumbSchema, eventSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema, breadcrumbTrail, eventSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
 import { buildPageGraph, seoOverride } from "@/lib/seo/compose-page";
 
@@ -130,11 +130,7 @@ export async function renderEventDetail({
         id={`event-jsonld-${event.slug}`}
         graph={buildPageGraph({
           nodes: [
-            breadcrumbSchema([
-              { name: "Home", path: "/" },
-              { name: "Events", path: "/events" },
-              { name: event.title },
-            ]),
+            breadcrumbSchema(breadcrumbTrail("event", { title: event.title })),
             eventSchema({
               title: event.title,
               path: `/event/${event.slug}`,
