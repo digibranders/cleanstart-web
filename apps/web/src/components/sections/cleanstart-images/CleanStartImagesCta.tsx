@@ -136,7 +136,7 @@ export function CleanStartImagesCta(): React.ReactElement {
       />
 
       <div
-        className="relative flex h-full flex-col items-start justify-center gap-5 pt-6 pb-6 sm:pt-4 sm:pb-4 lg:flex-row lg:items-center lg:justify-start lg:gap-[100px] lg:pt-0 lg:pb-0"
+        className="relative flex h-full flex-col items-start justify-center gap-5 pt-6 pb-6 sm:pt-4 sm:pb-4 lg:flex-row lg:items-start lg:justify-start lg:gap-[100px] lg:pt-[clamp(28px,4vw,48px)] lg:pb-[clamp(28px,4vw,48px)]"
         style={{
           paddingLeft: "clamp(32px, 9.4vw, 108px)",
           paddingRight: "clamp(32px, 5.2vw, 60px)",

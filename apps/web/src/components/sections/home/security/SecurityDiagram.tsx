@@ -69,6 +69,15 @@ const descStyle = {
   letterSpacing: "-0.01em",
 } as const;
 
+/* Stage descriptions wrap to a uniform three lines so the six lifecycle stages
+   read as an evenly aligned row. The cap sits just above the longest single
+   word ("environments") — wide enough never to break a word, narrow enough to
+   force three lines on every stage. */
+const stageDescStyle = {
+  ...descStyle,
+  maxWidth: "104px",
+} as const;
+
 const NOISE_TEXTURE =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E\")";
 
@@ -112,7 +121,7 @@ function StageItem({
         <h3 className="font-display font-semibold text-white" style={titleStyle}>
           {stage.title}
         </h3>
-        <p className="text-white/70" style={descStyle}>
+        <p className="text-white/70" style={stageDescStyle}>
           {stage.desc}
         </p>
       </div>

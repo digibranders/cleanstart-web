@@ -96,7 +96,7 @@ export function CommunityCTA() {
 
       {/* Desktop content row */}
       <div
-        className="hidden md:flex md:flex-col md:gap-y-4 lg:flex-row lg:gap-y-0 absolute inset-0 items-start lg:items-center"
+        className="hidden md:flex md:flex-col md:gap-y-4 lg:flex-row lg:gap-y-0 absolute inset-0 items-start"
         style={{
           paddingLeft: "clamp(28px, 4vw, 64px)",
           paddingRight: "clamp(28px, 4vw, 64px)",

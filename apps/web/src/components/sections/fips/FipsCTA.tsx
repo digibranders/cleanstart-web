@@ -29,12 +29,14 @@ export function FipsCTA(): React.ReactElement {
       />
 
       <div
-        className="hidden md:flex absolute items-center"
+        className="hidden md:flex absolute items-start"
         style={{
           left: "9.56%",
           width: "82.05%",
           top: 0,
           bottom: 0,
+          paddingTop: "clamp(28px, 4vw, 48px)",
+          paddingBottom: "clamp(28px, 4vw, 48px)",
           gap: "clamp(32px, 10.98%, 115px)",
         }}
       >
