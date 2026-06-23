@@ -7,6 +7,7 @@ import { ogImageUrl } from '@/lib/seo/og';
 import {
   articleSchema,
   breadcrumbSchema,
+  breadcrumbTrail,
   videoObjectSchema,
 } from '@/lib/seo/jsonld';
 import { JsonLdGraph } from '@/components/JsonLdGraph';
@@ -77,14 +78,10 @@ export default async function KnowledgeHubArticlePage({
       sub: article.abstract ?? undefined,
     });
 
-  const crumbs = [
-    { name: 'Home', path: '/' },
-    { name: 'Knowledge Hub', path: '/knowledge-hub' },
-    ...(article.category?.name
-      ? [{ name: article.category.name }]
-      : []),
-    { name: article.title },
-  ];
+  const crumbs = breadcrumbTrail("knowledgeBase", {
+    title: article.title,
+    category: article.category?.name,
+  });
 
   return (
     <>

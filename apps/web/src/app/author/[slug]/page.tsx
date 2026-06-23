@@ -12,7 +12,7 @@ import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
 import { getAuthorBySlug, getAuthorSlugs, getPostsByAuthor } from "@/lib/authors";
 import { mediaUrl } from "@/lib/blog";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { breadcrumbSchema, profilePageSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema, breadcrumbTrail, profilePageSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
 import { buildPageGraph, seoOverride } from "@/lib/seo/compose-page";
 
@@ -94,12 +94,7 @@ export default async function AuthorPage({
         id={`author-jsonld-${author.slug}`}
         graph={buildPageGraph({
           nodes: [
-            // No `/author` index route exists, so an "Authors" crumb would link
-            // to a 404. The honest trail for a profile page is Home › <Name>.
-            breadcrumbSchema([
-              { name: "Home", path: "/" },
-              { name: author.name },
-            ]),
+            breadcrumbSchema(breadcrumbTrail("author", { title: author.name })),
             profilePageSchema({
               name: author.name,
               slug: author.slug,
