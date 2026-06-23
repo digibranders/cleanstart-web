@@ -77,6 +77,7 @@ import {
 import { checkBrokenLinksTask } from './payload/jobs/check-broken-links';
 import { drainLeadQueueTask } from './payload/jobs/drain-lead-queue';
 import { purgeCareerApplicationsTask } from './payload/jobs/purge-career-applications';
+import { retryDealSyncTask } from './payload/jobs/retry-deal-sync';
 import { purgeConsentLogTask } from './payload/jobs/purge-consent-log';
 import { purgeLeadsPiiTask } from './payload/jobs/purge-leads-pii';
 import { purgePreviewAuditTask } from './payload/jobs/purge-preview-audit';
@@ -433,6 +434,7 @@ export default buildConfig({
       dashboardRefreshFrequentTask,
       dashboardRefreshDailyTask,
       analyticsCachePruneTask,
+      retryDealSyncTask,
     ],
     autoRun: [
       {
@@ -482,6 +484,10 @@ export default buildConfig({
       {
         cron: '0 7 * * *', // daily at 07:00 UTC — analyticsCache 90-day prune
         queue: 'analyticsCachePrune',
+      },
+      {
+        cron: '*/10 * * * *', // every 10 minutes — re-attempt failed deal-registration HubSpot Deal sync
+        queue: 'dealSyncRetry',
       },
       {
         cron: '* * * * *', // every minute — Payload built-in schedulePublish jobs land in the `default` queue; wait_until gates actual execution

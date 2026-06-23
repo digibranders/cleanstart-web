@@ -196,6 +196,7 @@ export interface Config {
       dashboardRefreshFrequent: TaskDashboardRefreshFrequent;
       dashboardRefreshDaily: TaskDashboardRefreshDaily;
       analyticsCachePrune: TaskAnalyticsCachePrune;
+      retryDealSync: TaskRetryDealSync;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -7660,6 +7661,7 @@ export interface PayloadJob {
           | 'dashboardRefreshFrequent'
           | 'dashboardRefreshDaily'
           | 'analyticsCachePrune'
+          | 'retryDealSync'
           | 'schedulePublish';
         taskID: string;
         input?:
@@ -7708,6 +7710,7 @@ export interface PayloadJob {
         | 'dashboardRefreshFrequent'
         | 'dashboardRefreshDaily'
         | 'analyticsCachePrune'
+        | 'retryDealSync'
         | 'schedulePublish'
       )
     | null;
@@ -11908,6 +11911,14 @@ export interface TaskDashboardRefreshDaily {
  * via the `definition` "TaskAnalyticsCachePrune".
  */
 export interface TaskAnalyticsCachePrune {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskRetryDealSync".
+ */
+export interface TaskRetryDealSync {
   input?: unknown;
   output?: unknown;
 }
