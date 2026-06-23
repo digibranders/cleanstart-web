@@ -343,14 +343,16 @@ These resolved the open forks from arch doc §`#decisions`. Build accordingly:
 
 ## Background jobs
 
-Seven Payload cron tasks run in `apps/cms/src/payload/jobs/`. All are gated by `PAYLOAD_AUTO_RUN=true` — set this in `.env` to enable; omitting it (e.g. in test runs) prevents spurious fires.
+Ten Payload cron tasks run in `apps/cms/src/payload/jobs/`. All are gated by `PAYLOAD_AUTO_RUN=true` — set this in `.env` to enable; omitting it (e.g. in test runs) prevents spurious fires.
 
 | Job | Schedule (UTC) | File |
 |-----|----------------|------|
 | Lead queue drain | every 5 min | `drain-lead-queue.ts` |
 | Webhook retry | every 5 min | `retry-webhook.ts` |
+| Deal-registration HubSpot sync retry | every 10 min | `retry-deal-sync.ts` |
 | Search-log purge (90-day retention) | daily 03:00 | `purge-search-log.ts` |
 | Leads PII redaction (365-day retention) | daily 03:15 | `purge-leads-pii.ts` |
+| Deal-registrations purge (PII redaction, 365-day) | daily 03:30 | `purge-deal-registrations.ts` |
 | Career-applications purge (resume delete + PII redaction, 365-day) | daily 03:45 | `purge-career-applications.ts` |
 | Consent-log purge (cookie-consent proof, 24-month retention) | daily 04:00 | `purge-consent-log.ts` |
 | Broken-links scan | daily 04:30 | `check-broken-links.ts` |
@@ -367,7 +369,7 @@ These channels are wired and active (env-var configured). See `apps/cms/.env.exa
 | Integration | Purpose | Key env vars |
 |---|---|---|
 | Cloudflare R2 | Media storage + lead fallback queue | `R2_BUCKET`, `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_PUBLIC_BASE` |
-| HubSpot | Lead relay (secondary handler) → Forms Submissions API; owns all lead email (follow-up + notifications). Forms keyed by `forms.hubspotFormGuid`. See `docs/integrations/forms-hubspot-verification.md`. | `HUBSPOT_PORTAL_ID` (relay), `HUBSPOT_PRIVATE_APP_TOKEN` (GDPR erasure only) |
+| HubSpot | Lead relay (secondary handler) → Forms Submissions API; owns all lead email (follow-up + notifications). Forms keyed by `forms.hubspotFormGuid`. **Also** the destination for **deal registrations** via the CRM **Deals** API (creates a Deal + prospect/partner-rep Contacts + associations; `lib/deal-registrations/hubspot-deal.ts`), gated by the `integrations` `hubspotCrm` row — distinct from the contacts-only Forms path. See `docs/integrations/forms-hubspot-verification.md`. | `HUBSPOT_PORTAL_ID` (relay), `HUBSPOT_PRIVATE_APP_TOKEN` (CRM deal creation + GDPR erasure), `HUBSPOT_DEAL_PIPELINE`, `HUBSPOT_DEAL_STAGE` |
 | Microsoft Teams (Workflows) | Publish + lead notifications via Adaptive Cards | `WEBHOOK_TEAMS_URL`, `WEBHOOK_TEAMS_EVENTS` |
 | Standard Webhooks | Generic HMAC-signed outbound webhook | `WEBHOOK_GENERIC_URL`, `WEBHOOK_GENERIC_EVENTS`, `WEBHOOK_GENERIC_SIGNING_SECRET` |
 | Meilisearch | Full-text search + analytics | `MEILISEARCH_URL`, `MEILISEARCH_MASTER_KEY`, `MEILISEARCH_API_KEY` |
@@ -527,6 +529,13 @@ These are one-shot operations that **must** run against the prod Postgres on the
    - **Then, per taxonomy** (one-shot, quiet window, `--dry-run` first): `pnpm exec tsx --env-file=.env scripts/seed-<x>.ts` then `scripts/backfill-<x>.ts`. Seeds are idempotent/skip-safe; backfills map the legacy enum value → the seeded term (slug === enum value, so `?filter=<value>` URLs are preserved). Scripts: `seed-industries`/`backfill-case-study-industry`, `seed-resource-types`/`backfill-resource-type`, `seed-departments`/`backfill-job-department-ref` (after the existing `backfill-job-department` enum restore), `seed-regions`/`backfill-region-ref` (both News+Webinars), `seed-press-types`/`backfill-news-press-type`, `seed-webinar-types`/`backfill-webinar-type`.
    - `payload.update` re-fires content-collection afterChange hooks (Teams/IndexNow are publish-transition-gated → no fire on re-save; Meilisearch re-sync + web revalidate + a version row per doc). Taxonomy seeds fire no external hooks.
    - **Enum removal is deferred:** the legacy `select` columns stay until apps/web is fully switched to the relationships and verified live; a follow-up migration drops them then.
+
+20. **Deal-registration → HubSpot Deals provisioning.** The `/deal-registration` form now creates a real HubSpot **Deal** per submission (CRM API), not just a Contact — distinct from the lead Forms-Submissions path. The old Webflow form NEVER created deals (it was a contacts-only auto-collected form), so there is **no historical deal backfill** — this is net-new behavior. Pipeline:
+    - Endpoint `POST /api/deal-registrations/apply` (`payload/endpoints/deal-registration-apply.ts`) → durably persists a `deal-registrations` row (append-only collection, primary store) → best-effort `createHubspotDeal` (`payload/lib/deal-registrations/hubspot-deal.ts`): idempotent contact upsert (prospect + partner-rep, by email) + a Deal with custom properties + v4 default associations. Tables created by the `20260623_120000_add_deal_registrations` migration (runs via CI on deploy to `main`).
+    - **Before this feature creates deals in prod, an operator must (one-shot, gated on approval):** (a) run `apps/cms/scripts/setup-hubspot-deal-properties.ts` (`--dry-run` first, then real) to create the custom deal properties (`partner_name`, `partner_rep_name`, `partner_rep_email`, `deal_details`) under a "Deal Registration" group — requires `HUBSPOT_PRIVATE_APP_TOKEN` with `crm.schemas.deals.write` + `crm.objects.deals.write` + `crm.objects.contacts.*`; (b) set `HUBSPOT_DEAL_PIPELINE` / `HUBSPOT_DEAL_STAGE` on the droplet to the intended pipeline + entry-stage **internal ids** (HubSpot → Settings → Objects → Deals → Pipelines; the default Sales Pipeline's first stage is commonly `appointmentscheduled` — verify); (c) ensure an `integrations` row `kind: 'hubspotCrm'`, `enabled: true`, `source: 'db'` exists (Phase J3).
+    - **No registration lost:** until HubSpot is provisioned, submissions are still captured to the `deal-registrations` collection with `hubspotSync.status` = `skipped` (no integration) or `failed` (transient error). The `retryDealSync` cron (every 10 min) back-fills the Deal for any legit (`turnstilePassed=true`) un-synced row — both `failed` and pre-provisioning `skipped` — up to `DEAL_REG_SYNC_MAX_ATTEMPTS` (default 8); honeypot rows (`turnstilePassed=false`) are never retried.
+    - PII on `deal-registrations` is redacted after `DEAL_REG_RETENTION_DAYS` (default 365) by the `purgeDealRegistrations` cron (daily 03:30). Both crons respect the `PAYLOAD_AUTO_RUN` gate.
+    - The existing HubSpot `website-deal-registration` form (GUID `9d7c0791-…`, a book-a-demo clone with the wrong fields) is **unused** by this pipeline and can be archived in HubSpot.
 
 (Add new one-shot production tasks under this list as they come up — Phase H imports, Meilisearch initial index, etc.)
 

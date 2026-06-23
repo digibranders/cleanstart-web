@@ -1,6 +1,10 @@
 import type { CollectionConfig, Field } from 'payload';
 
 import { isAdmin, isAdminOrEditor } from '../access';
+import {
+  dealRegistrationApplyEndpoint,
+  dealRegistrationApplyOptionsEndpoint,
+} from '../endpoints/deal-registration-apply';
 
 const SYNC_STATUSES = [
   { label: 'Created', value: 'synced' },
@@ -38,7 +42,7 @@ export const DealRegistrations: CollectionConfig = {
     update: () => false,
     delete: isAdmin,
   },
-  endpoints: [],
+  endpoints: [dealRegistrationApplyEndpoint, dealRegistrationApplyOptionsEndpoint],
   fields: [
     { name: 'partnerName', type: 'text', required: true },
     { name: 'partnerRepFirstName', type: 'text', required: true },

@@ -208,6 +208,8 @@ export interface Config {
       dashboardRefreshFrequent: TaskDashboardRefreshFrequent;
       dashboardRefreshDaily: TaskDashboardRefreshDaily;
       analyticsCachePrune: TaskAnalyticsCachePrune;
+      retryDealSync: TaskRetryDealSync;
+      purgeDealRegistrations: TaskPurgeDealRegistrations;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -657,6 +659,7 @@ export interface Media {
    * Photographer / source attribution.
    */
   credit?: string | null;
+  prefix?: string | null;
   /**
    * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
    */
@@ -664,7 +667,6 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
-  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -5936,7 +5938,6 @@ export interface CareerApplication {
  */
 export interface Resume {
   id: number;
-  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -8763,6 +8764,8 @@ export interface PayloadJob {
           | 'dashboardRefreshFrequent'
           | 'dashboardRefreshDaily'
           | 'analyticsCachePrune'
+          | 'retryDealSync'
+          | 'purgeDealRegistrations'
           | 'schedulePublish';
         taskID: string;
         input?:
@@ -8811,6 +8814,8 @@ export interface PayloadJob {
         | 'dashboardRefreshFrequent'
         | 'dashboardRefreshDaily'
         | 'analyticsCachePrune'
+        | 'retryDealSync'
+        | 'purgeDealRegistrations'
         | 'schedulePublish'
       )
     | null;
@@ -10589,13 +10594,13 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   credit?: T;
+  prefix?: T;
   focalPoint?:
     | T
     | {
         x?: T;
         y?: T;
       };
-  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -12485,7 +12490,6 @@ export interface CareerApplicationsSelect<T extends boolean = true> {
  * via the `definition` "resumes_select".
  */
 export interface ResumesSelect<T extends boolean = true> {
-  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -13385,6 +13389,22 @@ export interface TaskDashboardRefreshDaily {
  * via the `definition` "TaskAnalyticsCachePrune".
  */
 export interface TaskAnalyticsCachePrune {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskRetryDealSync".
+ */
+export interface TaskRetryDealSync {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskPurgeDealRegistrations".
+ */
+export interface TaskPurgeDealRegistrations {
   input?: unknown;
   output?: unknown;
 }

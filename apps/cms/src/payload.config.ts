@@ -16,7 +16,6 @@ import { BrokenLinks } from './payload/collections/BrokenLinks';
 import { CaseStudies } from './payload/collections/CaseStudies';
 import { PageRegistry } from './payload/collections/PageRegistry';
 import { Categories } from './payload/collections/Categories';
-import { DealRegistrations } from './payload/collections/DealRegistrations';
 import { Events } from './payload/collections/Events';
 import { Forms } from './payload/collections/Forms';
 import { Guides } from './payload/collections/Guides';
@@ -37,6 +36,7 @@ import { Leads } from './payload/collections/Leads';
 import { LegalDocuments } from './payload/collections/Legal';
 import { Media } from './payload/collections/Media';
 import { PartnerApplications } from './payload/collections/PartnerApplications';
+import { DealRegistrations } from './payload/collections/DealRegistrations';
 import { News } from './payload/collections/News';
 import { NewsCategories } from './payload/collections/NewsCategories';
 import { Pages } from './payload/collections/Pages';
@@ -83,6 +83,8 @@ import {
 import { checkBrokenLinksTask } from './payload/jobs/check-broken-links';
 import { drainLeadQueueTask } from './payload/jobs/drain-lead-queue';
 import { purgeCareerApplicationsTask } from './payload/jobs/purge-career-applications';
+import { purgeDealRegistrationsTask } from './payload/jobs/purge-deal-registrations';
+import { retryDealSyncTask } from './payload/jobs/retry-deal-sync';
 import { purgeConsentLogTask } from './payload/jobs/purge-consent-log';
 import { purgeLeadsPiiTask } from './payload/jobs/purge-leads-pii';
 import { purgePreviewAuditTask } from './payload/jobs/purge-preview-audit';
@@ -445,6 +447,8 @@ export default buildConfig({
       dashboardRefreshFrequentTask,
       dashboardRefreshDailyTask,
       analyticsCachePruneTask,
+      retryDealSyncTask,
+      purgeDealRegistrationsTask,
     ],
     autoRun: [
       {
@@ -494,6 +498,14 @@ export default buildConfig({
       {
         cron: '0 7 * * *', // daily at 07:00 UTC — analyticsCache 90-day prune
         queue: 'analyticsCachePrune',
+      },
+      {
+        cron: '*/10 * * * *', // every 10 minutes — re-attempt failed deal-registration HubSpot Deal sync
+        queue: 'dealSyncRetry',
+      },
+      {
+        cron: '30 3 * * *', // daily at 03:30 UTC — deal-registration PII 365-day redaction
+        queue: 'dealRegistrationsPurge',
       },
       {
         cron: '* * * * *', // every minute — Payload built-in schedulePublish jobs land in the `default` queue; wait_until gates actual execution
