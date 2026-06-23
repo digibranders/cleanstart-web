@@ -38,6 +38,11 @@
       ]
     },
     {
+      "type": "relationship",
+      "name": "typeRef",
+      "relationTo": "resourceTypes"
+    },
+    {
       "type": "textarea",
       "name": "summary"
     },

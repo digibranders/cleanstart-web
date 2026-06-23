@@ -11,6 +11,7 @@ import { Events } from './Events';
 import { Forms } from './Forms';
 import { Guides } from './Guides';
 import { Industries } from './Industries';
+import { ResourceTypes } from './ResourceTypes';
 import { JobLocations } from './JobLocations';
 import { Jobs } from './Jobs';
 import { KnowledgeBase } from './KnowledgeBase';
@@ -93,6 +94,7 @@ const collections: { name: string; config: CollectionConfig }[] = [
   { name: 'Forms', config: Forms },
   { name: 'Guides', config: Guides },
   { name: 'Industries', config: Industries },
+  { name: 'ResourceTypes', config: ResourceTypes },
   { name: 'JobLocations', config: JobLocations },
   { name: 'Jobs', config: Jobs },
   { name: 'KnowledgeBase', config: KnowledgeBase },

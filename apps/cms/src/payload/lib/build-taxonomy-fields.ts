@@ -11,6 +11,7 @@ const PATH_PREFIX_BY_SLUG: Record<string, string> = {
   newsCategories: '/news',
   knowledgeCategories: '/knowledge-hub',
   industries: '/case-studies/industry',
+  resourceTypes: '/resources/type',
 };
 
 /**
@@ -23,7 +24,7 @@ const PATH_PREFIX_BY_SLUG: Record<string, string> = {
  * content collection — taxonomies are content too.
  */
 export const buildTaxonomyFields = (
-  selfSlug: 'categories' | 'newsCategories' | 'knowledgeCategories' | 'industries',
+  selfSlug: 'categories' | 'newsCategories' | 'knowledgeCategories' | 'industries' | 'resourceTypes',
 ): Field[] => [
   { name: 'name', type: 'text', required: true },
   slugField({ source: 'name' }),

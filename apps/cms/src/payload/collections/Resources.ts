@@ -54,6 +54,10 @@ export const Resources: CollectionConfig = {
     {
       name: 'type',
       type: 'select',
+      admin: {
+        description:
+          'Legacy enum — superseded by the Resource type relationship below. Kept during the taxonomy transition; removed once apps/web reads the relationship.',
+      },
       options: [
         { label: 'Whitepaper', value: 'whitepaper' },
         { label: 'Ebook', value: 'ebook' },
@@ -61,6 +65,15 @@ export const Resources: CollectionConfig = {
         { label: 'Architecture Insights', value: 'architecture-insights' },
         { label: 'Report', value: 'report' },
       ],
+    },
+    {
+      name: 'typeRef',
+      type: 'relationship',
+      relationTo: 'resourceTypes',
+      admin: {
+        description:
+          'Resource type taxonomy reference. Seeded/backfilled from the legacy `type` enum; editors manage the list under Taxonomies → Resource types.',
+      },
     },
     { name: 'summary', type: 'textarea' },
     mediaUploadField({
