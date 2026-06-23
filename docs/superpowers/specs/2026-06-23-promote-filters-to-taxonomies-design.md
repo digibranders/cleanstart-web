@@ -1,7 +1,9 @@
 # Promote inline filters to editor-managed taxonomies
 
 **Date:** 2026-06-23
-**Status:** Approved (brainstorming) — Phase 1 implementation in progress
+**Status:** All 6 taxonomies code-complete (Phases 1–5) + Phase 1 web dual-read.
+Migrations NOT yet generated (blocked — interactive `migrate:create`; see
+"Migration generation" below). Nothing deployable until migrations land.
 **Scope:** `apps/cms` (schema + collections + migrations + seed/backfill scripts) and `apps/web` (filter rewiring)
 
 ## Goal
@@ -95,3 +97,79 @@ template established in Phase 1.
 - **Local DB is push-mode** — `payload migrate` hangs locally; develop against
   dev server, let CI run the migration on deploy.
 - **Type drift** — regenerate `payload-types.ts` after each schema change.
+
+## Implementation log (commits on `development`, not pushed)
+
+| Phase | Taxonomy | Source enum | Ref field(s) | Commit |
+|-------|----------|-------------|--------------|--------|
+| relabel | `categories` → "Blog categories" | — | — | `f4e23fc9` |
+| 1 | `industries` | CaseStudies.industry | `industryRef` | `f4e23fc9` |
+| 2 | `resourceTypes` | Resources.type | `typeRef` | `7d9893ea` |
+| 3 | `departments` | Jobs.department | `departmentRef` | `fb586cff` |
+| 4 | `regions` (shared) | News.region + Webinars.region | `regionRef` (both) | `2821d366` |
+| 5 | `pressTypes` | News.pressType | `pressTypeRef` | `2821d366` |
+| 5 | `webinarTypes` | Webinars.webinarType | `webinarTypeRef` | `2821d366` |
+| web 1 | industries dual-read | — | — | `15002e93` |
+
+Each content collection KEEPS its legacy enum (reversible). Web reads the
+relationship with enum fallback (`resolveIndustryLabel` pattern).
+
+## Migration generation (the blocker)
+
+`payload migrate:create` is **interactive** — it asks "Is `enum_<x>` created
+or renamed?" for every new enum and reads the answer from a `prompts` select
+that requires a real TTY. It cannot be driven from a non-interactive/CI shell
+(piped stdin and PTY-via-`script` both fail). So the migration must be created
+in a **real terminal**. The reliable recipe (validated up to the prompt):
+
+```bash
+# From apps/cms, against a CLEAN sibling DB so the diff is isolated from local
+# push-drift. Replace <conn> with DATABASE_URI's user/host.
+psql "$DATABASE_URI" -c "DROP DATABASE IF EXISTS cleanstart_miggen;"
+psql "$DATABASE_URI" -c "CREATE DATABASE cleanstart_miggen;"
+MIG="${DATABASE_URI/\/cleanstart/\/cleanstart_miggen}"
+
+# 1. Apply all committed migrations → exact pre-change baseline:
+DATABASE_URI="$MIG" PAYLOAD_DB_PUSH=false pnpm exec payload migrate
+
+# 2. Generate the diff (INTERACTIVE — answer "create" to every enum prompt;
+#    the delta is purely additive so "create" is always correct):
+DATABASE_URI="$MIG" PAYLOAD_DB_PUSH=false pnpm exec payload migrate:create add_filter_taxonomies
+
+# 3. Inspect the generated src/migrations/<ts>_add_filter_taxonomies.ts —
+#    confirm it ONLY creates tables/columns/enums (no DROP/RENAME of existing
+#    objects). Then drop the throwaway DB:
+psql "$DATABASE_URI" -c "DROP DATABASE IF EXISTS cleanstart_miggen;"
+```
+
+CAVEAT: because the concurrent `deal-registrations` collection has no
+migration either, this single diff will also include `deal_registrations`.
+Either keep it as one catch-up migration, or land the `deal-registrations`
+migration first so this diff is taxonomy-only.
+
+After generating: regenerate types if needed, run `pnpm --filter
+@cleanstart/cms test/lint/typecheck`, commit the migration. CI applies it on
+deploy.
+
+## Per-phase production rollout runbook
+
+Per taxonomy, AFTER the migration deploys (one-shot, in a quiet window):
+
+1. **Seed** the vocabulary: `pnpm exec tsx --env-file=.env scripts/seed-<x>.ts`
+   (`--dry-run` first). Idempotent.
+2. **Backfill** the relationship: `pnpm exec tsx --env-file=.env
+   scripts/backfill-<x>.ts` (`--dry-run` first). Idempotent.
+3. **Verify** the listing on the live site shows the term (web dual-read
+   already prefers the relationship).
+4. **Web filter switch** (later): point the listing filter at the relationship
+   slug instead of the enum.
+5. **Enum removal** (last): once web is verified, a follow-up migration drops
+   the legacy `select` column.
+
+Scripts by taxonomy: industries → `seed-industries` / `backfill-case-study-industry`;
+resourceTypes → `seed-resource-types` / `backfill-resource-type`; departments →
+`seed-departments` / `backfill-job-department-ref` (run after the existing
+`backfill-job-department` enum restore); regions → `seed-regions` /
+`backfill-region-ref` (both News+Webinars); pressTypes → `seed-press-types` /
+`backfill-news-press-type`; webinarTypes → `seed-webinar-types` /
+`backfill-webinar-type`.
