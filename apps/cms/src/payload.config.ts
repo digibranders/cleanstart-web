@@ -16,9 +16,11 @@ import { BrokenLinks } from './payload/collections/BrokenLinks';
 import { CaseStudies } from './payload/collections/CaseStudies';
 import { PageRegistry } from './payload/collections/PageRegistry';
 import { Categories } from './payload/collections/Categories';
+import { DealRegistrations } from './payload/collections/DealRegistrations';
 import { Events } from './payload/collections/Events';
 import { Forms } from './payload/collections/Forms';
 import { Guides } from './payload/collections/Guides';
+import { Industries } from './payload/collections/Industries';
 import { AnalyticsCache } from './payload/collections/AnalyticsCache';
 import { ConsentLog } from './payload/collections/ConsentLog';
 import { Integrations } from './payload/collections/Integrations';
@@ -348,11 +350,13 @@ export default buildConfig({
     NewsCategories,
     KnowledgeCategories,
     JobLocations,
+    Industries,
 
     // Marketing — Leads (daily inbox) before Forms (one-time setup).
     Leads,
     Forms,
     PartnerApplications,
+    DealRegistrations,
 
     // SEO — the SEO editor's toolkit. Redirects (every slug change) and
     // broken-link reports; SEO defaults global trails in the `globals`
