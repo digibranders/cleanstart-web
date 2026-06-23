@@ -29,7 +29,7 @@ const num = (v: string | null | undefined): number => {
   return Number.isFinite(n) ? n : 0;
 };
 
-const buildClient = (creds: Ga4Credentials): BetaAnalyticsDataClient => {
+export const buildClient = (creds: Ga4Credentials): BetaAnalyticsDataClient => {
   const clientEmail = creds.serviceAccountJson.client_email;
   const privateKey = creds.serviceAccountJson.private_key;
   const projectId = creds.serviceAccountJson.project_id;
