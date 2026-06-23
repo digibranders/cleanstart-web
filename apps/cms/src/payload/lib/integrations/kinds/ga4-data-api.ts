@@ -39,6 +39,14 @@ const buildClient = (creds: Ga4Credentials): BetaAnalyticsDataClient => {
       ...(typeof privateKey === 'string' ? { private_key: privateKey } : {}),
     },
     ...(typeof projectId === 'string' ? { projectId } : {}),
+    // Force REST/HTTP transport instead of the default gRPC. Inside the
+    // instrumented `next start` runtime, OpenTelemetry/Sentry auto-
+    // instrumentation breaks @grpc/grpc-js and the client throws an opaque
+    // error ("undefined undefined: undefined"), even though gRPC works in a
+    // plain node process. REST returns byte-identical report data and is
+    // unaffected. (GSC uses `googleapis`, which is REST-only, so it never hit
+    // this.)
+    fallback: true,
   });
 };
 
