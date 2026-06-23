@@ -219,7 +219,7 @@ function FactoryEnclosure() {
             panel without darkening it. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/cleanstart-factory/factory-overlay.png"
+          src="/images/cleanstart-factory/factory-overlay.webp"
           alt=""
           aria-hidden
           loading="lazy"

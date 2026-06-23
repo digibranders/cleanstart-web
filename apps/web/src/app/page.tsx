@@ -50,8 +50,12 @@ export default async function Home(): Promise<React.ReactElement> {
   // V4 redesign: hero + factory + testimonials/stats section.
   // Impact stats are editable in the CMS (`impactStats` global) and shared with
   // the Images catalog hero; falls back to defaults if the CMS is unreachable.
-  const impactStats = await getImpactStats();
-  const graph = await getPageGraph("/", [faqPageSchema([...HOME_FAQ_ITEMS])]);
+  // Both are independent CMS reads — fetch them in parallel so a cold render
+  // pays one round-trip of latency, not two (cuts homepage TTFB on cache miss).
+  const [impactStats, graph] = await Promise.all([
+    getImpactStats(),
+    getPageGraph("/", [faqPageSchema([...HOME_FAQ_ITEMS])]),
+  ]);
   return (
     <>
       {/* FAQPage structured data for the 6 home FAQs — feeds answer engines /
