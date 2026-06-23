@@ -89,6 +89,20 @@ const apiNoindexHeader = { key: 'X-Robots-Tag', value: 'noindex, nofollow' };
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Keep the Google API client libraries external (required from node_modules
+  // at runtime) instead of letting Next bundle them into the server chunks.
+  // `@google-analytics/data` (gRPC via google-gax) and `googleapis` rely on
+  // dynamic requires + `.proto`/`.json` descriptor assets that don't survive
+  // Next's server bundling — once bundled, the GA4 client throws an opaque
+  // "undefined undefined: undefined" at call time, so the dashboardRefreshFrequent
+  // cron never populated `analyticsCache`. The unbundled module works (verified
+  // in prod: 4322 sessions). withPayload merges this with its own externals.
+  serverExternalPackages: [
+    '@google-analytics/data',
+    'google-gax',
+    'googleapis',
+    'google-auth-library',
+  ],
   // Pin Turbopack's workspace root to the monorepo root. Without this, Next
   // infers the root from the nearest lockfile and can mis-resolve in the pnpm
   // workspace; Turbopack also requires an absolute path here.
