@@ -89,6 +89,7 @@ export interface Config {
     leads: Lead;
     forms: Form;
     'partner-applications': PartnerApplication;
+    'deal-registrations': DealRegistration;
     redirects: Redirect;
     brokenLinks: BrokenLink;
     pageRegistry: PageRegistry;
@@ -136,6 +137,7 @@ export interface Config {
     leads: LeadsSelect<false> | LeadsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'partner-applications': PartnerApplicationsSelect<false> | PartnerApplicationsSelect<true>;
+    'deal-registrations': DealRegistrationsSelect<false> | DealRegistrationsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     brokenLinks: BrokenLinksSelect<false> | BrokenLinksSelect<true>;
     pageRegistry: PageRegistrySelect<false> | PageRegistrySelect<true>;
@@ -6926,6 +6928,52 @@ export interface PartnerApplication {
   createdAt: string;
 }
 /**
+ * Partner deal registrations (append-only). Submitted via the /deal-registration form; a HubSpot Deal is created per row.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "deal-registrations".
+ */
+export interface DealRegistration {
+  id: number;
+  partnerName: string;
+  partnerRepFirstName: string;
+  partnerRepLastName: string;
+  partnerRepEmail: string;
+  partnerRepPhone?: string | null;
+  prospectFirstName: string;
+  prospectLastName: string;
+  prospectEmail: string;
+  prospectPhone?: string | null;
+  dealDetails?: string | null;
+  /**
+   * Referrer URL.
+   */
+  source?: string | null;
+  ip?: string | null;
+  userAgent?: string | null;
+  consentGivenAt?: string | null;
+  consentSnapshot?: string | null;
+  privacyPolicyVersion?: string | null;
+  consentCategories?:
+    | {
+        category?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  hubspotSync?: {
+    status?: ('synced' | 'failed' | 'skipped') | null;
+    dealId?: string | null;
+    error?: string | null;
+    attempts?: number | null;
+    lastAttemptAt?: string | null;
+  };
+  honeypot?: string | null;
+  turnstilePassed?: boolean | null;
+  piiRedactedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
@@ -7772,6 +7820,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'partner-applications';
         value: number | PartnerApplication;
+      } | null)
+    | ({
+        relationTo: 'deal-registrations';
+        value: number | DealRegistration;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -10817,6 +10869,48 @@ export interface PartnerApplicationsSelect<T extends boolean = true> {
         status?: T;
         messageId?: T;
         error?: T;
+      };
+  honeypot?: T;
+  turnstilePassed?: T;
+  piiRedactedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "deal-registrations_select".
+ */
+export interface DealRegistrationsSelect<T extends boolean = true> {
+  partnerName?: T;
+  partnerRepFirstName?: T;
+  partnerRepLastName?: T;
+  partnerRepEmail?: T;
+  partnerRepPhone?: T;
+  prospectFirstName?: T;
+  prospectLastName?: T;
+  prospectEmail?: T;
+  prospectPhone?: T;
+  dealDetails?: T;
+  source?: T;
+  ip?: T;
+  userAgent?: T;
+  consentGivenAt?: T;
+  consentSnapshot?: T;
+  privacyPolicyVersion?: T;
+  consentCategories?:
+    | T
+    | {
+        category?: T;
+        id?: T;
+      };
+  hubspotSync?:
+    | T
+    | {
+        status?: T;
+        dealId?: T;
+        error?: T;
+        attempts?: T;
+        lastAttemptAt?: T;
       };
   honeypot?: T;
   turnstilePassed?: T;

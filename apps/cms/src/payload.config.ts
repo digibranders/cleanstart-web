@@ -30,6 +30,7 @@ import { Leads } from './payload/collections/Leads';
 import { LegalDocuments } from './payload/collections/Legal';
 import { Media } from './payload/collections/Media';
 import { PartnerApplications } from './payload/collections/PartnerApplications';
+import { DealRegistrations } from './payload/collections/DealRegistrations';
 import { News } from './payload/collections/News';
 import { NewsCategories } from './payload/collections/NewsCategories';
 import { Pages } from './payload/collections/Pages';
@@ -353,6 +354,7 @@ export default buildConfig({
     Leads,
     Forms,
     PartnerApplications,
+    DealRegistrations,
 
     // SEO — the SEO editor's toolkit. Redirects (every slug change) and
     // broken-link reports; SEO defaults global trails in the `globals`
