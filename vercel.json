@@ -6,8 +6,8 @@
   "ignoreCommand": "git diff --quiet HEAD^ HEAD -- apps/web packages pnpm-lock.yaml 2>/dev/null && exit 0 || exit 1",
   "git": {
     "deploymentEnabled": {
-      "development": false,
-      "farheen": false
+      "main": true,
+      "**": false
     }
   }
 }
