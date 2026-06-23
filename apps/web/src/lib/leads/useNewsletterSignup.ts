@@ -3,21 +3,12 @@
 import { useRef, useState } from "react";
 import { submitLead } from "./submitLead";
 
-/**
- * Shared submit logic for the email-only newsletter CTAs (Blogs, Blog detail,
- * Webinars, Events). Each CTA renders its own layout but shares this hook so
- * the `submitLead` call, consent snapshot, and in-flight/success/error state
- * live in one place.
- *
- * The newsletter form is exempt from Turnstile server-side (see the submit
- * endpoint), so these CTAs render no widget. Subscribing is the single opt-in
- * act; we snapshot that consent with a "marketing" category.
- */
 const NEWSLETTER_CONSENT_TEXT =
   "I agree to receive the CleanStart newsletter and to the storage & processing of my email per the Privacy Policy.";
 
 export interface NewsletterSignup {
   emailRef: React.RefObject<HTMLInputElement | null>;
+  consentRef: React.RefObject<HTMLInputElement | null>;
   submitted: boolean;
   submitting: boolean;
   error: string | null;
@@ -26,6 +17,7 @@ export interface NewsletterSignup {
 
 export function useNewsletterSignup(): NewsletterSignup {
   const emailRef = useRef<HTMLInputElement>(null);
+  const consentRef = useRef<HTMLInputElement>(null);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,6 +27,10 @@ export function useNewsletterSignup(): NewsletterSignup {
     e.preventDefault();
     const email = emailRef.current?.value.trim();
     if (!email) return;
+    if (!consentRef.current?.checked) {
+      setError("Please agree to the Privacy Policy to subscribe.");
+      return;
+    }
     if (inFlightRef.current) return;
     inFlightRef.current = true;
     setSubmitting(true);
@@ -56,11 +52,12 @@ export function useNewsletterSignup(): NewsletterSignup {
     if (result.ok) {
       setSubmitted(true);
       if (emailRef.current) emailRef.current.value = "";
+      if (consentRef.current) consentRef.current.checked = false;
       window.setTimeout(() => setSubmitted(false), 5000);
     } else {
       setError("Something went wrong. Please try again.");
     }
   };
 
-  return { emailRef, submitted, submitting, error, handleSubmit };
+  return { emailRef, consentRef, submitted, submitting, error, handleSubmit };
 }

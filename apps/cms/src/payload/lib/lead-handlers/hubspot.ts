@@ -106,11 +106,13 @@ export const hubspotHandler: LeadHandler = {
       id: submission.formId,
       depth: 0,
       overrideAccess: true,
-    })) as { hubspotFormGuid?: string | null } | null;
+    })) as { hubspotFormGuid?: string | null; hubspotSubscriptionTypeId?: string | null } | null;
     const guid = form?.hubspotFormGuid?.trim();
     if (!guid) {
       return { handler: 'hubspot', status: 'skipped', reason: 'no-hubspot-form-guid' };
     }
+    const rawSubscriptionTypeId = form?.hubspotSubscriptionTypeId?.trim();
+    const subscriptionTypeId = rawSubscriptionTypeId ? Number(rawSubscriptionTypeId) : Number.NaN;
 
     // Field names in submission.fields are HubSpot internal names by design.
     const fields = Object.entries(submission.fields)
@@ -125,12 +127,16 @@ export const hubspotHandler: LeadHandler = {
       context: { pageUri: submission.source ?? '' },
     };
     if (submission.consent) {
-      body.legalConsentOptions = {
-        consent: {
-          consentToProcess: true,
-          text: submission.consent.snapshot,
-        },
+      const consent: Record<string, unknown> = {
+        consentToProcess: true,
+        text: submission.consent.snapshot,
       };
+      if (Number.isFinite(subscriptionTypeId)) {
+        consent.communications = [
+          { value: true, subscriptionTypeId, text: submission.consent.snapshot },
+        ];
+      }
+      body.legalConsentOptions = { consent };
     }
 
     try {

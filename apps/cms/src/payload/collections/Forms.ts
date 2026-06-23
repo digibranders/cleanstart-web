@@ -266,6 +266,15 @@ export const Forms: CollectionConfig = {
           'GUID of the matching HubSpot form in the "website" folder. Set this to relay submissions to HubSpot via the Forms API. Leave empty to skip HubSpot sync.',
       },
     },
+    {
+      name: 'hubspotSubscriptionTypeId',
+      type: 'text',
+      admin: {
+        position: 'sidebar',
+        description:
+          'Optional. HubSpot subscription type internal id this form opts the contact into (marketing subscription opt-in). Set for the newsletter form; leave empty for forms that should not subscribe.',
+      },
+    },
   ],
   hooks: {
     // formsCoerceHook runs first: enforces consent-required + rejects unsafe

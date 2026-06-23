@@ -1,5 +1,6 @@
 "use client";
 
+import { NewsletterConsent } from "@/components/forms/NewsletterConsent";
 import { useNewsletterSignup } from "@/lib/leads/useNewsletterSignup";
 
 /**
@@ -7,7 +8,7 @@ import { useNewsletterSignup } from "@/lib/leads/useNewsletterSignup";
  * in the corners, plus a blue→teal "Subscribe" gradient button.
  */
 export function BlogDetailCTA(): React.ReactElement {
-  const { emailRef, submitted, submitting, error, handleSubmit } = useNewsletterSignup();
+  const { emailRef, consentRef, submitted, submitting, error, handleSubmit } = useNewsletterSignup();
 
   return (
     <div className="absolute inset-0 overflow-hidden" style={{ background: "#fff" }}>
@@ -134,49 +135,52 @@ export function BlogDetailCTA(): React.ReactElement {
             ) : (
               <form
                 onSubmit={handleSubmit}
-                className="relative flex items-center w-full"
+                className="flex flex-col gap-3 w-full"
                 aria-label="Newsletter subscription"
               >
-                <div
-                  className="relative overflow-hidden flex-1 min-w-0"
-                  style={{
-                    height: "44px",
-                    background: "rgba(0,0,0,0.05)",
-                    border: "1px solid rgba(156,149,160,0.6)",
-                    borderRight: "none",
-                    borderRadius: "12px 0 0 12px",
-                  }}
-                >
-                  <input
-                    ref={emailRef}
-                    type="email"
-                    name="email"
-                    required
-                    placeholder="Enter your email"
-                    className="absolute inset-0 w-full h-full bg-transparent px-[14px] text-[#111] placeholder:text-[#7E7E7E] text-base leading-[1.5] outline-none"
-                    style={{ fontWeight: 400 }}
-                  />
+                <div className="relative flex items-center w-full">
+                  <div
+                    className="relative overflow-hidden flex-1 min-w-0"
+                    style={{
+                      height: "44px",
+                      background: "rgba(0,0,0,0.05)",
+                      border: "1px solid rgba(156,149,160,0.6)",
+                      borderRight: "none",
+                      borderRadius: "12px 0 0 12px",
+                    }}
+                  >
+                    <input
+                      ref={emailRef}
+                      type="email"
+                      name="email"
+                      required
+                      placeholder="Enter your email"
+                      className="absolute inset-0 w-full h-full bg-transparent px-[14px] text-[#111] placeholder:text-[#7E7E7E] text-base leading-[1.5] outline-none"
+                      style={{ fontWeight: 400 }}
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    aria-busy={submitting || undefined}
+                    className="shrink-0 inline-flex cursor-pointer items-center justify-center font-medium text-white disabled:cursor-not-allowed disabled:opacity-70"
+                    style={{
+                      height: "44px",
+                      padding: "0 18px",
+                      // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored submit-button label, fixed 18px to match the inline gradient pill chrome. See RESPONSIVE-AUDIT.md §14.3.
+                      fontSize: "var(--fs-button)",
+                      letterSpacing: "-0.01em",
+                      background:
+                        "linear-gradient(180deg, #3960F9 0%, #2B97D1 100%)",
+                      borderRadius: "0 12px 12px 0",
+                      boxShadow:
+                        "0 0 0 1px #3960F9, 0 1px 2px -1px rgba(9,6,63,0.4), inset 0 1px 0 0 rgba(255,255,255,0.16)",
+                    }}
+                  >
+                    {submitting ? "Subscribing…" : "Subscribe"}
+                  </button>
                 </div>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  aria-busy={submitting || undefined}
-                  className="shrink-0 inline-flex cursor-pointer items-center justify-center font-medium text-white disabled:cursor-not-allowed disabled:opacity-70"
-                  style={{
-                    height: "44px",
-                    padding: "0 18px",
-                    // eslint-disable-next-line no-restricted-syntax -- v3 exception: Figma-anchored submit-button label, fixed 18px to match the inline gradient pill chrome. See RESPONSIVE-AUDIT.md §14.3.
-                    fontSize: "var(--fs-button)",
-                    letterSpacing: "-0.01em",
-                    background:
-                      "linear-gradient(180deg, #3960F9 0%, #2B97D1 100%)",
-                    borderRadius: "0 12px 12px 0",
-                    boxShadow:
-                      "0 0 0 1px #3960F9, 0 1px 2px -1px rgba(9,6,63,0.4), inset 0 1px 0 0 rgba(255,255,255,0.16)",
-                  }}
-                >
-                  {submitting ? "Subscribing…" : "Subscribe"}
-                </button>
+                <NewsletterConsent ref={consentRef} />
               </form>
             )}
             {error && (

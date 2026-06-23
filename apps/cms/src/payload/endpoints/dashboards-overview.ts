@@ -1,11 +1,13 @@
-import type { Endpoint } from 'payload';
-import { z } from 'zod';
+import type { Endpoint, PayloadRequest } from 'payload';
 
 import { hasAnyRole } from '../access/typed-user';
 import { COLLECTION_PATH_PREFIX, buildOverviewCacheKey } from '../lib/dashboards/overview-filters';
+import type { OverviewWindow } from '../lib/dashboards/overview-types';
 import { TTL_MS, isStale, readCache, writeCache } from '../lib/integrations/cache';
 import { resolveGa4Credentials } from '../lib/integrations/credentials';
 import { fetchGa4Overview } from '../lib/integrations/kinds/ga4-overview';
+import { fetchGscOverview } from '../lib/integrations/kinds/gsc-overview';
+import { getGscCredentialsFromRow } from '../lib/integrations/kinds/gsc-search-analytics';
 import { findRowsOfKind } from '../lib/integrations/kinds/types';
 
 const json = (data: unknown, init?: ResponseInit): Response =>
@@ -14,11 +16,20 @@ const json = (data: unknown, init?: ResponseInit): Response =>
     headers: { 'content-type': 'application/json', ...(init?.headers ?? {}) },
   });
 
-const querySchema = z.object({
-  window: z.enum(['7d', '28d', '90d']).default('28d'),
-  country: z.string().min(1).max(80).optional(),
-  collection: z.string().min(1).max(40).optional(),
-});
+const WINDOWS: readonly OverviewWindow[] = ['7d', '28d', '90d'];
+
+// Read query params defensively: `req.query` is not populated for custom
+// endpoints in this Payload version, so read from `req.searchParams`
+// (a URLSearchParams). Unknown/missing values fall back to safe defaults —
+// never a 400, so a bad/absent param degrades to the default view.
+const readParam = (req: PayloadRequest, name: string): string | null => {
+  const v = req.searchParams?.get?.(name);
+  return v && v.length > 0 ? v : null;
+};
+const readWindow = (req: PayloadRequest): OverviewWindow => {
+  const w = readParam(req, 'window');
+  return w && (WINDOWS as readonly string[]).includes(w) ? (w as OverviewWindow) : '28d';
+};
 
 export const ga4OverviewEndpoint: Endpoint = {
   path: '/dashboards/ga4-overview',
@@ -27,12 +38,10 @@ export const ga4OverviewEndpoint: Endpoint = {
     if (!hasAnyRole(req.user, ['admin', 'editor'])) {
       return json({ ok: false, error: 'forbidden' }, { status: 403 });
     }
-    const parsed = querySchema.safeParse(req.query);
-    if (!parsed.success) return json({ ok: false, error: 'bad_params' }, { status: 400 });
     const filters = {
-      window: parsed.data.window,
-      country: parsed.data.country ?? null,
-      collection: parsed.data.collection ?? null,
+      window: readWindow(req),
+      country: readParam(req, 'country'),
+      collection: readParam(req, 'collection'),
     };
 
     const rows = await findRowsOfKind(req.payload, 'ga4DataApi');
@@ -66,8 +75,6 @@ export const ga4OverviewEndpoint: Endpoint = {
   },
 };
 
-// Real handler lands in Phase 3 (Task 10). Stub returns "not configured" so the
-// dashboard renders its empty state without erroring.
 export const gscOverviewEndpoint: Endpoint = {
   path: '/dashboards/gsc-overview',
   method: 'get',
@@ -75,6 +82,35 @@ export const gscOverviewEndpoint: Endpoint = {
     if (!hasAnyRole(req.user, ['admin', 'editor'])) {
       return json({ ok: false, error: 'forbidden' }, { status: 403 });
     }
-    return json({ ok: true, configured: false, payload: null });
+    const window = readWindow(req);
+    // GSC overview is window-only (no country/collection segmentation in v1).
+    const key = buildOverviewCacheKey('gsc', { window, country: null, collection: null });
+
+    const rows = await findRowsOfKind(req.payload, 'gscSearchAnalyticsApi');
+    const configured = rows.length > 0;
+    const cached = await readCache(req.payload, 'gscSearchAnalyticsApi', 'global', key);
+    if (cached && !isStale(cached, TTL_MS.gscSearchAnalyticsApi)) {
+      return json({ ok: true, configured: true, fromCache: true, capturedAt: cached.capturedAt, payload: cached.payload });
+    }
+    if (!configured) return json({ ok: true, configured: false, payload: null });
+
+    for (const row of rows) {
+      const creds = getGscCredentialsFromRow(row);
+      if (!creds) continue;
+      try {
+        const payload = await fetchGscOverview(creds, window);
+        await writeCache(req.payload, 'gscSearchAnalyticsApi', 'global', key, payload);
+        return json({ ok: true, configured: true, fromCache: false, capturedAt: new Date().toISOString(), payload });
+      } catch (err) {
+        req.payload.logger.warn(
+          { error: err instanceof Error ? err.message : String(err), key },
+          'gsc overview fetch failed',
+        );
+      }
+    }
+    if (cached) {
+      return json({ ok: true, configured: true, fromCache: true, stale: true, capturedAt: cached.capturedAt, payload: cached.payload });
+    }
+    return json({ ok: false, configured: true, error: 'fetch_failed' }, { status: 502 });
   },
 };

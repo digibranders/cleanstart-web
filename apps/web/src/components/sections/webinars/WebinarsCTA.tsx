@@ -1,12 +1,13 @@
 "use client";
 
+import { NewsletterConsent } from "@/components/forms/NewsletterConsent";
 import { useNewsletterSignup } from "@/lib/leads/useNewsletterSignup";
 
 /**
  * Newsletter CTA for the Webinars page, rendered inside the Footer's CTA slot.
  */
 export function WebinarsCTA(): React.ReactElement {
-  const { emailRef, submitted, submitting, error, handleSubmit } = useNewsletterSignup();
+  const { emailRef, consentRef, submitted, submitting, error, handleSubmit } = useNewsletterSignup();
 
   return (
     <div
@@ -130,44 +131,47 @@ export function WebinarsCTA(): React.ReactElement {
             ) : (
               <form
                 onSubmit={handleSubmit}
-                className="relative flex items-center w-full"
+                className="flex flex-col gap-3 w-full"
                 aria-label="Webinars newsletter subscription"
               >
-                <div
-                  className="relative overflow-hidden flex-1 min-w-0"
-                  style={{
-                    height: "44px",
-                    background: "rgba(255,255,255,0.2)",
-                    border: "1px solid rgba(237,203,255,0.6)",
-                    borderRight: "none",
-                    borderRadius: "12px 0 0 12px",
-                  }}
-                >
-                  <input
-                    ref={emailRef}
-                    type="email"
-                    name="email"
-                    required
-                    placeholder="Enter your email"
-                    className="absolute inset-0 w-full h-full bg-transparent px-[14px] text-white placeholder:text-white/60 text-base leading-[1.5] outline-none"
-                    style={{ fontWeight: 400 }}
-                  />
-                </div>
+                <div className="relative flex items-center w-full">
+                  <div
+                    className="relative overflow-hidden flex-1 min-w-0"
+                    style={{
+                      height: "44px",
+                      background: "rgba(255,255,255,0.2)",
+                      border: "1px solid rgba(237,203,255,0.6)",
+                      borderRight: "none",
+                      borderRadius: "12px 0 0 12px",
+                    }}
+                  >
+                    <input
+                      ref={emailRef}
+                      type="email"
+                      name="email"
+                      required
+                      placeholder="Enter your email"
+                      className="absolute inset-0 w-full h-full bg-transparent px-[14px] text-white placeholder:text-white/60 text-base leading-[1.5] outline-none"
+                      style={{ fontWeight: 400 }}
+                    />
+                  </div>
 
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  aria-busy={submitting || undefined}
-                  className="cs-btn-glass cs-btn-glass--no-lift shrink-0 disabled:cursor-not-allowed disabled:opacity-70"
-                  style={{
-                    ["--cs-btn-px" as string]: "16px",
-                    ["--cs-btn-fs" as string]: "16px",
-                    borderRadius: "0 12px 12px 0",
-                    borderLeft: "none",
-                  }}
-                >
-                  {submitting ? "Subscribing…" : "Subscribe"}
-                </button>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    aria-busy={submitting || undefined}
+                    className="cs-btn-glass cs-btn-glass--no-lift shrink-0 disabled:cursor-not-allowed disabled:opacity-70"
+                    style={{
+                      ["--cs-btn-px" as string]: "16px",
+                      ["--cs-btn-fs" as string]: "16px",
+                      borderRadius: "0 12px 12px 0",
+                      borderLeft: "none",
+                    }}
+                  >
+                    {submitting ? "Subscribing…" : "Subscribe"}
+                  </button>
+                </div>
+                <NewsletterConsent ref={consentRef} />
               </form>
             )}
             {error && (

@@ -53,6 +53,17 @@ describe('dealRegistrationApplyEndpoint', () => {
     const res = await (dealRegistrationApplyOptionsEndpoint.handler as (r: unknown) => Promise<Response>)(makeReq());
     expect([200, 204]).toContain(res.status);
   });
+  it('sets Access-Control-Allow-Credentials on the preflight and the POST (web fetch uses credentials:include)', async () => {
+    const preflight = await (
+      dealRegistrationApplyOptionsEndpoint.handler as (r: unknown) => Promise<Response>
+    )(makeReq());
+    expect(preflight.headers.get('access-control-allow-credentials')).toBe('true');
+    expect(preflight.headers.get('access-control-allow-origin')).toBe(ALLOWED);
+
+    const post = await runPost(makeReq());
+    expect(post.headers.get('access-control-allow-credentials')).toBe('true');
+    expect(post.headers.get('access-control-allow-origin')).toBe(ALLOWED);
+  });
   it('rejects a disallowed origin with 403', async () => {
     const res = await runPost(makeReq({ origin: 'https://evil.example' }));
     expect(res.status).toBe(403);

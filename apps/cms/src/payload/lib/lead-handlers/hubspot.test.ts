@@ -14,10 +14,14 @@ const submission: LeadSubmission = {
   consent: { snapshot: 'I agree…', givenAt: '2026-06-02T00:00:00Z' },
 };
 
-const ctx = (guid: string | null) =>
+const ctx = (guid: string | null, subscriptionTypeId?: string) =>
   ({
     payload: {
-      findByID: vi.fn(async () => (guid ? { id: 7, hubspotFormGuid: guid } : { id: 7 })),
+      findByID: vi.fn(async () =>
+        guid
+          ? { id: 7, hubspotFormGuid: guid, hubspotSubscriptionTypeId: subscriptionTypeId ?? null }
+          : { id: 7 },
+      ),
     },
     primarySucceeded: true,
     leadId: 7,
@@ -61,6 +65,27 @@ describe('hubspotHandler (Forms API)', () => {
       ]),
     );
     expect(sent.legalConsentOptions).toBeDefined();
+  });
+
+  it('includes a marketing-subscription opt-in when the form has hubspotSubscriptionTypeId', async () => {
+    const fetchSpy = vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({}) });
+    vi.stubGlobal('fetch', fetchSpy);
+    await hubspotHandler.run(submission, ctx('guid-1', '42'));
+    const [, init] = fetchSpy.mock.calls[0] ?? [];
+    const sent = JSON.parse((init as RequestInit).body as string);
+    expect(sent.legalConsentOptions.consent.communications).toEqual([
+      { value: true, subscriptionTypeId: 42, text: 'I agree…' },
+    ]);
+    expect(sent.legalConsentOptions.consent.consentToProcess).toBe(true);
+  });
+
+  it('omits communications when the form has no hubspotSubscriptionTypeId', async () => {
+    const fetchSpy = vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({}) });
+    vi.stubGlobal('fetch', fetchSpy);
+    await hubspotHandler.run(submission, ctx('guid-1'));
+    const [, init] = fetchSpy.mock.calls[0] ?? [];
+    const sent = JSON.parse((init as RequestInit).body as string);
+    expect(sent.legalConsentOptions.consent.communications).toBeUndefined();
   });
 
   it('returns failed on a non-2xx response', async () => {
