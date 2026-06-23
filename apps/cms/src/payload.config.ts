@@ -434,11 +434,14 @@ export default buildConfig({
     previewVerifyEndpoint,
     previewRevokeEndpoint,
     previewRedirectEndpoint,
+    // Exact-path overview endpoints MUST be registered before the
+    // `/dashboards/:provider` param route below, or that route matches
+    // `/dashboards/ga4-overview` (:provider="ga4-overview") first and 400s.
+    ga4OverviewEndpoint,
+    gscOverviewEndpoint,
     dashboardsGlobalEndpoint,
     dashboardsGscPerDocEndpoint,
     dashboardsGscInspectEndpoint,
-    ga4OverviewEndpoint,
-    gscOverviewEndpoint,
     calcomInboundEndpoint,
   ],
   jobs: {
