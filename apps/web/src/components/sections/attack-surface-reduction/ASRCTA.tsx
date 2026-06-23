@@ -12,7 +12,7 @@ import { Reveal } from "@/components/ui/Reveal";
 export function ASRCTA(): React.ReactElement {
   return (
     <div
-      className="absolute inset-0 overflow-hidden flex flex-col items-center justify-center text-center gap-5 px-8 md:px-12 lg:grid lg:grid-cols-[minmax(0,460px)_minmax(0,460px)] lg:items-center lg:gap-x-[clamp(32px,5vw,72px)] lg:justify-center lg:text-left lg:p-[clamp(32px,4vw,48px)_clamp(32px,5vw,80px)]"
+      className="absolute inset-0 overflow-hidden flex flex-col items-center justify-center text-center gap-5 px-8 md:px-12 lg:grid lg:grid-cols-[minmax(0,460px)_minmax(0,460px)] lg:items-start lg:gap-x-[clamp(32px,5vw,72px)] lg:justify-center lg:text-left lg:p-[clamp(32px,4vw,48px)_clamp(32px,5vw,80px)]"
       style={{ background: "#FFFFFF" }}
     >
       {/* Mobile: top-left pink glow blob — bleeds off-canvas intentionally. */}

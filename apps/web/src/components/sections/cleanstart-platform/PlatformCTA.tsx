@@ -66,7 +66,7 @@ export function PlatformCTA() {
 
       {/* Content */}
       <div
-        className="relative z-10 flex h-full flex-col items-start justify-center lg:flex-row lg:items-center"
+        className="relative z-10 flex h-full flex-col items-start justify-center lg:flex-row lg:items-start"
         style={{
           padding: "clamp(28px, 4vw, 56px) clamp(28px, 5vw, 80px)",
           gap: "clamp(20px, 5vw, 68px)",

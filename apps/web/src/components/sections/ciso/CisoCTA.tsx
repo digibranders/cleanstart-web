@@ -99,9 +99,9 @@ export function CisoCTA(): React.ReactElement {
       </div>
 
       <div
-        className="hidden sm:flex absolute inset-0 flex-row items-center overflow-hidden"
+        className="hidden sm:flex absolute inset-0 flex-row items-start overflow-hidden"
         style={{
-          padding: "0 clamp(32px, 6.35vw, 122px)",
+          padding: "clamp(28px, 4vw, 48px) clamp(32px, 6.35vw, 122px)",
           gap: "clamp(24px, 2.2vw, 32px)",
         }}
       >

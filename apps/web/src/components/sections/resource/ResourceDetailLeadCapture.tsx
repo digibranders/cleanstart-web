@@ -169,7 +169,7 @@ export function ResourceDetailLeadCapture({
             className="absolute inset-0 flex items-center px-6 py-8"
             style={{ paddingLeft: "clamp(32px, 5.2vw, 100px)", paddingRight: "clamp(32px, 5.2vw, 100px)" }}
           >
-            <div className="flex flex-col lg:flex-row items-center lg:items-center gap-6 lg:gap-[clamp(32px,3.5vw,68px)] w-full min-w-0">
+            <div className="flex flex-col lg:flex-row items-center lg:items-start gap-6 lg:gap-[clamp(32px,3.5vw,68px)] w-full min-w-0">
               <h2
                 id="rd-cta-title"
                 className="font-display text-white text-center lg:text-left w-full lg:w-auto lg:flex-shrink-0"
