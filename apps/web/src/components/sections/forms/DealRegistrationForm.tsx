@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { LeadConsent } from "@/components/forms/LeadConsent";
+import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
+import { submitDealRegistration } from "@/lib/leads/submitDealRegistration";
 import {
   FormCard,
   FormSectionTitle,
@@ -11,32 +13,85 @@ import {
   TextInput,
 } from "./FormCard";
 
+const STORAGE_CONSENT_TEXT =
+  "I agree to allow CleanStart to store and process my personal data.";
+
+const str = (fd: FormData, name: string): string => {
+  const v = fd.get(name);
+  return typeof v === "string" ? v.trim() : "";
+};
+
 export function DealRegistrationForm(): React.ReactElement {
-  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const { status, setStatus, statusRef } = useFormStatus();
+  const inFlightRef = useRef(false);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // The lead intake adapter is not yet exposed at the web edge; this form is
-    // client-side UX only until it is wired through LeadHandler.
-    setSubmitted(true);
-  };
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
+    setStatus(null);
+    setSubmitting(true);
 
-  if (submitted) {
-    return (
-      <FormCard>
-        <p
-          className="text-center text-[#0F123E]"
-          style={{ fontSize: "var(--fs-body)", lineHeight: 1.5 }}
-        >
-          Thanks, your deal registration has been received. We&apos;ll be in touch within one
-          business day.
-        </p>
-      </FormCard>
-    );
-  }
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    const categories = [
+      "storage",
+      ...(fd.get("consent_marketing") != null ? ["marketing"] : []),
+    ];
+    const turnstileToken = fd.get("cf-turnstile-response");
+
+    const partnerRepPhone = str(fd, "partnerRepPhone");
+    const prospectPhone = str(fd, "prospectPhone");
+    const dealDetails = str(fd, "dealDetails");
+
+    const result = await submitDealRegistration({
+      partnerName: str(fd, "partnerName"),
+      partnerRep: {
+        firstName: str(fd, "partnerRepFirstName"),
+        lastName: str(fd, "partnerRepLastName"),
+        email: str(fd, "partnerRepEmail"),
+        ...(partnerRepPhone ? { phone: partnerRepPhone } : {}),
+      },
+      prospect: {
+        firstName: str(fd, "prospectFirstName"),
+        lastName: str(fd, "prospectLastName"),
+        email: str(fd, "prospectEmail"),
+        ...(prospectPhone ? { phone: prospectPhone } : {}),
+      },
+      ...(dealDetails ? { dealDetails } : {}),
+      consent: {
+        snapshot: STORAGE_CONSENT_TEXT,
+        givenAt: new Date().toISOString(),
+        categories,
+      },
+      ...(typeof turnstileToken === "string" ? { turnstileToken } : {}),
+      ...(typeof window !== "undefined" ? { source: window.location.href } : {}),
+    });
+
+    setSubmitting(false);
+    inFlightRef.current = false;
+    if (result.ok) {
+      form.reset();
+      setStatus({
+        tone: "success",
+        title: "Deal registration received",
+        message:
+          "Thanks, your deal registration has been received. We'll be in touch within one business day.",
+      });
+      window.setTimeout(() => setStatus(null), 6000);
+    } else {
+      setStatus({
+        tone: "error",
+        title: "Couldn't submit registration",
+        message: "We couldn't submit your registration. Please try again.",
+      });
+    }
+  };
 
   return (
     <FormCard>
+      {status ? <StatusBanner ref={statusRef} {...status} /> : null}
       <form onSubmit={onSubmit} noValidate className="flex flex-col gap-5">
         <div className="flex flex-col gap-3">
           <FormSectionTitle>Partner Details</FormSectionTitle>
@@ -69,7 +124,9 @@ export function DealRegistrationForm(): React.ReactElement {
         <div className="flex justify-start">
           <TurnstileWidget />
         </div>
-        <SubmitButton>Submit Application</SubmitButton>
+        <SubmitButton busy={submitting} busyLabel="Submitting…">
+          Submit Application
+        </SubmitButton>
       </form>
     </FormCard>
   );
