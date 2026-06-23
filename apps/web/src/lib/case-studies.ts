@@ -33,11 +33,19 @@ export type CaseStudyMedia = {
   filename?: string;
 };
 
+/**
+ * Industry taxonomy reference. Populated to a full term (depth ≥ 1) once the
+ * `industryRef` relationship is backfilled in the CMS; until then it is
+ * null/undefined and the display falls back to the legacy `industry` enum.
+ */
+export type IndustryRef = { id?: string; name?: string | null; slug?: string | null };
+
 export type CaseStudy = {
   id: string;
   title: string;
   slug: string;
   industry: CaseStudyIndustry;
+  industryRef?: IndustryRef | string | null;
   company: string;
   companyLogo?: CaseStudyMedia | null;
   coverImage?: CaseStudyMedia | null;

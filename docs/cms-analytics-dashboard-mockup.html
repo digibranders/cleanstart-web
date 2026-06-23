@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CleanStart CMS — Analytics (full-feature mockup)</title>
+<style>
+  :root{
+    --bg:#0d0a16;--bg2:#0a0712;--card:#171128;--card2:#1c1533;
+    --bd:rgba(255,255,255,.08);--bd2:rgba(255,255,255,.14);
+    --tx:#f4f2fb;--tx2:#a8a2c0;--tx3:#6f6a85;
+    --cyan:#2dd4ff;--purple:#8b7ff0;--teal:#34d3a6;--green:#3ddc97;--amber:#f5b94d;--red:#ff6b6b;--pink:#f178b6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5}
+  a{color:inherit;text-decoration:none}
+  .app{display:flex;min-height:100vh}
+  .side{width:208px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--bd);padding:18px 14px}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px;margin:0 6px 22px}
+  .brand .tag{font-size:10px;font-weight:600;color:var(--cyan);border:1px solid var(--cyan);border-radius:5px;padding:1px 5px}
+  .nav a{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;color:var(--tx2);font-size:13px;margin-bottom:2px}
+  .nav a.active{background:rgba(139,127,240,.16);color:var(--tx)}
+  .nav .sec{font-size:10px;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase;margin:18px 10px 8px}
+  .main{flex:1;min-width:0;padding:22px 26px 60px;max-width:1100px}
+  .ribbon{background:rgba(245,185,77,.12);border:1px solid rgba(245,185,77,.3);color:var(--amber);font-size:12px;padding:9px 13px;border-radius:8px;margin-bottom:20px}
+  .top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px}
+  .title{display:flex;align-items:center;gap:10px;font-size:21px;font-weight:600}
+  .badge{font-size:12px;color:var(--green);background:rgba(61,220,151,.13);padding:3px 9px;border-radius:7px}
+  .filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .pills{display:inline-flex;border:1px solid var(--bd2);border-radius:8px;overflow:hidden;font-size:12px}
+  .pills span{padding:6px 12px;color:var(--tx2);cursor:pointer}
+  .pills span.on{background:rgba(45,212,255,.16);color:var(--cyan);font-weight:600}
+  select{background:var(--card);color:var(--tx);border:1px solid var(--bd2);border-radius:8px;padding:6px 10px;font-size:12px}
+  .sechead{display:flex;align-items:center;gap:10px;margin:30px 0 12px}
+  .sechead h2{font-size:15px;font-weight:600;margin:0}
+  .ph{font-size:10.5px;font-weight:600;letter-spacing:.03em;padding:2px 8px;border-radius:20px;background:rgba(139,127,240,.16);color:#c9c2ff}
+  .ph.opt{background:rgba(245,185,77,.15);color:var(--amber)}
+  .ph.now{background:rgba(61,220,151,.15);color:var(--green)}
+  .sub{font-size:12px;color:var(--tx3)}
+  .grouplbl{font-size:12px;color:var(--tx2);margin:0 0 9px;display:flex;align-items:center;gap:7px}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:11px;margin-bottom:14px}
+  .kpi{background:var(--card);border:1px solid var(--bd);border-radius:11px;padding:12px 14px}
+  .kpi .lab{font-size:12px;color:var(--tx2)}
+  .kpi .val{font-size:23px;font-weight:600;margin:3px 0 4px}
+  .kpi .dl{font-size:12px}
+  .up{color:var(--green)}.down{color:var(--red)}.muted{color:var(--tx3)}
+  .panel{background:var(--card);border:1px solid var(--bd);border-radius:13px;padding:15px 17px;margin-bottom:14px}
+  .panel h3{font-size:13.5px;font-weight:600;margin:0 0 4px;display:flex;align-items:center;gap:7px;justify-content:space-between}
+  .panel h3 .hint{font-size:11px;color:var(--tx3);font-weight:400}
+  .cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+  .cols3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .legend{display:flex;gap:16px;font-size:12px;color:var(--tx2);margin:6px 0 8px;flex-wrap:wrap}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .legend i.line{height:3px;border-radius:2px;width:14px}
+  .cw{position:relative;width:100%}
+  .hr,.row{display:grid;gap:5px 8px;align-items:center}
+  .hr{font-size:11px;color:var(--tx3);padding-bottom:7px;border-bottom:1px solid var(--bd)}
+  .row{font-size:12.5px;padding:8px 0;border-bottom:1px solid var(--bd)}
+  .rt{text-align:right}.ln{color:var(--cyan);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .s2{color:var(--tx2)}
+  .pill{font-size:10.5px;padding:2px 7px;border-radius:20px;white-space:nowrap}
+  .p-red{background:rgba(255,107,107,.16);color:#ff9b9b}
+  .p-amber{background:rgba(245,185,77,.16);color:var(--amber)}
+  .p-green{background:rgba(61,220,151,.16);color:var(--green)}
+  .p-cyan{background:rgba(45,212,255,.14);color:var(--cyan)}
+  .bars{display:flex;flex-direction:column;gap:9px}
+  .bar{display:grid;grid-template-columns:120px 1fr 52px;gap:10px;align-items:center;font-size:12px}
+  .track{height:8px;background:rgba(255,255,255,.07);border-radius:5px;overflow:hidden}
+  .fill{height:100%;border-radius:5px}
+  .cwv{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+  .cwv .m{background:var(--card2);border-radius:9px;padding:11px 13px;text-align:center}
+  .cwv .m .v{font-size:22px;font-weight:600}
+  .funnel{display:flex;flex-direction:column;gap:8px}
+  .fstep{display:grid;grid-template-columns:130px 1fr 70px;gap:10px;align-items:center;font-size:12px}
+  .fbar{height:24px;border-radius:6px;display:flex;align-items:center;padding-left:9px;font-size:11px;color:#0d0a16;font-weight:600}
+  .ai{background:var(--card2);border:1px dashed rgba(139,127,240,.4);border-radius:10px;padding:12px 14px;font-size:12.5px}
+  .ai .h{color:var(--purple);font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+  .ai .old{color:var(--tx3);text-decoration:line-through}
+  .ai .new{color:var(--green)}
+  .digest{font-size:12.5px}
+  .digest li{margin:5px 0;color:var(--tx2)}
+  .goal{margin-top:6px}
+  .stat{display:flex;gap:18px;flex-wrap:wrap}
+  .stat .b{flex:1;min-width:120px;background:var(--card2);border-radius:9px;padding:11px 13px}
+  .stat .b .v{font-size:22px;font-weight:600}
+  .stat .b .l{font-size:12px;color:var(--tx2)}
+  .foot{margin-top:22px;font-size:11px;color:var(--tx3);border-top:1px solid var(--bd);padding-top:12px}
+  .ico{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;flex-shrink:0}
+  @media(max-width:760px){.side{display:none}.main{padding:18px 16px}.cwv{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">CleanStart <span class="tag">CMS</span></div>
+    <nav class="nav">
+      <a href="#"><svg class="ico" viewBox="0 0 24 24"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg> Dashboard</a>
+      <a href="#" class="active"><svg class="ico" viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-8M20 16v-3"/></svg> Analytics</a>
+      <div class="sec">Content</div>
+      <a href="#"><svg class="ico" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg> Blogs</a>
+      <a href="#"><svg class="ico" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg> Guides</a>
+      <a href="#"><svg class="ico" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg> Knowledge Hub</a>
+      <div class="sec">System</div>
+      <a href="#"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg> Integrations</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <div class="ribbon">Full-feature mockup for review · all phases of the roadmap shown together · data is illustrative (GA4 figures approximate real numbers; GSC, content-intelligence, and DataForSEO values are placeholders).</div>
+
+    <div class="top">
+      <div class="title">
+        <svg class="ico" style="width:22px;height:22px;color:var(--cyan)" viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-8M20 16v-3"/></svg>
+        Analytics
+        <span class="badge">● fresh · 5m ago</span>
+        <span class="pill p-cyan">● 6 live now</span>
+      </div>
+      <div class="filters">
+        <div class="pills"><span>7d</span><span class="on">28d</span><span>90d</span></div>
+        <select><option>All content</option><option>Blogs</option><option>Guides</option><option>Knowledge Hub</option></select>
+        <select><option>All countries</option><option>United States</option><option>India</option></select>
+      </div>
+    </div>
+
+    <div class="sechead"><h2>Overview</h2><span class="ph now">Phase 1–2 · free</span></div>
+    <div class="grouplbl"><svg class="ico" viewBox="0 0 24 24"><path d="M17 20a5 5 0 00-10 0M12 11a4 4 0 100-8 4 4 0 000 8z"/></svg> Audience · Google Analytics 4</div>
+    <div class="kpis">
+      <div class="kpi"><div class="lab">Sessions</div><div class="val">4,322</div><div class="dl up">▲ 8%</div></div>
+      <div class="kpi"><div class="lab">Users</div><div class="val">3,140</div><div class="dl up">▲ 6%</div></div>
+      <div class="kpi"><div class="lab">Engagement</div><div class="val">48%</div><div class="dl up">▲ 2pp</div></div>
+      <div class="kpi"><div class="lab">Key events</div><div class="val muted">—</div><div class="dl muted">needs setup</div></div>
+    </div>
+    <div class="grouplbl"><svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg> Search · Google Search Console</div>
+    <div class="kpis">
+      <div class="kpi"><div class="lab">Clicks</div><div class="val">1,840</div><div class="dl up">▲ 12%</div></div>
+      <div class="kpi"><div class="lab">Impressions</div><div class="val">62.4K</div><div class="dl up">▲ 9%</div></div>
+      <div class="kpi"><div class="lab">CTR</div><div class="val">2.9%</div><div class="dl up">▲ 0.3pp</div></div>
+      <div class="kpi"><div class="lab">Avg position</div><div class="val">14.2</div><div class="dl up">▼ 1.4 better</div></div>
+    </div>
+    <div class="panel">
+      <h3>Sessions &amp; search clicks <span class="hint">last 28 days · period-over-period</span></h3>
+      <div class="legend"><span><i style="background:#8b7ff0"></i>Sessions</span><span><i class="line" style="background:#34d3a6"></i>Clicks</span></div>
+      <div class="cw" style="height:200px"><canvas id="trend" role="img" aria-label="Sessions and clicks over 28 days"></canvas></div>
+    </div>
+
+    <div class="sechead"><h2>Audience &amp; acquisition</h2><span class="ph">Phase 5 · free</span></div>
+    <div class="cols3">
+      <div class="panel"><h3>Channels</h3><div class="legend" id="chlegend" style="font-size:11px"></div><div class="cw" style="height:150px"><canvas id="channels" role="img" aria-label="Traffic by channel"></canvas></div></div>
+      <div class="panel"><h3>Devices</h3><div class="bars" id="devices"></div></div>
+      <div class="panel"><h3>Top countries</h3><div class="bars" id="countries"></div></div>
+    </div>
+
+    <div class="sechead"><h2>Top content</h2><span class="ph now">Phase 1–2 · free</span></div>
+    <div class="cols2">
+      <div class="panel"><h3>Top pages <span class="hint">GA4 + GSC merged</span></h3>
+        <div class="hr" style="grid-template-columns:1fr 46px 46px 38px"><span>Page</span><span class="rt">Sess.</span><span class="rt">Clicks</span><span class="rt">Pos.</span></div>
+        <div id="pages"></div></div>
+      <div class="panel"><h3>Top search queries</h3>
+        <div class="hr" style="grid-template-columns:1fr 46px 40px 38px"><span>Query</span><span class="rt">Clicks</span><span class="rt">CTR</span><span class="rt">Pos.</span></div>
+        <div id="queries"></div></div>
+    </div>
+
+    <div class="sechead"><h2>Content intelligence</h2><span class="ph">Phase 3 · free · CMS-only</span><span class="sub">joins analytics to your content — not possible in GA4/GSC</span></div>
+    <div class="panel"><h3>Refresh queue <span class="hint">declining traffic · not recently updated</span></h3>
+      <div class="hr" style="grid-template-columns:1fr 70px 90px 80px"><span>Page</span><span class="rt">90d Δ</span><span class="rt">Updated</span><span class="rt">Action</span></div>
+      <div id="decay"></div></div>
+    <div class="cols2">
+      <div class="panel"><h3>Author leaderboard</h3>
+        <div class="hr" style="grid-template-columns:1fr 52px 50px 44px"><span>Author</span><span class="rt">Sess.</span><span class="rt">Clicks</span><span class="rt">Leads</span></div>
+        <div id="authors"></div></div>
+      <div class="panel"><h3>Indexation coverage <span class="hint">published vs indexed</span></h3><div class="bars" id="indexation"></div></div>
+    </div>
+    <div class="cols2">
+      <div class="panel"><h3>Conversion attribution <span class="hint">needs key events</span></h3>
+        <div class="hr" style="grid-template-columns:1fr 56px 70px"><span>Page</span><span class="rt">Leads</span><span class="rt">Value</span></div>
+        <div id="conv"></div></div>
+      <div class="panel"><h3>Content health</h3>
+        <div class="stat">
+          <div class="b"><div class="v" style="color:var(--red)">14</div><div class="l">Orphan / zero-traffic pages</div></div>
+          <div class="b"><div class="v" style="color:var(--amber)">23</div><div class="l">Decaying (refresh soon)</div></div>
+          <div class="b"><div class="v" style="color:var(--green)">312</div><div class="l">Healthy published</div></div>
+        </div></div>
+    </div>
+
+    <div class="sechead"><h2>SEO opportunities</h2><span class="ph">Phase 4 · free</span></div>
+    <div class="cols2">
+      <div class="panel"><h3>Striking distance <span class="hint">pos 5–15 · high impressions</span></h3>
+        <div class="hr" style="grid-template-columns:1fr 42px 56px 70px"><span>Query</span><span class="rt">Pos.</span><span class="rt">Impr.</span><span class="rt">Upside</span></div>
+        <div id="striking"></div></div>
+      <div class="panel"><h3>Low CTR for position</h3>
+        <div class="hr" style="grid-template-columns:1fr 40px 44px 44px"><span>Page</span><span class="rt">Pos.</span><span class="rt">CTR</span><span class="rt">Exp.</span></div>
+        <div id="lowctr"></div></div>
+    </div>
+    <div class="cols2">
+      <div class="panel"><h3>Keyword cannibalization</h3><div id="cannibal"></div></div>
+      <div class="panel"><h3>Content-gap suggestions <span class="hint">impressions · no page</span></h3><div id="gap"></div></div>
+    </div>
+
+    <div class="sechead"><h2>Diagnostics &amp; visualizations</h2><span class="ph">Phase 5 · free</span></div>
+    <div class="cols2">
+      <div class="panel"><h3>Ranking distribution</h3><div class="cw" style="height:170px"><canvas id="histogram" role="img" aria-label="Number of queries by ranking band"></canvas></div></div>
+      <div class="panel"><h3>CTR vs position <span class="hint">dots below line underperform</span></h3><div class="cw" style="height:170px"><canvas id="scatter" role="img" aria-label="CTR versus ranking position scatter"></canvas></div></div>
+    </div>
+    <div class="cols2">
+      <div class="panel"><h3>Core Web Vitals <span class="hint">field data · CrUX</span></h3>
+        <div class="cwv">
+          <div class="m"><div class="v" style="color:var(--green)">1.9s</div><div class="s2">LCP</div></div>
+          <div class="m"><div class="v" style="color:var(--amber)">210ms</div><div class="s2">INP</div></div>
+          <div class="m"><div class="v" style="color:var(--green)">0.04</div><div class="s2">CLS</div></div>
+        </div></div>
+      <div class="panel"><h3>Funnel <span class="hint">impressions → key events</span></h3><div class="funnel" id="funnel"></div></div>
+    </div>
+
+    <div class="sechead"><h2>Proactive &amp; AI</h2><span class="ph">Phase 6</span><span class="sub">reuses Teams + Brevo · Claude</span></div>
+    <div class="cols2">
+      <div class="panel"><h3>Weekly digest <span class="hint">→ Teams / email</span></h3>
+        <ul class="digest" style="margin:6px 0 0;padding-left:18px">
+          <li><span class="up">▲</span> Top mover: <span class="ln">/blogs/sbom-101</span> +38% clicks</li>
+          <li><span class="down">▼</span> Decaying: <span class="ln">/cleansight</span> −22% 90d</li>
+          <li><span class="p-amber pill">index</span> 3 new pages not yet indexed</li>
+          <li><span class="p-cyan pill">win</span> 5 queries entered striking distance</li>
+        </ul></div>
+      <div class="panel"><h3>Goal &amp; alerts</h3>
+        <div style="font-size:12px;color:var(--tx2)">Monthly clicks goal</div>
+        <div class="goal"><div class="track" style="height:10px"><div class="fill" style="width:74%;background:var(--cyan)"></div></div></div>
+        <div style="font-size:12px;color:var(--tx2);margin-top:5px">1,840 / 2,500 · on track</div>
+        <div style="margin-top:12px"><span class="pill p-red">alert</span> <span style="font-size:12px;color:var(--tx2)">Traffic drop −31% on /guide/* (yesterday)</span></div>
+      </div>
+    </div>
+    <div class="panel"><div class="ai">
+      <div class="h"><svg class="ico" style="width:16px;height:16px" viewBox="0 0 24 24"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg> AI suggestion · low-CTR rewrite for /knowledge-hub/vex-documents</div>
+      <div style="margin-bottom:4px">Title: <span class="old">VEX Documents</span> → <span class="new">VEX Documents Explained: Format, Examples &amp; How to Use Them (2026)</span></div>
+      <div>Meta: <span class="new">Learn what a VEX document is, the CycloneDX/CSAF formats, and how to publish one — with real examples.</span></div>
+    </div></div>
+
+    <div class="sechead"><h2>Competitive intelligence — DataForSEO</h2><span class="ph opt">Phase 7 · optional · paid</span><span class="sub">market data GA4/GSC can't see</span></div>
+    <div class="cols2">
+      <div class="panel"><h3>Keyword rank vs competitors <span class="hint">tracked set</span></h3>
+        <div class="hr" style="grid-template-columns:1fr 56px 42px 70px"><span>Keyword</span><span class="rt">Volume</span><span class="rt">You</span><span class="rt">Top rival</span></div>
+        <div id="kwrank"></div></div>
+      <div class="panel"><h3>Keyword gap <span class="hint">rivals rank, you don't</span></h3>
+        <div class="hr" style="grid-template-columns:1fr 56px 70px"><span>Keyword</span><span class="rt">Volume</span><span class="rt">Rival pos</span></div>
+        <div id="kwgap"></div></div>
+    </div>
+    <div class="cols2">
+      <div class="panel"><h3>SERP features</h3><div id="serp"></div></div>
+      <div class="panel"><h3>Backlinks <span class="hint">you vs rivals</span></h3><div class="bars" id="backlinks"></div></div>
+    </div>
+
+    <div class="foot">Data sources — GA4 (audience), Google Search Console (search), CMS (content joins), Google CrUX (Core Web Vitals), Microsoft Teams + Brevo (digests), Claude (AI), DataForSEO (competitive · optional/paid). All cached server-side; no per-request paid calls.</div>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+(function(){
+  var tick='rgba(235,235,245,.5)',grid='rgba(235,235,245,.07)';
+  function rows(id,tmpl,data,cell){document.getElementById(id).innerHTML=data.map(function(r){return '<div class="row" style="grid-template-columns:'+tmpl+'">'+cell(r)+'</div>';}).join('');}
+  function bars(id,data,color){var max=Math.max.apply(null,data.map(function(d){return d[1];}));document.getElementById(id).innerHTML=data.map(function(d){return '<div class="bar"><span class="s2" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+d[0]+'</span><span class="track"><span class="fill" style="width:'+Math.round(d[1]/max*100)+'%;background:'+(d[2]||color)+'"></span></span><span class="rt s2">'+(d[3]||d[1])+'</span></div>';}).join('');}
+
+  if(window.Chart){
+    var L=Array.from({length:15},function(_,i){return (i*2+1)+'d';});
+    new Chart(document.getElementById('trend'),{data:{labels:L,datasets:[
+      {type:'line',label:'Sessions',data:[118,131,126,142,150,138,161,155,170,164,158,176,168,182,190],borderColor:'#8b7ff0',backgroundColor:'rgba(139,127,240,.15)',fill:true,tension:.35,pointRadius:0,borderWidth:2,yAxisID:'y'},
+      {type:'line',label:'Clicks',data:[48,55,52,60,64,58,69,66,74,71,67,77,73,80,84],borderColor:'#34d3a6',borderDash:[5,4],tension:.35,pointRadius:0,borderWidth:2,yAxisID:'y1'}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:tick,font:{size:11},maxTicksLimit:8}},y:{grid:{color:grid},ticks:{color:tick,font:{size:11}},beginAtZero:true},y1:{position:'right',grid:{display:false},ticks:{color:tick,font:{size:11}},beginAtZero:true}}}});
+
+    var ch=[['Organic',56,'#34d3a6'],['Direct',24,'#8b7ff0'],['Referral',12,'#2dd4ff'],['Social',8,'#f178b6']];
+    document.getElementById('chlegend').innerHTML=ch.map(function(c){return '<span><i style="background:'+c[2]+'"></i>'+c[0]+' '+c[1]+'%</span>';}).join('');
+    new Chart(document.getElementById('channels'),{type:'doughnut',data:{labels:ch.map(function(c){return c[0];}),datasets:[{data:ch.map(function(c){return c[1];}),backgroundColor:ch.map(function(c){return c[2];}),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false}}}});
+
+    new Chart(document.getElementById('histogram'),{type:'bar',data:{labels:['1–3','4–10','11–20','21–50','50+'],datasets:[{data:[18,54,72,96,140],backgroundColor:'#8b7ff0',borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:tick,font:{size:11}}},y:{grid:{color:grid},ticks:{color:tick,font:{size:11}},beginAtZero:true}}}});
+
+    var pts=[{x:2,y:31},{x:4,y:18},{x:6,y:9},{x:7,y:3.6},{x:9,y:5.2},{x:11,y:2.6},{x:12,y:1.4},{x:14,y:2.1},{x:18,y:.9},{x:22,y:1.2}];
+    new Chart(document.getElementById('scatter'),{type:'scatter',data:{datasets:[{data:pts,backgroundColor:'#2dd4ff',pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'position',color:tick,font:{size:10}},grid:{color:grid},ticks:{color:tick,font:{size:10}}},y:{title:{display:true,text:'CTR %',color:tick,font:{size:10}},grid:{color:grid},ticks:{color:tick,font:{size:10}},beginAtZero:true}}}});
+  }
+
+  bars('devices',[['Desktop',58,'#8b7ff0','58%'],['Mobile',38,'#2dd4ff','38%'],['Tablet',4,'#34d3a6','4%']]);
+  bars('countries',[['United States',1600,'#34d3a6','1.6K'],['India',820,'#8b7ff0','820'],['United Kingdom',460,'#2dd4ff','460'],['Germany',330,'#f178b6','330'],['Singapore',250,'#f5b94d','250']]);
+  bars('indexation',[['Blogs',96,'#34d3a6','96%'],['Guides',88,'#34d3a6','88%'],['Knowledge Hub',73,'#f5b94d','73%'],['News',61,'#ff6b6b','61%']]);
+  bars('backlinks',[['You',1240,'#8b7ff0','1.2K'],['Rival A',3400,'#6f6a85','3.4K'],['Rival B',2100,'#6f6a85','2.1K']]);
+
+  rows('pages','1fr 46px 46px 38px',[['/guides/nist-800-53…',612,410,'8.1'],['/blogs/sbom-101',540,380,'6.4'],['/knowledge-hub/vex-documents',360,240,'9.2'],['/cleansight',410,150,'11.0'],['/ (home)',320,90,'18.5']],function(r){return '<span class="ln">'+r[0]+'</span><span class="rt">'+r[1]+'</span><span class="rt s2">'+r[2]+'</span><span class="rt s2">'+r[3]+'</span>';});
+  rows('queries','1fr 46px 40px 38px',[['container security',220,'2.6%','11'],['sbom tools',180,'3.0%','9'],['fips 140-3 containers',140,'3.6%','7'],['vex document format',120,'2.7%','12'],['near zero cve images',95,'3.4%','6']],function(r){return '<span class="ln">'+r[0]+'</span><span class="rt">'+r[1]+'</span><span class="rt s2">'+r[2]+'</span><span class="rt s2">'+r[3]+'</span>';});
+
+  rows('decay','1fr 70px 90px 80px',[['/cleansight','−22%','7mo ago','refresh'],['/blogs/busybox-risk','−18%','9mo ago','refresh'],['/guide/cis-benchmark','−14%','5mo ago','review'],['/news/2025-recap','−31%','11mo ago','refresh']],function(r){var c=parseInt(r[1])<=-20?'p-red':'p-amber';return '<span class="ln">'+r[0]+'</span><span class="rt down">'+r[1]+'</span><span class="rt s2">'+r[2]+'</span><span class="rt"><span class="pill '+c+'">'+r[3]+'</span></span>';});
+  rows('authors','1fr 52px 50px 44px',[['Priya N.',1820,760,12],['Alex R.',1340,520,8],['Sam K.',980,410,5],['Guest',420,180,1]],function(r){return '<span class="s2">'+r[0]+'</span><span class="rt">'+r[1]+'</span><span class="rt s2">'+r[2]+'</span><span class="rt s2">'+r[3]+'</span>';});
+  rows('conv','1fr 56px 70px',[['/cleansight',9,'$5.4K'],['/blogs/sbom-101',6,'$3.6K'],['/guides/fips',4,'$2.4K']],function(r){return '<span class="ln">'+r[0]+'</span><span class="rt">'+r[1]+'</span><span class="rt s2">'+r[2]+'</span>';});
+
+  rows('striking','1fr 42px 56px 70px',[['fips 140-3 containers',7,'3.9K','+90/mo'],['vex document format',12,'4.5K','+140/mo'],['container hardening',11,'5.1K','+160/mo'],['sbom format',9,'3.2K','+70/mo']],function(r){return '<span class="ln">'+r[0]+'</span><span class="rt"><span class="pill p-amber">'+r[1]+'</span></span><span class="rt s2">'+r[2]+'</span><span class="rt up">'+r[3]+'</span>';});
+  rows('lowctr','1fr 40px 44px 44px',[['/knowledge-hub/vex',6,'1.1%','4.8%'],['/blogs/sca-101',8,'1.6%','3.7%'],['/cleansight',11,'2.0%','2.9%']],function(r){return '<span class="ln">'+r[0]+'</span><span class="rt">'+r[1]+'</span><span class="rt down">'+r[2]+'</span><span class="rt s2">'+r[3]+'</span>';});
+
+  document.getElementById('cannibal').innerHTML=[['"sbom tools"','/blogs/sbom-101','/guides/sbom-guide'],['"container security"','/cleansight','/blogs/container-sec']].map(function(r){return '<div class="row" style="grid-template-columns:1fr"><div><span class="pill p-amber">'+r[0]+'</span><div class="s2" style="margin-top:4px;font-size:11.5px">'+r[1]+' &nbsp;⚔&nbsp; '+r[2]+'</div></div></div>';}).join('');
+  document.getElementById('gap').innerHTML=[['kubernetes cve scanning','4.4K'],['distroless vs alpine','2.9K'],['sbom compliance nist','1.8K']].map(function(r){return '<div class="row" style="grid-template-columns:1fr 60px"><span class="s2">'+r[0]+'</span><span class="rt s2">'+r[1]+'</span></div>';}).join('');
+
+  document.getElementById('funnel').innerHTML=[['Impressions',62400,100,'#8b7ff0'],['Clicks',1840,62,'#7c84e8'],['Sessions',4322,40,'#2dd4ff'],['Key events',31,12,'#34d3a6']].map(function(s){return '<div class="fstep"><span class="s2">'+s[0]+'</span><span class="fbar" style="width:'+s[2]+'%;background:'+s[3]+'">'+s[1].toLocaleString()+'</span><span class="rt s2">'+(s[0]==='Key events'?'needs setup':'')+'</span></div>';}).join('');
+
+  rows('kwrank','1fr 56px 42px 70px',[['container security','8.4K',11,'#3 (rival A)'],['sbom tools','3.1K',9,'#2 (rival B)'],['fips containers','1.2K',7,'#5 (rival A)']],function(r){return '<span class="s2">'+r[0]+'</span><span class="rt s2">'+r[1]+'</span><span class="rt"><span class="pill p-amber">'+r[2]+'</span></span><span class="rt s2">'+r[3]+'</span>';});
+  rows('kwgap','1fr 56px 70px',[['image signing cosign','6.2K','#2'],['ironbank alternative','3.8K','#1'],['cve free base image','2.4K','#4']],function(r){return '<span class="s2">'+r[0]+'</span><span class="rt s2">'+r[1]+'</span><span class="rt s2">'+r[2]+'</span>';});
+  document.getElementById('serp').innerHTML=[['AI Overview','container security','p-cyan'],['Featured snippet','what is sbom','p-green'],['People also ask','vex document','p-amber'],['Video','docker hardening','p-amber']].map(function(r){return '<div class="row" style="grid-template-columns:120px 1fr"><span><span class="pill '+r[2]+'">'+r[0]+'</span></span><span class="s2" style="font-size:11.5px">'+r[1]+'</span></div>';}).join('');
+})();
+</script>
+</body>
+</html>

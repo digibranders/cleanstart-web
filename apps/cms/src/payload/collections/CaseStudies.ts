@@ -60,7 +60,17 @@ export const CaseStudies: CollectionConfig = {
         { label: 'Other', value: 'other' },
       ],
       admin: {
-        description: 'Industry tag shown on the listing card.',
+        description:
+          'Legacy enum — superseded by the Industry relationship below. Kept during the taxonomy transition; removed once apps/web reads the relationship.',
+      },
+    },
+    {
+      name: 'industryRef',
+      type: 'relationship',
+      relationTo: 'industries',
+      admin: {
+        description:
+          'Industry taxonomy reference. Seeded/backfilled from the legacy `industry` enum; editors manage the list under Taxonomies → Industries.',
       },
     },
     {

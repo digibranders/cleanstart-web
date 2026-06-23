@@ -49,6 +49,11 @@
       ]
     },
     {
+      "type": "relationship",
+      "name": "webinarTypeRef",
+      "relationTo": "webinarTypes"
+    },
+    {
       "type": "select",
       "name": "region",
       "required": true,
@@ -66,6 +71,11 @@
           "value": "global"
         }
       ]
+    },
+    {
+      "type": "relationship",
+      "name": "regionRef",
+      "relationTo": "regions"
     },
     {
       "type": "date",

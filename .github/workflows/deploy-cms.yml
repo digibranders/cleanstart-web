@@ -121,6 +121,10 @@ jobs:
           WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}
           WEB_REVALIDATE_URL: ${{ vars.WEB_REVALIDATE_URL }}
           HUBSPOT_PORTAL_ID: ${{ vars.HUBSPOT_PORTAL_ID }}
+          HUBSPOT_DEAL_PIPELINE: ${{ vars.HUBSPOT_DEAL_PIPELINE }}
+          HUBSPOT_DEAL_STAGE: ${{ vars.HUBSPOT_DEAL_STAGE }}
+          DEAL_REG_SYNC_MAX_ATTEMPTS: ${{ vars.DEAL_REG_SYNC_MAX_ATTEMPTS }}
+          DEAL_REG_RETENTION_DAYS: ${{ vars.DEAL_REG_RETENTION_DAYS }}
           BREVO_SENDER_EMAIL: ${{ vars.BREVO_SENDER_EMAIL }}
           BREVO_SENDER_NAME: ${{ vars.BREVO_SENDER_NAME }}
           BREVO_TEMPLATE_ID: ${{ vars.BREVO_TEMPLATE_ID }}
@@ -219,6 +223,13 @@ jobs:
             echo "INDEXNOW_KEY=${INDEXNOW_KEY}"
             echo "HUBSPOT_PORTAL_ID=${HUBSPOT_PORTAL_ID}"
             echo "HUBSPOT_PRIVATE_APP_TOKEN=${HUBSPOT_PRIVATE_APP_TOKEN}"
+            # Deal-registration → HubSpot Deals targeting + tuning. Fall back to the
+            # code defaults if the GitHub variable is unset (empty would NOT trigger
+            # the code's ?? default, so render the literal default here).
+            echo "HUBSPOT_DEAL_PIPELINE=${HUBSPOT_DEAL_PIPELINE:-default}"
+            echo "HUBSPOT_DEAL_STAGE=${HUBSPOT_DEAL_STAGE:-appointmentscheduled}"
+            echo "DEAL_REG_SYNC_MAX_ATTEMPTS=${DEAL_REG_SYNC_MAX_ATTEMPTS:-8}"
+            echo "DEAL_REG_RETENTION_DAYS=${DEAL_REG_RETENTION_DAYS:-365}"
             echo "BREVO_API_KEY=${BREVO_API_KEY}"
             echo "BREVO_SENDER_EMAIL=${BREVO_SENDER_EMAIL}"
             echo "BREVO_SENDER_NAME=${BREVO_SENDER_NAME}"

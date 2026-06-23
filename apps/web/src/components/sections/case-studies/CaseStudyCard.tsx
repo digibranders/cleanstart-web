@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { CaseStudy } from "@/lib/case-studies";
-import { formatFileMeta, industryLabel, mediaUrl } from "@/lib/case-studies-utils";
+import { formatFileMeta, mediaUrl, resolveIndustryLabel } from "@/lib/case-studies-utils";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
 import { CardCoverFallback } from "@/components/ui/CardCoverFallback";
 
@@ -37,7 +37,7 @@ export function CaseStudyCard({ caseStudy }: CaseStudyCardProps): React.ReactEle
   const logoSrc = mediaUrl(caseStudy.companyLogo?.url);
   const downloadHref = mediaUrl(caseStudy.asset?.url);
   const fileMeta = formatFileMeta(caseStudy.asset);
-  const tag = industryLabel(caseStudy.industry);
+  const tag = resolveIndustryLabel(caseStudy);
 
   return (
     <article

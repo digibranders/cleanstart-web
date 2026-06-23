@@ -64,6 +64,11 @@
       ]
     },
     {
+      "type": "relationship",
+      "name": "departmentRef",
+      "relationTo": "departments"
+    },
+    {
       "type": "select",
       "name": "employmentType",
       "options": [

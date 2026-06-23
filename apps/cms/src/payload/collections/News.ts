@@ -66,7 +66,8 @@ export const News: CollectionConfig = {
       type: 'select',
       defaultValue: 'press-release',
       admin: {
-        description: 'Pill shown on cards and the detail meta strip.',
+        description:
+          'Legacy enum — superseded by the Press type relationship below. Kept during the taxonomy transition; removed once apps/web reads the relationship.',
       },
       options: [
         { label: 'Press Release', value: 'press-release' },
@@ -74,6 +75,15 @@ export const News: CollectionConfig = {
         { label: 'Announcement', value: 'announcement' },
         { label: 'Feature', value: 'feature' },
       ],
+    },
+    {
+      name: 'pressTypeRef',
+      type: 'relationship',
+      relationTo: 'pressTypes',
+      admin: {
+        description:
+          'Press type taxonomy reference. Seeded/backfilled from the legacy `pressType` enum; editors manage the list under Taxonomies → Press types.',
+      },
     },
     {
       name: 'location',
@@ -91,7 +101,16 @@ export const News: CollectionConfig = {
       ],
       admin: {
         description:
-          'Region this story belongs to. Powers the region filter on the /news listing page.',
+          'Legacy enum — superseded by the Region relationship below. Kept during the taxonomy transition; removed once apps/web reads the relationship.',
+      },
+    },
+    {
+      name: 'regionRef',
+      type: 'relationship',
+      relationTo: 'regions',
+      admin: {
+        description:
+          'Region taxonomy reference (shared with Webinars). Seeded/backfilled from the legacy `region` enum; editors manage the list under Taxonomies → Regions.',
       },
     },
     { name: 'body', type: 'richText' },

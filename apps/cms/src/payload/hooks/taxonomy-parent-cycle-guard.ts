@@ -30,7 +30,16 @@ const idOfParent = (parent: TaxonomyRow['parent']): string | number | null => {
  * iteration budget, same error semantics, just no path computation.
  */
 export const taxonomyParentCycleGuardHook = (
-  collection: 'categories' | 'newsCategories' | 'knowledgeCategories',
+  collection:
+    | 'categories'
+    | 'newsCategories'
+    | 'knowledgeCategories'
+    | 'industries'
+    | 'resourceTypes'
+    | 'departments'
+    | 'regions'
+    | 'pressTypes'
+    | 'webinarTypes',
 ): CollectionBeforeChangeHook =>
   async ({ data, req, originalDoc }) => {
     if (!data) return data;

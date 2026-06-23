@@ -1,0 +1,263 @@
+{
+  "slug": "regions",
+  "versions": {
+    "drafts": true
+  },
+  "timestamps": true,
+  "fields": [
+    {
+      "type": "text",
+      "name": "name",
+      "required": true
+    },
+    {
+      "type": "text",
+      "name": "slug",
+      "required": true,
+      "unique": true
+    },
+    {
+      "type": "textarea",
+      "name": "description"
+    },
+    {
+      "type": "upload",
+      "name": "icon",
+      "relationTo": "media"
+    },
+    {
+      "type": "relationship",
+      "name": "parent",
+      "relationTo": "regions"
+    },
+    {
+      "type": "ui",
+      "name": "seoHealthScore"
+    },
+    {
+      "type": "ui",
+      "name": "seoTitle"
+    },
+    {
+      "type": "ui",
+      "name": "seoDescription"
+    },
+    {
+      "type": "ui",
+      "name": "seoIndexable"
+    },
+    {
+      "type": "ui",
+      "name": "serpPreview"
+    },
+    {
+      "type": "ui",
+      "name": "schemaPreview"
+    },
+    {
+      "type": "ui",
+      "name": "keywords"
+    },
+    {
+      "type": "ui",
+      "name": "canonicalUrl"
+    },
+    {
+      "type": "ui",
+      "name": "socialCard"
+    },
+    {
+      "type": "ui",
+      "name": "redirect"
+    },
+    {
+      "type": "ui",
+      "name": "headTags"
+    },
+    {
+      "type": "ui",
+      "name": "urlChangeHistory"
+    },
+    {
+      "type": "group",
+      "name": "seo",
+      "fields": [
+        {
+          "type": "text",
+          "name": "title"
+        },
+        {
+          "type": "textarea",
+          "name": "description"
+        },
+        {
+          "type": "select",
+          "name": "indexable",
+          "options": [
+            {
+              "value": "index"
+            },
+            {
+              "value": "noindex"
+            },
+            {
+              "value": "noindex,nofollow"
+            }
+          ]
+        },
+        {
+          "type": "upload",
+          "name": "ogImage",
+          "relationTo": "media"
+        },
+        {
+          "type": "text",
+          "name": "ogImageAlt"
+        },
+        {
+          "type": "checkbox",
+          "name": "useAdvancedOg"
+        },
+        {
+          "type": "text",
+          "name": "ogTitle"
+        },
+        {
+          "type": "textarea",
+          "name": "ogDescription"
+        },
+        {
+          "type": "checkbox",
+          "name": "useAdvancedTwitter"
+        },
+        {
+          "type": "select",
+          "name": "twitterCard",
+          "options": [
+            {
+              "value": "summary"
+            },
+            {
+              "value": "summary_large_image"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "name": "twitterTitle"
+        },
+        {
+          "type": "textarea",
+          "name": "twitterDescription"
+        },
+        {
+          "type": "upload",
+          "name": "twitterImage",
+          "relationTo": "media"
+        },
+        {
+          "type": "checkbox",
+          "name": "useCustomCanonical"
+        },
+        {
+          "type": "text",
+          "name": "canonicalOverride"
+        },
+        {
+          "type": "group",
+          "name": "robotsAdvanced",
+          "fields": [
+            {
+              "type": "checkbox",
+              "name": "noarchive"
+            },
+            {
+              "type": "checkbox",
+              "name": "nosnippet"
+            },
+            {
+              "type": "checkbox",
+              "name": "noimageindex"
+            },
+            {
+              "type": "checkbox",
+              "name": "notranslate"
+            },
+            {
+              "type": "number",
+              "name": "maxSnippet"
+            },
+            {
+              "type": "select",
+              "name": "maxImagePreview",
+              "options": [
+                {
+                  "value": "standard"
+                },
+                {
+                  "value": "large"
+                },
+                {
+                  "value": "none"
+                }
+              ]
+            },
+            {
+              "type": "number",
+              "name": "maxVideoPreview"
+            },
+            {
+              "type": "date",
+              "name": "unavailableAfter"
+            }
+          ]
+        },
+        {
+          "type": "json",
+          "name": "alternates"
+        },
+        {
+          "type": "json",
+          "name": "customTags"
+        },
+        {
+          "type": "text",
+          "name": "keywordTarget"
+        },
+        {
+          "type": "json",
+          "name": "keywords"
+        },
+        {
+          "type": "array",
+          "name": "speakablePath",
+          "fields": [
+            {
+              "type": "text",
+              "name": "selector",
+              "required": true
+            }
+          ]
+        },
+        {
+          "type": "json",
+          "name": "additionalSchema"
+        },
+        {
+          "type": "json",
+          "name": "schemaHistory"
+        }
+      ]
+    },
+    {
+      "type": "ui",
+      "name": "seoAdvanced"
+    }
+  ],
+  "hooks": {
+    "beforeChange": 1,
+    "afterChange": 1,
+    "beforeValidate": 0,
+    "afterDelete": 0
+  }
+}

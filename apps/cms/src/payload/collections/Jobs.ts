@@ -99,6 +99,10 @@ export const Jobs: CollectionConfig = {
     {
       name: 'department',
       type: 'select',
+      admin: {
+        description:
+          'Legacy enum — superseded by the Department relationship below. Kept during the taxonomy transition; removed once apps/web reads the relationship.',
+      },
       options: [
         { label: 'Engineering', value: 'engineering' },
         { label: 'Sales', value: 'sales' },
@@ -109,6 +113,15 @@ export const Jobs: CollectionConfig = {
         { label: 'Legal', value: 'legal' },
         { label: 'People', value: 'people' },
       ],
+    },
+    {
+      name: 'departmentRef',
+      type: 'relationship',
+      relationTo: 'departments',
+      admin: {
+        description:
+          'Department taxonomy reference. Seeded/backfilled from the legacy `department` enum; editors manage the list under Taxonomies → Departments.',
+      },
     },
     {
       name: 'employmentType',
