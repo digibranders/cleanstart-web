@@ -18,46 +18,154 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
 -- ============================================================
 
 -- 1. Enum types for the 6 taxonomy collections (status + SEO selects)
-CREATE TYPE public."enum__departments_v_version_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
-CREATE TYPE public."enum__departments_v_version_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
-CREATE TYPE public."enum__departments_v_version_status" AS ENUM ('draft', 'published');
-CREATE TYPE public."enum__industries_v_version_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
-CREATE TYPE public."enum__industries_v_version_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
-CREATE TYPE public."enum__industries_v_version_status" AS ENUM ('draft', 'published');
-CREATE TYPE public."enum__press_types_v_version_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
-CREATE TYPE public."enum__press_types_v_version_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
-CREATE TYPE public."enum__press_types_v_version_status" AS ENUM ('draft', 'published');
-CREATE TYPE public."enum__regions_v_version_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
-CREATE TYPE public."enum__regions_v_version_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
-CREATE TYPE public."enum__regions_v_version_status" AS ENUM ('draft', 'published');
-CREATE TYPE public."enum__resource_types_v_version_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
-CREATE TYPE public."enum__resource_types_v_version_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
-CREATE TYPE public."enum__resource_types_v_version_status" AS ENUM ('draft', 'published');
-CREATE TYPE public."enum__webinar_types_v_version_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
-CREATE TYPE public."enum__webinar_types_v_version_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
-CREATE TYPE public."enum__webinar_types_v_version_status" AS ENUM ('draft', 'published');
-CREATE TYPE public."enum_departments_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
-CREATE TYPE public."enum_departments_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
-CREATE TYPE public."enum_departments_status" AS ENUM ('draft', 'published');
-CREATE TYPE public."enum_industries_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
-CREATE TYPE public."enum_industries_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
-CREATE TYPE public."enum_industries_status" AS ENUM ('draft', 'published');
-CREATE TYPE public."enum_press_types_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
-CREATE TYPE public."enum_press_types_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
-CREATE TYPE public."enum_press_types_status" AS ENUM ('draft', 'published');
-CREATE TYPE public."enum_regions_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
-CREATE TYPE public."enum_regions_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
-CREATE TYPE public."enum_regions_status" AS ENUM ('draft', 'published');
-CREATE TYPE public."enum_resource_types_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
-CREATE TYPE public."enum_resource_types_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
-CREATE TYPE public."enum_resource_types_status" AS ENUM ('draft', 'published');
-CREATE TYPE public."enum_webinar_types_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
-CREATE TYPE public."enum_webinar_types_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
-CREATE TYPE public."enum_webinar_types_status" AS ENUM ('draft', 'published');
+DO $$ BEGIN
+  CREATE TYPE public."enum__departments_v_version_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum__departments_v_version_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum__departments_v_version_status" AS ENUM ('draft', 'published');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum__industries_v_version_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum__industries_v_version_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum__industries_v_version_status" AS ENUM ('draft', 'published');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum__press_types_v_version_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum__press_types_v_version_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum__press_types_v_version_status" AS ENUM ('draft', 'published');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum__regions_v_version_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum__regions_v_version_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum__regions_v_version_status" AS ENUM ('draft', 'published');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum__resource_types_v_version_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum__resource_types_v_version_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum__resource_types_v_version_status" AS ENUM ('draft', 'published');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum__webinar_types_v_version_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum__webinar_types_v_version_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum__webinar_types_v_version_status" AS ENUM ('draft', 'published');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum_departments_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum_departments_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum_departments_status" AS ENUM ('draft', 'published');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum_industries_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum_industries_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum_industries_status" AS ENUM ('draft', 'published');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum_press_types_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum_press_types_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum_press_types_status" AS ENUM ('draft', 'published');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum_regions_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum_regions_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum_regions_status" AS ENUM ('draft', 'published');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum_resource_types_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum_resource_types_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum_resource_types_status" AS ENUM ('draft', 'published');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum_webinar_types_seo_indexable" AS ENUM ('index', 'noindex', 'noindex,nofollow');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum_webinar_types_seo_twitter_card" AS ENUM ('summary', 'summary_large_image');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  CREATE TYPE public."enum_webinar_types_status" AS ENUM ('draft', 'published');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- 2. Taxonomy collection tables (+ version tables, speakable-path arrays,
 --    sequences, PK/FK constraints, indexes)
-CREATE TABLE public._departments_v (
+CREATE TABLE IF NOT EXISTS public._departments_v (
     id integer NOT NULL,
     parent_id integer,
     version_name character varying,
@@ -104,7 +212,7 @@ CREATE TABLE public._departments_v (
 
 
 
-CREATE SEQUENCE public._departments_v_id_seq
+CREATE SEQUENCE IF NOT EXISTS public._departments_v_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -118,7 +226,7 @@ ALTER SEQUENCE public._departments_v_id_seq OWNED BY public._departments_v.id;
 
 
 
-CREATE TABLE public._departments_v_version_seo_speakable_path (
+CREATE TABLE IF NOT EXISTS public._departments_v_version_seo_speakable_path (
     _order integer NOT NULL,
     _parent_id integer NOT NULL,
     id integer NOT NULL,
@@ -128,7 +236,7 @@ CREATE TABLE public._departments_v_version_seo_speakable_path (
 
 
 
-CREATE SEQUENCE public._departments_v_version_seo_speakable_path_id_seq
+CREATE SEQUENCE IF NOT EXISTS public._departments_v_version_seo_speakable_path_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -142,7 +250,7 @@ ALTER SEQUENCE public._departments_v_version_seo_speakable_path_id_seq OWNED BY 
 
 
 
-CREATE TABLE public._industries_v (
+CREATE TABLE IF NOT EXISTS public._industries_v (
     id integer NOT NULL,
     parent_id integer,
     version_name character varying,
@@ -189,7 +297,7 @@ CREATE TABLE public._industries_v (
 
 
 
-CREATE SEQUENCE public._industries_v_id_seq
+CREATE SEQUENCE IF NOT EXISTS public._industries_v_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -203,7 +311,7 @@ ALTER SEQUENCE public._industries_v_id_seq OWNED BY public._industries_v.id;
 
 
 
-CREATE TABLE public._industries_v_version_seo_speakable_path (
+CREATE TABLE IF NOT EXISTS public._industries_v_version_seo_speakable_path (
     _order integer NOT NULL,
     _parent_id integer NOT NULL,
     id integer NOT NULL,
@@ -213,7 +321,7 @@ CREATE TABLE public._industries_v_version_seo_speakable_path (
 
 
 
-CREATE SEQUENCE public._industries_v_version_seo_speakable_path_id_seq
+CREATE SEQUENCE IF NOT EXISTS public._industries_v_version_seo_speakable_path_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -227,7 +335,7 @@ ALTER SEQUENCE public._industries_v_version_seo_speakable_path_id_seq OWNED BY p
 
 
 
-CREATE TABLE public._press_types_v (
+CREATE TABLE IF NOT EXISTS public._press_types_v (
     id integer NOT NULL,
     parent_id integer,
     version_name character varying,
@@ -274,7 +382,7 @@ CREATE TABLE public._press_types_v (
 
 
 
-CREATE SEQUENCE public._press_types_v_id_seq
+CREATE SEQUENCE IF NOT EXISTS public._press_types_v_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -288,7 +396,7 @@ ALTER SEQUENCE public._press_types_v_id_seq OWNED BY public._press_types_v.id;
 
 
 
-CREATE TABLE public._press_types_v_version_seo_speakable_path (
+CREATE TABLE IF NOT EXISTS public._press_types_v_version_seo_speakable_path (
     _order integer NOT NULL,
     _parent_id integer NOT NULL,
     id integer NOT NULL,
@@ -298,7 +406,7 @@ CREATE TABLE public._press_types_v_version_seo_speakable_path (
 
 
 
-CREATE SEQUENCE public._press_types_v_version_seo_speakable_path_id_seq
+CREATE SEQUENCE IF NOT EXISTS public._press_types_v_version_seo_speakable_path_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -312,7 +420,7 @@ ALTER SEQUENCE public._press_types_v_version_seo_speakable_path_id_seq OWNED BY 
 
 
 
-CREATE TABLE public._regions_v (
+CREATE TABLE IF NOT EXISTS public._regions_v (
     id integer NOT NULL,
     parent_id integer,
     version_name character varying,
@@ -359,7 +467,7 @@ CREATE TABLE public._regions_v (
 
 
 
-CREATE SEQUENCE public._regions_v_id_seq
+CREATE SEQUENCE IF NOT EXISTS public._regions_v_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -373,7 +481,7 @@ ALTER SEQUENCE public._regions_v_id_seq OWNED BY public._regions_v.id;
 
 
 
-CREATE TABLE public._regions_v_version_seo_speakable_path (
+CREATE TABLE IF NOT EXISTS public._regions_v_version_seo_speakable_path (
     _order integer NOT NULL,
     _parent_id integer NOT NULL,
     id integer NOT NULL,
@@ -383,7 +491,7 @@ CREATE TABLE public._regions_v_version_seo_speakable_path (
 
 
 
-CREATE SEQUENCE public._regions_v_version_seo_speakable_path_id_seq
+CREATE SEQUENCE IF NOT EXISTS public._regions_v_version_seo_speakable_path_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -397,7 +505,7 @@ ALTER SEQUENCE public._regions_v_version_seo_speakable_path_id_seq OWNED BY publ
 
 
 
-CREATE TABLE public._resource_types_v (
+CREATE TABLE IF NOT EXISTS public._resource_types_v (
     id integer NOT NULL,
     parent_id integer,
     version_name character varying,
@@ -444,7 +552,7 @@ CREATE TABLE public._resource_types_v (
 
 
 
-CREATE SEQUENCE public._resource_types_v_id_seq
+CREATE SEQUENCE IF NOT EXISTS public._resource_types_v_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -458,7 +566,7 @@ ALTER SEQUENCE public._resource_types_v_id_seq OWNED BY public._resource_types_v
 
 
 
-CREATE TABLE public._resource_types_v_version_seo_speakable_path (
+CREATE TABLE IF NOT EXISTS public._resource_types_v_version_seo_speakable_path (
     _order integer NOT NULL,
     _parent_id integer NOT NULL,
     id integer NOT NULL,
@@ -468,7 +576,7 @@ CREATE TABLE public._resource_types_v_version_seo_speakable_path (
 
 
 
-CREATE SEQUENCE public._resource_types_v_version_seo_speakable_path_id_seq
+CREATE SEQUENCE IF NOT EXISTS public._resource_types_v_version_seo_speakable_path_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -482,7 +590,7 @@ ALTER SEQUENCE public._resource_types_v_version_seo_speakable_path_id_seq OWNED 
 
 
 
-CREATE TABLE public._webinar_types_v (
+CREATE TABLE IF NOT EXISTS public._webinar_types_v (
     id integer NOT NULL,
     parent_id integer,
     version_name character varying,
@@ -529,7 +637,7 @@ CREATE TABLE public._webinar_types_v (
 
 
 
-CREATE SEQUENCE public._webinar_types_v_id_seq
+CREATE SEQUENCE IF NOT EXISTS public._webinar_types_v_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -543,7 +651,7 @@ ALTER SEQUENCE public._webinar_types_v_id_seq OWNED BY public._webinar_types_v.i
 
 
 
-CREATE TABLE public._webinar_types_v_version_seo_speakable_path (
+CREATE TABLE IF NOT EXISTS public._webinar_types_v_version_seo_speakable_path (
     _order integer NOT NULL,
     _parent_id integer NOT NULL,
     id integer NOT NULL,
@@ -553,7 +661,7 @@ CREATE TABLE public._webinar_types_v_version_seo_speakable_path (
 
 
 
-CREATE SEQUENCE public._webinar_types_v_version_seo_speakable_path_id_seq
+CREATE SEQUENCE IF NOT EXISTS public._webinar_types_v_version_seo_speakable_path_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -567,7 +675,7 @@ ALTER SEQUENCE public._webinar_types_v_version_seo_speakable_path_id_seq OWNED B
 
 
 
-CREATE TABLE public.departments (
+CREATE TABLE IF NOT EXISTS public.departments (
     id integer NOT NULL,
     name character varying,
     slug character varying,
@@ -610,7 +718,7 @@ CREATE TABLE public.departments (
 
 
 
-CREATE SEQUENCE public.departments_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.departments_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -624,7 +732,7 @@ ALTER SEQUENCE public.departments_id_seq OWNED BY public.departments.id;
 
 
 
-CREATE TABLE public.departments_seo_speakable_path (
+CREATE TABLE IF NOT EXISTS public.departments_seo_speakable_path (
     _order integer NOT NULL,
     _parent_id integer NOT NULL,
     id character varying NOT NULL,
@@ -633,7 +741,7 @@ CREATE TABLE public.departments_seo_speakable_path (
 
 
 
-CREATE TABLE public.industries (
+CREATE TABLE IF NOT EXISTS public.industries (
     id integer NOT NULL,
     name character varying,
     slug character varying,
@@ -676,7 +784,7 @@ CREATE TABLE public.industries (
 
 
 
-CREATE SEQUENCE public.industries_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.industries_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -690,7 +798,7 @@ ALTER SEQUENCE public.industries_id_seq OWNED BY public.industries.id;
 
 
 
-CREATE TABLE public.industries_seo_speakable_path (
+CREATE TABLE IF NOT EXISTS public.industries_seo_speakable_path (
     _order integer NOT NULL,
     _parent_id integer NOT NULL,
     id character varying NOT NULL,
@@ -699,7 +807,7 @@ CREATE TABLE public.industries_seo_speakable_path (
 
 
 
-CREATE TABLE public.press_types (
+CREATE TABLE IF NOT EXISTS public.press_types (
     id integer NOT NULL,
     name character varying,
     slug character varying,
@@ -742,7 +850,7 @@ CREATE TABLE public.press_types (
 
 
 
-CREATE SEQUENCE public.press_types_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.press_types_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -756,7 +864,7 @@ ALTER SEQUENCE public.press_types_id_seq OWNED BY public.press_types.id;
 
 
 
-CREATE TABLE public.press_types_seo_speakable_path (
+CREATE TABLE IF NOT EXISTS public.press_types_seo_speakable_path (
     _order integer NOT NULL,
     _parent_id integer NOT NULL,
     id character varying NOT NULL,
@@ -765,7 +873,7 @@ CREATE TABLE public.press_types_seo_speakable_path (
 
 
 
-CREATE TABLE public.regions (
+CREATE TABLE IF NOT EXISTS public.regions (
     id integer NOT NULL,
     name character varying,
     slug character varying,
@@ -808,7 +916,7 @@ CREATE TABLE public.regions (
 
 
 
-CREATE SEQUENCE public.regions_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.regions_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -822,7 +930,7 @@ ALTER SEQUENCE public.regions_id_seq OWNED BY public.regions.id;
 
 
 
-CREATE TABLE public.regions_seo_speakable_path (
+CREATE TABLE IF NOT EXISTS public.regions_seo_speakable_path (
     _order integer NOT NULL,
     _parent_id integer NOT NULL,
     id character varying NOT NULL,
@@ -831,7 +939,7 @@ CREATE TABLE public.regions_seo_speakable_path (
 
 
 
-CREATE TABLE public.resource_types (
+CREATE TABLE IF NOT EXISTS public.resource_types (
     id integer NOT NULL,
     name character varying,
     slug character varying,
@@ -874,7 +982,7 @@ CREATE TABLE public.resource_types (
 
 
 
-CREATE SEQUENCE public.resource_types_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.resource_types_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -888,7 +996,7 @@ ALTER SEQUENCE public.resource_types_id_seq OWNED BY public.resource_types.id;
 
 
 
-CREATE TABLE public.resource_types_seo_speakable_path (
+CREATE TABLE IF NOT EXISTS public.resource_types_seo_speakable_path (
     _order integer NOT NULL,
     _parent_id integer NOT NULL,
     id character varying NOT NULL,
@@ -897,7 +1005,7 @@ CREATE TABLE public.resource_types_seo_speakable_path (
 
 
 
-CREATE TABLE public.webinar_types (
+CREATE TABLE IF NOT EXISTS public.webinar_types (
     id integer NOT NULL,
     name character varying,
     slug character varying,
@@ -940,7 +1048,7 @@ CREATE TABLE public.webinar_types (
 
 
 
-CREATE SEQUENCE public.webinar_types_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.webinar_types_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -954,7 +1062,7 @@ ALTER SEQUENCE public.webinar_types_id_seq OWNED BY public.webinar_types.id;
 
 
 
-CREATE TABLE public.webinar_types_seo_speakable_path (
+CREATE TABLE IF NOT EXISTS public.webinar_types_seo_speakable_path (
     _order integer NOT NULL,
     _parent_id integer NOT NULL,
     id character varying NOT NULL,
@@ -1035,1075 +1143,1387 @@ ALTER TABLE ONLY public.webinar_types ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 
-ALTER TABLE ONLY public._departments_v
-    ADD CONSTRAINT _departments_v_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public._departments_v
+  ADD CONSTRAINT _departments_v_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._departments_v_version_seo_speakable_path
-    ADD CONSTRAINT _departments_v_version_seo_speakable_path_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public._departments_v_version_seo_speakable_path
+  ADD CONSTRAINT _departments_v_version_seo_speakable_path_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._industries_v
-    ADD CONSTRAINT _industries_v_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public._industries_v
+  ADD CONSTRAINT _industries_v_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._industries_v_version_seo_speakable_path
-    ADD CONSTRAINT _industries_v_version_seo_speakable_path_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public._industries_v_version_seo_speakable_path
+  ADD CONSTRAINT _industries_v_version_seo_speakable_path_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._press_types_v
-    ADD CONSTRAINT _press_types_v_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public._press_types_v
+  ADD CONSTRAINT _press_types_v_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._press_types_v_version_seo_speakable_path
-    ADD CONSTRAINT _press_types_v_version_seo_speakable_path_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public._press_types_v_version_seo_speakable_path
+  ADD CONSTRAINT _press_types_v_version_seo_speakable_path_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._regions_v
-    ADD CONSTRAINT _regions_v_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public._regions_v
+  ADD CONSTRAINT _regions_v_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._regions_v_version_seo_speakable_path
-    ADD CONSTRAINT _regions_v_version_seo_speakable_path_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public._regions_v_version_seo_speakable_path
+  ADD CONSTRAINT _regions_v_version_seo_speakable_path_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._resource_types_v
-    ADD CONSTRAINT _resource_types_v_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public._resource_types_v
+  ADD CONSTRAINT _resource_types_v_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._resource_types_v_version_seo_speakable_path
-    ADD CONSTRAINT _resource_types_v_version_seo_speakable_path_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public._resource_types_v_version_seo_speakable_path
+  ADD CONSTRAINT _resource_types_v_version_seo_speakable_path_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._webinar_types_v
-    ADD CONSTRAINT _webinar_types_v_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public._webinar_types_v
+  ADD CONSTRAINT _webinar_types_v_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._webinar_types_v_version_seo_speakable_path
-    ADD CONSTRAINT _webinar_types_v_version_seo_speakable_path_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public._webinar_types_v_version_seo_speakable_path
+  ADD CONSTRAINT _webinar_types_v_version_seo_speakable_path_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.departments
-    ADD CONSTRAINT departments_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public.departments
+  ADD CONSTRAINT departments_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.departments_seo_speakable_path
-    ADD CONSTRAINT departments_seo_speakable_path_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public.departments_seo_speakable_path
+  ADD CONSTRAINT departments_seo_speakable_path_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.industries
-    ADD CONSTRAINT industries_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public.industries
+  ADD CONSTRAINT industries_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.industries_seo_speakable_path
-    ADD CONSTRAINT industries_seo_speakable_path_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public.industries_seo_speakable_path
+  ADD CONSTRAINT industries_seo_speakable_path_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.press_types
-    ADD CONSTRAINT press_types_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public.press_types
+  ADD CONSTRAINT press_types_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.press_types_seo_speakable_path
-    ADD CONSTRAINT press_types_seo_speakable_path_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public.press_types_seo_speakable_path
+  ADD CONSTRAINT press_types_seo_speakable_path_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.regions
-    ADD CONSTRAINT regions_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public.regions
+  ADD CONSTRAINT regions_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.regions_seo_speakable_path
-    ADD CONSTRAINT regions_seo_speakable_path_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public.regions_seo_speakable_path
+  ADD CONSTRAINT regions_seo_speakable_path_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.resource_types
-    ADD CONSTRAINT resource_types_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public.resource_types
+  ADD CONSTRAINT resource_types_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.resource_types_seo_speakable_path
-    ADD CONSTRAINT resource_types_seo_speakable_path_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public.resource_types_seo_speakable_path
+  ADD CONSTRAINT resource_types_seo_speakable_path_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.webinar_types
-    ADD CONSTRAINT webinar_types_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public.webinar_types
+  ADD CONSTRAINT webinar_types_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.webinar_types_seo_speakable_path
-    ADD CONSTRAINT webinar_types_seo_speakable_path_pkey PRIMARY KEY (id);
+DO $$ BEGIN
+  ALTER TABLE ONLY public.webinar_types_seo_speakable_path
+  ADD CONSTRAINT webinar_types_seo_speakable_path_pkey PRIMARY KEY (id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-CREATE INDEX _departments_v_created_at_idx ON public._departments_v USING btree (created_at);
+CREATE INDEX IF NOT EXISTS _departments_v_created_at_idx ON public._departments_v USING btree (created_at);
 
 
 
-CREATE INDEX _departments_v_latest_idx ON public._departments_v USING btree (latest);
+CREATE INDEX IF NOT EXISTS _departments_v_latest_idx ON public._departments_v USING btree (latest);
 
 
 
-CREATE INDEX _departments_v_parent_idx ON public._departments_v USING btree (parent_id);
+CREATE INDEX IF NOT EXISTS _departments_v_parent_idx ON public._departments_v USING btree (parent_id);
 
 
 
-CREATE INDEX _departments_v_updated_at_idx ON public._departments_v USING btree (updated_at);
+CREATE INDEX IF NOT EXISTS _departments_v_updated_at_idx ON public._departments_v USING btree (updated_at);
 
 
 
-CREATE INDEX _departments_v_version_seo_speakable_path_order_idx ON public._departments_v_version_seo_speakable_path USING btree (_order);
+CREATE INDEX IF NOT EXISTS _departments_v_version_seo_speakable_path_order_idx ON public._departments_v_version_seo_speakable_path USING btree (_order);
 
 
 
-CREATE INDEX _departments_v_version_seo_speakable_path_parent_id_idx ON public._departments_v_version_seo_speakable_path USING btree (_parent_id);
+CREATE INDEX IF NOT EXISTS _departments_v_version_seo_speakable_path_parent_id_idx ON public._departments_v_version_seo_speakable_path USING btree (_parent_id);
 
 
 
-CREATE INDEX _departments_v_version_seo_version_seo_og_image_idx ON public._departments_v USING btree (version_seo_og_image_id);
+CREATE INDEX IF NOT EXISTS _departments_v_version_seo_version_seo_og_image_idx ON public._departments_v USING btree (version_seo_og_image_id);
 
 
 
-CREATE INDEX _departments_v_version_seo_version_seo_twitter_image_idx ON public._departments_v USING btree (version_seo_twitter_image_id);
+CREATE INDEX IF NOT EXISTS _departments_v_version_seo_version_seo_twitter_image_idx ON public._departments_v USING btree (version_seo_twitter_image_id);
 
 
 
-CREATE INDEX _departments_v_version_version__status_idx ON public._departments_v USING btree (version__status);
+CREATE INDEX IF NOT EXISTS _departments_v_version_version__status_idx ON public._departments_v USING btree (version__status);
 
 
 
-CREATE INDEX _departments_v_version_version_created_at_idx ON public._departments_v USING btree (version_created_at);
+CREATE INDEX IF NOT EXISTS _departments_v_version_version_created_at_idx ON public._departments_v USING btree (version_created_at);
 
 
 
-CREATE INDEX _departments_v_version_version_icon_idx ON public._departments_v USING btree (version_icon_id);
+CREATE INDEX IF NOT EXISTS _departments_v_version_version_icon_idx ON public._departments_v USING btree (version_icon_id);
 
 
 
-CREATE INDEX _departments_v_version_version_parent_idx ON public._departments_v USING btree (version_parent_id);
+CREATE INDEX IF NOT EXISTS _departments_v_version_version_parent_idx ON public._departments_v USING btree (version_parent_id);
 
 
 
-CREATE INDEX _departments_v_version_version_slug_idx ON public._departments_v USING btree (version_slug);
+CREATE INDEX IF NOT EXISTS _departments_v_version_version_slug_idx ON public._departments_v USING btree (version_slug);
 
 
 
-CREATE INDEX _departments_v_version_version_updated_at_idx ON public._departments_v USING btree (version_updated_at);
+CREATE INDEX IF NOT EXISTS _departments_v_version_version_updated_at_idx ON public._departments_v USING btree (version_updated_at);
 
 
 
-CREATE INDEX _industries_v_created_at_idx ON public._industries_v USING btree (created_at);
+CREATE INDEX IF NOT EXISTS _industries_v_created_at_idx ON public._industries_v USING btree (created_at);
 
 
 
-CREATE INDEX _industries_v_latest_idx ON public._industries_v USING btree (latest);
+CREATE INDEX IF NOT EXISTS _industries_v_latest_idx ON public._industries_v USING btree (latest);
 
 
 
-CREATE INDEX _industries_v_parent_idx ON public._industries_v USING btree (parent_id);
+CREATE INDEX IF NOT EXISTS _industries_v_parent_idx ON public._industries_v USING btree (parent_id);
 
 
 
-CREATE INDEX _industries_v_updated_at_idx ON public._industries_v USING btree (updated_at);
+CREATE INDEX IF NOT EXISTS _industries_v_updated_at_idx ON public._industries_v USING btree (updated_at);
 
 
 
-CREATE INDEX _industries_v_version_seo_speakable_path_order_idx ON public._industries_v_version_seo_speakable_path USING btree (_order);
+CREATE INDEX IF NOT EXISTS _industries_v_version_seo_speakable_path_order_idx ON public._industries_v_version_seo_speakable_path USING btree (_order);
 
 
 
-CREATE INDEX _industries_v_version_seo_speakable_path_parent_id_idx ON public._industries_v_version_seo_speakable_path USING btree (_parent_id);
+CREATE INDEX IF NOT EXISTS _industries_v_version_seo_speakable_path_parent_id_idx ON public._industries_v_version_seo_speakable_path USING btree (_parent_id);
 
 
 
-CREATE INDEX _industries_v_version_seo_version_seo_og_image_idx ON public._industries_v USING btree (version_seo_og_image_id);
+CREATE INDEX IF NOT EXISTS _industries_v_version_seo_version_seo_og_image_idx ON public._industries_v USING btree (version_seo_og_image_id);
 
 
 
-CREATE INDEX _industries_v_version_seo_version_seo_twitter_image_idx ON public._industries_v USING btree (version_seo_twitter_image_id);
+CREATE INDEX IF NOT EXISTS _industries_v_version_seo_version_seo_twitter_image_idx ON public._industries_v USING btree (version_seo_twitter_image_id);
 
 
 
-CREATE INDEX _industries_v_version_version__status_idx ON public._industries_v USING btree (version__status);
+CREATE INDEX IF NOT EXISTS _industries_v_version_version__status_idx ON public._industries_v USING btree (version__status);
 
 
 
-CREATE INDEX _industries_v_version_version_created_at_idx ON public._industries_v USING btree (version_created_at);
+CREATE INDEX IF NOT EXISTS _industries_v_version_version_created_at_idx ON public._industries_v USING btree (version_created_at);
 
 
 
-CREATE INDEX _industries_v_version_version_icon_idx ON public._industries_v USING btree (version_icon_id);
+CREATE INDEX IF NOT EXISTS _industries_v_version_version_icon_idx ON public._industries_v USING btree (version_icon_id);
 
 
 
-CREATE INDEX _industries_v_version_version_parent_idx ON public._industries_v USING btree (version_parent_id);
+CREATE INDEX IF NOT EXISTS _industries_v_version_version_parent_idx ON public._industries_v USING btree (version_parent_id);
 
 
 
-CREATE INDEX _industries_v_version_version_slug_idx ON public._industries_v USING btree (version_slug);
+CREATE INDEX IF NOT EXISTS _industries_v_version_version_slug_idx ON public._industries_v USING btree (version_slug);
 
 
 
-CREATE INDEX _industries_v_version_version_updated_at_idx ON public._industries_v USING btree (version_updated_at);
+CREATE INDEX IF NOT EXISTS _industries_v_version_version_updated_at_idx ON public._industries_v USING btree (version_updated_at);
 
 
 
-CREATE INDEX _press_types_v_created_at_idx ON public._press_types_v USING btree (created_at);
+CREATE INDEX IF NOT EXISTS _press_types_v_created_at_idx ON public._press_types_v USING btree (created_at);
 
 
 
-CREATE INDEX _press_types_v_latest_idx ON public._press_types_v USING btree (latest);
+CREATE INDEX IF NOT EXISTS _press_types_v_latest_idx ON public._press_types_v USING btree (latest);
 
 
 
-CREATE INDEX _press_types_v_parent_idx ON public._press_types_v USING btree (parent_id);
+CREATE INDEX IF NOT EXISTS _press_types_v_parent_idx ON public._press_types_v USING btree (parent_id);
 
 
 
-CREATE INDEX _press_types_v_updated_at_idx ON public._press_types_v USING btree (updated_at);
+CREATE INDEX IF NOT EXISTS _press_types_v_updated_at_idx ON public._press_types_v USING btree (updated_at);
 
 
 
-CREATE INDEX _press_types_v_version_seo_speakable_path_order_idx ON public._press_types_v_version_seo_speakable_path USING btree (_order);
+CREATE INDEX IF NOT EXISTS _press_types_v_version_seo_speakable_path_order_idx ON public._press_types_v_version_seo_speakable_path USING btree (_order);
 
 
 
-CREATE INDEX _press_types_v_version_seo_speakable_path_parent_id_idx ON public._press_types_v_version_seo_speakable_path USING btree (_parent_id);
+CREATE INDEX IF NOT EXISTS _press_types_v_version_seo_speakable_path_parent_id_idx ON public._press_types_v_version_seo_speakable_path USING btree (_parent_id);
 
 
 
-CREATE INDEX _press_types_v_version_seo_version_seo_og_image_idx ON public._press_types_v USING btree (version_seo_og_image_id);
+CREATE INDEX IF NOT EXISTS _press_types_v_version_seo_version_seo_og_image_idx ON public._press_types_v USING btree (version_seo_og_image_id);
 
 
 
-CREATE INDEX _press_types_v_version_seo_version_seo_twitter_image_idx ON public._press_types_v USING btree (version_seo_twitter_image_id);
+CREATE INDEX IF NOT EXISTS _press_types_v_version_seo_version_seo_twitter_image_idx ON public._press_types_v USING btree (version_seo_twitter_image_id);
 
 
 
-CREATE INDEX _press_types_v_version_version__status_idx ON public._press_types_v USING btree (version__status);
+CREATE INDEX IF NOT EXISTS _press_types_v_version_version__status_idx ON public._press_types_v USING btree (version__status);
 
 
 
-CREATE INDEX _press_types_v_version_version_created_at_idx ON public._press_types_v USING btree (version_created_at);
+CREATE INDEX IF NOT EXISTS _press_types_v_version_version_created_at_idx ON public._press_types_v USING btree (version_created_at);
 
 
 
-CREATE INDEX _press_types_v_version_version_icon_idx ON public._press_types_v USING btree (version_icon_id);
+CREATE INDEX IF NOT EXISTS _press_types_v_version_version_icon_idx ON public._press_types_v USING btree (version_icon_id);
 
 
 
-CREATE INDEX _press_types_v_version_version_parent_idx ON public._press_types_v USING btree (version_parent_id);
+CREATE INDEX IF NOT EXISTS _press_types_v_version_version_parent_idx ON public._press_types_v USING btree (version_parent_id);
 
 
 
-CREATE INDEX _press_types_v_version_version_slug_idx ON public._press_types_v USING btree (version_slug);
+CREATE INDEX IF NOT EXISTS _press_types_v_version_version_slug_idx ON public._press_types_v USING btree (version_slug);
 
 
 
-CREATE INDEX _press_types_v_version_version_updated_at_idx ON public._press_types_v USING btree (version_updated_at);
+CREATE INDEX IF NOT EXISTS _press_types_v_version_version_updated_at_idx ON public._press_types_v USING btree (version_updated_at);
 
 
 
-CREATE INDEX _regions_v_created_at_idx ON public._regions_v USING btree (created_at);
+CREATE INDEX IF NOT EXISTS _regions_v_created_at_idx ON public._regions_v USING btree (created_at);
 
 
 
-CREATE INDEX _regions_v_latest_idx ON public._regions_v USING btree (latest);
+CREATE INDEX IF NOT EXISTS _regions_v_latest_idx ON public._regions_v USING btree (latest);
 
 
 
-CREATE INDEX _regions_v_parent_idx ON public._regions_v USING btree (parent_id);
+CREATE INDEX IF NOT EXISTS _regions_v_parent_idx ON public._regions_v USING btree (parent_id);
 
 
 
-CREATE INDEX _regions_v_updated_at_idx ON public._regions_v USING btree (updated_at);
+CREATE INDEX IF NOT EXISTS _regions_v_updated_at_idx ON public._regions_v USING btree (updated_at);
 
 
 
-CREATE INDEX _regions_v_version_seo_speakable_path_order_idx ON public._regions_v_version_seo_speakable_path USING btree (_order);
+CREATE INDEX IF NOT EXISTS _regions_v_version_seo_speakable_path_order_idx ON public._regions_v_version_seo_speakable_path USING btree (_order);
 
 
 
-CREATE INDEX _regions_v_version_seo_speakable_path_parent_id_idx ON public._regions_v_version_seo_speakable_path USING btree (_parent_id);
+CREATE INDEX IF NOT EXISTS _regions_v_version_seo_speakable_path_parent_id_idx ON public._regions_v_version_seo_speakable_path USING btree (_parent_id);
 
 
 
-CREATE INDEX _regions_v_version_seo_version_seo_og_image_idx ON public._regions_v USING btree (version_seo_og_image_id);
+CREATE INDEX IF NOT EXISTS _regions_v_version_seo_version_seo_og_image_idx ON public._regions_v USING btree (version_seo_og_image_id);
 
 
 
-CREATE INDEX _regions_v_version_seo_version_seo_twitter_image_idx ON public._regions_v USING btree (version_seo_twitter_image_id);
+CREATE INDEX IF NOT EXISTS _regions_v_version_seo_version_seo_twitter_image_idx ON public._regions_v USING btree (version_seo_twitter_image_id);
 
 
 
-CREATE INDEX _regions_v_version_version__status_idx ON public._regions_v USING btree (version__status);
+CREATE INDEX IF NOT EXISTS _regions_v_version_version__status_idx ON public._regions_v USING btree (version__status);
 
 
 
-CREATE INDEX _regions_v_version_version_created_at_idx ON public._regions_v USING btree (version_created_at);
+CREATE INDEX IF NOT EXISTS _regions_v_version_version_created_at_idx ON public._regions_v USING btree (version_created_at);
 
 
 
-CREATE INDEX _regions_v_version_version_icon_idx ON public._regions_v USING btree (version_icon_id);
+CREATE INDEX IF NOT EXISTS _regions_v_version_version_icon_idx ON public._regions_v USING btree (version_icon_id);
 
 
 
-CREATE INDEX _regions_v_version_version_parent_idx ON public._regions_v USING btree (version_parent_id);
+CREATE INDEX IF NOT EXISTS _regions_v_version_version_parent_idx ON public._regions_v USING btree (version_parent_id);
 
 
 
-CREATE INDEX _regions_v_version_version_slug_idx ON public._regions_v USING btree (version_slug);
+CREATE INDEX IF NOT EXISTS _regions_v_version_version_slug_idx ON public._regions_v USING btree (version_slug);
 
 
 
-CREATE INDEX _regions_v_version_version_updated_at_idx ON public._regions_v USING btree (version_updated_at);
+CREATE INDEX IF NOT EXISTS _regions_v_version_version_updated_at_idx ON public._regions_v USING btree (version_updated_at);
 
 
 
-CREATE INDEX _resource_types_v_created_at_idx ON public._resource_types_v USING btree (created_at);
+CREATE INDEX IF NOT EXISTS _resource_types_v_created_at_idx ON public._resource_types_v USING btree (created_at);
 
 
 
-CREATE INDEX _resource_types_v_latest_idx ON public._resource_types_v USING btree (latest);
+CREATE INDEX IF NOT EXISTS _resource_types_v_latest_idx ON public._resource_types_v USING btree (latest);
 
 
 
-CREATE INDEX _resource_types_v_parent_idx ON public._resource_types_v USING btree (parent_id);
+CREATE INDEX IF NOT EXISTS _resource_types_v_parent_idx ON public._resource_types_v USING btree (parent_id);
 
 
 
-CREATE INDEX _resource_types_v_updated_at_idx ON public._resource_types_v USING btree (updated_at);
+CREATE INDEX IF NOT EXISTS _resource_types_v_updated_at_idx ON public._resource_types_v USING btree (updated_at);
 
 
 
-CREATE INDEX _resource_types_v_version_seo_speakable_path_order_idx ON public._resource_types_v_version_seo_speakable_path USING btree (_order);
+CREATE INDEX IF NOT EXISTS _resource_types_v_version_seo_speakable_path_order_idx ON public._resource_types_v_version_seo_speakable_path USING btree (_order);
 
 
 
-CREATE INDEX _resource_types_v_version_seo_speakable_path_parent_id_idx ON public._resource_types_v_version_seo_speakable_path USING btree (_parent_id);
+CREATE INDEX IF NOT EXISTS _resource_types_v_version_seo_speakable_path_parent_id_idx ON public._resource_types_v_version_seo_speakable_path USING btree (_parent_id);
 
 
 
-CREATE INDEX _resource_types_v_version_seo_version_seo_og_image_idx ON public._resource_types_v USING btree (version_seo_og_image_id);
+CREATE INDEX IF NOT EXISTS _resource_types_v_version_seo_version_seo_og_image_idx ON public._resource_types_v USING btree (version_seo_og_image_id);
 
 
 
-CREATE INDEX _resource_types_v_version_seo_version_seo_twitter_image_idx ON public._resource_types_v USING btree (version_seo_twitter_image_id);
+CREATE INDEX IF NOT EXISTS _resource_types_v_version_seo_version_seo_twitter_image_idx ON public._resource_types_v USING btree (version_seo_twitter_image_id);
 
 
 
-CREATE INDEX _resource_types_v_version_version__status_idx ON public._resource_types_v USING btree (version__status);
+CREATE INDEX IF NOT EXISTS _resource_types_v_version_version__status_idx ON public._resource_types_v USING btree (version__status);
 
 
 
-CREATE INDEX _resource_types_v_version_version_created_at_idx ON public._resource_types_v USING btree (version_created_at);
+CREATE INDEX IF NOT EXISTS _resource_types_v_version_version_created_at_idx ON public._resource_types_v USING btree (version_created_at);
 
 
 
-CREATE INDEX _resource_types_v_version_version_icon_idx ON public._resource_types_v USING btree (version_icon_id);
+CREATE INDEX IF NOT EXISTS _resource_types_v_version_version_icon_idx ON public._resource_types_v USING btree (version_icon_id);
 
 
 
-CREATE INDEX _resource_types_v_version_version_parent_idx ON public._resource_types_v USING btree (version_parent_id);
+CREATE INDEX IF NOT EXISTS _resource_types_v_version_version_parent_idx ON public._resource_types_v USING btree (version_parent_id);
 
 
 
-CREATE INDEX _resource_types_v_version_version_slug_idx ON public._resource_types_v USING btree (version_slug);
+CREATE INDEX IF NOT EXISTS _resource_types_v_version_version_slug_idx ON public._resource_types_v USING btree (version_slug);
 
 
 
-CREATE INDEX _resource_types_v_version_version_updated_at_idx ON public._resource_types_v USING btree (version_updated_at);
+CREATE INDEX IF NOT EXISTS _resource_types_v_version_version_updated_at_idx ON public._resource_types_v USING btree (version_updated_at);
 
 
 
-CREATE INDEX _webinar_types_v_created_at_idx ON public._webinar_types_v USING btree (created_at);
+CREATE INDEX IF NOT EXISTS _webinar_types_v_created_at_idx ON public._webinar_types_v USING btree (created_at);
 
 
 
-CREATE INDEX _webinar_types_v_latest_idx ON public._webinar_types_v USING btree (latest);
+CREATE INDEX IF NOT EXISTS _webinar_types_v_latest_idx ON public._webinar_types_v USING btree (latest);
 
 
 
-CREATE INDEX _webinar_types_v_parent_idx ON public._webinar_types_v USING btree (parent_id);
+CREATE INDEX IF NOT EXISTS _webinar_types_v_parent_idx ON public._webinar_types_v USING btree (parent_id);
 
 
 
-CREATE INDEX _webinar_types_v_updated_at_idx ON public._webinar_types_v USING btree (updated_at);
+CREATE INDEX IF NOT EXISTS _webinar_types_v_updated_at_idx ON public._webinar_types_v USING btree (updated_at);
 
 
 
-CREATE INDEX _webinar_types_v_version_seo_speakable_path_order_idx ON public._webinar_types_v_version_seo_speakable_path USING btree (_order);
+CREATE INDEX IF NOT EXISTS _webinar_types_v_version_seo_speakable_path_order_idx ON public._webinar_types_v_version_seo_speakable_path USING btree (_order);
 
 
 
-CREATE INDEX _webinar_types_v_version_seo_speakable_path_parent_id_idx ON public._webinar_types_v_version_seo_speakable_path USING btree (_parent_id);
+CREATE INDEX IF NOT EXISTS _webinar_types_v_version_seo_speakable_path_parent_id_idx ON public._webinar_types_v_version_seo_speakable_path USING btree (_parent_id);
 
 
 
-CREATE INDEX _webinar_types_v_version_seo_version_seo_og_image_idx ON public._webinar_types_v USING btree (version_seo_og_image_id);
+CREATE INDEX IF NOT EXISTS _webinar_types_v_version_seo_version_seo_og_image_idx ON public._webinar_types_v USING btree (version_seo_og_image_id);
 
 
 
-CREATE INDEX _webinar_types_v_version_seo_version_seo_twitter_image_idx ON public._webinar_types_v USING btree (version_seo_twitter_image_id);
+CREATE INDEX IF NOT EXISTS _webinar_types_v_version_seo_version_seo_twitter_image_idx ON public._webinar_types_v USING btree (version_seo_twitter_image_id);
 
 
 
-CREATE INDEX _webinar_types_v_version_version__status_idx ON public._webinar_types_v USING btree (version__status);
+CREATE INDEX IF NOT EXISTS _webinar_types_v_version_version__status_idx ON public._webinar_types_v USING btree (version__status);
 
 
 
-CREATE INDEX _webinar_types_v_version_version_created_at_idx ON public._webinar_types_v USING btree (version_created_at);
+CREATE INDEX IF NOT EXISTS _webinar_types_v_version_version_created_at_idx ON public._webinar_types_v USING btree (version_created_at);
 
 
 
-CREATE INDEX _webinar_types_v_version_version_icon_idx ON public._webinar_types_v USING btree (version_icon_id);
+CREATE INDEX IF NOT EXISTS _webinar_types_v_version_version_icon_idx ON public._webinar_types_v USING btree (version_icon_id);
 
 
 
-CREATE INDEX _webinar_types_v_version_version_parent_idx ON public._webinar_types_v USING btree (version_parent_id);
+CREATE INDEX IF NOT EXISTS _webinar_types_v_version_version_parent_idx ON public._webinar_types_v USING btree (version_parent_id);
 
 
 
-CREATE INDEX _webinar_types_v_version_version_slug_idx ON public._webinar_types_v USING btree (version_slug);
+CREATE INDEX IF NOT EXISTS _webinar_types_v_version_version_slug_idx ON public._webinar_types_v USING btree (version_slug);
 
 
 
-CREATE INDEX _webinar_types_v_version_version_updated_at_idx ON public._webinar_types_v USING btree (version_updated_at);
+CREATE INDEX IF NOT EXISTS _webinar_types_v_version_version_updated_at_idx ON public._webinar_types_v USING btree (version_updated_at);
 
 
 
-CREATE INDEX departments__status_idx ON public.departments USING btree (_status);
+CREATE INDEX IF NOT EXISTS departments__status_idx ON public.departments USING btree (_status);
 
 
 
-CREATE INDEX departments_created_at_idx ON public.departments USING btree (created_at);
+CREATE INDEX IF NOT EXISTS departments_created_at_idx ON public.departments USING btree (created_at);
 
 
 
-CREATE INDEX departments_icon_idx ON public.departments USING btree (icon_id);
+CREATE INDEX IF NOT EXISTS departments_icon_idx ON public.departments USING btree (icon_id);
 
 
 
-CREATE INDEX departments_parent_idx ON public.departments USING btree (parent_id);
+CREATE INDEX IF NOT EXISTS departments_parent_idx ON public.departments USING btree (parent_id);
 
 
 
-CREATE INDEX departments_seo_seo_og_image_idx ON public.departments USING btree (seo_og_image_id);
+CREATE INDEX IF NOT EXISTS departments_seo_seo_og_image_idx ON public.departments USING btree (seo_og_image_id);
 
 
 
-CREATE INDEX departments_seo_seo_twitter_image_idx ON public.departments USING btree (seo_twitter_image_id);
+CREATE INDEX IF NOT EXISTS departments_seo_seo_twitter_image_idx ON public.departments USING btree (seo_twitter_image_id);
 
 
 
-CREATE INDEX departments_seo_speakable_path_order_idx ON public.departments_seo_speakable_path USING btree (_order);
+CREATE INDEX IF NOT EXISTS departments_seo_speakable_path_order_idx ON public.departments_seo_speakable_path USING btree (_order);
 
 
 
-CREATE INDEX departments_seo_speakable_path_parent_id_idx ON public.departments_seo_speakable_path USING btree (_parent_id);
+CREATE INDEX IF NOT EXISTS departments_seo_speakable_path_parent_id_idx ON public.departments_seo_speakable_path USING btree (_parent_id);
 
 
 
-CREATE UNIQUE INDEX departments_slug_idx ON public.departments USING btree (slug);
+CREATE UNIQUE INDEX IF NOT EXISTS departments_slug_idx ON public.departments USING btree (slug);
 
 
 
-CREATE INDEX departments_updated_at_idx ON public.departments USING btree (updated_at);
+CREATE INDEX IF NOT EXISTS departments_updated_at_idx ON public.departments USING btree (updated_at);
 
 
 
-CREATE INDEX industries__status_idx ON public.industries USING btree (_status);
+CREATE INDEX IF NOT EXISTS industries__status_idx ON public.industries USING btree (_status);
 
 
 
-CREATE INDEX industries_created_at_idx ON public.industries USING btree (created_at);
+CREATE INDEX IF NOT EXISTS industries_created_at_idx ON public.industries USING btree (created_at);
 
 
 
-CREATE INDEX industries_icon_idx ON public.industries USING btree (icon_id);
+CREATE INDEX IF NOT EXISTS industries_icon_idx ON public.industries USING btree (icon_id);
 
 
 
-CREATE INDEX industries_parent_idx ON public.industries USING btree (parent_id);
+CREATE INDEX IF NOT EXISTS industries_parent_idx ON public.industries USING btree (parent_id);
 
 
 
-CREATE INDEX industries_seo_seo_og_image_idx ON public.industries USING btree (seo_og_image_id);
+CREATE INDEX IF NOT EXISTS industries_seo_seo_og_image_idx ON public.industries USING btree (seo_og_image_id);
 
 
 
-CREATE INDEX industries_seo_seo_twitter_image_idx ON public.industries USING btree (seo_twitter_image_id);
+CREATE INDEX IF NOT EXISTS industries_seo_seo_twitter_image_idx ON public.industries USING btree (seo_twitter_image_id);
 
 
 
-CREATE INDEX industries_seo_speakable_path_order_idx ON public.industries_seo_speakable_path USING btree (_order);
+CREATE INDEX IF NOT EXISTS industries_seo_speakable_path_order_idx ON public.industries_seo_speakable_path USING btree (_order);
 
 
 
-CREATE INDEX industries_seo_speakable_path_parent_id_idx ON public.industries_seo_speakable_path USING btree (_parent_id);
+CREATE INDEX IF NOT EXISTS industries_seo_speakable_path_parent_id_idx ON public.industries_seo_speakable_path USING btree (_parent_id);
 
 
 
-CREATE UNIQUE INDEX industries_slug_idx ON public.industries USING btree (slug);
+CREATE UNIQUE INDEX IF NOT EXISTS industries_slug_idx ON public.industries USING btree (slug);
 
 
 
-CREATE INDEX industries_updated_at_idx ON public.industries USING btree (updated_at);
+CREATE INDEX IF NOT EXISTS industries_updated_at_idx ON public.industries USING btree (updated_at);
 
 
 
-CREATE INDEX press_types__status_idx ON public.press_types USING btree (_status);
+CREATE INDEX IF NOT EXISTS press_types__status_idx ON public.press_types USING btree (_status);
 
 
 
-CREATE INDEX press_types_created_at_idx ON public.press_types USING btree (created_at);
+CREATE INDEX IF NOT EXISTS press_types_created_at_idx ON public.press_types USING btree (created_at);
 
 
 
-CREATE INDEX press_types_icon_idx ON public.press_types USING btree (icon_id);
+CREATE INDEX IF NOT EXISTS press_types_icon_idx ON public.press_types USING btree (icon_id);
 
 
 
-CREATE INDEX press_types_parent_idx ON public.press_types USING btree (parent_id);
+CREATE INDEX IF NOT EXISTS press_types_parent_idx ON public.press_types USING btree (parent_id);
 
 
 
-CREATE INDEX press_types_seo_seo_og_image_idx ON public.press_types USING btree (seo_og_image_id);
+CREATE INDEX IF NOT EXISTS press_types_seo_seo_og_image_idx ON public.press_types USING btree (seo_og_image_id);
 
 
 
-CREATE INDEX press_types_seo_seo_twitter_image_idx ON public.press_types USING btree (seo_twitter_image_id);
+CREATE INDEX IF NOT EXISTS press_types_seo_seo_twitter_image_idx ON public.press_types USING btree (seo_twitter_image_id);
 
 
 
-CREATE INDEX press_types_seo_speakable_path_order_idx ON public.press_types_seo_speakable_path USING btree (_order);
+CREATE INDEX IF NOT EXISTS press_types_seo_speakable_path_order_idx ON public.press_types_seo_speakable_path USING btree (_order);
 
 
 
-CREATE INDEX press_types_seo_speakable_path_parent_id_idx ON public.press_types_seo_speakable_path USING btree (_parent_id);
+CREATE INDEX IF NOT EXISTS press_types_seo_speakable_path_parent_id_idx ON public.press_types_seo_speakable_path USING btree (_parent_id);
 
 
 
-CREATE UNIQUE INDEX press_types_slug_idx ON public.press_types USING btree (slug);
+CREATE UNIQUE INDEX IF NOT EXISTS press_types_slug_idx ON public.press_types USING btree (slug);
 
 
 
-CREATE INDEX press_types_updated_at_idx ON public.press_types USING btree (updated_at);
+CREATE INDEX IF NOT EXISTS press_types_updated_at_idx ON public.press_types USING btree (updated_at);
 
 
 
-CREATE INDEX regions__status_idx ON public.regions USING btree (_status);
+CREATE INDEX IF NOT EXISTS regions__status_idx ON public.regions USING btree (_status);
 
 
 
-CREATE INDEX regions_created_at_idx ON public.regions USING btree (created_at);
+CREATE INDEX IF NOT EXISTS regions_created_at_idx ON public.regions USING btree (created_at);
 
 
 
-CREATE INDEX regions_icon_idx ON public.regions USING btree (icon_id);
+CREATE INDEX IF NOT EXISTS regions_icon_idx ON public.regions USING btree (icon_id);
 
 
 
-CREATE INDEX regions_parent_idx ON public.regions USING btree (parent_id);
+CREATE INDEX IF NOT EXISTS regions_parent_idx ON public.regions USING btree (parent_id);
 
 
 
-CREATE INDEX regions_seo_seo_og_image_idx ON public.regions USING btree (seo_og_image_id);
+CREATE INDEX IF NOT EXISTS regions_seo_seo_og_image_idx ON public.regions USING btree (seo_og_image_id);
 
 
 
-CREATE INDEX regions_seo_seo_twitter_image_idx ON public.regions USING btree (seo_twitter_image_id);
+CREATE INDEX IF NOT EXISTS regions_seo_seo_twitter_image_idx ON public.regions USING btree (seo_twitter_image_id);
 
 
 
-CREATE INDEX regions_seo_speakable_path_order_idx ON public.regions_seo_speakable_path USING btree (_order);
+CREATE INDEX IF NOT EXISTS regions_seo_speakable_path_order_idx ON public.regions_seo_speakable_path USING btree (_order);
 
 
 
-CREATE INDEX regions_seo_speakable_path_parent_id_idx ON public.regions_seo_speakable_path USING btree (_parent_id);
+CREATE INDEX IF NOT EXISTS regions_seo_speakable_path_parent_id_idx ON public.regions_seo_speakable_path USING btree (_parent_id);
 
 
 
-CREATE UNIQUE INDEX regions_slug_idx ON public.regions USING btree (slug);
+CREATE UNIQUE INDEX IF NOT EXISTS regions_slug_idx ON public.regions USING btree (slug);
 
 
 
-CREATE INDEX regions_updated_at_idx ON public.regions USING btree (updated_at);
+CREATE INDEX IF NOT EXISTS regions_updated_at_idx ON public.regions USING btree (updated_at);
 
 
 
-CREATE INDEX resource_types__status_idx ON public.resource_types USING btree (_status);
+CREATE INDEX IF NOT EXISTS resource_types__status_idx ON public.resource_types USING btree (_status);
 
 
 
-CREATE INDEX resource_types_created_at_idx ON public.resource_types USING btree (created_at);
+CREATE INDEX IF NOT EXISTS resource_types_created_at_idx ON public.resource_types USING btree (created_at);
 
 
 
-CREATE INDEX resource_types_icon_idx ON public.resource_types USING btree (icon_id);
+CREATE INDEX IF NOT EXISTS resource_types_icon_idx ON public.resource_types USING btree (icon_id);
 
 
 
-CREATE INDEX resource_types_parent_idx ON public.resource_types USING btree (parent_id);
+CREATE INDEX IF NOT EXISTS resource_types_parent_idx ON public.resource_types USING btree (parent_id);
 
 
 
-CREATE INDEX resource_types_seo_seo_og_image_idx ON public.resource_types USING btree (seo_og_image_id);
+CREATE INDEX IF NOT EXISTS resource_types_seo_seo_og_image_idx ON public.resource_types USING btree (seo_og_image_id);
 
 
 
-CREATE INDEX resource_types_seo_seo_twitter_image_idx ON public.resource_types USING btree (seo_twitter_image_id);
+CREATE INDEX IF NOT EXISTS resource_types_seo_seo_twitter_image_idx ON public.resource_types USING btree (seo_twitter_image_id);
 
 
 
-CREATE INDEX resource_types_seo_speakable_path_order_idx ON public.resource_types_seo_speakable_path USING btree (_order);
+CREATE INDEX IF NOT EXISTS resource_types_seo_speakable_path_order_idx ON public.resource_types_seo_speakable_path USING btree (_order);
 
 
 
-CREATE INDEX resource_types_seo_speakable_path_parent_id_idx ON public.resource_types_seo_speakable_path USING btree (_parent_id);
+CREATE INDEX IF NOT EXISTS resource_types_seo_speakable_path_parent_id_idx ON public.resource_types_seo_speakable_path USING btree (_parent_id);
 
 
 
-CREATE UNIQUE INDEX resource_types_slug_idx ON public.resource_types USING btree (slug);
+CREATE UNIQUE INDEX IF NOT EXISTS resource_types_slug_idx ON public.resource_types USING btree (slug);
 
 
 
-CREATE INDEX resource_types_updated_at_idx ON public.resource_types USING btree (updated_at);
+CREATE INDEX IF NOT EXISTS resource_types_updated_at_idx ON public.resource_types USING btree (updated_at);
 
 
 
-CREATE INDEX webinar_types__status_idx ON public.webinar_types USING btree (_status);
+CREATE INDEX IF NOT EXISTS webinar_types__status_idx ON public.webinar_types USING btree (_status);
 
 
 
-CREATE INDEX webinar_types_created_at_idx ON public.webinar_types USING btree (created_at);
+CREATE INDEX IF NOT EXISTS webinar_types_created_at_idx ON public.webinar_types USING btree (created_at);
 
 
 
-CREATE INDEX webinar_types_icon_idx ON public.webinar_types USING btree (icon_id);
+CREATE INDEX IF NOT EXISTS webinar_types_icon_idx ON public.webinar_types USING btree (icon_id);
 
 
 
-CREATE INDEX webinar_types_parent_idx ON public.webinar_types USING btree (parent_id);
+CREATE INDEX IF NOT EXISTS webinar_types_parent_idx ON public.webinar_types USING btree (parent_id);
 
 
 
-CREATE INDEX webinar_types_seo_seo_og_image_idx ON public.webinar_types USING btree (seo_og_image_id);
+CREATE INDEX IF NOT EXISTS webinar_types_seo_seo_og_image_idx ON public.webinar_types USING btree (seo_og_image_id);
 
 
 
-CREATE INDEX webinar_types_seo_seo_twitter_image_idx ON public.webinar_types USING btree (seo_twitter_image_id);
+CREATE INDEX IF NOT EXISTS webinar_types_seo_seo_twitter_image_idx ON public.webinar_types USING btree (seo_twitter_image_id);
 
 
 
-CREATE INDEX webinar_types_seo_speakable_path_order_idx ON public.webinar_types_seo_speakable_path USING btree (_order);
+CREATE INDEX IF NOT EXISTS webinar_types_seo_speakable_path_order_idx ON public.webinar_types_seo_speakable_path USING btree (_order);
 
 
 
-CREATE INDEX webinar_types_seo_speakable_path_parent_id_idx ON public.webinar_types_seo_speakable_path USING btree (_parent_id);
+CREATE INDEX IF NOT EXISTS webinar_types_seo_speakable_path_parent_id_idx ON public.webinar_types_seo_speakable_path USING btree (_parent_id);
 
 
 
-CREATE UNIQUE INDEX webinar_types_slug_idx ON public.webinar_types USING btree (slug);
+CREATE UNIQUE INDEX IF NOT EXISTS webinar_types_slug_idx ON public.webinar_types USING btree (slug);
 
 
 
-CREATE INDEX webinar_types_updated_at_idx ON public.webinar_types USING btree (updated_at);
+CREATE INDEX IF NOT EXISTS webinar_types_updated_at_idx ON public.webinar_types USING btree (updated_at);
 
 
 
-ALTER TABLE ONLY public._departments_v
-    ADD CONSTRAINT _departments_v_parent_id_departments_id_fk FOREIGN KEY (parent_id) REFERENCES public.departments(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._departments_v
+  ADD CONSTRAINT _departments_v_parent_id_departments_id_fk FOREIGN KEY (parent_id) REFERENCES public.departments(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._departments_v
-    ADD CONSTRAINT _departments_v_version_icon_id_media_id_fk FOREIGN KEY (version_icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._departments_v
+  ADD CONSTRAINT _departments_v_version_icon_id_media_id_fk FOREIGN KEY (version_icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._departments_v
-    ADD CONSTRAINT _departments_v_version_parent_id_departments_id_fk FOREIGN KEY (version_parent_id) REFERENCES public.departments(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._departments_v
+  ADD CONSTRAINT _departments_v_version_parent_id_departments_id_fk FOREIGN KEY (version_parent_id) REFERENCES public.departments(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._departments_v
-    ADD CONSTRAINT _departments_v_version_seo_og_image_id_media_id_fk FOREIGN KEY (version_seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._departments_v
+  ADD CONSTRAINT _departments_v_version_seo_og_image_id_media_id_fk FOREIGN KEY (version_seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._departments_v_version_seo_speakable_path
-    ADD CONSTRAINT _departments_v_version_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public._departments_v(id) ON DELETE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._departments_v_version_seo_speakable_path
+  ADD CONSTRAINT _departments_v_version_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public._departments_v(id) ON DELETE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._departments_v
-    ADD CONSTRAINT _departments_v_version_seo_twitter_image_id_media_id_fk FOREIGN KEY (version_seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._departments_v
+  ADD CONSTRAINT _departments_v_version_seo_twitter_image_id_media_id_fk FOREIGN KEY (version_seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._industries_v
-    ADD CONSTRAINT _industries_v_parent_id_industries_id_fk FOREIGN KEY (parent_id) REFERENCES public.industries(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._industries_v
+  ADD CONSTRAINT _industries_v_parent_id_industries_id_fk FOREIGN KEY (parent_id) REFERENCES public.industries(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._industries_v
-    ADD CONSTRAINT _industries_v_version_icon_id_media_id_fk FOREIGN KEY (version_icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._industries_v
+  ADD CONSTRAINT _industries_v_version_icon_id_media_id_fk FOREIGN KEY (version_icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._industries_v
-    ADD CONSTRAINT _industries_v_version_parent_id_industries_id_fk FOREIGN KEY (version_parent_id) REFERENCES public.industries(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._industries_v
+  ADD CONSTRAINT _industries_v_version_parent_id_industries_id_fk FOREIGN KEY (version_parent_id) REFERENCES public.industries(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._industries_v
-    ADD CONSTRAINT _industries_v_version_seo_og_image_id_media_id_fk FOREIGN KEY (version_seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._industries_v
+  ADD CONSTRAINT _industries_v_version_seo_og_image_id_media_id_fk FOREIGN KEY (version_seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._industries_v_version_seo_speakable_path
-    ADD CONSTRAINT _industries_v_version_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public._industries_v(id) ON DELETE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._industries_v_version_seo_speakable_path
+  ADD CONSTRAINT _industries_v_version_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public._industries_v(id) ON DELETE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._industries_v
-    ADD CONSTRAINT _industries_v_version_seo_twitter_image_id_media_id_fk FOREIGN KEY (version_seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._industries_v
+  ADD CONSTRAINT _industries_v_version_seo_twitter_image_id_media_id_fk FOREIGN KEY (version_seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._press_types_v
-    ADD CONSTRAINT _press_types_v_parent_id_press_types_id_fk FOREIGN KEY (parent_id) REFERENCES public.press_types(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._press_types_v
+  ADD CONSTRAINT _press_types_v_parent_id_press_types_id_fk FOREIGN KEY (parent_id) REFERENCES public.press_types(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._press_types_v
-    ADD CONSTRAINT _press_types_v_version_icon_id_media_id_fk FOREIGN KEY (version_icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._press_types_v
+  ADD CONSTRAINT _press_types_v_version_icon_id_media_id_fk FOREIGN KEY (version_icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._press_types_v
-    ADD CONSTRAINT _press_types_v_version_parent_id_press_types_id_fk FOREIGN KEY (version_parent_id) REFERENCES public.press_types(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._press_types_v
+  ADD CONSTRAINT _press_types_v_version_parent_id_press_types_id_fk FOREIGN KEY (version_parent_id) REFERENCES public.press_types(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._press_types_v
-    ADD CONSTRAINT _press_types_v_version_seo_og_image_id_media_id_fk FOREIGN KEY (version_seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._press_types_v
+  ADD CONSTRAINT _press_types_v_version_seo_og_image_id_media_id_fk FOREIGN KEY (version_seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._press_types_v_version_seo_speakable_path
-    ADD CONSTRAINT _press_types_v_version_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public._press_types_v(id) ON DELETE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._press_types_v_version_seo_speakable_path
+  ADD CONSTRAINT _press_types_v_version_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public._press_types_v(id) ON DELETE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._press_types_v
-    ADD CONSTRAINT _press_types_v_version_seo_twitter_image_id_media_id_fk FOREIGN KEY (version_seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._press_types_v
+  ADD CONSTRAINT _press_types_v_version_seo_twitter_image_id_media_id_fk FOREIGN KEY (version_seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._regions_v
-    ADD CONSTRAINT _regions_v_parent_id_regions_id_fk FOREIGN KEY (parent_id) REFERENCES public.regions(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._regions_v
+  ADD CONSTRAINT _regions_v_parent_id_regions_id_fk FOREIGN KEY (parent_id) REFERENCES public.regions(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._regions_v
-    ADD CONSTRAINT _regions_v_version_icon_id_media_id_fk FOREIGN KEY (version_icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._regions_v
+  ADD CONSTRAINT _regions_v_version_icon_id_media_id_fk FOREIGN KEY (version_icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._regions_v
-    ADD CONSTRAINT _regions_v_version_parent_id_regions_id_fk FOREIGN KEY (version_parent_id) REFERENCES public.regions(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._regions_v
+  ADD CONSTRAINT _regions_v_version_parent_id_regions_id_fk FOREIGN KEY (version_parent_id) REFERENCES public.regions(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._regions_v
-    ADD CONSTRAINT _regions_v_version_seo_og_image_id_media_id_fk FOREIGN KEY (version_seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._regions_v
+  ADD CONSTRAINT _regions_v_version_seo_og_image_id_media_id_fk FOREIGN KEY (version_seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._regions_v_version_seo_speakable_path
-    ADD CONSTRAINT _regions_v_version_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public._regions_v(id) ON DELETE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._regions_v_version_seo_speakable_path
+  ADD CONSTRAINT _regions_v_version_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public._regions_v(id) ON DELETE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._regions_v
-    ADD CONSTRAINT _regions_v_version_seo_twitter_image_id_media_id_fk FOREIGN KEY (version_seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._regions_v
+  ADD CONSTRAINT _regions_v_version_seo_twitter_image_id_media_id_fk FOREIGN KEY (version_seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._resource_types_v
-    ADD CONSTRAINT _resource_types_v_parent_id_resource_types_id_fk FOREIGN KEY (parent_id) REFERENCES public.resource_types(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._resource_types_v
+  ADD CONSTRAINT _resource_types_v_parent_id_resource_types_id_fk FOREIGN KEY (parent_id) REFERENCES public.resource_types(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._resource_types_v
-    ADD CONSTRAINT _resource_types_v_version_icon_id_media_id_fk FOREIGN KEY (version_icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._resource_types_v
+  ADD CONSTRAINT _resource_types_v_version_icon_id_media_id_fk FOREIGN KEY (version_icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._resource_types_v
-    ADD CONSTRAINT _resource_types_v_version_parent_id_resource_types_id_fk FOREIGN KEY (version_parent_id) REFERENCES public.resource_types(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._resource_types_v
+  ADD CONSTRAINT _resource_types_v_version_parent_id_resource_types_id_fk FOREIGN KEY (version_parent_id) REFERENCES public.resource_types(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._resource_types_v
-    ADD CONSTRAINT _resource_types_v_version_seo_og_image_id_media_id_fk FOREIGN KEY (version_seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._resource_types_v
+  ADD CONSTRAINT _resource_types_v_version_seo_og_image_id_media_id_fk FOREIGN KEY (version_seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._resource_types_v_version_seo_speakable_path
-    ADD CONSTRAINT _resource_types_v_version_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public._resource_types_v(id) ON DELETE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._resource_types_v_version_seo_speakable_path
+  ADD CONSTRAINT _resource_types_v_version_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public._resource_types_v(id) ON DELETE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._resource_types_v
-    ADD CONSTRAINT _resource_types_v_version_seo_twitter_image_id_media_id_fk FOREIGN KEY (version_seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._resource_types_v
+  ADD CONSTRAINT _resource_types_v_version_seo_twitter_image_id_media_id_fk FOREIGN KEY (version_seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._webinar_types_v
-    ADD CONSTRAINT _webinar_types_v_parent_id_webinar_types_id_fk FOREIGN KEY (parent_id) REFERENCES public.webinar_types(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._webinar_types_v
+  ADD CONSTRAINT _webinar_types_v_parent_id_webinar_types_id_fk FOREIGN KEY (parent_id) REFERENCES public.webinar_types(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._webinar_types_v
-    ADD CONSTRAINT _webinar_types_v_version_icon_id_media_id_fk FOREIGN KEY (version_icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._webinar_types_v
+  ADD CONSTRAINT _webinar_types_v_version_icon_id_media_id_fk FOREIGN KEY (version_icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._webinar_types_v
-    ADD CONSTRAINT _webinar_types_v_version_parent_id_webinar_types_id_fk FOREIGN KEY (version_parent_id) REFERENCES public.webinar_types(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._webinar_types_v
+  ADD CONSTRAINT _webinar_types_v_version_parent_id_webinar_types_id_fk FOREIGN KEY (version_parent_id) REFERENCES public.webinar_types(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._webinar_types_v
-    ADD CONSTRAINT _webinar_types_v_version_seo_og_image_id_media_id_fk FOREIGN KEY (version_seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._webinar_types_v
+  ADD CONSTRAINT _webinar_types_v_version_seo_og_image_id_media_id_fk FOREIGN KEY (version_seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._webinar_types_v_version_seo_speakable_path
-    ADD CONSTRAINT _webinar_types_v_version_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public._webinar_types_v(id) ON DELETE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._webinar_types_v_version_seo_speakable_path
+  ADD CONSTRAINT _webinar_types_v_version_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public._webinar_types_v(id) ON DELETE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public._webinar_types_v
-    ADD CONSTRAINT _webinar_types_v_version_seo_twitter_image_id_media_id_fk FOREIGN KEY (version_seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public._webinar_types_v
+  ADD CONSTRAINT _webinar_types_v_version_seo_twitter_image_id_media_id_fk FOREIGN KEY (version_seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.departments
-    ADD CONSTRAINT departments_icon_id_media_id_fk FOREIGN KEY (icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.departments
+  ADD CONSTRAINT departments_icon_id_media_id_fk FOREIGN KEY (icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.departments
-    ADD CONSTRAINT departments_parent_id_departments_id_fk FOREIGN KEY (parent_id) REFERENCES public.departments(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.departments
+  ADD CONSTRAINT departments_parent_id_departments_id_fk FOREIGN KEY (parent_id) REFERENCES public.departments(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.departments
-    ADD CONSTRAINT departments_seo_og_image_id_media_id_fk FOREIGN KEY (seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.departments
+  ADD CONSTRAINT departments_seo_og_image_id_media_id_fk FOREIGN KEY (seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.departments_seo_speakable_path
-    ADD CONSTRAINT departments_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public.departments(id) ON DELETE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.departments_seo_speakable_path
+  ADD CONSTRAINT departments_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public.departments(id) ON DELETE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.departments
-    ADD CONSTRAINT departments_seo_twitter_image_id_media_id_fk FOREIGN KEY (seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.departments
+  ADD CONSTRAINT departments_seo_twitter_image_id_media_id_fk FOREIGN KEY (seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.industries
-    ADD CONSTRAINT industries_icon_id_media_id_fk FOREIGN KEY (icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.industries
+  ADD CONSTRAINT industries_icon_id_media_id_fk FOREIGN KEY (icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.industries
-    ADD CONSTRAINT industries_parent_id_industries_id_fk FOREIGN KEY (parent_id) REFERENCES public.industries(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.industries
+  ADD CONSTRAINT industries_parent_id_industries_id_fk FOREIGN KEY (parent_id) REFERENCES public.industries(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.industries
-    ADD CONSTRAINT industries_seo_og_image_id_media_id_fk FOREIGN KEY (seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.industries
+  ADD CONSTRAINT industries_seo_og_image_id_media_id_fk FOREIGN KEY (seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.industries_seo_speakable_path
-    ADD CONSTRAINT industries_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public.industries(id) ON DELETE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.industries_seo_speakable_path
+  ADD CONSTRAINT industries_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public.industries(id) ON DELETE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.industries
-    ADD CONSTRAINT industries_seo_twitter_image_id_media_id_fk FOREIGN KEY (seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.industries
+  ADD CONSTRAINT industries_seo_twitter_image_id_media_id_fk FOREIGN KEY (seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.press_types
-    ADD CONSTRAINT press_types_icon_id_media_id_fk FOREIGN KEY (icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.press_types
+  ADD CONSTRAINT press_types_icon_id_media_id_fk FOREIGN KEY (icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.press_types
-    ADD CONSTRAINT press_types_parent_id_press_types_id_fk FOREIGN KEY (parent_id) REFERENCES public.press_types(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.press_types
+  ADD CONSTRAINT press_types_parent_id_press_types_id_fk FOREIGN KEY (parent_id) REFERENCES public.press_types(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.press_types
-    ADD CONSTRAINT press_types_seo_og_image_id_media_id_fk FOREIGN KEY (seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.press_types
+  ADD CONSTRAINT press_types_seo_og_image_id_media_id_fk FOREIGN KEY (seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.press_types_seo_speakable_path
-    ADD CONSTRAINT press_types_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public.press_types(id) ON DELETE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.press_types_seo_speakable_path
+  ADD CONSTRAINT press_types_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public.press_types(id) ON DELETE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.press_types
-    ADD CONSTRAINT press_types_seo_twitter_image_id_media_id_fk FOREIGN KEY (seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.press_types
+  ADD CONSTRAINT press_types_seo_twitter_image_id_media_id_fk FOREIGN KEY (seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.regions
-    ADD CONSTRAINT regions_icon_id_media_id_fk FOREIGN KEY (icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.regions
+  ADD CONSTRAINT regions_icon_id_media_id_fk FOREIGN KEY (icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.regions
-    ADD CONSTRAINT regions_parent_id_regions_id_fk FOREIGN KEY (parent_id) REFERENCES public.regions(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.regions
+  ADD CONSTRAINT regions_parent_id_regions_id_fk FOREIGN KEY (parent_id) REFERENCES public.regions(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.regions
-    ADD CONSTRAINT regions_seo_og_image_id_media_id_fk FOREIGN KEY (seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.regions
+  ADD CONSTRAINT regions_seo_og_image_id_media_id_fk FOREIGN KEY (seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.regions_seo_speakable_path
-    ADD CONSTRAINT regions_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public.regions(id) ON DELETE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.regions_seo_speakable_path
+  ADD CONSTRAINT regions_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public.regions(id) ON DELETE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.regions
-    ADD CONSTRAINT regions_seo_twitter_image_id_media_id_fk FOREIGN KEY (seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.regions
+  ADD CONSTRAINT regions_seo_twitter_image_id_media_id_fk FOREIGN KEY (seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.resource_types
-    ADD CONSTRAINT resource_types_icon_id_media_id_fk FOREIGN KEY (icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.resource_types
+  ADD CONSTRAINT resource_types_icon_id_media_id_fk FOREIGN KEY (icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.resource_types
-    ADD CONSTRAINT resource_types_parent_id_resource_types_id_fk FOREIGN KEY (parent_id) REFERENCES public.resource_types(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.resource_types
+  ADD CONSTRAINT resource_types_parent_id_resource_types_id_fk FOREIGN KEY (parent_id) REFERENCES public.resource_types(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.resource_types
-    ADD CONSTRAINT resource_types_seo_og_image_id_media_id_fk FOREIGN KEY (seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.resource_types
+  ADD CONSTRAINT resource_types_seo_og_image_id_media_id_fk FOREIGN KEY (seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.resource_types_seo_speakable_path
-    ADD CONSTRAINT resource_types_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public.resource_types(id) ON DELETE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.resource_types_seo_speakable_path
+  ADD CONSTRAINT resource_types_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public.resource_types(id) ON DELETE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.resource_types
-    ADD CONSTRAINT resource_types_seo_twitter_image_id_media_id_fk FOREIGN KEY (seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.resource_types
+  ADD CONSTRAINT resource_types_seo_twitter_image_id_media_id_fk FOREIGN KEY (seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.webinar_types
-    ADD CONSTRAINT webinar_types_icon_id_media_id_fk FOREIGN KEY (icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.webinar_types
+  ADD CONSTRAINT webinar_types_icon_id_media_id_fk FOREIGN KEY (icon_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.webinar_types
-    ADD CONSTRAINT webinar_types_parent_id_webinar_types_id_fk FOREIGN KEY (parent_id) REFERENCES public.webinar_types(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.webinar_types
+  ADD CONSTRAINT webinar_types_parent_id_webinar_types_id_fk FOREIGN KEY (parent_id) REFERENCES public.webinar_types(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.webinar_types
-    ADD CONSTRAINT webinar_types_seo_og_image_id_media_id_fk FOREIGN KEY (seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.webinar_types
+  ADD CONSTRAINT webinar_types_seo_og_image_id_media_id_fk FOREIGN KEY (seo_og_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.webinar_types_seo_speakable_path
-    ADD CONSTRAINT webinar_types_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public.webinar_types(id) ON DELETE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.webinar_types_seo_speakable_path
+  ADD CONSTRAINT webinar_types_seo_speakable_path_parent_id_fk FOREIGN KEY (_parent_id) REFERENCES public.webinar_types(id) ON DELETE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 
 
-ALTER TABLE ONLY public.webinar_types
-    ADD CONSTRAINT webinar_types_seo_twitter_image_id_media_id_fk FOREIGN KEY (seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE ONLY public.webinar_types
+  ADD CONSTRAINT webinar_types_seo_twitter_image_id_media_id_fk FOREIGN KEY (seo_twitter_image_id) REFERENCES public.media(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- 3. ...Ref relationship columns on the 5 content collections (+ _v tables)
-  ALTER TABLE public."case_studies" ADD COLUMN "industry_ref_id" integer;
-  ALTER TABLE public."jobs" ADD COLUMN "department_ref_id" integer;
-  ALTER TABLE public."news" ADD COLUMN "press_type_ref_id" integer;
-  ALTER TABLE public."news" ADD COLUMN "region_ref_id" integer;
-  ALTER TABLE public."resources" ADD COLUMN "type_ref_id" integer;
-  ALTER TABLE public."webinars" ADD COLUMN "region_ref_id" integer;
-  ALTER TABLE public."webinars" ADD COLUMN "webinar_type_ref_id" integer;
-  ALTER TABLE public."_case_studies_v" ADD COLUMN "version_industry_ref_id" integer;
-  ALTER TABLE public."_jobs_v" ADD COLUMN "version_department_ref_id" integer;
-  ALTER TABLE public."_news_v" ADD COLUMN "version_press_type_ref_id" integer;
-  ALTER TABLE public."_news_v" ADD COLUMN "version_region_ref_id" integer;
-  ALTER TABLE public."_resources_v" ADD COLUMN "version_type_ref_id" integer;
-  ALTER TABLE public."_webinars_v" ADD COLUMN "version_region_ref_id" integer;
-  ALTER TABLE public."_webinars_v" ADD COLUMN "version_webinar_type_ref_id" integer;
+  ALTER TABLE public."case_studies" ADD COLUMN IF NOT EXISTS "industry_ref_id" integer;
+  ALTER TABLE public."jobs" ADD COLUMN IF NOT EXISTS "department_ref_id" integer;
+  ALTER TABLE public."news" ADD COLUMN IF NOT EXISTS "press_type_ref_id" integer;
+  ALTER TABLE public."news" ADD COLUMN IF NOT EXISTS "region_ref_id" integer;
+  ALTER TABLE public."resources" ADD COLUMN IF NOT EXISTS "type_ref_id" integer;
+  ALTER TABLE public."webinars" ADD COLUMN IF NOT EXISTS "region_ref_id" integer;
+  ALTER TABLE public."webinars" ADD COLUMN IF NOT EXISTS "webinar_type_ref_id" integer;
+  ALTER TABLE public."_case_studies_v" ADD COLUMN IF NOT EXISTS "version_industry_ref_id" integer;
+  ALTER TABLE public."_jobs_v" ADD COLUMN IF NOT EXISTS "version_department_ref_id" integer;
+  ALTER TABLE public."_news_v" ADD COLUMN IF NOT EXISTS "version_press_type_ref_id" integer;
+  ALTER TABLE public."_news_v" ADD COLUMN IF NOT EXISTS "version_region_ref_id" integer;
+  ALTER TABLE public."_resources_v" ADD COLUMN IF NOT EXISTS "version_type_ref_id" integer;
+  ALTER TABLE public."_webinars_v" ADD COLUMN IF NOT EXISTS "version_region_ref_id" integer;
+  ALTER TABLE public."_webinars_v" ADD COLUMN IF NOT EXISTS "version_webinar_type_ref_id" integer;
 
-ALTER TABLE public."_case_studies_v" ADD CONSTRAINT "_case_studies_v_version_industry_ref_id_industries_id_fk" FOREIGN KEY (version_industry_ref_id) REFERENCES industries(id) ON DELETE SET NULL;
-ALTER TABLE public."_jobs_v" ADD CONSTRAINT "_jobs_v_version_department_ref_id_departments_id_fk" FOREIGN KEY (version_department_ref_id) REFERENCES departments(id) ON DELETE SET NULL;
-ALTER TABLE public."_news_v" ADD CONSTRAINT "_news_v_version_press_type_ref_id_press_types_id_fk" FOREIGN KEY (version_press_type_ref_id) REFERENCES press_types(id) ON DELETE SET NULL;
-ALTER TABLE public."_news_v" ADD CONSTRAINT "_news_v_version_region_ref_id_regions_id_fk" FOREIGN KEY (version_region_ref_id) REFERENCES regions(id) ON DELETE SET NULL;
-ALTER TABLE public."_resources_v" ADD CONSTRAINT "_resources_v_version_type_ref_id_resource_types_id_fk" FOREIGN KEY (version_type_ref_id) REFERENCES resource_types(id) ON DELETE SET NULL;
-ALTER TABLE public."_webinars_v" ADD CONSTRAINT "_webinars_v_version_webinar_type_ref_id_webinar_types_id_fk" FOREIGN KEY (version_webinar_type_ref_id) REFERENCES webinar_types(id) ON DELETE SET NULL;
-ALTER TABLE public."_webinars_v" ADD CONSTRAINT "_webinars_v_version_region_ref_id_regions_id_fk" FOREIGN KEY (version_region_ref_id) REFERENCES regions(id) ON DELETE SET NULL;
-ALTER TABLE public."case_studies" ADD CONSTRAINT "case_studies_industry_ref_id_industries_id_fk" FOREIGN KEY (industry_ref_id) REFERENCES industries(id) ON DELETE SET NULL;
-ALTER TABLE public."jobs" ADD CONSTRAINT "jobs_department_ref_id_departments_id_fk" FOREIGN KEY (department_ref_id) REFERENCES departments(id) ON DELETE SET NULL;
-ALTER TABLE public."news" ADD CONSTRAINT "news_press_type_ref_id_press_types_id_fk" FOREIGN KEY (press_type_ref_id) REFERENCES press_types(id) ON DELETE SET NULL;
-ALTER TABLE public."news" ADD CONSTRAINT "news_region_ref_id_regions_id_fk" FOREIGN KEY (region_ref_id) REFERENCES regions(id) ON DELETE SET NULL;
-ALTER TABLE public."resources" ADD CONSTRAINT "resources_type_ref_id_resource_types_id_fk" FOREIGN KEY (type_ref_id) REFERENCES resource_types(id) ON DELETE SET NULL;
-ALTER TABLE public."webinars" ADD CONSTRAINT "webinars_region_ref_id_regions_id_fk" FOREIGN KEY (region_ref_id) REFERENCES regions(id) ON DELETE SET NULL;
-ALTER TABLE public."webinars" ADD CONSTRAINT "webinars_webinar_type_ref_id_webinar_types_id_fk" FOREIGN KEY (webinar_type_ref_id) REFERENCES webinar_types(id) ON DELETE SET NULL;
+DO $$ BEGIN
+  ALTER TABLE public."_case_studies_v" ADD CONSTRAINT "_case_studies_v_version_industry_ref_id_industries_id_fk" FOREIGN KEY (version_industry_ref_id) REFERENCES industries(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE public."_jobs_v" ADD CONSTRAINT "_jobs_v_version_department_ref_id_departments_id_fk" FOREIGN KEY (version_department_ref_id) REFERENCES departments(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE public."_news_v" ADD CONSTRAINT "_news_v_version_press_type_ref_id_press_types_id_fk" FOREIGN KEY (version_press_type_ref_id) REFERENCES press_types(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE public."_news_v" ADD CONSTRAINT "_news_v_version_region_ref_id_regions_id_fk" FOREIGN KEY (version_region_ref_id) REFERENCES regions(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE public."_resources_v" ADD CONSTRAINT "_resources_v_version_type_ref_id_resource_types_id_fk" FOREIGN KEY (version_type_ref_id) REFERENCES resource_types(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE public."_webinars_v" ADD CONSTRAINT "_webinars_v_version_webinar_type_ref_id_webinar_types_id_fk" FOREIGN KEY (version_webinar_type_ref_id) REFERENCES webinar_types(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE public."_webinars_v" ADD CONSTRAINT "_webinars_v_version_region_ref_id_regions_id_fk" FOREIGN KEY (version_region_ref_id) REFERENCES regions(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE public."case_studies" ADD CONSTRAINT "case_studies_industry_ref_id_industries_id_fk" FOREIGN KEY (industry_ref_id) REFERENCES industries(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE public."jobs" ADD CONSTRAINT "jobs_department_ref_id_departments_id_fk" FOREIGN KEY (department_ref_id) REFERENCES departments(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE public."news" ADD CONSTRAINT "news_press_type_ref_id_press_types_id_fk" FOREIGN KEY (press_type_ref_id) REFERENCES press_types(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE public."news" ADD CONSTRAINT "news_region_ref_id_regions_id_fk" FOREIGN KEY (region_ref_id) REFERENCES regions(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE public."resources" ADD CONSTRAINT "resources_type_ref_id_resource_types_id_fk" FOREIGN KEY (type_ref_id) REFERENCES resource_types(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE public."webinars" ADD CONSTRAINT "webinars_region_ref_id_regions_id_fk" FOREIGN KEY (region_ref_id) REFERENCES regions(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$ BEGIN
+  ALTER TABLE public."webinars" ADD CONSTRAINT "webinars_webinar_type_ref_id_webinar_types_id_fk" FOREIGN KEY (webinar_type_ref_id) REFERENCES webinar_types(id) ON DELETE SET NULL;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE INDEX _case_studies_v_version_version_industry_ref_idx ON public._case_studies_v USING btree (version_industry_ref_id);
-CREATE INDEX _jobs_v_version_version_department_ref_idx ON public._jobs_v USING btree (version_department_ref_id);
-CREATE INDEX _news_v_version_version_press_type_ref_idx ON public._news_v USING btree (version_press_type_ref_id);
-CREATE INDEX _news_v_version_version_region_ref_idx ON public._news_v USING btree (version_region_ref_id);
-CREATE INDEX _resources_v_version_version_type_ref_idx ON public._resources_v USING btree (version_type_ref_id);
-CREATE INDEX _webinars_v_version_version_webinar_type_ref_idx ON public._webinars_v USING btree (version_webinar_type_ref_id);
-CREATE INDEX _webinars_v_version_version_region_ref_idx ON public._webinars_v USING btree (version_region_ref_id);
-CREATE INDEX case_studies_industry_ref_idx ON public.case_studies USING btree (industry_ref_id);
-CREATE INDEX jobs_department_ref_idx ON public.jobs USING btree (department_ref_id);
-CREATE INDEX news_region_ref_idx ON public.news USING btree (region_ref_id);
-CREATE INDEX news_press_type_ref_idx ON public.news USING btree (press_type_ref_id);
-CREATE INDEX resources_type_ref_idx ON public.resources USING btree (type_ref_id);
-CREATE INDEX webinars_webinar_type_ref_idx ON public.webinars USING btree (webinar_type_ref_id);
-CREATE INDEX webinars_region_ref_idx ON public.webinars USING btree (region_ref_id);
+CREATE INDEX IF NOT EXISTS _case_studies_v_version_version_industry_ref_idx ON public._case_studies_v USING btree (version_industry_ref_id);
+CREATE INDEX IF NOT EXISTS _jobs_v_version_version_department_ref_idx ON public._jobs_v USING btree (version_department_ref_id);
+CREATE INDEX IF NOT EXISTS _news_v_version_version_press_type_ref_idx ON public._news_v USING btree (version_press_type_ref_id);
+CREATE INDEX IF NOT EXISTS _news_v_version_version_region_ref_idx ON public._news_v USING btree (version_region_ref_id);
+CREATE INDEX IF NOT EXISTS _resources_v_version_version_type_ref_idx ON public._resources_v USING btree (version_type_ref_id);
+CREATE INDEX IF NOT EXISTS _webinars_v_version_version_webinar_type_ref_idx ON public._webinars_v USING btree (version_webinar_type_ref_id);
+CREATE INDEX IF NOT EXISTS _webinars_v_version_version_region_ref_idx ON public._webinars_v USING btree (version_region_ref_id);
+CREATE INDEX IF NOT EXISTS case_studies_industry_ref_idx ON public.case_studies USING btree (industry_ref_id);
+CREATE INDEX IF NOT EXISTS jobs_department_ref_idx ON public.jobs USING btree (department_ref_id);
+CREATE INDEX IF NOT EXISTS news_region_ref_idx ON public.news USING btree (region_ref_id);
+CREATE INDEX IF NOT EXISTS news_press_type_ref_idx ON public.news USING btree (press_type_ref_id);
+CREATE INDEX IF NOT EXISTS resources_type_ref_idx ON public.resources USING btree (type_ref_id);
+CREATE INDEX IF NOT EXISTS webinars_webinar_type_ref_idx ON public.webinars USING btree (webinar_type_ref_id);
+CREATE INDEX IF NOT EXISTS webinars_region_ref_idx ON public.webinars USING btree (region_ref_id);
 `)
 }
 
