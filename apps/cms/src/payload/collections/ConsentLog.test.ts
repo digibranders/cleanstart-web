@@ -39,4 +39,16 @@ describe('ConsentLog collection', () => {
     expect(typeof ConsentLog.access?.read).toBe('function');
     expect(typeof ConsentLog.access?.delete).toBe('function');
   });
+
+  it('renders every field read-only in the admin form', () => {
+    // Collection-level `update: () => false` blocks the save but does NOT
+    // disable the form inputs — a human can still type into them. Each field
+    // must therefore be explicitly `admin.readOnly` so the audit record is
+    // visibly immutable in the editor.
+    const fields = ConsentLog.fields as { name?: string; admin?: { readOnly?: boolean } }[];
+    for (const field of fields) {
+      if (!field.name) continue;
+      expect(field.admin?.readOnly, `${field.name} must be readOnly`).toBe(true);
+    }
+  });
 });
