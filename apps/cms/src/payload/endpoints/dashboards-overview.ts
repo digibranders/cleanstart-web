@@ -6,6 +6,8 @@ import { COLLECTION_PATH_PREFIX, buildOverviewCacheKey } from '../lib/dashboards
 import { TTL_MS, isStale, readCache, writeCache } from '../lib/integrations/cache';
 import { resolveGa4Credentials } from '../lib/integrations/credentials';
 import { fetchGa4Overview } from '../lib/integrations/kinds/ga4-overview';
+import { fetchGscOverview } from '../lib/integrations/kinds/gsc-overview';
+import { getGscCredentialsFromRow } from '../lib/integrations/kinds/gsc-search-analytics';
 import { findRowsOfKind } from '../lib/integrations/kinds/types';
 
 const json = (data: unknown, init?: ResponseInit): Response =>
@@ -66,8 +68,8 @@ export const ga4OverviewEndpoint: Endpoint = {
   },
 };
 
-// Real handler lands in Phase 3 (Task 10). Stub returns "not configured" so the
-// dashboard renders its empty state without erroring.
+const gscQuerySchema = z.object({ window: z.enum(['7d', '28d', '90d']).default('28d') });
+
 export const gscOverviewEndpoint: Endpoint = {
   path: '/dashboards/gsc-overview',
   method: 'get',
@@ -75,6 +77,37 @@ export const gscOverviewEndpoint: Endpoint = {
     if (!hasAnyRole(req.user, ['admin', 'editor'])) {
       return json({ ok: false, error: 'forbidden' }, { status: 403 });
     }
-    return json({ ok: true, configured: false, payload: null });
+    const parsed = gscQuerySchema.safeParse(req.query);
+    if (!parsed.success) return json({ ok: false, error: 'bad_params' }, { status: 400 });
+    const window = parsed.data.window;
+    // GSC overview is window-only (no country/collection segmentation in v1).
+    const key = buildOverviewCacheKey('gsc', { window, country: null, collection: null });
+
+    const rows = await findRowsOfKind(req.payload, 'gscSearchAnalyticsApi');
+    const configured = rows.length > 0;
+    const cached = await readCache(req.payload, 'gscSearchAnalyticsApi', 'global', key);
+    if (cached && !isStale(cached, TTL_MS.gscSearchAnalyticsApi)) {
+      return json({ ok: true, configured: true, fromCache: true, capturedAt: cached.capturedAt, payload: cached.payload });
+    }
+    if (!configured) return json({ ok: true, configured: false, payload: null });
+
+    for (const row of rows) {
+      const creds = getGscCredentialsFromRow(row);
+      if (!creds) continue;
+      try {
+        const payload = await fetchGscOverview(creds, window);
+        await writeCache(req.payload, 'gscSearchAnalyticsApi', 'global', key, payload);
+        return json({ ok: true, configured: true, fromCache: false, capturedAt: new Date().toISOString(), payload });
+      } catch (err) {
+        req.payload.logger.warn(
+          { error: err instanceof Error ? err.message : String(err), key },
+          'gsc overview fetch failed',
+        );
+      }
+    }
+    if (cached) {
+      return json({ ok: true, configured: true, fromCache: true, stale: true, capturedAt: cached.capturedAt, payload: cached.payload });
+    }
+    return json({ ok: false, configured: true, error: 'fetch_failed' }, { status: 502 });
   },
 };
