@@ -41,6 +41,7 @@ import * as migration_20260622_260000_drop_seo_defaults_brand_icons from './2026
 
 import * as migration_20260622_270000_drop_site_settings_timezone from './20260622_270000_drop_site_settings_timezone';
 import * as migration_20260623_120000_add_deal_registrations from './20260623_120000_add_deal_registrations';
+import * as migration_20260623_160000_add_taxonomy_collections from './20260623_160000_add_taxonomy_collections';
 
 export const migrations = [
   {
@@ -232,5 +233,10 @@ export const migrations = [
     up: migration_20260623_120000_add_deal_registrations.up,
     down: migration_20260623_120000_add_deal_registrations.down,
     name: '20260623_120000_add_deal_registrations',
+  },
+  {
+    up: migration_20260623_160000_add_taxonomy_collections.up,
+    down: migration_20260623_160000_add_taxonomy_collections.down,
+    name: '20260623_160000_add_taxonomy_collections',
   },
 ];
