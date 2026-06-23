@@ -97,13 +97,17 @@ export function EventDetailMobileCard({
           >
             Events
           </Link>
-          <Chevron />
-          <span
-            className="px-2 py-1 text-xs max-w-[180px] truncate"
-            style={{ color: "#BFCCDA" }}
-            aria-current="page"
-          >
-            {title}
+          {/* Parent-only on the smallest screens: the title crumb duplicates the
+              card heading below, so hide it < sm and keep `Home › Events`. */}
+          <span className="hidden sm:flex items-center">
+            <Chevron />
+            <span
+              className="px-2 py-1 text-xs max-w-[180px] truncate"
+              style={{ color: "#BFCCDA" }}
+              aria-current="page"
+            >
+              {title}
+            </span>
           </span>
         </nav>
 

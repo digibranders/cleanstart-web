@@ -94,9 +94,10 @@ export default async function AuthorPage({
         id={`author-jsonld-${author.slug}`}
         graph={buildPageGraph({
           nodes: [
+            // No `/author` index route exists, so an "Authors" crumb would link
+            // to a 404. The honest trail for a profile page is Home › <Name>.
             breadcrumbSchema([
               { name: "Home", path: "/" },
-              { name: "Authors", path: "/author" },
               { name: author.name },
             ]),
             profilePageSchema({

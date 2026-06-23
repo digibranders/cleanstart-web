@@ -1,8 +1,8 @@
-import Link from "next/link";
 import type { ResourceDetail } from "@/lib/resources";
-import { resourceTypeLabel, mediaUrl } from "@/lib/resources";
+import { mediaUrl } from "@/lib/resources";
 import type { Form } from "@/lib/forms";
 import { DETAIL_HERO_TITLE_STYLE } from "@/components/sections/_shared/DetailHero";
+import { HeroBreadcrumb } from "@/components/sections/_shared/HeroBreadcrumb";
 import { ResourceDownloadButton } from "@/components/resource/ResourceDownloadButton";
 import { HeroReveal } from "@/components/ui/Reveal";
 
@@ -15,7 +15,6 @@ export function ResourceDetailHero({
   resource,
   gateForm,
 }: ResourceDetailHeroProps): React.ReactElement {
-  const typeLabel = resourceTypeLabel(resource.type);
   const assetHref = resource.asset?.url ? (mediaUrl(resource.asset.url) ?? "#") : "#";
   const gated = resource.gated === true;
 
@@ -92,108 +91,13 @@ export function ResourceDetailHero({
         className="relative mx-auto"
         style={{ maxWidth: "1276px", paddingLeft: "24px", paddingRight: "24px" }}
       >
-        {/* On mobile (<sm) the intermediate "Resources" and "<Type>" crumbs
-            collapse to save vertical space and avoid an orphan-chevron wrap on
-            long titles. The full chain stays in the DOM for screen readers via
-            `hidden sm:flex`. */}
-        <nav
-          aria-label="Breadcrumb"
-          className="flex flex-nowrap items-center overflow-x-auto pt-[120px] lg:pt-[calc(138px+var(--cs-header-extra))] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible"
-        >
-          <Link
-            href="/"
-            aria-label="Home"
-            className="flex items-center justify-center shrink-0"
-            style={{ padding: "0 8px", height: "32px", borderRadius: "1000px" }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/resource-center/breadcrumb-home.svg"
-              alt=""
-              aria-hidden
-              width={16}
-              height={16}
-              className="pointer-events-none select-none"
-              loading="lazy"
-              decoding="async"
-            />
-          </Link>
-          <span className="hidden sm:flex items-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/resource-center/breadcrumb-arrow.svg"
-              alt=""
-              aria-hidden
-              width={20}
-              height={20}
-              className="pointer-events-none select-none shrink-0"
-              loading="lazy"
-              decoding="async"
-            />
-            <Link
-              href="/resource-center"
-              className="flex items-center justify-center text-xs font-normal leading-[1.4] shrink-0"
-              style={{
-                padding: "0 8px",
-                height: "32px",
-                color: "#98acc3",
-                textDecoration: "none",
-                borderRadius: "1000px",
-              }}
-            >
-              Resources
-            </Link>
-          </span>
-          <span className="hidden sm:flex items-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/resource-center/breadcrumb-arrow.svg"
-              alt=""
-              aria-hidden
-              width={20}
-              height={20}
-              className="pointer-events-none select-none shrink-0"
-              loading="lazy"
-              decoding="async"
-            />
-            <Link
-              href={`/resource-center?type=${encodeURIComponent(resource.type ?? "")}`}
-              className="flex items-center justify-center text-xs font-normal leading-[1.4] shrink-0"
-              style={{
-                padding: "0 8px",
-                height: "32px",
-                color: "#98acc3",
-                textDecoration: "none",
-                borderRadius: "1000px",
-              }}
-            >
-              {typeLabel}
-            </Link>
-          </span>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/resource-center/breadcrumb-arrow.svg"
-            alt=""
-            aria-hidden
-            width={20}
-            height={20}
-            className="pointer-events-none select-none shrink-0"
-            loading="lazy"
-            decoding="async"
-          />
-          <span
-            className="text-xs font-normal truncate min-w-0 max-w-[220px] sm:max-w-[320px]"
-            style={{
-              padding: "0 8px",
-              height: "32px",
-              lineHeight: "32px",
-              color: "#bfccda",
-            }}
-            aria-current="page"
-          >
-            {resource.title}
-          </span>
-        </nav>
+        <HeroBreadcrumb
+          items={[
+            { label: "Resource Center", href: "/resource-center" },
+            { label: resource.title },
+          ]}
+          navClassName="pt-[120px] lg:pt-[calc(138px+var(--cs-header-extra))]"
+        />
 
         <div
           className="flex flex-col items-center"

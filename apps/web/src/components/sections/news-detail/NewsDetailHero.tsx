@@ -45,7 +45,6 @@ export function NewsDetailHero({
     <DetailHero
       title={title}
       breadcrumb={[
-        { label: "Resources", href: "/news" },
         { label: "Newsroom", href: "/news" },
         { label: title },
       ]}

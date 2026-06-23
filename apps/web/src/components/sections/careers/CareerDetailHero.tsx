@@ -1,8 +1,8 @@
-import Link from "next/link";
 import {
   DETAIL_HERO_GRADIENT,
   DETAIL_HERO_TITLE_STYLE,
 } from "@/components/sections/_shared/DetailHero";
+import { HeroBreadcrumb } from "@/components/sections/_shared/HeroBreadcrumb";
 import { HeroReveal } from "@/components/ui/Reveal";
 
 interface MetaItem {
@@ -61,7 +61,10 @@ export function CareerDetailHero({
       />
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        <Breadcrumb title={title} />
+        <HeroBreadcrumb
+          items={[{ label: "Careers", href: "/careers" }, { label: title }]}
+          navClassName="pt-[calc(var(--cs-header-h)+env(safe-area-inset-top)+clamp(8px,2vw,24px))]"
+        />
 
         <div className="flex justify-center mt-6 md:mt-10">
           <HeroReveal y={40} duration={0.9}>
@@ -133,84 +136,3 @@ export function CareerDetailHero({
   );
 }
 
-function Breadcrumb({ title }: { title: string }): React.ReactElement {
-  const items: { label: string; href?: string }[] = [
-    { label: "Careers", href: "/careers" },
-    { label: "Jobs", href: "/careers" },
-    { label: title },
-  ];
-  return (
-    <nav
-      aria-label="Breadcrumb"
-      className="flex flex-wrap items-center gap-y-1 gap-0 pt-[calc(var(--cs-header-h)+env(safe-area-inset-top)+clamp(8px,2vw,24px))]"
-    >
-      <Link
-        href="/"
-        className="flex items-center justify-center w-11 h-11 rounded-full"
-        aria-label="Home"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path
-            d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5Z"
-            stroke="rgba(152,172,195,0.8)"
-            strokeWidth="1.5"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M9 21V12h6v9"
-            stroke="rgba(152,172,195,0.8)"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </Link>
-      {items.map((item, idx) => {
-        const isLast = idx === items.length - 1;
-        return (
-          <span key={`${item.label}-${idx}`} className="flex items-center">
-            <Chevron />
-            {item.href && !isLast ? (
-              <Link
-                href={item.href}
-                className="flex items-center h-11 px-2 rounded-full text-xs leading-[1.4]"
-                style={{ color: "#98ACC3" }}
-              >
-                {item.label}
-              </Link>
-            ) : (
-              <span
-                className="flex items-center h-11 px-2 max-w-[200px] sm:max-w-[280px] truncate text-xs leading-[1.4]"
-                style={{ color: "#BFCCDA" }}
-                aria-current={isLast ? "page" : undefined}
-              >
-                {item.label}
-              </span>
-            )}
-          </span>
-        );
-      })}
-    </nav>
-  );
-}
-
-function Chevron(): React.ReactElement {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden
-      className="shrink-0"
-    >
-      <path
-        d="M9 18l6-6-6-6"
-        stroke="rgba(152,172,195,0.6)"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}

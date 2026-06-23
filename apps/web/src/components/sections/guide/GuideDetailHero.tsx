@@ -46,7 +46,6 @@ export function GuideDetailHero({
     <DetailHero
       title={title}
       breadcrumb={[
-        { label: "Resources", href: "/guide" },
         { label: "Guides", href: "/guide" },
         { label: title },
       ]}
