@@ -53,6 +53,39 @@ describe("breadcrumbTrail", () => {
     ]);
   });
 
+  it("contract: knowledgeBase category crumb has no path; surrounding crumbs do", () => {
+    const trail = breadcrumbTrail("knowledgeBase", { title: "A", category: "Cat" });
+    // trail is always [Home, Knowledge Hub, category, title] when category is given
+    expect(trail[0]?.path).toBe("/");               // Home
+    expect(trail[1]?.path).toBe("/knowledge-hub");  // listing
+    expect(trail[2]?.path).toBeUndefined();         // category — intentionally unlinked
+    expect(trail[3]?.path).toBeUndefined();         // title — current page
+  });
+
+  it("guide uses the '/guide' path (not '/guides')", () => {
+    expect(breadcrumbTrail("guide", { title: "Article" })[1]).toEqual({
+      name: "Guides",
+      path: "/guide",
+    });
+  });
+
+  it("event uses the '/events' listing path (not '/event')", () => {
+    expect(breadcrumbTrail("event", { title: "Conf" })[1]).toEqual({
+      name: "Events",
+      path: "/events",
+    });
+  });
+
+  it("legal uses 'Legal' and /legal path", () => {
+    expect(breadcrumbTrail("legal", { title: "DPA" })[1]).toEqual({
+      name: "Legal",
+      path: "/legal",
+    });
+  });
+
+  // knowledgeBase is excluded from the sweep below because its category crumb is
+  // intentionally unlinked (no path) and sits in the middle of the trail; it is
+  // covered by the dedicated test directly below.
   it("contract: first crumb is Home, last crumb is the title with no path", () => {
     const kinds = ["blog", "guide", "news", "event", "job", "resource", "author", "legal"] as const;
     for (const kind of kinds) {

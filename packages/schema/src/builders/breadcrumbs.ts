@@ -19,7 +19,10 @@ export type DetailKind =
 export interface DetailTrailInput {
   /** The current page's display name (the last, unlinked crumb). */
   title: string;
-  /** Knowledge Hub only: category name, rendered as an UNLINKED crumb (no route). */
+  /**
+   * Knowledge Hub only: category name, rendered as an UNLINKED crumb between the
+   * hub listing and the title. Ignored for all other kinds.
+   */
   category?: string | null | undefined;
 }
 
