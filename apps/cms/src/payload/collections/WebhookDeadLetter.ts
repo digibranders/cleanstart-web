@@ -17,6 +17,15 @@ import { isAdmin } from '../access';
  *
  * Admin can hard-delete rows once they've been triaged. Soft-delete is
  * intentionally disabled — no need for a recycle bin on delivery logs.
+ *
+ * System-managed log: every row is written by dispatchEvent (create) and
+ * mutated by retryWebhookTask (update) via `overrideAccess: true`, which
+ * bypasses the access rules below. Create/update are therefore hard-denied
+ * so the admin can't hand-edit a row — editing `eventPayload` would corrupt
+ * the blob the retry task re-sends, and editing the schedule/state fields
+ * breaks the retry invariants. Every field is also `admin.readOnly` because
+ * collection-level `update: () => false` blocks the save but does NOT disable
+ * the form inputs. Read + delete stay admin-gated for triage.
  */
 export const WebhookDeadLetter: CollectionConfig = {
   slug: 'webhooks_dead_letter',
@@ -28,8 +37,8 @@ export const WebhookDeadLetter: CollectionConfig = {
   },
   access: {
     read: isAdmin,
-    create: isAdmin,
-    update: isAdmin,
+    create: () => false,
+    update: () => false,
     delete: isAdmin,
   },
   timestamps: true,
@@ -38,12 +47,13 @@ export const WebhookDeadLetter: CollectionConfig = {
       name: 'webhookId',
       type: 'text',
       required: true,
-      admin: { description: 'Unique ID for this delivery attempt (UUID).' },
+      admin: { readOnly: true, description: 'Unique ID for this delivery attempt (UUID).' },
     },
     {
       name: 'event',
       type: 'select',
       required: true,
+      admin: { readOnly: true },
       options: [
         { label: 'document.published', value: 'document.published' },
         { label: 'lead.submitted', value: 'lead.submitted' },
@@ -53,18 +63,19 @@ export const WebhookDeadLetter: CollectionConfig = {
       name: 'eventPayload',
       type: 'json',
       required: true,
-      admin: { description: 'Full event data blob. Used to re-run the delivery on retry.' },
+      admin: { readOnly: true, description: 'Full event data blob. Used to re-run the delivery on retry.' },
     },
     {
       name: 'destinationId',
       type: 'text',
       required: true,
-      admin: { description: 'teams | generic | <custom id>' },
+      admin: { readOnly: true, description: 'teams | generic | <custom id>' },
     },
     {
       name: 'destinationKind',
       type: 'select',
       required: true,
+      admin: { readOnly: true },
       options: [
         { label: 'Teams', value: 'teams' },
         { label: 'Generic (Standard Webhooks)', value: 'generic' },
@@ -73,24 +84,25 @@ export const WebhookDeadLetter: CollectionConfig = {
     {
       name: 'destinationLabel',
       type: 'text',
-      admin: { description: 'First 80 chars of the destination URL for quick scanning.' },
+      admin: { readOnly: true, description: 'First 80 chars of the destination URL for quick scanning.' },
     },
     {
       name: 'attemptCount',
       type: 'number',
       required: true,
       defaultValue: 1,
-      admin: { description: 'How many delivery attempts have been made (including the original).' },
+      admin: { readOnly: true, description: 'How many delivery attempts have been made (including the original).' },
     },
     {
       name: 'lastError',
       type: 'textarea',
-      admin: { description: 'Error message or HTTP status from the most recent attempt.' },
+      admin: { readOnly: true, description: 'Error message or HTTP status from the most recent attempt.' },
     },
     {
       name: 'nextRetryAt',
       type: 'date',
       admin: {
+        readOnly: true,
         date: { displayFormat: 'PPpp' },
         description: 'When the retry task will next attempt this delivery. Null = no more retries.',
       },
@@ -99,6 +111,7 @@ export const WebhookDeadLetter: CollectionConfig = {
       name: 'resolvedAt',
       type: 'date',
       admin: {
+        readOnly: true,
         date: { displayFormat: 'PPpp' },
         description: 'Set when a retry succeeds. Null = still failing or exhausted.',
       },
@@ -106,7 +119,7 @@ export const WebhookDeadLetter: CollectionConfig = {
     {
       name: 'requestId',
       type: 'text',
-      admin: { description: 'x-request-id from the originating HTTP request, for log correlation.' },
+      admin: { readOnly: true, description: 'x-request-id from the originating HTTP request, for log correlation.' },
     },
   ],
 };
