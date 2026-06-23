@@ -41,7 +41,13 @@ export const retryDealSync = async (
 ): Promise<{ scanned: number; retried: number; synced: number; failed: number }> => {
   const found = await payload.find({
     collection: 'deal-registrations',
-    where: { 'hubspotSync.status': { equals: 'failed' } },
+    // Retry legit (turnstile-passed) rows whose deal isn't created yet — both transient 'failed' and pre-provisioning 'skipped'. Honeypot rows are turnstilePassed:false and must never create a deal.
+    where: {
+      and: [
+        { turnstilePassed: { equals: true } },
+        { 'hubspotSync.status': { in: ['failed', 'skipped'] } },
+      ],
+    },
     limit: 100,
     depth: 0,
     overrideAccess: true,

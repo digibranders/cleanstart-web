@@ -13,6 +13,7 @@ const row = {
   partnerRepFirstName: 'Jane', partnerRepLastName: 'Doe', partnerRepEmail: 'jane@acme.com',
   prospectFirstName: 'Sam', prospectLastName: 'Lee', prospectEmail: 'sam@prospect.com',
   dealDetails: 'K8s',
+  turnstilePassed: true,
   hubspotSync: { status: 'failed', attempts: 1 },
 };
 
@@ -44,5 +45,15 @@ describe('retryDealSync', () => {
     const result = await retryDealSync(payload as never, { pipeline: 'p', stage: 's', maxAttempts: 5 });
     expect(result.retried).toBe(0);
     expect(createHubspotDeal).not.toHaveBeenCalled();
+  });
+
+  it('queries only legit (turnstile-passed) rows with failed or skipped sync', async () => {
+    const payload = makePayload();
+    await retryDealSync(payload as never, { pipeline: 'p', stage: 's', maxAttempts: 5 });
+    const where = payload.find.mock.calls[0]?.[0]?.where;
+    expect(where.and).toEqual([
+      { turnstilePassed: { equals: true } },
+      { 'hubspotSync.status': { in: ['failed', 'skipped'] } },
+    ]);
   });
 });
