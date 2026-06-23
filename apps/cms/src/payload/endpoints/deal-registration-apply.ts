@@ -30,6 +30,9 @@ const corsHeaders = (origin: string): Record<string, string> => ({
   'access-control-allow-origin': origin,
   'access-control-allow-methods': 'POST, OPTIONS',
   'access-control-allow-headers': 'content-type',
+  // The web client fetches with credentials:'include'; a cross-origin
+  // (www → cms) response is rejected by the browser without this.
+  'access-control-allow-credentials': 'true',
   vary: 'Origin',
 });
 
