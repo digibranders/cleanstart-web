@@ -41,6 +41,7 @@ import * as migration_20260622_260000_drop_seo_defaults_brand_icons from './2026
 
 import * as migration_20260622_270000_drop_site_settings_timezone from './20260622_270000_drop_site_settings_timezone';
 import * as migration_20260623_120000_add_deal_registrations from './20260623_120000_add_deal_registrations';
+import * as migration_20260623_140000_add_forms_hubspot_subscription_type_id from './20260623_140000_add_forms_hubspot_subscription_type_id';
 
 export const migrations = [
   {
@@ -232,5 +233,10 @@ export const migrations = [
     up: migration_20260623_120000_add_deal_registrations.up,
     down: migration_20260623_120000_add_deal_registrations.down,
     name: '20260623_120000_add_deal_registrations',
+  },
+  {
+    up: migration_20260623_140000_add_forms_hubspot_subscription_type_id.up,
+    down: migration_20260623_140000_add_forms_hubspot_subscription_type_id.down,
+    name: '20260623_140000_add_forms_hubspot_subscription_type_id',
   },
 ];
