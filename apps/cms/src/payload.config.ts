@@ -66,6 +66,7 @@ import {
   dashboardsGscInspectEndpoint,
   dashboardsGscPerDocEndpoint,
 } from './payload/endpoints/dashboards';
+import { ga4OverviewEndpoint, gscOverviewEndpoint } from './payload/endpoints/dashboards-overview';
 import { calcomInboundEndpoint } from './payload/endpoints/integrations-inbound';
 import { jsonLdEndpoint, jsonLdPreviewEndpoint } from './payload/endpoints/jsonld';
 import { mediaIngestUrlEndpoint } from './payload/endpoints/media-ingest-url';
@@ -431,6 +432,8 @@ export default buildConfig({
     dashboardsGlobalEndpoint,
     dashboardsGscPerDocEndpoint,
     dashboardsGscInspectEndpoint,
+    ga4OverviewEndpoint,
+    gscOverviewEndpoint,
     calcomInboundEndpoint,
   ],
   jobs: {
