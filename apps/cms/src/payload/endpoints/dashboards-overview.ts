@@ -1,8 +1,8 @@
-import type { Endpoint } from 'payload';
-import { z } from 'zod';
+import type { Endpoint, PayloadRequest } from 'payload';
 
 import { hasAnyRole } from '../access/typed-user';
 import { COLLECTION_PATH_PREFIX, buildOverviewCacheKey } from '../lib/dashboards/overview-filters';
+import type { OverviewWindow } from '../lib/dashboards/overview-types';
 import { TTL_MS, isStale, readCache, writeCache } from '../lib/integrations/cache';
 import { resolveGa4Credentials } from '../lib/integrations/credentials';
 import { fetchGa4Overview } from '../lib/integrations/kinds/ga4-overview';
@@ -16,11 +16,20 @@ const json = (data: unknown, init?: ResponseInit): Response =>
     headers: { 'content-type': 'application/json', ...(init?.headers ?? {}) },
   });
 
-const querySchema = z.object({
-  window: z.enum(['7d', '28d', '90d']).default('28d'),
-  country: z.string().min(1).max(80).optional(),
-  collection: z.string().min(1).max(40).optional(),
-});
+const WINDOWS: readonly OverviewWindow[] = ['7d', '28d', '90d'];
+
+// Read query params defensively: `req.query` is not populated for custom
+// endpoints in this Payload version, so read from `req.searchParams`
+// (a URLSearchParams). Unknown/missing values fall back to safe defaults —
+// never a 400, so a bad/absent param degrades to the default view.
+const readParam = (req: PayloadRequest, name: string): string | null => {
+  const v = req.searchParams?.get?.(name);
+  return v && v.length > 0 ? v : null;
+};
+const readWindow = (req: PayloadRequest): OverviewWindow => {
+  const w = readParam(req, 'window');
+  return w && (WINDOWS as readonly string[]).includes(w) ? (w as OverviewWindow) : '28d';
+};
 
 export const ga4OverviewEndpoint: Endpoint = {
   path: '/dashboards/ga4-overview',
@@ -29,12 +38,10 @@ export const ga4OverviewEndpoint: Endpoint = {
     if (!hasAnyRole(req.user, ['admin', 'editor'])) {
       return json({ ok: false, error: 'forbidden' }, { status: 403 });
     }
-    const parsed = querySchema.safeParse(req.query);
-    if (!parsed.success) return json({ ok: false, error: 'bad_params' }, { status: 400 });
     const filters = {
-      window: parsed.data.window,
-      country: parsed.data.country ?? null,
-      collection: parsed.data.collection ?? null,
+      window: readWindow(req),
+      country: readParam(req, 'country'),
+      collection: readParam(req, 'collection'),
     };
 
     const rows = await findRowsOfKind(req.payload, 'ga4DataApi');
@@ -68,8 +75,6 @@ export const ga4OverviewEndpoint: Endpoint = {
   },
 };
 
-const gscQuerySchema = z.object({ window: z.enum(['7d', '28d', '90d']).default('28d') });
-
 export const gscOverviewEndpoint: Endpoint = {
   path: '/dashboards/gsc-overview',
   method: 'get',
@@ -77,9 +82,7 @@ export const gscOverviewEndpoint: Endpoint = {
     if (!hasAnyRole(req.user, ['admin', 'editor'])) {
       return json({ ok: false, error: 'forbidden' }, { status: 403 });
     }
-    const parsed = gscQuerySchema.safeParse(req.query);
-    if (!parsed.success) return json({ ok: false, error: 'bad_params' }, { status: 400 });
-    const window = parsed.data.window;
+    const window = readWindow(req);
     // GSC overview is window-only (no country/collection segmentation in v1).
     const key = buildOverviewCacheKey('gsc', { window, country: null, collection: null });
 
