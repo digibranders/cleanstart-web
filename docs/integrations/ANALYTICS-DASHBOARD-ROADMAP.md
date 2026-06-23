@@ -113,6 +113,8 @@ GA4 and GSC already do "what happened on my site" better than we ever will. **Ou
 
 **Goal:** push insight to the team and reduce manual analysis. Reuses integrations you already have.
 
+> **Cost:** the proactive core (weekly digest, anomaly alerts, goal tracking) is **free** — it reuses the already-wired Teams + Brevo channels. Only the two **AI** features cost LLM tokens (pay-per-use via Claude, no subscription, cents per short prompt). This phase is *not* a paid phase — unlike Phase 7 (DataForSEO).
+
 | Feature | What it does | Source | Cost | Effort |
 |---|---|---|---|---|
 | **Weekly digest** | "Top movers · decaying pages · indexation issues" to a channel/inbox | reuse **Teams Workflow + Brevo** | Free | M |
