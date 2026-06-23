@@ -7,7 +7,7 @@ import { buildTaxonomyFields } from '../lib/build-taxonomy-fields';
 
 export const Categories: CollectionConfig = {
   slug: 'categories',
-  labels: { singular: 'Category', plural: 'Categories' },
+  labels: { singular: 'Blog category', plural: 'Blog categories' },
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'parent', 'updatedAt'],
