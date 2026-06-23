@@ -83,11 +83,18 @@ describe("breadcrumbTrail", () => {
     });
   });
 
+  it("webinar uses the '/webinars' listing path", () => {
+    expect(breadcrumbTrail("webinar", { title: "W" })[1]).toEqual({
+      name: "Webinars",
+      path: "/webinars",
+    });
+  });
+
   // knowledgeBase is excluded from the sweep below because its category crumb is
   // intentionally unlinked (no path) and sits in the middle of the trail; it is
   // covered by the dedicated test directly below.
   it("contract: first crumb is Home, last crumb is the title with no path", () => {
-    const kinds = ["blog", "guide", "news", "event", "job", "resource", "author", "legal"] as const;
+    const kinds = ["blog", "guide", "news", "event", "job", "resource", "author", "legal", "webinar"] as const;
     for (const kind of kinds) {
       const trail = breadcrumbTrail(kind, { title: "X" });
       expect(trail[0]).toEqual({ name: "Home", path: "/" });
@@ -100,7 +107,7 @@ describe("breadcrumbTrail", () => {
 
   it("contract: no trail links to a route that does not exist", () => {
     const dead = ["/author", "/resources", "/webinar", "/jobs"];
-    const kinds = ["blog", "guide", "news", "event", "job", "resource", "author", "legal", "knowledgeBase"] as const;
+    const kinds = ["blog", "guide", "news", "event", "job", "resource", "author", "legal", "knowledgeBase", "webinar"] as const;
     for (const kind of kinds) {
       for (const crumb of breadcrumbTrail(kind, { title: "X", category: "C" })) {
         if (crumb.path) expect(dead).not.toContain(crumb.path);

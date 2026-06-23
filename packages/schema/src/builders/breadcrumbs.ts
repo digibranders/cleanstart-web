@@ -14,7 +14,8 @@ export type DetailKind =
   | "resource"
   | "knowledgeBase"
   | "author"
-  | "legal";
+  | "legal"
+  | "webinar";
 
 export interface DetailTrailInput {
   /** The current page's display name (the last, unlinked crumb). */
@@ -39,6 +40,7 @@ const LISTING: Record<DetailKind, BreadcrumbCrumb | null> = {
   knowledgeBase: { name: "Knowledge Hub", path: "/knowledge-hub" },
   legal: { name: "Legal", path: "/legal" },
   author: null,
+  webinar: { name: "Webinars", path: "/webinars" },
 };
 
 /**

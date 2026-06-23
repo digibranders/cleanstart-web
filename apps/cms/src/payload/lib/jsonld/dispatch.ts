@@ -1,3 +1,4 @@
+import { breadcrumbTrail } from '@cleanstart/schema/builders';
 import { dispatchAddons, mergeAddons } from './addons/dispatch';
 import { type ArticleSource, buildArticleBlob, inlineByline } from './article';
 import { buildBreadcrumbBlob } from './breadcrumb';
@@ -341,38 +342,21 @@ const buildGuideHowTo = (
   });
 };
 
+const KIND_BY_COLLECTION = {
+  blogs: 'blog',
+  news: 'news',
+  guides: 'guide',
+  knowledgeBase: 'knowledgeBase',
+} as const;
+
 const breadcrumbsFor = (
   collection: 'blogs' | 'news' | 'guides' | 'knowledgeBase',
   doc: AnyDoc,
-) => {
-  const title = doc.title ?? '';
-  switch (collection) {
-    case 'blogs':
-      return [
-        { name: 'Home', path: '/' },
-        { name: 'Blog', path: '/blogs' },
-        { name: title, path: `/blogs/${doc.slug}` },
-      ];
-    case 'news':
-      return [
-        { name: 'Home', path: '/' },
-        { name: 'News', path: '/news' },
-        { name: title, path: `/news/${doc.slug}` },
-      ];
-    case 'guides':
-      return [
-        { name: 'Home', path: '/' },
-        { name: 'Guides', path: '/guide' },
-        { name: title, path: `/guide/${doc.slug}` },
-      ];
-    case 'knowledgeBase':
-      return [
-        { name: 'Home', path: '/' },
-        { name: 'Knowledge Hub', path: '/knowledge-hub' },
-        { name: title, path: `/knowledge-hub/${doc.slug}` },
-      ];
-  }
-};
+) =>
+  breadcrumbTrail(KIND_BY_COLLECTION[collection], {
+    title: doc.title ?? '',
+    category: (doc as { category?: { name?: string } | null }).category?.name,
+  });
 
 const dispatchAuthor = (ctx: JsonLdContext, doc: AnyDoc): JsonLdBlob[] => {
   const slug = doc.slug ?? '';
@@ -387,11 +371,7 @@ const dispatchAuthor = (ctx: JsonLdContext, doc: AnyDoc): JsonLdBlob[] => {
   const person = buildPersonBlob(ctx, doc as AuthorSource);
   if (person) blobs.push(person);
 
-  const breadcrumb = buildBreadcrumbBlob(ctx, [
-    { name: 'Home', path: '/' },
-    { name: 'Authors', path: '/author' },
-    { name, path: `/author/${slug}` },
-  ]);
+  const breadcrumb = buildBreadcrumbBlob(ctx, breadcrumbTrail('author', { title: name }));
   if (breadcrumb) blobs.push(breadcrumb);
 
   return blobs;
@@ -466,16 +446,8 @@ const dispatchEvent = (
   const breadcrumb = buildBreadcrumbBlob(
     ctx,
     collection === 'events'
-      ? [
-          { name: 'Home', path: '/' },
-          { name: 'Events', path: '/events' },
-          { name: doc.title, path: `/event/${doc.slug}` },
-        ]
-      : [
-          { name: 'Home', path: '/' },
-          { name: 'Webinars', path: '/webinar' },
-          { name: doc.title, path: `/webinar/${doc.slug}` },
-        ],
+      ? breadcrumbTrail('event', { title: doc.title })
+      : breadcrumbTrail('webinar', { title: doc.title }),
   );
   if (breadcrumb) blobs.push(breadcrumb);
 
@@ -573,11 +545,7 @@ const dispatchJob = (ctx: JsonLdContext, doc: AnyDoc): JsonLdBlob[] => {
   });
   if (job) blobs.push(job);
 
-  const breadcrumb = buildBreadcrumbBlob(ctx, [
-    { name: 'Home', path: '/' },
-    { name: 'Jobs', path: '/job' },
-    { name: doc.title, path: `/job/${doc.slug}` },
-  ]);
+  const breadcrumb = buildBreadcrumbBlob(ctx, breadcrumbTrail('job', { title: doc.title }));
   if (breadcrumb) blobs.push(breadcrumb);
 
   return blobs;
@@ -719,11 +687,7 @@ const dispatchResource = (ctx: JsonLdContext, doc: AnyDoc): JsonLdBlob[] => {
     if (digitalDoc) blobs.push(digitalDoc);
   }
 
-  const breadcrumb = buildBreadcrumbBlob(ctx, [
-    { name: 'Home', path: '/' },
-    { name: 'Resources', path: '/resources' },
-    { name: doc.title, path: `/resources/${doc.slug}` },
-  ]);
+  const breadcrumb = buildBreadcrumbBlob(ctx, breadcrumbTrail('resource', { title: doc.title }));
   if (breadcrumb) blobs.push(breadcrumb);
 
   return blobs;
