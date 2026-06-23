@@ -343,14 +343,16 @@ These resolved the open forks from arch doc §`#decisions`. Build accordingly:
 
 ## Background jobs
 
-Seven Payload cron tasks run in `apps/cms/src/payload/jobs/`. All are gated by `PAYLOAD_AUTO_RUN=true` — set this in `.env` to enable; omitting it (e.g. in test runs) prevents spurious fires.
+Ten Payload cron tasks run in `apps/cms/src/payload/jobs/`. All are gated by `PAYLOAD_AUTO_RUN=true` — set this in `.env` to enable; omitting it (e.g. in test runs) prevents spurious fires.
 
 | Job | Schedule (UTC) | File |
 |-----|----------------|------|
 | Lead queue drain | every 5 min | `drain-lead-queue.ts` |
 | Webhook retry | every 5 min | `retry-webhook.ts` |
+| Deal-registration HubSpot sync retry | every 10 min | `retry-deal-sync.ts` |
 | Search-log purge (90-day retention) | daily 03:00 | `purge-search-log.ts` |
 | Leads PII redaction (365-day retention) | daily 03:15 | `purge-leads-pii.ts` |
+| Deal-registrations purge (PII redaction, 365-day) | daily 03:30 | `purge-deal-registrations.ts` |
 | Career-applications purge (resume delete + PII redaction, 365-day) | daily 03:45 | `purge-career-applications.ts` |
 | Consent-log purge (cookie-consent proof, 24-month retention) | daily 04:00 | `purge-consent-log.ts` |
 | Broken-links scan | daily 04:30 | `check-broken-links.ts` |
