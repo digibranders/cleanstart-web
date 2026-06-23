@@ -5,7 +5,7 @@
 //
 // Type-only import — erased at runtime, so this does not create a runtime cycle
 // with `case-studies.ts` (which re-exports these for server-side backward compat).
-import type { CaseStudyIndustry, CaseStudyMedia } from "./case-studies";
+import type { CaseStudyIndustry, CaseStudyMedia, IndustryRef } from "./case-studies";
 
 // `NEXT_PUBLIC_CMS_URL` is inlined at build time, so this is safe on the client
 // (matches `cmsBaseUrl()` in `cms-fetch`, which we can't import here — it pulls
@@ -24,6 +24,22 @@ export const CASE_STUDY_INDUSTRY_LABELS: Record<CaseStudyIndustry, string> = {
 export function industryLabel(value: CaseStudyIndustry | null | undefined): string {
   if (!value) return "";
   return CASE_STUDY_INDUSTRY_LABELS[value] ?? "";
+}
+
+/**
+ * Display label for a case study's industry, during the enum → taxonomy
+ * transition. Prefers the populated `industryRef` term name (editor-managed,
+ * future source of truth); falls back to the legacy `industry` enum label
+ * when the relationship is not yet populated/backfilled. Deployable today;
+ * auto-upgrades once the backfill runs.
+ */
+export function resolveIndustryLabel(caseStudy: {
+  industry?: CaseStudyIndustry | null;
+  industryRef?: IndustryRef | string | null;
+}): string {
+  const ref = caseStudy.industryRef;
+  if (ref && typeof ref === "object" && ref.name) return ref.name;
+  return industryLabel(caseStudy.industry ?? null);
 }
 
 /** Resolve a CMS-relative media path to an absolute URL. R2 assets are already absolute. */
