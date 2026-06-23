@@ -1066,56 +1066,6 @@ body {
   border-bottom-color: rgba(255, 255, 255, 0.04);
 }
 
-/* Mega-menu / compact dropdown surface — dark glass card */
-.cs-mega-surface {
-  background-color: rgba(21, 16, 33, 0.92);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-}
-
-/* Pointed arrow at the top of the mega-menu, auto-aligned to active trigger.
-   Uses the SAME rgba + backdrop-blur as .cs-mega-surface so the surfaces read
-   as identical. The element box is intentionally larger than the visible
-   triangle (40x20 box → 18x10 triangle) so backdrop-filter has enough pixels
-   to sample — a 10px-tall element gives the blur almost nothing to work with
-   and ends up looking grey. clip-path then shows only the triangle. */
-.cs-mega-arrow {
-  width: 40px;
-  height: 20px;
-  background-color: rgba(21, 16, 33, 0.92);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  /* Visible 18x10 triangle occupies the TOP half of the 40x20 box.
-     The bottom half is clipped away, but its presence gives backdrop-filter
-     more area to sample, producing the same blur color as .cs-mega-surface. */
-  clip-path: polygon(50% 0%, calc(50% - 9px) 50%, calc(50% + 9px) 50%);
-}
-
-/* Hover state for individual menu items — subtle gradient left bar + soft fill */
-.cs-mega-item {
-  position: relative;
-}
-.cs-mega-item::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 8px;
-  bottom: 8px;
-  width: 2px;
-  border-radius: 2px;
-  background: linear-gradient(180deg, #471fc3 0%, #2cc1eb 100%);
-  opacity: 0;
-  transition: opacity 180ms ease-out;
-}
-.cs-mega-item:hover {
-  background-color: rgba(255, 255, 255, 0.04);
-}
-.cs-mega-item:hover::before {
-  opacity: 1;
-}
-
 /* Active route — gradient underline beneath top-level nav links */
 .cs-nav-link {
   padding-bottom: 6px;
@@ -1134,8 +1084,6 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .cs-nav-surface,
   .cs-nav-surface::before,
-  .cs-mega-item,
-  .cs-mega-item::before,
   .cs-nav-link::after {
     transition: none !important;
   }
@@ -3805,6 +3753,177 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .cs-tile-interactive {
+    transition: none !important;
+  }
+}
+
+/* ============================================================
+   MEGA MENU v2 — premium card system (Figma node 1672:1420).
+   A self-contained visual language layered over the tonal floor:
+   a near-black navy panel, indigo-glow gradient cards, lavender
+   icon tiles, and circular indigo arrow buttons. All scoped to
+   `.cs-mega-*` so the Phase-8 tonal ladder above is untouched.
+   Colors sampled directly from the Figma raster fills:
+     glow peak  #131b8f → #1b2ea2   (matches the arrow button)
+     navy base  #0b0a1c
+   ============================================================ */
+
+/* Panel floor — near-black navy gradient + a brand top-edge accent line +
+   an inset front-edge highlight. The atmosphere wash (top-right) is tunable
+   per menu through `--cs-atm`; it resolves to a faint indigo by default. */
+.cs-mega-panel {
+  background:
+    radial-gradient(
+      120% 82% at 88% -8%,
+      var(--cs-atm, rgba(100, 60, 255, 0.1)) 0%,
+      transparent 60%
+    ),
+    linear-gradient(170deg, rgba(18, 14, 38, 0.99) 8%, rgba(10, 12, 26, 0.99) 92%);
+  box-shadow:
+    0 32px 80px -24px rgba(0, 0, 0, 0.75),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+    inset 0 1px 0 0 rgba(155, 127, 255, 0.12);
+}
+.cs-mega-panel::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 1px;
+  width: min(340px, 62%);
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(155, 127, 255, 0.6) 30%,
+    rgba(44, 193, 235, 0.4) 70%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  pointer-events: none;
+}
+
+/* Fading hairline divider under the panel header. */
+.cs-mega-divider {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.09) 14%,
+    rgba(255, 255, 255, 0.09) 86%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+/* Signature card — indigo glow rising from the bottom over a near-black navy
+   base, with a quiet front-edge highlight. */
+.cs-mega-card {
+  /* Faithful to the Figma raster: a smooth, restrained dark→medium-blue, the
+     glow concentrated low-center so the upper card stays near-black navy and the
+     bottom corners (where the arrow sits) fall to dark. Quiet, not loud. */
+  background:
+    radial-gradient(
+      82% 78% at 50% 122%,
+      #1b2a86 0%,
+      #111d5e 34%,
+      rgba(12, 14, 44, 0) 70%
+    ),
+    #0b0a1b;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  transition:
+    box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    background 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cs-mega-card:hover {
+  background:
+    radial-gradient(
+      84% 80% at 50% 122%,
+      #21339d 0%,
+      #15226e 34%,
+      rgba(12, 14, 44, 0) 70%
+    ),
+    #0c0b1f;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    inset 0 0 0 1px rgba(124, 92, 246, 0.14),
+    0 16px 36px -20px rgba(16, 26, 120, 0.6);
+}
+
+/* Dense category tile (Resources) — a quiet recessed surface, not the full glow,
+   so a 9-tile grid stays calm; the lavender icon tile keeps brand continuity. */
+.cs-mega-card-dense {
+  background: rgba(255, 255, 255, 0.02);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  transition: background-color 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cs-mega-card-dense:hover {
+  background: rgba(124, 92, 246, 0.1);
+}
+
+/* Full-width CTA bar — the same glow, wider and a touch brighter. */
+.cs-mega-cta {
+  /* The one focal element per menu — carries slightly more presence than the
+     quiet cards: a wider, gentle indigo wash reading left-to-right. */
+  background:
+    radial-gradient(
+      120% 160% at 30% 135%,
+      #233ac0 0%,
+      #16236f 32%,
+      rgba(13, 22, 78, 0.35) 62%,
+      rgba(11, 11, 28, 0) 86%
+    ),
+    #0b0a1b;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  transition:
+    box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    background 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cs-mega-cta:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 0 1px rgba(124, 92, 246, 0.16),
+    0 16px 38px -20px rgba(22, 34, 170, 0.55);
+}
+
+/* Lavender icon tile — gradient fill + faint violet edge (Figma 1672:1430). */
+.cs-mega-icon {
+  background: linear-gradient(
+    135deg,
+    rgba(167, 139, 250, 0.16) 0%,
+    rgba(167, 139, 250, 0.04) 100%
+  );
+  box-shadow: inset 0 0 0 1px rgba(167, 139, 250, 0.19);
+}
+
+/* Circular indigo arrow button. The fill brightens from the parent card / CTA
+   hover; the glyph nudge is driven by the group utilities in MegaArrowButton. */
+.cs-mega-arrow-btn {
+  /* Quiet by default — a clean indigo disc with a hairline ring that defines the
+     edge against the card. Brightens to the brand accent on card/CTA hover.
+     NB: distinct name from the legacy `.cs-mega-arrow` caret (now removed) which
+     carried a triangle clip-path. */
+  background: #1a2596;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    0 2px 6px rgba(0, 0, 0, 0.3);
+  transition:
+    background-color 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cs-mega-card:hover .cs-mega-arrow-btn,
+.cs-mega-cta:hover .cs-mega-arrow-btn {
+  background: #3145de;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.22),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-mega-card,
+  .cs-mega-card-dense,
+  .cs-mega-cta,
+  .cs-mega-arrow-btn {
     transition: none !important;
   }
 }
