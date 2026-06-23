@@ -1,3 +1,4 @@
+import { breadcrumbTrail } from "@cleanstart/schema/builders";
 import {
   DETAIL_HERO_GRADIENT,
   DETAIL_HERO_TITLE_STYLE,
@@ -62,7 +63,7 @@ export function CareerDetailHero({
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <HeroBreadcrumb
-          items={[{ label: "Careers", href: "/careers" }, { label: title }]}
+          items={breadcrumbTrail("job", { title }).slice(1)}
           navClassName="pt-[calc(var(--cs-header-h)+env(safe-area-inset-top)+clamp(8px,2vw,24px))]"
         />
 

@@ -1,10 +1,8 @@
 import Link from "next/link";
+import type { BreadcrumbCrumb } from "@cleanstart/schema/builders";
 
-export interface HeroCrumb {
-  label: string;
-  /** Path-only, e.g. `/news`. Omit on the current-page (last) crumb. */
-  href?: string;
-}
+/** Same shape as the JSON-LD crumb so one trail array drives both. */
+export type HeroCrumb = BreadcrumbCrumb;
 
 interface HeroBreadcrumbProps {
   items: HeroCrumb[];
@@ -55,17 +53,17 @@ export function HeroBreadcrumb({ items, navClassName = "" }: HeroBreadcrumbProps
           const hideOnMobile = isLast && items.length > 1;
           return (
             <li
-              key={`${item.label}-${idx}`}
+              key={`${item.name}-${idx}`}
               className={`items-center min-w-0 ${hideOnMobile ? "hidden sm:flex" : "flex"}`}
             >
               <Chevron />
-              {item.href && !isLast ? (
+              {item.path && !isLast ? (
                 <Link
-                  href={item.href}
+                  href={item.path}
                   className="flex items-center h-11 px-2 rounded-full text-xs leading-[1.4] whitespace-nowrap"
                   style={{ color: "#98ACC3" }}
                 >
-                  {item.label}
+                  {item.name}
                 </Link>
               ) : (
                 <span
@@ -73,7 +71,7 @@ export function HeroBreadcrumb({ items, navClassName = "" }: HeroBreadcrumbProps
                   style={{ color: "#BFCCDA" }}
                   aria-current={isLast ? "page" : undefined}
                 >
-                  {item.label}
+                  {item.name}
                 </span>
               )}
             </li>

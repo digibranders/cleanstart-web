@@ -1,3 +1,4 @@
+import { breadcrumbTrail } from "@cleanstart/schema/builders";
 import type { ResourceDetail } from "@/lib/resources";
 import { mediaUrl } from "@/lib/resources";
 import type { Form } from "@/lib/forms";
@@ -92,10 +93,7 @@ export function ResourceDetailHero({
         style={{ maxWidth: "1276px", paddingLeft: "24px", paddingRight: "24px" }}
       >
         <HeroBreadcrumb
-          items={[
-            { label: "Resource Center", href: "/resource-center" },
-            { label: resource.title },
-          ]}
+          items={breadcrumbTrail("resource", { title: resource.title }).slice(1)}
           navClassName="pt-[120px] lg:pt-[calc(138px+var(--cs-header-extra))]"
         />
 

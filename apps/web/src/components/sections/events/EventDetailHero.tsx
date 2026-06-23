@@ -1,3 +1,4 @@
+import { breadcrumbTrail } from "@cleanstart/schema/builders";
 import { DetailHero, DetailHeroMetaSeparator } from "@/components/sections/_shared/DetailHero";
 import { CalendarIcon, LocationIcon } from "@/components/sections/_shared/DetailHeroIcons";
 
@@ -26,10 +27,7 @@ export function EventDetailHero({
       // sr-only <h1> in the page, because it also has a separate mobile-card
       // title. Both visible titles (this hero + the mobile card) are <p>.
       as="p"
-      breadcrumb={[
-        { label: "Events", href: "/events" },
-        { label: title },
-      ]}
+      breadcrumb={breadcrumbTrail("event", { title }).slice(1)}
       meta={
         <>
           <div className="flex items-center gap-[8px] shrink-0 text-white">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { breadcrumbTrail } from "@cleanstart/schema/builders";
 import { formatGuideDate } from "@/lib/guides";
 import type { GuideAuthor, GuideImage } from "@/lib/guides";
 import { DetailHero, DetailHeroMetaSeparator } from "@/components/sections/_shared/DetailHero";
@@ -45,10 +46,7 @@ export function GuideDetailHero({
   return (
     <DetailHero
       title={title}
-      breadcrumb={[
-        { label: "Guides", href: "/guide" },
-        { label: title },
-      ]}
+      breadcrumb={breadcrumbTrail("guide", { title }).slice(1)}
       meta={
         <>
           <div className="basis-full lg:hidden flex flex-col items-stretch w-full gap-[10px]">

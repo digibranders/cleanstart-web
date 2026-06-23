@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import { breadcrumbTrail } from "@cleanstart/schema/builders";
 import { copyText } from "@/lib/clipboard";
 import type { PressType } from "@/lib/news";
 import { formatNewsDate, pressTypeLabel } from "@/lib/news-utils";
@@ -44,10 +45,7 @@ export function NewsDetailHero({
   return (
     <DetailHero
       title={title}
-      breadcrumb={[
-        { label: "Newsroom", href: "/news" },
-        { label: title },
-      ]}
+      breadcrumb={breadcrumbTrail("news", { title }).slice(1)}
       meta={
         <>
           <div className="flex items-center gap-2">

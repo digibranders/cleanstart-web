@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { breadcrumbTrail } from "@cleanstart/schema/builders";
 import { formatBlogDate } from "@/lib/blog";
 import type { BlogCategory, BlogAuthor, BlogImage } from "@/lib/blog";
 import { DetailHero, DetailHeroMetaSeparator } from "@/components/sections/_shared/DetailHero";
@@ -47,10 +48,7 @@ export function BlogDetailHero({
   return (
     <DetailHero
       title={title}
-      breadcrumb={[
-        { label: "Blogs", href: "/blogs" },
-        { label: title },
-      ]}
+      breadcrumb={breadcrumbTrail("blog", { title }).slice(1)}
       meta={
         <>
           {/* ── Mobile (< lg) ── */}
