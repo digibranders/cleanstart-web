@@ -72,6 +72,10 @@ export const Webinars: CollectionConfig = {
       type: 'select',
       required: true,
       defaultValue: 'live',
+      admin: {
+        description:
+          'Legacy enum — superseded by the Webinar type relationship below. Kept during the taxonomy transition; removed once apps/web reads the relationship.',
+      },
       options: [
         { label: 'Live', value: 'live' },
         { label: 'On-demand', value: 'on-demand' },
@@ -80,16 +84,38 @@ export const Webinars: CollectionConfig = {
       ],
     },
     {
+      name: 'webinarTypeRef',
+      type: 'relationship',
+      relationTo: 'webinarTypes',
+      admin: {
+        description:
+          'Webinar type taxonomy reference. Seeded/backfilled from the legacy `webinarType` enum; editors manage the list under Taxonomies → Webinar types.',
+      },
+    },
+    {
       name: 'region',
       type: 'select',
       required: true,
       defaultValue: 'global',
+      admin: {
+        description:
+          'Legacy enum — superseded by the Region relationship below. Kept during the taxonomy transition; removed once apps/web reads the relationship.',
+      },
       options: [
         { label: 'North America', value: 'north-america' },
         { label: 'Asia & MEA', value: 'asia-mea' },
         { label: 'EMEA', value: 'emea' },
         { label: 'Global', value: 'global' },
       ],
+    },
+    {
+      name: 'regionRef',
+      type: 'relationship',
+      relationTo: 'regions',
+      admin: {
+        description:
+          'Region taxonomy reference (shared with News). Seeded/backfilled from the legacy `region` enum; editors manage the list under Taxonomies → Regions.',
+      },
     },
     {
       name: 'startsAt',

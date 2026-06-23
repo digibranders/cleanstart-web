@@ -13,6 +13,9 @@ const PATH_PREFIX_BY_SLUG: Record<string, string> = {
   industries: '/case-studies/industry',
   resourceTypes: '/resources/type',
   departments: '/careers/department',
+  regions: '/region',
+  pressTypes: '/news/type',
+  webinarTypes: '/webinar/type',
 };
 
 /**
@@ -31,7 +34,10 @@ export const buildTaxonomyFields = (
     | 'knowledgeCategories'
     | 'industries'
     | 'resourceTypes'
-    | 'departments',
+    | 'departments'
+    | 'regions'
+    | 'pressTypes'
+    | 'webinarTypes',
 ): Field[] => [
   { name: 'name', type: 'text', required: true },
   slugField({ source: 'name' }),

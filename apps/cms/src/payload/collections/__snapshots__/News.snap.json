@@ -53,6 +53,11 @@
       ]
     },
     {
+      "type": "relationship",
+      "name": "pressTypeRef",
+      "relationTo": "pressTypes"
+    },
+    {
       "type": "text",
       "name": "location"
     },
@@ -67,6 +72,11 @@
           "value": "apac"
         }
       ]
+    },
+    {
+      "type": "relationship",
+      "name": "regionRef",
+      "relationTo": "regions"
     },
     {
       "type": "richText",

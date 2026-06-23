@@ -89,6 +89,9 @@ export interface Config {
     industries: Industry;
     resourceTypes: ResourceType;
     departments: Department;
+    regions: Region;
+    pressTypes: PressType;
+    webinarTypes: WebinarType;
     leads: Lead;
     forms: Form;
     'partner-applications': PartnerApplication;
@@ -140,6 +143,9 @@ export interface Config {
     industries: IndustriesSelect<false> | IndustriesSelect<true>;
     resourceTypes: ResourceTypesSelect<false> | ResourceTypesSelect<true>;
     departments: DepartmentsSelect<false> | DepartmentsSelect<true>;
+    regions: RegionsSelect<false> | RegionsSelect<true>;
+    pressTypes: PressTypesSelect<false> | PressTypesSelect<true>;
+    webinarTypes: WebinarTypesSelect<false> | WebinarTypesSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'partner-applications': PartnerApplicationsSelect<false> | PartnerApplicationsSelect<true>;
@@ -1151,17 +1157,25 @@ export interface News {
    */
   publisherLogo?: (number | null) | Media;
   /**
-   * Pill shown on cards and the detail meta strip.
+   * Legacy enum — superseded by the Press type relationship below. Kept during the taxonomy transition; removed once apps/web reads the relationship.
    */
   pressType?: ('press-release' | 'news' | 'announcement' | 'feature') | null;
+  /**
+   * Press type taxonomy reference. Seeded/backfilled from the legacy `pressType` enum; editors manage the list under Taxonomies → Press types.
+   */
+  pressTypeRef?: (number | null) | PressType;
   /**
    * Dateline city, e.g. "Lewes, DE" — rendered before the body opener.
    */
   location?: string | null;
   /**
-   * Region this story belongs to. Powers the region filter on the /news listing page.
+   * Legacy enum — superseded by the Region relationship below. Kept during the taxonomy transition; removed once apps/web reads the relationship.
    */
   region?: ('north-america' | 'apac') | null;
+  /**
+   * Region taxonomy reference (shared with Webinars). Seeded/backfilled from the legacy `region` enum; editors manage the list under Taxonomies → Regions.
+   */
+  regionRef?: (number | null) | Region;
   body?: {
     root: {
       type: string;
@@ -1482,6 +1496,356 @@ export interface News {
       | null;
   };
   featured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pressTypes".
+ */
+export interface PressType {
+  id: number;
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  description?: string | null;
+  icon?: (number | null) | Media;
+  /**
+   * Optional parent category for hierarchical taxonomies.
+   */
+  parent?: (number | null) | PressType;
+  /**
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    useCustomCanonical?: boolean | null;
+    canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     */
+    additionalSchema?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    schemaHistory?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "regions".
+ */
+export interface Region {
+  id: number;
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  description?: string | null;
+  icon?: (number | null) | Media;
+  /**
+   * Optional parent category for hierarchical taxonomies.
+   */
+  parent?: (number | null) | Region;
+  /**
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    useCustomCanonical?: boolean | null;
+    canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     */
+    additionalSchema?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    schemaHistory?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -4033,8 +4397,22 @@ export interface Webinar {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Legacy enum — superseded by the Webinar type relationship below. Kept during the taxonomy transition; removed once apps/web reads the relationship.
+   */
   webinarType: 'live' | 'on-demand' | 'panel' | 'demo';
+  /**
+   * Webinar type taxonomy reference. Seeded/backfilled from the legacy `webinarType` enum; editors manage the list under Taxonomies → Webinar types.
+   */
+  webinarTypeRef?: (number | null) | WebinarType;
+  /**
+   * Legacy enum — superseded by the Region relationship below. Kept during the taxonomy transition; removed once apps/web reads the relationship.
+   */
   region: 'north-america' | 'asia-mea' | 'emea' | 'global';
+  /**
+   * Region taxonomy reference (shared with News). Seeded/backfilled from the legacy `region` enum; editors manage the list under Taxonomies → Regions.
+   */
+  regionRef?: (number | null) | Region;
   startsAt?: string | null;
   endsAt?: string | null;
   /**
@@ -4221,6 +4599,181 @@ export interface Webinar {
    * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
    */
   displayPublishedAt?: string | null;
+  /**
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    useCustomCanonical?: boolean | null;
+    canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     */
+    additionalSchema?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    schemaHistory?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "webinarTypes".
+ */
+export interface WebinarType {
+  id: number;
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  description?: string | null;
+  icon?: (number | null) | Media;
+  /**
+   * Optional parent category for hierarchical taxonomies.
+   */
+  parent?: (number | null) | WebinarType;
   /**
    * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
    */
@@ -8371,6 +8924,18 @@ export interface PayloadLockedDocument {
         value: number | Department;
       } | null)
     | ({
+        relationTo: 'regions';
+        value: number | Region;
+      } | null)
+    | ({
+        relationTo: 'pressTypes';
+        value: number | PressType;
+      } | null)
+    | ({
+        relationTo: 'webinarTypes';
+        value: number | WebinarType;
+      } | null)
+    | ({
         relationTo: 'leads';
         value: number | Lead;
       } | null)
@@ -8663,8 +9228,10 @@ export interface NewsSelect<T extends boolean = true> {
   publisher?: T;
   publisherLogo?: T;
   pressType?: T;
+  pressTypeRef?: T;
   location?: T;
   region?: T;
+  regionRef?: T;
   body?: T;
   authors?: T;
   newsCategories?: T;
@@ -9544,7 +10111,9 @@ export interface WebinarsSelect<T extends boolean = true> {
   abstract?: T;
   body?: T;
   webinarType?: T;
+  webinarTypeRef?: T;
   region?: T;
+  regionRef?: T;
   startsAt?: T;
   endsAt?: T;
   timezone?: T;
@@ -11398,6 +11967,177 @@ export interface ResourceTypesSelect<T extends boolean = true> {
  * via the `definition` "departments_select".
  */
 export interface DepartmentsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  icon?: T;
+  parent?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
+        keywordTarget?: T;
+        keywords?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+        additionalSchema?: T;
+        schemaHistory?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "regions_select".
+ */
+export interface RegionsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  icon?: T;
+  parent?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
+        keywordTarget?: T;
+        keywords?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+        additionalSchema?: T;
+        schemaHistory?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pressTypes_select".
+ */
+export interface PressTypesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  icon?: T;
+  parent?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
+        keywordTarget?: T;
+        keywords?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+        additionalSchema?: T;
+        schemaHistory?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "webinarTypes_select".
+ */
+export interface WebinarTypesSelect<T extends boolean = true> {
   name?: T;
   slug?: T;
   description?: T;

@@ -12,7 +12,10 @@ import { Forms } from './Forms';
 import { Guides } from './Guides';
 import { Departments } from './Departments';
 import { Industries } from './Industries';
+import { PressTypes } from './PressTypes';
+import { Regions } from './Regions';
 import { ResourceTypes } from './ResourceTypes';
+import { WebinarTypes } from './WebinarTypes';
 import { JobLocations } from './JobLocations';
 import { Jobs } from './Jobs';
 import { KnowledgeBase } from './KnowledgeBase';
@@ -96,6 +99,9 @@ const collections: { name: string; config: CollectionConfig }[] = [
   { name: 'Guides', config: Guides },
   { name: 'Departments', config: Departments },
   { name: 'Industries', config: Industries },
+  { name: 'Regions', config: Regions },
+  { name: 'PressTypes', config: PressTypes },
+  { name: 'WebinarTypes', config: WebinarTypes },
   { name: 'ResourceTypes', config: ResourceTypes },
   { name: 'JobLocations', config: JobLocations },
   { name: 'Jobs', config: Jobs },

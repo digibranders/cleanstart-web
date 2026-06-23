@@ -23,6 +23,9 @@ import { Guides } from './payload/collections/Guides';
 import { Industries } from './payload/collections/Industries';
 import { ResourceTypes } from './payload/collections/ResourceTypes';
 import { Departments } from './payload/collections/Departments';
+import { Regions } from './payload/collections/Regions';
+import { PressTypes } from './payload/collections/PressTypes';
+import { WebinarTypes } from './payload/collections/WebinarTypes';
 import { AnalyticsCache } from './payload/collections/AnalyticsCache';
 import { ConsentLog } from './payload/collections/ConsentLog';
 import { Integrations } from './payload/collections/Integrations';
@@ -355,6 +358,9 @@ export default buildConfig({
     Industries,
     ResourceTypes,
     Departments,
+    Regions,
+    PressTypes,
+    WebinarTypes,
 
     // Marketing — Leads (daily inbox) before Forms (one-time setup).
     Leads,

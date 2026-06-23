@@ -36,7 +36,10 @@ export const taxonomyParentCycleGuardHook = (
     | 'knowledgeCategories'
     | 'industries'
     | 'resourceTypes'
-    | 'departments',
+    | 'departments'
+    | 'regions'
+    | 'pressTypes'
+    | 'webinarTypes',
 ): CollectionBeforeChangeHook =>
   async ({ data, req, originalDoc }) => {
     if (!data) return data;
