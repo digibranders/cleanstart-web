@@ -100,7 +100,7 @@ export function LibrariesHero(): React.ReactElement {
           {/* Right: 3D dependency cube. */}
           <div className="relative w-full md:flex-1 flex justify-center md:justify-end">
             <Image
-              src="/images/clean-libraries/hero-dependency-cube.png"
+              src="/images/clean-libraries/hero-dependency-cube.webp"
               alt="Wireframe cube of interconnected dependency nodes labelled AI-Introduced, Transitive, and Vulnerable"
               width={1160}
               height={886}
