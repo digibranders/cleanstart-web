@@ -1,46 +1,87 @@
-import { MegaPanel } from "@/components/nav/mega/MegaPanel";
-import { MegaCard } from "@/components/nav/mega/MegaCard";
-import { MegaCtaBar } from "@/components/nav/mega/MegaCtaBar";
+import Link from "next/link";
+import { NavIcon } from "@/components/nav/icons/NavIcon";
+import { PanelShell } from "@/components/nav/panels/PanelShell";
+import { HeroTile } from "@/components/nav/pieces/HeroTile";
+import { ComplianceProof } from "@/components/nav/pieces/ComplianceProof";
+import type { NavGroup } from "@/lib/nav-config";
 import type { NavMegaItem } from "@/lib/nav-config";
 
 type Props = { item: NavMegaItem };
 
 // Brand-family atmosphere for Solutions: a low cyan-teal wash in the top-right.
-const ATMOSPHERE = "rgba(44, 193, 235, 0.08)";
+const ATMOSPHERE = "rgba(44, 193, 235, 0.05)";
 
-const GROUP_LABEL = "mb-2 px-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white/45";
+// Grouped, label-only columns (Capability / Compliance / By role). Descriptions
+// live in nav-config for the mobile sheet; the desktop panel stays scannable and
+// lets the group header + featured tile carry the narrative — same grammar as the
+// Resources BrowseColumn.
+function GroupColumn({ group }: { group: NavGroup }) {
+  return (
+    <div>
+      {group.title && (
+        <div className="mb-1.5 px-2 text-[9px] font-bold uppercase tracking-[0.14em] text-white/45">
+          {group.title}
+        </div>
+      )}
+      <div className="flex flex-col">
+        {group.items.map((leaf) =>
+          leaf.built === false ? null : (
+            <Link
+              key={leaf.label}
+              href={leaf.href}
+              className="flex items-center gap-2.5 rounded-[6px] px-2 py-1.5 text-[13px] font-medium text-white/90 transition-colors hover:bg-white/[0.035]"
+            >
+              <NavIcon
+                id={leaf.icon ?? "shield-check"}
+                size={14}
+                className="cs-nav-glyph"
+              />
+              {leaf.label}
+            </Link>
+          ),
+        )}
+      </div>
+    </div>
+  );
+}
 
 export function PanelSolutions({ item }: Props) {
-  // One labelled column per group (Capability / Compliance / By role), preserving
-  // the IA — the new card language replaces the old flat rows, not the grouping.
-  return (
-    <MegaPanel width={item.width ?? 880} title={item.label} subtitle={item.tagline} atmosphere={ATMOSPHERE}>
-      <div className="grid grid-cols-3 gap-3.5">
-        {item.groups.map((group, gi) => (
-          <div key={group.title ?? gi} className="flex flex-col gap-2.5">
-            {group.title && <div className={GROUP_LABEL}>{group.title}</div>}
-            {group.items.map((s) => (
-              <MegaCard
-                key={s.label}
-                href={s.href}
-                label={s.label}
-                {...(s.description ? { description: s.description } : {})}
-                icon={s.icon ?? "shield-check"}
-                built={s.built !== false}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
+  const capability = item.groups.find((g) => g.title === "Capability");
+  const compliance = item.groups.find((g) => g.title === "Compliance");
+  const byRole = item.groups.find((g) => g.title === "By role");
 
-      <div className="mt-3.5">
-        <MegaCtaBar
-          href="/fips"
+  return (
+    <PanelShell
+      width={item.width ?? 1000}
+      eyebrow={item.label}
+      tagline={item.tagline}
+      atmosphere={ATMOSPHERE}
+    >
+      <div className="grid grid-cols-3 gap-3">
+        {/* Col 1: Capability stacked above Compliance */}
+        <div className="flex flex-col gap-3">
+          {capability && <GroupColumn group={capability} />}
+          {compliance && (
+            <>
+              <div className="h-px bg-white/[0.05]" />
+              <GroupColumn group={compliance} />
+            </>
+          )}
+        </div>
+
+        {/* Col 2: By Role */}
+        {byRole && <GroupColumn group={byRole} />}
+
+        {/* Col 3: FIPS featured tile */}
+        <HeroTile
           headline="FIPS, drop-in."
-          sub="Inherit FIPS 140-3 validated crypto without re-architecting."
           ctaLabel="Inherit FIPS compliance"
-        />
+          ctaHref="/fips"
+          minHeight={0}
+        >
+          <ComplianceProof />
+        </HeroTile>
       </div>
-    </MegaPanel>
+    </PanelShell>
   );
 }
