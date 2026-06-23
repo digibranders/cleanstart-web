@@ -88,3 +88,9 @@ launch.json
 tmp/
 .tmp/
 .env.bak
+
+# Local capability-deck artifacts (one-off deliverables, not part of the app)
+/add_charts.py
+/CleanStart-Website-Platform-Capabilities.xlsx
+# Payload types-gen backups (created transiently by scripts/generate-types.ts)
+*.types-gen.bak
