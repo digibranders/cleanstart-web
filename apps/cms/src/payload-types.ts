@@ -197,6 +197,7 @@ export interface Config {
       dashboardRefreshDaily: TaskDashboardRefreshDaily;
       analyticsCachePrune: TaskAnalyticsCachePrune;
       retryDealSync: TaskRetryDealSync;
+      purgeDealRegistrations: TaskPurgeDealRegistrations;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -7662,6 +7663,7 @@ export interface PayloadJob {
           | 'dashboardRefreshDaily'
           | 'analyticsCachePrune'
           | 'retryDealSync'
+          | 'purgeDealRegistrations'
           | 'schedulePublish';
         taskID: string;
         input?:
@@ -7711,6 +7713,7 @@ export interface PayloadJob {
         | 'dashboardRefreshDaily'
         | 'analyticsCachePrune'
         | 'retryDealSync'
+        | 'purgeDealRegistrations'
         | 'schedulePublish'
       )
     | null;
@@ -11919,6 +11922,14 @@ export interface TaskAnalyticsCachePrune {
  * via the `definition` "TaskRetryDealSync".
  */
 export interface TaskRetryDealSync {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskPurgeDealRegistrations".
+ */
+export interface TaskPurgeDealRegistrations {
   input?: unknown;
   output?: unknown;
 }
