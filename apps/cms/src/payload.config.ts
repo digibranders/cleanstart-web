@@ -22,6 +22,7 @@ import { Forms } from './payload/collections/Forms';
 import { Guides } from './payload/collections/Guides';
 import { Industries } from './payload/collections/Industries';
 import { ResourceTypes } from './payload/collections/ResourceTypes';
+import { Departments } from './payload/collections/Departments';
 import { AnalyticsCache } from './payload/collections/AnalyticsCache';
 import { ConsentLog } from './payload/collections/ConsentLog';
 import { Integrations } from './payload/collections/Integrations';
@@ -353,6 +354,7 @@ export default buildConfig({
     JobLocations,
     Industries,
     ResourceTypes,
+    Departments,
 
     // Marketing — Leads (daily inbox) before Forms (one-time setup).
     Leads,
