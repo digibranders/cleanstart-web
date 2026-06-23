@@ -128,35 +128,82 @@ function TableOfContents({ toc }: { toc?: TocEntry[] | null | undefined }): Reac
   useEffect(() => {
     if (!entries.length) return;
 
-    const findTargetEl = (slug: string): HTMLElement | null => {
-      const byId = document.getElementById(slug);
-      if (byId) return byId;
-      const all = Array.from(
+    // The sidebar this drives is `hidden lg:block` — display:none below 1024px.
+    // Only wire the scroll spy when the desktop breakpoint is active so the
+    // per-frame layout reads never run on mobile (where they'd cost INP for an
+    // invisible element). Re-evaluates when the breakpoint changes.
+    const mq = window.matchMedia("(min-width: 1024px)");
+
+    let targets: { slug: string; el: HTMLElement }[] = [];
+    let rafId = 0;
+    let attached = false;
+
+    // Resolve each TOC slug to its heading element once, on attach, instead of
+    // re-querying the DOM on every scroll tick.
+    const resolveTargets = (): void => {
+      const headings = Array.from(
         document.querySelectorAll<HTMLElement>(
           ".article-body .article-h2, .article-body .article-h3, .article-body .article-h4",
         ),
       );
-      return all.find((h) => slugifyText(h.textContent ?? "") === slug) ?? null;
+      targets = entries
+        .map((entry) => {
+          const el =
+            document.getElementById(entry.slug) ??
+            headings.find((h) => slugifyText(h.textContent ?? "") === entry.slug) ??
+            null;
+          return el ? { slug: entry.slug, el } : null;
+        })
+        .filter((t): t is { slug: string; el: HTMLElement } => t !== null);
     };
 
-    const onScroll = (): void => {
+    const computeActive = (): void => {
+      rafId = 0;
+      const offset = getHeaderOffset();
       let current = entries[0]?.slug ?? "";
-      for (const entry of entries) {
-        const el = findTargetEl(entry.slug);
-        if (!el) continue;
-        if (el.getBoundingClientRect().top <= getHeaderOffset()) current = entry.slug;
+      for (const { slug, el } of targets) {
+        if (el.getBoundingClientRect().top <= offset) current = slug;
       }
       setActiveId(current);
     };
 
-    const t = setTimeout(() => {
-      onScroll();
+    // Coalesce bursts of scroll events into a single layout-read pass per frame.
+    const onScroll = (): void => {
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(computeActive);
+    };
+
+    const attach = (): void => {
+      if (attached) return;
+      attached = true;
+      resolveTargets();
+      computeActive();
       window.addEventListener("scroll", onScroll, { passive: true });
-    }, 120);
+    };
+
+    const detach = (): void => {
+      if (!attached) return;
+      attached = false;
+      window.removeEventListener("scroll", onScroll);
+      if (rafId) {
+        window.cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+    };
+
+    const sync = (): void => {
+      if (mq.matches) attach();
+      else detach();
+    };
+
+    // Defer initial wiring so headings are laid out before the first read.
+    const t = window.setTimeout(sync, 120);
+    mq.addEventListener("change", sync);
 
     return () => {
-      clearTimeout(t);
-      window.removeEventListener("scroll", onScroll);
+      window.clearTimeout(t);
+      mq.removeEventListener("change", sync);
+      detach();
     };
   }, [entries]);
 

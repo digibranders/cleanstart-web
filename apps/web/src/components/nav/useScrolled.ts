@@ -1,9 +1,9 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 
-// Module-level scroll subscription. `useSyncExternalStore` reads `scrollY`
-// synchronously before the first browser paint, so the header lands at the
+// Module-level scroll subscription. `useSyncExternalStore` reads the scrolled
+// state synchronously before the first browser paint, so the header lands at the
 // correct solid/transparent state on back navigation and bfcache restores —
 // no transient transparent flash over real content.
 
@@ -20,15 +20,12 @@ function subscribe(cb: () => void) {
   };
 }
 
-function getSnapshot() {
-  return window.scrollY;
-}
-
-function getServerSnapshot() {
-  return 0;
-}
-
 export function useScrolled(threshold = 24): boolean {
-  const scrollY = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  return scrollY > threshold;
+  // Snapshot the derived boolean — not raw `scrollY` — so `useSyncExternalStore`
+  // bails out of re-rendering on every scroll frame and only re-renders the
+  // header at the two threshold crossings. The `cb` still fires per tick, but
+  // an unchanged boolean is a no-op for React reconciliation.
+  const getSnapshot = useCallback(() => window.scrollY > threshold, [threshold]);
+  const getServerSnapshot = useCallback(() => false, []);
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
