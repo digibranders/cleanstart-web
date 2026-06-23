@@ -34,6 +34,7 @@ type SeedForm = {
   slug: string;
   name: string;
   hubspotFormGuid: string;
+  hubspotSubscriptionTypeId?: string;
   fields: SeedField[];
 };
 
@@ -73,6 +74,9 @@ const FORMS: readonly SeedForm[] = [
     slug: 'newsletter',
     name: 'Newsletter',
     hubspotFormGuid: 'd23691e3-fabd-41d1-8d19-3384d6043179',
+    ...(process.env.HUBSPOT_NEWSLETTER_SUBSCRIPTION_TYPE_ID
+      ? { hubspotSubscriptionTypeId: process.env.HUBSPOT_NEWSLETTER_SUBSCRIPTION_TYPE_ID }
+      : {}),
     fields: [{ name: 'email', type: 'email', label: 'Email', required: true }],
   },
   {
@@ -95,6 +99,9 @@ const run = async (): Promise<void> => {
       postSubmit: { kind: 'message' as const },
       crmHandlers: ['hubspot' as const],
       hubspotFormGuid: form.hubspotFormGuid,
+      ...(form.hubspotSubscriptionTypeId
+        ? { hubspotSubscriptionTypeId: form.hubspotSubscriptionTypeId }
+        : {}),
       _status: 'published' as const,
     };
 
