@@ -17,7 +17,9 @@ export const BrokenLinks: CollectionConfig = {
   admin: {
     useAsTitle: 'url',
     defaultColumns: ['url', 'status', 'sourceCollection', 'sourceDocId', 'lastChecked'],
-    group: 'SEO',
+    // System/ops group — cron-written, admin-read-only monitoring table; not an
+    // editorial SEO surface (Redirects + Pages (Schema) remain under SEO).
+    group: 'System',
     description:
       'Auto-populated by the nightly link-check cron. Read-only — fix the URL on the source doc and re-publish, the next cron run clears the row.',
   },

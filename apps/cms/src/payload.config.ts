@@ -76,6 +76,7 @@ import {
 import { checkBrokenLinksTask } from './payload/jobs/check-broken-links';
 import { drainLeadQueueTask } from './payload/jobs/drain-lead-queue';
 import { purgeCareerApplicationsTask } from './payload/jobs/purge-career-applications';
+import { purgeConsentLogTask } from './payload/jobs/purge-consent-log';
 import { purgeLeadsPiiTask } from './payload/jobs/purge-leads-pii';
 import { purgePreviewAuditTask } from './payload/jobs/purge-preview-audit';
 import { purgeSearchLogTask } from './payload/jobs/purge-search-log';
@@ -90,14 +91,9 @@ import { wireAnalyticsTab } from './payload/lib/wire-analytics-tab';
 import { wireCustomFields } from './payload/lib/wire-custom-fields';
 import { wireCustomListView } from './payload/lib/wire-custom-list-view';
 import { wirePublishGate } from './payload/lib/wire-publish-gate';
-import { Announcements } from './payload/globals/announcements';
-import { FooterNav } from './payload/globals/footerNav';
 import { ImpactStats } from './payload/globals/impactStats';
 import { Legal } from './payload/globals/legal';
-import { MainNav } from './payload/globals/mainNav';
-import { PodcastPage } from './payload/globals/podcastPage';
-import { CompanySpotlight } from './payload/globals/companySpotlight';
-import { ResourcesSpotlight } from './payload/globals/resourcesSpotlight';
+import { Spotlights } from './payload/globals/spotlights';
 import { SeoDefaults } from './payload/globals/seoDefaults';
 import { SiteSettings } from './payload/globals/siteSettings';
 
@@ -385,12 +381,12 @@ export default buildConfig({
     .map(wireCustomListView)
     .map(wireAnalyticsTab)
     .map(wireCustomFields),
-  // Within-group order for the Globals group: settings → nav chrome
-  // (main/footer nav + the two mega-menu spotlights) → announcements →
-  // podcast page → legal. SeoDefaults is grouped under 'SEO' (trails
-  // here; it renders in the SEO group, after the Redirects/BrokenLinks
-  // collections).
-  globals: [SiteSettings, MainNav, FooterNav, ImpactStats, ResourcesSpotlight, CompanySpotlight, Announcements, PodcastPage, Legal, SeoDefaults]
+  // Within-group order for the Globals group: settings → mega-menu spotlights →
+  // impact stats → legal. SeoDefaults is grouped under 'SEO' (renders in the SEO
+  // group, after the Redirects/BrokenLinks collections). (mainNav/footerNav/
+  // announcements globals were removed 2026-06-22 — the live site hardcodes
+  // nav/footer and has no banner, so they were dead.)
+  globals: [SiteSettings, ImpactStats, Spotlights, Legal, SeoDefaults]
     .map(wireCustomFields),
   endpoints: [
     jsonLdEndpoint,
@@ -427,6 +423,7 @@ export default buildConfig({
       purgeSearchLogTask,
       purgeLeadsPiiTask,
       purgeCareerApplicationsTask,
+      purgeConsentLogTask,
       purgePreviewAuditTask,
       checkBrokenLinksTask,
       retryWebhookTask,
@@ -459,6 +456,10 @@ export default buildConfig({
       {
         cron: '45 3 * * *', // daily at 03:45 UTC — career-applications PII + resume 365-day purge
         queue: 'careerApplicationsPurge',
+      },
+      {
+        cron: '0 4 * * *', // daily at 04:00 UTC — consentLog 24-month retention
+        queue: 'consentLogPurge',
       },
       {
         cron: '30 4 * * *', // daily at 04:30 UTC — broken-link scan

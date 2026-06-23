@@ -13,11 +13,18 @@ import {
   GatedAnalytics,
   CookieBanner,
 } from "@/components/consent";
+import { composeGraph, type GraphNode } from "@cleanstart/schema";
 import { SITE_NAME, SITE_URL } from "@/lib/seo/canonical";
 import { isIndexingAllowed } from "@/lib/seo/indexing";
-import { siteVerification } from "@/lib/seo/verification";
 import { ogImageUrl } from "@/lib/seo/og";
-import { JsonLd, organizationSchema, webSiteSchema } from "@/lib/seo/jsonld";
+import { organizationSchema, webSiteSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import {
+  getSeoDefaults,
+  orgConfigFromDefaults,
+  verificationFromDefaults,
+  webSiteConfigFromDefaults,
+} from "@/lib/seo/seo-defaults";
 
 // Display family — headings, section titles, card titles. Preloaded for LCP.
 const manrope = Manrope({
@@ -65,49 +72,57 @@ const HOME_OG = ogImageUrl({
   sub: DESCRIPTION,
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: {
-    default: TITLE,
-    template: "%s | CleanStart",
-  },
-  description: DESCRIPTION,
-  // Google Search Console site-verification — env-scoped (prod only), set once
-  // here and inherited by every route. Omitted entirely when unset. See
-  // lib/seo/verification.ts.
-  verification: siteVerification(),
-  alternates: {
-    canonical: "/",
-  },
-  robots: allowIndexing
-    ? {
-        index: true,
-        follow: true,
-        googleBot: {
+// Build-time only: pulls the editor-managed SEO defaults global (title
+// template, default description/OG, twitter handle, verification tokens) and
+// bakes them into the site-wide metadata. Falls back to the hardcoded values
+// when the CMS is unreachable (INV-1). The template + verification are
+// inherited by every route; description/OG apply to the home (default) doc.
+export async function generateMetadata(): Promise<Metadata> {
+  const d = await getSeoDefaults();
+  const description = d?.defaultDescription?.trim() || DESCRIPTION;
+  const ogUrl = d?.defaultOgImage?.url?.trim() || HOME_OG;
+  const template = d?.defaultTitleTemplate?.trim() || "%s | CleanStart";
+  const twitterHandle = d?.twitterHandle?.trim();
+
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: { default: TITLE, template },
+    description,
+    // Verification tokens from the CMS (env google as fallback), emitted only
+    // on the indexable production host so staging/preview stay unverified.
+    verification: verificationFromDefaults(d, allowIndexing),
+    alternates: { canonical: "/" },
+    robots: allowIndexing
+      ? {
           index: true,
           follow: true,
-          "max-image-preview": "large",
-          "max-snippet": -1,
-          "max-video-preview": -1,
-        },
-      }
-    : { index: false, follow: false, googleBot: { index: false, follow: false } },
-  openGraph: {
-    title: TITLE,
-    description: DESCRIPTION,
-    url: SITE_URL,
-    type: "website",
-    siteName: SITE_NAME,
-    images: [{ url: HOME_OG, width: 1200, height: 630, alt: TITLE }],
-    locale: "en_US",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: TITLE,
-    description: DESCRIPTION,
-    images: [{ url: HOME_OG, alt: TITLE }],
-  },
-};
+          googleBot: {
+            index: true,
+            follow: true,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+            "max-video-preview": -1,
+          },
+        }
+      : { index: false, follow: false, googleBot: { index: false, follow: false } },
+    openGraph: {
+      title: TITLE,
+      description,
+      url: SITE_URL,
+      type: "website",
+      siteName: SITE_NAME,
+      images: [{ url: ogUrl, width: 1200, height: 630, alt: TITLE }],
+      locale: "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      ...(twitterHandle ? { site: twitterHandle } : {}),
+      title: TITLE,
+      description,
+      images: [{ url: ogUrl, alt: TITLE }],
+    },
+  };
+}
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -117,11 +132,22 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Compose the site-wide @graph once, at build time: Organization + WebSite
+  // (driven by the SEO defaults global, falling back to brand defaults) plus
+  // any editor-added global override blocks, merged per-@type.
+  const seoDefaults = await getSeoDefaults();
+  const siteGraph = composeGraph({
+    auto: [
+      organizationSchema(orgConfigFromDefaults(seoDefaults)),
+      webSiteSchema(webSiteConfigFromDefaults(seoDefaults)),
+    ] as GraphNode[],
+    override: seoDefaults?.additionalSchema ?? undefined,
+  });
   return (
     <html
       lang="en"
@@ -144,8 +170,7 @@ export default function RootLayout({
           Skip to main content
         </a>
         <ConsentProvider>
-          <JsonLd id="org-jsonld" data={organizationSchema()} />
-          <JsonLd id="website-jsonld" data={webSiteSchema()} />
+          <JsonLdGraph id="site-jsonld" graph={siteGraph} />
           <PreviewBanner />
           <SearchProvider>
             <SmoothScrollProvider>{children}</SmoothScrollProvider>

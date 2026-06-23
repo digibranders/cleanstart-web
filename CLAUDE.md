@@ -352,6 +352,7 @@ Seven Payload cron tasks run in `apps/cms/src/payload/jobs/`. All are gated by `
 | Search-log purge (90-day retention) | daily 03:00 | `purge-search-log.ts` |
 | Leads PII redaction (365-day retention) | daily 03:15 | `purge-leads-pii.ts` |
 | Career-applications purge (resume delete + PII redaction, 365-day) | daily 03:45 | `purge-career-applications.ts` |
+| Consent-log purge (cookie-consent proof, 24-month retention) | daily 04:00 | `purge-consent-log.ts` |
 | Broken-links scan | daily 04:30 | `check-broken-links.ts` |
 | Meilisearch reindex (drift check + self-heal) | daily 05:00 | `reindex-meili.ts` |
 

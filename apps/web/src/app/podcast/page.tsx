@@ -16,9 +16,9 @@ const PodcastChannelVideos = nextDynamic(() =>
 );
 import {
   getFeaturedPodcastEpisodes,
+  getHeroEpisode,
   getPodcastEpisodes,
-  getPodcastPage,
-  isHydratedEpisode,
+  PODCAST_TITLE,
   type PodcastCtaCard,
 } from "@/lib/podcast";
 import {
@@ -34,9 +34,13 @@ import { JsonLd, breadcrumbSchema, podcastSeriesSchema } from "@/lib/seo/jsonld"
 // cookies, so nothing forces dynamic rendering — the page is served from the
 // edge like the rest of the site, refreshing the video list hourly.
 
-const FALLBACK_TITLE = "Leadership Exchange";
-const FALLBACK_DESCRIPTION =
+// The /podcast layout — title, section headings, and CTA cards — is owned here
+// in code. The CMS supplies only the episodes (videos + content) via the
+// `podcastEpisodes` collection.
+const PODCAST_DESCRIPTION =
   "Listen to CleanStart's podcast where industry leaders decode container security, software supply chain risk, and the future of trusted software delivery.";
+
+const LATEST_EPISODES_LIMIT = 6;
 
 const DEFAULT_CTA_CARDS: PodcastCtaCard[] = [
   {
@@ -65,23 +69,19 @@ const DEFAULT_CTA_CARDS: PodcastCtaCard[] = [
   },
 ];
 
-export async function generateMetadata(): Promise<Metadata> {
-  const page = await getPodcastPage();
+export function generateMetadata(): Metadata {
   return buildPageMetadata({
-    title: page?.heroTitle ?? FALLBACK_TITLE,
-    description: page?.heroSubtitle ?? FALLBACK_DESCRIPTION,
+    title: PODCAST_TITLE,
+    description: PODCAST_DESCRIPTION,
     path: "/podcast",
   });
 }
 
 export default async function PodcastPage(): Promise<React.ReactElement> {
-  const page = await getPodcastPage();
-  const limit = page?.latestEpisodesLimit ?? 6;
-
-  const [latestData, featured, channelVideos] = await Promise.all([
-    // Fetch one extra so dropping the featured hero below still leaves up to
-    // `limit` cards in the Latest Episodes grid.
-    getPodcastEpisodes({ limit: limit + 1 }).catch(() => ({
+  const [latestData, featured, heroEpisode, channelVideos] = await Promise.all([
+    // Fetch one extra so dropping the hero episode below still leaves up to
+    // LATEST_EPISODES_LIMIT cards in the Latest Episodes grid.
+    getPodcastEpisodes({ limit: LATEST_EPISODES_LIMIT + 1 }).catch(() => ({
       docs: [],
       hasNextPage: false,
       hasPrevPage: false,
@@ -90,26 +90,23 @@ export default async function PodcastPage(): Promise<React.ReactElement> {
       totalPages: 1,
     })),
     getFeaturedPodcastEpisodes(2).catch(() => []),
+    getHeroEpisode().catch(() => null),
     getChannelVideos(6).catch(() => []),
   ]);
 
-  const featuredHero =
-    page && isHydratedEpisode(page.featuredHeroEpisode)
-      ? page.featuredHeroEpisode
-      : (latestData.docs[0] ?? null);
+  // The hero video is the episode flagged `heroEpisode` in the CMS (the
+  // Introduction); fall back to the newest episode when none is flagged.
+  const featuredHero = heroEpisode ?? latestData.docs[0] ?? null;
 
-  // The featured hero (e.g. the channel Introduction) already plays in the hero
-  // above, so exclude it from the Latest Episodes grid to avoid a duplicate.
+  // The hero episode already plays in the hero above, so exclude it from the
+  // Latest Episodes grid to avoid a duplicate.
   const latestEpisodes = (
     featuredHero
       ? latestData.docs.filter((ep) => ep.id !== featuredHero.id)
       : latestData.docs
-  ).slice(0, limit);
+  ).slice(0, LATEST_EPISODES_LIMIT);
 
-  const ctaCards =
-    page?.ctaCards && page.ctaCards.length > 0
-      ? page.ctaCards
-      : DEFAULT_CTA_CARDS;
+  const ctaCards = DEFAULT_CTA_CARDS;
 
   return (
     <>
@@ -117,32 +114,32 @@ export default async function PodcastPage(): Promise<React.ReactElement> {
         id="podcast-breadcrumbs"
         data={breadcrumbSchema([
           { name: "Home", path: "/" },
-          { name: page?.heroTitle ?? FALLBACK_TITLE },
+          { name: PODCAST_TITLE },
         ])}
       />
       <JsonLd
         id="podcast-series"
         data={podcastSeriesSchema({
-          name: page?.heroTitle ?? FALLBACK_TITLE,
-          description: page?.heroSubtitle ?? FALLBACK_DESCRIPTION,
+          name: PODCAST_TITLE,
+          description: PODCAST_DESCRIPTION,
           path: "/podcast",
         })}
       />
       <Header />
       <main id="main-content">
-        <PodcastHero page={page} featuredHero={featuredHero} />
+        <PodcastHero featuredHero={featuredHero} />
 
         <FadeUp>
           <PodcastLatestEpisodes
-            title={page?.latestEpisodesTitle ?? "Latest Episodes"}
+            title="Latest Episodes"
             episodes={latestEpisodes}
           />
         </FadeUp>
 
         <FadeUp>
           <PodcastFeaturedContent
-            title={page?.featuredSectionTitle ?? "Featured Content"}
-            highlight={page?.featuredSectionHighlight ?? "Content"}
+            title="Featured Content"
+            highlight="Content"
             episodes={featured}
           />
         </FadeUp>

@@ -2,7 +2,11 @@
 // client components (e.g. YouTubeEmbed) don't transitively pull
 // `next/headers` via the draft-mode-aware `cms-fetch`.
 
-import type { PodcastEpisode, PodcastPage } from "./podcast";
+import type { PodcastEpisode } from "./podcast";
+
+// Hero title / brand name for the /podcast page. Lives here (client-safe) so the
+// hero section, page metadata, and JSON-LD all read one source.
+export const PODCAST_TITLE = "Leadership Exchange";
 
 const YT_ID_RE = /^[A-Za-z0-9_-]{11}$/;
 
@@ -61,6 +65,6 @@ export const resolveVideoId = (
 ): string | null => episode.youtubeVideoId ?? extractYoutubeId(episode.youtubeUrl);
 
 export const isHydratedEpisode = (
-  value: PodcastPage["featuredHeroEpisode"],
+  value: PodcastEpisode | string | number | null | undefined,
 ): value is PodcastEpisode =>
   typeof value === "object" && value !== null && "youtubeUrl" in value;

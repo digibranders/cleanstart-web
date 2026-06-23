@@ -1,5 +1,3 @@
-import { cache } from "react";
-
 import { fetchCMS } from "./cms-fetch";
 
 export type PodcastMediaImage = {
@@ -19,6 +17,7 @@ export type PodcastEpisode = {
   thumbnailOverride?: PodcastMediaImage | null;
   abstract?: string | null;
   featured?: boolean | null;
+  heroEpisode?: boolean | null;
   durationSeconds?: number | null;
   publicationDate?: string | null;
 };
@@ -28,19 +27,6 @@ export type PodcastCtaCard = {
   body: string;
   ctaLabel: string;
   ctaHref: string;
-};
-
-export type PodcastPage = {
-  heroEyebrow?: string | null;
-  heroTitle: string;
-  heroTitleHighlight: string;
-  heroSubtitle?: string | null;
-  featuredHeroEpisode: PodcastEpisode | string | number | null;
-  latestEpisodesTitle?: string | null;
-  latestEpisodesLimit?: number | null;
-  featuredSectionTitle?: string | null;
-  featuredSectionHighlight?: string | null;
-  ctaCards?: PodcastCtaCard[] | null;
 };
 
 type PayloadListResponse<T> = {
@@ -57,13 +43,24 @@ type PayloadListResponse<T> = {
 export type PodcastListResponse = PayloadListResponse<PodcastEpisode>;
 
 
-export const getPodcastPage = cache(async (): Promise<PodcastPage | null> => {
-  try {
-    return await fetchCMS<PodcastPage>("/api/globals/podcastPage?depth=2");
-  } catch {
-    return null;
-  }
-});
+/**
+ * The single episode flagged `heroEpisode` in the CMS (the Introduction video).
+ * If several are flagged the most recent wins; callers fall back to the newest
+ * episode when this returns null.
+ */
+export async function getHeroEpisode(): Promise<PodcastEpisode | null> {
+  const params = new URLSearchParams({
+    "where[_status][equals]": "published",
+    "where[heroEpisode][equals]": "true",
+    depth: "1",
+    limit: "1",
+    sort: "-publicationDate",
+  });
+  const data = await fetchCMS<PodcastListResponse>(
+    `/api/podcastEpisodes?${params.toString()}`,
+  );
+  return data.docs[0] ?? null;
+}
 
 export async function getPodcastEpisodes({
   limit = 6,
@@ -104,6 +101,7 @@ export async function getFeaturedPodcastEpisodes(
 // can use them without pulling in `cms-fetch` (which imports `next/headers`).
 // Re-exported here for backward compatibility with existing consumers.
 export {
+  PODCAST_TITLE,
   extractYoutubeId,
   formatEpisodeNumber,
   isHydratedEpisode,
