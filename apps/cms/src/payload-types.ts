@@ -3269,7 +3269,7 @@ export interface Event {
   startsAt: string;
   endsAt?: string | null;
   /**
-   * IANA timezone string (e.g. Asia/Kolkata). Falls back to siteSettings.organizationTimezone.
+   * IANA timezone string (e.g. Asia/Kolkata).
    */
   timezone?: string | null;
   /**
@@ -3669,7 +3669,7 @@ export interface Webinar {
   startsAt?: string | null;
   endsAt?: string | null;
   /**
-   * Falls back to siteSettings.organizationTimezone.
+   * IANA timezone string (e.g. Asia/Kolkata).
    */
   timezone?: string | null;
   registrationMode: 'internal' | 'external';
@@ -11211,10 +11211,6 @@ export interface SiteSetting {
    */
   baseUrl: string;
   defaultLocale: string;
-  /**
-   * IANA timezone identifier (e.g. Asia/Kolkata, America/New_York). Default for events / webinars.
-   */
-  organizationTimezone?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -11551,7 +11547,6 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   siteName?: T;
   baseUrl?: T;
   defaultLocale?: T;
-  organizationTimezone?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
