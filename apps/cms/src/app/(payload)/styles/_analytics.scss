@@ -1,0 +1,173 @@
+// Phase J2 — dedicated /admin/analytics page. Reuses the dashboard's
+// theme tokens (--theme-*, --cs-*) so it matches the CMS skin in both modes.
+
+.cs-analytics {
+  &__head h1 {
+    font-family: var(--font-display);
+    color: var(--cs-text-heading);
+    margin: 0 0 var(--cs-space-4);
+  }
+
+  &__filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--cs-space-3, 12px);
+    margin-bottom: var(--cs-space-5);
+  }
+
+  &__pills {
+    display: inline-flex;
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card, 8px);
+    overflow: hidden;
+
+    button {
+      appearance: none;
+      background: transparent;
+      border: 0;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: var(--theme-text-soft);
+      cursor: pointer;
+
+      &.is-on {
+        background: color-mix(in srgb, var(--cs-cyan-500) 16%, transparent);
+        color: var(--cs-cyan-500);
+        font-weight: 600;
+      }
+    }
+  }
+
+  &__kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--cs-space-3, 12px);
+    margin-bottom: var(--cs-space-4);
+  }
+
+  &__kpi {
+    background: var(--theme-input-bg);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card, 8px);
+    padding: var(--cs-space-3, 12px) var(--cs-space-4, 16px);
+  }
+
+  &__kpi-label {
+    font-size: 13px;
+    color: var(--theme-text-soft);
+  }
+
+  &__kpi-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--cs-text-heading);
+    margin-top: 4px;
+
+    &.is-muted {
+      color: var(--theme-elevation-400);
+    }
+  }
+
+  &__panel {
+    background: var(--theme-elevation-100);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card, 8px);
+    padding: var(--cs-space-4, 16px);
+    margin-bottom: var(--cs-space-4);
+
+    h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--cs-text-heading);
+      margin: 0 0 var(--cs-space-3, 12px);
+    }
+  }
+
+  &__cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--cs-space-4, 16px);
+  }
+
+  &__empty {
+    color: var(--theme-text-soft);
+    font-size: 13px;
+    padding: var(--cs-space-4, 16px) 0;
+  }
+
+  &__thead,
+  &__trow {
+    display: grid;
+    gap: 6px 10px;
+    align-items: center;
+    font-size: 12.5px;
+  }
+
+  &__thead {
+    color: var(--theme-elevation-400);
+    font-size: 11px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid var(--theme-elevation-150);
+  }
+
+  &__trow {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--theme-elevation-150);
+
+    .is-primary {
+      color: var(--cs-cyan-500);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .is-right {
+      text-align: right;
+      color: var(--theme-text-soft);
+    }
+  }
+
+  &__bars {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  &__bar-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 56px;
+    gap: 10px;
+    align-items: center;
+    font-size: 12px;
+    color: var(--theme-text-soft);
+  }
+
+  &__bar-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__bar-track {
+    height: 8px;
+    background: var(--theme-elevation-150);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+
+  &__bar-fill {
+    display: block;
+    height: 100%;
+    border-radius: 5px;
+    background: var(--cs-cyan-500);
+  }
+
+  &__bar-val {
+    text-align: right;
+  }
+}
+
+.cs-nav-analytics-link {
+  display: block;
+}

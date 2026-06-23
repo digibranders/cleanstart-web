@@ -288,6 +288,7 @@ export default buildConfig({
         // admin page; it's a DOM enhancer that self-activates only when an
         // edit-view sidebar (`.document-fields--has-sidebar`) is present.
         './payload/admin/components/DocSidebarResizer.tsx#DocSidebarResizer',
+        './payload/admin/components/Analytics/AnalyticsNavLink.tsx#AnalyticsNavLink',
       ],
       beforeNavLinks: ['./payload/admin/components/SidebarHeader.tsx#SidebarHeader'],
       // Wave 5 — branded hero injected above the stock LoginForm. Full
@@ -308,6 +309,11 @@ export default buildConfig({
         account: {
           Component:
             './payload/admin/components/auth/CmsAccountView.tsx#CmsAccountView',
+        },
+        // Phase J2 — dedicated filterable analytics page (GA4 + GSC).
+        analytics: {
+          Component: './payload/admin/components/Analytics/AnalyticsView.tsx#AnalyticsView',
+          path: '/analytics',
         },
       },
     },
