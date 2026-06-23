@@ -27,7 +27,7 @@ const STEPS: Step[] = [
 
 function StepItem({ step }: { step: Step }) {
   return (
-    <div className="flex w-full max-w-[280px] flex-col items-start gap-4 text-left">
+    <div className="flex w-full max-w-[300px] flex-col items-start gap-4 text-left">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={`/images/process/${step.icon}`}
