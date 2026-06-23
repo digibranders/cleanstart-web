@@ -48,6 +48,7 @@ export const ConsentLog: CollectionConfig = {
       required: true,
       index: true,
       admin: {
+        readOnly: true,
         description:
           'Random per-visitor id stored in the cs_consent cookie. Not linked to any account.',
       },
@@ -56,6 +57,7 @@ export const ConsentLog: CollectionConfig = {
       name: 'decision',
       type: 'select',
       required: true,
+      admin: { readOnly: true },
       options: [
         { label: 'Accept all', value: 'accept_all' },
         { label: 'Reject all', value: 'reject_all' },
@@ -67,21 +69,23 @@ export const ConsentLog: CollectionConfig = {
       type: 'json',
       required: true,
       admin: {
+        readOnly: true,
         description:
           'Resolved category map at decision time, e.g. { "essential": true, "analytics": false }.',
       },
     },
-    { name: 'consentVersion', type: 'number', required: true },
+    { name: 'consentVersion', type: 'number', required: true, admin: { readOnly: true } },
     {
       name: 'gpc',
       type: 'checkbox',
       defaultValue: false,
-      admin: { description: 'Global Privacy Control signal present at decision time.' },
+      admin: { readOnly: true, description: 'Global Privacy Control signal present at decision time.' },
     },
     {
       name: 'country',
       type: 'text',
       admin: {
+        readOnly: true,
         description: 'Coarse ISO country from x-vercel-ip-country (may be unknown locally).',
       },
     },
@@ -89,13 +93,14 @@ export const ConsentLog: CollectionConfig = {
       name: 'ipHash',
       type: 'text',
       admin: {
+        readOnly: true,
         description: 'HMAC-SHA256 of client IP (CONSENT_LOG_HMAC_SECRET). No raw IP stored.',
       },
     },
     {
       name: 'userAgentHash',
       type: 'text',
-      admin: { description: 'HMAC-SHA256 of user-agent. No raw UA stored.' },
+      admin: { readOnly: true, description: 'HMAC-SHA256 of user-agent. No raw UA stored.' },
     },
   ],
   endpoints: [
