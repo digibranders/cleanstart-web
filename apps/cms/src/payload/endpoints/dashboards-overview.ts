@@ -44,11 +44,12 @@ export const ga4OverviewEndpoint: Endpoint = {
       collection: readParam(req, 'collection'),
     };
 
+    const force = readParam(req, 'refresh') === '1';
     const rows = await findRowsOfKind(req.payload, 'ga4DataApi');
     const configured = rows.length > 0;
     const key = buildOverviewCacheKey('ga4', filters);
     const cached = await readCache(req.payload, 'ga4DataApi', 'global', key);
-    if (cached && !isStale(cached, TTL_MS.ga4DataApi)) {
+    if (cached && !force && !isStale(cached, TTL_MS.ga4DataApi)) {
       return json({ ok: true, configured: true, fromCache: true, capturedAt: cached.capturedAt, payload: cached.payload });
     }
     if (!configured) return json({ ok: true, configured: false, payload: null });
@@ -86,10 +87,11 @@ export const gscOverviewEndpoint: Endpoint = {
     // GSC overview is window-only (no country/collection segmentation in v1).
     const key = buildOverviewCacheKey('gsc', { window, country: null, collection: null });
 
+    const force = readParam(req, 'refresh') === '1';
     const rows = await findRowsOfKind(req.payload, 'gscSearchAnalyticsApi');
     const configured = rows.length > 0;
     const cached = await readCache(req.payload, 'gscSearchAnalyticsApi', 'global', key);
-    if (cached && !isStale(cached, TTL_MS.gscSearchAnalyticsApi)) {
+    if (cached && !force && !isStale(cached, TTL_MS.gscSearchAnalyticsApi)) {
       return json({ ok: true, configured: true, fromCache: true, capturedAt: cached.capturedAt, payload: cached.payload });
     }
     if (!configured) return json({ ok: true, configured: false, payload: null });

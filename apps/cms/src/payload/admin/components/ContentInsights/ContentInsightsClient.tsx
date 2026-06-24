@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { ReactElement } from 'react';
 
 import type { ContentInsightsResponse } from '../../../lib/content-insights/types';
+import { RefreshButton } from '../Analytics/RefreshButton';
 import { AttributionPanel } from './AttributionPanel';
 import { Cannibalization } from './Cannibalization';
 import { DecayQueue } from './DecayQueue';
@@ -17,31 +18,36 @@ import { VelocityPanel } from './VelocityPanel';
 export function ContentInsightsClient(): ReactElement {
   const [data, setData] = useState<ContentInsightsResponse | null>(null);
   const [state, setState] = useState<'loading' | 'ready' | 'unconfigured' | 'error'>('loading');
+  const [refreshing, setRefreshing] = useState(false);
+
+  const load = useCallback(async (force: boolean): Promise<void> => {
+    setState('loading');
+    try {
+      const res = await fetch(`/api/content-insights${force ? '?refresh=1' : ''}`, { credentials: 'include' });
+      const j = (await res.json()) as ContentInsightsResponse;
+      if (!j.ok) return setState('error');
+      if (!j.configured) return setState('unconfigured');
+      setData(j);
+      setState('ready');
+    } catch {
+      setState('error');
+    }
+  }, []);
 
   useEffect(() => {
-    let cancelled = false;
-    setState('loading');
-    fetch('/api/content-insights', { credentials: 'include' })
-      .then((r) => r.json())
-      .then((j: ContentInsightsResponse) => {
-        if (cancelled) return;
-        if (!j.ok) return setState('error');
-        if (!j.configured) return setState('unconfigured');
-        setData(j);
-        setState('ready');
-      })
-      .catch(() => {
-        if (!cancelled) setState('error');
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    void load(false);
+  }, [load]);
+
+  const handleRefresh = useCallback((): void => {
+    setRefreshing(true);
+    void load(true).finally(() => setRefreshing(false));
+  }, [load]);
 
   return (
     <div className="cs-analytics cs-content-insights">
       <header className="cs-analytics__head">
         <h1>Content insights</h1>
+        <RefreshButton onClick={handleRefresh} busy={refreshing} updatedAt={data?.capturedAt ?? null} />
       </header>
       {state === 'loading' && (
         <div className="cs-analytics__empty">

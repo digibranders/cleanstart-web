@@ -26,9 +26,10 @@ export const cruxEndpoint: Endpoint = {
     if (!hasAnyRole(req.user, ['admin', 'editor'])) {
       return json({ ok: false, error: 'forbidden' }, { status: 403 });
     }
+    const force = req.searchParams?.get?.('refresh') === '1';
     const creds = resolveCruxCredentials();
     const cached = await readCache<CruxPayload>(req.payload, 'ga4DataApi', 'global', CRUX_KEY);
-    if (cached && !isStale(cached, CRUX_TTL_MS)) {
+    if (cached && !force && !isStale(cached, CRUX_TTL_MS)) {
       return json({ ok: true, configured: true, fromCache: true, capturedAt: cached.capturedAt, payload: cached.payload });
     }
     if (!creds) return json({ ok: true, configured: false, payload: null });
@@ -53,8 +54,9 @@ export const ga4RealtimeEndpoint: Endpoint = {
     if (!hasAnyRole(req.user, ['admin', 'editor'])) {
       return json({ ok: false, error: 'forbidden' }, { status: 403 });
     }
+    const force = req.searchParams?.get?.('refresh') === '1';
     const cached = await readCache<RealtimePayload>(req.payload, 'ga4DataApi', 'global', REALTIME_KEY);
-    if (cached && !isStale(cached, REALTIME_TTL_MS)) {
+    if (cached && !force && !isStale(cached, REALTIME_TTL_MS)) {
       return json({ ok: true, configured: true, fromCache: true, payload: cached.payload });
     }
     const rows = await findRowsOfKind(req.payload, 'ga4DataApi');
