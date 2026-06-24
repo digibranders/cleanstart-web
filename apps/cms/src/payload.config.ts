@@ -316,6 +316,11 @@ export default buildConfig({
           Component: './payload/admin/components/Analytics/AnalyticsView.tsx#AnalyticsView',
           path: '/analytics',
         },
+        // Phase 3 — content-joined intelligence (decay, leaderboards, etc.).
+        contentInsights: {
+          Component: './payload/admin/components/ContentInsights/ContentInsightsView.tsx#ContentInsightsView',
+          path: '/content-insights',
+        },
       },
     },
     meta: {

@@ -37,6 +37,7 @@ export const SidebarHeader = (): ReactElement => {
   const pathname = usePathname() ?? '';
   const isDashboard = pathname === '/admin' || pathname === '/admin/';
   const isAnalytics = pathname.startsWith('/admin/analytics');
+  const isContentInsights = pathname.startsWith('/admin/content-insights');
   const isMac = useIsMac();
 
   // Open the Cmd+K palette on click. CommandPalette listens for the
@@ -161,6 +162,40 @@ export const SidebarHeader = (): ReactElement => {
           />
         </svg>
         <span>Analytics</span>
+      </Link>
+
+      <Link
+        href="/admin/content-insights"
+        className={
+          isContentInsights
+            ? 'cs-sidebar-dashboard cs-sidebar-dashboard--active'
+            : 'cs-sidebar-dashboard'
+        }
+        aria-current={isContentInsights ? 'page' : undefined}
+      >
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 16 16"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path
+            d="M4 2.5h6l2.5 2.5v8.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1Z"
+            stroke="currentColor"
+            strokeWidth="1.4"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M5.5 8.5h5M5.5 11h3"
+            stroke="currentColor"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+          />
+        </svg>
+        <span>Content insights</span>
       </Link>
     </div>
   );
