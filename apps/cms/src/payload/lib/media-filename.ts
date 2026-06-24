@@ -15,15 +15,45 @@ const SHORT_HASH_LEN = 8;
  * hint (host doc slug) is preferred so the R2 key actually carries
  * page provenance instead of `image001-a1b2c3d4.webp` × N.
  */
+// Each token separator is matched as `[\s_-]` because the candidate may
+// arrive humanised (spaces) or as a raw slug (hyphens/underscores). Every
+// pattern is anchored at both ends so a meaningful name that merely starts
+// with one of these tokens (`download-guide`, `file-structure-diagram`,
+// `new-relic-integration`) is NOT flagged.
 const JUNK_SLUG_PATTERNS: readonly RegExp[] = [
-  /^image[-_]?\d+$/i,
-  /^img[-_]?\d+$/i,
-  /^clip[-_]?image\d+$/i,
+  // Generic editor/clipboard placeholders.
+  /^image[\s_-]?\d+$/i,
+  /^clip[\s_-]?image\s*\d+$/i,
   /^picture\s*\d*$/i,
-  /^pasted[-_]\d+$/i,
-  /^ingested[-_]\d+$/i,
-  /^untitled[-_]?\d*$/i,
-  /^screenshot[-_]?.*$/i,
+  /^untitled[\s_-]?\d*$/i,
+  /^unnamed(\s*\(?\d+\)?)?$/i,
+  /^download(\s*\(?\d+\)?)?$/i,
+  /^file(\s*\(?\d+\)?)?$/i,
+  /^new[\s_-]?(file|image|document)\b.*$/i,
+  /^scanned[\s_-]?document\b.*$/i,
+  /^pasted[\s_-]\d+$/i,
+  /^ingested[\s_-]\d+$/i,
+  // Camera / phone exports.
+  /^img[\s_-]?\d+$/i, // IMG_3492
+  /^dscn?[\s_-]?\d+$/i, // DSC_0001 / DSCN1234
+  /^p\d{7,}$/i, // P1010101
+  /^pxl[\s_-]?\d.*$/i, // PXL_20240101_… (Pixel)
+  /^mvimg[\s_-]?\d.*$/i,
+  /^vid[\s_-]?\d+$/i,
+  /^photo([\s_-]on\b.*)?$/i, // "Photo on 2026-…" or bare "photo"
+  /^screen[\s_-]?shot\b.*$/i, // "Screenshot …" / "Screen Shot …"
+  // Messaging-app exports — WhatsApp/Signal/Telegram/Messenger/Facebook
+  // name every saved file by date+time, which carries no semantics and
+  // should yield to the host-doc context hint (e.g. the page title).
+  /^whatsapp[\s_-]?(image|video|audio|ptt)\b.*$/i,
+  /^signal[\s_-]?\d.*$/i,
+  /^telegram\b.*$/i,
+  /^fb[\s_-]?img[\s_-]?\d+$/i,
+  /^received[\s_-]\d+$/i,
+  /^snapchat[\s_-]?\d.*$/i,
+  // Bare date / time stamps.
+  /^\d{8}[\s_-]?\d{4,6}$/, // 20240101_120000
+  /^\d{4}[\s_-]\d{2}[\s_-]\d{2}([\s_-].*)?$/, // leading ISO date stamp
   /^[a-f0-9]{6,}$/i, // bare hex (Webflow CDN basenames)
   /^\d+$/, // pure numeric
 ];
@@ -79,11 +109,52 @@ export const canonicalExtensionForMime = (mimeType: string | undefined | null): 
   return 'bin';
 };
 
+// Short connector words that read as noise when a slug ends on them
+// (`…-security-at-the` → `…-security`). Trimmed only from the TAIL after a
+// truncation, never from the middle, so meaning is preserved.
+const TRAILING_STOPWORDS: ReadonlySet<string> = new Set([
+  'a',
+  'an',
+  'and',
+  'at',
+  'by',
+  'for',
+  'in',
+  'of',
+  'on',
+  'or',
+  'the',
+  'to',
+  'vs',
+  'with',
+]);
+
+/**
+ * Truncate a hyphen-separated slug to `max` characters *logically*:
+ * back off to the last whole word rather than slicing through one, then
+ * drop any dangling connector word. A long title therefore yields a clean,
+ * shorter slug (`cleanstart-named-winner-in-software-supply-chain-security`)
+ * instead of a fixed-length chop mid-word (`…-secur`).
+ *
+ * The one exception is a single word longer than `max` with no internal
+ * boundary — there is nothing to back off to, so it is hard-cut.
+ */
 const truncateSlug = (slug: string, max: number): string => {
   if (slug.length <= max) return slug;
-  const cut = slug.slice(0, max);
-  // Avoid leaving a dangling separator at the cut boundary.
-  return cut.replace(/-+$/, '');
+  let cut = slug.slice(0, max);
+  // If the cut landed inside a word (the next source char is not a
+  // boundary), retreat to the last complete word within the window.
+  const cutMidWord = slug[max] !== undefined && slug[max] !== '-';
+  if (cutMidWord) {
+    const lastDash = cut.lastIndexOf('-');
+    if (lastDash > 0) cut = cut.slice(0, lastDash);
+  }
+  cut = cut.replace(/-+$/, '');
+  const parts = cut.split('-');
+  while (parts.length > 1 && TRAILING_STOPWORDS.has(parts[parts.length - 1] ?? '')) {
+    parts.pop();
+  }
+  return parts.join('-');
 };
 
 export const shortHash = (bytes: Buffer | Uint8Array): string =>
