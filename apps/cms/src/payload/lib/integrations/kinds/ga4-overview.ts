@@ -101,9 +101,7 @@ export const fetchGa4Overview = async (
       orderBys: [{ metric: { metricName: 'sessions' }, desc: true }],
       limit: 6,
     });
-  const [resp] = await client.batchRunReports({
-    property,
-    requests: [
+  const requests = [
       withFilter({
         property,
         dateRanges: range,
@@ -157,7 +155,18 @@ export const fetchGa4Overview = async (
         metrics: [{ name: 'sessions' }],
         limit: 2000,
       }),
-    ],
-  });
-  return shapeGa4Overview(filters.window, resp as GaBatch);
+  ];
+  // GA4 batchRunReports allows at most 5 requests per batch, so split the 9
+  // reports into chunks and concatenate the responses in order (the shaper
+  // indexes reports[0..8]).
+  const BATCH_MAX = 5;
+  const chunks: (typeof requests)[] = [];
+  for (let i = 0; i < requests.length; i += BATCH_MAX) {
+    chunks.push(requests.slice(i, i + BATCH_MAX));
+  }
+  const responses = await Promise.all(
+    chunks.map((batch) => client.batchRunReports({ property, requests: batch })),
+  );
+  const reports = responses.flatMap(([resp]) => (resp as GaBatch).reports ?? []);
+  return shapeGa4Overview(filters.window, { reports });
 };
