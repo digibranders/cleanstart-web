@@ -11,6 +11,11 @@ import {
   deriveVelocity,
   keyEventsConfigured,
 } from '../lib/content-insights/sections';
+import {
+  deriveCannibalization,
+  deriveLowCtr,
+  deriveStrikingDistance,
+} from '../lib/content-insights/seo-sections';
 import type { ContentSnapshot } from '../lib/content-insights/types';
 import { isStale, readCache, writeCache } from '../lib/integrations/cache';
 
@@ -30,6 +35,9 @@ const sectionsOf = (snap: ContentSnapshot) => ({
   indexation: deriveIndexation(snap),
   velocity: deriveVelocity(snap),
   attribution: deriveAttribution(snap),
+  strikingDistance: deriveStrikingDistance(snap),
+  lowCtr: deriveLowCtr(snap),
+  cannibalization: deriveCannibalization(snap),
 });
 
 export const contentInsightsEndpoint: Endpoint = {
