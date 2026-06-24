@@ -4,10 +4,9 @@ import { hasAnyRole } from '../access/typed-user';
 import type { CruxPayload, RealtimePayload } from '../lib/dashboards/overview-types';
 import { isStale, readCache, writeCache } from '../lib/integrations/cache';
 import { resolveCruxCredentials, resolveGa4Credentials } from '../lib/integrations/credentials';
-import { fetchCrux } from '../lib/integrations/kinds/crux';
+import { fetchCrux, resolveCruxOrigin } from '../lib/integrations/kinds/crux';
 import { fetchRealtime } from '../lib/integrations/kinds/ga4-realtime';
 import { findRowsOfKind } from '../lib/integrations/kinds/types';
-import { resolveSiteUrl } from '../lib/site-url';
 
 const CRUX_KEY = 'crux:default';
 const CRUX_TTL_MS = 26 * 60 * 60 * 1000;
@@ -34,8 +33,7 @@ export const cruxEndpoint: Endpoint = {
     }
     if (!creds) return json({ ok: true, configured: false, payload: null });
     try {
-      const origin = resolveSiteUrl();
-      const payload = await fetchCrux(creds, origin, []);
+      const payload = await fetchCrux(creds, resolveCruxOrigin(), []);
       await writeCache(req.payload, 'ga4DataApi', 'global', CRUX_KEY, payload);
       return json({ ok: true, configured: true, fromCache: false, capturedAt: new Date().toISOString(), payload });
     } catch (err) {

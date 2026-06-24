@@ -1,6 +1,14 @@
 import type { CruxPayload, CruxRecord, CwvMetric, CwvRating } from '../../dashboards/overview-types';
 import type { CruxCredentials } from '../credentials';
 
+/**
+ * The public production origin to query CrUX for. Decoupled from the CMS's own
+ * base URL (`resolveSiteUrl`) because that resolves to staging in non-prod
+ * environments, and CrUX only has field data for the live www origin.
+ */
+export const resolveCruxOrigin = (): string =>
+  process.env.CRUX_ORIGIN ?? 'https://www.cleanstart.com';
+
 const rate = (v: number, good: number, poor: number): CwvRating =>
   v <= good ? 'good' : v <= poor ? 'needs-improvement' : 'poor';
 
