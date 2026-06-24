@@ -357,6 +357,7 @@ Ten Payload cron tasks run in `apps/cms/src/payload/jobs/`. All are gated by `PA
 | Consent-log purge (cookie-consent proof, 24-month retention) | daily 04:00 | `purge-consent-log.ts` |
 | Broken-links scan | daily 04:30 | `check-broken-links.ts` |
 | Meilisearch reindex (drift check + self-heal) | daily 05:00 | `reindex-meili.ts` |
+| Content-insights snapshot rebuild | daily 06:30 | `refresh-content-insights.ts` |
 
 Never change a job schedule without updating this table. Every new job needs a test file and must respect the `PAYLOAD_AUTO_RUN` gate.
 

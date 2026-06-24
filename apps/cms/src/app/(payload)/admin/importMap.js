@@ -134,6 +134,7 @@ import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc056
 import { Dashboard as Dashboard_99a124d7b5ab83228ca0a3f897256570 } from '../../../payload/admin/components/Dashboard/Dashboard.tsx'
 import { CmsAccountView as CmsAccountView_e25882c99036df42ce1493c03452d7e3 } from '../../../payload/admin/components/auth/CmsAccountView.tsx'
 import { AnalyticsView as AnalyticsView_9809f757f325208f1f22c259e380c7d4 } from '../../../payload/admin/components/Analytics/AnalyticsView.tsx'
+import { ContentInsightsView as ContentInsightsView_4f64082482f4a971d7f1f3adfd127137 } from '../../../payload/admin/components/ContentInsights/ContentInsightsView.tsx'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -274,5 +275,6 @@ export const importMap = {
   "./payload/admin/components/Dashboard/Dashboard.tsx#Dashboard": Dashboard_99a124d7b5ab83228ca0a3f897256570,
   "./payload/admin/components/auth/CmsAccountView.tsx#CmsAccountView": CmsAccountView_e25882c99036df42ce1493c03452d7e3,
   "./payload/admin/components/Analytics/AnalyticsView.tsx#AnalyticsView": AnalyticsView_9809f757f325208f1f22c259e380c7d4,
+  "./payload/admin/components/ContentInsights/ContentInsightsView.tsx#ContentInsightsView": ContentInsightsView_4f64082482f4a971d7f1f3adfd127137,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

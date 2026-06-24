@@ -28,49 +28,81 @@
 
   /* Card-title scale — fills the gap between display-sm and text-3xl.
      Use per the role->token map in apps/web/docs/design-tokens.md. */
-  --text-card-title-xl: clamp(1.5rem, 2vw, 2.0625rem);     /* 24→33px — FactoryCard, AboutPowering hero feature cards */
-  --text-card-title-lg: clamp(1.375rem, 1.8vw, 2rem);      /* 22→32px — Security headers, AudienceTabs, AsrApproach, AsrFitsBuilt, AboutWhoWeAre pillars */
-  --text-card-title-md: clamp(1.125rem, 1.4vw, 1.5rem);    /* 18→24px — Blog/News/Resource/Event/Webinar/PodcastEpisode card titles */
-  --text-card-title-sm: clamp(1rem, 1.1vw, 1.3125rem);     /* 16→21px — pill/tab labels */
+  --text-card-title-xl: clamp(1.5rem, 2vw, 2.0625rem);
+  /* 24→33px — FactoryCard, AboutPowering hero feature cards */
+  --text-card-title-lg: clamp(1.375rem, 1.8vw, 2rem);
+  /* 22→32px — Security headers, AudienceTabs, AsrApproach, AsrFitsBuilt, AboutWhoWeAre pillars */
+  --text-card-title-md: clamp(1.125rem, 1.4vw, 1.5rem);
+  /* 18→24px — Blog/News/Resource/Event/Webinar/PodcastEpisode card titles */
+  --text-card-title-sm: clamp(1rem, 1.1vw, 1.3125rem);
+  /* 16→21px — pill/tab labels */
 
   /* Body scale (inside cards & marketing copy — NOT for CMS prose; see .article-body below) */
-  --text-body-xl: clamp(1.0625rem, 1.4vw, 1.5rem);         /* 17→24px — section lead paragraph below H2 */
-  --text-body-lg: clamp(1rem, 1.2vw, 1.375rem);            /* 16→22px — standard card body, bullet items */
-  --text-body-md: clamp(0.9375rem, 1vw, 1.125rem);         /* 15→18px — secondary text, compact card body */
-  --text-body-sm: clamp(0.875rem, 0.9vw, 1rem);            /* 14→16px — meta, table cells */
-  --text-body-xs: clamp(0.75rem, 0.85vw, 0.875rem);        /* 12→14px — eyebrow, breadcrumb, caption */
+  --text-body-xl: clamp(1.0625rem, 1.4vw, 1.5rem);
+  /* 17→24px — section lead paragraph below H2 */
+  --text-body-lg: clamp(1rem, 1.2vw, 1.375rem);
+  /* 16→22px — standard card body, bullet items */
+  --text-body-md: clamp(0.9375rem, 1vw, 1.125rem);
+  /* 15→18px — secondary text, compact card body */
+  --text-body-sm: clamp(0.875rem, 0.9vw, 1rem);
+  /* 14→16px — meta, table cells */
+  --text-body-xs: clamp(0.75rem, 0.85vw, 0.875rem);
+  /* 12→14px — eyebrow, breadcrumb, caption */
 
   /* Section vertical-padding scale (fluid) */
-  --spacing-section-sm: clamp(2.5rem, 5vw, 4rem);            /* 40→64px — tight/sequential grids */
-  --spacing-section-md: clamp(3rem, 6vw, 5.5rem);            /* 48→88px — standard sections */
-  --spacing-section-lg: clamp(4rem, 8vw, 7rem);              /* 64→112px — feature/hero-adjacent */
-  --spacing-section-cta: 27.5rem;                            /* 440px (mobile). On mobile the card is fully ABOVE the footer (detached, 30px gap) — section pb = card_h(350) + 30 + 60 breathing = 440. sm/lg overrides below center the card on the footer edge. */
-  --footer-cta-pt: 5rem;                                     /* 80px (mobile) — footer regular pt since card sits above, not overlapping. sm/lg overrides below give card-half + 60 breathing. */
+  --spacing-section-sm: clamp(2.5rem, 5vw, 4rem);
+  /* 40→64px — tight/sequential grids */
+  --spacing-section-md: clamp(3rem, 6vw, 5.5rem);
+  /* 48→88px — standard sections */
+  --spacing-section-lg: clamp(4rem, 8vw, 7rem);
+  /* 64→112px — feature/hero-adjacent */
+  --spacing-section-cta: 27.5rem;
+  /* 440px (mobile). On mobile the card is fully ABOVE the footer (detached, 30px gap) — section pb = card_h(350) + 30 + 60 breathing = 440. sm/lg overrides below center the card on the footer edge. */
+  --footer-cta-pt: 5rem;
+  /* 80px (mobile) — footer regular pt since card sits above, not overlapping. sm/lg overrides below give card-half + 60 breathing. */
 
   /* Card padding scale (fluid) */
-  --spacing-card-sm: clamp(1rem, 1.5vw, 1.5rem);             /* 16→24px — compact cards */
-  --spacing-card-md: clamp(1.25rem, 2vw, 2rem);              /* 20→32px — standard cards */
-  --spacing-card-lg: clamp(1.5rem, 2.5vw, 2.5rem);           /* 24→40px — hero/feature cards */
+  --spacing-card-sm: clamp(1rem, 1.5vw, 1.5rem);
+  /* 16→24px — compact cards */
+  --spacing-card-md: clamp(1.25rem, 2vw, 2rem);
+  /* 20→32px — standard cards */
+  --spacing-card-lg: clamp(1.5rem, 2.5vw, 2.5rem);
+  /* 24→40px — hero/feature cards */
 
   /* Discrete button size scale — buttons MUST stay fixed (WCAG 2.5.8 floor); never clamp height.
      Minimum CTA target is 44px (lg). Smaller variants are utility-only and require data-cta-utility. */
-  --btn-fs-xl: 1.25rem;   /* 20px */
-  --btn-fs-lg: 1.25rem;   /* 20px — primary hero CTA */
-  --btn-fs-md: 1rem;      /* 16px — secondary inline */
-  --btn-fs-sm: 0.875rem;  /* 14px — utility (data-cta-utility) */
-  --btn-fs-xs: 0.8125rem; /* 13px — utility (data-cta-utility) */
+  --btn-fs-xl: 1.25rem;
+  /* 20px */
+  --btn-fs-lg: 1.25rem;
+  /* 20px — primary hero CTA */
+  --btn-fs-md: 1rem;
+  /* 16px — secondary inline */
+  --btn-fs-sm: 0.875rem;
+  /* 14px — utility (data-cta-utility) */
+  --btn-fs-xs: 0.8125rem;
+  /* 13px — utility (data-cta-utility) */
 
-  --btn-h-xl: 3rem;       /* 48px — hero-feature CTA */
-  --btn-h-lg: 2.75rem;    /* 44px — WCAG 2.5.8 floor; default for every primary CTA */
-  --btn-h-md: 2.25rem;    /* 36px — utility only (requires data-cta-utility) */
-  --btn-h-sm: 2rem;       /* 32px — utility only (requires data-cta-utility) */
-  --btn-h-xs: 1.75rem;    /* 28px — utility only (requires data-cta-utility) */
+  --btn-h-xl: 3rem;
+  /* 48px — hero-feature CTA */
+  --btn-h-lg: 2.75rem;
+  /* 44px — WCAG 2.5.8 floor; default for every primary CTA */
+  --btn-h-md: 2.25rem;
+  /* 36px — utility only (requires data-cta-utility) */
+  --btn-h-sm: 2rem;
+  /* 32px — utility only (requires data-cta-utility) */
+  --btn-h-xs: 1.75rem;
+  /* 28px — utility only (requires data-cta-utility) */
 
-  --btn-px-xl: 1.75rem;   /* 28px */
-  --btn-px-lg: 1.375rem;  /* 22px */
-  --btn-px-md: 1rem;      /* 16px */
-  --btn-px-sm: 0.75rem;   /* 12px */
-  --btn-px-xs: 0.625rem;  /* 10px */
+  --btn-px-xl: 1.75rem;
+  /* 28px */
+  --btn-px-lg: 1.375rem;
+  /* 22px */
+  --btn-px-md: 1rem;
+  /* 16px */
+  --btn-px-sm: 0.75rem;
+  /* 12px */
+  --btn-px-xs: 0.625rem;
+  /* 10px */
 
   --color-cs-navy-0: #151021;
   --color-cs-navy-1: #10123e;
@@ -94,8 +126,8 @@
      in product — the team chose visual consistency across desktop widths
      instead. --container-cs kept as alias for any legacy consumer. */
   --container-default: 1440px;
-  --container-prose:    720px;
-  --container-wide:    1600px;
+  --container-prose: 720px;
+  --container-wide: 1600px;
   --container-cs: var(--container-default);
 
   /* Fixed-header height, single source of truth. The header is a fixed 72px
@@ -113,13 +145,16 @@
   /* Hero role tokens — see RESPONSIVE-SYSTEM-AUDIT.md §5.3.
      Clamp below lg; locked at lg+ via the @media (min-width: 64rem) :root
      override below the :root block. */
-  --text-hero-marketing: clamp(2.5rem, 5.5vw, 4.5rem);  /* 40 → 72  — home, about-us, teams */
-  --text-hero-product:   clamp(2.25rem, 4vw, 3.5rem);   /* 36 → 56  — product pages */
-  --text-hero-utility:   clamp(2rem, 3.5vw, 3rem);      /* 32 → 48  — listing + article-detail */
+  --text-hero-marketing: clamp(2.5rem, 5.5vw, 4.5rem);
+  /* 40 → 72  — home, about-us, teams */
+  --text-hero-product: clamp(2.25rem, 4vw, 3.5rem);
+  /* 36 → 56  — product pages */
+  --text-hero-utility: clamp(2rem, 3.5vw, 3rem);
+  /* 32 → 48  — listing + article-detail */
   --text-hero-marketing-ls: -0.04em;
-  --text-hero-product-ls:   -0.04em;
-  --text-hero-utility-ls:   -0.03em;
-  --text-hero-lh:           1.05;
+  --text-hero-product-ls: -0.04em;
+  --text-hero-utility-ls: -0.03em;
+  --text-hero-lh: 1.05;
 
   /* Section H2 alias (== --text-display-md, named for clarity in markup) */
   --text-section-h2: var(--text-display-md);
@@ -145,46 +180,53 @@
 
      Locked at ≥lg via @media block below (paired tokens stay constant).
      ───────────────────────────────────────────────────────────────────── */
-  --text-t-display-1:  clamp(2.5rem, 5.5vw, 4.5rem);
-  --text-t-display-2:  clamp(2rem, 4.2vw, 3.5rem);
+  --text-t-display-1: clamp(2.5rem, 5.5vw, 4.5rem);
+  --text-t-display-2: clamp(2rem, 4.2vw, 3.5rem);
   --text-t-heading-lg: clamp(1.375rem, 2.1vw, 2rem);
   --text-t-heading-md: clamp(1.25rem, 1.6vw, 1.5rem);
   --text-t-heading-sm: clamp(1.125rem, 1.3vw, 1.25rem);
-  --text-t-subhead:    clamp(1.0625rem, 1.5vw, 1.375rem); /* 17 → 22 — section intro paragraph next to H2 */
-  --text-t-body-lg:    clamp(1rem, 1.2vw, 1.125rem);
-  --text-t-body-md:    clamp(0.875rem, 1vw, 1rem);
-  --text-t-body-sm:    clamp(0.75rem, 0.85vw, 0.875rem);
+  --text-t-subhead: clamp(1.0625rem, 1.5vw, 1.375rem);
+  /* 17 → 22 — section intro paragraph next to H2 */
+  --text-t-body-lg: clamp(1rem, 1.2vw, 1.125rem);
+  --text-t-body-md: clamp(0.875rem, 1vw, 1rem);
+  --text-t-body-sm: clamp(0.75rem, 0.85vw, 0.875rem);
 
   /* Letter-spacing per role (paired with sizes above) */
-  --text-t-display-1-ls:  -0.04em;
-  --text-t-display-2-ls:  -0.04em;
+  --text-t-display-1-ls: -0.04em;
+  --text-t-display-2-ls: -0.04em;
   --text-t-heading-lg-ls: -0.04em;
   --text-t-heading-md-ls: -0.03em;
   --text-t-heading-sm-ls: -0.02em;
-  --text-t-subhead-ls:    -0.02em;
-  --text-t-body-lg-ls:    -0.02em;
-  --text-t-body-md-ls:    -0.01em;
-  --text-t-body-sm-ls:    0;
+  --text-t-subhead-ls: -0.02em;
+  --text-t-body-lg-ls: -0.02em;
+  --text-t-body-md-ls: -0.01em;
+  --text-t-body-sm-ls: 0;
 
   /* Line-height per role */
-  --text-t-display-1-lh:  1.0;
-  --text-t-display-2-lh:  1.05;
+  --text-t-display-1-lh: 1.0;
+  --text-t-display-2-lh: 1.05;
   --text-t-heading-lg-lh: 1.1;
   --text-t-heading-md-lh: 1.2;
   --text-t-heading-sm-lh: 1.3;
-  --text-t-subhead-lh:    1.45;
-  --text-t-body-lg-lh:    1.5;
-  --text-t-body-md-lh:    1.55;
-  --text-t-body-sm-lh:    1.5;
+  --text-t-subhead-lh: 1.45;
+  --text-t-body-lg-lh: 1.5;
+  --text-t-body-md-lh: 1.55;
+  --text-t-body-sm-lh: 1.5;
 
   /* Prose tokens for .prose-cs (long-form article body — see RESPONSIVE-SYSTEM-AUDIT.md §9.3).
      Body 17 → 18, H3 ≥ 22 (fixes the prior H3 < body inversion). */
-  --prose-h1: clamp(2.25rem, 4vw, 3.5rem);              /* 36 → 56 */
-  --prose-h2: clamp(1.625rem, 2.5vw, 2.25rem);          /* 26 → 36 */
-  --prose-h3: clamp(1.25rem, 1.6vw, 1.5rem);            /* 20 → 24 */
-  --prose-h4: clamp(1.125rem, 1.3vw, 1.25rem);          /* 18 → 20 */
-  --prose-body: clamp(1.0625rem, 1.2vw, 1.125rem);      /* 17 → 18 */
-  --prose-blockquote: clamp(1.1875rem, 1.4vw, 1.25rem); /* 19 → 20 */
+  --prose-h1: clamp(2.25rem, 4vw, 3.5rem);
+  /* 36 → 56 */
+  --prose-h2: clamp(1.625rem, 2.5vw, 2.25rem);
+  /* 26 → 36 */
+  --prose-h3: clamp(1.25rem, 1.6vw, 1.5rem);
+  /* 20 → 24 */
+  --prose-h4: clamp(1.125rem, 1.3vw, 1.25rem);
+  /* 18 → 20 */
+  --prose-body: clamp(1.0625rem, 1.2vw, 1.125rem);
+  /* 17 → 18 */
+  --prose-blockquote: clamp(1.1875rem, 1.4vw, 1.25rem);
+  /* 19 → 20 */
   --prose-code: 0.9rem;
   --prose-figcaption: 0.9375rem;
   --prose-h1-lh: 1.1;
@@ -206,16 +248,18 @@
      duplicated the same clamp strings inline. Anything painted inside the
      footer slot must consume these — never hardcode a new clamp for the title,
      description, or submit button. */
-  --cta-card-title:       clamp(26px, 3.1vw, 36px);
-  --cta-card-title-ls:    -0.04em;
-  --cta-card-title-lh:    1.1;
+  --cta-card-title: clamp(26px, 3.1vw, 36px);
+  --cta-card-title-ls: -0.04em;
+  --cta-card-title-lh: 1.1;
   --cta-card-title-weight: 600;
-  --cta-card-desc:        clamp(16px, 1.5vw, 20px);
-  --cta-card-desc-ls:     -0.02em;
-  --cta-card-desc-lh:     1.4;
-  --cta-card-btn-h:       36px;  /* base = mobile; sm/lg overrides below */
-  --cta-card-btn-px:      16px;
-  --cta-card-btn-fs:      13px;  /* base = mobile; sm/lg overrides below */
+  --cta-card-desc: clamp(16px, 1.5vw, 20px);
+  --cta-card-desc-ls: -0.02em;
+  --cta-card-desc-lh: 1.4;
+  --cta-card-btn-h: 36px;
+  /* base = mobile; sm/lg overrides below */
+  --cta-card-btn-px: 16px;
+  --cta-card-btn-fs: 13px;
+  /* base = mobile; sm/lg overrides below */
 
   /* ═══════════════════════════════════════════════════════════════════════
      TYPOGRAPHY SYSTEM v2 — --fs-* family (canonical)
@@ -237,102 +281,139 @@
      v6 (2026-06-06): hero --fs-display pulled 36→64 down to 36→56 and --fs-h2
      pulled 28→56 back to 28→48 — marketing hierarchy is now H1 56 / H2 48
      (hero display & --fs-h1 share the 56 cap; section H2 sits one step below). */
-  --fs-display:  clamp(2.25rem, 1.5rem + 2.22vw, 3.5rem);    /* 36 → 56  hero H1 */
+  --fs-display: clamp(2.25rem, 1.5rem + 2.22vw, 3.5rem);
+  /* 36 → 56  hero H1 */
   /* Homepage hero only — restores the larger 36 → 64 cap (consumed by
      sections/home/Hero.tsx). Other marketing/product heroes keep --fs-display
      (36 → 56). Same lower lock-point as --fs-display (~540px) so only the
      desktop end grows. */
-  --fs-display-home: clamp(2.25rem, 1.2rem + 3.11vw, 4rem);  /* 36 → 64  home hero H1 */
-  --fs-h1:       clamp(2rem, 1.5rem + 2.22vw, 3.5rem);       /* 32 → 56  listing/detail/legal H1 */
-  --fs-h2:       clamp(1.75rem, 1.375rem + 1.81vw, 3rem);    /* 28 → 48  section H2 */
-  --fs-h3:       clamp(1.375rem, 1.25rem + 0.56vw, 1.75rem); /* 22 → 28  subsection / card title */
-  --fs-h4:       1.25rem;                                     /* 20  (1.375rem ≥ md via override) */
-  --fs-h5:       1.125rem;                                    /* 18 */
-  --fs-h6:       1rem;                                        /* 16 */
+  --fs-display-home: clamp(2.25rem, 1.2rem + 3.11vw, 4rem);
+  /* 36 → 64  home hero H1 */
+  --fs-h1: clamp(2rem, 1.5rem + 2.22vw, 3.5rem);
+  /* 32 → 56  listing/detail/legal H1 */
+  --fs-h2: clamp(1.75rem, 1.375rem + 1.81vw, 3rem);
+  /* 28 → 48  section H2 */
+  --fs-h3: clamp(1.375rem, 1.25rem + 0.56vw, 1.75rem);
+  /* 22 → 28  subsection / card title */
+  --fs-h4: 1.25rem;
+  /* 20  (1.375rem ≥ md via override) */
+  --fs-h5: 1.125rem;
+  /* 18 */
+  --fs-h6: 1rem;
+  /* 16 */
 
   /* Body */
-  --fs-lead:     clamp(1.125rem, 0.96rem + 0.83vw, 1.5rem);  /* 18 → 24  section description / hero sub-heading */
-  --fs-lead-sm:  clamp(1.125rem, 1.07rem + 0.27vw, 1.25rem); /* 18 → 20  compact hero sub-heading (contact / utility) */
-  --fs-body:     clamp(1rem, 0.95rem + 0.15vw, 1.0625rem);   /* 16 → 17  non-prose body */
-  --fs-body-sm:  0.875rem;                                    /* 14 */
-  --fs-caption:  0.8125rem;                                   /* 13 */
-  --fs-eyebrow:  clamp(0.8125rem, 0.78rem + 0.08vw, 0.875rem); /* 13 → 14  eyebrow chip */
+  --fs-lead: clamp(1.125rem, 0.96rem + 0.83vw, 1.5rem);
+  /* 18 → 24  section description / hero sub-heading */
+  --fs-lead-sm: clamp(1.125rem, 1.07rem + 0.27vw, 1.25rem);
+  /* 18 → 20  compact hero sub-heading (contact / utility) */
+  --fs-body: clamp(1rem, 0.95rem + 0.15vw, 1.0625rem);
+  /* 16 → 17  non-prose body */
+  --fs-body-sm: 0.875rem;
+  /* 14 */
+  --fs-caption: 0.8125rem;
+  /* 13 */
+  --fs-eyebrow: clamp(0.8125rem, 0.78rem + 0.08vw, 0.875rem);
+  /* 13 → 14  eyebrow chip */
 
   /* Controls */
-  --fs-button:     1rem;                                                /* 16  default CTA */
-  --fs-button-lg:  clamp(1rem, 0.96rem + 0.12vw, 1.125rem);             /* 16 → 18  hero CTA */
-  --fs-button-sm:  0.875rem;                                            /* 14 */
-  --fs-input:        1rem;                                              /* 16  iOS zoom floor */
-  --fs-input-label:  0.875rem;                                          /* 14 */
-  --fs-input-help:   0.8125rem;                                         /* 13 */
+  --fs-button: 1rem;
+  /* 16  default CTA */
+  --fs-button-lg: clamp(1rem, 0.96rem + 0.12vw, 1.125rem);
+  /* 16 → 18  hero CTA */
+  --fs-button-sm: 0.875rem;
+  /* 14 */
+  --fs-input: 1rem;
+  /* 16  iOS zoom floor */
+  --fs-input-label: 0.875rem;
+  /* 14 */
+  --fs-input-help: 0.8125rem;
+  /* 13 */
 
   /* Chrome */
-  --fs-nav:     0.9375rem;   /* 15  top-nav link */
-  --fs-footer:  0.875rem;    /* 14  footer link */
-  --fs-badge:   0.75rem;     /* 12  status pill (uppercase) */
+  --fs-nav: 0.9375rem;
+  /* 15  top-nav link */
+  --fs-footer: 0.875rem;
+  /* 14  footer link */
+  --fs-badge: 0.75rem;
+  /* 12  status pill (uppercase) */
 
   /* Code & tabular */
-  --fs-code:       0.875rem;                                              /* 14 */
-  --fs-code-block: clamp(0.8125rem, 0.79rem + 0.08vw, 0.875rem);          /* 13 → 14 */
-  --fs-table-th:   0.8125rem;                                             /* 13 (0.875rem ≥ md via override) */
-  --fs-table-td:   0.875rem;                                              /* 14 (0.9375rem ≥ md via override) */
+  --fs-code: 0.875rem;
+  /* 14 */
+  --fs-code-block: clamp(0.8125rem, 0.79rem + 0.08vw, 0.875rem);
+  /* 13 → 14 */
+  --fs-table-th: 0.8125rem;
+  /* 13 (0.875rem ≥ md via override) */
+  --fs-table-td: 0.875rem;
+  /* 14 (0.9375rem ≥ md via override) */
 
   /* Companion line-heights */
   --fs-display-lh: 1.05;
-  --fs-h1-lh:      1.1;
-  --fs-h2-lh:      1.15;
-  --fs-h3-lh:      1.2;
-  --fs-h4-lh:      1.25;
-  --fs-h5-lh:      1.3;
-  --fs-h6-lh:      1.3;
-  --fs-lead-lh:    1.5;
-  --fs-body-lh:    1.6;
+  --fs-h1-lh: 1.1;
+  --fs-h2-lh: 1.15;
+  --fs-h3-lh: 1.2;
+  --fs-h4-lh: 1.25;
+  --fs-h5-lh: 1.3;
+  --fs-h6-lh: 1.3;
+  --fs-lead-lh: 1.5;
+  --fs-body-lh: 1.6;
   --fs-body-sm-lh: 1.5;
   --fs-caption-lh: 1.4;
   --fs-eyebrow-lh: 1.2;
-  --fs-button-lh:  1.2;
-  --fs-input-lh:   1.5;
+  --fs-button-lh: 1.2;
+  --fs-input-lh: 1.5;
 
   /* Companion letter-spacing */
   --fs-display-ls: -0.04em;
-  --fs-h1-ls:      -0.03em;
-  --fs-h2-ls:      -0.03em;
-  --fs-h3-ls:      -0.02em;
-  --fs-h4-ls:      -0.02em;
-  --fs-h5-ls:      -0.01em;
-  --fs-h6-ls:      0;
-  --fs-lead-ls:    -0.01em;
-  --fs-body-ls:    0;
+  --fs-h1-ls: -0.03em;
+  --fs-h2-ls: -0.03em;
+  --fs-h3-ls: -0.02em;
+  --fs-h4-ls: -0.02em;
+  --fs-h5-ls: -0.01em;
+  --fs-h6-ls: 0;
+  --fs-lead-ls: -0.01em;
+  --fs-body-ls: 0;
   --fs-eyebrow-ls: 0.08em;
-  --fs-badge-ls:   0.04em;
-  --fs-button-ls:  -0.01em;
+  --fs-badge-ls: 0.04em;
+  --fs-button-ls: -0.01em;
 
   /* Companion weights (3-weight rule: 400 / 500 / 600 / 700 only) */
   --fs-display-weight: 600;
-  --fs-h1-weight:      600;
-  --fs-h2-weight:      600;
-  --fs-h3-weight:      600;
-  --fs-h4-weight:      600;
-  --fs-h5-weight:      600;
-  --fs-h6-weight:      700;
-  --fs-lead-weight:    400;
-  --fs-body-weight:    400;
+  --fs-h1-weight: 600;
+  --fs-h2-weight: 600;
+  --fs-h3-weight: 600;
+  --fs-h4-weight: 600;
+  --fs-h5-weight: 600;
+  --fs-h6-weight: 700;
+  --fs-lead-weight: 400;
+  --fs-body-weight: 400;
   --fs-eyebrow-weight: 600;
-  --fs-badge-weight:   600;
-  --fs-button-weight:  500;
-  --fs-nav-weight:     500;
+  --fs-badge-weight: 600;
+  --fs-button-weight: 500;
+  --fs-nav-weight: 500;
 
   /* ─── --prose-* extensions (additive — existing tokens above stay) ────── */
-  --prose-pull-quote:              clamp(1.375rem, 1rem + 1vw, 1.75rem);  /* 22 → 28 */
-  --prose-pull-quote-attribution:  0.9375rem;                              /* 15 */
-  --prose-image-caption:           0.875rem;                               /* 14 */
-  --prose-callout-title:           1.0625rem;                              /* 17 */
-  --prose-callout-body:            1rem;                                   /* 16 */
-  --prose-author-bio:              1rem;                                   /* 16 */
-  --prose-byline:                  0.875rem;                               /* 14 */
-  --prose-byline-meta:             0.8125rem;                              /* 13 */
-  --prose-related-title:           1.125rem;                               /* 18 */
-  --prose-related-meta:            0.8125rem;                              /* 13 */
+  --prose-pull-quote: clamp(1.375rem, 1rem + 1vw, 1.75rem);
+  /* 22 → 28 */
+  --prose-pull-quote-attribution: 0.9375rem;
+  /* 15 */
+  --prose-image-caption: 0.875rem;
+  /* 14 */
+  --prose-callout-title: 1.0625rem;
+  /* 17 */
+  --prose-callout-body: 1rem;
+  /* 16 */
+  --prose-author-bio: 1rem;
+  /* 16 */
+  --prose-byline: 0.875rem;
+  /* 14 */
+  --prose-byline-meta: 0.8125rem;
+  /* 13 */
+  --prose-related-title: 1.125rem;
+  /* 18 */
+  --prose-related-meta: 0.8125rem;
+  /* 13 */
 
   /* ═══════════════════════════════════════════════════════════════════════
      LEGACY ALIAS SHIM — preserved until Phase 4 migrates all call-sites.
@@ -341,34 +422,34 @@
      Do NOT add NEW call-sites using these tokens. Consume --fs-* directly.
      ═══════════════════════════════════════════════════════════════════════ */
   --text-hero-marketing: var(--fs-display);
-  --text-hero-product:   var(--fs-display);
-  --text-hero-utility:   var(--fs-h1);
-  --text-display-lg:     var(--fs-h1);
-  --text-display-md:     var(--fs-h2);
-  --text-display-sm:     var(--fs-h3);
-  --text-card-title-xl:  var(--fs-h3);
-  --text-card-title-lg:  var(--fs-h3);
-  --text-card-title-md:  var(--fs-h4);
-  --text-card-title-sm:  var(--fs-h5);
-  --text-body-xl:        var(--fs-lead);
-  --text-body-lg:        var(--fs-body);
-  --text-body-md:        var(--fs-body);
-  --text-body-sm:        var(--fs-body-sm);
-  --text-body-xs:        var(--fs-caption);
-  --text-t-display-1:    var(--fs-display);
-  --text-t-display-2:    var(--fs-h1);
-  --text-t-heading-lg:   var(--fs-h2);
-  --text-t-heading-md:   var(--fs-h3);
-  --text-t-heading-sm:   var(--fs-h4);
-  --text-t-subhead:      var(--fs-lead);
-  --text-t-body-lg:      var(--fs-body);
-  --text-t-body-md:      var(--fs-body);
-  --text-t-body-sm:      var(--fs-body-sm);
-  --btn-fs-xl:           var(--fs-button-lg);
-  --btn-fs-lg:           var(--fs-button-lg);
-  --btn-fs-md:           var(--fs-button);
-  --btn-fs-sm:           var(--fs-button-sm);
-  --btn-fs-xs:           var(--fs-button-sm);
+  --text-hero-product: var(--fs-display);
+  --text-hero-utility: var(--fs-h1);
+  --text-display-lg: var(--fs-h1);
+  --text-display-md: var(--fs-h2);
+  --text-display-sm: var(--fs-h3);
+  --text-card-title-xl: var(--fs-h3);
+  --text-card-title-lg: var(--fs-h3);
+  --text-card-title-md: var(--fs-h4);
+  --text-card-title-sm: var(--fs-h5);
+  --text-body-xl: var(--fs-lead);
+  --text-body-lg: var(--fs-body);
+  --text-body-md: var(--fs-body);
+  --text-body-sm: var(--fs-body-sm);
+  --text-body-xs: var(--fs-caption);
+  --text-t-display-1: var(--fs-display);
+  --text-t-display-2: var(--fs-h1);
+  --text-t-heading-lg: var(--fs-h2);
+  --text-t-heading-md: var(--fs-h3);
+  --text-t-heading-sm: var(--fs-h4);
+  --text-t-subhead: var(--fs-lead);
+  --text-t-body-lg: var(--fs-body);
+  --text-t-body-md: var(--fs-body);
+  --text-t-body-sm: var(--fs-body-sm);
+  --btn-fs-xl: var(--fs-button-lg);
+  --btn-fs-lg: var(--fs-button-lg);
+  --btn-fs-md: var(--fs-button);
+  --btn-fs-sm: var(--fs-button-sm);
+  --btn-fs-xs: var(--fs-button-sm);
 }
 
 :root {
@@ -377,17 +458,15 @@
      then an alpha-fade tail at the bottom so the seam into #F6F6F6 is soft.
      The .bg-cs-hero rule applies a #151021 fallback bg-color for the
      transparent-tail safety. */
-  --bg-hero-mesh: linear-gradient(
-    180deg,
-    rgba(21, 16, 33, 1) 0%,
-    rgba(16, 18, 62, 1) 31%,
-    rgba(19, 30, 143, 1) 51%,
-    rgba(71, 30, 192, 1) 69%,
-    rgba(71, 31, 195, 1) 80%,
-    rgba(70, 30, 191, 0.85) 85%,
-    rgba(66, 30, 188, 0.4) 94%,
-    rgba(66, 30, 188, 0) 99%
-  );
+  --bg-hero-mesh: linear-gradient(180deg,
+      rgba(21, 16, 33, 1) 0%,
+      rgba(16, 18, 62, 1) 31%,
+      rgba(19, 30, 143, 1) 51%,
+      rgba(71, 30, 192, 1) 69%,
+      rgba(71, 31, 195, 1) 80%,
+      rgba(70, 30, 191, 0.85) 85%,
+      rgba(66, 30, 188, 0.4) 94%,
+      rgba(66, 30, 188, 0) 99%);
 
   /* Decorative purple radial blobs (#640DFB) used as overlays for the
      mesh-blob effect. Two opacity tiers: 0.30 inside hero, 0.10 elsewhere. */
@@ -431,8 +510,10 @@
    breathing (sm card 288/2 = 144 + 60 = 204; lg card 240/2 = 120 + 60 = 180). */
 @media (min-width: 40rem) {
   :root {
-    --spacing-section-cta: 13.125rem;  /* 210px (sm) — overlap mode (card 300/2 + 60) */
-    --footer-cta-pt: 13.125rem;        /* 210px (sm) — overlap mode */
+    --spacing-section-cta: 13.125rem;
+    /* 210px (sm) — overlap mode (card 300/2 + 60) */
+    --footer-cta-pt: 13.125rem;
+    /* 210px (sm) — overlap mode */
   }
 }
 
@@ -447,19 +528,26 @@
        Legacy --text-hero-*, --text-t-* tokens are now aliased to --fs-*
        in the @theme block; their previous fixed-px locks at lg+ have been
        removed here so the aliases pass through cleanly. */
-    --fs-h4:       1.375rem;   /* 22  card sub-title at lg+ */
-    --fs-table-th: 0.875rem;   /* 14  comparison-table header at lg+ */
-    --fs-table-td: 0.9375rem;  /* 15  comparison-table cell at lg+ */
+    --fs-h4: 1.375rem;
+    /* 22  card sub-title at lg+ */
+    --fs-table-th: 0.875rem;
+    /* 14  comparison-table header at lg+ */
+    --fs-table-td: 0.9375rem;
+    /* 15  comparison-table cell at lg+ */
 
-    --spacing-section-cta: 11.875rem;  /* 190px (lg) — overlap mode (card 260/2 + 60) */
-    --footer-cta-pt: 11.875rem;        /* 190px (lg) — overlap mode */
+    --spacing-section-cta: 11.875rem;
+    /* 190px (lg) — overlap mode (card 260/2 + 60) */
+    --footer-cta-pt: 11.875rem;
+    /* 190px (lg) — overlap mode */
 
-    --cta-card-btn-h:  44px;  /* desktop CTA button + input target height */
+    --cta-card-btn-h: 44px;
+    /* desktop CTA button + input target height */
     --cta-card-btn-fs: 16px;
   }
 }
 
-html, body {
+html,
+body {
   background: #ffffff;
   color: #111111;
   font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
@@ -518,12 +606,11 @@ body {
 
 /* Diagonal stripe pattern for engine panel inner */
 .bg-cs-diagonal {
-  background-image: repeating-linear-gradient(
-    -45deg,
-    rgba(255, 255, 255, 0.045) 0,
-    rgba(255, 255, 255, 0.045) 1px,
-    transparent 1px,
-    transparent 6px);
+  background-image: repeating-linear-gradient(-45deg,
+      rgba(255, 255, 255, 0.045) 0,
+      rgba(255, 255, 255, 0.045) 1px,
+      transparent 1px,
+      transparent 6px);
 }
 
 /* Engine panel inner cards (AI Logic Engine / CleanCompile Factory) */
@@ -537,7 +624,7 @@ body {
    CTA SYSTEM
    --------------------------------------------------------------------------
    Two distinct CTA types:
-     1. "Glass Button" — Book a Demo, Browse Images, Get a Demo. All share the
+     1. "Glass Button" — Book a Demo, Browse Images, Book a Demo. All share the
         same multi-layer fill + stroke:
           • base: rgba(255,255,255,0.65)
           • LINEAR_DODGE radial #FFFFFF→#3D00FF @50% (blue tint top-left)
@@ -558,9 +645,17 @@ body {
    =========================================================================== */
 
 @keyframes cs-cta-shine {
-  0%   { transform: translateX(-110%) skewX(-12deg); }
-  60%  { transform: translateX(120%)  skewX(-12deg); }
-  100% { transform: translateX(120%)  skewX(-12deg); }
+  0% {
+    transform: translateX(-110%) skewX(-12deg);
+  }
+
+  60% {
+    transform: translateX(120%) skewX(-12deg);
+  }
+
+  100% {
+    transform: translateX(120%) skewX(-12deg);
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -592,10 +687,12 @@ body {
   transition: transform 200ms ease, filter 200ms ease;
   -webkit-tap-highlight-color: transparent;
 }
+
 .cs-btn-blue:hover {
   transform: translateY(-1px);
   filter: brightness(1.10);
 }
+
 .cs-btn-blue:active {
   /* No geometry change — see .cs-btn-glass:active comment. Filter-only press
      feedback so button width/height stay locked next to attached pills. */
@@ -603,11 +700,16 @@ body {
   filter: brightness(0.92);
   transition-duration: 80ms;
 }
-.cs-btn-blue:focus { outline: none; }
+
+.cs-btn-blue:focus {
+  outline: none;
+}
+
 .cs-btn-blue:focus-visible {
   outline: 2px solid #33BAEC;
   outline-offset: 3px;
 }
+
 .cs-btn-blue[aria-disabled="true"],
 .cs-btn-blue:disabled {
   opacity: 0.45;
@@ -617,7 +719,7 @@ body {
 
 /* ---------------------------------------------------------------------------
    GLASS BUTTON
-   Used by: "Book a Demo", "Browse Images", "Get a Demo"
+   Used by: "Book a Demo", "Browse Images", "Book a Demo"
    --------------------------------------------------------------------------- */
 .cs-btn-glass {
   position: relative;
@@ -665,27 +767,34 @@ body {
     background-color 200ms ease-out;
   -webkit-tap-highlight-color: transparent;
 }
+
 /* Shine-sheen overlay that animates across button on hover */
 .cs-btn-glass::after {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(110deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.50) 50%,
-    transparent 70%);
+      transparent 30%,
+      rgba(255, 255, 255, 0.50) 50%,
+      transparent 70%);
   transform: translateX(-110%) skewX(-12deg);
   pointer-events: none;
   opacity: 0;
 }
+
 .cs-btn-glass:hover {
   transform: translateY(-1px);
   background:
     radial-gradient(120% 110% at 100% 0%, rgba(60, 0, 255, 0.36) 0%, rgba(60, 0, 255, 0) 60%),
-    radial-gradient(110% 90% at 0% 100%,  rgba(60, 0, 255, 0.24) 0%, rgba(60, 0, 255, 0) 60%),
+    radial-gradient(110% 90% at 0% 100%, rgba(60, 0, 255, 0.24) 0%, rgba(60, 0, 255, 0) 60%),
     rgba(255, 255, 255, 0.92);
 }
-.cs-btn-glass:hover::after { opacity: 1; animation: cs-cta-shine 900ms ease-out 1; }
+
+.cs-btn-glass:hover::after {
+  opacity: 1;
+  animation: cs-cta-shine 900ms ease-out 1;
+}
+
 /* Press feedback — no geometry change. A previous `scale(0.97)` shrank the
    button ~1px in both axes, which broke alignment with attached input pills
    (BlogsCTA, etc.) and caused subtle layout judder elsewhere. Filter-only
@@ -695,8 +804,12 @@ body {
   filter: brightness(0.92);
   transition-duration: 80ms;
 }
+
 /* Modifier for buttons joined to an input — also suppresses the hover lift. */
-.cs-btn-glass--no-lift:hover { transform: none; }
+.cs-btn-glass--no-lift:hover {
+  transform: none;
+}
+
 .cs-btn-glass--no-lift:active {
   transform: none;
   filter: brightness(0.92);
@@ -709,6 +822,7 @@ body {
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
 }
+
 .cs-category-pill::after {
   content: '';
   position: absolute;
@@ -719,21 +833,30 @@ body {
   pointer-events: none;
   border-radius: inherit;
 }
-.cs-btn-glass:focus { outline: none; }
+
+.cs-btn-glass:focus {
+  outline: none;
+}
+
 .cs-btn-glass:focus-visible {
   outline: 2px solid #33BAEC;
   outline-offset: 3px;
 }
+
 .cs-btn-glass[aria-disabled="true"],
 .cs-btn-glass:disabled {
   opacity: 0.45;
   cursor: not-allowed;
   pointer-events: none;
 }
+
 .cs-btn-glass .cs-cta-arrow {
   transition: transform 220ms cubic-bezier(.2, .9, .3, 1);
 }
-.cs-btn-glass:hover .cs-cta-arrow { transform: translateX(4px); }
+
+.cs-btn-glass:hover .cs-cta-arrow {
+  transform: translateX(4px);
+}
 
 /* ---------------------------------------------------------------------------
    GHOST BUTTON (secondary, on dark)
@@ -770,31 +893,42 @@ body {
     border-color 200ms ease-out;
   -webkit-tap-highlight-color: transparent;
 }
+
 .cs-btn-ghost:hover {
   transform: translateY(-1px);
   background: rgba(255, 255, 255, 0.10);
   border-color: rgba(255, 255, 255, 0.45);
 }
+
 .cs-btn-ghost:active {
   transform: translateY(0);
   filter: brightness(0.92);
   transition-duration: 80ms;
 }
-.cs-btn-ghost:focus { outline: none; }
+
+.cs-btn-ghost:focus {
+  outline: none;
+}
+
 .cs-btn-ghost:focus-visible {
   outline: 2px solid #33BAEC;
   outline-offset: 3px;
 }
+
 .cs-btn-ghost[aria-disabled="true"],
 .cs-btn-ghost:disabled {
   opacity: 0.45;
   cursor: not-allowed;
   pointer-events: none;
 }
+
 .cs-btn-ghost .cs-cta-arrow {
   transition: transform 220ms cubic-bezier(.2, .9, .3, 1);
 }
-.cs-btn-ghost:hover .cs-cta-arrow { transform: translateX(4px); }
+
+.cs-btn-ghost:hover .cs-cta-arrow {
+  transform: translateX(4px);
+}
 
 /* Footer social icon — glyph shifts to its platform brand color on hover.
    Per-link color is supplied inline via the --social-hover custom property
@@ -818,6 +952,7 @@ body {
    without it. Horizontal padding is NOT overridden so each card tunes
    label-to-edge spacing independently. */
 @media (min-width: 64rem) {
+
   footer .pointer-events-auto .cs-btn-glass,
   footer .pointer-events-auto .cs-btn-blue {
     --cs-btn-h: 44px !important;
@@ -826,7 +961,9 @@ body {
     font-size: 16px !important;
   }
 }
+
 @media (max-width: 63.99rem) {
+
   .cs-btn-glass,
   .cs-btn-blue {
     --cs-btn-h: 36px !important;
@@ -834,6 +971,7 @@ body {
     height: 36px !important;
     font-size: 13px !important;
   }
+
   /* Compact inline CTA (mobile-nav submenu cards). Higher specificity than the
      global mobile rule above so the 28px chip survives — without it the global
      36px/13px clobber the inline size and the label overflows its card. */
@@ -854,6 +992,7 @@ body {
    16 triggers an iOS Safari zoom-in-on-focus (see CLAUDE.md). Only the height
    changes per breakpoint. */
 @media (max-width: 63.99rem) {
+
   /* Each selector in its own rule so :has() parsing on one can't drop the
      others (older browsers / Tailwind preprocessor edge cases). min-height +
      height belt-and-suspenders so UA input intrinsic sizing can't squish. */
@@ -861,32 +1000,39 @@ body {
     height: 36px !important;
     min-height: 36px !important;
   }
+
   /* Only target the pill-wrapper pattern (input-only direct child, e.g.
      BlogsCTA / EventsCTA). Resource detail wraps input+button siblings in the
      same div — forcing height: 36 on THAT div clips the button to overlap. */
   footer .pointer-events-auto form div:has(> input[type="email"]):not(:has(> button)) {
     height: 36px !important;
   }
+
   footer .pointer-events-auto form button[type="submit"] {
     height: 36px !important;
     min-height: 36px !important;
     font-size: 13px !important;
     padding: 0 16px !important;
   }
+
   /* Input keeps 16px to avoid iOS Safari zoom-on-focus (CLAUDE.md). */
   footer .pointer-events-auto form input[type="email"] {
     font-size: 16px !important;
   }
 }
+
 @media (min-width: 64rem) {
+
   footer .pointer-events-auto form input[type="email"],
   footer .pointer-events-auto form div:has(> input[type="email"]):not(:has(> button)),
   footer .pointer-events-auto form button[type="submit"] {
     height: 44px !important;
   }
+
   footer .pointer-events-auto form button[type="submit"] {
     font-size: 16px !important;
   }
+
   footer .pointer-events-auto form input[type="email"] {
     font-size: 16px !important;
   }
@@ -910,8 +1056,15 @@ body {
   transition: color 200ms ease;
   -webkit-tap-highlight-color: transparent;
 }
-.cs-link-cta--light { color: #3960F9; }
-.cs-link-cta--lightDark { color: #1B1F4F; }
+
+.cs-link-cta--light {
+  color: #3960F9;
+}
+
+.cs-link-cta--lightDark {
+  color: #1B1F4F;
+}
+
 .cs-link-cta::after {
   content: "";
   position: absolute;
@@ -925,18 +1078,40 @@ body {
   opacity: 0.55;
   transition: transform 240ms cubic-bezier(.2, .9, .3, 1);
 }
-.cs-link-cta:hover::after { transform: scaleX(1); }
-.cs-link-cta:hover { color: #33BAEC; }
-.cs-link-cta--light:hover  { color: #1B1F4F; }
-.cs-link-cta--lightDark:hover { color: #3960F9; }
-.cs-link-cta:hover .cs-cta-arrow { transform: translateX(4px); }
-.cs-link-cta:focus { outline: none; }
+
+.cs-link-cta:hover::after {
+  transform: scaleX(1);
+}
+
+.cs-link-cta:hover {
+  color: #33BAEC;
+}
+
+.cs-link-cta--light:hover {
+  color: #1B1F4F;
+}
+
+.cs-link-cta--lightDark:hover {
+  color: #3960F9;
+}
+
+.cs-link-cta:hover .cs-cta-arrow {
+  transform: translateX(4px);
+}
+
+.cs-link-cta:focus {
+  outline: none;
+}
+
 .cs-link-cta:focus-visible {
   outline: 2px solid #33BAEC;
   outline-offset: 4px;
   border-radius: 4px;
 }
-.cs-link-cta .cs-cta-arrow { transition: transform 220ms cubic-bezier(.2, .9, .3, 1); }
+
+.cs-link-cta .cs-cta-arrow {
+  transition: transform 220ms cubic-bezier(.2, .9, .3, 1);
+}
 
 /* ---- KEEP existing pill (Plan/Analyze/etc.) but add proper interactive states */
 .cs-pill-cta {
@@ -957,17 +1132,27 @@ body {
   background:
     radial-gradient(ellipse 70% 110% at 43% 31%, #000000 0%, #000000 19%, #1E5AFF 100%);
   cursor: pointer;
-  transition: filter 180ms ease, transform 180ms cubic-bezier(.2,.9,.3,1);
+  transition: filter 180ms ease, transform 180ms cubic-bezier(.2, .9, .3, 1);
 }
+
 .cs-pill-cta:hover {
   filter: brightness(1.15);
   transform: translateY(-1px);
 }
-.cs-pill-cta:active { transform: translateY(0) scale(0.97); transition-duration: 80ms; }
-.cs-pill-cta:focus-visible { outline: 2px solid #CDE4FF; outline-offset: 2px; }
+
+.cs-pill-cta:active {
+  transform: translateY(0) scale(0.97);
+  transition-duration: 80ms;
+}
+
+.cs-pill-cta:focus-visible {
+  outline: 2px solid #CDE4FF;
+  outline-offset: 2px;
+}
 
 /* ---- Legacy classes kept as aliases for any spots that still reference them */
-.cs-pill-glass { /* kept for backward compatibility — prefer cs-btn-secondary */
+.cs-pill-glass {
+  /* kept for backward compatibility — prefer cs-btn-secondary */
   background:
     radial-gradient(120% 90% at 50% -10%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 60%),
     radial-gradient(80% 60% at 50% 110%, rgba(218, 182, 243, 0.35), rgba(255, 255, 255, 0) 60%),
@@ -978,17 +1163,20 @@ body {
     0 4px 18px rgba(0, 0, 0, 0.18);
   backdrop-filter: blur(6px);
 }
-.cs-pill-demo { /* kept — header demo button */
+
+.cs-pill-demo {
+  /* kept — header demo button */
   background: linear-gradient(135deg,
-    rgba(112, 112, 112, 0.28) 0%,
-    rgba(214, 214, 214, 0.28) 23%,
-    rgba(214, 214, 214, 0.28) 68%,
-    rgba(155, 155, 155, 0.28) 84%);
+      rgba(112, 112, 112, 0.28) 0%,
+      rgba(214, 214, 214, 0.28) 23%,
+      rgba(214, 214, 214, 0.28) 68%,
+      rgba(155, 155, 155, 0.28) 84%);
   border: 1.5px solid rgba(174, 174, 174, 0.7);
   backdrop-filter: blur(4px);
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .cs-cta-base,
   .cs-btn-primary,
   .cs-btn-secondary,
@@ -997,11 +1185,18 @@ body {
   .cs-pill-cta {
     transition: none !important;
   }
-  .cs-btn-primary::after { animation: none !important; opacity: 0 !important; }
+
+  .cs-btn-primary::after {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+
   .cs-btn-primary:hover,
   .cs-btn-secondary:hover,
   .cs-btn-ghost-dark:hover,
-  .cs-pill-cta:hover { transform: none !important; }
+  .cs-pill-cta:hover {
+    transform: none !important;
+  }
 }
 
 /* Header glass nav */
@@ -1062,6 +1257,7 @@ body {
 .cs-nav-surface.cs-nav-shadow::before {
   background-color: rgba(21, 16, 33, 0.78);
 }
+
 .cs-nav-shadow {
   border-bottom-color: rgba(255, 255, 255, 0.04);
 }
@@ -1097,6 +1293,7 @@ body {
 .cs-mega-item {
   position: relative;
 }
+
 .cs-mega-item::before {
   content: "";
   position: absolute;
@@ -1109,9 +1306,11 @@ body {
   opacity: 0;
   transition: opacity 180ms ease-out;
 }
+
 .cs-mega-item:hover {
   background-color: rgba(255, 255, 255, 0.04);
 }
+
 .cs-mega-item:hover::before {
   opacity: 1;
 }
@@ -1120,6 +1319,7 @@ body {
 .cs-nav-link {
   padding-bottom: 6px;
 }
+
 .cs-nav-link-active::after {
   content: "";
   position: absolute;
@@ -1132,6 +1332,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .cs-nav-surface,
   .cs-nav-surface::before,
   .cs-mega-item,
@@ -1146,6 +1347,7 @@ body {
   [data-slot="navigation-menu-content"] {
     transition-property: opacity !important;
   }
+
   [data-slot="navigation-menu-content"][data-starting-style],
   [data-slot="navigation-menu-content"][data-ending-style] {
     translate: none !important;
@@ -1206,6 +1408,7 @@ body {
     opacity: 0;
     transform: translateY(8px) scale(0.985);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -1220,6 +1423,7 @@ body {
     opacity: 0;
     transform: translateY(18px) scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -1237,17 +1441,19 @@ body {
     opacity: 0;
     transform: translateY(var(--cs-hr-y, 40px));
   }
+
   to {
     opacity: 1;
     transform: none;
   }
 }
+
 .cs-hero-reveal {
-  animation: cs-hero-reveal var(--cs-hr-duration, 0.9s) cubic-bezier(0.16, 1, 0.3, 1)
-    var(--cs-hr-delay, 0s) both;
+  animation: cs-hero-reveal var(--cs-hr-duration, 0.9s) cubic-bezier(0.16, 1, 0.3, 1) var(--cs-hr-delay, 0s) both;
   /* No persistent will-change: this is a one-shot entrance, so a permanent
      compositor-layer hint would hold GPU memory long after it finishes. */
 }
+
 @media (prefers-reduced-motion: reduce) {
   .cs-hero-reveal {
     animation: none;
@@ -1271,16 +1477,15 @@ body {
   position: relative;
   white-space: nowrap;
 }
+
 .cs-hh-type {
   display: inline-block;
   /* Brand cyan→purple gradient (shared H2 stops, .cs-text-gradient-impact),
      mirrored periodic so the continuous drift loops seamlessly. */
-  background-image: linear-gradient(
-    100deg,
-    #2cc1eb 0%,
-    #9a51ff 50%,
-    #2cc1eb 100%
-  );
+  background-image: linear-gradient(100deg,
+      #2cc1eb 0%,
+      #9a51ff 50%,
+      #2cc1eb 100%);
   background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -1294,18 +1499,22 @@ body {
      background-position shine is a paint (not a compositable) property, so a
      layer hint buys nothing while holding memory on the LCP heading. */
 }
+
 @keyframes cs-hh-reveal {
   from {
     clip-path: inset(0 100% 0 0);
   }
+
   to {
     clip-path: inset(0 0 0 0);
   }
 }
+
 @keyframes cs-hh-snap {
   from {
     filter: blur(5px);
   }
+
   to {
     filter: blur(0);
   }
@@ -1326,23 +1535,29 @@ body {
     cs-hh-blink 0.7s step-end 0.15s infinite,
     cs-hh-caret-hide 0.25s linear 1.05s forwards;
 }
+
 @keyframes cs-hh-caret-move {
   from {
     left: 0;
   }
+
   to {
     left: 100%;
   }
 }
+
 @keyframes cs-hh-blink {
+
   0%,
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0;
   }
 }
+
 @keyframes cs-hh-caret-hide {
   to {
     opacity: 0;
@@ -1355,12 +1570,14 @@ body {
   animation: cs-hh-focus 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.25s both;
   /* One-shot focus-settle — no persistent compositor-layer hint. */
 }
+
 @keyframes cs-hh-focus {
   from {
     opacity: 0;
     filter: blur(12px);
     transform: translateY(0.18em);
   }
+
   to {
     opacity: 1;
     filter: blur(0);
@@ -1374,38 +1591,56 @@ body {
   from {
     background-position: 0 0;
   }
+
   to {
     background-position: -200% 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .cs-hh-type,
   .cs-hh-phrase {
     animation: none;
   }
+
   /* Hold a static cyan→purple gradient on line 1 when motion is off. */
   .cs-hh-type {
     background-position: 0 0;
   }
+
   .cs-hh-typewrap::after {
     display: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [style*="cs-fade-slide-in"]   { animation: none !important; }
-  [style*="cs-tab-card-in"]     { animation: none !important; }
-  [style*="cs-pulse-glow"]      { animation: none !important; }
-  [style*="cs-pulse-glow-flare"]{ animation: none !important; }
+  [style*="cs-fade-slide-in"] {
+    animation: none !important;
+  }
+
+  [style*="cs-tab-card-in"] {
+    animation: none !important;
+  }
+
+  [style*="cs-pulse-glow"] {
+    animation: none !important;
+  }
+
+  [style*="cs-pulse-glow-flare"] {
+    animation: none !important;
+  }
 }
 
 /* Vertical-pipeline pulse for the mobile Factory cards' left guide-line dots. */
 @keyframes cs-pulse-glow {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(-50%, -50%) scale(1);
     opacity: 0.7;
   }
+
   50% {
     transform: translate(-50%, -50%) scale(1.55);
     opacity: 1;
@@ -1416,9 +1651,12 @@ body {
    Preserves the translateY(-50%) the flare uses for vertical centering;
    only opacity changes so the cyan glow gently pulses behind each card. */
 @keyframes cs-pulse-glow-flare {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.75;
   }
+
   50% {
     opacity: 1;
   }
@@ -1427,29 +1665,103 @@ body {
 /* Remediation-flow diagram (CleanSight). Dashed connectors flow toward the
    card; node halos breathe. Both disabled under reduced-motion. */
 @keyframes cs-flow-dash {
-  from { stroke-dashoffset: 0; }
-  to { stroke-dashoffset: -32; }
+  from {
+    stroke-dashoffset: 0;
+  }
+
+  to {
+    stroke-dashoffset: -32;
+  }
 }
+
 @keyframes cs-flow-pulse {
-  0%, 100% { opacity: 0.5; transform: scale(0.96); }
-  50% { opacity: 0.9; transform: scale(1.04); }
+
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(0.96);
+  }
+
+  50% {
+    opacity: 0.9;
+    transform: scale(1.04);
+  }
 }
+
 .cs-flow-dash {
   animation: cs-flow-dash 0.9s linear infinite;
 }
+
 /* Slow, calm dotted drift for the CleanSight posture-loop arrows. Reuses the
    cs-flow-dash keyframe (offset -32, a multiple of the 8px dot period, so the
    loop is seamless). Paint-only stroke-dashoffset — no layout / CLS. */
 .cs-posture-flow {
   animation: cs-flow-dash 2.6s linear infinite;
 }
+
 .cs-flow-pulse {
   animation: cs-flow-pulse 3.6s ease-in-out infinite;
 }
+
 @media (prefers-reduced-motion: reduce) {
+
   .cs-flow-dash,
   .cs-posture-flow,
   .cs-flow-pulse {
+    animation: none !important;
+  }
+}
+
+/* Clean Libraries hero — ambient motion over the baked "dependencies flowing
+   into the clean container" illustration. Paint/transform-only (GPU-composited,
+   no layout), all disabled under reduced-motion so the static raster stands on
+   its own. `cs-libhero-float` gives the whole illustration a slow vertical
+   drift; `cs-libhero-breathe` is the blob rim / package-field glow pulse. */
+@keyframes cs-libhero-float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes cs-libhero-breathe {
+
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.97);
+  }
+
+  50% {
+    opacity: 0.95;
+    transform: scale(1.04);
+  }
+}
+
+.cs-libhero-float {
+  will-change: transform;
+  animation: cs-libhero-float 7s ease-in-out infinite;
+}
+
+.cs-libhero-breathe {
+  will-change: opacity, transform;
+  animation: cs-libhero-breathe 5.5s ease-in-out infinite;
+}
+
+/* Offset the left package-field glow so the two glows breathe out of phase. */
+.cs-libhero-breathe-delay {
+  animation-delay: -2.75s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .cs-libhero-float,
+  .cs-libhero-breathe {
     animation: none !important;
   }
 }
@@ -1462,15 +1774,26 @@ body {
    `.cs-flow-beam`/`.cs-flow-arrow` tracks belong to the Platform pipeline and
    are left untouched. All motion is disabled under reduced-motion. */
 @keyframes cs-sec-rise {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
+
 /* Flowing "current" beam (Platform pipeline). The dashed track is translated
    by exactly one dash period (18px), so the loop is seamless; using transform
    keeps it GPU-composited and free of stutter/jerk. */
 @keyframes cs-flow-beam {
-  to { transform: translateY(18px); }
+  to {
+    transform: translateY(18px);
+  }
 }
+
 /* Home Platform-pipeline mobile spine: a single comet (head + tail) falling
    down the off-white rail on an infinite, seamless loop. `top` is animated as a
    percentage so the comet spans the full rail height whatever it resolves to;
@@ -1478,11 +1801,25 @@ body {
    loop has no hard cut. Decorative — hidden under reduced-motion (the static
    off-white rail stays). */
 @keyframes cs-home-comet {
-  0% { transform: translateX(-50%) translateY(106%); opacity: 0; }
-  12% { opacity: 1; }
-  80% { opacity: 1; }
-  100% { transform: translateX(-50%) translateY(8%); opacity: 0; }
+  0% {
+    transform: translateX(-50%) translateY(106%);
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  80% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(-50%) translateY(8%);
+    opacity: 0;
+  }
 }
+
 .cs-home-comet {
   /* Full-height track so translateY(%) maps 1:1 to the old top(%) — same motion,
      now GPU-composited (was animating `top`, forcing layout every frame). */
@@ -1491,52 +1828,116 @@ body {
   will-change: transform;
   animation: cs-home-comet 3.4s linear infinite;
 }
+
 @media (prefers-reduced-motion: reduce) {
   .cs-home-comet {
     animation: none;
     opacity: 0;
   }
 }
+
 @keyframes cs-sec-sheen {
-  0% { transform: translateX(0) rotate(9deg); opacity: 0; }
-  9% { opacity: 1; }
-  40% { opacity: 1; }
-  48% { transform: translateX(320%) rotate(9deg); opacity: 0; }
-  100% { transform: translateX(320%) rotate(9deg); opacity: 0; }
+  0% {
+    transform: translateX(0) rotate(9deg);
+    opacity: 0;
+  }
+
+  9% {
+    opacity: 1;
+  }
+
+  40% {
+    opacity: 1;
+  }
+
+  48% {
+    transform: translateX(320%) rotate(9deg);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateX(320%) rotate(9deg);
+    opacity: 0;
+  }
 }
+
 /* Single trust packet (comet head + tail) gliding down a verification lane.
    Mounts on cue, plays once, unmounts on landing — see VerifyBeams.tsx. The
    travel distance is passed per-lane via --travel so the strip height can vary
    without touching the keyframe. */
 @keyframes cs-sec-packet {
-  0% { transform: translateY(-18px); opacity: 0; }
-  16% { opacity: 1; }
-  86% { opacity: 1; }
-  100% { transform: translateY(var(--travel, 60px)); opacity: 0; }
+  0% {
+    transform: translateY(-18px);
+    opacity: 0;
+  }
+
+  16% {
+    opacity: 1;
+  }
+
+  86% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(var(--travel, 60px));
+    opacity: 0;
+  }
 }
+
 /* Fixed-position glow that blooms exactly where the comet lands — centred on
    the landing point via margins, so it only scales (from its own centre) and
    never drifts off the comet's stop position. */
 @keyframes cs-sec-land {
-  0% { opacity: 0; transform: scale(0.6); }
-  22% { opacity: 1; transform: scale(1.08); }
-  60% { opacity: 0.95; transform: scale(0.96); }
-  100% { opacity: 0; transform: scale(1.05); }
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+
+  22% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+
+  60% {
+    opacity: 0.95;
+    transform: scale(0.96);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.05);
+  }
 }
+
 /* Wordmark ignition at the cascade climax. */
 @keyframes cs-sec-ignite {
-  0% { transform: scale(0.992); }
-  45% { transform: scale(1.035); }
-  100% { transform: scale(1.018); }
+  0% {
+    transform: scale(0.992);
+  }
+
+  45% {
+    transform: scale(1.035);
+  }
+
+  100% {
+    transform: scale(1.018);
+  }
 }
+
 /* Lifecycle arrow tail — dots flow rightward by one dot period (seamless,
    GPU-composited) toward a static chevron head. See FlowArrow.tsx. */
 @keyframes cs-flow-arrow {
-  to { transform: translateX(6px); }
+  to {
+    transform: translateX(6px);
+  }
 }
 
 /* Entrance build-in. */
-.cs-sec-rise { opacity: 0; }
+.cs-sec-rise {
+  opacity: 0;
+}
+
 .cs-sec-on .cs-sec-rise {
   animation: cs-sec-rise 0.6s ease-out both;
   animation-delay: var(--d, 0s);
@@ -1544,19 +1945,33 @@ body {
 
 /* Lifecycle stage (A) — flares brightly as its trust packet launches, visibly
    driving the lane below it. A soft halo behind the icon pulses on cue. */
-.cs-sec-stage { transition: transform 0.5s cubic-bezier(0.2,0.7,0.2,1), filter 0.45s ease; }
-.cs-sec-stage img { transition: filter 0.45s ease; }
-.cs-sec-stage[data-lit="true"] { transform: translateY(-3px) scale(1.07); }
+.cs-sec-stage {
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), filter 0.45s ease;
+}
+
+.cs-sec-stage img {
+  transition: filter 0.45s ease;
+}
+
+.cs-sec-stage[data-lit="true"] {
+  transform: translateY(-3px) scale(1.07);
+}
+
 .cs-sec-stage[data-lit="true"] img {
   filter: drop-shadow(0 0 14px rgba(120, 200, 255, 0.85)) brightness(1.28);
 }
+
 .cs-sec-stage-halo {
   opacity: 0;
   background: radial-gradient(circle, rgba(120, 200, 255, 0.55) 0%, rgba(120, 200, 255, 0) 70%);
   transition: opacity 0.5s ease, transform 0.5s ease;
   transform: scale(0.7);
 }
-.cs-sec-stage[data-lit="true"] .cs-sec-stage-halo { opacity: 0.9; transform: scale(1.15); }
+
+.cs-sec-stage[data-lit="true"] .cs-sec-stage-halo {
+  opacity: 0.9;
+  transform: scale(1.15);
+}
 
 /* Guarantee card (B) — a PERMANENT, STABLE box. The frame never moves, lifts or
    recolours: it's a fixed backdrop. Only its interior (cs-sec-card-inner) changes
@@ -1568,31 +1983,47 @@ body {
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.012) 100%);
   box-shadow: inset 0 0 0 1px rgba(150, 210, 255, 0.05);
 }
+
 .cs-sec-card-inner {
   opacity: 0;
   transform: translateY(8px);
-  transition: opacity 0.45s ease, transform 0.5s cubic-bezier(0.2,0.7,0.2,1);
+  transition: opacity 0.45s ease, transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
-.cs-sec-card[data-built="true"] .cs-sec-card-inner { opacity: 1; transform: none; }
+
+.cs-sec-card[data-built="true"] .cs-sec-card-inner {
+  opacity: 1;
+  transform: none;
+}
 
 /* Shield — green bloom + halo + draws its check as the lane is verified. */
-.cs-sec-shield { transition: filter 0.45s ease, transform 0.45s ease; }
+.cs-sec-shield {
+  transition: filter 0.45s ease, transform 0.45s ease;
+}
+
 .cs-sec-card[data-built="true"] .cs-sec-shield {
   filter: drop-shadow(0 0 12px rgba(45, 224, 166, 0.7));
   transform: scale(1.04);
 }
+
 .cs-sec-check {
   stroke-dasharray: 30;
   stroke-dashoffset: 30;
   transition: stroke-dashoffset 0.55s ease 0.18s;
 }
-.cs-sec-card[data-built="true"] .cs-sec-check { stroke-dashoffset: 0; }
+
+.cs-sec-card[data-built="true"] .cs-sec-check {
+  stroke-dashoffset: 0;
+}
+
 .cs-sec-shield-halo {
   opacity: 0;
   background: radial-gradient(circle, rgba(45, 224, 166, 0.6) 0%, rgba(45, 224, 166, 0) 68%);
   transition: opacity 0.5s ease;
 }
-.cs-sec-card[data-built="true"] .cs-sec-shield-halo { opacity: 0.7; }
+
+.cs-sec-card[data-built="true"] .cs-sec-shield-halo {
+  opacity: 0.7;
+}
 
 /* Climax flood — a blue aurora that blooms across the enclosure once all six
    lanes are verified. Driven by data-climax on the diagram root. */
@@ -1603,7 +2034,10 @@ body {
     linear-gradient(180deg, rgba(120, 200, 255, 0) 40%, rgba(96, 156, 255, 0.14) 100%);
   transition: opacity 1s ease;
 }
-[data-climax="true"] .cs-sec-flood { opacity: 1; }
+
+[data-climax="true"] .cs-sec-flood {
+  opacity: 1;
+}
 
 /* Wordmark — ignites once all six lanes are verified (cascade climax). */
 .cs-sec-wordmark {
@@ -1611,10 +2045,11 @@ body {
   transform: scale(0.992);
   transition: opacity 0.9s ease, filter 0.9s ease, transform 0.9s ease;
 }
+
 .cs-sec-wordmark[data-climax="true"] {
   opacity: 1;
   filter: drop-shadow(0 0 22px rgba(120, 200, 255, 0.6));
-  animation: cs-sec-ignite 1.5s cubic-bezier(0.2,0.7,0.2,1) forwards;
+  animation: cs-sec-ignite 1.5s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
 }
 
 /* Beam packet + landing flash (one-shot on mount). Duration is set inline to
@@ -1623,6 +2058,7 @@ body {
   animation: cs-sec-packet var(--dur, 0.9s) cubic-bezier(0.4, 0, 0.2, 1) forwards;
   will-change: transform, opacity;
 }
+
 .cs-sec-land {
   animation: cs-sec-land 0.85s ease-out forwards;
   will-change: transform, opacity;
@@ -1630,23 +2066,41 @@ body {
 
 /* Persistent dashed "current" fades in once its lane is verified, then stays. */
 @keyframes cs-sec-thread-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
-.cs-sec-thread { animation: cs-sec-thread-in 0.5s ease both; }
+
+.cs-sec-thread {
+  animation: cs-sec-thread-in 0.5s ease both;
+}
 
 /* Lifecycle arrows fire sequentially as the verification wave moves forward:
    faint at rest, each brightens with a one-shot surge as its stage is reached,
    then holds lit until the cycle resets. */
 @keyframes cs-sec-arrow-surge {
-  0% { filter: drop-shadow(0 0 0 rgba(160, 210, 255, 0)); }
-  40% { filter: drop-shadow(0 0 12px rgba(190, 228, 255, 0.95)); }
-  100% { filter: drop-shadow(0 0 6px rgba(150, 205, 255, 0.65)); }
+  0% {
+    filter: drop-shadow(0 0 0 rgba(160, 210, 255, 0));
+  }
+
+  40% {
+    filter: drop-shadow(0 0 12px rgba(190, 228, 255, 0.95));
+  }
+
+  100% {
+    filter: drop-shadow(0 0 6px rgba(150, 205, 255, 0.65));
+  }
 }
+
 .cs-sec-arrow {
   opacity: 0.3;
   transition: opacity 0.5s ease, filter 0.5s ease;
 }
+
 .cs-sec-arrow-on {
   opacity: 1;
   filter: drop-shadow(0 0 6px rgba(150, 205, 255, 0.65));
@@ -1673,11 +2127,23 @@ body {
 }
 
 /* Hover lane-linking. */
-.cs-sec-dim { opacity: 0.4; filter: saturate(0.7); transition: opacity 0.25s, filter 0.25s; }
-.cs-sec-lit { transition: opacity 0.25s; }
+.cs-sec-dim {
+  opacity: 0.4;
+  filter: saturate(0.7);
+  transition: opacity 0.25s, filter 0.25s;
+}
+
+.cs-sec-lit {
+  transition: opacity 0.25s;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .cs-sec-rise { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .cs-sec-rise {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
   .cs-sec-stage,
   .cs-sec-stage img,
   .cs-sec-card,
@@ -1686,20 +2152,53 @@ body {
   .cs-sec-shield-halo,
   .cs-sec-stage-halo,
   .cs-sec-flood,
-  .cs-sec-wordmark { transition: none !important; animation: none !important; }
+  .cs-sec-wordmark {
+    transition: none !important;
+    animation: none !important;
+  }
+
   /* Show the fully-verified resting state, no motion. */
   .cs-sec-stage[data-lit="true"],
-  .cs-sec-card[data-built="true"] { transform: none !important; }
-  .cs-sec-card-inner { opacity: 1 !important; transform: none !important; }
-  .cs-sec-check { stroke-dashoffset: 0 !important; }
+  .cs-sec-card[data-built="true"] {
+    transform: none !important;
+  }
+
+  .cs-sec-card-inner {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .cs-sec-check {
+    stroke-dashoffset: 0 !important;
+  }
+
   .cs-sec-packet,
-  .cs-sec-land { display: none !important; }
-  .cs-sec-thread { animation: none !important; opacity: 1 !important; }
-  .cs-sec-arrow { opacity: 1 !important; filter: none !important; }
-  .cs-sec-arrow-on { animation: none !important; }
+  .cs-sec-land {
+    display: none !important;
+  }
+
+  .cs-sec-thread {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  .cs-sec-arrow {
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  .cs-sec-arrow-on {
+    animation: none !important;
+  }
+
   .cs-flow-beam,
-  .cs-flow-arrow { animation: none !important; }
-  .cs-sec-sheen { display: none !important; }
+  .cs-flow-arrow {
+    animation: none !important;
+  }
+
+  .cs-sec-sheen {
+    display: none !important;
+  }
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
@@ -1722,12 +2221,21 @@ body {
     0 0 0 1px color-mix(in srgb, var(--accent) 38%, transparent),
     0 16px 44px -34px var(--accent);
 }
+
 .wf-anim .wf-card[data-featured="true"]::after {
   animation: wf-ring-pulse 3.2s ease-in-out infinite;
 }
+
 @keyframes wf-ring-pulse {
-  0%, 100% { opacity: 0.28; }
-  50% { opacity: 0.55; }
+
+  0%,
+  100% {
+    opacity: 0.28;
+  }
+
+  50% {
+    opacity: 0.55;
+  }
 }
 
 /* Flowing dotted arrow track — colour inherits the connector's accent. */
@@ -1738,15 +2246,29 @@ body {
   opacity: 0.7;
   background-image: repeating-linear-gradient(90deg, currentColor 0 2px, transparent 2px 6px);
 }
-.wf-arrow svg { opacity: 0.8; }
-.wf-anim .wf-arrow-track { animation: wf-dots 0.6s linear infinite; }
+
+.wf-arrow svg {
+  opacity: 0.8;
+}
+
+.wf-anim .wf-arrow-track {
+  animation: wf-dots 0.6s linear infinite;
+}
+
 @keyframes wf-dots {
-  to { background-position: 6px 0; }
+  to {
+    background-position: 6px 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wf-card[data-featured="true"]::after { animation: none !important; }
-  .wf-arrow-track { animation: none !important; }
+  .wf-card[data-featured="true"]::after {
+    animation: none !important;
+  }
+
+  .wf-arrow-track {
+    animation: none !important;
+  }
 }
 
 /* FAQ answer drawer — kept minimal; height + opacity are driven by inline
@@ -1754,12 +2276,23 @@ body {
    browsers. Per Google Core Web Vitals, the resulting section growth
    within 500ms of user input is excluded from CLS. */
 @media (prefers-reduced-motion: reduce) {
-  [data-faq-answer] { transition: none !important; }
+  [data-faq-answer] {
+    transition: none !important;
+  }
 }
 
 @keyframes cs-flame-pulse {
-  0%, 100% { opacity: 0.85; transform: scaleY(1); }
-  50% { opacity: 1; transform: scaleY(1.05); }
+
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: scaleY(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scaleY(1.05);
+  }
 }
 
 /* Rocket flame
@@ -1774,10 +2307,10 @@ body {
   pointer-events: none;
   /* Soft outer halo */
   background: radial-gradient(ellipse 50% 14% at 50% 8%,
-    rgba(211, 255, 248, 0.85) 0%,
-    rgba(21, 173, 250, 0.55) 18%,
-    rgba(1, 102, 204, 0.30) 40%,
-    rgba(1, 10, 28, 0) 80%);
+      rgba(211, 255, 248, 0.85) 0%,
+      rgba(21, 173, 250, 0.55) 18%,
+      rgba(1, 102, 204, 0.30) 40%,
+      rgba(1, 10, 28, 0) 80%);
   filter: blur(4px);
   border-radius: 999px;
   transform-origin: top center;
@@ -1795,10 +2328,10 @@ body {
   height: 24px;
   transform: translateX(-50%);
   background: radial-gradient(closest-side,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(211, 255, 248, 0.95) 25%,
-    rgba(21, 173, 250, 0.7) 55%,
-    rgba(21, 173, 250, 0) 90%);
+      rgba(255, 255, 255, 1) 0%,
+      rgba(211, 255, 248, 0.95) 25%,
+      rgba(21, 173, 250, 0.7) 55%,
+      rgba(21, 173, 250, 0) 90%);
   filter: blur(2px);
   border-radius: 50%;
 }
@@ -1813,11 +2346,11 @@ body {
   width: 6px;
   height: 100%;
   background: linear-gradient(180deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(211, 255, 248, 0.85) 18%,
-    rgba(21, 173, 250, 0.55) 50%,
-    rgba(1, 102, 204, 0.20) 80%,
-    rgba(1, 10, 28, 0) 100%);
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(211, 255, 248, 0.85) 18%,
+      rgba(21, 173, 250, 0.55) 50%,
+      rgba(1, 102, 204, 0.20) 80%,
+      rgba(1, 10, 28, 0) 100%);
   filter: blur(1.5px);
   border-radius: 999px;
 }
@@ -1834,19 +2367,47 @@ body {
    centring, so we compose that into every keyframe. Tiny amplitudes give a
    3D bob without ever drifting the cube off the sphere. */
 @keyframes cs-orb-core-breathe {
-  0%   { transform: translate(-50%, -50%) translate3d(0, 0, 0)    rotateX(0deg)    rotateY(0deg)    scale(1);     filter: brightness(1); }
-  25%  { transform: translate(-50%, -50%) translate3d(0, -1.4%, 0) rotateX(2deg)    rotateY(-2.5deg) scale(1.012); filter: brightness(1.03); }
-  50%  { transform: translate(-50%, -50%) translate3d(0, -2.2%, 0) rotateX(0deg)    rotateY(0deg)    scale(1.022); filter: brightness(1.06); }
-  75%  { transform: translate(-50%, -50%) translate3d(0, -1.4%, 0) rotateX(-2deg)   rotateY(2.5deg)  scale(1.012); filter: brightness(1.03); }
-  100% { transform: translate(-50%, -50%) translate3d(0, 0, 0)    rotateX(0deg)    rotateY(0deg)    scale(1);     filter: brightness(1); }
+  0% {
+    transform: translate(-50%, -50%) translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg) scale(1);
+    filter: brightness(1);
+  }
+
+  25% {
+    transform: translate(-50%, -50%) translate3d(0, -1.4%, 0) rotateX(2deg) rotateY(-2.5deg) scale(1.012);
+    filter: brightness(1.03);
+  }
+
+  50% {
+    transform: translate(-50%, -50%) translate3d(0, -2.2%, 0) rotateX(0deg) rotateY(0deg) scale(1.022);
+    filter: brightness(1.06);
+  }
+
+  75% {
+    transform: translate(-50%, -50%) translate3d(0, -1.4%, 0) rotateX(-2deg) rotateY(2.5deg) scale(1.012);
+    filter: brightness(1.03);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg) scale(1);
+    filter: brightness(1);
+  }
 }
 
 /* Centre cube — static position; only a gentle scale + brightness pulse so
    it breathes with the sphere. No rotation: the cube is a flat image and
    rotateY would visibly flatten it at 90°. */
 @keyframes cs-orb-cube-pulse {
-  0%, 100% { transform: translate(-50%, -50%) scale(1);     filter: brightness(1)    drop-shadow(0 0 0 rgb(180 140 255 / 0)); }
-  50%      { transform: translate(-50%, -50%) scale(1.035); filter: brightness(1.08) drop-shadow(0 0 12px rgb(180 140 255 / 0.45)); }
+
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    filter: brightness(1) drop-shadow(0 0 0 rgb(180 140 255 / 0));
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.035);
+    filter: brightness(1.08) drop-shadow(0 0 12px rgb(180 140 255 / 0.45));
+  }
 }
 
 .cs-orb-stage {
@@ -1858,7 +2419,13 @@ body {
   container-type: inline-size;
 }
 
-.cs-orb-flow { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.cs-orb-flow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
 
 /* Orb container — sized in container-query units so it tracks the stage width.
    The PNG bakes in glow bleed, so the width is mapped to the orb's inscribed
@@ -1942,6 +2509,7 @@ body {
   -webkit-backdrop-filter: blur(8px);
   position: relative;
 }
+
 .cs-flow-chip img {
   width: 40px;
   height: 40px;
@@ -1952,11 +2520,14 @@ body {
 .cs-flow-chip.is-in img {
   filter: brightness(1.08) saturate(0.78);
 }
+
 .cs-flow-chip.is-in::after {
   content: "";
   position: absolute;
-  top: 7px; right: 7px;
-  width: 10px; height: 10px;
+  top: 7px;
+  right: 7px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: #FF6C6C;
   border: 1.5px solid rgba(255, 255, 255, 0.85);
@@ -1974,12 +2545,18 @@ body {
     0 8px 24px -8px rgba(30, 90, 255, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
-.cs-flow-chip.is-out img { filter: brightness(1.18); }
+
+.cs-flow-chip.is-out img {
+  filter: brightness(1.18);
+}
+
 .cs-flow-chip.is-out::after {
   content: "";
   position: absolute;
-  top: 7px; right: 7px;
-  width: 10px; height: 10px;
+  top: 7px;
+  right: 7px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: #2EFD54;
   border: 1.5px solid rgba(255, 255, 255, 0.85);
@@ -1987,9 +2564,15 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .cs-orb,
-  .cs-orb__cube { animation: none !important; }
-  .cs-orb { transform: translate(-50%, -50%); }
+  .cs-orb__cube {
+    animation: none !important;
+  }
+
+  .cs-orb {
+    transform: translate(-50%, -50%);
+  }
 }
 
 /* ============================================================
@@ -1997,27 +2580,54 @@ body {
    ============================================================ */
 
 @keyframes cs-tt-float {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50%      { transform: translate3d(0, -3px, 0); }
+
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, -3px, 0);
+  }
 }
+
 /* ── SBOM hero report window animations ─────────────────────────────────── */
 /* Entrance: opacity only — does NOT touch transform so it doesn't fight the
    positioning wrapper's translateY(-50%). Float is on the same inner element
    but targets translateY only → no property conflict, composes cleanly. */
 @keyframes cs-sbom-enter {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
+
 /* Gentle float — same feel as cs-tt-float but slightly more travel (6px) and
    a faster period (4s) to match the tighter hero viewport. */
 @keyframes cs-sbom-float {
-  from { transform: translate3d(0, 0, 0); }
-  to   { transform: translate3d(0, -6px, 0); }
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, -6px, 0);
+  }
 }
+
 /* Terminal cursor blink — step-end gives the authentic cursor pulse. */
 @keyframes cs-sbom-blink {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
 }
 
 .cs-sbom-window-animate {
@@ -2027,6 +2637,7 @@ body {
     cs-sbom-enter 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both,
     cs-sbom-float 4s ease-in-out 1.35s infinite alternate;
 }
+
 .cs-sbom-cursor {
   display: inline-block;
   width: 0.5em;
@@ -2037,23 +2648,55 @@ body {
   margin-left: 2px;
   animation: cs-sbom-blink 1s step-end infinite;
 }
+
 @media (prefers-reduced-motion: reduce) {
-  .cs-sbom-window-animate { animation: none; opacity: 1; }
-  .cs-sbom-cursor          { animation: none; opacity: 0.75; }
+  .cs-sbom-window-animate {
+    animation: none;
+    opacity: 1;
+  }
+
+  .cs-sbom-cursor {
+    animation: none;
+    opacity: 0.75;
+  }
 }
+
 /* ── end SBOM animations ─────────────────────────────────────────────────── */
 
 @keyframes cs-tt-progress {
-  from { transform: scaleX(0); transform-origin: left; }
-  to   { transform: scaleX(1); transform-origin: left; }
+  from {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  to {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
 }
+
 @keyframes cs-tt-slide-in-right {
-  from { opacity: 0; transform: translate3d(48px, 0, 0) scale(0.985); }
-  to   { opacity: 1; transform: translate3d(0, 0, 0)    scale(1); }
+  from {
+    opacity: 0;
+    transform: translate3d(48px, 0, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
 }
+
 @keyframes cs-tt-slide-in-left {
-  from { opacity: 0; transform: translate3d(-48px, 0, 0) scale(0.985); }
-  to   { opacity: 1; transform: translate3d(0, 0, 0)     scale(1); }
+  from {
+    opacity: 0;
+    transform: translate3d(-48px, 0, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
 }
 
 .cs-tt-carousel {
@@ -2086,12 +2729,14 @@ body {
   border: 0;
   padding: 0;
 }
+
 .cs-tt-card__photo {
   position: relative;
   flex-shrink: 0;
   overflow: hidden;
   border-radius: 24px;
 }
+
 .cs-tt-card__photo img {
   width: 100%;
   height: 100%;
@@ -2099,6 +2744,7 @@ body {
   object-position: center 20%;
   display: block;
 }
+
 .cs-tt-card__body {
   display: flex;
   flex: 1 1 0%;
@@ -2106,29 +2752,34 @@ body {
   justify-content: space-between;
   min-width: 0;
 }
+
 .cs-tt-card__head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
 }
+
 .cs-tt-card__name {
   font-family: var(--font-sans);
   font-weight: 500;
   letter-spacing: -0.02em;
 }
+
 .cs-tt-card__role {
   font-family: var(--font-sans);
   font-weight: 400;
   letter-spacing: -0.02em;
   color: rgb(255 255 255 / 0.7);
 }
+
 .cs-tt-card__quote {
   font-family: var(--font-sans);
   font-weight: 500;
   letter-spacing: -0.02em;
   line-height: 1.4;
 }
+
 .cs-tt-card__cta {
   display: inline-flex;
   align-items: center;
@@ -2139,13 +2790,19 @@ body {
   color: rgb(255 255 255 / 0.95);
   transition: color 180ms ease-out, transform 180ms ease-out;
 }
+
 .cs-tt-card__cta:hover {
   color: white;
 }
+
 .cs-tt-card__cta:hover svg {
   transform: translateX(2px);
 }
-.cs-tt-card__cta svg { transition: transform 180ms ease-out; }
+
+.cs-tt-card__cta svg {
+  transition: transform 180ms ease-out;
+}
+
 .cs-tt-card__cta-spacer {
   display: inline-block;
   height: 1.5em;
@@ -2178,24 +2835,40 @@ body {
      FadeUp wrapper. Float is purely vertical and doesn't break centering. */
   animation: cs-tt-float 7s ease-in-out infinite;
 }
+
 .cs-tt-card--active .cs-tt-card__photo {
   width: clamp(200px, 20vw, 264px);
   height: 100%;
   border-radius: 24px 0 0 24px;
 }
-.cs-tt-card--active .cs-tt-card__body  {
+
+.cs-tt-card--active .cs-tt-card__body {
   padding: clamp(20px, 2.2vw, 28px) clamp(24px, 2.8vw, 36px) clamp(20px, 2vw, 24px);
   gap: clamp(12px, 1.4vw, 18px);
 }
-.cs-tt-card--active .cs-tt-card__name  { font-size: clamp(16px, 1.4vw, 20px); }
-.cs-tt-card--active .cs-tt-card__role  { font-size: clamp(16px, 1.4vw, 20px); }
+
+.cs-tt-card--active .cs-tt-card__name {
+  font-size: clamp(16px, 1.4vw, 20px);
+}
+
+.cs-tt-card--active .cs-tt-card__role {
+  font-size: clamp(16px, 1.4vw, 20px);
+}
+
 .cs-tt-card--active .cs-tt-card__quote {
   font-size: clamp(16px, 1.4vw, 20px);
   line-height: 1.4;
   margin-top: -6px;
 }
-.cs-tt-card--active .cs-tt-card__cta   { font-size: clamp(0.875rem, 0.95vw, 1rem); }
-.cs-tt-card__quote-mark { display: block; margin-bottom: -8px; }
+
+.cs-tt-card--active .cs-tt-card__cta {
+  font-size: clamp(0.875rem, 0.95vw, 1rem);
+}
+
+.cs-tt-card__quote-mark {
+  display: block;
+  margin-bottom: -8px;
+}
 
 /* ---- Side peek cards (stacked-deck depth) ------------------------------
    Full-content cards (photo + meta + quote + CTA) sitting BEHIND the active
@@ -2226,6 +2899,7 @@ body {
     filter 360ms ease-out,
     transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
 }
+
 /* v3 Consistency Layer: peek inner-edge sits ~80px inside the active card.
    Active card is min(798px, 100%) wide → its half-width = min(399px, 50cqi).
    Left peek's right edge sits at stage_center − (active_half − 80).
@@ -2238,27 +2912,33 @@ body {
   transform: translate(max(-319px, calc(80px - 50cqi)), -50%) scale(0.74);
   transform-origin: right center;
 }
+
 .cs-tt-peek[data-pos="right"] {
   left: 50%;
   transform: translate(min(319px, calc(50cqi - 80px)), -50%) scale(0.74);
   transform-origin: left center;
 }
+
 .cs-tt-peek:hover,
 .cs-tt-peek:focus-visible {
   filter: blur(0.6px) saturate(1) brightness(0.86);
 }
+
 .cs-tt-peek[data-pos="left"]:hover,
 .cs-tt-peek[data-pos="left"]:focus-visible {
   transform: translate(max(-300px, calc(99px - 50cqi)), -50%) scale(0.77);
 }
+
 .cs-tt-peek[data-pos="right"]:hover,
 .cs-tt-peek[data-pos="right"]:focus-visible {
   transform: translate(min(300px, calc(50cqi - 99px)), -50%) scale(0.77);
 }
+
 .cs-tt-peek:focus-visible {
   outline: 2px solid rgb(132 188 255 / 0.7);
   outline-offset: 6px;
 }
+
 .cs-tt-peek__photo {
   position: relative;
   flex-shrink: 0;
@@ -2267,12 +2947,14 @@ body {
   overflow: hidden;
   border-radius: 22px 0 0 22px;
 }
+
 .cs-tt-peek__photo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
+
 .cs-tt-peek__body {
   display: flex;
   flex: 1 1 0%;
@@ -2282,24 +2964,28 @@ body {
   padding: clamp(16px, 2vw, 22px) clamp(18px, 2.2vw, 24px);
   color: white;
 }
+
 .cs-tt-peek__head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
 }
+
 .cs-tt-peek__name {
   display: block;
   font-weight: 600;
   font-size: clamp(0.875rem, 0.95vw, 1rem);
   letter-spacing: -0.02em;
 }
+
 .cs-tt-peek__role {
   display: block;
   margin-top: 2px;
   font-size: clamp(0.6875rem, 0.75vw, 0.75rem);
   color: rgb(255 255 255 / 0.7);
 }
+
 .cs-tt-peek__quote {
   display: -webkit-box;
   -webkit-line-clamp: 4;
@@ -2311,6 +2997,7 @@ body {
   letter-spacing: -0.02em;
   margin: 10px 0;
 }
+
 .cs-tt-peek__cta {
   display: inline-flex;
   align-items: center;
@@ -2335,13 +3022,14 @@ body {
   opacity: 0.42;
   filter: blur(0.6px);
   border-radius: 20px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.015) 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.015) 100%);
   box-shadow: 0 12px 32px -16px rgba(7, 4, 30, 0.5);
   transition:
     opacity 360ms ease-out,
     filter 360ms ease-out,
     transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
 }
+
 .cs-tt-card--side[data-pos="left"] {
   right: 50%;
   transform: translateY(-50%) scale(0.85);
@@ -2350,24 +3038,41 @@ body {
      card sits ~50 px left of stage centre with ~190 px peeking past the
      active card's left edge. Both side cards fit fully within the stage. */
 }
+
 .cs-tt-card--side[data-pos="right"] {
   left: 50%;
   transform: translateY(-50%) scale(0.85);
 }
+
 .cs-tt-card--side:hover,
 .cs-tt-card--side:focus-visible {
   opacity: 0.7;
   filter: blur(0);
   transform: translateY(-50%) scale(0.88);
 }
+
 .cs-tt-card--side:focus-visible {
   outline: 2px solid rgb(132 188 255 / 0.7);
   outline-offset: 6px;
 }
-.cs-tt-card--side .cs-tt-card__photo { width: 211px; height: 263px; }
-.cs-tt-card--side .cs-tt-card__body  { padding: 0 12px 0 24px; }
-.cs-tt-card--side .cs-tt-card__name  { font-size: 0.9375rem; }
-.cs-tt-card--side .cs-tt-card__role  { font-size: 0.75rem; }
+
+.cs-tt-card--side .cs-tt-card__photo {
+  width: 211px;
+  height: 263px;
+}
+
+.cs-tt-card--side .cs-tt-card__body {
+  padding: 0 12px 0 24px;
+}
+
+.cs-tt-card--side .cs-tt-card__name {
+  font-size: 0.9375rem;
+}
+
+.cs-tt-card--side .cs-tt-card__role {
+  font-size: 0.75rem;
+}
+
 .cs-tt-card--side .cs-tt-card__quote {
   font-size: 0.875rem;
   font-weight: 600;
@@ -2377,36 +3082,51 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.cs-tt-card__cta--peek { font-size: 0.8125rem; color: rgb(255 255 255 / 0.7); }
+
+.cs-tt-card__cta--peek {
+  font-size: 0.8125rem;
+  color: rgb(255 255 255 / 0.7);
+}
 
 /* ---- Mobile / narrow: hide side cards entirely ------------------------- */
 @media (max-width: 1023px) {
+
   /* `.cs-tt-card--side` is a legacy class; the live JSX renders `.cs-tt-peek`.
      Hide both so the active card has the stage to itself on stacked layouts. */
   .cs-tt-card--side,
-  .cs-tt-peek { display: none; }
+  .cs-tt-peek {
+    display: none;
+  }
+
   .cs-tt-card--active {
     width: 100%;
     height: auto;
     min-height: 300px;
     flex-direction: column;
   }
+
   .cs-tt-card--active .cs-tt-card__photo {
     width: 100%;
     height: 220px;
     border-radius: 24px 24px 0 0;
   }
+
   .cs-tt-card--active .cs-tt-card__body {
     /* L/R padding so quote text doesn't clip against the card's
        overflow:hidden walls when the layout stacks (photo on top). */
     padding: 20px 20px 24px;
     gap: 14px;
   }
+
   .cs-tt-card--active .cs-tt-card__quote {
     font-size: 16px;
     line-height: 1.45;
   }
-  .cs-tt-stage { height: auto; min-height: 480px; }
+
+  .cs-tt-stage {
+    height: auto;
+    min-height: 480px;
+  }
 }
 
 /* =============================================================================
@@ -2466,19 +3186,20 @@ body {
   z-index: 10;
   opacity: 0.32;
   filter: blur(4px);
-  background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.015) 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.015) 100%);
   box-shadow: 0 12px 32px -16px rgba(7, 4, 30, 0.5);
 }
+
 .cs-tt-morph[data-pos="-1"] {
   transform:
-    translate(calc(-50% - clamp(280px, 28vw, 380px)), -50%)
-    scale(0.68);
+    translate(calc(-50% - clamp(280px, 28vw, 380px)), -50%) scale(0.68);
 }
+
 .cs-tt-morph[data-pos="1"] {
   transform:
-    translate(calc(-50% + clamp(280px, 28vw, 380px)), -50%)
-    scale(0.68);
+    translate(calc(-50% + clamp(280px, 28vw, 380px)), -50%) scale(0.68);
 }
+
 .cs-tt-morph[data-pos="-1"]:hover,
 .cs-tt-morph[data-pos="1"]:hover,
 .cs-tt-morph[data-pos="-1"]:focus-visible,
@@ -2486,6 +3207,7 @@ body {
   opacity: 0.7;
   filter: blur(0);
 }
+
 .cs-tt-morph[data-pos="-1"]:focus-visible,
 .cs-tt-morph[data-pos="1"]:focus-visible {
   outline: 2px solid rgb(132 188 255 / 0.7);
@@ -2514,7 +3236,9 @@ body {
    set on mobile, the rules won't apply and the touch-swipe + dots / nav
    buttons keep owning navigation at narrow viewports. */
 @media (min-width: 1024px) {
-  .cs-tt-stage { --cs-tt-peek-dist: clamp(280px, 28vw, 380px); }
+  .cs-tt-stage {
+    --cs-tt-peek-dist: clamp(280px, 28vw, 380px);
+  }
 
   /* Affordance: grabbable cards on desktop. touch-action: none keeps a
      touchscreen-laptop user's finger from triggering native scroll while
@@ -2526,6 +3250,7 @@ body {
     cursor: grab;
     touch-action: none;
   }
+
   .cs-tt-stage[data-dragging] .cs-tt-morph {
     transition: none;
     cursor: grabbing;
@@ -2536,33 +3261,24 @@ body {
      until commit, where the existing data-wrap teleport masks its jump
      back to the left slot. */
   .cs-tt-stage[data-dragging="prev"] {
-    --cs-tt-progress: clamp(
-      0,
-      calc(var(--cs-tt-drag-dx, 0px) / var(--cs-tt-peek-dist)),
-      1
-    );
+    --cs-tt-progress: clamp(0,
+        calc(var(--cs-tt-drag-dx, 0px) / var(--cs-tt-peek-dist)),
+        1);
   }
+
   .cs-tt-stage[data-dragging="prev"] .cs-tt-morph[data-pos="-1"] {
     transform:
-      translate(
-        calc(
-          (-50% - var(--cs-tt-peek-dist))
-          + var(--cs-tt-progress, 0) * var(--cs-tt-peek-dist)
-        ),
-        -50%
-      )
-      scale(calc(0.68 + var(--cs-tt-progress, 0) * 0.32));
+      translate(calc((-50% - var(--cs-tt-peek-dist)) + var(--cs-tt-progress, 0) * var(--cs-tt-peek-dist)),
+        -50%) scale(calc(0.68 + var(--cs-tt-progress, 0) * 0.32));
     opacity: calc(0.32 + var(--cs-tt-progress, 0) * 0.68);
     filter: blur(calc((1 - var(--cs-tt-progress, 0)) * 4px));
     z-index: 35;
   }
+
   .cs-tt-stage[data-dragging="prev"] .cs-tt-morph[data-pos="0"] {
     transform:
-      translate(
-        calc(-50% + var(--cs-tt-progress, 0) * var(--cs-tt-peek-dist)),
-        -50%
-      )
-      scale(calc(1 - var(--cs-tt-progress, 0) * 0.32));
+      translate(calc(-50% + var(--cs-tt-progress, 0) * var(--cs-tt-peek-dist)),
+        -50%) scale(calc(1 - var(--cs-tt-progress, 0) * 0.32));
     opacity: calc(1 - var(--cs-tt-progress, 0) * 0.68);
     filter: blur(calc(var(--cs-tt-progress, 0) * 4px));
   }
@@ -2571,33 +3287,24 @@ body {
      Mirror of the prev block. The drag-dx is negative here, so we negate
      before dividing. */
   .cs-tt-stage[data-dragging="next"] {
-    --cs-tt-progress: clamp(
-      0,
-      calc((0px - var(--cs-tt-drag-dx, 0px)) / var(--cs-tt-peek-dist)),
-      1
-    );
+    --cs-tt-progress: clamp(0,
+        calc((0px - var(--cs-tt-drag-dx, 0px)) / var(--cs-tt-peek-dist)),
+        1);
   }
+
   .cs-tt-stage[data-dragging="next"] .cs-tt-morph[data-pos="1"] {
     transform:
-      translate(
-        calc(
-          (-50% + var(--cs-tt-peek-dist))
-          - var(--cs-tt-progress, 0) * var(--cs-tt-peek-dist)
-        ),
-        -50%
-      )
-      scale(calc(0.68 + var(--cs-tt-progress, 0) * 0.32));
+      translate(calc((-50% + var(--cs-tt-peek-dist)) - var(--cs-tt-progress, 0) * var(--cs-tt-peek-dist)),
+        -50%) scale(calc(0.68 + var(--cs-tt-progress, 0) * 0.32));
     opacity: calc(0.32 + var(--cs-tt-progress, 0) * 0.68);
     filter: blur(calc((1 - var(--cs-tt-progress, 0)) * 4px));
     z-index: 35;
   }
+
   .cs-tt-stage[data-dragging="next"] .cs-tt-morph[data-pos="0"] {
     transform:
-      translate(
-        calc(-50% - var(--cs-tt-progress, 0) * var(--cs-tt-peek-dist)),
-        -50%
-      )
-      scale(calc(1 - var(--cs-tt-progress, 0) * 0.32));
+      translate(calc(-50% - var(--cs-tt-progress, 0) * var(--cs-tt-peek-dist)),
+        -50%) scale(calc(1 - var(--cs-tt-progress, 0) * 0.32));
     opacity: calc(1 - var(--cs-tt-progress, 0) * 0.68);
     filter: blur(calc(var(--cs-tt-progress, 0) * 4px));
   }
@@ -2610,11 +3317,23 @@ body {
   transition: opacity 600ms ease-in-out, filter 600ms ease-in-out;
   animation: cs-tt-morph-wrap 640ms ease-in-out both;
 }
+
 @keyframes cs-tt-morph-wrap {
-  0%   { opacity: 0.42; }
-  35%  { opacity: 0; }
-  65%  { opacity: 0; }
-  100% { opacity: 0.42; }
+  0% {
+    opacity: 0.42;
+  }
+
+  35% {
+    opacity: 0;
+  }
+
+  65% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 0.42;
+  }
 }
 
 /* Inner element sizing — same intrinsic sizes for all cards; the card-level
@@ -2624,16 +3343,27 @@ body {
   height: 100%;
   border-radius: 24px 0 0 24px;
 }
+
 .cs-tt-morph .cs-tt-card__body {
   padding: clamp(20px, 2.2vw, 28px) clamp(24px, 2.8vw, 36px) clamp(20px, 2vw, 24px);
   gap: clamp(12px, 1.4vw, 18px);
 }
-.cs-tt-morph .cs-tt-card__name  { font-size: clamp(16px, 1.4vw, 20px); }
-.cs-tt-morph .cs-tt-card__role  { font-size: clamp(14px, 1.2vw, 16px); }
+
+.cs-tt-morph .cs-tt-card__name {
+  font-size: clamp(16px, 1.4vw, 20px);
+}
+
+.cs-tt-morph .cs-tt-card__role {
+  font-size: clamp(14px, 1.2vw, 16px);
+}
+
 .cs-tt-morph .cs-tt-card__quote {
   font-size: clamp(0.9375rem, 0.95vw, 1.0625rem);
 }
-.cs-tt-morph .cs-tt-card__cta   { font-size: clamp(0.875rem, 0.95vw, 1rem); }
+
+.cs-tt-morph .cs-tt-card__cta {
+  font-size: clamp(0.875rem, 0.95vw, 1rem);
+}
 
 /* Peek interactions */
 .cs-tt-morph:not([data-pos="0"]) .cs-tt-card__cta {
@@ -2649,6 +3379,7 @@ body {
 
    Shared base for mobile (vertical stack) AND tablet (horizontal split). */
 @media (max-width: 1023px) {
+
   /* Stage clips off-screen cards so the swipe motion stays visually
      contained within the card area; without this, the sliding peeks
      would briefly show beyond the section padding. */
@@ -2657,6 +3388,7 @@ body {
     overflow: hidden;
     border-radius: 24px;
   }
+
   .cs-tt-morph {
     position: absolute;
     inset: 0;
@@ -2672,21 +3404,25 @@ body {
     transition: transform 620ms cubic-bezier(0.4, 0, 0.2, 1);
     will-change: transform;
   }
+
   .cs-tt-morph[data-pos="0"] {
     z-index: 30;
     transform: translate3d(0, 0, 0);
     pointer-events: auto;
   }
+
   .cs-tt-morph[data-pos="1"] {
     z-index: 20;
     transform: translate3d(105%, 0, 0);
     pointer-events: none;
   }
+
   .cs-tt-morph[data-pos="-1"] {
     z-index: 20;
     transform: translate3d(-105%, 0, 0);
     pointer-events: none;
   }
+
   /* Wrapping card teleports between off-screen sides — both positions
      are outside the clipped stage so the jump is invisible. Disabling
      the transform transition prevents a brief flash through the centre. */
@@ -2697,17 +3433,25 @@ body {
 
 /* ---- Mobile (≤ 639 px): vertical stack, photo on top --------------------- */
 @media (max-width: 639px) {
-  .cs-tt-stage { height: clamp(540px, 130vw, 680px); }
-  .cs-tt-morph { flex-direction: column; }
+  .cs-tt-stage {
+    height: clamp(540px, 130vw, 680px);
+  }
+
+  .cs-tt-morph {
+    flex-direction: column;
+  }
+
   .cs-tt-morph[data-pos="0"] .cs-tt-card__photo {
     width: 100%;
     height: 220px;
     border-radius: 24px 24px 0 0;
   }
+
   .cs-tt-morph[data-pos="0"] .cs-tt-card__body {
     padding: 20px 20px 24px;
     gap: 14px;
   }
+
   .cs-tt-morph[data-pos="0"] .cs-tt-card__quote {
     font-size: 16px;
     line-height: 1.45;
@@ -2724,13 +3468,19 @@ body {
     height: clamp(360px, 50vw, 440px);
     min-height: 0;
   }
-  .cs-tt-morph { flex-direction: row; align-items: stretch; }
+
+  .cs-tt-morph {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
   .cs-tt-morph[data-pos="0"] .cs-tt-card__photo {
     width: clamp(220px, 38%, 300px);
     height: 100%;
     border-radius: 24px 0 0 24px;
     flex-shrink: 0;
   }
+
   .cs-tt-morph[data-pos="0"] .cs-tt-card__body {
     padding: clamp(20px, 3vw, 32px);
     gap: clamp(12px, 1.6vw, 18px);
@@ -2740,21 +3490,26 @@ body {
        present, so the layout stays consistent across cards. */
     justify-content: flex-start;
   }
+
   .cs-tt-morph[data-pos="0"] .cs-tt-card__name {
     font-size: clamp(16px, 1.8vw, 20px);
   }
+
   .cs-tt-morph[data-pos="0"] .cs-tt-card__role {
     font-size: clamp(13px, 1.4vw, 15px);
   }
+
   .cs-tt-morph[data-pos="0"] .cs-tt-card__quote {
     font-size: clamp(15px, 1.7vw, 17px);
     line-height: 1.5;
     margin-top: 4px;
   }
+
   .cs-tt-morph[data-pos="0"] .cs-tt-card__cta {
     font-size: clamp(13px, 1.4vw, 15px);
     margin-top: auto;
   }
+
   /* When there's no CTA, the spacer keeps the quote anchored at the same
      visual height as a card that has a CTA — same trick as desktop. */
   .cs-tt-morph[data-pos="0"] .cs-tt-card__cta-spacer {
@@ -2764,8 +3519,13 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cs-tt-morph { transition-duration: 80ms !important; }
-  .cs-tt-morph[data-wrap="true"] { animation: none !important; }
+  .cs-tt-morph {
+    transition-duration: 80ms !important;
+  }
+
+  .cs-tt-morph[data-wrap="true"] {
+    animation: none !important;
+  }
 }
 
 /* ---- Nav button ---------------------------- */
@@ -2783,22 +3543,30 @@ body {
   color: white;
   isolation: isolate;
   transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
-              box-shadow 200ms ease-out,
-              border-color 200ms ease-out;
+    box-shadow 200ms ease-out,
+    border-color 200ms ease-out;
   overflow: hidden;
 }
+
 .cs-tt-nav:hover {
   transform: translateY(-1px) scale(1.05);
   box-shadow: 0 0 0 4px rgba(218, 182, 243, 0.14),
-              0 8px 22px -10px rgba(218, 182, 243, 0.55);
+    0 8px 22px -10px rgba(218, 182, 243, 0.55);
   border-color: rgb(255 255 255 / 0.9);
 }
-.cs-tt-nav:active { transform: scale(0.97); }
+
+.cs-tt-nav:active {
+  transform: scale(0.97);
+}
+
 .cs-tt-nav:focus-visible {
   outline: 2px solid rgb(132 188 255 / 0.7);
   outline-offset: 4px;
 }
-.cs-tt-nav[data-direction="prev"] .cs-tt-nav__arrow { transform: scaleX(-1); }
+
+.cs-tt-nav[data-direction="prev"] .cs-tt-nav__arrow {
+  transform: scaleX(-1);
+}
 
 /* Two plus-lighter radial glows:
    #DAB6F3 → rgba(177,145,208,.75) → rgba(135,108,173,.5) → rgba(52,34,102,0). */
@@ -2809,41 +3577,65 @@ body {
   pointer-events: none;
   mix-blend-mode: plus-lighter;
 }
+
 .cs-tt-nav__glow--tr {
-  background: radial-gradient(
-    ellipse 70% 90% at 92% 22%,
-    rgba(218, 182, 243, 0.20) 0%,
-    rgba(177, 145, 208, 0.15) 25%,
-    rgba(135, 108, 173, 0.10) 50%,
-    rgba(52, 34, 102, 0)      100%
-  );
+  background: radial-gradient(ellipse 70% 90% at 92% 22%,
+      rgba(218, 182, 243, 0.20) 0%,
+      rgba(177, 145, 208, 0.15) 25%,
+      rgba(135, 108, 173, 0.10) 50%,
+      rgba(52, 34, 102, 0) 100%);
 }
+
 .cs-tt-nav__glow--bottom {
-  background: radial-gradient(
-    ellipse 45% 75% at 50% 100%,
-    rgba(218, 182, 243, 0.30) 0%,
-    rgba(177, 145, 208, 0.225) 25%,
-    rgba(135, 108, 173, 0.15)  50%,
-    rgba(52, 34, 102, 0)       100%
-  );
+  background: radial-gradient(ellipse 45% 75% at 50% 100%,
+      rgba(218, 182, 243, 0.30) 0%,
+      rgba(177, 145, 208, 0.225) 25%,
+      rgba(135, 108, 173, 0.15) 50%,
+      rgba(52, 34, 102, 0) 100%);
 }
-.cs-tt-nav__arrow { position: relative; z-index: 1; width: 14px; height: 10px; }
+
+.cs-tt-nav__arrow {
+  position: relative;
+  z-index: 1;
+  width: 14px;
+  height: 10px;
+}
 
 @media (min-width: 768px) {
-  .cs-tt-nav { width: 56px; height: 56px; }
-  .cs-tt-nav__arrow { width: 20px; height: 14px; }
+  .cs-tt-nav {
+    width: 56px;
+    height: 56px;
+  }
+
+  .cs-tt-nav__arrow {
+    width: 20px;
+    height: 14px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cs-tt-card--active { animation: none; }
-  .cs-tt-card--side { transition: none; }
-  .cs-tt-nav { transition: none; }
+  .cs-tt-card--active {
+    animation: none;
+  }
+
+  .cs-tt-card--side {
+    transition: none;
+  }
+
+  .cs-tt-nav {
+    transition: none;
+  }
 }
 
 /* Marquee — right-to-left infinite scroll */
 @keyframes cs-marquee-rtl {
-  from { transform: translate3d(0, 0, 0); }
-  to   { transform: translate3d(-50%, 0, 0); }
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
 }
 
 .cs-marquee {
@@ -2854,7 +3646,9 @@ body {
 
 
 @media (prefers-reduced-motion: reduce) {
-  .cs-marquee { animation: none; }
+  .cs-marquee {
+    animation: none;
+  }
 }
 
 /* Gradient text used in section headings ("patching", "Advantage") */
@@ -2881,12 +3675,10 @@ body {
    the cs-hh-shine keyframe), minus the one-shot typewriter entrance. Use on
    inline text that should carry the looping shine. */
 .cs-text-shine {
-  background-image: linear-gradient(
-    100deg,
-    #2cc1eb 0%,
-    #9a51ff 50%,
-    #2cc1eb 100%
-  );
+  background-image: linear-gradient(100deg,
+      #2cc1eb 0%,
+      #9a51ff 50%,
+      #2cc1eb 100%);
   background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -2894,6 +3686,7 @@ body {
   color: transparent;
   animation: cs-hh-shine 6s linear infinite;
 }
+
 @media (prefers-reduced-motion: reduce) {
   .cs-text-shine {
     animation: none;
@@ -2912,12 +3705,10 @@ body {
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(
-    135deg,
-    rgba(51, 186, 236, 0.6) 0%,
-    rgba(111, 141, 255, 0.28) 50%,
-    rgba(177, 156, 255, 0.6) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(51, 186, 236, 0.6) 0%,
+      rgba(111, 141, 255, 0.28) 50%,
+      rgba(177, 156, 255, 0.6) 100%);
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
@@ -2947,10 +3738,16 @@ body {
 }
 
 /* Container utility */
-.cs-container { max-width: 1276px; margin-inline: auto; padding-inline: 24px; }
+.cs-container {
+  max-width: 1276px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
 
 @media (max-width: 1340px) {
-  .cs-container { padding-inline: 32px; }
+  .cs-container {
+    padding-inline: 32px;
+  }
 }
 
 @theme inline {
@@ -3050,11 +3847,14 @@ body {
   font-weight: 400;
   line-height: var(--prose-body-lh);
   letter-spacing: -0.01em;
-  color: rgba(17,17,17,0.85);
+  color: rgba(17, 17, 17, 0.85);
   margin-bottom: 1.25em;
   text-wrap: pretty;
 }
-.article-body .article-paragraph:last-child { margin-bottom: 0; }
+
+.article-body .article-paragraph:last-child {
+  margin-bottom: 0;
+}
 
 /* Sticky-header offset for TOC anchor jumps. Header-aware via --cs-header-h
    (72px) plus breathing room, so #anchor links never land under the fixed
@@ -3070,6 +3870,7 @@ body {
   letter-spacing: -0.02em;
   color: #111111;
 }
+
 .article-body .article-h1 {
   font-size: var(--prose-h1);
   font-weight: 600;
@@ -3077,6 +3878,7 @@ body {
   margin-top: 3rem;
   margin-bottom: 1rem;
 }
+
 /* Legal document titles sit in a two-column reading layout (~1021px content
    column), so the full prose-h1 (56px) makes the longest titles — e.g.
    "Customer Data Processing Addendum" / "Vulnerability Disclosure Policies" —
@@ -3085,6 +3887,7 @@ body {
 .article-body .legal-doc-title {
   font-size: clamp(2rem, 1.25rem + 2.6vw, 3.125rem);
 }
+
 .article-body .article-h2 {
   font-size: var(--prose-h2);
   font-weight: 600;
@@ -3092,6 +3895,7 @@ body {
   margin-top: var(--prose-h2-mt);
   margin-bottom: var(--prose-h2-mb);
 }
+
 .article-body .article-h3 {
   font-size: var(--prose-h3);
   font-weight: 600;
@@ -3099,6 +3903,7 @@ body {
   margin-top: var(--prose-h3-mt);
   margin-bottom: var(--prose-h3-mb);
 }
+
 .article-body .article-h4,
 .article-body .article-h5,
 .article-body .article-h6 {
@@ -3111,14 +3916,21 @@ body {
 
 /* <strong>/<b> inherits the host heading's weight so it doesn't jump to 900
    (Manrope resolves `font-weight: bolder` to 900). Headings stay at 600. */
-.article-body .article-h1 strong, .article-body .article-h1 b,
-.article-body .article-h2 strong, .article-body .article-h2 b,
-.article-body .article-h3 strong, .article-body .article-h3 b,
-.article-body .article-h4 strong, .article-body .article-h4 b,
-.article-body .article-h5 strong, .article-body .article-h5 b,
-.article-body .article-h6 strong, .article-body .article-h6 b {
+.article-body .article-h1 strong,
+.article-body .article-h1 b,
+.article-body .article-h2 strong,
+.article-body .article-h2 b,
+.article-body .article-h3 strong,
+.article-body .article-h3 b,
+.article-body .article-h4 strong,
+.article-body .article-h4 b,
+.article-body .article-h5 strong,
+.article-body .article-h5 b,
+.article-body .article-h6 strong,
+.article-body .article-h6 b {
   font-weight: inherit;
 }
+
 /* Body-level <strong>/<b> emphasis caps at 700 — never the browser default 900. */
 .article-body .article-paragraph strong,
 .article-body .article-paragraph b,
@@ -3134,27 +3946,40 @@ body {
   font-size: var(--prose-body);
   line-height: var(--prose-body-lh);
   letter-spacing: -0.01em;
-  color: rgba(17,17,17,0.85);
+  color: rgba(17, 17, 17, 0.85);
   padding-left: 1.5em;
   margin-bottom: 1.25em;
 }
-.article-body .article-ul { list-style-type: disc; }
-.article-body .article-ol { list-style-type: decimal; }
-.article-body .article-li { margin-bottom: 0.2em; line-height: 1.5; }
-.article-body .article-ul + .article-ul,
-.article-body .article-ol + .article-ol,
-.article-body .article-ul + .article-ol,
-.article-body .article-ol + .article-ul { margin-top: -1em; }
+
+.article-body .article-ul {
+  list-style-type: disc;
+}
+
+.article-body .article-ol {
+  list-style-type: decimal;
+}
+
+.article-body .article-li {
+  margin-bottom: 0.2em;
+  line-height: 1.5;
+}
+
+.article-body .article-ul+.article-ul,
+.article-body .article-ol+.article-ol,
+.article-body .article-ul+.article-ol,
+.article-body .article-ol+.article-ul {
+  margin-top: -1em;
+}
 
 .article-body .article-blockquote {
   border-left: 4px solid #4a3bf1;
   padding: 0.75em 1.25em;
   margin: 1.75rem 0;
-  background: rgba(74,59,241,0.04);
+  background: rgba(74, 59, 241, 0.04);
   border-radius: 0 8px 8px 0;
   font-size: var(--prose-blockquote);
   font-style: italic;
-  color: rgba(17,17,17,0.75);
+  color: rgba(17, 17, 17, 0.75);
   line-height: 1.55;
 }
 
@@ -3172,6 +3997,7 @@ body {
   padding: clamp(20px, 3.5vw, 28px) clamp(20px, 3.5vw, 32px);
   border-radius: var(--radius-cs-card);
 }
+
 @media (min-width: 640px) {
   .article-body .article-cta {
     flex-direction: row;
@@ -3180,6 +4006,7 @@ body {
     gap: 24px;
   }
 }
+
 .article-body .article-cta__heading {
   margin: 0;
   font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
@@ -3189,6 +4016,7 @@ body {
   letter-spacing: -0.02em;
   text-wrap: balance;
 }
+
 .article-body .article-cta__button {
   flex-shrink: 0;
 }
@@ -3200,6 +4028,7 @@ body {
     #eef2fe;
   border: 1px solid rgba(57, 96, 249, 0.16);
 }
+
 .article-body .article-cta--soft .article-cta__heading {
   color: #111111;
 }
@@ -3209,6 +4038,7 @@ body {
   background: linear-gradient(120deg, #471ec0 0%, #131e8f 100%);
   border: 1px solid rgba(255, 255, 255, 0.10);
 }
+
 .article-body .article-cta--solid .article-cta__heading {
   color: #ffffff;
 }
@@ -3339,7 +4169,7 @@ body {
 
 .article-body .article-hr {
   border: none;
-  border-top: 1px solid rgba(17,17,17,0.12);
+  border-top: 1px solid rgba(17, 17, 17, 0.12);
   margin: 2.5rem 0;
 }
 
@@ -3416,8 +4246,8 @@ body {
   border-radius: 12px;
 }
 
-.article-body .article-embed .myth-box > :first-child,
-.article-body .article-embed .what-is-mythos-box > :first-child {
+.article-body .article-embed .myth-box> :first-child,
+.article-body .article-embed .what-is-mythos-box> :first-child {
   margin-top: 0;
 }
 
@@ -3443,6 +4273,7 @@ body {
     flex-direction: column;
     align-items: center;
   }
+
   .article-body .article-embed .divider {
     width: 60%;
     height: 1px;
@@ -3459,7 +4290,8 @@ body {
   width: 100%;
   border-collapse: collapse;
   font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
-  font-size: 0.875rem; /* 14px at default 16px root */
+  font-size: 0.875rem;
+  /* 14px at default 16px root */
   line-height: 1.4;
   letter-spacing: -0.02em;
 }
@@ -3484,7 +4316,7 @@ body {
    Covers both explicit `th.article-th-row` and positional `td:first-child`
    for tables authored without headerState in the CMS. */
 .article-body .article-table th.article-th-row,
-.article-body .article-table tr > td:first-child {
+.article-body .article-table tr>td:first-child {
   font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
   font-weight: 500;
   color: #000000;
@@ -3493,8 +4325,8 @@ body {
 /* Column header (top row) — Sora semibold. Wins over the 1st-column rule
    so the corner cell reads as a column header. */
 .article-body .article-table th.article-th-col,
-.article-body .article-table tr:first-child > td,
-.article-body .article-table tr:first-child > th {
+.article-body .article-table tr:first-child>td,
+.article-body .article-table tr:first-child>th {
   font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
   font-weight: 600;
   color: #000000;
@@ -3546,8 +4378,8 @@ body {
 }
 
 /* First h2 should have less top margin if it's the very first child */
-.article-body > .article-h2:first-child,
-.article-body > .article-h1:first-child {
+.article-body>.article-h2:first-child,
+.article-body>.article-h1:first-child {
   margin-top: 0;
 }
 
@@ -3652,9 +4484,11 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   /* Modern browsers (Chrome 114+, Safari 17.5+, Firefox 121+) render
      evenly-balanced headings with this declaration. Free polish; no
      fallback needed in older browsers (they get the default behavior).
@@ -3662,9 +4496,13 @@ body {
      without per-component opt-in. Article-body headings already set
      text-wrap: balance explicitly — this just makes everywhere else
      consistent. */
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     text-wrap: balance;
   }
+
   /* Heading weight roles: section <h2> and subsection/card <h3> default to 600
      site-wide (matches --fs-h2-weight / --fs-h3-weight and the article-body
      rules). No heading uses 700 — components no longer need a per-instance
@@ -3673,9 +4511,11 @@ body {
   h2 {
     font-weight: var(--fs-h2-weight);
   }
+
   h3 {
     font-weight: var(--fs-h3-weight);
   }
+
   html {
     @apply font-sans;
     /* Reserve scrollbar space so route changes that add/remove a scrollable
@@ -3722,11 +4562,9 @@ body {
    it resolves to `transparent`, so un-migrated panels render exactly as before. */
 .cs-panel-glass {
   background:
-    radial-gradient(
-      125% 90% at var(--cs-atm-x, 100%) -10%,
+    radial-gradient(125% 90% at var(--cs-atm-x, 100%) -10%,
       var(--cs-atm, transparent) 0%,
-      transparent 62%
-    ),
+      transparent 62%),
     var(--cs-surface-1);
   box-shadow:
     0 32px 80px -32px rgba(0, 0, 0, 0.7),
@@ -3748,6 +4586,7 @@ body {
     background-color 180ms cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1);
 }
+
 .cs-tile-interactive:hover {
   background: var(--cs-surface-2h);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
@@ -3785,11 +4624,9 @@ body {
 .cs-hero-surface {
   --cs-hero-tint: 140, 120, 255;
   background:
-    linear-gradient(
-      180deg,
+    linear-gradient(180deg,
       rgba(var(--cs-hero-tint), 0.07) 0%,
-      transparent 38%
-    ),
+      transparent 38%),
     var(--cs-surface-2);
   box-shadow:
     inset 0 1px 0 rgba(var(--cs-hero-tint), 0.22),
@@ -3835,9 +4672,19 @@ body {
 
 /* Secure core — slow breathing scale + brightness. */
 @keyframes cs-civ-core-breathe {
-  0%, 100% { transform: scale(1);     filter: brightness(1); }
-  50%      { transform: scale(1.035); filter: brightness(1.12); }
+
+  0%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+
+  50% {
+    transform: scale(1.035);
+    filter: brightness(1.12);
+  }
 }
+
 .cs-civ-core {
   transform-box: fill-box;
   transform-origin: center;
@@ -3847,11 +4694,25 @@ body {
 
 /* Membrane scan sweep — bright node travels top → bottom of the gate. */
 @keyframes cs-civ-sweep {
-  0%       { transform: translateY(0);     opacity: 0; }
-  12%      { opacity: 0.95; }
-  88%      { opacity: 0.95; }
-  100%     { transform: translateY(372px); opacity: 0; }
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 0.95;
+  }
+
+  88% {
+    opacity: 0.95;
+  }
+
+  100% {
+    transform: translateY(372px);
+    opacity: 0;
+  }
 }
+
 .cs-civ-sweep {
   animation: cs-civ-sweep 3.6s ease-in-out infinite;
   will-change: transform, opacity;
@@ -3859,10 +4720,24 @@ body {
 
 /* Chaotic dependency nodes — restless flicker + tiny drift. */
 @keyframes cs-civ-chaos {
-  0%, 100% { transform: translate(0, 0);       opacity: 0.55; }
-  30%      { transform: translate(2px, -3px);  opacity: 0.9; }
-  60%      { transform: translate(-2px, 2px);  opacity: 0.5; }
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0.55;
+  }
+
+  30% {
+    transform: translate(2px, -3px);
+    opacity: 0.9;
+  }
+
+  60% {
+    transform: translate(-2px, 2px);
+    opacity: 0.5;
+  }
 }
+
 .cs-civ-chaos {
   transform-box: fill-box;
   animation: cs-civ-chaos 3.1s ease-in-out infinite;
@@ -3871,9 +4746,19 @@ body {
 
 /* Verified lattice dots — calm pulse. */
 @keyframes cs-civ-pulse {
-  0%, 100% { transform: scale(1);    opacity: 0.7; }
-  50%      { transform: scale(1.28); opacity: 1; }
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+
+  50% {
+    transform: scale(1.28);
+    opacity: 1;
+  }
 }
+
 .cs-civ-pulse {
   animation: cs-civ-pulse 3.4s ease-in-out infinite;
   will-change: transform, opacity;
@@ -3881,8 +4766,11 @@ body {
 
 /* Convergence beams — energy flowing along each stream. */
 @keyframes cs-civ-beam {
-  to { stroke-dashoffset: -36; }
+  to {
+    stroke-dashoffset: -36;
+  }
 }
+
 .cs-civ-beams line {
   stroke-dasharray: 4 10;
   animation: cs-civ-beam 1.4s linear infinite;
@@ -3890,8 +4778,11 @@ body {
 
 /* Radar scope — slow continuous sweep around the secure core. */
 @keyframes cs-civ-scope {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
+
 .cs-civ-scope {
   transform-box: fill-box;
   animation: cs-civ-scope 18s linear infinite;
@@ -3902,18 +4793,38 @@ body {
    harden red → cyan as they cross the membrane, dock at translate(0). The
    var() is resolved per-element, so one keyframe serves every packet. */
 @keyframes cs-civ-packet {
-  0%   { transform: translate(var(--civ-fx), var(--civ-fy)); fill: #ff6c6c; opacity: 0; }
-  8%   { opacity: 1; }
-  48%  { fill: #ff8a6c; }
-  62%  { fill: #6fe8ff; }
-  100% { transform: translate(0, 0); fill: #a8efff; opacity: 1; }
+  0% {
+    transform: translate(var(--civ-fx), var(--civ-fy));
+    fill: #ff6c6c;
+    opacity: 0;
+  }
+
+  8% {
+    opacity: 1;
+  }
+
+  48% {
+    fill: #ff8a6c;
+  }
+
+  62% {
+    fill: #6fe8ff;
+  }
+
+  100% {
+    transform: translate(0, 0);
+    fill: #a8efff;
+    opacity: 1;
+  }
 }
+
 .cs-civ-packet {
   animation: cs-civ-packet 5.4s cubic-bezier(0.45, 0, 0.25, 1) infinite;
   will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .cs-civ-core,
   .cs-civ-sweep,
   .cs-civ-scope,
@@ -3923,8 +4834,11 @@ body {
   .cs-civ-packet {
     animation: none !important;
   }
+
   /* Resolved frame: hide the moving sweep; packets rest docked + cyan. */
-  .cs-civ-sweep { opacity: 0; }
+  .cs-civ-sweep {
+    opacity: 0;
+  }
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
@@ -3950,6 +4864,7 @@ body {
   animation-delay: calc(0.3s + var(--cs-i, 0) * 0.13s);
   /* One-shot row cascade — no persistent compositor-layer hint (6 rows). */
 }
+
 @keyframes cs-lpr-row-in {
   from {
     opacity: 0;
@@ -3963,6 +4878,7 @@ body {
   animation: cs-lpr-bar-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: calc(0.55s + var(--cs-i, 0) * 0.13s);
 }
+
 @keyframes cs-lpr-bar-in {
   from {
     transform: translateY(-50%) scaleY(0);
@@ -3979,9 +4895,11 @@ body {
   animation: cs-lpr-count 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: var(--cs-num-delay, 0.4s);
 }
+
 .cs-lpr-num::after {
   content: counter(cs-lpr-c);
 }
+
 @keyframes cs-lpr-count {
   from {
     --cs-num: 0;
@@ -3996,26 +4914,31 @@ body {
   animation: cs-lpr-check-pop 0.44s cubic-bezier(0.34, 1.4, 0.64, 1) both;
   animation-delay: calc(0.5s + var(--cs-i, 0) * 0.13s);
 }
+
 @keyframes cs-lpr-check-pop {
   0% {
     opacity: 0;
     transform: scale(0.4);
   }
+
   60% {
     opacity: 1;
     transform: scale(1.15);
   }
+
   100% {
     opacity: 1;
     transform: scale(1);
   }
 }
+
 .cs-lpr-check path {
   stroke-dasharray: 16;
   stroke-dashoffset: 0;
   animation: cs-lpr-draw 0.4s ease-out both;
   animation-delay: calc(0.78s + var(--cs-i, 0) * 0.13s);
 }
+
 @keyframes cs-lpr-draw {
   from {
     stroke-dashoffset: 16;
@@ -4026,12 +4949,10 @@ body {
 .cs-lpr-beam {
   top: 0;
   height: 46%;
-  background: linear-gradient(
-    to bottom,
-    rgba(124, 92, 255, 0) 0%,
-    rgba(124, 92, 255, 0.14) 70%,
-    rgba(160, 130, 255, 0.4) 100%
-  );
+  background: linear-gradient(to bottom,
+      rgba(124, 92, 255, 0) 0%,
+      rgba(124, 92, 255, 0.14) 70%,
+      rgba(160, 130, 255, 0.4) 100%);
   border-bottom: 1px solid rgba(180, 150, 255, 0.5);
   opacity: 0;
   /* Holds off until the rows have assembled + certified (~2.3s), then re-scans
@@ -4039,17 +4960,21 @@ body {
      only, so it stays on the compositor (no layout/paint thrash, no CWV impact). */
   animation: cs-lpr-scan 9s cubic-bezier(0.5, 0, 0.5, 1) 2.6s infinite;
 }
+
 @keyframes cs-lpr-scan {
   0% {
     transform: translateY(-100%);
     opacity: 0;
   }
+
   2% {
     opacity: 1;
   }
+
   17% {
     opacity: 1;
   }
+
   19%,
   100% {
     transform: translateY(230%);
@@ -4059,22 +4984,23 @@ body {
 
 /* Slow diagonal sheen across the glass. */
 .cs-lpr-sheen {
-  background: linear-gradient(
-    105deg,
-    transparent 40%,
-    rgba(255, 255, 255, 0.06) 50%,
-    transparent 60%
-  );
+  background: linear-gradient(105deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.06) 50%,
+      transparent 60%);
   background-size: 240% 100%;
   background-position: 130% 0;
   mix-blend-mode: screen;
   animation: cs-lpr-sheen 7s ease-in-out 2.4s infinite;
 }
+
 @keyframes cs-lpr-sheen {
+
   0%,
   20% {
     background-position: 130% 0;
   }
+
   60%,
   100% {
     background-position: -40% 0;
@@ -4085,12 +5011,15 @@ body {
 .cs-lpr-bloom {
   animation: cs-lpr-bloom 8s ease-in-out infinite;
 }
+
 @keyframes cs-lpr-bloom {
+
   0%,
   100% {
     opacity: 0.85;
     transform: scale(1);
   }
+
   50% {
     opacity: 1;
     transform: scale(1.05);
@@ -4104,6 +5033,7 @@ body {
 .cs-lpr-dot {
   position: relative;
 }
+
 .cs-lpr-dot::after {
   content: "";
   position: absolute;
@@ -4112,11 +5042,13 @@ body {
   box-shadow: 0 0 0 1.5px rgba(52, 216, 163, 0.5);
   animation: cs-lpr-dot 2.4s ease-out infinite;
 }
+
 @keyframes cs-lpr-dot {
   0% {
     transform: scale(1);
     opacity: 0.7;
   }
+
   70%,
   100% {
     transform: scale(2.6);
@@ -4132,23 +5064,28 @@ body {
     cs-lpr-bob var(--cs-bob-dur, 6s) ease-in-out var(--cs-bob-delay, 2s) infinite;
   will-change: transform;
 }
+
 @keyframes cs-lpr-float-in {
   from {
     opacity: 0;
     transform: translateY(14px) scale(0.94);
   }
 }
+
 @keyframes cs-lpr-bob {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-5px);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .cs-lpr-row,
   .cs-lpr-bar,
   .cs-lpr-num,
@@ -4162,9 +5099,11 @@ body {
   .cs-lpr-float {
     animation: none !important;
   }
+
   .cs-lpr-beam {
     opacity: 0;
   }
+
   /* No resting ring around the dots when motion is off. */
   .cs-lpr-dot::after {
     opacity: 0;
@@ -4174,37 +5113,87 @@ body {
 /* ─── Global Presence Map animations ──────────────────────────────────────── */
 
 @keyframes cs-map-pulse {
-  0%   { transform: scale(1);   opacity: 0.65; }
-  70%  { transform: scale(2.6); opacity: 0; }
-  100% { transform: scale(2.6); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.65;
+  }
+
+  70% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
 }
 
 @keyframes cs-map-arc-draw {
-  from { stroke-dashoffset: 600; }
-  to   { stroke-dashoffset: 0; }
+  from {
+    stroke-dashoffset: 600;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 @keyframes cs-map-marker-in {
-  from { transform: scale(0); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 @keyframes cs-map-tooltip-in {
-  from { opacity: 0; transform: translate(-50%, calc(-100% - 20px)); }
-  to   { opacity: 1; transform: translate(-50%, calc(-100% - 12px)); }
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-100% - 20px));
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, calc(-100% - 12px));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cs-map-pulse-ring   { animation: none !important; opacity: 0 !important; }
-  .cs-map-arc          { animation: none !important; stroke-dashoffset: 0 !important; }
-  .cs-map-marker       { animation: none !important; }
-  .cs-map-tooltip      { animation: none !important; }
+  .cs-map-pulse-ring {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+
+  .cs-map-arc {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+
+  .cs-map-marker {
+    animation: none !important;
+  }
+
+  .cs-map-tooltip {
+    animation: none !important;
+  }
 }
 
 /* ── GlobalPresence network map ──────────────────────────────────────────── */
 @keyframes gp-svg-pulse {
-  0%   { transform: scale(0.8); opacity: 0.6; }
-  100% { transform: scale(2.6); opacity: 0;   }
+  0% {
+    transform: scale(0.8);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
 }
 
 .gp-svg-pulse {
@@ -4214,5 +5203,8 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .gp-svg-pulse { animation: none !important; opacity: 0 !important; }
+  .gp-svg-pulse {
+    animation: none !important;
+    opacity: 0 !important;
+  }
 }

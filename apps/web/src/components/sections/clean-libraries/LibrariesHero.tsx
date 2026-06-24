@@ -1,10 +1,13 @@
-import Image from "next/image";
 import Link from "next/link";
 import { HeroReveal } from "@/components/ui/Reveal";
+import { LibrariesHeroScene } from "./LibrariesHeroScene";
 
 /**
- * Clean Libraries hero — left headline + CTA, 3D dependency-cube image on the right.
- * Shares the product-hero gradient backdrop with CleanSight / CleanStart Images.
+ * Clean Libraries hero — left headline + CTA, with the "dependencies flowing
+ * into the clean container" scene on the right, built entirely in SVG/CSS
+ * (no raster). The scene carries its own glows; the parent applies the slow
+ * `cs-libhero-float` drift. All motion is disabled under prefers-reduced-motion
+ * (see globals.css and LibrariesHeroScene).
  */
 export function LibrariesHero(): React.ReactElement {
   return (
@@ -16,7 +19,7 @@ export function LibrariesHero(): React.ReactElement {
           "linear-gradient(179.996deg, rgb(21,16,33) 25.7%, rgb(16,18,62) 31.16%, rgb(19,30,143) 51%, rgb(71,30,192) 68.71%, rgb(71,31,195) 100%)",
       }}
     >
-      {/* Purple wash behind the cube. */}
+      {/* Purple wash behind the illustration. */}
       <div
         aria-hidden
         className="pointer-events-none select-none absolute hidden md:block"
@@ -77,7 +80,8 @@ export function LibrariesHero(): React.ReactElement {
                   margin: 0,
                 }}
               >
-                Reduce dependency sprawl across your software supply chain.
+                Govern software dependencies with continuous validation and
+                policy enforcement.
               </p>
             </HeroReveal>
 
@@ -97,18 +101,12 @@ export function LibrariesHero(): React.ReactElement {
             </HeroReveal>
           </div>
 
-          {/* Right: 3D dependency cube. */}
-          <div className="relative w-full md:flex-1 flex justify-center md:justify-end">
-            <Image
-              src="/images/clean-libraries/hero-dependency-cube.webp"
-              alt="Wireframe cube of interconnected dependency nodes labelled AI-Introduced, Transitive, and Vulnerable"
-              width={1160}
-              height={886}
-              sizes="(min-width: 1024px) 580px, (min-width: 768px) 50vw, 90vw"
-              className="relative block h-auto w-full max-w-[580px] select-none"
-              priority
-              draggable={false}
-            />
+          {/* Right: dependencies-flowing-into-clean-container scene (pure SVG/CSS).
+              Hidden below md — the cube field needs the horizontal room. */}
+          <div className="relative w-full md:flex-1 hidden md:flex justify-center md:justify-end">
+            <div className="cs-libhero-float relative w-full max-w-[620px]">
+              <LibrariesHeroScene />
+            </div>
           </div>
         </div>
       </div>

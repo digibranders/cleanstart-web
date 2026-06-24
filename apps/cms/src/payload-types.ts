@@ -210,6 +210,7 @@ export interface Config {
       analyticsCachePrune: TaskAnalyticsCachePrune;
       retryDealSync: TaskRetryDealSync;
       purgeDealRegistrations: TaskPurgeDealRegistrations;
+      refreshContentInsights: TaskRefreshContentInsights;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -8770,6 +8771,7 @@ export interface PayloadJob {
           | 'analyticsCachePrune'
           | 'retryDealSync'
           | 'purgeDealRegistrations'
+          | 'refreshContentInsights'
           | 'schedulePublish';
         taskID: string;
         input?:
@@ -8820,6 +8822,7 @@ export interface PayloadJob {
         | 'analyticsCachePrune'
         | 'retryDealSync'
         | 'purgeDealRegistrations'
+        | 'refreshContentInsights'
         | 'schedulePublish'
       )
     | null;
@@ -13410,6 +13413,14 @@ export interface TaskRetryDealSync {
  * via the `definition` "TaskPurgeDealRegistrations".
  */
 export interface TaskPurgeDealRegistrations {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskRefreshContentInsights".
+ */
+export interface TaskRefreshContentInsights {
   input?: unknown;
   output?: unknown;
 }
