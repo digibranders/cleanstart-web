@@ -1,5 +1,10 @@
 import { docPath, normalizePath } from './page-path';
-import type { ContentDocRecord, ContentSnapshot } from './types';
+import type {
+  ContentDocRecord,
+  ContentSnapshot,
+  SnapshotQueryPageRow,
+  SnapshotQueryRow,
+} from './types';
 
 export interface CmsDocInput {
   collection: string;
@@ -33,6 +38,8 @@ export interface BuildSnapshotInput {
   ga4Recent: Ga4Row[];
   ga4Prior: Ga4Row[];
   gsc: GscRow[];
+  queries?: SnapshotQueryRow[];
+  queryPages?: SnapshotQueryPageRow[];
 }
 
 const indexByPath = <T extends { path: string }>(rows: T[]): Map<string, T> => {
@@ -72,5 +79,11 @@ export const buildSnapshot = (input: BuildSnapshotInput): ContentSnapshot => {
       indexedProxy: (g?.impressions ?? 0) > 0,
     });
   }
-  return { capturedAt: input.capturedAt, windows: input.windows, docs };
+  return {
+    capturedAt: input.capturedAt,
+    windows: input.windows,
+    docs,
+    queries: input.queries ?? [],
+    queryPages: input.queryPages ?? [],
+  };
 };

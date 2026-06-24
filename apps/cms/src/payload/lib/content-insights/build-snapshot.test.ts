@@ -50,6 +50,34 @@ describe('buildSnapshot', () => {
     expect(snap.docs[0]).toMatchObject({ sessionsRecent: 0, sessionsPrior: 0, impressions: 0, indexedProxy: false });
   });
 
+  it('passes query and queryPage arrays through onto the snapshot', () => {
+    const snap = buildSnapshot({
+      capturedAt: '2026-06-24T00:00:00.000Z',
+      windows,
+      cmsDocs: [cmsDoc],
+      ga4Recent: [],
+      ga4Prior: [],
+      gsc: [],
+      queries: [{ query: 'sbom', clicks: 10, impressions: 500, ctr: 0.02, position: 8.4 }],
+      queryPages: [{ query: 'sbom', page: '/blogs/sbom-101', clicks: 10, impressions: 500, position: 8.4 }],
+    });
+    expect(snap.queries).toHaveLength(1);
+    expect(snap.queryPages[0]?.page).toBe('/blogs/sbom-101');
+  });
+
+  it('defaults query arrays to empty when omitted', () => {
+    const snap = buildSnapshot({
+      capturedAt: '2026-06-24T00:00:00.000Z',
+      windows,
+      cmsDocs: [cmsDoc],
+      ga4Recent: [],
+      ga4Prior: [],
+      gsc: [],
+    });
+    expect(snap.queries).toEqual([]);
+    expect(snap.queryPages).toEqual([]);
+  });
+
   it('skips CMS docs whose collection has no public path prefix', () => {
     const snap = buildSnapshot({
       capturedAt: '2026-06-24T00:00:00.000Z',
