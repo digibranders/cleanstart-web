@@ -1,0 +1,164 @@
+[
+  {
+    "slug": "breaking-the-migration-barrier",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/6927f82dfd02a70270694e4f_Breaking%20the%20Migration.png",
+    "alt": "",
+    "title": "Breaking the Migration Barrier"
+  },
+  {
+    "slug": "busybox-replacement",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/69c1238dfe8a63306fb7ad11_BusyBox-Replacement.jpg",
+    "alt": "",
+    "title": "BusyBox Replacement"
+  },
+  {
+    "slug": "cis-hardening-as-an-architectural-property",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/696b1e69d14ea138829d7e8a__Architectural-Insight.jpg",
+    "alt": "",
+    "title": "CIS Hardening as an Architectural Property"
+  },
+  {
+    "slug": "cleansight",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/69b7ac438c5278a314429436_Cleansight%20(2).jpg",
+    "alt": "",
+    "title": "CleanSight"
+  },
+  {
+    "slug": "cleanstart-ai-sbom",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/6927e6dfda3c69f983ae20c9_Ai-Sbom.jpg",
+    "alt": "",
+    "title": "CleanStart AI-SBOM"
+  },
+  {
+    "slug": "containing-vulnerabilities-in-your-containers",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/68f23b99816aeb3eb9f532d4_Containing%20Vulnerabilities%20in%20your%20Container.png",
+    "alt": "",
+    "title": "Containing Vulnerabilities in your Containers"
+  },
+  {
+    "slug": "dependency-management-attack-surface-reduction",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/69291fdef4ebeb0091b9364e_Dependency%20Management%20%26%20Attack%20Surface%20Reduction%20.png",
+    "alt": "",
+    "title": "Dependency Management & Attack Surface Reduction"
+  },
+  {
+    "slug": "eliminating-the-security-velocity-trade-off",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/69297d67e30a03c6fe293f32_Eliminating%20the%20security.png",
+    "alt": "",
+    "title": "Eliminating the Security-Velocity Trade - off"
+  },
+  {
+    "slug": "embedding-fips-140-2-compliance-at-the-foundation",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/691311ad2f27a22b80081000_1.jpg",
+    "alt": "",
+    "title": "Embedding FIPS 140-2 Compliance at the Foundation"
+  },
+  {
+    "slug": "enterprise-grade-hardened-container-images",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/68f23b412e74b21304850921_Enterprise%20grade-%20Hardened%20Container%20Images.png",
+    "alt": "",
+    "title": "Enterprise-Grade Hardened Container Images"
+  },
+  {
+    "slug": "fips-140-3-and-the-quantum-imperative",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/691311842a2714ee412d783b_3%20(1).jpg",
+    "alt": "",
+    "title": "FIPS 140-3 and the Quantum Imperative"
+  },
+  {
+    "slug": "fips-compliance",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/69131152ca7b918fef3cda79_2.jpg",
+    "alt": "",
+    "title": "FIPS Compliance"
+  },
+  {
+    "slug": "fips-traces",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/69131490f3f3be92f4091974_4%20(2).jpg",
+    "alt": "",
+    "title": "FIPS Traces"
+  },
+  {
+    "slug": "isolated-package-compilation",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/69ba956f729ae31a4cd7ea2c_Isolated-Package-Compilation.jpg",
+    "alt": "",
+    "title": "Isolated Package Compilation"
+  },
+  {
+    "slug": "replacing-busybox-in-container-images",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/69cca1e28cc544932a2dfcae_New-Thumbnail.jpg",
+    "alt": "",
+    "title": "Replacing BusyBox in Container Images"
+  },
+  {
+    "slug": "rethinking-container-builds-for-security-and-scale",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/68f23ffda0617c2174436763_rethinking%20container%20Builds%20for%20Security%20%26%20bScale.png",
+    "alt": "",
+    "title": "Rethinking Container Builds for Security and Scale"
+  },
+  {
+    "slug": "retrofitting-security-vs-building-it-in",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/69bd2640c7acd24e43e438f4_Retrofitting-Security-vs-Building-It-In-.jpg",
+    "alt": "",
+    "title": "Retrofitting Security vs Building It In"
+  },
+  {
+    "slug": "secure-lightweight-container-images",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/68f23ae6814856515b88f2aa_Secure%20Lightweight.png",
+    "alt": "",
+    "title": "Secure Lightweight Container Images"
+  },
+  {
+    "slug": "securing-the-software-supply-chain-in-2026",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/69416481723e448071330e51_WhatsApp%20Image%202025-12-16%20at%2019.06.33_f20eef54.jpg",
+    "alt": "",
+    "title": "Securing the Software Supply Chain in 2026"
+  },
+  {
+    "slug": "shell-less-and-read-only-container-architecture",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/69cca24888fd128ab230393c_Shell-less%20and%20Read-Only%20Container%20Architecture.jpg",
+    "alt": "",
+    "title": "Shell-less and Read-Only  Container Architecture"
+  },
+  {
+    "slug": "slsa-levels-as-architectural-states-of-trust",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/6969ef3f70a26337f6b1f335_SLSA-Levels-as-Architectural-States-of-Trust.jpg",
+    "alt": "",
+    "title": "SLSA Levels as Architectural States of Trust"
+  },
+  {
+    "slug": "software-bill-of-materials",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/68f23fdd39ac4d03966cfa4c_Software%20Bill%20of%20Materials.png",
+    "alt": "",
+    "title": "Software Bill of Materials "
+  },
+  {
+    "slug": "stig-hardening-by-design",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/69369fa0630ff1603836a7b8_STIG%20HArdening.png",
+    "alt": "",
+    "title": "STIG Hardening by Design"
+  },
+  {
+    "slug": "stig-openscap-compliance-architecture",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/69369ee8160e44a6b6bfd14a_STIG%20%26%20OpenSCAP.png",
+    "alt": "",
+    "title": "STIG & OpenSCAP Compliance Architecture"
+  },
+  {
+    "slug": "the-binary-trust-problem",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/69a97466bc6b4282e7152deb_Cover---Thumbnail.jpg",
+    "alt": "",
+    "title": "The Binary Trust Problem"
+  },
+  {
+    "slug": "the-real-cost-of-public-container-images",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/68f2401b6900d3f30229b0ec_The%20real%20cost%20of%20Public%20container%20Images.png",
+    "alt": "",
+    "title": "The Real Cost of Public Container Images"
+  },
+  {
+    "slug": "vex-and-the-shift-from-vulnerability-presence-to-exploitability",
+    "url": "https://cdn.prod.website-files.com/6895a064b2f1e141dcbf7da9/6969ef8b983f81c6c0a1682e_VEX-and-the-Shift-From-Vulnerability-Presence-to-Exploitability.jpg",
+    "alt": "",
+    "title": "VEX and the Shift From Vulnerability Presence to Exploitability"
+  }
+]
