@@ -4,7 +4,12 @@ import { useEffect, useState } from 'react';
 import type { ReactElement } from 'react';
 
 import type { ContentInsightsResponse } from '../../../lib/content-insights/types';
+import { AttributionPanel } from './AttributionPanel';
 import { DecayQueue } from './DecayQueue';
+import { IndexationRollup } from './IndexationRollup';
+import { Leaderboards } from './Leaderboards';
+import { OrphanAudit } from './OrphanAudit';
+import { VelocityPanel } from './VelocityPanel';
 
 export function ContentInsightsClient(): ReactElement {
   const [data, setData] = useState<ContentInsightsResponse | null>(null);
@@ -49,6 +54,11 @@ export function ContentInsightsClient(): ReactElement {
       {state === 'ready' && data?.sections && (
         <div className="cs-content-insights__sections">
           <DecayQueue rows={data.sections.decay} />
+          <Leaderboards data={data.sections.leaderboards} />
+          <OrphanAudit rows={data.sections.orphans} />
+          <IndexationRollup rows={data.sections.indexation} />
+          <VelocityPanel buckets={data.sections.velocity} />
+          <AttributionPanel rows={data.sections.attribution} configured={data.keyEventsConfigured} />
         </div>
       )}
     </div>
