@@ -7,7 +7,7 @@ import { buildClient } from '../integrations/kinds/ga4-data-api';
 import { getGscCredentialsFromRow } from '../integrations/kinds/gsc-search-analytics';
 import { findRowsOfKind } from '../integrations/kinds/types';
 import { buildSnapshot, type CmsDocInput, type Ga4Row, type GscRow } from './build-snapshot';
-import type { ContentSnapshot } from './types';
+import type { ContentSnapshot, SnapshotQueryPageRow, SnapshotQueryRow } from './types';
 
 const RECENT_DAYS = 28;
 const GSC_DAYS = 90;
@@ -93,6 +93,44 @@ const fetchGscPages = async (creds: GscCredentials | null): Promise<GscRow[]> =>
   }));
 };
 
+const fetchGscQueries = async (creds: GscCredentials | null): Promise<SnapshotQueryRow[]> => {
+  if (!creds) return [];
+  const c = gscClient(creds);
+  const end = new Date();
+  const start = new Date(end.getTime() - GSC_DAYS * 86400000);
+  const fmt = (d: Date): string => d.toISOString().slice(0, 10);
+  const resp = await c.searchanalytics.query({
+    siteUrl: creds.siteUrl,
+    requestBody: { startDate: fmt(start), endDate: fmt(end), dimensions: ['query'], rowLimit: 1000 },
+  });
+  return (resp.data.rows ?? []).map((r) => ({
+    query: r.keys?.[0] ?? '',
+    clicks: r.clicks ?? 0,
+    impressions: r.impressions ?? 0,
+    ctr: r.ctr ?? 0,
+    position: r.position ?? 0,
+  }));
+};
+
+const fetchGscQueryPages = async (creds: GscCredentials | null): Promise<SnapshotQueryPageRow[]> => {
+  if (!creds) return [];
+  const c = gscClient(creds);
+  const end = new Date();
+  const start = new Date(end.getTime() - GSC_DAYS * 86400000);
+  const fmt = (d: Date): string => d.toISOString().slice(0, 10);
+  const resp = await c.searchanalytics.query({
+    siteUrl: creds.siteUrl,
+    requestBody: { startDate: fmt(start), endDate: fmt(end), dimensions: ['query', 'page'], rowLimit: 2000 },
+  });
+  return (resp.data.rows ?? []).map((r) => ({
+    query: r.keys?.[0] ?? '',
+    page: r.keys?.[1] ?? '',
+    clicks: r.clicks ?? 0,
+    impressions: r.impressions ?? 0,
+    position: r.position ?? 0,
+  }));
+};
+
 const fetchCmsDocs = async (payload: BasePayload): Promise<CmsDocInput[]> => {
   const out: CmsDocInput[] = [];
   for (const collection of CONTENT_COLLECTIONS) {
@@ -135,10 +173,12 @@ export const fetchContentSnapshot = async (payload: BasePayload): Promise<Conten
   const gscCreds =
     gscRows.map((r) => getGscCredentialsFromRow(r)).find((c): c is GscCredentials => c !== null) ?? null;
 
-  const [ga4Recent, ga4Prior, gsc, cmsDocs] = await Promise.all([
+  const [ga4Recent, ga4Prior, gsc, queries, queryPages, cmsDocs] = await Promise.all([
     fetchGa4Pages(ga4Creds, `${RECENT_DAYS}daysAgo`, 'today'),
     fetchGa4Pages(ga4Creds, `${RECENT_DAYS * 2}daysAgo`, `${RECENT_DAYS + 1}daysAgo`),
     fetchGscPages(gscCreds),
+    fetchGscQueries(gscCreds),
+    fetchGscQueryPages(gscCreds),
     fetchCmsDocs(payload),
   ]);
 
@@ -149,5 +189,7 @@ export const fetchContentSnapshot = async (payload: BasePayload): Promise<Conten
     ga4Recent,
     ga4Prior,
     gsc,
+    queries,
+    queryPages,
   });
 };
