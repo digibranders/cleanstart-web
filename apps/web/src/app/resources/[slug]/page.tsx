@@ -5,7 +5,6 @@ import { Footer } from "@/components/sections/Footer";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { ResourceDetailHero } from "@/components/sections/resource/ResourceDetailHero";
 import { ResourceDetailContent } from "@/components/sections/resource/ResourceDetailContent";
-import { ResourceDetailLeadCapture } from "@/components/sections/resource/ResourceDetailLeadCapture";
 import {
   getResourceBySlug,
   getResourceBySlugDraft,
@@ -147,7 +146,7 @@ export async function renderResourceDetail({
         </FadeUp>
 
       </main>
-      <Footer cta={<ResourceDetailLeadCapture resource={resource} />} />
+      <Footer />
     </>
   );
 }

@@ -21,7 +21,7 @@ export function ResourceDetailHero({
 
   return (
     <section
-      className="relative overflow-hidden min-h-[440px] lg:min-h-[519px]"
+      className="relative overflow-hidden min-h-[400px] lg:min-h-[460px]"
       aria-labelledby="rd-hero-title"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -113,7 +113,7 @@ export function ResourceDetailHero({
         </div>
 
         <div
-          className="flex justify-center mt-6 lg:mt-[30px] pb-12 lg:pb-20"
+          className="flex justify-center mt-6 lg:mt-[30px] pb-8 lg:pb-12"
         >
           <ResourceDownloadButton
             resourceId={resource.id}

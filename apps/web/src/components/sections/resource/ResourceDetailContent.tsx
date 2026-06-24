@@ -29,7 +29,7 @@ export function ResourceDetailContent({
 
   return (
     <section
-      className="relative pt-8 pb-section-cta lg:pt-12"
+      className="relative pt-4 pb-section-lg lg:pt-6"
       style={{ zIndex: 1 }}
       aria-label="Resource content"
     >

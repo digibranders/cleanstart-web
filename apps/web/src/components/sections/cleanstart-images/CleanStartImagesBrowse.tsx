@@ -9,7 +9,7 @@ type TrustCard = {
 
 const TRUST_CARDS: TrustCard[] = [
   {
-    title: "Transperent Origins",
+    title: "Trusted Origins",
     body: "Rebuilt from trusted upstream software.",
     iconSrc: "/images/cleanstart-images/trust-icon-trusted-source.svg",
   },
