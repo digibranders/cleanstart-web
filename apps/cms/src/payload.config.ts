@@ -94,6 +94,7 @@ import { purgeSearchLogTask } from './payload/jobs/purge-search-log';
 import { reindexMeiliTask } from './payload/jobs/reindex-meili';
 import { retryWebhookTask } from './payload/jobs/retry-webhook';
 import { analyticsCachePruneTask } from './payload/jobs/analytics-cache-prune';
+import { refreshContentInsightsTask } from './payload/jobs/refresh-content-insights';
 import { dashboardRefreshDailyTask } from './payload/jobs/dashboard-refresh-daily';
 import { dashboardRefreshFrequentTask } from './payload/jobs/dashboard-refresh-frequent';
 import { registerLeadHandlers } from './payload/lib/lead-handlers';
@@ -462,6 +463,7 @@ export default buildConfig({
       analyticsCachePruneTask,
       retryDealSyncTask,
       purgeDealRegistrationsTask,
+      refreshContentInsightsTask,
     ],
     autoRun: [
       {
@@ -519,6 +521,10 @@ export default buildConfig({
       {
         cron: '30 3 * * *', // daily at 03:30 UTC — deal-registration PII 365-day redaction
         queue: 'dealRegistrationsPurge',
+      },
+      {
+        cron: '30 6 * * *', // daily at 06:30 UTC — content-insights snapshot rebuild (after GSC daily refresh)
+        queue: 'contentInsightsRefresh',
       },
       {
         cron: '* * * * *', // every minute — Payload built-in schedulePublish jobs land in the `default` queue; wait_until gates actual execution
