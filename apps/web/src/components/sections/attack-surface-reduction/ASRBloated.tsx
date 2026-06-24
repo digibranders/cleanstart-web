@@ -7,26 +7,26 @@ const CARDS = [
   {
     id: 'tl',
     mobileOrder: 0,
-    title: 'Inherited Vulnerabilities',
-    description: 'Risk exist before application code is added.',
+    title: 'Hidden Risk',
+    description: 'Risk arrives through dependencies.',
   },
   {
     id: 'tr',
     mobileOrder: 2,
-    title: 'Too Many Components',
-    description: 'Public images include packages most workloads never use.',
+    title: 'Component Sprawl',
+    description: 'Most software ships with unnecessary components.',
   },
   {
     id: 'bl',
     mobileOrder: 1,
-    title: "Oversized SBOM's",
-    description: 'More components to track, justify, and audit.',
+    title: 'Inventory Overload',
+    description: 'Larger software inventories increase complexity.',
   },
   {
     id: 'br',
     mobileOrder: 3,
-    title: 'Constant Patching',
-    description: 'The same base issues reappear release after release.',
+    title: 'Endless Patching',
+    description: 'More software means more maintenance.',
   },
 ] as const;
 
@@ -46,7 +46,7 @@ export function ASRBloated(): React.ReactElement {
             marginBottom: 'clamp(24px, 2.5vw, 48px)',
           }}
         >
-          <span className="block">Public Images Are</span>
+          <span className="block">Modern Software Ships</span>
           <span
             className="block"
             style={{
@@ -58,7 +58,7 @@ export function ASRBloated(): React.ReactElement {
               letterSpacing: '-1.4px',
             }}
           >
-            bloated
+            Too Much
           </span>
         </h2>
         </Reveal>

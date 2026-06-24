@@ -107,7 +107,7 @@ export function FipsHero(): React.ReactElement {
                 marginBottom: "clamp(16px, 1.67vw, 24px)",
               }}
             >
-              FIPS-Validated. Always Verified.
+              Simplify FIPS 140-3 Compliance
             </h1>
           </HeroReveal>
 
@@ -124,8 +124,8 @@ export function FipsHero(): React.ReactElement {
                 marginBottom: "clamp(24px, 2.22vw, 32px)",
               }}
             >
-              Built on validated cryptographic foundations for secure, compliant
-              container environments
+              Deploy validated cryptographic foundations without rebuilding your
+              software stack.
             </p>
           </HeroReveal>
 

@@ -12,29 +12,36 @@ interface Integration {
 
 const INTEGRATIONS: Integration[] = [
   {
-    title: 'Drop-in Images',
-    desc: 'Works with existing workflows.',
-    icon: '/images/attack-surface-reduction/dropin-images-icon.webp',
-    iconAlt: 'Monitor icon',
-    iconWidth: 96,
-    iconHeight: 96,
+    title: 'Platform Engineering',
+    desc: 'Smaller foundations. Faster delivery.',
+    icon: '/images/attack-surface-reduction/team-platform-engineering.webp',
+    iconAlt: 'Platform engineering icon',
+    iconWidth: 128,
+    iconHeight: 128,
   },
   {
-    title: 'Pipeline Compatible',
-    desc: 'Integrates into CI/CD environments.',
-    icon: '/images/attack-surface-reduction/pipeline.webp',
-    iconAlt: 'CI/CD pipeline icon',
-    // Cropped landscape artwork (~2.1:1) — intrinsic ratio for the reserved box.
-    iconWidth: 201,
-    iconHeight: 96,
+    title: 'DevSecOps Teams',
+    desc: 'Reduce exposure before deployment.',
+    icon: '/images/attack-surface-reduction/team-devsecops.webp',
+    iconAlt: 'DevSecOps icon',
+    iconWidth: 128,
+    iconHeight: 128,
   },
   {
-    title: 'Deploy Anywhere',
-    desc: 'Cloud, on-prem, or regulated environments.',
-    icon: '/images/attack-surface-reduction/deploy-icon.webp',
-    iconAlt: 'Deploy icon',
-    iconWidth: 96,
-    iconHeight: 96,
+    title: 'Security Teams',
+    desc: 'Lower inherited software risk.',
+    icon: '/images/attack-surface-reduction/team-security.webp',
+    iconAlt: 'Security team icon',
+    iconWidth: 128,
+    iconHeight: 128,
+  },
+  {
+    title: 'Compliance Teams',
+    desc: 'Simplify reviews and audits.',
+    icon: '/images/attack-surface-reduction/team-compliance.webp',
+    iconAlt: 'Compliance team icon',
+    iconWidth: 128,
+    iconHeight: 128,
   },
 ];
 
@@ -57,12 +64,12 @@ export function ASRFits(): React.ReactElement {
                 color: '#111111',
               }}
             >
-              Fits into what you've <span className="cs-text-gradient-impact">already built</span>
+              Benefits <span className="cs-text-gradient-impact">Across Teams</span>
             </h2>
           </Reveal>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3" style={{ gap: '24px' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" style={{ gap: '24px' }}>
           {INTEGRATIONS.map((item) => (
             <div
               key={item.title}

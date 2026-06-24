@@ -1,6 +1,6 @@
 'use client';
 
-import { useField } from '@payloadcms/ui';
+import { useField, useFormFields } from '@payloadcms/ui';
 import type { ChangeEvent, DragEvent, ReactElement } from 'react';
 import {
   useCallback,
@@ -180,6 +180,18 @@ export const MediaField = (props: Props): ReactElement => {
 
   const { value, setValue } = useField<string | undefined | null>({ path });
 
+  // Host-document title (or name) — sent as the `x-media-context-hint`
+  // header on upload so the Media collection's filename hook can name the
+  // R2 key after the page (e.g. `cleanstart-named-winner-…-<hash>.webp`)
+  // instead of a junk export name like `whatsapp-image-2026-06-24-…`.
+  // The hint only wins when the uploaded filename carries no semantics
+  // (see `pickSlugSource` / `looksLikeJunkSlug`), so a deliberately-named
+  // file (`sbom-coverage-diagram.png`) keeps its name.
+  const contextHint = useFormFields(([fields]) => {
+    const raw = fields?.title?.value ?? fields?.name?.value;
+    return typeof raw === 'string' ? raw.trim() : '';
+  });
+
   const [doc, setDoc] = useState<MediaDoc | null>(null);
   const [docLoading, setDocLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -325,10 +337,11 @@ export const MediaField = (props: Props): ReactElement => {
       };
       xhr.open('POST', '/api/media');
       xhr.setRequestHeader('Accept', 'application/json');
+      if (contextHint) xhr.setRequestHeader('x-media-context-hint', contextHint);
       xhr.withCredentials = true;
       xhr.send(fd);
     },
-    [acceptedMimes, folderHint, setValue],
+    [acceptedMimes, contextHint, folderHint, setValue],
   );
 
   const onPickFile = useCallback(
@@ -430,32 +443,38 @@ export const MediaField = (props: Props): ReactElement => {
     try {
       // POST to /rename moves the R2 object and updates media.url in a
       // single atomic operation — a bare PATCH would only update the DB
-      // column, leaving the storage object at the old key (broken URL).
-      // The stem is the filename without extension; the endpoint appends
-      // the original extension automatically.
-      const dotIdx = next.lastIndexOf('.');
-      const stem = dotIdx > 0 ? next.slice(0, dotIdx) : next;
+      // column, leaving the storage object at the old key (broken URL),
+      // and is blocked by the `rejectFilenameRename` beforeChange hook.
+      // The endpoint takes the new filename WITHOUT extension as
+      // `filename`, slugifies it, and reattaches the original extension.
       const res = await fetch(`/api/media/${doc.id}/rename`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ stem }),
+        body: JSON.stringify({ filename: stem }),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = (await res.json()) as { ok?: boolean; filename?: string; doc?: MediaDoc; error?: string };
-      if (!json.ok) throw new Error(json.error ?? 'Rename failed');
-      if (json.doc) setDoc(json.doc);
-      else {
-        // Fall back to a fresh fetch so the URL is read from storage truth.
-        const refetch = await fetch(`/api/media/${doc.id}?depth=0`, {
-          credentials: 'include',
-        });
-        if (refetch.ok) setDoc((await refetch.json()) as MediaDoc);
+      const json = (await res.json().catch(() => null)) as
+        | { ok?: boolean; filename?: string; error?: string }
+        | null;
+      if (!res.ok || !json?.ok) {
+        const reason =
+          json?.error === 'filename_taken'
+            ? 'That filename is already used by another media item.'
+            : json?.error === 'storage_unavailable'
+              ? 'Storage is unavailable. Try again in a moment.'
+              : 'Could not rename file. Please try again.';
+        throw new Error(reason);
       }
+      // The endpoint returns the new filename, not the full doc — refetch
+      // so the URL and meta are read from storage truth.
+      const refetch = await fetch(`/api/media/${doc.id}?depth=0`, {
+        credentials: 'include',
+      });
+      if (refetch.ok) setDoc((await refetch.json()) as MediaDoc);
       setEditingFilename(false);
       setError(null);
-    } catch {
-      setError('Could not rename file. The original filename is still in use.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not rename file.');
     } finally {
       setFilenameSaving(false);
     }

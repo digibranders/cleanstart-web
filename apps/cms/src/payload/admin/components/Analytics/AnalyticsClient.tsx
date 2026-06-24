@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ReactElement } from 'react';
 
 import type {
@@ -14,6 +14,7 @@ import { FilterBar } from './FilterBar';
 import { KpiCards } from './KpiCards';
 import { PositionHistogram } from './PositionHistogram';
 import { RealtimeWidget } from './RealtimeWidget';
+import { RefreshButton } from './RefreshButton';
 import { Sparkline } from './Sparkline';
 import { Split } from './Split';
 import { TopList } from './TopList';
@@ -31,67 +32,77 @@ export function AnalyticsClient(): ReactElement {
   const [state, setState] = useState<LoadState>('loading');
   const [gsc, setGsc] = useState<GscOverviewPayload | null>(null);
   const [gscState, setGscState] = useState<LoadState>('loading');
+  const [capturedAt, setCapturedAt] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  // Epoch guards: ignore a slower in-flight response once a newer load started
+  // (prevents a stale filter's result from overwriting the current one).
+  const ga4Epoch = useRef(0);
+  const gscEpoch = useRef(0);
 
-  useEffect(() => {
-    let cancelled = false;
-    setState('loading');
-    const qs = new URLSearchParams({ window: filters.window });
-    if (filters.country) qs.set('country', filters.country);
-    if (filters.collection) qs.set('collection', filters.collection);
-    fetch(`/api/dashboards/ga4-overview?${qs.toString()}`, { credentials: 'include' })
-      .then((r) => r.json())
-      .then((j) => {
-        if (cancelled) return;
-        if (!j.ok) {
-          setState('error');
-          return;
-        }
-        if (!j.configured) {
-          setState('unconfigured');
-          return;
-        }
+  const loadGa4 = useCallback(
+    async (force: boolean): Promise<void> => {
+      const epoch = ++ga4Epoch.current;
+      setState('loading');
+      const qs = new URLSearchParams({ window: filters.window });
+      if (filters.country) qs.set('country', filters.country);
+      if (filters.collection) qs.set('collection', filters.collection);
+      if (force) qs.set('refresh', '1');
+      try {
+        const res = await fetch(`/api/dashboards/ga4-overview?${qs.toString()}`, { credentials: 'include' });
+        const j = await res.json();
+        if (epoch !== ga4Epoch.current) return;
+        if (!j.ok) return setState('error');
+        if (!j.configured) return setState('unconfigured');
         setData(j.payload as Ga4OverviewPayload);
+        setCapturedAt((j.capturedAt as string | null) ?? null);
         setState('ready');
-      })
-      .catch(() => {
-        if (!cancelled) setState('error');
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [filters]);
+      } catch {
+        if (epoch === ga4Epoch.current) setState('error');
+      }
+    },
+    [filters],
+  );
 
-  useEffect(() => {
-    let cancelled = false;
-    setGscState('loading');
-    fetch(`/api/dashboards/gsc-overview?window=${filters.window}`, { credentials: 'include' })
-      .then((r) => r.json())
-      .then((j) => {
-        if (cancelled) return;
-        if (!j.ok) {
-          setGscState('error');
-          return;
-        }
-        if (!j.configured) {
-          setGscState('unconfigured');
-          return;
-        }
+  const loadGsc = useCallback(
+    async (force: boolean): Promise<void> => {
+      const epoch = ++gscEpoch.current;
+      setGscState('loading');
+      const qs = new URLSearchParams({ window: filters.window });
+      if (force) qs.set('refresh', '1');
+      try {
+        const res = await fetch(`/api/dashboards/gsc-overview?${qs.toString()}`, { credentials: 'include' });
+        const j = await res.json();
+        if (epoch !== gscEpoch.current) return;
+        if (!j.ok) return setGscState('error');
+        if (!j.configured) return setGscState('unconfigured');
         setGsc(j.payload as GscOverviewPayload);
         setGscState('ready');
-      })
-      .catch(() => {
-        if (!cancelled) setGscState('error');
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [filters.window]);
+      } catch {
+        if (epoch === gscEpoch.current) setGscState('error');
+      }
+    },
+    [filters.window],
+  );
+
+  useEffect(() => {
+    void loadGa4(false);
+  }, [loadGa4]);
+
+  useEffect(() => {
+    void loadGsc(false);
+  }, [loadGsc]);
+
+  const handleRefresh = useCallback((): void => {
+    setRefreshing(true);
+    void Promise.all([loadGa4(true), loadGsc(true)]).finally(() => setRefreshing(false));
+  }, [loadGa4, loadGsc]);
 
   return (
     <div className="cs-analytics">
       <header className="cs-analytics__head">
         <h1>Analytics</h1>
         <RealtimeWidget />
+        <RefreshButton onClick={handleRefresh} busy={refreshing} updatedAt={capturedAt} />
       </header>
       <FilterBar
         filters={filters}

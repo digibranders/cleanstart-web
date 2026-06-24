@@ -86,8 +86,8 @@ export function ASRHero(): React.ReactElement {
                     margin: 0,
                   }}
                 >
-                  <span className="block">Bigger Images,</span>
-                  <span className="block">Bigger Risk</span>
+                  <span className="block">More Components.</span>
+                  <span className="block">More Exposure.</span>
                 </h1>
               </HeroReveal>
 
@@ -104,8 +104,8 @@ export function ASRHero(): React.ReactElement {
                     margin: 0,
                   }}
                 >
-                  CleanStart Images reduce attack surface by eliminating unnecessary components before
-                  they enter production.
+                  Reduce attack surface by eliminating unnecessary software components before they
+                  reach production.
                 </p>
               </HeroReveal>
             </div>

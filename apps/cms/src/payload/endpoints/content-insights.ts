@@ -47,8 +47,9 @@ export const contentInsightsEndpoint: Endpoint = {
     if (!hasAnyRole(req.user, ['admin', 'editor'])) {
       return json({ ok: false, error: 'forbidden' }, { status: 403 });
     }
+    const force = req.searchParams?.get?.('refresh') === '1';
     const cached = await readCache<ContentSnapshot>(req.payload, 'ga4DataApi', 'global', SNAPSHOT_KEY);
-    if (cached && !isStale(cached, SNAPSHOT_TTL_MS)) {
+    if (cached && !force && !isStale(cached, SNAPSHOT_TTL_MS)) {
       const snap = cached.payload;
       return json({
         ok: true,

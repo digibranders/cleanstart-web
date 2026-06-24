@@ -8,6 +8,7 @@ import {
   shortHash,
   stripVendorAssetIdPrefix,
 } from './media-filename';
+import { slugify } from './slugify';
 import { ALLOWED_MIME_TYPES } from './upload-limits';
 
 describe('shortHash', () => {
@@ -96,6 +97,39 @@ describe('buildMediaFilename', () => {
     const slugPart = name.split('-').slice(0, -1).join('-');
     expect(slugPart.length).toBeLessThanOrEqual(10);
     expect(slugPart.endsWith('-')).toBe(false);
+  });
+
+  it('truncates a long title at a word boundary, never mid-word', () => {
+    const title =
+      'CleanStart Named Winner in Software Supply Chain Security at the 2026 Cybersecurity Stars Awards';
+    const name = buildMediaFilename({
+      slugSource: title,
+      bytes,
+      ext: 'webp',
+      hashOverride: 'deadbeef',
+    });
+    const slug = name.replace(/-deadbeef\.webp$/, '');
+    expect(slug.length).toBeLessThanOrEqual(64);
+    // Every segment is a whole word from the source — no partial like "secur".
+    const sourceWords = new Set(slugify(title).split('-'));
+    for (const seg of slug.split('-')) {
+      expect(sourceWords.has(seg)).toBe(true);
+    }
+    // Must not end on a dangling connector word.
+    expect(['at', 'the', 'in', 'of', 'to', 'and', 'for', 'on']).not.toContain(
+      slug.split('-').pop(),
+    );
+  });
+
+  it('keeps a single over-long word as a hard cut (no word boundary available)', () => {
+    const name = buildMediaFilename({
+      slugSource: 'a'.repeat(100),
+      bytes,
+      ext: 'webp',
+      maxSlugLen: 10,
+      hashOverride: 'deadbeef',
+    });
+    expect(name).toBe(`${'a'.repeat(10)}-deadbeef.webp`);
   });
 
   it('falls back to "asset" when slug source is unrepresentable', () => {
@@ -211,6 +245,26 @@ describe('looksLikeJunkSlug', () => {
     'Untitled',
     'Untitled-1',
     'screenshot 2026-05-04 at 12.13',
+    'Screen Shot 2026-05-04 at 12.13',
+    'Whatsapp image 2026 06 24 at 12 15 30',
+    'WhatsApp Image 2026-06-24 at 12.15.30',
+    'whatsapp-image-2026-06-24',
+    'WhatsApp Video 2026-06-24',
+    'DSC_0001',
+    'DSCN1234',
+    'Pxl 20240101 120000',
+    'MVIMG_20240101',
+    'VID_20240101',
+    'Fb img 20240101',
+    'Signal 2026 01 01',
+    'Telegram photo',
+    'received 1700000000000',
+    'unnamed',
+    'unnamed (1)',
+    'download',
+    'download (2)',
+    'Photo on 2026-01-01 at 09.00',
+    '20240101 120000',
     'a1b2c3d4e5f6',
     '00000',
     '',
@@ -225,6 +279,11 @@ describe('looksLikeJunkSlug', () => {
     'Dhanush VM portrait',
     'Hero illustration for the resource',
     'attack-surface-diagram',
+    'photography-tips',
+    'file-structure-diagram',
+    'download-guide',
+    'new-relic-integration',
+    'images-and-containers',
   ])('accepts %s as meaningful', (input) => {
     expect(looksLikeJunkSlug(input)).toBe(false);
   });
@@ -251,6 +310,16 @@ describe('pickSlugSource', () => {
         contextHint: 'blog-getting-started-inline',
       }),
     ).toBe('blog-getting-started-inline');
+  });
+
+  it('prefers the host-doc title over a WhatsApp export filename', () => {
+    expect(
+      pickSlugSource({
+        alt: '',
+        filename: 'Whatsapp image 2026 06 24 at 12 15 30',
+        contextHint: 'CleanStart Named Winner in Software Supply Chain Security',
+      }),
+    ).toBe('CleanStart Named Winner in Software Supply Chain Security');
   });
 
   it('uses junk alt as last-resort when nothing else is available', () => {

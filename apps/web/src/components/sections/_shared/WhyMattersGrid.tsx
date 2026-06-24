@@ -55,13 +55,19 @@ export interface WhyMattersGridProps {
   /** Render the hex-grid blob at the bottom-left corner at reduced opacity.
    *  Used on ASRApproach where the rest of the decoration is suppressed. */
   showBottomLeftGrid?: boolean;
+  /** Colour scheme. Defaults to 'light'. 'dark' paints an opaque dark-indigo
+   *  background and flips heading/card/divider colours for a dark section. */
+  theme?: 'light' | 'dark';
 }
 
-// Divider gradients — fade in from the edges, 20%→80% solid.
-const DIVIDER_H =
-  'linear-gradient(to right, transparent 0%, #d9d9d9 20%, #d9d9d9 80%, transparent 100%)';
-const DIVIDER_V =
-  'linear-gradient(to bottom, transparent 0%, #d9d9d9 20%, #d9d9d9 80%, transparent 100%)';
+// Divider gradients — fade in from the edges, 20%→80% solid. Colour swaps with theme.
+function dividerGradients(theme: 'light' | 'dark'): { horizontal: string; vertical: string } {
+  const c = theme === 'dark' ? 'rgba(255,255,255,0.14)' : '#d9d9d9';
+  return {
+    horizontal: `linear-gradient(to right, transparent 0%, ${c} 20%, ${c} 80%, transparent 100%)`,
+    vertical: `linear-gradient(to bottom, transparent 0%, ${c} 20%, ${c} 80%, transparent 100%)`,
+  };
+}
 
 // Default crop for cards that don't ship per-card positioning.
 const DEFAULT_IMG_STYLE: React.CSSProperties = {
@@ -72,7 +78,15 @@ const DEFAULT_IMG_STYLE: React.CSSProperties = {
   objectFit: 'contain',
 };
 
-function DesktopCard({ imgSrc, imgAlt, imgStyle, title, desc }: WhyCard): React.ReactElement {
+function DesktopCard({
+  imgSrc,
+  imgAlt,
+  imgStyle,
+  title,
+  desc,
+  theme = 'light',
+}: WhyCard & { theme?: 'light' | 'dark' }): React.ReactElement {
+  const dark = theme === 'dark';
   return (
     <div className="flex items-center" style={{ gap: 'clamp(16px, 1.67vw, 24px)' }}>
       <div
@@ -118,7 +132,7 @@ function DesktopCard({ imgSrc, imgAlt, imgStyle, title, desc }: WhyCard): React.
             fontWeight: 700,
             letterSpacing: '-0.04em',
             lineHeight: 1.1,
-            color: '#111111',
+            color: dark ? '#ffffff' : '#111111',
             margin: 0,
           }}
         >
@@ -131,7 +145,7 @@ function DesktopCard({ imgSrc, imgAlt, imgStyle, title, desc }: WhyCard): React.
             fontWeight: 400,
             letterSpacing: '-0.02em',
             lineHeight: 1.4,
-            color: '#333333',
+            color: dark ? 'rgba(255,255,255,0.72)' : '#333333',
             margin: 0,
           }}
         >
@@ -142,15 +156,26 @@ function DesktopCard({ imgSrc, imgAlt, imgStyle, title, desc }: WhyCard): React.
   );
 }
 
-function MobileCard({ imgSrc, imgAlt, mobileImgStyle, title, desc }: WhyCard): React.ReactElement {
+function MobileCard({
+  imgSrc,
+  imgAlt,
+  mobileImgStyle,
+  title,
+  desc,
+  theme = 'light',
+}: WhyCard & { theme?: 'light' | 'dark' }): React.ReactElement {
+  const dark = theme === 'dark';
   return (
     <div
-      className="relative bg-white flex flex-col items-center"
+      className="relative flex flex-col items-center"
       style={{
         borderRadius: '24px',
         padding: '20px 24px 28px',
-        boxShadow:
-          '0 1px 2px rgba(17, 17, 17, 0.04), 0 12px 32px -8px rgba(17, 17, 17, 0.06)',
+        background: dark ? 'rgba(255,255,255,0.05)' : '#ffffff',
+        border: dark ? '1px solid rgba(255,255,255,0.1)' : 'none',
+        boxShadow: dark
+          ? 'none'
+          : '0 1px 2px rgba(17, 17, 17, 0.04), 0 12px 32px -8px rgba(17, 17, 17, 0.06)',
       }}
     >
       <div className="relative shrink-0" aria-hidden style={{ width: '108px', height: '87px' }}>
@@ -198,7 +223,7 @@ function MobileCard({ imgSrc, imgAlt, mobileImgStyle, title, desc }: WhyCard): R
             fontWeight: 600,
             letterSpacing: '-0.05em',
             lineHeight: 1,
-            color: '#000000',
+            color: dark ? '#ffffff' : '#000000',
             margin: 0,
           }}
         >
@@ -211,7 +236,7 @@ function MobileCard({ imgSrc, imgAlt, mobileImgStyle, title, desc }: WhyCard): R
             fontWeight: 400,
             letterSpacing: '-0.04em',
             lineHeight: 1.4,
-            color: 'rgba(17, 17, 17, 0.8)',
+            color: dark ? 'rgba(255,255,255,0.8)' : 'rgba(17, 17, 17, 0.8)',
             maxWidth: '260px',
             margin: 0,
           }}
@@ -235,22 +260,29 @@ export function WhyMattersGrid({
   showUnionTint = false,
   flushBg = false,
   showBottomLeftGrid = false,
+  theme = 'light',
 }: WhyMattersGridProps): React.ReactElement {
+  const isDark = theme === 'dark';
+  const dividers = dividerGradients(theme);
   return (
     <section
       data-section={dataSection}
       className="relative overflow-hidden"
       style={{
-        background: flushBg
-          ? // Transparent — the caller is expected to wrap this section
-            // (and the section above it) in a single bg-[#F6F6F6] container,
-            // so both render against ONE continuous backdrop with no
-            // FadeUp-induced sub-pixel seam between them.
-            'transparent'
-          : // Soft gradient blend at the top + bottom edges so the section
-            // doesn't form a hard horizontal seam against whatever sits above
-            // (typically a darker hero gradient) or below it.
-            'linear-gradient(180deg, rgba(246,246,246,0) 0%, #F6F6F6 96px, #F6F6F6 calc(100% - 96px), rgba(246,246,246,0) 100%)',
+        background: isDark
+          ? // Canonical dark→blue→purple section gradient (shared across the
+            // site's dark bands). Opaque, so it covers any light wrapper behind.
+            'linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)'
+          : flushBg
+            ? // Transparent — the caller is expected to wrap this section
+              // (and the section above it) in a single bg-[#F6F6F6] container,
+              // so both render against ONE continuous backdrop with no
+              // FadeUp-induced sub-pixel seam between them.
+              'transparent'
+            : // Soft gradient blend at the top + bottom edges so the section
+              // doesn't form a hard horizontal seam against whatever sits above
+              // (typically a darker hero gradient) or below it.
+              'linear-gradient(180deg, rgba(246,246,246,0) 0%, #F6F6F6 96px, #F6F6F6 calc(100% - 96px), rgba(246,246,246,0) 100%)',
       }}
     >
       {/* Left hex-grid blob — negative offsets let it bleed off-canvas intentionally. */}
@@ -405,7 +437,7 @@ export function WhyMattersGrid({
               fontWeight: 600,
               letterSpacing: '-0.04em',
               lineHeight: 1.15,
-              color: '#111111',
+              color: isDark ? '#ffffff' : '#111111',
               margin: 0,
             }}
           >
@@ -423,7 +455,7 @@ export function WhyMattersGrid({
                 fontWeight: 400,
                 letterSpacing: '-0.02em',
                 lineHeight: 1.4,
-                color: 'rgba(17, 17, 17, 0.8)',
+                color: isDark ? 'rgba(255,255,255,0.8)' : 'rgba(17, 17, 17, 0.8)',
                 maxWidth: '680px',
                 marginTop: 'clamp(12px, 1.5vw, 20px)',
                 marginBottom: 0,
@@ -439,7 +471,7 @@ export function WhyMattersGrid({
           <div className="flex flex-col gap-4 md:hidden">
             {mobileOrder.map((idx) => {
               const card = cards[idx] ?? cards[0];
-              return <MobileCard key={`m-${idx}`} {...card} />;
+              return <MobileCard key={`m-${idx}`} {...card} theme={theme} />;
             })}
           </div>
 
@@ -454,7 +486,7 @@ export function WhyMattersGrid({
                 top: '4%',
                 bottom: '4%',
                 width: '1px',
-                background: DIVIDER_V,
+                background: dividers.vertical,
               }}
             />
 
@@ -469,10 +501,10 @@ export function WhyMattersGrid({
                   paddingBottom: '28px',
                 }}
               >
-                <DesktopCard {...cards[0]} />
+                <DesktopCard {...cards[0]} theme={theme} />
               </div>
               <div style={{ paddingLeft: '24px', paddingBottom: '28px' }}>
-                <DesktopCard {...cards[1]} />
+                <DesktopCard {...cards[1]} theme={theme} />
               </div>
 
               {/* Horizontal divider between rows */}
@@ -482,7 +514,7 @@ export function WhyMattersGrid({
                 style={{
                   gridColumn: '1 / -1',
                   height: '1px',
-                  background: DIVIDER_H,
+                  background: dividers.horizontal,
                 }}
               />
 
@@ -493,10 +525,10 @@ export function WhyMattersGrid({
                   paddingTop: '28px',
                 }}
               >
-                <DesktopCard {...cards[2]} />
+                <DesktopCard {...cards[2]} theme={theme} />
               </div>
               <div style={{ paddingLeft: '24px', paddingTop: '28px' }}>
-                <DesktopCard {...cards[3]} />
+                <DesktopCard {...cards[3]} theme={theme} />
               </div>
             </div>
           </div>

@@ -36,7 +36,7 @@ export function ResourceCenterContent({
             marginTop: "-32px",
             zIndex: 1,
             paddingTop: "52px",
-            paddingBottom: "var(--spacing-section-cta)",
+            paddingBottom: "var(--spacing-section-lg)",
           }}
           aria-label="Resources listing"
         >
