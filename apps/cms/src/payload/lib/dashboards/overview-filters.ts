@@ -11,7 +11,7 @@ export const COLLECTION_PATH_PREFIX: Record<string, string> = {
   events: '/events',
   webinars: '/webinars',
   resources: '/resource-center',
-  caseStudies: '/case-studies',
+  'case-studies': '/case-studies',
 };
 
 const slug = (s: string): string =>
