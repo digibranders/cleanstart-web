@@ -59,7 +59,7 @@ const PLACEHOLDER_ARTICLES_BY_TAB: ResourceCardsByTab = {
   ],
   resource: [
     {
-      image: "/images/resource-center/cover-poster/datasheet-cover.webp",
+      image: "/images/resource-center/cover-poster/whitepaper.webp",
       title: "CleanStart Whitepaper: A Technical Architecture Overview",
       description:
         "A deep technical dive into how CleanStart's deterministic build pipeline produces hardened, signed container images at scale.",

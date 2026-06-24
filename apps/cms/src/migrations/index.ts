@@ -44,6 +44,7 @@ import * as migration_20260623_120000_add_deal_registrations from './20260623_12
 import * as migration_20260623_140000_add_forms_hubspot_subscription_type_id from './20260623_140000_add_forms_hubspot_subscription_type_id';
 import * as migration_20260623_160000_add_taxonomy_collections from './20260623_160000_add_taxonomy_collections';
 import * as migration_20260623_170000_reapply_taxonomy_collections from './20260623_170000_reapply_taxonomy_collections';
+import * as migration_20260624_120000_add_resources_hero_image from './20260624_120000_add_resources_hero_image';
 
 export const migrations = [
   {
@@ -250,5 +251,10 @@ export const migrations = [
     up: migration_20260623_170000_reapply_taxonomy_collections.up,
     down: migration_20260623_170000_reapply_taxonomy_collections.down,
     name: '20260623_170000_reapply_taxonomy_collections',
+  },
+  {
+    up: migration_20260624_120000_add_resources_hero_image.up,
+    down: migration_20260624_120000_add_resources_hero_image.down,
+    name: '20260624_120000_add_resources_hero_image',
   },
 ];

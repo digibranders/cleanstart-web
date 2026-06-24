@@ -20,10 +20,10 @@ interface StatDef {
 }
 
 const STATS: StatDef[] = [
-  { prefix: "", end: 85, suffix: "%", label: "Container coverage", labelSize: "clamp(15px,1.198vw,23px)", labelTracking: "-0.02em" },
-  { prefix: "<", end: 24, suffix: " hr", label: "Remediation cycles", labelSize: "clamp(15px,1.042vw,20px)", labelTracking: "-0.02em" },
-  { prefix: "", end: 85, suffix: "%", label: "Risk reduction", labelSize: "clamp(15px,1.042vw,20px)", labelTracking: "-0.02em" },
-  { prefix: "", end: 100, suffix: "%", label: "Compliance visibility", labelSize: "clamp(14px,1.042vw,20px)", labelTracking: "-0.02em" },
+  { prefix: "", end: 7000, suffix: "+", label: "Assets discovered", labelSize: "clamp(14px,1.042vw,20px)", labelTracking: "-0.02em" },
+  { prefix: "", end: 85, suffix: "%", label: "Risk correlation accuracy", labelSize: "clamp(14px,1.042vw,20px)", labelTracking: "-0.02em" },
+  { prefix: "", end: 100, suffix: "%", label: "Inventory traceability", labelSize: "clamp(14px,1.042vw,20px)", labelTracking: "-0.02em" },
+  { prefix: "<", end: 24, suffix: " hrs", label: "Remediation recommendations", labelSize: "clamp(14px,1.042vw,20px)", labelTracking: "-0.02em" },
 ];
 
 /** Counts from 0 → end when `active` flips true. Fires once. Honors
@@ -76,7 +76,7 @@ function AnimatedStatValue({
   const count = useCountUp(end, active);
   return (
     <p style={style}>
-      {prefix}{count}{suffix}
+      {prefix}{count.toLocaleString("en-US")}{suffix}
     </p>
   );
 }
@@ -209,7 +209,7 @@ export function CleanSightStats(): React.ReactElement {
                   letterSpacing: s.labelTracking,
                   lineHeight: 1.3,
                   opacity: 0.9,
-                  whiteSpace: "nowrap",
+                  textWrap: "balance",
                 }}
               >
                 {s.label}

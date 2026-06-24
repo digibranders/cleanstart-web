@@ -77,6 +77,12 @@ export const Resources: CollectionConfig = {
     },
     { name: 'summary', type: 'textarea' },
     mediaUploadField({
+      name: 'heroImage',
+      folderHint: 'web/resource',
+      description:
+        'Optional cover shown on the resource detail page. When empty, the detail page falls back to the branded type poster (whitepaper / ebook / etc.). Listing cards always use the type poster.',
+    }),
+    mediaUploadField({
       name: 'asset',
       folderHint: 'web/resource',
       description: 'PDF or ZIP downloadable. Routed to web/resource/.',

@@ -31,6 +31,30 @@ export const ROUTE_PREFIX = {
 
 export type RoutePrefixKey = keyof typeof ROUTE_PREFIX;
 
+/**
+ * Listing (index) route per collection, used only for cache revalidation of
+ * the index page. For most collections the listing lives at its ROUTE_PREFIX,
+ * but several were rebuilt with a listing route that differs from the
+ * (singular / legacy) detail prefix — e.g. detail `/resources/<slug>` but
+ * listing `/resource-center`, detail `/job/<slug>` but listing `/careers`.
+ * Revalidating the detail prefix for those purges a 301 redirect, never the
+ * real listing, so a newly published doc never appears until the ISR TTL
+ * lapses. Collections absent here list at their ROUTE_PREFIX.
+ */
+const LISTING_PATH_OVERRIDE: Partial<Record<RoutePrefixKey, string>> = {
+  resources: '/resource-center',
+  events: '/events',
+  webinars: '/webinars',
+  jobs: '/careers',
+};
+
+/** Index-page path for a collection, preferring an explicit listing override. */
+export const listingPathForCollection = (collection: string): string | null => {
+  const override = (LISTING_PATH_OVERRIDE as Record<string, string>)[collection];
+  if (override) return override;
+  return (ROUTE_PREFIX as Record<string, string>)[collection] ?? null;
+};
+
 export const collectionUrlFromSlug = (collection: string, slug: string): string | null => {
   const prefix = (ROUTE_PREFIX as Record<string, string>)[collection];
   if (!prefix) return null;

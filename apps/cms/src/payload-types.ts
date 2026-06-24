@@ -3335,6 +3335,10 @@ export interface Resource {
   typeRef?: (number | null) | ResourceType;
   summary?: string | null;
   /**
+   * Optional cover shown on the resource detail page. When empty, the detail page falls back to the branded type poster (whitepaper / ebook / etc.). Listing cards always use the type poster.
+   */
+  heroImage?: (number | null) | Media;
+  /**
    * PDF or ZIP downloadable. Routed to web/resource/.
    */
   asset?: (number | null) | Media;
@@ -9802,6 +9806,7 @@ export interface ResourcesSelect<T extends boolean = true> {
   type?: T;
   typeRef?: T;
   summary?: T;
+  heroImage?: T;
   asset?: T;
   body?: T;
   gated?: T;

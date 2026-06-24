@@ -48,6 +48,11 @@
     },
     {
       "type": "upload",
+      "name": "heroImage",
+      "relationTo": "media"
+    },
+    {
+      "type": "upload",
       "name": "asset",
       "relationTo": "media"
     },
