@@ -28,7 +28,7 @@ const OUTCOMES: Outcome[] = [
   },
   {
     icon: "/images/clean-libraries/out-policy2.svg",
-    title: "Trusted Production Releases",
+    title: "Trusted Releases",
   },
 ];
 

@@ -2,7 +2,7 @@ import Image from "next/image";
 import { HeroReveal } from "@/components/ui/Reveal";
 
 /**
- * Dark gradient hero band for the Book a Demo page. A centred "Get a Demo"
+ * Dark gradient hero band for the Book a Demo page. A centred "Book a Demo"
  * title (with a gradient "Demo" word) flanked by two iridescent cube images.
  */
 export function DemoHero(): React.ReactElement {
@@ -87,7 +87,7 @@ export function DemoHero(): React.ReactElement {
               letterSpacing: "-0.04em",
             }}
           >
-            Get a Demo
+            Book a Demo
           </h1>
         </HeroReveal>
       </div>

@@ -67,7 +67,7 @@ export function ReadyToSecureCTA() {
             ["--cs-btn-fs" as string]: "16px",
           }}
         >
-          <span>Get a Demo</span>
+          <span>Book a Demo</span>
         </a>
       </Reveal>
     </div>

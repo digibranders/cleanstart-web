@@ -10,23 +10,23 @@ interface RiskCard {
 const CARDS: RiskCard[] = [
   {
     icon: "/images/clean-libraries/risk-ai.svg",
-    title: "AI-Introduced Dependencies",
-    body: "AI coding assistants can introduce libraries that developers never explicitly reviewed or approved.",
+    title: "AI Dependencies",
+    body: "Introduced through AI-generated code.",
   },
   {
     icon: "/images/clean-libraries/risk-vulnerable.svg",
-    title: "Vulnerable & Outdated Libraries",
-    body: "Public packages often contain known vulnerabilities that increase inherited software risk.",
+    title: "Vulnerable Libraries",
+    body: "Inherited from open source packages.",
   },
   {
     icon: "/images/clean-libraries/risk-transitive.svg",
-    title: "Transitive Dependency Growth",
-    body: "Dependencies often introduce additional packages that teams never explicitly selected or reviewed.",
+    title: "Transitive Growth",
+    body: "Expanded through indirect dependencies.",
   },
   {
     icon: "/images/clean-libraries/risk-visibility.svg",
-    title: "Limited Dependency Visibility",
-    body: "Engineering teams often lack a complete inventory of dependencies across repositories and environments.",
+    title: "Approval Gaps",
+    body: "Added without review or approval.",
   },
 ];
 
@@ -56,7 +56,7 @@ function Ball({ icon }: { icon: string }): React.ReactElement {
 function Card({ card }: { card: RiskCard }): React.ReactElement {
   return (
     <div
-      className="relative h-full min-h-[372px] overflow-hidden rounded-[28px] border-[1.5px] bg-white"
+      className="relative h-full min-h-[272px] overflow-hidden rounded-[28px] border-[1.5px] bg-white"
       style={{ borderColor: "rgba(44,193,235,0.45)" }}
     >
       {/* Top purple wash. */}
@@ -66,7 +66,7 @@ function Card({ card }: { card: RiskCard }): React.ReactElement {
         style={{ background: "#df9bff", filter: "blur(66.5px)" }}
       />
       {/* Horizontal grid lines. */}
-      {[68, 184].map((y) => (
+      {[68, 170].map((y) => (
         <div
           key={y}
           aria-hidden
@@ -83,7 +83,7 @@ function Card({ card }: { card: RiskCard }): React.ReactElement {
         <div
           key={x}
           aria-hidden
-          className="pointer-events-none absolute top-0 h-[264px] w-px select-none opacity-80"
+          className="pointer-events-none absolute top-0 h-[200px] w-px select-none opacity-80"
           style={{
             left: `${x}%`,
             background:
@@ -94,7 +94,7 @@ function Card({ card }: { card: RiskCard }): React.ReactElement {
 
       <div className="relative z-10 flex h-full flex-col p-6">
         <Ball icon={card.icon} />
-        <div className="mt-8 flex flex-col gap-3">
+        <div className="mt-6 flex flex-col gap-2">
           <h3
             className="font-display text-[#111]"
             style={{

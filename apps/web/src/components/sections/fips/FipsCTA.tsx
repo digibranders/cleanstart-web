@@ -86,7 +86,7 @@ export function FipsCTA(): React.ReactElement {
               } as React.CSSProperties
             }
           >
-            Get a Demo
+            Book a Demo
           </Link>
         </Reveal>
       </div>
@@ -128,7 +128,7 @@ export function FipsCTA(): React.ReactElement {
             } as React.CSSProperties
           }
         >
-          Get a Demo
+          Book a Demo
         </Link>
       </div>
     </div>

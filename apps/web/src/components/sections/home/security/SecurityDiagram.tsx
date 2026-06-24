@@ -117,7 +117,7 @@ function StageItem({
           className="relative size-12 select-none"
         />
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col items-center gap-2">
         <h3 className="font-display font-semibold text-white" style={titleStyle}>
           {stage.title}
         </h3>

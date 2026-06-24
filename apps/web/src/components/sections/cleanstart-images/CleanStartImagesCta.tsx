@@ -177,8 +177,7 @@ export function CleanStartImagesCta(): React.ReactElement {
               maxWidth: "440px",
             }}
           >
-            Source-built hardened images with near-zero CVEs, verifiable
-            provenance, and enterprise-ready security.
+            Learn how hardened container images reduce inherited risk and improve software supply chain security.
           </p>
 
           <Link
