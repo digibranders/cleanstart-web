@@ -5,7 +5,10 @@ import type { ReactElement } from 'react';
 
 import type { ContentInsightsResponse } from '../../../lib/content-insights/types';
 import { AttributionPanel } from './AttributionPanel';
+import { Cannibalization } from './Cannibalization';
 import { DecayQueue } from './DecayQueue';
+import { LowCtr } from './LowCtr';
+import { StrikingDistance } from './StrikingDistance';
 import { IndexationRollup } from './IndexationRollup';
 import { Leaderboards } from './Leaderboards';
 import { OrphanAudit } from './OrphanAudit';
@@ -59,6 +62,11 @@ export function ContentInsightsClient(): ReactElement {
           <IndexationRollup rows={data.sections.indexation} />
           <VelocityPanel buckets={data.sections.velocity} />
           <AttributionPanel rows={data.sections.attribution} configured={data.keyEventsConfigured} />
+
+          <h2 className="cs-content-insights__group-head">SEO opportunities</h2>
+          <StrikingDistance rows={data.sections.strikingDistance} />
+          <LowCtr rows={data.sections.lowCtr} />
+          <Cannibalization rows={data.sections.cannibalization} />
         </div>
       )}
     </div>

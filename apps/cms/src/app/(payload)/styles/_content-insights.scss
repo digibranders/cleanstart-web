@@ -90,4 +90,62 @@
   &__trow--attr {
     grid-template-columns: 1fr 100px;
   }
+
+  &__group-head {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--cs-text-heading);
+    margin: var(--cs-space-4, 16px) 0 0;
+    padding-top: var(--cs-space-4, 16px);
+    border-top: 1px solid var(--theme-elevation-150);
+  }
+
+  &__thead--sd,
+  &__trow--sd,
+  &__thead--lc,
+  &__trow--lc {
+    grid-template-columns: 1fr 60px 80px 70px 70px;
+  }
+
+  &__cannibal {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-3, 12px);
+  }
+
+  &__cannibal-row {
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card, 8px);
+    padding: 12px 14px;
+  }
+
+  &__cannibal-query {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-weight: 600;
+    color: var(--cs-text-heading);
+    margin-bottom: 8px;
+  }
+
+  &__cannibal-pages {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    li {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    a {
+      color: var(--cs-cyan-500);
+      text-decoration: none;
+    }
+  }
 }
