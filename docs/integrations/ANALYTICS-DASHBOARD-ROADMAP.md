@@ -24,7 +24,9 @@ GA4 and GSC already do "what happened on my site" better than we ever will. **Ou
 
 ---
 
-## Phase 1 — Foundation: filterable GA4 dashboard 🟡
+## Phase 1 — Foundation: filterable GA4 dashboard ✅
+
+**Status:** shipped 2026-06-24 — built, verified against prod GA4 data, and polished (route-collision fix, custom filter dropdowns, dashboard snapshot bar, rebuilt trend chart with axes/legend/tooltip).
 
 **Goal:** a dedicated `/admin/analytics` page powered by GA4, with date-range / country / collection filters. Works today (GA4 is live in prod).
 
@@ -41,7 +43,9 @@ GA4 and GSC already do "what happened on my site" better than we ever will. **Ou
 
 ---
 
-## Phase 2 — Search performance: Google Search Console 🟡
+## Phase 2 — Search performance: Google Search Console ✅
+
+**Status:** shipped 2026-06-24 — GSC access granted to the service account; data path verified live (clicks/impressions/queries returning). Sections render in `/admin/analytics`.
 
 **Goal:** add the acquisition half of the funnel. Built but inert until an owner grants the service account GSC access.
 
@@ -166,7 +170,7 @@ GA4 and GSC already do "what happened on my site" better than we ever will. **Ou
 | Prereq | Unblocks | Status |
 |---|---|---|
 | GA4 service account + property access + `GOOGLE_APPLICATION_CREDENTIALS_JSON` (GH secret) | Phases 1, 3, 5 | ✅ done |
-| GSC owner adds the SA as a Full user | Phase 2, 4, indexation rollup | ⬜ pending team |
+| GSC owner adds the SA as a Full user | Phase 2, 4, indexation rollup | ✅ done |
 | GA4 **key events** configured | conversion attribution (Phase 3), funnel (Phase 5) | ⬜ small task |
 | CrUX API (free, no account) | Core Web Vitals (Phase 5) | ⬜ |
 | Teams + Brevo (already wired) | digests/alerts (Phase 6) | ✅ available |
