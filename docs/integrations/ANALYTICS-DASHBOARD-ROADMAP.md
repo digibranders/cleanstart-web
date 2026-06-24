@@ -61,7 +61,9 @@ GA4 and GSC already do "what happened on my site" better than we ever will. **Ou
 
 ---
 
-## Phase 3 — Content intelligence ⬜ (the CMS-unique differentiator — highest leverage)
+## Phase 3 — Content intelligence ✅ (the CMS-unique differentiator — highest leverage)
+
+**Status:** built 2026-06-24 — `/admin/content-insights` page with all six sections, fed by a daily per-document snapshot (`analyticsCache` key `content:snapshot`, cron 06:30 UTC). Conversion attribution ships **gated** (a "needs key events" empty state) until GA4 key events are configured. Spec → [`../superpowers/specs/2026-06-24-content-intelligence-design.md`](../superpowers/specs/2026-06-24-content-intelligence-design.md); plan → [`../superpowers/plans/2026-06-24-content-intelligence.md`](../superpowers/plans/2026-06-24-content-intelligence.md).
 
 **Goal:** join analytics to content metadata. None of this is possible in GA4/GSC alone.
 
