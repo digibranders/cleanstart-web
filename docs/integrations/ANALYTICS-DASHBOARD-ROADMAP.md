@@ -97,7 +97,9 @@ GA4 and GSC already do "what happened on my site" better than we ever will. **Ou
 
 ---
 
-## Phase 5 — Advanced visualizations & richer standard metrics ⬜
+## Phase 5 — Advanced visualizations & richer standard metrics 🟡 (Groups A+B shipped)
+
+**Status:** Groups A+B built 2026-06-24 on `/admin/analytics` — period-over-period KPI deltas, channel/device/source splits, position-distribution histogram, CTR-vs-position scatter, per-row sparklines, Core Web Vitals via CrUX (gated on `CRUX_API_KEY`, free), and a realtime active-users widget (GA4 Realtime, 60s poll). **Deferred to a later phase:** traffic treemap by collection + funnel (impressions→clicks→sessions→key events). Spec → [`../superpowers/specs/2026-06-24-advanced-analytics-design.md`](../superpowers/specs/2026-06-24-advanced-analytics-design.md); plan → [`../superpowers/plans/2026-06-24-advanced-analytics.md`](../superpowers/plans/2026-06-24-advanced-analytics.md).
 
 **Goal:** depth and polish; mostly surfacing data GA4/GSC have, in-context.
 
@@ -176,7 +178,7 @@ GA4 and GSC already do "what happened on my site" better than we ever will. **Ou
 | GA4 service account + property access + `GOOGLE_APPLICATION_CREDENTIALS_JSON` (GH secret) | Phases 1, 3, 5 | ✅ done |
 | GSC owner adds the SA as a Full user | Phase 2, 4, indexation rollup | ✅ done |
 | GA4 **key events** configured | conversion attribution (Phase 3), funnel (Phase 5) | ⬜ small task |
-| CrUX API (free, no account) | Core Web Vitals (Phase 5) | ⬜ |
+| CrUX API key (`CRUX_API_KEY`, free — Chrome UX Report API enabled) | Core Web Vitals (Phase 5, built; section gated until key set) | ⬜ pending key |
 | Teams + Brevo (already wired) | digests/alerts (Phase 6) | ✅ available |
 | DataForSEO account + budget | Phase 7 | ◻ optional |
 
