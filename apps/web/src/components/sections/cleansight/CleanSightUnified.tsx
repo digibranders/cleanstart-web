@@ -202,20 +202,21 @@ export function CleanSightUnified(): React.ReactElement {
                   color: '#3f3f46',
                 }}
               >
-                Continuously discover software assets, correlate inherited software risk, maintain
-                verified inventories, and accelerate remediation with verified software
-                alternatives.
+                Establish continuous software supply chain posture through
+                discovery, risk analysis, verified inventories, and remediation.
               </p>
             </Reveal>
           </div>
 
           {/* ── Right: continuous-loop diagram (tablet / desktop) ────── */}
-          {/* `pb` reserves room for the bottom disc's label so it stays inside the
-              diagram box instead of spilling into the section's bottom padding —
-              which is what made the loop sit too high. `pt-2` evens the top. */}
+          {/* Symmetric `pt`/`pb` reserve room for the top and bottom discs'
+              labels so both sit OUTSIDE the ring (above the top disc, below the
+              bottom disc) without spilling into the section padding. Total
+              vertical padding is kept at the previous 140px so the section
+              height is unchanged. */}
           <Reveal
             delay={0.1}
-            className="relative mx-auto hidden w-full max-w-[680px] pt-2 pb-[132px] sm:block"
+            className="relative mx-auto hidden w-full max-w-[680px] pt-[70px] pb-[70px] sm:block"
           >
             {/* The ring lives in a centred square; the wider wrapper leaves side
                 margins so the left/right labels can sit OUTSIDE the circle, clear
@@ -244,6 +245,31 @@ export function CleanSightUnified(): React.ReactElement {
                 ))}
               </svg>
 
+              {/* Center hub — a quiet looping glyph echoing the continuous
+                  cycle. Deliberately disc-less and muted so it reads as a hub
+                  motif, not a fifth node. The faint halo gives it presence
+                  without competing with the coloured node discs. */}
+              <div
+                aria-hidden
+                className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center"
+                style={{ width: 128, height: 128 }}
+              >
+                <span
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background:
+                      'radial-gradient(circle, rgba(124,92,247,0.08) 0%, rgba(44,193,235,0.06) 45%, transparent 70%)',
+                  }}
+                />
+                <RefreshCw
+                  size={46}
+                  strokeWidth={1.5}
+                  className="relative"
+                  style={{ color: '#9aa3c7' }}
+                  aria-hidden
+                />
+              </div>
+
               {/* Nodes. The disc is centred exactly on the loop point. Top and
                   bottom labels hang below their disc; the left/right labels sit
                   OUTSIDE the ring (in the wrapper's side margins) so the vertical
@@ -251,13 +277,21 @@ export function CleanSightUnified(): React.ReactElement {
               {NODES.map((node) => {
                 const p = point(node.angle, R_NODE);
                 const placement =
-                  node.angle === 0 ? 'right' : node.angle === 180 ? 'left' : 'below';
+                  node.angle === 0
+                    ? 'right'
+                    : node.angle === 180
+                      ? 'left'
+                      : node.angle === -90
+                        ? 'above'
+                        : 'below';
                 const labelClass =
                   placement === 'right'
                     ? 'absolute left-full top-1/2 -translate-y-1/2 pl-3 text-left'
                     : placement === 'left'
                       ? 'absolute right-full top-1/2 -translate-y-1/2 pr-3 text-right'
-                      : 'absolute left-1/2 top-full -translate-x-1/2 pt-3.5 text-center';
+                      : placement === 'above'
+                        ? 'absolute left-1/2 bottom-full -translate-x-1/2 pb-3.5 text-center'
+                        : 'absolute left-1/2 top-full -translate-x-1/2 pt-3.5 text-center';
                 return (
                   <div
                     key={node.title}
@@ -273,7 +307,12 @@ export function CleanSightUnified(): React.ReactElement {
                     <NodeBadge node={node} size={76} />
                     <div
                       className={labelClass}
-                      style={{ width: placement === 'below' ? 168 : 120 }}
+                      style={{
+                        width:
+                          placement === 'below' || placement === 'above'
+                            ? 190
+                            : 120,
+                      }}
                     >
                       <p
                         className="font-display font-semibold"

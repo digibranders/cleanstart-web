@@ -16,8 +16,8 @@ const STAGES: Stage[] = [
   { icon: "icon-dependencies.svg", title: "Dependencies", desc: "Direct and transitive packages" },
   { icon: "icon-build.svg", title: "Build", desc: "Controlled build environments" },
   { icon: "icon-registry.svg", title: "Registry", desc: "Published software artifacts" },
-  { icon: "icon-deploy.svg", title: "Deploy", desc: "Managed deployment environments" },
-  { icon: "icon-runtime.svg", title: "Runtime", desc: "Running production workloads" },
+  { icon: "icon-deploy.svg", title: "Deploy", desc: "Managed Environments" },
+  { icon: "icon-runtime.svg", title: "Runtime", desc: "Production Workloads" },
 ];
 
 const GUARANTEES: Guarantee[] = [
