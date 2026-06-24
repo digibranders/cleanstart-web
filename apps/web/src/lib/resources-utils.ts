@@ -53,7 +53,7 @@ export function resourceCoverPoster(type: ResourceType | null | undefined): stri
     case "report":
       return "/images/resource-center/cover-poster/datasheet-report.webp";
     case "whitepaper":
-      return "/images/resource-center/cover-poster/datasheet-cover.webp";
+      return "/images/resource-center/cover-poster/whitepaper.webp";
     default:
       return "/images/resource-center/cover-poster/architecture-insights.webp";
   }

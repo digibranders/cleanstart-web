@@ -245,31 +245,6 @@ export function CleanSightUnified(): React.ReactElement {
                 ))}
               </svg>
 
-              {/* Center hub — a quiet looping glyph echoing the continuous
-                  cycle. Deliberately disc-less and muted so it reads as a hub
-                  motif, not a fifth node. The faint halo gives it presence
-                  without competing with the coloured node discs. */}
-              <div
-                aria-hidden
-                className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center"
-                style={{ width: 128, height: 128 }}
-              >
-                <span
-                  className="absolute inset-0 rounded-full"
-                  style={{
-                    background:
-                      'radial-gradient(circle, rgba(124,92,247,0.08) 0%, rgba(44,193,235,0.06) 45%, transparent 70%)',
-                  }}
-                />
-                <RefreshCw
-                  size={46}
-                  strokeWidth={1.5}
-                  className="relative"
-                  style={{ color: '#9aa3c7' }}
-                  aria-hidden
-                />
-              </div>
-
               {/* Nodes. The disc is centred exactly on the loop point. Top and
                   bottom labels hang below their disc; the left/right labels sit
                   OUTSIDE the ring (in the wrapper's side margins) so the vertical
