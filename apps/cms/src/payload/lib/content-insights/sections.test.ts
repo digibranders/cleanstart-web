@@ -35,6 +35,8 @@ const snap = (docs: ContentDocRecord[]): ContentSnapshot => ({
   capturedAt: '2026-06-24T00:00:00.000Z',
   windows: { recentDays: 28, priorDays: 28, gscDays: 90 },
   docs,
+  queries: [],
+  queryPages: [],
 });
 
 describe('deriveDecay', () => {

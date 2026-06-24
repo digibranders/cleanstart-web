@@ -18,10 +18,28 @@ export interface ContentDocRecord {
   indexedProxy: boolean;
 }
 
+export interface SnapshotQueryRow {
+  query: string;
+  clicks: number;
+  impressions: number;
+  ctr: number;
+  position: number;
+}
+
+export interface SnapshotQueryPageRow {
+  query: string;
+  page: string;
+  clicks: number;
+  impressions: number;
+  position: number;
+}
+
 export interface ContentSnapshot {
   capturedAt: string;
   windows: { recentDays: number; priorDays: number; gscDays: number };
   docs: ContentDocRecord[];
+  queries: SnapshotQueryRow[];
+  queryPages: SnapshotQueryPageRow[];
 }
 
 export interface DecayRow {
@@ -87,6 +105,37 @@ export interface AttributionRow {
   conversions: number;
 }
 
+export interface StrikingDistanceRow {
+  query: string;
+  position: number;
+  impressions: number;
+  clicks: number;
+  ctr: number;
+}
+
+export interface LowCtrRow {
+  query: string;
+  position: number;
+  ctr: number;
+  expectedCtr: number;
+  missedClicks: number;
+}
+
+export interface CannibalizationPage {
+  collection: string;
+  id: string;
+  title: string;
+  url: string;
+  impressions: number;
+  position: number;
+}
+
+export interface CannibalizationRow {
+  query: string;
+  totalImpressions: number;
+  pages: CannibalizationPage[];
+}
+
 export interface ContentInsightsResponse {
   ok: boolean;
   configured: boolean;
@@ -100,5 +149,8 @@ export interface ContentInsightsResponse {
     indexation: IndexationCollectionRow[];
     velocity: VelocityBucket[];
     attribution: AttributionRow[];
+    strikingDistance: StrikingDistanceRow[];
+    lowCtr: LowCtrRow[];
+    cannibalization: CannibalizationRow[];
   } | null;
 }
