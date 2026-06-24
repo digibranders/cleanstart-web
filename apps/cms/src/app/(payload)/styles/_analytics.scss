@@ -133,15 +133,43 @@
     color: var(--theme-text-soft);
   }
 
+  &__kpi-valuerow {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
   &__kpi-value {
     font-size: 24px;
     font-weight: 600;
     color: var(--cs-text-heading);
-    margin-top: 4px;
 
     &.is-muted {
       color: var(--theme-elevation-400);
     }
+  }
+
+  &__kpi-delta {
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    &.is-up {
+      color: var(--color-success-500, #1d9e75);
+    }
+
+    &.is-down {
+      color: var(--color-error-500, #e24b4a);
+    }
+  }
+
+  &__spark {
+    display: block;
+  }
+
+  &__spark-empty {
+    color: var(--theme-elevation-400);
   }
 
   &__panel {
