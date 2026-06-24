@@ -80,7 +80,9 @@ GA4 and GSC already do "what happened on my site" better than we ever will. **Ou
 
 ---
 
-## Phase 4 — SEO opportunity engine ⬜
+## Phase 4 — SEO opportunity engine ✅ (striking-distance · low-CTR · cannibalization)
+
+**Status:** built 2026-06-24 — three GSC-driven worklists added as an "SEO opportunities" group on the `/admin/content-insights` page, fed by query-level GSC data now carried in the same `content:snapshot`. Striking-distance (pos 5–15, high impressions), low-CTR-for-position (vs an expected-CTR curve), and keyword cannibalization (≥2 of our pages per query) are live. **Content-gap finder deferred to Phase 7** (needs DataForSEO volume to be reliable). Spec → [`../superpowers/specs/2026-06-24-seo-opportunity-engine-design.md`](../superpowers/specs/2026-06-24-seo-opportunity-engine-design.md); plan → [`../superpowers/plans/2026-06-24-seo-opportunity-engine.md`](../superpowers/plans/2026-06-24-seo-opportunity-engine.md).
 
 **Goal:** turn GSC's raw data into an actionable to-do list (GSC has the data, no workflow).
 
