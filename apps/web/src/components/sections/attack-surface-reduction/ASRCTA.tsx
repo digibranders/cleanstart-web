@@ -131,7 +131,7 @@ export function ASRCTA(): React.ReactElement {
             textWrap: "balance",
           }}
         >
-          What&rsquo;s Actually Inside Your Container Images?
+          What&rsquo;s Actually Inside Your Software?
         </p>
       </Reveal>
 
@@ -148,12 +148,12 @@ export function ASRCTA(): React.ReactElement {
             lineHeight: "var(--cta-card-desc-lh)",
           }}
         >
-          See how hardened images reduce unnecessary components, inherited CVEs, and operational
-          overhead.
+          Learn how leading teams reduce attack surface by removing unnecessary software
+          components before deployment.
         </p>
 
         <Link
-          href="/software-bill-materials"
+          href="/resources/dependency-management-attack-surface-reduction"
           className="inline-flex items-center gap-2 font-sans font-medium text-white shrink-0"
           style={{
             background: "#3960F9",
@@ -168,7 +168,7 @@ export function ASRCTA(): React.ReactElement {
               "0px 1px 2px -1px rgba(9,6,63,0.4), 0px 0px 0px 1px #3960F9, inset 0px 1px 0px 0px rgba(255,255,255,0.16)",
           }}
         >
-          <span>See What&rsquo;s Inside Your Images</span>
+          <span>Download the Guide</span>
           <svg
             width="18"
             height="18"

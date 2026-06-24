@@ -216,12 +216,12 @@ export function CleanSightUnified(): React.ReactElement {
               height is unchanged. */}
           <Reveal
             delay={0.1}
-            className="relative mx-auto hidden w-full max-w-[680px] pt-[70px] pb-[70px] sm:block"
+            className="relative mx-auto hidden w-full max-w-[680px] pt-[106px] pb-[106px] sm:block"
           >
             {/* The ring lives in a centred square; the wider wrapper leaves side
                 margins so the left/right labels can sit OUTSIDE the circle, clear
                 of the arrows. */}
-            <div className="relative mx-auto aspect-square w-full max-w-[408px]">
+            <div className="relative mx-auto aspect-square w-full max-w-[336px]">
               {/* Connector layer. */}
               <svg
                 viewBox={`0 0 ${SIZE} ${SIZE}`}
@@ -282,12 +282,7 @@ export function CleanSightUnified(): React.ReactElement {
                     <NodeBadge node={node} size={76} />
                     <div
                       className={labelClass}
-                      style={{
-                        width:
-                          placement === 'below' || placement === 'above'
-                            ? 190
-                            : 120,
-                      }}
+                      style={{ width: placement === 'below' ? 128 : 158 }}
                     >
                       <p
                         className="font-display font-semibold"
@@ -304,7 +299,7 @@ export function CleanSightUnified(): React.ReactElement {
                         className="mt-1.5"
                         style={{
                           fontFamily: 'var(--font-sans)',
-                          fontSize: '13.5px',
+                          fontSize: '12px',
                           lineHeight: 1.45,
                           color: '#52525b',
                         }}

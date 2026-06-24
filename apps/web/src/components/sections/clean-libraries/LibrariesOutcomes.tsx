@@ -28,7 +28,9 @@ const OUTCOMES: Outcome[] = [
   },
   {
     icon: "/images/clean-libraries/out-policy2.svg",
-    title: "Trusted Releases",
+    // Forced two-line break (rendered via `white-space: pre-line`) so this short
+    // title matches the other four, which wrap to two lines at the item width.
+    title: "Trusted\nReleases",
   },
 ];
 
@@ -64,6 +66,7 @@ function OutcomeItem({ outcome }: { outcome: Outcome }): React.ReactElement {
           fontWeight: 700,
           letterSpacing: "-0.02em",
           lineHeight: 1.15,
+          whiteSpace: "pre-line",
         }}
       >
         {outcome.title}

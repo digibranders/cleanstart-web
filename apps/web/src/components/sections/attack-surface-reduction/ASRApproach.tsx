@@ -3,22 +3,22 @@ import { WhyMattersGrid, type WhyCard } from '../_shared/WhyMattersGrid';
 
 const CARDS: readonly [WhyCard, WhyCard, WhyCard, WhyCard] = [
   {
-    title: 'Minimal Foundations',
-    desc: 'Only required runtime components',
+    title: 'Existing Workflows',
+    desc: 'Fits existing development workflows.',
     imgSrc: '/images/attack-surface-reduction/approach-icon-minimal.webp',
-    imgAlt: 'Minimal foundations icon',
+    imgAlt: 'Existing workflows icon',
   },
   {
-    title: 'Bloat Removed',
-    desc: 'No shells or unused tooling.',
+    title: 'Existing Toolchains',
+    desc: 'Works across modern CI/CD pipelines.',
     imgSrc: '/images/attack-surface-reduction/approach-icon-bloat.webp',
-    imgAlt: 'Bloat removed icon',
+    imgAlt: 'Existing toolchains icon',
   },
   {
-    title: 'Deterministic Builds',
-    desc: 'Reproducible and verifiable.',
+    title: 'Existing Environments',
+    desc: 'Cloud, on-premises, or regulated.',
     imgSrc: '/images/attack-surface-reduction/approach-icon-deterministic.webp',
-    imgAlt: 'Deterministic builds icon',
+    imgAlt: 'Existing environments icon',
   },
   {
     title: 'Secure Defaults',
@@ -34,16 +34,15 @@ export function ASRApproach(): React.ReactElement {
       dataSection="ASRApproach"
       heading={
         <>
-          {'The CleanStart '}
-          <span className="cs-text-gradient-impact">Approach</span>
+          {'Deploy '}
+          <span className="cs-text-gradient-impact">Without Disruption</span>
         </>
       }
       cards={CARDS}
+      theme="dark"
       showCornerGlows={false}
       showLeftGrid={false}
       showRightGrid={false}
-      showBottomLeftGrid
-      flushBg
     />
   );
 }

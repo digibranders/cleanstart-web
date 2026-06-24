@@ -8,7 +8,6 @@ import {
   selectResources,
 } from "@/components/sections/resource-center/ResourceCenterContent";
 import { ResourceCenterHero } from "@/components/sections/resource-center/ResourceCenterHero";
-import { ResourceCenterCTA } from "@/components/sections/resource-center/ResourceCenterCTA";
 import { getResources } from "@/lib/resources";
 import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
@@ -97,7 +96,7 @@ export default async function ResourceCenterPage(): Promise<React.ReactElement> 
           <ResourceCenterBrowser allResources={allResources} />
         </Suspense>
       </main>
-      <Footer cta={<ResourceCenterCTA />} />
+      <Footer />
     </>
   );
 }

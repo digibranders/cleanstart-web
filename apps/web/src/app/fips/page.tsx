@@ -3,10 +3,9 @@ import { Footer } from "@/components/sections/Footer";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { FipsHero } from "@/components/sections/fips/FipsHero";
 import { FipsWhyMatters } from "@/components/sections/fips/FipsWhyMatters";
-import { FipsEnables } from "@/components/sections/fips/FipsEnables";
-import { FipsMaturityModel } from "@/components/sections/fips/FipsMaturityModel";
 import { FipsRegulatedEnvironments } from "@/components/sections/fips/FipsRegulatedEnvironments";
-import { FipsOperationalImpact } from "@/components/sections/fips/FipsOperationalImpact";
+import { FipsHowDelivers } from "@/components/sections/fips/FipsHowDelivers";
+import { FipsTrustedIndustries } from "@/components/sections/fips/FipsTrustedIndustries";
 import { FipsCTA } from "@/components/sections/fips/FipsCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { breadcrumbSchema } from "@/lib/seo/jsonld";
@@ -41,16 +40,13 @@ export default async function FipsCompliancePage(): Promise<React.ReactElement> 
           <FipsWhyMatters />
         </FadeUp>
         <FadeUp>
-          <FipsEnables />
-        </FadeUp>
-        <FadeUp>
-          <FipsMaturityModel />
-        </FadeUp>
-        <FadeUp>
           <FipsRegulatedEnvironments />
         </FadeUp>
         <FadeUp>
-          <FipsOperationalImpact />
+          <FipsHowDelivers />
+        </FadeUp>
+        <FadeUp>
+          <FipsTrustedIndustries />
         </FadeUp>
       </main>
       <Footer cta={<FipsCTA />} />

@@ -1,27 +1,29 @@
 import React from "react";
 import { Reveal } from "@/components/ui/Reveal";
 
-interface Sector {
+interface Pillar {
   title: string;
   description: string;
 }
 
-const SECTORS: Sector[] = [
+const PILLARS: Pillar[] = [
   {
-    title: "Government & Public Sector",
-    description: "Built for regulated federal workloads.",
+    title: "Faster Audit Readiness",
+    description: "Pre-built evidence and validated foundations simplify audits.",
   },
   {
-    title: "Financial Services",
-    description: "Validated cryptography for sensitive environments.",
+    title: "Compliance Simplified",
+    description:
+      "Spend less time collecting and maintaining compliance artifacts.",
   },
   {
-    title: "Healthcare & Life Sciences",
-    description: "Secure compliant infrastructure for critical systems.",
+    title: "Consistent Compliance",
+    description:
+      "Maintain approved cryptographic standards across environments.",
   },
   {
-    title: "Enterprise Security Teams",
-    description: "Reduce operational compliance complexity.",
+    title: "Continuous Assurance",
+    description: "Monitor compliance posture throughout the software lifecycle.",
   },
 ];
 
@@ -30,7 +32,7 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
     <section
       data-section="FipsRegulatedEnvironments"
       className="relative isolate overflow-hidden"
-      aria-label="Built for Regulated Environments"
+      aria-label="Built-In Compliance. Measurable Impact."
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
@@ -74,26 +76,26 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
                 lineHeight: 1.1,
               }}
             >
-              Built for Regulated{" "}
-              <span className="cs-text-gradient-impact">Environments</span>
+              Built-In Compliance.{" "}
+              <span className="cs-text-gradient-impact">Measurable Impact.</span>
             </h2>
           </Reveal>
         </div>
 
         <div className="mt-12 flex flex-col gap-6 sm:mt-14 lg:hidden">
-          {SECTORS.map((sector, i) => (
-            <React.Fragment key={sector.title}>
-              <SectorBlock sector={sector} variant="mobile" />
-              {i < SECTORS.length - 1 && <HorizontalDivider />}
+          {PILLARS.map((pillar, i) => (
+            <React.Fragment key={pillar.title}>
+              <PillarBlock pillar={pillar} variant="mobile" />
+              {i < PILLARS.length - 1 && <HorizontalDivider />}
             </React.Fragment>
           ))}
         </div>
 
         <div className="hidden lg:mt-[120px] lg:flex lg:items-start lg:justify-between lg:gap-6">
-          {SECTORS.map((sector, i) => (
-            <React.Fragment key={sector.title}>
-              <SectorBlock sector={sector} variant="desktop" />
-              {i < SECTORS.length - 1 && <VerticalDivider />}
+          {PILLARS.map((pillar, i) => (
+            <React.Fragment key={pillar.title}>
+              <PillarBlock pillar={pillar} variant="desktop" />
+              {i < PILLARS.length - 1 && <VerticalDivider />}
             </React.Fragment>
           ))}
         </div>
@@ -102,11 +104,11 @@ export function FipsRegulatedEnvironments(): React.ReactElement {
   );
 }
 
-function SectorBlock({
-  sector,
+function PillarBlock({
+  pillar,
   variant,
 }: {
-  sector: Sector;
+  pillar: Pillar;
   variant: "mobile" | "desktop";
 }) {
   if (variant === "mobile") {
@@ -121,7 +123,7 @@ function SectorBlock({
             letterSpacing: "-0.04em",
           }}
         >
-          {sector.title}
+          {pillar.title}
         </div>
         <div
           className="text-white"
@@ -133,7 +135,7 @@ function SectorBlock({
             letterSpacing: "-0.02em",
           }}
         >
-          {sector.description}
+          {pillar.description}
         </div>
       </div>
     );
@@ -150,7 +152,7 @@ function SectorBlock({
           maxWidth: "219px",
         }}
       >
-        {sector.title}
+        {pillar.title}
       </div>
       <div
         className="mt-5 max-w-[219px] text-white"
@@ -162,7 +164,7 @@ function SectorBlock({
           letterSpacing: "-0.02em",
         }}
       >
-        {sector.description}
+        {pillar.description}
       </div>
     </div>
   );

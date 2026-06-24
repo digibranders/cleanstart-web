@@ -45,18 +45,24 @@ interface CodeLine {
 /** Container ellipse — the secure "clean zone". */
 const C = { cx: 590, cy: 296, rx: 206, ry: 196 } as const;
 
-/** Boundary entry points where clean packages cross in. */
+/** Boundary entry points where clean packages cross in, and the interior
+ *  targets the rails continue to inside the container (clean deps delivered). */
 const ENTRY_TOP: Pt = { x: 392, y: 232 };
 const ENTRY_BOT: Pt = { x: 398, y: 344 };
+const INSIDE_TOP: Pt = { x: 478, y: 254 };
+const INSIDE_BOT: Pt = { x: 486, y: 326 };
 
-/** Clean packages outside, flowing toward an entry point. */
-const GREEN_IN: readonly (CubeSpec & { entry: Pt })[] = [
-  { x: 108, y: 150, scale: 1.4, tone: "green", entry: ENTRY_TOP },
-  { x: 170, y: 206, scale: 1.0, tone: "green", entry: ENTRY_TOP },
-  { x: 92, y: 256, scale: 1.18, tone: "green", entry: ENTRY_TOP },
-  { x: 146, y: 336, scale: 1.45, tone: "green", entry: ENTRY_BOT },
-  { x: 92, y: 408, scale: 1.1, tone: "green", entry: ENTRY_BOT },
-  { x: 214, y: 392, scale: 1.22, tone: "green", entry: ENTRY_BOT },
+/** Clean packages — intermixed with the amber ones across the whole field;
+ *  each routes through the nearer gate (top half → top gate, bottom half →
+ *  bottom gate) and its rail continues inside. */
+const GREEN_IN: readonly (CubeSpec & { entry: Pt; inside: Pt })[] = [
+  { x: 70, y: 122, scale: 0.95, tone: "green", entry: ENTRY_TOP, inside: INSIDE_TOP },
+  { x: 244, y: 138, scale: 0.85, tone: "green", entry: ENTRY_TOP, inside: INSIDE_TOP },
+  { x: 132, y: 276, scale: 1.12, tone: "green", entry: ENTRY_TOP, inside: INSIDE_TOP },
+  { x: 96, y: 342, scale: 1.05, tone: "green", entry: ENTRY_BOT, inside: INSIDE_BOT },
+  { x: 206, y: 320, scale: 0.95, tone: "green", entry: ENTRY_BOT, inside: INSIDE_BOT },
+  { x: 162, y: 442, scale: 0.95, tone: "green", entry: ENTRY_BOT, inside: INSIDE_BOT },
+  { x: 274, y: 402, scale: 0.8, tone: "green", entry: ENTRY_BOT, inside: INSIDE_BOT },
 ];
 
 /** Clean packages that already passed — inside the container, by the code. */
@@ -65,11 +71,13 @@ const GREEN_INSIDE: readonly CubeSpec[] = [
   { x: 458, y: 332, scale: 0.78, tone: "green" },
 ];
 
-/** Vulnerable packages — stopped outside; each gets a blocked badge at `stop`. */
-const AMBER_BLOCKED: readonly (CubeSpec & { stop: Pt })[] = [
-  { x: 250, y: 224, scale: 1.0, tone: "amber", stop: { x: 348, y: 236 } },
-  { x: 262, y: 300, scale: 1.06, tone: "amber", stop: { x: 356, y: 300 } },
-  { x: 248, y: 372, scale: 0.96, tone: "amber", stop: { x: 348, y: 360 } },
+/** Vulnerable packages — scattered nearer the gate; each is stopped right on
+ *  the container's curve (stop computed in `gateStop`) and gets a ⊘ badge. */
+const AMBER_BLOCKED: readonly CubeSpec[] = [
+  { x: 150, y: 156, scale: 1.0, tone: "amber" },
+  { x: 60, y: 234, scale: 0.9, tone: "amber" },
+  { x: 252, y: 224, scale: 0.92, tone: "amber" },
+  { x: 96, y: 404, scale: 0.85, tone: "amber" },
 ];
 
 /** Ambient sparkles scattered through the package field. */
@@ -138,17 +146,26 @@ function cubeCenter(c: CubeSpec): Pt {
   return { x: c.x, y: c.y + 22 * c.scale };
 }
 
+/** Point just outside the container's left curve at height `y` — where a
+ *  rejected package is halted (so blocked badges hug the boundary). */
+function gateStop(y: number): Pt {
+  const t = Math.max(-0.96, Math.min(0.96, (y - C.cy) / C.ry));
+  return { x: C.cx - C.rx * Math.sqrt(1 - t * t) - 8, y };
+}
+
 export function LibrariesHeroScene(): React.ReactElement {
   const greenStreams = GREEN_IN.map((c) => {
     const s = cubeCenter(c);
     const e = c.entry;
+    const i = c.inside;
     const mx = (s.x + e.x) / 2;
-    return `M ${s.x} ${s.y} C ${mx} ${s.y}, ${mx} ${e.y}, ${e.x} ${e.y}`;
+    return `M ${s.x} ${s.y} C ${mx} ${s.y}, ${mx} ${e.y}, ${e.x} ${e.y} L ${i.x} ${i.y}`;
   });
-  const amberStreams = AMBER_BLOCKED.map((c) => {
+  const amberData = AMBER_BLOCKED.map((c) => {
     const s = cubeCenter(c);
-    const mx = (s.x + c.stop.x) / 2;
-    return `M ${s.x} ${s.y} C ${mx} ${s.y}, ${mx} ${c.stop.y}, ${c.stop.x} ${c.stop.y}`;
+    const stop = gateStop(s.y);
+    const mx = (s.x + stop.x) / 2;
+    return { d: `M ${s.x} ${s.y} C ${mx} ${s.y}, ${mx} ${stop.y}, ${stop.x} ${stop.y}`, stop };
   });
 
   return (
@@ -249,17 +266,10 @@ export function LibrariesHeroScene(): React.ReactElement {
         ))}
       </g>
 
-      {/* Clean streams — flow inward toward the entry points. */}
-      <g fill="none" strokeLinecap="round" strokeWidth={2.6} strokeDasharray="1 7">
-        {greenStreams.map((d, i) => (
-          <path key={`gs-${i}`} d={d} className="cs-flow-dash" stroke="url(#libStreamGreen)" />
-        ))}
-      </g>
-
       {/* Vulnerable streams — halt at the boundary (rejected). */}
       <g fill="none" strokeLinecap="round" strokeWidth={2.4} strokeDasharray="1 7">
-        {amberStreams.map((d, i) => (
-          <path key={`as-${i}`} d={d} className="cs-flow-dash" stroke="url(#libStreamAmber)" strokeOpacity={0.8} />
+        {amberData.map((a, i) => (
+          <path key={`as-${i}`} d={a.d} className="cs-flow-dash" stroke="url(#libStreamAmber)" strokeOpacity={0.8} />
         ))}
       </g>
 
@@ -283,6 +293,24 @@ export function LibrariesHeroScene(): React.ReactElement {
           className="cs-lib-rim"
           filter="url(#libRimGlow)"
         />
+
+        {/* Clean rails — pass through the gate and continue inside the zone. */}
+        <g fill="none" strokeLinecap="round" strokeWidth={2.6} strokeDasharray="1 7">
+          {greenStreams.map((d, i) => (
+            <path key={`gs-${i}`} d={d} className="cs-flow-dash" stroke="url(#libStreamGreen)" />
+          ))}
+        </g>
+        {/* Green packets riding the rails into the container. */}
+        {greenStreams.map((d, i) => (
+          <g
+            key={`gp-${i}`}
+            className="cs-lib-packet"
+            style={{ offsetPath: `path('${d}')`, animationDelay: `${i * 0.42}s` }}
+          >
+            <circle r={8} fill="url(#libGlow-green)" filter="url(#libBloom)" />
+            <circle r={2.8} fill="#eafff3" />
+          </g>
+        ))}
 
         {/* Filter membrane — faint bright arc on the entry (left) side. */}
         <path
@@ -329,8 +357,8 @@ export function LibrariesHeroScene(): React.ReactElement {
       {AMBER_BLOCKED.map((cube, i) => (
         <Cube key={`a-${i}`} {...cube} />
       ))}
-      {AMBER_BLOCKED.map((c, i) => (
-        <BlockedBadge key={`bb-${i}`} {...c.stop} />
+      {amberData.map((a, i) => (
+        <BlockedBadge key={`bb-${i}`} {...a.stop} />
       ))}
 
       {/* Foreground clean package field. */}
@@ -338,22 +366,12 @@ export function LibrariesHeroScene(): React.ReactElement {
         <Cube key={`g-${i}`} {...cube} />
       ))}
 
-      {/* Traveling packets — green comets stream in; amber comets are repelled. */}
-      {greenStreams.map((d, i) => (
-        <g
-          key={`gp-${i}`}
-          className="cs-lib-packet"
-          style={{ offsetPath: `path('${d}')`, animationDelay: `${i * 0.42}s` }}
-        >
-          <circle r={8} fill="url(#libGlow-green)" filter="url(#libBloom)" />
-          <circle r={2.8} fill="#eafff3" />
-        </g>
-      ))}
-      {amberStreams.map((d, i) => (
+      {/* Amber packets — rush the gate, then recoil + fade (repelled). */}
+      {amberData.map((a, i) => (
         <g
           key={`ap-${i}`}
           className="cs-lib-packet-amber"
-          style={{ offsetPath: `path('${d}')`, animationDelay: `${i * 0.5}s` }}
+          style={{ offsetPath: `path('${a.d}')`, animationDelay: `${i * 0.5}s` }}
         >
           <circle r={7} fill="url(#libGlow-amber)" filter="url(#libBloom)" />
           <circle r={2.6} fill="#ffd9c2" />

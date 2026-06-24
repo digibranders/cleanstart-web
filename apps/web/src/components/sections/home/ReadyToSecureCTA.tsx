@@ -56,8 +56,7 @@ export function ReadyToSecureCTA() {
             opacity: 0.8,
           }}
         >
-          Start with zero-CVE hardened images. Deploy faster with confidence
-          knowing your containers are secured from the ground up.
+          Start with zero-CVE hardened images for faster deployment with confidence.
         </p>
         <a
           href="/book-a-demo"
