@@ -9,10 +9,16 @@ import type {
   OverviewFilters,
 } from '../../../lib/dashboards/overview-types';
 import { CountryBars } from './CountryBars';
+import { CtrScatter } from './CtrScatter';
 import { FilterBar } from './FilterBar';
 import { KpiCards } from './KpiCards';
+import { PositionHistogram } from './PositionHistogram';
+import { RealtimeWidget } from './RealtimeWidget';
+import { Sparkline } from './Sparkline';
+import { Split } from './Split';
 import { TopList } from './TopList';
 import { TrendChart } from './TrendChart';
+import { WebVitals } from './WebVitals';
 
 const pct = (n: number): string => `${Math.round(n * 100)}%`;
 const fmt = (n: number): string => Math.round(n).toLocaleString();
@@ -85,6 +91,7 @@ export function AnalyticsClient(): ReactElement {
     <div className="cs-analytics">
       <header className="cs-analytics__head">
         <h1>Analytics</h1>
+        <RealtimeWidget />
       </header>
       <FilterBar
         filters={filters}
@@ -103,9 +110,13 @@ export function AnalyticsClient(): ReactElement {
         <>
           <KpiCards
             items={[
-              { label: 'Sessions', value: fmt(data.totals.sessions) },
-              { label: 'Users', value: fmt(data.totals.totalUsers) },
-              { label: 'Engagement', value: pct(data.totals.engagementRate) },
+              { label: 'Sessions', value: fmt(data.totals.sessions), deltaPct: data.deltas?.sessions.deltaPct ?? null },
+              { label: 'Users', value: fmt(data.totals.totalUsers), deltaPct: data.deltas?.totalUsers.deltaPct ?? null },
+              {
+                label: 'Engagement',
+                value: pct(data.totals.engagementRate),
+                deltaPct: data.deltas?.engagementRate.deltaPct ?? null,
+              },
               {
                 label: 'Key events',
                 value: data.totals.conversions ? fmt(data.totals.conversions) : '—',
@@ -122,16 +133,29 @@ export function AnalyticsClient(): ReactElement {
               title="Top pages"
               columns={[
                 { key: 'path', label: 'Page' },
+                { key: 'trend', label: 'Trend', width: '96px' },
                 { key: 'sessions', label: 'Sess.', align: 'right' },
                 { key: 'views', label: 'Views', align: 'right' },
               ]}
-              rows={data.topPages.map((p) => ({ path: p.path, sessions: fmt(p.sessions), views: fmt(p.views) }))}
+              rows={data.topPages.map((p) => ({
+                path: p.path,
+                trend: <Sparkline daily={p.daily} />,
+                sessions: fmt(p.sessions),
+                views: fmt(p.views),
+              }))}
             />
             <div className="cs-analytics__panel">
               <h3>Top countries</h3>
               <CountryBars rows={data.topCountries} />
             </div>
           </div>
+          {(data.channels?.length || data.devices?.length || data.sources?.length) && (
+            <div className="cs-analytics__cols">
+              <Split title="Channels" rows={data.channels ?? []} />
+              <Split title="Devices" rows={data.devices ?? []} />
+              <Split title="Sources" rows={data.sources ?? []} />
+            </div>
+          )}
         </>
       )}
 
@@ -148,12 +172,22 @@ export function AnalyticsClient(): ReactElement {
         <>
           <KpiCards
             items={[
-              { label: 'Clicks', value: fmt(gsc.totals.clicks) },
-              { label: 'Impressions', value: fmt(gsc.totals.impressions) },
-              { label: 'CTR', value: pct(gsc.totals.ctr) },
+              { label: 'Clicks', value: fmt(gsc.totals.clicks), deltaPct: gsc.deltas?.clicks.deltaPct ?? null },
+              { label: 'Impressions', value: fmt(gsc.totals.impressions), deltaPct: gsc.deltas?.impressions.deltaPct ?? null },
+              { label: 'CTR', value: pct(gsc.totals.ctr), deltaPct: gsc.deltas?.ctr.deltaPct ?? null },
               { label: 'Avg position', value: gsc.totals.position.toFixed(1) },
             ]}
           />
+          <div className="cs-analytics__cols">
+            <div className="cs-analytics__panel">
+              <h3>Query position distribution</h3>
+              <PositionHistogram buckets={gsc.positionBuckets ?? []} />
+            </div>
+            <div className="cs-analytics__panel">
+              <h3>CTR vs position</h3>
+              <CtrScatter points={gsc.scatter ?? []} />
+            </div>
+          </div>
           <TopList
             title="Top search queries"
             columns={[
@@ -171,6 +205,8 @@ export function AnalyticsClient(): ReactElement {
           />
         </>
       )}
+
+      <WebVitals />
     </div>
   );
 }

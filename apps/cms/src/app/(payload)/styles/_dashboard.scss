@@ -427,15 +427,15 @@
     margin-bottom: var(--cs-space-8);
   }
 
-  // Stacked full-width horizontal bars (one row per configured provider) —
-  // always fills the width whether 1 or 4 providers are connected, instead
-  // of the old 4-col tile grid that stranded a lone card in column 1.
+  // Compact horizontal provider bars in a responsive grid — two sit side by
+  // side on a wide dashboard (GA4 | GSC), collapsing to one column when narrow.
+  // Replaces the full-width stack that made 2+ providers eat too much height.
   &__analytics-bars {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
     gap: var(--cs-space-3);
 
-    // span wrappers from the .map() key must not collapse the flex row
+    // span wrappers from the .map() key must stretch to fill their grid cell
     > span {
       display: block;
     }
@@ -444,8 +444,9 @@
   &__analytics-bar {
     display: flex;
     align-items: center;
-    gap: var(--cs-space-6);
-    padding: 16px 24px;
+    gap: var(--cs-space-4);
+    height: 100%;
+    padding: 12px 18px;
     background: var(--theme-input-bg);
     border: 1px solid var(--theme-elevation-150);
     border-radius: var(--cs-radius-card);
@@ -456,10 +457,10 @@
       background: var(--theme-elevation-50);
     }
 
-    @media (max-width: 760px) {
+    @media (max-width: 600px) {
       flex-direction: column;
       align-items: flex-start;
-      gap: var(--cs-space-3);
+      gap: var(--cs-space-2);
     }
   }
 
@@ -468,7 +469,7 @@
     flex-direction: column;
     gap: 2px;
     flex-shrink: 0;
-    min-width: 152px;
+    min-width: 132px;
   }
 
   &__analytics-title {
@@ -506,7 +507,7 @@
   &__analytics-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--cs-space-3) var(--cs-space-8);
+    gap: var(--cs-space-2) var(--cs-space-5);
     margin: 0;
     padding: 0;
     width: 100%;

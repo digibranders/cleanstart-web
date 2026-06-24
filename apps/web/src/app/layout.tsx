@@ -81,7 +81,12 @@ export async function generateMetadata(): Promise<Metadata> {
   const d = await getSeoDefaults();
   const description = d?.defaultDescription?.trim() || DESCRIPTION;
   const ogUrl = d?.defaultOgImage?.url?.trim() || HOME_OG;
-  const template = d?.defaultTitleTemplate?.trim() || "%s | CleanStart";
+  // Titles use a pipe separator; normalize any em/en dash the stored CMS
+  // template may still carry so no page <title> renders with a dash.
+  const template = (d?.defaultTitleTemplate?.trim() || "%s | CleanStart").replace(
+    /\s*[—–]\s*/g,
+    " | ",
+  );
   const twitterHandle = d?.twitterHandle?.trim();
 
   return {

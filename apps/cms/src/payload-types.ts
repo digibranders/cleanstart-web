@@ -211,6 +211,7 @@ export interface Config {
       retryDealSync: TaskRetryDealSync;
       purgeDealRegistrations: TaskPurgeDealRegistrations;
       refreshContentInsights: TaskRefreshContentInsights;
+      refreshCrux: TaskRefreshCrux;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -8772,6 +8773,7 @@ export interface PayloadJob {
           | 'retryDealSync'
           | 'purgeDealRegistrations'
           | 'refreshContentInsights'
+          | 'refreshCrux'
           | 'schedulePublish';
         taskID: string;
         input?:
@@ -8823,6 +8825,7 @@ export interface PayloadJob {
         | 'retryDealSync'
         | 'purgeDealRegistrations'
         | 'refreshContentInsights'
+        | 'refreshCrux'
         | 'schedulePublish'
       )
     | null;
@@ -13421,6 +13424,14 @@ export interface TaskPurgeDealRegistrations {
  * via the `definition` "TaskRefreshContentInsights".
  */
 export interface TaskRefreshContentInsights {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskRefreshCrux".
+ */
+export interface TaskRefreshCrux {
   input?: unknown;
   output?: unknown;
 }

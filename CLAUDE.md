@@ -358,6 +358,7 @@ Ten Payload cron tasks run in `apps/cms/src/payload/jobs/`. All are gated by `PA
 | Broken-links scan | daily 04:30 | `check-broken-links.ts` |
 | Meilisearch reindex (drift check + self-heal) | daily 05:00 | `reindex-meili.ts` |
 | Content-insights snapshot rebuild | daily 06:30 | `refresh-content-insights.ts` |
+| Core Web Vitals (CrUX) refresh | daily 06:45 | `refresh-crux.ts` (no-op without `CRUX_API_KEY`) |
 
 Never change a job schedule without updating this table. Every new job needs a test file and must respect the `PAYLOAD_AUTO_RUN` gate.
 

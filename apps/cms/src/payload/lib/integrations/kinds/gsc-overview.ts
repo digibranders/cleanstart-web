@@ -1,5 +1,6 @@
 import { google, type searchconsole_v1 } from 'googleapis';
 
+import { bucketPositions, buildScatter, computeDelta } from '../../dashboards/advanced-metrics';
 import { WINDOW_DAYS } from '../../dashboards/overview-filters';
 import type { GscOverviewPayload, OverviewWindow } from '../../dashboards/overview-types';
 import type { GscCredentials } from '../credentials';
@@ -24,20 +25,37 @@ export const fetchGscOverview = async (
 ): Promise<GscOverviewPayload> => {
   const c = client(creds);
   const now = new Date();
+  const days = WINDOW_DAYS[window];
   const endDate = fmtDate(now);
-  const startDate = fmtDate(new Date(now.getTime() - WINDOW_DAYS[window] * 86_400_000));
+  const startDate = fmtDate(new Date(now.getTime() - days * 86_400_000));
+  const prevEndDate = fmtDate(new Date(now.getTime() - (days + 1) * 86_400_000));
+  const prevStartDate = fmtDate(new Date(now.getTime() - days * 2 * 86_400_000));
   const byDim = (dimensions: string[]) => ({
     siteUrl: creds.siteUrl,
     requestBody: { startDate, endDate, dimensions, rowLimit: 10 },
   });
 
-  const [totalsR, queriesR, pagesR] = await Promise.all([
+  const [totalsR, queriesR, pagesR, prevTotalsR, distR] = await Promise.all([
     c.searchanalytics.query({ siteUrl: creds.siteUrl, requestBody: { startDate, endDate, rowLimit: 1 } }),
     c.searchanalytics.query(byDim(['query'])),
     c.searchanalytics.query(byDim(['page'])),
+    c.searchanalytics.query({
+      siteUrl: creds.siteUrl,
+      requestBody: { startDate: prevStartDate, endDate: prevEndDate, rowLimit: 1 },
+    }),
+    c.searchanalytics.query({
+      siteUrl: creds.siteUrl,
+      requestBody: { startDate, endDate, dimensions: ['query'], rowLimit: 1000 },
+    }),
   ]);
 
   const t = totalsR.data.rows?.[0];
+  const prev = prevTotalsR.data.rows?.[0];
+  const distRows = (distR.data.rows ?? []).map((r) => ({
+    position: r.position ?? 0,
+    ctr: r.ctr ?? 0,
+    impressions: r.impressions ?? 0,
+  }));
   return {
     window,
     totals: {
@@ -46,6 +64,14 @@ export const fetchGscOverview = async (
       ctr: t?.ctr ?? 0,
       position: t?.position ?? 0,
     },
+    deltas: {
+      clicks: computeDelta(t?.clicks ?? 0, prev?.clicks ?? 0),
+      impressions: computeDelta(t?.impressions ?? 0, prev?.impressions ?? 0),
+      ctr: computeDelta(t?.ctr ?? 0, prev?.ctr ?? 0),
+      position: computeDelta(t?.position ?? 0, prev?.position ?? 0),
+    },
+    positionBuckets: bucketPositions(distRows),
+    scatter: buildScatter(distRows, 200),
     topQueries: (queriesR.data.rows ?? []).map((r) => ({
       query: r.keys?.[0] ?? '',
       clicks: r.clicks ?? 0,

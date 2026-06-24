@@ -89,11 +89,19 @@ const FACT_LABELS: Record<string, string> = {
 // Keys whose ISO value should render as a human-readable date in the card.
 const DATE_FACT_KEYS = new Set(['publishedAt', 'updatedAt']);
 
+// Render card dates in IST so the editor channel reads in local team time
+// regardless of the (UTC) server timezone.
+const CARD_TIME_ZONE = 'Asia/Kolkata';
+
 const formatFactValue = (key: string, raw: unknown): string => {
   if (DATE_FACT_KEYS.has(key) && typeof raw === 'string' && raw.length > 0) {
     const d = new Date(raw);
     if (!Number.isNaN(d.getTime())) {
-      return d.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+      return d.toLocaleString('en-US', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+        timeZone: CARD_TIME_ZONE,
+      });
     }
   }
   return truncateValue(raw);

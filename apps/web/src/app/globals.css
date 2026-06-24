@@ -1766,6 +1766,60 @@ body {
   }
 }
 
+/* Clean Libraries hero — packet flow + container energy.
+   `cs-lib-packet` rides a green comet along a stream's `offset-path` into the
+   container; `cs-lib-packet-amber` rushes the gate then recoils + fades (the
+   vulnerable package is repelled). `cs-lib-rim` sweeps a bright glint around
+   the rim. `cs-lib-twinkle` pulses badges / ambient sparkles. All offset-path /
+   dash / opacity only (GPU-composited), all off under reduced-motion. */
+@keyframes cs-lib-packet {
+  0% { offset-distance: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+@keyframes cs-lib-packet-amber {
+  0% { offset-distance: 0%; opacity: 0; }
+  18% { opacity: 1; }
+  68% { offset-distance: 96%; opacity: 1; }
+  80% { offset-distance: 86%; opacity: 0.9; }
+  100% { offset-distance: 86%; opacity: 0; }
+}
+@keyframes cs-lib-rim-glint {
+  to { stroke-dashoffset: -1280; }
+}
+@keyframes cs-lib-twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.95; }
+}
+.cs-lib-packet {
+  offset-rotate: 0deg;
+  animation: cs-lib-packet 2.9s linear infinite;
+}
+.cs-lib-packet-amber {
+  offset-rotate: 0deg;
+  animation: cs-lib-packet-amber 2.7s ease-in-out infinite;
+}
+.cs-lib-rim {
+  animation: cs-lib-rim-glint 7s linear infinite;
+}
+.cs-lib-twinkle {
+  animation: cs-lib-twinkle 3.2s ease-in-out infinite;
+}
+/* packet-flow rebuild marker v2 */
+@media (prefers-reduced-motion: reduce) {
+  .cs-lib-packet,
+  .cs-lib-packet-amber,
+  .cs-lib-rim,
+  .cs-lib-twinkle {
+    animation: none !important;
+  }
+  .cs-lib-packet,
+  .cs-lib-packet-amber {
+    opacity: 0 !important;
+  }
+}
+
 /* "Security Isn't Just Patching" — Verification Cascade.
    Entrance: cards/stages rise once when the section gains `.cs-sec-on`. The
    ambient loop is orchestrated in JS (SecurityDiagram) which toggles

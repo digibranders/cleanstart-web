@@ -1,9 +1,11 @@
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 interface Col {
   key: string;
   label: string;
   align?: 'right';
+  /** Track width for non-first columns (default 60px). */
+  width?: string;
 }
 
 export function TopList({
@@ -13,9 +15,9 @@ export function TopList({
 }: {
   title: string;
   columns: Col[];
-  rows: Array<Record<string, string | number>>;
+  rows: Array<Record<string, ReactNode>>;
 }): ReactElement {
-  const cols = `1fr repeat(${columns.length - 1}, 60px)`;
+  const cols = ['1fr', ...columns.slice(1).map((c) => c.width ?? '60px')].join(' ');
   return (
     <div className="cs-analytics__panel">
       <h3>{title}</h3>
@@ -30,9 +32,9 @@ export function TopList({
               </span>
             ))}
           </div>
-          {rows.map((r) => (
+          {rows.map((r, i) => (
             <div
-              key={String(r[columns[0]?.key ?? ''])}
+              key={String(r[columns[0]?.key ?? ''] ?? i)}
               className="cs-analytics__trow"
               style={{ gridTemplateColumns: cols }}
             >
