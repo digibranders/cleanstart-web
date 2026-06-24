@@ -3,7 +3,7 @@ import type {
   CollectionAfterDeleteHook,
 } from 'payload';
 
-import { ROUTE_PREFIX, collectionUrlFromDoc } from '../lib/route-prefixes';
+import { collectionUrlFromDoc, listingPathForCollection } from '../lib/route-prefixes';
 import { revalidateWeb } from '../lib/web-revalidate';
 
 type StatusDoc = { _status?: string; slug?: string | null; path?: string | null };
@@ -35,7 +35,7 @@ export const revalidateWebPublishAfterChangeHook =
 
       const paths = new Set<string>();
 
-      const listing = (ROUTE_PREFIX as Record<string, string>)[collection];
+      const listing = listingPathForCollection(collection);
       if (listing) paths.add(listing);
 
       const currentUrl = collectionUrlFromDoc(collection, doc as StatusDoc);
@@ -72,7 +72,7 @@ export const revalidateWebAfterDeleteHook =
     try {
       const paths = new Set<string>();
 
-      const listing = (ROUTE_PREFIX as Record<string, string>)[collection];
+      const listing = listingPathForCollection(collection);
       if (listing) paths.add(listing);
 
       const url = collectionUrlFromDoc(collection, doc as StatusDoc);
