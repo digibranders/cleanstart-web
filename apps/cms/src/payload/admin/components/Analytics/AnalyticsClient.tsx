@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ReactElement } from 'react';
 
 import type {
@@ -34,9 +34,14 @@ export function AnalyticsClient(): ReactElement {
   const [gscState, setGscState] = useState<LoadState>('loading');
   const [capturedAt, setCapturedAt] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  // Epoch guards: ignore a slower in-flight response once a newer load started
+  // (prevents a stale filter's result from overwriting the current one).
+  const ga4Epoch = useRef(0);
+  const gscEpoch = useRef(0);
 
   const loadGa4 = useCallback(
     async (force: boolean): Promise<void> => {
+      const epoch = ++ga4Epoch.current;
       setState('loading');
       const qs = new URLSearchParams({ window: filters.window });
       if (filters.country) qs.set('country', filters.country);
@@ -45,13 +50,14 @@ export function AnalyticsClient(): ReactElement {
       try {
         const res = await fetch(`/api/dashboards/ga4-overview?${qs.toString()}`, { credentials: 'include' });
         const j = await res.json();
+        if (epoch !== ga4Epoch.current) return;
         if (!j.ok) return setState('error');
         if (!j.configured) return setState('unconfigured');
         setData(j.payload as Ga4OverviewPayload);
         setCapturedAt((j.capturedAt as string | null) ?? null);
         setState('ready');
       } catch {
-        setState('error');
+        if (epoch === ga4Epoch.current) setState('error');
       }
     },
     [filters],
@@ -59,18 +65,20 @@ export function AnalyticsClient(): ReactElement {
 
   const loadGsc = useCallback(
     async (force: boolean): Promise<void> => {
+      const epoch = ++gscEpoch.current;
       setGscState('loading');
       const qs = new URLSearchParams({ window: filters.window });
       if (force) qs.set('refresh', '1');
       try {
         const res = await fetch(`/api/dashboards/gsc-overview?${qs.toString()}`, { credentials: 'include' });
         const j = await res.json();
+        if (epoch !== gscEpoch.current) return;
         if (!j.ok) return setGscState('error');
         if (!j.configured) return setGscState('unconfigured');
         setGsc(j.payload as GscOverviewPayload);
         setGscState('ready');
       } catch {
-        setGscState('error');
+        if (epoch === gscEpoch.current) setGscState('error');
       }
     },
     [filters.window],

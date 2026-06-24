@@ -1,7 +1,7 @@
 import type { Endpoint, PayloadRequest } from 'payload';
 
 import { hasAnyRole } from '../access/typed-user';
-import type { CruxPayload, RealtimePayload } from '../lib/dashboards/overview-types';
+import type { CruxPayload } from '../lib/dashboards/overview-types';
 import { isStale, readCache, writeCache } from '../lib/integrations/cache';
 import { resolveCruxCredentials, resolveGa4Credentials } from '../lib/integrations/credentials';
 import { fetchCrux, resolveCruxOrigin } from '../lib/integrations/kinds/crux';
@@ -10,8 +10,6 @@ import { findRowsOfKind } from '../lib/integrations/kinds/types';
 
 const CRUX_KEY = 'crux:default';
 const CRUX_TTL_MS = 26 * 60 * 60 * 1000;
-const REALTIME_KEY = 'realtime:default';
-const REALTIME_TTL_MS = 60 * 1000;
 
 const json = (data: unknown, init?: ResponseInit): Response =>
   new Response(JSON.stringify(data), {
@@ -54,11 +52,10 @@ export const ga4RealtimeEndpoint: Endpoint = {
     if (!hasAnyRole(req.user, ['admin', 'editor'])) {
       return json({ ok: false, error: 'forbidden' }, { status: 403 });
     }
-    const force = req.searchParams?.get?.('refresh') === '1';
-    const cached = await readCache<RealtimePayload>(req.payload, 'ga4DataApi', 'global', REALTIME_KEY);
-    if (cached && !force && !isStale(cached, REALTIME_TTL_MS)) {
-      return json({ ok: true, configured: true, fromCache: true, payload: cached.payload });
-    }
+    // Realtime is fetched fresh on every poll — deliberately NOT cached. A 60s
+    // cache would write a new analyticsCache row per poll per viewer (the client
+    // polls every 60s), bloating the table; GA4 Realtime quota easily covers
+    // one call per minute per active viewer.
     const rows = await findRowsOfKind(req.payload, 'ga4DataApi');
     const creds = rows
       .map((r) => resolveGa4Credentials(r as unknown as { ga4Config?: { propertyId?: string } }))
@@ -66,11 +63,9 @@ export const ga4RealtimeEndpoint: Endpoint = {
     if (!creds) return json({ ok: true, configured: false, payload: null });
     try {
       const payload = await fetchRealtime(creds);
-      await writeCache(req.payload, 'ga4DataApi', 'global', REALTIME_KEY, payload);
-      return json({ ok: true, configured: true, fromCache: false, payload });
+      return json({ ok: true, configured: true, payload });
     } catch (err) {
       req.payload.logger.warn({ error: err instanceof Error ? err.message : String(err) }, 'realtime fetch failed');
-      if (cached) return json({ ok: true, configured: true, fromCache: true, payload: cached.payload });
       return json({ ok: false, configured: true, error: 'fetch_failed' }, { status: 502 });
     }
   },
