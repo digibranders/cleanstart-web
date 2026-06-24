@@ -13,10 +13,12 @@ import { CtrScatter } from './CtrScatter';
 import { FilterBar } from './FilterBar';
 import { KpiCards } from './KpiCards';
 import { PositionHistogram } from './PositionHistogram';
+import { RealtimeWidget } from './RealtimeWidget';
 import { Sparkline } from './Sparkline';
 import { Split } from './Split';
 import { TopList } from './TopList';
 import { TrendChart } from './TrendChart';
+import { WebVitals } from './WebVitals';
 
 const pct = (n: number): string => `${Math.round(n * 100)}%`;
 const fmt = (n: number): string => Math.round(n).toLocaleString();
@@ -89,6 +91,7 @@ export function AnalyticsClient(): ReactElement {
     <div className="cs-analytics">
       <header className="cs-analytics__head">
         <h1>Analytics</h1>
+        <RealtimeWidget />
       </header>
       <FilterBar
         filters={filters}
@@ -202,6 +205,8 @@ export function AnalyticsClient(): ReactElement {
           />
         </>
       )}
+
+      <WebVitals />
     </div>
   );
 }

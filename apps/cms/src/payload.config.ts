@@ -67,6 +67,7 @@ import {
   dashboardsGscPerDocEndpoint,
 } from './payload/endpoints/dashboards';
 import { contentInsightsEndpoint } from './payload/endpoints/content-insights';
+import { cruxEndpoint, ga4RealtimeEndpoint } from './payload/endpoints/dashboards-advanced';
 import { ga4OverviewEndpoint, gscOverviewEndpoint } from './payload/endpoints/dashboards-overview';
 import { calcomInboundEndpoint } from './payload/endpoints/integrations-inbound';
 import { jsonLdEndpoint, jsonLdPreviewEndpoint } from './payload/endpoints/jsonld';
@@ -95,6 +96,7 @@ import { reindexMeiliTask } from './payload/jobs/reindex-meili';
 import { retryWebhookTask } from './payload/jobs/retry-webhook';
 import { analyticsCachePruneTask } from './payload/jobs/analytics-cache-prune';
 import { refreshContentInsightsTask } from './payload/jobs/refresh-content-insights';
+import { refreshCruxTask } from './payload/jobs/refresh-crux';
 import { dashboardRefreshDailyTask } from './payload/jobs/dashboard-refresh-daily';
 import { dashboardRefreshFrequentTask } from './payload/jobs/dashboard-refresh-frequent';
 import { registerLeadHandlers } from './payload/lib/lead-handlers';
@@ -446,6 +448,8 @@ export default buildConfig({
     // `/dashboards/ga4-overview` (:provider="ga4-overview") first and 400s.
     ga4OverviewEndpoint,
     gscOverviewEndpoint,
+    cruxEndpoint,
+    ga4RealtimeEndpoint,
     dashboardsGlobalEndpoint,
     dashboardsGscPerDocEndpoint,
     dashboardsGscInspectEndpoint,
@@ -469,6 +473,7 @@ export default buildConfig({
       retryDealSyncTask,
       purgeDealRegistrationsTask,
       refreshContentInsightsTask,
+      refreshCruxTask,
     ],
     autoRun: [
       {
@@ -530,6 +535,10 @@ export default buildConfig({
       {
         cron: '30 6 * * *', // daily at 06:30 UTC — content-insights snapshot rebuild (after GSC daily refresh)
         queue: 'contentInsightsRefresh',
+      },
+      {
+        cron: '45 6 * * *', // daily at 06:45 UTC — Core Web Vitals (CrUX) origin-level cache
+        queue: 'cruxRefresh',
       },
       {
         cron: '* * * * *', // every minute — Payload built-in schedulePublish jobs land in the `default` queue; wait_until gates actual execution

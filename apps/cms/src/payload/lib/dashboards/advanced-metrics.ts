@@ -27,9 +27,9 @@ export const buildScatter = (
 
 interface RtBatch {
   rows?: Array<{
-    dimensionValues?: Array<{ value?: string }>;
-    metricValues?: Array<{ value?: string }>;
-  }>;
+    dimensionValues?: Array<{ value?: string | null }> | null;
+    metricValues?: Array<{ value?: string | null }> | null;
+  }> | null;
 }
 
 export const shapeRealtime = (totalRows: RtBatch, pageRows: RtBatch): RealtimePayload => ({

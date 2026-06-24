@@ -183,6 +183,17 @@ export const resolveGscCredentials = (
   return { siteUrl, serviceAccountJson: sa };
 };
 
+// ─── CrUX (Chrome UX Report — env-keyed, no per-row config) ──────
+
+export interface CruxCredentials {
+  readonly apiKey: string;
+}
+
+export const resolveCruxCredentials = (): CruxCredentials | null => {
+  const apiKey = process.env.CRUX_API_KEY;
+  return apiKey ? { apiKey } : null;
+};
+
 // ─── MS Clarity ──────────────────────────────────────────────────
 
 export interface ClarityCredentials {

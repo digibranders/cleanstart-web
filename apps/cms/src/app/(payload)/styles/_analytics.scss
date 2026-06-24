@@ -2,10 +2,84 @@
 // theme tokens (--theme-*, --cs-*) so it matches the CMS skin in both modes.
 
 .cs-analytics {
+  &__head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--cs-space-4, 16px);
+    flex-wrap: wrap;
+  }
+
   &__head h1 {
     font-family: var(--font-display);
     color: var(--cs-text-heading);
     margin: 0 0 var(--cs-space-4);
+  }
+
+  &__realtime {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--theme-text-soft);
+    margin-bottom: var(--cs-space-4, 16px);
+  }
+
+  &__realtime-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-success-500, #1d9e75);
+  }
+
+  &__realtime-count {
+    font-weight: 700;
+    color: var(--cs-text-heading);
+  }
+
+  &__realtime-top {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 320px;
+  }
+
+  &__cwv-tiles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--cs-space-3, 12px);
+  }
+
+  &__cwv-tile {
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card, 8px);
+    padding: var(--cs-space-3, 12px);
+    border-left-width: 3px;
+
+    &.is-good {
+      border-left-color: var(--color-success-500, #1d9e75);
+    }
+    &.is-needs-improvement {
+      border-left-color: var(--color-warning-500, #ba7517);
+    }
+    &.is-poor {
+      border-left-color: var(--color-error-500, #e24b4a);
+    }
+  }
+
+  &__cwv-metric {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--theme-text-soft);
+  }
+
+  &__cwv-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--cs-text-heading);
+    margin-top: 4px;
+    font-feature-settings: 'tnum' 1;
   }
 
   &__filters {
