@@ -43,7 +43,7 @@ export const SeoDefaults: GlobalConfig = {
     {
       name: 'defaultTitleTemplate',
       type: 'text',
-      defaultValue: '%s — CleanStart',
+      defaultValue: '%s | CleanStart',
       admin: {
         description:
           'Used when seo.title is unset. %s is replaced with the document title.',
