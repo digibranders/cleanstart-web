@@ -47,8 +47,8 @@ interface CardProps {
 }
 
 const Card = ({ title, capturedAt, stale, children }: CardProps): ReactElement => (
-  <div className="cs-dashboard__analytics-card">
-    <div className="cs-dashboard__analytics-head">
+  <div className="cs-dashboard__analytics-bar">
+    <div className="cs-dashboard__analytics-bar-head">
       <h3 className="cs-dashboard__analytics-title">{title}</h3>
       <span
         className={`cs-dashboard__analytics-meta${stale ? ' cs-dashboard__analytics-meta--stale' : ''}`}
@@ -57,7 +57,7 @@ const Card = ({ title, capturedAt, stale, children }: CardProps): ReactElement =
         {stale ? '· stale ·' : 'fresh'}
       </span>
     </div>
-    <div className="cs-dashboard__analytics-body">{children}</div>
+    <div className="cs-dashboard__analytics-bar-body">{children}</div>
   </div>
 );
 
@@ -224,14 +224,14 @@ export const AnalyticsCards = async ({
     <section aria-label="Analytics snapshot" className="cs-dashboard__analytics">
       <div className="cs-dashboard__section-head">
         <h2 className="cs-dashboard__section-title">Analytics snapshot</h2>
-        {unconfigured.length === 0 ? (
-          <a className="cs-dashboard__section-link" href="/admin/collections/integrations">
-            Manage integrations →
+        {configured.length > 0 ? (
+          <a className="cs-dashboard__section-link" href="/admin/analytics">
+            View full analytics →
           </a>
         ) : null}
       </div>
       {configured.length > 0 ? (
-        <div className="cs-dashboard__analytics-grid-cards">
+        <div className="cs-dashboard__analytics-bars">
           {configured.map((r) => (
             <span key={r.kind}>{r.element}</span>
           ))}

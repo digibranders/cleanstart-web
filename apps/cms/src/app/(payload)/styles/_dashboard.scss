@@ -427,64 +427,48 @@
     margin-bottom: var(--cs-space-8);
   }
 
-  &__analytics-grid-cards {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--cs-space-4);
-    grid-auto-rows: 1fr;
+  // Stacked full-width horizontal bars (one row per configured provider) —
+  // always fills the width whether 1 or 4 providers are connected, instead
+  // of the old 4-col tile grid that stranded a lone card in column 1.
+  &__analytics-bars {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cs-space-3);
 
-    @media (max-width: 1100px) {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    @media (max-width: 600px) {
-      grid-template-columns: 1fr;
+    // span wrappers from the .map() key must not collapse the flex row
+    > span {
+      display: block;
     }
   }
 
-  &__analytics-card {
+  &__analytics-bar {
     display: flex;
-    flex-direction: column;
-    gap: var(--cs-space-2);
-    padding: 20px;
+    align-items: center;
+    gap: var(--cs-space-6);
+    padding: 16px 24px;
     background: var(--theme-input-bg);
     border: 1px solid var(--theme-elevation-150);
     border-radius: var(--cs-radius-card);
-    text-decoration: none;
-    color: inherit;
-
-    &[href] {
-      cursor: pointer;
-      transition:
-        border-color var(--cs-motion-micro),
-        background-color var(--cs-motion-micro),
-        transform var(--cs-motion-micro);
-
-      &:hover {
-        border-color: var(--cs-cyan-500);
-        background: var(--theme-elevation-50);
-        transform: translateY(-1px);
-      }
-
-      &:focus-visible {
-        outline: 2px solid var(--cs-cyan-500);
-        outline-offset: 2px;
-      }
-    }
 
     // Empty-state variant: dashed border, dimmer background
     &:has(.cs-dashboard__analytics-empty) {
       border-style: dashed;
       background: var(--theme-elevation-50);
     }
+
+    @media (max-width: 760px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--cs-space-3);
+    }
   }
 
-  &__analytics-head {
+  &__analytics-bar-head {
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--cs-space-2);
-    margin-bottom: 2px;
+    flex-direction: column;
+    gap: 2px;
+    flex-shrink: 0;
+    min-width: 152px;
   }
 
   &__analytics-title {
@@ -496,7 +480,7 @@
   }
 
   &__analytics-meta {
-    font-size: 11px; /* intentional 11px — compact secondary meta in tight header row */
+    font-size: 11px; /* intentional 11px — compact secondary meta */
     color: var(--theme-text-soft);
     white-space: nowrap;
 
@@ -505,10 +489,11 @@
     }
   }
 
-  &__analytics-body {
+  &__analytics-bar-body {
     flex: 1;
+    min-width: 0;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
   }
 
   &__analytics-empty {
@@ -516,13 +501,12 @@
     color: var(--theme-text-disabled);
     line-height: 1.5;
     margin: 0;
-    padding-top: var(--cs-space-1);
   }
 
   &__analytics-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--cs-space-2) var(--cs-space-3);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cs-space-3) var(--cs-space-8);
     margin: 0;
     padding: 0;
     width: 100%;
@@ -543,7 +527,7 @@
 
     dd {
       font-family: var(--font-display);
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 700;
       letter-spacing: -0.02em;
       color: var(--cs-text-heading);
@@ -558,7 +542,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 100%;
+    max-width: 280px;
     color: var(--theme-text);
     /* font-size intentionally 12px — URL is secondary metadata */
   }
