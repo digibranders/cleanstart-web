@@ -24,6 +24,9 @@ export async function GET(
   // accepts the URL — local images WITH a query string are rejected by
   // default, which would force `unoptimized` and ship the full PNG.
   const keyword = decodeURIComponent(slug).slice(0, 80) || "CleanStart Guide";
+  // Original site logo (the navbar lockup) for the eyebrow; the faint crystal
+  // mark stays only as a decorative corner watermark.
+  const logoUrl = new URL("/images/cleanstart-logo.png", req.url).toString();
   const markUrl = new URL("/images/logo-cleanstart-mark.svg", req.url).toString();
 
   return new ImageResponse(
@@ -75,13 +78,13 @@ export async function GET(
           style={{ position: "absolute", right: -70, bottom: -130, opacity: 0.12 }}
         />
 
-        {/* eyebrow */}
+        {/* eyebrow — original site logo + GUIDE label */}
         <div style={{ display: "flex", alignItems: "center", position: "relative" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={markUrl} width={44} height={44} alt="" />
+          <img src={logoUrl} width={234} height={49} alt="" />
           <span
             style={{
-              marginLeft: 18,
+              marginLeft: 28,
               fontSize: 24,
               fontWeight: 700,
               letterSpacing: 8,
@@ -89,7 +92,7 @@ export async function GET(
               color: "#c9c3ff",
             }}
           >
-            CleanStart Guide
+            Guide
           </span>
         </div>
 

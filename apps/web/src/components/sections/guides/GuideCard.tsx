@@ -3,7 +3,8 @@ import Link from "next/link";
 import type { Guide } from "@/lib/guides";
 import { formatGuideDate, guideMediaUrl } from "@/lib/guides-utils";
 import { effectivePublishedAt } from "@/lib/published-date";
-import { deriveCoverKeyword, guideCoverPath } from "@/lib/guide-cover";
+import { deriveCoverKeyword } from "@/lib/guide-cover";
+import { GeneratedGuideCover } from "@/components/sections/_shared/GeneratedGuideCover";
 
 interface GuideCardProps {
   guide: Guide;
@@ -45,14 +46,7 @@ export function GuideCard({ guide, priority = false }: GuideCardProps): React.Re
             priority={priority}
           />
         ) : (
-          <Image
-            src={guideCoverPath(coverKeyword)}
-            alt={`${coverKeyword} — CleanStart Guide`}
-            fill
-            className="object-cover"
-            sizes="(min-width: 1280px) 300px, (min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
-            priority={priority}
-          />
+          <GeneratedGuideCover keyword={coverKeyword} />
         )}
       </div>
 

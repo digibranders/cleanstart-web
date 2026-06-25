@@ -22,9 +22,11 @@ describe('BrokenLinks collection', () => {
     // `update: () => false` blocks the save but does NOT disable the inputs;
     // each field must be admin.readOnly so a cron-detected row can't be
     // hand-edited.
-    const fields = BrokenLinks.fields as { name?: string; admin?: { readOnly?: boolean } }[];
+    const fields = BrokenLinks.fields as { name?: string; type?: string; admin?: { readOnly?: boolean } }[];
     for (const field of fields) {
-      if (!field.name) continue;
+      // `ui` fields are presentational (no data, no input to disable), so the
+      // readOnly invariant doesn't apply to them.
+      if (!field.name || field.type === 'ui') continue;
       expect(field.admin?.readOnly, `${field.name} must be readOnly`).toBe(true);
     }
   });

@@ -21,7 +21,7 @@ export const BrokenLinks: CollectionConfig = {
   labels: { singular: 'Broken link', plural: 'Broken links' },
   admin: {
     useAsTitle: 'url',
-    defaultColumns: ['url', 'status', 'sourceCollection', 'sourceDocId', 'lastChecked'],
+    defaultColumns: ['url', 'anchorText', 'status', 'sourceDocTitle', 'sourceCollection', 'lastChecked'],
     // System/ops group — cron-written, admin-read-only monitoring table; not an
     // editorial SEO surface (Redirects + Pages (Schema) remain under SEO).
     group: 'System',
@@ -35,12 +35,25 @@ export const BrokenLinks: CollectionConfig = {
     delete: isAdmin,
   },
   fields: [
-    { name: 'url', type: 'text', required: true, index: true, admin: { readOnly: true } },
+    {
+      name: 'url',
+      type: 'text',
+      required: true,
+      index: true,
+      admin: {
+        readOnly: true,
+        components: { Field: { path: '@/payload/admin/components/BrokenLinkUrlField.tsx#BrokenLinkUrlField' } },
+      },
+    },
     {
       name: 'status',
       type: 'select',
       required: true,
       admin: { readOnly: true },
+      // `redirect` is retained for backward-compat only — the scanner no
+      // longer emits it (redirects are followed and classified by their
+      // final landing page). Postgres can't cleanly drop an enum value, so
+      // the option stays; no new row will ever carry it.
       options: [
         { label: 'OK (2xx)', value: 'ok' },
         { label: 'Broken (4xx / 5xx)', value: 'broken' },
@@ -60,6 +73,58 @@ export const BrokenLinks: CollectionConfig = {
     { name: 'sourceCollection', type: 'text', required: true, index: true, admin: { readOnly: true } },
     { name: 'sourceDocId', type: 'text', required: true, index: true, admin: { readOnly: true } },
     { name: 'sourceDocSlug', type: 'text', admin: { readOnly: true } },
+    {
+      name: 'sourceDocTitle',
+      type: 'text',
+      admin: {
+        readOnly: true,
+        components: { Cell: { path: '@/payload/admin/components/SourcePageCell.tsx#SourcePageCell' } },
+      },
+    },
+    {
+      name: 'anchorText',
+      type: 'text',
+      admin: {
+        readOnly: true,
+        description: 'Visible link text on the page (empty for non-rich-text URL fields).',
+      },
+    },
+    {
+      name: 'location',
+      type: 'text',
+      admin: {
+        readOnly: true,
+        description: 'Where the link lives in the page — "Body" or the field label.',
+      },
+    },
+    {
+      name: 'finalUrl',
+      type: 'text',
+      admin: {
+        readOnly: true,
+        description:
+          'Where the link ends up after following redirects (set only when it differs from the URL).',
+      },
+    },
+    {
+      name: 'sourcePageLink',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: { path: '@/payload/admin/components/SourcePageLinkField.tsx#SourcePageLinkField' },
+        },
+      },
+    },
+    {
+      name: 'diagnosis',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: { path: '@/payload/admin/components/BrokenLinkStatusField.tsx#BrokenLinkStatusField' },
+        },
+      },
+    },
     { name: 'firstSeenAt', type: 'date', admin: { readOnly: true } },
     { name: 'lastChecked', type: 'date', admin: { readOnly: true } },
     {

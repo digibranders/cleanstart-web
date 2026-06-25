@@ -2485,7 +2485,7 @@ export interface CaseStudy {
   /**
    * Legacy enum — superseded by the Industry relationship below. Kept during the taxonomy transition; removed once apps/web reads the relationship.
    */
-  industry: 'healthcare' | 'telecom' | 'finance' | 'technology' | 'manufacturing' | 'other';
+  industry?: ('healthcare' | 'telecom' | 'finance' | 'technology' | 'manufacturing' | 'other') | null;
   /**
    * Industry taxonomy reference. Seeded/backfilled from the legacy `industry` enum; editors manage the list under Taxonomies → Industries.
    */
@@ -2495,13 +2495,13 @@ export interface CaseStudy {
    */
   company: string;
   /**
-   * Optional company wordmark shown beside the company name. Falls back to a generic icon when empty.
+   * Company wordmark shown beside the company name.
    */
-  companyLogo?: (number | null) | Media;
+  companyLogo: number | Media;
   /**
-   * Card thumbnail image.
+   * Optional card thumbnail image.
    */
-  coverImage: number | Media;
+  coverImage?: (number | null) | Media;
   summary: string;
   /**
    * Downloadable case-study PDF. Routed to web/case-study/ in R2.
@@ -8135,6 +8135,19 @@ export interface BrokenLink {
   sourceCollection: string;
   sourceDocId: string;
   sourceDocSlug?: string | null;
+  sourceDocTitle?: string | null;
+  /**
+   * Visible link text on the page (empty for non-rich-text URL fields).
+   */
+  anchorText?: string | null;
+  /**
+   * Where the link lives in the page — "Body" or the field label.
+   */
+  location?: string | null;
+  /**
+   * Where the link ends up after following redirects (set only when it differs from the URL).
+   */
+  finalUrl?: string | null;
   firstSeenAt?: string | null;
   lastChecked?: string | null;
   /**
@@ -12441,6 +12454,10 @@ export interface BrokenLinksSelect<T extends boolean = true> {
   sourceCollection?: T;
   sourceDocId?: T;
   sourceDocSlug?: T;
+  sourceDocTitle?: T;
+  anchorText?: T;
+  location?: T;
+  finalUrl?: T;
   firstSeenAt?: T;
   lastChecked?: T;
   note?: T;

@@ -45,6 +45,30 @@
       "name": "sourceDocSlug"
     },
     {
+      "type": "text",
+      "name": "sourceDocTitle"
+    },
+    {
+      "type": "text",
+      "name": "anchorText"
+    },
+    {
+      "type": "text",
+      "name": "location"
+    },
+    {
+      "type": "text",
+      "name": "finalUrl"
+    },
+    {
+      "type": "ui",
+      "name": "sourcePageLink"
+    },
+    {
+      "type": "ui",
+      "name": "diagnosis"
+    },
+    {
       "type": "date",
       "name": "firstSeenAt"
     },
