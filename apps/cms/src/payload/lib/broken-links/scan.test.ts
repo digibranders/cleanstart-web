@@ -5,7 +5,7 @@ import { scanForBrokenLinks } from './scan';
 const fakeResponse = (init: { status?: number; location?: string } = {}): Response =>
   new Response(null, {
     status: init.status ?? 200,
-    headers: init.location ? { location: init.location } : undefined,
+    ...(init.location ? { headers: { location: init.location } } : {}),
   });
 
 const seedRecord = (

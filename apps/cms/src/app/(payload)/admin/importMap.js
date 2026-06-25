@@ -67,7 +67,6 @@ import { CheckboxField as CheckboxField_fa838d594eaa6e28e24d17add0c5aa91 } from 
 import { GroupField as GroupField_74bc515fedbf6bc79a8d465c8195685c } from '@/payload/admin/components/fields/GroupField.tsx'
 import { JsonField as JsonField_c698ed818f2263de63387a332e0e62c8 } from '@/payload/admin/components/fields/JsonField.tsx'
 import { SeoAdvancedPanel as SeoAdvancedPanel_301d2755c840ba9d0cd27854dd230b50 } from '@/payload/admin/components/SeoAdvancedPanel.tsx'
-import { AnalyticsTab as AnalyticsTab_2fe4ac23b60559d4c4eee324922d800b } from '@/payload/admin/components/integrations/AnalyticsTab.tsx'
 import { DocHeader as DocHeader_ad90301af1277969698538615cf842dc } from '@/payload/admin/components/DocHeader.tsx'
 import { PublishChecklistBanner as PublishChecklistBanner_efcc6882ba9cb24c59d6b432ca4d5bec } from '@/payload/admin/components/PublishChecklistBanner.tsx'
 import { PublishOverrideGuard as PublishOverrideGuard_a50d41ea09f2769cab2ac29c72f33f02 } from '@/payload/admin/components/PublishOverrideGuard.tsx'
@@ -91,6 +90,10 @@ import { DsarActionsPanel as DsarActionsPanel_270b8398021fd191ac147b0b8d59049c }
 import { FlaggedLeadsTab as FlaggedLeadsTab_e23fb65ad956ac1ee9fd221fde0635a2 } from '@/payload/admin/components/FlaggedLeadsTab.tsx'
 import { PartnersExportButton as PartnersExportButton_bdb98055df2d18c5a1146f8080480dbe } from '@/payload/admin/components/PartnersExportButton.tsx'
 import { RedirectStalenessField as RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d } from '@/payload/admin/components/RedirectStalenessField.tsx'
+import { BrokenLinkUrlField as BrokenLinkUrlField_4a01d0b6434722bf7eb4cb88cdee7302 } from '@/payload/admin/components/BrokenLinkUrlField.tsx'
+import { SourcePageCell as SourcePageCell_65f8a80f341c90429e3920a086ad845d } from '@/payload/admin/components/SourcePageCell.tsx'
+import { SourcePageLinkField as SourcePageLinkField_669042998f4e9f8d6e482d4318d5a74d } from '@/payload/admin/components/SourcePageLinkField.tsx'
+import { BrokenLinkStatusField as BrokenLinkStatusField_0ea1120a9b67f1995faa1caeb6850114 } from '@/payload/admin/components/BrokenLinkStatusField.tsx'
 import { SchemaSidebarInfo as SchemaSidebarInfo_96468a0c8dfd7d485ad501c3f3cb5169 } from '../../../payload/admin/components/SchemaManager/SchemaSidebarInfo.tsx'
 import { CurrentSchemaView as CurrentSchemaView_eb2b5a26ddc5c1c2f69a2c0c3dd840f2 } from '../../../payload/admin/components/SchemaManager/CurrentSchemaView.tsx'
 import { SchemaBlockBuilder as SchemaBlockBuilder_39f9c228a6de3d4d87098f39d8bc67da } from '../../../payload/admin/components/SchemaManager/SchemaBlockBuilder.tsx'
@@ -136,6 +139,11 @@ import { CmsAccountView as CmsAccountView_e25882c99036df42ce1493c03452d7e3 } fro
 import { AnalyticsView as AnalyticsView_9809f757f325208f1f22c259e380c7d4 } from '../../../payload/admin/components/Analytics/AnalyticsView.tsx'
 import { ContentInsightsView as ContentInsightsView_4f64082482f4a971d7f1f3adfd127137 } from '../../../payload/admin/components/ContentInsights/ContentInsightsView.tsx'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
+import { PointField as PointField_dc800e7ca3d2eb7ea39fd4bc6138c687 } from '@/payload/admin/components/fields/PointField.tsx'
+import { RadioField as RadioField_31aae9b520654e49d40e444571bafe41 } from '@/payload/admin/components/fields/RadioField.tsx'
+import { TabsField as TabsField_c014faddfba6da88b9efedda256f4990 } from '@/payload/admin/components/fields/TabsField.tsx'
+import { RowField as RowField_1ef7316c3d3f9450222b0eb086a8e243 } from '@/payload/admin/components/fields/RowField.tsx'
+import { CodeField as CodeField_4aa85fbd783c4d26c5c89ebf383941c1 } from '@/payload/admin/components/fields/CodeField.tsx'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
@@ -208,7 +216,6 @@ export const importMap = {
   "@/payload/admin/components/fields/GroupField.tsx#GroupField": GroupField_74bc515fedbf6bc79a8d465c8195685c,
   "@/payload/admin/components/fields/JsonField.tsx#JsonField": JsonField_c698ed818f2263de63387a332e0e62c8,
   "@/payload/admin/components/SeoAdvancedPanel.tsx#SeoAdvancedPanel": SeoAdvancedPanel_301d2755c840ba9d0cd27854dd230b50,
-  "@/payload/admin/components/integrations/AnalyticsTab.tsx#AnalyticsTab": AnalyticsTab_2fe4ac23b60559d4c4eee324922d800b,
   "@/payload/admin/components/DocHeader.tsx#DocHeader": DocHeader_ad90301af1277969698538615cf842dc,
   "@/payload/admin/components/PublishChecklistBanner.tsx#PublishChecklistBanner": PublishChecklistBanner_efcc6882ba9cb24c59d6b432ca4d5bec,
   "@/payload/admin/components/PublishOverrideGuard.tsx#PublishOverrideGuard": PublishOverrideGuard_a50d41ea09f2769cab2ac29c72f33f02,
@@ -232,6 +239,10 @@ export const importMap = {
   "@/payload/admin/components/FlaggedLeadsTab.tsx#FlaggedLeadsTab": FlaggedLeadsTab_e23fb65ad956ac1ee9fd221fde0635a2,
   "@/payload/admin/components/PartnersExportButton.tsx#PartnersExportButton": PartnersExportButton_bdb98055df2d18c5a1146f8080480dbe,
   "@/payload/admin/components/RedirectStalenessField.tsx#RedirectStalenessField": RedirectStalenessField_84bc6f5d8c91b849b5d672b94a8f286d,
+  "@/payload/admin/components/BrokenLinkUrlField.tsx#BrokenLinkUrlField": BrokenLinkUrlField_4a01d0b6434722bf7eb4cb88cdee7302,
+  "@/payload/admin/components/SourcePageCell.tsx#SourcePageCell": SourcePageCell_65f8a80f341c90429e3920a086ad845d,
+  "@/payload/admin/components/SourcePageLinkField.tsx#SourcePageLinkField": SourcePageLinkField_669042998f4e9f8d6e482d4318d5a74d,
+  "@/payload/admin/components/BrokenLinkStatusField.tsx#BrokenLinkStatusField": BrokenLinkStatusField_0ea1120a9b67f1995faa1caeb6850114,
   "./payload/admin/components/SchemaManager/SchemaSidebarInfo.tsx#SchemaSidebarInfo": SchemaSidebarInfo_96468a0c8dfd7d485ad501c3f3cb5169,
   "./payload/admin/components/SchemaManager/CurrentSchemaView.tsx#CurrentSchemaView": CurrentSchemaView_eb2b5a26ddc5c1c2f69a2c0c3dd840f2,
   "./payload/admin/components/SchemaManager/SchemaBlockBuilder.tsx#SchemaBlockBuilder": SchemaBlockBuilder_39f9c228a6de3d4d87098f39d8bc67da,
@@ -276,5 +287,10 @@ export const importMap = {
   "./payload/admin/components/auth/CmsAccountView.tsx#CmsAccountView": CmsAccountView_e25882c99036df42ce1493c03452d7e3,
   "./payload/admin/components/Analytics/AnalyticsView.tsx#AnalyticsView": AnalyticsView_9809f757f325208f1f22c259e380c7d4,
   "./payload/admin/components/ContentInsights/ContentInsightsView.tsx#ContentInsightsView": ContentInsightsView_4f64082482f4a971d7f1f3adfd127137,
-  "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
+  "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
+  "@/payload/admin/components/fields/PointField.tsx#PointField": PointField_dc800e7ca3d2eb7ea39fd4bc6138c687,
+  "@/payload/admin/components/fields/RadioField.tsx#RadioField": RadioField_31aae9b520654e49d40e444571bafe41,
+  "@/payload/admin/components/fields/TabsField.tsx#TabsField": TabsField_c014faddfba6da88b9efedda256f4990,
+  "@/payload/admin/components/fields/RowField.tsx#RowField": RowField_1ef7316c3d3f9450222b0eb086a8e243,
+  "@/payload/admin/components/fields/CodeField.tsx#CodeField": CodeField_4aa85fbd783c4d26c5c89ebf383941c1
 }

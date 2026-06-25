@@ -8135,6 +8135,19 @@ export interface BrokenLink {
   sourceCollection: string;
   sourceDocId: string;
   sourceDocSlug?: string | null;
+  sourceDocTitle?: string | null;
+  /**
+   * Visible link text on the page (empty for non-rich-text URL fields).
+   */
+  anchorText?: string | null;
+  /**
+   * Where the link lives in the page — "Body" or the field label.
+   */
+  location?: string | null;
+  /**
+   * Where the link ends up after following redirects (set only when it differs from the URL).
+   */
+  finalUrl?: string | null;
   firstSeenAt?: string | null;
   lastChecked?: string | null;
   /**
@@ -12441,6 +12454,10 @@ export interface BrokenLinksSelect<T extends boolean = true> {
   sourceCollection?: T;
   sourceDocId?: T;
   sourceDocSlug?: T;
+  sourceDocTitle?: T;
+  anchorText?: T;
+  location?: T;
+  finalUrl?: T;
   firstSeenAt?: T;
   lastChecked?: T;
   note?: T;
