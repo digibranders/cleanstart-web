@@ -4,7 +4,8 @@ import type { AdminViewServerProps, Payload, Where } from 'payload';
 import type { ReactElement, ReactNode } from 'react';
 
 import { ChevronRight } from '../icons/Chevron';
-import { AnalyticsCards } from './AnalyticsCards';
+// Analytics snapshot hidden — re-enable with the render below.
+// import { AnalyticsCards } from './AnalyticsCards';
 
 const PROJECT_NAME = 'CleanStart';
 
@@ -471,7 +472,9 @@ export const Dashboard = async (
         />
       </section>
 
-      <AnalyticsCards payload={payload} />
+      {/* Analytics snapshot hidden — re-enable by uncommenting this and the
+          AnalyticsCards import at the top of the file. */}
+      {/* <AnalyticsCards payload={payload} /> */}
 
       <section aria-label="Recent edits" className="cs-dashboard__section">
         <div className="cs-dashboard__section-head">
