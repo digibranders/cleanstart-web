@@ -96,4 +96,33 @@ describe('checkBrokenLinksTask', () => {
     await handler({ req } as never);
     expect(spies.create).not.toHaveBeenCalled();
   });
+
+  it('persists anchorText, sourceDocTitle, finalUrl and location on create', async () => {
+    vi.spyOn(scanner, 'scanForBrokenLinks').mockResolvedValueOnce([
+      {
+        url: 'https://example.com/x',
+        status: 'broken',
+        httpStatus: 404,
+        finalUrl: 'https://example.com/gone',
+        sourceCollection: 'blogs',
+        sourceDocId: '7',
+        sourceDocSlug: 'x',
+        sourceDocTitle: 'Post X',
+        anchorText: 'see this',
+        location: 'Body',
+      },
+    ] as never);
+    const { req, spies } = makeReq([]);
+    await handler({ req } as never);
+    expect(spies.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          anchorText: 'see this',
+          sourceDocTitle: 'Post X',
+          finalUrl: 'https://example.com/gone',
+          location: 'Body',
+        }),
+      }),
+    );
+  });
 });
