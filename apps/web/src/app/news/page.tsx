@@ -16,14 +16,8 @@ const TITLE = "Newsroom";
 const DESCRIPTION =
   "Stay current with CleanStart's latest press releases, partnership announcements, product launches, and milestones in secure container image and software supply chain security.";
 
-export async function generateMetadata({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}): Promise<Metadata> {
-  const params = await searchParams;
-  const page = Math.max(1, Number.parseInt(String(params.page ?? "1"), 10) || 1);
-  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/news", eyebrow: "Newsroom" }, page);
+export function generateMetadata(): Metadata {
+  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/news", eyebrow: "Newsroom" });
 }
 
 /**

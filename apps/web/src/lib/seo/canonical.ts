@@ -193,34 +193,24 @@ interface ListingMetadataInput {
 }
 
 /**
- * Metadata for paginated listing pages. Rules:
- *   page 1 (or absent) → canonical = basePath, fully indexed
- *   pages 2–5          → self-canonical with ?page=N, fully indexed
- *   pages 6+           → self-canonical + noindex, follow:true (too deep to index,
- *                         but crawlers should still follow links to discover articles)
+ * Metadata for listing pages. Canonical is always the clean `basePath` and the
+ * page is always indexed.
+ *
+ * These listings paginate/filter entirely on the client: every `?page=N` /
+ * `?category=` / `?q=` URL returns the *same* statically-rendered page-1 HTML
+ * and JS swaps the grid in memory. There is no distinct server-rendered
+ * document per page, so a `?page=N` self-canonical would point a crawler at a
+ * query variant that renders identically — duplicate content. Canonicalling
+ * every variant to `basePath` is both correct and what keeps the route static:
+ * reading `searchParams` here (to vary the canonical by page) would opt the
+ * whole route into dynamic rendering, defeating the static-listing design.
  */
-export function buildListingMetadata(
-  input: ListingMetadataInput,
-  page: number,
-): Metadata {
-  const p = Math.max(1, Number.isFinite(page) ? page : 1);
-  const canonicalPath = p <= 1 ? input.basePath : `${input.basePath}?page=${p}`;
-  const isDeepPage = p >= 6;
-
-  const metadata = buildPageMetadata({
+export function buildListingMetadata(input: ListingMetadataInput): Metadata {
+  return buildPageMetadata({
     title: input.title,
     description: input.description,
-    path: canonicalPath,
+    path: input.basePath,
     eyebrow: input.eyebrow,
     variant: input.variant,
-    noindex: isDeepPage,
   });
-
-  if (isDeepPage) {
-    // buildPageMetadata sets follow:false when noindex:true; override to
-    // follow:true so crawlers can still reach article URLs on deep pages.
-    return { ...metadata, robots: { index: false, follow: true } };
-  }
-
-  return metadata;
 }
