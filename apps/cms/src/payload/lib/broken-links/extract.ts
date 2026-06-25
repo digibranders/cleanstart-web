@@ -1,17 +1,14 @@
 import { isSafePublicHttpUrl } from '../url-safety/ssrf-guard';
 
 /**
- * Walk a Lexical body + adjacent doc fields (heroImage, asset) and
- * return a deduplicated set of every external + internal URL the
- * editor referenced. Used by the nightly broken-link scanner.
+ * Walk a Lexical body + adjacent doc fields and return every external
+ * URL the editor referenced, with the visible anchor text and a
+ * human-readable location. Used by the nightly broken-link scanner.
  *
- * We deliberately don't follow internal-doc relationships — the
- * `slugChangeRedirectHook` already keeps those resolvable. The
- * scanner cares about typed URL fields and rich-text href anchors.
+ * Internal-doc relationships (`linkType === 'internal'`, `doc != null`)
+ * are skipped — Payload's slug-change hook keeps those resolvable.
  *
- * SSRF defence: every emitted URL passes `isSafePublicHttpUrl` so
- * the nightly cron never HEADs an editor-planted private-IP /
- * loopback / metadata target.
+ * SSRF defence: every emitted URL passes `isSafePublicHttpUrl`.
  */
 
 interface LinkAttrs {
@@ -25,31 +22,43 @@ interface LexicalNode {
   type?: string;
   fields?: LinkAttrs;
   url?: string;
+  text?: string;
   children?: LexicalNode[];
+}
+
+export interface LexicalLink {
+  url: string;
+  anchorText: string | null;
+}
+
+export interface ExtractedLink {
+  url: string;
+  anchorText: string | null;
+  location: string;
 }
 
 const isLinkNode = (node: LexicalNode): boolean =>
   node.type === 'link' || node.type === 'autolink';
 
-/**
- * Walk a Lexical body and yield every URL referenced. Internal
- * relationships (`linkType === 'internal'`, `doc != null`) are
- * skipped — those resolve via Payload's relationship surface and
- * are kept consistent by the slug-change hook.
- */
-export const extractLinksFromLexical = (body: unknown): string[] => {
+const collectText = (node: LexicalNode): string => {
+  if (typeof node.text === 'string') return node.text;
+  if (node.children) return node.children.map(collectText).join('');
+  return '';
+};
+
+export const extractLinksFromLexical = (body: unknown): LexicalLink[] => {
   if (!body || typeof body !== 'object') return [];
   const root = (body as { root?: LexicalNode }).root;
   if (!root || !root.children) return [];
-  const urls = new Set<string>();
+  const byUrl = new Map<string, LexicalLink>();
   const walk = (node: LexicalNode): void => {
     if (isLinkNode(node)) {
       const linkType = node.fields?.linkType;
       const doc = node.fields?.doc;
       const url = node.fields?.url ?? node.url ?? '';
-      // Skip internal-doc relationships — Payload manages them.
-      if (linkType !== 'internal' && doc == null && url.length > 0) {
-        urls.add(url);
+      if (linkType !== 'internal' && doc == null && url.length > 0 && !byUrl.has(url)) {
+        const text = collectText(node).trim();
+        byUrl.set(url, { url, anchorText: text.length > 0 ? text : null });
       }
     }
     if (node.children) {
@@ -57,46 +66,47 @@ export const extractLinksFromLexical = (body: unknown): string[] => {
     }
   };
   for (const child of root.children) walk(child);
-  return [...urls];
+  return [...byUrl.values()];
 };
 
 const isFetchSafeHttpUrl = (raw: string): boolean => isSafePublicHttpUrl(raw).ok;
 
+const SCALAR_URL_FIELDS: ReadonlyArray<readonly [key: string, label: string]> = [
+  ['applyUrl', 'Apply URL'],
+  ['atsUrl', 'ATS URL'],
+  ['registrationUrl', 'Registration URL'],
+  ['recordingUrl', 'Recording URL'],
+  ['slidesUrl', 'Slides URL'],
+  ['newsLink', 'News link'],
+];
+
 /**
- * Top-level extractor — handles a doc's body PLUS the most-common
- * URL-bearing typed fields (canonical override, applyUrl, atsUrl,
- * registrationUrl, recordingUrl, slidesUrl, News Link, Resources
- * PDF Url). Returns absolute http(s) URLs only that pass the SSRF
- * guard — site-relative paths and editor-planted private/loopback /
- * metadata addresses stay out of the broken-link detector.
+ * Top-level extractor — body rich-text links (location "Body") plus the
+ * common typed URL fields and the nested SEO canonical override (located
+ * by field label). Returns absolute http(s) URLs that pass the SSRF
+ * guard; first occurrence of a URL wins (body before typed fields).
  */
-export const extractAllLinks = (
-  doc: Record<string, unknown>,
-): string[] => {
-  const urls = new Set<string>();
+export const extractAllLinks = (doc: Record<string, unknown>): ExtractedLink[] => {
+  const byUrl = new Map<string, ExtractedLink>();
+  const add = (url: string, anchorText: string | null, location: string): void => {
+    if (isFetchSafeHttpUrl(url) && !byUrl.has(url)) {
+      byUrl.set(url, { url, anchorText, location });
+    }
+  };
 
-  for (const url of extractLinksFromLexical(doc.body)) {
-    if (isFetchSafeHttpUrl(url)) urls.add(url);
+  for (const link of extractLinksFromLexical(doc.body)) {
+    add(link.url, link.anchorText, 'Body');
   }
 
-  const SCALAR_URL_FIELDS = [
-    'applyUrl',
-    'atsUrl',
-    'registrationUrl',
-    'recordingUrl',
-    'slidesUrl',
-    'newsLink',
-  ] as const;
-  for (const key of SCALAR_URL_FIELDS) {
+  for (const [key, label] of SCALAR_URL_FIELDS) {
     const value = doc[key];
-    if (typeof value === 'string' && isFetchSafeHttpUrl(value)) urls.add(value);
+    if (typeof value === 'string') add(value, null, label);
   }
 
-  // Nested SEO override.
   const seo = doc.seo as { canonicalOverride?: string } | undefined;
-  if (seo && typeof seo.canonicalOverride === 'string' && isFetchSafeHttpUrl(seo.canonicalOverride)) {
-    urls.add(seo.canonicalOverride);
+  if (seo && typeof seo.canonicalOverride === 'string') {
+    add(seo.canonicalOverride, null, 'Canonical override');
   }
 
-  return [...urls];
+  return [...byUrl.values()];
 };
