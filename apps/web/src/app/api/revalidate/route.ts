@@ -38,6 +38,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   let body: {
     tags?: unknown;
     paths?: unknown;
+    layoutPaths?: unknown;
     secret?: unknown;
     tag?: unknown;
   } | null = null;
@@ -46,6 +47,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     body = (await req.json()) as {
       tags?: unknown;
       paths?: unknown;
+      layoutPaths?: unknown;
       secret?: unknown;
       tag?: unknown;
     };
@@ -98,6 +100,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         (p): p is string => typeof p === "string" && p.startsWith("/"),
       )
     : [];
+  const layoutPaths = Array.isArray(body?.layoutPaths)
+    ? body.layoutPaths.filter(
+        (p): p is string => typeof p === "string" && p.startsWith("/"),
+      )
+    : [];
 
   // Next 16 `revalidateTag` requires a cache profile arg. "default"
   // matches the framework's built-in profile and triggers an immediate
@@ -112,9 +119,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // "page" only matches the route pattern (/blogs/[slug]), not the concrete
   // instance — which left every detail page stale until the ISR TTL lapsed.
   for (const path of paths) revalidatePath(path);
+  // layoutPaths revalidate a whole route subtree (revalidatePath(p, 'layout')).
+  // The CMS sends ['/'] for a full-site purge — the canonical "revalidate
+  // everything" form, since revalidatePath('/') alone only purges the homepage.
+  for (const path of layoutPaths) revalidatePath(path, "layout");
 
   return NextResponse.json({
     ok: true,
-    revalidated: { tags, paths },
+    revalidated: { tags, paths, layoutPaths },
   });
 }
