@@ -1,10 +1,15 @@
 'use client';
 
+import { useAuth } from '@payloadcms/ui';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState, type ReactElement } from 'react';
 
 import { Logo } from '../Logo';
+
+const isAdmin = (user: unknown): boolean =>
+  Array.isArray((user as { roles?: unknown })?.roles) &&
+  (user as { roles: string[] }).roles.includes('admin');
 
 // Detect Mac so we render the right shortcut glyph in the search hint.
 const useIsMac = (): boolean => {
@@ -35,7 +40,9 @@ const useIsMac = (): boolean => {
  */
 export const SidebarHeader = (): ReactElement => {
   const pathname = usePathname() ?? '';
+  const { user } = useAuth();
   const isDashboard = pathname === '/admin' || pathname === '/admin/';
+  const isCache = pathname.startsWith('/admin/cache');
   // Analytics + Content insights nav links are hidden. To re-enable, uncomment
   // these two consts and the matching <Link> blocks in the render below.
   // const isAnalytics = pathname.startsWith('/admin/analytics');
@@ -130,6 +137,52 @@ export const SidebarHeader = (): ReactElement => {
         </svg>
         <span>Dashboard</span>
       </Link>
+
+      {/* Cache — admin-only ISR purge controls. Sits in the sticky header as a
+          first-class destination directly below Dashboard, styled identically. */}
+      {isAdmin(user) && (
+        <Link
+          href="/admin/cache"
+          className={
+            isCache
+              ? 'cs-sidebar-dashboard cs-sidebar-dashboard--active'
+              : 'cs-sidebar-dashboard'
+          }
+          aria-current={isCache ? 'page' : undefined}
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <ellipse
+              cx="8"
+              cy="3.5"
+              rx="5.5"
+              ry="2"
+              stroke="currentColor"
+              strokeWidth="1.4"
+            />
+            <path
+              d="M2.5 3.5v9c0 1.1 2.46 2 5.5 2s5.5-.9 5.5-2v-9"
+              stroke="currentColor"
+              strokeWidth="1.4"
+              strokeLinecap="round"
+            />
+            <path
+              d="M2.5 8c0 1.1 2.46 2 5.5 2s5.5-.9 5.5-2"
+              stroke="currentColor"
+              strokeWidth="1.4"
+              strokeLinecap="round"
+            />
+          </svg>
+          <span>Cache</span>
+        </Link>
+      )}
 
       {/* Analytics + Content insights nav links hidden — re-enable by uncommenting
           this block and the two consts above.
