@@ -102,6 +102,10 @@ export const Resources: CollectionConfig = {
       name: 'gateForm',
       type: 'relationship',
       relationTo: 'forms',
+      // Restrict the picker to the dedicated gated-download form so editors
+      // can't accidentally attach an unrelated lead form (book-a-demo,
+      // contact, …) as a download gate.
+      filterOptions: () => ({ slug: { equals: 'content-gated' } }),
       admin: {
         description:
           'Form the visitor fills to unlock the download. Required when gated — the validator blocks save until set.',
