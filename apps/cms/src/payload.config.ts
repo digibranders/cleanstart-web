@@ -50,6 +50,7 @@ import { SearchLog } from './payload/collections/SearchLog';
 import { Users } from './payload/collections/Users';
 import { Webinars } from './payload/collections/Webinars';
 import { cachePurgeEndpoint } from './payload/endpoints/cache-purge';
+import { cacheSearchEndpoint } from './payload/endpoints/cache-search';
 import { canonicalCheckEndpoint } from './payload/endpoints/canonical-check';
 import { mediaRenameEndpoint } from './payload/endpoints/media-rename';
 import { userReassignContentEndpoint } from './payload/endpoints/user-offboard';
@@ -440,6 +441,7 @@ export default buildConfig({
     redirectsRecordHitEndpoint,
     canonicalCheckEndpoint,
     cachePurgeEndpoint,
+    cacheSearchEndpoint,
     searchQueryEndpoint,
     searchAnalyticsEndpoint,
     topicSuggestionsEndpoint,
