@@ -103,12 +103,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   // matches the framework's built-in profile and triggers an immediate
   // purge of fetches tagged with this tag on the next request.
   for (const tag of tags) revalidateTag(tag, "default");
-  // Pass 'page' (not 'layout'): the CMS publish hooks always send concrete
-  // leaf paths — the listing (e.g. /blogs) and the exact detail URL (e.g.
-  // /blogs/my-post) — never a prefix meant to fan out to a subtree. 'layout'
-  // would revalidate the whole nested route group, billing extra ISR writes
-  // for pages that didn't change. 'page' revalidates exactly the URL given.
-  for (const path of paths) revalidatePath(path, "page");
+  // The CMS publish hooks always send concrete resolved URLs — the listing
+  // (e.g. /blogs) and the exact detail URL (e.g. /blogs/my-post), never a
+  // bracket route pattern. Call revalidatePath with NO type arg: for a
+  // resolved URL that is the documented "revalidate this specific URL" form,
+  // which purges both static listings and dynamic [slug] detail pages.
+  // Passing "page" alongside a *resolved* dynamic URL silently no-ops —
+  // "page" only matches the route pattern (/blogs/[slug]), not the concrete
+  // instance — which left every detail page stale until the ISR TTL lapsed.
+  for (const path of paths) revalidatePath(path);
 
   return NextResponse.json({
     ok: true,

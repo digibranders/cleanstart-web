@@ -10,6 +10,10 @@ import {
 } from '../hooks/search-sync';
 import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { normalizeLexicalHook } from '../hooks/normalize-lexical';
+import {
+  revalidateWebAfterDeleteHook,
+  revalidateWebPublishAfterChangeHook,
+} from '../hooks/revalidate-web-publish';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
@@ -177,8 +181,12 @@ export const Authors: CollectionConfig = {
       searchSyncAfterChangeHook('authors'),
       webhooksPublishAfterChangeHook('authors'),
       indexNowPublishAfterChangeHook('authors'),
+      revalidateWebPublishAfterChangeHook('authors'),
     ],
-    afterDelete: [searchSyncAfterDeleteHook('authors')],
+    afterDelete: [
+      searchSyncAfterDeleteHook('authors'),
+      revalidateWebAfterDeleteHook('authors'),
+    ],
   },
   versions: { drafts: true },
   timestamps: true,

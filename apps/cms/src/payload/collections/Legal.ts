@@ -13,6 +13,10 @@ import { firstPublishHook } from '../hooks/first-publish';
 import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { normalizeLexicalHook } from '../hooks/normalize-lexical';
 import {
+  revalidateWebAfterDeleteHook,
+  revalidateWebPublishAfterChangeHook,
+} from '../hooks/revalidate-web-publish';
+import {
   searchSyncAfterChangeHook,
   searchSyncAfterDeleteHook,
 } from '../hooks/search-sync';
@@ -127,8 +131,12 @@ export const LegalDocuments: CollectionConfig = {
       searchSyncAfterChangeHook('legalDocuments'),
       webhooksPublishAfterChangeHook('legalDocuments'),
       indexNowPublishAfterChangeHook('legalDocuments'),
+      revalidateWebPublishAfterChangeHook('legalDocuments'),
     ],
-    afterDelete: [searchSyncAfterDeleteHook('legalDocuments')],
+    afterDelete: [
+      searchSyncAfterDeleteHook('legalDocuments'),
+      revalidateWebAfterDeleteHook('legalDocuments'),
+    ],
   },
   // No `maxPerDoc` cap: legal documents retain their full amendment history
   // for compliance/audit. Schedule-publish is enabled for dated effective terms.
