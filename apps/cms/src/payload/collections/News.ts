@@ -1,28 +1,26 @@
 import type { CollectionConfig } from 'payload';
+import { purgePageUiField } from '../fields/purge-page-ui';
 
 import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
-import { ROUTE_PREFIX } from '../lib/route-prefixes';
 import { mediaUploadField } from '../fields/media-upload';
 import { schemaAddonsField } from '../fields/schema-addons';
-import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { bodyStatsHook } from '../hooks/body-stats';
-import { normalizeLexicalHook } from '../hooks/normalize-lexical';
 import { firstPublishBeforeValidateHook } from '../hooks/first-publish';
-import {
-  searchSyncAfterChangeHook,
-  searchSyncAfterDeleteHook,
-} from '../hooks/search-sync';
 import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
+import { normalizeLexicalHook } from '../hooks/normalize-lexical';
 import {
   revalidateWebAfterDeleteHook,
   revalidateWebPublishAfterChangeHook,
 } from '../hooks/revalidate-web-publish';
+import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
+import { searchSyncAfterChangeHook, searchSyncAfterDeleteHook } from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
+import { ROUTE_PREFIX } from '../lib/route-prefixes';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 export const News: CollectionConfig = {
@@ -43,6 +41,7 @@ export const News: CollectionConfig = {
     delete: isAdminOrEditor,
   },
   fields: [
+    purgePageUiField,
     contentTitleField,
     slugField({ source: 'title' }),
     { name: 'abstract', type: 'textarea' },
@@ -243,10 +242,7 @@ export const News: CollectionConfig = {
       indexNowPublishAfterChangeHook('news'),
       revalidateWebPublishAfterChangeHook('news'),
     ],
-    afterDelete: [
-      searchSyncAfterDeleteHook('news'),
-      revalidateWebAfterDeleteHook('news'),
-    ],
+    afterDelete: [searchSyncAfterDeleteHook('news'), revalidateWebAfterDeleteHook('news')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

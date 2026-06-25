@@ -1,10 +1,10 @@
 import type { CollectionBeforeChangeHook, CollectionConfig } from 'payload';
+import { purgePageUiField } from '../fields/purge-page-ui';
 
 import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
-import { ROUTE_PREFIX } from '../lib/route-prefixes';
-import { mediaUploadField } from '../fields/media-upload';
 import { displayPublishedAtField } from '../fields/display-published-at';
+import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
@@ -13,19 +13,17 @@ import { contentTitleField } from '../fields/title';
 import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
 import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
 import { firstPublishHook } from '../hooks/first-publish';
-import { normalizeLexicalHook } from '../hooks/normalize-lexical';
-import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
-import {
-  searchSyncAfterChangeHook,
-  searchSyncAfterDeleteHook,
-} from '../hooks/search-sync';
 import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
+import { normalizeLexicalHook } from '../hooks/normalize-lexical';
+import {
+  revalidateWebAfterDeleteHook,
+  revalidateWebPublishAfterChangeHook,
+} from '../hooks/revalidate-web-publish';
+import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
+import { searchSyncAfterChangeHook, searchSyncAfterDeleteHook } from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
-import {
-  revalidateWebPublishAfterChangeHook,
-  revalidateWebAfterDeleteHook,
-} from '../hooks/revalidate-web-publish';
+import { ROUTE_PREFIX } from '../lib/route-prefixes';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 /**
@@ -37,11 +35,7 @@ import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape'
 const stampClosedAtHook: CollectionBeforeChangeHook = ({ data, originalDoc }) => {
   const next = data as Record<string, unknown>;
   const prev = originalDoc as Record<string, unknown> | undefined;
-  if (
-    next.hiringStatus === 'closed' &&
-    prev?.hiringStatus !== 'closed' &&
-    next.closedAt == null
-  ) {
+  if (next.hiringStatus === 'closed' && prev?.hiringStatus !== 'closed' && next.closedAt == null) {
     next.closedAt = new Date().toISOString();
   }
   return next;
@@ -52,7 +46,14 @@ export const Jobs: CollectionConfig = {
   labels: { singular: 'Job', plural: 'Jobs' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'department', 'employmentType', 'hiringStatus', '_status', 'updatedAt'],
+    defaultColumns: [
+      'title',
+      'department',
+      'employmentType',
+      'hiringStatus',
+      '_status',
+      'updatedAt',
+    ],
     group: 'Content',
     components: {
       edit: docStatusBarEditConfig({ showStats: false, showPublishedAt: true }),
@@ -65,6 +66,7 @@ export const Jobs: CollectionConfig = {
     delete: isAdminOrEditor,
   },
   fields: [
+    purgePageUiField,
     contentTitleField,
     slugField({ source: 'title' }),
     {
@@ -223,8 +225,7 @@ export const Jobs: CollectionConfig = {
       name: 'descriptionPdf',
       folderHint: 'web/job',
       description: 'Optional JD PDF (routed to web/job/).',
-      condition: (_data, sibling) =>
-        (sibling as { source?: string } | undefined)?.source === 'cms',
+      condition: (_data, sibling) => (sibling as { source?: string } | undefined)?.source === 'cms',
     }),
     {
       name: 'applyUrl',
@@ -247,8 +248,7 @@ export const Jobs: CollectionConfig = {
       ],
       admin: {
         position: 'sidebar',
-        description:
-          'Hiring lifecycle. Distinct from Payload _status (draft/published).',
+        description: 'Hiring lifecycle. Distinct from Payload _status (draft/published).',
       },
     },
     {
@@ -289,7 +289,8 @@ export const Jobs: CollectionConfig = {
       admin: {
         allowCreate: false,
         defaultColumns: ['firstName', 'lastName', 'email', 'emailDelivery', 'createdAt'],
-        description: 'Applications submitted for this job (read-only). Open one to download the resume.',
+        description:
+          'Applications submitted for this job (read-only). Open one to download the resume.',
       },
     },
     {
@@ -312,7 +313,12 @@ export const Jobs: CollectionConfig = {
     ...seoFieldsForSidebar('jobs'),
   ],
   hooks: {
-    beforeChange: [normalizeLexicalHook(), firstPublishHook(), displayPublishedAtBackfillHook, stampClosedAtHook],
+    beforeChange: [
+      normalizeLexicalHook(),
+      firstPublishHook(),
+      displayPublishedAtBackfillHook,
+      stampClosedAtHook,
+    ],
     afterChange: [
       slugChangeRedirectHook('jobs'),
       schemaOverrideAuditHook('jobs'),

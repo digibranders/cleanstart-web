@@ -1,3 +1,4 @@
+import { PurgePageButton as PurgePageButton_a58a4f3c1ca0e03afe93a686210809b9 } from '@/payload/admin/components/cache/PurgePageButton.tsx'
 import { TextField as TextField_d8b22c7a38a756dd8ecb3437acff34bf } from '@/payload/admin/components/fields/TextField.tsx'
 import { SlugField as SlugField_72967e7957358d52051eede57fbdd787 } from '@/payload/admin/components/SlugField.tsx'
 import { TextareaField as TextareaField_910298ace0fe3204ac012253d7fcff5b } from '@/payload/admin/components/fields/TextareaField.tsx'
@@ -147,6 +148,7 @@ import { CodeField as CodeField_4aa85fbd783c4d26c5c89ebf383941c1 } from '@/paylo
 
 /** @type import('payload').ImportMap */
 export const importMap = {
+  "@/payload/admin/components/cache/PurgePageButton.tsx#PurgePageButton": PurgePageButton_a58a4f3c1ca0e03afe93a686210809b9,
   "@/payload/admin/components/fields/TextField.tsx#TextField": TextField_d8b22c7a38a756dd8ecb3437acff34bf,
   "@/payload/admin/components/SlugField.tsx#SlugField": SlugField_72967e7957358d52051eede57fbdd787,
   "@/payload/admin/components/fields/TextareaField.tsx#TextareaField": TextareaField_910298ace0fe3204ac012253d7fcff5b,

@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload';
+import { purgePageUiField } from '../fields/purge-page-ui';
 
 import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
@@ -7,11 +8,11 @@ import { publishedAtField } from '../fields/published-at';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { firstPublishHook } from '../hooks/first-publish';
-import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 import {
-  revalidateWebPublishAfterChangeHook,
   revalidateWebAfterDeleteHook,
+  revalidateWebPublishAfterChangeHook,
 } from '../hooks/revalidate-web-publish';
+import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
 /**
  * Case Studies — a listing-only, download-first collection.
@@ -45,6 +46,7 @@ export const CaseStudies: CollectionConfig = {
     delete: isAdminOrEditor,
   },
   fields: [
+    purgePageUiField,
     contentTitleField,
     slugField({ source: 'title' }),
     {

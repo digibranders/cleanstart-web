@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload';
+import { purgePageUiField } from '../fields/purge-page-ui';
 
 import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
@@ -16,10 +17,7 @@ import {
   revalidateWebAfterDeleteHook,
   revalidateWebPublishAfterChangeHook,
 } from '../hooks/revalidate-web-publish';
-import {
-  searchSyncAfterChangeHook,
-  searchSyncAfterDeleteHook,
-} from '../hooks/search-sync';
+import { searchSyncAfterChangeHook, searchSyncAfterDeleteHook } from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
@@ -63,6 +61,7 @@ export const LegalDocuments: CollectionConfig = {
     delete: isAdminOrEditor,
   },
   fields: [
+    purgePageUiField,
     contentTitleField,
     slugField({ source: 'title' }),
     {
@@ -94,7 +93,8 @@ export const LegalDocuments: CollectionConfig = {
       admin: {
         position: 'sidebar',
         date: { pickerAppearance: 'dayOnly', displayFormat: 'MMMM d, yyyy' },
-        description: 'The date these terms take legal effect. Shown publicly as the “Effective” date.',
+        description:
+          'The date these terms take legal effect. Shown publicly as the “Effective” date.',
       },
     },
     { name: 'body', type: 'richText' },
@@ -120,11 +120,7 @@ export const LegalDocuments: CollectionConfig = {
     ...seoSidebarFields({ pathPrefix: '/legal', descriptionSource: 'title' }),
   ],
   hooks: {
-    beforeChange: [
-      normalizeLexicalHook(),
-      firstPublishHook(),
-      displayPublishedAtBackfillHook,
-    ],
+    beforeChange: [normalizeLexicalHook(), firstPublishHook(), displayPublishedAtBackfillHook],
     afterChange: [
       slugChangeRedirectHook('legalDocuments'),
       displayPublishedAtAuditHook('legalDocuments'),
