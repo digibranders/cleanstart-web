@@ -61,6 +61,14 @@
       "name": "finalUrl"
     },
     {
+      "type": "ui",
+      "name": "sourcePageLink"
+    },
+    {
+      "type": "ui",
+      "name": "diagnosis"
+    },
+    {
       "type": "date",
       "name": "firstSeenAt"
     },

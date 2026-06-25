@@ -35,7 +35,16 @@ export const BrokenLinks: CollectionConfig = {
     delete: isAdmin,
   },
   fields: [
-    { name: 'url', type: 'text', required: true, index: true, admin: { readOnly: true } },
+    {
+      name: 'url',
+      type: 'text',
+      required: true,
+      index: true,
+      admin: {
+        readOnly: true,
+        components: { Field: { path: '@/payload/admin/components/BrokenLinkUrlField.tsx#BrokenLinkUrlField' } },
+      },
+    },
     {
       name: 'status',
       type: 'select',
@@ -95,6 +104,25 @@ export const BrokenLinks: CollectionConfig = {
         readOnly: true,
         description:
           'Where the link ends up after following redirects (set only when it differs from the URL).',
+      },
+    },
+    {
+      name: 'sourcePageLink',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: { path: '@/payload/admin/components/SourcePageLinkField.tsx#SourcePageLinkField' },
+        },
+      },
+    },
+    {
+      name: 'diagnosis',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: { path: '@/payload/admin/components/BrokenLinkStatusField.tsx#BrokenLinkStatusField' },
+        },
       },
     },
     { name: 'firstSeenAt', type: 'date', admin: { readOnly: true } },
