@@ -154,7 +154,7 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
   );
 }
 
-// Intelligence Centre bar — the original platform-bar treatment (indigo
+// Intelligence Center bar — the original platform-bar treatment (indigo
 // gradient, lavender stroke, diagonal hatch), opaque so it occludes the card
 // exhaust-flare tails that bleed up from the gap above it.
 function IntelligenceBar() {
@@ -182,7 +182,7 @@ function IntelligenceBar() {
           letterSpacing: "-0.04em",
         }}
       >
-        CleanStart Intelligence Centre
+        CleanStart Intelligence Center
       </h3>
       <p
         className="relative text-white/80"
@@ -201,7 +201,7 @@ function IntelligenceBar() {
 
 // Original factory enclosure (dark-navy → indigo → purple gradient, lavender
 // stroke, diagonal hatch, layered drop shadow) wrapping the 3 cards and the
-// Intelligence Centre bar.
+// Intelligence Center bar.
 function FactoryEnclosure() {
   return (
     <div className="relative w-full">
@@ -246,7 +246,7 @@ function FactoryEnclosure() {
               per card. Mirrors the card grid (same width + gap) so each beam
               stays centred on its card whatever the gap. Each is a flowing
               dashed "current"; `reverse` makes it flow bottom-up (Intelligence
-              Centre → cards). Phase-offset per lane for life. Always shown: the
+              Center → cards). Phase-offset per lane for life. Always shown: the
               layout never collapses to a single column. */}
           <div className="relative mx-auto w-full max-w-[780px]">
             <div className="grid h-[38px] grid-cols-3 gap-11">
@@ -521,7 +521,7 @@ function CometRail({
 }
 
 // Mobile root: a live left rail — an off-white comet "spine" falling toward the
-// Intelligence Centre, branching through a dotted tap + connector node into each
+// Intelligence Center, branching through a dotted tap + connector node into each
 // of the three stacked product cards. The original "Pipeline Tower" stacked
 // vertically, wired with motion instead of the desktop block scaled down to a
 // postage stamp.
@@ -556,7 +556,7 @@ function PlatformPipelineMobile() {
         ))}
       </div>
 
-      {/* Gap, then the Intelligence Centre bar — the spine plugs into its top-left
+      {/* Gap, then the Intelligence Center bar — the spine plugs into its top-left
           corner, marked by a node. */}
       <div className="relative" style={{ marginTop: 40 }}>
         <RailNode left={SPINE_X} top={0} />
