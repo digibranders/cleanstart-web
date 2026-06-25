@@ -152,7 +152,7 @@ export function HeroAwardSlide(): React.ReactElement {
         y={40}
         delay={0.15}
         duration={1.0}
-        className="relative z-10 flex w-full max-w-[440px] shrink-0 justify-center lg:w-[46%] lg:justify-end lg:pr-[24px]"
+        className="relative z-10 flex w-full max-w-[440px] shrink-0 justify-center lg:w-[46%] lg:max-w-none lg:justify-start"
       >
         <Image
           src="/images/home/award-winner-2026.webp"

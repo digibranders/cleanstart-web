@@ -18,14 +18,8 @@ const TITLE = "Resource Center";
 const DESCRIPTION =
   "A curated collection of whitepapers, ebooks, datasheets, architecture insights, and reports on container security.";
 
-export async function generateMetadata({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}): Promise<Metadata> {
-  const params = await searchParams;
-  const page = Math.max(1, Number.parseInt(String(params.page ?? "1"), 10) || 1);
-  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/resource-center", eyebrow: "Resources" }, page);
+export function generateMetadata(): Metadata {
+  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/resource-center", eyebrow: "Resources" });
 }
 
 /**

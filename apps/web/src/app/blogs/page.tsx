@@ -16,14 +16,8 @@ const TITLE = "Blogs";
 const DESCRIPTION =
   "Explore CleanStart's blog expert insights on container security, software supply chain threats, CVE management, SBOM, and building trust in cloud-native environments.";
 
-export async function generateMetadata({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}): Promise<Metadata> {
-  const params = await searchParams;
-  const page = Math.max(1, Number.parseInt(String(params.page ?? "1"), 10) || 1);
-  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/blogs", eyebrow: "Blog" }, page);
+export function generateMetadata(): Metadata {
+  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/blogs", eyebrow: "Blog" });
 }
 
 /**

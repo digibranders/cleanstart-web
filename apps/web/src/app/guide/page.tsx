@@ -16,14 +16,8 @@ const TITLE = "Guides";
 const DESCRIPTION =
   "A curated collection of writings, research, and solutions on container security, DevOps, and compliance.";
 
-export async function generateMetadata({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}): Promise<Metadata> {
-  const params = await searchParams;
-  const page = Math.max(1, Number.parseInt(String(params.page ?? "1"), 10) || 1);
-  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/guide", eyebrow: "Guide" }, page);
+export function generateMetadata(): Metadata {
+  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/guide", eyebrow: "Guide" });
 }
 
 /**

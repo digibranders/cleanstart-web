@@ -75,11 +75,30 @@ export async function getCaseStudies({
   const params = new URLSearchParams({
     "where[_status][equals]": "published",
     "where[publishedAt][exists]": "true",
-    depth: "2",
+    // depth=1 hydrates the uploads (companyLogo/coverImage/asset — the R2
+    // adapter resolves upload URLs at depth=1; deeper is unresolved anyway) and
+    // the `industryRef` term's name/slug. depth=2 with no select returned every
+    // field, risking Next's 2 MB data-cache ceiling on the limit=1000 listing.
+    depth: "1",
     limit: String(limit),
     page: String(page),
     sort: "-publishedAt",
   });
+  // Whitelist the `CaseStudy` (card) field surface.
+  for (const field of [
+    "title",
+    "slug",
+    "industry",
+    "industryRef",
+    "company",
+    "companyLogo",
+    "coverImage",
+    "summary",
+    "asset",
+    "publishedAt",
+  ]) {
+    params.set(`select[${field}]`, "true");
+  }
   if (industry) params.set("where[industry][equals]", String(industry));
   return fetchCMS<PayloadListResponse<CaseStudy>>(
     `/api/case-studies?${params.toString()}`,

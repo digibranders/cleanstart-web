@@ -137,12 +137,17 @@ Prebuilt content served **instantly with full content while the CMS was down**.
 The never-built slug is the only failure mode, and `generateStaticParams`
 (prebuild every published slug) is exactly what removes it.
 
-### Follow-up surfaced by the test
-The **listing** routes (`/blogs`, `/guide`, `/news`, `/resources`) are still
-dynamic (`ƒ`) — under a sustained outage they stale-serve (if warmed) or hang on
-the 5-retry backoff (~12–19 s) before erroring. Make them ISR/SSG too (a `revalidate`
-export + on-demand purge on publish, which the hook already sends for the listing
-path) so listings are equally outage-proof. Tracked as a Phase 3 item.
+### Follow-up surfaced by the test — RESOLVED (Phase 3, see §3)
+The **listing** routes (`/blogs`, `/guide`, `/news`, `/resources`, plus
+`/events`, `/webinars`, `/case-studies`, `/careers`, `/resource-center`) were
+still dynamic (`ƒ`) — under a sustained outage they stale-served (if warmed) or
+hung on the 5-retry backoff (~12–19 s) before erroring, and in normal operation
+re-ran a blocking whole-collection (`limit: 1000`) fetch on **every** request,
+showing the root spinner each time. **Root cause:** each route's
+`generateMetadata` read `searchParams` (to build the `?page=N` canonical), which
+opts the whole route into dynamic rendering — `export const revalidate` can't
+override an explicit dynamic-API access. Fixed in Phase 3 (below): the listing
+metadata is now static, so the routes are ISR/SSG and equally outage-proof.
 
 **Build hardening this required:** pre-rendering *all* content makes the build
 itself depend on the CMS surviving a burst of hundreds of reads. Capped via
@@ -154,7 +159,30 @@ instead of failing the deploy.
 
 ## 3. Remaining
 
-### Phase 3 — deferred (lower value now that pages are static)
+### Phase 3 — static listings + skeleton loaders (SHIPPED)
+- **Listings made static/ISR.** `buildListingMetadata` (`lib/seo/canonical.ts`)
+  no longer takes `page`/reads `searchParams` — canonical is always the clean
+  `basePath`, always indexed (correct, since pagination is client-side: every
+  `?page=N` returns the same static page-1 HTML and JS swaps the grid). Each of
+  the 8 listing `page.tsx` files (`blogs/news/events/webinars/case-studies/
+  careers/guide/resource-center`) now exports a **synchronous, no-arg**
+  `generateMetadata`. This removes the only dynamic-render trigger, so the
+  routes are ISR/SSG (`revalidate = 3600` now effective) and served from the
+  edge — no per-request whole-collection fetch, no root spinner on every load.
+- **Two remaining heavy list queries projected.** `getWebinars` and
+  `getCaseStudies` went `depth=2 → depth=1` + `select[...]` card-field
+  whitelist (matching blogs/news/guides/resources), so their `limit: 1000`
+  listing responses stay under Next's 2 MB Data-Cache ceiling and cache.
+- **Skeleton loaders replace the spinner.** New light-themed listing skeletons
+  (`components/sections/_shared/ListingSkeleton.tsx`: per-page dark-hero
+  placeholders with search/pills/featured-post/marquee + filter rows +
+  card-shaped grid skeletons matching each card's exact dimensions) wired via a
+  per-route `loading.tsx` on all 9 listings (incl. podcast). Pure CSS
+  `animate-pulse`, `aria-live`, shift-free. (Client-side filter/pagination needs
+  no transition skeleton — the Browser components filter the in-memory set
+  synchronously, so it's already instant.)
+
+### Phase 3 (original) — deferred (lower value now that pages are static)
 - **`<Suspense>`-stream** related/journey so hero+body paint first. Deferred:
   static generation already moves Shiki + the fan-out off the user request path
   (they run at build / background ISR), so this only helps the rare cold render.
