@@ -3,7 +3,8 @@ import Image from "next/image";
 import { formatGuideDate, guideMediaUrl } from "@/lib/guides";
 import type { Guide } from "@/lib/guides";
 import { effectivePublishedAt } from "@/lib/published-date";
-import { deriveCoverKeyword, guideCoverPath } from "@/lib/guide-cover";
+import { deriveCoverKeyword } from "@/lib/guide-cover";
+import { GeneratedGuideCover } from "@/components/sections/_shared/GeneratedGuideCover";
 import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 
 interface GuideDetailRelatedGuidesProps {
@@ -107,13 +108,7 @@ function RelatedGuideCard({ guide }: { guide: Guide }): React.ReactElement {
             className="object-cover"
           />
         ) : (
-          <Image
-            src={guideCoverPath(coverKeyword)}
-            alt={`${coverKeyword} — CleanStart Guide`}
-            fill
-            sizes="(min-width: 1280px) 380px, (min-width: 768px) 50vw, 100vw"
-            className="object-cover"
-          />
+          <GeneratedGuideCover keyword={coverKeyword} />
         )}
       </div>
 
