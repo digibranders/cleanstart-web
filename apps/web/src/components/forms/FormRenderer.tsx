@@ -7,6 +7,7 @@ import type {
   FormFieldConditionRule,
 } from "@/lib/forms";
 import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
+import { TurnstileWidget } from "@/components/TurnstileWidget";
 
 export interface FormRendererSubmitResult {
   duplicate?: boolean;
@@ -129,6 +130,11 @@ export function FormRenderer({
   const { status, setStatus, statusRef } = useFormStatus();
   // Honeypot — never rendered visibly, but its existence is what bots fill.
   const [honeypot, setHoneypot] = useState("");
+  // Cloudflare Turnstile token. Required server-side for every form except the
+  // exempt low-friction slugs (newsletter, resource-capture); harmless to send
+  // for those. The gate modal renders any gateForm through this component, so
+  // the widget lives here rather than in each caller.
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   const visibleFields = useMemo(
     () => form.fields.filter((f) => evaluateConditions(f, values)),
@@ -191,6 +197,7 @@ export function FormRenderer({
         source: context?.sourceUrl,
         consent: buildConsentPayload(),
         website: honeypot,
+        ...(turnstileToken ? { turnstileToken } : {}),
         ...(context?.resourceId != null
           ? { context: { resourceId: context.resourceId } }
           : {}),
@@ -384,6 +391,12 @@ export function FormRenderer({
             </div>
           );
         })}
+
+        <TurnstileWidget
+          onToken={setTurnstileToken}
+          onExpired={() => setTurnstileToken("")}
+          onError={() => setTurnstileToken("")}
+        />
 
         <button
           type="submit"
