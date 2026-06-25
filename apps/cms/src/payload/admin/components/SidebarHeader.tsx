@@ -36,8 +36,10 @@ const useIsMac = (): boolean => {
 export const SidebarHeader = (): ReactElement => {
   const pathname = usePathname() ?? '';
   const isDashboard = pathname === '/admin' || pathname === '/admin/';
-  const isAnalytics = pathname.startsWith('/admin/analytics');
-  const isContentInsights = pathname.startsWith('/admin/content-insights');
+  // Analytics + Content insights nav links are hidden. To re-enable, uncomment
+  // these two consts and the matching <Link> blocks in the render below.
+  // const isAnalytics = pathname.startsWith('/admin/analytics');
+  // const isContentInsights = pathname.startsWith('/admin/content-insights');
   const isMac = useIsMac();
 
   // Open the Cmd+K palette on click. CommandPalette listens for the
@@ -129,6 +131,8 @@ export const SidebarHeader = (): ReactElement => {
         <span>Dashboard</span>
       </Link>
 
+      {/* Analytics + Content insights nav links hidden — re-enable by uncommenting
+          this block and the two consts above.
       <Link
         href="/admin/analytics"
         className={
@@ -197,6 +201,7 @@ export const SidebarHeader = (): ReactElement => {
         </svg>
         <span>Content insights</span>
       </Link>
+      */}
     </div>
   );
 };
