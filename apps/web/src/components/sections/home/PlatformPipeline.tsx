@@ -182,7 +182,7 @@ function IntelligenceBar() {
           letterSpacing: "-0.04em",
         }}
       >
-        CleanStart Intelligence Centre
+        CleanStart Intelligence Center
       </h3>
       <p
         className="relative text-white/80"
