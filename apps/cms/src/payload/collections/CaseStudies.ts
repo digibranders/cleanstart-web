@@ -50,7 +50,6 @@ export const CaseStudies: CollectionConfig = {
     {
       name: 'industry',
       type: 'select',
-      required: true,
       options: [
         { label: 'Healthcare', value: 'healthcare' },
         { label: 'Telecom', value: 'telecom' },
@@ -83,14 +82,14 @@ export const CaseStudies: CollectionConfig = {
     },
     mediaUploadField({
       name: 'companyLogo',
+      required: true,
       folderHint: 'web/case-study',
-      description: 'Optional company wordmark shown beside the company name. Falls back to a generic icon when empty.',
+      description: 'Company wordmark shown beside the company name.',
     }),
     mediaUploadField({
       name: 'coverImage',
-      required: true,
       folderHint: 'web/case-study',
-      description: 'Card thumbnail image.',
+      description: 'Optional card thumbnail image.',
     }),
     { name: 'summary', type: 'textarea', required: true },
     mediaUploadField({
