@@ -132,6 +132,7 @@ import { CmsLoginFooter as CmsLoginFooter_67c5b820b6d3bc2ad13ebd4c41435e40 } fro
 import { UserMenu as UserMenu_8a2f404b3fa17e34974bf49ed5367371 } from '../../../payload/admin/components/UserMenu.tsx'
 import { NavOpenOnDesktop as NavOpenOnDesktop_21bf36b0db39df18e02fc9fdb6b1a47e } from '../../../payload/admin/components/NavOpenOnDesktop.tsx'
 import { DocSidebarResizer as DocSidebarResizer_cb8d71363ce9ac2087ce9e8e5b3cebe2 } from '../../../payload/admin/components/DocSidebarResizer.tsx'
+import { CacheNavLink as CacheNavLink_adcaafc396b5c82124a19df098a36d48 } from '../../../payload/admin/components/cache/CacheNavLink.tsx'
 import { CmsLoginHero as CmsLoginHero_32623b867969588592e72c90b3b4967a } from '../../../payload/admin/components/auth/CmsLoginHero.tsx'
 import { SidebarHeader as SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519 } from '../../../payload/admin/components/SidebarHeader.tsx'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
@@ -139,6 +140,7 @@ import { Dashboard as Dashboard_99a124d7b5ab83228ca0a3f897256570 } from '../../.
 import { CmsAccountView as CmsAccountView_e25882c99036df42ce1493c03452d7e3 } from '../../../payload/admin/components/auth/CmsAccountView.tsx'
 import { AnalyticsView as AnalyticsView_9809f757f325208f1f22c259e380c7d4 } from '../../../payload/admin/components/Analytics/AnalyticsView.tsx'
 import { ContentInsightsView as ContentInsightsView_4f64082482f4a971d7f1f3adfd127137 } from '../../../payload/admin/components/ContentInsights/ContentInsightsView.tsx'
+import { CacheView as CacheView_53dd99c40bf5dfa0411c06d06a42a42b } from '../../../payload/admin/components/cache/CacheView.tsx'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { PointField as PointField_dc800e7ca3d2eb7ea39fd4bc6138c687 } from '@/payload/admin/components/fields/PointField.tsx'
 import { RadioField as RadioField_31aae9b520654e49d40e444571bafe41 } from '@/payload/admin/components/fields/RadioField.tsx'
@@ -282,6 +284,7 @@ export const importMap = {
   "./payload/admin/components/UserMenu.tsx#UserMenu": UserMenu_8a2f404b3fa17e34974bf49ed5367371,
   "./payload/admin/components/NavOpenOnDesktop.tsx#NavOpenOnDesktop": NavOpenOnDesktop_21bf36b0db39df18e02fc9fdb6b1a47e,
   "./payload/admin/components/DocSidebarResizer.tsx#DocSidebarResizer": DocSidebarResizer_cb8d71363ce9ac2087ce9e8e5b3cebe2,
+  "./payload/admin/components/cache/CacheNavLink.tsx#CacheNavLink": CacheNavLink_adcaafc396b5c82124a19df098a36d48,
   "./payload/admin/components/auth/CmsLoginHero.tsx#CmsLoginHero": CmsLoginHero_32623b867969588592e72c90b3b4967a,
   "./payload/admin/components/SidebarHeader.tsx#SidebarHeader": SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
@@ -289,6 +292,7 @@ export const importMap = {
   "./payload/admin/components/auth/CmsAccountView.tsx#CmsAccountView": CmsAccountView_e25882c99036df42ce1493c03452d7e3,
   "./payload/admin/components/Analytics/AnalyticsView.tsx#AnalyticsView": AnalyticsView_9809f757f325208f1f22c259e380c7d4,
   "./payload/admin/components/ContentInsights/ContentInsightsView.tsx#ContentInsightsView": ContentInsightsView_4f64082482f4a971d7f1f3adfd127137,
+  "./payload/admin/components/cache/CacheView.tsx#CacheView": CacheView_53dd99c40bf5dfa0411c06d06a42a42b,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@/payload/admin/components/fields/PointField.tsx#PointField": PointField_dc800e7ca3d2eb7ea39fd4bc6138c687,
   "@/payload/admin/components/fields/RadioField.tsx#RadioField": RadioField_31aae9b520654e49d40e444571bafe41,

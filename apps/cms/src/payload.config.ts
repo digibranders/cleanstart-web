@@ -294,6 +294,8 @@ export default buildConfig({
         // admin page; it's a DOM enhancer that self-activates only when an
         // edit-view sidebar (`.document-fields--has-sidebar`) is present.
         './payload/admin/components/DocSidebarResizer.tsx#DocSidebarResizer',
+        // Admin-only link to the /admin/cache purge page.
+        './payload/admin/components/cache/CacheNavLink.tsx#CacheNavLink',
       ],
       beforeNavLinks: ['./payload/admin/components/SidebarHeader.tsx#SidebarHeader'],
       // Wave 5 — branded hero injected above the stock LoginForm. Full
@@ -324,6 +326,11 @@ export default buildConfig({
         contentInsights: {
           Component: './payload/admin/components/ContentInsights/ContentInsightsView.tsx#ContentInsightsView',
           path: '/content-insights',
+        },
+        // On-demand ISR cache purge — global + custom path/tag (admin-only).
+        cache: {
+          Component: './payload/admin/components/cache/CacheView.tsx#CacheView',
+          path: '/cache',
         },
       },
     },
