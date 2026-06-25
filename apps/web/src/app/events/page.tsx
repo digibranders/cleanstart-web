@@ -26,14 +26,8 @@ const TITLE = "Events";
 const DESCRIPTION =
   "Explore CleanStart's past and upcoming events including DevOps, DevSecOps, and cybersecurity conferences, summits, and meetups across India and beyond.";
 
-export async function generateMetadata({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}): Promise<Metadata> {
-  const params = await searchParams;
-  const page = Math.max(1, Number.parseInt(String(params.page ?? "1"), 10) || 1);
-  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/events", eyebrow: "Events" }, page);
+export function generateMetadata(): Metadata {
+  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/events", eyebrow: "Events" });
 }
 
 const emptyList = (): EventsListResponse => ({

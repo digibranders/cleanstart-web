@@ -17,14 +17,8 @@ const TITLE = "Careers";
 const DESCRIPTION =
   "Join CleanStart and help build the next generation of secure software supply chains. Explore open roles in security, engineering, and compliance at a fast growing cybersecurity company.";
 
-export async function generateMetadata({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}): Promise<Metadata> {
-  const params = await searchParams;
-  const page = Math.max(1, Number.parseInt(String(params.page ?? "1"), 10) || 1);
-  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/careers", eyebrow: "Careers" }, page);
+export function generateMetadata(): Metadata {
+  return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/careers", eyebrow: "Careers" });
 }
 
 /**
