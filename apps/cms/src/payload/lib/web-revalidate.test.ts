@@ -58,3 +58,31 @@ describe('revalidateWeb', () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 });
+
+describe('revalidateWeb result + layoutPaths', () => {
+  it('reports disabled when env vars are unset', async () => {
+    vi.stubEnv('WEB_REVALIDATE_URL', '');
+    vi.stubEnv('WEB_REVALIDATE_SECRET', '');
+    const res = await revalidateWeb(fakePayload(), { paths: ['/news'] });
+
+    expect(res).toEqual({ ok: false, disabled: true });
+  });
+
+  it('posts layoutPaths and returns ok on 2xx', async () => {
+    const res = await revalidateWeb(fakePayload(), { layoutPaths: ['/'] });
+
+    expect(res).toEqual({ ok: true, disabled: false, status: 200 });
+    const [, init] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0] ?? [];
+    const body = JSON.parse((init as { body: string }).body) as { layoutPaths: string[] };
+    expect(body.layoutPaths).toEqual(['/']);
+  });
+
+  it('returns ok:false on non-2xx', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('nope', { status: 500 })));
+    const res = await revalidateWeb(fakePayload(), { paths: ['/news'] });
+
+    expect(res.ok).toBe(false);
+    expect(res.disabled).toBe(false);
+    expect(res.status).toBe(500);
+  });
+});

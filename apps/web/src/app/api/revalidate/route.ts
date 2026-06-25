@@ -38,6 +38,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   let body: {
     tags?: unknown;
     paths?: unknown;
+    layoutPaths?: unknown;
     secret?: unknown;
     tag?: unknown;
   } | null = null;
@@ -46,6 +47,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     body = (await req.json()) as {
       tags?: unknown;
       paths?: unknown;
+      layoutPaths?: unknown;
       secret?: unknown;
       tag?: unknown;
     };
@@ -98,20 +100,32 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         (p): p is string => typeof p === "string" && p.startsWith("/"),
       )
     : [];
+  const layoutPaths = Array.isArray(body?.layoutPaths)
+    ? body.layoutPaths.filter(
+        (p): p is string => typeof p === "string" && p.startsWith("/"),
+      )
+    : [];
 
   // Next 16 `revalidateTag` requires a cache profile arg. "default"
   // matches the framework's built-in profile and triggers an immediate
   // purge of fetches tagged with this tag on the next request.
   for (const tag of tags) revalidateTag(tag, "default");
-  // Pass 'page' (not 'layout'): the CMS publish hooks always send concrete
-  // leaf paths — the listing (e.g. /blogs) and the exact detail URL (e.g.
-  // /blogs/my-post) — never a prefix meant to fan out to a subtree. 'layout'
-  // would revalidate the whole nested route group, billing extra ISR writes
-  // for pages that didn't change. 'page' revalidates exactly the URL given.
-  for (const path of paths) revalidatePath(path, "page");
+  // The CMS publish hooks always send concrete resolved URLs — the listing
+  // (e.g. /blogs) and the exact detail URL (e.g. /blogs/my-post), never a
+  // bracket route pattern. Call revalidatePath with NO type arg: for a
+  // resolved URL that is the documented "revalidate this specific URL" form,
+  // which purges both static listings and dynamic [slug] detail pages.
+  // Passing "page" alongside a *resolved* dynamic URL silently no-ops —
+  // "page" only matches the route pattern (/blogs/[slug]), not the concrete
+  // instance — which left every detail page stale until the ISR TTL lapsed.
+  for (const path of paths) revalidatePath(path);
+  // layoutPaths revalidate a whole route subtree (revalidatePath(p, 'layout')).
+  // The CMS sends ['/'] for a full-site purge — the canonical "revalidate
+  // everything" form, since revalidatePath('/') alone only purges the homepage.
+  for (const path of layoutPaths) revalidatePath(path, "layout");
 
   return NextResponse.json({
     ok: true,
-    revalidated: { tags, paths },
+    revalidated: { tags, paths, layoutPaths },
   });
 }

@@ -6,6 +6,10 @@
   "timestamps": true,
   "fields": [
     {
+      "type": "ui",
+      "name": "purgeCache"
+    },
+    {
       "type": "text",
       "name": "title",
       "required": true

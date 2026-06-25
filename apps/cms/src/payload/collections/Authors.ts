@@ -1,15 +1,17 @@
 import type { CollectionConfig } from 'payload';
+import { purgePageUiField } from '../fields/purge-page-ui';
 
 import { isAdminOrEditor } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
-import {
-  searchSyncAfterChangeHook,
-  searchSyncAfterDeleteHook,
-} from '../hooks/search-sync';
 import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { normalizeLexicalHook } from '../hooks/normalize-lexical';
+import {
+  revalidateWebAfterDeleteHook,
+  revalidateWebPublishAfterChangeHook,
+} from '../hooks/revalidate-web-publish';
+import { searchSyncAfterChangeHook, searchSyncAfterDeleteHook } from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
@@ -29,12 +31,21 @@ export const Authors: CollectionConfig = {
     delete: isAdminOrEditor,
   },
   fields: [
+    purgePageUiField,
     { name: 'name', type: 'text', required: true },
     slugField({ source: 'name' }),
     mediaUploadField({ name: 'photo', folderHint: 'web/author' }),
-    { name: 'role', type: 'text', admin: { description: 'Job title shown on the byline + Person JSON-LD.' } },
+    {
+      name: 'role',
+      type: 'text',
+      admin: { description: 'Job title shown on the byline + Person JSON-LD.' },
+    },
     { name: 'location', type: 'text' },
-    { name: 'bioShort', type: 'textarea', admin: { description: 'One-line bio for cards and SERP snippets.' } },
+    {
+      name: 'bioShort',
+      type: 'textarea',
+      admin: { description: 'One-line bio for cards and SERP snippets.' },
+    },
     {
       name: 'bioLong',
       type: 'richText',
@@ -58,10 +69,30 @@ export const Authors: CollectionConfig = {
         // `beforeValidate` normalises bare domains (`cleanstart.com`) to
         // `https://cleanstart.com` so the optional-URL validator stops
         // blocking publish on a value editors think of as a valid URL.
-        { name: 'twitter',  type: 'text', hooks: { beforeValidate: [normalizeOptionalUrlHook] }, validate: validateOptionalUrl },
-        { name: 'linkedin', type: 'text', hooks: { beforeValidate: [normalizeOptionalUrlHook] }, validate: validateOptionalUrl },
-        { name: 'github',   type: 'text', hooks: { beforeValidate: [normalizeOptionalUrlHook] }, validate: validateOptionalUrl },
-        { name: 'website',  type: 'text', hooks: { beforeValidate: [normalizeOptionalUrlHook] }, validate: validateOptionalUrl },
+        {
+          name: 'twitter',
+          type: 'text',
+          hooks: { beforeValidate: [normalizeOptionalUrlHook] },
+          validate: validateOptionalUrl,
+        },
+        {
+          name: 'linkedin',
+          type: 'text',
+          hooks: { beforeValidate: [normalizeOptionalUrlHook] },
+          validate: validateOptionalUrl,
+        },
+        {
+          name: 'github',
+          type: 'text',
+          hooks: { beforeValidate: [normalizeOptionalUrlHook] },
+          validate: validateOptionalUrl,
+        },
+        {
+          name: 'website',
+          type: 'text',
+          hooks: { beforeValidate: [normalizeOptionalUrlHook] },
+          validate: validateOptionalUrl,
+        },
         { name: 'email', type: 'email' },
       ],
     },
@@ -177,8 +208,9 @@ export const Authors: CollectionConfig = {
       searchSyncAfterChangeHook('authors'),
       webhooksPublishAfterChangeHook('authors'),
       indexNowPublishAfterChangeHook('authors'),
+      revalidateWebPublishAfterChangeHook('authors'),
     ],
-    afterDelete: [searchSyncAfterDeleteHook('authors')],
+    afterDelete: [searchSyncAfterDeleteHook('authors'), revalidateWebAfterDeleteHook('authors')],
   },
   versions: { drafts: true },
   timestamps: true,

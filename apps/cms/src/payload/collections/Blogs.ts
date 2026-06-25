@@ -1,32 +1,30 @@
 import type { CollectionConfig } from 'payload';
+import { purgePageUiField } from '../fields/purge-page-ui';
 
 import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
-import { ROUTE_PREFIX } from '../lib/route-prefixes';
+import { displayPublishedAtField } from '../fields/display-published-at';
 import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
-import { displayPublishedAtField } from '../fields/display-published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { bodyStatsHook } from '../hooks/body-stats';
-import { normalizeLexicalHook } from '../hooks/normalize-lexical';
 import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
 import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
 import { firstPublishHook } from '../hooks/first-publish';
-import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
-import {
-  searchSyncAfterChangeHook,
-  searchSyncAfterDeleteHook,
-} from '../hooks/search-sync';
 import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
+import { normalizeLexicalHook } from '../hooks/normalize-lexical';
 import {
   revalidateWebAfterDeleteHook,
   revalidateWebPublishAfterChangeHook,
 } from '../hooks/revalidate-web-publish';
+import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
+import { searchSyncAfterChangeHook, searchSyncAfterDeleteHook } from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
+import { ROUTE_PREFIX } from '../lib/route-prefixes';
 
 const ABSTRACT_CHAR_HINT = 160;
 
@@ -48,6 +46,7 @@ export const Blogs: CollectionConfig = {
     delete: isAdminOrEditor,
   },
   fields: [
+    purgePageUiField,
     contentTitleField,
     slugField({ source: 'title' }),
     {
@@ -152,7 +151,7 @@ export const Blogs: CollectionConfig = {
       hasMany: true,
       admin: {
         description:
-          'Pin up to 3 posts the reader should see next. Curated picks appear first, in this order. Empty slots auto-fill with the latest from this post\'s category, then with the latest site-wide.',
+          "Pin up to 3 posts the reader should see next. Curated picks appear first, in this order. Empty slots auto-fill with the latest from this post's category, then with the latest site-wide.",
       },
     },
     {
@@ -311,10 +310,7 @@ export const Blogs: CollectionConfig = {
       indexNowPublishAfterChangeHook('blogs'),
       revalidateWebPublishAfterChangeHook('blogs'),
     ],
-    afterDelete: [
-      searchSyncAfterDeleteHook('blogs'),
-      revalidateWebAfterDeleteHook('blogs'),
-    ],
+    afterDelete: [searchSyncAfterDeleteHook('blogs'), revalidateWebAfterDeleteHook('blogs')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,

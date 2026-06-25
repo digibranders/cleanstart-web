@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload';
+import { purgePageUiField } from '../fields/purge-page-ui';
 
 import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 
@@ -17,9 +18,8 @@ const validateEndsAfterStarts = (
   return true;
 };
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
-import { ROUTE_PREFIX } from '../lib/route-prefixes';
-import { mediaUploadField } from '../fields/media-upload';
 import { displayPublishedAtField } from '../fields/display-published-at';
+import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
@@ -29,19 +29,17 @@ import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit
 import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
 import { eventStatusTimestampsHook } from '../hooks/event-status-timestamps';
 import { firstPublishHook } from '../hooks/first-publish';
-import { normalizeLexicalHook } from '../hooks/normalize-lexical';
-import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
-import {
-  searchSyncAfterChangeHook,
-  searchSyncAfterDeleteHook,
-} from '../hooks/search-sync';
 import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
+import { normalizeLexicalHook } from '../hooks/normalize-lexical';
+import {
+  revalidateWebAfterDeleteHook,
+  revalidateWebPublishAfterChangeHook,
+} from '../hooks/revalidate-web-publish';
+import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
+import { searchSyncAfterChangeHook, searchSyncAfterDeleteHook } from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
-import {
-  revalidateWebPublishAfterChangeHook,
-  revalidateWebAfterDeleteHook,
-} from '../hooks/revalidate-web-publish';
+import { ROUTE_PREFIX } from '../lib/route-prefixes';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
 export const Webinars: CollectionConfig = {
@@ -62,6 +60,7 @@ export const Webinars: CollectionConfig = {
     delete: isAdminOrEditor,
   },
   fields: [
+    purgePageUiField,
     contentTitleField,
     slugField({ source: 'title' }),
     mediaUploadField({ name: 'heroImage', folderHint: 'web/webinar' }),
@@ -160,9 +159,7 @@ export const Webinars: CollectionConfig = {
       },
       validate: (
         value: string | string[] | null | undefined,
-        {
-          siblingData,
-        }: { siblingData?: { registrationMode?: string; webinarType?: string } },
+        { siblingData }: { siblingData?: { registrationMode?: string; webinarType?: string } },
       ): true | string => {
         if (siblingData?.webinarType === 'on-demand') return true;
         if (siblingData?.registrationMode !== 'external') return true;
@@ -182,9 +179,7 @@ export const Webinars: CollectionConfig = {
       },
       validate: (
         value: unknown,
-        {
-          siblingData,
-        }: { siblingData?: { registrationMode?: string; webinarType?: string } },
+        { siblingData }: { siblingData?: { registrationMode?: string; webinarType?: string } },
       ): true | string => {
         if (siblingData?.webinarType === 'on-demand') return true;
         if (siblingData?.registrationMode !== 'internal') return true;
@@ -293,7 +288,12 @@ export const Webinars: CollectionConfig = {
     ...seoFieldsForSidebar('webinars'),
   ],
   hooks: {
-    beforeChange: [normalizeLexicalHook(), firstPublishHook(), displayPublishedAtBackfillHook, eventStatusTimestampsHook],
+    beforeChange: [
+      normalizeLexicalHook(),
+      firstPublishHook(),
+      displayPublishedAtBackfillHook,
+      eventStatusTimestampsHook,
+    ],
     afterChange: [
       slugChangeRedirectHook('webinars'),
       schemaOverrideAuditHook('webinars'),

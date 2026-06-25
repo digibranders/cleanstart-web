@@ -41,16 +41,22 @@ export type RoutePrefixKey = keyof typeof ROUTE_PREFIX;
  * real listing, so a newly published doc never appears until the ISR TTL
  * lapses. Collections absent here list at their ROUTE_PREFIX.
  */
-const LISTING_PATH_OVERRIDE: Partial<Record<RoutePrefixKey, string>> = {
+const LISTING_PATH_OVERRIDE: Record<string, string> = {
   resources: '/resource-center',
   events: '/events',
   webinars: '/webinars',
   jobs: '/careers',
+  // case-studies is listing-only on the web (no `/case-studies/[slug]` detail
+  // route) and is intentionally absent from ROUTE_PREFIX, so it has no detail
+  // prefix to fall back to. Without this entry the publish hook revalidates
+  // nothing for a case study — not even its `/case-studies` index — leaving
+  // newly published case studies hidden until the ISR TTL lapses.
+  'case-studies': '/case-studies',
 };
 
 /** Index-page path for a collection, preferring an explicit listing override. */
 export const listingPathForCollection = (collection: string): string | null => {
-  const override = (LISTING_PATH_OVERRIDE as Record<string, string>)[collection];
+  const override = LISTING_PATH_OVERRIDE[collection];
   if (override) return override;
   return (ROUTE_PREFIX as Record<string, string>)[collection] ?? null;
 };

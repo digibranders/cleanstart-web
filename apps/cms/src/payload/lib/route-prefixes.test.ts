@@ -35,6 +35,14 @@ describe('listingPathForCollection (index URLs for revalidation)', () => {
     expect(listingPathForCollection('news')).toBe(ROUTE_PREFIX.news);
   });
 
+  it('resolves a listing-only collection that has no detail prefix', () => {
+    // case-studies has a `/case-studies` index but no `/case-studies/[slug]`
+    // detail route, so it is absent from ROUTE_PREFIX. The override is the
+    // only way its publish hook can purge anything.
+    expect(listingPathForCollection('case-studies')).toBe('/case-studies');
+    expect(collectionUrlFromDoc('case-studies', { slug: 'x' })).toBeNull();
+  });
+
   it('returns null for unknown collections', () => {
     expect(listingPathForCollection('nope')).toBeNull();
   });

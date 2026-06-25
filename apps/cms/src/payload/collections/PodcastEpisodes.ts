@@ -1,9 +1,10 @@
 import type { CollectionBeforeChangeHook, CollectionConfig } from 'payload';
+import { purgePageUiField } from '../fields/purge-page-ui';
 
 import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
-import { mediaUploadField } from '../fields/media-upload';
 import { displayPublishedAtField } from '../fields/display-published-at';
+import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
@@ -12,12 +13,9 @@ import { contentTitleField } from '../fields/title';
 import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
 import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
 import { firstPublishHook } from '../hooks/first-publish';
-import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
-import {
-  searchSyncAfterChangeHook,
-  searchSyncAfterDeleteHook,
-} from '../hooks/search-sync';
 import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
+import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
+import { searchSyncAfterChangeHook, searchSyncAfterDeleteHook } from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
@@ -54,9 +52,7 @@ const extractYoutubeId = (raw: string | null | undefined): string | null => {
  * client-side regex set used by `apps/web/src/lib/podcast.ts` so the
  * extracted ID is always renderable as a thumbnail / embed.
  */
-const validateYoutubeUrl = (
-  value: string | string[] | null | undefined,
-): true | string => {
+const validateYoutubeUrl = (value: string | string[] | null | undefined): true | string => {
   if (typeof value !== 'string' || value.trim().length === 0) {
     return 'YouTube URL is required.';
   }
@@ -101,10 +97,7 @@ export const enforceSingleHeroEpisodeHook: CollectionBeforeChangeHook = async ({
       currentId === undefined
         ? { heroEpisode: { equals: true } }
         : {
-            and: [
-              { heroEpisode: { equals: true } },
-              { id: { not_equals: currentId } },
-            ],
+            and: [{ heroEpisode: { equals: true } }, { id: { not_equals: currentId } }],
           },
     data: { heroEpisode: false },
     req,
@@ -140,6 +133,7 @@ export const PodcastEpisodes: CollectionConfig = {
     delete: isAdminOrEditor,
   },
   fields: [
+    purgePageUiField,
     contentTitleField,
     slugField({ source: 'title' }),
     {
@@ -148,8 +142,7 @@ export const PodcastEpisodes: CollectionConfig = {
       required: true,
       min: 1,
       admin: {
-        description:
-          'Sequential episode number, rendered as "Episode N" on cards and the hero.',
+        description: 'Sequential episode number, rendered as "Episode N" on cards and the hero.',
       },
     },
     {
@@ -200,8 +193,7 @@ export const PodcastEpisodes: CollectionConfig = {
       defaultValue: false,
       admin: {
         position: 'sidebar',
-        description:
-          'When on, this episode appears in the Featured Content section on /podcast.',
+        description: 'When on, this episode appears in the Featured Content section on /podcast.',
       },
     },
     {

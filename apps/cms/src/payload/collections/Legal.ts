@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload';
+import { purgePageUiField } from '../fields/purge-page-ui';
 
 import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
@@ -13,9 +14,10 @@ import { firstPublishHook } from '../hooks/first-publish';
 import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { normalizeLexicalHook } from '../hooks/normalize-lexical';
 import {
-  searchSyncAfterChangeHook,
-  searchSyncAfterDeleteHook,
-} from '../hooks/search-sync';
+  revalidateWebAfterDeleteHook,
+  revalidateWebPublishAfterChangeHook,
+} from '../hooks/revalidate-web-publish';
+import { searchSyncAfterChangeHook, searchSyncAfterDeleteHook } from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
 
@@ -59,6 +61,7 @@ export const LegalDocuments: CollectionConfig = {
     delete: isAdminOrEditor,
   },
   fields: [
+    purgePageUiField,
     contentTitleField,
     slugField({ source: 'title' }),
     {
@@ -90,7 +93,8 @@ export const LegalDocuments: CollectionConfig = {
       admin: {
         position: 'sidebar',
         date: { pickerAppearance: 'dayOnly', displayFormat: 'MMMM d, yyyy' },
-        description: 'The date these terms take legal effect. Shown publicly as the “Effective” date.',
+        description:
+          'The date these terms take legal effect. Shown publicly as the “Effective” date.',
       },
     },
     { name: 'body', type: 'richText' },
@@ -116,19 +120,19 @@ export const LegalDocuments: CollectionConfig = {
     ...seoSidebarFields({ pathPrefix: '/legal', descriptionSource: 'title' }),
   ],
   hooks: {
-    beforeChange: [
-      normalizeLexicalHook(),
-      firstPublishHook(),
-      displayPublishedAtBackfillHook,
-    ],
+    beforeChange: [normalizeLexicalHook(), firstPublishHook(), displayPublishedAtBackfillHook],
     afterChange: [
       slugChangeRedirectHook('legalDocuments'),
       displayPublishedAtAuditHook('legalDocuments'),
       searchSyncAfterChangeHook('legalDocuments'),
       webhooksPublishAfterChangeHook('legalDocuments'),
       indexNowPublishAfterChangeHook('legalDocuments'),
+      revalidateWebPublishAfterChangeHook('legalDocuments'),
     ],
-    afterDelete: [searchSyncAfterDeleteHook('legalDocuments')],
+    afterDelete: [
+      searchSyncAfterDeleteHook('legalDocuments'),
+      revalidateWebAfterDeleteHook('legalDocuments'),
+    ],
   },
   // No `maxPerDoc` cap: legal documents retain their full amendment history
   // for compliance/audit. Schedule-publish is enabled for dated effective terms.

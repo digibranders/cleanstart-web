@@ -1,14 +1,11 @@
 import type { CollectionConfig } from 'payload';
+import { purgePageUiField } from '../fields/purge-page-ui';
 
 import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
-import {
-  resourceDownloadEndpoint,
-  resourceTokenEndpoint,
-} from '../endpoints/resources-download';
-import { ROUTE_PREFIX } from '../lib/route-prefixes';
-import { mediaUploadField } from '../fields/media-upload';
+import { resourceDownloadEndpoint, resourceTokenEndpoint } from '../endpoints/resources-download';
 import { displayPublishedAtField } from '../fields/display-published-at';
+import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
@@ -17,19 +14,17 @@ import { contentTitleField } from '../fields/title';
 import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
 import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
 import { firstPublishHook } from '../hooks/first-publish';
-import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
-import {
-  searchSyncAfterChangeHook,
-  searchSyncAfterDeleteHook,
-} from '../hooks/search-sync';
 import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
+import { normalizeLexicalHook } from '../hooks/normalize-lexical';
 import {
   revalidateWebAfterDeleteHook,
   revalidateWebPublishAfterChangeHook,
 } from '../hooks/revalidate-web-publish';
-import { normalizeLexicalHook } from '../hooks/normalize-lexical';
+import { schemaOverrideAuditHook } from '../hooks/schema-override-audit';
+import { searchSyncAfterChangeHook, searchSyncAfterDeleteHook } from '../hooks/search-sync';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
+import { ROUTE_PREFIX } from '../lib/route-prefixes';
 
 export const Resources: CollectionConfig = {
   slug: 'resources',
@@ -49,6 +44,7 @@ export const Resources: CollectionConfig = {
     delete: isAdminOrEditor,
   },
   fields: [
+    purgePageUiField,
     contentTitleField,
     slugField({ source: 'title' }),
     {
@@ -177,8 +173,7 @@ export const Resources: CollectionConfig = {
       access: { update: () => false },
       admin: {
         readOnly: true,
-        description:
-          'Automatically incremented each time a visitor downloads this resource.',
+        description: 'Automatically incremented each time a visitor downloads this resource.',
         position: 'sidebar',
         condition: (_data, sibling) => sibling?.gated === true,
       },
