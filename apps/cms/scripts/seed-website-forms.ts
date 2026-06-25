@@ -1,6 +1,6 @@
 #!/usr/bin/env -S node --no-warnings --experimental-strip-types
 /**
- * Seed / upsert the five marketing-site lead-capture forms that relay to
+ * Seed / upsert the marketing-site lead-capture forms that relay to
  * HubSpot via the Forms Submissions API.
  *
  * Each Payload `forms` row mirrors one HubSpot form in the "website" folder:
@@ -25,9 +25,10 @@ import payloadConfig from '../src/payload.config.ts';
 
 type SeedField = {
   name: string;
-  type: 'text' | 'email' | 'textarea';
+  type: 'text' | 'email' | 'textarea' | 'consent';
   label: string;
   required?: boolean;
+  consentText?: string;
 };
 
 type SeedForm = {
@@ -35,6 +36,7 @@ type SeedForm = {
   name: string;
   hubspotFormGuid: string;
   hubspotSubscriptionTypeId?: string;
+  submitLabel?: string;
   fields: SeedField[];
 };
 
@@ -85,6 +87,31 @@ const FORMS: readonly SeedForm[] = [
     hubspotFormGuid: '82790e37-d079-428c-8145-70749a164fe8',
     fields: [{ name: 'email', type: 'email', label: 'Email', required: true }],
   },
+  {
+    // Richer lead-gate rendered by the generic FormRenderer in the resource
+    // download modal (gateForm relationship). Unlike the bespoke forms above,
+    // FormRenderer only shows a consent checkbox when the form carries a
+    // `consent` field — and the HubSpot form requires storage consent — so the
+    // consent field is modelled here.
+    slug: 'content-gated',
+    name: 'Gated Resource Download',
+    hubspotFormGuid: '82b3860c-a669-47bd-8f72-bdcfa2373646',
+    submitLabel: 'Download now',
+    fields: [
+      { name: 'firstname', type: 'text', label: 'First name', required: true },
+      { name: 'lastname', type: 'text', label: 'Last name' },
+      { name: 'email', type: 'email', label: 'Email', required: true },
+      { name: 'company', type: 'text', label: 'Company', required: true },
+      {
+        name: 'consent',
+        type: 'consent',
+        label: 'Data processing consent',
+        required: true,
+        consentText:
+          'I agree to allow CleanStart to store and process my personal data to deliver this resource and contact me about it. See our Privacy Policy.',
+      },
+    ],
+  },
 ];
 
 const run = async (): Promise<void> => {
@@ -95,7 +122,7 @@ const run = async (): Promise<void> => {
       name: form.name,
       slug: form.slug,
       fields: form.fields,
-      submitLabel: 'Submit',
+      submitLabel: form.submitLabel ?? 'Submit',
       postSubmit: { kind: 'message' as const },
       crmHandlers: ['hubspot' as const],
       hubspotFormGuid: form.hubspotFormGuid,

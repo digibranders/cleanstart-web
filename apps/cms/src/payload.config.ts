@@ -101,7 +101,8 @@ import { dashboardRefreshDailyTask } from './payload/jobs/dashboard-refresh-dail
 import { dashboardRefreshFrequentTask } from './payload/jobs/dashboard-refresh-frequent';
 import { registerLeadHandlers } from './payload/lib/lead-handlers';
 import { wirePreviewControls } from './payload/lib/wire-preview';
-import { wireAnalyticsTab } from './payload/lib/wire-analytics-tab';
+// Per-document Analytics tab hidden — re-enable with the .map(wireAnalyticsTab) below.
+// import { wireAnalyticsTab } from './payload/lib/wire-analytics-tab';
 import { wireCustomFields } from './payload/lib/wire-custom-fields';
 import { wireCustomListView } from './payload/lib/wire-custom-list-view';
 import { wirePublishGate } from './payload/lib/wire-publish-gate';
@@ -410,7 +411,8 @@ export default buildConfig({
     .map(wirePublishGate)
     .map(wirePreviewControls)
     .map(wireCustomListView)
-    .map(wireAnalyticsTab)
+    // Per-document Analytics tab hidden — re-enable by uncommenting this and its import.
+    // .map(wireAnalyticsTab)
     .map(wireCustomFields),
   // Within-group order for the Globals group: settings → mega-menu spotlights →
   // impact stats → legal. SeoDefaults is grouped under 'SEO' (renders in the SEO
