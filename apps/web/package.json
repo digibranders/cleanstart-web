@@ -24,6 +24,7 @@
     "@cleanstart/schema": "workspace:*",
     "@cleanstart/types": "workspace:*",
     "@cleanstart/ui": "workspace:*",
+    "@sentry/nextjs": "^9.47.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lenis": "^1.3.23",

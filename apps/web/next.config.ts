@@ -1,6 +1,7 @@
 import path from "node:path";
 import type { NextConfig } from "next";
 import bundleAnalyzer from "@next/bundle-analyzer";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "1",
@@ -147,4 +148,17 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withBundleAnalyzer(nextConfig);
+// Sentry wrapper is a no-op when SENTRY_DSN is unset. The tunnelRoute proxies
+// Sentry events through /monitoring so adblockers cannot intercept them.
+// Source-map upload is gated on SENTRY_AUTH_TOKEN — skipped when unset.
+export default withSentryConfig(withBundleAnalyzer(nextConfig), {
+  silent: !process.env.SENTRY_AUTH_TOKEN,
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  tunnelRoute: "/monitoring",
+  sourcemaps: {
+    deleteSourcemapsAfterUpload: true,
+  },
+  disableLogger: true,
+  automaticVercelMonitors: false,
+});

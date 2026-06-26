@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import type { Endpoint } from 'payload';
 
 import { clientIpFromHeaders } from '../lib/client-ip';
@@ -138,6 +139,7 @@ export const partnerApplyEndpoint: Endpoint = {
         const legal = (await req.payload.findGlobal({ slug: 'legal', depth: 0, overrideAccess: true })) as { policyVersion?: string | null } | null;
         policyVersion = legal?.policyVersion ?? undefined;
       } catch (err) {
+        Sentry.captureException(err, { tags: { form: 'partner', stage: 'policy-version-fetch' }, level: 'warning' });
         req.payload.logger.warn({ err: err instanceof Error ? err.message : String(err) }, 'Could not read Legal global for policyVersion');
       }
     }
@@ -224,6 +226,7 @@ export const partnerApplyEndpoint: Endpoint = {
         overrideAccess: true,
       });
     } catch (err) {
+      Sentry.captureException(err, { tags: { form: 'partner', stage: 'db-create' } });
       req.payload.logger.error({ err: err instanceof Error ? err.message : String(err) }, 'Partner application create failed');
       return json({ ok: false, error: 'capture_failed' }, { status: 502, headers: cors });
     }
