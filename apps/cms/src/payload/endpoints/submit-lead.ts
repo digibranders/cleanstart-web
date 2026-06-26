@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import type { Endpoint } from 'payload';
 
 import { clientIpFromHeaders } from '../lib/client-ip';
@@ -354,6 +355,7 @@ export const submitLeadEndpoint: Endpoint = {
           consentWithPolicy = { ...data.consent, policyVersion };
         }
       } catch (err) {
+        Sentry.captureException(err, { tags: { form: 'lead', stage: 'policy-version-fetch' }, level: 'warning' });
         req.payload.logger.warn(
           { err: err instanceof Error ? err.message : String(err) },
           'Could not fetch Legal global for policyVersion — consent stored without it',
@@ -412,6 +414,7 @@ export const submitLeadEndpoint: Endpoint = {
           { logger: req.payload.logger, payload: req.payload },
         );
       } catch (webhookErr) {
+        Sentry.captureException(webhookErr, { tags: { form: 'lead', stage: 'webhook-dispatch' }, level: 'warning' });
         req.payload.logger.warn(
           { error: webhookErr instanceof Error ? webhookErr.message : String(webhookErr) },
           'lead.submitted webhook dispatch threw',
@@ -469,6 +472,7 @@ export const submitLeadEndpoint: Endpoint = {
             }
           }
         } catch (err) {
+          Sentry.captureException(err, { tags: { form: 'lead', stage: 'resource-gate-lookup' }, level: 'warning' });
           req.payload.logger.warn(
             { err: err instanceof Error ? err.message : String(err), resourceIdRaw },
             'Gated resource lookup failed — lead saved, no token issued',
@@ -485,6 +489,7 @@ export const submitLeadEndpoint: Endpoint = {
         { headers: responseHeaders },
       );
     } catch (error) {
+      Sentry.captureException(error, { tags: { form: 'lead', stage: 'endpoint' } });
       const message = error instanceof Error ? error.message : 'unknown';
       const parked = await parkSubmission(submission, `endpoint-threw: ${message}`);
       if (parked.ok) {

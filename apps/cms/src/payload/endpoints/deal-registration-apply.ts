@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import type { Endpoint } from 'payload';
 
 import { clientIpFromHeaders } from '../lib/client-ip';
@@ -156,6 +157,7 @@ export const dealRegistrationApplyEndpoint: Endpoint = {
           | null;
         policyVersion = legal?.policyVersion ?? undefined;
       } catch (err) {
+        Sentry.captureException(err, { tags: { form: 'deal-registration', stage: 'policy-version-fetch' }, level: 'warning' });
         req.payload.logger.warn(
           { err: err instanceof Error ? err.message : String(err) },
           'Could not read Legal global for policyVersion',
@@ -198,6 +200,7 @@ export const dealRegistrationApplyEndpoint: Endpoint = {
         overrideAccess: true,
       });
     } catch (err) {
+      Sentry.captureException(err, { tags: { form: 'deal-registration', stage: 'db-create' } });
       req.payload.logger.error(
         { err: err instanceof Error ? err.message : String(err) },
         'Deal registration create failed',

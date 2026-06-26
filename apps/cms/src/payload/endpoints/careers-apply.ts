@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import type { Endpoint } from 'payload';
 
 import { applicationFieldsSchema } from '../lib/careers/application-schema';
@@ -268,6 +269,7 @@ export const careersApplyEndpoint: Endpoint = {
       });
       resumeId = created.id as number;
     } catch (err) {
+      Sentry.captureException(err, { tags: { form: 'careers', stage: 'resume-upload' } });
       req.payload.logger.error(
         { err: err instanceof Error ? err.message : String(err) },
         'Resume upload failed — application not stored',
@@ -295,6 +297,7 @@ export const careersApplyEndpoint: Endpoint = {
         });
         coverLetterFileId = created.id as number;
       } catch (err) {
+        Sentry.captureException(err, { tags: { form: 'careers', stage: 'cover-letter-upload' }, level: 'warning' });
         req.payload.logger.warn(
           { err: err instanceof Error ? err.message : String(err) },
           'Cover-letter file upload failed — continuing without it',
@@ -312,6 +315,7 @@ export const careersApplyEndpoint: Endpoint = {
         } | null;
         policyVersion = legal?.policyVersion ?? undefined;
       } catch (err) {
+        Sentry.captureException(err, { tags: { form: 'careers', stage: 'policy-version-fetch' }, level: 'warning' });
         req.payload.logger.warn(
           { err: err instanceof Error ? err.message : String(err) },
           'Could not read Legal global for policyVersion',
@@ -439,6 +443,7 @@ export const careersApplyEndpoint: Endpoint = {
         overrideAccess: true,
       });
     } catch (err) {
+      Sentry.captureException(err, { tags: { form: 'careers', stage: 'db-create' } });
       req.payload.logger.error(
         { err: err instanceof Error ? err.message : String(err), resumeId },
         'Career application create failed after resume upload',

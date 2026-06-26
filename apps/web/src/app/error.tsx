@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import * as Sentry from "@sentry/nextjs";
 import { Logo } from "@/components/icons/Logo";
 import { StateView, type StateVariant } from "@/components/feedback";
 
@@ -60,11 +61,7 @@ export default function ErrorBoundary({
   reset: () => void;
 }) {
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const sentry = (window as { Sentry?: { captureException: (e: unknown) => void } })
-        .Sentry;
-      sentry?.captureException(error);
-    }
+    Sentry.captureException(error);
   }, [error]);
 
   return (
