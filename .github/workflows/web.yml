@@ -84,6 +84,14 @@ jobs:
 
       - name: Build
         run: pnpm --filter @cleanstart/web build
+        env:
+          # Sentry — DSN baked into the client bundle; auth token enables
+          # source-map upload at build time (skipped when unset).
+          SENTRY_DSN: ${{ secrets.SENTRY_WEB_DSN }}
+          NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.SENTRY_WEB_DSN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ vars.SENTRY_WEB_PROJECT }}
 
       - name: Capture build size
         if: always()
