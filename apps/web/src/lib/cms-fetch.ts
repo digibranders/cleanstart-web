@@ -124,8 +124,21 @@ export async function fetchCMS<T>(path: string, options: CmsFetchOptions = {}): 
   // these under load: when hundreds of pages prerender against the single
   // droplet at build time, or during an ISR regeneration while the CMS
   // restarts. Without the 5xx retry, one transient blip fails an entire
-  // static build. Non-transient statuses (4xx, 500) surface immediately.
-  const RETRYABLE_STATUS = new Set([502, 503, 504]);
+  // static build.
+  //
+  // At RUNTIME a 500 is treated as non-transient and surfaces immediately to
+  // the error boundary — there it usually signals a genuine app/data error,
+  // not load. But during a production BUILD a 500 is almost always
+  // load-induced: ~29 prerender workers burst the single CMS droplet's
+  // Postgres connection pool concurrently, which Payload surfaces as a 500
+  // rather than a gateway 5xx. So include 500 in the retry set ONLY while
+  // building (NEXT_PHASE === 'phase-production-build'); the build no longer
+  // depends on Next's page-level retry to ride out a transient CMS blip.
+  // Other 4xx always surface immediately.
+  const isProductionBuild = process.env.NEXT_PHASE === 'phase-production-build';
+  const RETRYABLE_STATUS = new Set(
+    isProductionBuild ? [500, 502, 503, 504] : [502, 503, 504],
+  );
   // Retry only outside local dev. In production / build the single CMS droplet
   // briefly refuses connections or 502s under prerender load, so 5 attempts
   // with backoff (~6 s) is the right resilience trade. In `next dev`, a refused
