@@ -23,7 +23,15 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.restoreAllMocks();
+  vi.useRealTimers();
   fetchMock.mockReset();
+  // Restore the test-env defaults so a test that flips NODE_ENV / NEXT_PHASE
+  // (to exercise the retry loop, which is disabled under NODE_ENV==='test')
+  // doesn't leak into later tests and silently change MAX_ATTEMPTS. Written
+  // through a Record cast: NODE_ENV is typed read-only on ProcessEnv.
+  const env = process.env as Record<string, string | undefined>;
+  env.NODE_ENV = "test";
+  env.NEXT_PHASE = undefined;
 });
 
 const firstCall = (): unknown[] => fetchMock.mock.calls[0] ?? [];
@@ -59,6 +67,33 @@ describe("fetchCMS — published mode", () => {
     fetchMock.mockResolvedValue({ ok: false, status: 503 } as Response);
     await expect(fetchCMS("/api/blogs")).rejects.toBeInstanceOf(CmsFetchError);
     await expect(fetchCMS("/api/blogs")).rejects.toMatchObject({ status: 503 });
+  });
+});
+
+describe("fetchCMS — transient retry", () => {
+  it("retries a 500 during a production build, then resolves", async () => {
+    vi.useFakeTimers();
+    const { fetchCMS } = await load({
+      NODE_ENV: "production",
+      NEXT_PHASE: "phase-production-build",
+    });
+    fetchMock
+      .mockResolvedValueOnce({ ok: false, status: 500 } as Response)
+      .mockResolvedValueOnce(ok({ docs: [1] }));
+    const promise = fetchCMS<{ docs: number[] }>("/api/knowledgeBase");
+    // Drain the backoff timer(s) so the retry fires.
+    await vi.advanceTimersByTimeAsync(10_000);
+    await expect(promise).resolves.toEqual({ docs: [1] });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("does NOT retry a 500 at runtime — surfaces immediately", async () => {
+    // Production runtime (not a build): 500 is non-transient and must throw
+    // on the first attempt so the error boundary renders without backoff.
+    const { fetchCMS, CmsFetchError } = await load({ NODE_ENV: "production" });
+    fetchMock.mockResolvedValue({ ok: false, status: 500 } as Response);
+    await expect(fetchCMS("/api/knowledgeBase")).rejects.toBeInstanceOf(CmsFetchError);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
 
