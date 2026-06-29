@@ -49,6 +49,14 @@ describe('buildCsp', () => {
     expect(d['script-src']).toContain('https:');
   });
 
+  it('allows the Leadfeeder tracker host in connect-src and img-src', () => {
+    const d = parse(buildCsp(base));
+    expect(d['connect-src']).toContain('https://*.lfeeder.com');
+    expect(d['img-src']).toContain('https://*.lfeeder.com');
+    // The sc.lfeeder.com loader is served over https: (no per-host script-src).
+    expect(d['script-src']).toContain('https:');
+  });
+
   it('locks object-src, base-uri and form-action', () => {
     const d = parse(buildCsp(base));
     expect(d['object-src']).toBe("'none'");
