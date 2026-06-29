@@ -430,31 +430,13 @@ export function SecurityDiagram(): React.ReactElement {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/security/cs-logomark.svg"
+              src="/images/cleanstart-logo.png"
               alt=""
-              width={54}
-              height={62}
+              width={459}
+              height={96}
               className="w-auto"
-              style={{ height: "var(--fs-h1)", aspectRatio: "54 / 62" }}
+              style={{ height: "var(--fs-h1)", aspectRatio: "459 / 96" }}
             />
-            <span
-              className="font-display font-normal"
-              style={{
-                fontSize: "var(--fs-h1)",
-                lineHeight: 1,
-                letterSpacing: "-0.05em",
-                backgroundImage:
-                  "linear-gradient(180deg, rgba(255,255,255,0.48) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.34) 100%)",
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                color: "transparent",
-                filter:
-                  "drop-shadow(0 1px 1px rgba(0,0,0,0.30)) drop-shadow(0 0 0.5px rgba(255,255,255,0.35))",
-              }}
-            >
-              CleanStart
-            </span>
           </div>
         </div>
       </div>
