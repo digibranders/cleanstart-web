@@ -1,5 +1,6 @@
 'use client';
 
+import { ConfirmDialog } from '@cleanstart/ui';
 import { useAuth, useConfig } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -37,6 +38,7 @@ export const CacheClient = (): ReactElement => {
   const { config } = useConfig();
   const serverURL = config?.serverURL ?? '';
   const [busy, setBusy] = useState(false);
+  const [confirmAllOpen, setConfirmAllOpen] = useState(false);
 
   // ── Page search state ──────────────────────────────────────────────────────
   const [searchQuery, setSearchQuery] = useState('');
@@ -168,34 +170,6 @@ export const CacheClient = (): ReactElement => {
           revalidate automatically — use these controls only to force a refresh.
         </p>
       </header>
-
-      {/* ── Danger zone: full-site purge ── */}
-      <section className="cs-cache__card cs-cache__card--danger" aria-labelledby="cs-cache-all-title">
-        <div className="cs-cache__card-head">
-          <span className="cs-cache__badge cs-cache__badge--danger">Danger zone</span>
-          <h2 className="cs-cache__card-title" id="cs-cache-all-title">
-            Purge entire site
-          </h2>
-          <p className="cs-cache__card-desc">
-            Re-renders every page on its next request, billing one ISR write per page.
-            Use sparingly — prefer a targeted purge below when you can.
-          </p>
-        </div>
-        <div className="cs-cache__actions">
-          <button
-            type="button"
-            className="cs-btn cs-btn--danger"
-            disabled={busy}
-            onClick={() => {
-              if (window.confirm('Purge the ENTIRE site cache? This re-renders every page.')) {
-                void post({ scope: 'all' });
-              }
-            }}
-          >
-            Purge entire site
-          </button>
-        </div>
-      </section>
 
       {/* ── Page search purge ── */}
       <section className="cs-cache__card" aria-labelledby="cs-cache-search-title">
@@ -397,6 +371,45 @@ export const CacheClient = (): ReactElement => {
           </button>
         </div>
       </section>
+
+      {/* ── Danger zone: full-site purge (kept last — destructive) ── */}
+      <section className="cs-cache__card cs-cache__card--danger" aria-labelledby="cs-cache-all-title">
+        <div className="cs-cache__card-head">
+          <span className="cs-cache__badge cs-cache__badge--danger">Danger zone</span>
+          <h2 className="cs-cache__card-title" id="cs-cache-all-title">
+            Purge entire site
+          </h2>
+          <p className="cs-cache__card-desc">
+            Re-renders every page on its next request, billing one ISR write per page.
+            Use sparingly — prefer a targeted purge above when you can.
+          </p>
+        </div>
+        <div className="cs-cache__actions">
+          <button
+            type="button"
+            className="cs-btn cs-btn--danger"
+            disabled={busy}
+            onClick={() => setConfirmAllOpen(true)}
+          >
+            Purge entire site
+          </button>
+        </div>
+      </section>
+
+      <ConfirmDialog
+        open={confirmAllOpen}
+        onClose={() => setConfirmAllOpen(false)}
+        title="Purge entire site cache?"
+        description="This re-renders every page on the marketing site on its next request, billing one ISR write per page. Prefer a targeted purge when you can."
+        confirmLabel={busy ? 'Purging…' : 'Purge entire site'}
+        cancelLabel="Cancel"
+        tone="danger"
+        busy={busy}
+        onConfirm={async () => {
+          await post({ scope: 'all' });
+          setConfirmAllOpen(false);
+        }}
+      />
     </>
   );
 };
