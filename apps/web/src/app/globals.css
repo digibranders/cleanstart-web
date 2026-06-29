@@ -2095,13 +2095,13 @@ body {
 
 /* Wordmark — ignites once all six lanes are verified (cascade climax). */
 .cs-sec-wordmark {
-  opacity: 0.7;
+  opacity: 0.5;
   transform: scale(0.992);
   transition: opacity 0.9s ease, filter 0.9s ease, transform 0.9s ease;
 }
 
 .cs-sec-wordmark[data-climax="true"] {
-  opacity: 1;
+  opacity: 0.55;
   filter: drop-shadow(0 0 22px rgba(120, 200, 255, 0.6));
   animation: cs-sec-ignite 1.5s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
 }
