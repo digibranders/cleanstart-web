@@ -430,7 +430,7 @@ export function SecurityDiagram(): React.ReactElement {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/security/cs-logomark.png"
+              src="/images/security/cs-logomark.svg"
               alt=""
               width={54}
               height={62}
