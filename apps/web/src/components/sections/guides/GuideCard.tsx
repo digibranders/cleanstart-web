@@ -1,24 +1,20 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { Guide } from "@/lib/guides";
-import { formatGuideDate, guideMediaUrl } from "@/lib/guides-utils";
+import { formatGuideDate } from "@/lib/guides-utils";
 import { effectivePublishedAt } from "@/lib/published-date";
-import { deriveCoverKeyword } from "@/lib/guide-cover";
+import { guideCoverKeyword } from "@/lib/guide-cover";
 import { GeneratedGuideCover } from "@/components/sections/_shared/GeneratedGuideCover";
 
 interface GuideCardProps {
   guide: Guide;
-  /** Preload the image (set true for cards in the first two rows). */
-  priority?: boolean;
 }
 
-export function GuideCard({ guide, priority = false }: GuideCardProps): React.ReactElement {
+export function GuideCard({ guide }: GuideCardProps): React.ReactElement {
   const authorName = guide.authors?.[0]?.name ?? null;
   const updatedDate = formatGuideDate(
     guide.updatedAt ?? effectivePublishedAt(guide),
   );
-  const imageUrl = guideMediaUrl(guide.heroImage?.url);
-  const coverKeyword = deriveCoverKeyword(guide.title);
+  const coverKeyword = guideCoverKeyword(guide);
   // The Webflow import left `abstract` empty on guides; fall back to the SEO
   // description (the same lede text) so the card still shows a summary.
   const lede = guide.abstract ?? guide.seo?.description ?? null;
@@ -36,18 +32,7 @@ export function GuideCard({ guide, priority = false }: GuideCardProps): React.Re
         className="relative shrink-0 mx-[14px] mt-[14px] overflow-hidden"
         style={{ aspectRatio: "267 / 140", borderRadius: "8px", background: "#e8e8f0" }}
       >
-        {imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt={guide.heroImage?.alt ?? guide.title}
-            fill
-            className="object-cover"
-            sizes="(min-width: 1280px) 300px, (min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
-            priority={priority}
-          />
-        ) : (
-          <GeneratedGuideCover keyword={coverKeyword} />
-        )}
+        <GeneratedGuideCover keyword={coverKeyword} />
       </div>
 
       <div className="flex flex-1 flex-col px-[14px] pb-[14px] pt-4">

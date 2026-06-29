@@ -29,7 +29,7 @@ export const transformGuide = (row: Record<string, unknown>): Record<string, unk
   const bodyHtml = asHtmlString(row['main-text']) ?? asHtmlString(row.body);
   const abstract = asString(row['meta-description']) ?? asString(row.summary);
   const wordCount = asNumber(row['word-count']);
-  const { faqs, keywords, citations, articleSections } = normalizeWebflowGuide(row);
+  const { faqs, keywords, citations } = normalizeWebflowGuide(row);
 
   // Webflow embeds the FAQ Q&A both in the slot fields (→ `faqs`) and inline in
   // the body HTML. Strip the inline copy when the structured FAQs are present
@@ -47,25 +47,24 @@ export const transformGuide = (row: Record<string, unknown>): Record<string, unk
     abstract,
     wordCount: wordCount ?? undefined,
     faqs: faqs.length > 0 ? faqs : undefined,
-    keywords: keywords.length > 0 ? keywords : undefined,
     citations: citations.length > 0 ? citations : undefined,
-    articleSections:
-      articleSections.length > 0
-        ? articleSections.map((s) => ({ heading: s.heading, body: htmlToLexical(s.body) }))
-        : undefined,
-    seo: buildSeoOverrides(row),
+    seo: buildSeoOverrides(row, keywords),
     _rawAuthors: row.author ?? row.authors ?? null,
     _rawReviewedBy: row['review-by'] ?? row['review-by-2'] ?? null,
     _rawHeroImage: row['main-image'] ?? row.image ?? null,
   };
 };
 
-const buildSeoOverrides = (row: Record<string, unknown>): Record<string, unknown> | undefined => {
+const buildSeoOverrides = (
+  row: Record<string, unknown>,
+  keywords: readonly string[],
+): Record<string, unknown> | undefined => {
   const title = asString(row['meta-title']);
   const description = asString(row['meta-description']);
-  if (!title && !description) return undefined;
+  if (!title && !description && keywords.length === 0) return undefined;
   const seo: Record<string, unknown> = {};
   if (title) seo.title = title;
   if (description) seo.description = description;
+  if (keywords.length > 0) seo.keywords = [...keywords];
   return seo;
 };

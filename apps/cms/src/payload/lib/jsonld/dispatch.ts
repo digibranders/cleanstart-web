@@ -5,7 +5,6 @@ import { buildBreadcrumbBlob } from './breadcrumb';
 import type { JsonLdContext } from './context';
 import { buildEventBlob, type EventAttendanceMode } from './event';
 import { buildFaqPageBlob } from './faq-page';
-import { buildHowToBlob, type HowToStep } from './how-to';
 import { validateOverrideForCollection } from './override-validator';
 import {
   buildJobPostingBlob,
@@ -138,17 +137,10 @@ const readFaqs = (doc: AnyDoc) =>
   ((doc as { faqs?: { question?: string | null; answer?: string | null }[] | null }).faqs ?? null);
 
 const readKeywords = (doc: AnyDoc): string[] | null => {
-  // Canonical source is `seo.keywords` (string[] json). Legacy guides
-  // carry a top-level `keywords[]` array of `{ keyword }` until the
-  // backfill consolidates them — read both, prefer seo.keywords.
+  // Canonical source is `seo.keywords` (string[] json). The legacy
+  // top-level `keywords[]` array was consolidated into it and dropped.
   const seoKeywords = (doc as { seo?: { keywords?: unknown } }).seo?.keywords;
-  const legacyRaw = (doc as { keywords?: { keyword?: string | null }[] | null }).keywords;
-  const legacy = Array.isArray(legacyRaw)
-    ? legacyRaw
-        .map((k) => k?.keyword ?? '')
-        .filter((s): s is string => s.length > 0)
-    : [];
-  const merged = mergeKeywordSources(seoKeywords, legacy);
+  const merged = mergeKeywordSources(seoKeywords, []);
   return merged.length > 0 ? merged : null;
 };
 
@@ -277,69 +269,7 @@ const dispatchArticleLike = (
   const breadcrumb = buildBreadcrumbBlob(ctx, breadcrumbs);
   const faqs = buildFaqPageBlob(url, faqsRaw);
 
-  const blobs = composeArticleBlobs(ctx, source, authors, breadcrumb, faqs);
-
-  // Guides can opt into a sibling HowTo blob when the editor flips
-  // `howTo.enabled` and the article has at least one section.
-  if (collection === 'guides') {
-    const howTo = buildGuideHowTo(ctx, doc, url);
-    if (howTo) blobs.push(howTo);
-  }
-
-  return blobs;
-};
-
-interface GuideHowToConfig {
-  enabled?: boolean;
-  totalTime?: string | null;
-  prepTime?: string | null;
-  performTime?: string | null;
-  estimatedCost?: string | null;
-}
-
-interface ArticleSectionRow {
-  heading?: string | null;
-  body?: unknown;
-}
-
-const lexicalRichTextToPlain = (body: unknown): string => {
-  // Reuse the canonical text-collector that already handles the
-  // Lexical tree shape — same one the JobPosting description fallback
-  // uses. Avoid a second walk implementation.
-  return collectLexicalText(body);
-};
-
-const buildGuideHowTo = (
-  ctx: JsonLdContext,
-  doc: AnyDoc,
-  url: string,
-) => {
-  const cfg = (doc as { howTo?: GuideHowToConfig }).howTo;
-  if (!cfg?.enabled) return null;
-  const sections =
-    (doc as { articleSections?: ArticleSectionRow[] | null }).articleSections ?? [];
-  const steps: HowToStep[] = [];
-  for (const section of sections) {
-    if (typeof section.heading !== 'string' || section.heading.trim().length === 0) {
-      continue;
-    }
-    const body = lexicalRichTextToPlain(section.body);
-    if (body.length === 0) continue;
-    steps.push({ heading: section.heading.trim(), body });
-  }
-  if (steps.length === 0) return null;
-
-  return buildHowToBlob(ctx, {
-    url,
-    title: doc.title ?? '',
-    description: readDescription(doc),
-    heroImage: readHeroImage(doc),
-    totalTime: cfg.totalTime ?? null,
-    prepTime: cfg.prepTime ?? null,
-    performTime: cfg.performTime ?? null,
-    estimatedCost: cfg.estimatedCost ?? null,
-    steps,
-  });
+  return composeArticleBlobs(ctx, source, authors, breadcrumb, faqs);
 };
 
 const KIND_BY_COLLECTION = {

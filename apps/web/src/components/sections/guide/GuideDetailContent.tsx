@@ -3,19 +3,17 @@
 import type React from "react";
 import { useState, useEffect, useMemo } from "react";
 import { RenderLexical, slugifyText } from "@/lib/renderLexical";
-import type { LexicalRoot, TocEntry, GuideImage } from "@/lib/guides";
+import type { LexicalRoot, TocEntry } from "@/lib/guides";
 
 interface GuideDetailContentProps {
   body?: LexicalRoot | null | undefined;
   tableOfContents?: TocEntry[] | null | undefined;
-  heroImage?: GuideImage | null | undefined;
   abstract?: string | undefined;
 }
 
 export function GuideDetailContent({
   body,
   tableOfContents,
-  heroImage: _heroImage,
   abstract,
 }: GuideDetailContentProps): React.ReactElement {
   return (

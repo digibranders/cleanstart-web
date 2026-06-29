@@ -46,6 +46,8 @@ import * as migration_20260623_160000_add_taxonomy_collections from './20260623_
 import * as migration_20260623_170000_reapply_taxonomy_collections from './20260623_170000_reapply_taxonomy_collections';
 import * as migration_20260624_120000_add_resources_hero_image from './20260624_120000_add_resources_hero_image';
 import * as migration_20260625_120000_add_broken_links_details from './20260625_120000_add_broken_links_details';
+import * as migration_20260629_120000_drop_guides_legacy_sections_keywords_howto from './20260629_120000_drop_guides_legacy_sections_keywords_howto';
+import * as migration_20260629_130000_guides_cover_title from './20260629_130000_guides_cover_title';
 
 export const migrations = [
   {
@@ -262,5 +264,15 @@ export const migrations = [
     up: migration_20260625_120000_add_broken_links_details.up,
     down: migration_20260625_120000_add_broken_links_details.down,
     name: '20260625_120000_add_broken_links_details',
+  },
+  {
+    up: migration_20260629_120000_drop_guides_legacy_sections_keywords_howto.up,
+    down: migration_20260629_120000_drop_guides_legacy_sections_keywords_howto.down,
+    name: '20260629_120000_drop_guides_legacy_sections_keywords_howto',
+  },
+  {
+    up: migration_20260629_130000_guides_cover_title.up,
+    down: migration_20260629_130000_guides_cover_title.down,
+    name: '20260629_130000_guides_cover_title',
   },
 ];

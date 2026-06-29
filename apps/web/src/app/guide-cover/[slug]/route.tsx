@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { coverTitleSize } from "@/lib/guide-cover";
 
 /**
  * Generated branded cover for guides without a real hero image.
@@ -24,6 +25,8 @@ export async function GET(
   // accepts the URL — local images WITH a query string are rejected by
   // default, which would force `unoptimized` and ship the full PNG.
   const keyword = decodeURIComponent(slug).slice(0, 80) || "CleanStart Guide";
+  // Shrink the title for longer phrases so it never clips the 1200×630 frame.
+  const titleFont = coverTitleSize(keyword).px;
   // Original site logo (the navbar lockup) for the eyebrow; the faint crystal
   // mark stays only as a decorative corner watermark.
   const logoUrl = new URL("/images/cleanstart-logo.png", req.url).toString();
@@ -99,7 +102,7 @@ export async function GET(
         {/* keyword */}
         <div style={{ display: "flex", flexDirection: "column", position: "relative", maxWidth: 1000 }}>
           <div style={{ width: 72, height: 6, borderRadius: 3, background: "#7c5bff", marginBottom: 30 }} />
-          <span style={{ fontSize: 84, fontWeight: 700, lineHeight: 1.04, letterSpacing: -2 }}>
+          <span style={{ fontSize: titleFont, fontWeight: 700, lineHeight: 1.04, letterSpacing: -2 }}>
             {keyword}
           </span>
         </div>

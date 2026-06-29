@@ -72,61 +72,16 @@ export const collapseGuideFaqs = (
   return out;
 };
 
-// ─── Article sections (Article About 1 … 8) ─────────────────────
-
-export interface ArticleSection {
-  readonly heading: string;
-  readonly body: string;
-}
-
-/**
- * Webflow's `Article About N` slots were free-text — editors used the
- * first sentence as a heading and the remainder as the body. We split
- * on the first `:` or sentence break, fall back to using the whole
- * value as both heading + body when no split is found.
- *
- * For the most common case where editors copied a heading + a
- * one-line summary, the split produces clean structured rows.
- */
-export const collapseArticleSections = (
-  row: Record<string, unknown>,
-  maxSlots = 8,
-): ArticleSection[] => {
-  const slots = collectSlots(row, ['article-about-', 'Article About '], maxSlots);
-  return slots.map((raw) => {
-    // Try `Heading: body text` first.
-    const colon = raw.indexOf(':');
-    if (colon > 0 && colon < 80) {
-      const heading = raw.slice(0, colon).trim();
-      const body = raw.slice(colon + 1).trim();
-      if (heading.length > 0 && body.length > 0) return { heading, body };
-    }
-    // Fall back to first-sentence split.
-    const sentenceEnd = raw.search(/[.!?]\s/);
-    if (sentenceEnd > 0 && sentenceEnd < 120) {
-      const heading = raw.slice(0, sentenceEnd + 1).trim();
-      const body = raw.slice(sentenceEnd + 1).trim();
-      if (heading.length > 0 && body.length > 0) return { heading, body };
-    }
-    // No usable split — heading and body both repeat the value so the
-    // structured row at least carries the prose. Editor will tidy.
-    return { heading: raw.slice(0, 80), body: raw };
-  });
-};
-
 // ─── Keywords (Article keyword 1 … 10) ──────────────────────────
 
-export interface KeywordEntry {
-  readonly keyword: string;
-}
-
+/**
+ * Webflow's `Article keyword N` slots → a flat `string[]` for the
+ * consolidated `seo.keywords` field.
+ */
 export const collapseKeywords = (
   row: Record<string, unknown>,
   maxSlots = 10,
-): KeywordEntry[] =>
-  collectSlots(row, ['article-keyword-', 'Article keyword '], maxSlots).map((keyword) => ({
-    keyword,
-  }));
+): string[] => collectSlots(row, ['article-keyword-', 'Article keyword '], maxSlots);
 
 // ─── Citations (Article Mentions 1 … 10) ────────────────────────
 
@@ -192,8 +147,7 @@ export const collapseCitations = (
 
 export interface NormalizedGuide {
   readonly faqs: readonly FaqEntry[];
-  readonly articleSections: readonly ArticleSection[];
-  readonly keywords: readonly KeywordEntry[];
+  readonly keywords: readonly string[];
   readonly citations: readonly CitationEntry[];
 }
 
@@ -201,7 +155,6 @@ export const normalizeWebflowGuide = (
   row: Record<string, unknown>,
 ): NormalizedGuide => ({
   faqs: collapseGuideFaqs(row),
-  articleSections: collapseArticleSections(row),
   keywords: collapseKeywords(row),
   citations: collapseCitations(row),
 });

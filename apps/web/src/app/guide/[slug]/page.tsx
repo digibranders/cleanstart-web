@@ -21,6 +21,7 @@ import {
   guideMediaUrl,
 } from "@/lib/guides";
 import type { Guide } from "@/lib/guides";
+import { guideCoverKeyword, guideCoverPath } from "@/lib/guide-cover";
 import { effectivePublishedAt } from "@/lib/published-date";
 import { absoluteUrl, buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
@@ -64,8 +65,11 @@ export async function generateMetadata({
     });
   }
 
-  const heroAbsolute = guideMediaUrl(guide.heroImage?.url);
   const seo = resolveCmsSeo(guide.seo, { absolutize: guideMediaUrl });
+  // Guides have no uploaded hero image — the social card is the branded,
+  // per-guide generated cover (1200×630), unless the editor set an explicit
+  // SEO image override.
+  const coverImageUrl = absoluteUrl(guideCoverPath(guideCoverKeyword(guide)));
 
   return buildPageMetadata({
     title: seo.title ?? guide.title,
@@ -81,18 +85,12 @@ export async function generateMetadata({
     authors: guide.authors?.map((a) => a.name),
     ...(seo.noindex ? { noindex: true, nofollow: seo.nofollow } : {}),
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
-    ...(seo.image
-      ? { image: seo.image }
-      : heroAbsolute && guide.heroImage
-        ? {
-            image: {
-              url: heroAbsolute,
-              width: guide.heroImage.width,
-              height: guide.heroImage.height,
-              alt: guide.heroImage.alt ?? guide.title,
-            },
-          }
-        : {}),
+    image: seo.image ?? {
+      url: coverImageUrl,
+      width: 1200,
+      height: 630,
+      alt: guide.title,
+    },
   });
 }
 
@@ -127,7 +125,7 @@ export async function renderGuideDetail({
   const previousTarget = manualPrevious ?? toGuideJourneyTarget(autoJourney.previous);
   const nextTarget = manualNext ?? toGuideJourneyTarget(autoJourney.next);
 
-  const heroAbsolute = guideMediaUrl(guide.heroImage?.url);
+  const coverImageUrl = absoluteUrl(guideCoverPath(guideCoverKeyword(guide)));
   const faqs = (guide.faqs ?? []).filter((f) => f.question && f.answer);
 
   return (
@@ -150,7 +148,7 @@ export async function renderGuideDetail({
               path: `/guide/${guide.slug}`,
               publishedAt: publishedAt ?? guide.publishedAt ?? undefined,
               modifiedAt: guide.updatedAt ?? undefined,
-              imageUrl: heroAbsolute,
+              imageUrl: coverImageUrl,
               authors: guide.authors?.map((a) => ({ name: a.name, slug: a.slug })),
             }),
             ...(faqs.length > 0
@@ -169,13 +167,11 @@ export async function renderGuideDetail({
           publishedAt={publishedAt ?? undefined}
           updatedAt={guide.updatedAt ?? undefined}
           readingMinutes={guide.readingMinutes ?? undefined}
-          heroImage={guide.heroImage}
         />
 
         <GuideDetailContent
           body={highlightedBody}
           tableOfContents={guide.tableOfContents}
-          heroImage={guide.heroImage}
           abstract={guide.abstract ?? undefined}
         />
 

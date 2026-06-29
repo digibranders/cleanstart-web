@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  collapseArticleSections,
   collapseCitations,
   collapseGuideFaqs,
   collapseKeywords,
@@ -31,54 +30,15 @@ describe('collapseGuideFaqs', () => {
   });
 });
 
-describe('collapseArticleSections', () => {
-  it('splits "Heading: body" into structured rows', () => {
-    expect(
-      collapseArticleSections({
-        'Article About 1': 'Why SBOMs matter: They give you provenance.',
-      }),
-    ).toEqual([
-      { heading: 'Why SBOMs matter', body: 'They give you provenance.' },
-    ]);
-  });
-
-  it('falls back to first-sentence split when no colon', () => {
-    expect(
-      collapseArticleSections({
-        'Article About 1': 'SBOMs matter. Here is why they do.',
-      }),
-    ).toEqual([{ heading: 'SBOMs matter.', body: 'Here is why they do.' }]);
-  });
-
-  it('uses the value as both heading + body when no split is found', () => {
-    const result = collapseArticleSections({
-      'Article About 1': 'A single short sentence with no terminal punctuation',
-    });
-    expect(result[0]?.heading).toBe('A single short sentence with no terminal punctuation');
-    expect(result[0]?.body).toBe('A single short sentence with no terminal punctuation');
-  });
-
-  it('skips empty / whitespace-only slots', () => {
-    expect(
-      collapseArticleSections({
-        'Article About 1': 'Heading: body',
-        'Article About 2': '   ',
-        'Article About 3': '',
-        'Article About 4': 'Another: section',
-      }),
-    ).toHaveLength(2);
-  });
-});
-
 describe('collapseKeywords', () => {
-  it('returns one entry per filled slot', () => {
+  it('returns one string per filled slot', () => {
     expect(
       collapseKeywords({
         'Article keyword 1': 'sbom',
         'Article keyword 2': '',
         'Article keyword 3': '  container security  ',
       }),
-    ).toEqual([{ keyword: 'sbom' }, { keyword: 'container security' }]);
+    ).toEqual(['sbom', 'container security']);
   });
 });
 
@@ -129,24 +89,21 @@ describe('collapseCitations', () => {
 });
 
 describe('normalizeWebflowGuide', () => {
-  it('returns all four arrays for a fully-populated row', () => {
+  it('returns all arrays for a fully-populated row', () => {
     const result = normalizeWebflowGuide({
       Q1: 'Why?',
       Ans1: 'Because.',
-      'Article About 1': 'Header: paragraph',
       'Article keyword 1': 'sbom',
       'Article Mentions 1': 'https://example.com',
     });
     expect(result.faqs).toHaveLength(1);
-    expect(result.articleSections).toHaveLength(1);
-    expect(result.keywords).toEqual([{ keyword: 'sbom' }]);
+    expect(result.keywords).toEqual(['sbom']);
     expect(result.citations).toHaveLength(1);
   });
 
   it('returns empty arrays for an empty row', () => {
     expect(normalizeWebflowGuide({})).toEqual({
       faqs: [],
-      articleSections: [],
       keywords: [],
       citations: [],
     });

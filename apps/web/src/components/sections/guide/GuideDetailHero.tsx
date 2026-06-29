@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { breadcrumbTrail } from "@cleanstart/schema/builders";
 import { formatGuideDate } from "@/lib/guides";
-import type { GuideAuthor, GuideImage } from "@/lib/guides";
+import type { GuideAuthor } from "@/lib/guides";
 import { DetailHero, DetailHeroMetaSeparator } from "@/components/sections/_shared/DetailHero";
 import { CalendarIcon, ClockIcon } from "@/components/sections/_shared/DetailHeroIcons";
 
@@ -12,7 +12,6 @@ interface GuideDetailHeroProps {
   publishedAt?: string | undefined;
   updatedAt?: string | undefined;
   readingMinutes?: number | undefined;
-  heroImage?: GuideImage | null | undefined;
 }
 
 // Show "Updated" only when the document was meaningfully revised after publish.

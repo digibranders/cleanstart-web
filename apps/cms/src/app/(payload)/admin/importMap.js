@@ -134,6 +134,7 @@ import { NavOpenOnDesktop as NavOpenOnDesktop_21bf36b0db39df18e02fc9fdb6b1a47e }
 import { DocSidebarResizer as DocSidebarResizer_cb8d71363ce9ac2087ce9e8e5b3cebe2 } from '../../../payload/admin/components/DocSidebarResizer.tsx'
 import { CmsLoginHero as CmsLoginHero_32623b867969588592e72c90b3b4967a } from '../../../payload/admin/components/auth/CmsLoginHero.tsx'
 import { SidebarHeader as SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519 } from '../../../payload/admin/components/SidebarHeader.tsx'
+import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { Dashboard as Dashboard_99a124d7b5ab83228ca0a3f897256570 } from '../../../payload/admin/components/Dashboard/Dashboard.tsx'
 import { CmsAccountView as CmsAccountView_e25882c99036df42ce1493c03452d7e3 } from '../../../payload/admin/components/auth/CmsAccountView.tsx'
 import { AnalyticsView as AnalyticsView_9809f757f325208f1f22c259e380c7d4 } from '../../../payload/admin/components/Analytics/AnalyticsView.tsx'
@@ -284,6 +285,7 @@ export const importMap = {
   "./payload/admin/components/DocSidebarResizer.tsx#DocSidebarResizer": DocSidebarResizer_cb8d71363ce9ac2087ce9e8e5b3cebe2,
   "./payload/admin/components/auth/CmsLoginHero.tsx#CmsLoginHero": CmsLoginHero_32623b867969588592e72c90b3b4967a,
   "./payload/admin/components/SidebarHeader.tsx#SidebarHeader": SidebarHeader_097cf2f13eb2504ed4d6ee2ccfe04519,
+  "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "./payload/admin/components/Dashboard/Dashboard.tsx#Dashboard": Dashboard_99a124d7b5ab83228ca0a3f897256570,
   "./payload/admin/components/auth/CmsAccountView.tsx#CmsAccountView": CmsAccountView_e25882c99036df42ce1493c03452d7e3,
   "./payload/admin/components/Analytics/AnalyticsView.tsx#AnalyticsView": AnalyticsView_9809f757f325208f1f22c259e380c7d4,
