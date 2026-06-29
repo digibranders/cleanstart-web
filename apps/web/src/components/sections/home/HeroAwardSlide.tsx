@@ -43,7 +43,7 @@ export function HeroAwardSlide(): React.ReactElement {
         {/* Headline + floating eyebrow (eyebrow is out of flow so the headline
             aligns with the product slide's <h1>). */}
         <div className="relative">
-          <div className="absolute bottom-[calc(100%+0.75rem)] left-1/2 -translate-x-1/2 lg:left-0 lg:translate-x-0">
+          <div className="mb-3 flex justify-center lg:absolute lg:bottom-[calc(100%+0.75rem)] lg:left-0 lg:mb-0 lg:block lg:justify-start">
             <HeroReveal y={16} delay={0.06} duration={0.7}>
               <div className="inline-flex items-center gap-2 whitespace-nowrap">
                 <span
