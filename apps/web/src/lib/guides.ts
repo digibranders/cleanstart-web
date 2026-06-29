@@ -21,7 +21,7 @@ export type Guide = {
   title: string;
   slug: string;
   abstract?: string | null;
-  heroImage?: GuideImage | null;
+  coverTitle?: string | null;
   authors?: BlogAuthor[] | null;
   publishedAt?: string | null;
   updatedAt?: string | null;
@@ -77,7 +77,7 @@ export async function getGuides({
     "title",
     "slug",
     "abstract",
-    "heroImage",
+    "coverTitle",
     "publishedAt",
     "updatedAt",
     "readingMinutes",
@@ -167,7 +167,7 @@ const RELATED_FILL_OVERSHOOT = 5;
 // Next's 2 MB Data-Cache ceiling (the response is then never cached, so every
 // ISR regen re-fetches it). Cards only render these fields.
 const RELATED_CARD_SELECT =
-  "select[title]=true&select[slug]=true&select[heroImage]=true&select[abstract]=true&select[readingMinutes]=true";
+  "select[title]=true&select[slug]=true&select[coverTitle]=true&select[abstract]=true&select[readingMinutes]=true";
 const JOURNEY_SELECT = "select[title]=true&select[slug]=true";
 
 /**

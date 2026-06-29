@@ -1,9 +1,8 @@
 import Link from "next/link";
-import Image from "next/image";
-import { formatGuideDate, guideMediaUrl } from "@/lib/guides";
+import { formatGuideDate } from "@/lib/guides";
 import type { Guide } from "@/lib/guides";
 import { effectivePublishedAt } from "@/lib/published-date";
-import { deriveCoverKeyword } from "@/lib/guide-cover";
+import { guideCoverKeyword } from "@/lib/guide-cover";
 import { GeneratedGuideCover } from "@/components/sections/_shared/GeneratedGuideCover";
 import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 
@@ -84,8 +83,7 @@ export function GuideDetailRelatedGuides({
 }
 
 function RelatedGuideCard({ guide }: { guide: Guide }): React.ReactElement {
-  const imageUrl = guideMediaUrl(guide.heroImage?.url);
-  const coverKeyword = deriveCoverKeyword(guide.title);
+  const coverKeyword = guideCoverKeyword(guide);
 
   return (
     <article
@@ -100,17 +98,7 @@ function RelatedGuideCard({ guide }: { guide: Guide }): React.ReactElement {
         className="relative shrink-0 mx-3 mt-3 rounded-[20px] md:rounded-[24px] overflow-hidden h-[150px] md:h-[200px]"
         style={{ background: "#e8e8f0" }}
       >
-        {imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt={guide.heroImage?.alt ?? guide.title}
-            fill
-            sizes="(min-width: 1280px) 380px, (min-width: 768px) 50vw, 100vw"
-            className="object-cover"
-          />
-        ) : (
-          <GeneratedGuideCover keyword={coverKeyword} />
-        )}
+        <GeneratedGuideCover keyword={coverKeyword} />
       </div>
 
       <div className="flex flex-col gap-2.5 md:gap-[12px] p-5 md:p-[32px] flex-1">

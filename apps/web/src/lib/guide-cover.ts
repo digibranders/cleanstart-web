@@ -27,6 +27,38 @@ export function deriveCoverKeyword(title: string | null | undefined): string {
 }
 
 /**
+ * The text painted on a guide's generated cover (cards + social image):
+ * the editor-set `coverTitle` verbatim when present (capped for legibility),
+ * else the title-derived topic phrase.
+ */
+export function guideCoverKeyword(guide: {
+  coverTitle?: string | null;
+  title?: string | null;
+}): string {
+  const manual = guide.coverTitle?.trim();
+  if (manual) return manual.slice(0, 80);
+  return deriveCoverKeyword(guide.title);
+}
+
+/**
+ * Cover-title display size, scaled down as the title gets longer so it never
+ * clips and stays legible. Same length tiers expressed in two unit systems:
+ *   - `px`  for the 1200×630 satori OG route (`/guide-cover/[slug]`)
+ *   - `cqw` (% of the cover's own width) for the on-page CSS cover
+ *
+ * `coverTitle` is capped at 80 chars upstream, so the smallest tier still has
+ * to seat ~80 characters in ≤3 lines on both surfaces.
+ */
+export function coverTitleSize(text: string): { px: number; cqw: number } {
+  const len = text.trim().length;
+  if (len <= 20) return { px: 84, cqw: 6 };
+  if (len <= 32) return { px: 72, cqw: 5.2 };
+  if (len <= 46) return { px: 62, cqw: 4.5 };
+  if (len <= 62) return { px: 52, cqw: 3.9 };
+  return { px: 44, cqw: 3.4 };
+}
+
+/**
  * URL for the generated cover image. The keyword is carried in the PATH
  * (not a query string) so Next's image optimizer accepts and downsizes it
  * — local images with a query string are rejected by default. Forward

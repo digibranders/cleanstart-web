@@ -140,11 +140,9 @@ export function GuidesList({
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
               style={{ gap: "32px", justifyItems: "center" }}
             >
-              {guides.map((guide, index) => (
+              {guides.map((guide) => (
                 <RevealItem key={guide.id} className="h-full w-full flex justify-center">
-                  {/* Preload the first 8 cards (2 rows at 4-col xl, 2+ at 3-col lg).
-                      They are LCP candidates and must not wait for lazy discovery. */}
-                  <GuideCard guide={guide} priority={index < 8} />
+                  <GuideCard guide={guide} />
                 </RevealItem>
               ))}
             </RevealStagger>

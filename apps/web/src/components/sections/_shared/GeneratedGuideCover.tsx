@@ -10,10 +10,13 @@
  * be `position: relative`; the cover fills it. Decorative — the card already
  * carries the title in its heading, so the whole cover is aria-hidden.
  *
- * The 1200×630 `/guide-cover/[slug]` route still exists as a standalone OG-sized
- * image endpoint (not currently wired into guide OG metadata); this component is
- * its on-page equivalent for the cards.
+ * The 1200×630 `/guide-cover/[slug]` route is the OG/social twin of this cover
+ * (wired into guide og:image + JSON-LD); this component is its on-page
+ * equivalent for the cards. Both size the title via `coverTitleSize` so a long
+ * editor-set `coverTitle` shrinks to fit instead of clipping.
  */
+
+import { coverTitleSize } from "@/lib/guide-cover";
 
 function Mark({ style }: { style?: React.CSSProperties }): React.ReactElement {
   // Inlined logo-cleanstart-mark.svg (white), so the cover ships no extra request.
@@ -45,6 +48,7 @@ interface GeneratedGuideCoverProps {
 export function GeneratedGuideCover({
   keyword,
 }: GeneratedGuideCoverProps): React.ReactElement {
+  const { cqw } = coverTitleSize(keyword);
   return (
     // Outer element establishes the container so children's `cqw` resolve
     // against the cover's own width (cq units reference an ancestor, not self).
@@ -152,7 +156,7 @@ export function GeneratedGuideCover({
           <span
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "6cqw",
+              fontSize: `${cqw}cqw`,
               fontWeight: 600,
               lineHeight: 1.08,
               letterSpacing: "-0.14cqw",
