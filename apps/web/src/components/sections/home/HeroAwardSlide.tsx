@@ -1,11 +1,13 @@
 import Image from "next/image";
+import Link from "next/link";
 
 import { HeroReveal } from "@/components/ui/Reveal";
 
-// "Full winners List is Live" CTA → the CleanStart winner page on The Hacker
-// News' Cybersecurity Stars Awards site (external).
-const WINNERS_HREF =
-  "https://awards.thehackernews.com/winners/2026/cleanstart-supply-chain-security/";
+// "Read Full Story" CTA → the CleanStart award announcement on our own /news
+// listing. Internal route, so it's a Next <Link> (client-side nav), not an
+// external anchor.
+const STORY_HREF =
+  "/news/cleanstart-named-winner-in-software-supply-chain-security-at-the-2026-cybersecurity-stars-awards";
 
 // CleanStart V4 hero carousel slide 2: the "Winners of 2026 — Cybersecurity
 // Stars Awards" campaign. The in-flow content (headline → lead → CTA) is kept
@@ -111,10 +113,8 @@ export function HeroAwardSlide(): React.ReactElement {
 
         <HeroReveal y={30} delay={0.28} duration={0.8}>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
-            <a
-              href={WINNERS_HREF}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href={STORY_HREF}
               className="cs-btn-glass"
               style={{
                 ["--cs-btn-h" as string]: "44px",
@@ -125,7 +125,7 @@ export function HeroAwardSlide(): React.ReactElement {
                 fontWeight: 500,
               }}
             >
-              <span>Full winners List is Live</span>
+              <span>Read Full Story</span>
               <svg
                 width="18"
                 height="18"
@@ -142,7 +142,7 @@ export function HeroAwardSlide(): React.ReactElement {
                   strokeLinejoin="round"
                 />
               </svg>
-            </a>
+            </Link>
           </div>
         </HeroReveal>
       </div>
