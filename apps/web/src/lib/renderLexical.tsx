@@ -1,8 +1,92 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import type { LexicalNode, LexicalRoot, LexicalTableNode } from "@/lib/blog";
 import { CodeBlock } from "@/components/code/CodeBlock";
 import { InlineCtaCard } from "@/components/article/InlineCtaCard";
+import { SITE_URL } from "@/lib/seo/canonical";
+
+// Hosts that resolve to THIS marketing site (apps/web). Internal links must
+// render same-tab as client-side navigation, never `target="_blank"`. Only the
+// apex + `www` belong here — sibling subdomains like `images.`/`cms.` are
+// separate apps and stay external. Derived from the canonical origin so an env
+// override carries through.
+const INTERNAL_HOSTS: ReadonlySet<string> = (() => {
+  let host = "www.cleanstart.com";
+  try {
+    host = new URL(SITE_URL).host.toLowerCase();
+  } catch {
+    /* fall back to the canonical default */
+  }
+  const apex = host.replace(/^www\./, "");
+  return new Set([host, apex, `www.${apex}`]);
+})();
+
+// Invisible characters that Webflow content smuggled into hrefs (zero-width
+// space/joiner, BOM, soft hyphen). They URL-encode into the path and 404 the
+// link, so strip them defensively before classifying.
+const INVISIBLE_CHARS = /\u200B|\u200C|\u200D|\uFEFF|\u00AD/g;
+
+type ResolvedLink = {
+  /** Final href: a root-relative path for internal links, the URL as-is otherwise. */
+  href: string;
+  /** True when the destination is another origin (or a non-web scheme). */
+  external: boolean;
+  /** Non-http schemes (mailto:, tel:) — external but never opened in a new tab. */
+  specialScheme: boolean;
+};
+
+export function resolveLexicalLink(raw: string | undefined): ResolvedLink {
+  const cleaned = (raw ?? "").replace(INVISIBLE_CHARS, "").trim();
+  if (!cleaned) return { href: "#", external: false, specialScheme: false };
+
+  // Already a path, anchor, or query — inherently internal.
+  if (
+    cleaned.startsWith("/") ||
+    cleaned.startsWith("#") ||
+    cleaned.startsWith("?")
+  ) {
+    return { href: cleaned, external: false, specialScheme: false };
+  }
+
+  try {
+    const url = new URL(cleaned);
+    if (url.protocol === "http:" || url.protocol === "https:") {
+      if (INTERNAL_HOSTS.has(url.host.toLowerCase())) {
+        // Strip the origin so the link navigates within the app (same tab,
+        // client-side) instead of triggering a full cross-origin reload.
+        const path = `${url.pathname}${url.search}${url.hash}`;
+        return { href: path || "/", external: false, specialScheme: false };
+      }
+      return { href: cleaned, external: true, specialScheme: false };
+    }
+    // mailto:, tel:, etc.
+    return { href: cleaned, external: true, specialScheme: true };
+  } catch {
+    // Not a parseable absolute URL and not a path — treat as external, as-is.
+    return { href: cleaned, external: true, specialScheme: true };
+  }
+}
+
+// Build the `rel` attribute: preserve a meaningful stored rel (nofollow,
+// sponsored, ugc — never the no-op "follow") and always add the
+// noopener/noreferrer guard whenever the link opens a new browsing context.
+function buildLinkRel(
+  storedRel: string | undefined,
+  newTab: boolean,
+): string | undefined {
+  const parts = new Set<string>();
+  if (storedRel && storedRel !== "follow") {
+    for (const token of storedRel.split(/\s+/)) {
+      if (token) parts.add(token);
+    }
+  }
+  if (newTab) {
+    parts.add("noopener");
+    parts.add("noreferrer");
+  }
+  return parts.size > 0 ? [...parts].join(" ") : undefined;
+}
 
 type LexicalBlockNode = {
   type: "block";
@@ -83,17 +167,44 @@ function renderNode(node: LexicalNode, key: string): React.ReactNode {
     case "link":
     case "autolink": {
       const linkNode = node as Extract<LexicalNode, { type: "link" | "autolink" }>;
-      const href = linkNode.url ?? (linkNode.fields as { url?: string } | undefined)?.url ?? "#";
-      const isExternal = href.startsWith("http");
+      const rawHref = linkNode.url ?? linkNode.fields?.url;
+      const { href, external, specialScheme } = resolveLexicalLink(rawHref);
+      const children = renderNodes(linkNode.children ?? [], key);
+      const linkStyle = {
+        color: "#4a3bf1",
+        textDecoration: "underline",
+        textUnderlineOffset: "3px",
+      } as const;
+
+      // Internal links navigate in the same tab via the client router. The
+      // migrated `newTab` flag is deliberately ignored here: Webflow set it
+      // inconsistently across same-site links, and an internal page opening a
+      // new tab is virtually never intended.
+      if (!external) {
+        return (
+          <Link
+            key={key}
+            href={href}
+            rel={buildLinkRel(linkNode.fields?.rel, false)}
+            style={linkStyle}
+          >
+            {children}
+          </Link>
+        );
+      }
+
+      // External (and mailto:/tel:) links keep `target="_blank"`, except
+      // non-web schemes which should open in place.
+      const newTab = !specialScheme;
       return (
         <a
           key={key}
           href={href}
-          target={isExternal ? "_blank" : undefined}
-          rel={isExternal ? "noopener noreferrer" : undefined}
-          style={{ color: "#4a3bf1", textDecoration: "underline", textUnderlineOffset: "3px" }}
+          target={newTab ? "_blank" : undefined}
+          rel={buildLinkRel(linkNode.fields?.rel, newTab)}
+          style={linkStyle}
         >
-          {renderNodes(linkNode.children ?? [], key)}
+          {children}
         </a>
       );
     }

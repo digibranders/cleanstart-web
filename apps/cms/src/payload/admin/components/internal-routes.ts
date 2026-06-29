@@ -68,6 +68,15 @@ export const toStoredUrl = (input: string): string => {
   return trimmed;
 };
 
+// Compare hosts as the same site regardless of a leading `www.` or the
+// http/https scheme. Migrated content stores links on `www.cleanstart.com`
+// while `SITE_ORIGIN` may be the apex `cleanstart.com`; without this they read
+// as External in the popover (the radio defaults wrong and rel flips to
+// nofollow). Sibling subdomains (`images.`, `cms.`) still differ and stay
+// external.
+const normaliseHost = (host: string): string =>
+  host.toLowerCase().replace(/^www\./, '');
+
 // Inverse of `toStoredUrl` for display. If `stored` lives on the
 // configured site origin, strip it to a relative path so the popover
 // shows `/news/foo` under Internal. Foreign URLs come back unchanged.
@@ -76,7 +85,7 @@ export const fromStoredUrl = (stored: string): string => {
   try {
     const parsed = new URL(stored);
     const origin = new URL(SITE_ORIGIN);
-    if (parsed.host === origin.host && parsed.protocol === origin.protocol) {
+    if (normaliseHost(parsed.host) === normaliseHost(origin.host)) {
       const tail = `${parsed.pathname}${parsed.search}${parsed.hash}`;
       return tail || '/';
     }

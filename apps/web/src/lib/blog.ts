@@ -69,7 +69,7 @@ export type LexicalTextNode = {
 export type LexicalLinkNode = {
   type: "link" | "autolink";
   url?: string;
-  fields?: { url?: string; newTab?: boolean };
+  fields?: { url?: string; newTab?: boolean; rel?: string; linkType?: string };
   children: LexicalNode[];
   version: number;
 };
