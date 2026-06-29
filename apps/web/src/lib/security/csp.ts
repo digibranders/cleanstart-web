@@ -22,6 +22,9 @@ const GA4_COLLECT = 'https://www.google-analytics.com';
 // NOT cover those, so both families are listed.
 const GA4_COLLECT_REGION = 'https://*.google-analytics.com';
 const GA4_REGION = 'https://*.analytics.google.com';
+// Leadfeeder / Dealfront tracker: loader is sc.lfeeder.com (served via
+// script-src 'https:'); the tracker beacons + pixels back to *.lfeeder.com.
+const LEADFEEDER = 'https://*.lfeeder.com';
 
 // Frame-ancestors override applied to preview surfaces (cookie-based
 // draft mode AND the new token-based `/preview/*` route). In every
@@ -70,6 +73,8 @@ export function buildCsp({
     // GA4 no-cors pixel fallback when sendBeacon/fetch is unavailable.
     GA4_COLLECT,
     GTM,
+    // Leadfeeder tracking pixel.
+    LEADFEEDER,
   ];
 
   const fontSrc = ["'self'", 'https://fonts.gstatic.com', 'data:'];
@@ -92,6 +97,7 @@ export function buildCsp({
     GA4_COLLECT,
     GA4_COLLECT_REGION,
     GA4_REGION,
+    LEADFEEDER,
   ];
   if (!isProduction) {
     // Local dev: web (3010/3001) calls the CMS at localhost:3000 for

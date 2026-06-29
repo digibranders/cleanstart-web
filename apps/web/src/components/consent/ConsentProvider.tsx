@@ -35,6 +35,8 @@ interface ConsentContextValue {
   categories: ConsentCategories | null;
   /** Convenience flag for gating behavioural analytics (performance category). */
   performanceGranted: boolean;
+  /** Convenience flag for gating advertising / profiling tools (targeting category). */
+  targetingGranted: boolean;
   /** GPC signal detected at load. */
   gpc: boolean;
   decide: (
@@ -156,6 +158,7 @@ export function ConsentProvider({ children }: { children: React.ReactNode }) {
       promptOpen,
       categories: record?.categories ?? null,
       performanceGranted: record?.categories.performance ?? false,
+      targetingGranted: record?.categories.targeting ?? false,
       gpc,
       decide,
       openPrompt: () => setPromptOpen(true),
