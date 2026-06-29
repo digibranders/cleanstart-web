@@ -7,6 +7,7 @@ import {
   TOGGLE_LINK_COMMAND,
 } from '@payloadcms/richtext-lexical/client';
 import {
+  $getNodeByKey,
   $getSelection,
   $isRangeSelection,
   COMMAND_PRIORITY_LOW,
@@ -192,8 +193,15 @@ export function LinkPopoverPlugin({
   const [editor] = useLexicalComposerContext();
   const [state, setState] = useState<PopoverState | null>(null);
   const popoverRef = useRef<HTMLDivElement | null>(null);
+  // Key of the LinkNode under edit. Captured when the popover opens over an
+  // existing link so the save can target that node directly instead of relying
+  // on the editor's RangeSelection — which is lost once focus moves into the
+  // popover inputs (collapsed caret selections do not survive the blur, so the
+  // stock TOGGLE_LINK_COMMAND would no-op and the edit would silently revert).
+  const editLinkKeyRef = useRef<string | null>(null);
 
   const close = useCallback(() => {
+    editLinkKeyRef.current = null;
     setState(null);
     editor.focus();
   }, [editor]);
@@ -203,11 +211,13 @@ export function LinkPopoverPlugin({
       const rect = getNativeSelectionRect(editor);
       if (!rect) return;
       let initial: LinkPopoverValue = DEFAULT_VALUE;
+      editLinkKeyRef.current = null;
       editor.getEditorState().read(() => {
         const selection = $getSelection();
         if (!$isRangeSelection(selection)) return;
         const { node } = readLinkAtSelection(selection);
         if (node) {
+          editLinkKeyRef.current = node.getKey();
           const fields = node.getFields() as unknown as Record<
             string,
             unknown
@@ -333,24 +343,69 @@ export function LinkPopoverPlugin({
       // path shape (see fieldsToValue → isInternalPath).
       const trimmed = value.url.trim();
       if (!trimmed) return;
+      const fields = {
+        doc: null,
+        linkType: 'custom' as const,
+        newTab: value.newTab,
+        rel: value.rel,
+        url: toStoredUrl(trimmed),
+      };
+
+      // Editing an existing link: write straight to the captured node. This is
+      // selection-independent, so it survives focus living in the popover (the
+      // root cause of the previous "Update does nothing" behaviour).
+      const editKey = editLinkKeyRef.current;
+      if (editKey) {
+        let updated = false;
+        editor.update(() => {
+          const node = $getNodeByKey(editKey);
+          if ($isLinkNode(node)) {
+            node.setFields(fields);
+            updated = true;
+          }
+        });
+        if (updated) {
+          editLinkKeyRef.current = null;
+          setState(null);
+          return;
+        }
+        // Node no longer exists (text was rewritten) — fall through to the
+        // command path, which re-wraps the current selection.
+      }
+
+      // Creating a new link: wrap the live selection via the stock command.
       editor.dispatchCommand(TOGGLE_LINK_COMMAND, {
-        fields: {
-          doc: null,
-          linkType: 'custom',
-          newTab: value.newTab,
-          rel: value.rel,
-          url: toStoredUrl(trimmed),
-        },
+        fields,
         selectedNodes: [],
         text: null,
       });
+      editLinkKeyRef.current = null;
       setState(null);
     },
     [editor],
   );
 
   const handleRemove = useCallback(() => {
+    const editKey = editLinkKeyRef.current;
+    if (editKey) {
+      let removed = false;
+      editor.update(() => {
+        const node = $getNodeByKey(editKey);
+        if ($isLinkNode(node)) {
+          const children = node.getChildren();
+          for (const child of children) node.insertBefore(child);
+          node.remove();
+          removed = true;
+        }
+      });
+      if (removed) {
+        editLinkKeyRef.current = null;
+        setState(null);
+        return;
+      }
+    }
     editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
+    editLinkKeyRef.current = null;
     setState(null);
   }, [editor]);
 
