@@ -59,9 +59,8 @@ export function PricingHero(): React.ReactElement {
                 maxWidth: "640px",
               }}
             >
-              Our platform is built to support a wide range of enterprise and
-              operational needs across industries. From community-ready images
-              to enterprise-grade software supply chain security.
+              From community-ready images to enterprise-grade
+              <span className="block">software supply chain security.</span>
             </p>
           </HeroReveal>
 
