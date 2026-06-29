@@ -25,9 +25,8 @@
       "name": "abstract"
     },
     {
-      "type": "upload",
-      "name": "heroImage",
-      "relationTo": "media"
+      "type": "text",
+      "name": "coverTitle"
     },
     {
       "type": "richText",
@@ -70,48 +69,6 @@
     },
     {
       "type": "array",
-      "name": "articleSections",
-      "fields": [
-        {
-          "type": "text",
-          "name": "heading",
-          "required": true
-        },
-        {
-          "type": "richText",
-          "name": "body",
-          "required": true
-        }
-      ]
-    },
-    {
-      "type": "group",
-      "name": "howTo",
-      "fields": [
-        {
-          "type": "checkbox",
-          "name": "enabled"
-        },
-        {
-          "type": "text",
-          "name": "totalTime"
-        },
-        {
-          "type": "text",
-          "name": "prepTime"
-        },
-        {
-          "type": "text",
-          "name": "performTime"
-        },
-        {
-          "type": "text",
-          "name": "estimatedCost"
-        }
-      ]
-    },
-    {
-      "type": "array",
       "name": "citations",
       "fields": [
         {
@@ -126,17 +83,6 @@
         {
           "type": "text",
           "name": "url"
-        }
-      ]
-    },
-    {
-      "type": "array",
-      "name": "keywords",
-      "fields": [
-        {
-          "type": "text",
-          "name": "keyword",
-          "required": true
         }
       ]
     },

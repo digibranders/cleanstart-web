@@ -4,7 +4,6 @@ import { purgePageUiField } from '../fields/purge-page-ui';
 import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { displayPublishedAtField } from '../fields/display-published-at';
-import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
@@ -56,7 +55,15 @@ export const Guides: CollectionConfig = {
         description: `Drives the SEO description fallback and listing-card lede. Aim for ≤ ${ABSTRACT_CHAR_HINT} characters.`,
       },
     },
-    mediaUploadField({ name: 'heroImage', folderHint: 'web/guide' }),
+    {
+      name: 'coverTitle',
+      type: 'text',
+      maxLength: 80,
+      admin: {
+        description:
+          "Title shown on the guide's auto-generated cover (listing / related cards) and its social-share image. Leave blank to derive it from the document title. Keep it short — long titles are clipped on the cover.",
+      },
+    },
     { name: 'body', type: 'richText' },
     {
       name: 'faqsBulkPaste',
@@ -137,94 +144,18 @@ export const Guides: CollectionConfig = {
       },
     },
     {
-      name: 'articleSections',
-      type: 'array',
-      labels: { singular: 'Section', plural: 'Article sections' },
-      admin: {
-        description:
-          'Replaces Webflow Article About 1…8. Each section is one step when "Emit HowTo schema" is on below.',
-      },
-      fields: [
-        { name: 'heading', type: 'text', required: true },
-        { name: 'body', type: 'richText', required: true },
-      ],
-    },
-    {
-      type: 'group',
-      name: 'howTo',
-      label: 'How-to schema',
-      admin: {
-        description:
-          'When on, the guide emits a Schema.org HowTo blob alongside the TechArticle, treating each Article Section as a step. Use only for genuine procedural content (e.g. "How to harden your SSH server in 6 steps") — Google penalises HowTo on non-procedural articles.',
-      },
-      fields: [
-        {
-          name: 'enabled',
-          type: 'checkbox',
-          defaultValue: false,
-        },
-        {
-          name: 'totalTime',
-          type: 'text',
-          admin: {
-            description:
-              'ISO 8601 duration for the entire guide (e.g. PT30M = 30 minutes, PT1H30M = 1 hour 30 min).',
-            condition: (_data, sibling) => sibling?.enabled === true,
-          },
-        },
-        {
-          name: 'prepTime',
-          type: 'text',
-          admin: {
-            description: 'ISO 8601 prep duration (optional).',
-            condition: (_data, sibling) => sibling?.enabled === true,
-          },
-        },
-        {
-          name: 'performTime',
-          type: 'text',
-          admin: {
-            description: 'ISO 8601 active-work duration (optional).',
-            condition: (_data, sibling) => sibling?.enabled === true,
-          },
-        },
-        {
-          name: 'estimatedCost',
-          type: 'text',
-          admin: {
-            description: 'Optional cost hint (e.g. "$0", "$50 in tooling").',
-            condition: (_data, sibling) => sibling?.enabled === true,
-          },
-        },
-      ],
-    },
-    {
       name: 'citations',
       type: 'array',
       labels: { singular: 'Citation', plural: 'Citations' },
       admin: {
-        description:
-          'Replaces Webflow Article Mentions 1…10. Each citation surfaces in JSON-LD citation[].',
+        initCollapsed: true,
+        description: 'Sources mentioned in this guide. Each citation surfaces in JSON-LD citation[].',
       },
       fields: [
         { name: 'label', type: 'text', required: true },
         { name: 'source', type: 'text' },
         { name: 'url', type: 'text' },
       ],
-    },
-    {
-      name: 'keywords',
-      type: 'array',
-      labels: { singular: 'Keyword', plural: 'Keywords' },
-      admin: {
-        // Superseded by the shared `seo.keywords` sidebar card. Kept as a
-        // hidden data field for back-compat reads (dispatch/search merge
-        // it as a fallback) until a later migration drops the column.
-        hidden: true,
-        description:
-          'Legacy — edit topic keywords in the SEO sidebar (Topic keywords). Retained for back-compat.',
-      },
-      fields: [{ name: 'keyword', type: 'text', required: true }],
     },
     {
       name: 'relatedGuides',
@@ -307,6 +238,10 @@ export const Guides: CollectionConfig = {
       access: { update: () => false },
       labels: { singular: 'Heading', plural: 'Table of contents' },
       admin: {
+        // Auto-derived from the body on every save (bodyStatsHook). Editors
+        // never touch it and it renders on the live page, so it's hidden
+        // from the form to declutter the editor. Data column is unchanged.
+        hidden: true,
         readOnly: true,
         initCollapsed: true,
         components: {

@@ -178,56 +178,12 @@ describe('buildJsonLdBlobs', () => {
       expect(article?.citation).toBeUndefined();
     });
 
-    it('emits a HowTo blob alongside the TechArticle when howTo.enabled is true', () => {
-      const blobs = buildJsonLdBlobs(ctx, 'guides', {
-        slug: 'sbom-howto',
-        title: 'How to sign your SBOM',
-        abstract: 'Step-by-step.',
-        howTo: { enabled: true, totalTime: 'PT15M' },
-        articleSections: [
-          {
-            heading: 'Generate the SBOM',
-            body: { root: { children: [{ text: 'Run syft to produce CycloneDX.' }] } },
-          },
-          {
-            heading: 'Sign with cosign',
-            body: { root: { children: [{ text: 'cosign sign-blob …' }] } },
-          },
-        ],
-      });
-      const howTo = blobs.find((b) => b['@type'] === 'HowTo') as
-        | { totalTime?: string; step: { name: string }[] }
-        | undefined;
-      expect(howTo).toBeDefined();
-      expect(howTo?.totalTime).toBe('PT15M');
-      expect(howTo?.step).toHaveLength(2);
-      expect(howTo?.step[0]?.name).toBe('Generate the SBOM');
-      expect(blobs.find((b) => b['@type'] === 'TechArticle')).toBeDefined();
-    });
-
-    it('omits the HowTo when toggle is off OR no sections have body text', () => {
-      const offBlobs = buildJsonLdBlobs(ctx, 'guides', {
-        slug: 'no-howto',
-        title: 'Plain guide',
-        articleSections: [{ heading: 'Section', body: { root: { children: [{ text: 'x' }] } } }],
-      });
-      expect(offBlobs.find((b) => b['@type'] === 'HowTo')).toBeUndefined();
-
-      const emptyBlobs = buildJsonLdBlobs(ctx, 'guides', {
-        slug: 'empty-sections',
-        title: 'Empty guide',
-        howTo: { enabled: true },
-        articleSections: [],
-      });
-      expect(emptyBlobs.find((b) => b['@type'] === 'HowTo')).toBeUndefined();
-    });
-
-    it('emits TechArticle and surfaces keywords[] as mentions[]', () => {
+    it('emits TechArticle and surfaces seo.keywords as mentions[]', () => {
       const blobs = buildJsonLdBlobs(ctx, 'guides', {
         slug: 'sbom-101',
         title: 'SBOM 101',
         wordCount: 1850,
-        keywords: [{ keyword: 'SBOM' }, { keyword: 'CVE' }, { keyword: '' }],
+        seo: { keywords: ['SBOM', 'CVE'] },
       });
       const article = blobs.find((b) => b['@type'] === 'TechArticle');
       expect(article).toMatchObject({

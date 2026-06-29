@@ -661,7 +661,6 @@ export interface Media {
    * Photographer / source attribution.
    */
   credit?: string | null;
-  prefix?: string | null;
   /**
    * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
    */
@@ -669,6 +668,7 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -2044,7 +2044,10 @@ export interface Guide {
    * Drives the SEO description fallback and listing-card lede. Aim for ≤ 160 characters.
    */
   abstract?: string | null;
-  heroImage?: (number | null) | Media;
+  /**
+   * Title shown on the guide's auto-generated cover (listing / related cards) and its social-share image. Leave blank to derive it from the document title. Keep it short — long titles are clipped on the cover.
+   */
+  coverTitle?: string | null;
   body?: {
     root: {
       type: string;
@@ -2077,68 +2080,13 @@ export interface Guide {
    */
   lastReviewedAt?: string | null;
   /**
-   * Replaces Webflow Article About 1…8. Each section is one step when "Emit HowTo schema" is on below.
-   */
-  articleSections?:
-    | {
-        heading: string;
-        body: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * When on, the guide emits a Schema.org HowTo blob alongside the TechArticle, treating each Article Section as a step. Use only for genuine procedural content (e.g. "How to harden your SSH server in 6 steps") — Google penalises HowTo on non-procedural articles.
-   */
-  howTo?: {
-    enabled?: boolean | null;
-    /**
-     * ISO 8601 duration for the entire guide (e.g. PT30M = 30 minutes, PT1H30M = 1 hour 30 min).
-     */
-    totalTime?: string | null;
-    /**
-     * ISO 8601 prep duration (optional).
-     */
-    prepTime?: string | null;
-    /**
-     * ISO 8601 active-work duration (optional).
-     */
-    performTime?: string | null;
-    /**
-     * Optional cost hint (e.g. "$0", "$50 in tooling").
-     */
-    estimatedCost?: string | null;
-  };
-  /**
-   * Replaces Webflow Article Mentions 1…10. Each citation surfaces in JSON-LD citation[].
+   * Sources mentioned in this guide. Each citation surfaces in JSON-LD citation[].
    */
   citations?:
     | {
         label: string;
         source?: string | null;
         url?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Legacy — edit topic keywords in the SEO sidebar (Topic keywords). Retained for back-compat.
-   */
-  keywords?:
-    | {
-        keyword: string;
         id?: string | null;
       }[]
     | null;
@@ -5948,6 +5896,7 @@ export interface CareerApplication {
  */
 export interface Resume {
   id: number;
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -9414,7 +9363,7 @@ export interface GuidesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   abstract?: T;
-  heroImage?: T;
+  coverTitle?: T;
   body?: T;
   faqs?:
     | T
@@ -9426,34 +9375,12 @@ export interface GuidesSelect<T extends boolean = true> {
   authors?: T;
   reviewedBy?: T;
   lastReviewedAt?: T;
-  articleSections?:
-    | T
-    | {
-        heading?: T;
-        body?: T;
-        id?: T;
-      };
-  howTo?:
-    | T
-    | {
-        enabled?: T;
-        totalTime?: T;
-        prepTime?: T;
-        performTime?: T;
-        estimatedCost?: T;
-      };
   citations?:
     | T
     | {
         label?: T;
         source?: T;
         url?: T;
-        id?: T;
-      };
-  keywords?:
-    | T
-    | {
-        keyword?: T;
         id?: T;
       };
   relatedGuides?: T;
@@ -10622,13 +10549,13 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   credit?: T;
-  prefix?: T;
   focalPoint?:
     | T
     | {
         x?: T;
         y?: T;
       };
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -12523,6 +12450,7 @@ export interface CareerApplicationsSelect<T extends boolean = true> {
  * via the `definition` "resumes_select".
  */
 export interface ResumesSelect<T extends boolean = true> {
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
