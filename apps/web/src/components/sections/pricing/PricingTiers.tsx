@@ -1,10 +1,10 @@
+import Link from "next/link";
 import { Container, Section } from "@/components/layout";
-import { RevealItem, RevealStagger } from "@/components/ui/Reveal";
+import { Reveal, RevealItem, RevealStagger } from "@/components/ui/Reveal";
 
 interface Offering {
   title: string;
   body: string;
-  bullets?: string[];
 }
 
 const OFFERINGS: Offering[] = [
@@ -34,7 +34,7 @@ export function PricingTiers(): React.ReactElement {
   return (
     <Section
       padding="none"
-      className="relative overflow-hidden bg-white pt-0 pb-[var(--spacing-section-cta)]"
+      className="relative overflow-hidden bg-white pt-0 pb-section-lg"
     >
       {/* Decorative grid SVGs anchored to the bottom corners (Figma "Union"). */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -56,8 +56,7 @@ export function PricingTiers(): React.ReactElement {
         loading="lazy"
         decoding="async"
       />
-      {/* Pink→cyan gradient ellipses glowing from the bottom corners
-          (Figma Ellipse 46685 / 46686). */}
+      {/* Pink→cyan gradient ellipses glowing from the bottom corners. */}
       <div
         aria-hidden
         className="pointer-events-none absolute"
@@ -90,12 +89,34 @@ export function PricingTiers(): React.ReactElement {
       />
 
       <Container className="relative">
-        {/* Cap the panel to the same width as the plans section above. */}
         <div className="mx-auto w-full max-w-[1080px]">
-          <div className={`${CARD_FRAME} px-6 py-10 sm:px-10 sm:py-12`}>
+          <Reveal header className="mx-auto max-w-[720px] text-center">
+            <h2
+              className="font-display"
+              style={{
+                fontSize: "var(--fs-h2)",
+                fontWeight: 600,
+                letterSpacing: "-0.03em",
+                lineHeight: 1.1,
+                color: "#111",
+              }}
+            >
+              Complete Your Platform
+            </h2>
+            <p
+              className="mx-auto mt-4 max-w-[620px] text-[#555]"
+              style={{ fontSize: "var(--fs-body)", lineHeight: 1.6 }}
+            >
+              Extend your software supply chain with enterprise solutions for
+              visibility, governance, and secure deployment.
+            </p>
+          </Reveal>
+
+          {/* Single container: the four offerings + the tailored-solution CTA. */}
+          <div className={`${CARD_FRAME} mt-11 px-6 py-10 sm:px-10 sm:py-12`}>
             <CardDecor />
 
-            {/* Four offering cells in a 2×2 grid with a centred divider cross. */}
+            {/* Four offerings in a 2×2 grid with a centred divider cross. */}
             <RevealStagger className="relative grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-0">
               {OFFERINGS.map((offering, i) => (
                 <RevealItem
@@ -114,6 +135,44 @@ export function PricingTiers(): React.ReactElement {
                 </RevealItem>
               ))}
             </RevealStagger>
+
+            {/* Tailored-solution CTA — same container, below the offerings. */}
+            <div className="relative mt-10 flex flex-col items-center gap-5 border-t border-[rgba(44,193,235,0.28)] pt-10 text-center md:flex-row md:justify-between md:gap-8 md:text-left">
+              <div className="md:max-w-[600px]">
+                <h3
+                  className="font-display"
+                  style={{
+                    fontSize: "var(--fs-h3)",
+                    fontWeight: 700,
+                    letterSpacing: "-0.03em",
+                    lineHeight: 1.15,
+                    color: "#111",
+                  }}
+                >
+                  Need a tailored solution?
+                </h3>
+                <p
+                  className="mt-2.5 text-[#555]"
+                  style={{ fontSize: "var(--fs-body)", lineHeight: 1.6 }}
+                >
+                  Our team can help you choose the right combination of images,
+                  libraries, discovery, and deployment assets.
+                </p>
+              </div>
+              <Link
+                href="/contact-us"
+                className="cs-btn-blue shrink-0"
+                style={
+                  {
+                    "--cs-btn-h": "var(--btn-h-xl)",
+                    "--cs-btn-px": "28px",
+                    "--cs-btn-fs": "var(--fs-button)",
+                  } as React.CSSProperties
+                }
+              >
+                <span>Talk to an Expert</span>
+              </Link>
+            </div>
           </div>
         </div>
       </Container>
@@ -146,29 +205,6 @@ function OfferingColumn({
       >
         {offering.body}
       </p>
-      {offering.bullets ? (
-        <ul className="mt-5 flex flex-col gap-3 text-left">
-          {offering.bullets.map((bullet) => (
-            <li key={bullet} className="flex items-start gap-3">
-              <span
-                aria-hidden
-                className="mt-[10px] h-[6px] w-[6px] shrink-0 rounded-full"
-                style={{ background: "#4A3BF1" }}
-              />
-              <span
-                style={{
-                  fontSize: "var(--fs-body)",
-                  fontWeight: 500,
-                  lineHeight: 1.5,
-                  color: "#111",
-                }}
-              >
-                {bullet}
-              </span>
-            </li>
-          ))}
-        </ul>
-      ) : null}
     </div>
   );
 }

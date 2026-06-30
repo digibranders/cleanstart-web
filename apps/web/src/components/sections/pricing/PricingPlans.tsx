@@ -168,7 +168,9 @@ function DeveloperCard(): React.ReactElement {
       </ul>
 
       <Link
-        href="/contact-us"
+        href="https://images.cleanstart.com/?categoryId=__community__"
+        target="_blank"
+        rel="noopener noreferrer"
         className="cs-btn-blue relative w-full"
         style={
           {
