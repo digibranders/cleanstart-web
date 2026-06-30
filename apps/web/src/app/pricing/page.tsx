@@ -3,6 +3,7 @@ import { Footer } from "@/components/sections/Footer";
 import { PricingHero } from "@/components/sections/pricing/PricingHero";
 import { PricingPlans } from "@/components/sections/pricing/PricingPlans";
 import { PricingTiers } from "@/components/sections/pricing/PricingTiers";
+import { PricingCTA } from "@/components/sections/pricing/PricingCTA";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { breadcrumbSchema } from "@/lib/seo/jsonld";
@@ -39,7 +40,7 @@ export default async function PricingPage(): Promise<React.ReactElement> {
           <PricingTiers />
         </FadeUp>
       </main>
-      <Footer />
+      <Footer cta={<PricingCTA />} />
     </>
   );
 }

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Container, Section } from "@/components/layout";
 import { RevealItem, RevealStagger } from "@/components/ui/Reveal";
 
@@ -10,22 +9,20 @@ interface Offering {
 
 const OFFERINGS: Offering[] = [
   {
-    title: "Clean Libraries",
-    body: "Validated software dependencies curated for enterprise development.",
-  },
-  {
     title: "CleanSight",
-    body: "Continuous visibility into your software supply chain with near-zero CVEs and automatic versioned updates.",
+    body: "Discover containers, registries, and software assets across your environments.",
   },
   {
-    title: "Additional Services",
-    body: "Tailored solutions for your business.",
-    bullets: [
-      "Custom image hardening",
-      "24x7 support",
-      "On-premise deployment support",
-      "Custom compliance framework integration",
-    ],
+    title: "Clean Libraries",
+    body: "Secure software dependencies with verified, policy-driven libraries.",
+  },
+  {
+    title: "Custom Images",
+    body: "Build images tailored to your compliance, operating systems, and internal software.",
+  },
+  {
+    title: "Helm Charts",
+    body: "Deploy enterprise-ready Helm charts maintained for Kubernetes environments.",
   },
 ];
 
@@ -37,7 +34,7 @@ export function PricingTiers(): React.ReactElement {
   return (
     <Section
       padding="none"
-      className="relative overflow-hidden bg-white pt-0 pb-section-lg"
+      className="relative overflow-hidden bg-white pt-0 pb-[var(--spacing-section-cta)]"
     >
       {/* Decorative grid SVGs anchored to the bottom corners (Figma "Union"). */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -98,32 +95,25 @@ export function PricingTiers(): React.ReactElement {
           <div className={`${CARD_FRAME} px-6 py-10 sm:px-10 sm:py-12`}>
             <CardDecor />
 
-            {/* Three offering columns separated by vertical dividers. */}
-            <RevealStagger className="relative grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-0">
+            {/* Four offering cells in a 2×2 grid with a centred divider cross. */}
+            <RevealStagger className="relative grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-0">
               {OFFERINGS.map((offering, i) => (
-                <RevealItem key={offering.title} className="h-full">
-                  <OfferingColumn offering={offering} withDivider={i > 0} />
+                <RevealItem
+                  key={offering.title}
+                  className={`h-full md:px-10 ${
+                    i % 2 === 0
+                      ? "md:border-r md:border-[rgba(44,193,235,0.28)]"
+                      : ""
+                  } ${
+                    i < 2
+                      ? "md:border-b md:border-[rgba(44,193,235,0.28)] md:pb-10"
+                      : "md:pt-10"
+                  }`}
+                >
+                  <OfferingColumn offering={offering} />
                 </RevealItem>
               ))}
             </RevealStagger>
-
-            {/* One shared CTA for all three offerings. */}
-            <div className="relative mt-12 flex justify-center">
-              <Link
-                href="/contact-us"
-                className="cs-btn-blue"
-                style={
-                  {
-                    "--cs-btn-fs": "var(--fs-button)",
-                    "--cs-btn-px": "28px",
-                    gap: "8px",
-                  } as React.CSSProperties
-                }
-              >
-                <span>Contact Sales</span>
-                <Arrow />
-              </Link>
-            </div>
           </div>
         </div>
       </Container>
@@ -133,19 +123,11 @@ export function PricingTiers(): React.ReactElement {
 
 function OfferingColumn({
   offering,
-  withDivider,
 }: {
   offering: Offering;
-  withDivider: boolean;
 }): React.ReactElement {
   return (
-    <div
-      className={`flex h-full flex-col text-center md:px-8 ${
-        withDivider
-          ? "md:border-l md:border-[rgba(44,193,235,0.28)]"
-          : ""
-      }`}
-    >
+    <div className="flex h-full flex-col text-center">
       <h3
         className="font-display"
         style={{
@@ -242,26 +224,5 @@ function CardDecor(): React.ReactElement {
         />
       ))}
     </>
-  );
-}
-
-function Arrow(): React.ReactElement {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 18 18"
-      fill="none"
-      aria-hidden
-      focusable="false"
-    >
-      <path
-        d="M3.75 9h10.5M9.75 4.5 14.25 9l-4.5 4.5"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }
