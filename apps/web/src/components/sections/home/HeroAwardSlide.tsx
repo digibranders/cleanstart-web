@@ -64,7 +64,7 @@ export function HeroAwardSlide(): React.ReactElement {
                     letterSpacing: "-0.03em",
                   }}
                 >
-                  2026 • Cybersecurity Stars Awards
+                  Software Supply Chain Security
                 </span>
               </div>
             </HeroReveal>
@@ -79,7 +79,7 @@ export function HeroAwardSlide(): React.ReactElement {
                 lineHeight: 1.05,
               }}
             >
-              <span className="block">The Winners</span>
+              <span className="block">Proud Winner Of</span>
               <span
                 className="block"
                 style={{
@@ -91,7 +91,7 @@ export function HeroAwardSlide(): React.ReactElement {
                   WebkitTextFillColor: "transparent",
                 }}
               >
-                of 2026
+                Cybersecurity Stars Award 2026
               </span>
             </p>
           </HeroReveal>
@@ -106,8 +106,8 @@ export function HeroAwardSlide(): React.ReactElement {
               letterSpacing: "-0.02em",
             }}
           >
-            Honoring the innovation, impact, and technical excellence driving
-            cybersecurity forward.
+            By The Hacker News — recognizing excellence in software supply chain
+            security.
           </p>
         </HeroReveal>
 
