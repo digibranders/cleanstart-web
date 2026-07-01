@@ -12,7 +12,7 @@ import {
   getEventSlugs,
   type EventCountry,
 } from "@/lib/events";
-import { mediaUrl } from "@/lib/blog";
+import { isLexicalBodyEmpty, mediaUrl } from "@/lib/blog";
 import { RenderLexical } from "@/lib/renderLexical";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
@@ -167,7 +167,6 @@ export async function renderEventDetail({
             event.customDateLabel,
             "short",
           )}
-          abstract={event.abstract ?? null}
           heroImageUrl={heroImg ?? null}
           heroImageAlt={event.heroImage?.alt ?? null}
           heroImageWidth={event.heroImage?.width ?? null}
@@ -253,7 +252,13 @@ export async function renderEventDetail({
           className="relative mx-auto max-w-[820px] px-6"
           style={{ paddingTop: "80px", paddingBottom: "120px" }}
         >
-          {event.body && (
+          {isLexicalBodyEmpty(event.body) ? (
+            event.abstract && (
+              <div className="article-body">
+                <p className="article-paragraph">{event.abstract}</p>
+              </div>
+            )
+          ) : (
             <div className="article-body">
               <RenderLexical content={event.body} />
             </div>

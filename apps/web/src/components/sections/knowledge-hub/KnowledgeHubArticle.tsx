@@ -26,22 +26,6 @@ export function KnowledgeHubArticle({
         </h1>
       </Reveal>
 
-      {article.abstract && (
-        <Reveal header delay={0.15} y={20}>
-          <p
-            className="mt-6 font-medium"
-            style={{
-              fontSize: 'var(--fs-body)',
-              lineHeight: 1.5,
-              letterSpacing: '-0.01em',
-              color: '#3A3F55',
-            }}
-          >
-            {article.abstract}
-          </p>
-        </Reveal>
-      )}
-
       {article.videoUrl && (
         <Reveal header delay={0.2} y={20}>
           <div className="mt-10">

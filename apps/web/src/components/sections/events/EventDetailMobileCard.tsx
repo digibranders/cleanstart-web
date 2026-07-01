@@ -11,7 +11,6 @@ interface EventDetailMobileCardProps {
   venue: string;
   longDate?: string | null;
   shortDate?: string | null;
-  abstract?: string | null;
   /** Resolved absolute hero-image URL — pass null when missing. */
   heroImageUrl?: string | null;
   heroImageAlt?: string | null;
@@ -26,8 +25,7 @@ interface EventDetailMobileCardProps {
  *
  * Replaces the desktop hero+image+body stack on smaller viewports. Renders a
  * compact card on the dark gradient with the date pill, event image, title,
- * date row, location row, and a native share button, with the abstract text
- * flowing below the card on the same gradient.
+ * date row, location row, and a native share button.
  */
 export function EventDetailMobileCard({
   title,
@@ -35,7 +33,6 @@ export function EventDetailMobileCard({
   venue,
   longDate,
   shortDate,
-  abstract,
   heroImageUrl,
   heroImageAlt,
   heroImageWidth,
@@ -259,20 +256,6 @@ export function EventDetailMobileCard({
             {shareState === "copied" ? <CheckIcon /> : <ShareIcon />}
           </button>
         </div>
-
-        {abstract && (
-          <p
-            className="font-sans text-white mt-6"
-            style={{
-              fontSize: "var(--fs-body-sm)",
-              lineHeight: 1.55,
-              letterSpacing: "-0.005em",
-              opacity: 0.85,
-            }}
-          >
-            {abstract}
-          </p>
-        )}
 
         <div aria-hidden style={{ height: "48px" }} />
       </div>

@@ -178,6 +178,42 @@ export type LexicalRoot = {
   };
 };
 
+// Container node types whose emptiness depends on their children. Everything
+// outside this set (upload, table, code, horizontalrule, custom blocks, links)
+// carries visible content on its own and is treated as non-empty.
+const EMPTY_CANDIDATE_CONTAINERS: ReadonlySet<string> = new Set([
+  "root",
+  "paragraph",
+  "heading",
+  "quote",
+  "list",
+  "listitem",
+]);
+
+function isEmptyLexicalNode(node: LexicalNode): boolean {
+  if (node.type === "text") {
+    return ((node as { text?: string }).text ?? "").trim().length === 0;
+  }
+  if (node.type === "linebreak" || node.type === "tab") return true;
+  if (EMPTY_CANDIDATE_CONTAINERS.has(node.type)) {
+    const children = (node as { children?: LexicalNode[] }).children;
+    if (!children || children.length === 0) return true;
+    return children.every(isEmptyLexicalNode);
+  }
+  return false;
+}
+
+/**
+ * True when a Lexical body has no visible content — null/undefined, no children,
+ * or only whitespace/empty paragraphs. Used to fall back to the abstract on
+ * detail pages so an empty body never leaves the page blank.
+ */
+export function isLexicalBodyEmpty(body: LexicalRoot | null | undefined): boolean {
+  const children = body?.root?.children;
+  if (!children || children.length === 0) return true;
+  return children.every(isEmptyLexicalNode);
+}
+
 export type TocEntry = {
   level?: number | null;
   text?: string | null;

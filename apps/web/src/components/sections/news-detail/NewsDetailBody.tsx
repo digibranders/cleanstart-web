@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { mediaUrl } from "@/lib/blog";
+import { isLexicalBodyEmpty, mediaUrl } from "@/lib/blog";
 import { RenderLexical } from "@/lib/renderLexical";
 import type { NewsDetail } from "@/lib/news";
 import { formatNewsDate } from "@/lib/news";
@@ -11,6 +11,9 @@ interface NewsDetailBodyProps {
 export function NewsDetailBody({ item }: NewsDetailBodyProps): React.ReactElement {
   const logoUrl = mediaUrl(item.publisherLogo?.url);
   const heroUrl = mediaUrl(item.heroImage?.url);
+  // Fall back to the abstract only when the body has no visible content, so an
+  // empty-body news item still renders something below the dateline.
+  const bodyEmpty = isLexicalBodyEmpty(item.body);
 
   const datelinePieces: string[] = [];
   if (item.location) datelinePieces.push(item.location);
@@ -71,16 +74,21 @@ export function NewsDetailBody({ item }: NewsDetailBodyProps): React.ReactElemen
             className="font-sans font-medium leading-[1.6] mb-6"
             style={{ fontSize: "var(--fs-body-sm)", color: "rgba(17,17,17,0.6)", letterSpacing: "0.02em" }}
           >
-            {dateline} —{" "}
-            <span style={{ color: "rgba(17,17,17,0.85)", fontWeight: 400 }}>
-              {item.abstract}
-            </span>
+            {dateline}
           </p>
         )}
 
-        <div className="article-body">
-          <RenderLexical content={item.body} />
-        </div>
+        {bodyEmpty ? (
+          item.abstract && (
+            <div className="article-body">
+              <p className="article-paragraph">{item.abstract}</p>
+            </div>
+          )
+        ) : (
+          <div className="article-body">
+            <RenderLexical content={item.body} />
+          </div>
+        )}
       </div>
     </section>
   );

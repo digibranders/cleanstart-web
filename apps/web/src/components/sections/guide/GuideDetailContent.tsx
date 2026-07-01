@@ -8,13 +8,11 @@ import type { LexicalRoot, TocEntry } from "@/lib/guides";
 interface GuideDetailContentProps {
   body?: LexicalRoot | null | undefined;
   tableOfContents?: TocEntry[] | null | undefined;
-  abstract?: string | undefined;
 }
 
 export function GuideDetailContent({
   body,
   tableOfContents,
-  abstract,
 }: GuideDetailContentProps): React.ReactElement {
   return (
     <section className="relative w-full bg-white overflow-x-clip" data-section="GuideDetailContent">
@@ -68,20 +66,6 @@ export function GuideDetailContent({
             <div className="lg:hidden mb-8">
               <MobileTableOfContents toc={tableOfContents} />
             </div>
-
-            {abstract && (
-              <p
-                className="mb-8 leading-[1.7] tracking-[-0.01em]"
-                style={{
-                  fontSize: "var(--fs-body)",
-                  color: "rgba(17,17,17,0.65)",
-                  borderLeft: "3px solid #4a3bf1",
-                  paddingLeft: "16px",
-                }}
-              >
-                {abstract}
-              </p>
-            )}
 
             <div className="article-body">
               <RenderLexical content={body} />

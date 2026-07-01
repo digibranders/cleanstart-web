@@ -191,7 +191,6 @@ export async function renderBlogDetail({
           body={highlightedBody}
           tableOfContents={post.tableOfContents}
           heroImage={post.heroImage}
-          abstract={post.abstract ?? undefined}
         />
 
         <BlogDetailAuthor authors={post.authors} />

@@ -172,7 +172,6 @@ export async function renderGuideDetail({
         <GuideDetailContent
           body={highlightedBody}
           tableOfContents={guide.tableOfContents}
-          abstract={guide.abstract ?? undefined}
         />
 
         {faqs.length > 0 ? <GuideDetailFAQ faqs={faqs} /> : null}

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
-import type { Blog } from "./blog";
+import type { Blog, LexicalRoot } from "./blog";
 
 const fetchCMS = vi.fn();
 
@@ -9,7 +9,12 @@ vi.mock("./cms-fetch", () => ({
   cmsBaseUrl: () => "http://localhost:3000",
 }));
 
-const { getRelatedBlogs, getAutoJourneyTargets } = await import("./blog");
+const { getRelatedBlogs, getAutoJourneyTargets, isLexicalBodyEmpty } = await import("./blog");
+
+const mkRoot = (children: unknown[]): LexicalRoot =>
+  ({
+    root: { type: "root", children, direction: "ltr", format: "", indent: 0, version: 1 },
+  }) as LexicalRoot;
 
 interface FakeBlog {
   id: string;
@@ -196,5 +201,56 @@ describe("getAutoJourneyTargets", () => {
       .mockResolvedValueOnce(mkResponse<FakeBlog>([]));
     const out = await getAutoJourneyTargets("self", ANCHOR, ["cat-1"]);
     expect(out).toEqual({ previous: null, next: null });
+  });
+});
+
+describe("isLexicalBodyEmpty", () => {
+  test("null / undefined body is empty", () => {
+    expect(isLexicalBodyEmpty(null)).toBe(true);
+    expect(isLexicalBodyEmpty(undefined)).toBe(true);
+  });
+
+  test("no children is empty", () => {
+    expect(isLexicalBodyEmpty(mkRoot([]))).toBe(true);
+  });
+
+  test("a single empty paragraph is empty", () => {
+    expect(
+      isLexicalBodyEmpty(mkRoot([{ type: "paragraph", version: 1, children: [] }])),
+    ).toBe(true);
+  });
+
+  test("a paragraph with only whitespace text is empty", () => {
+    expect(
+      isLexicalBodyEmpty(
+        mkRoot([
+          { type: "paragraph", version: 1, children: [{ type: "text", version: 1, text: "   " }] },
+        ]),
+      ),
+    ).toBe(true);
+  });
+
+  test("a paragraph with real text is not empty", () => {
+    expect(
+      isLexicalBodyEmpty(
+        mkRoot([
+          { type: "paragraph", version: 1, children: [{ type: "text", version: 1, text: "Hi" }] },
+        ]),
+      ),
+    ).toBe(false);
+  });
+
+  test("a self-contained node (upload) with no children is not empty", () => {
+    expect(isLexicalBodyEmpty(mkRoot([{ type: "upload", version: 1 }]))).toBe(false);
+  });
+
+  test("a heading with text is not empty", () => {
+    expect(
+      isLexicalBodyEmpty(
+        mkRoot([
+          { type: "heading", tag: "h2", version: 1, children: [{ type: "text", version: 1, text: "T" }] },
+        ]),
+      ),
+    ).toBe(false);
   });
 });
