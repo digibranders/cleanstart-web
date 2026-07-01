@@ -57,7 +57,15 @@ export const KnowledgeBase: CollectionConfig = {
         description: `Drives the SEO description fallback and the listing-card lede. Aim for ≤ ${ABSTRACT_CHAR_HINT} characters.`,
       },
     },
-    mediaUploadField({ name: 'heroImage', folderHint: 'web/general' }),
+    mediaUploadField({
+      name: 'heroImage',
+      folderHint: 'web/general',
+      guidance: {
+        dimensions: '1600 × 900 px',
+        aspectRatio: '16:9 (landscape)',
+        note: 'Article hero image. Cropped to fill — keep the subject centered. Min 1280 px wide.',
+      },
+    }),
     {
       name: 'videoUrl',
       type: 'text',

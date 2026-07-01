@@ -56,7 +56,15 @@ export const Blogs: CollectionConfig = {
         description: `Drives the SEO description fallback. Aim for ≤ ${ABSTRACT_CHAR_HINT} characters.`,
       },
     },
-    mediaUploadField({ name: 'heroImage', folderHint: 'web/blog' }),
+    mediaUploadField({
+      name: 'heroImage',
+      folderHint: 'web/blog',
+      guidance: {
+        dimensions: '1600 × 900 px',
+        aspectRatio: '16:9 (landscape)',
+        note: 'Cover for the listing cards and the featured hero. Cropped to fill — keep the subject centered. Min 1280 px wide.',
+      },
+    }),
     { name: 'body', type: 'richText' },
     {
       name: 'faqsBulkPaste',

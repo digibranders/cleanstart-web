@@ -12787,7 +12787,6 @@ export interface Spotlight {
    * Shown in the Resources mega menu. Falls back to the Bulletin evergreen when no event/webinar is upcoming and this is empty or expired.
    */
   resources?: {
-    image?: (number | null) | Media;
     headline?: string | null;
     sub?: string | null;
     ctaLabel?: string | null;
@@ -12804,7 +12803,6 @@ export interface Spotlight {
    * Shown in the Company mega menu when there are no open careers. Falls back to the Talent Network evergreen when empty or expired.
    */
   company?: {
-    image?: (number | null) | Media;
     headline?: string | null;
     sub?: string | null;
     ctaLabel?: string | null;
@@ -13109,7 +13107,6 @@ export interface SpotlightsSelect<T extends boolean = true> {
   resources?:
     | T
     | {
-        image?: T;
         headline?: T;
         sub?: T;
         ctaLabel?: T;
@@ -13119,7 +13116,6 @@ export interface SpotlightsSelect<T extends boolean = true> {
   company?:
     | T
     | {
-        image?: T;
         headline?: T;
         sub?: T;
         ctaLabel?: T;

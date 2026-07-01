@@ -2,7 +2,7 @@ export type SpotlightCard =
   | { kind: 'event'; title: string; slug: string; startsAt: string }
   | { kind: 'webinar'; title: string; slug: string; startsAt: string }
   | { kind: 'careers'; openRoles: number }
-  | { kind: 'cms'; headline: string; sub?: string; ctaLabel: string; ctaHref: string; image?: string }
+  | { kind: 'cms'; headline: string; sub?: string; ctaLabel: string; ctaHref: string }
   | { kind: 'evergreen'; id: 'bulletin' | 'community' };
 
 export const BULLETIN_EVERGREEN: SpotlightCard = { kind: 'evergreen', id: 'bulletin' };
@@ -15,7 +15,6 @@ type CmsSpotlight = {
   sub?: string;
   ctaLabel: string;
   ctaHref: string;
-  image?: string;
   expiresAt?: string;
 };
 
@@ -32,7 +31,6 @@ function toCmsCard(cms: CmsSpotlight): SpotlightCard {
     ctaHref: cms.ctaHref,
   };
   if (cms.sub !== undefined) card.sub = cms.sub;
-  if (cms.image !== undefined) card.image = cms.image;
   return card;
 }
 

@@ -45,7 +45,15 @@ export const News: CollectionConfig = {
     contentTitleField,
     slugField({ source: 'title' }),
     { name: 'abstract', type: 'textarea' },
-    mediaUploadField({ name: 'heroImage', folderHint: 'web/news' }),
+    mediaUploadField({
+      name: 'heroImage',
+      folderHint: 'web/news',
+      guidance: {
+        dimensions: '1600 × 900 px',
+        aspectRatio: '16:9 (landscape)',
+        note: 'Cover for the listing card and the detail hero. Cropped to fill — keep the subject centered. Min 1280 px wide.',
+      },
+    }),
     {
       name: 'publisher',
       type: 'text',
@@ -59,6 +67,11 @@ export const News: CollectionConfig = {
       folderHint: 'web/news',
       description:
         'Outlet logo (~400×120, transparent PNG/SVG). Rendered large on the listing card and as the hero card on the detail page.',
+      guidance: {
+        dimensions: '≈ 400 × 120 px',
+        aspectRatio: 'Horizontal wordmark',
+        note: 'Publisher / outlet logo. Transparent PNG or SVG preferred so it sits on any background.',
+      },
     }),
     {
       name: 'pressType',

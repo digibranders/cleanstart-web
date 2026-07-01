@@ -112,7 +112,6 @@ import { ClarityConfigNote as ClarityConfigNote_dd07c5d802b83ad4ca896a67326d6b90
 import { HealthBadge as HealthBadge_89f48d3894398c6d1021775cfdeaf211 } from '@/payload/admin/components/integrations/HealthBadge.tsx'
 import { TestButton as TestButton_0a975e83e531dadfb4f8fa6589a5704a } from '@/payload/admin/components/integrations/TestButton.tsx'
 import { AuditTrail as AuditTrail_eca9fb91faa70a942f7e3507305e451c } from '@/payload/admin/components/integrations/AuditTrail.tsx'
-import { UploadField as UploadField_9a37057695692a15b6c8aaeb6d981611 } from '@/payload/admin/components/fields/UploadField.tsx'
 import { GlobalSchemaView as GlobalSchemaView_962751a33d0bde2910843d19f617ee83 } from '../../../payload/admin/components/SchemaManager/GlobalSchemaView.tsx'
 import { CollapsibleField as CollapsibleField_e8aff66100db6bf10de9866e9f9ca5a8 } from '@/payload/admin/components/fields/CollapsibleField.tsx'
 import { Icon as Icon_c822e198d4078a1912cce52e024df304 } from '../../../payload/admin/Icon.tsx'
@@ -263,7 +262,6 @@ export const importMap = {
   "@/payload/admin/components/integrations/HealthBadge.tsx#HealthBadge": HealthBadge_89f48d3894398c6d1021775cfdeaf211,
   "@/payload/admin/components/integrations/TestButton.tsx#TestButton": TestButton_0a975e83e531dadfb4f8fa6589a5704a,
   "@/payload/admin/components/integrations/AuditTrail.tsx#AuditTrail": AuditTrail_eca9fb91faa70a942f7e3507305e451c,
-  "@/payload/admin/components/fields/UploadField.tsx#UploadField": UploadField_9a37057695692a15b6c8aaeb6d981611,
   "./payload/admin/components/SchemaManager/GlobalSchemaView.tsx#GlobalSchemaView": GlobalSchemaView_962751a33d0bde2910843d19f617ee83,
   "@/payload/admin/components/fields/CollapsibleField.tsx#CollapsibleField": CollapsibleField_e8aff66100db6bf10de9866e9f9ca5a8,
   "./payload/admin/Icon.tsx#Icon": Icon_c822e198d4078a1912cce52e024df304,

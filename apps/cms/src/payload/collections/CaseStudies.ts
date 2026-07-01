@@ -87,11 +87,21 @@ export const CaseStudies: CollectionConfig = {
       required: true,
       folderHint: 'web/case-study',
       description: 'Company wordmark shown beside the company name.',
+      guidance: {
+        dimensions: '≥ 200 × 200 px',
+        aspectRatio: 'Square or horizontal wordmark',
+        note: 'Rendered small beside the company name. Transparent PNG or SVG preferred.',
+      },
     }),
     mediaUploadField({
       name: 'coverImage',
       folderHint: 'web/case-study',
       description: 'Optional card thumbnail image.',
+      guidance: {
+        dimensions: '1600 × 900 px',
+        aspectRatio: '16:9 (landscape)',
+        note: 'Card thumbnail. Cropped to fill — keep the subject centered. Min 1280 px wide.',
+      },
     }),
     { name: 'summary', type: 'textarea', required: true },
     mediaUploadField({

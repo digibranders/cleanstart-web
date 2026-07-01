@@ -63,7 +63,15 @@ export const Webinars: CollectionConfig = {
     purgePageUiField,
     contentTitleField,
     slugField({ source: 'title' }),
-    mediaUploadField({ name: 'heroImage', folderHint: 'web/webinar' }),
+    mediaUploadField({
+      name: 'heroImage',
+      folderHint: 'web/webinar',
+      guidance: {
+        dimensions: '1600 × 800 px',
+        aspectRatio: '2:1 (wide landscape)',
+        note: 'Cover for the listing card and the detail hero. Cropped to fill — keep the subject centered. Min 1200 px wide.',
+      },
+    }),
     { name: 'abstract', type: 'textarea' },
     { name: 'body', type: 'richText' },
     {

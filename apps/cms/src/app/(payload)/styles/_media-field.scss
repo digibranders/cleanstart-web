@@ -35,6 +35,109 @@
     font-weight: 700;
   }
 
+  // ─── Label row + sizing-guidance popover ("i" info button) ──────
+  &__label-row {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+
+    .cs-media-field__label {
+      margin-bottom: 0;
+    }
+  }
+
+  &__info-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    border-radius: 999px;
+    color: var(--theme-text-disabled);
+    cursor: pointer;
+    transition:
+      color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro);
+
+    &:hover,
+    &[aria-expanded='true'] {
+      color: var(--cs-cyan-500);
+      background: var(--cs-tint-brand-soft);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--cs-cyan-500);
+      outline-offset: 1px;
+    }
+  }
+
+  &__guidance {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 20;
+    width: max-content;
+    max-width: 300px;
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-200);
+    border-radius: var(--cs-radius-card);
+    padding: var(--cs-space-3);
+    box-shadow: var(--cs-shadow-lift-md, 0 12px 32px -12px rgba(0, 0, 0, 0.45));
+  }
+
+  &__guidance-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--theme-text);
+    margin-bottom: 6px;
+  }
+
+  &__guidance-list {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__guidance-item {
+    display: grid;
+    grid-template-columns: 46px 1fr;
+    gap: var(--cs-space-2);
+    align-items: baseline;
+
+    dt {
+      margin: 0;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--theme-text-soft);
+    }
+
+    dd {
+      margin: 0;
+      font-size: 12.5px;
+      color: var(--theme-text);
+      font-feature-settings: 'tnum' 1;
+    }
+  }
+
+  &__guidance-note {
+    margin: 8px 0 0;
+    padding-top: 8px;
+    border-top: 1px solid var(--theme-elevation-150);
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--theme-text-soft);
+  }
+
   // ─── Empty-state dropzone ───────────────────────────────────────
   &__dropzone {
     background: var(--theme-elevation-50);

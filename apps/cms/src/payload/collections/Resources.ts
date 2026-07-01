@@ -77,6 +77,11 @@ export const Resources: CollectionConfig = {
       folderHint: 'web/resource',
       description:
         'Optional cover shown on the resource detail page. When empty, the detail page falls back to the branded type poster (whitepaper / ebook / etc.). Listing cards always use the type poster.',
+      guidance: {
+        dimensions: '1600 × 900 px',
+        aspectRatio: '16:9 (landscape)',
+        note: 'Detail-page cover. Cropped to fill — keep the subject centered. Min 1280 px wide.',
+      },
     }),
     mediaUploadField({
       name: 'asset',

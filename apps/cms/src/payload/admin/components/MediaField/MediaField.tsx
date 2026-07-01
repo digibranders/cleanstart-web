@@ -33,13 +33,23 @@ type MediaDoc = {
   sizes?: Record<string, MediaSize | undefined> | null;
 };
 
+type MediaGuidance = {
+  dimensions?: string;
+  aspectRatio?: string;
+  note?: string;
+};
+
 type ClientFieldShape = {
   name?: string;
   label?: string;
   required?: boolean;
   admin?: {
     description?: string;
-    custom?: { folderHint?: string; accept?: readonly string[] };
+    custom?: {
+      folderHint?: string;
+      accept?: readonly string[];
+      guidance?: MediaGuidance;
+    };
   } | null;
 };
 
@@ -205,7 +215,9 @@ export const MediaField = (props: Props): ReactElement => {
   const [altSaving, setAltSaving] = useState(false);
   const [browseOpen, setBrowseOpen] = useState(false);
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
+  const [guidanceOpen, setGuidanceOpen] = useState(false);
 
+  const labelRowRef = useRef<HTMLDivElement | null>(null);
   const altInputRef = useRef<HTMLInputElement | null>(null);
   const filenameInputRef = useRef<HTMLInputElement | null>(null);
   const previewDialogRef = useRef<HTMLDialogElement | null>(null);
@@ -524,6 +536,37 @@ export const MediaField = (props: Props): ReactElement => {
     return `${formatAcceptList(acceptedMimes)} up to ${limitMb} MB. Drag and drop, paste a URL, or click to upload.`;
   }, [acceptedMimes, description]);
 
+  // Editor-facing sizing guidance shown behind the "i" info button. Only
+  // present on image fields (set via `mediaUploadField({ guidance })`).
+  const guidance = props.field?.admin?.custom?.guidance;
+  const hasGuidance = Boolean(guidance?.dimensions || guidance?.aspectRatio);
+
+  // Compact "formats · up to N MB" line for the guidance popover.
+  const formatsAndSize = useMemo(() => {
+    const maxLimit = acceptedMimes.reduce(
+      (max, mime) => Math.max(max, limitForMime(mime)),
+      0,
+    );
+    return `${formatAcceptList(acceptedMimes)} · up to ${Math.round(maxLimit / MB)} MB`;
+  }, [acceptedMimes]);
+
+  // Close the guidance popover on outside click or Escape.
+  useEffect(() => {
+    if (!guidanceOpen) return undefined;
+    const onDown = (e: MouseEvent): void => {
+      if (!labelRowRef.current?.contains(e.target as Node)) setGuidanceOpen(false);
+    };
+    const onKey = (e: KeyboardEvent): void => {
+      if (e.key === 'Escape') setGuidanceOpen(false);
+    };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [guidanceOpen]);
+
   const filename = doc?.filename ?? '';
   const dimensions =
     doc?.width && doc?.height ? `${doc.width} × ${doc.height}` : '';
@@ -546,10 +589,63 @@ export const MediaField = (props: Props): ReactElement => {
       data-cs-media-field
       data-readonly={props.readOnly ? 'true' : 'false'}
     >
-      <label htmlFor={inputId} className="field-label cs-media-field__label">
-        <span>{label}</span>
-        {required && <span className="cs-media-field__required" aria-hidden="true">*</span>}
-      </label>
+      <div className="cs-media-field__label-row" ref={labelRowRef}>
+        <label htmlFor={inputId} className="field-label cs-media-field__label">
+          <span>{label}</span>
+          {required && <span className="cs-media-field__required" aria-hidden="true">*</span>}
+        </label>
+        {hasGuidance && (
+          <>
+            <button
+              type="button"
+              className="cs-media-field__info-btn"
+              aria-label="Recommended image size"
+              aria-expanded={guidanceOpen}
+              title="Recommended image size"
+              onClick={() => setGuidanceOpen((o) => !o)}
+            >
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 16 16"
+                fill="none"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <circle cx="8" cy="8" r="6.75" stroke="currentColor" strokeWidth="1.3" />
+                <path d="M8 7.1v3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                <circle cx="8" cy="4.9" r="0.85" fill="currentColor" />
+              </svg>
+            </button>
+            {guidanceOpen && (
+              <div className="cs-media-field__guidance">
+                <div className="cs-media-field__guidance-title">Recommended image</div>
+                <dl className="cs-media-field__guidance-list">
+                  {guidance?.dimensions && (
+                    <div className="cs-media-field__guidance-item">
+                      <dt>Size</dt>
+                      <dd>{guidance.dimensions}</dd>
+                    </div>
+                  )}
+                  {guidance?.aspectRatio && (
+                    <div className="cs-media-field__guidance-item">
+                      <dt>Aspect</dt>
+                      <dd>{guidance.aspectRatio}</dd>
+                    </div>
+                  )}
+                  <div className="cs-media-field__guidance-item">
+                    <dt>File</dt>
+                    <dd>{formatsAndSize}</dd>
+                  </div>
+                </dl>
+                {guidance?.note && (
+                  <p className="cs-media-field__guidance-note">{guidance.note}</p>
+                )}
+              </div>
+            )}
+          </>
+        )}
+      </div>
 
       {isEmpty && (
         // The dropzone is a passive container — the inner "Upload from

@@ -34,7 +34,15 @@ export const Authors: CollectionConfig = {
     purgePageUiField,
     { name: 'name', type: 'text', required: true },
     slugField({ source: 'name' }),
-    mediaUploadField({ name: 'photo', folderHint: 'web/author' }),
+    mediaUploadField({
+      name: 'photo',
+      folderHint: 'web/author',
+      guidance: {
+        dimensions: '600 × 600 px',
+        aspectRatio: '1:1 (square)',
+        note: 'Shown as a round avatar and as a portrait on the author page. A centered head-and-shoulders crop works best.',
+      },
+    }),
     {
       name: 'role',
       type: 'text',

@@ -61,6 +61,11 @@ export const SeoDefaults: GlobalConfig = {
       folderHint: 'web/general',
       description:
         'Site-wide fallback when seo.ogImage and the page hero are both empty.',
+      guidance: {
+        dimensions: '1200 × 630 px',
+        aspectRatio: '1.91:1 (Open Graph)',
+        note: 'Social-share preview (LinkedIn, Facebook, X). Keep text and logo away from the edges.',
+      },
     }),
     {
       name: 'twitterHandle',
@@ -88,7 +93,15 @@ export const SeoDefaults: GlobalConfig = {
           hooks: { beforeValidate: [normalizeOptionalUrlHook] },
           validate: validateOptionalUrl,
         },
-        mediaUploadField({ name: 'logo', folderHint: 'web/general' }),
+        mediaUploadField({
+          name: 'logo',
+          folderHint: 'web/general',
+          guidance: {
+            dimensions: '≥ 512 × 512 px',
+            aspectRatio: 'Square (1:1)',
+            note: 'Organization logo emitted in structured data (Google Knowledge Panel). Transparent PNG on a square canvas.',
+          },
+        }),
         { name: 'slogan', type: 'text', admin: { description: 'Company tagline (Schema.org slogan).' } },
         {
           name: 'foundingDate',

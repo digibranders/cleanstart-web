@@ -169,6 +169,11 @@ export const PodcastEpisodes: CollectionConfig = {
       folderHint: 'web/general',
       description:
         'Optional custom thumbnail. Leave blank to use YouTube’s maxresdefault thumbnail.',
+      guidance: {
+        dimensions: '1280 × 720 px',
+        aspectRatio: '16:9 (landscape)',
+        note: 'Overrides the YouTube thumbnail. Match YouTube’s 16:9 frame so it lines up with the player.',
+      },
     }),
     {
       name: 'abstract',

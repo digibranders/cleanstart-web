@@ -6,8 +6,9 @@ import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape'
 // Shared shape for both mega-menu spotlight cards. Fields are optional (each
 // card is optional and falls back to its evergreen) — the web resolver checks
 // for ctaLabel/ctaHref presence before rendering.
+// (No image field: the mega-menu spotlight card renders headline/sub/CTA
+// only — SpotlightRenderer's `cms` branch never displayed an image.)
 const spotlightFields = (): Field[] => [
-  { name: 'image', type: 'upload', relationTo: 'media' },
   { name: 'headline', type: 'text', maxLength: 80 },
   { name: 'sub', type: 'text', maxLength: 160 },
   { name: 'ctaLabel', type: 'text', maxLength: 40 },

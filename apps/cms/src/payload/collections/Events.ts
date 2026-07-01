@@ -60,7 +60,15 @@ export const Events: CollectionConfig = {
       },
     },
     { name: 'abstract', type: 'textarea' },
-    mediaUploadField({ name: 'heroImage', folderHint: 'web/event' }),
+    mediaUploadField({
+      name: 'heroImage',
+      folderHint: 'web/event',
+      guidance: {
+        dimensions: '1600 × 800 px',
+        aspectRatio: '2:1 (wide landscape)',
+        note: 'Cover for the listing card and the detail hero. Cropped to fill — keep the subject centered. Min 1200 px wide.',
+      },
+    }),
     { name: 'body', type: 'richText' },
     {
       name: 'startsAt',
@@ -294,7 +302,16 @@ export const Events: CollectionConfig = {
       labels: { singular: 'Photo', plural: 'Photos' },
       admin: { description: 'Post-event photos. Surface only after the event ends.' },
       fields: [
-        mediaUploadField({ name: 'image', required: true, folderHint: 'web/event' }),
+        mediaUploadField({
+          name: 'image',
+          required: true,
+          folderHint: 'web/event',
+          guidance: {
+            dimensions: '≥ 1600 px on the long edge',
+            aspectRatio: 'Landscape (16:9 preferred)',
+            note: 'Post-event photo shown in the gallery grid. Cropped to fill.',
+          },
+        }),
         { name: 'caption', type: 'text' },
       ],
     },

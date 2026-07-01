@@ -45,7 +45,16 @@ export const AboutGalleries: CollectionConfig = {
         ],
       },
     },
-    mediaUploadField({ name: 'image', required: true, folderHint: 'web/about' }),
+    mediaUploadField({
+      name: 'image',
+      required: true,
+      folderHint: 'web/about',
+      guidance: {
+        dimensions: '≥ 1600 px on the long edge',
+        aspectRatio: 'Landscape',
+        note: 'Photo shown in the About-page gallery. Cropped to fill.',
+      },
+    }),
     { name: 'caption', type: 'text' },
     {
       name: 'imageLink',

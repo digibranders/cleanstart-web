@@ -2,6 +2,23 @@ import type { Field, FieldHook, Validate } from 'payload';
 
 type Condition = (data: unknown, siblingData: unknown) => boolean;
 
+/**
+ * Editor-facing sizing guidance for an image field. Rendered behind an
+ * "i" info button next to the field label in the admin so editors know
+ * exactly what to upload for the image to render crisply on the website.
+ * The numbers are derived from how `apps/web` actually renders the image
+ * (next/image `sizes` + container aspect ratio, 2× for retina) — do not
+ * invent them. Omit this on non-image (PDF/ZIP) fields.
+ */
+export type MediaGuidance = {
+  /** Recommended intrinsic pixel size, e.g. `'1600 × 900 px'`. */
+  dimensions: string;
+  /** Aspect-ratio descriptor, e.g. `'16:9 (landscape)'`. */
+  aspectRatio: string;
+  /** Where/how the image is used, and whether it is cropped to fill. */
+  note?: string;
+};
+
 export type MediaUploadOptions = {
   /** Field name (e.g. `heroImage`, `photo`, `logo`). */
   name: string;
@@ -33,6 +50,12 @@ export type MediaUploadOptions = {
    * of greying them out.
    */
   accept?: readonly string[];
+  /**
+   * Editor-facing image sizing guidance, shown behind an "i" info button
+   * beside the field label. Set only on image fields — leave undefined for
+   * downloadable PDF/ZIP asset fields.
+   */
+  guidance?: MediaGuidance;
   /** Standard Payload admin.condition. */
   condition?: Condition;
   /** Pass through validate. */
@@ -70,6 +93,7 @@ export const mediaUploadField = (opts: MediaUploadOptions): Field => ({
     custom: {
       folderHint: opts.folderHint ?? 'web/general',
       ...(opts.accept ? { accept: opts.accept } : {}),
+      ...(opts.guidance ? { guidance: opts.guidance } : {}),
     },
     ...(opts.description ? { description: opts.description } : {}),
     ...(opts.condition ? { condition: opts.condition } : {}),
