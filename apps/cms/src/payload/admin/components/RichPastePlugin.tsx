@@ -264,6 +264,20 @@ const detectCodeFromClipboard = (
   return null;
 };
 
+// A paste whose target is a form control (`<input>` / `<textarea>` /
+// `<select>`) hosted by a block decorator — e.g. the CodeBlock `content`
+// textarea, its `highlightLines` input, or the language `<select>` — must
+// paste *natively* into that control. The editor-wide rich-paste /
+// code-detect behaviour would otherwise hijack the event and drop the
+// clipboard into the surrounding body (or silently nowhere), so the field
+// never receives what the user pasted. Mirrors `guardDecoratorInputKeys`.
+const isFormControlInsideDecorator = (target: EventTarget | null): boolean => {
+  if (!(target instanceof HTMLElement)) return false;
+  const tag = target.tagName;
+  if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') return false;
+  return !!target.closest('[data-lexical-decorator="true"]');
+};
+
 const handlePaste = (
   event: ClipboardEvent,
   ownEditor: LexicalEditor,
@@ -272,6 +286,11 @@ const handlePaste = (
 ): void => {
   const target = event.target;
   if (!(target instanceof HTMLElement)) return;
+  // Let block-decorator form fields (CodeBlock content/highlight/language,
+  // InlineCta fields, etc.) handle their own paste natively — never
+  // intercept it. This is the primary code-block paste fix: pasting into an
+  // open code block now lands in its textarea instead of being swallowed.
+  if (isFormControlInsideDecorator(target)) return;
   const editorRoot = target.closest(
     '[data-lexical-editor="true"]',
   ) as LexicalDomElement | null;
@@ -291,6 +310,17 @@ const handlePaste = (
     if (detected) {
       event.preventDefault();
       event.stopImmediatePropagation();
+      // Payload's INSERT_BLOCK_COMMAND handler silently no-ops unless the
+      // editor has a RangeSelection (it guards on `$isRangeSelection` yet
+      // still returns true). If the caret was lost — focus shifted mid-paste,
+      // or a decorator node is selected — the block would vanish while the
+      // toast below still claimed success. Anchor a caret at the end of the
+      // root first so the block always lands.
+      ownEditor.update(() => {
+        if (!$isRangeSelection($getSelection())) {
+          $getRoot().selectEnd();
+        }
+      });
       ownEditor.dispatchCommand(INSERT_BLOCK_COMMAND, {
         blockName: '',
         blockType: 'codeBlock',
@@ -390,13 +420,6 @@ const isEditingShortcut = (e: KeyboardEvent): boolean => {
     }
   }
   return false;
-};
-
-const isFormControlInsideDecorator = (target: EventTarget | null): boolean => {
-  if (!(target instanceof HTMLElement)) return false;
-  const tag = target.tagName;
-  if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') return false;
-  return !!target.closest('[data-lexical-decorator="true"]');
 };
 
 const guardDecoratorInputKeys = (event: KeyboardEvent): void => {
