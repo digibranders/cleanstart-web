@@ -148,6 +148,80 @@ const validateFile = (file: File, acceptedMimes: readonly string[]): string | nu
   return null;
 };
 
+// Screenshot pastes (macOS Cmd+Shift+4 → Cmd+V) arrive as an "image.png"
+// blob with no meaningful name — rename those so the upload lands with a
+// stable, unique filename. A deliberately-named paste keeps its name.
+const renameGenericImageFile = (file: File): File => {
+  if (file.name && file.name !== 'image.png') return file;
+  const ext = file.type.split('/')[1] ?? 'png';
+  return new File([file], `pasted-${Date.now()}.${ext}`, { type: file.type });
+};
+
+// ─── Shared clipboard-image router ──────────────────────────────────
+// A page can mount several empty MediaFields at once (hero image, OG
+// image, gallery slots…). Each used to attach its OWN document-level
+// `paste` listener, and `preventDefault()` does not stop sibling
+// listeners — so one pasted image fanned out into EVERY empty field.
+//
+// Instead, every eligible field registers a claimant here and a SINGLE
+// refcounted `paste` listener routes each image to exactly one target:
+// the field the user is engaged with (focus-within or hovered), or — when
+// nothing is engaged — the sole eligible field. With multiple empty fields
+// and no engagement the destination is ambiguous, so we don't guess (a
+// wrong-field guess is worse than the user clicking the field first).
+interface MediaPasteClaimant {
+  isEngaged: () => boolean;
+  canAccept: () => boolean;
+  accept: (file: File) => void;
+}
+
+const mediaPasteClaimants = new Set<MediaPasteClaimant>();
+
+const routeClipboardImage = (event: ClipboardEvent): void => {
+  // Never hijack a paste aimed at a text field — plain-text paste into the
+  // title / alt / filename inputs (or any rich-text body) must pass through.
+  const target = event.target as HTMLElement | null;
+  if (
+    target?.tagName === 'INPUT' ||
+    target?.tagName === 'TEXTAREA' ||
+    target?.isContentEditable
+  ) {
+    return;
+  }
+
+  const items = event.clipboardData?.items;
+  if (!items) return;
+  let imageFile: File | null = null;
+  for (const item of Array.from(items)) {
+    if (item.kind === 'file' && item.type.startsWith('image/')) {
+      imageFile = item.getAsFile();
+      break;
+    }
+  }
+  if (!imageFile) return;
+
+  const eligible = Array.from(mediaPasteClaimants).filter((c) => c.canAccept());
+  if (eligible.length === 0) return;
+  const destination =
+    eligible.find((c) => c.isEngaged()) ?? (eligible.length === 1 ? eligible[0] : null);
+  if (!destination) return;
+
+  event.preventDefault();
+  destination.accept(renameGenericImageFile(imageFile));
+};
+
+const registerMediaPasteClaimant = (claimant: MediaPasteClaimant): (() => void) => {
+  const firstClaimant = mediaPasteClaimants.size === 0;
+  mediaPasteClaimants.add(claimant);
+  if (firstClaimant) document.addEventListener('paste', routeClipboardImage);
+  return () => {
+    mediaPasteClaimants.delete(claimant);
+    if (mediaPasteClaimants.size === 0) {
+      document.removeEventListener('paste', routeClipboardImage);
+    }
+  };
+};
+
 /**
  * Custom upload field. Replaces Payload's default upload UI with a
  * single-screen experience:
@@ -217,6 +291,8 @@ export const MediaField = (props: Props): ReactElement => {
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
   const [guidanceOpen, setGuidanceOpen] = useState(false);
 
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const hoveredRef = useRef(false);
   const labelRowRef = useRef<HTMLDivElement | null>(null);
   const altInputRef = useRef<HTMLInputElement | null>(null);
   const filenameInputRef = useRef<HTMLInputElement | null>(null);
@@ -378,44 +454,34 @@ export const MediaField = (props: Props): ReactElement => {
     [props.readOnly, startUpload, uploading],
   );
 
-  // Clipboard-paste support — listens at document level when the
-  // field is empty + idle. Cmd+V on a screenshot or copied image
-  // anywhere on an edit-view that has an empty media field will
-  // upload it directly. Skipped when the active element is a
-  // text input/textarea (so plain text-paste into the title /
-  // abstract still works).
-  const isPasteEligible = !value && !doc && !uploading;
+  // Clipboard-paste support — a screenshot or copied image pasted while
+  // this field is empty + idle uploads directly. Routing is delegated to
+  // the shared `routeClipboardImage` listener (see the claimant registry
+  // above) so several empty fields on one page never each grab the same
+  // paste. This field is preferred when the user is engaged with it
+  // (focus-within or hovered); otherwise it only wins as the sole eligible
+  // field. Live state is read through a ref so the claimant registers once.
+  const claimantStateRef = useRef({ value, doc, uploading, readOnly: props.readOnly, startUpload });
+  claimantStateRef.current = { value, doc, uploading, readOnly: props.readOnly, startUpload };
+
+  const isEngaged = useCallback((): boolean => {
+    if (hoveredRef.current) return true;
+    const root = rootRef.current;
+    const active = document.activeElement;
+    return !!root && active instanceof Node && root.contains(active);
+  }, []);
+
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
-    if (props.readOnly || !isPasteEligible) return undefined;
-
-    const onPaste = (e: globalThis.ClipboardEvent): void => {
-      const target = e.target as HTMLElement | null;
-      if (target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA' || target?.isContentEditable) {
-        return;
-      }
-      const items = e.clipboardData?.items;
-      if (!items) return;
-      for (const item of Array.from(items)) {
-        if (item.kind === 'file' && item.type.startsWith('image/')) {
-          const file = item.getAsFile();
-          if (file) {
-            e.preventDefault();
-            const named =
-              file.name && file.name !== 'image.png'
-                ? file
-                : new File([file], `pasted-${Date.now()}.${file.type.split('/')[1] ?? 'png'}`, {
-                    type: file.type,
-                  });
-            startUpload(named);
-            return;
-          }
-        }
-      }
-    };
-    document.addEventListener('paste', onPaste);
-    return () => document.removeEventListener('paste', onPaste);
-  }, [isPasteEligible, props.readOnly, startUpload]);
+    return registerMediaPasteClaimant({
+      isEngaged,
+      canAccept: () => {
+        const s = claimantStateRef.current;
+        return !s.readOnly && !s.value && !s.doc && !s.uploading;
+      },
+      accept: (file) => claimantStateRef.current.startUpload(file),
+    });
+  }, [isEngaged]);
 
   const onDetach = useCallback(() => {
     setValue(null);
@@ -585,9 +651,16 @@ export const MediaField = (props: Props): ReactElement => {
 
   return (
     <div
+      ref={rootRef}
       className="field-type cs-media-field"
       data-cs-media-field
       data-readonly={props.readOnly ? 'true' : 'false'}
+      onPointerEnter={() => {
+        hoveredRef.current = true;
+      }}
+      onPointerLeave={() => {
+        hoveredRef.current = false;
+      }}
     >
       <div className="cs-media-field__label-row" ref={labelRowRef}>
         <label htmlFor={inputId} className="field-label cs-media-field__label">
