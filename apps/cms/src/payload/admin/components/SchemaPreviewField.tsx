@@ -224,16 +224,33 @@ export const SchemaPreviewField = (
 
     request
       .then(async (res) => {
+        // A 404 from the jsonld endpoint means there is no published,
+        // schema-emitting version of this document yet (draft / never
+        // published), or an admin preview hit a not-yet-persisted doc.
+        // That is a draft state, not a failure — surface the neutral
+        // "unpublished" message instead of a red error.
+        if (res.status === 404) {
+          return { unpublished: true as const };
+        }
         if (!res.ok) {
           const body = (await res.json().catch(() => null)) as
             | { error?: string; message?: string }
             | null;
           throw new Error(body?.message ?? body?.error ?? `HTTP ${res.status}`);
         }
-        return res.json() as Promise<{ blobs?: Record<string, unknown>[] }>;
+        return (await res.json()) as { blobs?: Record<string, unknown>[] };
       })
       .then((body) => {
         if (cancelled) return;
+        if ('unpublished' in body) {
+          setFetchState({
+            status: 'unpublished',
+            blobs: [],
+            fromPreview: false,
+            autoTypes: new Set(),
+          });
+          return;
+        }
         const blobs = Array.isArray(body.blobs) ? body.blobs : [];
         const overrideBlobsList = canPreview ? overrideBlobsOf(overrideValue) : [];
         const overrideTypes = new Set(overrideBlobsList.map(blobTypeOf));
