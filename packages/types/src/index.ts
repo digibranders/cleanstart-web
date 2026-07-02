@@ -9,3 +9,80 @@
 // between editor and admin for SEO surfaces only.
 export const ROLES = ['admin', 'editor', 'author', 'seo'] as const;
 export type Role = (typeof ROLES)[number];
+
+// Embed style presets — the curated visual styles an editor can apply to a
+// rich-text Embed block (Script/HTML mode). Single source of truth for both
+// sides: the CMS embed dialog renders its Style dropdown from this list, and
+// apps/web's renderLexical only emits a class for slugs present here (so a
+// stray value in stored content can never inject an arbitrary class). The
+// matching CSS lives in apps/web globals.css under
+// `.article-body .article-embed.embed-style-<slug>` — a new preset is one
+// entry here plus one CSS rule, shipped in the same commit.
+export interface EmbedStylePreset {
+  readonly slug: string;
+  readonly label: string;
+  readonly description: string;
+  /** Chip color shown next to the option in the CMS style picker. */
+  readonly swatch: string;
+}
+
+export const EMBED_STYLE_PRESETS: readonly EmbedStylePreset[] = [
+  {
+    slug: 'callout-brand',
+    label: 'Callout — Brand',
+    description: 'Soft purple tint with a brand accent border. General-purpose highlight box.',
+    swatch: '#4a3bf1',
+  },
+  {
+    slug: 'callout-info',
+    label: 'Info',
+    description: 'Blue tint for notes and supplementary context.',
+    swatch: '#2f7fe0',
+  },
+  {
+    slug: 'callout-warning',
+    label: 'Warning',
+    description: 'Amber tint for caveats and gotchas.',
+    swatch: '#d29922',
+  },
+  {
+    slug: 'callout-success',
+    label: 'Success',
+    description: 'Green tint for best practices and positive outcomes.',
+    swatch: '#00a05a',
+  },
+  {
+    slug: 'callout-alert',
+    label: 'Alert',
+    description: 'Red tint for security advisories and critical warnings.',
+    swatch: '#e0453a',
+  },
+  {
+    slug: 'myth-reality',
+    label: 'Myth vs Reality',
+    description: 'Callout with an uppercase MYTH/REALITY-style label treatment.',
+    swatch: '#4a3bf1',
+  },
+  {
+    slug: 'stat-highlight',
+    label: 'Stat Highlight',
+    description: 'Centered panel that enlarges a key number or statistic.',
+    swatch: '#111111',
+  },
+  {
+    slug: 'pull-quote',
+    label: 'Pull Quote',
+    description: 'Neutral soft panel with larger, emphasised text.',
+    swatch: '#a4a7af',
+  },
+  {
+    slug: 'dark-panel',
+    label: 'Dark Panel',
+    description: 'Dark contrast box matching the article table panels.',
+    swatch: '#0d1117',
+  },
+] as const;
+
+export const EMBED_STYLE_SLUGS: ReadonlySet<string> = new Set(
+  EMBED_STYLE_PRESETS.map((p) => p.slug),
+);

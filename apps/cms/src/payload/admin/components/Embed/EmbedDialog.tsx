@@ -1,5 +1,6 @@
 'use client';
 
+import { EMBED_STYLE_PRESETS } from '@cleanstart/types';
 import { Dialog, DialogBody, DialogFooter, DialogHeader } from '@cleanstart/ui';
 import { useCallback, useEffect, useId, useReducer, useRef } from 'react';
 
@@ -20,6 +21,8 @@ export type EmbedDialogData = {
   readonly title: string;
   readonly aspectRatio: EmbedAspectRatio;
   readonly caption: string;
+  /** Visual preset slug from EMBED_STYLE_PRESETS; '' = no styling. */
+  readonly styleSlug: string;
 };
 
 type Props = {
@@ -45,6 +48,7 @@ type FormState = {
   scriptTitle: string;
   rawHtmlError: string;
   scriptTitleError: string;
+  styleSlug: string;
 };
 
 type Action =
@@ -59,6 +63,7 @@ type Action =
   | { type: 'SET_SCRIPT_TITLE'; title: string }
   | { type: 'SET_RAW_HTML_ERROR'; error: string }
   | { type: 'SET_SCRIPT_TITLE_ERROR'; error: string }
+  | { type: 'SET_STYLE_SLUG'; styleSlug: string }
   | { type: 'RESET'; data: EmbedDialogData | null };
 
 const ASPECT_RATIO_OPTIONS: ReadonlyArray<{ value: EmbedAspectRatio; label: string }> = [
@@ -83,6 +88,7 @@ function buildInitialState(data: EmbedDialogData | null): FormState {
       scriptTitle: '',
       rawHtmlError: '',
       scriptTitleError: '',
+      styleSlug: '',
     };
   }
   return {
@@ -97,6 +103,7 @@ function buildInitialState(data: EmbedDialogData | null): FormState {
     scriptTitle: data.mode === 'script' ? data.title : '',
     rawHtmlError: '',
     scriptTitleError: '',
+    styleSlug: data.styleSlug,
   };
 }
 
@@ -128,6 +135,8 @@ function reducer(state: FormState, action: Action): FormState {
       return { ...state, rawHtmlError: action.error };
     case 'SET_SCRIPT_TITLE_ERROR':
       return { ...state, scriptTitleError: action.error };
+    case 'SET_STYLE_SLUG':
+      return { ...state, styleSlug: action.styleSlug };
     case 'RESET':
       return buildInitialState(action.data);
     default:
@@ -188,6 +197,7 @@ export function EmbedDialog({ open, initialData, onClose, onConfirm }: Props): R
         title: state.iframeTitle.trim(),
         aspectRatio: state.aspectRatio,
         caption: state.caption.trim(),
+        styleSlug: '',
       });
     } else {
       let hasError = false;
@@ -209,6 +219,7 @@ export function EmbedDialog({ open, initialData, onClose, onConfirm }: Props): R
         title: state.scriptTitle.trim(),
         aspectRatio: state.aspectRatio,
         caption: state.caption.trim(),
+        styleSlug: state.styleSlug,
       });
     }
   }, [state, onConfirm]);
@@ -409,6 +420,49 @@ export function EmbedDialog({ open, initialData, onClose, onConfirm }: Props): R
               {state.rawHtmlError && (
                 <p className="cs-embed-dialog__error" role="alert">
                   {state.rawHtmlError}
+                </p>
+              )}
+            </div>
+
+            <div className="cs-embed-dialog__field">
+              <label className="cs-embed-dialog__label" htmlFor="cs-embed-style">
+                Style{' '}
+                <span className="cs-embed-dialog__label-note">
+                  (optional — visual preset applied on the site)
+                </span>
+              </label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                {state.styleSlug !== '' && (
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      width: 14,
+                      height: 14,
+                      borderRadius: 4,
+                      flexShrink: 0,
+                      background:
+                        EMBED_STYLE_PRESETS.find((p) => p.slug === state.styleSlug)?.swatch ??
+                        'transparent',
+                    }}
+                  />
+                )}
+                <select
+                  className="cs-embed-dialog__select"
+                  id="cs-embed-style"
+                  onChange={(e) => dispatch({ type: 'SET_STYLE_SLUG', styleSlug: e.target.value })}
+                  value={state.styleSlug}
+                >
+                  <option value="">None (unstyled)</option>
+                  {EMBED_STYLE_PRESETS.map((preset) => (
+                    <option key={preset.slug} value={preset.slug}>
+                      {preset.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {state.styleSlug !== '' && (
+                <p className="cs-embed-dialog__hint">
+                  {EMBED_STYLE_PRESETS.find((p) => p.slug === state.styleSlug)?.description}
                 </p>
               )}
             </div>

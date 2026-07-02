@@ -4322,6 +4322,135 @@ body {
   color: #4a3bf1;
 }
 
+/* ── Embed style presets ───────────────────────────────────────────────────────
+   Editor-selectable visual presets for the Embed block (Script/HTML mode).
+   The slug list is the shared EMBED_STYLE_PRESETS registry in packages/types;
+   renderLexical only emits `embed-style-<slug>` for slugs in that registry, so
+   these selectors are the complete set. A new preset = one registry entry +
+   one rule here, shipped together. The legacy .myth-box/.what-is-mythos-box
+   inner-class rules above stay for already-published Webflow content. */
+
+/* Shared callout shell — tinted panel with an accent left border. */
+.article-body .article-embed.embed-style-callout-brand,
+.article-body .article-embed.embed-style-callout-info,
+.article-body .article-embed.embed-style-callout-warning,
+.article-body .article-embed.embed-style-callout-success,
+.article-body .article-embed.embed-style-callout-alert,
+.article-body .article-embed.embed-style-myth-reality {
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px;
+  border: 1px solid;
+  border-left-width: 4px;
+}
+
+.article-body .article-embed[class*="embed-style-"] > :first-child {
+  margin-top: 0;
+}
+
+.article-body .article-embed[class*="embed-style-"] p:last-child,
+.article-body .article-embed[class*="embed-style-"] > :last-child {
+  margin-bottom: 0;
+}
+
+.article-body .article-embed.embed-style-callout-brand,
+.article-body .article-embed.embed-style-myth-reality {
+  background: rgba(74, 59, 241, 0.04);
+  border-color: rgba(74, 59, 241, 0.12);
+  border-left-color: #4a3bf1;
+}
+
+.article-body .article-embed.embed-style-callout-info {
+  background: rgba(47, 127, 224, 0.05);
+  border-color: rgba(47, 127, 224, 0.14);
+  border-left-color: #2f7fe0;
+}
+
+.article-body .article-embed.embed-style-callout-warning {
+  background: rgba(210, 153, 34, 0.06);
+  border-color: rgba(210, 153, 34, 0.16);
+  border-left-color: #d29922;
+}
+
+.article-body .article-embed.embed-style-callout-success {
+  background: rgba(0, 160, 90, 0.05);
+  border-color: rgba(0, 160, 90, 0.14);
+  border-left-color: #00a05a;
+}
+
+.article-body .article-embed.embed-style-callout-alert {
+  background: rgba(224, 69, 58, 0.05);
+  border-color: rgba(224, 69, 58, 0.14);
+  border-left-color: #e0453a;
+}
+
+/* Myth vs Reality — the callout shell plus the uppercase tag treatment for
+   any short leading label markup (strong or the legacy .myth-label). */
+.article-body .article-embed.embed-style-myth-reality p:first-child > strong:first-child,
+.article-body .article-embed.embed-style-myth-reality .myth-label {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #4a3bf1;
+}
+
+/* Stat highlight — centered panel that enlarges key numbers (any <strong>). */
+.article-body .article-embed.embed-style-stat-highlight {
+  padding: 1.75rem 1.5rem;
+  border-radius: 12px;
+  background: rgba(17, 17, 17, 0.03);
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  text-align: center;
+}
+
+.article-body .article-embed.embed-style-stat-highlight strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.75rem, 4cqi, 2.5rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #111111;
+}
+
+/* Pull quote — neutral soft panel with larger, emphasised text. */
+.article-body .article-embed.embed-style-pull-quote {
+  padding: 1.5rem 1.75rem;
+  border-radius: 12px;
+  background: rgba(17, 17, 17, 0.03);
+  border-left: 4px solid rgba(17, 17, 17, 0.2);
+}
+
+.article-body .article-embed.embed-style-pull-quote p {
+  font-size: 1.25rem;
+  font-style: italic;
+  line-height: 1.5;
+  color: rgba(17, 17, 17, 0.75);
+}
+
+/* Dark panel — high-contrast box matching the article table panels. */
+.article-body .article-embed.embed-style-dark-panel {
+  padding: 1.5rem 1.75rem;
+  border-radius: 12px;
+  background: #0d1117;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.article-body .article-embed.embed-style-dark-panel p,
+.article-body .article-embed.embed-style-dark-panel li {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.article-body .article-embed.embed-style-dark-panel h3,
+.article-body .article-embed.embed-style-dark-panel h4,
+.article-body .article-embed.embed-style-dark-panel strong {
+  color: #ffffff;
+}
+
 @media (max-width: 640px) {
   .article-body .article-embed .feature-grid {
     flex-direction: column;

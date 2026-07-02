@@ -1,5 +1,6 @@
 'use client';
 
+import { EMBED_STYLE_PRESETS } from '@cleanstart/types';
 import type { ElementFormatType, LexicalEditor } from 'lexical';
 import { $getNodeByKey } from 'lexical';
 import { BlockWithAlignableContents } from '@lexical/react/LexicalBlockWithAlignableContents';
@@ -17,6 +18,7 @@ type Props = {
   readonly title: string;
   readonly aspectRatio: EmbedAspectRatio;
   readonly caption: string;
+  readonly styleSlug: string;
   readonly format: ElementFormatType;
   readonly nodeKey: string;
   readonly editor: LexicalEditor;
@@ -85,10 +87,14 @@ export function EmbedComponent(props: Props): React.ReactElement {
     title,
     aspectRatio,
     caption,
+    styleSlug,
     format,
     nodeKey,
     editor,
   } = props;
+
+  const stylePreset =
+    styleSlug !== '' ? EMBED_STYLE_PRESETS.find((p) => p.slug === styleSlug) : undefined;
 
   const handleEdit = (): void => {
     editor.dispatchCommand(OPEN_EMBED_DIALOG_COMMAND, { nodeKey });
@@ -122,7 +128,15 @@ export function EmbedComponent(props: Props): React.ReactElement {
           />
         </div>
       ) : (
-        <div className="cs-embed-script-placeholder" data-cs-embed-mode="script">
+        <div
+          className="cs-embed-script-placeholder"
+          data-cs-embed-mode="script"
+          style={
+            stylePreset
+              ? { borderLeft: `4px solid ${stylePreset.swatch}` }
+              : undefined
+          }
+        >
           <CodeBracketIcon />
           <p className="cs-embed-script-placeholder__name">
             {title || 'Script embed'}
@@ -130,6 +144,11 @@ export function EmbedComponent(props: Props): React.ReactElement {
           <p className="cs-embed-script-placeholder__hint">
             Scripts execute on the live site only.
           </p>
+          {stylePreset && (
+            <p className="cs-embed-script-placeholder__hint">
+              Style: <strong style={{ color: stylePreset.swatch }}>{stylePreset.label}</strong>
+            </p>
+          )}
         </div>
       )}
 

@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { EMBED_STYLE_SLUGS } from "@cleanstart/types";
 import type { LexicalNode, LexicalRoot, LexicalTableNode } from "@/lib/blog";
 import { CodeBlock } from "@/components/code/CodeBlock";
 import { InlineCtaCard } from "@/components/article/InlineCtaCard";
@@ -387,12 +388,16 @@ function renderNode(node: LexicalNode, key: string): React.ReactNode {
       // a scoped container (see `.article-embed` in globals.css for the ported
       // Webflow layout styles). The HTML is first-party migrated content; we
       // still strip scripts and event handlers defensively.
-      const embed = node as { rawHtml?: string };
+      const embed = node as { rawHtml?: string; styleSlug?: string };
       const html = sanitizeEmbedHtml(embed.rawHtml ?? "");
       if (!html) return null;
       return (
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: first-party migrated embed markup, sanitized above
-        <div key={key} className="article-embed" dangerouslySetInnerHTML={{ __html: html }} />
+        <div
+          key={key}
+          className={`article-embed${embedStyleClass(embed.styleSlug)}`}
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: first-party migrated embed markup, sanitized above
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
       );
     }
 
@@ -408,6 +413,19 @@ function renderNode(node: LexicalNode, key: string): React.ReactNode {
       return null;
     }
   }
+}
+
+/**
+ * Maps an embed node's `styleSlug` to its preset class (with a leading space,
+ * ready for template-literal concatenation). Only slugs present in the shared
+ * EMBED_STYLE_PRESETS registry produce a class — anything else (older nodes
+ * without the field, hand-edited content, junk) yields '' so stored data can
+ * never inject an arbitrary class name. Matching CSS lives in globals.css
+ * under `.article-body .article-embed.embed-style-<slug>`.
+ */
+export function embedStyleClass(styleSlug: unknown): string {
+  if (typeof styleSlug !== "string" || styleSlug === "") return "";
+  return EMBED_STYLE_SLUGS.has(styleSlug) ? ` embed-style-${styleSlug}` : "";
 }
 
 /**

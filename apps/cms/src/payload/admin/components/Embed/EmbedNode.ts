@@ -28,6 +28,10 @@ export type SerializedEmbedNode = Spread<
     title: string;
     aspectRatio: EmbedAspectRatio;
     caption: string;
+    /** Optional visual preset slug from EMBED_STYLE_PRESETS ('' = none).
+        Optional in the serialized shape so nodes stored before the field
+        existed keep importing cleanly. */
+    styleSlug?: string;
   },
   SerializedDecoratorBlockNode
 > & {
@@ -44,6 +48,7 @@ type EmbedNodeData = {
   title: string;
   aspectRatio: EmbedAspectRatio;
   caption: string;
+  styleSlug?: string;
   format?: ElementFormatType;
   key?: NodeKey;
 };
@@ -57,6 +62,7 @@ export class EmbedNode extends DecoratorBlockNode {
   __title: string;
   __aspectRatio: EmbedAspectRatio;
   __caption: string;
+  __styleSlug: string;
 
   constructor(data: EmbedNodeData) {
     super(data.format, data.key);
@@ -68,6 +74,7 @@ export class EmbedNode extends DecoratorBlockNode {
     this.__title = data.title;
     this.__aspectRatio = data.aspectRatio;
     this.__caption = data.caption;
+    this.__styleSlug = data.styleSlug ?? '';
   }
 
   static override getType(): string {
@@ -84,6 +91,7 @@ export class EmbedNode extends DecoratorBlockNode {
       title: node.__title,
       aspectRatio: node.__aspectRatio,
       caption: node.__caption,
+      styleSlug: node.__styleSlug,
       format: node.__format,
       key: node.__key,
     });
@@ -99,6 +107,7 @@ export class EmbedNode extends DecoratorBlockNode {
       title: json.title,
       aspectRatio: json.aspectRatio,
       caption: json.caption,
+      styleSlug: json.styleSlug ?? '',
       format: json.format,
     });
   }
@@ -148,6 +157,7 @@ export class EmbedNode extends DecoratorBlockNode {
       title: this.__title,
       aspectRatio: this.__aspectRatio,
       caption: this.__caption,
+      styleSlug: this.__styleSlug,
     };
   }
 
@@ -190,6 +200,7 @@ export class EmbedNode extends DecoratorBlockNode {
   getTitle(): string { return this.__title; }
   getAspectRatio(): EmbedAspectRatio { return this.__aspectRatio; }
   getCaption(): string { return this.__caption; }
+  getStyleSlug(): string { return this.__styleSlug; }
 
   // Setters — must be called inside editor.update()
   setMode(mode: EmbedMode): void {
@@ -224,6 +235,11 @@ export class EmbedNode extends DecoratorBlockNode {
     w.__caption = caption;
   }
 
+  setStyleSlug(styleSlug: string): void {
+    const w = this.getWritable();
+    w.__styleSlug = styleSlug;
+  }
+
   // decorate() is only ever called client-side by Lexical's React renderer.
   // We do a lazy require here so the class remains importable server-side
   // (for getType / importJSON / exportJSON) without pulling in React/JSX.
@@ -242,6 +258,7 @@ export class EmbedNode extends DecoratorBlockNode {
       title: this.__title,
       aspectRatio: this.__aspectRatio,
       caption: this.__caption,
+      styleSlug: this.__styleSlug,
       format: this.__format,
       nodeKey: this.__key,
       editor,

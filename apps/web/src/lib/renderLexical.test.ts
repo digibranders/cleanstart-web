@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { resolveLexicalLink } from "./renderLexical";
+import { embedStyleClass, resolveLexicalLink } from "./renderLexical";
 
 describe("resolveLexicalLink", () => {
   it("treats www.cleanstart.com absolute URLs as internal and strips to a path", () => {
@@ -65,5 +65,25 @@ describe("resolveLexicalLink", () => {
   it("falls back to '#' for empty/whitespace hrefs", () => {
     expect(resolveLexicalLink(undefined).href).toBe("#");
     expect(resolveLexicalLink("   ").href).toBe("#");
+  });
+});
+
+describe("embedStyleClass", () => {
+  it("maps a known preset slug to its scoped class", () => {
+    expect(embedStyleClass("callout-brand")).toBe(" embed-style-callout-brand");
+    expect(embedStyleClass("stat-highlight")).toBe(" embed-style-stat-highlight");
+  });
+
+  it("ignores slugs that are not in the shared registry (no arbitrary class injection)", () => {
+    expect(embedStyleClass("evil injection")).toBe("");
+    expect(embedStyleClass('"><script>')).toBe("");
+    expect(embedStyleClass("not-a-preset")).toBe("");
+  });
+
+  it("returns empty for absent/empty/non-string values (pre-existing nodes)", () => {
+    expect(embedStyleClass(undefined)).toBe("");
+    expect(embedStyleClass("")).toBe("");
+    expect(embedStyleClass(42)).toBe("");
+    expect(embedStyleClass(null)).toBe("");
   });
 });

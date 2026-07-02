@@ -58,6 +58,7 @@ export const EmbedPlugin = (): ReactElement | null => {
               title: node.getTitle(),
               aspectRatio: node.getAspectRatio(),
               caption: node.getCaption(),
+              styleSlug: node.getStyleSlug(),
             });
             setEditNodeKey(nodeKey);
           });
@@ -90,6 +91,7 @@ export const EmbedPlugin = (): ReactElement | null => {
             node.setTitle(data.title);
             node.setAspectRatio(data.aspectRatio);
             node.setCaption(data.caption);
+            node.setStyleSlug(data.styleSlug);
           }
         } else {
           const embedNode = $createEmbedNode({
@@ -101,6 +103,7 @@ export const EmbedPlugin = (): ReactElement | null => {
             title: data.title,
             aspectRatio: data.aspectRatio,
             caption: data.caption,
+            styleSlug: data.styleSlug,
           });
           const sel = $getSelection();
           if (sel) {
