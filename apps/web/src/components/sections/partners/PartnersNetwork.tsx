@@ -51,6 +51,8 @@ const PARTNERS: Record<Region, Partner[]> = {
     { name: "R-Tech", country: "Indonesia", logo: "/images/partners/global/rtech.webp" },
     { name: "eSec Forte", country: "India", logo: "/images/partners/global/sec-forte.webp" },
     { name: "Raksha Technologies", country: "India", logo: "/images/partners/global/raksha.webp" },
+    { name: "Flying Stars", country: "India", logo: "/images/partners/global/flying-stars.webp" },
+    { name: "Softcell", country: "India", logo: "/images/partners/global/softcell.png" },
   ],
   Europe: [
     { name: "NGIT", country: "Nordics", logo: "/images/partners/global/ngit.webp" },
