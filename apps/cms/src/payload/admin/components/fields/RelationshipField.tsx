@@ -10,6 +10,7 @@ import { QuickCreateDialog } from '@cleanstart/ui';
 import { QUICK_CREATE_CONFIG } from '../../lib/quick-create-config';
 import { Popover } from '../ui/Popover';
 import { Spinner } from '../ui/Spinner';
+import { type EntryRef, type StoredValue, normalise, toStored } from './relationship-value';
 
 // =============================================================================
 // Row-rendering hints — which fields to surface as primary / secondary in the
@@ -121,49 +122,6 @@ const pickThumb = (doc: Record<string, unknown>): string | null => {
     return p.sizes?.thumb?.url ?? p.url ?? null;
   }
   return null;
-};
-
-// =============================================================================
-// Stored-value normalisation. Payload accepts several shapes for relationship
-// values — single id, array of ids, polymorphic { relationTo, value }, or
-// array of those. We always reduce to a stable list of EntryRefs and write
-// back in the same shape we received.
-// =============================================================================
-type EntryRef = { id: string; relationTo: string };
-type StoredValue =
-  | string
-  | number
-  | { relationTo: string; value: string | number }
-  | ReadonlyArray<string | number | { relationTo: string; value: string | number }>
-  | null
-  | undefined;
-
-const normalise = (raw: StoredValue, fallbackRelationTo: string): ReadonlyArray<EntryRef> => {
-  if (raw == null) return [];
-  const list = Array.isArray(raw) ? raw : [raw];
-  const out: EntryRef[] = [];
-  for (const item of list) {
-    if (item == null) continue;
-    if (typeof item === 'string' || typeof item === 'number') {
-      out.push({ id: String(item), relationTo: fallbackRelationTo });
-    } else if (typeof item === 'object' && 'relationTo' in item && 'value' in item) {
-      out.push({ id: String(item.value), relationTo: item.relationTo });
-    }
-  }
-  return out;
-};
-
-const toStored = (
-  entries: ReadonlyArray<EntryRef>,
-  relationTo: string | string[],
-  hasMany: boolean,
-): StoredValue => {
-  const polymorphic = Array.isArray(relationTo);
-  const mapped = entries.map((e) =>
-    polymorphic ? { relationTo: e.relationTo, value: e.id } : e.id,
-  );
-  if (hasMany) return mapped;
-  return mapped[0] ?? null;
 };
 
 // =============================================================================
