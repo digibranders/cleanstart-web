@@ -29,7 +29,7 @@ import {
 // Display family — headings, section titles, card titles. Preloaded for LCP.
 const manrope = Manrope({
   subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
+  weight: ["500", "600", "700"],
   variable: "--font-manrope",
   display: "swap",
   preload: true,

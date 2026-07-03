@@ -1,8 +1,16 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 
-import { SearchCommandPalette } from './SearchCommandPalette';
+// The palette (base-ui Dialog + Meilisearch client) is invisible until the user
+// opens it (⌘K / "/"), so its JS has no reason to sit in the initial hydration
+// bundle of every page. Load it on first open. `ssr: false` is safe because a
+// closed dialog renders nothing server-side anyway.
+const SearchCommandPalette = dynamic(
+  () => import('./SearchCommandPalette').then((m) => m.SearchCommandPalette),
+  { ssr: false },
+);
 
 const isEditableTarget = (el: EventTarget | null): boolean => {
   if (!(el instanceof HTMLElement)) return false;
@@ -19,6 +27,14 @@ const isEditableTarget = (el: EventTarget | null): boolean => {
  */
 export function SearchProvider({ children }: { children: React.ReactNode }): React.ReactElement {
   const [open, setOpen] = useState(false);
+  // Stays true after the first open so the palette keeps its DOM (and its close
+  // transition) once loaded; before that it's never mounted, keeping its chunk
+  // out of the initial bundle.
+  const [everOpened, setEverOpened] = useState(false);
+
+  useEffect(() => {
+    if (open) setEverOpened(true);
+  }, [open]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent): void => {
@@ -39,7 +55,7 @@ export function SearchProvider({ children }: { children: React.ReactNode }): Rea
   return (
     <>
       {children}
-      <SearchCommandPalette open={open} onOpenChange={setOpen} />
+      {everOpened && <SearchCommandPalette open={open} onOpenChange={setOpen} />}
     </>
   );
 }

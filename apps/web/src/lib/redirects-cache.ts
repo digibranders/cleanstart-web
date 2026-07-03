@@ -13,9 +13,13 @@
 const CMS_URL =
   process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:3000";
 
-const HIT_TTL_MS = 60_000;
-const MISS_TTL_MS = 30_000;
-const MAX_ENTRIES = 1000;
+// The redirect table is a small, editor-curated set (tens of rows), so the
+// whole thing is loaded once per isolate and every lookup is answered from
+// memory. This replaces the old per-path fetch, which cost one CMS round-trip
+// per distinct URL on every cold edge isolate — a per-request TTFB tax on a
+// serverless platform that cold-starts middleware constantly.
+const FULL_TTL_MS = 60_000; // refresh window; an editor's new row lands within a minute
+const ERROR_BACKOFF_MS = 10_000; // after a failed refresh, wait before retrying
 
 export type RedirectStatus = "301" | "302" | "307" | "308" | "410";
 
@@ -25,70 +29,78 @@ export interface RedirectRow {
   status: RedirectStatus;
 }
 
-interface CacheEntry {
-  row: RedirectRow | null;
+interface RedirectIndex {
+  map: Map<string, RedirectRow>;
   expiresAt: number;
 }
 
-const cache = new Map<string, CacheEntry>();
+let index: RedirectIndex | null = null;
+// Dedupe concurrent refreshes so a burst of requests on a cold isolate triggers
+// a single CMS fetch, not one per in-flight request.
+let inflight: Promise<Map<string, RedirectRow>> | null = null;
 
-const evictIfOversized = (): void => {
-  if (cache.size <= MAX_ENTRIES) return;
-  // Cheap eviction: drop the oldest 10% by insertion order.
-  const dropCount = Math.ceil(MAX_ENTRIES * 0.1);
-  let dropped = 0;
-  for (const key of cache.keys()) {
-    if (dropped >= dropCount) break;
-    cache.delete(key);
-    dropped += 1;
+const fetchAllRedirects = async (): Promise<Map<string, RedirectRow>> => {
+  const map = new Map<string, RedirectRow>();
+  // Page through defensively with a hard cap so a runaway paginator can't spin.
+  for (let page = 1; page <= 20; page += 1) {
+    const params = new URLSearchParams();
+    params.set("limit", "100");
+    params.set("page", String(page));
+    params.set("depth", "0");
+
+    const res = await fetch(`${CMS_URL}/api/redirects?${params.toString()}`, {
+      // Edge runtime: no `next: { revalidate }` — we cache the map in-process.
+      headers: { accept: "application/json" },
+    });
+    if (!res.ok) throw new Error(`redirects fetch failed: ${res.status}`);
+
+    const body = (await res.json()) as {
+      docs?: RedirectRow[];
+      hasNextPage?: boolean;
+    };
+    for (const row of body.docs ?? []) {
+      if (row?.from) {
+        map.set(row.from, {
+          from: row.from,
+          to: row.to ?? null,
+          status: row.status,
+        });
+      }
+    }
+    if (!body.hasNextPage) break;
   }
+  return map;
 };
 
-const fetchRedirect = async (pathname: string): Promise<RedirectRow | null> => {
-  const params = new URLSearchParams();
-  params.set("where[from][equals]", pathname);
-  params.set("limit", "1");
-  params.set("depth", "0");
+const ensureIndex = async (): Promise<Map<string, RedirectRow>> => {
+  if (index && index.expiresAt > Date.now()) return index.map;
+  if (inflight) return inflight;
 
-  const res = await fetch(`${CMS_URL}/api/redirects?${params.toString()}`, {
-    // Edge runtime: no `next: { revalidate }` — we cache in-process.
-    headers: { accept: "application/json" },
-  });
+  inflight = (async () => {
+    try {
+      const map = await fetchAllRedirects();
+      index = { map, expiresAt: Date.now() + FULL_TTL_MS };
+      return map;
+    } catch {
+      // Fail open: keep serving the last-known table if we have one, else treat
+      // everything as "no redirect". Back off before retrying so a CMS hiccup
+      // can't turn into a fetch storm.
+      const fallback = index?.map ?? new Map<string, RedirectRow>();
+      index = { map: fallback, expiresAt: Date.now() + ERROR_BACKOFF_MS };
+      return fallback;
+    } finally {
+      inflight = null;
+    }
+  })();
 
-  if (!res.ok) return null;
-  const body = (await res.json()) as { docs?: RedirectRow[] };
-  const row = body.docs?.[0];
-  if (!row || !row.from) return null;
-
-  return {
-    from: row.from,
-    to: row.to ?? null,
-    status: row.status,
-  };
+  return inflight;
 };
 
 export const lookupRedirect = async (
   pathname: string,
 ): Promise<RedirectRow | null> => {
-  const now = Date.now();
-  const cached = cache.get(pathname);
-  if (cached && cached.expiresAt > now) {
-    return cached.row;
-  }
-
-  try {
-    const row = await fetchRedirect(pathname);
-    cache.set(pathname, {
-      row,
-      expiresAt: now + (row ? HIT_TTL_MS : MISS_TTL_MS),
-    });
-    evictIfOversized();
-    return row;
-  } catch {
-    // Fail open: cache a brief miss so a CMS hiccup doesn't hammer us.
-    cache.set(pathname, { row: null, expiresAt: now + MISS_TTL_MS });
-    return null;
-  }
+  const map = await ensureIndex();
+  return map.get(pathname) ?? null;
 };
 
 /**
@@ -122,6 +134,10 @@ export const recordRedirectHit = async (pathname: string): Promise<void> => {
  * the obvious CMS-irrelevant paths.
  */
 export const shouldSkipRedirectLookup = (pathname: string): boolean => {
+  // The site root is the home page, never a CMS-managed legacy redirect (those
+  // are all sub-paths like `/jobs` → `/careers`). Skipping it means the most-
+  // trafficked URL never waits on the redirect index — directly trimming home TTFB.
+  if (pathname === "/") return true;
   if (pathname.startsWith("/_next")) return true;
   if (pathname.startsWith("/api")) return true;
   if (pathname.startsWith("/images")) return true;
