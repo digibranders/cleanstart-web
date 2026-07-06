@@ -63,7 +63,7 @@ export function LibrariesHero(): React.ReactElement {
                   margin: 0,
                 }}
               >
-                Trusted Software Dependencies
+                Trusted Software Libraries
               </h1>
             </HeroReveal>
 
@@ -80,8 +80,8 @@ export function LibrariesHero(): React.ReactElement {
                   margin: 0,
                 }}
               >
-                Govern software dependencies with continuous validation and
-                policy enforcement.
+                Continuously Verified from Source. Governed by Software
+                Dependency Governance.
               </p>
             </HeroReveal>
 

@@ -109,8 +109,8 @@ export function LibrariesCTA(): React.ReactElement {
             lineHeight: "var(--cta-card-desc-lh)",
           }}
         >
-          Gain visibility into AI-introduced dependencies, enforce policy
-          standards, and maintain control over your software supply chain.
+          Establish trust in every software dependency through continuous
+          verification, policy enforcement, and software dependency governance.
         </p>
 
         <Link

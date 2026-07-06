@@ -1820,6 +1820,175 @@ body {
   }
 }
 
+/* Clean Libraries — "The Trust Gap" section ambient motion. The amber
+   "pending" pips pulse on staggered phases, energy flows along the dotted
+   connectors toward the orbs, the reflective base rings ripple outward like
+   sonar, and the cube core breathes. The orbs themselves stay still (no bob).
+   Transform / opacity / dash-offset only (GPU-composited, no layout), all off
+   under reduced-motion so the static diagram stands on its own. */
+@keyframes cs-tg-pip {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 1;
+  }
+}
+@keyframes cs-tg-flow {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+@keyframes cs-tg-ripple {
+  0% {
+    transform: scale(0.72);
+    opacity: 0;
+  }
+  28% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.28);
+    opacity: 0;
+  }
+}
+@keyframes cs-tg-core {
+  0%,
+  100% {
+    opacity: 0.82;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.cs-tg-pip {
+  transform-origin: center;
+  will-change: transform, opacity;
+  animation: cs-tg-pip 2.4s ease-in-out infinite;
+}
+.cs-tg-flow {
+  animation: cs-tg-flow 1.6s linear infinite;
+}
+.cs-tg-ripple {
+  transform-box: fill-box;
+  transform-origin: center;
+  will-change: transform, opacity;
+  animation: cs-tg-ripple 4s ease-out infinite;
+}
+.cs-tg-core {
+  will-change: opacity;
+  animation: cs-tg-core 4.5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-tg-pip,
+  .cs-tg-flow,
+  .cs-tg-ripple,
+  .cs-tg-core {
+    animation: none !important;
+  }
+}
+
+/* Clean Libraries — "Libraries Enter Software Through" flow lanes. Accent beams
+   stream from the four entry-vector cards into the converging software node;
+   the node breathes and its core pulses. Dash-offset / transform / opacity only
+   (GPU-composited), all off under reduced-motion. */
+@keyframes cs-lep-beam {
+  to {
+    stroke-dashoffset: -22;
+  }
+}
+@keyframes cs-lep-node {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+@keyframes cs-lep-core {
+  0%,
+  100% {
+    opacity: 0.72;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes cs-lep-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes cs-lep-packet {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  14% {
+    opacity: 1;
+  }
+  86% {
+    opacity: 1;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+@keyframes cs-lep-ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.75);
+    opacity: 0;
+  }
+}
+.cs-lep-beam {
+  animation: cs-lep-beam 1.5s linear infinite;
+}
+.cs-lep-node {
+  will-change: transform;
+  animation: cs-lep-node 4.2s ease-in-out infinite;
+}
+.cs-lep-core {
+  will-change: opacity;
+  animation: cs-lep-core 3.6s ease-in-out infinite;
+}
+.cs-lep-beam-v {
+  will-change: opacity;
+  animation: cs-lep-pulse 2s ease-in-out infinite;
+}
+.cs-lep-packet {
+  offset-rotate: 0deg;
+  will-change: offset-distance, opacity;
+  animation: cs-lep-packet 2.6s linear infinite;
+}
+.cs-lep-ripple {
+  transform-origin: center;
+  will-change: transform, opacity;
+  animation: cs-lep-ripple 2.8s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-lep-beam,
+  .cs-lep-node,
+  .cs-lep-core,
+  .cs-lep-beam-v,
+  .cs-lep-packet,
+  .cs-lep-ripple {
+    animation: none !important;
+  }
+}
+
 /* "Security Isn't Just Patching" — Verification Cascade.
    Entrance: cards/stages rise once when the section gains `.cs-sec-on`. The
    ambient loop is orchestrated in JS (SecurityDiagram) which toggles

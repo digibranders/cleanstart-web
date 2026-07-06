@@ -38,7 +38,7 @@ const STAGES: Stage[] = [
   },
   {
     image: "/images/clean-libraries/flow-clean-library.webp",
-    title: "Clean Library",
+    title: "Clean Libraries",
     accent: "#a974ff",
     tint: "rgba(169,116,255,0.18)",
     featured: true,
@@ -50,17 +50,17 @@ const STAGES: Stage[] = [
   },
   {
     image: "/images/clean-libraries/flow-repository.webp",
-    title: "Validated Library Repository",
+    title: "Trusted Dependency Repository",
     accent: "#2dd4bf",
     tint: "rgba(45,212,191,0.14)",
-    body: "Approved packages and trusted sources.",
+    body: "Curated, verified packages and trusted dependencies.",
   },
   {
     image: "/images/clean-libraries/flow-cicd.webp",
     title: "CI/CD Gates",
     accent: "#f7a35c",
     tint: "rgba(247,163,92,0.14)",
-    body: "Automated policy enforcement.",
+    body: "Automated enforcement before deployment.",
   },
   {
     image: "/images/clean-libraries/flow-production.webp",
@@ -354,10 +354,11 @@ export function LibrariesWorkflow(): React.ReactElement {
 
   return (
     <Section
-      padding="sm"
-      className="overflow-hidden"
+      padding="none"
+      className="overflow-hidden pt-section-sm pb-section-cta"
       style={{
-        background: "linear-gradient(180deg, #08060f 0%, #0a0a1c 50%, #08060f 100%)",
+        background:
+          "linear-gradient(180deg, #151021 0%, #131E8F 50%, #151021 100%)",
       }}
     >
       {/* Decorative corner washes. */}
@@ -388,14 +389,27 @@ export function LibrariesWorkflow(): React.ReactElement {
               lineHeight: 1.1,
             }}
           >
-            Built Into Your Existing{" "}
+            Built Into Your{" "}
             <span
               className="bg-clip-text text-transparent"
               style={{ backgroundImage: "linear-gradient(102deg, #9a51ff 0%, #2cc1eb 100%)" }}
             >
-              Software Delivery Workflow
+              Workflow
             </span>
           </h2>
+          <p
+            className="mx-auto mt-6 max-w-[720px] text-center font-sans text-white/80"
+            style={{
+              fontSize: "var(--fs-lead)",
+              fontWeight: 400,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.5,
+            }}
+          >
+            Clean Libraries integrates into your existing software delivery
+            pipeline, validating and governing libraries before they reach
+            production.
+          </p>
         </Reveal>
 
         {/* The flow wrapper is the in-view target that gates the cascade. */}
