@@ -17,6 +17,7 @@ const TestimonialsStats = dynamic(() =>
 import { FrequentlyAskedQuestions } from "@/components/sections/home/FrequentlyAskedQuestions";
 import { HOME_FAQ_ITEMS } from "@/components/sections/home/home-faqs";
 import { faqPageSchema } from "@/lib/seo/jsonld";
+import { ogImageUrl } from "@/lib/seo/og";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
 import { getPageGraph } from "@/lib/seo/compose-page";
 import { ResourcesInsights } from "@/components/sections/home/ResourcesInsights";
@@ -33,15 +34,30 @@ import Image from "next/image";
 // immediately and removes that delay.
 const HERO_TOP_GLOW = "/images/home/hero-top-grid-glow.svg";
 
+// OG-card copy shared by the meta tag and the JSON-LD representative image, so
+// the two can never drift. `HOME_OG_IMAGE` reproduces the exact `/api/og` URL
+// that `buildPageMetadata` emits (same params) and is declared on the WebPage
+// node as `primaryImageOfPage` — the branded card Google should use as the
+// homepage search/Discover thumbnail instead of the in-hero award medal.
+const HOME_OG_TITLE = "Verified & Secure Container Images";
+const HOME_OG_ACCENT = "Secure Container Images";
+const HOME_DESCRIPTION =
+  "CleanStart delivers verified, zero-CVE container images and libraries that are hardened, continuously scanned, and built for secure software supply chains.";
+const HOME_OG_IMAGE = ogImageUrl({
+  variant: "hero",
+  title: HOME_OG_TITLE,
+  titleAccent: HOME_OG_ACCENT,
+  sub: HOME_DESCRIPTION,
+});
+
 export const metadata: Metadata = buildPageMetadata({
   title: "Verified, zero-CVE container images and libraries | CleanStart",
   absoluteTitle: true,
-  description:
-    "CleanStart delivers verified, zero-CVE container images and libraries that are hardened, continuously scanned, and built for secure software supply chains.",
+  description: HOME_DESCRIPTION,
   path: "/",
   variant: "hero",
-  ogTitle: "Verified & Secure Container Images",
-  titleAccent: "Secure Container Images",
+  ogTitle: HOME_OG_TITLE,
+  titleAccent: HOME_OG_ACCENT,
 });
 
 export const revalidate = 3600;
@@ -54,7 +70,9 @@ export default async function Home(): Promise<React.ReactElement> {
   // pays one round-trip of latency, not two (cuts homepage TTFB on cache miss).
   const [impactStats, graph] = await Promise.all([
     getImpactStats(),
-    getPageGraph("/", [faqPageSchema([...HOME_FAQ_ITEMS])]),
+    getPageGraph("/", [faqPageSchema([...HOME_FAQ_ITEMS])], {
+      primaryImagePath: HOME_OG_IMAGE,
+    }),
   ]);
   return (
     <>

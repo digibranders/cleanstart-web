@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { HeroReveal } from "@/components/ui/Reveal";
@@ -147,21 +146,26 @@ export function HeroAwardSlide(): React.ReactElement {
         </HeroReveal>
       </div>
 
-      {/* Right column — award medal */}
+      {/* Right column — award medal.
+          Rendered as a CSS background image (not <img>/next-image) on purpose:
+          it keeps the medal fully visible and accessible (role="img" + aria-label),
+          but removes it from Google's representative-image candidate pool. As the
+          only prominent raster in the hero, an <img> here was being chosen as the
+          homepage's search/Discover thumbnail over the branded OG card; a CSS
+          background is not eligible, so Google falls back to the declared
+          `primaryImageOfPage` / og:image card instead. filter: drop-shadow follows
+          the medal's alpha, preserving the original glow. */}
       <HeroReveal
         y={40}
         delay={0.15}
         duration={1.0}
         className="relative z-10 flex w-full max-w-[440px] shrink-0 justify-center lg:w-[46%] lg:max-w-none lg:justify-start"
       >
-        <Image
-          src="/images/home/award-winner-2026.webp"
-          alt="CleanStart — Winner of the 2026 Cybersecurity Stars Awards by The Hacker News"
-          width={440}
-          height={440}
-          sizes="(min-width: 1024px) 440px, (min-width: 640px) 60vw, 80vw"
-          className="h-auto w-full max-w-[440px] drop-shadow-[0_24px_60px_rgba(100,13,251,0.35)]"
-          priority={false}
+        <div
+          role="img"
+          aria-label="CleanStart — Winner of the 2026 Cybersecurity Stars Awards by The Hacker News"
+          className="aspect-square w-full max-w-[440px] bg-contain bg-center bg-no-repeat drop-shadow-[0_24px_60px_rgba(100,13,251,0.35)]"
+          style={{ backgroundImage: "url('/images/home/award-winner-2026.webp')" }}
         />
       </HeroReveal>
     </div>
