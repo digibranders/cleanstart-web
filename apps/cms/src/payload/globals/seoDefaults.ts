@@ -89,7 +89,7 @@ export const SeoDefaults: GlobalConfig = {
         {
           name: 'url',
           type: 'text',
-          defaultValue: 'https://cleanstart.com',
+          defaultValue: 'https://www.cleanstart.com',
           hooks: { beforeValidate: [normalizeOptionalUrlHook] },
           validate: validateOptionalUrl,
         },

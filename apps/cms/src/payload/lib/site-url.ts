@@ -10,7 +10,7 @@
  * follows one env var instead of a hardcoded host.
  */
 export const resolveSiteUrl = (settingsBaseUrl?: string | null): string =>
-  (process.env.NEXT_PUBLIC_SITE_URL || settingsBaseUrl || 'https://cleanstart.com').replace(
+  (process.env.NEXT_PUBLIC_SITE_URL || settingsBaseUrl || 'https://www.cleanstart.com').replace(
     /\/+$/,
     '',
   );

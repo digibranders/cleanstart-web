@@ -17,7 +17,7 @@ export const SiteSettings: GlobalConfig = {
     {
       name: 'baseUrl',
       type: 'text',
-      defaultValue: 'https://cleanstart.com',
+      defaultValue: 'https://www.cleanstart.com',
       required: true,
       admin: { description: 'Used to build absolute URLs for SEO and emails. Must be a valid https:// URL with no trailing slash.' },
       hooks: { beforeValidate: [normalizeOptionalUrlHook] },

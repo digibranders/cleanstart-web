@@ -28,7 +28,7 @@ const ROUTES: Record<string, string> = {
   webinars: '/webinars',
 };
 
-const SITE_ORIGIN_FALLBACK = 'https://cleanstart.com';
+const SITE_ORIGIN_FALLBACK = 'https://www.cleanstart.com';
 
 export const SITE_ORIGIN: string = (() => {
   const raw = process.env.NEXT_PUBLIC_SITE_ORIGIN;

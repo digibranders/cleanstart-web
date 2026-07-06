@@ -9,4 +9,4 @@
  */
 export const DEFAULT_SITE_URL: string =
   (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SITE_URL) ||
-  'https://cleanstart.com';
+  'https://www.cleanstart.com';
