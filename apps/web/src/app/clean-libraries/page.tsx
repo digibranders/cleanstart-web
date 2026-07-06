@@ -2,11 +2,11 @@ import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { LibrariesHero } from "@/components/sections/clean-libraries/LibrariesHero";
-import { LibrariesRisk } from "@/components/sections/clean-libraries/LibrariesRisk";
 import { LibrariesPipeline } from "@/components/sections/clean-libraries/LibrariesPipeline";
+import { LibrariesTrustGap } from "@/components/sections/clean-libraries/LibrariesTrustGap";
+import { LibrariesEstablishTrust } from "@/components/sections/clean-libraries/LibrariesEstablishTrust";
 import { LibrariesGovernance } from "@/components/sections/clean-libraries/LibrariesGovernance";
 import { LibrariesWorkflow } from "@/components/sections/clean-libraries/LibrariesWorkflow";
-import { LibrariesOutcomes } from "@/components/sections/clean-libraries/LibrariesOutcomes";
 import { LibrariesCTA } from "@/components/sections/clean-libraries/LibrariesCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/jsonld";
@@ -14,7 +14,7 @@ import { JsonLdGraph } from "@/components/JsonLdGraph";
 import { getPageGraph } from "@/lib/seo/compose-page";
 
 export const metadata = buildPageMetadata({
-  title: "Clean Library: Verify Every Dependency Across Your Workflow",
+  title: "Clean Libraries: Verify Every Dependency Across Your Workflow",
   absoluteTitle: true,
   description:
     "Scan every library for vulnerabilities and provenance, catch dependencies AI tools add silently, and gate builds with signed verdicts across your entire workflow.",
@@ -45,19 +45,19 @@ export default async function CleanLibrariesPage(): Promise<React.ReactElement> 
       <main id="main-content">
         <LibrariesHero />
         <FadeUp>
-          <LibrariesRisk />
+          <LibrariesPipeline />
         </FadeUp>
         <FadeUp>
-          <LibrariesPipeline />
+          <LibrariesTrustGap />
+        </FadeUp>
+        <FadeUp>
+          <LibrariesEstablishTrust />
         </FadeUp>
         <FadeUp>
           <LibrariesGovernance />
         </FadeUp>
         <FadeUp>
           <LibrariesWorkflow />
-        </FadeUp>
-        <FadeUp>
-          <LibrariesOutcomes />
         </FadeUp>
       </main>
       <Footer cta={<LibrariesCTA />} />
