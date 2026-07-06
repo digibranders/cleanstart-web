@@ -30,11 +30,23 @@ export function buildPageGraph({ nodes, override }: PageGraphInput): SchemaGraph
  * the runtime request path (INV-1). Fails safe to auto-only when the CMS is
  * down (getRegistryEntry returns { webPageType: 'none' }).
  */
-export async function getPageGraph(path: string, nodes: GraphNode[]): Promise<SchemaGraph> {
+export async function getPageGraph(
+  path: string,
+  nodes: GraphNode[],
+  opts?: { primaryImagePath?: string },
+): Promise<SchemaGraph> {
   const { override, webPageType, title } = await getRegistryEntry(path);
   const auto =
     webPageType !== "none"
-      ? [webPageSchema({ type: webPageType, path, name: title ?? "" }), ...nodes]
+      ? [
+          webPageSchema({
+            type: webPageType,
+            path,
+            name: title ?? "",
+            ...(opts?.primaryImagePath ? { primaryImagePath: opts.primaryImagePath } : {}),
+          }),
+          ...nodes,
+        ]
       : nodes;
   return composeGraph({ auto, override });
 }
