@@ -242,18 +242,7 @@ export function LibrariesGovernance(): React.ReactElement {
       <Container className="relative">
         <Reveal header>
           <div className="text-center">
-            <p
-              className="font-display"
-              style={{
-                fontSize: "var(--fs-eyebrow)",
-                fontWeight: 700,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                color: "#7c3aed",
-              }}
-            >
-              <span aria-hidden>•</span> Software Dependency Governance
-            </p>
+
             <h2
               className="mx-auto mt-4 max-w-[1180px] font-display text-[#1a1633]"
               style={{ fontSize: "var(--fs-h2)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.12 }}
@@ -261,7 +250,7 @@ export function LibrariesGovernance(): React.ReactElement {
               Govern every dependency. Build with confidence.
             </h2>
             <p
-              className="mx-auto mt-4 max-w-[720px] font-sans text-[#6b7280]"
+              className="mx-auto mt-4 max-w-[1120px] font-sans text-[#6b7280]"
               style={{ fontSize: "var(--fs-lead)", fontWeight: 400, letterSpacing: "-0.01em", lineHeight: 1.5 }}
             >
               Clean Libraries enforces policy, validates every dependency, and
