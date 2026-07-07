@@ -30,17 +30,27 @@ collection", not implicit):
 ```
 blogs, news, guides, case-studies, knowledgeBase, resources, events,
 webinars, podcastEpisodes, jobs, pages, aboutGalleries, authors,
-leads, forms, partner-applications, deal-registrations,
-career-applications, legalDocuments
+forms, deal-registrations, career-applications, legalDocuments
 ```
 
 Explicitly excluded: `users`, `media`, `integrations`, taxonomy lookup
 collections (`industries`, `regions`, `departments`, `resourceTypes`,
 `pressTypes`, `webinarTypes`, `categories`, `newsCategories`,
-`knowledgeCategories`, `jobLocations`), and ops/logging collections
+`knowledgeCategories`, `jobLocations`), ops/logging collections
 (`audit-log`, `searchLog`, `consentLog`, `analyticsCache`,
 `webhooks_dead_letter`, `previewAudit`, `redirects`, `brokenLinks`,
-`pageRegistry`, `resumes`).
+`pageRegistry`, `resumes`), and **`leads` / `partner-applications`** —
+both already have a working, GDPR-audited export (`export-leads-csv.ts`,
+`export-partners-csv.ts` at `/export-csv`) with hand-tailored column
+flattening (UTM/consent/audit joins). Reworking those onto the new generic
+serializer is out of scope for this change (see "Out of scope"); their
+existing export UI stays as-is.
+
+A global field denylist (`EXPORT_FIELD_DENYLIST = ['ip', 'userAgent']`)
+applies across every collection the new exporter serves — those fields are
+never offered in the field picker and are rejected server-side even if
+requested directly, so no collection can leak visitor PII through this path
+even if such a field is added to its schema later.
 
 The allow-list lives as a single exported constant
 (`EXPORTABLE_COLLECTION_SLUGS`) in the new `wireExportButton.ts` so adding a
@@ -74,12 +84,19 @@ Added to the `.map()` chain after `wireCustomListView`.
 
 ### 2. Admin UI
 
-- `apps/cms/src/payload/admin/components/views/list/ExportButton.tsx` — reads
-  `collection.custom.export` via `useConfig()` (data-layer only). Renders
-  nothing if `enabled` is falsy. Placed inside `ListHeader.tsx` next to the
-  existing "Views"/"..." controls.
-- `apps/cms/src/payload/admin/components/views/list/ExportModal.tsx` — built
-  on `@cleanstart/ui`'s `Dialog`. Contents:
+`CmsListView.tsx` already owns a kebab ("...") `DropdownMenu` with a
+"Columns…" item that opens a `Drawer` (`ColumnPicker.tsx` inside it) — this
+is the established pattern for list-view side-panel UI, not a modal
+`Dialog`. The export feature reuses it exactly:
+
+- In `CmsListView.tsx`'s `menuItems` list, add an `"Export…"` item —
+  conditionally, only when
+  `collectionConfig?.custom?.export?.enabled` is true (read from the same
+  `useConfig()` call `CmsListView` already makes; no new hook needed) — that
+  sets a new `exportDrawerOpen` state to `true`.
+- A second `Drawer` (sibling to the existing column-picker `Drawer`) renders
+  `apps/cms/src/payload/admin/components/views/list/ExportDrawer.tsx` when
+  `exportDrawerOpen` is true. Contents:
   - Date range: two `DateTimePicker` fields (from/to), optional (empty =
     unbounded).
   - Field picker: checklist built from the collection's field list
@@ -116,15 +133,19 @@ export function buildExportEndpoint(slug: string, opts: { dateField: string }): 
 - Builds the effective `where`: `{ and: [clientWhere, dateRangeCondition] }`
   where `dateRangeCondition` uses `opts.dateField` with `greater_than_equal`
   / `less_than_equal` from `from`/`to` when present.
-- Runs `payload.find({ collection: slug, where, sort, depth: 1, ...pagination, overrideAccess: false, user: req.user })`
-  — **not** `overrideAccess: true` — so the collection's own read access
-  control is enforced exactly as it is for the list view itself. No new
-  privilege is created by this feature.
-- Paginates with the same `CSV_EXPORT_PAGE_SIZE` / `CSV_EXPORT_HARD_CAP_PAGES`
-  constants `export-leads-csv.ts` already defines (moved to a shared
-  location); if the hard cap is hit, the response still downloads
-  successfully with a **truncation notice row** appended, matching current
-  behavior — never a silent partial export.
+- Gates on `hasAnyRole(req.user, ['admin', 'editor'])` → 403 otherwise, then
+  runs `payload.find({ collection: slug, where, sort, depth: 1, ...pagination, overrideAccess: true })`
+  — matching the exact access pattern `export-leads-csv.ts` /
+  `export-partners-csv.ts` already use (explicit role gate +
+  `overrideAccess: true`), not Payload's per-field access control. This is
+  the established convention for exports in this codebase; the field
+  denylist above is the safeguard against PII leakage rather than
+  per-field access control.
+- Paginates with its own `EXPORT_PAGE_SIZE = 200` / `EXPORT_HARD_CAP_PAGES = 100`
+  constants (same values `export-leads-csv.ts` uses, defined fresh here since
+  that file isn't being touched); if the hard cap is hit, the response still
+  downloads successfully with a **truncation notice row** appended, matching
+  the existing truncation-banner convention — never a silent partial export.
 - Serializes each requested field via
   `apps/cms/src/payload/lib/export/serialize-field.ts`
   (new): relationships → related doc's `title`/`name`/slug field (whichever
@@ -142,12 +163,27 @@ export function buildExportEndpoint(slug: string, opts: { dateField: string }): 
 
 ### 4. Existing Leads / Partner-Applications export endpoints
 
-`export-leads-csv.ts` and `export-partners-csv.ts` are refactored to call
-the same `buildExportEndpoint`/`serialize-field` machinery instead of their
-own bespoke pagination + CSV loop, so there is one export code path in the
-codebase, not two. Any Leads-specific behavior (e.g. PII handling) is
-preserved by passing collection-specific options into the shared factory,
-not by keeping a separate implementation.
+Left untouched. They already work, are GDPR-audited, and their column
+flattening is too bespoke (nested UTM/consent joins) to fold into a generic
+field serializer without risk. Not in `EXPORTABLE_COLLECTION_SLUGS`, so the
+new Export button doesn't appear on those two list pages — their existing
+export UI (`PartnersExportButton.tsx`, the leads export banner) is
+unaffected.
+
+## Decisions locked
+
+- No audit-log row is written by the new generic exporter. The existing
+  audit trail exists specifically because `leads`/`partner-applications`
+  export raw visitor PII; those stay on their own audited endpoint (out of
+  scope, see above). The 17 collections the generic exporter serves are
+  either public content (blogs, news, guides...) or already have their own
+  access-controlled admin views — adding an audit write here would be
+  scope creep without a corresponding compliance requirement.
+- `EXPORT_FIELD_DENYLIST` lives in `serialize-field.ts` and is checked both
+  when building the field picker's option list (client, via `useConfig`)
+  and server-side when validating the `fields` query param (defense in
+  depth — a denylisted field requested directly is dropped silently, not
+  a 400, so a stale client doesn't break).
 
 ## Error handling
 
