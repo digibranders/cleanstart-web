@@ -1,18 +1,19 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { buildExportEndpoint } from './build-export-endpoint';
+import { buildExportEndpoint, EXPORT_HARD_CAP_PAGES, EXPORT_HARD_CAP_ROWS } from './build-export-endpoint';
 
 const makeReq = (overrides: Partial<{
   url: string;
   user: { id: number; roles?: string[] } | null;
   docs: Record<string, unknown>[];
+  find: ReturnType<typeof vi.fn>;
 }>) => {
   const docs = overrides.docs ?? [];
   return {
     url: overrides.url ?? 'http://internal/api/blogs/export?fields=title,slug',
     user: overrides.user === undefined ? { id: 1, roles: ['admin'] } : overrides.user,
     payload: {
-      find: vi.fn().mockResolvedValue({ docs, hasNextPage: false }),
+      find: overrides.find ?? vi.fn().mockResolvedValue({ docs, hasNextPage: false }),
       logger: { error: vi.fn() },
       collections: {
         blogs: { config: { admin: { useAsTitle: 'title' } } },
@@ -119,5 +120,18 @@ describe('buildExportEndpoint', () => {
     });
     const res = await endpoint.handler(req);
     expect(res.headers.get('content-type')).toContain('spreadsheetml');
+  });
+
+  it('stops paginating at the hard cap and appends a truncation row when hasNextPage never turns false', async () => {
+    const endpoint = buildExportEndpoint('blogs', { dateField: 'publishedAt' });
+    const find = vi.fn().mockResolvedValue({ docs: [{ id: 1, title: 'Hello' }], hasNextPage: true });
+    const req = makeReq({
+      url: 'http://internal/api/blogs/export?fields=title',
+      find,
+    });
+    const res = await endpoint.handler(req);
+    expect(find).toHaveBeenCalledTimes(EXPORT_HARD_CAP_PAGES);
+    const text = await res.text();
+    expect(text).toContain(`truncated at ${EXPORT_HARD_CAP_ROWS} rows`);
   });
 });
