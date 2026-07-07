@@ -22,9 +22,12 @@ import type { ListViewClientProps } from 'payload';
 import type { ReactElement } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { isExportableCollection } from '../../../../lib/export/exportable-collections';
+
 import { ColumnPicker } from './ColumnPicker';
 import { ColumnResizer } from './ColumnResizer';
 import { BulkActionBar } from './BulkActionBar';
+import { ExportDrawer } from './ExportDrawer';
 import { ListHeader } from './ListHeader';
 
 /** Dispatched to ColumnResizer to clear all per-editor column widths. */
@@ -82,8 +85,16 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
   const { setStepNav } = useStepNav();
 
   const [columnPickerOpen, setColumnPickerOpen] = useState(false);
+  const [exportDrawerOpen, setExportDrawerOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuAnchorRef = useRef<HTMLButtonElement | null>(null);
+
+  // `collection.custom` is stripped from the client config by Payload
+  // (`serverOnlyCollectionProperties`), so this can't be read via
+  // `useConfig()` at runtime — check the same static slug list
+  // `wireExportButton` gates on instead. See
+  // `lib/export/exportable-collections.ts` for the full rationale.
+  const exportEnabled = isExportableCollection(collectionSlug);
 
   const menuItems: DropdownMenuItem[] = useMemo(() => {
     const items: DropdownMenuItem[] = [
@@ -104,6 +115,17 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
           }
         },
       },
+      ...(exportEnabled
+        ? [
+            { kind: 'separator' as const, id: 'sep-export' },
+            {
+              kind: 'item' as const,
+              id: 'export',
+              label: 'Export…',
+              onSelect: () => setExportDrawerOpen(true),
+            },
+          ]
+        : []),
     ];
     if (Array.isArray(listMenuItems) && listMenuItems.length > 0) {
       items.push({ kind: 'separator', id: 'sep-payload' });
@@ -120,7 +142,7 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
       }
     }
     return items;
-  }, [listMenuItems]);
+  }, [listMenuItems, exportEnabled]);
 
   const collectionLabel = useMemo(() => {
     const lbl = collectionConfig?.labels?.plural;
@@ -356,6 +378,23 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
             />
             <DrawerBody>
               <ColumnPicker columnState={columnState} />
+            </DrawerBody>
+          </Drawer>
+
+          <Drawer
+            open={exportDrawerOpen}
+            onClose={() => setExportDrawerOpen(false)}
+            ariaLabel="Export"
+            side="right"
+            size="sm"
+          >
+            <DrawerHeader
+              title="Export"
+              subtitle={`Download ${collectionLabel.toLowerCase()} as CSV or Excel.`}
+              onClose={() => setExportDrawerOpen(false)}
+            />
+            <DrawerBody>
+              <ExportDrawer collectionSlug={collectionSlug} open={exportDrawerOpen} />
             </DrawerBody>
           </Drawer>
         </div>
