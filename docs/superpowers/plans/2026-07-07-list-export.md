@@ -852,9 +852,9 @@ git commit -m "feat(cms): wire the shared export endpoint onto 17 content collec
 'use client';
 
 import { DateTimePicker } from '@cleanstart/ui';
-import { useConfig, useListQuery } from '@payloadcms/ui';
+import { useConfig, useListQuery, useTableColumns } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { EXPORT_FIELD_DENYLIST } from '../../../../lib/export/serialize-field';
 
@@ -862,6 +862,12 @@ type ExportableField = { name: string; label: string };
 
 type Props = {
   readonly collectionSlug: string;
+  /** Whether the parent `Drawer` is currently open. `Drawer` always keeps
+   * its children mounted (it toggles a native `<dialog>`, not conditional
+   * rendering — see `packages/ui/src/primitives/Drawer.tsx`), so this
+   * component must react to the open transition itself rather than rely
+   * on mount-time state to capture "columns displayed right now". */
+  readonly open: boolean;
 };
 
 const fieldLabel = (f: { label?: unknown; name?: string }): string => {
@@ -878,11 +884,20 @@ const fieldLabel = (f: { label?: unknown; name?: string }): string => {
  * from the collection's client config (`useConfig`) rather than
  * hardcoded per collection — every content collection this drawer
  * serves gets the same picker for free.
+ *
+ * Initial selection: whichever fields are currently shown as table
+ * columns (`useTableColumns` — the same hook `ColumnPicker.tsx` uses)
+ * are pre-checked, since that's what the editor is already looking at.
+ * Recomputed every time the drawer transitions from closed to open (not
+ * just once at mount — see the `open` prop doc above), so toggling
+ * columns via "Columns…" and then opening "Export…" reflects the latest
+ * choice.
  */
 export const ExportDrawer = (props: Props): ReactElement => {
-  const { collectionSlug } = props;
+  const { collectionSlug, open } = props;
   const { config } = useConfig();
   const { query } = useListQuery();
+  const { columns } = useTableColumns();
 
   const collection = useMemo(
     () => config.collections.find((c) => c.slug === collectionSlug),
@@ -897,9 +912,24 @@ export const ExportDrawer = (props: Props): ReactElement => {
       .map((f) => ({ name: f.name, label: fieldLabel(f) }));
   }, [collection]);
 
-  const [selectedFields, setSelectedFields] = useState<Set<string>>(
-    () => new Set(exportableFields.slice(0, 5).map((f) => f.name)),
-  );
+  const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
+
+  // Recompute the preselected columns on every closed→open transition only
+  // — not continuously while open, which would fight the editor's manual
+  // checkbox toggles mid-session.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally omits exportableFields/columns; reset must fire only on the `open` transition
+  useEffect(() => {
+    if (!open) return;
+    const displayedFieldNames = new Set(columns.filter((c) => c.active).map((c) => c.accessor));
+    const displayed = exportableFields.filter((f) => displayedFieldNames.has(f.name));
+    // Fall back to the first 5 exportable fields only if none of the
+    // displayed table columns map onto an exportable field name (e.g. every
+    // visible column is a nested/computed accessor) — the picker should
+    // never open with zero columns checked.
+    const initial = displayed.length > 0 ? displayed : exportableFields.slice(0, 5);
+    setSelectedFields(new Set(initial.map((f) => f.name)));
+  }, [open]);
+
   const [from, setFrom] = useState<string | null>(null);
   const [to, setTo] = useState<string | null>(null);
   const [format, setFormat] = useState<'csv' | 'xlsx'>('csv');
@@ -1052,7 +1082,7 @@ Finally, add a second `Drawer` sibling to the existing column-picker one
               onClose={() => setExportDrawerOpen(false)}
             />
             <DrawerBody>
-              <ExportDrawer collectionSlug={collectionSlug} />
+              <ExportDrawer collectionSlug={collectionSlug} open={exportDrawerOpen} />
             </DrawerBody>
           </Drawer>
 ```
@@ -1089,32 +1119,43 @@ Run: `pnpm --filter @cleanstart/cms dev` (or confirm it's already running), then
 Click the "..." button next to "Create". Expected: menu shows "Columns…",
 "Reset column widths", a separator, then "Export…".
 
-- [ ] **Step 3: Export a CSV**
+- [ ] **Step 3: Confirm displayed columns are auto-preselected**
 
-Click "Export…", leave the date range empty, check 2-3 columns (e.g.
-`title`, `slug`, `status`), leave format on CSV, click "Export N columns".
-Expected: a `blogs-YYYY-MM-DD.csv` file downloads; opening it shows a
-header row and one row per blog with the selected columns.
+Open "Columns…" first and note which columns are toggled on (e.g. Title,
+Status, Updated At), close it, then open "Export…". Expected: exactly
+those fields are pre-checked in the export field list, nothing else.
+Toggle a column off in "Columns…" (e.g. hide "Status"), reopen "Export…".
+Expected: "Status" is no longer pre-checked — the selection reflects the
+current column state, not what was checked the first time the drawer
+opened.
 
-- [ ] **Step 4: Export an XLSX with a date range**
+- [ ] **Step 4: Export a CSV**
+
+With the drawer's auto-preselected columns still checked (adjust if you
+want different ones), leave the date range empty, leave format on CSV,
+click "Export N columns". Expected: a `blogs-YYYY-MM-DD.csv` file
+downloads; opening it shows a header row and one row per blog with the
+selected columns.
+
+- [ ] **Step 5: Export an XLSX with a date range**
 
 Reopen the drawer, set a "From" date that excludes some blogs, switch
 format to "Excel (.xlsx)", export. Expected: a `.xlsx` file downloads and
 opens in Excel/Numbers/LibreOffice with the same columns, only rows
 published on/after the "From" date.
 
-- [ ] **Step 5: Confirm a filtered list is respected**
+- [ ] **Step 6: Confirm a filtered list is respected**
 
 Use the list's search box to filter to one term, reopen Export, export
 CSV. Expected: the exported CSV only contains rows matching the search
 term.
 
-- [ ] **Step 6: Confirm a non-exportable collection has no Export item**
+- [ ] **Step 7: Confirm a non-exportable collection has no Export item**
 
 Open `http://localhost:3000/admin/collections/media` (or `/users`), open
 its kebab menu. Expected: no "Export…" item present.
 
-- [ ] **Step 7: Confirm Leads/Partner-Applications are unaffected**
+- [ ] **Step 8: Confirm Leads/Partner-Applications are unaffected**
 
 Open `/admin/collections/leads` and `/admin/collections/partner-applications`.
 Expected: their existing export UI/button still works exactly as before

@@ -105,7 +105,14 @@ is the established pattern for list-view side-panel UI, not a modal
     upload, array/group/block fields are included with a serialization note
     (see below); fields the user has no read access to are already absent
     from the sanitized client config, so the picker never offers a field
-    the export endpoint would 403 on.
+    the export endpoint would 403 on. **Auto-preselected: whichever fields
+    are currently shown as table columns** (`useTableColumns` — the same
+    hook `ColumnPicker.tsx` already uses), recomputed every time the drawer
+    is opened (not just once), so it reflects whatever the editor has
+    toggled via the existing "Columns…" picker. Editors can still check/
+    uncheck freely before exporting; if no displayed column maps onto an
+    exportable field name, it falls back to the first 5 exportable fields
+    so the picker never opens empty.
   - Format: CSV / XLSX radio, default CSV.
   - On submit: reads current list state from `useListQuery()` (`where`,
     `search`, `sort`) and does a `window.location.assign` to
