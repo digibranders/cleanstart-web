@@ -133,6 +133,9 @@ function PillarCard({ pillar }: { pillar: TrustPillar }): React.ReactElement {
           </svg>
         </span>
       </div>
+      {/* Width cap forces every title onto two balanced lines; the two-line
+          min-height keeps the four body paragraphs starting at the same y
+          even if a title ever fits on one. */}
       <h3
         className="font-display text-[#111]"
         style={{
@@ -140,6 +143,8 @@ function PillarCard({ pillar }: { pillar: TrustPillar }): React.ReactElement {
           fontWeight: 700,
           letterSpacing: "-0.03em",
           lineHeight: 1.12,
+          maxWidth: "12ch",
+          minHeight: "2.24em",
         }}
       >
         {pillar.title}
@@ -232,12 +237,13 @@ export function LibrariesEstablishTrust(): React.ReactElement {
               Establishing Software Trust
             </h2>
             <p
-              className="mx-auto mt-6 max-w-[640px] font-sans text-[#555]"
+              className="mx-auto mt-6 max-w-[680px] font-sans text-[#555]"
               style={{
                 fontSize: "var(--fs-lead)",
                 fontWeight: 400,
                 letterSpacing: "-0.02em",
                 lineHeight: 1.5,
+                textWrap: "balance",
               }}
             >
               Verified libraries built directly from source, establishing trust

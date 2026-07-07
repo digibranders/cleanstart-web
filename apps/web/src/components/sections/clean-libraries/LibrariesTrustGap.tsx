@@ -248,22 +248,22 @@ function DiagramSvg({
       {/* In-cube label. */}
       <text
         x={CUBE_CX}
-        y="374"
+        y="372"
         textAnchor="middle"
         className="font-mono"
         fill="rgba(242,238,255,0.98)"
-        style={{ fontSize: "25px", letterSpacing: "2px" }}
+        style={{ fontSize: "30px", letterSpacing: "2px" }}
         filter={`url(#${gid("glow")})`}
       >
         {"</>"}
       </text>
       <text
         x={CUBE_CX}
-        y="398"
+        y="400"
         textAnchor="middle"
         className="font-display"
         fill="rgba(228,224,255,0.95)"
-        style={{ fontSize: "17px", fontWeight: 600, letterSpacing: "1px" }}
+        style={{ fontSize: "21px", fontWeight: 600, letterSpacing: "1px" }}
       >
         Library
       </text>
@@ -374,10 +374,11 @@ function TrustOrb({
   const pip = Math.max(11, Math.round(size * 0.16));
   return (
     <div
-      className="relative rounded-full"
+      className="cs-tg-orb relative rounded-full"
       style={{
         width: size,
         height: size,
+        animationDelay: `${-delay * 2.1}s`,
         background:
           "radial-gradient(122% 122% at 34% 24%, #3c3557 0%, #191630 46%, #090714 100%)",
         boxShadow:
@@ -418,7 +419,20 @@ function TrustOrb({
       >
         <AttrIcon icon={node.icon} size={Math.round(size * 0.42)} />
       </div>
-      {/* amber "pending / unverified" pip on the shoulder */}
+      {/* amber "pending / unverified" pip on the shoulder, with a radar-style
+          ping halo so it reads as a live status beacon rather than a dot */}
+      <span
+        aria-hidden
+        className="cs-tg-pip-ping absolute rounded-full"
+        style={{
+          top: "13%",
+          right: "13%",
+          width: pip,
+          height: pip,
+          animationDelay: `${delay}s`,
+          border: "1.5px solid rgba(245,166,35,0.8)",
+        }}
+      />
       <span
         aria-hidden
         className="cs-tg-pip absolute rounded-full"
@@ -441,7 +455,7 @@ function NodeLabel({ children }: { children: React.ReactNode }): React.ReactElem
   return (
     <span
       className="whitespace-nowrap font-sans text-white/85"
-      style={{ fontSize: "var(--fs-body-sm)", fontWeight: 500, letterSpacing: "-0.01em" }}
+      style={{ fontSize: "var(--fs-h5)", fontWeight: 500, letterSpacing: "-0.01em" }}
     >
       {children}
     </span>
@@ -567,6 +581,25 @@ export function LibrariesTrustGap(): React.ReactElement {
         <Reveal className="mt-4 lg:mt-6">
           <DiagramDesktop />
           <DiagramMobile />
+          {/* Legend — makes the amber pip's "pending" meaning explicit. */}
+          <p
+            className="mt-8 flex items-center justify-center gap-2.5 font-sans text-white/55"
+            style={{
+              fontSize: "var(--fs-caption)",
+              fontWeight: 500,
+              letterSpacing: "0.01em",
+            }}
+          >
+            <span
+              aria-hidden
+              className="inline-block size-2.5 shrink-0 rounded-full"
+              style={{
+                background: AMBER_PIP,
+                boxShadow: "0 0 8px rgba(245,166,35,0.6)",
+              }}
+            />
+            Unverified — trust attributes not yet established
+          </p>
         </Reveal>
       </Container>
     </Section>

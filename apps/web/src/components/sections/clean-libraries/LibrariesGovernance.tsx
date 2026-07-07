@@ -9,9 +9,16 @@ interface GovCard {
   icon: IconKey;
   title: string;
   body: string;
+  /** Line-icon + divider colour. */
   accent: string;
-  /** Card background tint (gradient start). */
-  tint: string;
+  /** Straight + curved card border colour. */
+  border: string;
+  /** Card fill tint (outer-corner gradient start; fades to white). */
+  fill: string;
+  /** Icon-circle drop-shadow colour. */
+  shadow: string;
+  /** Body-copy wrap width (px) — tuned per card to match the reference wrap. */
+  textMax: number;
   pos: Pos;
 }
 
@@ -21,8 +28,11 @@ const CARDS: GovCard[] = [
     icon: "repository",
     title: "Trusted Repository",
     body: "Approved libraries from trusted sources.",
-    accent: "#7c3aed",
-    tint: "#f5f2fe",
+    accent: "#6d28d9",
+    border: "#d4c6f9",
+    fill: "#f6f3fe",
+    shadow: "rgba(109,40,217,0.15)",
+    textMax: 200,
     pos: "tl",
   },
   {
@@ -30,17 +40,23 @@ const CARDS: GovCard[] = [
     icon: "search",
     title: "Dependency Validation",
     body: "Validate every library before adoption.",
-    accent: "#0d9488",
-    tint: "#edfbf7",
+    accent: "#0f766e",
+    border: "#b5e3d8",
+    fill: "#eefbf7",
+    shadow: "rgba(15,118,110,0.15)",
+    textMax: 220,
     pos: "tr",
   },
   {
     key: "ai",
     icon: "sparkles",
-    title: "AI Controls",
+    title: "AI Coding Controls",
     body: "Validate AI-suggested libraries before use.",
-    accent: "#6366f1",
-    tint: "#f1f2fe",
+    accent: "#1d4ed8",
+    border: "#b4c6f4",
+    fill: "#eff3fe",
+    shadow: "rgba(29,78,216,0.15)",
+    textMax: 210,
     pos: "bl",
   },
   {
@@ -49,19 +65,22 @@ const CARDS: GovCard[] = [
     title: "Policy Enforcement",
     body: "Enforce dependency policies across the software lifecycle.",
     accent: "#ea580c",
-    tint: "#fff4ec",
+    border: "#fcd0a1",
+    fill: "#fff5ee",
+    shadow: "rgba(234,88,12,0.15)",
+    textMax: 240,
     pos: "br",
   },
 ];
 
-function GovIcon({ icon, size = 26 }: { icon: IconKey; size?: number }): React.ReactElement {
+function GovIcon({ icon, size = 30 }: { icon: IconKey; size?: number }): React.ReactElement {
   const c = {
     width: size,
     height: size,
     viewBox: "0 0 24 24",
     fill: "none",
     stroke: "currentColor",
-    strokeWidth: 1.7,
+    strokeWidth: 2,
     strokeLinecap: "round" as const,
     strokeLinejoin: "round" as const,
     "aria-hidden": true,
@@ -77,7 +96,7 @@ function GovIcon({ icon, size = 26 }: { icon: IconKey; size?: number }): React.R
     case "search":
       return (
         <svg {...c}>
-          <circle cx="11" cy="11" r="7" />
+          <circle cx="11" cy="11" r="7.5" />
           <path d="m21 21-4.35-4.35" />
         </svg>
       );
@@ -100,94 +119,222 @@ function GovIcon({ icon, size = 26 }: { icon: IconKey; size?: number }): React.R
 
 function IconCircle({
   accent,
+  shadow,
   icon,
-  size = 60,
-  glyph = 28,
+  size = 64,
+  glyph = 30,
 }: {
   accent: string;
+  shadow: string;
   icon: IconKey;
   size?: number;
   glyph?: number;
 }): React.ReactElement {
   return (
     <div
-      className="flex shrink-0 items-center justify-center rounded-full"
-      style={{
-        width: size,
-        height: size,
-        color: accent,
-        background: `color-mix(in srgb, ${accent} 7%, #ffffff)`,
-        boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${accent} 14%, transparent), 0 6px 16px -8px color-mix(in srgb, ${accent} 60%, transparent)`,
-      }}
+      className="flex shrink-0 items-center justify-center rounded-full bg-white"
+      style={{ width: size, height: size, color: accent, boxShadow: `0 10px 25px -5px ${shadow}` }}
     >
       <GovIcon icon={icon} size={glyph} />
     </div>
   );
 }
 
-/** Alignment of a card's content toward its outer corner (desktop only). */
-const POS_ALIGN: Record<Pos, string> = {
-  tl: "items-start",
-  tr: "items-start lg:pl-[22%]",
-  bl: "items-end",
-  br: "items-end lg:pl-[22%]",
+/**
+ * Icon beside title, with the divider + body stacked in a column to the right of
+ * the icon — the horizontal content layout from the reference.
+ */
+function CardBody({ card }: { card: GovCard }): React.ReactElement {
+  return (
+    <div className="flex items-start gap-5">
+      <IconCircle accent={card.accent} shadow={card.shadow} icon={card.icon} />
+      <div className="flex flex-col">
+        <h3
+          className="font-display text-[#0f172a]"
+          style={{
+            fontSize: "var(--fs-h3)",
+            fontWeight: 700,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.15,
+            maxWidth: "170px",
+          }}
+        >
+          {card.title}
+        </h3>
+        <span aria-hidden className="mt-3 block h-[3px] w-6 rounded-full" style={{ background: card.accent }} />
+        <p
+          className="mt-4 font-sans text-[#475569]"
+          style={{ fontSize: "var(--fs-body-sm)", fontWeight: 400, lineHeight: 1.5, maxWidth: `${card.textMax}px` }}
+        >
+          {card.body}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* --- Desktop card geometry (fixed 1000×540 canvas, scaled to fit) --- */
+const CANVAS_W = 1000;
+const CANVAS_H = 540;
+const GAP = 32;
+const CARD_W = (CANVAS_W - GAP) / 2; // 484
+const CARD_H = (CANVAS_H - GAP) / 2; // 254
+const RC = 24; // outer corner radius
+const SCOOP_R = 140; // concave scoop radius (arc hugs the hub)
+const FILLET = 24; // convex fillet that eases the straight edge into the scoop
+const BW = 1.5; // border width
+
+/**
+ * Card outline with a *filleted* concave notch at the bottom-right corner.
+ * The straight edges ease into the scoop through small convex fillets (radius
+ * `FILLET`) so the transition is soft — no sharp kink where edge meets arc.
+ * Other corners are produced by reflecting this path (see NOTCH_TRANSFORM).
+ */
+function bottomRightNotchPath(): string {
+  const W = CARD_W;
+  const H = CARD_H;
+  const R = SCOOP_R;
+  const f = FILLET;
+  const rc = RC;
+  const D = Math.sqrt(R * R + 2 * R * f); // edge distance from corner to fillet start
+  const r2 = (n: number): number => Math.round(n * 100) / 100;
+  const yA = r2(H - D);
+  const xB = r2(W - D);
+  const t1x = r2(W - (R * f) / (R + f));
+  const t1y = r2(H - (R * D) / (R + f));
+  const t2x = r2(W - (R * D) / (R + f));
+  const t2y = r2(H - (R * f) / (R + f));
+  return [
+    `M ${rc} 0`,
+    `L ${W - rc} 0`,
+    `A ${rc} ${rc} 0 0 1 ${W} ${rc}`,
+    `L ${W} ${yA}`,
+    `A ${f} ${f} 0 0 1 ${t1x} ${t1y}`, // convex fillet into the scoop
+    `A ${R} ${R} 0 0 0 ${t2x} ${t2y}`, // concave scoop hugging the hub
+    `A ${f} ${f} 0 0 1 ${xB} ${H}`, // convex fillet back to the edge
+    `L ${rc} ${H}`,
+    `A ${rc} ${rc} 0 0 1 0 ${H - rc}`,
+    `L 0 ${rc}`,
+    `A ${rc} ${rc} 0 0 1 ${rc} 0`,
+    "Z",
+  ].join(" ");
+}
+
+const NOTCH_PATH = bottomRightNotchPath();
+
+/** Reflect the bottom-right notch onto each card's inner corner. */
+const NOTCH_TRANSFORM: Record<Pos, string | undefined> = {
+  tl: undefined, // notch bottom-right
+  tr: `translate(${CARD_W} 0) scale(-1 1)`, // notch bottom-left
+  bl: `translate(0 ${CARD_H}) scale(1 -1)`, // notch top-right
+  br: `translate(${CARD_W} ${CARD_H}) scale(-1 -1)`, // notch top-left
 };
 
-function GovCardView({ card, mobile = false }: { card: GovCard; mobile?: boolean }): React.ReactElement {
+/** Vertical (justify) + horizontal indent so content radiates to the outer corner. */
+const CONTENT_POS: Record<Pos, { justify: string; indent: boolean }> = {
+  tl: { justify: "justify-start", indent: false },
+  tr: { justify: "justify-start", indent: true },
+  bl: { justify: "justify-end", indent: false },
+  br: { justify: "justify-end", indent: true },
+};
+
+function GovCardDesktop({ card }: { card: GovCard }): React.ReactElement {
+  const place = CONTENT_POS[card.pos];
+  const gid = `gov-fill-${card.key}`;
   return (
-    <div
-      className={
-        mobile
-          ? "flex rounded-[22px] border p-6"
-          : `flex min-h-[248px] rounded-[24px] border p-8 ${POS_ALIGN[card.pos]}`
-      }
-      style={{
-        background: `linear-gradient(145deg, ${card.tint} 0%, #ffffff 60%)`,
-        borderColor: `color-mix(in srgb, ${card.accent} 22%, transparent)`,
-        boxShadow: `0 22px 44px -30px color-mix(in srgb, ${card.accent} 80%, transparent)`,
-      }}
-    >
-      <div className="flex gap-4">
-        <IconCircle accent={card.accent} icon={card.icon} />
-        <div className="flex max-w-[215px] flex-col gap-2.5 pt-0.5">
-          <h3
-            className="font-display text-[#1a1633]"
-            style={{ fontSize: "var(--fs-h3)", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.1 }}
-          >
-            {card.title}
-          </h3>
-          <span
-            aria-hidden
-            className="block h-[3px] w-11 rounded-full"
-            style={{ background: card.accent }}
-          />
-          <p
-            className="font-sans text-[#6b7280]"
-            style={{ fontSize: "var(--fs-body-sm)", fontWeight: 400, letterSpacing: "-0.01em", lineHeight: 1.45 }}
-          >
-            {card.body}
-          </p>
+    <div className="relative h-full w-full">
+      <svg
+        viewBox={`0 0 ${CARD_W} ${CARD_H}`}
+        width="100%"
+        height="100%"
+        preserveAspectRatio="none"
+        className="absolute inset-0"
+        aria-hidden
+      >
+        <defs>
+          <linearGradient id={gid} x1="0" y1="0" x2="0.55" y2="1">
+            <stop offset="0%" stopColor={card.fill} />
+            <stop offset="62%" stopColor="#ffffff" />
+          </linearGradient>
+        </defs>
+        <path
+          d={NOTCH_PATH}
+          transform={NOTCH_TRANSFORM[card.pos]}
+          fill={`url(#${gid})`}
+          stroke={card.border}
+          strokeWidth={BW}
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+      <div
+        className={`relative z-[3] flex h-full w-full flex-col ${place.justify}`}
+        style={{ padding: "36px 44px" }}
+      >
+        <div className={place.indent ? "pl-[60px]" : ""}>
+          <CardBody card={card} />
         </div>
       </div>
     </div>
   );
 }
 
-function Hub({ size = 210 }: { size?: number }): React.ReactElement {
+/** A pillar card in the mobile governance flow — full width with an accent left rail. */
+function GovCardFlow({ card }: { card: GovCard }): React.ReactElement {
   return (
     <div
-      className="flex flex-col items-center justify-center gap-3 rounded-full bg-white text-center"
+      className="w-full rounded-[20px] p-6"
+      style={{
+        background: `linear-gradient(150deg, ${card.fill} 0%, #ffffff 62%)`,
+        border: `${BW}px solid ${card.border}`,
+        borderLeftWidth: "4px",
+        borderLeftColor: card.accent,
+      }}
+    >
+      <CardBody card={card} />
+    </div>
+  );
+}
+
+/**
+ * A segment of the mobile "governance spine" — a vertical connector line linking
+ * the hub to each pillar card, with an optional accent node where a card joins.
+ */
+function FlowConnector({ accent }: { accent?: string }): React.ReactElement {
+  return (
+    <div className="relative flex h-9 items-center justify-center" aria-hidden>
+      <span
+        className="absolute inset-y-0 w-[2px] rounded-full"
+        style={{ background: "linear-gradient(180deg, #d7deee 0%, #c3cde3 100%)" }}
+      />
+      {accent ? (
+        <span
+          className="relative size-2.5 rounded-full"
+          style={{ background: accent, boxShadow: `0 0 0 5px color-mix(in srgb, ${accent} 12%, transparent)` }}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function Hub({ size = 230 }: { size?: number }): React.ReactElement {
+  return (
+    <div
+      className="flex flex-col items-center justify-center rounded-full bg-white text-center"
       style={{
         width: size,
         height: size,
-        boxShadow:
-          "0 26px 54px -22px rgba(84,44,160,0.36), 0 0 0 1px rgba(124,58,237,0.08), inset 0 0 0 7px rgba(248,246,255,0.85)",
+        boxShadow: "0 0 0 12px rgba(255,255,255,0.4), 0 20px 40px -10px rgba(0,0,0,0.1)",
       }}
     >
-      <IconCircle accent="#7c3aed" icon="shield" size={58} glyph={28} />
+      <div
+        className="mb-3 flex size-14 items-center justify-center rounded-full bg-white"
+        style={{ color: "#6d28d9", border: "2px solid #f3e8ff" }}
+      >
+        <GovIcon icon="shield" size={28} />
+      </div>
       <span
-        className="font-display text-[#1a1633]"
-        style={{ fontSize: "var(--fs-body)", fontWeight: 600, lineHeight: 1.22, maxWidth: "132px" }}
+        className="font-display text-[#0f172a]"
+        style={{ fontSize: "var(--fs-body)", fontWeight: 700, lineHeight: 1.2, letterSpacing: "-0.01em", maxWidth: "132px" }}
       >
         Software Dependency Governance
       </span>
@@ -197,18 +344,34 @@ function Hub({ size = 210 }: { size?: number }): React.ReactElement {
 
 function DiagramDesktop(): React.ReactElement {
   return (
-    <div className="relative mx-auto hidden w-full max-w-[920px] lg:block">
-      <RevealStagger className="grid grid-cols-2 gap-5">
-        {CARDS.map((card) => (
-          <RevealItem key={card.key}>
-            <GovCardView card={card} />
-          </RevealItem>
-        ))}
-      </RevealStagger>
-      <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
-        <Reveal header>
-          <Hub />
-        </Reveal>
+    <div
+      className="relative mx-auto hidden w-full max-w-[1000px] md:block"
+      style={{ aspectRatio: "1000 / 540", containerType: "inline-size" }}
+    >
+      <div
+        className="absolute left-0 top-0"
+        style={
+          {
+            width: 1000,
+            height: 540,
+            transformOrigin: "top left",
+            transform: "scale(var(--gov-scale))",
+            "--gov-scale": "min(1, 100cqw / 1000)",
+          } as React.CSSProperties
+        }
+      >
+        <RevealStagger className="grid h-full w-full grid-cols-2 grid-rows-2 gap-8">
+          {CARDS.map((card) => (
+            <RevealItem key={card.key} className="h-full">
+              <GovCardDesktop card={card} />
+            </RevealItem>
+          ))}
+        </RevealStagger>
+        <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
+          <Reveal header y={0} duration={0.6}>
+            <Hub />
+          </Reveal>
+        </div>
       </div>
     </div>
   );
@@ -216,14 +379,16 @@ function DiagramDesktop(): React.ReactElement {
 
 function DiagramMobile(): React.ReactElement {
   return (
-    <div className="flex flex-col items-center gap-6 lg:hidden">
-      <Reveal header>
-        <Hub size={168} />
+    <div className="mx-auto flex max-w-[420px] flex-col items-center md:hidden">
+      <Reveal header y={0} duration={0.6}>
+        <Hub size={150} />
       </Reveal>
-      <RevealStagger className="grid w-full max-w-[440px] grid-cols-1 gap-4">
-        {CARDS.map((card) => (
-          <RevealItem key={card.key}>
-            <GovCardView card={card} mobile />
+      <FlowConnector />
+      <RevealStagger className="flex w-full flex-col items-center">
+        {CARDS.map((card, i) => (
+          <RevealItem key={card.key} className="w-full">
+            {i > 0 ? <FlowConnector accent={card.accent} /> : null}
+            <GovCardFlow card={card} />
           </RevealItem>
         ))}
       </RevealStagger>
@@ -236,19 +401,19 @@ export function LibrariesGovernance(): React.ReactElement {
     <Section
       padding="lg"
       className="overflow-hidden"
-      style={{ background: "linear-gradient(180deg, #ffffff 0%, #faf9ff 100%)" }}
+      style={{ background: "linear-gradient(180deg, #ffffff 0%, #f4f7fb 100%)" }}
     >
       <Container className="relative">
         <Reveal header>
           <div className="text-center">
             <h2
-              className="mx-auto max-w-[1180px] font-display text-[#1a1633]"
+              className="mx-auto max-w-[1180px] font-display text-[#0f172a]"
               style={{ fontSize: "var(--fs-h2)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.12 }}
             >
               Govern every dependency. Build with confidence.
             </h2>
             <p
-              className="mx-auto mt-5 max-w-[840px] font-sans text-[#6b7280]"
+              className="mx-auto mt-5 max-w-[840px] font-sans text-[#475569]"
               style={{ fontSize: "var(--fs-lead)", fontWeight: 400, letterSpacing: "-0.01em", lineHeight: 1.5, textWrap: "balance" }}
             >
               Clean Libraries enforces policy, validates every dependency, and

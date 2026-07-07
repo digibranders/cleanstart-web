@@ -1823,9 +1823,10 @@ body {
 /* Clean Libraries — "The Trust Gap" section ambient motion. The amber
    "pending" pips pulse on staggered phases, energy flows along the dotted
    connectors toward the orbs, the reflective base rings ripple outward like
-   sonar, and the cube core breathes. The orbs themselves stay still (no bob).
-   Transform / opacity / dash-offset only (GPU-composited, no layout), all off
-   under reduced-motion so the static diagram stands on its own. */
+   sonar, the cube core breathes, and the orbs drift gently on desynced phases.
+   Transform / translate / opacity / dash-offset only (GPU-composited, no
+   layout), all off under reduced-motion so the static diagram stands on its
+   own. */
 @keyframes cs-tg-pip {
   0%,
   100% {
@@ -1864,6 +1865,26 @@ body {
     opacity: 1;
   }
 }
+@keyframes cs-tg-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  70%,
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+@keyframes cs-tg-orb-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -7px;
+  }
+}
 .cs-tg-pip {
   transform-origin: center;
   will-change: transform, opacity;
@@ -1882,11 +1903,24 @@ body {
   will-change: opacity;
   animation: cs-tg-core 4.5s ease-in-out infinite;
 }
+.cs-tg-pip-ping {
+  transform-origin: center;
+  will-change: transform, opacity;
+  animation: cs-tg-ping 2.4s ease-out infinite;
+}
+/* Gentle idle drift — uses the `translate` property so it never fights the
+   positioning transforms on the orb wrappers. Desynced per orb via a negative
+   inline animation-delay. */
+.cs-tg-orb {
+  animation: cs-tg-orb-float 6.5s ease-in-out infinite;
+}
 @media (prefers-reduced-motion: reduce) {
   .cs-tg-pip,
+  .cs-tg-pip-ping,
   .cs-tg-flow,
   .cs-tg-ripple,
-  .cs-tg-core {
+  .cs-tg-core,
+  .cs-tg-orb {
     animation: none !important;
   }
 }
@@ -2432,6 +2466,268 @@ body {
    accent drives the ring colour through its per-card --accent custom prop.
    ─────────────────────────────────────────────────────────────────────────── */
 
+/* Hover lift — every stage card rises gently and brightens its border.
+   Border colour comes through --wf-border (set inline per card) so the
+   hover rule can override it. */
+.wf-card {
+  border-color: var(--wf-border, rgba(255, 255, 255, 0.08));
+  transition:
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.4s ease;
+}
+
+.wf-card:hover {
+  transform: translateY(-6px);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+/* Relay loop — a spotlight travels through the pipeline: each stage lifts and
+   glows in turn (card 0 → 4), the arrow after it pulses during the handoff,
+   then the cycle repeats. Timing is pure CSS: every element's start offset in
+   steps (--wf-d) is computed by the component — ordinary stages occupy one
+   step, the featured stage dwells for two, so the schedule stays gap-free.
+   The lift uses the `translate` property so it composes with the hover
+   `transform` instead of fighting it. */
+.wf-anim {
+  --wf-step: 2.5s;
+  /* cycle = 6 steps: 4 ordinary stages × 1 + the featured stage's 2 */
+  --wf-cycle: 15s;
+  /* lets the entrance reveal finish before the first relay pass */
+  --wf-lead: 1.4s;
+}
+
+/* Accent spotlight overlay — faded in while the card holds the relay baton. */
+.wf-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent) 65%, transparent),
+    0 26px 70px -28px var(--accent),
+    inset 0 0 38px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.wf-anim .wf-card {
+  animation: wf-relay-lift var(--wf-cycle) ease-in-out infinite;
+  animation-delay: calc(var(--wf-d, 0) * var(--wf-step) + var(--wf-lead));
+}
+
+.wf-anim .wf-card::before {
+  animation: wf-relay-glow var(--wf-cycle) ease-in-out infinite;
+  animation-delay: calc(var(--wf-d, 0) * var(--wf-step) + var(--wf-lead));
+}
+
+/* One step = 16.667% of the 6-step cycle. An ordinary stage is active for
+   ~1.2 steps (rise 0–5%, hold 5–12.5%, settle by 20%), so each handoff keeps
+   the same 0.5s crossfade with the next stage's rise. */
+@keyframes wf-relay-lift {
+  0% {
+    translate: 0 0;
+  }
+
+  5%,
+  12.5% {
+    translate: 0 -9px;
+  }
+
+  20%,
+  100% {
+    translate: 0 0;
+  }
+}
+
+@keyframes wf-relay-glow {
+  0% {
+    opacity: 0;
+  }
+
+  5%,
+  12.5% {
+    opacity: 1;
+  }
+
+  20%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ── Featured (Clean Libraries) hero treatment ──────────────────────────────
+   The relay dwells on the featured card roughly twice as long as on the
+   others, rises higher, scales up slightly, and flares a stronger spotlight —
+   while the four supporting cards dim to hand it the stage. */
+
+.wf-card[data-featured="true"]::before {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent) 80%, transparent),
+    0 34px 90px -24px var(--accent),
+    inset 0 0 52px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.wf-anim .wf-card[data-featured="true"] {
+  animation-name: wf-relay-lift-featured;
+}
+
+.wf-anim .wf-card[data-featured="true"]::before {
+  animation-name: wf-relay-glow-featured;
+}
+
+/* Supporting cards yield (dim) during the featured card's dwell window.
+   The yield delay is fixed at one step — the featured card's start slot. */
+.wf-anim .wf-card:not([data-featured="true"]) {
+  animation:
+    wf-relay-lift var(--wf-cycle) ease-in-out infinite,
+    wf-relay-yield var(--wf-cycle) ease-in-out infinite;
+  animation-delay:
+    calc(var(--wf-d, 0) * var(--wf-step) + var(--wf-lead)),
+    calc(var(--wf-step) + var(--wf-lead));
+}
+
+/* The featured stage is active for ~2.2 steps: rise 0–5%, hold 5–29%
+   (two full steps), settle by 36.5% — the stage after it starts at two
+   steps (33.3%), preserving the standard 0.5s handoff crossfade. */
+@keyframes wf-relay-lift-featured {
+  0% {
+    translate: 0 0;
+    scale: 1;
+  }
+
+  5%,
+  29% {
+    translate: 0 -14px;
+    scale: 1.03;
+  }
+
+  36.5%,
+  100% {
+    translate: 0 0;
+    scale: 1;
+  }
+}
+
+@keyframes wf-relay-glow-featured {
+  0% {
+    opacity: 0;
+  }
+
+  5%,
+  29% {
+    opacity: 1;
+  }
+
+  36.5%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes wf-relay-yield {
+  0% {
+    opacity: 1;
+  }
+
+  5%,
+  29% {
+    opacity: 0.78;
+  }
+
+  36.5%,
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Border beam — a spark orbiting the featured card's border, running the
+   whole time the section is on screen. Only Clean Libraries carries it. */
+@property --wf-beam-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.wf-beam {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1.5px;
+  opacity: 0;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--wf-beam-angle),
+    transparent 0deg 286deg,
+    color-mix(in srgb, var(--accent) 70%, transparent) 330deg,
+    #fff 348deg,
+    var(--accent) 354deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  transition: opacity 0.6s ease;
+}
+
+.wf-anim .wf-beam {
+  opacity: 1;
+  animation: wf-beam-orbit 4.5s linear infinite;
+}
+
+@keyframes wf-beam-orbit {
+  to {
+    --wf-beam-angle: 360deg;
+  }
+}
+
+/* Handoff pulse — the arrow brightens as its stage passes the baton. Its
+   --wf-d is the NEXT stage's start minus 0.35 steps, so the pulse lands on
+   the handoff even after the featured stage's double dwell. The resting
+   opacity matches the keyframe base so the delayed start is seamless. */
+.wf-anim .wf-arrow {
+  opacity: 0.65;
+  animation: wf-relay-handoff var(--wf-cycle) ease-in-out infinite;
+  animation-delay: calc(var(--wf-d, 0) * var(--wf-step) + var(--wf-lead));
+}
+
+@keyframes wf-relay-handoff {
+  0%,
+  20%,
+  100% {
+    opacity: 0.65;
+    filter: none;
+  }
+
+  7%,
+  13% {
+    opacity: 1;
+    filter: drop-shadow(0 0 6px currentColor);
+  }
+}
+
+/* Idle float — the 3D medallions bob softly, desynced per stage so the row
+   never looks mechanically locked. Negative delay starts mid-cycle. */
+.wf-anim .wf-medallion {
+  animation: wf-float 5.6s ease-in-out infinite;
+  animation-delay: calc(var(--wf-d, 0) * -1.4s);
+}
+
+@keyframes wf-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: 0 -6px;
+  }
+}
+
 /* Glow ring — the featured (Clean Library) card only. */
 .wf-card[data-featured="true"]::after {
   content: "";
@@ -2485,12 +2781,26 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wf-card[data-featured="true"]::after {
+  .wf-card {
+    transition: none;
+  }
+
+  .wf-card:hover {
+    transform: none;
+  }
+
+  .wf-card,
+  .wf-card::before,
+  .wf-card[data-featured="true"]::after,
+  .wf-arrow,
+  .wf-arrow-track,
+  .wf-medallion {
     animation: none !important;
   }
 
-  .wf-arrow-track {
+  .wf-beam {
     animation: none !important;
+    opacity: 0 !important;
   }
 }
 
