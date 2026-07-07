@@ -118,22 +118,35 @@ is the established pattern for list-view side-panel UI, not a modal
 - A second `Drawer` (sibling to the existing column-picker `Drawer`) renders
   `apps/cms/src/payload/admin/components/views/list/ExportDrawer.tsx` when
   `exportDrawerOpen` is true. Contents:
-  - Date range: two `DateTimePicker` fields (from/to), optional (empty =
-    unbounded).
+  - Date range: a preset `<select>` (`All time` (default) / `Today` /
+    `Last 7 days` / `Last 30 days` / `This month` / `Last month` /
+    `Custom range`) above the two `DateTimePicker` fields (from/to).
+    Picking a non-custom preset computes local-calendar `YYYY-MM-DD`
+    strings (matching `DateTimePicker`'s own `mode="date"` storage format,
+    per `packages/ui/src/primitives/DateTimePicker.tsx`'s `formatStorage`)
+    and fills both pickers; manually editing either picker afterward
+    flips the preset back to `Custom range` (so the two controls never
+    silently disagree). `All time` clears both to `null` (unbounded,
+    today's default/only behavior before this addendum).
   - Field picker: checklist built from the collection's field list
     (`useConfig()` — sanitized client config already includes field
     name/label/type, no per-collection hardcoding). Relationship, richText,
     upload, array/group/block fields are included with a serialization note
     (see below); fields the user has no read access to are already absent
     from the sanitized client config, so the picker never offers a field
-    the export endpoint would 403 on. **Auto-preselected: whichever fields
-    are currently shown as table columns** (`useTableColumns` — the same
-    hook `ColumnPicker.tsx` already uses), recomputed every time the drawer
-    is opened (not just once), so it reflects whatever the editor has
-    toggled via the existing "Columns…" picker. Editors can still check/
-    uncheck freely before exporting; if no displayed column maps onto an
-    exportable field name, it falls back to the first 5 exportable fields
-    so the picker never opens empty.
+    the export endpoint would 403 on. **Auto-preselected: the union of (a)
+    whichever fields are currently shown as table columns** (`useTableColumns`
+    — the same hook `ColumnPicker.tsx` already uses) **and (b) a small,
+    generic "always useful" field-name allow-list** — `title`, `name`,
+    `slug`, `status`, `_status`, `createdAt`, `updatedAt`, `publishedAt`,
+    `publicationDate`, `effectiveDate` — checked against that collection's
+    *actual* field names (not hardcoded per collection; e.g. this is how
+    `news`'s `publicationDate` gets preselected even though it's rarely a
+    visible table column). Recomputed every time the drawer is opened (not
+    just once), so it reflects whatever the editor has toggled via the
+    existing "Columns…" picker. Editors can still check/uncheck freely
+    before exporting; if the union is still empty, it falls back to the
+    first 5 exportable fields so the picker never opens empty.
   - Format: CSV / XLSX radio, default CSV.
   - On submit: reads current list state from `useListQuery()` (`where`,
     `search`, `sort`) and does a `window.location.assign` to
@@ -160,7 +173,16 @@ export function buildExportEndpoint(slug: string, opts: { dateField: string }): 
   `search?: string`, `sort?: string`.
 - Builds the effective `where`: `{ and: [clientWhere, dateRangeCondition] }`
   where `dateRangeCondition` uses `opts.dateField` with `greater_than_equal`
-  / `less_than_equal` from `from`/`to` when present.
+  from `from` when present, and — **addendum, fixing a real off-by-one**
+  — for `to`: a date-only string (`YYYY-MM-DD`, exactly what the new date
+  presets produce) is treated as *inclusive through the end of that day*,
+  matching `export-leads-csv.ts`'s existing `until` handling (add 24h and
+  use `less_than` the next day's midnight UTC) rather than
+  `less_than_equal` on the bare date, which Postgres would otherwise
+  interpret as midnight-that-day — silently excluding the rest of the
+  day's rows (e.g. a "Today" export would exclude everything published
+  after 00:00 today). A full ISO-datetime `to` (not just `YYYY-MM-DD`)
+  still uses `less_than_equal` directly, unchanged.
 - Gates on `hasAnyRole(req.user, ['admin', 'editor'])` → 403 otherwise, then
   runs `payload.find({ collection: slug, where, sort, depth: 1, ...pagination, overrideAccess: true })`
   — matching the exact access pattern `export-leads-csv.ts` /
