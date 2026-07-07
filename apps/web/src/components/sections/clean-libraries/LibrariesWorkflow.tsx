@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 import { Container, Section } from "@/components/layout";
 import { Reveal, RevealItem, RevealStagger } from "@/components/ui/Reveal";
 
-type FeatureIcon = "visibility" | "validation" | "policy";
+type FeatureIcon = "source" | "verify" | "trust";
 
 interface FeatureRow {
   icon: FeatureIcon;
@@ -20,8 +20,7 @@ interface Stage {
   title: string;
   accent: string;
   tint: string;
-  /** Bullet list (devtools) or single description (repository, cicd, production). */
-  bullets?: string[];
+  /** Single description — every stage except the featured one. */
   body?: string;
   /** Icon-led feature rows — only the prominent Clean Library stage. */
   features?: FeatureRow[];
@@ -34,42 +33,60 @@ const STAGES: Stage[] = [
     title: "Developers & AI Coding Tools",
     accent: "#5b9bff",
     tint: "rgba(91,155,255,0.14)",
-    bullets: ["Cursor", "Claude Code", "GitHub Copilot"],
+    body: "Request software libraries.",
   },
   {
     image: "/images/clean-libraries/flow-clean-library.webp",
-    title: "Clean Libraries",
+    title: "Clean Library",
     accent: "#a974ff",
     tint: "rgba(169,116,255,0.18)",
     featured: true,
     features: [
-      { icon: "visibility", label: "Dependency visibility" },
-      { icon: "validation", label: "Validation" },
-      { icon: "policy", label: "Policy enforcement" },
+      { icon: "source", label: "Built from Source" },
+      { icon: "verify", label: "Continuous Verification" },
+      { icon: "trust", label: "Trusted Libraries" },
     ],
   },
   {
     image: "/images/clean-libraries/flow-repository.webp",
-    title: "Trusted Dependency Repository",
+    title: "Policy Controls",
     accent: "#2dd4bf",
     tint: "rgba(45,212,191,0.14)",
-    body: "Curated, verified packages and trusted dependencies.",
+    body: "Define and validate trust policies.",
   },
   {
     image: "/images/clean-libraries/flow-cicd.webp",
     title: "CI/CD Gates",
     accent: "#f7a35c",
     tint: "rgba(247,163,92,0.14)",
-    body: "Automated enforcement before deployment.",
+    body: "Automated policy enforcement.",
   },
   {
     image: "/images/clean-libraries/flow-production.webp",
     title: "Production Artifacts",
     accent: "#5b9bff",
     tint: "rgba(91,155,255,0.14)",
-    body: "Only approved dependencies reach production.",
+    body: "Trusted software reaches production.",
   },
 ];
+
+/**
+ * Relay start offset of each stage, in steps. Stages normally occupy one step;
+ * the featured (Clean Libraries) stage dwells for two, so everything after it
+ * starts one step later. The CSS `--wf-cycle` must equal the total step count
+ * (currently 6) × `--wf-step`.
+ */
+function relayStarts(stages: Stage[]): number[] {
+  const starts: number[] = [];
+  let t = 0;
+  for (const stage of stages) {
+    starts.push(t);
+    t += stage.featured ? 2 : 1;
+  }
+  return starts;
+}
+
+const STAGE_STARTS = relayStarts(STAGES);
 
 const STROKE = {
   fill: "none",
@@ -84,26 +101,27 @@ const STROKE = {
 function FeatureGlyph({ icon }: { icon: FeatureIcon }): React.ReactElement {
   const common = { ...STROKE, width: 18, height: 18, viewBox: "0 0 24 24" };
   switch (icon) {
-    case "visibility":
+    case "source":
       return (
         <svg {...common}>
-          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
-          <circle cx="12" cy="12" r="3" />
+          <line x1="6" y1="3" x2="6" y2="15" />
+          <circle cx="18" cy="6" r="3" />
+          <circle cx="6" cy="18" r="3" />
+          <path d="M18 9a9 9 0 0 1-9 9" />
         </svg>
       );
-    case "validation":
+    case "verify":
       return (
         <svg {...common}>
           <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1Z" />
           <path d="m9 12 2 2 4-4" />
         </svg>
       );
-    case "policy":
+    case "trust":
       return (
         <svg {...common}>
-          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-          <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
-          <path d="m9 14 2 2 4-4" />
+          <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+          <path d="m9 12 2 2 4-4" />
         </svg>
       );
   }
@@ -122,7 +140,10 @@ function Medallion({
   size: number;
 }): React.ReactElement {
   return (
-    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
+    <div
+      className="wf-medallion relative flex items-center justify-center"
+      style={{ width: size, height: size }}
+    >
       <span
         aria-hidden
         className="wf-icon-glow pointer-events-none absolute inset-[-22%] rounded-full"
@@ -189,29 +210,6 @@ function Body({ children }: { children: React.ReactNode }): React.ReactElement {
   );
 }
 
-function Bullets({ items, accent }: { items: string[]; accent: string }): React.ReactElement {
-  return (
-    <ul className="mx-auto flex w-fit flex-col gap-2.5 text-left">
-      {items.map((item) => (
-        <li key={item} className="flex items-center gap-2.5">
-          <span aria-hidden className="size-1.5 shrink-0 rounded-full" style={{ background: accent }} />
-          <span
-            className="font-sans text-white/75"
-            style={{
-              fontSize: "var(--fs-body-sm)",
-              fontWeight: 400,
-              letterSpacing: "-0.01em",
-              lineHeight: 1.4,
-            }}
-          >
-            {item}
-          </span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
 function FeatureList({
   features,
   accent,
@@ -256,7 +254,13 @@ function FeatureList({
  * height so the four reference stages read as a uniform set; the featured
  * (Clean Library) card is taller, wider, and carries the brand glow.
  */
-function StageCard({ stage }: { stage: Stage }): React.ReactElement {
+function StageCard({
+  stage,
+  delaySteps,
+}: {
+  stage: Stage;
+  delaySteps: number;
+}): React.ReactElement {
   const featured = stage.featured ?? false;
   return (
     <div
@@ -267,7 +271,8 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
       )}
       style={{
         ["--accent" as string]: stage.accent,
-        borderColor: featured
+        ["--wf-d" as string]: delaySteps,
+        ["--wf-border" as string]: featured
           ? `color-mix(in srgb, ${stage.accent} 55%, transparent)`
           : "rgba(255,255,255,0.08)",
         background: `linear-gradient(160deg, ${stage.tint} 0%, rgba(9,8,18,0.62) 60%)`,
@@ -277,11 +282,14 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
       }}
     >
       {featured ? (
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 -top-px mx-auto h-px w-2/3 rounded-full"
-          style={{ background: `linear-gradient(90deg, transparent, ${stage.accent}, transparent)` }}
-        />
+        <>
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 -top-px mx-auto h-px w-2/3 rounded-full"
+            style={{ background: `linear-gradient(90deg, transparent, ${stage.accent}, transparent)` }}
+          />
+          <span aria-hidden className="wf-beam" />
+        </>
       ) : null}
       <Medallion
         image={stage.image}
@@ -295,8 +303,6 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
       </div>
       {stage.features ? (
         <FeatureList features={stage.features} accent={stage.accent} />
-      ) : stage.bullets ? (
-        <Bullets items={stage.bullets} accent={stage.accent} />
       ) : (
         <Body>{stage.body}</Body>
       )}
@@ -311,9 +317,11 @@ function StageCard({ stage }: { stage: Stage }): React.ReactElement {
  */
 function Connector({
   accent,
+  delaySteps,
   vertical,
 }: {
   accent: string;
+  delaySteps: number;
   vertical?: boolean;
 }): React.ReactElement {
   return (
@@ -323,7 +331,7 @@ function Connector({
         "wf-arrow flex shrink-0 items-center justify-center",
         vertical ? "h-8 w-full" : "w-9",
       )}
-      style={{ color: accent }}
+      style={{ color: accent, ["--wf-d" as string]: delaySteps }}
     >
       <div className={cn("flex items-center gap-1", vertical && "rotate-90")}>
         <span className="wf-arrow-track" />
@@ -348,8 +356,9 @@ export function LibrariesWorkflow(): React.ReactElement {
   const flowRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   const inView = useInView(flowRef, { amount: 0.25, margin: "0px 0px -10% 0px" });
-  // Gates the on-screen motion: the flowing arrows and the Clean Library glow
-  // ring only animate while the section is in view (and motion is allowed).
+  // Gates the on-screen motion: the relay spotlight loop, flowing arrows,
+  // floating medallions, and the Clean Library glow ring only animate while
+  // the section is in view (and motion is allowed).
   const anim = inView && !reduce;
 
   return (
@@ -398,12 +407,13 @@ export function LibrariesWorkflow(): React.ReactElement {
             </span>
           </h2>
           <p
-            className="mx-auto mt-6 max-w-[720px] text-center font-sans text-white/80"
+            className="mx-auto mt-6 max-w-[900px] text-center font-sans text-white/80"
             style={{
               fontSize: "var(--fs-lead)",
               fontWeight: 400,
               letterSpacing: "-0.02em",
               lineHeight: 1.5,
+              textWrap: "balance",
             }}
           >
             Clean Libraries integrates into your existing software delivery
@@ -416,29 +426,42 @@ export function LibrariesWorkflow(): React.ReactElement {
         <div ref={flowRef} className={cn(anim && "wf-anim")}>
           {/* Desktop — horizontal flow with the Clean Library stage prominent.
               Cards and connectors are siblings so every non-featured card keeps
-              an identical flex basis (equal width); connectors never steal width. */}
-          <Reveal className="mt-14 hidden xl:block">
-            <div className="flex items-center justify-center gap-2">
-              {STAGES.map((stage, i) => (
-                <Fragment key={stage.title}>
-                  <div className={`${stage.featured ? "flex-[1.32]" : "flex-1"} min-w-0`}>
-                    <StageCard stage={stage} />
-                  </div>
-                  {i < STAGES.length - 1 ? (
-                    <Connector accent={STAGES[i + 1]?.accent ?? stage.accent} />
-                  ) : null}
-                </Fragment>
-              ))}
-            </div>
-          </Reveal>
+              an identical flex basis (equal width); connectors never steal width.
+              Each stage (and its arrow) reveals in sequence, left to right. */}
+          <RevealStagger
+            gap={0.12}
+            className="mt-14 hidden items-center justify-center gap-2 xl:flex"
+          >
+            {STAGES.map((stage, i) => (
+              <Fragment key={stage.title}>
+                <RevealItem
+                  className={`${stage.featured ? "relative z-10 flex-[1.32]" : "flex-1"} min-w-0`}
+                >
+                  <StageCard stage={stage} delaySteps={STAGE_STARTS[i] ?? 0} />
+                </RevealItem>
+                {i < STAGES.length - 1 ? (
+                  <RevealItem className="shrink-0">
+                    <Connector
+                      accent={STAGES[i + 1]?.accent ?? stage.accent}
+                      delaySteps={(STAGE_STARTS[i + 1] ?? 0) - 0.35}
+                    />
+                  </RevealItem>
+                ) : null}
+              </Fragment>
+            ))}
+          </RevealStagger>
 
           {/* Stacked — vertical flow for < xl. */}
           <RevealStagger className="mx-auto mt-12 flex max-w-[440px] flex-col items-stretch gap-3 xl:hidden">
             {STAGES.map((stage, i) => (
               <RevealItem key={stage.title} className="flex flex-col items-stretch gap-3">
-                <StageCard stage={stage} />
+                <StageCard stage={stage} delaySteps={STAGE_STARTS[i] ?? 0} />
                 {i < STAGES.length - 1 ? (
-                  <Connector accent={STAGES[i + 1]?.accent ?? stage.accent} vertical />
+                  <Connector
+                    accent={STAGES[i + 1]?.accent ?? stage.accent}
+                    delaySteps={(STAGE_STARTS[i + 1] ?? 0) - 0.35}
+                    vertical
+                  />
                 ) : null}
               </RevealItem>
             ))}

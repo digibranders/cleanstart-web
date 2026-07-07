@@ -69,7 +69,7 @@ export function LibrariesHero(): React.ReactElement {
 
             <HeroReveal y={30} delay={0.2} duration={0.8}>
               <p
-                className="text-white max-w-[520px]"
+                className="text-white max-w-[560px]"
                 style={{
                   fontFamily: "var(--font-sans)",
                   fontSize: "var(--fs-lead)",
@@ -78,6 +78,7 @@ export function LibrariesHero(): React.ReactElement {
                   lineHeight: 1.4,
                   opacity: 0.8,
                   margin: 0,
+                  textWrap: "balance",
                 }}
               >
                 Continuously Verified from Source. Governed by Software
