@@ -71,8 +71,7 @@ function GovIcon({ icon, size = 26 }: { icon: IconKey; size?: number }): React.R
       return (
         <svg {...c}>
           <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-          <path d="m3.3 7 8.7 5 8.7-5" />
-          <path d="M12 22V12" />
+          <path d="m8.6 12 2.3 2.3 4.7-4.7" />
         </svg>
       );
     case "search":
@@ -102,8 +101,8 @@ function GovIcon({ icon, size = 26 }: { icon: IconKey; size?: number }): React.R
 function IconCircle({
   accent,
   icon,
-  size = 56,
-  glyph = 26,
+  size = 60,
+  glyph = 28,
 }: {
   accent: string;
   icon: IconKey;
@@ -150,10 +149,10 @@ function GovCardView({ card, mobile = false }: { card: GovCard; mobile?: boolean
     >
       <div className="flex gap-4">
         <IconCircle accent={card.accent} icon={card.icon} />
-        <div className="flex max-w-[190px] flex-col gap-2.5 pt-0.5">
+        <div className="flex max-w-[215px] flex-col gap-2.5 pt-0.5">
           <h3
             className="font-display text-[#1a1633]"
-            style={{ fontSize: "var(--fs-h4)", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.12 }}
+            style={{ fontSize: "var(--fs-h3)", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.1 }}
           >
             {card.title}
           </h3>
@@ -185,10 +184,10 @@ function Hub({ size = 210 }: { size?: number }): React.ReactElement {
           "0 26px 54px -22px rgba(84,44,160,0.36), 0 0 0 1px rgba(124,58,237,0.08), inset 0 0 0 7px rgba(248,246,255,0.85)",
       }}
     >
-      <IconCircle accent="#7c3aed" icon="shield" size={54} glyph={26} />
+      <IconCircle accent="#7c3aed" icon="shield" size={58} glyph={28} />
       <span
         className="font-display text-[#1a1633]"
-        style={{ fontSize: "var(--fs-body)", fontWeight: 600, lineHeight: 1.22, maxWidth: "128px" }}
+        style={{ fontSize: "var(--fs-body)", fontWeight: 600, lineHeight: 1.22, maxWidth: "132px" }}
       >
         Software Dependency Governance
       </span>
@@ -242,16 +241,15 @@ export function LibrariesGovernance(): React.ReactElement {
       <Container className="relative">
         <Reveal header>
           <div className="text-center">
-
             <h2
-              className="mx-auto mt-4 max-w-[1180px] font-display text-[#1a1633]"
+              className="mx-auto max-w-[1180px] font-display text-[#1a1633]"
               style={{ fontSize: "var(--fs-h2)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.12 }}
             >
               Govern every dependency. Build with confidence.
             </h2>
             <p
-              className="mx-auto mt-4 max-w-[1120px] font-sans text-[#6b7280]"
-              style={{ fontSize: "var(--fs-lead)", fontWeight: 400, letterSpacing: "-0.01em", lineHeight: 1.5 }}
+              className="mx-auto mt-5 max-w-[840px] font-sans text-[#6b7280]"
+              style={{ fontSize: "var(--fs-lead)", fontWeight: 400, letterSpacing: "-0.01em", lineHeight: 1.5, textWrap: "balance" }}
             >
               Clean Libraries enforces policy, validates every dependency, and
               governs AI-suggested libraries across the software lifecycle.
