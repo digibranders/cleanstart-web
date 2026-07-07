@@ -1,35 +1,35 @@
 {
-  "timestamp": "2026-06-01T13:05:37.048Z",
+  "timestamp": "2026-07-07T11:44:49.000Z",
   "baseUrl": "http://127.0.0.1:3001",
   "budgetP50Kb": 220,
   "budgetP99Kb": 260,
-  "measuredP50Kb": 314.2,
-  "measuredP99Kb": 320.7,
-  "measuredMaxKb": 320.7,
+  "measuredP50Kb": 318,
+  "measuredP99Kb": 329.6,
+  "measuredMaxKb": 329.6,
   "routes": [
     {
       "route": "/",
-      "raw": 1062932,
-      "gz": 328349,
-      "rawKb": 1038,
-      "gzKb": 320.7,
-      "chunkCount": 14
+      "raw": 1087488,
+      "gz": 337510,
+      "rawKb": 1062,
+      "gzKb": 329.6,
+      "chunkCount": 17
     },
     {
       "route": "/about-us",
-      "raw": 1032931,
-      "gz": 319401,
-      "rawKb": 1008.7,
-      "gzKb": 311.9,
-      "chunkCount": 14
+      "raw": 1045299,
+      "gz": 325632,
+      "rawKb": 1020.8,
+      "gzKb": 318,
+      "chunkCount": 17
     },
     {
       "route": "/vulnerability-remediation",
-      "raw": 1039643,
-      "gz": 321769,
-      "rawKb": 1015.3,
-      "gzKb": 314.2,
-      "chunkCount": 14
+      "raw": 1044173,
+      "gz": 325427,
+      "rawKb": 1019.7,
+      "gzKb": 317.8,
+      "chunkCount": 17
     }
   ]
 }

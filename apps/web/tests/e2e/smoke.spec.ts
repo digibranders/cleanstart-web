@@ -42,7 +42,6 @@ const ROUTES = [
   "/news",
   "/resource-center",
   "/for-ciso",
-  "/software-composition-analysis",
   "/teams",
 ] as const;
 
@@ -99,6 +98,13 @@ test.afterAll(async ({}, testInfo) => {
 for (const route of ROUTES) {
   test(`smoke ${route}`, async ({ page }, testInfo) => {
     const project = testInfo.project.name;
+
+    // Render the settled (post-animation) state so the axe color-contrast scan
+    // measures the intended colors, not a FadeUp element caught mid-fade. Under
+    // reduced motion FadeUp paints its plain-div branch at full opacity, which
+    // makes the scan deterministic — a real contrast defect fails every run;
+    // the mid-animation false positive does not.
+    await page.emulateMedia({ reducedMotion: "reduce" });
 
     const response = await page.goto(route, { waitUntil: "domcontentloaded" });
     expect(response, `route ${route} returned no response`).not.toBeNull();

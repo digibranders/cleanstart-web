@@ -51,6 +51,7 @@
     "@types/pg": "^8.20.0",
     "codemirror": "^6.0.2",
     "cross-env": "^7.0.3",
+    "exceljs": "^4.4.0",
     "googleapis": "^171.4.0",
     "isomorphic-dompurify": "^2.36.0",
     "lexical": "^0.41.0",
