@@ -33,4 +33,10 @@ describe('wireExportButton', () => {
     expect(EXPORTABLE_COLLECTION_SLUGS).not.toContain('leads');
     expect(EXPORTABLE_COLLECTION_SLUGS).not.toContain('partner-applications');
   });
+
+  it('uses publicationDate for news, not createdAt (News has no publishedAt field)', () => {
+    const input = baseCollection('news', [{ name: 'publicationDate', type: 'date' }]);
+    const output = wireExportButton(input);
+    expect(output.custom?.export?.dateField).toBe('publicationDate');
+  });
 });
