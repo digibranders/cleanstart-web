@@ -14,6 +14,10 @@ const makeReq = (overrides: Partial<{
     payload: {
       find: vi.fn().mockResolvedValue({ docs, hasNextPage: false }),
       logger: { error: vi.fn() },
+      collections: {
+        blogs: { config: { admin: { useAsTitle: 'title' } } },
+        leads: { config: { admin: { useAsTitle: 'title' } } },
+      },
     },
   } as unknown as Parameters<ReturnType<typeof buildExportEndpoint>['handler']>[0];
 };
@@ -93,6 +97,18 @@ describe('buildExportEndpoint', () => {
     const text = await res.text();
     expect(text).toContain('title');
     expect(text).toContain('Hello');
+  });
+
+  it('merges the search term into an or/like where clause passed to payload.find', async () => {
+    const endpoint = buildExportEndpoint('blogs', { dateField: 'publishedAt' });
+    const req = makeReq({
+      url: 'http://internal/api/blogs/export?fields=title&search=kubernetes',
+    });
+    await endpoint.handler(req);
+    const findCall = (req.payload.find as ReturnType<typeof vi.fn>).mock.calls[0]?.[0];
+    expect(findCall.where).toEqual({
+      or: [{ title: { like: 'kubernetes' } }],
+    });
   });
 
   it('serializes rows as XLSX when format=xlsx', async () => {

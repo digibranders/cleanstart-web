@@ -1,4 +1,5 @@
 import type { CollectionSlug, Endpoint, Where } from 'payload';
+import { mergeListSearchAndWhere } from 'payload/shared';
 import { z } from 'zod';
 
 import { hasAnyRole } from '../../access/typed-user';
@@ -86,7 +87,7 @@ export const buildExportEndpoint = (slug: string, opts: { dateField: string }): 
     const url = new URL(req.url ?? '', 'http://internal');
     const parsed = QuerySchema.safeParse(Object.fromEntries(url.searchParams.entries()));
     if (!parsed.success) return jsonError(400, parsed.error.issues[0]?.message ?? 'invalid query');
-    const { fields, format, from, to, where: whereParam, sort } = parsed.data;
+    const { fields, format, from, to, where: whereParam, search, sort } = parsed.data;
 
     const requestedFields = fields
       .split(',')
@@ -114,7 +115,18 @@ export const buildExportEndpoint = (slug: string, opts: { dateField: string }): 
           ? (dateConditions[0] as Where)
           : { and: dateConditions };
 
-    const where: Where = dateWhere === null ? clientWhere : { and: [clientWhere, dateWhere] };
+    const dateMergedWhere: Where = dateWhere === null ? clientWhere : { and: [clientWhere, dateWhere] };
+
+    // Mirrors the CMS admin list view's own search box: Payload's REST list
+    // route resolves `search` into an `or`/`like` condition over
+    // `admin.listSearchableFields` (falling back to `useAsTitle`, then `id`)
+    // via this same helper, so an export must merge it identically or an
+    // editor exporting a filtered list silently gets every row instead.
+    const collectionConfig = req.payload.collections[slug as CollectionSlug]?.config;
+    const where: Where =
+      search && collectionConfig
+        ? mergeListSearchAndWhere({ collectionConfig, search, where: dateMergedWhere })
+        : dateMergedWhere;
 
     let page = 1;
     let truncated = false;
