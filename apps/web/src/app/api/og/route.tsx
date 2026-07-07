@@ -68,7 +68,21 @@ export async function GET(req: Request): Promise<ImageResponse> {
           <div style={{ display: "flex", flexWrap: "wrap", fontSize: titleSize, fontWeight: 700, lineHeight: 1.07, letterSpacing: "-0.02em", color: "#ffffff", maxWidth: 1010 }}>
             <span>{lead}</span>
             {accentText ? (
-              <span style={{ backgroundImage: ACCENT_GRAD, backgroundClip: "text", color: "transparent" }}>{accentText}</span>
+              <span
+                style={{
+                  backgroundImage: ACCENT_GRAD,
+                  backgroundClip: "text",
+                  color: "transparent",
+                  // `background-clip: text` bounds the gradient paint to the line
+                  // box, so with a tight line-height the descenders of g/y/p get
+                  // clipped. Pad below (offset by an equal negative margin) to
+                  // extend the paint area without shifting surrounding layout.
+                  paddingBottom: "0.2em",
+                  marginBottom: "-0.2em",
+                }}
+              >
+                {accentText}
+              </span>
             ) : null}
           </div>
           {sub ? (
