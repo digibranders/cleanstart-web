@@ -82,6 +82,14 @@ export function wireExportButton(collection: CollectionConfig): CollectionConfig
 
 Added to the `.map()` chain after `wireCustomListView`.
 
+**As shipped, two refinements beyond this sketch:** (1) `EXPORTABLE_COLLECTION_SLUGS`
+lives in the separate `exportable-collections.ts` module described in the
+Admin UI section below, and `wire-export-button.ts` imports/re-exports it;
+(2) the `dateField` inference has one override — `news` has no `publishedAt`
+field (it uses `publicationDate`, see `apps/cms/src/payload/fields/published-at.ts:25-27`),
+so a small `DATE_FIELD_OVERRIDES` map is checked before the
+`publishedAt`-or-`createdAt` fallback.
+
 ### 2. Admin UI
 
 `CmsListView.tsx` already owns a kebab ("...") `DropdownMenu` with a
@@ -90,10 +98,23 @@ is the established pattern for list-view side-panel UI, not a modal
 `Dialog`. The export feature reuses it exactly:
 
 - In `CmsListView.tsx`'s `menuItems` list, add an `"Export…"` item —
-  conditionally, only when
-  `collectionConfig?.custom?.export?.enabled` is true (read from the same
-  `useConfig()` call `CmsListView` already makes; no new hook needed) — that
-  sets a new `exportDrawerOpen` state to `true`.
+  conditionally, only when `isExportableCollection(collectionSlug)` is true.
+  **Correction from an earlier draft of this doc:** the item is *not* gated
+  on `collectionConfig?.custom?.export?.enabled` read via `useConfig()` —
+  Payload strips `custom` (and `endpoints`) from the client-serialized
+  collection config entirely (`serverOnlyCollectionProperties` in
+  `payload/dist/collections/config/client.js`), so that field is never
+  reachable client-side. Instead, `EXPORTABLE_COLLECTION_SLUGS` (the same
+  17-slug allow-list `wireExportButton` uses server-side) lives in its own
+  zero-dependency module, `apps/cms/src/payload/lib/export/exportable-collections.ts`,
+  which exports `isExportableCollection(slug)` and is imported by both the
+  server-side `wire-export-button.ts` and the client-side `CmsListView.tsx`
+  — a shared source of truth safe to cross the client/server boundary,
+  since it's just a static string array with no Payload-server imports.
+  `wire-export-button.ts` still stamps `collection.custom.export = { enabled, dateField }`
+  server-side (useful there — the export endpoint itself can read it), but
+  that value is not what gates the client-side menu item. Selecting the
+  item sets a new `exportDrawerOpen` state to `true`.
 - A second `Drawer` (sibling to the existing column-picker `Drawer`) renders
   `apps/cms/src/payload/admin/components/views/list/ExportDrawer.tsx` when
   `exportDrawerOpen` is true. Contents:
