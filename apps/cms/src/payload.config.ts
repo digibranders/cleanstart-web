@@ -107,6 +107,7 @@ import { wirePreviewControls } from './payload/lib/wire-preview';
 // import { wireAnalyticsTab } from './payload/lib/wire-analytics-tab';
 import { wireCustomFields } from './payload/lib/wire-custom-fields';
 import { wireCustomListView } from './payload/lib/wire-custom-list-view';
+import { wireExportButton } from './payload/lib/wire-export-button';
 import { wirePublishGate } from './payload/lib/wire-publish-gate';
 import { ImpactStats } from './payload/globals/impactStats';
 import { Legal } from './payload/globals/legal';
@@ -418,6 +419,7 @@ export default buildConfig({
     .map(wirePublishGate)
     .map(wirePreviewControls)
     .map(wireCustomListView)
+    .map(wireExportButton)
     // Per-document Analytics tab hidden — re-enable by uncommenting this and its import.
     // .map(wireAnalyticsTab)
     .map(wireCustomFields),

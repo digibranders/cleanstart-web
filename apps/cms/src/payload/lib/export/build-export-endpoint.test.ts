@@ -1,0 +1,137 @@
+import { describe, expect, it, vi } from 'vitest';
+
+import { buildExportEndpoint, EXPORT_HARD_CAP_PAGES, EXPORT_HARD_CAP_ROWS } from './build-export-endpoint';
+
+const makeReq = (overrides: Partial<{
+  url: string;
+  user: { id: number; roles?: string[] } | null;
+  docs: Record<string, unknown>[];
+  find: ReturnType<typeof vi.fn>;
+}>) => {
+  const docs = overrides.docs ?? [];
+  return {
+    url: overrides.url ?? 'http://internal/api/blogs/export?fields=title,slug',
+    user: overrides.user === undefined ? { id: 1, roles: ['admin'] } : overrides.user,
+    payload: {
+      find: overrides.find ?? vi.fn().mockResolvedValue({ docs, hasNextPage: false }),
+      logger: { error: vi.fn() },
+      collections: {
+        blogs: { config: { admin: { useAsTitle: 'title' } } },
+        leads: { config: { admin: { useAsTitle: 'title' } } },
+      },
+    },
+  } as unknown as Parameters<ReturnType<typeof buildExportEndpoint>['handler']>[0];
+};
+
+describe('buildExportEndpoint', () => {
+  it('registers at the single-segment /export path', () => {
+    const endpoint = buildExportEndpoint('blogs', { dateField: 'publishedAt' });
+    expect(endpoint.path).toBe('/export');
+    expect(endpoint.method).toBe('get');
+  });
+
+  it('returns 403 when the requester has no admin/editor role', async () => {
+    const endpoint = buildExportEndpoint('blogs', { dateField: 'publishedAt' });
+    const res = await endpoint.handler(makeReq({ user: { id: 2, roles: ['viewer'] } }));
+    expect(res.status).toBe(403);
+  });
+
+  it('returns 400 when fields is missing', async () => {
+    const endpoint = buildExportEndpoint('blogs', { dateField: 'publishedAt' });
+    const res = await endpoint.handler(
+      makeReq({ url: 'http://internal/api/blogs/export' }),
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it('returns 400 when from is after to', async () => {
+    const endpoint = buildExportEndpoint('blogs', { dateField: 'publishedAt' });
+    const res = await endpoint.handler(
+      makeReq({
+        url: 'http://internal/api/blogs/export?fields=title&from=2026-07-05&to=2026-07-01',
+      }),
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it('drops a denylisted field even when explicitly requested', async () => {
+    const endpoint = buildExportEndpoint('leads', { dateField: 'createdAt' });
+    const req = makeReq({
+      url: 'http://internal/api/leads/export?fields=title,ip,userAgent',
+      docs: [{ id: 1, title: 'x' }],
+    });
+    const res = await endpoint.handler(req);
+    const text = await res.text();
+    expect(text).toContain('title');
+    expect(text).not.toContain('ip');
+    expect(text).not.toContain('userAgent');
+  });
+
+  it('merges the date range into the where clause passed to payload.find', async () => {
+    const endpoint = buildExportEndpoint('blogs', { dateField: 'publishedAt' });
+    const req = makeReq({
+      url: 'http://internal/api/blogs/export?fields=title&from=2026-07-01&to=2026-07-05',
+    });
+    await endpoint.handler(req);
+    const findCall = (req.payload.find as ReturnType<typeof vi.fn>).mock.calls[0]?.[0];
+    expect(findCall.where).toEqual({
+      and: [
+        {},
+        {
+          and: [
+            { publishedAt: { greater_than_equal: '2026-07-01' } },
+            { publishedAt: { less_than_equal: '2026-07-05' } },
+          ],
+        },
+      ],
+    });
+  });
+
+  it('serializes rows as CSV by default', async () => {
+    const endpoint = buildExportEndpoint('blogs', { dateField: 'publishedAt' });
+    const req = makeReq({
+      url: 'http://internal/api/blogs/export?fields=title',
+      docs: [{ id: 1, title: 'Hello' }],
+    });
+    const res = await endpoint.handler(req);
+    expect(res.headers.get('content-type')).toContain('text/csv');
+    const text = await res.text();
+    expect(text).toContain('title');
+    expect(text).toContain('Hello');
+  });
+
+  it('merges the search term into an or/like where clause passed to payload.find', async () => {
+    const endpoint = buildExportEndpoint('blogs', { dateField: 'publishedAt' });
+    const req = makeReq({
+      url: 'http://internal/api/blogs/export?fields=title&search=kubernetes',
+    });
+    await endpoint.handler(req);
+    const findCall = (req.payload.find as ReturnType<typeof vi.fn>).mock.calls[0]?.[0];
+    expect(findCall.where).toEqual({
+      or: [{ title: { like: 'kubernetes' } }],
+    });
+  });
+
+  it('serializes rows as XLSX when format=xlsx', async () => {
+    const endpoint = buildExportEndpoint('blogs', { dateField: 'publishedAt' });
+    const req = makeReq({
+      url: 'http://internal/api/blogs/export?fields=title&format=xlsx',
+      docs: [{ id: 1, title: 'Hello' }],
+    });
+    const res = await endpoint.handler(req);
+    expect(res.headers.get('content-type')).toContain('spreadsheetml');
+  });
+
+  it('stops paginating at the hard cap and appends a truncation row when hasNextPage never turns false', async () => {
+    const endpoint = buildExportEndpoint('blogs', { dateField: 'publishedAt' });
+    const find = vi.fn().mockResolvedValue({ docs: [{ id: 1, title: 'Hello' }], hasNextPage: true });
+    const req = makeReq({
+      url: 'http://internal/api/blogs/export?fields=title',
+      find,
+    });
+    const res = await endpoint.handler(req);
+    expect(find).toHaveBeenCalledTimes(EXPORT_HARD_CAP_PAGES);
+    const text = await res.text();
+    expect(text).toContain(`truncated at ${EXPORT_HARD_CAP_ROWS} rows`);
+  });
+});
