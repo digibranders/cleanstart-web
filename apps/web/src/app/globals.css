@@ -2466,18 +2466,15 @@ body {
    accent drives the ring colour through its per-card --accent custom prop.
    ─────────────────────────────────────────────────────────────────────────── */
 
-/* Hover lift — every stage card rises gently and brightens its border.
+/* Hover — every stage card brightens its border.
    Border colour comes through --wf-border (set inline per card) so the
    hover rule can override it. */
 .wf-card {
   border-color: var(--wf-border, rgba(255, 255, 255, 0.08));
-  transition:
-    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.4s ease;
+  transition: border-color 0.4s ease;
 }
 
 .wf-card:hover {
-  transform: translateY(-6px);
   border-color: color-mix(in srgb, var(--accent) 55%, transparent);
 }
 
@@ -2783,10 +2780,6 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .wf-card {
     transition: none;
-  }
-
-  .wf-card:hover {
-    transform: none;
   }
 
   .wf-card,

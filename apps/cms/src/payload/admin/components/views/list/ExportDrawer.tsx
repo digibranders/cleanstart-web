@@ -7,6 +7,8 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { EXPORT_FIELD_DENYLIST } from '../../../../lib/export/serialize-field';
 
+import { DATE_PRESET_OPTIONS, type DatePreset, computePresetRange } from './export-date-preset';
+
 type ExportableField = { name: string; label: string };
 
 type Props = {
@@ -26,6 +28,23 @@ const fieldLabel = (f: { label?: unknown; name?: string }): string => {
   }
   return f.name ?? '';
 };
+
+/** Generic "always useful" field names — checked against whatever fields
+ * actually exist on the current collection, never hardcoded per collection.
+ * E.g. `news`'s `publicationDate` is preselected purely because it's in
+ * this list and happens to exist on that collection's field set. */
+const ALWAYS_USEFUL_FIELD_NAMES: readonly string[] = [
+  'title',
+  'name',
+  'slug',
+  'status',
+  '_status',
+  'createdAt',
+  'updatedAt',
+  'publishedAt',
+  'publicationDate',
+  'effectiveDate',
+];
 
 /**
  * The "Export…" kebab-menu drawer. Mirrors `ColumnPicker.tsx`'s shape
@@ -70,18 +89,46 @@ export const ExportDrawer = (props: Props): ReactElement => {
   useEffect(() => {
     if (!open) return;
     const displayedFieldNames = new Set(columns.filter((c) => c.active).map((c) => c.accessor));
-    const displayed = exportableFields.filter((f) => displayedFieldNames.has(f.name));
+    const union = new Set<string>();
+    for (const f of exportableFields) {
+      if (displayedFieldNames.has(f.name) || ALWAYS_USEFUL_FIELD_NAMES.includes(f.name)) {
+        union.add(f.name);
+      }
+    }
+    const displayed = exportableFields.filter((f) => union.has(f.name));
     // Fall back to the first 5 exportable fields only if none of the
-    // displayed table columns map onto an exportable field name (e.g. every
-    // visible column is a nested/computed accessor) — the picker should
-    // never open with zero columns checked.
+    // displayed table columns or "always useful" names map onto an
+    // exportable field (e.g. every visible column is a nested/computed
+    // accessor) — the picker should never open with zero columns checked.
     const initial = displayed.length > 0 ? displayed : exportableFields.slice(0, 5);
     setSelectedFields(new Set(initial.map((f) => f.name)));
   }, [open]);
 
   const [from, setFrom] = useState<string | null>(null);
   const [to, setTo] = useState<string | null>(null);
+  const [datePreset, setDatePreset] = useState<DatePreset>('allTime');
   const [format, setFormat] = useState<'csv' | 'xlsx'>('csv');
+
+  const onPresetChange = (preset: DatePreset): void => {
+    setDatePreset(preset);
+    if (preset === 'custom') return;
+    const range = computePresetRange(preset);
+    setFrom(range.from);
+    setTo(range.to);
+  };
+
+  // Manually editing either picker (not via the preset dropdown) means the
+  // two controls would otherwise silently disagree — flip back to "Custom
+  // range" so the dropdown always reflects what's actually selected.
+  const onFromChange = (next: string | null): void => {
+    setFrom(next);
+    setDatePreset('custom');
+  };
+
+  const onToChange = (next: string | null): void => {
+    setTo(next);
+    setDatePreset('custom');
+  };
 
   const toggleField = (name: string): void => {
     setSelectedFields((prev) => {
@@ -109,8 +156,20 @@ export const ExportDrawer = (props: Props): ReactElement => {
     <div className="cs-export-drawer">
       <fieldset className="cs-export-drawer__section">
         <legend>Date range</legend>
-        <DateTimePicker value={from} onChange={setFrom} mode="date" ariaLabel="From date" />
-        <DateTimePicker value={to} onChange={setTo} mode="date" ariaLabel="To date" />
+        <select
+          className="cs-native-select"
+          value={datePreset}
+          onChange={(e) => onPresetChange(e.target.value as DatePreset)}
+          aria-label="Date range preset"
+        >
+          {DATE_PRESET_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        <DateTimePicker value={from} onChange={onFromChange} mode="date" ariaLabel="From date" />
+        <DateTimePicker value={to} onChange={onToChange} mode="date" ariaLabel="To date" />
       </fieldset>
 
       <fieldset className="cs-export-drawer__section">

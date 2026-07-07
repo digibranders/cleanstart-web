@@ -386,7 +386,7 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
             onClose={() => setExportDrawerOpen(false)}
             ariaLabel="Export"
             side="right"
-            size="sm"
+            size="lg"
           >
             <DrawerHeader
               title="Export"

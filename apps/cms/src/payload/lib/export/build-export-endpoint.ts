@@ -106,7 +106,22 @@ export const buildExportEndpoint = (slug: string, opts: { dateField: string }): 
 
     const dateConditions: Where[] = [];
     if (from) dateConditions.push({ [opts.dateField]: { greater_than_equal: from } } as Where);
-    if (to) dateConditions.push({ [opts.dateField]: { less_than_equal: to } } as Where);
+    if (to) {
+      // Treat ?to=2026-07-05 as "include the full day" — a date-only string
+      // is what the UI date picker (and upcoming range presets) produce,
+      // and Postgres interprets `less_than_equal` on it as midnight, which
+      // silently excludes every row from later that same day. Mirrors
+      // `export-leads-csv.ts`'s `until` handling: a 10-char YYYY-MM-DD
+      // becomes a strict less-than the next day at 00:00 UTC; a
+      // time-aware ISO string passes through unchanged.
+      const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(to);
+      if (isDateOnly) {
+        const next = new Date(`${to}T00:00:00Z`).getTime() + 24 * 60 * 60 * 1000;
+        dateConditions.push({ [opts.dateField]: { less_than: new Date(next).toISOString() } } as Where);
+      } else {
+        dateConditions.push({ [opts.dateField]: { less_than_equal: to } } as Where);
+      }
+    }
 
     const dateWhere: Where | null =
       dateConditions.length === 0
