@@ -42,7 +42,6 @@ const ROUTES = [
   "/news",
   "/resource-center",
   "/for-ciso",
-  "/software-composition-analysis",
   "/teams",
 ] as const;
 
