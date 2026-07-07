@@ -68,7 +68,7 @@ page slugs, categories, types, and build status across the dev journey.
 | 5 | Vulnerability Remediation | `/vulnerability-remediation` | Static | ✅ | All 7 sections built |
 | 9 | For CISO | `/for-ciso` | Static | ✅ | All 8 sections built (farheen integration 2026-05-20) |
 | 10 | For Developers | `/for-developers` | Static | ✅ | Route at `src/app/for-developers/`. Linked from the homepage AudienceTabs and the nav (`nav-config.ts`). |
-| 3 | Enhance SCA | `/software-composition-analysis` | Static | ✅ (de-listed) | All 7 sections built (farheen integration 2026-05-20). **Page kept but intentionally de-listed** — excluded from the sitemap (`sitemap.ts:93` comment) and absent from nav-config per product decision. Reachable by direct URL only. |
+| 3 | Enhance SCA | `/software-composition-analysis` | Static | ❌ removed | **Deleted 2026-07-07** — page, `sca` section components, and image assets fully removed (was orphaned: `index,follow` but absent from nav/sitemap, so Google kept surfacing an unlinked page). Route now 301s to `/guide/software-composition-analysis` via the `redirects` collection (see `post-launch-redirects-seed.ts`). |
 
 ---
 
