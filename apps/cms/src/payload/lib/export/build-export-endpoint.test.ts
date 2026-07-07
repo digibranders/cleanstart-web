@@ -80,7 +80,27 @@ describe('buildExportEndpoint', () => {
         {
           and: [
             { publishedAt: { greater_than_equal: '2026-07-01' } },
-            { publishedAt: { less_than_equal: '2026-07-05' } },
+            { publishedAt: { less_than: '2026-07-06T00:00:00.000Z' } },
+          ],
+        },
+      ],
+    });
+  });
+
+  it('passes a time-aware ISO "to" value through unchanged (no next-day boundary shift)', async () => {
+    const endpoint = buildExportEndpoint('blogs', { dateField: 'publishedAt' });
+    const req = makeReq({
+      url: 'http://internal/api/blogs/export?fields=title&from=2026-07-01&to=2026-07-05T18:30:00.000Z',
+    });
+    await endpoint.handler(req);
+    const findCall = (req.payload.find as ReturnType<typeof vi.fn>).mock.calls[0]?.[0];
+    expect(findCall.where).toEqual({
+      and: [
+        {},
+        {
+          and: [
+            { publishedAt: { greater_than_equal: '2026-07-01' } },
+            { publishedAt: { less_than_equal: '2026-07-05T18:30:00.000Z' } },
           ],
         },
       ],
