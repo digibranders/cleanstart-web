@@ -264,9 +264,120 @@ unaffected.
   (`blogs`), pick a date range + 2 fields, export CSV, then XLSX; assert the
   download fires with the right filename and content-type for each.
 
-## Out of scope
+## Addendum: SEO field fix, Schema Types column, curated Blogs defaults
 
-- Background/async export jobs — not needed at current data volumes (all
-  collections are tens-to-low-hundreds of rows per the codebase survey).
-- Export scheduling / recurring exports.
-- Import (the reverse direction).
+Prompted by a user-provided screenshot of desired default columns plus a
+reference SEO-crawl-tool CSV. Two real gaps found during investigation,
+both fixed here.
+
+### 1. Several picker checkboxes silently exported blank
+
+`seoTitle`, `seoDescription`, `seoIndexable`, `canonicalUrl`, and
+`socialCard` (all defined in `apps/cms/src/payload/fields/seo.ts` via
+`seoSidebarFields`) are Payload `type: 'ui'` fields — pure admin-sidebar
+display widgets with no stored data of their own. The *actual* SEO data
+lives in a separate hidden `type: 'group'` field named `seo`
+(`seoFieldHidden`, `apps/cms/src/payload/fields/seo.ts:537`), with
+sub-fields `seo.title`, `seo.description`, `seo.indexable`,
+`seo.ogImage`, `seo.ogImageAlt`, `seo.canonicalOverride`, etc. Any `ui`
+field selected in the export picker returns `undefined` (Payload never
+populates `ui` fields into `doc`), so these five checkboxes always
+produced empty cells.
+
+**Fix, two parts:**
+
+- **Field-picker filtering** (`ExportDrawer.tsx`): exclude every
+  `type === 'ui'` field from `exportableFields` *except* a small
+  redirect allow-list (`seoTitle`, `seoDescription`, `seoIndexable`,
+  `canonicalUrl`, `socialCard` — see below). Everything else `ui`-typed
+  (`serpPreview`, `schemaPreview`, `seoHealthScore`, `seoAdvanced`) is
+  dropped from the picker entirely — each is a composite renderer with no
+  single clean data source, so there's nothing meaningful to export.
+- **Virtual field-path redirection** (new
+  `apps/cms/src/payload/lib/export/virtual-fields.ts`,
+  `VIRTUAL_FIELD_SOURCE_PATH: Record<string,string>`): the five
+  allow-listed names keep their existing visible label/column-header, but
+  the endpoint reads their value from the real nested path instead of the
+  (nonexistent) flat name:
+  - `seoTitle` → `seo.title`
+  - `seoDescription` → `seo.description`
+  - `seoIndexable` → `seo.indexable`
+  - `canonicalUrl` → `seo.canonicalOverride`
+  - `socialCard` → `seo.ogImage` (a media relationship — serializes via
+    the existing relationship branch of `serialize-field.ts`)
+  `build-export-endpoint.ts` resolves each requested field name through
+  this map (dot-path lookup, falling through unchanged for every
+  ordinary top-level field name) before calling `serializeFieldValue`.
+
+### 2. New synthetic "Schema Types" column
+
+Not a real Payload field — a computed value showing the distinct
+schema.org `@type`s a document would produce, e.g. `"Article, HowTo"`.
+
+Reuses the CMS's own existing, tested JSON-LD builder rather than
+re-deriving type logic: `buildJsonLdBlobs(ctx, collectionSlug, doc)`
+(`apps/cms/src/payload/lib/jsonld/dispatch.ts:661`) already returns the
+ordered Layer-1 (base type) + Layer-2 (`schemaAddons[]` block) blob list
+for a document, each blob carrying a real `@type`. New
+`apps/cms/src/payload/lib/export/schema-types.ts`:
+
+- `isSchemaEmittableCollection(slug)` — true only for the 10 collections
+  `buildJsonLdBlobs` actually supports (mirrors
+  `apps/cms/src/payload/endpoints/jsonld.ts`'s `SUPPORTED_COLLECTIONS`):
+  `blogs, news, guides, knowledgeBase, authors, events, webinars, jobs,
+  pages, resources`. For the other 7 exportable collections (no schema
+  type at all — `case-studies`, `podcastEpisodes` have no detail route
+  yet; `aboutGalleries`, `forms`, `deal-registrations`,
+  `career-applications`, `legalDocuments` aren't schema-emitting), the
+  column is simply blank — not hidden, for a consistent picker across all
+  17 collections.
+- `buildExportJsonLdContext(payload)` — fetches the two globals
+  (`siteSettings`, `seoDefaults`) `buildJsonLdContext` needs, mirroring
+  exactly how `jsonld.ts`'s existing endpoint constructs it. Called once
+  per export request (not per row) only when `__schemaTypes` is among the
+  requested fields.
+- `computeSchemaTypesLabel(ctx, slug, doc)` — calls `buildJsonLdBlobs`,
+  maps the blob list to `@type`, dedupes, joins with `", "`. Wrapped in
+  try/catch → `''` on any error (a malformed/partially-populated doc must
+  never fail the whole export, just leave that one cell blank).
+
+`build-export-endpoint.ts` requests `depth: 2` (not the usual `depth: 1`)
+only when `__schemaTypes` is requested — `buildJsonLdBlobs`'s read-helpers
+(hero image, authors, categories) expect populated relationship objects,
+matching the depth the existing single-doc `jsonld.ts` endpoint already
+uses. The field is offered in `ExportDrawer.tsx`'s picker as a synthetic
+entry `{ name: '__schemaTypes', label: 'Schema Types' }`, unconditionally
+appended (not per-collection-conditional client-side, consistent with the
+picker's existing "derive from config, don't special-case per collection"
+approach — server-side blank-for-unsupported-collections handles the
+rest).
+
+### 3. Curated default columns (Blogs)
+
+Per an explicit user decision, default column preselection moves from a
+purely generic heuristic to **curated per-collection lists where defined,
+falling back to the existing generic heuristic (displayed columns ∪
+always-useful names ∪ first-5) for any collection without a curated
+list.** New `apps/cms/src/payload/admin/components/views/list/export-default-columns.ts`
+(client-safe, no server imports — same constraint as
+`export-date-preset.ts`):
+
+```ts
+export const CURATED_DEFAULT_COLUMNS: Readonly<Record<string, readonly string[]>> = {
+  blogs: [
+    'title', 'slug', 'abstract', 'heroImage', 'authors', 'reviewedBy',
+    'categories', '__schemaTypes', 'publishedAt', 'seoTitle',
+    'seoDescription', 'seoIndexable', 'canonicalUrl', 'socialCard',
+    'wordCount', 'updatedAt', 'createdAt', '_status',
+  ],
+}
+```
+
+Only Blogs is curated for now — the other 16 collections keep the
+generic heuristic. Adding a curated list for another collection later is
+a one-entry addition to this map, not a new mechanism. `ExportDrawer.tsx`'s
+open-transition `useEffect` checks `CURATED_DEFAULT_COLUMNS[collectionSlug]`
+first (intersected with that collection's actual `exportableFields` names,
+so a stale/renamed entry never selects a checkbox that doesn't exist),
+then falls through to the existing displayed-columns/always-useful/first-5
+logic only when no curated list exists for that slug.
