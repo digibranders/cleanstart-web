@@ -5,7 +5,11 @@ import { z } from 'zod';
 import { hasAnyRole } from '../../access/typed-user';
 import { toCsv } from '../csv';
 import { toXlsx } from '../xlsx';
+import { buildExportJsonLdContext, computeSchemaTypesLabel } from './schema-types';
 import { isExportableFieldName, serializeFieldValue } from './serialize-field';
+import { getByPath, resolveVirtualFieldPath } from './virtual-fields';
+
+const SCHEMA_TYPES_FIELD = '__schemaTypes';
 
 export const EXPORT_PAGE_SIZE = 200;
 export const EXPORT_HARD_CAP_PAGES = 100;
@@ -143,6 +147,13 @@ export const buildExportEndpoint = (slug: string, opts: { dateField: string }): 
         ? mergeListSearchAndWhere({ collectionConfig, search, where: dateMergedWhere })
         : dateMergedWhere;
 
+    // Only pay for the two `findGlobal` calls (and the deeper relationship
+    // population below) when the synthesized Schema Types column was
+    // actually requested — the common export has no reason to touch
+    // JSON-LD context at all.
+    const needsSchemaTypes = requestedFields.includes(SCHEMA_TYPES_FIELD);
+    const jsonLdCtx = needsSchemaTypes ? await buildExportJsonLdContext(req.payload) : null;
+
     let page = 1;
     let truncated = false;
     const rows: Record<string, unknown>[] = [];
@@ -157,14 +168,28 @@ export const buildExportEndpoint = (slug: string, opts: { dateField: string }): 
         sort: sort ?? '-createdAt',
         limit: EXPORT_PAGE_SIZE,
         page,
-        depth: 1,
+        // `buildJsonLdBlobs`'s read-helpers (hero image, authors,
+        // categories) expect populated relationship objects, matching the
+        // depth the single-doc `jsonld.ts` endpoint already uses — bump
+        // only when Schema Types was requested; ordinary exports keep the
+        // shallower, cheaper depth: 1.
+        depth: needsSchemaTypes ? 2 : 1,
         overrideAccess: true,
       });
       const docs = result.docs as unknown as Record<string, unknown>[];
       for (const doc of docs) {
         const flat: Record<string, unknown> = {};
         for (const field of requestedFields) {
-          const raw = doc[field];
+          if (field === SCHEMA_TYPES_FIELD) {
+            // Reached only when needsSchemaTypes is true, so jsonLdCtx was
+            // built above — non-null by construction.
+            if (jsonLdCtx == null) {
+              throw new Error('invariant: jsonLdCtx must be built when __schemaTypes is requested');
+            }
+            flat[field] = computeSchemaTypesLabel(jsonLdCtx, slug, doc);
+            continue;
+          }
+          const raw = getByPath(doc, resolveVirtualFieldPath(field));
           flat[field] = serializeFieldValue(inferFieldType(raw), raw);
         }
         rows.push(flat);
