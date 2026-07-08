@@ -87,7 +87,7 @@ export function DetailHero({
         />
 
         <div className="flex justify-center mt-10">
-          <HeroReveal y={50} duration={1.0}>
+          <HeroReveal y={50} duration={1.0} lcp>
             <TitleTag
               id={titleId}
               className="font-display font-semibold text-white text-center"

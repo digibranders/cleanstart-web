@@ -128,12 +128,20 @@ export function Reveal({
  *
  * `prefers-reduced-motion` is honoured by the CSS rule (animation disabled).
  * Offset/timing map to the `--cs-hr-*` CSS variables.
+ *
+ * Pass `lcp` when this reveal wraps the page's Largest Contentful Paint element
+ * (the hero H1). The `lcp` variant animates **transform only** — the title
+ * paints at full opacity on the first frame instead of fading up from
+ * `opacity:0`. Chrome excludes `opacity:0` nodes from LCP candidacy, so a fade
+ * on the title delays LCP; a composited transform slide does not, and keeps CLS
+ * at 0. Use it only on the title reveal — sub-headings and CTAs still fade in.
  */
 interface HeroRevealProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
   children: ReactNode;
   y?: number;
   delay?: number;
   duration?: number;
+  lcp?: boolean;
 }
 
 export function HeroReveal({
@@ -141,13 +149,15 @@ export function HeroReveal({
   y = 40,
   delay = 0,
   duration = 0.9,
+  lcp = false,
   className,
   style,
   ...rest
 }: HeroRevealProps) {
+  const base = lcp ? "cs-hero-reveal-lcp" : "cs-hero-reveal";
   return (
     <div
-      className={className ? `cs-hero-reveal ${className}` : "cs-hero-reveal"}
+      className={className ? `${base} ${className}` : base}
       style={
         {
           "--cs-hr-y": `${y}px`,
