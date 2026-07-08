@@ -36,6 +36,35 @@ describe('serializeFieldValue', () => {
     expect(serializeFieldValue('relationship', 5)).toBe('5');
   });
 
+  it('renders a populated upload (media) doc as its absolute url, not the id', () => {
+    expect(
+      serializeFieldValue('upload', {
+        id: 367,
+        filename: 'sbom-101-hero-abc123.webp',
+        url: 'https://cdn.cleanstart.com/web/general/sbom-101-hero-abc123.webp',
+      }),
+    ).toBe('https://cdn.cleanstart.com/web/general/sbom-101-hero-abc123.webp');
+  });
+
+  it('falls back to filename when an upload doc has no url', () => {
+    expect(serializeFieldValue('upload', { id: 367, filename: 'sbom-101-hero.webp' })).toBe(
+      'sbom-101-hero.webp',
+    );
+  });
+
+  it('falls back to the id for an upload doc with neither url nor filename', () => {
+    expect(serializeFieldValue('upload', { id: 367 })).toBe('367');
+  });
+
+  it('renders an array of populated uploads (hasMany) as urls joined by "; "', () => {
+    expect(
+      serializeFieldValue('relationship', [
+        { id: 1, url: 'https://cdn.cleanstart.com/g/a.webp' },
+        { id: 2, url: 'https://cdn.cleanstart.com/g/b.webp' },
+      ]),
+    ).toBe('https://cdn.cleanstart.com/g/a.webp; https://cdn.cleanstart.com/g/b.webp');
+  });
+
   it('renders an array of populated relationships joined by "; "', () => {
     expect(
       serializeFieldValue('relationship', [
