@@ -27,12 +27,23 @@ type RelatedDocShape = {
   title?: unknown;
   name?: unknown;
   slug?: unknown;
+  url?: unknown;
+  filename?: unknown;
 };
 
 const relatedDocLabel = (doc: RelatedDocShape): string => {
   if (typeof doc.title === 'string') return doc.title;
   if (typeof doc.name === 'string') return doc.name;
   if (typeof doc.slug === 'string') return doc.slug;
+  // Upload/media docs (`heroImage`, `seo.ogImage`, `resources.asset`, …)
+  // have no title/name/slug. Prefer the absolute R2 `url`
+  // (`${R2_PUBLIC_BASE}/${prefix}/${filename}`, the same field the JSON-LD
+  // engine reads — see lib/jsonld/shared.ts) so the export cell is a
+  // usable image/asset link, falling back to the bare `filename`, then the
+  // id. Without this a populated media relationship fell through to the
+  // raw numeric id, so the cell read `367` instead of the image URL.
+  if (typeof doc.url === 'string') return doc.url;
+  if (typeof doc.filename === 'string') return doc.filename;
   return doc.id != null ? String(doc.id) : '';
 };
 

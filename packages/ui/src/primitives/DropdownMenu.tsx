@@ -39,16 +39,26 @@ type Props = {
 export const DropdownMenu = (props: Props): ReactElement | null => {
   const { open, onClose, anchorRef, items, placement = 'bottom-start', ariaLabel } = props;
   const floatingRef = useRef<HTMLDivElement | null>(null);
-  // Portal to <body> so `position: fixed` is computed against the
-  // viewport's initial containing block, not whatever ancestor
-  // happens to establish one (e.g. an element with `backdrop-filter`,
-  // `transform`, `filter`, `contain: paint`, or `will-change` —
-  // any of which silently break fixed positioning per CSS spec).
+  // Portal target, resolved when the menu opens. Default is <body> so
+  // `position: fixed` is computed against the viewport's initial
+  // containing block, not whatever ancestor happens to establish one
+  // (e.g. an element with `backdrop-filter`, `transform`, `filter`,
+  // `contain: paint`, or `will-change` — any of which silently break
+  // fixed positioning per CSS spec). But when the anchor lives inside a
+  // native modal <dialog> (opened via `showModal()`, e.g. our Drawer),
+  // that dialog is promoted to the browser top layer and paints above
+  // everything portaled to <body> — a <body> portal would render the
+  // menu behind the dialog's backdrop, invisible. Portaling into the
+  // dialog instead joins it in the top layer; fixed positioning there is
+  // still relative to the viewport, so the anchored coordinates hold.
   // SSR-safe: the portal node is only resolved after mount.
   const [portalNode, setPortalNode] = useState<HTMLElement | null>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-resolve on the open transition — the anchor may only be inside its dialog once opened
   useEffect(() => {
-    setPortalNode(typeof document !== 'undefined' ? document.body : null);
-  }, []);
+    if (typeof document === 'undefined') return;
+    const dialog = anchorRef.current?.closest('dialog') ?? null;
+    setPortalNode(dialog ?? document.body);
+  }, [open, anchorRef]);
 
   const pos = useAnchoredPosition({
     anchorRef,
