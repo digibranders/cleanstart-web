@@ -168,7 +168,7 @@ export function AboutGlobalPresence() {
                   style={{
                     fontSize: "12px",
                     fontWeight: 400,
-                    color: "rgba(255,255,255,0.45)",
+                    color: "rgba(255,255,255,0.6)",
                     fontFamily: "var(--font-sans)",
                     lineHeight: 1.4,
                     paddingLeft: "16px",
