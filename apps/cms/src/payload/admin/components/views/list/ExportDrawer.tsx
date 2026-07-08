@@ -1,9 +1,9 @@
 'use client';
 
-import { DateTimePicker } from '@cleanstart/ui';
+import { DateTimePicker, DropdownMenu, type DropdownMenuItem } from '@cleanstart/ui';
 import { useConfig, useListQuery, useTableColumns } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { EXPORT_FIELD_DENYLIST } from '../../../../lib/export/serialize-field';
 
@@ -108,6 +108,8 @@ export const ExportDrawer = (props: Props): ReactElement => {
   const [to, setTo] = useState<string | null>(null);
   const [datePreset, setDatePreset] = useState<DatePreset>('allTime');
   const [format, setFormat] = useState<'csv' | 'xlsx'>('csv');
+  const datePresetTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const [datePresetMenuOpen, setDatePresetMenuOpen] = useState(false);
 
   const onPresetChange = (preset: DatePreset): void => {
     setDatePreset(preset);
@@ -129,6 +131,16 @@ export const ExportDrawer = (props: Props): ReactElement => {
     setTo(next);
     setDatePreset('custom');
   };
+
+  const datePresetLabel =
+    DATE_PRESET_OPTIONS.find((opt) => opt.value === datePreset)?.label ?? 'All time';
+
+  const datePresetMenuItems: DropdownMenuItem[] = DATE_PRESET_OPTIONS.map((opt) => ({
+    kind: 'item',
+    id: opt.value,
+    label: opt.label,
+    onSelect: () => onPresetChange(opt.value),
+  }));
 
   const toggleField = (name: string): void => {
     setSelectedFields((prev) => {
@@ -156,18 +168,23 @@ export const ExportDrawer = (props: Props): ReactElement => {
     <div className="cs-export-drawer">
       <fieldset className="cs-export-drawer__section">
         <legend>Date range</legend>
-        <select
-          className="cs-native-select"
-          value={datePreset}
-          onChange={(e) => onPresetChange(e.target.value as DatePreset)}
-          aria-label="Date range preset"
+        <button
+          ref={datePresetTriggerRef}
+          type="button"
+          className="cs-btn cs-btn--subtle"
+          onClick={() => setDatePresetMenuOpen((o) => !o)}
+          aria-haspopup="menu"
+          aria-expanded={datePresetMenuOpen}
         >
-          {DATE_PRESET_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+          {datePresetLabel}
+        </button>
+        <DropdownMenu
+          open={datePresetMenuOpen}
+          onClose={() => setDatePresetMenuOpen(false)}
+          anchorRef={datePresetTriggerRef}
+          items={datePresetMenuItems}
+          ariaLabel="Date range preset"
+        />
         <DateTimePicker value={from} onChange={onFromChange} mode="date" ariaLabel="From date" />
         <DateTimePicker value={to} onChange={onToChange} mode="date" ariaLabel="To date" />
       </fieldset>
