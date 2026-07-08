@@ -118,16 +118,23 @@ is the established pattern for list-view side-panel UI, not a modal
 - A second `Drawer` (sibling to the existing column-picker `Drawer`) renders
   `apps/cms/src/payload/admin/components/views/list/ExportDrawer.tsx` when
   `exportDrawerOpen` is true. Contents:
-  - Date range: a preset `<select>` (`All time` (default) / `Today` /
+  - Date range: a preset picker (`All time` (default) / `Today` /
     `Last 7 days` / `Last 30 days` / `This month` / `Last month` /
     `Custom range`) above the two `DateTimePicker` fields (from/to).
-    Picking a non-custom preset computes local-calendar `YYYY-MM-DD`
-    strings (matching `DateTimePicker`'s own `mode="date"` storage format,
-    per `packages/ui/src/primitives/DateTimePicker.tsx`'s `formatStorage`)
-    and fills both pickers; manually editing either picker afterward
-    flips the preset back to `Custom range` (so the two controls never
-    silently disagree). `All time` clears both to `null` (unbounded,
-    today's default/only behavior before this addendum).
+    **Rendered as a trigger button + `@cleanstart/ui`'s `DropdownMenu`**
+    (the same anchored, portal-rendered, dark-themed popup that already
+    powers the kebab menu and `SavedViews.tsx`'s "Views" trigger) —
+    **not a native `<select>`.** A native select's trigger box can be
+    styled with `cs-native-select`, but its *popup list* is rendered by
+    the OS/browser and cannot be restyled via CSS, so it visibly breaks
+    the CMS's dark theme; `DropdownMenu` avoids that entirely since it's
+    a real DOM popup. Picking a non-custom preset computes local-calendar
+    `YYYY-MM-DD` strings (matching `DateTimePicker`'s own `mode="date"`
+    storage format, per `packages/ui/src/primitives/DateTimePicker.tsx`'s
+    `formatStorage`) and fills both pickers; manually editing either
+    picker afterward flips the preset back to `Custom range` (so the two
+    controls never silently disagree). `All time` clears both to `null`
+    (unbounded, today's default/only behavior before this addendum).
   - Field picker: checklist built from the collection's field list
     (`useConfig()` — sanitized client config already includes field
     name/label/type, no per-collection hardcoding). Relationship, richText,
