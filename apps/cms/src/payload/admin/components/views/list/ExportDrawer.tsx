@@ -7,9 +7,30 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { EXPORT_FIELD_DENYLIST } from '../../../../lib/export/serialize-field';
 
+import { resolveCuratedDefaultColumns } from './export-default-columns';
 import { DATE_PRESET_OPTIONS, type DatePreset, computePresetRange } from './export-date-preset';
 
 type ExportableField = { name: string; label: string };
+
+/** Synthetic, server-computed column — not a real Payload field, so it's
+ * appended unconditionally rather than derived from `collection.fields`.
+ * See `apps/cms/src/payload/lib/export/schema-types.ts`. */
+const SCHEMA_TYPES_FIELD: ExportableField = { name: '__schemaTypes', label: 'Schema Types' };
+
+/** `type: 'ui'` fields are pure admin-panel display widgets with no stored
+ * data — Payload never populates them into `doc`, so offering them in the
+ * export picker produces blank cells. These five are the exception: their
+ * visible name/label stays, but the endpoint redirects them to the real
+ * nested `seo.*` storage path (`lib/export/virtual-fields.ts`). Every other
+ * `ui` field (`serpPreview`, `schemaPreview`, `seoHealthScore`,
+ * `seoAdvanced`, ...) is dropped from the picker entirely. */
+const UI_FIELD_REDIRECT_ALLOWLIST: ReadonlySet<string> = new Set([
+  'seoTitle',
+  'seoDescription',
+  'seoIndexable',
+  'canonicalUrl',
+  'socialCard',
+]);
 
 type Props = {
   readonly collectionSlug: string;
@@ -74,10 +95,12 @@ export const ExportDrawer = (props: Props): ReactElement => {
 
   const exportableFields: ExportableField[] = useMemo(() => {
     const fields = collection?.fields ?? [];
-    return fields
+    const real = fields
       .filter((f): f is typeof f & { name: string } => 'name' in f && typeof f.name === 'string')
       .filter((f) => !EXPORT_FIELD_DENYLIST.includes(f.name))
+      .filter((f) => f.type !== 'ui' || UI_FIELD_REDIRECT_ALLOWLIST.has(f.name))
       .map((f) => ({ name: f.name, label: fieldLabel(f) }));
+    return [...real, SCHEMA_TYPES_FIELD];
   }, [collection]);
 
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
@@ -88,20 +111,34 @@ export const ExportDrawer = (props: Props): ReactElement => {
   // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally omits exportableFields/columns; reset must fire only on the `open` transition
   useEffect(() => {
     if (!open) return;
-    const displayedFieldNames = new Set(columns.filter((c) => c.active).map((c) => c.accessor));
-    const union = new Set<string>();
-    for (const f of exportableFields) {
-      if (displayedFieldNames.has(f.name) || ALWAYS_USEFUL_FIELD_NAMES.includes(f.name)) {
-        union.add(f.name);
+    const exportableNames = new Set(exportableFields.map((f) => f.name));
+
+    // Curated per-collection defaults take precedence when defined,
+    // intersected with the fields actually present so a stale/renamed
+    // curated entry never tries to select a nonexistent checkbox.
+    const curatedPreselect = resolveCuratedDefaultColumns(collectionSlug, exportableNames);
+
+    let initialNames: string[];
+    if (curatedPreselect && curatedPreselect.length > 0) {
+      initialNames = curatedPreselect;
+    } else {
+      const displayedFieldNames = new Set(columns.filter((c) => c.active).map((c) => c.accessor));
+      const union = new Set<string>();
+      for (const f of exportableFields) {
+        if (displayedFieldNames.has(f.name) || ALWAYS_USEFUL_FIELD_NAMES.includes(f.name)) {
+          union.add(f.name);
+        }
       }
+      initialNames = exportableFields.filter((f) => union.has(f.name)).map((f) => f.name);
     }
-    const displayed = exportableFields.filter((f) => union.has(f.name));
-    // Fall back to the first 5 exportable fields only if none of the
-    // displayed table columns or "always useful" names map onto an
-    // exportable field (e.g. every visible column is a nested/computed
-    // accessor) — the picker should never open with zero columns checked.
-    const initial = displayed.length > 0 ? displayed : exportableFields.slice(0, 5);
-    setSelectedFields(new Set(initial.map((f) => f.name)));
+
+    // Fall back to the first 5 exportable fields only if neither the
+    // curated list nor the generic heuristic produced anything — the
+    // picker should never open with zero columns checked.
+    if (initialNames.length === 0) {
+      initialNames = exportableFields.slice(0, 5).map((f) => f.name);
+    }
+    setSelectedFields(new Set(initialNames));
   }, [open]);
 
   const [from, setFrom] = useState<string | null>(null);
