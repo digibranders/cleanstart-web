@@ -1460,6 +1460,31 @@ body {
   }
 }
 
+/* LCP-safe hero entrance (HeroReveal `lcp`). Transform-only: no opacity fade,
+   so the hero H1 — the Largest Contentful Paint element on detail pages —
+   paints at full opacity on the first frame. Chrome excludes opacity:0 nodes
+   from LCP candidacy, so fading the title in defers LCP; a composited transform
+   slide does not, and (being transform-only) keeps CLS at 0. */
+@keyframes cs-hero-reveal-lcp {
+  from {
+    transform: translateY(var(--cs-hr-y, 40px));
+  }
+
+  to {
+    transform: none;
+  }
+}
+
+.cs-hero-reveal-lcp {
+  animation: cs-hero-reveal-lcp var(--cs-hr-duration, 0.9s) cubic-bezier(0.16, 1, 0.3, 1) var(--cs-hr-delay, 0s) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-hero-reveal-lcp {
+    animation: none;
+  }
+}
+
 /* Home hero H1 — "type-on → true-focus" then "focus-settle + living accent"
    (see HeroHeading.tsx). Pure CSS so the LCP H1 text paints from the server
    HTML; clip/opacity/blur live only in keyframes (never base rules), so
