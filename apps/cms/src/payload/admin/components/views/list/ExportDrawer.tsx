@@ -203,15 +203,51 @@ export const ExportDrawer = (props: Props): ReactElement => {
 
   return (
     <div className="cs-export-drawer">
-      <button
-        type="button"
-        className="cs-btn cs-btn--primary"
-        disabled={selectedFields.size === 0}
-        onClick={onExport}
-        style={{ marginBottom: '1rem' }}
+      <div
+        className="cs-export-drawer__toolbar"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '1rem',
+          flexWrap: 'wrap',
+          marginBottom: '1rem',
+        }}
       >
-        Export {selectedFields.size} column{selectedFields.size === 1 ? '' : 's'}
-      </button>
+        <button
+          type="button"
+          className="cs-btn cs-btn--primary"
+          disabled={selectedFields.size === 0}
+          onClick={onExport}
+        >
+          Export {selectedFields.size} column{selectedFields.size === 1 ? '' : 's'}
+        </button>
+        <div
+          role="radiogroup"
+          aria-label="Export format"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem' }}
+        >
+          <span style={{ fontSize: '0.8125rem', opacity: 0.7 }}>Format:</span>
+          <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+            <input
+              type="radio"
+              name="export-format"
+              checked={format === 'csv'}
+              onChange={() => setFormat('csv')}
+            />
+            CSV
+          </label>
+          <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+            <input
+              type="radio"
+              name="export-format"
+              checked={format === 'xlsx'}
+              onChange={() => setFormat('xlsx')}
+            />
+            Excel (.xlsx)
+          </label>
+        </div>
+      </div>
 
       <fieldset className="cs-export-drawer__section">
         <legend>Date range</legend>
@@ -288,28 +324,6 @@ export const ExportDrawer = (props: Props): ReactElement => {
             </li>
           ))}
         </ul>
-      </fieldset>
-
-      <fieldset className="cs-export-drawer__section">
-        <legend>Format</legend>
-        <label>
-          <input
-            type="radio"
-            name="export-format"
-            checked={format === 'csv'}
-            onChange={() => setFormat('csv')}
-          />
-          CSV
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="export-format"
-            checked={format === 'xlsx'}
-            onChange={() => setFormat('xlsx')}
-          />
-          Excel (.xlsx)
-        </label>
       </fieldset>
     </div>
   );
