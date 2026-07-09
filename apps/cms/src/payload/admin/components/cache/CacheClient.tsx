@@ -187,7 +187,9 @@ export const CacheClient = (): ReactElement => {
           <label className="cs-cache__label" htmlFor="cs-cache-search-input">
             Search pages
           </label>
-          <span className="cs-cache__hint">Type a title or slug to find a page.</span>
+          <span className="cs-cache__hint">
+            Type a title or slug — or paste a full page URL — to find a page.
+          </span>
           <div className="cs-cache__search-wrap">
             <div className="cs-cache__search-icon" aria-hidden="true">
               {searchLoading ? (

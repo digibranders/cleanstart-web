@@ -25,6 +25,23 @@ const COLLECTION_LABELS: Record<string, string> = {
 /** Collections that use `name` as their display field instead of `title`. */
 const NAME_FIELD_COLLECTIONS = new Set(['authors']);
 
+/**
+ * Reduce a search input to a matchable term. Editors routinely paste a full
+ * page URL (`https://cleanstart.com/blogs/<slug>`) or a bare path
+ * (`/blogs/<slug>`) instead of typing a title or slug — neither matches a
+ * stored `slug`/`title` verbatim, so the search returned nothing. When the
+ * input contains a `/`, strip any query/hash and collapse it to the last
+ * non-empty path segment (the doc slug). A plain title/slug (no slash) is
+ * returned trimmed and unchanged.
+ */
+export const normalizeSearchQuery = (raw: string): string => {
+  const trimmed = raw.trim();
+  if (!trimmed.includes('/')) return trimmed;
+  const withoutQueryOrHash = trimmed.split(/[?#]/)[0] ?? trimmed;
+  const segments = withoutQueryOrHash.split('/').filter(Boolean);
+  return (segments[segments.length - 1] ?? trimmed).trim();
+};
+
 const json = (data: unknown, init?: ResponseInit): Response =>
   new Response(JSON.stringify(data), {
     ...init,
@@ -53,9 +70,11 @@ export const cacheSearchEndpoint: Endpoint = {
 
     const rawUrl = typeof req.url === 'string' ? req.url : '';
     const qpStart = rawUrl.indexOf('?');
-    const q = qpStart >= 0
+    const rawQ = qpStart >= 0
       ? new URLSearchParams(rawUrl.slice(qpStart + 1)).get('q')?.trim() ?? ''
       : '';
+    // Reduce a pasted URL/path to its slug so it matches stored titles/slugs.
+    const q = normalizeSearchQuery(rawQ);
 
     if (q.length < 2) {
       return json({ ok: true, results: [] });
