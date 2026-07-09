@@ -256,6 +256,7 @@ export const Webinars: CollectionConfig = {
     mediaUploadField({
       name: 'pdf',
       folderHint: 'web/webinar',
+      accept: ['application/pdf'],
       description: 'Slides PDF (routed to web/webinar/).',
     }),
     {
