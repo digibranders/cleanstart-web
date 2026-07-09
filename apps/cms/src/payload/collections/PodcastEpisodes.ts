@@ -1,5 +1,4 @@
 import type { CollectionBeforeChangeHook, CollectionConfig } from 'payload';
-import { purgePageUiField } from '../fields/purge-page-ui';
 
 import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
@@ -123,7 +122,7 @@ export const PodcastEpisodes: CollectionConfig = {
     ],
     group: 'Content',
     components: {
-      edit: docStatusBarEditConfig({ showStats: false, showPublishedAt: true }),
+      edit: docStatusBarEditConfig({ showStats: false, showPublishedAt: true, showPurge: true }),
     },
   },
   access: {
@@ -133,7 +132,6 @@ export const PodcastEpisodes: CollectionConfig = {
     delete: isAdminOrEditor,
   },
   fields: [
-    purgePageUiField,
     contentTitleField,
     slugField({ source: 'title' }),
     {

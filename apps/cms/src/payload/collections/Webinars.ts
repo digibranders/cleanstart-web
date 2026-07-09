@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload';
-import { purgePageUiField } from '../fields/purge-page-ui';
 
 import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 
@@ -50,7 +49,7 @@ export const Webinars: CollectionConfig = {
     defaultColumns: ['title', 'webinarType', 'region', 'startsAt', '_status', 'updatedAt'],
     group: 'Content',
     components: {
-      edit: docStatusBarEditConfig({ showStats: false, showPublishedAt: true }),
+      edit: docStatusBarEditConfig({ showStats: false, showPublishedAt: true, showPurge: true }),
     },
   },
   access: {
@@ -60,7 +59,6 @@ export const Webinars: CollectionConfig = {
     delete: isAdminOrEditor,
   },
   fields: [
-    purgePageUiField,
     contentTitleField,
     slugField({ source: 'title' }),
     mediaUploadField({

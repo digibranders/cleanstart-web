@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload';
-import { purgePageUiField } from '../fields/purge-page-ui';
 
 import { isAdminOrEditor } from '../access';
 import { mediaUploadField } from '../fields/media-upload';
@@ -23,6 +22,18 @@ export const Authors: CollectionConfig = {
     useAsTitle: 'name',
     defaultColumns: ['name', 'role', 'acceptingNewBylines', 'updatedAt'],
     group: 'Content',
+    components: {
+      // Mount "Purge this page" in the controls strip (next to Save /
+      // Publish) rather than the sidebar. Authors uses Payload's stock doc
+      // header, so this is a direct beforeDocumentControls entry instead of
+      // the docStatusBarEditConfig({ showPurge }) path the other purgeable
+      // collections use.
+      edit: {
+        beforeDocumentControls: [
+          { path: '@/payload/admin/components/cache/PurgePageButton.tsx#PurgePageButton' },
+        ],
+      },
+    },
   },
   access: {
     read: () => true,
@@ -31,7 +42,6 @@ export const Authors: CollectionConfig = {
     delete: isAdminOrEditor,
   },
   fields: [
-    purgePageUiField,
     { name: 'name', type: 'text', required: true },
     slugField({ source: 'name' }),
     mediaUploadField({

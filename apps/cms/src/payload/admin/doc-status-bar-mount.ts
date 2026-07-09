@@ -5,6 +5,13 @@ type DocStatusBarMountArgs = {
   showPublishedAt?: boolean;
   /** Render the wordCount + readingMinutes pair. Default false. */
   showStats?: boolean;
+  /**
+   * Mount the "Purge this page" button in the controls strip, next to
+   * Save / Publish, instead of the edit sidebar. Set on the purgeable
+   * content collections (see PURGEABLE_COLLECTIONS in lib/web-pages.ts).
+   * Default false.
+   */
+  showPurge?: boolean;
 };
 
 type EditConfig = NonNullable<
@@ -23,14 +30,23 @@ type EditConfig = NonNullable<
  * and the draft → published versioning flow.
  */
 export const docStatusBarEditConfig = (args: DocStatusBarMountArgs = {}): EditConfig => {
-  const { showPublishedAt = true, showStats = false } = args;
+  const { showPublishedAt = true, showStats = false, showPurge = false } = args;
+  const beforeDocumentControls: NonNullable<EditConfig['beforeDocumentControls']> = [
+    {
+      path: '@/payload/admin/components/DocHeader.tsx#DocHeader',
+      clientProps: { showPublishedAt, showStats },
+    },
+  ];
+  // Rendered after DocHeader (which is flex:1 and fills the strip), so the
+  // purge button is pushed to the right edge, sitting just before the
+  // native Save Draft / Publish cluster.
+  if (showPurge) {
+    beforeDocumentControls.push({
+      path: '@/payload/admin/components/cache/PurgePageButton.tsx#PurgePageButton',
+    });
+  }
   return {
-    beforeDocumentControls: [
-      {
-        path: '@/payload/admin/components/DocHeader.tsx#DocHeader',
-        clientProps: { showPublishedAt, showStats },
-      },
-    ],
+    beforeDocumentControls,
     editMenuItems: [
       {
         path: '@/payload/admin/components/DocKebabExtras.tsx#DocKebabExtras',
