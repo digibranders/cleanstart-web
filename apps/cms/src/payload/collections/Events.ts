@@ -294,6 +294,7 @@ export const Events: CollectionConfig = {
     mediaUploadField({
       name: 'agendaPdf',
       folderHint: 'web/event',
+      accept: ['application/pdf'],
       description: 'Agenda PDF (routed to web/event/).',
     }),
     {

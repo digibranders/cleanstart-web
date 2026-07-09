@@ -224,6 +224,7 @@ export const Jobs: CollectionConfig = {
     mediaUploadField({
       name: 'descriptionPdf',
       folderHint: 'web/job',
+      accept: ['application/pdf'],
       description: 'Optional JD PDF (routed to web/job/).',
       condition: (_data, sibling) => (sibling as { source?: string } | undefined)?.source === 'cms',
     }),

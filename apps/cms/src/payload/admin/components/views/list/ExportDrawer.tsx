@@ -203,6 +203,16 @@ export const ExportDrawer = (props: Props): ReactElement => {
 
   return (
     <div className="cs-export-drawer">
+      <button
+        type="button"
+        className="cs-btn cs-btn--primary"
+        disabled={selectedFields.size === 0}
+        onClick={onExport}
+        style={{ marginBottom: '1rem' }}
+      >
+        Export {selectedFields.size} column{selectedFields.size === 1 ? '' : 's'}
+      </button>
+
       <fieldset className="cs-export-drawer__section">
         <legend>Date range</legend>
         <p
@@ -301,15 +311,6 @@ export const ExportDrawer = (props: Props): ReactElement => {
           Excel (.xlsx)
         </label>
       </fieldset>
-
-      <button
-        type="button"
-        className="cs-btn cs-btn--primary"
-        disabled={selectedFields.size === 0}
-        onClick={onExport}
-      >
-        Export {selectedFields.size} column{selectedFields.size === 1 ? '' : 's'}
-      </button>
     </div>
   );
 };

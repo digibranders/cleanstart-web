@@ -22,6 +22,7 @@ const FOLDERS = [
   'web/news',
   'web/guide',
   'web/resource',
+  'web/case-study',
   'web/event',
   'web/webinar',
   'web/job',
