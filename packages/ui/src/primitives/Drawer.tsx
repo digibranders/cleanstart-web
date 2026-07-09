@@ -53,9 +53,18 @@ export const Drawer = (props: Props): ReactElement => {
   useEffect(() => {
     if (!open || !dismissOnBackdrop) return undefined;
     const onMouseDown = (e: MouseEvent): void => {
-      const panel = panelRef.current;
-      if (!panel) return;
-      if (!panel.contains(e.target as Node)) onClose();
+      const dlg = dialogRef.current;
+      if (!dlg) return;
+      // A native <dialog> reports the dialog element *itself* as the event
+      // target when the click lands on its ::backdrop (the dimmed area
+      // outside the panel). Every click inside the panel — or inside a
+      // menu/popover portaled into the dialog's top layer, e.g. the export
+      // drawer's date-range DropdownMenu — has a descendant as its target,
+      // so it must not dismiss. A `panelRef.contains(target)` check would
+      // instead treat that portaled dropdown (a sibling of the panel, but
+      // still inside the dialog) as an outside click and wrongly close the
+      // drawer the moment the user picks a preset.
+      if (e.target === dlg) onClose();
     };
     document.addEventListener('mousedown', onMouseDown);
     return () => document.removeEventListener('mousedown', onMouseDown);
