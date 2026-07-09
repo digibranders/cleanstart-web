@@ -205,15 +205,51 @@ export const ExportDrawer = (props: Props): ReactElement => {
     <div className="cs-export-drawer">
       <fieldset className="cs-export-drawer__section">
         <legend>Date range</legend>
+        <p
+          className="cs-export-drawer__hint"
+          style={{ margin: '0 0 0.5rem', fontSize: '0.8125rem', opacity: 0.7 }}
+        >
+          Choose a quick preset below, or set a custom From / To range.
+        </p>
         <button
           ref={datePresetTriggerRef}
           type="button"
-          className="cs-btn cs-btn--subtle"
+          className="cs-btn cs-btn--subtle cs-export-drawer__date-trigger"
           onClick={() => setDatePresetMenuOpen((o) => !o)}
           aria-haspopup="menu"
           aria-expanded={datePresetMenuOpen}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '0.5rem',
+            minWidth: '13rem',
+          }}
         >
-          {datePresetLabel}
+          <span>
+            <span style={{ opacity: 0.6, marginRight: '0.4rem' }}>Date range:</span>
+            {datePresetLabel}
+          </span>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 16 16"
+            fill="none"
+            aria-hidden="true"
+            style={{
+              flexShrink: 0,
+              transition: 'transform 150ms ease',
+              transform: datePresetMenuOpen ? 'rotate(180deg)' : 'none',
+            }}
+          >
+            <path
+              d="M4 6l4 4 4-4"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </button>
         <DropdownMenu
           open={datePresetMenuOpen}
