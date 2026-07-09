@@ -40,6 +40,12 @@ export function buildRobotsTxt({ indexable }: { indexable: boolean }): string {
     "Allow: /",
     "Disallow: /preview/",
     "Disallow: /api/preview/",
+    // Next.js App Router appends `?_rsc=<hash>` to in-viewport <Link> prefetch
+    // fetches (Content-Type text/x-component). They are internal navigation
+    // payloads, never indexable pages, and each is already canonicalised to its
+    // clean URL — so blocking them only reclaims crawl budget. Real browser
+    // navigation ignores robots.txt, so this is crawler-only.
+    "Disallow: /*_rsc=",
     "",
     "User-Agent: Bytespider",
     "Disallow: /",
