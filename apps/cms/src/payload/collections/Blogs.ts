@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload';
-import { purgePageUiField } from '../fields/purge-page-ui';
 
 import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
@@ -36,7 +35,7 @@ export const Blogs: CollectionConfig = {
     defaultColumns: ['title', 'authors', 'categories', '_status', 'publishedAt', 'updatedAt'],
     group: 'Content',
     components: {
-      edit: docStatusBarEditConfig({ showStats: true, showPublishedAt: true }),
+      edit: docStatusBarEditConfig({ showStats: true, showPublishedAt: true, showPurge: true }),
     },
   },
   access: {
@@ -46,7 +45,6 @@ export const Blogs: CollectionConfig = {
     delete: isAdminOrEditor,
   },
   fields: [
-    purgePageUiField,
     contentTitleField,
     slugField({ source: 'title' }),
     {

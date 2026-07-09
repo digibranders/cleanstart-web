@@ -1,4 +1,4 @@
-import type { CollectionConfig, Field } from 'payload';
+import type { CollectionConfig } from 'payload';
 import { describe, expect, it } from 'vitest';
 
 import { PURGEABLE_COLLECTIONS } from '../lib/web-pages';
@@ -30,10 +30,23 @@ const COLLECTIONS: CollectionConfig[] = [
   PodcastEpisodes,
 ];
 
-const hasPurgeField = (c: CollectionConfig): boolean =>
-  c.fields.some(
-    (f: Field) => 'name' in f && f.type === 'ui' && f.name === 'purgeCache',
-  );
+const PURGE_BUTTON_PATH = '@/payload/admin/components/cache/PurgePageButton.tsx#PurgePageButton';
+
+/**
+ * The "Purge this page" button is mounted in the document controls strip
+ * (next to Save / Publish) via `admin.components.edit.beforeDocumentControls`
+ * — either appended by `docStatusBarEditConfig({ showPurge: true })` or, for
+ * Authors (stock header), as a direct entry. A `beforeDocumentControls` item
+ * is a component-path string or a `{ path }` object.
+ */
+const hasPurgeButton = (c: CollectionConfig): boolean => {
+  const before = c.admin?.components?.edit?.beforeDocumentControls ?? [];
+  return before.some((entry) => {
+    if (!entry) return false;
+    const path = typeof entry === 'string' ? entry : entry.path;
+    return path === PURGE_BUTTON_PATH;
+  });
+};
 
 describe('cache-purge field coverage', () => {
   it('covers exactly the PURGEABLE_COLLECTIONS set', () => {
@@ -41,9 +54,9 @@ describe('cache-purge field coverage', () => {
     expect(slugs).toEqual(Object.keys(PURGEABLE_COLLECTIONS).sort());
   });
 
-  it('mounts the purgeCache ui field on every collection', () => {
+  it('mounts the purge-page button in the controls strip on every collection', () => {
     for (const c of COLLECTIONS) {
-      expect(hasPurgeField(c), `${c.slug} missing purgeCache field`).toBe(true);
+      expect(hasPurgeButton(c), `${c.slug} missing purge-page button`).toBe(true);
     }
   });
 });

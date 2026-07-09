@@ -56,8 +56,15 @@ export const PurgePageButton = (): ReactElement => {
 
   if (!id) {
     return (
-      <div className="cs-purge-page cs-purge-page--disabled">
-        Save first to enable cache purge.
+      <div className="cs-purge-page">
+        <button
+          type="button"
+          className="cs-btn cs-btn--subtle"
+          disabled
+          title="Save this document first to enable cache purge."
+        >
+          Purge this page
+        </button>
       </div>
     );
   }

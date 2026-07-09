@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload';
-import { purgePageUiField } from '../fields/purge-page-ui';
 
 import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
@@ -37,7 +36,7 @@ export const KnowledgeBase: CollectionConfig = {
     description:
       'Technical knowledge-base articles surfaced under /knowledge-hub. Each article gets its own indexable URL — replaces the single-page Webflow KB.',
     components: {
-      edit: docStatusBarEditConfig({ showStats: true, showPublishedAt: true }),
+      edit: docStatusBarEditConfig({ showStats: true, showPublishedAt: true, showPurge: true }),
     },
   },
   access: {
@@ -47,7 +46,6 @@ export const KnowledgeBase: CollectionConfig = {
     delete: isAdminOrEditor,
   },
   fields: [
-    purgePageUiField,
     contentTitleField,
     slugField({ source: 'title' }),
     {

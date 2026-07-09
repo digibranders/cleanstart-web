@@ -25,6 +25,14 @@ describe("buildRobotsTxt (indexable)", () => {
     expect(lines).toContain("Disallow: /api/preview/");
   });
 
+  it("disallows Next.js RSC prefetch query variants inside the wildcard group", () => {
+    const wildcardIndex = lines.indexOf("User-Agent: *");
+    const rscIndex = lines.indexOf("Disallow: /*_rsc=");
+    const nextGroupIndex = lines.indexOf("User-Agent: Bytespider");
+    expect(rscIndex).toBeGreaterThan(wildcardIndex);
+    expect(rscIndex).toBeLessThan(nextGroupIndex);
+  });
+
   it("keeps the symbolic Bytespider block as its own group", () => {
     const byteIndex = lines.indexOf("User-Agent: Bytespider");
     expect(lines[byteIndex + 1]).toBe("Disallow: /");

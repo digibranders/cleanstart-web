@@ -257,8 +257,13 @@ export function Footer({
                 {LEGAL_LINKS.map((link, i) => (
                   <React.Fragment key={link.href}>
                     <li className="flex leading-none">
+                      {/* prefetch disabled: these legal links render on every
+                          page, so default in-viewport prefetch fires an RSC
+                          (`?_rsc=`) request site-wide — pure crawl-budget waste
+                          for low-traffic policy pages. Click nav is unaffected. */}
                       <Link
                         href={link.href}
+                        prefetch={false}
                         className="text-xs italic leading-[1.75] text-white transition-colors duration-200 hover:text-cyan-200 cursor-pointer"
                         style={{ letterSpacing: "0.24px" }}
                       >

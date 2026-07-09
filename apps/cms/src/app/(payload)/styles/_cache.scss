@@ -401,3 +401,14 @@
     color: var(--theme-text-soft);
   }
 }
+
+// "Purge this page" button — mounted in the document controls strip via
+// `beforeDocumentControls` (see doc-status-bar-mount.ts), so it must sit
+// inline with the native Save Draft / Publish cluster rather than as a
+// sidebar block. Its inner button follows the same 32px compact rhythm the
+// `.doc-controls` overrides apply to every other control.
+.cs-purge-page {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}

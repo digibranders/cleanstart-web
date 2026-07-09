@@ -21,8 +21,13 @@ export function LegalSidebar({ items }: { items: LegalNavItem[] }): React.ReactE
           const Icon = legalIcon(item.icon);
           return (
             <li key={item.href}>
+              {/* prefetch disabled: the sidebar renders every legal doc's link
+                  on each /legal/* page, so default prefetch fires an RSC
+                  (`?_rsc=`) request per item — the bulk of the legal-section
+                  crawl noise. Doc-switching stays instant enough on click. */}
               <Link
                 href={item.href}
+                prefetch={false}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "flex items-center gap-2.5 rounded-md px-3 py-2 transition-colors",
