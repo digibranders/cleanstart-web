@@ -48,6 +48,7 @@ import * as migration_20260624_120000_add_resources_hero_image from './20260624_
 import * as migration_20260625_120000_add_broken_links_details from './20260625_120000_add_broken_links_details';
 import * as migration_20260629_120000_drop_guides_legacy_sections_keywords_howto from './20260629_120000_drop_guides_legacy_sections_keywords_howto';
 import * as migration_20260629_130000_guides_cover_title from './20260629_130000_guides_cover_title';
+import * as migration_20260709_120000_add_media_folder_case_study from './20260709_120000_add_media_folder_case_study';
 
 export const migrations = [
   {
@@ -274,5 +275,10 @@ export const migrations = [
     up: migration_20260629_130000_guides_cover_title.up,
     down: migration_20260629_130000_guides_cover_title.down,
     name: '20260629_130000_guides_cover_title',
+  },
+  {
+    up: migration_20260709_120000_add_media_folder_case_study.up,
+    down: migration_20260709_120000_add_media_folder_case_study.down,
+    name: '20260709_120000_add_media_folder_case_study',
   },
 ];
