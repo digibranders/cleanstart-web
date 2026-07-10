@@ -199,12 +199,12 @@ function AccentBar({ accent }: { accent: string }): React.ReactElement {
 function Body({ children }: { children: React.ReactNode }): React.ReactElement {
   return (
     <p
-      className="mx-auto max-w-[220px] text-center font-sans text-white/60"
+      className="mx-auto max-w-[210px] text-center font-sans text-white/60"
       style={{
         fontSize: "var(--fs-body-sm)",
         fontWeight: 400,
         letterSpacing: "-0.01em",
-        lineHeight: 1.55,
+        lineHeight: 1.45,
       }}
     >
       {children}
@@ -264,7 +264,7 @@ function StageCard({
   stage: Stage;
   delaySteps: number;
   /**
-   * The desktop scene fixes each stage's height so the scaled 1180×420 canvas
+   * The desktop scene fixes each stage's height so the scaled 1240×368 canvas
    * stays deterministic; the stacked (mobile) layout uses natural heights.
    */
   desktop?: boolean;
@@ -275,8 +275,8 @@ function StageCard({
       data-featured={featured ? "true" : undefined}
       className={cn(
         "wf-card relative flex h-full flex-col items-center rounded-[22px] border text-center",
-        featured ? "gap-5 px-8 py-9" : "gap-4 px-6 py-8",
-        desktop && (featured ? "min-h-[420px]" : "min-h-[356px]"),
+        featured ? "gap-4 px-7 py-7" : "gap-3.5 px-5 py-6",
+        desktop && (featured ? "min-h-[368px]" : "min-h-[312px]"),
       )}
       style={{
         ["--accent" as string]: stage.accent,
@@ -304,9 +304,9 @@ function StageCard({
         image={stage.image}
         alt=""
         tint={stage.tint}
-        size={featured ? 132 : 108}
+        size={featured ? 104 : 86}
       />
-      <div className="flex flex-col items-center gap-3">
+      <div className="flex flex-col items-center gap-2.5">
         <Title featured={featured}>{stage.title}</Title>
         <AccentBar accent={stage.accent} />
       </div>
@@ -338,7 +338,7 @@ function Connector({
       aria-hidden
       className={cn(
         "wf-arrow flex shrink-0 items-center justify-center",
-        vertical ? "h-8 w-full" : "w-9",
+        vertical ? "h-8 w-full" : "w-7",
       )}
       style={{ color: accent, ["--wf-d" as string]: delaySteps }}
     >
@@ -433,7 +433,7 @@ export function LibrariesWorkflow(): React.ReactElement {
         {/* The flow wrapper is the in-view target that gates the cascade. */}
         <div ref={flowRef} className={cn(anim && "wf-anim")}>
           {/* Desktop — horizontal flow with the Clean Library stage prominent.
-              Rendered on a fixed 1180×420 design canvas that scales uniformly to
+              Rendered on a fixed 1240×368 design canvas that scales uniformly to
               fit its container (the same scale-to-fit technique as the Pipeline
               and Governance scenes on this page), so the row stays horizontal all
               the way down to `lg` instead of hard-switching to the stacked layout
@@ -441,20 +441,20 @@ export function LibrariesWorkflow(): React.ReactElement {
               keeps an identical flex basis; each stage (and its arrow) reveals in
               sequence, left to right. */}
           <div
-            className="relative mx-auto mt-14 hidden w-full max-w-[1180px] lg:block"
-            style={{ aspectRatio: "1180 / 420", containerType: "inline-size" }}
+            className="relative mx-auto mt-12 hidden w-full max-w-[1240px] lg:block"
+            style={{ aspectRatio: "1240 / 368", containerType: "inline-size" }}
           >
             <div
               className="absolute left-0 top-0"
               style={
                 {
-                  width: 1180,
-                  height: 420,
+                  width: 1240,
+                  height: 368,
                   transformOrigin: "top left",
                   transform: "scale(var(--wf-scale))",
-                  // Divide by a length (1180px) so the ratio is unitless —
+                  // Divide by a length (1240px) so the ratio is unitless —
                   // `scale()` rejects a length-valued custom property.
-                  "--wf-scale": "min(1, 100cqw / 1180px)",
+                  "--wf-scale": "min(1, 100cqw / 1240px)",
                 } as React.CSSProperties
               }
             >
