@@ -3,7 +3,9 @@ import type { Endpoint } from 'payload';
 
 import { clientIpFromHeaders } from '../lib/client-ip';
 import { createHubspotDeal } from '../lib/deal-registrations/hubspot-deal';
+import { buildDealRegistrationNotificationEmail } from '../lib/deal-registrations/notification-email';
 import { dealRegistrationSchema } from '../lib/deal-registrations/schema';
+import { sendBrevoEmail } from '../lib/email/brevo';
 import { DEFAULT_RATE_LIMITS, checkAndRecord } from '../lib/rate-limit';
 import { verifyTurnstileToken } from '../lib/turnstile';
 
@@ -41,6 +43,13 @@ const pipelineCfg = (): { pipeline: string; stage: string } => ({
   pipeline: process.env.HUBSPOT_DEAL_PIPELINE ?? 'default',
   stage: process.env.HUBSPOT_DEAL_STAGE ?? 'appointmentscheduled',
 });
+
+/** Internal recipients (CSV) for the deal-registration notification email. */
+const notifyEmails = (): string[] => {
+  const raw = process.env.DEAL_REG_NOTIFY_EMAILS;
+  if (!raw || raw.trim().length === 0) return [];
+  return raw.split(',').map((s) => s.trim()).filter((s) => s.length > 0);
+};
 
 export const dealRegistrationApplyOptionsEndpoint: Endpoint = {
   path: '/apply',
@@ -206,6 +215,44 @@ export const dealRegistrationApplyEndpoint: Endpoint = {
         'Deal registration create failed',
       );
       return json({ ok: false, error: 'capture_failed' }, { status: 502, headers: cors });
+    }
+
+    // Best-effort internal notification to the team (both marketing + Anil get
+    // the identical HTML email). Never blocks or fails the 200 — the durable
+    // deal-registrations row is already persisted above.
+    const recipients = notifyEmails();
+    if (recipients.length > 0) {
+      try {
+        const { subject, htmlContent } = buildDealRegistrationNotificationEmail({
+          partnerName: data.partnerName,
+          partnerRep: data.partnerRep,
+          prospect: data.prospect,
+          dealDetails: data.dealDetails,
+          dealId: sync.status === 'synced' ? sync.dealId : undefined,
+          portalId: process.env.HUBSPOT_PORTAL_ID,
+        });
+        const result = await sendBrevoEmail({
+          to: recipients.map((email) => ({ email })),
+          replyTo: { email: data.partnerRep.email, name: `${data.partnerRep.firstName} ${data.partnerRep.lastName}`.trim() },
+          subject,
+          htmlContent,
+        });
+        if (result.status === 'failed') {
+          req.payload.logger.warn(
+            { error: result.error },
+            'Deal registration notification email failed',
+          );
+        }
+      } catch (err) {
+        Sentry.captureException(err, {
+          tags: { form: 'deal-registration', stage: 'notify-email' },
+          level: 'warning',
+        });
+        req.payload.logger.warn(
+          { err: err instanceof Error ? err.message : String(err) },
+          'Deal registration notification email threw',
+        );
+      }
     }
 
     return json({ ok: true }, { headers: cors });
