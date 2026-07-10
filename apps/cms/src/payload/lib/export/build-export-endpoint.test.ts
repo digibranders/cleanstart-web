@@ -76,7 +76,7 @@ describe('buildExportEndpoint', () => {
     });
     const res = await endpoint.handler(req);
     const text = await res.text();
-    expect(text).toContain('title');
+    expect(text).toContain('Title');
     expect(text).not.toContain('ip');
     expect(text).not.toContain('userAgent');
   });
@@ -130,7 +130,8 @@ describe('buildExportEndpoint', () => {
     const res = await endpoint.handler(req);
     expect(res.headers.get('content-type')).toContain('text/csv');
     const text = await res.text();
-    expect(text).toContain('title');
+    // Header row is the humanised label, not the raw field name.
+    expect(text.split('\r\n')[0]).toBe('Title');
     expect(text).toContain('Hello');
   });
 
