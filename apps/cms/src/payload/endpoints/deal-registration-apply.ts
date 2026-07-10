@@ -233,6 +233,9 @@ export const dealRegistrationApplyEndpoint: Endpoint = {
         });
         const result = await sendBrevoEmail({
           to: recipients.map((email) => ({ email })),
+          // Send from the marketing identity, not the global "CleanStart Careers"
+          // sender name shared with the careers form.
+          senderName: process.env.DEAL_REG_SENDER_NAME?.trim() || 'CleanStart',
           replyTo: { email: data.partnerRep.email, name: `${data.partnerRep.firstName} ${data.partnerRep.lastName}`.trim() },
           subject,
           htmlContent,
