@@ -4736,6 +4736,30 @@ body {
   margin: 1.75rem 0;
 }
 
+/* Bare <ul>/<ol>/<li> authored directly inside an HTML embed (not the Lexical
+   list nodes, which carry .article-ul/.article-ol/.article-li classes). Tailwind
+   preflight strips list markers and indentation from raw list tags, so an
+   embedded list renders as flat text. Restore native marker + indent here,
+   scoped to embeds so it can't leak into the rest of the article body. */
+.article-body .article-embed ul,
+.article-body .article-embed ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.article-body .article-embed ul {
+  list-style-type: disc;
+}
+
+.article-body .article-embed ol {
+  list-style-type: decimal;
+}
+
+.article-body .article-embed li {
+  display: list-item;
+  margin: 0.35rem 0;
+}
+
 /* Feature grid — a row of icon + label items, separated by thin dividers.
    Wraps to a column on narrow viewports. */
 .article-body .article-embed .feature-grid {
