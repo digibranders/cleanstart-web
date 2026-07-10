@@ -2,7 +2,7 @@ import { Container, Section } from "@/components/layout";
 import { Reveal, RevealItem, RevealStagger } from "@/components/ui/Reveal";
 import { GlassIcon } from "./GlassIcon";
 
-type IconKey = "source" | "verify" | "provenance" | "trust";
+type IconKey = "source" | "verify" | "provenance" | "policy";
 
 /** One trust pillar — how a verified library earns trust before adoption. */
 interface TrustPillar {
@@ -16,29 +16,29 @@ interface TrustPillar {
 const PILLARS: TrustPillar[] = [
   {
     icon: "source",
-    title: "Built from Source",
-    body: "Built directly from verified upstream source code.",
+    title: "Source Verification",
+    body: "Libraries rebuilt and verified directly from trusted upstream source.",
     accent: "#a974ff",
     tint: "rgba(169,116,255,0.14)",
   },
   {
-    icon: "verify",
-    title: "Continuous Verification",
-    body: "Continuously verified and revalidated to maintain trust.",
-    accent: "#2dd4bf",
-    tint: "rgba(45,212,191,0.14)",
-  },
-  {
     icon: "provenance",
     title: "Transparent Provenance",
-    body: "Complete provenance and traceability for every verified library.",
+    body: "Complete traceability from source to software artifact.",
     accent: "#5b9bff",
     tint: "rgba(91,155,255,0.14)",
   },
   {
-    icon: "trust",
-    title: "Use What You Trust",
-    body: "Developers use only verified libraries they trust.",
+    icon: "verify",
+    title: "Continuous Validation",
+    body: "Libraries continuously verified as upstream projects evolve.",
+    accent: "#2dd4bf",
+    tint: "rgba(45,212,191,0.14)",
+  },
+  {
+    icon: "policy",
+    title: "Policy Governance",
+    body: "Only approved libraries become part of your software.",
     accent: "#f7a35c",
     tint: "rgba(247,163,92,0.14)",
   },
@@ -82,11 +82,13 @@ function PillarIcon({ icon }: { icon: IconKey }): React.ReactElement {
           <circle cx="18" cy="5" r="3" />
         </svg>
       );
-    case "trust":
+    case "policy":
       return (
         <svg {...common}>
-          <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
-          <path d="m9 12 2 2 4-4" />
+          <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+          <path d="M14 2v5h5" />
+          <line x1="8.5" y1="13" x2="15" y2="13" />
+          <line x1="8.5" y1="17" x2="13" y2="17" />
         </svg>
       );
   }
@@ -224,7 +226,7 @@ export function LibrariesEstablishTrust(): React.ReactElement {
       />
       <Container className="relative">
         <Reveal header>
-          <div className="mx-auto max-w-[760px] text-center">
+          <div className="mx-auto max-w-[820px] text-center">
             <h2
               className="font-display text-[#111]"
               style={{
@@ -234,10 +236,10 @@ export function LibrariesEstablishTrust(): React.ReactElement {
                 lineHeight: 1.1,
               }}
             >
-              Establishing Software Trust
+              Verified by Design
             </h2>
             <p
-              className="mx-auto mt-6 max-w-[680px] font-sans text-[#555]"
+              className="mx-auto mt-6 max-w-[800px] font-sans text-[#555]"
               style={{
                 fontSize: "var(--fs-lead)",
                 fontWeight: 400,
@@ -246,8 +248,8 @@ export function LibrariesEstablishTrust(): React.ReactElement {
                 textWrap: "balance",
               }}
             >
-              Verified libraries built directly from source, establishing trust
-              before they become part of your software.
+              Every library is backed by source verification, transparent
+              provenance, continuous validation, and policy-driven governance.
             </p>
           </div>
         </Reveal>

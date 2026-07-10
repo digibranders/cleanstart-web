@@ -50,7 +50,7 @@ const CARDS: GovCard[] = [
   {
     key: "ai",
     icon: "sparkles",
-    title: "AI Coding Controls",
+    title: "AI Controls",
     body: "Validate AI-suggested libraries before use.",
     accent: "#1d4ed8",
     border: "#b4c6f4",
@@ -407,7 +407,7 @@ export function LibrariesGovernance(): React.ReactElement {
         <Reveal header>
           <div className="text-center">
             <h2
-              className="mx-auto max-w-[1180px] font-display text-[#0f172a]"
+              className="mx-auto max-w-[640px] font-display text-[#0f172a]"
               style={{ fontSize: "var(--fs-h2)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.12 }}
             >
               Govern every dependency. Build with confidence.

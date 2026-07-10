@@ -63,7 +63,7 @@ export function LibrariesHero(): React.ReactElement {
                   margin: 0,
                 }}
               >
-                Trusted Software Libraries
+                Build Trusted Software with Verified Libraries
               </h1>
             </HeroReveal>
 
@@ -81,8 +81,7 @@ export function LibrariesHero(): React.ReactElement {
                   textWrap: "balance",
                 }}
               >
-                Continuously Verified from Source. Governed by Software
-                Dependency Governance.
+                Open source libraries you can trust.
               </p>
             </HeroReveal>
 
