@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { hasAnyRole } from '../../access/typed-user';
 import { toCsv } from '../csv';
 import { toXlsx } from '../xlsx';
+import { collectFieldLabels, exportHeaderLabel } from './field-labels';
 import { buildExportJsonLdContext, computeSchemaTypesLabel } from './schema-types';
 import { isExportableFieldName, serializeFieldValue } from './serialize-field';
 import { getByPath, resolveVirtualFieldPath } from './virtual-fields';
@@ -207,9 +208,16 @@ export const buildExportEndpoint = (slug: string, opts: { dateField: string }): 
       rows.push({ [firstField]: `— truncated at ${EXPORT_HARD_CAP_ROWS} rows —` });
     }
 
+    // Human-readable column headers: explicit field label from the
+    // collection config where set, otherwise the humanised field name, so
+    // the CSV/XLSX reads "Partner Name" not `partnerName`. Row objects stay
+    // keyed by field name — only the header row uses these labels.
+    const labelMap = collectFieldLabels(collectionConfig?.fields);
+    const headerLabels = requestedFields.map((name) => exportHeaderLabel(name, labelMap));
+
     const filename = `${slug}-${todayStamp()}.${format}`;
     if (format === 'xlsx') {
-      const buffer = await toXlsx(requestedFields, rows);
+      const buffer = await toXlsx(requestedFields, rows, headerLabels);
       return new Response(new Uint8Array(buffer), {
         status: 200,
         headers: {
@@ -220,7 +228,7 @@ export const buildExportEndpoint = (slug: string, opts: { dateField: string }): 
       });
     }
 
-    const csv = toCsv(requestedFields, rows);
+    const csv = toCsv(requestedFields, rows, headerLabels);
     return new Response(csv, {
       status: 200,
       headers: {

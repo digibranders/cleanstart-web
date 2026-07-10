@@ -44,17 +44,25 @@ export const DealRegistrations: CollectionConfig = {
   },
   endpoints: [dealRegistrationApplyEndpoint, dealRegistrationApplyOptionsEndpoint],
   fields: [
-    { name: 'partnerName', type: 'text', required: true },
-    { name: 'partnerRepFirstName', type: 'text', required: true },
-    { name: 'partnerRepLastName', type: 'text', required: true },
-    { name: 'partnerRepEmail', type: 'email', required: true },
-    { name: 'partnerRepPhone', type: 'text' },
-    { name: 'prospectFirstName', type: 'text', required: true },
-    { name: 'prospectLastName', type: 'text', required: true },
-    { name: 'prospectEmail', type: 'email', required: true },
-    { name: 'prospectPhone', type: 'text' },
-    { name: 'dealDetails', type: 'textarea' },
-    { name: 'source', type: 'text', admin: { position: 'sidebar', description: 'Referrer URL.' } },
+    // Append-only record of a partner's /deal-registration submission. Every
+    // field is read-only in the admin: the row is captured server-side by the
+    // apply endpoint, `access.update` is denied, and the data is the source of
+    // truth for the HubSpot Deal sync — editors view it, never edit it.
+    { name: 'partnerName', type: 'text', required: true, admin: { readOnly: true } },
+    { name: 'partnerRepFirstName', type: 'text', required: true, admin: { readOnly: true } },
+    { name: 'partnerRepLastName', type: 'text', required: true, admin: { readOnly: true } },
+    { name: 'partnerRepEmail', type: 'email', required: true, admin: { readOnly: true } },
+    { name: 'partnerRepPhone', type: 'text', admin: { readOnly: true } },
+    { name: 'prospectFirstName', type: 'text', required: true, admin: { readOnly: true } },
+    { name: 'prospectLastName', type: 'text', required: true, admin: { readOnly: true } },
+    { name: 'prospectEmail', type: 'email', required: true, admin: { readOnly: true } },
+    { name: 'prospectPhone', type: 'text', admin: { readOnly: true } },
+    { name: 'dealDetails', type: 'textarea', admin: { readOnly: true } },
+    {
+      name: 'source',
+      type: 'text',
+      admin: { readOnly: true, position: 'sidebar', description: 'Referrer URL.' },
+    },
     { name: 'ip', type: 'text', admin: { readOnly: true, position: 'sidebar' } },
     { name: 'userAgent', type: 'text', admin: { readOnly: true } },
     { name: 'consentGivenAt', type: 'date', admin: { readOnly: true, date: { pickerAppearance: 'dayAndTime' } } },

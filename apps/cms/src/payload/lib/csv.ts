@@ -42,12 +42,21 @@ const escapeCell = (raw: string): string => {
   return `"${safe.replaceAll('"', '""')}"`;
 };
 
+/**
+ * `headers` are the row-lookup keys (field names). `headerLabels`, when
+ * given, supplies the human-readable text for the header row instead of the
+ * raw keys — used by the generic collection export so a column reads
+ * "Partner Name" rather than `partnerName`. Defaults to `headers` for
+ * callers (leads / partners exports) that already pass labelled headers.
+ */
 export const toCsv = (
   headers: readonly string[],
   rows: readonly Record<string, unknown>[],
+  headerLabels?: readonly string[],
 ): string => {
+  const labels = headerLabels ?? headers;
   const lines: string[] = [];
-  lines.push(headers.map((h) => escapeCell(h)).join(','));
+  lines.push(labels.map((h) => escapeCell(h)).join(','));
   for (const row of rows) {
     lines.push(headers.map((h) => escapeCell(stringify(row[h]))).join(','));
   }

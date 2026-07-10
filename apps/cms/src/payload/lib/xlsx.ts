@@ -14,11 +14,15 @@ import ExcelJS from 'exceljs';
 export const toXlsx = async (
   headers: readonly string[],
   rows: readonly Record<string, unknown>[],
+  headerLabels?: readonly string[],
 ): Promise<Buffer> => {
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet('Export');
 
-  sheet.addRow([...headers]);
+  // `headers` remain the row-lookup keys; `headerLabels` (when given) is the
+  // human-readable header row. Defaults to `headers` for callers that pass
+  // already-labelled headers.
+  sheet.addRow([...(headerLabels ?? headers)]);
 
   for (const row of rows) {
     const values = headers.map((h) => row[h]);
