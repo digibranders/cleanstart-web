@@ -33,4 +33,13 @@ describe('resolveCuratedDefaultColumns', () => {
   it('returns null (not an empty array) when the intersection is empty', () => {
     expect(resolveCuratedDefaultColumns('blogs', new Set(['someUnrelatedField']))).toBeNull();
   });
+
+  it('preselects the curated deal-registrations columns', () => {
+    const curated = CURATED_DEFAULT_COLUMNS['deal-registrations'] ?? [];
+    expect(curated).toContain('partnerName');
+    expect(curated).toContain('hubspotSync');
+    expect(curated).toContain('source');
+    expect(curated).not.toContain('honeypot');
+    expect(resolveCuratedDefaultColumns('deal-registrations', new Set(curated))).toEqual(curated);
+  });
 });
