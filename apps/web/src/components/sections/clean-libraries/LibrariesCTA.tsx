@@ -88,7 +88,7 @@ export function LibrariesCTA(): React.ReactElement {
             textWrap: "balance",
           }}
         >
-          Govern Every Dependency
+          Build with Trust
         </p>
       </Reveal>
 
@@ -109,8 +109,8 @@ export function LibrariesCTA(): React.ReactElement {
             lineHeight: "var(--cta-card-desc-lh)",
           }}
         >
-          Establish trust in every software dependency through continuous
-          verification, policy enforcement, and software dependency governance.
+          Replace uncertainty with verified libraries built for modern software
+          supply chains.
         </p>
 
         <Link

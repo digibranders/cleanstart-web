@@ -32,6 +32,22 @@ export const CURATED_DEFAULT_COLUMNS: Readonly<Record<string, readonly string[]>
     'createdAt',
     '_status',
   ],
+  'deal-registrations': [
+    'partnerName',
+    'partnerRepFirstName',
+    'partnerRepLastName',
+    'partnerRepEmail',
+    'partnerRepPhone',
+    'prospectFirstName',
+    'prospectLastName',
+    'prospectEmail',
+    'prospectPhone',
+    'dealDetails',
+    'source',
+    'hubspotSync',
+    'updatedAt',
+    'createdAt',
+  ],
 };
 
 /**

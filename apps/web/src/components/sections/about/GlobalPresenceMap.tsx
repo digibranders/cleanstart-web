@@ -28,6 +28,14 @@ interface GlobalPresenceMapProps {
 
 const GEO_URL = "/data/world-110m.json";
 
+// India, drawn per the official Survey-of-India boundary (full Jammu & Kashmir
+// and Ladakh, incl. Gilgit-Baltistan and Aksai Chin). Overlaid on top of the
+// base Natural Earth topology, which truncates India at the Line of Control.
+const INDIA_OFFICIAL_URL = "/data/india-official.json";
+
+const HIGHLIGHT_FILL = "#3a6fef";
+const HIGHLIGHT_STROKE = "#5585ff";
+
 // Countries with offices — highlighted with a brighter fill
 const OFFICE_COUNTRIES = new Set([
   "United States of America",
@@ -109,8 +117,8 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
                 <Geography
                   key={geo.rsmKey}
                   geography={geo}
-                  fill={highlighted ? "#3a6fef" : "#1d3e96"}
-                  stroke={highlighted ? "#5585ff" : "#2a52c0"}
+                  fill={highlighted ? HIGHLIGHT_FILL : "#1d3e96"}
+                  stroke={highlighted ? HIGHLIGHT_STROKE : "#2a52c0"}
                   strokeWidth={highlighted ? 0.6 : 0.3}
                   style={{
                     default: { outline: "none" },
@@ -120,6 +128,28 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
                 />
               );
             })
+          }
+        </Geographies>
+
+        {/* Corrected India — official Survey-of-India boundary, drawn on top of
+            the base topology so the northern territories (J&K, Ladakh) that
+            Natural Earth truncates at the Line of Control read accurately. */}
+        <Geographies geography={INDIA_OFFICIAL_URL}>
+          {({ geographies }) =>
+            geographies.map((geo) => (
+              <Geography
+                key={geo.rsmKey}
+                geography={geo}
+                fill={HIGHLIGHT_FILL}
+                stroke={HIGHLIGHT_STROKE}
+                strokeWidth={0.6}
+                style={{
+                  default: { outline: "none" },
+                  hover: { outline: "none" },
+                  pressed: { outline: "none" },
+                }}
+              />
+            ))
           }
         </Geographies>
 

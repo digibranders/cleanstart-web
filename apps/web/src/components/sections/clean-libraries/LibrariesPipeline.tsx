@@ -22,7 +22,7 @@ interface Vector {
 const VECTORS: Vector[] = [
   { key: "developers", label: "Developers", glyph: "code", accent: "#7c3aed" },
   { key: "ai", label: "AI Coding Assistants", glyph: "ai", accent: "#2563eb" },
-  { key: "registries", label: "Public Registries", glyph: "globe", accent: "#0d9488" },
+  { key: "registries", label: "Package Registries", glyph: "globe", accent: "#0d9488" },
   { key: "transitive", label: "Transitive Dependencies", glyph: "link", accent: "#ea580c" },
 ];
 
@@ -171,6 +171,22 @@ function SoftwareNode({ size }: { size: number }): React.ReactElement {
   );
 }
 
+/** "Your Application" caption for the convergence node the vectors flow into. */
+function NodeLabel(): React.ReactElement {
+  return (
+    <span
+      className="whitespace-nowrap font-display text-[#111]"
+      style={{
+        fontSize: "var(--fs-h5)",
+        fontWeight: 600,
+        letterSpacing: "-0.02em",
+      }}
+    >
+      Your Application
+    </span>
+  );
+}
+
 function FlowDesktop(): React.ReactElement {
   return (
     <div
@@ -262,12 +278,18 @@ function FlowDesktop(): React.ReactElement {
           </div>
         ))}
 
-        {/* Convergence node. */}
+        {/* Convergence node + "Your Application" caption. */}
         <div
           className="absolute -translate-x-1/2 -translate-y-1/2"
           style={{ left: pct(NODE.cx, VB.w), top: pct(NODE.cy, VB.h) }}
         >
           <SoftwareNode size={NODE.r * 2} />
+        </div>
+        <div
+          className="absolute -translate-x-1/2 text-center"
+          style={{ left: pct(NODE.cx, VB.w), top: pct(NODE.cy + NODE.r + 24, VB.h) }}
+        >
+          <NodeLabel />
         </div>
       </div>
     </div>
@@ -291,7 +313,10 @@ function FlowMobile(): React.ReactElement {
           />
         </div>
       ))}
-      <SoftwareNode size={112} />
+      <div className="flex flex-col items-center gap-3">
+        <SoftwareNode size={112} />
+        <NodeLabel />
+      </div>
     </div>
   );
 }
@@ -331,23 +356,38 @@ export function LibrariesPipeline(): React.ReactElement {
       />
       <Container className="relative">
         <Reveal header>
-          <h2
-            className="mx-auto max-w-[760px] text-center font-display text-[#111]"
-            style={{
-              fontSize: "var(--fs-h2)",
-              fontWeight: 700,
-              letterSpacing: "-0.03em",
-              lineHeight: 1.08,
-            }}
-          >
-            <span
-              className="bg-clip-text text-transparent"
-              style={{ backgroundImage: "linear-gradient(102deg, #9a51ff 0%, #2cc1eb 100%)" }}
+          <div className="mx-auto max-w-[760px] text-center">
+            <h2
+              className="font-display text-[#111]"
+              style={{
+                fontSize: "var(--fs-h2)",
+                fontWeight: 700,
+                letterSpacing: "-0.03em",
+                lineHeight: 1.08,
+              }}
             >
-              Libraries
-            </span>{" "}
-            Enter Software Through
-          </h2>
+              <span
+                className="bg-clip-text text-transparent"
+                style={{ backgroundImage: "linear-gradient(102deg, #9a51ff 0%, #2cc1eb 100%)" }}
+              >
+                Libraries
+              </span>{" "}
+              Come from Everywhere. Trust Doesn&rsquo;t.
+            </h2>
+            <p
+              className="mx-auto mt-6 max-w-[680px] font-sans text-[#555]"
+              style={{
+                fontSize: "var(--fs-lead)",
+                fontWeight: 400,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.5,
+                textWrap: "balance",
+              }}
+            >
+              Every application depends on libraries introduced from multiple
+              sources.
+            </p>
+          </div>
         </Reveal>
 
         <Reveal className="mt-10 lg:mt-6">

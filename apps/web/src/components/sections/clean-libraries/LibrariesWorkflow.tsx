@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 import { Container, Section } from "@/components/layout";
 import { Reveal, RevealItem, RevealStagger } from "@/components/ui/Reveal";
 
-type FeatureIcon = "source" | "verify" | "trust";
+type FeatureIcon = "source" | "verify" | "policy";
 
 interface FeatureRow {
   icon: FeatureIcon;
@@ -30,43 +30,43 @@ interface Stage {
 const STAGES: Stage[] = [
   {
     image: "/images/clean-libraries/flow-developers.webp",
-    title: "Developers & AI Coding Tools",
+    title: "Developers & AI Coding Assistants",
     accent: "#5b9bff",
     tint: "rgba(91,155,255,0.14)",
-    body: "Request software libraries.",
+    body: "Build software using your preferred development tools.",
   },
   {
     image: "/images/clean-libraries/flow-clean-library.webp",
-    title: "Clean Library",
+    title: "Clean Libraries",
     accent: "#a974ff",
     tint: "rgba(169,116,255,0.18)",
     featured: true,
     features: [
-      { icon: "source", label: "Built from Source" },
-      { icon: "verify", label: "Continuous Verification" },
-      { icon: "trust", label: "Trusted Libraries" },
+      { icon: "source", label: "Source Verification" },
+      { icon: "verify", label: "Dependency Validation" },
+      { icon: "policy", label: "Policy Governance" },
     ],
   },
   {
     image: "/images/clean-libraries/flow-repository.webp",
-    title: "Policy Controls",
+    title: "Approved Libraries",
     accent: "#2dd4bf",
     tint: "rgba(45,212,191,0.14)",
-    body: "Define and validate trust policies.",
+    body: "Verified libraries ready for secure software development.",
   },
   {
     image: "/images/clean-libraries/flow-cicd.webp",
     title: "CI/CD Gates",
     accent: "#f7a35c",
     tint: "rgba(247,163,92,0.14)",
-    body: "Automated policy enforcement.",
+    body: "Automatically enforce library policies before deployment.",
   },
   {
     image: "/images/clean-libraries/flow-production.webp",
-    title: "Production Artifacts",
+    title: "Trusted Software",
     accent: "#5b9bff",
     tint: "rgba(91,155,255,0.14)",
-    body: "Trusted software reaches production.",
+    body: "Applications built on approved and verified libraries.",
   },
 ];
 
@@ -117,11 +117,13 @@ function FeatureGlyph({ icon }: { icon: FeatureIcon }): React.ReactElement {
           <path d="m9 12 2 2 4-4" />
         </svg>
       );
-    case "trust":
+    case "policy":
       return (
         <svg {...common}>
-          <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
-          <path d="m9 12 2 2 4-4" />
+          <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+          <path d="M14 2v5h5" />
+          <line x1="8.5" y1="13" x2="15" y2="13" />
+          <line x1="8.5" y1="17" x2="13" y2="17" />
         </svg>
       );
   }
@@ -257,9 +259,15 @@ function FeatureList({
 function StageCard({
   stage,
   delaySteps,
+  desktop = false,
 }: {
   stage: Stage;
   delaySteps: number;
+  /**
+   * The desktop scene fixes each stage's height so the scaled 1180×420 canvas
+   * stays deterministic; the stacked (mobile) layout uses natural heights.
+   */
+  desktop?: boolean;
 }): React.ReactElement {
   const featured = stage.featured ?? false;
   return (
@@ -267,7 +275,8 @@ function StageCard({
       data-featured={featured ? "true" : undefined}
       className={cn(
         "wf-card relative flex h-full flex-col items-center rounded-[22px] border text-center",
-        featured ? "gap-5 px-8 py-9 xl:min-h-[420px]" : "gap-4 px-6 py-8 xl:min-h-[356px]",
+        featured ? "gap-5 px-8 py-9" : "gap-4 px-6 py-8",
+        desktop && (featured ? "min-h-[420px]" : "min-h-[356px]"),
       )}
       style={{
         ["--accent" as string]: stage.accent,
@@ -398,12 +407,12 @@ export function LibrariesWorkflow(): React.ReactElement {
               lineHeight: 1.1,
             }}
           >
-            Built Into Your{" "}
+            Built for Modern{" "}
             <span
               className="bg-clip-text text-transparent"
               style={{ backgroundImage: "linear-gradient(102deg, #9a51ff 0%, #2cc1eb 100%)" }}
             >
-              Workflow
+              Software Delivery
             </span>
           </h2>
           <p
@@ -416,43 +425,66 @@ export function LibrariesWorkflow(): React.ReactElement {
               textWrap: "balance",
             }}
           >
-            Clean Libraries integrates into your existing software delivery
-            pipeline, validating and governing libraries before they reach
-            production.
+            Integrates into your existing development workflow, ensuring trusted
+            libraries become part of every application.
           </p>
         </Reveal>
 
         {/* The flow wrapper is the in-view target that gates the cascade. */}
         <div ref={flowRef} className={cn(anim && "wf-anim")}>
           {/* Desktop — horizontal flow with the Clean Library stage prominent.
-              Cards and connectors are siblings so every non-featured card keeps
-              an identical flex basis (equal width); connectors never steal width.
-              Each stage (and its arrow) reveals in sequence, left to right. */}
-          <RevealStagger
-            gap={0.12}
-            className="mt-14 hidden items-center justify-center gap-2 xl:flex"
+              Rendered on a fixed 1180×420 design canvas that scales uniformly to
+              fit its container (the same scale-to-fit technique as the Pipeline
+              and Governance scenes on this page), so the row stays horizontal all
+              the way down to `lg` instead of hard-switching to the stacked layout
+              at `xl`. Cards and connectors are siblings so every non-featured card
+              keeps an identical flex basis; each stage (and its arrow) reveals in
+              sequence, left to right. */}
+          <div
+            className="relative mx-auto mt-14 hidden w-full max-w-[1180px] lg:block"
+            style={{ aspectRatio: "1180 / 420", containerType: "inline-size" }}
           >
-            {STAGES.map((stage, i) => (
-              <Fragment key={stage.title}>
-                <RevealItem
-                  className={`${stage.featured ? "relative z-10 flex-[1.32]" : "flex-1"} min-w-0`}
-                >
-                  <StageCard stage={stage} delaySteps={STAGE_STARTS[i] ?? 0} />
-                </RevealItem>
-                {i < STAGES.length - 1 ? (
-                  <RevealItem className="shrink-0">
-                    <Connector
-                      accent={STAGES[i + 1]?.accent ?? stage.accent}
-                      delaySteps={(STAGE_STARTS[i + 1] ?? 0) - 0.35}
-                    />
-                  </RevealItem>
-                ) : null}
-              </Fragment>
-            ))}
-          </RevealStagger>
+            <div
+              className="absolute left-0 top-0"
+              style={
+                {
+                  width: 1180,
+                  height: 420,
+                  transformOrigin: "top left",
+                  transform: "scale(var(--wf-scale))",
+                  // Divide by a length (1180px) so the ratio is unitless —
+                  // `scale()` rejects a length-valued custom property.
+                  "--wf-scale": "min(1, 100cqw / 1180px)",
+                } as React.CSSProperties
+              }
+            >
+              <RevealStagger
+                gap={0.12}
+                className="flex h-full items-center justify-center gap-2"
+              >
+                {STAGES.map((stage, i) => (
+                  <Fragment key={stage.title}>
+                    <RevealItem
+                      className={`${stage.featured ? "relative z-10 flex-[1.32]" : "flex-1"} min-w-0`}
+                    >
+                      <StageCard stage={stage} delaySteps={STAGE_STARTS[i] ?? 0} desktop />
+                    </RevealItem>
+                    {i < STAGES.length - 1 ? (
+                      <RevealItem className="shrink-0">
+                        <Connector
+                          accent={STAGES[i + 1]?.accent ?? stage.accent}
+                          delaySteps={(STAGE_STARTS[i + 1] ?? 0) - 0.35}
+                        />
+                      </RevealItem>
+                    ) : null}
+                  </Fragment>
+                ))}
+              </RevealStagger>
+            </div>
+          </div>
 
-          {/* Stacked — vertical flow for < xl. */}
-          <RevealStagger className="mx-auto mt-12 flex max-w-[440px] flex-col items-stretch gap-3 xl:hidden">
+          {/* Stacked — vertical flow for < lg (mobile / small tablet). */}
+          <RevealStagger className="mx-auto mt-12 flex max-w-[440px] flex-col items-stretch gap-3 lg:hidden">
             {STAGES.map((stage, i) => (
               <RevealItem key={stage.title} className="flex flex-col items-stretch gap-3">
                 <StageCard stage={stage} delaySteps={STAGE_STARTS[i] ?? 0} />

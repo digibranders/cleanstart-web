@@ -1,64 +1,95 @@
 import { Container, Section } from "@/components/layout";
-import { Reveal } from "@/components/ui/Reveal";
+import { Reveal, RevealItem, RevealStagger } from "@/components/ui/Reveal";
+import { GlassIcon } from "./GlassIcon";
 
 /**
- * "The Trust Gap" — a glass library cube sits at the centre with five trust
- * attributes orbiting it. Each attribute (Identity, Provenance, Security,
- * Policy, Trust) carries its own ghosted glyph in an *unverified* state: a
- * dashed ring plus an amber "pending" pip. This is the first half of an
- * Unverified → Verified arc — the next section resolves the same attributes
- * into solid, established icons. Built entirely in SVG/CSS (no raster) to
- * match the page's other coded scenes.
+ * "Trust Is Built. Not Assumed." — the glass "Library" cube sits at the centre
+ * as the hero object, with four trust attributes (Identity, Provenance,
+ * Authenticity, Policy) presented as titled, described cards flanking it (two
+ * left, two right on desktop; a stacked grid below the cube on mobile). Thin
+ * brand-coloured connectors tie each card back to the cube. Everything is drawn
+ * in SVG/CSS (no raster) to match the page's other coded scenes; all motion is
+ * disabled under prefers-reduced-motion (see globals.css).
  *
- * The diagram lives on a fixed 1110×580 design canvas that is scaled uniformly
- * to fit (the same `--tg-scale` technique as the Pipeline orb), so every
- * coordinate below is exact. Below `lg` it falls back to a stacked cube +
- * orb grid. The heading is centred above the diagram, matching the other
- * sections on the page.
+ * The desktop diagram lives on a fixed 1160×430 design canvas scaled uniformly
+ * to fit (the same scale-to-fit technique as the Pipeline / Governance scenes),
+ * so every coordinate below is exact.
  */
 
-type NodeKey = "identity" | "provenance" | "security" | "policy" | "trust";
-type IconKey = "fingerprint" | "branch" | "shield" | "policy" | "seal";
+type IconKey = "fingerprint" | "branch" | "shield" | "policy";
 
-interface TrustNode {
-  key: NodeKey;
-  label: string;
-  /** Attribute glyph shown inside the orb (in its "unverified" state). */
+interface TrustCard {
+  key: string;
+  title: string;
+  desc: string;
   icon: IconKey;
-  /** Orb centre in the 1110×580 canvas. */
-  ox: number;
-  oy: number;
-  /** Label centre in the 1110×580 canvas. */
-  lx: number;
-  ly: number;
-  /** Where the connector meets the cube surface. */
-  attach: readonly [number, number];
+  accent: string;
+  tint: string;
+  /** Card centre in the 1160×600 canvas (desktop). */
+  cx: number;
+  cy: number;
+  /** X of the card edge the connector meets (inner edge, facing the cube). */
+  anchorX: number;
+  /** Point on the cube's side silhouette where this card's connector originates. */
+  cubePt: readonly [number, number];
 }
 
-const ORB_R = 54;
+const CARD_W = 286;
+const CARD_H = 120;
 
-/**
- * Caution accent for the "pending / unverified" pip. Kept here as the single
- * source; promote to a shared design token if a caution state is introduced on
- * other pages (amber = pending, green = verified, purple = brand).
- */
-const AMBER_PIP =
-  "radial-gradient(closest-side, #ffd27a 0%, #f5a623 62%, #d98a12 100%)";
-
-// Positions are symmetric about the canvas centre (x = 555) so the cube and
-// orb cluster sit dead-centre under the heading.
-// Every label sits a uniform 80px above its orb centre (a comfortable gap
-// above the orb; all-above reads consistently and avoids the Identity → cube
-// connector that an all-below layout would cross).
-const NODES: TrustNode[] = [
-  { key: "identity", label: "Identity", icon: "fingerprint", ox: 555, oy: 108, lx: 555, ly: 28, attach: [555, 268] },
-  { key: "provenance", label: "Provenance", icon: "branch", ox: 274, oy: 288, lx: 274, ly: 208, attach: [462, 328] },
-  { key: "security", label: "Security", icon: "shield", ox: 836, oy: 288, lx: 836, ly: 208, attach: [648, 328] },
-  { key: "policy", label: "Policy", icon: "policy", ox: 318, oy: 486, lx: 318, ly: 406, attach: [495, 434] },
-  { key: "trust", label: "Trust", icon: "seal", ox: 792, oy: 486, lx: 792, ly: 406, attach: [615, 434] },
+const CARDS: TrustCard[] = [
+  {
+    key: "identity",
+    title: "Identity",
+    desc: "Know exactly what you’re using.",
+    icon: "fingerprint",
+    accent: "#a974ff",
+    tint: "rgba(169,116,255,0.14)",
+    cx: 205,
+    cy: 90,
+    anchorX: 348,
+    cubePt: [464, 153],
+  },
+  {
+    key: "provenance",
+    title: "Provenance",
+    desc: "Know where every library came from.",
+    icon: "branch",
+    accent: "#5b9bff",
+    tint: "rgba(91,155,255,0.14)",
+    cx: 205,
+    cy: 340,
+    anchorX: 348,
+    cubePt: [464, 245],
+  },
+  {
+    key: "authenticity",
+    title: "Authenticity",
+    desc: "Know it hasn’t been altered.",
+    icon: "shield",
+    accent: "#2dd4bf",
+    tint: "rgba(45,212,191,0.14)",
+    cx: 955,
+    cy: 90,
+    anchorX: 812,
+    cubePt: [696, 153],
+  },
+  {
+    key: "policy",
+    title: "Policy",
+    desc: "Know it meets your standards.",
+    icon: "policy",
+    accent: "#f7a35c",
+    tint: "rgba(247,163,92,0.14)",
+    cx: 955,
+    cy: 340,
+    anchorX: 812,
+    cubePt: [696, 245],
+  },
 ];
 
-/* ---- Isometric cube geometry (1110×580 canvas) ------------------------- */
+/* ---- Isometric cube geometry (drawn on the full 1110×580 space, then cropped
+   to the cube region via the viewBox so it can be placed anywhere). ---------- */
 const CUBE_CX = 555;
 const W = 116; // top-rhombus half-width
 const Q = 56; // top-rhombus half-height (iso squash)
@@ -76,37 +107,27 @@ const V = {
 } as const;
 const P = (p: readonly [number, number]): string => `${p[0]},${p[1]}`;
 
-interface Connector {
-  d: string;
-  dot: readonly [number, number];
-}
-
-function connectorFor(n: TrustNode): Connector {
-  const [ax, ay] = n.attach;
-  const dx = n.ox - ax;
-  const dy = n.oy - ay;
-  const len = Math.hypot(dx, dy) || 1;
-  const ex = n.ox - (dx / len) * (ORB_R + 8);
-  const ey = n.oy - (dy / len) * (ORB_R + 8);
-  return { d: `M ${ax} ${ay} L ${ex.toFixed(1)} ${ey.toFixed(1)}`, dot: n.attach };
+function lineProps(
+  a: readonly [number, number],
+  b: readonly [number, number],
+): { x1: number; y1: number; x2: number; y2: number } {
+  return { x1: a[0], y1: a[1], x2: b[0], y2: b[1] };
 }
 
 /**
- * The canvas SVG: reflective base, glass cube, dotted connectors + dots. All
- * geometry is in the 1110×580 space; `viewBox` lets the mobile layout crop to
- * the cube region, and `withConnectors` drops the radiating lines there.
+ * The glass "Library" cube: reflective base, glass faces, glowing neon rim, and
+ * the in-cube `</> Library` label. The `viewBox` crops to the cube region so it
+ * can be sized and placed as a standalone centrepiece; `idPrefix` namespaces the
+ * gradient/filter ids so multiple mounted copies (desktop + mobile) never
+ * collide.
  */
-function DiagramSvg({
-  viewBox = "0 0 1110 580",
-  withConnectors = true,
-  idPrefix = "d",
+function LibraryCube({
+  viewBox = "335 200 440 330",
+  idPrefix = "cube",
 }: {
   viewBox?: string;
-  withConnectors?: boolean;
   idPrefix?: string;
 }): React.ReactElement {
-  // Namespaced ids so the desktop and mobile copies (both mounted, one hidden)
-  // never collide on gradient/filter ids.
   const gid = (name: string): string => `tg-${idPrefix}-${name}`;
   return (
     <svg
@@ -174,23 +195,6 @@ function DiagramSvg({
           strokeWidth="1"
         />
       ))}
-      {/* Sonar ripple emanating from the cube base (two rings, half a cycle
-          apart, so the pulse feels continuous). Desktop only. */}
-      {withConnectors &&
-        [0, 2].map((d) => (
-          <ellipse
-            key={d}
-            className="cs-tg-ripple"
-            cx={CUBE_CX}
-            cy="472"
-            rx="150"
-            ry="30"
-            fill="none"
-            stroke="rgba(150,130,255,0.45)"
-            strokeWidth="1.2"
-            style={{ animationDelay: `${d}s` }}
-          />
-        ))}
 
       {/* Inner core glow — energy sealed inside the glass (softly breathes). */}
       <ellipse
@@ -213,28 +217,17 @@ function DiagramSvg({
         opacity="0.26"
       />
 
-      {/* Glowing neon top rim + side verticals (the wireframe reads bright
-          against the near-solid dark faces). */}
+      {/* Glowing neon top rim + side verticals. */}
       <polyline
         points={`${P(V.Ttop)} ${P(V.Tright)} ${P(V.Tfront)} ${P(V.Tleft)} ${P(V.Ttop)}`}
         stroke="rgba(228,224,255,0.95)"
         strokeWidth="1.75"
         filter={`url(#${gid("glow")})`}
       />
-      <line
-        {...lineProps(V.Tleft, V.Bleft)}
-        stroke="rgba(150,138,255,0.85)"
-        strokeWidth="1.4"
-        filter={`url(#${gid("glow")})`}
-      />
-      <line
-        {...lineProps(V.Tright, V.Bright)}
-        stroke="rgba(174,162,255,0.9)"
-        strokeWidth="1.4"
-        filter={`url(#${gid("glow")})`}
-      />
+      <line {...lineProps(V.Tleft, V.Bleft)} stroke="rgba(150,138,255,0.85)" strokeWidth="1.4" filter={`url(#${gid("glow")})`} />
+      <line {...lineProps(V.Tright, V.Bright)} stroke="rgba(174,162,255,0.9)" strokeWidth="1.4" filter={`url(#${gid("glow")})`} />
 
-      {/* Bright front vertical + bottom edges (light catches the near corner). */}
+      {/* Bright front vertical + bottom edges. */}
       <line {...lineProps(V.Tfront, V.Bfront)} stroke="rgba(226,228,255,0.95)" strokeWidth="1.75" filter={`url(#${gid("glow")})`} />
       <polyline
         points={`${P(V.Bleft)} ${P(V.Bfront)} ${P(V.Bright)}`}
@@ -267,38 +260,11 @@ function DiagramSvg({
       >
         Library
       </text>
-
-      {/* Dotted connectors + glowing attach dots (drawn above the cube). */}
-      {withConnectors &&
-        NODES.map((n) => {
-          const c = connectorFor(n);
-          return (
-            <g key={n.key}>
-              <path
-                className="cs-tg-flow"
-                d={c.d}
-                stroke="rgba(150,124,255,0.55)"
-                strokeWidth="1.5"
-                strokeDasharray="1 7"
-                strokeLinecap="round"
-              />
-              <circle cx={c.dot[0]} cy={c.dot[1]} r="3.6" fill="#c3b4ff" filter={`url(#${gid("glow")})`} />
-            </g>
-          );
-        })}
     </svg>
   );
 }
 
-function lineProps(
-  a: readonly [number, number],
-  b: readonly [number, number],
-): { x1: number; y1: number; x2: number; y2: number } {
-  return { x1: a[0], y1: a[1], x2: b[0], y2: b[1] };
-}
-
-/** Attribute glyphs — one per trust attribute, drawn as thin line icons that
- *  inherit the orb's ghosted colour via currentColor. */
+/** Attribute glyphs — thin line icons; stroke inherits the accent via currentColor. */
 function AttrIcon({ icon, size }: { icon: IconKey; size: number }): React.ReactElement {
   const common = {
     width: size,
@@ -306,7 +272,7 @@ function AttrIcon({ icon, size }: { icon: IconKey; size: number }): React.ReactE
     viewBox: "0 0 24 24",
     fill: "none",
     stroke: "currentColor",
-    strokeWidth: 1.6,
+    strokeWidth: 1.7,
     strokeLinecap: "round" as const,
     strokeLinejoin: "round" as const,
     "aria-hidden": true,
@@ -334,6 +300,7 @@ function AttrIcon({ icon, size }: { icon: IconKey; size: number }): React.ReactE
       return (
         <svg {...common}>
           <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1Z" />
+          <path d="m9 12 2 2 4-4" />
         </svg>
       );
     case "policy":
@@ -345,187 +312,153 @@ function AttrIcon({ icon, size }: { icon: IconKey; size: number }): React.ReactE
           <line x1="8.5" y1="17" x2="13" y2="17" />
         </svg>
       );
-    case "seal":
-      return (
-        <svg {...common}>
-          <circle cx="12" cy="8.5" r="5" />
-          <path d="M8.6 12.6 7 22l5-2.8 5 2.8-1.6-9.4" />
-        </svg>
-      );
   }
 }
 
-/**
- * An "unverified" attribute orb: a glossy dark sphere carrying the attribute's
- * own glyph (ghosted), enclosed by a dashed ring and flagged with a small amber
- * "pending" pip — the visual language of *not yet established*. In the next
- * section these same attributes resolve into solid, verified icons.
- */
-function TrustOrb({
-  node,
-  size = 108,
-  delay = 0,
-}: {
-  node: TrustNode;
-  size?: number;
-  /** Per-orb animation offset (seconds) so the amber pips pulse out of phase. */
-  delay?: number;
-}): React.ReactElement {
-  const pip = Math.max(11, Math.round(size * 0.16));
+/** A trust-attribute card: glass icon + title + description. */
+function AttrCard({ card }: { card: TrustCard }): React.ReactElement {
   return (
     <div
-      className="cs-tg-orb relative rounded-full"
+      className="flex h-full flex-col justify-center rounded-[18px] border p-5"
       style={{
-        width: size,
-        height: size,
-        animationDelay: `${-delay * 2.1}s`,
-        background:
-          "radial-gradient(122% 122% at 34% 24%, #3c3557 0%, #191630 46%, #090714 100%)",
+        borderColor: `color-mix(in srgb, ${card.accent} 26%, transparent)`,
+        background: `linear-gradient(155deg, ${card.tint} 0%, rgba(12,10,26,0.62) 62%)`,
         boxShadow:
-          "0 16px 34px rgba(0,0,0,0.5), 0 0 22px rgba(122,90,248,0.16), inset 0 2px 5px rgba(198,190,255,0.24), inset 0 -10px 20px rgba(0,0,0,0.55)",
+          "0 14px 34px -20px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05)",
       }}
     >
-      {/* top-left specular highlight */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute rounded-full"
-        style={{
-          top: "11%",
-          left: "17%",
-          width: "44%",
-          height: "34%",
-          background:
-            "radial-gradient(closest-side, rgba(232,227,255,0.5) 0%, rgba(232,227,255,0) 70%)",
-          filter: "blur(3px)",
-        }}
-      />
-      {/* dashed "unverified" ring */}
-      <svg aria-hidden viewBox="0 0 100 100" className="absolute inset-0 h-full w-full">
-        <circle
-          cx="50"
-          cy="50"
-          r="46.5"
-          fill="none"
-          stroke="rgba(178,160,255,0.6)"
-          strokeWidth="1.4"
-          strokeDasharray="3 4.5"
-          strokeLinecap="round"
-        />
-      </svg>
-      {/* ghosted attribute glyph */}
-      <div
-        className="absolute inset-0 flex items-center justify-center"
-        style={{ color: "rgba(214,206,255,0.62)" }}
-      >
-        <AttrIcon icon={node.icon} size={Math.round(size * 0.42)} />
+      <div className="flex items-start gap-4">
+        <GlassIcon accent={card.accent} size={46}>
+          <AttrIcon icon={card.icon} size={22} />
+        </GlassIcon>
+        <div className="flex flex-col gap-1.5">
+          <h3
+            className="font-display text-white"
+            style={{
+              fontSize: "var(--fs-h5)",
+              fontWeight: 600,
+              letterSpacing: "-0.01em",
+              lineHeight: 1.2,
+            }}
+          >
+            {card.title}
+          </h3>
+          <p
+            className="font-sans text-white/65"
+            style={{
+              fontSize: "var(--fs-body-sm)",
+              fontWeight: 400,
+              letterSpacing: "-0.01em",
+              lineHeight: 1.45,
+              textWrap: "balance",
+            }}
+          >
+            {card.desc}
+          </p>
+        </div>
       </div>
-      {/* amber "pending / unverified" pip on the shoulder, with a radar-style
-          ping halo so it reads as a live status beacon rather than a dot */}
-      <span
-        aria-hidden
-        className="cs-tg-pip-ping absolute rounded-full"
-        style={{
-          top: "13%",
-          right: "13%",
-          width: pip,
-          height: pip,
-          animationDelay: `${delay}s`,
-          border: "1.5px solid rgba(245,166,35,0.8)",
-        }}
-      />
-      <span
-        aria-hidden
-        className="cs-tg-pip absolute rounded-full"
-        style={{
-          top: "13%",
-          right: "13%",
-          width: pip,
-          height: pip,
-          animationDelay: `${delay}s`,
-          background: AMBER_PIP,
-          boxShadow:
-            "0 0 10px rgba(245,166,35,0.75), inset 0 1px 1px rgba(255,255,255,0.5)",
-        }}
-      />
     </div>
   );
 }
 
-function NodeLabel({ children }: { children: React.ReactNode }): React.ReactElement {
-  return (
-    <span
-      className="whitespace-nowrap font-sans text-white/85"
-      style={{ fontSize: "var(--fs-h5)", fontWeight: 500, letterSpacing: "-0.01em" }}
-    >
-      {children}
-    </span>
-  );
-}
-
-const pct = (v: number, total: number): string => `${(v / total) * 100}%`;
-
-/** Scaled desktop diagram on the fixed 1110×580 canvas. */
+/** Scaled desktop diagram on the fixed 1160×430 canvas. */
 function DiagramDesktop(): React.ReactElement {
   return (
     <div
-      className="mx-auto hidden lg:block"
-      style={
-        {
-          "--tg-scale": "min(1, calc((min(100vw, 1200px) - 48px) / 1110px))",
-          width: "calc(1110px * var(--tg-scale))",
-          height: "calc(580px * var(--tg-scale))",
-        } as React.CSSProperties
-      }
+      className="relative mx-auto hidden w-full max-w-[1160px] lg:block"
+      style={{ aspectRatio: "1160 / 430", containerType: "inline-size" }}
     >
       <div
-        className="relative"
-        style={{
-          width: "1110px",
-          height: "580px",
-          transform: "scale(var(--tg-scale))",
-          transformOrigin: "top left",
-        }}
+        className="absolute left-0 top-0"
+        style={
+          {
+            width: 1160,
+            height: 430,
+            transformOrigin: "top left",
+            transform: "scale(var(--tg-scale))",
+            // Divide by a length so the ratio is unitless (scale() rejects a length).
+            "--tg-scale": "min(1, 100cqw / 1160px)",
+          } as React.CSSProperties
+        }
       >
-        <DiagramSvg />
-        {NODES.map((n, i) => (
-          <div
-            key={`orb-${n.key}`}
-            className="absolute -translate-x-1/2 -translate-y-1/2"
-            style={{ left: pct(n.ox, 1110), top: pct(n.oy, 580) }}
+        {/* Cube centrepiece (painted first, behind the connectors). */}
+        <Reveal
+          y={0}
+          duration={0.7}
+          className="absolute"
+          style={{ left: 360, top: 50, width: 440, height: 330 }}
+        >
+          <LibraryCube idPrefix="cube" />
+        </Reveal>
+
+        {/* Connectors from the cube out to each card. */}
+        <svg aria-hidden viewBox="0 0 1160 430" className="absolute inset-0 h-full w-full" fill="none">
+          <defs>
+            <filter id="tg-conn-glow" x="-40%" y="-40%" width="180%" height="180%">
+              <feGaussianBlur stdDeviation="1.6" result="b" />
+              <feMerge>
+                <feMergeNode in="b" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          {CARDS.map((card) => {
+            const [nx, ny] = card.cubePt;
+            return (
+              <g key={card.key}>
+                <line
+                  x1={nx}
+                  y1={ny}
+                  x2={card.anchorX}
+                  y2={card.cy}
+                  stroke={card.accent}
+                  strokeOpacity="0.5"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  filter="url(#tg-conn-glow)"
+                />
+                <circle cx={nx} cy={ny} r="4" fill={card.accent} filter="url(#tg-conn-glow)" />
+              </g>
+            );
+          })}
+        </svg>
+
+        {/* Attribute cards. */}
+        {CARDS.map((card, i) => (
+          <Reveal
+            key={card.key}
+            delay={0.15 + i * 0.1}
+            y={24}
+            className="absolute"
+            style={{
+              left: card.cx - CARD_W / 2,
+              top: card.cy - CARD_H / 2,
+              width: CARD_W,
+              height: CARD_H,
+            }}
           >
-            <TrustOrb node={n} delay={i * -1.1} />
-          </div>
-        ))}
-        {NODES.map((n) => (
-          <div
-            key={`lbl-${n.key}`}
-            className="absolute -translate-x-1/2 -translate-y-1/2"
-            style={{ left: pct(n.lx, 1110), top: pct(n.ly, 580) }}
-          >
-            <NodeLabel>{n.label}</NodeLabel>
-          </div>
+            <AttrCard card={card} />
+          </Reveal>
         ))}
       </div>
     </div>
   );
 }
 
-/** Stacked fallback for < lg — cube above a 2/3-col orb grid. */
+/** Stacked fallback for < lg — cube above a 1/2-col card grid. */
 function DiagramMobile(): React.ReactElement {
   return (
-    <div className="flex flex-col items-center gap-12 lg:hidden">
-      {/* Reuse the shared canvas, cropped to the cube region (no connectors). */}
-      <div className="relative w-full max-w-[300px]" style={{ aspectRatio: "320 / 295" }}>
-        <DiagramSvg viewBox="395 205 320 295" withConnectors={false} idPrefix="m" />
+    <div className="flex flex-col items-center gap-10 lg:hidden">
+      <div className="relative w-full max-w-[300px]" style={{ aspectRatio: "440 / 330" }}>
+        <LibraryCube idPrefix="cubem" />
       </div>
-      <div className="grid w-full max-w-[420px] grid-cols-2 gap-x-6 gap-y-9 sm:grid-cols-3">
-        {NODES.map((n, i) => (
-          <div key={n.key} className="flex flex-col items-center gap-4">
-            <TrustOrb node={n} size={84} delay={i * -1.1} />
-            <NodeLabel>{n.label}</NodeLabel>
-          </div>
+      <RevealStagger className="grid w-full max-w-[440px] grid-cols-1 gap-4 sm:grid-cols-2">
+        {CARDS.map((card) => (
+          <RevealItem key={card.key} className="h-full">
+            <AttrCard card={card} />
+          </RevealItem>
         ))}
-      </div>
+      </RevealStagger>
     </div>
   );
 }
@@ -561,46 +494,28 @@ export function LibrariesTrustGap(): React.ReactElement {
                 lineHeight: 1.1,
               }}
             >
-              The Trust Gap
+              Trust Is Built. Not Assumed.
             </h2>
             <p
-              className="mx-auto mt-6 max-w-[720px] font-sans text-white/80"
+              className="mx-auto mt-6 max-w-[640px] font-sans text-white/80"
               style={{
                 fontSize: "var(--fs-lead)",
                 fontWeight: 400,
                 letterSpacing: "-0.02em",
                 lineHeight: 1.5,
+                textWrap: "balance",
               }}
             >
-              Every library carries trust attributes that should be established
-              before it becomes part of your software.
+              Trust isn’t assumed. It’s established through continuous
+              verification.
             </p>
           </div>
         </Reveal>
 
-        <Reveal className="mt-4 lg:mt-6">
+        <div className="mt-2 lg:mt-4">
           <DiagramDesktop />
           <DiagramMobile />
-          {/* Legend — makes the amber pip's "pending" meaning explicit. */}
-          <p
-            className="mt-8 flex items-center justify-center gap-2.5 font-sans text-white/55"
-            style={{
-              fontSize: "var(--fs-caption)",
-              fontWeight: 500,
-              letterSpacing: "0.01em",
-            }}
-          >
-            <span
-              aria-hidden
-              className="inline-block size-2.5 shrink-0 rounded-full"
-              style={{
-                background: AMBER_PIP,
-                boxShadow: "0 0 8px rgba(245,166,35,0.6)",
-              }}
-            />
-            Unverified — trust attributes not yet established
-          </p>
-        </Reveal>
+        </div>
       </Container>
     </Section>
   );
