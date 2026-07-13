@@ -36,7 +36,8 @@ const STAGES: Stage[] = [
     body: "Build software using your preferred development tools.",
   },
   {
-    image: "/images/clean-libraries/flow-clean-library.webp",
+    // Reuse the homepage Clean Libraries product logo (shared asset).
+    image: "/images/cleanstart-factory/clean-libraries-2.webp",
     title: "Clean Libraries",
     accent: "#a974ff",
     tint: "rgba(169,116,255,0.18)",

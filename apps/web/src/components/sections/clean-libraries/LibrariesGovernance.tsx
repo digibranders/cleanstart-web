@@ -1,7 +1,8 @@
+import Image from "next/image";
 import { Container, Section } from "@/components/layout";
 import { Reveal, RevealItem, RevealStagger } from "@/components/ui/Reveal";
 
-type IconKey = "repository" | "search" | "sparkles" | "shield";
+type IconKey = "tag" | "scroll" | "refresh" | "scale";
 type Pos = "tl" | "tr" | "bl" | "br";
 
 interface GovCard {
@@ -24,22 +25,22 @@ interface GovCard {
 
 const CARDS: GovCard[] = [
   {
-    key: "repository",
-    icon: "repository",
-    title: "Trusted Repository",
-    body: "Approved libraries from trusted sources.",
+    key: "source",
+    icon: "tag",
+    title: "Source Verification",
+    body: "Libraries rebuilt and verified directly from trusted upstream source.",
     accent: "#6d28d9",
     border: "#d4c6f9",
     fill: "#f6f3fe",
     shadow: "rgba(109,40,217,0.15)",
-    textMax: 200,
+    textMax: 230,
     pos: "tl",
   },
   {
-    key: "validation",
-    icon: "search",
-    title: "Dependency Validation",
-    body: "Validate every library before adoption.",
+    key: "provenance",
+    icon: "scroll",
+    title: "Transparent Provenance",
+    body: "Complete traceability from source to software artifact.",
     accent: "#0f766e",
     border: "#b5e3d8",
     fill: "#eefbf7",
@@ -48,27 +49,27 @@ const CARDS: GovCard[] = [
     pos: "tr",
   },
   {
-    key: "ai",
-    icon: "sparkles",
-    title: "AI Controls",
-    body: "Validate AI-suggested libraries before use.",
+    key: "validation",
+    icon: "refresh",
+    title: "Continuous Validation",
+    body: "Libraries continuously verified as upstream projects evolve.",
     accent: "#1d4ed8",
     border: "#b4c6f4",
     fill: "#eff3fe",
     shadow: "rgba(29,78,216,0.15)",
-    textMax: 210,
+    textMax: 220,
     pos: "bl",
   },
   {
     key: "policy",
-    icon: "shield",
-    title: "Policy Enforcement",
-    body: "Enforce dependency policies across the software lifecycle.",
+    icon: "scale",
+    title: "Policy Governance",
+    body: "Only approved libraries become part of your software.",
     accent: "#ea580c",
     border: "#fcd0a1",
     fill: "#fff5ee",
     shadow: "rgba(234,88,12,0.15)",
-    textMax: 240,
+    textMax: 230,
     pos: "br",
   },
 ];
@@ -86,32 +87,37 @@ function GovIcon({ icon, size = 30 }: { icon: IconKey; size?: number }): React.R
     "aria-hidden": true,
   };
   switch (icon) {
-    case "repository":
+    case "tag":
       return (
         <svg {...c}>
-          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-          <path d="m8.6 12 2.3 2.3 4.7-4.7" />
+          <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42Z" />
+          <circle cx="7.5" cy="7.5" r="1.1" fill="currentColor" stroke="none" />
         </svg>
       );
-    case "search":
+    case "scroll":
       return (
         <svg {...c}>
-          <circle cx="11" cy="11" r="7.5" />
-          <path d="m21 21-4.35-4.35" />
+          <path d="M19 17V5a2 2 0 0 0-2-2H4" />
+          <path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3" />
         </svg>
       );
-    case "sparkles":
+    case "refresh":
       return (
         <svg {...c}>
-          <path d="M12 3 13.8 10.2 21 12 13.8 13.8 12 21 10.2 13.8 3 12 10.2 10.2Z" />
-          <path d="M18.5 4 19 6 21 6.5 19 7 18.5 9 18 7 16 6.5 18 6Z" />
+          <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+          <path d="M21 3v5h-5" />
+          <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+          <path d="M8 16H3v5" />
         </svg>
       );
-    case "shield":
+    case "scale":
       return (
         <svg {...c}>
-          <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1Z" />
-          <path d="m9 12 2 2 4-4" />
+          <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+          <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+          <path d="M7 21h10" />
+          <path d="M12 3v18" />
+          <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" />
         </svg>
       );
   }
@@ -316,6 +322,43 @@ function FlowConnector({ accent }: { accent?: string }): React.ReactElement {
   );
 }
 
+/** Keyframes for the hub cube — gentle float + breathing glow, reduced-motion safe. */
+const HUB_ANIM_CSS = `
+@keyframes cs-cube-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes cs-cube-glow{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:.8;transform:scale(1.1)}}
+.cs-cube-float{animation:cs-cube-float 4.5s ease-in-out infinite;will-change:transform}
+.cs-cube-glow{animation:cs-cube-glow 4.5s ease-in-out infinite;will-change:transform,opacity}
+@media (prefers-reduced-motion:reduce){.cs-cube-float,.cs-cube-glow{animation:none}}
+`;
+
+/**
+ * Premium "library cube": a rendered 3D glass cube with a glowing library stack
+ * inside, alpha-keyed so it floats cleanly on any background. Gently bobs above
+ * a breathing violet glow.
+ */
+function LibraryCube({ size = 92 }: { size?: number }): React.ReactElement {
+  return (
+    <div className="relative flex items-center justify-center" style={{ width: size, height: size }} aria-hidden>
+      <div
+        className="cs-cube-glow pointer-events-none absolute inset-0 rounded-full"
+        style={{
+          background: "radial-gradient(circle at 50% 48%, rgba(139,92,246,0.34) 0%, rgba(139,92,246,0) 62%)",
+          filter: "blur(8px)",
+        }}
+      />
+      <Image
+        src="/images/clean-libraries/software-trust-cube.png"
+        alt=""
+        width={size}
+        height={size}
+        sizes={`${size}px`}
+        className="cs-cube-float relative select-none object-contain"
+        style={{ filter: "drop-shadow(0 8px 18px rgba(109,40,217,0.18))" }}
+      />
+    </div>
+  );
+}
+
 function Hub({ size = 230 }: { size?: number }): React.ReactElement {
   return (
     <div
@@ -326,17 +369,14 @@ function Hub({ size = 230 }: { size?: number }): React.ReactElement {
         boxShadow: "0 0 0 12px rgba(255,255,255,0.4), 0 20px 40px -10px rgba(0,0,0,0.1)",
       }}
     >
-      <div
-        className="mb-3 flex size-14 items-center justify-center rounded-full bg-white"
-        style={{ color: "#6d28d9", border: "2px solid #f3e8ff" }}
-      >
-        <GovIcon icon="shield" size={28} />
+      <div className="mb-2">
+        <LibraryCube size={Math.round(size * 0.52)} />
       </div>
       <span
         className="font-display text-[#0f172a]"
         style={{ fontSize: "var(--fs-body)", fontWeight: 700, lineHeight: 1.2, letterSpacing: "-0.01em", maxWidth: "132px" }}
       >
-        Software Dependency Governance
+        Software Trust
       </span>
     </div>
   );
@@ -404,20 +444,22 @@ export function LibrariesGovernance(): React.ReactElement {
       style={{ background: "linear-gradient(180deg, #ffffff 0%, #f4f7fb 100%)" }}
     >
       <Container className="relative">
+        {/* biome-ignore lint/security/noDangerouslySetInnerHtml: static keyframes string, no user input */}
+        <style dangerouslySetInnerHTML={{ __html: HUB_ANIM_CSS }} />
         <Reveal header>
           <div className="text-center">
             <h2
               className="mx-auto max-w-[640px] font-display text-[#0f172a]"
               style={{ fontSize: "var(--fs-h2)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.12 }}
             >
-              Govern every dependency. Build with confidence.
+              Verified by Design
             </h2>
             <p
               className="mx-auto mt-5 max-w-[840px] font-sans text-[#475569]"
               style={{ fontSize: "var(--fs-lead)", fontWeight: 400, letterSpacing: "-0.01em", lineHeight: 1.5, textWrap: "balance" }}
             >
-              Clean Libraries enforces policy, validates every dependency, and
-              governs AI-suggested libraries across the software lifecycle.
+              Every library is backed by source verification, transparent
+              provenance, continuous validation, and policy-driven governance.
             </p>
           </div>
         </Reveal>
