@@ -4,7 +4,6 @@ import { FadeUp } from "@/components/ui/FadeUp";
 import { LibrariesHero } from "@/components/sections/clean-libraries/LibrariesHero";
 import { LibrariesPipeline } from "@/components/sections/clean-libraries/LibrariesPipeline";
 import { LibrariesTrustGap } from "@/components/sections/clean-libraries/LibrariesTrustGap";
-import { LibrariesEstablishTrust } from "@/components/sections/clean-libraries/LibrariesEstablishTrust";
 import { LibrariesGovernance } from "@/components/sections/clean-libraries/LibrariesGovernance";
 import { LibrariesWorkflow } from "@/components/sections/clean-libraries/LibrariesWorkflow";
 import { LibrariesCTA } from "@/components/sections/clean-libraries/LibrariesCTA";
@@ -49,9 +48,6 @@ export default async function CleanLibrariesPage(): Promise<React.ReactElement> 
         </FadeUp>
         <FadeUp>
           <LibrariesTrustGap />
-        </FadeUp>
-        <FadeUp>
-          <LibrariesEstablishTrust />
         </FadeUp>
         <FadeUp>
           <LibrariesGovernance />

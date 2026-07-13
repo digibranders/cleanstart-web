@@ -4417,7 +4417,10 @@ body {
 .article-body .article-h5,
 .article-body .article-h6 {
   scroll-margin-top: calc(var(--cs-header-h) + 16px);
-  text-wrap: balance;
+  /* Fill the available width and break only when a word won't fit — no
+     balanced two-line split on long headings (owner preference). Overrides
+     the site-wide h1–h4 balance rule via higher specificity. */
+  text-wrap: wrap;
   letter-spacing: -0.02em;
   color: #111111;
 }
