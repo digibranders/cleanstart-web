@@ -114,6 +114,13 @@ export const NAV_TREE: NavItem[] = [
             description: "Minimal images. Smaller blast radius.",
             icon: "minimize",
           },
+          {
+            label: "ROI Calculator",
+            href: "/roi-calculator",
+            description: "Estimate the operational impact of hardened images.",
+            icon: "radar",
+            built: false,
+          },
         ],
       },
       {
