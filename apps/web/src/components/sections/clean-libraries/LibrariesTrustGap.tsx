@@ -153,8 +153,8 @@ function TrustColumn({
         {card.title}
       </h3>
       <p
-        className="mt-2.5 max-w-[210px] font-sans text-white/62"
-        style={{ fontSize: "var(--fs-body-sm)", fontWeight: 400, letterSpacing: "-0.01em", lineHeight: 1.5, textWrap: "balance" }}
+        className="mt-2.5 max-w-[220px] font-sans text-white/70"
+        style={{ fontSize: "var(--fs-body)", fontWeight: 400, letterSpacing: "-0.01em", lineHeight: 1.5, textWrap: "balance" }}
       >
         <span style={{ color: knowColor, fontWeight: 600 }}>Know</span>
         {card.desc.slice(4)}
