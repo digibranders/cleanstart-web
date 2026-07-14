@@ -18,6 +18,10 @@ export const metadata = buildPageMetadata({
     "Estimate the operational impact of moving to minimal, trusted container images — reduced vulnerability noise, lower patch-cycle overhead, faster secure releases, and engineering hours recovered.",
   path: "/roi-calculator",
   eyebrow: "Tools",
+  // Not ready for search — kept out of the sitemap and nav (built: false), and
+  // noindex'd here so crawlers that reach it directly don't index it. Drop this
+  // (and add the route to sitemap STATIC_ROUTES) when the page ships.
+  noindex: true,
 });
 
 export const revalidate = 3600;
