@@ -28,7 +28,7 @@ const CARDS: GovCard[] = [
     key: "source",
     icon: "tag",
     title: "Source Verification",
-    body: "Libraries rebuilt and verified directly from trusted upstream source.",
+    body: "Rebuilt and verified directly from trusted upstream source.",
     accent: "#6d28d9",
     border: "#d4c6f9",
     fill: "#f6f3fe",
@@ -52,7 +52,7 @@ const CARDS: GovCard[] = [
     key: "validation",
     icon: "refresh",
     title: "Continuous Validation",
-    body: "Libraries continuously verified as upstream projects evolve.",
+    body: "Continuously verified as upstream projects evolve.",
     accent: "#1d4ed8",
     border: "#b4c6f4",
     fill: "#eff3fe",
@@ -64,7 +64,7 @@ const CARDS: GovCard[] = [
     key: "policy",
     icon: "scale",
     title: "Policy Governance",
-    body: "Only approved libraries become part of your software.",
+    body: "Only approved ones become part of your software.",
     accent: "#ea580c",
     border: "#fcd0a1",
     fill: "#fff5ee",
@@ -375,7 +375,7 @@ function Hub({ size = 230 }: { size?: number }): React.ReactElement {
         className="font-display text-[#0f172a]"
         style={{ fontSize: "var(--fs-body)", fontWeight: 700, lineHeight: 1.2, letterSpacing: "-0.01em", maxWidth: "132px" }}
       >
-        Software Trust
+        Clean Libraries
       </span>
     </div>
   );
