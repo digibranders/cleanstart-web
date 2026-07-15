@@ -1845,6 +1845,39 @@ body {
   }
 }
 
+/* Clean Libraries dependency-graph hero — extra life for the constellation.
+   `cs-dep-ring` expands a shockwave ring out of the verified core; `cs-dep-bob`
+   gives a node a slow vertical float on a desynced phase. Transform/opacity only,
+   both off under reduced-motion. */
+@keyframes cs-dep-ring {
+  0% { transform: scale(0.42); opacity: 0; }
+  22% { opacity: 0.55; }
+  100% { transform: scale(1.55); opacity: 0; }
+}
+@keyframes cs-dep-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+.cs-dep-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cs-dep-ring 4.6s ease-out infinite;
+  will-change: transform, opacity;
+}
+.cs-dep-bob {
+  animation: cs-dep-bob 6s ease-in-out infinite;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-dep-ring,
+  .cs-dep-bob {
+    animation: none !important;
+  }
+  .cs-dep-ring {
+    opacity: 0 !important;
+  }
+}
+
 /* Clean Libraries — "The Trust Gap" section ambient motion. The amber
    "pending" pips pulse on staggered phases, energy flows along the dotted
    connectors toward the orbs, the reflective base rings ripple outward like
