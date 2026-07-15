@@ -3,11 +3,12 @@ import { HeroReveal } from "@/components/ui/Reveal";
 import { LibrariesHeroScene } from "./LibrariesHeroScene";
 
 /**
- * Clean Libraries hero — left headline + CTA, with the "dependencies flowing
- * into the clean container" scene on the right, built entirely in SVG/CSS
- * (no raster). The scene carries its own glows; the parent applies the slow
- * `cs-libhero-float` drift. All motion is disabled under prefers-reduced-motion
- * (see globals.css and LibrariesHeroScene).
+ * Clean Libraries hero — left headline + CTA, with the interconnected
+ * "dependency graph" constellation on the right (a verified core cube wrapped in
+ * a web of library nodes), built entirely in SVG/CSS (no raster). The scene
+ * carries its own glows; the parent applies the slow `cs-libhero-float` drift.
+ * All motion is disabled under prefers-reduced-motion (see globals.css and
+ * LibrariesHeroScene).
  */
 export function LibrariesHero(): React.ReactElement {
   return (

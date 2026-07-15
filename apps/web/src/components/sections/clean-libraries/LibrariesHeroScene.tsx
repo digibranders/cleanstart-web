@@ -1,398 +1,470 @@
 /**
- * Clean Libraries hero scene — built entirely in SVG/CSS (no raster).
+ * Clean Libraries hero scene — an interconnected DEPENDENCY GRAPH, built
+ * entirely in SVG/CSS (no raster).
  *
- * Concept (the actual point of the page): the secure container is a FILTER.
- * Clean dependencies (green) pass through the boundary and live inside next to
- * the code; vulnerable dependencies (amber/red) are STOPPED at the edge — each
- * marked with a red ⊘ "blocked" badge — and never get in. A faint membrane arc
- * on the entry side reads as the gate.
+ * Concept: a glowing glass "core" cube at the centre, wrapped in a mesh of
+ * library nodes (small isometric cubes + glowing dots) linked by dependency
+ * edges, floating in a nebula of particle dust and out-of-focus bokeh. The hue
+ * drifts across the field — magenta on the left, violet through the core,
+ * cyan/blue on the right — echoing the reference art. A soft dark core gives the
+ * glow contrast against the purple hero without a hard black box.
  *
- * Fidelity techniques (to escape the flat "vector" look):
- *   - cube faces are gradient-lit (bright top ridge → shaded sides) with an
- *     emissive edge, each sitting on a blurred colored bloom;
- *   - a blurred, dimmed back layer of distant cubes gives atmospheric depth;
- *   - the elliptical container uses stacked glows (wide outer bloom + bright
- *     thin rim) over a vignetted dark interior, with a double-framed, tilted,
- *     top-glossed code card.
+ * Determinism: node/edge/particle/bokeh layout is generated once at module scope
+ * from a fixed-seed PRNG (mulberry32), so SSR output is stable across builds —
+ * no Math.random at render, no hydration drift.
  *
- * Motion is paint/transform-only and reuses the repo system: `cs-flow-dash`
- * drifts the dotted streams (green flow inward; amber halt at the gate),
- * `cs-libhero-breathe` pulses the glows, and the parent's `cs-libhero-float`
- * drifts the whole scene. All disabled under `prefers-reduced-motion` (see
- * globals.css), leaving a clean static scene.
+ * Motion (all GPU-composited transform/opacity/offset-path, all disabled under
+ * prefers-reduced-motion via globals.css):
+ *   - `cs-libhero-breathe` pulses the core bloom + bokeh;
+ *   - `cs-dep-ring` fires shockwave rings out of the core;
+ *   - `cs-lib-twinkle` fades a staggered subset of nodes + the particle dust;
+ *   - `cs-dep-bob` floats a subset of nodes on desynced phases;
+ *   - `cs-lib-packet` rides light pulses along edges (deps resolving);
+ *   - `cs-lib-rim` sweeps a glint around the core's energy ring;
+ *   - the parent's `cs-libhero-float` drifts the whole scene.
  */
 
-type CubeTone = "green" | "amber";
+type HueKey = "purple" | "violet" | "blue";
 
-interface CubeSpec {
+interface HueSpec {
+  top: string;
+  left: string;
+  right: string;
+  edge: string;
+  dot: string;
+  halo: string;
+}
+
+interface Node {
   x: number;
   y: number;
-  scale: number;
-  tone: CubeTone;
+  s: number;
+  hue: HueKey;
+  shape: "cube" | "dot";
+  back: boolean;
+  twinkle: boolean;
+  bob: boolean;
+  delay: number;
 }
 
-interface Pt {
+interface Edge {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  hub: boolean;
+}
+
+interface Particle {
   x: number;
   y: number;
+  r: number;
+  o: number;
+  twinkle: boolean;
+  delay: number;
 }
 
-interface CodeLine {
-  indent: number;
-  width: number;
-  color: string;
+interface Bokeh {
+  x: number;
+  y: number;
+  r: number;
+  hue: HueKey;
+  o: number;
+  breathe: boolean;
+  delay: number;
 }
 
-/** Container ellipse — the secure "clean zone". */
-const C = { cx: 590, cy: 296, rx: 206, ry: 196 } as const;
+interface Pulse {
+  d: string;
+  delay: number;
+  dur: number;
+}
 
-/** Boundary entry points where clean packages cross in, and the interior
- *  targets the rails continue to inside the container (clean deps delivered). */
-const ENTRY_TOP: Pt = { x: 392, y: 232 };
-const ENTRY_BOT: Pt = { x: 398, y: 344 };
-const INSIDE_TOP: Pt = { x: 478, y: 254 };
-const INSIDE_BOT: Pt = { x: 486, y: 326 };
+const VB = { w: 900, h: 620 } as const;
+const HUB = { x: 442, y: 308 } as const;
 
-/** Clean packages — intermixed with the amber ones across the whole field;
- *  each routes through the nearer gate (top half → top gate, bottom half →
- *  bottom gate) and its rail continues inside. */
-const GREEN_IN: readonly (CubeSpec & { entry: Pt; inside: Pt })[] = [
-  { x: 70, y: 122, scale: 0.95, tone: "green", entry: ENTRY_TOP, inside: INSIDE_TOP },
-  { x: 244, y: 138, scale: 0.85, tone: "green", entry: ENTRY_TOP, inside: INSIDE_TOP },
-  { x: 132, y: 276, scale: 1.12, tone: "green", entry: ENTRY_TOP, inside: INSIDE_TOP },
-  { x: 96, y: 342, scale: 1.05, tone: "green", entry: ENTRY_BOT, inside: INSIDE_BOT },
-  { x: 206, y: 320, scale: 0.95, tone: "green", entry: ENTRY_BOT, inside: INSIDE_BOT },
-  { x: 162, y: 442, scale: 0.95, tone: "green", entry: ENTRY_BOT, inside: INSIDE_BOT },
-  { x: 274, y: 402, scale: 0.8, tone: "green", entry: ENTRY_BOT, inside: INSIDE_BOT },
-];
+const HUE: Record<HueKey, HueSpec> = {
+  purple: { top: "#ecc0ff", left: "#b24bff", right: "#7a22d6", edge: "#f4d6ff", dot: "#c561ff", halo: "halo-purple" },
+  violet: { top: "#dcc6ff", left: "#8a5cff", right: "#5a2ee0", edge: "#ece1ff", dot: "#9a6bff", halo: "halo-violet" },
+  blue: { top: "#c4e6ff", left: "#3f9bff", right: "#1c63d6", edge: "#dff1ff", dot: "#48a6ff", halo: "halo-blue" },
+};
 
-/** Clean packages that already passed — inside the container, by the code. */
-const GREEN_INSIDE: readonly CubeSpec[] = [
-  { x: 444, y: 250, scale: 0.74, tone: "green" },
-  { x: 458, y: 332, scale: 0.78, tone: "green" },
-];
+function hueForX(x: number): HueKey {
+  const t = x / VB.w;
+  if (t < 0.37) return "purple";
+  if (t > 0.63) return "blue";
+  return "violet";
+}
 
-/** Vulnerable packages — scattered nearer the gate; each is stopped right on
- *  the container's curve (stop computed in `gateStop`) and gets a ⊘ badge. */
-const AMBER_BLOCKED: readonly CubeSpec[] = [
-  { x: 150, y: 156, scale: 1.0, tone: "amber" },
-  { x: 60, y: 234, scale: 0.9, tone: "amber" },
-  { x: 252, y: 224, scale: 0.92, tone: "amber" },
-  { x: 96, y: 404, scale: 0.85, tone: "amber" },
-];
+/** mulberry32 — tiny deterministic PRNG so the graph is stable across renders. */
+function mulberry32(seed: number): () => number {
+  let a = seed;
+  return () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
-/** Ambient sparkles scattered through the package field. */
-const SPARKS: readonly Pt[] = [
-  { x: 60, y: 92 },
-  { x: 300, y: 150 },
-  { x: 40, y: 360 },
-  { x: 322, y: 420 },
-  { x: 182, y: 502 },
-  { x: 128, y: 120 },
-  { x: 272, y: 232 },
-];
+/** Local visual centre of a node (iso-cube sits ~22px below its anchor). */
+function nodeCenter(n: Node): { x: number; y: number } {
+  return { x: n.x, y: n.y + 22 * n.s };
+}
 
-/** Distant packages — blurred + dimmed for atmospheric depth (all clean). */
-const BACK_CUBES: readonly CubeSpec[] = [
-  { x: 38, y: 112, scale: 0.6, tone: "green" },
-  { x: 206, y: 120, scale: 0.55, tone: "green" },
-  { x: 32, y: 304, scale: 0.55, tone: "green" },
-  { x: 60, y: 462, scale: 0.6, tone: "green" },
-  { x: 250, y: 474, scale: 0.56, tone: "green" },
-];
+const { NODES, EDGES, PARTICLES, BOKEH, PULSES } = ((): {
+  NODES: Node[];
+  EDGES: Edge[];
+  PARTICLES: Particle[];
+  BOKEH: Bokeh[];
+  PULSES: Pulse[];
+} => {
+  const rnd = mulberry32(20260715);
+  const nodes: Node[] = [];
 
-const CODE_LINES: readonly CodeLine[] = [
-  { indent: 0, width: 78, color: "#b794ff" },
-  { indent: 14, width: 104, color: "#5cc8ff" },
-  { indent: 14, width: 58, color: "#5ad6a0" },
-  { indent: 28, width: 122, color: "#d6deff" },
-  { indent: 28, width: 70, color: "#ffb866" },
-  { indent: 14, width: 96, color: "#5ad6a0" },
-  { indent: 0, width: 50, color: "#b794ff" },
-  { indent: 14, width: 132, color: "#5cc8ff" },
-  { indent: 28, width: 80, color: "#d6deff" },
-  { indent: 28, width: 110, color: "#5ad6a0" },
-  { indent: 14, width: 62, color: "#ffb866" },
-  { indent: 0, width: 92, color: "#b794ff" },
-  { indent: 14, width: 118, color: "#d6deff" },
-];
+  const N = 37;
+  const rMin = 92;
+  const rMax = 392;
+  for (let i = 0; i < N; i++) {
+    const ang = rnd() * Math.PI * 2;
+    const rr = rMin + rnd() ** 0.8 * (rMax - rMin);
+    const x = Math.max(40, Math.min(VB.w - 40, HUB.x + Math.cos(ang) * rr * 1.26));
+    const y = Math.max(48, Math.min(VB.h - 56, HUB.y + Math.sin(ang) * rr * 0.72));
+    const prox = 1 - (rr - rMin) / (rMax - rMin);
+    const s = 0.34 + prox * 0.42 + rnd() * 0.12;
+    const back = rr > 300 && rnd() > 0.5;
+    nodes.push({
+      x,
+      y,
+      s,
+      hue: hueForX(x),
+      shape: rnd() > 0.42 ? "cube" : "dot",
+      back,
+      twinkle: rnd() > 0.55,
+      bob: !back && rnd() > 0.55,
+      delay: rnd() * 3.6,
+    });
+  }
 
-function Cube({ x, y, scale, tone }: CubeSpec): React.ReactElement {
-  return (
-    <g transform={`translate(${x} ${y}) scale(${scale})`}>
-      <ellipse cx={0} cy={28} rx={30} ry={18} fill={`url(#libGlow-${tone})`} filter="url(#libBloom)" />
-      <polygon points="0,0 20,10 0,20 -20,10" fill={`url(#libTop-${tone})`} />
-      <polygon points="-20,10 0,20 0,44 -20,34" fill={`url(#libLeft-${tone})`} />
-      <polygon points="20,10 0,20 0,44 20,34" fill={`url(#libRight-${tone})`} />
-      <polyline points="-20,10 0,0 20,10" fill="none" stroke="#ffffff" strokeOpacity={0.7} strokeWidth={0.9} />
-      <line x1={0} y1={20} x2={0} y2={44} stroke="#ffffff" strokeOpacity={0.18} strokeWidth={0.7} />
-      {/* Specular glint for a glossy material read. */}
-      <circle cx={-6} cy={8} r={1.7} fill="#ffffff" opacity={0.85} />
+  // Edges: a real mesh — each node links to its 2 nearest neighbours, and the
+  // inner ring links to the hub (the primary dependency spokes).
+  const edges: Edge[] = [];
+  const seen = new Set<string>();
+  const addEdge = (a: { x: number; y: number }, b: { x: number; y: number }, hub: boolean, key: string): void => {
+    if (seen.has(key)) return;
+    seen.add(key);
+    edges.push({ x1: a.x, y1: a.y, x2: b.x, y2: b.y, hub });
+  };
+
+  nodes.forEach((n, i) => {
+    const c = nodeCenter(n);
+    const dHub = Math.hypot(c.x - HUB.x, c.y - HUB.y);
+    if (dHub < 268) addEdge(HUB, c, true, `h-${i}`);
+
+    const neighbours = nodes
+      .map((m, j) => ({ m, j, d: j === i ? Number.POSITIVE_INFINITY : Math.hypot(c.x - nodeCenter(m).x, c.y - nodeCenter(m).y) }))
+      .sort((p, q) => p.d - q.d)
+      .slice(0, 2);
+    for (const nb of neighbours) {
+      if (nb.d >= 236) continue;
+      const key = i < nb.j ? `n-${i}-${nb.j}` : `n-${nb.j}-${i}`;
+      addEdge(c, nodeCenter(nb.m), false, key);
+    }
+  });
+
+  // Particle dust — dense near the core, thinning outward (approx-gaussian).
+  const particles: Particle[] = [];
+  const gauss = (): number => (rnd() + rnd() + rnd() - 1.5) / 1.5;
+  for (let i = 0; i < 104; i++) {
+    const gx = gauss();
+    const gy = gauss();
+    const x = HUB.x + gx * 156;
+    const y = HUB.y + gy * 88;
+    if (x < 20 || x > VB.w - 20 || y < 20 || y > VB.h - 20) continue;
+    const near = 1 - Math.min(1, Math.hypot(gx, gy) / 1.4);
+    particles.push({
+      x,
+      y,
+      r: 0.5 + rnd() * 1.4,
+      o: 0.18 + near * 0.5,
+      twinkle: rnd() > 0.45,
+      delay: rnd() * 3.2,
+    });
+  }
+
+  // Out-of-focus bokeh discs — cinematic background depth.
+  const bokeh: Bokeh[] = [];
+  for (let i = 0; i < 7; i++) {
+    const x = HUB.x + (rnd() - 0.5) * 620;
+    const y = HUB.y + (rnd() - 0.5) * 360;
+    bokeh.push({
+      x,
+      y,
+      r: 34 + rnd() * 58,
+      hue: hueForX(x),
+      o: 0.1 + rnd() * 0.12,
+      breathe: rnd() > 0.5,
+      delay: rnd() * 4,
+    });
+  }
+
+  // Travelling data pulses — the strongest hub spokes flow inward, a scatter of
+  // mesh edges flow along, so the whole graph reads "live".
+  const hubEdges = edges.filter((e) => e.hub).sort((a, b) => Math.hypot(b.x2 - b.x1, b.y2 - b.y1) - Math.hypot(a.x2 - a.x1, a.y2 - a.y1));
+  const meshEdges = edges.filter((e) => !e.hub);
+  const pulses: Pulse[] = [];
+  hubEdges.slice(0, 7).forEach((e, i) => {
+    // hub is (x1,y1); flow inward toward the core.
+    pulses.push({ d: `M ${e.x2} ${e.y2} L ${e.x1} ${e.y1}`, delay: i * 0.5, dur: 2.6 + (i % 3) * 0.5 });
+  });
+  meshEdges.forEach((e, i) => {
+    if (i % 3 !== 0) return;
+    pulses.push({ d: `M ${e.x1} ${e.y1} L ${e.x2} ${e.y2}`, delay: (i % 5) * 0.7, dur: 3.2 + (i % 4) * 0.4 });
+  });
+
+  return { NODES: nodes, EDGES: edges, PARTICLES: particles, BOKEH: bokeh, PULSES: pulses.slice(0, 13) };
+})();
+
+const HUB_CX = HUB.x;
+const HUB_CY = HUB.y + 22;
+
+function IsoNode({ n }: { n: Node }): React.ReactElement {
+  const c = HUE[n.hue];
+  const center = nodeCenter(n);
+  const haloR = (n.shape === "cube" ? 20 : 12) * n.s + 6;
+  const glyph = (
+    <g className={n.twinkle ? "cs-lib-twinkle" : undefined} style={n.twinkle ? { animationDelay: `${n.delay}s` } : undefined}>
+      <circle cx={center.x} cy={center.y} r={haloR} fill={`url(#${c.halo})`} />
+      {n.shape === "cube" ? (
+        <g transform={`translate(${n.x} ${n.y}) scale(${n.s})`}>
+          <polygon points="0,0 20,10 0,20 -20,10" fill={c.top} />
+          <polygon points="-20,10 0,20 0,44 -20,34" fill={c.left} />
+          <polygon points="20,10 0,20 0,44 20,34" fill={c.right} />
+          <polyline points="-20,10 0,0 20,10" fill="none" stroke={c.edge} strokeOpacity={0.9} strokeWidth={1} />
+          <line x1={0} y1={20} x2={0} y2={44} stroke="#ffffff" strokeOpacity={0.14} strokeWidth={0.7} />
+          <circle cx={-6} cy={8} r={1.5} fill="#ffffff" opacity={0.8} />
+        </g>
+      ) : (
+        <>
+          <circle cx={center.x} cy={center.y} r={2.4 * n.s + 1} fill={c.dot} />
+          <circle cx={center.x} cy={center.y} r={1.1 * n.s + 0.4} fill="#ffffff" opacity={0.9} />
+        </>
+      )}
     </g>
   );
-}
-
-/** Red ⊘ marking a vulnerable package halted at the boundary. */
-function BlockedBadge({ x, y }: Pt): React.ReactElement {
+  if (!n.bob) return glyph;
   return (
-    <g transform={`translate(${x} ${y})`}>
-      <circle cx={0} cy={0} r={11} fill="#ff5a5a" opacity={0.4} filter="url(#libBloom)" className="cs-lib-twinkle" />
-      <circle cx={0} cy={0} r={7.5} fill="#1a0708" stroke="#ff5a5a" strokeWidth={1.8} />
-      <line x1={-4.2} y1={-4.2} x2={4.2} y2={4.2} stroke="#ff5a5a" strokeWidth={1.8} strokeLinecap="round" />
+    <g className="cs-dep-bob" style={{ animationDelay: `${n.delay}s` }}>
+      {glyph}
     </g>
   );
-}
-
-function cubeCenter(c: CubeSpec): Pt {
-  return { x: c.x, y: c.y + 22 * c.scale };
-}
-
-/** Point just outside the container's left curve at height `y` — where a
- *  rejected package is halted (so blocked badges hug the boundary). */
-function gateStop(y: number): Pt {
-  const t = Math.max(-0.96, Math.min(0.96, (y - C.cy) / C.ry));
-  return { x: C.cx - C.rx * Math.sqrt(1 - t * t) - 8, y };
 }
 
 export function LibrariesHeroScene(): React.ReactElement {
-  const greenStreams = GREEN_IN.map((c) => {
-    const s = cubeCenter(c);
-    const e = c.entry;
-    const i = c.inside;
-    const mx = (s.x + e.x) / 2;
-    return `M ${s.x} ${s.y} C ${mx} ${s.y}, ${mx} ${e.y}, ${e.x} ${e.y} L ${i.x} ${i.y}`;
-  });
-  const amberData = AMBER_BLOCKED.map((c) => {
-    const s = cubeCenter(c);
-    const stop = gateStop(s.y);
-    const mx = (s.x + stop.x) / 2;
-    return { d: `M ${s.x} ${s.y} C ${mx} ${s.y}, ${mx} ${stop.y}, ${stop.x} ${stop.y}`, stop };
-  });
-
   return (
     <svg
-      viewBox="0 0 820 600"
+      viewBox={`0 0 ${VB.w} ${VB.h}`}
       role="img"
-      aria-label="Clean green dependency packages passing into a glowing secure code container while vulnerable amber packages are blocked at the boundary"
+      aria-label="An interconnected dependency graph: a glowing glass core cube surrounded by a mesh of library nodes linked by edges, drifting from magenta through violet to cyan"
       preserveAspectRatio="xMidYMid meet"
       className="block h-auto w-full select-none"
       style={{ overflow: "visible" }}
     >
       <defs>
-        <linearGradient id="libTop-green" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#c6ffdd" />
-          <stop offset="100%" stopColor="#62ec9f" />
-        </linearGradient>
-        <linearGradient id="libLeft-green" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#39d684" />
-          <stop offset="100%" stopColor="#179152" />
-        </linearGradient>
-        <linearGradient id="libRight-green" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#1f9e5c" />
-          <stop offset="100%" stopColor="#0b6236" />
-        </linearGradient>
-        <linearGradient id="libTop-amber" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#ffe6b0" />
-          <stop offset="100%" stopColor="#ffbf6b" />
-        </linearGradient>
-        <linearGradient id="libLeft-amber" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#ff9d3d" />
-          <stop offset="100%" stopColor="#dd771c" />
-        </linearGradient>
-        <linearGradient id="libRight-amber" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#c4621a" />
-          <stop offset="100%" stopColor="#8a430e" />
-        </linearGradient>
-
-        <radialGradient id="libGlow-green" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#46e08a" stopOpacity={0.8} />
-          <stop offset="100%" stopColor="#46e08a" stopOpacity={0} />
+        <radialGradient id="depCoreCloud" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#d06bff" stopOpacity={0.62} />
+          <stop offset="34%" stopColor="#8a5cff" stopOpacity={0.34} />
+          <stop offset="70%" stopColor="#5a4bff" stopOpacity={0.12} />
+          <stop offset="100%" stopColor="#5a4bff" stopOpacity={0} />
         </radialGradient>
-        <radialGradient id="libGlow-amber" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#ff9d3d" stopOpacity={0.85} />
-          <stop offset="100%" stopColor="#ff9d3d" stopOpacity={0} />
+        <radialGradient id="depCoreCore" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity={0.78} />
+          <stop offset="24%" stopColor="#eccfff" stopOpacity={0.44} />
+          <stop offset="100%" stopColor="#c98bff" stopOpacity={0} />
         </radialGradient>
 
-        <radialGradient id="libBlobGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#62b4ff" stopOpacity={0.6} />
-          <stop offset="45%" stopColor="#7a86ff" stopOpacity={0.3} />
-          <stop offset="100%" stopColor="#8a56ff" stopOpacity={0} />
+        <radialGradient id="halo-purple" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#c561ff" stopOpacity={0.85} />
+          <stop offset="100%" stopColor="#c561ff" stopOpacity={0} />
         </radialGradient>
-        <radialGradient id="libBlobBody" cx="44%" cy="38%" r="64%">
-          <stop offset="0%" stopColor="#101641" />
-          <stop offset="70%" stopColor="#0a0e2e" />
-          <stop offset="100%" stopColor="#070a22" />
+        <radialGradient id="halo-violet" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#9a6bff" stopOpacity={0.85} />
+          <stop offset="100%" stopColor="#9a6bff" stopOpacity={0} />
         </radialGradient>
-        <linearGradient id="libBlobRim" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#74d4ff" />
-          <stop offset="50%" stopColor="#8aa6ff" />
-          <stop offset="100%" stopColor="#b884ff" />
+        <radialGradient id="halo-blue" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#48a6ff" stopOpacity={0.85} />
+          <stop offset="100%" stopColor="#48a6ff" stopOpacity={0} />
+        </radialGradient>
+
+        <linearGradient id="depHubTop" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="100%" stopColor="#e3c9ff" />
         </linearGradient>
-        <linearGradient id="libCardGloss" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity={0.1} />
-          <stop offset="100%" stopColor="#ffffff" stopOpacity={0} />
+        <linearGradient id="depHubLeft" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#c79bff" />
+          <stop offset="100%" stopColor="#7c46e6" />
         </linearGradient>
-        <linearGradient id="libStreamGreen" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#46e08a" stopOpacity={0.25} />
-          <stop offset="100%" stopColor="#9affc6" stopOpacity={1} />
+        <linearGradient id="depHubRight" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#8a54e8" />
+          <stop offset="100%" stopColor="#4f27bf" />
         </linearGradient>
-        <linearGradient id="libStreamAmber" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#ff9d3d" stopOpacity={0.2} />
-          <stop offset="100%" stopColor="#ff7a5a" stopOpacity={0.9} />
+        <linearGradient id="depEdge" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#b06bff" stopOpacity={0.7} />
+          <stop offset="50%" stopColor="#8aa0ff" stopOpacity={0.5} />
+          <stop offset="100%" stopColor="#5ab6ff" stopOpacity={0.7} />
         </linearGradient>
 
-        <filter id="libBloom" x="-80%" y="-80%" width="260%" height="260%">
-          <feGaussianBlur stdDeviation="5" />
+        <filter id="depBloom" x="-120%" y="-120%" width="340%" height="340%">
+          <feGaussianBlur stdDeviation="7" />
         </filter>
-        <filter id="libDepthBlur" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="3.4" />
+        <filter id="depBackBlur" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="2.6" />
         </filter>
-        <filter id="libRimGlow" x="-60%" y="-60%" width="220%" height="220%">
+        <filter id="depBokehBlur" x="-60%" y="-60%" width="220%" height="220%">
           <feGaussianBlur stdDeviation="9" />
-        </filter>
-        <filter id="libWideGlow" x="-80%" y="-80%" width="260%" height="260%">
-          <feGaussianBlur stdDeviation="32" />
         </filter>
       </defs>
 
-      {/* Ambient backdrop bloom behind the whole scene. */}
-      <g className="cs-libhero-breathe" style={{ transformOrigin: `${C.cx}px ${C.cy}px`, transformBox: "fill-box" }}>
-        <ellipse cx={C.cx} cy={C.cy} rx={C.rx + 56} ry={C.ry + 56} fill="url(#libBlobGlow)" />
-      </g>
-
-      {/* Distant package field — blurred + dimmed. */}
-      <g filter="url(#libDepthBlur)" opacity={0.5}>
-        {BACK_CUBES.map((cube, i) => (
-          <Cube key={`b-${i}`} {...cube} />
+      {/* Out-of-focus bokeh — cinematic depth behind the network. */}
+      <g filter="url(#depBokehBlur)">
+        {BOKEH.map((b, i) => (
+          <circle
+            key={`bk-${i}`}
+            cx={b.x}
+            cy={b.y}
+            r={b.r}
+            fill={`url(#${HUE[b.hue].halo})`}
+            opacity={b.o}
+            className={b.breathe ? "cs-libhero-breathe" : undefined}
+            style={b.breathe ? ({ transformOrigin: `${b.x}px ${b.y}px`, transformBox: "fill-box", animationDelay: `${b.delay}s` } as React.CSSProperties) : undefined}
+          />
         ))}
       </g>
 
-      {/* Vulnerable streams — halt at the boundary (rejected). */}
-      <g fill="none" strokeLinecap="round" strokeWidth={2.4} strokeDasharray="1 7">
-        {amberData.map((a, i) => (
-          <path key={`as-${i}`} d={a.d} className="cs-flow-dash" stroke="url(#libStreamAmber)" strokeOpacity={0.8} />
+      <g
+        className="cs-libhero-breathe"
+        style={{ transformOrigin: `${HUB.x}px ${HUB.y}px`, transformBox: "fill-box" } as React.CSSProperties}
+      >
+        <ellipse cx={HUB.x} cy={HUB.y} rx={300} ry={210} fill="url(#depCoreCloud)" />
+      </g>
+
+      {/* Dependency edges — faint mesh behind the nodes. */}
+      <g fill="none" strokeLinecap="round">
+        {EDGES.map((e, i) => (
+          <line
+            key={`e-${i}`}
+            x1={e.x1}
+            y1={e.y1}
+            x2={e.x2}
+            y2={e.y2}
+            stroke="url(#depEdge)"
+            strokeWidth={e.hub ? 1.15 : 0.85}
+            strokeOpacity={e.hub ? 0.34 : 0.2}
+          />
         ))}
       </g>
 
-      {/* The secure code container (elliptical clean zone). */}
-      <g>
-        <ellipse cx={C.cx} cy={C.cy} rx={C.rx + 8} ry={C.ry + 8} fill="none" stroke="url(#libBlobRim)" strokeWidth={18} strokeOpacity={0.55} filter="url(#libWideGlow)" />
-        <ellipse cx={C.cx} cy={C.cy} rx={C.rx} ry={C.ry} fill="url(#libBlobBody)" />
-        <ellipse cx={C.cx} cy={C.cy} rx={C.rx} ry={C.ry} fill="none" stroke="url(#libBlobRim)" strokeWidth={6} strokeOpacity={0.55} filter="url(#libRimGlow)" />
-        <ellipse cx={C.cx} cy={C.cy} rx={C.rx} ry={C.ry} fill="none" stroke="url(#libBlobRim)" strokeWidth={2.4} />
-        {/* Energy glint sweeping around the rim. */}
-        <ellipse
-          cx={C.cx}
-          cy={C.cy}
-          rx={C.rx}
-          ry={C.ry}
-          fill="none"
-          stroke="#e2f4ff"
-          strokeWidth={3}
-          strokeLinecap="round"
-          strokeDasharray="70 1210"
-          className="cs-lib-rim"
-          filter="url(#libRimGlow)"
-        />
-
-        {/* Clean rails — pass through the gate and continue inside the zone. */}
-        <g fill="none" strokeLinecap="round" strokeWidth={2.6} strokeDasharray="1 7">
-          {greenStreams.map((d, i) => (
-            <path key={`gs-${i}`} d={d} className="cs-flow-dash" stroke="url(#libStreamGreen)" />
-          ))}
-        </g>
-        {/* Green packets riding the rails into the container. */}
-        {greenStreams.map((d, i) => (
-          <g
-            key={`gp-${i}`}
-            className="cs-lib-packet"
-            style={{ offsetPath: `path('${d}')`, animationDelay: `${i * 0.42}s` }}
-          >
-            <circle r={8} fill="url(#libGlow-green)" filter="url(#libBloom)" />
-            <circle r={2.8} fill="#eafff3" />
-          </g>
+      {/* Distant nodes — blurred + dimmed for depth. */}
+      <g filter="url(#depBackBlur)" opacity={0.55}>
+        {NODES.filter((n) => n.back).map((n, i) => (
+          <IsoNode key={`bn-${i}`} n={n} />
         ))}
-
-        {/* Filter membrane — faint bright arc on the entry (left) side. */}
-        <path
-          d={`M ${C.cx - 64} ${C.cy - C.ry + 40} A ${C.rx} ${C.ry} 0 0 0 ${C.cx - 64} ${C.cy + C.ry - 40}`}
-          fill="none"
-          stroke="#9fdcff"
-          strokeWidth={1.4}
-          strokeOpacity={0.4}
-          strokeDasharray="2 6"
-        />
-
-        {/* Accepted clean packages, inside. */}
-        {GREEN_INSIDE.map((cube, i) => (
-          <Cube key={`gi-${i}`} {...cube} />
-        ))}
-
-        {/* Code card — double frame + top gloss, tilted in faux-3D. */}
-        <g transform="translate(620 286) skewX(-11) scale(1.04 0.9) rotate(-5) translate(-620 -286)">
-          <rect x={490} y={170} width={262} height={234} rx={16} fill="#0d1130" stroke="rgba(138,166,255,0.35)" strokeWidth={1.2} />
-          <rect x={498} y={178} width={246} height={218} rx={12} fill="none" stroke="rgba(138,166,255,0.16)" strokeWidth={1} />
-          <rect x={490} y={170} width={262} height={70} rx={16} fill="url(#libCardGloss)" />
-          <circle cx={510} cy={194} r={3.6} fill="#ff6b6b" />
-          <circle cx={523} cy={194} r={3.6} fill="#ffcf5c" />
-          <circle cx={536} cy={194} r={3.6} fill="#5ad6a0" />
-          <line x1={528} y1={212} x2={528} y2={388} stroke="rgba(138,166,255,0.18)" strokeWidth={1} />
-          {CODE_LINES.map((line, i) => (
-            <g key={`row-${i}`}>
-              <rect x={508} y={220 + i * 13} width={11} height={3} rx={1.5} fill="rgba(176,190,255,0.32)" />
-              <rect
-                x={538 + line.indent}
-                y={219 + i * 13}
-                width={line.width}
-                height={4.2}
-                rx={2}
-                fill={line.color}
-                fillOpacity={0.92}
-              />
-            </g>
-          ))}
-        </g>
       </g>
 
-      {/* Vulnerable packages — outside, with blocked badges. */}
-      {AMBER_BLOCKED.map((cube, i) => (
-        <Cube key={`a-${i}`} {...cube} />
-      ))}
-      {amberData.map((a, i) => (
-        <BlockedBadge key={`bb-${i}`} {...a.stop} />
-      ))}
-
-      {/* Foreground clean package field. */}
-      {GREEN_IN.map((cube, i) => (
-        <Cube key={`g-${i}`} {...cube} />
-      ))}
-
-      {/* Amber packets — rush the gate, then recoil + fade (repelled). */}
-      {amberData.map((a, i) => (
-        <g
-          key={`ap-${i}`}
-          className="cs-lib-packet-amber"
-          style={{ offsetPath: `path('${a.d}')`, animationDelay: `${i * 0.5}s` }}
-        >
-          <circle r={7} fill="url(#libGlow-amber)" filter="url(#libBloom)" />
-          <circle r={2.6} fill="#ffd9c2" />
-        </g>
-      ))}
-
-      {/* Ambient sparkles. */}
-      {SPARKS.map((p, i) => (
+      {/* Particle dust field. */}
+      {PARTICLES.map((p, i) => (
         <circle
-          key={`sp-${i}`}
+          key={`p-${i}`}
           cx={p.x}
           cy={p.y}
-          r={1.6}
-          fill="#bfe9ff"
-          className="cs-lib-twinkle"
-          style={{ animationDelay: `${i * 0.6}s` }}
+          r={p.r}
+          fill="#d8e6ff"
+          className={p.twinkle ? "cs-lib-twinkle" : undefined}
+          style={{ opacity: p.o, animationDelay: `${p.delay}s` }}
         />
       ))}
 
-      {/* Floor reflection. */}
-      <ellipse cx={C.cx} cy={C.cy + C.ry + 36} rx={C.rx - 16} ry={22} fill="url(#libBlobGlow)" opacity={0.45} />
+      {/* Foreground nodes. */}
+      {NODES.filter((n) => !n.back).map((n, i) => (
+        <IsoNode key={`fn-${i}`} n={n} />
+      ))}
+
+      {/* Travelling data pulses across the graph. */}
+      {PULSES.map((p, i) => (
+        <g key={`pulse-${i}`} className="cs-lib-packet" style={{ offsetPath: `path('${p.d}')`, animationDuration: `${p.dur}s`, animationDelay: `${p.delay}s` } as React.CSSProperties}>
+          <circle r={5} fill="url(#halo-violet)" filter="url(#depBloom)" />
+          <circle r={1.8} fill="#f2e9ff" />
+        </g>
+      ))}
+
+      {/* Verified glass core — shockwave rings, breathing bloom, layered crystal
+          cube, energy ring + light burst. */}
+      {[0, 1.55, 3.1].map((delay, i) => (
+        <circle
+          key={`ring-${i}`}
+          cx={HUB_CX}
+          cy={HUB_CY}
+          r={58}
+          fill="none"
+          stroke="#d9b8ff"
+          strokeWidth={1.4}
+          strokeOpacity={0.5}
+          className="cs-dep-ring"
+          style={{ animationDelay: `${delay}s` }}
+        />
+      ))}
+
+      <g className="cs-libhero-breathe" style={{ transformOrigin: `${HUB.x}px ${HUB.y}px`, transformBox: "fill-box" } as React.CSSProperties}>
+        <circle cx={HUB_CX} cy={HUB_CY} r={104} fill="url(#depCoreCore)" />
+      </g>
+
+      <ellipse
+        cx={HUB_CX}
+        cy={HUB_CY}
+        rx={76}
+        ry={72}
+        fill="none"
+        stroke="#e7d4ff"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeDasharray="28 440"
+        strokeOpacity={0.7}
+        className="cs-lib-rim"
+      />
+
+      {/* Outer glass cube — translucent faces, bright edges. */}
+      <g transform={`translate(${HUB.x} ${HUB.y - 26}) scale(2.2)`}>
+        <polyline points="-20,10 0,20 20,10" fill="none" stroke="#e7d4ff" strokeOpacity={0.4} strokeWidth={0.7} />
+        <line x1={0} y1={20} x2={0} y2={44} stroke="#e7d4ff" strokeOpacity={0.32} strokeWidth={0.7} />
+        <polygon points="0,0 20,10 0,20 -20,10" fill="url(#depHubTop)" fillOpacity={0.58} />
+        <polygon points="-20,10 0,20 0,44 -20,34" fill="url(#depHubLeft)" fillOpacity={0.4} />
+        <polygon points="20,10 0,20 0,44 20,34" fill="url(#depHubRight)" fillOpacity={0.4} />
+        <polyline points="-20,34 0,44 20,34" fill="none" stroke="#ffffff" strokeOpacity={0.5} strokeWidth={0.8} />
+        <polyline points="-20,10 0,0 20,10" fill="none" stroke="#ffffff" strokeOpacity={0.95} strokeWidth={1.3} />
+        <line x1={-20} y1={10} x2={-20} y2={34} stroke="#ffffff" strokeOpacity={0.55} strokeWidth={0.85} />
+        <line x1={20} y1={10} x2={20} y2={34} stroke="#ffffff" strokeOpacity={0.55} strokeWidth={0.85} />
+      </g>
+
+      {/* Inner crystal — brighter, denser. */}
+      <g transform={`translate(${HUB.x} ${HUB.y - 4}) scale(1.18)`}>
+        <polygon points="0,0 20,10 0,20 -20,10" fill="url(#depHubTop)" fillOpacity={0.96} />
+        <polygon points="-20,10 0,20 0,44 -20,34" fill="url(#depHubLeft)" fillOpacity={0.88} />
+        <polygon points="20,10 0,20 0,44 20,34" fill="url(#depHubRight)" fillOpacity={0.88} />
+        <polyline points="-20,10 0,0 20,10" fill="none" stroke="#ffffff" strokeWidth={1.2} />
+        <circle cx={-6} cy={7} r={1.8} fill="#ffffff" />
+      </g>
+
+      {/* Hot centre + light burst. */}
+      <g className="cs-lib-twinkle" style={{ transformOrigin: `${HUB_CX}px ${HUB_CY}px` }}>
+        <g stroke="#ffffff" strokeOpacity={0.85} strokeLinecap="round">
+          <line x1={HUB_CX - 24} y1={HUB_CY} x2={HUB_CX + 24} y2={HUB_CY} strokeWidth={1} />
+          <line x1={HUB_CX} y1={HUB_CY - 22} x2={HUB_CX} y2={HUB_CY + 22} strokeWidth={1} />
+          <line x1={HUB_CX - 14} y1={HUB_CY - 12} x2={HUB_CX + 14} y2={HUB_CY + 12} strokeWidth={0.7} strokeOpacity={0.5} />
+          <line x1={HUB_CX - 14} y1={HUB_CY + 12} x2={HUB_CX + 14} y2={HUB_CY - 12} strokeWidth={0.7} strokeOpacity={0.5} />
+        </g>
+        <circle cx={HUB_CX} cy={HUB_CY} r={5} fill="#ffffff" />
+      </g>
     </svg>
   );
 }
