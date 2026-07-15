@@ -11,6 +11,7 @@ import {
   DEPARTMENT_LABEL,
   experienceDisplay,
   getJobBySlug,
+  getJobBySlugDraft,
   getJobSlugs,
   locationDisplay,
   resolvedLocations,
@@ -84,11 +85,16 @@ export async function generateMetadata({
   });
 }
 
-export default async function CareerDetailPage({
-  params,
-}: CareerDetailPageProps): Promise<React.ReactElement> {
-  const { slug } = await params;
-  const job = await getJobBySlug(slug).catch(() => null);
+export async function renderJobDetail({
+  slug,
+  draft = false,
+}: {
+  slug: string;
+  draft?: boolean;
+}): Promise<React.ReactElement> {
+  const job = draft
+    ? await getJobBySlugDraft(slug).catch(() => null)
+    : await getJobBySlug(slug).catch(() => null);
   if (!job) notFound();
 
   // Older CMS bodies prefix the content with a single-line italic department
@@ -178,6 +184,13 @@ export default async function CareerDetailPage({
       <Footer />
     </>
   );
+}
+
+export default async function CareerDetailPage({
+  params,
+}: CareerDetailPageProps): Promise<React.ReactElement> {
+  const { slug } = await params;
+  return renderJobDetail({ slug });
 }
 
 interface LexicalTextLike {

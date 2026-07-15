@@ -5,6 +5,7 @@ import { renderEventDetail } from "@/app/event/[slug]/page";
 import { renderNewsDetail } from "@/app/news/[slug]/page";
 import { renderResourceDetail } from "@/app/resources/[slug]/page";
 import { renderGuideDetail } from "@/app/guide/[slug]/page";
+import { renderJobDetail } from "@/app/job/[slug]/page";
 import { renderLegalDetail } from "@/app/(legal)/legal/[slug]/page";
 import { cmsBaseUrl } from "@/lib/cms-fetch";
 
@@ -78,6 +79,7 @@ const renderers: Record<string, (args: { slug: string; draft?: boolean }) => Pro
   events: renderEventDetail,
   resources: renderResourceDetail,
   guides: renderGuideDetail,
+  jobs: renderJobDetail,
   legalDocuments: renderLegalDetail,
 };
 
