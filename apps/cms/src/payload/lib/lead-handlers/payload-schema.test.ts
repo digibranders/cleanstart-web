@@ -35,6 +35,40 @@ describe('submitLeadBodySchema', () => {
     expect(() => submitLeadBodySchema.parse({ ...minValid, source: big })).toThrow();
   });
 
+  it('accepts an attribution block with first touch + click IDs', () => {
+    const out = submitLeadBodySchema.parse({
+      ...minValid,
+      utm: { source: 'google', medium: 'cpc' },
+      attribution: {
+        device: 'mobile',
+        gclid: 'abc123',
+        firstTouch: {
+          source: 'linkedin',
+          landingPage: 'https://www.cleanstart.com/',
+          referrer: 'https://www.linkedin.com/',
+          at: '2026-07-01T00:00:00.000Z',
+        },
+      },
+    });
+    expect(out.attribution?.device).toBe('mobile');
+    expect(out.attribution?.firstTouch?.source).toBe('linkedin');
+  });
+
+  it('rejects an unknown attribution.device value', () => {
+    expect(() =>
+      submitLeadBodySchema.parse({ ...minValid, attribution: { device: 'watch' } }),
+    ).toThrow();
+  });
+
+  it('rejects a non-datetime firstTouch.at', () => {
+    expect(() =>
+      submitLeadBodySchema.parse({
+        ...minValid,
+        attribution: { firstTouch: { at: 'yesterday' } },
+      }),
+    ).toThrow();
+  });
+
   it('rejects consent.snapshot longer than 4096', () => {
     expect(() =>
       submitLeadBodySchema.parse({

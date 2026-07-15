@@ -11,6 +11,7 @@ const makeSubmission = (
   fields,
   source: undefined,
   utm: undefined,
+  attribution: undefined,
   ip: undefined,
   userAgent: undefined,
   consent: undefined,

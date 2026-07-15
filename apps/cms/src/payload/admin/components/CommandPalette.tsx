@@ -47,6 +47,12 @@ const NAV_TARGETS: Array<Omit<Action, 'group'>> = [
   { id: 'nav-jobLocations', label: 'Job locations', href: '/admin/collections/jobLocations', icon: 'collection' },
   { id: 'nav-forms', label: 'Forms', href: '/admin/collections/forms', icon: 'collection' },
   { id: 'nav-leads', label: 'Leads', href: '/admin/collections/leads', icon: 'collection' },
+  {
+    id: 'nav-lead-attribution',
+    label: 'Lead attribution',
+    href: '/admin/lead-attribution',
+    icon: 'collection',
+  },
   { id: 'nav-redirects', label: 'Redirects', href: '/admin/collections/redirects', icon: 'collection' },
   { id: 'nav-auditLog', label: 'Audit log', href: '/admin/collections/audit-log', icon: 'collection' },
   { id: 'nav-users', label: 'Users', href: '/admin/collections/users', icon: 'collection' },

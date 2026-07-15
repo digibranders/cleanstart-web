@@ -103,6 +103,7 @@ export const retryLeadSyncEndpoint: Endpoint = {
       userAgent: lead.userAgent ?? undefined,
       consent: undefined,
       utm: undefined,
+      attribution: undefined,
     };
 
     const ctx: LeadHandlerContext = {

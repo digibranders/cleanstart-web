@@ -28,6 +28,7 @@ const submission: LeadSubmission = {
   fields: { email: 'jane@example.com' },
   source: '/contact',
   utm: undefined,
+  attribution: undefined,
   ip: '1.2.3.4',
   userAgent: 'test',
   consent: undefined,

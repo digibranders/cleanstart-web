@@ -1,5 +1,7 @@
 import type { Payload } from 'payload';
 
+import type { LeadAttribution } from './attribution';
+
 /**
  * Validated submission payload as it crosses the LeadHandler boundary.
  * Built by the /api/leads/submit endpoint after Zod parsing + Turnstile
@@ -30,7 +32,13 @@ export type LeadSubmission = {
   formSchemaVersion: number;
   fields: Record<string, unknown>;
   source: string | undefined;
+  /** Last-touch UTMs from the URL at submit time. */
   utm: LeadSubmissionUtm | undefined;
+  /**
+   * First-touch campaign, ad click IDs, device, and the server-derived
+   * marketing channel. Undefined for legacy / attribution-less submissions.
+   */
+  attribution: LeadAttribution | undefined;
   ip: string | undefined;
   userAgent: string | undefined;
   consent: LeadSubmissionConsent | undefined;

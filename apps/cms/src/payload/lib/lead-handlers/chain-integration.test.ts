@@ -84,6 +84,7 @@ const submission: LeadSubmission = {
   fields: { email: 'cto@acme-corp.com', name: 'Pat' },
   source: '/contact',
   utm: undefined,
+  attribution: undefined,
   ip: '1.2.3.4',
   userAgent: 'curl',
   consent: undefined,

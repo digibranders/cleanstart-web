@@ -12,6 +12,8 @@
  * The endpoint always responds 200 for a tripped honeypot, so callers should
  * treat `{ ok: true }` as success and surface `error` only when `ok` is false.
  */
+import type { AttributionSubmission } from "@/lib/attribution/types";
+
 const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:3000";
 
 export interface LeadConsent {
@@ -31,6 +33,12 @@ export interface SubmitLeadInput {
   turnstileToken?: string;
   /** Honeypot value — pass the hidden input's value, normally "". */
   website?: string;
+  /**
+   * Marketing attribution captured by AttributionProvider. Spread from
+   * `useAttribution().getAttribution()`; carries last-touch `utm` and the
+   * first-touch / click-ID / device `attribution` group.
+   */
+  attribution?: AttributionSubmission;
 }
 
 export interface SubmitLeadResult {
@@ -52,6 +60,10 @@ export async function submitLead(input: SubmitLeadInput): Promise<SubmitLeadResu
         consent: input.consent,
         turnstileToken: input.turnstileToken,
         website: input.website ?? "",
+        ...(input.attribution?.utm ? { utm: input.attribution.utm } : {}),
+        ...(input.attribution?.attribution
+          ? { attribution: input.attribution.attribution }
+          : {}),
       }),
     });
     const json = (await res.json().catch(() => null)) as SubmitLeadResult | null;

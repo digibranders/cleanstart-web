@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/nextjs';
 import type { Endpoint } from 'payload';
 
 import { clientIpFromHeaders } from '../lib/client-ip';
+import { type LeadAttribution, deriveChannel } from '../lib/lead-handlers/attribution';
 import { parkSubmission } from '../lib/lead-fallback-queue';
 import { submitLeadBodySchema } from '../lib/lead-handlers/payload-schema';
 import { submitLead } from '../lib/lead-handlers/registry';
@@ -363,12 +364,32 @@ export const submitLeadEndpoint: Endpoint = {
       }
     }
 
+    // Re-derive the marketing channel server-side from the last-touch UTMs,
+    // ad click IDs, and first-touch referrer — never trust a client value.
+    // Build an attribution object whenever there is any signal (either a
+    // first-touch payload or last-touch UTMs) so every campaign-tagged lead
+    // carries a channel, even when the client omits the attribution block.
+    let attribution: LeadAttribution | undefined;
+    if (data.attribution != null || data.utm != null) {
+      attribution = {
+        ...(data.attribution ?? {}),
+        channel: deriveChannel({
+          utm: data.utm,
+          referrer: data.attribution?.firstTouch?.referrer,
+          gclid: data.attribution?.gclid,
+          fbclid: data.attribution?.fbclid,
+          liFatId: data.attribution?.liFatId,
+        }),
+      };
+    }
+
     const submission: LeadSubmission = {
       formId: numericFormId,
       formSchemaVersion: data.formSchemaVersion ?? resolvedForm.schemaVersion,
       fields: data.fields,
       source: data.source,
       utm: data.utm,
+      attribution,
       ip,
       userAgent,
       consent: consentWithPolicy,

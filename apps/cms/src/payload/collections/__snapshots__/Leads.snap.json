@@ -53,6 +53,107 @@
       ]
     },
     {
+      "type": "group",
+      "name": "attribution",
+      "fields": [
+        {
+          "type": "select",
+          "name": "channel",
+          "options": [
+            {
+              "value": "paid_search"
+            },
+            {
+              "value": "paid_social"
+            },
+            {
+              "value": "organic_search"
+            },
+            {
+              "value": "social"
+            },
+            {
+              "value": "email"
+            },
+            {
+              "value": "referral"
+            },
+            {
+              "value": "direct"
+            },
+            {
+              "value": "other"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "name": "device",
+          "options": [
+            {
+              "value": "desktop"
+            },
+            {
+              "value": "mobile"
+            },
+            {
+              "value": "tablet"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "name": "gclid"
+        },
+        {
+          "type": "text",
+          "name": "fbclid"
+        },
+        {
+          "type": "text",
+          "name": "liFatId"
+        },
+        {
+          "type": "group",
+          "name": "firstTouch",
+          "fields": [
+            {
+              "type": "text",
+              "name": "source"
+            },
+            {
+              "type": "text",
+              "name": "medium"
+            },
+            {
+              "type": "text",
+              "name": "campaign"
+            },
+            {
+              "type": "text",
+              "name": "term"
+            },
+            {
+              "type": "text",
+              "name": "content"
+            },
+            {
+              "type": "text",
+              "name": "landingPage"
+            },
+            {
+              "type": "text",
+              "name": "referrer"
+            },
+            {
+              "type": "date",
+              "name": "at"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "type": "text",
       "name": "ip"
     },

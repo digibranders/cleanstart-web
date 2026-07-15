@@ -69,6 +69,7 @@ import {
   dashboardsGscPerDocEndpoint,
 } from './payload/endpoints/dashboards';
 import { contentInsightsEndpoint } from './payload/endpoints/content-insights';
+import { leadAttributionEndpoint } from './payload/endpoints/lead-attribution';
 import { cruxEndpoint, ga4RealtimeEndpoint } from './payload/endpoints/dashboards-advanced';
 import { ga4OverviewEndpoint, gscOverviewEndpoint } from './payload/endpoints/dashboards-overview';
 import { calcomInboundEndpoint } from './payload/endpoints/integrations-inbound';
@@ -327,6 +328,12 @@ export default buildConfig({
           Component: './payload/admin/components/ContentInsights/ContentInsightsView.tsx#ContentInsightsView',
           path: '/content-insights',
         },
+        // Marketing lead-attribution report (channel / campaign / landing page).
+        leadAttribution: {
+          Component:
+            './payload/admin/components/LeadAttribution/LeadAttributionView.tsx#LeadAttributionView',
+          path: '/lead-attribution',
+        },
         // On-demand ISR cache purge — global + custom path/tag (admin-only).
         cache: {
           Component: './payload/admin/components/cache/CacheView.tsx#CacheView',
@@ -467,6 +474,7 @@ export default buildConfig({
     dashboardsGscPerDocEndpoint,
     dashboardsGscInspectEndpoint,
     contentInsightsEndpoint,
+    leadAttributionEndpoint,
     calcomInboundEndpoint,
   ],
   jobs: {

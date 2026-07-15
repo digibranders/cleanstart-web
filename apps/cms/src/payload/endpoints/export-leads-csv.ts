@@ -11,6 +11,7 @@ type LeadRow = {
   fields?: Record<string, unknown> | null;
   source?: string | null;
   utm?: Record<string, unknown> | null;
+  attribution?: Record<string, unknown> | null;
   ip?: string | null;
   userAgent?: string | null;
   consentGivenAt?: string | null;
@@ -35,9 +36,21 @@ const HEADERS = [
   'formId',
   'formName',
   'source',
+  'channel',
   'utm_campaign',
   'utm_source',
   'utm_medium',
+  'utm_term',
+  'utm_content',
+  'firsttouch_campaign',
+  'firsttouch_source',
+  'firsttouch_medium',
+  'firsttouch_landingPage',
+  'firsttouch_referrer',
+  'gclid',
+  'fbclid',
+  'liFatId',
+  'device',
   'companyFromDomain',
   'fields',
   'consentGivenAt',
@@ -47,7 +60,9 @@ const HEADERS = [
 ] as const;
 
 const flatten = (row: LeadRow): Record<string, unknown> => {
-  const utm = row.utm ?? {};
+  const utm = (row.utm ?? {}) as Record<string, unknown>;
+  const attribution = (row.attribution ?? {}) as Record<string, unknown>;
+  const firstTouch = (attribution.firstTouch ?? {}) as Record<string, unknown>;
   const enriched = row.enriched ?? {};
   const cfd = (enriched['company-from-domain'] ?? null) as
     | { company?: string; domain?: string }
@@ -66,9 +81,21 @@ const flatten = (row: LeadRow): Record<string, unknown> => {
     formId: formIdValue,
     formName,
     source: row.source ?? '',
-    utm_campaign: (utm as Record<string, unknown>).campaign ?? '',
-    utm_source: (utm as Record<string, unknown>).source ?? '',
-    utm_medium: (utm as Record<string, unknown>).medium ?? '',
+    channel: attribution.channel ?? '',
+    utm_campaign: utm.campaign ?? '',
+    utm_source: utm.source ?? '',
+    utm_medium: utm.medium ?? '',
+    utm_term: utm.term ?? '',
+    utm_content: utm.content ?? '',
+    firsttouch_campaign: firstTouch.campaign ?? '',
+    firsttouch_source: firstTouch.source ?? '',
+    firsttouch_medium: firstTouch.medium ?? '',
+    firsttouch_landingPage: firstTouch.landingPage ?? '',
+    firsttouch_referrer: firstTouch.referrer ?? '',
+    gclid: attribution.gclid ?? '',
+    fbclid: attribution.fbclid ?? '',
+    liFatId: attribution.liFatId ?? '',
+    device: attribution.device ?? '',
     companyFromDomain: cfd?.company ?? '',
     fields: row.fields ?? {},
     consentGivenAt: row.consentGivenAt ?? '',

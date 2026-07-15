@@ -5,6 +5,7 @@ import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { LeadConsent } from "@/components/forms/LeadConsent";
 import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
 import { submitLead } from "@/lib/leads/submitLead";
+import { useAttribution } from "@/components/attribution/AttributionProvider";
 import { SubmitButton } from "./FormCard";
 
 /** Web input name → HubSpot internal property name (the `forms` field names). */
@@ -24,6 +25,7 @@ export function BookDemoForm(): React.ReactElement {
   const [submitting, setSubmitting] = useState(false);
   const { status, setStatus, statusRef } = useFormStatus();
   const inFlightRef = useRef(false);
+  const { getAttribution } = useAttribution();
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -53,6 +55,7 @@ export function BookDemoForm(): React.ReactElement {
       },
       ...(typeof turnstileToken === "string" ? { turnstileToken } : {}),
       ...(typeof window !== "undefined" ? { source: window.location.href } : {}),
+      attribution: getAttribution(),
     });
 
     setSubmitting(false);

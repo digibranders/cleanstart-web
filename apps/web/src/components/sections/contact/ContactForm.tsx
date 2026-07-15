@@ -5,6 +5,7 @@ import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { LeadConsent } from "@/components/forms/LeadConsent";
 import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
 import { submitLead } from "@/lib/leads/submitLead";
+import { useAttribution } from "@/components/attribution/AttributionProvider";
 import { useRef, useState } from "react";
 
 interface FieldState {
@@ -44,6 +45,7 @@ export function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
   const { status, setStatus, statusRef } = useFormStatus();
   const inFlightRef = useRef(false);
+  const { getAttribution } = useAttribution();
 
   const onChange =
     (key: keyof FieldState) =>
@@ -76,6 +78,7 @@ export function ContactForm() {
       },
       ...(typeof turnstileToken === "string" ? { turnstileToken } : {}),
       ...(typeof window !== "undefined" ? { source: window.location.href } : {}),
+      attribution: getAttribution(),
     });
 
     setSubmitting(false);

@@ -8,6 +8,7 @@ import type {
 } from "@/lib/forms";
 import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
+import { useAttribution } from "@/components/attribution/AttributionProvider";
 
 export interface FormRendererSubmitResult {
   duplicate?: boolean;
@@ -128,6 +129,7 @@ export function FormRenderer({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const { status, setStatus, statusRef } = useFormStatus();
+  const { getAttribution } = useAttribution();
   // Honeypot — never rendered visibly, but its existence is what bots fill.
   const [honeypot, setHoneypot] = useState("");
   // Cloudflare Turnstile token. Required server-side for every form except the
@@ -190,6 +192,7 @@ export function FormRenderer({
 
     setSubmitting(true);
     try {
+      const attribution = getAttribution();
       const body = {
         formId: form.id,
         formSchemaVersion: form.schemaVersion,
@@ -198,6 +201,8 @@ export function FormRenderer({
         consent: buildConsentPayload(),
         website: honeypot,
         ...(turnstileToken ? { turnstileToken } : {}),
+        ...(attribution.utm ? { utm: attribution.utm } : {}),
+        ...(attribution.attribution ? { attribution: attribution.attribution } : {}),
         ...(context?.resourceId != null
           ? { context: { resourceId: context.resourceId } }
           : {}),

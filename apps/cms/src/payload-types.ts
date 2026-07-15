@@ -7862,7 +7862,7 @@ export interface Lead {
    */
   source?: string | null;
   /**
-   * From the query string at submit time.
+   * UTMs from the query string at submit time (last touch).
    */
   utm?: {
     campaign?: string | null;
@@ -7870,6 +7870,34 @@ export interface Lead {
     medium?: string | null;
     term?: string | null;
     content?: string | null;
+  };
+  /**
+   * Server-derived channel, ad click IDs, device, and the first-touch campaign that originally sourced this visitor.
+   */
+  attribution?: {
+    /**
+     * Derived server-side from UTMs, click IDs, and referrer. Read-only.
+     */
+    channel?:
+      | ('paid_search' | 'paid_social' | 'organic_search' | 'social' | 'email' | 'referral' | 'direct' | 'other')
+      | null;
+    device?: ('desktop' | 'mobile' | 'tablet') | null;
+    gclid?: string | null;
+    fbclid?: string | null;
+    liFatId?: string | null;
+    /**
+     * Campaign + landing page from the visitor’s first session.
+     */
+    firstTouch?: {
+      source?: string | null;
+      medium?: string | null;
+      campaign?: string | null;
+      term?: string | null;
+      content?: string | null;
+      landingPage?: string | null;
+      referrer?: string | null;
+      at?: string | null;
+    };
   };
   /**
    * Auto-purged after retention window. Never logged in raw form.
@@ -12168,6 +12196,27 @@ export interface LeadsSelect<T extends boolean = true> {
         medium?: T;
         term?: T;
         content?: T;
+      };
+  attribution?:
+    | T
+    | {
+        channel?: T;
+        device?: T;
+        gclid?: T;
+        fbclid?: T;
+        liFatId?: T;
+        firstTouch?:
+          | T
+          | {
+              source?: T;
+              medium?: T;
+              campaign?: T;
+              term?: T;
+              content?: T;
+              landingPage?: T;
+              referrer?: T;
+              at?: T;
+            };
       };
   ip?: T;
   userAgent?: T;

@@ -42,6 +42,8 @@ export const dbPrimaryHandler: LeadHandler = {
     }
 
     const utm = submission.utm ?? {};
+    const attribution = submission.attribution ?? {};
+    const firstTouch = attribution.firstTouch ?? {};
     const created = await ctx.payload.create({
       collection: 'leads',
       data: {
@@ -55,6 +57,23 @@ export const dbPrimaryHandler: LeadHandler = {
           medium: utm.medium ?? null,
           term: utm.term ?? null,
           content: utm.content ?? null,
+        },
+        attribution: {
+          channel: attribution.channel ?? null,
+          device: attribution.device ?? null,
+          gclid: attribution.gclid ?? null,
+          fbclid: attribution.fbclid ?? null,
+          liFatId: attribution.liFatId ?? null,
+          firstTouch: {
+            source: firstTouch.source ?? null,
+            medium: firstTouch.medium ?? null,
+            campaign: firstTouch.campaign ?? null,
+            term: firstTouch.term ?? null,
+            content: firstTouch.content ?? null,
+            landingPage: firstTouch.landingPage ?? null,
+            referrer: firstTouch.referrer ?? null,
+            at: firstTouch.at ?? null,
+          },
         },
         ip: submission.ip ?? null,
         userAgent: submission.userAgent ?? null,

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { hubspotHandler } from './hubspot';
+import { attributionHubspotFields, hubspotHandler } from './hubspot';
 import type { LeadSubmission } from './types';
 
 const submission: LeadSubmission = {
@@ -9,6 +9,7 @@ const submission: LeadSubmission = {
   fields: { email: 'cto@acme.com', firstname: 'Pat', company: 'Acme' },
   source: 'https://cleanstart.com/contact',
   utm: undefined,
+  attribution: undefined,
   ip: '1.2.3.4',
   userAgent: 'curl',
   consent: { snapshot: 'I agree…', givenAt: '2026-06-02T00:00:00Z' },
@@ -92,5 +93,36 @@ describe('hubspotHandler (Forms API)', () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 400, text: async () => 'bad' }));
     const r = await hubspotHandler.run(submission, ctx('guid-1'));
     expect(r.status).toBe('failed');
+  });
+});
+
+describe('attributionHubspotFields', () => {
+  const withAttribution: LeadSubmission = {
+    ...submission,
+    utm: { source: 'google', medium: 'cpc', campaign: 'spring' },
+    attribution: { channel: undefined, gclid: 'gc1', firstTouch: undefined },
+  };
+
+  afterEach(() => {
+    Reflect.deleteProperty(process.env, 'HUBSPOT_FORWARD_ATTRIBUTION');
+  });
+
+  it('returns nothing when the flag is off', () => {
+    expect(attributionHubspotFields(withAttribution)).toEqual([]);
+  });
+
+  it('forwards non-empty utm + click IDs when enabled', () => {
+    process.env.HUBSPOT_FORWARD_ATTRIBUTION = 'true';
+    expect(attributionHubspotFields(withAttribution)).toEqual([
+      { name: 'utm_source', value: 'google' },
+      { name: 'utm_medium', value: 'cpc' },
+      { name: 'utm_campaign', value: 'spring' },
+      { name: 'gclid', value: 'gc1' },
+    ]);
+  });
+
+  it('emits nothing when enabled but no attribution present', () => {
+    process.env.HUBSPOT_FORWARD_ATTRIBUTION = 'true';
+    expect(attributionHubspotFields(submission)).toEqual([]);
   });
 });

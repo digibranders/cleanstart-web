@@ -158,6 +158,7 @@ export const calcomInboundEndpoint: Endpoint = {
       },
       source: 'calcom',
       utm: undefined,
+      attribution: undefined,
       ip,
       userAgent: undefined,
       consent: undefined,

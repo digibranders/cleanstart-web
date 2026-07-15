@@ -9,6 +9,7 @@ const baseSubmission: LeadSubmission = {
   fields: { email: 'jane@example.com', name: 'Jane' },
   source: '/contact',
   utm: { campaign: 'spring', source: 'twitter' },
+  attribution: undefined,
   ip: '1.2.3.4',
   userAgent: 'curl/8',
   consent: {

@@ -38,6 +38,29 @@ export const submitLeadBodySchema = z
         content: z.string().max(256).optional(),
       })
       .optional(),
+    // First-touch attribution + ad click IDs + device. `channel` is NOT
+    // accepted here — the endpoint derives it server-side so it can't be
+    // spoofed. Sizes mirror the last-touch `utm` caps.
+    attribution: z
+      .object({
+        device: z.enum(['desktop', 'mobile', 'tablet']).optional(),
+        gclid: z.string().max(512).optional(),
+        fbclid: z.string().max(512).optional(),
+        liFatId: z.string().max(512).optional(),
+        firstTouch: z
+          .object({
+            source: z.string().max(256).optional(),
+            medium: z.string().max(256).optional(),
+            campaign: z.string().max(256).optional(),
+            term: z.string().max(256).optional(),
+            content: z.string().max(256).optional(),
+            landingPage: z.string().max(2048).optional(),
+            referrer: z.string().max(2048).optional(),
+            at: z.string().datetime().optional(),
+          })
+          .optional(),
+      })
+      .optional(),
     consent: z
       .object({
         givenAt: z.string().datetime(),

@@ -7,6 +7,7 @@ import { PreviewBanner } from "@/components/PreviewBanner";
 import { ClickSpark } from "@/components/ui/ClickSpark";
 import { SearchProvider } from "@/components/search/SearchProvider";
 import { SmoothScrollProvider } from "@/components/SmoothScrollProvider";
+import { AttributionProvider } from "@/components/attribution/AttributionProvider";
 import {
   ConsentProvider,
   ConsentModeScript,
@@ -175,14 +176,16 @@ export default async function RootLayout({
           Skip to main content
         </a>
         <ConsentProvider>
-          <JsonLdGraph id="site-jsonld" graph={siteGraph} />
-          <PreviewBanner />
-          <SearchProvider>
-            <SmoothScrollProvider>{children}</SmoothScrollProvider>
-          </SearchProvider>
-          <GatedAnalytics />
-          <CookieBanner />
-          <ClickSpark />
+          <AttributionProvider>
+            <JsonLdGraph id="site-jsonld" graph={siteGraph} />
+            <PreviewBanner />
+            <SearchProvider>
+              <SmoothScrollProvider>{children}</SmoothScrollProvider>
+            </SearchProvider>
+            <GatedAnalytics />
+            <CookieBanner />
+            <ClickSpark />
+          </AttributionProvider>
         </ConsentProvider>
       </body>
     </html>
