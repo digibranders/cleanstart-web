@@ -15,7 +15,6 @@ const NAME_MAP: Record<string, string> = {
   company: "company",
   country: "country",
   phone: "phone",
-  referralSource: "how_did_you_hear_about_cleanstart_",
 };
 
 const STORAGE_CONSENT_TEXT =
@@ -110,16 +109,11 @@ export function BookDemoForm(): React.ReactElement {
                 <FigmaTextInput name="phone" type="tel" label="Phone Number" required />
               </div>
 
-              <FigmaTextInput
-                name="referralSource"
-                label="How did you hear about CleanStart?"
-              />
-
               <LeadConsent />
 
               <TurnstileWidget />
               <SubmitButton busy={submitting} busyLabel="Submitting…">
-                Submit Application
+                Let's Connect
               </SubmitButton>
             </form>
         </div>

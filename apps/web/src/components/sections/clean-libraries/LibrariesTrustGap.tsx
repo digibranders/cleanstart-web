@@ -148,7 +148,7 @@ function TrustColumn({
       </div>
       <h3
         className="font-display text-white"
-        style={{ fontSize: "var(--fs-h5)", fontWeight: 600, letterSpacing: "-0.01em", lineHeight: 1.2 }}
+        style={{ fontSize: "var(--fs-h4)", fontWeight: 600, letterSpacing: "-0.01em", lineHeight: 1.2 }}
       >
         {card.title}
       </h3>

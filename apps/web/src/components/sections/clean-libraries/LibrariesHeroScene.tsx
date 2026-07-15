@@ -4,18 +4,18 @@
  *
  * Concept: a glowing glass "core" cube at the centre, wrapped in a mesh of
  * library nodes (small isometric cubes + glowing dots) linked by dependency
- * edges, floating in a nebula of particle dust and out-of-focus bokeh. The hue
+ * edges, floating in a nebula of particle dust. The hue
  * drifts across the field — magenta on the left, violet through the core,
  * cyan/blue on the right — echoing the reference art. A soft dark core gives the
  * glow contrast against the purple hero without a hard black box.
  *
- * Determinism: node/edge/particle/bokeh layout is generated once at module scope
+ * Determinism: node/edge/particle layout is generated once at module scope
  * from a fixed-seed PRNG (mulberry32), so SSR output is stable across builds —
  * no Math.random at render, no hydration drift.
  *
  * Motion (all GPU-composited transform/opacity/offset-path, all disabled under
  * prefers-reduced-motion via globals.css):
- *   - `cs-libhero-breathe` pulses the core bloom + bokeh;
+ *   - `cs-libhero-breathe` pulses the core bloom;
  *   - `cs-dep-ring` fires shockwave rings out of the core;
  *   - `cs-lib-twinkle` fades a staggered subset of nodes + the particle dust;
  *   - `cs-dep-bob` floats a subset of nodes on desynced phases;
@@ -64,16 +64,6 @@ interface Particle {
   delay: number;
 }
 
-interface Bokeh {
-  x: number;
-  y: number;
-  r: number;
-  hue: HueKey;
-  o: number;
-  breathe: boolean;
-  delay: number;
-}
-
 interface Pulse {
   d: string;
   delay: number;
@@ -113,15 +103,14 @@ function nodeCenter(n: Node): { x: number; y: number } {
   return { x: n.x, y: n.y + 22 * n.s };
 }
 
-const { NODES, EDGES, PARTICLES, BOKEH, PULSES } = ((): {
+const { NODES, EDGES, PARTICLES, PULSES } = ((): {
   NODES: Node[];
   EDGES: Edge[];
   PARTICLES: Particle[];
-  BOKEH: Bokeh[];
   PULSES: Pulse[];
 } => {
   const rnd = mulberry32(20260715);
-  const nodes: Node[] = [];
+  let nodes: Node[] = [];
 
   const N = 37;
   const rMin = 92;
@@ -146,6 +135,11 @@ const { NODES, EDGES, PARTICLES, BOKEH, PULSES } = ((): {
       delay: rnd() * 3.6,
     });
   }
+
+  // Keep a clear zone around the core cube — drop nodes that would crowd/overlap
+  // the central glow (they read as clutter sitting on top of the hub).
+  const HUB_CENTER = { x: HUB.x, y: HUB.y + 22 };
+  nodes = nodes.filter((n) => Math.hypot(nodeCenter(n).x - HUB_CENTER.x, nodeCenter(n).y - HUB_CENTER.y) > 118);
 
   // Edges: a real mesh — each node links to its 2 nearest neighbours, and the
   // inner ring links to the hub (the primary dependency spokes).
@@ -193,22 +187,6 @@ const { NODES, EDGES, PARTICLES, BOKEH, PULSES } = ((): {
     });
   }
 
-  // Out-of-focus bokeh discs — cinematic background depth.
-  const bokeh: Bokeh[] = [];
-  for (let i = 0; i < 7; i++) {
-    const x = HUB.x + (rnd() - 0.5) * 620;
-    const y = HUB.y + (rnd() - 0.5) * 360;
-    bokeh.push({
-      x,
-      y,
-      r: 34 + rnd() * 58,
-      hue: hueForX(x),
-      o: 0.1 + rnd() * 0.12,
-      breathe: rnd() > 0.5,
-      delay: rnd() * 4,
-    });
-  }
-
   // Travelling data pulses — the strongest hub spokes flow inward, a scatter of
   // mesh edges flow along, so the whole graph reads "live".
   const hubEdges = edges.filter((e) => e.hub).sort((a, b) => Math.hypot(b.x2 - b.x1, b.y2 - b.y1) - Math.hypot(a.x2 - a.x1, a.y2 - a.y1));
@@ -223,7 +201,7 @@ const { NODES, EDGES, PARTICLES, BOKEH, PULSES } = ((): {
     pulses.push({ d: `M ${e.x1} ${e.y1} L ${e.x2} ${e.y2}`, delay: (i % 5) * 0.7, dur: 3.2 + (i % 4) * 0.4 });
   });
 
-  return { NODES: nodes, EDGES: edges, PARTICLES: particles, BOKEH: bokeh, PULSES: pulses.slice(0, 13) };
+  return { NODES: nodes, EDGES: edges, PARTICLES: particles, PULSES: pulses.slice(0, 13) };
 })();
 
 const HUB_CX = HUB.x;
@@ -321,26 +299,7 @@ export function LibrariesHeroScene(): React.ReactElement {
         <filter id="depBackBlur" x="-40%" y="-40%" width="180%" height="180%">
           <feGaussianBlur stdDeviation="2.6" />
         </filter>
-        <filter id="depBokehBlur" x="-60%" y="-60%" width="220%" height="220%">
-          <feGaussianBlur stdDeviation="9" />
-        </filter>
       </defs>
-
-      {/* Out-of-focus bokeh — cinematic depth behind the network. */}
-      <g filter="url(#depBokehBlur)">
-        {BOKEH.map((b, i) => (
-          <circle
-            key={`bk-${i}`}
-            cx={b.x}
-            cy={b.y}
-            r={b.r}
-            fill={`url(#${HUE[b.hue].halo})`}
-            opacity={b.o}
-            className={b.breathe ? "cs-libhero-breathe" : undefined}
-            style={b.breathe ? ({ transformOrigin: `${b.x}px ${b.y}px`, transformBox: "fill-box", animationDelay: `${b.delay}s` } as React.CSSProperties) : undefined}
-          />
-        ))}
-      </g>
 
       <g
         className="cs-libhero-breathe"

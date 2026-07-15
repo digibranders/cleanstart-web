@@ -52,11 +52,6 @@ const FORMS: readonly SeedForm[] = [
       { name: 'company', type: 'text', label: 'Company', required: true },
       { name: 'country', type: 'text', label: 'Country/Region' },
       { name: 'phone', type: 'text', label: 'Phone', required: true },
-      {
-        name: 'how_did_you_hear_about_cleanstart_',
-        type: 'textarea',
-        label: 'How did you hear about CleanStart?',
-      },
     ],
   },
   {
