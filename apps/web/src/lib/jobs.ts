@@ -116,20 +116,30 @@ export async function getJobs({
   );
 }
 
+// Shared loader. In draft mode the published filter is dropped so the preview
+// route can render unpublished edits (cms-fetch authenticates the draft read).
+async function loadJobBySlug(slug: string, draft = false): Promise<Job | null> {
+  const params = new URLSearchParams({
+    "where[slug][equals]": slug,
+    depth: "2",
+    limit: "1",
+  });
+  if (!draft) params.set("where[_status][equals]", "published");
+  const res = await fetchCMS<PayloadListResponse<Job>>(
+    `/api/jobs?${params.toString()}`,
+    { draft },
+  );
+  return res.docs[0] ?? null;
+}
+
 export const getJobBySlug = cache(
-  async (slug: string): Promise<Job | null> => {
-    const params = new URLSearchParams({
-      "where[slug][equals]": slug,
-      "where[_status][equals]": "published",
-      depth: "2",
-      limit: "1",
-    });
-    const res = await fetchCMS<PayloadListResponse<Job>>(
-      `/api/jobs?${params.toString()}`,
-    );
-    return res.docs[0] ?? null;
-  },
+  async (slug: string): Promise<Job | null> => loadJobBySlug(slug, false),
 );
+
+/** Draft variant for the `/preview/jobs/[slug]` route. Not cached. */
+export async function getJobBySlugDraft(slug: string): Promise<Job | null> {
+  return loadJobBySlug(slug, true);
+}
 
 export async function getJobLocations(): Promise<JobLocation[]> {
   const res = await fetchCMS<PayloadListResponse<JobLocation>>(
