@@ -332,9 +332,8 @@ const HUB_ANIM_CSS = `
 `;
 
 /**
- * Premium "library cube": a rendered 3D glass cube with a glowing library stack
- * inside, alpha-keyed so it floats cleanly on any background. Gently bobs above
- * a breathing violet glow.
+ * The CleanSight badge, alpha-keyed so it floats cleanly on any background.
+ * Gently bobs above a breathing brand-cyan glow.
  */
 function LibraryCube({ size = 92 }: { size?: number }): React.ReactElement {
   return (
@@ -342,18 +341,18 @@ function LibraryCube({ size = 92 }: { size?: number }): React.ReactElement {
       <div
         className="cs-cube-glow pointer-events-none absolute inset-0 rounded-full"
         style={{
-          background: "radial-gradient(circle at 50% 48%, rgba(139,92,246,0.34) 0%, rgba(139,92,246,0) 62%)",
+          background: "radial-gradient(circle at 50% 48%, rgba(27,143,230,0.32) 0%, rgba(27,143,230,0) 62%)",
           filter: "blur(8px)",
         }}
       />
       <Image
-        src="/images/clean-libraries/software-trust-cube.png"
+        src="/images/cleanstart-factory/cleansight-2.webp"
         alt=""
         width={size}
         height={size}
         sizes={`${size}px`}
         className="cs-cube-float relative select-none object-contain"
-        style={{ filter: "drop-shadow(0 8px 18px rgba(109,40,217,0.18))" }}
+        style={{ filter: "drop-shadow(0 8px 18px rgba(27,143,230,0.22))" }}
       />
     </div>
   );
