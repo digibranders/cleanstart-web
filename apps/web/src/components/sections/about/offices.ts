@@ -8,13 +8,13 @@ import type { Office } from "./GlobalPresenceMap";
 export const OFFICES: Office[] = [
   {
     id: "hq",
-    city: "Lewes, Delaware",
+    city: "Newark, California",
     country: "United States",
     role: "North America (HQ)",
     address:
-      "CleanStart Security Inc. 16192 Coastal Highway, Lewes, Delaware 19958, County Of Sussex",
+      "CleanStart Security Inc. 8407 Central Avenue, Newark, California 94560",
     color: "amber",
-    coordinates: [-75.5, 38.9],
+    coordinates: [-122.04, 37.53],
     imageSrc: "/images/about/global/landmark-delaware.webp",
   },
   {
