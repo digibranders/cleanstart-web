@@ -1,6 +1,6 @@
 import type { CollectionBeforeChangeHook, CollectionConfig } from 'payload';
 
-import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
+import { isAdminEditorOrHr, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { displayPublishedAtField } from '../fields/display-published-at';
 import { mediaUploadField } from '../fields/media-upload';
@@ -60,9 +60,9 @@ export const Jobs: CollectionConfig = {
   },
   access: {
     read: publishedOrAuthenticated,
-    create: isAdminOrEditor,
-    update: isAdminOrEditor,
-    delete: isAdminOrEditor,
+    create: isAdminEditorOrHr,
+    update: isAdminEditorOrHr,
+    delete: isAdminEditorOrHr,
   },
   fields: [
     contentTitleField,

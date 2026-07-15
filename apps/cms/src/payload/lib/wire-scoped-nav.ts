@@ -1,0 +1,89 @@
+import type { CollectionConfig } from 'payload';
+
+import { userRoles } from '../access/typed-user';
+import type { Role } from '../access/typed-user';
+
+/**
+ * Departmental roles get a *restricted* admin nav: a user whose only roles are
+ * departmental sees exactly the collections in their domain and nothing else.
+ * Any user who also holds a general role (admin/editor/author/seo) keeps the
+ * full nav. Every non-departmental role behaves exactly as before.
+ *
+ * This is a nav-visibility concern only — the security boundary is the per-
+ * collection `access` block, which already denies writes on out-of-domain
+ * collections to these roles (they stay on `isAdminOrEditor`).
+ */
+export const CAREERS_COLLECTION_SLUGS = [
+  'jobs',
+  'career-applications',
+  'resumes',
+  'departments',
+  'jobLocations',
+] as const;
+
+export const EVENTS_COLLECTION_SLUGS = [
+  'events',
+  'webinars',
+  'webinarTypes',
+  'podcastEpisodes',
+] as const;
+
+/** Departmental role → the collection slugs that role is scoped to see. */
+const SCOPED_ROLE_COLLECTIONS = {
+  hr: CAREERS_COLLECTION_SLUGS,
+  events: EVENTS_COLLECTION_SLUGS,
+} as const satisfies Record<string, readonly string[]>;
+
+type ScopedRole = keyof typeof SCOPED_ROLE_COLLECTIONS;
+
+const SCOPED_ROLES = Object.keys(SCOPED_ROLE_COLLECTIONS) as ScopedRole[];
+
+const isScopedRole = (role: Role): role is ScopedRole =>
+  (SCOPED_ROLES as readonly string[]).includes(role);
+
+/**
+ * Decides whether `slug` should be hidden from the admin nav for `user`.
+ * Exported for unit testing; `wireScopedNav` is the config-facing wrapper.
+ *
+ * Returns `false` (visible) for:
+ *   - unauthenticated / role-less requests (leave the default behaviour),
+ *   - any user holding at least one general (non-departmental) role.
+ * For a departmental-only user, the collection is visible iff it belongs to
+ * one of that user's scoped domains.
+ */
+export const isHiddenForScopedNav = (slug: string, user: unknown): boolean => {
+  const roles = userRoles(user);
+  if (roles.length === 0) return false;
+
+  const scopedRoles = roles.filter(isScopedRole);
+  const hasGeneralRole = roles.length > scopedRoles.length;
+  if (hasGeneralRole || scopedRoles.length === 0) return false;
+
+  const visible = scopedRoles.some((role) =>
+    (SCOPED_ROLE_COLLECTIONS[role] as readonly string[]).includes(slug),
+  );
+  return !visible;
+};
+
+type HiddenOption = NonNullable<NonNullable<CollectionConfig['admin']>['hidden']>;
+type HiddenFn = Extract<HiddenOption, (args: never) => boolean>;
+
+/**
+ * Composes a role-aware `admin.hidden` onto a collection, preserving any
+ * existing `hidden` (a statically-hidden collection stays hidden for everyone).
+ * Mirrors the shape of `wireExportButton` / `wireCustomListView`.
+ */
+export const wireScopedNav = (collection: CollectionConfig): CollectionConfig => {
+  const existingHidden = collection.admin?.hidden;
+
+  const hidden: HiddenFn = (args) => {
+    if (existingHidden === true) return true;
+    if (typeof existingHidden === 'function' && existingHidden(args)) return true;
+    return isHiddenForScopedNav(collection.slug, (args as { user?: unknown }).user);
+  };
+
+  return {
+    ...collection,
+    admin: { ...collection.admin, hidden },
+  };
+};

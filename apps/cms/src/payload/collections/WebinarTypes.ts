@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload';
 
-import { isAdminOrEditor } from '../access';
+import { isAdminEditorOrEvents } from '../access';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
 import { taxonomyParentCycleGuardHook } from '../hooks/taxonomy-parent-cycle-guard';
 import { buildTaxonomyFields } from '../lib/build-taxonomy-fields';
@@ -21,9 +21,9 @@ export const WebinarTypes: CollectionConfig = {
   },
   access: {
     read: () => true,
-    create: isAdminOrEditor,
-    update: isAdminOrEditor,
-    delete: isAdminOrEditor,
+    create: isAdminEditorOrEvents,
+    update: isAdminEditorOrEvents,
+    delete: isAdminEditorOrEvents,
   },
   fields: buildTaxonomyFields('webinarTypes'),
   hooks: {

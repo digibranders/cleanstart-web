@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload';
 
-import { isAdmin, isAdminOrEditor } from '../access';
+import { isAdmin, isAdminEditorOrHr } from '../access';
 import { careersApplyEndpoint, careersApplyOptionsEndpoint } from '../endpoints/careers-apply';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
@@ -21,7 +21,7 @@ export const CareerApplications: CollectionConfig = {
     description: 'Job applications (append-only). Resumes are stored privately and emailed to HR.',
   },
   access: {
-    read: isAdminOrEditor,
+    read: isAdminEditorOrHr,
     create: () => false,
     update: () => false,
     delete: isAdmin,

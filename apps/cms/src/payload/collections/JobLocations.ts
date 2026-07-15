@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload';
 
-import { isAdminOrEditor } from '../access';
+import { isAdminEditorOrHr } from '../access';
 import { slugField } from '../fields/slug';
 
 const ISO_3166_ALPHA_2 = /^[A-Z]{2}$/;
@@ -15,9 +15,9 @@ export const JobLocations: CollectionConfig = {
   },
   access: {
     read: () => true,
-    create: isAdminOrEditor,
-    update: isAdminOrEditor,
-    delete: isAdminOrEditor,
+    create: isAdminEditorOrHr,
+    update: isAdminEditorOrHr,
+    delete: isAdminEditorOrHr,
   },
   fields: [
     { name: 'name', type: 'text', required: true },

@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload';
 import { ValidationError } from 'payload';
 
-import { isAdminOrEditor } from '../access';
+import { isAdminEditorOrHr } from '../access';
 import { ALLOWED_MIME_TYPES, RESUME_MIME_TYPES, checkUploadSize } from '../lib/upload-limits';
 
 /**
@@ -21,10 +21,10 @@ export const Resumes: CollectionConfig = {
     hidden: false,
   },
   access: {
-    read: isAdminOrEditor,
+    read: isAdminEditorOrHr,
     create: () => false,
-    update: isAdminOrEditor,
-    delete: isAdminOrEditor,
+    update: isAdminEditorOrHr,
+    delete: isAdminEditorOrHr,
   },
   upload: {
     mimeTypes: [...RESUME_MIME_TYPES],

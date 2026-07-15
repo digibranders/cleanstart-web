@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload';
 
-import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
+import { isAdminEditorOrEvents, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
@@ -35,9 +35,9 @@ export const Events: CollectionConfig = {
   },
   access: {
     read: publishedOrAuthenticated,
-    create: isAdminOrEditor,
-    update: isAdminOrEditor,
-    delete: isAdminOrEditor,
+    create: isAdminEditorOrEvents,
+    update: isAdminEditorOrEvents,
+    delete: isAdminEditorOrEvents,
   },
   fields: [
     contentTitleField,

@@ -7,7 +7,17 @@
 // `seo` — a structured-data/SEO operator who may edit Schema.org overrides
 // (seo.additionalSchema, pageRegistry) site-wide without full admin. Sits
 // between editor and admin for SEO surfaces only.
-export const ROLES = ['admin', 'editor', 'author', 'seo'] as const;
+//
+// `hr` and `events` are *departmental* roles: scoped write access to a single
+// content domain plus a restricted admin nav that shows only that domain.
+//   - `hr`     — job postings + careers (jobs, career-applications, resumes,
+//                departments, jobLocations).
+//   - `events` — events, webinars, podcasts (events, webinars, webinarTypes,
+//                podcastEpisodes).
+// The collection wiring lives in the relevant collections' `access` blocks
+// (via `isAdminEditorOrHr` / `isAdminEditorOrEvents`) and the nav scoping in
+// `apps/cms/src/payload/lib/wire-scoped-nav.ts`.
+export const ROLES = ['admin', 'editor', 'author', 'seo', 'hr', 'events'] as const;
 export type Role = (typeof ROLES)[number];
 
 // Embed style presets — the curated visual styles an editor can apply to a

@@ -30,6 +30,24 @@ export const isAdminEditorOrSeo: Access = ({ req: { user } }) =>
   hasAnyRole(user, ['admin', 'editor', 'seo']);
 
 /**
+ * Careers-domain write access: admin/editor plus the departmental `hr` role.
+ * Wired into the jobs/careers collections so HR can self-serve job postings
+ * and applicant records without touching general site content. Editors retain
+ * access (they manage all content); `hr` is additive on this domain only —
+ * every other collection stays on `isAdminOrEditor`, which excludes `hr`.
+ */
+export const isAdminEditorOrHr: Access = ({ req: { user } }) =>
+  hasAnyRole(user, ['admin', 'editor', 'hr']);
+
+/**
+ * Events-domain write access: admin/editor plus the departmental `events` role.
+ * Wired into the events/webinars/podcasts collections. Same shape as
+ * `isAdminEditorOrHr` — scoped, additive, and isolated to this domain.
+ */
+export const isAdminEditorOrEvents: Access = ({ req: { user } }) =>
+  hasAnyRole(user, ['admin', 'editor', 'events']);
+
+/**
  * Public read access for draft-enabled content collections.
  *
  * Authenticated requests (admin/editor/author sessions AND the read-only

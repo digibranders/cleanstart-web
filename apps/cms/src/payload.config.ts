@@ -110,6 +110,7 @@ import { wireCustomFields } from './payload/lib/wire-custom-fields';
 import { wireCustomListView } from './payload/lib/wire-custom-list-view';
 import { wireExportButton } from './payload/lib/wire-export-button';
 import { wirePublishGate } from './payload/lib/wire-publish-gate';
+import { wireScopedNav } from './payload/lib/wire-scoped-nav';
 import { ImpactStats } from './payload/globals/impactStats';
 import { Legal } from './payload/globals/legal';
 import { Spotlights } from './payload/globals/spotlights';
@@ -427,6 +428,8 @@ export default buildConfig({
     .map(wirePreviewControls)
     .map(wireCustomListView)
     .map(wireExportButton)
+    // Departmental roles (hr/events) get a nav scoped to their domain only.
+    .map(wireScopedNav)
     // Per-document Analytics tab hidden — re-enable by uncommenting this and its import.
     // .map(wireAnalyticsTab)
     .map(wireCustomFields),

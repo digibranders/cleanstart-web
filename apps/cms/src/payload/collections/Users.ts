@@ -46,7 +46,13 @@ export const Users: CollectionConfig = {
     delete: isAdmin,
     admin: ({ req: { user } }) => {
       const roles = userRoles(user);
-      return roles.includes('admin') || roles.includes('editor') || roles.includes('author');
+      return (
+        roles.includes('admin') ||
+        roles.includes('editor') ||
+        roles.includes('author') ||
+        roles.includes('hr') ||
+        roles.includes('events')
+      );
     },
   },
   hooks: {

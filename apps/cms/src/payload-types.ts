@@ -8205,7 +8205,7 @@ export interface User {
   /**
    * Composite roles supported. Author = own drafts only. Editor = publish content. Admin = full access.
    */
-  roles: ('admin' | 'editor' | 'author' | 'seo')[];
+  roles: ('admin' | 'editor' | 'author' | 'seo' | 'hr' | 'events')[];
   preferences?:
     | {
         [k: string]: unknown;
