@@ -10,6 +10,7 @@ import {
   $getNodeByKey,
   $getSelection,
   $isRangeSelection,
+  $setSelection,
   COMMAND_PRIORITY_LOW,
   type LexicalCommand,
   type LexicalEditor,
@@ -199,9 +200,17 @@ export function LinkPopoverPlugin({
   // popover inputs (collapsed caret selections do not survive the blur, so the
   // stock TOGGLE_LINK_COMMAND would no-op and the edit would silently revert).
   const editLinkKeyRef = useRef<string | null>(null);
+  // Snapshot of the editor's RangeSelection captured the moment the popover
+  // opens. Focus then moves into the popover inputs, so by save-time the live
+  // editor selection is no longer a RangeSelection — the stock $toggleLink
+  // would early-return and the new link would silently not be created. On save
+  // (create path) we restore this snapshot so the command wraps the intended
+  // text. Edit uses editLinkKeyRef instead and never needs this.
+  const createSelectionRef = useRef<RangeSelection | null>(null);
 
   const close = useCallback(() => {
     editLinkKeyRef.current = null;
+    createSelectionRef.current = null;
     setState(null);
     editor.focus();
   }, [editor]);
@@ -212,9 +221,13 @@ export function LinkPopoverPlugin({
       if (!rect) return;
       let initial: LinkPopoverValue = DEFAULT_VALUE;
       editLinkKeyRef.current = null;
+      createSelectionRef.current = null;
       editor.getEditorState().read(() => {
         const selection = $getSelection();
         if (!$isRangeSelection(selection)) return;
+        // Snapshot the selection so a new link can be wrapped after focus
+        // leaves the editor for the popover inputs.
+        createSelectionRef.current = selection.clone();
         const { node } = readLinkAtSelection(selection);
         if (node) {
           editLinkKeyRef.current = node.getKey();
@@ -373,13 +386,23 @@ export function LinkPopoverPlugin({
         // command path, which re-wraps the current selection.
       }
 
-      // Creating a new link: wrap the live selection via the stock command.
+      // Creating a new link: restore the selection captured at open time so
+      // $toggleLink sees a RangeSelection to wrap. Without this, focus lives in
+      // the popover, the live selection is not a RangeSelection, and the stock
+      // command early-returns — the reported "nothing happens" on Add link.
+      const savedSelection = createSelectionRef.current;
+      if (savedSelection) {
+        editor.update(() => {
+          $setSelection(savedSelection.clone());
+        });
+      }
       editor.dispatchCommand(TOGGLE_LINK_COMMAND, {
         fields,
         selectedNodes: [],
         text: null,
       });
       editLinkKeyRef.current = null;
+      createSelectionRef.current = null;
       setState(null);
     },
     [editor],
