@@ -14,7 +14,6 @@ import {
   COMMAND_PRIORITY_LOW,
   type LexicalCommand,
   type LexicalEditor,
-  type LexicalNode,
   type RangeSelection,
   SELECTION_CHANGE_COMMAND,
   createCommand,
@@ -388,25 +387,23 @@ export function LinkPopoverPlugin({
       }
 
       // Creating a new link. Focus now lives in the popover, so the editor's
-      // live selection is no longer a RangeSelection — the stock $toggleLink
-      // early-returns (no RangeSelection AND no selectedNodes) and the link is
-      // silently never created (the reported "nothing happens" on Add link).
-      // Restore the RangeSelection captured when the popover opened AND extract
-      // its nodes, passing them as `selectedNodes`; $toggleLink then wraps them
-      // whether or not the blurred live selection survived. extract() also
-      // splits text nodes at the selection boundary, so partial selections wrap
-      // exactly the chosen text.
+      // live selection is no longer the text the user picked — the stock
+      // $toggleLink early-returns (no RangeSelection AND no selectedNodes) and
+      // the link is silently never created (the reported "nothing happens" on
+      // Add link). Restore the RangeSelection captured when the popover opened,
+      // then dispatch: $toggleLink runs its own `selection.extract()` on the
+      // restored selection and wraps it. Do NOT pre-extract/mutate the tree
+      // here — that leaves the selection pointing at split nodes so the
+      // command's own extract() finds nothing and no link is created.
       const savedSelection = createSelectionRef.current;
-      let selectedNodes: LexicalNode[] = [];
-      editor.update(() => {
-        if (!savedSelection) return;
-        const restored = savedSelection.clone();
-        $setSelection(restored);
-        selectedNodes = restored.extract();
-      });
+      if (savedSelection) {
+        editor.update(() => {
+          $setSelection(savedSelection.clone());
+        });
+      }
       editor.dispatchCommand(TOGGLE_LINK_COMMAND, {
         fields,
-        selectedNodes,
+        selectedNodes: [],
         text: null,
       });
       editLinkKeyRef.current = null;
