@@ -9,6 +9,7 @@ import type {
 import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { useAttribution } from "@/components/attribution/AttributionProvider";
+import { trackEvent } from "@/lib/analytics/track";
 
 export interface FormRendererSubmitResult {
   duplicate?: boolean;
@@ -244,6 +245,10 @@ export function FormRenderer({
           expiresAt: json.download.expiresAt,
         };
       }
+      trackEvent("generate_lead", {
+        form_id: form.id,
+        gated: Boolean(json.download),
+      });
       onSuccess?.(successPayload);
     } catch {
       setStatus({

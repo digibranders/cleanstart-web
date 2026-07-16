@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { LeadConsent } from "@/components/forms/LeadConsent";
 import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
+import { trackEvent } from "@/lib/analytics/track";
 import { submitDealRegistration } from "@/lib/leads/submitDealRegistration";
 import {
   FormCard,
@@ -72,6 +73,7 @@ export function DealRegistrationForm(): React.ReactElement {
     setSubmitting(false);
     inFlightRef.current = false;
     if (result.ok) {
+      trackEvent("deal_registration", { marketing_opt_in: categories.includes("marketing") });
       form.reset();
       setStatus({
         tone: "success",

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { Form } from "@/lib/forms";
 import { FormRenderer } from "@/components/forms/FormRenderer";
+import { trackEvent } from "@/lib/analytics/track";
 
 interface ResourceGateModalProps {
   open: boolean;
@@ -61,6 +62,10 @@ export function ResourceGateModal({
     download?: { url: string; expiresAt: number };
   }): void => {
     if (result.download?.url) {
+      trackEvent("file_download", {
+        resource_title: resourceTitle,
+        gated: true,
+      });
       onUnlocked(result.download.url);
       window.location.assign(result.download.url);
     }

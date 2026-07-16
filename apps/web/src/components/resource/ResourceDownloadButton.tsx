@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Form } from "@/lib/forms";
 import { ResourceGateModal } from "@/components/resource/ResourceGateModal";
+import { trackEvent } from "@/lib/analytics/track";
 
 interface ResourceDownloadButtonProps {
   resourceId: string | number;
@@ -67,6 +68,11 @@ export function ResourceDownloadButton({
           const absolute = json.download.url.startsWith("http")
             ? json.download.url
             : `${CMS_URL}${json.download.url}`;
+          trackEvent("file_download", {
+            resource_slug: resourceSlug,
+            resource_title: resourceTitle,
+            gated: true,
+          });
           window.location.assign(absolute);
           return;
         }

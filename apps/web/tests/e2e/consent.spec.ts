@@ -4,35 +4,33 @@ import { expect, test } from "@playwright/test";
  * @phase-j-consent — cookie-consent CMP acceptance suite (WEB-PRODUCTION.md §11).
  *
  * Verifies: banner shows on first visit with one-click Allow/Reject parity,
- * no behavioural analytics fires before consent, the 4-category preference
- * panel persists per-category choices to the `cs_consent` cookie, and the
- * footer affordance re-opens the banner (GDPR Art. 7(3) withdrawal parity).
+ * no analytics IDENTIFIER is stored before consent (Advanced Consent Mode v2 —
+ * gtag.js may send cookieless modeling pings pre-consent, but sets no `_ga`
+ * cookie until Analytics is granted), the 4-category preference panel persists
+ * per-category choices to the `cs_consent` cookie, and the footer affordance
+ * re-opens the banner (GDPR Art. 7(3) withdrawal parity).
  */
 test.describe("cookie consent", () => {
   test.beforeEach(async ({ context }) => {
     await context.clearCookies();
   });
 
-  test("banner shows on first visit and fires no analytics before consent", async ({
+  test("banner shows on first visit and stores no analytics identifier before consent", async ({
     page,
   }) => {
-    const analyticsHits: string[] = [];
-    page.on("request", (r) => {
-      const u = r.url();
-      if (
-        u.includes("google-analytics.com") ||
-        u.includes("/_vercel/insights") ||
-        u.includes("/_vercel/speed-insights")
-      ) {
-        analyticsHits.push(u);
-      }
-    });
     await page.goto("/");
     const banner = page.getByRole("dialog", { name: "Cookie consent" });
     await expect(banner).toBeVisible();
     await expect(page.getByRole("button", { name: "Allow All" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Reject All" })).toBeVisible();
-    expect(analyticsHits).toHaveLength(0);
+
+    // Advanced Consent Mode contract: default-denied `analytics_storage` means
+    // gtag.js writes NO `_ga`/`_gid` identifier to the device before consent,
+    // even though the (cookieless) tag itself may have loaded.
+    const gaCookies = (await page.context().cookies()).filter((c) =>
+      c.name.startsWith("_ga"),
+    );
+    expect(gaCookies).toHaveLength(0);
   });
 
   test("Reject All has one-click parity and dismisses the banner", async ({
