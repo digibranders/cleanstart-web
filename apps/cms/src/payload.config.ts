@@ -110,7 +110,7 @@ import { wireCustomFields } from './payload/lib/wire-custom-fields';
 import { wireCustomListView } from './payload/lib/wire-custom-list-view';
 import { wireExportButton } from './payload/lib/wire-export-button';
 import { wirePublishGate } from './payload/lib/wire-publish-gate';
-import { wireScopedNav } from './payload/lib/wire-scoped-nav';
+import { wireScopedNav, wireScopedNavGlobal } from './payload/lib/wire-scoped-nav';
 import { ImpactStats } from './payload/globals/impactStats';
 import { Legal } from './payload/globals/legal';
 import { Spotlights } from './payload/globals/spotlights';
@@ -439,7 +439,8 @@ export default buildConfig({
   // announcements globals were removed 2026-06-22 — the live site hardcodes
   // nav/footer and has no banner, so they were dead.)
   globals: [SiteSettings, ImpactStats, Spotlights, Legal, SeoDefaults]
-    .map(wireCustomFields),
+    .map(wireCustomFields)
+    .map(wireScopedNavGlobal),
   endpoints: [
     jsonLdEndpoint,
     jsonLdPreviewEndpoint,

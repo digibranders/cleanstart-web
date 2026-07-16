@@ -1,12 +1,23 @@
-import type { CollectionConfig } from 'payload';
+import type { CollectionConfig, GlobalConfig } from 'payload';
 import { describe, expect, it } from 'vitest';
 
-import { isHiddenForScopedNav, wireScopedNav } from './wire-scoped-nav';
+import {
+  isHiddenForScopedNav,
+  isScopedOnlyUser,
+  wireScopedNav,
+  wireScopedNavGlobal,
+} from './wire-scoped-nav';
 
 const userWith = (...roles: string[]) => ({ id: 1, roles });
 
 const hiddenFor = (collection: CollectionConfig, user: unknown): boolean => {
   const hidden = collection.admin?.hidden;
+  if (typeof hidden !== 'function') return hidden === true;
+  return hidden({ user } as never);
+};
+
+const globalHiddenFor = (global: GlobalConfig, user: unknown): boolean => {
+  const hidden = global.admin?.hidden;
   if (typeof hidden !== 'function') return hidden === true;
   return hidden({ user } as never);
 };
@@ -57,6 +68,57 @@ describe('isHiddenForScopedNav', () => {
     const editorHr = userWith('editor', 'hr');
     expect(isHiddenForScopedNav('blogs', editorHr)).toBe(false);
     expect(isHiddenForScopedNav('users', editorHr)).toBe(false);
+  });
+});
+
+describe('isScopedOnlyUser', () => {
+  it('is true only for users whose roles are all departmental', () => {
+    expect(isScopedOnlyUser(userWith('hr'))).toBe(true);
+    expect(isScopedOnlyUser(userWith('events'))).toBe(true);
+    expect(isScopedOnlyUser(userWith('hr', 'events'))).toBe(true);
+  });
+
+  it('is false for general roles, mixed roles, and role-less/anonymous requests', () => {
+    for (const role of ['admin', 'editor', 'author', 'seo']) {
+      expect(isScopedOnlyUser(userWith(role))).toBe(false);
+    }
+    expect(isScopedOnlyUser(userWith('editor', 'hr'))).toBe(false);
+    expect(isScopedOnlyUser(userWith())).toBe(false);
+    expect(isScopedOnlyUser(null)).toBe(false);
+    expect(isScopedOnlyUser(undefined)).toBe(false);
+  });
+});
+
+describe('wireScopedNavGlobal', () => {
+  it('hides every global from a departmental-only user', () => {
+    const output = wireScopedNavGlobal({ slug: 'siteSettings', fields: [] });
+    expect(globalHiddenFor(output, userWith('hr'))).toBe(true);
+    expect(globalHiddenFor(output, userWith('events'))).toBe(true);
+  });
+
+  it('leaves globals visible to general roles and anonymous requests', () => {
+    const output = wireScopedNavGlobal({ slug: 'seoDefaults', fields: [] });
+    expect(globalHiddenFor(output, userWith('admin'))).toBe(false);
+    expect(globalHiddenFor(output, userWith('editor', 'hr'))).toBe(false);
+    expect(globalHiddenFor(output, null)).toBe(false);
+  });
+
+  it('preserves a statically hidden global for everyone', () => {
+    const output = wireScopedNavGlobal({ slug: 'legal', fields: [], admin: { hidden: true } });
+    expect(globalHiddenFor(output, userWith('admin'))).toBe(true);
+    expect(globalHiddenFor(output, userWith('events'))).toBe(true);
+  });
+
+  it('honours an existing hidden function (OR-composed) before applying scope', () => {
+    const output = wireScopedNavGlobal({
+      slug: 'impactStats',
+      fields: [],
+      admin: {
+        hidden: ({ user }) => (user as { roles?: string[] })?.roles?.includes('author') ?? false,
+      },
+    });
+    expect(globalHiddenFor(output, userWith('author'))).toBe(true);
+    expect(globalHiddenFor(output, userWith('admin'))).toBe(false);
   });
 });
 

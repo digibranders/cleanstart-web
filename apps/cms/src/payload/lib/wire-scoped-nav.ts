@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload';
+import type { CollectionConfig, GlobalConfig } from 'payload';
 
 import { userRoles } from '../access/typed-user';
 import type { Role } from '../access/typed-user';
@@ -42,6 +42,24 @@ const isScopedRole = (role: Role): role is ScopedRole =>
   (SCOPED_ROLES as readonly string[]).includes(role);
 
 /**
+ * A "scoped-only" user holds at least one departmental role and no general
+ * (admin/editor/author/seo) role. These are the users whose nav is restricted.
+ * Everyone else — role-less/unauthenticated requests and anyone with a general
+ * role — keeps the full nav and is left untouched.
+ *
+ * Exported for the global wrapper: globals never belong to a departmental
+ * domain, so a scoped-only user should not see any of them.
+ */
+export const isScopedOnlyUser = (user: unknown): boolean => {
+  const roles = userRoles(user);
+  if (roles.length === 0) return false;
+
+  const scopedRoles = roles.filter(isScopedRole);
+  const hasGeneralRole = roles.length > scopedRoles.length;
+  return !hasGeneralRole && scopedRoles.length > 0;
+};
+
+/**
  * Decides whether `slug` should be hidden from the admin nav for `user`.
  * Exported for unit testing; `wireScopedNav` is the config-facing wrapper.
  *
@@ -52,13 +70,9 @@ const isScopedRole = (role: Role): role is ScopedRole =>
  * one of that user's scoped domains.
  */
 export const isHiddenForScopedNav = (slug: string, user: unknown): boolean => {
-  const roles = userRoles(user);
-  if (roles.length === 0) return false;
+  if (!isScopedOnlyUser(user)) return false;
 
-  const scopedRoles = roles.filter(isScopedRole);
-  const hasGeneralRole = roles.length > scopedRoles.length;
-  if (hasGeneralRole || scopedRoles.length === 0) return false;
-
+  const scopedRoles = userRoles(user).filter(isScopedRole);
   const visible = scopedRoles.some((role) =>
     (SCOPED_ROLE_COLLECTIONS[role] as readonly string[]).includes(slug),
   );
@@ -85,5 +99,28 @@ export const wireScopedNav = (collection: CollectionConfig): CollectionConfig =>
   return {
     ...collection,
     admin: { ...collection.admin, hidden },
+  };
+};
+
+type GlobalHiddenOption = NonNullable<NonNullable<GlobalConfig['admin']>['hidden']>;
+type GlobalHiddenFn = Extract<GlobalHiddenOption, (args: never) => boolean>;
+
+/**
+ * Globals are never part of a departmental domain, so a scoped-only user must
+ * not see any of them — in the nav or on the Dashboard, both of which honour
+ * `admin.hidden`. Any existing `hidden` is preserved.
+ */
+export const wireScopedNavGlobal = (global: GlobalConfig): GlobalConfig => {
+  const existingHidden = global.admin?.hidden;
+
+  const hidden: GlobalHiddenFn = (args) => {
+    if (existingHidden === true) return true;
+    if (typeof existingHidden === 'function' && existingHidden(args)) return true;
+    return isScopedOnlyUser((args as { user?: unknown }).user);
+  };
+
+  return {
+    ...global,
+    admin: { ...global.admin, hidden },
   };
 };
