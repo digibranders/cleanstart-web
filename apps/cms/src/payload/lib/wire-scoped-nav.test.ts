@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   isHiddenForScopedNav,
   isScopedOnlyUser,
+  scopedCollectionSlugsForUser,
   wireScopedNav,
   wireScopedNavGlobal,
 } from './wire-scoped-nav';
@@ -86,6 +87,38 @@ describe('isScopedOnlyUser', () => {
     expect(isScopedOnlyUser(userWith())).toBe(false);
     expect(isScopedOnlyUser(null)).toBe(false);
     expect(isScopedOnlyUser(undefined)).toBe(false);
+  });
+});
+
+describe('scopedCollectionSlugsForUser', () => {
+  it('returns null for users with full access (general role, mixed, anon)', () => {
+    expect(scopedCollectionSlugsForUser(userWith('admin'))).toBeNull();
+    expect(scopedCollectionSlugsForUser(userWith('editor', 'hr'))).toBeNull();
+    expect(scopedCollectionSlugsForUser(userWith())).toBeNull();
+    expect(scopedCollectionSlugsForUser(null)).toBeNull();
+  });
+
+  it('returns the domain slugs for a single departmental role', () => {
+    expect(scopedCollectionSlugsForUser(userWith('hr'))).toEqual([
+      'jobs',
+      'career-applications',
+      'resumes',
+      'departments',
+      'jobLocations',
+    ]);
+    expect(scopedCollectionSlugsForUser(userWith('events'))).toEqual([
+      'events',
+      'webinars',
+      'webinarTypes',
+      'podcastEpisodes',
+    ]);
+  });
+
+  it('unions and de-duplicates domains for a user holding both roles', () => {
+    const slugs = scopedCollectionSlugsForUser(userWith('hr', 'events'));
+    expect(slugs).toContain('jobs');
+    expect(slugs).toContain('webinars');
+    expect(new Set(slugs).size).toBe(slugs?.length);
   });
 });
 

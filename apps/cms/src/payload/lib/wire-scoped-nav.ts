@@ -60,6 +60,23 @@ export const isScopedOnlyUser = (user: unknown): boolean => {
 };
 
 /**
+ * The union of collection slugs a scoped-only user may see, or `null` when the
+ * user is not scoped-only (full nav / full dashboard). Consumed by the custom
+ * Dashboard to restrict which collections it queries, counts, and links to, so
+ * a departmental user never sees cross-domain content or dead create links.
+ */
+export const scopedCollectionSlugsForUser = (user: unknown): readonly string[] | null => {
+  if (!isScopedOnlyUser(user)) return null;
+
+  const scopedRoles = userRoles(user).filter(isScopedRole);
+  const slugs = new Set<string>();
+  for (const role of scopedRoles) {
+    for (const slug of SCOPED_ROLE_COLLECTIONS[role]) slugs.add(slug);
+  }
+  return [...slugs];
+};
+
+/**
  * Decides whether `slug` should be hidden from the admin nav for `user`.
  * Exported for unit testing; `wireScopedNav` is the config-facing wrapper.
  *

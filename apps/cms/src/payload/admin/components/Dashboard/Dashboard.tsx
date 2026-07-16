@@ -4,6 +4,7 @@ import type { AdminViewServerProps, Payload, Where } from 'payload';
 import type { ReactElement, ReactNode } from 'react';
 
 import { ChevronRight } from '../icons/Chevron';
+import { scopedCollectionSlugsForUser } from '../../../lib/wire-scoped-nav';
 // Analytics snapshot hidden — re-enable with the render below.
 // import { AnalyticsCards } from './AnalyticsCards';
 
@@ -48,8 +49,10 @@ type RecentEdit = {
 type Pulse = {
   draftsPending: number;
   publishedThisWeek: number;
-  leadsToday: number;
-  redirectsActive: number;
+  // `null` for scoped (departmental) users, who don't own leads/redirects —
+  // the corresponding cards are omitted rather than shown as zero.
+  leadsToday: number | null;
+  redirectsActive: number | null;
 };
 
 const safeFind = async (
@@ -75,19 +78,23 @@ const safeFind = async (
   }
 };
 
-const fetchPulse = async (payload: Payload): Promise<Pulse> => {
+const fetchPulse = async (
+  payload: Payload,
+  contentSlugs: readonly VersionedSlug[],
+  includeGlobalStats: boolean,
+): Promise<Pulse> => {
   const dayAgo = new Date(Date.now() - ONE_DAY).toISOString();
   const weekAgo = new Date(Date.now() - SEVEN_DAYS).toISOString();
 
   const [draftCounts, publishedCounts, leadsToday, redirectsActive] =
     await Promise.all([
       Promise.all(
-        VERSIONED_CONTENT.map((slug) =>
+        contentSlugs.map((slug) =>
           safeFind(payload, slug, { _status: { equals: 'draft' } }, true),
         ),
       ),
       Promise.all(
-        VERSIONED_CONTENT.map((slug) =>
+        contentSlugs.map((slug) =>
           safeFind(payload, slug, {
             and: [
               { _status: { equals: 'published' } },
@@ -96,8 +103,12 @@ const fetchPulse = async (payload: Payload): Promise<Pulse> => {
           }),
         ),
       ),
-      safeFind(payload, 'leads', { createdAt: { greater_than: dayAgo } }),
-      safeFind(payload, 'redirects', undefined),
+      includeGlobalStats
+        ? safeFind(payload, 'leads', { createdAt: { greater_than: dayAgo } })
+        : Promise.resolve(null),
+      includeGlobalStats
+        ? safeFind(payload, 'redirects', undefined)
+        : Promise.resolve(null),
     ]);
 
   return {
@@ -118,9 +129,12 @@ const pickTitle = (doc: Record<string, unknown>): string => {
   return 'Untitled';
 };
 
-const fetchRecentEdits = async (payload: Payload): Promise<RecentEdit[]> => {
+const fetchRecentEdits = async (
+  payload: Payload,
+  contentSlugs: readonly VersionedSlug[],
+): Promise<RecentEdit[]> => {
   const lists = await Promise.all(
-    VERSIONED_CONTENT.map(async (slug) => {
+    contentSlugs.map(async (slug) => {
       try {
         const r = await payload.find({
           collection: slug,
@@ -175,7 +189,7 @@ type PulseCardProps = {
   label: string;
   value: number;
   caption: string;
-  href?: string;
+  href?: string | undefined;
   tone?: 'neutral' | 'cyan' | 'amber';
 };
 
@@ -365,9 +379,54 @@ const QUICK_LINKS: QuickLinkProps[] = [
   },
 ];
 
-const QuickLinks = (): ReactElement => (
+/**
+ * Domain-scoped quick actions, keyed by collection slug. A departmental user
+ * only ever sees the create/manage links for the collections in their own
+ * domain — never a "New blog post" link that would 404 on their access.
+ */
+const DOMAIN_QUICK_LINKS: Partial<Record<string, QuickLinkProps>> = {
+  events: {
+    label: 'New event',
+    href: '/admin/collections/events/create',
+    description: 'Create an in-person or virtual event entry.',
+  },
+  webinars: {
+    label: 'New webinar',
+    href: '/admin/collections/webinars/create',
+    description: 'Schedule a live session or upload a recording.',
+  },
+  podcastEpisodes: {
+    label: 'New podcast episode',
+    href: '/admin/collections/podcastEpisodes/create',
+    description: 'Publish a new podcast episode.',
+  },
+  jobs: {
+    label: 'New job posting',
+    href: '/admin/collections/jobs/create',
+    description: 'Open a new role in the Jobs collection.',
+  },
+  'career-applications': {
+    label: 'Review applications',
+    href: '/admin/collections/career-applications',
+    description: 'See and triage submitted career applications.',
+  },
+  resumes: {
+    label: 'Open resumes',
+    href: '/admin/collections/resumes',
+    description: 'Browse submitted applicant resumes.',
+  },
+};
+
+const scopedQuickLinks = (slugs: readonly string[]): QuickLinkProps[] =>
+  slugs.map((slug) => DOMAIN_QUICK_LINKS[slug]).filter((l): l is QuickLinkProps => l != null);
+
+const QuickLinks = ({
+  links = QUICK_LINKS,
+}: {
+  links?: QuickLinkProps[];
+}): ReactElement => (
   <div className="cs-dashboard__quick">
-    {QUICK_LINKS.map((link) => (
+    {links.map((link) => (
       <a key={link.href} className="cs-dashboard__quick-card" href={link.href}>
         <span className="cs-dashboard__quick-label">{link.label}</span>
         <span className="cs-dashboard__quick-desc">{link.description}</span>
@@ -421,10 +480,31 @@ export const Dashboard = async (
     req: { payload, user },
   } = initPageResult;
 
+  // Departmental (scoped-only) users get a dashboard restricted to their own
+  // domain: no cross-domain counts, recent edits, leads/redirects, or create
+  // links that their access would reject.
+  const scopedSlugs = scopedCollectionSlugsForUser(user);
+  const isScoped = scopedSlugs !== null;
+  const contentSlugs = isScoped
+    ? VERSIONED_CONTENT.filter((slug) => scopedSlugs.includes(slug))
+    : VERSIONED_CONTENT;
+
   const [pulse, recent] = await Promise.all([
-    fetchPulse(payload),
-    fetchRecentEdits(payload),
+    fetchPulse(payload, contentSlugs, !isScoped),
+    fetchRecentEdits(payload, contentSlugs),
   ]);
+
+  const draftsHref =
+    contentSlugs.length > 0
+      ? `/admin/collections/${contentSlugs[0]}?where[_status][equals]=draft`
+      : undefined;
+  const draftsCaption = isScoped
+    ? 'Across your collections'
+    : 'Across all content collections';
+  const recentMeta = isScoped
+    ? 'Last 10 in your collections'
+    : 'Last 10 across content collections';
+  const quickLinks = isScoped ? scopedQuickLinks(scopedSlugs) : QUICK_LINKS;
 
   return (
     <div className="cs-dashboard">
@@ -447,8 +527,8 @@ export const Dashboard = async (
         <PulseCard
           label="Drafts pending"
           value={pulse.draftsPending}
-          caption="Across all content collections"
-          href="/admin/collections/blogs?where[_status][equals]=draft"
+          caption={draftsCaption}
+          href={draftsHref}
           tone={pulse.draftsPending > 0 ? 'amber' : 'neutral'}
         />
         <PulseCard
@@ -457,19 +537,23 @@ export const Dashboard = async (
           caption="Live changes in the last week"
           tone="cyan"
         />
-        <PulseCard
-          label="Leads · 24h"
-          value={pulse.leadsToday}
-          caption="Form submissions in the last day"
-          href="/admin/collections/leads"
-          tone={pulse.leadsToday > 0 ? 'cyan' : 'neutral'}
-        />
-        <PulseCard
-          label="Redirects"
-          value={pulse.redirectsActive}
-          caption="Active URL redirects"
-          href="/admin/collections/redirects"
-        />
+        {pulse.leadsToday !== null ? (
+          <PulseCard
+            label="Leads · 24h"
+            value={pulse.leadsToday}
+            caption="Form submissions in the last day"
+            href="/admin/collections/leads"
+            tone={pulse.leadsToday > 0 ? 'cyan' : 'neutral'}
+          />
+        ) : null}
+        {pulse.redirectsActive !== null ? (
+          <PulseCard
+            label="Redirects"
+            value={pulse.redirectsActive}
+            caption="Active URL redirects"
+            href="/admin/collections/redirects"
+          />
+        ) : null}
       </section>
 
       {/* Analytics snapshot hidden — re-enable by uncommenting this and the
@@ -479,19 +563,19 @@ export const Dashboard = async (
       <section aria-label="Recent edits" className="cs-dashboard__section">
         <div className="cs-dashboard__section-head">
           <h2 className="cs-dashboard__section-title">Recent edits</h2>
-          <span className="cs-dashboard__section-meta">
-            Last 10 across content collections
-          </span>
+          <span className="cs-dashboard__section-meta">{recentMeta}</span>
         </div>
         <RecentEditsTable items={recent} />
       </section>
 
-      <section aria-label="Quick links" className="cs-dashboard__section">
-        <div className="cs-dashboard__section-head">
-          <h2 className="cs-dashboard__section-title">Quick actions</h2>
-        </div>
-        <QuickLinks />
-      </section>
+      {quickLinks.length > 0 ? (
+        <section aria-label="Quick links" className="cs-dashboard__section">
+          <div className="cs-dashboard__section-head">
+            <h2 className="cs-dashboard__section-title">Quick actions</h2>
+          </div>
+          <QuickLinks links={quickLinks} />
+        </section>
+      ) : null}
     </div>
   );
 };
