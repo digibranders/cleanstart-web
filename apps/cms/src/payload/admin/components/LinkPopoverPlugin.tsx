@@ -14,6 +14,7 @@ import {
   COMMAND_PRIORITY_LOW,
   type LexicalCommand,
   type LexicalEditor,
+  type LexicalNode,
   type RangeSelection,
   SELECTION_CHANGE_COMMAND,
   createCommand,
@@ -386,19 +387,26 @@ export function LinkPopoverPlugin({
         // command path, which re-wraps the current selection.
       }
 
-      // Creating a new link: restore the selection captured at open time so
-      // $toggleLink sees a RangeSelection to wrap. Without this, focus lives in
-      // the popover, the live selection is not a RangeSelection, and the stock
-      // command early-returns — the reported "nothing happens" on Add link.
+      // Creating a new link. Focus now lives in the popover, so the editor's
+      // live selection is no longer a RangeSelection — the stock $toggleLink
+      // early-returns (no RangeSelection AND no selectedNodes) and the link is
+      // silently never created (the reported "nothing happens" on Add link).
+      // Restore the RangeSelection captured when the popover opened AND extract
+      // its nodes, passing them as `selectedNodes`; $toggleLink then wraps them
+      // whether or not the blurred live selection survived. extract() also
+      // splits text nodes at the selection boundary, so partial selections wrap
+      // exactly the chosen text.
       const savedSelection = createSelectionRef.current;
-      if (savedSelection) {
-        editor.update(() => {
-          $setSelection(savedSelection.clone());
-        });
-      }
+      let selectedNodes: LexicalNode[] = [];
+      editor.update(() => {
+        if (!savedSelection) return;
+        const restored = savedSelection.clone();
+        $setSelection(restored);
+        selectedNodes = restored.extract();
+      });
       editor.dispatchCommand(TOGGLE_LINK_COMMAND, {
         fields,
-        selectedNodes: [],
+        selectedNodes,
         text: null,
       });
       editLinkKeyRef.current = null;
