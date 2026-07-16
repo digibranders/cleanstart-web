@@ -346,7 +346,7 @@ function LibraryCube({ size = 92 }: { size?: number }): React.ReactElement {
         }}
       />
       <Image
-        src="/images/cleanstart-factory/cleansight-2.webp"
+        src="/images/cleanstart-factory/clean-libraries-2.webp"
         alt=""
         width={size}
         height={size}
@@ -369,7 +369,7 @@ function Hub({ size = 230 }: { size?: number }): React.ReactElement {
       }}
     >
       <div className="mb-2">
-        <LibraryCube size={Math.round(size * 0.52)} />
+        <LibraryCube size={Math.round(size * 0.62)} />
       </div>
       <span
         className="font-display text-[#0f172a]"
