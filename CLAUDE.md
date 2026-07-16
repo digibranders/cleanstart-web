@@ -334,4 +334,5 @@ The `Integrations` collection (Phase J1) provides editor self-serve config for c
 - **Which page to build:** `docs/web/WEB-PAGES.md`.
 - **Web production:** `docs/web/WEB-PRODUCTION.md`.
 - **Prod one-shots:** `docs/operations/PRODUCTION-ROLLOUT.md`.
+- **Past incidents & non-obvious bugs:** `docs/operations/INCIDENTS.md` — check it before deep-debugging a prod issue, and **append a new entry** whenever you fix a prod incident or a bug whose root cause was non-obvious (symptom → root cause → fix → reusable lesson).
 - **Decision not documented?** Stop and ask.
