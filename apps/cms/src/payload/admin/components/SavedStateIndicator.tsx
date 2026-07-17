@@ -106,7 +106,18 @@ export const SavedStateIndicator = (): ReactElement | null => {
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
     const detect = (): void => {
-      setEditPath(matchEditPath(window.location.pathname));
+      const next = matchEditPath(window.location.pathname);
+      // `matchEditPath` returns a fresh object each call, so setting it
+      // unconditionally would change `editPath`'s reference on every 500ms
+      // tick — re-running the fetch effect below and turning its 30s poll
+      // into a ~2/s hammer. Only update when the collection/id actually
+      // change so the reference (and the poll cadence) stays stable.
+      setEditPath((prev) => {
+        if (prev?.collection === next?.collection && prev?.id === next?.id) {
+          return prev;
+        }
+        return next;
+      });
     };
     detect();
     window.addEventListener('popstate', detect);

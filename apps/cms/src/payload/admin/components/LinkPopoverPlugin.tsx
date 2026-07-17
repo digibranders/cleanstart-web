@@ -5,7 +5,9 @@ import {
   $isLinkNode,
   type LinkNode,
   TOGGLE_LINK_COMMAND,
+  useEditorConfigContext,
 } from '@payloadcms/richtext-lexical/client';
+import { useField } from '@payloadcms/ui';
 import {
   $getNodeByKey,
   $getSelection,
@@ -194,6 +196,62 @@ export function LinkPopoverPlugin({
   const [editor] = useLexicalComposerContext();
   const [state, setState] = useState<PopoverState | null>(null);
   const popoverRef = useRef<HTMLDivElement | null>(null);
+  // This rich-text field's form path, read from the editor-config context Payload
+  // populates for every field editor. Used to push link mutations straight into
+  // the form value (below).
+  const { fieldProps } = useEditorConfigContext();
+  const fieldPath = (fieldProps as { path?: string } | null)?.path ?? '';
+  const { setValue: setFieldValue, initialValue: fieldInitialValue } =
+    useField<unknown>({ path: fieldPath });
+  // After a link mutation we push the new value into the field (below). A
+  // `getFormState` response already in flight — from the focus change that drove
+  // the popover — can land right after and overwrite the field with the server's
+  // PRE-link value, wiping the link (the reported "link disappears / doesn't
+  // save"). A `getFormState` arrival is exactly what changes `initialValue`, so we
+  // stash the committed value and re-assert it on each `initialValue` change for a
+  // short window, guaranteeing our value is the last word. Idempotent once it
+  // sticks; the window bounds it so later legitimate edits aren't clobbered.
+  const pendingCommitRef = useRef<{ json: unknown; until: number } | null>(
+    null,
+  );
+  // `fieldInitialValue` is intentionally a dependency even though the body does not
+  // read it: an `initialValue` reference change is exactly the signal that a
+  // `getFormState` response landed, which is when we must re-assert.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-run on getFormState arrival is the intent
+  useEffect(() => {
+    const pending = pendingCommitRef.current;
+    if (!pending) return;
+    if (Date.now() > pending.until) {
+      pendingCommitRef.current = null;
+      return;
+    }
+    setFieldValue(pending.json);
+  }, [fieldInitialValue, setFieldValue]);
+  // Commit the editor's committed state into the Payload form value as soon as a
+  // link create/edit/remove reconciles. Our popover mutates the editor while focus
+  // lives in the popover (editor blurred); the field's own `OnChangePlugin` gates
+  // out blurred-editor updates, so the mutation never reaches the form value on its
+  // own. A one-shot update listener reads the post-commit state and writes it to
+  // the form value, marking the field modified so Save keeps the link. Reading
+  // synchronously after dispatch would capture the PRE-mutation tree (Lexical
+  // reconciles on a later tick), so we must use the listener, not a direct read.
+  const registerCommitOnNextChange = useCallback((): (() => void) => {
+    if (!fieldPath) return () => {};
+    // The listener only runs on a later tick, so referencing `unregister` inside
+    // it before this `const` settles is safe (no TDZ at call time).
+    const unregister = editor.registerUpdateListener(
+      ({ editorState, dirtyElements, dirtyLeaves }) => {
+        // Ignore the selection-only restore update; wait for the content change.
+        if (dirtyElements.size === 0 && dirtyLeaves.size === 0) return;
+        unregister();
+        const json = editorState.toJSON();
+        setFieldValue(json);
+        // Guard the commit against a late stale `getFormState` for ~1.5s.
+        pendingCommitRef.current = { json, until: Date.now() + 1500 };
+      },
+    );
+    return unregister;
+  }, [editor, fieldPath, setFieldValue]);
   // Key of the LinkNode under edit. Captured when the popover opens over an
   // existing link so the save can target that node directly instead of relying
   // on the editor's RangeSelection — which is lost once focus moves into the
@@ -370,6 +428,7 @@ export function LinkPopoverPlugin({
       const editKey = editLinkKeyRef.current;
       if (editKey) {
         let updated = false;
+        const cancelCommit = registerCommitOnNextChange();
         editor.update(() => {
           const node = $getNodeByKey(editKey);
           if ($isLinkNode(node)) {
@@ -382,8 +441,10 @@ export function LinkPopoverPlugin({
           setState(null);
           return;
         }
-        // Node no longer exists (text was rewritten) — fall through to the
-        // command path, which re-wraps the current selection.
+        // Node no longer exists (text was rewritten) — no dirty update fired, so
+        // drop the armed listener and fall through to the command path, which
+        // re-wraps the current selection.
+        cancelCommit();
       }
 
       // Creating a new link. Focus now lives in the popover, so the editor's
@@ -397,10 +458,21 @@ export function LinkPopoverPlugin({
       // command's own extract() finds nothing and no link is created.
       const savedSelection = createSelectionRef.current;
       if (savedSelection) {
-        editor.update(() => {
-          $setSelection(savedSelection.clone());
-        });
+        // `discrete: true` forces this selection restore to commit synchronously,
+        // BEFORE the dispatch below. Without it the restore can still be pending
+        // when `$toggleLink` runs, so the command reads the stale (collapsed) live
+        // selection, extracts nothing, and silently creates no link — the reported
+        // "nothing happens" when adding a link to a fresh selection.
+        editor.update(
+          () => {
+            $setSelection(savedSelection.clone());
+          },
+          { discrete: true },
+        );
       }
+      // Arm the commit listener before the link-creating dispatch so it fires on
+      // that update (the selection restore above is selection-only and skipped).
+      registerCommitOnNextChange();
       editor.dispatchCommand(TOGGLE_LINK_COMMAND, {
         fields,
         selectedNodes: [],
@@ -410,13 +482,14 @@ export function LinkPopoverPlugin({
       createSelectionRef.current = null;
       setState(null);
     },
-    [editor],
+    [editor, registerCommitOnNextChange],
   );
 
   const handleRemove = useCallback(() => {
     const editKey = editLinkKeyRef.current;
     if (editKey) {
       let removed = false;
+      const cancelCommit = registerCommitOnNextChange();
       editor.update(() => {
         const node = $getNodeByKey(editKey);
         if ($isLinkNode(node)) {
@@ -431,11 +504,13 @@ export function LinkPopoverPlugin({
         setState(null);
         return;
       }
+      cancelCommit();
     }
+    registerCommitOnNextChange();
     editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
     editLinkKeyRef.current = null;
     setState(null);
-  }, [editor]);
+  }, [editor, registerCommitOnNextChange]);
 
   if (!state) return null;
 
