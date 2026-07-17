@@ -210,14 +210,15 @@ describe('buildJsonLdBlobs', () => {
         '@type': 'TechArticle',
         about: { '@type': 'Thing', name: 'Emerging Standards' },
       });
-      // breadcrumb: Home › Knowledge Hub (/knowledge-hub) › category (no item) › title (no item)
+      // breadcrumb: Home › Knowledge Hub (/knowledge-hub) › title (no item).
+      // The category is intentionally NOT a crumb — it has no landing page, so an
+      // unlinked mid-trail ListItem would be an invalid BreadcrumbList (see
+      // breadcrumbs.ts). It still drives `about{}` above.
       const breadcrumb = blobs.find((b) => b['@type'] === 'BreadcrumbList') as
         | { itemListElement: { name: string; item?: string }[] }
         | undefined;
+      expect(breadcrumb?.itemListElement).toHaveLength(3);
       expect(breadcrumb?.itemListElement[1]).toMatchObject({ name: 'Knowledge Hub', item: 'https://cleanstart.com/knowledge-hub' });
-      // category crumb sits at index 2 when present — intentionally unlinked
-      expect(breadcrumb?.itemListElement[2]).toMatchObject({ name: 'Emerging Standards' });
-      expect(breadcrumb?.itemListElement[2]).not.toHaveProperty('item');
       // last crumb (title) has no item
       const last = breadcrumb?.itemListElement.at(-1);
       expect(last?.name).toBe('How to use VEX documents');
