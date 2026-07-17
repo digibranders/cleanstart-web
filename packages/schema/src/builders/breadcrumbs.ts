@@ -20,11 +20,6 @@ export type DetailKind =
 export interface DetailTrailInput {
   /** The current page's display name (the last, unlinked crumb). */
   title: string;
-  /**
-   * Knowledge Hub only: category name, rendered as an UNLINKED crumb between the
-   * hub listing and the title. Ignored for all other kinds.
-   */
-  category?: string | null | undefined;
 }
 
 const HOME: BreadcrumbCrumb = { name: "Home", path: "/" };
@@ -44,9 +39,16 @@ const LISTING: Record<DetailKind, BreadcrumbCrumb | null> = {
 };
 
 /**
- * The canonical breadcrumb trail for a detail page: `Home › <Listing> › <Title>`
- * (Knowledge Hub inserts an unlinked category before the title). The last crumb
- * has NO `path` — it is the current page, not a link (Google + UX best practice).
+ * The canonical breadcrumb trail for a detail page: `Home › <Listing> › <Title>`.
+ * Only the last crumb (the current page) has NO `path` — Google explicitly permits
+ * omitting `item` on the final breadcrumb, and it is not a link. EVERY other crumb
+ * carries a `path`, so `breadcrumbSchema` never emits a mid-trail `ListItem` with a
+ * missing `item` (which Google Search Console flags as an invalid BreadcrumbList).
+ *
+ * NB: Knowledge Hub categories are deliberately NOT a crumb here — they have no
+ * landing page, so a category `ListItem` would have no valid `item` URL. The
+ * category still appears in the visible KB breadcrumb (KnowledgeHubArticle.tsx),
+ * which is UX chrome, not structured data.
  *
  * This is the ONLY place trail shapes are defined. Both apps/web (visible hero +
  * JSON-LD) and apps/cms (/api/jsonld preview) call it, so the visible breadcrumb
@@ -56,8 +58,5 @@ export function breadcrumbTrail(kind: DetailKind, input: DetailTrailInput): Brea
   const listing = LISTING[kind];
   const middle: BreadcrumbCrumb[] = [];
   if (listing) middle.push(listing);
-  if (kind === "knowledgeBase" && input.category) {
-    middle.push({ name: input.category });
-  }
   return [HOME, ...middle, { name: input.title }];
 }

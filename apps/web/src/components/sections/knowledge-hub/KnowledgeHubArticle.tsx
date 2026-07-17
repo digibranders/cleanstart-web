@@ -57,11 +57,13 @@ export function KnowledgeHubArticle({
 }
 
 // NOTE: this light-theme breadcrumb intentionally ends at the category and
-// omits the article title (the title is the H1 below). The JSON-LD (built in
-// app/knowledge-hub/[slug]/page.tsx via breadcrumbTrail("knowledgeBase", …))
-// DOES include the title — Google permits a current-page crumb in markup that
-// isn't a visible link. This is the one accepted visible/JSON-LD divergence;
-// see docs/superpowers/plans/2026-06-23-breadcrumb-single-source.md.
+// omits the article title (the title is the H1 below). It is UX chrome, NOT
+// structured data. The JSON-LD BreadcrumbList (built in
+// app/knowledge-hub/[slug]/page.tsx via breadcrumbTrail("knowledgeBase", …)) is
+// `Home › Knowledge Hub › Title` and deliberately does NOT include the category:
+// KB categories have no landing page, so a category ListItem would carry no valid
+// `item` URL — which Google Search Console flags as an invalid BreadcrumbList.
+// See docs/superpowers/plans/2026-06-23-breadcrumb-single-source.md.
 function Breadcrumb({ category }: { category?: string | null | undefined }): React.ReactElement {
   return (
     <nav aria-label="Breadcrumb">
