@@ -285,7 +285,6 @@ const breadcrumbsFor = (
 ) =>
   breadcrumbTrail(KIND_BY_COLLECTION[collection], {
     title: doc.title ?? '',
-    category: (doc as { category?: { name?: string } | null }).category?.name,
   });
 
 const dispatchAuthor = (ctx: JsonLdContext, doc: AnyDoc): JsonLdBlob[] => {

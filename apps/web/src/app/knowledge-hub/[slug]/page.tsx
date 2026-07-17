@@ -78,10 +78,7 @@ export default async function KnowledgeHubArticlePage({
       sub: article.abstract ?? undefined,
     });
 
-  const crumbs = breadcrumbTrail("knowledgeBase", {
-    title: article.title,
-    category: article.category?.name,
-  });
+  const crumbs = breadcrumbTrail("knowledgeBase", { title: article.title });
 
   return (
     <>

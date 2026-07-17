@@ -36,30 +36,12 @@ describe("breadcrumbTrail", () => {
     ]);
   });
 
-  it("knowledgeBase inserts an unlinked category between hub and title", () => {
-    expect(breadcrumbTrail("knowledgeBase", { title: "Article", category: "Images" })).toEqual([
-      { name: "Home", path: "/" },
-      { name: "Knowledge Hub", path: "/knowledge-hub" },
-      { name: "Images" },
-      { name: "Article" },
-    ]);
-  });
-
-  it("knowledgeBase omits the category crumb when absent", () => {
+  it("knowledgeBase: Home > Knowledge Hub > Title, no category crumb (categories have no page)", () => {
     expect(breadcrumbTrail("knowledgeBase", { title: "Article" })).toEqual([
       { name: "Home", path: "/" },
       { name: "Knowledge Hub", path: "/knowledge-hub" },
       { name: "Article" },
     ]);
-  });
-
-  it("contract: knowledgeBase category crumb has no path; surrounding crumbs do", () => {
-    const trail = breadcrumbTrail("knowledgeBase", { title: "A", category: "Cat" });
-    // trail is always [Home, Knowledge Hub, category, title] when category is given
-    expect(trail[0]?.path).toBe("/");               // Home
-    expect(trail[1]?.path).toBe("/knowledge-hub");  // listing
-    expect(trail[2]?.path).toBeUndefined();         // category — intentionally unlinked
-    expect(trail[3]?.path).toBeUndefined();         // title — current page
   });
 
   it("guide uses the '/guide' path (not '/guides')", () => {
@@ -90,11 +72,11 @@ describe("breadcrumbTrail", () => {
     });
   });
 
-  // knowledgeBase is excluded from the sweep below because its category crumb is
-  // intentionally unlinked (no path) and sits in the middle of the trail; it is
-  // covered by the dedicated test directly below.
-  it("contract: first crumb is Home, last crumb is the title with no path", () => {
-    const kinds = ["blog", "guide", "news", "event", "job", "resource", "author", "legal", "webinar"] as const;
+  // Every kind (knowledgeBase included) now shares the same shape: the ONLY crumb
+  // without a path is the last one. This is the invariant that keeps the JSON-LD
+  // BreadcrumbList valid — no mid-trail ListItem is ever missing its `item` URL.
+  it("contract: first crumb is Home, last crumb is the title with no path, all others linked", () => {
+    const kinds = ["blog", "guide", "news", "event", "job", "resource", "author", "legal", "knowledgeBase", "webinar"] as const;
     for (const kind of kinds) {
       const trail = breadcrumbTrail(kind, { title: "X" });
       expect(trail[0]).toEqual({ name: "Home", path: "/" });
@@ -109,7 +91,7 @@ describe("breadcrumbTrail", () => {
     const dead = ["/author", "/resources", "/webinar", "/jobs"];
     const kinds = ["blog", "guide", "news", "event", "job", "resource", "author", "legal", "knowledgeBase", "webinar"] as const;
     for (const kind of kinds) {
-      for (const crumb of breadcrumbTrail(kind, { title: "X", category: "C" })) {
+      for (const crumb of breadcrumbTrail(kind, { title: "X" })) {
         if (crumb.path) expect(dead).not.toContain(crumb.path);
       }
     }
