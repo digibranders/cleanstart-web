@@ -382,6 +382,15 @@ export function LinkPopoverPlugin({
     const handleDocClick = (event: MouseEvent): void => {
       const target = event.target;
       if (!(target instanceof Node)) return;
+      // Selecting a result in the popover's own dropdown synchronously
+      // unmounts that result (the results list closes on select), so by the
+      // time this document-level `mousedown` handler runs the clicked node is
+      // already detached from the DOM. `contains()` would then report it as
+      // "outside" and wrongly dismiss the whole popover — the reported
+      // "clicking the page suggestion makes the popover vanish" bug. A
+      // detached target was inside our tree when the click landed, so treat
+      // it as inside and do not dismiss.
+      if (!target.isConnected) return;
       if (popoverRef.current?.contains(target)) return;
       const root = editor.getRootElement();
       if (root?.contains(target)) return;
