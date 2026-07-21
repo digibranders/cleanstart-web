@@ -6039,3 +6039,230 @@ body {
     transition: none !important;
   }
 }
+
+/* ROI calculator — "compounding chain" (RoiHowItWorks). Metro-line on desktop,
+   vertical timeline on mobile. Tier-coloured stations with a growing severity
+   meter. Pseudo-elements + keyframes live here; motion is reduced-motion aware. */
+.cs-chain {
+  position: relative;
+  margin-top: 8px;
+}
+.cs-chain-spine {
+  display: none;
+}
+.cs-chain-stations {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+.cs-chain-st {
+  position: relative;
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+.cs-chain-st:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 26px;
+  top: 54px;
+  bottom: -14px;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--seg1), var(--seg2));
+  opacity: 0.5;
+}
+.cs-chain-dot {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  color: #fff;
+  box-shadow:
+    0 6px 16px -4px rgba(17, 17, 17, 0.28),
+    0 0 0 6px #fff;
+}
+.cs-chain-card {
+  flex: 1;
+  background: #fff;
+  border: 1px solid rgba(17, 17, 17, 0.08);
+  border-radius: 20px;
+  padding: 18px 20px;
+  box-shadow: 0 10px 30px -18px rgba(17, 17, 17, 0.35);
+  display: flex;
+  flex-direction: column;
+}
+.cs-chain-card h3 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h5);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.22;
+  color: #111;
+}
+.cs-chain-card p {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: #5b6070;
+  line-height: 1.5;
+  margin-top: 8px;
+  text-wrap: balance;
+  flex: 1;
+}
+.cs-chain-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #5b6070;
+  font-weight: 600;
+  margin-top: 14px;
+}
+.cs-chain-meta b {
+  font-family: var(--font-display);
+  font-size: 12px;
+  color: #111;
+  letter-spacing: 0;
+}
+.cs-chain-track {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(17, 17, 17, 0.07);
+  margin-top: 7px;
+  overflow: hidden;
+}
+.cs-chain-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+.cs-chain-st5 .cs-chain-card {
+  background: linear-gradient(160deg, #241247, #3b1f9e 70%, #8b1fc3);
+  border-color: transparent;
+  box-shadow: 0 18px 40px -18px rgba(90, 20, 150, 0.6);
+}
+.cs-chain-st5 .cs-chain-card h3 {
+  color: #fff;
+}
+.cs-chain-st5 .cs-chain-card p {
+  color: rgba(255, 255, 255, 0.78);
+}
+.cs-chain-st5 .cs-chain-meta {
+  color: rgba(255, 255, 255, 0.6);
+}
+.cs-chain-st5 .cs-chain-meta b {
+  color: #fff;
+}
+.cs-chain-st5 .cs-chain-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+.cs-chain-cut {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .cs-chain-spine {
+    display: block;
+    position: absolute;
+    top: 26px;
+    left: 10%;
+    right: 10%;
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(
+      90deg,
+      #2cc1eb,
+      #3960f9 28%,
+      #471ec0 52%,
+      #6b2ec9 76%,
+      #8b1fc3
+    );
+  }
+  .cs-chain-spine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 2px;
+    background: repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.85) 0 8px,
+      transparent 8px 26px
+    );
+    opacity: 0.55;
+    animation: cs-chain-flow 1.4s linear infinite;
+  }
+  .cs-chain-stations {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+  }
+  .cs-chain-st {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0;
+  }
+  .cs-chain-st:not(:last-child)::before {
+    display: none;
+  }
+  .cs-chain-card {
+    width: 100%;
+    margin-top: 20px;
+    min-height: 200px;
+    padding: 22px 20px 20px;
+  }
+  .cs-chain-cut {
+    display: flex;
+    position: absolute;
+    top: -6px;
+    left: 20%;
+    transform: translateX(-50%);
+    z-index: 3;
+    flex-direction: column;
+    align-items: center;
+  }
+  .cs-chain-cut .cs-chain-sc {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #2cc1eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 16px -6px rgba(44, 193, 235, 0.7);
+  }
+  .cs-chain-cut .cs-chain-pill {
+    margin-top: 8px;
+    white-space: nowrap;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #0a6b86;
+    background: rgba(44, 193, 235, 0.12);
+    border: 1px solid rgba(44, 193, 235, 0.35);
+    border-radius: 999px;
+    padding: 4px 10px;
+  }
+}
+@keyframes cs-chain-flow {
+  to {
+    background-position: 34px 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-chain-spine::after {
+    animation: none;
+    opacity: 0.3;
+  }
+}
