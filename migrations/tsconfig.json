@@ -1,0 +1,14 @@
+{
+  "extends": "../packages/config/tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "preserve",
+    "paths": {
+      "payload": ["../apps/cms/node_modules/payload"],
+      "@aws-sdk/client-s3": ["../apps/cms/node_modules/@aws-sdk/client-s3"],
+      "pg": ["../apps/cms/node_modules/pg"],
+      "@/*": ["../apps/cms/src/*"]
+    }
+  },
+  "include": ["**/*.ts"]
+}
