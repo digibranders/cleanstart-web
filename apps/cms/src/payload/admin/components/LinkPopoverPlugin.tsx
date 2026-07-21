@@ -7,7 +7,7 @@ import {
   TOGGLE_LINK_COMMAND,
   useEditorConfigContext,
 } from '@payloadcms/richtext-lexical/client';
-import { useField } from '@payloadcms/ui';
+import { useDocumentInfo, useField } from '@payloadcms/ui';
 import {
   $getNodeByKey,
   $getSelection,
@@ -16,6 +16,7 @@ import {
   COMMAND_PRIORITY_LOW,
   type LexicalCommand,
   type LexicalEditor,
+  type LexicalNode,
   type RangeSelection,
   SELECTION_CHANGE_COMMAND,
   createCommand,
@@ -51,6 +52,38 @@ const mergeCleanups = (
   return () => {
     for (const cleanup of cleanups) cleanup();
   };
+};
+
+// Pending link commits, keyed by the rich-text field's form path. MODULE
+// scope, not a React ref: a stale `getFormState` response re-keys (re-mounts)
+// the whole editor subtree, destroying this plugin instance — a ref-held
+// pending value was lost at exactly the moment it was needed, which is how a
+// created link could still vanish under prod latency. An entry lives until the
+// server echoes a form state that contains it (content-acknowledged), a newer
+// editor change supersedes it, or the safety timeout expires.
+const PENDING_COMMIT_TTL_MS = 15_000;
+const pendingCommits = new Map<string, { json: unknown; until: number }>();
+
+// Key-order-insensitive deep equality. `getFormState` echoes come back from
+// postgres with unstable JSON key order, so reference or stringify comparison
+// misreads an acknowledged commit as unacknowledged.
+const deepEqual = (a: unknown, b: unknown): boolean => {
+  if (a === b) return true;
+  if (typeof a !== typeof b) return false;
+  if (Array.isArray(a)) {
+    if (!Array.isArray(b) || a.length !== b.length) return false;
+    return a.every((item, i) => deepEqual(item, b[i]));
+  }
+  if (a && b && typeof a === 'object') {
+    if (Array.isArray(b)) return false;
+    const aObj = a as Record<string, unknown>;
+    const bObj = b as Record<string, unknown>;
+    const aKeys = Object.keys(aObj);
+    const bKeys = Object.keys(bObj);
+    if (aKeys.length !== bKeys.length) return false;
+    return aKeys.every((key) => deepEqual(aObj[key], bObj[key]));
+  }
+  return false;
 };
 
 type Mode = 'edit' | 'create';
@@ -118,6 +151,34 @@ const readLinkAtSelection = (
     }
   }
   return { node: null, text };
+};
+
+// The single LinkNode enclosing the ENTIRE selection, or null. This is the
+// edit-vs-create discriminator: only a selection fully inside one link is an
+// edit of that link. A selection that merely OVERLAPS a link (a phrase
+// spanning plain text plus an already-linked word — routine in migrated,
+// link-dense bodies) must be treated as create: targeting the inner link
+// would rewrite that link's fields and silently never wrap the user's
+// selection, which surfaced as "Add link does nothing / shows Update".
+const $findSingleEnclosingLink = (
+  selection: RangeSelection,
+): LinkNode | null => {
+  let enclosing: LinkNode | null = null;
+  for (const node of selection.getNodes()) {
+    let link: LinkNode | null = null;
+    let current: LexicalNode | null = node;
+    while (current) {
+      if ($isLinkNode(current)) {
+        link = current;
+        break;
+      }
+      current = current.getParent();
+    }
+    if (!link) return null;
+    if (enclosing && link.getKey() !== enclosing.getKey()) return null;
+    enclosing = link;
+  }
+  return enclosing;
 };
 
 const extractDoc = (
@@ -203,30 +264,79 @@ export function LinkPopoverPlugin({
   const fieldPath = (fieldProps as { path?: string } | null)?.path ?? '';
   const { setValue: setFieldValue, initialValue: fieldInitialValue } =
     useField<unknown>({ path: fieldPath });
+  // Pending commits are keyed by document + field, NOT fieldPath alone: the
+  // path (`body`) repeats across documents, and the module-level map outlives
+  // client-side navigation — an unscoped key could resurrect one document's
+  // body into another.
+  const { collectionSlug, id: docId } = useDocumentInfo();
+  const commitKey = fieldPath
+    ? `${collectionSlug ?? ''}:${docId ?? ''}:${fieldPath}`
+    : '';
   // After a link mutation we push the new value into the field (below). A
   // `getFormState` response already in flight — from the focus change that drove
   // the popover — can land right after and overwrite the field with the server's
   // PRE-link value, wiping the link (the reported "link disappears / doesn't
   // save"). A `getFormState` arrival is exactly what changes `initialValue`, so we
-  // stash the committed value and re-assert it on each `initialValue` change for a
-  // short window, guaranteeing our value is the last word. Idempotent once it
-  // sticks; the window bounds it so later legitimate edits aren't clobbered.
-  const pendingCommitRef = useRef<{ json: unknown; until: number } | null>(
-    null,
-  );
+  // re-assert the committed value on each `initialValue` change until the server
+  // echo CONTAINS it (deep-equal — content-acknowledged, not time-boxed: under
+  // prod latency a stale response can land seconds later, after any fixed window).
   // `fieldInitialValue` is intentionally a dependency even though the body does not
-  // read it: an `initialValue` reference change is exactly the signal that a
-  // `getFormState` response landed, which is when we must re-assert.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: re-run on getFormState arrival is the intent
+  // read it beyond the ack check: an `initialValue` reference change is exactly the
+  // signal that a `getFormState` response landed, which is when we must re-assert.
   useEffect(() => {
-    const pending = pendingCommitRef.current;
+    if (!commitKey) return;
+    const pending = pendingCommits.get(commitKey);
     if (!pending) return;
-    if (Date.now() > pending.until) {
-      pendingCommitRef.current = null;
+    if (
+      Date.now() > pending.until ||
+      deepEqual(fieldInitialValue, pending.json)
+    ) {
+      pendingCommits.delete(commitKey);
       return;
     }
     setFieldValue(pending.json);
-  }, [fieldInitialValue, setFieldValue]);
+  }, [commitKey, fieldInitialValue, setFieldValue]);
+  // Resurrection after a stale re-mount: when a link-less `getFormState`
+  // response lands, Payload's Field re-keys the editor subtree, re-mounting the
+  // editor from the stale value and destroying the previous plugin instance.
+  // This mount effect runs in the NEW instance: if a pending commit is still
+  // unacknowledged, push it back into both the form value and the freshly
+  // mounted editor so the link the user just created doesn't visibly vanish.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: mount-only by design
+  useEffect(() => {
+    if (!commitKey) return;
+    const pending = pendingCommits.get(commitKey);
+    if (!pending || Date.now() > pending.until) return;
+    const current = editor.getEditorState().toJSON();
+    const pendingJson = pending.json as { root?: unknown } | null;
+    if (!pendingJson || typeof pendingJson !== 'object' || !pendingJson.root) {
+      return;
+    }
+    if (deepEqual(current.root, pendingJson.root)) return;
+    setFieldValue(pending.json);
+    editor.setEditorState(
+      editor.parseEditorState(
+        pending.json as Parameters<typeof editor.parseEditorState>[0],
+      ),
+    );
+  }, []);
+  // While a commit is pending, any newer content change in the editor becomes
+  // the pending value — the open editor is the source of truth, and a re-assert
+  // must never roll back typing that happened after the link mutation.
+  useEffect(() => {
+    if (!commitKey) return;
+    return editor.registerUpdateListener(
+      ({ editorState, dirtyElements, dirtyLeaves }) => {
+        if (dirtyElements.size === 0 && dirtyLeaves.size === 0) return;
+        const pending = pendingCommits.get(commitKey);
+        if (!pending) return;
+        pendingCommits.set(commitKey, {
+          json: editorState.toJSON(),
+          until: Date.now() + PENDING_COMMIT_TTL_MS,
+        });
+      },
+    );
+  }, [editor, commitKey]);
   // Commit the editor's committed state into the Payload form value as soon as a
   // link create/edit/remove reconciles. Our popover mutates the editor while focus
   // lives in the popover (editor blurred); the field's own `OnChangePlugin` gates
@@ -236,7 +346,7 @@ export function LinkPopoverPlugin({
   // synchronously after dispatch would capture the PRE-mutation tree (Lexical
   // reconciles on a later tick), so we must use the listener, not a direct read.
   const registerCommitOnNextChange = useCallback((): (() => void) => {
-    if (!fieldPath) return () => {};
+    if (!commitKey) return () => {};
     // The listener only runs on a later tick, so referencing `unregister` inside
     // it before this `const` settles is safe (no TDZ at call time).
     const unregister = editor.registerUpdateListener(
@@ -246,12 +356,16 @@ export function LinkPopoverPlugin({
         unregister();
         const json = editorState.toJSON();
         setFieldValue(json);
-        // Guard the commit against a late stale `getFormState` for ~1.5s.
-        pendingCommitRef.current = { json, until: Date.now() + 1500 };
+        // Guard the commit against late stale `getFormState` responses until
+        // the server acknowledges it (see the re-assert effect above).
+        pendingCommits.set(commitKey, {
+          json,
+          until: Date.now() + PENDING_COMMIT_TTL_MS,
+        });
       },
     );
     return unregister;
-  }, [editor, fieldPath, setFieldValue]);
+  }, [editor, commitKey, setFieldValue]);
   // Key of the LinkNode under edit. Captured when the popover opens over an
   // existing link so the save can target that node directly instead of relying
   // on the editor's RangeSelection — which is lost once focus moves into the
@@ -274,7 +388,7 @@ export function LinkPopoverPlugin({
   }, [editor]);
 
   const openForCurrentSelection = useCallback(
-    (mode: Mode) => {
+    () => {
       const rect = getNativeSelectionRect(editor);
       if (!rect) return;
       let initial: LinkPopoverValue = DEFAULT_VALUE;
@@ -286,7 +400,7 @@ export function LinkPopoverPlugin({
         // Snapshot the selection so a new link can be wrapped after focus
         // leaves the editor for the popover inputs.
         createSelectionRef.current = selection.clone();
-        const { node } = readLinkAtSelection(selection);
+        const node = $findSingleEnclosingLink(selection);
         if (node) {
           editLinkKeyRef.current = node.getKey();
           const fields = node.getFields() as unknown as Record<
@@ -296,6 +410,13 @@ export function LinkPopoverPlugin({
           initial = fieldsToValue(fields);
         }
       });
+      // Which command opened the popover doesn't decide the mode — what the
+      // selection actually encloses does. A CREATE from the toolbar with the
+      // caret inside a link is really an edit of that link; an EDIT open
+      // whose selection spans beyond the link must create/wrap, or the save
+      // would target the inner link and drop the wider selection.
+      const mode: Mode =
+        editLinkKeyRef.current !== null ? 'edit' : 'create';
       setState({ initial, mode, rect });
       // Resolve the doc title in the background so the popover can
       // display "Blog: Some Title" instead of "blogs/<id>" when editing
@@ -326,7 +447,7 @@ export function LinkPopoverPlugin({
       editor.registerCommand(
         OPEN_LINK_POPOVER_CREATE,
         () => {
-          openForCurrentSelection('create');
+          openForCurrentSelection();
           return true;
         },
         COMMAND_PRIORITY_LOW,
@@ -334,7 +455,7 @@ export function LinkPopoverPlugin({
       editor.registerCommand(
         OPEN_LINK_POPOVER_EDIT,
         () => {
-          openForCurrentSelection('edit');
+          openForCurrentSelection();
           return true;
         },
         COMMAND_PRIORITY_LOW,
@@ -358,23 +479,40 @@ export function LinkPopoverPlugin({
   }, [editor, openForCurrentSelection, state]);
 
   useEffect(() => {
-    const root = editor.getRootElement();
-    if (!root) return;
     const handleClick = (event: MouseEvent): void => {
+      if (event.button !== 0) return;
+      // Deliberate "follow the link" gesture — let Payload's stock
+      // ClickableLinkPlugin handle it (opens in a new tab).
+      if (event.metaKey || event.ctrlKey) return;
       const target = event.target;
       if (!(target instanceof Element)) return;
       const anchor = target.closest('a');
-      if (!anchor || !root.contains(anchor)) return;
+      if (!anchor || !editor.getRootElement()?.contains(anchor)) return;
+      // Editor anchors are clickable again (pointer-events restored in
+      // _editor.scss so this handler can fire at all). A plain click inside
+      // the editor means "edit this link", not "follow it": preventDefault
+      // stops the browser navigation, and stopImmediatePropagation stops the
+      // stock ClickableLinkPlugin — a bubble listener on this same root whose
+      // window.open ignores preventDefault. Caret placement is unaffected
+      // (the browser sets it on mousedown, not click).
+      event.preventDefault();
+      event.stopImmediatePropagation();
       // Defer so Lexical's own selection sync runs first; otherwise the
       // selection rect we read is stale.
       setTimeout(() => {
         editor.dispatchCommand(OPEN_LINK_POPOVER_EDIT, undefined);
       }, 0);
     };
-    root.addEventListener('click', handleClick);
-    return () => {
-      root.removeEventListener('click', handleClick);
-    };
+    // registerRootListener (not a one-shot getRootElement read): the
+    // ContentEditable attaches AFTER this plugin's effects run, so
+    // `editor.getRootElement()` is still null here and a listener bound to it
+    // would never exist — clicking a link would silently do nothing. The root
+    // listener fires with the element once it mounts and again on re-attach.
+    // Capture phase, so it runs before the root's bubble listeners.
+    return editor.registerRootListener((rootElement, prevRootElement) => {
+      prevRootElement?.removeEventListener('click', handleClick, true);
+      rootElement?.addEventListener('click', handleClick, true);
+    });
   }, [editor]);
 
   useEffect(() => {
