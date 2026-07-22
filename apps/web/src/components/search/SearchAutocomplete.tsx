@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import { trackEvent } from '@/lib/analytics/track';
 import type { SearchHit } from '@/lib/search';
 import { Kbd, ResultRow, SkeletonRows } from './search-ui';
 
@@ -97,9 +98,16 @@ export function SearchAutocomplete({
           { signal: controller.signal },
         );
         const data = (await res.json()) as { hits?: SearchHit[] };
-        setHits(Array.isArray(data.hits) ? data.hits : []);
+        const nextHits = Array.isArray(data.hits) ? data.hits : [];
+        setHits(nextHits);
         setActiveIndex(0);
         setStatus('done');
+        // Manual GA4 site-search — see SearchCommandPalette for rationale.
+        trackEvent('search', {
+          search_term: q,
+          search_results: nextHits.length,
+          search_scope: collection,
+        });
       } catch (err) {
         if ((err as Error).name !== 'AbortError') {
           setHits([]);

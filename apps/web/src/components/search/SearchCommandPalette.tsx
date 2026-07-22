@@ -5,6 +5,7 @@ import { Search, SearchX, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { trackEvent } from '@/lib/analytics/track';
 import type { SearchHit } from '@/lib/search';
 import { Kbd, ResultRow, SkeletonRows, groupHits } from './search-ui';
 
@@ -62,9 +63,14 @@ export function SearchCommandPalette({
           signal: controller.signal,
         });
         const data = (await res.json()) as { hits?: SearchHit[] };
-        setHits(Array.isArray(data.hits) ? data.hits : []);
+        const nextHits = Array.isArray(data.hits) ? data.hits : [];
+        setHits(nextHits);
         setActiveIndex(0);
         setStatus('done');
+        // Manual GA4 site-search: the palette never puts ?q= in the URL, so
+        // enhanced measurement can't see it. Debounce upstream keeps this to
+        // one event per settled query.
+        trackEvent('search', { search_term: q, search_results: nextHits.length });
       } catch (err) {
         if ((err as Error).name !== 'AbortError') {
           setHits([]);

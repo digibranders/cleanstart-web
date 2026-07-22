@@ -81,10 +81,13 @@ const newId = (): string =>
 
 const granted = (on: boolean): "granted" | "denied" => (on ? "granted" : "denied");
 
+// `analytics_storage` stays "granted" regardless of the banner decision — GA4
+// is intentionally un-gated (see lib/consent/consent-mode-snippet.ts). Only the
+// advertising + functionality signals follow the visitor's categories.
 const updateConsentMode = (c: ConsentCategories): void => {
   const w = window as Window & { gtag?: (...args: unknown[]) => void };
   w.gtag?.("consent", "update", {
-    analytics_storage: granted(c.performance),
+    analytics_storage: "granted",
     ad_storage: granted(c.targeting),
     ad_user_data: granted(c.targeting),
     ad_personalization: granted(c.targeting),
