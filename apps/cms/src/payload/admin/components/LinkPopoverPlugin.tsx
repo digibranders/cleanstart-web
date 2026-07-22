@@ -498,14 +498,23 @@ export function LinkPopoverPlugin({
   useEffect(() => {
     const handleClick = (event: MouseEvent): void => {
       if (event.button !== 0) return;
-      // Deliberate "follow the link" gesture — let Payload's stock
-      // ClickableLinkPlugin handle it (opens in a new tab).
-      if (event.metaKey || event.ctrlKey) return;
       const target = event.target;
       if (!(target instanceof Element)) return;
       const anchor = target.closest('a');
       if (!anchor || !editor.getRootElement()?.contains(anchor)) {
         armedLinkKeyRef.current = null;
+        return;
+      }
+      // Deliberate "follow the link" gesture. Handle it OURSELVES with an
+      // explicit `_blank` instead of falling through to the stock
+      // ClickableLinkPlugin + the browser default — navigation away from an
+      // open editor must never happen in the same tab (unsaved work), and
+      // letting two handlers race can double-open.
+      if (event.metaKey || event.ctrlKey) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        const href = anchor.getAttribute('href');
+        if (href) window.open(href, '_blank', 'noopener,noreferrer');
         return;
       }
       // A plain click inside the editor must never follow the link:

@@ -2,7 +2,7 @@
 
 import { forwardRef, useEffect, useId, useMemo, useRef, useState } from 'react';
 
-import { resolveInternalPath } from './internal-routes';
+import { resolveInternalPath, toStoredUrl } from './internal-routes';
 import { type InternalPick, LinkInternalSearch } from './LinkInternalSearch';
 
 import './LinkPopover.scss';
@@ -199,6 +199,16 @@ export const LinkPopover = forwardRef<HTMLDivElement, Props>(
       ? internalPath != null && internalPath.length > 0
       : url.trim().length > 0;
 
+    // Where "Open link ↗" goes. Internal paths resolve to the public site
+    // URL (toStoredUrl prefixes the site origin) — a bare `/about-us` would
+    // otherwise open on the CMS origin. Always a new tab: navigating the
+    // admin tab away from an open editor loses unsaved work.
+    const visitHref = isInternal
+      ? internalPath
+        ? toStoredUrl(internalPath)
+        : null
+      : url.trim() || null;
+
     const initialDocDisplay = doc?.title
       ? `${doc.title}`
       : doc
@@ -293,13 +303,25 @@ export const LinkPopover = forwardRef<HTMLDivElement, Props>(
 
           <div className="cs-link-popover__actions">
             {mode === 'edit' ? (
-              <button
-                className="cs-link-popover__btn cs-link-popover__btn--ghost"
-                onClick={onRemove}
-                type="button"
-              >
-                Remove link
-              </button>
+              <span className="cs-link-popover__actions-left">
+                <button
+                  className="cs-link-popover__btn cs-link-popover__btn--ghost"
+                  onClick={onRemove}
+                  type="button"
+                >
+                  Remove link
+                </button>
+                {visitHref ? (
+                  <a
+                    className="cs-link-popover__btn cs-link-popover__btn--ghost"
+                    href={visitHref}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Open ↗
+                  </a>
+                ) : null}
+              </span>
             ) : (
               <span />
             )}
