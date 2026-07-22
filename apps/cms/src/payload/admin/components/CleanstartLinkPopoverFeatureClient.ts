@@ -19,6 +19,7 @@ import {
   OPEN_LINK_POPOVER_EDIT,
 } from './LinkPopoverPlugin';
 import { StockToolbarSuppressorPlugin } from './StockToolbarSuppressorPlugin';
+import { ToolbarTipsPlugin } from './ToolbarTipsPlugin';
 
 const isInsideLink = (node: LexicalNode | null): boolean => {
   let current: LexicalNode | null = node;
@@ -74,6 +75,10 @@ export const CleanstartLinkPopoverFeatureClient = createClientFeature(() => ({
     },
     {
       Component: StockToolbarSuppressorPlugin,
+      position: 'normal',
+    },
+    {
+      Component: ToolbarTipsPlugin,
       position: 'normal',
     },
   ],
