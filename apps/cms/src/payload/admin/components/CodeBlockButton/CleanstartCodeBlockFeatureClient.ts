@@ -3,6 +3,7 @@
 import { createClientFeature } from '@payloadcms/richtext-lexical/client';
 
 import { CodeBlockToolbarButton } from './CodeBlockToolbarButton';
+import { InlineCodeEscapePlugin } from './InlineCodeEscapePlugin';
 
 // Merge into the stock `format` group (key `format`, order 40) so the `<>`
 // button sits among the inline format marks — the same cluster, and very
@@ -24,5 +25,13 @@ const codeBlockGroup = {
 };
 
 export const CleanstartCodeBlockFeatureClient = createClientFeature(() => ({
+  // Space at the end of an inline-code run exits the mark — without this the
+  // backtick shortcut leaves the caret stuck in code format forever.
+  plugins: [
+    {
+      Component: InlineCodeEscapePlugin,
+      position: 'normal',
+    },
+  ],
   toolbarFixed: { groups: [codeBlockGroup] },
 }));
