@@ -5131,7 +5131,10 @@ body {
   font-weight: 700;
   letter-spacing: 0.02em;
   color: #ffffff;
-  background: #151021;
+  /* Vertical gradient — angled gradients restart per cell and seam at every
+     column boundary; top→bottom is identical in each cell so the band reads
+     as one continuous surface. */
+  background: linear-gradient(180deg, #4a21c6 0%, #3a1699 100%);
   border-bottom: none;
 }
 
