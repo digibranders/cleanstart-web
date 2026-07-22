@@ -9,6 +9,7 @@ import {
 } from '@payloadcms/richtext-lexical/client';
 import { useDocumentInfo, useField } from '@payloadcms/ui';
 import {
+  $getNearestNodeFromDOMNode,
   $getNodeByKey,
   $getSelection,
   $isRangeSelection,
@@ -379,6 +380,11 @@ export function LinkPopoverPlugin({
   // (create path) we restore this snapshot so the command wraps the intended
   // text. Edit uses editLinkKeyRef instead and never needs this.
   const createSelectionRef = useRef<RangeSelection | null>(null);
+  // Two-click open: the first plain click on a link behaves like any editor
+  // click (places the caret); it "arms" the link's node key here. A second
+  // single click on the SAME link opens the popover. Disarmed when the caret
+  // leaves the link or the user clicks elsewhere.
+  const armedLinkKeyRef = useRef<string | null>(null);
 
   const close = useCallback(() => {
     editLinkKeyRef.current = null;
@@ -463,8 +469,19 @@ export function LinkPopoverPlugin({
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
         () => {
-          if (!state || state.mode !== 'edit') return false;
           const selection = $getSelection();
+          // Disarm the two-click open when the caret leaves the armed link
+          // (keyboard navigation, clicks elsewhere). Without this, clicking a
+          // link, arrowing away, and coming back much later would count the
+          // return click as the "second" click and pop the editor unexpectedly.
+          if (armedLinkKeyRef.current) {
+            const inside =
+              $isRangeSelection(selection) &&
+              readLinkAtSelection(selection).node?.getKey() ===
+                armedLinkKeyRef.current;
+            if (!inside) armedLinkKeyRef.current = null;
+          }
+          if (!state || state.mode !== 'edit') return false;
           if (!$isRangeSelection(selection)) {
             setState(null);
             return false;
@@ -487,21 +504,50 @@ export function LinkPopoverPlugin({
       const target = event.target;
       if (!(target instanceof Element)) return;
       const anchor = target.closest('a');
-      if (!anchor || !editor.getRootElement()?.contains(anchor)) return;
-      // Editor anchors are clickable again (pointer-events restored in
-      // _editor.scss so this handler can fire at all). A plain click inside
-      // the editor means "edit this link", not "follow it": preventDefault
-      // stops the browser navigation, and stopImmediatePropagation stops the
-      // stock ClickableLinkPlugin — a bubble listener on this same root whose
-      // window.open ignores preventDefault. Caret placement is unaffected
-      // (the browser sets it on mousedown, not click).
+      if (!anchor || !editor.getRootElement()?.contains(anchor)) {
+        armedLinkKeyRef.current = null;
+        return;
+      }
+      // A plain click inside the editor must never follow the link:
+      // preventDefault stops the browser navigation, and
+      // stopImmediatePropagation stops the stock ClickableLinkPlugin — a
+      // bubble listener on this same root whose window.open ignores
+      // preventDefault. Caret placement is unaffected (the browser sets it
+      // on mousedown, not click).
       event.preventDefault();
       event.stopImmediatePropagation();
-      // Defer so Lexical's own selection sync runs first; otherwise the
-      // selection rect we read is stale.
-      setTimeout(() => {
-        editor.dispatchCommand(OPEN_LINK_POPOVER_EDIT, undefined);
-      }, 0);
+      // Resolve which LinkNode was clicked so the two-click arm/open cycle
+      // can tell "same link again" from "a different link". Must be
+      // `editor.read`, not `editorState.read`: $getNearestNodeFromDOMNode
+      // resolves DOM→node via the ACTIVE EDITOR, which only editor.read/
+      // editor.update establish — editorState.read throws "Unable to find an
+      // active editor".
+      let clickedKey: string | null = null;
+      editor.read(() => {
+        let current: LexicalNode | null = $getNearestNodeFromDOMNode(anchor);
+        while (current) {
+          if ($isLinkNode(current)) {
+            clickedKey = current.getKey();
+            break;
+          }
+          current = current.getParent();
+        }
+      });
+      // detail > 1 is a double/triple click — a text-selection gesture, not
+      // an "open the editor" gesture. It must neither open nor disarm.
+      if (event.detail !== 1 || clickedKey === null) return;
+      if (armedLinkKeyRef.current === clickedKey) {
+        // Second single click on the same link → open the popover.
+        armedLinkKeyRef.current = null;
+        // Defer so Lexical's own selection sync runs first; otherwise the
+        // selection rect we read is stale.
+        setTimeout(() => {
+          editor.dispatchCommand(OPEN_LINK_POPOVER_EDIT, undefined);
+        }, 0);
+      } else {
+        // First click: behave like a normal editor click (caret only), arm.
+        armedLinkKeyRef.current = clickedKey;
+      }
     };
     // registerRootListener (not a one-shot getRootElement read): the
     // ContentEditable attaches AFTER this plugin's effects run, so
@@ -509,9 +555,23 @@ export function LinkPopoverPlugin({
     // would never exist — clicking a link would silently do nothing. The root
     // listener fires with the element once it mounts and again on re-attach.
     // Capture phase, so it runs before the root's bubble listeners.
+    //
+    // The `cs-link-clickable` class is what re-enables pointer-events on
+    // links (_editor.scss) — Payload's stock CSS ships them inert. Stamping
+    // it HERE, from the same chunk as the click interception, couples
+    // clickability to interception atomically: if this chunk ever fails to
+    // load (stale build, chunk mismatch), links stay inert like stock Payload
+    // instead of navigating away — which is exactly the failure mode a
+    // CSS-only override produced under a stale .next.
     return editor.registerRootListener((rootElement, prevRootElement) => {
-      prevRootElement?.removeEventListener('click', handleClick, true);
-      rootElement?.addEventListener('click', handleClick, true);
+      if (prevRootElement) {
+        prevRootElement.classList.remove('cs-link-clickable');
+        prevRootElement.removeEventListener('click', handleClick, true);
+      }
+      if (rootElement) {
+        rootElement.classList.add('cs-link-clickable');
+        rootElement.addEventListener('click', handleClick, true);
+      }
     });
   }, [editor]);
 

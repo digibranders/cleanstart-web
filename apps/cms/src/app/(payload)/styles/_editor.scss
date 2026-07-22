@@ -432,12 +432,6 @@
   color: var(--cs-text-link);
   text-decoration: none;
   border-bottom: 1px dashed transparent;
-  // Payload's stock editor CSS sets `pointer-events: none` on links, which
-  // makes every click land on the parent <p> — our click-to-edit popover
-  // (LinkPopoverPlugin root listener → closest('a')) never fires. Re-enable;
-  // plain clicks inside contenteditable don't navigate, so this only feeds
-  // the popover.
-  pointer-events: auto;
   transition:
     color var(--cs-motion-micro),
     border-bottom-color var(--cs-motion-micro);
@@ -447,6 +441,18 @@
     color: var(--cs-text-link-hover);
     border-bottom-color: currentColor;
   }
+}
+
+// Payload's stock editor CSS ships links with `pointer-events: none`, so
+// clicks land on the parent <p> and never reach an <a>. The LinkPopoverPlugin
+// needs clickable links for its two-click open (first click = caret, second
+// click = popover) — but ONLY when its click-interception handler is actually
+// loaded, because clickable links without the interceptor navigate away (the
+// stock ClickableLinkPlugin window.opens them). The plugin stamps this class
+// on the editor root at mount, coupling clickability to interception in one
+// chunk. Never widen this to a bare `.LexicalEditorTheme__link` override.
+.cs-link-clickable .LexicalEditorTheme__link {
+  pointer-events: auto;
 }
 
 .LexicalEditorTheme__quote {

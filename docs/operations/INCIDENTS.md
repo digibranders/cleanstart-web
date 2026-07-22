@@ -10,6 +10,17 @@ A running, reverse-chronological log of production incidents and non-obvious bug
 
 ---
 
+## 2026-07-22 — Lexical link editor follow-up: click-on-link navigated away + toolbar button dead on collapsed caret
+
+- **Area:** `apps/cms` — link popover (`LinkPopoverPlugin.tsx`, `CleanstartLinkPopoverFeatureClient.ts`, `_editor.scss`). Follow-up to the 2026-07-21 entry below.
+- **Symptom (reported):** clicking linked text in the editor opened the URL directly instead of the popover, and the toolbar link button did nothing.
+- **Root cause A (navigation):** stale build — a production `next build` output was left in `apps/cms/.next` and a dev server on top of it served the NEW CSS (links clickable) with OLD JS (no click interception), so the stock ClickableLinkPlugin `window.open`ed every click. Not reproducible on a clean build. **Durable fix:** the `pointer-events: auto` override is no longer a bare CSS rule — it's scoped to `.cs-link-clickable`, a class the plugin stamps on the editor root at mount, so clickability and interception ship in the same chunk; any future stale-chunk state degrades to inert links (stock behavior), never to navigate-on-click.
+- **Root cause B (toolbar):** the button's `isEnabled` required non-empty selection TEXT — a collapsed caret inside a link left it silently disabled. Now enabled when text is selected OR the caret sits inside a link (which opens edit mode).
+- **Also changed (UX, per request):** clicking a link once now just places the caret; a **second single click on the same link** opens the popover (armed node-key, disarmed when the caret leaves the link; `event.detail === 1` so double-click stays a text-selection gesture). Cmd/ctrl-click still opens the URL in a new tab.
+- **Gotcha for next time:** `$getNearestNodeFromDOMNode` requires the ACTIVE EDITOR — it throws "Unable to find an active editor" inside `editorState.read()`; use `editor.read()`. The throw surfaced only in the browser console (the click handler died mid-flight), not in typecheck.
+- **Status:** Fixed & verified live (two-click open, toolbar from caret and from selection, create+save+DB persistence, no navigation, no new tabs).
+- **Reusable lesson:** when a runtime behavior needs CSS + JS to cooperate, gate the CSS on a class the JS applies — shipping them independently means a stale chunk can create a state neither version intended. And never leave a production build in `.next` on a dev machine.
+
 ## 2026-07-21 — Lexical link editor: "Add link / Update does nothing" — three stacked root causes
 
 - **Area:** `apps/cms` — CMS rich-text link popover (`LinkPopoverPlugin.tsx`, `_editor.scss`).
