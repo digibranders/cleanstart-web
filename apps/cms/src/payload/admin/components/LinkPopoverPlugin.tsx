@@ -478,15 +478,55 @@ export function LinkPopoverPlugin({
     );
   }, [editor, openForCurrentSelection, state]);
 
-  // NOTE (deliberate): there is NO click handler on editor links. Payload's
-  // stock CSS ships them `pointer-events: none`, so clicks pass through to
-  // the text and just place the caret — navigation out of the editor canvas
-  // is impossible by construction. The link editor opens from the toolbar
-  // link button (enabled for a selection OR a caret inside a link), and the
-  // popover's "Open ↗" action is the one way to visit the URL (new tab).
-  // Earlier iterations made links clickable (click/two-click to edit,
-  // cmd-click to follow); every variant either raced the stock
-  // ClickableLinkPlugin's window.open or confused editors — removed 2026-07-22.
+  // Click contract for editor links (final, 2026-07-22):
+  //   * plain left-click  → NOTHING beyond normal caret placement
+  //   * cmd/ctrl + click  → open the URL in a NEW tab (never the admin tab)
+  //   * editing           → toolbar link button; visiting → popover "Open ↗"
+  //
+  // This interceptor must exist in EVERY build, even though the current CSS
+  // ships links inert: a previously-cached stylesheet from a build where
+  // links were clickable (`pointer-events: auto`) can pair with current JS
+  // in a long-lived tab. In that state, without this handler, clicks reach
+  // the anchor and Payload's stock ClickableLinkPlugin — a bubble listener
+  // whose window.open ignores preventDefault and defaults to opening on ANY
+  // plain click — navigates away. "Inert via CSS" alone is not a guarantee;
+  // owning the click in capture phase is.
+  useEffect(() => {
+    const handleClick = (event: MouseEvent): void => {
+      if (event.button !== 0) return;
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const anchor = target.closest('a');
+      if (!anchor || !editor.getRootElement()?.contains(anchor)) return;
+      // Own every left-click on an editor link: preventDefault kills the
+      // browser default, stopImmediatePropagation kills the stock
+      // ClickableLinkPlugin. Caret placement is unaffected (that happens on
+      // mousedown, not click).
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (event.metaKey || event.ctrlKey) {
+        const href = anchor.getAttribute('href');
+        if (href) window.open(href, '_blank', 'noopener,noreferrer');
+      }
+    };
+    // registerRootListener (not a one-shot getRootElement read — that is
+    // null when plugin effects first run), capture phase so it beats every
+    // bubble listener on the root. The `cs-link-clickable` class is what
+    // re-enables pointer-events on links (_editor.scss) so cmd/ctrl-click
+    // can reach an anchor at all; stamping it HERE couples clickability to
+    // this interceptor atomically — a stale-chunk state where this JS is
+    // missing leaves links inert instead of navigable.
+    return editor.registerRootListener((rootElement, prevRootElement) => {
+      if (prevRootElement) {
+        prevRootElement.classList.remove('cs-link-clickable');
+        prevRootElement.removeEventListener('click', handleClick, true);
+      }
+      if (rootElement) {
+        rootElement.classList.add('cs-link-clickable');
+        rootElement.addEventListener('click', handleClick, true);
+      }
+    });
+  }, [editor]);
 
   useEffect(() => {
     if (!state) return;
