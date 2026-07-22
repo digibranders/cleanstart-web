@@ -136,10 +136,12 @@ function renderTextNode(node: Extract<LexicalNode, { type: "text" }>, key: strin
   if (fmt & FORMAT_CODE) {
     el = (
       <code
-        className="rounded px-1 py-0.5 text-[0.875em]"
+        className="rounded-md px-[0.4em] py-[0.15em] text-[0.9em] font-medium"
         style={{
-          background: "rgba(17,17,17,0.08)",
-          fontFamily: "var(--font-mono), ui-monospace, monospace",
+          background: "#FCE7EA",
+          color: "#B42342",
+          fontFamily: "var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace",
+          border: "1px solid rgba(180, 35, 66, 0.12)",
         }}
       >
         {el}

@@ -432,6 +432,12 @@
   color: var(--cs-text-link);
   text-decoration: none;
   border-bottom: 1px dashed transparent;
+  // Payload's stock editor CSS sets `pointer-events: none` on links, which
+  // makes every click land on the parent <p> — our click-to-edit popover
+  // (LinkPopoverPlugin root listener → closest('a')) never fires. Re-enable;
+  // plain clicks inside contenteditable don't navigate, so this only feeds
+  // the popover.
+  pointer-events: auto;
   transition:
     color var(--cs-motion-micro),
     border-bottom-color var(--cs-motion-micro);

@@ -9,6 +9,7 @@ import {
   HeadingFeature,
   HorizontalRuleFeature,
   IndentFeature,
+  InlineCodeFeature,
   InlineToolbarFeature,
   ItalicFeature,
   LinkFeature,
@@ -47,6 +48,7 @@ export const cleanstartLexicalEditor = () =>
       StrikethroughFeature(),
       SubscriptFeature(),
       SuperscriptFeature(),
+      InlineCodeFeature(),
 
       BlockquoteFeature(),
       UnorderedListFeature(),
