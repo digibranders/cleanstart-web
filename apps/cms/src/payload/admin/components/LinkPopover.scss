@@ -148,6 +148,18 @@
     margin-top: 4px;
   }
 
+  &__actions-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    // "Open ↗" is an <a> reusing the ghost-button look — normalize the
+    // anchor defaults so it sits identically to the Remove button.
+    a.cs-link-popover__btn {
+      text-decoration: none;
+    }
+  }
+
   &__search {
     position: relative;
   }

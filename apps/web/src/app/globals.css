@@ -4753,6 +4753,35 @@ body {
   display: none;
 }
 
+/* ── Inline code (backtick mark in the Lexical editor) ──────────────────────
+ * A miniature of the .cs-code block: same JetBrains Mono stack, same dark
+ * navy surface, brand cyan text — so inline `code` and full code blocks read
+ * as one system. Rendered by renderLexical.tsx's FORMAT_CODE branch.
+ */
+.cs-inline-code {
+  font-family: var(--font-mono), ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  font-weight: 500;
+  background: #0c131c;
+  color: #4ec9f5;
+  border-radius: 6px;
+  padding: 0.14em 0.42em 0.16em;
+  white-space: nowrap;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+}
+
+/* Long tokens (URLs, flags) must be allowed to wrap on narrow viewports —
+ * nowrap keeps short chips intact but would overflow the 680px prose column
+ * on mobile if the token itself is long. */
+@media (max-width: 480px) {
+  .cs-inline-code {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+
 
 .article-body .article-hr {
   border: none;

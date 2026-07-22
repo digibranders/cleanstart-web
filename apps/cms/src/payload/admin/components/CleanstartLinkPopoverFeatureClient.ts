@@ -6,7 +6,6 @@ import {
   toolbarFeatureButtonsGroupWithItems,
 } from '@payloadcms/richtext-lexical/client';
 import {
-  $getSelection,
   $isRangeSelection,
   type BaseSelection,
   type LexicalEditor,
@@ -38,9 +37,16 @@ const linkToolbarItem = {
     if (!$isRangeSelection(selection)) return false;
     return isInsideLink(selection.getNodes()[0] ?? null);
   },
-  isEnabled: ({ selection }: ToolbarSelection): boolean =>
-    $isRangeSelection(selection) &&
-    ($getSelection()?.getTextContent()?.length ?? 0) > 0,
+  isEnabled: ({ selection }: ToolbarSelection): boolean => {
+    if (!$isRangeSelection(selection)) return false;
+    // Text selected → create (or re-wrap) a link around it.
+    if (selection.getTextContent().length > 0) return true;
+    // Collapsed caret inside an existing link → the button edits that link.
+    // Without this branch the button is silently disabled after a plain
+    // click into linked text — the reported "toolbar link button does
+    // nothing" bug.
+    return isInsideLink(selection.getNodes()[0] ?? null);
+  },
   key: 'cs-link',
   label: 'Link (inline)',
   onSelect: ({

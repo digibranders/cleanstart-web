@@ -31,12 +31,12 @@ import {
   type LinkPopoverValue,
 } from './LinkPopover';
 
-// Two open-paths feed the popover:
-//   * `OPEN_LINK_POPOVER_CREATE` — fired by our custom toolbar button
-//     when the editor has a non-empty selection but no link wraps it.
-//   * `OPEN_LINK_POPOVER_EDIT` — fired by the click handler on any
-//     existing <a> in the editor (and re-used internally when the
-//     toolbar button fires while caret is already inside a link).
+// Both commands open the popover from the toolbar link button — CREATE when
+// the selection is plain text, EDIT when the caret/selection sits inside an
+// existing link (openForCurrentSelection derives the real mode either way,
+// so the two commands are equivalent today). Editor links themselves are NOT
+// clickable (stock pointer-events: none — see the note above the popover
+// dismiss effect); the popover's "Open ↗" is the only way to visit a URL.
 // The stock Payload drawer is suppressed via CSS in LinkPopover.scss
 // (`.link-editor` + the `.toolbar-popup__button-link` button).
 export const OPEN_LINK_POPOVER_CREATE: LexicalCommand<void> = createCommand(
@@ -478,42 +478,15 @@ export function LinkPopoverPlugin({
     );
   }, [editor, openForCurrentSelection, state]);
 
-  useEffect(() => {
-    const handleClick = (event: MouseEvent): void => {
-      if (event.button !== 0) return;
-      // Deliberate "follow the link" gesture — let Payload's stock
-      // ClickableLinkPlugin handle it (opens in a new tab).
-      if (event.metaKey || event.ctrlKey) return;
-      const target = event.target;
-      if (!(target instanceof Element)) return;
-      const anchor = target.closest('a');
-      if (!anchor || !editor.getRootElement()?.contains(anchor)) return;
-      // Editor anchors are clickable again (pointer-events restored in
-      // _editor.scss so this handler can fire at all). A plain click inside
-      // the editor means "edit this link", not "follow it": preventDefault
-      // stops the browser navigation, and stopImmediatePropagation stops the
-      // stock ClickableLinkPlugin — a bubble listener on this same root whose
-      // window.open ignores preventDefault. Caret placement is unaffected
-      // (the browser sets it on mousedown, not click).
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      // Defer so Lexical's own selection sync runs first; otherwise the
-      // selection rect we read is stale.
-      setTimeout(() => {
-        editor.dispatchCommand(OPEN_LINK_POPOVER_EDIT, undefined);
-      }, 0);
-    };
-    // registerRootListener (not a one-shot getRootElement read): the
-    // ContentEditable attaches AFTER this plugin's effects run, so
-    // `editor.getRootElement()` is still null here and a listener bound to it
-    // would never exist — clicking a link would silently do nothing. The root
-    // listener fires with the element once it mounts and again on re-attach.
-    // Capture phase, so it runs before the root's bubble listeners.
-    return editor.registerRootListener((rootElement, prevRootElement) => {
-      prevRootElement?.removeEventListener('click', handleClick, true);
-      rootElement?.addEventListener('click', handleClick, true);
-    });
-  }, [editor]);
+  // NOTE (deliberate): there is NO click handler on editor links. Payload's
+  // stock CSS ships them `pointer-events: none`, so clicks pass through to
+  // the text and just place the caret — navigation out of the editor canvas
+  // is impossible by construction. The link editor opens from the toolbar
+  // link button (enabled for a selection OR a caret inside a link), and the
+  // popover's "Open ↗" action is the one way to visit the URL (new tab).
+  // Earlier iterations made links clickable (click/two-click to edit,
+  // cmd-click to follow); every variant either raced the stock
+  // ClickableLinkPlugin's window.open or confused editors — removed 2026-07-22.
 
   useEffect(() => {
     if (!state) return;

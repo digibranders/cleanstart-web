@@ -428,16 +428,25 @@
   text-underline-offset: 2px;
 }
 
+// Inline code mark (backtick shortcut / Cmd+E). Mirrors the web renderer's
+// .cs-inline-code chip (apps/web globals.css) so editors see what ships:
+// JetBrains Mono stack, dark navy surface, brand cyan text.
+.LexicalEditorTheme__textCode {
+  font-family: var(--font-mono, ui-monospace), 'Cascadia Code', Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  font-weight: 500;
+  background: #0c131c;
+  color: #4ec9f5;
+  border-radius: 6px;
+  padding: 0.14em 0.42em 0.16em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
 .LexicalEditorTheme__link {
   color: var(--cs-text-link);
   text-decoration: none;
   border-bottom: 1px dashed transparent;
-  // Payload's stock editor CSS sets `pointer-events: none` on links, which
-  // makes every click land on the parent <p> — our click-to-edit popover
-  // (LinkPopoverPlugin root listener → closest('a')) never fires. Re-enable;
-  // plain clicks inside contenteditable don't navigate, so this only feeds
-  // the popover.
-  pointer-events: auto;
   transition:
     color var(--cs-motion-micro),
     border-bottom-color var(--cs-motion-micro);
@@ -448,6 +457,14 @@
     border-bottom-color: currentColor;
   }
 }
+
+// Editor links deliberately keep Payload's stock `pointer-events: none` —
+// clicks pass through and place the caret, and navigating out of the editor
+// canvas is impossible by construction. Do NOT re-enable pointer-events on
+// `.LexicalEditorTheme__link`: every clickable-link iteration either raced
+// the stock ClickableLinkPlugin's window.open (same-tab navigation, lost
+// work) or confused editors. Links are edited via the toolbar button and
+// visited via the popover's "Open ↗" (new tab).
 
 .LexicalEditorTheme__quote {
   border-inline-start: 4px solid var(--cs-cyan-500);
