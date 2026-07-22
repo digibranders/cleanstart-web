@@ -5117,9 +5117,18 @@ body {
   color: #151021;
 }
 
-/* Column header (top row) — dark ink band, white semibold text. Placed after
-   the zebra/hover/row-header rules so it wins for every cell in the top row
-   (including the corner cell). */
+/* Column header (top row) — brand band echoing the logo's purple→cyan
+   (logo-cleanstart-mark.svg: #9A51FF → #2CC1EB), white semibold text. The
+   horizontal gradient lives on the <tr> (cell backgrounds would restart the
+   gradient at every column boundary); header cells go transparent to let it
+   through. The sweep ends in a deepened blue so white text stays readable.
+   Placed after the zebra/hover/row-header rules so it wins for every cell in
+   the top row (including the corner cell). */
+.article-body .article-table tr:first-child,
+.article-body .article-table tr:has(>th.article-th-col) {
+  background: linear-gradient(90deg, #471ec0 0%, #2f53d8 55%, #1e7fcb 100%);
+}
+
 .article-body .article-table th.article-th-col,
 .article-body .article-table tr:first-child>td,
 .article-body .article-table tr:first-child>th {
@@ -5131,10 +5140,7 @@ body {
   font-weight: 700;
   letter-spacing: 0.02em;
   color: #ffffff;
-  /* Vertical gradient — angled gradients restart per cell and seam at every
-     column boundary; top→bottom is identical in each cell so the band reads
-     as one continuous surface. */
-  background: linear-gradient(180deg, #4a21c6 0%, #3a1699 100%);
+  background: transparent;
   border-bottom: none;
 }
 
