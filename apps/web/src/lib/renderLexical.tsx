@@ -134,19 +134,7 @@ function renderTextNode(node: Extract<LexicalNode, { type: "text" }>, key: strin
   let el: React.ReactNode = node.text;
 
   if (fmt & FORMAT_CODE) {
-    el = (
-      <code
-        className="rounded-md px-[0.4em] py-[0.15em] text-[0.9em] font-medium"
-        style={{
-          background: "#FCE7EA",
-          color: "#B42342",
-          fontFamily: "var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace",
-          border: "1px solid rgba(180, 35, 66, 0.12)",
-        }}
-      >
-        {el}
-      </code>
-    );
+    el = <code className="cs-inline-code">{el}</code>;
   }
   if (fmt & FORMAT_BOLD) el = <strong>{el}</strong>;
   if (fmt & FORMAT_ITALIC) el = <em>{el}</em>;

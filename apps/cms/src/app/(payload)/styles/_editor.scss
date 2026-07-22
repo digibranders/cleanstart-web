@@ -428,6 +428,21 @@
   text-underline-offset: 2px;
 }
 
+// Inline code mark (backtick shortcut / Cmd+E). Mirrors the web renderer's
+// .cs-inline-code chip (apps/web globals.css) so editors see what ships:
+// JetBrains Mono stack, dark navy surface, brand cyan text.
+.LexicalEditorTheme__textCode {
+  font-family: var(--font-mono, ui-monospace), 'Cascadia Code', Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  font-weight: 500;
+  background: #0c131c;
+  color: #4ec9f5;
+  border-radius: 6px;
+  padding: 0.14em 0.42em 0.16em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
 .LexicalEditorTheme__link {
   color: var(--cs-text-link);
   text-decoration: none;
