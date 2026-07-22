@@ -93,6 +93,10 @@ export const LinkPopover = forwardRef<HTMLDivElement, Props>(
     const [newTab, setNewTab] = useState(initial.newTab);
     const [rel, setRel] = useState(initial.rel);
     const [relTouched, setRelTouched] = useState(false);
+    // In edit mode the checkbox starts "touched": the stored value is the
+    // editor's earlier decision and must not be overridden by the auto-sync
+    // below just because the popover re-opened on an external link.
+    const [newTabTouched, setNewTabTouched] = useState(mode === 'edit');
     const idBase = useId();
     const externalInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -107,6 +111,15 @@ export const LinkPopover = forwardRef<HTMLDivElement, Props>(
       if (relTouched) return;
       setRel(linkType === 'internal' ? 'follow' : 'nofollow');
     }, [linkType, relTouched]);
+
+    // External links leave the site, so they default to a new tab; internal
+    // links stay same-tab. Follows the link type — including the automatic
+    // flip to External when a foreign URL is pasted into the internal box —
+    // until the editor touches the checkbox themselves.
+    useEffect(() => {
+      if (newTabTouched) return;
+      setNewTab(linkType === 'external');
+    }, [linkType, newTabTouched]);
 
     // The parent fetches the doc title async (edit mode) — when it
     // arrives, fold it into our local `doc` so the search input shows
@@ -274,7 +287,10 @@ export const LinkPopover = forwardRef<HTMLDivElement, Props>(
             <label className="cs-link-popover__check">
               <input
                 checked={newTab}
-                onChange={(event) => setNewTab(event.target.checked)}
+                onChange={(event) => {
+                  setNewTab(event.target.checked);
+                  setNewTabTouched(true);
+                }}
                 type="checkbox"
               />
               <span>Open in new tab</span>

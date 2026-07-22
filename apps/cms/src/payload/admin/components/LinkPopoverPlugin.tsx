@@ -9,7 +9,6 @@ import {
 } from '@payloadcms/richtext-lexical/client';
 import { useDocumentInfo, useField } from '@payloadcms/ui';
 import {
-  $getNearestNodeFromDOMNode,
   $getNodeByKey,
   $getSelection,
   $isRangeSelection,
@@ -32,12 +31,12 @@ import {
   type LinkPopoverValue,
 } from './LinkPopover';
 
-// Two open-paths feed the popover:
-//   * `OPEN_LINK_POPOVER_CREATE` — fired by our custom toolbar button
-//     when the editor has a non-empty selection but no link wraps it.
-//   * `OPEN_LINK_POPOVER_EDIT` — fired by the click handler on any
-//     existing <a> in the editor (and re-used internally when the
-//     toolbar button fires while caret is already inside a link).
+// Both commands open the popover from the toolbar link button — CREATE when
+// the selection is plain text, EDIT when the caret/selection sits inside an
+// existing link (openForCurrentSelection derives the real mode either way,
+// so the two commands are equivalent today). Editor links themselves are NOT
+// clickable (stock pointer-events: none — see the note above the popover
+// dismiss effect); the popover's "Open ↗" is the only way to visit a URL.
 // The stock Payload drawer is suppressed via CSS in LinkPopover.scss
 // (`.link-editor` + the `.toolbar-popup__button-link` button).
 export const OPEN_LINK_POPOVER_CREATE: LexicalCommand<void> = createCommand(
@@ -380,11 +379,6 @@ export function LinkPopoverPlugin({
   // (create path) we restore this snapshot so the command wraps the intended
   // text. Edit uses editLinkKeyRef instead and never needs this.
   const createSelectionRef = useRef<RangeSelection | null>(null);
-  // Two-click open: the first plain click on a link behaves like any editor
-  // click (places the caret); it "arms" the link's node key here. A second
-  // single click on the SAME link opens the popover. Disarmed when the caret
-  // leaves the link or the user clicks elsewhere.
-  const armedLinkKeyRef = useRef<string | null>(null);
 
   const close = useCallback(() => {
     editLinkKeyRef.current = null;
@@ -469,19 +463,8 @@ export function LinkPopoverPlugin({
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
         () => {
-          const selection = $getSelection();
-          // Disarm the two-click open when the caret leaves the armed link
-          // (keyboard navigation, clicks elsewhere). Without this, clicking a
-          // link, arrowing away, and coming back much later would count the
-          // return click as the "second" click and pop the editor unexpectedly.
-          if (armedLinkKeyRef.current) {
-            const inside =
-              $isRangeSelection(selection) &&
-              readLinkAtSelection(selection).node?.getKey() ===
-                armedLinkKeyRef.current;
-            if (!inside) armedLinkKeyRef.current = null;
-          }
           if (!state || state.mode !== 'edit') return false;
+          const selection = $getSelection();
           if (!$isRangeSelection(selection)) {
             setState(null);
             return false;
@@ -495,94 +478,15 @@ export function LinkPopoverPlugin({
     );
   }, [editor, openForCurrentSelection, state]);
 
-  useEffect(() => {
-    const handleClick = (event: MouseEvent): void => {
-      if (event.button !== 0) return;
-      const target = event.target;
-      if (!(target instanceof Element)) return;
-      const anchor = target.closest('a');
-      if (!anchor || !editor.getRootElement()?.contains(anchor)) {
-        armedLinkKeyRef.current = null;
-        return;
-      }
-      // Deliberate "follow the link" gesture. Handle it OURSELVES with an
-      // explicit `_blank` instead of falling through to the stock
-      // ClickableLinkPlugin + the browser default — navigation away from an
-      // open editor must never happen in the same tab (unsaved work), and
-      // letting two handlers race can double-open.
-      if (event.metaKey || event.ctrlKey) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        const href = anchor.getAttribute('href');
-        if (href) window.open(href, '_blank', 'noopener,noreferrer');
-        return;
-      }
-      // A plain click inside the editor must never follow the link:
-      // preventDefault stops the browser navigation, and
-      // stopImmediatePropagation stops the stock ClickableLinkPlugin — a
-      // bubble listener on this same root whose window.open ignores
-      // preventDefault. Caret placement is unaffected (the browser sets it
-      // on mousedown, not click).
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      // Resolve which LinkNode was clicked so the two-click arm/open cycle
-      // can tell "same link again" from "a different link". Must be
-      // `editor.read`, not `editorState.read`: $getNearestNodeFromDOMNode
-      // resolves DOM→node via the ACTIVE EDITOR, which only editor.read/
-      // editor.update establish — editorState.read throws "Unable to find an
-      // active editor".
-      let clickedKey: string | null = null;
-      editor.read(() => {
-        let current: LexicalNode | null = $getNearestNodeFromDOMNode(anchor);
-        while (current) {
-          if ($isLinkNode(current)) {
-            clickedKey = current.getKey();
-            break;
-          }
-          current = current.getParent();
-        }
-      });
-      // detail > 1 is a double/triple click — a text-selection gesture, not
-      // an "open the editor" gesture. It must neither open nor disarm.
-      if (event.detail !== 1 || clickedKey === null) return;
-      if (armedLinkKeyRef.current === clickedKey) {
-        // Second single click on the same link → open the popover.
-        armedLinkKeyRef.current = null;
-        // Defer so Lexical's own selection sync runs first; otherwise the
-        // selection rect we read is stale.
-        setTimeout(() => {
-          editor.dispatchCommand(OPEN_LINK_POPOVER_EDIT, undefined);
-        }, 0);
-      } else {
-        // First click: behave like a normal editor click (caret only), arm.
-        armedLinkKeyRef.current = clickedKey;
-      }
-    };
-    // registerRootListener (not a one-shot getRootElement read): the
-    // ContentEditable attaches AFTER this plugin's effects run, so
-    // `editor.getRootElement()` is still null here and a listener bound to it
-    // would never exist — clicking a link would silently do nothing. The root
-    // listener fires with the element once it mounts and again on re-attach.
-    // Capture phase, so it runs before the root's bubble listeners.
-    //
-    // The `cs-link-clickable` class is what re-enables pointer-events on
-    // links (_editor.scss) — Payload's stock CSS ships them inert. Stamping
-    // it HERE, from the same chunk as the click interception, couples
-    // clickability to interception atomically: if this chunk ever fails to
-    // load (stale build, chunk mismatch), links stay inert like stock Payload
-    // instead of navigating away — which is exactly the failure mode a
-    // CSS-only override produced under a stale .next.
-    return editor.registerRootListener((rootElement, prevRootElement) => {
-      if (prevRootElement) {
-        prevRootElement.classList.remove('cs-link-clickable');
-        prevRootElement.removeEventListener('click', handleClick, true);
-      }
-      if (rootElement) {
-        rootElement.classList.add('cs-link-clickable');
-        rootElement.addEventListener('click', handleClick, true);
-      }
-    });
-  }, [editor]);
+  // NOTE (deliberate): there is NO click handler on editor links. Payload's
+  // stock CSS ships them `pointer-events: none`, so clicks pass through to
+  // the text and just place the caret — navigation out of the editor canvas
+  // is impossible by construction. The link editor opens from the toolbar
+  // link button (enabled for a selection OR a caret inside a link), and the
+  // popover's "Open ↗" action is the one way to visit the URL (new tab).
+  // Earlier iterations made links clickable (click/two-click to edit,
+  // cmd-click to follow); every variant either raced the stock
+  // ClickableLinkPlugin's window.open or confused editors — removed 2026-07-22.
 
   useEffect(() => {
     if (!state) return;

@@ -458,17 +458,13 @@
   }
 }
 
-// Payload's stock editor CSS ships links with `pointer-events: none`, so
-// clicks land on the parent <p> and never reach an <a>. The LinkPopoverPlugin
-// needs clickable links for its two-click open (first click = caret, second
-// click = popover) — but ONLY when its click-interception handler is actually
-// loaded, because clickable links without the interceptor navigate away (the
-// stock ClickableLinkPlugin window.opens them). The plugin stamps this class
-// on the editor root at mount, coupling clickability to interception in one
-// chunk. Never widen this to a bare `.LexicalEditorTheme__link` override.
-.cs-link-clickable .LexicalEditorTheme__link {
-  pointer-events: auto;
-}
+// Editor links deliberately keep Payload's stock `pointer-events: none` —
+// clicks pass through and place the caret, and navigating out of the editor
+// canvas is impossible by construction. Do NOT re-enable pointer-events on
+// `.LexicalEditorTheme__link`: every clickable-link iteration either raced
+// the stock ClickableLinkPlugin's window.open (same-tab navigation, lost
+// work) or confused editors. Links are edited via the toolbar button and
+// visited via the popover's "Open ↗" (new tab).
 
 .LexicalEditorTheme__quote {
   border-inline-start: 4px solid var(--cs-cyan-500);
