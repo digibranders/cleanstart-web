@@ -42,7 +42,11 @@ const CHAIN: ChainLink[] = [
 export function RoiHowItWorks(): React.ReactElement {
   return (
     <section data-section="RoiHowItWorks" aria-labelledby="roi-how-heading" className="relative" style={{ background: "#ffffff" }}>
-      <div className="mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md">
+      {/* pb = --spacing-section-cta so the Footer's floating CTA card (which
+          hangs half above the footer's top edge, per Footer.tsx §layout-contract)
+          overlaps this section's own white background instead of colliding with
+          the "CleanStart breaks the chain" dark banner at the section's tail. */}
+      <div className="mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-section-md pb-[var(--spacing-section-cta)]">
         <div className="text-center" style={{ marginBottom: "clamp(36px,4vw,52px)" }}>
           <Reveal header>
             <h2 id="roi-how-heading" style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h2)", fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 1.1, color: "#111" }}>
