@@ -21,6 +21,7 @@ import {
   shouldSkipRedirectLookup,
 } from "@/lib/redirects-cache";
 import { isIndexingAllowed } from "@/lib/seo/indexing";
+import { stripLegacyPaginationParams } from "@/lib/seo/legacy-params";
 
 const PRODUCTION_HOST = "www.cleanstart.com";
 const APEX_HOST = "cleanstart.com";
@@ -101,6 +102,16 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
   if (shouldLowercase(nextUrl.pathname)) {
     const url = nextUrl.clone();
     url.pathname = nextUrl.pathname.toLowerCase();
+    return NextResponse.redirect(url, 308);
+  }
+
+  // Legacy Webflow pagination params (`?<hash>_page=N`) survive in Google's
+  // index from the pre-migration site — some indexed as their own canonical.
+  // The listings ignore them, so 308 to the clean URL to force consolidation.
+  const strippedSearch = stripLegacyPaginationParams(nextUrl.search);
+  if (strippedSearch !== null) {
+    const url = nextUrl.clone();
+    url.search = strippedSearch;
     return NextResponse.redirect(url, 308);
   }
 
