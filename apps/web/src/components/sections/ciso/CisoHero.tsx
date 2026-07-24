@@ -66,7 +66,7 @@ export function CisoHero(): React.ReactElement {
           className="relative flex flex-col items-center text-center md:items-start md:text-left"
           style={{ maxWidth: "749px" }}
         >
-          <HeroReveal y={50} duration={1.0}>
+          <HeroReveal y={50} duration={1.0} lcp>
             <h1
               className="text-white"
               style={{

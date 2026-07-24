@@ -35,7 +35,7 @@ export function PricingHero(): React.ReactElement {
 
       <div className="relative z-[2] mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[calc(clamp(112px,10vw,140px)+var(--cs-header-extra))] pb-[clamp(110px,13vw,190px)]">
         <div className="flex flex-col items-center text-center gap-7">
-          <HeroReveal y={50} duration={1.0}>
+          <HeroReveal y={50} duration={1.0} lcp>
             <h1
               className="font-display font-semibold text-white mx-auto"
               style={{

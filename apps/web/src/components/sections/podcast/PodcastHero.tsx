@@ -76,7 +76,7 @@ export function PodcastHero({ featuredHero }: Props): React.ReactElement {
         />
         {/* Heading style and top spacing match the Resource Center hero for cross-page consistency. */}
         <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-[calc(clamp(72px,8vw,128px)+var(--cs-header-extra))] pb-[260px] flex flex-col items-center text-center">
-          <HeroReveal y={50} duration={1.0}>
+          <HeroReveal y={50} duration={1.0} lcp>
             <h1
               id="podcast-hero-title"
               className="font-display font-semibold text-white"

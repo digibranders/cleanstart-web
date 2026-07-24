@@ -45,7 +45,7 @@ export function CommunityHero() {
       <Container className="relative z-10">
         <div className="mx-auto w-full max-w-[1200px] pt-[calc(clamp(112px,10vw,172px)+var(--cs-header-extra))] pb-[clamp(40px,5vw,80px)]">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-8">
-            <HeroReveal y={50} duration={1.0} className="lg:w-[48%]">
+            <HeroReveal y={50} duration={1.0} lcp className="lg:w-[48%]">
               <h1
                 className="font-display font-semibold text-white"
                 style={{

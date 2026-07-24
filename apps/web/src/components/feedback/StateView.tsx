@@ -124,7 +124,7 @@ export function StateView({
 
         <Container variant="default" className="relative">
           <div className="flex flex-col items-center pt-[clamp(80px,10vw,140px)] pb-[clamp(48px,6vw,96px)] text-center">
-            <HeroReveal y={50} duration={1.0}>
+            <HeroReveal y={50} duration={1.0} lcp>
               <h1 className="font-display text-balance" style={TITLE_STYLE}>
                 {resolvedTitle}
               </h1>

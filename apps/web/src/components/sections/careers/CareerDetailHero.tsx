@@ -68,7 +68,7 @@ export function CareerDetailHero({
         />
 
         <div className="flex justify-center mt-6 md:mt-10">
-          <HeroReveal y={40} duration={0.9}>
+          <HeroReveal y={40} duration={0.9} lcp>
             <h1
               className="font-display font-semibold text-white text-center"
               style={{ ...DETAIL_HERO_TITLE_STYLE, maxWidth: "860px" }}

@@ -56,7 +56,7 @@ export function NewsroomHero({
             style={{ maxWidth: "702px" }}
           >
             <div className="flex flex-col items-center gap-8 w-full">
-              <HeroReveal y={50} duration={1.0}>
+              <HeroReveal y={50} duration={1.0} lcp>
                 <h1
                   id="newsroom-hero-title"
                   className="font-display font-semibold text-white text-center w-full"

@@ -70,7 +70,7 @@ export function UpcomingEventHero({
         className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10"
         style={{ paddingTop: "calc(clamp(96px, 11vw, 160px) + var(--cs-header-extra))", paddingBottom: "clamp(48px, 6vw, 80px)" }}
       >
-        <HeroReveal y={50} duration={1.0}>
+        <HeroReveal y={50} duration={1.0} lcp>
           <h1
             id="events-hero-title"
             className="font-display font-semibold text-white text-center"

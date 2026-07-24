@@ -76,7 +76,7 @@ export function DemoHero(): React.ReactElement {
           paddingBottom: "clamp(60px, 8vw, 200px)",
         }}
       >
-        <HeroReveal y={50} duration={1.0}>
+        <HeroReveal y={50} duration={1.0} lcp>
           <h1
             className="text-white"
             style={{

@@ -101,7 +101,7 @@ export function ResourceDetailHero({
           className="flex flex-col items-center"
           style={{ marginTop: "16px" }}
         >
-          <HeroReveal y={50} duration={1.0}>
+          <HeroReveal y={50} duration={1.0} lcp>
             <h1
               id="rd-hero-title"
               className="font-display font-semibold text-center text-white"

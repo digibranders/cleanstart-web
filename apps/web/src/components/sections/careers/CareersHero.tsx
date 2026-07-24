@@ -79,7 +79,7 @@ export function CareersHero({ initialQuery }: CareersHeroProps): React.ReactElem
             className="flex flex-col items-center gap-6 text-center text-white"
             style={{ maxWidth: "674px" }}
           >
-            <HeroReveal y={50} duration={1.0}>
+            <HeroReveal y={50} duration={1.0} lcp>
               <h1
                 id="careers-hero-title"
                 className="font-display font-semibold"

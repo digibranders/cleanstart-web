@@ -108,7 +108,7 @@ export function WebinarsHero(): React.ReactElement {
           className="flex flex-col items-center gap-6 mx-auto text-center"
           style={{ paddingTop: "calc(140px + var(--cs-header-extra))", paddingBottom: "80px", maxWidth: "864px" }}
         >
-          <HeroReveal y={50} duration={1.0}>
+          <HeroReveal y={50} duration={1.0} lcp>
             <h1
               id="webinars-hero-title"
               className="font-display font-semibold text-white"

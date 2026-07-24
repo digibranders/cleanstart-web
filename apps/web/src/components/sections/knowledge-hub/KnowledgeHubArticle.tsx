@@ -1,4 +1,4 @@
-import { Reveal } from '@/components/ui/Reveal';
+import { HeroReveal, Reveal } from '@/components/ui/Reveal';
 import type { KhArticle } from '@/lib/knowledge-hub';
 import { RenderLexical } from '@/lib/renderLexical';
 import Link from 'next/link';
@@ -12,7 +12,9 @@ export function KnowledgeHubArticle({
     <>
       <Reveal header>
         <Breadcrumb category={article.category?.name} />
+      </Reveal>
 
+      <HeroReveal lcp>
         <h1
           className="font-display font-semibold mt-4"
           style={{
@@ -24,7 +26,7 @@ export function KnowledgeHubArticle({
         >
           {article.title}
         </h1>
-      </Reveal>
+      </HeroReveal>
 
       {article.videoUrl && (
         <Reveal header delay={0.2} y={20}>

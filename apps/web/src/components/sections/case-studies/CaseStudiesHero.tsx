@@ -91,7 +91,7 @@ export function CaseStudiesHero(): React.ReactElement {
           className="flex flex-col items-start gap-6 pt-[calc(clamp(96px,11vw,168px)+var(--cs-header-extra))]"
           style={{ maxWidth: "640px" }}
         >
-          <HeroReveal y={50} duration={1.0}>
+          <HeroReveal y={50} duration={1.0} lcp>
             <h1
               id="case-studies-hero-title"
               className="font-display font-semibold text-white"

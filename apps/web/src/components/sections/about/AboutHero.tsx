@@ -85,7 +85,7 @@ export function AboutHero() {
         <div className="pt-[calc(clamp(112px,8vw,128px)+var(--cs-header-extra))] pb-[clamp(40px,5vw,80px)]">
           <div className="flex flex-col items-center text-center lg:items-start lg:text-left gap-10 lg:max-w-[540px]">
             <div className="flex flex-col gap-5">
-              <HeroReveal y={50} duration={1.0}>
+              <HeroReveal y={50} duration={1.0} lcp>
                 <h1
                   className="font-display font-semibold text-white"
                   style={{

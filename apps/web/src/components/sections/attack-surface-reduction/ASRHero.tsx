@@ -74,7 +74,7 @@ export function ASRHero(): React.ReactElement {
             style={{ maxWidth: '545px' }}
           >
             <div className="flex flex-col items-center md:items-start text-center md:text-left gap-4 md:gap-5 lg:gap-6 w-full">
-              <HeroReveal y={50} duration={1.0}>
+              <HeroReveal y={50} duration={1.0} lcp>
                 <h1
                   className="font-bold lg:font-semibold"
                   style={{

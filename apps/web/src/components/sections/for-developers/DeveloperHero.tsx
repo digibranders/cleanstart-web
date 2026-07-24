@@ -378,7 +378,7 @@ export function DeveloperHero(): React.ReactElement {
         className="relative mx-auto z-[2] flex w-full max-w-[840px] flex-col items-center px-6 sm:px-10 text-center"
         style={{ paddingTop: 'calc(clamp(112px, 14vw, 203px) + var(--cs-header-extra))' }}
       >
-        <HeroReveal y={50} duration={1.0}>
+        <HeroReveal y={50} duration={1.0} lcp>
           <h1
             className="text-white"
             style={{

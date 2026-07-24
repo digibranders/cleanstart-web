@@ -22,7 +22,7 @@ export function CleanSightHero(): React.ReactElement {
       >
         <div className="grid items-center gap-12 lg:grid-cols-[1.02fr_1fr] lg:gap-16">
           <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-            <HeroReveal y={50} duration={1.0}>
+            <HeroReveal y={50} duration={1.0} lcp>
               <h1
                 className="text-white"
                 style={{

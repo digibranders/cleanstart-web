@@ -130,7 +130,7 @@ export function AuthorHero({ author }: AuthorHeroProps): React.ReactElement {
           </div>
 
           <div className="flex flex-col items-center gap-3">
-            <HeroReveal y={50} duration={1.0} className="flex items-center justify-center gap-3 flex-wrap">
+            <HeroReveal y={50} duration={1.0} lcp className="flex items-center justify-center gap-3 flex-wrap">
               <h1
                 className="font-display font-semibold text-white"
                 style={{

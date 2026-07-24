@@ -49,7 +49,7 @@ export function RoiHero(): React.ReactElement {
           paddingBottom: "clamp(32px, 4vw, 56px)",
         }}
       >
-        <HeroReveal y={50} duration={1.0}>
+        <HeroReveal y={50} duration={1.0} lcp>
           <h1
             style={{
               fontFamily: "var(--font-display)",

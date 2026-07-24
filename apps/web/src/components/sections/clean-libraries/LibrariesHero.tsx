@@ -51,7 +51,7 @@ export function LibrariesHero(): React.ReactElement {
         >
           {/* Left: heading + description + CTA */}
           <div className="w-full md:flex-1 flex flex-col items-center md:items-start text-center md:text-left gap-6 lg:gap-8 max-w-[560px]">
-            <HeroReveal y={50} duration={1.0}>
+            <HeroReveal y={50} duration={1.0} lcp>
               <h1
                 className="text-white"
                 style={{
