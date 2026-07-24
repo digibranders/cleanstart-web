@@ -22,7 +22,7 @@ CleanStart is shipping a Next.js 16.2.5 / React 19 / Tailwind v4 marketing site 
 
 ## 2. Branch & environment strategy
 
-**Model:** day-to-day work commits directly to `development`; promote `development` → `main` via PR. (Authoritative branching policy: `CLAUDE.md` → "Branching policy" — three long-lived branches `main` / `development` / `farheen`, no routine feature branches.)
+**Model:** day-to-day work commits directly to `development`; promote `development` → `main` via PR. (Authoritative branching policy: `CLAUDE.md` → "Branching policy" — two long-lived branches `main` / `development`, no routine feature branches.)
 
 | Branch | Vercel env | Domain | Indexable | Lifetime | Purpose |
 |---|---|---|---|---|---|

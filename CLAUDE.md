@@ -29,19 +29,8 @@ apps/web:  Next.js 16.2.5 · React 19.2.4 · Tailwind CSS v4
 | ------------- | ------------------------------------------------ | ------------- |
 | `main`        | Production. Deploys go from here.                | Everything    |
 | `development` | Day-to-day dev for `apps/cms` + `apps/web`.      | Everything    |
-| `farheen`     | Web page work (scoped — see rules below).        | `apps/web` only, scoped to in-progress page |
 
-No other long-lived branches. No feature branches, no worktrees for routine work. Short-lived branches by other developers (e.g. `feat/yatish-resume`) are tolerated but don't enter the merge cycle until promoted to `development`. All three branches are kept in sync at the same HEAD after every merge.
-
-### Scoped-change rule on `farheen`
-
-Every commit must be **scoped to the page being worked on**:
-- Only touch `apps/web/src/app/<page>/`, `apps/web/src/components/sections/<page>/`, `apps/web/public/images/<page>/`.
-- Allowed cross-page edits: one nav entry in `src/lib/nav-config.ts`, one row in `docs/web/WEB-PAGES.md`.
-- **Do not touch:** `globals.css`, layout primitives, `tsconfig`/`eslint`/`biome` config, or any `apps/cms/` path.
-- **Typography from global config, NOT Figma.** See `apps/web/docs/TYPOGRAPHY-SYSTEM.md` for the `--fs-*` token family. Never inline `text-[clamp()]` or `fontSize: "Xpx"`. If a role token doesn't exist for what Figma shows, **stop and ask** — adding a token is a shared change.
-- No bulk formatter sweeps. No "while I'm here" cleanups.
-- If a shared change is needed (new token, layout primitive, CSP entry), it lands on `development` first, then `farheen` rebases.
+No other long-lived branches. No feature branches, no worktrees for routine work. Short-lived branches by other developers (e.g. `feat/yatish-resume`) are tolerated but don't enter the merge cycle until promoted to `development`. Both branches are kept in sync at the same HEAD after every merge.
 
 ### Forbidden git actions
 
