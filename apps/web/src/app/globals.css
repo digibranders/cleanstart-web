@@ -1914,14 +1914,6 @@ body {
    utility regardless of source order — declaring `position` here would silently
    beat `md:absolute` and collapse the desktop overlay. */
 .cs-libvideo-card {
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  background: rgba(12, 10, 32, 0.55);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
-    0 24px 80px rgba(154, 81, 255, 0.35);
   opacity: 0;
   pointer-events: none;
   transition: opacity 240ms ease-out;
@@ -1932,33 +1924,63 @@ body {
   pointer-events: auto;
 }
 
-/* One-shot sheen across the panel as it opens — reuses the glass-button shine so
-   the panel joins the existing material language instead of inventing one. */
-.cs-libvideo-card[data-open="true"]::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  border-radius: inherit;
-  pointer-events: none;
-  background: linear-gradient(110deg,
-      transparent 30%,
-      rgba(255, 255, 255, 0.22) 50%,
-      transparent 70%);
-  transform: translateX(120%) skewX(-12deg);
-  animation: cs-cta-shine 900ms ease-out 1;
+/* The video itself carries the only surface treatment: a rounded clip and a soft
+   violet bloom so it sits in the same pool of light as the core cube. No border,
+   fill or backdrop — the video's artwork is already a violet gradient close to
+   the hero's, and any frame around it read as a box pasted onto the hero. */
+.cs-libvideo-frame {
+  border-radius: 16px;
+  background: rgba(10, 8, 28, 0.9);
+  box-shadow: 0 26px 90px rgba(124, 70, 230, 0.42);
+}
+
+/* Our own play affordance over the poster — deliberately not YouTube's red
+   button, so the resting state stays inside the hero's material language. */
+.cs-libvideo-play-badge {
+  width: 68px;
+  height: 68px;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 10px 40px rgba(10, 8, 28, 0.45);
+  padding-left: 4px;
+  transition:
+    transform 220ms cubic-bezier(.2, .9, .3, 1),
+    background-color 200ms ease-out;
+}
+
+.cs-libvideo-play:hover .cs-libvideo-play-badge {
+  transform: translate(-50%, -50%) scale(1.07);
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.cs-libvideo-play:focus-visible {
+  outline: 2px solid #33baec;
+  outline-offset: -3px;
+  border-radius: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-libvideo-play:hover .cs-libvideo-play-badge {
+    transform: translate(-50%, -50%);
+  }
 }
 
 .cs-libvideo-close {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(10, 8, 28, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   transition:
     background-color 180ms ease-out,
-    border-color 180ms ease-out;
+    opacity 180ms ease-out;
+  opacity: 0.75;
 }
 
 .cs-libvideo-close:hover {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(10, 8, 28, 0.8);
+  opacity: 1;
 }
 
 .cs-libvideo-close:focus-visible {
@@ -2031,11 +2053,6 @@ body {
 
   .cs-libvideo-card {
     transform: none;
-  }
-
-  .cs-libvideo-card[data-open="true"]::after {
-    animation: none;
-    content: none;
   }
 }
 
