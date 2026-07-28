@@ -18,12 +18,23 @@
  * Edge-safe: pure `process.env` reads only, so it is importable from middleware
  * (proxy.ts) as well as build-time metadata.
  */
-const NOINDEX_HOSTS = new Set(["staging.cleanstart.com"]);
+/**
+ * Exact hosts we never index. Exported so the GA4 head snippet can serialize the
+ * same list into its in-browser host check (lib/analytics/ga4-snippet.ts) rather
+ * than hardcoding a second copy that could drift from this one.
+ */
+export const NOINDEX_HOSTS: readonly string[] = ["staging.cleanstart.com"];
+
+/** Host suffixes we never index (Vercel preview aliases). Same rationale. */
+export const NOINDEX_HOST_SUFFIXES: readonly string[] = [".vercel.app"];
 
 export function isNoindexHost(host: string | null | undefined): boolean {
   if (!host) return false;
   const bare = host.split(":")[0]?.toLowerCase() ?? "";
-  return NOINDEX_HOSTS.has(bare) || bare.endsWith(".vercel.app");
+  return (
+    NOINDEX_HOSTS.includes(bare) ||
+    NOINDEX_HOST_SUFFIXES.some((suffix) => bare.endsWith(suffix))
+  );
 }
 
 /**

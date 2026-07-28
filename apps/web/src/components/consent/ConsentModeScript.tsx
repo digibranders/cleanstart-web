@@ -7,9 +7,11 @@ import { CONSENT_MODE_SNIPPET } from "@/lib/consent/consent-mode-snippet";
  * before any tag runs. The ConsentProvider fires `gtag('consent','update', …)`
  * for the ad/functionality signals when the visitor decides.
  *
- * This runs before any analytics tag; the GA4 tag
- * (components/analytics/Ga4Script.tsx) relies on the `window.gtag` /
- * `dataLayer` queue this snippet bootstraps.
+ * This runs before any analytics tag; the GA4 bootstrap
+ * (components/analytics/Ga4HeadScript.tsx) is emitted directly after it in the
+ * same `<head>` and relies on the `window.gtag` / `dataLayer` queue this snippet
+ * establishes. Keep this component FIRST — reordering them would let the GA4
+ * `config` call run before consent defaults are queued.
  *
  * Cleared by a CSP hash (see lib/security/csp.ts), NOT a per-request
  * nonce — a nonce would require reading headers() in the root layout,
