@@ -39,6 +39,14 @@ describe('buildCsp', () => {
     expect(d['media-src']).toContain("'self'");
   });
 
+  it('allows the youtube-nocookie player in frame-src', () => {
+    const d = parse(buildCsp(base));
+    // Without an explicit frame-src these iframes inherit default-src 'self'
+    // and are blocked outright once the policy is enforced.
+    expect(d['frame-src']).toContain('https://www.youtube-nocookie.com');
+    expect(d['frame-src']).toContain("'self'");
+  });
+
   it('allows GA4 gtag.js and its collect endpoints (incl. regional)', () => {
     const d = parse(buildCsp(base));
     expect(d['connect-src']).toContain('https://www.googletagmanager.com');

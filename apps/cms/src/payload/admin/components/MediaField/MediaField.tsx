@@ -11,6 +11,7 @@ import {
   useState,
 } from 'react';
 
+import { encodeMediaContextHint } from '../../../lib/media-context-hint';
 import { MediaBrowseDialog, type MediaBrowseDoc } from '../MediaBrowseDialog';
 import { PdfThumb } from './PdfThumb';
 
@@ -425,7 +426,8 @@ export const MediaField = (props: Props): ReactElement => {
       };
       xhr.open('POST', '/api/media');
       xhr.setRequestHeader('Accept', 'application/json');
-      if (contextHint) xhr.setRequestHeader('x-media-context-hint', contextHint);
+      const encodedHint = encodeMediaContextHint(contextHint);
+      if (encodedHint) xhr.setRequestHeader('x-media-context-hint', encodedHint);
       xhr.withCredentials = true;
       xhr.send(fd);
     },

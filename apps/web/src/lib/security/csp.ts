@@ -25,6 +25,11 @@ const GA4_REGION = 'https://*.analytics.google.com';
 // Leadfeeder / Dealfront tracker: loader is sc.lfeeder.com (served via
 // script-src 'https:'); the tracker beacons + pixels back to *.lfeeder.com.
 const LEADFEEDER = 'https://*.lfeeder.com';
+// Privacy-preserving YouTube player used by the podcast page, Knowledge Hub
+// lessons, and the Clean Libraries hero video. Without an explicit `frame-src`
+// these iframes fall back to `default-src 'self'` and are blocked outright the
+// moment CSP_ENFORCE is set.
+const YOUTUBE_EMBED = 'https://www.youtube-nocookie.com';
 
 // Frame-ancestors override applied to preview surfaces (cookie-based
 // draft mode AND the new token-based `/preview/*` route). In every
@@ -115,6 +120,7 @@ export function buildCsp({
     ['font-src', fontSrc.join(' ')],
     ['media-src', mediaSrc.join(' ')],
     ['connect-src', connectSrc.join(' ')],
+    ['frame-src', ["'self'", YOUTUBE_EMBED].join(' ')],
     ['frame-ancestors', frameAncestors.join(' ')],
     ['base-uri', "'self'"],
     ['form-action', "'self'"],

@@ -1,7 +1,7 @@
 /**
  * Typed GA4 custom-event emitter.
  *
- * Fires `gtag('event', …)` against the tag loaded by <Ga4Script/>. GA4
+ * Fires `gtag('event', …)` against the tag loaded by <Ga4HeadScript/>. GA4
  * measurement is un-gated (analytics_storage is granted by default — see
  * lib/consent/consent-mode-snippet.ts), so events are emitted unconditionally —
  * caller code never needs to read consent state. Safe on the server (no-ops) and
@@ -52,7 +52,7 @@ export function trackEvent(name: Ga4EventName, params?: Ga4EventParams): void {
 
 /**
  * Manual `page_view` for client-side route changes. The initial page load's
- * page_view comes from `gtag('config', …)` in <Ga4Script/>; <Ga4RouteTracker/>
+ * page_view comes from `gtag('config', …)` in <Ga4HeadScript/>; <Ga4RouteTracker/>
  * calls this for every subsequent soft navigation with the post-commit
  * document.title (GA4's own history tracking reads the PREVIOUS page's title).
  */

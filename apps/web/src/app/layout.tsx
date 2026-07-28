@@ -8,6 +8,7 @@ import { ClickSpark } from "@/components/ui/ClickSpark";
 import { SearchProvider } from "@/components/search/SearchProvider";
 import { SmoothScrollProvider } from "@/components/SmoothScrollProvider";
 import { AttributionProvider } from "@/components/attribution/AttributionProvider";
+import { Ga4HeadScript } from "@/components/analytics/Ga4HeadScript";
 import {
   ConsentProvider,
   ConsentModeScript,
@@ -164,7 +165,15 @@ export default async function RootLayout({
       }}
     >
       <head>
+        {/* Warm the GA4 collect origin. gtag.js is injected during head parse,
+            so googletagmanager.com connects on its own; google-analytics.com is
+            only reached once the library runs and would otherwise pay full
+            DNS+TCP+TLS on the first beacon (~RTT 131ms p75 on mobile). */}
+        <link rel="preconnect" href="https://www.google-analytics.com" crossOrigin="" />
+        {/* Order is load-bearing: the Consent Mode default must be queued
+            before the GA4 config call that follows it. */}
         <ConsentModeScript />
+        <Ga4HeadScript />
       </head>
       <body suppressHydrationWarning>
         {/* Skip-to-content link (WCAG 2.1 A): first focusable element; hidden

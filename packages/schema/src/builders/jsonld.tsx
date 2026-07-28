@@ -672,12 +672,21 @@ export interface VideoObjectSchemaInput {
   thumbnailUrl?: string | undefined;
   /** Page path where the video appears, e.g. `/knowledge-hub/my-article`. */
   embedPath?: string | undefined;
+  /**
+   * Absolute player URL, for videos hosted by a third party (e.g. the
+   * youtube-nocookie embed). Takes precedence over `embedPath`, which resolves
+   * against our own origin and is only correct for self-hosted players.
+   */
+  embedUrl?: string | undefined;
+  /** ISO-8601 duration, e.g. `PT2M39S`. Recommended by Google. */
+  duration?: string | undefined;
 }
 
 /**
- * VideoObject for lesson videos (Knowledge Hub "Watch the Lesson" player).
- * `thumbnailUrl` and `uploadDate` are required for Google's video rich results —
- * callers should provide them when available.
+ * VideoObject for lesson videos (Knowledge Hub "Watch the Lesson" player) and
+ * product videos embedded in marketing pages. `thumbnailUrl` and `uploadDate`
+ * are required for Google's video rich results — callers should provide them
+ * when available.
  */
 export function videoObjectSchema({
   name,
@@ -686,6 +695,8 @@ export function videoObjectSchema({
   uploadDate,
   thumbnailUrl,
   embedPath,
+  embedUrl,
+  duration,
 }: VideoObjectSchemaInput) {
   return {
     "@context": "https://schema.org",
@@ -695,7 +706,12 @@ export function videoObjectSchema({
     contentUrl,
     ...(uploadDate ? { uploadDate } : {}),
     ...(thumbnailUrl ? { thumbnailUrl } : {}),
-    ...(embedPath ? { embedUrl: absoluteUrl(embedPath) } : {}),
+    ...(duration ? { duration } : {}),
+    ...(embedUrl
+      ? { embedUrl }
+      : embedPath
+        ? { embedUrl: absoluteUrl(embedPath) }
+        : {}),
     publisher: { "@id": ORGANIZATION_ID },
   };
 }

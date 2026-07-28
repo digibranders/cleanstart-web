@@ -81,13 +81,22 @@ const newId = (): string =>
 
 const granted = (on: boolean): "granted" | "denied" => (on ? "granted" : "denied");
 
-// `analytics_storage` stays "granted" regardless of the banner decision — GA4
-// is intentionally un-gated (see lib/consent/consent-mode-snippet.ts). Only the
-// advertising + functionality signals follow the visitor's categories.
+// `analytics_storage` is deliberately ONLY ever sent to GRANT it, never to deny.
+//
+// `consent update` accepts no `region` parameter, so anything sent here applies
+// to the visitor globally and would clobber the region-scoped defaults set in
+// lib/consent/consent-mode-snippet.ts. Omitting the key leaves whichever default
+// applies to that visitor untouched, which yields the intended matrix:
+//   EEA/UK/CH + opt-in   → granted here          (consented measurement)
+//   EEA/UK/CH + reject   → stays denied by default (compliant)
+//   rest of world        → stays granted by default (GA4 un-gated, per the
+//                          2026-07-22 business decision)
+// Do NOT add `analytics_storage: "denied"` to this payload — outside the EEA it
+// would newly gate analytics, and inside it the default already covers us.
 const updateConsentMode = (c: ConsentCategories): void => {
   const w = window as Window & { gtag?: (...args: unknown[]) => void };
   w.gtag?.("consent", "update", {
-    analytics_storage: "granted",
+    ...(c.performance ? { analytics_storage: "granted" } : {}),
     ad_storage: granted(c.targeting),
     ad_user_data: granted(c.targeting),
     ad_personalization: granted(c.targeting),

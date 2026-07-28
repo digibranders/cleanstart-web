@@ -10,6 +10,8 @@
  * simpler `fetch` variant for surfaces that don't expose progress UI.
  */
 
+import { encodeMediaContextHint } from '../../../lib/media-context-hint';
+
 /**
  * Coerce a Media doc id into the shape Payload's stock validators
  * expect. Postgres uses numeric auto-increment ids; if the id arrives
@@ -100,9 +102,8 @@ export const uploadMediaFile = async (
   // clipboard's filename (`image001.png`, `pasted-...`) and alt
   // are junk. See lib/media-filename.ts#pickSlugSource.
   const headers: Record<string, string> = { Accept: 'application/json' };
-  if (options.contextHint && options.contextHint.trim().length > 0) {
-    headers['x-media-context-hint'] = options.contextHint.trim();
-  }
+  const encodedHint = encodeMediaContextHint(options.contextHint);
+  if (encodedHint) headers['x-media-context-hint'] = encodedHint;
 
   try {
     const res = await fetch('/api/media', {
@@ -175,9 +176,8 @@ export const ingestMediaFromUrl = async (
     'content-type': 'application/json',
     Accept: 'application/json',
   };
-  if (options.contextHint && options.contextHint.trim().length > 0) {
-    headers['x-media-context-hint'] = options.contextHint.trim();
-  }
+  const encodedHint = encodeMediaContextHint(options.contextHint);
+  if (encodedHint) headers['x-media-context-hint'] = encodedHint;
   try {
     const res = await fetch('/api/media-ingest-url', {
       method: 'POST',

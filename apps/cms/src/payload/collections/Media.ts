@@ -6,6 +6,7 @@ import { ValidationError } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { humaniseFilename } from '../lib/humanise-filename';
+import { decodeMediaContextHint } from '../lib/media-context-hint';
 import {
   buildMediaFilename,
   canonicalExtensionForMime,
@@ -274,9 +275,11 @@ export const Media: CollectionConfig = {
         // context-hint` request header so the R2 key carries page
         // provenance: `blog-getting-started-with-sbom-inline-{hash}.webp`
         // instead of `image001-{hash}.webp` × N.
+        // Percent-encoded on the wire — the raw title can carry
+        // characters HTTP headers cannot (see lib/media-context-hint.ts).
         const contextHint =
           typeof req.headers?.get === 'function'
-            ? (req.headers.get('x-media-context-hint') ?? '').trim()
+            ? decodeMediaContextHint(req.headers.get('x-media-context-hint'))
             : '';
         const slugSource = pickSlugSource({
           alt: incomingAlt,

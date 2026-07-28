@@ -9,8 +9,9 @@ import { trackPageView } from "@/lib/analytics/track";
  * Emits a GA4 `page_view` on every client-side navigation.
  *
  * The initial page load is covered by `gtag('config', …)`'s own page_view in
- * <Ga4Script/> (kept there so it rides the gtag queue and can never race the
- * config call), so the first effect run only records the starting URL. Every
+ * the head bootstrap (<Ga4HeadScript/>, kept there so it rides the gtag queue
+ * and can never race the loader), so the first effect run only records the
+ * starting URL — it does not emit. Every
  * later pathname/search-params change fires a manual page_view with the
  * post-commit document.title — this replaces GA4 Enhanced Measurement's
  * "history events" tracking, which fires before Next.js swaps the <title> and
