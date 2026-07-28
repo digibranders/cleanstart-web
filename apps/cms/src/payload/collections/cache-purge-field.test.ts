@@ -5,6 +5,7 @@ import { PURGEABLE_COLLECTIONS } from '../lib/web-pages';
 import { Authors } from './Authors';
 import { Blogs } from './Blogs';
 import { CaseStudies } from './CaseStudies';
+import { EmailSignatures } from './EmailSignatures';
 import { Events } from './Events';
 import { Guides } from './Guides';
 import { Jobs } from './Jobs';
@@ -28,6 +29,7 @@ const COLLECTIONS: CollectionConfig[] = [
   CaseStudies,
   Webinars,
   PodcastEpisodes,
+  EmailSignatures,
 ];
 
 const PURGE_BUTTON_PATH = '@/payload/admin/components/cache/PurgePageButton.tsx#PurgePageButton';

@@ -1,0 +1,84 @@
+{
+  "slug": "emailSignatures",
+  "versions": {
+    "drafts": false
+  },
+  "timestamps": true,
+  "fields": [
+    {
+      "type": "text",
+      "name": "name",
+      "required": true
+    },
+    {
+      "type": "text",
+      "name": "slug",
+      "required": true,
+      "unique": true
+    },
+    {
+      "type": "text",
+      "name": "jobTitle",
+      "required": true
+    },
+    {
+      "type": "email",
+      "name": "email",
+      "required": true
+    },
+    {
+      "type": "text",
+      "name": "phoneE164",
+      "required": true
+    },
+    {
+      "type": "text",
+      "name": "phoneDisplay"
+    },
+    {
+      "type": "relationship",
+      "name": "template",
+      "required": true,
+      "relationTo": "signatureTemplates"
+    },
+    {
+      "type": "select",
+      "name": "group",
+      "required": true,
+      "options": [
+        {
+          "value": "Executive Leadership"
+        },
+        {
+          "value": "Sales & Regional Leadership"
+        },
+        {
+          "value": "Marketing & Communications"
+        },
+        {
+          "value": "HR & People Operations"
+        },
+        {
+          "value": "Account Management & Sales Operations"
+        },
+        {
+          "value": "Engineering & Technical Solutions"
+        }
+      ]
+    },
+    {
+      "type": "number",
+      "name": "sortOrder"
+    },
+    {
+      "type": "checkbox",
+      "name": "active"
+    }
+  ],
+  "hooks": {
+    "beforeChange": 0,
+    "afterChange": 1,
+    "beforeValidate": 0,
+    "afterDelete": 1
+  }
+}

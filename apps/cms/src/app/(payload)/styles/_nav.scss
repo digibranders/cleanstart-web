@@ -23,6 +23,7 @@
 //   Content       — what editors publish every day (articles lead; Media here)
 //   Taxonomies    — categories the content references (assigned while authoring)
 //   Marketing     — leads inbox + forms (checked frequently by marketing/SEO)
+//   Brand         — email signatures + their templates/assets (occasional)
 //   SEO           — SEO defaults + redirects + broken-link reports (SEO toolkit)
 //   Globals       — site-wide config + nav chrome (set-and-forget, periodic)
 //   Recruiting    — jobs intake: applications, resumes (HR-only)
@@ -44,10 +45,11 @@
   &.Content    { order: 1; }
   &.Taxonomies { order: 2; }
   &.Marketing  { order: 3; }
-  &.SEO        { order: 4; }
-  &.Globals    { order: 5; }
-  &.Recruiting { order: 6; }
-  &.System     { order: 7; }
+  &.Brand      { order: 4; }
+  &.SEO        { order: 5; }
+  &.Globals    { order: 6; }
+  &.Recruiting { order: 7; }
+  &.System     { order: 8; }
 }
 .cs-user-menu { order: 100; }
 

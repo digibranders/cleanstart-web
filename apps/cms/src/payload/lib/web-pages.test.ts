@@ -21,10 +21,11 @@ describe('isPurgeableCollection', () => {
       'case-studies',
       'webinars',
       'podcastEpisodes',
+      'emailSignatures',
     ]) {
       expect(isPurgeableCollection(c)).toBe(true);
     }
-    expect(Object.keys(PURGEABLE_COLLECTIONS)).toHaveLength(12);
+    expect(Object.keys(PURGEABLE_COLLECTIONS)).toHaveLength(13);
   });
 
   it('excludes collections with no live web route', () => {

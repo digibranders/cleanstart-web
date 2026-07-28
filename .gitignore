@@ -94,3 +94,9 @@ tmp/
 /CleanStart-Website-Platform-Capabilities.xlsx
 # Payload types-gen backups (created transiently by scripts/generate-types.ts)
 *.types-gen.bak
+
+# Standalone email-signature repo (github.com/digibranders/cleanstart-email-signatures).
+# Kept checked out here as the ETL source for scripts/seed-email-signatures.ts, but
+# it has its own git history — committing it would embed a gitlink that breaks
+# fresh clones, and the legacy HTML carries every employee's direct-dial number.
+/cleanstart-email-signatures/

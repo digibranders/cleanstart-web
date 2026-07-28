@@ -10,7 +10,15 @@ const APP_DIR = path.resolve(
   '../../../../web/src/app',
 );
 
-/** Collect every route URL-pattern that has a page.tsx, stripping (groups). */
+/**
+ * Collect every route URL-pattern, stripping (groups).
+ *
+ * A segment counts as a route if it has a `page.tsx` OR a `route.ts` — the
+ * latter is a Route Handler, which serves a real URL just like a page. The
+ * email-signature detail route is a handler on purpose: it emits a bare HTML
+ * document so the whole `<body>` is the signature and nothing else, which a
+ * page inheriting the site layout could not do.
+ */
 const collectRoutePatterns = (dir: string, urlSegments: string[], out: Set<string>): void => {
   for (const entry of readdirSync(dir)) {
     const full = path.join(dir, entry);
@@ -20,7 +28,9 @@ const collectRoutePatterns = (dir: string, urlSegments: string[], out: Set<strin
       continue;
     }
     const next = [...urlSegments, entry];
-    if (existsSync(path.join(full, 'page.tsx'))) out.add(`/${next.join('/')}`);
+    if (existsSync(path.join(full, 'page.tsx')) || existsSync(path.join(full, 'route.ts'))) {
+      out.add(`/${next.join('/')}`);
+    }
     collectRoutePatterns(full, next, out);
   }
 };

@@ -1,0 +1,43 @@
+{
+  "slug": "signatureTemplates",
+  "versions": {
+    "drafts": true
+  },
+  "timestamps": true,
+  "fields": [
+    {
+      "type": "text",
+      "name": "name",
+      "required": true
+    },
+    {
+      "type": "text",
+      "name": "slug",
+      "required": true,
+      "unique": true
+    },
+    {
+      "type": "code",
+      "name": "html",
+      "required": true
+    },
+    {
+      "type": "ui",
+      "name": "_preview"
+    },
+    {
+      "type": "checkbox",
+      "name": "isDefault"
+    },
+    {
+      "type": "textarea",
+      "name": "notes"
+    }
+  ],
+  "hooks": {
+    "beforeChange": 0,
+    "afterChange": 1,
+    "beforeValidate": 0,
+    "afterDelete": 0
+  }
+}
