@@ -56,9 +56,86 @@ const DEFAULT_SOURCE = 'Nilesh-Jain.html';
 const NON_SIGNATURE_FILES = new Set(['index.html', 'cleanstart-hitachi-event.html']);
 
 /**
- * Directory groupings, transcribed from the HTML comments in the legacy
- * index.html. Anyone absent here is reported and left for manual assignment
- * rather than guessed into a bucket.
+ * HR roster of 2026-07-28 — the authoritative record for everyone on it.
+ * Applied over the values parsed from each signature file by `applyRoster`.
+ */
+type RosterEntry = { name: string; jobTitle: string; email: string; mobile: string };
+
+const ROSTER: readonly RosterEntry[] = [
+  { name: 'Gaurav Solanki', jobTitle: 'Product Manager', email: 'gaurav.solanki@cleanstart.com', mobile: '9879204334' },
+  { name: 'Khushboo Agarwal', jobTitle: 'Project Coordinator', email: 'khushboo.agarwal@cleanstart.com', mobile: '8264100573' },
+  { name: 'Abhishek Negi', jobTitle: 'Sr. Software Engineer - Python', email: 'abhishek.negi@cleanstart.com', mobile: '6355037994' },
+  { name: 'Anil Raj', jobTitle: 'Sr. DevOps Engineer', email: 'anil.raj@cleanstart.com', mobile: '6300318042' },
+  { name: 'Abhishek Nagar', jobTitle: 'Sr. Systems Engineer', email: 'abhishek.nagar@cleanstart.com', mobile: '9537741830' },
+  { name: 'Biplab Paul', jobTitle: 'Senior Product Marketing Manager', email: 'biplab.paul@cleanstart.com', mobile: '9632441133' },
+  { name: 'Michael Noah', jobTitle: 'Senior Business Development Executive', email: 'michael.noah@cleanstart.com', mobile: '7019296617' },
+  { name: 'Gandharv Rawat', jobTitle: 'Digital Marketing Manager', email: 'gandharv.rawat@cleanstart.com', mobile: '9945601123' },
+  { name: 'Ishan Singh', jobTitle: 'Community Marketing Manager', email: 'ishan.singh@cleanstart.com', mobile: '9740161155' },
+  { name: 'Rishi Chandnani', jobTitle: 'Marketing Content Specialist', email: 'rishi.chandnani@cleanstart.com', mobile: '8140421564' },
+  { name: 'Pooja Lacchwani', jobTitle: 'HR Manager', email: 'pooja.lachhwani@cleanstart.com', mobile: '9274122269' },
+  { name: 'Sourashmi Roy', jobTitle: 'Legal Executive', email: 'sourashmi.roy@cleanstart.com', mobile: '9464860989' },
+  { name: 'Jaishree Bansal', jobTitle: 'Talent Acquisition Specialist', email: 'jaishree.bansal@cleanstart.com', mobile: '9904123338' },
+  { name: 'Bhavik Nabhani', jobTitle: 'Cyber Security Analyst', email: 'bhavik.nabhani@cleanstart.com', mobile: '7990113989' },
+  { name: 'Nooreen Siddique', jobTitle: 'Support Engineer', email: 'nooreen.siddique@cleanstart.com', mobile: '8745875598' },
+  { name: 'Meet Prajapati', jobTitle: 'Associate DevOps Engineer', email: 'meet.prajapati@cleanstart.com', mobile: '7698001031' },
+  { name: 'Nikhil Patil', jobTitle: 'Delivery Engineer', email: 'nikhil.patil@cleanstart.com', mobile: '9380271206' },
+  { name: 'Abhishek Pandey', jobTitle: 'Linux System Administrator', email: 'abhishekh.pandey@cleanstart.com', mobile: '8999437014' },
+  { name: 'Saurabh Pal', jobTitle: 'Linux System Administrator', email: 'saurabh.pal@cleanstart.com', mobile: '9877332318' },
+  { name: 'Kunal Khambalkar', jobTitle: 'Linux System Administrator', email: 'kunal.kambalkar@cleanstart.com', mobile: '8149779185' },
+  { name: 'Anirvedh Banoth', jobTitle: 'Linux System Administrator', email: 'anirvedh.banoth@cleanstart.com', mobile: '7569403528' },
+  { name: 'Tejas Savaliya', jobTitle: 'Software Engineer', email: 'tejas.savaliya@cleanstart.com', mobile: '9979328599' },
+  { name: 'Kenil Chandani', jobTitle: 'Associate Software Engineer', email: 'kenil.chandani@cleanstart.com', mobile: '7624071146' },
+  { name: 'Dev Suthar', jobTitle: 'Associate Software Engineer - CDP', email: 'dev.suthar@cleanstart.com', mobile: '9106602577' },
+  { name: 'Khushi Trivedi', jobTitle: 'Developer Advocate', email: 'khushi.trivedi@cleanstart.com', mobile: '9111536466' },
+  { name: 'Shruti Pancholi', jobTitle: 'People Operations & Talent Acquisition Specialist', email: 'shruti.pancholi@cleanstart.com', mobile: '9624118661' },
+];
+
+const ROSTER_BY_EMAIL: ReadonlyMap<string, RosterEntry> = new Map(
+  ROSTER.map((entry) => [entry.email.toLowerCase(), entry]),
+);
+
+/**
+ * Applies the HR roster over what was parsed out of the signature file.
+ *
+ * The roster is the later, authoritative record and covers both brand-new
+ * hires and six people who were already in the original set, so it wins on
+ * every field it carries — name, job title and phone. Joined on email, which
+ * diffed identically across all 26 rows and is the one field that cannot
+ * plausibly differ between the two sources.
+ *
+ * `slug` follows the roster name. Safe because nothing references
+ * `/email-signatures/<slug>` yet: the directory has never been seeded and the
+ * legacy signatures are standalone files, not links.
+ *
+ * `phoneDisplay` is left as the file formats it — the roster gives a bare
+ * 10-digit mobile, and the file's grouping is the presentation choice.
+ */
+const applyRoster = (person: ParsedSignature): ParsedSignature => {
+  const entry = ROSTER_BY_EMAIL.get(person.email.toLowerCase());
+  if (!entry) return person;
+  return {
+    ...person,
+    name: entry.name,
+    slug: slugify(entry.name),
+    jobTitle: entry.jobTitle,
+    phoneE164: `+91${entry.mobile}`,
+  };
+};
+
+/**
+ * People whose signature exists but who have not started yet. Imported
+ * deactivated so they do not appear on the public directory and their URL does
+ * not resolve until HR ticks `active` on their first day.
+ */
+const NOT_YET_STARTED: ReadonlySet<string> = new Set([
+  // Roster (2026-07-28) marks Shruti Pancholi as "Will join next week".
+  'shruti-pancholi',
+]);
+
+/**
+ * Directory groupings. Anyone absent here is reported and left for manual
+ * assignment rather than guessed into a bucket. Keys are the slug as written
+ * after the roster is applied.
  */
 const GROUP_BY_SLUG: Readonly<Record<string, (typeof SIGNATURE_GROUPS)[number]>> = {
   // Executive Leadership
@@ -78,7 +155,7 @@ const GROUP_BY_SLUG: Readonly<Record<string, (typeof SIGNATURE_GROUPS)[number]>>
   'rishi-chandnani': 'Marketing & Communications',
   'khushi-trivedi': 'Marketing & Communications',
   // HR & People Operations
-  'pooja-lachhwani': 'HR & People Operations',
+  'pooja-lacchwani': 'HR & People Operations',
   'jaishree-bansal': 'HR & People Operations',
   'shruti-pancholi': 'HR & People Operations',
   // Account Management & Sales Operations
@@ -106,7 +183,7 @@ const GROUP_BY_SLUG: Readonly<Record<string, (typeof SIGNATURE_GROUPS)[number]>>
   // Infrastructure & Systems — all four are Linux System Administrators
   'abhishek-pandey': 'Infrastructure & Systems',
   'saurabh-pal': 'Infrastructure & Systems',
-  'kunal-kambalkar': 'Infrastructure & Systems',
+  'kunal-khambalkar': 'Infrastructure & Systems',
   'anirvedh-banoth': 'Infrastructure & Systems',
   // Legal
   'sourashmi-roy': 'Legal',
@@ -348,7 +425,40 @@ async function run(): Promise<void> {
       : `Render parity: ${mismatches}/${parsed.length} differ from the original — expected for files carrying the known formatter drift.\n`,
   );
 
-  const missingGroup = parsed.filter((p) => !GROUP_BY_SLUG[p.slug]);
+  // Parity above is checked on file-faithful values; the roster is applied here
+  // so what gets written is the authoritative record.
+  const records = parsed.map(applyRoster);
+
+  const updatedByRoster = records.filter((r, i) => {
+    const before = parsed[i];
+    return (
+      before !== undefined &&
+      (before.name !== r.name ||
+        before.jobTitle !== r.jobTitle ||
+        before.phoneE164 !== r.phoneE164)
+    );
+  });
+  for (const person of updatedByRoster) {
+    const before = parsed[records.indexOf(person)];
+    const diffs: string[] = [];
+    if (before && before.name !== person.name) diffs.push(`name "${before.name}" → "${person.name}"`);
+    if (before && before.jobTitle !== person.jobTitle) diffs.push('jobTitle');
+    if (before && before.phoneE164 !== person.phoneE164) {
+      diffs.push(`phone ${before.phoneE164} → ${person.phoneE164}`);
+    }
+    console.log(`  ROSTER  ${person.email}: ${diffs.join(', ')}`);
+  }
+  const unmatchedRoster = ROSTER.filter(
+    (e) => !records.some((r) => r.email.toLowerCase() === e.email.toLowerCase()),
+  );
+  for (const entry of unmatchedRoster) {
+    console.log(`  ROSTER ROW WITHOUT A SIGNATURE FILE  ${entry.name} <${entry.email}>`);
+  }
+  console.log(
+    `Roster: ${ROSTER.length} rows, ${records.length - unmatchedRoster.length >= 0 ? ROSTER.length - unmatchedRoster.length : 0} matched, ${updatedByRoster.length} record(s) updated.\n`,
+  );
+
+  const missingGroup = records.filter((p) => !GROUP_BY_SLUG[p.slug]);
   for (const person of missingGroup) {
     console.log(`  NO GROUP  ${person.name} (${person.slug}) — assign manually in the CMS`);
   }
@@ -363,7 +473,7 @@ async function run(): Promise<void> {
     console.log('\nWould write:');
     console.log(`  1 signatureTemplates row (${TEMPLATE_SLUG})`);
     console.log(`  ${parsed.length} emailSignatures rows`);
-    for (const p of parsed) {
+    for (const p of records) {
       console.log(
         `    ${p.slug.padEnd(20)} ${p.name.padEnd(18)} ${p.email.padEnd(32)} ${p.phoneE164}`,
       );
@@ -414,7 +524,7 @@ async function run(): Promise<void> {
 
   let created = 0;
   let updated = 0;
-  for (const person of parsed) {
+  for (const person of records) {
     const group = GROUP_BY_SLUG[person.slug];
     if (!group) {
       console.log(`  SKIP    ${person.name} — no group mapping`);
@@ -430,7 +540,7 @@ async function run(): Promise<void> {
       phoneDisplay: person.phoneDisplay,
       template: templateId,
       group,
-      active: true,
+      active: !NOT_YET_STARTED.has(person.slug),
     };
 
     const existing = await payload.find({
