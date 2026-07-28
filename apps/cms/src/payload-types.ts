@@ -8112,7 +8112,20 @@ export interface EmailSignature {
     | 'Marketing & Communications'
     | 'HR & People Operations'
     | 'Account Management & Sales Operations'
-    | 'Engineering & Technical Solutions';
+    | 'Engineering & Technical Solutions'
+    | 'Product & Program Management'
+    | 'Infrastructure & Systems'
+    | 'Legal'
+    | 'Finance & Accounts'
+    | 'Customer Success'
+    | 'Partnerships & Alliances'
+    | 'Operations'
+    | 'Data & Analytics'
+    | 'Design'
+    | 'IT & Security'
+    | 'Quality Assurance'
+    | 'Training & Enablement'
+    | 'Administration';
   /**
    * Order within the group — lower first. Ties fall back to name.
    */

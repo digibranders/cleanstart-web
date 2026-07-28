@@ -61,26 +61,55 @@ const NON_SIGNATURE_FILES = new Set(['index.html', 'cleanstart-hitachi-event.htm
  * rather than guessed into a bucket.
  */
 const GROUP_BY_SLUG: Readonly<Record<string, (typeof SIGNATURE_GROUPS)[number]>> = {
+  // Executive Leadership
   'nilesh-jain': 'Executive Leadership',
   'biswajit-de': 'Executive Leadership',
   'vijendra-katiyar': 'Executive Leadership',
+  // Sales & Regional Leadership
   'adrian-lee': 'Sales & Regional Leadership',
   'anil-dhoot': 'Sales & Regional Leadership',
   'arjun-d-j': 'Sales & Regional Leadership',
+  'michael-noah': 'Sales & Regional Leadership',
+  // Marketing & Communications
   'biplab-paul': 'Marketing & Communications',
   'gandharv-rawat': 'Marketing & Communications',
   'ishan-singh': 'Marketing & Communications',
   'pallavi-puri': 'Marketing & Communications',
+  'rishi-chandnani': 'Marketing & Communications',
+  'khushi-trivedi': 'Marketing & Communications',
+  // HR & People Operations
   'pooja-lachhwani': 'HR & People Operations',
   'jaishree-bansal': 'HR & People Operations',
+  'shruti-pancholi': 'HR & People Operations',
+  // Account Management & Sales Operations
   'sidhika-mirajkar': 'Account Management & Sales Operations',
   'uttam-kaul': 'Account Management & Sales Operations',
   'mark-tharakan': 'Account Management & Sales Operations',
   'nafisul-zaman': 'Account Management & Sales Operations',
   'mrinaal-duggal': 'Account Management & Sales Operations',
   'monali-lalwani': 'Account Management & Sales Operations',
+  // Engineering & Technical Solutions
   'dhanush-vm': 'Engineering & Technical Solutions',
   'abhishek-negi': 'Engineering & Technical Solutions',
+  'anil-raj': 'Engineering & Technical Solutions',
+  'abhishek-nagar': 'Engineering & Technical Solutions',
+  'meet-prajapati': 'Engineering & Technical Solutions',
+  'tejas-savaliya': 'Engineering & Technical Solutions',
+  'kenil-chandani': 'Engineering & Technical Solutions',
+  'dev-suthar': 'Engineering & Technical Solutions',
+  'nikhil-patil': 'Engineering & Technical Solutions',
+  'nooreen-siddique': 'Engineering & Technical Solutions',
+  'bhavik-nabhani': 'Engineering & Technical Solutions',
+  // Product & Program Management
+  'gaurav-solanki': 'Product & Program Management',
+  'khushboo-agarwal': 'Product & Program Management',
+  // Infrastructure & Systems — all four are Linux System Administrators
+  'abhishek-pandey': 'Infrastructure & Systems',
+  'saurabh-pal': 'Infrastructure & Systems',
+  'kunal-kambalkar': 'Infrastructure & Systems',
+  'anirvedh-banoth': 'Infrastructure & Systems',
+  // Legal
+  'sourashmi-roy': 'Legal',
 };
 
 type ParsedSignature = {

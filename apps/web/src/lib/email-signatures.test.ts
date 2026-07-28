@@ -69,17 +69,15 @@ describe("groupSignatures", () => {
     expect(groupSignatures([])).toEqual([]);
   });
 
-  it("covers every group the CMS collection offers", () => {
-    // Guards against the two lists drifting apart — a group present in the CMS
-    // but missing here would render in the unknown-group tail instead of its
-    // intended position.
-    expect(SIGNATURE_GROUP_ORDER).toEqual([
-      "Executive Leadership",
-      "Sales & Regional Leadership",
-      "Marketing & Communications",
-      "HR & People Operations",
-      "Account Management & Sales Operations",
-      "Engineering & Technical Solutions",
-    ]);
+  it("lists no duplicate groups", () => {
+    // Set equality against the CMS enum is enforced from the other side, by
+    // `apps/cms/.../email-signature-groups.routes.test.ts`, which reads this
+    // file. Restating the names here could only ever agree with itself.
+    expect(new Set(SIGNATURE_GROUP_ORDER).size).toBe(SIGNATURE_GROUP_ORDER.length);
+  });
+
+  it("leads with the groups actually in use, so the page opens on leadership", () => {
+    expect(SIGNATURE_GROUP_ORDER[0]).toBe("Executive Leadership");
+    expect(SIGNATURE_GROUP_ORDER.indexOf("Sales & Regional Leadership")).toBe(1);
   });
 });

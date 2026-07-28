@@ -26,12 +26,31 @@ import { slugField } from '../fields/slug';
  * signature directory is organised for browsing.
  */
 export const SIGNATURE_GROUPS = [
+  // In use today.
   'Executive Leadership',
   'Sales & Regional Leadership',
   'Marketing & Communications',
   'HR & People Operations',
   'Account Management & Sales Operations',
   'Engineering & Technical Solutions',
+  'Product & Program Management',
+  'Infrastructure & Systems',
+  'Legal',
+  // Reserved headroom. Postgres cannot remove an enum label, and adding one
+  // needs a migration + deploy — so the common remaining departments are
+  // declared up front and simply never render until somebody is assigned to
+  // them (the directory drops empty groups). Cheap insurance against a
+  // one-line change blocking an org update.
+  'Finance & Accounts',
+  'Customer Success',
+  'Partnerships & Alliances',
+  'Operations',
+  'Data & Analytics',
+  'Design',
+  'IT & Security',
+  'Quality Assurance',
+  'Training & Enablement',
+  'Administration',
 ] as const;
 
 export const EmailSignatures: CollectionConfig = {

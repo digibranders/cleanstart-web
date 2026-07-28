@@ -21,6 +21,19 @@ export const SIGNATURE_GROUP_ORDER = [
   "HR & People Operations",
   "Account Management & Sales Operations",
   "Engineering & Technical Solutions",
+  "Product & Program Management",
+  "Infrastructure & Systems",
+  "Finance & Accounts",
+  "Customer Success",
+  "Partnerships & Alliances",
+  "Operations",
+  "Data & Analytics",
+  "Design",
+  "IT & Security",
+  "Quality Assurance",
+  "Training & Enablement",
+  "Administration",
+  "Legal",
 ] as const;
 
 export interface EmailSignatureSummary {

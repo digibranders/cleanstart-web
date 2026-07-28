@@ -52,6 +52,7 @@ import * as migration_20260709_120000_add_media_folder_case_study from './202607
 import * as migration_20260715_120000_add_leads_attribution from './20260715_120000_add_leads_attribution';
 import * as migration_20260715_130000_add_hr_events_roles from './20260715_130000_add_hr_events_roles';
 import * as migration_20260728_120000_add_email_signatures from './20260728_120000_add_email_signatures';
+import * as migration_20260728_180000_add_email_signature_groups from './20260728_180000_add_email_signature_groups';
 
 export const migrations = [
   {
@@ -298,5 +299,10 @@ export const migrations = [
     up: migration_20260728_120000_add_email_signatures.up,
     down: migration_20260728_120000_add_email_signatures.down,
     name: '20260728_120000_add_email_signatures',
+  },
+  {
+    up: migration_20260728_180000_add_email_signature_groups.up,
+    down: migration_20260728_180000_add_email_signature_groups.down,
+    name: '20260728_180000_add_email_signature_groups',
   },
 ];
