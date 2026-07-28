@@ -83,6 +83,14 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
   const isPreviewPath =
     nextUrl.pathname.startsWith("/preview/") ||
     nextUrl.pathname.startsWith("/api/preview/");
+  // The bare email-signature documents render admin-authored HTML, so their
+  // route handler ships a deliberately strict, script-free CSP and a noindex
+  // X-Robots-Tag. Next writes middleware headers first and only *adds* a
+  // handler header when the name is not already set, so anything we set here
+  // silently wins over the handler. Skip the two colliding headers and let the
+  // route own them. Matches only the `[slug]` documents, not the directory
+  // index at `/email-signatures`, which is an ordinary page.
+  const ownsSecurityHeaders = nextUrl.pathname.startsWith("/email-signatures/");
 
   // Redirects run before header work to avoid building headers for a discarded response.
 
@@ -184,7 +192,9 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
       ? "Content-Security-Policy"
       : "Content-Security-Policy-Report-Only";
 
-  response.headers.set(cspHeaderName, csp);
+  if (!ownsSecurityHeaders) {
+    response.headers.set(cspHeaderName, csp);
+  }
   response.headers.set("Reporting-Endpoints", REPORTING_ENDPOINTS);
 
   // HSTS only in production. In dev, localhost is served over HTTP and
@@ -222,7 +232,7 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
 
   if (isDraftMode || isPreviewPath || !isIndexingAllowed(host)) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
-  } else {
+  } else if (!ownsSecurityHeaders) {
     response.headers.set("X-Robots-Tag", "max-image-preview:large, max-snippet:-1");
   }
 

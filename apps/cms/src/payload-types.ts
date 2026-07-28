@@ -96,6 +96,9 @@ export interface Config {
     forms: Form;
     'partner-applications': PartnerApplication;
     'deal-registrations': DealRegistration;
+    emailSignatures: EmailSignature;
+    signatureTemplates: SignatureTemplate;
+    emailAssets: EmailAsset;
     redirects: Redirect;
     brokenLinks: BrokenLink;
     pageRegistry: PageRegistry;
@@ -150,6 +153,9 @@ export interface Config {
     forms: FormsSelect<false> | FormsSelect<true>;
     'partner-applications': PartnerApplicationsSelect<false> | PartnerApplicationsSelect<true>;
     'deal-registrations': DealRegistrationsSelect<false> | DealRegistrationsSelect<true>;
+    emailSignatures: EmailSignaturesSelect<false> | EmailSignaturesSelect<true>;
+    signatureTemplates: SignatureTemplatesSelect<false> | SignatureTemplatesSelect<true>;
+    emailAssets: EmailAssetsSelect<false> | EmailAssetsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     brokenLinks: BrokenLinksSelect<false> | BrokenLinksSelect<true>;
     pageRegistry: PageRegistrySelect<false> | PageRegistrySelect<true>;
@@ -8066,6 +8072,121 @@ export interface DealRegistration {
   createdAt: string;
 }
 /**
+ * Employee email signatures. The directory lives at /email-signatures on the website.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "emailSignatures".
+ */
+export interface EmailSignature {
+  id: number;
+  /**
+   * Full name as it should appear in the signature.
+   */
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  /**
+   * Exactly as it should read, e.g. "Co-founder & CEO".
+   */
+  jobTitle: string;
+  email: string;
+  /**
+   * International format, digits only after the +, e.g. +6596847785. Used for the tel: link so the number is dialable from any country.
+   */
+  phoneE164: string;
+  /**
+   * How the number reads in the signature, e.g. "+65-96847785". Leave blank to show the E.164 value.
+   */
+  phoneDisplay?: string | null;
+  /**
+   * Which markup to render this signature with. Defaults to the template marked "Default".
+   */
+  template: number | SignatureTemplate;
+  /**
+   * Section heading this person appears under in the directory.
+   */
+  group:
+    | 'Executive Leadership'
+    | 'Sales & Regional Leadership'
+    | 'Marketing & Communications'
+    | 'HR & People Operations'
+    | 'Account Management & Sales Operations'
+    | 'Engineering & Technical Solutions';
+  /**
+   * Order within the group — lower first. Ties fall back to name.
+   */
+  sortOrder?: number | null;
+  /**
+   * Uncheck when someone leaves: the directory hides them and their signature URL stops resolving. Preferred over deleting, which loses the record.
+   */
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Email-signature markup. Use {{name}}, {{jobTitle}}, {{email}}, {{phone}} and {{phoneHref}} as placeholders.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "signatureTemplates".
+ */
+export interface SignatureTemplate {
+  id: number;
+  /**
+   * Editor-facing name, e.g. "CleanStart Standard 2026".
+   */
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  /**
+   * Table-based HTML with inline styles — the only markup Outlook renders reliably. Placeholders: {{name}}, {{jobTitle}}, {{email}}, {{phone}}, {{phoneHref}}. Reference images by absolute CDN URL (see Email Assets); relative paths do not resolve in a mail client.
+   */
+  html: string;
+  /**
+   * Pre-selected for new signatures. Setting this clears it on other templates.
+   */
+  isDefault?: boolean | null;
+  /**
+   * What this template is for, and anything a future editor should know.
+   */
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Images embedded in outbound email. PNG/JPEG/GIF only — Outlook does not render WebP or SVG. Filenames are permanent: they are referenced from signatures already installed in mail clients.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "emailAssets".
+ */
+export interface EmailAsset {
+  id: number;
+  /**
+   * Shown when the recipient blocks images — which most clients do by default. Describe the image, e.g. "CleanStart logo".
+   */
+  alt: string;
+  /**
+   * Where this asset is used, e.g. "Signature logo (rendered at 140px wide)".
+   */
+  usage?: string | null;
+  prefix?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
@@ -8961,6 +9082,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'deal-registrations';
         value: number | DealRegistration;
+      } | null)
+    | ({
+        relationTo: 'emailSignatures';
+        value: number | EmailSignature;
+      } | null)
+    | ({
+        relationTo: 'signatureTemplates';
+        value: number | SignatureTemplate;
+      } | null)
+    | ({
+        relationTo: 'emailAssets';
+        value: number | EmailAsset;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -12404,6 +12537,58 @@ export interface DealRegistrationsSelect<T extends boolean = true> {
   piiRedactedAt?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "emailSignatures_select".
+ */
+export interface EmailSignaturesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  jobTitle?: T;
+  email?: T;
+  phoneE164?: T;
+  phoneDisplay?: T;
+  template?: T;
+  group?: T;
+  sortOrder?: T;
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "signatureTemplates_select".
+ */
+export interface SignatureTemplatesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  html?: T;
+  isDefault?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "emailAssets_select".
+ */
+export interface EmailAssetsSelect<T extends boolean = true> {
+  alt?: T;
+  usage?: T;
+  prefix?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

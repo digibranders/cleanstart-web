@@ -33,6 +33,11 @@ docs/
 migrations/webflow-import/
 infra/
 
+# Standalone email-signature repo — ETL source only, never needed at runtime.
+# The Dockerfile does `COPY . .`, so without this its 5.6 MB of legacy HTML and
+# images enters the build context and busts the layer cache on every build.
+cleanstart-email-signatures/
+
 # Test files
 **/*.test.ts
 **/*.test.tsx

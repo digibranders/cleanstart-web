@@ -7,6 +7,9 @@ import { Authors } from './Authors';
 import { Blogs } from './Blogs';
 import { BrokenLinks } from './BrokenLinks';
 import { Categories } from './Categories';
+import { EmailAssets } from './EmailAssets';
+import { EmailSignatures } from './EmailSignatures';
+import { SignatureTemplates } from './SignatureTemplates';
 import { Events } from './Events';
 import { Forms } from './Forms';
 import { Guides } from './Guides';
@@ -94,6 +97,9 @@ const collections: { name: string; config: CollectionConfig }[] = [
   { name: 'Blogs', config: Blogs },
   { name: 'BrokenLinks', config: BrokenLinks },
   { name: 'Categories', config: Categories },
+  { name: 'EmailAssets', config: EmailAssets },
+  { name: 'EmailSignatures', config: EmailSignatures },
+  { name: 'SignatureTemplates', config: SignatureTemplates },
   { name: 'Events', config: Events },
   { name: 'Forms', config: Forms },
   { name: 'Guides', config: Guides },

@@ -16,6 +16,9 @@ import { BrokenLinks } from './payload/collections/BrokenLinks';
 import { CaseStudies } from './payload/collections/CaseStudies';
 import { PageRegistry } from './payload/collections/PageRegistry';
 import { Categories } from './payload/collections/Categories';
+import { EmailAssets, EMAIL_ASSET_PREFIX } from './payload/collections/EmailAssets';
+import { EmailSignatures } from './payload/collections/EmailSignatures';
+import { SignatureTemplates } from './payload/collections/SignatureTemplates';
 import { Events } from './payload/collections/Events';
 import { Forms } from './payload/collections/Forms';
 import { Guides } from './payload/collections/Guides';
@@ -196,6 +199,19 @@ const storagePlugins = r2EnvComplete()
             prefix:
               process.env.R2_RESUME_PREFIX ??
               (process.env.NODE_ENV === 'production' ? 'web/resumes' : 'dev/resumes'),
+          },
+          // Email assets keep their uploaded filename and a fixed prefix so
+          // the CDN URL embedded in already-sent mail never moves. Unlike
+          // `media` there is no per-doc prefix field — the value is constant
+          // per environment (see EMAIL_ASSET_PREFIX).
+          emailAssets: {
+            prefix: EMAIL_ASSET_PREFIX,
+            disablePayloadAccessControl: true,
+            generateFileURL: ({ filename, prefix }) => {
+              const publicBase = process.env.R2_PUBLIC_BASE ?? '';
+              const effectivePrefix = prefix || EMAIL_ASSET_PREFIX;
+              return `${publicBase}/${effectivePrefix}/${encodeURIComponent(filename)}`;
+            },
           },
         },
         bucket: requireEnv('R2_BUCKET'),
@@ -401,6 +417,12 @@ export default buildConfig({
     Forms,
     PartnerApplications,
     DealRegistrations,
+
+    // Brand — outbound email identity. Signatures are the daily object;
+    // Templates and Email Assets are set-and-forget infrastructure behind them.
+    EmailSignatures,
+    SignatureTemplates,
+    EmailAssets,
 
     // SEO — the SEO editor's toolkit. Redirects (every slug change) and
     // broken-link reports; SEO defaults global trails in the `globals`

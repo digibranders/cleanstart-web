@@ -1,0 +1,21 @@
+{
+  "slug": "emailAssets",
+  "timestamps": true,
+  "fields": [
+    {
+      "type": "text",
+      "name": "alt",
+      "required": true
+    },
+    {
+      "type": "text",
+      "name": "usage"
+    }
+  ],
+  "hooks": {
+    "beforeChange": 1,
+    "afterChange": 0,
+    "beforeValidate": 1,
+    "afterDelete": 0
+  }
+}

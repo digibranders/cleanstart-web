@@ -25,6 +25,14 @@ describe("buildRobotsTxt (indexable)", () => {
     expect(lines).toContain("Disallow: /api/preview/");
   });
 
+  it("disallows the internal email-signature directory inside the wildcard group", () => {
+    const wildcardIndex = lines.indexOf("User-Agent: *");
+    const signaturesIndex = lines.indexOf("Disallow: /email-signatures");
+    const nextGroupIndex = lines.indexOf("User-Agent: Bytespider");
+    expect(signaturesIndex).toBeGreaterThan(wildcardIndex);
+    expect(signaturesIndex).toBeLessThan(nextGroupIndex);
+  });
+
   it("disallows Next.js RSC prefetch query variants inside the wildcard group", () => {
     const wildcardIndex = lines.indexOf("User-Agent: *");
     const rscIndex = lines.indexOf("Disallow: /*_rsc=");

@@ -26,6 +26,12 @@ export const PURGEABLE_COLLECTIONS: Record<string, WebPage> = {
   'case-studies': { listingPath: '/case-studies' },
   webinars: { listingPath: '/webinars' },
   podcastEpisodes: { listingPath: '/podcast' },
+  // Offboarding is the load-bearing case: unchecking `active` must actually
+  // stop the signature URL resolving. Without an on-demand purge that waits out
+  // the web ISR window on top of the CMS API's Cloudflare TTL — hours, not
+  // minutes. The detail route is a Route Handler rather than a page; both serve
+  // a real URL, so it purges the same way.
+  emailSignatures: { detailPrefix: '/email-signatures', listingPath: '/email-signatures' },
 };
 
 export const isPurgeableCollection = (collection: string): boolean =>
