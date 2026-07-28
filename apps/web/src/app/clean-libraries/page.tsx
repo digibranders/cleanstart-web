@@ -7,10 +7,18 @@ import { LibrariesTrustGap } from "@/components/sections/clean-libraries/Librari
 import { LibrariesGovernance } from "@/components/sections/clean-libraries/LibrariesGovernance";
 import { LibrariesWorkflow } from "@/components/sections/clean-libraries/LibrariesWorkflow";
 import { LibrariesCTA } from "@/components/sections/clean-libraries/LibrariesCTA";
-import { buildPageMetadata } from "@/lib/seo/canonical";
-import { breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/jsonld";
+import { buildPageMetadata, SITE_URL } from "@/lib/seo/canonical";
+import {
+  breadcrumbSchema,
+  softwareApplicationSchema,
+  videoObjectSchema,
+} from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
 import { getPageGraph } from "@/lib/seo/compose-page";
+import {
+  CLEAN_LIBRARIES_VIDEO,
+  toIso8601Duration,
+} from "@/lib/clean-libraries-video";
 
 export const metadata = buildPageMetadata({
   title: "Clean Libraries: Verify Every Dependency Across Your Workflow",
@@ -35,6 +43,15 @@ export default async function CleanLibrariesPage(): Promise<React.ReactElement> 
       description:
         "Discover, validate, and govern every software dependency — including AI-introduced libraries — across the development lifecycle, with policy enforcement built into existing CI/CD and registries.",
       path: "/clean-libraries",
+    }),
+    videoObjectSchema({
+      name: CLEAN_LIBRARIES_VIDEO.title,
+      description: CLEAN_LIBRARIES_VIDEO.description,
+      contentUrl: `https://www.youtube.com/watch?v=${CLEAN_LIBRARIES_VIDEO.videoId}`,
+      embedUrl: `https://www.youtube-nocookie.com/embed/${CLEAN_LIBRARIES_VIDEO.videoId}`,
+      uploadDate: CLEAN_LIBRARIES_VIDEO.uploadDate,
+      thumbnailUrl: `${SITE_URL}${CLEAN_LIBRARIES_VIDEO.posterPath}`,
+      duration: toIso8601Duration(CLEAN_LIBRARIES_VIDEO.durationSeconds),
     }),
   ]);
   return (

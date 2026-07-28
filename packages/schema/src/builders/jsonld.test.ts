@@ -5,6 +5,7 @@ import {
   eventSchema,
   jobPostingSchema,
   organizationSchema,
+  videoObjectSchema,
 } from "./jsonld";
 
 // Builders read SITE_URL from NEXT_PUBLIC_SITE_URL with a fixed fallback.
@@ -42,6 +43,31 @@ describe("jsonld builders (INV-3 output guard)", () => {
     const ev = eventSchema({ title: "E", path: "/event/e", venue: "V", eventStatus: "cancelled" });
     expect(ev.eventStatus).toBe("https://schema.org/EventCancelled");
     expect(ev.eventAttendanceMode).toBe("https://schema.org/OfflineEventAttendanceMode");
+  });
+
+  it("videoObjectSchema resolves embedPath against our origin", () => {
+    const v = videoObjectSchema({
+      name: "Lesson",
+      contentUrl: "https://storage.googleapis.com/x.mp4",
+      embedPath: "/knowledge-hub/a",
+    });
+    expect(v.embedUrl).toBe(`${BASE}/knowledge-hub/a`);
+    expect("duration" in v).toBe(false);
+  });
+
+  it("videoObjectSchema prefers an absolute embedUrl over embedPath and carries duration", () => {
+    const v = videoObjectSchema({
+      name: "Clean Libraries",
+      contentUrl: "https://www.youtube.com/watch?v=abc",
+      embedUrl: "https://www.youtube-nocookie.com/embed/abc",
+      embedPath: "/clean-libraries",
+      duration: "PT2M39S",
+      uploadDate: "2026-07-24T02:56:59-07:00",
+      thumbnailUrl: `${BASE}/images/x.jpg`,
+    });
+    expect(v.embedUrl).toBe("https://www.youtube-nocookie.com/embed/abc");
+    expect(v.duration).toBe("PT2M39S");
+    expect(v.publisher).toEqual({ "@id": `${BASE}/#organization` });
   });
 
   it("jobPostingSchema requires title + description + hiringOrganization", () => {
