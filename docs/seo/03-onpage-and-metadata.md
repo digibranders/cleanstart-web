@@ -92,7 +92,7 @@ Evidence: all 57 head-captured routes (including the 13 legacy-redirect 404 chec
   - No two distinct-content pages share identical description text
   - Description reads as accurate even on a query where it might be shown verbatim
 - **Verify:** `jq -r '.pages[].head.description // empty' docs/seo/evidence/live-capture.json | sort | uniq -d`
-- **Reference:** `apps/web/src/lib/seo/canonical.ts:88` (description passthrough); `cms-seo.ts:25-34` (CMS `seo.description` field)
+- **Reference:** `apps/web/src/lib/seo/canonical.ts:130` (description passthrough — `canonical.ts:88` is `modifiedTime,`, an unrelated field, and is not the citation for this rule); `cms-seo.ts:25-34` (CMS `seo.description` field)
 - **Source:** [Tier 1] https://developers.google.com/search/docs/appearance/snippet
 - **Anti-patterns:** duplicate/templated descriptions across many pages; keyword-stuffed description text instead of natural sentences; relying on the description to influence ranking (it doesn't — only snippet display and, indirectly, CTR).
 - **CleanStart:** Partial
@@ -164,9 +164,9 @@ Evidence: verified live on the home page and a blog detail route: `twitter:card`
 - **Reference:** CLAUDE.md "Image rules" (project convention: `next/image` for content images with explicit dimensions, decorative SVGs get `aria-hidden`); `biome.json:33` (`recommended: true`, enabling Biome's `a11y` rule set, which includes an alt-text check) plus `apps/web/biome.json:9-13` (per-directory `a11y` overrides)
 - **Source:** [Tier 1] https://developers.google.com/search/docs/appearance/google-images
 - **Anti-patterns:** `alt="image"`, `alt="photo123.jpg"`, or omitted `alt` entirely; keyword-stuffed alt strings; omitted `alt=""` on decorative/spacer images (forces screen readers to announce the filename).
-- **CleanStart:** Unverified — spot-checked one route only, not a full-site audit
+- **CleanStart:** Partial
 
-Evidence: `/blogs/ai-broke-software-security-biggest-assumption` — 31 of 31 `<img>` elements carry an `alt` attribute — but this is one of ~39 route types, not a full-site audit. Biome's `a11y` recommended rule set is enabled (`biome.json:33`) and should catch missing `alt` attributes at lint time, but this pass did not independently re-run that lint gate to confirm zero violations; content quality (keyword-stuffing, accuracy) was not assessed at all.
+Evidence: `/blogs/ai-broke-software-security-biggest-assumption` — 31 of 31 `<img>` elements carry an `alt` attribute — but this is one of ~39 route types, not a full-site audit. Alt **presence** is CI-enforced, not merely spot-checked: root `biome.json:33` sets the linter's `"recommended": true`, which enables Biome's `a11y` rule set (including its `useAltText` check), and `apps/web/biome.json:9-13` overrides only three unrelated `a11y` rules (`noSvgWithoutTitle`, `useSemanticElements`, `useAnchorContent`) — it does not touch `useAltText`. `.github/workflows/web.yml` runs `biome lint src` on both `push` and `pull_request`, so a missing `alt` attribute fails CI, not just a local spot-check. What remains genuinely unverified in this pass is narrower than "presence": alt **quality** (descriptive vs. keyword-stuffed vs. filename-as-alt) has no automated check and was not assessed, and full-site coverage beyond the one sampled route was not re-run against the live site.
 
 ### META-10 — CMS `seo.*` overrides must reach every CMS-backed detail route through one shared resolver
 
