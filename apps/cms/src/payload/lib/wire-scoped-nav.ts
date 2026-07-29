@@ -13,12 +13,15 @@ import type { Role } from '../access/typed-user';
  * collection `access` block, which already denies writes on out-of-domain
  * collections to these roles (they stay on `isAdminOrEditor`).
  */
-export const CAREERS_COLLECTION_SLUGS = [
+export const HR_COLLECTION_SLUGS = [
   'jobs',
   'career-applications',
   'resumes',
   'departments',
   'jobLocations',
+  // Not a careers collection, but the signature roster is the staff roster:
+  // it changes on the same onboarding/offboarding events HR already owns.
+  'emailSignatures',
 ] as const;
 
 export const EVENTS_COLLECTION_SLUGS = [
@@ -30,7 +33,7 @@ export const EVENTS_COLLECTION_SLUGS = [
 
 /** Departmental role → the collection slugs that role is scoped to see. */
 const SCOPED_ROLE_COLLECTIONS = {
-  hr: CAREERS_COLLECTION_SLUGS,
+  hr: HR_COLLECTION_SLUGS,
   events: EVENTS_COLLECTION_SLUGS,
 } as const satisfies Record<string, readonly string[]>;
 
