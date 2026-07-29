@@ -77,7 +77,7 @@ Field rules enforced by the linter: heading must match `### PREFIX-NN — Title`
 
 Two authoring constraints follow directly from how the linter parses fields, and both are load-bearing — get either wrong and a rule field is silently truncated or corrupted, which is exactly the failure mode this schema gate exists to prevent:
 
-- **A field that wraps onto a second line must indent the continuation by two spaces.** The linter treats an indented line as a continuation of the field above it and folds it in; it treats an unindented line as the start of new prose and closes the field there, discarding whatever field content you intended to add. An unindented continuation is therefore a **lint error, by design** — not a silent truncation. If your `Why` or `Rule` text needs a second line, indent it two spaces, exactly as `Acceptance`'s sub-bullets are indented in the example above.
+- **A field that wraps onto a second line must indent the continuation.** The linter accepts any non-zero amount of leading whitespace on a continuation line — its check is simply "some leading whitespace, then content," not a specific column count — but this SOP's house convention, used in every example including the one above, is exactly two spaces; indent by two spaces unless you have a specific reason not to. The linter treats an indented line as a continuation of the field above it and folds it in; it treats an unindented line as the start of new prose and closes the field there, discarding whatever field content you intended to add. An unindented continuation is therefore a **lint error, by design** — not a silent truncation. If your `Why` or `Rule` text needs a second line, indent it two spaces, exactly as `Acceptance`'s sub-bullets are indented in the example above.
 - **`Verify` must be a single-line inline code span** — one backtick-delimited command (or command → expected-output pair) on the `- **Verify:**` line itself. It must never be an indented fenced code block. An indented fence placed inside a rule field does not render as a code block in this context — the linter's field parser folds each fenced line into the field text as literal backtick characters, corrupting the field. If a check genuinely needs more than one command (a multi-step curl sequence, a script that greps several headers), write that check as a named script under `scripts/seo-sop/` and have `Verify` reference it by path, e.g. `` `node scripts/seo-sop/check-hreflang-matrix.mjs` ``.
 
 ## 5. Severity model
@@ -118,9 +118,11 @@ Conformance verdicts (used in each rule's `CleanStart` field and in `91-cleansta
 
 **Core — always apply**
 
+Module 00 is listed first below for completeness, but it is this conventions document, not a rule module — it contains no rules of its own. Wherever this SOP (including §2 and §3 above) refers to "the core modules" as a range, that range is the **core rule modules, 01–11**; 00 is out of that range.
+
 | # | Module | Scope |
 | --- | --- | --- |
-| 00 | Index & conventions | This document — how to use, rule-ID scheme, severity model, evidence tiers, glossary |
+| 00 | Index & conventions (not a rule module — no rules herein) | This document — how to use, rule-ID scheme, severity model, evidence tiers, glossary |
 | 01 | Crawl & index control | robots.txt, meta robots, `X-Robots-Tag`, parameter handling, preview/staging isolation, soft-404s, crawl budget |
 | 02 | Site & URL architecture | Taxonomy, route naming, depth, internal linking, breadcrumbs, orphan prevention, XML sitemaps & sitemap index |
 | 03 | On-page & metadata | Title/description formulas per template with length limits, heading architecture, OG/Twitter cards, image & alt policy, canonical self-reference |
