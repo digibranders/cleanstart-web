@@ -423,7 +423,9 @@ It must contain, in this order, with no placeholders:
 1. **Purpose and audience** — engineers and SEO leads building any website on this team.
 2. **How to use** — new build → read module 00, run the pre-build section of `90-operator-checklist.md`; audit → run the full checklist; per-client → decide which `C*` modules apply.
 3. **Rule-ID scheme** — prefix table exactly as in spec §5.2, including `SEM` for module 11; IDs never reused; deprecated rules retained as `Superseded by <ID>`.
-4. **Rule block format** — reproduce the format block from this plan verbatim, as the authoring contract. State explicitly: **a field that wraps onto a second line must indent the continuation by two spaces.** An unindented continuation is a lint error, not a silent truncation — the linter rejects it by design.
+4. **Rule block format** — reproduce the format block from this plan verbatim, as the authoring contract. State two authoring constraints explicitly:
+   - **A field that wraps onto a second line must indent the continuation by two spaces.** An unindented continuation is a lint error, not a silent truncation — the linter rejects it by design.
+   - **`Verify` must be a single-line inline code span**, never an indented fenced block. An indented fence inside a rule field folds into the field text as literal backticks. A check that genuinely needs multiple commands belongs in a named script under `scripts/seo-sop/`, referenced from `Verify` by path.
 5. **Severity model** — the P0–P3 table from spec §5.4, plus the statement that severity derives from mechanism and blast radius, cross-checked against tool weighting, with disagreements stated explicitly.
 6. **Evidence tiers** — the four-tier table from spec §5.5 and the ≥1 Tier 1/2 requirement.
 7. **Verdict vocabulary** — `Pass` · `Partial` · `Fail` · `N/A` · `Unverified — <reason>`, with the explicit statement that fabricating a verdict is prohibited.
