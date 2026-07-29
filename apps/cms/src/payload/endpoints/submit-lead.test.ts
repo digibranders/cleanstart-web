@@ -117,8 +117,8 @@ describe('OPTIONS /submit (CORS preflight)', () => {
   });
 
   it('respects LEAD_SUBMIT_ALLOWED_ORIGINS override', async () => {
-    process.env.LEAD_SUBMIT_ALLOWED_ORIGINS = 'https://staging.cleanstart.com';
-    const res = await callOptions('https://staging.cleanstart.com');
+    process.env.LEAD_SUBMIT_ALLOWED_ORIGINS = 'https://qa.example.com';
+    const res = await callOptions('https://qa.example.com');
     expect(res.status).toBe(204);
     const denied = await callOptions('https://cleanstart.com');
     expect(denied.status).toBe(403);

@@ -152,7 +152,6 @@ const serverURL = process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:300
 const DEFAULT_ADMIN_ALLOWED_ORIGINS = [
   'https://cleanstart.com',
   'https://www.cleanstart.com',
-  'https://staging.cleanstart.com',
 ];
 
 const adminAllowedOrigins = (): string[] => {

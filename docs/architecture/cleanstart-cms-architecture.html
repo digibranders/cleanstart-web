@@ -4953,20 +4953,24 @@ export async function POST(req: Request) {
         the vendor is not.
       </p>
 
-      <h3 id="staging">Staging environment</h3>
+      <h3 id="staging">Staging environment <span class="small">(retired)</span></h3>
       <p>
-        A dedicated <code>staging.cleanstart.com</code> deployment of <code>apps/web</code> points
-        at a refreshed-nightly snapshot of the production database (Postgres branching on managed
-        Postgres makes this trivial). Used for CSS / template change verification, page-builder
-        block additions, and JSON-LD emission spot checks across collection types — without
-        touching production content.
+        <strong>Retired 2026-07-29.</strong> The <code>staging.cleanstart.com</code> DNS record was
+        deleted; there is no named non-production host for <code>apps/web</code>. Pre-production
+        verification — CSS / template changes, page-builder block additions, JSON-LD emission spot
+        checks — now happens on <strong>Vercel preview deploys</strong> (<code>*.vercel.app</code>).
       </p>
       <ul>
-        <li>Behind <strong>Cloudflare Access</strong>; not reachable from the public internet.</li>
-        <li>Always emits <code>X-Robots-Tag: noindex, nofollow</code> + <code>&lt;meta name="robots" content="noindex"&gt;</code> belt-and-braces.</li>
-        <li>Analytics excluded for any path on the staging host — doesn't pollute production metrics.</li>
-        <li>R2 reads point at the same bucket as prod (assets are immutable content-addressed URLs); writes are blocked at the storage-credential level (staging has read-only R2 keys).</li>
-        <li>Used for the monthly restore drill (see §<a href="#restore-runbook">Backup &amp; restore</a>) — a successful restore on staging is the prerequisite for declaring the runbook current.</li>
+        <li>Preview hosts are held at <code>X-Robots-Tag: noindex, nofollow, noarchive</code> plus a
+          <code>&lt;meta name="robots" content="noindex"&gt;</code> by <code>isNoindexHost</code>
+          (<code>apps/web/src/lib/seo/indexing.ts</code>) — the single source of truth for both the
+          noindex layers and analytics exclusion.</li>
+        <li>The same host check keeps GA4 and Leadfeeder off preview deploys, so they never pollute
+          production metrics (<code>lib/analytics/ga4-snippet.ts</code>, <code>leadfeeder.ts</code>).</li>
+        <li><strong>Open:</strong> the monthly restore drill (§<a href="#restore-runbook">Backup &amp;
+          restore</a>) previously used staging as its target and its prerequisite for declaring the
+          runbook current. It needs a replacement target — a disposable droplet or a local Postgres
+          restore — before the next drill.</li>
       </ul>
 
       <p class="small">
