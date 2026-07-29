@@ -761,7 +761,9 @@ Shape — one entry per template, covering every static route plus one live exam
 }
 ```
 
-Additionally include the four control URLs that test index-control behaviour: a known 404 path, a known legacy redirect source, `https://www.cleanstart.com/sitemap.xml`, and `https://www.cleanstart.com/llms.txt`.
+Additionally include control URLs that test index-control behaviour: a known 404 path, `https://www.cleanstart.com/sitemap.xml`, `https://www.cleanstart.com/llms.txt`, and **every legacy redirect source documented in `docs/web/SEO-AUDIT-REPORT.md` §4** as its own `control:legacy-redirect:<slug>` row.
+
+Capture the whole redirect map, not a sample. Whether those 301s are actually live is a P0-class question — indexed legacy URLs returning 404 lose their accumulated link equity — and a conclusion about it must rest on committed evidence, not on an ad-hoc spot check that a later reader cannot reproduce.
 
 - [ ] **Step 3: Run the capture**
 
