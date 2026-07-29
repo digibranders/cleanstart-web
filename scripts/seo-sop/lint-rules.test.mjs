@@ -94,3 +94,35 @@ test('parseRules ignores rule headings inside fenced code blocks', () => {
   const doc = ['## Format', '', '```markdown', VALID, '```', ''].join('\n');
   assert.deepEqual(parseRules(doc, '00-index.md'), []);
 });
+
+const RULE_LINE = '- **Rule:** Production robots.txt must not disallow any indexable path.';
+
+test('an unindented continuation is flagged rather than silently dropped', () => {
+  const doc = VALID.replace(
+    RULE_LINE,
+    '- **Rule:** Production robots.txt must not disallow any indexable path\nbecause a disallowed path is never crawled.',
+  );
+  const rule = parseRules(doc, 'f.md')[0];
+  assert.match(rule.parseErrors.join(), /unindented continuation line after "Rule"/);
+  assert.match(lintRule(rule).join(), /unindented continuation line after "Rule"/);
+});
+
+test('an indented continuation is folded into the field', () => {
+  const doc = VALID.replace(
+    RULE_LINE,
+    '- **Rule:** Production robots.txt must not disallow any indexable path\n  because a disallowed path is never crawled.',
+  );
+  const rule = parseRules(doc, 'f.md')[0];
+  assert.deepEqual(rule.parseErrors, []);
+  assert.match(rule.fields.Rule, /path because a disallowed path is never crawled\./);
+});
+
+test('prose after a blank line is not mistaken for a truncated field', () => {
+  const rule = parseRules(`${VALID}\nA closing note that belongs to no field.\n`, 'f.md')[0];
+  assert.deepEqual(rule.parseErrors, []);
+});
+
+test('parseRules exposes only heading, file, fields and parseErrors', () => {
+  const rule = parseRules(VALID, 'f.md')[0];
+  assert.deepEqual(Object.keys(rule).sort(), ['fields', 'file', 'heading', 'parseErrors']);
+});

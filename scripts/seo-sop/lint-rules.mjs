@@ -17,6 +17,7 @@ const HEADING = /^([A-Z]+)-(\d{2}) — (.+)$/;
 
 function parseFields(bodyLines) {
   const fields = {};
+  const errors = [];
   let key = null;
   for (const line of bodyLines) {
     const m = /^- \*\*([A-Za-z-]+):\*\*\s*(.*)$/.exec(line);
@@ -25,9 +26,24 @@ function parseFields(bodyLines) {
       fields[key] = m[2].trim();
       continue;
     }
-    if (key && /^\s+\S/.test(line)) fields[key] = `${fields[key]} ${line.trim()}`.trim();
+    // A blank line closes the field; anything after it is prose, not a continuation.
+    if (!line.trim()) {
+      key = null;
+      continue;
+    }
+    if (/^\s+\S/.test(line)) {
+      if (key) fields[key] = `${fields[key]} ${line.trim()}`.trim();
+      continue;
+    }
+    // Markdown would fold an unindented line into the preceding list item, but a
+    // silently half-captured rule field defeats the entire point of this gate.
+    if (key) {
+      errors.push(
+        `unindented continuation line after "${key}" — indent continuation lines by two spaces: "${line.trim()}"`,
+      );
+    }
   }
-  return fields;
+  return { fields, errors };
 }
 
 export function parseRules(markdown, file) {
@@ -35,7 +51,10 @@ export function parseRules(markdown, file) {
   let current = null;
   let fenced = false;
   const flush = () => {
-    if (current) out.push({ ...current, fields: parseFields(current.body) });
+    if (current) {
+      const { fields, errors } = parseFields(current.body);
+      out.push({ heading: current.heading, file: current.file, fields, parseErrors: errors });
+    }
     current = null;
   };
   for (const line of markdown.split('\n')) {
@@ -67,8 +86,8 @@ export function parseRules(markdown, file) {
 }
 
 export function lintRule(rule) {
-  const errs = [];
   const where = `${rule.file}: ${rule.heading}`;
+  const errs = (rule.parseErrors ?? []).map((e) => `${where}: ${e}`);
   if (!HEADING.test(rule.heading)) {
     errs.push(`${where}: heading must be "PREFIX-NN — Title"`);
     return errs;
