@@ -942,7 +942,9 @@ From `docs/seo/evidence/sources/`, produce a flat list of every candidate rule w
 
 - [ ] **Step 2: Dispatch refutation agents**
 
-Three independent verifiers per candidate, each with a distinct lens. Prompt:
+**Batching.** Per-candidate fan-out (3 verifiers × ~150 rules ≈ 450 agents) is not affordable and approaches the hard agent cap. Instead: **one verifier per domain per lens** — 16 domains × 3 lenses ≈ 48 agents — each receiving that domain's full candidate list and returning a verdict per candidate. Escalate to dedicated per-rule verification only for (a) every P0 candidate, and (b) any candidate a batch verifier marks `contested`. This preserves independent multi-lens refutation while keeping the pass tractable.
+
+Each verifier gets one lens over one domain's candidates. Prompt:
 
 > Attempt to **refute** this proposed SEO rule. You are not asked to confirm it.
 >
@@ -1206,7 +1208,7 @@ git commit -m "docs(seo): add CleanStart conformance report and ranked gap backl
 - [ ] **Step 1: Run the full mechanical gate**
 
 ```bash
-node --test scripts/seo-sop/ && node scripts/seo-sop/lint-rules.mjs docs/seo
+node --test scripts/seo-sop/*.test.mjs && node scripts/seo-sop/lint-rules.mjs docs/seo
 ```
 
 Expected: all tooling tests pass, and the corpus lints clean.
