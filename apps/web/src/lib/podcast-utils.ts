@@ -47,7 +47,10 @@ export const youtubeWatchUrl = (videoId: string): string =>
 
 export const youtubeEmbedUrl = (
   videoId: string,
-  { autoplay = true }: { autoplay?: boolean } = {},
+  {
+    autoplay = true,
+    captions = true,
+  }: { autoplay?: boolean; captions?: boolean } = {},
 ): string => {
   const qs = new URLSearchParams({
     autoplay: autoplay ? "1" : "0",
@@ -55,6 +58,11 @@ export const youtubeEmbedUrl = (
     modestbranding: "1",
     playsinline: "1",
   });
+  // YouTube documents `cc_load_policy=1` as "force captions on"; the default is
+  // the viewer's own preference, so `0` is the only lever an embed has to ask for
+  // them off. It is advisory — callers that must have them off also unload the
+  // captions module over the IFrame API.
+  if (!captions) qs.set("cc_load_policy", "0");
   return `https://www.youtube-nocookie.com/embed/${videoId}?${qs.toString()}`;
 };
 

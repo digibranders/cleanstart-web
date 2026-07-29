@@ -1988,18 +1988,9 @@ body {
   outline-offset: 2px;
 }
 
-/* Secondary-CTA affordances: play/close glyph chip + duration pill. */
+/* Secondary-CTA affordance: play/close glyph chip. */
 .cs-libcta-glyph {
   background: rgba(255, 255, 255, 0.14);
-}
-
-.cs-libcta-chip {
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  color: rgba(255, 255, 255, 0.7);
-  background: rgba(255, 255, 255, 0.08);
 }
 
 /* The ghost twin has to track the glass primary's height at BOTH breakpoints.
@@ -2019,10 +2010,6 @@ body {
     --cs-btn-h: 44px;
     --cs-btn-fs: 16px;
     --cs-btn-px: 16px;
-  }
-
-  .cs-libcta-chip {
-    font-size: 11px;
   }
 }
 

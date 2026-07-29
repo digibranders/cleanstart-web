@@ -79,9 +79,20 @@ export function LibrariesHeroVideo({
   useEffect(() => {
     if (!open) return;
 
+    // The first message back proves the widget is listening, which is the
+    // earliest point a command is not silently dropped — and the point at which
+    // captions can be taken off the player for good. `cc_load_policy=0` on the
+    // src only *asks*; a viewer whose account preference is "captions on" still
+    // gets them burned over the hero unless the module itself is unloaded.
+    let captionsOff = false;
+
     const onMessage = (event: MessageEvent): void => {
       if (event.origin !== YT_ORIGIN) return;
       if (typeof event.data !== "string") return;
+      if (!captionsOff) {
+        captionsOff = true;
+        post({ event: "command", func: "unloadModule", args: ["captions"] });
+      }
       try {
         const data = JSON.parse(event.data) as {
           event?: string;
@@ -157,7 +168,7 @@ export function LibrariesHeroVideo({
   }, [post]);
 
   const src = open
-    ? `${youtubeEmbedUrl(VIDEO.videoId, { autoplay: true })}&enablejsapi=1${
+    ? `${youtubeEmbedUrl(VIDEO.videoId, { autoplay: true, captions: false })}&enablejsapi=1${
         typeof window === "undefined"
           ? ""
           : `&origin=${encodeURIComponent(window.location.origin)}`

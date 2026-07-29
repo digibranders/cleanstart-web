@@ -1,6 +1,6 @@
 /**
- * Clean Libraries hero product video — single source of truth for the embed,
- * the CTA duration chip, and the page's VideoObject JSON-LD.
+ * Clean Libraries hero product video — single source of truth for the embed and
+ * the page's VideoObject JSON-LD.
  *
  * Metadata is pinned here rather than fetched from YouTube: `/clean-libraries`
  * is statically prerendered, so a third-party fetch on that path would either
@@ -60,13 +60,4 @@ export function toIso8601Duration(totalSeconds: number): string {
   return `PT${hours > 0 ? `${hours}H` : ""}${minutes > 0 ? `${minutes}M` : ""}${
     seconds > 0 ? `${seconds}S` : ""
   }`;
-}
-
-/** Spoken duration for the CTA's accessible name, e.g. "2 min 39 sec". */
-export function spokenDuration(totalSeconds: number): string {
-  const total = Math.floor(totalSeconds);
-  const minutes = Math.floor(total / 60);
-  const seconds = total % 60;
-  if (minutes === 0) return `${seconds} sec`;
-  return seconds > 0 ? `${minutes} min ${seconds} sec` : `${minutes} min`;
 }

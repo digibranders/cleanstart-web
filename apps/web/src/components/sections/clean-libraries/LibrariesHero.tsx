@@ -4,11 +4,7 @@ import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 
 import { HeroReveal } from "@/components/ui/Reveal";
-import {
-  CLEAN_LIBRARIES_VIDEO as VIDEO,
-  formatDurationLabel,
-  spokenDuration,
-} from "@/lib/clean-libraries-video";
+import { CLEAN_LIBRARIES_VIDEO as VIDEO } from "@/lib/clean-libraries-video";
 import { trackEvent } from "@/lib/analytics/track";
 import { LibrariesHeroScene } from "./LibrariesHeroScene";
 import { LibrariesHeroVideo } from "./LibrariesHeroVideo";
@@ -62,8 +58,6 @@ export function LibrariesHero(): React.ReactElement {
     setVideoOpen(false);
     toggleRef.current?.focus();
   }, []);
-
-  const durationLabel = formatDurationLabel(VIDEO.durationSeconds);
 
   return (
     <section
@@ -168,7 +162,7 @@ export function LibrariesHero(): React.ReactElement {
                   aria-label={
                     videoOpen
                       ? "Back to Overview — hide the Clean Libraries product video"
-                      : `See It in Action — Clean Libraries product video, ${spokenDuration(VIDEO.durationSeconds)}`
+                      : "See It in Action — play the Clean Libraries product video"
                   }
                   className="cs-btn-ghost"
                 >
@@ -195,14 +189,6 @@ export function LibrariesHero(): React.ReactElement {
                     )}
                   </span>
                   <span>{videoOpen ? "Back to Overview" : "See It in Action"}</span>
-                  {videoOpen ? null : (
-                    <span
-                      aria-hidden
-                      className="cs-libcta-chip shrink-0 rounded-[5px] px-1.5 py-[2px]"
-                    >
-                      {durationLabel}
-                    </span>
-                  )}
                 </button>
               </div>
             </HeroReveal>
