@@ -55,7 +55,7 @@ Prefixes, reproduced from the design spec §5.2:
 Every rule in every core and conditional module (01–11, C1–C5) is authored in this exact shape. This is the authoring contract: `lint-rules.mjs` parses and enforces it mechanically, so deviation is a build-breaking error, not a style nit.
 
 ```markdown
-### CRAWL-04 — Canonical URLs are absolute and self-referencing
+### EXAMPLE-01 — Canonical URLs are absolute and self-referencing
 
 - **Severity:** P1
 - **Applies:** Always
@@ -78,7 +78,7 @@ Field rules enforced by the linter: heading must match `### PREFIX-NN — Title`
 Two authoring constraints follow directly from how the linter parses fields, and both are load-bearing — get either wrong and a rule field is silently truncated or corrupted, which is exactly the failure mode this schema gate exists to prevent:
 
 - **A field that wraps onto a second line must indent the continuation.** The linter accepts any non-zero amount of leading whitespace on a continuation line — its check is simply "some leading whitespace, then content," not a specific column count — but this SOP's house convention, used in every example including the one above, is exactly two spaces; indent by two spaces unless you have a specific reason not to. The linter treats an indented line as a continuation of the field above it and folds it in; it treats an unindented line as the start of new prose and closes the field there, discarding whatever field content you intended to add. An unindented continuation is therefore a **lint error, by design** — not a silent truncation. If your `Why` or `Rule` text needs a second line, indent it two spaces, exactly as `Acceptance`'s sub-bullets are indented in the example above.
-- **`Verify` must be a single-line inline code span** — one backtick-delimited command (or command → expected-output pair) on the `- **Verify:**` line itself. It must never be an indented fenced code block. An indented fence placed inside a rule field does not render as a code block in this context — the linter's field parser folds each fenced line into the field text as literal backtick characters, corrupting the field. If a check genuinely needs more than one command (a multi-step curl sequence, a script that greps several headers), write that check as a named script under `scripts/seo-sop/` and have `Verify` reference it by path, e.g. `` `node scripts/seo-sop/check-hreflang-matrix.mjs` ``.
+- **`Verify` must be a single-line inline code span** — one backtick-delimited command (or command → expected-output pair) on the `- **Verify:**` line itself. It must never be an indented fenced code block. An indented fence placed inside a rule field does not render as a code block in this context — the linter's field parser folds each fenced line into the field text as literal backtick characters, corrupting the field. If a check genuinely needs more than one command (a multi-step curl sequence, a script that greps several headers), write that check as a named script under `scripts/seo-sop/` and have `Verify` reference it by path, e.g. `` `node scripts/seo-sop/check-my-rule.mjs` `` — but only once that script actually exists in the repo. Until it is authored, state `Verify` as an explicit manual procedure instead of citing a script path that doesn't resolve; a `Verify` field must never point at a file that isn't there.
 
 ## 5. Severity model
 

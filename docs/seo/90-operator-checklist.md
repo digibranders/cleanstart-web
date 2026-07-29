@@ -101,7 +101,7 @@ Recurring operational health checks.
 - **CRAWL-02** — robots.txt has not returned a sustained 5xx since the last check — `curl -s -o /dev/null -w "%{http_code}\n" https://www.cleanstart.com/robots.txt`
 - **SCHEMA-07** — no `JobPosting` markup remains live past its requisition's close date — Search Console "Job Postings" rich-result report, checked for closed-but-still-marked-up pages
 - **RENDER-05** — no site/section has been returning `503`/`429` for an extended period on the assumption the index is safe by default — `curl -s -o /dev/null -w "%{http_code}\n" https://www.cleanstart.com/`
-- **MIG-09** — every migration redirect is still live, tracked against a dated cutover log, and none removed before its one-year floor — `node scripts/seo-sop/check-redirect-retention.mjs`
+- **MIG-09** — every migration redirect is still live, tracked against a dated cutover log, and none removed before its one-year floor — manual: no dated cutover log or automated script exists yet; cross-check each redirect row's `hitCount`/`lastHitAt` against its age by hand (see `08-migrations.md`)
 - **MEAS-04** — GA4's own "History events" automatic page-view detection is still OFF in the live property console — `grep -n "History events" apps/web/src/components/analytics/Ga4RouteTracker.tsx apps/web/src/components/consent/GatedAnalytics.tsx`
 
 ## Quarterly
@@ -128,16 +128,16 @@ Core modules `01`–`11` above always apply. The modules below apply only when t
 
 **Trigger:** the site serves, or plans to serve, two or more language/region locale variants of the same content.
 
-- **INTL-01** — every localized page's canonical resolves to a URL in its own language, never a different-language "master" — `node scripts/seo-sop/check-hreflang-canonical-language-match.mjs`
+- **INTL-01** — every localized page's canonical resolves to a URL in its own language, never a different-language "master" — manual: no automated script exists; for every hreflang cluster member, confirm its canonical target's own hreflang self-declaration matches its language (see `C1-international-hreflang.md`)
 - **INTL-02** — every locale is exposed at a stable, distinct, crawlable URL — no locale-adaptive page relies on IP/`Accept-Language` detection alone — `curl -s https://example.com/de/ | grep -c 'lang="de"'`
 - **INTL-03** — every hreflang `<link>` renders inside a well-formed `<head>`, one per variant, never combined with another attribute — `document.head.querySelectorAll('link[hreflang]').length`
-- **INTL-04** — every sitemap-declared hreflang cluster is self-inclusive and complete for every member — `node scripts/seo-sop/check-hreflang-matrix.mjs`
-- **INTL-05** — every hreflang annotation is bidirectional; no declared relationship is missing its return link — `node scripts/seo-sop/check-hreflang-matrix.mjs`
-- **INTL-06** — a locale URL change updates every sibling's hreflang reference in the same deploy — `node scripts/seo-sop/check-hreflang-matrix.mjs`
-- **INTL-07** — every hreflang value is language-first with a valid ISO 639-1 code, never a bare region code — `node scripts/seo-sop/check-hreflang-codes.mjs`
-- **INTL-08** — every hreflang region subtag is a currently assigned ISO 3166-1 Alpha-2 code, never `EU`/`UN`/`UK` — `node scripts/seo-sop/check-hreflang-codes.mjs`
-- **INTL-09** — same-language near-duplicates inside a cluster always declare an explicit canonical; hreflang membership is never the sole consolidation mechanism — `node scripts/seo-sop/check-hreflang-canonical-language-match.mjs`
-- **INTL-10** — same-language, different-region pages are either substantively differentiated or consolidated to one canonical — `node scripts/seo-sop/check-locale-content-similarity.mjs`
+- **INTL-04** — every sitemap-declared hreflang cluster is self-inclusive and complete for every member — manual: no automated script exists; group sitemap `<xhtml:link>` entries by cluster and confirm each member lists every other member plus itself (see `C1-international-hreflang.md`)
+- **INTL-05** — every hreflang annotation is bidirectional; no declared relationship is missing its return link — manual: no automated script exists; for every declared `(source, code, target)` triple, confirm the reciprocal triple exists (see `C1-international-hreflang.md`)
+- **INTL-06** — a locale URL change updates every sibling's hreflang reference in the same deploy — manual: re-run the INTL-05 reciprocity check across the whole cluster post-deploy (see `C1-international-hreflang.md`)
+- **INTL-07** — every hreflang value is language-first with a valid ISO 639-1 code, never a bare region code — `curl -s https://example.com/sitemap.xml | grep -oE 'hreflang="[^"]+"' | sort -u | grep -vE 'hreflang="[a-z]{2}(-[A-Z]{2})?"'` → empty
+- **INTL-08** — every hreflang region subtag is a currently assigned ISO 3166-1 Alpha-2 code, never `EU`/`UN`/`UK` — `curl -s https://example.com/sitemap.xml | grep -oE 'hreflang="[^"]+"' | sort -u | grep -iE 'hreflang="[a-z]{2}-(EU|UN|UK)"'` → empty
+- **INTL-09** — same-language near-duplicates inside a cluster always declare an explicit canonical; hreflang membership is never the sole consolidation mechanism — manual: no automated script exists; confirm each same-language duplicate set has an explicit `rel="canonical"` (see `C1-international-hreflang.md`)
+- **INTL-10** — same-language, different-region pages are either substantively differentiated or consolidated to one canonical — manual: no automated script exists; diff rendered body content between region variants of the same language (see `C1-international-hreflang.md`)
 - **INTL-11** — locale-adaptive robots directives are identical across every locale's rendering of a shared URL — `curl -sI -H "Accept-Language: de" https://example.com/ | grep -i x-robots-tag`
 
 #### C2 — E-commerce
@@ -162,7 +162,7 @@ Core modules `01`–`11` above always apply. The modules below apply only when t
 - **LOCAL-03** — name/address/phone match the real-world signage and connect to the specific location, no keyword-stuffed name or central call-center number — `curl -s "https://support.google.com/business/answer/3038177"`
 - **LOCAL-04** — every service-area business has exactly one profile, hidden address, and declared area by city/postal code within ~2 hours drive — `curl -s "https://support.google.com/business/answer/9157481"`
 - **LOCAL-05** — no local-ranking claim in reporting/docs names a factor beyond relevance, distance, prominence — `curl -s "https://support.google.com/business/answer/7091"`
-- **LOCAL-06** — every location page carries genuine location-specific content, not just a city-name template funneling elsewhere — `node scripts/seo-sop/check-locale-content-similarity.mjs`
+- **LOCAL-06** — every location page carries genuine location-specific content, not just a city-name template funneling elsewhere — manual: diff location-page pairs after stripping the NAP block and city name (see `C3-local.md`)
 - **LOCAL-07** — the store/location locator renders real `<a href>` links to each location page, never JS-only or iframe-embedded — `curl -s <locator-url> | grep -o '<a[^>]*href="[^"]*store[^"]*"'`
 - **LOCAL-08** — no `Review`/`AggregateRating` markup on `LocalBusiness`/`Organization` is self-served for the site's own entity — `curl -s <url> | grep -B2 '"@type":"AggregateRating"' | grep -o '"@type":"[^"]*"'`
 - **LOCAL-09** — no review solicitation offers an incentive or pressures/scripts the review's content — `grep -rni "review.*discount\|discount.*review" .`
@@ -171,13 +171,13 @@ Core modules `01`–`11` above always apply. The modules below apply only when t
 
 **Trigger:** the site generates pages at scale from templates or exposes combinable filter/sort URL parameters (faceted navigation).
 
-- **PROG-01** — every programmatic-page system has a written, non-ranking user-facing reason each page exists independently — `node scripts/seo-sop/check-locale-content-similarity.mjs`
-- **PROG-02** — a crawl-control plan exists before a new filter/sort parameter ships, not after — `grep "Googlebot" access.log | grep -c "category="`
+- **PROG-01** — every programmatic-page system has a written, non-ranking user-facing reason each page exists independently — manual editorial review, not a script (see `C4-programmatic-faceted.md`)
+- **PROG-02** — a crawl-control plan exists before a new filter/sort parameter ships, not after — manual: no `access.log` exists for a Vercel-hosted site; use Search Console Crawl Stats or a provisioned log drain (see `C4-programmatic-faceted.md`)
 - **PROG-03** — non-indexable facets are blocked at the `robots.txt` parameter level, not via `rel=canonical`/`nofollow` alone — `curl -s https://example.com/robots.txt | grep -i 'disallow.*='`
-- **PROG-04** — `rel=canonical`/`nofollow` on facet links are never the sole mitigation for a combinatorial facet space — `grep "Googlebot" access.log | grep -c "canonical-target-path"`
+- **PROG-04** — `rel=canonical`/`nofollow` on facet links are never the sole mitigation for a combinatorial facet space — manual: no `access.log` exists for a Vercel-hosted site; use Search Console Crawl Stats or a provisioned log drain (see `C4-programmatic-faceted.md`)
 - **PROG-05** — every indexable facet combination has a real demand reason, a stable canonical parameter order, and a genuine `404` for empty results — `curl -s -o /dev/null -w "%{http_code}\n" "https://example.com/category?color=nonexistent-value"`
-- **PROG-06** — every generated page has at least one crawlable internal `<a href>` link from an indexed page — `node scripts/seo-sop/check-hreflang-matrix.mjs`
-- **PROG-07** — no tier of near-duplicate variant pages exists solely to capture query variants and funnel to one destination — `node scripts/seo-sop/check-locale-content-similarity.mjs`
+- **PROG-06** — every generated page has at least one crawlable internal `<a href>` link from an indexed page — manual: crawl with sitemap-seeding disabled and diff against the sitemap (see `C4-programmatic-faceted.md`)
+- **PROG-07** — no tier of near-duplicate variant pages exists solely to capture query variants and funnel to one destination — manual: diff sibling-template body content (see `C4-programmatic-faceted.md`)
 - **PROG-08** — every programmatic template has been individually audited against each of Google's four named scaled-content-abuse forms — `grep -c "does not apply" docs/launch-checklist.md`
 - **PROG-09** — thin-but-useful templated pages use bare `noindex` (no `nofollow`) and are never also blocked in `robots.txt` — `curl -sI https://example.com/thin-page | grep -i x-robots-tag`
 
@@ -186,7 +186,7 @@ Core modules `01`–`11` above always apply. The modules below apply only when t
 **Trigger:** the site publishes news content and pursues Google News/Top Stories eligibility.
 
 - **NEWS-01** — `dateModified`/visible date changes only on substantive edits; no article is deleted-and-recreated under a new URL to simulate a fresh publish — `grep -c "dateModified" <(curl -s <article-url>)`
-- **NEWS-02** — the News sitemap contains only articles from the last 48 hours, capped at 1,000 entries per file — `node scripts/seo-sop/check-news-sitemap-window.mjs`
+- **NEWS-02** — the News sitemap contains only articles from the last 48 hours, capped at 1,000 entries per file — manual/scheduled: no automated script exists (see `C5-news-publisher.md`)
 - **NEWS-03** — Top Stories effort is gated on content-policy compliance and Search Essentials, not on markup/AMP/CWV thresholds — `curl -s "https://search.google.com/search-console/manual-actions"`
 - **NEWS-04** — every news-classified page carries clear dates, bylines, publisher identity, and disclosed sponsorship — `curl -s <article-url> | grep -ci "sponsored\|paid content"`
 - **NEWS-05** — every paywalled article declares `isAccessibleForFree: false` at the article level plus a `hasPart`/`cssSelector`-scoped gated region — `curl -s <article-url> | grep -o '"isAccessibleForFree":[a-z]*'`

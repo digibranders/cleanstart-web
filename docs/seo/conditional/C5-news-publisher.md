@@ -47,7 +47,7 @@ Apply this module the moment a client takes on a news-classified property — a 
 - **Rule:** Include only articles published within the last two days in the News sitemap, and never exceed 1,000 `<news:news>` entries per sitemap file.
 - **Why:** Google's documented rule: "Only include recent URLs for articles that were created in the last two days" — once an article passes the two-day mark, either remove the URL entirely from the news sitemap or strip its `<news:news>` metadata block (the URL can remain in a general sitemap). The per-file cap is 1,000 `<news:news>` tags; a publisher exceeding that volume in a 48-hour window needs a sitemap index pointing at multiple news sitemap files.
 - **Acceptance:** No `<news:publication_date>` value in the currently-submitted news sitemap is older than 48 hours from the time of the check; the file contains ≤1,000 `<news:news>` blocks (or the site correctly uses a sitemap index for overflow).
-- **Verify:** `node scripts/seo-sop/check-news-sitemap-window.mjs`
+- **Verify:** Manual — no automated script exists in this repo; parse the live News sitemap XML, confirm every `<news:publication_date>` is within 48 hours of the check time, and confirm each file has ≤1,000 `<news:news>` entries (or a sitemap index is used for overflow). This needs a recurring scheduled check, not a one-time command — see this rule's own `Tools` field.
 - **Reference:** None — no reference implementation
 - **Source:** [Tier 1] https://developers.google.com/search/docs/crawling-indexing/sitemaps/news-sitemap (last updated 2025-12-10 UTC)
 - **Tools:** A scheduled job parsing the live news sitemap XML and computing `now() - news:publication_date` for every entry is the correct verification method, not a one-time check.

@@ -4,6 +4,7 @@
 **Prefix:** `META`
 **Scope (per `00-index.md` §8):** Title/description formulas per template with length limits, heading architecture (H1 presence only — full hierarchy lives in module 11), OG/Twitter cards, image & alt policy, canonical self-reference.
 **Out of scope:** keyword research, per-page copywriting, topical strategy (`00-index.md` §1); full heading-hierarchy/outline rules (module 11); `hreflang` matrix correctness for genuinely multi-locale builds (`C1`); `JobPosting`/`Article`/`FAQPage` structured-data requirements (module 04) — this module covers only the `<title>`/`<meta description>` surface those routes also happen to populate.
+**Review cadence:** Semi-annual (per `00-index.md` §9).
 
 This module is authored against `docs/seo/evidence/sources/metadata.md` (research), `docs/seo/evidence/verification-log.md` (adversarial verification — all three required corrections for this domain are applied below: Requirement 3's fabricated pixel/character figures, Requirement 8's wrong Twitter/X URL, and Requirement 6's uncited "secondary-sourced" claim), `docs/seo/evidence/codebase-inventory.md`'s On-Page Metadata section, and a live capture of `www.cleanstart.com` taken 2026-07-29 (`docs/seo/evidence/live-capture.json`, 59 URLs). Every `CleanStart` verdict below cites one of these three evidence sources, or a direct `curl`/`grep` run in this authoring session.
 

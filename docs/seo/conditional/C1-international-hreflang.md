@@ -33,7 +33,7 @@ Apply this module the moment a client site serves more than one language or regi
 - **Acceptance:**
   - For every URL in an hreflang cluster, `<link rel="canonical">` on that URL resolves to that same URL, or at minimum to another URL in the *same* language (e.g., consolidating `en-us`/`en-ca` duplicate-content variants per INTL-14)
   - No canonical target in the cluster differs in language from the page being annotated
-- **Verify:** `node scripts/seo-sop/check-hreflang-canonical-language-match.mjs`
+- **Verify:** Manual — no automated script exists in this repo; for every URL in an hreflang cluster, parse its `rel="canonical"` target's own hreflang self-declaration and confirm the two languages match.
 - **Reference:** None — no reference implementation
 - **Source:** [Tier 1] https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls — "If you're using hreflang elements, make sure to specify a canonical page in the same language, or the best possible substitute language if a canonical page doesn't exist for the same language."
 - **Tools:** No tool distinguishes "canonical is present" from "canonical is same-language" — a clean Screaming Frog/Ahrefs canonical report can still hide this defect entirely.
@@ -89,7 +89,7 @@ Apply this module the moment a client site serves more than one language or regi
 - **Acceptance:**
   - For every `<loc>` in the sitemap, the number of `<xhtml:link>` children equals the number of locale variants of that page
   - The same set of `<xhtml:link>` children (byte-identical URLs and codes) appears on every member of that cluster's own `<url>` entries
-- **Verify:** `node scripts/seo-sop/check-hreflang-matrix.mjs`
+- **Verify:** Manual — no automated script exists in this repo; group the sitemap's `<url>` entries by hreflang cluster and confirm every member lists the same complete, byte-identical set of `<xhtml:link>` children.
 - **Reference:** None — no reference implementation
 - **Source:** [Tier 1] https://developers.google.com/search/docs/specialty/international/localized-versions
 - **Tools:** Not documented as a distinct check by any tool surveyed — sitemap-hreflang cluster completeness is a cross-page consistency property, not a single-page defect a crawl audit surfaces.
@@ -105,7 +105,7 @@ Apply this module the moment a client site serves more than one language or regi
 - **Rule:** If page A declares an `hreflang` alternate pointing to page B, page B must declare an `hreflang` alternate pointing back to page A with the correct reciprocal code; partial coverage across a large cluster is tolerated, but every declared relationship must still be reciprocal.
 - **Why:** Google states plainly: "If two pages don't both point to each other, the tags will be ignored. This is so that someone on another site can't arbitrarily create a tag naming itself as an alternative version of one of your pages." Google's own troubleshooting text: "If page X links to page Y, page Y must link back to page X." A missing return link causes the annotation *pair* to be ignored, not just the missing direction.
 - **Acceptance:** For every `(source URL, hreflang code, target URL)` triple across all delivery methods, a reciprocal triple `(target URL, code-for-source, source URL)` exists.
-- **Verify:** `node scripts/seo-sop/check-hreflang-matrix.mjs`
+- **Verify:** Manual — no automated script exists in this repo; for every declared `(source URL, hreflang code, target URL)` triple, confirm the reciprocal `(target URL, code-for-source, source URL)` triple also exists.
 - **Reference:** None — no reference implementation
 - **Source:** [Tier 1] https://developers.google.com/search/docs/specialty/international/localized-versions — "Missing return links: If page X links to page Y, page Y must link back to page X."
 - **Tools:** No tool surveyed flags a broken reciprocal link as a single issue — it only shows up as a cross-page diff, which is why this SOP treats the matrix script as the single highest-value automated check for this module.
@@ -121,7 +121,7 @@ Apply this module the moment a client site serves more than one language or regi
 - **Rule:** Any URL-structure change to a localized page must update the `hreflang` reference on every *other* member of its cluster in the same deploy, not only redirect the page that moved.
 - **Why:** Reciprocity (INTL-05) is checked per pair; if page B's URL changes and page A's entry for B still points at the old URL, that triple 404s and reciprocity for the pair silently breaks — Google Search Console does not proactively surface this as a "broken hreflang" error.
 - **Acceptance:** Post-deploy, the cluster-matrix script re-passes with zero 404s and zero one-way pairs.
-- **Verify:** `node scripts/seo-sop/check-hreflang-matrix.mjs`
+- **Verify:** Manual — no automated script exists in this repo; post-deploy, re-run the INTL-05 reciprocity check across the whole affected cluster and confirm zero 404s and zero one-way pairs.
 - **Reference:** None — no reference implementation
 - **Source:** [Tier 1] https://developers.google.com/search/docs/specialty/international/localized-versions
 - **Tools:** No tool surveyed runs this check automatically in CI; it must be wired as a deploy gate for any locale-routing change.
@@ -139,7 +139,7 @@ Apply this module the moment a client site serves more than one language or regi
 - **Acceptance:**
   - Every `hreflang` value matches `^[a-z]{2}(-[A-Z]{2})?$` (or the ISO-15924 script variant, INTL-11)
   - The first subtag is a valid ISO 639-1 code, never a country code used positionally as if it were a language
-- **Verify:** `node scripts/seo-sop/check-hreflang-codes.mjs`
+- **Verify:** `curl -s https://example.com/sitemap.xml | grep -oE 'hreflang="[^"]+"' | sort -u | grep -vE 'hreflang="[a-z]{2}(-[A-Z]{2})?"'` → empty (checks the syntactic shape only — bare-region-as-language misuse like `be`-for-Belgium is a semantic defect no single command catches; spot-check the resulting code list against ISO 639-1 by hand)
 - **Reference:** None — no reference implementation
 - **Source:** [Tier 1] https://developers.google.com/search/docs/specialty/international/localized-versions
 - **Tools:** Not documented as a distinct check by any tool surveyed — code-validity is a hand-authored-file property, not something an external crawl audit verifies against ISO tables.
@@ -155,7 +155,7 @@ Apply this module the moment a client site serves more than one language or regi
 - **Rule:** Use only currently assigned ISO 3166-1 Alpha-2 region codes; never a colloquial or reserved code such as `EU`, `UN`, or `UK` in the region position.
 - **Why:** Google states directly: "If you use codes that are listed as reserved for something else, Google Search ignores that part of the annotation (for example, using EU, UN, or UK in hreflang annotations doesn't have an effect on Google Search)." This is a silent failure mode — no error, warning, or Search Console flag is raised; the annotation is simply degraded to the bare language code, which can then collide with other same-language entries in the cluster's fallback logic.
 - **Acceptance:** Every region subtag is cross-checked against a current, maintained ISO 3166-1 Alpha-2 assigned-code list (e.g., the IANA Language Subtag Registry) rather than a hand-maintained array that can drift stale; `UK` fails this check even though it is colloquially universal — the correct code is `GB`.
-- **Verify:** `node scripts/seo-sop/check-hreflang-codes.mjs`
+- **Verify:** `curl -s https://example.com/sitemap.xml | grep -oE 'hreflang="[^"]+"' | sort -u | grep -iE 'hreflang="[a-z]{2}-(EU|UN|UK)"'` → empty
 - **Reference:** None — no reference implementation
 - **Source:** [Tier 1] https://developers.google.com/search/docs/specialty/international/localized-versions
 - **Tools:** Not documented as a distinct check by any tool surveyed — the failure is invisible to tooling by design, which is why this rule exists.
@@ -171,7 +171,7 @@ Apply this module the moment a client site serves more than one language or regi
 - **Rule:** Do not rely on hreflang-cluster membership alone to establish which URL is canonical among near-duplicate pages within the *same* language — declare an explicit `rel="canonical"` in every case where duplicate-content consolidation is needed, and treat cluster-preference behavior as a fallback tiebreaker only.
 - **Why:** Google documents hreflang-cluster preference as one of a short list of *implicit* signals it consults "apart from explicitly provided methods" — i.e., only after explicit signals (canonical tag, sitemap inclusion, redirects) have already been weighed. It is a preference among candidates already competing for canonical status, not a mechanism that assigns canonical status on its own in the presence of an explicit, conflicting `rel="canonical"`.
 - **Acceptance:** Every set of same-language duplicate URLs has an explicit `rel="canonical"` declared; hreflang-cluster membership is never the sole documented signal a build relies on for a consolidation decision that matters.
-- **Verify:** `node scripts/seo-sop/check-hreflang-canonical-language-match.mjs`
+- **Verify:** Manual — no automated script exists in this repo; for every set of same-language near-duplicate URLs, confirm an explicit `rel="canonical"` is declared rather than relying on hreflang-cluster membership alone.
 - **Reference:** None — no reference implementation
 - **Source:** [Tier 1] https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls — "for canonicalization purposes Google prefers URLs that are part of hreflang clusters," listed under "Other signals," i.e. after explicit signals.
 - **Tools:** Not applicable as a tool-scored issue — this is a design-intent rule about not skipping the explicit signal.
@@ -187,7 +187,7 @@ Apply this module the moment a client site serves more than one language or regi
 - **Rule:** When two or more locale URLs serve the same language with no substantive regional difference (pricing, regulation, terminology, examples), either genuinely differentiate the content per region or consolidate to one canonical URL for that language with `hreflang` pointing region-specific traffic at it.
 - **Why:** Google and Bing separately document that localization is a cause of duplicate content, not an exemption from it. Google: "Localized versions of a page are only considered duplicates if the main content of the page remains untranslated" — i.e., the test is about the primary content, not the URL's regional label. Bing's own framing: "Localization creates duplicate content when regional or language pages are nearly identical and do not provide meaningful differences for users in each market."
 - **Acceptance:** Any two same-language locale pages either (a) differ in primary content in a way that reflects genuine regional variation (terminology, examples, regulations, product details, pricing/currency), or (b) are consolidated to a single canonical URL for that language with region-specific hreflang variants pointing at it.
-- **Verify:** `node scripts/seo-sop/check-locale-content-similarity.mjs`
+- **Verify:** Manual — no automated script exists in this repo; diff the rendered primary-content body (excluding nav/footer/boilerplate) between same-language, different-region page pairs and confirm either genuine regional differentiation or consolidation to one canonical.
 - **Reference:** None — no reference implementation
 - **Source:** [Tier 1] https://developers.google.com/search/docs/specialty/international/managing-multi-regional-sites; [Tier 1] https://blogs.bing.com/webmaster/December-2025/Does-Duplicate-Content-Hurt-SEO-and-AI-Search-Visibility
 - **Tools:** Ahrefs'/Semrush's duplicate-content checks would surface the symptom without diagnosing that region-labeling alone does not exempt the pages.
@@ -285,7 +285,7 @@ Apply this module the moment a client site serves more than one language or regi
 - **Rule:** When multiple region-specific variants of one language exist (`en-ie`, `en-ca`, `en-au`), also provide (or designate one variant as) a bare-language catch-all (`en`) for searchers whose specific region isn't covered.
 - **Why:** Google: "If you have several alternate URLs targeted at users with the same language but in different locales, it's a good idea to also provide a catchall URL for geographically unspecified users of that language... It can be one of the specific pages, if you choose."
 - **Acceptance:** Every hreflang cluster containing ≥2 region-qualified entries of the same base language also contains one bare-language entry in that same cluster.
-- **Verify:** `node scripts/seo-sop/check-hreflang-matrix.mjs`
+- **Verify:** Manual — no automated script exists in this repo; for every hreflang cluster with ≥2 region-qualified variants of the same base language, confirm a bare-language entry also exists in that cluster.
 - **Reference:** None — no reference implementation
 - **Source:** [Tier 1] https://developers.google.com/search/docs/specialty/international/localized-versions
 - **Tools:** Not applicable — no tool surveyed checks for a missing bare-language fallback in a cluster.
@@ -367,7 +367,7 @@ Apply this module the moment a client site serves more than one language or regi
 - **Rule:** Do not use UN M.49 numeric-region codes or other non-ISO-3166-1-Alpha-2 region identifiers (e.g., `es-419` for "Latin American Spanish") in `hreflang`, even though such codes are valid and meaningful under BCP 47/UN M.49 more broadly.
 - **Why:** Google states directly: "Only language codes listed in ISO 639-1 and region codes listed in ISO 3166-1 Alpha 2 are supported; other codes that aren't listed in those standards, such as es-419, aren't supported." This is narrower than BCP 47/RFC 5646 permits generally, which explicitly allows three-digit UN M.49 numeric region subtags.
 - **Acceptance:** No `hreflang` value uses a three-digit numeric region subtag; region subtags are two-letter ISO 3166-1 Alpha-2 only.
-- **Verify:** `node scripts/seo-sop/check-hreflang-codes.mjs`
+- **Verify:** `curl -s https://example.com/sitemap.xml | grep -oE 'hreflang="[^"]+"' | grep -E 'hreflang="[a-z]{2}-[0-9]{3}"'` → empty
 - **Reference:** None — no reference implementation
 - **Source:** [Tier 1] https://developers.google.com/search/docs/specialty/international/localized-versions
 - **Tools:** Not applicable — no tool surveyed validates hreflang codes against the ISO-only restriction.
@@ -383,7 +383,7 @@ Apply this module the moment a client site serves more than one language or regi
 - **Rule:** Treat `hreflang` values as case-insensitive when validating or deduplicating; do not reject a technically-valid tag purely because it doesn't match the lowercase-language/uppercase-region display convention.
 - **Why:** RFC 5646 §2.1.1: "At all times, language tags and their subtags... are to be treated as case insensitive: there exist conventions for the capitalization of some of the subtags, but these MUST NOT be taken to carry meaning." Google's own examples consistently render `en-GB`/`de-CH` in that display convention, but it is documented display style, not a matching requirement.
 - **Acceptance:** A validation script lowercases both sides before comparing/deduplicating values (so `EN-gb` and `en-GB` are recognized as the same tag), while still emitting the conventional casing in generated markup.
-- **Verify:** `node scripts/seo-sop/check-hreflang-codes.mjs`
+- **Verify:** Manual — no automated script exists in this repo; read the hreflang-generating/validating code path and confirm it lowercases both sides before comparing or deduplicating values, while still emitting the conventional display casing in generated markup.
 - **Reference:** None — no reference implementation
 - **Source:** [Tier 1] https://www.rfc-editor.org/rfc/rfc5646.txt §2.1.1
 - **Tools:** Not applicable — no tool surveyed scores hreflang casing consistency.

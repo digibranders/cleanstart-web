@@ -111,7 +111,7 @@ Apply this module the moment a client has a physical location customers visit, a
 - **Rule:** It is legitimate to publish one page per genuine physical/service location; it becomes a policy violation when those pages are built primarily to rank for city/region-name queries and funnel users onward without adding location-specific value.
 - **Why:** Google's spam policies define doorway abuse as pages "created to rank for specific, similar search queries" that funnel users to another page, explicitly citing "having multiple domain names or pages targeted at specific regions or cities that funnel users to one page." Google does not publish a dedicated "location page requirements" document — the applicable guidance is this general doorway-abuse policy, applied to the local-page case.
 - **Acceptance:** Each location page contains content genuinely specific to that location (real address, real hours, real staff/inventory/service-area detail, unique photos) rather than a templated city-name swap over otherwise identical body copy; the page is a genuine destination, not an intermediate funnel to one central page.
-- **Verify:** `node scripts/seo-sop/check-locale-content-similarity.mjs`
+- **Verify:** Manual — no automated script exists in this repo; diff the body content of location-page pairs after stripping the NAP block and city name, per this rule's own `Tools` field.
 - **Reference:** None — no reference implementation
 - **Source:** [Tier 1] https://developers.google.com/search/docs/essentials/spam-policies (doorway abuse section, last updated 2026-05-15 UTC)
 - **Tools:** Not applicable — diff the body content of two location pages after stripping the NAP block and city name; substantially identical boilerplate is a doorway-risk signal.

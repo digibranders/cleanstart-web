@@ -3,7 +3,8 @@
 **Module:** 10 — Governance & CI enforcement
 **Prefix:** `GOV`
 **Review cadence:** Not listed in `00-index.md` §9 — no fixed cadence stated; update opportunistically when a rule is found stale or a client engagement surfaces a gap (`00-index.md` §9, closing note).
-**Scope:** SEO as code — tests, lint gates, publishing checklist, editor guardrails, drift tests, ownership/RACI (`00-index.md` §8, module map row 10).
+**Scope:** SEO as code — tests, lint gates, publishing checklist, editor guardrails, drift tests, and per-gate ownership (`00-index.md` §8, module map row 10).
+**Out of scope:** A broader accountability/escalation matrix (who owns an SEO regression end-to-end, escalation path across teams) — `GOV-12` requires only that every CI gate/checklist item has one named owner; it does not attempt a full RACI matrix for the SEO function as a whole.
 **Evidence base:** `docs/seo/evidence/sources/governance.md` (13 researched items plus the mechanically-testable-vs-human-review taxonomy); `docs/seo/evidence/verification-log.md` corrections #29–#31 (all three applied below); `docs/seo/evidence/codebase-inventory.md` §"Measurement & Governance" (mechanisms, configuration, and the enforcement-inventory table) and §"Performance & Core Web Vitals" (bundle-budget mechanics); a direct `gh api` branch-protection re-check against `digibranders/cleanstart-website`, run on 2026-07-29 while authoring this module, which reconfirmed the codebase inventory's own finding: `404 "Branch not protected"` on both `main` and `development`.
 
 ## A module with unusually little authority to borrow

@@ -15,10 +15,10 @@
 
 | Verdict | Count |
 |---|---|
-| Pass | 66 |
+| Pass | 67 |
 | Fail | 33 |
 | Partial | 33 |
-| Unverified | 18 |
+| Unverified | 17 |
 | N/A | 21 |
 
 **By severity, core modules only:**
@@ -28,7 +28,7 @@
 | P0 | 2 | 1 | 6 | 0 | 0 | 9 |
 | P1 | 23 | 12 | 14 | 7 | 5 | 61 |
 | P2 | 23 | 16 | 8 | 8 | 7 | 62 |
-| P3 | 18 | 4 | 5 | 3 | 9 | 39 |
+| P3 | 19 | 4 | 5 | 2 | 9 | 39 |
 
 Every `Fail` and `Partial` closes through one of the 35 entries in `## Ranked gap backlog` below — several close more than one rule ID at once because they share a single root cause.
 
@@ -161,7 +161,7 @@ One row per core rule (171 rows). `Evidence` points to the module file carrying 
 | RENDER-13 | `Vary` determines the cache key; get it wrong and a shared cache serves the wrong representation to the wrong audience | P2 | N/A | 07-render | — |
 | RENDER-14 | Content freshness follows stale-while-revalidate, not always-fresh — verify the actual revalidation configuration, not a comment describing it | P2 | Unverified | 07-render | — |
 | RENDER-15 | Never state a fixed render-queue or "second wave" delay — Google deliberately gives no number | P3 | N/A | 07-render | — |
-| RENDER-16 | Support conditional GET so unchanged pages can return 304 without altering indexed content | P3 | Unverified | 07-render | — |
+| RENDER-16 | Support conditional GET so unchanged pages can return 304 without altering indexed content | P3 | Pass | 07-render | — |
 | RENDER-17 | `stale-while-revalidate` and `stale-if-error` are formally defined `Cache-Control` extensions with their own numeric semantics | P3 | N/A | 07-render | — |
 | MIG-01 | A previously-indexed URL 404ing instead of 301ing is a time-decaying, only-partially-recoverable loss | P0 | Fail | 08-mig | #1 |
 | MIG-02 | A redirect loop is a total outage for every URL caught in it | P0 | Pass | 08-mig | — |
@@ -640,7 +640,7 @@ Not a failure section — this is the honest edge of what this pass could actual
 
 #### Needs exhaustive per-file coverage, not a sample
 
-- **`PERF-05`** (LCP-candidate `priority`/`fetchpriority` correctness) and **`PERF-09`** (responsive `sizes` matching rendered width) — two sampled hero files and a handful of the ~62 `next/image` call sites confirmed correct usage; the rest were not individually read. **`PERF-15`** names this exact gap as its own rule (verify by convention vs. by a real check). Closing all three needs either a custom lint rule or a dated full manual pass across every file using the `priority`/`sizes` convention — not another sample.
+- **`PERF-05`** (LCP-candidate `priority`/`fetchpriority` correctness) and **`PERF-09`** (responsive `sizes` matching rendered width) — two sampled hero files and a handful of the ~62 `next/image` call sites confirmed correct usage; the rest were not individually read. Re-verification narrowed both: `PERF-05`'s own `Verify` command had a case-sensitivity bug (fixed) and now confirms the homepage's LCP candidate is correct; `PERF-09`'s isolation gap is closed (the one file lacking `sizes=` is `PodcastChannelVideos.tsx`, out of 61 files today, not the "2 of 62" originally recorded). Neither re-check reaches the deeper claim — correctness across every remaining file, not just presence of the attribute. **`PERF-15`** names this exact gap as its own rule (verify by convention vs. by a real check). Closing all three needs either a custom lint rule or a dated full manual pass across every file using the `priority`/`sizes` convention — not another sample.
 - **`SEM-05`** (alt-text quality sitewide) — 20 files spot-checked, no violations found; full coverage needs an axe-core (or equivalent) scan, exactly what backlog #31 proposes.
 - **`MIG-06`** (redirect map free of multi-hop chains) — the middleware's fixed rule order structurally limits chaining within a single request, but doesn't by itself prove zero chains have crept in across sequential CMS-row edits over time; closing it needs the same redirect-graph script proposed in backlog #5 (`GOV-07`).
 
@@ -648,7 +648,8 @@ Not a failure section — this is the honest edge of what this pass could actual
 
 - **`MEAS-04`** (GA4 Enhanced Measurement "History events" toggle) and **`MEAS-12`** (GA4 thresholding banner) — both are GA4-Admin-UI-only states with no API surface; closing either needs direct GA4 Admin console access, not a code read.
 - **`GEO-09`** (GSC Generative AI performance report rollout, Bing Webmaster Tools access) — GSC domain-property access for standard Search Analytics is confirmed live (`MEAS-01`); whether the Generative AI report specifically has rolled out for this property, and whether Bing Webmaster Tools is onboarded at all, needs a login to each console.
-- **`RENDER-12`** (what `x-nextjs-stale-time: 300` represents relative to a route's own `revalidate` value) and **`RENDER-14`** (the podcast page's actual effective revalidation interval; whether `/api/revalidate`'s Mode 2 auth path has any external caller) — both need Vercel platform support/documentation beyond what's publicly written, or a controlled revalidate-timing experiment against the live deployment.
+- **`RENDER-12`** (what `x-nextjs-stale-time: 300` represents relative to a route's own `revalidate` value) — needs Vercel platform support/documentation beyond what's publicly written, or a controlled revalidate-timing experiment against the live deployment.
+- **`RENDER-14`** (whether `/api/revalidate`'s Mode 2 auth path has any external caller) — no in-repo caller exists, but an external one (a manual request, an undiscovered script, an unmatched Payload hook) can't be excluded by static analysis alone. (The podcast page's effective revalidation interval, the other half of this rule in the prior pass, is now traced and closed — re-running the rule's own `Verify` command found no `revalidateSeconds` override in `lib/podcast.ts`'s three `fetchCMS` calls, confirming the true interval is the shared 3600s default and that `page.tsx:31-35`'s "revalidate 60" comment is stale; see `07-rendering-and-delivery.md`.)
 
 #### Depends on a fix landing first
 
@@ -656,8 +657,8 @@ Not a failure section — this is the honest edge of what this pass could actual
 
 #### Needs a live test or a process artifact that doesn't exist yet
 
-- **`RENDER-05`** (sustained 5xx/429 monitoring beyond the homepage/health endpoint) and **`RENDER-16`** (conditional-GET/304 support) — both need a monitoring change or a live request test, not a code read.
-- **`MIG-09`** (redirect retention against a 365-day floor) — `hitCount`/`lastHitAt` exist on every redirect row, but no dated cutover log exists to check any row's age against, and the script this rule's own `Verify` field names (`check-redirect-retention.mjs`) doesn't exist yet.
+- **`RENDER-05`** (sustained 5xx/429 monitoring beyond the homepage/health endpoint) — needs a monitoring change, not a code read. (`RENDER-16`, conditional-GET/304 support, was in this bullet in the prior pass; re-running its own `Verify` command now resolves cleanly to `Pass` — see `07-rendering-and-delivery.md`.)
+- **`MIG-09`** (redirect retention against a 365-day floor) — `hitCount`/`lastHitAt` exist on every redirect row, but no dated cutover log exists to check any row's age against; this rule's `Verify` field is now stated as an explicit manual procedure rather than a script path (no such script exists, and none is being authored as part of this documentation pass).
 - **`SEM-03`** (heading visual-prominence, not just presence/count) — needs a computed-style spot check against rendered CSS, not a raw-HTML read.
 
 #### Needs review of artifacts outside this codebase

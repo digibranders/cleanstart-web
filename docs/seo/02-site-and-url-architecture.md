@@ -2,7 +2,8 @@
 
 **Module:** 02 — Site & URL architecture
 **Prefix:** `ARCH`
-**Scope:** Taxonomy, route naming, trailing-slash/case consistency, site depth, internal linking, orphan prevention, breadcrumbs, pagination, XML sitemap protocol, `lastmod` semantics, HTML sitemaps, faceted navigation, and the redirect-resolution architecture that keeps a site's URL graph coherent across renames and migrations. Authored per the rule-block format, severity model, evidence tiers, and verdict vocabulary defined in `00-index.md` — read that module first if any field below is unclear.
+**Scope:** Route naming, trailing-slash/case consistency, site depth, internal linking, orphan prevention, breadcrumbs, pagination, XML sitemap protocol, `lastmod` semantics, whether to build an HTML sitemap (one rule, a documented negative — don't), faceted navigation, and the redirect-resolution architecture that keeps a site's URL graph coherent across renames and migrations. Authored per the rule-block format, severity model, evidence tiers, and verdict vocabulary defined in `00-index.md` — read that module first if any field below is unclear.
+**Out of scope:** Taxonomy/category-structure design (a distinct information-architecture discipline this module's rule set does not cover directly — `ARCH-07` governs URL-*path* hygiene, not category taxonomy).
 
 **Review cadence:** Semi-annual (per `00-index.md` §9).
 
