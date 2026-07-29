@@ -13,9 +13,11 @@ import { dirname } from 'node:path';
 
 const UA = 'Mozilla/5.0 (compatible; CleanStart-SEO-Audit/1.0)';
 
-const attr = (html, re) => {
+const TIMEOUT_MS = 15_000;
+
+const attr = (html, re, group = 1) => {
   const m = re.exec(html);
-  return m ? m[1].trim() : null;
+  return m ? m[group].trim() : null;
 };
 
 export function extractHead(html) {
@@ -27,6 +29,7 @@ export function extractHead(html) {
     []) {
     const body = block.replace(/^[\s\S]*?>/, '').replace(/<\/script>$/i, '');
     try {
+      // for...of rather than forEach: biome's noForEach rule governs root scripts/.
       const collect = (node) => {
         if (Array.isArray(node)) {
           for (const item of node) collect(item);
@@ -45,16 +48,23 @@ export function extractHead(html) {
     }
   }
 
+  // Attribute values are captured with a quote backreference — (["'])(...)\1 — so a
+  // double-quoted value containing an apostrophe ("CleanStart's images") is not
+  // truncated at the apostrophe. The captured value is group 2.
   return {
     title: attr(html, /<title[^>]*>([\s\S]*?)<\/title>/i),
-    description: attr(html, /<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["']/i),
-    metaRobots: attr(html, /<meta[^>]+name=["']robots["'][^>]+content=["']([^"']*)["']/i),
-    canonical: canonicals.length ? attr(canonicals[0], /href=["']([^"']*)["']/i) : null,
+    description: attr(
+      html,
+      /<meta[^>]+name=["']description["'][^>]+content=(["'])([\s\S]*?)\1/i,
+      2,
+    ),
+    metaRobots: attr(html, /<meta[^>]+name=["']robots["'][^>]+content=(["'])([\s\S]*?)\1/i, 2),
+    canonical: canonicals.length ? attr(canonicals[0], /href=(["'])([\s\S]*?)\1/i, 2) : null,
     canonicalCount: canonicals.length,
     hreflangCount: (html.match(/hreflang=["'][^"']+["']/gi) ?? []).length,
     h1Count: (html.match(/<h1[\s>]/gi) ?? []).length,
-    ogTitle: attr(html, /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']*)["']/i),
-    ogImage: attr(html, /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']*)["']/i),
+    ogTitle: attr(html, /<meta[^>]+property=["']og:title["'][^>]+content=(["'])([\s\S]*?)\1/i, 2),
+    ogImage: attr(html, /<meta[^>]+property=["']og:image["'][^>]+content=(["'])([\s\S]*?)\1/i, 2),
     jsonLdTypes: [...jsonLdTypes],
     jsonLdParseErrors,
   };
@@ -73,7 +83,11 @@ async function trace(url) {
   const chain = [];
   let current = url;
   for (let hop = 0; hop < 10; hop += 1) {
-    const res = await fetch(current, { redirect: 'manual', headers: { 'user-agent': UA } });
+    const res = await fetch(current, {
+      redirect: 'manual',
+      headers: { 'user-agent': UA },
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
     chain.push({ url: current, status: res.status });
     const location = res.headers.get('location');
     if (!location) return { chain, final: res };
@@ -89,7 +103,16 @@ async function main() {
 
   const pages = [];
   for (const { template, url } of matrix.urls) {
-    const { chain, final } = await trace(url);
+    let traced;
+    try {
+      traced = await trace(url);
+    } catch (err) {
+      // A timeout or transport failure is evidence too — record it and keep going,
+      // rather than aborting a 50-URL capture run on one bad response.
+      pages.push({ template, url, error: `fetch failed: ${err.message}` });
+      continue;
+    }
+    const { chain, final } = traced;
     if (!final) {
       pages.push({ template, url, error: 'redirect loop or >10 hops', chain });
       continue;

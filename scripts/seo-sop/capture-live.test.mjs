@@ -51,6 +51,28 @@ test('extractHead tolerates malformed JSON-LD without throwing', () => {
   assert.equal(h.jsonLdParseErrors, 1);
 });
 
+test('an apostrophe in a double-quoted value does not truncate it', () => {
+  const html = `<meta name="description" content="CleanStart's hardened images, near-zero CVEs.">`;
+  assert.equal(extractHead(html).description, "CleanStart's hardened images, near-zero CVEs.");
+});
+
+test('single-quoted attribute values are still captured', () => {
+  const html = `<meta property='og:title' content='Hardened Images'/>`;
+  assert.equal(extractHead(html).ogTitle, 'Hardened Images');
+});
+
+test('extractHead counts duplicate canonicals', () => {
+  const html = `<link rel="canonical" href="https://a.example/x"/><link rel="canonical" href="https://a.example/y"/>`;
+  const h = extractHead(html);
+  assert.equal(h.canonicalCount, 2);
+  assert.equal(h.canonical, 'https://a.example/x');
+});
+
+test('extractHead collects array-valued JSON-LD @type', () => {
+  const html = `<script type="application/ld+json">{"@type":["Article","NewsArticle"]}</script>`;
+  assert.deepEqual(extractHead(html).jsonLdTypes.sort(), ['Article', 'NewsArticle']);
+});
+
 test('summarizeHeaders lifts the SEO-relevant headers', () => {
   const headers = new Headers({
     'x-robots-tag': 'max-image-preview:large',
