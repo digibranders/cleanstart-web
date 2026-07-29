@@ -20,7 +20,7 @@ import { SIGNATURE_GROUPS } from '../../collections/EmailSignatures';
  */
 const WEB_LIB = path.resolve(
   path.dirname(new URL(import.meta.url).pathname),
-  '../../../../../web/src/lib/email-signatures.ts',
+  '../../../../../web/src/lib/email-signatures-utils.ts',
 );
 
 const webGroupOrder = (): string[] => {

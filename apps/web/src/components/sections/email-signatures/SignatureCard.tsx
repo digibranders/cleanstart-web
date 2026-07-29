@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { copyRichHtml } from "@/lib/clipboard";
-import type { EmailSignatureSummary } from "@/lib/email-signatures";
+import type { EmailSignatureSummary } from "@/lib/email-signatures-utils";
 
 type CopyState = "idle" | "copying" | "copied" | "error";
 

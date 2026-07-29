@@ -1,9 +1,14 @@
 import { cache } from "react";
 
 import { fetchCMS } from "./cms-fetch";
+import type { EmailSignatureSummary } from "./email-signatures-utils";
 
 /**
- * Employee email-signature directory.
+ * Employee email-signature directory — the server-only half.
+ *
+ * The types and pure helpers the directory UI needs live in
+ * `email-signatures-utils.ts`, because `fetchCMS` pulls in `next/headers` and
+ * a client component cannot import this module.
  *
  * The signature HTML itself is rendered by the CMS
  * (`/api/emailSignatures/:slug/render`) rather than here: the token contract
@@ -12,39 +17,6 @@ import { fetchCMS } from "./cms-fetch";
  * have to duplicate the token list, and any drift would surface as a silently
  * empty field in a signature already pasted into somebody's mail client.
  */
-
-/** Section headings the directory groups people under, in display order. */
-export const SIGNATURE_GROUP_ORDER = [
-  "Executive Leadership",
-  "Sales & Regional Leadership",
-  "Marketing & Communications",
-  "HR & People Operations",
-  "Account Management & Sales Operations",
-  "Engineering & Technical Solutions",
-  "Product & Program Management",
-  "Infrastructure & Systems",
-  "Finance & Accounts",
-  "Customer Success",
-  "Partnerships & Alliances",
-  "Operations",
-  "Data & Analytics",
-  "Design",
-  "IT & Security",
-  "Quality Assurance",
-  "Training & Enablement",
-  "Administration",
-  "Legal",
-] as const;
-
-export interface EmailSignatureSummary {
-  id: string | number;
-  slug: string;
-  name: string;
-  jobTitle: string;
-  email: string;
-  group: string;
-  sortOrder?: number | null;
-}
 
 export interface RenderedSignature {
   slug: string;
@@ -101,30 +73,6 @@ export const getEmailSignatures = cache(
     );
   },
 );
-
-/** Signatures bucketed into `SIGNATURE_GROUP_ORDER`; empty groups are dropped. */
-export function groupSignatures(
-  signatures: EmailSignatureSummary[],
-): { group: string; people: EmailSignatureSummary[] }[] {
-  const known = new Set<string>(SIGNATURE_GROUP_ORDER);
-
-  const ordered = SIGNATURE_GROUP_ORDER.map((group) => ({
-    group: group as string,
-    people: signatures.filter((person) => person.group === group),
-  }));
-
-  // A group added in the CMS but not yet reflected here still renders, after
-  // the known ones, rather than silently dropping those people from the page.
-  const extras = [...new Set(signatures.map((p) => p.group))]
-    .filter((group) => !known.has(group))
-    .sort()
-    .map((group) => ({
-      group,
-      people: signatures.filter((person) => person.group === group),
-    }));
-
-  return [...ordered, ...extras].filter((entry) => entry.people.length > 0);
-}
 
 /**
  * Final signature HTML for one person, or null when the slug is unknown or the

@@ -2,9 +2,9 @@ import type React from "react";
 
 import { Container, Section } from "@/components/layout";
 import { Header } from "@/components/nav/Header";
-import { SignatureCard } from "@/components/sections/email-signatures/SignatureCard";
+import { SignatureDirectory } from "@/components/sections/email-signatures/SignatureDirectory";
 import { Footer } from "@/components/sections/Footer";
-import { getEmailSignatures, groupSignatures } from "@/lib/email-signatures";
+import { getEmailSignatures } from "@/lib/email-signatures";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 
 /**
@@ -31,7 +31,6 @@ export const revalidate = 300;
 
 export default async function EmailSignaturesPage(): Promise<React.ReactElement> {
   const signatures = await getEmailSignatures();
-  const groups = groupSignatures(signatures);
 
   return (
     <>
@@ -43,32 +42,7 @@ export default async function EmailSignaturesPage(): Promise<React.ReactElement>
               Email Signatures Directory
             </h1>
 
-            {groups.length === 0 ? (
-              <p className="mt-10 text-[length:var(--fs-body)] text-white/50">
-                No signatures have been published yet.
-              </p>
-            ) : (
-              <div className="mt-10 space-y-11">
-                {groups.map(({ group, people }) => (
-                  <section key={group}>
-                    {/* Quiet label + hairline rather than a display heading:
-                        this is a directory people scan, so the groups should
-                        organise the grid without competing with the names. */}
-                    <div className="flex items-center gap-4">
-                      <h2 className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.14em] text-white/45">
-                        {group}
-                      </h2>
-                      <span aria-hidden="true" className="h-px flex-1 bg-white/10" />
-                    </div>
-                    <div className="mt-5 grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(300px,1fr))]">
-                      {people.map((person) => (
-                        <SignatureCard key={person.slug} person={person} />
-                      ))}
-                    </div>
-                  </section>
-                ))}
-              </div>
-            )}
+            <SignatureDirectory signatures={signatures} />
           </Container>
         </Section>
       </main>
