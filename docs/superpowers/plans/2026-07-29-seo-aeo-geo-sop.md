@@ -25,6 +25,7 @@ Every task's requirements implicitly include these.
 - **Every conditional module** (`C1`–`C5`) opens with the banner: `> **Not exercised by CleanStart — verified against primary documentation only.**`
 - **Commit style:** `docs(seo): <description>` for docs, `chore(seo-sop): <description>` for tooling. Stage explicit paths only — never `git add -A` or `git add .`.
 - **Branch:** `development`.
+- **Repo lint conventions for `scripts/seo-sop/*.mjs`:** biome lints root `scripts/` and its `noConsole` rule allows only `console.error`, `console.warn`, `console.info` — use `console.info` for success output, never `console.log`. Before committing any `.mjs` file, run `npx biome format --write scripts/seo-sop/` and `npx biome lint scripts/seo-sop/`; both must be clean for the files this workstream adds.
 
 ---
 
@@ -327,7 +328,7 @@ async function main() {
     console.error(`\n${errs.length} problem(s) across ${rules.length} rule(s)`);
     process.exit(1);
   }
-  console.log(`✓ ${rules.length} rule(s) across ${files.length} file(s) — schema clean`);
+  console.info(`✓ ${rules.length} rule(s) across ${files.length} file(s) — schema clean`);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) await main();
@@ -341,7 +342,13 @@ node --test scripts/seo-sop/lint-rules.test.mjs
 
 Expected: PASS — 12 tests, 0 failures.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Format and lint, then commit**
+
+```bash
+npx biome format --write scripts/seo-sop/ && npx biome lint scripts/seo-sop/
+```
+
+Expected: no errors and no warnings for these two files.
 
 ```bash
 git add scripts/seo-sop/lint-rules.mjs scripts/seo-sop/lint-rules.test.mjs
@@ -591,7 +598,7 @@ async function main() {
 
   await mkdir(dirname(outPath), { recursive: true });
   await writeFile(outPath, `${JSON.stringify({ capturedAt: new Date().toISOString(), pages }, null, 2)}\n`);
-  console.log(`✓ captured ${pages.length} URL(s) → ${outPath}`);
+  console.info(`✓ captured ${pages.length} URL(s) → ${outPath}`);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) await main();
@@ -605,7 +612,13 @@ node --test scripts/seo-sop/capture-live.test.mjs
 
 Expected: PASS — 8 tests, 0 failures.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Format and lint, then commit**
+
+```bash
+npx biome format --write scripts/seo-sop/ && npx biome lint scripts/seo-sop/
+```
+
+Expected: no errors and no warnings for these files.
 
 ```bash
 git add scripts/seo-sop/capture-live.mjs scripts/seo-sop/capture-live.test.mjs
