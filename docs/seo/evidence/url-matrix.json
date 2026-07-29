@@ -1,0 +1,73 @@
+{
+  "host": "https://www.cleanstart.com",
+  "urls": [
+    { "template": "home", "url": "https://www.cleanstart.com/" },
+
+    { "template": "listing:legal", "url": "https://www.cleanstart.com/legal" },
+    { "template": "detail:legal", "url": "https://www.cleanstart.com/legal/acceptable-use-policy" },
+    { "template": "static:privacy-policy", "url": "https://www.cleanstart.com/privacy-policy" },
+
+    { "template": "static:about-us", "url": "https://www.cleanstart.com/about-us" },
+    { "template": "static:attack-surface-reduction", "url": "https://www.cleanstart.com/attack-surface-reduction" },
+
+    { "template": "detail:author", "url": "https://www.cleanstart.com/author/cleanstart-security" },
+
+    { "template": "listing:blogs", "url": "https://www.cleanstart.com/blogs" },
+    { "template": "detail:blog", "url": "https://www.cleanstart.com/blogs/ai-broke-software-security-biggest-assumption" },
+
+    { "template": "static:book-a-demo", "url": "https://www.cleanstart.com/book-a-demo" },
+
+    { "template": "listing:careers", "url": "https://www.cleanstart.com/careers" },
+    { "template": "detail:job", "url": "https://www.cleanstart.com/job/senior-software-engineer" },
+
+    { "template": "listing:case-studies", "url": "https://www.cleanstart.com/case-studies" },
+
+    { "template": "static:clean-libraries", "url": "https://www.cleanstart.com/clean-libraries" },
+    { "template": "static:cleansight", "url": "https://www.cleanstart.com/cleansight" },
+    { "template": "static:cleanstart-images", "url": "https://www.cleanstart.com/cleanstart-images" },
+    { "template": "static:cleanstart-platform", "url": "https://www.cleanstart.com/cleanstart-platform" },
+    { "template": "static:community", "url": "https://www.cleanstart.com/community" },
+    { "template": "static:contact-us", "url": "https://www.cleanstart.com/contact-us" },
+    { "template": "static:deal-registration", "url": "https://www.cleanstart.com/deal-registration" },
+    { "template": "static:email-signatures", "url": "https://www.cleanstart.com/email-signatures" },
+
+    { "template": "listing:events", "url": "https://www.cleanstart.com/events" },
+    { "template": "detail:event", "url": "https://www.cleanstart.com/event/reflections-from-gids-2026-the-future-of-ai-driven-development" },
+
+    { "template": "static:fips", "url": "https://www.cleanstart.com/fips" },
+    { "template": "static:for-ciso", "url": "https://www.cleanstart.com/for-ciso" },
+    { "template": "static:for-developers", "url": "https://www.cleanstart.com/for-developers" },
+
+    { "template": "listing:guide", "url": "https://www.cleanstart.com/guide" },
+    { "template": "detail:guide", "url": "https://www.cleanstart.com/guide/attack-surface-reduction-vs-vulnerability-management" },
+
+    { "template": "listing:knowledge-hub", "url": "https://www.cleanstart.com/knowledge-hub" },
+    { "template": "detail:knowledge-hub", "url": "https://www.cleanstart.com/knowledge-hub/release-notes" },
+
+    { "template": "listing:news", "url": "https://www.cleanstart.com/news" },
+    { "template": "detail:news", "url": "https://www.cleanstart.com/news/cleanstart-launches-clean-libraries" },
+
+    { "template": "static:partners", "url": "https://www.cleanstart.com/partners" },
+
+    { "template": "listing:podcast", "url": "https://www.cleanstart.com/podcast" },
+
+    { "template": "detail:preview", "url": "https://www.cleanstart.com/preview/blogs/none" },
+
+    { "template": "static:pricing", "url": "https://www.cleanstart.com/pricing" },
+
+    { "template": "listing:resource-center", "url": "https://www.cleanstart.com/resource-center" },
+    { "template": "detail:resource", "url": "https://www.cleanstart.com/resources/clean-libraries" },
+
+    { "template": "static:roi-calculator", "url": "https://www.cleanstart.com/roi-calculator" },
+    { "template": "static:software-bill-materials", "url": "https://www.cleanstart.com/software-bill-materials" },
+    { "template": "static:teams", "url": "https://www.cleanstart.com/teams" },
+    { "template": "static:vulnerability-remediation", "url": "https://www.cleanstart.com/vulnerability-remediation" },
+
+    { "template": "listing:webinars", "url": "https://www.cleanstart.com/webinars" },
+
+    { "template": "control:404", "url": "https://www.cleanstart.com/this-page-definitely-does-not-exist-404-check" },
+    { "template": "control:legacy-redirect", "url": "https://www.cleanstart.com/acceptable-use-policy" },
+    { "template": "control:sitemap", "url": "https://www.cleanstart.com/sitemap.xml" },
+    { "template": "control:llms-txt", "url": "https://www.cleanstart.com/llms.txt" }
+  ]
+}
