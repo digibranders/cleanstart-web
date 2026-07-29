@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-07-29T11:02:35.441Z",
+  "capturedAt": "2026-07-29T11:10:05.538Z",
   "pages": [
     {
       "template": "home",
@@ -1584,13 +1584,423 @@
       }
     },
     {
-      "template": "control:legacy-redirect",
+      "template": "control:legacy-redirect:acceptable-use-policy",
       "url": "https://www.cleanstart.com/acceptable-use-policy",
       "status": 404,
       "redirects": 0,
       "chain": [
         {
           "url": "https://www.cleanstart.com/acceptable-use-policy",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:leadership",
+      "url": "https://www.cleanstart.com/leadership",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/leadership",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:search",
+      "url": "https://www.cleanstart.com/search",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/search",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:survey",
+      "url": "https://www.cleanstart.com/survey",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/survey",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:pricing",
+      "url": "https://www.cleanstart.com/pricing",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/pricing",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Pricing | CleanStart",
+        "description": "Choose the CleanStart plan that fits your team — free hardened container images for developers, enterprise images with FIPS and SLSA Level 3 provenance, plus custom images, clean libraries, and additional services.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/pricing",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Pricing | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Pricing+%7C+CleanStart&amp;sub=Choose+the+CleanStart+plan+that+fits+your+team+%E2%80%94+free+hardened+container+images+for+developers%2C+enterprise+images+with+FIPS+and+SLSA+Level+3+provenance%2C+plus+cu",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "WebPage",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:webinar-sysdig-1",
+      "url": "https://www.cleanstart.com/webinar/secure-containers-end-to-end-from-trusted-images-to-runtime-visibility-with-cleanstart-and-sysdig",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/webinar/secure-containers-end-to-end-from-trusted-images-to-runtime-visibility-with-cleanstart-and-sysdig",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:webinar-sysdig-2",
+      "url": "https://www.cleanstart.com/webinar/secure-containers-end-to-end-from-trusted-images-to-runtime-visibility-with-cleanstart-and-sysdig-2",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/webinar/secure-containers-end-to-end-from-trusted-images-to-runtime-visibility-with-cleanstart-and-sysdig-2",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:new-year-event-sysdig",
+      "url": "https://www.cleanstart.com/new-year-event-sysdig",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/new-year-event-sysdig",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:new-year-event-eventus",
+      "url": "https://www.cleanstart.com/new-year-event-eventus",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/new-year-event-eventus",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:cleanstart-hitachi-chennai",
+      "url": "https://www.cleanstart.com/cleanstart-hitachi-chennai",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/cleanstart-hitachi-chennai",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:cleanstart-hitachi-bengaluru",
+      "url": "https://www.cleanstart.com/cleanstart-hitachi-bengaluru",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/cleanstart-hitachi-bengaluru",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:cleanstart-hitachi-hyderabad",
+      "url": "https://www.cleanstart.com/cleanstart-hitachi-hyderabad",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/cleanstart-hitachi-hyderabad",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:cleanstart-raksha-chennai",
+      "url": "https://www.cleanstart.com/cleanstart-raksha-chennai",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/cleanstart-raksha-chennai",
           "status": 404
         }
       ],

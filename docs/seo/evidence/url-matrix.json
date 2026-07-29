@@ -51,7 +51,7 @@
 
     { "template": "listing:podcast", "url": "https://www.cleanstart.com/podcast" },
 
-    { "template": "detail:preview", "url": "https://www.cleanstart.com/preview/blogs/none" },
+    { "template": "detail:preview", "url": "https://www.cleanstart.com/preview/blogs/none", "note": "deliberate probe path, not sitemap-sourced content — exercises the unauthenticated preview route, no published doc lives at this slug" },
 
     { "template": "static:pricing", "url": "https://www.cleanstart.com/pricing" },
 
@@ -66,7 +66,21 @@
     { "template": "listing:webinars", "url": "https://www.cleanstart.com/webinars" },
 
     { "template": "control:404", "url": "https://www.cleanstart.com/this-page-definitely-does-not-exist-404-check" },
-    { "template": "control:legacy-redirect", "url": "https://www.cleanstart.com/acceptable-use-policy" },
+
+    { "template": "control:legacy-redirect:acceptable-use-policy", "url": "https://www.cleanstart.com/acceptable-use-policy" },
+    { "template": "control:legacy-redirect:leadership", "url": "https://www.cleanstart.com/leadership" },
+    { "template": "control:legacy-redirect:search", "url": "https://www.cleanstart.com/search" },
+    { "template": "control:legacy-redirect:survey", "url": "https://www.cleanstart.com/survey" },
+    { "template": "control:legacy-redirect:pricing", "url": "https://www.cleanstart.com/pricing" },
+    { "template": "control:legacy-redirect:webinar-sysdig-1", "url": "https://www.cleanstart.com/webinar/secure-containers-end-to-end-from-trusted-images-to-runtime-visibility-with-cleanstart-and-sysdig" },
+    { "template": "control:legacy-redirect:webinar-sysdig-2", "url": "https://www.cleanstart.com/webinar/secure-containers-end-to-end-from-trusted-images-to-runtime-visibility-with-cleanstart-and-sysdig-2" },
+    { "template": "control:legacy-redirect:new-year-event-sysdig", "url": "https://www.cleanstart.com/new-year-event-sysdig" },
+    { "template": "control:legacy-redirect:new-year-event-eventus", "url": "https://www.cleanstart.com/new-year-event-eventus" },
+    { "template": "control:legacy-redirect:cleanstart-hitachi-chennai", "url": "https://www.cleanstart.com/cleanstart-hitachi-chennai" },
+    { "template": "control:legacy-redirect:cleanstart-hitachi-bengaluru", "url": "https://www.cleanstart.com/cleanstart-hitachi-bengaluru" },
+    { "template": "control:legacy-redirect:cleanstart-hitachi-hyderabad", "url": "https://www.cleanstart.com/cleanstart-hitachi-hyderabad" },
+    { "template": "control:legacy-redirect:cleanstart-raksha-chennai", "url": "https://www.cleanstart.com/cleanstart-raksha-chennai" },
+
     { "template": "control:sitemap", "url": "https://www.cleanstart.com/sitemap.xml" },
     { "template": "control:llms-txt", "url": "https://www.cleanstart.com/llms.txt" }
   ]
