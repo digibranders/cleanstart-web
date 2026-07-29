@@ -52,6 +52,7 @@ This section is the most load-bearing part of the document. It collects every pl
 - Whether `/pricing`'s sitemap inclusion is the intended current state or a regression relative to the stale comment at `sitemap.ts:71` — would need author/PR history (`git blame`) for that line; out of a static-code-read audit's scope.
 - Whether the hardcoded `SECTION_INDEX_REDIRECTS` targets in `proxy.ts:40-41` (`/knowledge-hub` → `/knowledge-hub/vex-documents`, `/legal` → `/legal/additional-third-party-terms`) currently match what `getKnowledgeLanding()`/`getLegalList()` would compute live from the CMS's current `displayOrder`/`order` — would need querying live/dev CMS data for those two collections.
 - Whether `/api/` paths are individually excluded from `sitemap.xml` candidacy by an explicit rule, or simply never added — `robots.txt` disallows only `/api/preview/`, not `/api/` broadly, so there is no code-level assertion ruling out a future `/api/*` route being added to the sitemap by mistake.
+- Whether `next.config.ts`'s `redirects()` (`:62-99`) run strictly before middleware — a Next.js-internal ordering behavior, not decided by this repo's code.
 
 **On-Page Metadata**
 - Whether the home page's (`/`) dual metadata definitions (`layout.tsx`'s `generateMetadata()` plus `page.tsx`'s `export const metadata`) are an intentional override-on-purpose or accidental duplication — no comment explains it; would need commit history or an author interview.
