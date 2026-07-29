@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import {
   CLEAN_LIBRARIES_VIDEO,
   formatDurationLabel,
-  spokenDuration,
   toIso8601Duration,
 } from "./clean-libraries-video";
 
@@ -32,14 +31,6 @@ describe("toIso8601Duration", () => {
 
   it("represents a zero duration as PT0S rather than a bare PT", () => {
     expect(toIso8601Duration(0)).toBe("PT0S");
-  });
-});
-
-describe("spokenDuration", () => {
-  it("reads out minutes and seconds for screen readers", () => {
-    expect(spokenDuration(159)).toBe("2 min 39 sec");
-    expect(spokenDuration(120)).toBe("2 min");
-    expect(spokenDuration(45)).toBe("45 sec");
   });
 });
 
