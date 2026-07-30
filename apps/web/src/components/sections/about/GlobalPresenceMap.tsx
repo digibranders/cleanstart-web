@@ -84,7 +84,10 @@ export function GlobalPresenceMap({ offices }: GlobalPresenceMapProps) {
         width={1100}
         height={480}
         projection="geoNaturalEarth1"
-        projectionConfig={{ scale: 340, center: [12, 14] }}
+        // scale/center chosen so every office pin (US west coast → Singapore)
+        // projects inside the 1100×480 viewBox — scale 340 / center [12,14]
+        // pushed California off the left edge at every viewport size.
+        projectionConfig={{ scale: 315, center: [-6, 14] }}
         style={{ width: "100%", height: "auto" }}
       >
         <defs>
