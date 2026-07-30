@@ -20,6 +20,7 @@ import {
   recordRedirectHit,
   shouldSkipRedirectLookup,
 } from "@/lib/redirects-cache";
+import { detailRouteExists } from "@/lib/detail-route-not-found-guard";
 import { isIndexingAllowed } from "@/lib/seo/indexing";
 import { stripLegacyPaginationParams } from "@/lib/seo/legacy-params";
 
@@ -156,6 +157,29 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
           Number.parseInt(row.status, 10) as 301 | 302 | 307 | 308,
         );
       }
+    }
+  }
+
+  // Existence check for the nine dynamic CMS detail routes (blogs, event,
+  // author, guide, job, news, resources, knowledge-hub, legal). This can't
+  // be done inside the page component: the root `app/loading.tsx` Suspense
+  // boundary locks the response status at 200 the instant anything under it
+  // suspends, and a live CMS check is unavoidably suspending — see
+  // `lib/detail-route-not-found-guard.ts` for the full reasoning and the
+  // Next.js docs citation. Runs after redirects (an existing CMS redirect
+  // for the path wins) and before header work, so a discarded response
+  // doesn't pay for header construction — same rationale as the redirect
+  // block above.
+  if (request.method === "GET" && !isDraftMode && !isPreviewPath) {
+    const exists = await detailRouteExists(nextUrl.pathname);
+    if (!exists) {
+      return new NextResponse(
+        '<!doctype html><html lang="en"><head><meta charset="utf-8" /><title>Not found</title><meta name="robots" content="noindex" /></head><body><p>This page could not be found.</p></body></html>',
+        {
+          status: 404,
+          headers: { "content-type": "text/html; charset=utf-8" },
+        },
+      );
     }
   }
 
