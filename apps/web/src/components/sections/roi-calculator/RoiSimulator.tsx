@@ -13,9 +13,11 @@ import { useReducedMotion } from "motion/react";
 import {
   BURDEN_SCALE,
   computeImpact,
+  IMAGE_WEIGHT_THRESHOLDS,
   INPUT_BOUNDS,
   REMEDIATION_OPTIONS,
   RELEASE_OPTIONS,
+  TEAM_WEIGHT_THRESHOLDS,
   TIER_NAMES,
   type ReleaseOption,
   type RemediationOption,
@@ -146,7 +148,12 @@ function RadialGauge({ progress, tier, burden }: { progress: number; tier: TierN
       <div className="relative">
         <svg viewBox={`0 0 ${GAUGE.w} 128`} width="100%" role="img" aria-label={`Operational burden ${Math.round(burden)} of ${BURDEN_SCALE.max}, runtime complexity ${tier}.`}>
           <defs>
-            <filter id="roi-needle-shadow" x="-50%" y="-50%" width="200%" height="200%">
+            {/* userSpaceOnUse, not the default objectBoundingBox: at burden 100
+                and 360 the needle is exactly horizontal, so its bounding box has
+                zero height. Percentage filter regions resolve against that box,
+                making the region collapse and the needle disappear entirely at
+                both ends of the scale. A fixed region in user units is immune. */}
+            <filter id="roi-needle-shadow" filterUnits="userSpaceOnUse" x="-4" y="-4" width={GAUGE.w + 8} height="136">
               <feDropShadow dx="0" dy="1" stdDeviation="1.5" floodColor="rgba(17,17,17,0.35)" />
             </filter>
           </defs>
@@ -181,13 +188,22 @@ function RadialGauge({ progress, tier, burden }: { progress: number; tier: TierN
   );
 }
 
-/* ── contextual descriptors so a raw number reads as a scale ── */
-function imageContext(n: number): string {
-  return n <= 60 ? "Small footprint" : n <= 150 ? "Growing estate" : n <= 300 ? "Large estate" : "Enterprise-scale";
+/*
+ * Contextual descriptors so a raw number reads as a scale. These MUST stay on
+ * the model's own band edges — a caption that switches at a different count
+ * than the score does makes the gauge look broken ("it says Large estate but
+ * nothing moved"). One label per scoring band, in order.
+ */
+type BandLabels = readonly [string, string, string, string];
+
+function bandLabel(value: number, thresholds: readonly number[], labels: BandLabels): string {
+  const [first, second, third, top] = labels;
+  const i = thresholds.findIndex((t) => value <= t);
+  return i === 0 ? first : i === 1 ? second : i === 2 ? third : top;
 }
-function teamContext(n: number): string {
-  return n <= 15 ? "Small team" : n <= 60 ? "Mid-sized org" : n <= 120 ? "Large org" : "Enterprise org";
-}
+
+const IMAGE_LABELS: BandLabels = ["Small footprint", "Growing estate", "Large estate", "Enterprise-scale"];
+const TEAM_LABELS: BandLabels = ["Small team", "Mid-sized org", "Large org", "Enterprise org"];
 
 /* ── icons ── */
 const stroke = (d: string): React.ReactNode => (
@@ -218,8 +234,19 @@ function StepLabel({ text, color = ACCENT }: { text: string; color?: string }): 
   return <span style={{ fontFamily: "var(--font-sans)", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color }}>{text}</span>;
 }
 
-function Slider({ label, tip, value, min, max, step, onChange, context }: {
-  label: string; tip: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void; context: string;
+/*
+ * Thumb is 22px wide and its centre travels from 11px to (track − 11px), so a
+ * bare `left: X%` would drift from the thumb by up to 11px at the ends. This
+ * matches the native thumb's travel exactly, which matters because the whole
+ * point of the ticks is to mark where the score steps.
+ */
+function thumbOffset(pct: number): string {
+  return `calc(${pct}% + ${(11 - pct * 0.22).toFixed(2)}px)`;
+}
+
+function Slider({ label, tip, value, min, max, step, onChange, context, ticks }: {
+  label: string; tip: string; value: number; min: number; max: number; step: number;
+  onChange: (v: number) => void; context: string; ticks: readonly number[];
 }): React.ReactElement {
   const pct = ((value - min) / (max - min)) * 100;
   return (
@@ -243,7 +270,21 @@ function Slider({ label, tip, value, min, max, step, onChange, context }: {
         onChange={(e) => onChange(Number(e.target.value))}
         style={{ ["--pct" as string]: `${pct}%` }}
       />
-      <div className="flex justify-between items-center" style={{ marginTop: "8px" }}>
+      {/* Band markers — the score steps here, so telegraph it. Decorative:
+          the band name is already announced through aria-valuetext. */}
+      <div aria-hidden className="relative" style={{ height: "16px", marginTop: "3px" }}>
+        {ticks.map((t) => {
+          const tickPct = ((t - min) / (max - min)) * 100;
+          const passed = value > t;
+          return (
+            <span key={t} className="absolute flex flex-col items-center" style={{ left: thumbOffset(tickPct), transform: "translateX(-50%)", top: 0 }}>
+              <span style={{ width: "1.5px", height: "5px", borderRadius: "1px", background: passed ? "rgba(57,96,249,0.55)" : "rgba(17,17,17,0.18)", transition: "background .15s" }} />
+              <span style={{ fontFamily: "var(--font-sans)", fontSize: "10px", lineHeight: 1.1, marginTop: "2px", color: passed ? ACCENT : MUTED, fontVariantNumeric: "tabular-nums", transition: "color .15s" }}>{t}</span>
+            </span>
+          );
+        })}
+      </div>
+      <div className="flex justify-between items-center" style={{ marginTop: "4px" }}>
         <span style={{ fontFamily: "var(--font-sans)", fontSize: "12px", fontWeight: 600, color: SUB }}>{context}</span>
         <span style={{ fontFamily: "var(--font-sans)", fontSize: "11.5px", color: MUTED, fontVariantNumeric: "tabular-nums" }}>{min}–{max}</span>
       </div>
@@ -287,8 +328,6 @@ export function RoiSimulator(): React.ReactElement {
   const [remediation, setRemediation] = useState<RemediationOption>("Monthly");
   const [release, setRelease] = useState<ReleaseOption>("Continuous");
   const [mounted, setMounted] = useState(false);
-  const [showWhy, setShowWhy] = useState(false);
-  const whyId = useId();
   useEffect(() => setMounted(true), []);
 
   const out = computeImpact({ images, team, remediation, release });
@@ -301,6 +340,7 @@ export function RoiSimulator(): React.ReactElement {
   const fte = useTweenNumber(out.fteRecovered, mounted);
   const meter = useTweenNumber(out.meterProgress, mounted, 650);
   const burden = useTweenNumber(out.burden, mounted, 650);
+  const reduction = useTweenNumber(out.burdenReduction, mounted);
 
   const cardData: Record<MetricDef["key"], { value: string; raw: number; band: readonly [number, number]; suffix: string }> = {
     vuln: { value: `${Math.round(vuln)}%`, raw: vuln, band: out.bands.vuln, suffix: "%" },
@@ -325,9 +365,6 @@ export function RoiSimulator(): React.ReactElement {
         .roi-slider:focus-visible{outline:2px solid #33BAEC;outline-offset:4px;}
         .roi-card{transition:transform .22s cubic-bezier(.2,.7,.3,1),box-shadow .22s;}
         .roi-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px -12px rgba(17,17,17,0.18);}
-        .roi-why{transition:background .15s,border-color .15s,box-shadow .15s;}
-        .roi-why:hover{background:rgba(57,96,249,0.11);border-color:rgba(57,96,249,0.4);box-shadow:0 2px 8px -3px rgba(57,96,249,0.4);}
-        .roi-why:focus-visible{outline:2px solid #33BAEC;outline-offset:2px;}
       `}</style>
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md">
@@ -338,8 +375,8 @@ export function RoiSimulator(): React.ReactElement {
             <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h4)", fontWeight: 600, color: INK, letterSpacing: "-0.02em", marginTop: "4px" }}>Your environment</h3>
             <p style={{ fontFamily: "var(--font-sans)", fontSize: "13px", color: MUTED, marginTop: "4px", marginBottom: "24px" }}>Four signals describe your runtime.</p>
 
-            <Slider label="Production images" tip="Distinct container images running in production. Each one is a surface you patch, scan, and secure." value={images} min={INPUT_BOUNDS.images.min} max={INPUT_BOUNDS.images.max} step={10} onChange={setImages} context={imageContext(images)} />
-            <Slider label="Engineering team size" tip="People building or maintaining the services that run on these images." value={team} min={INPUT_BOUNDS.team.min} max={INPUT_BOUNDS.team.max} step={5} onChange={setTeam} context={teamContext(team)} />
+            <Slider label="Production images" tip="Distinct container images running in production. Each one is a surface you patch, scan, and secure." value={images} min={INPUT_BOUNDS.images.min} max={INPUT_BOUNDS.images.max} step={10} onChange={setImages} context={bandLabel(images, IMAGE_WEIGHT_THRESHOLDS, IMAGE_LABELS)} ticks={IMAGE_WEIGHT_THRESHOLDS} />
+            <Slider label="Engineering team size" tip="People building or maintaining the services that run on these images." value={team} min={INPUT_BOUNDS.team.min} max={INPUT_BOUNDS.team.max} step={5} onChange={setTeam} context={bandLabel(team, TEAM_WEIGHT_THRESHOLDS, TEAM_LABELS)} ticks={TEAM_WEIGHT_THRESHOLDS} />
             <Segmented label="Remediation frequency" tip="How often your team patches known vulnerabilities (CVEs) in running images." options={REMEDIATION_OPTIONS} value={remediation} onChange={setRemediation} />
             <Segmented label="Release cadence" tip="How often you ship changes to production." options={RELEASE_OPTIONS} value={release} onChange={setRelease} />
 
@@ -364,37 +401,19 @@ export function RoiSimulator(): React.ReactElement {
                   </div>
                   <p style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-body)", color: SUB, lineHeight: 1.5, marginTop: "8px", maxWidth: "42ch", textWrap: "balance" }}>{TIER_BLURB[out.tier]}</p>
 
-                  <button type="button" className="roi-why inline-flex items-center gap-2 mt-4" aria-expanded={showWhy} aria-controls={whyId} onClick={() => setShowWhy((s) => !s)}
-                    style={{ fontFamily: "var(--font-sans)", fontSize: "13px", fontWeight: 600, color: ACCENT, background: "rgba(57,96,249,0.06)", border: "1px solid rgba(57,96,249,0.24)", cursor: "pointer", borderRadius: "999px", padding: "9px 16px", minHeight: "38px", letterSpacing: "-0.01em" }}>
-                    <span aria-hidden style={{ display: "inline-flex", color: ACCENT }}>
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></svg>
+                  {/* Burden Reduction keys off the score, not the tier, so it
+                      belongs beside the gauge rather than in the Step 3 grid. */}
+                  <div className="inline-flex items-baseline" style={{ gap: "12px", marginTop: "14px", padding: "11px 16px", borderRadius: "12px", background: `${TIER_COLOR[out.tier]}12`, border: `1px solid ${TIER_COLOR[out.tier]}33` }}>
+                    <span style={{ fontFamily: "var(--font-display)", fontSize: "28px", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1, color: TIER_COLOR[out.tier], fontVariantNumeric: "tabular-nums" }}>
+                      {Math.round(reduction)}%
                     </span>
-                    {showWhy ? "Hide breakdown" : "Why this score?"}
-                    <span aria-hidden style={{ display: "inline-block", transform: showWhy ? "rotate(180deg)" : "none", transition: "transform .2s", fontSize: "10px", marginLeft: "1px" }}>▾</span>
-                  </button>
-                </div>
-              </div>
-
-              {showWhy && (
-                <div id={whyId} style={{ marginTop: "18px", paddingTop: "18px", borderTop: "1px solid rgba(17,17,17,0.07)" }}>
-                  <p style={{ fontFamily: "var(--font-sans)", fontSize: "12.5px", color: SUB, marginBottom: "14px", lineHeight: 1.5 }}>
-                    Your score is the sum of four weighted factors, out of {BURDEN_SCALE.max}. Images carry the most weight because image sprawl drives most inherited runtime risk.
-                  </p>
-                  <div className="flex flex-col gap-2.5">
-                    {out.contributions.map((c) => (
-                      <div key={c.label} className="grid items-center gap-3" style={{ gridTemplateColumns: "130px 1fr 54px" }}>
-                        <span style={{ fontFamily: "var(--font-sans)", fontSize: "12.5px", fontWeight: 600, color: INK }}>
-                          {c.label} <span style={{ color: MUTED, fontWeight: 500 }}>·{Math.round(c.weightPct)}%</span>
-                        </span>
-                        <span aria-hidden style={{ position: "relative", height: "7px", borderRadius: "999px", background: "rgba(17,17,17,0.06)" }}>
-                          <span style={{ position: "absolute", inset: "0 auto 0 0", width: `${(c.level / 4) * 100}%`, borderRadius: "999px", background: "linear-gradient(90deg,#3960F9,#471ec0)", transition: "width .3s" }} />
-                        </span>
-                        <span style={{ fontFamily: "var(--font-display)", fontSize: "13px", fontWeight: 700, color: SUB, textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{Math.round(c.points)} pts</span>
-                      </div>
-                    ))}
+                    <span className="inline-flex items-center" style={{ fontFamily: "var(--font-sans)", fontSize: "13px", fontWeight: 600, color: SUB, lineHeight: 1.35, maxWidth: "24ch" }}>
+                      of this burden removed on trusted images
+                      <InfoTip label="burden reduction" text="Your overall operational burden — images, team, patching and release cadence combined. The Step 3 figures break out where that reduction comes from." />
+                    </span>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
 
             {/* bridge line — connects burden to outcomes */}
