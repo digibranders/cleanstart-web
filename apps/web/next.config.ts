@@ -95,6 +95,79 @@ const nextConfig: NextConfig = {
         destination: "/job/:slug",
         permanent: true,
       },
+      // Residual Webflow migration redirects. These twelve URLs were indexed on
+      // the old site and had been returning 404 in production since cutover —
+      // confirmed by live capture 2026-07-29 (docs/seo/evidence/live-capture.json,
+      // `control:legacy-redirect:*`). Google drops a persistently-404ing URL and
+      // progressively throttles recrawls of it, so the loss compounds until the
+      // redirect exists. Mapping is docs/web/SEO-IMPLEMENTATION-PLAN.md Task 0.1;
+      // `/pricing` is omitted from that list because the page was since built and
+      // now returns 200. See ARCH-01 and MIG-01 in docs/seo/.
+      {
+        source: "/acceptable-use-policy",
+        destination: "/legal/acceptable-use-policy",
+        permanent: true,
+      },
+      {
+        source: "/leadership",
+        destination: "/teams",
+        permanent: true,
+      },
+      {
+        source: "/search",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/survey",
+        destination: "/",
+        permanent: true,
+      },
+      // Both webinar detail URLs are retired; the listing is the nearest
+      // equivalent surface for the same content type.
+      {
+        source:
+          "/webinar/secure-containers-end-to-end-from-trusted-images-to-runtime-visibility-with-cleanstart-and-sysdig",
+        destination: "/webinars",
+        permanent: true,
+      },
+      {
+        source:
+          "/webinar/secure-containers-end-to-end-from-trusted-images-to-runtime-visibility-with-cleanstart-and-sysdig-2",
+        destination: "/webinars",
+        permanent: true,
+      },
+      // Retired event landing pages → the events listing.
+      {
+        source: "/new-year-event-sysdig",
+        destination: "/events",
+        permanent: true,
+      },
+      {
+        source: "/new-year-event-eventus",
+        destination: "/events",
+        permanent: true,
+      },
+      {
+        source: "/cleanstart-hitachi-chennai",
+        destination: "/events",
+        permanent: true,
+      },
+      {
+        source: "/cleanstart-hitachi-bengaluru",
+        destination: "/events",
+        permanent: true,
+      },
+      {
+        source: "/cleanstart-hitachi-hyderabad",
+        destination: "/events",
+        permanent: true,
+      },
+      {
+        source: "/cleanstart-raksha-chennai",
+        destination: "/events",
+        permanent: true,
+      },
     ];
   },
   images: {
