@@ -7,8 +7,10 @@ import { UpcomingEventHero } from "@/components/sections/events/UpcomingEventHer
 import {
   EventsContent,
   selectPastEvents,
+  PAST_EVENTS_PAGE_SIZE,
 } from "@/components/sections/events/EventsContent";
 import { EventsCTA } from "@/components/sections/events/EventsCTA";
+import { CrawlableLinkIndex } from "@/components/ui/CrawlableLinkIndex";
 import {
   getUpcomingEvents,
   getPastEvents,
@@ -96,6 +98,24 @@ export default async function EventsPage(): Promise<React.ReactElement> {
         >
           <EventsBrowser allPastEvents={allPastEvents} />
         </Suspense>
+        {/*
+          Only the first upcoming event is guaranteed a real anchor in the
+          served HTML: with a single upcoming event `FeaturedEventCard` renders
+          directly, and with several the carousel still server-renders just
+          its initial slide (the rest live in the client-side hydration
+          payload). Past events beyond `PAST_EVENTS_PAGE_SIZE` are likewise
+          client-pagination-only. Cover both gaps here.
+        */}
+        <CrawlableLinkIndex
+          label="All events"
+          items={[
+            ...upcomingEvents.slice(1),
+            ...allPastEvents.slice(PAST_EVENTS_PAGE_SIZE),
+          ].map((e) => ({
+            href: `/event/${e.slug}`,
+            title: e.title,
+          }))}
+        />
       </main>
       <Footer cta={<EventsCTA />} />
     </>

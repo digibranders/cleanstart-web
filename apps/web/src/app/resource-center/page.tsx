@@ -6,8 +6,10 @@ import { ResourceCenterBrowser } from "@/components/sections/resource-center/Res
 import {
   ResourceCenterContent,
   selectResources,
+  RESOURCES_PAGE_SIZE,
 } from "@/components/sections/resource-center/ResourceCenterContent";
 import { ResourceCenterHero } from "@/components/sections/resource-center/ResourceCenterHero";
+import { CrawlableLinkIndex } from "@/components/ui/CrawlableLinkIndex";
 import { getResources } from "@/lib/resources";
 import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
@@ -89,6 +91,12 @@ export default async function ResourceCenterPage(): Promise<React.ReactElement> 
         >
           <ResourceCenterBrowser allResources={allResources} />
         </Suspense>
+        <CrawlableLinkIndex
+          label="All resources"
+          items={allResources
+            .slice(RESOURCES_PAGE_SIZE)
+            .map((r) => ({ href: `/resources/${r.slug}`, title: r.title }))}
+        />
       </main>
       <Footer />
     </>

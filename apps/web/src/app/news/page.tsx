@@ -4,8 +4,13 @@ import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { BlogsCTA } from "@/components/sections/blogs/BlogsCTA";
 import { NewsBrowser } from "@/components/sections/newsroom/NewsBrowser";
-import { NewsContent, selectNews } from "@/components/sections/newsroom/NewsContent";
+import {
+  NewsContent,
+  selectNews,
+  NEWS_PAGE_SIZE,
+} from "@/components/sections/newsroom/NewsContent";
 import { NewsroomHero } from "@/components/sections/newsroom/NewsroomHero";
+import { CrawlableLinkIndex } from "@/components/ui/CrawlableLinkIndex";
 import { getNews, getFeaturedNews, getNewsCategories } from "@/lib/news";
 import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
@@ -83,6 +88,12 @@ export default async function NewsPage(): Promise<React.ReactElement> {
         >
           <NewsBrowser allNews={allNews} categories={categories} />
         </Suspense>
+        <CrawlableLinkIndex
+          label="All newsroom articles"
+          items={allNews
+            .slice(NEWS_PAGE_SIZE)
+            .map((n) => ({ href: `/news/${n.slug}`, title: n.title }))}
+        />
       </main>
       <Footer cta={<BlogsCTA />} />
     </>
