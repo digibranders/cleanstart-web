@@ -19,7 +19,7 @@ describe("leadfeederAccountId", () => {
     expect(leadfeederAccountId()).toBe("kn9Eq4RXRqJ8RlvP");
   });
 
-  it("returns null when unset (staging / preview)", () => {
+  it("returns null when unset (preview deploys)", () => {
     vi.stubEnv("NEXT_PUBLIC_LEADFEEDER_ID", "");
     expect(leadfeederAccountId()).toBeNull();
   });
@@ -41,11 +41,6 @@ describe("resolveLeadfeederAccountId", () => {
     expect(resolveLeadfeederAccountId("www.cleanstart.com")).toBe(
       "kn9Eq4RXRqJ8RlvP",
     );
-  });
-
-  it("returns null on the staging alias (shares the prod build)", () => {
-    vi.stubEnv("NEXT_PUBLIC_LEADFEEDER_ID", "kn9Eq4RXRqJ8RlvP");
-    expect(resolveLeadfeederAccountId("staging.cleanstart.com")).toBeNull();
   });
 
   it("returns null on a *.vercel.app preview alias", () => {

@@ -6,10 +6,9 @@ afterEach(() => {
 });
 
 describe("isNoindexHost", () => {
-  it("flags staging and any *.vercel.app alias, ignoring port and case", () => {
-    expect(isNoindexHost("staging.cleanstart.com")).toBe(true);
-    expect(isNoindexHost("STAGING.cleanstart.com:443")).toBe(true);
+  it("flags any *.vercel.app alias, ignoring port and case", () => {
     expect(isNoindexHost("cleanstart-web-git-development.vercel.app")).toBe(true);
+    expect(isNoindexHost("CleanStart-Web.VERCEL.app:443")).toBe(true);
   });
 
   it("does not flag the production host or an empty host", () => {
@@ -27,10 +26,9 @@ describe("isIndexingAllowed", () => {
     expect(isIndexingAllowed()).toBe(false);
   });
 
-  it("allows the production host but blocks staging / vercel.app on production env", () => {
+  it("allows the production host but blocks vercel.app aliases on production env", () => {
     vi.stubEnv("VERCEL_ENV", "production");
     expect(isIndexingAllowed("www.cleanstart.com")).toBe(true);
-    expect(isIndexingAllowed("staging.cleanstart.com")).toBe(false);
     expect(isIndexingAllowed("anything.vercel.app")).toBe(false);
   });
 
@@ -42,7 +40,6 @@ describe("isIndexingAllowed", () => {
   it("ALLOW_INDEXING=1 forces indexing on regardless of env or host", () => {
     vi.stubEnv("VERCEL_ENV", "preview");
     vi.stubEnv("ALLOW_INDEXING", "1");
-    expect(isIndexingAllowed("staging.cleanstart.com")).toBe(true);
     expect(isIndexingAllowed("anything.vercel.app")).toBe(true);
     expect(isIndexingAllowed()).toBe(true);
   });
@@ -50,6 +47,6 @@ describe("isIndexingAllowed", () => {
   it("ignores ALLOW_INDEXING values other than the exact '1'", () => {
     vi.stubEnv("VERCEL_ENV", "preview");
     vi.stubEnv("ALLOW_INDEXING", "true");
-    expect(isIndexingAllowed("staging.cleanstart.com")).toBe(false);
+    expect(isIndexingAllowed("anything.vercel.app")).toBe(false);
   });
 });

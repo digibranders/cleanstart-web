@@ -415,6 +415,11 @@ const DOMAIN_QUICK_LINKS: Partial<Record<string, QuickLinkProps>> = {
     href: '/admin/collections/resumes',
     description: 'Browse submitted applicant resumes.',
   },
+  emailSignatures: {
+    label: 'New email signature',
+    href: '/admin/collections/emailSignatures/create',
+    description: 'Add a signature for someone who has joined.',
+  },
 };
 
 const scopedQuickLinks = (slugs: readonly string[]): QuickLinkProps[] =>

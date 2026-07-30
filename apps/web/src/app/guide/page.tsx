@@ -3,9 +3,14 @@ import { Suspense } from "react";
 import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { GuidesBrowser } from "@/components/sections/guides/GuidesBrowser";
-import { GuidesContent, selectGuides } from "@/components/sections/guides/GuidesContent";
+import {
+  GuidesContent,
+  selectGuides,
+  GUIDES_PAGE_SIZE,
+} from "@/components/sections/guides/GuidesContent";
 import { GuidesHero } from "@/components/sections/guides/GuidesHero";
 import { GuidesCTA } from "@/components/sections/guides/GuidesCTA";
+import { CrawlableLinkIndex } from "@/components/ui/CrawlableLinkIndex";
 import { getGuides } from "@/lib/guides";
 import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
@@ -69,6 +74,12 @@ export default async function GuidesPage(): Promise<React.ReactElement> {
         >
           <GuidesBrowser allGuides={allGuides} />
         </Suspense>
+        <CrawlableLinkIndex
+          label="All guides"
+          items={allGuides
+            .slice(GUIDES_PAGE_SIZE)
+            .map((g) => ({ href: `/guide/${g.slug}`, title: g.title }))}
+        />
       </main>
       <Footer cta={<GuidesCTA />} />
     </>

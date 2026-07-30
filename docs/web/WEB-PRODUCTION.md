@@ -32,9 +32,9 @@ CleanStart is shipping a Next.js 16.2.5 / React 19 / Tailwind v4 marketing site 
 
 > **Go-live status (2026-06-19):** DNS has been cut over. The new Next.js site now serves **`www.cleanstart.com`** (apex `cleanstart.com` 308-redirects → `www`). `NEXT_PUBLIC_SITE_URL=https://www.cleanstart.com` is baked in the production build. Indexing is active — `VERCEL_ENV=production` + host not in `NOINDEX_HOSTS` in `indexing.ts` → all five layers (`robots.txt`, meta robots, `X-Robots-Tag`, sitemap, canonicals) serve the production-indexed state.
 >
-> `staging.cleanstart.com` remains assigned to the Vercel Production target as an alias (for QA access) but is held at **noindex** by `isNoindexHost` in `indexing.ts` — it will never compete with `www` in search.
+> There is no staging domain: `staging.cleanstart.com` was deleted from DNS on 2026-07-29. QA now runs on Vercel preview deploys, whose `*.vercel.app` hosts are held at **noindex** by `isNoindexHost` in `indexing.ts` — they will never compete with `www` in search.
 >
-> **To open staging for an SEO/security audit:** set Vercel env `ALLOW_INDEXING=1` (overrides all five layers), then **redeploy**. Remove to re-block.
+> **To open a non-production deploy for an SEO/security audit:** set Vercel env `ALLOW_INDEXING=1` (overrides all five layers), then **redeploy**. Remove to re-block.
 >
 > **Canonical host:** `www.cleanstart.com` — wired in `proxy.ts` (`PRODUCTION_HOST`) and `canonical.ts` (`SITE_URL`). No code change needed for future deploys; normal artifact-reuse "Promote to Production" is safe now that the correct host is baked into the bundle.
 
@@ -60,7 +60,7 @@ gh pr create --base development --fill
 - Production Branch: `main`
 - Preview Deployments: enabled for all branches
 - `vercel.json` → `git.deploymentEnabled: { "main": true, "development": true, "feat/*": true, "fix/*": true, "chore/*": true, "hotfix/*": true }`
-- Production domain `www.cleanstart.com` → assigned to the **Production** target (`main`). `staging.cleanstart.com` is kept as a Vercel alias (QA access) but held at noindex by `indexing.ts`.
+- Production domain `www.cleanstart.com` → assigned to the **Production** target (`main`). No staging alias exists (DNS record deleted 2026-07-29); preview deploys serve QA and are held at noindex by `indexing.ts`.
 - Preview Comments enabled (auto-posts URL + Lighthouse delta)
 - Deployment Protection: Vercel SSO on Preview deployments
 
@@ -84,7 +84,6 @@ gh pr create --base development --fill
 |---|---|---|---|---|
 | `cleanstart.com` (apex) | CNAME (Cloudflare flattening) | `cname.vercel-dns.com` | DNS only | 300 → 86400 |
 | `www` | CNAME | `cname.vercel-dns.com` | DNS only | 300 → 86400 |
-| `staging` | CNAME | `cname.vercel-dns.com` | DNS only | 300 → 86400 |
 | `cleanstart.com` | CAA | `0 issue "letsencrypt.org"` | — | 86400 |
 | `cleanstart.com` | CAA | `0 issuewild ";"` | — | 86400 |
 | `cleanstart.com` | CAA | `0 iodef "mailto:security@cleanstart.com"` | — | 86400 |

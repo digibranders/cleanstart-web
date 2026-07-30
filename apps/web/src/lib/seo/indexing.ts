@@ -6,14 +6,13 @@
  * `apps/cms/src/payload/lib/seo-env.ts`.
  *
  * Indexing is allowed only on the production site (www.cleanstart.com), which
- * runs with `VERCEL_ENV=production`. Staging and the production deployment's
- * `*.vercel.app` aliases also run with `VERCEL_ENV=production`, so they are
- * excluded by host to avoid duplicating www in the index.
+ * runs with `VERCEL_ENV=production`. The production deployment's `*.vercel.app`
+ * aliases also run with `VERCEL_ENV=production`, so they are excluded by host to
+ * avoid duplicating www in the index.
  *
  * `ALLOW_INDEXING=1` is a temporary escape hatch that forces indexing on
- * regardless of env/host — used to open a non-production deploy (e.g. staging)
- * to an external SEO/security audit tool, then re-blocked by unsetting it. Off
- * by default.
+ * regardless of env/host — used to open a non-production deploy to an external
+ * SEO/security audit tool, then re-blocked by unsetting it. Off by default.
  *
  * Edge-safe: pure `process.env` reads only, so it is importable from middleware
  * (proxy.ts) as well as build-time metadata.
@@ -22,8 +21,14 @@
  * Exact hosts we never index. Exported so the GA4 head snippet can serialize the
  * same list into its in-browser host check (lib/analytics/ga4-snippet.ts) rather
  * than hardcoding a second copy that could drift from this one.
+ *
+ * Intentionally EMPTY since 2026-07-29: `staging.cleanstart.com` was deleted
+ * from DNS, so there is no longer a named non-production alias. Preview deploys
+ * are still covered by `NOINDEX_HOST_SUFFIXES` below. Add a host here (not a
+ * second list elsewhere) if a named alias is ever reintroduced — doing so also
+ * keeps GA4 off it automatically.
  */
-export const NOINDEX_HOSTS: readonly string[] = ["staging.cleanstart.com"];
+export const NOINDEX_HOSTS: readonly string[] = [];
 
 /** Host suffixes we never index (Vercel preview aliases). Same rationale. */
 export const NOINDEX_HOST_SUFFIXES: readonly string[] = [".vercel.app"];

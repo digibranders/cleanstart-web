@@ -38,12 +38,29 @@ describe('isHiddenForScopedNav', () => {
     expect(isHiddenForScopedNav('blogs', userWith())).toBe(false);
   });
 
-  it('shows an hr-only user their careers collections and hides the rest', () => {
+  it('shows an hr-only user their careers + signature collections and hides the rest', () => {
     const hr = userWith('hr');
-    for (const slug of ['jobs', 'career-applications', 'resumes', 'departments', 'jobLocations']) {
+    for (const slug of [
+      'jobs',
+      'career-applications',
+      'resumes',
+      'departments',
+      'jobLocations',
+      'emailSignatures',
+    ]) {
       expect(isHiddenForScopedNav(slug, hr)).toBe(false);
     }
-    for (const slug of ['blogs', 'events', 'webinars', 'leads', 'users']) {
+    // signatureTemplates and emailAssets stay admin-only, so hr must not see
+    // them even though they sit in the same Brand nav group.
+    for (const slug of [
+      'blogs',
+      'events',
+      'webinars',
+      'leads',
+      'users',
+      'signatureTemplates',
+      'emailAssets',
+    ]) {
       expect(isHiddenForScopedNav(slug, hr)).toBe(true);
     }
   });
@@ -105,6 +122,7 @@ describe('scopedCollectionSlugsForUser', () => {
       'resumes',
       'departments',
       'jobLocations',
+      'emailSignatures',
     ]);
     expect(scopedCollectionSlugsForUser(userWith('events'))).toEqual([
       'events',

@@ -74,6 +74,8 @@ Verified directly against source (`apps/web/src/app/layout.tsx`, `lib/seo/canoni
 
 ## 3.1 Indexing controls verification (production-only indexing)
 
+> **Superseded 2026-07-29:** `staging.cleanstart.com` was deleted from DNS and no longer exists. The `NOINDEX_HOSTS` entry for it has been removed; `*.vercel.app` preview hosts remain covered by the same mechanism. The staging rows below are retained as a record of the 2026-05-29 audit, not as current state.
+
 Explicitly verified against source: only production `www.cleanstart.com` is indexable; `staging.cleanstart.com` and the `/preview` (CMS preview link) routes are noindex. All three are correctly enforced today, with one minor consistency hardening available.
 
 | Requirement | Enforcement | Status |

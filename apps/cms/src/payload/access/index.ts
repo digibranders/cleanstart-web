@@ -30,11 +30,17 @@ export const isAdminEditorOrSeo: Access = ({ req: { user } }) =>
   hasAnyRole(user, ['admin', 'editor', 'seo']);
 
 /**
- * Careers-domain write access: admin/editor plus the departmental `hr` role.
- * Wired into the jobs/careers collections so HR can self-serve job postings
- * and applicant records without touching general site content. Editors retain
- * access (they manage all content); `hr` is additive on this domain only —
- * every other collection stays on `isAdminOrEditor`, which excludes `hr`.
+ * HR-domain write access: admin/editor plus the departmental `hr` role. Wired
+ * into the jobs/careers collections so HR can self-serve job postings and
+ * applicant records without touching general site content, and into
+ * `emailSignatures` — the signature roster is the staff roster, so the same
+ * onboarding/offboarding that HR already owns is the only thing that changes
+ * it. `signatureTemplates` and `emailAssets` deliberately stay admin-only:
+ * those are shared raw markup and binary assets, not per-person data.
+ *
+ * Editors retain access (they manage all content); `hr` is additive on this
+ * domain only — every other collection stays on `isAdminOrEditor`, which
+ * excludes `hr`.
  */
 export const isAdminEditorOrHr: Access = ({ req: { user } }) =>
   hasAnyRole(user, ['admin', 'editor', 'hr']);

@@ -297,10 +297,10 @@ The `Integrations` collection (Phase J1) provides editor self-serve config for c
 ## Deploy rules
 
 - **`apps/cms`:** GitHub Actions (`.github/workflows/deploy-cms.yml`) on push to `main`. Docker image → droplet → `docker compose up -d --wait`. Caddy handles TLS. Single droplet at `cms.cleanstart.com`. Admin access is password-only at v1 — 2FA deferred (see `docs/BACKLOG.md` A9).
-- **`apps/web`:** Vercel, deploys from `main`. Live at `www.cleanstart.com`. Staging at `staging.cleanstart.com` (noindex QA alias).
+- **`apps/web`:** Vercel, deploys from `main`. Live at `www.cleanstart.com`. There is no staging domain — `staging.cleanstart.com` was deleted from DNS on 2026-07-29. Non-production QA happens on Vercel preview deploys (`*.vercel.app`), which `isNoindexHost` keeps noindex and untracked.
 - Postgres on the droplet, localhost-bound. Migrations via Payload's migration runner, never raw SQL.
 - Cloudflare WAF in front of `cms.cleanstart.com`.
-- Never point staging at prod data. Staging is a separate droplet (or DB) per arch doc §`#staging`.
+- The staging environment is retired (arch doc §`#staging`). Never point a non-production deploy at prod data.
 - Backup-cron heartbeat is P1 alert (arch doc §`#logging-alerting`). If a backup script is changed, verify the heartbeat fires.
 
 ---

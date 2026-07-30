@@ -23,9 +23,9 @@ export function leadfeederAccountId(): string | null {
  * a given host.
  *
  * The Vercel "Production" environment serves BOTH the canonical site
- * (www.cleanstart.com) and its noindex QA alias (staging.cleanstart.com) from
- * the SAME build, so `NEXT_PUBLIC_LEADFEEDER_ID` is baked into both. A runtime
- * host check keeps staging / preview traffic out of the production Leadfeeder
+ * (www.cleanstart.com) and its `*.vercel.app` deployment aliases from the SAME
+ * build, so `NEXT_PUBLIC_LEADFEEDER_ID` is baked into both. A runtime host check
+ * keeps preview traffic out of the production Leadfeeder
  * account: a host we don't index is a host we don't track. A missing host fails
  * safe to "don't load". Local dev is already excluded because the env var is
  * unset there (production-only).

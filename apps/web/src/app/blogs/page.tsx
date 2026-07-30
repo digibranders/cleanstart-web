@@ -3,9 +3,14 @@ import { Suspense } from "react";
 import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { BlogsBrowser } from "@/components/sections/blogs/BlogsBrowser";
-import { BlogsContent, selectBlogs } from "@/components/sections/blogs/BlogsContent";
+import {
+  BlogsContent,
+  selectBlogs,
+  BLOGS_PAGE_SIZE,
+} from "@/components/sections/blogs/BlogsContent";
 import { BlogsHero } from "@/components/sections/blogs/BlogsHero";
 import { BlogsCTA } from "@/components/sections/blogs/BlogsCTA";
+import { CrawlableLinkIndex } from "@/components/ui/CrawlableLinkIndex";
 import { getFeaturedBlog, getBlogs, getBlogCategories } from "@/lib/blog";
 import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
@@ -82,6 +87,12 @@ export default async function BlogsPage(): Promise<React.ReactElement> {
         >
           <BlogsBrowser allPosts={allPosts} />
         </Suspense>
+        <CrawlableLinkIndex
+          label="All blog posts"
+          items={allPosts
+            .slice(BLOGS_PAGE_SIZE)
+            .map((p) => ({ href: `/blogs/${p.slug}`, title: p.title }))}
+        />
       </main>
       <Footer cta={<BlogsCTA />} />
     </>

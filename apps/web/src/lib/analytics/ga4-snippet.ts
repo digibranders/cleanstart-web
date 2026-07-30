@@ -38,14 +38,25 @@ import { NOINDEX_HOSTS, NOINDEX_HOST_SUFFIXES } from "@/lib/seo/indexing";
  *   character class admits no quote or script-breaking character.
  */
 export function buildGa4Snippet(measurementId: string): string {
-  const hosts = JSON.stringify(NOINDEX_HOSTS);
-  const suffixes = JSON.stringify(NOINDEX_HOST_SUFFIXES);
+  // Emitted only when the corresponding list is non-empty, so an empty
+  // NOINDEX_HOSTS doesn't ship a dead `[].indexOf(h)` check to every visitor.
+  const guards = [
+    NOINDEX_HOSTS.length > 0
+      ? `if(${JSON.stringify(NOINDEX_HOSTS)}.indexOf(h)>-1)return;`
+      : null,
+    NOINDEX_HOST_SUFFIXES.length > 0
+      ? `if(${JSON.stringify(
+          NOINDEX_HOST_SUFFIXES,
+        )}.some(function(s){return h.slice(-s.length)===s}))return;`
+      : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
 
   return `(function(){
 var h=(location.hostname||"").toLowerCase();
 if(!h)return;
-if(${hosts}.indexOf(h)>-1)return;
-if(${suffixes}.some(function(s){return h.slice(-s.length)===s}))return;
+${guards}
 window.dataLayer=window.dataLayer||[];
 function gtag(){dataLayer.push(arguments)}
 window.gtag=window.gtag||gtag;

@@ -79,14 +79,11 @@ describe("buildGa4Snippet on an indexable host", () => {
 });
 
 describe("buildGa4Snippet host gating", () => {
-  // staging.cleanstart.com and *.vercel.app share the SAME production build (and
-  // therefore the same baked-in NEXT_PUBLIC_GA4_ID) as www, so the runtime host
-  // check is the only thing keeping their traffic out of the GA4 property.
-  it.each([
-    ["staging.cleanstart.com", "the noindex staging alias"],
-    ["cleanstart-web-git-development.vercel.app", "a Vercel preview alias"],
-  ])("loads no tag on %s (%s)", (hostname) => {
-    runSnippetOn(hostname);
+  // *.vercel.app preview aliases share the SAME production build (and therefore
+  // the same baked-in NEXT_PUBLIC_GA4_ID) as www, so the runtime host check is
+  // the only thing keeping their traffic out of the GA4 property.
+  it("loads no tag on a Vercel preview alias", () => {
+    runSnippetOn("cleanstart-web-git-development.vercel.app");
     expect(
       document.head.querySelector('script[src*="googletagmanager.com"]'),
     ).toBeNull();
@@ -94,7 +91,7 @@ describe("buildGa4Snippet host gating", () => {
   });
 
   it("matches noindex hosts case-insensitively", () => {
-    runSnippetOn("STAGING.CleanStart.com");
+    runSnippetOn("CleanStart-Web.VERCEL.app");
     expect(
       document.head.querySelector('script[src*="googletagmanager.com"]'),
     ).toBeNull();

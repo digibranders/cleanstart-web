@@ -31,7 +31,6 @@ export const LEAD_SUBMIT_MAX_BYTES = 64 * 1024;
 const DEFAULT_ALLOWED_ORIGINS = [
   'https://cleanstart.com',
   'https://www.cleanstart.com',
-  'https://staging.cleanstart.com',
 ];
 
 const allowedOrigins = (): string[] => {

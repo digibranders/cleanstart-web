@@ -1,0 +1,2069 @@
+{
+  "capturedAt": "2026-07-29T11:10:05.538Z",
+  "pages": [
+    {
+      "template": "home",
+      "url": "https://www.cleanstart.com/",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Verified, zero-CVE container images and libraries | CleanStart",
+        "description": "CleanStart delivers verified, zero-CVE container images and libraries that are hardened, continuously scanned, and built for secure software supply chains.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified, zero-CVE container images and libraries | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=CleanStart+delivers+verified%2C+zero-CVE+container+images+and+libraries+that+are+hardened%2C+continuously+scanned%2C+and+built+for+secure+software+supply+chains.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "WebPage",
+          "FAQPage"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "listing:legal",
+      "url": "https://www.cleanstart.com/legal",
+      "status": 200,
+      "redirects": 1,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/legal",
+          "status": 308
+        },
+        {
+          "url": "https://www.cleanstart.com/legal/additional-third-party-terms",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Additional Third-Party Terms | CleanStart",
+        "description": "Additional Third-Party Terms — CleanStart legal documents.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/legal/additional-third-party-terms",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Additional Third-Party Terms",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Additional+Third-Party+Terms&amp;sub=Additional+Third-Party+Terms+%E2%80%94+CleanStart+legal+documents.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "detail:legal",
+      "url": "https://www.cleanstart.com/legal/acceptable-use-policy",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/legal/acceptable-use-policy",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Acceptable Use Policy | CleanStart",
+        "description": "Acceptable Use Policy — CleanStart legal documents.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/legal/acceptable-use-policy",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Acceptable Use Policy",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Acceptable+Use+Policy&amp;sub=Acceptable+Use+Policy+%E2%80%94+CleanStart+legal+documents.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:privacy-policy",
+      "url": "https://www.cleanstart.com/privacy-policy",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/privacy-policy",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Privacy Policy | CleanStart",
+        "description": "Read CleanStart&#x27;s Privacy Policy detailing how personal and organizational data is collected, used, stored, and protected across its platform and services.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/privacy-policy",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Privacy Policy",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Privacy+Policy&amp;sub=Read+CleanStart%27s+Privacy+Policy+detailing+how+personal+and+organizational+data+is+collected%2C+used%2C+stored%2C+and+protected+across+its+platform+and+services.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "WebPage",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:about-us",
+      "url": "https://www.cleanstart.com/about-us",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/about-us",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "About CleanStart | Building Trusted Software Foundations",
+        "description": "Learn how CleanStart is building the foundation for trusted software delivery, integrating security, compliance, and provenance into every build from source to production.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/about-us",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "About CleanStart | Building Trusted Software Foundations",
+        "ogImage": "https://www.cleanstart.com/api/og?title=About+CleanStart+%7C+Building+Trusted+Software+Foundations&amp;sub=Learn+how+CleanStart+is+building+the+foundation+for+trusted+software+delivery%2C+integrating+security%2C+compliance%2C+and+provenance+into+every+build+from+source+to+",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "AboutPage",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:attack-surface-reduction",
+      "url": "https://www.cleanstart.com/attack-surface-reduction",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/attack-surface-reduction",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Reduce attack surface with Hardened Images | CleanStart",
+        "description": "CleanStart shrinks your attack surface by stripping unnecessary components before production. Minimal, hardened images mean fewer inherited CVEs and less patching.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/attack-surface-reduction",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Reduce attack surface with Hardened Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Reduce+attack+surface+with+Hardened+Images+%7C+CleanStart&amp;eyebrow=Solutions&amp;sub=CleanStart+shrinks+your+attack+surface+by+stripping+unnecessary+components+before+production.+Minimal%2C+hardened+images+mean+fewer+inherited+CVEs+and+less+patchi",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "WebPage",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "detail:author",
+      "url": "https://www.cleanstart.com/author/cleanstart-security",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/author/cleanstart-security",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "CleanStart Security | CleanStart",
+        "description": "CleanStart Security at CleanStart.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/author/cleanstart-security",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "CleanStart Security",
+        "ogImage": "https://www.cleanstart.com/api/og?title=CleanStart+Security&amp;eyebrow=Team&amp;sub=CleanStart+Security+at+CleanStart.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "BreadcrumbList",
+          "ProfilePage"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "listing:blogs",
+      "url": "https://www.cleanstart.com/blogs",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/blogs",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Blogs | CleanStart",
+        "description": "Explore CleanStart&#x27;s blog expert insights on container security, software supply chain threats, CVE management, SBOM, and building trust in cloud-native environments.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/blogs",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Blogs",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Blogs&amp;eyebrow=Blog&amp;sub=Explore+CleanStart%27s+blog+expert+insights+on+container+security%2C+software+supply+chain+threats%2C+CVE+management%2C+SBOM%2C+and+building+trust+in+cloud-native+environ",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "BreadcrumbList",
+          "ItemList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "detail:blog",
+      "url": "https://www.cleanstart.com/blogs/ai-broke-software-security-biggest-assumption",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/blogs/ai-broke-software-security-biggest-assumption",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "AI Is Finding More Vulnerabilities. Is Software More Secure? | CleanStart",
+        "description": "AI is uncovering vulnerabilities at unprecedented speed, but discovery alone doesn&#x27;t improve security. Learn why prevention is the future of software security.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/blogs/ai-broke-software-security-biggest-assumption",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "AI Is Finding More Vulnerabilities. Is Software More Secure?",
+        "ogImage": "https://cdn.cleanstart.com/web/general/glowing-blue-chess-knight-standing-out-among-glass-chess-pieces-4c1ab102.webp",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "BreadcrumbList",
+          "BlogPosting"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:book-a-demo",
+      "url": "https://www.cleanstart.com/book-a-demo",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/book-a-demo",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Book a Demo | CleanStart",
+        "description": "Book a personalized CleanStart demo to see how verified, hardened container images can eliminate vulnerabilities, accelerate compliance, and secure your software supply chain.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/book-a-demo",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Book a Demo",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Book+a+Demo&amp;sub=Book+a+personalized+CleanStart+demo+to+see+how+verified%2C+hardened+container+images+can+eliminate+vulnerabilities%2C+accelerate+compliance%2C+and+secure+your+softwar",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "ContactPage",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "listing:careers",
+      "url": "https://www.cleanstart.com/careers",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/careers",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Careers | CleanStart",
+        "description": "Join CleanStart and help build the next generation of secure software supply chains. Explore open roles in security, engineering, and compliance at a fast growing cybersecurity company.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/careers",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Careers",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Careers&amp;eyebrow=Careers&amp;sub=Join+CleanStart+and+help+build+the+next+generation+of+secure+software+supply+chains.+Explore+open+roles+in+security%2C+engineering%2C+and+compliance+at+a+fast+growi",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "BreadcrumbList",
+          "ItemList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "detail:job",
+      "url": "https://www.cleanstart.com/job/senior-software-engineer",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/job/senior-software-engineer",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Senior Software Engineer | CleanStart",
+        "description": "Apply for the Senior Software Engineer role at CleanStart in Engineering (Ahmedabad, Bengaluru)",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/job/senior-software-engineer",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Senior Software Engineer",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Senior+Software+Engineer&amp;eyebrow=Careers&amp;sub=Apply+for+the+Senior+Software+Engineer+role+at+CleanStart+in+Engineering+%28Ahmedabad%2C+Bengaluru%29",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "BreadcrumbList",
+          "JobPosting"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "listing:case-studies",
+      "url": "https://www.cleanstart.com/case-studies",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/case-studies",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Case Studies | CleanStart",
+        "description": "Real challenges and the measurable impact CleanStart delivered. Download customer case studies across healthcare, telecom, finance, and more.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/case-studies",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Case Studies",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Case+Studies&amp;eyebrow=Resources&amp;sub=Real+challenges+and+the+measurable+impact+CleanStart+delivered.+Download+customer+case+studies+across+healthcare%2C+telecom%2C+finance%2C+and+more.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "BreadcrumbList",
+          "ItemList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:clean-libraries",
+      "url": "https://www.cleanstart.com/clean-libraries",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/clean-libraries",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Clean Libraries: Verify Every Dependency Across Your Workflow",
+        "description": "Scan every library for vulnerabilities and provenance, catch dependencies AI tools add silently, and gate builds with signed verdicts across your entire workflow.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/clean-libraries",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Clean Libraries: Verify Every Dependency Across Your Workflow",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Clean+Libraries%3A+Verify+Every+Dependency+Across+Your+Workflow&amp;variant=hero&amp;eyebrow=Products&amp;sub=Scan+every+library+for+vulnerabilities+and+provenance%2C+catch+dependencies+AI+tools+add+silently%2C+and+gate+builds+with+signed+verdicts+across+your+entire+workflo",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "WebPage",
+          "BreadcrumbList",
+          "SoftwareApplication",
+          "VideoObject"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:cleansight",
+      "url": "https://www.cleanstart.com/cleansight",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/cleansight",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Container Vulnerability Detection and Remediation | CleanSight",
+        "description": "Continuously discover software assets, inherited risk, and a remediation path. Move from blind spots to remediation.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/cleansight",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Container Vulnerability Detection and Remediation | CleanSight",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Continuous+Visibility.+Continuous+Remediation.&amp;variant=hero&amp;eyebrow=CleanSight&amp;accent=Remediation.&amp;sub=Continuously+discover+software+assets%2C+inherited+risk%2C+and+a+remediation+path.+Move+from+blind+spots+to+remediation.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "WebPage",
+          "BreadcrumbList",
+          "SoftwareApplication"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:cleanstart-images",
+      "url": "https://www.cleanstart.com/cleanstart-images",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/cleanstart-images",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Zero CVE Hardened Container Images | CleanStart",
+        "description": "Source-built, hardened container images with near-zero CVEs and verifiable provenance, up to 80% smaller and continuously rebuilt to stay current with the latest fixes.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/cleanstart-images",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Zero CVE Hardened Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Trusted+Container+Foundations&amp;variant=hero&amp;eyebrow=CleanStart+Images&amp;accent=Foundations&amp;sub=Source-built%2C+hardened+container+images+with+near-zero+CVEs+and+verifiable+provenance%2C+up+to+80%25+smaller+and+continuously+rebuilt+to+stay+current+with+the+lates",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "WebPage",
+          "BreadcrumbList",
+          "SoftwareApplication"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:cleanstart-platform",
+      "url": "https://www.cleanstart.com/cleanstart-platform",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/cleanstart-platform",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Inside the CleanStart Platform | CleanStart",
+        "description": "AI-native software manufacturing for trusted runtime foundations. Explore how CleanStart builds trusted software through deterministic trust architecture.",
+        "metaRobots": "noindex, follow",
+        "canonical": "https://www.cleanstart.com/cleanstart-platform",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Inside the CleanStart Platform",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Inside+the+CleanStart+Platform&amp;variant=hero&amp;eyebrow=Platform&amp;accent=Platform&amp;sub=AI-native+software+manufacturing+for+trusted+runtime+foundations.+Explore+how+CleanStart+builds+trusted+software+through+deterministic+trust+architecture.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "WebPage",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:community",
+      "url": "https://www.cleanstart.com/community",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/community",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Developer &amp; Security Community | CleanStart",
+        "description": "Join the CleanStart community of security practitioners, developers, and compliance leaders working together to advance trusted, verified software delivery practices.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/community",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Developer &amp; Security Community",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Developer+%26+Security+Community&amp;sub=Join+the+CleanStart+community+of+security+practitioners%2C+developers%2C+and+compliance+leaders+working+together+to+advance+trusted%2C+verified+software+delivery+prac",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "WebPage",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:contact-us",
+      "url": "https://www.cleanstart.com/contact-us",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/contact-us",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Contact CleanStart | Talk to a Secure Software Expert",
+        "description": "Contact CleanStart for enterprise consultations on verified container images, FIPS compliance, SBOM generation, and software supply chain security for your organization.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/contact-us",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Contact CleanStart | Talk to a Secure Software Expert",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Contact+CleanStart+%7C+Talk+to+a+Secure+Software+Expert&amp;sub=Contact+CleanStart+for+enterprise+consultations+on+verified+container+images%2C+FIPS+compliance%2C+SBOM+generation%2C+and+software+supply+chain+security+for+your+orga",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "ContactPage",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:deal-registration",
+      "url": "https://www.cleanstart.com/deal-registration",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/deal-registration",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Deal Registration | CleanStart",
+        "description": "Register your CleanStart deal to protect your pipeline, access partner pricing, and collaborate with the CleanStart team on enterprise opportunities in secure software supply chain.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/deal-registration",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Deal Registration",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Deal+Registration&amp;sub=Register+your+CleanStart+deal+to+protect+your+pipeline%2C+access+partner+pricing%2C+and+collaborate+with+the+CleanStart+team+on+enterprise+opportunities+in+secure+s",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "ContactPage",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:email-signatures",
+      "url": "https://www.cleanstart.com/email-signatures",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/email-signatures",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Email Signatures | CleanStart",
+        "description": "Internal directory of CleanStart employee email signatures. Copy your signature and paste it into your mail client.",
+        "metaRobots": "noindex, nofollow",
+        "canonical": "https://www.cleanstart.com/email-signatures",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Email Signatures | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Email+Signatures+%7C+CleanStart&amp;sub=Internal+directory+of+CleanStart+employee+email+signatures.+Copy+your+signature+and+paste+it+into+your+mail+client.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "listing:events",
+      "url": "https://www.cleanstart.com/events",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/events",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Events | CleanStart",
+        "description": "Explore CleanStart&#x27;s past and upcoming events including DevOps, DevSecOps, and cybersecurity conferences, summits, and meetups across India and beyond.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/events",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 0,
+        "ogTitle": "Events",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Events&amp;eyebrow=Events&amp;sub=Explore+CleanStart%27s+past+and+upcoming+events+including+DevOps%2C+DevSecOps%2C+and+cybersecurity+conferences%2C+summits%2C+and+meetups+across+India+and+beyond.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "detail:event",
+      "url": "https://www.cleanstart.com/event/reflections-from-gids-2026-the-future-of-ai-driven-development",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/event/reflections-from-gids-2026-the-future-of-ai-driven-development",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Reflections from GIDS 2026: The Future of AI-Driven Development | CleanStart",
+        "description": "The Team CleanStart participated as one of the sponsors at the Great International Developer Summit (GIDS) 2026). It was a wonderful opportunity for us to connect with developers, architects, DevOps engineers, and technology leaders who are actively shaping the future of software engineering.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/event/reflections-from-gids-2026-the-future-of-ai-driven-development",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Reflections from GIDS 2026: The Future of AI-Driven Development",
+        "ogImage": "https://cdn.cleanstart.com/web/event/reflections-from-gids-2026-the-future-of-ai-driven-development-h-5928627d.webp",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "BreadcrumbList",
+          "Event"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:fips",
+      "url": "https://www.cleanstart.com/fips",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/fips",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "FIPS-compliant hardened container images | CleanStart",
+        "description": "FIPS 140-3 validated cryptography built into hardened containers. Secure regulated workloads with automated compliance and continuous monitoring.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/fips",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "FIPS-compliant hardened container images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=FIPS-compliant+hardened+container+images+%7C+CleanStart&amp;eyebrow=Solutions&amp;sub=FIPS+140-3+validated+cryptography+built+into+hardened+containers.+Secure+regulated+workloads+with+automated+compliance+and+continuous+monitoring.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "WebPage",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:for-ciso",
+      "url": "https://www.cleanstart.com/for-ciso",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/for-ciso",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Hardened Images &amp; Libraries for Security and Compliance Teams | CleanStart",
+        "description": "Hardened images and libraries that help security and compliance teams cut inherited risk with continuous governance, provenance verification, and verified remediation.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/for-ciso",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Hardened Images &amp; Libraries for Security and Compliance Teams | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Hardened+Images+%26+Libraries+for+Security+and+Compliance+Teams+%7C+CleanStart&amp;eyebrow=Solutions&amp;sub=Hardened+images+and+libraries+that+help+security+and+compliance+teams+cut+inherited+risk+with+continuous+governance%2C+provenance+verification%2C+and+verified+remed",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "WebPage",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:for-developers",
+      "url": "https://www.cleanstart.com/for-developers",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/for-developers",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Hardened Container Images and Libraries For Developers | CleanStart",
+        "description": "Hardened, zero-CVE container images and libraries built for modern developer stacks. Drop-in compatible with your existing CI/CD, minimal, and continuously rebuilt.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/for-developers",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Hardened Container Images and Libraries For Developers | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Hardened+Container+Images+and+Libraries+For+Developers+%7C+CleanStart&amp;eyebrow=Solutions&amp;sub=Hardened%2C+zero-CVE+container+images+and+libraries+built+for+modern+developer+stacks.+Drop-in+compatible+with+your+existing+CI%2FCD%2C+minimal%2C+and+continuously+rebu",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "WebPage",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "listing:guide",
+      "url": "https://www.cleanstart.com/guide",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/guide",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Guides | CleanStart",
+        "description": "A curated collection of writings, research, and solutions on container security, DevOps, and compliance.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/guide",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Guides",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Guides&amp;eyebrow=Guide&amp;sub=A+curated+collection+of+writings%2C+research%2C+and+solutions+on+container+security%2C+DevOps%2C+and+compliance.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "BreadcrumbList",
+          "ItemList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "detail:guide",
+      "url": "https://www.cleanstart.com/guide/attack-surface-reduction-vs-vulnerability-management",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/guide/attack-surface-reduction-vs-vulnerability-management",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Attack Surface Reduction vs. Vulnerability Management: What&#x27;s the Difference? | CleanStart",
+        "description": "Container image risk grows with every dependency. Learn how attack surface reduction vs vulnerability management reduces exposure and improves remediation.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/guide/attack-surface-reduction-vs-vulnerability-management",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Attack Surface Reduction vs. Vulnerability Management: What&#x27;s the Difference?",
+        "ogImage": "https://www.cleanstart.com/guide-cover/Attack%20Surface%20Reduction%20vs.%20Vulnerability%20Management",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "BreadcrumbList",
+          "Article",
+          "FAQPage"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "listing:knowledge-hub",
+      "url": "https://www.cleanstart.com/knowledge-hub",
+      "status": 200,
+      "redirects": 1,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/knowledge-hub",
+          "status": 308
+        },
+        {
+          "url": "https://www.cleanstart.com/knowledge-hub/vex-documents",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "How to Use VEX Documents to Suppress Non-Exploitable CVEs in Your Pipeline | CleanStart",
+        "description": "CleanStart addresses several critical challenges that plague traditional container security approaches.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/knowledge-hub/vex-documents",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "How to Use VEX Documents to Suppress Non-Exploitable CVEs in Your Pipeline",
+        "ogImage": "https://www.cleanstart.com/api/og?title=How+to+Use+VEX+Documents+to+Suppress+Non-Exploitable+CVEs+in+Your+Pipeline&amp;eyebrow=Emerging+Standards&amp;sub=CleanStart+addresses+several+critical+challenges+that+plague+traditional+container+security+approaches.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "BreadcrumbList",
+          "Article"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "detail:knowledge-hub",
+      "url": "https://www.cleanstart.com/knowledge-hub/release-notes",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/knowledge-hub/release-notes",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Release Notes | CleanStart",
+        "description": "Risk Scoring for Transitive Dependencies Analyze indirect dependencies for hidden vulnerabilities Aggregate risk scores across entire dependency tree Identif…",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/knowledge-hub/release-notes",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Release Notes",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Release+Notes&amp;eyebrow=Quickstart&amp;sub=Risk+Scoring+for+Transitive+Dependencies+Analyze+indirect+dependencies+for+hidden+vulnerabilities+Aggregate+risk+scores+across+entire+dependency+tree+Identif%E2%80%A6",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "BreadcrumbList",
+          "Article"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "listing:news",
+      "url": "https://www.cleanstart.com/news",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/news",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Newsroom | CleanStart",
+        "description": "Stay current with CleanStart&#x27;s latest press releases, partnership announcements, product launches, and milestones in secure container image and software supply chain security.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/news",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 0,
+        "ogTitle": "Newsroom",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Newsroom&amp;eyebrow=Newsroom&amp;sub=Stay+current+with+CleanStart%27s+latest+press+releases%2C+partnership+announcements%2C+product+launches%2C+and+milestones+in+secure+container+image+and+software+supply+",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "detail:news",
+      "url": "https://www.cleanstart.com/news/cleanstart-launches-clean-libraries",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/news/cleanstart-launches-clean-libraries",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "CleanStart Launches Clean Libraries for Trusted Development | CleanStart",
+        "description": "Expands CleanStart’s software supply chain security portfolio, enabling organizations in the AI era to use verified open-source libraries by default.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/news/cleanstart-launches-clean-libraries",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "CleanStart Launches Clean Libraries for Trusted Development",
+        "ogImage": "https://cdn.cleanstart.com/web/news/clean-libraries-banner-website-d2dd7bcf.webp",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "BreadcrumbList",
+          "NewsArticle"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:partners",
+      "url": "https://www.cleanstart.com/partners",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/partners",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "CleanStart Partners | Collaborate on Secure Software Supply Chains",
+        "description": "Explore CleanStart&#x27;s global partner network of technology providers, system integrators, and cloud platforms delivering hardened, compliance ready container images worldwide.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/partners",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "CleanStart Partners | Collaborate on Secure Software Supply Chains",
+        "ogImage": "https://www.cleanstart.com/api/og?title=CleanStart+Partners+%7C+Collaborate+on+Secure+Software+Supply+Chains&amp;sub=Explore+CleanStart%27s+global+partner+network+of+technology+providers%2C+system+integrators%2C+and+cloud+platforms+delivering+hardened%2C+compliance+ready+container+ima",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "WebPage",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "listing:podcast",
+      "url": "https://www.cleanstart.com/podcast",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/podcast",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Leadership Exchange | CleanStart",
+        "description": "Listen to CleanStart&#x27;s podcast where industry leaders decode container security, software supply chain risk, and the future of trusted software delivery.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/podcast",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Leadership Exchange",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Leadership+Exchange&amp;sub=Listen+to+CleanStart%27s+podcast+where+industry+leaders+decode+container+security%2C+software+supply+chain+risk%2C+and+the+future+of+trusted+software+delivery.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "BreadcrumbList",
+          "PodcastSeries"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "detail:preview",
+      "url": "https://www.cleanstart.com/preview/blogs/none",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/preview/blogs/none",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "noindex, nofollow, noarchive",
+        "cacheControl": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\", </_next/static/media/6bd983bd58a87a3d-s.p.0h108oidc_0fm.woff2?dpl=dpl_2H8aqwPb3GwLc5653uJ5v71w6pRL>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/media/a343f882a40d2cc9-s.p.0kho-wj7-y-w1.woff2?dpl=dpl_2H8aqwPb3GwLc5653uJ5v71w6pRL>; rel=preload; as=\"font\"; crossorigin=\"\"; type=\"font/woff2\", </_next/static/chunks/0krix810j.t4j.css?dpl=dpl_2H8aqwPb3GwLc5653uJ5v71w6pRL>; rel=preload; as=\"style\", </_next/static/chunks/0j7-u81ij8wey.css?dpl=dpl_2H8aqwPb3GwLc5653uJ5v71w6pRL>; rel=preload; as=\"style\", </_next/static/chunks/10m1xv9r2g9ic.css?dpl=dpl_2H8aqwPb3GwLc5653uJ5v71w6pRL>; rel=preload; as=\"style\""
+      },
+      "head": {
+        "title": "Preview · CleanStart | CleanStart",
+        "description": "Build on verified, near-zero-vulnerability container images with cryptographic provenance and compliance alignment.",
+        "metaRobots": "noindex, nofollow, nocache",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:pricing",
+      "url": "https://www.cleanstart.com/pricing",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/pricing",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Pricing | CleanStart",
+        "description": "Choose the CleanStart plan that fits your team — free hardened container images for developers, enterprise images with FIPS and SLSA Level 3 provenance, plus custom images, clean libraries, and additional services.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/pricing",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Pricing | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Pricing+%7C+CleanStart&amp;sub=Choose+the+CleanStart+plan+that+fits+your+team+%E2%80%94+free+hardened+container+images+for+developers%2C+enterprise+images+with+FIPS+and+SLSA+Level+3+provenance%2C+plus+cu",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "WebPage",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "listing:resource-center",
+      "url": "https://www.cleanstart.com/resource-center",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/resource-center",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Resource Center | CleanStart",
+        "description": "A curated collection of whitepapers, ebooks, datasheets, architecture insights, and reports on container security.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/resource-center",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Resource Center",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Resource+Center&amp;eyebrow=Resources&amp;sub=A+curated+collection+of+whitepapers%2C+ebooks%2C+datasheets%2C+architecture+insights%2C+and+reports+on+container+security.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "BreadcrumbList",
+          "ItemList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "detail:resource",
+      "url": "https://www.cleanstart.com/resources/clean-libraries",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/resources/clean-libraries",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Clean Library | Verified Open Source Dependencies | CleanStart",
+        "description": "Clean Library continuously verifies open-source dependencies directly from source, giving developers trusted libraries to consume",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/resources/clean-libraries",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Clean Library | Verified Open Source Dependencies",
+        "ogImage": "https://cdn.cleanstart.com/web/resource/cleanlib-3-1-3932d9b2.pdf",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "BreadcrumbList",
+          "Article"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:roi-calculator",
+      "url": "https://www.cleanstart.com/roi-calculator",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/roi-calculator",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "ROI Calculator — Operational Impact of Hardened Images | CleanStart",
+        "description": "Estimate the operational impact of moving to minimal, trusted container images — reduced vulnerability noise, lower patch-cycle overhead, faster secure releases, and engineering hours recovered.",
+        "metaRobots": "noindex, nofollow",
+        "canonical": "https://www.cleanstart.com/roi-calculator",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "ROI Calculator — Operational Impact of Hardened Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=ROI+Calculator+%E2%80%94+Operational+Impact+of+Hardened+Images+%7C+CleanStart&amp;eyebrow=Tools&amp;sub=Estimate+the+operational+impact+of+moving+to+minimal%2C+trusted+container+images+%E2%80%94+reduced+vulnerability+noise%2C+lower+patch-cycle+overhead%2C+faster+secure+releases",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:software-bill-materials",
+      "url": "https://www.cleanstart.com/software-bill-materials",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/software-bill-materials",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "CleanStart SBOM for software transparency | CleanStart",
+        "description": "CleanStart images deliver automated SBOM generation with cryptographic signing and continuous software integrity tracking across build and delivery workflows.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/software-bill-materials",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "CleanStart SBOM for software transparency | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=CleanStart+SBOM+for+software+transparency+%7C+CleanStart&amp;eyebrow=Solutions&amp;sub=CleanStart+images+deliver+automated+SBOM+generation+with+cryptographic+signing+and+continuous+software+integrity+tracking+across+build+and+delivery+workflows.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "WebPage",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:teams",
+      "url": "https://www.cleanstart.com/teams",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/teams",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Meet the Team &amp; Leadership | CleanStart",
+        "description": "Explore CleanStart&#x27;s expert teams in security, engineering, and compliance, united by a shared mission to build and deliver trusted, verifiable software from the ground up.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/teams",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Meet the Team &amp; Leadership",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Meet+the+Team+%26+Leadership&amp;eyebrow=Team&amp;sub=Explore+CleanStart%27s+expert+teams+in+security%2C+engineering%2C+and+compliance%2C+united+by+a+shared+mission+to+build+and+deliver+trusted%2C+verifiable+software+from+th",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "AboutPage",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "static:vulnerability-remediation",
+      "url": "https://www.cleanstart.com/vulnerability-remediation",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/vulnerability-remediation",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Remediate Vulnerability at source | CleanStart Images",
+        "description": "Remediate vulnerabilities at the source with hardened, near-zero-CVE container images. Reduce inherited risk, cut scanner noise, and ship faster.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/vulnerability-remediation",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Remediate Vulnerability at source | CleanStart Images",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Remediate+Vulnerability+at+source+%7C+CleanStart+Images&amp;eyebrow=Solutions&amp;sub=Remediate+vulnerabilities+at+the+source+with+hardened%2C+near-zero-CVE+container+images.+Reduce+inherited+risk%2C+cut+scanner+noise%2C+and+ship+faster.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "WebPage",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "listing:webinars",
+      "url": "https://www.cleanstart.com/webinars",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/webinars",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "CleanStart Webinar | CleanStart",
+        "description": "Live and on-demand webinars on hardened container images, software supply-chain security, and CleanStart product deep-dives.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/webinars",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 0,
+        "ogTitle": "CleanStart Webinar",
+        "ogImage": "https://www.cleanstart.com/api/og?title=CleanStart+Webinar&amp;eyebrow=Webinar&amp;sub=Live+and+on-demand+webinars+on+hardened+container+images%2C+software+supply-chain+security%2C+and+CleanStart+product+deep-dives.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:404",
+      "url": "https://www.cleanstart.com/this-page-definitely-does-not-exist-404-check",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/this-page-definitely-does-not-exist-404-check",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:acceptable-use-policy",
+      "url": "https://www.cleanstart.com/acceptable-use-policy",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/acceptable-use-policy",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:leadership",
+      "url": "https://www.cleanstart.com/leadership",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/leadership",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:search",
+      "url": "https://www.cleanstart.com/search",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/search",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:survey",
+      "url": "https://www.cleanstart.com/survey",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/survey",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:pricing",
+      "url": "https://www.cleanstart.com/pricing",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/pricing",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Pricing | CleanStart",
+        "description": "Choose the CleanStart plan that fits your team — free hardened container images for developers, enterprise images with FIPS and SLSA Level 3 provenance, plus custom images, clean libraries, and additional services.",
+        "metaRobots": "index, follow",
+        "canonical": "https://www.cleanstart.com/pricing",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Pricing | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Pricing+%7C+CleanStart&amp;sub=Choose+the+CleanStart+plan+that+fits+your+team+%E2%80%94+free+hardened+container+images+for+developers%2C+enterprise+images+with+FIPS+and+SLSA+Level+3+provenance%2C+plus+cu",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite",
+          "WebPage",
+          "BreadcrumbList"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:webinar-sysdig-1",
+      "url": "https://www.cleanstart.com/webinar/secure-containers-end-to-end-from-trusted-images-to-runtime-visibility-with-cleanstart-and-sysdig",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/webinar/secure-containers-end-to-end-from-trusted-images-to-runtime-visibility-with-cleanstart-and-sysdig",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:webinar-sysdig-2",
+      "url": "https://www.cleanstart.com/webinar/secure-containers-end-to-end-from-trusted-images-to-runtime-visibility-with-cleanstart-and-sysdig-2",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/webinar/secure-containers-end-to-end-from-trusted-images-to-runtime-visibility-with-cleanstart-and-sysdig-2",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:new-year-event-sysdig",
+      "url": "https://www.cleanstart.com/new-year-event-sysdig",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/new-year-event-sysdig",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:new-year-event-eventus",
+      "url": "https://www.cleanstart.com/new-year-event-eventus",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/new-year-event-eventus",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:cleanstart-hitachi-chennai",
+      "url": "https://www.cleanstart.com/cleanstart-hitachi-chennai",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/cleanstart-hitachi-chennai",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:cleanstart-hitachi-bengaluru",
+      "url": "https://www.cleanstart.com/cleanstart-hitachi-bengaluru",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/cleanstart-hitachi-bengaluru",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:cleanstart-hitachi-hyderabad",
+      "url": "https://www.cleanstart.com/cleanstart-hitachi-hyderabad",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/cleanstart-hitachi-hyderabad",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:legacy-redirect:cleanstart-raksha-chennai",
+      "url": "https://www.cleanstart.com/cleanstart-raksha-chennai",
+      "status": 404,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/cleanstart-raksha-chennai",
+          "status": 404
+        }
+      ],
+      "headers": {
+        "xRobotsTag": "max-image-preview:large, max-snippet:-1",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/html; charset=utf-8",
+        "link": "</.well-known/api-catalog>; rel=\"api-catalog\"; type=\"application/linkset+json\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </api/search>; rel=\"service-desc\"; type=\"application/json\""
+      },
+      "head": {
+        "title": "Page Not Found · CleanStart | CleanStart",
+        "description": "The page you&#x27;re looking for doesn&#x27;t exist or has moved.",
+        "metaRobots": "noindex",
+        "canonical": "https://www.cleanstart.com",
+        "canonicalCount": 1,
+        "hreflangCount": 0,
+        "h1Count": 1,
+        "ogTitle": "Verified &amp; Secure Container Images | CleanStart",
+        "ogImage": "https://www.cleanstart.com/api/og?title=Verified+%26+Secure+Container+Images&amp;variant=hero&amp;accent=Secure+Container+Images&amp;sub=Build+on+verified%2C+near-zero-vulnerability+container+images+with+cryptographic+provenance+and+compliance+alignment.",
+        "jsonLdTypes": [
+          "Organization",
+          "WebSite"
+        ],
+        "jsonLdParseErrors": 0
+      }
+    },
+    {
+      "template": "control:sitemap",
+      "url": "https://www.cleanstart.com/sitemap.xml",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/sitemap.xml",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "application/xml",
+        "link": null
+      },
+      "head": null
+    },
+    {
+      "template": "control:llms-txt",
+      "url": "https://www.cleanstart.com/llms.txt",
+      "status": 200,
+      "redirects": 0,
+      "chain": [
+        {
+          "url": "https://www.cleanstart.com/llms.txt",
+          "status": 200
+        }
+      ],
+      "headers": {
+        "xRobotsTag": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "contentType": "text/plain; charset=utf-8",
+        "link": null
+      },
+      "head": null
+    }
+  ]
+}

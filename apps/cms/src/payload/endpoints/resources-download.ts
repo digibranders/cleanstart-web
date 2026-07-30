@@ -47,7 +47,6 @@ const getSecret = (): string => {
 const DEFAULT_ALLOWED_ORIGINS = [
   'https://cleanstart.com',
   'https://www.cleanstart.com',
-  'https://staging.cleanstart.com',
 ];
 
 const allowedOrigins = (): string[] => {

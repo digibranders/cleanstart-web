@@ -1,12 +1,11 @@
 import { BrandMarquee } from "@/components/sections/home/BrandMarquee";
-import { HeroAwardSlide } from "@/components/sections/home/HeroAwardSlide";
 import { HeroCarousel } from "@/components/sections/home/HeroCarousel";
 import { HeroProductSlide } from "@/components/sections/home/HeroProductSlide";
 
-// CleanStart V4 home hero. The hero is now an auto-advancing crossfade carousel
-// (HeroCarousel) rotating between the product slide (slide 1, the page's <h1>)
-// and the "Winners of 2026" awards campaign slide. The brand marquee is a shared
-// trust band pinned below the carousel — it does not rotate with the slides.
+// CleanStart V4 home hero. The hero renders through HeroCarousel (currently a
+// single product slide — the page's <h1>; with one slide it shows no dots and
+// does not auto-advance). The brand marquee is a shared trust band pinned
+// below the carousel — it does not rotate with the slides.
 export function Hero(): React.ReactElement {
   return (
     <section className="relative overflow-hidden pt-[calc(clamp(96px,8vw,120px)+var(--cs-header-extra))]">
@@ -17,11 +16,6 @@ export function Hero(): React.ReactElement {
               id: "product",
               label: "Verified, zero-CVE container images and libraries",
               content: <HeroProductSlide />,
-            },
-            {
-              id: "award",
-              label: "Winners of the 2026 Cybersecurity Stars Awards",
-              content: <HeroAwardSlide />,
             },
           ]}
         />

@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload';
 
-import { isAdminOrEditor } from '../access';
+import { isAdminEditorOrHr } from '../access';
 import { emailSignatureRenderEndpoint } from '../endpoints/email-signature-render';
 import {
   revalidateWebAfterDeleteHook,
@@ -75,9 +75,9 @@ export const EmailSignatures: CollectionConfig = {
   },
   access: {
     read: () => true,
-    create: isAdminOrEditor,
-    update: isAdminOrEditor,
-    delete: isAdminOrEditor,
+    create: isAdminEditorOrHr,
+    update: isAdminEditorOrHr,
+    delete: isAdminEditorOrHr,
   },
   fields: [
     {
