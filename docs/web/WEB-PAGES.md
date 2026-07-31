@@ -85,6 +85,17 @@ page slugs, categories, types, and build status across the dev journey.
 
 ---
 
+## Comparison Pages
+
+Competitive comparison pages live under the `/compare/` segment. One page per competitor;
+the segment is reserved for this purpose and has no listing route of its own.
+
+| # | Page Name | URL Slug | Type | Status | Notes |
+|---|-----------|----------|------|--------|-------|
+| C1 | Docker Hardened Images vs CleanStart | `/compare/cleanstart-vs-docker-hardened-images` | Static | ✅ | Built 2026-07-31 from the "Docker Hardened Images vs CleanStart" copy doc. 12 sections in `src/components/sections/compare/`, all copy + the 15-row capability matrix + FAQ centralised in `compare-data.ts` (matrix counts and FAQPage JSON-LD both derive from it). Emits BreadcrumbList + FAQPage. In sitemap STATIC_ROUTES. **Not yet in `nav-config.ts`** — nav placement is a separate decision. Carries a Docker trademark disclaimer under the matrix. |
+
+---
+
 ## Resources Pages
 
 | # | Page Name | URL Slug | Type | Status | Notes |

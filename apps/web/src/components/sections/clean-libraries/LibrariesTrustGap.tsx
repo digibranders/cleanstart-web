@@ -1,6 +1,6 @@
 import { Container, Section } from "@/components/layout";
 import { Reveal, RevealItem, RevealStagger } from "@/components/ui/Reveal";
-import { GlassIcon } from "./GlassIcon";
+import { GlassIcon } from "@/components/sections/_shared/GlassIcon";
 
 /**
  * "Trust Is Built. Not Assumed." — the four facets of library trust (Identity,

@@ -1,6 +1,6 @@
 import { Container, Section } from "@/components/layout";
 import { Reveal } from "@/components/ui/Reveal";
-import { GlassIcon } from "./GlassIcon";
+import { GlassIcon } from "@/components/sections/_shared/GlassIcon";
 
 /**
  * "Libraries Enter Software Through" — the four entry vectors stream into your
