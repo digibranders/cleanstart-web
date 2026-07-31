@@ -16,6 +16,7 @@ import {
   getPastEvents,
   type EventsListResponse,
 } from "@/lib/events";
+import { logListingFetchFailure } from "@/lib/log-listing-fetch-failure";
 import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
 
@@ -53,8 +54,12 @@ const emptyList = (): EventsListResponse => ({
 export default async function EventsPage(): Promise<React.ReactElement> {
   let pastFailed = false;
   const [upcoming, past] = await Promise.all([
-    getUpcomingEvents({ limit: 10 }).catch(emptyList),
-    getPastEvents({ limit: 1000 }).catch(() => {
+    getUpcomingEvents({ limit: 10 }).catch((err: unknown) => {
+      logListingFetchFailure("/events", "getUpcomingEvents", err);
+      return emptyList();
+    }),
+    getPastEvents({ limit: 1000 }).catch((err: unknown) => {
+      logListingFetchFailure("/events", "getPastEvents", err);
       pastFailed = true;
       return emptyList();
     }),

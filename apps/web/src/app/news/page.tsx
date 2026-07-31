@@ -11,6 +11,7 @@ import {
 } from "@/components/sections/newsroom/NewsContent";
 import { NewsroomHero } from "@/components/sections/newsroom/NewsroomHero";
 import { CrawlableLinkIndex } from "@/components/ui/CrawlableLinkIndex";
+import { logListingFetchFailure } from "@/lib/log-listing-fetch-failure";
 import { getNews, getFeaturedNews, getNewsCategories } from "@/lib/news";
 import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
@@ -35,16 +36,25 @@ export function generateMetadata(): Metadata {
  */
 export default async function NewsPage(): Promise<React.ReactElement> {
   const [featuredNews, newsData, categories] = await Promise.all([
-    getFeaturedNews().catch(() => null),
-    getNews({ limit: 1000 }).catch(() => ({
-      docs: [],
-      hasNextPage: false,
-      hasPrevPage: false,
-      page: 1,
-      totalDocs: 0,
-      totalPages: 1,
-    })),
-    getNewsCategories().catch(() => []),
+    getFeaturedNews().catch((err: unknown) => {
+      logListingFetchFailure("/news", "getFeaturedNews", err);
+      return null;
+    }),
+    getNews({ limit: 1000 }).catch((err: unknown) => {
+      logListingFetchFailure("/news", "getNews", err);
+      return {
+        docs: [],
+        hasNextPage: false,
+        hasPrevPage: false,
+        page: 1,
+        totalDocs: 0,
+        totalPages: 1,
+      };
+    }),
+    getNewsCategories().catch((err: unknown) => {
+      logListingFetchFailure("/news", "getNewsCategories", err);
+      return [];
+    }),
   ]);
 
   const allNews = newsData.docs;

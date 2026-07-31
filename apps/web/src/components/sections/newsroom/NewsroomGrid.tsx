@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { Suspense } from "react";
 import type { News, NewsCategory, NewsRegion } from "@/lib/news";
 import { EmptyState } from "@/components/feedback";
 import { Pagination } from "@/components/ui/Pagination";
@@ -178,12 +179,23 @@ export function NewsroomGrid({
             className="shrink-0 lg:sticky lg:max-h-[calc(100vh-112px)] lg:overflow-y-auto"
             style={{ top: "96px", alignSelf: "flex-start" }}
           >
-            <NewsroomFilters
-              categories={categories}
-              activeCategory={activeCategory || undefined}
-              activeRegion={activeRegion}
-              activeYear={activeYear}
-            />
+            {/* NewsroomFilters calls useSearchParams(), which opts any
+                ancestor into client-only rendering unless it has its own
+                Suspense boundary — without this, the boundary bubbles up
+                to the route's loading.tsx and the whole page bails to the
+                loading skeleton during static generation. */}
+            <Suspense
+              fallback={
+                <div className="w-full lg:w-[295px]" style={{ height: "420px" }} />
+              }
+            >
+              <NewsroomFilters
+                categories={categories}
+                activeCategory={activeCategory || undefined}
+                activeRegion={activeRegion}
+                activeYear={activeYear}
+              />
+            </Suspense>
           </aside>
 
           <div className="flex-1 min-w-0">
