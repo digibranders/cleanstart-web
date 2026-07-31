@@ -23,7 +23,7 @@ import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
 // Re-render hourly so the upcoming/past split and country data stay fresh
 // without requiring a new deploy. On-demand revalidation (CMS afterChange hook
 // on the Events collection) handles instant updates when an event is published.
-export const revalidate = 3600;
+export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
 
 const TITLE = "Events";
 const DESCRIPTION =

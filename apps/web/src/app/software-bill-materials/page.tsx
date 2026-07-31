@@ -21,7 +21,7 @@ export const metadata = buildPageMetadata({
   path: "/software-bill-materials",
 });
 
-export const revalidate = 3600;
+export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
 
 export default async function SoftwareBillOfMaterialsPage(): Promise<React.ReactElement> {
   const graph = await getPageGraph("/software-bill-materials", [

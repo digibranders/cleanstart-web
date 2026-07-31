@@ -26,7 +26,7 @@ export const metadata = buildPageMetadata({
   titleAccent: "Foundations",
 });
 
-export const revalidate = 3600;
+export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
 
 export default async function CleanStartImagesPage(): Promise<React.ReactElement> {
   const graph = await getPageGraph("/cleanstart-images", [

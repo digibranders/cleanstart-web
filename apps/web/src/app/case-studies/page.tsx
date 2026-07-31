@@ -14,7 +14,7 @@ import { getCaseStudies } from "@/lib/case-studies";
 import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, caseStudyListSchema } from "@/lib/seo/jsonld";
 
-export const revalidate = 3600;
+export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
 
 const TITLE = "Case Studies";
 const DESCRIPTION =

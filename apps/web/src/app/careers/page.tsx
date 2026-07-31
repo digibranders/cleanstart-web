@@ -11,7 +11,7 @@ import { getJobLocations, getJobs, type JobLocation } from "@/lib/jobs";
 import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
 
-export const revalidate = 3600;
+export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
 
 const TITLE = "Careers";
 const DESCRIPTION =

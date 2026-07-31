@@ -60,7 +60,7 @@ export const metadata: Metadata = buildPageMetadata({
   titleAccent: HOME_OG_ACCENT,
 });
 
-export const revalidate = 3600;
+export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
 
 export default async function Home(): Promise<React.ReactElement> {
   // V4 redesign: hero + factory + testimonials/stats section.
