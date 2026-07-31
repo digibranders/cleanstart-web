@@ -51,7 +51,8 @@ export const Users: CollectionConfig = {
         roles.includes('editor') ||
         roles.includes('author') ||
         roles.includes('hr') ||
-        roles.includes('events')
+        roles.includes('events') ||
+        roles.includes('legal')
       );
     },
   },

@@ -53,6 +53,7 @@ import * as migration_20260715_120000_add_leads_attribution from './20260715_120
 import * as migration_20260715_130000_add_hr_events_roles from './20260715_130000_add_hr_events_roles';
 import * as migration_20260728_120000_add_email_signatures from './20260728_120000_add_email_signatures';
 import * as migration_20260728_180000_add_email_signature_groups from './20260728_180000_add_email_signature_groups';
+import * as migration_20260731_120000_add_legal_role from './20260731_120000_add_legal_role';
 
 export const migrations = [
   {
@@ -304,5 +305,10 @@ export const migrations = [
     up: migration_20260728_180000_add_email_signature_groups.up,
     down: migration_20260728_180000_add_email_signature_groups.down,
     name: '20260728_180000_add_email_signature_groups',
+  },
+  {
+    up: migration_20260731_120000_add_legal_role.up,
+    down: migration_20260731_120000_add_legal_role.down,
+    name: '20260731_120000_add_legal_role',
   },
 ];

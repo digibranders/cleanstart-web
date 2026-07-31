@@ -17,7 +17,7 @@
 // The collection wiring lives in the relevant collections' `access` blocks
 // (via `isAdminEditorOrHr` / `isAdminEditorOrEvents`) and the nav scoping in
 // `apps/cms/src/payload/lib/wire-scoped-nav.ts`.
-export const ROLES = ['admin', 'editor', 'author', 'seo', 'hr', 'events'] as const;
+export const ROLES = ['admin', 'editor', 'author', 'seo', 'hr', 'events', 'legal'] as const;
 export type Role = (typeof ROLES)[number];
 
 // Embed style presets — the curated visual styles an editor can apply to a
