@@ -54,6 +54,15 @@ export const isAdminEditorOrEvents: Access = ({ req: { user } }) =>
   hasAnyRole(user, ['admin', 'editor', 'events']);
 
 /**
+ * Legal-domain write access: admin/editor plus the departmental `legal` role.
+ * Wired into `legalDocuments` only — legal owns the policy documents outright
+ * and nothing else. Same shape as `isAdminEditorOrEvents`: scoped, additive,
+ * and isolated to this domain.
+ */
+export const isAdminEditorOrLegal: Access = ({ req: { user } }) =>
+  hasAnyRole(user, ['admin', 'editor', 'legal']);
+
+/**
  * Public read access for draft-enabled content collections.
  *
  * Authenticated requests (admin/editor/author sessions AND the read-only

@@ -40,11 +40,15 @@ const CMS_API_KEY_COLLECTION = process.env.CMS_API_KEY_COLLECTION ?? 'users';
 // Time-based ISR is only a fallback here: the CMS pushes on-demand
 // revalidation (revalidatePath / revalidateTag via /api/revalidate) the
 // instant a doc is published or edited, so pages go live in seconds without
-// waiting out this window. A long fallback keeps content correct if a webhook
-// is ever missed while avoiding a regeneration (= a billed ISR write) on every
-// CMS-backed route once a minute. Per-call overrides via `revalidateSeconds`
-// still apply for anything that needs to be fresher.
-const DEFAULT_REVALIDATE_SECONDS = 3600;
+// waiting out this window. This default governs the many CMS-backed *detail*
+// routes (no per-page `export const revalidate`), which are the dominant
+// source of billed ISR writes: at a 1h window every one of the thousands of
+// detail pages regenerated up to 24×/day under crawler traffic. A 24h fallback
+// cuts that ~24× while staying instantly fresh via the publish hooks, and
+// self-heals within 24h if a hook is ever missed. Per-call overrides via
+// `revalidateSeconds` still apply for anything that must be fresher (search
+// uses 30s, email signatures 300s).
+const DEFAULT_REVALIDATE_SECONDS = 86400;
 
 const stripPublishedFilter = (path: string): string => {
   // Path is of the form `/api/<coll>?...querystring...`. Parse the

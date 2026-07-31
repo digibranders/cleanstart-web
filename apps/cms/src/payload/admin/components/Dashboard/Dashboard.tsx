@@ -1,5 +1,6 @@
 // Gutter intentionally replaced with a plain div — @payloadcms/ui Gutter
 // is a render-side component (forbidden by the data-layer-only rule).
+import { redirect } from 'next/navigation';
 import type { AdminViewServerProps, Payload, Where } from 'payload';
 import type { ReactElement, ReactNode } from 'react';
 
@@ -489,6 +490,16 @@ export const Dashboard = async (
   // domain: no cross-domain counts, recent edits, leads/redirects, or create
   // links that their access would reject.
   const scopedSlugs = scopedCollectionSlugsForUser(user);
+
+  // A scoped-only user whose whole domain is ONE collection has nothing a
+  // dashboard can tell them that the collection list does not — every panel
+  // would be a view of that single collection. Send them straight to it, so
+  // login lands on the work instead of on a summary of it. Multi-collection
+  // departments (hr, events) keep the scoped dashboard.
+  if (scopedSlugs?.length === 1) {
+    redirect(`/admin/collections/${scopedSlugs[0]}`);
+  }
+
   const isScoped = scopedSlugs !== null;
   const contentSlugs = isScoped
     ? VERSIONED_CONTENT.filter((slug) => scopedSlugs.includes(slug))

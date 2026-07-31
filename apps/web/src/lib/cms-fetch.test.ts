@@ -7,6 +7,15 @@ vi.mock("next/headers", () => ({
 
 const fetchMock = vi.fn();
 
+/**
+ * Mirrors `DEFAULT_REVALIDATE_SECONDS` in cms-fetch.ts. Deliberately duplicated
+ * rather than imported: this window is the dominant driver of billed ISR writes
+ * (at 1h, thousands of detail pages regenerated up to 24x/day under crawler
+ * traffic), so narrowing it should fail a test rather than show up on an
+ * invoice. Importing the constant would make the assertion tautological.
+ */
+const DEFAULT_REVALIDATE_SECONDS = 86400;
+
 const ok = (data: unknown): Response => ({ ok: true, status: 200, json: async () => data }) as Response;
 
 const load = async (env: Record<string, string> = {}) => {
@@ -45,7 +54,7 @@ describe("fetchCMS — published mode", () => {
     fetchMock.mockResolvedValue(ok({ docs: [1] }));
     const out = await fetchCMS<{ docs: number[] }>("/api/blogs?limit=1");
     expect(out).toEqual({ docs: [1] });
-    expect(calledInit().next).toEqual({ revalidate: 3600 });
+    expect(calledInit().next).toEqual({ revalidate: DEFAULT_REVALIDATE_SECONDS });
     expect(calledInit().cache).toBeUndefined();
     expect((calledInit().headers as Record<string, string>).Authorization).toBeUndefined();
   });
@@ -137,6 +146,6 @@ describe("fetchCMS — draft mode", () => {
     fetchMock.mockResolvedValue(ok({}));
     await fetchCMS("/api/blogs");
     expect(calledUrl()).not.toContain("draft=true");
-    expect(calledInit().next).toEqual({ revalidate: 3600 });
+    expect(calledInit().next).toEqual({ revalidate: DEFAULT_REVALIDATE_SECONDS });
   });
 });

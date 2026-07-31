@@ -9,11 +9,12 @@ import {
 } from "@/components/sections/webinars/WebinarsContent";
 import { WebinarsHero } from "@/components/sections/webinars/WebinarsHero";
 import { WebinarsCTA } from "@/components/sections/webinars/WebinarsCTA";
+import { logListingFetchFailure } from "@/lib/log-listing-fetch-failure";
 import { getWebinars } from "@/lib/webinars";
 import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, webinarListSchema } from "@/lib/seo/jsonld";
 
-export const revalidate = 3600;
+export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
 
 const TITLE = "CleanStart Webinar";
 const DESCRIPTION =
@@ -32,7 +33,8 @@ export function generateMetadata(): Metadata {
  */
 export default async function WebinarsPage(): Promise<React.ReactElement> {
   let loadFailed = false;
-  const data = await getWebinars({ limit: 1000 }).catch(() => {
+  const data = await getWebinars({ limit: 1000 }).catch((err: unknown) => {
+    logListingFetchFailure("/webinars", "getWebinars", err);
     loadFailed = true;
     return {
       docs: [],

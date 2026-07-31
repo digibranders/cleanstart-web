@@ -17,7 +17,7 @@ export const metadata = buildPageMetadata({
   path: "/pricing",
 });
 
-export const revalidate = 3600;
+export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
 
 export default async function PricingPage(): Promise<React.ReactElement> {
   const graph = await getPageGraph("/pricing", [

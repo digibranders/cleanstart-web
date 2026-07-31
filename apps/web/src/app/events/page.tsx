@@ -16,13 +16,14 @@ import {
   getPastEvents,
   type EventsListResponse,
 } from "@/lib/events";
+import { logListingFetchFailure } from "@/lib/log-listing-fetch-failure";
 import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
 
 // Re-render hourly so the upcoming/past split and country data stay fresh
 // without requiring a new deploy. On-demand revalidation (CMS afterChange hook
 // on the Events collection) handles instant updates when an event is published.
-export const revalidate = 3600;
+export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
 
 const TITLE = "Events";
 const DESCRIPTION =
@@ -53,8 +54,12 @@ const emptyList = (): EventsListResponse => ({
 export default async function EventsPage(): Promise<React.ReactElement> {
   let pastFailed = false;
   const [upcoming, past] = await Promise.all([
-    getUpcomingEvents({ limit: 10 }).catch(emptyList),
-    getPastEvents({ limit: 1000 }).catch(() => {
+    getUpcomingEvents({ limit: 10 }).catch((err: unknown) => {
+      logListingFetchFailure("/events", "getUpcomingEvents", err);
+      return emptyList();
+    }),
+    getPastEvents({ limit: 1000 }).catch((err: unknown) => {
+      logListingFetchFailure("/events", "getPastEvents", err);
       pastFailed = true;
       return emptyList();
     }),

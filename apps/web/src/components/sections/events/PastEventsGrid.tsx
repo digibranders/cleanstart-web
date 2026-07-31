@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { Suspense } from "react";
 import type { Event, EventCountry } from "@/lib/events";
 import { EmptyState } from "@/components/feedback";
 import { Pagination } from "@/components/ui/Pagination";
@@ -148,7 +149,18 @@ export function PastEventsGrid({
             className="shrink-0 lg:sticky lg:max-h-[calc(100vh-112px)] lg:overflow-y-auto"
             style={{ top: "96px", alignSelf: "flex-start" }}
           >
-            <EventFilters activeCountry={activeCountry} activeYear={activeYear} />
+            {/* EventFilters calls useSearchParams(), which opts any
+                ancestor into client-only rendering unless it has its own
+                Suspense boundary — without this, the boundary bubbles up
+                to the route's loading.tsx and the whole page bails to the
+                loading skeleton during static generation. */}
+            <Suspense
+              fallback={
+                <div className="w-full lg:w-[295px]" style={{ height: "420px" }} />
+              }
+            >
+              <EventFilters activeCountry={activeCountry} activeYear={activeYear} />
+            </Suspense>
           </aside>
 
           <div className="flex-1 min-w-0">

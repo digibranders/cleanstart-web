@@ -5,6 +5,7 @@ import {
   isAdmin,
   isAdminEditorOrEvents,
   isAdminEditorOrHr,
+  isAdminEditorOrLegal,
   isAdminEditorOrSeo,
   isAdminFieldLevel,
   isAdminOrEditor,
@@ -27,6 +28,7 @@ const author = { id: 3, roles: ['author'] };
 const seo = { id: 4, roles: ['seo'] };
 const hr = { id: 5, roles: ['hr'] };
 const events = { id: 6, roles: ['events'] };
+const legal = { id: 7, roles: ['legal'] };
 describe('isAuthenticated', () => {
   it('is true for any logged-in user, false otherwise', () => {
     expect(callAccess(isAuthenticated, author)).toBe(true);
@@ -101,6 +103,16 @@ describe('departmental role write access', () => {
     expect(callAccess(isAdminEditorOrEvents, hr)).toBe(false);
     expect(callAccess(isAdminEditorOrEvents, author)).toBe(false);
     expect(callAccess(isAdminEditorOrEvents, null)).toBe(false);
+  });
+
+  it('isAdminEditorOrLegal: admin + editor + legal, not hr/events/author/anon', () => {
+    expect(callAccess(isAdminEditorOrLegal, admin)).toBe(true);
+    expect(callAccess(isAdminEditorOrLegal, editor)).toBe(true);
+    expect(callAccess(isAdminEditorOrLegal, legal)).toBe(true);
+    expect(callAccess(isAdminEditorOrLegal, hr)).toBe(false);
+    expect(callAccess(isAdminEditorOrLegal, events)).toBe(false);
+    expect(callAccess(isAdminEditorOrLegal, author)).toBe(false);
+    expect(callAccess(isAdminEditorOrLegal, null)).toBe(false);
   });
 });
 

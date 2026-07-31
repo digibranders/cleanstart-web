@@ -14,7 +14,7 @@ import { getResources } from "@/lib/resources";
 import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
 
-export const revalidate = 3600;
+export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
 
 const TITLE = "Resource Center";
 const DESCRIPTION =

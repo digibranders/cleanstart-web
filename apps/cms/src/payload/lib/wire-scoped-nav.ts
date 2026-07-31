@@ -31,10 +31,13 @@ export const EVENTS_COLLECTION_SLUGS = [
   'podcastEpisodes',
 ] as const;
 
+export const LEGAL_COLLECTION_SLUGS = ['legalDocuments'] as const;
+
 /** Departmental role → the collection slugs that role is scoped to see. */
 const SCOPED_ROLE_COLLECTIONS = {
   hr: HR_COLLECTION_SLUGS,
   events: EVENTS_COLLECTION_SLUGS,
+  legal: LEGAL_COLLECTION_SLUGS,
 } as const satisfies Record<string, readonly string[]>;
 
 type ScopedRole = keyof typeof SCOPED_ROLE_COLLECTIONS;

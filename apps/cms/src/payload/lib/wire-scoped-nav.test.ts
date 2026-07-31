@@ -65,6 +65,14 @@ describe('isHiddenForScopedNav', () => {
     }
   });
 
+  it('shows a legal-only user only legalDocuments and hides the rest', () => {
+    const legal = userWith('legal');
+    expect(isHiddenForScopedNav('legalDocuments', legal)).toBe(false);
+    for (const slug of ['jobs', 'events', 'webinars', 'blogs', 'media', 'users', 'leads']) {
+      expect(isHiddenForScopedNav(slug, legal)).toBe(true);
+    }
+  });
+
   it('shows an events-only user their events collections and hides the rest', () => {
     const events = userWith('events');
     for (const slug of ['events', 'webinars', 'webinarTypes', 'podcastEpisodes']) {
@@ -94,6 +102,7 @@ describe('isScopedOnlyUser', () => {
     expect(isScopedOnlyUser(userWith('hr'))).toBe(true);
     expect(isScopedOnlyUser(userWith('events'))).toBe(true);
     expect(isScopedOnlyUser(userWith('hr', 'events'))).toBe(true);
+    expect(isScopedOnlyUser(userWith('legal'))).toBe(true);
   });
 
   it('is false for general roles, mixed roles, and role-less/anonymous requests', () => {
@@ -130,6 +139,9 @@ describe('scopedCollectionSlugsForUser', () => {
       'webinarTypes',
       'podcastEpisodes',
     ]);
+    // Exactly one slug — the Dashboard redirects single-collection departments
+    // straight to their collection, so this length is a behavioural contract.
+    expect(scopedCollectionSlugsForUser(userWith('legal'))).toEqual(['legalDocuments']);
   });
 
   it('unions and de-duplicates domains for a user holding both roles', () => {
