@@ -7,25 +7,32 @@ import {
   Prose,
   SectionHeading,
 } from "./compare-editorial";
-import { ChainStep, Glow, Glyph, accentAt } from "./compare-visuals";
+import { Glow, Glyph, accentAt, type GlyphKey } from "./compare-visuals";
 
 /**
  * Software Provenance · SBOMs and AI BOMs.
  *
- * Provenance: the eight record fields as two numbered chains — a provenance
- * record is an ordered account of how something was produced, so a chain reads
- * it correctly where a grid of tiles would not. Previously this was a mock
- * terminal with invented repository paths and SHA digests; nothing here is
- * fabricated.
+ * Elevated visual designs:
+ *  - 8 Provenance Fields: 4-column elevated card matrix with glowing line icon gems.
+ *  - SLSA Level 3 vs Level 4 Comparison Deck: Side-by-side comparative cards.
+ *  - BOMs: Stacked planes on dark band.
  *
- * BOMs: two stacked planes on a dark band. An AI BOM extends the SBOM layer
- * rather than competing with it, so the shared plane sits underneath and the
- * CleanStart-only plane is lifted and lit above it.
+ * No em-dashes, no cheap eyebrows or artificial tags.
  */
+
+const PROVENANCE_ICONS: readonly GlyphKey[] = [
+  "origin",
+  "compiler",
+  "surface",
+  "build",
+  "packages",
+  "binary",
+  "overhead",
+  "seal",
+];
+
 export function CompareProvenance(): React.ReactElement {
   const fields = PROVENANCE.items;
-  const firstHalf = fields.slice(0, 4);
-  const secondHalf = fields.slice(4);
 
   return (
     <>
@@ -36,38 +43,106 @@ export function CompareProvenance(): React.ReactElement {
         <Prose paragraphs={PROVENANCE.body} lead />
         <ListLead>{PROVENANCE.listLead}</ListLead>
 
-        <div className="mt-2 grid grid-cols-1 gap-x-16 gap-y-0 sm:grid-cols-2">
-          <RevealStagger>
-            <ol className="flex flex-col">
-              {firstHalf.map((field, index) => (
-                <RevealItem key={field}>
-                  <ChainStep
-                    index={index + 1}
-                    accent={accentAt(index)}
-                    label={field}
-                    last={index === firstHalf.length - 1}
-                  />
-                </RevealItem>
-              ))}
-            </ol>
-          </RevealStagger>
-          <RevealStagger>
-            <ol className="flex flex-col">
-              {secondHalf.map((field, index) => (
-                <RevealItem key={field}>
-                  <ChainStep
-                    index={index + 5}
-                    accent={accentAt(index)}
-                    label={field}
-                    last={index === secondHalf.length - 1}
-                  />
-                </RevealItem>
-              ))}
-            </ol>
-          </RevealStagger>
-        </div>
+        {/* 8-Stage Provenance Record Matrix */}
+        <RevealStagger className="my-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {fields.map((field, index) => {
+            const accent = accentAt(index);
+            return (
+              <RevealItem key={field} className="h-full">
+                <article
+                  className="group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                  style={{
+                    borderColor: accent.border,
+                    background: `linear-gradient(180deg, ${accent.fill} 0%, #ffffff 60%)`,
+                  }}
+                >
+                  <div className="mb-4">
+                    <span
+                      aria-hidden
+                      className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white transition-transform duration-300 group-hover:scale-110"
+                      style={{
+                        color: accent.light,
+                        boxShadow: `0 6px 16px -6px ${accent.shadow}, inset 0 0 0 1px ${accent.border}`,
+                      }}
+                    >
+                      <Glyph icon={PROVENANCE_ICONS[index] ?? "check"} size={20} />
+                    </span>
+                  </div>
 
-        <Prose paragraphs={PROVENANCE.after} />
+                  <p
+                    className="font-display text-[#111111]"
+                    style={{
+                      fontSize: "var(--fs-body)",
+                      fontWeight: 600,
+                      letterSpacing: "-0.01em",
+                      lineHeight: 1.35,
+                    }}
+                  >
+                    {field}
+                  </p>
+                </article>
+              </RevealItem>
+            );
+          })}
+        </RevealStagger>
+
+        {/* SLSA Level 3 vs SLSA Level 4 Comparison Cards */}
+        {PROVENANCE.after && PROVENANCE.after.length >= 2 && (
+          <RevealStagger className="my-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {/* DHI SLSA Level 3 Card */}
+            <RevealItem className="h-full">
+              <div className="relative flex h-full flex-col justify-between rounded-2xl border border-blue-200/80 bg-gradient-to-br from-blue-50/50 via-white to-white p-6 shadow-sm">
+                <div>
+                  <h3 className="mb-3 font-display text-base font-semibold text-[#111111]">
+                    Docker Hardened Images
+                  </h3>
+                  <p
+                    className="text-[#374151]"
+                    style={{
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "var(--fs-body)",
+                      lineHeight: 1.6,
+                      letterSpacing: "-0.01em",
+                    }}
+                  >
+                    {PROVENANCE.after[0]}
+                  </p>
+                </div>
+              </div>
+            </RevealItem>
+
+            {/* CleanStart SLSA Level 4 Card */}
+            <RevealItem className="h-full">
+              <div
+                className="relative flex h-full flex-col justify-between rounded-2xl border border-purple-300/80 bg-gradient-to-br from-purple-50/80 via-indigo-50/40 to-white p-6 shadow-md"
+                style={{ boxShadow: "0 12px 32px -16px rgba(109, 40, 217, 0.22)" }}
+              >
+                <div>
+                  <h3 className="mb-3 font-display text-base font-semibold text-[#111111]">
+                    CleanStart
+                  </h3>
+                  <p
+                    className="text-[#111111]"
+                    style={{
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "var(--fs-body)",
+                      fontWeight: 500,
+                      lineHeight: 1.6,
+                      letterSpacing: "-0.01em",
+                    }}
+                  >
+                    {PROVENANCE.after[1]}
+                  </p>
+                </div>
+              </div>
+            </RevealItem>
+          </RevealStagger>
+        )}
+
+        {/* Concluding Paragraph */}
+        {PROVENANCE.after?.[2] && (
+          <Prose paragraphs={[PROVENANCE.after[2]]} />
+        )}
       </ArticleSection>
 
       <Section

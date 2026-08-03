@@ -7,7 +7,7 @@ import {
   RULE,
   SectionHeading,
 } from "./compare-editorial";
-import { ChainStep, Glyph, accentAt, type GlyphKey } from "./compare-visuals";
+import { Glyph, accentAt, type GlyphKey } from "./compare-visuals";
 
 /**
  * Compliance and Regulatory Readiness · Developer Experience · Verifying
@@ -28,10 +28,18 @@ const EVIDENCE_ICONS: readonly GlyphKey[] = [
   "stig",
 ];
 
+const VERIFYING_ICONS: readonly GlyphKey[] = [
+  "sbom",
+  "signature",
+  "provenance",
+  "binary",
+  "build",
+  "origin",
+  "seal",
+];
+
 export function CompareReadiness(): React.ReactElement {
   const questions = VERIFYING.items;
-  const firstHalf = questions.slice(0, 4);
-  const secondHalf = questions.slice(4);
 
   return (
     <>
@@ -42,7 +50,7 @@ export function CompareReadiness(): React.ReactElement {
         <Prose paragraphs={COMPLIANCE.body} lead />
         <ListLead>{COMPLIANCE.listLead}</ListLead>
 
-        <RevealStagger className="mt-2 grid grid-cols-1 gap-x-8 gap-y-1 sm:grid-cols-2 lg:grid-cols-3">
+        <RevealStagger className="my-6 grid grid-cols-1 gap-x-8 gap-y-1 sm:grid-cols-2 lg:grid-cols-3">
           {(COMPLIANCE.items ?? []).map((item, index) => {
             const accent = accentAt(index);
             return (
@@ -133,36 +141,46 @@ export function CompareReadiness(): React.ReactElement {
         <Prose paragraphs={VERIFYING.body} lead />
         <ListLead>{VERIFYING.listLead}</ListLead>
 
-        <div className="mt-2 grid grid-cols-1 gap-x-16 gap-y-0 sm:grid-cols-2">
-          <RevealStagger>
-            <ol className="flex flex-col">
-              {firstHalf.map((question, index) => (
-                <RevealItem key={question}>
-                  <ChainStep
-                    index={index + 1}
-                    accent={accentAt(index)}
-                    label={question}
-                    last={index === firstHalf.length - 1}
-                  />
-                </RevealItem>
-              ))}
-            </ol>
-          </RevealStagger>
-          <RevealStagger>
-            <ol className="flex flex-col">
-              {secondHalf.map((question, index) => (
-                <RevealItem key={question}>
-                  <ChainStep
-                    index={index + 5}
-                    accent={accentAt(index)}
-                    label={question}
-                    last={index === secondHalf.length - 1}
-                  />
-                </RevealItem>
-              ))}
-            </ol>
-          </RevealStagger>
-        </div>
+        {/* 7 Verification Criteria Cards */}
+        <RevealStagger className="my-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {questions.map((question, index) => {
+            const accent = accentAt(index);
+            return (
+              <RevealItem key={question} className="h-full">
+                <article
+                  className="group relative flex h-full items-center gap-4 overflow-hidden rounded-2xl border bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                  style={{
+                    borderColor: accent.border,
+                    background: `linear-gradient(180deg, ${accent.fill} 0%, #ffffff 60%)`,
+                  }}
+                >
+                  <span
+                    aria-hidden
+                    className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white transition-transform duration-300 group-hover:scale-110"
+                    style={{
+                      color: accent.light,
+                      boxShadow: `0 6px 16px -6px ${accent.shadow}, inset 0 0 0 1px ${accent.border}`,
+                    }}
+                  >
+                    <Glyph icon={VERIFYING_ICONS[index] ?? "check"} size={20} />
+                  </span>
+
+                  <p
+                    className="font-display text-[#111111]"
+                    style={{
+                      fontSize: "var(--fs-body)",
+                      fontWeight: 600,
+                      letterSpacing: "-0.01em",
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {question}
+                  </p>
+                </article>
+              </RevealItem>
+            );
+          })}
+        </RevealStagger>
 
         <Prose paragraphs={VERIFYING.after} />
       </ArticleSection>

@@ -41,11 +41,6 @@ export function SectionHeading({
   const Tag = size === "h2" ? "h2" : "h3";
   return (
     <Reveal header>
-      <div
-        aria-hidden
-        style={{ borderTop: inverse ? RULE_INVERSE : RULE }}
-        className="mb-7 w-full md:mb-9"
-      />
       <Tag
         {...(id ? { id } : {})}
         className={cn("font-display", inverse ? "text-white" : "text-[#111111]")}
