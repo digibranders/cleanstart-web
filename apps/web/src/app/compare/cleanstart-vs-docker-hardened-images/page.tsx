@@ -7,6 +7,7 @@ import { breadcrumbSchema, faqPageSchema } from "@/lib/seo/jsonld";
 import { getPageGraph } from "@/lib/seo/compose-page";
 import { CompareHero } from "@/components/sections/compare/CompareHero";
 import { CompareMatrix } from "@/components/sections/compare/CompareMatrix";
+import { CompareSocialProof } from "@/components/sections/compare/CompareSocialProof";
 import { ComparePhilosophies } from "@/components/sections/compare/ComparePhilosophies";
 import { CompareBeyondCves } from "@/components/sections/compare/CompareBeyondCves";
 import { CompareBuilds } from "@/components/sections/compare/CompareBuilds";
@@ -54,6 +55,9 @@ export default async function CleanStartVsDockerHardenedImagesPage(): Promise<Re
         <CompareHero />
         <FadeUp>
           <CompareMatrix />
+        </FadeUp>
+        <FadeUp>
+          <CompareSocialProof />
         </FadeUp>
         <FadeUp>
           <ComparePhilosophies />

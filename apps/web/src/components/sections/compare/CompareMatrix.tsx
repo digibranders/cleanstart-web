@@ -66,7 +66,7 @@ export function CompareMatrix(): React.ReactElement {
               <tr>
                 <th
                   scope="col"
-                  className="sticky left-0 z-20 w-[188px] bg-white text-left align-bottom sm:w-[240px] md:static md:z-auto md:w-[44%]"
+                  className="sticky left-0 top-[var(--cs-header-h)] z-30 w-[188px] bg-white text-left align-bottom sm:w-[240px] md:left-auto md:w-[44%]"
                   style={{ padding: "0 clamp(16px, 1.5vw, 24px) clamp(16px, 1.6vw, 24px) 0" }}
                 >
                   <span className="sr-only">Capability</span>
@@ -76,16 +76,14 @@ export function CompareMatrix(): React.ReactElement {
               </tr>
             </thead>
 
-            <tbody>
-              {MATRIX_CATEGORIES.map((category) => (
-                <tbody key={category.id} className="contents">
-                  <CategoryRow category={category} />
-                  {category.rows.map((row) => (
-                    <MatrixTableRow key={row.id} row={row} />
-                  ))}
-                </tbody>
-              ))}
-            </tbody>
+            {MATRIX_CATEGORIES.map((category) => (
+              <tbody key={category.id}>
+                <CategoryRow category={category} />
+                {category.rows.map((row) => (
+                  <MatrixTableRow key={row.id} row={row} />
+                ))}
+              </tbody>
+            ))}
           </table>
         </Reveal>
 
@@ -136,11 +134,23 @@ export function CompareMatrix(): React.ReactElement {
 
             <div className="flex flex-col gap-4 relative z-10">
               {/* Elegant Graphic Quote Accent */}
-              <div className="font-display text-5xl font-black text-purple-400/50 leading-none select-none -mb-3">
+              <div
+                aria-hidden
+                className="font-display text-purple-400/50 leading-none select-none -mb-3"
+                style={{ fontSize: "var(--fs-h1)", fontWeight: 700 }}
+              >
                 “
               </div>
 
-              <blockquote className="text-slate-900 font-sans text-xl sm:text-2xl md:text-3xl font-semibold leading-snug tracking-tight text-pretty">
+              <blockquote
+                className="font-display text-slate-900 text-pretty"
+                style={{
+                  fontSize: "var(--fs-h3)",
+                  fontWeight: 600,
+                  letterSpacing: "var(--fs-h3-ls)",
+                  lineHeight: "var(--fs-h3-lh)",
+                }}
+              >
                 {KEY_TAKEAWAY}
               </blockquote>
 
@@ -170,7 +180,7 @@ function VendorColumnHead({
   return (
     <th
       scope="col"
-      className={`w-[168px] overflow-hidden text-left align-bottom sm:w-[200px] md:w-[28%] ${
+      className={`sticky top-[var(--cs-header-h)] z-30 w-[168px] overflow-hidden text-left align-bottom sm:w-[200px] md:w-[28%] ${
         branded ? "cs-cmp-cleanstart-header" : "cs-cmp-public-header"
       }`}
       style={{
@@ -289,13 +299,13 @@ function MatrixCell({
               className={`inline-flex items-center justify-center w-5 h-5 rounded-full shrink-0 ${
                 isCleanStart
                   ? "bg-purple-600 text-white shadow-xs"
-                  : "bg-emerald-600 text-white"
+                  : "bg-[#1d4ed8] text-white"
               }`}
             >
               <Tick stroke="#FFFFFF" />
             </span>
-            <span className="text-xs font-semibold text-slate-800 hidden sm:inline">
-              Included
+            <span className="text-xs font-semibold text-slate-800">
+              {UI_CHROME.legendIncluded}
             </span>
           </span>
         )}
@@ -314,7 +324,7 @@ function MatrixCell({
                 className={`inline-flex items-center justify-center w-5 h-5 rounded-full shrink-0 ${
                   isCleanStart
                     ? "bg-purple-600 text-white shadow-xs"
-                    : "bg-emerald-600 text-white"
+                    : "bg-[#1d4ed8] text-white"
                 }`}
               >
                 <Tick stroke="#FFFFFF" />
@@ -324,7 +334,7 @@ function MatrixCell({
               className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${
                 isCleanStart
                   ? "bg-purple-100 text-purple-900 border border-purple-200"
-                  : "bg-slate-100 text-slate-700 border border-slate-200"
+                  : "bg-blue-50 text-blue-900 border border-blue-200"
               }`}
             >
               {cell.note}
@@ -337,7 +347,7 @@ function MatrixCell({
             className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${
               isCleanStart
                 ? "bg-purple-100 text-purple-950 border border-purple-200"
-                : "bg-slate-100 text-slate-600 border border-slate-200"
+                : "bg-blue-50 text-blue-900 border border-blue-200"
             }`}
           >
             {cell.note}

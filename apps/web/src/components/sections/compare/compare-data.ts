@@ -139,6 +139,60 @@ export const KEY_TAKEAWAY =
 
 export const KEY_TAKEAWAY_LABEL = "Key takeaway";
 
+export interface Credential {
+  label: string;
+  name: string;
+  src: string;
+  w: number;
+  h: number;
+}
+
+/**
+ * Not from the document body. The SEO review left an empty placeholder heading
+ * directly after the capability table, commented "Social proof is missing"
+ * (2026-07-30) — the point where the table has just shown both vendors ticking
+ * nearly every row.
+ *
+ * These are CleanStart's existing third-party credentials, the same set already
+ * published in the site footer, so this introduces no new claim. Deliberately no
+ * customer names or testimonials: none are cleared for use on a page that names
+ * a competitor. Wording is pending SEO/marketing sign-off.
+ */
+export const SOCIAL_PROOF = {
+  heading: "Independently Certified and Recognized",
+  lead: "CleanStart's platform and operations carry third-party certifications and verified publisher status.",
+  credentials: [
+    {
+      label: "Awarded with",
+      name: "Cyber Security Excellence Awards Winner",
+      src: "/images/awards/award-1.webp",
+      w: 486,
+      h: 616,
+    },
+    {
+      label: "Docker verified",
+      name: "Docker Verified Publisher",
+      src: "/images/awards/award-2.webp",
+      w: 268,
+      h: 267,
+    },
+    {
+      label: "Certification",
+      name: "AICPA SOC 2",
+      src: "/images/awards/award-4.webp",
+      w: 1024,
+      h: 1023,
+    },
+    {
+      label: "Certification",
+      name: "ISO/IEC 27001",
+      src: "/images/awards/award-3.webp",
+      w: 200,
+      h: 200,
+    },
+  ] satisfies readonly Credential[],
+} as const;
+
 export interface DocSection {
   id: string;
   heading: string;
@@ -399,6 +453,15 @@ export const WHICH_BETTER = {
     "If your organization also requires higher-assurance build verification, deterministic software production, AI BOMs, and a broader Software Supply Chain Posture strategy, CleanStart extends those capabilities beyond traditional image hardening.",
   ],
 } as const;
+
+/**
+ * Not from the document body. Requested by the SEO review as a comment anchored
+ * to the "Which solution is better?" heading (2026-07-30): an additional H2 that
+ * carries the "alternative to Docker Hardened Images" query. It heads the two
+ * recommendation cards, which are the copy that answers it.
+ */
+export const WHICH_BETTER_ALT_HEADING =
+  "Is CleanStart the Right Alternative to Docker Hardened Images?";
 
 export const FINAL_THOUGHTS = {
   heading: "Final Thoughts",

@@ -285,6 +285,9 @@ export function CompareBuilds(): React.ReactElement {
                   DETERMINISTIC_BUILD_COMPARATOR
                 </span>
               </div>
+              <span className="inline-flex items-center rounded-full border border-slate-600/60 bg-slate-800/60 px-3 py-1 font-mono text-[11px] font-medium tracking-wide text-slate-300">
+                ILLUSTRATIVE EXAMPLE
+              </span>
             </div>
 
             {/* Console Content: Dual Build Paths */}
@@ -303,7 +306,7 @@ export function CompareBuilds(): React.ReactElement {
                     <div className="space-y-2 text-xs">
                       <div className="flex justify-between">
                         <span className="text-slate-500">Source Commit</span>
-                        <span className="text-slate-200">git: 8f9a2e1d</span>
+                        <span className="text-slate-200">git: a1b2c3d4</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-500">Compiler Flags</span>
@@ -311,7 +314,7 @@ export function CompareBuilds(): React.ReactElement {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-500">Target Output</span>
-                        <span className="text-slate-200">cleanstart-base:v3.2.0</span>
+                        <span className="text-slate-200">cleanstart-base:latest</span>
                       </div>
                     </div>
                   </div>
@@ -319,7 +322,7 @@ export function CompareBuilds(): React.ReactElement {
                   <div className="mt-5 pt-3 border-t border-slate-800/80">
                     <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Source Artifact SHA-256 Digest</p>
                     <p className="text-xs text-emerald-400 font-mono break-all bg-slate-950/80 p-2.5 rounded border border-slate-800/60">
-                      sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+                      sha256:9f2b7c4e…d13ac41e
                     </p>
                   </div>
                 </div>
@@ -337,7 +340,7 @@ export function CompareBuilds(): React.ReactElement {
                     <div className="space-y-2 text-xs">
                       <div className="flex justify-between">
                         <span className="text-slate-500">Source Commit</span>
-                        <span className="text-slate-200">git: 8f9a2e1d</span>
+                        <span className="text-slate-200">git: a1b2c3d4</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-500">Compiler Flags</span>
@@ -345,7 +348,7 @@ export function CompareBuilds(): React.ReactElement {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-500">Target Output</span>
-                        <span className="text-slate-200">cleanstart-base:v3.2.0</span>
+                        <span className="text-slate-200">cleanstart-base:latest</span>
                       </div>
                     </div>
                   </div>
@@ -353,7 +356,7 @@ export function CompareBuilds(): React.ReactElement {
                   <div className="mt-5 pt-3 border-t border-slate-800/80">
                     <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Source Artifact SHA-256 Digest</p>
                     <p className="text-xs text-emerald-400 font-mono break-all bg-slate-950/80 p-2.5 rounded border border-slate-800/60">
-                      sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+                      sha256:9f2b7c4e…d13ac41e
                     </p>
                   </div>
                 </div>
@@ -364,7 +367,7 @@ export function CompareBuilds(): React.ReactElement {
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0 text-emerald-400">
                   <path d="M13.3332 4L5.99984 11.3333L2.6665 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                <span>VERIFICATION PASSED: Digests match across independent infrastructure (0 byte variation)</span>
+                <span>Identical inputs, identical outputs: two independent builds resolve to the same digest</span>
               </div>
             </div>
           </div>
@@ -385,7 +388,7 @@ export function CompareBuilds(): React.ReactElement {
               textWrap: "balance",
             }}
           >
-            "{REPRODUCIBLE.pull}"
+            “{REPRODUCIBLE.pull}”
           </p>
         </Reveal>
 

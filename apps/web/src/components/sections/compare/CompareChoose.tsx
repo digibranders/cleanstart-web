@@ -1,6 +1,11 @@
 import { Section, Container } from "@/components/layout";
 import { Reveal, RevealItem, RevealStagger } from "@/components/ui/Reveal";
-import { CHOOSING, FINAL_THOUGHTS, WHICH_BETTER } from "./compare-data";
+import {
+  CHOOSING,
+  FINAL_THOUGHTS,
+  WHICH_BETTER,
+  WHICH_BETTER_ALT_HEADING,
+} from "./compare-data";
 import { ArticleSection, Prose, SectionHeading } from "./compare-editorial";
 import { Glow, Glyph, accentAt } from "./compare-visuals";
 
@@ -122,7 +127,13 @@ export function CompareChoose(): React.ReactElement {
 
         {/* Dual Recommendation Guidance Cards */}
         {WHICH_BETTER.body.length >= 3 && (
-          <RevealStagger className="my-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <>
+            <div className="mt-12">
+              <SectionHeading id="compare-alternative-title">
+                {WHICH_BETTER_ALT_HEADING}
+              </SectionHeading>
+            </div>
+            <RevealStagger className="my-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
             {/* Card 1: DHI Priority */}
             <RevealItem className="h-full">
               <article className="group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-blue-200/80 bg-gradient-to-br from-blue-50/50 via-white to-white p-6 sm:p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
@@ -186,7 +197,8 @@ export function CompareChoose(): React.ReactElement {
                 </p>
               </article>
             </RevealItem>
-          </RevealStagger>
+            </RevealStagger>
+          </>
         )}
       </ArticleSection>
 
@@ -216,7 +228,13 @@ export function CompareChoose(): React.ReactElement {
                 </span>
                 <h2
                   id="compare-final-title"
-                  className="font-display text-xs font-semibold uppercase tracking-wider text-purple-300/80"
+                  className="font-display text-white/70"
+                  style={{
+                    fontSize: "var(--fs-h5)",
+                    fontWeight: 600,
+                    letterSpacing: "-0.02em",
+                    lineHeight: 1.3,
+                  }}
                 >
                   {FINAL_THOUGHTS.heading}
                 </h2>
