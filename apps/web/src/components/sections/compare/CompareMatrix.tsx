@@ -111,45 +111,44 @@ export function CompareMatrix(): React.ReactElement {
           </div>
         </Reveal>
 
-        {/* Sleek Light Studio Executive Takeaway Card */}
+        {/*
+         * The section's closing beat, set as a statement rather than a tinted
+         * card. This is the one sentence a reader should leave the table with,
+         * and scale carries that better than a box does — the table above is
+         * already the section's one enclosed object.
+         */}
         <Reveal className="mt-14 md:mt-20">
-          <div className="relative overflow-hidden rounded-2xl bg-[#F9F8FE] border border-purple-200/90 p-7 sm:p-9 md:p-10 shadow-xs">
-            {/* Soft subtle radial ambient glow in top right */}
-            <div
-              className="absolute -top-24 -right-24 w-72 h-72 rounded-full pointer-events-none opacity-40 blur-2xl"
-              style={{ background: "radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, rgba(255, 255, 255, 0) 70%)" }}
-            />
+          <div
+            className="flex max-w-[46ch] flex-col gap-4"
+            style={{
+              borderTop: "2px solid #6d28d9",
+              paddingTop: "clamp(18px, 1.6vw, 26px)",
+            }}
+          >
+            {/* The document prefixes this paragraph "Key takeaway:" — real
+                sourced text, so it stands as the label. */}
+            <span
+              className="font-sans font-semibold text-[#6d28d9]"
+              style={{
+                fontSize: "var(--fs-caption)",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+              }}
+            >
+              {KEY_TAKEAWAY_LABEL}
+            </span>
 
-            <div className="flex flex-col gap-4 relative z-10">
-              {/*
-               * The document prefixes this paragraph "Key takeaway:" — real
-               * sourced text, so it replaces the decorative quote glyph that
-               * previously sat here.
-               */}
-              <span
-                className="font-sans font-semibold text-[#6d28d9]"
-                style={{
-                  fontSize: "var(--fs-caption)",
-                  letterSpacing: "0.06em",
-                  textTransform: "uppercase",
-                }}
-              >
-                {KEY_TAKEAWAY_LABEL}
-              </span>
-
-              <blockquote
-                className="font-display text-slate-900 text-pretty"
-                style={{
-                  fontSize: "var(--fs-h3)",
-                  fontWeight: 600,
-                  letterSpacing: "var(--fs-h3-ls)",
-                  lineHeight: "var(--fs-h3-lh)",
-                }}
-              >
-                {KEY_TAKEAWAY}
-              </blockquote>
-
-            </div>
+            <blockquote
+              className="font-display text-pretty text-slate-900"
+              style={{
+                fontSize: "var(--fs-h3)",
+                fontWeight: 600,
+                letterSpacing: "var(--fs-h3-ls)",
+                lineHeight: "var(--fs-h3-lh)",
+              }}
+            >
+              {KEY_TAKEAWAY}
+            </blockquote>
           </div>
         </Reveal>
 

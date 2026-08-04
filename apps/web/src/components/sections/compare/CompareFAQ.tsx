@@ -78,7 +78,12 @@ export function CompareFAQ(): React.ReactElement {
 
           {/* Right Column: Interactive Accordion Cards */}
           <div>
-            <RevealStagger className="flex flex-col gap-4">
+            {/* No gap — the rows share one continuous set of rules, and a
+                bottom rule closes the list. */}
+            <RevealStagger
+              className="flex flex-col"
+              style={{ borderBottom: "1px solid rgba(17, 17, 17, 0.11)" }}
+            >
               {COMPARE_FAQS.map((faq) => (
                 <RevealItem key={faq.id}>
                   <FaqCard
@@ -107,15 +112,15 @@ function FaqCard({
 }): React.ReactElement {
   const answerId = `compare-faq-answer-${item.id}`;
   return (
+    /*
+     * A rule, not a card. Seven bordered, filled, shadowed boxes stacked on top
+     * of each other read as seven objects; seven rows under one rule read as
+     * one list — which is what an FAQ is. The open row is marked by its
+     * question colour and the toggle alone, so nothing moves sideways.
+     */
     <div
-      className="group rounded-2xl border transition-all duration-300"
-      style={{
-        borderColor: isOpen ? "rgba(109, 40, 217, 0.4)" : "rgba(17, 17, 17, 0.11)",
-        background: isOpen
-          ? "linear-gradient(180deg, rgba(245, 243, 255, 0.6) 0%, #ffffff 100%)"
-          : "#ffffff",
-        boxShadow: isOpen ? "0 10px 28px -14px rgba(109, 40, 217, 0.18)" : "none",
-      }}
+      className="group"
+      style={{ borderTop: "1px solid rgba(17, 17, 17, 0.11)" }}
     >
       <h3>
         <button
@@ -123,14 +128,15 @@ function FaqCard({
           onClick={onToggle}
           aria-expanded={isOpen}
           aria-controls={answerId}
-          className="flex w-full cursor-pointer items-center justify-between gap-6 p-5 sm:p-6 text-left outline-none focus-visible:[outline-style:solid] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6d28d9] rounded-2xl"
+          className="flex w-full cursor-pointer items-center justify-between gap-6 py-6 text-left outline-none focus-visible:[outline-style:solid] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#6d28d9]"
         >
           <span
-            className="flex-1 font-display text-[#111111] font-semibold"
+            className="flex-1 font-display font-semibold transition-colors duration-200"
             style={{
               fontSize: "var(--fs-h4)",
               lineHeight: 1.35,
               letterSpacing: "-0.02em",
+              color: isOpen ? "#4C1D95" : "#111111",
             }}
           >
             {item.question}
@@ -153,7 +159,7 @@ function FaqCard({
       >
         <div style={{ overflow: "hidden", minHeight: 0 }}>
           <p
-            className="px-5 pb-5 sm:px-6 sm:pb-6 text-[#374151]"
+            className="pb-7 pr-14 text-[#374151]"
             style={{
               fontFamily: "var(--font-sans)",
               fontSize: "var(--fs-body)",
@@ -177,11 +183,13 @@ function ToggleDisc({ isOpen }: { isOpen: boolean }): React.ReactElement {
   return (
     <span
       aria-hidden
-      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all duration-300"
+      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all duration-300 group-hover:border-[#6d28d9]/40"
       style={{
-        background: isOpen ? "#6d28d9" : "rgba(17, 17, 17, 0.05)",
+        /* Outlined, not filled. Against a rule-separated list a solid disc per
+           row would put seven heavy dots down the right edge. */
+        background: isOpen ? "#6d28d9" : "transparent",
+        border: `1px solid ${isOpen ? "#6d28d9" : "rgba(17,17,17,0.16)"}`,
         color: isOpen ? "#ffffff" : "#111111",
-        boxShadow: isOpen ? "0 4px 12px rgba(109, 40, 217, 0.3)" : "none",
         transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
       }}
     >

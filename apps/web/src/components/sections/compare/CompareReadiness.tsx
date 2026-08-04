@@ -1,5 +1,6 @@
 import { Container, Section } from "@/components/layout";
 import { Reveal, RevealItem, RevealStagger } from "@/components/ui/Reveal";
+import { cn } from "@/lib/cn";
 import { COMPLIANCE, DEV_EXPERIENCE, VERIFYING } from "./compare-data";
 import { BAND_DARK, EllipseGlow, Icon3D } from "./compare-visuals";
 
@@ -111,38 +112,52 @@ export function CompareReadiness(): React.ReactElement {
             </p>
           </Reveal>
 
-          <RevealStagger className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {(COMPLIANCE.items ?? []).map((item, index) => (
-              <RevealItem key={item} className="h-full">
-                <div
-                  className="flex h-full items-center gap-4"
-                  style={{
-                    borderRadius: "20px",
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.10)",
-                    padding: "clamp(14px, 1.3vw, 20px)",
-                  }}
-                >
-                  <Icon3D
-                    src={EVIDENCE_ICONS[index] ?? EVIDENCE_ICONS[0] ?? ""}
-                    size={56}
-                  />
-                  <span
-                    className="font-display text-white"
-                    style={{
-                      fontSize: "var(--fs-h5)",
-                      fontWeight: 600,
-                      letterSpacing: "-0.02em",
-                      lineHeight: 1.25,
-                      textWrap: "balance",
-                    }}
+          {/* One panel holding all six, divided by hairlines — the same move as
+              the opening questions. Six separate tiles was noise; six bare rows
+              on a dark band had nothing holding them together. */}
+          <div
+            className="overflow-hidden"
+            style={{
+              borderRadius: "24px",
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.10)",
+            }}
+          >
+            <RevealStagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              {(COMPLIANCE.items ?? []).map((item, index) => (
+                <RevealItem key={item} className="h-full">
+                  <div
+                    className={cn(
+                      "flex h-full items-center gap-4 border-white/[0.10]",
+                      index > 0 ? "border-t sm:border-t-0" : "",
+                      index % 2 === 1 ? "sm:border-l lg:border-l-0" : "",
+                      index >= 2 ? "sm:border-t" : "",
+                      index % 3 !== 0 ? "lg:border-l" : "",
+                      index >= 3 ? "lg:border-t" : "lg:border-t-0",
+                    )}
+                    style={{ padding: "clamp(16px, 1.5vw, 22px)" }}
                   >
-                    {item}
-                  </span>
-                </div>
-              </RevealItem>
-            ))}
-          </RevealStagger>
+                    <Icon3D
+                      src={EVIDENCE_ICONS[index] ?? EVIDENCE_ICONS[0] ?? ""}
+                      size={56}
+                    />
+                    <span
+                      className="font-display text-white"
+                      style={{
+                        fontSize: "var(--fs-h5)",
+                        fontWeight: 600,
+                        letterSpacing: "-0.02em",
+                        lineHeight: 1.25,
+                        textWrap: "balance",
+                      }}
+                    >
+                      {item}
+                    </span>
+                  </div>
+                </RevealItem>
+              ))}
+            </RevealStagger>
+          </div>
 
           <Reveal>
             <p style={DARK_BODY}>{COMPLIANCE.after?.[0]}</p>

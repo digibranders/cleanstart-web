@@ -83,13 +83,19 @@ export function Icon3D({
           aria-hidden
           className="pointer-events-none absolute select-none rounded-full"
           style={{
-            width: size * 0.72,
-            height: size * 0.72,
+            /* Capped, not proportional. The bloom is a hint of light behind the
+               artwork, so it must not keep growing with the icon — at 128px a
+               linear halo became a magenta cloud filling the card. */
+            width: Math.min(size * 0.72, 74),
+            height: Math.min(size * 0.72, 74),
             background: BRAND.violetPale,
-            /* Low and wide. A tighter, hotter halo reads as fog over the
-               artwork rather than as light behind it. */
-            opacity: 0.18,
-            filter: `blur(${Math.round(size * 0.3)}px)`,
+            opacity: 0.16,
+            filter: `blur(${Math.min(Math.round(size * 0.3), 24)}px)`,
+            /* Explicit. `filter` gives this span its own stacking context, and
+               with both it and the image on `z-index: auto` the paint order was
+               left to chance — the bloom won and hid the artwork outright at
+               large sizes. */
+            zIndex: 0,
           }}
         />
       )}
@@ -100,7 +106,7 @@ export function Icon3D({
         height={size}
         sizes={`${size}px`}
         className="relative object-contain"
-        style={{ width: "100%", height: "100%" }}
+        style={{ width: "100%", height: "100%", zIndex: 1 }}
         loading="lazy"
         decoding="async"
         draggable={false}
@@ -238,25 +244,38 @@ export function CornerGlows(): React.ReactElement {
 export function VectorGrid({
   side = "right",
   width = "clamp(520px, 46vw, 860px)",
-  top = "-8%",
+  top,
+  bottom,
+  edge = "-6%",
   opacity = 0.55,
 }: {
   side?: "left" | "right";
   width?: string;
+  /** Vertical anchor. Pass one of `top` / `bottom`; `top: -8%` is the default. */
   top?: string;
+  bottom?: string;
+  /** Horizontal bleed off the section edge. Push this further negative to keep
+   *  the plate clear of a column that reaches into the same corner. */
+  edge?: string;
   opacity?: number;
 }): React.ReactElement {
+  // The plate is flipped on each axis it is anchored to, so its dense corner
+  // always faces into the section and the fade always runs off-canvas.
+  const flips = [
+    side === "left" ? "scaleX(-1)" : "",
+    bottom !== undefined ? "scaleY(-1)" : "",
+  ].filter(Boolean);
   return (
     <div
       aria-hidden
       className="pointer-events-none absolute hidden select-none lg:block"
       style={{
-        ...(side === "left" ? { left: "-6%" } : { right: "-6%" }),
-        top,
+        ...(side === "left" ? { left: edge } : { right: edge }),
+        ...(bottom !== undefined ? { bottom } : { top: top ?? "-8%" }),
         width,
         aspectRatio: "730 / 708",
         opacity,
-        ...(side === "left" ? { transform: "scaleX(-1)" } : {}),
+        ...(flips.length ? { transform: flips.join(" ") } : {}),
       }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}

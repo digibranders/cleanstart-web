@@ -1,12 +1,8 @@
 import { Container, Section } from "@/components/layout";
 import { Reveal, RevealItem, RevealStagger } from "@/components/ui/Reveal";
+import { cn } from "@/lib/cn";
 import { INTRO_BODY, INTRO_LEAD, OPENING_QUESTIONS } from "./compare-data";
-import {
-  AssuranceCard,
-  Icon3D,
-  LightBandDecor,
-  WASH_LIGHT,
-} from "./compare-visuals";
+import { Icon3D, LightBandDecor, WASH_LIGHT } from "./compare-visuals";
 
 /**
  * The article's opening block, kept whole.
@@ -59,31 +55,71 @@ export function CompareIntro(): React.ReactElement {
           </p>
         </Reveal>
 
-        <RevealStagger className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {OPENING_QUESTIONS.map((question, index) => (
-            <RevealItem key={question} className="h-full">
-              <AssuranceCard className="h-full">
-                <Icon3D
-                  src={QUESTION_ICONS[index] ?? QUESTION_ICONS[0] ?? ""}
-                  size={76}
-                  className="mb-5"
-                />
-                <p
-                  className="font-display text-[#111111]"
-                  style={{
-                    fontSize: "var(--fs-h5)",
-                    fontWeight: 600,
-                    letterSpacing: "-0.02em",
-                    lineHeight: 1.35,
-                    textWrap: "balance",
-                  }}
-                >
-                  {question}
-                </p>
-              </AssuranceCard>
-            </RevealItem>
-          ))}
-        </RevealStagger>
+        {/*
+         * ONE container, not four. Four separate tiles made these read as four
+         * product features; four bare columns left the band looking unresolved.
+         * A single panel divided by hairlines holds the set together — the
+         * questions are one thought in the document, and this is one object.
+         */}
+        <Reveal delay={0.08} className="mt-10">
+          <div
+            className="relative overflow-hidden bg-white"
+            style={{
+              borderRadius: "28px",
+              border: "1px solid rgba(17,17,17,0.08)",
+              boxShadow:
+                "0 1px 2px rgba(17,17,17,0.04), 0 18px 44px -26px rgba(70,30,190,0.20)",
+            }}
+          >
+            {/* Violet wash from the top-left corner only, so the panel has
+                depth without becoming a coloured block. */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 select-none"
+              style={{
+                background:
+                  "radial-gradient(120% 130% at 0% 0%, #F6F1FF 0%, rgba(255,255,255,0) 62%)",
+              }}
+            />
+
+            <RevealStagger className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+              {OPENING_QUESTIONS.map((question, index) => (
+                <RevealItem key={question} className="h-full">
+                  <div
+                    className={cn(
+                      "flex h-full flex-col gap-5 border-[#111111]/[0.08]",
+                      /* Dividers between columns only — never at the start of a
+                         row. 1-up below sm, 2-up to lg, 4-up above. */
+                      "border-t sm:border-t-0",
+                      index === 0 ? "border-t-0" : "",
+                      index % 2 === 1 ? "sm:border-l" : "",
+                      index > 0 ? "lg:border-l" : "",
+                      index >= 2 ? "sm:border-t lg:border-t-0" : "",
+                    )}
+                    style={{ padding: "clamp(24px, 2.2vw, 34px)" }}
+                  >
+                    <Icon3D
+                      src={QUESTION_ICONS[index] ?? QUESTION_ICONS[0] ?? ""}
+                      size={80}
+                    />
+                    <p
+                      className="font-display text-[#111111]"
+                      style={{
+                        fontSize: "var(--fs-h5)",
+                        fontWeight: 600,
+                        letterSpacing: "-0.02em",
+                        lineHeight: 1.35,
+                        textWrap: "balance",
+                      }}
+                    >
+                      {question}
+                    </p>
+                  </div>
+                </RevealItem>
+              ))}
+            </RevealStagger>
+          </div>
+        </Reveal>
 
         <Reveal delay={0.16} className="mt-12 flex flex-col gap-5">
           {INTRO_BODY.map((text, index) => (

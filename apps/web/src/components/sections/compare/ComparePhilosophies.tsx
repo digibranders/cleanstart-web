@@ -7,7 +7,6 @@ import {
 } from "./compare-data";
 import {
   BAND_DARK,
-  DarkPanel,
   EllipseGlow,
   VectorGrid,
 } from "./compare-visuals";
@@ -77,9 +76,14 @@ export function ComparePhilosophies(): React.ReactElement {
           </div>
         </Reveal>
 
-        <RevealStagger className="mt-14 grid grid-cols-1 gap-6 lg:mt-20 lg:grid-cols-2 lg:gap-8">
-          <RevealItem className="h-full">
-            <DarkPanel className="h-full">
+        {/* A luminous rule, not two boxes. Translucent panels on a dark band are
+            low-contrast filler; the contrast the article draws is between the
+            two arguments, and a divider states that without enclosing either.
+            The two sides are also free to differ in length here, which the
+            article intends — Docker gets a list, CleanStart running prose. */}
+        <RevealStagger className="mt-14 grid grid-cols-1 gap-12 lg:mt-20 lg:grid-cols-2 lg:gap-0">
+          <RevealItem className="h-full lg:pr-14 xl:pr-20">
+            <div className="flex h-full flex-col">
               <VendorMark
                 src="/images/cleanstart-images/workflows-docker.webp"
                 name={PHILOSOPHY_DHI.name}
@@ -111,23 +115,16 @@ export function ComparePhilosophies(): React.ReactElement {
               >
                 {PHILOSOPHY_DHI.close}
               </p>
-            </DarkPanel>
+            </div>
           </RevealItem>
 
-          <RevealItem className="h-full">
-            <DarkPanel className="h-full">
-              {/* Brand tint on the CleanStart side, so the pair reads as
-                  comparator and subject rather than two vendors competing for
-                  the same emphasis. */}
-              <span
-                aria-hidden
-                className="pointer-events-none absolute inset-0 select-none"
-                style={{
-                  background:
-                    "radial-gradient(120% 100% at 100% 0%, rgba(169,116,255,0.22) 0%, rgba(169,116,255,0) 62%)",
-                }}
-              />
-              <div className="relative">
+          <RevealItem className="h-full lg:border-l lg:border-white/[0.16] lg:pl-14 xl:pl-20">
+            <div className="flex h-full flex-col">
+              {/* The panel tint that used to sit here is gone with the panel.
+                  It was absolutely positioned against the panel; without one it
+                  would have spread across the whole section. The CleanStart
+                  side is now distinguished by its lead line instead. */}
+              <div>
                 <VendorMark
                   src="/images/security/cs-logomark.svg"
                   name={PHILOSOPHY_CLEANSTART.name}
@@ -147,7 +144,7 @@ export function ComparePhilosophies(): React.ReactElement {
                   ))}
                 </div>
               </div>
-            </DarkPanel>
+            </div>
           </RevealItem>
         </RevealStagger>
       </Container>

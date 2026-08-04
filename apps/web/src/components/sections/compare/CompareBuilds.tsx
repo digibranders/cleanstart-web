@@ -1,13 +1,9 @@
 import { Container, Section } from "@/components/layout";
 import { Reveal, RevealItem, RevealStagger } from "@/components/ui/Reveal";
+import { ReproducibleBuildProof } from "./compare-artifacts";
 import { HERMETIC, REPRODUCIBLE, SOURCE_BUILT } from "./compare-data";
 import { ListLead, P, Prose, SectionHeading } from "./compare-editorial";
-import {
-  CornerTile,
-  Icon3D,
-  RULE_LIGHT,
-  cornerAt,
-} from "./compare-visuals";
+import { BAND_DARK, Icon3D, VectorGrid } from "./compare-visuals";
 
 /**
  * Building from Source · Hermetic and Deterministic Builds · Reproducible
@@ -29,6 +25,7 @@ const SOURCE_ICONS: readonly string[] = [
 
 export function CompareBuilds(): React.ReactElement {
   return (
+    <>
     <Section
       data-section="CompareBuilds"
       padding="lg"
@@ -47,13 +44,38 @@ export function CompareBuilds(): React.ReactElement {
           <RevealStagger className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {(SOURCE_BUILT.items ?? []).map((item, index) => (
               <RevealItem key={item} className="h-full">
-                <CornerTile corner={cornerAt(index)}>
+                {/*
+                 * Four discrete capabilities, so four cards — separate boxes
+                 * here rather than the single divided panel the opening
+                 * questions use, which keeps the two light sections from
+                 * reading as the same layout twice.
+                 */}
+                <div
+                  className="relative flex h-full flex-col items-center overflow-hidden bg-white text-center"
+                  style={{
+                    borderRadius: "24px",
+                    border: "1px solid rgba(17,17,17,0.08)",
+                    boxShadow:
+                      "0 1px 2px rgba(17,17,17,0.04), 0 16px 40px -26px rgba(70,30,190,0.20)",
+                    padding: "clamp(28px, 2.4vw, 40px) clamp(20px, 1.8vw, 28px)",
+                    gap: "clamp(18px, 1.6vw, 24px)",
+                  }}
+                >
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 select-none"
+                    style={{
+                      background:
+                        "radial-gradient(115% 90% at 50% 0%, #F6F1FF 0%, rgba(255,255,255,0) 66%)",
+                    }}
+                  />
                   <Icon3D
                     src={SOURCE_ICONS[index] ?? SOURCE_ICONS[0] ?? ""}
-                    size={68}
+                    size={128}
+                    className="relative"
                   />
                   <p
-                    className="font-display text-[#111111]"
+                    className="relative font-display text-[#111111]"
                     style={{
                       fontSize: "var(--fs-h5)",
                       fontWeight: 600,
@@ -64,23 +86,48 @@ export function CompareBuilds(): React.ReactElement {
                   >
                     {item}
                   </p>
-                </CornerTile>
+                </div>
               </RevealItem>
             ))}
           </RevealStagger>
 
           <Prose paragraphs={SOURCE_BUILT.after ?? []} />
         </div>
+      </Container>
+    </Section>
 
-        {/* ── Hermetic and Deterministic Builds ── */}
-        <div
-          className="flex flex-col gap-6 md:gap-7"
-          style={{ borderTop: RULE_LIGHT, paddingTop: "clamp(40px, 3.6vw, 64px)" }}
-        >
-          <SectionHeading id="compare-hermetic-title">
+    {/*
+     * ── Hermetic and Deterministic Builds ──
+     *
+     * Its own dark band, for two reasons. Structurally, the five movements from
+     * "Building from Source" to "SBOMs and AI BOMs" ran to 4,287px of unbroken
+     * light — #F6F6F6 against #FFFFFF is not a perceptible change, so it read
+     * as one slab. Conceptually, this is the section about a sealed environment
+     * that cannot reach outside itself, and the inversion is the enclosure.
+     */}
+    <Section
+      data-section="CompareHermetic"
+      padding="lg"
+      className="relative overflow-hidden"
+      style={{ background: BAND_DARK }}
+      aria-labelledby="compare-hermetic-title"
+    >
+      {/* Bottom-right, and well off the edge. The prohibitions panel runs the
+          full container width, so a plate at the default bleed sat underneath
+          it; this one is pushed out until it clears the panel entirely. */}
+      <VectorGrid
+        side="right"
+        bottom="-26%"
+        edge="-22%"
+        width="clamp(420px, 34vw, 640px)"
+        opacity={0.42}
+      />
+      <Container className="relative">
+        <div className="flex flex-col gap-6 md:gap-7">
+          <SectionHeading id="compare-hermetic-title" inverse>
             {HERMETIC.heading}
           </SectionHeading>
-          <Prose paragraphs={HERMETIC.body} lead />
+          <Prose paragraphs={HERMETIC.body} lead inverse />
 
           {/* The four prohibitions are the one list on this page that is a set
               of negatives, so they are struck rather than ticked. */}
@@ -89,14 +136,13 @@ export function CompareBuilds(): React.ReactElement {
               className="relative overflow-hidden"
               style={{
                 borderRadius: "24px",
-                background:
-                  "linear-gradient(150deg, #F7F5FF 0%, #FFFFFF 55%, #F4F0FF 100%)",
-                border: "1.5px solid rgba(0,0,0,0.06)",
+                background: "rgba(255,255,255,0.045)",
+                border: "1px solid rgba(255,255,255,0.12)",
                 padding: "clamp(22px, 2.2vw, 36px)",
               }}
             >
               <p
-                className="text-[#111111]"
+                className="text-white"
                 style={{
                   fontFamily: "var(--font-sans)",
                   fontSize: "var(--fs-body)",
@@ -113,7 +159,7 @@ export function CompareBuilds(): React.ReactElement {
                     key={item}
                     className="flex items-start gap-3"
                     style={{
-                      borderTop: RULE_LIGHT,
+                      borderTop: "1px solid rgba(255,255,255,0.14)",
                       paddingTop: "clamp(10px, 0.9vw, 14px)",
                       paddingBottom: "clamp(10px, 0.9vw, 14px)",
                     }}
@@ -125,9 +171,9 @@ export function CompareBuilds(): React.ReactElement {
                         fontSize: "var(--fs-body)",
                         lineHeight: 1.45,
                         letterSpacing: "-0.01em",
-                        color: "#6B6B6B",
+                        color: "rgba(255,255,255,0.55)",
                         textDecoration: "line-through",
-                        textDecorationColor: "rgba(17,17,17,0.28)",
+                        textDecorationColor: "rgba(255,255,255,0.38)",
                       }}
                     >
                       {item}
@@ -138,14 +184,20 @@ export function CompareBuilds(): React.ReactElement {
             </div>
           </Reveal>
 
-          <Prose paragraphs={HERMETIC.after ?? []} />
+          <Prose paragraphs={HERMETIC.after ?? []} inverse />
         </div>
+      </Container>
+    </Section>
 
-        {/* ── Reproducible Builds ── */}
-        <div
-          className="flex flex-col gap-6 md:gap-7"
-          style={{ borderTop: RULE_LIGHT, paddingTop: "clamp(40px, 3.6vw, 64px)" }}
-        >
+    {/* ── Reproducible Builds ── */}
+    <Section
+      data-section="CompareReproducible"
+      padding="lg"
+      className="relative overflow-hidden bg-white"
+      aria-labelledby="compare-reproducible-title"
+    >
+      <Container className="relative">
+        <div className="flex flex-col gap-6 md:gap-7">
           <SectionHeading id="compare-reproducible-title">
             {REPRODUCIBLE.heading}
           </SectionHeading>
@@ -171,59 +223,40 @@ export function CompareBuilds(): React.ReactElement {
               <Prose paragraphs={REPRODUCIBLE.body} />
             </div>
 
-            {/* The article's own one-line thesis for this section, given the
-                weight of a statement rather than another paragraph. */}
+            {/*
+             * The section asks a question, so this answers it rather than
+             * restating it: two builds that agree on nothing — different
+             * builder, different day, different machine — and produce the same
+             * digest. That is what "reproducible" means, shown instead of
+             * asserted.
+             */}
             <Reveal className="lg:pt-2">
-              <div
-                className="relative flex h-full flex-col justify-center overflow-hidden"
-                style={{
-                  borderRadius: "24px",
-                  background:
-                    "linear-gradient(150deg, #241A4D 0%, #2E2270 48%, #4A25B8 100%)",
-                  padding: "clamp(26px, 2.6vw, 44px)",
-                }}
-              >
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute select-none rounded-full"
-                  style={{
-                    right: "-18%",
-                    top: "-26%",
-                    width: "62%",
-                    aspectRatio: "1 / 1",
-                    background:
-                      "radial-gradient(closest-side, rgba(169,116,255,0.55), transparent 72%)",
-                  }}
-                />
-                <p
-                  className="relative font-display text-white"
-                  style={{
-                    fontSize: "var(--fs-h3)",
-                    fontWeight: 600,
-                    letterSpacing: "var(--fs-h3-ls)",
-                    lineHeight: 1.28,
-                    textWrap: "balance",
-                  }}
-                >
-                  {REPRODUCIBLE.pull}
-                </p>
-                <p
-                  className="relative mt-5 text-white/72"
-                  style={{
-                    fontFamily: "var(--font-sans)",
-                    fontSize: "var(--fs-body)",
-                    lineHeight: 1.6,
-                    letterSpacing: "-0.01em",
-                  }}
-                >
-                  {REPRODUCIBLE.close}
-                </p>
-              </div>
+              <ReproducibleBuildProof />
             </Reveal>
           </div>
+
+          {/* The article's own one-line thesis, at display scale on the band.
+              It carried a dark card before; the size alone is enough. */}
+          <Reveal header className="mt-2">
+            <p
+              className="font-display text-[#111111]"
+              style={{
+                fontSize: "var(--fs-h2)",
+                fontWeight: 600,
+                letterSpacing: "var(--fs-h2-ls)",
+                lineHeight: 1.15,
+                maxWidth: "20ch",
+                textWrap: "balance",
+              }}
+            >
+              {REPRODUCIBLE.pull}
+            </p>
+          </Reveal>
+          <P>{REPRODUCIBLE.close}</P>
         </div>
       </Container>
     </Section>
+    </>
   );
 }
 
@@ -239,7 +272,7 @@ function Cross(): React.ReactElement {
     >
       <path
         d="M4 4l7 7M11 4l-7 7"
-        stroke="rgba(17,17,17,0.32)"
+        stroke="rgba(255,255,255,0.45)"
         strokeWidth="1.8"
         strokeLinecap="round"
       />
