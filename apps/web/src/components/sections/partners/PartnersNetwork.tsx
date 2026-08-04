@@ -77,6 +77,11 @@ const PARTNERS: Record<Region, Partner[]> = {
   ],
   "North America": [
     {
+      name: "PacGenesis",
+      country: "USA",
+      logo: "/images/partners/global/pacgenesis.png",
+    },
+    {
       name: "Fortifire",
       country: "North America",
       logo: "/images/partners/global/fortifire-icon.webp",
