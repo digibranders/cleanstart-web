@@ -74,6 +74,39 @@ export const MATRIX_ROWS: readonly MatrixRow[] = [
   },
 ];
 
+export interface MatrixCategory {
+  id: string;
+  title: string;
+  badge: string;
+  description: string;
+  rows: readonly MatrixRow[];
+}
+
+export const MATRIX_CATEGORIES: readonly MatrixCategory[] = [
+  {
+    id: "core-hardening",
+    title: "Core Image Hardening",
+    badge: "01",
+    description: "Baseline container security and vulnerability surface reduction",
+    rows: MATRIX_ROWS.slice(0, 6),
+  },
+  {
+    id: "build-assurance",
+    title: "Build Assurance & Provenance",
+    badge: "02",
+    description: "Cryptographic build verification, source integrity, and compliance readiness",
+    rows: MATRIX_ROWS.slice(6, 12),
+  },
+  {
+    id: "supply-chain-governance",
+    title: "Supply Chain Posture & Governance",
+    badge: "03",
+    description: "Advanced AI supply chain visibility, hermetic build philosophy, and posture management",
+    rows: MATRIX_ROWS.slice(12, 15),
+  },
+];
+
+
 export const VENDOR_DHI = "Docker Hardened Images";
 export const VENDOR_CLEANSTART = "CleanStart Verified Images";
 

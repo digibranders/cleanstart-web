@@ -3,36 +3,22 @@ import { Reveal } from "@/components/ui/Reveal";
 import {
   INTRO_BODY,
   KEY_TAKEAWAY,
-  KEY_TAKEAWAY_LABEL,
+  MATRIX_CATEGORIES,
   MATRIX_HEADING,
-  MATRIX_ROWS,
   UI_CHROME,
   VENDOR_CLEANSTART,
   VENDOR_DHI,
+  type MatrixCategory,
   type MatrixRow,
 } from "./compare-data";
-import { P, PullQuote, RULE } from "./compare-editorial";
+import { P, RULE } from "./compare-editorial";
 import { Glyph, type GlyphKey } from "./compare-visuals";
 
 /**
- * The comparison table.
- *
- * No card: no outer border, radius, shadow, or gradient header strip. The table
- * sits directly on the page and is held together by hairline rules and one
- * tinted column, so it reads as typeset data rather than as a widget. Column
- * identity persists via that tint rather than a sticky header.
- *
- * Rows the article qualifies get a slightly heavier label and a top rule at
- * full strength; the twelve unqualified rows stay deliberately quiet. The break
- * is carried by weight and spacing alone — the article supplies no band labels,
- * so none are invented here.
- *
- * On mobile it scrolls horizontally with the capability column pinned; column
- * widths are fixed px below md so the pinned column always leaves room for a
- * whole vendor column beside it (188 + 168 = 356 inside a 390 px viewport).
+ * Clean & Pure Comparison Matrix (All eyebrows removed).
  */
 
-const CLEANSTART_TINT = "rgba(154, 81, 255, 0.04)";
+const CLEANSTART_TINT = "rgba(106, 61, 240, 0.035)";
 
 export function CompareMatrix(): React.ReactElement {
   return (
@@ -44,33 +30,34 @@ export function CompareMatrix(): React.ReactElement {
       aria-labelledby="compare-matrix-title"
     >
       <Container>
+        {/* Intro Paragraphs */}
         <Reveal className="mb-10 flex flex-col gap-4 md:mb-14">
           {INTRO_BODY.map((text) => (
             <P key={text}>{text}</P>
           ))}
         </Reveal>
 
+        {/* Section Heading — Pure H2 without eyebrow kicker */}
         <Reveal header>
           <h2
             id="compare-matrix-title"
-            className="font-display text-[#111111]"
+            className="font-display text-slate-900 font-bold mb-8 md:mb-10"
             style={{
               fontSize: "var(--fs-h2)",
-              fontWeight: 600,
               letterSpacing: "var(--fs-h2-ls)",
               lineHeight: "var(--fs-h2-lh)",
               maxWidth: "24ch",
               textWrap: "balance",
-              marginBottom: "clamp(24px, 2.4vw, 40px)",
             }}
           >
             {MATRIX_HEADING}
           </h2>
         </Reveal>
 
+        {/* Matrix Table */}
         <Reveal className="overflow-x-auto md:overflow-x-visible">
           <table
-            className="w-full min-w-[524px] border-separate sm:min-w-[640px] md:min-w-0"
+            className="w-full min-w-[580px] border-separate sm:min-w-[660px] md:min-w-0"
             style={{ borderSpacing: 0 }}
           >
             <caption className="sr-only">{UI_CHROME.matrixCaption}</caption>
@@ -79,8 +66,8 @@ export function CompareMatrix(): React.ReactElement {
               <tr>
                 <th
                   scope="col"
-                  className="sticky left-0 z-20 w-[188px] bg-white text-left align-bottom sm:w-[240px] md:static md:z-auto md:w-[46%]"
-                  style={{ padding: "0 clamp(16px, 1.5vw, 24px) 0 0" }}
+                  className="sticky left-0 z-20 w-[188px] bg-white text-left align-bottom sm:w-[240px] md:static md:z-auto md:w-[44%]"
+                  style={{ padding: "0 clamp(16px, 1.5vw, 24px) clamp(16px, 1.6vw, 24px) 0" }}
                 >
                   <span className="sr-only">Capability</span>
                 </th>
@@ -90,78 +77,87 @@ export function CompareMatrix(): React.ReactElement {
             </thead>
 
             <tbody>
-              {MATRIX_ROWS.map((row) => (
-                <MatrixTableRow key={row.id} row={row} />
+              {MATRIX_CATEGORIES.map((category) => (
+                <tbody key={category.id} className="contents">
+                  <CategoryRow category={category} />
+                  {category.rows.map((row) => (
+                    <MatrixTableRow key={row.id} row={row} />
+                  ))}
+                </tbody>
               ))}
             </tbody>
           </table>
         </Reveal>
 
+        {/* Legend & Trademark Footer */}
         <Reveal
           className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-10"
-          style={{ borderTop: RULE, paddingTop: "clamp(14px, 1.3vw, 20px)" }}
+          style={{ borderTop: RULE, paddingTop: "clamp(16px, 1.4vw, 22px)" }}
         >
-          <p
-            className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[#6B6B6B]"
+          <div
+            className="flex flex-wrap items-center gap-x-6 gap-y-2 text-slate-600"
             style={{
               fontFamily: "var(--font-sans)",
               fontSize: "var(--fs-caption)",
-              letterSpacing: "-0.01em",
             }}
           >
             <span className="inline-flex items-center gap-2">
-              <Tick />
-              {UI_CHROME.legendIncluded}
+              <span className="w-4 h-4 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold">
+                <Tick stroke="#FFFFFF" />
+              </span>
+              <span className="font-medium text-slate-900">{UI_CHROME.legendIncluded}</span>
             </span>
             <span className="inline-flex items-center gap-2">
-              <Dash />
-              {UI_CHROME.legendAbsent}
+              <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-400 text-xs font-semibold border border-slate-200">
+                —
+              </span>
+              <span>{UI_CHROME.legendAbsent}</span>
             </span>
-          </p>
+          </div>
           <p
-            className="text-[#6B6B6B]"
+            className="text-slate-500 text-xs leading-relaxed"
             style={{
               fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-caption)",
-              lineHeight: 1.5,
-              maxWidth: "52ch",
+              maxWidth: "54ch",
             }}
           >
             {UI_CHROME.trademark}
           </p>
         </Reveal>
 
-        <div
-          className="mt-14 md:mt-20"
-          style={{ borderTop: RULE, paddingTop: "clamp(28px, 3vw, 48px)" }}
-        >
-          <Reveal>
-            <p
-              className="mb-4 text-[#6B6B6B]"
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "var(--fs-body-sm)",
-                fontWeight: 500,
-                letterSpacing: "-0.01em",
-              }}
-            >
-              {KEY_TAKEAWAY_LABEL}
-            </p>
-          </Reveal>
-          <PullQuote>{KEY_TAKEAWAY}</PullQuote>
-        </div>
+        {/* Sleek Light Studio Executive Takeaway Card */}
+        <Reveal className="mt-14 md:mt-20">
+          <div className="relative overflow-hidden rounded-2xl bg-[#F9F8FE] border border-purple-200/90 p-7 sm:p-9 md:p-10 shadow-xs">
+            {/* Soft subtle radial ambient glow in top right */}
+            <div
+              className="absolute -top-24 -right-24 w-72 h-72 rounded-full pointer-events-none opacity-40 blur-2xl"
+              style={{ background: "radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, rgba(255, 255, 255, 0) 70%)" }}
+            />
+
+            <div className="flex flex-col gap-4 relative z-10">
+              {/* Elegant Graphic Quote Accent */}
+              <div className="font-display text-5xl font-black text-purple-400/50 leading-none select-none -mb-3">
+                “
+              </div>
+
+              <blockquote className="text-slate-900 font-sans text-xl sm:text-2xl md:text-3xl font-semibold leading-snug tracking-tight text-pretty">
+                {KEY_TAKEAWAY}
+              </blockquote>
+
+              <div className="pt-4 mt-2 border-t border-purple-200/60 flex flex-wrap items-center justify-between gap-4 text-xs font-medium text-slate-500">
+                <span>Architectural evaluation & software supply chain governance comparison</span>
+                <span className="text-purple-700 font-semibold tracking-wide">CleanStart Platform Security</span>
+              </div>
+            </div>
+          </div>
+        </Reveal>
+
       </Container>
     </Section>
   );
 }
 
-/**
- * Vendor column header. The two gradient strips are the site's existing
- * comparison-header treatment (`.cs-cmp-public-header` /
- * `.cs-cmp-cleanstart-header`), which anchors the top of the table without
- * wrapping the whole thing in a card. `text-left` is load-bearing: <th> centres
- * by default, which would offset every header from the glyph column beneath it.
- */
+/** Vendor Column Header */
 function VendorColumnHead({
   label,
   icon,
@@ -174,63 +170,80 @@ function VendorColumnHead({
   return (
     <th
       scope="col"
-      className={`w-[168px] overflow-hidden text-left align-bottom sm:w-[200px] md:w-[27%] ${
+      className={`w-[168px] overflow-hidden text-left align-bottom sm:w-[200px] md:w-[28%] ${
         branded ? "cs-cmp-cleanstart-header" : "cs-cmp-public-header"
       }`}
       style={{
         padding: "clamp(16px, 1.6vw, 24px) clamp(12px, 1.2vw, 20px)",
-        borderRadius: "14px 14px 0 0",
+        borderRadius: "12px 12px 0 0",
         ...(branded
-          ? { boxShadow: "inset 1px 0 0 rgba(255,255,255,0.14)" }
-          : {}),
+          ? {
+              boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.2)",
+            }
+          : {
+              boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.08)",
+            }),
       }}
     >
-      <span className="flex flex-col items-start gap-3">
+      <div className="flex flex-col items-start gap-3">
         <span
           aria-hidden
-          className="inline-flex h-9 w-9 items-center justify-center rounded-[11px] text-white"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-white"
           style={{
-            background: "rgba(255,255,255,0.12)",
-            boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.18)",
+            background: branded ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.12)",
+            boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.2)",
           }}
         >
-          <Glyph icon={icon} size={18} />
+          <Glyph icon={icon} size={16} />
         </span>
         <span
-          className="block font-display text-white"
-          style={{
-            fontSize: "var(--fs-h5)",
-            fontWeight: 600,
-            letterSpacing: "-0.02em",
-            lineHeight: 1.25,
-            textWrap: "balance",
-          }}
+          className="block font-display text-white font-bold text-base sm:text-lg leading-snug"
+          style={{ textWrap: "balance" }}
         >
           {label}
         </span>
-      </span>
+      </div>
     </th>
   );
 }
 
+/** Category Header Row — Clean title without badge pill */
+function CategoryRow({ category }: { category: MatrixCategory }): React.ReactElement {
+  return (
+    <tr className="bg-slate-100/90 border-t border-b border-slate-200">
+      <td
+        colSpan={3}
+        className="px-4 py-3 sm:px-5 sm:py-3.5 sticky left-0 z-10 bg-slate-100/95 backdrop-blur-xs md:static"
+      >
+        <div className="flex items-center gap-2.5">
+          <span className="font-display text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-wider">
+            {category.title}
+          </span>
+          <span className="hidden sm:inline text-xs text-slate-500 font-normal">
+            — {category.description}
+          </span>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+/** Matrix Table Row */
 function MatrixTableRow({ row }: { row: MatrixRow }): React.ReactElement {
   const emphasised = row.divergent === true;
-  const padY = emphasised
-    ? "clamp(18px, 1.7vw, 26px)"
-    : "clamp(13px, 1.2vw, 18px)";
+  const padY = emphasised ? "clamp(16px, 1.5vw, 22px)" : "clamp(12px, 1.1vw, 16px)";
+
   return (
-    <tr>
+    <tr className={`transition-colors duration-150 ${emphasised ? "bg-purple-50/20" : "hover:bg-slate-50/50"}`}>
       <th
         scope="row"
         className="sticky left-0 z-10 bg-white text-left align-middle md:static md:z-auto"
         style={{ padding: `${padY} clamp(16px, 1.5vw, 24px) ${padY} 0`, borderTop: RULE }}
       >
         <span
-          className="text-[#111111]"
+          className={`text-slate-900 ${emphasised ? "font-semibold text-sm sm:text-base text-purple-950" : "font-normal text-xs sm:text-sm text-slate-800"}`}
           style={{
             fontFamily: "var(--font-sans)",
-            fontSize: "var(--fs-table-td)",
-            fontWeight: emphasised ? 600 : 400,
             lineHeight: 1.45,
             letterSpacing: "-0.01em",
           }}
@@ -238,20 +251,21 @@ function MatrixTableRow({ row }: { row: MatrixRow }): React.ReactElement {
           {row.capability}
         </span>
       </th>
-      <MatrixCell cell={row.docker} padY={padY} />
-      <MatrixCell cell={row.cleanstart} padY={padY} tinted />
+      <MatrixCell cell={row.docker} padY={padY} isCleanStart={false} />
+      <MatrixCell cell={row.cleanstart} padY={padY} isCleanStart={true} />
     </tr>
   );
 }
 
+/** Matrix Table Cell */
 function MatrixCell({
   cell,
   padY,
-  tinted = false,
+  isCleanStart = false,
 }: {
-  cell: MatrixRow["docker"];
+  cell: MatrixRow["docker"] | MatrixRow["cleanstart"];
   padY: string;
-  tinted?: boolean;
+  isCleanStart?: boolean;
 }): React.ReactElement {
   return (
     <td
@@ -259,55 +273,95 @@ function MatrixCell({
       style={{
         padding: `${padY} clamp(12px, 1.2vw, 20px)`,
         borderTop: RULE,
-        ...(tinted ? { background: CLEANSTART_TINT } : {}),
+        ...(isCleanStart
+          ? {
+              background: CLEANSTART_TINT,
+              borderRight: "1px solid rgba(154, 81, 255, 0.1)",
+              borderLeft: "1px solid rgba(154, 81, 255, 0.06)",
+            }
+          : {}),
       }}
     >
-      <span className="flex flex-col items-start gap-1.5">
-        {cell.state === "yes" && (
-          <>
-            <Tick />
-            <span className="sr-only">{UI_CHROME.legendIncluded}</span>
-          </>
+      <div className="flex flex-col items-start gap-1.5">
+        {cell.state === "yes" && !cell.note && (
+          <span className="inline-flex items-center gap-2">
+            <span
+              className={`inline-flex items-center justify-center w-5 h-5 rounded-full shrink-0 ${
+                isCleanStart
+                  ? "bg-purple-600 text-white shadow-xs"
+                  : "bg-emerald-600 text-white"
+              }`}
+            >
+              <Tick stroke="#FFFFFF" />
+            </span>
+            <span className="text-xs font-semibold text-slate-800 hidden sm:inline">
+              Included
+            </span>
+          </span>
         )}
+
         {cell.state === "no" && (
-          <>
+          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-100 text-slate-400 text-xs font-semibold border border-slate-200">
             <Dash />
-            <span className="sr-only">{UI_CHROME.legendAbsent}</span>
-          </>
+            <span>Not offered</span>
+          </span>
         )}
-        {cell.note && (
+
+        {cell.state === "yes" && cell.note && (
+          <div className="flex flex-col items-start gap-1.5">
+            <span className="inline-flex items-center gap-2">
+              <span
+                className={`inline-flex items-center justify-center w-5 h-5 rounded-full shrink-0 ${
+                  isCleanStart
+                    ? "bg-purple-600 text-white shadow-xs"
+                    : "bg-emerald-600 text-white"
+                }`}
+              >
+                <Tick stroke="#FFFFFF" />
+              </span>
+            </span>
+            <span
+              className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${
+                isCleanStart
+                  ? "bg-purple-100 text-purple-900 border border-purple-200"
+                  : "bg-slate-100 text-slate-700 border border-slate-200"
+              }`}
+            >
+              {cell.note}
+            </span>
+          </div>
+        )}
+
+        {cell.state === "text" && cell.note && (
           <span
-            className="text-[#4A4A4A]"
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-caption)",
-              lineHeight: 1.4,
-              letterSpacing: "-0.01em",
-            }}
+            className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${
+              isCleanStart
+                ? "bg-purple-100 text-purple-950 border border-purple-200"
+                : "bg-slate-100 text-slate-600 border border-slate-200"
+            }`}
           >
             {cell.note}
           </span>
         )}
-      </span>
+      </div>
     </td>
   );
 }
 
-/** Bare check glyph — no disc, no fill, no gradient. */
-function Tick(): React.ReactElement {
+function Tick({ stroke = "#111111" }: { stroke?: string }): React.ReactElement {
   return (
     <svg
       aria-hidden
-      width="15"
-      height="15"
+      width="10"
+      height="10"
       viewBox="0 0 15 15"
       fill="none"
       className="shrink-0"
     >
       <path
-        d="M2 7.9 5.6 11.5 13 3.6"
-        stroke="#111111"
-        strokeWidth="1.6"
+        d="M2.5 8L5.5 11L12.5 4"
+        stroke={stroke}
+        strokeWidth="2.4"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -319,13 +373,13 @@ function Dash(): React.ReactElement {
   return (
     <svg
       aria-hidden
-      width="15"
-      height="15"
+      width="10"
+      height="10"
       viewBox="0 0 15 15"
       fill="none"
       className="shrink-0"
     >
-      <path d="M3 7.5h9" stroke="#8A8A8A" strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M3 7.5h9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
