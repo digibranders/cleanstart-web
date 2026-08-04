@@ -15,7 +15,7 @@ export const metadata = buildPageMetadata({
   title: "ROI Calculator — Operational Impact of Hardened Images | CleanStart",
   absoluteTitle: true,
   description:
-    "Estimate the operational impact of moving to minimal, trusted container images — reduced vulnerability noise, lower patch-cycle overhead, faster secure releases, and engineering hours recovered.",
+    "Estimate the operational impact of moving to minimal, trusted container images — Vulnerability Noise Reduction, Patch Cycle Overhead Reduction, Faster Secure Releases, Runtime Footprint Reduction, and Engineering Hours Recovered.",
   path: "/roi-calculator",
   eyebrow: "Tools",
   // Not ready for search — kept out of the sitemap and nav (built: false), and

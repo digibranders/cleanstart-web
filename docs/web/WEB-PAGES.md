@@ -85,6 +85,17 @@ page slugs, categories, types, and build status across the dev journey.
 
 ---
 
+## Comparison Pages
+
+Competitive comparison pages live under the `/compare/` segment. One page per competitor;
+the segment is reserved for this purpose and has no listing route of its own.
+
+| # | Page Name | URL Slug | Type | Status | Notes |
+|---|-----------|----------|------|--------|-------|
+| C1 | Docker Hardened Images vs CleanStart | `/compare/cleanstart-vs-docker-hardened-images` | Static | ✅ | Built 2026-07-31 from the "Docker Hardened Images vs CleanStart" copy doc. Sections in `src/components/sections/compare/`, all copy + the 15-row capability matrix + FAQ centralised in `compare-data.ts` (matrix counts and FAQPage JSON-LD both derive from it). Emits BreadcrumbList + FAQPage. In sitemap STATIC_ROUTES. **Deliberately orphaned — not in `nav-config.ts` and no inbound internal links** (decision 2026-08-04); revisit before expecting it to rank. 2026-08-04: hero rebuilt around an inline isometric artifact (`CompareHeroArtifact`); the whole untitled intro run (lead + four questions + three closing paragraphs) reunited in `CompareIntro` on its own tinted band, matching the document, which puts no heading between the title and "At a Glance"; capability table restored to flat (header + 15 rows — the source groups nothing); the "Key takeaway:" label restored from the document. Removed as not-in-document: category bands, takeaway-card footer strings, 01–04 numerals (the source list is `numFmt="bullet"`), and the Docker trademark disclaimer. |
+
+---
+
 ## Resources Pages
 
 | # | Page Name | URL Slug | Type | Status | Notes |

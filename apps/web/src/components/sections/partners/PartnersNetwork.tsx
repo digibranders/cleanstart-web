@@ -74,6 +74,31 @@ const PARTNERS: Record<Region, Partner[]> = {
       country: "Dubai, UAE",
       logo: "/images/partners/global/help-ag-logo-2048x603.png",
     },
+    {
+      name: "Paramount Assure",
+      country: "Dubai, UAE",
+      logo: "/images/partners/global/paramount.png",
+    },
+    {
+      name: "Gulf IT",
+      country: "Dubai, UAE",
+      logo: "/images/partners/global/gulf-it.svg",
+    },
+    {
+      name: "Sechpoint Tech",
+      country: "Dubai, UAE",
+      logo: "/images/partners/global/sechpoint.svg",
+    },
+    {
+      name: "Sandbox Security",
+      country: "Dubai, UAE",
+      logo: "/images/partners/global/sandbox-security.png",
+    },
+    {
+      name: "TecCentric",
+      country: "Doha, Qatar",
+      logo: "/images/partners/global/teccentric.svg",
+    },
   ],
   "North America": [
     {

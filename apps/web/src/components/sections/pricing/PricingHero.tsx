@@ -79,7 +79,9 @@ export function PricingHero(): React.ReactElement {
                 Talk to Sales
               </Link>
               <Link
-                href="/contact-us"
+                href="https://aws.amazon.com/marketplace/pp/prodview-k3yvxdov2cbum"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="cs-btn-ghost"
                 style={
                   {
