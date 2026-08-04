@@ -136,25 +136,34 @@ export interface Credential {
  * a competitor. Wording is pending SEO/marketing sign-off.
  */
 export const SOCIAL_PROOF = {
-  heading: "Independently Certified and Recognized",
-  lead: "CleanStart's platform and operations carry third-party certifications and verified publisher status.",
+  heading: "Independently Verified",
+  /*
+   * The lead does the work of the section's position: the table directly above
+   * shows both vendors ticking nearly every row, so the honest next move is to
+   * separate what we assert from what an outside party has examined. It makes
+   * no claim of its own — each credential below is already published in the
+   * site footer.
+   */
+  lead: "The capabilities above are ours to state. These are the ones a third party has examined and attested to.",
   credentials: [
     {
-      label: "Awarded with",
+      /* Labels name the *kind* of attestation, so four credentials of three
+       * different kinds do not all read as the generic "Certification". */
+      label: "Industry award",
       name: "Cyber Security Excellence Awards Winner",
       src: "/images/awards/award-1.webp",
       w: 486,
       h: 616,
     },
     {
-      label: "Docker verified",
+      label: "Registry verification",
       name: "Docker Verified Publisher",
       src: "/images/awards/award-2.webp",
       w: 268,
       h: 267,
     },
     {
-      label: "Certification",
+      label: "Independent audit",
       name: "AICPA SOC 2",
       src: "/images/awards/award-4.webp",
       w: 1024,

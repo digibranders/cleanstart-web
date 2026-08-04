@@ -56,9 +56,10 @@ export function CompareFAQ(): React.ReactElement {
             {/* Quick Demo Callout Box */}
             <Reveal delay={0.12} className="mt-8">
               <div className="relative overflow-hidden rounded-2xl border border-purple-200/80 bg-gradient-to-br from-purple-50/70 via-indigo-50/30 to-white p-6 shadow-sm">
-                <h3 className="font-display text-base font-semibold text-[#111111]">
+                {/* A UI callout, not part of the document outline. */}
+                <p className="font-display text-base font-semibold text-[#111111]">
                   Have more questions?
-                </h3>
+                </p>
                 <p className="mt-2 text-sm text-[#4B5563]" style={{ fontFamily: "var(--font-sans)" }}>
                   Speak directly with our security engineering team to explore CleanStart for your supply chain.
                 </p>

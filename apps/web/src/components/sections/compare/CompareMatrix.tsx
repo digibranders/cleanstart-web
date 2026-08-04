@@ -11,7 +11,6 @@ import {
   type MatrixRow,
 } from "./compare-data";
 import { RULE } from "./compare-editorial";
-import { Glyph, type GlyphKey } from "./compare-visuals";
 
 /**
  * The capability comparison, rendered flat — header plus fifteen rows — because
@@ -65,8 +64,15 @@ export function CompareMatrix(): React.ReactElement {
                 >
                   <span className="sr-only">Capability</span>
                 </th>
-                <VendorColumnHead label={VENDOR_DHI} icon="image" />
-                <VendorColumnHead label={VENDOR_CLEANSTART} icon="build" branded />
+                <VendorColumnHead
+                  label={VENDOR_DHI}
+                  logo="/images/cleanstart-images/workflows-docker.webp"
+                />
+                <VendorColumnHead
+                  label={VENDOR_CLEANSTART}
+                  logo="/images/security/cs-logomark.svg"
+                  branded
+                />
               </tr>
             </thead>
 
@@ -155,11 +161,13 @@ export function CompareMatrix(): React.ReactElement {
 /** Vendor Column Header */
 function VendorColumnHead({
   label,
-  icon,
+  logo,
   branded = false,
 }: {
   label: string;
-  icon: GlyphKey;
+  /** The vendor's own mark. On a page that names a competitor, the real logo
+   *  is both more legible and more honest than a stand-in glyph. */
+  logo: string;
   branded?: boolean;
 }): React.ReactElement {
   return (
@@ -189,7 +197,16 @@ function VendorColumnHead({
             boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.2)",
           }}
         >
-          <Glyph icon={icon} size={16} />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={logo}
+            alt=""
+            aria-hidden
+            className="pointer-events-none select-none"
+            style={{ width: 18, height: 18, objectFit: "contain" }}
+            loading="lazy"
+            decoding="async"
+          />
         </span>
         <span
           className="block font-display text-white font-bold text-base sm:text-lg leading-snug"

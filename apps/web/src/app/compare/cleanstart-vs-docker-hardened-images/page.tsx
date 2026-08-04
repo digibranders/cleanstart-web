@@ -36,11 +36,14 @@ export const metadata = buildPageMetadata({
 export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
 
 /**
- * The source copy is a fourteen-section technical article, so the page is
- * typeset as long-form editorial: one continuous white reading column held by
- * hairline rules, one data artifact (the capability table), and one inverted
- * band where the article turns. `FadeUp` wraps the below-fold groups only — the
- * hero renders visible for LCP.
+ * The source copy is a fourteen-section technical article. Rather than give
+ * every heading its own band, related headings share one band and are separated
+ * by hairline rules, so the page reads in the site's light/dark section rhythm
+ * instead of as a stack of fourteen slabs. Every heading keeps the document's
+ * own wording and its H2 level; only the number of *bands* was reduced.
+ *
+ * `FadeUp` wraps the below-fold sections only — the hero renders visible for
+ * LCP.
  */
 export default async function CleanStartVsDockerHardenedImagesPage(): Promise<React.ReactElement> {
   const graph = await getPageGraph(PATH, [
@@ -54,7 +57,9 @@ export default async function CleanStartVsDockerHardenedImagesPage(): Promise<Re
       <Header />
       <main id="main-content">
         <CompareHero />
-        <CompareIntro />
+        <FadeUp>
+          <CompareIntro />
+        </FadeUp>
         <FadeUp>
           <CompareMatrix />
         </FadeUp>
@@ -64,11 +69,21 @@ export default async function CleanStartVsDockerHardenedImagesPage(): Promise<Re
         <FadeUp>
           <ComparePhilosophies />
         </FadeUp>
-        <CompareBeyondCves />
-        <CompareBuilds />
-        <CompareProvenance />
-        <CompareReadiness />
-        <CompareChoose />
+        <FadeUp>
+          <CompareBeyondCves />
+        </FadeUp>
+        <FadeUp>
+          <CompareBuilds />
+        </FadeUp>
+        <FadeUp>
+          <CompareProvenance />
+        </FadeUp>
+        <FadeUp>
+          <CompareReadiness />
+        </FadeUp>
+        <FadeUp>
+          <CompareChoose />
+        </FadeUp>
         <FadeUp>
           <CompareFAQ />
         </FadeUp>

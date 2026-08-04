@@ -1,34 +1,49 @@
-import { Section, Container } from "@/components/layout";
+import { Container, Section } from "@/components/layout";
 import { Reveal, RevealItem, RevealStagger } from "@/components/ui/Reveal";
 import {
   PHILOSOPHIES_SECTION,
   PHILOSOPHY_CLEANSTART,
   PHILOSOPHY_DHI,
 } from "./compare-data";
-import { GemColumn, Glow, ThreadStyles, accentAt } from "./compare-visuals";
+import {
+  BAND_DARK,
+  DarkPanel,
+  EllipseGlow,
+  VectorGrid,
+} from "./compare-visuals";
 
 /**
  * Two Different Security Philosophies.
  *
- * A dark band with two gem-anchored columns split by a glowing vertical thread.
  * The two sides are deliberately unequal in shape — the article gives Docker a
- * six-item list and CleanStart four running paragraphs — and the gems plus the
- * thread carry the composition so neither side needs a card to hold it.
+ * six-item list and CleanStart four running paragraphs — so they are set as two
+ * panels free to differ in length rather than forced into matching boxes.
+ *
+ * Each side is headed by the vendor's own mark rather than an invented glyph.
+ * On a page that names a competitor, the real logo is both more legible and
+ * more honest than a stand-in icon.
  */
-export function ComparePhilosophies(): React.ReactElement {
-  const dhiAccent = accentAt(1);
-  const csAccent = accentAt(0);
 
+const BODY_STYLE: React.CSSProperties = {
+  fontFamily: "var(--font-sans)",
+  fontSize: "var(--fs-body)",
+  fontWeight: 400,
+  lineHeight: 1.6,
+  letterSpacing: "-0.01em",
+  color: "rgba(255,255,255,0.78)",
+};
+
+export function ComparePhilosophies(): React.ReactElement {
   return (
     <Section
       data-section="ComparePhilosophies"
       padding="lg"
       className="relative overflow-hidden"
-      style={{ background: "linear-gradient(180deg, #10123E 0%, #151021 100%)" }}
+      style={{ background: BAND_DARK }}
       aria-labelledby="compare-philosophies-title"
     >
-      <ThreadStyles />
-      <Glow color="rgba(169,116,255,0.2)" size="min(720px, 50%)" left="50%" top="-22%" />
+      <VectorGrid side="right" top="-14%" opacity={0.5} />
+      <EllipseGlow side="left" />
 
       <Container className="relative">
         <Reveal header>
@@ -38,9 +53,9 @@ export function ComparePhilosophies(): React.ReactElement {
               className="font-display text-white"
               style={{
                 fontSize: "var(--fs-h2)",
-                fontWeight: 700,
-                letterSpacing: "-0.03em",
-                lineHeight: 1.1,
+                fontWeight: 600,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.15,
                 textWrap: "balance",
               }}
             >
@@ -62,124 +77,145 @@ export function ComparePhilosophies(): React.ReactElement {
           </div>
         </Reveal>
 
-        <div className="relative mt-14 grid gap-14 lg:mt-20 lg:grid-cols-2 lg:gap-0">
-          {/* Vertical thread between the two philosophies. */}
-          <span
-            aria-hidden
-            className="pointer-events-none absolute left-1/2 hidden w-[2px] select-none overflow-hidden rounded-full lg:block"
-            style={{
-              top: 0,
-              bottom: 0,
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0), rgba(169,116,255,0.4) 30%, rgba(91,155,255,0.4) 70%, rgba(255,255,255,0))",
-            }}
-          >
-            <div className="cmp-thread-pulse-v absolute inset-0" />
-          </span>
-
-          <div className="lg:pr-14 xl:pr-20">
-            <Reveal>
-              <GemColumn
-                icon="image"
-                accent={dhiAccent}
-                title={PHILOSOPHY_DHI.name}
-                showDivider={false}
-                size={76}
+        <RevealStagger className="mt-14 grid grid-cols-1 gap-6 lg:mt-20 lg:grid-cols-2 lg:gap-8">
+          <RevealItem className="h-full">
+            <DarkPanel className="h-full">
+              <VendorMark
+                src="/images/cleanstart-images/workflows-docker.webp"
+                name={PHILOSOPHY_DHI.name}
               />
-            </Reveal>
-            <Reveal delay={0.08}>
-              <p
-                className="mx-auto mt-7 max-w-[46ch] text-center text-white/76"
-                style={{
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "var(--fs-body)",
-                  lineHeight: 1.6,
-                  letterSpacing: "-0.01em",
-                }}
-              >
+              <p className="mt-6" style={BODY_STYLE}>
                 {PHILOSOPHY_DHI.lead}
               </p>
-            </Reveal>
-            <RevealStagger className="mx-auto mt-7 grid max-w-[520px] grid-cols-1 gap-x-9 gap-y-0 sm:grid-cols-2">
-              {PHILOSOPHY_DHI.items.map((item) => (
-                <RevealItem key={item}>
-                  <div
-                    className="flex items-center gap-3"
+              <ul className="mt-5 grid grid-cols-1 gap-x-8 sm:grid-cols-2">
+                {PHILOSOPHY_DHI.items.map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-start gap-3 border-t border-white/[0.14] py-3"
                     style={{
-                      borderTop: "1px solid rgba(255,255,255,0.14)",
-                      paddingTop: "clamp(10px, 0.9vw, 13px)",
-                      paddingBottom: "clamp(10px, 0.9vw, 13px)",
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "var(--fs-body-sm)",
+                      lineHeight: 1.45,
+                      letterSpacing: "-0.01em",
+                      color: "rgba(255,255,255,0.9)",
                     }}
                   >
-                    <span
-                      aria-hidden
-                      className="h-1.5 w-1.5 shrink-0 rounded-full"
-                      style={{ background: dhiAccent.dark }}
-                    />
-                    <span
-                      className="text-white/90"
-                      style={{
-                        fontFamily: "var(--font-sans)",
-                        fontSize: "var(--fs-body-sm)",
-                        lineHeight: 1.4,
-                        letterSpacing: "-0.01em",
-                      }}
-                    >
-                      {item}
-                    </span>
-                  </div>
-                </RevealItem>
-              ))}
-            </RevealStagger>
-            <Reveal delay={0.12}>
+                    <Tick />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
               <p
-                className="mx-auto mt-7 max-w-[44ch] text-center text-white/60"
-                style={{
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "var(--fs-body-sm)",
-                  lineHeight: 1.55,
-                  letterSpacing: "-0.01em",
-                }}
+                className="mt-6"
+                style={{ ...BODY_STYLE, color: "rgba(255,255,255,0.62)" }}
               >
                 {PHILOSOPHY_DHI.close}
               </p>
-            </Reveal>
-          </div>
+            </DarkPanel>
+          </RevealItem>
 
-          <div className="lg:pl-14 xl:pl-20">
-            <Reveal delay={0.06}>
-              <GemColumn
-                icon="build"
-                accent={csAccent}
-                title={PHILOSOPHY_CLEANSTART.name}
-                showDivider={false}
-                size={76}
+          <RevealItem className="h-full">
+            <DarkPanel className="h-full">
+              {/* Brand tint on the CleanStart side, so the pair reads as
+                  comparator and subject rather than two vendors competing for
+                  the same emphasis. */}
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-0 select-none"
+                style={{
+                  background:
+                    "radial-gradient(120% 100% at 100% 0%, rgba(169,116,255,0.22) 0%, rgba(169,116,255,0) 62%)",
+                }}
               />
-            </Reveal>
-            <Reveal delay={0.12} className="mt-7 flex flex-col gap-4">
-              {PHILOSOPHY_CLEANSTART.body.map((text, index) => (
-                <p
-                  key={text}
-                  className="mx-auto max-w-[48ch] text-center"
-                  style={{
-                    fontFamily: "var(--font-sans)",
-                    fontSize:
-                      index === 0 ? "var(--fs-lead-sm)" : "var(--fs-body)",
-                    fontWeight: index === 0 ? 500 : 400,
-                    lineHeight: index === 0 ? 1.45 : 1.6,
-                    letterSpacing: "-0.01em",
-                    color:
-                      index === 0 ? "#ffffff" : "rgba(255,255,255,0.76)",
-                    textWrap: "pretty",
-                  }}
-                >
-                  {text}
-                </p>
-              ))}
-            </Reveal>
-          </div>
-        </div>
+              <div className="relative">
+                <VendorMark
+                  src="/images/security/cs-logomark.svg"
+                  name={PHILOSOPHY_CLEANSTART.name}
+                />
+                <div className="mt-6 flex flex-col gap-4">
+                  {PHILOSOPHY_CLEANSTART.body.map((text, index) => (
+                    <p
+                      key={text}
+                      style={
+                        index === 0
+                          ? { ...BODY_STYLE, color: "#ffffff", fontWeight: 600 }
+                          : BODY_STYLE
+                      }
+                    >
+                      {text}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            </DarkPanel>
+          </RevealItem>
+        </RevealStagger>
       </Container>
     </Section>
+  );
+}
+
+/** Vendor logo in a glass tile, with the vendor name beside it. */
+function VendorMark({
+  src,
+  name,
+}: {
+  src: string;
+  name: string;
+}): React.ReactElement {
+  return (
+    <div className="relative flex items-center gap-4">
+      <span
+        aria-hidden
+        className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl"
+        style={{
+          background: "rgba(255,255,255,0.08)",
+          boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.16)",
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={src}
+          alt=""
+          aria-hidden
+          className="pointer-events-none select-none"
+          style={{ width: 30, height: 30, objectFit: "contain" }}
+          loading="lazy"
+          decoding="async"
+        />
+      </span>
+      <h3
+        className="font-display text-white"
+        style={{
+          fontSize: "var(--fs-h4)",
+          fontWeight: 600,
+          letterSpacing: "var(--fs-h4-ls)",
+          lineHeight: 1.2,
+        }}
+      >
+        {name}
+      </h3>
+    </div>
+  );
+}
+
+function Tick(): React.ReactElement {
+  return (
+    <svg
+      aria-hidden
+      width="15"
+      height="15"
+      viewBox="0 0 15 15"
+      fill="none"
+      className="mt-[3px] shrink-0"
+    >
+      <path
+        d="M2.5 8L5.5 11L12.5 4"
+        stroke="rgba(201,166,255,0.95)"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }

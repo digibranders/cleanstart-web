@@ -1,4 +1,4 @@
-import { Section, Container } from "@/components/layout";
+import { Container, Section } from "@/components/layout";
 import { Reveal, RevealItem, RevealStagger } from "@/components/ui/Reveal";
 import {
   CHOOSING,
@@ -6,291 +6,231 @@ import {
   WHICH_BETTER,
   WHICH_BETTER_ALT_HEADING,
 } from "./compare-data";
-import { ArticleSection, Prose, SectionHeading } from "./compare-editorial";
-import { Glow, Glyph, accentAt } from "./compare-visuals";
+import { P, Prose, SectionHeading } from "./compare-editorial";
+import {
+  BAND_DARK,
+  EllipseGlow,
+  RULE_LIGHT,
+} from "./compare-visuals";
 
 /**
- * Choosing the Right Approach · Which solution is better? · Final Thoughts.
+ * Choosing the Right Approach · Is CleanStart the Right Alternative · Which
+ * solution is better? · Final Thoughts.
  *
  * The two recommendations are the one place on this page where a panel is the
- * right affordance — this is a decision, and each option needs to be picked up
- * as a unit. They get identical weight and chrome, differing only in accent: the
- * article recommends Docker Hardened Images without qualification for a real set
- * of buyers, and dressing our side up would misrepresent it.
+ * right affordance — this is a decision, and each option has to be picked up as
+ * a unit. They get identical chrome and differ only in tint: the article
+ * recommends Docker Hardened Images without qualification for a real set of
+ * buyers, and dressing our side up would misrepresent it.
  *
- * Final Thoughts closes on a dark band so the article ends where the hero began.
+ * Final Thoughts closes on a dark band, so the article ends where the hero
+ * began.
  */
-export function CompareChoose(): React.ReactElement {
-  const options = [
-    { ...CHOOSING.dhi, icon: "image" as const, accent: accentAt(1) },
-    { ...CHOOSING.cleanstart, icon: "build" as const, accent: accentAt(0) },
-  ];
 
+const OPTIONS = [
+  {
+    ...CHOOSING.dhi,
+    logo: "/images/cleanstart-images/workflows-docker.webp",
+    branded: false,
+  },
+  {
+    ...CHOOSING.cleanstart,
+    logo: "/images/security/cs-logomark.svg",
+    branded: true,
+  },
+] as const;
+
+export function CompareChoose(): React.ReactElement {
   return (
     <>
-      <ArticleSection label="compare-choosing-title" name="CompareChoosing">
-        <SectionHeading id="compare-choosing-title">
-          {CHOOSING.heading}
-        </SectionHeading>
-        <Prose paragraphs={CHOOSING.body} lead />
+      <Section
+        data-section="CompareChoosing"
+        padding="lg"
+        className="relative overflow-hidden bg-white"
+        aria-labelledby="compare-choosing-title"
+      >
+        <Container className="relative flex flex-col gap-[clamp(48px,4.4vw,76px)]">
+          <div className="flex flex-col gap-6 md:gap-7">
+            <SectionHeading id="compare-choosing-title">
+              {CHOOSING.heading}
+            </SectionHeading>
+            <Prose paragraphs={CHOOSING.body} lead />
+          </div>
 
-        <RevealStagger className="my-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {options.map((option) => (
-            <RevealItem key={option.name} className="h-full">
-              <article
-                className="group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border bg-white p-6 sm:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl"
-                style={{
-                  borderColor: option.accent.border,
-                  background: `linear-gradient(180deg, ${option.accent.fill} 0%, #ffffff 50%)`,
-                  boxShadow: `0 10px 30px -15px ${option.accent.shadow}`,
-                }}
-              >
-                {/* Top accent hairline */}
-                <span
-                  aria-hidden
-                  className="absolute inset-x-0 top-0 h-1.5"
-                  style={{ background: option.accent.light }}
-                />
+          <div className="flex flex-col gap-6 md:gap-7">
+            {/* H3, not H2. The source document sets "Which solution is
+                better?" at its own H2 level (one below every section heading),
+                and the SEO comment asks for this alternative-intent heading to
+                be added "as an h2" — i.e. as that heading's sibling. Both
+                therefore sit under the Choosing H2. */}
+            <SectionHeading id="compare-alternative-title" size="h3">
+              {WHICH_BETTER_ALT_HEADING}
+            </SectionHeading>
 
-                <div>
-                  <div className="mb-6 flex items-center gap-4">
-                    <span
-                      aria-hidden
-                      className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white transition-transform duration-300 group-hover:scale-110"
-                      style={{
-                        color: option.accent.light,
-                        boxShadow: `0 8px 20px -6px ${option.accent.shadow}, inset 0 0 0 1px ${option.accent.border}`,
-                      }}
-                    >
-                      <Glyph icon={option.icon} size={23} />
-                    </span>
-                    <h3
-                      className="font-display text-[#111111]"
-                      style={{
-                        fontSize: "var(--fs-h4)",
-                        fontWeight: 600,
-                        letterSpacing: "var(--fs-h4-ls)",
-                        lineHeight: "var(--fs-h4-lh)",
-                      }}
-                    >
-                      {option.name}
-                    </h3>
-                  </div>
-                  <p
-                    className="text-[#374151]"
+            <RevealStagger className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              {OPTIONS.map((option) => (
+                <RevealItem key={option.name} className="h-full">
+                  <article
+                    className="relative flex h-full flex-col overflow-hidden"
                     style={{
-                      fontFamily: "var(--font-sans)",
-                      fontSize: "var(--fs-body)",
-                      lineHeight: 1.65,
-                      letterSpacing: "-0.01em",
-                      textWrap: "pretty",
+                      borderRadius: "24px",
+                      background: option.branded
+                        ? "linear-gradient(150deg, #ffffff 0%, #ffffff 34%, #F3EBFF 78%, #E9DBFF 100%)"
+                        : "#FFFFFF",
+                      border: option.branded
+                        ? "1.5px solid rgba(138,92,246,0.30)"
+                        : "1.5px solid rgba(0,0,0,0.07)",
+                      padding: "clamp(24px, 2.3vw, 38px)",
+                      boxShadow: option.branded
+                        ? "0 1px 2px rgba(17,17,17,0.04), 0 16px 38px -20px rgba(70,30,190,0.22)"
+                        : "0 1px 2px rgba(17,17,17,0.04)",
                     }}
                   >
-                    {option.text}
-                  </p>
-                </div>
-              </article>
-            </RevealItem>
-          ))}
-        </RevealStagger>
+                    <div className="flex items-center gap-4">
+                      {/* Both marks sit on the same dark tile. The CleanStart
+                          logomark is white-and-cyan, so it needs a dark ground;
+                          giving Docker's mark a white tile instead would make
+                          the pair look accidental rather than compared. */}
+                      <span
+                        aria-hidden
+                        className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl"
+                        style={{
+                          background: "#1B1440",
+                          boxShadow:
+                            "inset 0 0 0 1px rgba(255,255,255,0.12), 0 6px 16px -8px rgba(27,20,64,0.5)",
+                        }}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={option.logo}
+                          alt=""
+                          aria-hidden
+                          className="pointer-events-none select-none"
+                          style={{ width: 30, height: 30, objectFit: "contain" }}
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </span>
+                      {/* Not a heading. The source document sets these two
+                          vendor names as labels inside the recommendation
+                          copy, not as document structure; promoting them to
+                          H3 would add two headings the SEO outline does not
+                          have. */}
+                      <p
+                        className="font-display text-[#111111]"
+                        style={{
+                          fontSize: "var(--fs-h4)",
+                          fontWeight: 600,
+                          letterSpacing: "var(--fs-h4-ls)",
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        {option.name}
+                      </p>
+                    </div>
 
-        <Reveal className="mt-4">
-          <div
-            className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-50/60 p-6 sm:p-7"
-          >
-            <p
-              className="font-sans text-[#4A4A4A]"
-              style={{
-                fontSize: "var(--fs-body)",
-                fontWeight: 500,
-                lineHeight: 1.6,
-                letterSpacing: "-0.01em",
-              }}
-            >
-              {CHOOSING.close}
-            </p>
-          </div>
-        </Reveal>
-      </ArticleSection>
-
-      <ArticleSection
-        label="compare-which-better-title"
-        name="CompareWhichBetter"
-        className="!bg-[#fbfbfb]"
-      >
-        <SectionHeading id="compare-which-better-title">
-          {WHICH_BETTER.heading}
-        </SectionHeading>
-        {WHICH_BETTER.body[0] && (
-          <Prose paragraphs={[WHICH_BETTER.body[0]]} lead />
-        )}
-
-        {/* Dual Recommendation Guidance Cards */}
-        {WHICH_BETTER.body.length >= 3 && (
-          <>
-            <div className="mt-12">
-              <SectionHeading id="compare-alternative-title">
-                {WHICH_BETTER_ALT_HEADING}
-              </SectionHeading>
-            </div>
-            <RevealStagger className="my-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-            {/* Card 1: DHI Priority */}
-            <RevealItem className="h-full">
-              <article className="group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-blue-200/80 bg-gradient-to-br from-blue-50/50 via-white to-white p-6 sm:p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
-                <span aria-hidden className="absolute inset-x-0 top-0 h-1.5 bg-blue-500" />
-                <div className="mb-4 flex items-center gap-3">
-                  <span
-                    aria-hidden
-                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-700"
-                  >
-                    <Glyph icon="image" size={20} />
-                  </span>
-                  <h3 className="font-display text-base font-semibold text-[#111111]">
-                    Docker Hardened Images
-                  </h3>
-                </div>
-                <p
-                  className="text-[#374151]"
-                  style={{
-                    fontFamily: "var(--font-sans)",
-                    fontSize: "var(--fs-body)",
-                    lineHeight: 1.65,
-                    letterSpacing: "-0.01em",
-                    textWrap: "pretty",
-                  }}
-                >
-                  {WHICH_BETTER.body[1]}
-                </p>
-              </article>
-            </RevealItem>
-
-            {/* Card 2: CleanStart Priority */}
-            <RevealItem className="h-full">
-              <article
-                className="group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-purple-300/80 bg-gradient-to-br from-purple-50/70 via-indigo-50/40 to-white p-6 sm:p-7 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-                style={{ boxShadow: "0 12px 32px -16px rgba(109, 40, 217, 0.2)" }}
-              >
-                <span aria-hidden className="absolute inset-x-0 top-0 h-1.5 bg-[#6d28d9]" />
-                <div className="mb-4 flex items-center gap-3">
-                  <span
-                    aria-hidden
-                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#6d28d9] text-white shadow-sm"
-                  >
-                    <Glyph icon="build" size={20} />
-                  </span>
-                  <h3 className="font-display text-base font-semibold text-[#111111]">
-                    CleanStart
-                  </h3>
-                </div>
-                <p
-                  className="text-[#111111]"
-                  style={{
-                    fontFamily: "var(--font-sans)",
-                    fontSize: "var(--fs-body)",
-                    fontWeight: 500,
-                    lineHeight: 1.65,
-                    letterSpacing: "-0.01em",
-                    textWrap: "pretty",
-                  }}
-                >
-                  {WHICH_BETTER.body[2]}
-                </p>
-              </article>
-            </RevealItem>
+                    <p
+                      className="mt-6"
+                      style={{
+                        fontFamily: "var(--font-sans)",
+                        fontSize: "var(--fs-body)",
+                        lineHeight: 1.65,
+                        letterSpacing: "-0.01em",
+                        color: option.branded ? "#241A4D" : "#4A4A4A",
+                      }}
+                    >
+                      {option.text}
+                    </p>
+                  </article>
+                </RevealItem>
+              ))}
             </RevealStagger>
-          </>
-        )}
-      </ArticleSection>
 
+            <Reveal>
+              <P>{CHOOSING.close}</P>
+            </Reveal>
+          </div>
+
+          <div
+            className="flex flex-col gap-6 md:gap-7"
+            style={{ borderTop: RULE_LIGHT, paddingTop: "clamp(40px, 3.6vw, 64px)" }}
+          >
+            <SectionHeading id="compare-which-better-title" size="h3">
+              {WHICH_BETTER.heading}
+            </SectionHeading>
+            <Prose paragraphs={WHICH_BETTER.body} />
+          </div>
+        </Container>
+      </Section>
+
+      {/* ── Final Thoughts ── */}
       <Section
         data-section="CompareFinalThoughts"
-        padding="sm"
+        padding="lg"
         className="relative overflow-hidden"
-        style={{
-          background:
-            "linear-gradient(180deg, #120D22 0%, #171038 50%, #291461 100%)",
-        }}
+        style={{ background: BAND_DARK }}
         aria-labelledby="compare-final-title"
       >
-        <Glow color="rgba(147, 51, 234, 0.25)" size="min(600px, 45%)" left="50%" top="-15%" />
-        <Glow color="rgba(59, 130, 246, 0.18)" size="min(500px, 35%)" right="-10%" bottom="-20%" />
+        <EllipseGlow side="right" />
 
-        <Container className="relative z-10">
-          <div className="mx-auto max-w-[760px]">
-            {/* Compact Keynote Glass Card Container */}
-            <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-white/[0.04] p-6 sm:p-8 backdrop-blur-xl shadow-xl">
-              <Reveal header className="text-center">
-                <span
-                  aria-hidden
-                  className="mx-auto mb-3 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-purple-300 border border-white/20 shadow-inner"
-                >
-                  <Glyph icon="seal" size={18} />
-                </span>
+        <Container className="relative">
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-20">
+            <div>
+              <Reveal header>
                 <h2
                   id="compare-final-title"
-                  className="font-display text-white/70"
+                  className="font-display text-white"
                   style={{
-                    fontSize: "var(--fs-h5)",
+                    fontSize: "var(--fs-h2)",
                     fontWeight: 600,
-                    letterSpacing: "-0.02em",
-                    lineHeight: 1.3,
+                    letterSpacing: "var(--fs-h2-ls)",
+                    lineHeight: "var(--fs-h2-lh)",
                   }}
                 >
                   {FINAL_THOUGHTS.heading}
                 </h2>
               </Reveal>
-
-              <Reveal header delay={0.08} className="text-center">
+              <Reveal header delay={0.08}>
                 <p
-                  className="mx-auto mt-3 font-display text-white"
+                  className="mt-6 font-display"
                   style={{
                     fontSize: "var(--fs-h3)",
                     fontWeight: 600,
                     letterSpacing: "var(--fs-h3-ls)",
                     lineHeight: 1.3,
-                    maxWidth: "28ch",
+                    maxWidth: "24ch",
                     textWrap: "balance",
+                    color: "#C9A6FF",
                   }}
                 >
                   {FINAL_THOUGHTS.pull}
                 </p>
               </Reveal>
+            </div>
 
-              <Reveal delay={0.16} className="mt-5 flex flex-col gap-4 text-center">
-                {FINAL_THOUGHTS.body.slice(0, 2).map((text) => (
+            <div className="flex flex-col gap-5 lg:pt-2">
+              {FINAL_THOUGHTS.body.map((text, index) => (
+                <Reveal key={text} delay={index * 0.06}>
                   <p
-                    key={text}
-                    className="mx-auto max-w-[58ch] text-white/80"
                     style={{
                       fontFamily: "var(--font-sans)",
                       fontSize: "var(--fs-body)",
-                      lineHeight: 1.6,
+                      lineHeight: 1.65,
                       letterSpacing: "-0.01em",
+                      color:
+                        index === FINAL_THOUGHTS.body.length - 1
+                          ? "#ffffff"
+                          : "rgba(255,255,255,0.78)",
+                      fontWeight:
+                        index === FINAL_THOUGHTS.body.length - 1 ? 600 : 400,
+                      maxWidth: "62ch",
                       textWrap: "pretty",
                     }}
                   >
                     {text}
                   </p>
-                ))}
-              </Reveal>
-
-              {FINAL_THOUGHTS.body[2] && (
-                <Reveal delay={0.24} className="mt-6">
-                  <div className="rounded-xl border border-purple-400/30 bg-purple-500/10 p-4 text-center backdrop-blur-md">
-                    <p
-                      className="font-display text-white"
-                      style={{
-                        fontSize: "var(--fs-body)",
-                        fontWeight: 600,
-                        lineHeight: 1.45,
-                        letterSpacing: "-0.01em",
-                      }}
-                    >
-                      {FINAL_THOUGHTS.body[2]}
-                    </p>
-                  </div>
                 </Reveal>
-              )}
+              ))}
             </div>
           </div>
         </Container>

@@ -1,402 +1,248 @@
-import { RevealItem, RevealStagger, Reveal } from "@/components/ui/Reveal";
+import { Container, Section } from "@/components/layout";
+import { Reveal, RevealItem, RevealStagger } from "@/components/ui/Reveal";
 import { HERMETIC, REPRODUCIBLE, SOURCE_BUILT } from "./compare-data";
+import { ListLead, P, Prose, SectionHeading } from "./compare-editorial";
 import {
-  ArticleSection,
-  ListLead,
-  P,
-  Prose,
-  SectionHeading,
-} from "./compare-editorial";
-import {
-  Glyph,
-  accentAt,
-  type GlyphKey,
+  CornerTile,
+  Icon3D,
+  RULE_LIGHT,
+  cornerAt,
 } from "./compare-visuals";
 
 /**
- * Building from Source · Hermetic and Deterministic Builds · Reproducible Builds.
+ * Building from Source · Hermetic and Deterministic Builds · Reproducible
+ * Builds — the article's three build-assurance sections, set as three movements
+ * inside ONE band instead of three stacked slabs.
  *
- * Elevated visual designs:
- *  - Source-built: 4 elevated step cards with hairline top borders and glowing icon gems.
- *  - Hermetic: Vault card for enclosure definition + security restriction list.
- *  - Reproducible: Independent verification console with dual build nodes and '=' comparator.
- *
- * No em-dashes, no cheap eyebrows or artificial tags.
+ * Every heading stays an H2 with the document's own wording. The consolidation
+ * here is visual: one background, one decoration pass, hairline rules between
+ * movements. Demoting these to H3 would have needed an invented parent heading,
+ * which the copy document does not supply.
  */
 
-const SOURCE_ICONS: readonly GlyphKey[] = [
-  "origin",
-  "compiler",
-  "provenance",
-  "binary",
+const SOURCE_ICONS: readonly string[] = [
+  "/images/compare/icon-origin.webp",
+  "/images/for-developers/why/icon-development.webp",
+  "/images/compare/icon-provenance.webp",
+  "/images/sbom/risk-icon-incomplete.webp",
 ];
 
 export function CompareBuilds(): React.ReactElement {
   return (
-    <>
-      <ArticleSection label="compare-source-title" name="CompareSourceBuilt" className="!bg-[#fafafa]">
-        <SectionHeading id="compare-source-title">
-          {SOURCE_BUILT.heading}
-        </SectionHeading>
-        <Prose paragraphs={SOURCE_BUILT.body} lead />
-        <ListLead>{SOURCE_BUILT.listLead}</ListLead>
+    <Section
+      data-section="CompareBuilds"
+      padding="lg"
+      className="relative overflow-hidden bg-white"
+      aria-labelledby="compare-source-title"
+    >
+      <Container className="relative flex flex-col gap-[clamp(56px,5vw,88px)]">
+        {/* ── Building from Source ── */}
+        <div className="flex flex-col gap-6 md:gap-7">
+          <SectionHeading id="compare-source-title">
+            {SOURCE_BUILT.heading}
+          </SectionHeading>
+          <Prose paragraphs={SOURCE_BUILT.body} lead />
+          <ListLead>{SOURCE_BUILT.listLead}</ListLead>
 
-        <RevealStagger className="my-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {(SOURCE_BUILT.items ?? []).map((item, index) => {
-            const accent = accentAt(index);
-            return (
+          <RevealStagger className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {(SOURCE_BUILT.items ?? []).map((item, index) => (
               <RevealItem key={item} className="h-full">
-                <article
-                  className="group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border bg-white p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl"
-                  style={{
-                    borderColor: accent.border,
-                    background: `linear-gradient(180deg, ${accent.fill} 0%, #ffffff 55%)`,
-                    boxShadow: `0 8px 24px -12px ${accent.shadow}`,
-                  }}
-                >
-                  {/* Top accent hairline */}
-                  <span
-                    aria-hidden
-                    className="absolute inset-x-0 top-0 h-1.5"
-                    style={{ background: accent.light }}
+                <CornerTile corner={cornerAt(index)}>
+                  <Icon3D
+                    src={SOURCE_ICONS[index] ?? SOURCE_ICONS[0] ?? ""}
+                    size={68}
                   />
-
-                  <div>
-                    <div className="mb-6 flex items-center justify-between">
-                      <span
-                        aria-hidden
-                        className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white transition-transform duration-300 group-hover:scale-110"
-                        style={{
-                          color: accent.light,
-                          boxShadow: `0 8px 20px -6px ${accent.shadow}, inset 0 0 0 1px ${accent.border}`,
-                        }}
-                      >
-                        <Glyph icon={SOURCE_ICONS[index] ?? "check"} size={22} />
-                      </span>
-                    </div>
-
-                    <p
-                      className="font-display text-[#111111]"
-                      style={{
-                        fontSize: "var(--fs-h5)",
-                        fontWeight: 600,
-                        letterSpacing: "-0.01em",
-                        lineHeight: 1.35,
-                      }}
-                    >
-                      {item}
-                    </p>
-                  </div>
-                </article>
+                  <p
+                    className="font-display text-[#111111]"
+                    style={{
+                      fontSize: "var(--fs-h5)",
+                      fontWeight: 600,
+                      letterSpacing: "-0.02em",
+                      lineHeight: 1.3,
+                      textWrap: "balance",
+                    }}
+                  >
+                    {item}
+                  </p>
+                </CornerTile>
               </RevealItem>
-            );
-          })}
-        </RevealStagger>
+            ))}
+          </RevealStagger>
 
-        {SOURCE_BUILT.after && SOURCE_BUILT.after.length > 0 && (
-          <Reveal className="mt-4">
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+          <Prose paragraphs={SOURCE_BUILT.after ?? []} />
+        </div>
+
+        {/* ── Hermetic and Deterministic Builds ── */}
+        <div
+          className="flex flex-col gap-6 md:gap-7"
+          style={{ borderTop: RULE_LIGHT, paddingTop: "clamp(40px, 3.6vw, 64px)" }}
+        >
+          <SectionHeading id="compare-hermetic-title">
+            {HERMETIC.heading}
+          </SectionHeading>
+          <Prose paragraphs={HERMETIC.body} lead />
+
+          {/* The four prohibitions are the one list on this page that is a set
+              of negatives, so they are struck rather than ticked. */}
+          <Reveal>
+            <div
+              className="relative overflow-hidden"
+              style={{
+                borderRadius: "24px",
+                background:
+                  "linear-gradient(150deg, #F7F5FF 0%, #FFFFFF 55%, #F4F0FF 100%)",
+                border: "1.5px solid rgba(0,0,0,0.06)",
+                padding: "clamp(22px, 2.2vw, 36px)",
+              }}
+            >
               <p
-                className="font-sans text-[#374151]"
+                className="text-[#111111]"
                 style={{
+                  fontFamily: "var(--font-sans)",
                   fontSize: "var(--fs-body)",
                   fontWeight: 500,
-                  lineHeight: 1.6,
+                  lineHeight: 1.5,
                   letterSpacing: "-0.01em",
                 }}
               >
-                {SOURCE_BUILT.after[0]}
+                {HERMETIC.listLead}
               </p>
-            </div>
-          </Reveal>
-        )}
-      </ArticleSection>
-
-      <ArticleSection label="compare-hermetic-title" name="CompareHermetic" className="!bg-white">
-        <SectionHeading id="compare-hermetic-title">
-          {HERMETIC.heading}
-        </SectionHeading>
-        <Prose paragraphs={[HERMETIC.body[0] ?? ""]} lead />
-
-        <div className="my-8 grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-stretch lg:gap-10">
-          {/* Left Side: The Hermetic Enclosure Vault Card */}
-          <Reveal className="h-full">
-            <div
-              className="relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border p-6 sm:p-8"
-              style={{
-                borderColor: accentAt(2).border,
-                background: `radial-gradient(130% 130% at 0% 0%, ${accentAt(2).fill} 0%, #ffffff 70%)`,
-                boxShadow: `0 12px 32px -15px ${accentAt(2).shadow}`,
-              }}
-            >
-              <div>
-                <div className="mb-6">
-                  <span
-                    aria-hidden
-                    className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white"
+              <ul className="mt-4 grid grid-cols-1 gap-x-10 sm:grid-cols-2">
+                {(HERMETIC.items ?? []).map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-start gap-3"
                     style={{
-                      color: accentAt(2).light,
-                      boxShadow: `0 8px 20px -6px ${accentAt(2).shadow}, inset 0 0 0 1px ${accentAt(2).border}`,
+                      borderTop: RULE_LIGHT,
+                      paddingTop: "clamp(10px, 0.9vw, 14px)",
+                      paddingBottom: "clamp(10px, 0.9vw, 14px)",
                     }}
                   >
-                    <Glyph icon="fips" size={24} />
-                  </span>
-                </div>
-
-                <p
-                  className="font-display text-[#111111]"
-                  style={{
-                    fontSize: "var(--fs-h4)",
-                    fontWeight: 600,
-                    letterSpacing: "-0.02em",
-                    lineHeight: 1.4,
-                    textWrap: "pretty",
-                  }}
-                >
-                  {HERMETIC.body[1]}
-                </p>
-              </div>
-            </div>
-          </Reveal>
-
-          {/* Right Side: Security Restriction List */}
-          <div className="flex flex-col justify-between">
-            <ListLead>{HERMETIC.listLead}</ListLead>
-            <RevealStagger className="mt-4 flex flex-col gap-3">
-              {(HERMETIC.items ?? []).map((item) => (
-                <RevealItem key={item}>
-                  <div className="group relative flex items-center gap-3.5 rounded-xl border border-red-200/70 bg-red-50/40 p-4 transition-all duration-200 hover:border-red-300 hover:bg-red-50/70">
-                    <span
-                      aria-hidden
-                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-600"
-                    >
-                      <svg
-                        width="15"
-                        height="15"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                        aria-hidden
-                      >
-                        <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5" />
-                        <path d="M3.5 10.5L10.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                      </svg>
-                    </span>
+                    <Cross />
                     <span
                       style={{
                         fontFamily: "var(--font-sans)",
                         fontSize: "var(--fs-body)",
-                        fontWeight: 500,
-                        lineHeight: 1.4,
+                        lineHeight: 1.45,
                         letterSpacing: "-0.01em",
-                        color: "#374151",
+                        color: "#6B6B6B",
+                        textDecoration: "line-through",
+                        textDecorationColor: "rgba(17,17,17,0.28)",
                       }}
                     >
                       {item}
                     </span>
-                  </div>
-                </RevealItem>
-              ))}
-            </RevealStagger>
-          </div>
-        </div>
-
-        {/* Hermetic & Deterministic Principles */}
-        <Prose paragraphs={[HERMETIC.after?.[0] ?? "", HERMETIC.after?.[1] ?? ""]} />
-
-        {HERMETIC.after?.[2] && (
-          <Reveal className="mt-6">
-            <div
-              className="relative overflow-hidden rounded-2xl border border-purple-200/80 bg-gradient-to-r from-purple-50/80 via-indigo-50/50 to-white p-6 sm:p-8"
-              style={{
-                boxShadow: "0 10px 28px -14px rgba(109, 40, 217, 0.16)",
-              }}
-            >
-              <div className="flex items-start gap-4">
-                <span
-                  aria-hidden
-                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#6d28d9] text-white shadow-sm"
-                >
-                  <Glyph icon="seal" size={20} />
-                </span>
-                <div>
-                  <p
-                    className="font-display text-[#111111]"
-                    style={{
-                      fontSize: "var(--fs-h4)",
-                      fontWeight: 600,
-                      lineHeight: 1.4,
-                      letterSpacing: "-0.01em",
-                    }}
-                  >
-                    {HERMETIC.after[2]}
-                  </p>
-                </div>
-              </div>
+                  </li>
+                ))}
+              </ul>
             </div>
           </Reveal>
-        )}
-      </ArticleSection>
 
-      <ArticleSection label="compare-reproducible-title" name="CompareReproducible" className="!bg-[#fafafa]">
-        <SectionHeading id="compare-reproducible-title">
-          {REPRODUCIBLE.heading}
-        </SectionHeading>
-        <P lead>{REPRODUCIBLE.lead}</P>
+          <Prose paragraphs={HERMETIC.after ?? []} />
+        </div>
 
-        {/* The Core Question Deck — Refined Editorial Callout */}
-        <Reveal header className="my-6">
-          <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-8 shadow-sm">
-            <div className="flex items-start gap-4">
-              <span
-                aria-hidden
-                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-white font-mono text-sm font-bold shadow-sm"
-              >
-                ?
-              </span>
-              <p
-                className="font-display text-[#111111]"
+        {/* ── Reproducible Builds ── */}
+        <div
+          className="flex flex-col gap-6 md:gap-7"
+          style={{ borderTop: RULE_LIGHT, paddingTop: "clamp(40px, 3.6vw, 64px)" }}
+        >
+          <SectionHeading id="compare-reproducible-title">
+            {REPRODUCIBLE.heading}
+          </SectionHeading>
+
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16">
+            <div className="flex flex-col gap-6">
+              <P lead>{REPRODUCIBLE.lead}</P>
+              <Reveal header>
+                <p
+                  className="font-display text-[#111111]"
+                  style={{
+                    fontSize: "var(--fs-h3)",
+                    fontWeight: 600,
+                    letterSpacing: "var(--fs-h3-ls)",
+                    lineHeight: 1.3,
+                    maxWidth: "26ch",
+                    textWrap: "balance",
+                  }}
+                >
+                  {REPRODUCIBLE.question}
+                </p>
+              </Reveal>
+              <Prose paragraphs={REPRODUCIBLE.body} />
+            </div>
+
+            {/* The article's own one-line thesis for this section, given the
+                weight of a statement rather than another paragraph. */}
+            <Reveal className="lg:pt-2">
+              <div
+                className="relative flex h-full flex-col justify-center overflow-hidden"
                 style={{
-                  fontSize: "var(--fs-h3)",
-                  fontWeight: 600,
-                  letterSpacing: "var(--fs-h3-ls)",
-                  lineHeight: 1.35,
-                  maxWidth: "38ch",
-                  textWrap: "balance",
+                  borderRadius: "24px",
+                  background:
+                    "linear-gradient(150deg, #241A4D 0%, #2E2270 48%, #4A25B8 100%)",
+                  padding: "clamp(26px, 2.6vw, 44px)",
                 }}
               >
-                {REPRODUCIBLE.question}
-              </p>
-            </div>
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute select-none rounded-full"
+                  style={{
+                    right: "-18%",
+                    top: "-26%",
+                    width: "62%",
+                    aspectRatio: "1 / 1",
+                    background:
+                      "radial-gradient(closest-side, rgba(169,116,255,0.55), transparent 72%)",
+                  }}
+                />
+                <p
+                  className="relative font-display text-white"
+                  style={{
+                    fontSize: "var(--fs-h3)",
+                    fontWeight: 600,
+                    letterSpacing: "var(--fs-h3-ls)",
+                    lineHeight: 1.28,
+                    textWrap: "balance",
+                  }}
+                >
+                  {REPRODUCIBLE.pull}
+                </p>
+                <p
+                  className="relative mt-5 text-white/72"
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "var(--fs-body)",
+                    lineHeight: 1.6,
+                    letterSpacing: "-0.01em",
+                  }}
+                >
+                  {REPRODUCIBLE.close}
+                </p>
+              </div>
+            </Reveal>
           </div>
-        </Reveal>
-
-        {/* Visual Deterministic Build Verification Console */}
-        <Reveal delay={0.08} className="my-8">
-          <div className="overflow-hidden rounded-2xl border border-slate-800 bg-[#0b0f17] text-white shadow-2xl">
-            {/* Console Header Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 bg-[#0e1420] px-5 py-3.5">
-              <div className="flex items-center gap-2.5">
-                <div className="flex items-center gap-1.5" aria-hidden>
-                  <span className="h-2.5 w-2.5 rounded-full bg-slate-700" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-slate-700" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-slate-700" />
-                </div>
-                <span className="font-mono text-xs text-slate-400 font-medium tracking-wide ml-2">
-                  DETERMINISTIC_BUILD_COMPARATOR
-                </span>
-              </div>
-              <span className="inline-flex items-center rounded-full border border-slate-600/60 bg-slate-800/60 px-3 py-1 font-mono text-[11px] font-medium tracking-wide text-slate-300">
-                ILLUSTRATIVE EXAMPLE
-              </span>
-            </div>
-
-            {/* Console Content: Dual Build Paths */}
-            <div className="p-6 sm:p-8">
-              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                {/* Build Node A */}
-                <div className="flex flex-col justify-between rounded-xl border border-slate-800/90 bg-slate-900/60 p-5 font-mono">
-                  <div>
-                    <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-800">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                        Primary Build Pipeline (A)
-                      </span>
-                      <span className="text-[11px] text-slate-500">x86_64-linux</span>
-                    </div>
-
-                    <div className="space-y-2 text-xs">
-                      <div className="flex justify-between">
-                        <span className="text-slate-500">Source Commit</span>
-                        <span className="text-slate-200">git: a1b2c3d4</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-500">Compiler Flags</span>
-                        <span className="text-slate-300">--hermetic --strip</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-500">Target Output</span>
-                        <span className="text-slate-200">cleanstart-base:latest</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-5 pt-3 border-t border-slate-800/80">
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Source Artifact SHA-256 Digest</p>
-                    <p className="text-xs text-emerald-400 font-mono break-all bg-slate-950/80 p-2.5 rounded border border-slate-800/60">
-                      sha256:9f2b7c4e…d13ac41e
-                    </p>
-                  </div>
-                </div>
-
-                {/* Build Node B */}
-                <div className="flex flex-col justify-between rounded-xl border border-slate-800/90 bg-slate-900/60 p-5 font-mono">
-                  <div>
-                    <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-800">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                        Independent Auditor (B)
-                      </span>
-                      <span className="text-[11px] text-slate-500">arm64-darwin</span>
-                    </div>
-
-                    <div className="space-y-2 text-xs">
-                      <div className="flex justify-between">
-                        <span className="text-slate-500">Source Commit</span>
-                        <span className="text-slate-200">git: a1b2c3d4</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-500">Compiler Flags</span>
-                        <span className="text-slate-300">--hermetic --strip</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-500">Target Output</span>
-                        <span className="text-slate-200">cleanstart-base:latest</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-5 pt-3 border-t border-slate-800/80">
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Source Artifact SHA-256 Digest</p>
-                    <p className="text-xs text-emerald-400 font-mono break-all bg-slate-950/80 p-2.5 rounded border border-slate-800/60">
-                      sha256:9f2b7c4e…d13ac41e
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Verified Result Banner */}
-              <div className="mt-6 flex items-center justify-center gap-3 rounded-xl border border-emerald-500/20 bg-emerald-950/30 p-3.5 text-center font-mono text-xs text-emerald-300">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0 text-emerald-400">
-                  <path d="M13.3332 4L5.99984 11.3333L2.6665 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                <span>Identical inputs, identical outputs: two independent builds resolve to the same digest</span>
-              </div>
-            </div>
-          </div>
-        </Reveal>
-
-        <Prose paragraphs={REPRODUCIBLE.body} />
-
-        {/* High-Impact Editorial Pull Quote */}
-        <Reveal header className="my-8 py-8 border-y border-[#111111]/[0.11]">
-          <p
-            className="font-display text-[#111111]"
-            style={{
-              fontSize: "var(--fs-h3)",
-              fontWeight: 600,
-              letterSpacing: "var(--fs-h3-ls)",
-              lineHeight: 1.35,
-              maxWidth: "36ch",
-              textWrap: "balance",
-            }}
-          >
-            “{REPRODUCIBLE.pull}”
-          </p>
-        </Reveal>
-
-        <Prose paragraphs={[REPRODUCIBLE.close]} />
-      </ArticleSection>
-    </>
+        </div>
+      </Container>
+    </Section>
   );
 }
 
-
-
+function Cross(): React.ReactElement {
+  return (
+    <svg
+      aria-hidden
+      width="15"
+      height="15"
+      viewBox="0 0 15 15"
+      fill="none"
+      className="mt-[5px] shrink-0"
+    >
+      <path
+        d="M4 4l7 7M11 4l-7 7"
+        stroke="rgba(17,17,17,0.32)"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
