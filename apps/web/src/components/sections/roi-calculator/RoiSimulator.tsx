@@ -2,10 +2,13 @@
 
 /*
  * The interactive centrepiece of /roi-calculator. A four-step narrative:
- *   1 Your environment (inputs)         → 2 Your operational burden (gauge)
- *   3 Expected improvements (KPIs)      → 4 Recovered engineering capacity
- * Numbers tween smoothly; the burden score is transparent (per-input breakdown);
- * technical terms carry accessible tooltips. Math lives in ./model.ts.
+ *   1 Your environment (inputs)         → 2 Operational Burden Score (gauge)
+ *   3 Expected improvements (KPIs)      → 4 Engineering Hours Recovered
+ * Numbers tween smoothly; technical terms carry accessible tooltips. Math and
+ * the client-owned naming both live in ./model.ts.
+ *
+ * Input labels stay sentence case (they are form fields); outcome labels are
+ * Title Case because they are the client's proper metric names — see model.ts.
  */
 
 import { useEffect, useId, useRef, useState } from "react";
@@ -38,11 +41,16 @@ const TIER_COLOR: Record<TierName, string> = {
 };
 const TIER_SPAN: Record<TierName, number> = { Low: 20, Moderate: 100, High: 100, Extreme: 40 };
 const SPAN_TOTAL = 260;
+/*
+ * Verbatim from ROI 1.xlsx §"Background Scoring & Logic" item 1, which pairs one
+ * of these descriptions with each Runtime Complexity band. Only the terminal
+ * full stops are ours — the sheet omits them because they are cell values.
+ */
 const TIER_BLURB: Record<TierName, string> = {
-  Low: "Small, stable runtimes with limited inherited complexity.",
-  Moderate: "Growing container adoption with rising remediation overhead.",
-  High: "Large runtime sprawl with frequent vulnerability-management cycles.",
-  Extreme: "High-frequency enterprise delivery carrying significant inherited burden.",
+  Low: "Small stable runtimes with limited inherited complexity.",
+  Moderate: "Growing container adoption with increasing remediation overhead.",
+  High: "Large runtime sprawl with frequent vulnerability management cycles.",
+  Extreme: "High-frequency enterprise delivery with significant inherited operational burden.",
 };
 
 /* ── tween: animates a display number toward `target`, retargeting on change ── */
@@ -146,7 +154,7 @@ function RadialGauge({ progress, tier, burden }: { progress: number; tier: TierN
   return (
     <div className="w-full" style={{ maxWidth: `${GAUGE.w}px` }}>
       <div className="relative">
-        <svg viewBox={`0 0 ${GAUGE.w} 128`} width="100%" role="img" aria-label={`Operational burden ${Math.round(burden)} of ${BURDEN_SCALE.max}, runtime complexity ${tier}.`}>
+        <svg viewBox={`0 0 ${GAUGE.w} 128`} width="100%" role="img" aria-label={`Operational Burden Score ${Math.round(burden)} of ${BURDEN_SCALE.max}, Runtime Complexity ${tier}.`}>
           <defs>
             {/* userSpaceOnUse, not the default objectBoundingBox: at burden 100
                 and 360 the needle is exactly horizontal, so its bounding box has
@@ -219,11 +227,17 @@ interface MetricDef {
   accent: string;
   icon: React.ReactNode;
 }
+/*
+ * Titles are the client's outcome names, verbatim from ROI 1.xlsx §RESULTS and
+ * the Sheet2 "New CleanStart Model" column — the same words the sales deck uses.
+ * They are Title Case because they are proper metric names, not sentences. The
+ * `sub` line carries the plain-English gloss that the name alone doesn't give.
+ */
 const METRICS: MetricDef[] = [
-  { key: "vuln", title: "Less vulnerability noise", sub: "Fewer false alarms to triage", accent: "#471ec0", icon: stroke("M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6l7-3z") },
-  { key: "patch", title: "Less patch-cycle overhead", sub: "Less time patching and re-testing", accent: "#3960F9", icon: stroke("M4 12a8 8 0 0 1 13.7-5.6L20 8M20 3v5h-5M20 12a8 8 0 0 1-13.7 5.6L4 16M4 21v-5h5") },
-  { key: "release", title: "Faster secure releases", sub: "Ship trusted builds sooner", accent: "#0e7fa8", icon: stroke("M5 15c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2 0-2.8a2 2 0 0 0-3 0zM8.5 13.5l2 2M13 20l2-4M8 11l-4 2M14.5 5.5a9 9 0 0 1 4 4l-6 6-4-4 6-6z") },
-  { key: "footprint", title: "Smaller runtime footprint", sub: "Less to store, scan, and attack", accent: "#6b2ec9", icon: stroke("M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3zM12 3v18M20 7.5L12 12 4 7.5") },
+  { key: "vuln", title: "Vulnerability Noise Reduction", sub: "Fewer false alarms to triage", accent: "#471ec0", icon: stroke("M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6l7-3z") },
+  { key: "patch", title: "Patch Cycle Overhead Reduction", sub: "Less time patching and re-testing", accent: "#3960F9", icon: stroke("M4 12a8 8 0 0 1 13.7-5.6L20 8M20 3v5h-5M20 12a8 8 0 0 1-13.7 5.6L4 16M4 21v-5h5") },
+  { key: "release", title: "Faster Secure Releases", sub: "Ship trusted builds sooner", accent: "#0e7fa8", icon: stroke("M5 15c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2 0-2.8a2 2 0 0 0-3 0zM8.5 13.5l2 2M13 20l2-4M8 11l-4 2M14.5 5.5a9 9 0 0 1 4 4l-6 6-4-4 6-6z") },
+  { key: "footprint", title: "Runtime Footprint Reduction", sub: "Less to store, scan, and attack", accent: "#6b2ec9", icon: stroke("M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3zM12 3v18M20 7.5L12 12 4 7.5") },
 ];
 
 function clamp01(x: number): number {
@@ -389,7 +403,7 @@ export function RoiSimulator(): React.ReactElement {
           <div className="flex flex-col gap-5">
             {/* STEP 2 — operational burden */}
             <div className="roi-card" style={{ background: "#ffffff", borderRadius: "var(--radius-cs-card)", border: "1px solid rgba(17,17,17,0.07)", boxShadow: "0 2px 10px -4px rgba(17,17,17,0.08)", padding: "clamp(22px,2vw,30px)" }}>
-              <StepLabel text="Step 2 · Your operational burden" color={TIER_COLOR[out.tier]} />
+              <StepLabel text="Step 2 · Operational Burden Score" color={TIER_COLOR[out.tier]} />
               <div className="grid items-center gap-6 mt-3 grid-cols-1 sm:grid-cols-[minmax(200px,240px)_1fr]">
                 <div className="flex justify-center">
                   <RadialGauge progress={meter} tier={out.tier} burden={burden} />
@@ -397,7 +411,7 @@ export function RoiSimulator(): React.ReactElement {
                 <div>
                   <div style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h2)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.05 }}>
                     <span className="cs-text-gradient-impact">{out.tier}</span>
-                    <span style={{ fontFamily: "var(--font-sans)", fontSize: "13px", fontWeight: 600, color: MUTED, marginLeft: "10px", verticalAlign: "middle", letterSpacing: 0 }}>complexity</span>
+                    <span style={{ fontFamily: "var(--font-sans)", fontSize: "13px", fontWeight: 600, color: MUTED, marginLeft: "10px", verticalAlign: "middle", letterSpacing: 0 }}>Runtime Complexity</span>
                   </div>
                   <p style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-body)", color: SUB, lineHeight: 1.5, marginTop: "8px", maxWidth: "42ch", textWrap: "balance" }}>{TIER_BLURB[out.tier]}</p>
 
@@ -408,8 +422,8 @@ export function RoiSimulator(): React.ReactElement {
                       {Math.round(reduction)}%
                     </span>
                     <span className="inline-flex items-center" style={{ fontFamily: "var(--font-sans)", fontSize: "13px", fontWeight: 600, color: SUB, lineHeight: 1.35, maxWidth: "24ch" }}>
-                      of this burden removed on trusted images
-                      <InfoTip label="burden reduction" text="Your overall operational burden — images, team, patching and release cadence combined. The Step 3 figures break out where that reduction comes from." />
+                      Burden Reduction on trusted images
+                      <InfoTip label="Burden Reduction" text="The share of your Operational Burden Score removed on minimal, trusted images — images, team, patching and release cadence combined. The Step 3 figures break out where that reduction comes from." />
                     </span>
                   </div>
                 </div>
@@ -452,14 +466,14 @@ export function RoiSimulator(): React.ReactElement {
 
             {/* STEP 4 — recovered engineering capacity */}
             <div>
-              <StepLabel text="Step 4 · Recovered engineering capacity" />
+              <StepLabel text="Step 4 · Engineering Hours Recovered" />
               <div className="roi-card relative overflow-hidden mt-3" style={{ borderRadius: "var(--radius-cs-card)", padding: "clamp(24px,2.2vw,30px)", background: "linear-gradient(120deg, #151021 0%, #1c1a63 55%, #3b1f9e 100%)", boxShadow: "0 10px 30px -12px rgba(30,20,120,0.5)" }}>
                 <div aria-hidden className="pointer-events-none absolute" style={{ right: "-60px", bottom: "-80px", width: "300px", height: "300px", borderRadius: "50%", background: "radial-gradient(closest-side, rgba(44,193,235,0.28), transparent)" }} />
                 <div className="relative flex flex-wrap items-end justify-between" style={{ gap: "20px 24px" }}>
                   <div style={{ minWidth: "220px" }}>
                     <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", fontFamily: "var(--font-sans)", fontSize: "12px", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "rgba(255,255,255,0.66)" }}>
                       <span style={{ color: "#2cc1eb" }}>{stroke("M12 7v5l3 2M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z")}</span>
-                      Engineering hours recovered / year
+                      Engineering Hours Recovered / year
                     </span>
                     <div style={{ fontFamily: "var(--font-display)", fontSize: "clamp(42px,5.4vw,64px)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1, color: "#fff", marginTop: "10px", fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>
                       {Math.round(hours).toLocaleString("en-US")}

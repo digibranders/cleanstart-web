@@ -3,8 +3,17 @@
  * ROI calculator's math. Pure, deterministic, dependency-free so it can be unit
  * tested and reasoned about in isolation from the UI.
  *
- * Pipeline: four inputs → 1–4 weights → a blended Burden Score →
+ * Pipeline: four inputs → 1–4 weights → a blended Operational Burden Score →
  * a Runtime Complexity tier → five interpolated operational outcomes.
+ *
+ * NAMING IS CLIENT-OWNED TOO. The outcome names surfaced in the UI (Vulnerability
+ * Noise Reduction, Patch Cycle Overhead Reduction, Faster Secure Releases,
+ * Runtime Footprint Reduction, Engineering Hours Recovered) come from ROI 1.xlsx
+ * §RESULTS and its Sheet2 mapping table, which records what each term replaced
+ * and why. Rephrasing them de-syncs the site from the sales deck. Note the sheet
+ * is internally inconsistent: its tier table header row uses shorter labels
+ * ("Vulnerability Reduction", "Engineering Recovery"); §RESULTS and Sheet2 agree
+ * with each other, so those win.
  *
  * SCORING IS CLIENT-OWNED. Every band, weight and constant below is transcribed
  * from the client's `ROI 1.xlsx` §"Background Scoring & Logic" and must not be
@@ -44,7 +53,7 @@ interface TierBand {
 export interface RoiOutput {
   burden: number;
   tier: TierName;
-  /** Share of the operational burden removed, as a percentage. Sheet §2. */
+  /** "Burden Reduction" — share of the score removed, as a percentage. Sheet §2. */
   burdenReduction: number;
   /** 0–1 position of the score across the full 100–360 scale (for the meter). */
   meterProgress: number;
@@ -201,10 +210,10 @@ export function computeImpact(input: RoiInput): RoiOutput {
   const fteRecovered = hoursRecovered / WORK_HOURS_PER_YEAR;
 
   const contributions: BurdenContribution[] = [
-    { label: "Production images", weightPct: WEIGHTS.image * 100, level: imgW, maxLevel: MAX_COUNT_LEVEL, points: imgW * WEIGHTS.image * 100 },
-    { label: "Team size", weightPct: WEIGHTS.eng * 100, level: engW, maxLevel: MAX_COUNT_LEVEL, points: engW * WEIGHTS.eng * 100 },
-    { label: "Remediation", weightPct: WEIGHTS.remediation * 100, level: remW, maxLevel: MAX_CADENCE_LEVEL, points: remW * WEIGHTS.remediation * 100 },
-    { label: "Release cadence", weightPct: WEIGHTS.release * 100, level: relW, maxLevel: MAX_CADENCE_LEVEL, points: relW * WEIGHTS.release * 100 },
+    { label: "Number of Production Images", weightPct: WEIGHTS.image * 100, level: imgW, maxLevel: MAX_COUNT_LEVEL, points: imgW * WEIGHTS.image * 100 },
+    { label: "Engineering Team Size", weightPct: WEIGHTS.eng * 100, level: engW, maxLevel: MAX_COUNT_LEVEL, points: engW * WEIGHTS.eng * 100 },
+    { label: "Remediation Frequency", weightPct: WEIGHTS.remediation * 100, level: remW, maxLevel: MAX_CADENCE_LEVEL, points: remW * WEIGHTS.remediation * 100 },
+    { label: "Release Cadence", weightPct: WEIGHTS.release * 100, level: relW, maxLevel: MAX_CADENCE_LEVEL, points: relW * WEIGHTS.release * 100 },
   ];
 
   return {
