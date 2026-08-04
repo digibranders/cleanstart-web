@@ -71,7 +71,7 @@ export function CompareHero(): React.ReactElement {
 
               <Link
                 href="#capability-matrix"
-                className="cs-btn-glass group mt-10 inline-flex items-center gap-2"
+                className="cs-btn-glass mt-10"
                 style={
                   {
                     "--cs-btn-px": "24px",
@@ -79,23 +79,7 @@ export function CompareHero(): React.ReactElement {
                   } as React.CSSProperties
                 }
               >
-                <span>{UI_CHROME.jumpToMatrix}</span>
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  aria-hidden
-                  className="transition-transform duration-200 group-hover:translate-y-0.5"
-                >
-                  <path
-                    d="M8 3v10M3 8l5 5 5-5"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                {UI_CHROME.jumpToMatrix}
               </Link>
             </HeroReveal>
           </div>
