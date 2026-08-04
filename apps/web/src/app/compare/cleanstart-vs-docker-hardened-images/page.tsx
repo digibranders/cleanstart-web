@@ -31,6 +31,16 @@ export const metadata = buildPageMetadata({
     "Compare Docker Hardened Images vs CleanStart across security, provenance, compliance, SBOMs, deterministic builds, and software verification.",
   path: PATH,
   eyebrow: "Comparison",
+  /*
+   * Held back from search until the page is signed off. Both directives are
+   * deliberate: `nofollow` is not the default for a per-page `noindex` (the
+   * helper still emits `follow` so link equity flows), so it is set explicitly
+   * here. Drop BOTH of these and re-add the path to `app/sitemap.ts` when the
+   * page ships — the sitemap entry is removed for as long as this is noindex,
+   * because listing a noindex URL is a contradictory signal.
+   */
+  noindex: true,
+  nofollow: true,
 });
 
 export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh

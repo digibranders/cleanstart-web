@@ -84,7 +84,10 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   // complete, so it is noindex'd and excluded from the sitemap. Re-add when it
   // ships (and drop the `noindex` in its page metadata).
   { path: '/community' },
-  { path: '/compare/cleanstart-vs-docker-hardened-images' },
+  // `/compare/cleanstart-vs-docker-hardened-images` is intentionally de-listed
+  // — the page is not signed off yet, so it is noindex,nofollow and excluded
+  // from the sitemap. Re-add when it ships (and drop the `noindex` / `nofollow`
+  // in its page metadata).
   { path: '/contact-us' },
   { path: '/deal-registration' },
   { path: '/events' },
