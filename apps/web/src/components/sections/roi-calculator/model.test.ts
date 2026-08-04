@@ -57,13 +57,23 @@ describe("input weight bands (sheet §Background Scoring & Logic)", () => {
   });
 
   it("scores cadences in the order the sheet lists them", () => {
+    // Ascending burden, straight from the sheet's weight tables. Deliberately
+    // NOT the *_OPTIONS constants — those carry the UI's display order, which
+    // for remediation runs the opposite way.
+    const remediationByBurden: readonly RemediationOption[] = ["Quarterly", "Monthly", "Weekly"];
+    const releaseByBurden: readonly ReleaseOption[] = ["Monthly", "Biweekly", "Continuous"];
     // Each cadence step is worth one level at 20% weight — 20 points.
-    for (const [lower, higher] of pairs(REMEDIATION_OPTIONS.map((r) => at({ remediation: r }).burden))) {
+    for (const [lower, higher] of pairs(remediationByBurden.map((r) => at({ remediation: r }).burden))) {
       expect(higher - lower).toBeCloseTo(20);
     }
-    for (const [lower, higher] of pairs(RELEASE_OPTIONS.map((r) => at({ release: r }).burden))) {
+    for (const [lower, higher] of pairs(releaseByBurden.map((r) => at({ release: r }).burden))) {
       expect(higher - lower).toBeCloseTo(20);
     }
+  });
+
+  it("offers remediation most-frequent-first in the UI", () => {
+    expect(REMEDIATION_OPTIONS).toEqual(["Weekly", "Monthly", "Quarterly"]);
+    expect(RELEASE_OPTIONS).toEqual(["Monthly", "Biweekly", "Continuous"]);
   });
 });
 

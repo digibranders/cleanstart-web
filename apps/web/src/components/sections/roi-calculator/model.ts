@@ -233,7 +233,14 @@ export function computeImpact(input: RoiInput): RoiOutput {
   };
 }
 
-export const REMEDIATION_OPTIONS: readonly RemediationOption[] = ["Quarterly", "Monthly", "Weekly"];
+/*
+ * DISPLAY order, not scoring order. Remediation reads most-frequent-first;
+ * the sheet's weight table happens to list it the other way round. Weights are
+ * looked up by name (REMEDIATION_WEIGHT / RELEASE_WEIGHT), never by index, so
+ * reordering these is purely presentational and cannot move a score.
+ * model.test.ts pins this display order and the sheet's scoring order apart.
+ */
+export const REMEDIATION_OPTIONS: readonly RemediationOption[] = ["Weekly", "Monthly", "Quarterly"];
 export const RELEASE_OPTIONS: readonly ReleaseOption[] = ["Monthly", "Biweekly", "Continuous"];
 export const TIER_NAMES: readonly TierName[] = ["Low", "Moderate", "High", "Extreme"];
 export const INPUT_BOUNDS = INPUT_RANGE;
