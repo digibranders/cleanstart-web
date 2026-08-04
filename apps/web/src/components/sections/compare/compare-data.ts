@@ -74,38 +74,15 @@ export const MATRIX_ROWS: readonly MatrixRow[] = [
   },
 ];
 
-export interface MatrixCategory {
-  id: string;
-  title: string;
-  badge: string;
-  description: string;
-  rows: readonly MatrixRow[];
-}
-
-export const MATRIX_CATEGORIES: readonly MatrixCategory[] = [
-  {
-    id: "core-hardening",
-    title: "Core Image Hardening",
-    badge: "01",
-    description: "Baseline container security and vulnerability surface reduction",
-    rows: MATRIX_ROWS.slice(0, 6),
-  },
-  {
-    id: "build-assurance",
-    title: "Build Assurance & Provenance",
-    badge: "02",
-    description: "Cryptographic build verification, source integrity, and compliance readiness",
-    rows: MATRIX_ROWS.slice(6, 12),
-  },
-  {
-    id: "supply-chain-governance",
-    title: "Supply Chain Posture & Governance",
-    badge: "03",
-    description: "Advanced AI supply chain visibility, hermetic build philosophy, and posture management",
-    rows: MATRIX_ROWS.slice(12, 15),
-  },
-];
-
+/*
+ * There are deliberately no capability categories here. The source document's
+ * table is a flat header plus fifteen rows, every row three cells wide — it
+ * groups nothing. Category bands ("Core Image Hardening", "Build Assurance &
+ * Provenance", "Supply Chain Posture & Governance") were added to the page on
+ * 2026-08-04 and removed the same day: none of those titles or their
+ * descriptions appear anywhere in the document, and grouping the rows asserts
+ * an editorial reading the SEO team never wrote or reviewed.
+ */
 
 export const VENDOR_DHI = "Docker Hardened Images";
 export const VENDOR_CLEANSTART = "CleanStart Verified Images";
@@ -546,6 +523,12 @@ export const UI_CHROME = {
   legendIncluded: "Included",
   legendAbsent: "Not offered",
   jumpToMatrix: "See the comparison",
-  trademark:
-    "Docker and Docker Hardened Images are trademarks of Docker, Inc. CleanStart is not affiliated with Docker, Inc. Capabilities reflect each vendor's public documentation.",
 } as const;
+
+/*
+ * A Docker trademark / non-affiliation disclaimer used to sit under the matrix.
+ * Removed 2026-08-04: the word "trademark" appears nowhere in the source
+ * document, and the page is held to document-verbatim copy. If legal wants a
+ * disclaimer back, it should come from them as approved wording rather than be
+ * reinstated here.
+ */

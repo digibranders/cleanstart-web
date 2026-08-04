@@ -1,21 +1,22 @@
 import { Section, Container } from "@/components/layout";
 import { Reveal } from "@/components/ui/Reveal";
 import {
-  INTRO_BODY,
   KEY_TAKEAWAY,
-  MATRIX_CATEGORIES,
+  KEY_TAKEAWAY_LABEL,
   MATRIX_HEADING,
+  MATRIX_ROWS,
   UI_CHROME,
   VENDOR_CLEANSTART,
   VENDOR_DHI,
-  type MatrixCategory,
   type MatrixRow,
 } from "./compare-data";
-import { P, RULE } from "./compare-editorial";
+import { RULE } from "./compare-editorial";
 import { Glyph, type GlyphKey } from "./compare-visuals";
 
 /**
- * Clean & Pure Comparison Matrix (All eyebrows removed).
+ * The capability comparison, rendered flat — header plus fifteen rows — because
+ * that is exactly what the source document's table is. See the note in
+ * compare-data.ts on why the category bands were removed.
  */
 
 const CLEANSTART_TINT = "rgba(106, 61, 240, 0.035)";
@@ -30,13 +31,6 @@ export function CompareMatrix(): React.ReactElement {
       aria-labelledby="compare-matrix-title"
     >
       <Container>
-        {/* Intro Paragraphs */}
-        <Reveal className="mb-10 flex flex-col gap-4 md:mb-14">
-          {INTRO_BODY.map((text) => (
-            <P key={text}>{text}</P>
-          ))}
-        </Reveal>
-
         {/* Section Heading — Pure H2 without eyebrow kicker */}
         <Reveal header>
           <h2
@@ -76,14 +70,11 @@ export function CompareMatrix(): React.ReactElement {
               </tr>
             </thead>
 
-            {MATRIX_CATEGORIES.map((category) => (
-              <tbody key={category.id}>
-                <CategoryRow category={category} />
-                {category.rows.map((row) => (
-                  <MatrixTableRow key={row.id} row={row} />
-                ))}
-              </tbody>
-            ))}
+            <tbody>
+              {MATRIX_ROWS.map((row) => (
+                <MatrixTableRow key={row.id} row={row} />
+              ))}
+            </tbody>
           </table>
         </Reveal>
 
@@ -112,15 +103,6 @@ export function CompareMatrix(): React.ReactElement {
               <span>{UI_CHROME.legendAbsent}</span>
             </span>
           </div>
-          <p
-            className="text-slate-500 text-xs leading-relaxed"
-            style={{
-              fontFamily: "var(--font-sans)",
-              maxWidth: "54ch",
-            }}
-          >
-            {UI_CHROME.trademark}
-          </p>
         </Reveal>
 
         {/* Sleek Light Studio Executive Takeaway Card */}
@@ -133,14 +115,21 @@ export function CompareMatrix(): React.ReactElement {
             />
 
             <div className="flex flex-col gap-4 relative z-10">
-              {/* Elegant Graphic Quote Accent */}
-              <div
-                aria-hidden
-                className="font-display text-purple-400/50 leading-none select-none -mb-3"
-                style={{ fontSize: "var(--fs-h1)", fontWeight: 700 }}
+              {/*
+               * The document prefixes this paragraph "Key takeaway:" — real
+               * sourced text, so it replaces the decorative quote glyph that
+               * previously sat here.
+               */}
+              <span
+                className="font-sans font-semibold text-[#6d28d9]"
+                style={{
+                  fontSize: "var(--fs-caption)",
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                }}
               >
-                “
-              </div>
+                {KEY_TAKEAWAY_LABEL}
+              </span>
 
               <blockquote
                 className="font-display text-slate-900 text-pretty"
@@ -154,10 +143,6 @@ export function CompareMatrix(): React.ReactElement {
                 {KEY_TAKEAWAY}
               </blockquote>
 
-              <div className="pt-4 mt-2 border-t border-purple-200/60 flex flex-wrap items-center justify-between gap-4 text-xs font-medium text-slate-500">
-                <span>Architectural evaluation & software supply chain governance comparison</span>
-                <span className="text-purple-700 font-semibold tracking-wide">CleanStart Platform Security</span>
-              </div>
             </div>
           </div>
         </Reveal>
@@ -195,10 +180,10 @@ function VendorColumnHead({
             }),
       }}
     >
-      <div className="flex flex-col items-start gap-3">
+      <div className="flex flex-row items-center gap-3">
         <span
           aria-hidden
-          className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-white"
+          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white"
           style={{
             background: branded ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.12)",
             boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.2)",
@@ -214,27 +199,6 @@ function VendorColumnHead({
         </span>
       </div>
     </th>
-  );
-}
-
-/** Category Header Row — Clean title without badge pill */
-function CategoryRow({ category }: { category: MatrixCategory }): React.ReactElement {
-  return (
-    <tr className="bg-slate-100/90 border-t border-b border-slate-200">
-      <td
-        colSpan={3}
-        className="px-4 py-3 sm:px-5 sm:py-3.5 sticky left-0 z-10 bg-slate-100/95 backdrop-blur-xs md:static"
-      >
-        <div className="flex items-center gap-2.5">
-          <span className="font-display text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-wider">
-            {category.title}
-          </span>
-          <span className="hidden sm:inline text-xs text-slate-500 font-normal">
-            — {category.description}
-          </span>
-        </div>
-      </td>
-    </tr>
   );
 }
 
@@ -318,17 +282,15 @@ function MatrixCell({
         )}
 
         {cell.state === "yes" && cell.note && (
-          <div className="flex flex-col items-start gap-1.5">
-            <span className="inline-flex items-center gap-2">
-              <span
-                className={`inline-flex items-center justify-center w-5 h-5 rounded-full shrink-0 ${
-                  isCleanStart
-                    ? "bg-purple-600 text-white shadow-xs"
-                    : "bg-[#1d4ed8] text-white"
-                }`}
-              >
-                <Tick stroke="#FFFFFF" />
-              </span>
+          <div className="flex flex-row items-center gap-2">
+            <span
+              className={`inline-flex items-center justify-center w-5 h-5 rounded-full shrink-0 ${
+                isCleanStart
+                  ? "bg-purple-600 text-white shadow-xs"
+                  : "bg-[#1d4ed8] text-white"
+              }`}
+            >
+              <Tick stroke="#FFFFFF" />
             </span>
             <span
               className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${
