@@ -243,18 +243,13 @@ export function CompareBuilds(): React.ReactElement {
         </SectionHeading>
         <P lead>{REPRODUCIBLE.lead}</P>
 
-        {/* The Core Question Deck */}
+        {/* The Core Question Deck — Refined Editorial Callout */}
         <Reveal header className="my-6">
-          <div
-            className="relative overflow-hidden rounded-2xl border border-purple-200/80 bg-gradient-to-br from-purple-50/70 via-indigo-50/40 to-white p-6 sm:p-8"
-            style={{
-              boxShadow: "0 10px 30px -15px rgba(109, 40, 217, 0.15)",
-            }}
-          >
+          <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-8 shadow-sm">
             <div className="flex items-start gap-4">
               <span
                 aria-hidden
-                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#6d28d9] text-white shadow-md font-mono text-base font-bold"
+                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-white font-mono text-sm font-bold shadow-sm"
               >
                 ?
               </span>
@@ -264,8 +259,8 @@ export function CompareBuilds(): React.ReactElement {
                   fontSize: "var(--fs-h3)",
                   fontWeight: 600,
                   letterSpacing: "var(--fs-h3-ls)",
-                  lineHeight: 1.3,
-                  maxWidth: "36ch",
+                  lineHeight: 1.35,
+                  maxWidth: "38ch",
                   textWrap: "balance",
                 }}
               >
@@ -277,35 +272,99 @@ export function CompareBuilds(): React.ReactElement {
 
         {/* Visual Deterministic Build Verification Console */}
         <Reveal delay={0.08} className="my-8">
-          <div className="rounded-2xl border border-slate-200 bg-slate-900 p-6 sm:p-8 text-white shadow-xl">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-[1fr_auto_1fr] md:items-center">
-              {/* Build Node A */}
-              <div className="rounded-xl border border-slate-800 bg-slate-950/80 p-5">
-                <div className="flex items-center gap-4">
-                  <ArtifactMark />
-                  <div className="min-w-0 flex-1">
-                    <p className="font-display text-sm font-semibold text-white">Builder Environment A</p>
-                    <p className="font-sans text-xs text-slate-400 mt-1">Source Artifact Digest</p>
-                  </div>
+          <div className="overflow-hidden rounded-2xl border border-slate-800 bg-[#0b0f17] text-white shadow-2xl">
+            {/* Console Header Bar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 bg-[#0e1420] px-5 py-3.5">
+              <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-1.5" aria-hidden>
+                  <span className="h-2.5 w-2.5 rounded-full bg-slate-700" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-slate-700" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-slate-700" />
                 </div>
-              </div>
-
-              {/* Equals Comparator */}
-              <div className="flex flex-col items-center justify-center">
-                <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-600/20 text-purple-300 border border-purple-500/40 font-mono text-xl font-bold shadow-inner">
-                  =
+                <span className="font-mono text-xs text-slate-400 font-medium tracking-wide ml-2">
+                  DETERMINISTIC_BUILD_COMPARATOR
                 </span>
               </div>
+            </div>
 
-              {/* Build Node B */}
-              <div className="rounded-xl border border-slate-800 bg-slate-950/80 p-5">
-                <div className="flex items-center gap-4">
-                  <ArtifactMark />
-                  <div className="min-w-0 flex-1">
-                    <p className="font-display text-sm font-semibold text-white">Builder Environment B</p>
-                    <p className="font-sans text-xs text-slate-400 mt-1">Source Artifact Digest</p>
+            {/* Console Content: Dual Build Paths */}
+            <div className="p-6 sm:p-8">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                {/* Build Node A */}
+                <div className="flex flex-col justify-between rounded-xl border border-slate-800/90 bg-slate-900/60 p-5 font-mono">
+                  <div>
+                    <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-800">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                        Primary Build Pipeline (A)
+                      </span>
+                      <span className="text-[11px] text-slate-500">x86_64-linux</span>
+                    </div>
+
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Source Commit</span>
+                        <span className="text-slate-200">git: 8f9a2e1d</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Compiler Flags</span>
+                        <span className="text-slate-300">--hermetic --strip</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Target Output</span>
+                        <span className="text-slate-200">cleanstart-base:v3.2.0</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 pt-3 border-t border-slate-800/80">
+                    <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Source Artifact SHA-256 Digest</p>
+                    <p className="text-xs text-emerald-400 font-mono break-all bg-slate-950/80 p-2.5 rounded border border-slate-800/60">
+                      sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+                    </p>
                   </div>
                 </div>
+
+                {/* Build Node B */}
+                <div className="flex flex-col justify-between rounded-xl border border-slate-800/90 bg-slate-900/60 p-5 font-mono">
+                  <div>
+                    <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-800">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                        Independent Auditor (B)
+                      </span>
+                      <span className="text-[11px] text-slate-500">arm64-darwin</span>
+                    </div>
+
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Source Commit</span>
+                        <span className="text-slate-200">git: 8f9a2e1d</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Compiler Flags</span>
+                        <span className="text-slate-300">--hermetic --strip</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Target Output</span>
+                        <span className="text-slate-200">cleanstart-base:v3.2.0</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 pt-3 border-t border-slate-800/80">
+                    <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Source Artifact SHA-256 Digest</p>
+                    <p className="text-xs text-emerald-400 font-mono break-all bg-slate-950/80 p-2.5 rounded border border-slate-800/60">
+                      sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Verified Result Banner */}
+              <div className="mt-6 flex items-center justify-center gap-3 rounded-xl border border-emerald-500/20 bg-emerald-950/30 p-3.5 text-center font-mono text-xs text-emerald-300">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0 text-emerald-400">
+                  <path d="M13.3332 4L5.99984 11.3333L2.6665 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span>VERIFICATION PASSED: Digests match across independent infrastructure (0 byte variation)</span>
               </div>
             </div>
           </div>
@@ -313,46 +372,26 @@ export function CompareBuilds(): React.ReactElement {
 
         <Prose paragraphs={REPRODUCIBLE.body} />
 
-        {/* High-Impact Pull Quote */}
-        <Reveal header className="my-8">
-          <blockquote className="relative overflow-hidden rounded-2xl border-l-4 border-[#6d28d9] bg-gradient-to-r from-purple-50/80 via-indigo-50/30 to-transparent p-6 sm:p-8">
-            <p
-              className="font-display text-[#111111]"
-              style={{
-                fontSize: "var(--fs-h3)",
-                fontWeight: 600,
-                letterSpacing: "var(--fs-h3-ls)",
-                lineHeight: 1.3,
-                maxWidth: "32ch",
-                textWrap: "balance",
-              }}
-            >
-              {REPRODUCIBLE.pull}
-            </p>
-          </blockquote>
+        {/* High-Impact Editorial Pull Quote */}
+        <Reveal header className="my-8 py-8 border-y border-[#111111]/[0.11]">
+          <p
+            className="font-display text-[#111111]"
+            style={{
+              fontSize: "var(--fs-h3)",
+              fontWeight: 600,
+              letterSpacing: "var(--fs-h3-ls)",
+              lineHeight: 1.35,
+              maxWidth: "36ch",
+              textWrap: "balance",
+            }}
+          >
+            "{REPRODUCIBLE.pull}"
+          </p>
         </Reveal>
 
         <Prose paragraphs={[REPRODUCIBLE.close]} />
       </ArticleSection>
     </>
-  );
-}
-
-/** One artifact glyph in a tinted disc — used twice, either side of the equals. */
-function ArtifactMark(): React.ReactElement {
-  const accent = accentAt(0);
-  return (
-    <span
-      aria-hidden
-      className="inline-flex h-[68px] w-[68px] shrink-0 items-center justify-center rounded-[22px] bg-white"
-      style={{
-        color: accent.light,
-        boxShadow: `0 10px 26px -12px ${accent.shadow}, inset 0 0 0 1px ${accent.border}`,
-        background: `radial-gradient(120% 120% at 30% 0%, ${accent.fill} 0%, #ffffff 70%)`,
-      }}
-    >
-      <Glyph icon="packages" size={30} />
-    </span>
   );
 }
 
