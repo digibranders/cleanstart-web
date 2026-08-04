@@ -417,12 +417,16 @@ export function RoiSimulator(): React.ReactElement {
 
                   {/* Burden Reduction keys off the score, not the tier, so it
                       belongs beside the gauge rather than in the Step 3 grid. */}
-                  <div className="inline-flex items-baseline" style={{ gap: "12px", marginTop: "14px", padding: "11px 16px", borderRadius: "12px", background: `${TIER_COLOR[out.tier]}12`, border: `1px solid ${TIER_COLOR[out.tier]}33` }}>
+                  <div className="inline-flex items-center" style={{ gap: "12px", marginTop: "14px", padding: "11px 16px", borderRadius: "12px", background: `${TIER_COLOR[out.tier]}12`, border: `1px solid ${TIER_COLOR[out.tier]}33` }}>
                     <span style={{ fontFamily: "var(--font-display)", fontSize: "28px", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1, color: TIER_COLOR[out.tier], fontVariantNumeric: "tabular-nums" }}>
                       {Math.round(reduction)}%
                     </span>
-                    <span className="inline-flex items-center" style={{ fontFamily: "var(--font-sans)", fontSize: "13px", fontWeight: 600, color: SUB, lineHeight: 1.35, maxWidth: "24ch" }}>
-                      Burden Reduction on trusted images
+                    {/* Plain span, NOT inline-flex: the label and its InfoTip have to
+                        flow as one run of text so the icon trails the last word. As a
+                        flex container the raw text became its own anonymous item and
+                        the icon was pushed out to the pill's right edge. */}
+                    <span style={{ fontFamily: "var(--font-sans)", fontSize: "13px", fontWeight: 600, color: SUB, lineHeight: 1.35, maxWidth: "26ch", textWrap: "balance" }}>
+                      Burden Reduction on trusted images{" "}
                       <InfoTip label="Burden Reduction" text="The share of your Operational Burden Score removed on minimal, trusted images — images, team, patching and release cadence combined. The Step 3 figures break out where that reduction comes from." />
                     </span>
                   </div>
