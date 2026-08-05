@@ -23,7 +23,7 @@ import { HOME_TESTIMONIALS } from "@/components/sections/home/Testimonials";
 const BLOCK_BACKGROUND =
   "linear-gradient(180deg, #120D1F 0%, #151021 50%, #131E8F 82%, #471EC0 100%)";
 
-const CISO_VOICE = HOME_TESTIMONIALS.find((t) => t.role.includes("CISO"));
+const CISO_VOICE = HOME_TESTIMONIALS.find((t) => t.company === "IIFL Finance");
 
 // The colored IIFL wordmark vanishes on a dark surface; the white wordmark
 // (orange mandala + white "IIFL FINANCE") reads cleanly here.
@@ -67,10 +67,14 @@ export function CisoValidationOutcomes(): React.ReactElement {
 
 function ValidationSpotlight(): React.ReactElement | null {
   if (!CISO_VOICE) return null;
-  const { role, quote, caseStudyHref } = CISO_VOICE;
+  const { role, company, quote, caseStudyHref } = CISO_VOICE;
   // Attribute by role, not by person (name + photo removed). The IIFL wordmark
-  // carries the company, so trim the ", IIFL Finance" tail off the role title.
-  const roleTitle = role.split(",")[0]?.trim() ?? role;
+  // carries the company, so trim the trailing ", IIFL Finance" off the role
+  // title — matched on the company field, since the title itself has commas.
+  const companyTail = `, ${company}`;
+  const roleTitle = role.endsWith(companyTail)
+    ? role.slice(0, -companyTail.length)
+    : role;
 
   return (
     <section

@@ -40,7 +40,7 @@ export const HOME_TESTIMONIALS: Testimonial[] = [
   },
   {
     name: "Shanker Ramrakhiani",
-    role: "CISO & Head of BCP, IIFL Finance",
+    role: "Head, Risk and App security, IIFL Finance",
     company: "IIFL Finance",
     logoSrc: "/images/testimonials/iifl-finance.png",
     photoSrc: "/images/testimonials/shanker-ramrakhiani.webp",
