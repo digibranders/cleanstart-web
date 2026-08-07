@@ -5224,6 +5224,7 @@ body {
    fallbacks when it is not. */
 .article-body .article-table-wrapper {
   margin: 1.75rem 0;
+  width: 100%;
   overflow-x: auto;
   border: 1px solid #e4e4ec;
   border-radius: 12px;
@@ -5232,6 +5233,7 @@ body {
 
 .article-body .article-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
   font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
@@ -5244,11 +5246,13 @@ body {
 .article-body .article-table th,
 .article-body .article-table td {
   text-align: left;
-  padding: 12px 20px;
+  padding: 12px 14px;
   border: none;
   border-bottom: 1px solid #ededf3;
   background: #ffffff;
   vertical-align: top;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* Body cells (default) — Sora regular */
