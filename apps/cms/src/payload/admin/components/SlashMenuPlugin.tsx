@@ -10,11 +10,14 @@ import {
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode';
 import {
   $getSelection,
+  $isElementNode,
   $isRangeSelection,
+  $isRootNode,
   $isTextNode,
   COMMAND_PRIORITY_LOW,
   KEY_DOWN_COMMAND,
   type LexicalEditor,
+  type LexicalNode,
 } from 'lexical';
 import { $setBlocksType } from '@lexical/selection';
 import {
@@ -26,6 +29,36 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { OPEN_EMBED_DIALOG_COMMAND } from './Embed/EmbedPlugin';
 import { OPEN_INLINE_IMAGE_DIALOG_COMMAND } from './InlineImage/InlineImagePlugin';
+
+/**
+ * Safely removes trigger text (like `/cta` or `/code`) from the paragraph
+ * where the slash menu was invoked.
+ *
+ * CRITICAL FIX: Ensures we NEVER wipe the RootNode or any top-level block
+ * other than the specific paragraph containing the trigger.
+ */
+function clearSlashTriggerText(editor: LexicalEditor): void {
+  editor.update(() => {
+    const sel = $getSelection();
+    if (!$isRangeSelection(sel)) return;
+    const anchorNode = sel.anchor.getNode();
+    if (!anchorNode) return;
+
+    let topBlock: LexicalNode | null = anchorNode;
+    while (topBlock && !$isRootNode(topBlock.getParent())) {
+      topBlock = topBlock.getParent();
+    }
+
+    if (topBlock && !$isRootNode(topBlock) && $isElementNode(topBlock)) {
+      const text = topBlock.getTextContent();
+      if (text.startsWith('/') || text.trim() === '') {
+        for (const child of topBlock.getChildren()) {
+          child.remove();
+        }
+      }
+    }
+  });
+}
 
 type SlashItem = {
   readonly id: string;
@@ -317,16 +350,7 @@ export const SlashMenuPlugin = (): ReactElement | null => {
           const item = items[activeIdx];
           if (!item) return false;
           event.preventDefault();
-          editor.update(() => {
-            const sel = $getSelection();
-            if ($isRangeSelection(sel)) {
-              const par = sel.anchor.getNode().getParent();
-              // Wipe the trigger characters before running the action.
-              if (par) {
-                for (const c of par.getChildren()) c.remove();
-              }
-            }
-          });
+          clearSlashTriggerText(editor);
           item.run(editor);
           setOpen(false);
           return true;
@@ -366,15 +390,7 @@ export const SlashMenuPlugin = (): ReactElement | null => {
                 onMouseEnter={() => setActiveIdx(i)}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => {
-                  editor.update(() => {
-                    const sel = $getSelection();
-                    if ($isRangeSelection(sel)) {
-                      const par = sel.anchor.getNode().getParent();
-                      if (par) {
-                        for (const c of par.getChildren()) c.remove();
-                      }
-                    }
-                  });
+                  clearSlashTriggerText(editor);
                   it.run(editor);
                   setOpen(false);
                 }}

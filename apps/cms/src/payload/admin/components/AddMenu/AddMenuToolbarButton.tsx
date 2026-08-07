@@ -13,6 +13,8 @@ import type { ReactElement } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import { INSERT_BLOCK_COMMAND } from '@payloadcms/richtext-lexical/client';
+
 import { OPEN_TABLE_GRID_COMMAND } from '../TableGridPickerPlugin';
 import { OPEN_INLINE_IMAGE_DIALOG_COMMAND } from '../InlineImage/InlineImagePlugin';
 import { OPEN_EMBED_DIALOG_COMMAND } from '../Embed/EmbedPlugin';
@@ -85,6 +87,18 @@ const ICONS = {
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <rect x="1" y="3" width="14" height="10" rx="1.5" {...stroke} />
       <path {...stroke} d="M5.5 6.5L3 8l2.5 1.5M10.5 6.5L13 8l-2.5 1.5M7.5 10l1-4" />
+    </svg>
+  ),
+  code: (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path {...stroke} d="M6 5L3 8l3 3M10 5l3 3-3 3" />
+    </svg>
+  ),
+  cta: (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <rect x="1.5" y="3.5" width="13" height="9" rx="1.5" {...stroke} />
+      <path {...stroke} d="M4 7h5" />
+      <rect x="9.5" y="9" width="4" height="2" rx="1" fill="currentColor" />
     </svg>
   ),
 } as const;
@@ -165,6 +179,33 @@ const MENU_ITEMS: ReadonlyArray<MenuItem> = [
     label: 'Embed',
     icon: ICONS.embed,
     run: (editor) => editor.dispatchCommand(OPEN_EMBED_DIALOG_COMMAND, {}),
+  },
+  {
+    id: 'code',
+    label: 'Code block',
+    icon: ICONS.code,
+    run: (editor) =>
+      editor.dispatchCommand(INSERT_BLOCK_COMMAND, {
+        blockName: '',
+        blockType: 'codeBlock',
+        language: 'bash',
+        content: '',
+        showLineNumbers: true,
+      }),
+  },
+  {
+    id: 'cta',
+    label: 'CTA card',
+    icon: ICONS.cta,
+    run: (editor) =>
+      editor.dispatchCommand(INSERT_BLOCK_COMMAND, {
+        blockName: '',
+        blockType: 'inlineCta',
+        heading: '',
+        buttonLabel: '',
+        buttonUrl: '',
+        variant: 'soft',
+      }),
   },
 ];
 
