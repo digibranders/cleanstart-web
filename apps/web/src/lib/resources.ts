@@ -129,7 +129,9 @@ export const getResourceBySlug = cache(
 
 /** Draft variant for the `/preview/resources/[slug]` route. Not cached. */
 export async function getResourceBySlugDraft(slug: string): Promise<ResourceDetail | null> {
-  return loadResourceBySlug(slug, true);
+  const draftDoc = await loadResourceBySlug(slug, true);
+  if (draftDoc) return draftDoc;
+  return loadResourceBySlug(slug, false);
 }
 
 // Client-safe helpers live in `resources-utils.ts`. Re-exported here

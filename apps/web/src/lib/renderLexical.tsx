@@ -155,6 +155,10 @@ function renderNode(node: LexicalNode, key: string): React.ReactNode {
     case "text":
       return renderTextNode(node as Extract<LexicalNode, { type: "text" }>, key);
 
+    case "linebreak":
+      // eslint-disable-next-line no-restricted-syntax -- Shift+Enter inline line break in Lexical editor
+      return <br key={key} />;
+
     case "link":
     case "autolink": {
       const linkNode = node as Extract<LexicalNode, { type: "link" | "autolink" }>;

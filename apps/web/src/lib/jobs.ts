@@ -138,7 +138,9 @@ export const getJobBySlug = cache(
 
 /** Draft variant for the `/preview/jobs/[slug]` route. Not cached. */
 export async function getJobBySlugDraft(slug: string): Promise<Job | null> {
-  return loadJobBySlug(slug, true);
+  const draftDoc = await loadJobBySlug(slug, true);
+  if (draftDoc) return draftDoc;
+  return loadJobBySlug(slug, false);
 }
 
 export async function getJobLocations(): Promise<JobLocation[]> {

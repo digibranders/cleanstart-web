@@ -169,7 +169,9 @@ export const getNewsBySlug = cache(
 
 /** Draft variant for the `/preview/news/[slug]` route. Not cached. */
 export async function getNewsBySlugDraft(slug: string): Promise<NewsDetail | null> {
-  return loadNewsBySlug(slug, true);
+  const draftDoc = await loadNewsBySlug(slug, true);
+  if (draftDoc) return draftDoc;
+  return loadNewsBySlug(slug, false);
 }
 
 export async function getRelatedNews(

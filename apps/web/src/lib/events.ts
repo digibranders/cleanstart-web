@@ -158,7 +158,9 @@ export const getEventBySlug = cache(
 
 /** Draft variant for the `/preview/events/[slug]` route. Not cached. */
 export async function getEventBySlugDraft(slug: string): Promise<EventDetail | null> {
-  return loadEventBySlug(slug, true);
+  const draftDoc = await loadEventBySlug(slug, true);
+  if (draftDoc) return draftDoc;
+  return loadEventBySlug(slug, false);
 }
 
 /** All published event slugs, for generateStaticParams (prerender at build). */
