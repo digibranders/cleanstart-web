@@ -195,11 +195,11 @@ export async function renderBlogDetail({
 
         <BlogDetailAuthor authors={post.authors} />
 
-        <BlogDetailJourneyNav previous={previousTarget} next={nextTarget} />
-
         {post.faqs && post.faqs.length > 0 && (
           <BlogDetailFAQ faqs={post.faqs} />
         )}
+
+        <BlogDetailJourneyNav previous={previousTarget} next={nextTarget} />
 
         {/* Trailing buffer keeps a consistent gap between the last section and
             the CTA card. `--spacing-section-cta` holds the per-breakpoint clearance;

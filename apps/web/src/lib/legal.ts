@@ -74,7 +74,9 @@ export const getLegalBySlug = cache(
 
 /** Draft variant for the /preview/legal/[slug] route. Not cached. */
 export async function getLegalBySlugDraft(slug: string): Promise<LegalDocDetail | null> {
-  return loadLegalBySlug(slug, true);
+  const draftDoc = await loadLegalBySlug(slug, true);
+  if (draftDoc) return draftDoc;
+  return loadLegalBySlug(slug, false);
 }
 
 /**

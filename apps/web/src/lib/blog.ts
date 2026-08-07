@@ -151,6 +151,11 @@ export type LexicalTableNode = {
   version: number;
 };
 
+export type LexicalLinebreakNode = {
+  type: "linebreak";
+  version: number;
+};
+
 export type LexicalNode =
   | LexicalTextNode
   | LexicalLinkNode
@@ -165,6 +170,7 @@ export type LexicalNode =
   | LexicalTableNode
   | LexicalTableRowNode
   | LexicalTableCellNode
+  | LexicalLinebreakNode
   | { type: string; children?: LexicalNode[]; version: number; [key: string]: unknown };
 
 export type LexicalRoot = {
@@ -386,7 +392,9 @@ export const getBlogBySlug = cache(
  * preview render re-fetches so the editor sees their latest save immediately.
  */
 export async function getBlogBySlugDraft(slug: string): Promise<BlogDetail | null> {
-  return loadBlogBySlug(slug, true);
+  const draftDoc = await loadBlogBySlug(slug, true);
+  if (draftDoc) return draftDoc;
+  return loadBlogBySlug(slug, false);
 }
 
 const RELATED_TARGET = 3;

@@ -273,5 +273,7 @@ export const getGuideBySlug = cache(
 export async function getGuideBySlugDraft(
   slug: string,
 ): Promise<GuideDetail | null> {
-  return loadGuideBySlug(slug, true);
+  const draftDoc = await loadGuideBySlug(slug, true);
+  if (draftDoc) return draftDoc;
+  return loadGuideBySlug(slug, false);
 }

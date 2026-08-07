@@ -33,9 +33,9 @@ export class CmsFetchError extends Error {
   }
 }
 
-const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? 'http://localhost:3000';
-const CMS_API_KEY = process.env.CMS_API_KEY;
-const CMS_API_KEY_COLLECTION = process.env.CMS_API_KEY_COLLECTION ?? 'users';
+const getCmsUrl = (): string => process.env.NEXT_PUBLIC_CMS_URL ?? 'http://localhost:3000';
+const getCmsApiKey = (): string | undefined => process.env.CMS_API_KEY;
+const getCmsApiKeyCollection = (): string => process.env.CMS_API_KEY_COLLECTION ?? 'users';
 
 // Time-based ISR is only a fallback here: the CMS pushes on-demand
 // revalidation (revalidatePath / revalidateTag via /api/revalidate) the
@@ -107,8 +107,9 @@ export async function fetchCMS<T>(path: string, options: CmsFetchOptions = {}): 
 
   if (isDraft) {
     effectivePath = withDraftFlag(stripPublishedFilter(path));
-    if (CMS_API_KEY && CMS_API_KEY.length > 0) {
-      headers.Authorization = `${CMS_API_KEY_COLLECTION} API-Key ${CMS_API_KEY}`;
+    const apiKey = getCmsApiKey();
+    if (apiKey && apiKey.length > 0) {
+      headers.Authorization = `${getCmsApiKeyCollection()} API-Key ${apiKey}`;
     }
   }
 
@@ -161,7 +162,7 @@ export async function fetchCMS<T>(path: string, options: CmsFetchOptions = {}): 
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt += 1) {
     const isLast = attempt === MAX_ATTEMPTS - 1;
     try {
-      const candidate = await fetch(`${CMS_URL}${effectivePath}`, init);
+      const candidate = await fetch(`${getCmsUrl()}${effectivePath}`, init);
       if (RETRYABLE_STATUS.has(candidate.status) && !isLast) {
         lastError = new CmsFetchError(candidate.status, effectivePath);
         await new Promise((resolve) => setTimeout(resolve, backoffMs(attempt)));
@@ -181,4 +182,4 @@ export async function fetchCMS<T>(path: string, options: CmsFetchOptions = {}): 
   return res.json() as Promise<T>;
 }
 
-export const cmsBaseUrl = (): string => CMS_URL;
+export const cmsBaseUrl = (): string => getCmsUrl();
