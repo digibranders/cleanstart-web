@@ -2,6 +2,13 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* Tailwind's source detection scans the markdown docs alongside the code, so
+   placeholder class names from their code samples ("w-[Xpx]", "aspect-[W/H]",
+   "drop-shadow-[...]", "gap-[40px]") compile into real utilities — ~10 KB of
+   CSS that nothing renders. Excluding .md keeps automatic detection everywhere
+   else, so new component directories still work with no config change. */
+@source not "../../../../**/*.md";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme {
@@ -613,13 +620,6 @@ body {
       transparent 6px);
 }
 
-/* Engine panel inner cards (AI Logic Engine / CleanCompile Factory) */
-.cs-engine-card {
-  background: #151021;
-  border: 1px solid rgba(218, 182, 243, 0.35);
-  border-radius: 24px;
-}
-
 /* ===========================================================================
    CTA SYSTEM
    --------------------------------------------------------------------------
@@ -1057,14 +1057,6 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-.cs-link-cta--light {
-  color: #3960F9;
-}
-
-.cs-link-cta--lightDark {
-  color: #1B1F4F;
-}
-
 .cs-link-cta::after {
   content: "";
   position: absolute;
@@ -1087,14 +1079,6 @@ body {
   color: #33BAEC;
 }
 
-.cs-link-cta--light:hover {
-  color: #1B1F4F;
-}
-
-.cs-link-cta--lightDark:hover {
-  color: #3960F9;
-}
-
 .cs-link-cta:hover .cs-cta-arrow {
   transform: translateX(4px);
 }
@@ -1113,68 +1097,6 @@ body {
   transition: transform 220ms cubic-bezier(.2, .9, .3, 1);
 }
 
-/* ---- KEEP existing pill (Plan/Analyze/etc.) but add proper interactive states */
-.cs-pill-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 31px;
-  padding: 5px 16px;
-  border-radius: 999px;
-  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
-  font-size: 1.125rem;
-  font-weight: 400;
-  line-height: 110%;
-  letter-spacing: -0.04em;
-  color: #ffffff;
-  white-space: nowrap;
-  border: 1.3px solid rgba(205, 228, 255, 0.55);
-  background:
-    radial-gradient(ellipse 70% 110% at 43% 31%, #000000 0%, #000000 19%, #1E5AFF 100%);
-  cursor: pointer;
-  transition: filter 180ms ease, transform 180ms cubic-bezier(.2, .9, .3, 1);
-}
-
-.cs-pill-cta:hover {
-  filter: brightness(1.15);
-  transform: translateY(-1px);
-}
-
-.cs-pill-cta:active {
-  transform: translateY(0) scale(0.97);
-  transition-duration: 80ms;
-}
-
-.cs-pill-cta:focus-visible {
-  outline: 2px solid #CDE4FF;
-  outline-offset: 2px;
-}
-
-/* ---- Legacy classes kept as aliases for any spots that still reference them */
-.cs-pill-glass {
-  /* kept for backward compatibility — prefer cs-btn-secondary */
-  background:
-    radial-gradient(120% 90% at 50% -10%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 60%),
-    radial-gradient(80% 60% at 50% 110%, rgba(218, 182, 243, 0.35), rgba(255, 255, 255, 0) 60%),
-    rgba(255, 255, 255, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    0 4px 18px rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(6px);
-}
-
-.cs-pill-demo {
-  /* kept — header demo button */
-  background: linear-gradient(135deg,
-      rgba(112, 112, 112, 0.28) 0%,
-      rgba(214, 214, 214, 0.28) 23%,
-      rgba(214, 214, 214, 0.28) 68%,
-      rgba(155, 155, 155, 0.28) 84%);
-  border: 1.5px solid rgba(174, 174, 174, 0.7);
-  backdrop-filter: blur(4px);
-}
-
 @media (prefers-reduced-motion: reduce) {
 
   .cs-cta-base,
@@ -1185,25 +1107,6 @@ body {
   .cs-pill-cta {
     transition: none !important;
   }
-
-  .cs-btn-primary::after {
-    animation: none !important;
-    opacity: 0 !important;
-  }
-
-  .cs-btn-primary:hover,
-  .cs-btn-secondary:hover,
-  .cs-btn-ghost-dark:hover,
-  .cs-pill-cta:hover {
-    transform: none !important;
-  }
-}
-
-/* Header glass nav */
-.cs-nav-glass {
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* ============================================================
@@ -1260,59 +1163,6 @@ body {
 
 .cs-nav-shadow {
   border-bottom-color: rgba(255, 255, 255, 0.04);
-}
-
-/* Mega-menu / compact dropdown surface — dark glass card */
-.cs-mega-surface {
-  background-color: rgba(21, 16, 33, 0.92);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-}
-
-/* Pointed arrow at the top of the mega-menu, auto-aligned to active trigger.
-   Uses the SAME rgba + backdrop-blur as .cs-mega-surface so the surfaces read
-   as identical. The element box is intentionally larger than the visible
-   triangle (40x20 box → 18x10 triangle) so backdrop-filter has enough pixels
-   to sample — a 10px-tall element gives the blur almost nothing to work with
-   and ends up looking grey. clip-path then shows only the triangle. */
-.cs-mega-arrow {
-  width: 40px;
-  height: 20px;
-  background-color: rgba(21, 16, 33, 0.92);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  /* Visible 18x10 triangle occupies the TOP half of the 40x20 box.
-     The bottom half is clipped away, but its presence gives backdrop-filter
-     more area to sample, producing the same blur color as .cs-mega-surface. */
-  clip-path: polygon(50% 0%, calc(50% - 9px) 50%, calc(50% + 9px) 50%);
-}
-
-/* Hover state for individual menu items — subtle gradient left bar + soft fill */
-.cs-mega-item {
-  position: relative;
-}
-
-.cs-mega-item::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 8px;
-  bottom: 8px;
-  width: 2px;
-  border-radius: 2px;
-  background: linear-gradient(180deg, #471fc3 0%, #2cc1eb 100%);
-  opacity: 0;
-  transition: opacity 180ms ease-out;
-}
-
-.cs-mega-item:hover {
-  background-color: rgba(255, 255, 255, 0.04);
-}
-
-.cs-mega-item:hover::before {
-  opacity: 1;
 }
 
 /* Active route — gradient underline beneath top-level nav links */
@@ -1403,17 +1253,7 @@ body {
 
 /* Rocket flame beam */
 /* Testimonial card fade+slide animation (used by Testimonials carousel) */
-@keyframes cs-fade-slide-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.985);
-  }
 
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
 
 /* Tab-content swap animation (used by the homepage Resources & Insights rail).
    Slightly larger Y offset and a longer duration than `cs-fade-slide-in` so
@@ -1658,34 +1498,12 @@ body {
 }
 
 /* Vertical-pipeline pulse for the mobile Factory cards' left guide-line dots. */
-@keyframes cs-pulse-glow {
 
-  0%,
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.7;
-  }
-
-  50% {
-    transform: translate(-50%, -50%) scale(1.55);
-    opacity: 1;
-  }
-}
 
 /* Slow-breathing brightness for the mobile Factory cards' flares.
    Preserves the translateY(-50%) the flare uses for vertical centering;
    only opacity changes so the cyan glow gently pulses behind each card. */
-@keyframes cs-pulse-glow-flare {
 
-  0%,
-  100% {
-    opacity: 0.75;
-  }
-
-  50% {
-    opacity: 1;
-  }
-}
 
 /* Remediation-flow diagram (CleanSight). Dashed connectors flow toward the
    card; node halos breathe. Both disabled under reduced-motion. */
@@ -1778,11 +1596,6 @@ body {
   animation: cs-libhero-breathe 5.5s ease-in-out infinite;
 }
 
-/* Offset the left package-field glow so the two glows breathe out of phase. */
-.cs-libhero-breathe-delay {
-  animation-delay: -2.75s;
-}
-
 @media (prefers-reduced-motion: reduce) {
 
   .cs-libhero-float,
@@ -1820,10 +1633,6 @@ body {
 .cs-lib-packet {
   offset-rotate: 0deg;
   animation: cs-lib-packet 2.9s linear infinite;
-}
-.cs-lib-packet-amber {
-  offset-rotate: 0deg;
-  animation: cs-lib-packet-amber 2.7s ease-in-out infinite;
 }
 .cs-lib-rim {
   animation: cs-lib-rim-glint 7s linear infinite;
@@ -2108,46 +1917,6 @@ body {
     translate: 0 -7px;
   }
 }
-.cs-tg-pip {
-  transform-origin: center;
-  will-change: transform, opacity;
-  animation: cs-tg-pip 2.4s ease-in-out infinite;
-}
-.cs-tg-flow {
-  animation: cs-tg-flow 1.6s linear infinite;
-}
-.cs-tg-ripple {
-  transform-box: fill-box;
-  transform-origin: center;
-  will-change: transform, opacity;
-  animation: cs-tg-ripple 4s ease-out infinite;
-}
-.cs-tg-core {
-  will-change: opacity;
-  animation: cs-tg-core 4.5s ease-in-out infinite;
-}
-.cs-tg-pip-ping {
-  transform-origin: center;
-  will-change: transform, opacity;
-  animation: cs-tg-ping 2.4s ease-out infinite;
-}
-/* Gentle idle drift — uses the `translate` property so it never fights the
-   positioning transforms on the orb wrappers. Desynced per orb via a negative
-   inline animation-delay. */
-.cs-tg-orb {
-  animation: cs-tg-orb-float 6.5s ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .cs-tg-pip,
-  .cs-tg-pip-ping,
-  .cs-tg-flow,
-  .cs-tg-ripple,
-  .cs-tg-core,
-  .cs-tg-orb {
-    animation: none !important;
-  }
-}
-
 /* Clean Libraries — "Libraries Enter Software Through" flow lanes. Accent beams
    stream from the four entry-vector cards into the converging software node;
    the node breathes and its core pulses. Dash-offset / transform / opacity only
@@ -2611,10 +2380,6 @@ body {
   opacity: 0.4;
   filter: saturate(0.7);
   transition: opacity 0.25s, filter 0.25s;
-}
-
-.cs-sec-lit {
-  transition: opacity 0.25s;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3105,226 +2870,6 @@ body {
 }
 
 /* ============================================================
-   HERO ORB — animated container-image factory.
-   Center logo + rotating chromatic ring + chips that flow
-   in from the left ("vulnerable images") and emerge clean
-   on the right ("hardened by CleanStart").
-   ============================================================ */
-
-/* Whole-orb float — applied to the wrapper so the sphere AND the cube move
-   together as one unit. Wrapper already has `translate(-50%, -50%)` for
-   centring, so we compose that into every keyframe. Tiny amplitudes give a
-   3D bob without ever drifting the cube off the sphere. */
-@keyframes cs-orb-core-breathe {
-  0% {
-    transform: translate(-50%, -50%) translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg) scale(1);
-    filter: brightness(1);
-  }
-
-  25% {
-    transform: translate(-50%, -50%) translate3d(0, -1.4%, 0) rotateX(2deg) rotateY(-2.5deg) scale(1.012);
-    filter: brightness(1.03);
-  }
-
-  50% {
-    transform: translate(-50%, -50%) translate3d(0, -2.2%, 0) rotateX(0deg) rotateY(0deg) scale(1.022);
-    filter: brightness(1.06);
-  }
-
-  75% {
-    transform: translate(-50%, -50%) translate3d(0, -1.4%, 0) rotateX(-2deg) rotateY(2.5deg) scale(1.012);
-    filter: brightness(1.03);
-  }
-
-  100% {
-    transform: translate(-50%, -50%) translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg) scale(1);
-    filter: brightness(1);
-  }
-}
-
-/* Centre cube — static position; only a gentle scale + brightness pulse so
-   it breathes with the sphere. No rotation: the cube is a flat image and
-   rotateY would visibly flatten it at 90°. */
-@keyframes cs-orb-cube-pulse {
-
-  0%,
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-    filter: brightness(1) drop-shadow(0 0 0 rgb(180 140 255 / 0));
-  }
-
-  50% {
-    transform: translate(-50%, -50%) scale(1.035);
-    filter: brightness(1.08) drop-shadow(0 0 12px rgb(180 140 255 / 0.45));
-  }
-}
-
-.cs-orb-stage {
-  position: relative;
-  width: 100%;
-  max-width: 1280px;
-  aspect-ratio: 1280 / 520;
-  margin-inline: auto;
-  container-type: inline-size;
-}
-
-.cs-orb-flow {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-/* Orb container — sized in container-query units so it tracks the stage width.
-   The PNG bakes in glow bleed, so the width is mapped to the orb's inscribed
-   sphere rather than the full image. The clamp keeps the orb at ~2.6x chip
-   size so the sphere stays prominent without the baked-in halo crowding the
-   frame. */
-.cs-orb {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  /* Min lowered (220 → 140) so the orb scales down properly on mobile —
-     at narrow stages it was hitting the floor and dominating the frame.
-     Multiplier tightened (26 → 22cqi) so even mid stages feel balanced;
-     max trimmed slightly (340 → 320) so the orb stays sphere-prominent
-     without ballooning at the widest stages. */
-  width: clamp(140px, 22cqi, 320px);
-  height: auto;
-  z-index: 3;
-  pointer-events: none;
-  display: grid;
-  place-items: center;
-  filter: drop-shadow(0 4px 4px rgb(0 0 0 / 0.25));
-  /* 3D scene: depth lets the wrapper bob/tilt with real perspective. */
-  perspective: 900px;
-  perspective-origin: 50% 45%;
-  transform-style: preserve-3d;
-  /* Float applied to the wrapper so sphere + cube move as one. The keyframe
-     composes `translate(-50%, -50%)` into every transform, replacing the
-     static centring transform we used to put on the wrapper directly. */
-  animation: cs-orb-core-breathe 7s ease-in-out infinite;
-  will-change: transform, filter;
-}
-
-.cs-orb__img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* Cube logo — sized at ~29% of the container to match the original
-   cube/sphere ratio, centred over the sphere with a slow 3D rotate.
-   The sphere PNG's bounds are expanded asymmetrically for effect bleed, so
-   the visible sphere is not centred in the image — the measured alpha-centroid
-   is (55.9%, 46.6%), which is where the cube must land to read as centred. */
-.cs-orb__cube {
-  position: absolute;
-  left: 55.9%;
-  top: 46.6%;
-  width: 29%;
-  height: auto;
-  transform: translate(-50%, -50%);
-  transform-origin: 50% 50%;
-  animation: cs-orb-cube-pulse 4.5s ease-in-out infinite;
-  pointer-events: none;
-  will-change: transform, filter;
-  /* mix-blend-mode: luminosity lets the cube take its lightness from its own
-     pixels and its colour from the purple sphere underneath at composite
-     time. */
-  mix-blend-mode: luminosity;
-}
-
-/* Flow chips (logos travelling along the beams) -------------------
-   72px square, ~16px corner radius, dark glass fill, gradient stroke,
-   layered drop shadow. */
-.cs-flow-chip {
-  width: 72px;
-  height: 72px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 16px;
-  background:
-    radial-gradient(120% 100% at 30% 20%, rgba(120, 90, 220, 0.28), rgba(20, 12, 50, 0.72) 75%),
-    linear-gradient(180deg, rgba(40, 24, 80, 0.85), rgba(20, 12, 50, 0.92));
-  border: 1px solid rgba(218, 182, 243, 0.35);
-  box-shadow:
-    0 12px 28px -10px rgba(8, 4, 30, 0.65),
-    0 6px 14px -6px rgba(8, 4, 30, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  position: relative;
-}
-
-.cs-flow-chip img {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
-}
-
-/* Inbound (vulnerable) — slightly muted + red status dot */
-.cs-flow-chip.is-in img {
-  filter: brightness(1.08) saturate(0.78);
-}
-
-.cs-flow-chip.is-in::after {
-  content: "";
-  position: absolute;
-  top: 7px;
-  right: 7px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #FF6C6C;
-  border: 1.5px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 0 0 8px rgba(255, 108, 108, 0.95);
-}
-
-/* Outbound (hardened) — gradient stroke (90deg #1E5AFF → #CDE4FF) plus a
-   green status dot. */
-.cs-flow-chip.is-out {
-  border: 1px solid transparent;
-  background:
-    linear-gradient(135deg, rgba(30, 90, 255, 0.18), rgba(255, 255, 255, 0.06)) padding-box,
-    linear-gradient(90deg, #1E5AFF 0%, #CDE4FF 100%) border-box;
-  box-shadow:
-    0 8px 24px -8px rgba(30, 90, 255, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
-}
-
-.cs-flow-chip.is-out img {
-  filter: brightness(1.18);
-}
-
-.cs-flow-chip.is-out::after {
-  content: "";
-  position: absolute;
-  top: 7px;
-  right: 7px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #2EFD54;
-  border: 1.5px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 0 0 10px rgba(46, 253, 84, 0.95);
-}
-
-@media (prefers-reduced-motion: reduce) {
-
-  .cs-orb,
-  .cs-orb__cube {
-    animation: none !important;
-  }
-
-  .cs-orb {
-    transform: translate(-50%, -50%);
-  }
-}
-
-/* ============================================================
    TESTIMONIALS — three-up carousel with dominant centre card.
    ============================================================ */
 
@@ -3424,29 +2969,6 @@ body {
   }
 }
 
-@keyframes cs-tt-slide-in-right {
-  from {
-    opacity: 0;
-    transform: translate3d(48px, 0, 0) scale(0.985);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-}
-
-@keyframes cs-tt-slide-in-left {
-  from {
-    opacity: 0;
-    transform: translate3d(-48px, 0, 0) scale(0.985);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-}
 
 .cs-tt-carousel {
   /* Allow side cards to extend beyond the section container width without
@@ -3558,33 +3080,6 @@ body {
   width: 0;
 }
 
-/* ---- Active (centre) card ----------------------------------------------
-   Subtle frosted panel: lifts the card off the gradient and cleanly masks
-   any side-card content that ends up behind its body area. Modern stacked-
-   deck pattern — keeps the active card clearly dominant while the sides
-   overlap behind. */
-.cs-tt-card--active {
-  /* v3 Consistency Layer: active card scales between 480px and 798px wide
-     (was: flat 798px), height clamps between 280 and 329 (was: flat 329). */
-  width: min(798px, 100%);
-  height: clamp(280px, 24vw, 329px);
-  max-width: 100%;
-  z-index: 30;
-  border-radius: 24px;
-  /* Fully opaque panel — no alpha. The side peeks were bleeding through
-     before, breaking the "in front" depth cue. */
-  background:
-    linear-gradient(135deg, #1F1740 0%, #242682 60%, #3F279E 100%);
-  box-shadow:
-    0 24px 60px -20px rgba(7, 4, 30, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.10),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-  /* Gentle floating only — the previous slide-in animation was leaving the
-     card offset from its centered final position when the page entered via
-     FadeUp wrapper. Float is purely vertical and doesn't break centering. */
-  animation: cs-tt-float 7s ease-in-out infinite;
-}
-
 .cs-tt-card--active .cs-tt-card__photo {
   width: clamp(200px, 20vw, 264px);
   height: 100%;
@@ -3614,197 +3109,6 @@ body {
   font-size: clamp(0.875rem, 0.95vw, 1rem);
 }
 
-.cs-tt-card__quote-mark {
-  display: block;
-  margin-bottom: -8px;
-}
-
-/* ---- Side peek cards (stacked-deck depth) ------------------------------
-   Full-content cards (photo + meta + quote + CTA) sitting BEHIND the active
-   card. Scaled down and dimmed via filter (NOT opacity, so the section
-   gradient doesn't bleed through). Reads as "another testimonial behind"
-   while remaining recognisable. Click to jump to that testimonial.        */
-.cs-tt-peek {
-  position: absolute;
-  top: 50%;
-  /* v3 Consistency Layer: peeks scale with the stage (was: flat 600x260). */
-  width: clamp(380px, 46vw, 600px);
-  height: clamp(200px, 21vw, 260px);
-  z-index: 10;
-  cursor: pointer;
-  border: 0;
-  padding: 0;
-  display: flex;
-  text-align: left;
-  background:
-    linear-gradient(135deg, rgba(28, 22, 58, 0.96) 0%, rgba(32, 32, 110, 0.94) 60%, rgba(54, 35, 138, 0.96) 100%);
-  border-radius: 22px;
-  overflow: hidden;
-  filter: blur(1.4px) saturate(0.78) brightness(0.66);
-  box-shadow:
-    0 18px 40px -20px rgba(7, 4, 30, 0.7),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-  transition:
-    filter 360ms ease-out,
-    transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* v3 Consistency Layer: peek inner-edge sits ~80px inside the active card.
-   Active card is min(798px, 100%) wide → its half-width = min(399px, 50cqi).
-   Left peek's right edge sits at stage_center − (active_half − 80).
-     wide stage  (≥798): active_half = 399px → translate = -319px (original)
-     narrow stage:       active_half = 50cqi → translate = 80 − 50cqi  (less negative)
-   Use max() so the value clamps to -319 at wide stages and walks toward
-   zero at narrow stages — keeping the peek's outer edge inside the stage. */
-.cs-tt-peek[data-pos="left"] {
-  right: 50%;
-  transform: translate(max(-319px, calc(80px - 50cqi)), -50%) scale(0.74);
-  transform-origin: right center;
-}
-
-.cs-tt-peek[data-pos="right"] {
-  left: 50%;
-  transform: translate(min(319px, calc(50cqi - 80px)), -50%) scale(0.74);
-  transform-origin: left center;
-}
-
-.cs-tt-peek:hover,
-.cs-tt-peek:focus-visible {
-  filter: blur(0.6px) saturate(1) brightness(0.86);
-}
-
-.cs-tt-peek[data-pos="left"]:hover,
-.cs-tt-peek[data-pos="left"]:focus-visible {
-  transform: translate(max(-300px, calc(99px - 50cqi)), -50%) scale(0.77);
-}
-
-.cs-tt-peek[data-pos="right"]:hover,
-.cs-tt-peek[data-pos="right"]:focus-visible {
-  transform: translate(min(300px, calc(50cqi - 99px)), -50%) scale(0.77);
-}
-
-.cs-tt-peek:focus-visible {
-  outline: 2px solid rgb(132 188 255 / 0.7);
-  outline-offset: 6px;
-}
-
-.cs-tt-peek__photo {
-  position: relative;
-  flex-shrink: 0;
-  width: clamp(160px, 16vw, 208px);
-  height: 100%;
-  overflow: hidden;
-  border-radius: 22px 0 0 22px;
-}
-
-.cs-tt-peek__photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.cs-tt-peek__body {
-  display: flex;
-  flex: 1 1 0%;
-  flex-direction: column;
-  justify-content: space-between;
-  min-width: 0;
-  padding: clamp(16px, 2vw, 22px) clamp(18px, 2.2vw, 24px);
-  color: white;
-}
-
-.cs-tt-peek__head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.cs-tt-peek__name {
-  display: block;
-  font-weight: 600;
-  font-size: clamp(0.875rem, 0.95vw, 1rem);
-  letter-spacing: -0.02em;
-}
-
-.cs-tt-peek__role {
-  display: block;
-  margin-top: 2px;
-  font-size: clamp(0.6875rem, 0.75vw, 0.75rem);
-  color: rgb(255 255 255 / 0.7);
-}
-
-.cs-tt-peek__quote {
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  font-size: clamp(0.875rem, 0.95vw, 1rem);
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: -0.02em;
-  margin: 10px 0;
-}
-
-.cs-tt-peek__cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: clamp(0.75rem, 0.8vw, 0.8125rem);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: rgb(255 255 255 / 0.95);
-}
-
-/* ---- Side cards (preview) ----------------------------------------------
-   Stacked-deck layout: both side cards fully inside the stage and visibly
-   peek out from behind the active card. Active's frosted body cleanly
-   masks the inner overlap so no readable text bleeds through. */
-.cs-tt-card--side {
-  position: absolute;
-  top: 50%;
-  width: 638px;
-  height: 263px;
-  z-index: 10;
-  cursor: pointer;
-  opacity: 0.42;
-  filter: blur(0.6px);
-  border-radius: 20px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.015) 100%);
-  box-shadow: 0 12px 32px -16px rgba(7, 4, 30, 0.5);
-  transition:
-    opacity 360ms ease-out,
-    filter 360ms ease-out,
-    transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.cs-tt-card--side[data-pos="left"] {
-  right: 50%;
-  transform: translateY(-50%) scale(0.85);
-  /* `right: 50%` anchors the card's unscaled right edge to the stage centre.
-     Scale(0.85) shrinks toward the card's own centre, so the visible side
-     card sits ~50 px left of stage centre with ~190 px peeking past the
-     active card's left edge. Both side cards fit fully within the stage. */
-}
-
-.cs-tt-card--side[data-pos="right"] {
-  left: 50%;
-  transform: translateY(-50%) scale(0.85);
-}
-
-.cs-tt-card--side:hover,
-.cs-tt-card--side:focus-visible {
-  opacity: 0.7;
-  filter: blur(0);
-  transform: translateY(-50%) scale(0.88);
-}
-
-.cs-tt-card--side:focus-visible {
-  outline: 2px solid rgb(132 188 255 / 0.7);
-  outline-offset: 6px;
-}
-
 .cs-tt-card--side .cs-tt-card__photo {
   width: 211px;
   height: 263px;
@@ -3830,11 +3134,6 @@ body {
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-.cs-tt-card__cta--peek {
-  font-size: 0.8125rem;
-  color: rgb(255 255 255 / 0.7);
 }
 
 /* ---- Mobile / narrow: hide side cards entirely ------------------------- */
@@ -4363,13 +3662,6 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cs-tt-card--active {
-    animation: none;
-  }
-
-  .cs-tt-card--side {
-    transition: none;
-  }
 
   .cs-tt-nav {
     transition: none;
@@ -4398,14 +3690,6 @@ body {
   .cs-marquee {
     animation: none;
   }
-}
-
-/* Gradient text used in section headings ("patching", "Advantage") */
-.cs-text-gradient-purple {
-  background: linear-gradient(90deg, #5a3df0 0%, #a06bff 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
 }
 
 /* Unified H2 gradient — the "Impact" style. Use anywhere a word inside an
@@ -4467,36 +3751,6 @@ body {
     linear-gradient(#000 0 0);
   mask-composite: exclude;
   pointer-events: none;
-}
-
-/* Brand-cyan stroke for icon-only SVG glyphs (Lucide, Heroicons, etc.).
-   `currentColor` flows through to the icon's stroke. A true linear gradient
-   on the stroke would require an inline <defs> in the same SVG — for the
-   small icons we use, solid cyan reads cleaner against the gradient-tinted
-   icon badge. */
-.cs-icon-gradient {
-  color: #2CC1EB;
-}
-
-/* Grid backdrop for security section (subtle) */
-.cs-section-light {
-  background:
-    radial-gradient(700px 350px at 12% 10%, rgba(99, 70, 255, 0.06), transparent 60%),
-    radial-gradient(700px 350px at 85% 80%, rgba(0, 200, 255, 0.06), transparent 60%),
-    #f5f6f7;
-}
-
-/* Container utility */
-.cs-container {
-  max-width: 1276px;
-  margin-inline: auto;
-  padding-inline: 24px;
-}
-
-@media (max-width: 1340px) {
-  .cs-container {
-    padding-inline: 32px;
-  }
 }
 
 @theme inline {
@@ -6115,76 +5369,6 @@ body {
 
 /* ─── Global Presence Map animations ──────────────────────────────────────── */
 
-@keyframes cs-map-pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.65;
-  }
-
-  70% {
-    transform: scale(2.6);
-    opacity: 0;
-  }
-
-  100% {
-    transform: scale(2.6);
-    opacity: 0;
-  }
-}
-
-@keyframes cs-map-arc-draw {
-  from {
-    stroke-dashoffset: 600;
-  }
-
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes cs-map-marker-in {
-  from {
-    transform: scale(0);
-    opacity: 0;
-  }
-
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes cs-map-tooltip-in {
-  from {
-    opacity: 0;
-    transform: translate(-50%, calc(-100% - 20px));
-  }
-
-  to {
-    opacity: 1;
-    transform: translate(-50%, calc(-100% - 12px));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cs-map-pulse-ring {
-    animation: none !important;
-    opacity: 0 !important;
-  }
-
-  .cs-map-arc {
-    animation: none !important;
-    stroke-dashoffset: 0 !important;
-  }
-
-  .cs-map-marker {
-    animation: none !important;
-  }
-
-  .cs-map-tooltip {
-    animation: none !important;
-  }
-}
 
 /* ── GlobalPresence network map ──────────────────────────────────────────── */
 @keyframes gp-svg-pulse {
