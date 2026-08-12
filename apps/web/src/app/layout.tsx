@@ -98,7 +98,11 @@ export async function generateMetadata(): Promise<Metadata> {
     // Verification tokens from the CMS (env google as fallback), emitted only
     // on the indexable production host so staging/preview stay unverified.
     verification: verificationFromDefaults(d, allowIndexing),
-    alternates: { canonical: "/" },
+    // Absolute + trailing slash so the canonical exactly matches both the
+    // served URL and the sitemap <loc>. A bare "/" is joined against
+    // metadataBase and loses the slash, making the homepage the only page
+    // where canonical, sitemap, and served URL disagree.
+    alternates: { canonical: `${SITE_URL}/` },
     robots: allowIndexing
       ? {
           index: true,
