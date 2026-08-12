@@ -16,7 +16,7 @@ const TestimonialsStats = dynamic(() =>
 );
 import { FrequentlyAskedQuestions } from "@/components/sections/home/FrequentlyAskedQuestions";
 import { HOME_FAQ_ITEMS } from "@/components/sections/home/home-faqs";
-import { faqPageSchema } from "@/lib/seo/jsonld";
+import { faqPageSchema, reviewSchema } from "@/lib/seo/jsonld";
 import { ogImageUrl } from "@/lib/seo/og";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
 import { getPageGraph } from "@/lib/seo/compose-page";
@@ -26,7 +26,6 @@ import { Footer } from "@/components/sections/Footer";
 import { ProcessBand } from "@/components/sections/home/ProcessBand";
 import { FadeUp } from "@/components/ui/FadeUp";
 import Image from "next/image";
-import { homeReviewSchema } from "@/lib/seo/home-review-schema";
 import { HOME_TESTIMONIALS } from "@/components/sections/home/testimonials-data";
 
 // The hero-top grid/glow SVG is the home page's measured LCP element. By default
@@ -74,7 +73,7 @@ export default async function Home(): Promise<React.ReactElement> {
     getImpactStats(),
     getPageGraph(
       "/",
-      [faqPageSchema([...HOME_FAQ_ITEMS]), ...homeReviewSchema(HOME_TESTIMONIALS)],
+      [faqPageSchema([...HOME_FAQ_ITEMS]), ...reviewSchema(HOME_TESTIMONIALS)],
       { primaryImagePath: HOME_OG_IMAGE },
     ),
   ]);

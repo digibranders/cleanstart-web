@@ -881,3 +881,42 @@ export function profilePageSchema({
     },
   };
 }
+
+export interface ReviewSourceInput {
+  name: string;
+  role: string;
+  company: string;
+  quote: string;
+}
+
+/**
+ * Review nodes for genuine, named customer testimonials, attached to the
+ * Organization via ORGANIZATION_ID. Unlike every other builder in this file,
+ * returns one node per input entry rather than a single node — each
+ * testimonial is its own top-level graph member.
+ *
+ * Deliberately emits no `reviewRating`: no numeric rating is collected from
+ * these customers, and inventing one to unlock a star rich result would be
+ * fabricated structured data. A Review without a rating is valid and honest
+ * (see the Review rule in validate/rich-result-lint.ts, where reviewRating
+ * is recommended, not required).
+ *
+ * Entries missing a name or quote are skipped — an unattributed review is
+ * worse than no review.
+ */
+export function reviewSchema(sources: readonly ReviewSourceInput[]) {
+  return sources
+    .filter((s) => s.name.trim().length > 0 && s.quote.trim().length > 0)
+    .map((s) => ({
+      "@context": "https://schema.org",
+      "@type": "Review",
+      reviewBody: s.quote,
+      itemReviewed: { "@id": ORGANIZATION_ID },
+      author: {
+        "@type": "Person",
+        name: s.name,
+        jobTitle: s.role,
+        affiliation: { "@type": "Organization", name: s.company },
+      },
+    }));
+}
