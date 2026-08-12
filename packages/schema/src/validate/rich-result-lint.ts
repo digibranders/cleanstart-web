@@ -128,7 +128,11 @@ export const RICH_RESULT_RULES: Readonly<Record<string, TypeRule>> = {
   WebSite: { required: ["name", "url"], recommended: ["publisher"] },
   BreadcrumbList: { required: ["itemListElement"], recommended: [] },
   ItemList: { required: ["itemListElement"], recommended: ["name"] },
-  Review: { required: ["itemReviewed", "reviewRating", "author"], recommended: [] },
+  // reviewRating is recommended, not required: Schema.org's own Review type
+  // doesn't mandate a rating, and a sourced testimonial with no rating data
+  // is a valid, honest Review — fabricating one to satisfy this rule would
+  // be worse than omitting it.
+  Review: { required: ["itemReviewed", "author"], recommended: ["reviewRating"] },
   AggregateRating: {
     required: ["itemReviewed", "ratingValue"],
     recommended: ["ratingCount", "reviewCount"],

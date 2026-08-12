@@ -33,6 +33,8 @@ function StepItem({ step }: { step: Step }) {
         src={`/images/process/${step.icon}`}
         alt=""
         aria-hidden
+        width={52}
+        height={52}
         loading="lazy"
         decoding="async"
         className="size-[52px] select-none"

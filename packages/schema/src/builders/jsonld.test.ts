@@ -5,6 +5,7 @@ import {
   eventSchema,
   jobPostingSchema,
   organizationSchema,
+  reviewSchema,
   videoObjectSchema,
 } from "./jsonld";
 
@@ -75,5 +76,54 @@ describe("jsonld builders (INV-3 output guard)", () => {
     expect(job.title).toBe("Eng");
     expect(job.description).toBe("do things");
     expect((job.hiringOrganization as { "@id": string })["@id"]).toBe(`${BASE}/#organization`);
+  });
+});
+
+describe("reviewSchema", () => {
+  const SAMPLE = [
+    {
+      name: "Mathan Babu K",
+      role: "CTSO & DPO, Vodafone Idea",
+      company: "Vodafone Idea",
+      quote: "CleanStart's shift-left security approach arrived at a critical time.",
+    },
+  ];
+
+  it("builds one Review per entry, attributed to the named person, referencing the real Organization @id", () => {
+    const [review] = reviewSchema(SAMPLE);
+
+    expect(review).toMatchObject({
+      "@type": "Review",
+      reviewBody: SAMPLE[0]?.quote,
+      author: { "@type": "Person", name: "Mathan Babu K" },
+      itemReviewed: { "@id": `${BASE}/#organization` },
+    });
+  });
+
+  it("never emits a rating, since no rating data is collected", () => {
+    const [review] = reviewSchema(SAMPLE);
+
+    expect(review).not.toHaveProperty("reviewRating");
+  });
+
+  it("records the reviewer's employer as the author's affiliation", () => {
+    const [review] = reviewSchema(SAMPLE);
+
+    expect(review).toMatchObject({
+      author: { affiliation: { "@type": "Organization", name: "Vodafone Idea" } },
+    });
+  });
+
+  it("skips entries missing a name or quote", () => {
+    const incomplete = [
+      { name: "", role: "r", company: "c", quote: "q" },
+      { name: "n", role: "r", company: "c", quote: "" },
+    ];
+
+    expect(reviewSchema(incomplete)).toEqual([]);
+  });
+
+  it("returns an empty array for no entries", () => {
+    expect(reviewSchema([])).toEqual([]);
   });
 });

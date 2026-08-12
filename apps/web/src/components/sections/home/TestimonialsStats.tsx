@@ -144,6 +144,8 @@ function TestimonialCard({
         src="/images/home/quote-mark.svg"
         alt=""
         aria-hidden
+        width={42}
+        height={42}
         loading="lazy"
         decoding="async"
         className="pointer-events-none absolute right-6 top-6 size-[42px] rotate-180 select-none"
@@ -211,6 +213,8 @@ function StatItem({
         src={icon}
         alt=""
         aria-hidden
+        width={40}
+        height={40}
         loading="lazy"
         decoding="async"
         className="size-10 select-none"

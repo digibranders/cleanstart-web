@@ -98,6 +98,14 @@ export async function generateMetadata(): Promise<Metadata> {
     // Verification tokens from the CMS (env google as fallback), emitted only
     // on the indexable production host so staging/preview stay unverified.
     verification: verificationFromDefaults(d, allowIndexing),
+    // Next.js's own metadata resolver (resolveAbsoluteUrlWithPathname)
+    // unconditionally collapses a root-path canonical to the bare origin
+    // whenever `trailingSlash` isn't enabled in next.config.ts (it isn't —
+    // the site strips trailing slashes everywhere by policy, see
+    // shouldRedirectTrailingSlash in proxy.ts). No string passed here can
+    // survive that: "/" and an absolute "https://.../ " both resolve to the
+    // same origin-only canonical at render time. Verified against a
+    // production build; kept as the plain path form other pages use.
     alternates: { canonical: "/" },
     robots: allowIndexing
       ? {
