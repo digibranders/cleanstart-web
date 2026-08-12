@@ -1,5 +1,5 @@
 import type { GraphNode } from "@cleanstart/schema";
-import type { Testimonial } from "@/components/sections/home/Testimonials";
+import type { Testimonial } from "@/components/sections/home/testimonials-data";
 import { SITE_URL } from "./canonical";
 
 /**

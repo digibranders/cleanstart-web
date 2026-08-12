@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Testimonial } from "@/components/sections/home/Testimonials";
+import type { Testimonial } from "@/components/sections/home/testimonials-data";
 import { homeReviewSchema } from "./home-review-schema";
 
 const SAMPLE: Testimonial[] = [

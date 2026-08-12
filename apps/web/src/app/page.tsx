@@ -27,7 +27,7 @@ import { ProcessBand } from "@/components/sections/home/ProcessBand";
 import { FadeUp } from "@/components/ui/FadeUp";
 import Image from "next/image";
 import { homeReviewSchema } from "@/lib/seo/home-review-schema";
-import { HOME_TESTIMONIALS } from "@/components/sections/home/Testimonials";
+import { HOME_TESTIMONIALS } from "@/components/sections/home/testimonials-data";
 
 // The hero-top grid/glow SVG is the home page's measured LCP element. By default
 // it is discovered late and fetched at Low priority, which on mobile produced a
