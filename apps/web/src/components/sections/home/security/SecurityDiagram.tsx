@@ -112,6 +112,8 @@ function StageItem({
           src={`/images/security/${stage.icon}`}
           alt=""
           aria-hidden
+          width={48}
+          height={48}
           loading="lazy"
           decoding="async"
           className="relative size-12 select-none"
