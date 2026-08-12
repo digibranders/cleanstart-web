@@ -26,6 +26,8 @@ import { Footer } from "@/components/sections/Footer";
 import { ProcessBand } from "@/components/sections/home/ProcessBand";
 import { FadeUp } from "@/components/ui/FadeUp";
 import Image from "next/image";
+import { homeReviewSchema } from "@/lib/seo/home-review-schema";
+import { HOME_TESTIMONIALS } from "@/components/sections/home/Testimonials";
 
 // The hero-top grid/glow SVG is the home page's measured LCP element. By default
 // it is discovered late and fetched at Low priority, which on mobile produced a
@@ -70,9 +72,11 @@ export default async function Home(): Promise<React.ReactElement> {
   // pays one round-trip of latency, not two (cuts homepage TTFB on cache miss).
   const [impactStats, graph] = await Promise.all([
     getImpactStats(),
-    getPageGraph("/", [faqPageSchema([...HOME_FAQ_ITEMS])], {
-      primaryImagePath: HOME_OG_IMAGE,
-    }),
+    getPageGraph(
+      "/",
+      [faqPageSchema([...HOME_FAQ_ITEMS]), ...homeReviewSchema(HOME_TESTIMONIALS)],
+      { primaryImagePath: HOME_OG_IMAGE },
+    ),
   ]);
   return (
     <>
