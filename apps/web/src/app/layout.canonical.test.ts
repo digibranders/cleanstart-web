@@ -19,10 +19,17 @@ vi.mock("next/font/google", () => ({
 }));
 
 describe("root layout canonical", () => {
-  it("self-references the homepage with a trailing slash", async () => {
+  it("uses the plain path form ('/'), matching every other page's canonical style", async () => {
     const { generateMetadata } = await import("./layout");
     const meta = await generateMetadata();
 
-    expect(meta.alternates?.canonical).toBe("https://www.cleanstart.com/");
+    // Pinned intentionally at "/", NOT an absolute trailing-slash URL. Next's
+    // resolveAbsoluteUrlWithPathname (lib/metadata/resolvers/resolve-url.js)
+    // collapses ANY root-path canonical to the bare origin at render time
+    // whenever `trailingSlash` is unset in next.config.ts, which it is here.
+    // Passing an absolute "https://www.cleanstart.com/" changes nothing in
+    // the rendered <link> tag — verified against a production build — so
+    // there is no string to put here that survives Next's own resolver.
+    expect(meta.alternates?.canonical).toBe("/");
   });
 });
