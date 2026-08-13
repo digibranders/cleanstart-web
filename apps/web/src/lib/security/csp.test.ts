@@ -47,6 +47,14 @@ describe('buildCsp', () => {
     expect(d['frame-src']).toContain("'self'");
   });
 
+  it('allows the Turnstile challenge iframe in frame-src', () => {
+    const d = parse(buildCsp(base));
+    // Turnstile's loader is covered by script-src 'https:', but its challenge
+    // renders in an iframe from this origin. Omitting it strips bot protection
+    // from every lead form the moment CSP_ENFORCE is set.
+    expect(d['frame-src']).toContain('https://challenges.cloudflare.com');
+  });
+
   it('allows GA4 gtag.js and its collect endpoints (incl. regional)', () => {
     const d = parse(buildCsp(base));
     expect(d['connect-src']).toContain('https://www.googletagmanager.com');

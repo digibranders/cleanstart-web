@@ -30,6 +30,14 @@ const LEADFEEDER = 'https://*.lfeeder.com';
 // these iframes fall back to `default-src 'self'` and are blocked outright the
 // moment CSP_ENFORCE is set.
 const YOUTUBE_EMBED = 'https://www.youtube-nocookie.com';
+// Cloudflare Turnstile renders its challenge in an iframe from this origin.
+// The loader script is covered by `script-src 'https:'`, but the iframe is
+// not — without it here, every Turnstile-protected form (book-a-demo, deal
+// registration, contact, job apply, partner CTA, and every CMS form rendered
+// by FormRenderer) loses bot protection the moment CSP_ENFORCE is set.
+// Confirmed against the live report-only policy, which logs:
+//   Framing 'https://challenges.cloudflare.com/' violates … "frame-src …"
+const TURNSTILE_FRAME = 'https://challenges.cloudflare.com';
 
 // Frame-ancestors override applied to preview surfaces (cookie-based
 // draft mode AND the new token-based `/preview/*` route). In every
@@ -120,7 +128,7 @@ export function buildCsp({
     ['font-src', fontSrc.join(' ')],
     ['media-src', mediaSrc.join(' ')],
     ['connect-src', connectSrc.join(' ')],
-    ['frame-src', ["'self'", YOUTUBE_EMBED].join(' ')],
+    ['frame-src', ["'self'", YOUTUBE_EMBED, TURNSTILE_FRAME].join(' ')],
     ['frame-ancestors', frameAncestors.join(' ')],
     ['base-uri', "'self'"],
     ['form-action', "'self'"],
