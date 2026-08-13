@@ -12,7 +12,7 @@ import { getPageGraph } from "@/lib/seo/compose-page";
 export const metadata = buildPageMetadata({
   title: "Deal Registration",
   description:
-    "Register your CleanStart deal to protect your pipeline, access partner pricing, and collaborate with the CleanStart team on enterprise opportunities in secure software supply chain.",
+    "Register your CleanStart deal to protect your pipeline, access partner pricing, and collaborate on enterprise supply chain security opportunities.",
   path: "/deal-registration",
 });
 
