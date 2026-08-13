@@ -111,9 +111,22 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/webinars' },
 ];
 
+/**
+ * Root is emitted as the bare origin (no trailing slash) so the `<loc>` matches
+ * the homepage's own `rel=canonical` byte-for-byte.
+ *
+ * The two forms are equivalent — RFC 3986 §6.2.3 normalises an empty http(s)
+ * path to `/` — so this changes nothing Google acts on. It exists because the
+ * canonical is the side we cannot move: Next's metadata resolver collapses any
+ * root-path canonical to the origin unless `trailingSlash` is enabled, and
+ * enabling that would invert the trailing-slash policy `proxy.ts` applies to
+ * every other route. Aligning the sitemap is the side that is safe to change.
+ *
+ * Every non-root path already lacks a trailing slash, so this only affects `/`.
+ */
 function entry(path: string, lastModified?: string): MetadataRoute.Sitemap[number] {
   return {
-    url: `${SITE_URL}${path}`,
+    url: path === '/' ? SITE_URL : `${SITE_URL}${path}`,
     ...(lastModified ? { lastModified: new Date(lastModified) } : {}),
   };
 }
