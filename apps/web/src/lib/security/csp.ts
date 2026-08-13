@@ -38,6 +38,13 @@ const YOUTUBE_EMBED = 'https://www.youtube-nocookie.com';
 // Confirmed against the live report-only policy, which logs:
 //   Framing 'https://challenges.cloudflare.com/' violates … "frame-src …"
 const TURNSTILE_FRAME = 'https://challenges.cloudflare.com';
+// YouTube video thumbnails/posters (podcast episode cards, Knowledge Hub
+// lessons, the Clean Libraries hero). These come from ytimg.com, NOT from the
+// youtube-nocookie origin allowed in frame-src — allowing the player does not
+// allow its poster images. YouTube serves them from `i.` and numbered `i1.`–
+// `i4.` hosts (`podcast-utils.ts` builds `i.ytimg.com`; feed items arrive with
+// `i4.ytimg.com`), so the wildcard covers the rotation.
+const YOUTUBE_THUMBS = 'https://*.ytimg.com';
 
 // Frame-ancestors override applied to preview surfaces (cookie-based
 // draft mode AND the new token-based `/preview/*` route). In every
@@ -88,6 +95,8 @@ export function buildCsp({
     GTM,
     // Leadfeeder tracking pixel.
     LEADFEEDER,
+    // YouTube poster frames — see YOUTUBE_THUMBS.
+    YOUTUBE_THUMBS,
   ];
 
   const fontSrc = ["'self'", 'https://fonts.gstatic.com', 'data:'];

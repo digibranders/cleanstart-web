@@ -47,6 +47,13 @@ describe('buildCsp', () => {
     expect(d['frame-src']).toContain("'self'");
   });
 
+  it('allows YouTube poster images in img-src', () => {
+    const d = parse(buildCsp(base));
+    // frame-src allows the player origin; the thumbnails come from ytimg.com.
+    // Without this, every podcast/lesson poster frame is blocked outright.
+    expect(d['img-src']).toContain('https://*.ytimg.com');
+  });
+
   it('allows the Turnstile challenge iframe in frame-src', () => {
     const d = parse(buildCsp(base));
     // Turnstile's loader is covered by script-src 'https:', but its challenge
