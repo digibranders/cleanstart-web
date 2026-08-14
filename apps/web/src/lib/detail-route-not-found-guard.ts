@@ -16,11 +16,17 @@
  * check is unavoidably "an await that may suspend" (and `dynamicParams:
  * true` requires it to stay live, so newly-published content still renders
  * on demand) — so once inside any of these pages, the check is already too
- * late: the root `app/loading.tsx` boundary is an ancestor of every route in
- * the app and cannot be removed without losing the app-wide instant-loading
- * UX. The only place left to decide "does this exist" before React starts
+ * late. The only place left to decide "does this exist" before React starts
  * rendering at all is `proxy.ts`, which runs ahead of routing. This module
  * is consumed from there — see `apps/web/src/proxy.ts`.
+ *
+ * This guard is independent of `loading.tsx`. It originally cited the root
+ * `app/loading.tsx` as the boundary forcing the 200, but every `loading.tsx`
+ * was removed (they streamed all page content into trailing `<div hidden>`
+ * blocks, so text extractors saw ~100 characters instead of the article) and
+ * the guard still returns correct 404s, because it runs before routing rather
+ * than inside it. Do not reintroduce a `loading.tsx` to "restore" this guard —
+ * it never depended on one, and doing so would re-hide page content.
  *
  * Fails open: any CMS/network error is treated as "exists" so a transient
  * CMS outage degrades to the pre-existing (SEO-imperfect but functionally
