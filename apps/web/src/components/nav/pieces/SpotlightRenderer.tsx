@@ -145,8 +145,12 @@ export function SpotlightRenderer({ spotlight, hero = false, dense = false, styl
   }
 
   if (spotlight.kind === "evergreen" && spotlight.id === "bulletin") {
+    // Links straight to /blogs, which hosts the Bulletin signup form
+    // (BlogsCTA). The legacy /subscribe path only 308s here, and this card
+    // renders in the nav on every page — so pointing at it put a redirect hop
+    // on every internal link crawl of the site.
     return (
-      <Link href="/subscribe" className={`${CARD} ${minH("min-h-[230px]")}`} style={style}>
+      <Link href="/blogs" className={`${CARD} ${minH("min-h-[230px]")}`} style={style}>
         <div>
           <div className={EYEBROW}>Newsletter</div>
           <div className={`mt-2 ${headlineClass}`}>Get the CleanStart Bulletin.</div>

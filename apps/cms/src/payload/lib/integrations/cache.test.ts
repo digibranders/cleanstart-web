@@ -83,6 +83,31 @@ describe('writeCache', () => {
     const payload = { create: vi.fn().mockRejectedValue(new Error('boom')) } as unknown as BasePayload;
     await expect(writeCache(payload, 'msClarity', 'global', 'k', {})).resolves.toBeUndefined();
   });
+
+  it('still cron-safe when the payload instance has no logger', async () => {
+    // Guards the ordering of the two guarantees: a failed write must never
+    // throw into a cron, so the diagnostic logging can't be what breaks it.
+    const payload = {
+      create: vi.fn().mockRejectedValue(new Error('boom')),
+      logger: undefined,
+    } as unknown as BasePayload;
+    await expect(writeCache(payload, 'msClarity', 'global', 'k', {})).resolves.toBeUndefined();
+  });
+
+  it('logs the failure so a stalled cache key is diagnosable', async () => {
+    const error = vi.fn();
+    const payload = {
+      create: vi.fn().mockRejectedValue(new Error('boom')),
+      logger: { error },
+    } as unknown as BasePayload;
+
+    await writeCache(payload, 'msClarity', 'global', 'k', {});
+
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(error.mock.calls[0]?.[0]).toEqual(
+      expect.objectContaining({ provider: 'msClarity', scope: 'global', key: 'k' }),
+    );
+  });
 });
 
 describe('isStale', () => {

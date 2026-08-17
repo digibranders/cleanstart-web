@@ -11,6 +11,7 @@ import { CaseStudiesHero } from "@/components/sections/case-studies/CaseStudiesH
 import { Testimonials } from "@/components/sections/home/Testimonials";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { getCaseStudies } from "@/lib/case-studies";
+import { mediaUrl } from "@/lib/case-studies-utils";
 import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, caseStudyListSchema } from "@/lib/seo/jsonld";
 
@@ -59,6 +60,8 @@ export default async function CaseStudiesPage(): Promise<React.ReactElement> {
               summary: s.summary,
               company: s.company,
               publishedAt: s.publishedAt,
+              slug: s.slug,
+              imageUrl: mediaUrl(s.coverImage?.url),
             })),
           )}
         />

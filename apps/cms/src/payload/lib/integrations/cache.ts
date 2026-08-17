@@ -116,8 +116,20 @@ export const writeCache = async <T = unknown>(
       },
       overrideAccess: true,
     });
-  } catch {
-    // Cache write must never throw into a cron — the next refresh re-tries.
+  } catch (err) {
+    // Still never throws into a cron — the next refresh re-tries — but the
+    // failure is logged rather than discarded. Swallowing it silently meant a
+    // whole class of cache key could stop updating for weeks with nothing to
+    // show for it: every `overview:*` key and `crux:default` last wrote on
+    // 2026-06-29 while the frequent-dashboard keys kept going, and there was
+    // no error anywhere to explain the difference.
+    // Optional-chained: the "never throws into a cron" guarantee outranks the
+    // logging, so a payload instance without a logger must not turn a cache
+    // miss into a failed job.
+    payload.logger?.error?.(
+      { err, provider, scope, key, env: currentEnv() },
+      'analyticsCache write failed — cache key will serve stale data',
+    );
   }
 };
 
