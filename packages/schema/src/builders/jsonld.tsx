@@ -784,6 +784,11 @@ export interface CaseStudyListItem {
   summary: string;
   company: string;
   publishedAt?: string | null | undefined;
+  /** Slug of the case study. Emitted as a `#slug` fragment so each entry has a
+   *  distinct, deep-linkable URL; the listing renders a matching element id. */
+  slug?: string | null | undefined;
+  /** Absolute cover-image URL. Google's Article guidance recommends `image`. */
+  imageUrl?: string | null | undefined;
 }
 
 export function caseStudyListSchema(items: CaseStudyListItem[]) {
@@ -801,7 +806,16 @@ export function caseStudyListSchema(items: CaseStudyListItem[]) {
         headline: s.title,
         description: s.summary,
         about: s.company,
-        url: absoluteUrl("/case-studies"),
+        // Distinct per entry. Every item previously carried the bare listing
+        // URL, so nothing could deep-link to a specific customer story. The
+        // listing renders `id="<slug>"` on each card, so the fragment resolves.
+        url: s.slug
+          ? `${absoluteUrl("/case-studies")}#${s.slug}`
+          : absoluteUrl("/case-studies"),
+        ...(s.imageUrl ? { image: [s.imageUrl] } : {}),
+        // Case studies are corporate-authored; the Organization is the honest
+        // author as well as the publisher.
+        author: { "@id": ORGANIZATION_ID },
         publisher: { "@id": ORGANIZATION_ID },
         ...(s.publishedAt ? { datePublished: s.publishedAt } : {}),
       },

@@ -4,6 +4,7 @@ import {
   breadcrumbSchema,
   eventSchema,
   jobPostingSchema,
+  caseStudyListSchema,
   organizationSchema,
   reviewSchema,
   videoObjectSchema,
@@ -76,6 +77,44 @@ describe("jsonld builders (INV-3 output guard)", () => {
     expect(job.title).toBe("Eng");
     expect(job.description).toBe("do things");
     expect((job.hiringOrganization as { "@id": string })["@id"]).toBe(`${BASE}/#organization`);
+  });
+});
+
+describe("caseStudyListSchema", () => {
+  const ITEMS = [
+    { title: "IIFL", summary: "s1", company: "IIFL Finance", slug: "iifl-story", imageUrl: `${BASE}/a.jpg` },
+    { title: "Aurascape", summary: "s2", company: "Aurascape", slug: "aurascape-story" },
+  ];
+
+  it("gives each entry a distinct deep-linkable URL", () => {
+    const list = caseStudyListSchema(ITEMS) as unknown as {
+      itemListElement: Array<{ item: { url: string } }>;
+    };
+    const urls = list.itemListElement.map((e) => e.item.url);
+
+    expect(urls).toEqual([`${BASE}/case-studies#iifl-story`, `${BASE}/case-studies#aurascape-story`]);
+    expect(new Set(urls).size).toBe(urls.length);
+  });
+
+  it("emits image when a cover exists and always attributes an author", () => {
+    const list = caseStudyListSchema(ITEMS) as unknown as {
+      itemListElement: Array<{ item: Record<string, unknown> }>;
+    };
+    const [first, second] = list.itemListElement.map((e) => e.item);
+
+    expect(first?.image).toEqual([`${BASE}/a.jpg`]);
+    expect(second).not.toHaveProperty("image");
+    for (const item of [first, second]) {
+      expect(item?.author).toEqual({ "@id": `${BASE}/#organization` });
+      expect(item?.publisher).toEqual({ "@id": `${BASE}/#organization` });
+    }
+  });
+
+  it("falls back to the bare listing URL when an entry has no slug", () => {
+    const list = caseStudyListSchema([{ title: "t", summary: "s", company: "c" }]) as unknown as {
+      itemListElement: Array<{ item: { url: string } }>;
+    };
+    expect(list.itemListElement[0]?.item.url).toBe(`${BASE}/case-studies`);
   });
 });
 
