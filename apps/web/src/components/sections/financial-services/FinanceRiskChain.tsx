@@ -1,104 +1,123 @@
 import type React from 'react';
-import { Reveal } from '@/components/ui/Reveal';
-import { RISK_ART } from './FinanceRiskArt';
+import { Fragment } from 'react';
+import Image from 'next/image';
+import { FlowArrow } from '@/components/ui/FlowArrow';
+import { Reveal, RevealItem, RevealStagger } from '@/components/ui/Reveal';
 
 /*
- * FinanceRiskChain — "Risk Enters Long Before Production".
+ * "Risk Enters Long Before Production" — the site's canonical dark band
+ * (#151021 → #131E8F → #471EC0) with the shared overlay meshes, carrying the
+ * proposal's six-stage supply chain.
  *
- * The one dark band in the page body, and the page's turn from what the
- * software is made of to where it goes wrong. Built to the proposal's own
- * reference for this section: a chain of objects with risk arriving at every
- * one of them, resolving at the institution.
+ * The connector is the site's own FlowArrow — the dotted tail that flows
+ * rightward into a chevron, staggered per gap the way home/ProcessBand
+ * staggers it — so the chain reads as one continuous accumulation arriving at
+ * the institution. It sits in the gutter BETWEEN nodes rather than running
+ * through them, which the previous hairline did.
  *
- * It is deliberately a SEQUENCE where the section above it is a SET — six
- * objects wired in order on a spine, on dark, at smaller scale, ending in the
- * one object on the page that is not a software component. Same drawn
- * vocabulary, different argument, so the two sections never read as the same
- * layout twice.
- *
- * Real DOM with real text, so it reflows, translates, and reads to a screen
- * reader — none of which the reference raster could do.
+ * The first four stages reuse the exact icons the section above assigns to the
+ * same components, so the chain reads as those components moving downstream
+ * rather than as a new set of objects. Copy is the proposal's, verbatim; the
+ * two-line labels match the proposal's own reference for this section.
  */
 
 interface Stage {
-  title: string;
+  icon: string;
+  iconAlt: string;
+  /** Split across two lines so all six labels are the same depth. */
+  line1: string;
+  line2: string;
   /** The terminal node — what everything upstream arrives at. */
   terminal?: boolean;
 }
 
 const STAGES: readonly Stage[] = [
-  { title: 'Open Source Components' },
-  { title: 'Libraries & Dependencies' },
-  { title: 'Container Images' },
-  { title: 'AI-Generated Code' },
-  { title: 'Build & Delivery Pipeline' },
-  { title: 'Financial Applications', terminal: true },
+  {
+    icon: '/images/compare/icon-origin.webp',
+    iconAlt: '3D icon of a component block with an origin marker',
+    line1: 'Open Source',
+    line2: 'Components',
+  },
+  {
+    icon: '/images/compare/icon-provenance.webp',
+    iconAlt: '3D icon of linked component blocks',
+    line1: 'Libraries &',
+    line2: 'Dependencies',
+  },
+  {
+    icon: '/images/cleanstart-images/uvp-icon-smaller-images.webp',
+    iconAlt: '3D icon of stacked container blocks',
+    line1: 'Container',
+    line2: 'Images',
+  },
+  {
+    icon: '/images/compare/icon-ai-bom.webp',
+    iconAlt: '3D icon of a document with a processor chip',
+    line1: 'AI-Generated',
+    line2: 'Code',
+  },
+  {
+    icon: '/images/attack-surface-reduction/deploy-icon.webp',
+    iconAlt: '3D icon of a delivery pipeline',
+    line1: 'Build & Delivery',
+    line2: 'Pipeline',
+  },
+  {
+    icon: '/images/compare/icon-regulatory.webp',
+    iconAlt: '3D icon of a financial institution with a shield',
+    line1: 'Financial',
+    line2: 'Applications',
+    terminal: true,
+  },
 ];
 
-// Spine colour per segment — risk red where it enters, resolving toward the
-// cyan of the terminal object. One entry per gap between stages.
-const SEGMENT: readonly string[] = [
-  'rgba(255, 95, 95, 0.6)',
-  'rgba(226, 96, 158, 0.6)',
-  'rgba(184, 96, 200, 0.6)',
-  'rgba(140, 130, 224, 0.62)',
-  'rgba(95, 216, 255, 0.68)',
-];
-
-function StageNode({
-  title,
-  terminal,
-  index,
-  last,
-}: Stage & { index: number; last: boolean }): React.ReactElement {
-  const Art = RISK_ART[index];
+function StageNode({ icon, iconAlt, line1, line2, terminal }: Stage): React.ReactElement {
   return (
-    <div className="relative flex flex-col items-center text-center">
-      {/* Spine segment to the next stage — drawn per node so the chain stops at
-          the institution rather than running on past it. */}
-      {!last ? (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute hidden lg:block"
-          style={{
-            left: '50%',
-            right: 'calc(-50% - var(--fin-gap))',
-            top: '71%',
-            height: '1px',
-            background: SEGMENT[index],
-          }}
-        >
-          {/* Risk entering here and moving downstream. Each segment carries one,
-              staggered, so the chain reads as continuous accumulation rather
-              than as six separate events. */}
-          <span
-            className="cs-fin-carry"
-            style={{ background: SEGMENT[index], animationDelay: `${index * 0.55}s` }}
-          />
-        </div>
-      ) : null}
-
+    <div className="flex flex-col items-center text-center">
       <div
-        aria-hidden
-        className="relative z-[1]"
-        style={{ width: 'min(100%, 196px)', aspectRatio: '160 / 150' }}
+        className="relative flex items-center justify-center"
+        style={{ height: 'var(--fin-icon)' }}
       >
-        {Art ? <Art /> : null}
+        {/* Halo — seats the object on the band. Cyan at the destination, violet
+            at every stage that is still a software component. */}
+        <span
+          aria-hidden
+          className="absolute"
+          style={{
+            width: 'calc(var(--fin-icon) * 1.34)',
+            height: 'calc(var(--fin-icon) * 1.34)',
+            borderRadius: '50%',
+            background: terminal
+              ? 'radial-gradient(closest-side, rgba(44,193,235,0.36) 0%, rgba(44,193,235,0) 72%)'
+              : 'radial-gradient(closest-side, rgba(154,81,255,0.30) 0%, rgba(154,81,255,0) 72%)',
+          }}
+        />
+        <Image
+          src={icon}
+          alt={iconAlt}
+          width={144}
+          height={144}
+          sizes="144px"
+          className="relative object-contain"
+          style={{ height: 'var(--fin-icon)', width: 'auto' }}
+        />
       </div>
 
       <h3
         style={{
-          marginTop: '2px',
+          marginTop: 'clamp(14px, 1.4vw, 20px)',
           fontFamily: 'var(--font-display)',
-          fontSize: 'var(--fs-h6)',
+          fontSize: 'var(--fs-h5)',
           fontWeight: 600,
-          letterSpacing: '-0.015em',
-          lineHeight: 1.35,
-          color: terminal ? '#a6ecff' : '#ffffff',
-          maxWidth: '16ch',
+          letterSpacing: '-0.03em',
+          lineHeight: 1.3,
+          color: terminal ? '#A6ECFF' : '#ffffff',
         }}
       >
-        {title}
+        {/* Two spans rather than a <br /> — the repo bans <br /> in copy, and
+            block spans keep the label one accessible string. */}
+        <span className="block">{line1}</span>
+        <span className="block">{line2}</span>
       </h3>
     </div>
   );
@@ -110,47 +129,86 @@ export function FinanceRiskChain(): React.ReactElement {
       data-section="FinanceRiskChain"
       className="relative overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, #0e0a20 0%, #150e33 52%, #110c28 100%)',
+        background: 'linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)',
       }}
     >
-      <div
-        className="relative mx-auto"
+      {/* Shared overlay meshes — the decoration this dark band always carries. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        src="/images/attack-surface-reduction/prod-mesh-2.svg"
+        alt=""
+        className="pointer-events-none absolute hidden select-none mix-blend-overlay md:block"
         style={{
-          maxWidth: 'var(--container-default)',
-          paddingLeft: 'clamp(16px, 4vw, 48px)',
-          paddingRight: 'clamp(16px, 4vw, 48px)',
-          paddingTop: 'clamp(44px, 4.2vw, 68px)',
-          paddingBottom: 'clamp(36px, 3.4vw, 52px)',
+          right: '-150px',
+          top: '-175px',
+          width: '488px',
+          height: '497px',
+          transform: 'rotate(141.39deg) scaleY(-1)',
+        }}
+        loading="lazy"
+        decoding="async"
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        src="/images/attack-surface-reduction/prod-mesh-1.svg"
+        alt=""
+        className="pointer-events-none absolute hidden select-none mix-blend-overlay md:block"
+        style={{
+          left: '-147px',
+          bottom: '-180px',
+          width: '469px',
+          height: '488px',
+          transform: 'rotate(-150deg) scaleY(-1)',
+        }}
+        loading="lazy"
+        decoding="async"
+      />
+
+      <div
+        className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10"
+        style={{
+          paddingTop: 'clamp(60px, 8vw, 128px)',
+          paddingBottom: 'clamp(56px, 7vw, 112px)',
         }}
       >
-        <div className="grid grid-cols-1 gap-x-16 gap-y-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-end">
+        <div className="mx-auto flex max-w-[820px] flex-col items-center gap-5 text-center">
           <Reveal header>
             <h2
-              className="text-white"
               style={{
-                maxWidth: '19ch',
                 fontFamily: 'var(--font-display)',
                 fontSize: 'var(--fs-h2)',
                 fontWeight: 600,
                 letterSpacing: '-0.04em',
-                lineHeight: 1.1,
-                margin: 0,
+                lineHeight: 1.05,
+                color: '#ffffff',
               }}
             >
-              Risk Enters Long Before Production
+              Risk Enters Long{' '}
+              <span
+                style={{
+                  background: 'linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                Before Production
+              </span>
             </h2>
           </Reveal>
 
-          <Reveal delay={0.08} y={20}>
+          <Reveal header delay={0.15} y={20}>
             <p
               style={{
-                maxWidth: '46ch',
                 fontFamily: 'var(--font-sans)',
                 fontSize: 'var(--fs-lead-sm)',
                 fontWeight: 400,
-                letterSpacing: '-0.01em',
-                lineHeight: 1.55,
-                color: 'rgba(222, 218, 244, 0.76)',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.5,
+                color: 'rgba(255,255,255,0.8)',
+                maxWidth: '600px',
                 margin: 0,
               }}
             >
@@ -160,44 +218,53 @@ export function FinanceRiskChain(): React.ReactElement {
           </Reveal>
         </div>
 
-        <Reveal y={22}>
-          <div
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6"
-            style={
-              {
-                marginTop: 'clamp(34px, 3.6vw, 56px)',
-                // Read back by each node's spine segment so the connector spans
-                // exactly the gutter it has to cross.
-                '--fin-gap': 'clamp(12px, 1.4vw, 24px)',
-                columnGap: 'var(--fin-gap)',
-                rowGap: 'clamp(28px, 3vw, 40px)',
-              } as React.CSSProperties
-            }
-          >
-            {STAGES.map((s, i) => (
-              <StageNode key={s.title} {...s} index={i} last={i === STAGES.length - 1} />
+        {/*
+         * One row, one set of headings. It wraps two-up then three-up and only
+         * becomes a single line at lg, where the arrows appear — so there is no
+         * second mobile copy of the six labels in the DOM.
+         */}
+        {/* The custom property lives on a plain wrapper: RevealStagger's `style`
+            is a MotionStyle, which a CSSProperties cast does not satisfy under
+            the build's stricter type check. */}
+        <div
+          style={
+            {
+              marginTop: 'clamp(48px, 6.2vw, 96px)',
+              // Read by the node's icon box and by each arrow's offset, so the
+              // arrows land on the icons' centre line at every width.
+              '--fin-icon': 'clamp(84px, 7.4vw, 108px)',
+            } as React.CSSProperties
+          }
+        >
+          <RevealStagger className="flex flex-wrap items-start justify-center gap-x-4 gap-y-10 lg:flex-nowrap lg:justify-between lg:gap-x-2">
+            {STAGES.map((stage, i) => (
+              <Fragment key={stage.line1}>
+                <RevealItem
+                  // The basis subtracts the row gap, otherwise 2 or 3 items at
+                  // a flat 1/2 or 1/3 overflow the line and wrap one short.
+                  className="min-w-0 basis-[calc((100%-1rem)/2)] sm:basis-[calc((100%-2rem)/3)] lg:basis-0 lg:grow"
+                >
+                  <StageNode {...stage} />
+                </RevealItem>
+                {i < STAGES.length - 1 ? (
+                  <FlowArrow
+                    scale={1.3}
+                    className="hidden shrink-0 self-start lg:flex"
+                    style={
+                      {
+                        // Half the icon box, less half the arrow's LAYOUT
+                        // height (13px). `scale` transforms about the centre,
+                        // so the scaled height never enters the offset.
+                        marginTop: 'calc(var(--fin-icon) / 2 - 6.5px)',
+                        '--arrow-delay': `${i * 0.12}s`,
+                      } as React.CSSProperties
+                    }
+                  />
+                ) : null}
+              </Fragment>
             ))}
-          </div>
-        </Reveal>
-
-        <Reveal delay={0.12} y={16}>
-          <p
-            style={{
-              marginTop: 'clamp(32px, 3.4vw, 52px)',
-              paddingTop: 'clamp(18px, 1.8vw, 26px)',
-              borderTop: '1px solid rgba(255, 255, 255, 0.13)',
-              maxWidth: '34ch',
-              fontFamily: 'var(--font-display)',
-              fontSize: 'var(--fs-h4)',
-              fontWeight: 600,
-              letterSpacing: '-0.025em',
-              lineHeight: 1.35,
-              color: '#ffd8d8',
-            }}
-          >
-            By the time it reaches production, the risk is already inside.
-          </p>
-        </Reveal>
+          </RevealStagger>
+        </div>
       </div>
     </section>
   );

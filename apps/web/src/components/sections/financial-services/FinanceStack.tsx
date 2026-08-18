@@ -1,92 +1,86 @@
 import type React from 'react';
-import { Reveal } from '@/components/ui/Reveal';
-import { COMPONENT_ART, COMPONENT_ACCENT } from './FinanceComponentArt';
+import Image from 'next/image';
+import { Reveal, RevealItem, RevealStagger } from '@/components/ui/Reveal';
 
 /*
- * FinanceStack — "Financial Software Runs on More Than Code".
- *
- * Four components, each shown as the thing it is: a sealed container, a set of
- * interlocking modules, a dependency tree that branches into more than it
- * started with, a code surface still emitting new pieces. See
- * FinanceComponentArt for the drawings.
- *
- * The objects lead and the type follows, so the reader knows what they are
- * looking at before they read a word. Each column is opened by a rule in its
- * object's own colour — that is the only chrome; there is no card, no capsule,
- * and no icon tile anywhere in this section.
+ * "Financial Software Runs on More Than Code" — the site's soft-violet feature
+ * card grid (the ASRFits / "Benefits Across Teams" pattern): 3D icon on top,
+ * title, one-line description, and the proposal's three sub-items below a
+ * hairline. Copy is the proposal's, verbatim.
  */
 
 interface Component {
+  icon: string;
+  iconAlt: string;
   title: string;
-  role: string;
-  parts: readonly [string, string, string];
+  desc: string;
+  items: readonly [string, string, string];
 }
 
 const COMPONENTS: readonly [Component, Component, Component, Component] = [
   {
+    icon: '/images/cleanstart-images/uvp-icon-smaller-images.webp',
+    iconAlt: '3D icon of stacked container blocks',
     title: 'Container Images',
-    role: 'The foundation of modern application delivery',
-    parts: ['Base images', 'Runtime components', 'Application workloads'],
+    desc: 'The foundation of modern application delivery',
+    items: ['Base images', 'Runtime components', 'Application workloads'],
   },
   {
+    icon: '/images/for-developers/why/icon-development.webp',
+    iconAlt: '3D icon of code brackets and a gear',
     title: 'Open Source Libraries',
-    role: 'Reusable components powering innovation',
-    parts: ['Frameworks', 'Packages', 'Third-party libraries'],
+    desc: 'Reusable components powering innovation',
+    items: ['Frameworks', 'Packages', 'Third-party libraries'],
   },
   {
+    icon: '/images/compare/icon-provenance.webp',
+    iconAlt: '3D icon of linked component blocks',
     title: 'Software Dependencies',
-    role: 'The hidden layers behind every application',
-    parts: ['Direct dependencies', 'Transitive dependencies', 'Package ecosystems'],
+    desc: 'The hidden layers behind every application',
+    items: ['Direct dependencies', 'Transitive dependencies', 'Package ecosystems'],
   },
   {
+    icon: '/images/compare/icon-ai-bom.webp',
+    iconAlt: '3D icon of a document with a processor chip',
     title: 'AI-Generated Code',
-    role: 'A new source of software creation',
-    parts: ['Generated code', 'AI-assisted development', 'New dependency paths'],
+    desc: 'A new source of software creation',
+    items: ['Generated code', 'AI-assisted development', 'New dependency paths'],
   },
 ];
 
 export function FinanceStack(): React.ReactElement {
   return (
-    <section data-section="FinanceStack" className="relative" style={{ background: '#F6F6F6' }}>
-      <div
-        className="relative mx-auto"
-        style={{
-          maxWidth: 'var(--container-default)',
-          paddingLeft: 'clamp(16px, 4vw, 48px)',
-          paddingRight: 'clamp(16px, 4vw, 48px)',
-          paddingTop: 'clamp(44px, 4.2vw, 68px)',
-          paddingBottom: 'clamp(32px, 3vw, 48px)',
-        }}
-      >
-        <div className="grid grid-cols-1 gap-x-16 gap-y-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-end">
-          <Reveal header>
+    <section data-section="FinanceStack" className="relative bg-white py-section-md">
+      <div className="mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
+        <div
+          className="flex flex-col lg:flex-row lg:items-end lg:justify-between"
+          style={{ marginBottom: 'clamp(40px, 4.4vw, 64px)', gap: '24px' }}
+        >
+          <Reveal header style={{ maxWidth: '660px' }}>
             <h2
               style={{
-                maxWidth: '21ch',
                 fontFamily: 'var(--font-display)',
                 fontSize: 'var(--fs-h2)',
                 fontWeight: 600,
                 letterSpacing: '-0.04em',
                 lineHeight: 1.1,
                 color: '#111111',
-                margin: 0,
               }}
             >
-              Financial Software Runs on More Than Code
+              Financial Software Runs on{' '}
+              <span className="cs-text-gradient-impact">More Than Code</span>
             </h2>
           </Reveal>
 
-          <Reveal delay={0.08} y={20}>
+          <Reveal header delay={0.15} y={20} style={{ maxWidth: '420px' }}>
             <p
               style={{
-                maxWidth: '48ch',
                 fontFamily: 'var(--font-sans)',
-                fontSize: 'var(--fs-lead-sm)',
+                fontSize: 'var(--fs-body)',
                 fontWeight: 400,
-                letterSpacing: '-0.01em',
-                lineHeight: 1.55,
-                color: '#4a4a4a',
-                margin: 0,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.5,
+                color: '#555555',
               }}
             >
               Modern financial applications are built from interconnected software components.
@@ -94,75 +88,90 @@ export function FinanceStack(): React.ReactElement {
           </Reveal>
         </div>
 
-        <div
+        <RevealStagger
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
-          style={{ marginTop: 'clamp(22px, 2.4vw, 34px)', gap: 'clamp(24px, 2.4vw, 36px)' }}
+          style={{ gap: '24px' }}
         >
-          {COMPONENTS.map((c, i) => {
-            const Art = COMPONENT_ART[i];
-            return (
-              <Reveal key={c.title} delay={i * 0.08} y={20}>
-                <div className="group flex h-full flex-col">
-                  <div
-                    aria-hidden
-                    className="mx-auto transition-transform duration-500 group-hover:-translate-y-1.5 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0"
-                    style={{ width: 'min(100%, 262px)', aspectRatio: '220 / 200' }}
-                  >
-                    {Art ? <Art /> : null}
-                  </div>
+          {COMPONENTS.map((item) => (
+            <RevealItem key={item.title} className="h-full">
+              <div
+                className="flex h-full flex-col items-center text-center sm:items-start sm:text-left"
+                style={{
+                  background: 'linear-gradient(135deg, #F3F0FF 0%, #EEF4FF 100%)',
+                  borderRadius: '20px',
+                  padding: 'clamp(28px, 4vw, 40px) clamp(20px, 3vw, 32px)',
+                  gap: '16px',
+                  border: '1px solid rgba(154,81,255,0.12)',
+                }}
+              >
+                <Image
+                  src={item.icon}
+                  alt={item.iconAlt}
+                  width={128}
+                  height={128}
+                  sizes="128px"
+                  className="object-contain"
+                  style={{ height: '104px', width: 'auto' }}
+                />
 
-                  <div
-                    style={{
-                      marginTop: 'clamp(4px, 0.8vw, 10px)',
-                      paddingTop: 'clamp(14px, 1.4vw, 20px)',
-                      borderTop: `2px solid ${COMPONENT_ACCENT[i]}`,
-                    }}
-                  >
-                    <h3
+                <h3
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'var(--fs-h3)',
+                    fontWeight: 600,
+                    letterSpacing: '-0.04em',
+                    lineHeight: 1.1,
+                    color: '#111111',
+                  }}
+                >
+                  {item.title}
+                </h3>
+
+                <p
+                  style={{
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: 'var(--fs-body)',
+                    fontWeight: 400,
+                    letterSpacing: '-0.02em',
+                    lineHeight: 1.4,
+                    color: '#555555',
+                  }}
+                >
+                  {item.desc}
+                </p>
+
+                <ul
+                  className="w-full"
+                  style={{
+                    marginTop: 'auto',
+                    paddingTop: 'clamp(14px, 1.5vw, 20px)',
+                    borderTop: '1px solid rgba(17,17,17,0.09)',
+                    listStyle: 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px',
+                  }}
+                >
+                  {item.items.map((sub) => (
+                    <li
+                      key={sub}
                       style={{
-                        fontFamily: 'var(--font-display)',
-                        fontSize: 'var(--fs-h5)',
-                        fontWeight: 600,
-                        letterSpacing: '-0.025em',
-                        lineHeight: 1.25,
-                        color: '#111111',
-                        margin: 0,
-                      }}
-                    >
-                      {c.title}
-                    </h3>
-                    <p
-                      style={{
-                        margin: '7px 0 0',
                         fontFamily: 'var(--font-sans)',
                         fontSize: 'var(--fs-body-sm)',
-                        fontWeight: 400,
-                        letterSpacing: '-0.005em',
-                        lineHeight: 1.5,
-                        color: '#4a4a4a',
-                      }}
-                    >
-                      {c.role}
-                    </p>
-                    <p
-                      style={{
-                        margin: '10px 0 0',
-                        fontFamily: 'var(--font-sans)',
-                        fontSize: 'var(--fs-caption)',
                         fontWeight: 500,
-                        letterSpacing: '-0.005em',
-                        lineHeight: 1.6,
-                        color: '#5c5c5c',
+                        letterSpacing: '-0.01em',
+                        lineHeight: 1.4,
+                        color: '#3d3766',
                       }}
                     >
-                      {c.parts.join(' · ')}
-                    </p>
-                  </div>
-                </div>
-              </Reveal>
-            );
-          })}
-        </div>
+                      {sub}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </RevealItem>
+          ))}
+        </RevealStagger>
       </div>
     </section>
   );

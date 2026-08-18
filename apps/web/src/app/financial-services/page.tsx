@@ -6,8 +6,7 @@ import { FinanceHero } from "@/components/sections/financial-services/FinanceHer
 import { FinanceStack } from "@/components/sections/financial-services/FinanceStack";
 import { FinanceRiskChain } from "@/components/sections/financial-services/FinanceRiskChain";
 import { FinanceFoundation } from "@/components/sections/financial-services/FinanceFoundation";
-import { FinanceRequirements } from "@/components/sections/financial-services/FinanceRequirements";
-import { FinanceOutcomes } from "@/components/sections/financial-services/FinanceOutcomes";
+import { FinanceProofBand } from "@/components/sections/financial-services/FinanceProofBand";
 import { FinanceCTA } from "@/components/sections/financial-services/FinanceCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 
@@ -45,12 +44,10 @@ export default function FinancialServicesPage(): React.ReactElement {
         <FadeUp>
           <FinanceFoundation />
         </FadeUp>
-        <FadeUp>
-          <FinanceRequirements />
-        </FadeUp>
-        <FadeUp>
-          <FinanceOutcomes />
-        </FadeUp>
+        {/* The conformance record and the results share one continuous dark
+            gradient, so the page closes on a single passage rather than two
+            stacked bands. FinanceProofBand owns their FadeUps. */}
+        <FinanceProofBand />
       </main>
       <Footer cta={<FinanceCTA />} />
     </>
