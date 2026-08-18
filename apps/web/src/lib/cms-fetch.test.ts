@@ -96,6 +96,41 @@ describe("fetchCMS — transient retry", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
+  it.each([520, 522, 525])(
+    "retries Cloudflare origin error %i during a production build",
+    async (status) => {
+      // The CMS sits behind Cloudflare, so origin saturation surfaces as a 52x
+      // — not a 502/503/504. These were absent from the retry set, and three CI
+      // builds died on exactly 520/522/525 without retrying.
+      vi.useFakeTimers();
+      const { fetchCMS } = await load({
+        NODE_ENV: "production",
+        NEXT_PHASE: "phase-production-build",
+      });
+      fetchMock
+        .mockResolvedValueOnce({ ok: false, status } as Response)
+        .mockResolvedValueOnce(ok({ docs: [1] }));
+      const promise = fetchCMS<{ docs: number[] }>("/api/knowledgeBase");
+      await vi.advanceTimersByTimeAsync(10_000);
+      await expect(promise).resolves.toEqual({ docs: [1] });
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      vi.useRealTimers();
+    },
+  );
+
+  it("retries a Cloudflare 522 at runtime too — it is never app logic", async () => {
+    vi.useFakeTimers();
+    const { fetchCMS } = await load({ NODE_ENV: "production" });
+    fetchMock
+      .mockResolvedValueOnce({ ok: false, status: 522 } as Response)
+      .mockResolvedValueOnce(ok({ docs: [] }));
+    const promise = fetchCMS<{ docs: number[] }>("/api/blogs");
+    await vi.advanceTimersByTimeAsync(10_000);
+    await expect(promise).resolves.toEqual({ docs: [] });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    vi.useRealTimers();
+  });
+
   it("does NOT retry a 500 at runtime — surfaces immediately", async () => {
     // Production runtime (not a build): 500 is non-transient and must throw
     // on the first attempt so the error boundary renders without backoff.
