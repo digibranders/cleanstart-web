@@ -14,10 +14,11 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 /*
  * /financial-services — first draft.
  *
- * Unlinked and noindex on purpose: the page is not in nav-config, not in the
- * sitemap, and carries no JSON-LD graph yet. Drop the `noindex` flag, add the
- * breadcrumb/JsonLdGraph pair the other solutions pages use, and register the
- * route in nav-config + docs/web/WEB-PAGES.md when it is approved to ship.
+ * Unlinked and noindex,nofollow on purpose: the page is not in nav-config, not
+ * in the sitemap, and carries no JSON-LD graph yet — reachable only by direct
+ * URL. Drop the `noindex`/`nofollow` flags, add the breadcrumb/JsonLdGraph pair
+ * the other solutions pages use, and register the route in nav-config +
+ * docs/web/WEB-PAGES.md when it is approved to ship.
  */
 export const metadata = buildPageMetadata({
   title:
@@ -28,6 +29,7 @@ export const metadata = buildPageMetadata({
   path: "/financial-services",
   eyebrow: "Solutions",
   noindex: true,
+  nofollow: true,
 });
 
 export default function FinancialServicesPage(): React.ReactElement {
