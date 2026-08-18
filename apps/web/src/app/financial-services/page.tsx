@@ -6,7 +6,8 @@ import { FinanceHero } from "@/components/sections/financial-services/FinanceHer
 import { FinanceStack } from "@/components/sections/financial-services/FinanceStack";
 import { FinanceRiskChain } from "@/components/sections/financial-services/FinanceRiskChain";
 import { FinanceFoundation } from "@/components/sections/financial-services/FinanceFoundation";
-import { FinanceProofBand } from "@/components/sections/financial-services/FinanceProofBand";
+import { FinanceRequirements } from "@/components/sections/financial-services/FinanceRequirements";
+import { FinanceOutcomes } from "@/components/sections/financial-services/FinanceOutcomes";
 import { FinanceCTA } from "@/components/sections/financial-services/FinanceCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 
@@ -44,10 +45,17 @@ export default function FinancialServicesPage(): React.ReactElement {
         <FadeUp>
           <FinanceFoundation />
         </FadeUp>
-        {/* The conformance record and the results share one continuous dark
-            gradient, so the page closes on a single passage rather than two
-            stacked bands. FinanceProofBand owns their FadeUps. */}
-        <FinanceProofBand />
+        {/* Requirements stays light. The Footer is itself a dark gradient, so
+            a dark Requirements would stack three dark blocks in a row before
+            the page ends — every CTA page on this site runs exactly one dark
+            section into the white CTA card and then the footer. The two light
+            sections are separated by value instead. */}
+        <FadeUp>
+          <FinanceRequirements />
+        </FadeUp>
+        <FadeUp>
+          <FinanceOutcomes />
+        </FadeUp>
       </main>
       <Footer cta={<FinanceCTA />} />
     </>

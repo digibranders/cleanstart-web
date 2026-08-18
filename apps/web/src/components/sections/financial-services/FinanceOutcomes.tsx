@@ -94,7 +94,57 @@ function OutcomeFigure({ title, body }: Outcome): React.ReactElement {
 
 export function FinanceOutcomes(): React.ReactElement {
   return (
-    <section data-section="FinanceOutcomes" className="relative">
+    <section
+      data-section="FinanceOutcomes"
+      className="relative overflow-hidden"
+      style={{
+        background: 'linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)',
+      }}
+    >
+      {/* Grid mesh planes — the CISO outcomes decoration, read as a measured
+          surface rather than another glow. No aura: screen-blended over this
+          band it lifted the copy toward violet and cost it contrast. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute hidden select-none lg:block"
+        style={{
+          left: 'calc(-220 / 1920 * 100vw)',
+          top: '-150px',
+          width: '803px',
+          height: '803px',
+          opacity: 0.3,
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/ciso/outcomes-vector-center.svg"
+          alt=""
+          style={{ display: 'block', width: '100%', height: '100%' }}
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute hidden select-none lg:block"
+        style={{
+          right: 'calc(-340 / 1920 * 100vw)',
+          bottom: '-320px',
+          width: '979px',
+          height: '979px',
+          opacity: 0.2,
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/ciso/outcomes-vector-corner.svg"
+          alt=""
+          style={{ display: 'block', width: '100%', height: '100%' }}
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+
       {/* Footer contract: as the last background section on this CTA page, the
           bottom padding uses --spacing-section-cta so the overlapping footer CTA
           card has matching breathing room. */}

@@ -1,68 +1,48 @@
 import type React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { LogoMark } from '@/components/icons/Logo';
 import { Reveal, RevealItem, RevealStagger } from '@/components/ui/Reveal';
 
 /*
- * "Build on a Verified Software Foundation" — the page's resolution, built on
- * the site's light-band vocabulary: the shared hex-grid unions and corner
- * glows from /images/for-developers/why/, white artifact cards, and the
- * CisoEnterprise blue-sphere icon treatment for the four operating steps.
+ * "Build on a Verified Software Foundation" — Product Showcase & Operating Loop
+ *
+ * Displays the two core CleanStart products as structured enterprise showcase
+ * cards, followed by the "Powered by CleanStart" divider and the four-step
+ * operating loop (Discover, Verify, Govern, Remediate).
  * Copy is the proposal's, verbatim.
  */
-
-interface Pillar {
-  icon: string;
-  iconAlt: string;
-  title: string;
-  body: string;
-  href: string;
-}
-
-const PILLARS: readonly [Pillar, Pillar] = [
-  {
-    icon: '/images/cleanstart-images/uvp-icon-smaller-images.webp',
-    iconAlt: '3D icon of stacked container blocks',
-    title: 'Verified Container Images',
-    body: 'Hardened, minimal, and secure container images for your applications.',
-    href: '/cleanstart-images',
-  },
-  {
-    icon: '/images/compare/icon-provenance.webp',
-    iconAlt: '3D icon of linked component blocks',
-    title: 'Verified Libraries & Dependencies',
-    body: 'Secure, trusted, and proven libraries and dependencies for modern applications.',
-    href: '/clean-libraries',
-  },
-];
 
 interface Step {
   icon: string;
   title: string;
-  body: string;
+  line1: string;
+  line2: string;
 }
 
 const STEPS: readonly [Step, Step, Step, Step] = [
   {
     icon: '/images/ciso/enterprise-icon-cloud.svg',
     title: 'Discover',
-    body: 'Gain visibility across your environment.',
+    line1: 'Gain visibility across',
+    line2: 'your environment.',
   },
   {
     icon: '/images/ciso/enterprise-icon-devsecops.svg',
     title: 'Verify',
-    body: 'Verify integrity and establish trust.',
+    line1: 'Verify integrity and',
+    line2: 'establish trust.',
   },
   {
     icon: '/images/ciso/enterprise-icon-compliance.svg',
     title: 'Govern',
-    body: 'Enforce policies and maintain compliance.',
+    line1: 'Enforce policies and',
+    line2: 'maintain compliance.',
   },
   {
     icon: '/images/ciso/enterprise-icon-security-ops.svg',
     title: 'Remediate',
-    body: 'Replace risky components with verified alternatives.',
+    line1: 'Replace risky components',
+    line2: 'with verified alternatives.',
   },
 ];
 
@@ -101,7 +81,7 @@ export function FinanceFoundation(): React.ReactElement {
       className="relative overflow-hidden"
       style={{
         background:
-          'linear-gradient(180deg, rgba(246,246,246,0) 0%, #F6F6F6 96px, #F6F6F6 100%)',
+          'linear-gradient(180deg, rgba(255,255,255,0) 0%, #FDFDFF 96px, #FDFDFF 100%)',
       }}
     >
       {/* Shared hex-grid unions + corner glows — the light band's decoration. */}
@@ -223,82 +203,302 @@ export function FinanceFoundation(): React.ReactElement {
           </Reveal>
         </div>
 
-        {/* The two artifacts. */}
+        {/* The two Product Artifact Showcase Cards */}
         <RevealStagger
           className="grid grid-cols-1 lg:grid-cols-2"
-          style={{ marginTop: 'clamp(28px, 3vw, 44px)', gap: 'clamp(20px, 2vw, 28px)' }}
+          style={{ marginTop: 'clamp(28px, 3vw, 40px)', gap: 'clamp(20px, 2vw, 28px)' }}
         >
-          {PILLARS.map((pillar) => (
-            <RevealItem key={pillar.title} className="h-full">
-              <Link
-                href={pillar.href}
-                className="group flex h-full flex-col items-center gap-6 text-center transition-transform duration-300 hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#7C4FF0] motion-reduce:transition-none motion-reduce:hover:translate-y-0 sm:flex-row sm:text-left"
-                style={{
-                  background: '#ffffff',
-                  borderRadius: '24px',
-                  border: '1px solid rgba(154,81,255,0.14)',
-                  padding: 'clamp(22px, 2.2vw, 30px)',
-                  boxShadow: '0 1px 2px rgba(17,17,17,0.04), 0 18px 44px -24px rgba(40,30,90,0.22)',
-                }}
-              >
-                <div
-                  className="relative shrink-0"
-                  aria-hidden
-                  style={{ width: 'clamp(96px, 8vw, 116px)', height: 'clamp(96px, 8vw, 116px)' }}
+          {/* Product 1: Verified Container Images */}
+          <RevealItem className="h-full">
+            <Link
+              href="/cleanstart-images"
+              className="group flex h-full flex-col justify-between overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_48px_-20px_rgba(40,30,90,0.18)]"
+              style={{
+                background: '#ffffff',
+                borderRadius: '20px',
+                border: '1px solid rgba(154,81,255,0.14)',
+                padding: 'clamp(20px, 2.2vw, 28px)',
+                boxShadow:
+                  '0 1px 2px rgba(17,17,17,0.04), 0 16px 40px -24px rgba(40,30,90,0.14)',
+              }}
+            >
+              <div>
+                <h3
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'var(--fs-h3)',
+                    fontWeight: 600,
+                    letterSpacing: '-0.04em',
+                    lineHeight: 1.15,
+                    color: '#111111',
+                    margin: 0,
+                  }}
                 >
-                  <span
-                    className="absolute"
-                    style={{
-                      left: '4%',
-                      top: '6%',
-                      width: '92%',
-                      height: '92%',
-                      borderRadius: '50%',
-                      background: '#DF9BFF',
-                      opacity: 0.32,
-                      filter: 'blur(24px)',
-                    }}
-                  />
-                  <Image
-                    src={pillar.icon}
-                    alt={pillar.iconAlt}
-                    fill
-                    sizes="132px"
-                    className="relative object-contain"
-                  />
-                </div>
+                  Verified Container Images
+                </h3>
+                <p
+                  style={{
+                    marginTop: '6px',
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: 'var(--fs-body-sm)',
+                    fontWeight: 400,
+                    letterSpacing: '-0.01em',
+                    lineHeight: 1.45,
+                    color: '#555555',
+                    margin: 0,
+                  }}
+                >
+                  Hardened, minimal, and secure container images for your applications.
+                </p>
 
-                <div className="flex min-w-0 flex-col" style={{ gap: '12px' }}>
-                  <h3
+                {/* Minimalist Container Runtime Foundation Graphic */}
+                <div
+                  className="mt-3.5 flex flex-col gap-1.5 rounded-xl p-2.5 sm:p-3"
+                  style={{
+                    background: 'linear-gradient(135deg, #F9F8FD 0%, #F3F5FA 100%)',
+                    border: '1px solid rgba(154,81,255,0.1)',
+                  }}
+                >
+                  <div
+                    className="flex items-center justify-between rounded-lg px-3 py-2"
                     style={{
-                      fontFamily: 'var(--font-display)',
-                      fontSize: 'var(--fs-h3)',
-                      fontWeight: 600,
-                      letterSpacing: '-0.04em',
-                      lineHeight: 1.15,
-                      color: '#111111',
-                      margin: 0,
+                      background: '#ffffff',
+                      border: '1px solid rgba(17,17,17,0.06)',
+                      boxShadow: '0 1px 3px rgba(17,17,17,0.04)',
                     }}
                   >
-                    {pillar.title}
-                  </h3>
-                  <p
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--fs-body-sm)',
+                        fontWeight: 500,
+                        color: '#111111',
+                      }}
+                    >
+                      Application Workloads
+                    </span>
+                    <span
+                      style={{
+                        width: '7px',
+                        height: '7px',
+                        borderRadius: '50%',
+                        background: '#9A51FF',
+                      }}
+                    />
+                  </div>
+
+                  <div
+                    className="flex items-center justify-between rounded-lg px-3 py-2"
                     style={{
-                      fontFamily: 'var(--font-sans)',
-                      fontSize: 'var(--fs-body)',
-                      fontWeight: 400,
-                      letterSpacing: '-0.02em',
-                      lineHeight: 1.5,
-                      color: '#555555',
-                      margin: 0,
+                      background: '#ffffff',
+                      border: '1px solid rgba(17,17,17,0.06)',
+                      boxShadow: '0 1px 3px rgba(17,17,17,0.04)',
                     }}
                   >
-                    {pillar.body}
-                  </p>
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--fs-body-sm)',
+                        fontWeight: 500,
+                        color: '#111111',
+                      }}
+                    >
+                      Runtime Components
+                    </span>
+                    <span
+                      style={{
+                        width: '7px',
+                        height: '7px',
+                        borderRadius: '50%',
+                        background: '#2CC1EB',
+                      }}
+                    />
+                  </div>
+
+                  <div
+                    className="flex items-center justify-between rounded-lg px-3 py-2"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(154,81,255,0.08) 0%, rgba(44,193,235,0.08) 100%)',
+                      border: '1px solid rgba(154,81,255,0.18)',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--fs-body-sm)',
+                        fontWeight: 600,
+                        color: '#3D3766',
+                      }}
+                    >
+                      Minimal Base Images
+                    </span>
+                    <span
+                      style={{
+                        width: '7px',
+                        height: '7px',
+                        borderRadius: '50%',
+                        background: '#10B981',
+                      }}
+                    />
+                  </div>
                 </div>
-              </Link>
-            </RevealItem>
-          ))}
+              </div>
+
+              <div
+                className="mt-4 flex items-center justify-between pt-3 text-sm font-semibold text-[#7C4FF0] transition-colors group-hover:text-[#5B21B6]"
+                style={{ borderTop: '1px solid rgba(17,17,17,0.08)' }}
+              >
+                <span>Learn more about CleanStart Images</span>
+                <span className="transition-transform group-hover:translate-x-1">→</span>
+              </div>
+            </Link>
+          </RevealItem>
+
+          {/* Product 2: Verified Libraries & Dependencies */}
+          <RevealItem className="h-full">
+            <Link
+              href="/clean-libraries"
+              className="group flex h-full flex-col justify-between overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_48px_-20px_rgba(40,30,90,0.18)]"
+              style={{
+                background: '#ffffff',
+                borderRadius: '20px',
+                border: '1px solid rgba(154,81,255,0.14)',
+                padding: 'clamp(20px, 2.2vw, 28px)',
+                boxShadow:
+                  '0 1px 2px rgba(17,17,17,0.04), 0 16px 40px -24px rgba(40,30,90,0.14)',
+              }}
+            >
+              <div>
+                <h3
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'var(--fs-h3)',
+                    fontWeight: 600,
+                    letterSpacing: '-0.04em',
+                    lineHeight: 1.15,
+                    color: '#111111',
+                    margin: 0,
+                  }}
+                >
+                  Verified Libraries & Dependencies
+                </h3>
+                <p
+                  style={{
+                    marginTop: '6px',
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: 'var(--fs-body-sm)',
+                    fontWeight: 400,
+                    letterSpacing: '-0.01em',
+                    lineHeight: 1.45,
+                    color: '#555555',
+                    margin: 0,
+                  }}
+                >
+                  Secure, trusted libraries and dependencies for your applications.
+                </p>
+
+                {/* Minimalist Verified Component Chain Graphic */}
+                <div
+                  className="mt-3.5 flex flex-col gap-1.5 rounded-xl p-2.5 sm:p-3"
+                  style={{
+                    background: 'linear-gradient(135deg, #F9F8FD 0%, #F3F5FA 100%)',
+                    border: '1px solid rgba(154,81,255,0.1)',
+                  }}
+                >
+                  <div
+                    className="flex items-center justify-between rounded-lg px-3 py-2"
+                    style={{
+                      background: '#ffffff',
+                      border: '1px solid rgba(17,17,17,0.06)',
+                      boxShadow: '0 1px 3px rgba(17,17,17,0.04)',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--fs-body-sm)',
+                        fontWeight: 500,
+                        color: '#111111',
+                      }}
+                    >
+                      Frameworks
+                    </span>
+                    <span
+                      style={{
+                        width: '7px',
+                        height: '7px',
+                        borderRadius: '50%',
+                        background: '#9A51FF',
+                      }}
+                    />
+                  </div>
+
+                  <div
+                    className="flex items-center justify-between rounded-lg px-3 py-2"
+                    style={{
+                      background: '#ffffff',
+                      border: '1px solid rgba(17,17,17,0.06)',
+                      boxShadow: '0 1px 3px rgba(17,17,17,0.04)',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--fs-body-sm)',
+                        fontWeight: 500,
+                        color: '#111111',
+                      }}
+                    >
+                      Packages
+                    </span>
+                    <span
+                      style={{
+                        width: '7px',
+                        height: '7px',
+                        borderRadius: '50%',
+                        background: '#2CC1EB',
+                      }}
+                    />
+                  </div>
+
+                  <div
+                    className="flex items-center justify-between rounded-lg px-3 py-2"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(154,81,255,0.08) 0%, rgba(44,193,235,0.08) 100%)',
+                      border: '1px solid rgba(154,81,255,0.18)',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'var(--fs-body-sm)',
+                        fontWeight: 600,
+                        color: '#3D3766',
+                      }}
+                    >
+                      Third-Party Libraries
+                    </span>
+                    <span
+                      style={{
+                        width: '7px',
+                        height: '7px',
+                        borderRadius: '50%',
+                        background: '#10B981',
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="mt-4 flex items-center justify-between pt-3 text-sm font-semibold text-[#7C4FF0] transition-colors group-hover:text-[#5B21B6]"
+                style={{ borderTop: '1px solid rgba(17,17,17,0.08)' }}
+              >
+                <span>Learn more about Clean Libraries</span>
+                <span className="transition-transform group-hover:translate-x-1">→</span>
+              </div>
+            </Link>
+          </RevealItem>
         </RevealStagger>
 
         {/* Powered by CleanStart — the proposal's own divider. */}
@@ -385,7 +585,6 @@ export function FinanceFoundation(): React.ReactElement {
                 <p
                   style={{
                     marginTop: '8px',
-                    maxWidth: '26ch',
                     fontFamily: 'var(--font-sans)',
                     fontSize: 'var(--fs-body-sm)',
                     fontWeight: 400,
@@ -394,7 +593,8 @@ export function FinanceFoundation(): React.ReactElement {
                     color: '#555555',
                   }}
                 >
-                  {step.body}
+                  <span className="block">{step.line1}</span>
+                  <span className="block">{step.line2}</span>
                 </p>
               </div>
             </RevealItem>

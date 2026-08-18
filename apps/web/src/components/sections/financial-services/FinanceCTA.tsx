@@ -3,8 +3,15 @@
  * slot, on the site's shared CTA treatment: decorative purple grid, corner glow
  * ellipses, a violet cube, dark text and a solid blue button.
  *
- * The proposal supplies a headline and a button and no supporting line, so the
- * card carries exactly those two.
+ * Layout matches FipsCTA and VulnCTA: headline left, supporting line and button
+ * stacked on the right, both columns vertically centred in the slot.
+ *
+ * NOTE — DESCRIPTION is the one string on this page not taken from the client
+ * proposal, which supplies a headline and a button for this card and nothing
+ * else. Without it the content block came to 89px in a 260px card, so
+ * everything hugged the top and left 164px of dead space with the decorative
+ * cube stranded in it. It is written to set up the conversation the button
+ * promises rather than to restate the headline. Flag it for client sign-off.
  */
 
 'use client';
@@ -13,6 +20,8 @@ import Link from 'next/link';
 import { Reveal } from '@/components/ui/Reveal';
 
 const HEADLINE = 'Build Trusted Financial Software with CleanStart';
+const DESCRIPTION =
+  'Talk through your compliance requirements and see how verified components fit your existing stack.';
 const BUTTON_LABEL = 'Talk to a Security Expert';
 const BUTTON_HREF = '/contact-us';
 
@@ -123,9 +132,10 @@ export function FinanceCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Desktop / tablet — headline left, button right. */}
+      {/* Desktop / tablet — headline left, supporting line and button right,
+          both columns centred on the slot's vertical axis. */}
       <div
-        className="absolute inset-0 hidden items-center md:flex md:flex-col md:items-start md:justify-center md:gap-y-6 lg:flex-row lg:justify-between lg:gap-y-0"
+        className="absolute inset-0 hidden items-center md:flex md:flex-col md:justify-center md:gap-y-6 lg:flex-row lg:justify-between lg:gap-y-0"
         style={{
           paddingLeft: 'clamp(28px, 4vw, 64px)',
           paddingRight: 'clamp(28px, 4vw, 64px)',
@@ -137,7 +147,7 @@ export function FinanceCTA(): React.ReactElement {
         <Reveal
           header
           className="relative w-full min-w-0"
-          style={{ maxWidth: 'min(620px, 100%)', zIndex: 2 }}
+          style={{ maxWidth: 'min(460px, 100%)', zIndex: 2 }}
         >
           <p
             className="font-display"
@@ -155,10 +165,30 @@ export function FinanceCTA(): React.ReactElement {
           </p>
         </Reveal>
 
-        <Reveal header delay={0.15} y={20} className="relative shrink-0" style={{ zIndex: 2 }}>
+        <Reveal
+          header
+          delay={0.15}
+          y={20}
+          className="relative flex w-full min-w-0 flex-col"
+          style={{ maxWidth: '420px', gap: 'clamp(16px, 1.5vw, 24px)', zIndex: 2 }}
+        >
+          <p
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--cta-card-desc)',
+              fontWeight: 400,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.4,
+              color: 'rgba(17, 17, 17, 0.8)',
+              margin: 0,
+            }}
+          >
+            {DESCRIPTION}
+          </p>
+
           <Link
             href={BUTTON_HREF}
-            className="cs-btn-blue"
+            className="cs-btn-blue self-start"
             style={
               {
                 '--cs-btn-h': '44px',
@@ -214,6 +244,23 @@ export function FinanceCTA(): React.ReactElement {
           {HEADLINE}
         </p>
 
+        <p
+          style={{
+            position: 'relative',
+            zIndex: 2,
+            fontFamily: 'var(--font-sans)',
+            fontSize: 'var(--cta-card-desc)',
+            fontWeight: 400,
+            letterSpacing: '-0.02em',
+            lineHeight: 1.4,
+            color: 'rgba(17, 17, 17, 0.8)',
+            margin: '12px 0 0',
+            maxWidth: '320px',
+          }}
+        >
+          {DESCRIPTION}
+        </p>
+
         <Link
           href={BUTTON_HREF}
           className="cs-btn-blue"
@@ -221,7 +268,7 @@ export function FinanceCTA(): React.ReactElement {
             {
               position: 'relative',
               zIndex: 2,
-              marginTop: '24px',
+              marginTop: '20px',
               '--cs-btn-h': '44px',
               '--cs-btn-px': '20px',
               '--cs-btn-fs': '15px',

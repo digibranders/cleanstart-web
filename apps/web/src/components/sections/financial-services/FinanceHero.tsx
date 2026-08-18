@@ -42,11 +42,11 @@ export function FinanceHero(): React.ReactElement {
             top: '50%',
             transform: 'translateY(-50%)',
             width: 'clamp(460px, 44vw, 680px)',
-            aspectRatio: '1100 / 826',
+            aspectRatio: '1100 / 805',
           }}
         >
           <Image
-            src="/images/financial-services/hero-verified-dashboard.webp"
+            src="/images/financial-services/hero-verified-dashboard-v2.webp"
             alt=""
             fill
             sizes="(min-width: 1440px) 680px, 44vw"
@@ -153,10 +153,10 @@ export function FinanceHero(): React.ReactElement {
         <div
           aria-hidden
           className="relative mx-auto mt-10 w-[min(92vw,460px)] lg:hidden"
-          style={{ aspectRatio: '1100 / 826' }}
+          style={{ aspectRatio: '1100 / 805' }}
         >
           <Image
-            src="/images/financial-services/hero-verified-dashboard.webp"
+            src="/images/financial-services/hero-verified-dashboard-v2.webp"
             alt=""
             fill
             sizes="(max-width: 1023px) 92vw, 460px"

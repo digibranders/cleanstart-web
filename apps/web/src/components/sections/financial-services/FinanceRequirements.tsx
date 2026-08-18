@@ -9,11 +9,13 @@ import { Reveal, RevealItem, RevealStagger } from '@/components/ui/Reveal';
  * the icon slot instead of a glyph sphere, so a compliance group is
  * recognisable at a glance.
  *
- * The section paints no background of its own: it sits inside FinanceProofBand,
- * which carries one continuous dark gradient across this section and the
- * outcomes below it. White cards on that dark ground are the site's own
- * treatment (FipsTrustedIndustries, VulnAdvantage), and the cyan ring reads as
- * a halo here in a way it never could on white.
+ * It sits on a violet-tinted wash rather than white. Foundation above it is the
+ * page's bright moment and this is the conformance record that follows, so the
+ * pair reads as a deliberate step down in value. They were previously #F6F6F6
+ * and #FFFFFF — a 3.5% difference, which reads as an accident rather than a
+ * decision. The record stays light because the Footer is itself a dark
+ * gradient: a dark section here would put three dark blocks back to back at the
+ * end of the page.
  *
  * The proposal's standards line sits below the cards as the summary band it is.
  * It duplicates five of its six tokens from the columns above (only SPDX is
@@ -151,7 +153,44 @@ function RequirementCard({ icon, iconAlt, title, items }: Requirement): React.Re
 
 export function FinanceRequirements(): React.ReactElement {
   return (
-    <section data-section="FinanceRequirements" className="relative py-section-md">
+    <section
+      data-section="FinanceRequirements"
+      className="relative overflow-hidden py-section-md"
+      style={{ background: '#EFEDF7' }}
+    >
+      {/* Corner unions — the light-band decoration, mirrored top-left/top-right. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        src="/images/ciso/enterprise-union.svg"
+        alt=""
+        className="pointer-events-none absolute hidden select-none lg:block"
+        style={{
+          right: '-185px',
+          top: '-193px',
+          width: '488px',
+          height: '496px',
+          transform: 'rotate(141.39deg) scaleY(-1)',
+        }}
+        loading="lazy"
+        decoding="async"
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        src="/images/ciso/enterprise-union.svg"
+        alt=""
+        className="pointer-events-none absolute hidden select-none lg:block"
+        style={{
+          left: '-218px',
+          top: '-139px',
+          width: '488px',
+          height: '496px',
+          transform: 'rotate(141.39deg) scaleY(-1)',
+        }}
+        loading="lazy"
+        decoding="async"
+      />
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <Reveal header>
@@ -164,7 +203,7 @@ export function FinanceRequirements(): React.ReactElement {
               fontWeight: 600,
               letterSpacing: '-0.04em',
               lineHeight: 1.1,
-              color: '#ffffff',
+              color: '#111111',
               marginBottom: 'clamp(36px, 4vw, 64px)',
             }}
           >
@@ -188,8 +227,8 @@ export function FinanceRequirements(): React.ReactElement {
             style={{
               marginTop: 'clamp(32px, 3.4vw, 52px)',
               padding: 'clamp(14px, 1.4vw, 20px) clamp(8px, 1.6vw, 24px)',
-              borderTop: '1px solid rgba(255,255,255,0.18)',
-              borderBottom: '1px solid rgba(255,255,255,0.18)',
+              borderTop: '1px solid rgba(17,17,17,0.12)',
+              borderBottom: '1px solid rgba(17,17,17,0.12)',
               listStyle: 'none',
               gap: '8px 0',
             }}
@@ -200,7 +239,7 @@ export function FinanceRequirements(): React.ReactElement {
                 // Dividers only where the row does not wrap; below sm the band
                 // breaks over several lines and a leading rule would strand at
                 // the start of one.
-                className={i === 0 ? '' : 'sm:border-l sm:border-[rgba(255,255,255,0.2)]'}
+                className={i === 0 ? '' : 'sm:border-l sm:border-[rgba(17,17,17,0.14)]'}
                 style={{
                   fontFamily: 'var(--font-sans)',
                   fontSize: 'var(--fs-caption)',
@@ -208,7 +247,7 @@ export function FinanceRequirements(): React.ReactElement {
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
                   lineHeight: 1.4,
-                  color: 'rgba(255,255,255,0.82)',
+                  color: '#3d3766',
                   padding: '0 clamp(12px, 1.4vw, 22px)',
                   whiteSpace: 'nowrap',
                 }}
