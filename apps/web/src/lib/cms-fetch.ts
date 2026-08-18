@@ -140,9 +140,21 @@ export async function fetchCMS<T>(path: string, options: CmsFetchOptions = {}): 
   // building (NEXT_PHASE === 'phase-production-build'); the build no longer
   // depends on Next's page-level retry to ride out a transient CMS blip.
   // Other 4xx always surface immediately.
+  //
+  // Cloudflare sits in front of cms.cleanstart.com, so when the origin droplet
+  // saturates the browser-visible status is one of Cloudflare's own 52x origin
+  // errors — NOT a 502/503/504 from the origin itself. Those were missing from
+  // this set, so the exact failure mode this retry exists for went unretried:
+  // three separate CI builds died on `CMS fetch failed: 520 / 522 / 525` without
+  // a single retry, while the CMS was healthy again seconds later. 52x is always
+  // an edge-to-origin transport failure, never application logic, so it is
+  // retryable at runtime too.
   const isProductionBuild = process.env.NEXT_PHASE === 'phase-production-build';
+  const CLOUDFLARE_ORIGIN_ERRORS = [520, 521, 522, 523, 524, 525, 526, 527];
   const RETRYABLE_STATUS = new Set(
-    isProductionBuild ? [500, 502, 503, 504] : [502, 503, 504],
+    isProductionBuild
+      ? [500, 502, 503, 504, ...CLOUDFLARE_ORIGIN_ERRORS]
+      : [502, 503, 504, ...CLOUDFLARE_ORIGIN_ERRORS],
   );
   // Retry only outside local dev. In production / build the single CMS droplet
   // briefly refuses connections or 502s under prerender load, so 5 attempts

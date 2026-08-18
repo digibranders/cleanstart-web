@@ -1,4 +1,5 @@
 import { SITE_URL } from '@/lib/seo/canonical';
+import { legalHref } from '@/lib/legal';
 import { isIndexingAllowed } from '@/lib/seo/indexing';
 import type { MetadataRoute } from 'next';
 
@@ -103,7 +104,9 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/partners' },
   { path: '/podcast' },
   { path: '/pricing' },
-  { path: '/privacy-policy' },
+  // `/privacy-policy` is emitted from the legalDocuments block below (via
+  // `legalHref`), which carries a real CMS lastmod. Listing it here too would
+  // duplicate the URL.
   { path: '/resource-center' },
   { path: '/software-bill-materials' },
   { path: '/teams' },
@@ -171,6 +174,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...events.map((e) => entry(`/event/${e.slug}`, e.updatedAt ?? e.publishedAt ?? undefined)),
     ...jobs.map((j) => entry(`/job/${j.slug}`, j.updatedAt ?? undefined)),
     ...guides.map((g) => entry(`/guide/${g.slug}`, g.updatedAt ?? g.publishedAt ?? undefined)),
-    ...legal.map((d) => entry(`/legal/${d.slug}`, d.updatedAt ?? d.publishedAt ?? undefined)),
+    // `legalHref` — not `/legal/<slug>` — because the Privacy Policy's canonical
+    // public URL is the standalone `/privacy-policy`; `/legal/privacy-policy`
+    // permanently redirects to it. Emitting the raw path put a 308 in the
+    // sitemap alongside its own destination.
+    ...legal.map((d) => entry(legalHref(d.slug), d.updatedAt ?? d.publishedAt ?? undefined)),
   ];
 }
