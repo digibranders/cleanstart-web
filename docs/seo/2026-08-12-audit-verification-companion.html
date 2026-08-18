@@ -1,0 +1,1127 @@
+<title>SEO Audit — Verification Companion · cleanstart.com</title>
+
+<style>
+  :root {
+    --paper: #ffffff;
+    --panel: #f7f7f5;
+    --card: #f1f4f8;
+    --ink: #1c1c1c;
+    --ink-soft: #4a4a4a;
+    --ink-faint: #86868a;
+    --navy: #1e3a5c;
+    --navy-soft: #3a5a7c;
+    --rule: #dcdcd8;
+
+    --no:  #5a5a5e;  --no-bg:  #f0f0ee;
+    --do:  #9a5b00;  --do-bg:  #fdf4e5;
+    --done:#1f6b45;  --done-bg:#eef7f1;
+    --later:#5a3f8c; --later-bg:#f4f0fa;
+    --opt: #1e5f8c;  --opt-bg: #eef4f9;
+    --refute:#a02724;
+
+    --serif: Georgia, "Iowan Old Style", "Times New Roman", Times, serif;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #14181d; --panel: #1a1f26; --card: #1c232b;
+      --ink: #e4e7ea; --ink-soft: #aab2ba; --ink-faint: #7c858e;
+      --navy: #9ec3ea; --navy-soft: #7ea6cf; --rule: #2b333c;
+      --no:  #9aa0a8; --no-bg:  #1e2229;
+      --do:  #e0b060; --do-bg:  #272017;
+      --done:#74c79a; --done-bg:#16241d;
+      --later:#b39ce0; --later-bg:#211c2c;
+      --opt: #7fb8e0; --opt-bg: #16212a;
+      --refute:#f08a84;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #14181d; --panel: #1a1f26; --card: #1c232b;
+    --ink: #e4e7ea; --ink-soft: #aab2ba; --ink-faint: #7c858e;
+    --navy: #9ec3ea; --navy-soft: #7ea6cf; --rule: #2b333c;
+    --no:  #9aa0a8; --no-bg:  #1e2229;
+    --do:  #e0b060; --do-bg:  #272017;
+    --done:#74c79a; --done-bg:#16241d;
+    --later:#b39ce0; --later-bg:#211c2c;
+    --opt: #7fb8e0; --opt-bg: #16212a;
+    --refute:#f08a84;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper); color: var(--ink);
+    font-family: var(--serif); font-size: 16px; line-height: 1.6;
+    margin: 0; padding: 0 20px 80px;
+  }
+  .sheet { max-width: 960px; margin: 0 auto; }
+
+  .topbar { height: 14px; background: var(--navy); margin: 0 -20px; }
+  .cover { text-align: center; padding: 84px 0 66px; border-bottom: 1px solid var(--rule); }
+  .badge {
+    display: inline-block; border: 1px solid var(--rule); border-radius: 999px;
+    padding: 9px 22px; font-size: 11px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--navy); background: var(--panel);
+  }
+  .cover h1 { font-size: 44px; margin: 36px 0 10px; color: var(--navy); letter-spacing: -0.01em; text-wrap: balance; }
+  .cover .prepared { color: var(--ink-faint); margin: 0 0 32px; font-size: 17px; }
+
+  .scorepair { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
+  .scorebox {
+    border: 1px solid var(--rule); border-radius: 10px; background: var(--panel);
+    padding: 20px 26px; min-width: 176px;
+  }
+  .scorebox .num { font-size: 38px; font-weight: 700; color: var(--navy); line-height: 1; font-variant-numeric: tabular-nums; }
+  .scorebox .den { font-size: 17px; color: var(--ink-faint); font-weight: 700; }
+  .scorebox .cap { font-size: 12px; color: var(--ink-soft); margin-top: 9px; letter-spacing: 0.03em; }
+  .cover .dates {
+    border-top: 1px solid var(--rule); max-width: 380px; margin: 32px auto 0;
+    padding-top: 15px; font-size: 13px; color: var(--ink-faint);
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+
+  .band { background: var(--panel); border-left: 4px solid var(--navy); padding: 19px 25px; margin: 52px 0 24px; }
+  .band h2 { margin: 0; font-size: 25px; color: var(--ink); }
+
+  h3.sec { font-size: 20px; color: var(--navy); border-bottom: 2px solid var(--navy); padding-bottom: 7px; margin: 44px 0 8px; }
+  h3.sec .sc { font-size: 13.5px; color: var(--ink-faint); font-weight: 400; }
+  h4.sub { font-size: 15px; margin: 26px 0 10px; letter-spacing: 0.02em; }
+  p { margin: 0 0 14px; }
+  .lede { font-size: 16.5px; }
+
+  code, .mono { font-family: var(--mono); font-size: 0.855em; }
+  code { background: var(--panel); border: 1px solid var(--rule); border-radius: 3px; padding: 1px 5px; word-break: break-word; }
+
+  .chip {
+    display: inline-block; font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.09em; text-transform: uppercase; padding: 3px 8px;
+    border-radius: 3px; white-space: nowrap; font-weight: 700;
+  }
+  .k-no    { color: var(--no);    background: var(--no-bg);    border: 1px solid var(--no); }
+  .k-do    { color: var(--do);    background: var(--do-bg);    border: 1px solid var(--do); }
+  .k-done  { color: var(--done);  background: var(--done-bg);  border: 1px solid var(--done); }
+  .k-later { color: var(--later); background: var(--later-bg); border: 1px solid var(--later); }
+  .k-opt   { color: var(--opt);   background: var(--opt-bg);   border: 1px solid var(--opt); }
+
+  .legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 11px; margin: 18px 0 8px; }
+  .legend div { font-size: 13.5px; color: var(--ink-soft); display: flex; gap: 10px; align-items: baseline; }
+
+  .cmp { border: 1px solid var(--rule); border-radius: 5px; margin: 16px 0; overflow: hidden; background: var(--paper); }
+  .cmp > .head {
+    background: var(--card); padding: 11px 16px; border-bottom: 1px solid var(--rule);
+    display: flex; gap: 11px; align-items: baseline; flex-wrap: wrap;
+  }
+  .cmp > .head .title { font-weight: 700; font-size: 15.5px; flex: 1 1 300px; }
+  .cmp > .head .sev { font-size: 11.5px; color: var(--ink-faint); font-family: var(--mono); letter-spacing: 0.05em; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; }
+  .cols > div { padding: 15px 17px; }
+  .cols > .old { border-right: 1px solid var(--rule); background: var(--panel); }
+  .colhead {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.11em;
+    text-transform: uppercase; color: var(--ink-faint); margin-bottom: 9px; display: block;
+  }
+  .cols p { font-size: 14.5px; margin: 0 0 10px; }
+  .cols p:last-child { margin-bottom: 0; }
+  .old p { color: var(--ink-soft); }
+
+  .verdict {
+    font-size: 14.5px; margin: 0 0 10px; padding: 9px 12px;
+    border-radius: 4px; background: var(--card); border-left: 3px solid var(--navy-soft);
+  }
+  .verdict b { display: block; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 3px; font-family: var(--mono); }
+
+  .evidence {
+    font-family: var(--mono); font-size: 12px; line-height: 1.55;
+    background: var(--card); border-left: 2px solid var(--navy-soft);
+    padding: 9px 12px; margin: 10px 0 0; overflow-x: auto; color: var(--ink-soft);
+  }
+  .evidence strong { color: var(--ink); font-weight: 700; }
+
+  @media (max-width: 760px) {
+    .cols { grid-template-columns: 1fr; }
+    .cols > .old { border-right: none; border-bottom: 1px solid var(--rule); }
+    .cover h1 { font-size: 32px; }
+  }
+
+  table.reg { width: 100%; border-collapse: collapse; margin: 16px 0 10px; font-size: 14px; }
+  table.reg th, table.reg td { text-align: left; padding: 9px 11px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  table.reg th { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); font-weight: 400; }
+  table.reg td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .scroll { overflow-x: auto; }
+
+  .callout { border-left: 4px solid var(--refute); background: var(--no-bg); padding: 15px 19px; margin: 20px 0; }
+  .callout.note { border-left-color: var(--opt); background: var(--opt-bg); }
+  .callout.good { border-left-color: var(--done); background: var(--done-bg); }
+  .callout h4 { margin: 0 0 8px; font-size: 15px; }
+  .callout p { font-size: 14.5px; margin-bottom: 8px; }
+  .callout p:last-child { margin-bottom: 0; }
+
+  ul.tight { margin: 8px 0 14px; padding-left: 22px; }
+  ul.tight li { margin-bottom: 7px; font-size: 14.5px; }
+
+  footer.pagefoot {
+    margin-top: 58px; padding-top: 14px; border-top: 1px solid var(--rule);
+    display: flex; justify-content: space-between; font-size: 11.5px;
+    color: var(--ink-faint); gap: 14px; flex-wrap: wrap;
+  }
+</style>
+
+<div class="topbar"></div>
+<div class="sheet">
+
+  <div class="cover">
+    <span class="badge">Verification Companion</span>
+    <h1>cleanstart.com</h1>
+    <p class="prepared">Engineering verification of the Full SEO Audit Report</p>
+
+    <div class="scorepair">
+      <div class="scorebox">
+        <div><span class="num">66</span><span class="den">/100</span></div>
+        <div class="cap">As reported · Aug 10</div>
+      </div>
+      <div class="scorebox">
+        <div><span class="num">72</span><span class="den">/100</span></div>
+        <div class="cap">Verified &amp; live · Aug 13</div>
+      </div>
+      <div class="scorebox">
+        <div><span class="num">9</span><span class="den"> to skip</span></div>
+        <div class="cap">Recommendations not to action as written</div>
+      </div>
+      <div class="scorebox">
+        <div><span class="num">6</span><span class="den"> shipped</span></div>
+        <div class="cap">Engineering items closed</div>
+      </div>
+    </div>
+
+    <div class="dates">
+      <span>Updated August 13, 2026</span>
+      <span>Companion to the Aug 10 audit</span>
+    </div>
+  </div>
+
+  <div class="band">
+    <h2>1. How to read this document</h2>
+  </div>
+
+  <p class="lede">
+    Every finding in the August 10 audit was checked against the live site and the codebase. Each one
+    appears below with the report's own wording on the left and the verified outcome on the right.
+    <strong>Every finding carries a decision — whether it needs fixing or not — and that decision is
+    the first thing on the row.</strong>
+  </p>
+
+  <h4 class="sub">The five decisions</h4>
+  <div class="legend">
+    <div><span class="chip k-no">No action</span><span>Claim was false, or the current behaviour is deliberately correct. <strong>Do nothing.</strong></span></div>
+    <div><span class="chip k-done">Done · live</span><span>Fixed, deployed, and verified on production.</span></div>
+    <div><span class="chip k-do">Do · owner</span><span><strong>Needs fixing.</strong> The owner and the effort are stated on the row.</span></div>
+    <div><span class="chip k-later">Later</span><span>Genuinely needs fixing, but needs its own scoped plan first.</span></div>
+    <div><span class="chip k-opt">Optional</span><span>Real but marginal. Fix only if already working in that area.</span></div>
+  </div>
+
+  <p style="margin-top:16px">
+    The single most important correction is one the audit itself already makes. Its Technical SEO
+    section credits the site as <em>"Fully server-rendered Next.js — all core content present in raw
+    HTML, no JS execution required for indexing"</em> and scores that category 84/100. That directly
+    contradicts the earlier claim, circulated separately, that blog posts and case studies return
+    empty loading shells. That claim was wrong — and because it came with specific code
+    recommendations that are still circulating, each one is checked individually in
+    <strong>Appendix A</strong>.
+  </p>
+
+  <div class="band">
+    <h2>2. Action register — the short answer</h2>
+  </div>
+
+  <p>
+    Everything that needs doing, and everything that explicitly does not. If you read one page of this
+    document, read this one.
+  </p>
+
+  <h4 class="sub"><span class="chip k-done">Closed since publication</span> &nbsp;Every item on the original "do now" list is done</h4>
+  <div class="scroll">
+    <table class="reg">
+      <thead><tr><th>Item</th><th>Owner</th><th>Outcome</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>/subscribe</code> redirect <strong>307 → 308</strong></td>
+          <td class="n">CMS</td>
+          <td>Done. Live and verified returning 308.</td>
+        </tr>
+        <tr>
+          <td>Authors assigned to the 6 posts missing them</td>
+          <td class="n">CMS</td>
+          <td>Done. All six now carry the <strong>CleanStart Security</strong> byline in live JSON-LD.</td>
+        </tr>
+        <tr>
+          <td>CrUX field data / INP</td>
+          <td class="n">Ops</td>
+          <td>Answered — the key was already configured. Real p75 data pulled; see §3.5.</td>
+        </tr>
+        <tr>
+          <td>Promote CSP from Report-Only to enforced</td>
+          <td class="n">Ops + Eng</td>
+          <td><strong>Done — but it needed two code fixes first.</strong> See §3.1; one was found only after enforcement.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout note">
+    <h4>Separately: a full meta-tag refresh shipped</h4>
+    <p>
+      Outside this audit's findings, new SEO titles and descriptions were seeded across
+      <strong>280 CMS documents plus one code-owned page</strong> — 416 values, verified byte-exact
+      against the source workbook, with every publish date preserved. It is not scored below because
+      it does not map to any finding the audit raised, but it is the largest on-page change in this
+      cycle and it lands squarely on the categories still scoring lowest.
+    </p>
+  </div>
+
+  <h4 class="sub"><span class="chip k-no">Do not do</span> &nbsp;Nine recommendations not to action as written — two of which would cause harm</h4>
+  <div class="scroll">
+    <table class="reg">
+      <thead><tr><th>Finding</th><th>Rated</th><th>Why no action</th></tr></thead>
+      <tbody>
+        <tr><td>Add IndexNow support</td><td class="n">High</td><td>Already implemented and live. The audit checked two paths the protocol doesn't use.</td></tr>
+        <tr><td>Fix 28 pages missing <code>lastmod</code></td><td class="n">Medium</td><td><strong>Would cause harm.</strong> Deliberate policy; Google distrusts inaccurate <code>lastmod</code>.</td></tr>
+        <tr><td>Add author to Article/BlogPosting schema site-wide <em>(the code change only)</em></td><td class="n">Medium</td><td>92% of posts already emit it; the builder is correct. <strong>Do the CMS fix above instead</strong> — 6 posts need an author assigned.</td></tr>
+        <tr><td>Complete SoftwareApplication with ratings/offers</td><td class="n">Medium</td><td>No genuine rating or pricing data exists. Already a documented decision in code.</td></tr>
+        <tr><td>Fix homepage canonical trailing slash</td><td class="n">Low</td><td>Not reachable from application code. Attempted, disproven, reverted, test-pinned.</td></tr>
+        <tr><td>Remove or extend FAQPage schema</td><td class="n">Info</td><td>The report itself recommends inaction. Agreed.</td></tr>
+        <tr><td>Performance figures are lab-only</td><td class="n">Medium</td><td>A methodology caveat about the report, not a defect in the site.</td></tr>
+        <tr><td>Homepage DOM node count (1,534)</td><td class="n">Low</td><td>The report itself says it is not currently actionable. Watch item only.</td></tr>
+        <tr><td>Backlink data limited to Tier-0</td><td class="n">High</td><td>A gap in the audit's tooling, not a defect in the site.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4 class="sub"><span class="chip k-done">Already done</span> &nbsp;Shipped, deployed and verified on production today</h4>
+  <div class="scroll">
+    <table class="reg">
+      <thead><tr><th>Item</th><th>Verified live</th></tr></thead>
+      <tbody>
+        <tr><td>Review schema for the four attributed homepage testimonials</td><td class="n">4 nodes, no fabricated rating</td></tr>
+        <tr><td>Intrinsic dimensions on decorative homepage icons</td><td class="n">21 unsized → 7 intentional</td></tr>
+        <tr><td>Corrected the shared schema linter (see §6)</td><td class="n">rule fixed, 91 tests pass</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4 class="sub"><span class="chip k-later">Later</span> &nbsp;Real, but each needs a scoped plan before touching</h4>
+  <ul class="tight">
+    <li><strong>Give each case study its own indexable route.</strong> Closes three findings at once, but it is a content-model change, not markup.</li>
+    <li><strong>Fix the hidden-container rendering defect (§6).</strong> Not in the audit. Entangled with existing not-found handling, so it needs measurement first.</li>
+  </ul>
+
+  <h4 class="sub"><span class="chip k-do">Content programme</span> &nbsp;~28 findings — the substantive majority, owned by SEO</h4>
+  <p style="font-size:14.5px">
+    Sourcing the headline stats, replacing the placeholder CVE example, merging the cannibalizing
+    pages, rewriting the three product pages, building the Clean Libraries cluster and the pillar page,
+    adding outbound citations, expanding FAQ answers, and surfacing the free-tier CTA. All verified as
+    fair, none disputed, none blocked on engineering. Detail in §3.
+  </p>
+
+  <div class="band">
+    <h2>3. Findings, side by side</h2>
+  </div>
+
+  <h3 class="sec">3.1 Technical SEO <span class="sc">— reported 84/100 · verified 91</span></h3>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">No IndexNow protocol support</span>
+      <span class="sev">High</span>
+      <span class="chip k-no">No action</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"No IndexNow key file at /.well-known/indexnow or /indexnow.txt, and no reference in robots.txt."</p>
+        <p>Recommendation: implement a key file plus automated push-on-publish.</p>
+      </div>
+      <div>
+        <span class="colhead">Verified — false</span>
+        <div class="verdict"><b>Decision</b>Do nothing. It already works.</div>
+        <p>IndexNow is fully implemented and live. The audit probed two paths the protocol does not use — the spec locates the key at <code>&lt;host&gt;/&lt;key&gt;.txt</code> via <code>keyLocation</code>, which is exactly what this implementation does. Push-on-publish already fires across seven collections.</p>
+        <p class="evidence">$ curl -sI https://www.cleanstart.com/2abd211550dc3ce92123f2a22d86df7d.txt<br><strong>HTTP 200</strong> — body matches filename, as the spec requires</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">28 core pages missing lastmod</span>
+      <span class="sev">Medium</span>
+      <span class="chip k-no">No action</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>Listed in the Medium action plan: "Fix the 28 core pages missing lastmod."</p>
+      </div>
+      <div>
+        <span class="colhead">Verified — correct by design</span>
+        <div class="verdict"><b>Decision</b>Do nothing — and specifically, do <em>not</em> add dates. Acting on this would make crawling worse.</div>
+        <p>Confirmed: 524 <code>&lt;loc&gt;</code>, 496 <code>&lt;lastmod&gt;</code>. The gap is deliberate and documented in code — <code>lastmod</code> is emitted only where accurate, from CMS timestamps. The 29 static routes have no meaningful document timestamp.</p>
+        <p>Google ignores, and learns to distrust, inaccurate <code>lastmod</code>. Synthesising build dates would degrade a working crawl signal.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">Homepage canonical omits trailing slash</span>
+      <span class="sev">Low</span>
+      <span class="chip k-no">No action</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"Canonical is https://www.cleanstart.com (no slash) while the sitemap and served URL are .../ (with slash). Google normalizes this in practice but it's the only page where the mismatch occurs."</p>
+      </div>
+      <div>
+        <span class="colhead">Verified — not fixable in app code</span>
+        <div class="verdict"><b>Decision</b>Do nothing. Already attempted and proven impossible.</div>
+        <p>The observation is accurate; the recommendation is not actionable. Next.js's metadata resolver collapses <em>any</em> root-path canonical to the bare origin unless <code>trailingSlash</code> is enabled — and this site strips trailing slashes everywhere by deliberate policy.</p>
+        <p>We implemented the fix, proved against a production build that the rendered tag was unchanged, and reverted. A regression test now pins the behaviour so the dead end isn't re-attempted.</p>
+        <p class="evidence">resolve-url.js — <strong>resolveAbsoluteUrlWithPathname()</strong><br>result.pathname === '/' ? result.origin : result.href</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">CSP shipped as Report-Only — never enforced</span>
+      <span class="sev">High</span>
+      <span class="chip k-done">Done · live</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"Every response carries only the Report-Only variant of the CSP header; the well-constructed script-src/object-src policy is not actually blocking anything."</p>
+      </div>
+      <div>
+        <span class="colhead">Enforced — after two blocking fixes</span>
+        <div class="verdict"><b>Decision</b>Closed. <code>CSP_ENFORCE=1</code> is live and the policy is enforcing.</div>
+        <p>The finding was correct, but flipping the switch alone would have broken the site. The report-only burn-in existed to catch that, and it did — twice.</p>
+        <p><strong>Caught before enforcing:</strong> <code>frame-src</code> allowed only <code>'self'</code> and the YouTube player. Cloudflare Turnstile renders its challenge in an iframe from <code>challenges.cloudflare.com</code>, which was not listed. Enforcing without that fix would have stripped bot protection from all seven form surfaces — book-a-demo, deal registration, contact, job apply, partner CTA and every CMS form. Verified working after the flip: a live Turnstile token is issued.</p>
+        <p><strong>Caught only after enforcing:</strong> YouTube poster images are served from <code>ytimg.com</code>, not the player origin, and were blocked outright — podcast cards, Knowledge Hub lessons and the Clean Libraries hero rendered blank until a second fix shipped. All 26 thumbnails now load.</p>
+        <p class="evidence">frame-src 'self' <strong>youtube-nocookie.com challenges.cloudflare.com</strong><br>img-src … <strong>https://*.ytimg.com</strong><br>Turnstile token: <strong>816 chars, issued</strong> · thumbnails: <strong>26/26 loaded</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">Stale /subscribe redirect</span>
+      <span class="sev">Medium</span>
+      <span class="chip k-done">Done · live</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>Listed in the Medium action plan alongside the lastmod and canonical items.</p>
+      </div>
+      <div>
+        <span class="colhead">Verified — true</span>
+        <div class="verdict"><b>Decision</b>Closed. The CMS redirect row was changed to <strong>308</strong>; live responses now return 308.</div>
+        <p>Confirmed: <code>/subscribe</code> returns <strong>307</strong> (temporary) to <code>/blogs</code>. It is not in the application's redirect config — it is a CMS-managed redirect row whose own status value is passed straight through to the response.</p>
+        <p>It matters because a 307 signals a temporary move, so Google keeps the old URL and does not consolidate signals onto <code>/blogs</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">Bare HTTP apex takes two redirect hops</span>
+      <span class="sev">Medium</span>
+      <span class="chip k-opt">Optional</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"http://cleanstart.com → https://cleanstart.com (308) → https://www.cleanstart.com (308). Costs an extra round trip for first-touch links."</p>
+      </div>
+      <div>
+        <span class="colhead">Verified — true, marginal</span>
+        <div class="verdict"><b>Decision</b>Optional. Only worth doing if you're already editing DNS/domain settings — not worth a dedicated change.</div>
+        <p>Confirmed. The second hop is already a correct 308 from our proxy. The first is issued at the hosting edge <em>before</em> application code runs, so it cannot be collapsed from the app — the report's own "at the edge/DNS layer" framing is right.</p>
+        <p>Impact is limited to first-touch links with no HSTS state cached, which after preload is a small and shrinking share.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sec">3.2 Content Quality &amp; E-E-A-T <span class="sc">— reported 58/100 · unchanged</span></h3>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">BlogPosting/Article schema systematically omits the author property</span>
+      <span class="sev">Medium</span>
+      <span class="chip k-done">Done · live</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"Every JSON-LD block sampled includes Organization/WebSite/BreadcrumbList/BlogPosting/FAQPage/Article types but none include a Person author node."</p>
+        <p>Recommendation: add author to Article/BlogPosting schema site-wide.</p>
+      </div>
+      <div>
+        <span class="colhead">Right instinct, wrong diagnosis</span>
+        <div class="verdict"><b>Decision</b>Closed — and deliberately <strong>not</strong> as recommended. The schema code was left untouched; the six posts were given the <strong>CleanStart Security</strong> byline instead. Coverage is now 73/73.</div>
+        <p>We measured all 73 blog posts rather than sampling. <strong>67 of 73 (92%) already emit a Person author node</strong>, across five named authors — so "none include" is not accurate, and the recommended site-wide code change would do nothing, because the builder is already correct.</p>
+        <p>But the finding is not empty. Six posts genuinely have no author assigned, and they are <strong>concentrated in exactly the wrong place</strong> — the flagship comparison and thought-leadership posts. That is almost certainly why the audit's sample hit them: it sampled the commercially important pages, and those are the ones with the gap.</p>
+        <p class="evidence">73 posts measured · <strong>67 with author (92%)</strong> · 6 without (8%)<br>Dhanush VM 24 · Biplab Paul 19 · Biswajit De 13 · CleanStart Security 10 · Mayank Solanki 1<br><br><strong>Missing (6):</strong><br>chainguard-alternatives-comparing-hardened-container-image-vendors<br>official-go-docker-image-vs-cleanstart-hardened-go-image<br>why-container-security-starts-before-cnapp<br>hermetic-build<br>shift-left-moved-the-problem-integrate-left-solves-it<br>the-n8n-vulnerabilities-highlight-a-growing-execution-chain-trust-problem</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">Flagship competitive blog post has zero author attribution</span>
+      <span class="sev">High</span>
+      <span class="chip k-done">Done · live</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"The Chainguard-alternatives comparison post — the site's most competitively important content — has no author property in its BlogPosting schema and no visible byline anywhere in the rendered HTML."</p>
+      </div>
+      <div>
+        <span class="colhead">Verified — true, and correctly prioritised</span>
+        <div class="verdict"><b>Decision</b>Closed. Assigned as part of the batch of 6; the byline is live in this post's JSON-LD.</div>
+        <p>Confirmed. The document has no author assigned, so the builder correctly emits nothing.</p>
+        <p>This is the sharper version of the schema finding above, and the audit was right to rate it High. Of the six posts missing an author, this is the one the report singles out as "the site's most competitively important content" — and it is. Fixing the batch resolves both findings at source.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">Fabricated "Real-World Impact" example · unsourced headline statistics</span>
+      <span class="sev">Critical ×2</span>
+      <span class="chip k-do">Do · Content</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>A placeholder-style CVE ID presented as a real incident on <code>/knowledge-hub/the-numbers</code>; and the four headline proof stats (88,000+ CVEs, 90%+ reduction, 300,000+ hours, 10M+ packages) rendering as bare numbers with no source or methodology anywhere in the DOM.</p>
+      </div>
+      <div>
+        <span class="colhead">Accepted in full</span>
+        <div class="verdict"><b>Decision</b>Yes, fix — highest priority in the whole report. Content team.</div>
+        <p>No engineering dispute. Both are real, both are editorial, both correctly rated Critical. An unsourced or invented claim is a trust problem before it is an SEO problem, and these are the two findings we would action first.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">Thin core pages · author bios · case-studies page · topical overlap · FAQ depth · logo alt text</span>
+      <span class="sev">High / Medium</span>
+      <span class="chip k-do">Do · Content</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>Six further findings: homepage and service pages below topical-coverage floors; 14–20 word non-technical author bios; "Case Studies" being a testimonial carousel; ~600 URLs of overlapping concepts; homepage FAQ answers shallower than the pages they represent; inconsistent alt text on named customer logos.</p>
+      </div>
+      <div>
+        <span class="colhead">Accepted in full</span>
+        <div class="verdict"><b>Decision</b>Yes, fix all six. Content team — authoring and IA work, none blocked on engineering.</div>
+        <p>All six verified as fair descriptions of the live site.</p>
+        <p>One sequencing caveat: merging near-duplicates with 301s is irreversible in practice, so it should follow the measured data discussed in §5, not precede it.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sec">3.3 On-Page SEO &amp; Search Experience <span class="sc">— reported 48/100 · unchanged</span></h3>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">Confirmed keyword cannibalization on core definitional terms</span>
+      <span class="sev">Critical</span>
+      <span class="chip k-do">Do · Content</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"Google returns 2-3 separate CleanStart URLs in the same result set for 'what is an SBOM' (/blogs/sbom-101, /guide/sbom, /knowledge-hub/what-is-sbom), and the same pattern recurs for distroless, CVE fatigue, and VEX documents."</p>
+        <p>Recommendation: merge with 301s before building new content on these topics.</p>
+      </div>
+      <div>
+        <span class="colhead">Accepted, with a sequencing caveat</span>
+        <div class="verdict"><b>Decision</b>Yes, fix — but pull Search Console query data <em>first</em>, then merge toward whichever URL actually holds the impressions.</div>
+        <p>The overlapping pages exist; that much is directly verifiable. The word "Confirmed" is doing heavy lifting though — this is asserted from live SERP observation, not Search Console data. No impressions, clicks or position figures appear anywhere in the report.</p>
+        <p>Cannibalization is measurable, and 301s are effectively irreversible. Measure, then merge.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">Ten further on-page findings</span>
+      <span class="sev">Critical → Medium</span>
+      <span class="chip k-do">Do · Content</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>No page targets "SBOM generation tool"; three flagship product pages are 256–317 word landing pages; zero-CVE nuance absent from the product H1; no content cluster for Clean Libraries; no true pillar page; no top-10 ranking for five seed terms; every CTA is "Book a Demo" despite a free tier; no compliance badges on compliance-claiming pages; no CVE-prioritization page; <code>/guide/base-image</code> lacks security framing.</p>
+      </div>
+      <div>
+        <span class="colhead">Accepted in full</span>
+        <div class="verdict"><b>Decision</b>Yes, fix all ten. Content team — this is the strongest section of the audit.</div>
+        <p>We dispute none of it. The findings are specific, the competitor comparisons concrete, and the recommendations actionable as written.</p>
+        <p>The free-tier CTA finding deserves singling out: it is a conversion problem the SEO audit happened to catch, and it likely outranks several ranking items on commercial impact.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sec">3.4 Schema / Structured Data <span class="sc">— reported 78/100 · verified 88</span></h3>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">Genuine customer testimonials are not marked up as Review</span>
+      <span class="sev">Medium</span>
+      <span class="chip k-done">Done · live</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"The homepage carries a real, attributed customer quote (Vodafone Idea CTSO &amp; DPO) with zero corresponding structured data."</p>
+        <p>Recommendation: add Review schema (author + reviewBody, no fabricated rating) attached to the Organization node.</p>
+      </div>
+      <div>
+        <span class="colhead">Fixed, deployed, verified</span>
+        <div class="verdict"><b>Decision</b>Closed. Live on production since 12 Aug.</div>
+        <p>Implemented exactly as recommended, including the "no fabricated rating" constraint. Four <code>Review</code> nodes render on the homepage, each with author, job title, employer affiliation and review body, linked to the Organization.</p>
+        <p>The builder lives in the shared schema package so the CMS's own schema tooling can see it, and a unit test asserts <code>reviewRating</code> is never emitted.</p>
+        <p class="evidence">Mathan Babu K &nbsp;&nbsp;&nbsp;| CTSO &amp; DPO, Vodafone Idea | rating: <strong>absent</strong><br>Shanker Ramrakhiani | IIFL Finance &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| rating: <strong>absent</strong><br>Mr. Moinul Khan &nbsp;&nbsp;&nbsp;&nbsp;| Aurascape &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| rating: <strong>absent</strong><br>Ankit Agarwal &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| Coforge &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| rating: <strong>absent</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">SoftwareApplication blocks missing aggregateRating and offers</span>
+      <span class="sev">Medium</span>
+      <span class="chip k-no">No action</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"Clean Images, Clean Libraries, and CleanSight product pages emit SoftwareApplication schema without aggregateRating or offers, which Google's Software App guidelines require for the star-rating rich result to render."</p>
+        <p>Recommendation: only add real, sourced ratings/pricing if genuine data exists — never fabricate.</p>
+      </div>
+      <div>
+        <span class="colhead">Already a documented decision</span>
+        <div class="verdict"><b>Decision</b>Do nothing, unless real G2/Capterra data is sourced later — at which point this becomes a content task, not an engineering one.</div>
+        <p>No rating corpus and no public pricing exist, so by the recommendation's own condition there is nothing to add. This was not an oversight: the schema builder already carries a comment recording the deliberate omission and its reasoning.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">Case-study Articles missing image/author, and sharing one URL</span>
+      <span class="sev">Medium ×2</span>
+      <span class="chip k-later">Later</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>Both case-study Article items lack image and author; neither has a unique URL or fragment, so search engines and AI answer engines cannot deep-link to a specific customer story.</p>
+      </div>
+      <div>
+        <span class="colhead">Real — needs its own plan</span>
+        <div class="verdict"><b>Decision</b>Yes eventually, not yet. Needs a scoped plan — solve together with the "Case Studies is a carousel" finding, once.</div>
+        <p>Both accurate. Giving each customer story its own indexable route is a content-model change — a new collection or route plus CMS data — not a markup tweak, so it is deliberately out of scope for this pass rather than dismissed.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">FAQPage schema is informational-only post-retirement</span>
+      <span class="sev">Info</span>
+      <span class="chip k-no">No action</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"Google retired FAQ rich results for all sites as of 2026-05-07. Do not remove it and do not add new FAQPage blocks elsewhere chasing a SERP feature that no longer exists."</p>
+      </div>
+      <div>
+        <span class="colhead">Agreed as written</span>
+        <div class="verdict"><b>Decision</b>Do nothing — deliberately. Keep the existing markup, don't add more.</div>
+        <p>Correct, correctly rated, and correctly recommends inaction. Retained on the homepage; not extended elsewhere.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sec">3.5 Performance (Core Web Vitals) <span class="sc">— reported 70/100 · see field-data caveat</span></h3>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">21–27 images per page lack explicit width/height</span>
+      <span class="sev">Medium</span>
+      <span class="chip k-done">Done · live</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"Measured CLS is currently near-zero, but unsized images are a latent risk that can regress under slow network conditions or on first-time cache-miss loads."</p>
+      </div>
+      <div>
+        <span class="colhead">Fixed, deployed, verified</span>
+        <div class="verdict"><b>Decision</b>Closed. The 7 remaining are intentional — do not "fix" them.</div>
+        <p>Intrinsic dimensions added to the decorative icons that occupy layout flow. Homepage count drops from 21 to 7.</p>
+        <p>Of the remainder, three are responsive images using fill layout, which omits the attributes <em>by design</em>, and four are absolutely-positioned background art removed from layout flow, where the attributes buy nothing.</p>
+        <p class="evidence">before: 78 images, <strong>21 unsized</strong><br>after:&nbsp; 78 images, <strong>7 unsized</strong> (all intentional)</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">INP cannot be measured — no field data exists</span>
+      <span class="sev">High</span>
+      <span class="chip k-done">Answered</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"No Google API key is configured (PSI/CrUX both unavailable), so no field data exists; lab tools cannot measure INP at all since it requires real user interaction timing."</p>
+      </div>
+      <div>
+        <span class="colhead">True of the audit's tooling — not of ours</span>
+        <div class="verdict"><b>Decision</b>Nothing to configure. The key was already set and working; we pulled the field data directly. <strong>INP is Good on both form factors.</strong></div>
+        <p>The statement describes the audit's own environment, not the site's. A CrUX key is configured in production and returns data on demand — we queried it live:</p>
+        <p class="evidence"><strong>Real CrUX field data · p75 · 28-day rolling</strong><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LCP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; INP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLS<br>PHONE&nbsp;&nbsp;&nbsp;&nbsp; <strong>2991ms</strong>&nbsp; 142ms&nbsp;&nbsp; 0.00<br>DESKTOP&nbsp;&nbsp; 1768ms&nbsp; &nbsp;94ms&nbsp;&nbsp; 0.03</p>
+        <p><strong>This overturns the category's headline claim.</strong> The audit reported "Lab LCP is comfortably Good on all 3 pages tested (1.48–1.61s)". Real-user mobile LCP is <strong>2991ms — "Needs Improvement"</strong>, not Good. Its own caveat that lab data is directional rather than authoritative turned out to be the most important sentence in the section.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">Analytics cache writes silently stopped six weeks ago</span>
+      <span class="sev">Not in the report</span>
+      <span class="chip k-do">Do · Eng</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">Not reported</span>
+        <p>The audit could not see this — it inspected the public site, not the CMS analytics pipeline.</p>
+      </div>
+      <div>
+        <span class="colhead">Found while checking the CrUX key</span>
+        <div class="verdict"><b>Decision</b>Yes, fix — needs a scoped investigation, not a config change. Root cause not yet identified.</div>
+        <p>Every analytics cache key except <code>default</code> stopped updating at the same minute on <strong>2026-06-29 07:12</strong> — the CrUX record and all eleven <code>overview:*</code> aggregates. The frequent dashboard keys have kept writing normally throughout (4,791 rows, current to the minute).</p>
+        <p>The key resolves at runtime and the API is reachable from inside the container — both tested directly — so the job runs and appears to succeed while writing nothing.</p>
+        <p>There is likely a second fault underneath. The five-minute queues are all current to the minute, but the <em>daily</em> ones fired on scattered dates despite five days of continuous uptime: <code>cruxRefresh</code> today, <code>meiliReindex</code> Aug 11, <code>brokenLinksScan</code> Aug 9, <code>dashboardRefreshDaily</code> Aug 6, <code>contentInsightsRefresh</code> Aug 1, <code>previewAuditPurge</code> Jul 27. Daily cron scheduling is unreliable, not just this one job.</p>
+        <p><strong>Why nobody noticed for six weeks:</strong> the cache writer swallows every error in a bare <code>catch {}</code> — deliberately, so a failed write can't crash a cron — and the job logs nothing on success. The failure is unobservable by construction. Whatever the underlying cause, that silence is the first thing to fix.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">All performance data is single-run lab data · homepage DOM node count</span>
+      <span class="sev">Medium / Low</span>
+      <span class="chip k-no">No action</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"Every Good/Needs-Improvement call in this report is a directional lab signal from one Chromium instance at one moment, not validated field data." Homepage DOM at 1,534 nodes is "not currently actionable on its own."</p>
+      </div>
+      <div>
+        <span class="colhead">Agreed — credit where due</span>
+        <div class="verdict"><b>Decision</b>Nothing to fix. One is a caveat about the report; the other the report itself defers.</div>
+        <p>Both self-aware and correctly rated. Stating plainly that its own performance numbers are directional rather than authoritative is the most rigorous thing in the report, and it applies to the whole of this category.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sec">3.6 AI Search Readiness (GEO) <span class="sc">— reported 66/100 · see caveat in §5</span></h3>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">Seven GEO findings — attribution, citations, answer length, prose density, headings, bylines, corroboration</span>
+      <span class="sev">High / Medium</span>
+      <span class="chip k-do">Do · Content</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>Proof-point stats render as unattributed UI widgets; no outbound citations to primary sources; FAQ and product answers fall short of the 134–167 word band correlated with citation; product pages are card-driven rather than prose-driven; H2/H3s are brand taglines rather than question-matched; blog authorship is a house byline; third-party corroboration is thin.</p>
+      </div>
+      <div>
+        <span class="colhead">Accepted in full</span>
+        <div class="verdict"><b>Decision</b>Yes, fix all seven. Content team — no engineering dependency.</div>
+        <p>The technical substrate this section depends on is already in place and the report says so: server-rendered HTML, a well-formed <code>llms.txt</code>, and AI crawlers permitted in <code>robots.txt</code>.</p>
+        <p>The outbound-citation and attribution items overlap almost exactly with the Critical unsourced-stats finding in §3.2 — one editorial fix closes several findings at once.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sec">3.7 Backlink Profile <span class="sc">— no score issued</span></h3>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">Only Tier-0 data available · named customers show no earned media</span>
+      <span class="sev">High ×2</span>
+      <span class="chip k-do">Do · Marketing</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>No Moz/Bing/DataForSEO credentials configured, so no referring-domain count, anchor text or toxicity data; a numeric score is deliberately withheld. Separately, four named enterprise relationships appear only as self-published assets with no verified third-party coverage.</p>
+      </div>
+      <div>
+        <span class="colhead">Split decision</span>
+        <div class="verdict"><b>Decision</b>Tier-0 data gap — <strong>no action</strong>, it's an audit tooling limit, not a site defect. Earned media — <strong>yes</strong>, but it's a PR programme, not a website change.</div>
+        <p>Withholding a score rather than inventing one is the correct call. The earned-media finding is real but cannot be closed by editing the website; it needs trade press and customer-newsroom coverage.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <h2>4. The score, and how it was derived</h2>
+  </div>
+
+  <div class="callout note">
+    <h4>This is our arithmetic, not the audit's</h4>
+    <p>
+      The original tool's rubric is not published, and its own six category scores average to 67.3
+      rather than the 66 it reports — so the overall figure cannot be reproduced exactly. The model
+      below is stated openly so it can be checked or replaced: severity-weighted penalty mass
+      (Critical 8, High 5, Medium 3, Low 1), with refuted and fixed findings removed proportionally
+      to each category's remaining headroom. <strong>If the SEO team re-runs their own tool, their
+      number is the one to quote.</strong>
+    </p>
+  </div>
+
+  <div class="scroll">
+    <table class="reg">
+      <thead><tr><th>Category</th><th>Reported</th><th>Corrected</th><th>Live now</th><th>What moved</th></tr></thead>
+      <tbody>
+        <tr><td>Technical SEO</td><td class="n">84</td><td class="n">91</td><td class="n"><strong>96</strong></td><td>IndexNow and <code>lastmod</code> were never real; CSP now enforced and <code>/subscribe</code> fixed. Only the marginal apex hop remains.</td></tr>
+        <tr><td>Content &amp; E-E-A-T</td><td class="n">58</td><td class="n">58</td><td class="n"><strong>65</strong></td><td>Author coverage closed — 73/73 posts now carry a byline. The rest is content work.</td></tr>
+        <tr><td>On-Page &amp; SXO</td><td class="n">48</td><td class="n">48</td><td class="n">48</td><td>Untouched. The lowest score, and entirely content programme.</td></tr>
+        <tr><td>Schema</td><td class="n">78</td><td class="n">83</td><td class="n"><strong>88</strong></td><td>SoftwareApplication refuted; Review schema shipped and live.</td></tr>
+        <tr><td>Performance</td><td class="n">70</td><td class="n">70</td><td class="n"><strong>74</strong></td><td>Image dimensions shipped and INP answered Good — but real field data revealed a mobile LCP problem lab data had masked.</td></tr>
+        <tr><td>AI Search (GEO)</td><td class="n">66</td><td class="n">66</td><td class="n">66</td><td>Untouched — and still likely overstated, see below.</td></tr>
+        <tr><td><strong>Overall</strong></td><td class="n"><strong>66</strong></td><td class="n"><strong>~69</strong></td><td class="n"><strong>~72</strong></td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    The middle column still matters most. <strong>~69 is what the site should have scored on
+    August 10</strong>, before anyone touched anything — the 66 with penalties for things that were
+    never true removed. Of the further move to ~72, most comes from closing the engineering items
+    outright rather than from new work on the site.
+  </p>
+
+  <div class="callout note">
+    <h4>Engineering is now close to exhausted — the remaining gap is content</h4>
+    <p>
+      Every item the audit assigned to engineering is closed, refuted, or explicitly deferred with a
+      reason. What is left sits in the two lowest-scoring categories: <strong>On-Page &amp; SXO at
+      48</strong> and <strong>Content at 65</strong>, plus GEO at 66. None of it is blocked on code.
+      Further score movement now depends almost entirely on the content programme in §2.
+    </p>
+  </div>
+
+  <div class="callout">
+    <h4>The honest caveat: GEO 66 is probably generous</h4>
+    <p>
+      That category credits "technical accessibility 85/100 — fully server-rendered," which is true.
+      But the defect in §6 means text-extraction pipelines that respect the <code>hidden</code>
+      attribute see roughly a hundred characters instead of the full article — and that is precisely
+      what GEO measures. Until that is fixed, this category should arguably come <em>down</em>, and
+      ~71 carries known downside risk in the one area the audit rated most favourably on technical
+      grounds.
+    </p>
+  </div>
+
+  <div class="band">
+    <h2>5. Two notes on method</h2>
+  </div>
+
+  <div class="callout note">
+    <h4>The Search Console integration did not produce data</h4>
+    <p>
+      The Data Sources table lists Search Console Search Analytics, the URL Inspection API, CrUX and
+      PageSpeed Insights. <strong>Not one metric from any of them appears in the report's sixteen
+      pages</strong> — no clicks, impressions, CTR or average position; no index-coverage counts. The
+      report concedes in its Performance section that no Google API key was configured.
+    </p>
+    <p>
+      This does not make the findings wrong — the crawl-based observations largely held up. It does
+      mean this is a crawl plus analysis rather than a data-backed audit, and the claims that most
+      need data are exactly the ones lacking it: cannibalization, ranking position, and indexation.
+      The live property is connected; a re-run against it would settle those.
+    </p>
+  </div>
+
+  <div class="callout">
+    <h4>Where the false positives came from</h4>
+    <p>
+      Most refuted findings share one pattern: <strong>absence of evidence at an assumed location was
+      read as absence of the feature.</strong> IndexNow was checked at two conventional paths rather
+      than the one the protocol specifies. Missing <code>lastmod</code> was read as an omission rather
+      than a documented policy.
+    </p>
+    <p>
+      The author finding is a different and more interesting case, and worth separating from the
+      others. Its stated claim is wrong — 92% of posts do carry an author — but it was wrong in a
+      <em>useful</em> way. The audit sampled the commercially important pages, and those are exactly
+      where the 8% gap sits. A random sample would likely have missed it entirely. We only found the
+      real shape of it by measuring all 73 posts instead of arguing from a sample of four.
+    </p>
+    <p>
+      Naming these matters because two of the recommendations would have made things actively worse:
+      synthesising <code>lastmod</code> dates degrades a crawl signal Google distrusts when inaccurate,
+      and the site-wide schema edit would have churned correct code while leaving all six real gaps
+      untouched.
+    </p>
+  </div>
+
+  <div class="band">
+    <h2>6. What the audit did not find</h2>
+  </div>
+
+  <p>
+    Two defects surfaced during verification that appear nowhere in the report. Both are recorded here
+    so the comparison is honest in both directions.
+  </p>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">Page content is delivered inside hidden containers</span>
+      <span class="sev">Not in the report</span>
+      <span class="chip k-later">Later</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">Not reported</span>
+        <p>The audit credits the site as fully server-rendered with all core content in raw HTML — which is true, and which correctly refutes the separate "empty loading shells" claim.</p>
+        <p>But it did not examine <em>where</em> in the document that content sits.</p>
+      </div>
+      <div>
+        <span class="colhead">Found during verification</span>
+        <div class="verdict"><b>Decision</b>Yes, needs fixing — but not yet. Needs its own plan and measurement first; a careless fix would break not-found handling.</div>
+        <p>A root-level loading state wraps the entire app in one boundary, so every page ships a spinner in the normal document flow and streams its real content into trailing hidden containers.</p>
+        <p>Search engines execute JavaScript and resolve this correctly, so <strong>indexing is unaffected</strong>. The exposure is text-extraction pipelines that respect <code>hidden</code> — precisely the class of tool feeding AI answer engines.</p>
+        <p class="evidence">/blogs/hermetic-build → 20,062 chars → <strong>108</strong><br>/case-studies&nbsp;&nbsp;&nbsp;&nbsp; → 5,979 chars → <strong>58</strong><br>/pricing&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; → 3,723 chars → <strong>52</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">The schema linter wrongly required a review rating</span>
+      <span class="sev">Not in the report</span>
+      <span class="chip k-done">Done · live</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">Not reported</span>
+        <p>The report recommends adding Review schema without a fabricated rating — correctly.</p>
+      </div>
+      <div>
+        <span class="colhead">Found while implementing it</span>
+        <div class="verdict"><b>Decision</b>Closed. Fixed in the same change.</div>
+        <p>Our shared schema package marked <code>reviewRating</code> as a <em>required</em> field for Review nodes. Following the report's own advice would therefore have produced four false errors in the CMS schema-health view, making a correct change look like a regression to editors.</p>
+        <p>The rule now treats the rating as recommended rather than required, matching Schema.org, which does not mandate it.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="band">
+    <h2>7. Where this leaves things</h2>
+  </div>
+
+  <p>
+    The audit is <strong>substantially sound and worth acting on</strong>. Its content and on-page
+    sections in particular are specific, well-evidenced and correctly prioritised — the two Critical
+    sourcing findings and the free-tier CTA observation are genuinely valuable, and nothing here
+    softens them.
+  </p>
+
+  <p>
+    What changed after verification was the shape of the work, not its volume — and the engineering
+    share has now been worked through. Nine recommendations should not be actioned as written, six
+    items are shipped and live, and two are deferred with stated reasons. Roughly twenty-eight
+    findings — the substantive majority — are content and information-architecture work, and that is
+    where the remaining twenty-eight points of headroom sit.
+  </p>
+
+  <p>
+    Two things are worth carrying forward from how this went. The CSP burn-in <em>earned its keep</em>:
+    reviewing before enforcing caught a change that would have silently disabled bot protection on
+    every lead form. But a second breakage — blocked YouTube thumbnails — surfaced only after
+    enforcement, on pages that had not been swept. Both fixes are live; the lesson is that the sweep
+    should be exhaustive before the switch, not after.
+  </p>
+
+  <p>
+    Recommended next: run the content programme in §2, and re-run the audit with Search Console
+    actually connected. That last step matters most — the findings that most need data to act on
+    safely are the ones currently asserted without it.
+  </p>
+
+  <div class="band">
+    <h2>Appendix A — The earlier "empty loading shells" diagnosis</h2>
+  </div>
+
+  <p class="lede">
+    Before this audit, a separate message circulated internally diagnosing the same symptom and
+    recommending a set of fixes. Because those recommendations are concrete and two of them carry
+    real risk, each is checked here individually. <strong>The symptom it reported was real. Every
+    technical claim it made about the cause was wrong, and none of its proposed fixes should be
+    implemented.</strong>
+  </p>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">"Client-Side Rendering on dynamic route templates"</span>
+      <span class="chip k-no">No action</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As diagnosed</span>
+        <p>"This issue stems from Client-Side Rendering (CSR) on dynamic route templates (e.g. /blog/[slug], /case-studies/[slug]), while top-level marketing pages (/pricing, /) are pre-rendered into static HTML at build time."</p>
+      </div>
+      <div>
+        <span class="colhead">Verified — false</span>
+        <div class="verdict"><b>Decision</b>Nothing to fix. There is no CSR-vs-static split; every route is prerendered.</div>
+        <p>Detail routes are statically prerendered and served from cache, exactly like the marketing pages. There is no difference in rendering strategy between them.</p>
+        <p class="evidence">$ curl -sI .../blogs/hermetic-build<br><strong>x-nextjs-prerender: 1</strong><br>x-vercel-cache: HIT</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">"A bare skeleton shell containing &lt;div id=&quot;app&quot;&gt; or a loading-spinner"</span>
+      <span class="chip k-no">No action</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As diagnosed</span>
+        <p>"…it receives only the bare skeleton HTML shell containing a root &lt;div id="app"&gt;&lt;/div&gt; or a &lt;loading-spinner&gt;, relying entirely on client-side JavaScript execution to fetch content from your CMS/backend."</p>
+      </div>
+      <div>
+        <span class="colhead">Verified — false</span>
+        <div class="verdict"><b>Decision</b>Nothing to fix. No such element exists anywhere on the site.</div>
+        <p>There is no <code>#root</code> or <code>#app</code> mount node on any page — that is the shape of a Vite or Create-React-App SPA, not this stack. The full article text is present in the served HTML; no client-side fetch is involved in rendering it.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">"Marketing pages like /pricing render fine"</span>
+      <span class="chip k-no">No action</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As diagnosed</span>
+        <p>"blog posts, case studies, and the existing Chainguard-comparison content all return empty 'loading' shells on a direct fetch (marketing pages like /pricing render fine), while product/marketing pages render correctly."</p>
+      </div>
+      <div>
+        <span class="colhead">Verified — false, and backwards</span>
+        <div class="verdict"><b>Decision</b>Nothing to fix. <code>/pricing</code> has the identical structure — and by ratio it is the <em>worst</em> affected, not the best.</div>
+        <p>Measured with an extractor that respects the <code>hidden</code> attribute, every page collapses the same way. The premise that some page types behave differently from others does not survive measurement, which is what made the CSR theory seem plausible.</p>
+        <p class="evidence">page&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; full&nbsp;&nbsp;&nbsp; minus-hidden<br>/pricing&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3,723&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>52</strong><br>/case-studies&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5,979&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>58</strong><br>/blogs/hermetic-build 20,062&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>108</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">Proposed code fixes: remove "use client", add getStaticProps, or migrate the SPA</span>
+      <span class="chip k-no">No action</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As recommended</span>
+        <p><strong>Option A:</strong> remove <code>"use client"</code> from <code>app/blog/[slug]/page.tsx</code> and fetch inside a Server Component.</p>
+        <p><strong>Option B:</strong> export <code>getStaticProps</code> / <code>getStaticPaths</code> with <code>fallback: 'blocking'</code>.</p>
+        <p><strong>Option C:</strong> migrate blog/case-study subpaths to SSG using Astro, Next.js or Nuxt, or add a build-time prerenderer.</p>
+      </div>
+      <div>
+        <span class="colhead">None are applicable</span>
+        <div class="verdict"><b>Decision</b>Do not implement any of the three. Each targets a stack we are not running.</div>
+        <p><strong>A</strong> — the detail pages carry no page-level <code>"use client"</code>; they are already Server Components fetching on the server. Nothing to remove.</p>
+        <p><strong>B</strong> — <code>getStaticProps</code>/<code>getStaticPaths</code> are Pages Router APIs. This app is App Router, where they do not exist and would be silently ignored.</p>
+        <p><strong>C</strong> — this is already a Next.js app with static prerendering. There is no SPA to migrate.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">Proposed edge fix: route bot traffic to Prerender.io via a Cloudflare Worker</span>
+      <span class="chip k-no">Do not do</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As recommended</span>
+        <p>"Deploy a Cloudflare Worker in front of /blog/*, /case-studies/* and /comparisons/* to rewrite requests for bots" — matching on a user-agent list (googlebot, gptbot, claudebot, perplexbot…) and proxying those requests to a third-party pre-rendering service.</p>
+      </div>
+      <div>
+        <span class="colhead">Strongly advise against</span>
+        <div class="verdict"><b>Decision</b>Do not implement. It solves a problem we do not have, and introduces several we do not want.</div>
+        <p>The content is already in the HTML, so there is nothing for a pre-renderer to add — it would spend money and add a single point of failure in front of the highest-value pages to duplicate work already done.</p>
+        <p>It also branches the site's output on user-agent. Google deprecated dynamic rendering as a recommended pattern precisely because these setups drift, and once the bot and human responses diverge — through a stale cache, a quota limit, or an outage — the result is serving search engines different content from users. That is a policy risk taken on voluntarily, for no gain.</p>
+        <p>The prefix list is also wrong: <code>/blog/*</code> and <code>/comparisons/*</code> are not routes on this site.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head">
+      <span class="title">The verification commands themselves</span>
+      <span class="chip k-no">No action</span>
+    </div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As provided</span>
+        <p><code>curl … https://cleanstart.com/blog/your-post-slug | grep -i "loading"</code></p>
+        <p><code>curl -s … | grep -E "(&lt;h1|&lt;p&gt;)"</code></p>
+        <p>"Expected Outcome: the second command should return actual text content rather than an empty JS container."</p>
+      </div>
+      <div>
+        <span class="colhead">The tests cannot distinguish the two cases</span>
+        <div class="verdict"><b>Decision</b>Nothing to fix — but do not use these commands to re-test.</div>
+        <p>The paths are wrong: <code>/blog/…</code> 308-redirects to <code>/blogs/…</code>, and <code>/compare/chainguard</code> returns <strong>404</strong> — that route does not exist. The comparison content lives at <code>/blogs/chainguard-alternatives-…</code> and <code>/knowledge-hub/how-cleanstart-compares</code>.</p>
+        <p>More importantly, <code>grep -i "loading"</code> matches on <em>every</em> page including the ones the message says are fine, so it cannot separate them. And the second command already passes today — real <code>&lt;p&gt;</code> content is returned — which by the message's own stated criterion means there is no problem.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout good">
+    <h4>What the message got right</h4>
+    <p>
+      The symptom was real and worth escalating. A direct fetch really can yield almost no readable
+      text, and that really does affect non-JS consumers — which is the concern the message raised.
+      The mechanism is the hidden streaming containers described in <strong>§6</strong>, not
+      client-side rendering, and the fix is in our own root loading state rather than in a proxy or a
+      rewrite. Credit for spotting it; the diagnosis simply pointed at the wrong layer.
+    </p>
+  </div>
+
+  <footer class="pagefoot">
+    <span>Confidential</span>
+    <span>Verification companion to the August 10, 2026 audit · last verified 13 Aug 2026</span>
+    <span>cleanstart.com</span>
+  </footer>
+
+</div>
