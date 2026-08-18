@@ -13,10 +13,10 @@ export interface PartnerQuote {
 
 export const PARTNER_TESTIMONIALS: PartnerQuote[] = [
   {
-    name: "Anuj Gupta",
-    role: "MD, Hitachi Systems (India)",
+    name: "Abdul Rahaman Mohammad",
+    role: "Chief Executive Officer, Gulf IT Network Distribution",
     quote:
-      "Life is all about new beginnings - a clean slate with new friends. Hitachi Systems India is proud to partner with CleanStart to bring market a revolutionary solution delivering clean, hardened, and compliant container and VM images with zero critical vulnerabilities. CleanStart is a game-changer in software supply chain security, blending compliance, security, and innovation to solve real-world customer challenges. CleanStart is manna from heaven for the software industry.",
+      "As organizations accelerate AI-driven software development, they are building software faster while increasingly relying on open-source components and third-party code. This makes the software supply chain a rapidly expanding attack surface, where trust must advance at the same pace as innovation. Together with CleanStart, Gulf IT is helping customers build, acquire and deploy software with confidence through verified software artefacts, backed by our local expertise and regional support.",
   },
   {
     name: "Shaq Khan",
