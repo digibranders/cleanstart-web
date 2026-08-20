@@ -331,7 +331,11 @@ export function CookieBanner() {
               <button
                 type="button"
                 onClick={() => setShowPrefs(true)}
-                className="cursor-pointer whitespace-nowrap font-medium text-white/80 underline underline-offset-4 transition hover:text-white"
+                /* `before:` lifts the touch target to 29px without moving the
+                   underline or the row: the label alone renders ~21px, under
+                   the 24x24 WCAG 2.5.8 AA floor. Padding would reflow the
+                   flex row it shares with the two primary buttons. */
+                className="relative cursor-pointer whitespace-nowrap font-medium text-white/80 underline underline-offset-4 transition hover:text-white before:absolute before:inset-x-0 before:-inset-y-1 before:content-['']"
                 style={{ fontSize: "14px" }}
                 aria-expanded={showPrefs}
               >
