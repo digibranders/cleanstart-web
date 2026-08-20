@@ -27,6 +27,32 @@ export function JsonLd({ data, id }: JsonLdProps) {
 }
 
 const ORGANIZATION_ID = `${SITE_URL}/#organization`;
+
+/**
+ * Slug of the shared house byline in the `authors` collection. It is a team
+ * account, not a person, so typing it as `Person` misdescribes the entity.
+ */
+const HOUSE_BYLINE_SLUG = "cleanstart-security";
+
+/**
+ * Map a byline to its Schema.org author node.
+ *
+ * Real contributors become `Person` with a link to their author page. The house
+ * byline instead references the Organization by `@id` — that node already
+ * carries name, url, logo and sameAs, so the reference is both truthful about
+ * what wrote the piece and richer than a bare Person stub.
+ *
+ * If named experts later replace the house byline (they are the better E-E-A-T
+ * signal), those authors flow through the Person branch automatically.
+ */
+const authorNode = (a: { name: string; slug?: string | undefined }) =>
+  a.slug === HOUSE_BYLINE_SLUG
+    ? { "@id": ORGANIZATION_ID }
+    : {
+        "@type": "Person",
+        name: a.name,
+        ...(a.slug ? { url: absoluteUrl(`/author/${a.slug}`) } : {}),
+      };
 const WEBSITE_ID = `${SITE_URL}/#website`;
 
 /** Shared schema.org event-status IRIs (Event + webinar ItemList). */
@@ -337,11 +363,7 @@ export function blogPostingSchema({
     ...(lastModified ? { dateModified: lastModified } : {}),
     ...(authors && authors.length > 0
       ? {
-          author: authors.map((a) => ({
-            "@type": "Person",
-            name: a.name,
-            ...(a.slug ? { url: absoluteUrl(`/author/${a.slug}`) } : {}),
-          })),
+          author: authors.map(authorNode),
         }
       : {}),
     ...(category ? { articleSection: category } : {}),
@@ -384,11 +406,7 @@ export function articleSchema({
     ...(lastModified ? { dateModified: lastModified } : {}),
     ...(authors && authors.length > 0
       ? {
-          author: authors.map((a) => ({
-            "@type": "Person",
-            name: a.name,
-            ...(a.slug ? { url: absoluteUrl(`/author/${a.slug}`) } : {}),
-          })),
+          author: authors.map(authorNode),
         }
       : {}),
     ...(type ? { genre: type } : {}),
@@ -438,11 +456,7 @@ export function newsArticleSchema({
     ...(section ? { articleSection: section } : {}),
     ...(authors && authors.length > 0
       ? {
-          author: authors.map((a) => ({
-            "@type": "Person",
-            name: a.name,
-            ...(a.slug ? { url: absoluteUrl(`/author/${a.slug}`) } : {}),
-          })),
+          author: authors.map(authorNode),
         }
       : {}),
     publisher: { "@id": ORGANIZATION_ID },
