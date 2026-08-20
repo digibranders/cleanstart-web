@@ -41,6 +41,33 @@ describe("jsonld builders (INV-3 output guard)", () => {
     expect(post.author).toEqual([{ "@type": "Person", name: "A", url: `${BASE}/author/a` }]);
   });
 
+  it("types the house byline as the Organization, not a Person", () => {
+    // "CleanStart Security" is a team account. Referencing the Organization by
+    // @id is both truthful and richer than a Person stub — that node already
+    // carries name, url, logo and sameAs.
+    const post = blogPostingSchema({
+      title: "T",
+      path: "/blogs/t",
+      authors: [{ name: "CleanStart Security", slug: "cleanstart-security" }],
+    });
+    expect(post.author).toEqual([{ "@id": `${BASE}/#organization` }]);
+  });
+
+  it("still emits named contributors as Person with an author-page link", () => {
+    const post = blogPostingSchema({
+      title: "T",
+      path: "/blogs/t",
+      authors: [
+        { name: "Dhanush VM", slug: "dhanush-vm" },
+        { name: "CleanStart Security", slug: "cleanstart-security" },
+      ],
+    });
+    expect(post.author).toEqual([
+      { "@type": "Person", name: "Dhanush VM", url: `${BASE}/author/dhanush-vm` },
+      { "@id": `${BASE}/#organization` },
+    ]);
+  });
+
   it("eventSchema maps status to the schema.org IRI", () => {
     const ev = eventSchema({ title: "E", path: "/event/e", venue: "V", eventStatus: "cancelled" });
     expect(ev.eventStatus).toBe("https://schema.org/EventCancelled");

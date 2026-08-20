@@ -332,7 +332,13 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
             <li key={link.href} className="flex leading-none">
               <a
                 href={link.href}
-                className="group/link inline-flex items-center gap-2 text-sm font-normal leading-[1.4] tracking-[-0.04em] text-white/85 transition-colors duration-200 hover:text-white cursor-pointer"
+                /* `before:` expands the touch target from 19.6px (14px x 1.4,
+                   no padding) to 28px, clearing the 24x24 WCAG 2.5.8 AA floor.
+                   Done with an absolutely-positioned pseudo-element rather than
+                   padding so the footer's visual rhythm is untouched: the list
+                   uses gap-3 (12px), so 4px of overhang each side still leaves
+                   4px of clearance between adjacent targets. */
+                className="group/link relative inline-flex items-center gap-2 text-sm font-normal leading-[1.4] tracking-[-0.04em] text-white/85 transition-colors duration-200 hover:text-white cursor-pointer before:absolute before:inset-x-0 before:-inset-y-1 before:content-['']"
               >
                 <span>{link.label}</span>
                 <svg

@@ -66,14 +66,32 @@ function shouldRedirectTrailingSlash(pathname: string) {
   return true;
 }
 
-function shouldLowercase(pathname: string) {
+/**
+ * Lowercase a path without touching percent-escape sequences.
+ *
+ * Percent-escapes are case-insensitive (RFC 3986 §6.2.2.1), so `%5C` and `%5c`
+ * address the same resource. Lowercasing the hex digits therefore changes
+ * nothing semantically while still tripping the "path is not lowercase" check —
+ * which produced a redirect to an identical URL. `/guide/cgroup%5C` 308'd to
+ * `/guide/cgroup%5c` and then 404'd, so a crawler saw a redirect landing on an
+ * error instead of a plain 404 for a path that simply does not exist.
+ */
+export function lowercasePreservingEscapes(pathname: string): string {
+  return pathname.replace(
+    /(%[0-9A-Fa-f]{2})|([^%]+)/g,
+    (_m, pctEscape: string | undefined, rest: string | undefined) =>
+      pctEscape ?? (rest ?? "").toLowerCase(),
+  );
+}
+
+export function shouldLowercase(pathname: string) {
   // Only enforce on non-file paths.
   if (/\.[a-z0-9]+$/i.test(pathname)) return false;
   // Generated guide covers carry a mixed-case keyword in the path
   // (`/guide-cover/Container%20Networking`); lowercasing it would mangle the
   // rendered text and break next/image optimization of the upstream fetch.
   if (pathname.startsWith("/guide-cover/")) return false;
-  return pathname !== pathname.toLowerCase();
+  return pathname !== lowercasePreservingEscapes(pathname);
 }
 
 export async function proxy(request: NextRequest, event: NextFetchEvent) {
@@ -110,7 +128,7 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
 
   if (shouldLowercase(nextUrl.pathname)) {
     const url = nextUrl.clone();
-    url.pathname = nextUrl.pathname.toLowerCase();
+    url.pathname = lowercasePreservingEscapes(nextUrl.pathname);
     return NextResponse.redirect(url, 308);
   }
 
