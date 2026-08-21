@@ -181,21 +181,21 @@
         <div class="cap">As reported · Aug 10</div>
       </div>
       <div class="scorebox">
-        <div><span class="num">72</span><span class="den">/100</span></div>
-        <div class="cap">Verified &amp; live · Aug 13</div>
+        <div><span class="num">73</span><span class="den">/100</span></div>
+        <div class="cap">Verified &amp; live · Aug 17</div>
       </div>
       <div class="scorebox">
         <div><span class="num">9</span><span class="den"> to skip</span></div>
         <div class="cap">Recommendations not to action as written</div>
       </div>
       <div class="scorebox">
-        <div><span class="num">6</span><span class="den"> shipped</span></div>
+        <div><span class="num">10</span><span class="den"> shipped</span></div>
         <div class="cap">Engineering items closed</div>
       </div>
     </div>
 
     <div class="dates">
-      <span>Updated August 13, 2026</span>
+      <span>Updated August 17, 2026</span>
       <span>Companion to the Aug 10 audit</span>
     </div>
   </div>
@@ -297,22 +297,32 @@
     </table>
   </div>
 
-  <h4 class="sub"><span class="chip k-done">Already done</span> &nbsp;Shipped, deployed and verified on production today</h4>
+  <h4 class="sub"><span class="chip k-done">Already done</span> &nbsp;Shipped, deployed and verified on production</h4>
   <div class="scroll">
     <table class="reg">
       <thead><tr><th>Item</th><th>Verified live</th></tr></thead>
       <tbody>
-        <tr><td>Review schema for the four attributed homepage testimonials</td><td class="n">4 nodes, no fabricated rating</td></tr>
+        <tr><td>Page content rendered in the document flow (all 18 <code>loading.tsx</code> removed)</td><td class="n">0 hidden containers site-wide</td></tr>
+        <tr><td>Review schema for the attributed homepage testimonials</td><td class="n">4 nodes, no fabricated rating</td></tr>
+        <tr><td>Case studies: unique URLs, cover images, author</td><td class="n">2/2, anchors resolve</td></tr>
+        <tr><td>CSP promoted from Report-Only to enforced</td><td class="n">+2 blocking fixes</td></tr>
+        <tr><td>Author coverage across the blog</td><td class="n">73/73 posts</td></tr>
+        <tr><td>Meta titles &amp; descriptions seeded from the workbook</td><td class="n">416 values, byte-exact</td></tr>
+        <tr><td><code>/subscribe</code> redirect 307 → 308</td><td class="n">live</td></tr>
+        <tr><td>Homepage sitemap <code>&lt;loc&gt;</code> aligned to the canonical</td><td class="n">526 locs, none trailing</td></tr>
+        <tr><td>Nav Bulletin card no longer routes through a redirect</td><td class="n">0 <code>/subscribe</code> links</td></tr>
         <tr><td>Intrinsic dimensions on decorative homepage icons</td><td class="n">21 unsized → 7 intentional</td></tr>
-        <tr><td>Corrected the shared schema linter (see §6)</td><td class="n">rule fixed, 91 tests pass</td></tr>
+        <tr><td>Shared schema linter corrected (see §6)</td><td class="n">rule fixed</td></tr>
+        <tr><td>Analytics cache failures now logged (see §6)</td><td class="n">deployed; awaiting next cron</td></tr>
       </tbody>
     </table>
   </div>
 
   <h4 class="sub"><span class="chip k-later">Later</span> &nbsp;Real, but each needs a scoped plan before touching</h4>
   <ul class="tight">
-    <li><strong>Give each case study its own indexable route.</strong> Closes three findings at once, but it is a content-model change, not markup.</li>
-    <li><strong>Fix the hidden-container rendering defect (§6).</strong> Not in the audit. Entangled with existing not-found handling, so it needs measurement first.</li>
+    <li><strong>Turn the case studies into real case studies.</strong> The schema half is done; the collection still has no rich-text body, so per-entry routes would be thin pages until challenge/solution/metrics content exists.</li>
+    <li><strong>Mobile LCP.</strong> Real field data puts it at 2,996ms origin-wide (2,539ms on the homepage) — "Needs Improvement". Re-measure before optimising: the §6 fix plausibly moved it, and CrUX runs on a 28-day window.</li>
+    <li><strong>Analytics cache pipeline.</strong> <code>writeCache</code> itself works — proven against production — so the cron is not reaching it. Logging is now deployed and the next 06:45 UTC run should say why.</li>
   </ul>
 
   <h4 class="sub"><span class="chip k-do">Content programme</span> &nbsp;~28 findings — the substantive majority, owned by SEO</h4>
@@ -374,7 +384,7 @@
     <div class="head">
       <span class="title">Homepage canonical omits trailing slash</span>
       <span class="sev">Low</span>
-      <span class="chip k-no">No action</span>
+      <span class="chip k-done">Done · live</span>
     </div>
     <div class="cols">
       <div class="old">
@@ -382,10 +392,12 @@
         <p>"Canonical is https://www.cleanstart.com (no slash) while the sitemap and served URL are .../ (with slash). Google normalizes this in practice but it's the only page where the mismatch occurs."</p>
       </div>
       <div>
-        <span class="colhead">Verified — not fixable in app code</span>
-        <div class="verdict"><b>Decision</b>Do nothing. Already attempted and proven impossible.</div>
+        <span class="colhead">Fixed — from the other side</span>
+        <div class="verdict"><b>Decision</b>Closed. The sitemap now emits the bare origin, so <code>&lt;loc&gt;</code> and canonical match byte-for-byte.</div>
         <p>The observation is accurate; the recommendation is not actionable. Next.js's metadata resolver collapses <em>any</em> root-path canonical to the bare origin unless <code>trailingSlash</code> is enabled — and this site strips trailing slashes everywhere by deliberate policy.</p>
-        <p>We implemented the fix, proved against a production build that the rendered tag was unchanged, and reverted. A regression test now pins the behaviour so the dead end isn't re-attempted.</p>
+        <p>We implemented the recommended fix, proved against a production build that the rendered tag was unchanged, and reverted it — a regression test pins that dead end.</p>
+        <p><strong>The finding was still closable, from the direction we first missed.</strong> The canonical is the side that cannot move; the sitemap is ours. Root now emits <code>https://www.cleanstart.com</code> with no trailing slash, matching the canonical exactly. Verified on a production build: 526 <code>&lt;loc&gt;</code> entries, none ending in a slash.</p>
+        <p>Worth stating plainly for whoever asked: the two forms are equivalent under RFC 3986, so this is hygiene, not a ranking change.</p>
         <p class="evidence">resolve-url.js — <strong>resolveAbsoluteUrlWithPathname()</strong><br>result.pathname === '/' ? result.origin : result.href</p>
       </div>
     </div>
@@ -437,7 +449,7 @@
     <div class="head">
       <span class="title">Bare HTTP apex takes two redirect hops</span>
       <span class="sev">Medium</span>
-      <span class="chip k-opt">Optional</span>
+      <span class="chip k-done">Verified · correct</span>
     </div>
     <div class="cols">
       <div class="old">
@@ -445,10 +457,13 @@
         <p>"http://cleanstart.com → https://cleanstart.com (308) → https://www.cleanstart.com (308). Costs an extra round trip for first-touch links."</p>
       </div>
       <div>
-        <span class="colhead">Verified — true, marginal</span>
-        <div class="verdict"><b>Decision</b>Optional. Only worth doing if you're already editing DNS/domain settings — not worth a dedicated change.</div>
-        <p>Confirmed. The second hop is already a correct 308 from our proxy. The first is issued at the hosting edge <em>before</em> application code runs, so it cannot be collapsed from the app — the report's own "at the edge/DNS layer" framing is right.</p>
-        <p>Impact is limited to first-touch links with no HSTS state cached, which after preload is a small and shrinking share.</p>
+        <span class="colhead">Verified — every entry point lands correctly</span>
+        <div class="verdict"><b>Decision</b>Closed, no change needed. All four host forms resolve to the canonical host with permanent 308s, preserving path and query. The extra hop is correct behaviour, not a defect.</div>
+        <p>Traced hop by hop. Every route terminates on <code>https://www.cleanstart.com</code> with a 200, and no chain exceeds two hops:</p>
+        <p class="evidence">http://cleanstart.com&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 308 → https://cleanstart.com/<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 308 → https://www.cleanstart.com/ <strong>200</strong><br>https://cleanstart.com&nbsp;&nbsp;&nbsp;&nbsp; 308 → https://www.cleanstart.com/ <strong>200</strong><br>http://www.cleanstart.com 308 → https://www.cleanstart.com/ <strong>200</strong><br>https://www.cleanstart.com&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>200</strong></p>
+        <p><strong>Path and query survive intact</strong> — <code>http://cleanstart.com/guide/container?utm_source=test</code> arrives at the www host with the path and UTM parameter preserved, so no campaign attribution or deep link is lost in the hop.</p>
+        <p><strong>HSTS removes the http hop entirely for repeat visitors</strong>: <code>max-age=63072000; includeSubDomains; preload</code>. With preload, browsers that have ever seen the site — and those shipping the preload list — never issue the plaintext request at all, so the two-hop case is limited to genuinely first-touch traffic on a cold browser.</p>
+        <p>The second hop is a correct 308 from our proxy; the first is issued at the hosting edge before application code runs, so it cannot be collapsed from the app. The report's own "at the edge/DNS layer" framing was right, and the gain would be one round trip for a shrinking slice of visitors.</p>
       </div>
     </div>
   </div>
@@ -627,7 +642,7 @@
     <div class="head">
       <span class="title">Case-study Articles missing image/author, and sharing one URL</span>
       <span class="sev">Medium ×2</span>
-      <span class="chip k-later">Later</span>
+      <span class="chip k-done">Done · live</span>
     </div>
     <div class="cols">
       <div class="old">
@@ -635,9 +650,11 @@
         <p>Both case-study Article items lack image and author; neither has a unique URL or fragment, so search engines and AI answer engines cannot deep-link to a specific customer story.</p>
       </div>
       <div>
-        <span class="colhead">Real — needs its own plan</span>
-        <div class="verdict"><b>Decision</b>Yes eventually, not yet. Needs a scoped plan — solve together with the "Case Studies is a carousel" finding, once.</div>
-        <p>Both accurate. Giving each customer story its own indexable route is a content-model change — a new collection or route plus CMS data — not a markup tweak, so it is deliberately out of scope for this pass rather than dismissed.</p>
+        <span class="colhead">Both fixed and live</span>
+        <div class="verdict"><b>Decision</b>Closed. Each entry now has a distinct deep-linkable URL, a real cover image and an author.</div>
+        <p>Every item previously carried the bare listing URL. Each now emits <code>/case-studies#&lt;slug&gt;</code>, and the listing renders a matching element id so the fragment actually resolves — a fragment pointing at nothing would have been worse than none. The cover image was already being fetched by the page and simply never passed to the schema builder; <code>author</code> is the Organization, the honest attribution for a corporate case study.</p>
+        <p class="evidence">Aurascape&nbsp;&nbsp;&nbsp; #streamlining-operations-for-a-leading-healthcare-provider<br>IIFL Finance #how-iifl-finance-standardized-secure-container-foundations<br>both: <strong>image YES · author YES</strong> · both anchors present in the DOM</p>
+        <p><strong>The related "carousel, not case studies" finding stays open, deliberately.</strong> The collection has no rich-text body — a case study here is a summary plus a downloadable asset — so building per-entry detail routes today would produce thin pages, the same defect the audit raises about the product pages. That needs a body field and real content first.</p>
       </div>
     </div>
   </div>
@@ -809,13 +826,13 @@
     <table class="reg">
       <thead><tr><th>Category</th><th>Reported</th><th>Corrected</th><th>Live now</th><th>What moved</th></tr></thead>
       <tbody>
-        <tr><td>Technical SEO</td><td class="n">84</td><td class="n">91</td><td class="n"><strong>96</strong></td><td>IndexNow and <code>lastmod</code> were never real; CSP now enforced and <code>/subscribe</code> fixed. Only the marginal apex hop remains.</td></tr>
-        <tr><td>Content &amp; E-E-A-T</td><td class="n">58</td><td class="n">58</td><td class="n"><strong>65</strong></td><td>Author coverage closed — 73/73 posts now carry a byline. The rest is content work.</td></tr>
+        <tr><td>Technical SEO</td><td class="n">84</td><td class="n">91</td><td class="n"><strong>98</strong></td><td>IndexNow and <code>lastmod</code> were never real; CSP enforced, <code>/subscribe</code> 308, canonical aligned from the sitemap side, and all four host entry points verified correct.</td></tr>
+        <tr><td>Content &amp; E-E-A-T</td><td class="n">58</td><td class="n">58</td><td class="n"><strong>65</strong></td><td>Author coverage closed — 73/73 posts carry a byline. The rest is content work.</td></tr>
         <tr><td>On-Page &amp; SXO</td><td class="n">48</td><td class="n">48</td><td class="n">48</td><td>Untouched. The lowest score, and entirely content programme.</td></tr>
-        <tr><td>Schema</td><td class="n">78</td><td class="n">83</td><td class="n"><strong>88</strong></td><td>SoftwareApplication refuted; Review schema shipped and live.</td></tr>
+        <tr><td>Schema</td><td class="n">78</td><td class="n">83</td><td class="n"><strong>98</strong></td><td>SoftwareApplication refuted; Review schema shipped; case studies now carry unique URLs, images and authors. Only the house-byline type remains.</td></tr>
         <tr><td>Performance</td><td class="n">70</td><td class="n">70</td><td class="n"><strong>74</strong></td><td>Image dimensions shipped and INP answered Good — but real field data revealed a mobile LCP problem lab data had masked.</td></tr>
-        <tr><td>AI Search (GEO)</td><td class="n">66</td><td class="n">66</td><td class="n">66</td><td>Untouched — and still likely overstated, see below.</td></tr>
-        <tr><td><strong>Overall</strong></td><td class="n"><strong>66</strong></td><td class="n"><strong>~69</strong></td><td class="n"><strong>~72</strong></td><td></td></tr>
+        <tr><td>AI Search (GEO)</td><td class="n">66</td><td class="n">66</td><td class="n">66</td><td>Score unchanged, but now <em>earned</em> — the hidden-container defect that made it generous is fixed.</td></tr>
+        <tr><td><strong>Overall</strong></td><td class="n"><strong>66</strong></td><td class="n"><strong>~69</strong></td><td class="n"><strong>~73</strong></td><td></td></tr>
       </tbody>
     </table>
   </div>
@@ -830,22 +847,26 @@
   <div class="callout note">
     <h4>Engineering is now close to exhausted — the remaining gap is content</h4>
     <p>
-      Every item the audit assigned to engineering is closed, refuted, or explicitly deferred with a
-      reason. What is left sits in the two lowest-scoring categories: <strong>On-Page &amp; SXO at
-      48</strong> and <strong>Content at 65</strong>, plus GEO at 66. None of it is blocked on code.
-      Further score movement now depends almost entirely on the content programme in §2.
+      Every item the audit assigned to engineering is now closed, refuted, or blocked on content
+      rather than code. What is left sits in the two lowest-scoring categories: <strong>On-Page &amp;
+      SXO at 48</strong> and <strong>Content at 65</strong>, plus GEO at 66 — and GEO barely moves
+      without the writing. None of it is blocked on engineering. Further score movement depends
+      almost entirely on the content programme in §2.
     </p>
   </div>
 
-  <div class="callout">
-    <h4>The honest caveat: GEO 66 is probably generous</h4>
+  <div class="callout good">
+    <h4>GEO 66 is now earned rather than generous</h4>
     <p>
-      That category credits "technical accessibility 85/100 — fully server-rendered," which is true.
-      But the defect in §6 means text-extraction pipelines that respect the <code>hidden</code>
-      attribute see roughly a hundred characters instead of the full article — and that is precisely
-      what GEO measures. Until that is fixed, this category should arguably come <em>down</em>, and
-      ~71 carries known downside risk in the one area the audit rated most favourably on technical
-      grounds.
+      This companion previously argued that GEO was overstated: the category credits "technical
+      accessibility 85/100 — fully server-rendered," which was true of the HTML but not of what an
+      extractor could read, because the defect in §6 left roughly a hundred characters visible
+      instead of the full article. That is now fixed, so the 85 stands on its own.
+    </p>
+    <p>
+      The score itself does not move, because every remaining GEO finding is editorial — attribution,
+      outbound citations, answer length, question-form headings. The technical substrate is no longer
+      the constraint; the writing is.
     </p>
   </div>
 
@@ -905,7 +926,7 @@
     <div class="head">
       <span class="title">Page content is delivered inside hidden containers</span>
       <span class="sev">Not in the report</span>
-      <span class="chip k-later">Later</span>
+      <span class="chip k-done">Done · live</span>
     </div>
     <div class="cols">
       <div class="old">
@@ -914,11 +935,12 @@
         <p>But it did not examine <em>where</em> in the document that content sits.</p>
       </div>
       <div>
-        <span class="colhead">Found during verification</span>
-        <div class="verdict"><b>Decision</b>Yes, needs fixing — but not yet. Needs its own plan and measurement first; a careless fix would break not-found handling.</div>
-        <p>A root-level loading state wraps the entire app in one boundary, so every page ships a spinner in the normal document flow and streams its real content into trailing hidden containers.</p>
-        <p>Search engines execute JavaScript and resolve this correctly, so <strong>indexing is unaffected</strong>. The exposure is text-extraction pipelines that respect <code>hidden</code> — precisely the class of tool feeding AI answer engines.</p>
-        <p class="evidence">/blogs/hermetic-build → 20,062 chars → <strong>108</strong><br>/case-studies&nbsp;&nbsp;&nbsp;&nbsp; → 5,979 chars → <strong>58</strong><br>/pricing&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; → 3,723 chars → <strong>52</strong></p>
+        <span class="colhead">Found during verification — now fixed and live</span>
+        <div class="verdict"><b>Decision</b>Closed. All 18 <code>loading.tsx</code> files removed; every page now renders its content in the normal document flow.</div>
+        <p>Each <code>loading.tsx</code> created a Suspense boundary whose fallback Next emits in the document flow, streaming the real page into trailing <code>&lt;div hidden&gt;</code> blocks swapped in by inline script. Search engines execute JavaScript and were never affected — <strong>this was never an indexing problem</strong>. The exposure was text-extraction pipelines that respect <code>hidden</code>, precisely the tools feeding AI answer engines.</p>
+        <p><strong>The reason it was deferred turned out not to hold.</strong> The 404 guard was documented as depending on the root boundary, but it runs in <code>proxy.ts</code> ahead of routing and never did. Verified after the change: unknown slugs on <code>/blogs</code>, <code>/guide</code>, <code>/knowledge-hub</code> and <code>/event</code> still return 404, real pages 200. That misleading comment has been corrected in the code.</p>
+        <p class="evidence">extractable characters, live &middot; before → after<br>/pricing&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 52 → <strong>&nbsp;3,779</strong><br>/case-studies&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 58 → <strong>&nbsp;4,170</strong><br>/blogs/hermetic-build&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 108 → <strong>18,417</strong><br>/knowledge-hub/how-compares - → <strong>27,457</strong><br>/guide/container&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - → <strong>29,049</strong><br><strong>hidden containers site-wide: 0</strong></p>
+        <p><strong>Trade-off:</strong> client-side navigation no longer shows an instant spinner. Pages are ISR-cached at the edge and Next keeps the current page visible until the next is ready, so there is no blank flash — but it is a feel change, and reverting one commit restores all 18 files.</p>
       </div>
     </div>
   </div>
@@ -956,18 +978,32 @@
 
   <p>
     What changed after verification was the shape of the work, not its volume — and the engineering
-    share has now been worked through. Nine recommendations should not be actioned as written, six
-    items are shipped and live, and two are deferred with stated reasons. Roughly twenty-eight
-    findings — the substantive majority — are content and information-architecture work, and that is
-    where the remaining twenty-eight points of headroom sit.
+    share is now essentially exhausted. Nine recommendations should not be actioned as written,
+    twelve items are shipped and live, and what remains is blocked on writing rather than code.
+    Roughly twenty-eight findings — the substantive majority — are content and
+    information-architecture work, and that is where the remaining twenty-seven points sit.
   </p>
 
   <p>
-    Two things are worth carrying forward from how this went. The CSP burn-in <em>earned its keep</em>:
-    reviewing before enforcing caught a change that would have silently disabled bot protection on
-    every lead form. But a second breakage — blocked YouTube thumbnails — surfaced only after
-    enforcement, on pages that had not been swept. Both fixes are live; the lesson is that the sweep
-    should be exhaustive before the switch, not after.
+    Three things are worth carrying forward. The CSP burn-in <em>earned its keep</em>: reviewing
+    before enforcing caught a change that would have silently disabled bot protection on every lead
+    form — though a second breakage, blocked YouTube thumbnails, surfaced only after the switch, on
+    pages that had not been swept. Sweep exhaustively before flipping, not after.
+  </p>
+
+  <p>
+    Second, two findings were closed only after the first answer turned out to be wrong. The homepage
+    canonical was written off as unfixable because one direction was tested and the other was not;
+    the sitemap side was ours all along. The hidden-container defect was deferred on a documented
+    claim that the 404 guard depended on the boundary — it never did. Both were re-opened by
+    re-reading the code rather than trusting the earlier note, including our own.
+  </p>
+
+  <p>
+    Third, the measurements that mattered most were the ones taken against production rather than
+    inferred. <code>writeCache</code> looked like the obvious culprit for the stalled analytics cache
+    until a live call proved it works. Two SE Ranking findings dissolved once asset sizes were
+    measured compressed rather than raw.
   </p>
 
   <p>

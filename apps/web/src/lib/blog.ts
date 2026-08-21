@@ -272,13 +272,17 @@ export async function getBlogSlugs(): Promise<string[]> {
 }
 
 export async function getFeaturedBlog(): Promise<Blog | null> {
+  // Sort by `displayPublishedAt`, not `publishedAt` — that's the field
+  // `effectivePublishedAt` prefers and what the byline/cards actually
+  // show, so the listing's order must match it or a post's displayed
+  // date and its rank in the grid can disagree.
   const featured = await fetchCMS<PayloadListResponse<Blog>>(
-    `/api/blogs?${PUBLISHED_FILTER}&where[featured][equals]=true&depth=1&limit=1&sort=-publishedAt`,
+    `/api/blogs?${PUBLISHED_FILTER}&where[featured][equals]=true&depth=1&limit=1&sort=-displayPublishedAt`,
   );
   if (featured.docs[0]) return featured.docs[0];
 
   const latest = await fetchCMS<PayloadListResponse<Blog>>(
-    `/api/blogs?${PUBLISHED_FILTER}&depth=1&limit=1&sort=-publishedAt`,
+    `/api/blogs?${PUBLISHED_FILTER}&depth=1&limit=1&sort=-displayPublishedAt`,
   );
   return latest.docs[0] ?? null;
 }
@@ -305,7 +309,9 @@ export async function getBlogs({
     depth: "1",
     limit: String(limit),
     page: String(page),
-    sort: "-publishedAt",
+    // See `getFeaturedBlog` — must match `effectivePublishedAt`'s
+    // precedence, not the raw system `publishedAt` stamp.
+    sort: "-displayPublishedAt",
   });
   // Whitelist the `Blog` (list) field surface so the response excludes
   // detail-only fields (`body`, `relatedPosts`, `faqs`, `tableOfContents`).

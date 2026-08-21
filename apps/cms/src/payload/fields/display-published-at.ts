@@ -21,6 +21,14 @@ import type { Field } from 'payload';
  *
  * News intentionally does NOT get this field — its `publicationDate`
  * is semantically equivalent and already wins the precedence check.
+ *
+ * `beforeDuplicate` clears the value for the same reason as
+ * `publishedAtField`: Payload's duplicate action copies it from the
+ * source doc, and `displayPublishedAtBackfillHook`'s "already set"
+ * check only inspects the incoming save data — so a copied value
+ * looks editor-set and is never re-stamped on the duplicate's actual
+ * publish, leaving it (and therefore the public listing sort) anchored
+ * to the source post's date.
  */
 export const displayPublishedAtField: Field = {
   name: 'displayPublishedAt',
@@ -35,5 +43,8 @@ export const displayPublishedAtField: Field = {
       Field:
         '@/payload/admin/components/DisplayPublishedAtField.tsx#DisplayPublishedAtField',
     },
+  },
+  hooks: {
+    beforeDuplicate: [() => null],
   },
 };
