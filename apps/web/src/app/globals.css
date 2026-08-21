@@ -5713,3 +5713,74 @@ body {
     opacity: 0.3;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Premium custom scrollbar (.scrollbar-premium / .scrollbar-premium-dark)
+   ─────────────────────────────────────────────────────────────────────────────
+   Authored as plain CSS because Tailwind emits no `::-webkit-scrollbar`
+   pseudo-element utilities.
+
+   Lives here rather than in its own file because a second `import` in the root
+   layout made Next emit a second render-blocking stylesheet. Lighthouse costed
+   that request at ~450-510 ms on mobile while carrying only 804 bytes — nearly
+   as much blocking time as the 44 KB main bundle, almost all of it request
+   latency rather than payload. Inlining removes the request entirely.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.scrollbar-premium {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(15, 16, 35, 0.24) transparent; /* Firefox: thumb track */
+}
+
+.scrollbar-premium::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.scrollbar-premium::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-premium::-webkit-scrollbar-thumb {
+  background-color: rgba(15, 16, 35, 0.18);
+  border-radius: 9999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 150ms ease;
+}
+
+.scrollbar-premium:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(15, 16, 35, 0.32);
+}
+
+.scrollbar-premium::-webkit-scrollbar-thumb:active {
+  background-color: rgba(15, 16, 35, 0.42);
+}
+
+/* Dark surfaces (e.g. the search command palette over a dark backdrop can opt
+   in via .scrollbar-premium-dark) — lighter thumb for contrast. */
+.scrollbar-premium-dark {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+}
+
+.scrollbar-premium-dark::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.scrollbar-premium-dark::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-premium-dark::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.22);
+  border-radius: 9999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 150ms ease;
+}
+
+.scrollbar-premium-dark:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.36);
+}
