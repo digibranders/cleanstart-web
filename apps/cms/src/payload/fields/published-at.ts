@@ -26,6 +26,13 @@ import type { Field } from 'payload';
  * the news event time rather than first-publish time) — the dispatcher
  * prefers `publicationDate` over `publishedAt` so News continues to
  * work as before.
+ *
+ * `beforeDuplicate` clears the value. Payload's duplicate action
+ * otherwise carries the source doc's `publishedAt` into the new draft,
+ * and `firstPublishHook`'s "never overwrite an existing value" guard
+ * then treats that copied value as an intentional prior stamp — so a
+ * duplicated-then-published post silently keeps the *source* post's
+ * publish date instead of getting its own.
  */
 export const publishedAtField: Field = {
   name: 'publishedAt',
@@ -43,5 +50,8 @@ export const publishedAtField: Field = {
     // which reads this value through `useField`. Hidden here so the form
     // doesn't render a duplicate read-only date input.
     hidden: true,
+  },
+  hooks: {
+    beforeDuplicate: [() => null],
   },
 };
