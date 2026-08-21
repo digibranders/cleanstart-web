@@ -1,16 +1,66 @@
 import type React from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { LogoMark } from '@/components/icons/Logo';
 import { Reveal, RevealItem, RevealStagger } from '@/components/ui/Reveal';
 
 /*
- * "Build on a Verified Software Foundation" — Product Showcase & Operating Loop
+ * "Build with Confidence" — Product Showcase & Operating Loop.
  *
- * Displays the two core CleanStart products as structured enterprise showcase
- * cards, followed by the "Powered by CleanStart" divider and the four-step
- * operating loop (Discover, Verify, Govern, Remediate).
- * Copy is the proposal's, verbatim.
+ * Rebuilt on the client's own reference mock: three product cards (CleanSight,
+ * Clean Images, Clean Libraries), not two — the section's job is to show every
+ * live product this page can point to, and it was missing CleanSight entirely.
+ * Each card is visual-first (a commissioned 3D product render, a logo, a
+ * name) rather than the earlier text-heavy mini-list.
+ *
+ * The three renders were generated to match, not to invent: same blue
+ * (#2F6FED → #1749B8) the reference uses for its own product visuals, same
+ * three compositions (laptop + magnifier for CleanSight, container + shield
+ * for Images, layered hexagon + shield for Libraries). The CleanSight render
+ * (v2) does carry baked-in UI text ("CleanSight", "Assets", "Containers" —
+ * cleanly spelled, unlike most AI text) rather than a code overlay; the two
+ * earlier attempts at requesting no text and adding a DOM overlay instead are
+ * superseded now that a clean text render exists.
+ *
+ * Card taglines are each product's own real hero copy (CleanSightHero,
+ * CleanStartImagesHero, ClearLibrariesHero), not invented for this page.
+ * Only the whole card's bottom strip (the name) is a link — matches the
+ * "bottom-only clickable" convention already set for the pillar cards below.
+ * No per-card logo glyph: the same CleanStart mark three times in a row
+ * doesn't distinguish the products, it just repeats.
  */
+
+interface Product {
+  image: string;
+  imageAlt: string;
+  name: string;
+  tagline: string;
+  href: string;
+}
+
+const PRODUCTS: readonly [Product, Product, Product] = [
+  {
+    image: '/images/financial-services/card-cleansight-v2.webp',
+    imageAlt: 'The CleanSight dashboard showing discovered assets across containers, images, repositories and vulnerabilities on a world map, with a magnifying glass revealing a verified software component',
+    name: 'CleanSight',
+    tagline: 'Discover software assets, dependencies, and inherited risk across modern environments.',
+    href: '/cleansight',
+  },
+  {
+    image: '/images/financial-services/card-clean-images.webp',
+    imageAlt: 'A shipping container marked with a verification shield',
+    name: 'Clean Images',
+    tagline: 'Hardened, minimal, and secure container images for your applications.',
+    href: '/cleanstart-images',
+  },
+  {
+    image: '/images/financial-services/card-clean-libraries.webp',
+    imageAlt: 'Stacked hexagonal library modules marked with a key-and-shield seal',
+    name: 'Clean Libraries',
+    tagline: 'Secure, trusted libraries and dependencies for your applications.',
+    href: '/clean-libraries',
+  },
+];
 
 interface Step {
   icon: string;
@@ -181,8 +231,8 @@ export function FinanceFoundation(): React.ReactElement {
                 color: '#111111',
               }}
             >
-              Build on a{' '}
-              <span className="cs-text-gradient-impact">Verified Software Foundation</span>
+              Build with{' '}
+              <span className="cs-text-gradient-impact">Confidence</span>
             </h2>
           </Reveal>
 
@@ -198,308 +248,95 @@ export function FinanceFoundation(): React.ReactElement {
                 margin: 0,
               }}
             >
-              Trusted software artifacts for regulated financial applications.
+              Secure applications start with a verified software foundation.
             </p>
           </Reveal>
         </div>
 
-        {/* The two Product Artifact Showcase Cards */}
+        {/* The three product showcase cards. */}
         <RevealStagger
-          className="grid grid-cols-1 lg:grid-cols-2"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
           style={{ marginTop: 'clamp(28px, 3vw, 40px)', gap: 'clamp(20px, 2vw, 28px)' }}
         >
-          {/* Product 1: Verified Container Images */}
-          <RevealItem className="h-full">
-            <Link
-              href="/cleanstart-images"
-              className="group flex h-full flex-col justify-between overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_48px_-20px_rgba(40,30,90,0.18)]"
-              style={{
-                background: '#ffffff',
-                borderRadius: '20px',
-                border: '1px solid rgba(154,81,255,0.14)',
-                padding: 'clamp(20px, 2.2vw, 28px)',
-                boxShadow:
-                  '0 1px 2px rgba(17,17,17,0.04), 0 16px 40px -24px rgba(40,30,90,0.14)',
-              }}
-            >
-              <div>
-                <h3
+          {PRODUCTS.map((product) => (
+            <RevealItem key={product.name} className="h-full">
+              <div
+                className="flex h-full flex-col overflow-hidden"
+                style={{
+                  background: '#ffffff',
+                  borderRadius: '20px',
+                  border: '1px solid rgba(154,81,255,0.14)',
+                  boxShadow: '0 1px 2px rgba(17,17,17,0.04), 0 16px 40px -24px rgba(40,30,90,0.14)',
+                }}
+              >
+                {/* The commissioned render. Padded rather than edge-to-edge so
+                    it reads as a product photo on a card, not a banner. */}
+                <div
+                  className="relative"
                   style={{
-                    fontFamily: 'var(--font-display)',
-                    fontSize: 'var(--fs-h3)',
-                    fontWeight: 600,
-                    letterSpacing: '-0.04em',
-                    lineHeight: 1.15,
-                    color: '#111111',
-                    margin: 0,
+                    aspectRatio: '900 / 660',
+                    padding: 'clamp(16px, 1.8vw, 24px)',
                   }}
                 >
-                  Verified Container Images
-                </h3>
+                  <div className="relative h-full w-full">
+                    <Image
+                      src={product.image}
+                      alt={product.imageAlt}
+                      fill
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                      className="object-contain"
+                    />
+                  </div>
+                </div>
+
                 <p
+                  className="px-5"
                   style={{
-                    marginTop: '6px',
                     fontFamily: 'var(--font-sans)',
                     fontSize: 'var(--fs-body-sm)',
                     fontWeight: 400,
                     letterSpacing: '-0.01em',
-                    lineHeight: 1.45,
+                    lineHeight: 1.5,
                     color: '#555555',
                     margin: 0,
                   }}
                 >
-                  Hardened, minimal, and secure container images for your applications.
+                  {product.tagline}
                 </p>
 
-                {/* Minimalist Container Runtime Foundation Graphic */}
-                <div
-                  className="mt-3.5 flex flex-col gap-1.5 rounded-xl p-2.5 sm:p-3"
-                  style={{
-                    background: 'linear-gradient(135deg, #F9F8FD 0%, #F3F5FA 100%)',
-                    border: '1px solid rgba(154,81,255,0.1)',
-                  }}
+                {/* Only this strip is a link — the card body above is not,
+                    matching the pillar-card convention below. No per-card
+                    logo: the same CleanStart mark repeated three times in a
+                    row identifies nothing (the three products aren't
+                    distinguished by it) and just reads as clutter. */}
+                <Link
+                  href={product.href}
+                  className="group/link mt-4 flex items-center gap-2.5 px-5 pb-5 pt-3 transition-colors"
+                  style={{ borderTop: '1px solid rgba(17,17,17,0.08)' }}
                 >
-                  <div
-                    className="flex items-center justify-between rounded-lg px-3 py-2"
+                  <span
+                    className="font-display"
                     style={{
-                      background: '#ffffff',
-                      border: '1px solid rgba(17,17,17,0.06)',
-                      boxShadow: '0 1px 3px rgba(17,17,17,0.04)',
+                      fontSize: 'var(--fs-h5)',
+                      fontWeight: 600,
+                      letterSpacing: '-0.03em',
+                      color: '#111111',
                     }}
                   >
-                    <span
-                      style={{
-                        fontFamily: 'var(--font-sans)',
-                        fontSize: 'var(--fs-body-sm)',
-                        fontWeight: 500,
-                        color: '#111111',
-                      }}
-                    >
-                      Application Workloads
-                    </span>
-                    <span
-                      style={{
-                        width: '7px',
-                        height: '7px',
-                        borderRadius: '50%',
-                        background: '#9A51FF',
-                      }}
-                    />
-                  </div>
-
-                  <div
-                    className="flex items-center justify-between rounded-lg px-3 py-2"
-                    style={{
-                      background: '#ffffff',
-                      border: '1px solid rgba(17,17,17,0.06)',
-                      boxShadow: '0 1px 3px rgba(17,17,17,0.04)',
-                    }}
+                    {product.name}
+                  </span>
+                  <span
+                    aria-hidden
+                    className="ml-auto text-[#7C4FF0] transition-transform group-hover/link:translate-x-1"
                   >
-                    <span
-                      style={{
-                        fontFamily: 'var(--font-sans)',
-                        fontSize: 'var(--fs-body-sm)',
-                        fontWeight: 500,
-                        color: '#111111',
-                      }}
-                    >
-                      Runtime Components
-                    </span>
-                    <span
-                      style={{
-                        width: '7px',
-                        height: '7px',
-                        borderRadius: '50%',
-                        background: '#2CC1EB',
-                      }}
-                    />
-                  </div>
-
-                  <div
-                    className="flex items-center justify-between rounded-lg px-3 py-2"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(154,81,255,0.08) 0%, rgba(44,193,235,0.08) 100%)',
-                      border: '1px solid rgba(154,81,255,0.18)',
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontFamily: 'var(--font-sans)',
-                        fontSize: 'var(--fs-body-sm)',
-                        fontWeight: 600,
-                        color: '#3D3766',
-                      }}
-                    >
-                      Minimal Base Images
-                    </span>
-                    <span
-                      style={{
-                        width: '7px',
-                        height: '7px',
-                        borderRadius: '50%',
-                        background: '#10B981',
-                      }}
-                    />
-                  </div>
-                </div>
+                    →
+                  </span>
+                </Link>
               </div>
-
-              <div
-                className="mt-4 flex items-center justify-between pt-3 text-sm font-semibold text-[#7C4FF0] transition-colors group-hover:text-[#5B21B6]"
-                style={{ borderTop: '1px solid rgba(17,17,17,0.08)' }}
-              >
-                <span>Learn more about CleanStart Images</span>
-                <span className="transition-transform group-hover:translate-x-1">→</span>
-              </div>
-            </Link>
-          </RevealItem>
-
-          {/* Product 2: Verified Libraries & Dependencies */}
-          <RevealItem className="h-full">
-            <Link
-              href="/clean-libraries"
-              className="group flex h-full flex-col justify-between overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_48px_-20px_rgba(40,30,90,0.18)]"
-              style={{
-                background: '#ffffff',
-                borderRadius: '20px',
-                border: '1px solid rgba(154,81,255,0.14)',
-                padding: 'clamp(20px, 2.2vw, 28px)',
-                boxShadow:
-                  '0 1px 2px rgba(17,17,17,0.04), 0 16px 40px -24px rgba(40,30,90,0.14)',
-              }}
-            >
-              <div>
-                <h3
-                  style={{
-                    fontFamily: 'var(--font-display)',
-                    fontSize: 'var(--fs-h3)',
-                    fontWeight: 600,
-                    letterSpacing: '-0.04em',
-                    lineHeight: 1.15,
-                    color: '#111111',
-                    margin: 0,
-                  }}
-                >
-                  Verified Libraries & Dependencies
-                </h3>
-                <p
-                  style={{
-                    marginTop: '6px',
-                    fontFamily: 'var(--font-sans)',
-                    fontSize: 'var(--fs-body-sm)',
-                    fontWeight: 400,
-                    letterSpacing: '-0.01em',
-                    lineHeight: 1.45,
-                    color: '#555555',
-                    margin: 0,
-                  }}
-                >
-                  Secure, trusted libraries and dependencies for your applications.
-                </p>
-
-                {/* Minimalist Verified Component Chain Graphic */}
-                <div
-                  className="mt-3.5 flex flex-col gap-1.5 rounded-xl p-2.5 sm:p-3"
-                  style={{
-                    background: 'linear-gradient(135deg, #F9F8FD 0%, #F3F5FA 100%)',
-                    border: '1px solid rgba(154,81,255,0.1)',
-                  }}
-                >
-                  <div
-                    className="flex items-center justify-between rounded-lg px-3 py-2"
-                    style={{
-                      background: '#ffffff',
-                      border: '1px solid rgba(17,17,17,0.06)',
-                      boxShadow: '0 1px 3px rgba(17,17,17,0.04)',
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontFamily: 'var(--font-sans)',
-                        fontSize: 'var(--fs-body-sm)',
-                        fontWeight: 500,
-                        color: '#111111',
-                      }}
-                    >
-                      Frameworks
-                    </span>
-                    <span
-                      style={{
-                        width: '7px',
-                        height: '7px',
-                        borderRadius: '50%',
-                        background: '#9A51FF',
-                      }}
-                    />
-                  </div>
-
-                  <div
-                    className="flex items-center justify-between rounded-lg px-3 py-2"
-                    style={{
-                      background: '#ffffff',
-                      border: '1px solid rgba(17,17,17,0.06)',
-                      boxShadow: '0 1px 3px rgba(17,17,17,0.04)',
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontFamily: 'var(--font-sans)',
-                        fontSize: 'var(--fs-body-sm)',
-                        fontWeight: 500,
-                        color: '#111111',
-                      }}
-                    >
-                      Packages
-                    </span>
-                    <span
-                      style={{
-                        width: '7px',
-                        height: '7px',
-                        borderRadius: '50%',
-                        background: '#2CC1EB',
-                      }}
-                    />
-                  </div>
-
-                  <div
-                    className="flex items-center justify-between rounded-lg px-3 py-2"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(154,81,255,0.08) 0%, rgba(44,193,235,0.08) 100%)',
-                      border: '1px solid rgba(154,81,255,0.18)',
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontFamily: 'var(--font-sans)',
-                        fontSize: 'var(--fs-body-sm)',
-                        fontWeight: 600,
-                        color: '#3D3766',
-                      }}
-                    >
-                      Third-Party Libraries
-                    </span>
-                    <span
-                      style={{
-                        width: '7px',
-                        height: '7px',
-                        borderRadius: '50%',
-                        background: '#10B981',
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div
-                className="mt-4 flex items-center justify-between pt-3 text-sm font-semibold text-[#7C4FF0] transition-colors group-hover:text-[#5B21B6]"
-                style={{ borderTop: '1px solid rgba(17,17,17,0.08)' }}
-              >
-                <span>Learn more about Clean Libraries</span>
-                <span className="transition-transform group-hover:translate-x-1">→</span>
-              </div>
-            </Link>
-          </RevealItem>
+            </RevealItem>
+          ))}
         </RevealStagger>
+
 
         {/* Powered by CleanStart — the proposal's own divider. */}
         <Reveal delay={0.1} y={18}>

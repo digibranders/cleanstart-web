@@ -1,59 +1,63 @@
 import type React from 'react';
 import Image from 'next/image';
-import { Reveal, RevealItem, RevealStagger } from '@/components/ui/Reveal';
+import { Reveal } from '@/components/ui/Reveal';
 
 /*
- * "Built Around the Requirements of Regulated Software Delivery" — the site's
- * cyan-ringed white card (the CisoEnterprise shell: 40px outer ring at 30%
- * #2cc1eb, 36px inner card and a purple blur) with the 3D standards icons in
- * the icon slot instead of a glyph sphere, so a compliance group is
- * recognisable at a glance.
+ * "Designed for Regulated Software Delivery" — Enterprise Compliance & Integrity Grid
  *
- * It sits on a violet-tinted wash rather than white. Foundation above it is the
- * page's bright moment and this is the conformance record that follows, so the
- * pair reads as a deliberate step down in value. They were previously #F6F6F6
- * and #FFFFFF — a 3.5% difference, which reads as an accident rather than a
- * decision. The record stays light because the Footer is itself a dark
- * gradient: a dark section here would put three dark blocks back to back at the
- * end of the page.
- *
- * The proposal's standards line sits below the cards as the summary band it is.
- * It duplicates five of its six tokens from the columns above (only SPDX is
- * unique) — that duplication is the client's to resolve, not ours to edit.
- * Copy is the proposal's, verbatim.
+ * Displays the four pillars of regulated delivery (Security, Integrity,
+ * Transparency, Compliance) in refined enterprise cards with custom 3D
+ * icon viewports, verified item checklists, and a certified standards badge ribbon.
  */
 
-interface Requirement {
+interface ColumnData {
   icon: string;
   iconAlt: string;
   title: string;
   items: readonly string[];
 }
 
-const REQUIREMENTS: readonly [Requirement, Requirement, Requirement, Requirement] = [
+const COLUMNS: readonly [ColumnData, ColumnData, ColumnData, ColumnData] = [
   {
     icon: '/images/attack-surface-reduction/approach-icon-secure.webp',
-    iconAlt: '3D icon of a padlock',
+    iconAlt: '3D icon of a security padlock',
     title: 'Security',
-    items: ['Hardened software foundations', 'Near-zero known CVEs', 'Reduced attack surface'],
+    items: [
+      'Hardened software foundations',
+      'Near-zero known CVEs',
+      'Reduced attack surface',
+    ],
   },
   {
     icon: '/images/compare/icon-signed-artifact.webp',
     iconAlt: '3D icon of a signed and sealed artifact',
     title: 'Integrity',
-    items: ['SLSA Level 4 provenance', 'Cryptographic signing', 'Reproducible builds'],
+    items: [
+      'SLSA Level 4 provenance',
+      'Cryptographic signing',
+      'Reproducible builds',
+    ],
   },
   {
     icon: '/images/compare/icon-sbom.webp',
-    iconAlt: '3D icon of a bill of materials document',
+    iconAlt: '3D icon of a software bill of materials document',
     title: 'Transparency',
-    items: ['SBOMs', 'AI BOMs', 'Dependency visibility'],
+    items: [
+      'SBOMs',
+      'AI BOMs',
+      'Dependency visibility',
+    ],
   },
   {
     icon: '/images/compare/icon-fips.webp',
     iconAlt: '3D icon of a compliance shield',
     title: 'Compliance',
-    items: ['FIPS 140-3', 'NIST SSDF', 'CIS Benchmarks', 'DISA STIG'],
+    items: [
+      'FIPS 140-3',
+      'NIST SSDF',
+      'CIS Benchmarks',
+      'DISA STIG',
+    ],
   },
 ];
 
@@ -65,91 +69,6 @@ const STANDARDS: readonly string[] = [
   'NIST SSDF',
   'CIS Benchmarks',
 ];
-
-function RequirementCard({ icon, iconAlt, title, items }: Requirement): React.ReactElement {
-  return (
-    <div className="relative h-full w-full" style={{ borderRadius: '40px', padding: '4px' }}>
-      {/* Outer cyan glow border. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{ borderRadius: '40px', background: '#2cc1eb', opacity: 0.3 }}
-      />
-
-      <div
-        className="relative flex h-full flex-col overflow-hidden bg-white"
-        style={{
-          borderRadius: '36px',
-          padding: 'clamp(20px, 2vw, 28px)',
-          minHeight: 'clamp(300px, 22vw, 356px)',
-        }}
-      >
-        {/* Purple blur decoration. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute"
-          style={{
-            top: '28px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '80%',
-            height: '153px',
-            background: '#df9bff',
-            filter: 'blur(66.5px)',
-            opacity: 0.3,
-          }}
-        />
-
-        <div className="relative shrink-0" style={{ width: '84px', height: '84px' }}>
-          <Image src={icon} alt={iconAlt} fill sizes="84px" className="object-contain" />
-        </div>
-
-        <h3
-          className="relative"
-          style={{
-            marginTop: 'clamp(14px, 1.4vw, 20px)',
-            fontFamily: 'var(--font-display)',
-            fontSize: 'var(--fs-h3)',
-            fontWeight: 600,
-            letterSpacing: '-0.04em',
-            lineHeight: 1.1,
-            color: '#111111',
-          }}
-        >
-          {title}
-        </h3>
-
-        <ul
-          className="relative"
-          style={{
-            marginTop: 'clamp(12px, 1.2vw, 16px)',
-            listStyle: 'none',
-            padding: 0,
-          }}
-        >
-          {items.map((item) => (
-            <li
-              key={item}
-              style={{
-                borderTop: '1px solid rgba(17,17,17,0.08)',
-                paddingTop: '9px',
-                paddingBottom: '9px',
-                fontFamily: 'var(--font-sans)',
-                fontSize: 'var(--fs-body-sm)',
-                fontWeight: 400,
-                letterSpacing: '-0.01em',
-                lineHeight: 1.45,
-                color: '#555555',
-              }}
-            >
-              {item}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
-}
 
 export function FinanceRequirements(): React.ReactElement {
   return (
@@ -193,69 +112,231 @@ export function FinanceRequirements(): React.ReactElement {
       />
 
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
-        <Reveal header>
-          <h2
-            className="mx-auto text-center"
+        {/* Header with Headline & Subtext */}
+        <div
+          className="mx-auto flex max-w-[840px] flex-col items-center gap-4 text-center"
+          style={{ marginBottom: 'clamp(36px, 4vw, 56px)' }}
+        >
+          <Reveal header>
+            <h2
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 'var(--fs-h2)',
+                fontWeight: 600,
+                letterSpacing: '-0.04em',
+                lineHeight: 1.1,
+                color: '#111111',
+                margin: 0,
+              }}
+            >
+              Designed for{' '}
+              <span className="cs-text-gradient-impact">Regulated Software Delivery</span>
+            </h2>
+          </Reveal>
+
+          <Reveal header delay={0.12} y={16}>
+            <p
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: 'var(--fs-lead-sm)',
+                fontWeight: 400,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.5,
+                color: 'rgba(17, 17, 17, 0.75)',
+                maxWidth: '680px',
+                margin: 0,
+              }}
+            >
+              Meet security, integrity, transparency, and compliance requirements with software
+              components built for trust.
+            </p>
+          </Reveal>
+        </div>
+
+        {/* Unified Enterprise Framework Matrix Container */}
+        <Reveal delay={0.15} y={20}>
+          <div
+            className="relative overflow-hidden"
             style={{
-              maxWidth: '880px',
-              fontFamily: 'var(--font-display)',
-              fontSize: 'var(--fs-h2)',
-              fontWeight: 600,
-              letterSpacing: '-0.04em',
-              lineHeight: 1.1,
-              color: '#111111',
-              marginBottom: 'clamp(36px, 4vw, 64px)',
+              background: '#FFFFFF',
+              borderRadius: '24px',
+              border: '1px solid rgba(154, 81, 255, 0.18)',
+              boxShadow:
+                '0 4px 24px -4px rgba(40, 30, 90, 0.04), 0 20px 48px -12px rgba(40, 30, 90, 0.07)',
             }}
           >
-            Built Around the Requirements of{' '}
-            <span className="cs-text-gradient-impact">Regulated Software Delivery</span>
-          </h2>
-        </Reveal>
+            {/* Top Grid: 4 Columns */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+              {COLUMNS.map((col, index) => {
+                const isLastInRowLg = index === COLUMNS.length - 1;
+                const isOddMd = index % 2 === 1;
 
-        <RevealStagger className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-          {REQUIREMENTS.map((req) => (
-            <RevealItem key={req.title} className="h-full">
-              <RequirementCard {...req} />
-            </RevealItem>
-          ))}
-        </RevealStagger>
+                return (
+                  <div
+                    key={col.title}
+                    className={`flex flex-col items-center text-center md:items-start md:text-left justify-between ${
+                      !isLastInRowLg ? 'lg:border-r lg:border-[rgba(154,81,255,0.12)]' : ''
+                    } ${
+                      !isOddMd ? 'md:border-r md:border-[rgba(154,81,255,0.12)]' : ''
+                    } ${
+                      index < 2 ? 'md:border-b lg:border-b-0 md:border-[rgba(154,81,255,0.12)]' : ''
+                    } ${
+                      index < COLUMNS.length - 1
+                        ? 'border-b md:border-b-0 border-[rgba(154,81,255,0.12)]'
+                        : ''
+                    }`}
+                    style={{
+                      padding: 'clamp(28px, 2.6vw, 36px) clamp(22px, 2vw, 30px)',
+                    }}
+                  >
+                    <div className="flex flex-col items-center md:items-start w-full">
+                      {/* 3D Icon Stage */}
+                      <div
+                        className="relative flex items-center justify-center md:justify-start"
+                        style={{ width: '80px', height: '80px' }}
+                      >
+                        <span
+                          aria-hidden
+                          className="absolute rounded-full pointer-events-none"
+                          style={{
+                            width: '74px',
+                            height: '74px',
+                            background:
+                              'radial-gradient(closest-side, rgba(154, 81, 255, 0.22) 0%, rgba(154, 81, 255, 0) 74%)',
+                            filter: 'blur(6px)',
+                          }}
+                        />
+                        <Image
+                          src={col.icon}
+                          alt={col.iconAlt}
+                          width={84}
+                          height={84}
+                          sizes="84px"
+                          className="relative object-contain"
+                          style={{
+                            width: 'auto',
+                            height: '76px',
+                            filter: 'drop-shadow(0 8px 14px rgba(40, 20, 90, 0.12))',
+                          }}
+                        />
+                      </div>
 
-        {/* Standards band — the proposal's summary line, as its own record. */}
-        <Reveal delay={0.1} y={18}>
-          <ul
-            className="flex flex-wrap items-center justify-center lg:justify-between"
-            style={{
-              marginTop: 'clamp(32px, 3.4vw, 52px)',
-              padding: 'clamp(14px, 1.4vw, 20px) clamp(8px, 1.6vw, 24px)',
-              borderTop: '1px solid rgba(17,17,17,0.12)',
-              borderBottom: '1px solid rgba(17,17,17,0.12)',
-              listStyle: 'none',
-              gap: '8px 0',
-            }}
-          >
-            {STANDARDS.map((s, i) => (
-              <li
-                key={s}
-                // Dividers only where the row does not wrap; below sm the band
-                // breaks over several lines and a leading rule would strand at
-                // the start of one.
-                className={i === 0 ? '' : 'sm:border-l sm:border-[rgba(17,17,17,0.14)]'}
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: 'var(--fs-caption)',
-                  fontWeight: 600,
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
-                  lineHeight: 1.4,
-                  color: '#3d3766',
-                  padding: '0 clamp(12px, 1.4vw, 22px)',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {s}
-              </li>
-            ))}
-          </ul>
+                      {/* Column Title */}
+                      <h3
+                        style={{
+                          fontFamily: 'var(--font-display)',
+                          fontSize: 'var(--fs-h3)',
+                          fontWeight: 600,
+                          letterSpacing: '-0.035em',
+                          lineHeight: 1.2,
+                          color: '#111111',
+                          margin: '20px 0 0',
+                        }}
+                      >
+                        {col.title}
+                      </h3>
+
+                      {/* Capabilities List */}
+                      <ul
+                        className="flex flex-col items-center md:items-start"
+                        style={{
+                          listStyle: 'none',
+                          padding: 0,
+                          gap: '11px',
+                          margin: '18px 0 0',
+                        }}
+                      >
+                        {col.items.map((item) => (
+                          <li
+                            key={item}
+                            className="flex items-center justify-center md:justify-start gap-2.5 text-left"
+                            style={{
+                              fontFamily: 'var(--font-sans)',
+                              fontSize: 'var(--fs-body-sm)',
+                              fontWeight: 400,
+                              letterSpacing: '-0.01em',
+                              lineHeight: 1.45,
+                              color: '#3B3654',
+                            }}
+                          >
+                            <span
+                              aria-hidden
+                              className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full"
+                              style={{
+                                background: 'rgba(154, 81, 255, 0.10)',
+                                color: '#7C4FF0',
+                              }}
+                            >
+                              <svg
+                                width="10"
+                                height="8"
+                                viewBox="0 0 10 8"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M1 4L3.5 6.5L9 1"
+                                  stroke="currentColor"
+                                  strokeWidth="1.5"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Bottom Spanning Row: Verified Standards Ribbon */}
+            <div
+              className="relative flex flex-wrap items-center justify-center"
+              style={{
+                background: 'linear-gradient(180deg, #FAF8FE 0%, #F5F1FD 100%)',
+                borderTop: '1px solid rgba(154, 81, 255, 0.14)',
+                padding: 'clamp(18px, 1.8vw, 24px) clamp(16px, 2vw, 32px)',
+              }}
+            >
+              <div className="flex flex-wrap items-center justify-center gap-y-2.5 text-center">
+                {STANDARDS.map((std, i) => (
+                  <span key={std} className="inline-flex items-center">
+                    {i > 0 && (
+                      <span
+                        aria-hidden
+                        className="hidden select-none sm:inline-block"
+                        style={{
+                          margin: '0 clamp(10px, 1.6vw, 22px)',
+                          color: 'rgba(154, 81, 255, 0.32)',
+                          fontWeight: 300,
+                          fontSize: '15px',
+                        }}
+                      >
+                        |
+                      </span>
+                    )}
+                    <span
+                      className="px-2.5 py-1 sm:p-0"
+                      style={{
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: 'clamp(12px, 1.05vw, 14px)',
+                        fontWeight: 600,
+                        letterSpacing: '0.05em',
+                        color: '#2E2856',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      {std}
+                    </span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
         </Reveal>
       </div>
     </section>
