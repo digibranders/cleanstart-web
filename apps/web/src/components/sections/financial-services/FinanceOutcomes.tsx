@@ -22,15 +22,32 @@ import { Reveal, RevealItem, RevealStagger } from '@/components/ui/Reveal';
  */
 
 interface Outcome {
-  title: string;
+  line1: string;
+  line2: string;
   body: string;
 }
 
 const OUTCOMES: readonly [Outcome, Outcome, Outcome, Outcome] = [
-  { title: 'Reduce Risk', body: 'Start with verified software components.' },
-  { title: 'Improve Compliance', body: 'Generate evidence of software integrity.' },
-  { title: 'Accelerate Delivery', body: 'Give developers secure foundations.' },
-  { title: 'Strengthen Governance', body: 'Know what software runs everywhere.' },
+  {
+    line1: 'Reduce Attack',
+    line2: 'Surface',
+    body: 'Start with hardened, minimal software components.',
+  },
+  {
+    line1: 'Built-In Security &',
+    line2: 'Compliance',
+    body: 'Adopt software aligned with security and regulatory requirements.',
+  },
+  {
+    line1: 'Build with',
+    line2: 'Verifiable Trust',
+    body: 'Prove software integrity with provenance and reproducible builds.',
+  },
+  {
+    line1: 'Integrate Without',
+    line2: 'Disruption',
+    body: 'Adopt verified components through existing CI/CD workflows.',
+  },
 ];
 
 /*
@@ -39,8 +56,7 @@ const OUTCOMES: readonly [Outcome, Outcome, Outcome, Outcome] = [
  * Sized a little taller than the figures and centred against them, so the bar
  * reads as a measured separator with an even overhang top and bottom rather
  * than a line trailing off below the text. All four figures resolve to the
- * same height (one-line title, two-line body), so centring the row keeps the
- * titles on a common baseline.
+ * same height, so centring the row keeps the titles on a common baseline.
  */
 function GlowBar(): React.ReactElement {
   return (
@@ -57,27 +73,25 @@ function GlowBar(): React.ReactElement {
   );
 }
 
-function OutcomeFigure({ title, body }: Outcome): React.ReactElement {
+function OutcomeFigure({ line1, line2, body }: Outcome): React.ReactElement {
   return (
     <div className="flex min-w-0 flex-col">
       <h3
-        className="font-display text-white lg:whitespace-nowrap"
+        className="font-display text-white"
         style={{
-          fontSize: 'clamp(18px, 1.8vw, 26px)',
+          fontSize: 'clamp(18px, 1.6vw, 22px)',
           fontWeight: 700,
-          letterSpacing: '-0.04em',
-          lineHeight: 1.15,
-          // The global base rule balances h1–h4, which splits these titles at
-          // exactly the widths this layout is sized to avoid.
-          textWrap: 'normal',
+          letterSpacing: '-0.035em',
+          lineHeight: 1.25,
         }}
       >
-        {title}
+        <span className="block">{line1}</span>
+        <span className="block">{line2}</span>
       </h3>
       <p
         style={{
           marginTop: 'clamp(10px, 1.1vw, 16px)',
-          maxWidth: '23ch',
+          maxWidth: '28ch',
           fontFamily: 'var(--font-sans)',
           fontSize: 'var(--fs-body-sm)',
           fontWeight: 400,
@@ -185,7 +199,7 @@ export function FinanceOutcomes(): React.ReactElement {
           style={{ gap: 'clamp(10px, 1.2vw, 22px)' }}
         >
           {OUTCOMES.map((outcome, i) => (
-            <Fragment key={outcome.title}>
+            <Fragment key={outcome.line1 + outcome.line2}>
               <RevealItem className="min-w-0 flex-1">
                 <OutcomeFigure {...outcome} />
               </RevealItem>
@@ -200,7 +214,7 @@ export function FinanceOutcomes(): React.ReactElement {
           style={{ columnGap: 'clamp(24px, 4vw, 56px)', rowGap: 'clamp(32px, 4.5vw, 48px)' }}
         >
           {OUTCOMES.map((outcome) => (
-            <RevealItem key={outcome.title}>
+            <RevealItem key={outcome.line1 + outcome.line2}>
               <OutcomeFigure {...outcome} />
             </RevealItem>
           ))}

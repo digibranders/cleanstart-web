@@ -1,174 +1,147 @@
 import type React from 'react';
+import Image from 'next/image';
 import { Reveal, RevealItem, RevealStagger } from '@/components/ui/Reveal';
 
 /*
- * "Financial Software Runs on More Than Code" — Clean Component Grid
+ * "Modern Financial Applications Are More Than Code" — Clean Component Stack
  *
- * Professional enterprise architecture grid with exact verbatim proposal copy:
- * clean typography hierarchy, aligned two-line headings, and structured sub-components.
+ * Minimalist single showcase card displaying the four core software components
+ * with 3D purple artifacts and clean two-line typography.
  */
 
 interface ComponentItem {
+  icon: string;
+  iconAlt: string;
   line1: string;
   line2: string;
-  desc: string;
-  items: readonly [string, string, string];
 }
 
 const COMPONENTS: readonly [ComponentItem, ComponentItem, ComponentItem, ComponentItem] = [
   {
+    icon: '/images/financial-services/icon-stack-container-images-v2.png',
+    iconAlt: '3D purple container images with network share disc',
     line1: 'Container',
     line2: 'Images',
-    desc: 'The foundation of modern application delivery',
-    items: ['Base images', 'Runtime components', 'Application workloads'],
   },
   {
+    icon: '/images/financial-services/icon-stack-open-source-libraries-v2.png',
+    iconAlt: '3D purple open source libraries gear',
     line1: 'Open Source',
     line2: 'Libraries',
-    desc: 'Reusable components powering innovation',
-    items: ['Frameworks', 'Packages', 'Third-party libraries'],
   },
   {
+    icon: '/images/financial-services/icon-stack-software-dependencies-v2.png',
+    iconAlt: '3D purple software dependency loops and geometry',
     line1: 'Software',
     line2: 'Dependencies',
-    desc: 'The hidden layers behind every application',
-    items: ['Direct dependencies', 'Transitive dependencies', 'Package ecosystems'],
   },
   {
+    icon: '/images/financial-services/icon-stack-ai-generated-code-v2.png',
+    iconAlt: '3D purple AI-generated code brackets with sparkles',
     line1: 'AI-Generated',
     line2: 'Code',
-    desc: 'A new source of software creation',
-    items: ['Generated code', 'AI-assisted development', 'New dependency paths'],
   },
 ];
 
 export function FinanceStack(): React.ReactElement {
   return (
-    <section data-section="FinanceStack" className="relative bg-white py-section-md">
+    <section
+      data-section="FinanceStack"
+      className="relative bg-white py-section-md"
+    >
       <div className="mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
+        {/* Section Heading */}
         <div
-          className="flex flex-col lg:flex-row lg:items-end lg:justify-between"
-          style={{ marginBottom: 'clamp(40px, 4.4vw, 64px)', gap: '24px' }}
+          className="mx-auto text-center"
+          style={{ marginBottom: 'clamp(36px, 4vw, 56px)' }}
         >
-          <Reveal header style={{ maxWidth: '660px' }}>
+          <Reveal header>
             <h2
               style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: 'var(--fs-h2)',
                 fontWeight: 600,
                 letterSpacing: '-0.04em',
-                lineHeight: 1.1,
+                lineHeight: 1.15,
                 color: '#111111',
               }}
             >
-              Financial Software Runs on{' '}
-              <span className="cs-text-gradient-impact">More Than Code</span>
+              <span className="block">Modern Financial Applications</span>
+              <span className="block cs-text-gradient-impact">Are More Than Code</span>
             </h2>
-          </Reveal>
-
-          <Reveal header delay={0.15} y={20} style={{ maxWidth: '420px' }}>
-            <p
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: 'var(--fs-body)',
-                fontWeight: 400,
-                letterSpacing: '-0.02em',
-                lineHeight: 1.5,
-                color: '#555555',
-              }}
-            >
-              Modern financial applications are built from interconnected software components.
-            </p>
           </Reveal>
         </div>
 
-        <RevealStagger
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
-          style={{ gap: '24px' }}
-        >
-          {COMPONENTS.map((item) => (
-            <RevealItem key={item.line1 + item.line2} className="h-full">
-              <div
-                className="group flex h-full flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_-16px_rgba(40,30,90,0.12)]"
-                style={{
-                  background: 'linear-gradient(135deg, #F9F8FD 0%, #F3F5FA 100%)',
-                  borderRadius: '20px',
-                  padding: 'clamp(28px, 3vw, 36px) clamp(24px, 2.6vw, 30px)',
-                  border: '1px solid rgba(154,81,255,0.12)',
-                }}
-              >
-                <div>
-                  <h3
-                    style={{
-                      fontFamily: 'var(--font-display)',
-                      fontSize: 'var(--fs-h3)',
-                      fontWeight: 600,
-                      letterSpacing: '-0.04em',
-                      lineHeight: 1.15,
-                      color: '#111111',
-                    }}
-                  >
-                    <span className="block">{item.line1}</span>
-                    <span className="block">{item.line2}</span>
-                  </h3>
-
-                  <p
-                    style={{
-                      marginTop: '12px',
-                      fontFamily: 'var(--font-sans)',
-                      fontSize: 'var(--fs-body-sm)',
-                      fontWeight: 400,
-                      letterSpacing: '-0.01em',
-                      lineHeight: 1.5,
-                      color: '#555555',
-                      minHeight: 'clamp(44px, 3.4vw, 48px)',
-                    }}
-                  >
-                    {item.desc}
-                  </p>
-                </div>
-
-                <ul
-                  style={{
-                    marginTop: 'clamp(20px, 2vw, 28px)',
-                    paddingTop: 'clamp(14px, 1.5vw, 18px)',
-                    borderTop: '1px solid rgba(17,17,17,0.08)',
-                    listStyle: 'none',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '8px',
-                    paddingLeft: 0,
-                    marginBottom: 0,
-                  }}
-                >
-                  {item.items.map((sub) => (
-                    <li
-                      key={sub}
-                      className="flex items-center gap-2.5"
-                      style={{
-                        fontFamily: 'var(--font-sans)',
-                        fontSize: 'var(--fs-body-sm)',
-                        fontWeight: 400,
-                        color: '#333333',
-                        letterSpacing: '-0.01em',
-                      }}
+        {/* Single Minimal Showcase Card */}
+        <Reveal delay={0.1} y={20}>
+          <div
+            className="relative mx-auto max-w-[1180px] overflow-hidden"
+            style={{
+              background: 'linear-gradient(180deg, #FFFFFF 0%, #FAF8FE 100%)',
+              borderRadius: 'clamp(20px, 2.2vw, 28px)',
+              border: '1px solid rgba(154, 81, 255, 0.14)',
+              boxShadow:
+                '0 4px 20px -4px rgba(40, 30, 90, 0.04), 0 20px 48px -16px rgba(40, 30, 90, 0.07)',
+              padding: 'clamp(32px, 3.6vw, 48px) clamp(20px, 2.8vw, 36px)',
+            }}
+          >
+            <RevealStagger className="grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-4 lg:gap-6">
+              {COMPONENTS.map((item) => (
+                <RevealItem key={item.line1 + item.line2} className="w-full">
+                  <div className="group flex flex-col items-center text-center transition-transform duration-300 hover:-translate-y-1">
+                    {/* 3D Icon Container with subtle ambient halo */}
+                    <div
+                      className="relative flex items-center justify-center"
+                      style={{ width: 'clamp(140px, 12vw, 168px)', height: 'clamp(130px, 11vw, 156px)' }}
                     >
                       <span
-                        className="inline-block shrink-0 rounded-full"
+                        aria-hidden
+                        className="absolute rounded-full pointer-events-none transition-transform duration-500 group-hover:scale-125"
                         style={{
-                          width: '4px',
-                          height: '4px',
-                          background: '#9A51FF',
+                          width: 'clamp(108px, 9vw, 128px)',
+                          height: 'clamp(108px, 9vw, 128px)',
+                          background:
+                            'radial-gradient(closest-side, rgba(154, 81, 255, 0.22) 0%, rgba(154, 81, 255, 0) 74%)',
+                          filter: 'blur(6px)',
                         }}
                       />
-                      <span>{sub}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </RevealItem>
-          ))}
-        </RevealStagger>
+                      <Image
+                        src={item.icon}
+                        alt={item.iconAlt}
+                        width={200}
+                        height={200}
+                        sizes="200px"
+                        className="relative object-contain transition-transform duration-300 group-hover:scale-105"
+                        style={{
+                          width: 'auto',
+                          height: 'clamp(120px, 10.4vw, 144px)',
+                          filter:
+                            'drop-shadow(0 10px 16px rgba(40, 20, 90, 0.10))',
+                        }}
+                      />
+                    </div>
+
+                    {/* Clean 2-line title */}
+                    <h3
+                      style={{
+                        marginTop: 'clamp(14px, 1.4vw, 18px)',
+                        fontFamily: 'var(--font-display)',
+                        fontSize: 'var(--fs-h4)',
+                        fontWeight: 600,
+                        letterSpacing: '-0.03em',
+                        lineHeight: 1.25,
+                        color: '#111111',
+                      }}
+                    >
+                      <span className="block">{item.line1}</span>
+                      <span className="block">{item.line2}</span>
+                    </h3>
+                  </div>
+                </RevealItem>
+              ))}
+            </RevealStagger>
+          </div>
+        </Reveal>
       </div>
     </section>
   );
