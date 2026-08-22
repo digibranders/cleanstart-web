@@ -54,6 +54,7 @@ import * as migration_20260715_130000_add_hr_events_roles from './20260715_13000
 import * as migration_20260728_120000_add_email_signatures from './20260728_120000_add_email_signatures';
 import * as migration_20260728_180000_add_email_signature_groups from './20260728_180000_add_email_signature_groups';
 import * as migration_20260731_120000_add_legal_role from './20260731_120000_add_legal_role';
+import * as migration_20260821_120000_faq_answer_richtext from './20260821_120000_faq_answer_richtext';
 
 export const migrations = [
   {
@@ -310,5 +311,10 @@ export const migrations = [
     up: migration_20260731_120000_add_legal_role.up,
     down: migration_20260731_120000_add_legal_role.down,
     name: '20260731_120000_add_legal_role',
+  },
+  {
+    up: migration_20260821_120000_faq_answer_richtext.up,
+    down: migration_20260821_120000_faq_answer_richtext.down,
+    name: '20260821_120000_faq_answer_richtext',
   },
 ];
