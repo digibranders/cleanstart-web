@@ -1,9 +1,9 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { GuideFaqItem } from "@/lib/guides";
-import { RenderLexical } from "@/lib/renderLexical";
+import { RenderLexical, slugifyText } from "@/lib/renderLexical";
 import { Reveal } from "@/components/ui/Reveal";
 
 interface GuideDetailFAQProps {
@@ -14,6 +14,43 @@ export function GuideDetailFAQ({
   faqs,
 }: GuideDetailFAQProps): React.ReactElement | null {
   const [openId, setOpenId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.location.hash) return;
+    const hash = window.location.hash.replace(/^#/, "");
+    const matchingFaq = faqs.find((item, i) => {
+      const slug = `faq-${slugifyText(item.question)}`;
+      const idSlug = `faq-${item.id ?? i}`;
+      return hash === slug || hash === idSlug || hash === item.id;
+    });
+    if (matchingFaq) {
+      const targetId = matchingFaq.id ?? String(faqs.indexOf(matchingFaq));
+      setOpenId(targetId);
+      const questionSlug = `faq-${slugifyText(matchingFaq.question)}`;
+      setTimeout(() => {
+        const el = document.getElementById(questionSlug);
+        el?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 150);
+    }
+  }, [faqs]);
+
+  const toggleOpen = (id: string, slug: string): void => {
+    const nextOpen = openId === id ? null : id;
+    setOpenId(nextOpen);
+    if (nextOpen && typeof window !== "undefined") {
+      window.history.replaceState(null, "", `#${slug}`);
+    }
+  };
+
+  const handleCopyLink = (slug: string, id: string): void => {
+    if (typeof window === "undefined") return;
+    const url = `${window.location.origin}${window.location.pathname}#${slug}`;
+    void navigator.clipboard.writeText(url).then(() => {
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    });
+  };
 
   if (!faqs.length) return null;
 
@@ -43,12 +80,14 @@ export function GuideDetailFAQ({
             >
               {faqs.map((item, i) => {
                 const id = item.id ?? String(i);
+                const slug = `faq-${slugifyText(item.question)}`;
                 const isOpen = openId === id;
                 const answerId = `guide-faq-answer-${id}`;
                 const questionId = `guide-faq-question-${id}`;
                 return (
                   <div
                     key={id}
+                    id={slug}
                     style={{
                       borderBottom: i < faqs.length - 1 ? "1px solid rgba(17,17,17,0.08)" : "none",
                     }}
@@ -61,7 +100,7 @@ export function GuideDetailFAQ({
                       <button
                         type="button"
                         id={questionId}
-                        onClick={() => setOpenId(isOpen ? null : id)}
+                        onClick={() => toggleOpen(id, slug)}
                         aria-expanded={isOpen}
                         aria-controls={answerId}
                         className="group flex w-full items-start justify-between gap-6 text-left cursor-pointer"
@@ -105,6 +144,31 @@ export function GuideDetailFAQ({
                     >
                       <div style={{ padding: "0 24px 20px" }}>
                         <RenderLexical content={item.answer} wrapperClassName="faq-answer-body" />
+                        <div className="flex justify-end pt-3">
+                          <button
+                            type="button"
+                            onClick={() => handleCopyLink(slug, id)}
+                            className="inline-flex items-center gap-1.5 text-xs text-black/50 hover:text-[#3960f9] transition-colors py-1 px-2 rounded-md hover:bg-black/[0.04] cursor-pointer"
+                            aria-label="Copy link to this answer"
+                          >
+                            {copiedId === id ? (
+                              <>
+                                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M13.5 4.5l-7 7L3 8" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                                <span>Link copied</span>
+                              </>
+                            ) : (
+                              <>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" strokeLinecap="round" strokeLinejoin="round" />
+                                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                                <span>Copy link</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -117,3 +181,5 @@ export function GuideDetailFAQ({
     </section>
   );
 }
+
+

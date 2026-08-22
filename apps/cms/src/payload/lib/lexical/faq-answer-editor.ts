@@ -1,10 +1,16 @@
 import {
+  BlockquoteFeature,
   BoldFeature,
   FixedToolbarFeature,
+  InlineCodeFeature,
   ItalicFeature,
   LinkFeature,
   OrderedListFeature,
   ParagraphFeature,
+  StrikethroughFeature,
+  SubscriptFeature,
+  SuperscriptFeature,
+  UnderlineFeature,
   UnorderedListFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical';
@@ -14,14 +20,12 @@ import { cleanstartLinkPopoverFeature } from './link-popover-feature';
 /**
  * Constrained editor for FAQ answers (Blogs / Guides / Knowledge Base
  * `faqs[].answer`). Deliberately smaller than `cleanstartLexicalEditor()`
- * (../editor-config.ts) — no headings, tables, embeds, uploads, or code
- * blocks. Schema.org's FAQPage `acceptedAnswer.text` is meant to stay
- * simple, and JSON-LD flattens this to plain text anyway (see
- * `lib/jsonld/faq-page.ts`), so any richer structure would be silently
- * discarded there.
+ * (../editor-config.ts) — no headings, tables, embeds, uploads, or full code
+ * blocks. Schema.org's FAQPage `acceptedAnswer.text` is flattened to plain text
+ * for JSON-LD (see `lib/jsonld/faq-page.ts`).
  *
- * `LinkFeature`'s `rel` field mirrors `cleanstartLexicalEditor()`'s so
- * link-rel handling stays consistent across both editors.
+ * Supports inline code, bold, italic, underline, strikethrough, sub/sup,
+ * quotes/callouts, lists, and inline links with custom rel.
  */
 export const faqAnswerLexicalEditor = (): ReturnType<typeof lexicalEditor> =>
   lexicalEditor({
@@ -29,6 +33,12 @@ export const faqAnswerLexicalEditor = (): ReturnType<typeof lexicalEditor> =>
       ParagraphFeature(),
       BoldFeature(),
       ItalicFeature(),
+      UnderlineFeature(),
+      StrikethroughFeature(),
+      InlineCodeFeature(),
+      SubscriptFeature(),
+      SuperscriptFeature(),
+      BlockquoteFeature(),
       UnorderedListFeature(),
       OrderedListFeature(),
       LinkFeature({
@@ -50,4 +60,5 @@ export const faqAnswerLexicalEditor = (): ReturnType<typeof lexicalEditor> =>
       FixedToolbarFeature(),
     ],
   });
+
 

@@ -4025,6 +4025,22 @@ body {
   margin-bottom: 0;
 }
 
+.faq-answer-body .article-blockquote {
+  border-left: 3px solid #4a3bf1;
+  padding: 0.5em 0.85em;
+  margin: 10px 0;
+  background: rgba(74, 59, 241, 0.04);
+  border-radius: 0 6px 6px 0;
+  font-size: var(--fs-body-sm);
+  color: rgba(17, 17, 17, 0.75);
+  line-height: 1.55;
+}
+
+.faq-answer-body .article-blockquote .article-paragraph {
+  margin-bottom: 0;
+  color: inherit;
+}
+
 .article-body .article-ul+.article-ul,
 .article-body .article-ol+.article-ol,
 .article-body .article-ul+.article-ol,
