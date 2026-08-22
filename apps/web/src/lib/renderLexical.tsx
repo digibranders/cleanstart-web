@@ -458,14 +458,22 @@ export function slugifyText(text: string): string {
 interface RenderLexicalProps {
   content: LexicalRoot | null | undefined;
   className?: string;
+  /** Defaults to "article-body" (full-article prose styling). Pass
+   * "faq-answer-body" for the compact FAQ-answer look. */
+  wrapperClassName?: string;
 }
 
-export function RenderLexical({ content, className = "" }: RenderLexicalProps): React.ReactElement | null {
+export function RenderLexical({
+  content,
+  className = "",
+  wrapperClassName = "article-body",
+}: RenderLexicalProps): React.ReactElement | null {
   if (!content?.root?.children?.length) return null;
 
   return (
-    <div className={`article-body ${className}`}>
+    <div className={`${wrapperClassName} ${className}`}>
       {renderNodes(content.root.children, "root")}
     </div>
   );
 }
+
