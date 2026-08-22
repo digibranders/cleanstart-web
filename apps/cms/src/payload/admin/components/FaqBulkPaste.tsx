@@ -27,14 +27,44 @@ const replaceLastSegment = (input: string, replacement: string): string => {
 const escapeRegExp = (input: string): string =>
   input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+const paragraphsToLexical = (paragraphs: string[]): Record<string, unknown> => ({
+  root: {
+    type: 'root',
+    children: paragraphs
+      .filter((p) => p.trim().length > 0)
+      .map((text) => ({
+        type: 'paragraph',
+        children: [
+          {
+            type: 'text',
+            text,
+            format: 0,
+            detail: 0,
+            mode: 'normal',
+            style: '',
+            version: 1,
+          },
+        ],
+        direction: null,
+        format: '',
+        indent: 0,
+        version: 1,
+      })),
+    direction: null,
+    format: '',
+    indent: 0,
+    version: 1,
+  },
+});
+
 const buildSubFieldState = (
   question: string,
   answerParagraphs: string[],
 ): Record<string, { initialValue: unknown; value: unknown; valid: true }> => {
-  const answerText = answerParagraphs.join('\n\n');
+  const answerLexical = paragraphsToLexical(answerParagraphs);
   return {
     question: { initialValue: question, value: question, valid: true },
-    answer: { initialValue: answerText, value: answerText, valid: true },
+    answer: { initialValue: answerLexical, value: answerLexical, valid: true },
   };
 };
 
@@ -117,7 +147,7 @@ export const FaqBulkPaste = (props: FaqBulkPasteProps): ReactElement | null => {
       // REPLACE_ROW (acts like insert in our state shape) and
       // REMOVE_ROW + ADD_ROW (race conditions across the React
       // reducer commit), and preserves the row's stable identity.
-      const firstAnswer = firstPair.answerParagraphs.join('\n\n');
+      const firstAnswer = paragraphsToLexical(firstPair.answerParagraphs);
       dispatchFields({
         type: 'UPDATE',
         path: `${arrayPath}.${startIndex}.question`,
