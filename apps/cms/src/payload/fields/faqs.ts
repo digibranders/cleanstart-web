@@ -37,6 +37,14 @@ export const faqsField: Field = {
   },
   fields: [
     { name: 'question', type: 'text', required: true },
-    { name: 'answer', type: 'richText', required: true, editor: faqAnswerLexicalEditor() },
+    {
+      name: 'answer',
+      type: 'richText',
+      required: true,
+      editor: faqAnswerLexicalEditor(),
+      admin: {
+        className: 'faq-answer-rich-text',
+      },
+    },
   ],
 };

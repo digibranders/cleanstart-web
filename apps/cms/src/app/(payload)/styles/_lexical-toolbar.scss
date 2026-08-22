@@ -212,6 +212,19 @@
   .rich-text-lexical__wrap.is-inline-fullscreen & {
     padding-right: 8px;
   }
+
+  // In nested / FAQ array editors, keep the toolbar compact and static
+  // without the 124px right reservation for fullscreen pill.
+  .cs-array &,
+  .cs-array__row &,
+  .cs-blocks &,
+  .faq-answer-rich-text & {
+    min-height: 36px;
+    padding: 3px 6px;
+    position: static;
+    border-radius: var(--cs-radius-input) var(--cs-radius-input) 0 0;
+    border-bottom: 1px solid var(--theme-elevation-150);
+  }
 }
 
 .toolbar-popup__container,

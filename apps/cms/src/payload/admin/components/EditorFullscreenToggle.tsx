@@ -33,7 +33,11 @@ export const EditorFullscreenToggle = (): ReactElement | null => {
   const findCandidate = useCallback((): HTMLElement | null => {
     const all = document.querySelectorAll<HTMLElement>('.rich-text-lexical__wrap');
     for (const el of all) {
-      if (el.closest('.array-field__row, .collapsible__content, .blocks-field__row')) {
+      if (
+        el.closest(
+          '.cs-array, .cs-array__row, .cs-blocks, .cs-collapsible, .faq-answer-rich-text, .array-field__row, .collapsible__content, .blocks-field__row',
+        )
+      ) {
         continue;
       }
       return el;
@@ -68,7 +72,9 @@ export const EditorFullscreenToggle = (): ReactElement | null => {
       const hosting = active.closest<HTMLElement>('.rich-text-lexical__wrap');
       if (
         hosting &&
-        !hosting.closest('.array-field__row, .collapsible__content, .blocks-field__row')
+        !hosting.closest(
+          '.cs-array, .cs-array__row, .cs-blocks, .cs-collapsible, .faq-answer-rich-text, .array-field__row, .collapsible__content, .blocks-field__row',
+        )
       ) {
         return hosting;
       }

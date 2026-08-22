@@ -83,6 +83,10 @@
 // Inside nested editor wraps, kill the bundled Lexical wrap padding
 // so the cyan-bordered card hugs the content tightly. Body editor
 // (top-level, --show-gutter outside any array row) keeps its wider feel.
+.cs-array .rich-text-lexical__wrap,
+.cs-array__row .rich-text-lexical__wrap,
+.cs-blocks .rich-text-lexical__wrap,
+.faq-answer-rich-text .rich-text-lexical__wrap,
 .array-field__row .rich-text-lexical__wrap,
 .collapsible__content .rich-text-lexical__wrap,
 .blocks-field__row .rich-text-lexical__wrap {
