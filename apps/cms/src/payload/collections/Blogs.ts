@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload';
 import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { displayPublishedAtField } from '../fields/display-published-at';
+import { faqsBulkPasteField, faqsField } from '../fields/faqs';
 import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
@@ -64,39 +65,8 @@ export const Blogs: CollectionConfig = {
       },
     }),
     { name: 'body', type: 'richText' },
-    {
-      name: 'faqsBulkPaste',
-      type: 'ui',
-      admin: {
-        components: {
-          Field: {
-            path: '@/payload/admin/components/FaqBulkPaste.tsx#FaqBulkPaste',
-            clientProps: { targetField: 'faqs' },
-          },
-        },
-      },
-    },
-    {
-      name: 'faqs',
-      type: 'array',
-      labels: { singular: 'FAQ', plural: 'FAQs' },
-      admin: {
-        // Start collapsed — long answer paragraphs make an expanded
-        // 5-FAQ list dominate the form; the row summary already shows
-        // the question text, so collapsed is the better default.
-        initCollapsed: true,
-        components: {
-          RowLabel: '@/payload/admin/components/FaqRowLabel.tsx#FaqRowLabel',
-        },
-      },
-      fields: [
-        { name: 'question', type: 'text', required: true },
-        // Plain-text answer — matches Schema.org `acceptedAnswer.text`
-        // and keeps each FAQ row compact. Multiple paragraphs via
-        // line breaks.
-        { name: 'answer', type: 'textarea', required: true },
-      ],
-    },
+    faqsBulkPasteField,
+    faqsField,
     {
       name: 'authors',
       type: 'relationship',

@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload';
 import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { displayPublishedAtField } from '../fields/display-published-at';
+import { faqsBulkPasteField, faqsField } from '../fields/faqs';
 import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
 import { schemaAddonsField } from '../fields/schema-addons';
@@ -83,33 +84,8 @@ export const KnowledgeBase: CollectionConfig = {
       },
     },
     { name: 'body', type: 'richText' },
-    {
-      name: 'faqsBulkPaste',
-      type: 'ui',
-      admin: {
-        components: {
-          Field: {
-            path: '@/payload/admin/components/FaqBulkPaste.tsx#FaqBulkPaste',
-            clientProps: { targetField: 'faqs' },
-          },
-        },
-      },
-    },
-    {
-      name: 'faqs',
-      type: 'array',
-      labels: { singular: 'FAQ', plural: 'FAQs' },
-      admin: {
-        initCollapsed: true,
-        components: {
-          RowLabel: '@/payload/admin/components/FaqRowLabel.tsx#FaqRowLabel',
-        },
-      },
-      fields: [
-        { name: 'question', type: 'text', required: true },
-        { name: 'answer', type: 'textarea', required: true },
-      ],
-    },
+    faqsBulkPasteField,
+    faqsField,
     {
       name: 'reviewedBy',
       type: 'relationship',
