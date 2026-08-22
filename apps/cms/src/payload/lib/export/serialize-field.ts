@@ -9,6 +9,8 @@
  * gets the same protection the existing CSV exports already have.
  */
 
+import { lexicalToPlainText } from '../lexical/to-plain-text';
+
 /** Never offered in the field picker, never honored server-side, even if
  * requested directly — defence in depth against visitor-PII leakage
  * through this generic path. See design doc "Decisions locked". */
@@ -45,24 +47,6 @@ const relatedDocLabel = (doc: RelatedDocShape): string => {
   if (typeof doc.url === 'string') return doc.url;
   if (typeof doc.filename === 'string') return doc.filename;
   return doc.id != null ? String(doc.id) : '';
-};
-
-const lexicalNodeToText = (node: unknown): string => {
-  if (node == null || typeof node !== 'object') return '';
-  const n = node as { type?: string; text?: string; children?: unknown[] };
-  if (n.type === 'text' && typeof n.text === 'string') return n.text;
-  if (Array.isArray(n.children)) return n.children.map(lexicalNodeToText).join('');
-  return '';
-};
-
-const lexicalToPlainText = (value: unknown): string => {
-  const root = (value as { root?: { children?: unknown[] } } | null)?.root;
-  if (!root || !Array.isArray(root.children)) return '';
-  return root.children
-    .map(lexicalNodeToText)
-    .filter((s) => s.length > 0)
-    .join(' ')
-    .trim();
 };
 
 export const serializeFieldValue = (fieldType: string, value: unknown): string => {

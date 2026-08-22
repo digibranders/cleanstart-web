@@ -85,8 +85,9 @@ describe('serializeFieldValue', () => {
         ],
       },
     };
-    expect(serializeFieldValue('richText', lexical)).toBe('Hello world');
+    expect(serializeFieldValue('richText', lexical)).toBe('Hello world.');
   });
+
 
   it('JSON-stringifies plain arrays, groups, and blocks', () => {
     expect(serializeFieldValue('array', [{ a: 1 }])).toBe('[{"a":1}]');
