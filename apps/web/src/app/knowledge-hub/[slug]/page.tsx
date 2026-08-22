@@ -8,8 +8,10 @@ import {
   articleSchema,
   breadcrumbSchema,
   breadcrumbTrail,
+  faqPageSchema,
   videoObjectSchema,
 } from '@/lib/seo/jsonld';
+import { lexicalToPlainText } from '@/lib/renderLexical';
 import { JsonLdGraph } from '@/components/JsonLdGraph';
 import { buildPageGraph, seoOverride } from '@/lib/seo/compose-page';
 import type { Metadata } from 'next';
@@ -107,6 +109,9 @@ export default async function KnowledgeHubArticlePage({
                     embedPath: `/knowledge-hub/${article.slug}`,
                   }),
                 ]
+              : []),
+            ...(article.faqs && article.faqs.length > 0
+              ? [faqPageSchema(article.faqs.map((f) => ({ question: f.question, answer: lexicalToPlainText(f.answer) })))]
               : []),
           ],
           override: seoOverride(article.seo),
