@@ -1,6 +1,13 @@
 import { type MigrateUpArgs, type MigrateDownArgs, sql } from '@payloadcms/db-postgres';
 
-const TABLES = ['blogs_faqs', 'guides_faqs', 'knowledge_base_faqs'] as const;
+const TABLES = [
+  'blogs_faqs',
+  'guides_faqs',
+  'knowledge_base_faqs',
+  '_blogs_v_version_faqs',
+  '_guides_v_version_faqs',
+  '_knowledge_base_v_version_faqs',
+] as const;
 
 export async function up({ db }: MigrateUpArgs): Promise<void> {
   for (const table of TABLES) {
