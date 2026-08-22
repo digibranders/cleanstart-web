@@ -53,7 +53,12 @@ const paragraphNode = (text: string) => ({
 });
 
 const stringToLexical = (raw: string) => {
-  const paragraphs = raw.split('\n').filter((line) => line.trim().length > 0);
+  const paragraphs = raw
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
   return {
     root: {
       type: 'root',
@@ -108,7 +113,7 @@ const run = async (): Promise<void> => {
       }
 
       // eslint-disable-next-line no-console -- script output
-      console.log(`  ${DRY_RUN ? '[dry run] would convert' : 'converting'} ${collection}#${String(typed.id)} (${nextFaqs.filter((r) => r !== faqs.find((f) => f === r)).length} of ${nextFaqs.length} rows)`);
+      console.log(`  ${DRY_RUN ? '[dry run] would convert' : 'converting'} ${collection}#${String(typed.id)} (${nextFaqs.filter((r, i) => r !== faqs[i]).length} of ${nextFaqs.length} rows)`);
 
       if (DRY_RUN) {
         totalConverted += 1;

@@ -21,7 +21,7 @@ import {
  * `LinkFeature`'s `rel` field mirrors `cleanstartLexicalEditor()`'s so
  * link-rel handling stays consistent across both editors.
  */
-export const faqAnswerLexicalEditor = () =>
+export const faqAnswerLexicalEditor = (): ReturnType<typeof lexicalEditor> =>
   lexicalEditor({
     features: () => [
       ParagraphFeature(),

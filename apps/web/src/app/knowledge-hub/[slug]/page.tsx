@@ -110,9 +110,12 @@ export default async function KnowledgeHubArticlePage({
                   }),
                 ]
               : []),
-            ...(article.faqs && article.faqs.length > 0
-              ? [faqPageSchema(article.faqs.map((f) => ({ question: f.question, answer: lexicalToPlainText(f.answer) })))]
-              : []),
+            ...(() => {
+              const validFaqs = (article.faqs ?? [])
+                .map((f) => ({ question: f.question?.trim() ?? '', answer: lexicalToPlainText(f.answer) }))
+                .filter((f) => f.question.length > 0 && f.answer.length > 0);
+              return validFaqs.length > 0 ? [faqPageSchema(validFaqs)] : [];
+            })(),
           ],
           override: seoOverride(article.seo),
         })}

@@ -16,7 +16,7 @@ type LexicalNodeLike = {
 };
 
 const BLOCK_TYPES = new Set(['paragraph', 'listitem', 'heading', 'quote']);
-const TERMINAL_PUNCTUATION = /[.!?:]\s*$/;
+const TERMINAL_PUNCTUATION = /[.!?:]["'”’)\s]*$/;
 
 const inlineText = (node: unknown): string => {
   if (node == null || typeof node !== 'object') return '';

@@ -31,7 +31,8 @@ const paragraphsToLexical = (paragraphs: string[]): Record<string, unknown> => (
   root: {
     type: 'root',
     children: paragraphs
-      .filter((p) => p.trim().length > 0)
+      .map((p) => p.trim())
+      .filter((p) => p.length > 0)
       .map((text) => ({
         type: 'paragraph',
         children: [

@@ -83,4 +83,12 @@ describe('lexicalToPlainText', () => {
     const value = root(paragraph(textNode('Bold word'), textNode(' and normal word')));
     expect(lexicalToPlainText(value)).toBe('Bold word and normal word.');
   });
+
+  it('recognizes closing quotes and parentheses after terminal punctuation without doubling', () => {
+    const quoted = root(paragraph(textNode('She said, "Yes."')));
+    expect(lexicalToPlainText(quoted)).toBe('She said, "Yes."');
+
+    const parenthetical = root(paragraph(textNode('See details (here!)')));
+    expect(lexicalToPlainText(parenthetical)).toBe('See details (here!)');
+  });
 });

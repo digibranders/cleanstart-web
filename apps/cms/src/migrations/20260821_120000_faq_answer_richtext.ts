@@ -25,15 +25,19 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
 
 export async function down({ db }: MigrateDownArgs): Promise<void> {
   for (const table of TABLES) {
-    // Reverse cast: a jsonb *string* value round-trips cleanly back to
-    // varchar via `#>> '{}'`. A real Lexical doc (post-backfill) would
-    // NOT round-trip meaningfully — this down() is only safe to run
-    // before apps/cms/scripts/backfill-faq-answer-lexical.ts has been
-    // executed against the target database.
+    // Reverse cast: a jsonb string scalar round-trips cleanly back to
+    // varchar via `#>> '{}'`. For a post-backfill Lexical object, fallback
+    // to text representation rather than wiping to NULL.
     await db.execute(sql.raw(`
       ALTER TABLE "${table}"
       ALTER COLUMN "answer" TYPE character varying
-      USING ("answer" #>> '{}');
+      USING (
+        CASE
+          WHEN jsonb_typeof("answer") = 'string' THEN "answer" #>> '{}'
+          WHEN "answer" IS NULL THEN NULL
+          ELSE "answer"::text
+        END
+      );
     `));
   }
 }

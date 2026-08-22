@@ -478,7 +478,7 @@ export function RenderLexical({
 }
 
 const BLOCK_TYPES = new Set(["paragraph", "listitem", "heading", "quote"]);
-const TERMINAL_PUNCTUATION = /[.!?:]\s*$/;
+const TERMINAL_PUNCTUATION = /[.!?:]["'”’)\s]*$/;
 
 export function lexicalToPlainText(content: LexicalRoot | null | undefined): string {
   if (!content?.root?.children?.length) return "";

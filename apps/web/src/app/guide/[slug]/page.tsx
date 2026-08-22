@@ -127,7 +127,6 @@ export async function renderGuideDetail({
   const nextTarget = manualNext ?? toGuideJourneyTarget(autoJourney.next);
 
   const coverImageUrl = absoluteUrl(guideCoverPath(guideCoverKeyword(guide)));
-  const faqs = (guide.faqs ?? []).filter((f) => f.question && f.answer);
 
   return (
     <>
@@ -152,9 +151,12 @@ export async function renderGuideDetail({
               imageUrl: coverImageUrl,
               authors: guide.authors?.map((a) => ({ name: a.name, slug: a.slug })),
             }),
-            ...(faqs.length > 0
-              ? [faqPageSchema(faqs.map((f) => ({ question: f.question, answer: lexicalToPlainText(f.answer) })))]
-              : []),
+            ...(() => {
+              const validFaqs = (guide.faqs ?? [])
+                .map((f) => ({ question: f.question?.trim() ?? '', answer: lexicalToPlainText(f.answer) }))
+                .filter((f) => f.question.length > 0 && f.answer.length > 0);
+              return validFaqs.length > 0 ? [faqPageSchema(validFaqs)] : [];
+            })(),
           ],
           override: seoOverride(guide.seo),
         })}
@@ -175,7 +177,7 @@ export async function renderGuideDetail({
           tableOfContents={guide.tableOfContents}
         />
 
-        {faqs.length > 0 ? <GuideDetailFAQ faqs={faqs} /> : null}
+        {guide.faqs && guide.faqs.length > 0 ? <GuideDetailFAQ faqs={guide.faqs} /> : null}
 
         <GuideDetailAuthor authors={guide.authors} />
 
@@ -201,7 +203,7 @@ export async function renderGuideDetail({
         ) : guide.authors && guide.authors.length > 0 ? (
           /* Author (pb-16 → 64px) is last. */
           <div aria-hidden className="bg-white" style={{ height: "calc(var(--spacing-section-cta) - 64px)" }} />
-        ) : faqs.length > 0 ? (
+        ) : guide.faqs && guide.faqs.length > 0 ? (
           /* FAQ (pb-20 → 80px) is last. */
           <div aria-hidden className="bg-white" style={{ height: "calc(var(--spacing-section-cta) - 80px)" }} />
         ) : (
