@@ -33,12 +33,7 @@ const VIEWPORT_PAD = 8;
 
 const computePosition = (
   rect: DOMRect,
-  anchorElem: HTMLElement | null,
 ): { left: number; top: number } => {
-  const containerRect = anchorElem?.getBoundingClientRect();
-  const offsetLeft = containerRect ? containerRect.left : 0;
-  const offsetTop = containerRect ? containerRect.top : 0;
-
   const viewportWidth =
     typeof window !== 'undefined' ? window.innerWidth : 1024;
   const viewportHeight =
@@ -56,20 +51,17 @@ const computePosition = (
   }
   if (top < VIEWPORT_PAD) top = VIEWPORT_PAD;
 
-  return { left: left - offsetLeft, top: top - offsetTop };
+  return { left, top };
 };
 
 type Props = {
   /** The selection rect used to position the popover. */
   anchorRect: DOMRect;
   /**
-   * The container element the popover is portalled into (the editor's
-   * parent element). Passed down from `LinkPopoverPlugin` so
-   * `computePosition` offsets correctly for whichever editor instance
-   * opened the popover — avoiding the `document.querySelector` bug that
-   * picks the first editor on multi-editor pages.
+   * Optional container element for backwards-compat. The popover
+   * is portalled to document.body and positioned via fixed viewport coordinates.
    */
-  anchorElem: HTMLElement;
+  anchorElem?: HTMLElement;
   initial: LinkPopoverValue;
   mode: 'create' | 'edit';
   onClose: () => void;
@@ -79,7 +71,7 @@ type Props = {
 
 export const LinkPopover = forwardRef<HTMLDivElement, Props>(
   function LinkPopover(
-    { anchorRect, anchorElem, initial, mode, onClose: _onClose, onRemove, onSave },
+    { anchorRect, initial, mode, onClose: _onClose, onRemove, onSave },
     ref,
   ) {
     const [linkType, setLinkType] = useState<LinkPopoverValue['linkType']>(
@@ -137,8 +129,8 @@ export const LinkPopover = forwardRef<HTMLDivElement, Props>(
     }, [initial.doc?.id, initial.doc?.title]);
 
     const position = useMemo(
-      () => computePosition(anchorRect, anchorElem),
-      [anchorRect, anchorElem],
+      () => computePosition(anchorRect),
+      [anchorRect],
     );
 
     const isInternal = linkType === 'internal';

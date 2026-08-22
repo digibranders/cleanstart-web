@@ -250,9 +250,9 @@ const fetchDocTitle = async (
 };
 
 export function LinkPopoverPlugin({
-  anchorElem,
+  anchorElem: _anchorElem,
 }: {
-  anchorElem: HTMLElement;
+  anchorElem?: HTMLElement;
 }): React.ReactElement | null {
   const [editor] = useLexicalComposerContext();
   const [state, setState] = useState<PopoverState | null>(null);
@@ -553,11 +553,21 @@ export function LinkPopoverPlugin({
         close();
       }
     };
+    const updateRect = (): void => {
+      const rect = getNativeSelectionRect(editor);
+      if (rect) {
+        setState((current) => (current ? { ...current, rect } : null));
+      }
+    };
     document.addEventListener('mousedown', handleDocClick);
     document.addEventListener('keydown', handleKey);
+    window.addEventListener('scroll', updateRect, true);
+    window.addEventListener('resize', updateRect);
     return () => {
       document.removeEventListener('mousedown', handleDocClick);
       document.removeEventListener('keydown', handleKey);
+      window.removeEventListener('scroll', updateRect, true);
+      window.removeEventListener('resize', updateRect);
     };
   }, [state, editor, close]);
 
@@ -672,12 +682,11 @@ export function LinkPopoverPlugin({
     setState(null);
   }, [editor, registerCommitOnNextChange]);
 
-  if (!state) return null;
+  if (!state || typeof document === 'undefined') return null;
 
   return createPortal(
     <LinkPopover
       anchorRect={state.rect}
-      anchorElem={anchorElem}
       initial={state.initial}
       mode={state.mode}
       onClose={close}
@@ -685,6 +694,6 @@ export function LinkPopoverPlugin({
       onSave={handleSave}
       ref={popoverRef}
     />,
-    anchorElem,
+    document.body,
   );
 }
