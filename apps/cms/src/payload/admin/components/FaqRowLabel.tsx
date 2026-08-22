@@ -3,28 +3,21 @@
 import { useRowLabel } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
 
+import { lexicalToPlainText } from '../../lib/lexical/to-plain-text';
+
 type FaqRowData = {
   question?: string | null;
-  answer?: string | null;
+  answer?: unknown;
 };
 
 const truncate = (input: string, max: number): string =>
   input.length > max ? `${input.slice(0, max - 1).trimEnd()}…` : input;
 
-/**
- * Row label for FAQ array fields. Shows the question text on the
- * collapsed row instead of the default `FAQ 01`/`FAQ 02` so editors
- * can scan the list without opening every row. Falls back to the
- * numeric label when a row hasn't had its question filled in yet.
- *
- * Trailing badge surfaces whether the answer is filled — lets editors
- * spot empty rows without expanding each one.
- */
 export const FaqRowLabel = (): ReactElement => {
   const { data, rowNumber } = useRowLabel<FaqRowData>();
   const number = (rowNumber ?? 0) + 1;
   const question = (data?.question ?? '').trim();
-  const answered = (data?.answer ?? '').trim() !== '';
+  const answered = lexicalToPlainText(data?.answer).length > 0;
   const numLabel = String(number).padStart(2, '0');
 
   if (!question) {
