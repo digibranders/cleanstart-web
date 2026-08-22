@@ -9,6 +9,8 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical';
 
+import { cleanstartLinkPopoverFeature } from './link-popover-feature';
+
 /**
  * Constrained editor for FAQ answers (Blogs / Guides / Knowledge Base
  * `faqs[].answer`). Deliberately smaller than `cleanstartLexicalEditor()`
@@ -44,6 +46,8 @@ export const faqAnswerLexicalEditor = (): ReturnType<typeof lexicalEditor> =>
           },
         ],
       }),
+      cleanstartLinkPopoverFeature(),
       FixedToolbarFeature(),
     ],
   });
+
