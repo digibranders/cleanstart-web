@@ -477,3 +477,45 @@ export function RenderLexical({
   );
 }
 
+const BLOCK_TYPES = new Set(["paragraph", "listitem", "heading", "quote"]);
+const TERMINAL_PUNCTUATION = /[.!?:]\s*$/;
+
+export function lexicalToPlainText(content: LexicalRoot | null | undefined): string {
+  if (!content?.root?.children?.length) return "";
+
+  const inlineText = (node: LexicalNode): string => {
+    if (node.type === "text") return (node as Extract<LexicalNode, { type: "text" }>).text;
+    if (node.type === "linebreak") return " ";
+    const generic = node as { children?: LexicalNode[] };
+    if (Array.isArray(generic.children)) return generic.children.map(inlineText).join("");
+    return "";
+  };
+
+  const blockTexts = (nodes: LexicalNode[]): string[] => {
+    const out: string[] = [];
+    for (const node of nodes) {
+      if (node.type === "list") {
+        const listNode = node as { children?: LexicalNode[] };
+        if (Array.isArray(listNode.children)) {
+          out.push(...blockTexts(listNode.children));
+          continue;
+        }
+      }
+      if (BLOCK_TYPES.has(node.type)) {
+        const text = inlineText(node).trim();
+        if (text.length > 0) out.push(text);
+        continue;
+      }
+      const fallback = inlineText(node).trim();
+      if (fallback.length > 0) out.push(fallback);
+    }
+    return out;
+  };
+
+  return blockTexts(content.root.children)
+    .map((block) => (TERMINAL_PUNCTUATION.test(block) ? block : `${block}.`))
+    .join(" ")
+    .trim();
+}
+
+

@@ -3,6 +3,7 @@
 import type React from "react";
 import { useState } from "react";
 import type { BlogFaqItem } from "@/lib/blog";
+import { RenderLexical } from "@/lib/renderLexical";
 import { Reveal } from "@/components/ui/Reveal";
 
 interface BlogDetailFAQProps {
@@ -101,21 +102,7 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
                       }}
                     >
                       <div style={{ padding: "0 24px 20px" }}>
-                        {item.answer.split("\n").map((para, j) =>
-                          para.trim() ? (
-                            <p
-                              key={j}
-                              className="font-normal leading-[1.65] tracking-[-0.01em]"
-                              style={{
-                                fontSize: "var(--fs-body-sm)",
-                                color: "rgba(17,17,17,0.65)",
-                                marginBottom: j < item.answer.split("\n").filter(Boolean).length - 1 ? "12px" : "0",
-                              }}
-                            >
-                              {para}
-                            </p>
-                          ) : null
-                        )}
+                        <RenderLexical content={item.answer} wrapperClassName="faq-answer-body" />
                       </div>
                     </section>
                   </div>

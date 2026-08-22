@@ -10,6 +10,7 @@ import {
 } from "@/lib/blog";
 import type { Blog } from "@/lib/blog";
 import { highlightLexical } from "@/lib/highlightLexical";
+import { lexicalToPlainText } from "@/lib/renderLexical";
 import { Header } from "@/components/nav/Header";
 import { BlogDetailHero } from "@/components/sections/blog/BlogDetailHero";
 import { BlogDetailContent } from "@/components/sections/blog/BlogDetailContent";
@@ -168,7 +169,7 @@ export async function renderBlogDetail({
               relatedLinks: journeyLinks.length > 0 ? journeyLinks : undefined,
             }),
             ...(faqs.length > 0
-              ? [faqPageSchema(faqs.map((f) => ({ question: f.question, answer: f.answer })))]
+              ? [faqPageSchema(faqs.map((f) => ({ question: f.question, answer: lexicalToPlainText(f.answer) })))]
               : []),
           ],
           override: seoOverride(post.seo),

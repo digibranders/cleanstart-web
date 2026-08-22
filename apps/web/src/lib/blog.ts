@@ -230,7 +230,7 @@ export type TocEntry = {
 export type BlogFaqItem = {
   id?: string;
   question: string;
-  answer: string;
+  answer: LexicalRoot;
 };
 
 export type BlogDetail = Blog & {

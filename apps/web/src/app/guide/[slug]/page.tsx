@@ -12,6 +12,7 @@ import { GuideDetailFAQ } from "@/components/sections/guide/GuideDetailFAQ";
 import { GuideDetailRelatedGuides } from "@/components/sections/guide/GuideDetailRelatedGuides";
 import { GuidesCTA } from "@/components/sections/guides/GuidesCTA";
 import { highlightLexical } from "@/lib/highlightLexical";
+import { lexicalToPlainText } from "@/lib/renderLexical";
 import {
   getGuideBySlug,
   getGuideBySlugDraft,
@@ -152,7 +153,7 @@ export async function renderGuideDetail({
               authors: guide.authors?.map((a) => ({ name: a.name, slug: a.slug })),
             }),
             ...(faqs.length > 0
-              ? [faqPageSchema(faqs.map((f) => ({ question: f.question, answer: f.answer })))]
+              ? [faqPageSchema(faqs.map((f) => ({ question: f.question, answer: lexicalToPlainText(f.answer) })))]
               : []),
           ],
           override: seoOverride(guide.seo),
