@@ -144,6 +144,10 @@ import { ContentInsightsView as ContentInsightsView_4f64082482f4a971d7f1f3adfd12
 import { LeadAttributionView as LeadAttributionView_09cce16329a31c9c0551fcad8db287ed } from '../../../payload/admin/components/LeadAttribution/LeadAttributionView.tsx'
 import { CacheView as CacheView_53dd99c40bf5dfa0411c06d06a42a42b } from '../../../payload/admin/components/cache/CacheView.tsx'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
+import { PointField as PointField_dc800e7ca3d2eb7ea39fd4bc6138c687 } from '@/payload/admin/components/fields/PointField.tsx'
+import { RadioField as RadioField_31aae9b520654e49d40e444571bafe41 } from '@/payload/admin/components/fields/RadioField.tsx'
+import { TabsField as TabsField_c014faddfba6da88b9efedda256f4990 } from '@/payload/admin/components/fields/TabsField.tsx'
+import { RowField as RowField_1ef7316c3d3f9450222b0eb086a8e243 } from '@/payload/admin/components/fields/RowField.tsx'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
@@ -292,5 +296,9 @@ export const importMap = {
   "./payload/admin/components/ContentInsights/ContentInsightsView.tsx#ContentInsightsView": ContentInsightsView_4f64082482f4a971d7f1f3adfd127137,
   "./payload/admin/components/LeadAttribution/LeadAttributionView.tsx#LeadAttributionView": LeadAttributionView_09cce16329a31c9c0551fcad8db287ed,
   "./payload/admin/components/cache/CacheView.tsx#CacheView": CacheView_53dd99c40bf5dfa0411c06d06a42a42b,
-  "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
+  "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
+  "@/payload/admin/components/fields/PointField.tsx#PointField": PointField_dc800e7ca3d2eb7ea39fd4bc6138c687,
+  "@/payload/admin/components/fields/RadioField.tsx#RadioField": RadioField_31aae9b520654e49d40e444571bafe41,
+  "@/payload/admin/components/fields/TabsField.tsx#TabsField": TabsField_c014faddfba6da88b9efedda256f4990,
+  "@/payload/admin/components/fields/RowField.tsx#RowField": RowField_1ef7316c3d3f9450222b0eb086a8e243
 }
