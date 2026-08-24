@@ -150,6 +150,14 @@ export function KnowledgeHubArticleFAQ({
                             Couldn&apos;t copy automatically. Copy this link manually: {copyErrorUrl}
                           </output>
                         ) : null}
+                        {/* Visually-hidden live region: the button's static aria-label
+                            overrides its own text for the accessible name, so the
+                            "Link copied" swap alone gives screen-reader users no
+                            confirmation — announce it separately, matching the
+                            copy-failure message above. */}
+                        {copiedId === anchorId ? (
+                          <output className="sr-only">Link copied to clipboard</output>
+                        ) : null}
                         <button
                           type="button"
                           onClick={() => handleCopyLink(anchorId)}
