@@ -17,6 +17,16 @@ type FaqBulkPasteProps = {
    * Pass `'faqs'` for the inline `faqs` arrays on Blogs / Guides.
    */
   targetField?: string;
+  /**
+   * Shape of the sibling `answer` field this instance writes into.
+   * `'text'` (default) matches the FAQ block's plain `textarea` —
+   * `'richText'` matches Blogs/Guides/KnowledgeBase's Lexical `answer`
+   * field. Must match the actual field's Payload type: writing a
+   * Lexical object into a `textarea` field renders `[object Object]`,
+   * and writing a plain string into a `richText` field can't be
+   * parsed by the Lexical editor.
+   */
+  answerFormat?: 'richText' | 'text';
 };
 
 const replaceLastSegment = (input: string, replacement: string): string => {
@@ -27,45 +37,74 @@ const replaceLastSegment = (input: string, replacement: string): string => {
 const escapeRegExp = (input: string): string =>
   input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-const paragraphsToLexical = (paragraphs: string[]): Record<string, unknown> => ({
-  root: {
-    type: 'root',
-    children: paragraphs
-      .map((p) => p.trim())
-      .filter((p) => p.length > 0)
-      .map((text) => ({
-        type: 'paragraph',
-        children: [
-          {
-            type: 'text',
-            text,
-            format: 0,
-            detail: 0,
-            mode: 'normal',
-            style: '',
-            version: 1,
-          },
-        ],
-        direction: null,
-        format: '',
-        indent: 0,
-        version: 1,
-      })),
-    direction: null,
-    format: '',
-    indent: 0,
-    version: 1,
-  },
-});
+const paragraphsToLexical = (paragraphs: string[]): Record<string, unknown> => {
+  const children = paragraphs
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0)
+    .map((text) => ({
+      type: 'paragraph',
+      children: [
+        {
+          type: 'text',
+          text,
+          format: 0,
+          detail: 0,
+          mode: 'normal',
+          style: '',
+          version: 1,
+        },
+      ],
+      direction: null,
+      format: '',
+      indent: 0,
+      version: 1,
+    }));
+  return {
+    root: {
+      type: 'root',
+      // Lexical's `setEditorState` throws if `root.children` is empty
+      // (e.g. every pasted answer line was blank) — a single empty
+      // paragraph keeps the doc valid instead of crashing that row's
+      // editor on render.
+      children: children.length > 0
+        ? children
+        : [
+            {
+              type: 'paragraph',
+              children: [
+                { type: 'text', text: '', format: 0, detail: 0, mode: 'normal', style: '', version: 1 },
+              ],
+              direction: null,
+              format: '',
+              indent: 0,
+              version: 1,
+            },
+          ],
+      direction: null,
+      format: '',
+      indent: 0,
+      version: 1,
+    },
+  };
+};
+
+const buildAnswerValue = (
+  answerParagraphs: string[],
+  answerFormat: 'richText' | 'text',
+): unknown =>
+  answerFormat === 'richText'
+    ? paragraphsToLexical(answerParagraphs)
+    : answerParagraphs.join('\n\n');
 
 const buildSubFieldState = (
   question: string,
   answerParagraphs: string[],
+  answerFormat: 'richText' | 'text',
 ): Record<string, { initialValue: unknown; value: unknown; valid: true }> => {
-  const answerLexical = paragraphsToLexical(answerParagraphs);
+  const answerValue = buildAnswerValue(answerParagraphs, answerFormat);
   return {
     question: { initialValue: question, value: question, valid: true },
-    answer: { initialValue: answerLexical, value: answerLexical, valid: true },
+    answer: { initialValue: answerValue, value: answerValue, valid: true },
   };
 };
 
@@ -88,7 +127,7 @@ const buildSubFieldState = (
  * render. A Portal makes React own the inserted node, so it survives.
  */
 export const FaqBulkPaste = (props: FaqBulkPasteProps): ReactElement | null => {
-  const { path, schemaPath, targetField = 'items' } = props;
+  const { path, schemaPath, targetField = 'items', answerFormat = 'text' } = props;
   const { addFieldRow, dispatchFields, removeFieldRow, getDataByPath } = useForm();
   const [portalHost, setPortalHost] = useState<HTMLElement | null>(null);
 
@@ -148,7 +187,7 @@ export const FaqBulkPaste = (props: FaqBulkPasteProps): ReactElement | null => {
       // REPLACE_ROW (acts like insert in our state shape) and
       // REMOVE_ROW + ADD_ROW (race conditions across the React
       // reducer commit), and preserves the row's stable identity.
-      const firstAnswer = paragraphsToLexical(firstPair.answerParagraphs);
+      const firstAnswer = buildAnswerValue(firstPair.answerParagraphs, answerFormat);
       dispatchFields({
         type: 'UPDATE',
         path: `${arrayPath}.${startIndex}.question`,
@@ -164,13 +203,13 @@ export const FaqBulkPaste = (props: FaqBulkPasteProps): ReactElement | null => {
           path: arrayPath,
           schemaPath: arraySchemaPath,
           rowIndex: startIndex + 1 + i,
-          subFieldState: buildSubFieldState(pair.question, pair.answerParagraphs),
+          subFieldState: buildSubFieldState(pair.question, pair.answerParagraphs, answerFormat),
         });
       });
 
       showToast({ message: `${parsed.length} Q&A pairs split and added.`, type: 'success' });
     },
-    [addFieldRow, arrayPath, arraySchemaPath, dispatchFields, inputNamePattern],
+    [addFieldRow, answerFormat, arrayPath, arraySchemaPath, dispatchFields, inputNamePattern],
   );
 
   useEffect(() => {

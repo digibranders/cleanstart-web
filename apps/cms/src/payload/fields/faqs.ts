@@ -16,7 +16,7 @@ export const faqsBulkPasteField: Field = {
     components: {
       Field: {
         path: '@/payload/admin/components/FaqBulkPaste.tsx#FaqBulkPaste',
-        clientProps: { targetField: 'faqs' },
+        clientProps: { targetField: 'faqs', answerFormat: 'richText' },
       },
     },
   },

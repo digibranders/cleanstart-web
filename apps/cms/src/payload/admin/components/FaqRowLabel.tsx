@@ -13,11 +13,18 @@ type FaqRowData = {
 const truncate = (input: string, max: number): string =>
   input.length > max ? `${input.slice(0, max - 1).trimEnd()}…` : input;
 
+// This row label mounts on both a richText `answer` (Blogs/Guides/
+// KnowledgeBase's `faqs`) and a plain-string `answer` (the FAQ
+// page-builder block's `textarea` field) — `lexicalToPlainText` only
+// recognizes the former, so a plain string must be checked directly.
+const answerText = (answer: unknown): string =>
+  typeof answer === 'string' ? answer.trim() : lexicalToPlainText(answer);
+
 export const FaqRowLabel = (): ReactElement => {
   const { data, rowNumber } = useRowLabel<FaqRowData>();
   const number = (rowNumber ?? 0) + 1;
   const question = (data?.question ?? '').trim();
-  const answered = lexicalToPlainText(data?.answer).length > 0;
+  const answered = answerText(data?.answer).length > 0;
   const numLabel = String(number).padStart(2, '0');
 
   if (!question) {
