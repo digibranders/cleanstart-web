@@ -564,12 +564,16 @@ export function LinkPopoverPlugin({
       const rect = getNativeSelectionRect(editor);
       if (rect) {
         setState((current) => (current ? { ...current, rect } : null));
-      } else {
-        // Selection is no longer inside this editor (e.g. focus moved to a
-        // different field via keyboard) — a stale rect would reposition
-        // the popover onto unrelated content, so close it instead.
-        setState(null);
+        return;
       }
+      // Selection left this editor. Expected and harmless while the user
+      // is typing into the popover's own inputs (URL, rel, doc search) —
+      // focus legitimately lives there, not in any Lexical selection, so
+      // keep the popover open at its last known position. Only close when
+      // focus is genuinely elsewhere (e.g. a different editor) — a stale
+      // rect there would reposition the popover onto unrelated content.
+      if (popoverRef.current?.contains(document.activeElement)) return;
+      setState(null);
     };
     document.addEventListener('mousedown', handleDocClick);
     document.addEventListener('keydown', handleKey);
