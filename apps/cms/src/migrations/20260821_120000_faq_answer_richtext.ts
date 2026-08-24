@@ -45,7 +45,11 @@ const CREATE_HELPERS = `
                 )
                 ORDER BY line_ord
               )
-              FROM unnest(string_to_array(answer, E'\\n')) WITH ORDINALITY AS t(line, line_ord)
+              -- Normalize CRLF and bare-CR (legacy Mac / Windows / Webflow
+              -- exports) to LF before splitting, so no stray \\r ends up
+              -- baked into a text node, and a CRLF-only blank line still
+              -- correctly counts as blank.
+              FROM unnest(string_to_array(regexp_replace(answer, E'\\r\\n?', E'\\n', 'g'), E'\\n')) WITH ORDINALITY AS t(line, line_ord)
               WHERE btrim(line) <> ''
             ),
             jsonb_build_array(
@@ -78,28 +82,68 @@ const CREATE_HELPERS = `
     END;
   $$ LANGUAGE sql IMMUTABLE;
 
+  -- Recursively concatenates every 'text' node under an arbitrary Lexical
+  -- node, regardless of nesting depth — a link's text lives one level
+  -- deeper (children[0].text), and a list's text lives inside its
+  -- listitem children, not on the list/listitem node itself. A
+  -- non-recursive extractor (reading only direct children's 'text' key)
+  -- silently drops both entirely, since string_agg ignores the resulting
+  -- NULLs with no error.
+  CREATE OR REPLACE FUNCTION _migration_faq_lexical_extract_text(node jsonb)
+  RETURNS text AS $$
+  DECLARE
+    child jsonb;
+    result text := '';
+  BEGIN
+    IF node ->> 'type' = 'text' THEN
+      RETURN COALESCE(node ->> 'text', '');
+    END IF;
+    IF node ? 'children' THEN
+      FOR child IN SELECT value FROM jsonb_array_elements(node -> 'children')
+      LOOP
+        result := result || _migration_faq_lexical_extract_text(child);
+      END LOOP;
+    END IF;
+    RETURN result;
+  END;
+  $$ LANGUAGE plpgsql IMMUTABLE;
+
+  -- One output line per top-level paragraph, and one line per list item
+  -- (list items are the direct children of a 'list' node) — the same
+  -- granularity _migration_faq_answer_to_lexical's up() produces lines
+  -- at, so a round-trip through up() then down() is stable for plain
+  -- multi-paragraph/list content (formatting itself is necessarily lost,
+  -- same as before — this only fixes TEXT vanishing, not marks).
   CREATE OR REPLACE FUNCTION _migration_faq_answer_to_text(answer jsonb)
   RETURNS varchar AS $$
-    SELECT CASE
-      WHEN answer IS NULL THEN NULL
-      ELSE (
-        SELECT string_agg(para_text, E'\\n' ORDER BY para_ord)
-        FROM (
-          SELECT
-            para_ord,
-            string_agg(node ->> 'text', '' ORDER BY node_ord) AS para_text
-          FROM jsonb_array_elements(answer -> 'root' -> 'children') WITH ORDINALITY AS p(para, para_ord)
-          CROSS JOIN LATERAL jsonb_array_elements(p.para -> 'children') WITH ORDINALITY AS n(node, node_ord)
-          GROUP BY para_ord
-        ) paragraphs
-      )
-    END;
-  $$ LANGUAGE sql IMMUTABLE;
+  DECLARE
+    block jsonb;
+    item jsonb;
+    lines text[] := ARRAY[]::text[];
+  BEGIN
+    IF answer IS NULL THEN
+      RETURN NULL;
+    END IF;
+    FOR block IN SELECT value FROM jsonb_array_elements(answer -> 'root' -> 'children')
+    LOOP
+      IF block ->> 'type' = 'list' THEN
+        FOR item IN SELECT value FROM jsonb_array_elements(block -> 'children')
+        LOOP
+          lines := array_append(lines, _migration_faq_lexical_extract_text(item));
+        END LOOP;
+      ELSE
+        lines := array_append(lines, _migration_faq_lexical_extract_text(block));
+      END IF;
+    END LOOP;
+    RETURN array_to_string(lines, E'\\n');
+  END;
+  $$ LANGUAGE plpgsql IMMUTABLE;
 `;
 
 const DROP_HELPERS = `
   DROP FUNCTION IF EXISTS _migration_faq_answer_to_lexical(varchar);
   DROP FUNCTION IF EXISTS _migration_faq_answer_to_text(jsonb);
+  DROP FUNCTION IF EXISTS _migration_faq_lexical_extract_text(jsonb);
 `;
 
 /**
