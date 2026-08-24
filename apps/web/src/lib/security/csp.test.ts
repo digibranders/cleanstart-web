@@ -80,6 +80,14 @@ describe('buildCsp', () => {
     expect(d['script-src']).toContain('https:');
   });
 
+  it('allows the Apollo.io tracker host in connect-src and img-src', () => {
+    const d = parse(buildCsp(base));
+    expect(d['connect-src']).toContain('https://*.apollo.io');
+    expect(d['img-src']).toContain('https://*.apollo.io');
+    // The assets.apollo.io loader is served over https: (no per-host script-src).
+    expect(d['script-src']).toContain('https:');
+  });
+
   it('locks object-src, base-uri and form-action', () => {
     const d = parse(buildCsp(base));
     expect(d['object-src']).toBe("'none'");
