@@ -213,11 +213,10 @@
     padding-right: 8px;
   }
 
-  // In nested / FAQ array editors, keep the toolbar compact and static
-  // without the 124px right reservation for fullscreen pill.
-  .cs-array &,
-  .cs-array__row &,
-  .cs-blocks &,
+  // In the FAQ answer editor, keep the toolbar compact and static
+  // without the 124px right reservation for fullscreen pill. Scoped to
+  // `.faq-answer-rich-text` only — see _editor.scss for why the generic
+  // `.cs-array`/`.cs-blocks` wrapper classes are deliberately not matched.
   .faq-answer-rich-text & {
     min-height: 36px;
     padding: 3px 6px;

@@ -1,16 +1,10 @@
 import {
-  BlockquoteFeature,
   BoldFeature,
   FixedToolbarFeature,
-  InlineCodeFeature,
   ItalicFeature,
   LinkFeature,
   OrderedListFeature,
   ParagraphFeature,
-  StrikethroughFeature,
-  SubscriptFeature,
-  SuperscriptFeature,
-  UnderlineFeature,
   UnorderedListFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical';
@@ -20,12 +14,12 @@ import { cleanstartLinkPopoverFeature } from './link-popover-feature';
 /**
  * Constrained editor for FAQ answers (Blogs / Guides / Knowledge Base
  * `faqs[].answer`). Deliberately smaller than `cleanstartLexicalEditor()`
- * (../editor-config.ts) — no headings, tables, embeds, uploads, or full code
- * blocks. Schema.org's FAQPage `acceptedAnswer.text` is flattened to plain text
- * for JSON-LD (see `lib/jsonld/faq-page.ts`).
- *
- * Supports inline code, bold, italic, underline, strikethrough, sub/sup,
- * quotes/callouts, lists, and inline links with custom rel.
+ * (../editor-config.ts) — no headings, tables, embeds, uploads, code
+ * blocks, or blockquotes. Schema.org's FAQPage `acceptedAnswer.text` is
+ * flattened to plain text for JSON-LD (see `lib/jsonld/faq-page.ts`),
+ * so any richer structure would be silently discarded there — this
+ * feature set is intentionally scoped to bold, italic, links, and
+ * ordered/unordered lists only.
  */
 export const faqAnswerLexicalEditor = (): ReturnType<typeof lexicalEditor> =>
   lexicalEditor({
@@ -33,12 +27,6 @@ export const faqAnswerLexicalEditor = (): ReturnType<typeof lexicalEditor> =>
       ParagraphFeature(),
       BoldFeature(),
       ItalicFeature(),
-      UnderlineFeature(),
-      StrikethroughFeature(),
-      InlineCodeFeature(),
-      SubscriptFeature(),
-      SuperscriptFeature(),
-      BlockquoteFeature(),
       UnorderedListFeature(),
       OrderedListFeature(),
       LinkFeature({
@@ -60,5 +48,3 @@ export const faqAnswerLexicalEditor = (): ReturnType<typeof lexicalEditor> =>
       FixedToolbarFeature(),
     ],
   });
-
-

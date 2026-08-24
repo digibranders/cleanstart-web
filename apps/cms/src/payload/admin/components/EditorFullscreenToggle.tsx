@@ -35,7 +35,17 @@ export const EditorFullscreenToggle = (): ReactElement | null => {
     for (const el of all) {
       if (
         el.closest(
-          '.cs-array, .cs-array__row, .cs-blocks, .cs-collapsible, .faq-answer-rich-text, .array-field__row, .collapsible__content, .blocks-field__row',
+          // `.faq-answer-rich-text` (apps/cms/src/payload/fields/faqs.ts)
+          // is the FAQ answer editor specifically. `.cs-array`/`.cs-blocks`/
+          // `.cs-collapsible` are generic wrappers shared by every array/
+          // blocks/collapsible field CMS-wide — matching on them here also
+          // hid the fullscreen toggle for unrelated full-featured editors
+          // (page-builder Rich Text/Form blocks, Forms.ts's postSubmit
+          // body). `.array-field__row`/`.collapsible__content`/
+          // `.blocks-field__row` are Payload's stock class names, kept
+          // only because they're otherwise inert no-ops in this app's
+          // custom field components.
+          '.faq-answer-rich-text, .array-field__row, .collapsible__content, .blocks-field__row',
         )
       ) {
         continue;
@@ -73,7 +83,17 @@ export const EditorFullscreenToggle = (): ReactElement | null => {
       if (
         hosting &&
         !hosting.closest(
-          '.cs-array, .cs-array__row, .cs-blocks, .cs-collapsible, .faq-answer-rich-text, .array-field__row, .collapsible__content, .blocks-field__row',
+          // `.faq-answer-rich-text` (apps/cms/src/payload/fields/faqs.ts)
+          // is the FAQ answer editor specifically. `.cs-array`/`.cs-blocks`/
+          // `.cs-collapsible` are generic wrappers shared by every array/
+          // blocks/collapsible field CMS-wide — matching on them here also
+          // hid the fullscreen toggle for unrelated full-featured editors
+          // (page-builder Rich Text/Form blocks, Forms.ts's postSubmit
+          // body). `.array-field__row`/`.collapsible__content`/
+          // `.blocks-field__row` are Payload's stock class names, kept
+          // only because they're otherwise inert no-ops in this app's
+          // custom field components.
+          '.faq-answer-rich-text, .array-field__row, .collapsible__content, .blocks-field__row',
         )
       ) {
         return hosting;
