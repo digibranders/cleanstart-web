@@ -19,12 +19,15 @@ type FaqBulkPasteProps = {
   targetField?: string;
   /**
    * Shape of the sibling `answer` field this instance writes into.
-   * `'text'` (default) matches the FAQ block's plain `textarea` —
-   * `'richText'` matches Blogs/Guides/KnowledgeBase's Lexical `answer`
-   * field. Must match the actual field's Payload type: writing a
-   * Lexical object into a `textarea` field renders `[object Object]`,
-   * and writing a plain string into a `richText` field can't be
-   * parsed by the Lexical editor.
+   * `'text'` (default) matches the FAQ block's plain `textarea`
+   * (blocks/FAQ.ts) — `'richText'` matches Blogs/Guides/KnowledgeBase's
+   * Lexical `answer` field (fields/faqs.ts). Must match the actual
+   * field's Payload type: writing a Lexical object into a `textarea`
+   * field renders `[object Object]`, and writing a plain string into a
+   * `richText` field can't be parsed by the Lexical editor. This is a
+   * hand-maintained invariant, not runtime-checked against the field's
+   * real config — if a field's `type` ever changes, update its
+   * `answerFormat` here too.
    */
   answerFormat?: 'richText' | 'text';
 };
