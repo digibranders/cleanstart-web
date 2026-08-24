@@ -121,6 +121,13 @@ const getNativeSelectionRect = (editor: LexicalEditor): DOMRect | null => {
   const win = root.ownerDocument.defaultView;
   const native = win?.getSelection();
   if (!native || native.rangeCount === 0) return null;
+  // Independent sibling rich-text fields (e.g. this editor vs. a FAQ answer
+  // editor elsewhere on the page) never notify each other on focus change —
+  // Lexical's SELECTION_CHANGE_COMMAND only fires for the editor that now
+  // owns the selection. Without this check, a popover left open in this
+  // editor after the user tabs into a different one would reposition onto
+  // that other editor's live caret on the next scroll/resize.
+  if (!native.anchorNode || !root.contains(native.anchorNode)) return null;
   const range = native.getRangeAt(0);
   const rect = range.getBoundingClientRect();
   if (rect.width === 0 && rect.height === 0) {
@@ -557,6 +564,11 @@ export function LinkPopoverPlugin({
       const rect = getNativeSelectionRect(editor);
       if (rect) {
         setState((current) => (current ? { ...current, rect } : null));
+      } else {
+        // Selection is no longer inside this editor (e.g. focus moved to a
+        // different field via keyboard) — a stale rect would reposition
+        // the popover onto unrelated content, so close it instead.
+        setState(null);
       }
     };
     document.addEventListener('mousedown', handleDocClick);
