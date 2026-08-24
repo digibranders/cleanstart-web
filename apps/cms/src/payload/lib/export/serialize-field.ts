@@ -43,6 +43,12 @@ const plainRowSummary = (doc: Record<string, unknown>): string => {
   const parts: string[] = [];
   for (const [key, value] of Object.entries(doc)) {
     if (key === 'id') continue;
+    // Same PII denylist the top-level field picker enforces — this
+    // generic row-summary path walks every string field on an
+    // unrecognized sub-object, so a relationship into a collection with
+    // an `ip`/`userAgent` field (Leads, CareerApplications, etc.) must
+    // not leak it just because that field happens to be a string.
+    if (!isExportableFieldName(key)) continue;
     if (typeof value === 'string') {
       if (value.length > 0) parts.push(`${capitalizeFieldLabel(key)}: ${value}`);
       continue;

@@ -110,6 +110,19 @@ describe('serializeFieldValue', () => {
     );
   });
 
+  it('never leaks a denylisted field (ip/userAgent) through the plain-row summary path', () => {
+    // A relationship into a collection with an `ip`/`userAgent` field
+    // (Leads, CareerApplications, etc.) that has none of the
+    // relationship-identifying fields must not dump those PII fields
+    // into the export just because they happen to be strings.
+    const result = serializeFieldValue('relationship', [
+      { id: 'lead-1', ip: '203.0.113.5', userAgent: 'Mozilla/5.0', category: 'Spam' },
+    ]);
+    expect(result).not.toContain('203.0.113.5');
+    expect(result).not.toContain('Mozilla/5.0');
+    expect(result).toBe('Category: Spam');
+  });
+
   it('extracts plain text from a Lexical richText value', () => {
     const lexical = {
       root: {
