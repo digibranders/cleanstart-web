@@ -82,6 +82,12 @@ export default async function KnowledgeHubArticlePage({
 
   const crumbs = breadcrumbTrail("knowledgeBase", { title: article.title });
 
+  // Filtered once here; both the FAQPage JSON-LD and the rendered accordion
+  // consume this same array so the visible content always matches the schema.
+  const validFaqs = (article.faqs ?? []).filter(
+    (faq) => (faq.question?.trim().length ?? 0) > 0 && lexicalToPlainText(faq.answer).length > 0,
+  );
+
   return (
     <>
       <JsonLdGraph
@@ -110,17 +116,21 @@ export default async function KnowledgeHubArticlePage({
                   }),
                 ]
               : []),
-            ...(() => {
-              const validFaqs = (article.faqs ?? [])
-                .map((f) => ({ question: f.question?.trim() ?? '', answer: lexicalToPlainText(f.answer) }))
-                .filter((f) => f.question.length > 0 && f.answer.length > 0);
-              return validFaqs.length > 0 ? [faqPageSchema(validFaqs)] : [];
-            })(),
+            ...(validFaqs.length > 0
+              ? [
+                  faqPageSchema(
+                    validFaqs.map((faq) => ({
+                      question: faq.question.trim(),
+                      answer: lexicalToPlainText(faq.answer),
+                    })),
+                  ),
+                ]
+              : []),
           ],
           override: seoOverride(article.seo),
         })}
       />
-      <KnowledgeHubArticle article={article} />
+      <KnowledgeHubArticle article={{ ...article, faqs: validFaqs }} />
     </>
   );
 }

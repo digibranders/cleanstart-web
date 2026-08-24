@@ -3,7 +3,7 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import type { KhFaqItem } from "@/lib/knowledge-hub";
-import { RenderLexical, slugifyText } from "@/lib/renderLexical";
+import { RenderLexical } from "@/lib/renderLexical";
 import { Reveal } from "@/components/ui/Reveal";
 
 interface KnowledgeHubArticleFAQProps {
@@ -17,41 +17,46 @@ export function KnowledgeHubArticleFAQ({
 }: KnowledgeHubArticleFAQProps): React.ReactElement | null {
   const [openId, setOpenId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copyErrorId, setCopyErrorId] = useState<string | null>(null);
+  const [copyErrorUrl, setCopyErrorUrl] = useState<string | null>(null);
 
+  // Anchor ids are keyed off the stable Payload row id, not the question
+  // text, so editing a question never breaks a previously shared link.
   useEffect(() => {
     if (typeof window === "undefined" || !window.location.hash) return;
     const hash = window.location.hash.replace(/^#/, "");
-    const matchingFaq = faqs.find((item, i) => {
-      const slug = `faq-${slugifyText(item.question)}`;
-      const idSlug = `faq-${item.id ?? i}`;
-      return hash === slug || hash === idSlug || hash === item.id;
-    });
-    if (matchingFaq) {
-      const targetId = matchingFaq.id ?? String(faqs.indexOf(matchingFaq));
-      setOpenId(targetId);
-      const questionSlug = `faq-${slugifyText(matchingFaq.question)}`;
-      setTimeout(() => {
-        const el = document.getElementById(questionSlug);
-        el?.scrollIntoView({ behavior: "smooth", block: "center" });
-      }, 150);
-    }
+    const hasMatch = faqs.some((item, i) => hash === (item.id ? `faq-${item.id}` : `faq-${i}`));
+    if (!hasMatch) return;
+    setOpenId(hash);
+    setTimeout(() => {
+      document.getElementById(hash)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 150);
   }, [faqs]);
 
-  const toggleOpen = (id: string, slug: string): void => {
-    const nextOpen = openId === id ? null : id;
+  const toggleOpen = (anchorId: string): void => {
+    const nextOpen = openId === anchorId ? null : anchorId;
     setOpenId(nextOpen);
     if (nextOpen && typeof window !== "undefined") {
-      window.history.replaceState(null, "", `#${slug}`);
+      window.history.replaceState(null, "", `#${nextOpen}`);
     }
   };
 
-  const handleCopyLink = (slug: string, id: string): void => {
+  const handleCopyLink = (anchorId: string): void => {
     if (typeof window === "undefined") return;
-    const url = `${window.location.origin}${window.location.pathname}#${slug}`;
-    void navigator.clipboard.writeText(url).then(() => {
-      setCopiedId(id);
-      setTimeout(() => setCopiedId(null), 2000);
-    });
+    const url = `${window.location.origin}${window.location.pathname}#${anchorId}`;
+    navigator.clipboard.writeText(url).then(
+      () => {
+        setCopyErrorId(null);
+        setCopiedId(anchorId);
+        setTimeout(() => setCopiedId(null), 2000);
+      },
+      () => {
+        setCopiedId(null);
+        setCopyErrorUrl(url);
+        setCopyErrorId(anchorId);
+        setTimeout(() => setCopyErrorId(null), 6000);
+      },
+    );
   };
 
   if (!faqs.length) return null;
@@ -74,15 +79,15 @@ export function KnowledgeHubArticleFAQ({
             style={{ border: "1px solid rgba(17,17,17,0.08)", overflow: "hidden" }}
           >
             {faqs.map((item, i) => {
-              const id = item.id ?? String(i);
-              const slug = `faq-${slugifyText(item.question)}`;
-              const isOpen = openId === id;
-              const answerId = `kh-faq-answer-${id}`;
-              const questionId = `kh-faq-question-${id}`;
+              const rowId = item.id ?? String(i);
+              const anchorId = `faq-${rowId}`;
+              const isOpen = openId === anchorId;
+              const answerId = `kh-faq-answer-${rowId}`;
+              const questionId = `kh-faq-question-${rowId}`;
               return (
                 <div
-                  key={id}
-                  id={slug}
+                  key={anchorId}
+                  id={anchorId}
                   style={{
                     borderBottom: i < faqs.length - 1 ? "1px solid rgba(17,17,17,0.08)" : "none",
                   }}
@@ -91,7 +96,7 @@ export function KnowledgeHubArticleFAQ({
                     <button
                       type="button"
                       id={questionId}
-                      onClick={() => toggleOpen(id, slug)}
+                      onClick={() => toggleOpen(anchorId)}
                       aria-expanded={isOpen}
                       aria-controls={answerId}
                       className="group flex w-full items-start justify-between gap-6 text-left cursor-pointer"
@@ -124,7 +129,11 @@ export function KnowledgeHubArticleFAQ({
                   <section
                     id={answerId}
                     aria-labelledby={questionId}
-                    aria-hidden={!isOpen}
+                    // `inert` (not just `aria-hidden`) removes the whole
+                    // collapsed panel from the tab order and a11y tree in
+                    // one step — including any links inside the answer's
+                    // rich text, not just the Copy-link button below.
+                    inert={!isOpen}
                     style={{
                       maxHeight: isOpen ? "800px" : "0px",
                       opacity: isOpen ? 1 : 0,
@@ -135,14 +144,19 @@ export function KnowledgeHubArticleFAQ({
                   >
                     <div style={{ padding: "0 24px 20px" }}>
                       <RenderLexical content={item.answer} wrapperClassName="faq-answer-body" />
-                      <div className="flex justify-end pt-3">
+                      <div className="flex flex-col items-end gap-1.5 pt-3">
+                        {copyErrorId === anchorId && copyErrorUrl ? (
+                          <output className="max-w-full break-all text-right text-xs text-black/60">
+                            Couldn&apos;t copy automatically. Copy this link manually: {copyErrorUrl}
+                          </output>
+                        ) : null}
                         <button
                           type="button"
-                          onClick={() => handleCopyLink(slug, id)}
+                          onClick={() => handleCopyLink(anchorId)}
                           className="inline-flex items-center gap-1.5 text-xs text-black/50 hover:text-[#3960f9] transition-colors py-1 px-2 rounded-md hover:bg-black/[0.04] cursor-pointer"
                           aria-label="Copy link to this answer"
                         >
-                          {copiedId === id ? (
+                          {copiedId === anchorId ? (
                             <>
                               <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
                                 <path d="M13.5 4.5l-7 7L3 8" strokeLinecap="round" strokeLinejoin="round" />

@@ -128,6 +128,12 @@ export async function renderGuideDetail({
 
   const coverImageUrl = absoluteUrl(guideCoverPath(guideCoverKeyword(guide)));
 
+  // Filtered once here; both the FAQPage JSON-LD and the rendered accordion
+  // consume this same array so the visible content always matches the schema.
+  const validFaqs = (guide.faqs ?? []).filter(
+    (faq) => (faq.question?.trim().length ?? 0) > 0 && lexicalToPlainText(faq.answer).length > 0,
+  );
+
   return (
     <>
       <GuideScrollReset />
@@ -151,12 +157,16 @@ export async function renderGuideDetail({
               imageUrl: coverImageUrl,
               authors: guide.authors?.map((a) => ({ name: a.name, slug: a.slug })),
             }),
-            ...(() => {
-              const validFaqs = (guide.faqs ?? [])
-                .map((f) => ({ question: f.question?.trim() ?? '', answer: lexicalToPlainText(f.answer) }))
-                .filter((f) => f.question.length > 0 && f.answer.length > 0);
-              return validFaqs.length > 0 ? [faqPageSchema(validFaqs)] : [];
-            })(),
+            ...(validFaqs.length > 0
+              ? [
+                  faqPageSchema(
+                    validFaqs.map((faq) => ({
+                      question: faq.question.trim(),
+                      answer: lexicalToPlainText(faq.answer),
+                    })),
+                  ),
+                ]
+              : []),
           ],
           override: seoOverride(guide.seo),
         })}
@@ -177,7 +187,7 @@ export async function renderGuideDetail({
           tableOfContents={guide.tableOfContents}
         />
 
-        {guide.faqs && guide.faqs.length > 0 ? <GuideDetailFAQ faqs={guide.faqs} /> : null}
+        {validFaqs.length > 0 ? <GuideDetailFAQ faqs={validFaqs} /> : null}
 
         <GuideDetailAuthor authors={guide.authors} />
 
@@ -203,7 +213,7 @@ export async function renderGuideDetail({
         ) : guide.authors && guide.authors.length > 0 ? (
           /* Author (pb-16 → 64px) is last. */
           <div aria-hidden className="bg-white" style={{ height: "calc(var(--spacing-section-cta) - 64px)" }} />
-        ) : guide.faqs && guide.faqs.length > 0 ? (
+        ) : validFaqs.length > 0 ? (
           /* FAQ (pb-20 → 80px) is last. */
           <div aria-hidden className="bg-white" style={{ height: "calc(var(--spacing-section-cta) - 80px)" }} />
         ) : (

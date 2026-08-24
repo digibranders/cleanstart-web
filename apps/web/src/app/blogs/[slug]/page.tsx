@@ -142,6 +142,12 @@ export async function renderBlogDetail({
     ...(nextTarget ? [`/blogs/${nextTarget.slug}`] : []),
   ];
 
+  // Filtered once here; both the FAQPage JSON-LD and the rendered accordion
+  // consume this same array so the visible content always matches the schema.
+  const validFaqs = (post.faqs ?? []).filter(
+    (faq) => (faq.question?.trim().length ?? 0) > 0 && lexicalToPlainText(faq.answer).length > 0,
+  );
+
   return (
     <>
       <BlogScrollReset />
@@ -167,12 +173,16 @@ export async function renderBlogDetail({
               category: post.categories?.name,
               relatedLinks: journeyLinks.length > 0 ? journeyLinks : undefined,
             }),
-            ...(() => {
-              const validFaqs = (post.faqs ?? [])
-                .map((f) => ({ question: f.question?.trim() ?? '', answer: lexicalToPlainText(f.answer) }))
-                .filter((f) => f.question.length > 0 && f.answer.length > 0);
-              return validFaqs.length > 0 ? [faqPageSchema(validFaqs)] : [];
-            })(),
+            ...(validFaqs.length > 0
+              ? [
+                  faqPageSchema(
+                    validFaqs.map((faq) => ({
+                      question: faq.question.trim(),
+                      answer: lexicalToPlainText(faq.answer),
+                    })),
+                  ),
+                ]
+              : []),
           ],
           override: seoOverride(post.seo),
         })}
@@ -198,9 +208,7 @@ export async function renderBlogDetail({
 
         <BlogDetailAuthor authors={post.authors} />
 
-        {post.faqs && post.faqs.length > 0 && (
-          <BlogDetailFAQ faqs={post.faqs} />
-        )}
+        {validFaqs.length > 0 && <BlogDetailFAQ faqs={validFaqs} />}
 
         <BlogDetailJourneyNav previous={previousTarget} next={nextTarget} />
 
@@ -211,7 +219,7 @@ export async function renderBlogDetail({
           <div style={{ background: "linear-gradient(180deg, #151021 0%, #131E8F 62%, #471EC0 100%)", paddingBottom: "calc(var(--spacing-section-cta) - 20px)" }}>
             <BlogDetailRelatedPosts posts={relatedPosts} />
           </div>
-        ) : post.faqs && post.faqs.length > 0 ? (
+        ) : validFaqs.length > 0 ? (
           /* FAQ section already has pb-20 (80px) → spacer covers remainder */
           <div aria-hidden className="bg-white" style={{ height: "calc(var(--spacing-section-cta) - 80px)" }} />
         ) : previousTarget || nextTarget ? (
