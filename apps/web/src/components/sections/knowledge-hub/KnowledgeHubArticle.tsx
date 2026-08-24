@@ -1,6 +1,7 @@
 import { HeroReveal, Reveal } from '@/components/ui/Reveal';
 import type { KhArticle } from '@/lib/knowledge-hub';
 import { RenderLexical } from '@/lib/renderLexical';
+import { KnowledgeHubArticleFAQ } from './KnowledgeHubArticleFAQ';
 import Link from 'next/link';
 
 export function KnowledgeHubArticle({
@@ -54,6 +55,10 @@ export function KnowledgeHubArticle({
       <div className="article-body mt-12">
         <RenderLexical content={article.body} />
       </div>
+
+      {article.faqs && article.faqs.length > 0 && (
+        <KnowledgeHubArticleFAQ faqs={article.faqs} />
+      )}
     </>
   );
 }

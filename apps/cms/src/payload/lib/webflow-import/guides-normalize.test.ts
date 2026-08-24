@@ -7,6 +7,27 @@ import {
   normalizeWebflowGuide,
 } from './guides-normalize';
 
+/** Build the expected `answer` richText value for a single-paragraph string. */
+const lexicalAnswer = (...paragraphs: string[]) => ({
+  root: {
+    type: 'root',
+    children: paragraphs.map((text) => ({
+      type: 'paragraph',
+      children: [
+        { type: 'text', text, format: 0, detail: 0, mode: 'normal', style: '', version: 1 },
+      ],
+      direction: null,
+      format: '',
+      indent: 0,
+      version: 1,
+    })),
+    direction: null,
+    format: '',
+    indent: 0,
+    version: 1,
+  },
+});
+
 describe('collapseGuideFaqs', () => {
   it('collapses Q1/Ans1 … Q5/Ans5 pairs and skips half-filled rows', () => {
     const result = collapseGuideFaqs({
@@ -20,13 +41,36 @@ describe('collapseGuideFaqs', () => {
       Ans4: '  Z is a thing.  ',
     });
     expect(result).toEqual([
-      { question: 'What is X?', answer: 'X is a thing.' },
-      { question: 'What is Z?', answer: 'Z is a thing.' },
+      { question: 'What is X?', answer: lexicalAnswer('X is a thing.') },
+      { question: 'What is Z?', answer: lexicalAnswer('Z is a thing.') },
     ]);
   });
 
   it('returns [] when no slots are filled', () => {
     expect(collapseGuideFaqs({})).toEqual([]);
+  });
+
+  it('splits a blank-line-separated answer into one paragraph per block', () => {
+    const result = collapseGuideFaqs({
+      Q1: 'Multi-paragraph?',
+      Ans1: 'First paragraph,\nstill first.\n\nSecond paragraph.',
+    });
+    expect(result).toEqual([
+      {
+        question: 'Multi-paragraph?',
+        answer: lexicalAnswer('First paragraph, still first.', 'Second paragraph.'),
+      },
+    ]);
+  });
+
+  it('drops blank-line-delimited segments that are whitespace-only', () => {
+    const result = collapseGuideFaqs({
+      Q1: 'Edge case?',
+      Ans1: '\n\n  \n\nReal paragraph.',
+    });
+    expect(result).toEqual([
+      { question: 'Edge case?', answer: lexicalAnswer('Real paragraph.') },
+    ]);
   });
 });
 

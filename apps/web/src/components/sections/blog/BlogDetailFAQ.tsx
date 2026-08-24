@@ -1,8 +1,9 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { BlogFaqItem } from "@/lib/blog";
+import { RenderLexical } from "@/lib/renderLexical";
 import { Reveal } from "@/components/ui/Reveal";
 
 interface BlogDetailFAQProps {
@@ -11,6 +12,48 @@ interface BlogDetailFAQProps {
 
 export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement | null {
   const [openId, setOpenId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copyErrorId, setCopyErrorId] = useState<string | null>(null);
+  const [copyErrorUrl, setCopyErrorUrl] = useState<string | null>(null);
+
+  // Anchor ids are keyed off the stable Payload row id, not the question
+  // text, so editing a question never breaks a previously shared link.
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.location.hash) return;
+    const hash = window.location.hash.replace(/^#/, "");
+    const hasMatch = faqs.some((item, i) => hash === `faq-${item.id ?? i}`);
+    if (!hasMatch) return;
+    setOpenId(hash);
+    setTimeout(() => {
+      document.getElementById(hash)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 150);
+  }, [faqs]);
+
+  const toggleOpen = (anchorId: string): void => {
+    const nextOpen = openId === anchorId ? null : anchorId;
+    setOpenId(nextOpen);
+    if (nextOpen && typeof window !== "undefined") {
+      window.history.replaceState(null, "", `#${nextOpen}`);
+    }
+  };
+
+  const handleCopyLink = (anchorId: string): void => {
+    if (typeof window === "undefined") return;
+    const url = `${window.location.origin}${window.location.pathname}#${anchorId}`;
+    navigator.clipboard.writeText(url).then(
+      () => {
+        setCopyErrorId(null);
+        setCopiedId(anchorId);
+        setTimeout(() => setCopiedId(null), 2000);
+      },
+      () => {
+        setCopiedId(null);
+        setCopyErrorUrl(url);
+        setCopyErrorId(anchorId);
+        setTimeout(() => setCopyErrorId(null), 6000);
+      },
+    );
+  };
 
   if (!faqs.length) return null;
 
@@ -39,13 +82,15 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
               }}
             >
               {faqs.map((item, i) => {
-                const id = item.id ?? String(i);
-                const isOpen = openId === id;
-                const answerId = `blog-faq-answer-${id}`;
-                const questionId = `blog-faq-question-${id}`;
+                const rowId = item.id ?? String(i);
+                const anchorId = `faq-${rowId}`;
+                const isOpen = openId === anchorId;
+                const answerId = `blog-faq-answer-${rowId}`;
+                const questionId = `blog-faq-question-${rowId}`;
                 return (
                   <div
-                    key={id}
+                    key={anchorId}
+                    id={anchorId}
                     style={{
                       borderBottom: i < faqs.length - 1 ? "1px solid rgba(17,17,17,0.08)" : "none",
                     }}
@@ -58,7 +103,7 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
                       <button
                         type="button"
                         id={questionId}
-                        onClick={() => setOpenId(isOpen ? null : id)}
+                        onClick={() => toggleOpen(anchorId)}
                         aria-expanded={isOpen}
                         aria-controls={answerId}
                         className="group flex w-full items-start justify-between gap-6 text-left cursor-pointer"
@@ -91,7 +136,11 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
                     <section
                       id={answerId}
                       aria-labelledby={questionId}
-                      aria-hidden={!isOpen}
+                      // `inert` (not just `aria-hidden`) removes the whole
+                      // collapsed panel from the tab order and a11y tree in
+                      // one step — including any links inside the answer's
+                      // rich text, not just the Copy-link button below.
+                      inert={!isOpen}
                       style={{
                         maxHeight: isOpen ? "800px" : "0px",
                         opacity: isOpen ? 1 : 0,
@@ -101,21 +150,37 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
                       }}
                     >
                       <div style={{ padding: "0 24px 20px" }}>
-                        {item.answer.split("\n").map((para, j) =>
-                          para.trim() ? (
-                            <p
-                              key={j}
-                              className="font-normal leading-[1.65] tracking-[-0.01em]"
-                              style={{
-                                fontSize: "var(--fs-body-sm)",
-                                color: "rgba(17,17,17,0.65)",
-                                marginBottom: j < item.answer.split("\n").filter(Boolean).length - 1 ? "12px" : "0",
-                              }}
-                            >
-                              {para}
-                            </p>
-                          ) : null
-                        )}
+                        <RenderLexical content={item.answer} wrapperClassName="faq-answer-body" />
+                        <div className="flex flex-col items-end gap-1.5 pt-3">
+                          {copyErrorId === anchorId && copyErrorUrl ? (
+                            <output className="max-w-full break-all text-right text-xs text-black/60">
+                              Couldn&apos;t copy automatically. Copy this link manually: {copyErrorUrl}
+                            </output>
+                          ) : null}
+                          <button
+                            type="button"
+                            onClick={() => handleCopyLink(anchorId)}
+                            className="inline-flex items-center gap-1.5 text-xs text-black/50 hover:text-[#3960f9] transition-colors py-1 px-2 rounded-md hover:bg-black/[0.04] cursor-pointer"
+                            aria-label="Copy link to this answer"
+                          >
+                            {copiedId === anchorId ? (
+                              <>
+                                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M13.5 4.5l-7 7L3 8" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                                <span>Link copied</span>
+                              </>
+                            ) : (
+                              <>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" strokeLinecap="round" strokeLinejoin="round" />
+                                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                                <span>Copy link</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -128,3 +193,5 @@ export function BlogDetailFAQ({ faqs }: BlogDetailFAQProps): React.ReactElement 
     </section>
   );
 }
+
+

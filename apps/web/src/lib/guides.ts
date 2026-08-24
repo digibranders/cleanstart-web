@@ -13,7 +13,7 @@ export type GuideAuthor = BlogAuthor;
 export type GuideFaqItem = {
   id?: string;
   question: string;
-  answer: string;
+  answer: LexicalRoot;
 };
 
 export type Guide = {

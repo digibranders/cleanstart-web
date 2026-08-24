@@ -10,6 +10,7 @@ import {
 } from "@/lib/blog";
 import type { Blog } from "@/lib/blog";
 import { highlightLexical } from "@/lib/highlightLexical";
+import { lexicalToPlainText } from "@/lib/renderLexical";
 import { Header } from "@/components/nav/Header";
 import { BlogDetailHero } from "@/components/sections/blog/BlogDetailHero";
 import { BlogDetailContent } from "@/components/sections/blog/BlogDetailContent";
@@ -136,11 +137,16 @@ export async function renderBlogDetail({
   const nextTarget = manualNext ?? toJourneyTarget(autoJourney.next);
 
   const heroAbsolute = mediaUrl(post.heroImage?.url);
-  const faqs = (post.faqs ?? []).filter((f) => f.question && f.answer);
   const journeyLinks = [
     ...(previousTarget ? [`/blogs/${previousTarget.slug}`] : []),
     ...(nextTarget ? [`/blogs/${nextTarget.slug}`] : []),
   ];
+
+  // Filtered once here; both the FAQPage JSON-LD and the rendered accordion
+  // consume this same array so the visible content always matches the schema.
+  const validFaqs = (post.faqs ?? []).filter(
+    (faq) => (faq.question?.trim().length ?? 0) > 0 && lexicalToPlainText(faq.answer).length > 0,
+  );
 
   return (
     <>
@@ -167,8 +173,15 @@ export async function renderBlogDetail({
               category: post.categories?.name,
               relatedLinks: journeyLinks.length > 0 ? journeyLinks : undefined,
             }),
-            ...(faqs.length > 0
-              ? [faqPageSchema(faqs.map((f) => ({ question: f.question, answer: f.answer })))]
+            ...(validFaqs.length > 0
+              ? [
+                  faqPageSchema(
+                    validFaqs.map((faq) => ({
+                      question: faq.question.trim(),
+                      answer: lexicalToPlainText(faq.answer),
+                    })),
+                  ),
+                ]
               : []),
           ],
           override: seoOverride(post.seo),
@@ -195,9 +208,7 @@ export async function renderBlogDetail({
 
         <BlogDetailAuthor authors={post.authors} />
 
-        {post.faqs && post.faqs.length > 0 && (
-          <BlogDetailFAQ faqs={post.faqs} />
-        )}
+        {validFaqs.length > 0 && <BlogDetailFAQ faqs={validFaqs} />}
 
         <BlogDetailJourneyNav previous={previousTarget} next={nextTarget} />
 
@@ -208,7 +219,7 @@ export async function renderBlogDetail({
           <div style={{ background: "linear-gradient(180deg, #151021 0%, #131E8F 62%, #471EC0 100%)", paddingBottom: "calc(var(--spacing-section-cta) - 20px)" }}>
             <BlogDetailRelatedPosts posts={relatedPosts} />
           </div>
-        ) : post.faqs && post.faqs.length > 0 ? (
+        ) : validFaqs.length > 0 ? (
           /* FAQ section already has pb-20 (80px) → spacer covers remainder */
           <div aria-hidden className="bg-white" style={{ height: "calc(var(--spacing-section-cta) - 80px)" }} />
         ) : previousTarget || nextTarget ? (

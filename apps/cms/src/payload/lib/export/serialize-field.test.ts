@@ -74,6 +74,55 @@ describe('serializeFieldValue', () => {
     ).toBe('Cyber Security; Data Protection');
   });
 
+  it('summarizes a faqs-shaped array of plain sub-object rows instead of emitting raw row ids', () => {
+    // `faqs` is a Payload `type: 'array'` field, not a relationship — each
+    // row is `{ id, question, answer }` with no title/name/slug/url/
+    // filename, so `inferFieldType` (which only sees the runtime shape)
+    // misclassifies it as 'relationship'. Regression test for the bug
+    // where this fell through to the bare row id instead of the content.
+    const answer = {
+      root: {
+        children: [
+          {
+            type: 'paragraph',
+            children: [{ type: 'text', text: 'Yes, CleanStart images are minimal' }],
+          },
+        ],
+      },
+    };
+    const result = serializeFieldValue('relationship', [
+      { id: 'a1b2c3', question: 'Are the images minimal?', answer },
+    ]);
+    expect(result).toBe('Question: Are the images minimal? Answer: Yes, CleanStart images are minimal.');
+    expect(result).not.toContain('a1b2c3');
+  });
+
+  it('joins multiple faqs-shaped rows with "; ", each summarized rather than reduced to its id', () => {
+    const makeAnswer = (text: string) => ({
+      root: { children: [{ type: 'paragraph', children: [{ type: 'text', text }] }] },
+    });
+    const result = serializeFieldValue('relationship', [
+      { id: 'row-1', question: 'What is CleanStart?', answer: makeAnswer('A hardened base image provider') },
+      { id: 'row-2', question: 'Is it free?', answer: makeAnswer('Some tiers are free') },
+    ]);
+    expect(result).toBe(
+      'Question: What is CleanStart? Answer: A hardened base image provider.; Question: Is it free? Answer: Some tiers are free.',
+    );
+  });
+
+  it('never leaks a denylisted field (ip/userAgent) through the plain-row summary path', () => {
+    // A relationship into a collection with an `ip`/`userAgent` field
+    // (Leads, CareerApplications, etc.) that has none of the
+    // relationship-identifying fields must not dump those PII fields
+    // into the export just because they happen to be strings.
+    const result = serializeFieldValue('relationship', [
+      { id: 'lead-1', ip: '203.0.113.5', userAgent: 'Mozilla/5.0', category: 'Spam' },
+    ]);
+    expect(result).not.toContain('203.0.113.5');
+    expect(result).not.toContain('Mozilla/5.0');
+    expect(result).toBe('Category: Spam');
+  });
+
   it('extracts plain text from a Lexical richText value', () => {
     const lexical = {
       root: {
@@ -85,8 +134,9 @@ describe('serializeFieldValue', () => {
         ],
       },
     };
-    expect(serializeFieldValue('richText', lexical)).toBe('Hello world');
+    expect(serializeFieldValue('richText', lexical)).toBe('Hello world.');
   });
+
 
   it('JSON-stringifies plain arrays, groups, and blocks', () => {
     expect(serializeFieldValue('array', [{ a: 1 }])).toBe('[{"a":1}]');

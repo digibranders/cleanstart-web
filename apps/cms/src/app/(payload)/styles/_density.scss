@@ -80,9 +80,12 @@
   }
 }
 
-// Inside nested editor wraps, kill the bundled Lexical wrap padding
-// so the cyan-bordered card hugs the content tightly. Body editor
-// (top-level, --show-gutter outside any array row) keeps its wider feel.
+// Inside the FAQ answer editor wrap, kill the bundled Lexical wrap
+// padding so the cyan-bordered card hugs the content tightly. Body
+// editor (top-level, --show-gutter outside any array row) keeps its
+// wider feel. Scoped to `.faq-answer-rich-text` only — see _editor.scss
+// for why `.cs-array`/`.cs-blocks` are deliberately not matched here.
+.faq-answer-rich-text .rich-text-lexical__wrap,
 .array-field__row .rich-text-lexical__wrap,
 .collapsible__content .rich-text-lexical__wrap,
 .blocks-field__row .rich-text-lexical__wrap {

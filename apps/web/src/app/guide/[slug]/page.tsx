@@ -12,6 +12,7 @@ import { GuideDetailFAQ } from "@/components/sections/guide/GuideDetailFAQ";
 import { GuideDetailRelatedGuides } from "@/components/sections/guide/GuideDetailRelatedGuides";
 import { GuidesCTA } from "@/components/sections/guides/GuidesCTA";
 import { highlightLexical } from "@/lib/highlightLexical";
+import { lexicalToPlainText } from "@/lib/renderLexical";
 import {
   getGuideBySlug,
   getGuideBySlugDraft,
@@ -126,7 +127,12 @@ export async function renderGuideDetail({
   const nextTarget = manualNext ?? toGuideJourneyTarget(autoJourney.next);
 
   const coverImageUrl = absoluteUrl(guideCoverPath(guideCoverKeyword(guide)));
-  const faqs = (guide.faqs ?? []).filter((f) => f.question && f.answer);
+
+  // Filtered once here; both the FAQPage JSON-LD and the rendered accordion
+  // consume this same array so the visible content always matches the schema.
+  const validFaqs = (guide.faqs ?? []).filter(
+    (faq) => (faq.question?.trim().length ?? 0) > 0 && lexicalToPlainText(faq.answer).length > 0,
+  );
 
   return (
     <>
@@ -151,8 +157,15 @@ export async function renderGuideDetail({
               imageUrl: coverImageUrl,
               authors: guide.authors?.map((a) => ({ name: a.name, slug: a.slug })),
             }),
-            ...(faqs.length > 0
-              ? [faqPageSchema(faqs.map((f) => ({ question: f.question, answer: f.answer })))]
+            ...(validFaqs.length > 0
+              ? [
+                  faqPageSchema(
+                    validFaqs.map((faq) => ({
+                      question: faq.question.trim(),
+                      answer: lexicalToPlainText(faq.answer),
+                    })),
+                  ),
+                ]
               : []),
           ],
           override: seoOverride(guide.seo),
@@ -174,7 +187,7 @@ export async function renderGuideDetail({
           tableOfContents={guide.tableOfContents}
         />
 
-        {faqs.length > 0 ? <GuideDetailFAQ faqs={faqs} /> : null}
+        {validFaqs.length > 0 ? <GuideDetailFAQ faqs={validFaqs} /> : null}
 
         <GuideDetailAuthor authors={guide.authors} />
 
@@ -200,7 +213,7 @@ export async function renderGuideDetail({
         ) : guide.authors && guide.authors.length > 0 ? (
           /* Author (pb-16 → 64px) is last. */
           <div aria-hidden className="bg-white" style={{ height: "calc(var(--spacing-section-cta) - 64px)" }} />
-        ) : faqs.length > 0 ? (
+        ) : validFaqs.length > 0 ? (
           /* FAQ (pb-20 → 80px) is last. */
           <div aria-hidden className="bg-white" style={{ height: "calc(var(--spacing-section-cta) - 80px)" }} />
         ) : (

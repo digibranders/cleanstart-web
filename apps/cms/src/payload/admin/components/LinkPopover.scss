@@ -15,8 +15,8 @@
 }
 
 .cs-link-popover {
-  position: absolute;
-  z-index: 50;
+  position: fixed;
+  z-index: 10000;
   // Responsive: clamp to viewport on narrow screens
   width: min(360px, calc(100vw - 16px));
   padding: 14px;

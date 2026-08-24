@@ -3970,6 +3970,61 @@ body {
   line-height: 1.5;
 }
 
+/* FAQ answers (Blogs / Guides / Knowledge Base `faqs[].answer`) — reuses
+   the same article-{paragraph,ul,ol,li} classes RenderLexical emits, but
+   scoped smaller/lighter to match the accordion's existing compact look
+   (was previously hardcoded inline in BlogDetailFAQ.tsx / GuideDetailFAQ.tsx). */
+.faq-answer-body {
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+}
+
+.faq-answer-body .article-paragraph {
+  font-size: var(--fs-body-sm);
+  font-weight: 400;
+  line-height: 1.65;
+  letter-spacing: -0.01em;
+  color: rgba(17, 17, 17, 0.65);
+  margin-bottom: 12px;
+}
+
+.faq-answer-body .article-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+.faq-answer-body .article-paragraph strong,
+.faq-answer-body .article-paragraph b,
+.faq-answer-body .article-li strong,
+.faq-answer-body .article-li b {
+  font-weight: 700;
+}
+
+.faq-answer-body .article-ul,
+.faq-answer-body .article-ol {
+  font-size: var(--fs-body-sm);
+  line-height: 1.65;
+  letter-spacing: -0.01em;
+  color: rgba(17, 17, 17, 0.65);
+  padding-left: 1.25em;
+  margin-bottom: 12px;
+}
+
+.faq-answer-body .article-ul {
+  list-style-type: disc;
+}
+
+.faq-answer-body .article-ol {
+  list-style-type: decimal;
+}
+
+.faq-answer-body .article-li {
+  margin-bottom: 0.25em;
+  line-height: 1.5;
+}
+
+.faq-answer-body .article-li:last-child {
+  margin-bottom: 0;
+}
+
 .article-body .article-ul+.article-ul,
 .article-body .article-ol+.article-ol,
 .article-body .article-ul+.article-ol,

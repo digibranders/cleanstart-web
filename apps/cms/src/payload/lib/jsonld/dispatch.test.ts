@@ -18,6 +18,26 @@ const ctx = buildJsonLdContext({
   },
 });
 
+const lexicalAnswer = (text: string) => ({
+  root: {
+    type: 'root',
+    children: [
+      {
+        type: 'paragraph',
+        children: [{ type: 'text', text, format: 0, detail: 0, mode: 'normal', style: '', version: 1 }],
+        direction: null,
+        format: '',
+        indent: 0,
+        version: 1,
+      },
+    ],
+    direction: null,
+    format: '',
+    indent: 0,
+    version: 1,
+  },
+});
+
 describe('buildJsonLdBlobs', () => {
   it('returns [] for an unsupported collection', () => {
     expect(buildJsonLdBlobs(ctx, 'mystery', { slug: 'x', title: 'X' })).toEqual([]);
@@ -54,7 +74,7 @@ describe('buildJsonLdBlobs', () => {
         slug: 'example',
         title: 'Example post',
         authors: [{ slug: 'jane-doe', name: 'Jane Doe', role: 'Researcher' }],
-        faqs: [{ question: 'Why?', answer: 'Because.' }],
+        faqs: [{ question: 'Why?', answer: lexicalAnswer('Because.') }],
       });
       const types = blobs.map((b) => b['@type']);
       expect(types).toEqual([

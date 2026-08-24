@@ -33,7 +33,21 @@ export const EditorFullscreenToggle = (): ReactElement | null => {
   const findCandidate = useCallback((): HTMLElement | null => {
     const all = document.querySelectorAll<HTMLElement>('.rich-text-lexical__wrap');
     for (const el of all) {
-      if (el.closest('.array-field__row, .collapsible__content, .blocks-field__row')) {
+      if (
+        el.closest(
+          // `.faq-answer-rich-text` (apps/cms/src/payload/fields/faqs.ts)
+          // is the FAQ answer editor specifically. `.cs-array`/`.cs-blocks`/
+          // `.cs-collapsible` are generic wrappers shared by every array/
+          // blocks/collapsible field CMS-wide — matching on them here also
+          // hid the fullscreen toggle for unrelated full-featured editors
+          // (page-builder Rich Text/Form blocks, Forms.ts's postSubmit
+          // body). `.array-field__row`/`.collapsible__content`/
+          // `.blocks-field__row` are Payload's stock class names, kept
+          // only because they're otherwise inert no-ops in this app's
+          // custom field components.
+          '.faq-answer-rich-text, .array-field__row, .collapsible__content, .blocks-field__row',
+        )
+      ) {
         continue;
       }
       return el;
@@ -68,7 +82,19 @@ export const EditorFullscreenToggle = (): ReactElement | null => {
       const hosting = active.closest<HTMLElement>('.rich-text-lexical__wrap');
       if (
         hosting &&
-        !hosting.closest('.array-field__row, .collapsible__content, .blocks-field__row')
+        !hosting.closest(
+          // `.faq-answer-rich-text` (apps/cms/src/payload/fields/faqs.ts)
+          // is the FAQ answer editor specifically. `.cs-array`/`.cs-blocks`/
+          // `.cs-collapsible` are generic wrappers shared by every array/
+          // blocks/collapsible field CMS-wide — matching on them here also
+          // hid the fullscreen toggle for unrelated full-featured editors
+          // (page-builder Rich Text/Form blocks, Forms.ts's postSubmit
+          // body). `.array-field__row`/`.collapsible__content`/
+          // `.blocks-field__row` are Payload's stock class names, kept
+          // only because they're otherwise inert no-ops in this app's
+          // custom field components.
+          '.faq-answer-rich-text, .array-field__row, .collapsible__content, .blocks-field__row',
+        )
       ) {
         return hosting;
       }

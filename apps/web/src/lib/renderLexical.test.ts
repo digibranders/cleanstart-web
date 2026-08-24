@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
+import type { LexicalNode, LexicalRoot } from "@/lib/blog";
 
-import { embedStyleClass, resolveLexicalLink } from "./renderLexical";
+import { embedStyleClass, lexicalToPlainText, resolveLexicalLink } from "./renderLexical";
 
 describe("resolveLexicalLink", () => {
   it("treats www.cleanstart.com absolute URLs as internal and strips to a path", () => {
@@ -65,6 +66,77 @@ describe("resolveLexicalLink", () => {
   it("falls back to '#' for empty/whitespace hrefs", () => {
     expect(resolveLexicalLink(undefined).href).toBe("#");
     expect(resolveLexicalLink("   ").href).toBe("#");
+  });
+});
+
+describe("lexicalToPlainText", () => {
+  const text = (value: string): LexicalNode => ({
+    type: "text",
+    text: value,
+    format: 0,
+    version: 1,
+  });
+
+  const paragraph = (...children: LexicalNode[]): LexicalNode => ({
+    type: "paragraph",
+    children,
+    version: 1,
+  });
+
+  const listitem = (...children: LexicalNode[]): LexicalNode => ({
+    type: "listitem",
+    value: 1,
+    children,
+    version: 1,
+  });
+
+  const list = (...children: LexicalNode[]): LexicalNode => ({
+    type: "list",
+    listType: "bullet",
+    children: children as never,
+    version: 1,
+  });
+
+  const root = (...children: LexicalNode[]): LexicalRoot => ({
+    root: {
+      type: "root",
+      children,
+      direction: null,
+      format: "",
+      indent: 0,
+      version: 1,
+    },
+  });
+
+  it("returns empty string for null/empty content", () => {
+    expect(lexicalToPlainText(null)).toBe("");
+    expect(lexicalToPlainText(undefined)).toBe("");
+    expect(lexicalToPlainText(root())).toBe("");
+  });
+
+  it("joins two paragraphs with a period-space boundary", () => {
+    const value = root(paragraph(text("First para")), paragraph(text("Second para")));
+    expect(lexicalToPlainText(value)).toBe("First para. Second para.");
+  });
+
+  it("separates a Tab-indented nested list into its own blocks, not run together", () => {
+    // A listitem whose only content is a nested list — standard Lexical
+    // shape for pressing Tab inside a bullet.
+    const value = root(
+      paragraph(text("Item 1")),
+      list(
+        listitem(list(listitem(text("Nested Item 1a")), listitem(text("Nested Item 1b")))),
+        listitem(text("Item 2")),
+      ),
+    );
+    expect(lexicalToPlainText(value)).toBe(
+      "Item 1. Nested Item 1a. Nested Item 1b. Item 2.",
+    );
+  });
+
+  it("does not double up existing terminal punctuation", () => {
+    const value = root(paragraph(text("Already ends with a question?")));
+    expect(lexicalToPlainText(value)).toBe("Already ends with a question?");
   });
 });
 

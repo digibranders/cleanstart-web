@@ -458,14 +458,82 @@ export function slugifyText(text: string): string {
 interface RenderLexicalProps {
   content: LexicalRoot | null | undefined;
   className?: string;
+  /** Defaults to "article-body" (full-article prose styling). Pass
+   * "faq-answer-body" for the compact FAQ-answer look. */
+  wrapperClassName?: string;
 }
 
-export function RenderLexical({ content, className = "" }: RenderLexicalProps): React.ReactElement | null {
+export function RenderLexical({
+  content,
+  className = "",
+  wrapperClassName = "article-body",
+}: RenderLexicalProps): React.ReactElement | null {
   if (!content?.root?.children?.length) return null;
 
   return (
-    <div className={`article-body ${className}`}>
+    <div className={`${wrapperClassName} ${className}`}>
       {renderNodes(content.root.children, "root")}
     </div>
   );
 }
+
+const BLOCK_TYPES = new Set(["paragraph", "listitem", "heading", "quote"]);
+const TERMINAL_PUNCTUATION = /[.!?:]["'”’)\s]*$/;
+
+export function lexicalToPlainText(content: LexicalRoot | null | undefined): string {
+  if (!content?.root?.children?.length) return "";
+
+  const inlineText = (node: LexicalNode): string => {
+    if (node.type === "text") return (node as Extract<LexicalNode, { type: "text" }>).text;
+    if (node.type === "linebreak") return " ";
+    const generic = node as { children?: LexicalNode[] };
+    if (Array.isArray(generic.children)) return generic.children.map(inlineText).join("");
+    return "";
+  };
+
+  const blockTexts = (nodes: LexicalNode[]): string[] => {
+    const out: string[] = [];
+    for (const node of nodes) {
+      if (node.type === "list") {
+        const listNode = node as { children?: LexicalNode[] };
+        if (Array.isArray(listNode.children)) {
+          out.push(...blockTexts(listNode.children));
+          continue;
+        }
+      }
+      if (node.type === "listitem") {
+        const liNode = node as Extract<LexicalNode, { type: "listitem" }>;
+        const nestedLists = liNode.children.filter(
+          (child): child is Extract<LexicalNode, { type: "list" }> => child.type === "list",
+        );
+        // A Tab-indented list item's only content is the nested list itself
+        // (standard Lexical nesting). Recurse into it block-by-block instead
+        // of falling through to the flatten-with-no-separator path below.
+        if (nestedLists.length > 0) {
+          const inlineChildren = liNode.children.filter((child) => child.type !== "list");
+          const text = inlineChildren.map(inlineText).join("").trim();
+          if (text.length > 0) out.push(text);
+          for (const nested of nestedLists) {
+            out.push(...blockTexts(nested.children));
+          }
+          continue;
+        }
+      }
+      if (BLOCK_TYPES.has(node.type)) {
+        const text = inlineText(node).trim();
+        if (text.length > 0) out.push(text);
+        continue;
+      }
+      const fallback = inlineText(node).trim();
+      if (fallback.length > 0) out.push(fallback);
+    }
+    return out;
+  };
+
+  return blockTexts(content.root.children)
+    .map((block) => (TERMINAL_PUNCTUATION.test(block) ? block : `${block}.`))
+    .join(" ")
+    .trim();
+}
+
+

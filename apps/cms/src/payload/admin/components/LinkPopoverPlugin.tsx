@@ -121,6 +121,13 @@ const getNativeSelectionRect = (editor: LexicalEditor): DOMRect | null => {
   const win = root.ownerDocument.defaultView;
   const native = win?.getSelection();
   if (!native || native.rangeCount === 0) return null;
+  // Independent sibling rich-text fields (e.g. this editor vs. a FAQ answer
+  // editor elsewhere on the page) never notify each other on focus change —
+  // Lexical's SELECTION_CHANGE_COMMAND only fires for the editor that now
+  // owns the selection. Without this check, a popover left open in this
+  // editor after the user tabs into a different one would reposition onto
+  // that other editor's live caret on the next scroll/resize.
+  if (!native.anchorNode || !root.contains(native.anchorNode)) return null;
   const range = native.getRangeAt(0);
   const rect = range.getBoundingClientRect();
   if (rect.width === 0 && rect.height === 0) {
@@ -250,9 +257,9 @@ const fetchDocTitle = async (
 };
 
 export function LinkPopoverPlugin({
-  anchorElem,
+  anchorElem: _anchorElem,
 }: {
-  anchorElem: HTMLElement;
+  anchorElem?: HTMLElement;
 }): React.ReactElement | null {
   const [editor] = useLexicalComposerContext();
   const [state, setState] = useState<PopoverState | null>(null);
@@ -553,11 +560,30 @@ export function LinkPopoverPlugin({
         close();
       }
     };
+    const updateRect = (): void => {
+      const rect = getNativeSelectionRect(editor);
+      if (rect) {
+        setState((current) => (current ? { ...current, rect } : null));
+        return;
+      }
+      // Selection left this editor. Expected and harmless while the user
+      // is typing into the popover's own inputs (URL, rel, doc search) —
+      // focus legitimately lives there, not in any Lexical selection, so
+      // keep the popover open at its last known position. Only close when
+      // focus is genuinely elsewhere (e.g. a different editor) — a stale
+      // rect there would reposition the popover onto unrelated content.
+      if (popoverRef.current?.contains(document.activeElement)) return;
+      setState(null);
+    };
     document.addEventListener('mousedown', handleDocClick);
     document.addEventListener('keydown', handleKey);
+    window.addEventListener('scroll', updateRect, true);
+    window.addEventListener('resize', updateRect);
     return () => {
       document.removeEventListener('mousedown', handleDocClick);
       document.removeEventListener('keydown', handleKey);
+      window.removeEventListener('scroll', updateRect, true);
+      window.removeEventListener('resize', updateRect);
     };
   }, [state, editor, close]);
 
@@ -672,12 +698,11 @@ export function LinkPopoverPlugin({
     setState(null);
   }, [editor, registerCommitOnNextChange]);
 
-  if (!state) return null;
+  if (!state || typeof document === 'undefined') return null;
 
   return createPortal(
     <LinkPopover
       anchorRect={state.rect}
-      anchorElem={anchorElem}
       initial={state.initial}
       mode={state.mode}
       onClose={close}
@@ -685,6 +710,6 @@ export function LinkPopoverPlugin({
       onSave={handleSave}
       ref={popoverRef}
     />,
-    anchorElem,
+    document.body,
   );
 }
