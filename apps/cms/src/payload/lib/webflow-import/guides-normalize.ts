@@ -44,9 +44,88 @@ const collectSlots = (
 
 // ─── FAQs (Q1/Ans1 … Q5/Ans5) ───────────────────────────────────
 
+// `faqs[].answer` is a Lexical `richText` field (see `fields/faqs.ts`),
+// not a plain string. This mirrors the minimal node shape Payload's
+// FAQ bulk-paste UI writes into the same field (`FaqBulkPaste.tsx`'s
+// `paragraphsToLexical`) — kept local rather than imported from
+// `apps/cms` runtime code so this ETL package stays decoupled from it.
+interface LexicalTextNode {
+  readonly type: 'text';
+  readonly text: string;
+  readonly format: 0;
+  readonly detail: 0;
+  readonly mode: 'normal';
+  readonly style: '';
+  readonly version: 1;
+}
+
+interface LexicalParagraphNode {
+  readonly type: 'paragraph';
+  readonly children: readonly [LexicalTextNode];
+  readonly direction: null;
+  readonly format: '';
+  readonly indent: 0;
+  readonly version: 1;
+}
+
+export interface LexicalRichTextValue {
+  readonly root: {
+    readonly type: 'root';
+    readonly children: readonly LexicalParagraphNode[];
+    readonly direction: null;
+    readonly format: '';
+    readonly indent: 0;
+    readonly version: 1;
+  };
+}
+
+const lexicalParagraphNode = (text: string): LexicalParagraphNode => ({
+  type: 'paragraph',
+  children: [
+    { type: 'text', text, format: 0, detail: 0, mode: 'normal', style: '', version: 1 },
+  ],
+  direction: null,
+  format: '',
+  indent: 0,
+  version: 1,
+});
+
+/**
+ * Webflow's `Ans1`…`Ans5` slots are plain text where a blank line marks a
+ * paragraph break — the same boundary `parseFaqBulk` uses for the FAQ
+ * bulk-paste UI on this identical field. Lines within a paragraph join
+ * with a single space so text wrapped at a column width still arrives
+ * as one paragraph. A blank/whitespace-only answer still yields one
+ * empty-text paragraph: Payload's Lexical field crashes on render if
+ * `root.children` is empty.
+ */
+const answerToLexical = (raw: string): LexicalRichTextValue => {
+  const paragraphs = raw
+    .split(/\n\s*\n/)
+    .map((block) =>
+      block
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0)
+        .join(' '),
+    )
+    .filter((paragraph) => paragraph.length > 0);
+  const children = (paragraphs.length > 0 ? paragraphs : ['']).map(lexicalParagraphNode);
+  return {
+    root: {
+      type: 'root',
+      children,
+      direction: null,
+      format: '',
+      indent: 0,
+      version: 1,
+    },
+  };
+};
+
 export interface FaqEntry {
   readonly question: string;
-  readonly answer: string;
+  readonly answer: LexicalRichTextValue;
 }
 
 /**
@@ -66,7 +145,7 @@ export const collapseGuideFaqs = (
     const q = row[`q${i}`] ?? row[`Q${i}`];
     const a = row[`ans-${i}`] ?? row[`Ans${i}`];
     if (isFilled(q) && isFilled(a)) {
-      out.push({ question: q.trim(), answer: a.trim() });
+      out.push({ question: q.trim(), answer: answerToLexical(a) });
     }
   }
   return out;
