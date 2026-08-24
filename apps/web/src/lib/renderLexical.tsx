@@ -501,6 +501,24 @@ export function lexicalToPlainText(content: LexicalRoot | null | undefined): str
           continue;
         }
       }
+      if (node.type === "listitem") {
+        const liNode = node as Extract<LexicalNode, { type: "listitem" }>;
+        const nestedLists = liNode.children.filter(
+          (child): child is Extract<LexicalNode, { type: "list" }> => child.type === "list",
+        );
+        // A Tab-indented list item's only content is the nested list itself
+        // (standard Lexical nesting). Recurse into it block-by-block instead
+        // of falling through to the flatten-with-no-separator path below.
+        if (nestedLists.length > 0) {
+          const inlineChildren = liNode.children.filter((child) => child.type !== "list");
+          const text = inlineChildren.map(inlineText).join("").trim();
+          if (text.length > 0) out.push(text);
+          for (const nested of nestedLists) {
+            out.push(...blockTexts(nested.children));
+          }
+          continue;
+        }
+      }
       if (BLOCK_TYPES.has(node.type)) {
         const text = inlineText(node).trim();
         if (text.length > 0) out.push(text);

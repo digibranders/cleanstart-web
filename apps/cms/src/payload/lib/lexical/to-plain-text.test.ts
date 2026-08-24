@@ -79,6 +79,21 @@ describe('lexicalToPlainText', () => {
     expect(lexicalToPlainText(value)).toBe('Steps: Step one. Step two.');
   });
 
+  it('separates a Tab-indented nested list into its own blocks instead of running them together', () => {
+    const value = root(
+      list(
+        listItem(textNode('Item 1')),
+        listItem(
+          list(listItem(textNode('Nested Item 1a')), listItem(textNode('Nested Item 1b'))),
+        ),
+        listItem(textNode('Item 2')),
+      ),
+    );
+    expect(lexicalToPlainText(value)).toBe(
+      'Item 1. Nested Item 1a. Nested Item 1b. Item 2.',
+    );
+  });
+
   it('preserves bold/italic text as plain text (formatting is dropped, content is not)', () => {
     const value = root(paragraph(textNode('Bold word'), textNode(' and normal word')));
     expect(lexicalToPlainText(value)).toBe('Bold word and normal word.');

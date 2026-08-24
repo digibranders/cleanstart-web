@@ -36,6 +36,25 @@ const blockTexts = (nodes: unknown[]): string[] => {
       out.push(...blockTexts(n.children));
       continue;
     }
+    if (n.type === 'listitem' && Array.isArray(n.children)) {
+      const nestedLists = n.children.filter(
+        (child) => (child as LexicalNodeLike | null | undefined)?.type === 'list',
+      ) as LexicalNodeLike[];
+      // A Tab-indented list item's only content is the nested list itself
+      // (standard Lexical nesting). Recurse into it block-by-block instead
+      // of falling through to the flatten-with-no-separator path below.
+      if (nestedLists.length > 0) {
+        const inlineChildren = n.children.filter(
+          (child) => (child as LexicalNodeLike | null | undefined)?.type !== 'list',
+        );
+        const text = inlineChildren.map(inlineText).join('').trim();
+        if (text.length > 0) out.push(text);
+        for (const nested of nestedLists) {
+          out.push(...blockTexts(nested.children ?? []));
+        }
+        continue;
+      }
+    }
     if (n.type && BLOCK_TYPES.has(n.type)) {
       const text = inlineText(n).trim();
       if (text.length > 0) out.push(text);
