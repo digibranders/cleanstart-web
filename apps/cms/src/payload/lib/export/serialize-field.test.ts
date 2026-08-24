@@ -74,6 +74,42 @@ describe('serializeFieldValue', () => {
     ).toBe('Cyber Security; Data Protection');
   });
 
+  it('summarizes a faqs-shaped array of plain sub-object rows instead of emitting raw row ids', () => {
+    // `faqs` is a Payload `type: 'array'` field, not a relationship — each
+    // row is `{ id, question, answer }` with no title/name/slug/url/
+    // filename, so `inferFieldType` (which only sees the runtime shape)
+    // misclassifies it as 'relationship'. Regression test for the bug
+    // where this fell through to the bare row id instead of the content.
+    const answer = {
+      root: {
+        children: [
+          {
+            type: 'paragraph',
+            children: [{ type: 'text', text: 'Yes, CleanStart images are minimal' }],
+          },
+        ],
+      },
+    };
+    const result = serializeFieldValue('relationship', [
+      { id: 'a1b2c3', question: 'Are the images minimal?', answer },
+    ]);
+    expect(result).toBe('Question: Are the images minimal? Answer: Yes, CleanStart images are minimal.');
+    expect(result).not.toContain('a1b2c3');
+  });
+
+  it('joins multiple faqs-shaped rows with "; ", each summarized rather than reduced to its id', () => {
+    const makeAnswer = (text: string) => ({
+      root: { children: [{ type: 'paragraph', children: [{ type: 'text', text }] }] },
+    });
+    const result = serializeFieldValue('relationship', [
+      { id: 'row-1', question: 'What is CleanStart?', answer: makeAnswer('A hardened base image provider') },
+      { id: 'row-2', question: 'Is it free?', answer: makeAnswer('Some tiers are free') },
+    ]);
+    expect(result).toBe(
+      'Question: What is CleanStart? Answer: A hardened base image provider.; Question: Is it free? Answer: Some tiers are free.',
+    );
+  });
+
   it('extracts plain text from a Lexical richText value', () => {
     const lexical = {
       root: {
