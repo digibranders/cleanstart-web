@@ -25,7 +25,7 @@ export function KnowledgeHubArticleFAQ({
   useEffect(() => {
     if (typeof window === "undefined" || !window.location.hash) return;
     const hash = window.location.hash.replace(/^#/, "");
-    const hasMatch = faqs.some((item, i) => hash === (item.id ? `faq-${item.id}` : `faq-${i}`));
+    const hasMatch = faqs.some((item, i) => hash === `faq-${item.id ?? i}`);
     if (!hasMatch) return;
     setOpenId(hash);
     setTimeout(() => {
