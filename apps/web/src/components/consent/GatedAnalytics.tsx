@@ -2,6 +2,7 @@
 
 import { Suspense } from "react";
 
+import { ApolloScript } from "@/components/analytics/ApolloScript";
 import { Ga4RouteTracker } from "@/components/analytics/Ga4RouteTracker";
 import { LeadfeederScript } from "@/components/analytics/LeadfeederScript";
 import { WebVitals } from "@/components/observability/WebVitals";
@@ -28,6 +29,9 @@ import { useConsent } from "./ConsentProvider";
  *  - Targeting → <LeadfeederScript/> reverse-IP company identification — B2B
  *    lead-gen (advertising/profiling, not aggregate analytics), self-noops when
  *    NEXT_PUBLIC_LEADFEEDER_ID is unset.
+ *  - Targeting → <ApolloScript/> Apollo.io website visitor tracker — B2B
+ *    identification/profiling for outbound sales, self-noops when
+ *    NEXT_PUBLIC_APOLLO_APP_ID is unset.
  *
  * Vercel <Analytics/> (Web Analytics) and <SpeedInsights/> were removed: both
  * are billable Vercel products, and GA4 + Search Console CrUX field data cover
@@ -43,6 +47,7 @@ export function GatedAnalytics() {
       </Suspense>
       {performanceGranted && <WebVitals />}
       {targetingGranted && <LeadfeederScript />}
+      {targetingGranted && <ApolloScript />}
     </>
   );
 }
