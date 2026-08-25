@@ -25,6 +25,9 @@ const GA4_REGION = 'https://*.analytics.google.com';
 // Leadfeeder / Dealfront tracker: loader is sc.lfeeder.com (served via
 // script-src 'https:'); the tracker beacons + pixels back to *.lfeeder.com.
 const LEADFEEDER = 'https://*.lfeeder.com';
+// Apollo.io website visitor tracker: loader is assets.apollo.io (served via
+// script-src 'https:'); the tracker beacons + pixels back to *.apollo.io.
+const APOLLO = 'https://*.apollo.io';
 // Privacy-preserving YouTube player used by the podcast page, Knowledge Hub
 // lessons, and the Clean Libraries hero video. Without an explicit `frame-src`
 // these iframes fall back to `default-src 'self'` and are blocked outright the
@@ -95,6 +98,8 @@ export function buildCsp({
     GTM,
     // Leadfeeder tracking pixel.
     LEADFEEDER,
+    // Apollo.io tracker pixel.
+    APOLLO,
     // YouTube poster frames — see YOUTUBE_THUMBS.
     YOUTUBE_THUMBS,
   ];
@@ -120,6 +125,7 @@ export function buildCsp({
     GA4_COLLECT_REGION,
     GA4_REGION,
     LEADFEEDER,
+    APOLLO,
   ];
   if (!isProduction) {
     // Local dev: web (3010/3001) calls the CMS at localhost:3000 for
