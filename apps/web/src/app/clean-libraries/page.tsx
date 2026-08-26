@@ -24,7 +24,7 @@ export const metadata = buildPageMetadata({
   title: "Clean Libraries: Verify Every Dependency Across Your Workflow",
   absoluteTitle: true,
   description:
-    "Scan every library for vulnerabilities and provenance, catch dependencies AI tools add silently, and gate builds with signed verdicts across your entire workflow.",
+    "Scan every library for vulnerabilities and provenance, catch dependencies AI tools add silently, and gate builds with signed verdicts.",
   path: "/clean-libraries",
   variant: "hero",
   eyebrow: "Products",

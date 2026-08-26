@@ -18,7 +18,7 @@ export const metadata = buildPageMetadata({
   title: "Zero CVE Hardened Container Images | CleanStart",
   absoluteTitle: true,
   description:
-    "Source-built, hardened container images with near-zero CVEs and verifiable provenance, up to 80% smaller and continuously rebuilt to stay current with the latest fixes.",
+    "Source-built, hardened container images with near-zero CVEs and verifiable provenance, up to 80% smaller and rebuilt continuously with the latest fixes.",
   path: "/cleanstart-images",
   variant: "hero",
   eyebrow: "CleanStart Images",

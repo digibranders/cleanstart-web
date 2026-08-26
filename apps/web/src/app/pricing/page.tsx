@@ -13,7 +13,7 @@ export const metadata = buildPageMetadata({
   title: "Pricing | CleanStart",
   absoluteTitle: true,
   description:
-    "Choose the CleanStart plan that fits your team — free hardened container images for developers, enterprise images with FIPS and SLSA Level 3 provenance, plus custom images, clean libraries, and additional services.",
+    "Compare CleanStart plans: free hardened container images for developers, and enterprise images with FIPS validation and SLSA Level 3 provenance.",
   path: "/pricing",
 });
 

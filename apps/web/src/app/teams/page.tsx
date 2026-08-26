@@ -14,7 +14,7 @@ import { getPageGraph } from "@/lib/seo/compose-page";
 export const metadata = buildPageMetadata({
   title: "Meet the Team & Leadership",
   description:
-    "Explore CleanStart's expert teams in security, engineering, and compliance, united by a shared mission to build and deliver trusted, verifiable software from the ground up.",
+    "Meet the CleanStart teams in security, engineering, and compliance who build and deliver trusted, verifiable software from the ground up.",
   path: "/teams",
   eyebrow: "Team",
 });

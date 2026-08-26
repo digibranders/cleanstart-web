@@ -981,6 +981,46 @@ body {
     height: 28px !important;
     font-size: 11px !important;
   }
+
+  /* Primary mobile-menu CTA. The global 36px/13px above is a *utility* size;
+     this is the one real call-to-action in the mobile drawer, so it takes the
+     44px WCAG 2.5.8 AA target and a 16px label (below 16px, iOS Safari zooms
+     the viewport on tap). Two class selectors outrank the single-class global
+     rule, which is what lets it win when both carry `!important`. */
+  .cs-btn-glass.cs-nav-cta {
+    --cs-btn-h: 44px !important;
+    --cs-btn-fs: 16px !important;
+    height: 44px !important;
+    font-size: 16px !important;
+  }
+}
+
+/* Cookie-consent sheet actions. Desktop keeps the header utility size; the
+   `!important` mobile override below restores a real touch target. Declared
+   here rather than inline on the buttons so a single rule owns both
+   breakpoints and no inline custom property can fight the mobile override. */
+.cs-consent-actions .cs-btn-blue.cs-consent-btn {
+  --cs-btn-h: 36px;
+  --cs-btn-px: 16px;
+  --cs-btn-fs: 14px;
+}
+
+@media (max-width: 63.99rem) {
+
+  /* Consent is the first thing a mobile visitor taps, and a mis-tap between
+     "Reject All" and "Allow All" is a compliance problem, not a cosmetic one.
+     So the banner opts out of the global 36px/13px clamp: 44px tall (WCAG
+     2.5.8 AA) with a 16px label (iOS Safari zooms the page when a tapped
+     control is under 16px). Scoped to `.cs-consent-actions` so the rest of the
+     site keeps its 36px utility buttons and the 28px `--mini` chip above still
+     resolves. Three class selectors are required, not stylistic: the global
+     rule is `!important`, so only higher specificity beats it. */
+  .cs-consent-actions .cs-btn-blue.cs-consent-btn {
+    --cs-btn-h: 44px !important;
+    --cs-btn-fs: 16px !important;
+    height: 44px !important;
+    font-size: 16px !important;
+  }
 }
 
 /* Inputs inside Footer CTA card track the button height so input + button rows

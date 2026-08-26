@@ -20,7 +20,7 @@ export const revalidate = 21600; // 6h ISR fallback — on-demand publish revali
 
 const TITLE = "Newsroom";
 const DESCRIPTION =
-  "Stay current with CleanStart's latest press releases, partnership announcements, product launches, and milestones in secure container image and software supply chain security.";
+  "CleanStart press releases, partnership announcements, and product launches in container image security and software supply chain security.";
 
 export function generateMetadata(): Metadata {
   return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/news", eyebrow: "Newsroom" });

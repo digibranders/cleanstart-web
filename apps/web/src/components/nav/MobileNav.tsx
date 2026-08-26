@@ -29,7 +29,7 @@ export function MobileNav() {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
         aria-label="Open menu"
-        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-white outline-none transition-colors hover:bg-white/[0.08] focus-visible:ring-2 focus-visible:ring-[#33BAEC] lg:hidden"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-white outline-none transition-colors hover:bg-white/[0.08] focus-visible:ring-2 focus-visible:ring-[#33BAEC] lg:hidden"
       >
         <MenuIcon className="size-5" />
       </SheetTrigger>
@@ -99,7 +99,10 @@ export function MobileNav() {
                               <Link
                                 href={leaf.href}
                                 onClick={close}
-                                className="flex items-center gap-2.5 rounded-[8px] px-3 py-2 text-sm text-white/80 no-underline transition-colors hover:bg-white/[0.06] hover:text-white"
+                                /* py-2.5 on a 16px/24px label gives a 44px row
+                                   (WCAG 2.5.8 AA); 16px also keeps iOS Safari
+                                   from zooming the page on tap. */
+                                className="flex items-center gap-2.5 rounded-[8px] px-3 py-2.5 text-base text-white/80 no-underline transition-colors hover:bg-white/[0.06] hover:text-white"
                               >
                                 {leaf.icon && <NavIcon id={leaf.icon} size={14} className="opacity-70" />}
                                 {leaf.label}
@@ -120,11 +123,7 @@ export function MobileNav() {
           <Link
             href="/book-a-demo"
             onClick={close}
-            className="cs-btn-glass flex-1 justify-center"
-            style={{
-              ["--cs-btn-h" as string]: "40px",
-              ["--cs-btn-fs" as string]: "13px",
-            }}
+            className="cs-btn-glass cs-nav-cta flex-1 justify-center"
           >
             Book a Demo
           </Link>

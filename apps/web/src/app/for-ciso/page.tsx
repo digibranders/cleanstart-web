@@ -16,7 +16,7 @@ export const metadata = buildPageMetadata({
   title: "Hardened Images & Libraries for Security and Compliance Teams | CleanStart",
   absoluteTitle: true,
   description:
-    "Hardened images and libraries that help security and compliance teams cut inherited risk with continuous governance, provenance verification, and verified remediation.",
+    "Hardened images and libraries that help security and compliance teams cut inherited risk through continuous governance and verified remediation.",
   path: "/for-ciso",
   eyebrow: "Solutions",
 });
