@@ -19,6 +19,22 @@ import type { MetadataRoute } from 'next';
  * advertise a URL the page itself tells Google not to index.
  */
 
+/**
+ * Re-render the route hourly.
+ *
+ * Without this the segment is prerendered once at build and served unchanged
+ * until the next deploy: the per-fetch `revalidate` below refreshes the data
+ * cache, but nothing re-runs this function, so a doc published between deploys
+ * never reaches the sitemap. Observed 2026-08-26 — the live sitemap's newest
+ * `lastmod` predated the last deploy and two documents published after it were
+ * absent while the CMS returned them correctly.
+ *
+ * The CMS publish hook also purges `/sitemap.xml` on every publish, so this is
+ * the backstop for changes that bypass the hook (a direct DB edit, a failed
+ * webhook), not the primary path.
+ */
+export const revalidate = 3600;
+
 type CmsDoc = {
   slug: string;
   updatedAt?: string | null;
