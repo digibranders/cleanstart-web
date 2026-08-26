@@ -119,7 +119,7 @@ tbody tr.rule-top td{border-top:2px solid var(--rule)}
   <div class="cf"><span class="n">4</span><span class="l">Confirmed as reported</span></div>
   <div class="cr"><span class="n">3</span><span class="l">Corrected: right concern, wrong figure</span></div>
   <div class="rf"><span class="n">4</span><span class="l">Refuted against live production</span></div>
-  <div><span class="n">2</span><span class="l">Findings the report missed</span></div>
+  <div><span class="n">3</span><span class="l">Findings the report missed</span></div>
 </div>
 
 <div class="sec">
@@ -383,6 +383,29 @@ days >2500ms    2026-06-22, 2026-08-10, 2026-08-17, 2026-08-18  (all deploy days
   </div>
 
   <div class="cmp">
+    <div class="head"><span class="title">A product page has never been crawled</span><span class="chip k-refute">Act on this</span></div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">How it surfaced</span>
+        <p>A search for "clean library cleanstart" returns the Resource Center article, not the product page. It also renders the product name in the singular, which appears nowhere on the site.</p>
+      </div>
+      <div>
+        <span class="colhead">Two separate problems, one of them commercial</span>
+        <p><strong>The product page is invisible.</strong> <code>/clean-libraries</code> shipped on Jun 17 and Google has still never fetched it: status "Discovered, currently not indexed", last crawl never. Nothing is wrong with the page. It returns 200 and <code>index, follow</code>, is self-canonical, sits in the sitemap, and is linked three times from the homepage plus the main nav. Google has simply not spent the crawl on it, and the Resource Center article ranks in its place. Of 20 commercial and top-level pages checked, this is the only one in that state.</p>
+        <p><strong>The singular is a stale snapshot.</strong> The live title and description both read "Clean Libraries". Google last crawled that URL on Aug 4, and the record was edited on Aug 26, so the SERP is showing the pre-edit copy. The two descriptions are otherwise word for word identical.</p>
+        <p>One contributing signal: static routes carry no <code>lastmod</code> in the sitemap, by design, because we only emit timestamps we can source accurately. A page with no lastmod, competing for crawl budget across 539 URLs, can sit in the discovered queue indefinitely. The fix is a manual Request Indexing rather than a fabricated date.</p>
+        <p class="evidence">/clean-libraries      never       Discovered, currently not indexed
+/fips                 2026-04-07  Excluded by 'noindex' tag  (stale, now index,follow)
+18 of 20 commercial pages    Submitted and indexed
+
+live  /resources/clean-libraries  "Clean Libraries | Verified Open Source Dependencies"
+SERP                              "Clean Library | Verified Open Source Dependencies"
+singular occurrences across live pages: 0</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
     <div class="head"><span class="title">The CMS origin is uncached and undersized</span><span class="chip k-do">Act on this</span></div>
     <div class="cols">
       <div class="old">
@@ -492,6 +515,7 @@ route table now reports 1h revalidate on /sitemap.xml</p>
         <tr><td>Batch deploys</td><td>Each merge to main flushes the cache and triggers a fresh 531-page prerender</td><td>Fynix</td><td>process change</td></tr>
         <tr><td>Weekly HTML latency watch, on the median</td><td>Audit action 7, amended so single-day origin events do not dominate the signal</td><td>Fynix</td><td>none</td></tr>
         <tr><td>Close audit actions 1, 5 and 6</td><td>Verified as non-issues against live production</td><td>SEO</td><td>none</td></tr>
+        <tr><td>Request indexing for <code>/clean-libraries</code></td><td>A product page invisible to Google for 70 days, with a Resource Center article ranking in its place</td><td>SEO</td><td class="bad">nothing, do it now</td></tr>
         <tr><td>Request indexing for one orphaned post</td><td><code>/blogs/how-attackers-weaponized-trust-the-billion-download-npm-breach</code> is healthy, in the sitemap and linked from the listing, yet unknown to Google. Needs a manual nudge.</td><td>SEO</td><td>none</td></tr>
         <tr><td>Re-check the 9 stale negative verdicts after deploy</td><td>All predate the Aug 14 fix. Confirm they flip once Google re-crawls.</td><td>SEO</td><td>PR #255 deploy</td></tr>
       </tbody>
