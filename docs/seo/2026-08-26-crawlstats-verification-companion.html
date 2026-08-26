@@ -1,0 +1,426 @@
+<title>Crawl Stats Verification</title>
+<style>
+:root{
+  --paper:#ffffff; --panel:#f7f7f5; --card:#f1f4f8;
+  --ink:#1c1c1c; --ink-soft:#4a4a4a; --ink-faint:#86868a;
+  --navy:#1e3a5c; --navy-soft:#3a5a7c; --rule:#dcdcd8;
+  --no:#5a5a5e;    --no-bg:#f0f0ee;
+  --do:#9a5b00;    --do-bg:#fdf4e5;
+  --done:#1f6b45;  --done-bg:#eef7f1;
+  --opt:#1e5f8c;   --opt-bg:#eef4f9;
+  --refute:#a02724;--refute-bg:#fbeeed;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#14181d; --panel:#1a1f26; --card:#1e242c;
+    --ink:#e6e8ea; --ink-soft:#b0b6bd; --ink-faint:#7d858e;
+    --navy:#8fb4de; --navy-soft:#6d93bd; --rule:#2b323b;
+    --no:#9aa1a9;    --no-bg:#232930;
+    --do:#d9a441;    --do-bg:#2c2618;
+    --done:#5cbd8c;  --done-bg:#16281f;
+    --opt:#6fa9d8;   --opt-bg:#152430;
+    --refute:#e0776f;--refute-bg:#2e1b1a;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#14181d; --panel:#1a1f26; --card:#1e242c;
+  --ink:#e6e8ea; --ink-soft:#b0b6bd; --ink-faint:#7d858e;
+  --navy:#8fb4de; --navy-soft:#6d93bd; --rule:#2b323b;
+  --no:#9aa1a9;    --no-bg:#232930;
+  --do:#d9a441;    --do-bg:#2c2618;
+  --done:#5cbd8c;  --done-bg:#16281f;
+  --opt:#6fa9d8;   --opt-bg:#152430;
+  --refute:#e0776f;--refute-bg:#2e1b1a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:3rem 1.5rem 5rem;display:flex;flex-direction:column;gap:2.75rem}
+h1,h2,h3{font-family:var(--serif);font-weight:600;margin:0;text-wrap:balance;color:var(--ink)}
+h1{font-size:2.3rem;line-height:1.14;letter-spacing:-.01em}
+h2{font-size:1.42rem;line-height:1.25}
+h3{font-size:1.06rem}
+p{margin:0}
+code{font-family:var(--mono);font-size:.87em;background:var(--card);padding:1px 5px;border-radius:3px}
+
+.masthead{display:flex;flex-direction:column;gap:1rem}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--navy)}
+.meta{display:flex;flex-wrap:wrap;gap:1.6rem;padding-top:.9rem;border-top:1px solid var(--rule)}
+.meta div{display:flex;flex-direction:column;gap:1px}
+.meta .k{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint)}
+.meta .v{font-size:14px;font-weight:500}
+
+.lede{font-family:var(--serif);font-size:1.18rem;line-height:1.58;border-left:2px solid var(--navy);padding-left:1.15rem}
+.lede strong{color:var(--navy)}
+
+.tally{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.tally div{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:.85rem 1rem;display:flex;flex-direction:column;gap:3px}
+.tally .n{font-family:var(--mono);font-size:1.5rem;font-weight:600;font-variant-numeric:tabular-nums}
+.tally .l{font-size:12.5px;color:var(--ink-soft)}
+.tally .cf .n{color:var(--done)} .tally .cr .n{color:var(--do)} .tally .rf .n{color:var(--refute)}
+
+.sec{display:flex;flex-direction:column;gap:1rem}
+.sub{font-size:15px;color:var(--ink-soft)}
+
+.scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:580px}
+th,td{padding:8px 12px;text-align:right;border-bottom:1px solid var(--rule);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);font-weight:500;background:var(--panel)}
+td{font-family:var(--mono);font-variant-numeric:tabular-nums}
+td:first-child{font-family:var(--sans)}
+tr:last-child td{border-bottom:none}
+td.bad{color:var(--refute);font-weight:600}
+td.good{color:var(--done);font-weight:600}
+tbody tr.rule-top td{border-top:2px solid var(--rule)}
+
+.cmp{border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:var(--panel)}
+.head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:.7rem 1rem;background:var(--card);border-bottom:1px solid var(--rule)}
+.title{font-weight:600;font-size:14.5px}
+.sev{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint)}
+.chip{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;padding:2px 8px;border-radius:20px;font-weight:600;margin-left:auto}
+.k-no{background:var(--no-bg);color:var(--no)}
+.k-do{background:var(--do-bg);color:var(--do)}
+.k-done{background:var(--done-bg);color:var(--done)}
+.k-opt{background:var(--opt-bg);color:var(--opt)}
+.k-refute{background:var(--refute-bg);color:var(--refute)}
+.cols{display:grid;grid-template-columns:1fr 1.25fr}
+.cols>div{padding:.9rem 1rem;display:flex;flex-direction:column;gap:.55rem}
+.old{background:var(--panel);border-right:1px solid var(--rule);color:var(--ink-soft)}
+.colhead{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint)}
+.cols p{font-size:13.8px;line-height:1.55}
+.verdict{background:var(--card);border-radius:6px;padding:.5rem .7rem;font-size:13.5px}
+.verdict b{display:block;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);margin-bottom:2px}
+.evidence{font-family:var(--mono);font-size:11.8px;line-height:1.55;background:var(--card);border-left:2px solid var(--navy-soft);padding:.5rem .7rem;border-radius:0 4px 4px 0;color:var(--ink-soft);white-space:pre-wrap;overflow-x:auto}
+@media (max-width:720px){ .cols{grid-template-columns:1fr} .old{border-right:none;border-bottom:1px solid var(--rule)} }
+
+.foot{border-top:1px solid var(--rule);padding-top:1rem;font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between}
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <span class="eyebrow">Verification companion</span>
+  <h1>Crawl Stats Verification</h1>
+  <p class="sub">Every figure in the SEO team's crawl audit, checked against the source workbook and live production. Left column is what the report said. Right column is what the evidence shows.</p>
+  <div class="meta">
+    <div><span class="k">Report reviewed</span><span class="v">Cleanstart crawl audit</span></div>
+    <div><span class="k">Source data</span><span class="v">Cleanstart - Crawlstats.xlsx · 7 sheets · 89 days</span></div>
+    <div><span class="k">Period</span><span class="v">May 28 to Aug 24, 2026</span></div>
+    <div><span class="k">Verified</span><span class="v">Aug 26, 2026</span></div>
+  </div>
+</header>
+
+<p class="lede">The report's arithmetic is <strong>exact</strong>: every request total and every monthly average reconciles to the workbook, to the digit. But three of its seven actions target problems that do not exist, the headline number rests on a four-day baseline, and <strong>the central trend claim is an artifact of its own month buckets</strong>. The underlying concern is real: HTML latency did degrade materially at migration. It just did not degrade the way the report describes, and the cause is documented in our own commit history.</p>
+
+<div class="tally">
+  <div class="cf"><span class="n">4</span><span class="l">Confirmed as reported</span></div>
+  <div class="cr"><span class="n">3</span><span class="l">Corrected: right concern, wrong figure</span></div>
+  <div class="rf"><span class="n">4</span><span class="l">Refuted against live production</span></div>
+  <div><span class="n">2</span><span class="l">Findings the report missed</span></div>
+</div>
+
+<div class="sec">
+  <span class="eyebrow">01 · Arithmetic</span>
+  <h2>Every number in the report reconciles</h2>
+  <p class="sub">Before disputing conclusions, it is worth stating plainly that the data handling is sound. All seven monthly request rows and all six monthly response-time rows match the workbook exactly, as do the totals and the worst-day figures.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Reported figure</th><th>Report</th><th>Workbook</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>Total crawl requests</td><td>35,810</td><td>35,810</td><td class="good">exact</td></tr>
+        <tr><td>Total downloaded</td><td>655.5 MB</td><td>655.5 MB</td><td class="good">exact</td></tr>
+        <tr><td>Monthly requests, all 7 resource types</td><td>28 cells</td><td>28 cells</td><td class="good">all match</td></tr>
+        <tr><td>Monthly avg response, all 6 types</td><td>22 cells</td><td>22 cells</td><td class="good">all match</td></tr>
+        <tr><td>HTML worst single day, per month</td><td>269 / 2,902 / 2,344 / 16,447</td><td>269 / 2,902 / 2,344 / 16,447</td><td class="good">exact</td></tr>
+        <tr><td>Jun 19 to 20 "other file type" burst</td><td>8,462</td><td>8,462</td><td class="good">exact</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="sec">
+  <span class="eyebrow">02 · The central correction</span>
+  <h2>HTML latency did not worsen three months straight</h2>
+  <p class="sub">This is the report's load-bearing claim, stated twice: "the only number moving in the wrong direction three months running" and "the one metric that's worsened three months straight". It comes from calendar-month buckets. June contains 18 days before the migration and 12 days after, so the fast pre-migration days drag June's average down and manufacture a rising line.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>June, decomposed</th><th>Days</th><th>Median</th><th>Mean</th></tr></thead>
+      <tbody>
+        <tr><td>Report's "Jun" bucket</td><td>30</td><td>379ms</td><td>788ms</td></tr>
+        <tr><td>&nbsp;&nbsp;of which pre-migration (Jun 1 to 18)</td><td>18</td><td>240ms</td><td>271ms</td></tr>
+        <tr><td>&nbsp;&nbsp;of which post-migration (Jun 19 to 30)</td><td>12</td><td>1,482ms</td><td>1,563ms</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="sub">Measured only on post-migration days, the shape reverses. July was a <strong>46% improvement</strong> on June, and August, while a regression, still sits below June.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>HTML response, like for like</th><th>Days</th><th>Median</th><th>Mean</th></tr></thead>
+      <tbody>
+        <tr><td>Pre-migration (May 28 to Jun 18)</td><td>22</td><td>240ms</td><td>255ms</td></tr>
+        <tr class="rule-top"><td>Jun 21 to 30 (settled, post-migration)</td><td>10</td><td class="bad">1,512ms</td><td>1,646ms</td></tr>
+        <tr><td>July</td><td>31</td><td class="good">796ms</td><td>924ms</td></tr>
+        <tr><td>August</td><td>24</td><td>1,138ms</td><td>2,242ms</td></tr>
+        <tr class="rule-top"><td>Aug 19 to 24 (most recent week)</td><td>6</td><td>1,036ms</td><td>1,010ms</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="sub">The true shape is a step change at migration, a partial recovery in July, and a partial regression in August. Current steady state is roughly 1,000ms, about four times the pre-migration baseline. That is worth fixing. It is not a metric in freefall.</p>
+</div>
+
+<div class="sec">
+  <span class="eyebrow">03 · Claim by claim</span>
+  <h2>The seven priority actions</h2>
+
+  <div class="cmp">
+    <div class="head"><span class="title">1. Confirm the rendering mode</span><span class="sev">Marked Critical</span><span class="chip k-refute">Refuted</span></div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"If the raw HTML is a near-empty shell and content only appears after rendering, Cleanstart is on client-side rendering with no pre-render step, the single biggest indexing risk a JS migration can introduce."</p>
+      </div>
+      <div>
+        <span class="colhead">Verified false</span>
+        <div class="verdict"><b>Decision</b>Close it. No work required.</div>
+        <p>The site is server-rendered and prerendered. Content is present in the raw document with JavaScript disabled, and the H1 is in the source. This claim has now been raised three times from the SEO side. It was true once, caused by a root <code>loading.tsx</code> that streamed content into a trailing hidden container, and it was fixed on Aug 14 in commit <code>96137029</code>.</p>
+        <p class="evidence">/knowledge-hub/spdx-sbom  x-nextjs-prerender: 1  22,764 chars with JS off
+/blogs                    x-nextjs-prerender: 1  10,446 chars with JS off
+/pricing                  x-nextjs-prerender: 1   3,709 chars with JS off
+hidden containers: 0 (one empty Suspense marker, carries no content)</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head"><span class="title">2. Diagnose the Aug 17 to 18 latency spike</span><span class="sev">Marked Critical</span><span class="chip k-done">Confirmed</span></div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"Pull server or function logs for the two days that produced 9.2s and 16.4s response times. This points at the origin render path, likely missing HTML caching, serverless cold starts, or an uncached data fetch on every request."</p>
+      </div>
+      <div>
+        <span class="colhead">Confirmed, and already root-caused</span>
+        <div class="verdict"><b>Decision</b>Correct instinct. The cause is documented in our own commit from that day.</div>
+        <p>Both spikes are real and the origin-path hypothesis is right. The specific mechanism was diagnosed on Aug 18: the CMS droplet saturates under the build's prerender burst, Cloudflare returns its own 52x origin errors, and the retry-with-backoff that absorbs them lengthens responses. Not cold starts, and not a missing cache.</p>
+        <p class="evidence">commit 14a17c94, 2026-08-18
+"the origin droplet saturates under the build's prerender burst"
+  CMS fetch failed: 520 (unknown origin error)
+  CMS fetch failed: 522 (connection timed out) x2
+  CMS fetch failed: 525 (SSL handshake failed)
+"it runs on ~2 GB while a build fans out across 531 pages"</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head"><span class="title">3. Check indexing coverage before vs after Jun 19</span><span class="sev">Marked High</span><span class="chip k-opt">Worth doing</span></div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"Compare indexed page count and the not-indexed buckets across the migration. A rising not-indexed count is the classic symptom of Google giving up on slow or JS-dependent pages."</p>
+      </div>
+      <div>
+        <span class="colhead">Sound, with one caveat</span>
+        <div class="verdict"><b>Decision</b>Do it, but expect the not-indexed count to be large and mostly correct.</div>
+        <p>Reasonable diagnostic. Note that the site has 539 canonical indexable URLs against a discovered surface of roughly 1,300 to 1,400, and nearly all of that gap is intentional: trailing-slash twins that 308, around 200 redirects, 55 closed job pages that are deliberately noindex, and parameter variants that canonicalise correctly. A high not-indexed count is the expected shape here, not evidence of the failure mode described.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head"><span class="title">4. Verify migration URL hygiene and the sitemap</span><span class="sev">Marked High</span><span class="chip k-done">Confirmed</span></div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"Confirm 301 redirects exist for every URL that changed shape, check for a 404 rise since Jun 19, and confirm the XML sitemap was regenerated for the new framework and resubmitted."</p>
+      </div>
+      <div>
+        <span class="colhead">Confirmed, and better aimed than they knew</span>
+        <div class="verdict"><b>Decision</b>Already found and fixed, one day before this report.</div>
+        <p>The sitemap half is a genuine hit. The route carried no revalidate, so it was prerendered once per deploy and served unchanged in between: anything published between deploys never reached it. Found Aug 25, fixed in <code>a2ed91fb</code>, awaiting deploy. Redirect hygiene is sound, and unknown slugs now return a true 404 on all eight detail routes.</p>
+        <p class="evidence">live sitemap:   537 URLs, newest lastmod 2026-08-24T13:55 (predates last deploy)
+CMS at the time: both missing docs returned correctly, 200 / index,follow
+after the fix:   539 URLs, both present, lastmod current</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head"><span class="title">5. Confirm structured data survived the rebuild</span><span class="sev">Marked Medium</span><span class="chip k-refute">Refuted</span></div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"JSON crawl volume is still near zero (34 requests in August). If the old framework carried JSON-LD schema markup, verify it's actually rendering in the new templates."</p>
+      </div>
+      <div>
+        <span class="colhead">Category error, and the premise is false</span>
+        <div class="verdict"><b>Decision</b>Close it. The inference does not hold, and the schema is present.</div>
+        <p>JSON-LD is inlined in the HTML document as <code>&lt;script type="application/ld+json"&gt;</code>. It is never fetched as a separate file, so it can never appear in the JSON row of a crawl-stats report. The "JSON" file type counts <code>.json</code> requests such as manifests, which has no bearing on schema markup. Independently of the reasoning, the markup is live.</p>
+        <p class="evidence">/knowledge-hub/spdx-sbom
+  ld+json blocks: 2
+  graph 1: Organization, WebSite
+  graph 2: BreadcrumbList, Article</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head"><span class="title">6. Audit JS bundle crawl efficiency</span><span class="sev">Marked Medium</span><span class="chip k-refute">Refuted</span></div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"Confirm hashed bundle filenames carry long-lived cache headers, and block publicly-exposed source maps in robots.txt, they add crawl volume with zero SEO value."</p>
+      </div>
+      <div>
+        <span class="colhead">Both halves already satisfied</span>
+        <div class="verdict"><b>Decision</b>Close it. Nothing to change.</div>
+        <p>Source maps are not publicly exposed, so there is nothing to block, and chunks carry no <code>sourceMappingURL</code> pointing at one. Hashed bundles already send exactly the immutable header the report asks us to confirm.</p>
+        <p class="evidence">/_next/static/chunks/17sc9pe9-mrrk.js       200
+/_next/static/chunks/17sc9pe9-mrrk.js.map   403
+sourceMappingURL references in chunk:         0
+cache-control: public,max-age=31536000,immutable</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head"><span class="title">7. Put HTML response time on a weekly watch</span><span class="sev">Marked Medium</span><span class="chip k-do">Adopt, amended</span></div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"Track it weekly against a sustained-1,000ms alert threshold, and pull Core Web Vitals field data pre- and post-migration."</p>
+      </div>
+      <div>
+        <span class="colhead">Adopt, but measure the median</span>
+        <div class="verdict"><b>Decision</b>Take it, with one amendment to the metric.</div>
+        <p>Good recommendation. Amend it to track the median rather than the mean. August's mean of 2,242ms is produced by two days; the median is 1,138ms, and excluding the three worst days the mean is 1,197ms. A mean-based threshold will fire on single-day origin events and stay quiet during genuine sustained drift.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <span class="eyebrow">04 · Figures restated</span>
+  <h2>Two headline numbers that need qualifying</h2>
+
+  <div class="cmp">
+    <div class="head"><span class="title">"HTML response time up 1,112% vs pre-migration"</span><span class="chip k-do">Corrected</span></div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>185ms before the switch, 2,242ms in August. Baseline labelled "Pre-migration (May)".</p>
+      </div>
+      <div>
+        <span class="colhead">Directionally right, materially overstated</span>
+        <p>The workbook begins on May 28, so the "May" column is a <strong>four-day, 97-request sample</strong>. The real pre-migration window runs to Jun 18 and covers 22 days and 764 requests, at a 240ms median. Comparing medians across the two full windows gives <strong>+375%</strong>. Still serious. Not 1,112%.</p>
+        <p class="evidence">report baseline "May"       n=4d   req=97   mean=185ms
+true pre-migration window   n=22d  req=764  mean=255ms  median=240ms
+August                      n=24d           mean=2,242ms median=1,138ms</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head"><span class="title">"8,462-request burst, almost certainly source maps"</span><span class="chip k-do">Corrected</span></div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">As reported</span>
+        <p>"Almost certainly source maps, manifests or hashed chunk files the old site never had. A one-time discovery event, not a problem on its own."</p>
+      </div>
+      <div>
+        <span class="colhead">Right that it was transient, wrong about what it was</span>
+        <p>Source maps are not served, so they cannot account for it. The signature matches Next.js <code>?_rsc=</code> prefetch payloads, which are served as <code>text/x-component</code> and land in the "other file type" bucket. That was identified and blocked in robots.txt on Jul 9 in commit <code>3874b4b4</code>, and the monthly figures track the fix precisely.</p>
+        <p class="evidence">other file type   Jun 9,014 -> Jul 481 -> Aug 212
+burst detail      Jun 19: 1,295   Jun 20: 7,167   avg 5,738 bytes/request
+robots.txt        Disallow: /*_rsc=   (live)</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <span class="eyebrow">05 · Not in the report</span>
+  <h2>What the data shows that the report did not look for</h2>
+
+  <div class="cmp">
+    <div class="head"><span class="title">Every extreme spike falls on a deploy day</span><span class="chip k-opt">New finding</span></div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">Not examined</span>
+        <p>The report treats the spikes as an unexplained origin fault and recommends pulling logs.</p>
+      </div>
+      <div>
+        <span class="colhead">Suggestive, stated with its limits</span>
+        <p>All four post-migration days above 2,500ms are days work landed on <code>main</code>, and the worst day on which nothing deployed reached only 2,125ms. Typical latency is unaffected: deploy-day and quiet-day medians are within 30ms of each other, so this explains the <em>spikes</em>, not the elevated baseline.</p>
+        <p>Being straight about the strength of this: with four spikes across 40 deploy and 25 quiet days, the chance of that split arising at random is <strong>0.135</strong>. That is suggestive, not statistically significant on its own. It is convincing here only because commit <code>14a17c94</code> independently documents the same mechanism on the same dates.</p>
+        <p class="evidence">deploy days     n=40  median=1,075ms  max=16,447ms
+quiet days      n=25  median=1,105ms  max= 2,125ms
+days >2500ms    2026-06-22, 2026-08-10, 2026-08-17, 2026-08-18  (all deploy days)</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head"><span class="title">The CMS origin is uncached and undersized</span><span class="chip k-do">Act on this</span></div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">Not examined</span>
+        <p>The report does not look past the edge to the origin the pages are built from.</p>
+      </div>
+      <div>
+        <span class="colhead">The most likely lever on the elevated baseline</span>
+        <p>The CMS collection API sends no <code>Cache-Control</code> header, so Cloudflare marks every response <code>DYNAMIC</code> and nothing is cached at the edge. Every page render, including all 531 during a build, reaches the droplet. That droplet has under 2 GB of RAM and runs the CMS, Postgres and Meilisearch together, which is precisely the saturation the Aug 18 commit describes.</p>
+        <p class="evidence">cms.cleanstart.com/api/blogs   cache-control: (none)   cf-cache-status: DYNAMIC
+origin latency                 ~330ms warm, ~1,000ms cold
+droplet                        1,967 MB total
+                               cms 321 MB · postgres 123 MB · meilisearch 145 MB</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <span class="eyebrow">06 · Present state</span>
+  <h2>Where the site actually stands today</h2>
+  <p class="sub">Measured 27 hours after the most recent deploy, across 14 randomly selected long-tail knowledge-hub articles plus the main templates. Everything served from cache, nothing close to the crawl-stats spikes.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Measurement</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>14 random knowledge-hub articles</td><td>400 to 780ms, all cache HIT</td></tr>
+        <tr><td>Home, blogs, pricing, cleansight, resource-center</td><td>355 to 466ms, all cache HIT</td></tr>
+        <tr><td>Unknown slugs on all 8 detail routes</td><td>404, correct</td></tr>
+        <tr><td>Parameter URLs (?page, ?category, ?utm_*)</td><td>canonicalise to the clean URL</td></tr>
+        <tr><td>Most recent 6 crawl days (Aug 19 to 24)</td><td>1,036ms median</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="sec">
+  <span class="eyebrow">07 · Recommended</span>
+  <h2>What to actually do</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Action</th><th>Why</th><th>Owner</th></tr></thead>
+      <tbody>
+        <tr><td>Cache the CMS API at the edge</td><td>Removes the droplet from the critical path of every build fetch, which is the documented saturation cause</td><td>Fynix</td></tr>
+        <tr><td>Resize the droplet above 2 GB</td><td>Three services share under 2 GB; the burst has no headroom to absorb</td><td>CleanStart</td></tr>
+        <tr><td>Deploy the sitemap fix</td><td>Committed in a2ed91fb, inert until apps/web ships from main</td><td>Fynix</td></tr>
+        <tr><td>Batch deploys</td><td>Each merge to main flushes the cache and triggers a fresh 531-page prerender</td><td>Fynix</td></tr>
+        <tr><td>Weekly HTML latency watch, on the median</td><td>The report's action 7, amended so single-day origin events do not dominate</td><td>Fynix</td></tr>
+        <tr><td>Close actions 1, 5 and 6</td><td>Verified as non-issues against live production</td><td>SEO</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="foot">
+  <span>Verified against Cleanstart - Crawlstats.xlsx, live production, and repository history · 2026-08-26</span>
+  <span>Companion to the SEO team's crawl audit</span>
+</div>
+
+</div>

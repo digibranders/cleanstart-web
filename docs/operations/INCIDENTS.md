@@ -10,6 +10,20 @@ A running, reverse-chronological log of production incidents and non-obvious bug
 
 ---
 
+## 2026-08-26 — Crawl-stats HTML latency: the spikes are build-driven origin saturation, not a rendering fault
+
+- **Area:** `apps/cms` (droplet + edge caching), `apps/web` (build fan-out). Surfaced by a Search Console crawl-stats audit covering 2026-05-28 to 2026-08-24.
+- **Symptom (as reported):** average HTML response time rising every month since the Jun 19 migration, 185ms to 2,242ms, with single days at 9,184ms (Aug 17) and 16,447ms (Aug 18). The audit read this as client-side rendering with no pre-render step.
+- **Root cause (spikes):** deploys, not rendering. Every post-migration day above 2,500ms is a day work landed on `main`; the worst day with no deploy reached only 2,125ms. A deploy triggers a build that prerenders ~531 pages against `cms.cleanstart.com`, which runs the CMS, Postgres and Meilisearch inside 1,967 MB. The droplet saturates, Cloudflare answers with its own 520/522/525, and the retry-with-backoff added in `14a17c94` lengthens the responses Googlebot records. Stated honestly: with 4 spikes across 40 deploy and 25 quiet days, that split alone has a 0.135 chance of being coincidence. It is convincing only because `14a17c94` independently documents the same mechanism on the same dates.
+- **Root cause (elevated baseline):** the CMS collection API sends no `Cache-Control`, so Cloudflare marks every response `DYNAMIC` and caches nothing. Every render, including all ~531 in a build, reaches the droplet at ~330ms warm and ~1,000ms cold.
+- **Not the cause, checked and refuted:** CSR (`x-nextjs-prerender: 1`, 22,764 chars of text with JS disabled), missing JSON-LD (2 blocks live: Organization, WebSite, BreadcrumbList, Article), exposed source maps (`.map` returns 403, no `sourceMappingURL` in chunks), and missing bundle cache headers (already `max-age=31536000, immutable`).
+- **Measurement trap:** the audit's "worsened three months straight" is an artifact of calendar-month buckets. June holds 18 pre-migration days at 271ms and 12 post-migration days at 1,563ms, blending to 788ms and manufacturing a rising line. Post-migration medians are 1,482 / 796 / 1,138: July *improved* by 46%. Its headline +1,112% also rests on a 4-day, 97-request "May" baseline; against the true 22-day window the figure is +375%.
+- **Fix:** `apps/cms/src/proxy.ts` marks anonymous GETs of allow-listed public collections edge-cacheable, gated behind `CMS_EDGE_CACHE_SMAXAGE` (unset = inert). The gate is load-bearing: `/api` is also the admin's data path and Cloudflare's default cache key ignores cookies, so the Cloudflare bypass-on-`payload-token` rule must exist *before* the var is set, or a signed-in editor can be served a cached anonymous response and lose sight of their drafts.
+- **Status:** **Mitigated, not resolved.** Origin half shipped and inert. Awaiting the Cloudflare cache rule, and a droplet above 2 GB, both of which are CleanStart-side.
+- **Reusable lesson:** three of them. Crawl-stats averages are mean-of-daily-averages and two bad days will move a month, so read the median before believing a trend. Calendar-month buckets straddling a migration will invent a trend that is not there, so always re-bucket on the event date. And when latency spikes without a matching rise in request volume, correlate against the deploy log before reaching for a rendering or CDN explanation.
+
+---
+
 ## 2026-07-22 — Lexical link editor follow-up: click-on-link navigated away + toolbar button dead on collapsed caret
 
 - **Area:** `apps/cms` — link popover (`LinkPopoverPlugin.tsx`, `CleanstartLinkPopoverFeatureClient.ts`, `_editor.scss`). Follow-up to the 2026-07-21 entry below.
