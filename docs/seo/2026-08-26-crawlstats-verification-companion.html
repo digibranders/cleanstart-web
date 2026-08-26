@@ -216,16 +216,35 @@ hidden containers: 0 (one empty Suspense marker, carries no content)</p>
   </div>
 
   <div class="cmp">
-    <div class="head"><span class="title">3. Check indexing coverage before vs after Jun 19</span><span class="sev">Marked High</span><span class="chip k-opt">Worth doing</span></div>
+    <div class="head"><span class="title">3. Check indexing coverage before vs after Jun 19</span><span class="sev">Marked High</span><span class="chip k-done">Done, answered</span></div>
     <div class="cols">
       <div class="old">
         <span class="colhead">As reported</span>
         <p>"Compare indexed page count and the not-indexed buckets across the migration. A rising not-indexed count is the classic symptom of Google giving up on slow or JS-dependent pages."</p>
       </div>
       <div>
-        <span class="colhead">Sound, with one caveat</span>
-        <div class="verdict"><b>Decision</b>Do it, but expect the not-indexed count to be large and mostly correct.</div>
-        <p>Reasonable diagnostic. Note that the site has 539 canonical indexable URLs against a discovered surface of roughly 1,300 to 1,400, and nearly all of that gap is intentional: trailing-slash twins that 308, around 200 redirects, 55 closed job pages that are deliberately noindex, and parameter variants that canonicalise correctly. A high not-indexed count is the expected shape here, not evidence of the failure mode described.</p>
+        <span class="colhead">Ran it. The hypothesised failure is not occurring.</span>
+        <div class="verdict"><b>Decision</b>Executed against the Search Console API on Aug 26. No sign of Google abandoning pages.</div>
+        <p>Search Console does not expose the Page Indexing report through any API, so this was answered two ways: Search Analytics for pages actually earning impressions, and URL Inspection for the real coverage verdict on a stratified sample of 48 URLs.</p>
+        <p><strong>Distinct pages earning impressions nearly tripled across the migration.</strong> The audit's stated symptom is a <em>rising</em> not-indexed count from Google giving up. The opposite happened.</p>
+        <p class="evidence">pre-migration  May 28 to Jun 18   255 pages   140,164 impressions
+post wk 1 to 3 Jun 21 to Jul 12   550 pages   215,630 impressions
+july           Jul 1  to Jul 31   648 pages   199,141 impressions
+most recent    Aug 3  to Aug 24   714 pages   136,136 impressions</p>
+        <p>The sample itself is healthy, and every negative verdict in it is <strong>stale rather than current</strong>. Not one URL crawled since the Aug 14 fix is un-indexed; all nine crawled negatives predate it, and seven predate the migration entirely.</p>
+        <p class="evidence">48 sampled URLs
+  37  Submitted and indexed
+   7  Crawled, currently not indexed
+   2  Discovered, currently not indexed
+   1  Soft 404
+   1  Excluded by 'noindex' tag
+
+last crawl vs the Aug 14 fix
+  indexed      n=37   before fix 25   after fix 12
+  not indexed  n=11   before fix  9   after fix  0   (2 never crawled)</p>
+        <p>Two spot-checks confirm the verdicts describe pages that no longer exist in that form. <code>/community</code> is marked "Excluded by noindex" on an Apr 20 crawl but now serves <code>index, follow</code>. The event page marked "Soft 404" on a May 26 crawl now returns 4,769 characters of text under a correct H1.</p>
+        <p><strong>Stated with its limits.</strong> Fisher's exact on that split gives p = 0.0476, which clears the line by a hair on a 48-URL sample. It is also confounded: Google re-crawls pages it already indexes more often, so "recently crawled" and "indexed" are not independent. The impressions trend above is the cleaner evidence, and the two spot-checks are the concrete ones.</p>
+        <p><strong>What this changes.</strong> The Aug 14 fix has not yet been priced in, because Google has not re-crawled the affected pages. Shipping the sitemap fix, which restores an accurate <code>lastmod</code>, is the main lever available for prompting that.</p>
       </div>
     </div>
   </div>
@@ -473,7 +492,8 @@ route table now reports 1h revalidate on /sitemap.xml</p>
         <tr><td>Batch deploys</td><td>Each merge to main flushes the cache and triggers a fresh 531-page prerender</td><td>Fynix</td><td>process change</td></tr>
         <tr><td>Weekly HTML latency watch, on the median</td><td>Audit action 7, amended so single-day origin events do not dominate the signal</td><td>Fynix</td><td>none</td></tr>
         <tr><td>Close audit actions 1, 5 and 6</td><td>Verified as non-issues against live production</td><td>SEO</td><td>none</td></tr>
-        <tr><td>Compare indexing coverage across Jun 19</td><td>Audit action 3, worth doing with the caveat in section 03</td><td>SEO</td><td>none</td></tr>
+        <tr><td>Request indexing for one orphaned post</td><td><code>/blogs/how-attackers-weaponized-trust-the-billion-download-npm-breach</code> is healthy, in the sitemap and linked from the listing, yet unknown to Google. Needs a manual nudge.</td><td>SEO</td><td>none</td></tr>
+        <tr><td>Re-check the 9 stale negative verdicts after deploy</td><td>All predate the Aug 14 fix. Confirm they flip once Google re-crawls.</td><td>SEO</td><td>PR #255 deploy</td></tr>
       </tbody>
     </table>
   </div>
