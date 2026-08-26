@@ -401,21 +401,83 @@ droplet                        1,967 MB total
 </div>
 
 <div class="sec">
-  <span class="eyebrow">07 · Recommended</span>
-  <h2>What to actually do</h2>
+  <span class="eyebrow">07 · Shipped</span>
+  <h2>Already fixed and live in production</h2>
+  <p class="sub">Several items the audit raises were fixed before it was written. These are deployed and verified against production, not planned.</p>
   <div class="scroll">
     <table>
-      <thead><tr><th>Action</th><th>Why</th><th>Owner</th></tr></thead>
+      <thead><tr><th>Fix</th><th>Landed</th><th>What it resolved</th><th>Verified by</th></tr></thead>
       <tbody>
-        <tr><td>Cache the CMS API at the edge</td><td>Removes the droplet from the critical path of every build fetch, which is the documented saturation cause</td><td>Fynix</td></tr>
-        <tr><td>Resize the droplet above 2 GB</td><td>Three services share under 2 GB; the burst has no headroom to absorb</td><td>CleanStart</td></tr>
-        <tr><td>Deploy the sitemap fix</td><td>Committed in a2ed91fb, inert until apps/web ships from main</td><td>Fynix</td></tr>
-        <tr><td>Batch deploys</td><td>Each merge to main flushes the cache and triggers a fresh 531-page prerender</td><td>Fynix</td></tr>
-        <tr><td>Weekly HTML latency watch, on the median</td><td>The report's action 7, amended so single-day origin events do not dominate</td><td>Fynix</td></tr>
-        <tr><td>Close actions 1, 5 and 6</td><td>Verified as non-issues against live production</td><td>SEO</td></tr>
+        <tr><td>Removed the root <code>loading.tsx</code></td><td>Aug 14 · 96137029</td><td>Page content streamed into a trailing hidden container, so extractors saw an empty shell. This is the real defect behind the recurring "CSR" claim.</td><td>22,764 chars with JS off</td></tr>
+        <tr><td>Blocked <code>?_rsc=</code> prefetch payloads</td><td>Jul 9 · 3874b4b4</td><td>The crawl-budget burst the audit attributes to source maps</td><td>9,014 to 481 to 212/mo</td></tr>
+        <tr><td>Retry Cloudflare 52x on CMS fetches</td><td>Aug 18 · 14a17c94</td><td>Builds dying on transient origin saturation</td><td>3 CI builds recovered</td></tr>
+        <tr><td>Soft-404 guard on detail routes</td><td>shipped</td><td>Unknown slugs returned 200 and polluted the index</td><td>404 on all 8 routes</td></tr>
+        <tr><td>Immutable headers on hashed bundles</td><td>in place</td><td>Audit action 6, first half</td><td>max-age=31536000</td></tr>
+        <tr><td>Source maps withheld</td><td>in place</td><td>Audit action 6, second half</td><td>.map returns 403</td></tr>
       </tbody>
     </table>
   </div>
+</div>
+
+<div class="sec">
+  <span class="eyebrow">08 · In flight</span>
+  <h2>Fixed, merged to development, awaiting deploy</h2>
+  <p class="sub">Both sit on <code>PR #255</code>. Neither takes effect until <code>apps/web</code> and <code>apps/cms</code> ship from <code>main</code>.</p>
+
+  <div class="cmp">
+    <div class="head"><span class="title">Sitemap no longer freezes between deploys</span><span class="chip k-do">Awaiting deploy</span></div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">The defect</span>
+        <p>The sitemap route carried no revalidate, so it was prerendered once per deploy and served unchanged in between. Anything published between deploys never reached it.</p>
+        <p>Found Aug 25, one day before this audit. Audit action 4 independently asks us to confirm exactly this.</p>
+      </div>
+      <div>
+        <span class="colhead">The fix, in two layers</span>
+        <p>The route now exports an hourly revalidate, and the CMS publish and delete hooks purge <code>/sitemap.xml</code> for the nine collections that contribute entries. The hook is the fast path; the revalidate is the backstop for anything that bypasses it, such as a direct database edit or a dropped webhook.</p>
+        <p class="evidence">before  537 URLs, newest lastmod 2026-08-24T13:55
+after   539 URLs, both missing documents present, lastmod current
+route table now reports 1h revalidate on /sitemap.xml</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmp">
+    <div class="head"><span class="title">CMS reads made edge-cacheable</span><span class="chip k-do">Shipped inert</span></div>
+    <div class="cols">
+      <div class="old">
+        <span class="colhead">The defect</span>
+        <p>The CMS collection API sends no <code>Cache-Control</code>, so Cloudflare caches nothing and every render reaches a droplet that runs three services inside 2 GB.</p>
+      </div>
+      <div>
+        <span class="colhead">The fix, deliberately switched off</span>
+        <p>A response is marked cacheable only for a GET, with no session cookie and no Authorization header, against one of thirteen allow-listed public collections. It is shipped with the feature switch unset, so nothing changes on merge.</p>
+        <p>That gate is load-bearing rather than cautious: <code>/api</code> is also the Payload admin's data path, and Cloudflare's default cache key ignores cookies. Enabling this before the bypass rule exists would let a signed-in editor be served a cached anonymous response and lose sight of their own drafts.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <span class="eyebrow">09 · Planned</span>
+  <h2>What happens next, and who owns it</h2>
+  <p class="sub">Ordered by dependency. The first two are the only items that move the elevated baseline, and both are CleanStart-side.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Next step</th><th>Why it matters</th><th>Owner</th><th>Blocked by</th></tr></thead>
+      <tbody>
+        <tr><td>Add the Cloudflare bypass-on-cookie rule</td><td>Unblocks edge caching, which removes the droplet from the critical path of every build fetch</td><td>CleanStart</td><td class="bad">nothing, ready now</td></tr>
+        <tr><td>Resize the droplet above 2 GB</td><td>CMS, Postgres and Meilisearch share 1,967 MB with no headroom to absorb a 531-page prerender burst</td><td>CleanStart</td><td class="bad">nothing, ready now</td></tr>
+        <tr><td>Deploy PR #255</td><td>The sitemap fix cannot take effect until it ships, which is the bug it fixes</td><td>Fynix</td><td>CI, then merge</td></tr>
+        <tr><td>Set <code>CMS_EDGE_CACHE_SMAXAGE=300</code></td><td>Turns edge caching on</td><td>Fynix</td><td>the Cloudflare rule above</td></tr>
+        <tr><td>Batch deploys</td><td>Each merge to main flushes the cache and triggers a fresh 531-page prerender</td><td>Fynix</td><td>process change</td></tr>
+        <tr><td>Weekly HTML latency watch, on the median</td><td>Audit action 7, amended so single-day origin events do not dominate the signal</td><td>Fynix</td><td>none</td></tr>
+        <tr><td>Close audit actions 1, 5 and 6</td><td>Verified as non-issues against live production</td><td>SEO</td><td>none</td></tr>
+        <tr><td>Compare indexing coverage across Jun 19</td><td>Audit action 3, worth doing with the caveat in section 03</td><td>SEO</td><td>none</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="sub">One measurement to expect. Even with everything above done, the not-indexed count in Search Console will stay high, because 539 canonical URLs sit inside a discovered surface of roughly 1,300 to 1,400. Nearly all of that gap is deliberate and correct.</p>
 </div>
 
 <div class="foot">
