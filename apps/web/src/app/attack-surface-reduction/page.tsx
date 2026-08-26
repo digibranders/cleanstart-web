@@ -16,7 +16,7 @@ export const metadata = buildPageMetadata({
   title: "Reduce attack surface with Hardened Images | CleanStart",
   absoluteTitle: true,
   description:
-    "CleanStart shrinks your attack surface by stripping unnecessary components before production. Minimal, hardened images mean fewer inherited CVEs and less patching.",
+    "CleanStart shrinks your attack surface by stripping unnecessary components before production. Minimal, hardened images mean fewer CVEs and less patching.",
   path: "/attack-surface-reduction",
   eyebrow: "Solutions",
 });

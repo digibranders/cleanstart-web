@@ -17,7 +17,7 @@ export const metadata = buildPageMetadata({
   title: "About CleanStart | Building Trusted Software Foundations",
   absoluteTitle: true,
   description:
-    "Learn how CleanStart is building the foundation for trusted software delivery, integrating security, compliance, and provenance into every build from source to production.",
+    "How CleanStart builds the foundation for trusted software delivery, with security, compliance, and provenance in every build from source to production.",
   path: "/about-us",
 });
 

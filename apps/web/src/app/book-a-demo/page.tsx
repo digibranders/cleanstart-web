@@ -13,7 +13,7 @@ import { getPageGraph } from "@/lib/seo/compose-page";
 export const metadata = buildPageMetadata({
   title: "Book a Demo",
   description:
-    "Book a personalized CleanStart demo to see how verified, hardened container images can eliminate vulnerabilities, accelerate compliance, and secure your software supply chain.",
+    "Book a CleanStart demo and see how hardened, verified container images cut vulnerabilities and speed up compliance across your software supply chain.",
   path: "/book-a-demo",
 });
 

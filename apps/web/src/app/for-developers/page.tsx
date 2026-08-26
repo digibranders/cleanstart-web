@@ -16,7 +16,7 @@ export const metadata = buildPageMetadata({
   title: 'Hardened Container Images and Libraries For Developers | CleanStart',
   absoluteTitle: true,
   description:
-    "Hardened, zero-CVE container images and libraries built for modern developer stacks. Drop-in compatible with your existing CI/CD, minimal, and continuously rebuilt.",
+    "Hardened, zero-CVE container images and libraries for modern developer stacks. Minimal, continuously rebuilt, and drop-in compatible with your CI/CD.",
   path: '/for-developers',
   eyebrow: 'Solutions',
 });

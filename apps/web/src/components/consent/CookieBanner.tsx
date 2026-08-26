@@ -193,13 +193,12 @@ export function CookieBanner() {
   const setCategory = (key: OptionalCategory, next: boolean) =>
     setSelection((prev) => ({ ...prev, [key]: next }));
 
-  // Compact size overrides for cs-btn-blue (slimmer than the 44px primary CTA),
-  // matching the header's utility-button sizing.
-  const compactBtn = {
-    ["--cs-btn-h" as string]: "36px",
-    ["--cs-btn-px" as string]: "16px",
-    ["--cs-btn-fs" as string]: "14px",
-  } as React.CSSProperties;
+  // Height / font-size / padding live in globals.css under
+  // `.cs-consent-actions .cs-btn-blue.cs-consent-btn`: 36px on desktop (the
+  // header utility size), 44px / 16px on mobile. They cannot be set inline
+  // here — the site-wide mobile clamp on `.cs-btn-blue` is `!important`, so
+  // only a higher-specificity rule beats it.
+  const actionBtn = "cs-btn-blue cs-consent-btn";
 
   return (
     <div
@@ -214,12 +213,15 @@ export function CookieBanner() {
       }`}
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <div className="relative mx-auto flex max-h-[100dvh] w-full max-w-[1100px] flex-col px-6 pt-5 pb-8">
+      <div className="relative mx-auto flex max-h-[100dvh] w-full max-w-[1100px] flex-col px-6 pt-4 pb-8 lg:pt-5">
         <button
           type="button"
           onClick={closePrompt}
           aria-label="Close"
-          className="absolute right-4 top-3 inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-white/60 transition hover:bg-white/10 hover:text-white"
+          // 44px hit area on mobile (WCAG 2.5.8 AA); the desktop chip stays 32px
+          // so the hover background does not grow on pointer devices. The icon
+          // size is unchanged at both breakpoints.
+          className="absolute right-4 top-3 inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-md text-white/60 transition hover:bg-white/10 hover:text-white lg:h-8 lg:w-8"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
@@ -232,7 +234,9 @@ export function CookieBanner() {
             shrink below its content so the overflow actually scrolls. */}
         <div className="flex min-h-0 flex-col gap-4 overflow-y-auto">
           <p
-            className="pr-8 text-white/80"
+            // pr-10 clears the 44px mobile close button (inset 16px + 44px wide
+            // = 60px from the sheet edge, less the 24px px-6 gutter).
+            className="pr-10 text-white/80 lg:pr-8"
             style={{ fontSize: "var(--fs-body-sm)", lineHeight: 1.55 }}
           >
             This website uses cookies and other tracking technologies to enhance
@@ -306,22 +310,25 @@ export function CookieBanner() {
             right-aligns. The sheet's `pb-8` lifts this row clear of fixed
             browser-extension toolbars (SEO bars, etc.) that shift the document
             root and re-anchor this fixed sheet a toolbar-height below the
-            viewport. */}
+            viewport.
+            At the 44px/16px mobile touch size the collapsed row no longer fits
+            on one line at 360-390px, so it wraps: the text link takes the first
+            line and the two primary buttons stay grouped on the second. From
+            sm+ it is back to a single right-aligned line. */}
         <div
-          className={`mt-4 flex shrink-0 flex-nowrap items-center gap-2 sm:gap-3 ${
+          className={`cs-consent-actions mt-3 flex shrink-0 flex-wrap items-center gap-x-2 gap-y-3 sm:mt-4 sm:flex-nowrap sm:gap-x-3 ${
             showPrefs ? "justify-end" : "justify-between sm:justify-end"
           }`}
         >
           {showPrefs ? (
             <>
-              <button type="button" onClick={() => decide("reject_all")} className="cs-btn-blue" style={compactBtn}>
+              <button type="button" onClick={() => decide("reject_all")} className={actionBtn}>
                 Reject All
               </button>
               <button
                 type="button"
                 onClick={() => decide("custom", { selection })}
-                className="cs-btn-blue"
-                style={compactBtn}
+                className={actionBtn}
               >
                 Confirm My Choices
               </button>
@@ -331,21 +338,21 @@ export function CookieBanner() {
               <button
                 type="button"
                 onClick={() => setShowPrefs(true)}
-                /* `before:` lifts the touch target to 29px without moving the
-                   underline or the row: the label alone renders ~21px, under
-                   the 24x24 WCAG 2.5.8 AA floor. Padding would reflow the
-                   flex row it shares with the two primary buttons. */
-                className="relative cursor-pointer whitespace-nowrap font-medium text-white/80 underline underline-offset-4 transition hover:text-white before:absolute before:inset-x-0 before:-inset-y-1 before:content-['']"
-                style={{ fontSize: "14px" }}
+                /* `before:` lifts the touch target without moving the underline
+                   or the row: the 16px label alone renders ~24px, so -inset-y-2.5
+                   takes it to 44px (WCAG 2.5.8 AA). Padding would reflow the flex
+                   row it shares with the two primary buttons. Desktop keeps the
+                   14px label and the original 29px target. */
+                className="relative cursor-pointer whitespace-nowrap text-base font-medium text-white/80 underline underline-offset-4 transition hover:text-white before:absolute before:inset-x-0 before:-inset-y-2.5 before:content-[''] lg:text-sm lg:before:-inset-y-1"
                 aria-expanded={showPrefs}
               >
                 Cookies Settings
               </button>
               <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-                <button type="button" onClick={() => decide("reject_all")} className="cs-btn-blue" style={compactBtn}>
+                <button type="button" onClick={() => decide("reject_all")} className={actionBtn}>
                   Reject All
                 </button>
-                <button type="button" onClick={() => decide("accept_all")} className="cs-btn-blue" style={compactBtn}>
+                <button type="button" onClick={() => decide("accept_all")} className={actionBtn}>
                   Allow All
                 </button>
               </div>

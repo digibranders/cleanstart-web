@@ -15,7 +15,7 @@ export const revalidate = 21600; // 6h ISR fallback — on-demand publish revali
 
 const TITLE = "Careers";
 const DESCRIPTION =
-  "Join CleanStart and help build the next generation of secure software supply chains. Explore open roles in security, engineering, and compliance at a fast growing cybersecurity company.";
+  "Join CleanStart and help secure the software supply chain. See open roles in security, engineering, and compliance at a growing cybersecurity company.";
 
 export function generateMetadata(): Metadata {
   return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/careers", eyebrow: "Careers" });

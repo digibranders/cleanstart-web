@@ -19,7 +19,7 @@ export const revalidate = 21600; // 6h ISR fallback — on-demand publish revali
 
 const TITLE = "Blogs";
 const DESCRIPTION =
-  "Explore CleanStart's blog expert insights on container security, software supply chain threats, CVE management, SBOM, and building trust in cloud-native environments.";
+  "Expert insights on container security, software supply chain threats, CVE management, SBOM, and building trust in cloud-native environments.";
 
 export function generateMetadata(): Metadata {
   return buildListingMetadata({ title: TITLE, description: DESCRIPTION, basePath: "/blogs", eyebrow: "Blog" });

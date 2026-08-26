@@ -13,7 +13,7 @@ import { getPageGraph } from '@/lib/seo/compose-page';
 export const metadata = buildPageMetadata({
   title: 'Developer & Security Community',
   description:
-    "Join the CleanStart community of security practitioners, developers, and compliance leaders working together to advance trusted, verified software delivery practices.",
+    "Join the CleanStart community of security practitioners, developers, and compliance leaders advancing trusted, verified software delivery.",
   path: '/community',
 });
 

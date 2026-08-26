@@ -168,6 +168,19 @@ const nextConfig: NextConfig = {
         destination: "/events",
         permanent: true,
       },
+      // Duplicate news article. The `-2` slug is a collision suffix: the two
+      // documents are 96.5% identical by rendered body text and both returned
+      // 200 with their own self-canonical, so Google saw two competing URLs for
+      // one story. The unsuffixed slug is the original (published 2025-11-14 vs
+      // 2025-12-26) and is the one kept. This 308 collapses them at the edge.
+      // The CMS document still exists and is still in the sitemap; the owner
+      // should set its `seo.indexable` to noindex or unpublish it, which is what
+      // drops it from sitemap.ts.
+      {
+        source: "/news/why-containers-drive-supply-chain-breaches-2",
+        destination: "/news/why-containers-drive-supply-chain-breaches",
+        permanent: true,
+      },
     ];
   },
   images: {

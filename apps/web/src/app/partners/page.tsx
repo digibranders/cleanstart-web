@@ -15,7 +15,7 @@ export const metadata = buildPageMetadata({
   title: "CleanStart Partners | Collaborate on Secure Software Supply Chains",
   absoluteTitle: true,
   description:
-    "Explore CleanStart's global partner network of technology providers, system integrators, and cloud platforms delivering hardened, compliance ready container images worldwide.",
+    "CleanStart partners with technology providers, system integrators, and cloud platforms worldwide to deliver hardened, compliance ready container images.",
   path: "/partners",
 });
 

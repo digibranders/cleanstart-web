@@ -14,7 +14,7 @@ export const metadata = buildPageMetadata({
   title: "Contact CleanStart | Talk to a Secure Software Expert",
   absoluteTitle: true,
   description:
-    "Contact CleanStart for enterprise consultations on verified container images, FIPS compliance, SBOM generation, and software supply chain security for your organization.",
+    "Contact CleanStart about verified container images, FIPS compliance, SBOM generation, and software supply chain security for your organization.",
   path: "/contact-us",
 });
 
