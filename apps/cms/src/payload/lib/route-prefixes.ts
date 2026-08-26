@@ -61,6 +61,35 @@ export const listingPathForCollection = (collection: string): string | null => {
   return (ROUTE_PREFIX as Record<string, string>)[collection] ?? null;
 };
 
+/**
+ * Collections whose documents produce a `<loc>` entry in apps/web's
+ * /sitemap.xml. Mirrors the `fetchDocs` calls in apps/web/src/app/sitemap.ts —
+ * keep the two in sync when a collection starts or stops being listed.
+ *
+ * Collections that only affect a hard-coded static route (webinars and
+ * case-studies list at `/webinars` and `/case-studies`, which are constants in
+ * the web sitemap) are excluded: publishing one cannot change the URL set.
+ * emailSignatures is excluded because the whole section is noindex.
+ */
+const SITEMAP_COLLECTIONS = new Set([
+  'blogs',
+  'news',
+  'guides',
+  'resources',
+  'events',
+  'jobs',
+  'authors',
+  'knowledgeBase',
+  'legalDocuments',
+]);
+
+/** Whether publishing in this collection can change the set of sitemap URLs. */
+export const affectsSitemap = (collection: string): boolean =>
+  SITEMAP_COLLECTIONS.has(collection);
+
+/** apps/web sitemap route, revalidated on publish so new URLs appear at once. */
+export const SITEMAP_PATH = '/sitemap.xml';
+
 export const collectionUrlFromSlug = (collection: string, slug: string): string | null => {
   const prefix = (ROUTE_PREFIX as Record<string, string>)[collection];
   if (!prefix) return null;

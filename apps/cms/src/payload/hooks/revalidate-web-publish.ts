@@ -3,7 +3,12 @@ import type {
   CollectionAfterDeleteHook,
 } from 'payload';
 
-import { collectionUrlFromDoc, listingPathForCollection } from '../lib/route-prefixes';
+import {
+  SITEMAP_PATH,
+  affectsSitemap,
+  collectionUrlFromDoc,
+  listingPathForCollection,
+} from '../lib/route-prefixes';
 import { revalidateWeb } from '../lib/web-revalidate';
 
 type StatusDoc = { _status?: string; slug?: string | null; path?: string | null };
@@ -20,6 +25,10 @@ type StatusDoc = { _status?: string; slug?: string | null; path?: string | null 
  *   - edit-live     (published → published): the page content changed.
  *   - unpublish     (published → draft): the page must 404 / redirect.
  * A draft → draft edit touches no live URL and is skipped.
+ *
+ * Collections listed in the web sitemap also purge `/sitemap.xml`. That route
+ * is prerendered, so without an explicit purge a newly published doc stays out
+ * of the sitemap until the next deploy.
  *
  * On a slug change the previous URL is revalidated too (it becomes a redirect /
  * 404). Fail-soft: `revalidateWeb` never throws and no-ops when the
@@ -40,6 +49,10 @@ export const revalidateWebPublishAfterChangeHook =
 
       const currentUrl = collectionUrlFromDoc(collection, doc as StatusDoc);
       if (currentUrl) paths.add(currentUrl);
+
+      // The sitemap route is prerendered and would otherwise only pick this
+      // doc up on the next deploy.
+      if (affectsSitemap(collection)) paths.add(SITEMAP_PATH);
 
       // Slug change → the old URL also needs revalidating (now a redirect/404).
       const previousUrl = previousDoc
@@ -77,6 +90,8 @@ export const revalidateWebAfterDeleteHook =
 
       const url = collectionUrlFromDoc(collection, doc as StatusDoc);
       if (url) paths.add(url);
+
+      if (affectsSitemap(collection)) paths.add(SITEMAP_PATH);
 
       if (paths.size === 0) return doc;
 
