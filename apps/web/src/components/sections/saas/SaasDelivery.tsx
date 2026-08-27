@@ -3,77 +3,65 @@ import Image from 'next/image';
 import { Reveal } from '@/components/ui/Reveal';
 
 /*
- * "Designed for Regulated Software Delivery" — Enterprise Compliance & Integrity Grid
+ * "Built for Modern Software Delivery" — the four delivery pillars in one
+ * unified matrix card, closed by the standards ribbon the proposal supplies.
  *
- * Displays the four pillars of regulated delivery (Security, Integrity,
- * Transparency, Compliance) in refined enterprise cards with custom 3D
- * icon viewports, verified item checklists, and a certified standards badge ribbon.
+ * Each pillar carries a single sentence rather than the checklist its
+ * financial-services sibling uses. The proposal gives one line per pillar and
+ * nothing more, and padding four one-liners out into twelve invented bullets
+ * would be writing claims the client did not make. It also spares the page
+ * twelve checkmark badges, which is the pattern this design language has
+ * already been pulled up on once.
+ *
+ * Copy is the proposal's, verbatim.
  */
 
 interface ColumnData {
   icon: string;
   iconAlt: string;
   title: string;
-  items: readonly string[];
+  body: string;
 }
 
 const COLUMNS: readonly [ColumnData, ColumnData, ColumnData, ColumnData] = [
   {
-    icon: '/images/attack-surface-reduction/approach-icon-secure.webp',
-    iconAlt: '3D icon of a security padlock',
-    title: 'Security',
-    items: [
-      'Hardened software foundations',
-      'Near-zero known CVEs',
-      'Reduced attack surface',
-    ],
+    icon: '/images/attack-surface-reduction/deploy-icon.webp',
+    iconAlt: '3D icon of a global delivery network',
+    title: 'Faster Development',
+    body: 'Enable teams to build and release applications without security friction.',
   },
   {
-    icon: '/images/compare/icon-signed-artifact.webp',
-    iconAlt: '3D icon of a signed and sealed artifact',
-    title: 'Integrity',
-    items: [
-      'SLSA Level 3 provenance',
-      'Cryptographic signing',
-      'Reproducible builds',
-    ],
+    icon: '/images/attack-surface-reduction/approach-icon-secure.webp',
+    iconAlt: '3D icon of a security padlock',
+    title: 'Secure Foundations',
+    body: 'Start with hardened software components designed to reduce risk.',
   },
   {
     icon: '/images/compare/icon-sbom.webp',
     iconAlt: '3D icon of a software bill of materials document',
-    title: 'Transparency',
-    items: [
-      'SBOMs',
-      'AI BOMs',
-      'Dependency visibility',
-    ],
+    title: 'Software Transparency',
+    body: 'Understand components, provenance, and dependencies.',
   },
   {
-    icon: '/images/compare/icon-fips.webp',
-    iconAlt: '3D icon of a compliance shield',
-    title: 'Compliance',
-    items: [
-      'FIPS 140-3',
-      'NIST SSDF',
-      'CIS Benchmarks',
-      'DISA STIG',
-    ],
+    icon: '/images/compare/icon-regulatory.webp',
+    iconAlt: '3D icon of a governance and policy seal',
+    title: 'Scalable Governance',
+    body: 'Apply consistent security standards across teams and environments.',
   },
 ];
 
 const STANDARDS: readonly string[] = [
-  'FIPS 140-3',
   'SLSA Level 3',
   'SBOM',
   'SPDX',
-  'NIST SSDF',
-  'CIS Benchmarks',
+  'Cryptographic Signing',
+  'Reproducible Builds',
 ];
 
-export function FinanceRequirements(): React.ReactElement {
+export function SaasDelivery(): React.ReactElement {
   return (
     <section
-      data-section="FinanceRequirements"
+      data-section="SaasDelivery"
       className="relative overflow-hidden py-section-md"
       style={{ background: '#EFEDF7' }}
     >
@@ -129,8 +117,7 @@ export function FinanceRequirements(): React.ReactElement {
                 margin: 0,
               }}
             >
-              Designed for{' '}
-              <span className="cs-text-gradient-impact">Regulated Software Delivery</span>
+              Built for <span className="cs-text-gradient-impact">Modern Software Delivery</span>
             </h2>
           </Reveal>
 
@@ -147,8 +134,7 @@ export function FinanceRequirements(): React.ReactElement {
                 margin: 0,
               }}
             >
-              Meet security, integrity, transparency, and compliance requirements with software
-              components built for trust.
+              Enable secure development practices without slowing engineering velocity.
             </p>
           </Reveal>
         </div>
@@ -174,13 +160,15 @@ export function FinanceRequirements(): React.ReactElement {
                 return (
                   <div
                     key={col.title}
-                    className={`flex flex-col items-center text-center md:items-start md:text-left justify-between ${!isLastInRowLg ? 'lg:border-r lg:border-[rgba(154,81,255,0.12)]' : ''
-                      } ${!isOddMd ? 'md:border-r md:border-[rgba(154,81,255,0.12)]' : ''
-                      } ${index < 2 ? 'md:border-b lg:border-b-0 md:border-[rgba(154,81,255,0.12)]' : ''
-                      } ${index < COLUMNS.length - 1
+                    className={`flex flex-col items-center text-center md:items-start md:text-left justify-between ${
+                      !isLastInRowLg ? 'lg:border-r lg:border-[rgba(154,81,255,0.12)]' : ''
+                    } ${!isOddMd ? 'md:border-r md:border-[rgba(154,81,255,0.12)]' : ''} ${
+                      index < 2 ? 'md:border-b lg:border-b-0 md:border-[rgba(154,81,255,0.12)]' : ''
+                    } ${
+                      index < COLUMNS.length - 1
                         ? 'border-b md:border-b-0 border-[rgba(154,81,255,0.12)]'
                         : ''
-                      }`}
+                    }`}
                     style={{
                       padding: 'clamp(28px, 2.6vw, 36px) clamp(22px, 2vw, 30px)',
                     }}
@@ -227,62 +215,30 @@ export function FinanceRequirements(): React.ReactElement {
                           lineHeight: 1.2,
                           color: '#111111',
                           margin: '20px 0 0',
+                          // "Software Transparency" wraps to two lines at every
+                          // desktop width while the other three hold one, which
+                          // drops its body a whole line below its neighbours.
+                          // Reserving two lines for all four keeps the bodies on
+                          // a common baseline instead.
+                          minHeight: 'calc(2 * 1.2em)',
                         }}
                       >
                         {col.title}
                       </h3>
 
-                      {/* Capabilities List */}
-                      <ul
-                        className="flex flex-col items-center md:items-start"
+                      <p
                         style={{
-                          listStyle: 'none',
-                          padding: 0,
-                          gap: '11px',
-                          margin: '18px 0 0',
+                          margin: '14px 0 0',
+                          fontFamily: 'var(--font-sans)',
+                          fontSize: 'var(--fs-body-sm)',
+                          fontWeight: 400,
+                          letterSpacing: '-0.01em',
+                          lineHeight: 1.55,
+                          color: '#3B3654',
                         }}
                       >
-                        {col.items.map((item) => (
-                          <li
-                            key={item}
-                            className="flex items-center justify-center md:justify-start gap-2.5 text-left"
-                            style={{
-                              fontFamily: 'var(--font-sans)',
-                              fontSize: 'var(--fs-body-sm)',
-                              fontWeight: 400,
-                              letterSpacing: '-0.01em',
-                              lineHeight: 1.45,
-                              color: '#3B3654',
-                            }}
-                          >
-                            <span
-                              aria-hidden
-                              className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full"
-                              style={{
-                                background: 'rgba(154, 81, 255, 0.10)',
-                                color: '#7C4FF0',
-                              }}
-                            >
-                              <svg
-                                width="10"
-                                height="8"
-                                viewBox="0 0 10 8"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M1 4L3.5 6.5L9 1"
-                                  stroke="currentColor"
-                                  strokeWidth="1.5"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            </span>
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
+                        {col.body}
+                      </p>
                     </div>
                   </div>
                 );

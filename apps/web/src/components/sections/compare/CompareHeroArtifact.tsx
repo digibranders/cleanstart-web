@@ -184,7 +184,7 @@ export function CompareHeroArtifact(): React.ReactElement {
           <g transform="translate(408, 130)">
             <rect x="0" y="0" width="112" height="22" rx="11" fill="rgba(106, 61, 240, 0.9)" stroke="rgba(255, 255, 255, 0.4)" />
             <text x="56" y="15" textAnchor="middle" fill="#ffffff" fontSize="10" fontFamily="var(--font-sans)" fontWeight="700">
-              SLSA Level 4 aligned
+              SLSA Level 3 aligned
             </text>
           </g>
 

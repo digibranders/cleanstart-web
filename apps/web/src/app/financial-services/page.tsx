@@ -25,7 +25,7 @@ export const metadata = buildPageMetadata({
     "Secure Software Foundations for Financial Institutions | CleanStart",
   absoluteTitle: true,
   description:
-    "Verified container images and hardened open-source libraries for regulated financial software — SLSA Level 4 provenance, signed SBOMs, and FIPS 140-3 crypto.",
+    "Verified container images and hardened open-source libraries for regulated financial software: SLSA Level 3 provenance, signed SBOMs, and FIPS 140-3 crypto.",
   path: "/financial-services",
   eyebrow: "Solutions",
   noindex: true,
