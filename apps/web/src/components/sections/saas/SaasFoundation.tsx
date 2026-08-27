@@ -16,10 +16,18 @@ import { Reveal, RevealItem, RevealStagger } from '@/components/ui/Reveal';
  * (#2F6FED → #1749B8) the reference uses for its own product visuals, same
  * three compositions (laptop + magnifier for CleanSight, container + shield
  * for Images, layered hexagon + shield for Libraries). The CleanSight render
- * (v2) does carry baked-in UI text ("CleanSight", "Assets", "Containers" —
- * cleanly spelled, unlike most AI text) rather than a code overlay; the two
- * earlier attempts at requesting no text and adding a DOM overlay instead are
+ * carries baked-in UI text ("CleanSight", "Assets", "Containers" — cleanly
+ * spelled, unlike most AI text) rather than a code overlay; the two earlier
+ * attempts at requesting no text and adding a DOM overlay instead are
  * superseded now that a clean text render exists.
+ *
+ * Renders are shared with the financial-services version of this section and
+ * live under /images/financial-services/ for that reason. Each carries its own
+ * product's real logo, the same mark the homepage PlatformPipeline uses,
+ * composited into whatever element was generic in that render: the sidebar app
+ * icon on the CleanSight laptop, and the badge on the container side and the
+ * top layer of the stack. Those badges used to be a stock shield and a stock
+ * key, which made all three cards read as the same anonymous product.
  *
  * The cards carry a render and a name and nothing else, because that is all the
  * reference image carries. The financial-services version of this section adds
@@ -28,8 +36,8 @@ import { Reveal, RevealItem, RevealStagger } from '@/components/ui/Reveal';
  *
  * Only the card's bottom strip (the name) is a link — matches the
  * "bottom-only clickable" convention already set for the pillar cards below.
- * No per-card logo glyph: the same CleanStart mark three times in a row
- * doesn't distinguish the products, it just repeats.
+ * No separate per-card logo glyph in the DOM: the mark now lives inside the
+ * render, where it identifies the product instead of repeating a house logo.
  */
 
 interface Product {
@@ -41,21 +49,21 @@ interface Product {
 
 const PRODUCTS: readonly [Product, Product, Product] = [
   {
-    image: '/images/financial-services/card-cleansight-v2.webp',
+    image: '/images/financial-services/card-cleansight-v3.webp',
     imageAlt:
-      'The CleanSight dashboard showing discovered assets across containers, images, repositories and vulnerabilities on a world map, with a magnifying glass revealing a verified software component',
+      'The CleanSight dashboard, badged with the CleanSight product logo, showing discovered assets across containers, images, repositories and vulnerabilities on a world map, with a magnifying glass revealing a verified software component',
     name: 'CleanSight',
     href: '/cleansight',
   },
   {
-    image: '/images/financial-services/card-clean-images.webp',
-    imageAlt: 'A shipping container marked with a verification shield',
+    image: '/images/financial-services/card-clean-images-v2.webp',
+    imageAlt: 'A shipping container badged with the Clean Images product logo',
     name: 'Clean Images',
     href: '/cleanstart-images',
   },
   {
-    image: '/images/financial-services/card-clean-libraries.webp',
-    imageAlt: 'Stacked hexagonal library modules marked with a key-and-shield seal',
+    image: '/images/financial-services/card-clean-libraries-v2.webp',
+    imageAlt: 'Stacked library modules badged with the Clean Libraries product logo',
     name: 'Clean Libraries',
     href: '/clean-libraries',
   },
