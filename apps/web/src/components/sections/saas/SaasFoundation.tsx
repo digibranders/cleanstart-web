@@ -23,11 +23,16 @@ import { Reveal, RevealItem, RevealStagger } from '@/components/ui/Reveal';
  *
  * Renders are shared with the financial-services version of this section and
  * live under /images/financial-services/ for that reason. Each carries its own
- * product's real logo, the same mark the homepage PlatformPipeline uses,
- * composited into whatever element was generic in that render: the sidebar app
- * icon on the CleanSight laptop, and the badge on the container side and the
- * top layer of the stack. Those badges used to be a stock shield and a stock
- * key, which made all three cards read as the same anonymous product.
+ * product's logo, the same mark the homepage PlatformPipeline uses, composited
+ * into whatever element was generic in that render: the sidebar app icon on the
+ * CleanSight laptop, and the badge on the container side and the top layer of
+ * the stack. Those badges used to be a stock shield and a stock key, which made
+ * all three cards read as the same anonymous product.
+ *
+ * The marks are flat single-colour white rather than the logo's violet-to-cyan
+ * gradient, translucent on the container and the stack so the ribs and sheen
+ * show through. See FinanceFoundation for the full reasoning; keep the two in
+ * step, since both sections point at the same three files.
  *
  * The cards carry a render and a name and nothing else, because that is all the
  * reference image carries. The financial-services version of this section adds
@@ -49,20 +54,20 @@ interface Product {
 
 const PRODUCTS: readonly [Product, Product, Product] = [
   {
-    image: '/images/financial-services/card-cleansight-v3.webp',
+    image: '/images/financial-services/card-cleansight-v4.webp',
     imageAlt:
       'The CleanSight dashboard, badged with the CleanSight product logo, showing discovered assets across containers, images, repositories and vulnerabilities on a world map, with a magnifying glass revealing a verified software component',
     name: 'CleanSight',
     href: '/cleansight',
   },
   {
-    image: '/images/financial-services/card-clean-images-v2.webp',
+    image: '/images/financial-services/card-clean-images-v3.webp',
     imageAlt: 'A shipping container badged with the Clean Images product logo',
     name: 'Clean Images',
     href: '/cleanstart-images',
   },
   {
-    image: '/images/financial-services/card-clean-libraries-v2.webp',
+    image: '/images/financial-services/card-clean-libraries-v3.webp',
     imageAlt: 'Stacked library modules badged with the Clean Libraries product logo',
     name: 'Clean Libraries',
     href: '/clean-libraries',
