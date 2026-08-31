@@ -32,14 +32,19 @@ import { Reveal, RevealItem, RevealStagger } from '@/components/ui/Reveal';
  * The marks are drawn as flat single-colour white, not in the logo's own
  * violet-to-cyan gradient. Client feedback on the gradient version: it read as
  * a loud multicoloured sticker pasted onto the product rather than part of it.
- * On the container and the stack the mark is translucent, so the ribs and the
- * surface sheen show through and it reads as screen printed; on the CleanSight
- * laptop it is opaque line art, because a sidebar app logo that faded into its
- * own background would look broken rather than subtle.
  *
- * Translucent here means about 70 percent, not the 30 percent a first pass
- * used. At 30 the mark all but vanished against the blue, which reads as a
- * rendering fault rather than as restraint. Quiet still has to be legible.
+ * All three are OPAQUE. Two earlier passes made the container and stack marks
+ * translucent so the ribs and sheen showed through, at 30 percent and then at
+ * 70. Both read as faded rather than restrained: at card size the mark is only
+ * about 60px wide, and translucency there costs legibility without buying any
+ * subtlety a viewer can actually perceive. Single colour was the ask; see
+ * through was not.
+ *
+ * The container and stack renders are used at their NATIVE 1536x1024, not
+ * downscaled on the way into WebP. Resampling to 1200 visibly softened the thin
+ * white linework, which was the other half of why the marks looked faded.
+ * Next's optimizer still generates the delivered variants; give it a sharp
+ * source and let it do that once, rather than shipping a pre-softened one.
  *
  * The CleanSight sidebar mark is NOT generated. Three attempts at having the
  * image model redraw it produced a different wrong logo each time: an image
@@ -78,14 +83,14 @@ const PRODUCTS: readonly [Product, Product, Product] = [
     href: '/cleansight',
   },
   {
-    image: '/images/financial-services/card-clean-images-v3.webp',
+    image: '/images/financial-services/card-clean-images-v4.webp',
     imageAlt: 'A shipping container badged with the Clean Images product logo',
     name: 'Clean Images',
     tagline: 'Hardened, minimal, and secure container images for your applications.',
     href: '/cleanstart-images',
   },
   {
-    image: '/images/financial-services/card-clean-libraries-v3.webp',
+    image: '/images/financial-services/card-clean-libraries-v4.webp',
     imageAlt: 'Stacked library modules badged with the Clean Libraries product logo',
     name: 'Clean Libraries',
     tagline: 'Secure, trusted libraries and dependencies for your applications.',

@@ -22,42 +22,25 @@ const COLUMNS: readonly [ColumnData, ColumnData, ColumnData, ColumnData] = [
     icon: '/images/attack-surface-reduction/approach-icon-secure.webp',
     iconAlt: '3D icon of a security padlock',
     title: 'Security',
-    items: [
-      'Hardened software foundations',
-      'Near-zero known CVEs',
-      'Reduced attack surface',
-    ],
+    items: ['Hardened software foundations', 'Near-zero known CVEs', 'Reduced attack surface'],
   },
   {
     icon: '/images/compare/icon-signed-artifact.webp',
     iconAlt: '3D icon of a signed and sealed artifact',
     title: 'Integrity',
-    items: [
-      'SLSA Level 3 provenance',
-      'Cryptographic signing',
-      'Reproducible builds',
-    ],
+    items: ['SLSA Level 3 provenance', 'Cryptographic signing', 'Reproducible builds'],
   },
   {
     icon: '/images/compare/icon-sbom.webp',
     iconAlt: '3D icon of a software bill of materials document',
     title: 'Transparency',
-    items: [
-      'SBOMs',
-      'AI BOMs',
-      'Dependency visibility',
-    ],
+    items: ['SBOMs', 'AI BOMs', 'Dependency visibility'],
   },
   {
     icon: '/images/compare/icon-fips.webp',
     iconAlt: '3D icon of a compliance shield',
     title: 'Compliance',
-    items: [
-      'FIPS 140-3',
-      'NIST SSDF',
-      'CIS Benchmarks',
-      'DISA STIG',
-    ],
+    items: ['FIPS 140-3', 'NIST SSDF', 'CIS Benchmarks', 'DISA STIG'],
   },
 ];
 
@@ -174,13 +157,15 @@ export function FinanceRequirements(): React.ReactElement {
                 return (
                   <div
                     key={col.title}
-                    className={`flex flex-col items-center text-center md:items-start md:text-left justify-between ${!isLastInRowLg ? 'lg:border-r lg:border-[rgba(154,81,255,0.12)]' : ''
-                      } ${!isOddMd ? 'md:border-r md:border-[rgba(154,81,255,0.12)]' : ''
-                      } ${index < 2 ? 'md:border-b lg:border-b-0 md:border-[rgba(154,81,255,0.12)]' : ''
-                      } ${index < COLUMNS.length - 1
+                    className={`flex flex-col items-center text-center md:items-start md:text-left justify-between ${
+                      !isLastInRowLg ? 'lg:border-r lg:border-[rgba(154,81,255,0.12)]' : ''
+                    } ${!isOddMd ? 'md:border-r md:border-[rgba(154,81,255,0.12)]' : ''} ${
+                      index < 2 ? 'md:border-b lg:border-b-0 md:border-[rgba(154,81,255,0.12)]' : ''
+                    } ${
+                      index < COLUMNS.length - 1
                         ? 'border-b md:border-b-0 border-[rgba(154,81,255,0.12)]'
                         : ''
-                      }`}
+                    }`}
                     style={{
                       padding: 'clamp(28px, 2.6vw, 36px) clamp(22px, 2vw, 30px)',
                     }}

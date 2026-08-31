@@ -5,20 +5,36 @@ import { Reveal, RevealItem, RevealStagger } from '@/components/ui/Reveal';
 /*
  * "Modern Applications Bring New Risks" — the risk register.
  *
- * The second of the proposal's four quartets, and the one that most needed a
- * form of its own. Rendered as another four-across grid it would have been
- * indistinguishable from the demands strip above it and the delivery pillars
- * below. Rendered as a list, it reads the way a security tool actually presents
- * findings — numbered rows, a severity edge, one line of detail each — which is
- * both a different rhythm on the page and the right register for the content.
+ * This took three tries, and the failures are the reason for the shape.
  *
- * The list is the only vertical form on the page. Every other section runs
- * horizontally, so this is where the eye slows down.
+ *   v1  list in a white slab      54-60% of every row empty; the accent redrew
+ *                                 per row into four disconnected stripes; the
+ *                                 slab duplicated the delivery matrix below.
+ *                                 Also carried 01-04, which the proposal does
+ *                                 not — four Heading3 paragraphs, no numbering.
+ *   v2  two-column table          empty width down to 15-22%, but the split was
+ *                                 arbitrary (detail began at 613px for no
+ *                                 reason a reader could see) and the far right
+ *                                 was still void.
+ *   v3  heading left, list right  filled the width, but the heading dominated
+ *                                 and the narrow list read as stranded.
  *
- * Nothing here grades the four risks. The proposal lists them flat, so the row
- * accent is the brand gradient rather than a severity scale, and there are no
- * badges: a "Critical" label on a row the client never graded would be a claim
- * rather than a design decision.
+ * All three stretched four small items across a wide row. The content is
+ * genuinely small — four labels and four half-sentences — so the answer is not
+ * a cleverer layout, it is fewer and bigger units. A 2x2 gives four equal
+ * cells, each comfortably filled, with no arbitrary track to align against and
+ * no rag worth measuring.
+ *
+ * It also stays distinct from the page's three other quartets, which are all
+ * 1x4 (demands strip, delivery matrix, outcomes figures). A different aspect
+ * gives the risk section more weight than the strip above it, which is right.
+ *
+ * Hairline cross-rules rather than a card: the delivery matrix two sections
+ * below is already a white slab, and the page does not need two.
+ *
+ * Nothing here grades the four risks — the proposal lists them flat, so there
+ * is no severity scale and no badges. A "Critical" label on a row the client
+ * never graded would be a claim rather than a design decision.
  *
  * Copy is the proposal's, verbatim.
  */
@@ -64,7 +80,7 @@ export function SaasRisks(): React.ReactElement {
       className="relative overflow-hidden py-section-md"
       style={{ background: '#EFEDF7' }}
     >
-      {/* Corner unions — the light-band decoration this design language uses. */}
+      {/* Corner union — the light-band decoration this design language uses. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -85,7 +101,7 @@ export function SaasRisks(): React.ReactElement {
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         <div
           className="mx-auto max-w-[820px] text-center"
-          style={{ marginBottom: 'clamp(32px, 3.6vw, 52px)' }}
+          style={{ marginBottom: 'clamp(32px, 3.6vw, 56px)' }}
         >
           <Reveal header>
             <h2
@@ -105,71 +121,49 @@ export function SaasRisks(): React.ReactElement {
         </div>
 
         <RevealStagger
-          className="mx-auto overflow-hidden"
-          style={{
-            // Narrower than the page container on purpose: a findings row is
-            // left-weighted (marker, index, icon, then a short line), so the
-            // full 1345px leaves a third of every row empty.
-            maxWidth: '940px',
-            background: '#FFFFFF',
-            borderRadius: '24px',
-            border: '1px solid rgba(154,81,255,0.16)',
-            boxShadow: '0 4px 24px -4px rgba(40,30,90,0.04), 0 20px 48px -12px rgba(40,30,90,0.07)',
-          }}
+          className="mx-auto grid grid-cols-1 sm:grid-cols-2"
+          style={{ maxWidth: '1000px' }}
         >
           {RISKS.map((risk, i) => (
             <RevealItem key={risk.title}>
+              {/* Cross-rules. Stacked, every cell after the first takes a top
+                  rule; as a 2x2, only the second row does, plus a left rule on
+                  the right-hand column. The two cases are resolved here rather
+                  than by stacking `sm:border-t` and `sm:border-t-0` on the same
+                  element — Tailwind emits the reset last, so it silently won
+                  and the row rule never drew. */}
               <div
-                className="relative flex items-center"
+                className={[
+                  // Centre, not top. The icon is 87px against a 56px text block, so
+                  // top-aligning left it hanging 31px below the copy in every cell.
+                  'flex h-full items-center gap-4 border-[rgba(17,17,17,0.10)] sm:gap-5',
+                  i > 0 ? 'border-t' : '',
+                  i > 0 && i < 2 ? 'sm:border-t-0' : '',
+                  i % 2 === 1 ? 'sm:border-l' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
                 style={{
-                  gap: 'clamp(16px, 2vw, 28px)',
-                  padding: 'clamp(20px, 2.2vw, 28px) clamp(20px, 2.6vw, 36px)',
-                  borderTop: i > 0 ? '1px solid rgba(154,81,255,0.12)' : 'none',
+                  padding: 'clamp(22px, 2.4vw, 34px) clamp(0px, 2vw, 32px)',
                 }}
               >
-                {/* Row accent, in the brand gradient. It was a red-to-amber
-                    severity edge; the proposal grades none of these four, so
-                    colour-coding them high and low was the design asserting a
-                    ranking the client never wrote. */}
-                <span
-                  aria-hidden
-                  className="absolute left-0"
-                  style={{
-                    top: i > 0 ? '-1px' : '0',
-                    bottom: 0,
-                    width: '3px',
-                    background:
-                      'linear-gradient(180deg, rgba(154,81,255,0.85) 0%, rgba(44,193,235,0.55) 100%)',
-                  }}
-                />
-
-                <span
-                  aria-hidden
-                  className="hidden shrink-0 font-mono sm:block"
-                  style={{
-                    width: '30px',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '13px',
-                    fontWeight: 500,
-                    letterSpacing: '0.04em',
-                    color: 'rgba(17,17,17,0.34)',
-                  }}
-                >
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-
                 <span
                   className="relative flex shrink-0 items-center justify-center"
-                  style={{ width: 'clamp(56px, 5vw, 72px)', height: 'clamp(56px, 5vw, 72px)' }}
+                  // Measured 66px against the delivery matrix's 76px — this
+                  // section is meant to outweigh that one, not sit under it.
+                  style={{
+                    width: 'clamp(72px, 6.1vw, 88px)',
+                    height: 'clamp(72px, 6.1vw, 88px)',
+                  }}
                 >
                   <span
                     aria-hidden
                     className="absolute rounded-full"
                     style={{
-                      width: '78%',
-                      height: '78%',
+                      width: '86%',
+                      height: '86%',
                       background:
-                        'radial-gradient(closest-side, rgba(154,81,255,0.18) 0%, rgba(154,81,255,0) 74%)',
+                        'radial-gradient(closest-side, rgba(154,81,255,0.20) 0%, rgba(154,81,255,0) 74%)',
                     }}
                   />
                   <Image
@@ -177,13 +171,13 @@ export function SaasRisks(): React.ReactElement {
                     alt={risk.iconAlt}
                     width={140}
                     height={140}
-                    sizes="72px"
+                    sizes="88px"
                     className="relative object-contain"
                     style={{ width: 'auto', height: '100%' }}
                   />
                 </span>
 
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0">
                   <h3
                     style={{
                       margin: 0,
@@ -191,7 +185,7 @@ export function SaasRisks(): React.ReactElement {
                       fontSize: 'var(--fs-h5)',
                       fontWeight: 600,
                       letterSpacing: '-0.03em',
-                      lineHeight: 1.25,
+                      lineHeight: 1.3,
                       color: '#111111',
                     }}
                   >
@@ -201,11 +195,11 @@ export function SaasRisks(): React.ReactElement {
                     style={{
                       margin: '6px 0 0',
                       fontFamily: 'var(--font-sans)',
-                      fontSize: 'var(--fs-body-sm)',
+                      fontSize: 'var(--fs-body)',
                       fontWeight: 400,
                       letterSpacing: '-0.01em',
                       lineHeight: 1.55,
-                      color: 'rgba(17,17,17,0.68)',
+                      color: 'rgba(17,17,17,0.66)',
                     }}
                   >
                     {risk.body}

@@ -9,16 +9,24 @@ import { HeroReveal } from '@/components/ui/Reveal';
  * artifact on the right, and a bottom fade into the white section below. Copy
  * is the proposal's, verbatim.
  *
- * The artifact is commissioned for this page, not borrowed: a SaaS application
- * panel riding a rail above a foundation of verified component blocks, with
- * motion trails behind it. It carries both halves of the headline — moving
- * faster, and the security keeping up underneath — rather than decorating them.
+ * The artifact is commissioned for this page, not borrowed: an application panel
+ * with a steadily rising chart, seated on a layered platform.
  *
- * It was rendered on white and matted afterwards. The generator ignored the
- * transparent-background request, and the motion trails fade out gradually, so
- * a threshold knockout would have clipped their tails and left white fringing;
- * a matting pass keeps them as genuine partial alpha. Corners confirmed
- * 0,0,0,0, so it composites straight onto the gradient with no blend mode.
+ * It faces LOWER-LEFT on purpose. The render is pinned to the right of the
+ * viewport with the headline and CTA on the left, so a subject facing right
+ * would point the reader off the edge of the page; facing left, it turns back
+ * into the copy.
+ *
+ * Rendered deliberately WITHOUT motion streaks. Three attempts at generating
+ * them produced trails that fired out of the panel edge like beams or ran the
+ * wrong way relative to the implied travel, because the generator has no model
+ * of which way the object is going. If motion is wanted, it belongs in CSS
+ * behind this image, where direction and colour are a one-line change.
+ *
+ * Rendered on white and matted afterwards — the generator ignores requests for
+ * a transparent background, and a threshold knockout leaves white fringing on
+ * the soft shadow. Corners confirmed 0,0,0,0, so it composites straight onto
+ * the gradient with no blend mode.
  */
 export function SaasHero(): React.ReactElement {
   return (
@@ -41,8 +49,8 @@ export function SaasHero(): React.ReactElement {
       {/* Hero artifact, pinned right and only at xl+. Below 1280px there is no
           width that holds both the render and the headline without one of them
           being squeezed, and shrinking the render past its floor turns the
-          shield marks on the component blocks into noise. Same "hide it when
-          there is no room" call the sibling hero makes. */}
+          panel's UI detail into noise. Same "hide it when there is no room"
+          call the sibling hero makes. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 mx-auto hidden select-none xl:block"
@@ -52,22 +60,23 @@ export function SaasHero(): React.ReactElement {
           className="absolute right-0"
           style={{
             // Sits above centre rather than on it. The section's bottom fade is
-            // 200px deep, and dead-centring the render pushes its rail and the
-            // cyan glow under it into that wash — which is where the whole
-            // composition lands. Lifting it keeps the rail clear of the fade
-            // while the motion trails still bleed into it, which is the part
-            // that benefits from softening.
+            // 200px deep, and dead-centring the render pushes the platform it
+            // stands on into that wash — which is where the composition lands.
             top: '44%',
             transform: 'translateY(-50%)',
-            width: 'clamp(500px, 45vw, 660px)',
-            aspectRatio: '1360 / 993',
+            // The render is near-square (1.09) where the first pass was
+            // landscape, so the width budget is set by HEIGHT, not width: wider
+            // than ~540px pushes the panel up behind the header and drops the
+            // platform into the bottom fade.
+            width: 'clamp(430px, 38vw, 540px)',
+            aspectRatio: '1234 / 1130',
           }}
         >
           <Image
-            src="/images/saas/hero-verified-stack.webp"
-            alt="A SaaS application dashboard moving forward above a foundation of verified software component blocks, each marked with a check shield"
+            src="/images/saas/hero-app-platform.webp"
+            alt="A SaaS application dashboard showing a steadily rising chart, seated on a layered software platform with a further module sliding into its base"
             fill
-            sizes="(min-width: 1440px) 660px, 45vw"
+            sizes="(min-width: 1440px) 540px, 38vw"
             className="object-contain"
             priority
           />

@@ -178,16 +178,10 @@ export function SaasOutcomes(): React.ReactElement {
             }}
           >
             Outcomes That{' '}
-            <span
-              style={{
-                background: 'linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              Drive Engineering Impact
-            </span>
+            {/* Shared utility rather than an inline gradient: the same stops,
+                but the clip properties cannot be reset by React re-applying the
+                `background` shorthand next to them. */}
+            <span className="cs-text-gradient-impact">Drive Engineering Impact</span>
           </h2>
         </Reveal>
 

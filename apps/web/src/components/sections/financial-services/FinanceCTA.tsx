@@ -132,30 +132,56 @@ export function FinanceCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Desktop / tablet — headline left, supporting line and button right,
-          both columns centred on the slot's vertical axis. */}
-      <div
-        className="absolute inset-0 hidden items-center md:flex md:flex-col md:justify-center md:gap-y-6 lg:flex-row lg:justify-between lg:gap-y-0"
+      {/* Decorative violet cube — bottom-right corner, below md only. The
+          desktop cube above sits bottom-LEFT, which is under the headline at
+          narrow widths. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        aria-hidden
+        src="/images/vulnerability-remediation/cta-cube.webp"
+        alt=""
+        className="pointer-events-none absolute select-none md:hidden"
         style={{
-          paddingLeft: 'clamp(28px, 4vw, 64px)',
-          paddingRight: 'clamp(28px, 4vw, 64px)',
-          paddingTop: 'clamp(20px, 3vw, 32px)',
-          paddingBottom: 'clamp(20px, 3vw, 32px)',
-          columnGap: 'clamp(32px, 5vw, 72px)',
+          right: '-24px',
+          bottom: '-24px',
+          width: '120px',
+          height: '120px',
+          objectFit: 'contain',
+          opacity: 0.85,
+          zIndex: 1,
         }}
-      >
+        loading="lazy"
+        decoding="async"
+      />
+
+      {/*
+       * One content block across all widths, on the same grid LibrariesCTA and
+       * the other product CTAs use: stacked and centred below lg, two columns
+       * above it.
+       *
+       * `lg:items-start` is the point of the grid. The previous flex row centred
+       * each column on its own axis, and the right column is taller (three lines
+       * plus a button), so the headline settled below the supporting line's
+       * first line and the two read as misaligned. Top-aligning the columns and
+       * centring the grid as a whole (`lg:content-center`) puts their first
+       * lines on one baseline.
+       *
+       * This also replaces a duplicated mobile block that repeated the headline,
+       * description and button in the DOM at every width.
+       */}
+      <div className="absolute inset-0 z-[2] flex flex-col items-center justify-center gap-5 px-8 text-center md:px-12 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.7fr)] lg:content-center lg:items-start lg:justify-center lg:gap-x-[clamp(32px,4vw,56px)] lg:p-[clamp(32px,4vw,56px)_clamp(40px,5vw,72px)] lg:text-left">
         <Reveal
           header
-          className="relative w-full min-w-0"
-          style={{ maxWidth: 'min(460px, 100%)', zIndex: 2 }}
+          className="relative z-10 w-full min-w-0"
+          style={{ maxWidth: 'min(460px, 100%)' }}
         >
           <p
             className="font-display"
             style={{
               fontSize: 'var(--cta-card-title)',
               fontWeight: 600,
-              letterSpacing: '-0.04em',
-              lineHeight: 1.1,
+              letterSpacing: 'var(--cta-card-title-ls)',
+              lineHeight: 'var(--cta-card-title-lh)',
               color: '#111111',
               textWrap: 'balance',
               margin: 0,
@@ -169,17 +195,17 @@ export function FinanceCTA(): React.ReactElement {
           header
           delay={0.15}
           y={20}
-          className="relative flex w-full min-w-0 flex-col"
-          style={{ maxWidth: '420px', gap: 'clamp(16px, 1.5vw, 24px)', zIndex: 2 }}
+          className="relative z-10 flex w-full min-w-0 flex-col items-center gap-[18px] lg:items-start"
         >
           <p
+            className="text-center font-sans lg:text-left"
             style={{
-              fontFamily: 'var(--font-sans)',
+              color: 'rgba(17, 17, 17, 0.8)',
+              maxWidth: '660px',
               fontSize: 'var(--cta-card-desc)',
               fontWeight: 400,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.4,
-              color: 'rgba(17, 17, 17, 0.8)',
+              letterSpacing: 'var(--cta-card-desc-ls)',
+              lineHeight: 'var(--cta-card-desc-lh)',
               margin: 0,
             }}
           >
@@ -188,7 +214,7 @@ export function FinanceCTA(): React.ReactElement {
 
           <Link
             href={BUTTON_HREF}
-            className="cs-btn-blue self-start"
+            className="cs-btn-blue"
             style={
               {
                 '--cs-btn-h': '44px',
@@ -200,83 +226,6 @@ export function FinanceCTA(): React.ReactElement {
             <span>{BUTTON_LABEL}</span>
           </Link>
         </Reveal>
-      </div>
-
-      {/* Mobile (< md) — centered column with cube decoration. */}
-      <div
-        className="absolute inset-0 flex flex-col items-center justify-center overflow-hidden text-center md:hidden"
-        style={{ padding: '32px 28px' }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          aria-hidden
-          src="/images/vulnerability-remediation/cta-cube.webp"
-          alt=""
-          className="pointer-events-none absolute select-none"
-          style={{
-            right: '-24px',
-            bottom: '-24px',
-            width: '120px',
-            height: '120px',
-            objectFit: 'contain',
-            opacity: 0.85,
-            zIndex: 1,
-          }}
-          loading="lazy"
-          decoding="async"
-        />
-
-        <p
-          className="font-display"
-          style={{
-            position: 'relative',
-            zIndex: 2,
-            fontSize: 'var(--cta-card-title)',
-            fontWeight: 600,
-            letterSpacing: '-0.04em',
-            lineHeight: 1.15,
-            color: '#111111',
-            margin: 0,
-            maxWidth: '320px',
-            textWrap: 'balance',
-          }}
-        >
-          {HEADLINE}
-        </p>
-
-        <p
-          style={{
-            position: 'relative',
-            zIndex: 2,
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--cta-card-desc)',
-            fontWeight: 400,
-            letterSpacing: '-0.02em',
-            lineHeight: 1.4,
-            color: 'rgba(17, 17, 17, 0.8)',
-            margin: '12px 0 0',
-            maxWidth: '320px',
-          }}
-        >
-          {DESCRIPTION}
-        </p>
-
-        <Link
-          href={BUTTON_HREF}
-          className="cs-btn-blue"
-          style={
-            {
-              position: 'relative',
-              zIndex: 2,
-              marginTop: '20px',
-              '--cs-btn-h': '44px',
-              '--cs-btn-px': '20px',
-              '--cs-btn-fs': '15px',
-            } as React.CSSProperties
-          }
-        >
-          <span>{BUTTON_LABEL}</span>
-        </Link>
       </div>
     </div>
   );

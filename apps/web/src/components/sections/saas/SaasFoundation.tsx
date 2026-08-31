@@ -30,9 +30,9 @@ import { Reveal, RevealItem, RevealStagger } from '@/components/ui/Reveal';
  * all three cards read as the same anonymous product.
  *
  * The marks are flat single-colour white rather than the logo's violet-to-cyan
- * gradient, translucent on the container and the stack so the ribs and sheen
- * show through. See FinanceFoundation for the full reasoning; keep the two in
- * step, since both sections point at the same three files.
+ * gradient, and opaque: translucent versions read as faded at card size. See
+ * FinanceFoundation for the full reasoning; keep the two in step, since both
+ * sections point at the same three files.
  *
  * The cards carry a render and a name and nothing else, because that is all the
  * reference image carries. The financial-services version of this section adds
@@ -61,13 +61,13 @@ const PRODUCTS: readonly [Product, Product, Product] = [
     href: '/cleansight',
   },
   {
-    image: '/images/financial-services/card-clean-images-v3.webp',
+    image: '/images/financial-services/card-clean-images-v4.webp',
     imageAlt: 'A shipping container badged with the Clean Images product logo',
     name: 'Clean Images',
     href: '/cleanstart-images',
   },
   {
-    image: '/images/financial-services/card-clean-libraries-v3.webp',
+    image: '/images/financial-services/card-clean-libraries-v4.webp',
     imageAlt: 'Stacked library modules badged with the Clean Libraries product logo',
     name: 'Clean Libraries',
     href: '/clean-libraries',
