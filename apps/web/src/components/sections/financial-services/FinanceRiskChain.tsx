@@ -11,11 +11,15 @@ import { Reveal, RevealStagger, RevealItem } from '@/components/ui/Reveal';
  * The section argues that risk is introduced upstream, not at deploy. Rather
  * than stating that with six static exhibits, the rail runs a scanner: one
  * light column sweeps left to right through every stage on an infinite loop,
- * surfacing critical/high findings as it crosses each one. The findings persist
- * for the rest of the pass, so by the time the beam lands on Financial
- * Applications the viewer is looking at a full ledger — five flagged inputs and
- * one clean output. Counts change every pass so the rail reads as live
- * instrumentation rather than a printed chart.
+ * marking each one with severity triangles as it crosses. The marks persist for
+ * the rest of the pass, so by the time the beam lands on Financial Applications
+ * the viewer is looking at a full ledger — five flagged inputs and one clean
+ * output.
+ *
+ * Findings are counted but never printed. The counts drive how many triangles a
+ * stage shows and which slots they take, so a heavier stage visibly carries
+ * more, and both vary per pass. Showing the numbers themselves invited a reader
+ * to treat illustrative figures as CleanStart's own data.
  *
  * Timing architecture: the beam's own CSS animation is the only clock. An 80ms
  * poll reads its `currentTime` to derive the active stage and the pass number,
@@ -214,17 +218,16 @@ const SEVERITY: Record<Severity, { color: string; ink: string }> = {
  * than from arc commands — at 13px a hand-authored rounded triangle is all
  * rounding and no triangle, while a 2-unit round join keeps the silhouette.
  *
- * `detail` carries the exclamation. It holds at pip size and turns to mud in the
- * 10px readout swatch, where the solid silhouette reads better on its own.
+ * The exclamation is always drawn. It held at pip size and turned to mud in the
+ * 10px readout swatch, so it used to be optional; the readout is gone and the
+ * pips are the only caller left.
  */
 function SeverityGlyph({
   severity,
   size,
-  detail,
 }: {
   severity: Severity;
   size: number;
-  detail: boolean;
 }): React.ReactElement {
   const { color, ink } = SEVERITY[severity];
 
@@ -244,87 +247,9 @@ function SeverityGlyph({
         strokeWidth="2.4"
         strokeLinejoin="round"
       />
-      {detail ? (
-        <>
-          <path d="M10 7.4 V10.9" stroke={ink} strokeWidth="2" strokeLinecap="round" />
-          <circle cx="10" cy="13.3" r="1.15" fill={ink} />
-        </>
-      ) : null}
+      <path d="M10 7.4 V10.9" stroke={ink} strokeWidth="2" strokeLinecap="round" />
+      <circle cx="10" cy="13.3" r="1.15" fill={ink} />
     </svg>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*                              COUNT-UP READOUT                              */
-/* -------------------------------------------------------------------------- */
-
-const COUNT_UP_MS = 520;
-
-function FindingCount({
-  value,
-  label,
-  tone,
-  revealed,
-  animated,
-}: {
-  value: number;
-  label: string;
-  tone: 'critical' | 'high' | 'clear';
-  revealed: boolean;
-  animated: boolean;
-}): React.ReactElement {
-  const [shown, setShown] = useState<number>(0);
-
-  useEffect(() => {
-    if (!revealed) {
-      setShown(0);
-      return;
-    }
-    if (!animated || value === 0) {
-      setShown(value);
-      return;
-    }
-
-    let frame = 0;
-    const startedAt = performance.now();
-    const step = (now: number): void => {
-      const t = Math.min(1, (now - startedAt) / COUNT_UP_MS);
-      setShown(Math.round(value * (1 - (1 - t) ** 3)));
-      if (t < 1) frame = requestAnimationFrame(step);
-    };
-    frame = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(frame);
-  }, [value, revealed, animated]);
-
-  const color = tone === 'clear' ? '#5FE3C0' : SEVERITY[tone].color;
-
-  return (
-    <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-      {/* The clear state keeps a dot on purpose. It is not a lesser severity,
-          it is the absence of one, so it should not wear the warning glyph. */}
-      {tone === 'clear' ? (
-        <span
-          aria-hidden
-          className="inline-block shrink-0 rounded-full"
-          style={{
-            width: '6px',
-            height: '6px',
-            background: color,
-            boxShadow: `0 0 8px ${color}`,
-          }}
-        />
-      ) : (
-        <span
-          aria-hidden
-          className="inline-flex shrink-0"
-          style={{ filter: `drop-shadow(0 0 5px ${color}80)` }}
-        >
-          <SeverityGlyph severity={tone} size={10} detail={false} />
-        </span>
-      )}
-      <span style={{ color, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{shown}</span>
-      <span style={{ color: 'rgba(255,255,255,0.62)' }}>{label}</span>
-    </span>
   );
 }
 
@@ -1120,7 +1045,7 @@ function FindingPips({
                 : 'none',
             }}
           >
-            <SeverityGlyph severity={severity} size={size} detail />
+            <SeverityGlyph severity={severity} size={size} />
           </span>
         );
       })}
@@ -1354,47 +1279,6 @@ function StageNode({
         <span className="block">{line1}</span>
         <span className="block">{line2}</span>
       </h3>
-
-      {/* Findings readout — height is reserved so nothing shifts as it fills. */}
-      <div
-        className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1"
-        style={{
-          marginTop: '10px',
-          minHeight: '20px',
-          fontFamily: 'var(--font-sans)',
-          fontSize: '12.5px',
-          letterSpacing: '-0.01em',
-          opacity: revealed ? 1 : 0,
-          transition: animated ? 'opacity 320ms ease-out' : 'none',
-        }}
-      >
-        {terminal ? (
-          <FindingCount
-            value={0}
-            label="findings"
-            tone="clear"
-            revealed={revealed}
-            animated={false}
-          />
-        ) : (
-          <>
-            <FindingCount
-              value={findings.critical}
-              label="critical"
-              tone="critical"
-              revealed={revealed}
-              animated={animated}
-            />
-            <FindingCount
-              value={findings.high}
-              label="high"
-              tone="high"
-              revealed={revealed}
-              animated={animated}
-            />
-          </>
-        )}
-      </div>
     </div>
   );
 }
@@ -1417,13 +1301,16 @@ function StageNode({
  * is isotropic, which puts a soft rectangle of even light around the line and
  * is the thing that makes a beam read as pasted on.
  *
- * The profile peaks at 55% rather than centre, which is where the rail crosses
- * once labels and readouts are counted into the row height. Light is brightest
- * where it meets the floor, tapers long through the artifact above it, and dies
- * short below into the labels.
+ * The profile peaks at 63% rather than centre, because that is where the rail
+ * crosses once the labels are counted into the row height (measured: a 207px
+ * row with the rail at 131px). Light is brightest where it meets the floor,
+ * tapers long through the artifact above it, and dies short below into the
+ * labels. Re-fit this if anything is added to or removed from the node below
+ * the artifact: it was 55% while the row still carried a findings readout, and
+ * dropping that row left the hottest point floating above the floor.
  */
 const BEAM_PROFILE =
-  'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.26) 9%, rgba(0,0,0,0.84) 26%, rgba(0,0,0,1) 55%, rgba(0,0,0,0.9) 63%, rgba(0,0,0,0.42) 81%, rgba(0,0,0,0) 97%)';
+  'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.26) 10%, rgba(0,0,0,0.84) 30%, rgba(0,0,0,1) 63%, rgba(0,0,0,0.9) 71%, rgba(0,0,0,0.42) 86%, rgba(0,0,0,0) 100%)';
 
 /**
  * Strips making up the column, widest first. `offset` is how far left of the
@@ -1758,16 +1645,10 @@ export function FinanceRiskChain(): React.ReactElement {
               }}
             >
               Risk Enters Long{' '}
-              <span
-                style={{
-                  background: 'linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                Before Production
-              </span>
+              {/* Shared utility rather than an inline gradient — see the note in
+                  FinanceOutcomes: the inline form silently loses its clip when
+                  the gradient value is later edited. */}
+              <span className="cs-text-gradient-impact">Before Production</span>
             </h2>
           </Reveal>
 
