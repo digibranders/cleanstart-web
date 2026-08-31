@@ -108,14 +108,15 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/contact-us' },
   { path: '/deal-registration' },
   { path: '/events' },
-  // The two `/industries/*` pages are intentionally de-listed — both are still
-  // noindex,nofollow pending sign-off. Re-add each when it ships (and drop the
-  // `noindex` / `nofollow` in its page metadata). `/industries` itself has no
-  // page, so there is no hub URL to list either.
   { path: '/fips' },
   { path: '/for-ciso' },
   { path: '/for-developers' },
   { path: '/guide' },
+  { path: '/industries/financial-services-container-security' },
+  // Its sibling `/industries/saas-container-security` is intentionally de-listed
+  // — the copy is not signed off, so the page stays noindex,nofollow. Re-add it
+  // when it ships (and drop the `noindex` / `nofollow` in its page metadata).
+  // `/industries` itself has no page, so there is no hub URL to list either.
   // `/knowledge-hub` is a redirect to the first article (no standalone listing) —
   // excluded here. The individual /knowledge-hub/<slug> articles are emitted below.
   // `/legal` is a 308 redirect (not a page) — excluded here. The individual
