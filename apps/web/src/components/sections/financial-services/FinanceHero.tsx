@@ -27,13 +27,6 @@ export function FinanceHero(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Deliberately NOT `priority`. Next emits a `<link rel=preload as=image>`
-          for a priority image with no `media` attribute, but this wrapper is
-          `hidden xl:block`, so every phone and tablet was preloading a hero it
-          never paints. It is also decorative (aria-hidden) and is not the LCP
-          element: the H1 below carries the `lcp` prop for that. Without
-          `priority` it still loads promptly at xl, because a lazy image already
-          inside the viewport is fetched immediately. */}
       {/* Commissioned hero artifact (v3): a financial analytics dashboard with
           a magnifying glass inspecting a verified, shielded container. Ships a
           real alpha channel (confirmed 0,0,0,0 at all four corners), so it
@@ -59,6 +52,7 @@ export function FinanceHero(): React.ReactElement {
             fill
             sizes="(min-width: 1440px) 700px, 46vw"
             className="object-contain"
+            priority
           />
         </div>
       </div>
@@ -83,17 +77,17 @@ export function FinanceHero(): React.ReactElement {
       >
         <div
           // The hero artifact is pinned absolute-right and only appears at
-          // xl+ (1280px), not lg. That call was originally forced by a longer
-          // headline that needed three lines everywhere; this copy wraps to
-          // two below xl, so the dead zone that drove the decision no longer
-          // exists and the image could be brought back to lg if the design
-          // wants it. Left at xl deliberately rather than changed as a side
-          // effect of a copy edit.
-          //
-          // At xl+ clamp(580px, 48vw, 670px) is fit to the image's own
-          // measured left edge at each width. Re-verified against this copy:
-          // 3 lines with a 36px gap at 1280, 60px at 1440, 30px at 1920, and
-          // 2 lines with no image rendered at 1100.
+          // xl+ (1280px) — not lg — because 1024–1279px genuinely has no
+          // width that fits both the image AND a 3-line headline; measured
+          // directly, that range needs ≥520px of text column to hold 3 lines
+          // at this font size, while the image's own floor width leaves at
+          // most ~500px before the two touch. Rather than fight that dead
+          // zone with a clamp, the image simply doesn't render there (same
+          // "hide when there's no room" call already made for mobile), so the
+          // full 700px column is safe for the whole sub-xl range. At xl+
+          // clamp(580px, 48vw, 670px) is fit to the image's own measured
+          // left edge at each width (with a margin), verified empirically at
+          // 1280/1366/1440/1536/1920 for both zero overlap and a 3-line wrap.
           className="relative flex max-w-[700px] flex-col items-center text-center md:items-start md:text-left xl:max-w-[clamp(580px,48vw,670px)]"
         >
           <HeroReveal y={50} duration={1.0} lcp>
@@ -108,11 +102,8 @@ export function FinanceHero(): React.ReactElement {
                 marginBottom: 'clamp(24px, 2.5vw, 36px)',
               }}
             >
-              {/* The SEO team's H1, verbatim. The gradient splits the phrase
-                  rather than adding words, so the rendered text is exactly
-                  "Container Security for Financial Services". */}
-              Container Security for{' '}
-              <span className="cs-text-gradient-impact">Financial Services</span>
+              Financial Institutions Are Moving Faster.{' '}
+              <span className="cs-text-gradient-impact">Security Can&apos;t Fall Behind.</span>
             </h1>
           </HeroReveal>
 

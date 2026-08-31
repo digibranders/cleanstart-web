@@ -61,8 +61,6 @@ page slugs, categories, types, and build status across the dev journey.
 
 ## Solutions Pages
 
-> **`/industries` segment.** The two industry pages are the only nested static routes on the site; everything else is one segment. `/industries` itself has no page and therefore 404s — a segment with no hub forfeits the main reason to nest (a hub that ranks for the category term and passes equity down) and dead-ends anyone who truncates the URL. Build the hub, or the nesting is decoration.
-
 | # | Page Name | URL Slug | Type | Status | Notes |
 |---|-----------|----------|------|--------|-------|
 | 2 | Attack Surface Reduction | `/attack-surface-reduction` | Static | ✅ | Built on `farheen`; ported from retired `web` branch. |
@@ -71,8 +69,6 @@ page slugs, categories, types, and build status across the dev journey.
 | 9 | For CISO | `/for-ciso` | Static | ✅ | All 8 sections built (farheen integration 2026-05-20) |
 | 10 | For Developers | `/for-developers` | Static | ✅ | Route at `src/app/for-developers/`. Linked from the homepage AudienceTabs and the nav (`nav-config.ts`). |
 | 12 | ROI Calculator | `/roi-calculator` | Static | 🚧 | Interactive Operational Impact simulator (light theme). Client `RoiSimulator` + isolated `model.ts` engine (v2 continuous log-scaled scoring). Sections: Hero, Simulator, How-it's-calculated, Footer CTA. Nav leaf added `built:false` under Solutions › Capability — flip to live once verified. |
-| 13 | Financial Services | `/industries/financial-services-container-security` | Static | 🚧 | Title, description and H1 are the SEO team's, applied verbatim. **Renamed from `/financial-services` 2026-08-31** while that URL was noindex, unlinked and out of the sitemap in production, so nothing was de-ranked; a 301 is registered in the CMS `redirects` collection (id=41) regardless, since it did resolve publicly. `noindex,nofollow` and out of the sitemap pending sign-off. Nav-linked (Solutions › By industry). Breadcrumb, `JsonLdGraph` and `pageRegistry` row (id=42) in place — to launch, drop the two flags and add the path to `STATIC_ROUTES`. |
-| 14 | SaaS | `/industries/saas-container-security` | Static | 🚧 | Title, description and H1 are the SEO team's, applied verbatim. **Renamed from `/saas` 2026-08-31**; that path returned 404 in production, so no redirect was needed (unlike its sibling, which resolved). `noindex,nofollow` and out of the sitemap pending copy approval. Nav-linked (Solutions › By industry). Breadcrumb, `JsonLdGraph` and `pageRegistry` row (id=43) in place, so it emits the same graph as its sibling — to launch, drop the two flags and add the path to `STATIC_ROUTES`. |
 | 3 | Enhance SCA | `/software-composition-analysis` | Static | ❌ removed | **Deleted 2026-07-07** — page, `sca` section components, and image assets fully removed (was orphaned: `index,follow` but absent from nav/sitemap, so Google kept surfacing an unlinked page). Route now 301s to `/guide/software-composition-analysis` via the `redirects` collection (see `post-launch-redirects-seed.ts`). |
 
 ---

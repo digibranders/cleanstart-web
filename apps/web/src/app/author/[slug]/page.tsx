@@ -12,7 +12,6 @@ import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
 import { getAuthorBySlug, getAuthorSlugs, getPostsByAuthor } from "@/lib/authors";
 import { mediaUrl } from "@/lib/blog";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 import { breadcrumbSchema, breadcrumbTrail, profilePageSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
 import { buildPageGraph, seoOverride } from "@/lib/seo/compose-page";
@@ -49,14 +48,7 @@ export async function generateMetadata({
   }
 
   const photoAbsolute = mediaUrl(author.photo?.url);
-  // Authors carry the same `seo` group as every other content collection, but
-  // this route was the only one that never read it, so a full bio shipped as
-  // the meta description (457 chars on one profile). Title stays generated:
-  // the editor-entered `seo.title` values are sentence-shaped ("The author, X,
-  // serves as Y at CleanStart") and longer than the "Name, Role" form.
-  const seo = resolveCmsSeo(author.seo, { absolutize: mediaUrl });
   const description =
-    seo.description ??
     author.bioShort ??
     `${author.name}${author.role ? `, ${author.role}` : ""} at CleanStart.`;
 
@@ -65,20 +57,16 @@ export async function generateMetadata({
     description,
     path: `/author/${author.slug}`,
     eyebrow: author.role ?? "Team",
-    ...(seo.noindex ? { noindex: true, nofollow: seo.nofollow } : {}),
-    ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
-    ...(seo.image
-      ? { image: seo.image }
-      : photoAbsolute && author.photo
-        ? {
-            image: {
-              url: photoAbsolute,
-              width: author.photo.width,
-              height: author.photo.height,
-              alt: author.photo.alt ?? author.name,
-            },
-          }
-        : {}),
+    ...(photoAbsolute && author.photo
+      ? {
+          image: {
+            url: photoAbsolute,
+            width: author.photo.width,
+            height: author.photo.height,
+            alt: author.photo.alt ?? author.name,
+          },
+        }
+      : {}),
   });
 }
 
