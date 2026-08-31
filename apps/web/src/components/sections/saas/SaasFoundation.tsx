@@ -1,7 +1,6 @@
 import type React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { LogoMark } from '@/components/icons/Logo';
 import { Reveal, RevealItem, RevealStagger } from '@/components/ui/Reveal';
 
 /*
@@ -22,43 +21,25 @@ import { Reveal, RevealItem, RevealStagger } from '@/components/ui/Reveal';
  * attempts at requesting no text and adding a DOM overlay instead are
  * superseded now that a clean text render exists.
  *
- * Each render carries its own product's logo, the same mark the homepage
- * PlatformPipeline uses (public/images/cleanstart-factory/*-2.webp),
- * composited into whatever element was generic in that render: the sidebar
- * app icon on the CleanSight laptop, and the badge on the container side and
- * the top layer of the stack. Those badges were previously a stock shield and
- * a stock key, which made all three cards read as the same anonymous product.
+ * Renders are shared with the financial-services version of this section and
+ * live under /images/financial-services/ for that reason. Each carries its own
+ * product's logo, the same mark the homepage PlatformPipeline uses, composited
+ * into whatever element was generic in that render: the sidebar app icon on the
+ * CleanSight laptop, and the badge on the container side and the top layer of
+ * the stack. Those badges used to be a stock shield and a stock key, which made
+ * all three cards read as the same anonymous product.
  *
- * The marks are drawn as flat single-colour white, not in the logo's own
- * violet-to-cyan gradient. Client feedback on the gradient version: it read as
- * a loud multicoloured sticker pasted onto the product rather than part of it.
+ * The marks are flat single-colour white rather than the logo's violet-to-cyan
+ * gradient, and opaque: translucent versions read as faded at card size. See
+ * FinanceFoundation for the full reasoning; keep the two in step, since both
+ * sections point at the same three files.
  *
- * All three are OPAQUE. Two earlier passes made the container and stack marks
- * translucent so the ribs and sheen showed through, at 30 percent and then at
- * 70. Both read as faded rather than restrained: at card size the mark is only
- * about 60px wide, and translucency there costs legibility without buying any
- * subtlety a viewer can actually perceive. Single colour was the ask; see
- * through was not.
+ * The cards carry a render and a name and nothing else, because that is all the
+ * reference image carries. The financial-services version of this section adds
+ * a tagline per product, pulled from each product's own hero page; on this page
+ * that would be three sentences the proposal never wrote.
  *
- * The container and stack renders are used at their NATIVE 1536x1024, not
- * downscaled on the way into WebP. Resampling to 1200 visibly softened the thin
- * white linework, which was the other half of why the marks looked faded.
- * Next's optimizer still generates the delivered variants; give it a sharp
- * source and let it do that once, rather than shipping a pre-softened one.
- *
- * The CleanSight sidebar mark is NOT generated. Three attempts at having the
- * image model redraw it produced a different wrong logo each time: an image
- * model cannot reproduce specific artwork at that size, and every retry is a
- * fresh guess rather than a correction. It is instead the real logo asset
- * composited in: the generated mark is painted out by interpolating the
- * sidebar gradient across the patch, then cleansight-2.webp is mapped to white
- * by its own luminance and sheared by 0.0875 dy/dx to sit on the screen plane,
- * a slope measured off the sidebar's top edge in the render. Redo it that way
- * if the render is ever regenerated; do not ask for the logo in the prompt.
- *
- * Card taglines are each product's own real hero copy (CleanSightHero,
- * CleanStartImagesHero, ClearLibrariesHero), not invented for this page.
- * Only the whole card's bottom strip (the name) is a link — matches the
+ * Only the card's bottom strip (the name) is a link — matches the
  * "bottom-only clickable" convention already set for the pillar cards below.
  * No separate per-card logo glyph in the DOM: the mark now lives inside the
  * render, where it identifies the product instead of repeating a house logo.
@@ -68,7 +49,6 @@ interface Product {
   image: string;
   imageAlt: string;
   name: string;
-  tagline: string;
   href: string;
 }
 
@@ -78,57 +58,40 @@ const PRODUCTS: readonly [Product, Product, Product] = [
     imageAlt:
       'The CleanSight dashboard, badged with the CleanSight product logo, showing discovered assets across containers, images, repositories and vulnerabilities on a world map, with a magnifying glass revealing a verified software component',
     name: 'CleanSight',
-    tagline:
-      'Discover software assets, dependencies, and inherited risk across modern environments.',
     href: '/cleansight',
   },
   {
     image: '/images/financial-services/card-clean-images-v4.webp',
     imageAlt: 'A shipping container badged with the Clean Images product logo',
     name: 'Clean Images',
-    tagline: 'Hardened, minimal, and secure container images for your applications.',
     href: '/cleanstart-images',
   },
   {
     image: '/images/financial-services/card-clean-libraries-v4.webp',
     imageAlt: 'Stacked library modules badged with the Clean Libraries product logo',
     name: 'Clean Libraries',
-    tagline: 'Secure, trusted libraries and dependencies for your applications.',
     href: '/clean-libraries',
   },
 ];
 
 interface Step {
   icon: string;
-  title: string;
-  line1: string;
-  line2: string;
+  text: string;
 }
 
+/*
+ * The four items along the bottom of the proposal's own reference image, in its
+ * words. The previous set ("Gain visibility across your environment", and so
+ * on) was carried over from the financial-services page and is not anything
+ * this proposal says.
+ */
 const STEPS: readonly [Step, Step, Step, Step] = [
-  {
-    icon: '/images/ciso/enterprise-icon-cloud.svg',
-    title: 'Discover',
-    line1: 'Gain visibility across',
-    line2: 'your environment.',
-  },
-  {
-    icon: '/images/ciso/enterprise-icon-devsecops.svg',
-    title: 'Verify',
-    line1: 'Verify integrity and',
-    line2: 'establish trust.',
-  },
-  {
-    icon: '/images/ciso/enterprise-icon-compliance.svg',
-    title: 'Govern',
-    line1: 'Enforce policies and',
-    line2: 'maintain compliance.',
-  },
+  { icon: '/images/ciso/enterprise-icon-cloud.svg', text: 'Discover. Remediate.' },
+  { icon: '/images/ciso/enterprise-icon-devsecops.svg', text: 'Secure Development.' },
+  { icon: '/images/ciso/enterprise-icon-compliance.svg', text: 'Validate. Govern.' },
   {
     icon: '/images/ciso/enterprise-icon-security-ops.svg',
-    title: 'Remediate',
-    line1: 'Replace risky components',
-    line2: 'with verified alternatives.',
+    text: 'Establish trust. Reduce risk. Deliver with confidence.',
   },
 ];
 
@@ -160,10 +123,10 @@ function IconSphere({ icon }: { icon: string }): React.ReactElement {
   );
 }
 
-export function FinanceFoundation(): React.ReactElement {
+export function SaasFoundation(): React.ReactElement {
   return (
     <section
-      data-section="FinanceFoundation"
+      data-section="SaasFoundation"
       className="relative overflow-hidden"
       style={{
         background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, #FDFDFF 96px, #FDFDFF 100%)',
@@ -282,7 +245,7 @@ export function FinanceFoundation(): React.ReactElement {
                 margin: 0,
               }}
             >
-              Secure applications start with a verified software foundation.
+              Start development with verified components built for secure delivery.
             </p>
           </Reveal>
         </div>
@@ -323,21 +286,6 @@ export function FinanceFoundation(): React.ReactElement {
                   </div>
                 </div>
 
-                <p
-                  className="px-5"
-                  style={{
-                    fontFamily: 'var(--font-sans)',
-                    fontSize: 'var(--fs-body-sm)',
-                    fontWeight: 400,
-                    letterSpacing: '-0.01em',
-                    lineHeight: 1.5,
-                    color: '#555555',
-                    margin: 0,
-                  }}
-                >
-                  {product.tagline}
-                </p>
-
                 {/* Only this strip is a link — the card body above is not,
                     matching the pillar-card convention below. No per-card
                     logo: the same CleanStart mark repeated three times in a
@@ -371,62 +319,11 @@ export function FinanceFoundation(): React.ReactElement {
           ))}
         </RevealStagger>
 
-        {/* Powered by CleanStart — the proposal's own divider. */}
-        <Reveal delay={0.1} y={18}>
-          <div
-            className="flex items-center"
-            style={{ marginTop: 'clamp(24px, 2.6vw, 40px)', gap: 'clamp(16px, 2vw, 32px)' }}
-          >
-            <span
-              aria-hidden
-              className="hidden flex-1 sm:block"
-              style={{
-                height: '1px',
-                background:
-                  'linear-gradient(to right, rgba(217,217,217,0) 0%, #d9d9d9 60%, #d9d9d9 100%)',
-              }}
-            />
-            <span className="mx-auto flex items-center gap-3 sm:mx-0">
-              <span
-                style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: 'var(--fs-caption)',
-                  fontWeight: 600,
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
-                  lineHeight: 1.4,
-                  color: '#6b6b6b',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                Powered by
-              </span>
-              <LogoMark className="h-[26px] w-[23px] shrink-0" />
-              <span
-                className="font-display"
-                style={{
-                  fontSize: 'var(--fs-h5)',
-                  fontWeight: 600,
-                  letterSpacing: '-0.03em',
-                  lineHeight: 1.2,
-                  color: '#111111',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                CleanStart
-              </span>
-            </span>
-            <span
-              aria-hidden
-              className="hidden flex-1 sm:block"
-              style={{
-                height: '1px',
-                background:
-                  'linear-gradient(to left, rgba(217,217,217,0) 0%, #d9d9d9 60%, #d9d9d9 100%)',
-              }}
-            />
-          </div>
-        </Reveal>
+        {/* No "Powered by CleanStart" divider here. The financial-services
+            proposal asks for one between the product cards and the loop; this
+            proposal does not, and a lockup the client never specified is a
+            claim about the page's structure rather than a layout choice. The
+            loop follows the cards directly. */}
 
         {/* The operating loop. */}
         <RevealStagger
@@ -434,35 +331,23 @@ export function FinanceFoundation(): React.ReactElement {
           style={{ marginTop: 'clamp(22px, 2.4vw, 34px)', gap: 'clamp(24px, 2.4vw, 36px)' }}
         >
           {STEPS.map((step) => (
-            <RevealItem key={step.title}>
+            <RevealItem key={step.text}>
               <div className="flex h-full flex-col items-center text-center">
                 <IconSphere icon={step.icon} />
-                <h3
-                  style={{
-                    marginTop: 'clamp(14px, 1.4vw, 20px)',
-                    fontFamily: 'var(--font-display)',
-                    fontSize: 'var(--fs-h4)',
-                    fontWeight: 600,
-                    letterSpacing: '-0.035em',
-                    lineHeight: 1.2,
-                    color: '#111111',
-                  }}
-                >
-                  {step.title}
-                </h3>
                 <p
                   style={{
-                    marginTop: '8px',
-                    fontFamily: 'var(--font-sans)',
-                    fontSize: 'var(--fs-body-sm)',
-                    fontWeight: 400,
-                    letterSpacing: '-0.01em',
-                    lineHeight: 1.5,
-                    color: '#555555',
+                    marginTop: 'clamp(14px, 1.4vw, 20px)',
+                    maxWidth: '22ch',
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'var(--fs-h5)',
+                    fontWeight: 600,
+                    letterSpacing: '-0.03em',
+                    lineHeight: 1.3,
+                    color: '#111111',
+                    margin: 'clamp(14px, 1.4vw, 20px) 0 0',
                   }}
                 >
-                  <span className="block">{step.line1}</span>
-                  <span className="block">{step.line2}</span>
+                  {step.text}
                 </p>
               </div>
             </RevealItem>

@@ -3,17 +3,16 @@ import { Fragment } from 'react';
 import { Reveal, RevealItem, RevealStagger } from '@/components/ui/Reveal';
 
 /*
- * "Outcomes That Drive Impact" — the page's close, on the site's own outcomes
+ * "Outcomes That Drive Engineering Impact" — the page's close, on the site's own outcomes
  * treatment (CisoValidationOutcomes): figures set straight on the dark band,
  * separated by the lit glow bars that section ships, with no container and no
  * rules.
  *
- * The gradient, the mesh planes and the aura belong to FinanceProofBand, which
- * paints them once across this section and the conformance record above it, so
- * the two read as a single closing passage instead of two stacked bands.
+ * This page has no proof band above it, so the section paints its own gradient
+ * and mesh planes.
  *
  * The titles are sized to the longest one so all four read on a single line at
- * every desktop width. "Strengthen Governance" is ~10.8x the font size wide,
+ * every desktop width. "Greater Software" is the longest here,
  * and the narrowest desktop column is 1024's, so the type floor is set from
  * there and scales up to 26px at 1440; `lg:whitespace-nowrap` then guarantees
  * the single line rather than leaving it to chance. The row holds four-across
@@ -29,24 +28,24 @@ interface Outcome {
 
 const OUTCOMES: readonly [Outcome, Outcome, Outcome, Outcome] = [
   {
-    line1: 'Reduce Attack',
-    line2: 'Surface',
-    body: 'Start with hardened, minimal software components.',
+    line1: 'Faster Time',
+    line2: 'to Market',
+    body: 'Release applications confidently without security delays.',
   },
   {
-    line1: 'Built-In Security &',
-    line2: 'Compliance',
-    body: 'Adopt software aligned with security and regulatory requirements.',
+    line1: 'Greater Software',
+    line2: 'Assurance',
+    body: 'Know the software powering every application.',
   },
   {
-    line1: 'Build with',
-    line2: 'Verifiable Trust',
-    body: 'Prove software integrity with provenance and reproducible builds.',
+    line1: 'Lower Security',
+    line2: 'Risk',
+    body: 'Reduce exposure from vulnerable components.',
   },
   {
-    line1: 'Integrate Without',
-    line2: 'Disruption',
-    body: 'Adopt verified components through existing CI/CD workflows.',
+    line1: 'Operational',
+    line2: 'Confidence',
+    body: 'Scale secure software delivery across teams.',
   },
 ];
 
@@ -106,10 +105,10 @@ function OutcomeFigure({ line1, line2, body }: Outcome): React.ReactElement {
   );
 }
 
-export function FinanceOutcomes(): React.ReactElement {
+export function SaasOutcomes(): React.ReactElement {
   return (
     <section
-      data-section="FinanceOutcomes"
+      data-section="SaasOutcomes"
       className="relative overflow-hidden"
       style={{
         background: 'linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)',
@@ -179,12 +178,10 @@ export function FinanceOutcomes(): React.ReactElement {
             }}
           >
             Outcomes That{' '}
-            {/* Shared utility rather than an inline gradient: identical stops,
-                but React re-applying the `background` shorthand on update can
-                reset background-clip to border-box when the clip longhands sit
-                beside it in the same style object, which renders the heading as
-                a solid gradient block with the letters knocked out. */}
-            <span className="cs-text-gradient-impact">Drive Impact</span>
+            {/* Shared utility rather than an inline gradient: the same stops,
+                but the clip properties cannot be reset by React re-applying the
+                `background` shorthand next to them. */}
+            <span className="cs-text-gradient-impact">Drive Engineering Impact</span>
           </h2>
         </Reveal>
 

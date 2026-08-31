@@ -1,0 +1,485 @@
+.stage {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  max-width: 1080px;
+  margin-inline: auto;
+}
+
+.desktopReactor {
+  display: none;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 34px 72px rgba(0, 0, 0, 0.46));
+}
+
+/* Mobile is a stack of cards, not a scaled scene — see SaasCleanroomReactor. */
+.mobileFlow {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mobileCard {
+  padding: 20px 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(127, 227, 255, 0.24);
+  background: linear-gradient(180deg, rgba(16, 26, 53, 0.92) 0%, rgba(7, 13, 29, 0.92) 100%);
+}
+
+.mobileCardRefused {
+  border-color: rgba(255, 135, 149, 0.3);
+  background: linear-gradient(180deg, rgba(38, 16, 30, 0.9) 0%, rgba(12, 10, 24, 0.92) 100%);
+}
+
+.mobileHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mobileHeadLabel {
+  font-family: var(--font-display);
+  font-size: var(--fs-h5);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+/* Short spine between head, stages and gate — the only connective tissue the
+   card needs, and it stays on the type grid instead of a scaled viewBox. */
+.mobileRail {
+  display: block;
+  width: 1px;
+  height: 14px;
+  margin: 10px 0 10px 19px;
+  background: rgba(127, 227, 255, 0.4);
+}
+
+.mobileStages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mobileStage {
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  font-family: var(--font-display);
+  font-size: var(--fs-body-sm);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.mobileGate {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1.5px solid #5fe3c0;
+  background: rgba(95, 227, 192, 0.13);
+  font-family: var(--font-display);
+  font-size: var(--fs-body-sm);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #5fe3c0;
+}
+
+.mobileGateRefused {
+  border-color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.13);
+  color: #ff8795;
+}
+
+.sourceLabel,
+.rejectLabel,
+.layerLabel,
+.perimeterLabel {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.sourceLabel {
+  fill: rgba(240, 248, 255, 0.94);
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+
+.rejectLabel {
+  fill: rgba(255, 214, 219, 0.94);
+  font-size: 20px;
+  letter-spacing: -0.01em;
+}
+
+.layerLabel {
+  fill: rgba(240, 248, 255, 0.9);
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+
+.perimeterLabel {
+  fill: rgba(240, 248, 255, 0.94);
+  font-size: 16px;
+  letter-spacing: -0.01em;
+}
+
+.sourcePulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: sourcePulse 10.8s ease-in-out infinite;
+}
+
+.intakeFlow {
+  animation: intakeFlow 10.8s linear infinite;
+}
+
+.intakeParticle,
+.intakeParticleSecondary {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: intakeParticle 10.8s cubic-bezier(0.55, 0, 0.3, 1) infinite;
+}
+
+.intakeParticleSecondary {
+  animation-delay: 0.24s;
+}
+
+.energyColumn {
+  animation: energyRise 10.8s linear infinite;
+}
+
+.layerPlate {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0.48;
+}
+
+.layerCode {
+  animation: layerCode 10.8s ease-out infinite;
+}
+
+.layerBuild {
+  animation: layerBuild 10.8s ease-out infinite;
+}
+
+.layerTest {
+  animation: layerTest 10.8s ease-out infinite;
+}
+
+.layerDeploy {
+  animation: layerDeploy 10.8s ease-out infinite;
+}
+
+.securityPerimeter {
+  opacity: 0.62;
+  animation: perimeterResolve 10.8s ease-in-out infinite;
+}
+
+.perimeterTrace {
+  animation: perimeterTrace 10.8s linear infinite;
+}
+
+.scanBeam {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: scanBeam 10.8s cubic-bezier(0.7, 0, 0.3, 1) infinite;
+}
+
+.lateArtifact {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: lateImpact 10.8s cubic-bezier(0.7, 0, 0.3, 1) infinite;
+}
+
+.fractureShard {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: fractureReject 10.8s ease-out infinite;
+}
+
+@keyframes sourcePulse {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.97);
+  }
+  10% {
+    opacity: 1;
+    transform: scale(1.045);
+  }
+  24%,
+  88% {
+    opacity: 0.94;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.7;
+    transform: scale(0.97);
+  }
+}
+
+@keyframes intakeFlow {
+  0% {
+    opacity: 0.24;
+    stroke-dashoffset: 0;
+  }
+  9%,
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.24;
+    stroke-dashoffset: -96;
+  }
+}
+
+@keyframes intakeParticle {
+  0% {
+    opacity: 0;
+    transform: translateX(-26px) scale(0.5);
+  }
+  7% {
+    opacity: 1;
+    transform: translateX(-10px) scale(1);
+  }
+  19% {
+    opacity: 1;
+    transform: translateX(44px) scale(1);
+  }
+  25%,
+  99% {
+    opacity: 0;
+    transform: translateX(62px) scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-26px) scale(0.5);
+  }
+}
+
+@keyframes energyRise {
+  0% {
+    opacity: 0.18;
+    stroke-dashoffset: 0;
+  }
+  22%,
+  86% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.18;
+    stroke-dashoffset: -152;
+  }
+}
+
+@keyframes layerCode {
+  0%,
+  19% {
+    opacity: 0.34;
+    filter: none;
+  }
+  24%,
+  86% {
+    opacity: 1;
+    filter: drop-shadow(0 0 12px rgba(154, 81, 255, 0.3));
+  }
+  92%,
+  100% {
+    opacity: 0.34;
+    filter: none;
+  }
+}
+
+@keyframes layerBuild {
+  0%,
+  27% {
+    opacity: 0.34;
+    filter: none;
+  }
+  32%,
+  89% {
+    opacity: 1;
+    filter: drop-shadow(0 0 12px rgba(154, 81, 255, 0.3));
+  }
+  95%,
+  100% {
+    opacity: 0.34;
+    filter: none;
+  }
+}
+
+@keyframes layerTest {
+  0%,
+  35% {
+    opacity: 0.34;
+    filter: none;
+  }
+  40%,
+  92% {
+    opacity: 1;
+    filter: drop-shadow(0 0 12px rgba(154, 81, 255, 0.3));
+  }
+  98%,
+  100% {
+    opacity: 0.34;
+    filter: none;
+  }
+}
+
+@keyframes layerDeploy {
+  0%,
+  43% {
+    opacity: 0.34;
+    filter: none;
+  }
+  48%,
+  94% {
+    opacity: 1;
+    filter: drop-shadow(0 0 12px rgba(154, 81, 255, 0.3));
+  }
+  100%,
+  100% {
+    opacity: 0.34;
+    filter: none;
+  }
+}
+
+@keyframes perimeterResolve {
+  0%,
+  50% {
+    opacity: 0.44;
+  }
+  60%,
+  88% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.44;
+  }
+}
+
+@keyframes perimeterTrace {
+  from {
+    stroke-dashoffset: 140;
+  }
+  to {
+    stroke-dashoffset: -172;
+  }
+}
+
+@keyframes scanBeam {
+  0%,
+  52% {
+    opacity: 0;
+    transform: translateY(-104px) scaleY(0.7);
+  }
+  57% {
+    opacity: 0.85;
+    transform: translateY(-76px) scaleY(1);
+  }
+  68% {
+    opacity: 0.85;
+    transform: translateY(318px) scaleY(1);
+  }
+  72%,
+  99% {
+    opacity: 0;
+    transform: translateY(348px) scaleY(0.7);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-104px) scaleY(0.7);
+  }
+}
+
+@keyframes lateImpact {
+  0%,
+  68% {
+    transform: translateX(24px);
+  }
+  76% {
+    transform: translateX(-2px);
+  }
+  81% {
+    transform: translateX(32px);
+  }
+  86% {
+    transform: translateX(18px);
+  }
+  92%,
+  100% {
+    transform: translateX(24px);
+  }
+}
+
+@keyframes fractureReject {
+  0%,
+  72% {
+    opacity: 0;
+    transform: translateX(6px);
+  }
+  78% {
+    opacity: 1;
+    transform: translateX(-4px);
+  }
+  88% {
+    opacity: 0.45;
+    transform: translateX(0);
+  }
+  94%,
+  100% {
+    opacity: 0;
+    transform: translateX(6px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .desktopReactor {
+    display: block;
+  }
+
+  .mobileFlow {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sourcePulse,
+  .intakeFlow,
+  .intakeParticle,
+  .intakeParticleSecondary,
+  .energyColumn,
+  .layerPlate,
+  .securityPerimeter,
+  .perimeterTrace,
+  .scanBeam,
+  .lateArtifact,
+  .fractureShard {
+    animation: none !important;
+  }
+
+  .sourcePulse,
+  .layerPlate,
+  .securityPerimeter {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .scanBeam {
+    opacity: 0 !important;
+  }
+
+  .lateArtifact {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .fractureShard {
+    opacity: 0.65 !important;
+    transform: none !important;
+  }
+}

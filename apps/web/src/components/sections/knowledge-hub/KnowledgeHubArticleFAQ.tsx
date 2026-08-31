@@ -62,9 +62,14 @@ export function KnowledgeHubArticleFAQ({
   if (!faqs.length) return null;
 
   return (
-    <section className="relative w-full bg-white" data-section="KnowledgeHubArticleFAQ">
-      <div className="relative mx-auto max-w-[1120px] px-6 pb-20">
-        <div className="min-w-0 flex-1" style={{ maxWidth: "680px" }}>
+    // Unlike the blog/guide FAQ this renders INSIDE the knowledge-hub grid
+    // column, whose layout already owns the container, horizontal padding and
+    // trailing pb-section-cta. So: no max-w/px wrapper (px-6 would shift the
+    // FAQ 24px off the article body above), no pb (it would stack onto the
+    // layout's), full column width to match the body, and mt-16 for the same
+    // 64px section boundary the guide and blog FAQs sit at.
+    <section className="relative w-full mt-16" data-section="KnowledgeHubArticleFAQ">
+      <div className="min-w-0">
           <Reveal header>
             <h2
               className="font-display font-semibold leading-[1.1] tracking-[-0.04em]"
@@ -188,7 +193,6 @@ export function KnowledgeHubArticleFAQ({
               );
             })}
           </div>
-        </div>
       </div>
     </section>
   );

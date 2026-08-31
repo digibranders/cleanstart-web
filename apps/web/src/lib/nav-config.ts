@@ -157,6 +157,35 @@ export const NAV_TREE: NavItem[] = [
           },
         ],
       },
+      {
+        // /industries/financial-services-container-security still carries
+        // noindex,nofollow and is absent from the sitemap. Linking it here makes
+        // it reachable by people without making it indexable — a deliberate soft
+        // launch, not an oversight. Lift the flags on the page and add its path
+        // to the sitemap's STATIC_ROUTES when the client signs the copy off.
+        //
+        // Its sibling /industries/saas-container-security is deliberately NOT
+        // listed: the page is built and complete (metadata, JSON-LD graph and
+        // pageRegistry row all in place) but its copy is not approved, so it
+        // stays reachable by direct URL only. Restore the row below when it is:
+        //   { label: "SaaS",
+        //     href: "/industries/saas-container-security",
+        //     description: "Ship faster on a verified software foundation.",
+        //     icon: "cloud" }
+        //
+        // Labels stay short. The page is titled "Container Security for
+        // Financial Services" for search, but the nav is navigation, not a
+        // ranking surface, and the group heading already says "By industry".
+        title: "By industry",
+        items: [
+          {
+            label: "Financial Services",
+            href: "/industries/financial-services-container-security",
+            description: "Verified components for regulated financial software.",
+            icon: "bank",
+          },
+        ],
+      },
     ],
   },
   {

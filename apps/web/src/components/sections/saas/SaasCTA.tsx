@@ -6,12 +6,8 @@
  * Layout matches FipsCTA and VulnCTA: headline left, supporting line and button
  * stacked on the right, both columns vertically centred in the slot.
  *
- * NOTE — DESCRIPTION is the one string on this page not taken from the client
- * proposal, which supplies a headline and a button for this card and nothing
- * else. Without it the content block came to 89px in a 260px card, so
- * everything hugged the top and left 164px of dead space with the decorative
- * cube stranded in it. It is written to set up the conversation the button
- * promises rather than to restate the headline. Flag it for client sign-off.
+ * Unlike its financial-services sibling, every string here is the proposal's:
+ * it supplies a headline, a supporting line and a button label for this card.
  */
 
 'use client';
@@ -19,16 +15,16 @@
 import Link from 'next/link';
 import { Reveal } from '@/components/ui/Reveal';
 
-const HEADLINE = 'Build Trusted Financial Software with CleanStart';
+const HEADLINE = 'Secure Your Next Release Before It Ships';
 const DESCRIPTION =
-  'Talk through your compliance requirements and see how verified components fit your existing stack.';
-const BUTTON_LABEL = 'Talk to a Security Expert';
+  'Give developers verified software components that integrate into existing workflows.';
+const BUTTON_LABEL = 'Talk to an Expert';
 const BUTTON_HREF = '/contact-us';
 
-export function FinanceCTA(): React.ReactElement {
+export function SaasCTA(): React.ReactElement {
   return (
     <div
-      data-section="FinanceCTA"
+      data-section="SaasCTA"
       className="relative h-full w-full overflow-hidden"
       style={{ background: '#ffffff' }}
     >
