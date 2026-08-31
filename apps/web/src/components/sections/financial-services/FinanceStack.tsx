@@ -36,22 +36,25 @@ const COMPONENTS: readonly [ComponentItem, ComponentItem, ComponentItem, Compone
     line2: 'Dependencies',
   },
   {
-    // The icon is still the AI-generated-code artifact (code brackets with
-    // sparkles) and reads as AI rather than third-party supply. Regenerate it
-    // in the icon-stack style before this page goes live.
     icon: '/images/financial-services/icon-stack-ai-generated-code-v2.png',
-    iconAlt: '3D purple code brackets representing third party components',
-    line1: 'Third Party',
-    line2: 'Components',
+    iconAlt: '3D purple AI-generated code brackets with sparkles',
+    line1: 'AI-Generated',
+    line2: 'Code',
   },
 ];
 
 export function FinanceStack(): React.ReactElement {
   return (
-    <section data-section="FinanceStack" className="relative bg-white py-section-md">
+    <section
+      data-section="FinanceStack"
+      className="relative bg-white py-section-md"
+    >
       <div className="mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
         {/* Section Heading */}
-        <div className="mx-auto text-center" style={{ marginBottom: 'clamp(36px, 4vw, 56px)' }}>
+        <div
+          className="mx-auto text-center"
+          style={{ marginBottom: 'clamp(36px, 4vw, 56px)' }}
+        >
           <Reveal header>
             <h2
               style={{
@@ -89,10 +92,7 @@ export function FinanceStack(): React.ReactElement {
                     {/* 3D Icon Container with subtle ambient halo */}
                     <div
                       className="relative flex items-center justify-center"
-                      style={{
-                        width: 'clamp(140px, 12vw, 168px)',
-                        height: 'clamp(130px, 11vw, 156px)',
-                      }}
+                      style={{ width: 'clamp(140px, 12vw, 168px)', height: 'clamp(130px, 11vw, 156px)' }}
                     >
                       <span
                         aria-hidden
@@ -115,7 +115,8 @@ export function FinanceStack(): React.ReactElement {
                         style={{
                           width: 'auto',
                           height: 'clamp(120px, 10.4vw, 144px)',
-                          filter: 'drop-shadow(0 10px 16px rgba(40, 20, 90, 0.10))',
+                          filter:
+                            'drop-shadow(0 10px 16px rgba(40, 20, 90, 0.10))',
                         }}
                       />
                     </div>

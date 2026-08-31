@@ -179,12 +179,16 @@ export function FinanceOutcomes(): React.ReactElement {
             }}
           >
             Outcomes That{' '}
-            {/* Shared utility rather than an inline gradient: identical stops,
-                but React re-applying the `background` shorthand on update can
-                reset background-clip to border-box when the clip longhands sit
-                beside it in the same style object, which renders the heading as
-                a solid gradient block with the letters knocked out. */}
-            <span className="cs-text-gradient-impact">Drive Impact</span>
+            <span
+              style={{
+                background: 'linear-gradient(-44deg, #2CC1EB 0%, #9A51FF 65%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
+              Drive Impact
+            </span>
           </h2>
         </Reveal>
 

@@ -17,51 +17,17 @@ import { Reveal, RevealItem, RevealStagger } from '@/components/ui/Reveal';
  * (#2F6FED → #1749B8) the reference uses for its own product visuals, same
  * three compositions (laptop + magnifier for CleanSight, container + shield
  * for Images, layered hexagon + shield for Libraries). The CleanSight render
- * carries baked-in UI text ("CleanSight", "Assets", "Containers" — cleanly
- * spelled, unlike most AI text) rather than a code overlay; the two earlier
- * attempts at requesting no text and adding a DOM overlay instead are
+ * (v2) does carry baked-in UI text ("CleanSight", "Assets", "Containers" —
+ * cleanly spelled, unlike most AI text) rather than a code overlay; the two
+ * earlier attempts at requesting no text and adding a DOM overlay instead are
  * superseded now that a clean text render exists.
- *
- * Each render carries its own product's logo, the same mark the homepage
- * PlatformPipeline uses (public/images/cleanstart-factory/*-2.webp),
- * composited into whatever element was generic in that render: the sidebar
- * app icon on the CleanSight laptop, and the badge on the container side and
- * the top layer of the stack. Those badges were previously a stock shield and
- * a stock key, which made all three cards read as the same anonymous product.
- *
- * The marks are drawn as flat single-colour white, not in the logo's own
- * violet-to-cyan gradient. Client feedback on the gradient version: it read as
- * a loud multicoloured sticker pasted onto the product rather than part of it.
- *
- * All three are OPAQUE. Two earlier passes made the container and stack marks
- * translucent so the ribs and sheen showed through, at 30 percent and then at
- * 70. Both read as faded rather than restrained: at card size the mark is only
- * about 60px wide, and translucency there costs legibility without buying any
- * subtlety a viewer can actually perceive. Single colour was the ask; see
- * through was not.
- *
- * The container and stack renders are used at their NATIVE 1536x1024, not
- * downscaled on the way into WebP. Resampling to 1200 visibly softened the thin
- * white linework, which was the other half of why the marks looked faded.
- * Next's optimizer still generates the delivered variants; give it a sharp
- * source and let it do that once, rather than shipping a pre-softened one.
- *
- * The CleanSight sidebar mark is NOT generated. Three attempts at having the
- * image model redraw it produced a different wrong logo each time: an image
- * model cannot reproduce specific artwork at that size, and every retry is a
- * fresh guess rather than a correction. It is instead the real logo asset
- * composited in: the generated mark is painted out by interpolating the
- * sidebar gradient across the patch, then cleansight-2.webp is mapped to white
- * by its own luminance and sheared by 0.0875 dy/dx to sit on the screen plane,
- * a slope measured off the sidebar's top edge in the render. Redo it that way
- * if the render is ever regenerated; do not ask for the logo in the prompt.
  *
  * Card taglines are each product's own real hero copy (CleanSightHero,
  * CleanStartImagesHero, ClearLibrariesHero), not invented for this page.
  * Only the whole card's bottom strip (the name) is a link — matches the
  * "bottom-only clickable" convention already set for the pillar cards below.
- * No separate per-card logo glyph in the DOM: the mark now lives inside the
- * render, where it identifies the product instead of repeating a house logo.
+ * No per-card logo glyph: the same CleanStart mark three times in a row
+ * doesn't distinguish the products, it just repeats.
  */
 
 interface Product {
@@ -74,24 +40,22 @@ interface Product {
 
 const PRODUCTS: readonly [Product, Product, Product] = [
   {
-    image: '/images/financial-services/card-cleansight-v4.webp',
-    imageAlt:
-      'The CleanSight dashboard, badged with the CleanSight product logo, showing discovered assets across containers, images, repositories and vulnerabilities on a world map, with a magnifying glass revealing a verified software component',
+    image: '/images/financial-services/card-cleansight-v2.webp',
+    imageAlt: 'The CleanSight dashboard showing discovered assets across containers, images, repositories and vulnerabilities on a world map, with a magnifying glass revealing a verified software component',
     name: 'CleanSight',
-    tagline:
-      'Discover software assets, dependencies, and inherited risk across modern environments.',
+    tagline: 'Discover software assets, dependencies, and inherited risk across modern environments.',
     href: '/cleansight',
   },
   {
-    image: '/images/financial-services/card-clean-images-v4.webp',
-    imageAlt: 'A shipping container badged with the Clean Images product logo',
+    image: '/images/financial-services/card-clean-images.webp',
+    imageAlt: 'A shipping container marked with a verification shield',
     name: 'Clean Images',
     tagline: 'Hardened, minimal, and secure container images for your applications.',
     href: '/cleanstart-images',
   },
   {
-    image: '/images/financial-services/card-clean-libraries-v4.webp',
-    imageAlt: 'Stacked library modules badged with the Clean Libraries product logo',
+    image: '/images/financial-services/card-clean-libraries.webp',
+    imageAlt: 'Stacked hexagonal library modules marked with a key-and-shield seal',
     name: 'Clean Libraries',
     tagline: 'Secure, trusted libraries and dependencies for your applications.',
     href: '/clean-libraries',
@@ -166,7 +130,8 @@ export function FinanceFoundation(): React.ReactElement {
       data-section="FinanceFoundation"
       className="relative overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, #FDFDFF 96px, #FDFDFF 100%)',
+        background:
+          'linear-gradient(180deg, rgba(255,255,255,0) 0%, #FDFDFF 96px, #FDFDFF 100%)',
       }}
     >
       {/* Shared hex-grid unions + corner glows — the light band's decoration. */}
@@ -266,7 +231,8 @@ export function FinanceFoundation(): React.ReactElement {
                 color: '#111111',
               }}
             >
-              Build with <span className="cs-text-gradient-impact">Confidence</span>
+              Build with{' '}
+              <span className="cs-text-gradient-impact">Confidence</span>
             </h2>
           </Reveal>
 
@@ -371,6 +337,7 @@ export function FinanceFoundation(): React.ReactElement {
           ))}
         </RevealStagger>
 
+
         {/* Powered by CleanStart — the proposal's own divider. */}
         <Reveal delay={0.1} y={18}>
           <div
@@ -435,7 +402,9 @@ export function FinanceFoundation(): React.ReactElement {
         >
           {STEPS.map((step) => (
             <RevealItem key={step.title}>
-              <div className="flex h-full flex-col items-center text-center">
+              <div
+                className="flex h-full flex-col items-center text-center"
+              >
                 <IconSphere icon={step.icon} />
                 <h3
                   style={{

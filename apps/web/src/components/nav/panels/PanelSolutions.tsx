@@ -49,7 +49,6 @@ export function PanelSolutions({ item }: Props) {
   const capability = item.groups.find((g) => g.title === "Capability");
   const compliance = item.groups.find((g) => g.title === "Compliance");
   const byRole = item.groups.find((g) => g.title === "By role");
-  const byIndustry = item.groups.find((g) => g.title === "By industry");
 
   return (
     <PanelShell
@@ -70,19 +69,8 @@ export function PanelSolutions({ item }: Props) {
           )}
         </div>
 
-        {/* Col 2: By Role stacked above By Industry, on the same divider
-            grammar as Col 1. Col 2 held a single two-item group and ran short
-            against Col 1's five, so the second group lands where the panel
-            already had vertical room. */}
-        <div className="flex flex-col gap-3">
-          {byRole && <GroupColumn group={byRole} />}
-          {byIndustry && (
-            <>
-              <div className="h-px bg-white/[0.05]" />
-              <GroupColumn group={byIndustry} />
-            </>
-          )}
-        </div>
+        {/* Col 2: By Role */}
+        {byRole && <GroupColumn group={byRole} />}
 
         {/* Col 3: FIPS featured tile */}
         <HeroTile

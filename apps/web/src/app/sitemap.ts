@@ -108,10 +108,6 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/contact-us' },
   { path: '/deal-registration' },
   { path: '/events' },
-  // The two `/industries/*` pages are intentionally de-listed — both are still
-  // noindex,nofollow pending sign-off. Re-add each when it ships (and drop the
-  // `noindex` / `nofollow` in its page metadata). `/industries` itself has no
-  // page, so there is no hub URL to list either.
   { path: '/fips' },
   { path: '/for-ciso' },
   { path: '/for-developers' },
