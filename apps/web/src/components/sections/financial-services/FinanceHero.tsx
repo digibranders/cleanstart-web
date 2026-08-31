@@ -88,17 +88,13 @@ export function FinanceHero(): React.ReactElement {
       >
         <div
           // The hero artifact is pinned absolute-right and only appears at
-          // xl+ (1280px), not lg. That call was originally forced by a longer
-          // headline that needed three lines everywhere; this copy wraps to
-          // two below xl, so the dead zone that drove the decision no longer
-          // exists and the image could be brought back to lg if the design
-          // wants it. Left at xl deliberately rather than changed as a side
-          // effect of a copy edit.
+          // xl+ (1280px), not lg: 1024-1279px has no width that fits both the
+          // render and this three-line headline without squeezing one of them.
           //
           // At xl+ clamp(580px, 48vw, 670px) is fit to the image's own
-          // measured left edge at each width. Re-verified against this copy:
-          // 3 lines with a 36px gap at 1280, 60px at 1440, 30px at 1920, and
-          // 2 lines with no image rendered at 1100.
+          // measured left edge at each width. Re-verified after the headline
+          // was reinstated: 3 lines at every xl width, no overlap, with a
+          // 159px gap at 1280, 215px at 1440 and 182px at 1920.
           className="relative flex max-w-[700px] flex-col items-center text-center md:items-start md:text-left xl:max-w-[clamp(580px,48vw,670px)]"
         >
           <HeroReveal y={50} duration={1.0} lcp>
@@ -113,11 +109,12 @@ export function FinanceHero(): React.ReactElement {
                 marginBottom: 'clamp(24px, 2.5vw, 36px)',
               }}
             >
-              {/* The SEO team's H1, verbatim. The gradient splits the phrase
-                  rather than adding words, so the rendered text is exactly
-                  "Container Security for Financial Services". */}
-              Container Security for{' '}
-              <span className="cs-text-gradient-impact">Financial Services</span>
+              {/* Client's headline, reinstated over the SEO team's
+                  "Container Security for Financial Services". The title tag
+                  still carries that phrase, so the page keeps the keyword in
+                  the SERP; the H1 no longer contains it. */}
+              Financial Services Move Fast.{' '}
+              <span className="cs-text-gradient-impact">Security Must Keep Up.</span>
             </h1>
           </HeroReveal>
 
@@ -127,8 +124,12 @@ export function FinanceHero(): React.ReactElement {
             duration={0.8}
             className="flex flex-col items-center sm:flex-row md:items-start"
           >
+            {/* Was "Financial Service Brochure" pointing at /resource-center,
+                a stand-in because the proposal named a brochure the client
+                never supplied. Now the same ask the CTA card makes, pointed at
+                a page that exists. */}
             <Link
-              href="/resource-center"
+              href="/contact-us"
               className="cs-btn-blue"
               style={
                 {
@@ -138,7 +139,7 @@ export function FinanceHero(): React.ReactElement {
                 } as React.CSSProperties
               }
             >
-              <span>Financial Service Brochure</span>
+              <span>Talk to a Security Expert</span>
             </Link>
           </HeroReveal>
         </div>
