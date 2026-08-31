@@ -11,6 +11,9 @@ import { SaasDelivery } from '@/components/sections/saas/SaasDelivery';
 import { SaasOutcomes } from '@/components/sections/saas/SaasOutcomes';
 import { SaasCTA } from '@/components/sections/saas/SaasCTA';
 import { buildPageMetadata } from '@/lib/seo/canonical';
+import { breadcrumbSchema } from '@/lib/seo/jsonld';
+import { JsonLdGraph } from '@/components/JsonLdGraph';
+import { getPageGraph } from '@/lib/seo/compose-page';
 
 /*
  * /industries/saas-container-security
@@ -22,10 +25,14 @@ import { buildPageMetadata } from '@/lib/seo/canonical';
  * Renamed from /saas, which never resolved in production (it returned 404
  * there, so no redirect is needed — unlike its sibling, which did resolve).
  *
- * Still noindex,nofollow, out of the sitemap and out of the nav pending copy
- * approval. Unlike its sibling it also has no breadcrumb / JsonLdGraph pair and
- * no pageRegistry row; add both when it is approved to ship, so it emits the
- * same graph every other solutions page does.
+ * Still noindex,nofollow and out of the sitemap pending copy approval, but it
+ * now carries the same breadcrumb + JsonLdGraph pair and pageRegistry row as
+ * its sibling, so it emits the full Organization + WebSite + WebPage +
+ * BreadcrumbList graph. To launch: drop the two flags and add the path to the
+ * sitemap's STATIC_ROUTES. Nothing else is outstanding.
+ *
+ * The breadcrumb is Home > SaaS, with no Industries crumb, because /industries
+ * has no page yet and the crumb would link to a 404.
  *
  * Band rhythm, in order: dark hero, white, tinted, DARK, white, tinted, DARK.
  * Only one dark run reaches the end of the page. The Footer is itself a dark
@@ -43,9 +50,15 @@ export const metadata = buildPageMetadata({
   nofollow: true,
 });
 
-export default function SaasPage(): React.ReactElement {
+export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
+
+export default async function SaasPage(): Promise<React.ReactElement> {
+  const graph = await getPageGraph('/industries/saas-container-security', [
+    breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'SaaS' }]),
+  ]);
   return (
     <>
+      <JsonLdGraph id="saas-container-security-jsonld" graph={graph} />
       <Header />
       <main id="main-content">
         <SaasHero />
