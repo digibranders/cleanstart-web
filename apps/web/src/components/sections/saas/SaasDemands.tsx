@@ -127,9 +127,15 @@ export function SaasDemands(): React.ReactElement {
                 }
                 style={{ paddingRight: 'clamp(0px, 2vw, 28px)' }}
               >
-                <IconSphere icon={demand.icon} />
+                {/* Icon and title centre on the column; the body below stays
+                    left-aligned by request. The wrapper does the centring so
+                    IconSphere keeps its own fixed-size box. */}
+                <div className="flex justify-center">
+                  <IconSphere icon={demand.icon} />
+                </div>
 
                 <h3
+                  className="text-center"
                   style={{
                     margin: 'clamp(16px, 1.6vw, 22px) 0 0',
                     fontFamily: 'var(--font-display)',
