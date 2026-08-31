@@ -108,8 +108,11 @@ export function FinanceHero(): React.ReactElement {
                 marginBottom: 'clamp(24px, 2.5vw, 36px)',
               }}
             >
-              Financial Services Move Fast.{' '}
-              <span className="cs-text-gradient-impact">Security Must Keep Up.</span>
+              {/* The SEO team's H1, verbatim. The gradient splits the phrase
+                  rather than adding words, so the rendered text is exactly
+                  "Container Security for Financial Services". */}
+              Container Security for{' '}
+              <span className="cs-text-gradient-impact">Financial Services</span>
             </h1>
           </HeroReveal>
 

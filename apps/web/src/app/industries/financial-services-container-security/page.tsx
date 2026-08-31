@@ -15,33 +15,52 @@ import { JsonLdGraph } from "@/components/JsonLdGraph";
 import { getPageGraph } from "@/lib/seo/compose-page";
 
 /*
- * /financial-services — live.
+ * /industries/financial-services-container-security
  *
- * Indexable as of the client sign-off: the `noindex`/`nofollow` flags are gone,
- * the route is in the sitemap's STATIC_ROUTES and in nav-config under
- * Solutions › By industry, and it carries the breadcrumb + JsonLdGraph pair
- * every other solutions page uses. /saas is the sibling page and stays
- * noindex until its own copy is approved.
+ * Title, description and H1 are the SEO team's, applied verbatim.
+ *
+ * First page under the /industries segment, with saas-container-security as
+ * its sibling. The segment is the one exception to this site's otherwise flat
+ * routing (every other static page is a single segment, including the
+ * /for-developers + /for-ciso role family) and it is deliberate: two committed
+ * children and a named nav family, same reasoning as /compare.
+ *
+ * NOTE: /industries itself has no page.tsx and therefore 404s. A segment with
+ * no hub is a dead end for anyone who truncates the URL, and it forfeits the
+ * main SEO argument for nesting — a hub that ranks for the category term and
+ * passes equity down. The breadcrumb is Home > this page for that reason; add
+ * an Industries crumb only once the hub exists, or it links to a 404.
+ *
+ * Renamed from /financial-services while that URL was still noindex, unlinked
+ * and absent from the sitemap in production, so no ranking moved. A 301 from
+ * the old path is registered in the CMS `redirects` collection anyway, since
+ * it resolved publicly for a while and may sit in a bookmark or an inbox.
+ *
+ * Still noindex,nofollow and out of the sitemap by request, as is its sibling.
+ * To launch: drop the two flags here and add the path to the sitemap's
+ * STATIC_ROUTES. The breadcrumb, JsonLdGraph and pageRegistry row are already
+ * in place, so nothing else is needed.
  */
 export const metadata = buildPageMetadata({
-  title:
-    "Secure Software Foundations for Financial Institutions | CleanStart",
+  title: "Container Security for Financial Services | CleanStart",
   absoluteTitle: true,
   description:
-    "Verified container images and hardened open-source libraries for regulated financial software: SLSA Level 3 provenance, signed SBOMs, and FIPS 140-3 crypto.",
-  path: "/financial-services",
+    "Secure financial services workloads with hardened container images, near-zero CVEs, SBOMs, signed provenance, and continuous container security.",
+  path: "/industries/financial-services-container-security",
   eyebrow: "Solutions",
+  noindex: true,
+  nofollow: true,
 });
 
 export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
 
 export default async function FinancialServicesPage(): Promise<React.ReactElement> {
-  const graph = await getPageGraph("/financial-services", [
+  const graph = await getPageGraph("/industries/financial-services-container-security", [
     breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Financial Services" }]),
   ]);
   return (
     <>
-      <JsonLdGraph id="financial-services-jsonld" graph={graph} />
+      <JsonLdGraph id="financial-services-container-security-jsonld" graph={graph} />
       <Header />
       <main id="main-content">
         <FinanceHero />

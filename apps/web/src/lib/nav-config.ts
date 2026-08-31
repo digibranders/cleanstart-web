@@ -158,22 +158,29 @@ export const NAV_TREE: NavItem[] = [
         ],
       },
       {
-        // /financial-services still carries noindex,nofollow and is absent from
-        // the sitemap and the JSON-LD graph. Linking it here makes it reachable
-        // by people without making it indexable — a deliberate soft launch, not
-        // an oversight. Lift the flags on the page and add the
-        // breadcrumb/JsonLdGraph pair when the client signs the copy off.
+        // Both /industries/* pages still carry noindex,nofollow and are absent
+        // from the sitemap. Linking them here makes them reachable by people
+        // without making them indexable — a deliberate soft launch, not an
+        // oversight. Lift the flags on each page and add its path to the
+        // sitemap's STATIC_ROUTES when the client signs that page's copy off.
         //
-        // /saas is deliberately NOT listed. It exists at the route and is
-        // noindex,nofollow like this one, but it stays reachable by direct URL
-        // only until its copy is approved.
+        // Labels stay short. The pages are titled "Container Security for
+        // Financial Services" / "…for SaaS Companies" for search, but repeating
+        // "Container Security" on both rows of one group reads as a stutter and
+        // buys nothing: the nav is navigation, not a ranking surface.
         title: "By industry",
         items: [
           {
             label: "Financial Services",
-            href: "/financial-services",
+            href: "/industries/financial-services-container-security",
             description: "Verified components for regulated financial software.",
             icon: "bank",
+          },
+          {
+            label: "SaaS",
+            href: "/industries/saas-container-security",
+            description: "Ship faster on a verified software foundation.",
+            icon: "cloud",
           },
         ],
       },

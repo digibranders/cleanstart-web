@@ -141,6 +141,11 @@ export const glyphs: Record<string, ReactNode> = {
       <path d="M3.5 21h17" />
     </>
   ),
+  cloud: (
+    <>
+      <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+    </>
+  ),
   star: <polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9 12 2" />,
   mail: (
     <>

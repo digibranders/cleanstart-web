@@ -13,34 +13,31 @@ import { SaasCTA } from '@/components/sections/saas/SaasCTA';
 import { buildPageMetadata } from '@/lib/seo/canonical';
 
 /*
- * /saas — first draft.
+ * /industries/saas-container-security
  *
- * Unlinked and noindex,nofollow on purpose, same as /financial-services: not in
- * nav-config, not in the sitemap, no JSON-LD graph yet — reachable only by
- * direct URL. Drop the `noindex`/`nofollow` flags, add the breadcrumb and
- * JsonLdGraph pair the other solutions pages use, and register the route in
- * nav-config + docs/web/WEB-PAGES.md when it is approved to ship.
+ * Title, description and H1 are the SEO team's, applied verbatim. Sibling to
+ * financial-services-container-security under the /industries segment; see that
+ * file for why the segment exists and why /industries itself still 404s.
  *
- * The slug is cheap to change while the page is unindexed and unlinked, and
- * expensive afterwards — renaming a route segment post-launch breaks every
- * indexed URL. Settle it before the noindex flags come off.
+ * Renamed from /saas, which never resolved in production (it returned 404
+ * there, so no redirect is needed — unlike its sibling, which did resolve).
+ *
+ * Still noindex,nofollow, out of the sitemap and out of the nav pending copy
+ * approval. Unlike its sibling it also has no breadcrumb / JsonLdGraph pair and
+ * no pageRegistry row; add both when it is approved to ship, so it emits the
+ * same graph every other solutions page does.
  *
  * Band rhythm, in order: dark hero, white, tinted, DARK, white, tinted, DARK.
  * Only one dark run reaches the end of the page. The Footer is itself a dark
  * gradient, so a second dark section before Outcomes would stack three dark
  * blocks into the close; the two light sections are separated by value instead.
  */
-/*
- * Title and description are assembled from the proposal's own lines rather than
- * written fresh, so the page claims nothing in a search result that it does not
- * claim on the page itself.
- */
 export const metadata = buildPageMetadata({
-  title: 'CleanStart for SaaS | Modern Applications Move Faster',
+  title: 'Container Security for SaaS Companies | CleanStart',
   absoluteTitle: true,
   description:
-    'Start development with verified components built for secure delivery. Enable secure development practices without slowing engineering velocity.',
-  path: '/saas',
+    'Protect SaaS applications with hardened container images, near-zero CVEs, SBOMs, signed provenance, and continuous software supply chain visibility.',
+  path: '/industries/saas-container-security',
   eyebrow: 'Solutions',
   noindex: true,
   nofollow: true,

@@ -123,8 +123,11 @@ export function SaasHero(): React.ReactElement {
                 marginBottom: 'clamp(24px, 2.5vw, 36px)',
               }}
             >
-              Modern Applications Move Faster.{' '}
-              <span className="cs-text-gradient-impact">Security Must Keep Up.</span>
+              {/* The SEO team's H1, verbatim. The gradient splits the phrase
+                  rather than adding words, so the rendered text is exactly
+                  "Container Security for SaaS Companies". */}
+              Container Security for{' '}
+              <span className="cs-text-gradient-impact">SaaS Companies</span>
             </h1>
           </HeroReveal>
 
