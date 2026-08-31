@@ -64,18 +64,27 @@ export function SaasHero(): React.ReactElement {
         style={{ maxWidth: 'var(--container-default)', height: '100%' }}
       >
         <div
-          className="absolute right-0"
+          className="absolute"
           style={{
-            // Sits above centre rather than on it. The section's bottom fade is
-            // 200px deep, and dead-centring the render pushes the platform it
-            // stands on into that wash — which is where the composition lands.
-            top: '44%',
+            // Inset to the SAME 40px the content column is padded by, not
+            // `right-0`. The wrapper is capped at --container-default while the
+            // copy sits inside px-10, so right-0 hung the render 40px past the
+            // text's mirror line and it read as escaping the grid.
+            right: '40px',
+            // Retuned for the two-line headline. The previous 44% / 540px pair
+            // was fitted to a three-line one; against the shorter headline it
+            // left a 352px hole in the middle of the composition and the render
+            // had no weight to answer the copy with.
+            //
+            // Measured at 1440: hero 627 tall, header bottom at 73, bottom fade
+            // starting at 427. 580px puts the render at 531 tall spanning
+            // 35..567 — the top tucks under the nav by 38px and the platform
+            // grounds into the fade, both of which read as intentional depth.
+            // Past ~600px the panel climbs far enough to collide with the logo
+            // row, which does not.
+            top: '48%',
             transform: 'translateY(-50%)',
-            // The render is near-square (1.09) where the first pass was
-            // landscape, so the width budget is set by HEIGHT, not width: wider
-            // than ~540px pushes the panel up behind the header and drops the
-            // platform into the bottom fade.
-            width: 'clamp(430px, 38vw, 540px)',
+            width: 'clamp(430px, 40vw, 580px)',
             aspectRatio: '1234 / 1130',
           }}
         >
