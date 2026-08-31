@@ -60,7 +60,11 @@ export function GuideDetailFAQ({
   if (!faqs.length) return null;
 
   return (
-    <section className="relative w-full bg-white" data-section="GuideDetailFAQ">
+    // -mt-12 pulls the FAQ up against GuideDetailContent's pb-28 so the gap
+    // above the heading lands at 64px — matching the Author-card boundary blogs
+    // get — instead of the full 112px. The pb values themselves must not change:
+    // the trailing-buffer branches in guide/[slug]/page.tsx subtract them.
+    <section className="relative w-full bg-white -mt-12" data-section="GuideDetailFAQ">
       <div className="relative mx-auto max-w-[1120px] px-6 pb-20">
         <div className="relative flex gap-12">
           {/* Spacer matches the TOC sidebar width so the FAQ aligns with the article body. */}
