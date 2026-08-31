@@ -144,7 +144,7 @@ export function SaasHero(): React.ReactElement {
             y={30}
             delay={0.2}
             duration={0.8}
-            className="flex flex-col items-center gap-4 sm:flex-row md:items-start"
+            className="flex flex-col items-center sm:flex-row md:items-start"
           >
             <Link
               href="/contact-us"
@@ -158,24 +158,6 @@ export function SaasHero(): React.ReactElement {
               }
             >
               <span>Talk to an Expert</span>
-            </Link>
-
-            {/* The proposal pairs the primary CTA with a "Video" button but
-                names no asset for it. Pointed at the resource centre so the
-                button resolves somewhere real rather than nowhere; repoint it
-                at the video when the client supplies one. */}
-            <Link
-              href="/resource-center"
-              className="cs-btn-glass"
-              style={
-                {
-                  '--cs-btn-h': '44px',
-                  '--cs-btn-px': '24px',
-                  '--cs-btn-fs': '16px',
-                } as React.CSSProperties
-              }
-            >
-              <span>Video</span>
             </Link>
           </HeroReveal>
         </div>

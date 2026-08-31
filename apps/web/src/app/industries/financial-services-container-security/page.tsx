@@ -36,10 +36,10 @@ import { getPageGraph } from "@/lib/seo/compose-page";
  * the old path is registered in the CMS `redirects` collection anyway, since
  * it resolved publicly for a while and may sit in a bookmark or an inbox.
  *
- * Still noindex,nofollow and out of the sitemap by request, as is its sibling.
- * To launch: drop the two flags here and add the path to the sitemap's
- * STATIC_ROUTES. The breadcrumb, JsonLdGraph and pageRegistry row are already
- * in place, so nothing else is needed.
+ * Launched: the noindex,nofollow pair is dropped and the path is listed in the
+ * sitemap's STATIC_ROUTES. The breadcrumb, JsonLdGraph and pageRegistry row
+ * were already in place. Its sibling /industries/saas-container-security stays
+ * noindex,nofollow and unlisted, pending sign-off on its copy.
  */
 export const metadata = buildPageMetadata({
   title: "Container Security for Financial Services | CleanStart",
@@ -48,8 +48,6 @@ export const metadata = buildPageMetadata({
     "Secure financial services workloads with hardened container images, near-zero CVEs, SBOMs, signed provenance, and continuous container security.",
   path: "/industries/financial-services-container-security",
   eyebrow: "Solutions",
-  noindex: true,
-  nofollow: true,
 });
 
 export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
