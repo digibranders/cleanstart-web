@@ -52,7 +52,10 @@ const DEMANDS: readonly [Demand, Demand, Demand, Demand] = [
     body: 'Limit exposure with secure software components.',
   },
   {
-    icon: '/images/for-developers/workflows/icon-sboms.svg',
+    // Was icon-sboms.svg, which reads as a package rather than as seeing.
+    // maturity-icon-monitor is the same filled family as the harden icon two
+    // rows up, so it matches the set as well as the label.
+    icon: '/images/fips/maturity-icon-monitor.svg',
     title: 'Improve Visibility',
     body: 'Know what enters your software supply chain.',
   },
@@ -119,23 +122,24 @@ export function SaasDemands(): React.ReactElement {
         <RevealStagger className="grid grid-cols-1 gap-y-10 sm:grid-cols-2 sm:gap-x-10 lg:grid-cols-4 lg:gap-x-0">
           {DEMANDS.map((demand, i) => (
             <RevealItem key={demand.title} className="min-w-0">
+              {/* All three elements share one centre axis. An earlier pass
+                  centred the icon and title over a left-aligned body, which
+                  read as a mistake rather than a choice.
+
+                  Padding is symmetric (lg:px-8 on every column, not lg:pl-8 on
+                  the bordered ones plus a right-only inline value): centred
+                  content in an asymmetrically padded box sits off the column's
+                  true centre. */}
               <div
                 className={
                   i > 0
-                    ? 'flex flex-col lg:border-l lg:border-[rgba(17,17,17,0.08)] lg:pl-8'
-                    : 'flex flex-col'
+                    ? 'flex flex-col items-center text-center lg:border-l lg:border-[rgba(17,17,17,0.08)] lg:px-8'
+                    : 'flex flex-col items-center text-center lg:px-8'
                 }
-                style={{ paddingRight: 'clamp(0px, 2vw, 28px)' }}
               >
-                {/* Icon and title centre on the column; the body below stays
-                    left-aligned by request. The wrapper does the centring so
-                    IconSphere keeps its own fixed-size box. */}
-                <div className="flex justify-center">
-                  <IconSphere icon={demand.icon} />
-                </div>
+                <IconSphere icon={demand.icon} />
 
                 <h3
-                  className="text-center"
                   style={{
                     margin: 'clamp(16px, 1.6vw, 22px) 0 0',
                     fontFamily: 'var(--font-display)',
