@@ -141,6 +141,10 @@ export const glyphs: Record<string, ReactNode> = {
       <path d="M3.5 21h17" />
     </>
   ),
+  // Currently unreferenced: the Solutions > By industry > SaaS row is commented
+  // out in nav-config until that page's copy is approved. Kept rather than
+  // deleted because it has already been removed and re-added twice as that row
+  // came and went.
   cloud: (
     <>
       <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />

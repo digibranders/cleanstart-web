@@ -45,8 +45,13 @@ export function FinanceHero(): React.ReactElement {
         style={{ maxWidth: 'var(--container-default)', height: '100%' }}
       >
         <div
-          className="absolute right-0"
+          className="absolute"
           style={{
+            // Inset to the SAME 40px the content column is padded by, not
+            // `right-0`. The wrapper is capped at --container-default while the
+            // copy sits inside px-10, so right-0 hung the render 40px past the
+            // text's mirror line and it read as escaping the grid.
+            right: '40px',
             top: '50%',
             transform: 'translateY(-50%)',
             width: 'clamp(480px, 46vw, 700px)',
