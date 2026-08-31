@@ -108,7 +108,11 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/contact-us' },
   { path: '/deal-registration' },
   { path: '/events' },
+  { path: '/financial-services' },
   { path: '/fips' },
+  // `/saas` is intentionally de-listed — the copy is not signed off yet, so the
+  // page is noindex,nofollow, absent from the nav and excluded here. Re-add when
+  // it ships (and drop the `noindex` / `nofollow` in its page metadata).
   { path: '/for-ciso' },
   { path: '/for-developers' },
   { path: '/guide' },

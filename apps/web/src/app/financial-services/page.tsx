@@ -10,15 +10,18 @@ import { FinanceRequirements } from "@/components/sections/financial-services/Fi
 import { FinanceOutcomes } from "@/components/sections/financial-services/FinanceOutcomes";
 import { FinanceCTA } from "@/components/sections/financial-services/FinanceCTA";
 import { buildPageMetadata } from "@/lib/seo/canonical";
+import { breadcrumbSchema } from "@/lib/seo/jsonld";
+import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { getPageGraph } from "@/lib/seo/compose-page";
 
 /*
- * /financial-services — first draft.
+ * /financial-services — live.
  *
- * Unlinked and noindex,nofollow on purpose: the page is not in nav-config, not
- * in the sitemap, and carries no JSON-LD graph yet — reachable only by direct
- * URL. Drop the `noindex`/`nofollow` flags, add the breadcrumb/JsonLdGraph pair
- * the other solutions pages use, and register the route in nav-config +
- * docs/web/WEB-PAGES.md when it is approved to ship.
+ * Indexable as of the client sign-off: the `noindex`/`nofollow` flags are gone,
+ * the route is in the sitemap's STATIC_ROUTES and in nav-config under
+ * Solutions › By industry, and it carries the breadcrumb + JsonLdGraph pair
+ * every other solutions page uses. /saas is the sibling page and stays
+ * noindex until its own copy is approved.
  */
 export const metadata = buildPageMetadata({
   title:
@@ -28,13 +31,17 @@ export const metadata = buildPageMetadata({
     "Verified container images and hardened open-source libraries for regulated financial software: SLSA Level 3 provenance, signed SBOMs, and FIPS 140-3 crypto.",
   path: "/financial-services",
   eyebrow: "Solutions",
-  noindex: true,
-  nofollow: true,
 });
 
-export default function FinancialServicesPage(): React.ReactElement {
+export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
+
+export default async function FinancialServicesPage(): Promise<React.ReactElement> {
+  const graph = await getPageGraph("/financial-services", [
+    breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Financial Services" }]),
+  ]);
   return (
     <>
+      <JsonLdGraph id="financial-services-jsonld" graph={graph} />
       <Header />
       <main id="main-content">
         <FinanceHero />

@@ -108,7 +108,10 @@ export function SaasCTA(): React.ReactElement {
         }}
       />
 
-      {/* Decorative violet cube — bottom-left corner of the card. */}
+      {/* Decorative violet cube — bottom-RIGHT corner. It used to sit
+          bottom-left, where it ran under the headline's last line. The right
+          side of the card is clear below the button, so the cube reads as
+          decoration there instead of as something behind the text. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
@@ -116,10 +119,10 @@ export function SaasCTA(): React.ReactElement {
         alt=""
         className="pointer-events-none absolute hidden select-none lg:block"
         style={{
-          left: '-40px',
-          bottom: '-40px',
-          width: '220px',
-          height: '220px',
+          right: '-60px',
+          bottom: '-50px',
+          width: '170px',
+          height: '170px',
           objectFit: 'contain',
           opacity: 0.5,
           zIndex: 3,
@@ -128,15 +131,15 @@ export function SaasCTA(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Decorative violet cube — bottom-right corner, below md only. The
-          desktop cube above sits bottom-LEFT, which is under the headline at
-          narrow widths. */}
+      {/* Smaller cube for the stacked layout. `lg:hidden` rather than
+          `md:hidden`: the large cube above is `lg:block`, so gating this one at
+          md left 768-1023px with no cube at all. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
         src="/images/vulnerability-remediation/cta-cube.webp"
         alt=""
-        className="pointer-events-none absolute select-none md:hidden"
+        className="pointer-events-none absolute select-none lg:hidden"
         style={{
           right: '-24px',
           bottom: '-24px',

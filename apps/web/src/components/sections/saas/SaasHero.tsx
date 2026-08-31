@@ -46,6 +46,13 @@ export function SaasHero(): React.ReactElement {
         decoding="async"
       />
 
+      {/* Deliberately NOT `priority`. Next emits a `<link rel=preload as=image>`
+          for a priority image with no `media` attribute, but this wrapper is
+          `hidden xl:block`, so every phone and tablet was preloading a hero it
+          never paints. It is also decorative (aria-hidden) and is not the LCP
+          element: the H1 below carries the `lcp` prop for that. Without
+          `priority` it still loads promptly at xl, because a lazy image already
+          inside the viewport is fetched immediately. */}
       {/* Hero artifact, pinned right and only at xl+. Below 1280px there is no
           width that holds both the render and the headline without one of them
           being squeezed, and shrinking the render past its floor turns the
@@ -78,7 +85,6 @@ export function SaasHero(): React.ReactElement {
             fill
             sizes="(min-width: 1440px) 540px, 38vw"
             className="object-contain"
-            priority
           />
         </div>
       </div>

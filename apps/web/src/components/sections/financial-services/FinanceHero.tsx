@@ -27,6 +27,13 @@ export function FinanceHero(): React.ReactElement {
         decoding="async"
       />
 
+      {/* Deliberately NOT `priority`. Next emits a `<link rel=preload as=image>`
+          for a priority image with no `media` attribute, but this wrapper is
+          `hidden xl:block`, so every phone and tablet was preloading a hero it
+          never paints. It is also decorative (aria-hidden) and is not the LCP
+          element: the H1 below carries the `lcp` prop for that. Without
+          `priority` it still loads promptly at xl, because a lazy image already
+          inside the viewport is fetched immediately. */}
       {/* Commissioned hero artifact (v3): a financial analytics dashboard with
           a magnifying glass inspecting a verified, shielded container. Ships a
           real alpha channel (confirmed 0,0,0,0 at all four corners), so it
@@ -52,7 +59,6 @@ export function FinanceHero(): React.ReactElement {
             fill
             sizes="(min-width: 1440px) 700px, 46vw"
             className="object-contain"
-            priority
           />
         </div>
       </div>
