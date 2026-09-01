@@ -83,9 +83,13 @@ describe('SaasShiftLeft', () => {
     const iconPlateRule = stylesheet.match(/\.coreWindow::after\s*{([^}]*)}/)?.[1] ?? '';
     const stageIconRule = stylesheet.match(/\.stageIcon\s*{([^}]*)}/)?.[1] ?? '';
 
+    expect(coreLineRule).toContain('position: absolute');
     expect(coreLineRule).toContain('z-index: 0');
+    expect(iconPlateRule).toContain('position: absolute');
     expect(iconPlateRule).toContain('z-index: 1');
-    expect(iconPlateRule).toContain('background: radial-gradient');
+    expect(iconPlateRule).toContain('#0c3548 0%');
+    expect(iconPlateRule).toContain('#051725 100%');
+    expect(stageIconRule).toContain('position: relative');
     expect(stageIconRule).toContain('z-index: 2');
   });
 
