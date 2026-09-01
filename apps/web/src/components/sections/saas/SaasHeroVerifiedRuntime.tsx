@@ -156,6 +156,42 @@ function Slab({ cx, cy, halfW, halfD, thick, edge, ribs = 0 }: SlabProps): React
   );
 }
 
+/*
+ * Base-layer treatment. The bottom layer is the hardened BASE IMAGE, and it
+ * should look like the sealed foundation the rest is built on.
+ *
+ * Software vocabulary only. An earlier pass put shipping-container corner
+ * castings here, which was the wrong register entirely: this is a container
+ * image, not cargo, and literal freight hardware makes it a box of goods. So
+ * the signals are a digest strip — the short run of uneven marks that reads as
+ * a content hash, which is what actually identifies and pins an image — and a
+ * violet underglow tying the base to the verified seal in front of it.
+ */
+function BaseTreatment({ cy }: { cy: number }): React.ReactElement {
+  const l: Point = { x: CX - HALF_W, y: cy };
+  const b: Point = { x: CX, y: cy + HALF_D };
+  const widths = [7, 4, 9, 5, 6, 3, 8, 5, 4, 7];
+
+  return (
+    <g>
+      {widths.map((w, i) => {
+        const f = 0.12 + (i / widths.length) * 0.76;
+        return (
+          <rect
+            key={`${w}-${f}`}
+            x={l.x + (b.x - l.x) * f}
+            y={l.y + (b.y - l.y) * f + THICK * 0.52}
+            width={w}
+            height={3.4}
+            rx={1.2}
+            fill="rgba(255,255,255,0.34)"
+          />
+        );
+      })}
+    </g>
+  );
+}
+
 /** A dim two-layer stack: one more image in the catalogue, and frame ballast. */
 function Satellite({ cx, cy, scale }: { cx: number; cy: number; scale: number }) {
   const halfW = 46 * scale;
@@ -288,6 +324,11 @@ export function SaasHeroVerifiedRuntime(): React.ReactElement {
         </radialGradient>
         {/* Fades the dot field out at the frame edges so it stops rather than
             being sliced off by the viewBox. */}
+        <radialGradient id="csr-base-glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#9a51ff" stopOpacity="0.55" />
+          <stop offset="60%" stopColor="#7c34e8" stopOpacity="0.20" />
+          <stop offset="100%" stopColor="#7c34e8" stopOpacity="0" />
+        </radialGradient>
         <radialGradient id="csr-field-mask" cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor="#ffffff" stopOpacity="1" />
           <stop offset="62%" stopColor="#ffffff" stopOpacity="0.55" />
@@ -328,6 +369,16 @@ export function SaasHeroVerifiedRuntime(): React.ReactElement {
         <Satellite cx={470} cy={232} scale={0.86} />
       </g>
 
+      {/* Seals the foundation visually: the base sits in the same violet the
+          verified mark uses, so the two read as one statement. */}
+      <ellipse
+        cx={CX}
+        cy={bottomLayerY + HALF_D + THICK - 4}
+        rx={HALF_W * 0.92}
+        ry={26}
+        fill="url(#csr-base-glow)"
+      />
+
       {/* Bottom layer drawn first so each upper layer occludes the one beneath,
           which is what gives the stack its depth order. */}
       <g className="cs-hero-band" style={{ animationDelay: '120ms' }}>
@@ -345,6 +396,7 @@ export function SaasHeroVerifiedRuntime(): React.ReactElement {
         ))}
 
         <TopSurface cy={TOP_LAYER_Y} />
+        <BaseTreatment cy={bottomLayerY} />
 
         {/* Verified seal, straddling the stack's front corner so it reads as
             applied to the whole image rather than to one layer. */}
