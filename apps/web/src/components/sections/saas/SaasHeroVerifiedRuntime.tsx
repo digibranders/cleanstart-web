@@ -53,6 +53,8 @@ const THICK = 28;
     between layers, which is what stops the stack reading as one solid box. */
 const LAYER_Y = [242, 276, 310] as const;
 
+const TOP_LAYER_Y = LAYER_Y[0];
+
 const APP_X = 146;
 const APP_Y = 44;
 const APP_W = 250;
@@ -82,9 +84,12 @@ interface SlabProps {
   readonly halfD: number;
   readonly thick: number;
   readonly edge: string;
+  /** Corrugation ribs per visible side face. 0 for the dim satellites, where
+      they would only turn to mush at the rendered size. */
+  readonly ribs?: number;
 }
 
-function Slab({ cx, cy, halfW, halfD, thick, edge }: SlabProps): React.ReactElement {
+function Slab({ cx, cy, halfW, halfD, thick, edge, ribs = 0 }: SlabProps): React.ReactElement {
   const t: Point = { x: cx, y: cy - halfD };
   const r: Point = { x: cx + halfW, y: cy };
   const b: Point = { x: cx, y: cy + halfD };
@@ -111,6 +116,38 @@ function Slab({ cx, cy, halfW, halfD, thick, edge }: SlabProps): React.ReactElem
         stroke="rgba(255,255,255,0.18)"
         strokeWidth={1.2}
       />
+      {/* Corrugation. This is the single strongest cue that the object is a
+          CONTAINER rather than a stack of slabs — the same ribbing the Clean
+          Images artifact uses elsewhere on the site. Vertical on screen because
+          the isometric projection maps height straight down. */}
+      {Array.from({ length: Math.max(0, ribs - 1) }, (_, i) => {
+        const f = (i + 1) / ribs;
+        const lx = l.x + (b.x - l.x) * f;
+        const ly = l.y + (b.y - l.y) * f;
+        const rx = b.x + (r.x - b.x) * f;
+        const ry = b.y + (r.y - b.y) * f;
+        return (
+          <g key={f}>
+            <line
+              x1={lx}
+              y1={ly}
+              x2={lx}
+              y2={ly + thick}
+              stroke="rgba(255,255,255,0.13)"
+              strokeWidth={1}
+            />
+            <line
+              x1={rx}
+              y1={ry}
+              x2={rx}
+              y2={ry + thick}
+              stroke="rgba(255,255,255,0.13)"
+              strokeWidth={1}
+            />
+          </g>
+        );
+      })}
+
       {/* Leading edges catch the light and separate one layer from the next;
           without them the stack flattens into a single mass. */}
       <line x1={l.x} y1={l.y} x2={b.x} y2={b.y} stroke={edge} strokeWidth={1.2} />
@@ -141,6 +178,64 @@ function Satellite({ cx, cy, scale }: { cx: number; cy: number; scale: number })
   );
 }
 
+/*
+ * Surface treatment for the one visible top face.
+ *
+ * Deliberately NOT a logo. This is the top of a container IMAGE, and a mark
+ * stamped on it turns the object into branded packaging, which is both a
+ * cheaper read and the 3D-render-with-logo look the client rejected. The app
+ * window also covers the middle of this face, so a centred graphic would be
+ * half-occluded and look like a bug.
+ *
+ * Left flat, though, the face read as unfinished rather than restrained — a
+ * material with no surface. An isometric grid (echoing the hero's own gridline
+ * overlay, so it stays on-system), an inset edge line for craft, and a soft
+ * sheen give it substance without adding a message.
+ */
+function TopSurface({ cy }: { cy: number }): React.ReactElement {
+  const t: Point = { x: CX, y: cy - HALF_D };
+  const r: Point = { x: CX + HALF_W, y: cy };
+  const b: Point = { x: CX, y: cy + HALF_D };
+  const l: Point = { x: CX - HALF_W, y: cy };
+
+  // Barycentric-ish walk across the rhombus: P = T + a·(T→R) + k·(T→L).
+  const at = (a: number, k: number): Point => ({
+    x: t.x + a * HALF_W - k * HALF_W,
+    y: t.y + a * HALF_D + k * HALF_D,
+  });
+  const inset = (p: Point): Point => ({
+    x: CX + (p.x - CX) * 0.9,
+    y: cy + (p.y - cy) * 0.9,
+  });
+
+  const steps = [1 / 6, 2 / 6, 3 / 6, 4 / 6, 5 / 6];
+  const line = (from: Point, to: Point, key: string) => (
+    <line
+      key={key}
+      x1={from.x}
+      y1={from.y}
+      x2={to.x}
+      y2={to.y}
+      stroke="rgba(255,255,255,0.10)"
+      strokeWidth={1}
+    />
+  );
+
+  return (
+    <g clipPath="url(#csr-topface)">
+      {steps.map((v) => line(at(v, 0), at(v, 1), `a${v}`))}
+      {steps.map((v) => line(at(0, v), at(1, v), `k${v}`))}
+      <polygon points={poly(t, r, b, l)} fill="url(#csr-sheen)" />
+      <polygon
+        points={poly(inset(t), inset(r), inset(b), inset(l))}
+        fill="none"
+        stroke="rgba(255,255,255,0.17)"
+        strokeWidth={1}
+      />
+    </g>
+  );
+}
+
 /** Deterministic is not needed here — the grid is a fixed lattice. */
 function DotField(): React.ReactElement {
   const dots: React.ReactElement[] = [];
@@ -153,7 +248,6 @@ function DotField(): React.ReactElement {
 }
 
 export function SaasHeroVerifiedRuntime(): React.ReactElement {
-  const topLayerY = LAYER_Y[0] ?? 242;
   const bottomLayerY = LAYER_Y[LAYER_Y.length - 1] ?? 310;
 
   return (
@@ -199,6 +293,21 @@ export function SaasHeroVerifiedRuntime(): React.ReactElement {
           <stop offset="62%" stopColor="#ffffff" stopOpacity="0.55" />
           <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
         </radialGradient>
+        <linearGradient id="csr-sheen" x1="10%" y1="0%" x2="90%" y2="100%">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.16" />
+          <stop offset="52%" stopColor="#ffffff" stopOpacity="0.03" />
+          <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+        </linearGradient>
+        <clipPath id="csr-topface">
+          <polygon
+            points={poly(
+              { x: CX, y: TOP_LAYER_Y - HALF_D },
+              { x: CX + HALF_W, y: TOP_LAYER_Y },
+              { x: CX, y: TOP_LAYER_Y + HALF_D },
+              { x: CX - HALF_W, y: TOP_LAYER_Y },
+            )}
+          />
+        </clipPath>
         <mask id="csr-field">
           <rect x="0" y="0" width={VIEW_W} height={VIEW_H} fill="url(#csr-field-mask)" />
         </mask>
@@ -230,9 +339,12 @@ export function SaasHeroVerifiedRuntime(): React.ReactElement {
             halfW={HALF_W}
             halfD={HALF_D}
             thick={THICK}
-            edge={cy === topLayerY ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.32)'}
+            ribs={8}
+            edge={cy === TOP_LAYER_Y ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.32)'}
           />
         ))}
+
+        <TopSurface cy={TOP_LAYER_Y} />
 
         {/* Verified seal, straddling the stack's front corner so it reads as
             applied to the whole image rather than to one layer. */}
@@ -249,7 +361,7 @@ export function SaasHeroVerifiedRuntime(): React.ReactElement {
         </g>
       </g>
 
-      <ellipse cx={CX} cy={topLayerY - HALF_D + 18} rx={112} ry={24} fill="url(#csr-contact)" />
+      <ellipse cx={CX} cy={TOP_LAYER_Y - HALF_D + 18} rx={112} ry={24} fill="url(#csr-contact)" />
 
       {/* SaaS application — the context. Tenants, not charts. */}
       <g className="cs-hero-band" style={{ animationDelay: '300ms' }}>
