@@ -1,646 +1,633 @@
+/*
+ * "Move Beyond Shift Left" pipeline.
+ *
+ * ONE deck, not three nested shells. The previous stylesheet wrapped the diagram
+ * in an outer surface, a route stack and a per-stage housing, each with its own
+ * border and background, which is why it read as boxes inside boxes. There is a
+ * single container now and the stages sit directly on it.
+ *
+ * Colour is rationed, because it carries the whole idea:
+ *   - GREEN belongs to the incoming Verified Components, the junction they lock
+ *     into, and the assurance that then travels the track. Nothing else.
+ *   - Every pipeline stage, Security Review included, shares one neutral
+ *     treatment. Colouring Security Review separately was what made it look like
+ *     a different system bolted on the end rather than the last stage of the
+ *     same pipeline.
+ *
+ * Every animation runs on the SAME period (--cycle) and differs only by delay.
+ * Mixed durations resynchronise at their lowest common multiple, which reads as
+ * a fault rather than a loop.
+ */
+
 .stage {
   width: 100%;
-  max-width: 1120px;
-  margin-inline: auto;
+  --cycle: 7s;
 }
 
-.desktopSurface {
-  display: none;
-}
+/* ---------- The deck ---------- */
 
-.mobileSurface {
-  display: grid;
-}
-
-.mobileVerifiedCard {
+.deck {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(151, 182, 235, 0.2);
-  border-radius: 22px;
+  padding: clamp(30px, 3.4vw, 52px) clamp(20px, 2.8vw, 44px);
+  border-radius: clamp(20px, 2.2vw, 28px);
+  border: 1px solid rgba(146, 180, 244, 0.16);
   background:
-    linear-gradient(rgba(118, 159, 218, 0.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(118, 159, 218, 0.055) 1px, transparent 1px),
-    linear-gradient(155deg, rgba(18, 29, 57, 0.96) 0%, rgba(6, 12, 29, 0.98) 100%);
-  background-size: 34px 34px, 34px 34px, auto;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 24px 50px rgba(3, 7, 21, 0.3);
+    radial-gradient(120% 140% at 8% 0%, rgba(45, 212, 160, 0.07) 0%, transparent 46%),
+    linear-gradient(180deg, rgba(16, 24, 66, 0.72) 0%, rgba(8, 12, 40, 0.62) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(196, 218, 255, 0.09),
+    0 34px 80px -40px rgba(2, 6, 28, 0.95);
 }
 
-.mobileVerifiedCard {
-  padding: 24px 18px 28px;
-  border-color: rgba(103, 227, 213, 0.3);
-  background:
-    radial-gradient(circle at 50% 12%, rgba(44, 193, 235, 0.17), transparent 32%),
-    linear-gradient(rgba(118, 159, 218, 0.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(118, 159, 218, 0.055) 1px, transparent 1px),
-    linear-gradient(155deg, rgba(12, 31, 55, 0.97) 0%, rgba(4, 15, 29, 0.99) 100%);
-  background-size: auto, 34px 34px, 34px 34px, auto;
-}
-
-.mobileCoreTrack {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 13px;
-}
-
-.mobileTrustRibbon {
+.deckGrid {
   position: absolute;
-  z-index: 0;
-  top: 72px;
-  bottom: 74px;
-  left: 50%;
-  width: 5px;
-  transform: translateX(-50%);
-  border-radius: 999px;
-  background: linear-gradient(180deg, #7fe3ff 0%, #57e4d0 74%, #71efb8 100%);
-  box-shadow: 0 0 18px rgba(95, 227, 192, 0.42);
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.4;
+  background-image:
+    linear-gradient(rgba(150, 184, 244, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(150, 184, 244, 0.05) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: radial-gradient(78% 78% at 50% 50%, #000 32%, transparent 100%);
+  -webkit-mask-image: radial-gradient(78% 78% at 50% 50%, #000 32%, transparent 100%);
 }
 
-.sourceShell,
-.stageShell {
+/* A slow sweep across the deck. It is the only thing that keeps the container
+   itself alive; without it the panel is inert behind a moving diagram. */
+.deckSheen {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -30%;
+  width: 30%;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(120, 190, 255, 0.05) 50%,
+    transparent 100%
+  );
+}
+
+.corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+  border: 1px solid rgba(146, 190, 255, 0.3);
+}
+
+.cornerTl {
+  top: 14px;
+  left: 14px;
+  border-right: 0;
+  border-bottom: 0;
+  border-top-left-radius: 5px;
+}
+
+.cornerTr {
+  top: 14px;
+  right: 14px;
+  border-left: 0;
+  border-bottom: 0;
+  border-top-right-radius: 5px;
+}
+
+.cornerBl {
+  bottom: 14px;
+  left: 14px;
+  border-right: 0;
+  border-top: 0;
+  border-bottom-left-radius: 5px;
+}
+
+.cornerBr {
+  bottom: 14px;
+  right: 14px;
+  border-left: 0;
+  border-top: 0;
+  border-bottom-right-radius: 5px;
+}
+
+/* ---------- Track ---------- */
+
+.track {
   position: relative;
-  z-index: 2;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
   width: 100%;
-  padding: 1px;
-  clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px);
 }
 
-.sourceShell {
-  max-width: 280px;
-  min-height: 86px;
-  background: linear-gradient(135deg, rgba(163, 112, 255, 0.9), rgba(93, 237, 204, 0.95));
-  filter: drop-shadow(0 14px 28px rgba(27, 184, 211, 0.2));
+.segment {
+  display: contents;
 }
 
-.sourceInner,
-.stageInner {
-  width: 100%;
-  height: 100%;
-  clip-path: inherit;
-}
+/* ---------- Verified Components: the piece that arrives ---------- */
 
-.sourceInner {
+.source {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 12px;
-  min-height: 84px;
-  padding: 14px;
-  background:
-    linear-gradient(135deg, rgba(62, 42, 111, 0.88) 0%, rgba(12, 68, 83, 0.94) 100%),
-    #0b1f35;
-}
-
-.sourceSeal {
-  display: grid;
   flex: 0 0 auto;
-  width: 40px;
-  height: 40px;
+  padding-top: 4px;
+}
+
+.sourceTile {
+  position: relative;
+  display: grid;
   place-items: center;
-  border: 1px solid rgba(210, 251, 255, 0.72);
-  border-radius: 50%;
-  background: linear-gradient(145deg, #c9f8ff 0%, #66e4d1 100%);
-  color: #0b2734;
-  box-shadow: 0 0 0 7px rgba(104, 228, 218, 0.08), 0 0 24px rgba(104, 228, 218, 0.34);
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  color: #04120d;
+  background: linear-gradient(180deg, #55e9b3 0%, #1fc78b 100%);
+  box-shadow:
+    0 0 0 6px rgba(45, 212, 160, 0.1),
+    0 12px 26px -10px rgba(31, 199, 139, 0.8);
 }
 
-.sourceSeal svg,
-.scannerStateIcon svg,
-.releaseCheck svg {
-  width: 20px;
-  height: 20px;
+.sourceTile svg {
+  width: 22px;
+  height: 22px;
 }
 
-.sourceLabel,
-.stageLabel,
-.scannerLabel {
-  font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: -0.02em;
+/* Expands once as the piece locks in, then gets out of the way. */
+.sourceRing {
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(78, 230, 173, 0.85);
+  opacity: 0;
 }
 
 .sourceLabel {
-  color: #f5fdff;
-  font-size: var(--fs-body-sm);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
   line-height: 1.25;
-  text-align: left;
+  letter-spacing: -0.01em;
+  color: #93f3d1;
+  white-space: nowrap;
 }
 
-.stageShell {
-  max-width: 260px;
-  min-height: 72px;
-  background: linear-gradient(135deg, rgba(131, 215, 255, 0.56), rgba(96, 225, 193, 0.33));
-  filter: drop-shadow(0 10px 20px rgba(9, 25, 46, 0.24));
-}
+/* ---------- Links ---------- */
 
-.stageInner {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 16px;
-  min-height: 70px;
-  padding: 13px 16px;
-  background:
-    linear-gradient(115deg, rgba(20, 43, 72, 0.95), rgba(7, 28, 45, 0.97)),
-    #081d31;
-}
-
-.stageLabel {
-  color: rgba(241, 250, 255, 0.94);
-  font-size: var(--fs-body-sm);
-  line-height: 1.2;
-}
-
-.coreWindow {
+.link {
   position: relative;
-  display: grid;
-  width: 46px;
-  height: 46px;
-  place-items: center;
-  border: 1px solid rgba(127, 227, 255, 0.45);
-  border-radius: 50%;
-  background: rgba(6, 31, 46, 0.86);
-  box-shadow: 0 0 0 6px rgba(95, 227, 192, 0.045);
+  flex: 1 1 auto;
+  min-width: 28px;
+  height: 2px;
+  margin-top: 27px;
+  border-radius: 2px;
+  background: rgba(150, 182, 240, 0.2);
 }
 
-.coreLine {
+.linkMerge {
+  min-width: 52px;
+  background: linear-gradient(90deg, rgba(45, 212, 160, 0.7) 0%, rgba(150, 182, 240, 0.2) 100%);
+}
+
+.linkExit {
+  min-width: 44px;
+  flex: 0 0 auto;
+}
+
+.junction {
   position: absolute;
-  z-index: 0;
   top: 50%;
-  right: -17px;
-  left: -17px;
-  height: 3px;
-  transform: translateY(-50%);
-  border-radius: 999px;
-  background: linear-gradient(90deg, #7fe3ff, #5fe3c0);
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  background: #2dd4a0;
+  transform: translate(-50%, -50%) rotate(45deg);
 }
 
-.coreWindow::after {
-  position: absolute;
-  z-index: 1;
-  inset: 2px;
-  border-radius: inherit;
-  background: radial-gradient(circle at 50% 42%, #0c3548 0%, #061f31 68%, #051725 100%);
-  box-shadow: inset 0 0 0 1px rgba(127, 227, 255, 0.08);
+.link::after {
   content: '';
-  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(45, 212, 160, 0.18) 28%,
+    #5df0bb 50%,
+    rgba(45, 212, 160, 0.18) 72%,
+    transparent 100%
+  );
 }
 
-.stageIcon {
+.exitCheck {
+  position: absolute;
+  top: 50%;
+  right: -10px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  transform: translateY(-50%) scale(0.5);
+  opacity: 0;
+  border-radius: 999px;
+  color: #04120d;
+  background: linear-gradient(180deg, #55e9b3 0%, #1fc78b 100%);
+  box-shadow: 0 0 0 5px rgba(45, 212, 160, 0.12);
+}
+
+.exitCheck svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* ---------- Stages: one treatment for all of them ---------- */
+
+.node {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  gap: 11px;
+  width: 96px;
+}
+
+.tile {
   position: relative;
-  z-index: 2;
-  width: 27px;
-  height: 27px;
-  overflow: visible;
-  color: #c9faff;
-  filter: drop-shadow(0 0 5px rgba(95, 227, 192, 0.76));
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 17px;
+  color: rgba(208, 226, 255, 0.92);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.035) 100%);
+  border: 1px solid rgba(168, 196, 245, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(214, 231, 255, 0.14),
+    0 14px 28px -18px rgba(3, 8, 30, 0.95);
+}
+
+/* Turns green as the pulse reaches the stage: the assurance propagating, not a
+   status the stage had on its own. */
+.tileDot {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background-color: rgba(168, 196, 245, 0.35);
+}
+
+.icon {
+  width: 26px;
+  height: 26px;
   stroke: currentColor;
-  stroke-width: 1.8;
+  stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-.scanner {
-  position: relative;
-  z-index: 3;
-  display: grid;
-  min-width: 86px;
-  min-height: 104px;
-  place-items: center;
-  align-content: center;
-  gap: 8px;
-}
-
-.scannerFrame {
-  position: relative;
-  width: 68px;
-  height: 66px;
-  overflow: hidden;
-  border-top: 3px solid currentColor;
-  border-right: 3px solid currentColor;
-  border-left: 3px solid currentColor;
-  border-radius: 10px 10px 3px 3px;
-  background: linear-gradient(180deg, #081b2d 0%, #061421 100%);
-  box-shadow: 0 0 18px color-mix(in srgb, currentColor 24%, transparent);
-}
-
-.scannerOpen {
-  color: #70edbd;
-}
-
-.scannerBeam {
-  position: absolute;
-  inset: 4px 7px auto;
-  height: 2px;
-  border-radius: 999px;
-  background: currentColor;
-  box-shadow: 0 0 12px currentColor;
-  animation: scannerSweep 8.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
-}
-
-.scannerBarrier {
-  position: absolute;
-  right: 8px;
-  bottom: 11px;
-  left: 8px;
-  height: 7px;
-  border-radius: 999px;
-  background: currentColor;
-  transform-origin: right center;
-}
-
-.scannerOpen .scannerBarrier {
-  transform: translateY(-31px) rotate(-90deg);
-  opacity: 0.72;
-}
-
-.scannerStateIcon {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  display: grid;
-  width: 26px;
-  height: 26px;
-  place-items: center;
-  transform: translate(-50%, -44%);
-}
-
-.scannerLabel {
-  color: currentColor;
-  font-size: var(--fs-caption);
-  line-height: 1.2;
+.label {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
   text-align: center;
+  color: rgba(223, 232, 255, 0.78);
 }
 
-.releaseExit {
-  position: absolute;
-  top: 26px;
-  left: calc(50% + 31px);
-  display: flex;
-  align-items: center;
-}
+/* ---------- Motion ---------- */
 
-.releaseLine {
-  width: 28px;
-  height: 2px;
-  background: linear-gradient(90deg, #70edbd, rgba(112, 237, 189, 0.18));
-}
-
-.releaseArrow {
-  width: 0;
-  height: 0;
-  margin-left: -1px;
-  border-top: 5px solid transparent;
-  border-bottom: 5px solid transparent;
-  border-left: 8px solid #70edbd;
-  filter: drop-shadow(0 0 5px rgba(112, 237, 189, 0.48));
-}
-
-.releaseCheck {
-  display: grid;
-  width: 30px;
-  height: 30px;
-  place-items: center;
-  border: 1px solid rgba(160, 255, 216, 0.74);
-  border-radius: 50%;
-  background: rgba(15, 75, 62, 0.92);
-  color: #a0ffd8;
-  box-shadow: 0 0 18px rgba(112, 237, 189, 0.3);
-  animation: releaseApproval 8.8s ease-in-out infinite;
-}
-
-.scannerVertical {
-  margin-top: 4px;
-  padding-bottom: 50px;
-}
-
-.scannerVertical .releaseExit {
-  top: auto;
-  bottom: 2px;
-  left: 50%;
-  flex-direction: column;
-  transform: translateX(-50%);
-}
-
-.scannerVertical .releaseLine {
-  width: 2px;
-  height: 18px;
-  background: linear-gradient(180deg, #70edbd, rgba(112, 237, 189, 0.18));
-}
-
-.scannerVertical .releaseArrow {
-  margin-top: -1px;
-  margin-left: 0;
-  transform: rotate(90deg);
-}
-
-@keyframes scannerSweep {
-  0%,
-  14% {
-    transform: translateY(0);
-    opacity: 0.32;
+@media (prefers-reduced-motion: no-preference) {
+  .source {
+    animation: dock var(--cycle) cubic-bezier(0.22, 1, 0.36, 1) infinite;
   }
-  42%,
-  62% {
-    transform: translateY(50px);
-    opacity: 0.95;
+
+  .sourceRing {
+    animation: lockRing var(--cycle) ease-out infinite;
   }
-  76%,
-  100% {
-    transform: translateY(0);
-    opacity: 0.32;
+
+  .junction {
+    animation: junctionLock var(--cycle) ease-out infinite;
+  }
+
+  .link::after {
+    animation: flow var(--cycle) var(--flow-delay, 0ms) linear infinite;
+  }
+
+  .tileDot {
+    animation: dotLit var(--cycle) var(--lit-delay, 0ms) ease-out infinite;
+  }
+
+  .exitCheck {
+    animation: exitPop var(--cycle) cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+
+  .deckSheen {
+    animation: sheen var(--cycle) ease-in-out infinite;
   }
 }
 
-@keyframes releaseApproval {
-  0%,
-  56% {
-    transform: scale(0.92);
-    opacity: 0.72;
+@keyframes dock {
+  0% {
+    opacity: 0;
+    transform: translateX(-54px);
   }
-  68%,
-  84% {
-    transform: scale(1.08);
+
+  13% {
     opacity: 1;
-    box-shadow: 0 0 24px rgba(112, 237, 189, 0.58);
+    transform: translateX(0);
   }
-  94%,
+
+  93% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  99%,
   100% {
-    transform: scale(0.92);
-    opacity: 0.72;
+    opacity: 0;
+    transform: translateX(-54px);
   }
 }
 
-@media (min-width: 1024px) {
-  .desktopSurface {
-    position: relative;
-    isolation: isolate;
-    display: block;
-    min-height: 284px;
-    overflow: hidden;
-    padding: 30px 34px 34px;
-    border: 1px solid rgba(137, 181, 244, 0.28);
-    border-radius: 28px;
-    background:
-      radial-gradient(circle at 35% 78%, rgba(44, 193, 235, 0.16), transparent 35%),
-      radial-gradient(circle at 82% 22%, rgba(105, 65, 203, 0.14), transparent 31%),
-      linear-gradient(145deg, rgba(15, 25, 51, 0.98) 0%, rgba(5, 12, 27, 0.99) 52%, rgba(5, 24, 34, 0.98) 100%);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.06),
-      inset 0 -1px 0 rgba(87, 218, 208, 0.08),
-      0 36px 78px rgba(3, 7, 21, 0.46);
+@keyframes lockRing {
+  0%,
+  11% {
+    opacity: 0;
+    transform: scale(0.72);
   }
 
-  .desktopSurface::before {
-    position: absolute;
-    z-index: -1;
-    inset: 0;
-    content: '';
-    background: linear-gradient(112deg, transparent 0%, rgba(126, 226, 255, 0.035) 44%, transparent 62%);
-    pointer-events: none;
+  15% {
+    opacity: 0.9;
+    transform: scale(1);
   }
 
-  .desktopSurface::after {
-    position: absolute;
-    z-index: 0;
-    inset: 0;
-    content: '';
-    background:
-      linear-gradient(rgba(138, 174, 228, 0.028) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(138, 174, 228, 0.028) 1px, transparent 1px);
-    background-size: 42px 42px;
-    -webkit-mask-image: radial-gradient(ellipse 78% 70% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.82) 52%, transparent 100%);
-    mask-image: radial-gradient(ellipse 78% 70% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.82) 52%, transparent 100%);
-    pointer-events: none;
+  26%,
+  100% {
+    opacity: 0;
+    transform: scale(1.45);
+  }
+}
+
+@keyframes junctionLock {
+  0%,
+  10% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(45deg) scale(0.3);
   }
 
-  .mobileSurface {
-    display: none;
+  15% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(45deg) scale(1.55);
+    box-shadow: 0 0 0 7px rgba(45, 212, 160, 0.2);
   }
 
-  .surfaceChrome {
-    position: absolute;
-    z-index: 0;
-    inset: 20px;
-    pointer-events: none;
+  21%,
+  94% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(45deg) scale(1);
+    box-shadow: 0 0 0 4px rgba(45, 212, 160, 0.14);
   }
 
-  .cornerTopLeft,
-  .cornerTopRight,
-  .cornerBottomLeft,
-  .cornerBottomRight {
-    position: absolute;
-    width: 24px;
-    height: 24px;
-    border-color: rgba(136, 200, 247, 0.34);
+  99%,
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(45deg) scale(0.3);
+    box-shadow: 0 0 0 0 rgba(45, 212, 160, 0);
+  }
+}
+
+@keyframes flow {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%);
   }
 
-  .cornerTopLeft {
-    top: 0;
-    left: 0;
-    border-top: 1px solid;
-    border-left: 1px solid;
+  2% {
+    opacity: 1;
   }
 
-  .cornerTopRight {
-    top: 0;
-    right: 0;
-    border-top: 1px solid;
-    border-right: 1px solid;
+  10% {
+    opacity: 1;
+    transform: translateX(100%);
   }
 
-  .cornerBottomLeft {
-    bottom: 0;
-    left: 0;
-    border-bottom: 1px solid;
-    border-left: 1px solid;
+  11%,
+  100% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes dotLit {
+  0% {
+    transform: scale(1);
+    background-color: rgba(168, 196, 245, 0.35);
+    box-shadow: 0 0 0 0 rgba(45, 212, 160, 0);
   }
 
-  .cornerBottomRight {
-    right: 0;
-    bottom: 0;
-    border-right: 1px solid;
-    border-bottom: 1px solid;
+  4% {
+    transform: scale(1.7);
+    background-color: #5df0bb;
+    box-shadow: 0 0 0 4px rgba(45, 212, 160, 0.22);
   }
 
-  .measureTop,
-  .measureBottom {
-    position: absolute;
-    left: 50%;
-    width: 116px;
-    height: 1px;
-    transform: translateX(-50%);
-    background: repeating-linear-gradient(90deg, rgba(127, 227, 255, 0.28) 0 2px, transparent 2px 10px);
+  10%,
+  84% {
+    transform: scale(1);
+    background-color: #5df0bb;
+    box-shadow: 0 0 0 3px rgba(45, 212, 160, 0.12);
   }
 
-  .measureTop {
-    top: 0;
+  93%,
+  100% {
+    transform: scale(1);
+    background-color: rgba(168, 196, 245, 0.35);
+    box-shadow: 0 0 0 0 rgba(45, 212, 160, 0);
+  }
+}
+
+@keyframes exitPop {
+  0%,
+  47% {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.5);
   }
 
-  .measureBottom {
-    bottom: 0;
+  53% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.28);
   }
 
-  .routeStack {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    gap: 16px;
+  58%,
+  92% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
   }
 
-  .verifiedGrid {
-    position: relative;
-    z-index: 2;
-    display: grid;
-    grid-template-columns: 1.38fr repeat(4, minmax(0, 1fr)) 1.2fr;
-    gap: 12px;
+  98%,
+  100% {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.5);
+  }
+}
+
+@keyframes sheen {
+  0%,
+  8% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+
+  16% {
+    opacity: 1;
+  }
+
+  62% {
+    transform: translateX(460%);
+    opacity: 0;
+  }
+
+  63%,
+  100% {
+    transform: translateX(460%);
+    opacity: 0;
+  }
+}
+
+/* ---------- Stacked below the breakpoint ---------- */
+
+@media (max-width: 899px) {
+  .track {
+    flex-direction: column;
     align-items: center;
   }
 
-  .verifiedRoute {
-    position: relative;
-    min-height: 220px;
-    padding: 30px 24px;
-    border: 1px solid rgba(95, 227, 192, 0.24);
-    border-radius: 18px;
-    background:
-      radial-gradient(circle at 11% 50%, rgba(136, 83, 255, 0.18), transparent 21%),
-      linear-gradient(100deg, rgba(29, 54, 91, 0.58) 0%, rgba(6, 33, 48, 0.62) 58%, rgba(8, 46, 45, 0.46) 100%);
-    box-shadow: inset 0 1px 0 rgba(198, 251, 255, 0.07), 0 0 46px rgba(44, 193, 235, 0.07);
-  }
-
-  .verifiedRoute::after {
-    position: absolute;
-    inset: 10px;
-    border: 1px solid rgba(127, 227, 255, 0.07);
-    border-radius: 12px;
-    content: '';
-    pointer-events: none;
-  }
-
-  .verifiedGrid {
-    min-height: 158px;
-  }
-
-  .trustRibbon {
-    position: absolute;
-    z-index: 1;
-    top: 50%;
-    right: 5.5%;
-    left: 6.8%;
-    height: 6px;
-    transform: translateY(-50%);
-    border-radius: 999px;
-    background: linear-gradient(90deg, #7fe3ff 0%, #69e4dd 42%, #5fe3c0 78%, #70edbd 100%);
-    box-shadow: 0 0 18px rgba(95, 227, 192, 0.38), 0 0 42px rgba(44, 193, 235, 0.12);
-  }
-
-  .verifiedPulse {
-    position: absolute;
-    z-index: 1;
-    top: 50%;
-    left: 8%;
-    width: 13px;
-    height: 13px;
-    transform: translate(-50%, -50%);
-    border: 2px solid #e7ffff;
-    border-radius: 50%;
-    background: #70edbd;
-    box-shadow: 0 0 18px #70edbd;
-    animation: verifiedSignal 8.8s cubic-bezier(0.55, 0, 0.35, 1) infinite;
-  }
-
-  .sourceShell,
-  .stageShell {
-    max-width: none;
-  }
-
-  .sourceShell {
-    min-height: 112px;
-  }
-
-  .sourceInner {
-    min-height: 110px;
-    padding: 14px 13px;
-  }
-
-  .sourceSeal {
-    width: 42px;
-    height: 42px;
-  }
-
-  .stageShell {
-    min-height: 100px;
-  }
-
-  .stageInner {
-    grid-template-columns: 1fr;
-    justify-items: center;
+  .source {
+    flex-direction: column;
     gap: 10px;
-    min-height: 98px;
-    padding: 14px 10px;
+    padding-top: 0;
+  }
+
+  .sourceLabel {
     text-align: center;
   }
 
-  .stageLabel {
-    font-size: var(--fs-body-sm);
-  }
-
-  .coreWindow {
-    width: 48px;
-    height: 48px;
-  }
-
-  .coreLine {
-    right: -26px;
-    left: -26px;
-  }
-
-  .verifiedRoute .scanner {
+  .link {
+    width: 2px;
     min-width: 0;
+    height: 32px;
+    margin-top: 0;
+  }
+
+  .linkMerge {
+    height: 46px;
+    background: linear-gradient(180deg, rgba(45, 212, 160, 0.7) 0%, rgba(150, 182, 240, 0.2) 100%);
+  }
+
+  .linkExit {
+    height: 36px;
+  }
+
+  .exitCheck {
+    top: auto;
+    right: 50%;
+    bottom: -12px;
+    transform: translateX(50%) scale(0.5);
+  }
+
+  .node {
+    width: auto;
+    min-width: 128px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .source {
+      animation-name: dockVertical;
+    }
+
+    .link::after {
+      animation-name: flowVertical;
+    }
+
+    .exitCheck {
+      animation-name: exitPopVertical;
+    }
   }
 }
 
-@keyframes verifiedSignal {
-  0%,
-  8% {
-    left: 8%;
+@keyframes dockVertical {
+  0% {
     opacity: 0;
+    transform: translateY(-42px);
   }
+
   13% {
     opacity: 1;
+    transform: translateY(0);
   }
-  78% {
-    left: 89%;
+
+  93% {
     opacity: 1;
+    transform: translateY(0);
   }
-  86%,
+
+  99%,
   100% {
-    left: 94%;
     opacity: 0;
+    transform: translateY(-42px);
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .verifiedPulse,
-  .scannerBeam,
-  .releaseCheck {
-    animation: none !important;
+@keyframes flowVertical {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
   }
 
-  .verifiedPulse {
-    left: 89%;
+  2% {
     opacity: 1;
   }
 
-  .scannerBeam {
-    transform: translateY(28px);
-    opacity: 0.74;
+  10% {
+    opacity: 1;
+    transform: translateY(100%);
   }
 
-  .releaseCheck {
-    transform: none;
+  11%,
+  100% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+@keyframes exitPopVertical {
+  0%,
+  47% {
+    opacity: 0;
+    transform: translateX(50%) scale(0.5);
+  }
+
+  53% {
     opacity: 1;
+    transform: translateX(50%) scale(1.28);
+  }
+
+  58%,
+  92% {
+    opacity: 1;
+    transform: translateX(50%) scale(1);
+  }
+
+  98%,
+  100% {
+    opacity: 0;
+    transform: translateX(50%) scale(0.5);
   }
 }

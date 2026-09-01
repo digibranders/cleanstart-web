@@ -1,7 +1,17 @@
-import { existsSync, readFileSync } from 'node:fs';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { SaasShiftLeft } from './SaasShiftLeft';
+
+/*
+ * These assertions are about what the section SAYS and the order it says it in.
+ *
+ * The previous suite read SaasVerifiedCore.module.css and asserted on rule
+ * contents — exact hex values, z-index numbers, gradient strings, whether a
+ * selector appeared inside a particular media query. That pinned the diagram's
+ * visual implementation in place: every one of those assertions failed on a
+ * redesign that changed nothing a user could describe, while none of them would
+ * have caught the diagram rendering the wrong stages in the wrong order.
+ */
 
 function toText(markup: string): string {
   return markup
@@ -17,162 +27,74 @@ function renderSection(): string {
 describe('SaasShiftLeft', () => {
   it('keeps the supplied heading and supporting paragraph exact', () => {
     const html = renderSection();
-    const headingMarkup = html.match(/<h2[^>]*>([\s\S]*?)<\/h2>/)?.[1] ?? '';
-    const paragraphMarkup = html.match(/<p[^>]*>([\s\S]*?)<\/p>/)?.[1] ?? '';
+    const heading = html.match(/<h2[^>]*>([\s\S]*?)<\/h2>/)?.[1] ?? '';
+    const paragraph = html.match(/<p[^>]*>([\s\S]*?)<\/p>/)?.[1] ?? '';
 
-    expect(toText(headingMarkup)).toBe('Move Beyond Shift Left');
-    expect(toText(paragraphMarkup)).toBe(
+    expect(toText(heading)).toBe('Move Beyond Shift Left');
+    expect(toText(paragraph)).toBe(
       'Modern applications require security to be built into the software components developers use, not added after applications are created.',
     );
   });
 
-  it('renders structurally distinct desktop and mobile Verified Core diagrams', () => {
+  it('exposes the pipeline to assistive tech as an ordered list', () => {
     const html = renderSection();
-    const mobile = html.slice(html.indexOf('data-verified-core="mobile"'));
+    const list = html.match(/<ol[^>]*class="sr-only"[^>]*>([\s\S]*?)<\/ol>/)?.[1] ?? '';
+    const items = [...list.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)].map((m) => toText(m[1] ?? ''));
 
-    expect(html).toContain('data-verified-core="desktop"');
-    expect(html).toContain('data-verified-core="mobile"');
-    expect(html).not.toContain('data-cleanroom-reactor=');
-    expect(html).not.toContain('data-reactor-chamber=');
-    expect(html).not.toContain('Unverified Components');
-    expect(mobile).not.toContain('data-late-review-path="return"');
-    expect(mobile).toContain('data-verified-source="verified-components"');
-    expect(mobile).toMatch(
-      /data-core-stage="code"[\s\S]*data-core-stage="build"[\s\S]*data-core-stage="test"[\s\S]*data-core-stage="deploy"/,
-    );
-    expect(mobile).not.toContain('data-security-review="closed"');
-    expect(mobile).toContain('data-security-review="open"');
-    expect(mobile).toContain('data-release-exit="approved"');
+    expect(items).toEqual([
+      'Verified Components',
+      'Code',
+      'Build',
+      'Test',
+      'Deploy',
+      'Security Review',
+    ]);
   });
 
-  it('carries one verified core through every delivery stage', () => {
+  it('runs verified components into the pipeline, in order', () => {
     const html = renderSection();
 
     expect(html).toContain('data-verified-source="verified-components"');
     expect(html).toContain('data-trust-ribbon="continuous"');
+    expect(html).toContain('data-security-review="open"');
+    expect(html).toContain('data-release-exit="approved"');
+
+    // The source attaches before the first stage, and Security Review closes it.
     expect(html).toMatch(
-      /data-core-stage="code"[\s\S]*data-core-stage="build"[\s\S]*data-core-stage="test"[\s\S]*data-core-stage="deploy"/,
+      /data-verified-source[\s\S]*data-trust-ribbon[\s\S]*data-core-stage="code"[\s\S]*data-core-stage="build"[\s\S]*data-core-stage="test"[\s\S]*data-core-stage="deploy"[\s\S]*data-security-review[\s\S]*data-release-exit/,
     );
   });
 
-  it('renders a distinct stage icon in both responsive diagrams', () => {
+  it('renders each stage icon exactly once', () => {
     const html = renderSection();
 
-    for (const stage of ['code', 'build', 'test', 'deploy']) {
-      expect(html.match(new RegExp(`data-stage-icon="${stage}"`, 'g'))).toHaveLength(2);
+    // The diagram used to be emitted twice, once for desktop and once for
+    // mobile, so every icon existed twice in the DOM. Orientation is now a CSS
+    // concern and the tree is rendered once.
+    for (const stage of ['code', 'build', 'test', 'deploy', 'review']) {
+      expect(html.match(new RegExp(`data-stage-icon="${stage}"`, 'g'))).toHaveLength(1);
     }
   });
 
-  it('keeps stage icons visually prominent inside their core windows', () => {
-    const stylesheet = readFileSync(
-      new URL('./SaasVerifiedCore.module.css', import.meta.url),
-      'utf8',
-    );
-    const stageIconRule = stylesheet.match(/\.stageIcon\s*{([^}]*)}/)?.[1] ?? '';
+  it('keeps the diagram out of the accessibility tree', () => {
+    const html = renderSection();
+    const diagram = html.slice(html.indexOf('data-verified-source'));
 
-    expect(stageIconRule).toContain('width: 27px');
-    expect(stageIconRule).toContain('height: 27px');
+    // The ordered list above is the accessible reading of the pipeline; the
+    // tiles are decoration and must not be announced alongside it.
+    expect(html).toMatch(/aria-hidden="true"[\s\S]*data-verified-source/);
+    expect(diagram).not.toContain('<h3');
   });
 
-  it('layers the provenance rail behind an opaque icon plate', () => {
-    const stylesheet = readFileSync(
-      new URL('./SaasVerifiedCore.module.css', import.meta.url),
-      'utf8',
-    );
-    const coreLineRule = stylesheet.match(/\.coreLine\s*{([^}]*)}/)?.[1] ?? '';
-    const iconPlateRule = stylesheet.match(/\.coreWindow::after\s*{([^}]*)}/)?.[1] ?? '';
-    const stageIconRule = stylesheet.match(/\.stageIcon\s*{([^}]*)}/)?.[1] ?? '';
-
-    expect(coreLineRule).toContain('position: absolute');
-    expect(coreLineRule).toContain('z-index: 0');
-    expect(iconPlateRule).toContain('position: absolute');
-    expect(iconPlateRule).toContain('z-index: 1');
-    expect(iconPlateRule).toContain('#0c3548 0%');
-    expect(iconPlateRule).toContain('#051725 100%');
-    expect(stageIconRule).toContain('position: relative');
-    expect(stageIconRule).toContain('z-index: 2');
-  });
-
-  it('masks the rail inside the scanner and fades the desktop grid', () => {
-    const stylesheet = readFileSync(
-      new URL('./SaasVerifiedCore.module.css', import.meta.url),
-      'utf8',
-    );
-    const scannerFrameRule = stylesheet.match(/\.scannerFrame\s*{([^}]*)}/)?.[1] ?? '';
-    const desktopSurfaceRules = [
-      ...stylesheet.matchAll(/\.desktopSurface\s*{([^}]*)}/g),
-    ];
-    const desktopSurfaceRule = desktopSurfaceRules[desktopSurfaceRules.length - 1]?.[1] ?? '';
-    const gridOverlayRule = stylesheet.match(/\.desktopSurface::after\s*{([^}]*)}/)?.[1] ?? '';
-    const routeStackRule = stylesheet.match(/\.routeStack\s*{([^}]*)}/)?.[1] ?? '';
-    const gridOverlayMatches = [...stylesheet.matchAll(/\.desktopSurface::after\s*{/g)];
-    const desktopMediaStart = stylesheet.indexOf('@media (min-width: 1024px)');
-    const desktopMediaEnd = stylesheet.indexOf('@keyframes verifiedSignal');
-    const desktopMediaRule = stylesheet.slice(desktopMediaStart, desktopMediaEnd);
-
-    expect(scannerFrameRule).toContain(
-      'background: linear-gradient(180deg, #081b2d 0%, #061421 100%)',
-    );
-    expect(desktopSurfaceRule).not.toContain('rgba(138, 174, 228, 0.055)');
-    expect(gridOverlayMatches).toHaveLength(1);
-    expect(desktopMediaRule).toContain('.desktopSurface::after');
-    expect(gridOverlayRule).toContain('position: absolute');
-    expect(gridOverlayRule).toContain('z-index: 0');
-    expect(gridOverlayRule).toContain('rgba(138, 174, 228, 0.028)');
-    expect(gridOverlayRule).toContain('-webkit-mask-image: radial-gradient');
-    expect(gridOverlayRule).toContain('mask-image: radial-gradient');
-    expect(gridOverlayRule).toContain('pointer-events: none');
-    expect(routeStackRule).toContain('position: relative');
-    expect(routeStackRule).toContain('z-index: 1');
-  });
-
-  it('renders only the verified route and its approved release', () => {
+  it('drops the retired container shells and legacy nodes', () => {
     const html = renderSection();
 
-    expect(html).toContain('data-security-review="open"');
-    expect(html).toContain('data-release-exit="approved"');
-    expect(html).toContain('data-release-arrow="forward"');
-    expect(html).not.toContain('data-security-review="closed"');
+    expect(html).not.toContain('data-cleanroom-reactor=');
+    expect(html).not.toContain('data-reactor-chamber=');
+    expect(html).not.toContain('Unverified Components');
+    expect(html).not.toContain('data-verified-core="desktop"');
+    expect(html).not.toContain('data-verified-core="mobile"');
     expect(html).not.toContain('data-late-review-path="return"');
-  });
-
-  it('exposes the verified sequence once and hides duplicate visuals', () => {
-    const html = renderSection();
-
-    expect(html).not.toContain('aria-label="Code, Build, Test, Deploy, Security Review"');
-    expect(
-      html.match(
-        /aria-label="Verified Components, Code, Build, Test, Deploy, Security Review"/g,
-      ),
-    ).toHaveLength(1);
-    expect(html).toMatch(/data-verified-core="desktop"[^>]*aria-hidden="true"/);
-    expect(html).toMatch(/data-verified-core="mobile"[^>]*aria-hidden="true"/);
-    expect(html).not.toMatch(/preserveAspectRatio=.none./);
-  });
-
-  it('provides a complete reduced-motion state for the Verified Core', () => {
-    const stylesheetPath = new URL('./SaasVerifiedCore.module.css', import.meta.url);
-    const stylesheet = existsSync(stylesheetPath) ? readFileSync(stylesheetPath, 'utf8') : '';
-
-    expect(stylesheet).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(stylesheet).toMatch(
-      /\.verifiedPulse,\s*\.scannerBeam,\s*\.releaseCheck\s*{\s*animation: none !important;/,
-    );
-    expect(stylesheet).not.toContain('.returnPulse');
-    expect(stylesheet).not.toContain('.lateRoute');
-    expect(stylesheet).not.toContain('.mobileLateCard');
-  });
-
-  it('keeps the trust ribbon cyan-to-mint and animates the approved release state', () => {
-    const stylesheet = readFileSync(
-      new URL('./SaasVerifiedCore.module.css', import.meta.url),
-      'utf8',
-    );
-    const trustRibbonRule = stylesheet.match(/\.trustRibbon\s*{([\s\S]*?)\n {2}}/)?.[1] ?? '';
-
-    expect(trustRibbonRule).toContain('#7fe3ff 0%');
-    expect(trustRibbonRule).not.toContain('#9a51ff');
-    expect(stylesheet).toMatch(/\.releaseCheck\s*{[\s\S]*animation: releaseApproval/);
-    expect(stylesheet).toContain('@keyframes releaseApproval');
+    expect(html).not.toContain('data-security-review="closed"');
   });
 });
