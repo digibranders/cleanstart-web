@@ -9,8 +9,6 @@ interface DeliveryStage {
 }
 
 interface SecurityScannerProps {
-  readonly state: 'open' | 'closed';
-  readonly compact?: boolean;
   readonly vertical?: boolean;
 }
 
@@ -35,7 +33,6 @@ function DesktopVerifiedCore(): React.ReactElement {
     <div data-verified-core="desktop" aria-hidden="true" className={styles.desktopSurface}>
       <SurfaceChrome />
       <div className={styles.routeStack}>
-        <LateReviewRoute />
         <VerifiedRoute />
       </div>
     </div>
@@ -55,63 +52,6 @@ function SurfaceChrome(): React.ReactElement {
   );
 }
 
-function LateReviewRoute(): React.ReactElement {
-  return (
-    <div className={styles.lateRoute}>
-      <svg
-        data-late-review-path="return"
-        className={styles.returnPath}
-        viewBox="0 0 1000 150"
-        preserveAspectRatio="xMidYMid meet"
-        fill="none"
-      >
-        <defs>
-          <marker
-            id="cs-verified-core-return-arrow"
-            viewBox="0 0 10 10"
-            refX="8"
-            refY="5"
-            markerWidth="6"
-            markerHeight="6"
-            orient="auto-start-reverse"
-          >
-            <path d="M 0 0 L 10 5 L 0 10 Z" fill="#FF8795" />
-          </marker>
-        </defs>
-        <path
-          d="M 918 102 C 918 25, 304 25, 304 82"
-          className={styles.returnGuide}
-          markerEnd="url(#cs-verified-core-return-arrow)"
-        />
-        <path
-          d="M 918 102 C 918 25, 304 25, 304 82"
-          className={styles.returnPulse}
-        />
-      </svg>
-
-      <span className={styles.lateRail} />
-      <div className={styles.lateGrid}>
-        <span />
-        {DELIVERY_STAGES.map((stage) => (
-          <LateStage key={stage.id} stage={stage} />
-        ))}
-        <SecurityScanner state="closed" compact />
-      </div>
-    </div>
-  );
-}
-
-function LateStage({ stage }: { readonly stage: DeliveryStage }): React.ReactElement {
-  return (
-    <div className={styles.lateStage}>
-      <span className={styles.lateNode}>
-        <span className={styles.lateNodeCore} />
-      </span>
-      <span className={styles.lateLabel}>{stage.label}</span>
-    </div>
-  );
-}
-
 function VerifiedRoute(): React.ReactElement {
   return (
     <div className={styles.verifiedRoute}>
@@ -122,7 +62,7 @@ function VerifiedRoute(): React.ReactElement {
         {DELIVERY_STAGES.map((stage) => (
           <StageHousing key={stage.id} stage={stage} />
         ))}
-        <SecurityScanner state="open" />
+        <SecurityScanner />
       </div>
     </div>
   );
@@ -194,40 +134,32 @@ function StageIcon({ stage }: { readonly stage: DeliveryStageId }): React.ReactE
   }
 }
 
-function SecurityScanner({
-  state,
-  compact = false,
-  vertical = false,
-}: SecurityScannerProps): React.ReactElement {
-  const isOpen = state === 'open';
+function SecurityScanner({ vertical = false }: SecurityScannerProps): React.ReactElement {
   const className = [
     styles.scanner,
-    isOpen ? styles.scannerOpen : styles.scannerClosed,
-    compact ? styles.scannerCompact : '',
+    styles.scannerOpen,
     vertical ? styles.scannerVertical : '',
   ]
     .filter(Boolean)
     .join(' ');
 
   return (
-    <div data-security-review={state} className={className}>
+    <div data-security-review="open" className={className}>
       <div className={styles.scannerFrame}>
         <span className={styles.scannerBeam} />
         <span className={styles.scannerBarrier} />
         <span className={styles.scannerStateIcon}>
-          {isOpen ? <CheckIcon /> : <CrossIcon />}
+          <CheckIcon />
         </span>
       </div>
       <span className={styles.scannerLabel}>Security Review</span>
-      {isOpen ? (
-        <span data-release-exit="approved" className={styles.releaseExit}>
-          <span className={styles.releaseLine} />
-          <span data-release-arrow="forward" className={styles.releaseArrow} />
-          <span className={styles.releaseCheck}>
-            <CheckIcon />
-          </span>
+      <span data-release-exit="approved" className={styles.releaseExit}>
+        <span className={styles.releaseLine} />
+        <span data-release-arrow="forward" className={styles.releaseArrow} />
+        <span className={styles.releaseCheck}>
+          <CheckIcon />
         </span>
-      ) : null}
+      </span>
     </div>
   );
 }
@@ -235,50 +167,7 @@ function SecurityScanner({
 function MobileVerifiedCore(): React.ReactElement {
   return (
     <div data-verified-core="mobile" aria-hidden="true" className={styles.mobileSurface}>
-      <MobileLateRoute />
       <MobileVerifiedRoute />
-    </div>
-  );
-}
-
-function MobileLateRoute(): React.ReactElement {
-  return (
-    <div className={styles.mobileLateCard}>
-      <div className={styles.mobileLateStages}>
-        {DELIVERY_STAGES.map((stage) => (
-          <span key={stage.id} className={styles.mobileLateStage}>
-            {stage.label}
-          </span>
-        ))}
-      </div>
-      <span className={styles.mobileLateConnector} />
-      <SecurityScanner state="closed" compact />
-      <svg
-        data-late-review-path="return"
-        className={styles.mobileReturnPath}
-        viewBox="0 0 300 54"
-        preserveAspectRatio="xMidYMid meet"
-        fill="none"
-      >
-        <defs>
-          <marker
-            id="cs-mobile-return-arrow"
-            viewBox="0 0 10 10"
-            refX="8"
-            refY="5"
-            markerWidth="5"
-            markerHeight="5"
-            orient="auto-start-reverse"
-          >
-            <path d="M 0 0 L 10 5 L 0 10 Z" fill="#FF8795" />
-          </marker>
-        </defs>
-        <path
-          d="M 276 8 C 244 45, 72 45, 24 14"
-          className={styles.returnGuide}
-          markerEnd="url(#cs-mobile-return-arrow)"
-        />
-      </svg>
     </div>
   );
 }
@@ -292,7 +181,7 @@ function MobileVerifiedRoute(): React.ReactElement {
         {DELIVERY_STAGES.map((stage) => (
           <StageHousing key={stage.id} stage={stage} />
         ))}
-        <SecurityScanner state="open" vertical />
+        <SecurityScanner vertical />
       </div>
     </div>
   );
@@ -307,19 +196,6 @@ function CheckIcon(): React.ReactElement {
         strokeWidth="2.4"
         strokeLinecap="round"
         strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function CrossIcon(): React.ReactElement {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-      <path
-        d="M5 5 L15 15 M15 5 L5 15"
-        stroke="currentColor"
-        strokeWidth="2.4"
-        strokeLinecap="round"
       />
     </svg>
   );

@@ -35,12 +35,12 @@ describe('SaasShiftLeft', () => {
     expect(html).not.toContain('data-cleanroom-reactor=');
     expect(html).not.toContain('data-reactor-chamber=');
     expect(html).not.toContain('Unverified Components');
-    expect(mobile).toContain('data-late-review-path="return"');
+    expect(mobile).not.toContain('data-late-review-path="return"');
     expect(mobile).toContain('data-verified-source="verified-components"');
     expect(mobile).toMatch(
       /data-core-stage="code"[\s\S]*data-core-stage="build"[\s\S]*data-core-stage="test"[\s\S]*data-core-stage="deploy"/,
     );
-    expect(mobile).toContain('data-security-review="closed"');
+    expect(mobile).not.toContain('data-security-review="closed"');
     expect(mobile).toContain('data-security-review="open"');
     expect(mobile).toContain('data-release-exit="approved"');
   });
@@ -126,22 +126,20 @@ describe('SaasShiftLeft', () => {
     expect(routeStackRule).toContain('z-index: 1');
   });
 
-  it('contrasts an open release with a closed late-review return', () => {
+  it('renders only the verified route and its approved release', () => {
     const html = renderSection();
 
     expect(html).toContain('data-security-review="open"');
     expect(html).toContain('data-release-exit="approved"');
     expect(html).toContain('data-release-arrow="forward"');
-    expect(html).toContain('data-security-review="closed"');
-    expect(html).toContain('data-late-review-path="return"');
+    expect(html).not.toContain('data-security-review="closed"');
+    expect(html).not.toContain('data-late-review-path="return"');
   });
 
-  it('exposes both exact source sequences once and hides duplicate visuals', () => {
+  it('exposes the verified sequence once and hides duplicate visuals', () => {
     const html = renderSection();
 
-    expect(html.match(/aria-label="Code, Build, Test, Deploy, Security Review"/g)).toHaveLength(
-      1,
-    );
+    expect(html).not.toContain('aria-label="Code, Build, Test, Deploy, Security Review"');
     expect(
       html.match(
         /aria-label="Verified Components, Code, Build, Test, Deploy, Security Review"/g,
@@ -149,7 +147,6 @@ describe('SaasShiftLeft', () => {
     ).toHaveLength(1);
     expect(html).toMatch(/data-verified-core="desktop"[^>]*aria-hidden="true"/);
     expect(html).toMatch(/data-verified-core="mobile"[^>]*aria-hidden="true"/);
-    expect(html).toContain('preserveAspectRatio="xMidYMid meet"');
     expect(html).not.toMatch(/preserveAspectRatio=.none./);
   });
 
@@ -159,8 +156,11 @@ describe('SaasShiftLeft', () => {
 
     expect(stylesheet).toContain('@media (prefers-reduced-motion: reduce)');
     expect(stylesheet).toMatch(
-      /\.verifiedPulse,\s*\.returnPulse,\s*\.scannerBeam,\s*\.releaseCheck\s*{\s*animation: none !important;/,
+      /\.verifiedPulse,\s*\.scannerBeam,\s*\.releaseCheck\s*{\s*animation: none !important;/,
     );
+    expect(stylesheet).not.toContain('.returnPulse');
+    expect(stylesheet).not.toContain('.lateRoute');
+    expect(stylesheet).not.toContain('.mobileLateCard');
   });
 
   it('keeps the trust ribbon cyan-to-mint and animates the approved release state', () => {

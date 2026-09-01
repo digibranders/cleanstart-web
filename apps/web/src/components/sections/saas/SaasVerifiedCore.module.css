@@ -10,10 +10,8 @@
 
 .mobileSurface {
   display: grid;
-  gap: 18px;
 }
 
-.mobileLateCard,
 .mobileVerifiedCard {
   position: relative;
   overflow: hidden;
@@ -25,59 +23,6 @@
     linear-gradient(155deg, rgba(18, 29, 57, 0.96) 0%, rgba(6, 12, 29, 0.98) 100%);
   background-size: 34px 34px, 34px 34px, auto;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 24px 50px rgba(3, 7, 21, 0.3);
-}
-
-.mobileLateCard {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 14px 12px;
-  padding: 20px 18px 12px;
-  border-color: rgba(255, 135, 149, 0.22);
-  background:
-    radial-gradient(circle at 92% 42%, rgba(255, 107, 107, 0.11), transparent 28%),
-    linear-gradient(rgba(118, 159, 218, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(118, 159, 218, 0.045) 1px, transparent 1px),
-    linear-gradient(155deg, rgba(24, 25, 50, 0.96) 0%, rgba(10, 11, 27, 0.98) 100%);
-  background-size: auto, 34px 34px, 34px 34px, auto;
-}
-
-.mobileLateStages {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 7px;
-}
-
-.mobileLateStage {
-  min-width: 0;
-  padding: 8px 9px;
-  border: 1px solid rgba(196, 207, 236, 0.13);
-  border-radius: 8px;
-  background: rgba(160, 177, 217, 0.055);
-  color: rgba(226, 232, 250, 0.63);
-  font-family: var(--font-display);
-  font-size: var(--fs-caption);
-  font-weight: 600;
-  line-height: 1.2;
-  text-align: center;
-}
-
-.mobileLateConnector {
-  position: absolute;
-  top: 50%;
-  right: 92px;
-  width: 28px;
-  height: 1px;
-  background: linear-gradient(90deg, rgba(183, 196, 226, 0.16), rgba(255, 135, 149, 0.56));
-}
-
-.mobileReturnPath {
-  grid-column: 1 / -1;
-  width: 100%;
-  height: 38px;
-  margin-top: -4px;
 }
 
 .mobileVerifiedCard {
@@ -284,10 +229,6 @@
   color: #70edbd;
 }
 
-.scannerClosed {
-  color: #ff8795;
-}
-
 .scannerBeam {
   position: absolute;
   inset: 4px 7px auto;
@@ -314,10 +255,6 @@
   opacity: 0.72;
 }
 
-.scannerClosed .scannerBarrier {
-  box-shadow: 0 0 14px rgba(255, 135, 149, 0.58);
-}
-
 .scannerStateIcon {
   position: absolute;
   top: 50%;
@@ -334,25 +271,6 @@
   font-size: var(--fs-caption);
   line-height: 1.2;
   text-align: center;
-}
-
-.scannerCompact {
-  min-width: 78px;
-  min-height: 82px;
-  gap: 5px;
-}
-
-.scannerCompact .scannerFrame {
-  width: 56px;
-  height: 50px;
-}
-
-.scannerCompact.scannerOpen .scannerBarrier {
-  transform: translateY(-21px) rotate(-90deg);
-}
-
-.scannerCompact .scannerLabel {
-  max-width: 86px;
 }
 
 .releaseExit {
@@ -417,22 +335,6 @@
   transform: rotate(90deg);
 }
 
-.returnGuide {
-  stroke: rgba(255, 135, 149, 0.55);
-  stroke-width: 2;
-  stroke-dasharray: 6 8;
-  stroke-linecap: round;
-}
-
-.returnPulse {
-  stroke: #ff8795;
-  stroke-width: 3;
-  stroke-dasharray: 80 1200;
-  stroke-linecap: round;
-  filter: drop-shadow(0 0 6px rgba(255, 135, 149, 0.7));
-  animation: returnSignal 8.8s linear infinite;
-}
-
 @keyframes scannerSweep {
   0%,
   14% {
@@ -448,26 +350,6 @@
   100% {
     transform: translateY(0);
     opacity: 0.32;
-  }
-}
-
-@keyframes returnSignal {
-  0%,
-  58% {
-    stroke-dashoffset: 0;
-    opacity: 0;
-  }
-  63% {
-    opacity: 1;
-  }
-  88% {
-    stroke-dashoffset: -760;
-    opacity: 1;
-  }
-  94%,
-  100% {
-    stroke-dashoffset: -840;
-    opacity: 0;
   }
 }
 
@@ -490,18 +372,12 @@
   }
 }
 
-@media (min-width: 640px) {
-  .mobileLateStages {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
 @media (min-width: 1024px) {
   .desktopSurface {
     position: relative;
     isolation: isolate;
     display: block;
-    min-height: 500px;
+    min-height: 284px;
     overflow: hidden;
     padding: 30px 34px 34px;
     border: 1px solid rgba(137, 181, 244, 0.28);
@@ -613,33 +489,6 @@
     gap: 16px;
   }
 
-  .lateRoute {
-    position: relative;
-    height: 172px;
-    opacity: 0.82;
-  }
-
-  .returnPath {
-    position: absolute;
-    z-index: 0;
-    top: -5px;
-    left: 0;
-    width: 100%;
-    height: 150px;
-    overflow: visible;
-  }
-
-  .lateRail {
-    position: absolute;
-    z-index: 0;
-    top: 111px;
-    right: 7.2%;
-    left: 20.2%;
-    height: 1px;
-    background: linear-gradient(90deg, rgba(193, 205, 234, 0.24), rgba(255, 135, 149, 0.5));
-  }
-
-  .lateGrid,
   .verifiedGrid {
     position: relative;
     z-index: 2;
@@ -647,51 +496,6 @@
     grid-template-columns: 1.38fr repeat(4, minmax(0, 1fr)) 1.2fr;
     gap: 12px;
     align-items: center;
-  }
-
-  .lateGrid {
-    height: 100%;
-    padding-top: 62px;
-  }
-
-  .lateStage {
-    display: grid;
-    min-width: 0;
-    place-items: center;
-    gap: 8px;
-  }
-
-  .lateNode {
-    position: relative;
-    display: grid;
-    width: 52px;
-    height: 44px;
-    place-items: center;
-    clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 9px, 100% calc(100% - 9px), calc(100% - 9px) 100%, 9px 100%, 0 calc(100% - 9px), 0 9px);
-    background: linear-gradient(145deg, rgba(130, 150, 195, 0.24), rgba(46, 58, 91, 0.52));
-    box-shadow: inset 0 0 0 1px rgba(196, 207, 236, 0.15);
-  }
-
-  .lateNodeCore {
-    width: 9px;
-    height: 9px;
-    border: 1px solid rgba(228, 233, 247, 0.32);
-    border-radius: 50%;
-    background: rgba(194, 204, 230, 0.18);
-  }
-
-  .lateLabel {
-    color: rgba(224, 230, 248, 0.58);
-    font-family: var(--font-display);
-    font-size: var(--fs-caption);
-    font-weight: 600;
-    line-height: 1.2;
-    text-align: center;
-  }
-
-  .lateRoute .scanner {
-    align-self: end;
-    margin-bottom: 4px;
   }
 
   .verifiedRoute {
@@ -820,7 +624,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .verifiedPulse,
-  .returnPulse,
   .scannerBeam,
   .releaseCheck {
     animation: none !important;
@@ -829,10 +632,6 @@
   .verifiedPulse {
     left: 89%;
     opacity: 1;
-  }
-
-  .returnPulse {
-    opacity: 0;
   }
 
   .scannerBeam {

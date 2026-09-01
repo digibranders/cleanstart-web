@@ -3,7 +3,6 @@ import { Container, Section } from '@/components/layout';
 import { Reveal } from '@/components/ui/Reveal';
 import { SaasVerifiedCore } from './SaasVerifiedCore';
 
-const LATE_REVIEW_DESCRIPTION = 'Code, Build, Test, Deploy, Security Review' as const;
 const VERIFIED_FIRST_DESCRIPTION =
   'Verified Components, Code, Build, Test, Deploy, Security Review' as const;
 
@@ -61,14 +60,6 @@ export function SaasShiftLeft(): React.ReactElement {
             </p>
           </Reveal>
         </div>
-
-        <ol className="sr-only" aria-label={LATE_REVIEW_DESCRIPTION}>
-          <li>Code</li>
-          <li>Build</li>
-          <li>Test</li>
-          <li>Deploy</li>
-          <li>Security Review</li>
-        </ol>
 
         <ol className="sr-only" aria-label={VERIFIED_FIRST_DESCRIPTION}>
           <li>Verified Components</li>
