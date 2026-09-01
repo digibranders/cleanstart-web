@@ -330,3 +330,40 @@ pnpm --filter @cleanstart/web build
 ```
 
 Expected: all focused and package checks pass, with Code, Build, Test, and Deploy remaining legible at desktop and mobile sizes.
+
+### Task 8: Layer the provenance rail behind stage icons
+
+**Files:**
+- Modify: `apps/web/src/components/sections/saas/SaasShiftLeft.test.tsx`
+- Modify: `apps/web/src/components/sections/saas/SaasVerifiedCore.module.css`
+
+- [ ] **Step 1: Write a failing paint-order test**
+
+Read the CSS module and assert that `.coreLine` uses `z-index: 0`, `.coreWindow::after` uses `z-index: 1`, and `.stageIcon` uses `z-index: 2`.
+
+- [ ] **Step 2: Run the focused test and verify RED**
+
+```bash
+pnpm --filter @cleanstart/web test -- src/components/sections/saas/SaasShiftLeft.test.tsx
+```
+
+Expected: FAIL because the rail currently has no explicit layer, there is no inner icon-plate mask, and the icon uses `z-index: 1`.
+
+- [ ] **Step 3: Implement the three-layer paint order**
+
+Set the rail to layer 0. Add a `coreWindow::after` pseudo-element inset inside the circular border with an opaque navy radial background at layer 1. Move `.stageIcon` to layer 2. The mask must cover only the circle, leaving the rail visible on either side.
+
+- [ ] **Step 4: Verify GREEN and inspect both responsive diagrams**
+
+Run the focused test, then inspect `/industries/saas-container-security` at 1440 × 900 and 390 × 844. Confirm the rail disappears beneath every circular plate without hiding or shrinking any icon.
+
+- [ ] **Step 5: Run package gates**
+
+```bash
+pnpm --filter @cleanstart/web test
+pnpm --filter @cleanstart/web lint
+pnpm --filter @cleanstart/web typecheck
+pnpm --filter @cleanstart/web build
+```
+
+Expected: all checks pass and the production build generates the complete site.

@@ -40,6 +40,7 @@ The late-review route sits above the primary route at reduced visual weight. It 
 - Late-review state: cool slate rail and stage housings, with coral reserved for the closed scanner and return signal.
 - Stage housings: transparent chamfered shells that reveal the route passing through their centers. They must not read as generic rounded cards.
 - Stage iconography: each primary delivery stage uses a distinct monoline symbol inside its core window—code brackets for Code, an isometric package for Build, a check-in-ring for Test, and an upward release arrow for Deploy. The symbols share one cyan line treatment so they improve recognition without fragmenting the continuous verified route.
+- Stage layering: the continuous provenance rail passes behind each circular icon plate. An opaque inner plate masks the rail within the circle, while the icon remains on the foreground layer; the rail stays visible only on either side of the plate.
 - Scanner: two vertical posts with a scanning aperture. The verified state is open; the late-review state is visibly closed.
 - Texture: fine grid, coordinate ticks, and restrained bloom provide depth without obscuring labels or flow.
 - Typography: all visible text uses the canonical `--fs-*`, `--font-display`, and `--font-sans` role tokens.
@@ -109,6 +110,7 @@ Verification requires the focused SaaS test, the web package test suite, lint, t
 - Verified Components is the unmistakable leftmost source of the primary route.
 - The same verified core is visibly embedded inside every delivery stage.
 - Code, Build, Test, and Deploy are distinguishable by both label and unique stage icon.
+- The horizontal provenance rail never cuts through a stage glyph or its circular plate.
 - The late-review route terminates in a closed scanner and visibly returns toward Code.
 - The verified route passes through an open scanner and exits as a successful release.
 - The design feels like a distinctive chain-of-trust instrument rather than a generic flowchart or metaphorical reactor.
