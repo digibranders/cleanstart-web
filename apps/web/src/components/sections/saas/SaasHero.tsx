@@ -131,10 +131,18 @@ export function SaasHero(): React.ReactElement {
                 marginBottom: 'clamp(24px, 2.5vw, 36px)',
               }}
             >
-              {/* The SEO team's H1, verbatim. The gradient splits the phrase
-                  rather than adding words, so the rendered text is exactly
-                  "Container Security for SaaS Companies". */}
-              Container Security for <span className="cs-text-gradient-impact">SaaS Companies</span>
+              {/* Client's headline, replacing the SEO team's "Container Security
+                  for SaaS Companies". The title tag still carries that phrase, so
+                  the page keeps the keyword in the SERP; the H1 no longer
+                  contains it. Same trade the financial services page made, and
+                  the same parallel construction.
+
+                  Each sentence gets its own block, because left to wrap
+                  naturally the break landed mid-clause — "Move Faster. Security"
+                  on one line — which destroys the parallel the headline is built
+                  on. Same treatment FinanceStack's heading uses; not a <br>. */}
+              <span className="block">Modern Applications Move Faster.</span>
+              <span className="block cs-text-gradient-impact">Security Must Keep Up.</span>
             </h1>
           </HeroReveal>
 
