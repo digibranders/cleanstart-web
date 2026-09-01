@@ -1316,8 +1316,7 @@ body {
    after JS hydration (which stranded LCP behind hydration on every page). The
    fade-up is now purely presentational; offset/timing come from CSS vars set by
    the HeroReveal component. */
-/* SaaS hero artifact (SaasHeroAttackSurface.tsx). The stacks build once from
-   the baseline up, then hold. A hero artifact that loops competes with the
+/* SaaS hero artifact (SaasHeroVerifiedRuntime.tsx). Builds once, then holds. A hero artifact that loops competes with the
    headline for attention.
 
    Opacity only, no transforms: these are SVG groups, where transform-origin
