@@ -15,7 +15,7 @@ Built for the AI Era.
 ```
 
 - Line 1, "Verified": the brand cyan→purple gradient treatment (currently used on "Verified. Secure."), on its own line, directly above line 2. No overlap with any other text.
-- Line 2, "Hardened. Secure.": "Hardened." renders in a muted gray and gets a red strikethrough drawn across it. "Secure." stays plain (same white as line 3), untouched.
+- Line 2, "Hardened. Secure.": both words type on together as one unit (same as today's "Verified. Secure." type-on) — "Secure." is not pre-rendered/static, it reveals with the same clip-path animation as "Hardened." Only after both have typed on does "Hardened." get a red strikethrough drawn across it and render in a muted gray. "Secure." carries the SAME brand gradient as "Verified" (line 1) — the two affirmative claims read as one visual pair, while struck-through "Hardened" stands apart as the rejected term.
 - Line 3, "Built for the AI Era.": unchanged from today — plain white, focus-settle entrance.
 
 This is a straight three-line heading (real DOM lines via `display: block` spans), not an absolutely-positioned overlay stamp — confirmed against a reference screenshot during design review.
@@ -24,9 +24,9 @@ This is a straight three-line heading (real DOM lines via `display: block` spans
 
 One-shot on page load, matching the existing hero's play-once philosophy (no looping):
 
-1. **0.15s–1.05s** — "Hardened. Secure." types on via the existing stepped clip-path reveal (reuse `cs-hh-reveal`/caret exactly as today, just re-targeted from "Verified. Secure." to "Hardened. Secure.").
-2. **1.05s–1.4s** — Red strikethrough draws left-to-right across "Hardened." only (`scaleX` on a `::after` bar), immediately after typing finishes — reads as a decisive cut, not a paused beat.
-3. **1.4s–1.95s** — "Verified" (line 1) rises into view: blur→sharp focus snap + fade + slight upward settle, using the brand gradient. Continuous gradient shine starts at 1.95s and loops (reuse `cs-hh-shine`), same as today's shine.
+1. **0.15s–1.05s** — "Hardened. Secure." types on together as one unit via the existing stepped clip-path reveal (reuse `cs-hh-reveal`/caret exactly as today, just re-targeted from "Verified. Secure." to "Hardened. Secure."). "Secure." types on already carrying the brand gradient; "Hardened." types on in the same gradient too at this stage — it only switches to muted gray once struck (step 2), so the reveal itself still reads as one unified gradient phrase.
+2. **1.05s–1.4s** — Red strikethrough draws left-to-right across "Hardened." only (`scaleX` on a `::after` bar), immediately after typing finishes; "Hardened." simultaneously desaturates from the gradient to muted gray as the strike lands — reads as a decisive cut, not a paused beat.
+3. **1.4s–1.95s** — "Verified" (line 1) rises into view: blur→sharp focus snap + fade + slight upward settle, using the same brand gradient as "Secure." Continuous gradient shine starts at 1.95s and loops across both "Verified" and "Secure." together (reuse `cs-hh-shine`), same as today's shine.
 4. **~1.7s–2.3s** — "Built for the AI Era." (line 3) focus-settles in, overlapping the tail of step 3, same easing/style as today's `cs-hh-focus`.
 
 Total settle lands ~2.3s, close to the current hero's documented ~2.2s finish — the H1 was already the longest-running hero element (other hero elements — lead paragraph, CTAs, side panel — finish by ~1.15s per `HeroProductSlide.tsx`), so the budget is not being blown out further.
