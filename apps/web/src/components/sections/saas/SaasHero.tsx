@@ -65,19 +65,26 @@ export function SaasHero(): React.ReactElement {
             // `right-0`. The wrapper is capped at --container-default while the
             // copy sits inside px-10, so right-0 hung the render 40px past the
             // text's mirror line and it read as escaping the grid.
-            right: '40px',
+            // Was a flat 40px, mirroring the copy's left padding. That looked
+            // right on paper but not on screen: the headline is short, so its
+            // text ended at 533 while the artifact began at 844 — a 310px hole
+            // in the middle against a 40px margin on the right. Pulling the
+            // artifact off the edge trades some of that hole for a right margin
+            // that is still smaller than the gap it closes.
+            right: 'clamp(24px, 4.5vw, 76px)',
             // Retuned for the two-line headline. The previous 44% / 540px pair
             // was fitted to a three-line one; against the shorter headline it
             // left a 352px hole in the middle of the composition and the
             // artifact had no weight to answer the copy with.
             top: '46%',
             transform: 'translateY(-50%)',
-            // Scales with the viewport now that it renders from md up: about
-            // 292px at 768, 389px at 1024, 486px at 1280 and 547px at 1440,
-            // capped at 560. The artifact is pure geometry with no type in it,
-            // so it survives being scaled down in a way the earlier
-            // caption-bearing versions would not have.
-            width: 'clamp(280px, 38vw, 560px)',
+            // Scales with the viewport now that it renders from md up. Widened
+            // from 38vw/560 because the drawing itself was mostly padding; with
+            // the frame filled, a bigger box puts real content closer to the
+            // copy instead of more empty space. Pure geometry with no type in
+            // it, so it survives scaling in a way the earlier caption-bearing
+            // versions would not have.
+            width: 'clamp(280px, 42vw, 600px)',
           }}
         >
           <SaasHeroVerifiedRuntime />
@@ -111,7 +118,7 @@ export function SaasHero(): React.ReactElement {
             handed the copy 15px it did not have and left a 24px gap to the
             artifact at 1030px. The xl rule stays as the tighter cap above
             1280. */}
-        <div className="relative flex max-w-[760px] flex-col items-center text-center md:max-w-[calc(100%-clamp(280px,38vw,560px)-56px)] md:items-start md:text-left xl:max-w-[clamp(560px,46vw,690px)]">
+        <div className="relative flex max-w-[760px] flex-col items-center text-center md:max-w-[calc(100%-clamp(280px,42vw,600px)-48px)] md:items-start md:text-left xl:max-w-[clamp(560px,46vw,690px)]">
           <HeroReveal y={50} duration={1.0} lcp>
             <h1
               className="text-white"

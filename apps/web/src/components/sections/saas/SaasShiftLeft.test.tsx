@@ -74,6 +74,21 @@ describe('SaasShiftLeft', () => {
     expect(stageIconRule).toContain('height: 27px');
   });
 
+  it('layers the provenance rail behind an opaque icon plate', () => {
+    const stylesheet = readFileSync(
+      new URL('./SaasVerifiedCore.module.css', import.meta.url),
+      'utf8',
+    );
+    const coreLineRule = stylesheet.match(/\.coreLine\s*{([^}]*)}/)?.[1] ?? '';
+    const iconPlateRule = stylesheet.match(/\.coreWindow::after\s*{([^}]*)}/)?.[1] ?? '';
+    const stageIconRule = stylesheet.match(/\.stageIcon\s*{([^}]*)}/)?.[1] ?? '';
+
+    expect(coreLineRule).toContain('z-index: 0');
+    expect(iconPlateRule).toContain('z-index: 1');
+    expect(iconPlateRule).toContain('background: radial-gradient');
+    expect(stageIconRule).toContain('z-index: 2');
+  });
+
   it('contrasts an open release with a closed late-review return', () => {
     const html = renderSection();
 
