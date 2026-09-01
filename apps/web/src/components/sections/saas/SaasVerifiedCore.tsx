@@ -92,8 +92,13 @@ export function SaasVerifiedCore(): React.ReactElement {
             preserveAspectRatio="none"
             aria-hidden="true"
           >
-            <path className={styles.mergeTrack} d="M2 2 C 48 2, 44 50, 90 50" />
-            <path className={styles.mergeFlow} d="M2 2 C 48 2, 44 50, 90 50" />
+            {/* Corner to corner. The endpoints are the two things this curve
+                has to join, so the stylesheet positions the BOX and the path
+                runs its full diagonal — inset the path even 2px and it ends
+                beside the rail instead of on it, which is exactly how the join
+                came to look broken. */}
+            <path className={styles.mergeTrack} d="M0 0 C 44 0, 48 52, 92 52" />
+            <path className={styles.mergeFlow} d="M0 0 C 44 0, 48 52, 92 52" />
           </svg>
 
           <div className={styles.railWrap}>

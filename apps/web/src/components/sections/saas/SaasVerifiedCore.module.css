@@ -21,12 +21,21 @@
   /* How far the hub sits above the rail. It is a negative margin, so it borrows
      from the deck's top padding — the padding has to add it back or the tile
      crowds the top edge while the bottom keeps its full gap. */
-  --raise: 60px;
+  /* DERIVED, never picked. The merge box spans from the hub tile's centre down
+     to the rail, so the raise is whatever puts those two --merge-h apart.
+     Choosing it by eye is what left the curve ending 2px off the rail. */
+  --raise: calc(var(--hub-tile) / 2 - var(--rail-y) + var(--merge-h));
+  --merge-h: 52px;
+  --merge-w: 92px;
+  --hub-w: 112px;
   --tile: 60px;
   /* The hub carries an orbit outside its hexagon, so it needs a larger box than
      a pipeline tile. Every measurement that meets the hub reads THIS, not
      --tile. */
   --hub-tile: 76px;
+  /* How far the orbit ring stops short of the hub tile's edge: the ring is
+     r=32.5 in a 76 box, so 38 - 32.5. */
+  --orbit-inset: 5.5px;
   --node-w: 104px;
   /* The stacked node column's height: tile + gap + label + underline. Only the
      vertical rail reads it. */
@@ -92,7 +101,7 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  width: 112px;
+  width: var(--hub-w);
   /* Raised clear of the rail so it reads as a separate thing joining, not as
      the first stage in the row. */
   margin-top: calc(-1 * var(--raise));
@@ -184,15 +193,23 @@
 
 /* ---------- Merge curve ---------- */
 
+/*
+ * The box IS the join. Its bottom-right corner sits exactly on the junction —
+ * which is also where the rail starts — and its top-left corner sits on the
+ * hub's orbit at the hub tile's centre height. The path runs corner to corner,
+ * so there is no arithmetic left over to get wrong.
+ *
+ * The left inset pulls the box back over the hub column: that column is wider
+ * than its tile, and the orbit stops short of the tile's own edge, so without
+ * it the curve began ~24px clear of the mark and read as a floating stub.
+ */
 .merge {
   flex: 0 0 auto;
-  width: 92px;
-  height: 52px;
-  /* Overlaps the rail's start by a few pixels. Butted exactly, a 2px seam sat
-     between the curve's cap and the rail and read as a broken join. */
-  margin-right: -4px;
-  /* Its top meets the hub tile's centre, its bottom meets the rail. */
-  margin-top: calc(-1 * var(--raise) + var(--hub-tile) / 2);
+  width: var(--merge-w);
+  height: var(--merge-h);
+  margin-right: 0;
+  margin-left: calc((var(--hub-tile) - var(--hub-w)) / 2 - var(--orbit-inset));
+  margin-top: calc(var(--rail-y) - var(--merge-h));
   overflow: visible;
 }
 
@@ -208,7 +225,12 @@
   stroke: var(--green);
   stroke-width: 2;
   stroke-linecap: round;
-  stroke-dasharray: 130;
+  /* 110 is the path's measured length (109.5), not a round number that clears
+     it. Set longer, the dash pattern runs out before the offset does and the
+     curve finishes drawing early — leaving a fully drawn green curve dead-ended
+     into a still-grey rail, which is the other half of what read as a broken
+     link. */
+  stroke-dasharray: 110;
   stroke-dashoffset: 0;
   filter: drop-shadow(0 0 5px rgba(52, 227, 164, 0.6));
 }
@@ -444,7 +466,7 @@
 @keyframes draw {
   0%,
   16% {
-    stroke-dashoffset: 130;
+    stroke-dashoffset: 110;
   }
 
   24%,
@@ -454,7 +476,7 @@
 
   96%,
   100% {
-    stroke-dashoffset: 130;
+    stroke-dashoffset: 110;
   }
 }
 
@@ -616,10 +638,12 @@
   }
 
   .merge {
-    width: 52px;
-    height: 46px;
-    /* Stacked, the overlap runs downward instead of to the right. */
-    margin: 6px 0 -4px;
+    --merge-w: 52px;
+    --merge-h: 46px;
+
+    /* Rotated, so the corner-to-corner path now runs top to bottom. Its ends
+       land on the hub above and the vertical rail below. */
+    margin: 4px 0 0;
     transform: rotate(90deg);
   }
 
