@@ -281,3 +281,52 @@ git diff -- apps/web/src/components/sections/saas docs/superpowers/plans/2026-09
 ```
 
 Expected: no whitespace errors and only the approved SaaS implementation plus its plan.
+
+### Task 7: Add distinct delivery-stage icons
+
+**Files:**
+- Modify: `apps/web/src/components/sections/saas/SaasShiftLeft.test.tsx`
+- Modify: `apps/web/src/components/sections/saas/SaasVerifiedCore.tsx`
+- Modify: `apps/web/src/components/sections/saas/SaasVerifiedCore.module.css`
+
+- [ ] **Step 1: Write a failing structural test**
+
+Assert that the rendered primary route contains a unique icon marker for every typed delivery-stage ID:
+
+```tsx
+it('gives every delivery stage its own recognizable icon', () => {
+  const html = renderSection();
+
+  for (const stage of ['code', 'build', 'test', 'deploy']) {
+    expect(html).toContain(`data-stage-icon="${stage}"`);
+  }
+});
+```
+
+- [ ] **Step 2: Run the focused test and verify RED**
+
+```bash
+pnpm --filter @cleanstart/web test -- src/components/sections/saas/SaasShiftLeft.test.tsx
+```
+
+Expected: FAIL because the stage housings currently render the same core node without `data-stage-icon` markers.
+
+- [ ] **Step 3: Add a typed icon renderer**
+
+Add a focused `StageIcon` helper that accepts `DeliveryStageId` and returns one decorative inline SVG per stage: code brackets, an isometric package, a check-in-ring, and an upward release arrow. Mark each SVG with `data-stage-icon={stage}` and keep the parent diagram `aria-hidden`.
+
+- [ ] **Step 4: Integrate icons without breaking the verified ribbon**
+
+Replace the generic core node inside `StageHousing` with `<StageIcon stage={stage.id} />`. Preserve `coreLine` behind the icon, and style every icon with one cyan-to-mint monoline treatment, identical dimensions, round joins, and a restrained glow.
+
+- [ ] **Step 5: Verify GREEN and run package gates**
+
+```bash
+pnpm --filter @cleanstart/web test -- src/components/sections/saas/SaasShiftLeft.test.tsx
+pnpm --filter @cleanstart/web test
+pnpm --filter @cleanstart/web lint
+pnpm --filter @cleanstart/web typecheck
+pnpm --filter @cleanstart/web build
+```
+
+Expected: all focused and package checks pass, with Code, Build, Test, and Deploy remaining legible at desktop and mobile sizes.
