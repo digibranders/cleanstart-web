@@ -1384,6 +1384,39 @@ body {
   .cs-hero-drift-b {
     animation: cs-hero-drift-b 6.5s ease-in-out -1.5s infinite alternate;
   }
+
+  /* Cursor parallax. SaasHeroParallax.tsx publishes --cs-px / --cs-py in the
+     range -1..1; the layers read them here so the browser can do the work on the
+     compositor without React re-rendering the SVG.
+
+     Amounts increase with proximity — the blurred back row moves least, the
+     surface more, the front cards most. That ordering is what turns three
+     stacked planes into actual depth rather than three flat groups sliding
+     together.
+
+     The transition is deliberate rather than leftover. rAF writes a new value
+     every frame, so a short ease gives the layers a slight trail behind the
+     cursor, which reads as mass. Without it the movement is rigid and snaps.
+
+     transform-origin is irrelevant here: these are pure translations, so the
+     SVG default of 0 0 costs nothing. The drift animations live on wrapper
+     groups INSIDE the front row, so parent parallax and child drift compose
+     instead of overwriting each other. */
+  .cs-par {
+    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .cs-par-back {
+    transform: translate(calc(var(--cs-px, 0) * 5px), calc(var(--cs-py, 0) * 4px));
+  }
+
+  .cs-par-mid {
+    transform: translate(calc(var(--cs-px, 0) * 10px), calc(var(--cs-py, 0) * 8px));
+  }
+
+  .cs-par-front {
+    transform: translate(calc(var(--cs-px, 0) * 18px), calc(var(--cs-py, 0) * 14px));
+  }
 }
 
 @keyframes cs-hero-reveal {

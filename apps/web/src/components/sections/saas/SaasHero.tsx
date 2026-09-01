@@ -1,6 +1,7 @@
 import type React from 'react';
 import Link from 'next/link';
 import { SaasHeroAppSurface } from './SaasHeroAppSurface';
+import { SaasHeroParallax } from './SaasHeroParallax';
 import { HeroReveal } from '@/components/ui/Reveal';
 
 /*
@@ -87,7 +88,9 @@ export function SaasHero(): React.ReactElement {
             width: 'clamp(280px, 42vw, 600px)',
           }}
         >
-          <SaasHeroAppSurface />
+          <SaasHeroParallax>
+            <SaasHeroAppSurface />
+          </SaasHeroParallax>
         </div>
       </div>
 

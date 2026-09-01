@@ -391,8 +391,13 @@ export function SaasHeroAppSurface(): React.ReactElement {
   const cy = APP_Y + APP_H / 2;
 
   return (
+    // The viewBox is deliberately larger than the artwork: 26px of slack left
+    // and right, 22px top and bottom. Parallax translates the front plane by up
+    // to 18px, and with the cards' rotation overhang on top of that the terminal
+    // reached x 592 in a 580-wide frame, where the SVG viewport clipped it. The
+    // artwork's own coordinates are unchanged; only the window onto it grew.
     <svg
-      viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
+      viewBox={`-26 -22 ${VIEW_W + 52} ${VIEW_H + 44}`}
       preserveAspectRatio="xMidYMid meet"
       role="presentation"
       className="block w-full"
@@ -443,7 +448,7 @@ export function SaasHeroAppSurface(): React.ReactElement {
 
       <ellipse cx={VIEW_W / 2} cy={VIEW_H / 2} rx={280} ry={226} fill="url(#csa-glow)" />
 
-      <g className="cs-hero-fade" style={{ animationDelay: '80ms' }}>
+      <g className="cs-hero-fade cs-par cs-par-back" style={{ animationDelay: '80ms' }}>
         {[-62, -40, -20, 0, 20, 40, 62].map((a) => (
           <polygon
             key={a}
@@ -465,7 +470,7 @@ export function SaasHeroAppSurface(): React.ReactElement {
 
       {/* Tethers. Without them the pieces read as confetti; with them every one
           belongs to the application in the middle. */}
-      <g className="cs-hero-fade" style={{ animationDelay: '560ms' }}>
+      <g className="cs-hero-fade cs-par cs-par-back" style={{ animationDelay: '560ms' }}>
         {(
           [
             [96, 120],
@@ -492,7 +497,11 @@ export function SaasHeroAppSurface(): React.ReactElement {
       </g>
 
       {/* BEHIND the surface, blurred back. */}
-      <g className="cs-hero-band" filter="url(#csa-back)" style={{ animationDelay: '260ms' }}>
+      <g
+        className="cs-hero-band cs-par cs-par-back"
+        filter="url(#csa-back)"
+        style={{ animationDelay: '260ms' }}
+      >
         <g transform="rotate(7 462 104) translate(396 56)">
           <Shell w={150} h={100} fill="url(#csa-cyan)" accent="rgba(79,227,255,0.4)" />
           <Cog x={34} y={36} r={13} fill="rgba(120,233,255,0.9)" />
@@ -537,7 +546,7 @@ export function SaasHeroAppSurface(): React.ReactElement {
       </g>
 
       {/* THE APPLICATION SURFACE */}
-      <g className="cs-hero-band" style={{ animationDelay: '140ms' }}>
+      <g className="cs-hero-band cs-par cs-par-mid" style={{ animationDelay: '140ms' }}>
         <rect
           x={APP_X}
           y={APP_Y}
@@ -734,7 +743,7 @@ export function SaasHeroAppSurface(): React.ReactElement {
       </g>
 
       {/* IN FRONT, overlapping the surface. */}
-      <g className="cs-hero-band" style={{ animationDelay: '380ms' }}>
+      <g className="cs-hero-band cs-par cs-par-front" style={{ animationDelay: '380ms' }}>
         {/* Package, moved out of the blurred back row. It sits in FRONT of the
             surface now, so it is sharp and overlaps the window's right edge
             rather than washing out behind it. Placed first in this group so the
