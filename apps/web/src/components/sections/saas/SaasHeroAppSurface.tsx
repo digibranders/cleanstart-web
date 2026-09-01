@@ -792,26 +792,34 @@ export function SaasHeroAppSurface(): React.ReactElement {
         </g>
 
         {/* Terminal: the one piece that says a human builds this. */}
-        <g transform="rotate(4 512 194) translate(452 156)">
-          <Shell w={120} h={76} fill="url(#csa-term)" accent="rgba(120,190,255,0.34)" radius={9} />
-          {[0, 1, 2].map((i) => (
-            <circle
-              key={i}
-              cx={12 + i * 9}
-              cy={12}
-              r={2.6}
-              fill={['#ff6b5a', '#ffc44d', '#4fe3ff'][i]}
-              opacity={0.85}
+        <g className="cs-hero-drift">
+          <g transform="rotate(4 512 194) translate(452 156)">
+            <Shell
+              w={120}
+              h={76}
+              fill="url(#csa-term)"
+              accent="rgba(120,190,255,0.34)"
+              radius={9}
             />
-          ))}
-          <line x1={0} y1={22} x2={120} y2={22} stroke="rgba(255,255,255,0.12)" strokeWidth={1} />
-          <rect x={12} y={32} width={7} height={3} rx={1.5} fill="#7de9ff" />
-          <Lines x={24} y={32} widths={[62]} opacity={0.34} />
-          <rect x={12} y={44} width={7} height={3} rx={1.5} fill="#7de9ff" />
-          <Lines x={24} y={44} widths={[44]} opacity={0.3} />
-          <rect x={12} y={56} width={7} height={3} rx={1.5} fill="#b47cff" />
-          <Lines x={24} y={56} widths={[74]} opacity={0.26} />
-          <rect x={12} y={66} width={5} height={5} rx={1} fill="rgba(125,233,255,0.9)" />
+            {[0, 1, 2].map((i) => (
+              <circle
+                key={i}
+                cx={12 + i * 9}
+                cy={12}
+                r={2.6}
+                fill={['#ff6b5a', '#ffc44d', '#4fe3ff'][i]}
+                opacity={0.85}
+              />
+            ))}
+            <line x1={0} y1={22} x2={120} y2={22} stroke="rgba(255,255,255,0.12)" strokeWidth={1} />
+            <rect x={12} y={32} width={7} height={3} rx={1.5} fill="#7de9ff" />
+            <Lines x={24} y={32} widths={[62]} opacity={0.34} />
+            <rect x={12} y={44} width={7} height={3} rx={1.5} fill="#7de9ff" />
+            <Lines x={24} y={44} widths={[44]} opacity={0.3} />
+            <rect x={12} y={56} width={7} height={3} rx={1.5} fill="#b47cff" />
+            <Lines x={24} y={56} widths={[74]} opacity={0.26} />
+            <rect x={12} y={66} width={5} height={5} rx={1} fill="rgba(125,233,255,0.9)" />
+          </g>
         </g>
 
         {/* Lifted: at translate(452 376) this ran to y 454 in a 460 frame and the
@@ -821,26 +829,28 @@ export function SaasHeroAppSurface(): React.ReactElement {
           <LayerStack />
         </g>
 
-        <g transform="rotate(9 86 376) translate(50 348)">
-          <Shell w={80} h={62} fill="url(#csa-cyan)" accent="rgba(79,227,255,0.5)" radius={15} />
-          <path
-            d="M27,22 L19,31 L27,40 M53,22 L61,31 L53,40"
-            fill="none"
-            stroke="#8beeff"
-            strokeWidth={2.7}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <line
-            x1={45}
-            y1={19}
-            x2={35}
-            y2={43}
-            stroke="#c9a6ff"
-            strokeWidth={2.5}
-            strokeLinecap="round"
-          />
-          <Tick x={68} y={11} r={8} />
+        <g className="cs-hero-drift-b">
+          <g transform="rotate(9 86 376) translate(50 348)">
+            <Shell w={80} h={62} fill="url(#csa-cyan)" accent="rgba(79,227,255,0.5)" radius={15} />
+            <path
+              d="M27,22 L19,31 L27,40 M53,22 L61,31 L53,40"
+              fill="none"
+              stroke="#8beeff"
+              strokeWidth={2.7}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <line
+              x1={45}
+              y1={19}
+              x2={35}
+              y2={43}
+              stroke="#c9a6ff"
+              strokeWidth={2.5}
+              strokeLinecap="round"
+            />
+            <Tick x={68} y={11} r={8} />
+          </g>
         </g>
       </g>
     </svg>

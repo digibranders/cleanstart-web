@@ -1336,6 +1336,38 @@ body {
   .cs-hero-fade {
     animation: cs-hero-band 560ms ease-out both;
   }
+
+  /* A slow drift on two isolated pieces, and only two. The point is to stop the
+     artifact reading as a flat print, not to animate it — a hero that keeps
+     moving competes with the headline it sits beside.
+
+     Applied to WRAPPER groups that carry no transform attribute of their own.
+     The cards themselves are positioned with SVG `transform="rotate(...)
+     translate(...)"`, and animating transform on those would fight the
+     attribute; a bare wrapper has nothing to collide with and needs no
+     transform-origin.
+
+     Both pieces are isolated in the composition, so a 3px drift never carries
+     one into another. */
+  @keyframes cs-hero-drift {
+    from {
+      transform: translateY(-3px);
+    }
+
+    to {
+      transform: translateY(3px);
+    }
+  }
+
+  .cs-hero-drift {
+    animation: cs-hero-drift 6s ease-in-out infinite alternate;
+  }
+
+  .cs-hero-drift-b {
+    /* Negative delay desynchronises the pair: started together they bob in
+       lockstep, which reads as the whole image wobbling. */
+    animation: cs-hero-drift 8s ease-in-out -2.5s infinite alternate;
+  }
 }
 
 @keyframes cs-hero-reveal {
