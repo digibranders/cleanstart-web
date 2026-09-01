@@ -1,6 +1,6 @@
 import type React from 'react';
 import Link from 'next/link';
-import { SaasHeroVerifiedRuntime } from './SaasHeroVerifiedRuntime';
+import { SaasHeroAppSurface } from './SaasHeroAppSurface';
 import { HeroReveal } from '@/components/ui/Reveal';
 
 /*
@@ -11,7 +11,7 @@ import { HeroReveal } from '@/components/ui/Reveal';
  *
  * The artifact is the one departure from that shell. Every other hero on the
  * site carries a 3D render; this one is drawn in code
- * (SaasHeroVerifiedRuntime.tsx), because the render it replaced was rejected and
+ * (SaasHeroAppSurface.tsx), because the render it replaced was rejected and
  * regenerating it kept landing on stock illustration.
  */
 export function SaasHero(): React.ReactElement {
@@ -42,7 +42,7 @@ export function SaasHero(): React.ReactElement {
           competing for the same row.
 
           Built, not rendered: this was hero-app-platform.webp until the client
-          rejected it. See SaasHeroVerifiedRuntime.tsx for the reasoning. There is no
+          rejected it. See SaasHeroAppSurface.tsx for the reasoning. There is no
           `priority` preload left to get wrong — the old render was preloading on
           phones that never painted it. */}
       <div
@@ -87,7 +87,7 @@ export function SaasHero(): React.ReactElement {
             width: 'clamp(280px, 42vw, 600px)',
           }}
         >
-          <SaasHeroVerifiedRuntime />
+          <SaasHeroAppSurface />
         </div>
       </div>
 
