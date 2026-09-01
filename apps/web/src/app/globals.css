@@ -1337,36 +1337,52 @@ body {
     animation: cs-hero-band 560ms ease-out both;
   }
 
-  /* A slow drift on two isolated pieces, and only two. The point is to stop the
+  /* A slow float on two isolated pieces, and only two. The point is to stop the
      artifact reading as a flat print, not to animate it — a hero that keeps
-     moving competes with the headline it sits beside.
+     moving competes with the headline beside it.
+
+     Amplitude matters more than it sounds. A first pass used 3px over 6s, which
+     is half a pixel per second and sits below the threshold of perception: the
+     animation was running and correct, and nobody could see it. 8px over 5s is
+     still quiet but actually reads.
+
+     The two run on OPPOSITE paths rather than the same keyframes offset by a
+     delay. Same-direction drift, however desynchronised, still reads as the
+     whole image swaying; opposing it reads as two things floating.
 
      Applied to WRAPPER groups that carry no transform attribute of their own.
-     The cards themselves are positioned with SVG `transform="rotate(...)
-     translate(...)"`, and animating transform on those would fight the
-     attribute; a bare wrapper has nothing to collide with and needs no
-     transform-origin.
+     The cards are positioned with SVG `transform="rotate(...) translate(...)"`,
+     and animating transform on those would fight the attribute; a bare wrapper
+     has nothing to collide with and needs no transform-origin.
 
-     Both pieces are isolated in the composition, so a 3px drift never carries
-     one into another. */
-  @keyframes cs-hero-drift {
+     Both pieces sit clear of their neighbours, so the travel never carries one
+     into another. */
+  @keyframes cs-hero-drift-a {
     from {
-      transform: translateY(-3px);
+      transform: translate(-2px, -8px);
     }
 
     to {
-      transform: translateY(3px);
+      transform: translate(2px, 8px);
+    }
+  }
+
+  @keyframes cs-hero-drift-b {
+    from {
+      transform: translate(3px, 7px);
+    }
+
+    to {
+      transform: translate(-3px, -7px);
     }
   }
 
   .cs-hero-drift {
-    animation: cs-hero-drift 6s ease-in-out infinite alternate;
+    animation: cs-hero-drift-a 5s ease-in-out infinite alternate;
   }
 
   .cs-hero-drift-b {
-    /* Negative delay desynchronises the pair: started together they bob in
-       lockstep, which reads as the whole image wobbling. */
-    animation: cs-hero-drift 8s ease-in-out -2.5s infinite alternate;
+    animation: cs-hero-drift-b 6.5s ease-in-out -1.5s infinite alternate;
   }
 }
 
