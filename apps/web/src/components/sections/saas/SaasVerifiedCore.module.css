@@ -167,14 +167,25 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  flex: 1 1 auto;
   /* Fixed pitch, not space-between: the halos need to know where each stage
      sits, and under space-between that depends on the container's width. Width
-     is 5 nodes + 4 gaps + a tail for the release cap. */
+     is 5 nodes + 4 gaps + a tail for the release cap.
+
+     box-sizing is declared explicitly and is load-bearing. Without it this
+     resolved as content-box, so the declared 638px became the CONTENT width and
+     the 34px tail was added on top — the rail measured 670px while the halo
+     fractions were computed against 638px. Every stage then lit after the front
+     had already passed it. */
+  box-sizing: border-box;
   width: calc(5 * var(--node-w) + 4 * 6px + 34px);
   justify-content: flex-start;
   gap: 6px;
   padding-right: 34px;
+  /* NOT flex: 1. Growing absorbed the row's free space and stretched the rail
+     from its declared 638px to 670px, while the halo fractions stayed computed
+     against 638 — so every stage lit after the front had passed it. The rail
+     must keep exactly the width its pitch implies. */
+  flex: 0 0 auto;
 }
 
 .railBase,
@@ -426,16 +437,18 @@
 /* One keyframe set for all five stages; --halo-delay puts each at its own point
    along the fill. Bright on arrival, then held down so the whole rail reads as
    verified rather than five things blinking. */
+/* Peaks on arrival. At 3% the flare landed 195ms behind the front, which reads
+   as the two being out of step. */
 @keyframes halo {
   0% {
     opacity: 0;
   }
 
-  3% {
+  2% {
     opacity: 1;
   }
 
-  10% {
+  8% {
     opacity: 0.5;
   }
 
