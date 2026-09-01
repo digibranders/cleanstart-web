@@ -1,6 +1,6 @@
 import type React from 'react';
 import Link from 'next/link';
-import { SaasHeroStack } from './SaasHeroStack';
+import { SaasHeroDashboard } from './SaasHeroDashboard';
 import { HeroReveal } from '@/components/ui/Reveal';
 
 /*
@@ -10,11 +10,9 @@ import { HeroReveal } from '@/components/ui/Reveal';
  * is the proposal's, verbatim.
  *
  * The artifact is the one departure from that shell. Every other hero on the
- * site carries a 3D render; this one is built in code from real catalogue data
- * (SaasHeroStack.tsx), because the render it replaced was rejected and four
- * regenerations could not shake the stock-illustration read. Both category
- * leaders reached the same conclusion: neither Chainguard nor Docker Hardened
- * Images uses an illustration in its hero.
+ * site carries a 3D render; this one is a product panel built in code
+ * (SaasHeroDashboard.tsx), because the render it replaced was rejected and
+ * regenerating it kept landing on stock illustration.
  */
 export function SaasHero(): React.ReactElement {
   return (
@@ -40,13 +38,21 @@ export function SaasHero(): React.ReactElement {
           hero makes.
 
           Built, not rendered: this was hero-app-platform.webp until the client
-          rejected it. See SaasHeroStack.tsx for the reasoning. There is no
+          rejected it. See SaasHeroDashboard.tsx for the reasoning. There is no
           `priority` preload left to get wrong — the old render was preloading on
           phones that never painted it. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 mx-auto hidden select-none xl:block"
-        style={{ maxWidth: 'var(--container-default)', height: '100%' }}
+        style={{
+          maxWidth: 'var(--container-default)',
+          height: '100%',
+          // Above the bottom fade, which is a later sibling and was painting
+          // white over the panel's lower third. The old 3D render wanted that
+          // wash — it read as the object grounding into the page — but a product
+          // UI panel with its edges dissolving just looks broken.
+          zIndex: 1,
+        }}
       >
         <div
           className="absolute"
@@ -60,15 +66,15 @@ export function SaasHero(): React.ReactElement {
             // was fitted to a three-line one; against the shorter headline it
             // left a 352px hole in the middle of the composition and the
             // artifact had no weight to answer the copy with.
-            top: '48%',
+            top: '46%',
             transform: 'translateY(-50%)',
-            // Fixed, not a clamp: the cards carry real text, so scaling the box
-            // with the viewport would scale the type off its own ramp. The
-            // artifact only renders at xl+, where 400px always fits.
-            width: '440px',
+            // Fixed, not a clamp: the panel carries real UI text, so scaling
+            // the box with the viewport would scale the type off its own ramp.
+            // The artifact only renders at xl+, where 520px always fits.
+            width: '520px',
           }}
         >
-          <SaasHeroStack />
+          <SaasHeroDashboard />
         </div>
       </div>
 
