@@ -307,6 +307,85 @@ function Graph(): React.ReactElement {
   );
 }
 
+/*
+ * A source tree. Indentation is the point: it is the one card whose structure
+ * says "this is nested", which no flat list of bars can express.
+ */
+function FileTree(): React.ReactElement {
+  const rows = [
+    { indent: 0, w: 54, dot: CYAN, caret: true },
+    { indent: 11, w: 42, dot: 'rgba(255,255,255,0.42)', caret: false },
+    { indent: 11, w: 60, dot: '#b47cff', caret: true },
+    { indent: 22, w: 38, dot: 'rgba(255,255,255,0.42)', caret: false },
+    { indent: 22, w: 50, dot: CYAN, caret: false },
+  ] as const;
+  return (
+    <g>
+      {rows.map((r, i) => {
+        const y = 14 + i * 13;
+        return (
+          <g key={`${r.indent}-${r.w}`}>
+            {r.caret && (
+              <path
+                d={`M${12 + r.indent},${y - 3} L${16 + r.indent},${y} L${12 + r.indent},${y + 3}`}
+                fill="none"
+                stroke="rgba(255,255,255,0.5)"
+                strokeWidth={1.3}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            )}
+            <rect x={21 + r.indent} y={y - 3} width={6} height={6} rx={1.4} fill={r.dot} />
+            <rect
+              x={31 + r.indent}
+              y={y - 2}
+              width={r.w}
+              height={3.4}
+              rx={1.7}
+              fill={`rgba(255,255,255,${i === 0 ? 0.4 : 0.24})`}
+            />
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+/*
+ * Image layers with their weights. The one card that shows a container image's
+ * internals rather than referring to it — narrow bars for thin layers, wide for
+ * fat ones, each with its size read off to the right.
+ */
+function LayerStack(): React.ReactElement {
+  const layers = [
+    { w: 76, size: 16, fill: '#7de9ff' },
+    { w: 54, size: 11, fill: 'rgba(255,255,255,0.34)' },
+    { w: 88, size: 21, fill: '#b47cff' },
+    { w: 44, size: 8, fill: 'rgba(255,255,255,0.28)' },
+    { w: 66, size: 14, fill: 'rgba(122,197,255,0.85)' },
+  ] as const;
+  return (
+    <g>
+      {layers.map((l, i) => {
+        const y = 14 + i * 12;
+        return (
+          <g key={`${l.w}-${i}`}>
+            <rect x={12} y={y} width={l.w} height={7} rx={2} fill={l.fill} opacity={0.85} />
+            <rect
+              x={12 + l.w + 5}
+              y={y + 2}
+              width={l.size}
+              height={3}
+              rx={1.5}
+              fill="rgba(255,255,255,0.22)"
+            />
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
 export function SaasHeroAppSurface(): React.ReactElement {
   const cx = APP_X + APP_W / 2;
   const cy = APP_Y + APP_H / 2;
@@ -431,6 +510,9 @@ export function SaasHeroAppSurface(): React.ReactElement {
             />
           ))}
           <Lines x={16} y={74} widths={[118, 96]} opacity={0.24} />
+          <rect x={16} y={60} width={22} height={10} rx={5} fill="rgba(125,233,255,0.7)" />
+          <circle cx={32} cy={65} r={3.4} fill="#0a1030" />
+          <rect x={46} y={62} width={34} height={5} rx={2.5} fill="rgba(255,255,255,0.26)" />
         </g>
 
         <g transform="rotate(-9 92 120) translate(16 70)">
@@ -443,6 +525,14 @@ export function SaasHeroAppSurface(): React.ReactElement {
 
         <g transform="rotate(-5 66 42) translate(20 14)">
           <Graph />
+        </g>
+
+        {/* Nudged down off the frame edge so it overlaps the surface top rather
+            than hugging y=2, and moved off csa-deep, which was invisible against
+            the background it sat on. */}
+        <g transform="rotate(5 180 48) translate(110 12)">
+          <Shell w={136} h={72} fill="url(#csa-blue)" accent="rgba(120,190,255,0.4)" radius={9} />
+          <FileTree />
         </g>
       </g>
 
@@ -673,7 +763,9 @@ export function SaasHeroAppSurface(): React.ReactElement {
             opacity={0.9}
           />
           <Lines x={60} y={20} widths={[68, 52, 60]} gap={10} opacity={0.42} />
-          <Lines x={16} y={64} widths={[114, 92]} opacity={0.2} />
+          <circle cx={22} cy={70} r={7} fill="rgba(180,124,255,0.55)" />
+          <Lines x={34} y={66} widths={[58, 40]} gap={8} opacity={0.24} />
+          <circle cx={128} cy={70} r={3} fill="rgba(125,233,255,0.9)" />
         </g>
 
         <g transform="rotate(5 356 376) translate(272 344)">
@@ -720,6 +812,13 @@ export function SaasHeroAppSurface(): React.ReactElement {
           <rect x={12} y={56} width={7} height={3} rx={1.5} fill="#b47cff" />
           <Lines x={24} y={56} widths={[74]} opacity={0.26} />
           <rect x={12} y={66} width={5} height={5} rx={1} fill="rgba(125,233,255,0.9)" />
+        </g>
+
+        {/* Lifted: at translate(452 376) this ran to y 454 in a 460 frame and the
+            rotation pushed a corner past it. */}
+        <g transform="rotate(-6 506 402) translate(446 362)">
+          <Shell w={120} h={78} fill="url(#csa-blue)" accent="rgba(120,190,255,0.42)" radius={9} />
+          <LayerStack />
         </g>
 
         <g transform="rotate(9 86 376) translate(50 348)">
