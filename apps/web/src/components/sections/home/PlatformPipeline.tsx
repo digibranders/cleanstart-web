@@ -66,17 +66,17 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
       className="factory-card relative flex h-full min-w-0 flex-col"
       style={{ containerType: "inline-size" }}
     >
-      {/* Blue glass card body — flat CSS gradient (no baked glow), matching
-          the mobile card's tones so the surface is consistent across
-          breakpoints. */}
-      <div
+      {/* Blue glass card body (designed art, with baked top/bottom glows). */}
+      <Image
+        src="/images/cleanstart-factory/factory-card-bg.webp"
+        alt=""
         aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          borderRadius: "9cqw",
-          border: "1px solid rgba(150,180,255,0.22)",
-          background: "linear-gradient(118deg, #0f1c4d 0%, #1a347f 52%, #2350c6 100%)",
-        }}
+        width={232}
+        height={374}
+        sizes="(min-width: 1024px) 320px, 42vw"
+        priority={isFirst}
+        className="pointer-events-none absolute inset-0 h-full w-full select-none"
+        style={{ borderRadius: "9cqw" }}
       />
 
       {/* Content layer — drives the card height (no fixed aspect ratio), so the
@@ -155,8 +155,8 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
 }
 
 // Intelligence Center bar — the original platform-bar treatment (indigo
-// gradient, lavender stroke, diagonal hatch), opaque so it occludes the card
-// exhaust-flare tails that bleed up from the gap above it.
+// gradient, diagonal hatch), opaque so it occludes the card exhaust-flare
+// tails that bleed up from the gap above it.
 function IntelligenceBar() {
   return (
     <div
@@ -165,7 +165,6 @@ function IntelligenceBar() {
         containerType: "inline-size",
         background:
           "linear-gradient(180deg, #151021 0%, #131E8F 71.2%, #551ECE 100%)",
-        border: "1px solid #dab6f3",
         borderRadius: 18,
         padding: "clamp(16px, 2.2cqw, 26px) 24px",
         gap: "clamp(8px, 1cqw, 14px)",
@@ -199,9 +198,9 @@ function IntelligenceBar() {
   );
 }
 
-// Original factory enclosure (dark-navy → indigo → purple gradient, lavender
-// stroke, diagonal hatch, layered drop shadow) wrapping the 3 cards and the
-// Intelligence Center bar.
+// Original factory enclosure (dark-navy → indigo → purple gradient, diagonal
+// hatch, layered drop shadow) wrapping the 3 cards and the Intelligence
+// Center bar.
 function FactoryEnclosure() {
   return (
     <div className="relative w-full">
@@ -210,7 +209,6 @@ function FactoryEnclosure() {
         style={{
           borderRadius: 32,
           background: "rgba(28, 28, 28, 0.7)",
-          border: "1px solid #dab6f3",
           boxShadow: "0px 4px 4px rgba(0,0,0,0.25)",
         }}
       >
