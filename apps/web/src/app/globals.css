@@ -1468,28 +1468,26 @@ body {
   }
 }
 
-/* Home hero H1 — "type-on → true-focus" then "focus-settle + living accent"
-   (see HeroHeading.tsx). Pure CSS so the LCP H1 text paints from the server
-   HTML; clip/opacity/blur live only in keyframes (never base rules), so
-   reduced-motion (animation: none) falls back to the final, fully-visible
-   heading. Timeline: 0.15s type-on starts → ~1.05s typed → focus snap →
-   1.25s line 2 focus-settles → ~2.2s accent shimmer + settle glint. */
+/* Home hero H1 — "reject, then correct": the industry's "Hardened. Secure."
+   types on and gets struck through, then "Verified" rises above it as the
+   brand's actual claim (see HeroHeading.tsx). Pure CSS so the LCP H1 text
+   paints from the server HTML; clip/opacity/blur live only in keyframes
+   (never base rules where avoidable), so reduced-motion (animation: none)
+   falls back to the final, fully-corrected, fully-visible heading. Timeline:
+   0.15s type-on starts → ~1.05s "Hardened. Secure." typed → 1.1s strike +
+   desaturate lands on "Hardened" → 1.4s "Verified" rises → ~1.95s shine
+   starts, line 3 focus-settles → ~2.5s fully settled. */
 .cs-hero-h1 {
   position: relative;
 }
 
-/* 1 · "Verified. Secure." — stepped clip reveal (type-on) held soft, then a
-   smooth blur→sharp focus snap once the line is fully revealed. */
-.cs-hh-typewrap {
-  display: inline-block;
-  position: relative;
-  white-space: nowrap;
-}
-
-.cs-hh-type {
-  display: inline-block;
-  /* Brand cyan→purple gradient (shared H2 stops, .cs-text-gradient-impact),
-     mirrored periodic so the continuous drift loops seamlessly. */
+/* Shared brand cyan→purple gradient text treatment (shared H2 stops,
+   .cs-text-gradient-impact), mirrored periodic so the continuous drift
+   loops seamlessly. Used by "Verified", "Secure.", and "Hardened." while
+   it's still typing (before the strike desaturates it). */
+.cs-hh-verified,
+.cs-hh-secure,
+.cs-hh-hardened-grad {
   background-image: linear-gradient(100deg,
       #2cc1eb 0%,
       #9a51ff 50%,
@@ -1499,13 +1497,47 @@ body {
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
+}
+
+/* 1 · "Verified" — the correction line. Rises into focus after the
+   "Hardened" strike lands, then joins "Secure." in the continuous shine. */
+.cs-hh-verified {
+  display: block;
+  animation:
+    cs-hh-verified-rise 0.55s cubic-bezier(0.16, 1, 0.3, 1) 1.4s both,
+    cs-hh-shine 6s linear 1.95s infinite;
+}
+
+@keyframes cs-hh-verified-rise {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(0.15em);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+/* 2 · "Hardened. Secure." — stepped clip reveal (type-on) for the whole
+   line, held soft, then a smooth blur→sharp focus snap once fully
+   revealed. */
+.cs-hh-typewrap {
+  display: block;
+  position: relative;
+  white-space: nowrap;
+}
+
+.cs-hh-line2 {
+  display: inline-block;
   animation:
     cs-hh-reveal 0.9s steps(17) 0.15s both,
-    cs-hh-snap 0.5s ease-out 1.05s both,
-    cs-hh-shine 6s linear 1.6s infinite;
-  /* No will-change: the clip/blur entrance is one-shot, and the looping
-     background-position shine is a paint (not a compositable) property, so a
-     layer hint buys nothing while holding memory on the LCP heading. */
+    cs-hh-snap 0.5s ease-out 1.05s both;
+  /* No will-change: the clip/blur entrance is one-shot, so a layer hint
+     buys nothing while holding memory on the LCP heading. */
 }
 
 @keyframes cs-hh-reveal {
@@ -1526,6 +1558,73 @@ body {
   to {
     filter: blur(0);
   }
+}
+
+/* "Hardened." types on in the gradient (so the type-on still reads as one
+   phrase), then — once the strike lands — crossfades to a muted gray twin
+   stacked in the same position. */
+.cs-hh-hardened {
+  position: relative;
+  display: inline-block;
+}
+
+.cs-hh-hardened::after {
+  content: "";
+  position: absolute;
+  left: -2%;
+  right: -2%;
+  top: 50%;
+  height: 3px;
+  background: #ff5468;
+  border-radius: 2px;
+  transform-origin: left center;
+  animation: cs-hh-strike 0.4s ease-out 1.1s both;
+}
+
+@keyframes cs-hh-strike {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.cs-hh-hardened-grad {
+  animation: cs-hh-fade-out 0.2s ease-out 1.1s both;
+}
+
+.cs-hh-hardened-gray {
+  position: absolute;
+  inset: 0;
+  color: #8892a4;
+  opacity: 0;
+  animation: cs-hh-fade-in 0.2s ease-out 1.1s both;
+}
+
+@keyframes cs-hh-fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes cs-hh-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.cs-hh-secure {
+  animation: cs-hh-shine 6s linear 1.95s infinite;
 }
 
 /* Blinking caret that travels with the reveal edge, then fades as focus runs.
@@ -1572,10 +1671,11 @@ body {
   }
 }
 
-/* 2 · "Built for the AI Era." — focus-settle entrance after the type-on line. */
+/* 3 · "Built for the AI Era." — focus-settle entrance after the correction
+   has landed. */
 .cs-hh-phrase {
-  display: inline-block;
-  animation: cs-hh-focus 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.25s both;
+  display: block;
+  animation: cs-hh-focus 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.7s both;
   /* One-shot focus-settle — no persistent compositor-layer hint. */
 }
 
@@ -1593,8 +1693,9 @@ body {
   }
 }
 
-/* Continuous seamless drift for the colored "Verified. Secure." line: scroll
-   the periodic gradient by exactly one tile width so it loops with no snap. */
+/* Continuous seamless drift for the gradient "Verified"/"Secure." text:
+   scroll the periodic gradient by exactly one tile width so it loops with
+   no snap. */
 @keyframes cs-hh-shine {
   from {
     background-position: 0 0;
@@ -1607,14 +1708,34 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
 
-  .cs-hh-type,
+  .cs-hh-verified,
+  .cs-hh-line2,
+  .cs-hh-hardened::after,
+  .cs-hh-hardened-grad,
+  .cs-hh-hardened-gray,
+  .cs-hh-secure,
   .cs-hh-phrase {
     animation: none;
   }
 
-  /* Hold a static cyan→purple gradient on line 1 when motion is off. */
-  .cs-hh-type {
+  /* Hold the final, fully-corrected state when motion is off: "Verified"
+     and "Secure." visible in a static gradient, "Hardened." shown as its
+     already-struck-through gray twin. */
+  .cs-hh-verified,
+  .cs-hh-secure {
     background-position: 0 0;
+  }
+
+  .cs-hh-hardened-grad {
+    opacity: 0;
+  }
+
+  .cs-hh-hardened-gray {
+    opacity: 1;
+  }
+
+  .cs-hh-hardened::after {
+    transform: scaleX(1);
   }
 
   .cs-hh-typewrap::after {
