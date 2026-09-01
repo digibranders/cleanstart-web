@@ -4,7 +4,7 @@ import { Reveal } from '@/components/ui/Reveal';
 import { SaasVerifiedCore } from './SaasVerifiedCore';
 
 const VERIFIED_FIRST_DESCRIPTION =
-  'Verified Components, Code, Build, Test, Deploy, Security Review' as const;
+  'Verified Components, Code, Build, Test, Deploy, Security Review, Trusted Release' as const;
 
 export function SaasShiftLeft(): React.ReactElement {
   return (
@@ -68,6 +68,7 @@ export function SaasShiftLeft(): React.ReactElement {
           <li>Test</li>
           <li>Deploy</li>
           <li>Security Review</li>
+          <li>Trusted Release</li>
         </ol>
 
         <Reveal delay={0.14}>

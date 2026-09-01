@@ -48,6 +48,7 @@ describe('SaasShiftLeft', () => {
       'Test',
       'Deploy',
       'Security Review',
+      'Trusted Release',
     ]);
   });
 
@@ -71,7 +72,7 @@ describe('SaasShiftLeft', () => {
     // The diagram used to be emitted twice, once for desktop and once for
     // mobile, so every icon existed twice in the DOM. Orientation is now a CSS
     // concern and the tree is rendered once.
-    for (const stage of ['code', 'build', 'test', 'deploy', 'review']) {
+    for (const stage of ['code', 'build', 'test', 'deploy', 'review', 'release']) {
       expect(html.match(new RegExp(`data-stage-icon="${stage}"`, 'g'))).toHaveLength(1);
     }
   });
