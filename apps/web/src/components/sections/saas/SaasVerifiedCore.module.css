@@ -210,8 +210,8 @@
 .coreWindow {
   position: relative;
   display: grid;
-  width: 34px;
-  height: 34px;
+  width: 46px;
+  height: 46px;
   place-items: center;
   border: 1px solid rgba(127, 227, 255, 0.45);
   border-radius: 50%;
@@ -230,15 +230,18 @@
   background: linear-gradient(90deg, #7fe3ff, #5fe3c0);
 }
 
-.coreNode {
+.stageIcon {
   position: relative;
   z-index: 1;
-  width: 10px;
-  height: 10px;
-  border: 2px solid #d8fbff;
-  border-radius: 50%;
-  background: #5fe3c0;
-  box-shadow: 0 0 15px rgba(95, 227, 192, 0.9);
+  width: 27px;
+  height: 27px;
+  overflow: visible;
+  color: #c9faff;
+  filter: drop-shadow(0 0 5px rgba(95, 227, 192, 0.76));
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .scanner {
@@ -758,8 +761,8 @@
   }
 
   .coreWindow {
-    width: 36px;
-    height: 36px;
+    width: 48px;
+    height: 48px;
   }
 
   .coreLine {

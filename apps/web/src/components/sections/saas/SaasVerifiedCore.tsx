@@ -148,11 +148,50 @@ function StageHousing({ stage }: { readonly stage: DeliveryStage }): React.React
         <span className={styles.stageLabel}>{stage.label}</span>
         <span className={styles.coreWindow}>
           <span className={styles.coreLine} />
-          <span className={styles.coreNode} />
+          <StageIcon stage={stage.id} />
         </span>
       </div>
     </div>
   );
+}
+
+function StageIcon({ stage }: { readonly stage: DeliveryStageId }): React.ReactElement {
+  const commonProps = {
+    'aria-hidden': true,
+    className: styles.stageIcon,
+    'data-stage-icon': stage,
+    fill: 'none',
+    viewBox: '0 0 24 24',
+  } as const;
+
+  switch (stage) {
+    case 'code':
+      return (
+        <svg {...commonProps}>
+          <path d="M8 6.5 3 12l5 5.5M16 6.5l5 5.5-5 5.5M14.5 4 9.5 20" />
+        </svg>
+      );
+    case 'build':
+      return (
+        <svg {...commonProps}>
+          <path d="m12 3 8.5 4.75L12 12.5 3.5 7.75 12 3Z" />
+          <path d="M3.5 7.75v8.5L12 21l8.5-4.75v-8.5M12 12.5V21" />
+        </svg>
+      );
+    case 'test':
+      return (
+        <svg {...commonProps}>
+          <circle cx="12" cy="12" r="8.5" />
+          <path d="m7.75 12.25 2.65 2.65 5.85-6" />
+        </svg>
+      );
+    case 'deploy':
+      return (
+        <svg {...commonProps}>
+          <path d="M12 16V4M7.5 8.5 12 4l4.5 4.5M5 15v5h14v-5" />
+        </svg>
+      );
+  }
 }
 
 function SecurityScanner({

@@ -55,6 +55,25 @@ describe('SaasShiftLeft', () => {
     );
   });
 
+  it('renders a distinct stage icon in both responsive diagrams', () => {
+    const html = renderSection();
+
+    for (const stage of ['code', 'build', 'test', 'deploy']) {
+      expect(html.match(new RegExp(`data-stage-icon="${stage}"`, 'g'))).toHaveLength(2);
+    }
+  });
+
+  it('keeps stage icons visually prominent inside their core windows', () => {
+    const stylesheet = readFileSync(
+      new URL('./SaasVerifiedCore.module.css', import.meta.url),
+      'utf8',
+    );
+    const stageIconRule = stylesheet.match(/\.stageIcon\s*{([^}]*)}/)?.[1] ?? '';
+
+    expect(stageIconRule).toContain('width: 27px');
+    expect(stageIconRule).toContain('height: 27px');
+  });
+
   it('contrasts an open release with a closed late-review return', () => {
     const html = renderSection();
 
