@@ -1316,45 +1316,26 @@ body {
    after JS hydration (which stranded LCP behind hydration on every page). The
    fade-up is now purely presentational; offset/timing come from CSS vars set by
    the HeroReveal component. */
-/* SaaS hero product panel (SaasHeroDashboard.tsx). Settles in once and holds —
-   a hero artifact that loops competes with the headline for attention.
+/* SaaS hero artifact (SaasHeroAttackSurface.tsx). The stacks build once from
+   the baseline up, then hold. A hero artifact that loops competes with the
+   headline for attention.
 
-   Written settled-first: the resting state IS the finished panel, and the
-   entrance is layered on only under `no-preference`, so reduced motion gets the
-   composed dashboard rather than an invisible one. */
+   Opacity only, no transforms: these are SVG groups, where transform-origin
+   resolves against the viewBox rather than the element unless transform-box is
+   set, and a stagger of scaling groups is not worth that risk.
+
+   Written settled-first, so reduced motion renders the finished artifact rather
+   than an empty frame. */
 @media (prefers-reduced-motion: no-preference) {
-  @keyframes cs-hero-panel {
-    from {
-      opacity: 0;
-      translate: 0 22px;
-    }
-  }
-
-  @keyframes cs-hero-panel-row {
+  @keyframes cs-hero-band {
     from {
       opacity: 0;
     }
   }
 
-  .cs-hero-panel {
-    animation: cs-hero-panel 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  .cs-hero-panel-row {
-    animation: cs-hero-panel-row 460ms ease-out both;
-  }
-
-  /* The floating provenance card lands after the panel it overlaps, so the
-     depth reads as a card arriving in front rather than as one flat unit. */
-  @keyframes cs-hero-panel-float {
-    from {
-      opacity: 0;
-      translate: -10px 16px;
-    }
-  }
-
-  .cs-hero-panel-float {
-    animation: cs-hero-panel-float 620ms cubic-bezier(0.16, 1, 0.3, 1) 520ms both;
+  .cs-hero-band,
+  .cs-hero-fade {
+    animation: cs-hero-band 560ms ease-out both;
   }
 }
 

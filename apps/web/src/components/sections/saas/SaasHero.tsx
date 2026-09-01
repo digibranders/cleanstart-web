@@ -1,6 +1,6 @@
 import type React from 'react';
 import Link from 'next/link';
-import { SaasHeroDashboard } from './SaasHeroDashboard';
+import { SaasHeroAttackSurface } from './SaasHeroAttackSurface';
 import { HeroReveal } from '@/components/ui/Reveal';
 
 /*
@@ -10,8 +10,8 @@ import { HeroReveal } from '@/components/ui/Reveal';
  * is the proposal's, verbatim.
  *
  * The artifact is the one departure from that shell. Every other hero on the
- * site carries a 3D render; this one is a product panel built in code
- * (SaasHeroDashboard.tsx), because the render it replaced was rejected and
+ * site carries a 3D render; this one is drawn in code
+ * (SaasHeroAttackSurface.tsx), because the render it replaced was rejected and
  * regenerating it kept landing on stock illustration.
  */
 export function SaasHero(): React.ReactElement {
@@ -38,7 +38,7 @@ export function SaasHero(): React.ReactElement {
           hero makes.
 
           Built, not rendered: this was hero-app-platform.webp until the client
-          rejected it. See SaasHeroDashboard.tsx for the reasoning. There is no
+          rejected it. See SaasHeroAttackSurface.tsx for the reasoning. There is no
           `priority` preload left to get wrong — the old render was preloading on
           phones that never painted it. */}
       <div
@@ -68,13 +68,16 @@ export function SaasHero(): React.ReactElement {
             // artifact had no weight to answer the copy with.
             top: '46%',
             transform: 'translateY(-50%)',
-            // Fixed, not a clamp: the panel carries real UI text, so scaling
-            // the box with the viewport would scale the type off its own ramp.
-            // The artifact only renders at xl+, where 520px always fits.
-            width: '520px',
+            // A deliberately narrow clamp. The artifact carries 10px labels, so
+            // a wide range would scale that type off its own ramp — but across
+            // 520..560 the labels only move 10.0px to 10.8px, which is nothing.
+            // Fixing it at 560 instead left just 43px between the artifact and
+            // the headline at 1280; this restores 83px there and keeps the full
+            // size from 1440 up.
+            width: 'clamp(520px, 40vw, 560px)',
           }}
         >
-          <SaasHeroDashboard />
+          <SaasHeroAttackSurface />
         </div>
       </div>
 
