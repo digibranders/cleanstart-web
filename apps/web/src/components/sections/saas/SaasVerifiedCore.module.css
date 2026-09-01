@@ -143,8 +143,10 @@
   overflow: visible;
 }
 
+/* Same reasoning as the rail base: the curve's unfilled track needs to read
+   before the draw reaches it. */
 .mergeTrack {
-  stroke: rgba(52, 227, 164, 0.24);
+  stroke: rgba(112, 236, 190, 0.38);
   stroke-width: 2;
   stroke-linecap: round;
 }
@@ -183,10 +185,15 @@
   border-radius: 2px;
 }
 
+/* The unfilled track has to be clearly visible on its own. At 0.18 it was
+   invisible against the deck, so wherever the green had not yet reached there
+   was nothing at all — and the fill looked like it ended in mid-air rather than
+   running along a rail that was waiting for it. That is what read as a broken
+   link, not the geometry. */
 .railBase {
   left: 0;
   right: 0;
-  background: rgba(152, 184, 240, 0.18);
+  background: rgba(163, 194, 246, 0.34);
 }
 
 /* One continuous fill, not a dot travelling between links. The claim is that
