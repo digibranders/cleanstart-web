@@ -32,10 +32,14 @@ export function SaasHero(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Hero artifact, pinned right and only at xl+. Below 1280px there is no
-          width that holds both the artifact and the headline without one of them
-          being squeezed. Same "hide it when there is no room" call the sibling
-          hero makes.
+      {/* Hero artifact, pinned right, visible from md up. It is hidden on phones
+          only: there is genuinely no room beside the headline at 375px, and the
+          artifact is decorative, so it drops rather than stacking.
+
+          It used to be xl+ (1280px), which left anyone on a 1024-1279px window
+          looking at an empty right half. Making it work at those widths means
+          scaling the artifact AND capping the copy column, since both are
+          competing for the same row.
 
           Built, not rendered: this was hero-app-platform.webp until the client
           rejected it. See SaasHeroVerifiedRuntime.tsx for the reasoning. There is no
@@ -43,7 +47,7 @@ export function SaasHero(): React.ReactElement {
           phones that never painted it. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 mx-auto hidden select-none xl:block"
+        className="pointer-events-none absolute inset-x-0 top-0 mx-auto hidden select-none md:block"
         style={{
           maxWidth: 'var(--container-default)',
           height: '100%',
@@ -68,13 +72,12 @@ export function SaasHero(): React.ReactElement {
             // artifact had no weight to answer the copy with.
             top: '46%',
             transform: 'translateY(-50%)',
-            // A deliberately narrow clamp. The artifact carries 10px labels, so
-            // a wide range would scale that type off its own ramp — but across
-            // 520..560 the labels only move 10.0px to 10.8px, which is nothing.
-            // Fixing it at 560 instead left just 43px between the artifact and
-            // the headline at 1280; this restores 83px there and keeps the full
-            // size from 1440 up.
-            width: 'clamp(520px, 40vw, 560px)',
+            // Scales with the viewport now that it renders from md up: about
+            // 292px at 768, 389px at 1024, 486px at 1280 and 547px at 1440,
+            // capped at 560. The artifact is pure geometry with no type in it,
+            // so it survives being scaled down in a way the earlier
+            // caption-bearing versions would not have.
+            width: 'clamp(280px, 38vw, 560px)',
           }}
         >
           <SaasHeroVerifiedRuntime />
@@ -99,10 +102,16 @@ export function SaasHero(): React.ReactElement {
           paddingBottom: 'clamp(56px, 6vw, 96px)',
         }}
       >
-        {/* Below xl the artifact does not render, so the column runs to its own
-            measure. At xl+ the budget is fitted to the artifact's measured left
-            edge at each width, with a margin. */}
-        <div className="relative flex max-w-[760px] flex-col items-center text-center md:items-start md:text-left xl:max-w-[clamp(560px,46vw,690px)]">
+        {/* The copy column has to yield room to the artifact from md up, or the
+            two overlap. The calc subtracts the artifact's own width and a 56px
+            gap from the padded container, so the budget tracks the artifact
+            automatically instead of being re-guessed per breakpoint.
+
+            100% of the container, NOT 100vw: vw includes the scrollbar, which
+            handed the copy 15px it did not have and left a 24px gap to the
+            artifact at 1030px. The xl rule stays as the tighter cap above
+            1280. */}
+        <div className="relative flex max-w-[760px] flex-col items-center text-center md:max-w-[calc(100%-clamp(280px,38vw,560px)-56px)] md:items-start md:text-left xl:max-w-[clamp(560px,46vw,690px)]">
           <HeroReveal y={50} duration={1.0} lcp>
             <h1
               className="text-white"
@@ -118,8 +127,7 @@ export function SaasHero(): React.ReactElement {
               {/* The SEO team's H1, verbatim. The gradient splits the phrase
                   rather than adding words, so the rendered text is exactly
                   "Container Security for SaaS Companies". */}
-              Container Security for{' '}
-              <span className="cs-text-gradient-impact">SaaS Companies</span>
+              Container Security for <span className="cs-text-gradient-impact">SaaS Companies</span>
             </h1>
           </HeroReveal>
 
