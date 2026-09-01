@@ -1316,6 +1316,25 @@ body {
    after JS hydration (which stranded LCP behind hydration on every page). The
    fade-up is now purely presentational; offset/timing come from CSS vars set by
    the HeroReveal component. */
+/* SaaS hero stack cards (SaasHeroStack.tsx). The cluster settles in once and
+   then holds — a hero artifact that loops competes with the headline.
+
+   Written settled-first: the resting state IS the finished card, and the
+   entrance is layered on only under `no-preference`, so reduced motion gets the
+   composed cluster rather than three invisible cards. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes cs-stack-card {
+    from {
+      opacity: 0;
+      translate: 0 18px;
+    }
+  }
+
+  .cs-stack-card {
+    animation: cs-stack-card 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
 @keyframes cs-hero-reveal {
   from {
     opacity: 0;

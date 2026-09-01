@@ -1,32 +1,20 @@
 import type React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
+import { SaasHeroStack } from './SaasHeroStack';
 import { HeroReveal } from '@/components/ui/Reveal';
 
 /*
  * SaaS hero — the site's standard solution-page hero shell (FipsHero /
- * CisoHero): bg-cs-hero mesh, a gridline overlay, left-aligned copy, a 3D
+ * CisoHero): bg-cs-hero mesh, a gridline overlay, left-aligned copy, an
  * artifact on the right, and a bottom fade into the white section below. Copy
  * is the proposal's, verbatim.
  *
- * The artifact is commissioned for this page, not borrowed: an application panel
- * with a steadily rising chart, seated on a layered platform.
- *
- * It faces LOWER-LEFT on purpose. The render is pinned to the right of the
- * viewport with the headline and CTA on the left, so a subject facing right
- * would point the reader off the edge of the page; facing left, it turns back
- * into the copy.
- *
- * Rendered deliberately WITHOUT motion streaks. Three attempts at generating
- * them produced trails that fired out of the panel edge like beams or ran the
- * wrong way relative to the implied travel, because the generator has no model
- * of which way the object is going. If motion is wanted, it belongs in CSS
- * behind this image, where direction and colour are a one-line change.
- *
- * Rendered on white and matted afterwards — the generator ignores requests for
- * a transparent background, and a threshold knockout leaves white fringing on
- * the soft shadow. Corners confirmed 0,0,0,0, so it composites straight onto
- * the gradient with no blend mode.
+ * The artifact is the one departure from that shell. Every other hero on the
+ * site carries a 3D render; this one is built in code from real catalogue data
+ * (SaasHeroStack.tsx), because the render it replaced was rejected and four
+ * regenerations could not shake the stock-illustration read. Both category
+ * leaders reached the same conclusion: neither Chainguard nor Docker Hardened
+ * Images uses an illustration in its hero.
  */
 export function SaasHero(): React.ReactElement {
   return (
@@ -46,18 +34,15 @@ export function SaasHero(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Deliberately NOT `priority`. Next emits a `<link rel=preload as=image>`
-          for a priority image with no `media` attribute, but this wrapper is
-          `hidden xl:block`, so every phone and tablet was preloading a hero it
-          never paints. It is also decorative (aria-hidden) and is not the LCP
-          element: the H1 below carries the `lcp` prop for that. Without
-          `priority` it still loads promptly at xl, because a lazy image already
-          inside the viewport is fetched immediately. */}
       {/* Hero artifact, pinned right and only at xl+. Below 1280px there is no
-          width that holds both the render and the headline without one of them
-          being squeezed, and shrinking the render past its floor turns the
-          panel's UI detail into noise. Same "hide it when there is no room"
-          call the sibling hero makes. */}
+          width that holds both the artifact and the headline without one of them
+          being squeezed. Same "hide it when there is no room" call the sibling
+          hero makes.
+
+          Built, not rendered: this was hero-app-platform.webp until the client
+          rejected it. See SaasHeroStack.tsx for the reasoning. There is no
+          `priority` preload left to get wrong — the old render was preloading on
+          phones that never painted it. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 mx-auto hidden select-none xl:block"
@@ -73,28 +58,17 @@ export function SaasHero(): React.ReactElement {
             right: '40px',
             // Retuned for the two-line headline. The previous 44% / 540px pair
             // was fitted to a three-line one; against the shorter headline it
-            // left a 352px hole in the middle of the composition and the render
-            // had no weight to answer the copy with.
-            //
-            // Measured at 1440: hero 627 tall, header bottom at 73, bottom fade
-            // starting at 427. 580px puts the render at 531 tall spanning
-            // 35..567 — the top tucks under the nav by 38px and the platform
-            // grounds into the fade, both of which read as intentional depth.
-            // Past ~600px the panel climbs far enough to collide with the logo
-            // row, which does not.
+            // left a 352px hole in the middle of the composition and the
+            // artifact had no weight to answer the copy with.
             top: '48%',
             transform: 'translateY(-50%)',
-            width: 'clamp(430px, 40vw, 580px)',
-            aspectRatio: '1234 / 1130',
+            // Fixed, not a clamp: the cards carry real text, so scaling the box
+            // with the viewport would scale the type off its own ramp. The
+            // artifact only renders at xl+, where 400px always fits.
+            width: '440px',
           }}
         >
-          <Image
-            src="/images/saas/hero-app-platform.webp"
-            alt="A SaaS application dashboard showing a steadily rising chart, seated on a layered software platform with a further module sliding into its base"
-            fill
-            sizes="(min-width: 1440px) 540px, 38vw"
-            className="object-contain"
-          />
+          <SaasHeroStack />
         </div>
       </div>
 
@@ -117,7 +91,7 @@ export function SaasHero(): React.ReactElement {
         }}
       >
         {/* Below xl the artifact does not render, so the column runs to its own
-            measure. At xl+ the budget is fitted to the render's measured left
+            measure. At xl+ the budget is fitted to the artifact's measured left
             edge at each width, with a margin. */}
         <div className="relative flex max-w-[760px] flex-col items-center text-center md:items-start md:text-left xl:max-w-[clamp(560px,46vw,690px)]">
           <HeroReveal y={50} duration={1.0} lcp>
