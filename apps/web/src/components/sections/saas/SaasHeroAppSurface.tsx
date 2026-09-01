@@ -32,10 +32,18 @@ import type React from 'react';
  * which is a free stock vector — attribution-bound and already on thousands of
  * sites.
  *
- * The security story lives in WHAT floats: source, base images, packages,
- * libraries, a signed manifest, a dependency graph, several carrying a verified
- * tick. That is what keeps this container security rather than generic app
- * development.
+ * The security story lives in WHAT floats, and the ticks follow a rule rather
+ * than being sprinkled for balance: they mark the SUPPLY-CHAIN pieces only —
+ * source, container images, packages and the signed manifest. The users panel,
+ * the build config and the terminal stay unmarked, because CleanStart verifies
+ * components, not your tenants or your CLI, and a tick on those would be a claim
+ * the product does not make.
+ *
+ * That is also why the ticks are not on everything. The page's own sections
+ * frame this complexity as RISK — AI-generated code, open source dependencies,
+ * public container images, component visibility — so the artifact has to say two
+ * things at once: look how much is packed in here, AND the parts that came from
+ * outside are accounted for.
  *
  * No numerals or words anywhere. The artifact scales from 599px down to 316px,
  * where real type would be illegible, so hierarchy is carried by weight, size
@@ -733,6 +741,7 @@ export function SaasHeroAppSurface(): React.ReactElement {
             strokeWidth={2.5}
             strokeLinecap="round"
           />
+          <Tick x={68} y={11} r={8} />
         </g>
       </g>
     </svg>
