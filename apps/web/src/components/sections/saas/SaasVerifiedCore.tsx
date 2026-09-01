@@ -56,15 +56,41 @@ const STAGES: readonly Stage[] = [
  * pipeline becomes verified, not that something travels through it, and a fill
  * says that where a moving pulse does not.
  */
-const CYCLE_MS = 6500;
-/* The rail fill runs from 22% to 74% of the cycle. A stage lights when the fill
-   reaches it, so its delay is the fill's start plus its own share of that span.
-   Computed rather than hand-tuned: percentages cannot be interpolated into
-   keyframe stops, so the timing has to live in the delay. */
-const FILL_START = 0.22;
-const FILL_SPAN = 0.52;
-const haloDelay = (i: number, total: number): string =>
-  `${Math.round(CYCLE_MS * (FILL_START + ((i + 0.5) / total) * FILL_SPAN))}ms`;
+/*
+ * A stage lights the instant the fill front crosses it, so its phase is its
+ * POSITION along the rail, not its index. Two things had to be true for that to
+ * hold, and neither was:
+ *
+ *   - The fill has to advance at constant speed. It was eased, so the front
+ *     accelerated and decelerated while the halos fired at evenly spaced times,
+ *     and the two drifted apart mid-sweep. The fill is linear now.
+ *   - The stage positions have to be knowable. Under `space-between` they
+ *     depend on the container's width, so no fixed fraction could be right. The
+ *     rail is now laid out on a fixed pitch, and these constants are the same
+ *     ones the stylesheet uses.
+ *
+ * Fractions are published as CSS custom properties rather than finished
+ * delays, so the stacked layout can supply its own without this file needing to
+ * know which breakpoint is active.
+ */
+const NODE_W = 116;
+const NODE_GAP = 6;
+const RAIL_TAIL = 34;
+
+const railWidth = (n: number): number => n * NODE_W + (n - 1) * NODE_GAP + RAIL_TAIL;
+
+/** Centre of stage i along the horizontal rail, as a 0..1 fraction. */
+const fracH = (i: number, n: number): number =>
+  (i * (NODE_W + NODE_GAP) + NODE_W / 2) / railWidth(n);
+
+/* Stacked: tile + gap + one line of label, on a 26px gap, with the same tail. */
+const NODE_H = 89;
+const NODE_GAP_V = 26;
+const railHeight = (n: number): number => n * NODE_H + (n - 1) * NODE_GAP_V + 40;
+
+/** Centre of stage i along the vertical rail, as a 0..1 fraction. */
+const fracV = (i: number, n: number): number =>
+  (i * (NODE_H + NODE_GAP_V) + NODE_H / 2) / railHeight(n);
 
 export function SaasVerifiedCore(): React.ReactElement {
   return (
@@ -103,7 +129,12 @@ export function SaasVerifiedCore(): React.ReactElement {
               <div
                 key={stage.id}
                 className={styles.node}
-                style={{ ['--halo-delay' as string]: haloDelay(i, STAGES.length) }}
+                style={
+                  {
+                    '--frac': fracH(i, STAGES.length).toFixed(4),
+                    '--frac-v': fracV(i, STAGES.length).toFixed(4),
+                  } as React.CSSProperties
+                }
                 {...(stage.id === 'review'
                   ? { 'data-security-review': 'open' }
                   : { 'data-core-stage': stage.id })}

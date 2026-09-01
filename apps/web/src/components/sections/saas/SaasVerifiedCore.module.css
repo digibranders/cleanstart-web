@@ -21,6 +21,10 @@
      borrows from the deck's top padding — the padding has to add it back or the
      tile crowds the top edge while the bottom keeps its full gap. */
   --raise: 52px;
+  /* The fill's window within the cycle. Shared by the fill itself and by every
+     halo, so a stage lights exactly as the front crosses it. */
+  --fill-start: 0.2;
+  --fill-span: 0.54;
   --tile: 60px;
   --node-w: 116px;
   --green: #34e3a4;
@@ -131,6 +135,9 @@
   flex: 0 0 auto;
   width: 92px;
   height: 52px;
+  /* Overlaps the rail's start by a few pixels. Butted exactly, a 2px seam sat
+     between the curve's cap and the rail and read as a broken join. */
+  margin-right: -4px;
   /* Its top meets the source tile's centre, its bottom meets the rail. */
   margin-top: calc(-1 * var(--raise) + var(--tile) / 2);
   overflow: visible;
@@ -159,8 +166,13 @@
   align-items: flex-start;
   justify-content: space-between;
   flex: 1 1 auto;
-  max-width: 616px;
-  padding-right: 32px;
+  /* Fixed pitch, not space-between: the halos need to know where each stage
+     sits, and under space-between that depends on the container's width. Width
+     is 5 nodes + 4 gaps + a tail for the release cap. */
+  width: calc(5 * var(--node-w) + 4 * 6px + 34px);
+  justify-content: flex-start;
+  gap: 6px;
+  padding-right: 34px;
 }
 
 .railBase,
@@ -298,27 +310,37 @@
   }
 
   .railFill {
-    animation: fill var(--cycle) cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    /* Linear, so the front travels at constant speed. Eased, it drifted out of
+       step with the halos, which fire on position. */
+    animation: fill var(--cycle) linear infinite;
   }
 
   .tileHalo {
     /* Delay, not a keyframe stop: a custom property cannot be interpolated into
-       a percentage inside @keyframes, so each stage carries its own phase. */
-    animation: halo var(--cycle) var(--halo-delay, 0ms) ease-out infinite;
+       a percentage inside @keyframes, so each stage carries its own phase.
+       Derived from the stage's position on the rail and the fill's own window,
+       which is what keeps the two moving together. */
+    animation: halo var(--cycle) ease-out infinite;
+    animation-delay: calc(var(--cycle) * (var(--fill-start) + var(--frac, 0.5) * var(--fill-span)));
   }
 
   .exit {
     animation: pop var(--cycle) cubic-bezier(0.22, 1, 0.36, 1) infinite;
+    /* Sits at the rail's end, so it resolves as the front arrives there. */
+    animation-delay: calc(var(--cycle) * (var(--fill-start) + var(--fill-span)));
   }
 }
 
+/* Completes exactly at --fill-start. It finished at 16% while the fill began at
+   20%, so for ~260ms a fully drawn green curve dead-ended into an unfilled grey
+   rail, which is what read as a broken link. */
 @keyframes draw {
   0% {
     stroke-dashoffset: 130;
   }
 
-  16%,
-  86% {
+  20%,
+  90% {
     stroke-dashoffset: 0;
   }
 
@@ -347,20 +369,22 @@
   }
 }
 
+/* Lands on the handoff: the curve has just arrived and the fill is about to
+   leave, so the junction marks the joint at the moment it matters. */
 @keyframes lock {
   0%,
-  16% {
+  18% {
     transform: rotate(45deg) scale(0);
     box-shadow: 0 0 0 0 rgba(52, 227, 164, 0);
   }
 
-  22% {
+  24% {
     transform: rotate(45deg) scale(1.5);
     box-shadow: 0 0 0 7px rgba(52, 227, 164, 0.2);
   }
 
-  28%,
-  88% {
+  30%,
+  90% {
     transform: rotate(45deg) scale(1);
     box-shadow: 0 0 0 4px rgba(52, 227, 164, 0.14);
   }
@@ -374,13 +398,13 @@
 
 @keyframes fill {
   0%,
-  22% {
+  20% {
     transform: scaleX(0);
     opacity: 1;
   }
 
   74%,
-  88% {
+  90% {
     transform: scaleX(1);
     opacity: 1;
   }
@@ -418,25 +442,26 @@
   }
 }
 
+/* Phase now lives in animation-delay, so this runs from the moment the front
+   reaches the rail's end. */
 @keyframes pop {
-  0%,
-  74% {
+  0% {
     opacity: 0;
     transform: scale(0.4);
   }
 
-  80% {
+  6% {
     opacity: 1;
     transform: scale(1.25);
   }
 
-  85%,
-  90% {
+  11%,
+  22% {
     opacity: 1;
     transform: scale(1);
   }
 
-  97%,
+  30%,
   100% {
     opacity: 0;
     transform: scale(0.4);
@@ -463,7 +488,8 @@
   .merge {
     width: 52px;
     height: 46px;
-    margin: 6px 0;
+    /* Stacked, the overlap runs downward instead of to the right. */
+    margin: 6px 0 -4px;
     transform: rotate(90deg);
   }
 
@@ -509,6 +535,13 @@
   }
 
   @media (prefers-reduced-motion: no-preference) {
+    .tileHalo {
+      /* Stacked, the stages sit at different fractions of a taller rail. */
+      animation-delay: calc(
+        var(--cycle) * (var(--fill-start) + var(--frac-v, 0.5) * var(--fill-span))
+      );
+    }
+
     .railFill {
       animation-name: fillVertical;
     }
@@ -525,13 +558,13 @@
 
 @keyframes fillVertical {
   0%,
-  22% {
+  20% {
     transform: translateX(-50%) scaleY(0);
     opacity: 1;
   }
 
   74%,
-  88% {
+  90% {
     transform: translateX(-50%) scaleY(1);
     opacity: 1;
   }
@@ -545,16 +578,16 @@
 
 @keyframes lockVertical {
   0%,
-  16% {
+  18% {
     transform: translateX(-50%) rotate(45deg) scale(0);
   }
 
-  22% {
+  24% {
     transform: translateX(-50%) rotate(45deg) scale(1.5);
   }
 
-  28%,
-  88% {
+  30%,
+  90% {
     transform: translateX(-50%) rotate(45deg) scale(1);
   }
 
@@ -565,24 +598,23 @@
 }
 
 @keyframes popVertical {
-  0%,
-  74% {
+  0% {
     opacity: 0;
     transform: translateX(-50%) scale(0.4);
   }
 
-  80% {
+  6% {
     opacity: 1;
     transform: translateX(-50%) scale(1.25);
   }
 
-  85%,
-  90% {
+  11%,
+  22% {
     opacity: 1;
     transform: translateX(-50%) scale(1);
   }
 
-  97%,
+  30%,
   100% {
     opacity: 0;
     transform: translateX(-50%) scale(0.4);
