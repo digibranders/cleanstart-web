@@ -17,6 +17,10 @@
 .stage {
   --cycle: 6.5s;
   --rail-y: 30px;
+  /* How far the source sits above the rail. It is a negative margin, so it
+     borrows from the deck's top padding — the padding has to add it back or the
+     tile crowds the top edge while the bottom keeps its full gap. */
+  --raise: 52px;
   --tile: 60px;
   --node-w: 116px;
   --green: #34e3a4;
@@ -35,7 +39,11 @@
      frame it with even air on both sides. At 1360 it was a mostly-empty band. */
   max-width: 968px;
   margin: 0 auto;
-  padding: clamp(44px, 4vw, 62px) clamp(22px, 2.6vw, 40px) clamp(32px, 3.2vw, 46px);
+  /* Top padding carries the raise so the air above the source matches the air
+     below the labels. Without the + var(--raise) the deck rendered top-heavy:
+     10px above the tile against 46px under the labels. */
+  padding: calc(clamp(28px, 2.8vw, 38px) + var(--raise)) clamp(22px, 2.6vw, 40px)
+    clamp(28px, 2.8vw, 38px);
   border-radius: clamp(20px, 2vw, 26px);
   border: 1px solid rgba(146, 180, 244, 0.15);
   background: linear-gradient(180deg, rgba(17, 25, 68, 0.66) 0%, rgba(9, 13, 42, 0.58) 100%);
@@ -77,7 +85,7 @@
   width: 128px;
   /* Raised clear of the rail so it reads as a separate thing joining, not as
      the first stage in the row. */
-  margin-top: -52px;
+  margin-top: calc(-1 * var(--raise));
 }
 
 .sourceTile {
@@ -124,7 +132,7 @@
   width: 92px;
   height: 52px;
   /* Its top meets the source tile's centre, its bottom meets the rail. */
-  margin-top: calc(-52px + var(--tile) / 2);
+  margin-top: calc(-1 * var(--raise) + var(--tile) / 2);
   overflow: visible;
 }
 
@@ -438,13 +446,17 @@
 /* ---------- Stacked below the breakpoint ---------- */
 
 @media (max-width: 899px) {
+  .stage {
+    /* Stacked, nothing is raised, so the deck should not pad for a raise. */
+    --raise: 0px;
+  }
+
   .diagram {
     flex-direction: column;
     align-items: center;
   }
 
   .source {
-    margin-top: 0;
     width: auto;
   }
 
