@@ -1,290 +1,241 @@
 /*
  * "Move Beyond Shift Left" pipeline.
  *
- * ONE deck, not three nested shells. The previous stylesheet wrapped the diagram
- * in an outer surface, a route stack and a per-stage housing, each with its own
- * border and background, which is why it read as boxes inside boxes. There is a
- * single container now and the stages sit directly on it.
+ * Geometry is anchored to one number: RAIL_Y, the distance from the top of a
+ * node column down to the centre of its tile. Every element that has to sit on
+ * the rail — the base line, the fill, the junction, the end cap, the bottom of
+ * the merge curve — is positioned from it, so nothing drifts when tile or label
+ * sizes change.
  *
- * Colour is rationed, because it carries the whole idea:
- *   - GREEN belongs to the incoming Verified Components, the junction they lock
- *     into, and the assurance that then travels the track. Nothing else.
- *   - Every pipeline stage, Security Review included, shares one neutral
- *     treatment. Colouring Security Review separately was what made it look like
- *     a different system bolted on the end rather than the last stage of the
- *     same pipeline.
- *
- * Every animation runs on the SAME period (--cycle) and differs only by delay.
- * Mixed durations resynchronise at their lowest common multiple, which reads as
- * a fault rather than a loop.
+ * Colour is rationed because it carries the argument. GREEN is the incoming
+ * verified components and the assurance they bring to the rail. Every pipeline
+ * stage, Security Review included, shares ONE neutral treatment: giving Security
+ * Review its own colour made it read as a separate system bolted on the end
+ * rather than the last stage of the same pipeline.
  */
 
 .stage {
+  --cycle: 6.5s;
+  --rail-y: 30px;
+  --tile: 60px;
+  --node-w: 116px;
+  --green: #34e3a4;
+  --green-soft: rgba(52, 227, 164, 0.16);
+
   width: 100%;
-  --cycle: 7s;
 }
 
-/* ---------- The deck ---------- */
+/* ---------- Deck ---------- */
 
 .deck {
   position: relative;
   overflow: hidden;
-  padding: clamp(30px, 3.4vw, 52px) clamp(20px, 2.8vw, 44px);
-  border-radius: clamp(20px, 2.2vw, 28px);
-  border: 1px solid rgba(146, 180, 244, 0.16);
-  background:
-    radial-gradient(120% 140% at 8% 0%, rgba(45, 212, 160, 0.07) 0%, transparent 46%),
-    linear-gradient(180deg, rgba(16, 24, 66, 0.72) 0%, rgba(8, 12, 40, 0.62) 100%);
+  /* Sized to the diagram, not to the column. Content measures ~872px across
+     (source 128 + merge 104 + rail 640), so the deck sits just wide enough to
+     frame it with even air on both sides. At 1360 it was a mostly-empty band. */
+  max-width: 968px;
+  margin: 0 auto;
+  padding: clamp(44px, 4vw, 62px) clamp(22px, 2.6vw, 40px) clamp(32px, 3.2vw, 46px);
+  border-radius: clamp(20px, 2vw, 26px);
+  border: 1px solid rgba(146, 180, 244, 0.15);
+  background: linear-gradient(180deg, rgba(17, 25, 68, 0.66) 0%, rgba(9, 13, 42, 0.58) 100%);
   box-shadow:
-    inset 0 1px 0 rgba(196, 218, 255, 0.09),
-    0 34px 80px -40px rgba(2, 6, 28, 0.95);
+    inset 0 1px 0 rgba(196, 218, 255, 0.08),
+    0 30px 70px -40px rgba(2, 6, 28, 0.9);
 }
 
-.deckGrid {
+/* Anchored under the merge, so the light in the panel comes from where the
+   verified components enter rather than from nowhere. */
+.deckGlow {
   position: absolute;
-  inset: 0;
+  top: -30%;
+  left: -6%;
+  width: 46%;
+  height: 160%;
   pointer-events: none;
-  opacity: 0.4;
-  background-image:
-    linear-gradient(rgba(150, 184, 244, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(150, 184, 244, 0.05) 1px, transparent 1px);
-  background-size: 46px 46px;
-  mask-image: radial-gradient(78% 78% at 50% 50%, #000 32%, transparent 100%);
-  -webkit-mask-image: radial-gradient(78% 78% at 50% 50%, #000 32%, transparent 100%);
+  background: radial-gradient(closest-side, rgba(52, 227, 164, 0.13) 0%, transparent 100%);
 }
 
-/* A slow sweep across the deck. It is the only thing that keeps the container
-   itself alive; without it the panel is inert behind a moving diagram. */
-.deckSheen {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: -30%;
-  width: 30%;
-  pointer-events: none;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(120, 190, 255, 0.05) 50%,
-    transparent 100%
-  );
-}
+/* ---------- Layout ---------- */
 
-.corner {
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  pointer-events: none;
-  border: 1px solid rgba(146, 190, 255, 0.3);
-}
-
-.cornerTl {
-  top: 14px;
-  left: 14px;
-  border-right: 0;
-  border-bottom: 0;
-  border-top-left-radius: 5px;
-}
-
-.cornerTr {
-  top: 14px;
-  right: 14px;
-  border-left: 0;
-  border-bottom: 0;
-  border-top-right-radius: 5px;
-}
-
-.cornerBl {
-  bottom: 14px;
-  left: 14px;
-  border-right: 0;
-  border-top: 0;
-  border-bottom-left-radius: 5px;
-}
-
-.cornerBr {
-  bottom: 14px;
-  right: 14px;
-  border-left: 0;
-  border-top: 0;
-  border-bottom-right-radius: 5px;
-}
-
-/* ---------- Track ---------- */
-
-.track {
+.diagram {
   position: relative;
   z-index: 1;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  width: 100%;
 }
 
-.segment {
-  display: contents;
-}
-
-/* ---------- Verified Components: the piece that arrives ---------- */
+/* ---------- Verified Components ---------- */
 
 .source {
   display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
   align-items: center;
   gap: 12px;
-  flex: 0 0 auto;
-  padding-top: 4px;
+  width: 128px;
+  /* Raised clear of the rail so it reads as a separate thing joining, not as
+     the first stage in the row. */
+  margin-top: -52px;
 }
 
 .sourceTile {
   position: relative;
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
-  flex: 0 0 auto;
+  width: var(--tile);
+  height: var(--tile);
   border-radius: 999px;
-  color: #04120d;
-  background: linear-gradient(180deg, #55e9b3 0%, #1fc78b 100%);
+  color: #04150e;
+  background: linear-gradient(180deg, #57ecb5 0%, #1cc389 100%);
   box-shadow:
-    0 0 0 6px rgba(45, 212, 160, 0.1),
-    0 12px 26px -10px rgba(31, 199, 139, 0.8);
+    0 0 0 7px rgba(52, 227, 164, 0.09),
+    0 14px 30px -12px rgba(28, 195, 137, 0.85);
 }
 
 .sourceTile svg {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
 }
 
-/* Expands once as the piece locks in, then gets out of the way. */
 .sourceRing {
   position: absolute;
-  inset: -6px;
+  inset: -7px;
   border-radius: 999px;
-  border: 1.5px solid rgba(78, 230, 173, 0.85);
+  border: 1.5px solid rgba(87, 236, 181, 0.9);
   opacity: 0;
 }
 
 .sourceLabel {
   font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.25;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.3;
   letter-spacing: -0.01em;
-  color: #93f3d1;
-  white-space: nowrap;
+  text-align: center;
+  color: #8ef0c9;
 }
 
-/* ---------- Links ---------- */
+/* ---------- Merge curve ---------- */
 
-.link {
-  position: relative;
-  flex: 1 1 auto;
-  min-width: 28px;
-  height: 2px;
-  margin-top: 27px;
-  border-radius: 2px;
-  background: rgba(150, 182, 240, 0.2);
-}
-
-.linkMerge {
-  min-width: 52px;
-  background: linear-gradient(90deg, rgba(45, 212, 160, 0.7) 0%, rgba(150, 182, 240, 0.2) 100%);
-}
-
-.linkExit {
-  min-width: 44px;
+.merge {
   flex: 0 0 auto;
+  width: 92px;
+  height: 52px;
+  /* Its top meets the source tile's centre, its bottom meets the rail. */
+  margin-top: calc(-52px + var(--tile) / 2);
+  overflow: visible;
+}
+
+.mergeTrack {
+  stroke: rgba(52, 227, 164, 0.24);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.mergeFlow {
+  stroke: var(--green);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 130;
+  stroke-dashoffset: 130;
+  filter: drop-shadow(0 0 5px rgba(52, 227, 164, 0.6));
+}
+
+/* ---------- Rail ---------- */
+
+.railWrap {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex: 1 1 auto;
+  max-width: 616px;
+  padding-right: 32px;
+}
+
+.railBase,
+.railFill {
+  position: absolute;
+  top: calc(var(--rail-y) - 1px);
+  height: 2px;
+  border-radius: 2px;
+}
+
+.railBase {
+  left: 0;
+  right: 0;
+  background: rgba(152, 184, 240, 0.18);
+}
+
+/* One continuous fill, not a dot travelling between links. The claim is that
+   the pipeline BECOMES verified; a fill says that, a moving pulse does not. */
+.railFill {
+  left: 0;
+  right: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--green) 0%, rgba(52, 227, 164, 0.55) 100%);
+  box-shadow: 0 0 10px rgba(52, 227, 164, 0.45);
 }
 
 .junction {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 9px;
-  height: 9px;
+  left: -5px;
+  top: calc(var(--rail-y) - 5px);
+  width: 10px;
+  height: 10px;
   border-radius: 2px;
-  background: #2dd4a0;
-  transform: translate(-50%, -50%) rotate(45deg);
+  background: var(--green);
+  transform: rotate(45deg) scale(0);
 }
 
-.link::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  opacity: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(45, 212, 160, 0.18) 28%,
-    #5df0bb 50%,
-    rgba(45, 212, 160, 0.18) 72%,
-    transparent 100%
-  );
-}
-
-.exitCheck {
-  position: absolute;
-  top: 50%;
-  right: -10px;
-  display: grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  transform: translateY(-50%) scale(0.5);
-  opacity: 0;
-  border-radius: 999px;
-  color: #04120d;
-  background: linear-gradient(180deg, #55e9b3 0%, #1fc78b 100%);
-  box-shadow: 0 0 0 5px rgba(45, 212, 160, 0.12);
-}
-
-.exitCheck svg {
-  width: 13px;
-  height: 13px;
-}
-
-/* ---------- Stages: one treatment for all of them ---------- */
+/* ---------- Stages ---------- */
 
 .node {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex: 0 0 auto;
   flex-direction: column;
   align-items: center;
-  gap: 11px;
-  width: 96px;
+  gap: 12px;
+  /* Wide enough that "Security Review" stays on one line; a single wrapping
+     label left the whole bottom edge ragged. */
+  width: var(--node-w);
 }
 
 .tile {
   position: relative;
   display: grid;
   place-items: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 17px;
-  color: rgba(208, 226, 255, 0.92);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.035) 100%);
-  border: 1px solid rgba(168, 196, 245, 0.18);
+  width: var(--tile);
+  height: var(--tile);
+  border-radius: 18px;
+  color: rgba(211, 228, 255, 0.94);
+  background: linear-gradient(180deg, rgba(31, 44, 96, 0.95) 0%, rgba(15, 22, 58, 0.95) 100%);
+  border: 1px solid rgba(168, 196, 245, 0.2);
   box-shadow:
-    inset 0 1px 0 rgba(214, 231, 255, 0.14),
-    0 14px 28px -18px rgba(3, 8, 30, 0.95);
+    inset 0 1px 0 rgba(214, 231, 255, 0.13),
+    0 14px 26px -16px rgba(2, 6, 26, 0.95);
 }
 
-/* Turns green as the pulse reaches the stage: the assurance propagating, not a
-   status the stage had on its own. */
-.tileDot {
+/* Lights as the fill reaches the stage: the assurance arriving, not a status
+   the stage held on its own. */
+.tileHalo {
   position: absolute;
-  top: 7px;
-  right: 7px;
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background-color: rgba(168, 196, 245, 0.35);
+  inset: -1px;
+  border-radius: inherit;
+  border: 1px solid var(--green);
+  opacity: 0;
+  box-shadow: 0 0 16px rgba(52, 227, 164, 0.32);
 }
 
 .icon {
-  width: 26px;
-  height: 26px;
+  position: relative;
+  width: 27px;
+  height: 27px;
   stroke: currentColor;
   stroke-width: 1.7;
   stroke-linecap: round;
@@ -298,336 +249,330 @@
   line-height: 1.3;
   letter-spacing: -0.01em;
   text-align: center;
-  color: rgba(223, 232, 255, 0.78);
+  white-space: nowrap;
+  color: rgba(223, 232, 255, 0.76);
+}
+
+.exit {
+  position: absolute;
+  right: 0;
+  top: calc(var(--rail-y) - 13px);
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  color: #04150e;
+  background: linear-gradient(180deg, #57ecb5 0%, #1cc389 100%);
+  box-shadow: 0 0 0 5px rgba(52, 227, 164, 0.12);
+  opacity: 0;
+  transform: scale(0.4);
+}
+
+.exit svg {
+  width: 14px;
+  height: 14px;
 }
 
 /* ---------- Motion ---------- */
 
 @media (prefers-reduced-motion: no-preference) {
-  .source {
-    animation: dock var(--cycle) cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  .sourceRing {
+    animation: ring var(--cycle) ease-out infinite;
   }
 
-  .sourceRing {
-    animation: lockRing var(--cycle) ease-out infinite;
+  .mergeFlow {
+    animation: draw var(--cycle) ease-in-out infinite;
   }
 
   .junction {
-    animation: junctionLock var(--cycle) ease-out infinite;
+    animation: lock var(--cycle) cubic-bezier(0.22, 1, 0.36, 1) infinite;
   }
 
-  .link::after {
-    animation: flow var(--cycle) var(--flow-delay, 0ms) linear infinite;
+  .railFill {
+    animation: fill var(--cycle) cubic-bezier(0.4, 0, 0.2, 1) infinite;
   }
 
-  .tileDot {
-    animation: dotLit var(--cycle) var(--lit-delay, 0ms) ease-out infinite;
+  .tileHalo {
+    /* Delay, not a keyframe stop: a custom property cannot be interpolated into
+       a percentage inside @keyframes, so each stage carries its own phase. */
+    animation: halo var(--cycle) var(--halo-delay, 0ms) ease-out infinite;
   }
 
-  .exitCheck {
-    animation: exitPop var(--cycle) cubic-bezier(0.22, 1, 0.36, 1) infinite;
-  }
-
-  .deckSheen {
-    animation: sheen var(--cycle) ease-in-out infinite;
+  .exit {
+    animation: pop var(--cycle) cubic-bezier(0.22, 1, 0.36, 1) infinite;
   }
 }
 
-@keyframes dock {
+@keyframes draw {
   0% {
-    opacity: 0;
-    transform: translateX(-54px);
+    stroke-dashoffset: 130;
   }
 
-  13% {
-    opacity: 1;
-    transform: translateX(0);
+  16%,
+  86% {
+    stroke-dashoffset: 0;
   }
 
-  93% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-
-  99%,
+  96%,
   100% {
-    opacity: 0;
-    transform: translateX(-54px);
+    stroke-dashoffset: 130;
   }
 }
 
-@keyframes lockRing {
+@keyframes ring {
   0%,
-  11% {
+  12% {
     opacity: 0;
-    transform: scale(0.72);
+    transform: scale(0.75);
   }
 
-  15% {
-    opacity: 0.9;
+  18% {
+    opacity: 0.95;
     transform: scale(1);
   }
 
-  26%,
+  32%,
   100% {
     opacity: 0;
-    transform: scale(1.45);
+    transform: scale(1.5);
   }
 }
 
-@keyframes junctionLock {
+@keyframes lock {
   0%,
-  10% {
-    opacity: 0;
-    transform: translate(-50%, -50%) rotate(45deg) scale(0.3);
-  }
-
-  15% {
-    opacity: 1;
-    transform: translate(-50%, -50%) rotate(45deg) scale(1.55);
-    box-shadow: 0 0 0 7px rgba(45, 212, 160, 0.2);
-  }
-
-  21%,
-  94% {
-    opacity: 1;
-    transform: translate(-50%, -50%) rotate(45deg) scale(1);
-    box-shadow: 0 0 0 4px rgba(45, 212, 160, 0.14);
-  }
-
-  99%,
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) rotate(45deg) scale(0.3);
-    box-shadow: 0 0 0 0 rgba(45, 212, 160, 0);
-  }
-}
-
-@keyframes flow {
-  0% {
-    opacity: 0;
-    transform: translateX(-100%);
-  }
-
-  2% {
-    opacity: 1;
-  }
-
-  10% {
-    opacity: 1;
-    transform: translateX(100%);
-  }
-
-  11%,
-  100% {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-}
-
-@keyframes dotLit {
-  0% {
-    transform: scale(1);
-    background-color: rgba(168, 196, 245, 0.35);
-    box-shadow: 0 0 0 0 rgba(45, 212, 160, 0);
-  }
-
-  4% {
-    transform: scale(1.7);
-    background-color: #5df0bb;
-    box-shadow: 0 0 0 4px rgba(45, 212, 160, 0.22);
-  }
-
-  10%,
-  84% {
-    transform: scale(1);
-    background-color: #5df0bb;
-    box-shadow: 0 0 0 3px rgba(45, 212, 160, 0.12);
-  }
-
-  93%,
-  100% {
-    transform: scale(1);
-    background-color: rgba(168, 196, 245, 0.35);
-    box-shadow: 0 0 0 0 rgba(45, 212, 160, 0);
-  }
-}
-
-@keyframes exitPop {
-  0%,
-  47% {
-    opacity: 0;
-    transform: translateY(-50%) scale(0.5);
-  }
-
-  53% {
-    opacity: 1;
-    transform: translateY(-50%) scale(1.28);
-  }
-
-  58%,
-  92% {
-    opacity: 1;
-    transform: translateY(-50%) scale(1);
-  }
-
-  98%,
-  100% {
-    opacity: 0;
-    transform: translateY(-50%) scale(0.5);
-  }
-}
-
-@keyframes sheen {
-  0%,
-  8% {
-    transform: translateX(0);
-    opacity: 0;
-  }
-
   16% {
+    transform: rotate(45deg) scale(0);
+    box-shadow: 0 0 0 0 rgba(52, 227, 164, 0);
+  }
+
+  22% {
+    transform: rotate(45deg) scale(1.5);
+    box-shadow: 0 0 0 7px rgba(52, 227, 164, 0.2);
+  }
+
+  28%,
+  88% {
+    transform: rotate(45deg) scale(1);
+    box-shadow: 0 0 0 4px rgba(52, 227, 164, 0.14);
+  }
+
+  97%,
+  100% {
+    transform: rotate(45deg) scale(0);
+    box-shadow: 0 0 0 0 rgba(52, 227, 164, 0);
+  }
+}
+
+@keyframes fill {
+  0%,
+  22% {
+    transform: scaleX(0);
     opacity: 1;
   }
 
-  62% {
-    transform: translateX(460%);
+  74%,
+  88% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+
+  97%,
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
+}
+
+/* One keyframe set for all five stages; --halo-delay puts each at its own point
+   along the fill. Bright on arrival, then held down so the whole rail reads as
+   verified rather than five things blinking. */
+@keyframes halo {
+  0% {
     opacity: 0;
   }
 
-  63%,
+  3% {
+    opacity: 1;
+  }
+
+  10% {
+    opacity: 0.5;
+  }
+
+  46% {
+    opacity: 0.5;
+  }
+
+  56%,
   100% {
-    transform: translateX(460%);
     opacity: 0;
+  }
+}
+
+@keyframes pop {
+  0%,
+  74% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+
+  80% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+
+  85%,
+  90% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  97%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4);
   }
 }
 
 /* ---------- Stacked below the breakpoint ---------- */
 
 @media (max-width: 899px) {
-  .track {
+  .diagram {
     flex-direction: column;
     align-items: center;
   }
 
   .source {
-    flex-direction: column;
-    gap: 10px;
-    padding-top: 0;
-  }
-
-  .sourceLabel {
-    text-align: center;
-  }
-
-  .link {
-    width: 2px;
-    min-width: 0;
-    height: 32px;
     margin-top: 0;
-  }
-
-  .linkMerge {
-    height: 46px;
-    background: linear-gradient(180deg, rgba(45, 212, 160, 0.7) 0%, rgba(150, 182, 240, 0.2) 100%);
-  }
-
-  .linkExit {
-    height: 36px;
-  }
-
-  .exitCheck {
-    top: auto;
-    right: 50%;
-    bottom: -12px;
-    transform: translateX(50%) scale(0.5);
-  }
-
-  .node {
     width: auto;
-    min-width: 128px;
+  }
+
+  .merge {
+    width: 52px;
+    height: 46px;
+    margin: 6px 0;
+    transform: rotate(90deg);
+  }
+
+  .railWrap {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 26px;
+    max-width: none;
+    padding-right: 0;
+    padding-bottom: 40px;
+  }
+
+  .railBase,
+  .railFill {
+    left: 50%;
+    right: auto;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    height: auto;
+    transform: translateX(-50%);
+  }
+
+  .railFill {
+    transform: translateX(-50%) scaleY(0);
+    transform-origin: top center;
+    background: linear-gradient(180deg, var(--green) 0%, rgba(52, 227, 164, 0.55) 100%);
+  }
+
+  .junction {
+    left: 50%;
+    top: -5px;
+    transform: translateX(-50%) rotate(45deg) scale(0);
+  }
+
+  .exit {
+    right: auto;
+    left: 50%;
+    top: auto;
+    bottom: 0;
+    transform: translateX(-50%) scale(0.4);
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .source {
-      animation-name: dockVertical;
+    .railFill {
+      animation-name: fillVertical;
     }
 
-    .link::after {
-      animation-name: flowVertical;
+    .junction {
+      animation-name: lockVertical;
     }
 
-    .exitCheck {
-      animation-name: exitPopVertical;
+    .exit {
+      animation-name: popVertical;
     }
   }
 }
 
-@keyframes dockVertical {
-  0% {
-    opacity: 0;
-    transform: translateY(-42px);
-  }
-
-  13% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  93% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  99%,
-  100% {
-    opacity: 0;
-    transform: translateY(-42px);
-  }
-}
-
-@keyframes flowVertical {
-  0% {
-    opacity: 0;
-    transform: translateY(-100%);
-  }
-
-  2% {
-    opacity: 1;
-  }
-
-  10% {
-    opacity: 1;
-    transform: translateY(100%);
-  }
-
-  11%,
-  100% {
-    opacity: 0;
-    transform: translateY(100%);
-  }
-}
-
-@keyframes exitPopVertical {
+@keyframes fillVertical {
   0%,
-  47% {
+  22% {
+    transform: translateX(-50%) scaleY(0);
+    opacity: 1;
+  }
+
+  74%,
+  88% {
+    transform: translateX(-50%) scaleY(1);
+    opacity: 1;
+  }
+
+  97%,
+  100% {
+    transform: translateX(-50%) scaleY(1);
     opacity: 0;
-    transform: translateX(50%) scale(0.5);
+  }
+}
+
+@keyframes lockVertical {
+  0%,
+  16% {
+    transform: translateX(-50%) rotate(45deg) scale(0);
   }
 
-  53% {
+  22% {
+    transform: translateX(-50%) rotate(45deg) scale(1.5);
+  }
+
+  28%,
+  88% {
+    transform: translateX(-50%) rotate(45deg) scale(1);
+  }
+
+  97%,
+  100% {
+    transform: translateX(-50%) rotate(45deg) scale(0);
+  }
+}
+
+@keyframes popVertical {
+  0%,
+  74% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.4);
+  }
+
+  80% {
     opacity: 1;
-    transform: translateX(50%) scale(1.28);
+    transform: translateX(-50%) scale(1.25);
   }
 
-  58%,
-  92% {
+  85%,
+  90% {
     opacity: 1;
-    transform: translateX(50%) scale(1);
+    transform: translateX(-50%) scale(1);
   }
 
-  98%,
+  97%,
   100% {
     opacity: 0;
-    transform: translateX(50%) scale(0.5);
+    transform: translateX(-50%) scale(0.4);
   }
 }

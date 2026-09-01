@@ -4,27 +4,32 @@ import styles from './SaasVerifiedCore.module.css';
 /*
  * "Move Beyond Shift Left" diagram.
  *
- * A standard delivery pipeline — Code, Build, Test, Deploy, Security Review —
- * with Verified Components arriving from the LEFT as a separate piece and
- * docking into it. Everything from the junction rightwards is one pipeline and
- * is styled identically, so the eye reads a single track rather than six
- * competing objects. Green belongs to the incoming components, to the junction
- * they lock into, and to the assurance that then travels the track. Nothing else
- * is green.
+ * The claim: security is not a gate at the end of delivery, it arrives with the
+ * components you start from. So Verified Components sits ABOVE and LEFT of the
+ * pipeline and joins it through a curve, ahead of Code — it is visibly a
+ * separate thing merging in, not simply the first box in a row. Everything from
+ * that junction onward is one pipeline in one neutral treatment, and the
+ * assurance it brings then fills the whole rail.
  *
- * ONE container, not three. The version this replaces nested an outer surface, a
- * route stack and a per-stage housing, each with its own border and background,
- * which is what made it read as boxes inside boxes. There is a single deck now,
- * and the stages sit directly on it.
+ * What went wrong in the version before this, all of it visible only once
+ * rendered at full width:
  *
- * Rendered ONCE, not twice. The previous component emitted a full desktop
- * diagram and a full mobile diagram side by side, so every icon existed twice in
- * the DOM. Orientation is a CSS concern, so the single tree flips from a row to
- * a column at the breakpoint instead.
+ *   - The container was 1360x160 of mostly empty space with a thin strip of
+ *     content adrift in it. The deck is now capped and hugs its contents.
+ *   - Two node grammars in one row: the source was a circle with its label
+ *     beside it, the stages were tiles with labels beneath. Nothing shared a
+ *     baseline. Every node now has identical anatomy — tile, then label.
+ *   - `flex: 1` connectors stretched across the full width, so the pipeline read
+ *     as scattered dots rather than a track. One continuous rail runs behind the
+ *     stages now, and it cannot be pulled apart by the container's width.
+ *   - "Security Review" wrapped to two lines while every other label was one,
+ *     leaving a ragged bottom edge. Node width now fits the longest label.
  *
- * The whole diagram is aria-hidden: SaasShiftLeft renders the same sequence as
- * an ordered list, which is a better reading of a pipeline than a row of
- * decorative tiles.
+ * Rendered once. Orientation is a CSS concern: the row becomes a column at the
+ * breakpoint rather than a second copy of the markup being emitted.
+ *
+ * The diagram is aria-hidden. SaasShiftLeft renders the same sequence as an
+ * ordered list, which is a better reading of a pipeline than a row of tiles.
  */
 
 type StageId = 'code' | 'build' | 'test' | 'deploy' | 'review';
@@ -43,92 +48,78 @@ const STAGES: readonly Stage[] = [
 ];
 
 /*
- * One shared cycle drives every part of the sequence, and each part carries its
- * own delay rather than its own duration. Same period everywhere is what keeps
- * the arrival, the lock, the travelling pulse and the release from drifting out
- * of phase over time — with mixed durations they resynchronise only at the
- * lowest common multiple, which looks like a fault.
+ * One clock. Every part of the sequence shares --cycle and differs only by
+ * delay: mixed durations resynchronise at their lowest common multiple, which
+ * reads as a fault rather than a loop.
  *
- * Order: the component arrives, locks at the junction, its assurance travels
- * stage to stage, and the release is approved. Then it holds and repeats.
+ * The rail FILLS rather than passing a dot along it. The claim is that the
+ * pipeline becomes verified, not that something travels through it, and a fill
+ * says that where a moving pulse does not.
  */
-const DOCK_MS = 900;
-const STEP_MS = 420;
-const TRAVEL_MS = 700;
-
-const linkDelay = (i: number): string => `${DOCK_MS + i * STEP_MS}ms`;
-const stageLitDelay = (i: number): string => `${DOCK_MS + i * STEP_MS + TRAVEL_MS - 120}ms`;
+const CYCLE_MS = 6500;
+/* The rail fill runs from 22% to 74% of the cycle. A stage lights when the fill
+   reaches it, so its delay is the fill's start plus its own share of that span.
+   Computed rather than hand-tuned: percentages cannot be interpolated into
+   keyframe stops, so the timing has to live in the delay. */
+const FILL_START = 0.22;
+const FILL_SPAN = 0.52;
+const haloDelay = (i: number, total: number): string =>
+  `${Math.round(CYCLE_MS * (FILL_START + ((i + 0.5) / total) * FILL_SPAN))}ms`;
 
 export function SaasVerifiedCore(): React.ReactElement {
   return (
     <div className={styles.stage}>
       <div aria-hidden="true" className={styles.deck}>
-        <span className={styles.deckGrid} />
-        <span className={styles.deckSheen} />
-        <span className={`${styles.corner} ${styles.cornerTl}`} />
-        <span className={`${styles.corner} ${styles.cornerTr}`} />
-        <span className={`${styles.corner} ${styles.cornerBl}`} />
-        <span className={`${styles.corner} ${styles.cornerBr}`} />
+        <span className={styles.deckGlow} />
 
-        <div className={styles.track}>
-          {/* Arrives from the left and docks. It is the only element that moves
-              in space; everything else responds to it. */}
+        <div className={styles.diagram}>
+          {/* The piece that merges in: raised above the rail, joined by a curve. */}
           <div data-verified-source="verified-components" className={styles.source}>
             <span className={styles.sourceTile}>
-              <CheckIcon />
               <span className={styles.sourceRing} />
+              <CheckIcon />
             </span>
-            <span className={styles.sourceLabel}>
-              Verified
-              <br />
-              Components
-            </span>
+            <span className={styles.sourceLabel}>Verified Components</span>
           </div>
 
-          <span
+          <svg
             data-trust-ribbon="continuous"
-            className={`${styles.link} ${styles.linkMerge}`}
-            style={{ ['--flow-delay' as string]: linkDelay(0) }}
+            className={styles.merge}
+            viewBox="0 0 104 52"
+            fill="none"
+            preserveAspectRatio="none"
           >
-            <span className={styles.junction} />
-          </span>
+            <title>Verified components joining the pipeline</title>
+            <path className={styles.mergeTrack} d="M2 2 C 54 2, 50 50, 102 50" />
+            <path className={styles.mergeFlow} d="M2 2 C 54 2, 50 50, 102 50" />
+          </svg>
 
-          {STAGES.map((stage, i) => (
-            <div className={styles.segment} key={stage.id}>
+          <div className={styles.railWrap}>
+            <span className={styles.railBase} />
+            <span className={styles.railFill} />
+            <span className={styles.junction} />
+
+            {STAGES.map((stage, i) => (
               <div
+                key={stage.id}
                 className={styles.node}
+                style={{ ['--halo-delay' as string]: haloDelay(i, STAGES.length) }}
                 {...(stage.id === 'review'
                   ? { 'data-security-review': 'open' }
                   : { 'data-core-stage': stage.id })}
               >
                 <span className={styles.tile}>
+                  <span className={styles.tileHalo} />
                   <StageIcon stage={stage.id} />
-                  <span
-                    className={styles.tileDot}
-                    style={{ ['--lit-delay' as string]: stageLitDelay(i) }}
-                  />
                 </span>
                 <span className={styles.label}>{stage.label}</span>
               </div>
+            ))}
 
-              {i < STAGES.length - 1 && (
-                <span
-                  className={styles.link}
-                  style={{ ['--flow-delay' as string]: linkDelay(i + 1) }}
-                />
-              )}
-            </div>
-          ))}
-
-          <span
-            data-release-exit="approved"
-            className={`${styles.link} ${styles.linkExit}`}
-            style={{ ['--flow-delay' as string]: linkDelay(STAGES.length) }}
-          >
-            <span className={styles.exitCheck}>
+            <span data-release-exit="approved" className={styles.exit}>
               <CheckIcon />
             </span>
-          </span>
+          </div>
         </div>
       </div>
     </div>
@@ -187,7 +178,7 @@ function CheckIcon(): React.ReactElement {
       <path
         d="M4 10.5 L8.1 14.4 L16 5.8"
         stroke="currentColor"
-        strokeWidth="2.4"
+        strokeWidth="2.6"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
