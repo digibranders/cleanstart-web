@@ -104,15 +104,26 @@ describe('SaasShiftLeft', () => {
     ];
     const desktopSurfaceRule = desktopSurfaceRules[desktopSurfaceRules.length - 1]?.[1] ?? '';
     const gridOverlayRule = stylesheet.match(/\.desktopSurface::after\s*{([^}]*)}/)?.[1] ?? '';
+    const routeStackRule = stylesheet.match(/\.routeStack\s*{([^}]*)}/)?.[1] ?? '';
+    const gridOverlayMatches = [...stylesheet.matchAll(/\.desktopSurface::after\s*{/g)];
+    const desktopMediaStart = stylesheet.indexOf('@media (min-width: 1024px)');
+    const desktopMediaEnd = stylesheet.indexOf('@keyframes verifiedSignal');
+    const desktopMediaRule = stylesheet.slice(desktopMediaStart, desktopMediaEnd);
 
     expect(scannerFrameRule).toContain(
       'background: linear-gradient(180deg, #081b2d 0%, #061421 100%)',
     );
     expect(desktopSurfaceRule).not.toContain('rgba(138, 174, 228, 0.055)');
+    expect(gridOverlayMatches).toHaveLength(1);
+    expect(desktopMediaRule).toContain('.desktopSurface::after');
+    expect(gridOverlayRule).toContain('position: absolute');
+    expect(gridOverlayRule).toContain('z-index: 0');
     expect(gridOverlayRule).toContain('rgba(138, 174, 228, 0.028)');
     expect(gridOverlayRule).toContain('-webkit-mask-image: radial-gradient');
     expect(gridOverlayRule).toContain('mask-image: radial-gradient');
     expect(gridOverlayRule).toContain('pointer-events: none');
+    expect(routeStackRule).toContain('position: relative');
+    expect(routeStackRule).toContain('z-index: 1');
   });
 
   it('contrasts an open release with a closed late-review return', () => {
