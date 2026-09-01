@@ -66,17 +66,17 @@ function FactoryCard({ data, isFirst }: { data: CardData; isFirst: boolean }) {
       className="factory-card relative flex h-full min-w-0 flex-col"
       style={{ containerType: "inline-size" }}
     >
-      {/* Blue glass card body (designed art, with baked top/bottom glows). */}
-      <Image
-        src="/images/cleanstart-factory/factory-card-bg.webp"
-        alt=""
+      {/* Blue glass card body — flat CSS gradient (no baked glow), matching
+          the mobile card's tones so the surface is consistent across
+          breakpoints. */}
+      <div
         aria-hidden
-        width={232}
-        height={374}
-        sizes="(min-width: 1024px) 320px, 42vw"
-        priority={isFirst}
-        className="pointer-events-none absolute inset-0 h-full w-full select-none"
-        style={{ borderRadius: "9cqw" }}
+        className="pointer-events-none absolute inset-0"
+        style={{
+          borderRadius: "9cqw",
+          border: "1px solid rgba(150,180,255,0.22)",
+          background: "linear-gradient(118deg, #0f1c4d 0%, #1a347f 52%, #2350c6 100%)",
+        }}
       />
 
       {/* Content layer — drives the card height (no fixed aspect ratio), so the
