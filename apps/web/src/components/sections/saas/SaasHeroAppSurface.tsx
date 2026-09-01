@@ -433,17 +433,6 @@ export function SaasHeroAppSurface(): React.ReactElement {
           <Lines x={14} y={60} widths={[114, 92, 100]} opacity={0.22} />
         </g>
 
-        <g transform="rotate(6 480 324) translate(414 278)">
-          <Shell w={142} h={94} fill="url(#csa-violet)" accent="rgba(167,107,255,0.4)" />
-          <path
-            d="M12,32 L12,18 A5,5 0 0 1 17,13 L38,13 L46,22 L114,22 A5,5 0 0 1 119,27 L119,32 Z"
-            fill="rgba(196,158,255,0.8)"
-          />
-          <rect x={12} y={32} width={107} height={46} rx={5} fill="rgba(96,150,255,0.4)" />
-          <Lines x={22} y={46} widths={[78, 58]} gap={10} opacity={0.5} />
-          <Tick x={126} y={16} r={10} />
-        </g>
-
         <g transform="rotate(-5 66 42) translate(20 14)">
           <Graph />
         </g>
@@ -648,6 +637,22 @@ export function SaasHeroAppSurface(): React.ReactElement {
 
       {/* IN FRONT, overlapping the surface. */}
       <g className="cs-hero-band" style={{ animationDelay: '380ms' }}>
+        {/* Package, moved out of the blurred back row. It sits in FRONT of the
+            surface now, so it is sharp and overlaps the window's right edge
+            rather than washing out behind it. Placed first in this group so the
+            manifest below still crosses over it and the depth stack keeps more
+            than two planes. */}
+        <g transform="rotate(6 480 324) translate(414 278)">
+          <Shell w={142} h={94} fill="url(#csa-violet)" accent="rgba(167,107,255,0.4)" />
+          <path
+            d="M12,32 L12,18 A5,5 0 0 1 17,13 L38,13 L46,22 L114,22 A5,5 0 0 1 119,27 L119,32 Z"
+            fill="rgba(196,158,255,0.8)"
+          />
+          <rect x={12} y={32} width={107} height={46} rx={5} fill="rgba(96,150,255,0.4)" />
+          <Lines x={22} y={46} widths={[78, 58]} gap={10} opacity={0.5} />
+          <Tick x={126} y={16} r={10} />
+        </g>
+
         <g transform="rotate(-6 122 264) translate(50 222)">
           <Shell w={146} h={86} fill="url(#csa-blue)" accent="rgba(120,190,255,0.4)" />
           <circle cx={31} cy={31} r={16} fill="none" stroke={CYAN} strokeWidth={2} opacity={0.9} />
