@@ -93,6 +93,28 @@ describe('SaasShiftLeft', () => {
     expect(stageIconRule).toContain('z-index: 2');
   });
 
+  it('masks the rail inside the scanner and fades the desktop grid', () => {
+    const stylesheet = readFileSync(
+      new URL('./SaasVerifiedCore.module.css', import.meta.url),
+      'utf8',
+    );
+    const scannerFrameRule = stylesheet.match(/\.scannerFrame\s*{([^}]*)}/)?.[1] ?? '';
+    const desktopSurfaceRules = [
+      ...stylesheet.matchAll(/\.desktopSurface\s*{([^}]*)}/g),
+    ];
+    const desktopSurfaceRule = desktopSurfaceRules[desktopSurfaceRules.length - 1]?.[1] ?? '';
+    const gridOverlayRule = stylesheet.match(/\.desktopSurface::after\s*{([^}]*)}/)?.[1] ?? '';
+
+    expect(scannerFrameRule).toContain(
+      'background: linear-gradient(180deg, #081b2d 0%, #061421 100%)',
+    );
+    expect(desktopSurfaceRule).not.toContain('rgba(138, 174, 228, 0.055)');
+    expect(gridOverlayRule).toContain('rgba(138, 174, 228, 0.028)');
+    expect(gridOverlayRule).toContain('-webkit-mask-image: radial-gradient');
+    expect(gridOverlayRule).toContain('mask-image: radial-gradient');
+    expect(gridOverlayRule).toContain('pointer-events: none');
+  });
+
   it('contrasts an open release with a closed late-review return', () => {
     const html = renderSection();
 

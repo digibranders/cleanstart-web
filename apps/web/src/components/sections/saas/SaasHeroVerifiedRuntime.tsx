@@ -227,6 +227,11 @@ function Satellite({ cx, cy, scale }: { cx: number; cy: number; scale: number })
  * material with no surface. An isometric grid (echoing the hero's own gridline
  * overlay, so it stays on-system), an inset edge line for craft, and a soft
  * sheen give it substance without adding a message.
+ *
+ * A few grid cells are then lit, which turns the surface from texture into
+ * content: components seated on the verified base. Using the grid that is
+ * already there beats dropping a foreign shape onto the plane — the marks
+ * inherit the isometric projection for free and cannot read as a sticker.
  */
 function TopSurface({ cy }: { cy: number }): React.ReactElement {
   const t: Point = { x: CX, y: cy - HALF_D };
@@ -245,6 +250,7 @@ function TopSurface({ cy }: { cy: number }): React.ReactElement {
   });
 
   const steps = [1 / 6, 2 / 6, 3 / 6, 4 / 6, 5 / 6];
+
   const line = (from: Point, to: Point, key: string) => (
     <line
       key={key}
@@ -399,14 +405,26 @@ export function SaasHeroVerifiedRuntime(): React.ReactElement {
         <BaseTreatment cy={bottomLayerY} />
 
         {/* Verified seal, straddling the stack's front corner so it reads as
-            applied to the whole image rather than to one layer. */}
-        <g transform={`translate(${CX} ${bottomLayerY + HALF_D + 6})`}>
-          <circle r={22} fill="url(#csr-seal)" stroke="rgba(255,255,255,0.6)" strokeWidth={1.8} />
+            applied to the whole image rather than to one layer.
+
+            A shield rather than a disc, and the ONLY security mark on the
+            artifact. A second one laid flat on the top plane was tried and
+            pulled: two marks say the same thing twice, and a symbol
+            foreshortened into the isometric plane reads as a sticker, where one
+            facing the viewer reads as a seal. */}
+        <g transform={`translate(${CX} ${bottomLayerY + HALF_D + 4})`}>
           <path
-            d="M-9.5,1 L-2.5,8.5 L10.5,-7"
+            d="M0,-25 L20,-14.5 L20,5 C20,18.5 0,25 0,25 C0,25 -20,18.5 -20,5 L-20,-14.5 Z"
+            fill="url(#csr-seal)"
+            stroke="rgba(255,255,255,0.62)"
+            strokeWidth={1.8}
+            strokeLinejoin="round"
+          />
+          <path
+            d="M-9,0.5 L-2.5,8 L10,-7"
             fill="none"
             stroke="#ffffff"
-            strokeWidth={3.8}
+            strokeWidth={3.6}
             strokeLinecap="round"
             strokeLinejoin="round"
           />
