@@ -1,9 +1,10 @@
 import type React from 'react';
 import { Container, Section } from '@/components/layout';
 import { Reveal } from '@/components/ui/Reveal';
-import { SaasCleanroomReactor } from './SaasCleanroomReactor';
+import { SaasVerifiedCore } from './SaasVerifiedCore';
 
-const PROCESS_DESCRIPTION =
+const LATE_REVIEW_DESCRIPTION = 'Code, Build, Test, Deploy, Security Review' as const;
+const VERIFIED_FIRST_DESCRIPTION =
   'Verified Components, Code, Build, Test, Deploy, Security Review' as const;
 
 export function SaasShiftLeft(): React.ReactElement {
@@ -61,7 +62,15 @@ export function SaasShiftLeft(): React.ReactElement {
           </Reveal>
         </div>
 
-        <ol className="sr-only" aria-label={PROCESS_DESCRIPTION}>
+        <ol className="sr-only" aria-label={LATE_REVIEW_DESCRIPTION}>
+          <li>Code</li>
+          <li>Build</li>
+          <li>Test</li>
+          <li>Deploy</li>
+          <li>Security Review</li>
+        </ol>
+
+        <ol className="sr-only" aria-label={VERIFIED_FIRST_DESCRIPTION}>
           <li>Verified Components</li>
           <li>Code</li>
           <li>Build</li>
@@ -72,7 +81,7 @@ export function SaasShiftLeft(): React.ReactElement {
 
         <Reveal delay={0.14}>
           <div className="mt-10 lg:mt-14">
-            <SaasCleanroomReactor />
+            <SaasVerifiedCore />
           </div>
         </Reveal>
       </Container>

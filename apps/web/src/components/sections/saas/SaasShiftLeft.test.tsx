@@ -26,72 +26,82 @@ describe('SaasShiftLeft', () => {
     );
   });
 
-  it('replaces the two-lane release gate with desktop and mobile cleanroom reactors', () => {
+  it('renders structurally distinct desktop and mobile Verified Core diagrams', () => {
     const html = renderSection();
+    const mobile = html.slice(html.indexOf('data-verified-core="mobile"'));
 
-    expect(html).toContain('data-cleanroom-reactor="desktop"');
-    expect(html).toContain('data-cleanroom-reactor="mobile"');
-    expect(html).not.toContain('data-release-gate=');
-    expect(html).not.toContain('data-release-path=');
+    expect(html).toContain('data-verified-core="desktop"');
+    expect(html).toContain('data-verified-core="mobile"');
+    expect(html).not.toContain('data-cleanroom-reactor=');
+    expect(html).not.toContain('data-reactor-chamber=');
+    expect(html).not.toContain('Unverified Components');
+    expect(mobile).toContain('data-late-review-path="return"');
+    expect(mobile).toContain('data-verified-source="verified-components"');
+    expect(mobile).toMatch(
+      /data-core-stage="code"[\s\S]*data-core-stage="build"[\s\S]*data-core-stage="test"[\s\S]*data-core-stage="deploy"/,
+    );
+    expect(mobile).toContain('data-security-review="closed"');
+    expect(mobile).toContain('data-security-review="open"');
+    expect(mobile).toContain('data-release-exit="approved"');
   });
 
-  it('places every application stage inside one reactor chamber', () => {
+  it('carries one verified core through every delivery stage', () => {
     const html = renderSection();
 
-    expect(html).toContain('data-reactor-chamber="application"');
+    expect(html).toContain('data-verified-source="verified-components"');
+    expect(html).toContain('data-trust-ribbon="continuous"');
     expect(html).toMatch(
-      /data-reactor-layer="code"[\s\S]*data-reactor-layer="build"[\s\S]*data-reactor-layer="test"[\s\S]*data-reactor-layer="deploy"/,
+      /data-core-stage="code"[\s\S]*data-core-stage="build"[\s\S]*data-core-stage="test"[\s\S]*data-core-stage="deploy"/,
     );
   });
 
-  it('makes verified components the source, security review the perimeter, and late review external', () => {
+  it('contrasts an open release with a closed late-review return', () => {
     const html = renderSection();
 
-    expect(html).toContain('data-reactor-source="verified-components"');
-    expect(html).toContain('data-security-review="perimeter"');
-    expect(html).toContain('data-late-artifact="rejected"');
-    // The refused artifact is named, not just drawn — without a label it read
-    // as a stray fragment. Both breakpoints must carry it.
-    expect(html.match(/Unverified Components/g)?.length).toBe(2);
+    expect(html).toContain('data-security-review="open"');
+    expect(html).toContain('data-release-exit="approved"');
+    expect(html).toContain('data-release-arrow="forward"');
+    expect(html).toContain('data-security-review="closed"');
+    expect(html).toContain('data-late-review-path="return"');
   });
 
-  it('delivers mobile as cards rather than a scaled copy of the desktop scene', () => {
-    const html = renderSection();
-    const mobile = html.slice(html.indexOf('data-cleanroom-reactor="mobile"'));
-
-    // Mobile used to be the desktop reactor in a 360x880 viewBox, which renders
-    // taller than a phone viewport. It must not go back to being a scaled scene.
-    expect(mobile).not.toContain('viewBox="0 0 360');
-
-    // Two runs, each ending at its own gate.
-    expect(mobile.match(/Security Review/g)?.length).toBe(2);
-
-    // Identical middles: both runs carry the same four stages, so the only
-    // difference the reader sees is the head and the verdict.
-    for (const stage of ['Code', 'Build', 'Test', 'Deploy']) {
-      expect(mobile.match(new RegExp(`>${stage}<`, 'g'))?.length).toBe(2);
-    }
-  });
-
-  it('keeps both visuals decorative and exposes one accessible process description', () => {
+  it('exposes both exact source sequences once and hides duplicate visuals', () => {
     const html = renderSection();
 
-    expect(html).toMatch(/data-cleanroom-reactor="desktop"[^>]*aria-hidden="true"/);
-    expect(html).toMatch(/data-cleanroom-reactor="mobile"[^>]*aria-hidden="true"/);
+    expect(html.match(/aria-label="Code, Build, Test, Deploy, Security Review"/g)).toHaveLength(
+      1,
+    );
     expect(
-      html.match(/aria-label="Verified Components, Code, Build, Test, Deploy, Security Review"/g),
+      html.match(
+        /aria-label="Verified Components, Code, Build, Test, Deploy, Security Review"/g,
+      ),
     ).toHaveLength(1);
+    expect(html).toMatch(/data-verified-core="desktop"[^>]*aria-hidden="true"/);
+    expect(html).toMatch(/data-verified-core="mobile"[^>]*aria-hidden="true"/);
     expect(html).toContain('preserveAspectRatio="xMidYMid meet"');
     expect(html).not.toMatch(/preserveAspectRatio=.none./);
   });
 
-  it('provides a complete reduced-motion state for the reactor', () => {
-    const stylesheetPath = new URL('./SaasCleanroomReactor.module.css', import.meta.url);
+  it('provides a complete reduced-motion state for the Verified Core', () => {
+    const stylesheetPath = new URL('./SaasVerifiedCore.module.css', import.meta.url);
     const stylesheet = existsSync(stylesheetPath) ? readFileSync(stylesheetPath, 'utf8') : '';
 
     expect(stylesheet).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(stylesheet).toMatch(/\.sourcePulse[\s\S]*animation: none !important/);
-    expect(stylesheet).toMatch(/\.layerPlate[\s\S]*opacity: 1 !important/);
-    expect(stylesheet).toMatch(/\.scanBeam[\s\S]*opacity: 0 !important/);
+    expect(stylesheet).toMatch(
+      /\.verifiedPulse,\s*\.returnPulse,\s*\.scannerBeam,\s*\.releaseCheck\s*{\s*animation: none !important;/,
+    );
+  });
+
+  it('keeps the trust ribbon cyan-to-mint and animates the approved release state', () => {
+    const stylesheet = readFileSync(
+      new URL('./SaasVerifiedCore.module.css', import.meta.url),
+      'utf8',
+    );
+    const trustRibbonRule = stylesheet.match(/\.trustRibbon\s*{([\s\S]*?)\n {2}}/)?.[1] ?? '';
+
+    expect(trustRibbonRule).toContain('#7fe3ff 0%');
+    expect(trustRibbonRule).not.toContain('#9a51ff');
+    expect(stylesheet).toMatch(/\.releaseCheck\s*{[\s\S]*animation: releaseApproval/);
+    expect(stylesheet).toContain('@keyframes releaseApproval');
   });
 });
