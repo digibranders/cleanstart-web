@@ -367,3 +367,33 @@ pnpm --filter @cleanstart/web build
 ```
 
 Expected: all checks pass and the production build generates the complete site.
+
+### Task 9: Mask the scanner rail and fade the desktop grid
+
+**Files:**
+- Modify: `apps/web/src/components/sections/saas/SaasShiftLeft.test.tsx`
+- Modify: `apps/web/src/components/sections/saas/SaasVerifiedCore.module.css`
+
+- [ ] **Step 1: Write failing scanner and grid-style tests**
+
+Assert that `.scannerFrame` uses a fully opaque background. Assert that the desktop surface no longer paints grid lines directly in its main background and that `.desktopSurface::after` owns a lower-opacity two-axis grid with both standard and WebKit radial masks.
+
+- [ ] **Step 2: Run the focused test and verify RED**
+
+```bash
+pnpm --filter @cleanstart/web test -- src/components/sections/saas/SaasShiftLeft.test.tsx
+```
+
+Expected: FAIL because the scanner background is translucent and the grid is currently painted uniformly in `.desktopSurface`.
+
+- [ ] **Step 3: Make the scanner body opaque**
+
+Replace the translucent scanner background with an opaque navy gradient. Preserve the open scanner geometry, beam, state icon, barrier, glow, and approved release exit.
+
+- [ ] **Step 4: Move the desktop grid to a faded overlay**
+
+Remove the two grid gradients from `.desktopSurface`. Add them to `.desktopSurface::after` at lower alpha, set their 42px cell size, and apply matching `mask-image` and `-webkit-mask-image` radial gradients that feather the grid to transparency near every edge. Keep the overlay non-interactive and beneath `.routeStack`.
+
+- [ ] **Step 5: Verify both breakpoints and package gates**
+
+Run the focused and complete test suites, inspect desktop and mobile, then run lint, typecheck, and production build. Confirm the rail is hidden inside the scanner, the grid fades without affecting labels, and no mobile overflow is introduced.
