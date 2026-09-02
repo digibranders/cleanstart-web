@@ -174,7 +174,7 @@ export const NAV_TREE: NavItem[] = [
           },
           {
             label: "Modern Technology",
-            href: "/industries/modern-technology",
+            href: "/modern-applications",
             description: "Ship faster on a verified software foundation.",
             icon: "cloud",
           },

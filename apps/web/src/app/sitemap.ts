@@ -113,7 +113,7 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/for-developers' },
   { path: '/guide' },
   { path: '/industries/financial-services-container-security' },
-  { path: '/industries/modern-technology' },
+  { path: '/modern-applications' },
   // `/industries` itself has no page, so there is no hub URL to list.
   // `/knowledge-hub` is a redirect to the first article (no standalone listing) —
   // excluded here. The individual /knowledge-hub/<slug> articles are emitted below.

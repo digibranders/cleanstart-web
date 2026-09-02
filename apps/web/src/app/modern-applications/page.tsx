@@ -16,18 +16,19 @@ import { JsonLdGraph } from '@/components/JsonLdGraph';
 import { getPageGraph } from '@/lib/seo/compose-page';
 
 /*
- * /industries/modern-technology
+ * /modern-applications
  *
- * Title, description and H1 are the SEO team's, applied verbatim. Sibling to
- * financial-services-container-security under the /industries segment; see that
- * file for why the segment exists and why /industries itself still 404s.
+ * URL, title and description are the SEO team's, applied verbatim (the H1 is
+ * the client's). The SEO doc puts this page at the top level, not under the
+ * /industries segment its sibling financial-services-container-security uses.
  *
  * Renamed from /saas, which never resolved in production (it returned 404
  * there, so no redirect was needed), then from /industries/saas-container-security
  * on 2026-09-02, before the page reached main. That path did resolve publicly
  * (noindex), so it 301s here from next.config alongside the short-path 301.
- * The pageRegistry row keys on path; update it to this path or the WebPage
- * node drops out of the graph.
+ * (An intermediate /industries/modern-technology existed on development for
+ * an hour and never deployed, so it has no redirect.) The pageRegistry row
+ * keys on path; update it to this path or the WebPage node drops out.
  *
  * Launched: the noindex,nofollow pair is dropped, the path is listed in the
  * sitemap's STATIC_ROUTES and the Solutions > By industry nav row is restored.
@@ -35,8 +36,7 @@ import { getPageGraph } from '@/lib/seo/compose-page';
  * its sibling, so it emits the full Organization + WebSite + WebPage +
  * BreadcrumbList graph.
  *
- * The breadcrumb is Home > Modern Technology, with no Industries crumb, because /industries
- * has no page yet and the crumb would link to a 404.
+ * The breadcrumb is Home > Modern Applications.
  *
  * Band rhythm, in order: dark hero, white, tinted, DARK, white, tinted, DARK.
  * Only one dark run reaches the end of the page. The Footer is itself a dark
@@ -44,23 +44,23 @@ import { getPageGraph } from '@/lib/seo/compose-page';
  * blocks into the close; the two light sections are separated by value instead.
  */
 export const metadata = buildPageMetadata({
-  title: 'Container Security for SaaS Companies | CleanStart',
+  title: 'Modern Application Security | CleanStart',
   absoluteTitle: true,
   description:
-    'Protect SaaS applications with hardened container images, near-zero CVEs, SBOMs, signed provenance, and continuous software supply chain visibility.',
-  path: '/industries/modern-technology',
+    'Secure modern applications with verified software components, hardened container images, and trusted open-source libraries built for faster, safer software delivery.',
+  path: '/modern-applications',
   eyebrow: 'Solutions',
 });
 
 export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
 
 export default async function SaasPage(): Promise<React.ReactElement> {
-  const graph = await getPageGraph('/industries/modern-technology', [
-    breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Modern Technology' }]),
+  const graph = await getPageGraph('/modern-applications', [
+    breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Modern Applications' }]),
   ]);
   return (
     <>
-      <JsonLdGraph id="modern-technology-jsonld" graph={graph} />
+      <JsonLdGraph id="modern-applications-jsonld" graph={graph} />
       <Header />
       <main id="main-content">
         <SaasHero />
