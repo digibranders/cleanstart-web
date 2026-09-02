@@ -1,0 +1,397 @@
+/*
+ * SaasTrustPipeline: every visual beat of the scene.
+ *
+ * The component only flips `data-*` flags on the root svg in order:
+ *   flying → approach → docked → fill → settled → exit
+ * Each flag stays set for the rest of the cycle, so a rule keyed on
+ * `[data-docked]` describes "from docking onwards". `data-phase="idle"` kills
+ * every transition so the reset after `exit` is an instant rewind rather than
+ * a replay in reverse.
+ *
+ * Rail timing is positional: `--frac` is a stage's 0..1 position along the
+ * rail and the sweep takes `--sweep`, so a badge lands the moment the fill
+ * front reaches its tile.
+ */
+
+.deck {
+  --green: #34e3a6;
+  --green-soft: #7cf3c6;
+  --sweep: 3.2s;
+  --flight: 2.6s;
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid rgba(140, 160, 255, 0.16);
+  background:
+    radial-gradient(60% 80% at 18% 60%, rgba(52, 227, 166, 0.05) 0%, rgba(52, 227, 166, 0) 70%),
+    linear-gradient(180deg, rgba(13, 17, 50, 0.88) 0%, rgba(8, 11, 36, 0.96) 100%);
+  box-shadow:
+    0 34px 90px -40px rgba(0, 0, 0, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* The svg must not clip: the hero glow spills past its box and the hero
+   itself starts off-canvas. The deck's overflow does the clipping, at the
+   card edge, where it reads as light leaving the card. */
+.scene {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.horizontal {
+  display: none;
+}
+
+.vertical {
+  display: block;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+/* Below lg the card hugs the vertical scene instead of spanning the
+   container, so there is no dead space beside it at tablet widths. */
+@media (max-width: 1023px) {
+  .deck {
+    max-width: 440px;
+    margin-inline: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .horizontal {
+    display: block;
+  }
+
+  .vertical {
+    display: none;
+  }
+}
+
+/* Instant rewind. */
+.scene[data-phase='idle'] * {
+  transition: none !important;
+}
+
+/* ---------------------------------------------------------------- statics */
+
+.railBase {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.11);
+  stroke-width: 3;
+}
+
+/* Opaque so the rail passes behind the tile, not across its icon. */
+.tile {
+  fill: #151a3d;
+  stroke: rgba(255, 255, 255, 0.14);
+  stroke-width: 1.25;
+  transition: stroke 0.4s ease;
+  transition-delay: calc(var(--frac) * var(--sweep));
+}
+
+.scene[data-fill] .tile {
+  stroke: rgba(255, 255, 255, 0.3);
+}
+
+.icon {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.label {
+  fill: rgba(226, 232, 255, 0.78);
+  transition: fill 0.4s ease;
+  transition-delay: calc(var(--frac) * var(--sweep));
+}
+
+.scene[data-fill] .label {
+  fill: rgba(240, 244, 255, 0.96);
+}
+
+/* ------------------------------------------------------------------ socket */
+
+.socketFace {
+  fill: rgba(255, 255, 255, 0.025);
+}
+
+.socketRing {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.3);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 7;
+  animation: march 1.6s linear infinite;
+  transition: stroke 0.35s ease;
+}
+
+.scene[data-docked] .socketRing {
+  stroke: var(--green);
+  stroke-dasharray: 1000 0;
+  animation: none;
+}
+
+.socketGlow {
+  opacity: 0.35;
+  transition: opacity 0.8s ease;
+}
+
+.scene[data-docked] .socketGlow {
+  opacity: 1;
+}
+
+.burst {
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 2;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.scene[data-docked] .burst {
+  animation: burst 0.9s ease-out forwards;
+}
+
+.sourceLabel,
+.sourceNote {
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.5s ease 0.15s,
+    transform 0.5s ease 0.15s;
+}
+
+.sourceLabel {
+  fill: var(--green-soft);
+}
+
+.sourceNote {
+  fill: rgba(190, 245, 223, 0.6);
+  transition-delay: 0.3s;
+}
+
+.scene[data-docked] .sourceLabel,
+.scene[data-docked] .sourceNote {
+  opacity: 1;
+  transform: none;
+}
+
+/* -------------------------------------------------------------------- hero */
+
+.hero {
+  offset-rotate: 0deg;
+  offset-distance: 0%;
+  transition: offset-distance var(--flight) cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.scene[data-flying] .hero {
+  offset-distance: 100%;
+}
+
+.heroBody {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(1.06);
+  transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.scene[data-docked] .heroBody {
+  transform: scale(1);
+}
+
+.trail {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.scene[data-flying] .trail {
+  opacity: 1;
+}
+
+.scene[data-approach] .trail {
+  opacity: 0;
+}
+
+.chip {
+  transition:
+    transform 0.55s ease-in,
+    opacity 0.4s ease-in;
+  transition-delay: calc(var(--i) * 70ms);
+}
+
+.chipFace {
+  fill: rgba(52, 227, 166, 0.12);
+  stroke: rgba(52, 227, 166, 0.5);
+  stroke-width: 1;
+}
+
+.chipText {
+  fill: #bdf5df;
+}
+
+.scene[data-approach] .chip {
+  transform: translate(var(--dx), var(--dy)) scale(0.3);
+  opacity: 0;
+}
+
+/* --------------------------------------------------------------- the sweep */
+
+.railFill {
+  fill: none;
+  stroke-width: 3;
+  stroke-dasharray: var(--len);
+  stroke-dashoffset: var(--len);
+  transition: stroke-dashoffset var(--sweep) linear;
+}
+
+.scene[data-fill] .railFill {
+  stroke-dashoffset: 0;
+}
+
+.badge {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0);
+  transition:
+    transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.25s ease;
+  transition-delay: calc(var(--frac) * var(--sweep));
+}
+
+.scene[data-fill] .badge {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.amber {
+  transition: opacity 0.3s ease;
+  transition-delay: calc(var(--frac) * var(--sweep));
+}
+
+.amberRing {
+  fill: none;
+  stroke: #f5b94a;
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulse 1.8s ease-out infinite;
+}
+
+.scene[data-fill] .amber {
+  opacity: 0;
+}
+
+.bloom {
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 2;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.scene[data-fill] .bloom {
+  animation: burst 0.9s ease-out var(--sweep) forwards;
+}
+
+.releaseFill {
+  opacity: 0;
+  transition: opacity 0.55s ease var(--sweep);
+}
+
+.scene[data-fill] .releaseFill {
+  opacity: 1;
+}
+
+.releaseIcon {
+  color: rgba(255, 255, 255, 0.86);
+  transition: color 0.4s ease calc(var(--sweep) + 0.05s);
+}
+
+.scene[data-fill] .releaseIcon {
+  color: #05231a;
+}
+
+.releaseLabel {
+  fill: rgba(226, 232, 255, 0.78);
+  transition: fill 0.4s ease var(--sweep);
+}
+
+.scene[data-fill] .releaseLabel {
+  fill: var(--green-soft);
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------------------- exit */
+
+.scene[data-exit] .hero,
+.scene[data-exit] .railFill,
+.scene[data-exit] .badge,
+.scene[data-exit] .sourceLabel,
+.scene[data-exit] .sourceNote,
+.scene[data-exit] .releaseFill,
+.scene[data-exit] .socketGlow {
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  transition-delay: 0s;
+}
+
+.scene[data-exit] .socketRing {
+  stroke: rgba(255, 255, 255, 0.3);
+}
+
+.scene[data-exit] .releaseIcon {
+  color: rgba(255, 255, 255, 0.86);
+  transition-delay: 0s;
+}
+
+.scene[data-exit] .releaseLabel {
+  fill: rgba(226, 232, 255, 0.78);
+  transition-delay: 0s;
+}
+
+/* -------------------------------------------------------------- keyframes */
+
+@keyframes march {
+  to {
+    stroke-dashoffset: -26;
+  }
+}
+
+@keyframes burst {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .socketRing,
+  .amberRing,
+  .burst,
+  .bloom {
+    animation: none !important;
+  }
+
+  .scene * {
+    transition: none !important;
+  }
+}
