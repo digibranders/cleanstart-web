@@ -1583,7 +1583,10 @@ body {
   /* Whole-pixel height so the bar renders crisp rather than antialiasing
      soft across rows (a 2.5px line reads no heavier than a 2px one). */
   height: 3px;
-  background: #e2726c;
+  /* Vermillion: saturated enough to read as a decisive cut, and far enough
+     around the wheel from the brand cyan/purple that it reads as negating
+     the word rather than decorating it. */
+  background: #ef4b39;
   border-radius: 2px;
   transform-origin: left center;
   animation: cs-hh-strike 0.55s ease-out 1.6s both;
