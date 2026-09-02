@@ -19,7 +19,7 @@ import { getPageGraph } from "@/lib/seo/compose-page";
  *
  * Title, description and H1 are the SEO team's, applied verbatim.
  *
- * First page under the /industries segment, with saas-container-security as
+ * First page under the /industries segment, with modern-technology (the SaaS page) as
  * its sibling. The segment is the one exception to this site's otherwise flat
  * routing (every other static page is a single segment, including the
  * /for-developers + /for-ciso role family) and it is deliberate: two committed
@@ -38,7 +38,7 @@ import { getPageGraph } from "@/lib/seo/compose-page";
  *
  * Launched: the noindex,nofollow pair is dropped and the path is listed in the
  * sitemap's STATIC_ROUTES. The breadcrumb, JsonLdGraph and pageRegistry row
- * were already in place. Its sibling /industries/saas-container-security stays
+ * were already in place. Its sibling /industries/modern-technology stays
  * noindex,nofollow and unlisted, pending sign-off on its copy.
  */
 export const metadata = buildPageMetadata({

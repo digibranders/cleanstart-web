@@ -173,8 +173,8 @@ export const NAV_TREE: NavItem[] = [
             icon: "bank",
           },
           {
-            label: "SaaS",
-            href: "/industries/saas-container-security",
+            label: "Modern Technology",
+            href: "/industries/modern-technology",
             description: "Ship faster on a verified software foundation.",
             icon: "cloud",
           },

@@ -86,7 +86,16 @@ const nextConfig: NextConfig = {
       // industry page is added.
       {
         source: "/saas-container-security",
-        destination: "/industries/saas-container-security",
+        destination: "/industries/modern-technology",
+        permanent: true,
+      },
+      // The SaaS page was renamed from `/industries/saas-container-security` on
+      // 2026-09-02 before it reached main. That path resolved publicly (noindex)
+      // for two days, so it is caught here; the short path above points straight
+      // at the final URL so nothing chains.
+      {
+        source: "/industries/saas-container-security",
+        destination: "/industries/modern-technology",
         permanent: true,
       },
       {
