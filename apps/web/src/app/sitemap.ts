@@ -97,9 +97,9 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/clean-libraries' },
   { path: '/cleansight' },
   { path: '/cleanstart-images' },
-  // `/cleanstart-platform` is intentionally de-listed — the page is not yet
-  // complete, so it is noindex'd and excluded from the sitemap. Re-add when it
-  // ships (and drop the `noindex` in its page metadata).
+  // `/cleanstart-platform` was deleted 2026-09-02 — the page was never finished
+  // and shipped noindex, unlinked and unlisted, so nothing was de-ranked. Recover
+  // the route and its sections from git history when it is rebuilt.
   { path: '/community' },
   // `/compare/cleanstart-vs-docker-hardened-images` is intentionally de-listed
   // — the page is not signed off yet, so it is noindex,nofollow and excluded
