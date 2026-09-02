@@ -79,13 +79,19 @@ const nextConfig: NextConfig = {
         destination: "/guide/:slug*",
         permanent: true,
       },
-      // Industry pages live under `/industries/`, but the slug already names
+      // Industry pages live under `/industries/`, but each slug already names
       // the industry, so the shorter path is the natural guess and returns a
-      // hard 404. Same courtesy 301 as `/guides` above: never a live URL,
-      // just one worth catching.
+      // hard 404. Same courtesy 301 as `/guides` above: neither was ever a
+      // live URL, just ones worth catching. Add an entry here whenever an
+      // industry page is added.
       {
         source: "/saas-container-security",
         destination: "/industries/saas-container-security",
+        permanent: true,
+      },
+      {
+        source: "/financial-services-container-security",
+        destination: "/industries/financial-services-container-security",
         permanent: true,
       },
       // Canonical detail routes are singular `/event/[slug]` and `/job/[slug]`
