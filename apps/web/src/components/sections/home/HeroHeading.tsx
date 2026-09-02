@@ -32,7 +32,7 @@ export function HeroHeading() {
       aria-label="Verified. Secure. Built for the AI Era."
     >
       <span aria-hidden="true">
-        <span className="cs-hh-verified">Verified</span>
+        <span className="cs-hh-verified">Verified.</span>
         {/* Caret lives on the wrapper so the inner clip-path doesn't crop it. */}
         <span className="cs-hh-typewrap">
           <span className="cs-hh-line2">
