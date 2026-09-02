@@ -79,6 +79,15 @@ const nextConfig: NextConfig = {
         destination: "/guide/:slug*",
         permanent: true,
       },
+      // Industry pages live under `/industries/`, but the slug already names
+      // the industry, so the shorter path is the natural guess and returns a
+      // hard 404. Same courtesy 301 as `/guides` above: never a live URL,
+      // just one worth catching.
+      {
+        source: "/saas-container-security",
+        destination: "/industries/saas-container-security",
+        permanent: true,
+      },
       // Canonical detail routes are singular `/event/[slug]` and `/job/[slug]`
       // (matching the indexed Webflow URLs). The redesign also shipped plural
       // aliases that rendered the same content and self-canonicalled to
