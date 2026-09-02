@@ -1474,9 +1474,9 @@ body {
    paints from the server HTML; clip/opacity/blur live only in keyframes
    (never base rules where avoidable), so reduced-motion (animation: none)
    falls back to the final, fully-corrected, fully-visible heading. Timeline:
-   0.15s type-on starts → ~1.05s "Hardened. Secure." typed → 1.1s strike +
-   desaturate lands on "Hardened" → 1.4s "Verified" rises → ~1.95s shine
-   starts, line 3 focus-settles → ~2.5s fully settled. */
+   0.2s type-on starts → ~1.5s "Hardened. Secure." typed → 1.6s strike +
+   desaturate lands on "Hardened" → 2s "Verified" rises → ~2.8s shine
+   starts, line 3 focus-settles → ~3.5s fully settled. */
 .cs-hero-h1 {
   position: relative;
 }
@@ -1504,8 +1504,8 @@ body {
 .cs-hh-verified {
   display: block;
   animation:
-    cs-hh-verified-rise 0.55s cubic-bezier(0.16, 1, 0.3, 1) 1.4s both,
-    cs-hh-shine 6s linear 1.95s infinite;
+    cs-hh-verified-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) 2s both,
+    cs-hh-shine 6s linear 2.8s infinite;
 }
 
 @keyframes cs-hh-verified-rise {
@@ -1534,8 +1534,8 @@ body {
 .cs-hh-line2 {
   display: inline-block;
   animation:
-    cs-hh-reveal 0.9s steps(17) 0.15s both,
-    cs-hh-snap 0.5s ease-out 1.05s both;
+    cs-hh-reveal 1.3s steps(17) 0.2s both,
+    cs-hh-snap 0.7s ease-out 1.5s both;
   /* No will-change: the clip/blur entrance is one-shot, so a layer hint
      buys nothing while holding memory on the LCP heading. */
 }
@@ -1578,7 +1578,7 @@ body {
   background: #e2726c;
   border-radius: 2px;
   transform-origin: left center;
-  animation: cs-hh-strike 0.4s ease-out 1.1s both;
+  animation: cs-hh-strike 0.55s ease-out 1.6s both;
 }
 
 @keyframes cs-hh-strike {
@@ -1592,7 +1592,7 @@ body {
 }
 
 .cs-hh-hardened-grad {
-  animation: cs-hh-fade-out 0.2s ease-out 1.1s both;
+  animation: cs-hh-fade-out 0.3s ease-out 1.6s both;
 }
 
 .cs-hh-hardened-gray {
@@ -1600,7 +1600,7 @@ body {
   inset: 0;
   color: #8892a4;
   opacity: 0;
-  animation: cs-hh-fade-in 0.2s ease-out 1.1s both;
+  animation: cs-hh-fade-in 0.3s ease-out 1.6s both;
 }
 
 @keyframes cs-hh-fade-out {
@@ -1638,9 +1638,9 @@ body {
   height: 0.82em;
   background: currentColor;
   animation:
-    cs-hh-caret-move 0.9s steps(17) 0.15s both,
-    cs-hh-blink 0.7s step-end 0.15s infinite,
-    cs-hh-caret-hide 0.25s linear 1.05s forwards;
+    cs-hh-caret-move 1.3s steps(17) 0.2s both,
+    cs-hh-blink 0.7s step-end 0.2s infinite,
+    cs-hh-caret-hide 0.35s linear 1.5s forwards;
 }
 
 @keyframes cs-hh-caret-move {
@@ -1675,7 +1675,7 @@ body {
    has landed. */
 .cs-hh-phrase {
   display: block;
-  animation: cs-hh-focus 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.7s both;
+  animation: cs-hh-focus 1.1s cubic-bezier(0.16, 1, 0.3, 1) 2.4s both;
   /* One-shot focus-settle — no persistent compositor-layer hint. */
 }
 
