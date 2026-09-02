@@ -1577,8 +1577,10 @@ body {
 .cs-hh-hardened::after {
   content: "";
   position: absolute;
-  left: -2%;
-  right: -2%;
+  /* Flush to the word — no overshoot, so the bar stops at the period instead
+     of running on into the gap before "Secure." */
+  left: 0;
+  right: 0;
   top: 50%;
   /* Whole-pixel height so the bar renders crisp rather than antialiasing
      soft across rows (a 2.5px line reads no heavier than a 2px one). */
@@ -5817,7 +5819,7 @@ body {
   }
 }
 
-/* ROI calculator — "compounding chain" (RoiHowItWorks). Metro-line on desktop,
+/* Estimate Your Outcome page: "compounding chain" (OutcomeHowItWorks). Metro-line on desktop,
    vertical timeline on mobile. Tier-coloured stations with a growing severity
    meter. Pseudo-elements + keyframes live here; motion is reduced-motion aware. */
 .cs-chain {
