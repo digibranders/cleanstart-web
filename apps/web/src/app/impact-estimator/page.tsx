@@ -5,9 +5,12 @@ import { FadeUp } from "@/components/ui/FadeUp";
 import { ImpactHero } from "@/components/sections/impact-estimator/ImpactHero";
 import { ImpactSimulator } from "@/components/sections/impact-estimator/ImpactSimulator";
 import { ImpactHowItWorks } from "@/components/sections/impact-estimator/ImpactHowItWorks";
+import { ImpactMethod } from "@/components/sections/impact-estimator/ImpactMethod";
+import { ImpactFAQ } from "@/components/sections/impact-estimator/ImpactFAQ";
 import { ImpactCTA } from "@/components/sections/impact-estimator/ImpactCTA";
+import { FAQS } from "@/components/sections/impact-estimator/impact-content";
 import { buildPageMetadata } from "@/lib/seo/canonical";
-import { breadcrumbSchema } from "@/lib/seo/jsonld";
+import { breadcrumbSchema, faqPageSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
 import { getPageGraph } from "@/lib/seo/compose-page";
 
@@ -28,6 +31,7 @@ export default async function ImpactEstimatorPage(): Promise<React.ReactElement>
       { name: "Home", path: "/" },
       { name: "Impact Estimator" },
     ]),
+    faqPageSchema([...FAQS]),
   ]);
 
   return (
@@ -41,6 +45,12 @@ export default async function ImpactEstimatorPage(): Promise<React.ReactElement>
         </FadeUp>
         <FadeUp>
           <ImpactHowItWorks />
+        </FadeUp>
+        <FadeUp>
+          <ImpactMethod />
+        </FadeUp>
+        <FadeUp>
+          <ImpactFAQ />
         </FadeUp>
       </main>
       <Footer cta={<ImpactCTA />} />

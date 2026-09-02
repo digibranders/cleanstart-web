@@ -250,3 +250,12 @@ export const TEAM_WEIGHT_THRESHOLDS = TEAM_THRESHOLDS;
 export const COUNT_LEVELS = MAX_COUNT_LEVEL;
 export const BURDEN_SCALE = { min: BURDEN_MIN, max: BURDEN_MAX } as const;
 export const ANNUAL_ENG_HOURS = WORK_HOURS_PER_YEAR;
+
+/*
+ * Read-only views for the methodology copy on the page, so the prose renders
+ * the same weights and tier edges the scoring uses and cannot drift from them.
+ */
+export const SCORE_WEIGHTS = WEIGHTS;
+export const TIER_SUMMARY: ReadonlyArray<{ name: TierName; min: number; max: number; hoursShare: number }> = TIERS.map(
+  (t) => ({ name: t.name, min: t.min, max: t.max, hoursShare: t.band.F }),
+);
