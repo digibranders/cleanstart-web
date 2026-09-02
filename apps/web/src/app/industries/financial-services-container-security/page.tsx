@@ -19,11 +19,11 @@ import { getPageGraph } from "@/lib/seo/compose-page";
  *
  * Title, description and H1 are the SEO team's, applied verbatim.
  *
- * The only page under the /industries segment: the SEO doc put its sibling,
- * the SaaS page, at the top-level /modern-applications. The segment is an
- * exception to this site's otherwise flat routing (every other static page is
- * a single segment, including the /for-developers + /for-ciso role family);
- * it stays because the URL is the SEO team's and is live and indexed.
+ * First page under the /industries segment, with modern-applications (the
+ * SaaS page) as its sibling. The segment is the one exception to this site's
+ * otherwise flat routing (every other static page is a single segment,
+ * including the /for-developers + /for-ciso role family) and it is deliberate:
+ * two committed children and a named nav family, same reasoning as /compare.
  *
  * NOTE: /industries itself has no page.tsx and therefore 404s. A segment with
  * no hub is a dead end for anyone who truncates the URL, and it forfeits the
@@ -38,7 +38,7 @@ import { getPageGraph } from "@/lib/seo/compose-page";
  *
  * Launched: the noindex,nofollow pair is dropped and the path is listed in the
  * sitemap's STATIC_ROUTES. The breadcrumb, JsonLdGraph and pageRegistry row
- * were already in place. Its sibling /modern-applications stays
+ * were already in place. Its sibling /industries/modern-applications stays
  * noindex,nofollow and unlisted, pending sign-off on its copy.
  */
 export const metadata = buildPageMetadata({

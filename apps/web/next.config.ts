@@ -79,26 +79,11 @@ const nextConfig: NextConfig = {
         destination: "/guide/:slug*",
         permanent: true,
       },
-      // Industry pages live under `/industries/`, but each slug already names
+      // Industry pages live under `/industries/`, but the slug already names
       // the industry, so the shorter path is the natural guess and returns a
-      // hard 404. Same courtesy 301 as `/guides` above: neither was ever a
-      // live URL, just ones worth catching. Add an entry here whenever an
-      // industry page is added.
-      {
-        source: "/saas-container-security",
-        destination: "/modern-applications",
-        permanent: true,
-      },
-      // The SaaS page was renamed from `/industries/saas-container-security` to
-      // the SEO doc's `/modern-applications` on 2026-09-02 before it reached
-      // main. The old path resolved publicly (noindex) for two days, so it is
-      // caught here; the short path above points straight at the final URL so
-      // nothing chains.
-      {
-        source: "/industries/saas-container-security",
-        destination: "/modern-applications",
-        permanent: true,
-      },
+      // hard 404. Same courtesy 301 as `/guides` above: it was never a live
+      // URL, just one worth catching. The sibling /industries/modern-applications
+      // was never indexed or linked under its earlier slugs, so it carries none.
       {
         source: "/financial-services-container-security",
         destination: "/industries/financial-services-container-security",

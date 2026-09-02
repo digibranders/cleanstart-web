@@ -16,19 +16,17 @@ import { JsonLdGraph } from '@/components/JsonLdGraph';
 import { getPageGraph } from '@/lib/seo/compose-page';
 
 /*
- * /modern-applications
+ * /industries/modern-applications
  *
- * URL, title and description are the SEO team's, applied verbatim (the H1 is
- * the client's). The SEO doc puts this page at the top level, not under the
- * /industries segment its sibling financial-services-container-security uses.
+ * Title and description are the SEO team's, applied verbatim; the H1 is the
+ * client's. Sibling to financial-services-container-security under the
+ * /industries segment; see that file for why the segment exists and why
+ * /industries itself still 404s.
  *
- * Renamed from /saas, which never resolved in production (it returned 404
- * there, so no redirect was needed), then from /industries/saas-container-security
- * on 2026-09-02, before the page reached main. That path did resolve publicly
- * (noindex), so it 301s here from next.config alongside the short-path 301.
- * (An intermediate /industries/modern-technology existed on development for
- * an hour and never deployed, so it has no redirect.) The pageRegistry row
- * keys on path; update it to this path or the WebPage node drops out.
+ * Built as /saas, then /industries/saas-container-security, and settled here
+ * on 2026-09-02 before ever being indexed or linked, so the earlier paths
+ * carry no redirects. The pageRegistry row keys on path; update it to this
+ * path or the WebPage node drops out of the graph.
  *
  * Launched: the noindex,nofollow pair is dropped, the path is listed in the
  * sitemap's STATIC_ROUTES and the Solutions > By industry nav row is restored.
@@ -36,7 +34,8 @@ import { getPageGraph } from '@/lib/seo/compose-page';
  * its sibling, so it emits the full Organization + WebSite + WebPage +
  * BreadcrumbList graph.
  *
- * The breadcrumb is Home > Modern Applications.
+ * The breadcrumb is Home > Modern Applications, with no Industries crumb,
+ * because /industries has no page and the crumb would link to a 404.
  *
  * Band rhythm, in order: dark hero, white, tinted, DARK, white, tinted, DARK.
  * Only one dark run reaches the end of the page. The Footer is itself a dark
@@ -48,14 +47,14 @@ export const metadata = buildPageMetadata({
   absoluteTitle: true,
   description:
     'Secure modern applications with verified software components, hardened container images, and trusted open-source libraries built for faster, safer software delivery.',
-  path: '/modern-applications',
+  path: '/industries/modern-applications',
   eyebrow: 'Solutions',
 });
 
 export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
 
 export default async function SaasPage(): Promise<React.ReactElement> {
-  const graph = await getPageGraph('/modern-applications', [
+  const graph = await getPageGraph('/industries/modern-applications', [
     breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Modern Applications' }]),
   ]);
   return (
