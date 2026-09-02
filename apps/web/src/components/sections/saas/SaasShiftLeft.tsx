@@ -1,10 +1,8 @@
 import type React from 'react';
 import { Container, Section } from '@/components/layout';
 import { Reveal } from '@/components/ui/Reveal';
-import { SaasCleanroomReactor } from './SaasCleanroomReactor';
-
-const PROCESS_DESCRIPTION =
-  'Verified Components, Code, Build, Test, Deploy, Security Review' as const;
+import { SaasTrustPipeline } from './SaasTrustPipeline';
+import { PIPELINE_STAGES, SOURCE_LABEL } from './saasPipelineStages';
 
 export function SaasShiftLeft(): React.ReactElement {
   return (
@@ -61,18 +59,16 @@ export function SaasShiftLeft(): React.ReactElement {
           </Reveal>
         </div>
 
-        <ol className="sr-only" aria-label={PROCESS_DESCRIPTION}>
-          <li>Verified Components</li>
-          <li>Code</li>
-          <li>Build</li>
-          <li>Test</li>
-          <li>Deploy</li>
-          <li>Security Review</li>
+        <ol className="sr-only" aria-label="How verified components enter the delivery pipeline">
+          <li>{SOURCE_LABEL}</li>
+          {PIPELINE_STAGES.map((stage) => (
+            <li key={stage.id}>{stage.label}</li>
+          ))}
         </ol>
 
         <Reveal delay={0.14}>
-          <div className="mt-10 lg:mt-14">
-            <SaasCleanroomReactor />
+          <div className="mx-auto mt-12 max-w-[1240px] lg:mt-16">
+            <SaasTrustPipeline />
           </div>
         </Reveal>
       </Container>

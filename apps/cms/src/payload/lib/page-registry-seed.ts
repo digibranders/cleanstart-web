@@ -59,6 +59,9 @@ export const PAGE_REGISTRY_SEED: readonly PageRegistrySeedRow[] = [
   { path: '/software-bill-materials', title: 'Software Bill of Materials', kind: 'static', order: 7, webPageType: 'WebPage' },
   { path: '/for-developers', title: 'For Developers', kind: 'static', order: 8, webPageType: 'WebPage' },
   { path: '/for-ciso', title: 'For CISO', kind: 'static', order: 9, webPageType: 'WebPage' },
+  // Solutions › Capability tool. Order sits after every seeded row so existing
+  // dashboard positions keep their numbers.
+  { path: '/impact-estimator', title: 'Impact Estimator', kind: 'static', order: 49, webPageType: 'WebPage' },
 
   // Resources (mega-menu)
   { path: '/blogs', title: 'Blogs', kind: 'cms-listing', order: 10, backingCollection: 'blogs' },

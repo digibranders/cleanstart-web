@@ -36,13 +36,15 @@ const COMPONENTS: readonly [ComponentItem, ComponentItem, ComponentItem, Compone
     line2: 'Dependencies',
   },
   {
-    // The icon is still the AI-generated-code artifact (code brackets with
-    // sparkles) and reads as AI rather than third-party supply. Regenerate it
-    // in the icon-stack style before this page goes live.
+    // The icon is still the AI-generated-code artifact: code brackets with
+    // sparkles, which read as AI and now match the label even less than they
+    // did. Regenerate it in the icon-stack style — a golden image wants a
+    // base-image or stamped-master form, distinct from the container stack in
+    // the first slot.
     icon: '/images/financial-services/icon-stack-ai-generated-code-v2.png',
-    iconAlt: '3D purple code brackets representing third party components',
-    line1: 'Third Party',
-    line2: 'Components',
+    iconAlt: '3D purple code brackets with sparkles',
+    line1: 'Golden',
+    line2: 'Images',
   },
 ];
 

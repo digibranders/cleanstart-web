@@ -10,11 +10,9 @@ import { cn } from "@/lib/cn";
  * oversized-corner white tile from `sbom/SbomAdvantage`.
  *
  * There is deliberately no accent-colour array. The site's palette runs
- * violet → indigo → blue; the per-card teal/orange rotation this file used to
- * export is what made the page read as a different product.
- *
- * `Glow` is consumed by `CompareHero`, which is frozen — do not change its
- * signature.
+ * violet → indigo → blue, and the page spends it on one axis only: CleanStart
+ * is violet, Docker Hardened Images is neutral slate. A second accent hue for
+ * the comparator would read as a second brand.
  */
 
 /* ─────────────────────────── tokens ─────────────────────────── */
@@ -22,10 +20,6 @@ import { cn } from "@/lib/cn";
 /** The canonical dark section gradient, shared across the site's dark bands. */
 export const BAND_DARK =
   "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)";
-
-/** Shorter dark band for sections that sit between two light ones. */
-export const BAND_DARK_SHORT =
-  "linear-gradient(180deg, #151021 0%, #1B1B6B 55%, #3A1BA8 100%)";
 
 /** Light section wash, matching `WhyMattersGrid` / `SbomAdvantage`. */
 export const WASH_LIGHT = "#F6F6F6";
@@ -44,7 +38,6 @@ export const BRAND = {
 
 /** The single hairline weight used for structural lines on light sections. */
 export const RULE_LIGHT = "1px solid rgba(17, 17, 17, 0.11)";
-export const RULE_DARK = "1px solid rgba(255, 255, 255, 0.16)";
 
 /* ─────────────────────────── 3D icons ─────────────────────────── */
 
@@ -117,10 +110,7 @@ export function Icon3D({
 
 /* ─────────────────────── decorative background ─────────────────────── */
 
-/**
- * Ambient radial glow. Kept from the previous revision because `CompareHero`
- * depends on it and the hero is frozen.
- */
+/** Ambient radial glow, used to light the corners of the hero band. */
 export function Glow({
   color,
   size,

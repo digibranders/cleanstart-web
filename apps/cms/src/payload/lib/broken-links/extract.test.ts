@@ -82,8 +82,72 @@ describe('extractAllLinks', () => {
     );
   });
 
-  it('drops site-relative URLs and non-string scalar fields', () => {
-    const links = extractAllLinks({ body: null, applyUrl: '/internal-path', registrationUrl: null, atsUrl: 42 });
+  it('resolves site-relative URLs against the public origin, and drops non-string scalars', () => {
+    // Reverses the previous contract, which dropped these. Nothing else
+    // validates a hand-typed internal path: it carries no relationship for the
+    // slug-change hook, so `/guide/orchestration` shipped as a live 404.
+    const links = extractAllLinks(
+      { body: null, applyUrl: '/internal-path', registrationUrl: null, atsUrl: 42 },
+      'https://www.cleanstart.com',
+    );
+    expect(links).toEqual([
+      { url: 'https://www.cleanstart.com/internal-path', anchorText: null, location: 'Apply URL' },
+    ]);
+  });
+
+  it('resolves site-relative body links too, keeping the anchor text', () => {
+    const links = extractAllLinks(
+      {
+        body: wrap([
+          { type: 'link', fields: { url: '/guide/orchestration' }, children: [{ type: 'text', text: 'orchestration guide' }] },
+        ]),
+      },
+      'https://www.cleanstart.com',
+    );
+    expect(links).toEqual([
+      { url: 'https://www.cleanstart.com/guide/orchestration', anchorText: 'orchestration guide', location: 'Body' },
+    ]);
+  });
+
+  it('never rewrites a protocol-relative URL into one of ours', () => {
+    // `//other.example/path` is another host, not a site path. Prefixing the
+    // origin would silently retarget it at ourselves and report a foreign
+    // link as healthy. It has no scheme, so the SSRF guard drops it instead —
+    // the property under test is that it is not absorbed into our origin.
+    const links = extractAllLinks(
+      { body: null, applyUrl: '//other.example/path' },
+      'https://www.cleanstart.com',
+    );
+    expect(links).toEqual([]);
+    expect(JSON.stringify(links)).not.toContain('cleanstart.com');
+  });
+
+  it('collapses a relative and an absolute reference to the same page into one check', () => {
+    const links = extractAllLinks(
+      {
+        body: wrap([
+          { type: 'link', fields: { url: '/pricing' }, children: [{ type: 'text', text: 'pricing' }] },
+        ]),
+        applyUrl: 'https://www.cleanstart.com/pricing',
+      },
+      'https://www.cleanstart.com',
+    );
+    expect(links).toEqual([
+      { url: 'https://www.cleanstart.com/pricing', anchorText: 'pricing', location: 'Body' },
+    ]);
+  });
+
+  it('does not resolve anchors, mailto or tel into page URLs', () => {
+    const links = extractAllLinks(
+      {
+        body: wrap([
+          { type: 'link', fields: { url: '#section-2' } },
+          { type: 'link', fields: { url: 'mailto:hi@cleanstart.com' } },
+          { type: 'link', fields: { url: 'tel:+911234567890' } },
+        ]),
+      },
+      'https://www.cleanstart.com',
+    );
     expect(links).toEqual([]);
   });
 

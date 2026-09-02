@@ -1,3 +1,4 @@
+import { resolveSiteUrl } from '../site-url';
 import { isSafePublicHttpUrl } from '../url-safety/ssrf-guard';
 
 /**
@@ -5,8 +6,15 @@ import { isSafePublicHttpUrl } from '../url-safety/ssrf-guard';
  * URL the editor referenced, with the visible anchor text and a
  * human-readable location. Used by the nightly broken-link scanner.
  *
- * Internal-doc relationships (`linkType === 'internal'`, `doc != null`)
+ * Internal-doc *relationships* (`linkType === 'internal'`, `doc != null`)
  * are skipped — Payload's slug-change hook keeps those resolvable.
+ *
+ * Hand-typed site-relative paths are NOT skipped. They carry no relationship
+ * for the slug-change hook to follow, so nothing else in the system validates
+ * them: `/guide/orchestration` and `/images/redis/details` both shipped in
+ * published bodies as 404s and went unnoticed until a manual crawl. They are
+ * resolved against the public origin so the scanner HEAD-checks them like any
+ * other link.
  *
  * SSRF defence: every emitted URL passes `isSafePublicHttpUrl`.
  */
@@ -71,6 +79,17 @@ export const extractLinksFromLexical = (body: unknown): LexicalLink[] => {
 
 const isFetchSafeHttpUrl = (raw: string): boolean => isSafePublicHttpUrl(raw).ok;
 
+/**
+ * Resolve a root-relative editor link against the public origin.
+ *
+ * Only `/path` is rewritten. `//host/path` is protocol-relative and points at
+ * another origin, so prefixing it would silently retarget the link; anything
+ * else (absolute URLs, `#anchor`, `mailto:`, `tel:`) is returned untouched and
+ * falls to the SSRF guard to accept or drop.
+ */
+const absolutiseInternal = (raw: string, origin: string): string =>
+  raw.startsWith('/') && !raw.startsWith('//') ? `${origin}${raw}` : raw;
+
 const SCALAR_URL_FIELDS: ReadonlyArray<readonly [key: string, label: string]> = [
   ['applyUrl', 'Apply URL'],
   ['atsUrl', 'ATS URL'],
@@ -86,9 +105,14 @@ const SCALAR_URL_FIELDS: ReadonlyArray<readonly [key: string, label: string]> = 
  * by field label). Returns absolute http(s) URLs that pass the SSRF
  * guard; first occurrence of a URL wins (body before typed fields).
  */
-export const extractAllLinks = (doc: Record<string, unknown>): ExtractedLink[] => {
+export const extractAllLinks = (
+  doc: Record<string, unknown>,
+  siteOrigin: string = resolveSiteUrl(),
+): ExtractedLink[] => {
   const byUrl = new Map<string, ExtractedLink>();
-  const add = (url: string, anchorText: string | null, location: string): void => {
+  const add = (raw: string, anchorText: string | null, location: string): void => {
+    // Dedupe on the resolved URL so `/x` and `https://site/x` collapse to one check.
+    const url = absolutiseInternal(raw, siteOrigin);
     if (isFetchSafeHttpUrl(url) && !byUrl.has(url)) {
       byUrl.set(url, { url, anchorText, location });
     }

@@ -31,6 +31,15 @@ export const glyphs: Record<string, ReactNode> = {
       <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
     </>
   ),
+  // Half-dial with a needle: the Impact Estimator's own radial gauge, reduced.
+  gauge: (
+    <>
+      <path d="M4 16a8 8 0 0 1 16 0" />
+      <path d="M12 16l4.5-5" />
+      <circle cx="12" cy="16" r="1.5" fill="currentColor" stroke="none" />
+      <path d="M3 20h18" />
+    </>
+  ),
   'shield-check': (
     <>
       <path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5l-8-3z" />
@@ -148,6 +157,15 @@ export const glyphs: Record<string, ReactNode> = {
   cloud: (
     <>
       <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+    </>
+  ),
+  // Stacked components: the same mark the Modern Applications hero uses for
+  // Verified Components, so the menu row and the page it opens share a symbol.
+  layers: (
+    <>
+      <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z" />
+      <path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65" />
+      <path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65" />
     </>
   ),
   star: <polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9 12 2" />,

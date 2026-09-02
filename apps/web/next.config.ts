@@ -79,6 +79,24 @@ const nextConfig: NextConfig = {
         destination: "/guide/:slug*",
         permanent: true,
       },
+      // Industry pages live under `/industries/`, but the slug already names
+      // the industry, so the shorter path is the natural guess and returns a
+      // hard 404. Same courtesy 301 as `/guides` above: it was never a live
+      // URL, just one worth catching. The sibling /industries/modern-applications
+      // was never indexed or linked under its earlier slugs, so it carries none.
+      {
+        source: "/financial-services-container-security",
+        destination: "/industries/financial-services-container-security",
+        permanent: true,
+      },
+      // The operational-impact estimator launched at `/roi-calculator` and was
+      // renamed while still noindex,nofollow, so nothing is indexed under the
+      // old path. It is live in the client's review links, though, so 308 it.
+      {
+        source: "/roi-calculator",
+        destination: "/impact-estimator",
+        permanent: true,
+      },
       // Canonical detail routes are singular `/event/[slug]` and `/job/[slug]`
       // (matching the indexed Webflow URLs). The redesign also shipped plural
       // aliases that rendered the same content and self-canonicalled to

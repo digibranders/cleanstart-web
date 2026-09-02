@@ -1,35 +1,159 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
-import { COMPARE_FAQS, FAQ_HEADING, type CompareFaq } from "./compare-data";
+import { useId, useState } from "react";
+import { Section, Container } from "@/components/layout";
+import { Reveal } from "@/components/ui/Reveal";
+import { FAQS, FAQ_HEADING, UI, type CompareFaq } from "./compare-data";
+import { BRAND } from "./compare-visuals";
 
 /**
- * Comparison FAQ — Balanced 2-Column Split:
- *  - Left: Heading, intro copy, and quick support/demo callout card.
- *  - Right: Sleek accordion cards with smooth grid-height transitions and glowing purple toggle discs.
+ * The eight questions from the document, as a single-open accordion.
+ *
+ * The questions are `<h3>` inside the section's H2. The document does not style
+ * them as headings, but an accordion whose trigger is not in a heading gives
+ * screen-reader users no way to walk the list, and `<h3>` here nests under the
+ * FAQ H2 without adding a level the document does not already have.
+ *
+ * Answers stay in the DOM when collapsed (`hidden` on a wrapper, height
+ * animated by a grid row) so the text is in the page source for crawlers and
+ * matches the FAQPage JSON-LD the route emits.
  */
-export function CompareFAQ(): React.ReactElement {
-  const [openId, setOpenId] = useState<string | null>(COMPARE_FAQS[0]?.id ?? null);
+
+function Row({
+  faq,
+  open,
+  onToggle,
+  index,
+}: {
+  faq: CompareFaq;
+  open: boolean;
+  onToggle: () => void;
+  index: number;
+}): React.ReactElement {
+  const panelId = `compare-faq-panel-${faq.id}`;
+  const buttonId = `compare-faq-trigger-${faq.id}`;
 
   return (
-    <section
-      data-section="CompareFAQ"
-      className="relative w-full bg-white"
+    <li
+      className="overflow-hidden transition-colors"
       style={{
-        paddingTop: "var(--spacing-section-md)",
-        paddingBottom: "var(--spacing-section-cta)",
+        borderRadius: "18px",
+        border: `1px solid ${open ? "rgba(106,61,240,0.28)" : "rgba(17,17,17,0.09)"}`,
+        background: open
+          ? "linear-gradient(150deg, #ffffff 0%, #FBF7FF 100%)"
+          : "#ffffff",
+        boxShadow: open
+          ? "0 18px 40px -28px rgba(70,30,190,0.35)"
+          : "0 1px 2px rgba(17,17,17,0.03)",
       }}
-      aria-labelledby="compare-faq-title"
     >
-      <div className="relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10">
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-start lg:gap-16">
-          {/* Left Column: Heading & Help Callout */}
-          <div className="lg:sticky lg:top-32">
+      <h3>
+        <button
+          type="button"
+          id={buttonId}
+          aria-expanded={open}
+          aria-controls={panelId}
+          onClick={onToggle}
+          className="flex w-full items-start gap-4 px-5 py-5 text-left sm:px-6"
+        >
+          <span
+            aria-hidden
+            className="mt-[3px] shrink-0"
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "12px",
+              letterSpacing: "0.04em",
+              color: open ? BRAND.violet : "rgba(17,17,17,0.3)",
+            }}
+          >
+            {String(index + 1).padStart(2, "0")}
+          </span>
+
+          <span
+            className="flex-1 font-display"
+            style={{
+              fontSize: "var(--fs-h5)",
+              fontWeight: 600,
+              letterSpacing: "-0.01em",
+              lineHeight: 1.4,
+              color: "#111111",
+            }}
+          >
+            {faq.question}
+          </span>
+
+          <span
+            aria-hidden
+            className="mt-[2px] inline-flex size-7 shrink-0 items-center justify-center rounded-full transition-colors"
+            style={{
+              background: open ? BRAND.violet : "rgba(17,17,17,0.05)",
+              color: open ? "#ffffff" : "rgba(17,17,17,0.55)",
+            }}
+          >
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 14 14"
+              fill="none"
+              className="transition-transform duration-300"
+              style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
+            >
+              <path
+                d="M3.5 5.25 7 8.75l3.5-3.5"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+        </button>
+      </h3>
+
+      <div
+        className="grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none"
+        style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
+      >
+        <div className="overflow-hidden">
+          <section id={panelId} aria-labelledby={buttonId}>
+            <p
+              className="px-5 pb-6 pl-[52px] sm:px-6 sm:pb-7 sm:pl-[60px]"
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-body)",
+                lineHeight: "var(--fs-body-lh)",
+                color: "rgba(17,17,17,0.68)",
+              }}
+            >
+              {faq.answer}
+            </p>
+          </section>
+        </div>
+      </div>
+    </li>
+  );
+}
+
+export function CompareFAQ(): React.ReactElement {
+  const [openId, setOpenId] = useState<string | null>(FAQS[0].id);
+  const headingId = useId();
+
+  return (
+    // `padding="none"` with an explicit bottom: this is the last section, so it
+    // owes the footer one CTA-card half of its own background to overlap (see
+    // the layout contract in Footer.tsx).
+    <Section
+      padding="none"
+      data-section="CompareFAQ"
+      className="bg-white pt-[var(--spacing-section-lg)] pb-[var(--spacing-section-cta)]"
+      aria-labelledby={headingId}
+    >
+      <Container>
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.28fr)] lg:gap-16">
+          <div className="lg:sticky lg:top-[calc(var(--cs-header-h)+40px)] lg:self-start">
             <Reveal header>
               <h2
-                id="compare-faq-title"
+                id={headingId}
                 className="font-display text-[#111111]"
                 style={{
                   fontSize: "var(--fs-h2)",
@@ -41,167 +165,36 @@ export function CompareFAQ(): React.ReactElement {
                 {FAQ_HEADING}
               </h2>
               <p
-                className="mt-4 text-[#555555]"
+                className="mt-4 max-w-[42ch]"
                 style={{
                   fontFamily: "var(--font-sans)",
                   fontSize: "var(--fs-body)",
-                  lineHeight: 1.6,
-                  letterSpacing: "-0.01em",
+                  lineHeight: "var(--fs-body-lh)",
+                  color: "rgba(17,17,17,0.6)",
                 }}
               >
-                Everything you need to know about container image security, provenance, reproducible builds, and compliance.
+                {UI.faqIntro}
               </p>
             </Reveal>
-
-            {/* Quick Demo Callout Box */}
-            <Reveal delay={0.12} className="mt-8">
-              <div className="relative overflow-hidden rounded-2xl border border-purple-200/80 bg-gradient-to-br from-purple-50/70 via-indigo-50/30 to-white p-6 shadow-sm">
-                {/* A UI callout, not part of the document outline. */}
-                <p className="font-display text-base font-semibold text-[#111111]">
-                  Have more questions?
-                </p>
-                <p className="mt-2 text-sm text-[#4B5563]" style={{ fontFamily: "var(--font-sans)" }}>
-                  Speak directly with our security engineering team to explore CleanStart for your supply chain.
-                </p>
-                <Link
-                  href="/book-a-demo"
-                  className="mt-4 inline-flex items-center gap-2 font-sans text-xs font-bold text-purple-700 hover:text-purple-900 transition-colors"
-                >
-                  <span>Book a Technical Demo</span>
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
-                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </Link>
-              </div>
-            </Reveal>
           </div>
 
-          {/* Right Column: Interactive Accordion Cards */}
-          <div>
-            {/* No gap — the rows share one continuous set of rules, and a
-                bottom rule closes the list. */}
-            <RevealStagger
-              className="flex flex-col"
-              style={{ borderBottom: "1px solid rgba(17, 17, 17, 0.11)" }}
-            >
-              {COMPARE_FAQS.map((faq) => (
-                <RevealItem key={faq.id}>
-                  <FaqCard
-                    item={faq}
-                    isOpen={openId === faq.id}
-                    onToggle={() => setOpenId(openId === faq.id ? null : faq.id)}
-                  />
-                </RevealItem>
+          <Reveal delay={0.1} y={24}>
+            <ul className="flex flex-col gap-3">
+              {FAQS.map((faq, index) => (
+                <Row
+                  key={faq.id}
+                  faq={faq}
+                  index={index}
+                  open={openId === faq.id}
+                  onToggle={() =>
+                    setOpenId((current) => (current === faq.id ? null : faq.id))
+                  }
+                />
               ))}
-            </RevealStagger>
-          </div>
+            </ul>
+          </Reveal>
         </div>
-      </div>
-    </section>
+      </Container>
+    </Section>
   );
 }
-
-function FaqCard({
-  item,
-  isOpen,
-  onToggle,
-}: {
-  item: CompareFaq;
-  isOpen: boolean;
-  onToggle: () => void;
-}): React.ReactElement {
-  const answerId = `compare-faq-answer-${item.id}`;
-  return (
-    /*
-     * A rule, not a card. Seven bordered, filled, shadowed boxes stacked on top
-     * of each other read as seven objects; seven rows under one rule read as
-     * one list — which is what an FAQ is. The open row is marked by its
-     * question colour and the toggle alone, so nothing moves sideways.
-     */
-    <div
-      className="group"
-      style={{ borderTop: "1px solid rgba(17, 17, 17, 0.11)" }}
-    >
-      <h3>
-        <button
-          type="button"
-          onClick={onToggle}
-          aria-expanded={isOpen}
-          aria-controls={answerId}
-          className="flex w-full cursor-pointer items-center justify-between gap-6 py-6 text-left outline-none focus-visible:[outline-style:solid] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#6d28d9]"
-        >
-          <span
-            className="flex-1 font-display font-semibold transition-colors duration-200"
-            style={{
-              fontSize: "var(--fs-h4)",
-              lineHeight: 1.35,
-              letterSpacing: "-0.02em",
-              color: isOpen ? "#4C1D95" : "#111111",
-            }}
-          >
-            {item.question}
-          </span>
-          <ToggleDisc isOpen={isOpen} />
-        </button>
-      </h3>
-
-      <div
-        id={answerId}
-        aria-hidden={!isOpen}
-        data-faq-answer={isOpen ? "open" : "closed"}
-        style={{
-          display: "grid",
-          gridTemplateRows: isOpen ? "1fr" : "0fr",
-          opacity: isOpen ? 1 : 0,
-          transition:
-            "grid-template-rows 320ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease-out",
-        }}
-      >
-        <div style={{ overflow: "hidden", minHeight: 0 }}>
-          <p
-            className="pb-7 pr-14 text-[#374151]"
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-body)",
-              fontWeight: 400,
-              lineHeight: 1.65,
-              letterSpacing: "-0.01em",
-              maxWidth: "68ch",
-              textWrap: "pretty",
-            }}
-          >
-            {item.answer}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/** Glowing purple toggle disc. */
-function ToggleDisc({ isOpen }: { isOpen: boolean }): React.ReactElement {
-  return (
-    <span
-      aria-hidden
-      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all duration-300 group-hover:border-[#6d28d9]/40"
-      style={{
-        /* Outlined, not filled. Against a rule-separated list a solid disc per
-           row would put seven heavy dots down the right edge. */
-        background: isOpen ? "#6d28d9" : "transparent",
-        border: `1px solid ${isOpen ? "#6d28d9" : "rgba(17,17,17,0.16)"}`,
-        color: isOpen ? "#ffffff" : "#111111",
-        transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-      }}
-    >
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-        <path
-          d={isOpen ? "M3 8h10" : "M8 3v10M3 8h10"}
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-        />
-      </svg>
-    </span>
-  );
-}
-

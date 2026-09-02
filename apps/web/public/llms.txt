@@ -4,7 +4,6 @@
 ## Product Pages
 - [CleanStart Images](https://www.cleanstart.com/cleanstart-images): Pre-built, hardened container base images with near-zero CVEs and automatic versioned updates.
 - [CleanSight](https://www.cleanstart.com/cleansight): Continuous vulnerability visibility across your entire container estate.
-- [CleanStart Platform](https://www.cleanstart.com/cleanstart-platform): Full platform overview — images, scanning, SBOM, and integrations.
 - [FIPS Compliance](https://www.cleanstart.com/fips): FIPS 140-2/3 validated container images for regulated industries.
 - [Software Bill of Materials (SBOM)](https://www.cleanstart.com/software-bill-materials): Automated SBOM generation and management for every image.
 - [Attack Surface Reduction](https://www.cleanstart.com/attack-surface-reduction): Shrink your container attack surface by removing unnecessary packages and layers.

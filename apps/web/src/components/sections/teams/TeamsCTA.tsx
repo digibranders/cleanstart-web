@@ -62,7 +62,7 @@ export function TeamsCTA() {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
-        src="/images/cleanstart-platform/cta-cube-textured.webp"
+        src="/images/teams/cta-cube-textured.webp"
         alt=""
         className="absolute pointer-events-none select-none hidden lg:block"
         style={{

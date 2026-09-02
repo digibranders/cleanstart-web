@@ -185,31 +185,17 @@ export function SaasOutcomes(): React.ReactElement {
           </h2>
         </Reveal>
 
-        {/* Desktop (lg+) — one row of four, held apart by light. Same layout
-            at every desktop width; the type scales, the arrangement does not. */}
-        <RevealStagger
-          className="hidden lg:flex lg:items-center lg:justify-between"
-          style={{ gap: 'clamp(10px, 1.2vw, 22px)' }}
-        >
+        {/* One tree for every width, so each H3 exists once in the DOM. Stacked,
+            then two-up, then at lg a single row of four held apart by light:
+            the separators are display:none below lg, so they leave the grid. */}
+        <RevealStagger className="grid grid-cols-1 gap-x-[clamp(24px,4vw,56px)] gap-y-[clamp(32px,4.5vw,48px)] sm:grid-cols-2 lg:flex lg:items-center lg:justify-between lg:gap-[clamp(10px,1.2vw,22px)]">
           {OUTCOMES.map((outcome, i) => (
             <Fragment key={outcome.line1 + outcome.line2}>
-              <RevealItem className="min-w-0 flex-1">
+              <RevealItem className="lg:min-w-0 lg:flex-1">
                 <OutcomeFigure {...outcome} />
               </RevealItem>
               {i < OUTCOMES.length - 1 ? <GlowBar /> : null}
             </Fragment>
-          ))}
-        </RevealStagger>
-
-        {/* Tablet and below — two-up, then stacked. */}
-        <RevealStagger
-          className="grid grid-cols-1 sm:grid-cols-2 lg:hidden"
-          style={{ columnGap: 'clamp(24px, 4vw, 56px)', rowGap: 'clamp(32px, 4.5vw, 48px)' }}
-        >
-          {OUTCOMES.map((outcome) => (
-            <RevealItem key={outcome.line1 + outcome.line2}>
-              <OutcomeFigure {...outcome} />
-            </RevealItem>
           ))}
         </RevealStagger>
       </div>

@@ -97,9 +97,9 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/clean-libraries' },
   { path: '/cleansight' },
   { path: '/cleanstart-images' },
-  // `/cleanstart-platform` is intentionally de-listed — the page is not yet
-  // complete, so it is noindex'd and excluded from the sitemap. Re-add when it
-  // ships (and drop the `noindex` in its page metadata).
+  // `/cleanstart-platform` was deleted 2026-09-02 — the page was never finished
+  // and shipped noindex, unlinked and unlisted, so nothing was de-ranked. Recover
+  // the route and its sections from git history when it is rebuilt.
   { path: '/community' },
   // `/compare/cleanstart-vs-docker-hardened-images` is intentionally de-listed
   // — the page is not signed off yet, so it is noindex,nofollow and excluded
@@ -112,11 +112,10 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/for-ciso' },
   { path: '/for-developers' },
   { path: '/guide' },
+  { path: '/impact-estimator' },
   { path: '/industries/financial-services-container-security' },
-  // Its sibling `/industries/saas-container-security` is intentionally de-listed
-  // — the copy is not signed off, so the page stays noindex,nofollow. Re-add it
-  // when it ships (and drop the `noindex` / `nofollow` in its page metadata).
-  // `/industries` itself has no page, so there is no hub URL to list either.
+  { path: '/industries/modern-applications' },
+  // `/industries` itself has no page, so there is no hub URL to list.
   // `/knowledge-hub` is a redirect to the first article (no standalone listing) —
   // excluded here. The individual /knowledge-hub/<slug> articles are emitted below.
   // `/legal` is a 308 redirect (not a page) — excluded here. The individual

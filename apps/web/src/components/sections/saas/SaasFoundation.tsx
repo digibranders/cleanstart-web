@@ -91,7 +91,7 @@ const STEPS: readonly [Step, Step, Step, Step] = [
   { icon: '/images/ciso/enterprise-icon-compliance.svg', text: 'Validate. Govern.' },
   {
     icon: '/images/ciso/enterprise-icon-security-ops.svg',
-    text: 'Establish trust. Reduce risk. Deliver with confidence.',
+    text: 'Deliver with confidence.',
   },
 ];
 

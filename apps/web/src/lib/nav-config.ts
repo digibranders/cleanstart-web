@@ -115,11 +115,10 @@ export const NAV_TREE: NavItem[] = [
             icon: "minimize",
           },
           {
-            label: "ROI Calculator",
-            href: "/roi-calculator",
+            label: "Impact Estimator",
+            href: "/impact-estimator",
             description: "Estimate the operational impact of hardened images.",
-            icon: "radar",
-            built: false,
+            icon: "gauge",
           },
         ],
       },
@@ -158,21 +157,12 @@ export const NAV_TREE: NavItem[] = [
         ],
       },
       {
-        // /industries/financial-services-container-security is live: indexable
-        // and listed in the sitemap.
+        // Both /industries/* pages are live: indexable and listed in the sitemap.
         //
-        // Its sibling /industries/saas-container-security is deliberately NOT
-        // listed: the page is built and complete (metadata, JSON-LD graph and
-        // pageRegistry row all in place) but its copy is not approved, so it
-        // stays reachable by direct URL only. Restore the row below when it is:
-        //   { label: "SaaS",
-        //     href: "/industries/saas-container-security",
-        //     description: "Ship faster on a verified software foundation.",
-        //     icon: "cloud" }
-        //
-        // Labels stay short. The page is titled "Container Security for
-        // Financial Services" for search, but the nav is navigation, not a
-        // ranking surface, and the group heading already says "By industry".
+        // Labels stay short. The pages are titled "Container Security for
+        // Financial Services" / "... for SaaS Companies" for search, but the nav
+        // is navigation, not a ranking surface, and the group heading already
+        // says "By industry".
         title: "By industry",
         items: [
           {
@@ -180,6 +170,12 @@ export const NAV_TREE: NavItem[] = [
             href: "/industries/financial-services-container-security",
             description: "Verified components for regulated financial software.",
             icon: "bank",
+          },
+          {
+            label: "Modern Applications",
+            href: "/industries/modern-applications",
+            description: "Ship faster on a verified software foundation.",
+            icon: "layers",
           },
         ],
       },

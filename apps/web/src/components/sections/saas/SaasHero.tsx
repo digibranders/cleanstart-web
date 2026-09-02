@@ -1,32 +1,19 @@
 import type React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
+import { SaasHeroAppSurface } from './SaasHeroAppSurface';
+import { SaasHeroParallax } from './SaasHeroParallax';
 import { HeroReveal } from '@/components/ui/Reveal';
 
 /*
  * SaaS hero — the site's standard solution-page hero shell (FipsHero /
- * CisoHero): bg-cs-hero mesh, a gridline overlay, left-aligned copy, a 3D
+ * CisoHero): bg-cs-hero mesh, a gridline overlay, left-aligned copy, an
  * artifact on the right, and a bottom fade into the white section below. Copy
  * is the proposal's, verbatim.
  *
- * The artifact is commissioned for this page, not borrowed: an application panel
- * with a steadily rising chart, seated on a layered platform.
- *
- * It faces LOWER-LEFT on purpose. The render is pinned to the right of the
- * viewport with the headline and CTA on the left, so a subject facing right
- * would point the reader off the edge of the page; facing left, it turns back
- * into the copy.
- *
- * Rendered deliberately WITHOUT motion streaks. Three attempts at generating
- * them produced trails that fired out of the panel edge like beams or ran the
- * wrong way relative to the implied travel, because the generator has no model
- * of which way the object is going. If motion is wanted, it belongs in CSS
- * behind this image, where direction and colour are a one-line change.
- *
- * Rendered on white and matted afterwards — the generator ignores requests for
- * a transparent background, and a threshold knockout leaves white fringing on
- * the soft shadow. Corners confirmed 0,0,0,0, so it composites straight onto
- * the gradient with no blend mode.
+ * The artifact is the one departure from that shell. Every other hero on the
+ * site carries a 3D render; this one is drawn in code
+ * (SaasHeroAppSurface.tsx), because the render it replaced was rejected and
+ * regenerating it kept landing on stock illustration.
  */
 export function SaasHero(): React.ReactElement {
   return (
@@ -46,22 +33,31 @@ export function SaasHero(): React.ReactElement {
         decoding="async"
       />
 
-      {/* Deliberately NOT `priority`. Next emits a `<link rel=preload as=image>`
-          for a priority image with no `media` attribute, but this wrapper is
-          `hidden xl:block`, so every phone and tablet was preloading a hero it
-          never paints. It is also decorative (aria-hidden) and is not the LCP
-          element: the H1 below carries the `lcp` prop for that. Without
-          `priority` it still loads promptly at xl, because a lazy image already
-          inside the viewport is fetched immediately. */}
-      {/* Hero artifact, pinned right and only at xl+. Below 1280px there is no
-          width that holds both the render and the headline without one of them
-          being squeezed, and shrinking the render past its floor turns the
-          panel's UI detail into noise. Same "hide it when there is no room"
-          call the sibling hero makes. */}
+      {/* Hero artifact, pinned right, visible from md up. It is hidden on phones
+          only: there is genuinely no room beside the headline at 375px, and the
+          artifact is decorative, so it drops rather than stacking.
+
+          It used to be xl+ (1280px), which left anyone on a 1024-1279px window
+          looking at an empty right half. Making it work at those widths means
+          scaling the artifact AND capping the copy column, since both are
+          competing for the same row.
+
+          Built, not rendered: this was hero-app-platform.webp until the client
+          rejected it. See SaasHeroAppSurface.tsx for the reasoning. There is no
+          `priority` preload left to get wrong — the old render was preloading on
+          phones that never painted it. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 mx-auto hidden select-none xl:block"
-        style={{ maxWidth: 'var(--container-default)', height: '100%' }}
+        className="pointer-events-none absolute inset-x-0 top-0 mx-auto hidden select-none md:block"
+        style={{
+          maxWidth: 'var(--container-default)',
+          height: '100%',
+          // Above the bottom fade, which is a later sibling and was painting
+          // white over the panel's lower third. The old 3D render wanted that
+          // wash — it read as the object grounding into the page — but a product
+          // UI panel with its edges dissolving just looks broken.
+          zIndex: 1,
+        }}
       >
         <div
           className="absolute"
@@ -70,31 +66,31 @@ export function SaasHero(): React.ReactElement {
             // `right-0`. The wrapper is capped at --container-default while the
             // copy sits inside px-10, so right-0 hung the render 40px past the
             // text's mirror line and it read as escaping the grid.
-            right: '40px',
+            // Was a flat 40px, mirroring the copy's left padding. That looked
+            // right on paper but not on screen: the headline is short, so its
+            // text ended at 533 while the artifact began at 844 — a 310px hole
+            // in the middle against a 40px margin on the right. Pulling the
+            // artifact off the edge trades some of that hole for a right margin
+            // that is still smaller than the gap it closes.
+            right: 'clamp(24px, 4.5vw, 76px)',
             // Retuned for the two-line headline. The previous 44% / 540px pair
             // was fitted to a three-line one; against the shorter headline it
-            // left a 352px hole in the middle of the composition and the render
-            // had no weight to answer the copy with.
-            //
-            // Measured at 1440: hero 627 tall, header bottom at 73, bottom fade
-            // starting at 427. 580px puts the render at 531 tall spanning
-            // 35..567 — the top tucks under the nav by 38px and the platform
-            // grounds into the fade, both of which read as intentional depth.
-            // Past ~600px the panel climbs far enough to collide with the logo
-            // row, which does not.
-            top: '48%',
+            // left a 352px hole in the middle of the composition and the
+            // artifact had no weight to answer the copy with.
+            top: '46%',
             transform: 'translateY(-50%)',
-            width: 'clamp(430px, 40vw, 580px)',
-            aspectRatio: '1234 / 1130',
+            // Scales with the viewport now that it renders from md up. Widened
+            // from 38vw/560 because the drawing itself was mostly padding; with
+            // the frame filled, a bigger box puts real content closer to the
+            // copy instead of more empty space. Pure geometry with no type in
+            // it, so it survives scaling in a way the earlier caption-bearing
+            // versions would not have.
+            width: 'clamp(280px, 42vw, 600px)',
           }}
         >
-          <Image
-            src="/images/saas/hero-app-platform.webp"
-            alt="A SaaS application dashboard showing a steadily rising chart, seated on a layered software platform with a further module sliding into its base"
-            fill
-            sizes="(min-width: 1440px) 540px, 38vw"
-            className="object-contain"
-          />
+          <SaasHeroParallax>
+            <SaasHeroAppSurface />
+          </SaasHeroParallax>
         </div>
       </div>
 
@@ -116,10 +112,16 @@ export function SaasHero(): React.ReactElement {
           paddingBottom: 'clamp(56px, 6vw, 96px)',
         }}
       >
-        {/* Below xl the artifact does not render, so the column runs to its own
-            measure. At xl+ the budget is fitted to the render's measured left
-            edge at each width, with a margin. */}
-        <div className="relative flex max-w-[760px] flex-col items-center text-center md:items-start md:text-left xl:max-w-[clamp(560px,46vw,690px)]">
+        {/* The copy column has to yield room to the artifact from md up, or the
+            two overlap. The calc subtracts the artifact's own width and a 56px
+            gap from the padded container, so the budget tracks the artifact
+            automatically instead of being re-guessed per breakpoint.
+
+            100% of the container, NOT 100vw: vw includes the scrollbar, which
+            handed the copy 15px it did not have and left a 24px gap to the
+            artifact at 1030px. The xl rule stays as the tighter cap above
+            1280. */}
+        <div className="relative flex max-w-[760px] flex-col items-center text-center md:max-w-[calc(100%-clamp(280px,42vw,600px)-48px)] md:items-start md:text-left xl:max-w-[clamp(560px,46vw,690px)]">
           <HeroReveal y={50} duration={1.0} lcp>
             <h1
               className="text-white"
@@ -132,11 +134,18 @@ export function SaasHero(): React.ReactElement {
                 marginBottom: 'clamp(24px, 2.5vw, 36px)',
               }}
             >
-              {/* The SEO team's H1, verbatim. The gradient splits the phrase
-                  rather than adding words, so the rendered text is exactly
-                  "Container Security for SaaS Companies". */}
-              Container Security for{' '}
-              <span className="cs-text-gradient-impact">SaaS Companies</span>
+              {/* Client's headline, replacing the SEO team's "Container Security
+                  for SaaS Companies". The title tag still carries that phrase, so
+                  the page keeps the keyword in the SERP; the H1 no longer
+                  contains it. Same trade the financial services page made, and
+                  the same parallel construction.
+
+                  Each sentence gets its own block, because left to wrap
+                  naturally the break landed mid-clause — "Move Faster. Security"
+                  on one line — which destroys the parallel the headline is built
+                  on. Same treatment FinanceStack's heading uses; not a <br>. */}
+              <span className="block">Applications Move Faster.</span>
+              <span className="block cs-text-gradient-impact">Security Must Be Smarter.</span>
             </h1>
           </HeroReveal>
 

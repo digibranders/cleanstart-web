@@ -6,29 +6,18 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { breadcrumbSchema, faqPageSchema } from "@/lib/seo/jsonld";
 import { getPageGraph } from "@/lib/seo/compose-page";
 import { CompareHero } from "@/components/sections/compare/CompareHero";
-import { CompareIntro } from "@/components/sections/compare/CompareIntro";
+import { CompareFoundations } from "@/components/sections/compare/CompareFoundations";
 import { CompareMatrix } from "@/components/sections/compare/CompareMatrix";
-import { CompareSocialProof } from "@/components/sections/compare/CompareSocialProof";
-import { ComparePhilosophies } from "@/components/sections/compare/ComparePhilosophies";
-import { CompareBeyondCves } from "@/components/sections/compare/CompareBeyondCves";
-import { CompareBuilds } from "@/components/sections/compare/CompareBuilds";
-import { CompareProvenance } from "@/components/sections/compare/CompareProvenance";
-import { CompareReadiness } from "@/components/sections/compare/CompareReadiness";
-import { CompareChoose } from "@/components/sections/compare/CompareChoose";
+import { CompareBuildFlow } from "@/components/sections/compare/CompareBuildFlow";
+import { CompareDifferentiators } from "@/components/sections/compare/CompareDifferentiators";
 import { CompareFAQ } from "@/components/sections/compare/CompareFAQ";
 import { CompareCTA } from "@/components/sections/compare/CompareCTA";
-import {
-  COMPARE_FAQ_ITEMS,
-  TITLE_MAIN,
-} from "@/components/sections/compare/compare-data";
-
-const PATH = "/compare/cleanstart-vs-docker-hardened-images";
+import { FAQS, META, PATH, TITLE } from "@/components/sections/compare/compare-data";
 
 export const metadata = buildPageMetadata({
-  title: "Docker Hardened Images vs CleanStart | Full Comparison",
+  title: META.title,
   absoluteTitle: true,
-  description:
-    "Compare Docker Hardened Images vs CleanStart across security, provenance, compliance, SBOMs, deterministic builds, and software verification.",
+  description: META.description,
   path: PATH,
   eyebrow: "Comparison",
   /*
@@ -36,8 +25,8 @@ export const metadata = buildPageMetadata({
    * deliberate: `nofollow` is not the default for a per-page `noindex` (the
    * helper still emits `follow` so link equity flows), so it is set explicitly
    * here. Drop BOTH of these and re-add the path to `app/sitemap.ts` when the
-   * page ships — the sitemap entry is removed for as long as this is noindex,
-   * because listing a noindex URL is a contradictory signal.
+   * page ships — the sitemap entry stays removed for as long as this is
+   * noindex, because listing a noindex URL is a contradictory signal.
    */
   noindex: true,
   nofollow: true,
@@ -46,19 +35,22 @@ export const metadata = buildPageMetadata({
 export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
 
 /**
- * The source copy is a fourteen-section technical article. Rather than give
- * every heading its own band, related headings share one band and are separated
- * by hairline rules, so the page reads in the site's light/dark section rhythm
- * instead of as a stack of fourteen slabs. Every heading keeps the document's
- * own wording and its H2 level; only the number of *bands* was reduced.
+ * Docker Hardened Images vs CleanStart.
  *
- * `FadeUp` wraps the below-fold sections only — the hero renders visible for
- * LCP.
+ * Five bands, one per heading in the source document, in the site's
+ * light/dark rhythm: hero (dark) → foundations (wash) → capability matrix
+ * (white) → build flow (dark) → differentiators (wash) → FAQ (white) → the
+ * footer CTA card. Every string is in `compare-data.ts`; the FAQ feeds both
+ * the rendered accordion and the FAQPage JSON-LD from the same array, so the
+ * two cannot drift.
+ *
+ * `FadeUp` wraps the below-fold sections only — the hero renders visible so it
+ * stays an LCP candidate.
  */
 export default async function CleanStartVsDockerHardenedImagesPage(): Promise<React.ReactElement> {
   const graph = await getPageGraph(PATH, [
-    breadcrumbSchema([{ name: "Home", path: "/" }, { name: TITLE_MAIN }]),
-    faqPageSchema([...COMPARE_FAQ_ITEMS]),
+    breadcrumbSchema([{ name: "Home", path: "/" }, { name: TITLE }]),
+    faqPageSchema([...FAQS]),
   ]);
 
   return (
@@ -68,31 +60,16 @@ export default async function CleanStartVsDockerHardenedImagesPage(): Promise<Re
       <main id="main-content">
         <CompareHero />
         <FadeUp>
-          <CompareIntro />
+          <CompareFoundations />
         </FadeUp>
         <FadeUp>
           <CompareMatrix />
         </FadeUp>
         <FadeUp>
-          <CompareSocialProof />
+          <CompareBuildFlow />
         </FadeUp>
         <FadeUp>
-          <ComparePhilosophies />
-        </FadeUp>
-        <FadeUp>
-          <CompareBeyondCves />
-        </FadeUp>
-        <FadeUp>
-          <CompareBuilds />
-        </FadeUp>
-        <FadeUp>
-          <CompareProvenance />
-        </FadeUp>
-        <FadeUp>
-          <CompareReadiness />
-        </FadeUp>
-        <FadeUp>
-          <CompareChoose />
+          <CompareDifferentiators />
         </FadeUp>
         <FadeUp>
           <CompareFAQ />

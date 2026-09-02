@@ -1,4 +1,4 @@
-<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="-3.86 -3.86 61.71 61.71" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g id="Capa_1" clip-path="url(#clip0_0_4)">
 <g id="Vector" filter="url(#filter0_dddii_0_4)">
 <path d="M22.2463 26.4659H31.7538V31.7512H22.2463V26.4659Z" fill="url(#paint0_linear_0_4)"/>
@@ -142,7 +142,7 @@
 <stop offset="1" stop-color="#82AEFF"/>
 </linearGradient>
 <clipPath id="clip0_0_4">
-<rect width="54" height="54" fill="white"/>
+<rect x="-3.86" y="-3.86" width="61.71" height="61.71" fill="white"/>
 </clipPath>
 </defs>
 </svg>
