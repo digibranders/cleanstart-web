@@ -1,20 +1,20 @@
 import Link from "next/link";
 import { HeroReveal } from "@/components/ui/Reveal";
-import { TITLE_SUB, UI_CHROME } from "./compare-data";
-import { CompareHeroArtifact } from "./CompareHeroArtifact";
+import { HERO_CTA, STANDFIRST, TITLE_PARTS, UI } from "./compare-data";
+import { CompareFoundationStacks } from "./CompareFoundationStacks";
 import { Glow } from "./compare-visuals";
 
 /**
- * Comparison hero: title, standfirst and jump link against the illustrated
- * artifact the page goes on to interrogate.
+ * Comparison hero: the document's title and standfirst on the left, the
+ * foundation-stack diagram on the right.
  *
- * The four opening questions deliberately do NOT live here. `INTRO_LEAD` ends
- * on a colon and the questions complete that sentence, so they travel together
- * into `CompareQuestions` rather than being split across a column boundary.
+ * Two calls to action, ranked. The document's own CTA ("Explore CleanStart
+ * Images") is the primary; the jump link to the capability matrix is the quiet
+ * secondary, because a visitor arriving on a comparison query wants the table
+ * and would otherwise scroll past four sections to reach it.
  *
- * Ends flat — no fade band into the section below. Height is tuned to sit in
- * the same range as the other page heroes (/pricing ~549px, /fips ~667px at
- * 1720w) rather than towering over them.
+ * The diagram is desktop-only. Stacked under the title on a phone it costs a
+ * full screen above the fold and pushes both CTAs out of view.
  */
 export function CompareHero(): React.ReactElement {
   return (
@@ -22,9 +22,18 @@ export function CompareHero(): React.ReactElement {
       data-section="CompareHero"
       className="relative overflow-hidden bg-cs-hero"
     >
-      <Glow color="rgba(169,116,255,0.25)" size="min(720px, 50%)" right="-5%" top="-15%" />
-      <Glow color="rgba(91,155,255,0.2)" size="min(600px, 45%)" left="-8%" bottom="-10%" />
-
+      <Glow
+        color="rgba(169,116,255,0.25)"
+        size="min(720px, 50%)"
+        right="-5%"
+        top="-15%"
+      />
+      <Glow
+        color="rgba(91,155,255,0.2)"
+        size="min(600px, 45%)"
+        left="-8%"
+        bottom="-10%"
+      />
 
       <div
         className="relative z-20 mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10"
@@ -33,8 +42,7 @@ export function CompareHero(): React.ReactElement {
           paddingBottom: "clamp(56px, 5vw, 84px)",
         }}
       >
-        <div className="grid gap-x-12 gap-y-16 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
-          {/* Left: title, standfirst, jump link */}
+        <div className="grid gap-x-12 gap-y-14 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)] lg:items-center">
           <div className="flex flex-col items-start">
             <HeroReveal y={50} duration={1} lcp>
               <h1
@@ -44,12 +52,15 @@ export function CompareHero(): React.ReactElement {
                   fontWeight: 600,
                   letterSpacing: "var(--fs-display-ls)",
                   lineHeight: "var(--fs-display-lh)",
-                  maxWidth: "16ch",
+                  maxWidth: "17ch",
                   textWrap: "balance",
                 }}
               >
-                Docker Hardened Images vs{" "}
-                <span className="cs-text-gradient-impact">CleanStart</span>
+                {TITLE_PARTS.lead}
+                <span className="cs-text-gradient-impact">
+                  {TITLE_PARTS.accent}
+                </span>
+                {TITLE_PARTS.tail}
               </h1>
             </HeroReveal>
 
@@ -62,36 +73,56 @@ export function CompareHero(): React.ReactElement {
                   letterSpacing: "-0.02em",
                   lineHeight: 1.35,
                   color: "rgba(255,255,255,0.68)",
-                  maxWidth: "34ch",
+                  maxWidth: "38ch",
                   marginTop: "clamp(18px, 1.8vw, 26px)",
                 }}
               >
-                {TITLE_SUB}
+                {STANDFIRST}
               </p>
 
-              <Link
-                href="#capability-matrix"
-                className="cs-btn-glass mt-10"
-                style={
-                  {
-                    "--cs-btn-px": "24px",
-                    "--cs-btn-fs": "16px",
-                  } as React.CSSProperties
-                }
-              >
-                {UI_CHROME.jumpToMatrix}
-              </Link>
+              {/*
+                * Stock CTA pair, no per-page variants. `cs-btn-blue` is the
+                * dark-hero primary the two most recent heroes use (SaasHero,
+                * FinanceHero) at h44 / px24 / fs16, and it matches the blue
+                * button in this page's own footer CTA. `cs-btn-ghost` is the
+                * site's only secondary, at the PricingHero / LibrariesHero
+                * sizing.
+                */}
+              <div className="mt-10 flex flex-wrap items-center gap-3">
+                <Link
+                  href={HERO_CTA.href}
+                  className="cs-btn-blue"
+                  style={
+                    {
+                      "--cs-btn-h": "44px",
+                      "--cs-btn-px": "24px",
+                      "--cs-btn-fs": "16px",
+                    } as React.CSSProperties
+                  }
+                >
+                  <span>{HERO_CTA.label}</span>
+                </Link>
+
+                <Link
+                  href="#capability-comparison"
+                  className="cs-btn-ghost"
+                  style={
+                    {
+                      "--cs-btn-h": "44px",
+                      "--cs-btn-px": "20px",
+                      "--cs-btn-fs": "16px",
+                    } as React.CSSProperties
+                  }
+                >
+                  <span>{UI.jumpToMatrix}</span>
+                </Link>
+              </div>
             </HeroReveal>
           </div>
 
-          {/*
-            * Right: the artifact. Desktop only — stacked under the title on a
-            * phone it costs a screenful above the fold and pushes the CTA out
-            * of view without adding meaning.
-            */}
           <div className="hidden lg:block">
             <HeroReveal y={40} delay={0.28} duration={1}>
-              <CompareHeroArtifact />
+              <CompareFoundationStacks />
             </HeroReveal>
           </div>
         </div>

@@ -1,543 +1,498 @@
 /**
- * Copy for the Docker Hardened Images ↔ CleanStart comparison page.
+ * Every string on `/compare/cleanstart-vs-docker-hardened-images`.
  *
- * Every string here is taken verbatim from the source copy document
- * ("Docker Hardened Images vs CleanStart"). Sentence case is normalised on
- * list items and nothing is paraphrased, re-headlined, or invented — including
- * the capability rows, which carry the document's own qualifier wording.
+ * The page is held to the SEO source document ("Docker Hardened Images vs
+ * CleanStart - Final"). Copy here is the document's, verbatim, with one class
+ * of edit: em-dashes are replaced with a colon or a semicolon per the house
+ * writing rule. Nothing is added, cut or re-worded.
  *
- * The only additions are UI chrome that a copy document cannot supply: button
- * labels, the table's accessible caption, and the legend. They are grouped at
- * the bottom under UI_CHROME so the boundary stays obvious.
+ * Heading levels follow the document's outline, shifted one level because the
+ * page title takes H1: the document's H1s are the page's H2s, its H2s are the
+ * page's H3s. Anything the document does not set as a heading (the two vendor
+ * labels, the matrix group names, the "focuses on" and "Build approach" lead-ins)
+ * stays a `<p>` or a table header cell so the outline stays the one SEO wrote.
+ *
+ * The capability matrix and the FAQ are both consumed twice — once by the
+ * rendered section and once by the FAQPage JSON-LD / matrix counts — so they
+ * live here rather than inside a component.
  */
+
+export const PATH = "/compare/cleanstart-vs-docker-hardened-images";
+
+export const META = {
+  title: "Docker Hardened Images vs CleanStart | Secure Container Images",
+  description:
+    "Compare Docker Hardened Images vs CleanStart. Explore differences in hardened container images, SBOMs, software provenance, SLSA builds, and secure software supply chain practices.",
+} as const;
+
+/** Full H1, also used as the BreadcrumbList leaf. */
+export const TITLE =
+  "Docker Hardened Images vs CleanStart: Secure Container Images Compared";
 
 /**
- * `state: "text"` is a cell the document answers with a phrase and no mark —
- * rendering those as a ✓ or a — would be us scoring a row the document
- * deliberately left unscored. `divergent` marks the rows where the document
- * itself qualifies or splits the answer.
+ * The H1 split for display. The hero sets the first half plain and the second
+ * half in the brand gradient, so the title reads as one line of type rather
+ * than as a coloured product name dropped into a sentence.
  */
-export interface MatrixRow {
-  id: string;
-  capability: string;
-  docker: { state: "yes" | "no" | "text"; note?: string };
-  cleanstart: { state: "yes" | "no" | "text"; note?: string };
-  divergent?: boolean;
-}
+export const TITLE_PARTS = {
+  lead: "Docker Hardened Images vs ",
+  accent: "CleanStart",
+  tail: ": Secure Container Images Compared",
+} as const;
 
-const yes = { state: "yes" } as const;
+export const STANDFIRST =
+  "Compare Docker Hardened Images and CleanStart across container security, software provenance, reproducible builds, and software supply chain verification.";
 
-export const MATRIX_ROWS: readonly MatrixRow[] = [
-  { id: "attack-surface", capability: "Reduced attack surface", docker: yes, cleanstart: yes },
-  { id: "minimal", capability: "Minimal image variants", docker: yes, cleanstart: yes },
-  { id: "distroless", capability: "Distroless images", docker: yes, cleanstart: yes },
-  { id: "cves", capability: "Near-zero known CVEs", docker: yes, cleanstart: yes },
-  {
-    id: "sbom",
-    capability: "Software Bill of Materials (SBOM)",
-    docker: yes,
-    cleanstart: yes,
-  },
-  { id: "signed", capability: "Signed software artifacts", docker: yes, cleanstart: yes },
-  {
-    id: "provenance",
-    capability: "Software provenance",
-    docker: { state: "yes", note: "SLSA Build Level 3" },
-    cleanstart: { state: "yes", note: "SLSA Level 4 aligned" },
-    divergent: true,
-  },
-  { id: "source-built", capability: "Source-built software", docker: yes, cleanstart: yes },
-  { id: "crypto", capability: "Cryptographic verification", docker: yes, cleanstart: yes },
-  { id: "rebuilds", capability: "Automatic rebuilds", docker: yes, cleanstart: yes },
-  { id: "fips", capability: "FIPS-ready variants", docker: yes, cleanstart: yes },
-  { id: "stig", capability: "STIG-aligned variants", docker: yes, cleanstart: yes },
-  {
-    id: "ai-bom",
-    capability: "AI Bill of Materials (AI BOM)",
-    docker: { state: "no" },
-    cleanstart: yes,
-    divergent: true,
-  },
-  {
-    id: "hermetic",
-    capability: "Deterministic, hermetic build philosophy",
-    docker: { state: "text", note: "Limited public emphasis" },
-    cleanstart: { state: "text", note: "Core design principle" },
-    divergent: true,
-  },
-  {
-    id: "posture",
-    capability: "Software Supply Chain Posture capabilities",
-    docker: { state: "text", note: "Image-focused" },
-    cleanstart: { state: "text", note: "Broader software supply chain focus" },
-    divergent: true,
-  },
-];
+/** The two vendors, named once. Every section labels its columns from here. */
+export const VENDOR = {
+  docker: "Docker Hardened Images",
+  cleanstart: "CleanStart",
+} as const;
 
-/*
- * There are deliberately no capability categories here. The source document's
- * table is a flat header plus fifteen rows, every row three cells wide — it
- * groups nothing. Category bands ("Core Image Hardening", "Build Assurance &
- * Provenance", "Supply Chain Posture & Governance") were added to the page on
- * 2026-08-04 and removed the same day: none of those titles or their
- * descriptions appear anywhere in the document, and grouping the rows asserts
- * an editorial reading the SEO team never wrote or reviewed.
- */
+export const HERO_CTA = {
+  label: "Explore CleanStart Images",
+  href: "/cleanstart-images",
+} as const;
 
-export const VENDOR_DHI = "Docker Hardened Images";
-export const VENDOR_CLEANSTART = "CleanStart Verified Images";
-
-/** Document title, split at the colon for the H1 / standfirst pair. */
-export const TITLE_MAIN = "Docker Hardened Images vs CleanStart";
-export const TITLE_SUB =
-  "A Technical Comparison of Two Approaches to Trusted Container Images";
-
-export const INTRO_LEAD =
-  "Modern container security is no longer just about reducing vulnerabilities. Engineering teams are increasingly expected to answer broader questions:";
-
-/** The four questions the document opens with. */
-export const OPENING_QUESTIONS: readonly string[] = [
-  "Where did this software originate?",
-  "How was it built?",
-  "Can it be independently verified?",
-  "Does it meet regulatory and organizational security requirements?",
-];
-
-export const INTRO_BODY: readonly string[] = [
-  "These questions have become central to software supply chain security.",
-  "Docker Hardened Images (DHI) and CleanStart Verified Images both aim to provide secure container images for production workloads, but they approach the problem from different perspectives. Docker Hardened Images focus on delivering hardened, enterprise-ready container images with a minimal attack surface. CleanStart extends that foundation by emphasizing deterministic builds, software provenance, verification, and Software Supply Chain Posture.",
-  "This guide compares both approaches from a technical perspective, explaining not only what each platform provides, but why those capabilities matter to modern engineering organizations.",
-];
-
-export const MATRIX_HEADING = "At a Glance: Hardened Container Images Comparison";
-
-export const KEY_TAKEAWAY =
-  "Both solutions significantly improve upon traditional public container images. The primary differences lie less in image hardening and more in the level of build assurance, software verification, and software supply chain governance they provide.";
-
-export const KEY_TAKEAWAY_LABEL = "Key takeaway";
-
-export interface Credential {
-  label: string;
-  name: string;
-  src: string;
-  w: number;
-  h: number;
-}
+/* ───────────────────────── hero diagram ───────────────────────── */
 
 /**
- * Not from the document body. The SEO review left an empty placeholder heading
- * directly after the capability table, commented "Social proof is missing"
- * (2026-07-30) — the point where the table has just shown both vendors ticking
- * nearly every row.
- *
- * These are CleanStart's existing third-party credentials, the same set already
- * published in the site footer, so this introduces no new claim. Deliberately no
- * customer names or testimonials: none are cleared for use on a page that names
- * a competitor. Wording is pending SEO/marketing sign-off.
+ * The hero artwork states the page's argument in one picture: Docker's stack
+ * stands on a base it inherits from an upstream distribution, CleanStart's
+ * stands on nothing. Both label sets are drawn from the matrix rows below, so
+ * the diagram never claims anything the table does not.
  */
-export const SOCIAL_PROOF = {
-  heading: "Independently Verified",
-  /*
-   * The lead does the work of the section's position: the table directly above
-   * shows both vendors ticking nearly every row, so the honest next move is to
-   * separate what we assert from what an outside party has examined. It makes
-   * no claim of its own — each credential below is already published in the
-   * site footer.
-   */
-  lead: "The capabilities above are ours to state. These are the ones a third party has examined and attested to.",
-  credentials: [
-    {
-      /* Labels name the *kind* of attestation, so four credentials of three
-       * different kinds do not all read as the generic "Certification". */
-      label: "Industry award",
-      name: "Cyber Security Excellence Awards Winner",
-      src: "/images/awards/award-1.webp",
-      w: 486,
-      h: 616,
-    },
-    {
-      label: "Registry verification",
-      name: "Docker Verified Publisher",
-      src: "/images/awards/award-2.webp",
-      w: 268,
-      h: 267,
-    },
-    {
-      label: "Independent audit",
-      name: "AICPA SOC 2",
-      src: "/images/awards/award-4.webp",
-      w: 1024,
-      h: 1023,
-    },
-    {
-      label: "Certification",
-      name: "ISO/IEC 27001",
-      src: "/images/awards/award-3.webp",
-      w: 200,
-      h: 200,
-    },
-  ] satisfies readonly Credential[],
-} as const;
-
-export interface DocSection {
-  id: string;
-  heading: string;
-  /** Paragraphs before any list. */
-  body: readonly string[];
-  /** Optional lead-in sentence that introduces `items`. */
-  listLead?: string;
-  items?: readonly string[];
-  /** Paragraphs after the list. */
-  after?: readonly string[];
-}
-
-export const PHILOSOPHIES_SECTION: DocSection = {
-  id: "philosophies",
-  heading: "Two Different Security Philosophies",
-  body: [
-    "Although Docker Hardened Images and CleanStart solve similar problems, they begin from different architectural assumptions.",
-  ],
-};
-
-export const PHILOSOPHY_DHI = {
-  name: "Docker Hardened Images",
-  lead: "Docker Hardened Images are designed to reduce operational risk by delivering production-ready images with:",
-  items: [
-    "Minimal software packages",
-    "Reduced attack surface",
-    "Enterprise support",
-    "Signed artifacts",
-    "Software provenance",
-    "Continuous updates",
-  ],
-  close:
-    "The emphasis is on delivering secure runtime images that organizations can confidently deploy.",
-} as const;
-
-export const PHILOSOPHY_CLEANSTART = {
-  name: "CleanStart",
-  body: [
-    "CleanStart begins earlier in the software lifecycle.",
-    "Instead of focusing solely on the final container image, it focuses on producing verified software artifacts through deterministic build pipelines.",
-    "The objective is not only to reduce vulnerabilities, but also to establish confidence in how every software artifact was produced.",
-    "This distinction becomes increasingly important for organizations implementing software supply chain frameworks such as SLSA, NIST SSDF, Executive Order 14028 requirements, or internal secure software development programs.",
-  ],
-} as const;
-
-export const BEYOND_CVES = {
-  heading: "Security: More Than Reducing CVEs",
-  body: [
-    "Reducing vulnerabilities remains one of the most effective ways to improve container security.",
-    "Both Docker Hardened Images and CleanStart significantly reduce unnecessary packages, remove common attack vectors, and deliver production-ready container images with substantially fewer known vulnerabilities than typical public container images.",
-  ],
-  benefitsLead: "Benefits include:",
-  benefits: [
-    "Smaller images",
-    "Fewer packages to maintain",
-    "Reduced remediation effort",
-    "Lower operational overhead",
-    "Smaller runtime attack surface",
-  ],
-  pivot: "However, vulnerability reduction answers only one question:",
-  answered: "Does this image contain known vulnerabilities today?",
-  unansweredLead: "It does not answer:",
-  unanswered: [
-    "Who built it?",
-    "Which source code produced it?",
-    "Was the build reproducible?",
-    "Has the artifact been modified?",
-    "Can another organization independently verify it?",
-  ],
-  close:
-    "Those questions belong to software integrity rather than vulnerability management.",
-} as const;
-
-export const SOURCE_BUILT: DocSection = {
-  id: "building-from-source",
-  heading: "Building from Source",
-  body: [
-    "One of the largest changes in software supply chain security over the past few years has been renewed interest in source-built software.",
-    "Historically, many container images incorporated binaries produced elsewhere.",
-  ],
-  listLead:
-    "Modern secure build systems increasingly rebuild packages directly from source, allowing organizations to:",
-  items: [
-    "Verify software origin",
-    "Apply consistent compiler settings",
-    "Generate provenance",
-    "Reduce reliance on opaque upstream binaries",
-  ],
-  after: [
-    "Both Docker Hardened Images and CleanStart embrace source-built software, helping establish stronger trust in the software delivered to production.",
-  ],
-};
-
-export const HERMETIC: DocSection = {
-  id: "hermetic-builds",
-  heading: "Understanding Hermetic and Deterministic Builds",
-  body: [
-    "Hermetic builds are frequently mentioned in software supply chain discussions but are often misunderstood.",
-    "A hermetic build executes inside an isolated environment where every dependency is explicitly declared before compilation begins.",
-  ],
-  listLead: "The build environment cannot:",
-  items: [
-    "Download undeclared packages",
-    "Depend on developer workstations",
-    "Rely on environment-specific configuration",
-    "Produce different artifacts because of transient infrastructure changes",
-  ],
-  after: [
-    "Deterministic builds extend this concept by ensuring identical inputs consistently produce identical outputs.",
-    "This enables reproducible builds, improves build integrity, and reduces opportunities for supply chain attacks involving compromised package repositories or unexpected build dependencies.",
-    "CleanStart places particular emphasis on hermetic, deterministic build pipelines as a core architectural principle.",
-  ],
-};
-
-export const REPRODUCIBLE = {
-  heading: "Reproducible Builds",
-  lead: "A reproducible build answers one simple but powerful question:",
-  question:
-    "If another engineer rebuilds this software using the same source code, will they obtain the same artifact?",
-  body: [
-    "If the answer is yes, consumers gain significantly greater confidence that the published software corresponds exactly to the documented source code.",
-  ],
-  pull: "Reproducibility transforms software verification from trust into evidence.",
-  close:
-    "For organizations operating in highly regulated environments, reproducible builds are increasingly becoming an important indicator of software integrity.",
-} as const;
-
-export const PROVENANCE = {
-  heading: "Software Provenance",
-  body: ["Software provenance describes how an artifact was produced."],
-  listLead: "Typical provenance records include:",
-  items: [
-    "Source repository",
-    "Commit identifier",
-    "Builder identity",
-    "Build workflow",
-    "Dependency information",
-    "Artifact digest",
-    "Timestamps",
-    "Cryptographic attestations",
-  ],
-  after: [
-    "Docker Hardened Images provide SLSA Build Level 3 provenance together with signed software artifacts.",
-    "CleanStart extends this approach by emphasizing SLSA Level 4 aligned provenance, deterministic builds, and comprehensive verification throughout the build pipeline.",
-    "Rather than replacing vulnerability management, provenance complements it by documenting the origin and production history of software artifacts.",
-  ],
-} as const;
-
-export const BOMS: DocSection = {
-  id: "sboms-ai-boms",
-  heading: "SBOMs and AI BOMs",
-  body: [
-    "A Software Bill of Materials (SBOM) provides an inventory of every software component included within a container image.",
-  ],
-  listLead: "SBOMs enable engineering teams to:",
-  items: [
-    "Identify vulnerable dependencies",
-    "Understand licensing obligations",
-    "Perform impact analysis",
-    "Accelerate incident response",
-  ],
-  after: [
-    "As organizations increasingly adopt AI-assisted software development, visibility into AI-generated artifacts becomes equally important.",
-    "CleanStart extends traditional SBOM capabilities with AI Bills of Materials (AI BOMs), helping organizations document AI-generated software components and strengthen governance across modern development workflows.",
-  ],
-};
-
-export const COMPLIANCE: DocSection = {
-  id: "compliance",
-  heading: "Compliance and Regulatory Readiness",
-  body: [
-    "Modern compliance requirements increasingly focus on software integrity rather than vulnerability counts alone.",
-    "Organizations in financial services, healthcare, government, and critical infrastructure frequently require evidence describing how software was produced.",
-  ],
-  listLead: "Capabilities such as:",
-  items: [
-    "Software provenance",
-    "Signed artifacts",
-    "SBOMs",
-    "Deterministic builds",
-    "FIPS-ready images",
-    "STIG-aligned images",
-  ],
-  after: [
-    "help simplify compliance activities while providing stronger assurance during audits.",
-  ],
-};
-
-// `as const` rather than `: DocSection` — these two are consumed field-by-field
-// rather than through DocBlock, so their list fields must be non-optional.
-export const DEV_EXPERIENCE = {
-  id: "developer-experience",
-  heading: "Developer Experience",
-  body: [
-    "Security improvements should integrate naturally into existing development workflows.",
-  ],
-  listLead:
-    "Both Docker Hardened Images and CleanStart support standard OCI container ecosystems and integrate with common tooling including:",
-  items: [
-    "Docker",
-    "Kubernetes",
-    "Helm",
-    "GitHub Actions",
-    "GitLab CI",
-    "Jenkins",
-    "Argo CD",
-  ],
-  after: [
-    "From a developer perspective, adoption typically involves replacing a base image with secure Docker base images while continuing to use existing container workflows.",
-    "Where the approaches differ is the amount of verification metadata available to downstream security and compliance teams.",
-  ],
-} as const;
-
-export const VERIFYING = {
-  id: "verifying-images",
-  heading: "Verifying Container Images",
-  body: [
-    "Regardless of which platform you choose, engineers should verify the software they deploy.",
-  ],
-  listLead:
-    "A secure container image should allow you to answer questions such as:",
-  items: [
-    "Is an SBOM available?",
-    "Is the image digitally signed?",
-    "Can software provenance be verified?",
-    "Is the image digest immutable?",
-    "Is the build process documented?",
-    "Was the software rebuilt from source?",
-    "Are updates published consistently?",
-  ],
-  after: [
-    "These verification steps help establish confidence in both the software itself and the processes used to produce it.",
-  ],
-} as const;
-
-export const CHOOSING = {
-  heading: "CleanStart vs Docker Hardened Images: Choosing the Right Approach",
-  body: [
-    "Docker Hardened Images and CleanStart are not mutually exclusive philosophies. Both recognize that public container images require stronger security, better maintenance, and improved transparency.",
-  ],
-  dhi: {
-    name: "Docker Hardened Images",
-    text: "Docker Hardened Images are well suited for organizations looking for hardened, enterprise-supported images that integrate seamlessly into Docker's ecosystem while providing signed artifacts, provenance, and reduced vulnerabilities.",
+export const HERO_DIAGRAM = {
+  caption:
+    "Where each stack starts: Docker Hardened Images harden an inherited Debian or Alpine base, CleanStart compiles every layer from verified source.",
+  docker: {
+    inherited: { label: "Upstream distro", detail: "Debian · Alpine" },
+    link: "inherits",
+    layers: ["Reduced packages", "Hardened configuration", "Attested image"],
   },
   cleanstart: {
-    name: "CleanStart",
-    text: "CleanStart is designed for organizations that require additional assurance through deterministic build pipelines, SLSA Level 4 aligned provenance, AI BOMs, and a broader approach to Software Supply Chain Posture that extends beyond the container image itself.",
+    inherited: { label: "Nothing inherited", detail: "zero upstream base" },
+    link: "builds from source",
+    layers: ["Verified source", "Hermetic build", "Signed artifact"],
   },
-  close:
-    "The right choice ultimately depends on your security objectives, compliance requirements, and the level of verification your organization expects from its software supply chain.",
 } as const;
 
-export const WHICH_BETTER = {
-  heading: "Which solution is better?",
-  body: [
-    "Both Docker Hardened Images and CleanStart significantly improve software security compared to traditional public container images.",
-    "If your priority is hardened, enterprise-supported container images with strong security fundamentals, Docker Hardened Images provide an excellent foundation.",
-    "If your organization also requires higher-assurance build verification, deterministic software production, AI BOMs, and a broader Software Supply Chain Posture strategy, CleanStart extends those capabilities beyond traditional image hardening.",
+/* ─────────────────────── section 1: foundations ─────────────────────── */
+
+export const FOUNDATIONS = {
+  heading:
+    "What Are Docker Hardened Images and How Do They Compare With CleanStart?",
+  intro:
+    "Docker Hardened Images and CleanStart take different approaches to container security. Both aim to reduce risk in the software supply chain, but they start from different foundations: one hardens an existing base, the other builds from verified source.",
+  columns: [
+    {
+      id: "docker",
+      label: "Docker Hardened Images",
+      body: "Docker Hardened Images provide hardened container images designed to reduce attack surface and improve container security.",
+      focusLabel: "Docker focuses on:",
+      focus: [
+        "Debian and Alpine-based foundations",
+        "Minimal production images",
+        "Reproducible builds",
+        "Supply chain metadata and attestations",
+      ],
+    },
+    {
+      id: "cleanstart",
+      label: "CleanStart Verified Images",
+      body: "CleanStart provides verified container images built through controlled software supply chain processes designed to establish artifact trust.",
+      focusLabel: "CleanStart focuses on:",
+      focus: [
+        "Distroless foundations",
+        "Source-based builds",
+        "Reproducible & hermetic build processes",
+        "Provenance & cryptographic verification",
+      ],
+    },
   ],
 } as const;
+
+/* ───────────────────────── section 2: matrix ───────────────────────── */
 
 /**
- * Not from the document body. Requested by the SEO review as a comment anchored
- * to the "Which solution is better?" heading (2026-07-30): an additional H2 that
- * carries the "alternative to Docker Hardened Images" query. It heads the two
- * recommendation cards, which are the copy that answers it.
+ * A matrix cell. `yes` / `no` render as markers with a screen-reader label;
+ * `text` renders the document's phrase. The document's own "✓" and "—" glyphs
+ * map to `yes` and `no` so the markers can carry an accessible name and a
+ * colour rather than sitting in the page as bare punctuation.
  */
-export const WHICH_BETTER_ALT_HEADING =
-  "Is CleanStart the Right Alternative to Docker Hardened Images?";
+export type MatrixCell =
+  | { readonly kind: "yes" }
+  | { readonly kind: "no" }
+  | { readonly kind: "text"; readonly value: string };
 
-export const FINAL_THOUGHTS = {
-  heading: "Final Thoughts",
-  pull: "Container security is evolving from secure images to verifiable software.",
-  body: [
-    "Reducing vulnerabilities remains essential, but modern software supply chain security also requires organizations to understand where software originated, how it was built, and whether its integrity can be independently verified.",
-    "Whether you choose Docker Hardened Images, CleanStart, or another trusted image provider, the long-term objective remains the same: establish confidence in every software artifact before it reaches production.",
-    "That confidence is built not only through hardening, but through verification.",
+export interface MatrixRow {
+  readonly id: string;
+  readonly capability: string;
+  readonly docker: MatrixCell;
+  readonly cleanstart: MatrixCell;
+}
+
+export interface MatrixGroup {
+  readonly id: string;
+  readonly label: string;
+  readonly rows: readonly MatrixRow[];
+}
+
+const yes: MatrixCell = { kind: "yes" };
+const no: MatrixCell = { kind: "no" };
+const text = (value: string): MatrixCell => ({ kind: "text", value });
+
+export const MATRIX = {
+  heading:
+    "Docker Hardened Images vs CleanStart: Container Security Comparison",
+  intro:
+    "Both Docker Hardened Images and CleanStart provide hardened container images with security metadata, signatures, and provenance. The difference lies in their approach to building, verifying, and maintaining software artifacts across the supply chain.",
+  caption:
+    "Capability comparison between Docker Hardened Images and CleanStart, grouped by image foundation, build and supply chain security, software transparency, and security and compliance.",
+  footnote:
+    "Comparison reflects each platform's published approach and CleanStart's documented capabilities as of September 2026. Specific behavior varies by image and variant.",
+  groups: [
+    {
+      id: "foundation",
+      label: "Image Foundation",
+      rows: [
+        {
+          id: "base-foundation",
+          capability: "Base foundation",
+          docker: text("Debian and Alpine-based images"),
+          cleanstart: text(
+            "CleanStart OS: source-built minimal image (no inherited base)",
+          ),
+        },
+        {
+          id: "image-hardening",
+          capability: "Image hardening",
+          docker: text(
+            "Reduced packages, hardened configurations, secure defaults",
+          ),
+          cleanstart: text(
+            "Compiled from source on a zero-inheritance foundation (custom glibc). Security flags set at build time; FIPS built in, not bolted on. Verified by a 78-test suite and 11 signed artifacts per variant.",
+          ),
+        },
+        {
+          id: "production-variants",
+          capability: "Production variants",
+          docker: text("Production, development, compatibility variants"),
+          cleanstart: text("Production, development, debug variants"),
+        },
+      ],
+    },
+    {
+      id: "build",
+      label: "Build & Supply Chain Security",
+      rows: [
+        {
+          id: "zero-inheritance",
+          capability: "Zero-inheritance architecture",
+          docker: text("Hardens existing Debian/Alpine base (inherits upstream)"),
+          cleanstart: text(
+            "Inherits nothing from upstream distros; every component compiled from verified source",
+          ),
+        },
+        {
+          id: "public-build-definitions",
+          capability: "Public build definitions",
+          docker: yes,
+          cleanstart: text("Controlled build pipelines"),
+        },
+        {
+          id: "source-based-builds",
+          capability: "Source-based builds",
+          docker: no,
+          cleanstart: yes,
+        },
+        {
+          id: "hermetic-build",
+          capability: "Hermetic build process",
+          docker: text("Not fully hermetic"),
+          cleanstart: yes,
+        },
+        {
+          id: "artifact-verification",
+          capability: "Artifact verification",
+          docker: text("Image attestations and signatures"),
+          cleanstart: text(
+            "Artifact verification through provenance and cryptographic signing",
+          ),
+        },
+      ],
+    },
+    {
+      id: "transparency",
+      label: "Software Transparency",
+      rows: [
+        {
+          id: "sboms",
+          capability: "SBOMs",
+          docker: text("SPDX and CycloneDX SBOMs"),
+          cleanstart: text("SPDX and CycloneDX SBOMs"),
+        },
+        {
+          id: "image-signing",
+          capability: "Image signing",
+          docker: text("Cosign signatures"),
+          cleanstart: text("Cosign signatures"),
+        },
+        {
+          id: "provenance",
+          capability: "Software provenance",
+          docker: text("SLSA Build Level 3 provenance"),
+          cleanstart: text("SLSA Level 3 aligned provenance"),
+        },
+        {
+          id: "vex",
+          capability: "VEX / exploitability context",
+          docker: yes,
+          cleanstart: yes,
+        },
+        {
+          id: "ai-bom",
+          capability: "AI BOM",
+          docker: no,
+          cleanstart: yes,
+        },
+      ],
+    },
+    {
+      id: "compliance",
+      label: "Security & Compliance",
+      rows: [
+        {
+          id: "fips",
+          capability: "FIPS-ready images",
+          docker: yes,
+          cleanstart: yes,
+        },
+        {
+          id: "stig",
+          capability: "STIG-aligned images",
+          docker: yes,
+          cleanstart: yes,
+        },
+        {
+          id: "compliance-artifacts",
+          capability: "Compliance artifacts",
+          docker: yes,
+          cleanstart: yes,
+        },
+        {
+          id: "vulnerability-intelligence",
+          capability: "Vulnerability intelligence",
+          docker: text("CVE metadata, VEX, security attestations"),
+          cleanstart: text(
+            "Vulnerability analysis, exploitability context, and verification workflows",
+          ),
+        },
+        {
+          id: "remediation-model",
+          capability: "Vulnerability remediation model",
+          docker: text("Patch-based, up to 7 days (paid-tier SLA)"),
+          cleanstart: text(
+            "Automatic rebuild from source via Continuous Trust Loop, ~24h",
+          ),
+        },
+        {
+          id: "vulnerability-data-accuracy",
+          capability: "Vulnerability data accuracy",
+          docker: no,
+          cleanstart: yes,
+        },
+        {
+          id: "shell-less",
+          capability: "Shell-less and read-only",
+          docker: no,
+          cleanstart: yes,
+        },
+      ],
+    },
+  ] as const satisfies readonly MatrixGroup[],
+} as const;
+
+/** Row count, derived so the section summary can never drift from the table. */
+export const MATRIX_ROW_COUNT = MATRIX.groups.reduce(
+  (total, group) => total + group.rows.length,
+  0,
+);
+
+/* ──────────────────────── section 3: build flow ──────────────────────── */
+
+export interface BuildFlowColumn {
+  readonly id: "docker" | "cleanstart";
+  readonly label: string;
+  readonly body: string;
+  readonly stepsLabel: string;
+  readonly steps: readonly string[];
+  readonly traitsLabel: string;
+  readonly traits: readonly string[];
+}
+
+export const BUILD_FLOW = {
+  heading:
+    "How Do Docker Hardened Images and CleanStart Build Secure Container Images?",
+  intro:
+    "The two platforms secure containers at different points in the lifecycle. Docker hardens a container foundation and validates the result; CleanStart verifies everything from source through to the final signed artifact.",
+  columns: [
+    {
+      id: "docker",
+      label: "Docker Hardened Images",
+      body: "Docker Hardened Images follow a hardened image approach designed to secure container foundations.",
+      stepsLabel: "Build approach:",
+      steps: [
+        "Base Container Foundation",
+        "Security Hardening",
+        "Testing & Validation",
+        "Signed Container Image",
+        "Production Deployment",
+      ],
+      traitsLabel: "Key characteristics:",
+      traits: [
+        "Hardened base images",
+        "Minimal production variants",
+        "Image attestations and metadata",
+      ],
+    },
+    {
+      id: "cleanstart",
+      label: "CleanStart Verified Images",
+      body: "CleanStart builds verified container images through controlled software supply chain processes.",
+      stepsLabel: "Build approach:",
+      steps: [
+        "Source Code",
+        "Source Verification",
+        "Controlled Build Pipeline",
+        "SBOM + Provenance Generation",
+        "Cryptographic Signing",
+        "Verified Container Image",
+        "Production Deployment",
+      ],
+      traitsLabel: "Key characteristics:",
+      traits: [
+        "Source-built images",
+        "Reproducible & hermetic build processes",
+        "Software provenance",
+        "Artifact verification",
+      ],
+    },
+  ] as const satisfies readonly BuildFlowColumn[],
+} as const;
+
+/* ────────────────────── section 4: differentiators ────────────────────── */
+
+export const DIFFERENTIATORS = {
+  heading: "Where CleanStart Differentiates",
+  items: [
+    {
+      id: "source-to-artifact",
+      /** Document H2 — renders as the page's H3. */
+      heading: "Source-to-Artifact Verification",
+      body: "CleanStart emphasizes verification across the artifact lifecycle, from source inputs through reproducible builds and final image delivery.",
+      /** Chained cubes: the unbroken link from source input to delivered image. */
+      icon: "/images/compare/icon-provenance.webp",
+    },
+    {
+      id: "reproducible-builds",
+      heading: "Reproducible Build Confidence",
+      body: "Security teams can validate how artifacts are created and reproduce build outcomes through controlled build processes.",
+      icon: "/images/compare/icon-signed-artifact.webp",
+    },
+    {
+      id: "verified-foundations",
+      heading: "Verified Software Foundations",
+      body: "CleanStart extends container security into broader software supply chain assurance across images, libraries, and dependencies.",
+      /** Manifest plus components: images, libraries and dependencies together. */
+      icon: "/images/compare/icon-sbom.webp",
+    },
   ],
 } as const;
 
-export const CTA = {
-  heading: "Build Trust Into Every Container Image",
-  body: "Secure container images are only one part of software supply chain security. Discover how CleanStart helps engineering and security teams verify software integrity before deployment.",
-  button: "Request a Demo",
-} as const;
+/* ───────────────────────────── section 5: FAQ ───────────────────────────── */
+
+export interface CompareFaq {
+  readonly id: string;
+  readonly question: string;
+  readonly answer: string;
+}
 
 export const FAQ_HEADING = "Frequently Asked Questions";
 
-export interface CompareFaq {
-  id: string;
-  question: string;
-  answer: string;
-}
-
-export const COMPARE_FAQS: readonly CompareFaq[] = [
+export const FAQS = [
   {
-    id: "hardened-vs-verified",
-    question: "What is the difference between a hardened image and a verified image?",
+    id: "what-are-dhi",
+    question: "What are Docker Hardened Images?",
     answer:
-      "A hardened image reduces the attack surface by minimizing unnecessary software and lowering known vulnerabilities. A verified image builds on hardening by providing evidence describing how the software was produced, including provenance, reproducible builds, cryptographic signatures, and attestations.",
+      "Docker Hardened Images are minimal, security-focused container images built to reduce attack surface and improve container security. They are based on Debian and Alpine foundations, ship as minimal production variants with reduced packages and secure defaults, and include supply chain metadata such as SBOMs, Cosign signatures, SLSA Build Level 3 provenance and VEX exploitability context.",
   },
   {
-    id: "still-scan",
-    question: "Do I still need vulnerability scanning?",
+    id: "difference",
+    question:
+      "What is the difference between Docker Hardened Images and CleanStart?",
     answer:
-      "Yes. Verification and vulnerability management solve different problems. Vulnerability scanning identifies known security issues, while verification establishes confidence in the integrity and origin of software artifacts.",
+      "Both provide hardened container images with SBOMs, Cosign signatures and SLSA-aligned provenance. The core difference is architecture: Docker Hardened Images harden existing Debian and Alpine base images and inherit from upstream distributions, while CleanStart uses a zero-inheritance model where every component is compiled from verified source on the CleanStart OS foundation (custom glibc), with hermetic builds, FIPS built in at build time, an AI BOM, and shell-less, read-only images.",
   },
   {
-    id: "what-is-provenance",
-    question: "What is software provenance?",
-    answer:
-      "Software provenance documents how software was produced, including its source repository, build workflow, builder identity, and cryptographic attestations. It enables consumers to verify the origin and integrity of software artifacts.",
-  },
-  {
-    id: "why-reproducible",
-    question: "Why are reproducible builds important?",
-    answer:
-      "Reproducible builds allow independent parties to verify that published artifacts correspond exactly to the documented source code, reducing reliance on trust alone.",
-  },
-  {
-    id: "good-alternative",
+    id: "alternative",
     question: "Is CleanStart a good alternative to Docker Hardened Images?",
     answer:
-      "Docker Hardened Images and CleanStart both provide secure container images with reduced attack surfaces, signed artifacts, SBOMs, and software provenance. CleanStart differentiates itself by emphasizing deterministic build pipelines, SLSA Level 4 aligned provenance, AI BOMs, and a broader software supply chain posture. The right choice depends on your organization's security, compliance, and verification requirements.",
+      "Yes. CleanStart is a strong alternative for teams that need deeper software supply chain assurance. It builds verified images from source with reproducible and hermetic pipelines, inherits nothing from upstream distributions, provides provenance and cryptographic verification, and extends coverage across images, libraries and dependencies rather than container images alone.",
   },
   {
-    id: "compliance-support",
-    question: "Which platform offers better compliance support?",
+    id: "more-secure",
+    question: "Which platform builds more secure container images?",
     answer:
-      "Both platforms support compliance initiatives through capabilities such as signed artifacts, software provenance, SBOMs, and hardened container images. CleanStart further emphasizes deterministic builds and broader software supply chain verification, which may provide additional assurance for organizations operating under strict regulatory or internal security requirements.",
+      "Both are secure by design. Docker hardens a known base and adds attestations and signatures. CleanStart removes inherited risk entirely by compiling every component from verified source on a zero-inheritance foundation, hardening at build time, and validating each variant with a 78-test suite and 11 signed artifacts. Teams that prioritize source-to-artifact verification and hermetic builds generally favor CleanStart's approach.",
   },
   {
-    id: "kubernetes",
-    question: "Which platform works better with Kubernetes?",
+    id: "compliance",
+    question: "Which solution offers better compliance support?",
     answer:
-      "Both Docker Hardened Images and CleanStart support standard OCI container ecosystems and integrate with Kubernetes alongside common CI/CD and GitOps tools. For most engineering teams, adopting either solution typically involves replacing the base image while maintaining existing deployment workflows.",
+      "Both offer FIPS-ready and STIG-aligned images plus compliance artifacts. CleanStart builds FIPS in at compile time rather than bolting it on afterward, and pairs it with SBOMs, provenance and an AI BOM, which gives auditors a consistent, source-verified evidence trail for regulated environments.",
   },
-];
+  {
+    id: "vulnerability-effort",
+    question: "Which platform reduces vulnerability management effort the most?",
+    answer:
+      "Both reduce effort by shipping minimal images with less to patch. Docker uses patch-based remediation with fixes typically within 7 days on paid tiers. CleanStart automatically rebuilds affected images from source through its Continuous Trust Loop, targeting roughly 24-hour remediation, and adds vulnerability data accuracy and exploitability context so teams spend less time triaging false positives.",
+  },
+  {
+    id: "advantages",
+    question:
+      "What are the advantages of CleanStart over Docker Hardened Images?",
+    answer:
+      "CleanStart's advantages include a zero-inheritance architecture (no upstream distro risk), source-based and hermetic builds, FIPS built in at build time, an AI BOM, shell-less and read-only images, faster source-based remediation via the Continuous Trust Loop, and supply chain assurance that extends across images, libraries and dependencies.",
+  },
+  {
+    id: "devsecops",
+    question: "Which hardened image solution is best for DevSecOps teams?",
+    answer:
+      "Both ship signed, attested images with SBOMs and SLSA-aligned provenance that plug into CI/CD gates and admission control. DevSecOps teams that want to verify how every artifact is built from source, reproduce build outcomes, and enforce provenance across images, libraries and dependencies tend to prefer CleanStart's source-to-artifact model.",
+  },
+] as const satisfies readonly CompareFaq[];
 
-/** Plain-text Q&A pairs for `faqPageSchema`. */
-export const COMPARE_FAQ_ITEMS: ReadonlyArray<{ question: string; answer: string }> =
-  COMPARE_FAQS.map((faq) => ({ question: faq.question, answer: faq.answer }));
+/* ───────────────────────────────── CTA ───────────────────────────────── */
 
-/**
- * Strings the copy document cannot supply: interface labels and accessible
- * text. Kept separate so the document-verbatim boundary above stays auditable.
- */
-export const UI_CHROME = {
-  matrixCaption:
-    "Capability comparison between Docker Hardened Images and CleanStart Verified Images.",
-  legendIncluded: "Included",
-  legendAbsent: "Not offered",
-  jumpToMatrix: "See the comparison",
+export const CTA = {
+  heading: "Build With Verified Container Images",
+  body: "Secure your software supply chain with CleanStart Images built from source, backed by SBOMs, software provenance, and cryptographic verification.",
+  button: "Start Building With CleanStart",
+  href: "https://images.cleanstart.com",
 } as const;
 
-/*
- * A Docker trademark / non-affiliation disclaimer used to sit under the matrix.
- * Removed 2026-08-04: the word "trademark" appears nowhere in the source
- * document, and the page is held to document-verbatim copy. If legal wants a
- * disclaimer back, it should come from them as approved wording rather than be
- * reinstated here.
+/* ──────────────────────── UI-only strings ──────────────────────── */
+
+/**
+ * Chrome the document does not write: link labels, accessible names and the
+ * two marker states in the matrix. Kept apart from the copy above so a future
+ * document diff never has to reason about them.
  */
+export const UI = {
+  jumpToMatrix: "Compare capabilities",
+  available: "Available",
+  notAvailable: "Not available",
+  faqIntro:
+    "Common questions about hardened container images, provenance, reproducible builds and compliance evidence.",
+} as const;
