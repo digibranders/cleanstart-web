@@ -36,9 +36,15 @@ export function HeroHeading() {
         {/* Caret lives on the wrapper so the inner clip-path doesn't crop it. */}
         <span className="cs-hh-typewrap">
           <span className="cs-hh-line2">
+            {/* The period sits outside .cs-hh-hardened so the strike crosses
+                the word only, while still sharing its gradient→gray fade. */}
             <span className="cs-hh-hardened">
-              <span className="cs-hh-hardened-grad">Hardened.</span>
-              <span className="cs-hh-hardened-gray">Hardened.</span>
+              <span className="cs-hh-hardened-grad">Hardened</span>
+              <span className="cs-hh-hardened-gray">Hardened</span>
+            </span>
+            <span className="cs-hh-hardened-dot">
+              <span className="cs-hh-hardened-grad">.</span>
+              <span className="cs-hh-hardened-gray">.</span>
             </span>{" "}
             <span className="cs-hh-secure">Secure.</span>
           </span>

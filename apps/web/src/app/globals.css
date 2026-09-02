@@ -1562,8 +1562,11 @@ body {
 
 /* "Hardened." types on in the gradient (so the type-on still reads as one
    phrase), then — once the strike lands — crossfades to a muted gray twin
-   stacked in the same position. */
-.cs-hh-hardened {
+   stacked in the same position. The trailing period is its own wrapper: it
+   shares the fade but sits outside the struck box, so the bar crosses the
+   word only. */
+.cs-hh-hardened,
+.cs-hh-hardened-dot {
   position: relative;
   display: inline-block;
   /* One step lighter than the H1's 600 (Manrope 500 is already loaded, so this
@@ -1577,8 +1580,8 @@ body {
 .cs-hh-hardened::after {
   content: "";
   position: absolute;
-  /* Flush to the word — no overshoot, so the bar stops at the period instead
-     of running on into the gap before "Secure." */
+  /* Flush to the word, no overshoot: the box holds "Hardened" alone, so the
+     bar ends before the period rather than running on toward "Secure." */
   left: 0;
   right: 0;
   top: 50%;
