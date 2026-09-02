@@ -51,6 +51,9 @@ test.describe("impact estimator copy link @phase-web-impact-estimator", () => {
     test.skip(browserName !== "chromium", "clipboard permissions are only grantable in Chromium");
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
     await page.goto(`${ROUTE}?images=60&team=15&remediation=Quarterly&release=Monthly`);
+    // The slider only reads 60 once the page has hydrated and adopted the URL;
+    // clicking before that lands on a button with no handler yet.
+    await expect(page.getByRole("slider", { name: "Production images" })).toHaveValue("60");
 
     const button = page.getByRole("button", { name: "Copy link to results" });
     await button.click();
@@ -69,11 +72,16 @@ test.describe("impact estimator mobile summary @phase-web-impact-estimator", () 
     const strip = page.locator('button[aria-label^="Jump to your results"]');
     await expect(strip).toHaveAttribute("aria-hidden", "true");
 
-    // Park the inputs card just under the header: the sliders are usable and
-    // the gauge sits below the fold on every phone viewport.
+    // Scroll so the gauge is only a fifth visible at the bottom edge: the inputs
+    // card is on screen and the readout is not, on phones and tablets alike. A
+    // fixed offset from the card top would not do: at 768px the card is short
+    // enough that the gauge is already mostly visible, and the strip rightly
+    // stays hidden.
     await page.evaluate(() => {
-      const card = document.querySelector<HTMLElement>('[data-section="ImpactSimulator"] .lg\\:sticky');
-      if (card) window.scrollTo({ top: card.getBoundingClientRect().top + window.scrollY - 80, behavior: "instant" });
+      const gauge = document.querySelector<HTMLElement>('[data-section="ImpactSimulator"] svg[role="img"]');
+      if (!gauge) return;
+      const r = gauge.getBoundingClientRect();
+      window.scrollTo({ top: r.top + window.scrollY - window.innerHeight + r.height * 0.2, behavior: "instant" });
     });
     await expect(strip).toHaveAttribute("aria-hidden", "false");
     await expect(strip).toHaveAttribute("aria-label", /High runtime complexity, burden 260, 7,800 hours/);
