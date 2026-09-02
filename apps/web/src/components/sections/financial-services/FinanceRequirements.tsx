@@ -217,9 +217,13 @@ export function FinanceRequirements(): React.ReactElement {
                         {col.title}
                       </h3>
 
-                      {/* Capabilities List */}
+                      {/* Capabilities List. The list is a shrink-wrapped block, so
+                          the column's own alignment centres it under the title on
+                          mobile; the ITEMS inside are always left-aligned, so the
+                          checkmarks line up in one column instead of each row
+                          centring on its own length. */}
                       <ul
-                        className="flex flex-col items-center md:items-start"
+                        className="flex flex-col items-start"
                         style={{
                           listStyle: 'none',
                           padding: 0,
@@ -230,7 +234,7 @@ export function FinanceRequirements(): React.ReactElement {
                         {col.items.map((item) => (
                           <li
                             key={item}
-                            className="flex items-center justify-center md:justify-start gap-2.5 text-left"
+                            className="flex items-center justify-start gap-2.5 text-left"
                             style={{
                               fontFamily: 'var(--font-sans)',
                               fontSize: 'var(--fs-body-sm)',
