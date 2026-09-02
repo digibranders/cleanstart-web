@@ -31,6 +31,15 @@ export const glyphs: Record<string, ReactNode> = {
       <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
     </>
   ),
+  // Half-dial with a needle: the Impact Estimator's own radial gauge, reduced.
+  gauge: (
+    <>
+      <path d="M4 16a8 8 0 0 1 16 0" />
+      <path d="M12 16l4.5-5" />
+      <circle cx="12" cy="16" r="1.5" fill="currentColor" stroke="none" />
+      <path d="M3 20h18" />
+    </>
+  ),
   'shield-check': (
     <>
       <path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5l-8-3z" />

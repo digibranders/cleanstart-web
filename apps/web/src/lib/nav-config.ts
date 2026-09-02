@@ -118,7 +118,7 @@ export const NAV_TREE: NavItem[] = [
             label: "Impact Estimator",
             href: "/impact-estimator",
             description: "Estimate the operational impact of hardened images.",
-            icon: "tools",
+            icon: "gauge",
           },
         ],
       },
