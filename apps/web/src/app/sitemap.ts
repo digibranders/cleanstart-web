@@ -112,6 +112,7 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/for-ciso' },
   { path: '/for-developers' },
   { path: '/guide' },
+  { path: '/impact-estimator' },
   { path: '/industries/financial-services-container-security' },
   { path: '/industries/modern-applications' },
   // `/industries` itself has no page, so there is no hub URL to list.

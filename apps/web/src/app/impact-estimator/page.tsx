@@ -15,15 +15,9 @@ export const metadata = buildPageMetadata({
   title: "Impact Estimator for Hardened Container Images | CleanStart",
   absoluteTitle: true,
   description:
-    "Estimate the operational impact of moving to minimal, trusted container images: Vulnerability Noise Reduction, Patch Cycle Overhead Reduction, Faster Secure Releases, Runtime Footprint Reduction, and Engineering Hours Recovered.",
+    "Estimate what hardened container images change for your runtime: vulnerability noise, patch cycles, release speed, footprint, and engineering hours recovered.",
   path: "/impact-estimator",
   eyebrow: "Tools",
-  // Not ready for search: kept out of the sitemap and nav (built: false), and
-  // both noindex + nofollow'd here so crawlers that reach it directly neither
-  // index it nor pass equity onward. Drop both (and add the route to sitemap
-  // STATIC_ROUTES) when the page ships.
-  noindex: true,
-  nofollow: true,
 });
 
 export const revalidate = 21600; // 6h ISR fallback; on-demand publish revalidation keeps this fresh

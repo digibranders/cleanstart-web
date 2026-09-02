@@ -76,7 +76,7 @@ export function ImpactHero(): React.ReactElement {
               color: "#111111",
             }}
           >
-            <span style={{ display: "block" }}>See what hardened runtimes</span>
+            <span style={{ display: "block" }}>See what hardened container images</span>
             <span style={{ display: "block" }} className="cs-text-gradient-impact">actually change</span>
           </h1>
         </HeroReveal>

@@ -1,4 +1,5 @@
 import type React from "react";
+import Link from "next/link";
 import { Reveal } from "@/components/ui/Reveal";
 
 /*
@@ -123,7 +124,8 @@ export function ImpactHowItWorks(): React.ReactElement {
                 Cut the first link, and every number after it improves
               </h3>
               <p style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-body)", color: "rgba(255,255,255,0.8)", lineHeight: 1.55, marginTop: "8px", maxWidth: "78ch" }}>
-                Minimal, hardened images inherit far fewer CVEs at the source, so there is less to triage, patch, and re-test all the way downstream.
+                Minimal, hardened images inherit far fewer CVEs at the source, so there is less to triage, patch, and re-test all the way downstream.{" "}
+                <Link href="/cleanstart-images" style={{ color: C1, fontWeight: 600, textDecoration: "underline", textUnderlineOffset: "3px", whiteSpace: "nowrap" }}>See how CleanStart images are built</Link>
               </p>
             </div>
           </div>

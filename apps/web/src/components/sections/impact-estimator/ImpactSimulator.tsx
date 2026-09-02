@@ -15,6 +15,7 @@
  */
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import Link from "next/link";
 import { useReducedMotion } from "motion/react";
 import { copyText } from "@/lib/clipboard";
 import {
@@ -516,7 +517,7 @@ export function ImpactSimulator(): React.ReactElement {
         <div className="grid grid-cols-1 gap-6 lg:gap-7 lg:grid-cols-[minmax(0,370px)_minmax(0,1fr)] lg:items-start">
           {/* ── inputs: sticky beside the results on desktop ── */}
           <div ref={inputsRef} className="lg:sticky" style={{ top: "calc(var(--cs-header-h) + 24px)", background: "#ffffff", borderRadius: "var(--radius-cs-card)", border: "1px solid rgba(17,17,17,0.07)", boxShadow: "0 2px 10px -4px rgba(17,17,17,0.08)", padding: "clamp(22px,1.8vw,28px)" }}>
-            <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h4)", fontWeight: 600, color: INK, letterSpacing: "-0.02em" }}>Your environment</h3>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h4)", fontWeight: 600, color: INK, letterSpacing: "-0.02em" }}>Your environment</h2>
             <p style={{ fontFamily: "var(--font-sans)", fontSize: "13px", color: MUTED, marginTop: "4px", marginBottom: "24px" }}>Four signals describe your runtime.</p>
 
             <Slider label="Production images" tip="Distinct container images running in production. Each one is a surface you patch, scan, and secure." value={input.images} min={INPUT_BOUNDS.images.min} max={INPUT_BOUNDS.images.max} step={INPUT_STEP.images} onChange={(v) => update({ images: v })} context={bandLabel(input.images, IMAGE_WEIGHT_THRESHOLDS, IMAGE_LABELS)} ticks={IMAGE_WEIGHT_THRESHOLDS} />
@@ -535,6 +536,9 @@ export function ImpactSimulator(): React.ReactElement {
 
           {/* ── results narrative ── */}
           <div ref={resultsRef} className="flex flex-col gap-5" style={{ scrollMarginTop: "calc(var(--cs-header-h) + 16px)" }}>
+            {/* The results have no visible title (the gauge is the title), so the
+                outline gets a screen-reader heading to sit level with "Your environment". */}
+            <h2 className="sr-only">Your estimated outcomes</h2>
             {/* operational burden: gauge, tier, reduction, breakdown */}
             <div className="impact-card" style={{ background: "#ffffff", borderRadius: "var(--radius-cs-card)", border: "1px solid rgba(17,17,17,0.07)", boxShadow: "0 2px 10px -4px rgba(17,17,17,0.08)", padding: "clamp(20px,1.8vw,26px)" }}>
               <div className="grid items-center gap-6 grid-cols-1 sm:grid-cols-[minmax(190px,216px)_1fr]">
@@ -633,6 +637,8 @@ export function ImpactSimulator(): React.ReactElement {
               <p className="inline-flex items-start sm:flex-1 min-w-0" style={{ fontFamily: "var(--font-sans)", fontSize: "12.5px", color: MUTED, lineHeight: 1.55 }}>
                 Estimated outcomes, modeled from industry benchmarks and organizations with similar runtime profiles. Directional, not a guarantee.
                 <InfoTip label="how these estimates work" text="We don't scan your systems. These ranges reflect typical results for environments with a comparable burden profile. Book a demo to measure your actual images." />
+                {" "}
+                <Link href="/book-a-demo" style={{ color: ACCENT, fontWeight: 600, textDecoration: "underline", textUnderlineOffset: "2px", whiteSpace: "nowrap" }}>Measure your real images</Link>
               </p>
               <CopyResultsLink input={input} />
             </div>
