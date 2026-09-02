@@ -51,6 +51,9 @@ test.describe("impact estimator copy link @phase-web-impact-estimator", () => {
     test.skip(browserName !== "chromium", "clipboard permissions are only grantable in Chromium");
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
     await page.goto(`${ROUTE}?images=60&team=15&remediation=Quarterly&release=Monthly`);
+    // The slider only reads 60 once the page has hydrated and adopted the URL;
+    // clicking before that lands on a button with no handler yet.
+    await expect(page.getByRole("slider", { name: "Production images" })).toHaveValue("60");
 
     const button = page.getByRole("button", { name: "Copy link to results" });
     await button.click();
