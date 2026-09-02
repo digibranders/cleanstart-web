@@ -29,20 +29,37 @@ import styles from './SaasTrustPipeline.module.css';
  * list in SaasShiftLeft is the accessible reading.
  */
 
-const PHASES = ['idle', 'flight', 'approach', 'docked', 'fill', 'settled', 'exit'] as const;
+const PHASES = [
+  'idle',
+  'flight',
+  'hover',
+  'absorb',
+  'descend',
+  'docked',
+  'fill',
+  'settled',
+  'exit',
+] as const;
 type Phase = (typeof PHASES)[number];
 
-/* Beat length (ms) for each phase. `flight` + `approach` add up to the hero's
-   2.6 s flight in the stylesheet; `fill` is the 3.2 s rail sweep plus the
-   0.9 s release bloom, so the hold starts on a still frame. */
+/* Beat length (ms) for each phase.
+   `flight` matches the 1.8 s glide in the stylesheet: the hero decelerates
+   into a hover directly above the landing spot. `hover` + `absorb` is the
+   reading window for the chips; they fold into the hero during `absorb`, so
+   they are gone before touchdown. Their sum is two cycles of the hover bob so
+   the bob ends at rest. `descend` matches the 0.75 s drop. `fill` is the
+   3.2 s rail sweep plus the 0.9 s release bloom, so the hold starts on a
+   still frame. */
 const BEATS: Record<Phase, number> = {
-  idle: 600,
-  flight: 1600,
-  approach: 1000,
-  docked: 500,
+  idle: 400,
+  flight: 1800,
+  hover: 1500,
+  absorb: 700,
+  descend: 750,
+  docked: 400,
   fill: 4200,
-  settled: 3000,
-  exit: 450,
+  settled: 1400,
+  exit: 400,
 };
 
 const SOURCE_LABEL = 'Verified Components';
@@ -66,8 +83,9 @@ interface Layout {
   readonly height: number;
   readonly socket: Point;
   readonly socketR: number;
-  /** Hero flight path, off-canvas to the socket centre. */
-  readonly flight: string;
+  /** Hero flight: off-canvas, to a hover point, to the socket centre. The
+      second-to-last point is the hover. */
+  readonly flight: readonly Point[];
   readonly rail: { readonly from: Point; readonly to: Point };
   readonly stages: readonly Point[];
   readonly stageLabel: (stage: Point) => TextAnchor;
@@ -86,7 +104,11 @@ const HORIZONTAL: Layout = {
   height: 380,
   socket: { x: 216, y: 224 },
   socketR: 56,
-  flight: 'M -170 108 L 90 108 C 170 108, 216 142, 216 224',
+  flight: [
+    { x: -190, y: 96 },
+    { x: 216, y: 96 },
+    { x: 216, y: 224 },
+  ],
   rail: { from: { x: 278, y: 224 }, to: { x: 1064, y: 224 } },
   stages: [392, 524, 656, 788, 920, 1064].map((x) => ({ x, y: 224 })),
   stageLabel: (s) => ({ x: s.x, y: s.y + TILE / 2 + 28, anchor: 'middle' }),
@@ -101,7 +123,11 @@ const VERTICAL: Layout = {
   height: 860,
   socket: { x: 78, y: 150 },
   socketR: 56,
-  flight: 'M -170 70 C -20 70, 78 60, 78 150',
+  flight: [
+    { x: -190, y: 62 },
+    { x: 78, y: 62 },
+    { x: 78, y: 150 },
+  ],
   rail: { from: { x: 78, y: 212 }, to: { x: 78, y: 782 } },
   stages: [270, 370, 470, 570, 670, 782].map((y) => ({ x: 78, y })),
   stageLabel: (s) => ({ x: s.x + TILE / 2 + 20, y: s.y + 6, anchor: 'start' }),
@@ -112,6 +138,24 @@ const VERTICAL: Layout = {
 };
 
 const LAYOUTS: Record<Orientation, Layout> = { horizontal: HORIZONTAL, vertical: VERTICAL };
+
+function polyline(points: readonly Point[]): string {
+  return points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+}
+
+/** 0..1 distance along the flight at which the hover point sits. */
+function hoverFraction(points: readonly Point[]): number {
+  let total = 0;
+  let toHover = 0;
+  for (let i = 1; i < points.length; i += 1) {
+    const a = points[i - 1];
+    const b = points[i];
+    if (!a || !b) continue;
+    total += Math.hypot(b.x - a.x, b.y - a.y);
+    if (i === points.length - 2) toHover = total;
+  }
+  return toHover / total;
+}
 
 function railLength(rail: Layout['rail']): number {
   return Math.hypot(rail.to.x - rail.from.x, rail.to.y - rail.from.y);
@@ -229,7 +273,9 @@ function Scene({ orientation, phase }: SceneProps): React.ReactElement {
       data-scene={orientation}
       data-phase={phase}
       data-flying={reached('flight')}
-      data-approach={reached('approach')}
+      data-hover={reached('hover')}
+      data-absorb={reached('absorb')}
+      data-descend={reached('descend')}
       data-docked={reached('docked')}
       data-fill={reached('fill')}
       data-settled={reached('settled')}
@@ -271,7 +317,7 @@ function Scene({ orientation, phase }: SceneProps): React.ReactElement {
         </radialGradient>
       </defs>
 
-      {/* Ambient glow around the socket, brightens once docked. */}
+      {/* Ambient glow under the docked hero. */}
       <circle
         className={styles.socketGlow}
         cx={L.socket.x}
@@ -280,8 +326,7 @@ function Scene({ orientation, phase }: SceneProps): React.ReactElement {
         fill={`url(#${uid}-socketGlow)`}
       />
 
-      {/* Rail: base, then the green fill that sweeps it. */}
-      <path className={styles.railBase} d={railPath} strokeLinecap="round" />
+      {/* Rail: drawn only by the green sweep, once the hero has docked. */}
       <path
         className={styles.railFill}
         d={railPath}
@@ -290,10 +335,8 @@ function Scene({ orientation, phase }: SceneProps): React.ReactElement {
         style={{ ['--len' as string]: len.toFixed(2) }}
       />
 
-      {/* Socket: the empty slot at the head of the pipeline. */}
+      {/* Landing flash at the head of the pipeline. */}
       <g transform={`translate(${L.socket.x} ${L.socket.y})`}>
-        <path className={styles.socketFace} d={hexagon(L.socketR)} />
-        <path className={styles.socketRing} d={hexagon(L.socketR)} />
         <circle className={styles.burst} r={L.socketR} />
       </g>
 
@@ -312,7 +355,9 @@ function Scene({ orientation, phase }: SceneProps): React.ReactElement {
             className={styles.stage}
             style={{ ['--frac' as string]: frac.toFixed(4) }}
           >
-            {isRelease ? <circle className={styles.bloom} cx={at.x} cy={at.y} r={TILE * 0.62} /> : null}
+            {isRelease ? (
+              <circle className={styles.bloom} cx={at.x} cy={at.y} r={TILE * 0.62} />
+            ) : null}
             <rect
               className={styles.tile}
               x={at.x - TILE / 2}
@@ -400,16 +445,32 @@ function Scene({ orientation, phase }: SceneProps): React.ReactElement {
 
       {/* The hero. Drawn centred on the origin and carried along the flight
           path by `offset-path`, so nothing here knows where the socket is. */}
-      <g className={styles.hero} style={{ offsetPath: `path("${L.flight}")` }}>
+      <g
+        className={styles.hero}
+        style={{
+          offsetPath: `path("${polyline(L.flight)}")`,
+          ['--hover' as string]: `${(hoverFraction(L.flight) * 100).toFixed(3)}%`,
+        }}
+      >
         {withChips ? (
-          <rect className={styles.trail} x="-210" y="-13" width="160" height="26" rx="13" fill={`url(#${uid}-trail)`} />
+          <rect
+            className={styles.trail}
+            x="-210"
+            y="-13"
+            width="160"
+            height="26"
+            rx="13"
+            fill={`url(#${uid}-trail)`}
+          />
         ) : null}
         {withChips
           ? CHIPS.map((chip, i) => {
+              /* Trailing the hero, and clear of the card's left edge once it
+                 has docked: the leftmost chip spans to x=22 at the socket. */
               const spots: readonly Point[] = [
-                { x: -142, y: -42 },
-                { x: -172, y: 0 },
-                { x: -142, y: 42 },
+                { x: -120, y: -44 },
+                { x: -152, y: 0 },
+                { x: -120, y: 44 },
               ];
               const at = spots[i] ?? { x: -150, y: 0 };
               return (
@@ -422,8 +483,21 @@ function Scene({ orientation, phase }: SceneProps): React.ReactElement {
                       ['--i' as string]: i,
                     }}
                   >
-                    <rect x="-44" y="-12" width="88" height="24" rx="12" className={styles.chipFace} />
-                    <text textAnchor="middle" y="4" fontSize="11" fontWeight={500} className={styles.chipText}>
+                    <rect
+                      x="-44"
+                      y="-12"
+                      width="88"
+                      height="24"
+                      rx="12"
+                      className={styles.chipFace}
+                    />
+                    <text
+                      textAnchor="middle"
+                      y="4"
+                      fontSize="11"
+                      fontWeight={500}
+                      className={styles.chipText}
+                    >
                       {chip}
                     </text>
                   </g>
@@ -431,26 +505,38 @@ function Scene({ orientation, phase }: SceneProps): React.ReactElement {
               );
             })
           : null}
-        <circle r="74" fill={`url(#${uid}-heroGlow)`} />
-        <g className={styles.heroBody}>
-          <path d={hexagon(52)} fill={`url(#${uid}-hero)`} />
-          <path d={hexagon(52)} fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5" />
-          <path d={hexagon(42)} fill="none" stroke="rgba(255,255,255,0.16)" strokeWidth="1" />
-          <g fill="none" stroke="#FFFFFF" strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round">
-            <path d="M0 -19 L18 -10 L0 -1 L-18 -10 Z" fill="rgba(255,255,255,0.92)" stroke="none" />
-            <path d="M-18 -1 L0 8 L18 -1" />
-            <path d="M-18 8 L0 17 L18 8" strokeOpacity="0.65" />
-          </g>
-          <g transform="translate(31 31)">
-            <circle r="13" fill="#0A1E2C" stroke="#34E3A6" strokeWidth="1.5" />
-            <polyline
-              points="-5 0.5 -1.6 4 5.5 -4"
+        <g className={styles.heroFloat}>
+          <circle r="74" fill={`url(#${uid}-heroGlow)`} />
+          <g className={styles.heroBody}>
+            <path d={hexagon(52)} fill={`url(#${uid}-hero)`} />
+            <path d={hexagon(52)} fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5" />
+            <path d={hexagon(42)} fill="none" stroke="rgba(255,255,255,0.16)" strokeWidth="1" />
+            <g
               fill="none"
-              stroke="#5CF0C0"
-              strokeWidth="2.2"
-              strokeLinecap="round"
+              stroke="#FFFFFF"
+              strokeWidth="2.4"
               strokeLinejoin="round"
-            />
+              strokeLinecap="round"
+            >
+              <path
+                d="M0 -19 L18 -10 L0 -1 L-18 -10 Z"
+                fill="rgba(255,255,255,0.92)"
+                stroke="none"
+              />
+              <path d="M-18 -1 L0 8 L18 -1" />
+              <path d="M-18 8 L0 17 L18 8" strokeOpacity="0.65" />
+            </g>
+            <g transform="translate(31 31)">
+              <circle r="13" fill="#0A1E2C" stroke="#34E3A6" strokeWidth="1.5" />
+              <polyline
+                points="-5 0.5 -1.6 4 5.5 -4"
+                fill="none"
+                stroke="#5CF0C0"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </g>
           </g>
         </g>
       </g>
@@ -495,18 +581,35 @@ export function SaasTrustPipeline(): React.ReactElement {
     setPhase('idle');
     if (!active) return;
 
+    /* Frame-driven rather than setTimeout: background tabs throttle timers to
+       one-second bursts, which would fast-forward the phases while the CSS
+       transitions sit frozen, then replay them as a jumble on return. Frames
+       stop while hidden, and the story restarts from idle when the tab comes
+       back, so a viewer never joins mid-transition. */
     let i = 0;
-    let timer = 0;
-    const step = (): void => {
+    let startedAt = performance.now();
+    let frame = 0;
+    const tick = (now: number): void => {
       const current = PHASES[i] ?? 'idle';
-      setPhase(current);
-      timer = window.setTimeout(() => {
+      if (now - startedAt >= BEATS[current]) {
         i = (i + 1) % PHASES.length;
-        step();
-      }, BEATS[current]);
+        startedAt = now;
+        setPhase(PHASES[i] ?? 'idle');
+      }
+      frame = window.requestAnimationFrame(tick);
     };
-    step();
-    return () => window.clearTimeout(timer);
+    const restart = (): void => {
+      if (document.visibilityState !== 'visible') return;
+      i = 0;
+      startedAt = performance.now();
+      setPhase('idle');
+    };
+    frame = window.requestAnimationFrame(tick);
+    document.addEventListener('visibilitychange', restart);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      document.removeEventListener('visibilitychange', restart);
+    };
   }, [active, reduce]);
 
   return (

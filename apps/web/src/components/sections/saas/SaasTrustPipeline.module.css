@@ -17,7 +17,8 @@
   --green: #34e3a6;
   --green-soft: #7cf3c6;
   --sweep: 3.2s;
-  --flight: 2.6s;
+  --glide: 1.8s;
+  --drop: 0.75s;
   position: relative;
   overflow: hidden;
   border-radius: 28px;
@@ -76,12 +77,6 @@
 
 /* ---------------------------------------------------------------- statics */
 
-.railBase {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.11);
-  stroke-width: 3;
-}
-
 /* Opaque so the rail passes behind the tile, not across its icon. */
 .tile {
   fill: #151a3d;
@@ -111,27 +106,8 @@
 
 /* ------------------------------------------------------------------ socket */
 
-.socketFace {
-  fill: rgba(255, 255, 255, 0.025);
-}
-
-.socketRing {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.3);
-  stroke-width: 1.5;
-  stroke-dasharray: 6 7;
-  animation: march 1.6s linear infinite;
-  transition: stroke 0.35s ease;
-}
-
-.scene[data-docked] .socketRing {
-  stroke: var(--green);
-  stroke-dasharray: 1000 0;
-  animation: none;
-}
-
 .socketGlow {
-  opacity: 0.35;
+  opacity: 0;
   transition: opacity 0.8s ease;
 }
 
@@ -178,14 +154,34 @@
 
 /* -------------------------------------------------------------------- hero */
 
+/* Two legs on one path: a long decelerating glide into the hover point,
+   then a short ease-in-out drop onto the socket. Retargeting the same
+   transition keeps the motion continuous between the legs. */
 .hero {
   offset-rotate: 0deg;
   offset-distance: 0%;
-  transition: offset-distance var(--flight) cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: offset-distance var(--glide) cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 .scene[data-flying] .hero {
+  offset-distance: var(--hover);
+}
+
+.scene[data-descend] .hero {
   offset-distance: 100%;
+  transition-duration: var(--drop);
+  transition-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+/* Gentle bob while hovering. Its period divides the hover + absorb beats so
+   it ends at rest as the descent begins. */
+.heroFloat {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.scene[data-hover]:not([data-descend]) .heroFloat {
+  animation: bob 1.1s ease-in-out infinite;
 }
 
 .heroBody {
@@ -208,15 +204,17 @@
   opacity: 1;
 }
 
-.scene[data-approach] .trail {
+.scene[data-hover] .trail {
   opacity: 0;
 }
 
+/* The chips ride in with the hero, sit beside it through the hover, and
+   fold into it before the descent. */
 .chip {
   transition:
-    transform 0.55s ease-in,
-    opacity 0.4s ease-in;
-  transition-delay: calc(var(--i) * 70ms);
+    transform 0.6s cubic-bezier(0.65, 0, 0.35, 1),
+    opacity 0.45s ease-in;
+  transition-delay: calc(var(--i) * 90ms);
 }
 
 .chipFace {
@@ -229,7 +227,7 @@
   fill: #bdf5df;
 }
 
-.scene[data-approach] .chip {
+.scene[data-absorb] .chip {
   transform: translate(var(--dx), var(--dy)) scale(0.3);
   opacity: 0;
 }
@@ -337,10 +335,6 @@
   transition-delay: 0s;
 }
 
-.scene[data-exit] .socketRing {
-  stroke: rgba(255, 255, 255, 0.3);
-}
-
 .scene[data-exit] .releaseIcon {
   color: rgba(255, 255, 255, 0.86);
   transition-delay: 0s;
@@ -353,12 +347,6 @@
 
 /* -------------------------------------------------------------- keyframes */
 
-@keyframes march {
-  to {
-    stroke-dashoffset: -26;
-  }
-}
-
 @keyframes burst {
   0% {
     transform: scale(0.7);
@@ -368,6 +356,17 @@
   100% {
     transform: scale(1.9);
     opacity: 0;
+  }
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
   }
 }
 
@@ -384,7 +383,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .socketRing,
+  .heroFloat,
   .amberRing,
   .burst,
   .bloom {
