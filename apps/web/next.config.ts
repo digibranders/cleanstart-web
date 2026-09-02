@@ -89,6 +89,14 @@ const nextConfig: NextConfig = {
         destination: "/industries/financial-services-container-security",
         permanent: true,
       },
+      // The operational-impact estimator launched at `/roi-calculator` and was
+      // renamed while still noindex,nofollow, so nothing is indexed under the
+      // old path. It is live in the client's review links, though, so 308 it.
+      {
+        source: "/roi-calculator",
+        destination: "/impact-estimator",
+        permanent: true,
+      },
       // Canonical detail routes are singular `/event/[slug]` and `/job/[slug]`
       // (matching the indexed Webflow URLs). The redesign also shipped plural
       // aliases that rendered the same content and self-canonicalled to

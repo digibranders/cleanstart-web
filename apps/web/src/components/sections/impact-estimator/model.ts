@@ -1,9 +1,9 @@
 /*
- * CleanStart Operational Impact model — the single source of truth for the
- * ROI calculator's math. Pure, deterministic, dependency-free so it can be unit
+ * CleanStart Operational Impact model: the single source of truth for the
+ * Impact Estimator page's math. Pure, deterministic, dependency-free so it can be unit
  * tested and reasoned about in isolation from the UI.
  *
- * Pipeline: four inputs → 1–4 weights → a blended Operational Burden Score →
+ * Pipeline: four inputs to 1 to 4 weights, to a blended Operational Burden Score, to
  * a Runtime Complexity tier → five interpolated operational outcomes.
  *
  * NAMING IS CLIENT-OWNED TOO. The outcome names surfaced in the UI (Vulnerability
@@ -17,7 +17,7 @@
  *
  * SCORING IS CLIENT-OWNED. Every band, weight and constant below is transcribed
  * from the client's `ROI 1.xlsx` §"Background Scoring & Logic" and must not be
- * "improved" without their sign-off — the same tables drive their sales
+ * "improved" without their sign-off; the same tables drive their sales
  * collateral, so any divergence makes the site and the deck disagree. An earlier
  * revision replaced the discrete image/team bands with a continuous log curve;
  * it read better on a slider but silently moved 13% of inputs into a different
@@ -33,9 +33,9 @@ export type ReleaseOption = "Monthly" | "Biweekly" | "Continuous";
 export type TierName = "Low" | "Moderate" | "High" | "Extreme";
 
 export interface RoiInput {
-  /** Production container images, 10–500. */
+  /** Production container images, 10 to 500. */
   images: number;
-  /** Engineering team size, 5–200. */
+  /** Engineering team size, 5 to 200. */
   team: number;
   remediation: RemediationOption;
   release: ReleaseOption;
@@ -53,9 +53,9 @@ interface TierBand {
 export interface RoiOutput {
   burden: number;
   tier: TierName;
-  /** "Burden Reduction" — share of the score removed, as a percentage. Sheet §2. */
+  /** "Burden Reduction": share of the score removed, as a percentage. Sheet §2. */
   burdenReduction: number;
-  /** 0–1 position of the score across the full 100–360 scale (for the meter). */
+  /** 0 to 1 position of the score across the full 100 to 360 scale (for the meter). */
   meterProgress: number;
   /** Per-input breakdown of what drives the burden score (for transparency UI). */
   contributions: BurdenContribution[];
@@ -76,7 +76,7 @@ export interface BurdenContribution {
   weightPct: number;
   /** This input's current level. */
   level: number;
-  /** Highest level this input can reach — 4 for counts, 3 for the two cadences. */
+  /** Highest level this input can reach: 4 for counts, 3 for the two cadences. */
   maxLevel: number;
   /** Points this input contributes to the burden score. */
   points: number;
@@ -88,14 +88,14 @@ const INPUT_RANGE = {
 } as const;
 
 /*
- * Client bands, verbatim from ROI 1.xlsx: images 0–25 / 26–100 / 101–250 /
- * 251–500 and team 1–10 / 11–50 / 51–100 / 100+. Stored as the inclusive upper
+ * Client bands, verbatim from ROI 1.xlsx: images 0 to 25 / 26 to 100 / 101 to 250 /
+ * 251 to 500 and team 1 to 10 / 11 to 50 / 51 to 100 / 100+. Stored as the inclusive upper
  * bound of each band except the last, so a value's weight is just how many
- * bounds it has passed, plus one — no sentinel band, no lookup table to keep in
+ * bounds it has passed, plus one: no sentinel band, no lookup table to keep in
  * step with the weights.
  *
  * The sheet writes the top team band as "100+" while the band below it is
- * "51–100"; the explicit range wins, so 100 scores 3 and 101 first scores 4.
+ * "51 to 100"; the explicit range wins, so 100 scores 3 and 101 first scores 4.
  */
 const IMAGE_THRESHOLDS: readonly number[] = [25, 100, 250];
 const TEAM_THRESHOLDS: readonly number[] = [10, 50, 100];
@@ -132,7 +132,7 @@ const TIERS: readonly Tier[] = [TIER_LOW, TIER_MODERATE, TIER_HIGH, TIER_EXTREME
 
 /*
  * Counts reach 4; the two cadences only offer three settings, so they top out
- * at 3. That asymmetry is what makes the scale 100–360 rather than 100–400.
+ * at 3. That asymmetry is what makes the scale 100 to 360 rather than 100 to 400.
  */
 const MAX_COUNT_LEVEL = 4;
 const MAX_CADENCE_LEVEL = 3;
@@ -153,7 +153,7 @@ function lerp(lo: number, hi: number, t: number): number {
  *
  * Two things to know before touching this. Its cut points sit exactly 30 above
  * the tier boundaries (150/250/350 against 120/220/320), which makes this figure
- * disagree with the gauge at four reachable scores — a burden of 140 reads
+ * disagree with the gauge at four reachable scores: a burden of 140 reads
  * "Moderate" but reports the Low-tier reduction. Kept as written pending the
  * client's confirmation that the offset is deliberate.
  *
@@ -240,7 +240,7 @@ export function computeImpact(input: RoiInput): RoiOutput {
  * reordering these is purely presentational and cannot move a score.
  * model.test.ts pins this display order and the sheet's scoring order apart.
  */
-export const REMEDIATION_OPTIONS: readonly RemediationOption[] = ["Weekly", "Monthly", "Quarterly"];
+export const REMEDIATION_OPTIONS: readonly RemediationOption[] = ["Quarterly", "Monthly", "Weekly"];
 export const RELEASE_OPTIONS: readonly ReleaseOption[] = ["Monthly", "Biweekly", "Continuous"];
 export const TIER_NAMES: readonly TierName[] = ["Low", "Moderate", "High", "Extreme"];
 export const INPUT_BOUNDS = INPUT_RANGE;

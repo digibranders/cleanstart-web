@@ -5822,7 +5822,7 @@ body {
   }
 }
 
-/* Estimate Your Outcome page: "compounding chain" (OutcomeHowItWorks). Metro-line on desktop,
+/* Impact Estimator page: "compounding chain" (ImpactHowItWorks). Metro-line on desktop,
    vertical timeline on mobile. Tier-coloured stations with a growing severity
    meter. Pseudo-elements + keyframes live here; motion is reduced-motion aware. */
 .cs-chain {

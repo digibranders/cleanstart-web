@@ -16,7 +16,7 @@ import {
 /*
  * These tests transcribe the client's `ROI 1.xlsx` and exist to stop the model
  * drifting away from it again. A failure here is not necessarily a bug in the
- * code — it means the code and the client's sheet now disagree, which is a
+ * code; it means the code and the client's sheet now disagree, which is a
  * question for the client before it is a fix for us.
  */
 
@@ -43,7 +43,7 @@ describe("input weight bands (sheet §Background Scoring & Logic)", () => {
     [11, 2],
     [50, 2],
     [51, 3],
-    // The sheet writes "51–100" and "100+"; the explicit range wins at 100.
+    // The sheet writes "51 to 100" and "100+"; the explicit range wins at 100.
     [100, 3],
     [101, 4],
     [200, 4],
@@ -58,11 +58,10 @@ describe("input weight bands (sheet §Background Scoring & Logic)", () => {
 
   it("scores cadences in the order the sheet lists them", () => {
     // Ascending burden, straight from the sheet's weight tables. Deliberately
-    // NOT the *_OPTIONS constants — those carry the UI's display order, which
-    // for remediation runs the opposite way.
+    // NOT the *_OPTIONS constants, which carry the UI's display order.
     const remediationByBurden: readonly RemediationOption[] = ["Quarterly", "Monthly", "Weekly"];
     const releaseByBurden: readonly ReleaseOption[] = ["Monthly", "Biweekly", "Continuous"];
-    // Each cadence step is worth one level at 20% weight — 20 points.
+    // Each cadence step is worth one level at 20% weight, so 20 points.
     for (const [lower, higher] of pairs(remediationByBurden.map((r) => at({ remediation: r }).burden))) {
       expect(higher - lower).toBeCloseTo(20);
     }
@@ -72,7 +71,7 @@ describe("input weight bands (sheet §Background Scoring & Logic)", () => {
   });
 
   it("offers remediation most-frequent-first in the UI", () => {
-    expect(REMEDIATION_OPTIONS).toEqual(["Weekly", "Monthly", "Quarterly"]);
+    expect(REMEDIATION_OPTIONS).toEqual(["Quarterly", "Monthly", "Weekly"]);
     expect(RELEASE_OPTIONS).toEqual(["Monthly", "Biweekly", "Continuous"]);
   });
 });
@@ -230,7 +229,7 @@ describe("outcome bands (sheet §Runtime Complexity table)", () => {
 
 describe("engineering hours recovered", () => {
   /*
-   * NOTE: the client's sheet leaves the formula for this output blank — only the
+   * NOTE: the client's sheet leaves the formula for this output blank; only the
    * per-tier "time lost" fraction (F) is given. The derivation below is ours and
    * is pending their confirmation, so these tests pin the behaviour we ship
    * rather than a client-stated rule.

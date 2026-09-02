@@ -212,7 +212,7 @@ Evidence: confirmed by direct fetch of the live homepage: zero `meta name="keywo
 - **Acceptance:**
   - Pages requiring snippet suppression return the correct `robots` meta directive in HTML source
   - No snippet text appears in a `site:` search for that URL
-- **Verify:** `curl -s https://www.cleanstart.com/roi-calculator | grep -o 'name="robots" content="[^"]*"'`
+- **Verify:** `curl -s https://www.cleanstart.com/impact-estimator | grep -o 'name="robots" content="[^"]*"'`
 - **Reference:** `apps/web/src/lib/seo/canonical.ts:161-177` (`robots` field construction — currently only expresses `noindex`/`nofollow`, no `nosnippet`/`max-snippet` param)
 - **Source:** [Tier 1] https://developers.google.com/search/docs/appearance/snippet ("Control your snippets"); [Tier 1] https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag (AI Overviews/AI Mode extension)
 - **Anti-patterns:** applying `nosnippet` site-wide by mistake (kills all organic snippets, hurting CTR); using `data-nosnippet` around content that should actually be searchable.

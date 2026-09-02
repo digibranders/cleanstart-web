@@ -115,8 +115,8 @@ export const NAV_TREE: NavItem[] = [
             icon: "minimize",
           },
           {
-            label: "ROI Calculator",
-            href: "/roi-calculator",
+            label: "Impact Estimator",
+            href: "/impact-estimator",
             description: "Estimate the operational impact of hardened images.",
             icon: "radar",
             built: false,

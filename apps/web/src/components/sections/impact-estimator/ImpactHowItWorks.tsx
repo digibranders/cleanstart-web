@@ -2,12 +2,12 @@ import type React from "react";
 import { Reveal } from "@/components/ui/Reveal";
 
 /*
- * "Why these numbers move together" — the input→output relationship rendered as
+ * "Why these numbers move together": the input-to-output relationship rendered as
  * a compounding chain (a metro-line on desktop, a vertical timeline on mobile).
  * Each station carries the calculator's own tier colour and a severity meter
  * that grows link-by-link, so the eye *sees* the burden amplify. A "CleanStart
  * cuts here" marker severs the spine after the first link; the dark banner below
- * is the payoff. Server component — motion is CSS-only and reduced-motion aware.
+ * is the payoff. Server component; motion is CSS-only and reduced-motion aware.
  */
 
 interface ChainLink {
@@ -15,7 +15,7 @@ interface ChainLink {
   title: string;
   body: string;
   load: string;
-  /** severity-meter fill, 0–100 */
+  /** severity-meter fill, 0 to 100 */
   pct: number;
   /** dot gradient stops */
   dot: [string, string];
@@ -32,16 +32,16 @@ const C4 = "#6b2ec9";
 const C5 = "#8b1fc3";
 
 const CHAIN: ChainLink[] = [
-  { n: 1, title: "More production images", body: "Every image inherits its base-OS packages — and their CVEs.", load: "Low", pct: 16, dot: ["#43d0f2", C1], fill: C1, seg: [C1, C2] },
+  { n: 1, title: "Inherited base-OS packages", body: "Every production image carries its base image's packages, and their CVEs.", load: "Low", pct: 16, dot: ["#43d0f2", C1], fill: C1, seg: [C1, C2] },
   { n: 2, title: "Higher runtime complexity", body: "More surfaces to scan, patch, and keep compliant.", load: "Rising", pct: 36, dot: ["#5678ff", C2], fill: C2, seg: [C2, C3] },
   { n: 3, title: "More vulnerability noise", body: "Scanners surface thousands of findings, most low-signal.", load: "High", pct: 58, dot: ["#5a35d6", C3], fill: C3, seg: [C3, C4] },
   { n: 4, title: "Longer patch cycles", body: "Teams rebuild, re-test, and redeploy on every fix.", load: "Severe", pct: 79, dot: ["#7e3bd8", C4], fill: C4, seg: [C4, C5] },
   { n: 5, title: "Engineering hours lost", body: "Toil that scales with your image and team count.", load: "Peak", pct: 100, dot: ["#a233d6", C5], fill: "linear-gradient(90deg,#8b1fc3,#c026d3)", seg: [C5, C5] },
 ];
 
-export function RoiHowItWorks(): React.ReactElement {
+export function ImpactHowItWorks(): React.ReactElement {
   return (
-    <section data-section="RoiHowItWorks" aria-labelledby="roi-how-heading" className="relative" style={{ background: "#ffffff" }}>
+    <section data-section="ImpactHowItWorks" aria-labelledby="impact-how-heading" className="relative" style={{ background: "#ffffff" }}>
       {/* pb = --spacing-section-cta so the Footer's floating CTA card (which
           hangs half above the footer's top edge, per Footer.tsx §layout-contract)
           overlaps this section's own white background instead of colliding with
@@ -49,13 +49,13 @@ export function RoiHowItWorks(): React.ReactElement {
       <div className="mx-auto max-w-[var(--container-default)] px-6 sm:px-10 pt-section-md pb-[var(--spacing-section-cta)]">
         <div className="text-center" style={{ marginBottom: "clamp(36px,4vw,52px)" }}>
           <Reveal header>
-            <h2 id="roi-how-heading" style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h2)", fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 1.1, color: "#111" }}>
+            <h2 id="impact-how-heading" style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h2)", fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 1.1, color: "#111" }}>
               Why these numbers <span className="cs-text-gradient-impact">move together</span>
             </h2>
           </Reveal>
           <Reveal>
             <p style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-lead-sm)", color: "#3a3f4c", lineHeight: 1.5, maxWidth: "60ch", margin: "16px auto 0" }}>
-              Inherited vulnerabilities compound down a predictable chain. Each link amplifies the next — which is exactly where the burden comes from.
+              Inherited vulnerabilities compound down a predictable chain. Each link amplifies the next, which is exactly where the burden comes from.
             </p>
           </Reveal>
         </div>
@@ -89,7 +89,7 @@ export function RoiHowItWorks(): React.ReactElement {
               ))}
             </ol>
 
-            {/* cut marker — desktop only, between links 1 and 2 */}
+            {/* cut marker, desktop only, between links 1 and 2 */}
             <div className="cs-chain-cut" aria-hidden>
               <span className="cs-chain-sc">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C1} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -123,7 +123,7 @@ export function RoiHowItWorks(): React.ReactElement {
                 Cut the first link, and every number after it improves
               </h3>
               <p style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-body)", color: "rgba(255,255,255,0.8)", lineHeight: 1.55, marginTop: "8px", maxWidth: "78ch" }}>
-                Minimal, hardened images inherit far fewer CVEs at the source — so there is less to triage, patch, and re-test all the way downstream.
+                Minimal, hardened images inherit far fewer CVEs at the source, so there is less to triage, patch, and re-test all the way downstream.
               </p>
             </div>
           </div>

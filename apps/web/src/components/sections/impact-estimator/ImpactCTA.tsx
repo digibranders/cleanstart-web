@@ -2,11 +2,11 @@ import type React from "react";
 import Link from "next/link";
 
 /*
- * Page-end CTA — paints inside the Footer's card slot (geometry owned by
+ * Page-end CTA. Paints inside the Footer's card slot (geometry owned by
  * Footer.tsx). Mirrors the CisoCTA recipe: white card, soft brand glows, a
  * mobile absolute layout and a desktop flex layout.
  */
-export function RoiCTA(): React.ReactElement {
+export function ImpactCTA(): React.ReactElement {
   return (
     <div className="relative w-full h-full overflow-hidden" style={{ background: "#ffffff" }}>
       <div
@@ -26,7 +26,7 @@ export function RoiCTA(): React.ReactElement {
           See it on your own runtime
         </p>
         <p className="absolute text-center" style={{ top: "150px", left: "50%", transform: "translateX(-50%)", width: "270px", fontFamily: "var(--font-sans)", fontSize: "var(--cta-card-desc)", fontWeight: 400, lineHeight: 1.4, letterSpacing: "-0.02em", color: "rgba(17,17,17,0.8)" }}>
-          The numbers above are modelled. Let&rsquo;s measure the real reduction against your images.
+          The numbers above are modeled. Let&rsquo;s measure the real reduction against your images.
         </p>
         <div className="absolute" style={{ top: "262px", left: "50%", transform: "translateX(-50%)" }}>
           <Link href="/book-a-demo" className="cs-btn-blue" style={{ ["--cs-btn-px" as string]: "24px", ["--cs-btn-fs" as string]: "16px", ["--cs-btn-h" as string]: "44px", whiteSpace: "nowrap" }}>
@@ -42,7 +42,7 @@ export function RoiCTA(): React.ReactElement {
         </p>
         <div className="relative flex flex-col" style={{ maxWidth: "min(540px, 100%)", gap: "clamp(16px, 1.25vw, 24px)" }}>
           <p style={{ fontFamily: "var(--font-sans)", fontSize: "var(--cta-card-desc)", fontWeight: 400, letterSpacing: "-0.02em", lineHeight: 1.4, color: "rgba(17,17,17,0.8)", textWrap: "balance" }}>
-            The numbers above are modelled from your inputs. Let&rsquo;s measure the real vulnerability, patch, and footprint reduction against your actual images.
+            The numbers above are modeled from your inputs. Let&rsquo;s measure the real vulnerability, patch, and footprint reduction against your actual images.
           </p>
           <Link href="/book-a-demo" className="cs-btn-blue self-start" style={{ ["--cs-btn-px" as string]: "18px", ["--cs-btn-fs" as string]: "18px" }}>
             <span>Book a demo</span>

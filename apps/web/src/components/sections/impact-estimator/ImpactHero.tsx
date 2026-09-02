@@ -2,15 +2,15 @@ import type React from "react";
 import { HeroReveal } from "@/components/ui/Reveal";
 
 /*
- * ROI calculator hero — LIGHT band. A soft brand-gradient wash plus a faint
+ * Impact Estimator hero, LIGHT band. A soft brand-gradient wash plus a faint
  * grid motif sit on white, keeping the premium look without the site's usual
  * dark hero. Eyebrow + headline (gradient accent word) + lead. Above the fold,
  * so it uses HeroReveal rather than FadeUp.
  */
-export function RoiHero(): React.ReactElement {
+export function ImpactHero(): React.ReactElement {
   return (
     <section
-      data-section="RoiHero"
+      data-section="ImpactHero"
       className="relative overflow-hidden"
       style={{ background: "#ffffff" }}
     >
@@ -49,6 +49,22 @@ export function RoiHero(): React.ReactElement {
           paddingBottom: "clamp(32px, 4vw, 56px)",
         }}
       >
+        <HeroReveal y={30} duration={0.8}>
+          <p
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--fs-eyebrow)",
+              fontWeight: 600,
+              letterSpacing: "var(--fs-eyebrow-ls)",
+              textTransform: "uppercase",
+              color: "#3960F9",
+              marginBottom: "16px",
+            }}
+          >
+            Impact Estimator
+          </p>
+        </HeroReveal>
+
         <HeroReveal y={50} duration={1.0} lcp>
           <h1
             style={{
@@ -79,7 +95,7 @@ export function RoiHero(): React.ReactElement {
             }}
           >
             Describe your setup and see what minimal, trusted container images
-            change — fewer vulnerabilities, faster releases, hours won back.
+            change: fewer vulnerabilities, faster releases, hours won back.
           </p>
         </HeroReveal>
       </div>
