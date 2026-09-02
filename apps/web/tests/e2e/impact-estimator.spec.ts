@@ -25,11 +25,6 @@ test.describe("impact estimator @phase-web-impact-estimator", () => {
     await expect(page.getByRole("slider", { name: "Engineering team size" })).toHaveValue("120");
     await expect(page.getByRole("button", { name: "Weekly", pressed: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Continuous", pressed: true })).toBeVisible();
-
-    await expect(page.locator('[data-section="ImpactSimulator"] a[href^="/book-a-demo"]')).toHaveAttribute(
-      "href",
-      "/book-a-demo?images=400&team=120&remediation=Weekly&release=Continuous",
-    );
   });
 
   test("mirrors a control change into the address bar", async ({ page }) => {

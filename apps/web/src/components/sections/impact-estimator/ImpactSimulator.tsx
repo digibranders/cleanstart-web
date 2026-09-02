@@ -3,7 +3,7 @@
 /*
  * The interactive centrepiece of /impact-estimator. A four-part narrative:
  *   Your environment (inputs) → Operational Burden Score (gauge)
- *   → Expected improvements (KPIs) → Engineering Hours Recovered (+ actions)
+ *   → Expected improvements (KPIs) → Engineering Hours Recovered
  * Numbers tween smoothly; technical terms carry accessible tooltips. Math and
  * the client-owned naming both live in ./model.ts; the shareable-link state
  * lives in ./url-state.ts. Inputs stay sticky beside the results on desktop;
@@ -15,7 +15,6 @@
  */
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import Link from "next/link";
 import { useReducedMotion } from "motion/react";
 import { copyText } from "@/lib/clipboard";
 import {
@@ -341,8 +340,8 @@ function Segmented<T extends string>({ label, tip, options, value, onChange }: {
   );
 }
 
-/* ── result actions: take the numbers somewhere ── */
-function ResultActions({ input }: { input: RoiInput }): React.ReactElement {
+/* ── copy link: the four inputs travel in the URL, nothing else ── */
+function CopyResultsLink({ input }: { input: RoiInput }): React.ReactElement {
   const [copied, setCopied] = useState(false);
   const timer = useRef(0);
   useEffect(() => () => window.clearTimeout(timer.current), []);
@@ -357,26 +356,22 @@ function ResultActions({ input }: { input: RoiInput }): React.ReactElement {
   }, [search]);
 
   return (
-    <div className="relative" style={{ marginTop: "22px", paddingTop: "20px", borderTop: "1px solid rgba(255,255,255,0.14)" }}>
-      <div className="flex flex-wrap items-center" style={{ gap: "10px 12px" }}>
-        <Link href={`/book-a-demo${search}`} className="cs-btn-blue" style={{ ["--cs-btn-fs" as string]: "15px", ["--cs-btn-px" as string]: "20px" }}>
-          Book a demo with these numbers
-        </Link>
-        <button type="button" onClick={() => void copyLink()} className="cs-btn-ghost" style={{ ["--cs-btn-fs" as string]: "15px" }}>
-          <span aria-hidden style={{ display: "inline-flex" }}>
-            {copied ? (
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
-            ) : (
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.5 1.5" /><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.5-1.5" /></svg>
-            )}
-          </span>
-          <span aria-live="polite">{copied ? "Link copied" : "Copy link to results"}</span>
-        </button>
-      </div>
-      <p style={{ fontFamily: "var(--font-sans)", fontSize: "12px", color: "rgba(255,255,255,0.6)", lineHeight: 1.5, marginTop: "12px", maxWidth: "60ch" }}>
-        The link carries only these four inputs, so a teammate opens the same result. Nothing else is stored.
-      </p>
-    </div>
+    <button
+      type="button"
+      onClick={() => void copyLink()}
+      title="The link carries only these four inputs, so a teammate opens the same result."
+      className="cs-btn-blue flex-none"
+      style={{ gap: "8px", ["--cs-btn-h" as string]: "40px", ["--cs-btn-fs" as string]: "14px", ["--cs-btn-px" as string]: "16px" }}
+    >
+      <span aria-hidden style={{ display: "inline-flex" }}>
+        {copied ? (
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+        ) : (
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.5 1.5" /><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.5-1.5" /></svg>
+        )}
+      </span>
+      <span aria-live="polite">{copied ? "Link copied" : "Copy link to results"}</span>
+    </button>
   );
 }
 
@@ -600,7 +595,7 @@ export function ImpactSimulator(): React.ReactElement {
               })}
             </div>
 
-            {/* recovered engineering capacity, then what to do with it */}
+            {/* recovered engineering capacity */}
             <div className="impact-card relative overflow-hidden" style={{ borderRadius: "var(--radius-cs-card)", padding: "clamp(22px,2vw,28px)", background: "linear-gradient(120deg, #151021 0%, #1c1a63 55%, #3b1f9e 100%)", boxShadow: "0 10px 30px -12px rgba(30,20,120,0.5)" }}>
               <div aria-hidden className="pointer-events-none absolute" style={{ right: "-60px", bottom: "-80px", width: "300px", height: "300px", borderRadius: "50%", background: "radial-gradient(closest-side, rgba(44,193,235,0.28), transparent)" }} />
               <div className="relative flex flex-wrap items-end justify-between" style={{ gap: "20px 24px" }}>
@@ -630,14 +625,17 @@ export function ImpactSimulator(): React.ReactElement {
                   ))}
                 </div>
               </div>
-              <ResultActions input={input} />
             </div>
 
-            {/* trust line */}
-            <p className="inline-flex items-start" style={{ fontFamily: "var(--font-sans)", fontSize: "12.5px", color: MUTED, lineHeight: 1.55, marginTop: "2px" }}>
-              Estimated outcomes, modeled from industry benchmarks and organizations with similar runtime profiles. Directional, not a guarantee.
-              <InfoTip label="how these estimates work" text="We don't scan your systems. These ranges reflect typical results for environments with a comparable burden profile. Book a demo to measure your actual images." />
-            </p>
+            {/* trust line, with the share action beside it rather than inside the hours card */}
+            {/* Text left, action right on every width from sm up; only phones stack. */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between" style={{ gap: "12px 20px", marginTop: "2px" }}>
+              <p className="inline-flex items-start sm:flex-1 min-w-0" style={{ fontFamily: "var(--font-sans)", fontSize: "12.5px", color: MUTED, lineHeight: 1.55 }}>
+                Estimated outcomes, modeled from industry benchmarks and organizations with similar runtime profiles. Directional, not a guarantee.
+                <InfoTip label="how these estimates work" text="We don't scan your systems. These ranges reflect typical results for environments with a comparable burden profile. Book a demo to measure your actual images." />
+              </p>
+              <CopyResultsLink input={input} />
+            </div>
           </div>
         </div>
       </div>
