@@ -1566,6 +1566,12 @@ body {
 .cs-hh-hardened {
   position: relative;
   display: inline-block;
+  /* One step lighter than the H1's 600 (Manrope 500 is already loaded, so this
+     costs no extra font payload on the LCP heading). The rejected term reads
+     as subordinate to the "Verified"/"Secure." claims that keep the full
+     weight. Manrope has no true italic, so no font-style here — a synthesised
+     oblique shears badly at display sizes. */
+  font-weight: 500;
 }
 
 .cs-hh-hardened::after {
@@ -1574,7 +1580,8 @@ body {
   left: -2%;
   right: -2%;
   top: 50%;
-  height: 3px;
+  /* 2px, not 3px: balanced against the lighter 500-weight letterforms. */
+  height: 2px;
   background: #e2726c;
   border-radius: 2px;
   transform-origin: left center;
