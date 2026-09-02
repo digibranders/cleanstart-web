@@ -144,8 +144,8 @@ export function SaasHero(): React.ReactElement {
                   naturally the break landed mid-clause — "Move Faster. Security"
                   on one line — which destroys the parallel the headline is built
                   on. Same treatment FinanceStack's heading uses; not a <br>. */}
-              <span className="block">Modern Applications Move Faster.</span>
-              <span className="block cs-text-gradient-impact">Security Must Keep Up.</span>
+              <span className="block">Applications Move Faster.</span>
+              <span className="block cs-text-gradient-impact">Security Must Be Smarter.</span>
             </h1>
           </HeroReveal>
 
