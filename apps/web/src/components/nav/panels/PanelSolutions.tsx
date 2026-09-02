@@ -59,29 +59,16 @@ export function PanelSolutions({ item }: Props) {
       atmosphere={ATMOSPHERE}
     >
       <div className="grid grid-cols-3 gap-3">
-        {/* Col 1: Capability stacked above Compliance */}
-        <div className="flex flex-col gap-3">
+        {/* Cols 1 and 2 share one grid so the two rows of groups line up:
+            Capability beside By role, one divider across both, then
+            Compliance beside By industry. Two independent stacks drifted as
+            soon as the groups had different item counts. */}
+        <div className="col-span-2 grid grid-cols-2 gap-x-3">
           {capability && <GroupColumn group={capability} />}
-          {compliance && (
-            <>
-              <div className="h-px bg-white/[0.05]" />
-              <GroupColumn group={compliance} />
-            </>
-          )}
-        </div>
-
-        {/* Col 2: By Role stacked above By Industry, on the same divider
-            grammar as Col 1. Col 2 held a single two-item group and ran short
-            against Col 1's five, so the second group lands where the panel
-            already had vertical room. */}
-        <div className="flex flex-col gap-3">
           {byRole && <GroupColumn group={byRole} />}
-          {byIndustry && (
-            <>
-              <div className="h-px bg-white/[0.05]" />
-              <GroupColumn group={byIndustry} />
-            </>
-          )}
+          <div className="col-span-2 my-3 h-px bg-white/[0.05]" />
+          {compliance && <GroupColumn group={compliance} />}
+          {byIndustry && <GroupColumn group={byIndustry} />}
         </div>
 
         {/* Col 3: FIPS featured tile */}
