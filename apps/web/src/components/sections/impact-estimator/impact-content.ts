@@ -1,7 +1,6 @@
 /*
- * Prose for the methodology and FAQ sections. Numbers that the scoring model
- * owns are not repeated here; the components read them from ./model so the
- * page cannot describe one formula while computing another.
+ * FAQ copy for the page. Answers describe the model in words only; the numbers
+ * live in ./model and are not repeated here.
  */
 
 export interface ImpactFaq {
@@ -9,30 +8,6 @@ export interface ImpactFaq {
   readonly question: string;
   readonly answer: string;
 }
-
-export const METHOD_HEADING = "How the estimate works";
-
-export const METHOD_INTRO =
-  "The estimator is a transparent scoring model, not a black box. Four facts about your runtime become a single burden score, the score places you in a Runtime Complexity tier, and each tier carries the outcome ranges typical for environments like yours.";
-
-export const METHOD_STEPS: ReadonlyArray<{ readonly title: string; readonly body: string }> = [
-  {
-    title: "Four signals are scored in bands",
-    body: "Production images and engineering team size each fall into one of four size bands. Remediation frequency and release cadence each take one of three levels. Each band or level becomes a score from 1 upward.",
-  },
-  {
-    title: "Weights turn the scores into one number",
-    body: "Production images carry the most weight because every image is a surface to patch, scan and secure. The weighted scores add up to your Operational Burden Score.",
-  },
-  {
-    title: "The score sets your tier",
-    body: "The scale runs from the lowest to the highest reachable score and is cut into four Runtime Complexity tiers. Crossing a tier edge is what moves the headline figures.",
-  },
-  {
-    title: "The tier carries the outcome ranges",
-    body: "Each tier has a published range for every outcome. Sitting deeper in a tier reports proportionally stronger results within that range. Hours recovered multiply the share of a working year lost to vulnerability toil by your Vulnerability Noise Reduction and your team size.",
-  },
-];
 
 export const FAQ_HEADING = "Questions about the estimate";
 

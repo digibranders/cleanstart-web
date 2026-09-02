@@ -5,7 +5,6 @@ import { FadeUp } from "@/components/ui/FadeUp";
 import { ImpactHero } from "@/components/sections/impact-estimator/ImpactHero";
 import { ImpactSimulator } from "@/components/sections/impact-estimator/ImpactSimulator";
 import { ImpactHowItWorks } from "@/components/sections/impact-estimator/ImpactHowItWorks";
-import { ImpactMethod } from "@/components/sections/impact-estimator/ImpactMethod";
 import { ImpactFAQ } from "@/components/sections/impact-estimator/ImpactFAQ";
 import { ImpactCTA } from "@/components/sections/impact-estimator/ImpactCTA";
 import { FAQS } from "@/components/sections/impact-estimator/impact-content";
@@ -45,9 +44,6 @@ export default async function ImpactEstimatorPage(): Promise<React.ReactElement>
         </FadeUp>
         <FadeUp>
           <ImpactHowItWorks />
-        </FadeUp>
-        <FadeUp>
-          <ImpactMethod />
         </FadeUp>
         <FadeUp>
           <ImpactFAQ />
