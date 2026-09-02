@@ -88,3 +88,37 @@ test.describe("impact estimator mobile summary @phase-web-impact-estimator", () 
     await expect(page.locator('[data-section="ImpactSimulator"] svg[role="img"]')).toBeInViewport();
   });
 });
+
+test.describe("impact estimator sticky inputs @phase-web-impact-estimator", () => {
+  test("keeps the inputs card pinned beside the results while the column scrolls", async ({ page, viewport }) => {
+    test.skip(!viewport || viewport.width < 1024, "inputs are only sticky from the lg breakpoint");
+    await page.goto(ROUTE);
+
+    const card = page.locator('[data-section="ImpactSimulator"] .lg\\:sticky');
+    const results = page.locator('[data-section="ImpactSimulator"] .lg\\:sticky + div');
+
+    // At rest both columns start on the same line.
+    const rest = await page.evaluate(() => {
+      const a = document.querySelector('[data-section="ImpactSimulator"] .lg\\:sticky');
+      const b = a?.nextElementSibling;
+      return a && b ? Math.round(a.getBoundingClientRect().top - b.getBoundingClientRect().top) : Number.NaN;
+    });
+    expect(rest).toBe(0);
+
+    // Bring the section under the header, then scroll a further 150px: the card
+    // pins at header + 24 while the results keep moving. 150px keeps the card
+    // inside its grid row, which is only as tall as the results column.
+    const headerH = await page.evaluate(() => Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--cs-header-h")));
+    await page.evaluate((h) => {
+      const section = document.querySelector('[data-section="ImpactSimulator"]');
+      if (section) window.scrollTo({ top: section.getBoundingClientRect().top + window.scrollY - h, behavior: "instant" });
+    }, headerH);
+    const before = await results.evaluate((el) => el.getBoundingClientRect().top);
+    await page.evaluate(() => window.scrollBy({ top: 150, behavior: "instant" }));
+    const cardTop = await card.evaluate((el) => el.getBoundingClientRect().top);
+    const after = await results.evaluate((el) => el.getBoundingClientRect().top);
+
+    expect(Math.round(cardTop)).toBe(Math.round(headerH + 24));
+    expect(Math.round(before - after)).toBe(150);
+  });
+});

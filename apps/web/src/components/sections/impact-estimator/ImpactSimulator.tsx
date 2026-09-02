@@ -2,7 +2,7 @@
 
 /*
  * The interactive centrepiece of /impact-estimator. A four-part narrative:
- *   Your environment (inputs) → Operational Burden Score (gauge + breakdown)
+ *   Your environment (inputs) → Operational Burden Score (gauge)
  *   → Expected improvements (KPIs) → Engineering Hours Recovered (+ actions)
  * Numbers tween smoothly; technical terms carry accessible tooltips. Math and
  * the client-owned naming both live in ./model.ts; the shareable-link state
@@ -28,7 +28,6 @@ import {
   RELEASE_OPTIONS,
   TEAM_WEIGHT_THRESHOLDS,
   TIER_NAMES,
-  type BurdenContribution,
   type RoiInput,
   type TierName,
 } from "./model";
@@ -159,7 +158,7 @@ function RadialGauge({ progress, tier, burden }: { progress: number; tier: TierN
   });
 
   return (
-    <div className="w-full" style={{ maxWidth: `${GAUGE.w}px` }}>
+    <div className="w-full" style={{ maxWidth: "208px" }}>
       <div className="relative">
         <svg viewBox={`0 0 ${GAUGE.w} 128`} width="100%" role="img" aria-label={`Operational Burden Score ${Math.round(burden)} of ${BURDEN_SCALE.max}, Runtime Complexity ${tier}.`}>
           <defs>
@@ -189,7 +188,7 @@ function RadialGauge({ progress, tier, burden }: { progress: number; tier: TierN
           <circle cx={cx} cy={cy} r="2.4" fill="#fff" />
         </svg>
         <div className="absolute text-center" style={{ left: "50%", top: "60%", transform: "translate(-50%,-50%)" }}>
-          <div style={{ fontFamily: "var(--font-display)", fontSize: "34px", fontWeight: 700, letterSpacing: "-0.03em", color: INK, lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{Math.round(burden)}</div>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: "30px", fontWeight: 700, letterSpacing: "-0.03em", color: INK, lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{Math.round(burden)}</div>
           <div style={{ fontFamily: "var(--font-sans)", fontSize: "11px", fontWeight: 500, color: MUTED, marginTop: "2px" }}>of {BURDEN_SCALE.max}</div>
         </div>
       </div>
@@ -270,7 +269,7 @@ function Slider({ label, tip, value, min, max, step, onChange, context, ticks }:
 }): React.ReactElement {
   const pct = ((value - min) / (max - min)) * 100;
   return (
-    <div style={{ marginBottom: "24px" }}>
+    <div style={{ marginBottom: "20px" }}>
       <div className="flex items-baseline justify-between" style={{ marginBottom: "10px" }}>
         <span className="inline-flex items-center" style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-body-sm)", fontWeight: 600, color: INK, letterSpacing: "-0.01em" }}>
           {label}
@@ -316,7 +315,7 @@ function Segmented<T extends string>({ label, tip, options, value, onChange }: {
   label: string; tip: string; options: readonly T[]; value: T; onChange: (v: T) => void;
 }): React.ReactElement {
   return (
-    <div style={{ marginBottom: "24px" }}>
+    <div style={{ marginBottom: "20px" }}>
       <span className="inline-flex items-center" style={{ fontFamily: "var(--font-sans)", fontSize: "var(--fs-body-sm)", fontWeight: 600, color: INK, letterSpacing: "-0.01em", marginBottom: "10px" }}>
         {label}
         <InfoTip label={label} text={tip} />
@@ -338,44 +337,6 @@ function Segmented<T extends string>({ label, tip, options, value, onChange }: {
           );
         })}
       </fieldset>
-    </div>
-  );
-}
-
-/* ── score breakdown: which input contributes what to the burden score ── */
-const CONTRIBUTION_UI: ReadonlyArray<{ label: string; color: string }> = [
-  { label: "Production images", color: "#471ec0" },
-  { label: "Team size", color: "#3960F9" },
-  { label: "Remediation frequency", color: "#2cc1eb" },
-  { label: "Release cadence", color: "#8b1fc3" },
-];
-
-function ScoreBreakdown({ contributions, burden }: { contributions: readonly BurdenContribution[]; burden: number }): React.ReactElement {
-  const rows = contributions.flatMap((c, i) => {
-    const ui = CONTRIBUTION_UI[i];
-    return ui ? [{ ...c, ...ui }] : [];
-  });
-  const summary = rows.map((r) => `${r.label} ${Math.round(r.points)}`).join(", ");
-  return (
-    <div style={{ marginTop: "18px", paddingTop: "16px", borderTop: "1px solid rgba(17,17,17,0.06)" }}>
-      <div className="flex items-baseline justify-between" style={{ gap: "12px" }}>
-        <span style={{ fontFamily: "var(--font-sans)", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: MUTED }}>What drives your score</span>
-        <span style={{ fontFamily: "var(--font-sans)", fontSize: "12px", color: MUTED, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{Math.round(burden)} of {BURDEN_SCALE.max} points</span>
-      </div>
-      <div className="flex" role="img" aria-label={`Score breakdown: ${summary}.`} style={{ height: "8px", borderRadius: "999px", background: "rgba(17,17,17,0.06)", overflow: "hidden", marginTop: "10px", gap: "2px" }}>
-        {rows.map((r) => (
-          <div key={r.label} style={{ width: `${(r.points / BURDEN_SCALE.max) * 100}%`, background: r.color, borderRadius: "999px", transition: "width .3s cubic-bezier(.2,.7,.3,1)" }} />
-        ))}
-      </div>
-      <ul className="flex flex-wrap" style={{ listStyle: "none", padding: 0, margin: "10px 0 0", gap: "6px 16px" }}>
-        {rows.map((r) => (
-          <li key={r.label} className="inline-flex items-center" style={{ gap: "6px", fontFamily: "var(--font-sans)", fontSize: "12px", color: SUB }} title={`${r.weightPct}% of the score. Level ${r.level} of ${r.maxLevel}.`}>
-            <span aria-hidden style={{ width: "8px", height: "8px", borderRadius: "50%", background: r.color, flex: "none" }} />
-            {r.label}
-            <b style={{ color: INK, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{Math.round(r.points)}</b>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }
@@ -533,9 +494,14 @@ export function ImpactSimulator(): React.ReactElement {
   // by 40 gives the weeks it spans.
   const hoursPerWeek = out.hoursPerEngineer / (ANNUAL_ENG_HOURS / 40);
 
+  // No overflow-hidden on the section: an overflow-clipping ancestor turns
+  // position: sticky off, and the inputs card relies on it. The decorative blob
+  // is clipped inside its own absolutely positioned layer instead.
   return (
-    <section data-section="ImpactSimulator" aria-label="Operational impact simulator" className="relative overflow-hidden" style={{ background: "#F6F6F6" }}>
-      <div aria-hidden className="pointer-events-none select-none absolute hidden lg:block" style={{ right: "-160px", top: "-120px", width: "480px", height: "480px", borderRadius: "50%", background: "radial-gradient(closest-side, rgba(71,30,192,0.10), rgba(255,255,255,0))" }} />
+    <section data-section="ImpactSimulator" aria-label="Operational impact simulator" className="relative" style={{ background: "#F6F6F6" }}>
+      <div aria-hidden className="pointer-events-none select-none absolute inset-0 overflow-hidden hidden lg:block">
+        <div className="absolute" style={{ right: "-160px", top: "-120px", width: "480px", height: "480px", borderRadius: "50%", background: "radial-gradient(closest-side, rgba(71,30,192,0.10), rgba(255,255,255,0))" }} />
+      </div>
 
       <style>{`
         .impact-slider{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:999px;outline:none;cursor:pointer;
@@ -554,7 +520,7 @@ export function ImpactSimulator(): React.ReactElement {
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10 py-section-md">
         <div className="grid grid-cols-1 gap-6 lg:gap-7 lg:grid-cols-[minmax(0,370px)_minmax(0,1fr)] lg:items-start">
           {/* ── inputs: sticky beside the results on desktop ── */}
-          <div ref={inputsRef} className="lg:sticky" style={{ top: "calc(var(--cs-header-h) + 24px)", background: "#ffffff", borderRadius: "var(--radius-cs-card)", border: "1px solid rgba(17,17,17,0.07)", boxShadow: "0 2px 10px -4px rgba(17,17,17,0.08)", padding: "clamp(24px,2vw,32px)" }}>
+          <div ref={inputsRef} className="lg:sticky" style={{ top: "calc(var(--cs-header-h) + 24px)", background: "#ffffff", borderRadius: "var(--radius-cs-card)", border: "1px solid rgba(17,17,17,0.07)", boxShadow: "0 2px 10px -4px rgba(17,17,17,0.08)", padding: "clamp(22px,1.8vw,28px)" }}>
             <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h4)", fontWeight: 600, color: INK, letterSpacing: "-0.02em" }}>Your environment</h3>
             <p style={{ fontFamily: "var(--font-sans)", fontSize: "13px", color: MUTED, marginTop: "4px", marginBottom: "24px" }}>Four signals describe your runtime.</p>
 
@@ -575,13 +541,13 @@ export function ImpactSimulator(): React.ReactElement {
           {/* ── results narrative ── */}
           <div ref={resultsRef} className="flex flex-col gap-5" style={{ scrollMarginTop: "calc(var(--cs-header-h) + 16px)" }}>
             {/* operational burden: gauge, tier, reduction, breakdown */}
-            <div className="impact-card" style={{ background: "#ffffff", borderRadius: "var(--radius-cs-card)", border: "1px solid rgba(17,17,17,0.07)", boxShadow: "0 2px 10px -4px rgba(17,17,17,0.08)", padding: "clamp(22px,2vw,30px)" }}>
-              <div className="grid items-center gap-6 grid-cols-1 sm:grid-cols-[minmax(200px,240px)_1fr]">
+            <div className="impact-card" style={{ background: "#ffffff", borderRadius: "var(--radius-cs-card)", border: "1px solid rgba(17,17,17,0.07)", boxShadow: "0 2px 10px -4px rgba(17,17,17,0.08)", padding: "clamp(20px,1.8vw,26px)" }}>
+              <div className="grid items-center gap-6 grid-cols-1 sm:grid-cols-[minmax(190px,216px)_1fr]">
                 <div ref={gaugeRef} className="flex justify-center">
                   <RadialGauge progress={meter} tier={out.tier} burden={burden} />
                 </div>
                 <div>
-                  <div style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h2)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.05 }}>
+                  <div style={{ fontFamily: "var(--font-display)", fontSize: "var(--fs-h3)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.05 }}>
                     <span className="cs-text-gradient-impact">{out.tier}</span>
                     <span style={{ fontFamily: "var(--font-sans)", fontSize: "13px", fontWeight: 600, color: MUTED, marginLeft: "10px", verticalAlign: "middle", letterSpacing: 0 }}>Runtime Complexity</span>
                   </div>
@@ -590,7 +556,7 @@ export function ImpactSimulator(): React.ReactElement {
                   {/* Burden Reduction keys off the score, not the tier, so it
                       belongs beside the gauge rather than in the improvements grid. */}
                   <div className="inline-flex items-center" style={{ gap: "12px", marginTop: "14px", padding: "11px 16px", borderRadius: "12px", background: `${TIER_COLOR[out.tier]}12`, border: `1px solid ${TIER_COLOR[out.tier]}33` }}>
-                    <span style={{ fontFamily: "var(--font-display)", fontSize: "28px", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1, color: TIER_COLOR[out.tier], fontVariantNumeric: "tabular-nums" }}>
+                    <span style={{ fontFamily: "var(--font-display)", fontSize: "24px", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1, color: TIER_COLOR[out.tier], fontVariantNumeric: "tabular-nums" }}>
                       {Math.round(reduction)}%
                     </span>
                     {/* Plain span, NOT inline-flex: the label and its InfoTip have to
@@ -604,7 +570,6 @@ export function ImpactSimulator(): React.ReactElement {
                   </div>
                 </div>
               </div>
-              <ScoreBreakdown contributions={out.contributions} burden={burden} />
             </div>
 
             {/* expected improvements */}
@@ -616,7 +581,7 @@ export function ImpactSimulator(): React.ReactElement {
                   <div key={m.key} className="impact-card relative overflow-hidden flex flex-col h-full p-4 sm:px-5 sm:pt-[22px] sm:pb-5" style={{ background: "#ffffff", borderRadius: "var(--radius-cs-card)", border: "1px solid rgba(17,17,17,0.07)", boxShadow: "0 1px 3px rgba(17,17,17,0.05)" }}>
                     <div aria-hidden className="pointer-events-none absolute" style={{ right: "-30px", top: "-30px", width: "110px", height: "110px", borderRadius: "50%", background: `radial-gradient(closest-side, ${m.accent}1f, transparent)` }} />
                     <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "42px", height: "42px", borderRadius: "13px", background: `linear-gradient(135deg, ${m.accent}22, ${m.accent}10)`, color: m.accent, marginBottom: "16px" }}>{m.icon}</span>
-                    <div style={{ fontFamily: "var(--font-display)", fontSize: "clamp(26px,3.2vw,38px)", fontWeight: 700, lineHeight: 1, letterSpacing: "-0.03em", color: INK, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{d.value}</div>
+                    <div style={{ fontFamily: "var(--font-display)", fontSize: "clamp(24px,2.4vw,32px)", fontWeight: 700, lineHeight: 1, letterSpacing: "-0.03em", color: INK, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{d.value}</div>
                     <div style={{ fontFamily: "var(--font-sans)", fontSize: "14px", fontWeight: 600, color: INK, lineHeight: 1.3, marginTop: "10px", textWrap: "balance" }}>{m.title}</div>
                     <div style={{ fontFamily: "var(--font-sans)", fontSize: "12.5px", color: MUTED, lineHeight: 1.35, marginTop: "3px" }}>{m.sub}</div>
                     <div style={{ marginTop: "auto", paddingTop: "16px" }}>
@@ -636,7 +601,7 @@ export function ImpactSimulator(): React.ReactElement {
             </div>
 
             {/* recovered engineering capacity, then what to do with it */}
-            <div className="impact-card relative overflow-hidden" style={{ borderRadius: "var(--radius-cs-card)", padding: "clamp(24px,2.2vw,30px)", background: "linear-gradient(120deg, #151021 0%, #1c1a63 55%, #3b1f9e 100%)", boxShadow: "0 10px 30px -12px rgba(30,20,120,0.5)" }}>
+            <div className="impact-card relative overflow-hidden" style={{ borderRadius: "var(--radius-cs-card)", padding: "clamp(22px,2vw,28px)", background: "linear-gradient(120deg, #151021 0%, #1c1a63 55%, #3b1f9e 100%)", boxShadow: "0 10px 30px -12px rgba(30,20,120,0.5)" }}>
               <div aria-hidden className="pointer-events-none absolute" style={{ right: "-60px", bottom: "-80px", width: "300px", height: "300px", borderRadius: "50%", background: "radial-gradient(closest-side, rgba(44,193,235,0.28), transparent)" }} />
               <div className="relative flex flex-wrap items-end justify-between" style={{ gap: "20px 24px" }}>
                 <div style={{ minWidth: "220px" }}>
@@ -644,7 +609,7 @@ export function ImpactSimulator(): React.ReactElement {
                     <span style={{ color: "#2cc1eb" }}>{stroke("M12 7v5l3 2M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z")}</span>
                     Hours recovered per year
                   </span>
-                  <div style={{ fontFamily: "var(--font-display)", fontSize: "clamp(42px,5.4vw,64px)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1, color: "#fff", marginTop: "10px", fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>
+                  <div style={{ fontFamily: "var(--font-display)", fontSize: "clamp(36px,4vw,52px)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1, color: "#fff", marginTop: "10px", fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>
                     {Math.round(hours).toLocaleString("en-US")}
                   </div>
                   <p style={{ fontFamily: "var(--font-sans)", fontSize: "14px", color: "rgba(255,255,255,0.74)", lineHeight: 1.5, marginTop: "12px", maxWidth: "34ch" }}>
@@ -659,7 +624,7 @@ export function ImpactSimulator(): React.ReactElement {
                     { v: hoursPerWeek.toFixed(1), l: "hrs / engineer / wk" },
                   ].map((s, i) => (
                     <div key={s.l} className="flex flex-col" style={{ padding: i === 0 ? "2px 14px 2px 0" : "2px 14px", borderLeft: i === 0 ? "none" : "1px solid rgba(255,255,255,0.16)" }}>
-                      <span style={{ fontFamily: "var(--font-display)", fontSize: "clamp(20px,2vw,24px)", fontWeight: 700, color: "#fff", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>{s.v}</span>
+                      <span style={{ fontFamily: "var(--font-display)", fontSize: "clamp(18px,1.6vw,22px)", fontWeight: 700, color: "#fff", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>{s.v}</span>
                       <span style={{ fontFamily: "var(--font-sans)", fontSize: "11.5px", color: "rgba(255,255,255,0.6)", marginTop: "3px", lineHeight: 1.3 }}>{s.l}</span>
                     </div>
                   ))}
