@@ -1580,9 +1580,9 @@ body {
   left: -2%;
   right: -2%;
   top: 50%;
-  /* Sits just under the 500-weight stem width — reads as a deliberate
-     cross-out rather than a hairline, without outweighing the letterforms. */
-  height: 2.5px;
+  /* Whole-pixel height so the bar renders crisp rather than antialiasing
+     soft across rows (a 2.5px line reads no heavier than a 2px one). */
+  height: 3px;
   background: #e2726c;
   border-radius: 2px;
   transform-origin: left center;
