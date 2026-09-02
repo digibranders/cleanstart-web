@@ -15,7 +15,6 @@
  */
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import Link from "next/link";
 import { useReducedMotion } from "motion/react";
 import { copyText } from "@/lib/clipboard";
 import {
@@ -637,8 +636,6 @@ export function ImpactSimulator(): React.ReactElement {
               <p className="inline-flex items-start sm:flex-1 min-w-0" style={{ fontFamily: "var(--font-sans)", fontSize: "12.5px", color: MUTED, lineHeight: 1.55 }}>
                 Estimated outcomes, modeled from industry benchmarks and organizations with similar runtime profiles. Directional, not a guarantee.
                 <InfoTip label="how these estimates work" text="We don't scan your systems. These ranges reflect typical results for environments with a comparable burden profile. Book a demo to measure your actual images." />
-                {" "}
-                <Link href="/book-a-demo" style={{ color: ACCENT, fontWeight: 600, textDecoration: "underline", textUnderlineOffset: "2px", whiteSpace: "nowrap" }}>Measure your real images</Link>
               </p>
               <CopyResultsLink input={input} />
             </div>
