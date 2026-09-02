@@ -25,11 +25,11 @@ import { getPageGraph } from '@/lib/seo/compose-page';
  * Renamed from /saas, which never resolved in production (it returned 404
  * there, so no redirect is needed — unlike its sibling, which did resolve).
  *
- * Still noindex,nofollow and out of the sitemap pending copy approval, but it
- * now carries the same breadcrumb + JsonLdGraph pair and pageRegistry row as
+ * Launched: the noindex,nofollow pair is dropped, the path is listed in the
+ * sitemap's STATIC_ROUTES and the Solutions > By industry nav row is restored.
+ * It carries the same breadcrumb + JsonLdGraph pair and pageRegistry row as
  * its sibling, so it emits the full Organization + WebSite + WebPage +
- * BreadcrumbList graph. To launch: drop the two flags and add the path to the
- * sitemap's STATIC_ROUTES. Nothing else is outstanding.
+ * BreadcrumbList graph.
  *
  * The breadcrumb is Home > SaaS, with no Industries crumb, because /industries
  * has no page yet and the crumb would link to a 404.
@@ -46,8 +46,6 @@ export const metadata = buildPageMetadata({
     'Protect SaaS applications with hardened container images, near-zero CVEs, SBOMs, signed provenance, and continuous software supply chain visibility.',
   path: '/industries/saas-container-security',
   eyebrow: 'Solutions',
-  noindex: true,
-  nofollow: true,
 });
 
 export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
