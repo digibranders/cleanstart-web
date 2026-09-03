@@ -33,7 +33,9 @@ import { BandHeader, BRAND, Icon3D, VectorGrid, VendorMark } from "./compare-vis
  * here carry colour and type only.
  *
  * Wayfinding for twenty rows: the four group rows open as chapters (3D icon
- * plus label) and stick under the column head while their rows scroll. The
+ * plus label) and stick while their rows scroll, under the column head on
+ * desktop and under the site header on small screens, where the list runs to
+ * many times the viewport. The
  * head itself sticks flush to the site header rather than a few pixels below
  * it: that offset let rows scroll through the strip in between, which the
  * dark CleanStart column turned into a visible seam. a
@@ -56,7 +58,7 @@ const HEAD_CELL =
   "sticky z-20 top-[var(--cs-header-h)] text-left align-middle px-[clamp(16px,1.5vw,26px)] py-3";
 
 const GROUP_CELL =
-  "lg:sticky lg:z-10 lg:top-[calc(var(--cs-header-h)+62px)] lg:border-y lg:border-[rgba(17,17,17,0.08)] lg:bg-[#FAFAFC] px-[clamp(16px,1.5vw,26px)] py-3 text-left max-lg:block max-lg:px-0 max-lg:pb-2 max-lg:pt-9";
+  "sticky z-10 lg:top-[calc(var(--cs-header-h)+62px)] lg:border-y lg:border-[rgba(17,17,17,0.08)] lg:bg-[#FAFAFC] px-[clamp(16px,1.5vw,26px)] py-3 text-left max-lg:top-[var(--cs-header-h)] max-lg:mt-7 max-lg:block max-lg:bg-white max-lg:px-0 max-lg:py-3";
 
 function YesMark({ tone }: { tone: "docker" | "cleanstart" }): React.ReactElement {
   const isCleanStart = tone === "cleanstart";
@@ -126,14 +128,17 @@ function Cell({
 function CellLabel({
   children,
   tone,
+  inline = false,
 }: {
   children: string;
   tone: "docker" | "cleanstart";
+  /** Marker answers sit beside their label rather than under it. */
+  inline?: boolean;
 }): React.ReactElement {
   return (
     <span
       aria-hidden
-      className="mb-2 flex items-center gap-2 font-display lg:hidden"
+      className={`flex items-center gap-2 font-display lg:hidden ${inline ? "" : "mb-2"}`}
       style={{
         fontSize: "var(--fs-badge)",
         fontWeight: "var(--fs-badge-weight)",
@@ -199,7 +204,10 @@ function isSame(row: MatrixRow): boolean {
 
 function GroupRow({ group }: { group: MatrixGroup }): React.ReactElement {
   return (
-    <tr className="max-lg:block">
+    // `display: contents` below lg, so the sticky heading's containing block is
+    // the tbody that holds the whole chapter rather than this one-cell row,
+    // which is the height of the heading itself and gives sticky no travel.
+    <tr className="max-lg:contents">
       <th
         scope="colgroup"
         colSpan={3}
@@ -238,6 +246,12 @@ function DataRow({
   // The card's own border already draws the last line; a cell border here
   // would double it.
   const edge = isFinal ? " border-b-0" : "";
+  // A marker is one glyph, so on small screens it sits on its label's row
+  // instead of claiming a line of its own.
+  const dockerInline = row.docker.kind !== "text";
+  const cleanstartInline = row.cleanstart.kind !== "text";
+  const inlineCell =
+    " max-lg:flex max-lg:items-center max-lg:justify-between max-lg:gap-4";
   return (
     <tr
       hidden={hidden}
@@ -259,26 +273,30 @@ function DataRow({
       </th>
 
       <td
-        className={`${CELL}${edge} transition-colors max-lg:mt-4 max-lg:border-t max-lg:border-[rgba(17,17,17,0.08)] max-lg:pt-4 lg:group-hover:bg-[rgba(17,17,17,0.03)]`}
+        className={`${CELL}${edge}${dockerInline ? inlineCell : ""} transition-colors max-lg:mt-4 max-lg:border-t max-lg:border-[rgba(17,17,17,0.08)] max-lg:pt-4 lg:group-hover:bg-[rgba(17,17,17,0.03)]`}
         style={{
           fontFamily: "var(--font-sans)",
           fontSize: "var(--fs-table-td)",
           lineHeight: "var(--fs-body-sm-lh)",
         }}
       >
-        <CellLabel tone="docker">{VENDOR.docker}</CellLabel>
+        <CellLabel tone="docker" inline={dockerInline}>
+          {VENDOR.docker}
+        </CellLabel>
         <Cell cell={row.docker} tone="docker" />
       </td>
 
       <td
-        className={`${CELL}${edge} bg-[rgba(106,61,240,0.055)] transition-colors max-lg:mt-4 max-lg:border-t max-lg:border-[rgba(106,61,240,0.2)] max-lg:bg-transparent max-lg:pt-4 lg:border-l lg:border-l-[rgba(106,61,240,0.16)] lg:group-hover:bg-[rgba(106,61,240,0.1)]`}
+        className={`${CELL}${edge}${cleanstartInline ? inlineCell : ""} bg-[rgba(106,61,240,0.055)] transition-colors max-lg:mt-4 max-lg:border-t max-lg:border-[rgba(106,61,240,0.2)] max-lg:bg-transparent max-lg:pt-4 lg:border-l lg:border-l-[rgba(106,61,240,0.16)] lg:group-hover:bg-[rgba(106,61,240,0.1)]`}
         style={{
           fontFamily: "var(--font-sans)",
           fontSize: "var(--fs-table-td)",
           lineHeight: "var(--fs-body-sm-lh)",
         }}
       >
-        <CellLabel tone="cleanstart">{VENDOR.cleanstart}</CellLabel>
+        <CellLabel tone="cleanstart" inline={cleanstartInline}>
+          {VENDOR.cleanstart}
+        </CellLabel>
         <Cell cell={row.cleanstart} tone="cleanstart" />
       </td>
     </tr>
