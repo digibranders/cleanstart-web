@@ -18,10 +18,15 @@ import { BandHeader, BRAND, Icon3D, VectorGrid, VendorMark } from "./compare-vis
  * came for. It gets the page's widest column, its only sticky chrome and its
  * only controls.
  *
- * One DOM, two layouts. It is a real `<table>` with a caption, column headers
- * and `scope="colgroup"` group rows; below `lg` the table parts flip to
- * `display: block` and each row becomes a card. Rendering a second mobile
- * copy of twenty rows would double the markup and duplicate every string.
+ * One DOM, three layouts. It is a real `<table>` with a caption, column
+ * headers and `scope="colgroup"` group rows; below `lg` the table parts flip
+ * to `display: block` and each row becomes a card. From `md` to `lg` that card
+ * is a two-column grid, because a tablet has room to set both answers side by
+ * side; below `md` they stack. Rendering a second copy of twenty rows would
+ * double the markup and duplicate every string.
+ *
+ * Below `lg` the outer wrapper drops its own border, fill and shadow, or the
+ * row cards would sit inside a second card.
  *
  * Because that flip is a breakpoint change, every property that differs
  * between the two layouts is a class, never an inline `style`. Inline styles
@@ -51,7 +56,7 @@ const HEAD_CELL =
   "sticky z-20 top-[var(--cs-header-h)] text-left align-middle px-[clamp(16px,1.5vw,26px)] py-3";
 
 const GROUP_CELL =
-  "lg:sticky lg:z-10 lg:top-[calc(var(--cs-header-h)+62px)] border-y border-[rgba(17,17,17,0.08)] px-[clamp(16px,1.5vw,26px)] py-3 text-left max-lg:block max-lg:border-0 max-lg:px-0 max-lg:pb-3 max-lg:pt-8";
+  "lg:sticky lg:z-10 lg:top-[calc(var(--cs-header-h)+62px)] lg:border-y lg:border-[rgba(17,17,17,0.08)] lg:bg-[#FAFAFC] px-[clamp(16px,1.5vw,26px)] py-3 text-left max-lg:block max-lg:px-0 max-lg:pb-2 max-lg:pt-9";
 
 function YesMark({ tone }: { tone: "docker" | "cleanstart" }): React.ReactElement {
   const isCleanStart = tone === "cleanstart";
@@ -200,7 +205,6 @@ function GroupRow({ group }: { group: MatrixGroup }): React.ReactElement {
         colSpan={3}
         id={`matrix-${group.id}`}
         className={`${GROUP_CELL} scroll-mt-[calc(var(--cs-header-h)+62px)]`}
-        style={{ background: "#FAFAFC" }}
       >
         <span className="flex items-center gap-2.5">
           <Icon3D src={group.icon} size={30} bloom={false} />
@@ -237,11 +241,11 @@ function DataRow({
   return (
     <tr
       hidden={hidden}
-      className="group max-lg:mb-3 max-lg:block max-lg:rounded-[16px] max-lg:border max-lg:border-[rgba(17,17,17,0.08)] max-lg:bg-white max-lg:px-5 max-lg:py-5"
+      className="group max-lg:mb-3 max-lg:block max-lg:rounded-[16px] max-lg:border max-lg:border-[rgba(17,17,17,0.08)] max-lg:bg-white max-lg:px-5 max-lg:py-5 md:max-lg:grid md:max-lg:grid-cols-2 md:max-lg:gap-x-7"
     >
       <th
         scope="row"
-        className={`${CELL}${edge} text-left transition-colors lg:group-hover:bg-[rgba(17,17,17,0.03)]`}
+        className={`${CELL}${edge} text-left transition-colors md:max-lg:col-span-2 lg:group-hover:bg-[rgba(17,17,17,0.03)]`}
         style={{
           fontFamily: "var(--font-sans)",
           fontSize: "var(--fs-table-td)",
@@ -255,7 +259,7 @@ function DataRow({
       </th>
 
       <td
-        className={`${CELL}${edge} transition-colors max-lg:pt-4 lg:group-hover:bg-[rgba(17,17,17,0.03)]`}
+        className={`${CELL}${edge} transition-colors max-lg:mt-4 max-lg:border-t max-lg:border-[rgba(17,17,17,0.08)] max-lg:pt-4 lg:group-hover:bg-[rgba(17,17,17,0.03)]`}
         style={{
           fontFamily: "var(--font-sans)",
           fontSize: "var(--fs-table-td)",
@@ -267,7 +271,7 @@ function DataRow({
       </td>
 
       <td
-        className={`${CELL}${edge} bg-[rgba(106,61,240,0.055)] transition-colors max-lg:bg-transparent max-lg:pt-4 lg:border-l lg:border-l-[rgba(106,61,240,0.16)] lg:group-hover:bg-[rgba(106,61,240,0.1)]`}
+        className={`${CELL}${edge} bg-[rgba(106,61,240,0.055)] transition-colors max-lg:mt-4 max-lg:border-t max-lg:border-[rgba(106,61,240,0.2)] max-lg:bg-transparent max-lg:pt-4 lg:border-l lg:border-l-[rgba(106,61,240,0.16)] lg:group-hover:bg-[rgba(106,61,240,0.1)]`}
         style={{
           fontFamily: "var(--font-sans)",
           fontSize: "var(--fs-table-td)",
@@ -418,15 +422,10 @@ export function CompareMatrix(): React.ReactElement {
               creates a scroll container, which is what `position: sticky`
               resolves against, and the head would silently stop sticking. */}
           <div
-            className="max-lg:border-0 max-lg:bg-transparent max-lg:shadow-none"
-            style={{
-              borderRadius: "24px",
-              overflow: "clip",
-              border: "1px solid rgba(17,17,17,0.09)",
-              background: "#ffffff",
-              boxShadow:
-                "0 1px 2px rgba(17,17,17,0.04), 0 30px 60px -46px rgba(17,17,17,0.4)",
-            }}
+            /* Chrome is class-based, not inline: an inline border or
+               background outranks a `max-lg:` variant, which is what put the
+               row cards inside a second card on small screens. */
+            className="overflow-clip lg:rounded-[24px] lg:border lg:border-[rgba(17,17,17,0.09)] lg:bg-white lg:shadow-[0_1px_2px_rgba(17,17,17,0.04),0_30px_60px_-46px_rgba(17,17,17,0.4)]"
           >
             <table
               className="w-full max-lg:block"
