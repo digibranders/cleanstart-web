@@ -28,7 +28,10 @@ import { BandHeader, BRAND, Icon3D, VectorGrid, VendorMark } from "./compare-vis
  * here carry colour and type only.
  *
  * Wayfinding for twenty rows: the four group rows open as chapters (3D icon
- * plus label) and stick under the column head while their rows scroll; a
+ * plus label) and stick under the column head while their rows scroll. The
+ * head itself sticks flush to the site header rather than a few pixels below
+ * it: that offset let rows scroll through the strip in between, which the
+ * dark CleanStart column turned into a visible seam. a
  * chapter index above the table jumps to each; and a "differences only"
  * switch hides the rows where the document gives both vendors the same
  * answer. Hidden rows stay in the DOM, so the page source and the table a
@@ -45,10 +48,10 @@ const CELL =
   "align-top border-b border-[rgba(17,17,17,0.06)] px-[clamp(16px,1.5vw,26px)] py-[clamp(14px,1.2vw,19px)] max-lg:block max-lg:border-0 max-lg:px-0 max-lg:py-0";
 
 const HEAD_CELL =
-  "sticky z-20 top-[calc(var(--cs-header-h)+8px)] text-left align-middle px-[clamp(16px,1.5vw,26px)] py-3";
+  "sticky z-20 top-[var(--cs-header-h)] text-left align-middle px-[clamp(16px,1.5vw,26px)] py-3";
 
 const GROUP_CELL =
-  "lg:sticky lg:z-10 lg:top-[calc(var(--cs-header-h)+8px+62px)] border-y border-[rgba(17,17,17,0.08)] px-[clamp(16px,1.5vw,26px)] py-3 text-left max-lg:block max-lg:border-0 max-lg:px-0 max-lg:pb-3 max-lg:pt-8";
+  "lg:sticky lg:z-10 lg:top-[calc(var(--cs-header-h)+62px)] border-y border-[rgba(17,17,17,0.08)] px-[clamp(16px,1.5vw,26px)] py-3 text-left max-lg:block max-lg:border-0 max-lg:px-0 max-lg:pb-3 max-lg:pt-8";
 
 function YesMark({ tone }: { tone: "docker" | "cleanstart" }): React.ReactElement {
   const isCleanStart = tone === "cleanstart";
@@ -196,7 +199,7 @@ function GroupRow({ group }: { group: MatrixGroup }): React.ReactElement {
         scope="colgroup"
         colSpan={3}
         id={`matrix-${group.id}`}
-        className={`${GROUP_CELL} scroll-mt-[calc(var(--cs-header-h)+100px)]`}
+        className={`${GROUP_CELL} scroll-mt-[calc(var(--cs-header-h)+62px)]`}
         style={{ background: "#FAFAFC" }}
       >
         <span className="flex items-center gap-2.5">
