@@ -17,10 +17,10 @@ const PATHS: Record<string, React.ReactNode> = {
   ),
   "Controlled Build Pipeline": (
     <>
-      <circle cx="6" cy="6" r="2" />
-      <circle cx="6" cy="18" r="2" />
-      <circle cx="18" cy="12" r="2" />
-      <path d="M8 6h4a4 4 0 0 1 4 4v0M8 18h4a4 4 0 0 0 4-4v0" />
+      <path d="M6 4.5v11" />
+      <circle cx="6" cy="18" r="2.6" />
+      <circle cx="18" cy="6" r="2.6" />
+      <path d="M18 8.6a8.4 8.4 0 0 1-8.4 8.4" />
     </>
   ),
   "SBOM + Provenance Generation": (
@@ -31,28 +31,29 @@ const PATHS: Record<string, React.ReactNode> = {
   ),
   "Cryptographic Signing": (
     <>
-      <circle cx="8" cy="15" r="4" />
-      <path d="M11 12l9-9M17 6l3 3M14.5 8.5l2 2" />
+      <circle cx="8.2" cy="15.8" r="4.4" />
+      <path d="M11.4 12.6L20 4M17.2 6.8l2.4 2.4M14.6 9.4l2.4 2.4" />
     </>
   ),
   "Verified Container Image": (
     <>
-      <path d="M12 2.5l8 4.5v9l-8 4.5-8-4.5V7l8-4.5z" />
-      <path d="M4 7l8 4.5L20 7M12 11.5v9" />
-      <path d="M13.5 15.5l1.5 1.5 3-3" />
+      <path d="M9.5 2l7 4v8l-7 4-7-4V6l7-4z" />
+      <path d="M2.5 6l7 4 7-4M9.5 10v8" />
+      <circle cx="18" cy="18" r="4.6" />
+      <path d="M15.9 18.1l1.5 1.5 2.7-3" />
     </>
   ),
   "Base Container Foundation": (
     <>
-      <path d="M12 3l9 5-9 5-9-5 9-5z" />
-      <path d="M3 13l9 5 9-5M3 17l9 5 9-5" />
+      <rect x="3" y="6.5" width="18" height="11.5" rx="2" />
+      <path d="M8 6.5v11.5M12 6.5v11.5M16 6.5v11.5" />
     </>
   ),
   "Security Hardening": (
     <>
       <path d="M12 3l7 3v5c0 4.6-3 8.1-7 10-4-1.9-7-5.4-7-10V6l7-3z" />
-      <rect x="9.5" y="11" width="5" height="4" rx="1" />
-      <path d="M10.5 11V9.5a1.5 1.5 0 0 1 3 0V11" />
+      <rect x="9" y="10.8" width="6" height="5" rx="1.2" />
+      <path d="M10.2 10.8V9.4a1.8 1.8 0 0 1 3.6 0v1.4" />
     </>
   ),
   "Testing & Validation": (
@@ -60,9 +61,9 @@ const PATHS: Record<string, React.ReactNode> = {
   ),
   "Signed Container Image": (
     <>
-      <path d="M12 2.5l8 4.5v9l-8 4.5-8-4.5V7l8-4.5z" />
-      <path d="M4 7l8 4.5L20 7M12 11.5v9" />
-      <circle cx="17" cy="16" r="2.2" />
+      <path d="M9.5 2l7 4v8l-7 4-7-4V6l7-4z" />
+      <path d="M2.5 6l7 4 7-4M9.5 10v8" />
+      <path d="M21.4 13.4a1.7 1.7 0 0 0-2.4 0l-5.2 5.2-.9 3.3 3.3-.9 5.2-5.2a1.7 1.7 0 0 0 0-2.4z" />
     </>
   ),
   "Production Deployment": (
