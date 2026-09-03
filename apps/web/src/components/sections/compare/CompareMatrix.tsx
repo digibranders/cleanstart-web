@@ -44,6 +44,11 @@ import { BandHeader, BRAND, Icon3D, VectorGrid, VendorMark } from "./compare-vis
  * answer. Hidden rows stay in the DOM, so the page source and the table a
  * crawler reads are unchanged.
  *
+ * Grey label text on the white surfaces is held at 0.62 alpha, 5.29:1
+ * against white. Below that the small uppercase labels drop under 4.5:1:
+ * measured, the jump-to label, the capability head and the per-cell vendor
+ * labels were at 3.54, 4.17 and 2.78.
+ *
  * Both vendors get the same check glyph. The earlier outlined-vs-filled pair
  * read as "partial" against "full" on rows where the document says both are
  * available; the CleanStart column's tint is what carries "our side".
@@ -144,7 +149,7 @@ function CellLabel({
         fontWeight: "var(--fs-badge-weight)",
         letterSpacing: "var(--fs-badge-ls)",
         textTransform: "uppercase",
-        color: tone === "cleanstart" ? BRAND.violet : "rgba(17,17,17,0.42)",
+        color: tone === "cleanstart" ? BRAND.violet : "rgba(17,17,17,0.62)",
       }}
     >
       <VendorMark tone={tone} size={22} />
@@ -361,7 +366,7 @@ export function CompareMatrix(): React.ReactElement {
                   fontWeight: "var(--fs-eyebrow-weight)",
                   letterSpacing: "var(--fs-eyebrow-ls)",
                   textTransform: "uppercase",
-                  color: "rgba(17,17,17,0.5)",
+                  color: "rgba(17,17,17,0.62)",
                 }}
               >
                 {UI.groupIndex}
@@ -471,7 +476,7 @@ export function CompareMatrix(): React.ReactElement {
                       fontWeight: "var(--fs-eyebrow-weight)",
                       letterSpacing: "var(--fs-eyebrow-ls)",
                       textTransform: "uppercase",
-                      color: "rgba(17,17,17,0.55)",
+                      color: "rgba(17,17,17,0.62)",
                     }}
                   >
                     {UI.capability}
