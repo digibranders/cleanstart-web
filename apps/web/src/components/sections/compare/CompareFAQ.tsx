@@ -8,7 +8,9 @@ import { FAQS, FAQ_HEADING, type CompareFaq } from "./compare-data";
 /**
  * The eight questions from the document, in the home page's FAQ chrome: two
  * white cards side by side, hairline dividers, plus-to-cross toggles, one
- * item open at a time across both columns.
+ * item open at a time across both columns. The split waits for `lg`; at
+ * tablet width these questions wrap to four lines a piece and the answers
+ * become a ribbon, so below that they run as one column.
  *
  * The questions are `<h3>` inside the section's H2. The document does not
  * style them as headings, but an accordion whose trigger is not in a heading
@@ -21,7 +23,7 @@ import { FAQS, FAQ_HEADING, type CompareFaq } from "./compare-data";
  */
 
 const CARD =
-  "flex flex-col gap-5 self-start max-md:rounded-none max-md:bg-transparent max-md:p-0 max-md:shadow-none md:rounded-[40px] md:bg-white md:p-8 md:shadow-[0_1px_0_rgba(0,0,0,0.04),_0_24px_48px_-24px_rgba(60,30,150,0.08)]";
+  "flex flex-col gap-5 self-start max-lg:rounded-none max-lg:bg-transparent max-lg:p-0 max-lg:shadow-none lg:rounded-[40px] lg:bg-white lg:p-8 lg:shadow-[0_1px_0_rgba(0,0,0,0.04),_0_24px_48px_-24px_rgba(60,30,150,0.08)]";
 
 function ToggleIcon({ open }: { open: boolean }): React.ReactElement {
   return (
@@ -62,7 +64,7 @@ function Row({
           aria-expanded={open}
           aria-controls={panelId}
           onClick={onToggle}
-          className="group flex w-full cursor-pointer items-start justify-between gap-6 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#33BAEC] md:gap-10"
+          className="group flex w-full cursor-pointer items-start justify-between gap-6 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#33BAEC] lg:gap-10"
         >
           <span
             className="flex-1 font-display text-[#111111] transition-colors duration-200 group-hover:text-[#1B1F4F]"
@@ -197,10 +199,10 @@ export function CompareFAQ(): React.ReactElement {
           </h2>
         </Reveal>
 
-        <Reveal delay={0.1} y={24} className="mt-8 md:mt-10">
-          <div className="grid grid-cols-1 items-start gap-5 rounded-[24px] bg-white p-6 max-md:shadow-[0_1px_0_rgba(0,0,0,0.04),_0_24px_48px_-24px_rgba(60,30,150,0.08)] sm:rounded-[40px] sm:p-8 md:grid-cols-2 md:gap-6 md:rounded-none md:bg-transparent md:p-0 md:shadow-none">
+        <Reveal delay={0.1} y={24} className="mt-8 lg:mt-10">
+          <div className="grid grid-cols-1 items-start gap-5 rounded-[24px] bg-white p-6 max-lg:shadow-[0_1px_0_rgba(0,0,0,0.04),_0_24px_48px_-24px_rgba(60,30,150,0.08)] sm:rounded-[40px] sm:p-8 lg:grid-cols-2 lg:gap-6 lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none">
             <Column items={left} openId={openId} onToggle={toggle} />
-            <div aria-hidden className="h-px w-full bg-[#D9D9D9] md:hidden" />
+            <div aria-hidden className="h-px w-full bg-[#D9D9D9] lg:hidden" />
             <Column items={right} openId={openId} onToggle={toggle} />
           </div>
         </Reveal>

@@ -509,22 +509,22 @@ export function CompareBuildFlow(): React.ReactElement {
 
             {/* Narrow: each vendor in full, stacked. */}
             <div className="flex flex-col gap-8 lg:hidden">
-              <div>
+              <div className="md:grid md:grid-cols-2 md:gap-x-8">
                 <VendorNotes column={docker} withName />
-                <div className="mt-6">
+                <div className="max-md:mt-6">
                   <Eyebrow text={docker.stepsLabel} tone="docker" />
+                  <StackedSteps column={docker} />
                 </div>
-                <StackedSteps column={docker} />
               </div>
               <div
-                className="border-t pt-8"
+                className="border-t pt-8 md:grid md:grid-cols-2 md:gap-x-8"
                 style={{ borderColor: "rgba(255,255,255,0.12)" }}
               >
                 <VendorNotes column={cleanstart} withName />
-                <div className="mt-6">
+                <div className="max-md:mt-6">
                   <Eyebrow text={cleanstart.stepsLabel} tone="cleanstart" />
+                  <StackedSteps column={cleanstart} />
                 </div>
-                <StackedSteps column={cleanstart} />
               </div>
             </div>
           </DarkPanel>
