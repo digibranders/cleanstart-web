@@ -44,6 +44,10 @@ import { BandHeader, BRAND, Icon3D, VectorGrid, VendorMark } from "./compare-vis
  * answer. Hidden rows stay in the DOM, so the page source and the table a
  * crawler reads are unchanged.
  *
+ * Cell padding is 11 to 13px, not the 17px it started at: at 15px/1.5 that
+ * put a one-line row at 58px, which reads as a spaced-out list rather than a
+ * table to scan down.
+ *
  * Grey label text on the white surfaces is held at 0.62 alpha, 5.29:1
  * against white. Below that the small uppercase labels drop under 4.5:1:
  * measured, the jump-to label, the capability head and the per-cell vendor
@@ -57,13 +61,13 @@ import { BandHeader, BRAND, Icon3D, VectorGrid, VendorMark } from "./compare-vis
 const HEAD_H = 62;
 
 const CELL =
-  "align-top border-b border-[rgba(17,17,17,0.06)] px-[clamp(16px,1.5vw,26px)] py-[clamp(14px,1.2vw,19px)] max-lg:block max-lg:border-0 max-lg:px-0 max-lg:py-0";
+  "align-top border-b border-[rgba(17,17,17,0.06)] px-[clamp(16px,1.5vw,26px)] py-[clamp(11px,0.85vw,13px)] max-lg:block max-lg:border-0 max-lg:px-0 max-lg:py-0";
 
 const HEAD_CELL =
   "sticky z-20 top-[var(--cs-header-h)] text-left align-middle px-[clamp(16px,1.5vw,26px)] py-3";
 
 const GROUP_CELL =
-  "sticky z-10 lg:top-[calc(var(--cs-header-h)+62px)] lg:border-y lg:border-[rgba(17,17,17,0.08)] lg:bg-[#FAFAFC] px-[clamp(16px,1.5vw,26px)] py-3 text-left max-lg:top-[var(--cs-header-h)] max-lg:mt-7 max-lg:block max-lg:bg-white max-lg:px-0 max-lg:py-3";
+  "sticky z-10 lg:top-[calc(var(--cs-header-h)+62px)] lg:border-y lg:border-[rgba(17,17,17,0.08)] lg:bg-[#FAFAFC] px-[clamp(16px,1.5vw,26px)] py-2.5 text-left max-lg:top-[var(--cs-header-h)] max-lg:mt-7 max-lg:block max-lg:bg-white max-lg:px-0 max-lg:py-3";
 
 function YesMark({ tone }: { tone: "docker" | "cleanstart" }): React.ReactElement {
   const isCleanStart = tone === "cleanstart";
@@ -220,7 +224,7 @@ function GroupRow({ group }: { group: MatrixGroup }): React.ReactElement {
         className={`${GROUP_CELL} scroll-mt-[calc(var(--cs-header-h)+62px)]`}
       >
         <span className="flex items-center gap-2.5">
-          <Icon3D src={group.icon} size={30} bloom={false} />
+          <Icon3D src={group.icon} size={26} bloom={false} />
           <span
             className="font-display"
             style={{
