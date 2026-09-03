@@ -30,14 +30,14 @@ export const TITLE =
   "Docker Hardened Images vs CleanStart: Secure Container Images Compared";
 
 /**
- * The H1 split for display. The hero sets the first half plain and the second
- * half in the brand gradient, so the title reads as one line of type rather
- * than as a coloured product name dropped into a sentence.
+ * The displayed H1. The hero shows the comparison itself and leaves the
+ * document title's ": Secure Container Images Compared" suffix to the page
+ * title and breadcrumb (`TITLE`), per the 2026-09-03 design review. The
+ * brand name takes the gradient so the title reads as one line of type.
  */
 export const TITLE_PARTS = {
   lead: "Docker Hardened Images vs ",
   accent: "CleanStart",
-  tail: ": Secure Container Images Compared",
 } as const;
 
 export const STANDFIRST =
@@ -54,27 +54,17 @@ export const HERO_CTA = {
   href: "/cleanstart-images",
 } as const;
 
-/* ───────────────────────── hero diagram ───────────────────────── */
+/* ───────────────────────── shared fragments ───────────────────────── */
 
 /**
- * The hero artwork states the page's argument in one picture: Docker's stack
- * stands on a base it inherits from an upstream distribution, CleanStart's
- * stands on nothing. Both label sets are drawn from the matrix rows below, so
- * the diagram never claims anything the table does not.
+ * The base Docker Hardened Images inherit, lifted verbatim from the capability
+ * matrix's "Base foundation" row. The build-flow diagram draws it as the ghost
+ * ahead of Docker's lane, which is why it lives here rather than inside that
+ * component.
  */
-export const HERO_DIAGRAM = {
-  caption:
-    "Where each stack starts: Docker Hardened Images harden an inherited Debian or Alpine base, CleanStart compiles every layer from verified source.",
-  docker: {
-    inherited: { label: "Upstream distro", detail: "Debian · Alpine" },
-    link: "inherits",
-    layers: ["Reduced packages", "Hardened configuration", "Attested image"],
-  },
-  cleanstart: {
-    inherited: { label: "Nothing inherited", detail: "zero upstream base" },
-    link: "builds from source",
-    layers: ["Verified source", "Hermetic build", "Signed artifact"],
-  },
+export const INHERITED_BASE = {
+  label: "Debian and Alpine-based images",
+  note: "inherits upstream",
 } as const;
 
 /* ─────────────────────── section 1: foundations ─────────────────────── */
@@ -135,6 +125,8 @@ export interface MatrixRow {
 export interface MatrixGroup {
   readonly id: string;
   readonly label: string;
+  /** Violet 3D icon that opens the group's chapter in the rendered table. */
+  readonly icon: string;
   readonly rows: readonly MatrixRow[];
 }
 
@@ -155,6 +147,7 @@ export const MATRIX = {
     {
       id: "foundation",
       label: "Image Foundation",
+      icon: "/images/compare/icon-origin.webp",
       rows: [
         {
           id: "base-foundation",
@@ -185,6 +178,7 @@ export const MATRIX = {
     {
       id: "build",
       label: "Build & Supply Chain Security",
+      icon: "/images/compare/icon-provenance.webp",
       rows: [
         {
           id: "zero-inheritance",
@@ -225,6 +219,7 @@ export const MATRIX = {
     {
       id: "transparency",
       label: "Software Transparency",
+      icon: "/images/compare/icon-sbom.webp",
       rows: [
         {
           id: "sboms",
@@ -261,6 +256,7 @@ export const MATRIX = {
     {
       id: "compliance",
       label: "Security & Compliance",
+      icon: "/images/compare/icon-regulatory.webp",
       rows: [
         {
           id: "fips",
@@ -391,21 +387,22 @@ export const DIFFERENTIATORS = {
       /** Document H2 — renders as the page's H3. */
       heading: "Source-to-Artifact Verification",
       body: "CleanStart emphasizes verification across the artifact lifecycle, from source inputs through reproducible builds and final image delivery.",
-      /** Chained cubes: the unbroken link from source input to delivered image. */
-      icon: "/images/compare/icon-provenance.webp",
+      /** Sealed cube: the delivered image carrying its verification. */
+      icon: "/images/compare/icon-signed-artifact.webp",
     },
     {
       id: "reproducible-builds",
       heading: "Reproducible Build Confidence",
       body: "Security teams can validate how artifacts are created and reproduce build outcomes through controlled build processes.",
-      icon: "/images/compare/icon-signed-artifact.webp",
+      /** Checked list under a shield: build outcomes validated. */
+      icon: "/images/compare/icon-stig.webp",
     },
     {
       id: "verified-foundations",
       heading: "Verified Software Foundations",
       body: "CleanStart extends container security into broader software supply chain assurance across images, libraries, and dependencies.",
-      /** Manifest plus components: images, libraries and dependencies together. */
-      icon: "/images/compare/icon-sbom.webp",
+      /** Shield with a seal: assurance across the whole foundation. */
+      icon: "/images/compare/icon-fips.webp",
     },
   ],
 } as const;
@@ -493,6 +490,13 @@ export const UI = {
   jumpToMatrix: "Compare capabilities",
   available: "Available",
   notAvailable: "Not available",
-  faqIntro:
-    "Common questions about hardened container images, provenance, reproducible builds and compliance evidence.",
+  /** Marker on the divider between the two vendor columns. */
+  versus: "vs",
+  /** Column caption for the capability column in the matrix head. */
+  capability: "Capability",
+  /** Matrix controls and legend. */
+  groupIndex: "Jump to",
+  differencesOnly: "Show differences only",
+  legendAvailable: "Available",
+  legendNotAvailable: "Not available",
 } as const;

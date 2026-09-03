@@ -2643,6 +2643,72 @@ body {
   will-change: transform;
 }
 
+/* Horizontal variant of the same current (comparison build-flow axis): the
+   dashed track is translated by one 18px dash period along X. */
+@keyframes cs-flow-beam-x {
+  to {
+    transform: translateX(18px);
+  }
+}
+
+.cs-flow-beam-x {
+  animation: cs-flow-beam-x 0.8s linear infinite;
+  animation-delay: var(--beam-delay, 0s);
+  will-change: transform;
+}
+
+/* Comparison build-flow lanes: a light pulse travels each lane and both
+   pulses reach the shared gate at 60% of one 6s period. The long lane leaves
+   at 0%, the short lane at 20%, so the two arrive together. Each stage's halo
+   fires when the pulse passes it (`--hit` is that moment as a delay); the
+   gate flashes on arrival. All of it is off under reduced motion. */
+@keyframes cs-lane-pulse-long {
+  0% { left: var(--lane-from); opacity: 0; }
+  3% { opacity: 1; }
+  58% { opacity: 1; }
+  60% { left: 100%; opacity: 0; }
+  100% { left: 100%; opacity: 0; }
+}
+
+@keyframes cs-lane-pulse-short {
+  0%, 20% { left: var(--lane-from); opacity: 0; }
+  23% { opacity: 1; }
+  58% { opacity: 1; }
+  60% { left: 100%; opacity: 0; }
+  100% { left: 100%; opacity: 0; }
+}
+
+@keyframes cs-stage-hit {
+  0% { opacity: 0; transform: scale(0.5); }
+  2% { opacity: 0.9; transform: scale(1); }
+  12% { opacity: 0; transform: scale(2); }
+  100% { opacity: 0; transform: scale(2); }
+}
+
+@keyframes cs-gate-hit {
+  0%, 58% { opacity: 0; }
+  61% { opacity: 1; }
+  80% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+.cs-lane-pulse-long {
+  animation: cs-lane-pulse-long 6s linear infinite;
+}
+
+.cs-lane-pulse-short {
+  animation: cs-lane-pulse-short 6s linear infinite;
+}
+
+.cs-stage-hit {
+  animation: cs-stage-hit 6s ease-out infinite;
+  animation-delay: var(--hit, 0s);
+}
+
+.cs-gate-hit {
+  animation: cs-gate-hit 6s ease-out infinite;
+}
+
 /* Sheen ambient (on-screen only). */
 .cs-sec-anim .cs-sec-sheen {
   animation: cs-sec-sheen 8s ease-in-out infinite;
@@ -2717,7 +2783,12 @@ body {
   }
 
   .cs-flow-beam,
-  .cs-flow-arrow {
+  .cs-flow-beam-x,
+  .cs-flow-arrow,
+  .cs-lane-pulse-long,
+  .cs-lane-pulse-short,
+  .cs-stage-hit,
+  .cs-gate-hit {
     animation: none !important;
   }
 
