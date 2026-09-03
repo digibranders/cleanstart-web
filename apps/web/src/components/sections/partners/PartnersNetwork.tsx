@@ -1,14 +1,8 @@
 "use client";
 
-import {
-  AnimatePresence,
-  domAnimation,
-  LazyMotion,
-  m,
-  useReducedMotion,
-} from "motion/react";
+import { domAnimation, LazyMotion, m, useReducedMotion } from "motion/react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Container, Section } from "@/components/layout";
 import { Reveal } from "@/components/ui/Reveal";
 import { EASE_SOFT } from "@/lib/motion";
@@ -142,6 +136,12 @@ export function PartnersNetwork(): React.ReactElement {
   const [active, setActive] = useState<TrackId>("technology-alliances");
   const showAlliances = active === "technology-alliances";
   const activeIndex = showAlliances ? 0 : 1;
+  // The panel fades only when the reader switches tracks. On first paint the section's own
+  // FadeUp wrapper owns the entrance, so a second fade here would double up.
+  const mounted = useRef(false);
+  useEffect(() => {
+    mounted.current = true;
+  }, []);
 
   return (
     <Section
@@ -254,60 +254,60 @@ export function PartnersNetwork(): React.ReactElement {
             })}
           </div>
 
-          <AnimatePresence mode="wait" initial={false}>
-            <m.div
-              key={active}
-              id={`partner-track-panel-${active}`}
-              role="tabpanel"
-              aria-labelledby={`partner-track-tab-${active}`}
-              initial={reduce ? { opacity: 0 } : { opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={reduce ? { opacity: 0 } : { opacity: 0, y: -12 }}
-              transition={{ duration: reduce ? 0.15 : 0.34, ease: EASE_SOFT }}
-              className="mt-10"
-            >
-              {showAlliances ? (
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                  {ALLIANCES.map((partner) => (
-                    <PartnerCard key={partner.name} partner={partner} headingLevel="h3" />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col gap-12">
-                  {CHANNEL.map((group) => (
-                    <div key={group.region}>
-                      <div className="flex items-center gap-5">
-                        <h3
-                          className="font-display font-semibold text-white"
-                          style={{
-                            fontSize: "var(--fs-h3)",
-                            lineHeight: 1.2,
-                            letterSpacing: "-0.02em",
-                          }}
-                        >
-                          {group.region}
-                        </h3>
-                        <span
-                          aria-hidden
-                          className="h-px flex-1"
-                          style={{ background: "rgba(255,255,255,0.16)" }}
-                        />
-                      </div>
-                      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                        {group.partners.map((partner) => (
-                          <PartnerCard
-                            key={`${group.region}-${partner.name}`}
-                            partner={partner}
-                            headingLevel="h4"
-                          />
-                        ))}
-                      </div>
+          {/* Swapping the panel changes the section height by ~1500px (4 cards vs 22). Doing
+              that in one frame, with an opacity-only fade and no exit phase, means the reader
+              sees a single layout change instead of a blank gap followed by a jump. */}
+          <m.div
+            key={active}
+            id={`partner-track-panel-${active}`}
+            role="tabpanel"
+            aria-labelledby={`partner-track-tab-${active}`}
+            initial={mounted.current && !reduce ? { opacity: 0 } : false}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.16, ease: EASE_SOFT }}
+            className="mt-10"
+          >
+            {showAlliances ? (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {ALLIANCES.map((partner) => (
+                  <PartnerCard key={partner.name} partner={partner} headingLevel="h3" />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-12">
+                {CHANNEL.map((group) => (
+                  <div key={group.region}>
+                    <div className="flex items-center gap-5">
+                      <h3
+                        className="font-display font-semibold text-white"
+                        style={{
+                          fontSize: "var(--fs-h3)",
+                          lineHeight: 1.2,
+                          letterSpacing: "-0.02em",
+                        }}
+                      >
+                        {group.region}
+                      </h3>
+                      <span
+                        aria-hidden
+                        className="h-px flex-1"
+                        style={{ background: "rgba(255,255,255,0.16)" }}
+                      />
                     </div>
-                  ))}
-                </div>
-              )}
-            </m.div>
-          </AnimatePresence>
+                    <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                      {group.partners.map((partner) => (
+                        <PartnerCard
+                          key={`${group.region}-${partner.name}`}
+                          partner={partner}
+                          headingLevel="h4"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </m.div>
         </LazyMotion>
       </Container>
     </Section>
