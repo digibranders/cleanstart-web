@@ -23,7 +23,7 @@
 export function HeroHeading() {
   return (
     <h1
-      className="cs-hero-h1 font-display font-semibold text-white"
+      className="cs-hero-h1 text-left font-display font-semibold text-white"
       style={{
         fontSize: "var(--fs-display-home)",
         letterSpacing: "var(--fs-display-ls)",
