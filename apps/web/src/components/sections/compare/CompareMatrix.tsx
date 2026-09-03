@@ -39,16 +39,16 @@ import { BandHeader, BRAND, Icon3D, VectorGrid, VendorMark } from "./compare-vis
  * available; the CleanStart column's tint is what carries "our side".
  */
 
-const HEAD_H = 84;
+const HEAD_H = 62;
 
 const CELL =
   "align-top border-b border-[rgba(17,17,17,0.06)] px-[clamp(16px,1.5vw,26px)] py-[clamp(14px,1.2vw,19px)] max-lg:block max-lg:border-0 max-lg:px-0 max-lg:py-0";
 
 const HEAD_CELL =
-  "sticky z-20 top-[calc(var(--cs-header-h)+8px)] text-left align-bottom px-[clamp(16px,1.5vw,26px)] py-[18px]";
+  "sticky z-20 top-[calc(var(--cs-header-h)+8px)] text-left align-middle px-[clamp(16px,1.5vw,26px)] py-3";
 
 const GROUP_CELL =
-  "lg:sticky lg:z-10 lg:top-[calc(var(--cs-header-h)+8px+84px)] border-y border-[rgba(17,17,17,0.08)] px-[clamp(16px,1.5vw,26px)] py-3 text-left max-lg:block max-lg:border-0 max-lg:px-0 max-lg:pb-3 max-lg:pt-8";
+  "lg:sticky lg:z-10 lg:top-[calc(var(--cs-header-h)+8px+62px)] border-y border-[rgba(17,17,17,0.08)] px-[clamp(16px,1.5vw,26px)] py-3 text-left max-lg:block max-lg:border-0 max-lg:px-0 max-lg:pb-3 max-lg:pt-8";
 
 function YesMark({ tone }: { tone: "docker" | "cleanstart" }): React.ReactElement {
   const isCleanStart = tone === "cleanstart";
@@ -162,14 +162,15 @@ function HeadCell({
         borderBottom: `1px solid ${isCleanStart ? BRAND.violet : "rgba(17,17,17,0.12)"}`,
       }}
     >
-      <span className="flex items-center gap-3">
-        <VendorMark tone={tone} />
+      <span className="flex items-center gap-2.5">
+        <VendorMark tone={tone} size={26} />
         <span
           className="block font-display"
           style={{
-            fontSize: "var(--fs-h4)",
-            fontWeight: 600,
-            letterSpacing: "var(--fs-h4-ls)",
+            fontSize: "var(--fs-h5)",
+            fontWeight: "var(--fs-h5-weight)",
+            letterSpacing: "var(--fs-h5-ls)",
+            lineHeight: "var(--fs-h5-lh)",
             color: isCleanStart ? "#ffffff" : "#111111",
           }}
         >
@@ -198,8 +199,8 @@ function GroupRow({ group }: { group: MatrixGroup }): React.ReactElement {
         className={`${GROUP_CELL} scroll-mt-[calc(var(--cs-header-h)+100px)]`}
         style={{ background: "#FAFAFC" }}
       >
-        <span className="flex items-center gap-3">
-          <Icon3D src={group.icon} size={40} bloom={false} />
+        <span className="flex items-center gap-2.5">
+          <Icon3D src={group.icon} size={30} bloom={false} />
           <span
             className="font-display"
             style={{

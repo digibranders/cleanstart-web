@@ -415,28 +415,30 @@ function LanesDiagram({
         style={{
           width: DIAGRAM_W,
           gridTemplateColumns: "220px minmax(0, 1fr) 160px",
-          gridTemplateRows: "auto auto",
+          gridTemplateRows: "auto auto auto",
         }}
       >
-        <div style={{ gridColumn: 1, gridRow: 1 }}>
+        {/* Both columns carry the document's same "Build approach:" lead-in, so
+            it is set once over the lanes rather than repeated per row. */}
+        <div style={{ gridColumn: 2, gridRow: 1, marginBottom: 4 }}>
+          <Eyebrow text={docker.stepsLabel} tone="docker" />
+        </div>
+
+        <div style={{ gridColumn: 1, gridRow: 2 }}>
           <VendorName column={docker} />
         </div>
-        <div className="min-w-0" style={{ gridColumn: 2, gridRow: 1 }}>
-          <Eyebrow text={docker.stepsLabel} tone="docker" />
-          <div className="mt-4">
-            <Lane column={docker} />
-          </div>
+        <div className="min-w-0" style={{ gridColumn: 2, gridRow: 2 }}>
+          <Lane column={docker} />
         </div>
-        <div style={{ gridColumn: 1, gridRow: 2 }}>
+
+        <div style={{ gridColumn: 1, gridRow: 3 }}>
           <VendorName column={cleanstart} />
         </div>
-        <div className="min-w-0" style={{ gridColumn: 2, gridRow: 2 }}>
-          <Eyebrow text={cleanstart.stepsLabel} tone="cleanstart" />
-          <div className="mt-4">
-            <Lane column={cleanstart} />
-          </div>
+        <div className="min-w-0" style={{ gridColumn: 2, gridRow: 3 }}>
+          <Lane column={cleanstart} />
         </div>
-        <div className="self-stretch" style={{ gridColumn: 3, gridRow: "1 / span 2" }}>
+
+        <div className="self-stretch" style={{ gridColumn: 3, gridRow: "2 / span 2" }}>
           <Gate label={gateLabel} />
         </div>
       </div>
