@@ -939,6 +939,107 @@ body {
   color: var(--social-hover);
 }
 
+/* ─── Footer ─────────────────────────────────────────────────────────────────
+   Credential shields size from the cluster's own inline width so the four of
+   them always share one row (92px cap on desktop, fluid down to phones).
+
+   The signature band (last child of the footer) holds the vector logo at
+   container width and is pinned to the viewport bottom beneath the opaque
+   footer body (`.cs-footer-body`, z-index 1). The body is the curtain: as its
+   bottom edge lifts, the wordmark shows underneath, translated down by
+   (1 - progress) * 50% so it drifts up at half the scroll speed and lands in
+   flow at the end of the page. FooterSignature drives the progress variable;
+   without JavaScript the variable defaults to 1 and the pinned logo is simply
+   revealed 1:1 by the curtain. The band's gradient continues the body's
+   gradient from its end color, so the seam is invisible. */
+.cs-footer-credentials {
+  container-type: inline-size;
+  --cs-shield-gap: 12px;
+  --cs-shield-w: min(92px, calc((100cqi - 3 * var(--cs-shield-gap)) / 4));
+}
+
+/* Tablet (md to lg): the cluster sits beside the columns as a 2 x 2 block,
+   so the shields take a fixed size instead of a quarter of the leftover. */
+@media (min-width: 48rem) and (max-width: 63.99rem) {
+  .cs-footer-credentials {
+    --cs-shield-w: 84px;
+  }
+}
+
+.cs-footer-shield {
+  aspect-ratio: 115.05 / 141.195;
+}
+
+/* Fallback fill for the band's in-flow slot while the band is pinned above it
+   (element screenshots, programmatic scroll-into-view): never paint white. */
+.cs-footer {
+  background: #471ec0;
+}
+
+.cs-footer-body {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(180deg, #151021 0%, #131e8f 70.794%, #371eb1 100%);
+}
+
+.cs-footer-signature {
+  position: sticky;
+  bottom: 0;
+  z-index: 0;
+  overflow: hidden;
+  line-height: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, #371eb1 0%, #471ec0 100%);
+}
+
+/* Wordmark-only vector (letters cut from the logo, viewBox 174.6 x 24.4,
+   cropped at cap height and at the baseline so the round glyphs' optical
+   overshoot is trimmed and every letter meets the page edge on one line) used
+   as a mask so the fill can fade from the cap height to the baseline: the
+   name reads as engraved into the footer rather than printed on it. */
+.cs-footer-wordmark {
+  width: 100%;
+  aspect-ratio: 174.6 / 24.4;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.62) 0%, rgba(255, 255, 255, 0.14) 100%);
+  -webkit-mask: url("/images/footer/cleanstart-wordmark.svg") center / 100% 100% no-repeat;
+  mask: url("/images/footer/cleanstart-wordmark.svg") center / 100% 100% no-repeat;
+  transform: translateY(calc((1 - var(--cs-signature-progress, 1)) * 50%));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-footer-wordmark {
+    transform: none;
+  }
+}
+
+/* Logo mark as a faint watermark in the gap between the nav columns and the
+   credential cluster. The slot takes the leftover width of that row, sizes
+   the mark from it, and drops it entirely when the gap is too narrow. */
+.cs-footer-watermark-slot {
+  flex: 1 1 0;
+  min-width: 0;
+  container-type: inline-size;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The real mark image (its cyan facet intact), dimmed and fading toward its
+   base so it sits in the background rather than on it. */
+.cs-footer-watermark {
+  display: block;
+  width: min(220px, 70cqi);
+  height: auto;
+  opacity: 0.16;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.3) 100%);
+  mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.3) 100%);
+}
+
+@container (max-width: 200px) {
+  .cs-footer-watermark {
+    display: none;
+  }
+}
+
 /* Unified CTA button HEIGHT + FONT-SIZE.
      - Mobile  (< 64rem):  GLOBAL — every cs-btn-glass / cs-btn-blue site-wide
        gets h 36 / fs 13 (Header "Book a Demo" utility size). Single mobile
