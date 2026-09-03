@@ -69,7 +69,7 @@ const CHANNEL: RegionGroup[] = [
     ],
   },
   {
-    region: "Middle East",
+    region: "Middle East & Africa",
     partners: [
       {
         name: "Help AG",
@@ -94,6 +94,11 @@ const CHANNEL: RegionGroup[] = [
         invertOnLight: true,
       },
       { name: "TecCentric", country: "Doha, Qatar", logo: "/images/partners/global/teccentric.svg" },
+      {
+        name: "Sechpoint Tech",
+        country: "Nairobi, Kenya",
+        logo: "/images/partners/global/sechpoint.svg",
+      },
     ],
   },
   {
@@ -116,16 +121,6 @@ const CHANNEL: RegionGroup[] = [
         country: "North America",
         logo: "/images/partners/global/fortifire-icon.webp",
         wordmark: "FORTIFIRE",
-      },
-    ],
-  },
-  {
-    region: "Africa",
-    partners: [
-      {
-        name: "Sechpoint Tech",
-        country: "Nairobi, Kenya",
-        logo: "/images/partners/global/sechpoint.svg",
       },
     ],
   },
