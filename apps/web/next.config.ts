@@ -86,7 +86,7 @@ const nextConfig: NextConfig = {
       // was never indexed or linked under its earlier slugs, so it carries none.
       {
         source: "/financial-services-container-security",
-        destination: "/industries/financial-services-container-security",
+        destination: "/industries/financial-services",
         permanent: true,
       },
       // The operational-impact estimator launched at `/roi-calculator` and was
@@ -111,6 +111,16 @@ const nextConfig: NextConfig = {
       {
         source: "/careers/:slug",
         destination: "/job/:slug",
+        permanent: true,
+      },
+      // Post-launch rename of the financial services page, requested
+      // 2026-09-04. Unlike the earlier /financial-services move, this URL was
+      // live: indexable, listed in the sitemap and linked from the nav, so the
+      // 301 is load-bearing rather than courtesy. It ships in code so the
+      // redirect lands in the same deploy as the route move.
+      {
+        source: "/industries/financial-services-container-security",
+        destination: "/industries/financial-services",
         permanent: true,
       },
       // Residual Webflow migration redirects. These twelve URLs were indexed on

@@ -19,7 +19,7 @@ import { getPageGraph } from '@/lib/seo/compose-page';
  * /industries/modern-applications
  *
  * Title and description are the SEO team's, applied verbatim; the H1 is the
- * client's. Sibling to financial-services-container-security under the
+ * client's. Sibling to financial-services under the
  * /industries segment; see that file for why the segment exists and why
  * /industries itself still 404s.
  *
