@@ -6,6 +6,29 @@
 
 **Run mechanism:** prod CMS image lacks `scripts/`; `docker cp` the script into `cleanstart-cms-1` and run via `pnpm exec tsx` (no `--env-file` — env is via container vars). See memory note `prod-backfill-script-run-mechanism`.
 
+### /industries path rename follow-up (2026-09-04)
+
+Script: `scripts/repoint-industry-paths.ts` — repoints the CMS rows that key on
+the two renamed `/industries` paths. Guarded on each row's expected current
+value, idempotent, supports `--dry-run`. Two stages, because the new URLs do not
+exist in production until the route move deploys:
+
+- `--stage=safe` — **DONE 2026-09-04.** `pageRegistry` id=43, which still held
+  `/industries/saas-container-security`, an intermediate slug the SaaS page left
+  on 2026-09-02. The live page has had no WebPage node in its JSON-LD graph
+  since. Neutral before the deploy, correct after it.
+- `--stage=deploy` — **PENDING, run immediately after the deploy lands.**
+  `pageRegistry` id=42 and `redirects` id=41. Both are correct against the URLs
+  production serves today; moving them early drops the finance page's WebPage
+  node and points the live `/financial-services` 301 at a 404.
+
+```bash
+ssh cleanstart-cms
+docker cp repoint-industry-paths.ts cleanstart-cms-1:/app/apps/cms/scripts/
+docker exec -w /app/apps/cms cleanstart-cms-1 pnpm exec tsx \
+  scripts/repoint-industry-paths.ts --stage=deploy --dry-run
+```
+
 ---
 
 ## Completed tasks
