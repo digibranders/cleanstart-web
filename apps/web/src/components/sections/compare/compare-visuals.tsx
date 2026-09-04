@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { cn } from "@/lib/cn";
+import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * Visual vocabulary for the comparison page.
@@ -23,6 +24,9 @@ export const BAND_DARK =
 
 /** Light section wash, matching `WhyMattersGrid` / `SbomAdvantage`. */
 export const WASH_LIGHT = "#F6F6F6";
+
+/** The lavender enterprise wash `FinanceRequirements` paints its band with. */
+export const WASH_LAVENDER = "#EFEDF7";
 
 /** Brand violet, used for the CleanStart side and every accent on the page. */
 export const BRAND = {
@@ -103,6 +107,134 @@ export function Icon3D({
         loading="lazy"
         decoding="async"
         draggable={false}
+      />
+    </span>
+  );
+}
+
+/* ───────────────────────────── headings ───────────────────────────── */
+
+/**
+ * A section heading with the brand name set in the site's impact gradient,
+ * the way the hero sets it. The document's headings all name CleanStart
+ * once; colouring that word is the one heading treatment shared with every
+ * sibling page, and it keeps the seven long question headings from reading as
+ * an article's subheads.
+ */
+export function AccentHeading({ text }: { text: string }): React.ReactNode {
+  const index = text.indexOf("CleanStart");
+  if (index === -1) return text;
+  return (
+    <>
+      {text.slice(0, index)}
+      <span className="cs-text-gradient-impact">CleanStart</span>
+      {text.slice(index + "CleanStart".length)}
+    </>
+  );
+}
+
+/**
+ * Band header: the document's H2 on the left, its intro paragraph on the
+ * right, top-aligned on wide screens so both start on the same line however
+ * many lines each runs to.
+ */
+export function BandHeader({
+  id,
+  heading,
+  intro,
+  tone = "light",
+}: {
+  id: string;
+  heading: string;
+  intro: string;
+  tone?: "light" | "dark";
+}): React.ReactElement {
+  const dark = tone === "dark";
+  return (
+    <div className="grid gap-y-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-start lg:gap-x-16">
+      <Reveal header>
+        <h2
+          id={id}
+          className="font-display"
+          style={{
+            fontSize: "var(--fs-h2)",
+            fontWeight: "var(--fs-h2-weight)",
+            letterSpacing: "var(--fs-h2-ls)",
+            lineHeight: "var(--fs-h2-lh)",
+            color: dark ? "#ffffff" : "#111111",
+            maxWidth: "20ch",
+          }}
+        >
+          <AccentHeading text={heading} />
+        </h2>
+      </Reveal>
+      <Reveal delay={0.1} y={20}>
+        <p
+          /* A small top inset so the paragraph's first line reads as level
+             with the heading's, rather than sitting hard against the grid
+             row's top edge under a much larger cap height. */
+          className="lg:pt-2"
+          style={{
+            fontFamily: "var(--font-sans)",
+            fontSize: "var(--fs-lead-sm)",
+            fontWeight: "var(--fs-lead-weight)",
+            lineHeight: "var(--fs-lead-lh)",
+            letterSpacing: "var(--fs-lead-ls)",
+            color: dark ? "rgba(255,255,255,0.72)" : "#333333",
+            maxWidth: "52ch",
+          }}
+        >
+          {intro}
+        </p>
+      </Reveal>
+    </div>
+  );
+}
+
+/* ───────────────────────────── vendor marks ───────────────────────────── */
+
+/** Vendor mark: the Docker whale on a white plate, the CleanStart logomark on
+    the dark-band tile it needs (the mark is white and cyan, and vanishes on
+    any light surface). Decorative; the label names it. */
+export function VendorMark({
+  tone,
+  size = 36,
+}: {
+  tone: "docker" | "cleanstart";
+  size?: number;
+}): React.ReactElement {
+  const isCleanStart = tone === "cleanstart";
+  const glyph = Math.round(size * 0.58);
+  return (
+    <span
+      aria-hidden
+      className="inline-flex shrink-0 items-center justify-center"
+      style={{
+        width: size,
+        height: size,
+        borderRadius: Math.round(size * 0.28),
+        background: isCleanStart
+          ? "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)"
+          : "#ffffff",
+        border: isCleanStart
+          ? "1px solid rgba(255,255,255,0.22)"
+          : "1px solid rgba(17,17,17,0.1)",
+        boxShadow: "0 1px 2px rgba(17,17,17,0.06)",
+      }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={
+          isCleanStart
+            ? "/images/security/cs-logomark.svg"
+            : "/images/compare/tools/docker.svg"
+        }
+        alt=""
+        width={glyph}
+        height={glyph}
+        style={{ width: glyph, height: glyph, objectFit: "contain" }}
+        loading="lazy"
+        decoding="async"
       />
     </span>
   );
@@ -214,6 +346,46 @@ export function CornerGlows(): React.ReactElement {
             src={`/images/for-developers/why/deco-glow-top-${side}.svg`}
             alt=""
             style={{ display: "block", width: "100%", height: "100%" }}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      ))}
+    </>
+  );
+}
+
+/**
+ * The corner unions the lavender enterprise band bleeds off its top corners
+ * (`FinanceRequirements`). One asset, mirrored, rotated the same way on both
+ * sides, so the band is framed rather than decorated.
+ */
+export function EnterpriseUnions(): React.ReactElement {
+  return (
+    <>
+      {(
+        [
+          { side: "left", left: "-218px", top: "-139px" },
+          { side: "right", right: "-185px", top: "-193px" },
+        ] as const
+      ).map((corner) => (
+        <div
+          key={corner.side}
+          aria-hidden
+          className="pointer-events-none absolute hidden select-none lg:block"
+          style={{
+            ...("left" in corner ? { left: corner.left } : { right: corner.right }),
+            top: corner.top,
+            width: "488px",
+            height: "496px",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/ciso/enterprise-union.svg"
+            alt=""
+            className="block size-full"
+            style={{ transform: "rotate(141.39deg) scaleY(-1)" }}
             loading="lazy"
             decoding="async"
           />
@@ -472,8 +644,10 @@ export function AssuranceCard({
 }
 
 /**
- * Dark-band equivalent of `AssuranceCard` — the translucent panel the site's
- * dark sections use instead of a bordered box.
+ * The deep navy plate the SaaS "shift left" deck uses on the same dark band:
+ * an opaque navy gradient with a violet bloom at the lower left, a cool
+ * hairline edge and a deep drop shadow. Opaque on purpose, so the band
+ * gradient behind it does not wash the panel's contents.
  */
 export function DarkPanel({
   className,
@@ -484,11 +658,18 @@ export function DarkPanel({
 }): React.ReactElement {
   return (
     <div
-      className={cn("relative h-full overflow-hidden", className)}
+      className={cn("relative overflow-hidden", className)}
       style={{
-        borderRadius: "24px",
-        background: "rgba(255,255,255,0.05)",
-        border: "1px solid rgba(255,255,255,0.10)",
+        borderRadius: "28px",
+        border: "1px solid rgba(140, 160, 255, 0.16)",
+        background: [
+          "radial-gradient(60% 80% at 18% 55%, rgba(106, 61, 240, 0.14) 0%, rgba(106, 61, 240, 0) 70%)",
+          "linear-gradient(180deg, rgba(13, 17, 50, 0.88) 0%, rgba(8, 11, 36, 0.96) 100%)",
+        ].join(", "),
+        boxShadow: [
+          "0 34px 90px -40px rgba(0, 0, 0, 0.75)",
+          "inset 0 1px 0 rgba(255, 255, 255, 0.06)",
+        ].join(", "),
         padding: "clamp(22px, 2vw, 34px)",
       }}
     >

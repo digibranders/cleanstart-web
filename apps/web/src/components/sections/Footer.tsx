@@ -2,13 +2,15 @@ import React from "react";
 import Link from "next/link";
 
 import { CookiePreferencesButton } from "@/components/consent";
+import { FooterSignature } from "@/components/sections/FooterSignature";
 
 /**
- * Footer layout (top → bottom): brand logo + social icons, then a band with
- * three nav columns (Contact / Solutions / Connect) on the left and a single
- * right-aligned "Trusted & Certified" credential cluster (the award + Docker +
- * SOC 2 + ISO badges) on the right, and a bottom row with copyright and legal
- * links.
+ * Footer layout (top to bottom): a brand band (logo left, social icons right),
+ * a nav band (Product / Solutions / Company columns left, the credential
+ * cluster right, the logo mark as a watermark between them), a utility row
+ * (copyright + legal links), and the signature: the wordmark at container
+ * width, pinned under the body and revealed as the page ends
+ * (FooterSignature).
  */
 
 interface FooterLink {
@@ -16,21 +18,29 @@ interface FooterLink {
   href: string;
 }
 
-const COL_CONTACT: FooterLink[] = [
-  { label: "About Us", href: "/about-us" },
-  { label: "How It Works", href: "/cleanstart-images" },
-  { label: "Events", href: "/events" },
+const COL_PRODUCT: FooterLink[] = [
+  { label: "Clean Images", href: "/cleanstart-images" },
+  { label: "Clean Libraries", href: "/clean-libraries" },
+  { label: "CleanSight", href: "/cleansight" },
+  { label: "Impact Estimator", href: "/impact-estimator" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Book a Demo", href: "/book-a-demo" },
 ];
 const COL_SOLUTIONS: FooterLink[] = [
-  { label: "Verifiable SBOMs", href: "/software-bill-materials" },
+  { label: "Vulnerability Remediation", href: "/vulnerability-remediation" },
+  { label: "Attack Surface Reduction", href: "/attack-surface-reduction" },
   { label: "FIPS Compliance", href: "/fips" },
-  { label: "Vulnerability", href: "/vulnerability-remediation" },
+  { label: "Verifiable SBOMs", href: "/software-bill-materials" },
+  { label: "For Developers", href: "/for-developers" },
+  { label: "For CISO", href: "/for-ciso" },
 ];
-const COL_CONNECT: FooterLink[] = [
-  { label: "Contact Us", href: "/contact-us" },
+const COL_COMPANY: FooterLink[] = [
+  { label: "About Us", href: "/about-us" },
   { label: "Careers", href: "/careers" },
+  { label: "Partners", href: "/partners" },
   { label: "Newsroom", href: "/news" },
-  { label: "Legal", href: "/legal" },
+  { label: "Events", href: "/events" },
+  { label: "Contact Us", href: "/contact-us" },
 ];
 // `hoverColor` is each platform's brand color, applied to the glyph on hover.
 // X and GitHub are brand-black; on the dark footer they stay white (a darkening
@@ -44,43 +54,40 @@ const SOCIAL_ICONS = [
   { name: "Docker", href: "https://hub.docker.com/u/cleanstart", hoverColor: "#2496ed", path: "M13.983 11.078h2.119a.186.186 0 0 0 .186-.185V9.006a.186.186 0 0 0-.186-.186h-2.119a.185.185 0 0 0-.185.185v1.888c0 .102.083.185.185.185m-2.954-5.43h2.118a.186.186 0 0 0 .186-.186V3.574a.186.186 0 0 0-.186-.185h-2.118a.185.185 0 0 0-.185.185v1.888c0 .102.082.185.185.185m0 2.716h2.118a.187.187 0 0 0 .186-.186V6.29a.186.186 0 0 0-.186-.185h-2.118a.185.185 0 0 0-.185.185v1.887c0 .102.082.185.185.186m-2.93 0h2.12a.186.186 0 0 0 .184-.186V6.29a.185.185 0 0 0-.185-.185H8.1a.185.185 0 0 0-.185.185v1.887c0 .102.083.185.185.186m-2.964 0h2.119a.186.186 0 0 0 .185-.186V6.29a.185.185 0 0 0-.184-.185H5.136a.186.186 0 0 0-.186.185v1.887c0 .102.084.185.186.186m5.893 2.715h2.118a.186.186 0 0 0 .186-.185V9.006a.186.186 0 0 0-.186-.186h-2.118a.185.185 0 0 0-.185.185v1.888c0 .102.082.185.185.185m-2.93 0h2.12a.185.185 0 0 0 .184-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.185.185 0 0 0-.184.185v1.888c0 .102.082.185.184.185m-2.964 0h2.119a.185.185 0 0 0 .185-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.186.186 0 0 0-.186.186v1.887c0 .102.084.185.186.185m-2.92 0h2.12a.185.185 0 0 0 .184-.185V9.006a.185.185 0 0 0-.184-.186h-2.12a.185.185 0 0 0-.184.185v1.888c0 .102.082.185.184.185M23.763 9.89c-.065-.051-.672-.51-1.954-.51-.338.001-.676.03-1.01.087-.248-1.7-1.653-2.53-1.716-2.566l-.344-.199-.226.327c-.284.438-.49.922-.612 1.43-.23.97-.09 1.882.403 2.661-.595.332-1.55.413-1.744.42H.751a.751.751 0 0 0-.75.748 11.376 11.376 0 0 0 .692 4.062c.545 1.428 1.355 2.48 2.41 3.124 1.18.723 3.1 1.137 5.275 1.137.983.003 1.963-.086 2.93-.266a12.248 12.248 0 0 0 3.823-1.389c.98-.567 1.86-1.288 2.61-2.136 1.252-1.418 1.998-2.997 2.553-4.4h.221c1.372 0 2.215-.549 2.68-1.009.309-.293.55-.65.707-1.046l.098-.288z" },
 ];
 
-// Credential badges render inside the glassy shield; the shield normalizes
-// their footprint, so only the intrinsic dimensions are tracked here.
+// Credential badges render inside the glassy shield; `caption` is the short
+// label shown under each shield, `name` the full accessible name.
 interface Badge {
   name: string;
+  caption: string;
   src: string;
   w: number;
   h: number;
 }
 
-// Right-anchored credential cluster, grouped under its own labels: the award,
-// the Docker-verified badge, and the two certifications (SOC 2 + ISO).
-const CREDENTIALS: { title: string; badges: Badge[] }[] = [
-  {
-    title: "Awarded with",
-    badges: [
-      { name: "Cyber Security Excellence Awards Winner", src: "/images/awards/award-1.webp", w: 486, h: 616 },
-    ],
-  },
-  {
-    title: "Docker verified",
-    badges: [
-      { name: "Docker Verified Publisher", src: "/images/awards/award-2.webp", w: 268, h: 267 },
-    ],
-  },
-  {
-    title: "Certifications",
-    badges: [
-      { name: "AICPA SOC 2", src: "/images/awards/award-4.webp", w: 1024, h: 1023 },
-      { name: "ISO/IEC 27001", src: "/images/awards/award-3.webp", w: 200, h: 200 },
-    ],
-  },
+const CREDENTIALS: Badge[] = [
+  { name: "Cyber Security Excellence Awards Winner", caption: "Excellence award", src: "/images/awards/award-1.webp", w: 486, h: 616 },
+  { name: "Docker Verified Publisher", caption: "Verified publisher", src: "/images/awards/award-2.webp", w: 268, h: 267 },
+  { name: "AICPA SOC 2", caption: "SOC 2", src: "/images/awards/award-4.webp", w: 1024, h: 1023 },
+  { name: "ISO/IEC 27001", caption: "ISO 27001", src: "/images/awards/award-3.webp", w: 200, h: 200 },
 ];
 
 const LEGAL_LINKS = [
+  { label: "Legal", href: "/legal" },
   { label: "Privacy Policy", href: "/privacy-policy" },
   { label: "Acceptable Use Policy", href: "/legal/acceptable-use-policy" },
 ];
+
+// The shield outline in objectBoundingBox units (0..1 on both axes) so one
+// clipPath scales to any shield width; the shield keeps the 115.05 x 141.195
+// aspect of the original path via `aspect-ratio`, so nothing distorts.
+const SHIELD_CLIP_ID = "cs-footer-shield-clip";
+const SHIELD_CLIP_PATH =
+  "M0 0.1254C0 0.0561 0.0689 0 0.1538 0H0.8462C0.9311 0 1 0.0561 1 0.1254V0.7994C1 0.8563 0.9528 0.9062 0.8852 0.9206L0.539 0.9945C0.5134 1 0.4866 1 0.461 0.9945L0.1148 0.9206C0.0472 0.9062 0 0.8563 0 0.7994V0.1254Z";
+
+const LINK_CLASS =
+  "whitespace-nowrap text-sm font-normal leading-[1.4] tracking-[-0.02em] text-white/70 transition-colors duration-200 hover:text-white cursor-pointer";
+const HEADING_CLASS =
+  "font-display whitespace-nowrap text-[15px] font-semibold leading-[1.3] tracking-[-0.02em] text-white";
 
 // CTA-card overlap is owned here, not by callers. The card is vertically
 // centered on the footer's top edge (half above, half below) via
@@ -102,24 +109,14 @@ export function Footer({
 }: { cta?: React.ReactNode; ctaOverlay?: React.ReactNode } = {}) {
   const hasCta = Boolean(cta);
   return (
-    <footer
-      className="relative w-full text-white"
-      style={{
-        background:
-          "linear-gradient(180deg, #151021 0%, #131E8F 70.794%, #471EC0 113.28%)",
-      }}
-    >
+    <footer className="cs-footer relative w-full text-white">
       {hasCta && (
-        <div
-          className="pointer-events-none absolute left-1/2 top-0 z-20 w-full max-w-[1152px] -translate-x-1/2 translate-y-[calc(-100%-30px)] sm:-translate-y-1/2 px-6 sm:px-10"
-        >
+        <div className="pointer-events-none absolute left-1/2 top-0 z-20 w-full max-w-[1152px] -translate-x-1/2 translate-y-[calc(-100%-30px)] sm:-translate-y-1/2 px-6 sm:px-10">
           {/* Sizing wrapper — NO overflow:hidden so `ctaOverlay` children can
               break out of the card. Card width is capped narrower than the
               global container so it reads as a focused conversion block, not a
               section-width banner. */}
-          <div
-            className="pointer-events-auto relative w-full h-[350px] sm:h-[300px] lg:h-[260px]"
-          >
+          <div className="pointer-events-auto relative w-full h-[350px] sm:h-[300px] lg:h-[260px]">
             {/* Clipped card surface — fills the slot and clips inner content
                 to the rounded box. */}
             <div
@@ -135,7 +132,18 @@ export function Footer({
           </div>
         </div>
       )}
-      <div className="relative w-full overflow-hidden">
+      <svg width="0" height="0" className="absolute" aria-hidden focusable="false">
+        <defs>
+          <clipPath id={SHIELD_CLIP_ID} clipPathUnits="objectBoundingBox">
+            <path d={SHIELD_CLIP_PATH} />
+          </clipPath>
+        </defs>
+      </svg>
+      {/* The body is the opaque curtain (gradient + z-index 1 in globals.css)
+          that lifts off the pinned signature band below it. `overflow-clip`,
+          not `hidden`: it crops the blurred glows without turning the body
+          into a scroll container, which would trap the sticky band. */}
+      <div className="cs-footer-body w-full overflow-clip">
         {/* Large soft glow that brightens the upper-left of the footer. */}
         <div
           aria-hidden
@@ -164,135 +172,158 @@ export function Footer({
             filter: "blur(125px)",
           }}
         />
-        <div className="relative">
-          <div className={`relative mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 pb-[80px] ${hasCta ? "pt-[var(--footer-cta-pt)]" : "pt-[80px]"}`}>
-            {/* Main row — three balanced zones: a brand anchor (logo with the
-            social icons stacked beneath), the nav columns, and the
-            right-anchored credential cluster (Awarded with / Docker verified /
-            Certifications). Stacks vertically below lg; becomes a single
-            edge-to-edge row at lg+. */}
-            <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between lg:gap-x-8 xl:gap-x-12">
-              {/* Brand anchor — logo over social icons. */}
-              <div className="flex shrink-0 flex-col gap-7">
-                <Link
-                  href="/"
-                  aria-label="CleanStart home"
-                  className="relative block h-[32px] w-[153px] rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300/70"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/images/cleanstart-logo.png"
-                    alt="CleanStart"
-                    width={153}
-                    height={32}
-                    loading="eager"
-                    decoding="async"
-                    className="h-full w-full object-contain object-left"
-                  />
-                </Link>
+        <div
+          className={`relative mx-auto w-full max-w-[var(--container-default)] px-6 pb-8 sm:px-10 lg:pb-10 ${hasCta ? "pt-[calc(var(--footer-cta-pt)-24px)]" : "pt-12 lg:pt-14"}`}
+        >
+          {/* Brand band: logo left, social icons right. Wraps to two rows
+              on narrow phones where both cannot share a line. */}
+          <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-6">
+            <Link
+              href="/"
+              aria-label="CleanStart home"
+              className="relative block h-[40px] w-[191px] rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300/70"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/cleanstart-logo.png"
+                alt="CleanStart"
+                width={191}
+                height={40}
+                loading="eager"
+                decoding="async"
+                className="h-full w-full object-contain object-left"
+              />
+            </Link>
 
-                <ul className="flex items-center gap-[19px]" aria-label="Social media">
-                  {SOCIAL_ICONS.map((s) => (
-                    <li key={s.name}>
-                      <a
-                        href={s.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={s.name}
-                        className="cs-social-link flex h-10 w-10 items-center justify-center rounded-full text-white transition-[transform,color] duration-200 hover:scale-105 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300/70"
-                        style={{
-                          backgroundColor: "rgba(217, 217, 217, 0.15)",
-                          backdropFilter: "blur(5px)",
-                          boxShadow:
-                            "inset 2.67px 2.67px 13.33px 4px rgba(168, 108, 252, 0.4)",
-                          "--social-hover": s.hoverColor,
-                        } as React.CSSProperties}
-                      >
-                        <span className="sr-only">{s.name}</span>
-                        <svg
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                          aria-hidden
-                        >
-                          <path d={s.path} />
-                        </svg>
-                      </a>
+            <ul className="flex items-center gap-3" aria-label="Social media">
+              {SOCIAL_ICONS.map((s) => (
+                <li key={s.name}>
+                  <a
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={s.name}
+                    className="cs-social-link flex h-10 w-10 items-center justify-center rounded-full text-white transition-[transform,color] duration-200 hover:scale-105 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300/70"
+                    style={{
+                      backgroundColor: "rgba(217, 217, 217, 0.15)",
+                      backdropFilter: "blur(5px)",
+                      boxShadow:
+                        "inset 2.67px 2.67px 13.33px 4px rgba(168, 108, 252, 0.4)",
+                      "--social-hover": s.hoverColor,
+                    } as React.CSSProperties}
+                  >
+                    <span className="sr-only">{s.name}</span>
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      aria-hidden
+                    >
+                      <path d={s.path} />
+                    </svg>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Nav band: link columns left, credential cluster right. The
+              columns are max-content tracks with nowrap labels, so they never
+              break a label; the cluster takes the remaining width and sizes
+              its shields from that width, so it never wraps to a second row. */}
+          <div className="mt-6 grid gap-y-10 border-t border-white/10 pt-8 md:grid-cols-[auto_minmax(0,1fr)] md:gap-x-8 lg:gap-x-12 lg:pt-10 xl:gap-x-16">
+            <nav
+              className="grid sm:grid-cols-[repeat(3,max-content)] sm:gap-x-8 lg:gap-x-10 xl:gap-x-14"
+              aria-label="Footer navigation"
+            >
+              <FooterColumn title="Product" links={COL_PRODUCT} />
+              <FooterColumn title="Solutions" links={COL_SOLUTIONS} />
+              <FooterColumn title="Company" links={COL_COMPANY} />
+            </nav>
+
+            <div className="cs-footer-credentials flex md:justify-end">
+              {/* Watermark: the logo mark, faint, centered in whatever space
+                  is left between the nav columns and the credentials. The
+                  slot sizes it from its own width and hides it when the gap
+                  is too narrow to hold it (globals.css). */}
+              <div className="cs-footer-watermark-slot hidden lg:flex" aria-hidden>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/footer/cleanstart-mark.svg"
+                  alt=""
+                  width={54}
+                  height={62}
+                  loading="lazy"
+                  decoding="async"
+                  draggable={false}
+                  className="cs-footer-watermark pointer-events-none select-none"
+                />
+              </div>
+              <div className="flex flex-col gap-4">
+                <p className={`${HEADING_CLASS} md:whitespace-normal lg:whitespace-nowrap`}>
+                  Certifications and recognition
+                </p>
+                <ul className="grid grid-cols-4 items-start gap-[var(--cs-shield-gap)] md:grid-cols-2 lg:grid-cols-4">
+                  {CREDENTIALS.map((badge) => (
+                    <li
+                      key={badge.src}
+                      className="flex w-[var(--cs-shield-w)] flex-col items-center gap-2"
+                    >
+                      <ShieldBadge badge={badge} />
+                      <span className="text-center text-xs leading-[1.3] text-white/60">
+                        {badge.caption}
+                      </span>
                     </li>
                   ))}
                 </ul>
               </div>
-
-              {/* Nav columns — accordion stack on mobile, a row from sm+. */}
-              <nav
-                className="flex flex-col sm:flex-row sm:gap-10 lg:gap-12"
-                aria-label="Footer navigation"
-              >
-                <FooterColumn title="Contact" links={COL_CONTACT} />
-                <FooterColumn title="Solutions" links={COL_SOLUTIONS} />
-                <FooterColumn title="Connect" links={COL_CONNECT} />
-              </nav>
-
-              {/* Right-anchored credential cluster — each heading centered over
-              its badge(s). */}
-              <div className="flex flex-wrap items-start justify-center lg:justify-end gap-x-6 gap-y-8 [--shield-scale:0.72] xl:[--shield-scale:0.85]">
-                {CREDENTIALS.map((group) => (
-                  <CredentialGroup key={group.title} group={group} />
-                ))}
-              </div>
             </div>
+          </div>
 
-            {/* Bottom row — copyright (left) + legal links (right), divided
-            from the nav band above. */}
-            <div className="mt-[32px] flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-[24px]">
-              <span
-                className="text-2xs font-normal leading-[1.1] text-white/95"
-                style={{ letterSpacing: "0.24px" }}
-              >
-                ©2026 CleanStart. All rights reserved.
-              </span>
+          {/* Utility row: copyright left, legal links right. */}
+          <div className="mt-10 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-t border-white/10 pt-6">
+            <span
+              className="text-xs leading-[1.4] text-white/60"
+              style={{ letterSpacing: "0.12px" }}
+            >
+              ©2026 CleanStart. All rights reserved.
+            </span>
 
-              <ul className="flex items-center gap-2 leading-none">
-                {LEGAL_LINKS.map((link, i) => (
-                  <React.Fragment key={link.href}>
-                    <li className="flex leading-none">
-                      {/* prefetch disabled: these legal links render on every
-                          page, so default in-viewport prefetch fires an RSC
-                          (`?_rsc=`) request site-wide — pure crawl-budget waste
-                          for low-traffic policy pages. Click nav is unaffected. */}
-                      <Link
-                        href={link.href}
-                        prefetch={false}
-                        className="text-xs italic leading-[1.75] text-white transition-colors duration-200 hover:text-cyan-200 cursor-pointer"
-                        style={{ letterSpacing: "0.24px" }}
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                    {i < LEGAL_LINKS.length - 1 && (
-                      <li
-                        aria-hidden
-                        className="h-[3px] w-[3px] rounded-full bg-white/95"
-                      />
-                    )}
-                  </React.Fragment>
-                ))}
-                <li
-                  aria-hidden
-                  className="h-[3px] w-[3px] rounded-full bg-white/95"
-                />
-                <li className="flex leading-none">
-                  <CookiePreferencesButton
-                    className="text-xs italic leading-[1.75] text-white transition-colors duration-200 hover:text-cyan-200 cursor-pointer"
-                    style={{ letterSpacing: "0.24px" }}
-                  />
-                </li>
-              </ul>
-            </div>
+            <ul className="flex flex-wrap items-center gap-x-3 gap-y-1 leading-none">
+              {LEGAL_LINKS.map((link, i) => (
+                <React.Fragment key={link.href}>
+                  <li className="flex leading-none">
+                    {/* prefetch disabled: these legal links render on every
+                        page, so default in-viewport prefetch fires an RSC
+                        (`?_rsc=`) request site-wide — pure crawl-budget waste
+                        for low-traffic policy pages. Click nav is unaffected. */}
+                    <Link
+                      href={link.href}
+                      prefetch={false}
+                      className="text-xs leading-[1.75] text-white/70 transition-colors duration-200 hover:text-white cursor-pointer"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                  {i < LEGAL_LINKS.length - 1 && (
+                    <li aria-hidden className="h-[3px] w-[3px] rounded-full bg-white/40" />
+                  )}
+                </React.Fragment>
+              ))}
+              <li aria-hidden className="h-[3px] w-[3px] rounded-full bg-white/40" />
+              <li className="flex leading-none">
+                <CookiePreferencesButton className="text-xs leading-[1.75] text-white/70 transition-colors duration-200 hover:text-white cursor-pointer" />
+              </li>
+            </ul>
           </div>
         </div>
       </div>
+
+      {/* Signature: the full vector logo at container width, pinned under
+          the body and revealed as the body lifts (see FooterSignature). Purely
+          decorative; the brand band above carries the accessible logo. */}
+      <FooterSignature />
     </footer>
   );
 }
@@ -304,12 +335,8 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
     <div className="sm:contents">
       {/* Mobile accordion */}
       <details className="sm:hidden border-b border-white/10 group">
-        <summary
-          className="flex items-center justify-between cursor-pointer list-none py-3"
-        >
-          <p className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white">
-            {title}
-          </p>
+        <summary className="flex items-center justify-between cursor-pointer list-none py-3">
+          <p className={HEADING_CLASS}>{title}</p>
           <svg
             width="16"
             height="16"
@@ -330,30 +357,17 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
         <ul className="flex flex-col gap-3 pb-4">
           {links.map((link) => (
             <li key={link.href} className="flex leading-none">
+              {/* `before:` expands the touch target from 19.6px (14px x 1.4,
+                  no padding) to 28px, clearing the 24x24 WCAG 2.5.8 AA floor.
+                  Done with an absolutely-positioned pseudo-element rather than
+                  padding so the footer's visual rhythm is untouched: the list
+                  uses gap-3 (12px), so 4px of overhang each side still leaves
+                  4px of clearance between adjacent targets. */}
               <a
                 href={link.href}
-                /* `before:` expands the touch target from 19.6px (14px x 1.4,
-                   no padding) to 28px, clearing the 24x24 WCAG 2.5.8 AA floor.
-                   Done with an absolutely-positioned pseudo-element rather than
-                   padding so the footer's visual rhythm is untouched: the list
-                   uses gap-3 (12px), so 4px of overhang each side still leaves
-                   4px of clearance between adjacent targets. */
-                className="group/link relative inline-flex items-center gap-2 text-sm font-normal leading-[1.4] tracking-[-0.04em] text-white/85 transition-colors duration-200 hover:text-white cursor-pointer before:absolute before:inset-x-0 before:-inset-y-1 before:content-['']"
+                className={`relative inline-flex items-center before:absolute before:inset-x-0 before:-inset-y-1 before:content-[''] ${LINK_CLASS}`}
               >
-                <span>{link.label}</span>
-                <svg
-                  width="10"
-                  height="14"
-                  viewBox="0 0 10 14"
-                  fill="none"
-                  aria-hidden
-                  className="opacity-90 transition-transform duration-200 group-hover/link:translate-x-1"
-                >
-                  <path
-                    d="M7.62875 7.38101L2.40375 12.3179L1.25 11.1674L4.40375 8.29228L5.49625 7.36956L4.40375 6.44683L1.25 3.59465L2.40375 2.41992L7.62875 7.38101Z"
-                    fill="currentColor"
-                  />
-                </svg>
+                {link.label}
               </a>
             </li>
           ))}
@@ -362,30 +376,12 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
 
       {/* Desktop column (always expanded) */}
       <div className="hidden sm:block">
-        <p className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white">
-          {title}
-        </p>
-        <ul className="mt-6 flex flex-col gap-3">
+        <p className={HEADING_CLASS}>{title}</p>
+        <ul className="mt-5 flex flex-col gap-3">
           {links.map((link) => (
             <li key={link.href} className="flex leading-none">
-              <a
-                href={link.href}
-                className="group inline-flex items-center gap-2 text-sm font-normal leading-[1.4] tracking-[-0.04em] text-white/85 transition-colors duration-200 hover:text-white cursor-pointer"
-              >
-                <span>{link.label}</span>
-                <svg
-                  width="10"
-                  height="14"
-                  viewBox="0 0 10 14"
-                  fill="none"
-                  aria-hidden
-                  className="opacity-90 transition-transform duration-200 group-hover:translate-x-1"
-                >
-                  <path
-                    d="M7.62875 7.38101L2.40375 12.3179L1.25 11.1674L4.40375 8.29228L5.49625 7.36956L4.40375 6.44683L1.25 3.59465L2.40375 2.41992L7.62875 7.38101Z"
-                    fill="currentColor"
-                  />
-                </svg>
+              <a href={link.href} className={`inline-flex items-center ${LINK_CLASS}`}>
+                {link.label}
               </a>
             </li>
           ))}
@@ -395,83 +391,48 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
   );
 }
 
-// One labelled credential group: a heading centered over its badge(s) at every
-// breakpoint; the parent wrapper packs the groups to the footer's right edge
-// (`sm:justify-end`).
-function CredentialGroup({ group }: { group: (typeof CREDENTIALS)[number] }) {
-  return (
-    <div className="flex flex-col gap-4 items-center">
-      <p className="font-display text-lg font-semibold leading-[1.3] tracking-[-0.04em] text-white text-center">
-        {group.title}
-      </p>
-      <div className="flex flex-wrap items-start justify-center gap-3">
-        {group.badges.map((badge) => (
-          <ShieldBadge key={badge.src} badge={badge} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-const BADGE_SHIELD_PATH =
-  "M0 17.7C0 7.925 7.925 0 17.7 0H97.35C107.125 0 115.05 7.925 115.05 17.7V112.865C115.05 120.911 109.622 127.946 101.837 129.986L62.012 140.424C59.07 141.195 55.98 141.195 53.038 140.424L13.213 129.986C5.428 127.946 0 120.911 0 112.865V17.7Z";
-
-// Glassy pentagonal shield housing a single credential badge image.
+// Glassy pentagonal shield housing a single credential badge image. Width comes
+// from `--cs-shield-w` (set on `.cs-footer-credentials` in globals.css from the
+// cluster's own inline size); the aspect ratio and the objectBoundingBox
+// clipPath keep the outline exact at every size.
 function ShieldBadge({ badge }: { badge: Badge }) {
-  const shield: React.CSSProperties = {
-    clipPath: `path('${BADGE_SHIELD_PATH}')`,
-    WebkitClipPath: `path('${BADGE_SHIELD_PATH}')`,
-  };
   return (
-    // Outer box reserves the post-scale footprint so flex layout stays honest.
-    // The inner box keeps the native 115×140 canvas the clip-path is authored
-    // against, then transforms down uniformly — scaling shield + image together.
-    // `--shield-scale` is set on the credentials wrapper (smaller on mobile, 1 at sm+).
     <div
-      className="relative"
+      className="cs-footer-shield relative w-full"
       title={badge.name}
       style={{
-        width: "calc(115px * var(--shield-scale, 1))",
-        height: "calc(140px * var(--shield-scale, 1))",
+        clipPath: `url(#${SHIELD_CLIP_ID})`,
+        WebkitClipPath: `url(#${SHIELD_CLIP_ID})`,
       }}
     >
+      {/* Glassy shield background */}
       <div
-        className="absolute left-0 top-0 h-[140px] w-[115px]"
+        aria-hidden
+        className="absolute inset-0 backdrop-blur-md"
+        style={{ backgroundColor: "rgba(255, 255, 255, 0.08)" }}
+      />
+      {/* Subtle inner highlight along the top edge for the glass feel */}
+      <div
+        aria-hidden
+        className="absolute inset-0"
         style={{
-          transform: "scale(var(--shield-scale, 1))",
-          transformOrigin: "top left",
+          background:
+            "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 35%)",
+          mixBlendMode: "screen",
         }}
-      >
-        {/* Glassy shield background */}
-        <div
-          aria-hidden
-          className="absolute inset-0 backdrop-blur-md"
-          style={{ ...shield, backgroundColor: "rgba(255, 255, 255, 0.08)" }}
+      />
+      {/* Badge image, centered in the rectangular area above the point. */}
+      <div className="absolute inset-x-0 top-0 flex h-[83%] items-center justify-center px-[5%]">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={badge.src}
+          alt={badge.name}
+          width={badge.w}
+          height={badge.h}
+          loading="lazy"
+          decoding="async"
+          className="max-h-[88%] w-auto max-w-full object-contain"
         />
-        {/* Subtle inner highlight along the top edge for the glass feel */}
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            ...shield,
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 35%)",
-            mixBlendMode: "screen",
-          }}
-        />
-        {/* Badge image — centered in the upper rectangular area, above the point */}
-        <div className="absolute inset-x-0 top-0 flex h-[117px] items-center justify-center px-1.5">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={badge.src}
-            alt={badge.name}
-            width={badge.w}
-            height={badge.h}
-            loading="lazy"
-            decoding="async"
-            className="max-h-[104px] w-auto max-w-full object-contain"
-          />
-        </div>
       </div>
     </div>
   );

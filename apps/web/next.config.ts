@@ -82,11 +82,10 @@ const nextConfig: NextConfig = {
       // Industry pages live under `/industries/`, but the slug already names
       // the industry, so the shorter path is the natural guess and returns a
       // hard 404. Same courtesy 301 as `/guides` above: it was never a live
-      // URL, just one worth catching. The sibling /industries/modern-applications
-      // was never indexed or linked under its earlier slugs, so it carries none.
+      // URL, just one worth catching.
       {
         source: "/financial-services-container-security",
-        destination: "/industries/financial-services-container-security",
+        destination: "/industries/financial-services",
         permanent: true,
       },
       // The operational-impact estimator launched at `/roi-calculator` and was
@@ -111,6 +110,25 @@ const nextConfig: NextConfig = {
       {
         source: "/careers/:slug",
         destination: "/job/:slug",
+        permanent: true,
+      },
+      // Post-launch rename of the financial services page, requested
+      // 2026-09-04. Unlike the earlier /financial-services move, this URL was
+      // live: indexable, listed in the sitemap and linked from the nav, so the
+      // 301 is load-bearing rather than courtesy. It ships in code so the
+      // redirect lands in the same deploy as the route move.
+      {
+        source: "/industries/financial-services-container-security",
+        destination: "/industries/financial-services",
+        permanent: true,
+      },
+      // Post-launch rename of the SaaS / modern applications page, requested
+      // 2026-09-04 alongside its H1 and nav label. Live URL: indexable,
+      // sitemap-listed and nav-linked, so this 301 is load-bearing and ships
+      // with the route move.
+      {
+        source: "/industries/modern-applications",
+        destination: "/industries/software-applications",
         permanent: true,
       },
       // Residual Webflow migration redirects. These twelve URLs were indexed on

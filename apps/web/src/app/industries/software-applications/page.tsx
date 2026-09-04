@@ -16,10 +16,21 @@ import { JsonLdGraph } from '@/components/JsonLdGraph';
 import { getPageGraph } from '@/lib/seo/compose-page';
 
 /*
- * /industries/modern-applications
+ * /industries/software-applications
  *
- * Title and description are the SEO team's, applied verbatim; the H1 is the
- * client's. Sibling to financial-services-container-security under the
+ * Renamed from /industries/modern-applications on 2026-09-04, on request,
+ * together with the H1 ("Applications" to "Software") and the nav label. This
+ * one was live: indexable, sitemap-listed and nav-linked, so its 301 is
+ * load-bearing and ships in next.config.ts alongside the route move.
+ *
+ * Title, description and breadcrumb were rewritten with it rather than left
+ * behind. The URL, H1 and nav anchor all now say software and SaaS; leaving
+ * "Modern Application Security" in the title and "Modern Applications" in the
+ * breadcrumb would have pointed the page's strongest relevance signals at a
+ * term it no longer uses anywhere a visitor can see. The title follows the
+ * sibling's proven shape ("Container Security for Financial Services"), which
+ * matters more than usual here: the H1 is a slogan carrying no keyword, so the
+ * title tag is the only place the head term still lives. Sibling to financial-services under the
  * /industries segment; see that file for why the segment exists and why
  * /industries itself still 404s.
  *
@@ -34,7 +45,7 @@ import { getPageGraph } from '@/lib/seo/compose-page';
  * its sibling, so it emits the full Organization + WebSite + WebPage +
  * BreadcrumbList graph.
  *
- * The breadcrumb is Home > Modern Applications, with no Industries crumb,
+ * The breadcrumb is Home > Software and SaaS, with no Industries crumb,
  * because /industries has no page and the crumb would link to a 404.
  *
  * Band rhythm, in order: dark hero, white, tinted, DARK, white, tinted, DARK.
@@ -43,23 +54,23 @@ import { getPageGraph } from '@/lib/seo/compose-page';
  * blocks into the close; the two light sections are separated by value instead.
  */
 export const metadata = buildPageMetadata({
-  title: 'Modern Application Security | CleanStart',
+  title: 'Container Security for SaaS and Software | CleanStart',
   absoluteTitle: true,
   description:
-    'Secure modern applications with verified software components, hardened container images, and trusted open-source libraries built for faster, safer software delivery.',
-  path: '/industries/modern-applications',
+    'Secure SaaS and software applications with verified software components, hardened container images, and trusted open-source libraries built for faster, safer software delivery.',
+  path: '/industries/software-applications',
   eyebrow: 'Solutions',
 });
 
 export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
 
 export default async function SaasPage(): Promise<React.ReactElement> {
-  const graph = await getPageGraph('/industries/modern-applications', [
-    breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Modern Applications' }]),
+  const graph = await getPageGraph('/industries/software-applications', [
+    breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Software and SaaS' }]),
   ]);
   return (
     <>
-      <JsonLdGraph id="modern-applications-jsonld" graph={graph} />
+      <JsonLdGraph id="software-applications-jsonld" graph={graph} />
       <Header />
       <main id="main-content">
         <SaasHero />

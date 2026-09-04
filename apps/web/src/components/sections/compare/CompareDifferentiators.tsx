@@ -1,15 +1,30 @@
 import { Section, Container } from "@/components/layout";
 import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import { DIFFERENTIATORS } from "./compare-data";
-import { CornerTile, cornerAt, Icon3D, WASH_LIGHT } from "./compare-visuals";
+import { AccentHeading, EnterpriseUnions, Icon3D, WASH_LAVENDER } from "./compare-visuals";
+
+/**
+ * Keep a hyphenated compound ("Source-to-Artifact") on one line. Balanced
+ * wrapping otherwise breaks it at the hyphen, which reads as a typo.
+ */
+function unbreakable(heading: string): React.ReactNode {
+  return heading.split(" ").map((word, i) => (
+    <span key={`${word}-${i}`}>
+      {i > 0 ? " " : null}
+      {word.includes("-") ? <span className="whitespace-nowrap">{word}</span> : word}
+    </span>
+  ));
+}
 
 /**
  * "Where CleanStart Differentiates" and its three sub-headings.
  *
- * These are the document's only H2s, so they are the page's only H3s. Three
- * `SbomAdvantage` corner tiles carrying the violet 3D icon set already in
- * `public/images/compare`; the oversized corner rotates across the row, which
- * is the rhythm the site gets out of that tile rather than a colour rotation.
+ * These are the document's only H2s, so they are the page's only H3s. Laid
+ * out the way the site's "Why It Matters" bands are: three open columns split
+ * by gradient hairlines, each led by a large violet 3D icon on the purple
+ * bloom, then a bold H3 and its sentence. No tiles: this is the page's thesis
+ * band, and the icons need room to carry it. Three columns need `lg` to hold
+ * a readable measure; below it they stack.
  */
 export function CompareDifferentiators(): React.ReactElement {
   return (
@@ -17,8 +32,10 @@ export function CompareDifferentiators(): React.ReactElement {
       padding="lg"
       data-section="CompareDifferentiators"
       className="overflow-hidden"
-      style={{ background: WASH_LIGHT }}
+      style={{ background: WASH_LAVENDER }}
     >
+      <EnterpriseUnions />
+
       <Container className="relative">
         <div className="max-w-[720px]">
           <Reveal header>
@@ -27,46 +44,62 @@ export function CompareDifferentiators(): React.ReactElement {
               className="font-display text-[#111111]"
               style={{
                 fontSize: "var(--fs-h2)",
-                fontWeight: 600,
+                fontWeight: "var(--fs-h2-weight)",
                 letterSpacing: "var(--fs-h2-ls)",
                 lineHeight: "var(--fs-h2-lh)",
               }}
             >
-              {DIFFERENTIATORS.heading}
+              <AccentHeading text={DIFFERENTIATORS.heading} />
             </h2>
           </Reveal>
         </div>
 
-        <RevealStagger className="mt-10 grid gap-6 md:grid-cols-2 lg:mt-14 lg:grid-cols-3">
+        <RevealStagger className="mt-12 grid gap-10 lg:mt-16 lg:grid-cols-3 lg:gap-0">
           {DIFFERENTIATORS.items.map((item, index) => (
-            <RevealItem key={item.id} className="h-full">
-              <CornerTile corner={cornerAt(index)} className="gap-0">
-                <Icon3D src={item.icon} size={68} />
-
-                <h3
-                  className="mt-5 font-display text-[#111111]"
+            <RevealItem
+              key={item.id}
+              className="relative flex flex-col lg:px-[clamp(20px,2.5vw,40px)] lg:first:pl-0 lg:last:pr-0"
+            >
+              {index > 0 && (
+                <span
+                  aria-hidden
+                  className="absolute inset-y-0 left-0 hidden w-px lg:block"
                   style={{
-                    fontSize: "var(--fs-h4)",
-                    fontWeight: 600,
-                    letterSpacing: "var(--fs-h4-ls)",
-                    lineHeight: "var(--fs-h4-lh)",
+                    background:
+                      "linear-gradient(to bottom, transparent 0%, #d9d9d9 20%, #d9d9d9 80%, transparent 100%)",
                   }}
-                >
-                  {item.heading}
-                </h3>
+                />
+              )}
 
-                <p
-                  className="mt-3"
-                  style={{
-                    fontFamily: "var(--font-sans)",
-                    fontSize: "var(--fs-body)",
-                    lineHeight: "var(--fs-body-lh)",
-                    color: "rgba(17,17,17,0.66)",
-                  }}
-                >
-                  {item.body}
-                </p>
-              </CornerTile>
+              <Icon3D src={item.icon} size={124} />
+
+              <h3
+                /* The measures are sized for the three-column desktop layout;
+                   below lg the column is the full width and a 20ch cap just
+                   leaves half the band empty. */
+                className="mt-6 font-display text-[#111111] lg:max-w-[20ch]"
+                style={{
+                  fontSize: "var(--fs-h3)",
+                  fontWeight: "var(--fs-h3-weight)",
+                  letterSpacing: "var(--fs-h3-ls)",
+                  lineHeight: "var(--fs-h3-lh)",
+                }}
+              >
+                {unbreakable(item.heading)}
+              </h3>
+
+              <p
+                className="mt-4 max-w-[62ch] lg:max-w-[36ch]"
+                style={{
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "var(--fs-body)",
+                  lineHeight: "var(--fs-body-lh)",
+                  letterSpacing: "var(--fs-body-ls)",
+                  color: "#333333",
+                }}
+              >
+                {item.body}
+              </p>
             </RevealItem>
           ))}
         </RevealStagger>

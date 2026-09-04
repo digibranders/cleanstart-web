@@ -1,42 +1,50 @@
 import { Section, Container } from "@/components/layout";
-import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
-import { FOUNDATIONS } from "./compare-data";
-import { BRAND, LightBandDecor, WASH_LIGHT } from "./compare-visuals";
+import { RevealStagger, RevealItem } from "@/components/ui/Reveal";
+import { FOUNDATIONS, UI } from "./compare-data";
+import { BandHeader, BRAND, LightBandDecor, WASH_LIGHT } from "./compare-visuals";
 
 /**
  * "What Are Docker Hardened Images and How Do They Compare With CleanStart?"
  *
- * Two panels, deliberately not symmetrical in weight. The Docker panel is a
- * plain white tile with a slate rule; the CleanStart panel carries the site's
- * gradient assurance card. Same structure, same type scale, same bullet count —
- * the page is not hiding the comparison, it is just clear about whose site this
- * is.
+ * Two open columns on the wash, split by the site's gradient hairline with a
+ * "vs" marker at its midpoint, rather than two boxed cards: the hero has just
+ * drawn the two stacks side by side, and this band keeps that axis (Docker on
+ * the left, CleanStart on the right) without adding chrome. The CleanStart
+ * column sits on a faint violet field; the Docker column sits on the wash.
+ * Same structure, same type scale, same bullet count. The page is not hiding
+ * the comparison, it is just clear about whose site this is.
  *
  * The vendor names and the two "focuses on" lead-ins are `<p>`, not headings:
  * the source document does not set them as headings, and promoting them would
  * add an outline level SEO never wrote.
  */
 
-function FocusMarker({
-  tone,
-}: {
-  tone: "docker" | "cleanstart";
-}): React.ReactElement {
+function Marker({ tone }: { tone: "docker" | "cleanstart" }): React.ReactElement {
+  const isCleanStart = tone === "cleanstart";
   return (
     <span
       aria-hidden
-      className="mt-[7px] block size-[7px] shrink-0 rotate-45 rounded-[1.5px]"
+      className="mt-[3px] inline-flex size-[20px] shrink-0 items-center justify-center rounded-full"
       style={{
-        background:
-          tone === "cleanstart"
-            ? `linear-gradient(135deg, ${BRAND.violetLight}, ${BRAND.violet})`
-            : "rgba(51, 65, 85, 0.42)",
+        background: isCleanStart
+          ? `linear-gradient(135deg, ${BRAND.violet}, ${BRAND.blue})`
+          : BRAND.slate,
       }}
-    />
+    >
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+        <path
+          d="M2.5 6.2 4.8 8.5 9.5 3.8"
+          stroke="#ffffff"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </span>
   );
 }
 
-function Panel({
+function Column({
   column,
   tone,
 }: {
@@ -46,112 +54,124 @@ function Panel({
   const isCleanStart = tone === "cleanstart";
   return (
     <article
-      className="relative flex h-full flex-col overflow-hidden"
+      className="relative flex h-full flex-col"
       style={{
         borderRadius: "24px",
-        padding: "clamp(24px, 2.2vw, 38px)",
-        ...(isCleanStart
-          ? {
-              border: "1px solid rgba(120,180,255,0.45)",
-              background:
-                "linear-gradient(150deg, #ffffff 0%, #ffffff 38%, #F6EDFF 78%, #EFDCFF 100%)",
-              boxShadow:
-                "0 1px 2px rgba(17,17,17,0.04), 0 18px 44px -22px rgba(70,30,190,0.24)",
-            }
-          : {
-              border: "1px solid rgba(17,17,17,0.09)",
-              background: "#ffffff",
-              boxShadow: "0 1px 2px rgba(17,17,17,0.04)",
-            }),
+        padding: "clamp(22px, 2vw, 34px)",
+        background: isCleanStart
+          ? "linear-gradient(180deg, rgba(106,61,240,0.085) 0%, rgba(106,61,240,0.025) 100%)"
+          : "transparent",
       }}
     >
-      {isCleanStart && (
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-0 select-none"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(120,120,200,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(120,120,200,0.07) 1px, transparent 1px)",
-            backgroundSize: "68px 68px",
-          }}
-        />
-      )}
 
-      <div className="relative flex h-full flex-col">
-        {/* Accent rule above the name: the page's one colour-coded axis. */}
-        <span
-          aria-hidden
-          className="block h-[3px] w-11 rounded-full"
-          style={{
-            background: isCleanStart
-              ? `linear-gradient(90deg, ${BRAND.violet}, ${BRAND.blue})`
-              : "rgba(51,65,85,0.3)",
-          }}
-        />
+      <p
+        className="font-display text-[#111111]"
+        style={{
+          fontSize: "var(--fs-h3)",
+          fontWeight: "var(--fs-h3-weight)",
+          letterSpacing: "var(--fs-h3-ls)",
+          lineHeight: "var(--fs-h3-lh)",
+        }}
+      >
+        {column.label}
+      </p>
 
-        <p
-          className="mt-5 font-display text-[#111111]"
-          style={{
-            fontSize: "var(--fs-h4)",
-            fontWeight: 600,
-            letterSpacing: "var(--fs-h4-ls)",
-            lineHeight: "var(--fs-h4-lh)",
-          }}
-        >
-          {column.label}
-        </p>
+      <p
+        className="mt-4"
+        style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: "var(--fs-body)",
+          lineHeight: "var(--fs-body-lh)",
+          letterSpacing: "var(--fs-body-ls)",
+          color: "#333333",
+          maxWidth: "46ch",
+        }}
+      >
+        {column.body}
+      </p>
 
-        <p
-          className="mt-3"
-          style={{
-            fontFamily: "var(--font-sans)",
-            fontSize: "var(--fs-body)",
-            lineHeight: "var(--fs-body-lh)",
-            color: "rgba(17,17,17,0.66)",
-          }}
-        >
-          {column.body}
-        </p>
+      <p
+        className="mt-8 font-display"
+        style={{
+          fontSize: "var(--fs-eyebrow)",
+          fontWeight: "var(--fs-eyebrow-weight)",
+          letterSpacing: "var(--fs-eyebrow-ls)",
+          lineHeight: "var(--fs-eyebrow-lh)",
+          textTransform: "uppercase",
+          color: isCleanStart ? BRAND.violet : "rgba(51,65,85,0.75)",
+        }}
+      >
+        {column.focusLabel}
+      </p>
 
-        <p
-          className="mt-auto pt-8 font-display"
-          style={{
-            fontSize: "var(--fs-eyebrow)",
-            fontWeight: 600,
-            letterSpacing: "var(--fs-eyebrow-ls)",
-            textTransform: "uppercase",
-            color: isCleanStart ? BRAND.violet : "rgba(51,65,85,0.72)",
-          }}
-        >
-          {column.focusLabel}
-        </p>
-
-        <ul className="mt-4 flex flex-col gap-3">
-          {column.focus.map((item) => (
-            <li key={item} className="flex items-start gap-3">
-              <FocusMarker tone={tone} />
-              <span
-                style={{
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "var(--fs-body)",
-                  lineHeight: 1.5,
-                  color: "#1A1A1A",
-                }}
-              >
-                {item}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <ul className="mt-4 flex flex-col gap-3">
+        {column.focus.map((item) => (
+          <li key={item} className="flex items-start gap-3">
+            <Marker tone={tone} />
+            <span
+              className="font-display"
+              style={{
+                fontSize: "var(--fs-h5)",
+                fontWeight: 500,
+                letterSpacing: "var(--fs-h5-ls)",
+                lineHeight: "var(--fs-h5-lh)",
+                color: "#111111",
+              }}
+            >
+              {item}
+            </span>
+          </li>
+        ))}
+      </ul>
     </article>
   );
 }
 
+function Divider(): React.ReactElement {
+  return (
+    <div
+      aria-hidden
+      className="relative flex h-full items-center justify-center lg:flex-col"
+      style={{ minHeight: "56px" }}
+    >
+      <span
+        className="absolute inset-x-0 top-1/2 h-px lg:inset-x-auto lg:inset-y-0 lg:left-1/2 lg:top-auto lg:h-auto lg:w-px"
+        style={{
+          background:
+            "linear-gradient(to right, transparent 0%, #d9d9d9 20%, #d9d9d9 80%, transparent 100%)",
+        }}
+      />
+      <span
+        className="absolute inset-y-0 left-1/2 hidden w-px lg:block"
+        style={{
+          background:
+            "linear-gradient(to bottom, transparent 0%, #d9d9d9 20%, #d9d9d9 80%, transparent 100%)",
+        }}
+      />
+      <span
+        className="relative inline-flex size-12 items-center justify-center rounded-full bg-white font-display"
+        style={{
+          border: "1.5px solid rgba(0,0,0,0.06)",
+          boxShadow: "0 8px 24px -14px rgba(17,17,17,0.35)",
+          fontSize: "var(--fs-caption)",
+          fontWeight: 600,
+          letterSpacing: "var(--fs-badge-ls)",
+          textTransform: "uppercase",
+          color: BRAND.violet,
+        }}
+      >
+        {UI.versus}
+      </span>
+    </div>
+  );
+}
+
 export function CompareFoundations(): React.ReactElement {
+  const [docker, cleanstart] = FOUNDATIONS.columns;
+
   return (
     <Section
-      padding="lg"
+      padding="md"
       data-section="CompareFoundations"
       className="overflow-hidden"
       style={{ background: WASH_LIGHT }}
@@ -159,46 +179,22 @@ export function CompareFoundations(): React.ReactElement {
       <LightBandDecor />
 
       <Container className="relative">
-        <div className="max-w-[760px]">
-          <Reveal header>
-            <h2
-              id="what-are-docker-hardened-images"
-              className="font-display text-[#111111]"
-              style={{
-                fontSize: "var(--fs-h2)",
-                fontWeight: 600,
-                letterSpacing: "var(--fs-h2-ls)",
-                lineHeight: "var(--fs-h2-lh)",
-              }}
-            >
-              {FOUNDATIONS.heading}
-            </h2>
-          </Reveal>
+        <BandHeader
+          id="what-are-docker-hardened-images"
+          heading={FOUNDATIONS.heading}
+          intro={FOUNDATIONS.intro}
+        />
 
-          <Reveal delay={0.1} y={20}>
-            <p
-              className="mt-5"
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "var(--fs-lead-sm)",
-                lineHeight: 1.6,
-                color: "rgba(17,17,17,0.68)",
-              }}
-            >
-              {FOUNDATIONS.intro}
-            </p>
-          </Reveal>
-        </div>
-
-        <RevealStagger className="mt-12 grid gap-6 lg:mt-16 lg:grid-cols-2 lg:gap-8">
-          {FOUNDATIONS.columns.map((column) => (
-            <RevealItem key={column.id}>
-              <Panel
-                column={column}
-                tone={column.id === "cleanstart" ? "cleanstart" : "docker"}
-              />
-            </RevealItem>
-          ))}
+        <RevealStagger className="mt-10 grid gap-2 lg:mt-14 lg:grid-cols-[minmax(0,1fr)_72px_minmax(0,1fr)] lg:gap-0">
+          <RevealItem className="h-full">
+            <Column column={docker} tone="docker" />
+          </RevealItem>
+          <RevealItem className="h-full self-stretch">
+            <Divider />
+          </RevealItem>
+          <RevealItem className="h-full">
+            <Column column={cleanstart} tone="cleanstart" />
+          </RevealItem>
         </RevealStagger>
       </Container>
     </Section>

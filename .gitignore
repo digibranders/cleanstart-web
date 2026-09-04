@@ -100,3 +100,6 @@ tmp/
 # it has its own git history — committing it would embed a gitlink that breaks
 # fresh clones, and the legacy HTML carries every employee's direct-dial number.
 /cleanstart-email-signatures/
+# Impeccable design-skill artifacts (surface briefs, detector cache). Local
+# tooling output, not app code.
+.impeccable/

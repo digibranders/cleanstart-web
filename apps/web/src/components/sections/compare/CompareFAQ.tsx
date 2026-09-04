@@ -1,142 +1,148 @@
 "use client";
 
-import { useId, useState } from "react";
+import React, { useState } from "react";
 import { Section, Container } from "@/components/layout";
 import { Reveal } from "@/components/ui/Reveal";
-import { FAQS, FAQ_HEADING, UI, type CompareFaq } from "./compare-data";
-import { BRAND } from "./compare-visuals";
+import { FAQS, FAQ_HEADING, type CompareFaq } from "./compare-data";
 
 /**
- * The eight questions from the document, as a single-open accordion.
+ * The eight questions from the document, in the home page's FAQ chrome: two
+ * white cards side by side, hairline dividers, plus-to-cross toggles, one
+ * item open at a time across both columns. The split waits for `lg`; at
+ * tablet width these questions wrap to four lines a piece and the answers
+ * become a ribbon, so below that they run as one column.
  *
- * The questions are `<h3>` inside the section's H2. The document does not style
- * them as headings, but an accordion whose trigger is not in a heading gives
- * screen-reader users no way to walk the list, and `<h3>` here nests under the
- * FAQ H2 without adding a level the document does not already have.
+ * The questions are `<h3>` inside the section's H2. The document does not
+ * style them as headings, but an accordion whose trigger is not in a heading
+ * gives screen-reader users no way to walk the list, and `<h3>` here nests
+ * under the FAQ H2 without adding a level the document does not already have.
  *
- * Answers stay in the DOM when collapsed (`hidden` on a wrapper, height
- * animated by a grid row) so the text is in the page source for crawlers and
- * matches the FAQPage JSON-LD the route emits.
+ * Answers stay in the DOM when collapsed (height animated by a grid row) so
+ * the text is in the page source for crawlers and matches the FAQPage JSON-LD
+ * the route emits.
  */
+
+const CARD =
+  "flex flex-col gap-5 self-start max-lg:rounded-none max-lg:bg-transparent max-lg:p-0 max-lg:shadow-none lg:rounded-[40px] lg:bg-white lg:p-8 lg:shadow-[0_1px_0_rgba(0,0,0,0.04),_0_24px_48px_-24px_rgba(60,30,150,0.08)]";
+
+function ToggleIcon({ open }: { open: boolean }): React.ReactElement {
+  return (
+    <span
+      aria-hidden
+      className="relative mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center"
+      style={{
+        transition: "transform 320ms cubic-bezier(0.22, 1, 0.36, 1)",
+        transform: open ? "rotate(45deg)" : "rotate(0deg)",
+      }}
+    >
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <rect x="2" y="8" width="14" height="2" rx="1" fill="#111111" />
+        <rect x="8" y="2" width="2" height="14" rx="1" fill="#111111" />
+      </svg>
+    </span>
+  );
+}
 
 function Row({
   faq,
   open,
   onToggle,
-  index,
 }: {
   faq: CompareFaq;
   open: boolean;
   onToggle: () => void;
-  index: number;
 }): React.ReactElement {
   const panelId = `compare-faq-panel-${faq.id}`;
   const buttonId = `compare-faq-trigger-${faq.id}`;
 
   return (
-    <li
-      className="overflow-hidden transition-colors"
-      style={{
-        borderRadius: "18px",
-        border: `1px solid ${open ? "rgba(106,61,240,0.28)" : "rgba(17,17,17,0.09)"}`,
-        background: open
-          ? "linear-gradient(150deg, #ffffff 0%, #FBF7FF 100%)"
-          : "#ffffff",
-        boxShadow: open
-          ? "0 18px 40px -28px rgba(70,30,190,0.35)"
-          : "0 1px 2px rgba(17,17,17,0.03)",
-      }}
-    >
-      <h3>
+    <div>
+      <h3 className="m-0">
         <button
           type="button"
           id={buttonId}
           aria-expanded={open}
           aria-controls={panelId}
           onClick={onToggle}
-          className="flex w-full items-start gap-4 px-5 py-5 text-left sm:px-6"
+          className="group flex w-full cursor-pointer items-start justify-between gap-6 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#33BAEC] lg:gap-10"
         >
           <span
-            aria-hidden
-            className="mt-[3px] shrink-0"
+            className="flex-1 font-display text-[#111111] transition-colors duration-200 group-hover:text-[#1B1F4F]"
             style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "12px",
-              letterSpacing: "0.04em",
-              color: open ? BRAND.violet : "rgba(17,17,17,0.3)",
-            }}
-          >
-            {String(index + 1).padStart(2, "0")}
-          </span>
-
-          <span
-            className="flex-1 font-display"
-            style={{
-              fontSize: "var(--fs-h5)",
-              fontWeight: 600,
-              letterSpacing: "-0.01em",
-              lineHeight: 1.4,
-              color: "#111111",
+              fontSize: "var(--fs-h4)",
+              fontWeight: "var(--fs-h4-weight)",
+              lineHeight: "var(--fs-h4-lh)",
+              letterSpacing: "var(--fs-h4-ls)",
             }}
           >
             {faq.question}
           </span>
-
-          <span
-            aria-hidden
-            className="mt-[2px] inline-flex size-7 shrink-0 items-center justify-center rounded-full transition-colors"
-            style={{
-              background: open ? BRAND.violet : "rgba(17,17,17,0.05)",
-              color: open ? "#ffffff" : "rgba(17,17,17,0.55)",
-            }}
-          >
-            <svg
-              width="13"
-              height="13"
-              viewBox="0 0 14 14"
-              fill="none"
-              className="transition-transform duration-300"
-              style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
-            >
-              <path
-                d="M3.5 5.25 7 8.75l3.5-3.5"
-                stroke="currentColor"
-                strokeWidth="1.7"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </span>
+          <ToggleIcon open={open} />
         </button>
       </h3>
 
-      <div
-        className="grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none"
-        style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
+      <section
+        id={panelId}
+        aria-labelledby={buttonId}
+        aria-hidden={!open}
+        style={{
+          display: "grid",
+          gridTemplateRows: open ? "1fr" : "0fr",
+          opacity: open ? 1 : 0,
+          transition:
+            "grid-template-rows 320ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease-out",
+        }}
       >
-        <div className="overflow-hidden">
-          <section id={panelId} aria-labelledby={buttonId}>
-            <p
-              className="px-5 pb-6 pl-[52px] sm:px-6 sm:pb-7 sm:pl-[60px]"
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "var(--fs-body)",
-                lineHeight: "var(--fs-body-lh)",
-                color: "rgba(17,17,17,0.68)",
-              }}
-            >
-              {faq.answer}
-            </p>
-          </section>
+        <div style={{ overflow: "hidden", minHeight: 0 }}>
+          <p
+            className="pt-3 pr-10"
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "var(--fs-body)",
+              lineHeight: "var(--fs-body-lh)",
+              letterSpacing: "var(--fs-body-ls)",
+              color: "#333333",
+            }}
+          >
+            {faq.answer}
+          </p>
         </div>
-      </div>
-    </li>
+      </section>
+    </div>
+  );
+}
+
+function Column({
+  items,
+  openId,
+  onToggle,
+}: {
+  items: readonly CompareFaq[];
+  openId: string | null;
+  onToggle: (id: string) => void;
+}): React.ReactElement {
+  return (
+    <div className={CARD}>
+      {items.map((faq, i) => (
+        <React.Fragment key={faq.id}>
+          <Row faq={faq} open={openId === faq.id} onToggle={() => onToggle(faq.id)} />
+          {i < items.length - 1 && (
+            <div aria-hidden className="h-px w-full bg-[#D9D9D9]" />
+          )}
+        </React.Fragment>
+      ))}
+    </div>
   );
 }
 
 export function CompareFAQ(): React.ReactElement {
   const [openId, setOpenId] = useState<string | null>(FAQS[0].id);
-  const headingId = useId();
+  const half = Math.ceil(FAQS.length / 2);
+  const left = FAQS.slice(0, half);
+  const right = FAQS.slice(half);
+
+  const toggle = (id: string): void =>
+    setOpenId((current) => (current === id ? null : id));
 
   return (
     // `padding="none"` with an explicit bottom: this is the last section, so it
@@ -145,55 +151,61 @@ export function CompareFAQ(): React.ReactElement {
     <Section
       padding="none"
       data-section="CompareFAQ"
-      className="bg-white pt-[var(--spacing-section-lg)] pb-[var(--spacing-section-cta)]"
-      aria-labelledby={headingId}
+      className="relative bg-white pt-[var(--spacing-section-lg)] pb-[var(--spacing-section-cta)]"
+      aria-labelledby="compare-faq-title"
     >
-      <Container>
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.28fr)] lg:gap-16">
-          <div className="lg:sticky lg:top-[calc(var(--cs-header-h)+40px)] lg:self-start">
-            <Reveal header>
-              <h2
-                id={headingId}
-                className="font-display text-[#111111]"
-                style={{
-                  fontSize: "var(--fs-h2)",
-                  fontWeight: 600,
-                  letterSpacing: "var(--fs-h2-ls)",
-                  lineHeight: "var(--fs-h2-lh)",
-                }}
-              >
-                {FAQ_HEADING}
-              </h2>
-              <p
-                className="mt-4 max-w-[42ch]"
-                style={{
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "var(--fs-body)",
-                  lineHeight: "var(--fs-body-lh)",
-                  color: "rgba(17,17,17,0.6)",
-                }}
-              >
-                {UI.faqIntro}
-              </p>
-            </Reveal>
-          </div>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute select-none"
+        style={{
+          right: "162px",
+          top: "143px",
+          width: "262px",
+          height: "262px",
+          borderRadius: "262px",
+          backgroundColor: "#2CC1EB",
+          opacity: 0.18,
+          filter: "blur(101.5px)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute select-none"
+        style={{
+          left: "215px",
+          top: "560px",
+          width: "262px",
+          height: "262px",
+          borderRadius: "262px",
+          backgroundColor: "#DF9BFF",
+          opacity: 0.45,
+          filter: "blur(131.5px)",
+        }}
+      />
 
-          <Reveal delay={0.1} y={24}>
-            <ul className="flex flex-col gap-3">
-              {FAQS.map((faq, index) => (
-                <Row
-                  key={faq.id}
-                  faq={faq}
-                  index={index}
-                  open={openId === faq.id}
-                  onToggle={() =>
-                    setOpenId((current) => (current === faq.id ? null : faq.id))
-                  }
-                />
-              ))}
-            </ul>
-          </Reveal>
-        </div>
+      <Container className="relative">
+        <Reveal header style={{ maxWidth: "720px" }}>
+          <h2
+            id="compare-faq-title"
+            className="font-display text-[#111111]"
+            style={{
+              fontSize: "var(--fs-h2)",
+              fontWeight: "var(--fs-h2-weight)",
+              letterSpacing: "var(--fs-h2-ls)",
+              lineHeight: "var(--fs-h2-lh)",
+            }}
+          >
+            {FAQ_HEADING}
+          </h2>
+        </Reveal>
+
+        <Reveal delay={0.1} y={24} className="mt-8 lg:mt-10">
+          <div className="grid grid-cols-1 items-start gap-5 rounded-[24px] bg-white p-6 max-lg:shadow-[0_1px_0_rgba(0,0,0,0.04),_0_24px_48px_-24px_rgba(60,30,150,0.08)] sm:rounded-[40px] sm:p-8 lg:grid-cols-2 lg:gap-6 lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none">
+            <Column items={left} openId={openId} onToggle={toggle} />
+            <div aria-hidden className="h-px w-full bg-[#D9D9D9] lg:hidden" />
+            <Column items={right} openId={openId} onToggle={toggle} />
+          </div>
+        </Reveal>
       </Container>
     </Section>
   );

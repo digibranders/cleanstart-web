@@ -1,67 +1,92 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import { Section, Container } from "@/components/layout";
 import { Reveal } from "@/components/ui/Reveal";
 import {
   MATRIX,
-  MATRIX_ROW_COUNT,
   UI,
   VENDOR,
   type MatrixCell,
+  type MatrixGroup,
+  type MatrixRow,
 } from "./compare-data";
-import { BRAND, VectorGrid } from "./compare-visuals";
+import { BandHeader, BRAND, Icon3D, VectorGrid, VendorMark } from "./compare-visuals";
 
 /**
- * The capability matrix — the section a visitor arriving on a comparison query
- * came for, so it gets the page's widest column and its only sticky chrome.
+ * The capability matrix, the section a visitor arriving on a comparison query
+ * came for. It gets the page's widest column, its only sticky chrome and its
+ * only controls.
  *
- * One DOM, two layouts. It is a real `<table>` with a caption, column headers
- * and `scope="colgroup"` group rows; below `lg` the table parts flip to
- * `display: block` and each row becomes a labelled card. Rendering a second
- * mobile copy of twenty rows would double the markup and duplicate every
- * string in the page source.
+ * One DOM, three layouts. It is a real `<table>` with a caption, column
+ * headers and `scope="colgroup"` group rows; below `lg` the table parts flip
+ * to `display: block` and each row becomes a card. From `md` to `lg` that card
+ * is a two-column grid, because a tablet has room to set both answers side by
+ * side; below `md` they stack. Rendering a second copy of twenty rows would
+ * double the markup and duplicate every string.
+ *
+ * Below `lg` the outer wrapper drops its own border, fill and shadow, or the
+ * row cards would sit inside a second card.
  *
  * Because that flip is a breakpoint change, every property that differs
- * between the two layouts is a class, never an inline `style` — an inline
- * declaration would win over the `max-lg:` variant and strand the mobile
- * layout with desktop padding. Inline styles here carry colour and type only.
+ * between the two layouts is a class, never an inline `style`. Inline styles
+ * here carry colour and type only.
  *
- * The CleanStart column is tinted for its full height and capped with a violet
- * rule. Twenty rows is more than the eye can track across three columns; the
- * tint is what keeps the reader in the right one.
+ * Wayfinding for twenty rows: the four group rows open as chapters (3D icon
+ * plus label) and stick while their rows scroll, under the column head on
+ * desktop and under the site header on small screens, where the list runs to
+ * many times the viewport. The
+ * head itself sticks flush to the site header rather than a few pixels below
+ * it: that offset let rows scroll through the strip in between, which the
+ * dark CleanStart column turned into a visible seam. a
+ * chapter index above the table jumps to each; and a "differences only"
+ * switch hides the rows where the document gives both vendors the same
+ * answer. Hidden rows stay in the DOM, so the page source and the table a
+ * crawler reads are unchanged.
  *
- * The document writes "✓" and "—" in some cells. Those become markers with an
- * accessible name rather than bare punctuation, so a screen reader announces
- * "Available" instead of reading a dash or skipping the glyph entirely.
+ * Cell padding is 11 to 13px, not the 17px it started at: at 15px/1.5 that
+ * put a one-line row at 58px, which reads as a spaced-out list rather than a
+ * table to scan down.
+ *
+ * Grey label text on the white surfaces is held at 0.62 alpha, 5.29:1
+ * against white. Below that the small uppercase labels drop under 4.5:1:
+ * measured, the jump-to label, the capability head and the per-cell vendor
+ * labels were at 3.54, 4.17 and 2.78.
+ *
+ * Both vendors get the same check glyph. The earlier outlined-vs-filled pair
+ * read as "partial" against "full" on rows where the document says both are
+ * available; the CleanStart column's tint is what carries "our side".
  */
 
-/** Shared padding/border rhythm for the twenty data rows. */
+const HEAD_H = 62;
+
 const CELL =
-  "align-top border-b border-[rgba(17,17,17,0.06)] px-[clamp(16px,1.4vw,24px)] py-[clamp(14px,1.15vw,18px)] max-lg:block max-lg:border-0 max-lg:px-0 max-lg:py-0";
+  "align-top border-b border-[rgba(17,17,17,0.06)] px-[clamp(16px,1.5vw,26px)] py-[clamp(11px,0.85vw,13px)] max-lg:block max-lg:border-0 max-lg:px-0 max-lg:py-0";
 
 const HEAD_CELL =
-  "sticky z-10 top-[calc(var(--cs-header-h)+8px)] text-left align-bottom px-[clamp(16px,1.4vw,24px)] py-[18px]";
+  "sticky z-20 top-[var(--cs-header-h)] text-left align-middle px-[clamp(16px,1.5vw,26px)] py-3";
 
-function YesMark({
-  tone,
-}: {
-  tone: "docker" | "cleanstart";
-}): React.ReactElement {
+const GROUP_CELL =
+  "sticky z-10 lg:top-[calc(var(--cs-header-h)+62px)] lg:border-y lg:border-[rgba(17,17,17,0.08)] lg:bg-[#FAFAFC] px-[clamp(16px,1.5vw,26px)] py-2.5 text-left max-lg:top-[var(--cs-header-h)] max-lg:mt-7 max-lg:block max-lg:bg-white max-lg:px-0 max-lg:py-3";
+
+function YesMark({ tone }: { tone: "docker" | "cleanstart" }): React.ReactElement {
   const isCleanStart = tone === "cleanstart";
   return (
     <span className="inline-flex items-center">
       <span
         aria-hidden
-        className="inline-flex size-[20px] items-center justify-center rounded-full"
+        className="inline-flex size-[22px] items-center justify-center rounded-full"
         style={{
           background: isCleanStart
             ? `linear-gradient(135deg, ${BRAND.violet}, ${BRAND.blue})`
-            : "transparent",
-          border: isCleanStart ? "none" : "1.5px solid rgba(51,65,85,0.34)",
+            : BRAND.slate,
+          boxShadow: isCleanStart ? "0 6px 14px -8px rgba(106,61,240,0.8)" : "none",
         }}
       >
-        <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
           <path
             d="M2.5 6.2 4.8 8.5 9.5 3.8"
-            stroke={isCleanStart ? "#ffffff" : "rgba(51,65,85,0.72)"}
+            stroke="#ffffff"
             strokeWidth="1.8"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -75,11 +100,11 @@ function YesMark({
 
 function NoMark(): React.ReactElement {
   return (
-    <span className="inline-flex items-center">
+    <span className="inline-flex h-[22px] items-center">
       <span
         aria-hidden
-        className="block h-px w-4 rounded-full"
-        style={{ background: "rgba(17,17,17,0.24)" }}
+        className="block h-[2px] w-[18px] rounded-full"
+        style={{ background: "rgba(17,17,17,0.22)" }}
       />
       <span className="sr-only">{UI.notAvailable}</span>
     </span>
@@ -97,8 +122,9 @@ function Cell({
   if (cell.kind === "no") return <NoMark />;
   return (
     <span
+      className="block max-w-[44ch]"
       style={{
-        color: tone === "cleanstart" ? "#111111" : "rgba(17,17,17,0.66)",
+        color: tone === "cleanstart" ? "#111111" : "rgba(17,17,17,0.74)",
         fontWeight: tone === "cleanstart" ? 500 : 400,
       }}
     >
@@ -107,31 +133,30 @@ function Cell({
   );
 }
 
-/**
- * Column label repeated inside every cell below `lg`, where the head is gone.
- * The CleanStart label is violet: with the column tint dropped on the card
- * layout, the label colour is the only thing left carrying the page's one
- * colour-coded axis.
- */
+/** Column label repeated inside every cell below `lg`, where the head is gone. */
 function CellLabel({
   children,
   tone,
+  inline = false,
 }: {
   children: string;
   tone: "docker" | "cleanstart";
+  /** Marker answers sit beside their label rather than under it. */
+  inline?: boolean;
 }): React.ReactElement {
   return (
     <span
       aria-hidden
-      className="mb-1.5 block font-display lg:hidden"
+      className={`flex items-center gap-2 font-display lg:hidden ${inline ? "" : "mb-2"}`}
       style={{
-        fontSize: "11px",
-        fontWeight: 600,
-        letterSpacing: "0.07em",
+        fontSize: "var(--fs-badge)",
+        fontWeight: "var(--fs-badge-weight)",
+        letterSpacing: "var(--fs-badge-ls)",
         textTransform: "uppercase",
-        color: tone === "cleanstart" ? BRAND.violet : "rgba(17,17,17,0.38)",
+        color: tone === "cleanstart" ? BRAND.violet : "rgba(17,17,17,0.62)",
       }}
     >
+      <VendorMark tone={tone} size={22} />
       {children}
     </span>
   );
@@ -150,48 +175,172 @@ function HeadCell({
       scope="col"
       className={HEAD_CELL}
       style={{
-        // The white layer under the tint is load-bearing: the head is sticky,
-        // and a translucent background would let twenty rows scroll through it.
+        height: HEAD_H,
+        // The opaque layer under the tint is load-bearing: the head is sticky
+        // and twenty rows scroll through it.
         background: isCleanStart
-          ? "linear-gradient(180deg, #ffffff 0%, rgba(106,61,240,0.07) 100%), #ffffff"
+          ? "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)"
           : "#ffffff",
         borderBottom: `1px solid ${isCleanStart ? BRAND.violet : "rgba(17,17,17,0.12)"}`,
       }}
     >
-      <span
-        aria-hidden
-        className="mb-2 block h-[3px] w-9 rounded-full"
-        style={{
-          background: isCleanStart
-            ? `linear-gradient(90deg, ${BRAND.violet}, ${BRAND.blue})`
-            : "rgba(51,65,85,0.3)",
-        }}
-      />
-      <span
-        className="block font-display"
-        style={{
-          fontSize: "var(--fs-h5)",
-          fontWeight: 600,
-          letterSpacing: "-0.01em",
-          color: isCleanStart ? "#111111" : "rgba(17,17,17,0.72)",
-        }}
-      >
-        {vendor}
+      <span className="flex items-center gap-2.5">
+        <VendorMark tone={tone} size={26} />
+        <span
+          className="block font-display"
+          style={{
+            fontSize: "var(--fs-h5)",
+            fontWeight: "var(--fs-h5-weight)",
+            letterSpacing: "var(--fs-h5-ls)",
+            lineHeight: "var(--fs-h5-lh)",
+            color: isCleanStart ? "#ffffff" : "#111111",
+          }}
+        >
+          {vendor}
+        </span>
       </span>
     </th>
   );
 }
 
+function isSame(row: MatrixRow): boolean {
+  if (row.docker.kind !== row.cleanstart.kind) return false;
+  if (row.docker.kind === "text" && row.cleanstart.kind === "text") {
+    return row.docker.value === row.cleanstart.value;
+  }
+  return true;
+}
+
+function GroupRow({ group }: { group: MatrixGroup }): React.ReactElement {
+  return (
+    // `display: contents` below lg, so the sticky heading's containing block is
+    // the tbody that holds the whole chapter rather than this one-cell row,
+    // which is the height of the heading itself and gives sticky no travel.
+    <tr className="max-lg:contents">
+      <th
+        scope="colgroup"
+        colSpan={3}
+        id={`matrix-${group.id}`}
+        className={`${GROUP_CELL} scroll-mt-[calc(var(--cs-header-h)+62px)]`}
+      >
+        <span className="flex items-center gap-2.5">
+          <Icon3D src={group.icon} size={26} bloom={false} />
+          <span
+            className="font-display"
+            style={{
+              fontSize: "var(--fs-h5)",
+              fontWeight: "var(--fs-h5-weight)",
+              letterSpacing: "var(--fs-h5-ls)",
+              lineHeight: "var(--fs-h5-lh)",
+              color: "#111111",
+            }}
+          >
+            {group.label}
+          </span>
+        </span>
+      </th>
+    </tr>
+  );
+}
+
+function DataRow({
+  row,
+  hidden,
+  isFinal,
+}: {
+  row: MatrixRow;
+  hidden: boolean;
+  isFinal: boolean;
+}): React.ReactElement {
+  // The card's own border already draws the last line; a cell border here
+  // would double it.
+  const edge = isFinal ? " border-b-0" : "";
+  // A marker is one glyph, so on small screens it sits on its label's row
+  // instead of claiming a line of its own.
+  const dockerInline = row.docker.kind !== "text";
+  const cleanstartInline = row.cleanstart.kind !== "text";
+  const inlineCell =
+    " max-lg:flex max-lg:items-center max-lg:justify-between max-lg:gap-4";
+  return (
+    <tr
+      hidden={hidden}
+      className="group max-lg:mb-3 max-lg:block max-lg:rounded-[16px] max-lg:border max-lg:border-[rgba(17,17,17,0.08)] max-lg:bg-white max-lg:px-5 max-lg:py-5 md:max-lg:grid md:max-lg:grid-cols-2 md:max-lg:gap-x-7"
+    >
+      <th
+        scope="row"
+        className={`${CELL}${edge} text-left transition-colors md:max-lg:col-span-2 lg:group-hover:bg-[rgba(17,17,17,0.03)]`}
+        style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: "var(--fs-table-td)",
+          fontWeight: 600,
+          lineHeight: "var(--fs-body-sm-lh)",
+          letterSpacing: "var(--fs-body-ls)",
+          color: "#111111",
+        }}
+      >
+        {row.capability}
+      </th>
+
+      <td
+        className={`${CELL}${edge}${dockerInline ? inlineCell : ""} transition-colors max-lg:mt-4 max-lg:border-t max-lg:border-[rgba(17,17,17,0.08)] max-lg:pt-4 lg:group-hover:bg-[rgba(17,17,17,0.03)]`}
+        style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: "var(--fs-table-td)",
+          lineHeight: "var(--fs-body-sm-lh)",
+        }}
+      >
+        <CellLabel tone="docker" inline={dockerInline}>
+          {VENDOR.docker}
+        </CellLabel>
+        <Cell cell={row.docker} tone="docker" />
+      </td>
+
+      <td
+        className={`${CELL}${edge}${cleanstartInline ? inlineCell : ""} bg-[rgba(106,61,240,0.055)] transition-colors max-lg:mt-4 max-lg:border-t max-lg:border-[rgba(106,61,240,0.2)] max-lg:bg-transparent max-lg:pt-4 lg:border-l lg:border-l-[rgba(106,61,240,0.16)] lg:group-hover:bg-[rgba(106,61,240,0.1)]`}
+        style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: "var(--fs-table-td)",
+          lineHeight: "var(--fs-body-sm-lh)",
+        }}
+      >
+        <CellLabel tone="cleanstart" inline={cleanstartInline}>
+          {VENDOR.cleanstart}
+        </CellLabel>
+        <Cell cell={row.cleanstart} tone="cleanstart" />
+      </td>
+    </tr>
+  );
+}
+
 export function CompareMatrix(): React.ReactElement {
-  const lastGroupId = MATRIX.groups[MATRIX.groups.length - 1]?.id;
+  const [diffOnly, setDiffOnly] = useState(false);
+
+  const differenceCount = useMemo(
+    () =>
+      MATRIX.groups.reduce(
+        (total, group) => total + group.rows.filter((row) => !isSame(row)).length,
+        0,
+      ),
+    [],
+  );
+
+  const lastGroup = MATRIX.groups[MATRIX.groups.length - 1];
+  const lastVisibleRowId = (() => {
+    for (let g = MATRIX.groups.length - 1; g >= 0; g -= 1) {
+      const rows = MATRIX.groups[g]?.rows ?? [];
+      for (let r = rows.length - 1; r >= 0; r -= 1) {
+        const row = rows[r];
+        if (row && (!diffOnly || !isSame(row))) return row.id;
+      }
+    }
+    return lastGroup?.rows[lastGroup.rows.length - 1]?.id;
+  })();
 
   return (
     <Section padding="lg" data-section="CompareMatrix" className="bg-white">
-      {/*
-        * The bleed clip lives on this layer, not on the section. `overflow:
-        * hidden` on the section would make it the scroll container the sticky
-        * column head resolves against, and the head would stop sticking.
-        */}
+      {/* The bleed clip lives on this layer, not on the section: `overflow:
+          hidden` on the section would become the scroll container the sticky
+          head resolves against, and the head would stop sticking. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 select-none overflow-hidden"
@@ -200,72 +349,110 @@ export function CompareMatrix(): React.ReactElement {
       </div>
 
       <Container className="relative">
-        <div className="max-w-[820px]">
-          <Reveal header>
-            <h2
-              id="capability-comparison"
-              className="font-display text-[#111111]"
-              style={{
-                fontSize: "var(--fs-h2)",
-                fontWeight: 600,
-                letterSpacing: "var(--fs-h2-ls)",
-                lineHeight: "var(--fs-h2-lh)",
-              }}
-            >
-              {MATRIX.heading}
-            </h2>
-          </Reveal>
+        <BandHeader
+          id="capability-comparison"
+          heading={MATRIX.heading}
+          intro={MATRIX.intro}
+        />
 
-          <Reveal delay={0.1} y={20}>
-            <p
-              className="mt-5"
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "var(--fs-lead-sm)",
-                lineHeight: 1.6,
-                color: "rgba(17,17,17,0.68)",
-              }}
+        {/* Controls: chapter index on the left, the differences switch on the
+            right. UI chrome, not document copy. */}
+        <Reveal delay={0.12} y={16}>
+          <div className="mt-8 flex flex-col gap-4 lg:mt-10 lg:flex-row lg:items-center lg:justify-between">
+            <nav
+              aria-label={UI.groupIndex}
+              className="flex flex-wrap items-center gap-2"
             >
-              {MATRIX.intro}
-            </p>
-
-            {/* UI chrome, not document copy — derived so it cannot drift. */}
-            <p
-              className="mt-6 inline-flex items-center gap-2.5 rounded-full px-4 py-2"
-              style={{
-                border: "1px solid rgba(106,61,240,0.22)",
-                background: "rgba(106,61,240,0.05)",
-                fontFamily: "var(--font-mono)",
-                fontSize: "12px",
-                letterSpacing: "0.02em",
-                color: BRAND.violet,
-              }}
-            >
-              {MATRIX_ROW_COUNT} capabilities
-              <span aria-hidden className="opacity-40">
-                ·
+              <span
+                className="mr-1 font-display"
+                style={{
+                  fontSize: "var(--fs-eyebrow)",
+                  fontWeight: "var(--fs-eyebrow-weight)",
+                  letterSpacing: "var(--fs-eyebrow-ls)",
+                  textTransform: "uppercase",
+                  color: "rgba(17,17,17,0.62)",
+                }}
+              >
+                {UI.groupIndex}
               </span>
-              {MATRIX.groups.length} categories
-            </p>
-          </Reveal>
-        </div>
+              {MATRIX.groups.map((group) => (
+                <a
+                  key={group.id}
+                  href={`#matrix-${group.id}`}
+                  className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-2 transition-colors hover:border-[rgba(106,61,240,0.4)] hover:bg-[rgba(106,61,240,0.05)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#33BAEC]"
+                  style={{
+                    border: "1px solid rgba(17,17,17,0.1)",
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "var(--fs-button-sm)",
+                    fontWeight: "var(--fs-button-weight)",
+                    letterSpacing: "var(--fs-button-ls)",
+                    color: "#111111",
+                  }}
+                >
+                  <Icon3D src={group.icon} size={22} bloom={false} />
+                  {group.label}
+                </a>
+              ))}
+            </nav>
 
-        <Reveal delay={0.15} y={24} className="mt-10 lg:mt-14">
-          {/*
-            * `overflow: clip`, not `hidden`. Both round the table's corners, but
-            * `hidden` makes this a scroll container and a scroll container is
-            * what `position: sticky` resolves against — the column head would
-            * silently stop sticking. `clip` does not create one.
-            */}
+            <button
+              type="button"
+              aria-pressed={diffOnly}
+              onClick={() => setDiffOnly((value) => !value)}
+              className="inline-flex cursor-pointer items-center gap-3 self-start rounded-full py-1.5 pl-1.5 pr-4 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#33BAEC] lg:self-auto"
+              style={{
+                border: `1px solid ${diffOnly ? "rgba(106,61,240,0.45)" : "rgba(17,17,17,0.1)"}`,
+                background: diffOnly ? "rgba(106,61,240,0.06)" : "#ffffff",
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-button-sm)",
+                fontWeight: "var(--fs-button-weight)",
+                letterSpacing: "var(--fs-button-ls)",
+                color: "#111111",
+              }}
+            >
+              <span
+                aria-hidden
+                className="relative block h-6 w-11 rounded-full transition-colors"
+                style={{
+                  background: diffOnly
+                    ? `linear-gradient(90deg, ${BRAND.violet}, ${BRAND.blue})`
+                    : "rgba(17,17,17,0.14)",
+                }}
+              >
+                <span
+                  className="absolute top-[3px] block size-[18px] rounded-full bg-white transition-transform"
+                  style={{
+                    left: "3px",
+                    transform: diffOnly ? "translateX(20px)" : "translateX(0)",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
+                  }}
+                />
+              </span>
+              <span className="whitespace-nowrap">{UI.differencesOnly}</span>
+              <span
+                className="rounded-full px-2 py-[2px]"
+                style={{
+                  fontSize: "var(--fs-badge)",
+                  fontWeight: "var(--fs-badge-weight)",
+                  background: diffOnly ? BRAND.violet : "rgba(17,17,17,0.06)",
+                  color: diffOnly ? "#ffffff" : "rgba(17,17,17,0.6)",
+                }}
+              >
+                {differenceCount}
+              </span>
+            </button>
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.15} y={24} className="mt-6 lg:mt-8">
+          {/* `overflow: clip`, not `hidden`: both round the corners, but `hidden`
+              creates a scroll container, which is what `position: sticky`
+              resolves against, and the head would silently stop sticking. */}
           <div
-            style={{
-              borderRadius: "24px",
-              overflow: "clip",
-              border: "1px solid rgba(17,17,17,0.09)",
-              background: "#ffffff",
-              boxShadow:
-                "0 1px 2px rgba(17,17,17,0.04), 0 30px 60px -46px rgba(17,17,17,0.4)",
-            }}
+            /* Chrome is class-based, not inline: an inline border or
+               background outranks a `max-lg:` variant, which is what put the
+               row cards inside a second card on small screens. */
+            className="overflow-clip lg:rounded-[24px] lg:border lg:border-[rgba(17,17,17,0.09)] lg:bg-white lg:shadow-[0_1px_2px_rgba(17,17,17,0.04),0_30px_60px_-46px_rgba(17,17,17,0.4)]"
           >
             <table
               className="w-full max-lg:block"
@@ -274,9 +461,9 @@ export function CompareMatrix(): React.ReactElement {
               <caption className="sr-only">{MATRIX.caption}</caption>
 
               <colgroup className="max-lg:hidden">
-                <col style={{ width: "23%" }} />
-                <col style={{ width: "38.5%" }} />
-                <col style={{ width: "38.5%" }} />
+                <col style={{ width: "24%" }} />
+                <col style={{ width: "38%" }} />
+                <col style={{ width: "38%" }} />
               </colgroup>
 
               <thead className="max-lg:hidden">
@@ -285,114 +472,81 @@ export function CompareMatrix(): React.ReactElement {
                     scope="col"
                     className={HEAD_CELL}
                     style={{
+                      height: HEAD_H,
                       background: "#ffffff",
                       borderBottom: "1px solid rgba(17,17,17,0.12)",
                       fontFamily: "var(--font-sans)",
                       fontSize: "var(--fs-table-th)",
-                      fontWeight: 600,
-                      letterSpacing: "0.06em",
+                      fontWeight: "var(--fs-eyebrow-weight)",
+                      letterSpacing: "var(--fs-eyebrow-ls)",
                       textTransform: "uppercase",
-                      color: "rgba(17,17,17,0.42)",
+                      color: "rgba(17,17,17,0.62)",
                     }}
                   >
-                    Capability
+                    {UI.capability}
                   </th>
                   <HeadCell vendor={VENDOR.docker} tone="docker" />
                   <HeadCell vendor={VENDOR.cleanstart} tone="cleanstart" />
                 </tr>
               </thead>
 
-              {MATRIX.groups.map((group) => (
-                <tbody key={group.id} className="max-lg:block">
-                  <tr className="max-lg:block">
-                    <th
-                      scope="colgroup"
-                      colSpan={3}
-                      className="border-y border-[rgba(17,17,17,0.08)] px-[clamp(16px,1.4vw,24px)] py-3 text-left max-lg:block"
-                      style={{
-                        background: "#F6F6F6",
-                        fontFamily: "var(--font-sans)",
-                        fontSize: "var(--fs-table-th)",
-                        fontWeight: 600,
-                        letterSpacing: "0.08em",
-                        textTransform: "uppercase",
-                        color: "rgba(17,17,17,0.55)",
-                      }}
-                    >
-                      {group.label}
-                    </th>
-                  </tr>
-
-                  {group.rows.map((row, rowIndex) => {
-                    const isFinalRow =
-                      group.id === lastGroupId &&
-                      rowIndex === group.rows.length - 1;
-                    // The card's own border already draws this line; a cell
-                    // border here would double it.
-                    const edge = isFinalRow ? " border-b-0" : "";
-
-                    return (
-                      <tr
+              {MATRIX.groups.map((group) => {
+                const groupHidden =
+                  diffOnly && group.rows.every((row) => isSame(row));
+                return (
+                  <tbody key={group.id} className="max-lg:block" hidden={groupHidden}>
+                    <GroupRow group={group} />
+                    {group.rows.map((row) => (
+                      <DataRow
                         key={row.id}
-                        className="max-lg:block max-lg:border-b max-lg:border-[rgba(17,17,17,0.08)] max-lg:px-5 max-lg:py-5 max-lg:last:border-b-0"
-                      >
-                        <th
-                          scope="row"
-                          className={`${CELL}${edge} text-left`}
-                          style={{
-                            fontFamily: "var(--font-sans)",
-                            fontWeight: 600,
-                            lineHeight: 1.45,
-                            color: "#111111",
-                          }}
-                        >
-                          <span className="text-[var(--fs-body)] lg:text-[var(--fs-body-sm)]">
-                            {row.capability}
-                          </span>
-                        </th>
-
-                        <td
-                          className={`${CELL}${edge} max-lg:pt-4 text-[var(--fs-body)] lg:text-[var(--fs-table-td)]`}
-                          style={{
-                            fontFamily: "var(--font-sans)",
-                            lineHeight: 1.5,
-                          }}
-                        >
-                          <CellLabel tone="docker">{VENDOR.docker}</CellLabel>
-                          <Cell cell={row.docker} tone="docker" />
-                        </td>
-
-                        <td
-                          className={`${CELL}${edge} max-lg:pt-4 bg-[rgba(106,61,240,0.035)] max-lg:bg-transparent text-[var(--fs-body)] lg:text-[var(--fs-table-td)]`}
-                          style={{
-                            fontFamily: "var(--font-sans)",
-                            lineHeight: 1.5,
-                          }}
-                        >
-                          <CellLabel tone="cleanstart">{VENDOR.cleanstart}</CellLabel>
-                          <Cell cell={row.cleanstart} tone="cleanstart" />
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              ))}
+                        row={row}
+                        hidden={diffOnly && isSame(row)}
+                        isFinal={row.id === lastVisibleRowId}
+                      />
+                    ))}
+                  </tbody>
+                );
+              })}
             </table>
           </div>
         </Reveal>
 
         <Reveal delay={0.1} y={16}>
-          <p
-            className="mt-5 max-w-[780px]"
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-caption)",
-              lineHeight: "var(--fs-caption-lh)",
-              color: "rgba(17,17,17,0.45)",
-            }}
-          >
-            {MATRIX.footnote}
-          </p>
+          <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-10">
+            <p
+              className="max-w-[720px]"
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-caption)",
+                lineHeight: "var(--fs-caption-lh)",
+                color: "rgba(17,17,17,0.62)",
+              }}
+            >
+              {MATRIX.footnote}
+            </p>
+            <dl
+              className="flex shrink-0 items-center gap-5"
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-caption)",
+                color: "rgba(17,17,17,0.62)",
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <dt className="flex items-center gap-1">
+                  <YesMark tone="docker" />
+                  <YesMark tone="cleanstart" />
+                </dt>
+                <dd>{UI.legendAvailable}</dd>
+              </div>
+              <div className="flex items-center gap-2">
+                <dt>
+                  <NoMark />
+                </dt>
+                <dd>{UI.legendNotAvailable}</dd>
+              </div>
+            </dl>
+          </div>
         </Reveal>
       </Container>
     </Section>

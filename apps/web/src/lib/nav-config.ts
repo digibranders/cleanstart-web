@@ -167,13 +167,13 @@ export const NAV_TREE: NavItem[] = [
         items: [
           {
             label: "Financial Services",
-            href: "/industries/financial-services-container-security",
+            href: "/industries/financial-services",
             description: "Verified components for regulated financial software.",
             icon: "bank",
           },
           {
-            label: "Modern Applications",
-            href: "/industries/modern-applications",
+            label: "Software / SaaS",
+            href: "/industries/software-applications",
             description: "Ship faster on a verified software foundation.",
             icon: "layers",
           },
