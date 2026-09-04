@@ -1,5 +1,4 @@
 import { Section, Container } from "@/components/layout";
-import { FlowBeam } from "@/components/ui/FlowBeam";
 import { Reveal } from "@/components/ui/Reveal";
 import { ScaleToFit } from "@/components/ui/ScaleToFit";
 import { BUILD_FLOW, INHERITED_BASE, type BuildFlowColumn } from "./compare-data";
@@ -450,19 +449,27 @@ function LanesDiagram({
 function StackedSteps({ column }: { column: BuildFlowColumn }): React.ReactElement {
   const isCleanStart = column.id === "cleanstart";
   return (
-    <div className="relative mt-4">
-      {isCleanStart ? (
-        <FlowBeam className="absolute bottom-[20px] left-[18px] top-[20px]" />
-      ) : (
-        <span
-          aria-hidden
-          className="absolute bottom-[20px] left-[19px] top-[20px] w-[2px] rounded-full"
-          style={{ background: "rgba(255,255,255,0.24)" }}
-        />
-      )}
-      <ol className="relative m-0 flex list-none flex-col gap-3 p-0">
+    <div className="mt-4">
+      <ol className="relative m-0 flex list-none flex-col gap-5 p-0">
         {column.steps.map((step, i) => (
-          <li key={step} className="flex items-center gap-4">
+          <li key={step} className="relative flex items-center gap-4">
+            {/* The connector is drawn per gap, from one tile to the next,
+                rather than as a single rail behind the column: the tiles are
+                translucent glass and a continuous line reads straight through
+                them. Same reason the wide lane is segmented. */}
+            {i < column.steps.length - 1 && (
+              <span
+                aria-hidden
+                className="pointer-events-none absolute left-[19px] top-full w-[2px]"
+                style={{
+                  height: 20,
+                  background: isCleanStart
+                    ? `linear-gradient(180deg, ${BRAND.violetLight}, #82E1FF)`
+                    : "rgba(255,255,255,0.24)",
+                  opacity: isCleanStart ? 0.85 : 1,
+                }}
+              />
+            )}
             <Stage label={step} tone={column.id} hitAt={i * STEP} />
           </li>
         ))}
