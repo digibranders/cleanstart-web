@@ -113,7 +113,7 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       // Post-launch rename of the financial services page, requested
-      // 2026-09-04. Unlike the earlier /financial-services move, this URL was
+      // 2026-09-08. Unlike the earlier /financial-services move, this URL was
       // live: indexable, listed in the sitemap and linked from the nav, so the
       // 301 is load-bearing rather than courtesy. It ships in code so the
       // redirect lands in the same deploy as the route move.
@@ -123,7 +123,7 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       // Post-launch rename of the SaaS / modern applications page, requested
-      // 2026-09-04 alongside its H1 and nav label. Live URL: indexable,
+      // 2026-09-08 alongside its H1 and nav label. Live URL: indexable,
       // sitemap-listed and nav-linked, so this 301 is load-bearing and ships
       // with the route move.
       {

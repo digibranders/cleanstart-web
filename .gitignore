@@ -103,3 +103,7 @@ tmp/
 # Impeccable design-skill artifacts (surface briefs, detector cache). Local
 # tooling output, not app code.
 .impeccable/
+
+# Local AI/editor tooling state, not app code.
+.claude-brain/
+GRAYMATTER.md

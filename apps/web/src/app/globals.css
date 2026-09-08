@@ -1094,6 +1094,25 @@ body {
     height: 44px !important;
     font-size: 16px !important;
   }
+
+  /* Hero CTA pair. Same reasoning as `.cs-nav-cta`, for the heroes that set a
+     glass primary beside a ghost secondary: `.cs-btn-ghost` is not in the
+     global rule above, so the ghost keeps its inline 44px/17px while the glass
+     button drops to the 36px utility size, and the pair renders mismatched.
+     This also keeps the page's primary action on the 44px WCAG 2.5.8 target
+     that the same rule cites, instead of below it. Two class selectors outrank
+     the single-class rule, which is what lets it win when both are
+     `!important`. */
+  .cs-btn-glass.cs-hero-cta {
+    --cs-btn-h: 44px !important;
+    --cs-btn-fs: var(--cs-hero-cta-fs, 17px) !important;
+    height: 44px !important;
+    /* Read from a property the rule above does not touch, so a hero whose
+       ghost sits at a different size can match it from the call site. An
+       inline `--cs-btn-fs` cannot be used for that: the global rule sets it
+       `!important`, which beats inline. */
+    font-size: var(--cs-hero-cta-fs, 17px) !important;
+  }
 }
 
 /* Cookie-consent sheet actions. Desktop keeps the header utility size; the

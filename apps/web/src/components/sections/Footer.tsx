@@ -22,8 +22,10 @@ const COL_PRODUCT: FooterLink[] = [
   { label: "Clean Images", href: "/cleanstart-images" },
   { label: "Clean Libraries", href: "/clean-libraries" },
   { label: "CleanSight", href: "/cleansight" },
-  { label: "Impact Estimator", href: "/impact-estimator" },
   { label: "Pricing", href: "/pricing" },
+  // Labelled by category, not by competitor: when /compare becomes a hub this
+  // link repoints at it and nothing else changes.
+  { label: "Compare", href: "/compare/cleanstart-vs-docker-hardened-images" },
   { label: "Book a Demo", href: "/book-a-demo" },
 ];
 const COL_SOLUTIONS: FooterLink[] = [

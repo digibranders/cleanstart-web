@@ -6,6 +6,26 @@
  * of edit: em-dashes are replaced with a colon or a semicolon per the house
  * writing rule. Nothing is added, cut or re-worded.
  *
+ * The capability matrix was replaced wholesale on 2026-09-08 from a newer
+ * final table: five groups and 32 rows, up from four and 20. Two things in it
+ * still needs the source's own answer and is NOT invented here: the FIPS and
+ * "Remediation SLA: High / Medium / Low" cells carry footnote markers [1] and
+ * [4] in the source, and the footnote text was not supplied, so the markers
+ * are omitted rather than left dangling.
+ *
+ * Five FAQ answers were rewritten on 2026-09-08 to stop contradicting that
+ * table. They had claimed roughly 24-hour remediation against its seven-day
+ * Critical SLA, and cited a 78-test suite, 11 signed artifacts, shell-less and
+ * read-only images, "vulnerability data accuracy" and the Continuous Trust
+ * Loop, none of which the new table carries. Every replacement clause is
+ * traceable to a cell in it, and nothing was added beyond what it states. The
+ * FIPS answer changed direction as a result: the table gives Docker
+ * CMVP-validated variants, so the old "CleanStart builds FIPS in at compile
+ * time rather than bolting it on" read as a claim the table does not support.
+ * These are derived rewrites, not the SEO document's own words, and want its
+ * review. The array feeds the FAQPage JSON-LD as well as the accordion, so the
+ * structured data moved with them.
+ *
  * Heading levels follow the document's outline, shifted one level because the
  * page title takes H1: the document's H1s are the page's H2s, its H2s are the
  * page's H3s. Anything the document does not set as a heading (the two vendor
@@ -106,13 +126,15 @@ export const FOUNDATIONS = {
 
 /**
  * A matrix cell. `yes` / `no` render as markers with a screen-reader label;
- * `text` renders the document's phrase. The document's own "✓" and "—" glyphs
- * map to `yes` and `no` so the markers can carry an accessible name and a
- * colour rather than sitting in the page as bare punctuation.
+ * `text` renders the document's phrase; `both` is the source table's "✓
+ * <detail>" shape, a tick with a qualifier beside it. The document's own "✓"
+ * and "—" glyphs map to `yes` and `no` so the markers can carry an accessible
+ * name and a colour rather than sitting in the page as bare punctuation.
  */
 export type MatrixCell =
   | { readonly kind: "yes" }
   | { readonly kind: "no" }
+  | { readonly kind: "both"; readonly value: string }
   | { readonly kind: "text"; readonly value: string };
 
 export interface MatrixRow {
@@ -133,6 +155,8 @@ export interface MatrixGroup {
 const yes: MatrixCell = { kind: "yes" };
 const no: MatrixCell = { kind: "no" };
 const text = (value: string): MatrixCell => ({ kind: "text", value });
+/** A tick that carries a qualifier, the source table's "✓ <detail>" cells. */
+const both = (value: string): MatrixCell => ({ kind: "both", value });
 
 export const MATRIX = {
   heading:
@@ -152,26 +176,40 @@ export const MATRIX = {
         {
           id: "base-foundation",
           capability: "Base foundation",
-          docker: text("Debian and Alpine-based images"),
+          docker: text("Debian- and Alpine-based"),
+          cleanstart: text("CleanStart OS"),
+        },
+        {
+          id: "zero-inheritance",
+          capability: "Zero-inheritance architecture",
+          docker: text("Hardens an existing distro base"),
+          cleanstart: text("Every component compiled from verified source"),
+        },
+        {
+          id: "hardening-method",
+          capability: "Hardening method",
+          docker: text("Package reduction, hardened configuration, secure defaults"),
           cleanstart: text(
-            "CleanStart OS: source-built minimal image (no inherited base)",
+            "Compile-time hardening flags on a custom glibc, set at build rather than applied after",
           ),
         },
         {
-          id: "image-hardening",
-          capability: "Image hardening",
-          docker: text(
-            "Reduced packages, hardened configurations, secure defaults",
-          ),
-          cleanstart: text(
-            "Compiled from source on a zero-inheritance foundation (custom glibc). Security flags set at build time; FIPS built in, not bolted on. Verified by a 78-test suite and 11 signed artifacts per variant.",
-          ),
+          id: "distroless-variants",
+          capability: "Distroless variants",
+          docker: yes,
+          cleanstart: yes,
         },
         {
-          id: "production-variants",
-          capability: "Production variants",
-          docker: text("Production, development, compatibility variants"),
-          cleanstart: text("Production, development, debug variants"),
+          id: "variants",
+          capability: "Production / dev / debug variants",
+          docker: yes,
+          cleanstart: yes,
+        },
+        {
+          id: "architectures",
+          capability: "linux/amd64 + linux/arm64",
+          docker: yes,
+          cleanstart: yes,
         },
       ],
     },
@@ -181,38 +219,40 @@ export const MATRIX = {
       icon: "/images/compare/icon-provenance.webp",
       rows: [
         {
-          id: "zero-inheritance",
-          capability: "Zero-inheritance architecture",
-          docker: text("Hardens existing Debian/Alpine base (inherits upstream)"),
-          cleanstart: text(
-            "Inherits nothing from upstream distros; every component compiled from verified source",
-          ),
+          id: "rebuilt-from-source",
+          capability: "Rebuilt from source",
+          docker: yes,
+          cleanstart: yes,
+        },
+        {
+          id: "hermetic-build",
+          capability: "Hermetic build pipeline",
+          docker: no,
+          cleanstart: yes,
+        },
+        {
+          id: "reproducible-builds",
+          capability: "Reproducible builds",
+          docker: yes,
+          cleanstart: yes,
+        },
+        {
+          id: "package-origin",
+          capability: "Verified package-origin enforcement",
+          docker: no,
+          cleanstart: yes,
         },
         {
           id: "public-build-definitions",
           capability: "Public build definitions",
           docker: yes,
-          cleanstart: text("Controlled build pipelines"),
-        },
-        {
-          id: "source-based-builds",
-          capability: "Source-based builds",
-          docker: no,
-          cleanstart: yes,
-        },
-        {
-          id: "hermetic-build",
-          capability: "Hermetic build process",
-          docker: text("Not fully hermetic"),
-          cleanstart: yes,
+          cleanstart: no,
         },
         {
           id: "artifact-verification",
           capability: "Artifact verification",
-          docker: text("Image attestations and signatures"),
-          cleanstart: text(
-            "Artifact verification through provenance and cryptographic signing",
-          ),
+          docker: both("Attestations and signatures"),
+          cleanstart: both("Provenance and cryptographic signing"),
         },
       ],
     },
@@ -222,27 +262,46 @@ export const MATRIX = {
       icon: "/images/compare/icon-sbom.webp",
       rows: [
         {
-          id: "sboms",
-          capability: "SBOMs",
-          docker: text("SPDX and CycloneDX SBOMs"),
-          cleanstart: text("SPDX and CycloneDX SBOMs"),
+          id: "sbom",
+          capability: "SPDX + CycloneDX SBOM",
+          docker: yes,
+          cleanstart: yes,
         },
         {
-          id: "image-signing",
-          capability: "Image signing",
-          docker: text("Cosign signatures"),
-          cleanstart: text("Cosign signatures"),
+          id: "signing",
+          capability: "Cosign / Sigstore signing",
+          docker: yes,
+          cleanstart: yes,
         },
         {
-          id: "provenance",
-          capability: "Software provenance",
-          docker: text("SLSA Build Level 3 provenance"),
-          cleanstart: text("SLSA Level 3 aligned provenance"),
+          id: "slsa-provenance",
+          capability: "SLSA provenance",
+          docker: both("Build Level 3"),
+          cleanstart: both("Build Level 3"),
+        },
+        {
+          id: "in-toto",
+          capability: "in-toto attestation format",
+          docker: yes,
+          cleanstart: yes,
         },
         {
           id: "vex",
           capability: "VEX / exploitability context",
           docker: yes,
+          cleanstart: yes,
+        },
+        {
+          id: "reachability-vex",
+          capability: "Reachability-backed VEX evidence",
+          docker: no,
+          cleanstart: yes,
+        },
+        {
+          id: "verdict-metadata",
+          capability:
+            "Reproducible verdict metadata (engine + CVE/KEV/EPSS snapshot versions)",
+          docker: no,
           cleanstart: yes,
         },
         {
@@ -260,9 +319,9 @@ export const MATRIX = {
       rows: [
         {
           id: "fips",
-          capability: "FIPS-ready images",
-          docker: yes,
-          cleanstart: yes,
+          capability: "FIPS images",
+          docker: both("CMVP-validated variants, Select/Enterprise"),
+          cleanstart: both("FIPS-compliant set"),
         },
         {
           id: "stig",
@@ -271,42 +330,79 @@ export const MATRIX = {
           cleanstart: yes,
         },
         {
-          id: "compliance-artifacts",
-          capability: "Compliance artifacts",
+          id: "cis",
+          capability: "CIS Benchmark alignment",
           docker: yes,
           cleanstart: yes,
+        },
+        {
+          id: "catalog-labels",
+          capability: "Per-image compliance labels in catalog",
+          docker: yes,
+          cleanstart: yes,
+        },
+        {
+          id: "compliance-artifacts",
+          capability: "Compliance artifacts / audit evidence",
+          docker: yes,
+          cleanstart: yes,
+        },
+      ],
+    },
+    {
+      id: "vulnerability",
+      label: "Vulnerability Management & Remediation",
+      icon: "/images/compare/icon-fips.webp",
+      rows: [
+        {
+          id: "event-driven-rebuild",
+          capability: "Continuous event-driven rebuild on upstream fix",
+          docker: yes,
+          cleanstart: yes,
+        },
+        {
+          id: "sla-critical",
+          capability: "Remediation SLA: Critical",
+          docker: both("7 days"),
+          cleanstart: both("7 days"),
+        },
+        {
+          id: "sla-high-medium-low",
+          capability: "Remediation SLA: High / Medium / Low",
+          docker: no,
+          cleanstart: both("14 days"),
         },
         {
           id: "vulnerability-intelligence",
           capability: "Vulnerability intelligence",
           docker: text("CVE metadata, VEX, security attestations"),
           cleanstart: text(
-            "Vulnerability analysis, exploitability context, and verification workflows",
+            "Vulnerability analysis, exploitability context, verification workflows",
           ),
         },
         {
-          id: "remediation-model",
-          capability: "Vulnerability remediation model",
-          docker: text("Patch-based, up to 7 days (paid-tier SLA)"),
-          cleanstart: text(
-            "Automatic rebuild from source via Continuous Trust Loop, ~24h",
-          ),
-        },
-        {
-          id: "vulnerability-data-accuracy",
-          capability: "Vulnerability data accuracy",
-          docker: no,
+          id: "malware-scanning",
+          capability: "Malware scanning",
+          docker: yes,
           cleanstart: yes,
         },
         {
-          id: "shell-less",
-          capability: "Shell-less and read-only",
+          id: "malicious-package-screening",
+          capability: "Malicious-package corpus screening",
+          docker: yes,
+          cleanstart: both(
+            "Campaign correlation (maintainer clustering, shared C2, install-script AST fingerprints)",
+          ),
+        },
+        {
+          id: "kev-epss",
+          capability: "KEV / EPSS enrichment",
           docker: no,
           cleanstart: yes,
         },
       ],
     },
-  ] as const satisfies readonly MatrixGroup[],
+  ] as const satisfies readonly MatrixGroup[]
 } as const;
 
 /** Row count, derived so the section summary can never drift from the table. */
@@ -429,7 +525,7 @@ export const FAQS = [
     question:
       "What is the difference between Docker Hardened Images and CleanStart?",
     answer:
-      "Both provide hardened container images with SBOMs, Cosign signatures and SLSA-aligned provenance. The core difference is architecture: Docker Hardened Images harden existing Debian and Alpine base images and inherit from upstream distributions, while CleanStart uses a zero-inheritance model where every component is compiled from verified source on the CleanStart OS foundation (custom glibc), with hermetic builds, FIPS built in at build time, an AI BOM, and shell-less, read-only images.",
+      "Both provide hardened container images with SPDX and CycloneDX SBOMs, Cosign and Sigstore signing, and SLSA Build Level 3 provenance. The core difference is architecture: Docker Hardened Images harden an existing Debian or Alpine base and inherit from upstream distributions, while CleanStart compiles every component from verified source on the CleanStart OS foundation, setting hardening flags at compile time on a custom glibc rather than applying them afterward, through a hermetic build pipeline with verified package-origin enforcement and an AI BOM.",
   },
   {
     id: "alternative",
@@ -441,26 +537,26 @@ export const FAQS = [
     id: "more-secure",
     question: "Which platform builds more secure container images?",
     answer:
-      "Both are secure by design. Docker hardens a known base and adds attestations and signatures. CleanStart removes inherited risk entirely by compiling every component from verified source on a zero-inheritance foundation, hardening at build time, and validating each variant with a 78-test suite and 11 signed artifacts. Teams that prioritize source-to-artifact verification and hermetic builds generally favor CleanStart's approach.",
+      "Both are secure by design. Docker hardens a known base and adds attestations and signatures. CleanStart removes inherited risk by compiling every component from verified source on a zero-inheritance foundation, setting hardening flags at compile time on a custom glibc, and enforcing verified package origin inside a hermetic build pipeline. Teams that prioritize source-to-artifact verification and hermetic builds generally favor CleanStart's approach.",
   },
   {
     id: "compliance",
     question: "Which solution offers better compliance support?",
     answer:
-      "Both offer FIPS-ready and STIG-aligned images plus compliance artifacts. CleanStart builds FIPS in at compile time rather than bolting it on afterward, and pairs it with SBOMs, provenance and an AI BOM, which gives auditors a consistent, source-verified evidence trail for regulated environments.",
+      "Both ship STIG-aligned images, CIS Benchmark alignment, per-image compliance labels in the catalog, and compliance artifacts for audit evidence. On FIPS they differ in kind: Docker Hardened Images offer CMVP-validated variants on their Select and Enterprise tiers, while CleanStart ships a FIPS-compliant set. CleanStart pairs that with SBOMs, provenance and an AI BOM, which gives auditors a source-verified evidence trail for regulated environments.",
   },
   {
     id: "vulnerability-effort",
     question: "Which platform reduces vulnerability management effort the most?",
     answer:
-      "Both reduce effort by shipping minimal images with less to patch. Docker uses patch-based remediation with fixes typically within 7 days on paid tiers. CleanStart automatically rebuilds affected images from source through its Continuous Trust Loop, targeting roughly 24-hour remediation, and adds vulnerability data accuracy and exploitability context so teams spend less time triaging false positives.",
+      "Both reduce effort by shipping minimal images with less to patch, rebuilding continuously when an upstream fix lands, and meeting a seven-day remediation SLA for Critical findings. CleanStart also publishes a 14-day SLA for High, Medium and Low. Its vulnerability intelligence adds exploitability context and verification workflows, reachability-backed VEX evidence, and KEV and EPSS enrichment, so teams spend less time triaging findings that are not reachable in their images.",
   },
   {
     id: "advantages",
     question:
       "What are the advantages of CleanStart over Docker Hardened Images?",
     answer:
-      "CleanStart's advantages include a zero-inheritance architecture (no upstream distro risk), source-based and hermetic builds, FIPS built in at build time, an AI BOM, shell-less and read-only images, faster source-based remediation via the Continuous Trust Loop, and supply chain assurance that extends across images, libraries and dependencies.",
+      "CleanStart's advantages include a zero-inheritance architecture (no upstream distro risk), a hermetic build pipeline with verified package-origin enforcement, an AI BOM, reachability-backed VEX evidence, reproducible verdict metadata, KEV and EPSS enrichment, a published remediation SLA for High, Medium and Low findings as well as Critical, and supply chain assurance that extends across images, libraries and dependencies.",
   },
   {
     id: "devsecops",

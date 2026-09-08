@@ -68,11 +68,12 @@ export function PricingHero(): React.ReactElement {
             <div className="flex flex-wrap items-center justify-center gap-3.5">
               <Link
                 href="/contact-us"
-                className="cs-btn-glass"
+                className="cs-btn-glass cs-hero-cta"
                 style={
                   {
                     "--cs-btn-px": "24px",
                     "--cs-btn-fs": "16px",
+                    "--cs-hero-cta-fs": "16px",
                   } as React.CSSProperties
                 }
               >

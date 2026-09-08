@@ -18,7 +18,7 @@ import { getPageGraph } from '@/lib/seo/compose-page';
 /*
  * /industries/software-applications
  *
- * Renamed from /industries/modern-applications on 2026-09-04, on request,
+ * Renamed from /industries/modern-applications on 2026-09-08, on request,
  * together with the H1 ("Applications" to "Software") and the nav label. This
  * one was live: indexable, sitemap-listed and nav-linked, so its 301 is
  * load-bearing and ships in next.config.ts alongside the route move.

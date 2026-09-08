@@ -120,6 +120,26 @@ function Cell({
 }): React.ReactElement {
   if (cell.kind === "yes") return <YesMark tone={tone} />;
   if (cell.kind === "no") return <NoMark />;
+  // "both" is a tick that carries a qualifier. The tick keeps its accessible
+  // name, so a screen reader hears "Available" and then the detail.
+  if (cell.kind === "both") {
+    return (
+      <span className="flex items-start gap-2.5">
+        <span className="mt-[1px] shrink-0">
+          <YesMark tone={tone} />
+        </span>
+        <span
+          className="block max-w-[40ch]"
+          style={{
+            color: tone === "cleanstart" ? "#111111" : "rgba(17,17,17,0.74)",
+            fontWeight: tone === "cleanstart" ? 500 : 400,
+          }}
+        >
+          {cell.value}
+        </span>
+      </span>
+    );
+  }
   return (
     <span
       className="block max-w-[44ch]"
@@ -205,7 +225,10 @@ function HeadCell({
 
 function isSame(row: MatrixRow): boolean {
   if (row.docker.kind !== row.cleanstart.kind) return false;
-  if (row.docker.kind === "text" && row.cleanstart.kind === "text") {
+  if (
+    (row.docker.kind === "text" || row.docker.kind === "both") &&
+    (row.cleanstart.kind === "text" || row.cleanstart.kind === "both")
+  ) {
     return row.docker.value === row.cleanstart.value;
   }
   return true;
