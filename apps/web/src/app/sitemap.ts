@@ -20,20 +20,22 @@ import type { MetadataRoute } from 'next';
  */
 
 /**
- * Re-render the route hourly.
+ * Render on every request.
  *
- * Without this the segment is prerendered once at build and served unchanged
- * until the next deploy: the per-fetch `revalidate` below refreshes the data
- * cache, but nothing re-runs this function, so a doc published between deploys
- * never reaches the sitemap. Observed 2026-08-26 — the live sitemap's newest
- * `lastmod` predated the last deploy and two documents published after it were
- * absent while the CMS returned them correctly.
+ * This route cannot use ISR. `sitemap.ts` compiles to a Route Handler
+ * (`/sitemap.xml/route`), and on Vercel a prerendered route handler is not
+ * reachable by `revalidatePath`: measured 2026-09-08, one `/api/revalidate`
+ * call carrying both paths returned `REVALIDATED, age=0` for `/blogs` and
+ * `HIT, age=353311` (4.1 days) for `/sitemap.xml`. Time-based revalidation had
+ * not fired either, so the previous `export const revalidate = 3600` left the
+ * sitemap frozen from one deploy to the next — the exact freeze it was added
+ * to fix.
  *
- * The CMS publish hook also purges `/sitemap.xml` on every publish, so this is
- * the backstop for changes that bypass the hook (a direct DB edit, a failed
- * webhook), not the primary path.
+ * Rendering per request is cheap here: the nine CMS reads below keep their own
+ * `revalidate` + tags, so the data cache still absorbs the load and the publish
+ * hook purges those tags to make an edit appear immediately.
  */
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 type CmsDoc = {
   slug: string;

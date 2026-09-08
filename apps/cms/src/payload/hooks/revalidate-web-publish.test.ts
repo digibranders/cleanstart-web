@@ -16,6 +16,12 @@ const purgedPaths = (): string[] => {
   return call?.[1]?.paths ?? [];
 };
 
+/** Cache tags passed to revalidateWeb by the most recent hook invocation. */
+const purgedTags = (): string[] => {
+  const call = revalidateWeb.mock.calls.at(-1) as unknown as [unknown, { tags?: string[] }];
+  return call?.[1]?.tags ?? [];
+};
+
 const publish = async (collection: string, slug: string): Promise<void> => {
   await revalidateWebPublishAfterChangeHook(collection)({
     doc: { _status: 'published', slug },
@@ -28,12 +34,17 @@ beforeEach(() => revalidateWeb.mockClear());
 afterEach(() => vi.clearAllMocks());
 
 describe('sitemap purge on publish', () => {
-  it('purges /sitemap.xml alongside the detail and listing paths', async () => {
+  it('purges the sitemap cache TAG, not the /sitemap.xml path', async () => {
+    // The path form is useless here: sitemap.ts is a Route Handler, and on
+    // Vercel revalidatePath silently no-ops on those. Only the data-cache tag
+    // the route reads actually clears it.
     await publish('guides', 'go-dependency-verification');
 
+    expect(purgedTags()).toEqual(['sitemap:guides']);
     expect(purgedPaths()).toEqual(
-      expect.arrayContaining(['/guide', '/guide/go-dependency-verification', '/sitemap.xml']),
+      expect.arrayContaining(['/guide', '/guide/go-dependency-verification']),
     );
+    expect(purgedPaths()).not.toContain('/sitemap.xml');
   });
 
   it.each([
@@ -45,10 +56,10 @@ describe('sitemap purge on publish', () => {
     ['authors', '/author'],
     ['knowledgeBase', '/knowledge-hub'],
     ['legalDocuments', '/legal'],
-  ])('purges the sitemap for %s, which contributes <loc> entries', async (collection) => {
+  ])('purges the sitemap tag for %s, which contributes <loc> entries', async (collection) => {
     await publish(collection, 'a-slug');
 
-    expect(purgedPaths()).toContain('/sitemap.xml');
+    expect(purgedTags()).toEqual([`sitemap:${collection}`]);
   });
 
   it.each([
@@ -63,7 +74,7 @@ describe('sitemap purge on publish', () => {
 
     expect(revalidateWeb).toHaveBeenCalled();
     expect(purgedPaths()).toContain(listing);
-    expect(purgedPaths()).not.toContain('/sitemap.xml');
+    expect(purgedTags()).toEqual([]);
   });
 
   it('never fires for emailSignatures, which has no public URL at all', async () => {
@@ -82,9 +93,8 @@ describe('sitemap purge on publish', () => {
       req,
     } as never);
 
-    expect(purgedPaths()).toEqual(
-      expect.arrayContaining(['/blogs', '/blogs/gone', '/sitemap.xml']),
-    );
+    expect(purgedPaths()).toEqual(expect.arrayContaining(['/blogs', '/blogs/gone']));
+    expect(purgedTags()).toEqual(['sitemap:blogs']);
   });
 
   it('stays silent for a draft → draft edit, which changes no live URL', async () => {

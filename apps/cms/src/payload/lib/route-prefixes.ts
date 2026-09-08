@@ -87,8 +87,19 @@ const SITEMAP_COLLECTIONS = new Set([
 export const affectsSitemap = (collection: string): boolean =>
   SITEMAP_COLLECTIONS.has(collection);
 
-/** apps/web sitemap route, revalidated on publish so new URLs appear at once. */
-export const SITEMAP_PATH = '/sitemap.xml';
+/**
+ * Cache tag for a collection's slice of apps/web's sitemap.
+ *
+ * Must stay in step with the `sitemap:${collection}` tag that
+ * apps/web/src/app/sitemap.ts attaches to each CMS read.
+ *
+ * A tag, not the `/sitemap.xml` path: that route is a Route Handler, and on
+ * Vercel `revalidatePath` silently no-ops on those (measured 2026-09-08 — the
+ * same request purged `/blogs` and left the sitemap at a 4-day-old entry).
+ * Purging the tag drops the underlying data cache, which the now-dynamic route
+ * re-reads on the next request.
+ */
+export const sitemapTag = (collection: string): string => `sitemap:${collection}`;
 
 export const collectionUrlFromSlug = (collection: string, slug: string): string | null => {
   const prefix = (ROUTE_PREFIX as Record<string, string>)[collection];
