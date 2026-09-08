@@ -38,7 +38,7 @@ export function HeroProductSlide(): React.ReactElement {
               href="https://images.cleanstart.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="cs-btn-glass"
+              className="cs-btn-glass cs-hero-cta"
               style={{
                 ["--cs-btn-h" as string]: "44px",
                 ["--cs-btn-px" as string]: "16px",
