@@ -8,15 +8,23 @@
  *
  * The capability matrix was replaced wholesale on 2026-09-08 from a newer
  * final table: five groups and 32 rows, up from four and 20. Two things in it
- * still need the source's own answer and are NOT invented here. The FIPS and
+ * still needs the source's own answer and is NOT invented here: the FIPS and
  * "Remediation SLA: High / Medium / Low" cells carry footnote markers [1] and
- * [4] in the source; the footnote text was not supplied, so the markers are
- * omitted rather than left dangling. And the FAQ answers below still cite
- * figures the new table changes: roughly 24-hour remediation against the
- * table's 7 days for Critical, plus a 78-test suite, 11 signed artifacts,
- * shell-less/read-only images and "vulnerability data accuracy", none of which
- * the new table carries. Those answers are the SEO document's and were left
- * untouched pending its own update.
+ * [4] in the source, and the footnote text was not supplied, so the markers
+ * are omitted rather than left dangling.
+ *
+ * Five FAQ answers were rewritten on 2026-09-08 to stop contradicting that
+ * table. They had claimed roughly 24-hour remediation against its seven-day
+ * Critical SLA, and cited a 78-test suite, 11 signed artifacts, shell-less and
+ * read-only images, "vulnerability data accuracy" and the Continuous Trust
+ * Loop, none of which the new table carries. Every replacement clause is
+ * traceable to a cell in it, and nothing was added beyond what it states. The
+ * FIPS answer changed direction as a result: the table gives Docker
+ * CMVP-validated variants, so the old "CleanStart builds FIPS in at compile
+ * time rather than bolting it on" read as a claim the table does not support.
+ * These are derived rewrites, not the SEO document's own words, and want its
+ * review. The array feeds the FAQPage JSON-LD as well as the accordion, so the
+ * structured data moved with them.
  *
  * Heading levels follow the document's outline, shifted one level because the
  * page title takes H1: the document's H1s are the page's H2s, its H2s are the
@@ -517,7 +525,7 @@ export const FAQS = [
     question:
       "What is the difference between Docker Hardened Images and CleanStart?",
     answer:
-      "Both provide hardened container images with SBOMs, Cosign signatures and SLSA-aligned provenance. The core difference is architecture: Docker Hardened Images harden existing Debian and Alpine base images and inherit from upstream distributions, while CleanStart uses a zero-inheritance model where every component is compiled from verified source on the CleanStart OS foundation (custom glibc), with hermetic builds, FIPS built in at build time, an AI BOM, and shell-less, read-only images.",
+      "Both provide hardened container images with SPDX and CycloneDX SBOMs, Cosign and Sigstore signing, and SLSA Build Level 3 provenance. The core difference is architecture: Docker Hardened Images harden an existing Debian or Alpine base and inherit from upstream distributions, while CleanStart compiles every component from verified source on the CleanStart OS foundation, setting hardening flags at compile time on a custom glibc rather than applying them afterward, through a hermetic build pipeline with verified package-origin enforcement and an AI BOM.",
   },
   {
     id: "alternative",
@@ -529,26 +537,26 @@ export const FAQS = [
     id: "more-secure",
     question: "Which platform builds more secure container images?",
     answer:
-      "Both are secure by design. Docker hardens a known base and adds attestations and signatures. CleanStart removes inherited risk entirely by compiling every component from verified source on a zero-inheritance foundation, hardening at build time, and validating each variant with a 78-test suite and 11 signed artifacts. Teams that prioritize source-to-artifact verification and hermetic builds generally favor CleanStart's approach.",
+      "Both are secure by design. Docker hardens a known base and adds attestations and signatures. CleanStart removes inherited risk by compiling every component from verified source on a zero-inheritance foundation, setting hardening flags at compile time on a custom glibc, and enforcing verified package origin inside a hermetic build pipeline. Teams that prioritize source-to-artifact verification and hermetic builds generally favor CleanStart's approach.",
   },
   {
     id: "compliance",
     question: "Which solution offers better compliance support?",
     answer:
-      "Both offer FIPS-ready and STIG-aligned images plus compliance artifacts. CleanStart builds FIPS in at compile time rather than bolting it on afterward, and pairs it with SBOMs, provenance and an AI BOM, which gives auditors a consistent, source-verified evidence trail for regulated environments.",
+      "Both ship STIG-aligned images, CIS Benchmark alignment, per-image compliance labels in the catalog, and compliance artifacts for audit evidence. On FIPS they differ in kind: Docker Hardened Images offer CMVP-validated variants on their Select and Enterprise tiers, while CleanStart ships a FIPS-compliant set. CleanStart pairs that with SBOMs, provenance and an AI BOM, which gives auditors a source-verified evidence trail for regulated environments.",
   },
   {
     id: "vulnerability-effort",
     question: "Which platform reduces vulnerability management effort the most?",
     answer:
-      "Both reduce effort by shipping minimal images with less to patch. Docker uses patch-based remediation with fixes typically within 7 days on paid tiers. CleanStart automatically rebuilds affected images from source through its Continuous Trust Loop, targeting roughly 24-hour remediation, and adds vulnerability data accuracy and exploitability context so teams spend less time triaging false positives.",
+      "Both reduce effort by shipping minimal images with less to patch, rebuilding continuously when an upstream fix lands, and meeting a seven-day remediation SLA for Critical findings. CleanStart also publishes a 14-day SLA for High, Medium and Low. Its vulnerability intelligence adds exploitability context and verification workflows, reachability-backed VEX evidence, and KEV and EPSS enrichment, so teams spend less time triaging findings that are not reachable in their images.",
   },
   {
     id: "advantages",
     question:
       "What are the advantages of CleanStart over Docker Hardened Images?",
     answer:
-      "CleanStart's advantages include a zero-inheritance architecture (no upstream distro risk), source-based and hermetic builds, FIPS built in at build time, an AI BOM, shell-less and read-only images, faster source-based remediation via the Continuous Trust Loop, and supply chain assurance that extends across images, libraries and dependencies.",
+      "CleanStart's advantages include a zero-inheritance architecture (no upstream distro risk), a hermetic build pipeline with verified package-origin enforcement, an AI BOM, reachability-backed VEX evidence, reproducible verdict metadata, KEV and EPSS enrichment, a published remediation SLA for High, Medium and Low findings as well as Critical, and supply chain assurance that extends across images, libraries and dependencies.",
   },
   {
     id: "devsecops",
