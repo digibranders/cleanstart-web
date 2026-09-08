@@ -20,16 +20,6 @@ export const metadata = buildPageMetadata({
   description: META.description,
   path: PATH,
   eyebrow: "Comparison",
-  /*
-   * Held back from search until the page is signed off. Both directives are
-   * deliberate: `nofollow` is not the default for a per-page `noindex` (the
-   * helper still emits `follow` so link equity flows), so it is set explicitly
-   * here. Drop BOTH of these and re-add the path to `app/sitemap.ts` when the
-   * page ships — the sitemap entry stays removed for as long as this is
-   * noindex, because listing a noindex URL is a contradictory signal.
-   */
-  noindex: true,
-  nofollow: true,
 });
 
 export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
@@ -46,6 +36,14 @@ export const revalidate = 21600; // 6h ISR fallback — on-demand publish revali
  *
  * `FadeUp` wraps the below-fold sections only — the hero renders visible so it
  * stays an LCP candidate.
+ *
+ * Launched 2026-09-08: the `noindex, nofollow` pair is dropped and the path is
+ * listed in the sitemap's STATIC_ROUTES. `/compare` itself has no page yet, so
+ * the breadcrumb stays Home > this page with no Compare crumb; add that crumb
+ * only when the hub exists, or it links to a 404. There is no `pageRegistry`
+ * row for this path, so `getPageGraph` contributes Organization and WebSite
+ * but no WebPage node; the BreadcrumbList and FAQPage below are passed
+ * directly and are unaffected.
  */
 export default async function CleanStartVsDockerHardenedImagesPage(): Promise<React.ReactElement> {
   const graph = await getPageGraph(PATH, [

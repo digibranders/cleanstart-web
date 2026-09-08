@@ -101,10 +101,7 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   // and shipped noindex, unlinked and unlisted, so nothing was de-ranked. Recover
   // the route and its sections from git history when it is rebuilt.
   { path: '/community' },
-  // `/compare/cleanstart-vs-docker-hardened-images` is intentionally de-listed
-  // — the page is not signed off yet, so it is noindex,nofollow and excluded
-  // from the sitemap. Re-add when it ships (and drop the `noindex` / `nofollow`
-  // in its page metadata).
+  { path: '/compare/cleanstart-vs-docker-hardened-images' },
   { path: '/contact-us' },
   { path: '/deal-registration' },
   { path: '/events' },
