@@ -15,7 +15,7 @@ const base: DealRegistrationNotificationInput = {
 describe('buildDealRegistrationNotificationEmail', () => {
   it('builds the deal-name subject as {prospect} — {partner}', () => {
     expect(buildDealRegistrationNotificationEmail(base).subject).toBe(
-      'New partner deal registration — Vinya Ramananda — Global Cybersecurity Innovation Pvt Ltd',
+      'New partner deal registration: Vinya Ramananda — Global Cybersecurity Innovation Pvt Ltd',
     );
   });
 

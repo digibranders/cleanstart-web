@@ -1,3 +1,5 @@
+import { type EmailBlock, renderEmail } from '../email/layout';
+
 export type HrApplicationEmailInput = {
   jobTitle: string;
   jobLocation?: string | undefined;
@@ -12,43 +14,80 @@ export type HrApplicationEmailInput = {
   linkedinUrl?: string | undefined;
 };
 
-const escapeHtml = (value: string): string =>
-  value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-
-const row = (label: string, value: string | undefined): string =>
-  value && value.trim().length > 0
-    ? `<tr><td style="padding:4px 12px 4px 0;color:#555;font-weight:600;">${label}</td><td style="padding:4px 0;">${escapeHtml(value)}</td></tr>`
-    : '';
-
-/**
- * Builds the HR-notification subject + HTML for a new application. Self-contained
- * (no Brevo dashboard template). All applicant-supplied values are HTML-escaped.
- */
+/** Internal HR notification for a new application. Resume arrives as an attachment. */
 export const buildHrApplicationEmail = (
   input: HrApplicationEmailInput,
 ): { subject: string; htmlContent: string } => {
   const fullName = `${input.firstName} ${input.lastName}`.trim();
-  const subject = `New application — ${input.jobTitle} — ${fullName}`;
-  const htmlContent = `<!doctype html><html><body style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#1a1a1a;">
-<h2 style="margin:0 0 12px;">New job application</h2>
-<p style="margin:0 0 16px;">A candidate applied for <strong>${escapeHtml(input.jobTitle)}</strong>. Resume attached.</p>
-<table style="border-collapse:collapse;">
-${row('Position', input.jobTitle)}
-${row('Role location', input.jobLocation)}
-${row('Name', fullName)}
-${row('Email', input.email)}
-${row('Phone', input.phone)}
-${row('Based in', input.location)}
-${row('Heard via', input.howDidYouHear)}
-${row('LinkedIn', input.linkedinUrl)}
-</table>
-${input.coverLetter && input.coverLetter.trim().length > 0 ? `<h3 style="margin:20px 0 6px;">Cover letter</h3><p style="white-space:pre-wrap;margin:0;">${escapeHtml(input.coverLetter)}</p>` : ''}
-${input.coverLetterAttached ? `<p style="margin:12px 0 0;color:#555;">📎 Cover letter file attached.</p>` : ''}
-</body></html>`;
-  return { subject, htmlContent };
+  const blocks: EmailBlock[] = [
+    {
+      kind: 'paragraph',
+      text: `${fullName} applied for ${input.jobTitle}. Their resume is attached to this email.`,
+    },
+    {
+      kind: 'details',
+      rows: [
+        ['Position', input.jobTitle],
+        ['Role location', input.jobLocation],
+        ['Name', fullName],
+        ['Email', input.email],
+        ['Phone', input.phone],
+        ['Based in', input.location],
+        ['Heard via', input.howDidYouHear],
+        ['LinkedIn', input.linkedinUrl],
+      ],
+    },
+    ...(input.coverLetter?.trim()
+      ? [{ kind: 'quote' as const, label: 'Cover letter', text: input.coverLetter }]
+      : []),
+    ...(input.coverLetterAttached
+      ? [{ kind: 'note' as const, text: 'A cover letter file is attached alongside the resume.' }]
+      : []),
+  ];
+
+  return {
+    subject: `New application: ${input.jobTitle}, ${fullName}`,
+    htmlContent: renderEmail({
+      preheader: `${fullName} applied for ${input.jobTitle}.`,
+      eyebrow: 'Careers',
+      heading: 'New job application',
+      blocks,
+      footerNote: 'Sent automatically from the CleanStart careers site.',
+    }),
+  };
 };
+
+/**
+ * Applicant acknowledgement.
+ *
+ * Until now an application was answered with silence: 1,482 candidates
+ * submitted and heard nothing back, with no way to tell a received application
+ * from a lost one.
+ */
+export const buildApplicantConfirmationEmail = (input: {
+  firstName: string;
+  jobTitle: string;
+}): { subject: string; htmlContent: string } => ({
+  subject: `We've received your application for ${input.jobTitle}`,
+  htmlContent: renderEmail({
+    preheader: `Your application for ${input.jobTitle} reached our team.`,
+    eyebrow: 'Careers',
+    heading: `Thanks for applying, ${input.firstName}`,
+    blocks: [
+      {
+        kind: 'paragraph',
+        text: `We've received your application for ${input.jobTitle}, along with your resume.`,
+      },
+      {
+        kind: 'paragraph',
+        text: 'Our team reviews every application. If your experience lines up with what the role needs, we will be in touch to arrange a first conversation.',
+      },
+      {
+        kind: 'note',
+        text: 'Please do not reply to this message. It is sent from an unmonitored address.',
+      },
+      { kind: 'paragraph', text: 'The CleanStart hiring team', muted: true },
+    ],
+    footerNote: 'You received this because you applied for a role on cleanstart.com.',
+  }),
+});

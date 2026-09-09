@@ -27,7 +27,11 @@ describe('buildHrApplicationEmail', () => {
 
   it('omits optional rows when absent', () => {
     const { htmlContent } = buildHrApplicationEmail({ ...base, phone: undefined, linkedinUrl: undefined, coverLetter: undefined });
-    expect(htmlContent).not.toContain('LinkedIn');
+    // Scoped to the card: "LinkedIn" also appears as the footer social icon's
+    // alt text, which is present on every email regardless of the details.
+    const card = htmlContent.slice(htmlContent.indexOf('<h1'), htmlContent.indexOf('</td></tr>', htmlContent.indexOf('<h1')));
+    expect(card).not.toContain('LinkedIn');
+    expect(card).not.toContain('Phone');
   });
 
   it('shows the role-location row when provided and omits it otherwise', () => {
@@ -50,11 +54,11 @@ describe('buildHrApplicationEmail', () => {
     expect(htmlContent).toContain('Berlin, DE');
     expect(htmlContent).toContain('Heard via');
     expect(htmlContent).toContain('LinkedIn');
-    expect(htmlContent).toContain('Cover letter file attached');
+    expect(htmlContent).toContain('cover letter file is attached');
 
     const without = buildHrApplicationEmail(base);
     expect(without.htmlContent).not.toContain('Based in');
     expect(without.htmlContent).not.toContain('Heard via');
-    expect(without.htmlContent).not.toContain('Cover letter file attached');
+    expect(without.htmlContent).not.toContain('cover letter file is attached');
   });
 });

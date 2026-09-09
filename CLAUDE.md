@@ -255,6 +255,30 @@ These are hard rules. Do not work around them — flag and stop instead.
 
 ---
 
+## Email
+
+Every email the site sends is built in code and delivered through
+`sendBrevoEmail` as `subject` + `htmlContent`. The registry at
+`apps/cms/src/payload/lib/email/registry.ts` lists all of them with the form
+that triggers each and the file that sends it.
+
+- **One layout.** `lib/email/layout.ts` owns presentation; builders describe
+  content as blocks. Table-based, inline styles, Arial, preheader, plated logo,
+  postal address. Do not hand-write email HTML.
+- **Never use a Brevo dashboard template for a form.** Brevo interpolates
+  `{{ params.* }}` unescaped, so visitor input reaches inboxes as live markup,
+  and a second design source means production sends two different-looking sets
+  of email. `BREVO_TEMPLATE_ID`, `PARTNER_ADMIN_TEMPLATE_ID` and
+  `PARTNER_USER_TEMPLATE_ID` are dead and can be unset.
+- **Payload's own mail** (password reset) goes through the Brevo adapter at
+  `lib/email/payload-adapter.ts`. Without it Payload logs mail to stdout and
+  password resets silently never arrive.
+- **`apps/cms/emails/` is generated.** Run `pnpm --filter @cleanstart/cms
+  emails:render` after changing a template and commit the result;
+  `emails:check` is the drift gate.
+
+---
+
 ## Background jobs
 
 Twelve cron tasks in `apps/cms/src/payload/jobs/`. All gated by `PAYLOAD_AUTO_RUN=true` — set this in `.env` to enable; omitting it (e.g. in test runs) prevents spurious fires.
