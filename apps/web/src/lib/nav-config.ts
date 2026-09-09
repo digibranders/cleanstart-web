@@ -6,6 +6,8 @@
 // the href is data-only until the page exists. When a page is marked ✅ in WEB-PAGES.md,
 // switch its renderer from <span> to <Link> in MegaMenu / MobileNav.
 
+import { sectionIndexHref } from "@/lib/nav/section-index";
+
 export type NavLeaf = {
   label: string;
   href: string;
@@ -195,7 +197,7 @@ export const NAV_TREE: NavItem[] = [
           { label: "Resource Center", href: "/resource-center", icon: "folder" },
           { label: "Case Studies", href: "/case-studies", icon: "doc-signed" },
           { label: "Newsroom", href: "/news", icon: "newspaper" },
-          { label: "Knowledge Hub", href: "/knowledge-hub", icon: "book-open" },
+          { label: "Knowledge Hub", href: sectionIndexHref("/knowledge-hub"), icon: "book-open" },
         ],
       },
       {

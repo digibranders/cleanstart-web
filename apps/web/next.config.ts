@@ -217,6 +217,19 @@ const nextConfig: NextConfig = {
         destination: "/news/why-containers-drive-supply-chain-breaches",
         permanent: true,
       },
+      // Second duplicate news article, same collision-suffix pattern as above.
+      // Both documents were created 2025-08-26 and render the same story with
+      // the same 104-character H1 (617 vs 616 words); both returned 200 with
+      // their own self-canonical. The unsuffixed slug is kept, matching the
+      // precedent set directly above. The CMS document still exists and is
+      // still in the sitemap until its `seo.indexable` is set to noindex.
+      {
+        source:
+          "/news/triam-security-rebrands-as-cleanstart-to-reflect-product-led-focus-on-securing-the-software-supply-chain-2",
+        destination:
+          "/news/triam-security-rebrands-as-cleanstart-to-reflect-product-led-focus-on-securing-the-software-supply-chain",
+        permanent: true,
+      },
     ];
   },
   images: {

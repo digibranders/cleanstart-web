@@ -23,6 +23,7 @@ import {
 import { detailRouteExists } from "@/lib/detail-route-not-found-guard";
 import { isIndexingAllowed } from "@/lib/seo/indexing";
 import { stripLegacyPaginationParams } from "@/lib/seo/legacy-params";
+import { SECTION_INDEX_REDIRECTS } from "@/lib/nav/section-index";
 
 const PRODUCTION_HOST = "www.cleanstart.com";
 const APEX_HOST = "cleanstart.com";
@@ -36,11 +37,8 @@ const DRAFT_BYPASS_COOKIE = "__prerender_bypass";
 // async Header fetches the CMS), Next downgrades the redirect to a 200 + meta
 // refresh, which search engines read as a duplicate page (it inherited the
 // default/home canonical). Targets are displayOrder-pinned, so they're stable
-// across re-seeds; the owning pages keep the same slugs as their fallback.
-const SECTION_INDEX_REDIRECTS: Record<string, string> = {
-  "/knowledge-hub": "/knowledge-hub/vex-documents",
-  "/legal": "/legal/additional-third-party-terms",
-};
+// across re-seeds; the owning pages keep the same slugs as their fallback. The
+// map lives in lib/nav so link sites resolve hrefs through the same pairs.
 
 // Stays report-only until the CSP burn-in is complete; set CSP_ENFORCE=1 to flip.
 const CSP_MODE: "report-only" | "enforce" =
