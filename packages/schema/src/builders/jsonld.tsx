@@ -53,6 +53,22 @@ const authorNode = (a: { name: string; slug?: string | undefined }) =>
         name: a.name,
         ...(a.slug ? { url: absoluteUrl(`/author/${a.slug}`) } : {}),
       };
+
+/**
+ * `author` is required on Article and its subtypes. Named contributors win when
+ * the document has them; otherwise the publishing Organization is the honest
+ * attribution, which is what the house byline already resolves to. Omitting the
+ * property instead leaves the node failing Google's Article requirements, which
+ * is what knowledge-hub, news and resources documents used to do.
+ */
+const authorProperty = (
+  authors?: Array<{ name: string; slug?: string | undefined }> | undefined,
+) => ({
+  author:
+    authors && authors.length > 0
+      ? authors.map(authorNode)
+      : [{ "@id": ORGANIZATION_ID }],
+});
 const WEBSITE_ID = `${SITE_URL}/#website`;
 
 /** Shared schema.org event-status IRIs (Event + webinar ItemList). */
@@ -361,11 +377,7 @@ export function blogPostingSchema({
     ...(imageUrl ? { image: [imageUrl] } : {}),
     ...(publishedAt ? { datePublished: publishedAt } : {}),
     ...(lastModified ? { dateModified: lastModified } : {}),
-    ...(authors && authors.length > 0
-      ? {
-          author: authors.map(authorNode),
-        }
-      : {}),
+    ...authorProperty(authors),
     ...(category ? { articleSection: category } : {}),
     ...(cleanRelatedLinks ? { relatedLink: cleanRelatedLinks } : {}),
     publisher: { "@id": ORGANIZATION_ID },
@@ -404,11 +416,7 @@ export function articleSchema({
     ...(imageUrl ? { image: [imageUrl] } : {}),
     ...(publishedAt ? { datePublished: publishedAt } : {}),
     ...(lastModified ? { dateModified: lastModified } : {}),
-    ...(authors && authors.length > 0
-      ? {
-          author: authors.map(authorNode),
-        }
-      : {}),
+    ...authorProperty(authors),
     ...(type ? { genre: type } : {}),
     publisher: { "@id": ORGANIZATION_ID },
   };
@@ -454,11 +462,7 @@ export function newsArticleSchema({
     ...(publishedAt ? { datePublished: publishedAt } : {}),
     ...(lastModified ? { dateModified: lastModified } : {}),
     ...(section ? { articleSection: section } : {}),
-    ...(authors && authors.length > 0
-      ? {
-          author: authors.map(authorNode),
-        }
-      : {}),
+    ...authorProperty(authors),
     publisher: { "@id": ORGANIZATION_ID },
   };
 }

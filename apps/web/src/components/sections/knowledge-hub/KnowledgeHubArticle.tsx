@@ -2,6 +2,8 @@ import { HeroReveal, Reveal } from '@/components/ui/Reveal';
 import type { KhArticle } from '@/lib/knowledge-hub';
 import { RenderLexical } from '@/lib/renderLexical';
 import { KnowledgeHubArticleFAQ } from './KnowledgeHubArticleFAQ';
+import { sectionIndexHref } from "@/lib/nav/section-index";
+
 import Link from 'next/link';
 
 export function KnowledgeHubArticle({
@@ -88,7 +90,7 @@ function Breadcrumb({ category }: { category?: string | null | undefined }): Rea
         </li>
         <li>
           <Link
-            href="/knowledge-hub"
+            href={sectionIndexHref("/knowledge-hub")}
             className="transition-colors hover:text-cs-purple-1"
             style={{ color: '#5A5F75' }}
           >

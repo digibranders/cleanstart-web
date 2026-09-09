@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
+  articleSchema,
   blogPostingSchema,
   breadcrumbSchema,
   eventSchema,
   jobPostingSchema,
   caseStudyListSchema,
   organizationSchema,
+  newsArticleSchema,
   reviewSchema,
   videoObjectSchema,
 } from "./jsonld";
@@ -191,5 +193,48 @@ describe("reviewSchema", () => {
 
   it("returns an empty array for no entries", () => {
     expect(reviewSchema([])).toEqual([]);
+  });
+});
+
+describe("author fallback (Google Article requirement)", () => {
+  const ORG = { "@id": "https://www.cleanstart.com/#organization" };
+
+  it("attributes an Article with no named author to the Organization", () => {
+    const node = articleSchema({ title: "T", path: "/knowledge-hub/x" });
+    expect(node.author).toEqual([ORG]);
+  });
+
+  it("attributes a BlogPosting with no named author to the Organization", () => {
+    const node = blogPostingSchema({ title: "T", path: "/blogs/x" });
+    expect(node.author).toEqual([ORG]);
+  });
+
+  it("attributes a NewsArticle with no named author to the Organization", () => {
+    const node = newsArticleSchema({ title: "T", path: "/news/x" });
+    expect(node.author).toEqual([ORG]);
+  });
+
+  it("prefers named contributors over the Organization fallback", () => {
+    const node = articleSchema({
+      title: "T",
+      path: "/blogs/x",
+      authors: [{ name: "Dhanush VM", slug: "dhanush-vm" }],
+    });
+    expect(node.author).toEqual([
+      {
+        "@type": "Person",
+        name: "Dhanush VM",
+        url: "https://www.cleanstart.com/author/dhanush-vm",
+      },
+    ]);
+  });
+
+  it("still collapses the house byline onto the Organization node", () => {
+    const node = articleSchema({
+      title: "T",
+      path: "/blogs/x",
+      authors: [{ name: "CleanStart Security", slug: "cleanstart-security" }],
+    });
+    expect(node.author).toEqual([ORG]);
   });
 });

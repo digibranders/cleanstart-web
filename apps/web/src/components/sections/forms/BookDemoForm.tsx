@@ -150,7 +150,7 @@ export function BookDemoForm(): React.ReactElement {
         tone: "success",
         title: "Demo request received",
         message:
-          "Thanks, your demo request has been received. Our team will reach out within 24 hours.",
+          "Thanks, your demo request has been received. Our team will reach out to arrange a time.",
       });
       window.setTimeout(() => setStatus(null), 5000);
       return;

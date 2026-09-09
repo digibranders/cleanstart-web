@@ -6,6 +6,16 @@
 
 **Run mechanism:** prod CMS image lacks `scripts/`; `docker cp` the script into `cleanstart-cms-1` and run via `pnpm exec tsx` (no `--env-file` — env is via container vars). See memory note `prod-backfill-script-run-mechanism`.
 
+**Deploy-order hazard:** `apps/cms` and `apps/web` both deploy from `main`, so one
+merge fires the Docker build and the Vercel build together, and Vercel normally
+wins by several minutes. Any change where the web app stops sending a field that
+the CMS `forms` row still marks required will 400 every submission for the length
+of that gap. There is no way to sequence the two from a single merge, so relax the
+constraint in prod *before* merging: make the field optional, deploy, then run the
+script that finishes the job. Field defs are additive-safe in the other direction,
+because `validateFields` iterates the form definition and ignores submitted fields
+it does not list.
+
 ### /industries path rename follow-up (2026-09-08)
 
 Script: `scripts/repoint-industry-paths.ts` — repoints the CMS rows that key on
@@ -38,6 +48,7 @@ docker exec -w /app/apps/cms cleanstart-cms-1 pnpm exec tsx \
 | 11 | Webflow media filename cleanup | DONE | 2026-06-09 |
 | 14 | Legacy Webflow 301 redirects seed | DONE | 2026-06-11 |
 | 15 | SEO keywords backfill (guides) | DONE | 2026-06-29 |
+| 17 | Forms overhaul field changes (`apply-form-field-changes.ts`) | DONE | 2026-09-09 |
 
 ---
 

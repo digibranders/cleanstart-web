@@ -8,6 +8,8 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 import { breadcrumbSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { sectionIndexHref } from "@/lib/nav/section-index";
+
 import { getPageGraph } from "@/lib/seo/compose-page";
 
 /**
@@ -60,7 +62,7 @@ export default async function PrivacyPolicyPage(): Promise<React.ReactElement> {
   const graph = await getPageGraph("/privacy-policy", [
     breadcrumbSchema([
       { name: "Home", path: "/" },
-      { name: "Legal", path: "/legal" },
+      { name: "Legal", path: sectionIndexHref("/legal") },
       { name: doc.title },
     ]),
   ]);

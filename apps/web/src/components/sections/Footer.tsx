@@ -2,6 +2,8 @@ import React from "react";
 import Link from "next/link";
 
 import { CookiePreferencesButton } from "@/components/consent";
+import { sectionIndexHref } from "@/lib/nav/section-index";
+
 import { FooterSignature } from "@/components/sections/FooterSignature";
 
 /**
@@ -74,7 +76,7 @@ const CREDENTIALS: Badge[] = [
 ];
 
 const LEGAL_LINKS = [
-  { label: "Legal", href: "/legal" },
+  { label: "Legal", href: sectionIndexHref("/legal") },
   { label: "Privacy Policy", href: "/privacy-policy" },
   { label: "Acceptable Use Policy", href: "/legal/acceptable-use-policy" },
 ];
@@ -300,10 +302,17 @@ export function Footer({
                         page, so default in-viewport prefetch fires an RSC
                         (`?_rsc=`) request site-wide — pure crawl-budget waste
                         for low-traffic policy pages. Click nav is unaffected. */}
+                    {/* `before:` lifts the touch target from 21px (12px x
+                        1.75, no padding) to 27px, clearing the 24x24 WCAG
+                        2.5.8 AA floor — same pseudo-element trick as the nav
+                        columns, so the utility row's visual rhythm is
+                        untouched. The row uses gap-y-1 (4px) when it wraps, so
+                        3px of overhang each side still leaves the wrapped
+                        lines from overlapping. */}
                     <Link
                       href={link.href}
                       prefetch={false}
-                      className="text-xs leading-[1.75] text-white/70 transition-colors duration-200 hover:text-white cursor-pointer"
+                      className="relative inline-flex items-center text-xs leading-[1.75] text-white/70 transition-colors duration-200 hover:text-white cursor-pointer before:absolute before:inset-x-0 before:-inset-y-[3px] before:content-['']"
                     >
                       {link.label}
                     </Link>

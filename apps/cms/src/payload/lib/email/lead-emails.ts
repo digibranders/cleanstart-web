@@ -24,13 +24,13 @@ export const buildDemoConfirmationEmail = (
 ): { subject: string; htmlContent: string } => ({
   subject: 'Your CleanStart demo request',
   htmlContent: renderEmail({
-    preheader: 'We have your demo request. A specialist will reach out within one business day.',
+    preheader: 'We have your demo request. A specialist will reach out to arrange a time.',
     eyebrow: 'Demo request',
     heading: greeting(input.firstName),
     blocks: [
       {
         kind: 'paragraph',
-        text: "We've received your demo request. One of our solutions specialists will reach out within one business day to arrange a time that suits you.",
+        text: "We've received your demo request. One of our solutions specialists will reach out to arrange a time that suits you.",
       },
       {
         kind: 'paragraph',
@@ -47,13 +47,13 @@ export const buildContactConfirmationEmail = (
 ): { subject: string; htmlContent: string } => ({
   subject: "We've received your message",
   htmlContent: renderEmail({
-    preheader: 'Your message reached the CleanStart team. We reply within one business day.',
+    preheader: 'Your message reached the CleanStart team and someone will get back to you.',
     eyebrow: 'Contact',
     heading: greeting(input.firstName),
     blocks: [
       {
         kind: 'paragraph',
-        text: "We've received your message and someone from the team will reply within one business day.",
+        text: "We've received your message and someone from the team will get back to you soon.",
       },
       { kind: 'paragraph', text: 'If it is urgent, reply to this email and it will reach us directly.' },
       signOff,
