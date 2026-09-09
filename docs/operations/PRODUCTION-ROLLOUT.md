@@ -49,6 +49,7 @@ docker exec -w /app/apps/cms cleanstart-cms-1 pnpm exec tsx \
 | 14 | Legacy Webflow 301 redirects seed | DONE | 2026-06-11 |
 | 15 | SEO keywords backfill (guides) | DONE | 2026-06-29 |
 | 17 | Forms overhaul field changes (`apply-form-field-changes.ts`) | DONE | 2026-09-09 |
+| 18 | Noindex the two duplicate news docs (`noindex-duplicate-news.ts`) | DONE | 2026-09-09 |
 
 ---
 
