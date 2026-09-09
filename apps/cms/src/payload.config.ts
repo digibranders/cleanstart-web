@@ -2,6 +2,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { postgresAdapter } from '@payloadcms/db-postgres';
+
+import { brevoEmailAdapter } from './payload/lib/email/payload-adapter';
 import { cleanstartLexicalEditor } from './payload/lib/lexical/editor-config';
 import { s3Storage } from '@payloadcms/storage-s3';
 import { buildConfig } from 'payload';
@@ -610,6 +612,7 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
+  email: brevoEmailAdapter,
   db: postgresAdapter({
     pool: {
       connectionString: requireEnv('DATABASE_URI'),
