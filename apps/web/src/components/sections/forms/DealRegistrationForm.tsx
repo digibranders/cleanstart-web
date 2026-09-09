@@ -7,6 +7,8 @@ import { PhoneField } from "@/components/forms/PhoneField";
 import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
 import { TextField } from "@/components/forms/TextField";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
+import { useAttribution } from "@/components/attribution/AttributionProvider";
+import { useConversionRedirect } from "@/lib/thank-you/useConversionRedirect";
 import { trackEvent } from "@/lib/analytics/track";
 import {
   emptyPhoneValue,
@@ -54,6 +56,8 @@ export function DealRegistrationForm(): React.ReactElement {
   const [submitting, setSubmitting] = useState(false);
   const { status, setStatus, statusRef } = useFormStatus();
   const inFlightRef = useRef(false);
+  const redirectToThankYou = useConversionRedirect();
+  const { getAttribution } = useAttribution();
   const { country: detectedCountry, detected } = useDetectedCountry();
   const touchedCountryRef = useRef(false);
 
@@ -155,10 +159,9 @@ export function DealRegistrationForm(): React.ReactElement {
       },
       ...(typeof turnstileToken === "string" ? { turnstileToken } : {}),
       ...(typeof window !== "undefined" ? { source: window.location.href } : {}),
+      attribution: getAttribution(),
     });
 
-    setSubmitting(false);
-    inFlightRef.current = false;
 
     if (result.ok) {
       trackEvent("deal_registration", { marketing_opt_in: categories.includes("marketing") });
@@ -167,13 +170,7 @@ export function DealRegistrationForm(): React.ReactElement {
       setProspectPhone((prev) => ({ country: prev.country, national: "" }));
       setErrors({});
       form.reset();
-      setStatus({
-        tone: "success",
-        title: "Deal registration received",
-        message:
-          "Thanks, your deal registration has been received. We'll be in touch about next steps.",
-      });
-      window.setTimeout(() => setStatus(null), 6000);
+      redirectToThankYou("deal-registration");
       return;
     }
 

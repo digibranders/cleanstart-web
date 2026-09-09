@@ -6,6 +6,7 @@ import { LeadConsent } from "@/components/forms/LeadConsent";
 import { PhoneField } from "@/components/forms/PhoneField";
 import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
 import { TextField } from "@/components/forms/TextField";
+import { useConversionRedirect } from "@/lib/thank-you/useConversionRedirect";
 import { submitLead } from "@/lib/leads/submitLead";
 import { useAttribution } from "@/components/attribution/AttributionProvider";
 import { trackEvent } from "@/lib/analytics/track";
@@ -67,6 +68,7 @@ export function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
   const { status, setStatus, statusRef } = useFormStatus();
   const inFlightRef = useRef(false);
+  const redirectToThankYou = useConversionRedirect();
   const { getAttribution } = useAttribution();
   const { country: detectedCountry, detected } = useDetectedCountry();
   const touchedCountryRef = useRef(false);
@@ -150,26 +152,22 @@ export function ContactForm() {
       attribution: getAttribution(),
     });
 
-    setSubmitting(false);
-    inFlightRef.current = false;
     if (result.ok) {
       trackEvent("generate_lead", { form_name: "contact" });
       setSubmitted(true);
       setValues(initialState);
       setPhone((prev) => ({ country: prev.country, national: "" }));
       setErrors({});
-      setStatus({
-        tone: "success",
-        title: "Message sent",
-        message:
-          "Thanks, we've received your message and will get back to you soon.",
-      });
-      window.setTimeout(() => {
-        setSubmitted(false);
-        setStatus(null);
-      }, 5000);
+      redirectToThankYou("contact");
       return;
     }
+
+    // Left busy and in-flight on success: the component is about to unmount
+    // into the thank-you page, and clearing them would show a ready-looking
+    // form for the length of the navigation and allow a second submit.
+
+    setSubmitting(false);
+    inFlightRef.current = false;
 
     // The API checks the full free-mail corpus, so a domain the browser's
     // shorter list missed comes back as a field issue rather than a banner.

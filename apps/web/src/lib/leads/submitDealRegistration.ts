@@ -1,3 +1,4 @@
+import type { AttributionSubmission } from "@/lib/attribution/types";
 const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:3000";
 
 export interface DealRegistrationPerson {
@@ -14,6 +15,8 @@ export interface DealRegistrationConsent {
 }
 
 export interface SubmitDealRegistrationInput {
+  /** Spread from `useAttribution().getAttribution()`. */
+  attribution?: AttributionSubmission;
   partnerName: string;
   partnerRep: DealRegistrationPerson;
   prospect: DealRegistrationPerson;
@@ -37,7 +40,12 @@ export async function submitDealRegistration(
       method: "POST",
       credentials: "include",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ ...input, hp: input.hp ?? "" }),
+      body: JSON.stringify({
+        ...input,
+        hp: input.hp ?? "",
+        ...(input.attribution?.utm ? { utm: input.attribution.utm } : {}),
+        ...(input.attribution?.attribution ? { attribution: input.attribution.attribution } : {}),
+      }),
     });
     const json = (await res.json().catch(() => null)) as SubmitDealRegistrationResult | null;
     if (!res.ok || !json?.ok) {

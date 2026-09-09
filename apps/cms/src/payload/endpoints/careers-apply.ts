@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs';
 import type { Endpoint } from 'payload';
 
+import { attributionColumns, buildAttribution } from '../lib/attribution-schema';
 import { applicationFieldsSchema } from '../lib/careers/application-schema';
 import {
   buildApplicantConfirmationEmail,
@@ -158,6 +159,20 @@ export const careersApplyEndpoint: Endpoint = {
         rawFields.consent = JSON.parse(consentRaw);
       } catch {
         return json({ ok: false, error: 'invalid_consent' }, { status: 400, headers: cors });
+      }
+    }
+
+    // This form is multipart because of the resume upload, so the structured
+    // fields arrive JSON-encoded. Malformed attribution is dropped rather than
+    // rejected: losing a campaign tag must never cost the application itself.
+    for (const key of ['utm', 'attribution'] as const) {
+      const raw = form.get(key);
+      if (typeof raw === 'string' && raw.length > 0) {
+        try {
+          rawFields[key] = JSON.parse(raw);
+        } catch {
+          // Ignored on purpose, see above.
+        }
       }
     }
 
@@ -425,6 +440,10 @@ export const careersApplyEndpoint: Endpoint = {
             error: delivery.status === 'failed' ? delivery.error : null,
           },
           turnstilePassed: true,
+          ...attributionColumns({
+            utm: data.utm,
+            attribution: buildAttribution({ utm: data.utm, attribution: data.attribution }),
+          }),
         },
         overrideAccess: true,
       });

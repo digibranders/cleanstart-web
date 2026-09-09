@@ -88,6 +88,10 @@ function isIndexable(doc: CmsDoc): boolean {
 
 // Every built non-dynamic route. Keep in sync with docs/web/WEB-PAGES.md.
 // `/pricing` and `/webinars/[slug]` are intentionally omitted (not built).
+// /thank-you/[type] is deliberately absent. Those pages are noindex and
+// disallowed in robots.ts: indexing a confirmation page means strangers land on
+// it from search and every load inflates the conversion count it exists to
+// measure. Do not add them here for completeness.
 const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/' },
   { path: '/about-us' },

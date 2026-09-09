@@ -44,6 +44,9 @@ export function buildRobotsTxt({ indexable }: { indexable: boolean }): string {
     // numbers for the whole company. Also noindex'd via page metadata and the
     // X-Robots-Tag header on the bare signature route.
     "Disallow: /email-signatures",
+    // Confirmation pages: indexing them means strangers land on them from
+    // search and every load inflates the conversion count.
+    "Disallow: /thank-you/",
     // Next.js App Router appends `?_rsc=<hash>` to in-viewport <Link> prefetch
     // fetches (Content-Type text/x-component). They are internal navigation
     // payloads, never indexable pages, and each is already canonicalised to its

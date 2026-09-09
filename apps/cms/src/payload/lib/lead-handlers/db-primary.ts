@@ -1,3 +1,4 @@
+import { attributionColumns } from '../attribution-schema';
 import { extractEmail } from './extract-fields';
 import type { LeadHandler, LeadSubmission } from './types';
 
@@ -41,9 +42,6 @@ export const dbPrimaryHandler: LeadHandler = {
       }
     }
 
-    const utm = submission.utm ?? {};
-    const attribution = submission.attribution ?? {};
-    const firstTouch = attribution.firstTouch ?? {};
     const created = await ctx.payload.create({
       collection: 'leads',
       data: {
@@ -51,30 +49,7 @@ export const dbPrimaryHandler: LeadHandler = {
         formSchemaVersion: submission.formSchemaVersion,
         fields: submission.fields,
         source: submission.source ?? null,
-        utm: {
-          campaign: utm.campaign ?? null,
-          source: utm.source ?? null,
-          medium: utm.medium ?? null,
-          term: utm.term ?? null,
-          content: utm.content ?? null,
-        },
-        attribution: {
-          channel: attribution.channel ?? null,
-          device: attribution.device ?? null,
-          gclid: attribution.gclid ?? null,
-          fbclid: attribution.fbclid ?? null,
-          liFatId: attribution.liFatId ?? null,
-          firstTouch: {
-            source: firstTouch.source ?? null,
-            medium: firstTouch.medium ?? null,
-            campaign: firstTouch.campaign ?? null,
-            term: firstTouch.term ?? null,
-            content: firstTouch.content ?? null,
-            landingPage: firstTouch.landingPage ?? null,
-            referrer: firstTouch.referrer ?? null,
-            at: firstTouch.at ?? null,
-          },
-        },
+        ...attributionColumns({ utm: submission.utm, attribution: submission.attribution }),
         ip: submission.ip ?? null,
         userAgent: submission.userAgent ?? null,
         consentGivenAt: submission.consent?.givenAt ?? null,

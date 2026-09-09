@@ -1,6 +1,11 @@
 import type { EmailAdapter, SendEmailOptions } from 'payload';
 
-import { type BrevoRecipient, type BrevoSendResult, sendBrevoEmail } from './brevo';
+import {
+  SITE_SENDER_NAME,
+  type BrevoRecipient,
+  type BrevoSendResult,
+  sendBrevoEmail,
+} from './brevo';
 
 /**
  * Payload email adapter backed by the Brevo transactional API.
@@ -48,7 +53,7 @@ const asString = (value: unknown): string | undefined =>
 export const brevoEmailAdapter: EmailAdapter<BrevoSendResult> = ({ payload }) => ({
   name: 'brevo',
   defaultFromAddress: process.env.BREVO_SENDER_EMAIL ?? 'no-reply@cleanstart.com',
-  defaultFromName: process.env.BREVO_SENDER_NAME ?? 'CleanStart',
+  defaultFromName: SITE_SENDER_NAME,
   async sendEmail(message: SendEmailOptions): Promise<BrevoSendResult> {
     const to = toRecipients(message.to);
     if (to.length === 0) {

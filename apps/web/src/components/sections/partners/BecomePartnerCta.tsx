@@ -13,6 +13,7 @@ import {
   validatePhone,
   type PhoneValue,
 } from "@/lib/forms/phone-value";
+import { useAttribution } from "@/components/attribution/AttributionProvider";
 import { useDetectedCountry } from "@/lib/forms/useDetectedCountry";
 import { emailError, optionalText, requiredText } from "@/lib/forms/validate";
 import { submitPartner } from "@/lib/partners/submitPartner";
@@ -76,6 +77,7 @@ function PartnerModal({ open, onClose }: PartnerModalProps): React.ReactElement 
   const [submitting, setSubmitting] = useState(false);
   const { status, setStatus, statusRef } = useFormStatus();
   const inFlightRef = useRef(false);
+  const { getAttribution } = useAttribution();
   const { country: detectedCountry, detected } = useDetectedCountry();
   const touchedCountryRef = useRef(false);
   // Pending auto-close timer: on success the modal flashes the confirmation
@@ -215,6 +217,7 @@ function PartnerModal({ open, onClose }: PartnerModalProps): React.ReactElement 
         ...(typeof window !== "undefined"
           ? { source: window.location.href }
           : {}),
+      attribution: getAttribution(),
       });
 
       if (result.ok) {

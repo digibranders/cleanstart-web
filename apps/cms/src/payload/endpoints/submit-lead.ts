@@ -2,14 +2,14 @@ import * as Sentry from '@sentry/nextjs';
 import type { Endpoint } from 'payload';
 
 import { clientIpFromHeaders } from '../lib/client-ip';
-import { type LeadAttribution, deriveChannel } from '../lib/lead-handlers/attribution';
+import { buildAttribution } from '../lib/attribution-schema';
 import { parkSubmission } from '../lib/lead-fallback-queue';
 import { submitLeadBodySchema } from '../lib/lead-handlers/payload-schema';
 import { submitLead } from '../lib/lead-handlers/registry';
 import type { LeadSubmission } from '../lib/lead-handlers/types';
 import { type FormFieldDef, validateFields } from '../lib/lead-handlers/validate-fields';
 import { DEFAULT_RATE_LIMITS, checkAndRecord } from '../lib/rate-limit';
-import { sendBrevoEmail } from '../lib/email/brevo';
+import { SITE_SENDER_NAME, sendBrevoEmail } from '../lib/email/brevo';
 import { buildResourceDownloadEmail } from '../lib/email/lead-emails';
 import { extractEmail, extractName } from '../lib/lead-handlers/extract-fields';
 import { signDownloadToken } from '../lib/resources/download-token';
@@ -371,19 +371,7 @@ export const submitLeadEndpoint: Endpoint = {
     // Build an attribution object whenever there is any signal (either a
     // first-touch payload or last-touch UTMs) so every campaign-tagged lead
     // carries a channel, even when the client omits the attribution block.
-    let attribution: LeadAttribution | undefined;
-    if (data.attribution != null || data.utm != null) {
-      attribution = {
-        ...(data.attribution ?? {}),
-        channel: deriveChannel({
-          utm: data.utm,
-          referrer: data.attribution?.firstTouch?.referrer,
-          gclid: data.attribution?.gclid,
-          fbclid: data.attribution?.fbclid,
-          liFatId: data.attribution?.liFatId,
-        }),
-      };
-    }
+    const attribution = buildAttribution({ utm: data.utm, attribution: data.attribution });
 
     const submission: LeadSubmission = {
       formId: numericFormId,
@@ -509,7 +497,12 @@ export const submitLeadEndpoint: Endpoint = {
                     expiresAt,
                     ...(firstName ? { firstName } : {}),
                   });
-                  const sent = await sendBrevoEmail({ to: [{ email: recipient }], subject, htmlContent });
+                  const sent = await sendBrevoEmail({
+                    to: [{ email: recipient }],
+                    senderName: SITE_SENDER_NAME,
+                    subject,
+                    htmlContent,
+                  });
                   if (sent.status === 'failed') {
                     req.payload.logger.warn(
                       { email: recipient, error: sent.error },

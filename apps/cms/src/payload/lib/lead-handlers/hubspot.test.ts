@@ -221,27 +221,27 @@ describe('hubspotHandler — unknown field recovery', () => {
   });
 });
 
-describe('hubspotHandler — company fallback', () => {
-  const sentFields = (mock: ReturnType<typeof vi.fn>): Record<string, string> => {
-    const body = JSON.parse(String(mock.mock.calls[0]?.[1]?.body)) as {
+describe('hubspotHandler — company and context', () => {
+  const sentBody = (mock: ReturnType<typeof vi.fn>) =>
+    JSON.parse(String(mock.mock.calls[0]?.[1]?.body)) as {
       fields: { name: string; value: string }[];
+      context: Record<string, unknown>;
     };
-    return Object.fromEntries(body.fields.map((f) => [f.name, f.value]));
-  };
 
-  it('derives company from the work-email domain when the form did not ask', async () => {
+  it('does not derive company from the email domain: that blocks HubSpot enrichment', async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response('{}', { status: 200 }));
     vi.stubGlobal('fetch', fetchMock);
 
     await hubspotHandler.run(
-      { ...submission, fields: { email: 'pat@cleanstart.com', firstname: 'Pat' } },
+      { ...submission, fields: { email: 'gaurav@fynix.digital', firstname: 'Gaurav' } },
       ctx('guid-1'),
     );
 
-    expect(sentFields(fetchMock).company).toBe('Cleanstart');
+    const names = sentBody(fetchMock).fields.map((f) => f.name);
+    expect(names).not.toContain('company');
   });
 
-  it('never overwrites a company the visitor actually typed', async () => {
+  it('still forwards a company the visitor actually typed', async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response('{}', { status: 200 }));
     vi.stubGlobal('fetch', fetchMock);
 
@@ -250,19 +250,26 @@ describe('hubspotHandler — company fallback', () => {
       ctx('guid-1'),
     );
 
-    expect(sentFields(fetchMock).company).toBe('CleanStart Inc.');
+    const company = sentBody(fetchMock).fields.find((f) => f.name === 'company');
+    expect(company?.value).toBe('CleanStart Inc.');
   });
 
-  it('sends no company for a free-mail address rather than inventing one', async () => {
+  it('sends the visitor IP so HubSpot form analytics are not blank', async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response('{}', { status: 200 }));
     vi.stubGlobal('fetch', fetchMock);
 
-    await hubspotHandler.run(
-      { ...submission, fields: { email: 'pat@gmail.com', firstname: 'Pat' } },
-      ctx('guid-1'),
-    );
+    await hubspotHandler.run(submission, ctx('guid-1'));
 
-    expect(sentFields(fetchMock)).not.toHaveProperty('company');
+    expect(sentBody(fetchMock).context).toMatchObject({ ipAddress: '1.2.3.4' });
+  });
+
+  it('omits ipAddress rather than sending an empty one', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await hubspotHandler.run({ ...submission, ip: undefined }, ctx('guid-1'));
+
+    expect(sentBody(fetchMock).context).not.toHaveProperty('ipAddress');
   });
 
   it('passes the country the phone selector resolved straight through', async () => {
@@ -277,7 +284,7 @@ describe('hubspotHandler — company fallback', () => {
       ctx('guid-1'),
     );
 
-    const sent = sentFields(fetchMock);
+    const sent = Object.fromEntries(sentBody(fetchMock).fields.map((f) => [f.name, f.value]));
     expect(sent.country).toBe('India');
     expect(sent.phone).toBe('+919876543210');
   });

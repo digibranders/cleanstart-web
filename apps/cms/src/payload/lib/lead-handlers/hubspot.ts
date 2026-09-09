@@ -2,8 +2,6 @@ import { Client } from '@hubspot/api-client';
 import type { BasePayload } from 'payload';
 
 import { resolveHubspotCredentials, type HubspotCredentials } from '../integrations/credentials';
-import { companyFromEmailDomain } from './enrichment';
-import { extractEmail } from './extract-fields';
 import type { LeadHandler, LeadHandlerResult, LeadSubmission } from './types';
 
 /**
@@ -181,22 +179,27 @@ export const hubspotHandler: LeadHandler = {
       if (!fields.some((f) => f.name === extra.name)) fields.push(extra);
     }
 
-    // Book a Demo dropped its company question: asking for something derivable
-    // from the work email is friction. Fill it from the email domain so the CRM
-    // record still carries a company, but only when the submission has none, so
-    // a form that does ask (Contact, Partner, Deal Registration) always wins.
+    // Deliberately NOT filling `company` from the email domain here.
     //
-    // HubSpot does not do this itself on a Forms API submission unless the
-    // portal has the paid enrichment add-on; where it does, its own data
-    // overwrites this afterwards.
-    if (!fields.some((f) => f.name === 'company')) {
-      const derived = companyFromEmailDomain(extractEmail(ctx.formFieldDefs, submission.fields));
-      if (derived) fields.push({ name: 'company', value: derived.company });
-    }
+    // The portal has enrichment switched on for new records, and it only fills
+    // properties that are EMPTY. Sending a domain-derived guess occupies the
+    // field and stops the better value landing: gaurav@fynix.digital arrived as
+    // "Fynix" because `.digital` is a TLD, while HubSpot had the real company.
+    //
+    // No domain heuristic can fix that, because the same shape needs opposite
+    // answers -- fynix.digital keeps its TLD, chainguard.dev must not. So the
+    // CRM value is HubSpot's to own. The derived name is still written to
+    // `leads.enriched` by the company-from-domain handler, where it is a useful
+    // hint for sales and blocks nothing.
 
     const body: Record<string, unknown> = {
       fields,
-      context: { pageUri: submission.source ?? '' },
+      context: {
+        pageUri: submission.source ?? '',
+        // Without this HubSpot flags the submission as missing an IP and its
+        // form analytics and geo fall back to nothing.
+        ...(submission.ip ? { ipAddress: submission.ip } : {}),
+      },
     };
     if (submission.consent) {
       const consent: Record<string, unknown> = {

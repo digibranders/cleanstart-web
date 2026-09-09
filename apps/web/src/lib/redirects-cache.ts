@@ -134,6 +134,9 @@ export const recordRedirectHit = async (pathname: string): Promise<void> => {
  * the obvious CMS-irrelevant paths.
  */
 export const shouldSkipRedirectLookup = (pathname: string): boolean => {
+  // Post-submit page: the RSC fetch for the soft navigation still hits
+  // middleware, and this is the one route where added latency is felt.
+  if (pathname.startsWith("/thank-you/")) return true;
   // The site root is the home page, never a CMS-managed legacy redirect (those
   // are all sub-paths like `/jobs` → `/careers`). Skipping it means the most-
   // trafficked URL never waits on the redirect index — directly trimming home TTFB.

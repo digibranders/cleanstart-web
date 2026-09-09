@@ -33,6 +33,14 @@ describe("buildRobotsTxt (indexable)", () => {
     expect(signaturesIndex).toBeLessThan(nextGroupIndex);
   });
 
+  it("disallows the thank-you pages inside the wildcard group", () => {
+    const wildcardIndex = lines.indexOf("User-Agent: *");
+    const thankYouIndex = lines.indexOf("Disallow: /thank-you/");
+    const nextGroupIndex = lines.indexOf("User-Agent: Bytespider");
+    expect(thankYouIndex).toBeGreaterThan(wildcardIndex);
+    expect(thankYouIndex).toBeLessThan(nextGroupIndex);
+  });
+
   it("disallows Next.js RSC prefetch query variants inside the wildcard group", () => {
     const wildcardIndex = lines.indexOf("User-Agent: *");
     const rscIndex = lines.indexOf("Disallow: /*_rsc=");

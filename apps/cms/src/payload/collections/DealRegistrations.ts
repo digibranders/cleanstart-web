@@ -1,6 +1,7 @@
 import type { CollectionConfig, Field } from 'payload';
 
 import { isAdmin, isAdminOrEditor } from '../access';
+import { attributionFields } from '../fields/attribution';
 import {
   dealRegistrationApplyEndpoint,
   dealRegistrationApplyOptionsEndpoint,
@@ -78,6 +79,7 @@ export const DealRegistrations: CollectionConfig = {
       access: { update: () => false },
       admin: { readOnly: true, position: 'sidebar', date: { pickerAppearance: 'dayAndTime' } },
     },
+    ...attributionFields(),
   ],
   timestamps: true,
 };

@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs';
 import type { Endpoint } from 'payload';
 
+import { attributionColumns, buildAttribution } from '../lib/attribution-schema';
 import { clientIpFromHeaders } from '../lib/client-ip';
 import { createHubspotDeal } from '../lib/deal-registrations/hubspot-deal';
 import {
@@ -207,6 +208,10 @@ export const dealRegistrationApplyEndpoint: Endpoint = {
             lastAttemptAt: new Date().toISOString(),
           },
           turnstilePassed: true,
+          ...attributionColumns({
+            utm: data.utm,
+            attribution: buildAttribution({ utm: data.utm, attribution: data.attribution }),
+          }),
         },
         overrideAccess: true,
       });

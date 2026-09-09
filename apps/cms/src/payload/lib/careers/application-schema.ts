@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { attributionSchema, utmSchema } from '../attribution-schema';
 import { emailField, optionalPhoneField } from '../form-field-schemas';
 
 const SLUG = /^[a-z0-9-]+$/;
@@ -15,6 +16,8 @@ export const applicationFieldsSchema = z.object({
   coverLetter: z.string().max(5000).optional(),
   linkedinUrl: z.string().url().max(500).optional(),
   source: z.string().max(2048).optional(),
+  utm: utmSchema,
+  attribution: attributionSchema,
   consent: z
     .object({
       snapshot: z.string().max(2000),

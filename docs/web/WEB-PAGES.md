@@ -147,6 +147,7 @@ the segment is reserved for this purpose and has no listing route of its own.
 | 27 | 404 Error Page | `/404` | Utility | ✅ | Next.js `not-found.tsx` (noindex, full header/footer nav). |
 | — | Guide OG Cover | `/guide-cover/[slug]` | Utility | ✅ | `ImageResponse` route — generated 1200×630 branded OG/social cover for guides without a hero image (`?kw=` keyword). Not a page; not in nav or sitemap. |
 | — | Draft Preview | `/preview/[collection]/[slug]` | Utility | ✅ | Draft-mode preview route at `src/app/preview/[collection]/[slug]/`. Renders unpublished CMS docs for editors via Payload draft preview; noindex, not in nav or sitemap. |
+| — | Thank You | `/thank-you/[type]` | Utility | ✅ | Post-submission confirmation for Book a Demo, Contact, Deal Registration and Job Application. One parameterised route; the four types match the GA4 `form_name` values so reports join without a lookup. `dynamicParams = false`, so an unknown type 404s. noindex, disallowed in robots.txt, omitted from the sitemap. The page always renders; only the `thank_you_view` conversion event is gated, on a one-shot in-memory handoff that dies on refresh. Newsletter, gated downloads and Become a Partner deliberately keep their inline banner. |
 
 ---
 

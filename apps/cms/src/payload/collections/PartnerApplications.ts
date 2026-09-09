@@ -1,6 +1,7 @@
 import type { CollectionConfig, Field } from 'payload';
 
 import { isAdmin, isAdminOrEditor } from '../access';
+import { attributionFields } from '../fields/attribution';
 import { exportPartnersCsvEndpoint } from '../endpoints/export-partners-csv';
 import { partnerApplyEndpoint, partnerApplyOptionsEndpoint } from '../endpoints/partner-apply';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
@@ -92,6 +93,7 @@ export const PartnerApplications: CollectionConfig = {
       access: { update: () => false },
       admin: { readOnly: true, position: 'sidebar', date: { pickerAppearance: 'dayAndTime' } },
     },
+    ...attributionFields(),
   ],
   timestamps: true,
 };
