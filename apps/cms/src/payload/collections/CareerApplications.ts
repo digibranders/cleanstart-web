@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdmin, isAdminEditorOrHr } from '../access';
+import { attributionFields } from '../fields/attribution';
 import { careersApplyEndpoint, careersApplyOptionsEndpoint } from '../endpoints/careers-apply';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
@@ -106,6 +107,7 @@ export const CareerApplications: CollectionConfig = {
       access: { update: () => false },
       admin: { readOnly: true, position: 'sidebar', date: { pickerAppearance: 'dayAndTime' } },
     },
+    ...attributionFields(),
   ],
   timestamps: true,
 };

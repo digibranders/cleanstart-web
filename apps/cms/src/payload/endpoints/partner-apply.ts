@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs';
 import type { Endpoint } from 'payload';
 
+import { attributionColumns, buildAttribution } from '../lib/attribution-schema';
 import { clientIpFromHeaders } from '../lib/client-ip';
 import { type BrevoSendResult, sendBrevoEmail } from '../lib/email/brevo';
 import { buildPartnerAdminEmail, buildPartnerApplicantEmail } from '../lib/partners/partner-emails';
@@ -216,6 +217,10 @@ export const partnerApplyEndpoint: Endpoint = {
           emailDeliveryApplicant: deliveryToFields(applicantDelivery),
           emailDeliveryAdmin: deliveryToFields(adminDelivery),
           turnstilePassed: true,
+          ...attributionColumns({
+            utm: data.utm,
+            attribution: buildAttribution({ utm: data.utm, attribution: data.attribution }),
+          }),
         },
         overrideAccess: true,
       });

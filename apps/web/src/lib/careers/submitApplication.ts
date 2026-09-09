@@ -1,3 +1,4 @@
+import type { AttributionSubmission } from "@/lib/attribution/types";
 /**
  * Client helper for relaying a job application to the CMS
  * `/api/career-applications/apply` endpoint. Unlike `submitLead`, applications
@@ -18,6 +19,8 @@ export interface ApplicationConsent {
 }
 
 export interface SubmitApplicationInput {
+  /** Spread from `useAttribution().getAttribution()`. */
+  attribution?: AttributionSubmission;
   jobSlug: string;
   firstName: string;
   lastName: string;
@@ -56,6 +59,11 @@ export async function submitApplication(
   if (input.coverLetter) fd.set("coverLetter", input.coverLetter);
   if (input.linkedinUrl) fd.set("linkedinUrl", input.linkedinUrl);
   if (input.source) fd.set("source", input.source);
+  // Structured fields go over multipart as JSON, matching `consent`.
+  if (input.attribution?.utm) fd.set("utm", JSON.stringify(input.attribution.utm));
+  if (input.attribution?.attribution) {
+    fd.set("attribution", JSON.stringify(input.attribution.attribution));
+  }
   if (input.turnstileToken) fd.set("turnstileToken", input.turnstileToken);
   if (input.website) fd.set("website", input.website);
   if (input.consent) fd.set("consent", JSON.stringify(input.consent));

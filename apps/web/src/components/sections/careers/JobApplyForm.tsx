@@ -12,6 +12,7 @@ import {
   validatePhone,
   type PhoneValue,
 } from "@/lib/forms/phone-value";
+import { useAttribution } from "@/components/attribution/AttributionProvider";
 import { useDetectedCountry } from "@/lib/forms/useDetectedCountry";
 import { submitApplication } from "@/lib/careers/submitApplication";
 import { trackEvent } from "@/lib/analytics/track";
@@ -67,6 +68,7 @@ export function JobApplyForm({
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const inFlightRef = useRef(false);
+  const { getAttribution } = useAttribution();
   const [phone, setPhone] = useState<PhoneValue>(() => emptyPhoneValue());
   const [phoneError, setPhoneError] = useState<string | undefined>(undefined);
   const { country: detectedCountry, detected } = useDetectedCountry();
@@ -154,6 +156,7 @@ export function JobApplyForm({
       ...(linkedinUrl ? { linkedinUrl } : {}),
       ...(typeof turnstileToken === "string" ? { turnstileToken } : {}),
       ...(typeof window !== "undefined" ? { source: window.location.href } : {}),
+      attribution: getAttribution(),
     });
     setBusy(false);
 

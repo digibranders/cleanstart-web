@@ -7,6 +7,7 @@ import { PhoneField } from "@/components/forms/PhoneField";
 import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
 import { TextField } from "@/components/forms/TextField";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
+import { useAttribution } from "@/components/attribution/AttributionProvider";
 import { trackEvent } from "@/lib/analytics/track";
 import {
   emptyPhoneValue,
@@ -54,6 +55,7 @@ export function DealRegistrationForm(): React.ReactElement {
   const [submitting, setSubmitting] = useState(false);
   const { status, setStatus, statusRef } = useFormStatus();
   const inFlightRef = useRef(false);
+  const { getAttribution } = useAttribution();
   const { country: detectedCountry, detected } = useDetectedCountry();
   const touchedCountryRef = useRef(false);
 
@@ -155,6 +157,7 @@ export function DealRegistrationForm(): React.ReactElement {
       },
       ...(typeof turnstileToken === "string" ? { turnstileToken } : {}),
       ...(typeof window !== "undefined" ? { source: window.location.href } : {}),
+      attribution: getAttribution(),
     });
 
     setSubmitting(false);

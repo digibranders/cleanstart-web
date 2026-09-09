@@ -1,3 +1,4 @@
+import type { AttributionSubmission } from "@/lib/attribution/types";
 /**
  * Client helper for relaying a "Become a Partner" inquiry to the dedicated CMS
  * `/api/partner-applications/apply` endpoint. The endpoint owns validation and
@@ -17,6 +18,8 @@ export interface PartnerConsent {
 }
 
 export interface SubmitPartnerInput {
+  /** Spread from `useAttribution().getAttribution()`. */
+  attribution?: AttributionSubmission;
   firstName: string;
   lastName: string;
   email: string;
