@@ -3,6 +3,18 @@ import { redactWebhookErrorBody } from '../webhooks/redact-error-body';
 const BREVO_ENDPOINT = 'https://api.brevo.com/v3/smtp/email';
 const TIMEOUT_MS = 10_000;
 
+/**
+ * Name on mail that speaks for the site rather than a specific team.
+ *
+ * Passed explicitly by the generic senders instead of inheriting
+ * BREVO_SENDER_NAME. That variable is rendered onto the droplet from a GitHub
+ * Actions Variable on every deploy, so it cannot be corrected by editing the
+ * droplet, and it was set to the careers identity: demo requests, contact
+ * replies, newsletter welcomes and resource downloads all went out signed
+ * "CleanStart Careers". Teams with their own identity still pass their own.
+ */
+export const SITE_SENDER_NAME = 'CleanStart';
+
 export type BrevoRecipient = { email: string; name?: string };
 export type BrevoAttachment = { name: string; content: string };
 

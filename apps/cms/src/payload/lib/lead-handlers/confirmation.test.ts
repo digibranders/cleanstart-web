@@ -4,7 +4,10 @@ import { sendBrevoEmail } from '../email/brevo';
 import { confirmationHandler } from './confirmation';
 import type { LeadSubmission } from './types';
 
-vi.mock('../email/brevo', () => ({
+// Only the send is stubbed. SITE_SENDER_NAME comes through real, so the
+// assertion below tests the actual constant rather than a mock of it.
+vi.mock('../email/brevo', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../email/brevo')>()),
   sendBrevoEmail: vi.fn(async () => ({ status: 'synced' as const })),
 }));
 
@@ -46,6 +49,16 @@ describe('confirmationHandler', () => {
     expect(result).toMatchObject({ status: 'synced' });
     expect(sendBrevoEmail).toHaveBeenCalledWith(
       expect.objectContaining({ to: [{ email: 'jane@acme.com' }], subject }),
+    );
+  });
+
+  it('signs as CleanStart, not whatever BREVO_SENDER_NAME happens to be', async () => {
+    // That variable is rendered from a GitHub Actions Variable on every deploy
+    // and was set to the careers identity, so these went out signed "CleanStart
+    // Careers". Pinning it here is what stops that recurring.
+    await confirmationHandler.run(submission(), ctx('book-a-demo'));
+    expect(sendBrevoEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ senderName: 'CleanStart' }),
     );
   });
 

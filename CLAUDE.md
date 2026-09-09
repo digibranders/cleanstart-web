@@ -273,6 +273,13 @@ that triggers each and the file that sends it.
 - **Payload's own mail** (password reset) goes through the Brevo adapter at
   `lib/email/payload-adapter.ts`. Without it Payload logs mail to stdout and
   password resets silently never arrive.
+- **Sender name is pinned in code, not inherited.** Mail that speaks for the
+  site passes `SITE_SENDER_NAME` from `lib/email/brevo.ts`; only careers,
+  partnerships and deal registration override it. `BREVO_SENDER_NAME` is
+  rendered onto the droplet from a GitHub Actions Variable on every deploy, so
+  editing `/opt/cleanstart/.env` does not survive a deploy, and it was set to
+  the careers identity, which signed every demo and contact confirmation
+  "CleanStart Careers".
 - **`apps/cms/emails/` is generated.** Run `pnpm --filter @cleanstart/cms
   emails:render` after changing a template and commit the result;
   `emails:check` is the drift gate.

@@ -1,4 +1,4 @@
-import { sendBrevoEmail } from '../email/brevo';
+import { SITE_SENDER_NAME, sendBrevoEmail } from '../email/brevo';
 import {
   buildContactConfirmationEmail,
   buildDemoConfirmationEmail,
@@ -75,7 +75,12 @@ export const confirmationHandler: LeadHandler = {
       firstName: firstNameOf(extractName(ctx.formFieldDefs, submission.fields)),
     });
 
-    const result = await sendBrevoEmail({ to: [{ email }], subject, htmlContent });
+    const result = await sendBrevoEmail({
+      to: [{ email }],
+      senderName: SITE_SENDER_NAME,
+      subject,
+      htmlContent,
+    });
     if (result.status === 'failed') {
       return { handler: 'confirmation-email', status: 'failed', error: result.error };
     }
