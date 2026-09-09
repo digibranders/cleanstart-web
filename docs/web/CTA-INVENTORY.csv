@@ -1,5 +1,5 @@
 Page,Slot,CTA text,Target,Notes
-/,Hero,Browse Images,https://images.cleanstart.com,Opens public image catalog in a new tab
+/,Hero,Pull Images,https://images.cleanstart.com,Opens public image catalog in a new tab
 /,Footer CTA,Get a Demo,/book-a-demo,Primary conversion — lead capture form
 /cleansight,Hero,Get a Demo,/book-a-demo,Primary conversion — lead capture form
 /cleansight,Footer CTA,Book a Container Scan,/book-a-demo,Primary conversion — lead capture form

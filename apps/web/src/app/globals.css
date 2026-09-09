@@ -624,7 +624,7 @@ body {
    CTA SYSTEM
    --------------------------------------------------------------------------
    Two distinct CTA types:
-     1. "Glass Button" — Book a Demo, Browse Images, Book a Demo. All share the
+     1. "Glass Button" — Book a Demo, Pull Images, Book a Demo. All share the
         same multi-layer fill + stroke:
           • base: rgba(255,255,255,0.65)
           • LINEAR_DODGE radial #FFFFFF→#3D00FF @50% (blue tint top-left)
@@ -719,7 +719,7 @@ body {
 
 /* ---------------------------------------------------------------------------
    GLASS BUTTON
-   Used by: "Book a Demo", "Browse Images", "Book a Demo"
+   Used by: "Book a Demo", "Pull Images", "Book a Demo"
    --------------------------------------------------------------------------- */
 .cs-btn-glass {
   position: relative;
