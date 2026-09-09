@@ -80,7 +80,7 @@ export const buildDealRegistrationConfirmationEmail = (
       blocks: [
         {
           kind: 'paragraph',
-          text: `We've received your deal registration for ${dealName}. Our partner team will review it and confirm next steps within one business day.`,
+          text: `We've received your deal registration for ${dealName}. Our partner team will review it and confirm next steps with you.`,
         },
         {
           kind: 'details',

@@ -162,7 +162,7 @@ export function ContactForm() {
         tone: "success",
         title: "Message sent",
         message:
-          "Thanks, we've received your message and will reply within 24 hours.",
+          "Thanks, we've received your message and will get back to you soon.",
       });
       window.setTimeout(() => {
         setSubmitted(false);

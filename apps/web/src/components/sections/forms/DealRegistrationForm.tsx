@@ -171,7 +171,7 @@ export function DealRegistrationForm(): React.ReactElement {
         tone: "success",
         title: "Deal registration received",
         message:
-          "Thanks, your deal registration has been received. We'll be in touch within one business day.",
+          "Thanks, your deal registration has been received. We'll be in touch about next steps.",
       });
       window.setTimeout(() => setStatus(null), 6000);
       return;
