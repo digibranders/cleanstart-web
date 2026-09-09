@@ -13,6 +13,7 @@ import {
   type PhoneValue,
 } from "@/lib/forms/phone-value";
 import { useAttribution } from "@/components/attribution/AttributionProvider";
+import { useConversionRedirect } from "@/lib/thank-you/useConversionRedirect";
 import { useDetectedCountry } from "@/lib/forms/useDetectedCountry";
 import { submitApplication } from "@/lib/careers/submitApplication";
 import { trackEvent } from "@/lib/analytics/track";
@@ -68,6 +69,7 @@ export function JobApplyForm({
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const inFlightRef = useRef(false);
+  const redirectToThankYou = useConversionRedirect();
   const { getAttribution } = useAttribution();
   const [phone, setPhone] = useState<PhoneValue>(() => emptyPhoneValue());
   const [phoneError, setPhoneError] = useState<string | undefined>(undefined);
@@ -158,20 +160,14 @@ export function JobApplyForm({
       ...(typeof window !== "undefined" ? { source: window.location.href } : {}),
       attribution: getAttribution(),
     });
-    setBusy(false);
-
     if (result.ok) {
       trackEvent("job_application", { job_slug: jobSlug });
-      setStatus({
-        tone: "success",
-        title: "Application received",
-        message: `Thanks for applying to ${jobTitle}. Our team will review your application and be in touch.`,
-      });
-      setResumeFile(null);
-      setCoverFile(null);
-      formRef.current?.reset();
-      inFlightRef.current = false;
+      // Left busy and in-flight: this component is about to unmount into the
+      // thank-you page, and clearing them would show a ready-looking form for
+      // the length of the navigation and allow a second submit.
+      redirectToThankYou("job-application");
     } else {
+      setBusy(false);
       setStatus({
         tone: "error",
         title: "Submission failed",

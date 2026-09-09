@@ -37,6 +37,10 @@ export type Ga4EventName =
   // folding ~1,500 applications a year into the lead count would make that
   // metric useless.
   | "job_application"
+  // Fired once per confirmed conversion from /thank-you/[type]. NOT a
+  // substitute for generate_lead: the gap between the two measures whether
+  // the redirect is working.
+  | "thank_you_view"
   | "cta_click"
   | "search";
 

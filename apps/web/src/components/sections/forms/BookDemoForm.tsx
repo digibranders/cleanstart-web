@@ -8,6 +8,7 @@ import { LeadConsent } from "@/components/forms/LeadConsent";
 import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { useAttribution } from "@/components/attribution/AttributionProvider";
+import { useConversionRedirect } from "@/lib/thank-you/useConversionRedirect";
 import { trackEvent } from "@/lib/analytics/track";
 import { useDetectedCountry } from "@/lib/forms/useDetectedCountry";
 import { emptyPhoneValue, toE164, validatePhone, type PhoneValue } from "@/lib/forms/phone-value";
@@ -50,6 +51,7 @@ export function BookDemoForm(): React.ReactElement {
   const [submitting, setSubmitting] = useState(false);
   const { status, setStatus, statusRef } = useFormStatus();
   const inFlightRef = useRef(false);
+  const redirectToThankYou = useConversionRedirect();
   const { getAttribution } = useAttribution();
   const { country: detectedCountry, detected } = useDetectedCountry();
   const touchedCountryRef = useRef(false);
@@ -132,8 +134,6 @@ export function BookDemoForm(): React.ReactElement {
       attribution: getAttribution(),
     });
 
-    setSubmitting(false);
-    inFlightRef.current = false;
 
     if (result.ok) {
       // Fired only once the API has confirmed the lead, so the count reflects
@@ -146,15 +146,16 @@ export function BookDemoForm(): React.ReactElement {
       setMessage("");
       setErrors({});
       form.reset();
-      setStatus({
-        tone: "success",
-        title: "Demo request received",
-        message:
-          "Thanks, your demo request has been received. Our team will reach out to arrange a time.",
-      });
-      window.setTimeout(() => setStatus(null), 5000);
+      redirectToThankYou("book-a-demo");
       return;
     }
+
+    // Left busy and in-flight on success: the component is about to unmount
+    // into the thank-you page, and clearing them would show a ready-looking
+    // form for the length of the navigation and allow a second submit.
+
+    setSubmitting(false);
+    inFlightRef.current = false;
 
     // The API re-validates against the full free-mail corpus, so a domain the
     // browser's shorter list missed comes back here. Show it on the field.
