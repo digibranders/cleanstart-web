@@ -34,11 +34,6 @@ const corsHeaders = (origin: string): Record<string, string> => ({
   vary: 'Origin',
 });
 
-const numericTemplateId = (raw: string | undefined): number | undefined => {
-  if (!raw) return undefined;
-  const n = Number.parseInt(raw, 10);
-  return Number.isInteger(n) && n > 0 ? n : undefined;
-};
 
 export const partnerApplyOptionsEndpoint: Endpoint = {
   path: '/apply',
@@ -128,6 +123,14 @@ export const partnerApplyEndpoint: Endpoint = {
 
     const turnstile = await verifyTurnstileToken(data.turnstileToken, ip);
     if (!turnstile.ok) {
+      // Logged because this branch writes nothing and sends nothing: a real
+      // applicant failing the bot check is otherwise indistinguishable from
+      // nobody having applied at all, which is exactly the hole that left the
+      // partner table empty with no way to tell why.
+      req.payload.logger.warn(
+        { ip, reason: turnstile.reason, email: data.email },
+        'Partner submission rejected — Turnstile failed',
+      );
       return json({ ok: false, error: 'turnstile_failed', reason: turnstile.reason }, { status: 403, headers: cors });
     }
 
@@ -148,14 +151,6 @@ export const partnerApplyEndpoint: Endpoint = {
       phone: data.phone, company: data.company, website: data.website, partnerReason: data.partnerReason,
     };
     const fullName = `${data.firstName} ${data.lastName}`.trim();
-    const submittedAt = new Date().toISOString();
-    const params = {
-      firstName: data.firstName, lastName: data.lastName, fullName,
-      email: data.email, phone: data.phone ?? '', company: data.company,
-      website: data.website ?? '', partnerReason: data.partnerReason ?? '', submittedAt,
-    };
-    const adminTemplate = numericTemplateId(process.env.PARTNER_ADMIN_TEMPLATE_ID);
-    const userTemplate = numericTemplateId(process.env.PARTNER_USER_TEMPLATE_ID);
     const adminEmail = process.env.PARTNERS_NOTIFY_EMAIL;
 
     // Partner emails are sent from the partner sender identity (falls back to
@@ -165,38 +160,38 @@ export const partnerApplyEndpoint: Endpoint = {
       ...(process.env.PARTNERS_SENDER_NAME ? { senderName: process.env.PARTNERS_SENDER_NAME } : {}),
     };
 
-    // Admin notification (non-fatal).
+    // One send path, built from lib/partners/partner-emails.ts.
+    //
+    // The PARTNER_*_TEMPLATE_ID branches that used to sit here are gone. They
+    // won in production, so this form sent the old dashboard design while the
+    // rest of the site sent the shared layout, and they handed submitter input
+    // to Brevo as raw `params`. Brevo interpolates merge tags unescaped; the
+    // builders escape every value.
     let adminDelivery: BrevoSendResult;
     if (!adminEmail) {
       adminDelivery = { status: 'skipped', reason: 'no-admin-recipient' };
-    } else if (adminTemplate != null) {
-      adminDelivery = await sendBrevoEmail({
-        ...partnerSender,
-        to: [{ email: adminEmail }], replyTo: { email: data.email, name: fullName },
-        templateId: adminTemplate, params,
-      });
     } else {
       const { subject, htmlContent } = buildPartnerAdminEmail(emailInput);
-      adminDelivery = await sendBrevoEmail({ ...partnerSender, to: [{ email: adminEmail }], replyTo: { email: data.email, name: fullName }, subject, htmlContent });
+      adminDelivery = await sendBrevoEmail({
+        ...partnerSender,
+        to: [{ email: adminEmail }],
+        replyTo: { email: data.email, name: fullName },
+        subject,
+        htmlContent,
+      });
     }
 
     // Applicant confirmation (non-fatal). replyTo = the partnerships inbox when set.
     let applicantDelivery: BrevoSendResult;
     const applicantReplyTo = adminEmail ? { email: adminEmail } : undefined;
-    if (userTemplate != null) {
-      applicantDelivery = await sendBrevoEmail({
-        ...partnerSender,
-        to: [{ email: data.email, name: fullName }],
-        ...(applicantReplyTo ? { replyTo: applicantReplyTo } : {}),
-        templateId: userTemplate, params,
-      });
-    } else {
+    {
       const { subject, htmlContent } = buildPartnerApplicantEmail(emailInput);
       applicantDelivery = await sendBrevoEmail({
         ...partnerSender,
         to: [{ email: data.email, name: fullName }],
         ...(applicantReplyTo ? { replyTo: applicantReplyTo } : {}),
-        subject, htmlContent,
+        subject,
+        htmlContent,
       });
     }
 

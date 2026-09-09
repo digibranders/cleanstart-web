@@ -9,6 +9,9 @@ import { submitLead } from '../lib/lead-handlers/registry';
 import type { LeadSubmission } from '../lib/lead-handlers/types';
 import { type FormFieldDef, validateFields } from '../lib/lead-handlers/validate-fields';
 import { DEFAULT_RATE_LIMITS, checkAndRecord } from '../lib/rate-limit';
+import { sendBrevoEmail } from '../lib/email/brevo';
+import { buildResourceDownloadEmail } from '../lib/email/lead-emails';
+import { extractEmail, extractName } from '../lib/lead-handlers/extract-fields';
 import { signDownloadToken } from '../lib/resources/download-token';
 import { buildUnlockCookieHeader } from '../lib/resources/unlock-cookie';
 import { verifyTurnstileToken } from '../lib/turnstile';
@@ -458,6 +461,7 @@ export const submitLeadEndpoint: Endpoint = {
           })) as {
             id: string | number;
             slug?: string | null;
+            title?: string | null;
             gated?: boolean | null;
             gateForm?: number | string | { id?: number | string } | null;
           } | null;
@@ -488,6 +492,31 @@ export const submitLeadEndpoint: Endpoint = {
                   secret,
                   secure: process.env.NODE_ENV === 'production',
                 });
+
+                // Email the link as well as returning it. Response-only
+                // delivery loses the asset the moment the tab closes, and
+                // removes the only reason to give a real address — which is
+                // the entire point of gating it. Sent from here rather than a
+                // lead handler because the signed token does not exist until
+                // this point. Best-effort: the visitor already has the link.
+                const recipient = extractEmail(fieldDefs, data.fields);
+                if (recipient) {
+                  const publicBase = (process.env.PAYLOAD_PUBLIC_SERVER_URL ?? '').replace(/\/$/u, '');
+                  const firstName = extractName(fieldDefs, data.fields)?.trim().split(/\s+/u)[0];
+                  const { subject, htmlContent } = buildResourceDownloadEmail({
+                    resourceTitle: String(resourceDoc.title ?? 'your resource'),
+                    downloadUrl: `${publicBase}${downloadPayload.url}`,
+                    expiresAt,
+                    ...(firstName ? { firstName } : {}),
+                  });
+                  const sent = await sendBrevoEmail({ to: [{ email: recipient }], subject, htmlContent });
+                  if (sent.status === 'failed') {
+                    req.payload.logger.warn(
+                      { email: recipient, error: sent.error },
+                      'Resource download email failed — visitor still has the in-page link',
+                    );
+                  }
+                }
               }
             }
           }
