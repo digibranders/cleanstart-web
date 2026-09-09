@@ -1,10 +1,16 @@
 import { z } from 'zod';
 
+import { emailField, optionalPhoneField } from '../form-field-schemas';
+
 export const partnerSubmissionSchema = z.object({
   firstName: z.string().min(1).max(120),
   lastName: z.string().min(1).max(120),
-  email: z.string().email().max(254),
-  phone: z.string().max(40).optional(),
+  // Any valid address. A prospective partner is often an individual or a
+  // small reseller applying before they have company mail set up, so the
+  // company-email gate the demo and contact forms use costs more here than
+  // the lead quality it buys.
+  email: emailField({ requireBusiness: false }),
+  phone: optionalPhoneField(),
   company: z.string().min(1).max(200),
   website: z.string().max(500).optional(),
   partnerReason: z.string().max(5000).optional(),

@@ -41,10 +41,22 @@ export interface SubmitLeadInput {
   attribution?: AttributionSubmission;
 }
 
+/** One field-level rejection from the API's server-side re-validation. */
+export interface LeadFieldIssue {
+  fieldName: string;
+  message: string;
+}
+
 export interface SubmitLeadResult {
   ok: boolean;
   error?: string;
   duplicate?: boolean;
+  /**
+   * Present when `error` is "invalid_fields". Keyed by the API field name
+   * (the HubSpot internal property), so callers map it back onto their own
+   * inputs and render each message inline rather than in a generic banner.
+   */
+  issues?: LeadFieldIssue[];
 }
 
 export async function submitLead(input: SubmitLeadInput): Promise<SubmitLeadResult> {
@@ -68,7 +80,11 @@ export async function submitLead(input: SubmitLeadInput): Promise<SubmitLeadResu
     });
     const json = (await res.json().catch(() => null)) as SubmitLeadResult | null;
     if (!res.ok || !json?.ok) {
-      return { ok: false, error: json?.error ?? "submit_failed" };
+      return {
+        ok: false,
+        error: json?.error ?? "submit_failed",
+        ...(json?.issues ? { issues: json.issues } : {}),
+      };
     }
     return json.duplicate != null ? { ok: true, duplicate: json.duplicate } : { ok: true };
   } catch {

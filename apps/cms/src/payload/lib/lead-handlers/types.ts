@@ -62,7 +62,13 @@ export type LeadHandlerContext = {
 };
 
 export type LeadHandlerResult =
-  | { handler: string; status: 'synced'; externalId?: string | undefined }
+  | {
+      handler: string;
+      status: 'synced';
+      externalId?: string | undefined;
+      /** Set when the sync succeeded but something was degraded, e.g. a field the remote form rejected. */
+      reason?: string | undefined;
+    }
   | { handler: string; status: 'failed'; error: string }
   | { handler: string; status: 'skipped'; reason: string };
 

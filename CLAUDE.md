@@ -56,6 +56,7 @@ cleanstart-website/                  monorepo · pnpm workspaces + Turborepo
 ├── packages/
 │   ├── types/                       re-exports apps/cms/payload-types
 │   ├── ui/                          @cleanstart/ui primitives + tokens (shared by cms + web)
+│   ├── forms/                       @cleanstart/forms — business-email + E.164 rules (shared by cms + web)
 │   └── config/                      tsconfig · biome · eslint
 ├── migrations/webflow-import/       Phase H: ETL scripts
 ├── infra/                           docker-compose · Caddy · backup/restore
@@ -64,6 +65,8 @@ cleanstart-website/                  monorepo · pnpm workspaces + Turborepo
 ```
 
 **Page inventory:** `docs/web/WEB-PAGES.md` — canonical list of all pages, slugs, types, build status. Update status when a page is completed.
+
+**`packages/forms`** is framework-agnostic and holds the rules both apps must agree on: `validateBusinessEmail`, the free-mail/disposable domain corpus, and the E.164 helpers. Two entry points: `@cleanstart/forms` is client-safe (curated ~260-domain list), while `@cleanstart/forms/server` adds the full 13,797-domain corpus and **must never be imported from a client component**. Refresh the corpus with `pnpm --filter @cleanstart/forms refresh-domains`.
 
 **`packages/ui`** hosts the shared React primitives (`Drawer`, `Dialog`, `Popover`, `Combobox`, `ConfirmDialog`, `Spinner`, `Tooltip`, `DropdownMenu`, `ContextMenu`, `DateTimePicker`, `Toast`) plus design tokens. Consumed by both `apps/cms` and `apps/web` — no duplication between apps.
 
@@ -158,6 +161,16 @@ import { Section, Container } from "@/components/layout";
   <Container>{/* content */}</Container>
 </Section>
 ```
+
+### Form fields
+
+Use the shared field components in `src/components/forms/`, never a per-form copy:
+
+- `<TextField>` and `<PhoneField>` render on the one field surface (`field-surface.ts`) and put validation messages **inline underneath the field**. Native browser validation bubbles are not used: every public form is `noValidate`.
+- `<PhoneField>` is the only way to collect a phone number. It composes E.164 from a country selector plus a digits-only input, and the selected country is where the lead's country comes from — do not add a separate country field alongside it.
+- The country preselects from `useDetectedCountry()`, which reads Vercel's `x-vercel-ip-country` via `/api/geo` and falls back to the browser locale. It is a hint: never overwrite a country the visitor has already chosen.
+- Email validation goes through `emailError()` in `lib/forms/validate.ts`. Pass `requireBusiness: false` only where a personal address is legitimate (newsletter, gated downloads, job applications).
+- Client validation is fast feedback, not the gate. The API re-checks every rule and returns `issues[]`; map those back onto fields with `issuesToErrors()` so a server-only rejection still lands under the right input.
 
 ### Component structure
 

@@ -1,13 +1,15 @@
 import { z } from 'zod';
 
+import { emailField, optionalPhoneField } from '../form-field-schemas';
+
 const SLUG = /^[a-z0-9-]+$/;
 
 export const applicationFieldsSchema = z.object({
   jobSlug: z.string().min(1).max(200).regex(SLUG),
   firstName: z.string().min(1).max(120),
   lastName: z.string().min(1).max(120),
-  email: z.string().email().max(254),
-  phone: z.string().max(40).optional(),
+  email: emailField({ requireBusiness: false }),
+  phone: optionalPhoneField(),
   location: z.string().max(160).optional(),
   howDidYouHear: z.string().max(120).optional(),
   coverLetter: z.string().max(5000).optional(),

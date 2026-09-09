@@ -6,7 +6,7 @@ import { formSchemaVersionHook } from '../hooks/form-schema-version';
 import { formsCoerceHook } from '../hooks/forms-coerce';
 import { normalizeOptionalUrlHook, validateOptionalUrl } from '../lib/url-shape';
 
-const VISIBLE_LABEL_TYPES = ['text', 'email', 'textarea', 'select', 'checkbox', 'consent'];
+const VISIBLE_LABEL_TYPES = ['text', 'email', 'tel', 'textarea', 'select', 'checkbox', 'consent'];
 const PLACEHOLDER_TYPES = ['text', 'email', 'textarea'];
 const VALIDATION_TYPES = ['text', 'email', 'textarea'];
 
@@ -62,6 +62,7 @@ export const Forms: CollectionConfig = {
           options: [
             { label: 'Text', value: 'text' },
             { label: 'Email', value: 'email' },
+            { label: 'Phone', value: 'tel' },
             { label: 'Textarea', value: 'textarea' },
             { label: 'Select', value: 'select' },
             { label: 'Checkbox', value: 'checkbox' },
@@ -84,6 +85,16 @@ export const Forms: CollectionConfig = {
           admin: {
             description:
               'Consent fields are always required and cannot be unchecked here.',
+          },
+        },
+        {
+          name: 'requireBusinessEmail',
+          type: 'checkbox',
+          defaultValue: false,
+          admin: {
+            description:
+              'Reject consumer webmail and disposable mailboxes (gmail, outlook, yahoo, mailinator and ~13,800 more). Leave off for newsletter and gated-download forms, where a personal address is a legitimate signup.',
+            condition: (_data, sibling) => sibling?.type === 'email',
           },
         },
         {

@@ -33,6 +33,10 @@ export type Ga4EventName =
   | "generate_lead"
   | "file_download"
   | "deal_registration"
+  // Deliberately not `generate_lead`: a candidate is not a sales lead, and
+  // folding ~1,500 applications a year into the lead count would make that
+  // metric useless.
+  | "job_application"
   | "cta_click"
   | "search";
 

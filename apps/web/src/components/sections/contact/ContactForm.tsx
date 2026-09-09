@@ -3,17 +3,27 @@
 import { Container } from "@/components/layout";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { LeadConsent } from "@/components/forms/LeadConsent";
+import { PhoneField } from "@/components/forms/PhoneField";
 import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
+import { TextField } from "@/components/forms/TextField";
 import { submitLead } from "@/lib/leads/submitLead";
 import { useAttribution } from "@/components/attribution/AttributionProvider";
-import { useRef, useState } from "react";
+import { trackEvent } from "@/lib/analytics/track";
+import { useDetectedCountry } from "@/lib/forms/useDetectedCountry";
+import {
+  emptyPhoneValue,
+  toE164,
+  validatePhone,
+  type PhoneValue,
+} from "@/lib/forms/phone-value";
+import { emailError, issuesToErrors, optionalText, requiredText } from "@/lib/forms/validate";
+import { useEffect, useRef, useState } from "react";
 
 interface FieldState {
   firstName: string;
   lastName: string;
   email: string;
   company: string;
-  phone: string;
   brief: string;
 }
 
@@ -22,7 +32,6 @@ const initialState: FieldState = {
   lastName: "",
   email: "",
   company: "",
-  phone: "",
   brief: "",
 };
 
@@ -32,31 +41,89 @@ const FIELD_TO_HUBSPOT: Record<keyof FieldState, string> = {
   lastName: "lastname",
   email: "email",
   company: "company",
-  phone: "phone",
   brief: "enter_message",
 };
+
+/** Reverse lookup, so a server-side field issue lands on the input that caused it. */
+const FIELD_BY_HUBSPOT_NAME: Readonly<Record<string, string>> = {
+  firstname: "firstName",
+  lastname: "lastName",
+  email: "email",
+  company: "company",
+  phone: "phone",
+  enter_message: "brief",
+};
+
+type FieldErrors = Partial<Record<keyof FieldState | "phone", string>>;
 
 const STORAGE_CONSENT_TEXT =
   "I agree to allow CleanStart to store and process my personal data.";
 
 export function ContactForm() {
   const [values, setValues] = useState<FieldState>(initialState);
+  const [phone, setPhone] = useState<PhoneValue>(() => emptyPhoneValue());
+  const [errors, setErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const { status, setStatus, statusRef } = useFormStatus();
   const inFlightRef = useRef(false);
   const { getAttribution } = useAttribution();
+  const { country: detectedCountry, detected } = useDetectedCountry();
+  const touchedCountryRef = useRef(false);
 
-  const onChange =
-    (key: keyof FieldState) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-      setValues((prev) => ({ ...prev, [key]: e.target.value }));
+  // Adopt the detected country until the visitor picks one themselves.
+  useEffect(() => {
+    if (!detected || touchedCountryRef.current) return;
+    setPhone((prev) => ({ ...prev, country: detectedCountry }));
+  }, [detected, detectedCountry]);
+
+  const onChange = (key: keyof FieldState) => (next: string) => {
+    setValues((prev) => ({ ...prev, [key]: next }));
+    if (errors[key]) setError(key, null);
+  };
+
+  const setError = (key: keyof FieldErrors, message: string | null): void =>
+    setErrors((prev) => {
+      if (message) return { ...prev, [key]: message };
+      const { [key]: _removed, ...rest } = prev;
+      return rest;
+    });
+
+  const validateAll = (): FieldErrors => {
+    const next: FieldErrors = {};
+    const first = requiredText(values.firstName, "First name", { min: 2, max: 50 });
+    if (first) next.firstName = first;
+    const last = optionalText(values.lastName, "Last name", { max: 50 });
+    if (last) next.lastName = last;
+    const mail = emailError(values.email);
+    if (mail) next.email = mail;
+    const company = optionalText(values.company, "Company", { max: 100 });
+    if (company) next.company = company;
+    const tel = validatePhone(phone, { required: false });
+    if (tel) next.phone = tel;
+    const brief = requiredText(values.brief, "Message", { min: 10, max: 1000 });
+    if (brief) next.brief = brief;
+    return next;
+  };
+
+  const focusFirst = (found: FieldErrors): void => {
+    const firstKey = Object.keys(found)[0];
+    if (firstKey) document.getElementById(`contact-${firstKey}`)?.focus();
+  };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (inFlightRef.current) return;
-    inFlightRef.current = true;
     setStatus(null);
+
+    const found = validateAll();
+    setErrors(found);
+    if (Object.keys(found).length > 0) {
+      focusFirst(found);
+      return;
+    }
+
+    inFlightRef.current = true;
     setSubmitting(true);
 
     const fd = new FormData(e.currentTarget);
@@ -65,6 +132,8 @@ export function ContactForm() {
       const value = values[key as keyof FieldState].trim();
       if (value) fields[hsName] = value;
     }
+    const e164 = toE164(phone);
+    if (e164) fields.phone = e164;
     const categories = ["storage", ...(fd.get("consent_marketing") != null ? ["marketing"] : [])];
     const turnstileToken = fd.get("cf-turnstile-response");
 
@@ -84,8 +153,11 @@ export function ContactForm() {
     setSubmitting(false);
     inFlightRef.current = false;
     if (result.ok) {
+      trackEvent("generate_lead", { form_name: "contact" });
       setSubmitted(true);
       setValues(initialState);
+      setPhone((prev) => ({ country: prev.country, national: "" }));
+      setErrors({});
       setStatus({
         tone: "success",
         title: "Message sent",
@@ -96,13 +168,23 @@ export function ContactForm() {
         setSubmitted(false);
         setStatus(null);
       }, 5000);
-    } else {
-      setStatus({
-        tone: "error",
-        title: "Couldn't send message",
-        message: "We couldn't send your message. Please try again.",
-      });
+      return;
     }
+
+    // The API checks the full free-mail corpus, so a domain the browser's
+    // shorter list missed comes back as a field issue rather than a banner.
+    const fieldErrors = issuesToErrors(result.issues, FIELD_BY_HUBSPOT_NAME);
+    if (Object.keys(fieldErrors).length > 0) {
+      setErrors(fieldErrors);
+      focusFirst(fieldErrors);
+      return;
+    }
+
+    setStatus({
+      tone: "error",
+      title: "Couldn't send message",
+      message: "We couldn't send your message. Please try again.",
+    });
   };
 
   return (
@@ -121,86 +203,102 @@ export function ContactForm() {
               <form
                 onSubmit={onSubmit}
                 className="px-3 pt-6 pb-3 sm:px-[24px] sm:pt-[30px] sm:pb-[18px]"
+                noValidate
               >
                 {status ? <StatusBanner ref={statusRef} {...status} /> : null}
                 <div className="grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2">
-                  <Field
-                    id="firstName"
+                  <TextField
+                    id="contact-firstName"
                     label="First Name"
-                    placeholder="Jane"
                     required
                     autoComplete="given-name"
-                    minLength={2}
                     maxLength={50}
-                    pattern="[A-Za-zÀ-ſ\s'\-]{2,50}"
-                    title="Letters, spaces, hyphens, and apostrophes only"
                     value={values.firstName}
                     onChange={onChange("firstName")}
+                    onBlur={() =>
+                      setError(
+                        "firstName",
+                        requiredText(values.firstName, "First name", { min: 2, max: 50 }),
+                      )
+                    }
+                    error={errors.firstName}
                   />
-                  <Field
-                    id="lastName"
+                  <TextField
+                    id="contact-lastName"
                     label="Last Name"
-                    placeholder="Doe"
                     autoComplete="family-name"
-                    minLength={2}
                     maxLength={50}
-                    pattern="[A-Za-zÀ-ſ\s'\-]{2,50}"
-                    title="Letters, spaces, hyphens, and apostrophes only"
                     value={values.lastName}
                     onChange={onChange("lastName")}
+                    onBlur={() =>
+                      setError("lastName", optionalText(values.lastName, "Last name", { max: 50 }))
+                    }
+                    error={errors.lastName}
                   />
-                  <Field
-                    id="email"
-                    label="Email"
-                    placeholder="jane@company.com"
+                  <TextField
+                    id="contact-email"
+                    label="Work Email"
                     type="email"
                     required
                     autoComplete="email"
                     maxLength={254}
-                    pattern="[^@\s]+@[^@\s]+\.[^@\s]{2,}"
-                    title="Enter a valid email address"
                     value={values.email}
                     onChange={onChange("email")}
+                    onBlur={() =>
+                      setError("email", values.email.trim() ? emailError(values.email) : null)
+                    }
+                    error={errors.email}
                   />
-                  <Field
-                    id="company"
+                  <TextField
+                    id="contact-company"
                     label="Company"
-                    placeholder="Acme Inc."
                     autoComplete="organization"
                     maxLength={100}
                     value={values.company}
                     onChange={onChange("company")}
+                    onBlur={() =>
+                      setError("company", optionalText(values.company, "Company", { max: 100 }))
+                    }
+                    error={errors.company}
                   />
-                  <div className="sm:col-span-2">
-                    <Field
-                      id="phone"
-                      label="Phone"
-                      placeholder="+1 (555) 000-0000"
-                      type="tel"
-                      autoComplete="tel"
-                      inputMode="tel"
-                      maxLength={20}
-                      pattern="[0-9+()\-\s]{7,20}"
-                      title="Digits, spaces, +, -, and parentheses only (7–20 chars)"
-                      filterInput={(v) => v.replace(/[^0-9+()\-\s]/g, "")}
-                      value={values.phone}
-                      onChange={onChange("phone")}
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <Field
-                      id="brief"
-                      label="Brief Requirement"
-                      placeholder="Tell us how we can help…"
-                      required
-                      multiline
-                      minLength={10}
-                      maxLength={1000}
-                      title="Please provide at least 10 characters"
-                      value={values.brief}
-                      onChange={onChange("brief")}
-                    />
-                  </div>
+                  <PhoneField
+                    id="contact-phone"
+                    label="Phone Number"
+                    className="sm:col-span-2"
+                    value={phone}
+                    onChange={(next) => {
+                      if (next.country.code !== phone.country.code) {
+                        touchedCountryRef.current = true;
+                      }
+                      setPhone(next);
+                      if (errors.phone) setError("phone", null);
+                    }}
+                    onBlur={() =>
+                      setError(
+                        "phone",
+                        phone.national ? validatePhone(phone, { required: false }) : null,
+                      )
+                    }
+                    error={errors.phone}
+                  />
+                  <TextField
+                    id="contact-brief"
+                    label="How can we help?"
+                    placeholder="We are evaluating hardened base images for a regulated workload and want to compare options."
+                    className="sm:col-span-2"
+                    required
+                    multiline
+                    maxLength={1000}
+                    value={values.brief}
+                    onChange={onChange("brief")}
+                    onBlur={() =>
+                      setError(
+                        "brief",
+                        requiredText(values.brief, "Message", { min: 10, max: 1000 }),
+                      )
+                    }
+                    error={errors.brief}
+                  />
                 </div>
 
                 <div className="mt-6">
@@ -295,116 +393,5 @@ export function ContactForm() {
         </div>
       </Container>
     </section>
-  );
-}
-
-interface FieldProps {
-  id: string;
-  label: string;
-  placeholder?: string;
-  required?: boolean;
-  type?: string;
-  multiline?: boolean;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  autoComplete?: string;
-  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
-  pattern?: string;
-  minLength?: number;
-  maxLength?: number;
-  title?: string;
-  /** Optional input sanitizer — strips disallowed characters as the user types
-   *  (e.g. tel field rejects letters). Runs before the parent's onChange. */
-  filterInput?: (raw: string) => string;
-}
-
-function Field({
-  id,
-  label,
-  placeholder,
-  required = false,
-  type = "text",
-  multiline = false,
-  value,
-  onChange,
-  autoComplete,
-  inputMode,
-  pattern,
-  minLength,
-  maxLength,
-  title,
-  filterInput,
-}: FieldProps) {
-  // Font size is fixed at 16px inline to prevent iOS Safari zoom-on-focus.
-  const sharedClass =
-    "block w-full rounded-[8px] bg-[#FBFBFB] text-[#111111] placeholder:text-[#A3A3A3] outline-none transition-colors focus:border-[#3960F9]";
-  const baseStyle: React.CSSProperties = {
-    background: "#FBFBFB",
-    border: "1.5px solid #DDDDDD",
-    fontFamily: "var(--font-display), 'Manrope', sans-serif",
-    fontWeight: 500,
-    fontSize: "var(--fs-input)",
-    lineHeight: multiline ? 1.5 : 1.125,
-    color: "#111111",
-  };
-  const inputStyle: React.CSSProperties = multiline
-    ? { ...baseStyle, minHeight: "88px", padding: "10px 14px" }
-    : { ...baseStyle, height: "40px", padding: "10px 14px" };
-
-  return (
-    <label htmlFor={id} className="block">
-      <span
-        className="mb-2 block text-[#111111]"
-        style={{
-          fontFamily: "var(--font-display, 'Manrope'), sans-serif",
-          fontSize: "var(--fs-input-label)",
-          fontWeight: 400,
-          lineHeight: 1.2,
-        }}
-      >
-        {label}
-        {required && <span className="ml-0.5 text-[#D14343]">*</span>}
-      </span>
-      {multiline ? (
-        <textarea
-          id={id}
-          name={id}
-          required={required}
-          rows={4}
-          placeholder={placeholder}
-          value={value}
-          onChange={onChange}
-          minLength={minLength}
-          maxLength={maxLength}
-          title={title}
-          className={sharedClass}
-          style={inputStyle}
-        />
-      ) : (
-        <input
-          id={id}
-          name={id}
-          type={type}
-          required={required}
-          placeholder={placeholder}
-          value={value}
-          onChange={(e) => {
-            if (filterInput) {
-              const cleaned = filterInput(e.target.value);
-              if (cleaned !== e.target.value) e.target.value = cleaned;
-            }
-            onChange(e);
-          }}
-          autoComplete={autoComplete}
-          inputMode={inputMode}
-          pattern={pattern}
-          minLength={minLength}
-          maxLength={maxLength}
-          title={title}
-          className={sharedClass}
-          style={inputStyle}
-        />
-      )}
-    </label>
   );
 }

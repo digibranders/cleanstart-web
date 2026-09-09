@@ -1,10 +1,12 @@
 import { z } from 'zod';
 
+import { emailField, optionalPhoneField } from '../form-field-schemas';
+
 const person = z.object({
   firstName: z.string().min(1).max(120),
   lastName: z.string().min(1).max(120),
-  email: z.string().email().max(254),
-  phone: z.string().max(40).optional(),
+  email: emailField({ requireBusiness: true }),
+  phone: optionalPhoneField(),
 });
 
 export const dealRegistrationSchema = z.object({

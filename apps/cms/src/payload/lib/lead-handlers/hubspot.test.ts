@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { attributionHubspotFields, hubspotHandler } from './hubspot';
+import { attributionHubspotFields, hubspotHandler, invalidHubspotFieldNames } from './hubspot';
 import type { LeadSubmission } from './types';
 
 const submission: LeadSubmission = {
@@ -124,5 +124,161 @@ describe('attributionHubspotFields', () => {
   it('emits nothing when enabled but no attribution present', () => {
     process.env.HUBSPOT_FORWARD_ATTRIBUTION = 'true';
     expect(attributionHubspotFields(submission)).toEqual([]);
+  });
+});
+
+describe('invalidHubspotFieldNames', () => {
+  it('pulls the field name out of the Forms API error text', () => {
+    expect(
+      invalidHubspotFieldNames(
+        `{"status":"error","message":"Error in 'fields.enter_message'","errors":[{"message":"Error in 'fields.enter_message'","errorType":"INVALID_METADATA"}]}`,
+      ),
+    ).toEqual(['enter_message']);
+  });
+
+  it('collects every named field once', () => {
+    expect(
+      invalidHubspotFieldNames("Error in 'fields.utm_source'. Error in 'fields.gclid'."),
+    ).toEqual(['utm_source', 'gclid']);
+  });
+
+  it('returns nothing for an error that names no field', () => {
+    expect(invalidHubspotFieldNames('{"status":"error","message":"Internal error"}')).toEqual([]);
+  });
+});
+
+describe('hubspotHandler — unknown field recovery', () => {
+  it('retries without the rejected field so the contact still syncs', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(`{"message":"Error in 'fields.enter_message'"}`, { status: 400 }),
+      )
+      .mockResolvedValueOnce(new Response('{}', { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await hubspotHandler.run(
+      { ...submission, fields: { ...submission.fields, enter_message: 'Need a demo next week' } },
+      ctx('3a491549-929f-41df-8446-32702d793780'),
+    );
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const retried = JSON.parse(String(fetchMock.mock.calls[1]?.[1]?.body)) as {
+      fields: { name: string }[];
+    };
+    expect(retried.fields.map((f) => f.name)).toEqual(['email', 'firstname', 'company']);
+    expect(result).toMatchObject({
+      status: 'synced',
+      reason: 'dropped-unknown-fields: enter_message',
+    });
+  });
+
+  it('does not retry when the 400 names no field', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response('{"message":"Internal error"}', { status: 400 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await hubspotHandler.run(submission, ctx('guid-1'));
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(result).toMatchObject({ status: 'failed' });
+  });
+
+  it('does not retry when every field was rejected, since there is nothing left to send', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          `{"message":"Error in 'fields.email'. Error in 'fields.firstname'. Error in 'fields.company'."}`,
+          { status: 400 },
+        ),
+      );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await hubspotHandler.run(submission, ctx('guid-1'));
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(result).toMatchObject({ status: 'failed' });
+  });
+
+  it('reports failed when the retry also fails', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(`{"message":"Error in 'fields.enter_message'"}`, { status: 400 }),
+      )
+      .mockResolvedValueOnce(new Response('{"message":"nope"}', { status: 400 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await hubspotHandler.run(
+      { ...submission, fields: { ...submission.fields, enter_message: 'hi' } },
+      ctx('guid-1'),
+    );
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(result).toMatchObject({ status: 'failed' });
+  });
+});
+
+describe('hubspotHandler — company fallback', () => {
+  const sentFields = (mock: ReturnType<typeof vi.fn>): Record<string, string> => {
+    const body = JSON.parse(String(mock.mock.calls[0]?.[1]?.body)) as {
+      fields: { name: string; value: string }[];
+    };
+    return Object.fromEntries(body.fields.map((f) => [f.name, f.value]));
+  };
+
+  it('derives company from the work-email domain when the form did not ask', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await hubspotHandler.run(
+      { ...submission, fields: { email: 'pat@cleanstart.com', firstname: 'Pat' } },
+      ctx('guid-1'),
+    );
+
+    expect(sentFields(fetchMock).company).toBe('Cleanstart');
+  });
+
+  it('never overwrites a company the visitor actually typed', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await hubspotHandler.run(
+      { ...submission, fields: { email: 'pat@cleanstart.com', company: 'CleanStart Inc.' } },
+      ctx('guid-1'),
+    );
+
+    expect(sentFields(fetchMock).company).toBe('CleanStart Inc.');
+  });
+
+  it('sends no company for a free-mail address rather than inventing one', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await hubspotHandler.run(
+      { ...submission, fields: { email: 'pat@gmail.com', firstname: 'Pat' } },
+      ctx('guid-1'),
+    );
+
+    expect(sentFields(fetchMock)).not.toHaveProperty('company');
+  });
+
+  it('passes the country the phone selector resolved straight through', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await hubspotHandler.run(
+      {
+        ...submission,
+        fields: { email: 'pat@cleanstart.com', phone: '+919876543210', country: 'India' },
+      },
+      ctx('guid-1'),
+    );
+
+    const sent = sentFields(fetchMock);
+    expect(sent.country).toBe('India');
+    expect(sent.phone).toBe('+919876543210');
   });
 });
