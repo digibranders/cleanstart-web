@@ -199,7 +199,8 @@ describe('careersApplyEndpoint', () => {
     expect(req.payload.create).toHaveBeenCalledWith(
       expect.objectContaining({ collection: 'resumes' }),
     );
-    expect(sendBrevoEmail).toHaveBeenCalledTimes(1);
+    // HR notification + applicant confirmation.
+    expect(sendBrevoEmail).toHaveBeenCalledTimes(2);
     expect(req.payload.create).toHaveBeenCalledWith(
       expect.objectContaining({
         collection: 'career-applications',

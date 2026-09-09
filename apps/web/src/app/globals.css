@@ -624,7 +624,7 @@ body {
    CTA SYSTEM
    --------------------------------------------------------------------------
    Two distinct CTA types:
-     1. "Glass Button" — Book a Demo, Browse Images, Book a Demo. All share the
+     1. "Glass Button" — Book a Demo, Pull Images, Book a Demo. All share the
         same multi-layer fill + stroke:
           • base: rgba(255,255,255,0.65)
           • LINEAR_DODGE radial #FFFFFF→#3D00FF @50% (blue tint top-left)
@@ -719,7 +719,7 @@ body {
 
 /* ---------------------------------------------------------------------------
    GLASS BUTTON
-   Used by: "Book a Demo", "Browse Images", "Book a Demo"
+   Used by: "Book a Demo", "Pull Images", "Book a Demo"
    --------------------------------------------------------------------------- */
 .cs-btn-glass {
   position: relative;
@@ -6309,4 +6309,29 @@ body {
 
 .scrollbar-premium-dark:hover::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.36);
+}
+
+/* ---------------------------------------------------------------------------
+   Form field focus indicator
+   ---------------------------------------------------------------------------
+   `:focus-visible` rather than `:focus`, so tabbing rings the field but a mouse
+   click on the country selector or the "how did you hear" trigger does not.
+   Browsers still match :focus-visible on text inputs when clicked, which is
+   wanted: you need to see where the caret landed.
+
+   Blue rather than the cyan the `.cs-btn-*` rules use. That cyan (#33BAEC) is
+   tuned for the dark hero surfaces those buttons sit on, where it measures
+   8.3:1; on the white form cards it drops to 2.2:1, under the 3:1 that WCAG
+   1.4.11 asks of a non-text indicator. #3960F9 is the form accent already and
+   clears it on every surface a field appears on (4.8:1 light, 3.7:1 dark).
+
+   An outline, not a border: the field border is set through an inline style and
+   inline always beats a class, so a border-based ring would silently not
+   render. An outline also sits outside the box, so nothing reflows.
+--------------------------------------------------------------------------- */
+
+.cs-field:focus-visible,
+.cs-field-group:has(:focus-visible) {
+  outline: 2px solid #3960f9;
+  outline-offset: 2px;
 }

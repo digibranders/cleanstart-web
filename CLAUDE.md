@@ -56,6 +56,7 @@ cleanstart-website/                  monorepo · pnpm workspaces + Turborepo
 ├── packages/
 │   ├── types/                       re-exports apps/cms/payload-types
 │   ├── ui/                          @cleanstart/ui primitives + tokens (shared by cms + web)
+│   ├── forms/                       @cleanstart/forms — business-email + E.164 rules (shared by cms + web)
 │   └── config/                      tsconfig · biome · eslint
 ├── migrations/webflow-import/       Phase H: ETL scripts
 ├── infra/                           docker-compose · Caddy · backup/restore
@@ -64,6 +65,8 @@ cleanstart-website/                  monorepo · pnpm workspaces + Turborepo
 ```
 
 **Page inventory:** `docs/web/WEB-PAGES.md` — canonical list of all pages, slugs, types, build status. Update status when a page is completed.
+
+**`packages/forms`** is framework-agnostic and holds the rules both apps must agree on: `validateBusinessEmail`, the free-mail/disposable domain corpus, and the E.164 helpers. Two entry points: `@cleanstart/forms` is client-safe (curated ~260-domain list), while `@cleanstart/forms/server` adds the full 13,797-domain corpus and **must never be imported from a client component**. Refresh the corpus with `pnpm --filter @cleanstart/forms refresh-domains`.
 
 **`packages/ui`** hosts the shared React primitives (`Drawer`, `Dialog`, `Popover`, `Combobox`, `ConfirmDialog`, `Spinner`, `Tooltip`, `DropdownMenu`, `ContextMenu`, `DateTimePicker`, `Toast`) plus design tokens. Consumed by both `apps/cms` and `apps/web` — no duplication between apps.
 
@@ -159,6 +162,16 @@ import { Section, Container } from "@/components/layout";
 </Section>
 ```
 
+### Form fields
+
+Use the shared field components in `src/components/forms/`, never a per-form copy:
+
+- `<TextField>` and `<PhoneField>` render on the one field surface (`field-surface.ts`) and put validation messages **inline underneath the field**. Native browser validation bubbles are not used: every public form is `noValidate`.
+- `<PhoneField>` is the only way to collect a phone number. It composes E.164 from a country selector plus a digits-only input, and the selected country is where the lead's country comes from — do not add a separate country field alongside it.
+- The country preselects from `useDetectedCountry()`, which reads Vercel's `x-vercel-ip-country` via `/api/geo` and falls back to the browser locale. It is a hint: never overwrite a country the visitor has already chosen.
+- Email validation goes through `emailError()` in `lib/forms/validate.ts`. Pass `requireBusiness: false` only where a personal address is legitimate (newsletter, gated downloads, job applications).
+- Client validation is fast feedback, not the gate. The API re-checks every rule and returns `issues[]`; map those back onto fields with `issuesToErrors()` so a server-only rejection still lands under the right input.
+
 ### Component structure
 
 - One section per file: `src/components/sections/[page]/SectionName.tsx`
@@ -239,6 +252,30 @@ These are hard rules. Do not work around them — flag and stop instead.
 - **Guest Contributors:** still open. Ship as an additive optional `contributorType: 'staff' | 'guest'` field on the existing `authors` collection — do **not** create a separate collection.
 - **Knowledge Hub:** `knowledgeBase` (versioned + drafts, slug-change-redirect hook, SEO field group) + `knowledgeCategories` (hierarchical with self-referencing `parent`).
 - **Integrations (Phase J1):** `config` field encrypted at rest via `lib/integrations/secrets.ts`. Per-row `routing` group (`events[]`, `collections[]`, `formSlugs[]`, `minLeadScore`). Admin endpoints: `/api/integrations/:id/test`, `/health`, `/audit` (file: `payload/endpoints/integrations-actions.ts`). Dead-letter retry reuses `WebhookDeadLetter`. Router: `lib/integrations/router.ts`.
+
+---
+
+## Email
+
+Every email the site sends is built in code and delivered through
+`sendBrevoEmail` as `subject` + `htmlContent`. The registry at
+`apps/cms/src/payload/lib/email/registry.ts` lists all of them with the form
+that triggers each and the file that sends it.
+
+- **One layout.** `lib/email/layout.ts` owns presentation; builders describe
+  content as blocks. Table-based, inline styles, Arial, preheader, plated logo,
+  postal address. Do not hand-write email HTML.
+- **Never use a Brevo dashboard template for a form.** Brevo interpolates
+  `{{ params.* }}` unescaped, so visitor input reaches inboxes as live markup,
+  and a second design source means production sends two different-looking sets
+  of email. `BREVO_TEMPLATE_ID`, `PARTNER_ADMIN_TEMPLATE_ID` and
+  `PARTNER_USER_TEMPLATE_ID` are dead and can be unset.
+- **Payload's own mail** (password reset) goes through the Brevo adapter at
+  `lib/email/payload-adapter.ts`. Without it Payload logs mail to stdout and
+  password resets silently never arrive.
+- **`apps/cms/emails/` is generated.** Run `pnpm --filter @cleanstart/cms
+  emails:render` after changing a template and commit the result;
+  `emails:check` is the drift gate.
 
 ---
 

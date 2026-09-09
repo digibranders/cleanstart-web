@@ -3,7 +3,10 @@ import type { Endpoint } from 'payload';
 
 import { clientIpFromHeaders } from '../lib/client-ip';
 import { createHubspotDeal } from '../lib/deal-registrations/hubspot-deal';
-import { buildDealRegistrationNotificationEmail } from '../lib/deal-registrations/notification-email';
+import {
+  buildDealRegistrationConfirmationEmail,
+  buildDealRegistrationNotificationEmail,
+} from '../lib/deal-registrations/notification-email';
 import { dealRegistrationSchema } from '../lib/deal-registrations/schema';
 import { sendBrevoEmail } from '../lib/email/brevo';
 import { DEFAULT_RATE_LIMITS, checkAndRecord } from '../lib/rate-limit';
@@ -219,6 +222,43 @@ export const dealRegistrationApplyEndpoint: Endpoint = {
     // Best-effort internal notification to the team (both marketing + Anil get
     // the identical HTML email). Never blocks or fails the 200 — the durable
     // deal-registrations row is already persisted above.
+    const dealSender = {
+      senderName: process.env.DEAL_REG_SENDER_NAME?.trim() || 'CleanStart',
+    };
+
+    // Confirmation to the partner rep who submitted. Best-effort, like the
+    // internal notification: the durable row is already persisted above.
+    try {
+      const confirmation = buildDealRegistrationConfirmationEmail({
+        partnerName: data.partnerName,
+        partnerRep: data.partnerRep,
+        prospect: data.prospect,
+        dealDetails: data.dealDetails,
+      });
+      const confirmResult = await sendBrevoEmail({
+        ...dealSender,
+        to: [
+          {
+            email: data.partnerRep.email,
+            name: `${data.partnerRep.firstName} ${data.partnerRep.lastName}`.trim(),
+          },
+        ],
+        ...(notifyEmails()[0] ? { replyTo: { email: notifyEmails()[0] as string } } : {}),
+        subject: confirmation.subject,
+        htmlContent: confirmation.htmlContent,
+      });
+      if (confirmResult.status === 'failed') {
+        req.payload.logger.warn(
+          { error: confirmResult.error },
+          'Deal registration confirmation email failed',
+        );
+      }
+    } catch (err) {
+      Sentry.captureException(err, {
+        tags: { form: 'deal-registration', stage: 'confirm-email' },
+      });
+    }
+
     const recipients = notifyEmails();
     if (recipients.length > 0) {
       try {

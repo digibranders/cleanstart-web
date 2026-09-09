@@ -1,57 +1,131 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { TurnstileWidget } from "@/components/TurnstileWidget";
+import { useEffect, useRef, useState } from "react";
+
+import { PhoneField } from "@/components/forms/PhoneField";
+import { TextField } from "@/components/forms/TextField";
 import { LeadConsent } from "@/components/forms/LeadConsent";
 import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
-import { submitLead } from "@/lib/leads/submitLead";
+import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { useAttribution } from "@/components/attribution/AttributionProvider";
+import { trackEvent } from "@/lib/analytics/track";
+import { useDetectedCountry } from "@/lib/forms/useDetectedCountry";
+import { emptyPhoneValue, toE164, validatePhone, type PhoneValue } from "@/lib/forms/phone-value";
+import { emailError, issuesToErrors, optionalText, requiredText } from "@/lib/forms/validate";
+import { submitLead } from "@/lib/leads/submitLead";
+
 import { SubmitButton } from "./FormCard";
 
-/** Web input name → HubSpot internal property name (the `forms` field names). */
-const NAME_MAP: Record<string, string> = {
+/** Form field key → HubSpot internal property name (the `forms` field names). */
+const HUBSPOT_NAMES = {
   firstName: "firstname",
   lastName: "lastname",
   email: "email",
-  company: "company",
-  country: "country",
   phone: "phone",
+  message: "enter_message",
+  country: "country",
+} as const;
+
+/** Reverse lookup, so a server-side field issue lands on the input that caused it. */
+const FIELD_BY_HUBSPOT_NAME: Readonly<Record<string, string>> = {
+  firstname: "firstName",
+  lastname: "lastName",
+  email: "email",
+  phone: "phone",
+  enter_message: "message",
 };
 
 const STORAGE_CONSENT_TEXT =
   "I agree to allow CleanStart to store and process my personal data.";
 
+type Errors = Partial<Record<"firstName" | "lastName" | "email" | "phone" | "message", string>>;
+
 export function BookDemoForm(): React.ReactElement {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState<PhoneValue>(() => emptyPhoneValue());
+  const [message, setMessage] = useState("");
+  const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
   const { status, setStatus, statusRef } = useFormStatus();
   const inFlightRef = useRef(false);
   const { getAttribution } = useAttribution();
+  const { country: detectedCountry, detected } = useDetectedCountry();
+  const touchedCountryRef = useRef(false);
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  // Adopt the detected country until the visitor picks one themselves, after
+  // which detection must never overwrite their choice.
+  useEffect(() => {
+    if (!detected || touchedCountryRef.current) return;
+    setPhone((prev) => ({ ...prev, country: detectedCountry }));
+  }, [detected, detectedCountry]);
+
+  const setError = (field: keyof Errors, message: string | null): void =>
+    setErrors((prev) => {
+      if (message) return { ...prev, [field]: message };
+      const { [field]: _removed, ...rest } = prev;
+      return rest;
+    });
+
+  const validateAll = (): Errors => {
+    const next: Errors = {};
+    const first = requiredText(firstName, "First name", { min: 2, max: 50 });
+    if (first) next.firstName = first;
+    const last = optionalText(lastName, "Last name", { max: 50 });
+    if (last) next.lastName = last;
+    const mail = emailError(email);
+    if (mail) next.email = mail;
+    const tel = validatePhone(phone, { required: true });
+    if (tel) next.phone = tel;
+    const note = optionalText(message, "Message", { max: 1000 });
+    if (note) next.message = note;
+    return next;
+  };
+
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    event.preventDefault();
     if (inFlightRef.current) return;
-    inFlightRef.current = true;
     setStatus(null);
-    setSubmitting(true);
 
-    const form = e.currentTarget;
-    const fd = new FormData(form);
-    const fields: Record<string, string> = {};
-    for (const [inputName, hsName] of Object.entries(NAME_MAP)) {
-      const value = fd.get(inputName);
-      if (typeof value === "string" && value.trim()) fields[hsName] = value.trim();
+    const found = validateAll();
+    setErrors(found);
+    if (Object.keys(found).length > 0) {
+      // Put the caret on the first thing that needs fixing rather than making
+      // the visitor hunt for the red text.
+      const firstKey = Object.keys(found)[0];
+      if (firstKey) document.getElementById(`demo-${firstKey}`)?.focus();
+      return;
     }
 
-    const categories = ["storage", ...(fd.get("consent_marketing") != null ? ["marketing"] : [])];
-    const turnstileToken = fd.get("cf-turnstile-response");
+    inFlightRef.current = true;
+    setSubmitting(true);
+
+    const form = event.currentTarget;
+    const turnstileToken = new FormData(form).get("cf-turnstile-response");
+    const consentMarketing = new FormData(form).get("consent_marketing") != null;
 
     const result = await submitLead({
       formSlug: "book-a-demo",
-      fields,
+      fields: {
+        [HUBSPOT_NAMES.firstName]: firstName.trim(),
+        ...(lastName.trim() ? { [HUBSPOT_NAMES.lastName]: lastName.trim() } : {}),
+        [HUBSPOT_NAMES.email]: email.trim().toLowerCase(),
+        // E.164 is guaranteed non-null here: validateAll rejected anything else.
+        [HUBSPOT_NAMES.phone]: toE164(phone) ?? "",
+        // The form no longer asks for a country: the dial code the visitor
+        // picked already answers it. Sent as the country name, which is what
+        // HubSpot's free-text `country` property holds. Resolved here rather
+        // than server-side because a dial code alone is ambiguous (+1 covers
+        // the US, Canada and twenty-odd Caribbean nations) while the visitor's
+        // explicit choice is not.
+        [HUBSPOT_NAMES.country]: phone.country.name,
+        ...(message.trim() ? { [HUBSPOT_NAMES.message]: message.trim() } : {}),
+      },
       consent: {
         snapshot: STORAGE_CONSENT_TEXT,
         givenAt: new Date().toISOString(),
-        categories,
+        categories: ["storage", ...(consentMarketing ? ["marketing"] : [])],
       },
       ...(typeof turnstileToken === "string" ? { turnstileToken } : {}),
       ...(typeof window !== "undefined" ? { source: window.location.href } : {}),
@@ -60,7 +134,17 @@ export function BookDemoForm(): React.ReactElement {
 
     setSubmitting(false);
     inFlightRef.current = false;
+
     if (result.ok) {
+      // Fired only once the API has confirmed the lead, so the count reflects
+      // captured leads rather than submit-button clicks.
+      trackEvent("generate_lead", { form_name: "book-a-demo" });
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setPhone((prev) => ({ country: prev.country, national: "" }));
+      setMessage("");
+      setErrors({});
       form.reset();
       setStatus({
         tone: "success",
@@ -69,13 +153,24 @@ export function BookDemoForm(): React.ReactElement {
           "Thanks, your demo request has been received. Our team will reach out within 24 hours.",
       });
       window.setTimeout(() => setStatus(null), 5000);
-    } else {
-      setStatus({
-        tone: "error",
-        title: "Couldn't submit request",
-        message: "We couldn't submit your request. Please try again.",
-      });
+      return;
     }
+
+    // The API re-validates against the full free-mail corpus, so a domain the
+    // browser's shorter list missed comes back here. Show it on the field.
+    const fieldErrors = issuesToErrors(result.issues, FIELD_BY_HUBSPOT_NAME);
+    if (Object.keys(fieldErrors).length > 0) {
+      setErrors(fieldErrors);
+      const firstKey = Object.keys(fieldErrors)[0];
+      if (firstKey) document.getElementById(`demo-${firstKey}`)?.focus();
+      return;
+    }
+
+    setStatus({
+      tone: "error",
+      title: "Couldn't submit request",
+      message: "We couldn't submit your request. Please try again.",
+    });
   };
 
   return (
@@ -96,83 +191,85 @@ export function BookDemoForm(): React.ReactElement {
           }}
         >
           {status ? <StatusBanner ref={statusRef} {...status} /> : null}
-          <form onSubmit={onSubmit} className="flex flex-col gap-5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-5">
-                <FigmaTextInput name="firstName" label="First Name" required />
-                <FigmaTextInput name="lastName" label="Last Name" />
-              </div>
+          <form onSubmit={onSubmit} className="flex flex-col gap-5" noValidate>
+            <div className="grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2">
+              <TextField
+                id="demo-firstName"
+                label="First Name"
+                required
+                autoComplete="given-name"
+                maxLength={50}
+                value={firstName}
+                onChange={setFirstName}
+                onBlur={() =>
+                  setError("firstName", requiredText(firstName, "First name", { min: 2, max: 50 }))
+                }
+                error={errors.firstName}
+              />
+              <TextField
+                id="demo-lastName"
+                label="Last Name"
+                autoComplete="family-name"
+                maxLength={50}
+                value={lastName}
+                onChange={setLastName}
+                onBlur={() => setError("lastName", optionalText(lastName, "Last name", { max: 50 }))}
+                error={errors.lastName}
+              />
+            </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-5">
-                <FigmaTextInput name="email" type="email" label="Email" required />
-                <FigmaTextInput name="company" label="Company Name" required />
-              </div>
+            <div className="grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2">
+              <TextField
+                id="demo-email"
+                type="email"
+                label="Work Email"
+                required
+                autoComplete="email"
+                maxLength={254}
+                value={email}
+                onChange={setEmail}
+                onBlur={() => setError("email", email.trim() ? emailError(email) : null)}
+                error={errors.email}
+              />
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-5">
-                <FigmaTextInput name="country" label="Country/Region" />
-                <FigmaTextInput name="phone" type="tel" label="Phone Number" required />
-              </div>
+              <PhoneField
+                id="demo-phone"
+                label="Phone Number"
+                required
+                value={phone}
+                onChange={(next) => {
+                  if (next.country.code !== phone.country.code) touchedCountryRef.current = true;
+                  setPhone(next);
+                  if (errors.phone) setError("phone", null);
+                }}
+                onBlur={() =>
+                  setError("phone", phone.national ? validatePhone(phone, { required: true }) : null)
+                }
+                error={errors.phone}
+              />
+            </div>
 
-              <LeadConsent />
+            <TextField
+              id="demo-message"
+              label="How can we help?"
+              placeholder="We run around 300 containers on EKS and want to cut CVE remediation time before our next audit."
+              multiline
+              maxLength={1000}
+              value={message}
+              onChange={setMessage}
+              onBlur={() => setError("message", optionalText(message, "Message", { max: 1000 }))}
+              error={errors.message}
+            />
 
-              <TurnstileWidget />
-              <SubmitButton busy={submitting} busyLabel="Submitting…">
-                Let's Connect
-              </SubmitButton>
-            </form>
+            <LeadConsent />
+
+            <TurnstileWidget />
+            <SubmitButton busy={submitting} busyLabel="Submitting…">
+              Let&apos;s Connect
+            </SubmitButton>
+          </form>
         </div>
       </div>
     </div>
-  );
-}
-
-interface InputProps {
-  name: string;
-  type?: "text" | "email" | "tel";
-  label: string;
-  placeholder?: string;
-  required?: boolean;
-}
-
-function FigmaTextInput({
-  name,
-  type = "text",
-  label,
-  placeholder,
-  required,
-}: InputProps): React.ReactElement {
-  return (
-    <label htmlFor={name} className="block">
-      <span
-        className="mb-2 block text-[#111111]"
-        style={{
-          fontFamily: "var(--font-display, 'Manrope'), sans-serif",
-          fontSize: "var(--fs-body-sm)",
-          fontWeight: 400,
-          lineHeight: 1.2,
-        }}
-      >
-        {label}
-        {required && <span className="ml-0.5 text-[#D14343]">*</span>}
-      </span>
-      <input
-        id={name}
-        name={name}
-        type={type}
-        required={required}
-        placeholder={placeholder ?? label}
-        className="block w-full rounded-[8px] outline-none transition-colors placeholder:text-[#9CA3AF] focus:border-[#3960F9]"
-        style={{
-          background: "#FBFBFB",
-          border: "1.5px solid #DDDDDD",
-          padding: "10px 14px",
-          fontFamily: "var(--font-display), 'Manrope', sans-serif",
-          fontWeight: 500,
-          fontSize: "var(--fs-input)",
-          lineHeight: 1.125,
-          color: "#111111",
-          height: "40px",
-        }}
-      />
-    </label>
   );
 }

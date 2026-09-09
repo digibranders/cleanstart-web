@@ -3872,7 +3872,7 @@ export interface Form {
      * Machine name. Becomes the JSON key on the lead record.
      */
     name: string;
-    type: 'text' | 'email' | 'textarea' | 'select' | 'checkbox' | 'consent';
+    type: 'text' | 'email' | 'tel' | 'textarea' | 'select' | 'checkbox' | 'consent';
     /**
      * Visitor-facing label.
      */
@@ -3881,6 +3881,10 @@ export interface Form {
      * Consent fields are always required and cannot be unchecked here.
      */
     required?: boolean | null;
+    /**
+     * Reject consumer webmail and disposable mailboxes (gmail, outlook, yahoo, mailinator and ~13,800 more). Leave off for newsletter and gated-download forms, where a personal address is a legitimate signup.
+     */
+    requireBusinessEmail?: boolean | null;
     placeholder?: string | null;
     helpText?: string | null;
     defaultValue?: string | null;
@@ -12449,6 +12453,7 @@ export interface FormsSelect<T extends boolean = true> {
         type?: T;
         label?: T;
         required?: T;
+        requireBusinessEmail?: T;
         placeholder?: T;
         helpText?: T;
         defaultValue?: T;

@@ -1,4 +1,5 @@
 import { companyFromDomainHandler } from './company-from-domain';
+import { confirmationHandler } from './confirmation';
 import { hubspotHandler } from './hubspot';
 import { registerSecondaryHandler } from './registry';
 
@@ -6,11 +7,14 @@ import { registerSecondaryHandler } from './registry';
 //   - company-from-domain  (free enrichment, no env gate)
 //   - hubspot              (primary CRM — Phase J3; reads DB-backed
 //                           integration row, no env gate)
+//   - confirmation-email   (visitor acknowledgement over Brevo)
 //
-// Email is owned entirely by HubSpot (form follow-up + internal
-// notifications). Brevo was removed once HubSpot became the single
-// email channel. Slack/Discord/Teams connect from the Integrations
-// admin surface, not env vars.
+// The visitor acknowledgement is ours rather than a HubSpot form follow-up.
+// A follow-up is a marketing send gated on subscription status, so anyone
+// declining marketing consent would get no acknowledgement of a demo request
+// they just made. These are transactional and must not depend on that.
+// Internal notification remains HubSpot's. Slack/Discord/Teams connect from
+// the Integrations admin surface, not env vars.
 
 let registered = false;
 
@@ -24,9 +28,10 @@ export const registerLeadHandlers = (): void => {
   registered = true;
   registerSecondaryHandler(companyFromDomainHandler);
   registerSecondaryHandler(hubspotHandler);
+  registerSecondaryHandler(confirmationHandler);
 };
 
-export { companyFromDomainHandler, hubspotHandler };
+export { companyFromDomainHandler, confirmationHandler, hubspotHandler };
 export { hubspotGdprDeleteByEmail } from './hubspot';
 export {
   registerSecondaryHandler,

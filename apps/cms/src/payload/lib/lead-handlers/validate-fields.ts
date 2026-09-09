@@ -11,9 +11,9 @@
  * can map them back onto fields.
  */
 
-import { compileSafe } from '../safe-regex';
+import { FREE_EMAIL_DOMAINS, isE164, validateBusinessEmail } from '@cleanstart/forms/server';
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { compileSafe } from '../safe-regex';
 
 export type FormFieldDef = {
   name?: string | null;
@@ -26,6 +26,12 @@ export type FormFieldDef = {
     maxLength?: number | null;
     pattern?: string | null;
   } | null;
+  /**
+   * Set on an `email` field to reject consumer webmail and disposable
+   * mailboxes. Off by default: the newsletter and gated-download forms
+   * deliberately accept a personal address.
+   */
+  requireBusinessEmail?: boolean | null;
 };
 
 export type FieldIssue = {
@@ -97,8 +103,34 @@ export const validateFields = (
     if (value === undefined || value === null) continue;
 
     if (def.type === 'email') {
-      if (typeof value !== 'string' || !EMAIL_RE.test(value)) {
+      if (typeof value !== 'string') {
         issues.push({ fieldName: def.name, message: `${label} must be a valid email address.` });
+        continue;
+      }
+      // The authoritative company-email gate. The browser checks a curated
+      // subset for instant feedback; this checks the full corpus, so a
+      // long-tail free-mail domain is caught here and surfaced back on the
+      // field via the `issues` array.
+      const email = validateBusinessEmail(value, {
+        freeDomains: FREE_EMAIL_DOMAINS,
+        requireBusiness: def.requireBusinessEmail === true,
+      });
+      if (!email.ok) {
+        issues.push({ fieldName: def.name, message: email.message });
+        continue;
+      }
+    }
+
+    if (def.type === 'tel') {
+      // An optional phone left blank arrives as '' rather than being omitted.
+      if (value === '') continue;
+      // The phone field composes E.164 from the selected country's dial code
+      // plus the digits typed, so anything else reaching here was hand-crafted.
+      if (typeof value !== 'string' || !isE164(value)) {
+        issues.push({
+          fieldName: def.name,
+          message: `${label} must be a phone number including its country code.`,
+        });
         continue;
       }
     }

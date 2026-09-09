@@ -1,11 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
+import { PhoneField } from "@/components/forms/PhoneField";
+import {
+  emptyPhoneValue,
+  toE164,
+  validatePhone,
+  type PhoneValue,
+} from "@/lib/forms/phone-value";
+import { useDetectedCountry } from "@/lib/forms/useDetectedCountry";
 import { submitApplication } from "@/lib/careers/submitApplication";
+import { trackEvent } from "@/lib/analytics/track";
 
 const MAX_RESUME_BYTES = 10 * 1024 * 1024;
 const RESUME_EXT_RE = /\.(pdf|doc|docx)$/i;
@@ -58,6 +67,16 @@ export function JobApplyForm({
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const inFlightRef = useRef(false);
+  const [phone, setPhone] = useState<PhoneValue>(() => emptyPhoneValue());
+  const [phoneError, setPhoneError] = useState<string | undefined>(undefined);
+  const { country: detectedCountry, detected } = useDetectedCountry();
+  const touchedCountryRef = useRef(false);
+
+  // Adopt the detected country until the applicant picks one themselves.
+  useEffect(() => {
+    if (!detected || touchedCountryRef.current) return;
+    setPhone((prev) => ({ ...prev, country: detectedCountry }));
+  }, [detected, detectedCountry]);
 
   // Auto-grow the cover-letter textarea: starts at one line, expands to fit
   // typed/pasted content, then scrolls only once it reaches the cap. The
@@ -100,8 +119,15 @@ export function JobApplyForm({
     }
     const resume = resumeFile;
 
+    const phoneInvalid = validatePhone(phone, { required: false });
+    setPhoneError(phoneInvalid ?? undefined);
+    if (phoneInvalid) {
+      document.getElementById("apply-phone")?.focus();
+      return;
+    }
+
     const turnstileToken = fd.get("cf-turnstile-response");
-    const phone = String(fd.get("phone") ?? "").trim();
+    const phoneE164 = toE164(phone);
     const location = String(fd.get("location") ?? "").trim();
     const howDidYouHear = String(fd.get("howDidYouHear") ?? "").trim();
     const coverLetter = String(fd.get("coverLetter") ?? "").trim();
@@ -120,7 +146,7 @@ export function JobApplyForm({
         givenAt: new Date().toISOString(),
         categories: ["recruitment"],
       },
-      ...(phone ? { phone } : {}),
+      ...(phoneE164 ? { phone: phoneE164 } : {}),
       ...(location ? { location } : {}),
       ...(howDidYouHear ? { howDidYouHear } : {}),
       ...(coverLetter ? { coverLetter } : {}),
@@ -132,6 +158,7 @@ export function JobApplyForm({
     setBusy(false);
 
     if (result.ok) {
+      trackEvent("job_application", { job_slug: jobSlug });
       setStatus({
         tone: "success",
         title: "Application received",
@@ -153,18 +180,52 @@ export function JobApplyForm({
   };
 
   return (
-    <section className="relative w-full bg-white overflow-x-clip">
+    <section
+      className="relative w-full overflow-x-clip"
+      style={{
+        // A white card on a white page can only be told apart by a hairline
+        // border, which is why one was there. Tinting the canvas instead lets
+        // the card be pure white and lifted, and the gradient starts and ends
+        // at #FFFFFF so there is no seam against the white content above.
+        background:
+          "linear-gradient(180deg, #FFFFFF 0%, #F5F6FB 22%, #F5F6FB 78%, #FFFFFF 100%)",
+      }}
+    >
+      {/* Soft indigo pool under the card, so the elevation reads as light
+          falling on a surface rather than a drop shadow pasted behind a box. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        style={{
+          width: "min(1100px, 120%)",
+          height: "70%",
+          background:
+            "radial-gradient(ellipse at center, rgba(74,59,241,0.06) 0%, rgba(74,59,241,0) 70%)",
+        }}
+      />
       <div className="relative mx-auto max-w-[820px] px-6 sm:px-10 pt-2 pb-24">
           <form
             ref={formRef}
             onSubmit={onSubmit}
             className="bg-white"
             style={{
-              borderRadius: "16px",
-              padding: "24px",
-              border: "1px solid rgba(74,59,241,0.25)",
-              boxShadow:
-                "0px 3px 7px 0px rgba(0,0,0,0.02), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 29px 17px 0px rgba(0,0,0,0.01)",
+              borderRadius: "20px",
+              padding: "clamp(20px, 3.2vw, 36px)",
+              // Three layers rather than one: a tight contact shadow, a mid
+              // spread, and a wide ambient pool. A single blurred shadow reads
+              // flat; stacking the way real light falls off is what makes a
+              // surface look lifted. Tinted with the site's #09063F indigo, as
+              // the buttons and popovers already are, not neutral black.
+              //
+              // The final inset is a hairline ring standing in for the border
+              // it replaces: it keeps the edge crisp on high-DPI screens
+              // without drawing a box around the form.
+              boxShadow: [
+                "0 1px 2px rgba(9,6,63,0.04)",
+                "0 8px 24px -8px rgba(9,6,63,0.10)",
+                "0 36px 72px -28px rgba(9,6,63,0.16)",
+                "inset 0 0 0 1px rgba(9,6,63,0.05)",
+              ].join(", "),
             }}
             noValidate
           >
@@ -208,14 +269,12 @@ export function JobApplyForm({
               <Field
                 label="First Name"
                 name="firstName"
-                placeholder="Jane"
                 required
                 autoComplete="given-name"
               />
               <Field
                 label="Last Name"
                 name="lastName"
-                placeholder="Doe"
                 required
                 autoComplete="family-name"
               />
@@ -226,16 +285,29 @@ export function JobApplyForm({
                 label="Email"
                 name="email"
                 type="email"
-                placeholder="you@email.com"
                 required
                 autoComplete="email"
               />
-              <Field
-                label="Phone"
-                name="phone"
-                type="tel"
-                placeholder="+1 (555) 000-0000"
-                autoComplete="tel"
+              <PhoneField
+                id="apply-phone"
+                label="Phone Number"
+                variant="careers"
+                value={phone}
+                onChange={(next) => {
+                  if (next.country.code !== phone.country.code) {
+                    touchedCountryRef.current = true;
+                  }
+                  setPhone(next);
+                  if (phoneError) setPhoneError(undefined);
+                }}
+                onBlur={() =>
+                  setPhoneError(
+                    phone.national
+                      ? (validatePhone(phone, { required: false }) ?? undefined)
+                      : undefined,
+                  )
+                }
+                error={phoneError}
               />
             </div>
 
@@ -296,7 +368,7 @@ export function JobApplyForm({
                 rows={1}
                 onInput={(e) => resizeCover(e.currentTarget)}
                 placeholder="A short note on why you're a great fit…"
-                className="font-sans w-full"
+                className="cs-field font-sans w-full outline-none"
                 style={{
                   padding: "10px 14px",
                   borderRadius: "10px",
@@ -304,7 +376,6 @@ export function JobApplyForm({
                   background: "white",
                   fontSize: "var(--fs-body)",
                   color: "#111",
-                  outline: "none",
                   resize: "none",
                   lineHeight: 1.5,
                   overflowY: "hidden",
@@ -625,7 +696,7 @@ function Field({
         required={required}
         placeholder={placeholder}
         autoComplete={autoComplete}
-        className="font-sans w-full"
+        className="cs-field font-sans w-full outline-none"
         style={{
           height: "44px",
           padding: "0 14px",
@@ -634,7 +705,6 @@ function Field({
           background: "white",
           fontSize: "var(--fs-body)",
           color: "#111",
-          outline: "none",
         }}
       />
     </div>
@@ -659,23 +729,60 @@ function SelectField({
 }: SelectFieldProps): React.ReactElement {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
+  // Drives both the pointer hover and the keyboard highlight, so the two can
+  // never disagree about which row is active.
+  const [activeIndex, setActiveIndex] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const listId = useId();
 
   useEffect(() => {
     if (!open) return;
     const onPointerDown = (e: MouseEvent): void => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
-    const onKey = (e: KeyboardEvent): void => {
-      if (e.key === "Escape") setOpen(false);
-    };
     document.addEventListener("mousedown", onPointerDown);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onPointerDown);
-      document.removeEventListener("keydown", onKey);
-    };
+    return () => document.removeEventListener("mousedown", onPointerDown);
   }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const selected = options.indexOf(value);
+    setActiveIndex(selected >= 0 ? selected : 0);
+  }, [open, options, value]);
+
+  const choose = (option: string): void => {
+    setValue(option);
+    setOpen(false);
+    triggerRef.current?.focus({ preventScroll: true });
+  };
+
+  const onKeyDown = (event: React.KeyboardEvent): void => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setOpen(false);
+      triggerRef.current?.focus({ preventScroll: true });
+      return;
+    }
+    if (!open) {
+      if (event.key === "ArrowDown" || event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        setOpen(true);
+      }
+      return;
+    }
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      const delta = event.key === "ArrowDown" ? 1 : -1;
+      setActiveIndex((prev) => (prev + delta + options.length) % options.length);
+      return;
+    }
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      const picked = options[activeIndex];
+      if (picked) choose(picked);
+    }
+  };
 
   return (
     <div ref={ref} className="relative">
@@ -693,11 +800,14 @@ function SelectField({
       </span>
       <input type="hidden" name={name} value={value} />
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
+        onKeyDown={onKeyDown}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="font-sans w-full flex items-center justify-between cursor-pointer"
+        aria-controls={open ? listId : undefined}
+        className="cs-field font-sans w-full flex items-center justify-between cursor-pointer outline-none"
         style={{
           height: "44px",
           padding: "0 14px",
@@ -706,7 +816,6 @@ function SelectField({
           background: "white",
           fontSize: "var(--fs-body)",
           color: value ? "#111" : "rgba(17,17,17,0.4)",
-          outline: "none",
           textAlign: "left",
         }}
       >
@@ -734,7 +843,15 @@ function SelectField({
         </svg>
       </button>
       {open && (
-        <ul
+        <div
+          id={listId}
+          // biome-ignore lint/a11y/useSemanticElements: a native <select> cannot carry the custom trigger and row styling this control needs
+          role="listbox"
+          tabIndex={-1}
+          aria-label={label}
+          // Lenis animates window.scrollY on wheel, which leaves nested scroll
+          // containers inert unless they opt out.
+          data-lenis-prevent
           className="absolute left-0 right-0 z-20 overflow-y-auto"
           style={{
             top: "calc(100% + 6px)",
@@ -750,28 +867,57 @@ function SelectField({
             padding: "4px",
           }}
         >
-          {options.map((option) => (
-            <li key={option}>
+          {options.map((option, index) => {
+            const isSelected = value === option;
+            const isActive = index === activeIndex;
+            return (
               <button
+                key={option}
                 type="button"
-                onClick={() => {
-                  setValue(option);
-                  setOpen(false);
-                }}
-                className="font-sans w-full text-left cursor-pointer rounded-[6px] hover:bg-[#f3f2fb]"
+                // biome-ignore lint/a11y/useSemanticElements: this option lives inside a custom listbox (see note above); a native <option> is not valid outside <select>
+                role="option"
+                aria-selected={isSelected}
+                onMouseEnter={() => setActiveIndex(index)}
+                onClick={() => choose(option)}
+                className="font-sans flex w-full cursor-pointer items-center justify-between gap-2 rounded-[6px] text-left"
                 style={{
                   padding: "9px 12px",
                   fontSize: "var(--fs-body)",
                   color: "#111",
-                  background:
-                    value === option ? "rgba(74,59,241,0.08)" : "transparent",
+                  fontWeight: isSelected ? 600 : 400,
+                  // Hover and keyboard highlight are one state, set inline
+                  // because an inline background would otherwise beat a
+                  // `hover:` class and the row would never light up.
+                  //
+                  // Hover is a neutral grey and selection is the brand violet,
+                  // so the two differ in hue rather than only in strength; two
+                  // tints of the same violet read as the same row twice.
+                  background: isSelected
+                    ? isActive
+                      ? "rgba(74,59,241,0.16)"
+                      : "rgba(74,59,241,0.10)"
+                    : isActive
+                      ? "rgba(17,17,17,0.05)"
+                      : "transparent",
                 }}
               >
-                {option}
+                <span>{option}</span>
+                {isSelected ? (
+                  // Colour alone must not carry the selected state (WCAG 1.4.1).
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+                    <path
+                      d="M20 6L9 17l-5-5"
+                      stroke="#4A3BF1"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                ) : null}
               </button>
-            </li>
-          ))}
-        </ul>
+            );
+          })}
+        </div>
       )}
     </div>
   );

@@ -42,6 +42,9 @@
               "value": "email"
             },
             {
+              "value": "tel"
+            },
+            {
               "value": "textarea"
             },
             {
@@ -62,6 +65,10 @@
         {
           "type": "checkbox",
           "name": "required"
+        },
+        {
+          "type": "checkbox",
+          "name": "requireBusinessEmail"
         },
         {
           "type": "text",

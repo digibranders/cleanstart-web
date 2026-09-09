@@ -26,6 +26,9 @@ importers:
       '@aws-sdk/client-s3':
         specifier: ^3.1042.0
         version: 3.1042.0
+      '@cleanstart/forms':
+        specifier: workspace:*
+        version: link:../../packages/forms
       '@cleanstart/schema':
         specifier: workspace:*
         version: link:../../packages/schema
@@ -189,6 +192,9 @@ importers:
       '@base-ui/react':
         specifier: ^1.4.1
         version: 1.4.1(@date-fns/tz@1.2.0)(@types/react@19.2.14)(date-fns@4.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@cleanstart/forms':
+        specifier: workspace:*
+        version: link:../../packages/forms
       '@cleanstart/schema':
         specifier: workspace:*
         version: link:../../packages/schema
@@ -210,6 +216,9 @@ importers:
       lenis:
         specifier: ^1.3.23
         version: 1.3.23(react@19.2.4)
+      libphonenumber-js:
+        specifier: ^1.13.12
+        version: 1.13.12
       lottie-react:
         specifier: ^2.4.1
         version: 2.4.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -315,6 +324,21 @@ importers:
         version: 2.1.9(@types/node@22.19.17)(happy-dom@20.9.0)(jsdom@28.1.0(@noble/hashes@1.8.0))(lightningcss@1.32.0)(msw@2.14.5(@types/node@22.19.17)(typescript@5.9.3))(sass@1.77.4)(terser@5.46.2)
 
   packages/config: {}
+
+  packages/forms:
+    devDependencies:
+      '@cleanstart/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.17
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@types/node@22.19.17)(happy-dom@20.9.0)(jsdom@28.1.0(@noble/hashes@1.8.0))(lightningcss@1.32.0)(msw@2.14.5(@types/node@22.19.17)(typescript@5.9.3))(sass@1.77.4)(terser@5.46.2)
 
   packages/schema:
     dependencies:
@@ -5674,6 +5698,9 @@ packages:
     resolution: {integrity: sha512-DeXj9X5xDCjgKLU/7RR+/HQEVzuuEUiwldwOGsHK/sfAfELGWEyTcf0x+uOvCvK3O2zPmZePXWL85vtia6GyZw==}
     engines: {node: '>=16'}
     hasBin: true
+
+  libphonenumber-js@1.13.12:
+    resolution: {integrity: sha512-uLVeV1c9OTk6qkdqnj+mpMD+ZdnZ0szVyWu58HwMmpwkHA1gCEkyjd3veZQXDnuw9KEwSRjcc9B1pS9XKIN1fA==}
 
   lie@3.3.0:
     resolution: {integrity: sha512-UaiMJzeWRlEujzAuw5LokY1L5ecNQYZKfmyZ9L7wDHb/p5etKaxXhohBcrw0EYby+G/NA52vRSN4N39dxHAIwQ==}
@@ -14068,6 +14095,8 @@ snapshots:
   lib0@0.2.117:
     dependencies:
       isomorphic.js: 0.2.5
+
+  libphonenumber-js@1.13.12: {}
 
   lie@3.3.0:
     dependencies:

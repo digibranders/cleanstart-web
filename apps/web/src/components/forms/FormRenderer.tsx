@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type {
   Form,
   FormField,
@@ -10,6 +10,15 @@ import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
 import { useAttribution } from "@/components/attribution/AttributionProvider";
 import { trackEvent } from "@/lib/analytics/track";
+import { emailError } from "@/lib/forms/validate";
+import { useDetectedCountry } from "@/lib/forms/useDetectedCountry";
+import {
+  emptyPhoneValue,
+  toE164,
+  validatePhone,
+  type PhoneValue,
+} from "@/lib/forms/phone-value";
+import { PhoneField } from "@/components/forms/PhoneField";
 
 export interface FormRendererSubmitResult {
   duplicate?: boolean;
@@ -28,7 +37,10 @@ interface FormRendererProps {
   className?: string;
 }
 
-type FieldValue = string | boolean | undefined;
+type FieldValue = string | boolean | PhoneValue | undefined;
+
+const isPhoneValue = (value: FieldValue): value is PhoneValue =>
+  typeof value === "object" && value !== null && "country" in value;
 
 const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:3000";
 
@@ -41,7 +53,11 @@ const evaluateConditions = (
   const mode = field.conditions?.mode ?? "all";
   const check = (rule: FormFieldConditionRule): boolean => {
     const actual = values[rule.fieldName];
-    const actualStr = actual == null ? "" : String(actual);
+    const actualStr = isPhoneValue(actual)
+      ? (toE164(actual) ?? "")
+      : actual == null
+        ? ""
+        : String(actual);
     switch (rule.operator) {
       case "equals":
         return actualStr === rule.value;
@@ -60,6 +76,11 @@ const validateField = (
   field: FormField,
   value: FieldValue,
 ): string | null => {
+  if (field.type === "tel") {
+    const phone = isPhoneValue(value) ? value : emptyPhoneValue();
+    return validatePhone(phone, { required: Boolean(field.required) });
+  }
+
   const isConsentOrCheckbox = field.type === "consent" || field.type === "checkbox";
   if (field.required) {
     if (isConsentOrCheckbox) {
@@ -74,8 +95,12 @@ const validateField = (
   }
   if (typeof value === "string" && value.length > 0) {
     if (field.type === "email") {
-      const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/u;
-      if (!emailRe.test(value)) return field.errorMessage ?? "Enter a valid email address.";
+      // Shape always; company-only when the form definition asks for it, which
+      // the newsletter and gated-download forms deliberately do not.
+      const invalid = emailError(value, {
+        requireBusiness: field.requireBusinessEmail === true,
+      });
+      if (invalid) return field.errorMessage ?? invalid;
     }
     const v = field.validation;
     if (v?.minLength != null && value.length < v.minLength) {
@@ -102,7 +127,6 @@ const fieldInputStyle: React.CSSProperties = {
   paddingLeft: "16px",
   paddingRight: "16px",
   color: "#111",
-  outline: "none",
   background: "white",
   height: "44px",
   width: "100%",
@@ -121,6 +145,7 @@ export function FormRenderer({
     const out: Record<string, FieldValue> = {};
     for (const f of form.fields) {
       if (f.type === "checkbox" || f.type === "consent") out[f.name] = false;
+      else if (f.type === "tel") out[f.name] = emptyPhoneValue();
       else out[f.name] = f.defaultValue ?? "";
     }
     return out;
@@ -138,6 +163,22 @@ export function FormRenderer({
   // for those. The gate modal renders any gateForm through this component, so
   // the widget lives here rather than in each caller.
   const [turnstileToken, setTurnstileToken] = useState("");
+  const { country: detectedCountry, detected } = useDetectedCountry();
+  const touchedCountryRef = useRef(false);
+
+  useEffect(() => {
+    if (!detected || touchedCountryRef.current) return;
+    setValues((prev) => {
+      const next = { ...prev };
+      for (const field of form.fields) {
+        const current = next[field.name];
+        if (field.type === "tel" && isPhoneValue(current)) {
+          next[field.name] = { ...current, country: detectedCountry };
+        }
+      }
+      return next;
+    });
+  }, [detected, detectedCountry, form.fields]);
 
   const visibleFields = useMemo(
     () => form.fields.filter((f) => evaluateConditions(f, values)),
@@ -171,7 +212,10 @@ export function FormRenderer({
     const out: Record<string, unknown> = {};
     for (const f of visibleFields) {
       if (f.type === "consent") continue;
-      out[f.name] = values[f.name] ?? "";
+      const value = values[f.name];
+      // Phone fields go over the wire as E.164, never as the country/digits
+      // pair the field holds internally.
+      out[f.name] = isPhoneValue(value) ? (toE164(value) ?? "") : (value ?? "");
     }
     return out;
   };
@@ -247,6 +291,7 @@ export function FormRenderer({
       }
       trackEvent("generate_lead", {
         form_id: form.id,
+        form_name: form.slug ?? String(form.id),
         gated: Boolean(json.download),
       });
       onSuccess?.(successPayload);
@@ -324,11 +369,34 @@ export function FormRenderer({
                   placeholder={f.placeholder ?? undefined}
                   value={String(values[f.name] ?? "")}
                   onChange={(e) => setValue(f.name, e.target.value)}
+                  className="cs-field outline-none"
                   style={{ ...fieldInputStyle, height: "96px", paddingTop: "10px" }}
                 />
                 {helpEl}
                 {errorEl}
               </div>
+            );
+          }
+
+          if (f.type === "tel") {
+            const phone = isPhoneValue(values[f.name]) ? values[f.name] : emptyPhoneValue();
+            return (
+              <PhoneField
+                key={f.name}
+                id={id}
+                label={f.label ?? f.name}
+                required={Boolean(f.required)}
+                value={phone as PhoneValue}
+                onChange={(next) => {
+                  if (next.country.code !== (phone as PhoneValue).country.code) {
+                    touchedCountryRef.current = true;
+                  }
+                  setValue(f.name, next);
+                }}
+                size="md"
+                error={err}
+                hint={f.helpText ?? undefined}
+              />
             );
           }
 
@@ -341,6 +409,7 @@ export function FormRenderer({
                   required={!!f.required}
                   value={String(values[f.name] ?? "")}
                   onChange={(e) => setValue(f.name, e.target.value)}
+                  className="cs-field outline-none"
                   style={fieldInputStyle}
                 >
                   <option value="">Select…</option>
@@ -394,6 +463,7 @@ export function FormRenderer({
                 placeholder={f.placeholder ?? undefined}
                 value={String(values[f.name] ?? "")}
                 onChange={(e) => setValue(f.name, e.target.value)}
+                className="cs-field outline-none"
                 style={fieldInputStyle}
               />
               {helpEl}

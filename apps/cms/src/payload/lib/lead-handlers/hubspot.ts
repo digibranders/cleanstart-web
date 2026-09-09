@@ -2,7 +2,27 @@ import { Client } from '@hubspot/api-client';
 import type { BasePayload } from 'payload';
 
 import { resolveHubspotCredentials, type HubspotCredentials } from '../integrations/credentials';
+import { companyFromEmailDomain } from './enrichment';
+import { extractEmail } from './extract-fields';
 import type { LeadHandler, LeadHandlerResult, LeadSubmission } from './types';
+
+/**
+ * HubSpot answers a submission carrying a field the form does not define with a
+ * 400 that names the offender as `fields.<name>`, and rejects the *whole*
+ * submission rather than the one field. Pull those names back out so the
+ * submission can be retried without them.
+ *
+ * Matching is on the error text because the Forms API expresses this failure in
+ * `message` on some shapes and inside `errors[].message` on others.
+ */
+export const invalidHubspotFieldNames = (detail: string): string[] => {
+  const found = new Set<string>();
+  for (const match of detail.matchAll(/fields\.([A-Za-z0-9_]+)/gu)) {
+    const name = match[1];
+    if (name) found.add(name);
+  }
+  return [...found];
+};
 
 /**
  * Build the extra HubSpot form fields carrying last-touch UTMs + ad click IDs.
@@ -161,6 +181,19 @@ export const hubspotHandler: LeadHandler = {
       if (!fields.some((f) => f.name === extra.name)) fields.push(extra);
     }
 
+    // Book a Demo dropped its company question: asking for something derivable
+    // from the work email is friction. Fill it from the email domain so the CRM
+    // record still carries a company, but only when the submission has none, so
+    // a form that does ask (Contact, Partner, Deal Registration) always wins.
+    //
+    // HubSpot does not do this itself on a Forms API submission unless the
+    // portal has the paid enrichment add-on; where it does, its own data
+    // overwrites this afterwards.
+    if (!fields.some((f) => f.name === 'company')) {
+      const derived = companyFromEmailDomain(extractEmail(ctx.formFieldDefs, submission.fields));
+      if (derived) fields.push({ name: 'company', value: derived.company });
+    }
+
     const body: Record<string, unknown> = {
       fields,
       context: { pageUri: submission.source ?? '' },
@@ -178,22 +211,48 @@ export const hubspotHandler: LeadHandler = {
       body.legalConsentOptions = { consent };
     }
 
+    const post = async (payload: Record<string, unknown>): Promise<Response> =>
+      fetch(`https://api.hsforms.com/submissions/v3/integration/submit/${portalId}/${guid}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(10_000),
+      });
+
     try {
-      const resp = await fetch(
-        `https://api.hsforms.com/submissions/v3/integration/submit/${portalId}/${guid}`,
-        {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify(body),
-          signal: AbortSignal.timeout(10_000),
-        },
-      );
+      let resp = await post(body);
+      let droppedFields: string[] = [];
+
+      // A field the form does not define fails the entire submission, which
+      // would drop the contact over one optional answer — and the operator
+      // only finds out from the handler log. Retry once without the offending
+      // fields so the identity fields still reach the CRM, and report which
+      // were dropped so the form can be fixed in HubSpot.
+      if (resp.status === 400) {
+        const detail = await resp.clone().text().catch(() => '');
+        const invalid = invalidHubspotFieldNames(detail);
+        const retained = fields.filter((f) => !invalid.includes(f.name));
+        if (invalid.length > 0 && retained.length > 0 && retained.length < fields.length) {
+          droppedFields = fields
+            .filter((f) => invalid.includes(f.name))
+            .map((f) => f.name);
+          resp = await post({ ...body, fields: retained });
+        }
+      }
+
       if (!resp.ok) {
         const detail = await resp.text().catch(() => '');
         return {
           handler: 'hubspot',
           status: 'failed',
           error: `HubSpot ${resp.status}: ${detail.slice(0, 200)}`,
+        };
+      }
+      if (droppedFields.length > 0) {
+        return {
+          handler: 'hubspot',
+          status: 'synced',
+          reason: `dropped-unknown-fields: ${droppedFields.join(', ')}`,
         };
       }
       return { handler: 'hubspot', status: 'synced' };

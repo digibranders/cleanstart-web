@@ -48,7 +48,7 @@ export function HeroProductSlide(): React.ReactElement {
                 fontWeight: 500,
               }}
             >
-              <span>Browse Images</span>
+              <span>Pull Images</span>
             </a>
 
             <Link

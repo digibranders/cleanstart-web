@@ -5,6 +5,7 @@ import { fetchCMS } from "./cms-fetch";
 export type FormFieldType =
   | "text"
   | "email"
+  | "tel"
   | "textarea"
   | "select"
   | "checkbox"
@@ -42,6 +43,8 @@ export interface FormField {
   defaultValue?: string | null;
   options?: FormFieldOption[] | null;
   consentText?: string | null;
+  /** Set on an email field to reject consumer webmail and disposable mailboxes. */
+  requireBusinessEmail?: boolean | null;
   validation?: FormFieldValidation | null;
   conditions?: FormFieldConditions | null;
   errorMessage?: string | null;

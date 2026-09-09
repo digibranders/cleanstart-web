@@ -132,3 +132,83 @@ describe('validateFields', () => {
     if (!result.ok) expect(result.issues).toHaveLength(2);
   });
 });
+
+const tel = (overrides: Partial<FormFieldDef> = {}): FormFieldDef => ({
+  name: 'phone',
+  type: 'tel',
+  label: 'Phone',
+  required: true,
+  ...overrides,
+});
+
+describe('validateFields — business email', () => {
+  it('accepts a free-mail address when the field does not require a business one', () => {
+    const result = validateFields([email()], { email: 'jane@gmail.com' });
+    expect(result.ok).toBe(true);
+  });
+
+  it('rejects free-mail when requireBusinessEmail is set', () => {
+    const result = validateFields([email({ requireBusinessEmail: true })], {
+      email: 'jane@gmail.com',
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.issues).toEqual([
+        { fieldName: 'email', message: 'Please use your company email address.' },
+      ]);
+    }
+  });
+
+  it('catches a long-tail free-mail domain the browser list does not carry', () => {
+    const result = validateFields([email({ requireBusinessEmail: true })], {
+      email: 'jane@emailfake.com',
+    });
+    expect(result.ok).toBe(false);
+  });
+
+  it('accepts a corporate address on a business-only field', () => {
+    const result = validateFields([email({ requireBusinessEmail: true })], {
+      email: 'jane@cleanstart.com',
+    });
+    expect(result.ok).toBe(true);
+  });
+
+  it('still rejects a malformed address either way', () => {
+    for (const requireBusinessEmail of [true, false]) {
+      const result = validateFields([email({ requireBusinessEmail })], { email: 'not-an-email' });
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.issues[0]?.message).toBe('Enter a valid email address.');
+      }
+    }
+  });
+});
+
+describe('validateFields — tel', () => {
+  it('accepts E.164', () => {
+    expect(validateFields([tel()], { phone: '+14155552671' }).ok).toBe(true);
+    expect(validateFields([tel()], { phone: '+919876543210' }).ok).toBe(true);
+  });
+
+  it.each(['4155552671', '+1 415 555 2671', '(415) 555-2671', '+1415'])(
+    'rejects %j, which is not E.164',
+    (phone) => {
+      const result = validateFields([tel()], { phone });
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.issues[0]?.message).toBe(
+          'Phone must be a phone number including its country code.',
+        );
+      }
+    },
+  );
+
+  it('rejects a missing required phone', () => {
+    expect(validateFields([tel()], {}).ok).toBe(false);
+  });
+
+  it('allows an optional phone to be absent or empty', () => {
+    expect(validateFields([tel({ required: false })], {}).ok).toBe(true);
+    expect(validateFields([tel({ required: false })], { phone: '' }).ok).toBe(true);
+  });
+});

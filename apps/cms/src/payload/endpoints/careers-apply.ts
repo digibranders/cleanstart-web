@@ -2,7 +2,10 @@ import * as Sentry from '@sentry/nextjs';
 import type { Endpoint } from 'payload';
 
 import { applicationFieldsSchema } from '../lib/careers/application-schema';
-import { buildHrApplicationEmail } from '../lib/careers/hr-email';
+import {
+  buildApplicantConfirmationEmail,
+  buildHrApplicationEmail,
+} from '../lib/careers/hr-email';
 import { formatJobLocation } from '../lib/careers/job-location';
 import { clientIpFromHeaders } from '../lib/client-ip';
 import { type BrevoSendResult, sendBrevoEmail } from '../lib/email/brevo';
@@ -10,22 +13,6 @@ import { DEFAULT_RATE_LIMITS, checkAndRecord } from '../lib/rate-limit';
 import { verifyTurnstileToken } from '../lib/turnstile';
 import { RESUME_LIMIT, checkUploadSize } from '../lib/upload-limits';
 
-/**
- * Human-readable submission timestamp for the HR email (Brevo templates can't
- * format dates). UTC with an explicit "UTC" suffix so it's unambiguous
- * regardless of where the server or recipient sits. e.g. "Jun 4, 2026, 12:56 PM UTC".
- */
-const formatSubmittedAt = (date: Date): string =>
-  new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-    timeZone: 'UTC',
-    timeZoneName: 'short',
-  }).format(date);
 
 const json = (data: unknown, init?: ResponseInit): Response =>
   new Response(JSON.stringify(data), {
@@ -330,12 +317,6 @@ export const careersApplyEndpoint: Endpoint = {
       attachments.push({ name: coverFile.name || 'cover-letter', content: coverBuffer.toString('base64') });
     }
     const hrEmail = process.env.CAREERS_HR_EMAIL;
-    // Use the Brevo dashboard template when BREVO_TEMPLATE_ID is a positive
-    // integer; otherwise fall back to the code-built HTML (hr-email.ts).
-    const templateIdRaw = process.env.BREVO_TEMPLATE_ID;
-    const templateIdParsed = templateIdRaw ? Number.parseInt(templateIdRaw, 10) : Number.NaN;
-    const templateId =
-      Number.isInteger(templateIdParsed) && templateIdParsed > 0 ? templateIdParsed : undefined;
 
     // Careers emails are sent from the careers sender identity (falls back to
     // the global BREVO_SENDER_* env when CAREERS_SENDER_* is unset).
@@ -344,32 +325,17 @@ export const careersApplyEndpoint: Endpoint = {
       ...(process.env.CAREERS_SENDER_NAME ? { senderName: process.env.CAREERS_SENDER_NAME } : {}),
     };
 
+    // One send path, built from lib/email/hr-email.ts.
+    //
+    // The BREVO_TEMPLATE_ID branch that used to sit here is gone. It won in
+    // production, so this form sent the old dashboard design while the rest of
+    // the site sent the shared layout, and it passed applicant input straight
+    // through as Brevo `params`. Brevo interpolates merge tags raw, so a cover
+    // letter containing markup reached HR's inbox unescaped. The builder
+    // escapes every value.
     let delivery: BrevoSendResult;
     if (!hrEmail) {
       delivery = { status: 'skipped', reason: 'no-hr-recipient' };
-    } else if (templateId != null) {
-      delivery = await sendBrevoEmail({
-        ...careersSender,
-        to: [{ email: hrEmail }],
-        replyTo: { email: data.email, name: fullName },
-        templateId,
-        params: {
-          jobTitle: job.title ?? data.jobSlug,
-          jobLocation: jobLocation ?? '',
-          fullName,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-          phone: data.phone ?? '',
-          location: data.location ?? '',
-          howDidYouHear: data.howDidYouHear ?? '',
-          linkedinUrl: data.linkedinUrl ?? '',
-          coverLetter: data.coverLetter ?? '',
-          coverLetterAttached: coverLetterFileId != null ? 'Yes' : '',
-          submittedAt: formatSubmittedAt(new Date()),
-        },
-        attachments,
-      });
     } else {
       const { subject, htmlContent } = buildHrApplicationEmail({
         jobTitle: job.title ?? data.jobSlug,
@@ -392,6 +358,27 @@ export const careersApplyEndpoint: Endpoint = {
         htmlContent,
         attachments,
       });
+    }
+
+    // Applicant acknowledgement. Non-fatal and deliberately after the HR
+    // notification: the internal copy is the one the business cannot lose, so
+    // it must not be delayed or risked by a second send.
+    const confirmation = buildApplicantConfirmationEmail({
+      firstName: data.firstName,
+      jobTitle: job.title ?? data.jobSlug,
+    });
+    const applicantDelivery = await sendBrevoEmail({
+      ...careersSender,
+      to: [{ email: data.email, name: fullName }],
+      ...(hrEmail ? { replyTo: { email: hrEmail } } : {}),
+      subject: confirmation.subject,
+      htmlContent: confirmation.htmlContent,
+    });
+    if (applicantDelivery.status === 'failed') {
+      req.payload.logger.warn(
+        { email: data.email, error: applicantDelivery.error },
+        'Applicant confirmation email failed',
+      );
     }
 
     // Roll back orphaned R2 uploads when the submission ultimately fails: the
