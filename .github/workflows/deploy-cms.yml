@@ -123,6 +123,7 @@ jobs:
           HUBSPOT_PORTAL_ID: ${{ vars.HUBSPOT_PORTAL_ID }}
           HUBSPOT_DEAL_PIPELINE: ${{ vars.HUBSPOT_DEAL_PIPELINE }}
           HUBSPOT_DEAL_STAGE: ${{ vars.HUBSPOT_DEAL_STAGE }}
+          HUBSPOT_FORWARD_ATTRIBUTION: ${{ vars.HUBSPOT_FORWARD_ATTRIBUTION }}
           DEAL_REG_SYNC_MAX_ATTEMPTS: ${{ vars.DEAL_REG_SYNC_MAX_ATTEMPTS }}
           DEAL_REG_RETENTION_DAYS: ${{ vars.DEAL_REG_RETENTION_DAYS }}
           DEAL_REG_NOTIFY_EMAILS: ${{ vars.DEAL_REG_NOTIFY_EMAILS }}
@@ -232,6 +233,10 @@ jobs:
             # the code's ?? default, so render the literal default here).
             echo "HUBSPOT_DEAL_PIPELINE=${HUBSPOT_DEAL_PIPELINE:-default}"
             echo "HUBSPOT_DEAL_STAGE=${HUBSPOT_DEAL_STAGE:-appointmentscheduled}"
+            # UTM/click-ID forwarding. Off unless the variable is exactly "true":
+            # HubSpot rejects a whole submission that carries a field the form
+            # does not define, so this stays gated on the form schema existing.
+            echo "HUBSPOT_FORWARD_ATTRIBUTION=${HUBSPOT_FORWARD_ATTRIBUTION:-false}"
             echo "DEAL_REG_SYNC_MAX_ATTEMPTS=${DEAL_REG_SYNC_MAX_ATTEMPTS:-8}"
             echo "DEAL_REG_RETENTION_DAYS=${DEAL_REG_RETENTION_DAYS:-365}"
             echo "DEAL_REG_NOTIFY_EMAILS=${DEAL_REG_NOTIFY_EMAILS}"
