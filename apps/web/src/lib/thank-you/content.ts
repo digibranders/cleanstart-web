@@ -6,7 +6,6 @@ export interface ThankYouCta {
 }
 
 export interface ThankYouContent {
-  eyebrow: string;
   headline: string;
   body: string;
   /** What we will do next, so the visitor knows whether to wait or act. */
@@ -34,7 +33,6 @@ export interface ThankYouContent {
  */
 export const THANK_YOU_CONTENT = {
   "book-a-demo": {
-    eyebrow: "Demo requested",
     headline: "Your demo request is in",
     body: "A solutions engineer is reading what you sent and will come back to you directly.",
     whatHappensNext:
@@ -45,7 +43,6 @@ export const THANK_YOU_CONTENT = {
     metaDescription: "Your CleanStart demo request has been received.",
   },
   contact: {
-    eyebrow: "Message sent",
     headline: "Thanks, we have your message",
     body: "It has gone to the team who can answer it.",
     whatHappensNext:
@@ -56,7 +53,6 @@ export const THANK_YOU_CONTENT = {
     metaDescription: "Your message to CleanStart has been received.",
   },
   "deal-registration": {
-    eyebrow: "Deal registered",
     headline: "Your deal registration is logged",
     body: "The partnerships team has it, along with the prospect details you entered.",
     whatHappensNext:
@@ -67,7 +63,6 @@ export const THANK_YOU_CONTENT = {
     metaDescription: "Your CleanStart deal registration has been received.",
   },
   "job-application": {
-    eyebrow: "Application received",
     headline: "Thanks for applying",
     body: "Your application and CV are with the hiring team, and every one is read by a person.",
     whatHappensNext:

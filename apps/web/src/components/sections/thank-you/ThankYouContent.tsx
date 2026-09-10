@@ -62,37 +62,17 @@ export function ThankYouContent({ content }: { content: Content }): React.ReactE
           }}
         >
           <HeroReveal y={40} duration={0.9} lcp>
-            <span
-              className="inline-flex items-center gap-2 rounded-full"
-              style={{
-                padding: "6px 14px",
-                background: "rgba(255, 255, 255, 0.10)",
-                boxShadow: "inset 0 0 0 1px rgba(255, 255, 255, 0.18)",
-                color: "#8CF5C4",
-                fontFamily: "var(--font-display), 'Manrope', sans-serif",
-                fontSize: "var(--fs-caption)",
-                fontWeight: 600,
-                letterSpacing: "0.02em",
-              }}
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden>
-                <path
-                  d="M20 6L9 17l-5-5"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              {content.eyebrow}
-            </span>
-
+            {/* No status pill above this heading. Nothing on the site renders a
+                success badge, and `eyebrow` here is a metadata convention, not a
+                visual one: pages pass it to buildPageMetadata so og.ts can print
+                a category onto the share card. A pill on the page read as a
+                generic form-submitted toast. The headline states the outcome. */}
             {/* tabIndex so the tracker can move focus here after a soft
                 navigation, which otherwise announces nothing. */}
             <h1
               id="thank-you-heading"
               tabIndex={-1}
-              className="mt-5 text-white outline-none"
+              className="text-white outline-none"
               style={{
                 fontFamily: "var(--font-display), sans-serif",
                 fontSize: "var(--text-hero-utility)",
