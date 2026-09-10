@@ -6,7 +6,6 @@ export interface ThankYouCta {
 }
 
 export interface ThankYouContent {
-  eyebrow: string;
   headline: string;
   body: string;
   /** What we will do next, so the visitor knows whether to wait or act. */
@@ -34,44 +33,40 @@ export interface ThankYouContent {
  */
 export const THANK_YOU_CONTENT = {
   "book-a-demo": {
-    eyebrow: "Demo requested",
     headline: "Your demo request is in",
-    body: "A solutions engineer will read what you sent and come back to you directly, usually within one business day.",
+    body: "One of our solutions specialists will reach out to arrange a time.",
     whatHappensNext:
-      "You will get an email from a real person, not an autoresponder sequence. If your timeline is tight, say so in the reply and we will work to it.",
-    primary: { label: "See how images are hardened", href: "/clean-images" },
-    secondary: { label: "Read the SBOM guide", href: "/resource-center" },
+      "Check your inbox for a confirmation. Reply to it with anything you want the demo to cover: your base images, the CVEs you are dealing with, or an audit you are preparing for.",
+    primary: { label: "See how our images are built", href: "/cleanstart-images" },
+    secondary: { label: "Browse the resource center", href: "/resource-center" },
     metaTitle: "Demo requested",
     metaDescription: "Your CleanStart demo request has been received.",
   },
   contact: {
-    eyebrow: "Message sent",
     headline: "Thanks, we have your message",
-    body: "It has gone to the team who can actually answer it, rather than a shared inbox nobody owns.",
+    body: "It has gone to the team who can answer it.",
     whatHappensNext:
-      "Expect a reply from a named person. If it turns out someone else is better placed to help, we will introduce you rather than forward you.",
-    primary: { label: "Browse the knowledge hub", href: "/knowledge-hub" },
-    secondary: { label: "See open roles", href: "/careers" },
+      "Check your inbox for a confirmation. If your message is urgent, reply to it and it reaches the team directly.",
+    primary: { label: "Browse the resource center", href: "/resource-center" },
+    secondary: { label: "Read the blog", href: "/blogs" },
     metaTitle: "Message sent",
     metaDescription: "Your message to CleanStart has been received.",
   },
   "deal-registration": {
-    eyebrow: "Deal registered",
     headline: "Your deal registration is logged",
     body: "The partnerships team has it, along with the prospect details you entered.",
     whatHappensNext:
-      "We will confirm registration and come back on deal protection within one business day. Nothing is contacted on your prospect's side until you tell us to.",
+      "Check your inbox for a confirmation. The partner team reviews the registration and confirms next steps with you.",
     primary: { label: "Partner resources", href: "/partners" },
-    secondary: { label: "Compare against alternatives", href: "/compare" },
+    secondary: { label: "Browse the resource center", href: "/resource-center" },
     metaTitle: "Deal registered",
     metaDescription: "Your CleanStart deal registration has been received.",
   },
   "job-application": {
-    eyebrow: "Application received",
     headline: "Thanks for applying",
-    body: "Your application and CV are with the hiring team. Every one is read by a person.",
+    body: "Your application and CV are with the hiring team.",
     whatHappensNext:
-      "If there is a fit you will hear from us with next steps. If there is not, you will still hear back rather than being left wondering.",
+      "Every application is reviewed. If your experience lines up with what the role needs, we will be in touch to arrange a first conversation.",
     primary: { label: "See all open roles", href: "/careers" },
     secondary: { label: "How we work", href: "/teams" },
     metaTitle: "Application received",

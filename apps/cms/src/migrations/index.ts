@@ -57,6 +57,7 @@ import * as migration_20260731_120000_add_legal_role from './20260731_120000_add
 import * as migration_20260821_120000_faq_answer_richtext from './20260821_120000_faq_answer_richtext';
 import * as migration_20260909_120000_add_form_tel_and_business_email from './20260909_120000_add_form_tel_and_business_email';
 import * as migration_20260909_180000_add_submission_attribution from './20260909_180000_add_submission_attribution';
+import * as migration_20260910_060000_add_missing_job_task_slugs from './20260910_060000_add_missing_job_task_slugs';
 
 export const migrations = [
   {
@@ -328,5 +329,10 @@ export const migrations = [
     up: migration_20260909_180000_add_submission_attribution.up,
     down: migration_20260909_180000_add_submission_attribution.down,
     name: '20260909_180000_add_submission_attribution',
+  },
+  {
+    up: migration_20260910_060000_add_missing_job_task_slugs.up,
+    down: migration_20260910_060000_add_missing_job_task_slugs.down,
+    name: '20260910_060000_add_missing_job_task_slugs',
   },
 ];

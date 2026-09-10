@@ -6335,3 +6335,34 @@ body {
   outline: 2px solid #3960f9;
   outline-offset: 2px;
 }
+
+/* Secondary CTA on a light surface (thank-you card).
+   `.cs-link-cta` cannot be reused here: it is white with a #33BAEC hover, both
+   built for the dark bands, so on white it renders invisible and its hover
+   fails contrast. #3960F9 measures 4.8:1 on white. */
+.cs-thank-you-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #3960F9;
+  text-decoration: none;
+  padding: 4px 0;
+  transition: color 200ms ease;
+}
+
+.cs-thank-you-secondary:hover {
+  color: #2748D6;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cs-thank-you-secondary svg {
+  transition: transform 200ms ease;
+}
+
+.cs-thank-you-secondary:hover svg {
+  transform: translateX(3px);
+}
