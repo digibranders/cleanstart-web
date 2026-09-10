@@ -45,7 +45,15 @@ export function ThankYouContent({ content }: { content: Content }): React.ReactE
           loading="lazy"
           decoding="async"
           className="pointer-events-none select-none absolute inset-x-0 top-0 w-full"
-          style={{ height: "100%", objectFit: "cover", opacity: 0.5 }}
+          // The asset is preserveAspectRatio="none", so it fills whatever box it
+          // is given. Stretching a 730x708 source across a short wide band drew
+          // the vertical lines about three times thicker than the horizontal
+          // ones. Holding the source ratio keeps the cells square and the lines
+          // hairline; the band's overflow-hidden crops the excess height.
+          // minHeight only binds on narrow viewports, where the band can grow
+          // taller than the ratio allows and the grid would otherwise stop
+          // short of its foot. Worst measured case needs 3% of stretch.
+          style={{ aspectRatio: "730 / 708", height: "auto", minHeight: "100%", opacity: 0.35 }}
         />
 
         <div
