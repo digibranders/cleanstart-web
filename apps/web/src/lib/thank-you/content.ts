@@ -34,9 +34,9 @@ export interface ThankYouContent {
 export const THANK_YOU_CONTENT = {
   "book-a-demo": {
     headline: "Your demo request is in",
-    body: "One of our solutions specialists will read what you sent and reach out to arrange a time.",
+    body: "One of our solutions specialists will reach out to arrange a time.",
     whatHappensNext:
-      "A confirmation is on its way to your inbox, subject 'Your CleanStart demo request'. Reply to it with what you want the demo to cover: your current base images, the CVE burden you are carrying, or the audit you are preparing for.",
+      "Check your inbox for a confirmation. Reply to it with anything you want the demo to cover: your base images, the CVEs you are dealing with, or an audit you are preparing for.",
     primary: { label: "See how our images are built", href: "/cleanstart-images" },
     secondary: { label: "Browse the resource center", href: "/resource-center" },
     metaTitle: "Demo requested",
@@ -46,7 +46,7 @@ export const THANK_YOU_CONTENT = {
     headline: "Thanks, we have your message",
     body: "It has gone to the team who can answer it.",
     whatHappensNext:
-      "A confirmation is on its way to your inbox, subject 'We have received your message'. If what you sent is urgent, reply to it and your message reaches the team directly.",
+      "Check your inbox for a confirmation. If your message is urgent, reply to it and it reaches the team directly.",
     primary: { label: "Browse the resource center", href: "/resource-center" },
     secondary: { label: "Read the blog", href: "/blogs" },
     metaTitle: "Message sent",
@@ -56,7 +56,7 @@ export const THANK_YOU_CONTENT = {
     headline: "Your deal registration is logged",
     body: "The partnerships team has it, along with the prospect details you entered.",
     whatHappensNext:
-      "A confirmation is on its way to your inbox, subject 'We have your deal registration'. The partner team reviews the registration and confirms next steps with you. Your prospect is not contacted until you say so.",
+      "Check your inbox for a confirmation. The partner team reviews the registration and confirms next steps with you.",
     primary: { label: "Partner resources", href: "/partners" },
     secondary: { label: "Browse the resource center", href: "/resource-center" },
     metaTitle: "Deal registered",
@@ -66,7 +66,7 @@ export const THANK_YOU_CONTENT = {
     headline: "Thanks for applying",
     body: "Your application and CV are with the hiring team.",
     whatHappensNext:
-      "Every application is read, and if your experience lines up with the role we will be in touch to arrange a first conversation. The confirmation in your inbox comes from an unmonitored address, so use the contact form if you need to reach us.",
+      "Every application is reviewed. If your experience lines up with what the role needs, we will be in touch to arrange a first conversation.",
     primary: { label: "See all open roles", href: "/careers" },
     secondary: { label: "How we work", href: "/teams" },
     metaTitle: "Application received",
