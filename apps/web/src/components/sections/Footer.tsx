@@ -24,6 +24,7 @@ const COL_PRODUCT: FooterLink[] = [
   { label: "Clean Images", href: "/cleanstart-images" },
   { label: "Clean Libraries", href: "/clean-libraries" },
   { label: "CleanSight", href: "/cleansight" },
+  { label: "Tricorder", href: "/tricorder" },
   { label: "Pricing", href: "/pricing" },
   // Labelled by category, not by competitor: when /compare becomes a hub this
   // link repoints at it and nothing else changes.

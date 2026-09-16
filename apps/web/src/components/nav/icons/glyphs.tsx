@@ -31,6 +31,14 @@ export const glyphs: Record<string, ReactNode> = {
       <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
     </>
   ),
+  // Tricorder: a scanning lens resolving to a verdict check.
+  lens: (
+    <>
+      <circle cx="12" cy="12" r="7" />
+      <path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5" />
+      <path d="m9.2 12 1.9 1.9 3.7-3.9" />
+    </>
+  ),
   // Half-dial with a needle: the Impact Estimator's own radial gauge, reduced.
   gauge: (
     <>
