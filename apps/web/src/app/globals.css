@@ -6466,3 +6466,29 @@ body {
     animation: none !important;
   }
 }
+
+/* Tricorder page — the "From Signals to Verdicts" rail (TricorderPipeline.tsx).
+   A highlight travels the hairline beneath the stage row. Lives here rather
+   than in an injected <style>, which put raw CSS into the page's text content. */
+@keyframes cs-tri-rail {
+  from {
+    background-position: -40% 0;
+  }
+  to {
+    background-position: 140% 0;
+  }
+}
+.cs-tri-rail-pulse {
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.9) 12%,
+      transparent 24%);
+  background-size: 38% 100%;
+  animation: cs-tri-rail 4.2s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-tri-rail-pulse {
+    animation: none;
+    opacity: 0;
+  }
+}

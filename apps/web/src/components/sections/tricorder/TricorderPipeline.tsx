@@ -1,3 +1,5 @@
+import { Fragment } from "react";
+
 import { Container, Section } from "@/components/layout";
 import { Reveal, RevealItem, RevealStagger } from "@/components/ui/Reveal";
 import { GlassIcon } from "@/components/sections/_shared/GlassIcon";
@@ -5,10 +7,11 @@ import { INK, INK_MUTED, SIGNAL, VERDICT } from "./tricorder-palette";
 
 /**
  * "From Signals to Verdicts." — the four analysis stages as a left-to-right
- * rail (Analyze → Compare → Correlate → Enrich) that terminates in a dark
- * verdict terminal showing the three possible outcomes. A pulse travels the
- * rail under the stages so the row reads as a pipeline, not a list of tiles.
- * Light section. Stages stack 2×2 below lg and single-column below sm.
+ * rail — Analyze → Compare → Correlate → Enrich → Verdict, the document's own
+ * sequence, arrows included — terminating in a dark verdict terminal carrying
+ * the three outcomes. A pulse travels the rail under the stages so the row
+ * reads as a pipeline, not a list of tiles. Light section; the stages stack
+ * 2×2 below lg and single-column below sm, where the arrow columns collapse.
  */
 
 type StageKey = "analyze" | "compare" | "correlate" | "enrich";
@@ -33,12 +36,6 @@ const OUTCOMES = [
   { label: "Uncertain", color: VERDICT.uncertain },
   { label: "Pass", color: VERDICT.pass },
 ] as const;
-
-const RAIL_CSS = `
-@keyframes cs-tri-rail{from{background-position:-40% 0}to{background-position:140% 0}}
-.cs-tri-rail-pulse{background:linear-gradient(90deg,transparent,rgba(255,255,255,0.9) 12%,transparent 24%);background-size:38% 100%;animation:cs-tri-rail 4.2s linear infinite}
-@media (prefers-reduced-motion:reduce){.cs-tri-rail-pulse{animation:none;opacity:0}}
-`;
 
 function StageGlyph({ stage, size }: { stage: StageKey; size: number }): React.ReactElement {
   const common = {
@@ -219,8 +216,6 @@ export function TricorderPipeline(): React.ReactElement {
           "radial-gradient(120% 90% at 85% 10%, rgba(124,92,247,0.07) 0%, transparent 55%), radial-gradient(110% 80% at 8% 90%, rgba(30,111,232,0.07) 0%, transparent 50%), #ffffff",
       }}
     >
-      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: static keyframes string, no user input */}
-      <style dangerouslySetInnerHTML={{ __html: RAIL_CSS }} />
       <Container className="relative">
         <Reveal header>
           <div className="mx-auto max-w-[800px] text-center">
@@ -260,13 +255,19 @@ export function TricorderPipeline(): React.ReactElement {
             <div className="cs-tri-rail-pulse absolute inset-0" />
           </div>
 
-          <RevealStagger className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))_22px_minmax(0,1.05fr)] lg:gap-4">
+          {/* The document sets the four stages out as `Analyze → Compare →
+              Correlate → Enrich → Verdict`, so every hop carries its arrow, not
+              just the last one. The arrow columns collapse below lg, where the
+              cards stack and the flow is top-to-bottom anyway. */}
+          <RevealStagger className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr)_22px)_minmax(0,1.05fr)] lg:gap-4">
             {STAGES.map((s) => (
-              <RevealItem key={s.key} className="h-full">
-                <StageCard stage={s} />
-              </RevealItem>
+              <Fragment key={s.key}>
+                <RevealItem className="h-full">
+                  <StageCard stage={s} />
+                </RevealItem>
+                <Connector />
+              </Fragment>
             ))}
-            <Connector />
             <RevealItem className="h-full sm:col-span-2 lg:col-span-1">
               <VerdictTerminal />
             </RevealItem>

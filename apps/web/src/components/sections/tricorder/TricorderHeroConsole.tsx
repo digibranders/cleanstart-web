@@ -21,11 +21,16 @@ interface SignalRow {
   level: number;
 }
 
+/**
+ * The four stage names are the copy doc's own — Analyze, Compare, Correlate,
+ * Enrich — so the hero shows the same pipeline the page explains further down,
+ * in the same words and the same accent colours.
+ */
 const ROWS: SignalRow[] = [
-  { key: "behavior", label: "Behavior", finding: "Opens outbound socket at install", accent: SIGNAL.behavior, level: 0.92 },
-  { key: "history", label: "History", finding: "Maintainer changed 3 days ago", accent: SIGNAL.history, level: 0.74 },
-  { key: "correlate", label: "Correlation", finding: "Shares infrastructure with 2 flagged packages", accent: SIGNAL.relationships, level: 0.83 },
-  { key: "enrich", label: "Enrichment", finding: "No CVE on record", accent: SIGNAL.intel, level: 0.18 },
+  { key: "analyze", label: "Analyze", finding: "Opens outbound socket at install", accent: SIGNAL.behavior, level: 0.92 },
+  { key: "compare", label: "Compare", finding: "Install script changed in 2.5.0", accent: SIGNAL.history, level: 0.74 },
+  { key: "correlate", label: "Correlate", finding: "Shares infrastructure with 2 flagged packages", accent: SIGNAL.relationships, level: 0.83 },
+  { key: "enrich", label: "Enrich", finding: "No CVE on record", accent: SIGNAL.intel, level: 0.18 },
 ];
 
 const VERSIONS = ["2.4.0", "2.4.1", "2.5.0"] as const;
@@ -259,7 +264,7 @@ export function TricorderHeroConsole(): React.ReactElement {
               className="mt-1 text-white/70"
               style={{ fontFamily: MONO, fontSize: "var(--fs-badge)" }}
             >
-              3 of 4 signals · evidence attached
+              3 of 4 stages flagged · evidence attached
             </p>
           </div>
           <span

@@ -131,6 +131,8 @@ export function TricorderHero(): React.ReactElement {
             </HeroReveal>
 
             <HeroReveal y={30} delay={0.35} duration={0.8}>
+              {/* "Talk to an Expert" is the only call to action the copy doc
+                  specifies, so it is the only one the page carries. */}
               <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
                 <Link
                   href="/contact-us"
@@ -143,33 +145,6 @@ export function TricorderHero(): React.ReactElement {
                   }
                 >
                   <span>Talk to an Expert</span>
-                </Link>
-                <Link
-                  href="#one-intelligence-layer"
-                  className="cs-btn-ghost"
-                  style={
-                    {
-                      "--cs-btn-px": "18px",
-                      "--cs-btn-fs": "15px",
-                    } as React.CSSProperties
-                  }
-                >
-                  <span>How It Powers CleanStart</span>
-                  <svg
-                    className="cs-cta-arrow"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden
-                  >
-                    <path d="M12 5v14" />
-                    <path d="m6 13 6 6 6-6" />
-                  </svg>
                 </Link>
               </div>
             </HeroReveal>
