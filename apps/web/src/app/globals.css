@@ -6430,3 +6430,39 @@ body {
     animation: none !important;
   }
 }
+
+/* Tricorder page — the intelligence-layer floor (TricorderSubstrate.tsx). A
+   scan band crosses the perspective plane; the emblem set into it breathes.
+   Transform / opacity only; both off under reduced-motion. */
+@keyframes cs-tri-scan {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(520%);
+  }
+}
+@keyframes cs-tri-emblem {
+  0%,
+  100% {
+    transform: translateY(0);
+    filter: drop-shadow(0 12px 22px rgba(154, 81, 255, 0.35));
+  }
+  50% {
+    transform: translateY(-4px);
+    filter: drop-shadow(0 20px 30px rgba(154, 81, 255, 0.55));
+  }
+}
+.cs-tri-scan {
+  will-change: transform;
+  animation: cs-tri-scan 7s linear infinite;
+}
+.cs-tri-emblem {
+  animation: cs-tri-emblem 5.5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-tri-scan,
+  .cs-tri-emblem {
+    animation: none !important;
+  }
+}
