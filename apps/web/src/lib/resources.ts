@@ -86,7 +86,12 @@ export async function getResources({
     // resource's full Lexical `body` across the whole (limit=1000) card set,
     // blowing past Next's 2 MB data-cache ceiling so the listing was never
     // cached and re-hit the CMS on every render. The card reads only these
-    // fields; `asset` is a direct upload, fully resolved at depth=1.
+    // fields.
+    //
+    // `asset` is deliberately absent. No card reads it, and selecting it
+    // serialised every resource's file URL into the client payload, which
+    // published the direct link to gated downloads on every page that lists
+    // resources.
     depth: "1",
     limit: String(limit),
     page: String(page),
@@ -102,7 +107,6 @@ export async function getResources({
     "updatedAt",
     "gated",
     "ctaButtonText",
-    "asset",
     "seo",
   ]) {
     params.set(`select[${field}]`, "true");

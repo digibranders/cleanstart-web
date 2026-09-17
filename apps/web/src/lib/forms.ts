@@ -1,6 +1,7 @@
-// Forms data layer — mirrors lib/resources.ts.
-
-import { fetchCMS } from "./cms-fetch";
+// Form definition types, as the CMS `forms` collection returns them.
+//
+// The public site no longer fetches a definition: that collection is readable
+// only by admins and editors, so every public form is coded in the web app.
 
 export type FormFieldType =
   | "text"
@@ -65,12 +66,4 @@ export interface Form {
   submitLabel?: string | null;
   postSubmit?: FormPostSubmit | null;
   schemaVersion: number;
-}
-
-export async function getFormById(id: string | number): Promise<Form | null> {
-  try {
-    return await fetchCMS<Form>(`/api/forms/${id}?depth=1`);
-  } catch {
-    return null;
-  }
 }

@@ -26,7 +26,12 @@ export interface LeadConsent {
 export interface SubmitLeadInput {
   /** Stable slug of the CMS `forms` row (e.g. "book-a-demo"). */
   formSlug: string;
-  fields: Record<string, string>;
+  /**
+   * Flat map keyed by the CMS field name. Strings for ordinary inputs; a
+   * boolean for a `consent`-type field, which the API validates as
+   * `=== true` and the HubSpot relay leaves out of its field list.
+   */
+  fields: Record<string, string | boolean>;
   source?: string;
   consent?: LeadConsent;
   /** Cloudflare Turnstile token from the widget, when the form renders one. */
@@ -39,6 +44,18 @@ export interface SubmitLeadInput {
    * first-touch / click-ID / device `attribution` group.
    */
   attribution?: AttributionSubmission;
+  /**
+   * Set on a gated resource download. When the resource's gate form is the
+   * form being submitted, the API answers with a signed download link.
+   */
+  context?: { resourceId: string | number };
+}
+
+/** A signed, short-lived download link for a gated resource. */
+export interface LeadDownload {
+  /** Always absolute, pointing at the CMS. */
+  url: string;
+  expiresAt: number;
 }
 
 /** One field-level rejection from the API's server-side re-validation. */
@@ -57,7 +74,16 @@ export interface SubmitLeadResult {
    * inputs and render each message inline rather than in a generic banner.
    */
   issues?: LeadFieldIssue[];
+  /** Present when the submission unlocked a gated resource. */
+  download?: LeadDownload;
 }
+
+/**
+ * The API returns the download as a path on the CMS. Left relative, the
+ * browser would resolve it against the marketing site, which has no such route.
+ */
+const absoluteCmsUrl = (url: string): string =>
+  /^https?:\/\//u.test(url) ? url : `${CMS_URL}${url}`;
 
 export async function submitLead(input: SubmitLeadInput): Promise<SubmitLeadResult> {
   try {
@@ -76,6 +102,7 @@ export async function submitLead(input: SubmitLeadInput): Promise<SubmitLeadResu
         ...(input.attribution?.attribution
           ? { attribution: input.attribution.attribution }
           : {}),
+        ...(input.context ? { context: input.context } : {}),
       }),
     });
     const json = (await res.json().catch(() => null)) as SubmitLeadResult | null;
@@ -86,7 +113,18 @@ export async function submitLead(input: SubmitLeadInput): Promise<SubmitLeadResu
         ...(json?.issues ? { issues: json.issues } : {}),
       };
     }
-    return json.duplicate != null ? { ok: true, duplicate: json.duplicate } : { ok: true };
+    return {
+      ok: true,
+      ...(json.duplicate != null ? { duplicate: json.duplicate } : {}),
+      ...(json.download
+        ? {
+            download: {
+              url: absoluteCmsUrl(json.download.url),
+              expiresAt: json.download.expiresAt,
+            },
+          }
+        : {}),
+    };
   } catch {
     return { ok: false, error: "network_error" };
   }

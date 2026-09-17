@@ -1,27 +1,23 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { Form } from "@/lib/forms";
-import { FormRenderer } from "@/components/forms/FormRenderer";
+import { GatedDownloadForm } from "@/components/resource/GatedDownloadForm";
 import { trackEvent } from "@/lib/analytics/track";
+import type { LeadDownload } from "@/lib/leads/submitLead";
 
 interface ResourceGateModalProps {
   open: boolean;
   onClose: () => void;
-  form: Form;
   resourceId: string | number;
   resourceTitle: string;
-  sourceUrl?: string;
   onUnlocked: (downloadUrl: string) => void;
 }
 
 export function ResourceGateModal({
   open,
   onClose,
-  form,
   resourceId,
   resourceTitle,
-  sourceUrl,
   onUnlocked,
 }: ResourceGateModalProps): React.ReactElement | null {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
@@ -54,21 +50,16 @@ export function ResourceGateModal({
     return () => document.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  // The download URL is already in the submit response, so the moment the form
-  // succeeds the download is "ready". The submit button stays busy right up to
-  // here (FormRenderer clears its busy state only after onSuccess), so we skip
-  // any "download ready" stage: fire the download and close the modal at once.
-  const handleSuccess = (result: {
-    download?: { url: string; expiresAt: number };
-  }): void => {
-    if (result.download?.url) {
-      trackEvent("file_download", {
-        resource_title: resourceTitle,
-        gated: true,
-      });
-      onUnlocked(result.download.url);
-      window.location.assign(result.download.url);
-    }
+  // The signed link arrives with the submit response, so the download is ready
+  // the moment the form succeeds: start it and close in one step. The submit
+  // button stays busy until the modal unmounts, so it cannot fire twice.
+  const handleUnlocked = (download: LeadDownload): void => {
+    trackEvent("file_download", {
+      resource_title: resourceTitle,
+      gated: true,
+    });
+    onUnlocked(download.url);
+    window.location.assign(download.url);
     onClose();
   };
 
@@ -138,11 +129,14 @@ export function ResourceGateModal({
             <div className="min-w-0">
               <h2
                 id="rgm-title"
-                className="font-display font-semibold text-[#111] truncate"
+                // Wraps rather than truncating: resource titles are routinely
+                // long enough that an ellipsis cut them mid-word.
+                className="font-display font-semibold text-[#111]"
                 style={{
                   fontSize: "var(--fs-h3)",
                   lineHeight: 1.2,
                   letterSpacing: "-0.02em",
+                  textWrap: "balance",
                 }}
               >
                 {`Unlock “${resourceTitle}”`}
@@ -185,13 +179,9 @@ export function ResourceGateModal({
                 className="text-sm text-[#555] mb-5"
                 style={{ lineHeight: 1.5 }}
               >
-                Fill in the form below and we'll unlock the download instantly.
+                Enter your details and the download starts straight away.
               </p>
-              <FormRenderer
-                form={form}
-                context={sourceUrl ? { resourceId, sourceUrl } : { resourceId }}
-                onSuccess={handleSuccess}
-              />
+              <GatedDownloadForm resourceId={resourceId} onUnlocked={handleUnlocked} />
             </>
           ) : null}
         </div>

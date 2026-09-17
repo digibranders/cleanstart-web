@@ -13,7 +13,6 @@ import {
   resourceTypeLabel,
 } from "@/lib/resources";
 import { highlightLexical } from "@/lib/highlightLexical";
-import { getFormById, type Form } from "@/lib/forms";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 import { effectivePublishedAt } from "@/lib/published-date";
@@ -55,7 +54,10 @@ export async function generateMetadata({
       noindex: true,
     });
   }
-  const assetAbsolute = mediaUrl(resource.asset?.url);
+  // The share image is the hero image. It used to fall back to `asset`, which
+  // is the downloadable file: a PDF is not an image, so social cards broke, and
+  // on a gated resource it published the direct link to the file.
+  const heroAbsolute = mediaUrl(resource.heroImage?.url);
   const seo = resolveCmsSeo(resource.seo, { absolutize: mediaUrl });
   return buildPageMetadata({
     title: seo.title ?? resource.title,
@@ -71,13 +73,13 @@ export async function generateMetadata({
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
     ...(seo.image
       ? { image: seo.image }
-      : assetAbsolute && resource.asset
+      : heroAbsolute && resource.heroImage
         ? {
             image: {
-              url: assetAbsolute,
-              width: resource.asset.width,
-              height: resource.asset.height,
-              alt: resource.asset.alt ?? resource.title,
+              url: heroAbsolute,
+              width: resource.heroImage.width,
+              height: resource.heroImage.height,
+              alt: resource.heroImage.alt ?? resource.title,
             },
           }
         : {}),
@@ -96,21 +98,10 @@ export async function renderResourceDetail({
     : await getResourceBySlug(slug).catch(() => null);
   if (!resource) notFound();
 
-  const assetAbsolute = mediaUrl(resource.asset?.url);
+  const heroAbsolute = mediaUrl(resource.heroImage?.url);
 
   const highlightedBody = await highlightLexical(resource.body ?? null);
   const resourceWithHighlighted = { ...resource, body: highlightedBody ?? null };
-
-  let gateForm: Form | null = null;
-  if (resource.gated === true && resource.gateForm != null) {
-    const gateFormId =
-      typeof resource.gateForm === "object"
-        ? resource.gateForm.id
-        : resource.gateForm;
-    if (gateFormId != null) {
-      gateForm = await getFormById(gateFormId);
-    }
-  }
 
   return (
     <>
@@ -124,7 +115,7 @@ export async function renderResourceDetail({
               description: resource.summary ?? undefined,
               path: `/resources/${resource.slug}`,
               publishedAt: effectivePublishedAt(resource) ?? resource.publishedAt ?? undefined,
-              imageUrl: assetAbsolute,
+              imageUrl: heroAbsolute,
               type: resourceTypeLabel(resource.type),
             }),
           ],
@@ -139,7 +130,7 @@ export async function renderResourceDetail({
             "linear-gradient(180deg, #151021 0%, #10123E 22%, #131E8F 48%, #471EC0 72%, #471FC3 100%)",
         }}
       >
-        <ResourceDetailHero resource={resource} gateForm={gateForm} />
+        <ResourceDetailHero resource={resource} />
 
         <FadeUp>
           <ResourceDetailContent resource={resourceWithHighlighted} />
