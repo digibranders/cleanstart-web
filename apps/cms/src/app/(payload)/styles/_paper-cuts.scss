@@ -159,6 +159,32 @@
   }
 }
 
+// ─── Lead sync chips (`LeadSyncCell`) ─────────────────────────────
+.sync-cell {
+  @extend %cs-chip-sm;
+  font-family: inherit;
+  white-space: nowrap;
+  cursor: help;
+
+  &[data-state='ok'] {
+    color: var(--color-success-500, #00c46a);
+    background: rgba(0, 196, 106, 0.14);
+    border-color: rgba(0, 196, 106, 0.28);
+  }
+
+  &[data-state='pending'] {
+    color: var(--theme-text-soft);
+    background: var(--theme-elevation-150);
+    border-color: var(--theme-elevation-200);
+  }
+
+  &[data-state='failed'] {
+    color: var(--color-error-500);
+    background: rgba(255, 77, 79, 0.12);
+    border-color: rgba(255, 77, 79, 0.3);
+  }
+}
+
 // ─── Integrations health badge — traffic-light chip ───────────────
 //
 // `HealthBadge.tsx` renders `<span class="cs-integrations-health

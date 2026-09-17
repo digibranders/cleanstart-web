@@ -86,6 +86,7 @@ import { EmailField as EmailField_7dd923731832c5c33b25cd573216c1bc } from '@/pay
 import { LegacyBioViewer as LegacyBioViewer_879b4bd183ddbb79ae3f346d2661eacc } from '@/payload/admin/components/LegacyBioViewer.tsx'
 import { AuthorCredibilityField as AuthorCredibilityField_0547251fb6ced865a9066cb05f501acb } from '@/payload/admin/components/AuthorCredibilityField.tsx'
 import { LeadContactCell as LeadContactCell_7859b912766a925a1159bc4804dbdd5b } from '@/payload/admin/components/LeadContactCell.tsx'
+import { LeadSyncCell as LeadSyncCell_7ea3c85275f13edbd48d8fecc2b96e98 } from '@/payload/admin/components/LeadSyncCell.tsx'
 import { LeadsImmutableBanner as LeadsImmutableBanner_c4273dccee2521e4317461376b79e241 } from '@/payload/admin/components/LeadsImmutableBanner.tsx'
 import { LeadsCsvTruncationBanner as LeadsCsvTruncationBanner_e22b2ed864c6d0e2876f5238fb489adb } from '@/payload/admin/components/LeadsCsvTruncationBanner.tsx'
 import { DsarActionsPanel as DsarActionsPanel_270b8398021fd191ac147b0b8d59049c } from '@/payload/admin/components/DsarActionsPanel.tsx'
@@ -239,6 +240,7 @@ export const importMap = {
   "@/payload/admin/components/LegacyBioViewer.tsx#LegacyBioViewer": LegacyBioViewer_879b4bd183ddbb79ae3f346d2661eacc,
   "@/payload/admin/components/AuthorCredibilityField.tsx#AuthorCredibilityField": AuthorCredibilityField_0547251fb6ced865a9066cb05f501acb,
   "@/payload/admin/components/LeadContactCell.tsx#LeadContactCell": LeadContactCell_7859b912766a925a1159bc4804dbdd5b,
+  "@/payload/admin/components/LeadSyncCell.tsx#LeadSyncCell": LeadSyncCell_7ea3c85275f13edbd48d8fecc2b96e98,
   "@/payload/admin/components/LeadsImmutableBanner.tsx#LeadsImmutableBanner": LeadsImmutableBanner_c4273dccee2521e4317461376b79e241,
   "@/payload/admin/components/LeadsCsvTruncationBanner.tsx#LeadsCsvTruncationBanner": LeadsCsvTruncationBanner_e22b2ed864c6d0e2876f5238fb489adb,
   "@/payload/admin/components/DsarActionsPanel.tsx#DsarActionsPanel": DsarActionsPanel_270b8398021fd191ac147b0b8d59049c,
