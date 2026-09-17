@@ -44,8 +44,8 @@ import { getPageGraph } from "@/lib/seo/compose-page";
  *
  * Launched: the noindex,nofollow pair is dropped and the path is listed in the
  * sitemap's STATIC_ROUTES. The breadcrumb, JsonLdGraph and pageRegistry row
- * were already in place. Its sibling /industries/software-applications stays
- * noindex,nofollow and unlisted, pending sign-off on its copy.
+ * were already in place. Its sibling /industries/software-applications has
+ * launched the same way: indexable, sitemap-listed and nav-linked.
  */
 export const metadata = buildPageMetadata({
   title: "Container Security for Financial Services | CleanStart",
