@@ -177,12 +177,14 @@ const tint = (accent: string, pct: number): string => `color-mix(in srgb, ${acce
 /** Accent lifted toward white, for glyphs and labels that must read on navy. */
 const lift = (accent: string, pct: number): string => `color-mix(in srgb, ${accent} ${pct}%, #ffffff)`;
 
-function GroupHeader({ accent, label, glyph }: { accent: string; label: string; glyph: GlyphKey }): React.ReactElement {
+function GroupHeader({ accent, label }: { accent: string; label: string }): React.ReactElement {
   return (
-    <div className="flex items-center gap-3">
-      <GlassIcon accent={accent} size={38}>
-        <Glyph name={glyph} size={19} />
-      </GlassIcon>
+    <div className="flex items-center gap-2.5">
+      <span
+        aria-hidden
+        className="block h-[7px] w-[7px] shrink-0 rounded-full"
+        style={{ background: accent, boxShadow: `0 0 10px ${accent}` }}
+      />
       <span
         className="font-display"
         style={{
@@ -558,7 +560,7 @@ function SceneDesktop(): React.ReactElement {
               className="absolute flex flex-col"
               style={{ left: p.x, top: PANEL_Y, width: p.w, height: PANEL_H, padding: "22px 24px 26px" }}
             >
-              <GroupHeader accent={g.accent} label={g.label} glyph={g.glyph} />
+              <GroupHeader accent={g.accent} label={g.label} />
               <div className="flex flex-1 items-center">
                 <GroupContent groupKey={g.key} accent={g.accent} />
               </div>
@@ -620,7 +622,7 @@ function SceneMobile(): React.ReactElement {
       {GROUPS.map((g) => (
         <div key={g.key} className="flex w-full max-w-[460px] flex-col items-center">
           <GroupPanel accent={g.accent} className="relative flex w-full flex-col gap-6 p-4 sm:p-5">
-            <GroupHeader accent={g.accent} label={g.label} glyph={g.glyph} />
+            <GroupHeader accent={g.accent} label={g.label} />
             <StackedGroupContent groupKey={g.key} accent={g.accent} />
           </GroupPanel>
           <Drop accent={g.accent} />
