@@ -18,6 +18,17 @@ describe("trackEvent", () => {
     });
   });
 
+  it("emits newsletter_signup with the form name", () => {
+    const gtag = vi.fn();
+    vi.stubGlobal("window", { gtag });
+
+    trackEvent("newsletter_signup", { form_name: "newsletter" });
+
+    expect(gtag).toHaveBeenCalledWith("event", "newsletter_signup", {
+      form_name: "newsletter",
+    });
+  });
+
   it("emits with no params when none are given", () => {
     const gtag = vi.fn();
     vi.stubGlobal("window", { gtag });

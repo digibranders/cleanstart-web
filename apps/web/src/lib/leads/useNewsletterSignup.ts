@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
+
+import { trackEvent } from "@/lib/analytics/track";
 import { submitLead } from "./submitLead";
 
 const NEWSLETTER_CONSENT_TEXT =
@@ -50,6 +52,7 @@ export function useNewsletterSignup(): NewsletterSignup {
     inFlightRef.current = false;
     setSubmitting(false);
     if (result.ok) {
+      trackEvent("newsletter_signup", { form_name: "newsletter" });
       setSubmitted(true);
       if (emailRef.current) emailRef.current.value = "";
       if (consentRef.current) consentRef.current.checked = false;
