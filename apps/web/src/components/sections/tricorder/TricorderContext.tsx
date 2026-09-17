@@ -17,14 +17,13 @@ import { SIGNAL } from "./tricorder-palette";
  * page and this section is dark:
  *  - the group panels become glass on the section gradient, the way the Clean
  *    Libraries scenes are built, so the page keeps its light/dark alternation;
- *  - the doc's flat outline-in-a-circle icons become `GlassIcon` gem tiles,
- *    which is the icon vocabulary the rest of the site uses;
+ *  - the doc's flat outline-in-a-circle icons become accent tiles, with the
+ *    group marks as `GlassIcon` gems, the icon vocabulary the rest of the site uses;
  *  - the doc's green becomes the teal already sanctioned as a card accent
  *    (#2dd4bf) — plain green is not in the CleanStart palette.
  *
- * The verdict card reuses the homepage Intelligence Center treatment (the
- * navy → indigo → violet gradient plus the diagonal hatch), which is the site's
- * existing way of saying "this is the Tricorder layer".
+ * Cards carry no outlines: depth is fill, sheen and shadow. The verdict card is
+ * the brightest object in the scene because it is where the diagram ends.
  *
  * The scene is laid out on a fixed 1320-wide canvas and scaled to fit, like the
  * other coded scenes. Below lg it stacks. The only motion is the reused
@@ -173,20 +172,25 @@ const GROUPS = [
 
 /* ── Shared pieces ───────────────────────────────────────────────────────── */
 
+/** Accent tint helper: the accent mixed into transparent at `pct`. */
+const tint = (accent: string, pct: number): string => `color-mix(in srgb, ${accent} ${pct}%, transparent)`;
+/** Accent lifted toward white, for glyphs and labels that must read on navy. */
+const lift = (accent: string, pct: number): string => `color-mix(in srgb, ${accent} ${pct}%, #ffffff)`;
+
 function GroupHeader({ accent, label, glyph }: { accent: string; label: string; glyph: GlyphKey }): React.ReactElement {
   return (
-    <div className="flex items-center gap-3.5">
-      <GlassIcon accent={accent} size={44}>
-        <Glyph name={glyph} size={22} />
+    <div className="flex items-center gap-3">
+      <GlassIcon accent={accent} size={38}>
+        <Glyph name={glyph} size={19} />
       </GlassIcon>
       <span
         className="font-display"
         style={{
-          fontSize: "var(--fs-h5)",
-          fontWeight: 700,
-          letterSpacing: "0.12em",
+          fontSize: "var(--fs-eyebrow)",
+          fontWeight: 600,
+          letterSpacing: "0.16em",
           textTransform: "uppercase",
-          color: `color-mix(in srgb, ${accent} 62%, #ffffff)`,
+          color: lift(accent, 55),
         }}
       >
         {label}
@@ -195,7 +199,10 @@ function GroupHeader({ accent, label, glyph }: { accent: string; label: string; 
   );
 }
 
-/** Glass shell every group panel shares. */
+/**
+ * Borderless glass card. Depth comes from the fill, an accent wash in the top
+ * corner, a one-pixel top sheen and a long soft shadow, not from an outline.
+ */
 function GroupPanel({
   accent,
   children,
@@ -209,13 +216,16 @@ function GroupPanel({
 }): React.ReactElement {
   return (
     <div
-      className={className}
+      className={`overflow-hidden ${className ?? ""}`}
       style={{
-        borderRadius: "20px",
-        background: "linear-gradient(180deg, rgba(255,255,255,0.075) 0%, rgba(255,255,255,0.025) 100%)",
-        boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${accent} 26%, rgba(255,255,255,0.09)), 0 26px 50px -34px rgba(0,0,0,0.85)`,
-        backdropFilter: "blur(10px)",
-        WebkitBackdropFilter: "blur(10px)",
+        borderRadius: "24px",
+        background: [
+          `radial-gradient(120% 90% at 0% 0%, ${tint(accent, 20)} 0%, transparent 55%)`,
+          "linear-gradient(180deg, rgba(255,255,255,0.085) 0%, rgba(255,255,255,0.03) 100%)",
+        ].join(", "),
+        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.10), 0 30px 60px -36px rgba(4,2,30,0.9)",
+        backdropFilter: "blur(14px)",
+        WebkitBackdropFilter: "blur(14px)",
         ...style,
       }}
     >
@@ -224,46 +234,84 @@ function GroupPanel({
   );
 }
 
-function Chevron({ size = 14 }: { size?: number }): React.ReactElement {
+/** A soft accent tile holding one line glyph. */
+function ItemTile({ accent, glyph, size = 46 }: { accent: string; glyph: GlyphKey; size?: number }): React.ReactElement {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="rgba(255,255,255,0.42)"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-      className="shrink-0"
+    <span
+      className="flex shrink-0 items-center justify-center"
+      style={{
+        width: size,
+        height: size,
+        borderRadius: Math.round(size * 0.3),
+        color: lift(accent, 78),
+        background: `linear-gradient(160deg, ${tint(accent, 30)} 0%, ${tint(accent, 12)} 100%)`,
+        boxShadow: `inset 0 1px 0 rgba(255,255,255,0.14), 0 10px 22px -14px ${accent}`,
+      }}
     >
-      <path d="M5 12h13" />
-      <path d="m13 6 6 6-6 6" />
-    </svg>
+      <Glyph name={glyph} size={Math.round(size * 0.48)} />
+    </span>
   );
 }
 
-/** History: the version chain, with the release under analysis filled in. */
+function ItemLabel({ children }: { children: React.ReactNode }): React.ReactElement {
+  return (
+    <span
+      className="whitespace-nowrap text-white/72"
+      style={{ fontSize: "var(--fs-badge)", fontWeight: 500, letterSpacing: "-0.005em" }}
+    >
+      {children}
+    </span>
+  );
+}
+
+/** History: a release timeline, with the version under analysis lit. */
 function HistoryContent({ accent }: { accent: string }): React.ReactElement {
   return (
-    <div className="flex h-full items-center justify-center gap-3 px-4 py-7">
+    <div className="relative grid w-full grid-cols-3">
+      <span
+        aria-hidden
+        className="absolute h-[2px] rounded-full"
+        style={{
+          top: 8,
+          left: "16.67%",
+          right: "16.67%",
+          background: `linear-gradient(90deg, rgba(255,255,255,0.14) 0%, ${tint(accent, 80)} 100%)`,
+        }}
+      />
       {HISTORY_VERSIONS.map((v, i) => {
         const current = i === HISTORY_VERSIONS.length - 1;
         return (
-          <div key={v} className="flex items-center gap-3">
-            {i > 0 ? <Chevron /> : null}
+          <div key={v} className="relative flex flex-col items-center gap-3.5">
+            <span className="flex h-[18px] items-center justify-center">
+              <span
+                className="block rounded-full"
+                style={
+                  current
+                    ? {
+                        width: 16,
+                        height: 16,
+                        background: accent,
+                        boxShadow: `0 0 0 5px ${tint(accent, 22)}, 0 0 20px ${accent}`,
+                      }
+                    : {
+                        width: 10,
+                        height: 10,
+                        background: "#2a2f8a",
+                        boxShadow: "inset 0 0 0 2px rgba(255,255,255,0.32)",
+                      }
+                }
+              />
+            </span>
             <span
-              className="inline-flex items-center justify-center rounded-full px-3.5 py-2"
+              className="inline-flex items-center rounded-full"
               style={{
                 fontFamily: MONO,
                 fontSize: "var(--fs-badge)",
                 fontWeight: current ? 600 : 400,
-                color: current ? "#ffffff" : "rgba(255,255,255,0.68)",
-                background: current ? accent : "rgba(255,255,255,0.06)",
-                boxShadow: current
-                  ? `0 0 22px color-mix(in srgb, ${accent} 55%, transparent), inset 0 1px 1px rgba(255,255,255,0.35)`
-                  : "inset 0 0 0 1px rgba(255,255,255,0.13)",
+                padding: current ? "5px 12px" : "5px 0",
+                color: current ? "#ffffff" : "rgba(255,255,255,0.55)",
+                background: current ? `linear-gradient(180deg, ${lift(accent, 88)} 0%, ${accent} 100%)` : undefined,
+                boxShadow: current ? `0 8px 20px -8px ${accent}, inset 0 1px 0 rgba(255,255,255,0.35)` : undefined,
               }}
             >
               {v}
@@ -275,53 +323,39 @@ function HistoryContent({ accent }: { accent: string }): React.ReactElement {
   );
 }
 
-/** Behavior: the four capability surfaces, divided like the doc's panel. */
+/** Behavior: the four capability surfaces Tricorder watches. */
 function BehaviorContent({ accent }: { accent: string }): React.ReactElement {
   return (
-    <div className="flex h-full items-stretch justify-center px-2">
-      {BEHAVIOR_ITEMS.map((item, i) => (
-        <div key={item.label} className="flex flex-1 items-center">
-          {i > 0 ? (
-            <span
-              aria-hidden
-              className="h-12 w-px shrink-0"
-              style={{ background: "linear-gradient(180deg, transparent, rgba(255,255,255,0.16), transparent)" }}
-            />
-          ) : null}
-          <div className="flex flex-1 flex-col items-center gap-2.5 px-1">
-            <span style={{ color: accent }}>
-              <Glyph name={item.glyph} size={26} />
-            </span>
-            <span
-              className="whitespace-nowrap text-white/70"
-              style={{ fontSize: "var(--fs-badge)", letterSpacing: "-0.01em" }}
-            >
-              {item.label}
-            </span>
-          </div>
+    <div className="grid w-full grid-cols-4">
+      {BEHAVIOR_ITEMS.map((item) => (
+        <div key={item.label} className="flex flex-col items-center gap-3">
+          <ItemTile accent={accent} glyph={item.glyph} />
+          <ItemLabel>{item.label}</ItemLabel>
         </div>
       ))}
     </div>
   );
 }
 
-/** Relationships: the chain the doc draws, maintainer through to endpoints. */
+/** Relationships: maintainer through to endpoints, joined by a flowing link. */
 function RelationshipsContent({ accent }: { accent: string }): React.ReactElement {
   return (
-    <div className="flex h-full items-center justify-center gap-2 px-4">
+    <div className="flex w-full items-start">
       {RELATIONSHIP_ITEMS.map((item, i) => (
-        <div key={item.label} className="flex items-center gap-2">
-          {i > 0 ? <Chevron size={13} /> : null}
-          <div className="flex flex-col items-center gap-2.5">
-            <span style={{ color: accent }}>
-              <Glyph name={item.glyph} size={26} />
-            </span>
+        <div key={item.label} className={`flex items-start ${i > 0 ? "flex-1" : ""}`}>
+          {i > 0 ? (
             <span
-              className="whitespace-nowrap text-white/70"
-              style={{ fontSize: "var(--fs-badge)", letterSpacing: "-0.01em" }}
-            >
-              {item.label}
-            </span>
+              aria-hidden
+              className="mt-[22px] h-[2px] min-w-3 flex-1 rounded-full"
+              style={{
+                backgroundImage: `repeating-linear-gradient(90deg, ${lift(accent, 70)} 0 3px, transparent 3px 7px)`,
+                opacity: 0.8,
+              }}
+            />
+          ) : null}
+          <div className="flex w-[92px] flex-col items-center gap-3">
+            <ItemTile accent={accent} glyph={item.glyph} />
+            <ItemLabel>{item.label}</ItemLabel>
           </div>
         </div>
       ))}
@@ -335,30 +369,38 @@ function GroupContent({ groupKey, accent }: { groupKey: string; accent: string }
   return <RelationshipsContent accent={accent} />;
 }
 
+const CARD_TITLE_STYLE: React.CSSProperties = {
+  fontSize: "var(--fs-h5)",
+  fontWeight: 700,
+  letterSpacing: "0.08em",
+  lineHeight: 1.2,
+  textTransform: "uppercase",
+};
+
+const COMPONENT_ACCENT = "#7aa6ff";
+
 /** The component the three currents resolve onto. */
 function ComponentCard(): React.ReactElement {
   return (
     <div
-      className="flex h-full w-full items-center gap-4 px-6"
+      className="flex h-full w-full items-center gap-4 px-5"
       style={{
-        borderRadius: "18px",
-        background: "linear-gradient(180deg, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.06) 100%)",
-        boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.20), 0 26px 50px -30px rgba(0,0,0,0.9)",
-        backdropFilter: "blur(10px)",
-        WebkitBackdropFilter: "blur(10px)",
+        borderRadius: "22px",
+        background: [
+          `radial-gradient(90% 120% at 0% 50%, ${tint(COMPONENT_ACCENT, 22)} 0%, transparent 60%)`,
+          "linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 100%)",
+        ].join(", "),
+        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.16), 0 28px 56px -30px rgba(4,2,30,0.95)",
+        backdropFilter: "blur(14px)",
+        WebkitBackdropFilter: "blur(14px)",
       }}
     >
-      <span className="shrink-0" style={{ color: "#8fb6ff" }}>
-        <Glyph name="cube" size={36} />
-      </span>
+      <ItemTile accent={COMPONENT_ACCENT} glyph="cube" size={52} />
       <div className="min-w-0">
-        <p
-          className="font-display text-white"
-          style={{ fontSize: "var(--fs-h5)", fontWeight: 700, letterSpacing: "0.08em", lineHeight: 1.2, textTransform: "uppercase" }}
-        >
+        <p className="font-display text-white" style={CARD_TITLE_STYLE}>
           Component
         </p>
-        <p className="mt-1 truncate" style={{ fontFamily: MONO, fontSize: "var(--fs-code)", color: "#8fb6ff" }}>
+        <p className="mt-1 truncate" style={{ fontFamily: MONO, fontSize: "var(--fs-code)", color: lift(COMPONENT_ACCENT, 70) }}>
           {COMPONENT_NAME}
         </p>
       </div>
@@ -366,42 +408,52 @@ function ComponentCard(): React.ReactElement {
   );
 }
 
+const VERDICT_ACCENT = "#8b6cff";
+
 /**
- * The verdict, in the homepage Intelligence Center treatment: the brand
- * navy → indigo → violet gradient under the diagonal hatch.
+ * The verdict: the end of the diagram, so it is the brightest object in it.
+ * Brand indigo → violet body, a light sheen across the top and a violet halo.
  */
 function VerdictCard(): React.ReactElement {
   return (
     <div
-      className="relative flex h-full w-full items-center gap-4 overflow-hidden px-6"
+      className="relative flex h-full w-full items-center gap-4 overflow-hidden px-5"
       style={{
-        borderRadius: "18px",
-        background: "linear-gradient(180deg, #151021 0%, #131E8F 71.2%, #551ECE 100%)",
-        boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.14), 0 30px 60px -28px rgba(0,0,0,0.95), 0 0 50px -18px rgba(122,89,255,0.55)",
+        borderRadius: "22px",
+        background: "linear-gradient(120deg, #1a2399 0%, #3b22c4 55%, #6a2fe0 100%)",
+        boxShadow: [
+          "inset 0 1px 0 rgba(255,255,255,0.28)",
+          "0 30px 60px -26px rgba(4,2,30,0.95)",
+          "0 0 70px -14px rgba(139,108,255,0.75)",
+        ].join(", "),
       }}
     >
-      <div
+      <span
         aria-hidden
-        className="pointer-events-none absolute inset-0"
+        className="pointer-events-none absolute inset-x-0 top-0 h-1/2"
+        style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 100%)" }}
+      />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute rounded-full"
         style={{
-          backgroundImage: "url(/images/cleanstart-factory/diagonal-lines.png)",
-          backgroundRepeat: "repeat",
-          backgroundSize: "22px 22px",
-          mixBlendMode: "luminosity",
-          opacity: 0.32,
+          right: -60,
+          top: -80,
+          width: 220,
+          height: 220,
+          background: "radial-gradient(closest-side, rgba(201,184,255,0.35), rgba(201,184,255,0))",
         }}
       />
-      <span className="relative shrink-0 text-white">
-        <Glyph name="shield" size={38} />
+      <span className="relative">
+        <GlassIcon accent={VERDICT_ACCENT} size={52}>
+          <Glyph name="shield" size={26} />
+        </GlassIcon>
       </span>
       <div className="relative min-w-0">
-        <p
-          className="font-display text-white"
-          style={{ fontSize: "var(--fs-h5)", fontWeight: 700, letterSpacing: "0.08em", lineHeight: 1.2, textTransform: "uppercase" }}
-        >
+        <p className="font-display text-white" style={CARD_TITLE_STYLE}>
           Tricorder Verdict
         </p>
-        <p className="mt-1 text-white/75" style={{ fontSize: "var(--fs-caption)", letterSpacing: "-0.01em" }}>
+        <p className="mt-1 text-white/80" style={{ fontSize: "var(--fs-caption)", letterSpacing: "-0.01em" }}>
           Evidence-backed verdict.
         </p>
       </div>
@@ -409,7 +461,7 @@ function VerdictCard(): React.ReactElement {
   );
 }
 
-/* ── Desktop scene: fixed 1120 × 504 canvas, scaled to fit ───────────────── */
+/* ── Desktop scene: fixed 1320 × 538 canvas, scaled to fit ───────────────── */
 
 const VB = { w: 1320, h: 538 } as const;
 /** Panel geometry. Widths differ because the doc's three panels carry different loads. */
@@ -418,14 +470,13 @@ const PANELS = {
   behavior: { x: 386, w: 440 },
   relationships: { x: 852, w: 468 },
 } as const;
-const HEAD_Y = 0;
-const PANEL_Y = 68;
-const PANEL_H = 148;
-const PANEL_BOTTOM = PANEL_Y + PANEL_H; // 216
+const PANEL_Y = 0;
+const PANEL_H = 200;
+const PANEL_BOTTOM = PANEL_Y + PANEL_H;
 const BUS_Y = 272;
 const CARD_X = VB.w / 2; // 660
-const COMPONENT = { y: 314, h: 92, w: 360 } as const;
-const VERDICT_CARD = { y: 442, h: 96, w: 420 } as const;
+const COMPONENT = { y: 314, h: 88, w: 380 } as const;
+const VERDICT_CARD = { y: 438, h: 100, w: 440 } as const;
 
 const centreOf = (p: { x: number; w: number }): number => p.x + p.w / 2;
 
@@ -497,16 +548,21 @@ function SceneDesktop(): React.ReactElement {
           />
         </svg>
 
-        {/* Group headers and panels. */}
+        {/* Group panels. */}
         {GROUPS.map((g) => {
           const p = PANELS[g.key];
           return (
-            <div key={g.key} className="absolute" style={{ left: p.x, top: HEAD_Y, width: p.w }}>
+            <GroupPanel
+              key={g.key}
+              accent={g.accent}
+              className="absolute flex flex-col"
+              style={{ left: p.x, top: PANEL_Y, width: p.w, height: PANEL_H, padding: "22px 24px 26px" }}
+            >
               <GroupHeader accent={g.accent} label={g.label} glyph={g.glyph} />
-              <GroupPanel accent={g.accent} style={{ marginTop: PANEL_Y - 44, height: PANEL_H }}>
+              <div className="flex flex-1 items-center">
                 <GroupContent groupKey={g.key} accent={g.accent} />
-              </GroupPanel>
-            </div>
+              </div>
+            </GroupPanel>
           );
         })}
 
@@ -547,15 +603,11 @@ function StackedGroupContent({ groupKey, accent }: { groupKey: string; accent: s
   if (groupKey === "history") return <HistoryContent accent={accent} />;
   const items = groupKey === "behavior" ? BEHAVIOR_ITEMS : RELATIONSHIP_ITEMS;
   return (
-    <div className="grid grid-cols-2 gap-x-3 gap-y-5 px-4 py-5">
+    <div className="grid w-full grid-cols-2 gap-x-3 gap-y-4">
       {items.map((item) => (
-        <div key={item.label} className="flex items-center gap-2.5">
-          <span className="shrink-0" style={{ color: accent }}>
-            <Glyph name={item.glyph} size={24} />
-          </span>
-          <span className="truncate text-white/70" style={{ fontSize: "var(--fs-badge)", letterSpacing: "-0.01em" }}>
-            {item.label}
-          </span>
+        <div key={item.label} className="flex min-w-0 items-center gap-2.5">
+          <ItemTile accent={accent} glyph={item.glyph} size={36} />
+          <ItemLabel>{item.label}</ItemLabel>
         </div>
       ))}
     </div>
@@ -567,12 +619,10 @@ function SceneMobile(): React.ReactElement {
     <div className="flex flex-col items-center lg:hidden">
       {GROUPS.map((g) => (
         <div key={g.key} className="flex w-full max-w-[460px] flex-col items-center">
-          <div className="w-full">
+          <GroupPanel accent={g.accent} className="relative flex w-full flex-col gap-6 p-4 sm:p-5">
             <GroupHeader accent={g.accent} label={g.label} glyph={g.glyph} />
-            <GroupPanel accent={g.accent} className="mt-4">
-              <StackedGroupContent groupKey={g.key} accent={g.accent} />
-            </GroupPanel>
-          </div>
+            <StackedGroupContent groupKey={g.key} accent={g.accent} />
+          </GroupPanel>
           <Drop accent={g.accent} />
         </div>
       ))}
@@ -580,7 +630,7 @@ function SceneMobile(): React.ReactElement {
         <ComponentCard />
       </div>
       <Drop accent="#8b6cff" />
-      <div className="w-full max-w-[460px]" style={{ height: "96px" }}>
+      <div className="w-full max-w-[460px]" style={{ height: "100px" }}>
         <VerdictCard />
       </div>
     </div>
