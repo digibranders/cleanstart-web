@@ -9,6 +9,7 @@
 - [Attack Surface Reduction](https://www.cleanstart.com/attack-surface-reduction): Shrink your container attack surface by removing unnecessary packages and layers.
 - [Vulnerability Remediation](https://www.cleanstart.com/vulnerability-remediation): Automated CVE remediation workflows for container images.
 - [Clean Libraries](https://www.cleanstart.com/clean-libraries): Hardened open-source library builds with security patches backported.
+- [Tricorder](https://www.cleanstart.com/tricorder): The intelligence layer behind CleanStart — behavioral analysis, package history, cross-package correlation and threat intelligence combined into an evidence-backed verdict for every component.
 
 ## Solutions by Role
 - [For CISOs](https://www.cleanstart.com/for-ciso): Executive-level container security posture, compliance reporting, and risk reduction metrics.
