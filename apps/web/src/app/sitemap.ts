@@ -133,7 +133,6 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/resource-center' },
   { path: '/software-bill-materials' },
   { path: '/teams' },
-  { path: '/tricorder' },
   { path: '/vulnerability-remediation' },
   { path: '/webinars' },
 ];
