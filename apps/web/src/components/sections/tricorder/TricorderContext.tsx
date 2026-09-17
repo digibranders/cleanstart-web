@@ -463,7 +463,7 @@ function VerdictCard(): React.ReactElement {
 
 /* ── Desktop scene: fixed 1320 × 538 canvas, scaled to fit ───────────────── */
 
-const VB = { w: 1320, h: 470 } as const;
+const VB = { w: 1320, h: 538 } as const;
 /** Panel geometry. Widths differ because the doc's three panels carry different loads. */
 const PANELS = {
   history: { x: 0, w: 360 },
@@ -472,16 +472,65 @@ const PANELS = {
 } as const;
 const PANEL_Y = 0;
 const PANEL_H = 200;
+const PANEL_BOTTOM = PANEL_Y + PANEL_H;
+const BUS_Y = 272;
 const CARD_X = VB.w / 2; // 660
-const COMPONENT = { y: 244, h: 88, w: 380 } as const;
-const VERDICT_CARD = { y: 368, h: 100, w: 440 } as const;
+const COMPONENT = { y: 314, h: 88, w: 380 } as const;
+const VERDICT_CARD = { y: 438, h: 100, w: 440 } as const;
+
+const centreOf = (p: { x: number; w: number }): number => p.x + p.w / 2;
+
+/** Elbow from a panel's underside, in to the bus, then down to the component. */
+function elbow(cx: number): string {
+  const r = 18;
+  if (Math.abs(cx - CARD_X) < 1) {
+    return `M ${cx} ${PANEL_BOTTOM} L ${cx} ${COMPONENT.y}`;
+  }
+  const dir = cx < CARD_X ? 1 : -1;
+  return [
+    `M ${cx} ${PANEL_BOTTOM}`,
+    `L ${cx} ${BUS_Y - r}`,
+    `Q ${cx} ${BUS_Y} ${cx + dir * r} ${BUS_Y}`,
+    `L ${CARD_X - dir * r} ${BUS_Y}`,
+    `Q ${CARD_X} ${BUS_Y} ${CARD_X} ${BUS_Y + r}`,
+    `L ${CARD_X} ${COMPONENT.y}`,
+  ].join(" ");
+}
 
 function SceneDesktop(): React.ReactElement {
   return (
     <ScaleToFit designWidth={VB.w} className="mx-auto hidden max-w-[1320px] lg:block">
       <div className="relative" style={{ width: VB.w, height: VB.h }}>
-        {/* One line: the Component resolving into the Verdict. */}
+        {/* Currents. Drawn first so the cards sit over their landing points. */}
         <svg aria-hidden viewBox={`0 0 ${VB.w} ${VB.h}`} className="absolute inset-0 h-full w-full" fill="none">
+          <defs>
+            <filter id="tri-ctx-glow" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur stdDeviation="3" result="b" />
+              <feMerge>
+                <feMergeNode in="b" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          {GROUPS.map((g, i) => {
+            const cx = centreOf(PANELS[g.key]);
+            return (
+              <g key={g.key}>
+                <path d={elbow(cx)} stroke={g.accent} strokeOpacity="0.32" strokeWidth="6" strokeLinecap="round" />
+                <path
+                  className="cs-lep-beam"
+                  d={elbow(cx)}
+                  stroke={g.accent}
+                  strokeWidth="2.25"
+                  strokeLinecap="round"
+                  strokeDasharray="2 9"
+                  style={{ animationDelay: `${i * -0.4}s` }}
+                />
+              </g>
+            );
+          })}
+          {/* Junction, then the drop into the verdict. */}
+          <circle cx={CARD_X} cy={BUS_Y} r="4.5" fill="#c9b8ff" filter="url(#tri-ctx-glow)" />
           <path
             d={`M ${CARD_X} ${COMPONENT.y + COMPONENT.h} L ${CARD_X} ${VERDICT_CARD.y}`}
             stroke="#8b6cff"
