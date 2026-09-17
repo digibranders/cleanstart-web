@@ -1,6 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { attributionHubspotFields, hubspotHandler, invalidHubspotFieldNames } from './hubspot';
+import {
+  attributionHubspotFields,
+  hubspotHandler,
+  hubspotLegalConsent,
+  invalidHubspotFieldNames,
+} from './hubspot';
 import type { LeadSubmission } from './types';
 
 const submission: LeadSubmission = {
@@ -68,25 +73,61 @@ describe('hubspotHandler (Forms API)', () => {
     expect(sent.legalConsentOptions).toBeDefined();
   });
 
-  it('includes a marketing-subscription opt-in when the form has hubspotSubscriptionTypeId', async () => {
-    const fetchSpy = vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({}) });
-    vi.stubGlobal('fetch', fetchSpy);
-    await hubspotHandler.run(submission, ctx('guid-1', '42'));
+  interface SentBody {
+    legalConsentOptions: {
+      consent: {
+        consentToProcess: boolean;
+        text: string;
+        communications?: { value: boolean; subscriptionTypeId: number; text: string }[];
+      };
+    };
+  }
+  const sentBody = (fetchSpy: ReturnType<typeof vi.fn>): SentBody => {
     const [, init] = fetchSpy.mock.calls[0] ?? [];
-    const sent = JSON.parse((init as RequestInit).body as string);
+    return JSON.parse((init as RequestInit).body as string) as SentBody;
+  };
+  const okFetch = (): ReturnType<typeof vi.fn> => {
+    const spy = vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({}) });
+    vi.stubGlobal('fetch', spy);
+    return spy;
+  };
+  const ticked = (categories: string[] | undefined): LeadSubmission => ({
+    ...submission,
+    consent: { snapshot: 'I agree…', givenAt: '2026-06-02T00:00:00Z', categories },
+  });
+
+  it('subscribes a visitor who ticked marketing, when the form names a subscription type', async () => {
+    const fetchSpy = okFetch();
+    await hubspotHandler.run(ticked(['storage', 'marketing']), ctx('guid-1', '42'));
+    const sent = sentBody(fetchSpy);
     expect(sent.legalConsentOptions.consent.communications).toEqual([
       { value: true, subscriptionTypeId: 42, text: 'I agree…' },
     ]);
     expect(sent.legalConsentOptions.consent.consentToProcess).toBe(true);
   });
 
-  it('omits communications when the form has no hubspotSubscriptionTypeId', async () => {
-    const fetchSpy = vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({}) });
-    vi.stubGlobal('fetch', fetchSpy);
-    await hubspotHandler.run(submission, ctx('guid-1'));
-    const [, init] = fetchSpy.mock.calls[0] ?? [];
-    const sent = JSON.parse((init as RequestInit).body as string);
+  // The regression this guards: the form's subscription type used to be enough
+  // on its own, so every visitor was subscribed whether or not they ticked.
+  it('does not subscribe a visitor who left marketing unticked', async () => {
+    const fetchSpy = okFetch();
+    await hubspotHandler.run(ticked(['storage']), ctx('guid-1', '42'));
+    const sent = sentBody(fetchSpy);
     expect(sent.legalConsentOptions.consent.communications).toBeUndefined();
+    expect(sent.legalConsentOptions.consent.consentToProcess).toBe(true);
+  });
+
+  it('does not subscribe when the consent carries no categories at all', async () => {
+    const fetchSpy = okFetch();
+    await hubspotHandler.run(submission, ctx('guid-1', '42'));
+    expect(sentBody(fetchSpy).legalConsentOptions.consent.communications).toBeUndefined();
+  });
+
+  it('omits communications when the form has no hubspotSubscriptionTypeId, even if ticked', async () => {
+    const fetchSpy = okFetch();
+    await hubspotHandler.run(ticked(['storage', 'marketing']), ctx('guid-1'));
+    const sent = sentBody(fetchSpy);
+    expect(sent.legalConsentOptions.consent.communications).toBeUndefined();
+    expect(sent.legalConsentOptions.consent.consentToProcess).toBe(true);
   });
 
   it('returns failed on a non-2xx response', async () => {
@@ -287,5 +328,47 @@ describe('hubspotHandler — company and context', () => {
     const sent = Object.fromEntries(sentBody(fetchMock).fields.map((f) => [f.name, f.value]));
     expect(sent.country).toBe('India');
     expect(sent.phone).toBe('+919876543210');
+  });
+});
+
+describe('hubspotLegalConsent', () => {
+  const consent = (categories?: string[]) => ({
+    snapshot: 'I agree…',
+    givenAt: '2026-06-02T00:00:00Z',
+    ...(categories ? { categories } : {}),
+  });
+
+  it('returns nothing when the visitor gave no consent', () => {
+    expect(hubspotLegalConsent(undefined, 42)).toBeUndefined();
+  });
+
+  it('always records consent to process', () => {
+    expect(hubspotLegalConsent(consent(['storage']), 42)).toEqual({
+      consent: { consentToProcess: true, text: 'I agree…' },
+    });
+  });
+
+  it('adds the subscription only for a marketing opt-in on a form that has one', () => {
+    expect(hubspotLegalConsent(consent(['storage', 'marketing']), 42)).toEqual({
+      consent: {
+        consentToProcess: true,
+        text: 'I agree…',
+        communications: [{ value: true, subscriptionTypeId: 42, text: 'I agree…' }],
+      },
+    });
+  });
+
+  it('never subscribes without an opt-in, whatever the subscription type', () => {
+    for (const categories of [undefined, [], ['storage']]) {
+      expect(hubspotLegalConsent(consent(categories), 42)?.consent).not.toHaveProperty(
+        'communications',
+      );
+    }
+  });
+
+  it('ignores an opt-in when the form has no subscription type', () => {
+    expect(hubspotLegalConsent(consent(['marketing']), Number.NaN)?.consent).not.toHaveProperty(
+      'communications',
+    );
   });
 });
