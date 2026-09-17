@@ -75,27 +75,6 @@ export function TricorderHero(): React.ReactElement {
           }}
         >
           <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-            <HeroReveal y={30} duration={0.8}>
-              <p
-                className="inline-flex items-center gap-2.5 font-display"
-                style={{
-                  fontSize: "var(--fs-eyebrow)",
-                  fontWeight: 600,
-                  letterSpacing: "var(--fs-eyebrow-ls)",
-                  textTransform: "uppercase",
-                  color: "#7fd9f5",
-                  marginBottom: "clamp(16px, 1.6vw, 22px)",
-                }}
-              >
-                <span
-                  aria-hidden
-                  className="block h-[6px] w-[6px] rounded-full"
-                  style={{ background: "#2cc1eb", boxShadow: "0 0 12px #2cc1eb" }}
-                />
-                Tricorder by CleanStart
-              </p>
-            </HeroReveal>
-
             <HeroReveal y={50} duration={1.0} lcp>
               <h1
                 className="text-white"
