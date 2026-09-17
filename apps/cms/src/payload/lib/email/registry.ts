@@ -91,7 +91,7 @@ export const EMAIL_TEMPLATES: readonly EmailTemplateEntry[] = [
   },
   {
     key: 'resource-download',
-    form: 'resource-capture (gated resources)',
+    form: 'content-gated (gated resource downloads)',
     audience: 'visitor',
     sentFrom: 'endpoints/submit-lead.ts',
     sample: () =>

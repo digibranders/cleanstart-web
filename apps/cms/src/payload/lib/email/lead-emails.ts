@@ -91,25 +91,30 @@ export type ResourceDownloadInput = ConfirmationInput & {
 };
 
 /**
- * Emails the gated-resource link.
+ * Thanks the visitor after a gated download, and carries the link.
  *
- * The link was previously returned only in the HTTP response, so closing the
- * tab lost the asset with no way to recover it, and it removed the only
- * reason for a visitor to give a real address, which is the point of gating.
+ * The download starts in the browser as soon as the gate form succeeds, so this
+ * arrives afterwards: it leads with thanks, and the link is the way back to the
+ * file for anyone who closed the tab. Before the link was emailed at all it
+ * lived only in the HTTP response, so a closed tab lost the asset for good.
  */
 export const buildResourceDownloadEmail = (
   input: ResourceDownloadInput,
 ): { subject: string; htmlContent: string } => {
   const hours = Math.max(1, Math.round((input.expiresAt - Date.now()) / 3_600_000));
   return {
-    subject: `Your download: ${input.resourceTitle}`,
+    subject: `Thanks for downloading ${input.resourceTitle}`,
     htmlContent: renderEmail({
-      preheader: `${input.resourceTitle} is ready to download.`,
-      eyebrow: 'Your download',
+      preheader: `Your copy of ${input.resourceTitle}, and a link to download it again.`,
+      eyebrow: 'Thank you',
       heading: greeting(input.firstName),
       blocks: [
-        { kind: 'paragraph', text: `Here is your copy of ${input.resourceTitle}.` },
-        { kind: 'button', label: 'Download it now', url: input.downloadUrl },
+        { kind: 'paragraph', text: `Thank you for downloading ${input.resourceTitle}.` },
+        {
+          kind: 'paragraph',
+          text: 'Your download should have started in your browser. If it did not, or you want the file again later, use the button below.',
+        },
+        { kind: 'button', label: 'Download your copy', url: input.downloadUrl },
         {
           kind: 'note',
           text: `This link is unique to you and stops working in about ${hours} ${hours === 1 ? 'hour' : 'hours'}. Request the resource again if it expires.`,
