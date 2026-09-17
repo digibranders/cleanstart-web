@@ -15,7 +15,7 @@ import { Reveal } from "@/components/ui/Reveal";
 export function TricorderCTA(): React.ReactElement {
   return (
     <div
-      className="absolute inset-0 flex flex-col items-center justify-center gap-5 overflow-hidden px-8 text-center md:px-12 lg:flex-row lg:items-start lg:gap-x-[clamp(32px,5vw,100px)] lg:px-[clamp(28px,4vw,64px)] lg:py-[clamp(20px,3vw,32px)] lg:text-left"
+      className="absolute inset-0 flex flex-col items-center justify-center gap-5 overflow-hidden px-8 text-center md:px-12 lg:flex-row lg:items-center lg:justify-start lg:gap-x-[clamp(32px,5vw,100px)] lg:px-[clamp(28px,4vw,64px)] lg:py-[clamp(20px,3vw,32px)] lg:text-left"
       style={{ background: "#ffffff" }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
