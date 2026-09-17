@@ -35,9 +35,9 @@ const APOLLO = 'https://*.apollo.io';
 const YOUTUBE_EMBED = 'https://www.youtube-nocookie.com';
 // Cloudflare Turnstile renders its challenge in an iframe from this origin.
 // The loader script is covered by `script-src 'https:'`, but the iframe is
-// not — without it here, every Turnstile-protected form (book-a-demo, deal
-// registration, contact, job apply, partner CTA, and every CMS form rendered
-// by FormRenderer) loses bot protection the moment CSP_ENFORCE is set.
+// not. Without it here, every form that renders <TurnstileWidget> (book-a-demo,
+// contact, deal registration, job apply, the partner CTA and the gated resource
+// download) loses bot protection the moment CSP_ENFORCE is set.
 // Confirmed against the live report-only policy, which logs:
 //   Framing 'https://challenges.cloudflare.com/' violates … "frame-src …"
 const TURNSTILE_FRAME = 'https://challenges.cloudflare.com';

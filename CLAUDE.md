@@ -142,7 +142,7 @@ pnpm --filter @cleanstart/web build
 - Every `<Image>` needs `sizes` matching rendered widths per breakpoint. SVGs: `preserveAspectRatio="xMidYMid meet"` (never `"none"`).
 - Buttons: `--btn-fs-*`/`--btn-h-*`/`--btn-px-*`, never `clamp()`. Primary CTAs ≥ 44px tall.
 - Section vertical padding: `--spacing-section-*` tokens via `<Section padding>` or `py-section-*` utilities. Do not invent `pt-Xpx sm:pt-Ypx lg:pt-Zpx` shapes.
-- Form inputs ≥ 16px font-size (iOS Safari zoom rule). `FormRenderer.tsx`'s `fieldInputStyle` already sets this; never override with `text-sm` (14 px).
+- Form inputs ≥ 16px font-size (iOS Safari zoom rule). The shared field surface (`src/components/forms/field-surface.ts`, used by `TextField` and `PhoneField`) sets this through `--fs-input`; never override with `text-sm` (14 px).
 - No `<br />` in prose — trust `max-width` + `text-wrap: balance` (applied globally on `h1`–`h4` via `@layer base`).
 - Footer CTA-card geometry is owned by `Footer.tsx`. Per-page CTAs paint inside the slot via the `cta` prop.
 
