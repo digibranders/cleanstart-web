@@ -40,7 +40,7 @@ export function TricorderThreatGap(): React.ReactElement {
   return (
     <section
       data-section="TricorderThreatGap"
-      className="relative overflow-hidden py-section-md"
+      className="relative overflow-hidden pt-section-sm pb-section-md"
       style={{ background: 'linear-gradient(180deg, #FFFFFF 0%, #F6F4FC 100%)' }}
     >
       <div className="relative mx-auto max-w-[var(--container-default)] px-6 sm:px-10">
