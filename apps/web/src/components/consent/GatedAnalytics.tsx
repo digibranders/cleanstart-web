@@ -2,36 +2,29 @@
 
 import { Suspense } from "react";
 
-import { ApolloScript } from "@/components/analytics/ApolloScript";
 import { Ga4RouteTracker } from "@/components/analytics/Ga4RouteTracker";
-import { LeadfeederScript } from "@/components/analytics/LeadfeederScript";
 import { WebVitals } from "@/components/observability/WebVitals";
 import { useConsent } from "./ConsentProvider";
 
 /**
- * Renders third-party tracking.
+ * Renders the client-side analytics that still live in code.
  *
- * The GA4 tag itself is NOT mounted here — it is server-rendered in the document
- * head by <Ga4HeadScript/> so it appears in the HTML source and loads before
- * hydration. All that remains client-side is <Ga4RouteTracker/>, which emits
- * `page_view` on SPA navigations (it needs `useSearchParams`, hence <Suspense/>).
+ * Third-party tags (GA4, Microsoft Clarity, Apollo.io, Leadfeeder) are NOT
+ * mounted here. They live in the GTM container loaded by <GtmHeadScript/>, and
+ * each carries a GTM consent check that reproduces the gating this component
+ * used to apply: Clarity on analytics_storage, Apollo and Leadfeeder on
+ * ad_storage, which <ConsentProvider/> flips on a Targeting opt-in. The full
+ * inventory is in docs/web/TRACKING-TAGS.md.
  *
- * GA4 fires on EVERY page load and is fully UN-GATED from the cookie banner
- * (business decision, 2026-07-22): the head consent snippet defaults
- * `analytics_storage` to granted, so gtag.js sets its cookies and sends complete,
- * unmodeled hits regardless of the visitor's banner choice. Advertising signals
- * (`ad_storage` &c.) stay default-denied and follow the Targeting category via
- * <ConsentProvider/>.
+ * GA4 stays UN-GATED from the cookie banner outside the EEA/UK/CH (business
+ * decision, 2026-07-22): the head consent snippet defaults analytics_storage to
+ * granted there, so the GA4 tag carries no extra GTM consent check.
  *
- * The remaining tools stay category-gated (they DO store/profile pre-consent, so
- * they cannot ride Advanced Consent Mode):
- *  - Performance → <WebVitals/> (Core Web Vitals to Sentry).
- *  - Targeting → <LeadfeederScript/> reverse-IP company identification — B2B
- *    lead-gen (advertising/profiling, not aggregate analytics), self-noops when
- *    NEXT_PUBLIC_LEADFEEDER_ID is unset.
- *  - Targeting → <ApolloScript/> Apollo.io website visitor tracker — B2B
- *    identification/profiling for outbound sales, self-noops when
- *    NEXT_PUBLIC_APOLLO_APP_ID is unset.
+ * What is left here:
+ *  - <Ga4RouteTracker/> pushes a page_view dataLayer event on SPA navigation
+ *    (needs useSearchParams, hence <Suspense/>).
+ *  - Performance → <WebVitals/> (Core Web Vitals to Sentry). This is our own
+ *    reporting, not a vendor tag, so it stays in code.
  *
  * Vercel <Analytics/> (Web Analytics) and <SpeedInsights/> were removed: both
  * are billable Vercel products, and GA4 + Search Console CrUX field data cover
@@ -39,15 +32,13 @@ import { useConsent } from "./ConsentProvider";
  * dashboard, re-add its component here AND its dependency in package.json.
  */
 export function GatedAnalytics() {
-  const { performanceGranted, targetingGranted } = useConsent();
+  const { performanceGranted } = useConsent();
   return (
     <>
       <Suspense fallback={null}>
         <Ga4RouteTracker />
       </Suspense>
       {performanceGranted && <WebVitals />}
-      {targetingGranted && <LeadfeederScript />}
-      {targetingGranted && <ApolloScript />}
     </>
   );
 }

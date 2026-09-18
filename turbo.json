@@ -26,8 +26,7 @@
         "SENTRY_PROJECT",
         "TRUSTED_PROXY_HOPS",
         "LEAD_QUEUE_LOCAL_DIR",
-        "NEXT_PUBLIC_GA4_ID",
-        "NEXT_PUBLIC_LEADFEEDER_ID",
+        "NEXT_PUBLIC_GTM_ID",
         "ALLOW_INDEXING",
         "VERCEL_ENV"
       ]

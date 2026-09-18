@@ -11,7 +11,7 @@ import type { ThankYouType } from "./types";
  *
  * `router.push` rather than a hard navigation, for two reasons. It is the only
  * option that preserves the in-memory handoff, and both paths already produce
- * exactly one GA4 `page_view` (a hard load from `gtag('config')`, a soft one
+ * exactly one GA4 `page_view` (a hard load from the GTM Google tag, a soft one
  * from Ga4RouteTracker, whose first effect returns early), so neither
  * double-counts and the faster one wins.
  */
