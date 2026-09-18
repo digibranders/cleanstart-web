@@ -518,7 +518,7 @@ Mobile = Moto G Power emulation. 0.90 mobile is unrealistic with hero + GA4 + cu
 ### Analytics
 
 - **Vercel Analytics + Speed Insights** (`@vercel/analytics`, `@vercel/speed-insights`). Cookie-less, no consent needed.
-- **GA4** via `next/script strategy="afterInteractive"`. Only injected when `cs_consent.analytics === 'granted'`. Consent Mode v2 — see §11.
+- **GA4, Microsoft Clarity, Apollo.io, Leadfeeder** via one Google Tag Manager container, loaded in the document head by `GtmHeadScript` and host-gated to production. Each tag's consent requirement is set in GTM on top of Consent Mode v2 (see §11). Full inventory: `docs/web/TRACKING-TAGS.md`.
 
 ### Alerts
 
@@ -729,7 +729,7 @@ Out of scope for this doc — see arch HTML §`#deploy-rollback`.
 | `SENTRY_AUTH_TOKEN` | CI only | Source map upload |
 | `REVALIDATE_SECRET` | All | HMAC for `/api/revalidate` |
 | `PREVIEW_SECRET` | All | HMAC for `/api/preview/enter` |
-| `NEXT_PUBLIC_GA4_ID` | Production only | `G-XXXXXXXXXX` |
+| `NEXT_PUBLIC_GTM_ID` | Production only | `GTM-XXXXXXX`. Loads every tracking tag; see `docs/web/TRACKING-TAGS.md` |
 | `CONSENT_LOG_HMAC_SECRET` | All | HMAC for `/api/consent` audit |
 
 **Rotation:** `CMS_API_KEY`, `REVALIDATE_SECRET`, `PREVIEW_SECRET`, `CONSENT_LOG_HMAC_SECRET`, `SENTRY_AUTH_TOKEN` rotate every **90 days**. Recorded in the operator's secrets store of choice (1Password / Bitwarden / Keychain).
