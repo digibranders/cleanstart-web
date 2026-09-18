@@ -1,8 +1,9 @@
 "use client";
 
-import { LazyMotion, domAnimation, m, useReducedMotion } from "motion/react";
+import { LazyMotion, domAnimation, m } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { EASE_OUT } from "@/lib/motion";
+import { useHydratedReducedMotion } from "@/lib/use-hydrated-reduced-motion";
 
 const AUTOPLAY_MS = 6500;
 const SWIPE_THRESHOLD = 48;
@@ -38,7 +39,7 @@ export function UpcomingEventCarousel({
   // +1 = advancing forward (slide in from the right), -1 = going back.
   const [direction, setDirection] = useState(1);
   const [paused, setPaused] = useState(false);
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useHydratedReducedMotion();
 
   const go = useCallback(
     (next: number, dir: number) => {

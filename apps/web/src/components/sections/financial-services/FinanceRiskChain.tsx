@@ -2,8 +2,8 @@
 
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { useReducedMotion } from 'motion/react';
 import { Reveal, RevealStagger, RevealItem } from '@/components/ui/Reveal';
+import { useHydratedReducedMotion } from '@/lib/use-hydrated-reduced-motion';
 
 /*
  * "Risk Enters Long Before Production" — a continuous supply-chain scan.
@@ -1520,7 +1520,7 @@ function ScanRail({
 /* -------------------------------------------------------------------------- */
 
 export function FinanceRiskChain(): React.ReactElement {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useHydratedReducedMotion();
   const animated = !reduceMotion;
   const { beamRef, scan } = useScanClock(animated);
 

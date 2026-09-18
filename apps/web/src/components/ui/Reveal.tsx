@@ -8,14 +8,7 @@ import {
   type HTMLMotionProps,
   type Variants,
 } from "motion/react";
-import {
-  type ReactNode,
-  type RefObject,
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { type ReactNode, type RefObject, useEffect, useRef, useState } from "react";
 
 import {
   EASE_OUT,
@@ -24,39 +17,9 @@ import {
   staggerChild,
   staggerParent,
 } from "@/lib/motion";
+import { useHydratedReducedMotion } from "@/lib/use-hydrated-reduced-motion";
 
 type RevealViewport = typeof REVEAL_VIEWPORT | typeof HEADER_VIEWPORT;
-
-const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
-
-function subscribeReducedMotion(onChange: () => void): () => void {
-  const mql = window.matchMedia(REDUCED_MOTION_QUERY);
-  mql.addEventListener("change", onChange);
-  return () => mql.removeEventListener("change", onChange);
-}
-
-function getReducedMotionSnapshot(): boolean {
-  return window.matchMedia(REDUCED_MOTION_QUERY).matches;
-}
-
-function getReducedMotionServerSnapshot(): boolean {
-  return false;
-}
-
-/**
- * Hydration-safe reduced-motion flag. motion's `useReducedMotion` reads the
- * media query during the first client render, so a reduced-motion visitor
- * hydrates different markup than the server sent. `useSyncExternalStore`
- * hydrates with the server snapshot (`false`) and re-renders with the real
- * value straight after, so SSR and the hydration render always agree.
- */
-function useHydratedReducedMotion(): boolean {
-  return useSyncExternalStore(
-    subscribeReducedMotion,
-    getReducedMotionSnapshot,
-    getReducedMotionServerSnapshot,
-  );
-}
 
 const INSTANT = { duration: 0 } as const;
 
