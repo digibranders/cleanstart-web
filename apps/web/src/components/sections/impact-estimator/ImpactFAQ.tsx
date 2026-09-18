@@ -29,7 +29,7 @@ function Row({ faq, open, onToggle, index }: { faq: ImpactFaq; open: boolean; on
       }}
     >
       <h3>
-        <button type="button" id={buttonId} aria-expanded={open} aria-controls={panelId} onClick={onToggle} className="flex w-full items-start gap-3 px-4 py-3.5 text-left sm:px-5">
+        <button type="button" id={buttonId} aria-expanded={open} aria-controls={panelId} onClick={onToggle} className="flex w-full cursor-pointer items-start gap-3 px-4 py-3.5 text-left sm:px-5">
           <span aria-hidden className="mt-[2px] shrink-0" style={{ fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: "0.04em", color: open ? ACCENT : "rgba(17,17,17,0.3)" }}>
             {String(index + 1).padStart(2, "0")}
           </span>
