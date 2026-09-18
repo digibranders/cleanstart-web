@@ -1,16 +1,17 @@
-import Image from 'next/image';
 import Link from 'next/link';
 
 import { HeroReveal } from '@/components/ui/Reveal';
+import { TricorderHeroVerdict } from './TricorderHeroVerdict';
 
 /**
  * Tricorder hero, on the solution-page hero shell (FinanceHero / SaasHero):
  * bg-cs-hero mesh, gridline overlay, left-aligned copy with the gradient
- * accent, a 3D artifact on the right and a fade into the white section below.
+ * accent, an artifact on the right and a fade into the white section below.
  *
- * The artifact is the copy doc's own hero concept: the intelligence brain in a
- * glass cube on a pedestal. The render was produced on black and matted to a
- * real alpha channel, so it composites straight onto the gradient.
+ * The artifact is the verdict loop (TricorderHeroVerdict), built in code: one
+ * package examined by the four stages and judged before it is trusted. It is
+ * decorative, so phones drop it rather than stack it under the headline, as
+ * the other solution heroes do.
  */
 export function TricorderHero(): React.ReactElement {
   return (
@@ -37,10 +38,9 @@ export function TricorderHero(): React.ReactElement {
       />
 
       <div
-        className="relative mx-auto grid max-w-[var(--container-default)] items-center gap-8 px-6 sm:px-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-10"
+        className="relative mx-auto grid max-w-[var(--container-default)] items-center gap-8 px-6 pb-[96px] sm:px-10 md:pb-[clamp(160px,13vw,200px)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-10"
         style={{
           paddingTop: 'calc(clamp(104px, 10vw, 150px) + var(--cs-header-extra))',
-          paddingBottom: 'clamp(96px, 9vw, 150px)',
         }}
       >
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
@@ -57,7 +57,7 @@ export function TricorderHero(): React.ReactElement {
               }}
             >
               The Intelligence Layer{' '}
-              <span className="cs-text-gradient-impact">for Software Trust</span>
+              <span className="cs-text-gradient-impact inline-block">for Software Trust</span>
             </h1>
           </HeroReveal>
 
@@ -101,31 +101,9 @@ export function TricorderHero(): React.ReactElement {
           y={40}
           delay={0.2}
           duration={1.0}
-          className="mx-auto w-full max-w-[560px] lg:max-w-[640px]"
+          className="mx-auto hidden w-full max-w-[440px] md:block lg:max-w-[520px]"
         >
-          <div className="relative w-full" style={{ aspectRatio: '1300 / 975' }}>
-            {/* Halo, so the render sits in light rather than on flat navy. */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-[6%] rounded-full select-none"
-              style={{
-                background:
-                  'radial-gradient(closest-side, rgba(90,110,255,0.38) 0%, rgba(90,110,255,0) 72%)',
-                filter: 'blur(24px)',
-              }}
-            />
-            <div className="cs-tri-float absolute inset-0">
-              <Image
-                src="/images/tricorder/hero-intelligence-cube.webp"
-                alt="A glowing glass cube holding a circuit-trace brain on a glass pedestal, surrounded by floating security panels"
-                fill
-                priority
-                sizes="(min-width: 1440px) 640px, (min-width: 1024px) 45vw, 560px"
-                className="select-none object-contain"
-                draggable={false}
-              />
-            </div>
-          </div>
+          <TricorderHeroVerdict />
         </HeroReveal>
       </div>
     </section>

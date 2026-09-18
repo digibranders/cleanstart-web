@@ -6433,6 +6433,68 @@ body {
   }
 }
 
+/* Tricorder page — the hero verdict loop (TricorderHeroVerdict). Dashes flow
+   along each input stream toward the package, and a scan line passes over the
+   package once per stage (the element is re-keyed per stage, so it restarts).
+   The loop itself is JS-driven and stops under reduced motion; these are off
+   there too. */
+@keyframes cs-tri-stream {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+@keyframes cs-tri-scanline {
+  from {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  to {
+    transform: translateY(132px);
+    opacity: 0;
+  }
+}
+@keyframes cs-tri-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes cs-tri-intel-pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+.cs-tri-stream {
+  animation: cs-tri-stream 0.8s linear infinite;
+}
+.cs-tri-orbit {
+  animation: cs-tri-orbit 9s linear infinite;
+}
+.cs-tri-intel-pulse {
+  animation: cs-tri-intel-pulse 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.cs-tri-scanline {
+  animation: cs-tri-scanline 0.85s ease-in-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-tri-stream,
+  .cs-tri-scanline,
+  .cs-tri-orbit,
+  .cs-tri-intel-pulse {
+    animation: none;
+  }
+}
+
 /* Vulnerability Remediation hero: "remediate at the source" panorama
    (VulnHeroScene.tsx). CVE chips ride `--dx`/`--dy` into the gate and a
    `cs-vuln-flash` with the same duration and delay fires as each one lands.
