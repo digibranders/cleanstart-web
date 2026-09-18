@@ -1,9 +1,10 @@
 "use client";
 
 import { Fragment, useEffect, useRef, useState } from "react";
-import { useInView, useReducedMotion } from "motion/react";
+import { useInView } from "motion/react";
 
 import { cn } from "@/lib/cn";
+import { useHydratedReducedMotion } from "@/lib/use-hydrated-reduced-motion";
 import { FlowArrow } from "@/components/ui/FlowArrow";
 import { ShieldCheck } from "./ShieldCheck";
 import { VerifyBeams } from "./VerifyBeams";
@@ -174,7 +175,7 @@ function GuaranteeCard({
 
 export function SecurityDiagram(): React.ReactElement {
   const ref = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
+  const reduce = useHydratedReducedMotion();
   const inView = useInView(ref, { margin: "0px 0px -80px 0px", amount: 0.05 });
   const [started, setStarted] = useState(false);
   const [hovered, setHovered] = useState<number | null>(null);

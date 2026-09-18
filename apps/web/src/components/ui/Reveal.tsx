@@ -5,8 +5,8 @@ import {
   domAnimation,
   m,
   useInView,
-  useReducedMotion,
   type HTMLMotionProps,
+  type Variants,
 } from "motion/react";
 import { type ReactNode, type RefObject, useEffect, useRef, useState } from "react";
 
@@ -17,8 +17,18 @@ import {
   staggerChild,
   staggerParent,
 } from "@/lib/motion";
+import { useHydratedReducedMotion } from "@/lib/use-hydrated-reduced-motion";
 
 type RevealViewport = typeof REVEAL_VIEWPORT | typeof HEADER_VIEWPORT;
+
+const INSTANT = { duration: 0 } as const;
+
+const instantStaggerParent: Variants = { hidden: {}, visible: {} };
+
+const instantStaggerChild: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: INSTANT },
+};
 
 /**
  * Fail-open in-view detection. Drives reveals off `useInView`, but if the
@@ -68,7 +78,9 @@ function useRevealInView(
  *  - `as`       — element to render (default `div`); pass `"span"` for inline
  *  - `header`   — use the section-header viewport margin (-80px instead of -60px)
  *
- * Respects `prefers-reduced-motion` — renders an unwrapped element.
+ * Respects `prefers-reduced-motion`: the content snaps to its final state
+ * after hydration instead of animating. The element tree stays the same so the
+ * server markup and the hydration render match.
  */
 interface RevealProps extends Omit<HTMLMotionProps<"div">, "children"> {
   children: ReactNode;
@@ -86,17 +98,10 @@ export function Reveal({
   header = false,
   ...rest
 }: RevealProps) {
-  const reduce = useReducedMotion();
+  const reduce = useHydratedReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const show = useRevealInView(ref, header ? HEADER_VIEWPORT : REVEAL_VIEWPORT);
-
-  if (reduce) {
-    return (
-      <div {...(rest as unknown as React.HTMLAttributes<HTMLDivElement>)}>
-        {children}
-      </div>
-    );
-  }
+  const visible = reduce || show;
 
   // `useInView` returns false on the server and first client render, so the
   // SSR markup matches the client's initial state (no hydration mismatch).
@@ -106,8 +111,8 @@ export function Reveal({
       <m.div
         ref={ref}
         initial={{ opacity: 0, y }}
-        animate={show ? { opacity: 1, y: 0 } : { opacity: 0, y }}
-        transition={{ duration, delay, ease: EASE_OUT }}
+        animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y }}
+        transition={reduce ? INSTANT : { duration, delay, ease: EASE_OUT }}
         {...rest}
       >
         {children}
@@ -189,25 +194,17 @@ export function RevealStagger({
   header = false,
   ...rest
 }: RevealStaggerProps) {
-  const reduce = useReducedMotion();
+  const reduce = useHydratedReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const show = useRevealInView(ref, header ? HEADER_VIEWPORT : REVEAL_VIEWPORT);
-
-  if (reduce) {
-    return (
-      <div {...(rest as unknown as React.HTMLAttributes<HTMLDivElement>)}>
-        {children}
-      </div>
-    );
-  }
 
   return (
     <LazyMotion features={domAnimation} strict>
       <m.div
         ref={ref}
         initial="hidden"
-        animate={show ? "visible" : "hidden"}
-        variants={staggerParent(gap)}
+        animate={reduce || show ? "visible" : "hidden"}
+        variants={reduce ? instantStaggerParent : staggerParent(gap)}
         {...rest}
       >
         {children}
@@ -222,19 +219,11 @@ interface RevealItemProps extends Omit<HTMLMotionProps<"div">, "children"> {
 }
 
 export function RevealItem({ children, ...rest }: RevealItemProps) {
-  const reduce = useReducedMotion();
-
-  if (reduce) {
-    return (
-      <div {...(rest as unknown as React.HTMLAttributes<HTMLDivElement>)}>
-        {children}
-      </div>
-    );
-  }
+  const reduce = useHydratedReducedMotion();
 
   return (
     <LazyMotion features={domAnimation} strict>
-      <m.div variants={staggerChild} {...rest}>
+      <m.div variants={reduce ? instantStaggerChild : staggerChild} {...rest}>
         {children}
       </m.div>
     </LazyMotion>
