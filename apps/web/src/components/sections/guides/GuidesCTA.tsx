@@ -231,7 +231,7 @@ export function GuidesCTA(): React.ReactElement {
                     {submitting ? "Subscribing…" : "Subscribe"}
                   </button>
                 </div>
-                <NewsletterConsent ref={consentRef} />
+                <NewsletterConsent ref={consentRef} variant="light" />
               </form>
             )}
             {error && (
