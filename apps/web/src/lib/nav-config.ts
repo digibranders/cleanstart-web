@@ -90,12 +90,6 @@ export const NAV_TREE: NavItem[] = [
             description: "Runtime visibility into vulnerabilities and drift.",
             icon: "radar",
           },
-          {
-            label: "Tricorder",
-            href: "/tricorder",
-            description: "The intelligence layer behind every CleanStart verdict.",
-            icon: "lens",
-          },
         ],
       },
     ],
