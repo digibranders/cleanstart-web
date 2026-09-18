@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import type { Form } from "@/lib/forms";
 import { ResourceGateModal } from "@/components/resource/ResourceGateModal";
 import { trackEvent } from "@/lib/analytics/track";
 
@@ -11,7 +10,11 @@ interface ResourceDownloadButtonProps {
   resourceSlug: string;
   gated: boolean;
   assetHref: string;
-  gateForm: Form | null;
+  /**
+   * Whether the resource names a gate form. The form itself is rendered in
+   * code, so only its presence matters here.
+   */
+  hasGateForm: boolean;
   className?: string;
   style?: React.CSSProperties;
   children: React.ReactNode;
@@ -25,7 +28,7 @@ export function ResourceDownloadButton({
   resourceSlug,
   gated,
   assetHref,
-  gateForm,
+  hasGateForm,
   className,
   style,
   children,
@@ -33,8 +36,9 @@ export function ResourceDownloadButton({
   const [modalOpen, setModalOpen] = useState(false);
   const [checking, setChecking] = useState(false);
 
-  // Non-gated, or gating data missing — render the original direct download link.
-  if (!gated || !gateForm) {
+  // Not gated, or gated without a form to gate behind: the CMS validator blocks
+  // the second case on save, so this is the plain download link.
+  if (!gated || !hasGateForm) {
     return (
       <a
         href={assetHref}
@@ -100,7 +104,6 @@ export function ResourceDownloadButton({
       <ResourceGateModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        form={gateForm}
         resourceId={resourceId}
         resourceTitle={resourceTitle}
         onUnlocked={() => {

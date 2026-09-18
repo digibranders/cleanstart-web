@@ -52,6 +52,37 @@ export const attributionHubspotFields = (
     .map(([name, value]) => ({ name, value }));
 };
 
+/** The consent category a visitor ticks to ask for marketing email. */
+const MARKETING_CATEGORY = 'marketing';
+
+/**
+ * Builds the Forms API `legalConsentOptions` for a submission.
+ *
+ * Consent to process is always recorded. A marketing subscription is added
+ * only when the visitor ticked the marketing box AND the form names a
+ * subscription type. The form's type used to be enough on its own, which
+ * would have subscribed every visitor whether or not they ticked, once a type
+ * was set; that is why most forms had none, and why real opt-ins were dropped.
+ *
+ * The newsletter is unaffected: signing up is itself the opt-in, so it always
+ * sends the marketing category.
+ */
+export const hubspotLegalConsent = (
+  consent: LeadSubmission['consent'],
+  subscriptionTypeId: number,
+): { consent: Record<string, unknown> } | undefined => {
+  if (!consent) return undefined;
+  const out: Record<string, unknown> = {
+    consentToProcess: true,
+    text: consent.snapshot,
+  };
+  const optedIn = consent.categories?.includes(MARKETING_CATEGORY) === true;
+  if (optedIn && Number.isFinite(subscriptionTypeId)) {
+    out.communications = [{ value: true, subscriptionTypeId, text: consent.snapshot }];
+  }
+  return { consent: out };
+};
+
 /**
  * HubSpot lead handler.
  *
@@ -201,18 +232,8 @@ export const hubspotHandler: LeadHandler = {
         ...(submission.ip ? { ipAddress: submission.ip } : {}),
       },
     };
-    if (submission.consent) {
-      const consent: Record<string, unknown> = {
-        consentToProcess: true,
-        text: submission.consent.snapshot,
-      };
-      if (Number.isFinite(subscriptionTypeId)) {
-        consent.communications = [
-          { value: true, subscriptionTypeId, text: submission.consent.snapshot },
-        ];
-      }
-      body.legalConsentOptions = { consent };
-    }
+    const legalConsentOptions = hubspotLegalConsent(submission.consent, subscriptionTypeId);
+    if (legalConsentOptions) body.legalConsentOptions = legalConsentOptions;
 
     const post = async (payload: Record<string, unknown>): Promise<Response> =>
       fetch(`https://api.hsforms.com/submissions/v3/integration/submit/${portalId}/${guid}`, {

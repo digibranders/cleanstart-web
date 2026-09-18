@@ -89,7 +89,7 @@ export const NAV_TREE: NavItem[] = [
             href: "/cleansight",
             description: "Runtime visibility into vulnerabilities and drift.",
             icon: "radar",
-          }
+          },
         ],
       },
     ],

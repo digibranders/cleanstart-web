@@ -230,6 +230,14 @@ const nextConfig: NextConfig = {
           "/news/triam-security-rebrands-as-cleanstart-to-reflect-product-led-focus-on-securing-the-software-supply-chain",
         permanent: true,
       },
+      // Client shared this blog URL without the /blogs/ prefix. Catch the bare
+      // slug and send it to the real post rather than 404ing (there is no
+      // root-level [slug] route in apps/web).
+      {
+        source: "/busybox-container-security-risk",
+        destination: "/blogs/busybox-container-security-risk",
+        permanent: true,
+      },
     ];
   },
   images: {

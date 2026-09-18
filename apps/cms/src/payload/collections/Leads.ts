@@ -220,11 +220,15 @@ export const Leads: CollectionConfig = {
     {
       name: 'syncedTo',
       type: 'array',
-      labels: { singular: 'Sync', plural: 'Sync attempts' },
+      label: 'Sync status',
+      labels: { singular: 'Sync step', plural: 'Sync steps' },
       admin: {
         description:
-          'One row per secondary handler (HubSpot, company-from-domain). Failed rows are retryable.',
+          'One row per handler step (database, company lookup, HubSpot, confirmation email). Skipped steps had nothing to do. Failed rows are retryable.',
         readOnly: true,
+        components: {
+          Cell: '@/payload/admin/components/LeadSyncCell.tsx#LeadSyncCell',
+        },
       },
       fields: [
         { name: 'handler', type: 'text', required: true },

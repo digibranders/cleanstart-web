@@ -8019,7 +8019,7 @@ export interface Lead {
       }[]
     | null;
   /**
-   * One row per secondary handler (HubSpot, company-from-domain). Failed rows are retryable.
+   * One row per handler step (database, company lookup, HubSpot, confirmation email). Skipped steps had nothing to do. Failed rows are retryable.
    */
   syncedTo?:
     | {

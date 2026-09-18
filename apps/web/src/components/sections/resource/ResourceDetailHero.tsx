@@ -1,7 +1,6 @@
 import { breadcrumbTrail } from "@cleanstart/schema/builders";
 import type { ResourceDetail } from "@/lib/resources";
 import { mediaUrl } from "@/lib/resources";
-import type { Form } from "@/lib/forms";
 import { DETAIL_HERO_TITLE_STYLE } from "@/components/sections/_shared/DetailHero";
 import { HeroBreadcrumb } from "@/components/sections/_shared/HeroBreadcrumb";
 import { ResourceDownloadButton } from "@/components/resource/ResourceDownloadButton";
@@ -9,15 +8,22 @@ import { HeroReveal } from "@/components/ui/Reveal";
 
 interface ResourceDetailHeroProps {
   resource: ResourceDetail;
-  gateForm?: Form | null;
 }
 
 export function ResourceDetailHero({
   resource,
-  gateForm,
 }: ResourceDetailHeroProps): React.ReactElement {
-  const assetHref = resource.asset?.url ? (mediaUrl(resource.asset.url) ?? "#") : "#";
   const gated = resource.gated === true;
+  const hasGateForm = resource.gateForm != null;
+  // A gated file's URL never reaches the client: the button's props are
+  // serialised into the page, so passing it would publish the direct link the
+  // gate exists to withhold. The download comes from the signed link instead.
+  const assetHref =
+    gated && hasGateForm
+      ? "#"
+      : resource.asset?.url
+        ? (mediaUrl(resource.asset.url) ?? "#")
+        : "#";
 
   return (
     <section
@@ -121,7 +127,7 @@ export function ResourceDetailHero({
             resourceSlug={resource.slug}
             gated={gated}
             assetHref={assetHref}
-            gateForm={gateForm ?? null}
+            hasGateForm={hasGateForm}
             className="cs-btn-blue gap-3 font-bold h-11 lg:h-[64px]"
             style={{
               width: "840px",

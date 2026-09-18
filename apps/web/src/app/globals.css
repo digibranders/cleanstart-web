@@ -6366,3 +6366,224 @@ body {
 .cs-thank-you-secondary:hover svg {
   transform: translateX(3px);
 }
+
+/* Tricorder page — the intelligence cube (TricorderHero, TricorderSubstrate)
+   drifts on a slow float. Transform only; off under reduced motion. */
+@keyframes cs-tri-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+.cs-tri-float {
+  will-change: transform;
+  animation: cs-tri-float 6s ease-in-out infinite;
+}
+
+/* Tricorder page — the verdict engine (TricorderPipeline). Signal particles
+   travel the rail (the wrapper spans the rail, the particle sits on its far
+   edge, so -100% to 0 is one full crossing), and the active station's podium
+   sends out a ping. Transform / opacity only. */
+@keyframes cs-tri-signal-x {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes cs-tri-signal-y {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes cs-tri-ping {
+  from {
+    transform: scale(0.9);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+.cs-tri-signal-x {
+  will-change: transform;
+  animation: cs-tri-signal-x 3.1s linear infinite;
+}
+.cs-tri-signal-y {
+  will-change: transform;
+  animation: cs-tri-signal-y 3.1s linear infinite;
+}
+.cs-tri-ping {
+  animation: cs-tri-ping 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-tri-float,
+  .cs-tri-signal-x,
+  .cs-tri-signal-y,
+  .cs-tri-ping {
+    animation: none;
+  }
+}
+
+/* Vulnerability Remediation hero: "remediate at the source" panorama
+   (VulnHeroScene.tsx). CVE chips ride `--dx`/`--dy` into the gate and a
+   `cs-vuln-flash` with the same duration and delay fires as each one lands.
+   Transform / opacity / offset-path / dash only; everything stops under
+   reduced motion, where the chips, gate, stack and attestations sit as a
+   static frame and the transient flashes and comets are hidden. */
+@keyframes cs-vuln-scene-in {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes cs-vuln-chip {
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  10% { opacity: 1; }
+  70% { transform: translate(calc(var(--dx) * 0.8), calc(var(--dy) * 0.8)) scale(0.88); opacity: 1; }
+  86%, 100% { transform: translate(var(--dx), var(--dy)) scale(0.28); opacity: 0; }
+}
+@keyframes cs-vuln-flash {
+  0%, 80% { transform: scale(0.35); opacity: 0; }
+  86% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+@keyframes cs-vuln-scan {
+  from { transform: translateY(-170px); }
+  to { transform: translateY(170px); }
+}
+@keyframes cs-vuln-rim {
+  to { stroke-dashoffset: -1280; }
+}
+@keyframes cs-vuln-breathe {
+  0%, 100% { opacity: 0.6; transform: scale(0.96); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+@keyframes cs-vuln-twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.95; }
+}
+@keyframes cs-vuln-comet {
+  0% { offset-distance: 0%; opacity: 0; }
+  12%, 82% { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+@keyframes cs-vuln-layer {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(var(--lift)); }
+}
+@keyframes cs-vuln-ring {
+  0% { transform: scale(0.6); opacity: 0; }
+  25% { opacity: 0.55; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+@keyframes cs-vuln-attest {
+  0% { opacity: 0.3; transform: translateX(-10px); }
+  10%, 86% { opacity: 1; transform: none; }
+  100% { opacity: 0.3; transform: translateX(-10px); }
+}
+@keyframes cs-vuln-check {
+  0%, 6% { opacity: 0; transform: scale(0.4); }
+  14%, 86% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: scale(0.4); }
+}
+.cs-vuln-scene {
+  animation: cs-vuln-scene-in 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.4s both;
+}
+.cs-vuln-chip {
+  transform-box: fill-box;
+  transform-origin: 100% 50%;
+  animation: cs-vuln-chip 7s cubic-bezier(0.45, 0, 0.8, 0.55) infinite;
+}
+.cs-vuln-flash {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: cs-vuln-flash 7s linear infinite;
+}
+.cs-vuln-scan {
+  animation: cs-vuln-scan 3.6s ease-in-out infinite alternate;
+}
+.cs-vuln-rim {
+  animation: cs-vuln-rim 6s linear infinite;
+}
+.cs-vuln-breathe {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cs-vuln-breathe 5.5s ease-in-out infinite;
+}
+.cs-vuln-twinkle {
+  animation: cs-vuln-twinkle 3.4s ease-in-out infinite;
+}
+.cs-vuln-comet {
+  offset-rotate: auto;
+  animation: cs-vuln-comet 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+.cs-vuln-layer {
+  animation: cs-vuln-layer 6s ease-in-out infinite;
+}
+.cs-vuln-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cs-vuln-ring 3.5s ease-out infinite;
+}
+.cs-vuln-attest {
+  animation: cs-vuln-attest 7s ease-out infinite;
+}
+.cs-vuln-check {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cs-vuln-check 7s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-vuln-scene,
+  .cs-vuln-chip,
+  .cs-vuln-flash,
+  .cs-vuln-scan,
+  .cs-vuln-rim,
+  .cs-vuln-breathe,
+  .cs-vuln-twinkle,
+  .cs-vuln-comet,
+  .cs-vuln-layer,
+  .cs-vuln-ring,
+  .cs-vuln-attest,
+  .cs-vuln-check {
+    animation: none !important;
+  }
+  .cs-vuln-flash,
+  .cs-vuln-comet,
+  .cs-vuln-ring {
+    opacity: 0 !important;
+  }
+}
+
+/* Vulnerability Remediation "Verification You Can Trust" chain: a pulse runs
+   along the rail from Source Built to Security Policies. The mover spans the
+   rail, so percentage translates travel the rail's own length. */
+@keyframes cs-vr-rail-x {
+  from { transform: translateX(-18%); }
+  to { transform: translateX(100%); }
+}
+@keyframes cs-vr-rail-y {
+  from { transform: translateY(-18%); }
+  to { transform: translateY(100%); }
+}
+.cs-vr-rail-x {
+  animation: cs-vr-rail-x 4.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+.cs-vr-rail-y {
+  animation: cs-vr-rail-y 4.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-vr-rail-x,
+  .cs-vr-rail-y {
+    animation: none;
+    opacity: 0;
+  }
+}

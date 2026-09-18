@@ -104,8 +104,7 @@ export function ASRHero(): React.ReactElement {
                     margin: 0,
                   }}
                 >
-                  Reduce attack surface by eliminating unnecessary software components before they
-                  reach production.
+                  Reduce your attack surface with a smaller software footprint.
                 </p>
               </HeroReveal>
             </div>
@@ -113,7 +112,7 @@ export function ASRHero(): React.ReactElement {
             {/* Inline style overrides are required because cs-btn-glass is
                 unlayered CSS and beats @layer utilities (Tailwind). */}
             <Link
-              href="https://images.cleanstart.com"
+              href="https://www.youtube.com/watch?v=WvxSvEzXbiQ"
               target="_blank"
               rel="noopener noreferrer"
               className="cs-btn-glass"
@@ -129,7 +128,7 @@ export function ASRHero(): React.ReactElement {
                 } as React.CSSProperties
               }
             >
-              Explore CleanStart Images
+              See How It Works
             </Link>
           </div>
 
