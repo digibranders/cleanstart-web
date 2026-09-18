@@ -355,7 +355,7 @@ function RelationshipsContent({ accent }: { accent: string }): React.ReactElemen
               }}
             />
           ) : null}
-          <div className="flex w-[92px] flex-col items-center gap-3">
+          <div className="flex w-[80px] flex-col items-center gap-3">
             <ItemTile accent={accent} glyph={item.glyph} />
             <ItemLabel>{item.label}</ItemLabel>
           </div>
@@ -466,11 +466,14 @@ function VerdictCard(): React.ReactElement {
 /* ── Desktop scene: fixed 1320 × 538 canvas, scaled to fit ───────────────── */
 
 const VB = { w: 1320, h: 538 } as const;
-/** Panel geometry. Widths differ because the doc's three panels carry different loads. */
+/**
+ * Panel geometry: equal thirds, so the Behavior panel is centred on CARD_X and
+ * its current drops straight through the junction into the component.
+ */
 const PANELS = {
-  history: { x: 0, w: 360 },
-  behavior: { x: 386, w: 440 },
-  relationships: { x: 852, w: 468 },
+  history: { x: 0, w: 424 },
+  behavior: { x: 448, w: 424 },
+  relationships: { x: 896, w: 424 },
 } as const;
 const PANEL_Y = 0;
 const PANEL_H = 200;
