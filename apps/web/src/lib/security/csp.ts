@@ -28,6 +28,11 @@ const LEADFEEDER = 'https://*.lfeeder.com';
 // Apollo.io website visitor tracker: loader is assets.apollo.io (served via
 // script-src 'https:'); the tracker beacons + pixels back to *.apollo.io.
 const APOLLO = 'https://*.apollo.io';
+// Microsoft Clarity, fired from GTM: loader is www.clarity.ms (served via
+// script-src 'https:'); the recorder uploads to *.clarity.ms and syncs identity
+// through c.bing.com by both fetch and pixel.
+const CLARITY = 'https://*.clarity.ms';
+const CLARITY_SYNC = 'https://c.bing.com';
 // Privacy-preserving YouTube player used by the podcast page, Knowledge Hub
 // lessons, and the Clean Libraries hero video. Without an explicit `frame-src`
 // these iframes fall back to `default-src 'self'` and are blocked outright the
@@ -100,6 +105,8 @@ export function buildCsp({
     LEADFEEDER,
     // Apollo.io tracker pixel.
     APOLLO,
+    CLARITY,
+    CLARITY_SYNC,
     // YouTube poster frames — see YOUTUBE_THUMBS.
     YOUTUBE_THUMBS,
   ];
@@ -126,6 +133,8 @@ export function buildCsp({
     GA4_REGION,
     LEADFEEDER,
     APOLLO,
+    CLARITY,
+    CLARITY_SYNC,
   ];
   if (!isProduction) {
     // Local dev: web (3010/3001) calls the CMS at localhost:3000 for
