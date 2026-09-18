@@ -8,6 +8,7 @@ import { SearchProvider } from "@/components/search/SearchProvider";
 import { SmoothScrollProvider } from "@/components/SmoothScrollProvider";
 import { AttributionProvider } from "@/components/attribution/AttributionProvider";
 import { Ga4HeadScript } from "@/components/analytics/Ga4HeadScript";
+import { GtmHeadScript } from "@/components/analytics/GtmHeadScript";
 import {
   ConsentProvider,
   ConsentModeScript,
@@ -178,9 +179,10 @@ export default async function RootLayout({
             DNS+TCP+TLS on the first beacon (~RTT 131ms p75 on mobile). */}
         <link rel="preconnect" href="https://www.google-analytics.com" crossOrigin="" />
         {/* Order is load-bearing: the Consent Mode default must be queued
-            before the GA4 config call that follows it. */}
+            before any tag boots, so every tag starts in the right state. */}
         <ConsentModeScript />
         <Ga4HeadScript />
+        <GtmHeadScript />
       </head>
       <body suppressHydrationWarning>
         {/* Skip-to-content link (WCAG 2.1 A): first focusable element; hidden
