@@ -47,7 +47,10 @@ export type Ga4EventName =
  *
  * GTM data layer variables persist once set, so a key left over from an earlier
  * push would silently attach itself to a later, unrelated event. Each emit
- * therefore nulls the whole set first. Params are typed against this list, so a
+ * therefore sets the whole list to `undefined` in the same push as the event.
+ * `undefined` rather than `null`: GTM's merge still overwrites the stale value,
+ * and a Data Layer Variable resolving to undefined makes the GA4 tag omit the
+ * param instead of sending a literal null. Params are typed against this list, so a
  * new key at a call site fails typecheck until it is added here, and it also
  * needs a Data Layer Variable in GTM before GA4 will receive it.
  */
@@ -83,14 +86,8 @@ function emit(name: string, params?: Ga4EventParams): void {
   const dataLayer = (window as Window & { dataLayer?: DataLayer }).dataLayer;
   if (!Array.isArray(dataLayer)) return;
 
-  const reset: Record<string, null> = {};
-  for (const key of EVENT_PARAM_KEYS) reset[key] = null;
-  dataLayer.push(reset);
-
   const payload: Record<string, unknown> = { event: name };
-  for (const [key, value] of Object.entries(params ?? {})) {
-    if (value !== undefined) payload[key] = value;
-  }
+  for (const key of EVENT_PARAM_KEYS) payload[key] = params?.[key];
   dataLayer.push(payload);
 }
 

@@ -10,11 +10,12 @@ import { useConsent } from "./ConsentProvider";
  * Renders the client-side analytics that still live in code.
  *
  * Third-party tags (GA4, Microsoft Clarity, Apollo.io, Leadfeeder) are NOT
- * mounted here. They live in the GTM container loaded by <GtmHeadScript/>, and
- * each carries a GTM consent check that reproduces the gating this component
- * used to apply: Clarity on analytics_storage, Apollo and Leadfeeder on
- * ad_storage, which <ConsentProvider/> flips on a Targeting opt-in. The full
- * inventory is in docs/web/TRACKING-TAGS.md.
+ * mounted here. They live in the GTM container loaded by <GtmHeadScript/>.
+ * Apollo and Leadfeeder used to mount here once `targetingGranted` was true; in
+ * GTM they fire on the `cs_consent_update` event that <ConsentProvider/> pushes,
+ * with a trigger condition on the Targeting flag. Clarity fires on the same
+ * event, conditioned on the Performance flag, the same category <WebVitals/>
+ * uses below. The full inventory is in docs/web/TRACKING-TAGS.md.
  *
  * GA4 stays UN-GATED from the cookie banner outside the EEA/UK/CH (business
  * decision, 2026-07-22): the head consent snippet defaults analytics_storage to

@@ -76,7 +76,17 @@ Live production values, confirmed from the rendered page on 2026-09-18:
 
 GA4 must never be firing from code and from GTM at the same time, or every pageview and conversion counts twice and the data is unusable for the period of overlap.
 
-The sequence below guarantees a short **undercount** instead, which is recoverable, rather than a double count, which is not:
+> **Superseded during implementation (2026-09-18).** The code for Tasks 1 to 4 and 7 shipped as one branch, `feat/gtm-tag-migration`, so the loader and the removal of the in-code tags land in the **same** deploy. That makes the staged sequence below unnecessary. Use this one instead, which has neither a gap nor a double count:
+>
+> 1. Build the container (Task 5) and **publish it with every tag live**. Production does not load GTM yet, so publishing fires nothing.
+> 2. Verify it with GTM Preview against a local `next start` build run with `NEXT_PUBLIC_GTM_ID` set (Preview works on any host the container loads on).
+> 3. Set `NEXT_PUBLIC_GTM_ID` in Vercel, Production only.
+> 4. Merge the branch and deploy. The first production build that loads GTM is also the first build without the in-code GA4, so the two never overlap.
+> 5. Run Task 8's verification.
+>
+> The one hazard left: never deploy this branch to production **without** `NEXT_PUBLIC_GTM_ID` set, or the site sends no analytics at all until it is.
+
+The original staged sequence, kept for reference. It guarantees a short **undercount** instead, which is recoverable, rather than a double count, which is not:
 
 1. Tasks 1 to 3 ship code that loads GTM. `NEXT_PUBLIC_GTM_ID` stays **unset** in Vercel, so the loader renders nothing. Nothing changes in production.
 2. Task 4 builds the container in the GTM UI with the GA4 tag **paused**. Nothing fires.
@@ -557,6 +567,8 @@ One User-Defined Variable per event parameter, all of type **Data Layer Variable
 | `dlv - page_location` | `page_location` | page_view |
 | `dlv - page_title` | `page_title` | page_view |
 | `dlv - page_referrer` | `page_referrer` | page_view |
+| `dlv - cs_consent_performance` | `cs_consent_performance` | Clarity trigger |
+| `dlv - cs_consent_targeting` | `cs_consent_targeting` | Apollo and Leadfeeder trigger |
 
 - [ ] **Step 3: Create the triggers**
 
@@ -573,6 +585,10 @@ One Custom Event trigger per event name pushed by `track.ts`. Event name must ma
 | `CE - thank_you_view` | Custom Event | `thank_you_view` |
 | `CE - cta_click` | Custom Event | `cta_click` |
 | `CE - search` | Custom Event | `search` |
+| `CE - consent performance granted` | Custom Event, fires on Some Custom Events where `dlv - cs_consent_performance` equals `true` | `cs_consent_update` |
+| `CE - consent targeting granted` | Custom Event, fires on Some Custom Events where `dlv - cs_consent_targeting` equals `true` | `cs_consent_update` |
+
+The two consent triggers exist because the gated tags must NOT fire on "All Pages". `ConsentProvider` applies the visitor's decision after hydration, after "All Pages" has been evaluated, and GTM never re-fires a tag that failed a consent check. `cs_consent_update` is pushed by `ConsentProvider` on every resolved decision (see `lib/consent/consent-event.ts`).
 
 - [ ] **Step 4: Create the GA4 configuration tag**
 
@@ -606,8 +622,9 @@ First create the Clarity project, since it does not exist yet: clarity.microsoft
 Then in GTM:
 
 - Tag type: **Custom HTML**
-- Trigger: `All Pages`
-- Consent Settings: **Require additional consent for tag to fire**, consent type `analytics_storage`. Clarity records sessions, so it cannot ride the unmodeled GA4 grant inside the EEA/UK/CH; the Consent Mode default handles the regional split for us.
+- Trigger: `CE - consent performance granted`
+- Tag firing options (Advanced Settings): **Once per page**.
+- Consent Settings: **No additional consent required.** Do not use `analytics_storage` here: it is granted by default outside the EEA/UK/CH so GA4 stays un-gated, so it would let Clarity record visitors who rejected Performance. The trigger condition is the gate.
 - HTML, with the real project id substituted for `CLARITY_PROJECT_ID`:
 
 ```html
@@ -625,8 +642,9 @@ y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
 - [ ] **Step 7: Create the Apollo.io tag**
 
 - Tag type: **Custom HTML**
-- Trigger: `All Pages`
-- Consent Settings: **Require additional consent**, consent type `ad_storage`. This reproduces today's `targetingGranted` gate in `GatedAnalytics.tsx`.
+- Trigger: `CE - consent targeting granted`
+- Tag firing options (Advanced Settings): **Once per page**.
+- Consent Settings: **Require additional consent**, consent type `ad_storage`. Belt and braces: `ConsentProvider` grants `ad_storage` in the same update that sets the Targeting flag, so this only blocks the tag if the two ever drift apart.
 - HTML, byte-identical to the snippet the site ships today:
 
 ```html
@@ -640,7 +658,8 @@ y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
 - [ ] **Step 8: Create the Leadfeeder tag**
 
 - Tag type: **Custom HTML**
-- Trigger: `All Pages`
+- Trigger: `CE - consent targeting granted`
+- Tag firing options (Advanced Settings): **Once per page**.
 - Consent Settings: **Require additional consent**, consent type `ad_storage`.
 - HTML:
 
@@ -1038,11 +1057,14 @@ In the browser console on a fresh load:
 performance.getEntriesByType('resource').map(r => r.name).filter(n => /googletagmanager|google-analytics|clarity|apollo|lfeeder/.test(n))
 ```
 
-Expected before any consent decision: `gtm.js`, `gtag/js`, `google-analytics.com/g/collect`, and `clarity.ms` only if you are outside the EEA/UK/CH. No `apollo.io` and no `lfeeder.com`, because `ad_storage` is default-denied everywhere.
+Expected before any consent decision (use a private window): `gtm.js`, `gtag/js` and `google-analytics.com/g/collect`. No `clarity.ms`, no `apollo.io`, no `lfeeder.com`: no decision means no `cs_consent_update` event, so no gated tag fires.
 
-- [ ] **Step 5: Verify the Targeting gate**
+- [ ] **Step 5: Verify the consent gates, including for returning visitors**
 
-Accept all in the cookie banner, then re-run the snippet from step 4. Expected: `assets.apollo.io` and `sc.lfeeder.com` now appear. This proves the GTM consent check reproduces the old React gate.
+1. Open Cookies Settings, enable Performance only, confirm. Re-run the snippet: `clarity.ms` appears, `apollo.io` and `lfeeder.com` do not.
+2. Reload the page. Re-run the snippet: `clarity.ms` appears again on the fresh load. This is the returning-visitor path that an "All Pages" trigger would have missed.
+3. Open Cookies Settings, enable Targeting too, confirm. `assets.apollo.io` and `sc.lfeeder.com` now appear, and `clarity.ms` is not loaded a second time (Once per page).
+4. Reject all, reload. None of the three appear.
 
 - [ ] **Step 6: Verify a conversion event end to end**
 

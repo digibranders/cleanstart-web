@@ -24,22 +24,50 @@ GTM owns the tags. Code owns four things GTM cannot do safely:
    Targeting opt-in. `ConsentProvider.tsx` sends the update when the visitor
    decides.
 3. **The dataLayer contract.** `lib/analytics/track.ts` is the only place
-   application code pushes events. Params are typed against its
-   `EVENT_PARAM_KEYS` list, which it nulls before every push because GTM data
-   layer variables otherwise persist into later events.
+   application code pushes GA4 events. Params are typed against its
+   `EVENT_PARAM_KEYS` list, and every push sets the unused keys to `undefined`
+   because GTM data layer variables otherwise persist into later events.
+   `ConsentProvider.tsx` pushes the one other event, `cs_consent_update` (see
+   below).
 4. **The CSP.** `lib/security/csp.ts` allow-lists each vendor's hosts. A new
    vendor added in GTM still needs a code change here first, or its beacons are
    blocked.
 
 ## Live tags
 
-| Tag | ID | Where it is configured | Consent requirement |
+| Tag | ID | Where it is configured | Fires when |
 |---|---|---|---|
-| Google Tag Manager | set in Vercel | `NEXT_PUBLIC_GTM_ID`, Vercel Production only | None. The container itself sets no cookies. |
-| GA4 | `G-S6T47D7PZR` | GTM: Google tag on Initialization, plus one GA4 event tag per event | Consent Mode only, no extra GTM check. GA4 stays unmodeled outside the EEA/UK/CH (business decision, 2026-07-22). |
-| Microsoft Clarity | see GTM | GTM: Custom HTML on All Pages | `analytics_storage` |
-| Apollo.io | `691b73cb5443850011f553d1` | GTM: Custom HTML on All Pages | `ad_storage` (Targeting) |
-| Leadfeeder / Dealfront | `kn9Eq4RXRqJ8RlvP` | GTM: Custom HTML on All Pages | `ad_storage` (Targeting) |
+| Google Tag Manager | set in Vercel | `NEXT_PUBLIC_GTM_ID`, Vercel Production only | Every production page. The container itself sets no cookies. |
+| GA4 | `G-S6T47D7PZR` | GTM: Google tag on Initialization, plus one GA4 event tag per event | Every page. Consent Mode only, no extra GTM check, so GA4 stays unmodeled outside the EEA/UK/CH (business decision, 2026-07-22). |
+| Microsoft Clarity | see GTM | GTM: Custom HTML on `cs_consent_update` | `cs_consent_performance` is true |
+| Apollo.io | `691b73cb5443850011f553d1` | GTM: Custom HTML on `cs_consent_update` | `cs_consent_targeting` is true, plus a GTM `ad_storage` consent check |
+| Leadfeeder / Dealfront | `kn9Eq4RXRqJ8RlvP` | GTM: Custom HTML on `cs_consent_update` | `cs_consent_targeting` is true, plus a GTM `ad_storage` consent check |
+
+### Why the gated tags don't fire on "All Pages"
+
+`ConsentProvider.tsx` applies the visitor's decision after React hydrates, which
+is after GTM has already evaluated "All Pages". GTM never re-fires a tag that
+failed its consent check, so an "All Pages" trigger would leave every opted-in
+visitor untracked until a hard reload. And `analytics_storage` is granted by
+default outside the EEA/UK/CH so that GA4 stays un-gated, so it cannot gate
+Clarity on the Performance category.
+
+Instead `ConsentProvider` pushes this event whenever a decision is resolved,
+both for a returning visitor on page load and for a fresh banner choice:
+
+```js
+{
+  event: "cs_consent_update",
+  cs_consent_performance: true,
+  cs_consent_functional: false,
+  cs_consent_targeting: true
+}
+```
+
+Built by `lib/consent/consent-event.ts`. The gated tags use a Custom Event
+trigger on it with a condition on the relevant flag, and tag firing option
+"Once per page" so a second decision in the same page view cannot load a vendor
+script twice. A visitor who has not decided yet gets no event, so no gated tag.
 
 Not tracking tags, listed so nobody goes looking for them:
 
@@ -75,7 +103,9 @@ events" toggle must stay OFF, or every SPA navigation counts twice.
 
 1. Add the vendor's hosts to `lib/security/csp.ts` with a test in
    `csp.test.ts`, and deploy that first.
-2. Build the tag in a GTM workspace with the right consent check, paused.
+2. Build the tag in a GTM workspace, paused. If it needs consent, trigger it on
+   `cs_consent_update` with a condition on the right category flag, never on
+   "All Pages".
 3. Verify it in GTM Preview against www.cleanstart.com.
 4. Unpause, publish, and add a row to the table above.
 

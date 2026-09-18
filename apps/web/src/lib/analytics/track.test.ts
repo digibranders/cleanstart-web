@@ -14,16 +14,23 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+/** Keys of a push whose value is set, i.e. what a GA4 event tag would send. */
+const sent = (push: Push | undefined): Push =>
+  Object.fromEntries(
+    Object.entries(push ?? {}).filter(([, value]) => value !== undefined),
+  );
+
 describe("trackEvent", () => {
-  it("pushes the event name under the `event` key with its params", () => {
+  it("pushes one entry carrying the event name and its params", () => {
     const dataLayer = stubDataLayer();
 
     trackEvent("generate_lead", { form_name: "contact" });
 
-    expect(dataLayer.at(-1)).toEqual({ event: "generate_lead", form_name: "contact" });
+    expect(dataLayer).toHaveLength(1);
+    expect(sent(dataLayer[0])).toEqual({ event: "generate_lead", form_name: "contact" });
   });
 
-  it("nulls every known parameter before each event push", () => {
+  it("clears every other known parameter in the same push", () => {
     // GTM data layer variables persist across pushes, so without a reset a
     // `job_slug` from an earlier event would attach itself to a later one.
     const dataLayer = stubDataLayer();
@@ -31,22 +38,19 @@ describe("trackEvent", () => {
     trackEvent("job_application", { job_slug: "staff-engineer" });
     trackEvent("newsletter_signup", { form_name: "newsletter" });
 
-    const reset = dataLayer.at(-2);
-    expect(reset?.job_slug).toBeNull();
-    expect(reset?.form_name).toBeNull();
-    expect(reset).not.toHaveProperty("event");
-    expect(dataLayer.at(-1)).toEqual({
-      event: "newsletter_signup",
-      form_name: "newsletter",
-    });
+    const last = dataLayer.at(-1);
+    // The key must be present (so GTM's merge overwrites the stale value) but
+    // undefined (so the GA4 tag omits the param rather than sending null).
+    expect(last).toHaveProperty("job_slug", undefined);
+    expect(sent(last)).toEqual({ event: "newsletter_signup", form_name: "newsletter" });
   });
 
-  it("omits undefined params so they don't overwrite the reset", () => {
+  it("treats an explicitly undefined param as cleared", () => {
     const dataLayer = stubDataLayer();
 
     trackEvent("cta_click", { cta: "hero_watch_video", page: undefined });
 
-    expect(dataLayer.at(-1)).toEqual({ event: "cta_click", cta: "hero_watch_video" });
+    expect(sent(dataLayer.at(-1))).toEqual({ event: "cta_click", cta: "hero_watch_video" });
   });
 
   it("pushes the bare event when no params are given", () => {
@@ -54,10 +58,10 @@ describe("trackEvent", () => {
 
     trackEvent("cta_click");
 
-    expect(dataLayer.at(-1)).toEqual({ event: "cta_click" });
+    expect(sent(dataLayer.at(-1))).toEqual({ event: "cta_click" });
   });
 
-  it("no-ops when the dataLayer does not exist (preview host or tag not configured)", () => {
+  it("no-ops when window.dataLayer is missing", () => {
     vi.stubGlobal("window", {});
     expect(() =>
       trackEvent("file_download", { resource_title: "x" }),
@@ -80,7 +84,7 @@ describe("trackPageView", () => {
       page_referrer: "https://www.cleanstart.com/",
     });
 
-    expect(dataLayer.at(-1)).toEqual({
+    expect(sent(dataLayer.at(-1))).toEqual({
       event: "page_view",
       page_location: "https://www.cleanstart.com/blog",
       page_title: "Blog",
