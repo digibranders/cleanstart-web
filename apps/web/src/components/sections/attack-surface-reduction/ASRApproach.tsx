@@ -22,7 +22,7 @@ const CARDS: readonly [WhyCard, WhyCard, WhyCard, WhyCard] = [
   },
   {
     title: 'Secure Defaults',
-    desc: 'Hardened by default.',
+    desc: 'Hardened configurations by default.',
     imgSrc: '/images/attack-surface-reduction/approach-icon-secure.webp',
     imgAlt: 'Secure defaults icon',
   },
@@ -34,10 +34,11 @@ export function ASRApproach(): React.ReactElement {
       dataSection="ASRApproach"
       heading={
         <>
-          {'Deploy '}
-          <span className="cs-text-gradient-impact">Without Disruption</span>
+          {'Reduce Exposure. '}
+          <span className="cs-text-gradient-impact">Keep Your Workflow.</span>
         </>
       }
+      subheading="Deploy Without Disruption"
       cards={CARDS}
       theme="dark"
       showCornerGlows={false}

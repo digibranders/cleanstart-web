@@ -3,18 +3,18 @@ import { Reveal } from '@/components/ui/Reveal';
 
 const TARGETS = [
   {
-    title: 'Kubernetes Platforms',
-    desc: 'Secure container foundations.',
+    title: 'Minimal Images',
+    desc: 'Fewer packages. Smaller footprint.',
     icon: '/images/attack-surface-reduction/modern-icon-k8s.svg',
   },
   {
-    title: 'Regulated Environments',
-    desc: 'Built for compliance-heavy workloads.',
+    title: 'Distroless Runtime',
+    desc: 'Only what applications need.',
     icon: '/images/attack-surface-reduction/modern-icon-regulated.svg',
   },
   {
-    title: 'Security-Focused Teams',
-    desc: 'Reduce software supply chain risk.',
+    title: 'Hardened Configurations',
+    desc: 'Secure defaults from the start.',
     icon: '/images/attack-surface-reduction/modern-icon-security.svg',
   },
 ] as const;
@@ -130,8 +130,8 @@ export function ASRModern(): React.ReactElement {
               marginBottom: 'clamp(32px, 5vw, 64px)',
             }}
           >
-            Built for Modern Production{' '}
-            <span className="cs-text-gradient-impact">Environments</span>
+            Built to{' '}
+            <span className="cs-text-gradient-impact">Reduce Attack Surface</span>
           </h2>
         </Reveal>
 
@@ -199,7 +199,7 @@ export function ASRModern(): React.ReactElement {
               margin: 0,
             }}
           >
-            {'Built for Modern Production '}
+            {'Built to '}
             <span
               style={{
                 background: 'linear-gradient(95.18deg, #9A51FF 42.34%, #2CC1EB 98.78%)',
@@ -209,7 +209,7 @@ export function ASRModern(): React.ReactElement {
                 color: 'transparent',
               }}
             >
-              Environments
+              Reduce Attack Surface
             </span>
           </p>
         </div>

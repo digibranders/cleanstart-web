@@ -7,26 +7,26 @@ const CARDS = [
   {
     id: 'tl',
     mobileOrder: 0,
-    title: 'Hidden Risk',
-    description: 'Risk arrives through dependencies.',
+    title: 'Component Sprawl',
+    description: 'More components to secure.',
   },
   {
     id: 'tr',
     mobileOrder: 2,
-    title: 'Component Sprawl',
-    description: 'Most software ships with unnecessary components.',
+    title: 'Unused Packages',
+    description: 'Extra software increases exposure.',
   },
   {
     id: 'bl',
     mobileOrder: 1,
-    title: 'Inventory Overload',
-    description: 'Larger software inventories increase complexity.',
+    title: 'Dependency Chains',
+    description: 'More dependencies, more complexity.',
   },
   {
     id: 'br',
     mobileOrder: 3,
-    title: 'Endless Patching',
-    description: 'More software means more maintenance.',
+    title: 'Maintenance Burden',
+    description: 'Every component needs upkeep.',
   },
 ] as const;
 
@@ -43,7 +43,7 @@ export function ASRBloated(): React.ReactElement {
             fontWeight: 600,
             letterSpacing: '-0.04em',
             lineHeight: 1.2,
-            marginBottom: 'clamp(24px, 2.5vw, 48px)',
+            marginBottom: '16px',
           }}
         >
           <span className="block">Modern Software Ships</span>
@@ -61,6 +61,24 @@ export function ASRBloated(): React.ReactElement {
             Too Much
           </span>
         </h2>
+        </Reveal>
+        <Reveal header delay={0.1} y={20}>
+          <p
+            className="text-center mx-auto"
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'var(--fs-body)',
+              fontWeight: 400,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.4,
+              color: '#555555',
+              maxWidth: '560px',
+              margin: '0 auto',
+              marginBottom: 'clamp(24px, 2.5vw, 48px)',
+            }}
+          >
+            Every extra component expands what you need to secure.
+          </p>
         </Reveal>
       </div>
 
