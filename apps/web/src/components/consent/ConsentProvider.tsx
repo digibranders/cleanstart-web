@@ -14,6 +14,7 @@ import {
   CONSENT_MAX_AGE,
   CONSENT_VERSION,
 } from "@/lib/consent/constants";
+import { consentUpdateEvent } from "@/lib/consent/consent-event";
 import {
   decodeRecord,
   encodeRecord,
@@ -93,8 +94,15 @@ const granted = (on: boolean): "granted" | "denied" => (on ? "granted" : "denied
 //                          2026-07-22 business decision)
 // Do NOT add `analytics_storage: "denied"` to this payload — outside the EEA it
 // would newly gate analytics, and inside it the default already covers us.
+//
+// The consent_update dataLayer event follows the Consent Mode update so that
+// GTM's consent-gated tags see the new signals when the event fires. See
+// lib/consent/consent-event.ts for why Consent Mode alone cannot gate them.
 const updateConsentMode = (c: ConsentCategories): void => {
-  const w = window as Window & { gtag?: (...args: unknown[]) => void };
+  const w = window as Window & {
+    gtag?: (...args: unknown[]) => void;
+    dataLayer?: unknown[];
+  };
   w.gtag?.("consent", "update", {
     ...(c.performance ? { analytics_storage: "granted" } : {}),
     ad_storage: granted(c.targeting),
@@ -103,6 +111,7 @@ const updateConsentMode = (c: ConsentCategories): void => {
     functionality_storage: granted(c.functional),
     personalization_storage: granted(c.functional),
   });
+  w.dataLayer?.push(consentUpdateEvent(c));
 };
 
 export function ConsentProvider({ children }: { children: React.ReactNode }) {
