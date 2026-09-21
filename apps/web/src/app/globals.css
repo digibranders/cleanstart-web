@@ -4172,6 +4172,10 @@ body {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
+  /* background-clip:text only paints inside the box; tight display line-heights
+     push descenders (g, y, p) below it. Grow the paint box, cancel the layout. */
+  padding-bottom: 0.15em;
+  margin-bottom: -0.15em;
 }
 
 /* Continuously-drifting brand gradient — the same color animation as the home

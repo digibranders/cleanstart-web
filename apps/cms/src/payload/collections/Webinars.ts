@@ -16,6 +16,17 @@ const validateEndsAfterStarts = (
   if (end < start) return 'End time cannot be before start time.';
   return true;
 };
+// A Live / Panel / Demo webinar is retired to On-demand by its date, so a
+// scheduled row without one would stay Live forever.
+const validateScheduledDatePresent = (
+  value: Date | string | null | undefined,
+  { siblingData }: { siblingData?: { webinarType?: string } },
+): true | string => {
+  if (siblingData?.webinarType === 'on-demand') return true;
+  if (value != null) return true;
+  return 'Start date is required for Live, Panel and Demo webinars.';
+};
+
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { displayPublishedAtField } from '../fields/display-published-at';
 import { mediaUploadField } from '../fields/media-upload';
@@ -79,7 +90,7 @@ export const Webinars: CollectionConfig = {
       defaultValue: 'live',
       admin: {
         description:
-          'Legacy enum — superseded by the Webinar type relationship below. Kept during the taxonomy transition; removed once apps/web reads the relationship.',
+          'The format as scheduled. Once the session has finished, the website lists a Live / Panel / Demo webinar under On-demand automatically, so there is no need to edit this after the event. Legacy enum — superseded by the Webinar type relationship below.',
       },
       options: [
         { label: 'Live', value: 'live' },
@@ -128,7 +139,10 @@ export const Webinars: CollectionConfig = {
       admin: {
         date: { pickerAppearance: 'dayAndTime' },
         condition: (_data, sibling) => sibling?.webinarType !== 'on-demand',
+        description:
+          'Drives the automatic move to On-demand on the website: the webinar stops reading as Live once this slot has passed (24 hours after the start when no end time is set).',
       },
+      validate: validateScheduledDatePresent,
     },
     {
       name: 'endsAt',
@@ -261,7 +275,8 @@ export const Webinars: CollectionConfig = {
       name: 'recordingUrl',
       type: 'text',
       admin: {
-        description: 'Post-event recording. Surfaces after endsAt < now.',
+        description:
+          'Post-event recording. Once the session has passed, the listing card links here instead of the registration URL, falling back to the registration URL when empty.',
       },
       hooks: { beforeValidate: [normalizeOptionalUrlHook] },
       validate: validateOptionalUrl,

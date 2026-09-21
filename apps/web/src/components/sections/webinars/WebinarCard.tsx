@@ -10,7 +10,13 @@ interface WebinarCardProps {
 const FALLBACK_IMAGE = "/images/blogs/hero-orb-top.webp";
 
 export function WebinarCard({ item }: WebinarCardProps): React.ReactElement {
-  const href = item.registrationUrl ?? "";
+  // `webinarType` arrives already resolved against the schedule (see
+  // `withEffectiveTypes`), so a live session whose slot has passed reaches the
+  // card as on-demand and asks the visitor to watch rather than to register.
+  const isOnDemand = item.webinarType === "on-demand";
+  const href =
+    (isOnDemand ? item.recordingUrl ?? item.registrationUrl : item.registrationUrl) ??
+    "";
   const hasLink = href.length > 0;
   const date = formatWebinarDate(item.startsAt ?? item.publishedAt, item.timezone);
   const region = regionLabel(item.region);
@@ -99,7 +105,11 @@ export function WebinarCard({ item }: WebinarCardProps): React.ReactElement {
             href={href}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`Register for ${item.title}`}
+            aria-label={
+              isOnDemand
+                ? `Watch ${item.title} on demand`
+                : `Register for ${item.title}`
+            }
             className="inline-flex items-center justify-center gap-2 font-sans font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5B33F3] focus-visible:ring-offset-2 transition-[background,opacity] hover:opacity-90"
             style={{
               height: "45px",
@@ -109,8 +119,8 @@ export function WebinarCard({ item }: WebinarCardProps): React.ReactElement {
               fontSize: "var(--fs-body-sm)",
             }}
           >
-            Register
-            <ArrowRightIcon />
+            {isOnDemand ? "Watch on-demand" : "Register"}
+            {isOnDemand ? <PlayIcon /> : <ArrowRightIcon />}
           </a>
         ) : (
           <span
@@ -126,8 +136,8 @@ export function WebinarCard({ item }: WebinarCardProps): React.ReactElement {
               cursor: "not-allowed",
             }}
           >
-            Register
-            <ArrowRightIcon />
+            {isOnDemand ? "Recording coming soon" : "Register"}
+            {isOnDemand ? <PlayIcon /> : <ArrowRightIcon />}
           </span>
         )}
       </div>
@@ -143,6 +153,21 @@ function ArrowRightIcon(): React.ReactElement {
         stroke="currentColor"
         strokeWidth="1.6"
         strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function PlayIcon(): React.ReactElement {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden>
+      <circle cx="9" cy="9" r="7" stroke="currentColor" strokeWidth="1.6" />
+      <path
+        d="M7.6 6.5l4 2.5-4 2.5V6.5z"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="1.2"
         strokeLinejoin="round"
       />
     </svg>

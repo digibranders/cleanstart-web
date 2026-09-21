@@ -4411,7 +4411,7 @@ export interface Webinar {
     [k: string]: unknown;
   } | null;
   /**
-   * Legacy enum — superseded by the Webinar type relationship below. Kept during the taxonomy transition; removed once apps/web reads the relationship.
+   * The format as scheduled. Once the session has finished, the website lists a Live / Panel / Demo webinar under On-demand automatically, so there is no need to edit this after the event. Legacy enum — superseded by the Webinar type relationship below.
    */
   webinarType: 'live' | 'on-demand' | 'panel' | 'demo';
   /**
@@ -4426,6 +4426,9 @@ export interface Webinar {
    * Region taxonomy reference (shared with News). Seeded/backfilled from the legacy `region` enum; editors manage the list under Taxonomies → Regions.
    */
   regionRef?: (number | null) | Region;
+  /**
+   * Drives the automatic move to On-demand on the website: the webinar stops reading as Live once this slot has passed (24 hours after the start when no end time is set).
+   */
   startsAt?: string | null;
   endsAt?: string | null;
   /**
@@ -4460,7 +4463,7 @@ export interface Webinar {
    */
   pdf?: (number | null) | Media;
   /**
-   * Post-event recording. Surfaces after endsAt < now.
+   * Post-event recording. Once the session has passed, the listing card links here instead of the registration URL, falling back to the registration URL when empty.
    */
   recordingUrl?: string | null;
   /**
