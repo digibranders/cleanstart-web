@@ -704,7 +704,7 @@
         "firingTriggerId": [
           "11"
         ],
-        "tagFiringOption": "ONCE_PER_PAGE",
+        "tagFiringOption": "ONCE_PER_LOAD",
         "monitoringMetadata": {
           "type": "MAP"
         },
@@ -743,7 +743,7 @@
         "firingTriggerId": [
           "11"
         ],
-        "tagFiringOption": "ONCE_PER_PAGE",
+        "tagFiringOption": "ONCE_PER_LOAD",
         "monitoringMetadata": {
           "type": "MAP"
         },
