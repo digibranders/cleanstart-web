@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload';
 import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { resourceDownloadEndpoint, resourceTokenEndpoint } from '../endpoints/resources-download';
+import { contentUpdatedAtField } from '../fields/content-updated-at';
 import { displayPublishedAtField } from '../fields/display-published-at';
 import { mediaUploadField } from '../fields/media-upload';
 import { publishedAtField } from '../fields/published-at';
@@ -10,6 +11,7 @@ import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
+import { contentUpdatedAtHook } from '../hooks/content-updated-at';
 import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
 import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
 import { firstPublishHook } from '../hooks/first-publish';
@@ -168,6 +170,7 @@ export const Resources: CollectionConfig = {
     schemaAddonsField,
     publishedAtField,
     displayPublishedAtField,
+    contentUpdatedAtField,
     ...seoSidebarFields({ pathPrefix: ROUTE_PREFIX.resources, descriptionSource: 'summary' }),
     {
       name: 'downloadCount',
@@ -184,7 +187,7 @@ export const Resources: CollectionConfig = {
     ...seoFieldsForSidebar('resources'),
   ],
   hooks: {
-    beforeChange: [normalizeLexicalHook(), firstPublishHook(), displayPublishedAtBackfillHook],
+    beforeChange: [normalizeLexicalHook(), contentUpdatedAtHook(), firstPublishHook(), displayPublishedAtBackfillHook],
     afterChange: [
       slugChangeRedirectHook('resources'),
       schemaOverrideAuditHook('resources'),

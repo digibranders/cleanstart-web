@@ -351,6 +351,10 @@
       ]
     },
     {
+      "type": "date",
+      "name": "contentUpdatedAt"
+    },
+    {
       "type": "ui",
       "name": "seoHealthScore"
     },
@@ -598,7 +602,7 @@
     }
   ],
   "hooks": {
-    "beforeChange": 2,
+    "beforeChange": 3,
     "afterChange": 6,
     "beforeValidate": 1,
     "afterDelete": 2

@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
+import { contentUpdatedAtField } from '../fields/content-updated-at';
 import { displayPublishedAtField } from '../fields/display-published-at';
 import { faqsBulkPasteField, faqsField } from '../fields/faqs';
 import { mediaUploadField } from '../fields/media-upload';
@@ -11,6 +12,7 @@ import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { bodyStatsHook } from '../hooks/body-stats';
+import { contentUpdatedAtHook } from '../hooks/content-updated-at';
 import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
 import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
 import { firstPublishHook } from '../hooks/first-publish';
@@ -176,6 +178,7 @@ export const Blogs: CollectionConfig = {
     schemaAddonsField,
     publishedAtField,
     displayPublishedAtField,
+    contentUpdatedAtField,
     ...seoSidebarFields({ pathPrefix: ROUTE_PREFIX.blogs, descriptionSource: 'abstract' }),
     {
       // Data-only — surfaced via the DocStatusBar in the top status bar.
@@ -266,6 +269,7 @@ export const Blogs: CollectionConfig = {
   hooks: {
     beforeChange: [
       normalizeLexicalHook(),
+      contentUpdatedAtHook(),
       firstPublishHook(),
       displayPublishedAtBackfillHook,
       bodyStatsHook({

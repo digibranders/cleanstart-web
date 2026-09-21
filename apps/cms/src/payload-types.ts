@@ -467,6 +467,10 @@ export interface Blog {
    * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
    */
   displayPublishedAt?: string | null;
+  /**
+   * Set automatically when the title, body, summary or FAQs change. Shown publicly as the "Updated" date.
+   */
+  contentUpdatedAt?: string | null;
   readingMinutes?: number | null;
   wordCount?: number | null;
   /**
@@ -1359,6 +1363,10 @@ export interface News {
           }
       )[]
     | null;
+  /**
+   * Set automatically when the title, body, summary or FAQs change. Shown publicly as the "Updated" date.
+   */
+  contentUpdatedAt?: string | null;
   /**
    * Defaults to the current moment on creation. Backdate or schedule by editing the picker.
    */
@@ -2283,6 +2291,10 @@ export interface Guide {
    */
   displayPublishedAt?: string | null;
   /**
+   * Set automatically when the title, body, summary or FAQs change. Shown publicly as the "Updated" date.
+   */
+  contentUpdatedAt?: string | null;
+  /**
    * Heading levels that appear in the Table of Contents. Re-save to apply.
    */
   tocDepth?: ('h2' | 'h2_h3' | 'h2_h3_h4') | null;
@@ -2893,6 +2905,10 @@ export interface KnowledgeBase {
    */
   displayPublishedAt?: string | null;
   /**
+   * Set automatically when the title, body, summary or FAQs change. Shown publicly as the "Updated" date.
+   */
+  contentUpdatedAt?: string | null;
+  /**
    * Heading levels that appear in the Table of Contents. Re-save to apply.
    */
   tocDepth?: ('h2' | 'h2_h3' | 'h2_h3_h4') | null;
@@ -3307,6 +3323,10 @@ export interface LegalDocument {
    * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
    */
   displayPublishedAt?: string | null;
+  /**
+   * Set automatically when the title, body, summary or FAQs change. Shown publicly as the "Updated" date.
+   */
+  contentUpdatedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -3512,6 +3532,10 @@ export interface Resource {
    * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
    */
   displayPublishedAt?: string | null;
+  /**
+   * Set automatically when the title, body, summary or FAQs change. Shown publicly as the "Updated" date.
+   */
+  contentUpdatedAt?: string | null;
   /**
    * Automatically incremented each time a visitor downloads this resource.
    */
@@ -9474,6 +9498,7 @@ export interface BlogsSelect<T extends boolean = true> {
       };
   publishedAt?: T;
   displayPublishedAt?: T;
+  contentUpdatedAt?: T;
   readingMinutes?: T;
   wordCount?: T;
   tocDepth?: T;
@@ -9639,6 +9664,7 @@ export interface NewsSelect<T extends boolean = true> {
               blockName?: T;
             };
       };
+  contentUpdatedAt?: T;
   publicationDate?: T;
   relatedNews?: T;
   readingMinutes?: T;
@@ -9809,6 +9835,7 @@ export interface GuidesSelect<T extends boolean = true> {
       };
   publishedAt?: T;
   displayPublishedAt?: T;
+  contentUpdatedAt?: T;
   tocDepth?: T;
   readingMinutes?: T;
   wordCount?: T;
@@ -9995,6 +10022,7 @@ export interface KnowledgeBaseSelect<T extends boolean = true> {
       };
   publishedAt?: T;
   displayPublishedAt?: T;
+  contentUpdatedAt?: T;
   tocDepth?: T;
   readingMinutes?: T;
   wordCount?: T;
@@ -10068,6 +10096,7 @@ export interface LegalDocumentsSelect<T extends boolean = true> {
   changeSummary?: T;
   publishedAt?: T;
   displayPublishedAt?: T;
+  contentUpdatedAt?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -10176,6 +10205,7 @@ export interface ResourcesSelect<T extends boolean = true> {
       };
   publishedAt?: T;
   displayPublishedAt?: T;
+  contentUpdatedAt?: T;
   downloadCount?: T;
   seo?:
     | T

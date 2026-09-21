@@ -2,12 +2,14 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
+import { contentUpdatedAtField } from '../fields/content-updated-at';
 import { mediaUploadField } from '../fields/media-upload';
 import { schemaAddonsField } from '../fields/schema-addons';
 import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { bodyStatsHook } from '../hooks/body-stats';
+import { contentUpdatedAtHook } from '../hooks/content-updated-at';
 import { firstPublishBeforeValidateHook } from '../hooks/first-publish';
 import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import { normalizeLexicalHook } from '../hooks/normalize-lexical';
@@ -178,6 +180,7 @@ export const News: CollectionConfig = {
       },
     },
     schemaAddonsField,
+    contentUpdatedAtField,
     ...seoSidebarFields({ pathPrefix: ROUTE_PREFIX.news, descriptionSource: 'abstract' }),
     {
       name: 'publicationDate',
@@ -241,6 +244,7 @@ export const News: CollectionConfig = {
     beforeValidate: [firstPublishBeforeValidateHook({ field: 'publicationDate' })],
     beforeChange: [
       normalizeLexicalHook(),
+      contentUpdatedAtHook(),
       bodyStatsHook({
         fields: { readingMinutes: 'readingMinutes', wordCount: 'wordCount' },
       }),
