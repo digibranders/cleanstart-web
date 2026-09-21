@@ -16,6 +16,7 @@ import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 const absolutizeCmsUrl = (url: string | null | undefined): string | undefined =>
   !url ? undefined : url.startsWith("http") ? url : `${cmsBaseUrl()}${url}`;
 import { JsonLd, breadcrumbSchema, breadcrumbTrail } from "@/lib/seo/jsonld";
+import { effectiveModifiedAt } from "@/lib/published-date";
 
 interface LegalPageProps {
   params: Promise<{ slug: string }>;
@@ -48,7 +49,7 @@ export async function generateMetadata({ params }: LegalPageProps): Promise<Meta
     path: `/legal/${doc.slug}`,
     type: "article",
     publishedTime: legalEffectiveDate(doc),
-    modifiedTime: doc.updatedAt ?? undefined,
+    modifiedTime: effectiveModifiedAt(doc),
     ...(seo.noindex ? { noindex: true, nofollow: seo.nofollow } : {}),
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
   });

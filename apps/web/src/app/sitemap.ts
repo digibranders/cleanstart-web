@@ -1,3 +1,5 @@
+import { fetchCMS } from '@/lib/cms-fetch';
+import { effectiveModifiedAt } from '@/lib/published-date';
 import { SITE_URL } from '@/lib/seo/canonical';
 import { legalHref } from '@/lib/legal';
 import { isIndexingAllowed } from '@/lib/seo/indexing';
@@ -8,8 +10,10 @@ import type { MetadataRoute } from 'next';
  *
  * Per Google Search Central (2023+), `<priority>` and `<changefreq>` are
  * ignored — Next.js's MetadataRoute.Sitemap type makes them optional and we
- * deliberately omit them. `<lastmod>` IS used, but only when accurate, so we
- * source it from CMS document timestamps. Static routes have no lastmod.
+ * deliberately omit them. `<lastmod>` IS used, but only when accurate, so it
+ * comes from `effectiveModifiedAt`: the CMS's `contentUpdatedAt`, else the
+ * publish date. Never the row-level `updatedAt`, which bulk scripts move.
+ * Static routes have no lastmod.
  *
  * When indexing is disallowed (any non-production deploy without the
  * ALLOW_INDEXING override) we return an empty sitemap — robots.ts blocks
@@ -39,7 +43,7 @@ export const dynamic = 'force-dynamic';
 
 type CmsDoc = {
   slug: string;
-  updatedAt?: string | null;
+  contentUpdatedAt?: string | null;
   publishedAt?: string | null;
   displayPublishedAt?: string | null;
   publicationDate?: string | null;
@@ -47,8 +51,6 @@ type CmsDoc = {
 };
 
 type CmsList<T> = { docs: T[] };
-
-const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? 'http://localhost:3000';
 
 // Per-collection published filters mirror each collection's lifecycle field:
 // blogs/resources/events/guides/knowledgeBase/legalDocuments use `publishedAt`,
@@ -62,21 +64,22 @@ const JOBS_FILTER = 'where[_status][equals]=published&where[hiringStatus][equals
 // Only the fields CmsDoc actually reads — keeps each response well under
 // Next's 2 MB data-cache ceiling (knowledgeBase full-body was 19.8 MB).
 const SITEMAP_SELECT =
-  'select[slug]=true&select[updatedAt]=true&select[publishedAt]=true' +
+  'select[slug]=true&select[contentUpdatedAt]=true&select[publishedAt]=true' +
   '&select[displayPublishedAt]=true&select[publicationDate]=true&select[seo]=true';
 
+/**
+ * A failed read must fail the whole sitemap. Returning `[]` here used to turn a
+ * CMS 502 into a valid 200 sitemap with that collection missing (or only the
+ * static routes, if the CMS was down), and a crawler would take that at face
+ * value. A 5xx tells it to keep its last good copy and retry. `fetchCMS`
+ * retries transient gateway errors first, then throws `CmsFetchError`.
+ */
 async function fetchDocs(collection: string, filter: string): Promise<CmsDoc[]> {
-  try {
-    const res = await fetch(
-      `${CMS_URL}/api/${collection}?${filter}&depth=0&limit=1000&${SITEMAP_SELECT}`,
-      { next: { revalidate: 3600, tags: [`sitemap:${collection}`] } },
-    );
-    if (!res.ok) return [];
-    const data = (await res.json()) as CmsList<CmsDoc>;
-    return (data.docs ?? []).filter(isIndexable);
-  } catch {
-    return [];
-  }
+  const data = await fetchCMS<CmsList<CmsDoc>>(
+    `/api/${collection}?${filter}&depth=0&limit=1000&${SITEMAP_SELECT}`,
+    { revalidateSeconds: 3600, tags: [`sitemap:${collection}`] },
+  );
+  return (data.docs ?? []).filter(isIndexable);
 }
 
 // A doc is indexable unless the editor explicitly set seo.indexable to a
@@ -175,32 +178,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...STATIC_ROUTES.map((r) => entry(r.path)),
-    ...knowledgeBase.map((k) =>
-      entry(
-        `/knowledge-hub/${k.slug}`,
-        k.updatedAt ?? k.displayPublishedAt ?? k.publishedAt ?? undefined,
-      ),
-    ),
-    ...blogs.map((b) =>
-      entry(`/blogs/${b.slug}`, b.updatedAt ?? b.displayPublishedAt ?? b.publishedAt ?? undefined),
-    ),
-    ...resources.map((r) =>
-      entry(
-        `/resources/${r.slug}`,
-        r.updatedAt ?? r.displayPublishedAt ?? r.publishedAt ?? undefined,
-      ),
-    ),
-    ...authors.map((a) =>
-      entry(`/author/${a.slug}`, a.updatedAt ?? a.displayPublishedAt ?? a.publishedAt ?? undefined),
-    ),
-    ...news.map((n) => entry(`/news/${n.slug}`, n.updatedAt ?? n.publicationDate ?? undefined)),
-    ...events.map((e) => entry(`/event/${e.slug}`, e.updatedAt ?? e.publishedAt ?? undefined)),
-    ...jobs.map((j) => entry(`/job/${j.slug}`, j.updatedAt ?? undefined)),
-    ...guides.map((g) => entry(`/guide/${g.slug}`, g.updatedAt ?? g.publishedAt ?? undefined)),
+    ...knowledgeBase.map((k) => entry(`/knowledge-hub/${k.slug}`, effectiveModifiedAt(k))),
+    ...blogs.map((b) => entry(`/blogs/${b.slug}`, effectiveModifiedAt(b))),
+    ...resources.map((r) => entry(`/resources/${r.slug}`, effectiveModifiedAt(r))),
+    ...authors.map((a) => entry(`/author/${a.slug}`, effectiveModifiedAt(a))),
+    ...news.map((n) => entry(`/news/${n.slug}`, effectiveModifiedAt(n))),
+    ...events.map((e) => entry(`/event/${e.slug}`, effectiveModifiedAt(e))),
+    ...jobs.map((j) => entry(`/job/${j.slug}`, effectiveModifiedAt(j))),
+    ...guides.map((g) => entry(`/guide/${g.slug}`, effectiveModifiedAt(g))),
     // `legalHref` — not `/legal/<slug>` — because the Privacy Policy's canonical
     // public URL is the standalone `/privacy-policy`; `/legal/privacy-policy`
     // permanently redirects to it. Emitting the raw path put a 308 in the
     // sitemap alongside its own destination.
-    ...legal.map((d) => entry(legalHref(d.slug), d.updatedAt ?? d.publishedAt ?? undefined)),
+    ...legal.map((d) => entry(legalHref(d.slug), effectiveModifiedAt(d))),
   ];
 }

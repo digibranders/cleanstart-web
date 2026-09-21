@@ -15,6 +15,7 @@ export interface LegalDoc {
   effectiveDate?: string | null;
   publishedAt?: string | null;
   displayPublishedAt?: string | null;
+  contentUpdatedAt?: string | null;
   updatedAt?: string | null;
   seo?: CmsSeo | null;
 }
@@ -45,6 +46,7 @@ export const getLegalList = cache(async (): Promise<LegalDoc[]> => {
     "effectiveDate",
     "publishedAt",
     "displayPublishedAt",
+    "contentUpdatedAt",
     "updatedAt",
     "seo",
   ]

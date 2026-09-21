@@ -24,7 +24,7 @@ import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
 import { Footer } from "@/components/sections/Footer";
 import { absoluteUrl, buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
-import { effectivePublishedAt } from "@/lib/published-date";
+import { effectiveModifiedAt, effectivePublishedAt } from "@/lib/published-date";
 import {
   blogPostingSchema,
   breadcrumbSchema,
@@ -80,7 +80,7 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
     eyebrow: post.categories?.name ?? "Blog",
     type: "article",
     publishedTime: effectivePublishedAt(post) ?? post.publishedAt,
-    modifiedTime: post.updatedAt,
+    modifiedTime: effectiveModifiedAt(post),
     authors: post.authors?.map((a) => a.name), // metadata authors (plain string[])
     ...(seo.noindex ? { noindex: true, nofollow: seo.nofollow } : {}),
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
@@ -167,7 +167,7 @@ export async function renderBlogDetail({
               description: post.abstract ?? undefined,
               path: `/blogs/${post.slug}`,
               publishedAt,
-              modifiedAt: post.updatedAt,
+              modifiedAt: effectiveModifiedAt(post),
               imageUrl: heroAbsolute,
               authors: post.authors?.map((a) => ({ name: a.name, slug: a.slug })),
               category: post.categories?.name,
@@ -195,7 +195,7 @@ export async function renderBlogDetail({
           categories={post.categories}
           authors={post.authors}
           publishedAt={publishedAt}
-          updatedAt={post.updatedAt ?? undefined}
+          updatedAt={post.contentUpdatedAt ?? undefined}
           readingMinutes={post.readingMinutes ?? undefined}
           heroImage={post.heroImage}
         />

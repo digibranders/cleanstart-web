@@ -23,7 +23,7 @@ import {
 } from "@/lib/guides";
 import type { Guide } from "@/lib/guides";
 import { guideCoverKeyword, guideCoverPath } from "@/lib/guide-cover";
-import { effectivePublishedAt } from "@/lib/published-date";
+import { effectiveModifiedAt, effectivePublishedAt } from "@/lib/published-date";
 import { absoluteUrl, buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 import {
@@ -82,7 +82,7 @@ export async function generateMetadata({
     path: `/guide/${guide.slug}`,
     type: "article",
     publishedTime: effectivePublishedAt(guide) ?? guide.publishedAt ?? undefined,
-    modifiedTime: guide.updatedAt ?? undefined,
+    modifiedTime: effectiveModifiedAt(guide),
     authors: guide.authors?.map((a) => a.name),
     ...(seo.noindex ? { noindex: true, nofollow: seo.nofollow } : {}),
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
@@ -153,7 +153,7 @@ export async function renderGuideDetail({
               description: guide.abstract ?? undefined,
               path: `/guide/${guide.slug}`,
               publishedAt: publishedAt ?? guide.publishedAt ?? undefined,
-              modifiedAt: guide.updatedAt ?? undefined,
+              modifiedAt: effectiveModifiedAt(guide),
               imageUrl: coverImageUrl,
               authors: guide.authors?.map((a) => ({ name: a.name, slug: a.slug })),
             }),
@@ -178,7 +178,7 @@ export async function renderGuideDetail({
           slug={guide.slug}
           authors={guide.authors}
           publishedAt={publishedAt ?? undefined}
-          updatedAt={guide.updatedAt ?? undefined}
+          updatedAt={guide.contentUpdatedAt ?? undefined}
           readingMinutes={guide.readingMinutes ?? undefined}
         />
 

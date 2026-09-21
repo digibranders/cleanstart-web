@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Guide } from "@/lib/guides";
 import { formatGuideDate } from "@/lib/guides-utils";
-import { effectivePublishedAt } from "@/lib/published-date";
+import { effectiveModifiedAt } from "@/lib/published-date";
 import { guideCoverKeyword } from "@/lib/guide-cover";
 import { GeneratedGuideCover } from "@/components/sections/_shared/GeneratedGuideCover";
 
@@ -11,9 +11,7 @@ interface GuideCardProps {
 
 export function GuideCard({ guide }: GuideCardProps): React.ReactElement {
   const authorName = guide.authors?.[0]?.name ?? null;
-  const updatedDate = formatGuideDate(
-    guide.updatedAt ?? effectivePublishedAt(guide),
-  );
+  const updatedDate = formatGuideDate(effectiveModifiedAt(guide));
   const coverKeyword = guideCoverKeyword(guide);
   // The Webflow import left `abstract` empty on guides; fall back to the SEO
   // description (the same lede text) so the card still shows a summary.
