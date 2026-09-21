@@ -63,9 +63,16 @@ function Column({
       style={{
         borderRadius: "24px",
         padding: "clamp(22px, 2vw, 34px)",
+        /* Both columns carry a surface, and the same one at the same weight:
+           violet for our side, neutral for theirs. They always had identical
+           padding, but only one had a fill, so the rival's text read as flush
+           to the container gutter while ours sat 24px inside a visible card.
+           On the band this section is about, that put the comparison's own
+           axis out of true. The tint and the violet markers are what say
+           whose column is whose; the shape should not. */
         background: isCleanStart
           ? "linear-gradient(180deg, rgba(106,61,240,0.085) 0%, rgba(106,61,240,0.025) 100%)"
-          : "transparent",
+          : "linear-gradient(180deg, rgba(17,17,17,0.04) 0%, rgba(17,17,17,0.012) 100%)",
       }}
     >
 
