@@ -5,6 +5,7 @@ import { Section, Container } from "@/components/layout";
 import { Reveal } from "@/components/ui/Reveal";
 import {
   matrixDifferenceCount,
+  matrixRowCount,
   rowsAgree,
   UI,
   type CompareTone,
@@ -364,6 +365,204 @@ function DataRow({
   );
 }
 
+/**
+ * The parity lede: what the table below actually says, stated before the
+ * reader scrolls it.
+ *
+ * Every comparison page in this market shows only the rows its author wins,
+ * so a reader arriving here assumes the page is selling. Opening with the
+ * count of rows where the two vendors give the SAME answer is the cheapest
+ * credibility this page can buy, and it makes the rows that do differ land.
+ * It also answers the scanning problem the table has on its own: on some
+ * comparisons more than half the rows are two identical ticks, and a reader
+ * working top to bottom meets the parity before the argument.
+ *
+ * Both numbers are computed from the table, so the concession cannot drift
+ * from what the table shows. This also carries the differences switch, which
+ * used to sit alone at the right of the chapter index and wrapped an orphan
+ * chip onto a second row at 1440.
+ */
+function ParityLede({
+  total,
+  differences,
+  rival,
+  diffOnly,
+  onToggle,
+}: {
+  total: number;
+  differences: number;
+  rival: string;
+  diffOnly: boolean;
+  onToggle: () => void;
+}): React.ReactElement {
+  const identical = total - differences;
+  const differPct = total === 0 ? 0 : (differences / total) * 100;
+  /* Composed as one string, not JSX with interpolated numbers. React emits a
+     `<!-- -->` marker either side of every expression, so the JSX form put
+     "15" and "26" in their own text nodes and broke the sentence up in the
+     static HTML. This sentence is the most quotable thing on the page and is
+     meant to be extracted whole. */
+  const lede = `${rival} and CleanStart give the same answer on ${identical} of ${total} capabilities. This table is about the other ${differences}.`;
+
+  return (
+    <div
+      className="relative overflow-hidden"
+      style={{
+        borderRadius: "24px",
+        border: "1px solid rgba(17,17,17,0.09)",
+        background:
+          "linear-gradient(135deg, #ffffff 0%, #ffffff 52%, #F7F2FF 100%)",
+        boxShadow:
+          "0 1px 2px rgba(17,17,17,0.04), 0 24px 48px -40px rgba(70,30,190,0.35)",
+        padding: "clamp(22px, 2.2vw, 34px)",
+      }}
+    >
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -right-16 -top-24 hidden size-[260px] select-none rounded-full lg:block"
+        style={{
+          background:
+            "radial-gradient(closest-side, rgba(169,116,255,0.16), transparent 72%)",
+        }}
+      />
+
+      <div className="relative flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between lg:gap-12">
+        <div className="min-w-0 flex-1">
+          <p
+            className="font-display"
+            style={{
+              fontSize: "var(--fs-eyebrow)",
+              fontWeight: "var(--fs-eyebrow-weight)",
+              letterSpacing: "var(--fs-eyebrow-ls)",
+              lineHeight: "var(--fs-eyebrow-lh)",
+              textTransform: "uppercase",
+              color: "rgba(17,17,17,0.62)",
+            }}
+          >
+            {UI.parityEyebrow}
+          </p>
+
+          <p
+            className="mt-3 font-display text-[#111111]"
+            style={{
+              fontSize: "var(--fs-h4)",
+              fontWeight: "var(--fs-h4-weight)",
+              letterSpacing: "var(--fs-h4-ls)",
+              lineHeight: "var(--fs-h4-lh)",
+              maxWidth: "46ch",
+              textWrap: "balance",
+            }}
+          >
+            {lede}
+          </p>
+
+          {/* The proportion, drawn. Neutral for the rows that agree, the
+              page's violet for the rows that do not, so the bar uses the
+              same two colours as the columns it summarises. */}
+          <div
+            className="mt-6 flex h-2.5 w-full max-w-[560px] overflow-hidden rounded-full"
+            role="img"
+            aria-label={`${UI.parityBarLabel}: ${differences} of ${total}`}
+          >
+            <span
+              className="block h-full"
+              style={{
+                width: `${100 - differPct}%`,
+                background: "rgba(17,17,17,0.13)",
+              }}
+            />
+            <span
+              className="block h-full"
+              style={{
+                width: `${differPct}%`,
+                background: `linear-gradient(90deg, ${BRAND.violet}, ${BRAND.blue})`,
+              }}
+            />
+          </div>
+
+          <dl
+            className="mt-3.5 flex max-w-[560px] flex-wrap items-baseline gap-x-8 gap-y-1"
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "var(--fs-body-sm)",
+              lineHeight: "var(--fs-body-sm-lh)",
+              color: "rgba(17,17,17,0.62)",
+            }}
+          >
+            <div className="flex items-baseline gap-1.5">
+              <dt className="sr-only">{UI.parityIdentical}</dt>
+              <dd className="flex items-baseline gap-1.5">
+                <span
+                  className="font-display"
+                  style={{ fontWeight: 600, color: "#111111" }}
+                >
+                  {identical}
+                </span>
+                {UI.parityIdentical}
+              </dd>
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <dt className="sr-only">{UI.parityDiffer}</dt>
+              <dd className="flex items-baseline gap-1.5">
+                <span
+                  className="font-display"
+                  style={{ fontWeight: 600, color: BRAND.violet }}
+                >
+                  {differences}
+                </span>
+                {UI.parityDiffer}
+              </dd>
+            </div>
+          </dl>
+        </div>
+
+        <button
+          type="button"
+          aria-pressed={diffOnly}
+          onClick={onToggle}
+          className="group inline-flex shrink-0 cursor-pointer items-center gap-2.5 self-start rounded-full transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#33BAEC] lg:self-auto"
+          style={{
+            border: `1px solid ${diffOnly ? "rgba(17,17,17,0.14)" : "transparent"}`,
+            background: diffOnly
+              ? "#ffffff"
+              : `linear-gradient(135deg, ${BRAND.violet}, ${BRAND.blue})`,
+            color: diffOnly ? "#111111" : "#ffffff",
+            fontFamily: "var(--font-sans)",
+            fontSize: "var(--fs-button)",
+            fontWeight: "var(--fs-button-weight)",
+            letterSpacing: "var(--fs-button-ls)",
+            height: "var(--btn-h-md, 44px)",
+            padding: "0 22px",
+            boxShadow: diffOnly
+              ? "none"
+              : "0 10px 24px -14px rgba(106,61,240,0.9)",
+          }}
+        >
+          <span className="whitespace-nowrap">
+            {diffOnly ? UI.parityShowAll : UI.parityShowDiff}
+          </span>
+          <svg
+            aria-hidden
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            className="transition-transform duration-200 group-hover:translate-x-0.5"
+          >
+            <path
+              d={diffOnly ? "M12.5 8h-9M7 4.5 3.5 8 7 11.5" : "M3.5 8h9M9 4.5 12.5 8 9 11.5"}
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function CompareMatrix({
   matrix,
   vendor,
@@ -376,6 +575,7 @@ export function CompareMatrix({
   const [diffOnly, setDiffOnly] = useState(false);
 
   const differenceCount = useMemo(() => matrixDifferenceCount(matrix), [matrix]);
+  const rowCount = useMemo(() => matrixRowCount(matrix), [matrix]);
 
   const lastGroup = matrix.groups[matrix.groups.length - 1];
   const lastVisibleRowId = (() => {
@@ -408,10 +608,19 @@ export function CompareMatrix({
           intro={matrix.intro}
         />
 
-        {/* Controls: chapter index on the left, the differences switch on the
-            right. UI chrome, not document copy. */}
+        <Reveal delay={0.1} y={20} className="mt-8 lg:mt-10">
+          <ParityLede
+            total={rowCount}
+            differences={differenceCount}
+            rival={vendor.rival}
+            diffOnly={diffOnly}
+            onToggle={() => setDiffOnly((value) => !value)}
+          />
+        </Reveal>
+
+        {/* Chapter index. UI chrome, not document copy. */}
         <Reveal delay={0.12} y={16}>
-          <div className="mt-8 flex flex-col gap-4 lg:mt-10 lg:flex-row lg:items-center lg:justify-between">
+          <div className="mt-6 flex flex-col gap-4 lg:mt-7 lg:flex-row lg:items-center lg:justify-between">
             <nav
               aria-label={UI.groupIndex}
               className="flex flex-wrap items-center gap-2"
@@ -448,52 +657,6 @@ export function CompareMatrix({
               ))}
             </nav>
 
-            <button
-              type="button"
-              aria-pressed={diffOnly}
-              onClick={() => setDiffOnly((value) => !value)}
-              className="inline-flex cursor-pointer items-center gap-3 self-start rounded-full py-1.5 pl-1.5 pr-4 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#33BAEC] lg:self-auto"
-              style={{
-                border: `1px solid ${diffOnly ? "rgba(106,61,240,0.45)" : "rgba(17,17,17,0.1)"}`,
-                background: diffOnly ? "rgba(106,61,240,0.06)" : "#ffffff",
-                fontFamily: "var(--font-sans)",
-                fontSize: "var(--fs-button-sm)",
-                fontWeight: "var(--fs-button-weight)",
-                letterSpacing: "var(--fs-button-ls)",
-                color: "#111111",
-              }}
-            >
-              <span
-                aria-hidden
-                className="relative block h-6 w-11 rounded-full transition-colors"
-                style={{
-                  background: diffOnly
-                    ? `linear-gradient(90deg, ${BRAND.violet}, ${BRAND.blue})`
-                    : "rgba(17,17,17,0.14)",
-                }}
-              >
-                <span
-                  className="absolute top-[3px] block size-[18px] rounded-full bg-white transition-transform"
-                  style={{
-                    left: "3px",
-                    transform: diffOnly ? "translateX(20px)" : "translateX(0)",
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
-                  }}
-                />
-              </span>
-              <span className="whitespace-nowrap">{UI.differencesOnly}</span>
-              <span
-                className="rounded-full px-2 py-[2px]"
-                style={{
-                  fontSize: "var(--fs-badge)",
-                  fontWeight: "var(--fs-badge-weight)",
-                  background: diffOnly ? BRAND.violet : "rgba(17,17,17,0.06)",
-                  color: diffOnly ? "#ffffff" : "rgba(17,17,17,0.6)",
-                }}
-              >
-                {differenceCount}
-              </span>
-            </button>
           </div>
         </Reveal>
 

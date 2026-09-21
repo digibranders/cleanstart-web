@@ -3,6 +3,7 @@ import { Section, Container } from "@/components/layout";
 import { HeroReveal } from "@/components/ui/Reveal";
 import { RevealStagger, RevealItem } from "@/components/ui/Reveal";
 import {
+  cleanstartOnlyRows,
   matrixDifferenceCount,
   matrixRowCount,
   type CompareContent,
@@ -35,8 +36,23 @@ import {
 /** Chrome the comparison documents do not write. */
 const INDEX_UI = {
   cardCta: "See the comparison",
-  /** Screen-reader label for the derived counts under each headline. */
-  statsLabel: "At a glance",
+  of: "of",
+  capabilities: "capabilities differ",
+  /** Lead-in for the capabilities the rival's own column records as absent. */
+  onlyCleanStart: "Only CleanStart",
+  /** Remainder chip when a comparison records more than the three shown. */
+  more: "+{n} more",
+  /** Accessible name for each card's proportion bar. */
+  barLabel: "Proportion of capabilities where the two answers differ",
+  /**
+   * The hero's scale line. Rows are counted, not merged: the three source
+   * documents name capabilities in their own vocabularies, so "84 capability
+   * rows" is the sum of three tables and deliberately not a claim that 84
+   * distinct capabilities exist across them.
+   */
+  statComparisons: "comparisons",
+  statRows: "capability rows",
+  statDifferences: "where they differ",
 } as const;
 
 export interface CompareIndexCopy {
@@ -72,31 +88,37 @@ function MarkPair({ rivalMark }: { rivalMark: string }): React.ReactElement {
   );
 }
 
-function Stat({ value, label }: { value: number; label: string }): React.ReactElement {
+/**
+ * The identical / differ proportion, drawn with the same two colours the
+ * capability table uses for its columns. The comparison pages open on the
+ * same bar, so a card and the page it links to state the split the same way.
+ */
+function SplitBar({
+  total,
+  differences,
+}: {
+  total: number;
+  differences: number;
+}): React.ReactElement {
+  const differPct = total === 0 ? 0 : (differences / total) * 100;
   return (
-    <span className="flex items-baseline gap-1.5">
+    <div
+      className="flex h-2 w-full overflow-hidden rounded-full"
+      role="img"
+      aria-label={`${INDEX_UI.barLabel}: ${differences} of ${total}`}
+    >
       <span
-        className="font-display"
-        style={{
-          fontSize: "var(--fs-h5)",
-          fontWeight: 600,
-          lineHeight: 1,
-          color: BRAND.violet,
-        }}
-      >
-        {value}
-      </span>
+        className="block h-full"
+        style={{ width: `${100 - differPct}%`, background: "rgba(17,17,17,0.13)" }}
+      />
       <span
+        className="block h-full"
         style={{
-          fontFamily: "var(--font-sans)",
-          fontSize: "var(--fs-caption)",
-          lineHeight: "var(--fs-caption-lh)",
-          color: "rgba(17,17,17,0.62)",
+          width: `${differPct}%`,
+          background: `linear-gradient(90deg, ${BRAND.violet}, ${BRAND.blue})`,
         }}
-      >
-        {label}
-      </span>
-    </span>
+      />
+    </div>
   );
 }
 
@@ -109,6 +131,12 @@ function Card({
 }): React.ReactElement {
   const rows = matrixRowCount(content.matrix);
   const differences = matrixDifferenceCount(content.matrix);
+  /* Capped at three, with the rest counted: this is a preview of the
+     argument, not the argument. The Docker comparison records seven and the
+     card would become a list. */
+  const onlyAll = cleanstartOnlyRows(content.matrix);
+  const onlyOurs = onlyAll.slice(0, 3);
+  const onlyRest = onlyAll.length - onlyOurs.length;
 
   return (
     <CornerTile
@@ -148,8 +176,11 @@ function Card({
         </Link>
       </h2>
 
+      {/* Floored for the same reason as the headline: the three standfirsts
+          run to three or four lines, and without this the proportion bars sit
+          at three different heights and stop being comparable at a glance. */}
       <p
-        className="mt-3"
+        className="mt-3 md:min-h-[4lh]"
         style={{
           fontFamily: "var(--font-sans)",
           fontSize: "var(--fs-body-sm)",
@@ -161,29 +192,84 @@ function Card({
         {content.standfirst}
       </p>
 
-      {/* Derived from the comparison's own matrix, so the card cannot
-          advertise a count the table then contradicts. */}
-      <dl
-        aria-label={INDEX_UI.statsLabel}
-        className="mt-auto flex flex-wrap items-baseline gap-x-6 gap-y-2 pt-6"
-      >
-        <div>
-          <dt className="sr-only">Capabilities compared</dt>
-          <dd>
-            <Stat value={rows} label="capabilities compared" />
-          </dd>
-        </div>
-        <div>
-          <dt className="sr-only">Differences</dt>
-          <dd>
-            <Stat value={differences} label="differences" />
-          </dd>
-        </div>
-      </dl>
+      {/* Everything below is derived from this comparison's own matrix, so a
+          card cannot advertise a split or a capability the table then
+          contradicts. */}
+      <div className="pt-6">
+        <SplitBar total={rows} differences={differences} />
+        <p
+          className="mt-3"
+          style={{
+            fontFamily: "var(--font-sans)",
+            fontSize: "var(--fs-body-sm)",
+            lineHeight: "var(--fs-body-sm-lh)",
+            color: "rgba(17,17,17,0.62)",
+          }}
+        >
+          <span className="font-display" style={{ fontWeight: 600, color: BRAND.violet }}>
+            {differences}
+          </span>{" "}
+          {INDEX_UI.of}{" "}
+          <span className="font-display" style={{ fontWeight: 600, color: "#111111" }}>
+            {rows}
+          </span>{" "}
+          {INDEX_UI.capabilities}
+        </p>
+
+        {onlyOurs.length > 0 && (
+          <div className="mt-5">
+            <p
+              className="font-display"
+              style={{
+                fontSize: "var(--fs-eyebrow)",
+                fontWeight: "var(--fs-eyebrow-weight)",
+                letterSpacing: "var(--fs-eyebrow-ls)",
+                lineHeight: "var(--fs-eyebrow-lh)",
+                textTransform: "uppercase",
+                color: BRAND.violet,
+              }}
+            >
+              {INDEX_UI.onlyCleanStart}
+            </p>
+            <ul className="mt-2.5 flex flex-wrap gap-1.5">
+              {onlyOurs.map((row) => (
+                <li
+                  key={row.id}
+                  className="rounded-full px-2.5 py-1"
+                  style={{
+                    border: "1px solid rgba(106,61,240,0.24)",
+                    background: "rgba(106,61,240,0.06)",
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "var(--fs-caption)",
+                    lineHeight: "var(--fs-caption-lh)",
+                    color: "#111111",
+                  }}
+                >
+                  {row.capability}
+                </li>
+              ))}
+              {onlyRest > 0 && (
+                <li
+                  className="rounded-full px-2.5 py-1"
+                  style={{
+                    border: "1px dashed rgba(106,61,240,0.32)",
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "var(--fs-caption)",
+                    lineHeight: "var(--fs-caption-lh)",
+                    color: BRAND.violet,
+                  }}
+                >
+                  {INDEX_UI.more.replace("{n}", String(onlyRest))}
+                </li>
+              )}
+            </ul>
+          </div>
+        )}
+      </div>
 
       <span
         aria-hidden
-        className="mt-5 inline-flex items-center gap-2 font-display"
+        className="mt-auto inline-flex items-center gap-2 pt-6 font-display"
         style={{
           fontSize: "var(--fs-button-sm)",
           fontWeight: "var(--fs-button-weight)",
@@ -212,11 +298,53 @@ function Card({
   );
 }
 
+function HeroStat({
+  value,
+  label,
+}: {
+  value: number;
+  label: string;
+}): React.ReactElement {
+  return (
+    <div className="flex flex-col items-center gap-1 px-1 text-center sm:items-start sm:text-left">
+      <span
+        className="font-display text-white"
+        style={{
+          fontSize: "var(--fs-h3)",
+          fontWeight: 600,
+          lineHeight: 1,
+          letterSpacing: "var(--fs-h3-ls)",
+        }}
+      >
+        {value}
+      </span>
+      <span
+        style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: "var(--fs-caption)",
+          lineHeight: "var(--fs-caption-lh)",
+          color: "rgba(255,255,255,0.62)",
+          maxWidth: "18ch",
+        }}
+      >
+        {label}
+      </span>
+    </div>
+  );
+}
+
 export function CompareIndexHero({
   copy,
+  comparisons,
 }: {
   copy: CompareIndexCopy;
+  comparisons: readonly CompareContent[];
 }): React.ReactElement {
+  const rows = comparisons.reduce((t, c) => t + matrixRowCount(c.matrix), 0);
+  const differences = comparisons.reduce(
+    (t, c) => t + matrixDifferenceCount(c.matrix),
+    0,
+  );
   return (
     <section
       data-section="CompareIndexHero"
@@ -285,6 +413,45 @@ export function CompareIndexHero({
             >
               {copy.standfirst}
             </p>
+
+            {/* Counted from the three matrices, so the hero cannot claim a
+                scale the pages below do not carry. */}
+            <dl className="mt-10 flex flex-wrap items-start justify-center gap-x-10 gap-y-6 sm:gap-x-14">
+              <div>
+                <dt className="sr-only">{INDEX_UI.statComparisons}</dt>
+                <dd>
+                  <HeroStat
+                    value={comparisons.length}
+                    label={INDEX_UI.statComparisons}
+                  />
+                </dd>
+              </div>
+              <span
+                aria-hidden
+                className="hidden h-10 w-px self-center sm:block"
+                style={{ background: "rgba(255,255,255,0.16)" }}
+              />
+              <div>
+                <dt className="sr-only">{INDEX_UI.statRows}</dt>
+                <dd>
+                  <HeroStat value={rows} label={INDEX_UI.statRows} />
+                </dd>
+              </div>
+              <span
+                aria-hidden
+                className="hidden h-10 w-px self-center sm:block"
+                style={{ background: "rgba(255,255,255,0.16)" }}
+              />
+              <div>
+                <dt className="sr-only">{INDEX_UI.statDifferences}</dt>
+                <dd>
+                  <HeroStat
+                    value={differences}
+                    label={INDEX_UI.statDifferences}
+                  />
+                </dd>
+              </div>
+            </dl>
           </HeroReveal>
         </div>
       </div>

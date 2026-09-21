@@ -229,6 +229,25 @@ export const matrixDifferenceCount = (matrix: MatrixSection): number =>
     0,
   );
 
+/**
+ * Capabilities this comparison records as absent for the rival and present,
+ * in some form, for CleanStart.
+ *
+ * The test is deliberately strict: the rival's cell must be the source
+ * table's own "—" (`no`), not a tick the source qualified and not a phrase a
+ * reader might weigh differently. So the result is only ever what one source
+ * document already states, and it says nothing about any vendor the
+ * comparison does not name. The `/compare` hub previews these on each card.
+ */
+export const cleanstartOnlyRows = (
+  matrix: MatrixSection,
+): readonly MatrixRow[] =>
+  matrix.groups.flatMap((group) =>
+    group.rows.filter(
+      (row) => row.rival.kind === "no" && row.cleanstart.kind !== "no",
+    ),
+  );
+
 /* ──────────────────────── UI-only strings ──────────────────────── */
 
 /**
@@ -249,7 +268,24 @@ export const UI = {
   capability: "Capability",
   /** Matrix controls and legend. */
   groupIndex: "Jump to",
-  differencesOnly: "Show differences only",
   legendAvailable: "Available",
   legendNotAvailable: "Not available",
+
+  /**
+   * The parity lede above each capability table.
+   *
+   * Every comparison page in this market shows only the rows its author
+   * wins. This one opens by conceding the rest: a reader arriving on a
+   * comparison query assumes the page is selling, and the fastest way to be
+   * believed about the differences is to be first to say how much is the
+   * same. The numbers are computed from the table below, so the concession
+   * can never overstate or understate what the table then shows.
+   */
+  parityEyebrow: "What this table says",
+  parityIdentical: "identical",
+  parityDiffer: "where they differ",
+  parityShowDiff: "Show only the differences",
+  parityShowAll: "Show all capabilities",
+  /** Accessible name for the identical/differ proportion bar. */
+  parityBarLabel: "Proportion of capabilities where the two answers differ",
 } as const;
