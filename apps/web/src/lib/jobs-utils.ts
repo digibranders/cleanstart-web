@@ -145,3 +145,19 @@ export const JOB_STATUS_LABEL: Record<JobStatusBadge, string> = {
   "closing-soon": "Closing soon",
   closed: "Closed",
 };
+
+/**
+ * `JobPosting.validThrough`, only when the CMS actually holds a date.
+ *
+ * Google's JobPosting guidance is explicit: if a posting never expires, or the
+ * expiry is unknown, leave the property out. The page used to invent a rolling
+ * 90-day date at render time, which moved forward on every ISR regeneration, so
+ * no open role ever expired in markup. `validThrough` is recommended, not
+ * required, and the schema builder already omits it when undefined.
+ */
+export function jobValidThrough(job: {
+  applicationDeadline?: string | null;
+  expiresAt?: string | null;
+}): string | undefined {
+  return job.applicationDeadline ?? job.expiresAt ?? undefined;
+}

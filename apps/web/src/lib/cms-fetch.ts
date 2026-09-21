@@ -85,6 +85,8 @@ export interface CmsFetchOptions {
    * cookie-based `draftMode()`. When undefined, falls back to the cookie.
    */
   draft?: boolean;
+  /** Data-cache tags, so a publish hook can purge this read via `revalidateTag`. */
+  tags?: readonly string[];
 }
 
 export async function fetchCMS<T>(path: string, options: CmsFetchOptions = {}): Promise<T> {
@@ -113,7 +115,7 @@ export async function fetchCMS<T>(path: string, options: CmsFetchOptions = {}): 
     }
   }
 
-  const init: RequestInit & { next?: { revalidate?: number } } = {
+  const init: RequestInit & { next?: { revalidate?: number; tags?: string[] } } = {
     headers,
   };
   if (isDraft || options.noStore) {
@@ -121,6 +123,7 @@ export async function fetchCMS<T>(path: string, options: CmsFetchOptions = {}): 
   } else {
     init.next = {
       revalidate: options.revalidateSeconds ?? DEFAULT_REVALIDATE_SECONDS,
+      ...(options.tags ? { tags: [...options.tags] } : {}),
     };
   }
 

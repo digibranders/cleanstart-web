@@ -13,6 +13,7 @@ import {
   getJobBySlug,
   getJobBySlugDraft,
   getJobSlugs,
+  jobValidThrough,
   locationDisplay,
   resolvedLocations,
   type JobEmploymentType,
@@ -22,6 +23,7 @@ import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 import { breadcrumbSchema, breadcrumbTrail, jobPostingSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
 import { buildPageGraph, seoOverride } from "@/lib/seo/compose-page";
+import { effectiveModifiedAt } from "@/lib/published-date";
 
 const SCHEMA_EMPLOYMENT_TYPE: Record<JobEmploymentType, string> = {
   "full-time": "FULL_TIME",
@@ -77,7 +79,7 @@ export async function generateMetadata({
     description: seo.description ?? descriptionParts.join(" "),
     path: `/job/${job.slug}`,
     type: "article",
-    modifiedTime: job.updatedAt ?? undefined,
+    modifiedTime: effectiveModifiedAt(job),
     noindex: seo.noindex || job.hiringStatus === "closed",
     nofollow: seo.nofollow,
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
@@ -146,13 +148,7 @@ export async function renderJobDetail({
                     description: jobDescription,
                     path: `/job/${job.slug}`,
                     datePosted: job.publishedAt ?? job.updatedAt ?? undefined,
-                    // Google strongly recommends validThrough; open roles with no
-                    // explicit deadline get a rolling 90-day expiry (ISR keeps it
-                    // future-dated) so the posting is never dropped for a missing field.
-                    validThrough:
-                      job.applicationDeadline ??
-                      job.expiresAt ??
-                      new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+                    validThrough: jobValidThrough(job),
                     employmentType: job.employmentType
                       ? SCHEMA_EMPLOYMENT_TYPE[job.employmentType]
                       : undefined,

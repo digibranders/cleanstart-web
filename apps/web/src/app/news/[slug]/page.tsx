@@ -19,6 +19,7 @@ import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 import { breadcrumbSchema, breadcrumbTrail, newsArticleSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
 import { buildPageGraph, seoOverride } from "@/lib/seo/compose-page";
+import { effectiveModifiedAt } from "@/lib/published-date";
 
 interface NewsDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -112,7 +113,7 @@ export async function renderNewsDetail({
               description: item.abstract ?? undefined,
               path: `/news/${item.slug}`,
               publishedAt: item.publicationDate ?? undefined,
-              modifiedAt: item.updatedAt ?? undefined,
+              modifiedAt: effectiveModifiedAt(item),
               imageUrl: heroAbsolute,
               section: item.pressType ?? undefined,
             }),

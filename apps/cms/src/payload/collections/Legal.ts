@@ -2,11 +2,13 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminEditorOrLegal, publishedOrAuthenticated } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
+import { contentUpdatedAtField } from '../fields/content-updated-at';
 import { displayPublishedAtField } from '../fields/display-published-at';
 import { publishedAtField } from '../fields/published-at';
 import { seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
+import { contentUpdatedAtHook } from '../hooks/content-updated-at';
 import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
 import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
 import { firstPublishHook } from '../hooks/first-publish';
@@ -115,10 +117,11 @@ export const LegalDocuments: CollectionConfig = {
     },
     publishedAtField,
     displayPublishedAtField,
+    contentUpdatedAtField,
     ...seoSidebarFields({ pathPrefix: '/legal', descriptionSource: 'title' }),
   ],
   hooks: {
-    beforeChange: [normalizeLexicalHook(), firstPublishHook(), displayPublishedAtBackfillHook],
+    beforeChange: [normalizeLexicalHook(), contentUpdatedAtHook(), firstPublishHook(), displayPublishedAtBackfillHook],
     afterChange: [
       slugChangeRedirectHook('legalDocuments'),
       displayPublishedAtAuditHook('legalDocuments'),

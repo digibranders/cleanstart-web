@@ -10,80 +10,147 @@ import {
   cleanstartOnlyRows,
   matrixDifferenceCount,
   matrixRowCount,
+  rowsAgree,
   type CompareContent,
+  type MatrixGroup,
 } from "./compare-types";
 import {
+  BAND_DARK,
   BRAND,
-  cornerAt,
-  CornerTile,
   Glow,
-  LightBandDecor,
+  Icon3D,
+  VectorGrid,
   VendorMark,
   WASH_LIGHT,
 } from "./compare-visuals";
+import { FingerprintReveal } from "./FingerprintReveal";
 
 /**
- * `/compare` — the hub the three comparison pages hang off.
+ * `/compare` — the hub the comparison pages hang off.
  *
- * Every card is composed from the comparison's own `CompareContent`: its
- * headline is `titleParts`, its sentence is the `standfirst` its source
- * document wrote, its counts are derived from its own matrix, and its link is
- * its own `path`. Nothing here restates a comparison in words of the hub's
- * own, so a card can never drift from the page it points at, and adding a
- * fourth comparison is adding it to the array the route passes in.
+ * The comparison pages open their capability table by conceding the parity:
+ * most rows are the same, and here is where they are not. The hub draws that
+ * argument instead of summarising it. Each comparison is a row in one ledger,
+ * and its matrix is set out as a fingerprint: one square per capability row,
+ * in three states (same answer, different answer, only CleanStart). A reader
+ * sees how much is shared and where the differences sit before opening a page.
  *
- * The two strings this file does own are UI chrome and are named in `INDEX_UI`
- * below. The hero's own headline and sentence come from the route, because
- * they are the page's copy and want SEO's review like any other.
+ * A row is kept to three things: who is compared, how different the answers
+ * are, and what only CleanStart has. An earlier pass also set every matrix
+ * group's label under its squares and a descriptor under the name; reviewed
+ * on screen it was a dashboard to decode, not a list to choose from.
+ *
+ * Everything in a row is composed from the comparison's own `CompareContent`:
+ * its headline is `titleParts`, its squares and counts are its own matrix, and
+ * its link is its own `path`. The hub restates no comparison in words of its
+ * own, so a row can never drift from the page it opens, and listing a fourth
+ * comparison is adding it to the array the route passes in.
+ *
+ * The strings this file does own are UI chrome and are named in `INDEX_UI`
+ * below. The hero, the method band and the closing card take their copy from
+ * the route, because that is the page's copy and wants SEO's review like any
+ * other.
  */
 
 /** Chrome the comparison documents do not write. */
 const INDEX_UI = {
-  cardCta: "See the comparison",
-  of: "of",
-  capabilities: "capabilities differ",
+  rowCta: "See the comparison",
+  legendSame: "Same answer",
+  legendDifferent: "Different answer",
+  legendOnly: "Only CleanStart",
+  answersMatch: "answers match.",
   /** Lead-in for the capabilities the rival's own column records as absent. */
   onlyCleanStart: "Only CleanStart",
-  /** Remainder chip when a comparison records more than the three shown. */
-  more: "+{n} more",
-  /** Accessible name for each card's proportion bar. */
-  barLabel: "Proportion of capabilities where the two answers differ",
-  /**
-   * The scale rail above the card grid. Rows are counted, not merged: the
-   * three source documents name capabilities in their own vocabularies, so
-   * "84 capability rows" is the sum of three tables and deliberately not a
-   * claim that 84 distinct capabilities exist across them.
-   */
-  statComparisons: "comparisons",
-  statRows: "capability rows",
-  statDifferences: "where they differ",
-  /**
-   * The hero's one call to action. Deliberately the same label and
-   * destination all three comparison pages already use for their own hero
-   * primary, so the family carries one label per intent rather than a hub
-   * variant of it.
-   */
-  heroCta: {
-    label: "Explore CleanStart Images",
-    href: "/cleanstart-images",
-  },
+  /** Remainder line when a comparison records more than the three shown. */
+  more: "and {n} more",
 } as const;
+
+const differPhrase = (n: number): string =>
+  n === 1 ? "1 differs" : `${n} differ`;
+
+export interface CompareIndexFact {
+  readonly id: string;
+  readonly icon: string;
+  readonly title: string;
+  readonly body: string;
+}
 
 export interface CompareIndexCopy {
   readonly titleLead: string;
   readonly titleAccent: string;
   readonly standfirst: string;
+  readonly method: {
+    readonly heading: string;
+    readonly facts: readonly CompareIndexFact[];
+  };
+}
+
+type CellState = "same" | "different" | "only";
+
+/** Fill-in order. One square every 18ms reads as a scan, not as a wait. */
+const CELL_STAGGER_MS = 18;
+/** Held back until the row's own reveal has mostly landed. */
+const CELL_DELAY_MS = 260;
+
+const CELL_STYLE: Record<CellState, React.CSSProperties> = {
+  same: {
+    background: "rgba(255,255,255,0.05)",
+    boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.15)",
+  },
+  different: {
+    background: "rgba(139,92,255,0.55)",
+    boxShadow: "inset 0 0 0 1px rgba(223,155,255,0.75)",
+  },
+  only: {
+    background: `linear-gradient(135deg, ${BRAND.violetPale}, #8B5CFF)`,
+    boxShadow:
+      "0 0 14px rgba(169,116,255,0.7), inset 0 1px 0 rgba(255,255,255,0.55)",
+  },
+};
+
+/**
+ * One capability row, drawn as a square. Decorative: the group link beside it
+ * carries the counts in words.
+ *
+ * Inside a `FingerprintReveal` the square waits at `opacity: 0` until the
+ * fingerprint is in view and then fills in on its own delay. Outside one (the
+ * legend) the `group/fp` variants match nothing and it simply renders.
+ */
+function Cell({
+  state,
+  order,
+  size,
+}: {
+  state: CellState;
+  order?: number;
+  /** Fixed box for the legend and list markers. Omitted in a fingerprint,
+   *  where the square fills the grid track it sits in. */
+  size?: number;
+}): React.ReactElement {
+  return (
+    <span
+      aria-hidden
+      className={`block shrink-0 rounded-[28%] transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-data-[inview=false]/fp:scale-50 group-data-[inview=false]/fp:opacity-0 motion-reduce:!scale-100 motion-reduce:!opacity-100 motion-reduce:transition-none${size === undefined ? " aspect-square w-full" : ""}`}
+      style={{
+        ...(size === undefined ? {} : { width: size, height: size }),
+        ...(order === undefined
+          ? {}
+          : { transitionDelay: `${CELL_DELAY_MS + order * CELL_STAGGER_MS}ms` }),
+        ...CELL_STYLE[state],
+      }}
+    />
+  );
 }
 
 /**
  * The rival's mark and CleanStart's, with the page's "vs" marker between them.
  * The same pairing the comparison pages set at the top of their capability
- * table, so a card is recognisable as the page it opens.
+ * table, so a row is recognisable as the page it opens.
  */
 function MarkPair({ rivalMark }: { rivalMark: string }): React.ReactElement {
   return (
     <span className="flex items-center gap-2.5">
-      <VendorMark tone="rival" rivalMark={rivalMark} size={34} />
+      <VendorMark tone="rival" rivalMark={rivalMark} size={44} />
       <span
         aria-hidden
         className="font-display"
@@ -92,209 +159,190 @@ function MarkPair({ rivalMark }: { rivalMark: string }): React.ReactElement {
           fontWeight: 600,
           letterSpacing: "var(--fs-badge-ls)",
           textTransform: "uppercase",
-          color: "rgba(17,17,17,0.45)",
+          color: "rgba(255,255,255,0.45)",
         }}
       >
         vs
       </span>
-      <VendorMark tone="cleanstart" rivalMark={rivalMark} size={34} />
+      <VendorMark tone="cleanstart" rivalMark={rivalMark} size={44} />
     </span>
   );
 }
 
+/** Largest a fingerprint square is drawn; narrower columns shrink it. */
+const CELL_MAX_PX = 14;
+/** Extra track between two matrix groups, on top of the grid gap. */
+const GROUP_GAP_PX = 7;
+
 /**
- * The identical / differ proportion.
+ * A comparison's matrix as one line of squares, a square per capability row.
  *
- * Same object the comparison pages open with, and the same shape the site's
- * one existing meter uses (`Testimonials`): a 3px rounded track at low alpha
- * with a brand-gradient fill. Not a new primitive.
+ * The groups are the source document's own and a slightly wider gap is all
+ * that marks them: the hub once set every group's label under its run, which
+ * made each row five captions to read before the comparison's name had
+ * registered. The labels live in the table the row opens.
+ *
+ * One grid, so the line always fits its column: every square is a
+ * `minmax(0, 14px)` track and they narrow together, where a wrapping run left
+ * the 32-row Docker matrix on two lines and the others on one. On a phone a
+ * single line would shrink the squares to specks, so there the tracks
+ * auto-fill at full size and the group spacers drop out.
  */
-function SplitBar({
-  total,
-  differences,
+function Fingerprint({
+  groups,
+  onlyIds,
 }: {
-  total: number;
-  differences: number;
+  groups: readonly MatrixGroup[];
+  onlyIds: ReadonlySet<string>;
 }): React.ReactElement {
-  const differPct = total === 0 ? 0 : (differences / total) * 100;
+  const columns = groups
+    .map((group) => `repeat(${group.rows.length}, minmax(0, ${CELL_MAX_PX}px))`)
+    .join(` ${GROUP_GAP_PX}px `);
+  let order = 0;
   return (
-    <div
-      className="flex h-[3px] w-full overflow-hidden rounded-full"
-      role="img"
-      aria-label={`${INDEX_UI.barLabel}: ${differences} of ${total}`}
+    <FingerprintReveal
+      className="grid gap-[3px] [grid-template-columns:repeat(auto-fill,14px)] sm:[grid-template-columns:var(--fp-columns)]"
+      style={{ "--fp-columns": columns } as React.CSSProperties}
     >
-      <span
-        className="block h-full"
-        style={{ width: `${100 - differPct}%`, background: "rgba(17,17,17,0.10)" }}
-      />
-      <span
-        className="block h-full"
-        style={{
-          width: `${differPct}%`,
-          background: `linear-gradient(90deg, ${BRAND.violet}, ${BRAND.blue})`,
-        }}
-      />
-    </div>
+      {groups.flatMap((group, groupIndex) => [
+        ...(groupIndex === 0
+          ? []
+          : [
+              <span
+                key={`${group.id}-gap`}
+                aria-hidden
+                className="hidden sm:block"
+              />,
+            ]),
+        ...group.rows.map((row) => (
+          <Cell
+            key={row.id}
+            order={order++}
+            state={
+              onlyIds.has(row.id)
+                ? "only"
+                : rowsAgree(row)
+                  ? "same"
+                  : "different"
+            }
+          />
+        )),
+      ])}
+    </FingerprintReveal>
   );
 }
 
-function Card({
+function LedgerRow({
   content,
-  corner,
 }: {
   content: CompareContent;
-  corner: ReturnType<typeof cornerAt>;
 }): React.ReactElement {
-  const rows = matrixRowCount(content.matrix);
+  const total = matrixRowCount(content.matrix);
   const differences = matrixDifferenceCount(content.matrix);
   /* Capped at three, with the rest counted: this is a preview of the
      argument, not the argument. The Docker comparison records seven and the
-     card would become a list. */
+     column would become the table. */
   const onlyAll = cleanstartOnlyRows(content.matrix);
-  const onlyOurs = onlyAll.slice(0, 3);
-  const onlyRest = onlyAll.length - onlyOurs.length;
+  const onlyIds = new Set(onlyAll.map((row) => row.id));
+  const onlyShown = onlyAll.slice(0, 3);
+  const onlyRest = onlyAll.length - onlyShown.length;
 
   return (
-    <CornerTile
-      corner={corner}
-      // `group` drives the arrow nudge and the border lift from the card's own
-      // hover, so the whole tile is one target rather than a tile with a link
-      // somewhere inside it.
-      /* A subgrid item spanning the six rows the band declares, so the marks,
-         headline, body, metric, chips and link of all three cards sit on the
-         same six lines however many lines each standfirst runs to. Those run
-         to four, five or six by width, so no `min-height` floor can align
-         them: an earlier `md:min-h-[4lh]` held at 1440 and drifted at 1280. */
-      subgridRows={6}
-      className="group transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[rgba(106,61,240,0.35)] hover:shadow-[0_1px_2px_rgba(17,17,17,0.04),0_28px_56px_-40px_rgba(70,30,190,0.45)] focus-within:border-[rgba(106,61,240,0.35)]"
-    >
-      <MarkPair rivalMark={content.rivalMark} />
-
-      <h2
-        className="mt-5 font-display text-[#111111]"
-        style={{
-          fontSize: "var(--fs-h4)",
-          fontWeight: "var(--fs-h4-weight)",
-          letterSpacing: "var(--fs-h4-ls)",
-          lineHeight: "var(--fs-h4-lh)",
-        }}
-      >
-        {/* The card is the whole tile: this link is stretched over it, so the
-            headline stays the accessible name of the one link. */}
-        <Link
-          href={content.path}
-          className="after:absolute after:inset-0 after:content-[''] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#33BAEC]"
-        >
-          {content.titleParts.lead}
-          <span className="cs-text-gradient-impact">
-            {content.titleParts.accent}
-          </span>
-        </Link>
-      </h2>
-
-      <p
-        className="mt-3"
-        style={{
-          fontFamily: "var(--font-sans)",
-          fontSize: "var(--fs-body-sm)",
-          lineHeight: "var(--fs-body-sm-lh)",
-          letterSpacing: "var(--fs-body-ls)",
-          color: "#333333",
-        }}
-      >
-        {content.standfirst}
-      </p>
-
-      {/* Everything below is derived from this comparison's own matrix, so a
-          card cannot advertise a split or a capability the table then
-          contradicts.
-
-          The count is set as a stat, not as body copy: `--fs-display` at 700,
-          which is what `CleanSightStats` uses for a figure. It was previously
-          caption-sized grey text under a hairline, which made the card's most
-          important number the smallest thing on it. */}
-      <div className="relative pt-6">
-        <p
-          className="font-display text-[#111111]"
+    // A row answers three questions and stops: who, how different, and what
+    // only CleanStart has. `group/row` drives the wash and the arrow from the
+    // row's own hover, so the whole row is one target.
+    <article className="group/row relative grid gap-y-7 px-6 py-8 transition-colors duration-300 hover:bg-[rgba(255,255,255,0.035)] focus-within:bg-[rgba(255,255,255,0.035)] sm:px-9 lg:grid-cols-[minmax(0,3.2fr)_minmax(0,5.6fr)_minmax(0,3.2fr)_48px] lg:items-center lg:gap-x-10 lg:px-10 lg:py-10">
+      <div>
+        <MarkPair rivalMark={content.rivalMark} />
+        <h2
+          className="mt-5 font-display text-white"
           style={{
-            fontSize: "var(--fs-display)",
-            fontWeight: 700,
-            lineHeight: "var(--fs-display-lh)",
-            letterSpacing: "var(--fs-display-ls)",
+            fontSize: "var(--fs-h4)",
+            fontWeight: "var(--fs-h4-weight)",
+            letterSpacing: "var(--fs-h4-ls)",
+            lineHeight: "var(--fs-h4-lh)",
+            maxWidth: "22ch",
+            textWrap: "balance",
           }}
         >
-          {differences}
-          <span
-            style={{
-              fontSize: "var(--fs-h4)",
-              fontWeight: 600,
-              color: "rgba(17,17,17,0.38)",
-            }}
+          {/* Stretched over the row, so the headline stays the accessible name
+              of the row's one link. */}
+          <Link
+            href={content.path}
+            className="after:absolute after:inset-0 after:content-[''] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#33BAEC]"
           >
-            /{rows}
-          </span>
-        </p>
+            {content.titleParts.lead}
+            {content.titleParts.accent}
+          </Link>
+        </h2>
+      </div>
+
+      <div>
+        <Fingerprint groups={content.matrix.groups} onlyIds={onlyIds} />
+        {/* The count in a sentence. It was a display-size "15/32", which left
+            a reader to work out what was being divided and in whose favour. */}
         <p
-          className="mt-1"
+          className="mt-4"
           style={{
             fontFamily: "var(--font-sans)",
             fontSize: "var(--fs-body-sm)",
-            fontWeight: 500,
             lineHeight: "var(--fs-body-sm-lh)",
-            color: "rgba(17,17,17,0.62)",
+            color: "rgba(255,255,255,0.68)",
           }}
         >
-          {INDEX_UI.capabilities}
+          <strong className="font-semibold text-white">
+            {total - differences} of {total}
+          </strong>{" "}
+          {INDEX_UI.answersMatch}{" "}
+          <strong className="font-semibold" style={{ color: BRAND.violetPale }}>
+            {differPhrase(differences)}
+          </strong>
+          .
         </p>
-        <div className="mt-4">
-          <SplitBar total={rows} differences={differences} />
-        </div>
       </div>
 
-        {/* Always rendered, even when a comparison records none, so every card
-            occupies the same six rows. */}
-        <div className="mt-5">
-          {onlyOurs.length > 0 && (
+      <div>
+        {onlyShown.length > 0 && (
           <>
             <p
               className="font-display"
               style={{
-                fontSize: "var(--fs-eyebrow)",
-                fontWeight: "var(--fs-eyebrow-weight)",
-                letterSpacing: "var(--fs-eyebrow-ls)",
-                lineHeight: "var(--fs-eyebrow-lh)",
-                textTransform: "uppercase",
-                color: BRAND.violet,
+                fontSize: "var(--fs-body-sm)",
+                fontWeight: 600,
+                lineHeight: "var(--fs-body-sm-lh)",
+                color: BRAND.violetPale,
               }}
             >
               {INDEX_UI.onlyCleanStart}
             </p>
-            <ul className="mt-2.5 flex flex-wrap gap-1.5">
-              {onlyOurs.map((row) => (
+            <ul className="mt-2.5 grid gap-2">
+              {onlyShown.map((row) => (
                 <li
                   key={row.id}
-                  className="rounded-full px-2.5 py-1"
+                  className="flex items-baseline gap-2.5"
                   style={{
-                    border: "1px solid rgba(106,61,240,0.16)",
-                    background: "rgba(106,61,240,0.055)",
                     fontFamily: "var(--font-sans)",
-                    fontSize: "var(--fs-caption)",
-                    lineHeight: "var(--fs-caption-lh)",
-                    color: "#111111",
+                    fontSize: "var(--fs-body-sm)",
+                    lineHeight: "var(--fs-body-sm-lh)",
+                    color: "rgba(255,255,255,0.88)",
                   }}
                 >
+                  {/* The legend's own square as the marker, so the list and
+                      the fingerprint read as one key. */}
+                  <span className="translate-y-px">
+                    <Cell state="only" size={10} />
+                  </span>
                   {row.capability}
                 </li>
               ))}
               {onlyRest > 0 && (
                 <li
-                  className="rounded-full px-2.5 py-1"
+                  className="pl-5"
                   style={{
-                    border: "1px dashed rgba(106,61,240,0.32)",
                     fontFamily: "var(--font-sans)",
                     fontSize: "var(--fs-caption)",
                     lineHeight: "var(--fs-caption-lh)",
-                    color: BRAND.violet,
+                    color: "rgba(255,255,255,0.5)",
                   }}
                 >
                   {INDEX_UI.more.replace("{n}", String(onlyRest))}
@@ -302,288 +350,272 @@ function Card({
               )}
             </ul>
           </>
-          )}
-        </div>
+        )}
+      </div>
 
       <span
         aria-hidden
-        className="inline-flex items-center gap-2 pt-6 font-display"
+        className="inline-flex items-center gap-2.5 font-display text-white lg:justify-self-end"
         style={{
           fontSize: "var(--fs-button-sm)",
           fontWeight: "var(--fs-button-weight)",
           letterSpacing: "var(--fs-button-ls)",
-          color: BRAND.violet,
         }}
       >
-        {INDEX_UI.cardCta}
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          className="transition-transform duration-200 group-hover:translate-x-1"
-        >
-          <path
-            d="M3.5 8h9M9 4.5 12.5 8 9 11.5"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        <span className="lg:sr-only">{INDEX_UI.rowCta}</span>
+        <span className="grid size-10 place-items-center rounded-full shadow-[inset_0_0_0_1px_rgba(255,255,255,0.24)] transition-[background-color,color,transform] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/row:translate-x-1 group-hover/row:bg-white group-hover/row:text-[#1B1F4F] group-focus-within/row:bg-white group-focus-within/row:text-[#1B1F4F] lg:size-12">
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
+            <path
+              d="M3.5 8h9M9 4.5 12.5 8 9 11.5"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
       </span>
-    </CornerTile>
+    </article>
   );
 }
 
-/**
- * One counted figure in the rail above the card grid.
- *
- * These three sat inside the hero, where they were the third and fourth text
- * elements above the fold and the page still asked for nothing. A hero
- * carries its proposition and one call to action; a scale strip is not that.
- * Read here they also sit directly above the cards they are counted from,
- * which is where a reader can act on them.
- */
-function ScaleStat({
-  value,
-  label,
-}: {
-  value: number;
-  label: string;
-}): React.ReactElement {
+/** The key to the fingerprints, set directly above them. */
+function Legend(): React.ReactElement {
+  const items: readonly (readonly [CellState, string])[] = [
+    ["same", INDEX_UI.legendSame],
+    ["different", INDEX_UI.legendDifferent],
+    ["only", INDEX_UI.legendOnly],
+  ];
   return (
-    <div className="flex flex-col gap-1">
-      <span
-        className="font-display text-[#111111]"
-        style={{
-          fontSize: "var(--fs-h3)",
-          fontWeight: 600,
-          lineHeight: 1,
-          letterSpacing: "var(--fs-h3-ls)",
-        }}
-      >
-        {value}
-      </span>
-      <span
-        style={{
-          fontFamily: "var(--font-sans)",
-          fontSize: "var(--fs-caption)",
-          lineHeight: "var(--fs-caption-lh)",
-          color: "rgba(17,17,17,0.62)",
-          maxWidth: "18ch",
-        }}
-      >
-        {label}
-      </span>
-    </div>
+    <ul className="flex flex-wrap gap-x-6 gap-y-3">
+      {items.map(([state, label]) => (
+        <li
+          key={state}
+          className="flex items-center gap-2"
+          style={{
+            fontFamily: "var(--font-sans)",
+            fontSize: "var(--fs-caption)",
+            fontWeight: 500,
+            lineHeight: "var(--fs-caption-lh)",
+            color: "rgba(255,255,255,0.74)",
+          }}
+        >
+          <Cell state={state} size={14} />
+          {label}
+        </li>
+      ))}
+    </ul>
   );
 }
 
 /**
- * The scale rail: the three figures, counted from the matrices the cards
- * below are built from, on one line with the site's hairline dividers.
+ * The hub's dark frame: the hero and the ledger on one continuous band.
  *
- * It doubles as the card band's header. The band opened straight onto the
- * grid with no lead of any kind, which is why the hero was carrying this
- * weight in the first place.
+ * They are one section of the page, not two: the legend and the squares it
+ * explains belong in the same room, and the first comparison lands inside the
+ * opening viewport, where the previous hero spent that space on a button that
+ * led away from the page.
+ *
+ * No call to action in the hero for the same reason: the rows are the action.
+ * The route closes on the footer's CTA card instead.
  */
-function ScaleRail({
+export function CompareIndexLedger({
+  copy,
   comparisons,
 }: {
-  comparisons: readonly CompareContent[];
-}): React.ReactElement {
-  const rows = comparisons.reduce((t, c) => t + matrixRowCount(c.matrix), 0);
-  const differences = comparisons.reduce(
-    (t, c) => t + matrixDifferenceCount(c.matrix),
-    0,
-  );
-  const divider = (
-    <span
-      aria-hidden
-      className="hidden h-10 w-px self-center sm:block"
-      style={{ background: "rgba(17,17,17,0.11)" }}
-    />
-  );
-  return (
-    <dl className="flex flex-wrap items-start gap-x-10 gap-y-6 sm:gap-x-14">
-      <div>
-        <dt className="sr-only">{INDEX_UI.statComparisons}</dt>
-        <dd>
-          <ScaleStat
-            value={comparisons.length}
-            label={INDEX_UI.statComparisons}
-          />
-        </dd>
-      </div>
-      {divider}
-      <div>
-        <dt className="sr-only">{INDEX_UI.statRows}</dt>
-        <dd>
-          <ScaleStat value={rows} label={INDEX_UI.statRows} />
-        </dd>
-      </div>
-      {divider}
-      <div>
-        <dt className="sr-only">{INDEX_UI.statDifferences}</dt>
-        <dd>
-          <ScaleStat value={differences} label={INDEX_UI.statDifferences} />
-        </dd>
-      </div>
-    </dl>
-  );
-}
-
-/**
- * The hub's hero: the title, its sentence and one call to action.
- *
- * The three counted figures that used to sit here moved to the rail above the
- * card grid (`ScaleRail`). What is left is the shape every other hero on the
- * site has.
- *
- * One button, not the site's usual glass-and-blue pair. The pair exists where
- * a page has two genuinely different destinations; here the second would be a
- * jump to a card grid that is already the next thing on screen. A lone
- * translucent glass button on the dark mesh is the weaker of the two
- * treatments, so the site's solid blue carries the page's only conversion
- * action. The inline custom properties are not decoration: a global mobile
- * rule overrides the button classes at 36px with `!important`, and setting
- * the variables is how the comparison heroes already beat it.
- */
-export function CompareIndexHero({
-  copy,
-}: {
   copy: CompareIndexCopy;
+  comparisons: readonly CompareContent[];
 }): React.ReactElement {
   return (
     <section
-      data-section="CompareIndexHero"
-      className="relative overflow-hidden bg-cs-hero"
+      data-section="CompareIndexLedger"
+      className="relative overflow-hidden"
+      style={{ background: BAND_DARK, backgroundColor: "#151021" }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        aria-hidden
-        src="/images/for-developers/hero-grid.svg"
-        alt=""
-        className="pointer-events-none absolute left-0 top-0 hidden w-full select-none md:block"
-        style={{ height: "520px", objectFit: "cover", opacity: 0.6 }}
-        loading="eager"
-        decoding="async"
+      <VectorGrid side="right" top="-6%" opacity={0.5} />
+      <Glow
+        color="rgba(169,116,255,0.24)"
+        size="min(820px, 56%)"
+        right="-10%"
+        top="-22%"
       />
       <Glow
-        color="rgba(169,116,255,0.28)"
-        size="min(760px, 52%)"
-        right="-6%"
-        top="-18%"
-      />
-      <Glow
-        color="rgba(7,110,255,0.22)"
-        size="min(560px, 42%)"
-        left="-10%"
-        bottom="-14%"
+        color="rgba(7,110,255,0.2)"
+        size="min(640px, 46%)"
+        left="-14%"
+        top="34%"
       />
 
       <div
         className="relative z-20 mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10"
         style={{
           paddingTop: "calc(clamp(104px, 9vw, 136px) + var(--cs-header-extra))",
-          paddingBottom: "clamp(72px, 8vw, 116px)",
+          paddingBottom: "var(--spacing-section-md)",
         }}
       >
-        <div className="flex flex-col items-center text-center">
-          <HeroReveal y={50} duration={1} lcp>
-            <h1
-              className="font-display text-white"
-              style={{
-                fontSize: "var(--fs-display)",
-                fontWeight: "var(--fs-display-weight)",
-                letterSpacing: "var(--fs-display-ls)",
-                lineHeight: "var(--fs-display-lh)",
-                maxWidth: "20ch",
-                textWrap: "balance",
-              }}
-            >
-              {copy.titleLead}
-              <span className="cs-text-gradient-impact">{copy.titleAccent}</span>
-            </h1>
-          </HeroReveal>
+        <HeroReveal y={50} duration={1} lcp>
+          <h1
+            className="font-display text-white"
+            style={{
+              fontSize: "var(--fs-display)",
+              fontWeight: "var(--fs-display-weight)",
+              letterSpacing: "var(--fs-display-ls)",
+              lineHeight: "var(--fs-display-lh)",
+              maxWidth: "16ch",
+              textWrap: "balance",
+            }}
+          >
+            {copy.titleLead}
+            <span className="cs-text-gradient-impact">{copy.titleAccent}</span>
+          </h1>
+        </HeroReveal>
 
-          <HeroReveal y={30} delay={0.15} duration={0.8}>
-            <p
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "var(--fs-lead)",
-                fontWeight: "var(--fs-lead-weight)",
-                letterSpacing: "var(--fs-lead-ls)",
-                lineHeight: "var(--fs-lead-lh)",
-                color: "rgba(255,255,255,0.78)",
-                maxWidth: "62ch",
-                marginTop: "clamp(20px, 2vw, 28px)",
-              }}
-            >
-              {copy.standfirst}
-            </p>
+        <HeroReveal y={30} delay={0.15} duration={0.8}>
+          <p
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "var(--fs-lead-sm)",
+              fontWeight: "var(--fs-lead-weight)",
+              letterSpacing: "var(--fs-lead-ls)",
+              lineHeight: "var(--fs-lead-lh)",
+              color: "rgba(255,255,255,0.78)",
+              maxWidth: "52ch",
+              marginTop: "clamp(16px, 1.6vw, 24px)",
+            }}
+          >
+            {copy.standfirst}
+          </p>
+        </HeroReveal>
 
-            <div className="mt-10 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
-              <Link
-                href={INDEX_UI.heroCta.href}
-                className="cs-btn-blue cs-hero-cta"
-                style={
-                  {
-                    "--cs-btn-h": "44px",
-                    "--cs-btn-px": "24px",
-                    "--cs-btn-fs": "var(--fs-button-lg)",
-                    /* Read by the mobile `.cs-hero-cta` rule. An inline
-                       `--cs-btn-fs` cannot carry this: the global mobile rule
-                       sets that property `!important`, which beats inline. */
-                    "--cs-hero-cta-fs": "16px",
-                  } as React.CSSProperties
+        {/* The key sits on the ledger it explains, not up in the hero. */}
+        <div className="mt-12 lg:mt-16">
+          <Legend />
+        </div>
+
+        {/* A shell and a core, concentric. The shell is the band showing
+            through a hairline tray; the core is opaque navy, so the gradient
+            behind it does not wash the squares. No backdrop blur: this is a
+            tall scrolling surface, and a blur here repaints on every frame. */}
+        <div
+          className="mt-5 p-1.5"
+          style={{
+            borderRadius: "30px",
+            background: "rgba(255,255,255,0.04)",
+            boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.09)",
+          }}
+        >
+          <RevealStagger
+            className="overflow-hidden"
+            style={{
+              borderRadius: "24px",
+              background: [
+                "radial-gradient(70% 60% at 12% 0%, rgba(106,61,240,0.16) 0%, rgba(106,61,240,0) 70%)",
+                "linear-gradient(180deg, rgba(13,17,50,0.9) 0%, rgba(8,11,36,0.96) 100%)",
+              ].join(", "),
+              boxShadow: [
+                "0 40px 100px -48px rgba(0,0,0,0.8)",
+                "inset 0 1px 0 rgba(255,255,255,0.08)",
+              ].join(", "),
+            }}
+          >
+            {comparisons.map((content, index) => (
+              <RevealItem
+                key={content.path}
+                className={
+                  index === 0 ? undefined : "border-t border-[rgba(255,255,255,0.08)]"
                 }
               >
-                <span>{INDEX_UI.heroCta.label}</span>
-              </Link>
-            </div>
-          </HeroReveal>
+                <LedgerRow content={content} />
+              </RevealItem>
+            ))}
+          </RevealStagger>
         </div>
       </div>
     </section>
   );
 }
 
-export function CompareIndexList({
-  comparisons,
+/**
+ * How the comparisons are made.
+ *
+ * A reader arriving on a comparison query assumes the page is selling. What
+ * earns the tables a hearing is the method, and the hub is the one place it
+ * can be said once for all of them: where the answers come from, that matching
+ * rows are kept, and that each table is dated and marks what varies.
+ *
+ * Reserves `--spacing-section-cta` below itself for the footer's CTA card,
+ * the way `CompareFAQ` does on the comparison pages.
+ */
+export function CompareIndexMethod({
+  method,
 }: {
-  comparisons: readonly CompareContent[];
+  method: CompareIndexCopy["method"];
 }): React.ReactElement {
   return (
-    // `padding="md"` and a bare `<Footer />`, the pattern the site's other
-    // listing pages use (`CaseStudiesGrid`, the resource centre). No CTA card
-    // means no overlap to reserve, so `--spacing-section-cta` here would just
-    // leave a band of empty wash above the footer.
     <Section
-      padding="md"
-      data-section="CompareIndexList"
-      className="relative overflow-hidden"
+      padding="none"
+      data-section="CompareIndexMethod"
+      className="relative pt-[var(--spacing-section-lg)] pb-[var(--spacing-section-cta)]"
       style={{ background: WASH_LIGHT }}
+      aria-labelledby="compare-method-title"
     >
-      <LightBandDecor />
+      <Container>
+        <div className="grid gap-y-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-x-16">
+          <Reveal header>
+            <h2
+              id="compare-method-title"
+              className="font-display text-[#111111]"
+              style={{
+                fontSize: "var(--fs-h2)",
+                fontWeight: "var(--fs-h2-weight)",
+                letterSpacing: "var(--fs-h2-ls)",
+                lineHeight: "var(--fs-h2-lh)",
+                maxWidth: "13ch",
+              }}
+            >
+              {method.heading}
+            </h2>
+          </Reveal>
 
-      <Container className="relative">
-        <Reveal header>
-          <ScaleRail comparisons={comparisons} />
-        </Reveal>
-
-        {/* Six explicit rows the cards subgrid onto. The chain is grid ->
-            RevealItem -> CornerTile, and `RevealItem` renders exactly one div
-            with the className passed through, so the tile still resolves
-            against this grid's rows. */}
-        <RevealStagger className="mt-10 grid grid-rows-[repeat(6,auto)] gap-5 md:grid-cols-2 lg:mt-12 lg:grid-cols-3 lg:gap-6">
-          {comparisons.map((content, index) => (
-            <RevealItem key={content.path} className="row-span-6 grid grid-rows-subgrid">
-              <Card content={content} corner={cornerAt(index)} />
-            </RevealItem>
-          ))}
-        </RevealStagger>
+          <RevealStagger className="grid gap-y-9 md:grid-cols-3 md:gap-x-0">
+            {method.facts.map((fact, index) => (
+              <RevealItem
+                key={fact.id}
+                className={
+                  index === 0
+                    ? "md:pr-8"
+                    : "md:border-l md:border-[rgba(17,17,17,0.11)] md:px-8"
+                }
+              >
+                <Icon3D src={fact.icon} size={64} />
+                <h3
+                  className="mt-5 font-display text-[#111111]"
+                  style={{
+                    fontSize: "var(--fs-h4)",
+                    fontWeight: "var(--fs-h4-weight)",
+                    letterSpacing: "var(--fs-h4-ls)",
+                    lineHeight: "var(--fs-h4-lh)",
+                  }}
+                >
+                  {fact.title}
+                </h3>
+                <p
+                  className="mt-2.5"
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "var(--fs-body-sm)",
+                    lineHeight: "var(--fs-body-sm-lh)",
+                    letterSpacing: "var(--fs-body-ls)",
+                    color: "#333333",
+                    maxWidth: "34ch",
+                  }}
+                >
+                  {fact.body}
+                </p>
+              </RevealItem>
+            ))}
+          </RevealStagger>
+        </div>
       </Container>
     </Section>
   );

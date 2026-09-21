@@ -6,11 +6,15 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
 import { getPageGraph } from "@/lib/seo/compose-page";
 import {
-  CompareIndexHero,
-  CompareIndexList,
+  CompareIndexLedger,
+  CompareIndexMethod,
   type CompareIndexCopy,
 } from "@/components/sections/compare/CompareIndex";
-import type { CompareContent } from "@/components/sections/compare/compare-types";
+import { CompareCTA } from "@/components/sections/compare/CompareCTA";
+import type {
+  CompareContent,
+  CompareCtaContent,
+} from "@/components/sections/compare/compare-types";
 import { DHI } from "@/components/sections/compare/compare-content-dhi";
 import { RED_HAT } from "@/components/sections/compare/compare-content-red-hat";
 import { CHAINGUARD } from "@/components/sections/compare/compare-content-chainguard";
@@ -21,10 +25,10 @@ const PATH = "/compare";
  * The hub's own copy, which no source document writes.
  *
  * SEO's comparison-page metadata table (2026-09-21) has a row per comparison
- * and none for the hub, so the title, description and the two lines below are
- * written here and want their own row before the page is indexed. They are
- * deliberately descriptive: the hub says what the comparisons cover and does
- * not make a claim of its own that a comparison would then have to support.
+ * and none for the hub, so everything below is written here and wants its own
+ * row before the page is indexed. `META` is deliberately descriptive: it says
+ * what the comparisons cover and makes no claim a comparison would then have
+ * to support.
  */
 const META = {
   title: "Compare CleanStart | Hardened Container Image Comparisons",
@@ -34,11 +38,57 @@ const META = {
 
 const TITLE = "Compare CleanStart";
 
+/**
+ * The page's proposition is the one the comparison tables already open with:
+ * most answers are the same, and the differences are specific. The hero says
+ * that in one line and makes no claim about any vendor.
+ *
+ * The method facts restate what every comparison page already carries: the
+ * matrix footnote ("each platform's published approach and CleanStart's
+ * documented capabilities as of ..."), the table's "show only the differences"
+ * switch, and the qualified-cell legend. None of them names a month, so the
+ * band does not go stale when a table is re-checked.
+ */
 const COPY: CompareIndexCopy = {
-  titleLead: "Compare ",
-  titleAccent: "CleanStart",
+  titleLead: "Where hardened images ",
+  titleAccent: "actually differ",
   standfirst:
-    "Side-by-side capability comparisons of CleanStart and other hardened container image providers, covering image foundations, build process, supply chain verification, and compliance.",
+    "CleanStart compared with other hardened image providers, one capability at a time. Pick a comparison to see the full table.",
+  method: {
+    heading: "How these comparisons are made",
+    facts: [
+      {
+        id: "sources",
+        icon: "/images/compare/icon-origin.webp",
+        title: "Published sources",
+        body: "Each table sets the vendor's published approach beside CleanStart's documented capabilities.",
+      },
+      {
+        id: "parity",
+        icon: "/images/compare/icon-sbom.webp",
+        title: "Matching rows stay in",
+        body: "Where both vendors give the same answer, the row is still shown. One switch filters a table down to its differences.",
+      },
+      {
+        id: "dated",
+        icon: "/images/compare/icon-signed-artifact.webp",
+        title: "Dated and qualified",
+        body: "Every table states the month it was checked and notes where behavior varies by image or variant.",
+      },
+    ],
+  },
+};
+
+/**
+ * The closing card. Same label and destination the comparison heroes use for
+ * their primary, so the family carries one label per intent. The body's claims
+ * are the ones the comparison pages' own closing cards already make.
+ */
+const CTA: CompareCtaContent = {
+  heading: "Put a verified image in your pipeline",
+  body: "CleanStart Images are built from source and ship with SBOMs, software provenance, and cryptographic verification.",
+  button: "Explore CleanStart Images",
+  href: "/cleanstart-images",
 };
 
 /**
@@ -81,7 +131,7 @@ export const revalidate = 21600; // 6h ISR fallback, matching the comparison pag
  * page, and repointing it here would aim all of them at a `noindex` URL.
  * Repoint it to `/compare` at launch, with the crumb.
  *
- * Each card composes itself from the comparison's own `CompareContent`, so
+ * Each row composes itself from the comparison's own `CompareContent`, so
  * listing a fourth comparison is adding it to `COMPARISONS` above.
  */
 export default async function CompareIndexPage(): Promise<React.ReactElement> {
@@ -102,12 +152,15 @@ export default async function CompareIndexPage(): Promise<React.ReactElement> {
       <JsonLdGraph id="compare-index-jsonld" graph={graph} />
       <Header />
       <main id="main-content">
-        <CompareIndexHero copy={COPY} />
+        {/* The hero and the ledger are one continuous dark frame, and the
+            first comparison sits inside the opening viewport, so the frame is
+            not wrapped in `FadeUp`. Its rows reveal themselves. */}
+        <CompareIndexLedger copy={COPY} comparisons={COMPARISONS} />
         <FadeUp>
-          <CompareIndexList comparisons={COMPARISONS} />
+          <CompareIndexMethod method={COPY.method} />
         </FadeUp>
       </main>
-      <Footer />
+      <Footer cta={<CompareCTA content={CTA} />} />
     </>
   );
 }
