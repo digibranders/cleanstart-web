@@ -281,7 +281,6 @@ export const UI = {
    * same. The numbers are computed from the table below, so the concession
    * can never overstate or understate what the table then shows.
    */
-  parityEyebrow: "What this table says",
   parityIdentical: "identical",
   parityDiffer: "where they differ",
   parityShowDiff: "Show only the differences",

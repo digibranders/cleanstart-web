@@ -428,22 +428,11 @@ function ParityLede({
 
       <div className="relative flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between lg:gap-12">
         <div className="min-w-0 flex-1">
+          {/* No eyebrow above this. "What this table says" was a label I wrote
+              that restated the sentence directly under it, which already says
+              what the table says. The sentence opens the block on its own. */}
           <p
-            className="font-display"
-            style={{
-              fontSize: "var(--fs-eyebrow)",
-              fontWeight: "var(--fs-eyebrow-weight)",
-              letterSpacing: "var(--fs-eyebrow-ls)",
-              lineHeight: "var(--fs-eyebrow-lh)",
-              textTransform: "uppercase",
-              color: "rgba(17,17,17,0.62)",
-            }}
-          >
-            {UI.parityEyebrow}
-          </p>
-
-          <p
-            className="mt-3 font-display text-[#111111]"
+            className="font-display text-[#111111]"
             style={{
               fontSize: "var(--fs-h4)",
               fontWeight: "var(--fs-h4-weight)",
