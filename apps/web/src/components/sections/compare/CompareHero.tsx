@@ -104,12 +104,19 @@ export function CompareHero({
                   Images heroes use, and the solid blue as secondary. */}
               <Link
                 href={heroCta.href}
-                className="cs-btn-glass"
+                className="cs-btn-glass cs-hero-cta"
                 style={
                   {
                     "--cs-btn-h": "44px",
                     "--cs-btn-px": "24px",
                     "--cs-btn-fs": "var(--fs-button-lg)",
+                    /* `cs-hero-cta` holds both buttons at 44px below lg. The
+                       inline `--cs-btn-fs` above cannot do it: the global
+                       mobile rule sets that property `!important`, which beats
+                       inline, so both buttons rendered at 36px/13px on the
+                       live Docker page. `--cs-hero-cta-fs` is the property
+                       that rule reads and does not overwrite. */
+                    "--cs-hero-cta-fs": "var(--fs-button-lg)",
                   } as React.CSSProperties
                 }
               >
@@ -118,12 +125,13 @@ export function CompareHero({
 
               <Link
                 href="#capability-comparison"
-                className="cs-btn-blue"
+                className="cs-btn-blue cs-hero-cta"
                 style={
                   {
                     "--cs-btn-h": "44px",
                     "--cs-btn-px": "24px",
                     "--cs-btn-fs": "var(--fs-button-lg)",
+                    "--cs-hero-cta-fs": "var(--fs-button-lg)",
                   } as React.CSSProperties
                 }
               >
