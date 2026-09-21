@@ -595,20 +595,36 @@ export const cornerAt = (index: number): Corner =>
 export function CornerTile({
   corner,
   className,
+  subgridRows,
   children,
 }: {
   corner: Corner;
   className?: string;
+  /**
+   * Lay the tile out as a subgrid spanning this many rows of its parent grid
+   * instead of as a stack, so a row of tiles can align its children with each
+   * other. The tile's own radius, border, fill and padding are unchanged;
+   * only its internal layout mode differs, and the 12px stack gap is dropped
+   * because a subgrid inherits its parent's row gap and the caller spaces
+   * children with margins.
+   */
+  subgridRows?: number;
   children: React.ReactNode;
 }): React.ReactElement {
   return (
     <article
-      className={cn("relative flex h-full flex-col bg-white", className)}
+      className={cn(
+        "relative bg-white",
+        subgridRows ? "grid grid-rows-subgrid" : "flex h-full flex-col",
+        className,
+      )}
       style={{
         borderRadius: CORNER_RADIUS[corner],
         border: "1.5px solid rgba(0,0,0,0.06)",
         padding: "clamp(20px, 1.67vw, 30px)",
-        gap: "12px",
+        ...(subgridRows
+          ? { gridRow: `span ${subgridRows}`, rowGap: 0 }
+          : { gap: "12px" }),
       }}
     >
       {children}

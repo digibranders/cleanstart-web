@@ -89,9 +89,11 @@ function MarkPair({ rivalMark }: { rivalMark: string }): React.ReactElement {
 }
 
 /**
- * The identical / differ proportion, drawn with the same two colours the
- * capability table uses for its columns. The comparison pages open on the
- * same bar, so a card and the page it links to state the split the same way.
+ * The identical / differ proportion.
+ *
+ * Same object the comparison pages open with, and the same shape the site's
+ * one existing meter uses (`Testimonials`): a 3px rounded track at low alpha
+ * with a brand-gradient fill. Not a new primitive.
  */
 function SplitBar({
   total,
@@ -103,13 +105,13 @@ function SplitBar({
   const differPct = total === 0 ? 0 : (differences / total) * 100;
   return (
     <div
-      className="flex h-2 w-full overflow-hidden rounded-full"
+      className="flex h-[3px] w-full overflow-hidden rounded-full"
       role="img"
       aria-label={`${INDEX_UI.barLabel}: ${differences} of ${total}`}
     >
       <span
         className="block h-full"
-        style={{ width: `${100 - differPct}%`, background: "rgba(17,17,17,0.13)" }}
+        style={{ width: `${100 - differPct}%`, background: "rgba(17,17,17,0.10)" }}
       />
       <span
         className="block h-full"
@@ -144,18 +146,18 @@ function Card({
       // `group` drives the arrow nudge and the border lift from the card's own
       // hover, so the whole tile is one target rather than a tile with a link
       // somewhere inside it.
+      /* A subgrid item spanning the six rows the band declares, so the marks,
+         headline, body, metric, chips and link of all three cards sit on the
+         same six lines however many lines each standfirst runs to. Those run
+         to four, five or six by width, so no `min-height` floor can align
+         them: an earlier `md:min-h-[4lh]` held at 1440 and drifted at 1280. */
+      subgridRows={6}
       className="group transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[rgba(106,61,240,0.35)] hover:shadow-[0_1px_2px_rgba(17,17,17,0.04),0_28px_56px_-40px_rgba(70,30,190,0.45)] focus-within:border-[rgba(106,61,240,0.35)]"
     >
       <MarkPair rivalMark={content.rivalMark} />
 
-      {/* Two lines of headline are reserved wherever the cards sit side by
-          side, so every card's paragraph starts on the same line. "Chainguard
-          vs CleanStart" fits on one line while the other two wrap, and without
-          this its body floated a line above its neighbours'. A floor, not a
-          fixed height: a longer rival name still takes the lines it needs.
-          Below `md` the cards stack and a reserved empty line is just a gap. */}
       <h2
-        className="mt-5 font-display text-[#111111] md:min-h-[2lh]"
+        className="mt-5 font-display text-[#111111]"
         style={{
           fontSize: "var(--fs-h4)",
           fontWeight: "var(--fs-h4-weight)",
@@ -176,11 +178,8 @@ function Card({
         </Link>
       </h2>
 
-      {/* Floored for the same reason as the headline: the three standfirsts
-          run to three or four lines, and without this the proportion bars sit
-          at three different heights and stop being comparable at a glance. */}
       <p
-        className="mt-3 md:min-h-[4lh]"
+        className="mt-3"
         style={{
           fontFamily: "var(--font-sans)",
           fontSize: "var(--fs-body-sm)",
@@ -194,30 +193,55 @@ function Card({
 
       {/* Everything below is derived from this comparison's own matrix, so a
           card cannot advertise a split or a capability the table then
-          contradicts. */}
-      <div className="pt-6">
-        <SplitBar total={rows} differences={differences} />
+          contradicts.
+
+          The count is set as a stat, not as body copy: `--fs-display` at 700,
+          which is what `CleanSightStats` uses for a figure. It was previously
+          caption-sized grey text under a hairline, which made the card's most
+          important number the smallest thing on it. */}
+      <div className="relative pt-6">
         <p
-          className="mt-3"
+          className="font-display text-[#111111]"
+          style={{
+            fontSize: "var(--fs-display)",
+            fontWeight: 700,
+            lineHeight: "var(--fs-display-lh)",
+            letterSpacing: "var(--fs-display-ls)",
+          }}
+        >
+          {differences}
+          <span
+            style={{
+              fontSize: "var(--fs-h4)",
+              fontWeight: 600,
+              color: "rgba(17,17,17,0.38)",
+            }}
+          >
+            /{rows}
+          </span>
+        </p>
+        <p
+          className="mt-1"
           style={{
             fontFamily: "var(--font-sans)",
             fontSize: "var(--fs-body-sm)",
+            fontWeight: 500,
             lineHeight: "var(--fs-body-sm-lh)",
             color: "rgba(17,17,17,0.62)",
           }}
         >
-          <span className="font-display" style={{ fontWeight: 600, color: BRAND.violet }}>
-            {differences}
-          </span>{" "}
-          {INDEX_UI.of}{" "}
-          <span className="font-display" style={{ fontWeight: 600, color: "#111111" }}>
-            {rows}
-          </span>{" "}
           {INDEX_UI.capabilities}
         </p>
+        <div className="mt-4">
+          <SplitBar total={rows} differences={differences} />
+        </div>
+      </div>
 
-        {onlyOurs.length > 0 && (
-          <div className="mt-5">
+        {/* Always rendered, even when a comparison records none, so every card
+            occupies the same six rows. */}
+        <div className="mt-5">
+          {onlyOurs.length > 0 && (
+          <>
             <p
               className="font-display"
               style={{
@@ -237,8 +261,8 @@ function Card({
                   key={row.id}
                   className="rounded-full px-2.5 py-1"
                   style={{
-                    border: "1px solid rgba(106,61,240,0.24)",
-                    background: "rgba(106,61,240,0.06)",
+                    border: "1px solid rgba(106,61,240,0.16)",
+                    background: "rgba(106,61,240,0.055)",
                     fontFamily: "var(--font-sans)",
                     fontSize: "var(--fs-caption)",
                     lineHeight: "var(--fs-caption-lh)",
@@ -263,13 +287,13 @@ function Card({
                 </li>
               )}
             </ul>
-          </div>
-        )}
-      </div>
+          </>
+          )}
+        </div>
 
       <span
         aria-hidden
-        className="mt-auto inline-flex items-center gap-2 pt-6 font-display"
+        className="inline-flex items-center gap-2 pt-6 font-display"
         style={{
           fontSize: "var(--fs-button-sm)",
           fontWeight: "var(--fs-button-weight)",
@@ -478,9 +502,13 @@ export function CompareIndexList({
       <LightBandDecor />
 
       <Container className="relative">
-        <RevealStagger className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+        {/* Six explicit rows the cards subgrid onto. The chain is grid ->
+            RevealItem -> CornerTile, and `RevealItem` renders exactly one div
+            with the className passed through, so the tile still resolves
+            against this grid's rows. */}
+        <RevealStagger className="grid grid-rows-[repeat(6,auto)] gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
           {comparisons.map((content, index) => (
-            <RevealItem key={content.path} className="h-full">
+            <RevealItem key={content.path} className="row-span-6 grid grid-rows-subgrid">
               <Card content={content} corner={cornerAt(index)} />
             </RevealItem>
           ))}
