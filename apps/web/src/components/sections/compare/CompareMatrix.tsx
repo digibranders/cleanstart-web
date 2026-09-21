@@ -71,12 +71,53 @@ const HEAD_CELL =
 const GROUP_CELL =
   "sticky z-10 lg:top-[calc(var(--cs-header-h)+62px)] lg:border-y lg:border-[rgba(17,17,17,0.08)] lg:bg-[#FAFAFC] px-[clamp(16px,1.5vw,26px)] py-2.5 text-left max-lg:top-[var(--cs-header-h)] max-lg:mt-7 max-lg:block max-lg:bg-white max-lg:px-0 max-lg:py-3";
 
+/**
+ * The word beside the mark.
+ *
+ * These strings were already written and already attached to the right glyph;
+ * they were just `sr-only`. Rendering them is what stops a boolean row being
+ * a 22px symbol alone in a 510px column, and it is most of the table: 22 of
+ * Docker's 32 rows, 17 of Red Hat's 26, 15 of Chainguard's 26 carry no prose
+ * in either answer column.
+ *
+ * It replaces the `sr-only` span rather than joining it. A visible string and
+ * a screen-reader-only copy of the same string would announce the cell twice.
+ */
+function Verdict({
+  tone,
+  label,
+  muted = false,
+}: {
+  tone: CompareTone;
+  label: string;
+  muted?: boolean;
+}): React.ReactElement {
+  return (
+    <span
+      className="ml-2.5 whitespace-nowrap"
+      style={{
+        color: muted
+          ? "rgba(17,17,17,0.55)"
+          : tone === "cleanstart"
+            ? "#111111"
+            : "rgba(17,17,17,0.74)",
+        fontWeight: tone === "cleanstart" && !muted ? 500 : 400,
+      }}
+    >
+      {label}
+    </span>
+  );
+}
+
 function YesMark({
   tone,
   srLabel = UI.available,
+  withVerdict = true,
 }: {
   tone: CompareTone;
   srLabel?: string;
+  /** `QualifiedMark` sets its own word, after the asterisk. */
+  withVerdict?: boolean;
 }): React.ReactElement {
   const isCleanStart = tone === "cleanstart";
   return (
@@ -101,7 +142,7 @@ function YesMark({
           />
         </svg>
       </span>
-      <span className="sr-only">{srLabel}</span>
+      {withVerdict && <Verdict tone={tone} label={srLabel} />}
     </span>
   );
 }
@@ -114,7 +155,7 @@ function NoMark(): React.ReactElement {
         className="block h-[2px] w-[18px] rounded-full"
         style={{ background: "rgba(17,17,17,0.22)" }}
       />
-      <span className="sr-only">{UI.notAvailable}</span>
+      <Verdict tone="rival" label={UI.notAvailable} muted />
     </span>
   );
 }
@@ -126,7 +167,7 @@ function QualifiedMark({ tone }: { tone: CompareTone }): React.ReactElement {
     // larger size and a negative top inset to land level with the tick. At the
     // table's 14px it rendered as a few pixels of grey and read as an artifact.
     <span className="inline-flex items-start gap-[3px]">
-      <YesMark tone={tone} srLabel={UI.availableQualified} />
+      <YesMark tone={tone} withVerdict={false} />
       <span
         aria-hidden
         className="font-display leading-none"
@@ -139,6 +180,9 @@ function QualifiedMark({ tone }: { tone: CompareTone }): React.ReactElement {
       >
         *
       </span>
+      {/* The word follows the asterisk, so the glyph pair the source table
+          writes as "✓*" stays intact. */}
+      <Verdict tone={tone} label={UI.availableQualified} />
     </span>
   );
 }
@@ -153,13 +197,18 @@ function Cell({
   if (cell.kind === "yes") return <YesMark tone={tone} />;
   if (cell.kind === "no") return <NoMark />;
   if (cell.kind === "qualified") return <QualifiedMark tone={tone} />;
-  // "both" is a tick that carries a qualifier. The tick keeps its accessible
-  // name, so a screen reader hears "Available" and then the detail.
+  // "both" is a tick that carries a qualifier. The qualifier is the answer, so
+  // the tick drops its word here: "Available" in front of a sentence that
+  // already says what is available would be read twice, once as a label and
+  // once as the detail.
   if (cell.kind === "both") {
     return (
       <span className="flex items-start gap-2.5">
         <span className="mt-[1px] shrink-0">
-          <YesMark tone={tone} />
+          <YesMark tone={tone} withVerdict={false} />
+          {/* The only mark on the page with no visible word beside it, so it
+              keeps the screen-reader name the others now carry in text. */}
+          <span className="sr-only">{UI.available}</span>
         </span>
         <span
           className="block max-w-[40ch]"
@@ -396,7 +445,6 @@ function ParityLede({
   onToggle: () => void;
 }): React.ReactElement {
   const identical = total - differences;
-  const differPct = total === 0 ? 0 : (differences / total) * 100;
   /* Composed as one string, not JSX with interpolated numbers. React emits a
      `<!-- -->` marker either side of every expression, so the JSX form put
      "15" and "26" in their own text nodes and broke the sentence up in the
@@ -445,64 +493,11 @@ function ParityLede({
             {lede}
           </p>
 
-          {/* The proportion, drawn. Neutral for the rows that agree, the
-              page's violet for the rows that do not, so the bar uses the
-              same two colours as the columns it summarises. */}
-          <div
-            className="mt-6 flex h-2.5 w-full max-w-[560px] overflow-hidden rounded-full"
-            role="img"
-            aria-label={`${UI.parityBarLabel}: ${differences} of ${total}`}
-          >
-            <span
-              className="block h-full"
-              style={{
-                width: `${100 - differPct}%`,
-                background: "rgba(17,17,17,0.13)",
-              }}
-            />
-            <span
-              className="block h-full"
-              style={{
-                width: `${differPct}%`,
-                background: `linear-gradient(90deg, ${BRAND.violet}, ${BRAND.blue})`,
-              }}
-            />
-          </div>
-
-          <dl
-            className="mt-3.5 flex max-w-[560px] flex-wrap items-baseline gap-x-8 gap-y-1"
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "var(--fs-body-sm)",
-              lineHeight: "var(--fs-body-sm-lh)",
-              color: "rgba(17,17,17,0.62)",
-            }}
-          >
-            <div className="flex items-baseline gap-1.5">
-              <dt className="sr-only">{UI.parityIdentical}</dt>
-              <dd className="flex items-baseline gap-1.5">
-                <span
-                  className="font-display"
-                  style={{ fontWeight: 600, color: "#111111" }}
-                >
-                  {identical}
-                </span>
-                {UI.parityIdentical}
-              </dd>
-            </div>
-            <div className="flex items-baseline gap-1.5">
-              <dt className="sr-only">{UI.parityDiffer}</dt>
-              <dd className="flex items-baseline gap-1.5">
-                <span
-                  className="font-display"
-                  style={{ fontWeight: 600, color: BRAND.violet }}
-                >
-                  {differences}
-                </span>
-                {UI.parityDiffer}
-              </dd>
-            </div>
-          </dl>
+          {/* No bar and no legend under this sentence. Both drew the same two
+              numbers the sentence has just said in words, so the block stated
+              the split three times. The hub cards keep their bar, where three
+              of them side by side is how a reader compares three comparisons
+              at a glance; here there is only one. */}
         </div>
 
         <button

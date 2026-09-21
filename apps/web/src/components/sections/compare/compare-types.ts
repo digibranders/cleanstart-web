@@ -281,10 +281,6 @@ export const UI = {
    * same. The numbers are computed from the table below, so the concession
    * can never overstate or understate what the table then shows.
    */
-  parityIdentical: "identical",
-  parityDiffer: "where they differ",
   parityShowDiff: "Show only the differences",
   parityShowAll: "Show all capabilities",
-  /** Accessible name for the identical/differ proportion bar. */
-  parityBarLabel: "Proportion of capabilities where the two answers differ",
 } as const;
