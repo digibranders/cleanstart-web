@@ -9,13 +9,12 @@ import {
   type CompareContent,
 } from "./compare-types";
 import {
+  BAND_DARK,
   BRAND,
-  cornerAt,
-  CornerTile,
+  EllipseGlow,
   Glow,
-  LightBandDecor,
+  HexOutline,
   VendorMark,
-  WASH_LIGHT,
 } from "./compare-visuals";
 
 /**
@@ -78,7 +77,7 @@ function MarkPair({ rivalMark }: { rivalMark: string }): React.ReactElement {
           fontWeight: 600,
           letterSpacing: "var(--fs-badge-ls)",
           textTransform: "uppercase",
-          color: "rgba(17,17,17,0.45)",
+          color: "rgba(255,255,255,0.45)",
         }}
       >
         vs
@@ -89,45 +88,67 @@ function MarkPair({ rivalMark }: { rivalMark: string }): React.ReactElement {
 }
 
 /**
- * The identical / differ proportion, drawn with the same two colours the
- * capability table uses for its columns. The comparison pages open on the
- * same bar, so a card and the page it links to state the split the same way.
+ * The comparison's capabilities as one cell each, the differing ones lit.
+ *
+ * A two-colour bar showed the proportion but hid the scale, so a 26-row and a
+ * 32-row comparison drew the same object. One cell per capability shows both
+ * at once: the Docker card is visibly a longer row than the other two before
+ * anyone reads a number. It is also the page's own subject matter drawn
+ * literally, which a bar is not.
+ *
+ * Differing cells come first rather than interleaved, so the lit run reads as
+ * a quantity instead of noise.
  */
-function SplitBar({
+function CapabilityCells({
   total,
   differences,
 }: {
   total: number;
   differences: number;
 }): React.ReactElement {
-  const differPct = total === 0 ? 0 : (differences / total) * 100;
   return (
     <div
-      className="flex h-2 w-full overflow-hidden rounded-full"
+      className="flex flex-wrap gap-[3px]"
       role="img"
       aria-label={`${INDEX_UI.barLabel}: ${differences} of ${total}`}
     >
-      <span
-        className="block h-full"
-        style={{ width: `${100 - differPct}%`, background: "rgba(17,17,17,0.13)" }}
-      />
-      <span
-        className="block h-full"
-        style={{
-          width: `${differPct}%`,
-          background: `linear-gradient(90deg, ${BRAND.violet}, ${BRAND.blue})`,
-        }}
-      />
+      {Array.from({ length: total }, (_, i) => (
+        <span
+          key={i}
+          className="block size-[7px] rounded-[2px]"
+          style={
+            i < differences
+              ? {
+                  background: `linear-gradient(135deg, ${BRAND.violetLight}, ${BRAND.blue})`,
+                  boxShadow: "0 0 10px -2px rgba(130,120,255,0.9)",
+                }
+              : { background: "rgba(255,255,255,0.14)" }
+          }
+        />
+      ))}
     </div>
   );
 }
 
+/**
+ * One comparison, as a glass panel on the dark band.
+ *
+ * The first version was a white tile on a light wash: flat, and it put the
+ * card's most important number, how many capabilities differ, in the smallest
+ * grey text on it. Here the number is the largest thing after the headline,
+ * the capability cells sit directly under it, and the violet reads as an
+ * accent instead of as one more grey.
+ *
+ * The material is the one `DarkPanel` uses on the build-process band, so the
+ * hub is recognisably the same system as the pages it links to.
+ */
 function Card({
   content,
-  corner,
+  index,
 }: {
   content: CompareContent;
-  corner: ReturnType<typeof cornerAt>;
+  /** Only used to vary which corner carries the oversized radius. */
+  index: number;
 }): React.ReactElement {
   const rows = matrixRowCount(content.matrix);
   const differences = matrixDifferenceCount(content.matrix);
@@ -137,87 +158,123 @@ function Card({
   const onlyAll = cleanstartOnlyRows(content.matrix);
   const onlyOurs = onlyAll.slice(0, 3);
   const onlyRest = onlyAll.length - onlyOurs.length;
+  const bigCorner = index % 2 === 0 ? "44px 14px 14px 14px" : "14px 44px 14px 14px";
 
   return (
-    <CornerTile
-      corner={corner}
-      // `group` drives the arrow nudge and the border lift from the card's own
-      // hover, so the whole tile is one target rather than a tile with a link
-      // somewhere inside it.
-      className="group transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[rgba(106,61,240,0.35)] hover:shadow-[0_1px_2px_rgba(17,17,17,0.04),0_28px_56px_-40px_rgba(70,30,190,0.45)] focus-within:border-[rgba(106,61,240,0.35)]"
+    <article
+      /* A subgrid item spanning the six rows the band declares, so the marks,
+         headline, body, metric, chips and link of all three cards sit on the
+         same six lines however many lines each standfirst runs to. Those run
+         to four, five or six by width, so no `min-height` floor can align
+         them; an earlier `md:min-h-[4lh]` held at 1440 and drifted at 1280. */
+      className="group relative row-span-6 grid grid-rows-subgrid overflow-hidden transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1 hover:border-[rgba(169,116,255,0.55)]"
+      style={{
+        rowGap: 0,
+        borderRadius: bigCorner,
+        border: "1px solid rgba(140,160,255,0.18)",
+        background: [
+          "radial-gradient(70% 55% at 12% 0%, rgba(106,61,240,0.22) 0%, rgba(106,61,240,0) 70%)",
+          "linear-gradient(180deg, rgba(16,20,56,0.92) 0%, rgba(8,11,34,0.97) 100%)",
+        ].join(", "),
+        boxShadow: [
+          "0 34px 80px -46px rgba(0,0,0,0.85)",
+          "inset 0 1px 0 rgba(255,255,255,0.07)",
+        ].join(", "),
+        padding: "clamp(24px, 2vw, 32px)",
+      }}
     >
-      <MarkPair rivalMark={content.rivalMark} />
-
-      {/* Two lines of headline are reserved wherever the cards sit side by
-          side, so every card's paragraph starts on the same line. "Chainguard
-          vs CleanStart" fits on one line while the other two wrap, and without
-          this its body floated a line above its neighbours'. A floor, not a
-          fixed height: a longer rival name still takes the lines it needs.
-          Below `md` the cards stack and a reserved empty line is just a gap. */}
-      <h2
-        className="mt-5 font-display text-[#111111] md:min-h-[2lh]"
+      {/* Ambient light that follows the hover, so the card reads as a surface
+          rather than a rectangle with a border. */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -right-20 -top-24 size-[300px] select-none rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
         style={{
-          fontSize: "var(--fs-h4)",
-          fontWeight: "var(--fs-h4-weight)",
-          letterSpacing: "var(--fs-h4-ls)",
-          lineHeight: "var(--fs-h4-lh)",
+          background:
+            "radial-gradient(closest-side, rgba(169,116,255,0.22), transparent 72%)",
         }}
-      >
-        {/* The card is the whole tile: this link is stretched over it, so the
-            headline stays the accessible name of the one link. */}
-        <Link
-          href={content.path}
-          className="after:absolute after:inset-0 after:content-[''] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#33BAEC]"
+      />
+
+      <span className="relative block">
+        <MarkPair rivalMark={content.rivalMark} />
+      </span>
+
+        <h2
+          className="relative mt-6 font-display text-white"
+          style={{
+            fontSize: "var(--fs-h4)",
+            fontWeight: "var(--fs-h4-weight)",
+            letterSpacing: "var(--fs-h4-ls)",
+            lineHeight: "var(--fs-h4-lh)",
+          }}
         >
-          {content.titleParts.lead}
-          <span className="cs-text-gradient-impact">
-            {content.titleParts.accent}
-          </span>
-        </Link>
-      </h2>
+          {/* The card is the whole tile: this link is stretched over it, so
+              the headline stays the accessible name of the one link. */}
+          <Link
+            href={content.path}
+            className="after:absolute after:inset-0 after:content-[''] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#33BAEC]"
+          >
+            {content.titleParts.lead}
+            <span className="cs-text-gradient-impact">
+              {content.titleParts.accent}
+            </span>
+          </Link>
+        </h2>
 
-      {/* Floored for the same reason as the headline: the three standfirsts
-          run to three or four lines, and without this the proportion bars sit
-          at three different heights and stop being comparable at a glance. */}
-      <p
-        className="mt-3 md:min-h-[4lh]"
-        style={{
-          fontFamily: "var(--font-sans)",
-          fontSize: "var(--fs-body-sm)",
-          lineHeight: "var(--fs-body-sm-lh)",
-          letterSpacing: "var(--fs-body-ls)",
-          color: "#333333",
-        }}
-      >
-        {content.standfirst}
-      </p>
-
-      {/* Everything below is derived from this comparison's own matrix, so a
-          card cannot advertise a split or a capability the table then
-          contradicts. */}
-      <div className="pt-6">
-        <SplitBar total={rows} differences={differences} />
         <p
-          className="mt-3"
+          className="relative mt-3.5"
           style={{
             fontFamily: "var(--font-sans)",
             fontSize: "var(--fs-body-sm)",
             lineHeight: "var(--fs-body-sm-lh)",
-            color: "rgba(17,17,17,0.62)",
+            letterSpacing: "var(--fs-body-ls)",
+            color: "rgba(255,255,255,0.64)",
           }}
         >
-          <span className="font-display" style={{ fontWeight: 600, color: BRAND.violet }}>
-            {differences}
-          </span>{" "}
-          {INDEX_UI.of}{" "}
-          <span className="font-display" style={{ fontWeight: 600, color: "#111111" }}>
-            {rows}
-          </span>{" "}
-          {INDEX_UI.capabilities}
+          {content.standfirst}
         </p>
 
-        {onlyOurs.length > 0 && (
-          <div className="mt-5">
+        {/* Everything below is derived from this comparison's own matrix, so a
+            card cannot advertise a split or a capability the table then
+            contradicts. */}
+        <div
+          className="relative mt-7 pt-6"
+          style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }}
+        >
+          <div className="flex items-baseline gap-2.5">
+            <span
+              className="font-display"
+              style={{
+                fontSize: "var(--fs-h2)",
+                fontWeight: 600,
+                lineHeight: 0.9,
+                letterSpacing: "var(--fs-h2-ls)",
+                color: "#ffffff",
+              }}
+            >
+              {differences}
+            </span>
+            <span
+              style={{
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--fs-body-sm)",
+                lineHeight: "var(--fs-body-sm-lh)",
+                color: "rgba(255,255,255,0.62)",
+              }}
+            >
+              {INDEX_UI.of} {rows} {INDEX_UI.capabilities}
+            </span>
+          </div>
+
+          <div className="mt-4">
+            <CapabilityCells total={rows} differences={differences} />
+          </div>
+        </div>
+
+        {/* Always rendered, even when a comparison records none, so every card
+            occupies the same six rows. */}
+        <div className="relative mt-7">
+          {onlyOurs.length > 0 && (
+          <>
             <p
               className="font-display"
               style={{
@@ -226,23 +283,23 @@ function Card({
                 letterSpacing: "var(--fs-eyebrow-ls)",
                 lineHeight: "var(--fs-eyebrow-lh)",
                 textTransform: "uppercase",
-                color: BRAND.violet,
+                color: BRAND.violetPale,
               }}
             >
               {INDEX_UI.onlyCleanStart}
             </p>
-            <ul className="mt-2.5 flex flex-wrap gap-1.5">
+            <ul className="mt-3 flex flex-wrap gap-1.5">
               {onlyOurs.map((row) => (
                 <li
                   key={row.id}
-                  className="rounded-full px-2.5 py-1"
+                  className="rounded-full px-3 py-1.5"
                   style={{
-                    border: "1px solid rgba(106,61,240,0.24)",
-                    background: "rgba(106,61,240,0.06)",
+                    border: "1px solid rgba(169,116,255,0.32)",
+                    background: "rgba(106,61,240,0.22)",
                     fontFamily: "var(--font-sans)",
                     fontSize: "var(--fs-caption)",
                     lineHeight: "var(--fs-caption-lh)",
-                    color: "#111111",
+                    color: "#EFE7FF",
                   }}
                 >
                   {row.capability}
@@ -250,51 +307,51 @@ function Card({
               ))}
               {onlyRest > 0 && (
                 <li
-                  className="rounded-full px-2.5 py-1"
+                  className="rounded-full px-3 py-1.5"
                   style={{
-                    border: "1px dashed rgba(106,61,240,0.32)",
+                    border: "1px dashed rgba(169,116,255,0.4)",
                     fontFamily: "var(--font-sans)",
                     fontSize: "var(--fs-caption)",
                     lineHeight: "var(--fs-caption-lh)",
-                    color: BRAND.violet,
+                    color: BRAND.violetPale,
                   }}
                 >
                   {INDEX_UI.more.replace("{n}", String(onlyRest))}
                 </li>
               )}
             </ul>
-          </div>
-        )}
-      </div>
+          </>
+          )}
+        </div>
 
-      <span
-        aria-hidden
-        className="mt-auto inline-flex items-center gap-2 pt-6 font-display"
-        style={{
-          fontSize: "var(--fs-button-sm)",
-          fontWeight: "var(--fs-button-weight)",
-          letterSpacing: "var(--fs-button-ls)",
-          color: BRAND.violet,
-        }}
-      >
-        {INDEX_UI.cardCta}
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          className="transition-transform duration-200 group-hover:translate-x-1"
+        <span
+          aria-hidden
+          className="relative inline-flex items-center gap-2 pt-7 font-display text-white"
+          style={{
+            fontSize: "var(--fs-button-sm)",
+            fontWeight: "var(--fs-button-weight)",
+            letterSpacing: "var(--fs-button-ls)",
+          }}
         >
-          <path
-            d="M3.5 8h9M9 4.5 12.5 8 9 11.5"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </span>
-    </CornerTile>
+          {INDEX_UI.cardCta}
+          <span
+            className="inline-flex size-7 items-center justify-center rounded-full transition-transform duration-300 group-hover:translate-x-1"
+            style={{
+              background: `linear-gradient(135deg, ${BRAND.violet}, ${BRAND.blue})`,
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <path
+                d="M3.5 8h9M9 4.5 12.5 8 9 11.5"
+                stroke="#ffffff"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+        </span>
+    </article>
   );
 }
 
@@ -465,23 +522,29 @@ export function CompareIndexList({
   comparisons: readonly CompareContent[];
 }): React.ReactElement {
   return (
-    // `padding="md"` and a bare `<Footer />`, the pattern the site's other
-    // listing pages use (`CaseStudiesGrid`, the resource centre). No CTA card
-    // means no overlap to reserve, so `--spacing-section-cta` here would just
-    // leave a band of empty wash above the footer.
+    // Dark, continuing the hero rather than breaking to a light wash. The hub
+    // is one band: the hero states what the comparisons are, the cards are
+    // the comparisons, and nothing sits between them. It also puts the cards
+    // on the same material as the build-process panel the pages themselves
+    // use, so the hub reads as part of the same system.
     <Section
       padding="md"
       data-section="CompareIndexList"
       className="relative overflow-hidden"
-      style={{ background: WASH_LIGHT }}
+      style={{ background: BAND_DARK }}
     >
-      <LightBandDecor />
+      <HexOutline side="right" />
+      <EllipseGlow side="left" size="380px" />
 
       <Container className="relative">
-        <RevealStagger className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+        {/* Six explicit rows the cards subgrid onto. The chain is grid ->
+            RevealItem -> article, and `RevealItem` renders exactly one div
+            with the className passed through, so the article still resolves
+            against this grid's rows. */}
+        <RevealStagger className="grid grid-rows-[repeat(6,auto)] gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
           {comparisons.map((content, index) => (
-            <RevealItem key={content.path} className="h-full">
-              <Card content={content} corner={cornerAt(index)} />
+            <RevealItem key={content.path} className="row-span-6 grid grid-rows-subgrid">
+              <Card content={content} index={index} />
             </RevealItem>
           ))}
         </RevealStagger>
