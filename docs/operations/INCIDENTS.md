@@ -10,6 +10,15 @@ A running, reverse-chronological log of production incidents and non-obvious bug
 
 ---
 
+## 2026-09-21 — Bulk scripts re-dated 368 articles as "Updated" (sitemap lastmod, dateModified, byline)
+
+- **Area:** `apps/cms` + `apps/web` (technical SEO audit F-06).
+- **Symptom:** 368 of 511 sitemap `lastmod` values fell inside two three-minute windows (2026-06-09 04:06 UTC, 2026-08-12 12:04 UTC). A post from 2025-02 showed "Updated 12 Aug 2026", with the same value in JSON-LD `dateModified` and `article:modified_time`.
+- **Root cause:** every public "modified" date read Payload's row-level `updatedAt`, which any write moves, including backfills and normalisation passes.
+- **Fix:** new `contentUpdatedAt` field, stamped by `hooks/content-updated-at.ts` only when title, body, abstract, summary or FAQs change (structural compare, because `jsonb` reorders keys). Web reads it through `effectiveModifiedAt` and falls back to the publish date, never `updatedAt`. Migration `20260921_140000` backfills only non-burst timestamps.
+- **Commits:** `fc28370d` (cms), `a425472f` (web). Needs a CMS deploy for the column; the web change is safe to ship first.
+- **Reusable lesson:** never publish `updatedAt` as a freshness signal. One-shot scripts that rewrite content must pass `context: { skipContentTimestamp: true }` to `payload.update`, or every touched article claims an edit.
+
 ## 2026-08-26 — Crawl-stats HTML latency: the spikes are build-driven origin saturation, not a rendering fault
 
 - **Area:** `apps/cms` (droplet + edge caching), `apps/web` (build fan-out). Surfaced by a Search Console crawl-stats audit covering 2026-05-28 to 2026-08-24.
