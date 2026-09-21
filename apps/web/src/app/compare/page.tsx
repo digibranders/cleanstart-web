@@ -102,7 +102,7 @@ export default async function CompareIndexPage(): Promise<React.ReactElement> {
       <JsonLdGraph id="compare-index-jsonld" graph={graph} />
       <Header />
       <main id="main-content">
-        <CompareIndexHero copy={COPY} comparisons={COMPARISONS} />
+        <CompareIndexHero copy={COPY} />
         <FadeUp>
           <CompareIndexList comparisons={COMPARISONS} />
         </FadeUp>

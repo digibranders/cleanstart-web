@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { Section, Container } from "@/components/layout";
-import { HeroReveal } from "@/components/ui/Reveal";
-import { RevealStagger, RevealItem } from "@/components/ui/Reveal";
+import {
+  HeroReveal,
+  Reveal,
+  RevealItem,
+  RevealStagger,
+} from "@/components/ui/Reveal";
 import {
   cleanstartOnlyRows,
   matrixDifferenceCount,
@@ -45,14 +49,24 @@ const INDEX_UI = {
   /** Accessible name for each card's proportion bar. */
   barLabel: "Proportion of capabilities where the two answers differ",
   /**
-   * The hero's scale line. Rows are counted, not merged: the three source
-   * documents name capabilities in their own vocabularies, so "84 capability
-   * rows" is the sum of three tables and deliberately not a claim that 84
-   * distinct capabilities exist across them.
+   * The scale rail above the card grid. Rows are counted, not merged: the
+   * three source documents name capabilities in their own vocabularies, so
+   * "84 capability rows" is the sum of three tables and deliberately not a
+   * claim that 84 distinct capabilities exist across them.
    */
   statComparisons: "comparisons",
   statRows: "capability rows",
   statDifferences: "where they differ",
+  /**
+   * The hero's one call to action. Deliberately the same label and
+   * destination all three comparison pages already use for their own hero
+   * primary, so the family carries one label per intent rather than a hub
+   * variant of it.
+   */
+  heroCta: {
+    label: "Explore CleanStart Images",
+    href: "/cleanstart-images",
+  },
 } as const;
 
 export interface CompareIndexCopy {
@@ -322,7 +336,16 @@ function Card({
   );
 }
 
-function HeroStat({
+/**
+ * One counted figure in the rail above the card grid.
+ *
+ * These three sat inside the hero, where they were the third and fourth text
+ * elements above the fold and the page still asked for nothing. A hero
+ * carries its proposition and one call to action; a scale strip is not that.
+ * Read here they also sit directly above the cards they are counted from,
+ * which is where a reader can act on them.
+ */
+function ScaleStat({
   value,
   label,
 }: {
@@ -330,9 +353,9 @@ function HeroStat({
   label: string;
 }): React.ReactElement {
   return (
-    <div className="flex flex-col items-center gap-1 px-1 text-center sm:items-start sm:text-left">
+    <div className="flex flex-col gap-1">
       <span
-        className="font-display text-white"
+        className="font-display text-[#111111]"
         style={{
           fontSize: "var(--fs-h3)",
           fontWeight: 600,
@@ -347,7 +370,7 @@ function HeroStat({
           fontFamily: "var(--font-sans)",
           fontSize: "var(--fs-caption)",
           lineHeight: "var(--fs-caption-lh)",
-          color: "rgba(255,255,255,0.62)",
+          color: "rgba(17,17,17,0.62)",
           maxWidth: "18ch",
         }}
       >
@@ -357,11 +380,17 @@ function HeroStat({
   );
 }
 
-export function CompareIndexHero({
-  copy,
+/**
+ * The scale rail: the three figures, counted from the matrices the cards
+ * below are built from, on one line with the site's hairline dividers.
+ *
+ * It doubles as the card band's header. The band opened straight onto the
+ * grid with no lead of any kind, which is why the hero was carrying this
+ * weight in the first place.
+ */
+function ScaleRail({
   comparisons,
 }: {
-  copy: CompareIndexCopy;
   comparisons: readonly CompareContent[];
 }): React.ReactElement {
   const rows = comparisons.reduce((t, c) => t + matrixRowCount(c.matrix), 0);
@@ -369,6 +398,63 @@ export function CompareIndexHero({
     (t, c) => t + matrixDifferenceCount(c.matrix),
     0,
   );
+  const divider = (
+    <span
+      aria-hidden
+      className="hidden h-10 w-px self-center sm:block"
+      style={{ background: "rgba(17,17,17,0.11)" }}
+    />
+  );
+  return (
+    <dl className="flex flex-wrap items-start gap-x-10 gap-y-6 sm:gap-x-14">
+      <div>
+        <dt className="sr-only">{INDEX_UI.statComparisons}</dt>
+        <dd>
+          <ScaleStat
+            value={comparisons.length}
+            label={INDEX_UI.statComparisons}
+          />
+        </dd>
+      </div>
+      {divider}
+      <div>
+        <dt className="sr-only">{INDEX_UI.statRows}</dt>
+        <dd>
+          <ScaleStat value={rows} label={INDEX_UI.statRows} />
+        </dd>
+      </div>
+      {divider}
+      <div>
+        <dt className="sr-only">{INDEX_UI.statDifferences}</dt>
+        <dd>
+          <ScaleStat value={differences} label={INDEX_UI.statDifferences} />
+        </dd>
+      </div>
+    </dl>
+  );
+}
+
+/**
+ * The hub's hero: the title, its sentence and one call to action.
+ *
+ * The three counted figures that used to sit here moved to the rail above the
+ * card grid (`ScaleRail`). What is left is the shape every other hero on the
+ * site has.
+ *
+ * One button, not the site's usual glass-and-blue pair. The pair exists where
+ * a page has two genuinely different destinations; here the second would be a
+ * jump to a card grid that is already the next thing on screen. A lone
+ * translucent glass button on the dark mesh is the weaker of the two
+ * treatments, so the site's solid blue carries the page's only conversion
+ * action. The inline custom properties are not decoration: a global mobile
+ * rule overrides the button classes at 36px with `!important`, and setting
+ * the variables is how the comparison heroes already beat it.
+ */
+export function CompareIndexHero({
+  copy,
+}: {
+  copy: CompareIndexCopy;
+}): React.ReactElement {
   return (
     <section
       data-section="CompareIndexHero"
@@ -438,44 +524,25 @@ export function CompareIndexHero({
               {copy.standfirst}
             </p>
 
-            {/* Counted from the three matrices, so the hero cannot claim a
-                scale the pages below do not carry. */}
-            <dl className="mt-10 flex flex-wrap items-start justify-center gap-x-10 gap-y-6 sm:gap-x-14">
-              <div>
-                <dt className="sr-only">{INDEX_UI.statComparisons}</dt>
-                <dd>
-                  <HeroStat
-                    value={comparisons.length}
-                    label={INDEX_UI.statComparisons}
-                  />
-                </dd>
-              </div>
-              <span
-                aria-hidden
-                className="hidden h-10 w-px self-center sm:block"
-                style={{ background: "rgba(255,255,255,0.16)" }}
-              />
-              <div>
-                <dt className="sr-only">{INDEX_UI.statRows}</dt>
-                <dd>
-                  <HeroStat value={rows} label={INDEX_UI.statRows} />
-                </dd>
-              </div>
-              <span
-                aria-hidden
-                className="hidden h-10 w-px self-center sm:block"
-                style={{ background: "rgba(255,255,255,0.16)" }}
-              />
-              <div>
-                <dt className="sr-only">{INDEX_UI.statDifferences}</dt>
-                <dd>
-                  <HeroStat
-                    value={differences}
-                    label={INDEX_UI.statDifferences}
-                  />
-                </dd>
-              </div>
-            </dl>
+            <div className="mt-10 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
+              <Link
+                href={INDEX_UI.heroCta.href}
+                className="cs-btn-blue cs-hero-cta"
+                style={
+                  {
+                    "--cs-btn-h": "44px",
+                    "--cs-btn-px": "24px",
+                    "--cs-btn-fs": "var(--fs-button-lg)",
+                    /* Read by the mobile `.cs-hero-cta` rule. An inline
+                       `--cs-btn-fs` cannot carry this: the global mobile rule
+                       sets that property `!important`, which beats inline. */
+                    "--cs-hero-cta-fs": "16px",
+                  } as React.CSSProperties
+                }
+              >
+                <span>{INDEX_UI.heroCta.label}</span>
+              </Link>
+            </div>
           </HeroReveal>
         </div>
       </div>
@@ -502,11 +569,15 @@ export function CompareIndexList({
       <LightBandDecor />
 
       <Container className="relative">
+        <Reveal header>
+          <ScaleRail comparisons={comparisons} />
+        </Reveal>
+
         {/* Six explicit rows the cards subgrid onto. The chain is grid ->
             RevealItem -> CornerTile, and `RevealItem` renders exactly one div
             with the className passed through, so the tile still resolves
             against this grid's rows. */}
-        <RevealStagger className="grid grid-rows-[repeat(6,auto)] gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+        <RevealStagger className="mt-10 grid grid-rows-[repeat(6,auto)] gap-5 md:grid-cols-2 lg:mt-12 lg:grid-cols-3 lg:gap-6">
           {comparisons.map((content, index) => (
             <RevealItem key={content.path} className="row-span-6 grid grid-rows-subgrid">
               <Card content={content} corner={cornerAt(index)} />

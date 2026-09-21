@@ -1102,8 +1102,14 @@ body {
      This also keeps the page's primary action on the 44px WCAG 2.5.8 target
      that the same rule cites, instead of below it. Two class selectors outrank
      the single-class rule, which is what lets it win when both are
-     `!important`. */
-  .cs-btn-glass.cs-hero-cta {
+     `!important`.
+
+     `.cs-btn-blue` carries the same escape hatch because a hero may run a
+     solid primary on its own rather than a pair. It matched nothing before
+     `/compare` used it, so adding it cannot resize a button on any existing
+     page. */
+  .cs-btn-glass.cs-hero-cta,
+  .cs-btn-blue.cs-hero-cta {
     --cs-btn-h: 44px !important;
     --cs-btn-fs: var(--cs-hero-cta-fs, 17px) !important;
     height: 44px !important;
