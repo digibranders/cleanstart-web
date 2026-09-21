@@ -49,6 +49,7 @@ describe('sitemap purge on publish', () => {
 
   it.each([
     ['blogs', '/blogs'],
+    ['case-studies', '/case-studies'],
     ['news', '/news'],
     ['resources', '/resource-center'],
     ['events', '/events'],
@@ -67,8 +68,11 @@ describe('sitemap purge on publish', () => {
     // so publishing cannot change the URL set. These still purge their own
     // listing, so the assertion below is about the sitemap specifically and
     // not about the hook having done nothing.
+    //
+    // case-studies used to be in this list. It gained a `/case-studies/[slug]`
+    // detail route in 2026-09, so publishing one now does change the URL set
+    // and it belongs in the sitemap-tag case above.
     ['webinars', '/webinars'],
-    ['case-studies', '/case-studies'],
   ])('purges %s own listing but not the sitemap', async (collection, listing) => {
     await publish(collection, 'a-slug');
 

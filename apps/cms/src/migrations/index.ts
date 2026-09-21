@@ -58,6 +58,7 @@ import * as migration_20260821_120000_faq_answer_richtext from './20260821_12000
 import * as migration_20260909_120000_add_form_tel_and_business_email from './20260909_120000_add_form_tel_and_business_email';
 import * as migration_20260909_180000_add_submission_attribution from './20260909_180000_add_submission_attribution';
 import * as migration_20260910_060000_add_missing_job_task_slugs from './20260910_060000_add_missing_job_task_slugs';
+import * as migration_20260921_100000_add_case_study_detail_fields from './20260921_100000_add_case_study_detail_fields';
 
 export const migrations = [
   {
@@ -334,5 +335,10 @@ export const migrations = [
     up: migration_20260910_060000_add_missing_job_task_slugs.up,
     down: migration_20260910_060000_add_missing_job_task_slugs.down,
     name: '20260910_060000_add_missing_job_task_slugs',
+  },
+  {
+    up: migration_20260921_100000_add_case_study_detail_fields.up,
+    down: migration_20260921_100000_add_case_study_detail_fields.down,
+    name: '20260921_100000_add_case_study_detail_fields',
   },
 ];

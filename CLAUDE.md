@@ -99,6 +99,7 @@ pnpm --filter @cleanstart/web build
 2. Never skip, even for one-line changes.
 3. Report: `lint ✓ · typecheck ✓ · build ✓`.
 4. `payload generate:types` runs in CI and fails on drift. If you change a collection, regenerate types locally and commit the result.
+5. **Do not trust `payload migrate:create`.** It diffs the config against the newest `.json` schema snapshot, and the last one committed is `20260611_061406_add_seo_keywords.json` — every migration since is hand-written with no snapshot. Running it emits every schema change made since June (879 statements on 2026-09-21). Use it only to *read* the SQL it proposes for your own tables, then hand-write a focused, `IF NOT EXISTS`-guarded migration in the style of the rest of `src/migrations/`, and delete the generated `.ts` + `.json`.
 
 ---
 
@@ -251,6 +252,7 @@ These are hard rules. Do not work around them — flag and stop instead.
 - **Authors:** pure content collection. No `linkedUser` at v1. If multi-author self-editing is needed later, an additive migration adds an optional `linkedUser` relationship.
 - **Guest Contributors:** still open. Ship as an additive optional `contributorType: 'staff' | 'guest'` field on the existing `authors` collection — do **not** create a separate collection.
 - **Knowledge Hub:** `knowledgeBase` (versioned + drafts, slug-change-redirect hook, SEO field group) + `knowledgeCategories` (hierarchical with self-referencing `parent`).
+- **Case studies:** listing **plus** a detail route at `/case-studies/[slug]` (reversed 2026-09-21; the collection was listing-only before). `summary` is the card blurb, `body` (Lexical) is the article. `outcomes` and `glance` are optional arrays the detail page reshapes around; `quote`/`quoteAuthor`/`quoteRole` are per-study and are **not** read from the homepage testimonial list; `featured` picks the listing spotlight, falling back to newest. Carries the full routed-collection machinery (slug-change redirect, SEO group, IndexNow, search sync) — adding a detail route without those breaks indexed URLs on rename.
 - **Integrations (Phase J1):** `config` field encrypted at rest via `lib/integrations/secrets.ts`. Per-row `routing` group (`events[]`, `collections[]`, `formSlugs[]`, `minLeadScore`). Admin endpoints: `/api/integrations/:id/test`, `/health`, `/audit` (file: `payload/endpoints/integrations-actions.ts`). Dead-letter retry reuses `WebhookDeadLetter`. Router: `lib/integrations/router.ts`.
 
 ---

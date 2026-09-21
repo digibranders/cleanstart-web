@@ -118,6 +118,33 @@ export async function getResources({
   );
 }
 
+/**
+ * Fetch a fixed set of resources by slug, for hand-curated rails (e.g. the
+ * /case-studies "keep reading" row). Returns only the slugs that are still
+ * published, in the order they were requested, so a card whose resource is
+ * unpublished disappears instead of linking into a 404.
+ */
+export async function getResourcesBySlugs(slugs: readonly string[]): Promise<Resource[]> {
+  if (slugs.length === 0) return [];
+  const params = new URLSearchParams({
+    "where[_status][equals]": "published",
+    "where[publishedAt][exists]": "true",
+    "where[slug][in]": slugs.join(","),
+    depth: "0",
+    limit: String(slugs.length),
+  });
+  for (const field of ["title", "slug", "type", "summary", "gated", "ctaButtonText"]) {
+    params.set(`select[${field}]`, "true");
+  }
+  const data = await fetchCMS<PayloadListResponse<Resource>>(
+    `/api/resources?${params.toString()}`,
+  );
+  const bySlug = new Map(data.docs.map((doc) => [doc.slug, doc]));
+  return slugs
+    .map((slug) => bySlug.get(slug))
+    .filter((doc): doc is Resource => doc !== undefined);
+}
+
 async function loadResourceBySlug(slug: string, draft = false): Promise<ResourceDetail | null> {
   const filter = draft ? "" : `&${PUBLISHED_FILTER}`;
   const data = await fetchCMS<PayloadListResponse<ResourceDetail>>(

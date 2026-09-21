@@ -160,9 +160,20 @@ function entry(path: string, lastModified?: string): MetadataRoute.Sitemap[numbe
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (!isIndexingAllowed()) return [];
 
-  const [blogs, resources, authors, news, events, jobs, guides, legal, knowledgeBase] =
-    await Promise.all([
+  const [
+    blogs,
+    caseStudies,
+    resources,
+    authors,
+    news,
+    events,
+    jobs,
+    guides,
+    legal,
+    knowledgeBase,
+  ] = await Promise.all([
       fetchDocs('blogs', BLOG_FILTER),
+      fetchDocs('case-studies', BLOG_FILTER),
       fetchDocs('resources', BLOG_FILTER),
       fetchDocs('authors', AUTHORS_FILTER),
       fetchDocs('news', NEWS_FILTER),
@@ -189,6 +200,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         `/resources/${r.slug}`,
         r.updatedAt ?? r.displayPublishedAt ?? r.publishedAt ?? undefined,
       ),
+    ),
+    ...caseStudies.map((c) =>
+      entry(`/case-studies/${c.slug}`, c.updatedAt ?? c.publishedAt ?? undefined),
     ),
     ...authors.map((a) =>
       entry(`/author/${a.slug}`, a.updatedAt ?? a.displayPublishedAt ?? a.publishedAt ?? undefined),

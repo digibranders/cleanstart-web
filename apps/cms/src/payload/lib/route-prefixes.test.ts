@@ -35,12 +35,13 @@ describe('listingPathForCollection (index URLs for revalidation)', () => {
     expect(listingPathForCollection('news')).toBe(ROUTE_PREFIX.news);
   });
 
-  it('resolves a listing-only collection that has no detail prefix', () => {
-    // case-studies has a `/case-studies` index but no `/case-studies/[slug]`
-    // detail route, so it is absent from ROUTE_PREFIX. The override is the
-    // only way its publish hook can purge anything.
+  it('resolves a collection whose listing and detail share a prefix', () => {
+    // case-studies lists at `/case-studies` and details at
+    // `/case-studies/<slug>`, so it needs no LISTING_PATH_OVERRIDE entry — the
+    // ROUTE_PREFIX fallback already gives the right index path, and the slug
+    // composes a real detail URL for the redirect hook to protect.
     expect(listingPathForCollection('case-studies')).toBe('/case-studies');
-    expect(collectionUrlFromDoc('case-studies', { slug: 'x' })).toBeNull();
+    expect(collectionUrlFromDoc('case-studies', { slug: 'x' })).toBe('/case-studies/x');
   });
 
   it('returns null for unknown collections', () => {

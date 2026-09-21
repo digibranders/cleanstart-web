@@ -2485,7 +2485,76 @@ export interface CaseStudy {
    * Optional card thumbnail image.
    */
   coverImage?: (number | null) | Media;
+  /**
+   * Card blurb — two or three sentences. Shown on the listing card and as the detail hero standfirst. The full story goes in Body below, not here.
+   */
   summary: string;
+  /**
+   * The case study itself, rendered under "What happened" on the detail page. Leave empty and the page invites the reader to the PDF instead.
+   */
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Headline figures for the detail hero. Publish only what the customer has approved — these are the most prominent claim on the page. No outcomes and the hero shows their quote instead.
+   */
+  outcomes?:
+    | {
+        /**
+         * e.g. "Up to 88%", "3x", "Zero".
+         */
+        value: string;
+        /**
+         * e.g. "less vulnerability noise". Lowercase, no full stop.
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Environment facts for the rail beside the article. Company, industry and publish date are added automatically — add what those do not cover.
+   */
+  glance?:
+    | {
+        /**
+         * e.g. "Migrated from".
+         */
+        label: string;
+        /**
+         * e.g. "Bitnami images".
+         */
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Approved customer quote. Shown on the detail page — in the hero card when there are no outcomes, in its own band when there are. Do not paste the summary back in here.
+   */
+  quote?: string | null;
+  /**
+   * Who said it.
+   */
+  quoteAuthor?: string | null;
+  /**
+   * Their role and company, e.g. "Head of Risk and App Security, IIFL Finance".
+   */
+  quoteRole?: string | null;
+  /**
+   * Spotlight this study at the top of the listing. With none set the newest published study is used.
+   */
+  featured?: boolean | null;
   /**
    * Downloadable case-study PDF. Routed to web/case-study/ in R2.
    */
@@ -2494,6 +2563,160 @@ export interface CaseStudy {
    * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
    */
   publishedAt?: string | null;
+  /**
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    useCustomCanonical?: boolean | null;
+    canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     */
+    additionalSchema?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    schemaHistory?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -9880,8 +10103,70 @@ export interface CaseStudiesSelect<T extends boolean = true> {
   companyLogo?: T;
   coverImage?: T;
   summary?: T;
+  body?: T;
+  outcomes?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  glance?:
+    | T
+    | {
+        label?: T;
+        value?: T;
+        id?: T;
+      };
+  quote?: T;
+  quoteAuthor?: T;
+  quoteRole?: T;
+  featured?: T;
   asset?: T;
   publishedAt?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
+        keywordTarget?: T;
+        keywords?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+        additionalSchema?: T;
+        schemaHistory?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
