@@ -18,15 +18,15 @@
  * (proxy.ts) as well as build-time metadata.
  */
 /**
- * Exact hosts we never index. Exported so the GA4 head snippet can serialize the
- * same list into its in-browser host check (lib/analytics/ga4-snippet.ts) rather
+ * Exact hosts we never index. Exported so the GTM head snippet can serialize the
+ * same list into its in-browser host check (lib/analytics/gtm-snippet.ts) rather
  * than hardcoding a second copy that could drift from this one.
  *
  * Intentionally EMPTY since 2026-07-29: `staging.cleanstart.com` was deleted
  * from DNS, so there is no longer a named non-production alias. Preview deploys
  * are still covered by `NOINDEX_HOST_SUFFIXES` below. Add a host here (not a
  * second list elsewhere) if a named alias is ever reintroduced — doing so also
- * keeps GA4 off it automatically.
+ * keeps every GTM tag off it automatically.
  */
 export const NOINDEX_HOSTS: readonly string[] = [];
 

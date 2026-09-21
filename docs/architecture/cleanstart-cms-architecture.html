@@ -4965,8 +4965,9 @@ export async function POST(req: Request) {
           <code>&lt;meta name="robots" content="noindex"&gt;</code> by <code>isNoindexHost</code>
           (<code>apps/web/src/lib/seo/indexing.ts</code>) — the single source of truth for both the
           noindex layers and analytics exclusion.</li>
-        <li>The same host check keeps GA4 and Leadfeeder off preview deploys, so they never pollute
-          production metrics (<code>lib/analytics/ga4-snippet.ts</code>, <code>leadfeeder.ts</code>).</li>
+        <li>The same host check keeps the Google Tag Manager container, and so every tracking tag in
+          it, off preview deploys, so they never pollute production metrics
+          (<code>lib/analytics/gtm-snippet.ts</code>; inventory in <code>docs/web/TRACKING-TAGS.md</code>).</li>
         <li><strong>Open:</strong> the monthly restore drill (§<a href="#restore-runbook">Backup &amp;
           restore</a>) previously used staging as its target and its prerequisite for declaring the
           runbook current. It needs a replacement target — a disposable droplet or a local Postgres
