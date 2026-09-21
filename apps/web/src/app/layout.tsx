@@ -1,3 +1,4 @@
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Manrope, Sora } from "next/font/google";
 import "./globals.css";
@@ -204,6 +205,12 @@ export default async function RootLayout({
             <ClickSpark />
           </AttributionProvider>
         </ConsentProvider>
+        {/* Real-user Core Web Vitals by route and country (technical SEO audit
+            F-01: origin mobile LCP p75 2.68s, cause unconfirmed). Production
+            only, so previews do not spend the allowance. Sampled at 30% to stay
+            inside the free tier's 10,000 events per 30 days; cookieless, so it
+            sits outside the consent gate. */}
+        {process.env.VERCEL_ENV === "production" ? <SpeedInsights sampleRate={0.3} /> : null}
       </body>
     </html>
   );
