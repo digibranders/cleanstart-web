@@ -44,11 +44,13 @@ export function WebinarsContent({
 export const WEBINARS_PAGE_SIZE = 9;
 
 /**
- * Client-safe filter + paginate over the full webinar set — mirrors the prior
- * server `getWebinars` where-clauses: `webinarType[equals]` and
- * `region[equals]`. The base published / not-cancelled filtering and the
- * `-startsAt` sort are applied server-side at fetch time, so this only narrows
- * by the two user-facing facets and paginates.
+ * Client-safe filter + paginate over the full webinar set. The base published /
+ * not-cancelled filtering and the `-startsAt` sort are applied server-side at
+ * fetch time, so this only narrows by the two user-facing facets and paginates.
+ *
+ * `w.webinarType` is the effective type (`withEffectiveTypes` in
+ * `lib/webinars.ts`), so a finished live session matches the On-demand filter
+ * without the record being edited.
  */
 export function selectWebinars(
   all: Webinar[],
