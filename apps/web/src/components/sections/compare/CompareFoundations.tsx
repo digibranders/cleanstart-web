@@ -6,13 +6,18 @@ import { BandHeader, BRAND, LightBandDecor, WASH_LIGHT } from "./compare-visuals
 /**
  * The document's opening band: the two approaches, side by side.
  *
- * Two open columns on the wash, split by the site's gradient hairline with a
- * "vs" marker at its midpoint, rather than two boxed cards: the hero has just
- * drawn the two stacks side by side, and this band keeps that axis (the rival
- * on the left, CleanStart on the right) without adding chrome. The CleanStart
- * column sits on a faint violet field; the rival column sits on the wash.
- * Same structure, same type scale, same bullet count. The page is not hiding
- * the comparison, it is just clear about whose site this is.
+ * Two columns on the wash, split by the site's gradient hairline with a "vs"
+ * marker at its midpoint: the hero has just drawn the two stacks side by side,
+ * and this band keeps that axis, the rival on the left and CleanStart on the
+ * right.
+ *
+ * Both columns carry a faint field of their own, violet for ours and neutral
+ * for theirs, at the same weight and inside the same padding. Only ours used
+ * to have one, which left the rival's text reading as flush to the container
+ * gutter while ours sat inside a visible card, and on the one band whose whole
+ * subject is the two approaches side by side that put the comparison's own
+ * axis out of true. Same structure, same type scale, same bullet count, same
+ * shape. The tint and the violet markers are what say whose column is whose.
  *
  * The two "focuses on" lead-ins are always `<p>`: no source document sets them
  * as headings, and promoting them would add an outline level SEO never wrote.

@@ -82,13 +82,22 @@ const GROUP_CELL =
  *
  * It replaces the `sr-only` span rather than joining it. A visible string and
  * a screen-reader-only copy of the same string would announce the cell twice.
+ *
+ * Deliberately blind to which column it is in. The prose cells emphasise our
+ * side, and that was fair when the boolean cells were two glyphs and the
+ * column tint was the only thing saying whose side was whose. Once the answer
+ * is a word, weighting it by column renders the identical string twice at two
+ * different weights, which reads as a weaker yes on the rival's side. On 22 of
+ * Docker's 32 rows the two answers are the same, and the lede directly above
+ * concedes exactly that, so the page would be arguing against its own opening
+ * sentence. The tint still carries column identity; the word is just the
+ * answer. `muted` is the one distinction left, and it tracks the answer rather
+ * than the vendor: "Not available" sits back because it is an absence.
  */
 function Verdict({
-  tone,
   label,
   muted = false,
 }: {
-  tone: CompareTone;
   label: string;
   muted?: boolean;
 }): React.ReactElement {
@@ -96,12 +105,8 @@ function Verdict({
     <span
       className="ml-2.5 whitespace-nowrap"
       style={{
-        color: muted
-          ? "rgba(17,17,17,0.55)"
-          : tone === "cleanstart"
-            ? "#111111"
-            : "rgba(17,17,17,0.74)",
-        fontWeight: tone === "cleanstart" && !muted ? 500 : 400,
+        color: muted ? "rgba(17,17,17,0.55)" : "rgba(17,17,17,0.74)",
+        fontWeight: 400,
       }}
     >
       {label}
@@ -142,7 +147,7 @@ function YesMark({
           />
         </svg>
       </span>
-      {withVerdict && <Verdict tone={tone} label={srLabel} />}
+      {withVerdict && <Verdict label={srLabel} />}
     </span>
   );
 }
@@ -155,7 +160,7 @@ function NoMark(): React.ReactElement {
         className="block h-[2px] w-[18px] rounded-full"
         style={{ background: "rgba(17,17,17,0.22)" }}
       />
-      <Verdict tone="rival" label={UI.notAvailable} muted />
+      <Verdict label={UI.notAvailable} muted />
     </span>
   );
 }
@@ -182,7 +187,7 @@ function QualifiedMark({ tone }: { tone: CompareTone }): React.ReactElement {
       </span>
       {/* The word follows the asterisk, so the glyph pair the source table
           writes as "✓*" stays intact. */}
-      <Verdict tone={tone} label={UI.availableQualified} />
+      <Verdict label={UI.availableQualified} />
     </span>
   );
 }
