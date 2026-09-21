@@ -26,12 +26,9 @@ const COL_PRODUCT: FooterLink[] = [
   { label: "CleanSight", href: "/cleansight" },
   { label: "Tricorder", href: "/tricorder" },
   { label: "Pricing", href: "/pricing" },
-  // Repointed from the Docker comparison to the hub on 2026-09-21, on the
-  // user's instruction. Note for whoever launches /compare: the hub is still
-  // `noindex, nofollow`, so this site-wide link now lands on a page search
-  // engines will crawl and drop, and the indexed Docker page no longer holds a
-  // site-wide internal link. Dropping the hub's noindex closes both.
-  { label: "Compare", href: "/compare" },
+  // Labelled by category, not by competitor: when /compare becomes a hub this
+  // link repoints at it and nothing else changes.
+  { label: "Compare", href: "/compare/cleanstart-vs-docker-hardened-images" },
   { label: "Book a Demo", href: "/book-a-demo" },
 ];
 const COL_SOLUTIONS: FooterLink[] = [
