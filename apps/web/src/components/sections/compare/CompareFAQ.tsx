@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import { Section, Container } from "@/components/layout";
 import { Reveal } from "@/components/ui/Reveal";
-import { FAQS, FAQ_HEADING, type CompareFaq } from "./compare-data";
+import type { CompareFaq } from "./compare-types";
 
 /**
- * The eight questions from the document, in the home page's FAQ chrome: two
+ * The document's questions, in the home page's FAQ chrome: two
  * white cards side by side, hairline dividers, plus-to-cross toggles, one
  * item open at a time across both columns. The split waits for `lg`; at
  * tablet width these questions wrap to four lines a piece and the answers
@@ -135,14 +135,37 @@ function Column({
   );
 }
 
-export function CompareFAQ(): React.ReactElement {
-  const [openId, setOpenId] = useState<string | null>(FAQS[0].id);
-  const half = Math.ceil(FAQS.length / 2);
-  const left = FAQS.slice(0, half);
-  const right = FAQS.slice(half);
+export function CompareFAQ({
+  heading,
+  faqs,
+}: {
+  heading: string;
+  faqs: readonly CompareFaq[];
+}): React.ReactElement {
+  const half = Math.ceil(faqs.length / 2);
+  const left = faqs.slice(0, half);
+  const right = faqs.slice(half);
 
-  const toggle = (id: string): void =>
-    setOpenId((current) => (current === id ? null : id));
+  /*
+   * One open question per column, not one for the section.
+   *
+   * A single `openId` shared by both columns meant opening a question on the
+   * right silently closed the one the reader had open on the left, which is
+   * not what two columns of an accordion look like they do. It also made the
+   * two columns' heights swing by up to 200px depending on which side held
+   * the open answer, so the ragged bottom edge moved as the reader worked.
+   * Per-column state fixes the interaction; the heights that follow from it
+   * are each column's own content, which is what `items-start` is for.
+   */
+  const [openLeft, setOpenLeft] = useState<string | null>(
+    left[0]?.id ?? null,
+  );
+  const [openRight, setOpenRight] = useState<string | null>(null);
+
+  const toggleIn =
+    (set: React.Dispatch<React.SetStateAction<string | null>>) =>
+    (id: string): void =>
+      set((current) => (current === id ? null : id));
 
   return (
     // `padding="none"` with an explicit bottom: this is the last section, so it
@@ -195,15 +218,23 @@ export function CompareFAQ(): React.ReactElement {
               lineHeight: "var(--fs-h2-lh)",
             }}
           >
-            {FAQ_HEADING}
+            {heading}
           </h2>
         </Reveal>
 
         <Reveal delay={0.1} y={24} className="mt-8 lg:mt-10">
           <div className="grid grid-cols-1 items-start gap-5 rounded-[24px] bg-white p-6 max-lg:shadow-[0_1px_0_rgba(0,0,0,0.04),_0_24px_48px_-24px_rgba(60,30,150,0.08)] sm:rounded-[40px] sm:p-8 lg:grid-cols-2 lg:gap-6 lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none">
-            <Column items={left} openId={openId} onToggle={toggle} />
+            <Column
+              items={left}
+              openId={openLeft}
+              onToggle={toggleIn(setOpenLeft)}
+            />
             <div aria-hidden className="h-px w-full bg-[#D9D9D9] lg:hidden" />
-            <Column items={right} openId={openId} onToggle={toggle} />
+            <Column
+              items={right}
+              openId={openRight}
+              onToggle={toggleIn(setOpenRight)}
+            />
           </div>
         </Reveal>
       </Container>

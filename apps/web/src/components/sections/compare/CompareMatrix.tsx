@@ -1,16 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Section, Container } from "@/components/layout";
 import { Reveal } from "@/components/ui/Reveal";
 import {
-  MATRIX,
+  matrixDifferenceCount,
+  matrixRowCount,
+  rowsAgree,
   UI,
-  VENDOR,
+  type CompareTone,
   type MatrixCell,
   type MatrixGroup,
   type MatrixRow,
-} from "./compare-data";
+  type MatrixSection,
+} from "./compare-types";
 import { BandHeader, BRAND, Icon3D, VectorGrid, VendorMark } from "./compare-visuals";
 
 /**
@@ -22,7 +25,7 @@ import { BandHeader, BRAND, Icon3D, VectorGrid, VendorMark } from "./compare-vis
  * headers and `scope="colgroup"` group rows; below `lg` the table parts flip
  * to `display: block` and each row becomes a card. From `md` to `lg` that card
  * is a two-column grid, because a tablet has room to set both answers side by
- * side; below `md` they stack. Rendering a second copy of twenty rows would
+ * side; below `md` they stack. Rendering a second copy of every row would
  * double the markup and duplicate every string.
  *
  * Below `lg` the outer wrapper drops its own border, fill and shadow, or the
@@ -32,15 +35,14 @@ import { BandHeader, BRAND, Icon3D, VectorGrid, VendorMark } from "./compare-vis
  * between the two layouts is a class, never an inline `style`. Inline styles
  * here carry colour and type only.
  *
- * Wayfinding for twenty rows: the four group rows open as chapters (3D icon
+ * Wayfinding for a table this long: the group rows open as chapters (3D icon
  * plus label) and stick while their rows scroll, under the column head on
  * desktop and under the site header on small screens, where the list runs to
- * many times the viewport. The
- * head itself sticks flush to the site header rather than a few pixels below
- * it: that offset let rows scroll through the strip in between, which the
- * dark CleanStart column turned into a visible seam. a
- * chapter index above the table jumps to each; and a "differences only"
- * switch hides the rows where the document gives both vendors the same
+ * many times the viewport. The head itself sticks flush to the site header
+ * rather than a few pixels below it: that offset let rows scroll through the
+ * strip in between, which the dark CleanStart column turned into a visible
+ * seam. A chapter index above the table jumps to each, and a "differences
+ * only" switch hides the rows where the document gives both vendors the same
  * answer. Hidden rows stay in the DOM, so the page source and the table a
  * crawler reads are unchanged.
  *
@@ -69,7 +71,59 @@ const HEAD_CELL =
 const GROUP_CELL =
   "sticky z-10 lg:top-[calc(var(--cs-header-h)+62px)] lg:border-y lg:border-[rgba(17,17,17,0.08)] lg:bg-[#FAFAFC] px-[clamp(16px,1.5vw,26px)] py-2.5 text-left max-lg:top-[var(--cs-header-h)] max-lg:mt-7 max-lg:block max-lg:bg-white max-lg:px-0 max-lg:py-3";
 
-function YesMark({ tone }: { tone: "docker" | "cleanstart" }): React.ReactElement {
+/**
+ * The word beside the mark.
+ *
+ * These strings were already written and already attached to the right glyph;
+ * they were just `sr-only`. Rendering them is what stops a boolean row being
+ * a 22px symbol alone in a 510px column, and it is most of the table: 22 of
+ * Docker's 32 rows, 17 of Red Hat's 26, 15 of Chainguard's 26 carry no prose
+ * in either answer column.
+ *
+ * It replaces the `sr-only` span rather than joining it. A visible string and
+ * a screen-reader-only copy of the same string would announce the cell twice.
+ *
+ * Deliberately blind to which column it is in. The prose cells emphasise our
+ * side, and that was fair when the boolean cells were two glyphs and the
+ * column tint was the only thing saying whose side was whose. Once the answer
+ * is a word, weighting it by column renders the identical string twice at two
+ * different weights, which reads as a weaker yes on the rival's side. On 22 of
+ * Docker's 32 rows the two answers are the same, and the lede directly above
+ * concedes exactly that, so the page would be arguing against its own opening
+ * sentence. The tint still carries column identity; the word is just the
+ * answer. `muted` is the one distinction left, and it tracks the answer rather
+ * than the vendor: "Not available" sits back because it is an absence.
+ */
+function Verdict({
+  label,
+  muted = false,
+}: {
+  label: string;
+  muted?: boolean;
+}): React.ReactElement {
+  return (
+    <span
+      className="ml-2.5 whitespace-nowrap"
+      style={{
+        color: muted ? "rgba(17,17,17,0.55)" : "rgba(17,17,17,0.74)",
+        fontWeight: 400,
+      }}
+    >
+      {label}
+    </span>
+  );
+}
+
+function YesMark({
+  tone,
+  srLabel = UI.available,
+  withVerdict = true,
+}: {
+  tone: CompareTone;
+  srLabel?: string;
+  /** `QualifiedMark` sets its own word, after the asterisk. */
+  withVerdict?: boolean;
+}): React.ReactElement {
   const isCleanStart = tone === "cleanstart";
   return (
     <span className="inline-flex items-center">
@@ -93,7 +147,7 @@ function YesMark({ tone }: { tone: "docker" | "cleanstart" }): React.ReactElemen
           />
         </svg>
       </span>
-      <span className="sr-only">{UI.available}</span>
+      {withVerdict && <Verdict label={srLabel} />}
     </span>
   );
 }
@@ -106,7 +160,34 @@ function NoMark(): React.ReactElement {
         className="block h-[2px] w-[18px] rounded-full"
         style={{ background: "rgba(17,17,17,0.22)" }}
       />
-      <span className="sr-only">{UI.notAvailable}</span>
+      <Verdict label={UI.notAvailable} muted />
+    </span>
+  );
+}
+
+/** The source table's "✓*": the tick, with the asterisk it is written with. */
+function QualifiedMark({ tone }: { tone: CompareTone }): React.ReactElement {
+  return (
+    // The asterisk sits in the top third of its own em box, so it needs both a
+    // larger size and a negative top inset to land level with the tick. At the
+    // table's 14px it rendered as a few pixels of grey and read as an artifact.
+    <span className="inline-flex items-start gap-[3px]">
+      <YesMark tone={tone} withVerdict={false} />
+      <span
+        aria-hidden
+        className="font-display leading-none"
+        style={{
+          fontSize: "20px",
+          fontWeight: 700,
+          marginTop: "-1px",
+          color: tone === "cleanstart" ? BRAND.violet : "rgba(17,17,17,0.7)",
+        }}
+      >
+        *
+      </span>
+      {/* The word follows the asterisk, so the glyph pair the source table
+          writes as "✓*" stays intact. */}
+      <Verdict label={UI.availableQualified} />
     </span>
   );
 }
@@ -114,25 +195,44 @@ function NoMark(): React.ReactElement {
 function Cell({
   cell,
   tone,
+  emphasise,
 }: {
   cell: MatrixCell;
-  tone: "docker" | "cleanstart";
+  tone: CompareTone;
+  /**
+   * Whether this cell's phrase carries the column's emphasis.
+   *
+   * Emphasis follows the ROW, not the column: it is on only where the two
+   * vendors give different answers, and then only on ours. Where the source
+   * table gives both the same phrase, both cells render the same, because a
+   * row whose two answers are identical should not read as a stronger yes on
+   * one side. The verdict words were already column-independent; these are
+   * the cells that carry a phrase, and two of them on the Docker page
+   * ("Build Level 3", "7 days") were set in two weights.
+   */
+  emphasise: boolean;
 }): React.ReactElement {
   if (cell.kind === "yes") return <YesMark tone={tone} />;
   if (cell.kind === "no") return <NoMark />;
-  // "both" is a tick that carries a qualifier. The tick keeps its accessible
-  // name, so a screen reader hears "Available" and then the detail.
+  if (cell.kind === "qualified") return <QualifiedMark tone={tone} />;
+  // "both" is a tick that carries a qualifier. The qualifier is the answer, so
+  // the tick drops its word here: "Available" in front of a sentence that
+  // already says what is available would be read twice, once as a label and
+  // once as the detail.
   if (cell.kind === "both") {
     return (
       <span className="flex items-start gap-2.5">
         <span className="mt-[1px] shrink-0">
-          <YesMark tone={tone} />
+          <YesMark tone={tone} withVerdict={false} />
+          {/* The only mark on the page with no visible word beside it, so it
+              keeps the screen-reader name the others now carry in text. */}
+          <span className="sr-only">{UI.available}</span>
         </span>
         <span
           className="block max-w-[40ch]"
           style={{
-            color: tone === "cleanstart" ? "#111111" : "rgba(17,17,17,0.74)",
-            fontWeight: tone === "cleanstart" ? 500 : 400,
+            color: emphasise ? "#111111" : "rgba(17,17,17,0.74)",
+            fontWeight: emphasise ? 500 : 400,
           }}
         >
           {cell.value}
@@ -144,8 +244,8 @@ function Cell({
     <span
       className="block max-w-[44ch]"
       style={{
-        color: tone === "cleanstart" ? "#111111" : "rgba(17,17,17,0.74)",
-        fontWeight: tone === "cleanstart" ? 500 : 400,
+        color: emphasise ? "#111111" : "rgba(17,17,17,0.74)",
+        fontWeight: emphasise ? 500 : 400,
       }}
     >
       {cell.value}
@@ -156,11 +256,13 @@ function Cell({
 /** Column label repeated inside every cell below `lg`, where the head is gone. */
 function CellLabel({
   children,
+  rivalMark,
   tone,
   inline = false,
 }: {
   children: string;
-  tone: "docker" | "cleanstart";
+  rivalMark: string;
+  tone: CompareTone;
   /** Marker answers sit beside their label rather than under it. */
   inline?: boolean;
 }): React.ReactElement {
@@ -176,7 +278,7 @@ function CellLabel({
         color: tone === "cleanstart" ? BRAND.violet : "rgba(17,17,17,0.62)",
       }}
     >
-      <VendorMark tone={tone} size={22} />
+      <VendorMark tone={tone} rivalMark={rivalMark} size={22} />
       {children}
     </span>
   );
@@ -184,10 +286,12 @@ function CellLabel({
 
 function HeadCell({
   vendor,
+  rivalMark,
   tone,
 }: {
   vendor: string;
-  tone: "docker" | "cleanstart";
+  rivalMark: string;
+  tone: CompareTone;
 }): React.ReactElement {
   const isCleanStart = tone === "cleanstart";
   return (
@@ -205,7 +309,7 @@ function HeadCell({
       }}
     >
       <span className="flex items-center gap-2.5">
-        <VendorMark tone={tone} size={26} />
+        <VendorMark tone={tone} rivalMark={rivalMark} size={26} />
         <span
           className="block font-display"
           style={{
@@ -221,17 +325,6 @@ function HeadCell({
       </span>
     </th>
   );
-}
-
-function isSame(row: MatrixRow): boolean {
-  if (row.docker.kind !== row.cleanstart.kind) return false;
-  if (
-    (row.docker.kind === "text" || row.docker.kind === "both") &&
-    (row.cleanstart.kind === "text" || row.cleanstart.kind === "both")
-  ) {
-    return row.docker.value === row.cleanstart.value;
-  }
-  return true;
 }
 
 function GroupRow({ group }: { group: MatrixGroup }): React.ReactElement {
@@ -268,10 +361,14 @@ function GroupRow({ group }: { group: MatrixGroup }): React.ReactElement {
 
 function DataRow({
   row,
+  vendor,
+  rivalMark,
   hidden,
   isFinal,
 }: {
   row: MatrixRow;
+  vendor: { readonly rival: string; readonly cleanstart: string };
+  rivalMark: string;
   hidden: boolean;
   isFinal: boolean;
 }): React.ReactElement {
@@ -280,8 +377,13 @@ function DataRow({
   const edge = isFinal ? " border-b-0" : "";
   // A marker is one glyph, so on small screens it sits on its label's row
   // instead of claiming a line of its own.
-  const dockerInline = row.docker.kind !== "text";
+  const rivalInline = row.rival.kind !== "text";
   const cleanstartInline = row.cleanstart.kind !== "text";
+  /* Emphasis follows the row, not the column. Where the source table gives
+     both vendors the same phrase, neither cell is emphasised: "Build Level 3"
+     against "Build Level 3" in two weights read as a stronger yes on our side
+     of a row the lede above already concedes is a tie. */
+  const differs = !rowsAgree(row);
   const inlineCell =
     " max-lg:flex max-lg:items-center max-lg:justify-between max-lg:gap-4";
   return (
@@ -305,17 +407,17 @@ function DataRow({
       </th>
 
       <td
-        className={`${CELL}${edge}${dockerInline ? inlineCell : ""} transition-colors max-lg:mt-4 max-lg:border-t max-lg:border-[rgba(17,17,17,0.08)] max-lg:pt-4 lg:group-hover:bg-[rgba(17,17,17,0.03)]`}
+        className={`${CELL}${edge}${rivalInline ? inlineCell : ""} transition-colors max-lg:mt-4 max-lg:border-t max-lg:border-[rgba(17,17,17,0.08)] max-lg:pt-4 lg:group-hover:bg-[rgba(17,17,17,0.03)]`}
         style={{
           fontFamily: "var(--font-sans)",
           fontSize: "var(--fs-table-td)",
           lineHeight: "var(--fs-body-sm-lh)",
         }}
       >
-        <CellLabel tone="docker" inline={dockerInline}>
-          {VENDOR.docker}
+        <CellLabel tone="rival" rivalMark={rivalMark} inline={rivalInline}>
+          {vendor.rival}
         </CellLabel>
-        <Cell cell={row.docker} tone="docker" />
+        <Cell cell={row.rival} tone="rival" emphasise={false} />
       </td>
 
       <td
@@ -326,34 +428,251 @@ function DataRow({
           lineHeight: "var(--fs-body-sm-lh)",
         }}
       >
-        <CellLabel tone="cleanstart" inline={cleanstartInline}>
-          {VENDOR.cleanstart}
+        <CellLabel tone="cleanstart" rivalMark={rivalMark} inline={cleanstartInline}>
+          {vendor.cleanstart}
         </CellLabel>
-        <Cell cell={row.cleanstart} tone="cleanstart" />
+        <Cell cell={row.cleanstart} tone="cleanstart" emphasise={differs} />
       </td>
     </tr>
   );
 }
 
-export function CompareMatrix(): React.ReactElement {
+/**
+ * The parity lede: what the table below actually says, stated before the
+ * reader scrolls it.
+ *
+ * Every comparison page in this market shows only the rows its author wins,
+ * so a reader arriving here assumes the page is selling. Opening with the
+ * count of rows where the two vendors give the SAME answer is the cheapest
+ * credibility this page can buy, and it makes the rows that do differ land.
+ * It also answers the scanning problem the table has on its own: on some
+ * comparisons more than half the rows are two identical ticks, and a reader
+ * working top to bottom meets the parity before the argument.
+ *
+ * Both numbers are computed from the table, so the concession cannot drift
+ * from what the table shows. This also carries the differences switch, which
+ * used to sit alone at the right of the chapter index and wrapped an orphan
+ * chip onto a second row at 1440.
+ */
+function ParityLede({
+  total,
+  differences,
+  rival,
+  diffOnly,
+  onToggle,
+}: {
+  total: number;
+  differences: number;
+  rival: string;
+  diffOnly: boolean;
+  onToggle: () => void;
+}): React.ReactElement {
+  const identical = total - differences;
+  /* Composed as one string, not JSX with interpolated numbers. React emits a
+     `<!-- -->` marker either side of every expression, so the JSX form put
+     "15" and "26" in their own text nodes and broke the sentence up in the
+     static HTML. This sentence is the most quotable thing on the page and is
+     meant to be extracted whole. */
+  const lede = `${rival} and CleanStart give the same answer on ${identical} of ${total} capabilities. This table is about the other ${differences}.`;
+
+  return (
+    <div
+      className="relative overflow-hidden"
+      style={{
+        borderRadius: "24px",
+        border: "1px solid rgba(17,17,17,0.09)",
+        background:
+          "linear-gradient(135deg, #ffffff 0%, #ffffff 52%, #F7F2FF 100%)",
+        boxShadow:
+          "0 1px 2px rgba(17,17,17,0.04), 0 24px 48px -40px rgba(70,30,190,0.35)",
+        padding: "clamp(22px, 2.2vw, 34px)",
+      }}
+    >
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -right-16 -top-24 hidden size-[260px] select-none rounded-full lg:block"
+        style={{
+          background:
+            "radial-gradient(closest-side, rgba(169,116,255,0.16), transparent 72%)",
+        }}
+      />
+
+      <div className="relative flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between lg:gap-12">
+        <div className="min-w-0 flex-1">
+          {/* No eyebrow above this. "What this table says" was a label I wrote
+              that restated the sentence directly under it, which already says
+              what the table says. The sentence opens the block on its own. */}
+          <p
+            className="font-display text-[#111111]"
+            style={{
+              fontSize: "var(--fs-h4)",
+              fontWeight: "var(--fs-h4-weight)",
+              letterSpacing: "var(--fs-h4-ls)",
+              lineHeight: "var(--fs-h4-lh)",
+              maxWidth: "46ch",
+              textWrap: "balance",
+            }}
+          >
+            {lede}
+          </p>
+
+          {/* No bar and no legend under this sentence. Both drew the same two
+              numbers the sentence has just said in words, so the block stated
+              the split three times. The hub cards keep their bar, where three
+              of them side by side is how a reader compares three comparisons
+              at a glance; here there is only one. */}
+        </div>
+
+        <button
+          type="button"
+          aria-pressed={diffOnly}
+          onClick={onToggle}
+          className="group inline-flex shrink-0 cursor-pointer items-center gap-2.5 self-start rounded-full transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#33BAEC] lg:self-auto"
+          style={{
+            border: `1px solid ${diffOnly ? "rgba(17,17,17,0.14)" : "transparent"}`,
+            background: diffOnly
+              ? "#ffffff"
+              : `linear-gradient(135deg, ${BRAND.violet}, ${BRAND.blue})`,
+            color: diffOnly ? "#111111" : "#ffffff",
+            fontFamily: "var(--font-sans)",
+            fontSize: "var(--fs-button)",
+            fontWeight: "var(--fs-button-weight)",
+            letterSpacing: "var(--fs-button-ls)",
+            height: "var(--btn-h-md, 44px)",
+            padding: "0 22px",
+            boxShadow: diffOnly
+              ? "none"
+              : "0 10px 24px -14px rgba(106,61,240,0.9)",
+          }}
+        >
+          <span className="whitespace-nowrap">
+            {diffOnly ? UI.parityShowAll : UI.parityShowDiff}
+          </span>
+          <svg
+            aria-hidden
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            className="transition-transform duration-200 group-hover:translate-x-0.5"
+          >
+            <path
+              d={diffOnly ? "M12.5 8h-9M7 4.5 3.5 8 7 11.5" : "M3.5 8h9M9 4.5 12.5 8 9 11.5"}
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The chapter index: one chip per capability group, always on one line.
+ *
+ * It used to wrap. The Docker comparison has five groups whose chips total
+ * 1244px, and its widest ("Vulnerability Management & Remediation", 350px)
+ * dropped onto a second row alone at 1440, 1280 and 1024. Moving the "Jump
+ * to" label out of the row bought 69px and fixed 1440 only; 1280 and 1024
+ * still stranded it. Wrapping cannot be balanced with `flex-wrap`, and an
+ * equal-width grid strands the same chip in a row of empty cells, so the row
+ * scrolls instead: deterministic at every width and at any group count, and
+ * on a phone it replaces five stacked rows with one.
+ *
+ * The right-edge fade is applied only while the row actually overflows,
+ * because a permanent mask would clip the last chip on a row that fits.
+ */
+function ChapterIndex({ groups }: { groups: readonly MatrixGroup[] }): React.ReactElement {
+  const trackRef = useRef<HTMLSpanElement | null>(null);
+  const [overflowing, setOverflowing] = useState(false);
+
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    const measure = (): void =>
+      setOverflowing(el.scrollWidth - el.clientWidth > 1);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <nav aria-label={UI.groupIndex} className="flex min-w-0 flex-col gap-2.5">
+      <span
+        className="font-display"
+        style={{
+          fontSize: "var(--fs-eyebrow)",
+          fontWeight: "var(--fs-eyebrow-weight)",
+          letterSpacing: "var(--fs-eyebrow-ls)",
+          textTransform: "uppercase",
+          color: "rgba(17,17,17,0.62)",
+        }}
+      >
+        {UI.groupIndex}
+      </span>
+      <span
+        ref={trackRef}
+        className="flex flex-nowrap items-center gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        style={
+          overflowing
+            ? {
+                maskImage:
+                  "linear-gradient(to right, #000 0, #000 calc(100% - 56px), transparent 100%)",
+                WebkitMaskImage:
+                  "linear-gradient(to right, #000 0, #000 calc(100% - 56px), transparent 100%)",
+              }
+            : undefined
+        }
+      >
+        {groups.map((group) => (
+          <a
+            key={group.id}
+            href={`#matrix-${group.id}`}
+            className="inline-flex shrink-0 items-center gap-2 rounded-full bg-white px-3.5 py-2 transition-colors hover:border-[rgba(106,61,240,0.4)] hover:bg-[rgba(106,61,240,0.05)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#33BAEC]"
+            style={{
+              border: "1px solid rgba(17,17,17,0.1)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "var(--fs-button-sm)",
+              fontWeight: "var(--fs-button-weight)",
+              letterSpacing: "var(--fs-button-ls)",
+              color: "#111111",
+              whiteSpace: "nowrap",
+            }}
+          >
+            <Icon3D src={group.icon} size={22} bloom={false} />
+            {group.label}
+          </a>
+        ))}
+      </span>
+    </nav>
+  );
+}
+
+export function CompareMatrix({
+  matrix,
+  vendor,
+  rivalMark,
+}: {
+  matrix: MatrixSection;
+  vendor: { readonly rival: string; readonly cleanstart: string };
+  rivalMark: string;
+}): React.ReactElement {
   const [diffOnly, setDiffOnly] = useState(false);
 
-  const differenceCount = useMemo(
-    () =>
-      MATRIX.groups.reduce(
-        (total, group) => total + group.rows.filter((row) => !isSame(row)).length,
-        0,
-      ),
-    [],
-  );
+  const differenceCount = useMemo(() => matrixDifferenceCount(matrix), [matrix]);
+  const rowCount = useMemo(() => matrixRowCount(matrix), [matrix]);
 
-  const lastGroup = MATRIX.groups[MATRIX.groups.length - 1];
+  const lastGroup = matrix.groups[matrix.groups.length - 1];
   const lastVisibleRowId = (() => {
-    for (let g = MATRIX.groups.length - 1; g >= 0; g -= 1) {
-      const rows = MATRIX.groups[g]?.rows ?? [];
+    for (let g = matrix.groups.length - 1; g >= 0; g -= 1) {
+      const rows = matrix.groups[g]?.rows ?? [];
       for (let r = rows.length - 1; r >= 0; r -= 1) {
         const row = rows[r];
-        if (row && (!diffOnly || !isSame(row))) return row.id;
+        if (row && (!diffOnly || !rowsAgree(row))) return row.id;
       }
     }
     return lastGroup?.rows[lastGroup.rows.length - 1]?.id;
@@ -374,96 +693,25 @@ export function CompareMatrix(): React.ReactElement {
       <Container className="relative">
         <BandHeader
           id="capability-comparison"
-          heading={MATRIX.heading}
-          intro={MATRIX.intro}
+          heading={matrix.heading}
+          intro={matrix.intro}
         />
 
-        {/* Controls: chapter index on the left, the differences switch on the
-            right. UI chrome, not document copy. */}
-        <Reveal delay={0.12} y={16}>
-          <div className="mt-8 flex flex-col gap-4 lg:mt-10 lg:flex-row lg:items-center lg:justify-between">
-            <nav
-              aria-label={UI.groupIndex}
-              className="flex flex-wrap items-center gap-2"
-            >
-              <span
-                className="mr-1 font-display"
-                style={{
-                  fontSize: "var(--fs-eyebrow)",
-                  fontWeight: "var(--fs-eyebrow-weight)",
-                  letterSpacing: "var(--fs-eyebrow-ls)",
-                  textTransform: "uppercase",
-                  color: "rgba(17,17,17,0.62)",
-                }}
-              >
-                {UI.groupIndex}
-              </span>
-              {MATRIX.groups.map((group) => (
-                <a
-                  key={group.id}
-                  href={`#matrix-${group.id}`}
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-2 transition-colors hover:border-[rgba(106,61,240,0.4)] hover:bg-[rgba(106,61,240,0.05)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#33BAEC]"
-                  style={{
-                    border: "1px solid rgba(17,17,17,0.1)",
-                    fontFamily: "var(--font-sans)",
-                    fontSize: "var(--fs-button-sm)",
-                    fontWeight: "var(--fs-button-weight)",
-                    letterSpacing: "var(--fs-button-ls)",
-                    color: "#111111",
-                  }}
-                >
-                  <Icon3D src={group.icon} size={22} bloom={false} />
-                  {group.label}
-                </a>
-              ))}
-            </nav>
+        <Reveal delay={0.1} y={20} className="mt-8 lg:mt-10">
+          <ParityLede
+            total={rowCount}
+            differences={differenceCount}
+            rival={vendor.rival}
+            diffOnly={diffOnly}
+            onToggle={() => setDiffOnly((value) => !value)}
+          />
+        </Reveal>
 
-            <button
-              type="button"
-              aria-pressed={diffOnly}
-              onClick={() => setDiffOnly((value) => !value)}
-              className="inline-flex cursor-pointer items-center gap-3 self-start rounded-full py-1.5 pl-1.5 pr-4 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#33BAEC] lg:self-auto"
-              style={{
-                border: `1px solid ${diffOnly ? "rgba(106,61,240,0.45)" : "rgba(17,17,17,0.1)"}`,
-                background: diffOnly ? "rgba(106,61,240,0.06)" : "#ffffff",
-                fontFamily: "var(--font-sans)",
-                fontSize: "var(--fs-button-sm)",
-                fontWeight: "var(--fs-button-weight)",
-                letterSpacing: "var(--fs-button-ls)",
-                color: "#111111",
-              }}
-            >
-              <span
-                aria-hidden
-                className="relative block h-6 w-11 rounded-full transition-colors"
-                style={{
-                  background: diffOnly
-                    ? `linear-gradient(90deg, ${BRAND.violet}, ${BRAND.blue})`
-                    : "rgba(17,17,17,0.14)",
-                }}
-              >
-                <span
-                  className="absolute top-[3px] block size-[18px] rounded-full bg-white transition-transform"
-                  style={{
-                    left: "3px",
-                    transform: diffOnly ? "translateX(20px)" : "translateX(0)",
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
-                  }}
-                />
-              </span>
-              <span className="whitespace-nowrap">{UI.differencesOnly}</span>
-              <span
-                className="rounded-full px-2 py-[2px]"
-                style={{
-                  fontSize: "var(--fs-badge)",
-                  fontWeight: "var(--fs-badge-weight)",
-                  background: diffOnly ? BRAND.violet : "rgba(17,17,17,0.06)",
-                  color: diffOnly ? "#ffffff" : "rgba(17,17,17,0.6)",
-                }}
-              >
-                {differenceCount}
-              </span>
-            </button>
+        {/* Chapter index. UI chrome, not document copy. */}
+        <Reveal delay={0.12} y={16}>
+          <div className="mt-6 flex flex-col gap-4 lg:mt-7 lg:flex-row lg:items-center lg:justify-between">
+            <ChapterIndex groups={matrix.groups} />
+
           </div>
         </Reveal>
 
@@ -481,7 +729,7 @@ export function CompareMatrix(): React.ReactElement {
               className="w-full max-lg:block"
               style={{ borderCollapse: "separate", borderSpacing: 0 }}
             >
-              <caption className="sr-only">{MATRIX.caption}</caption>
+              <caption className="sr-only">{matrix.caption}</caption>
 
               <colgroup className="max-lg:hidden">
                 <col style={{ width: "24%" }} />
@@ -508,14 +756,22 @@ export function CompareMatrix(): React.ReactElement {
                   >
                     {UI.capability}
                   </th>
-                  <HeadCell vendor={VENDOR.docker} tone="docker" />
-                  <HeadCell vendor={VENDOR.cleanstart} tone="cleanstart" />
+                  <HeadCell
+                    vendor={vendor.rival}
+                    rivalMark={rivalMark}
+                    tone="rival"
+                  />
+                  <HeadCell
+                    vendor={vendor.cleanstart}
+                    rivalMark={rivalMark}
+                    tone="cleanstart"
+                  />
                 </tr>
               </thead>
 
-              {MATRIX.groups.map((group) => {
+              {matrix.groups.map((group) => {
                 const groupHidden =
-                  diffOnly && group.rows.every((row) => isSame(row));
+                  diffOnly && group.rows.every((row) => rowsAgree(row));
                 return (
                   <tbody key={group.id} className="max-lg:block" hidden={groupHidden}>
                     <GroupRow group={group} />
@@ -523,7 +779,9 @@ export function CompareMatrix(): React.ReactElement {
                       <DataRow
                         key={row.id}
                         row={row}
-                        hidden={diffOnly && isSame(row)}
+                        vendor={vendor}
+                        rivalMark={rivalMark}
+                        hidden={diffOnly && rowsAgree(row)}
                         isFinal={row.id === lastVisibleRowId}
                       />
                     ))}
@@ -536,17 +794,32 @@ export function CompareMatrix(): React.ReactElement {
 
         <Reveal delay={0.1} y={16}>
           <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-10">
-            <p
-              className="max-w-[720px]"
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "var(--fs-caption)",
-                lineHeight: "var(--fs-caption-lh)",
-                color: "rgba(17,17,17,0.62)",
-              }}
-            >
-              {MATRIX.footnote}
-            </p>
+            <div className="max-w-[720px]">
+              {matrix.qualifiedNote ? (
+                <p
+                  className="mb-2"
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "var(--fs-caption)",
+                    lineHeight: "var(--fs-caption-lh)",
+                    color: "rgba(17,17,17,0.62)",
+                  }}
+                >
+                  <span aria-hidden>* </span>
+                  {matrix.qualifiedNote}
+                </p>
+              ) : null}
+              <p
+                style={{
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "var(--fs-caption)",
+                  lineHeight: "var(--fs-caption-lh)",
+                  color: "rgba(17,17,17,0.62)",
+                }}
+              >
+                {matrix.footnote}
+              </p>
+            </div>
             <dl
               className="flex shrink-0 items-center gap-5"
               style={{
@@ -557,7 +830,7 @@ export function CompareMatrix(): React.ReactElement {
             >
               <div className="flex items-center gap-2">
                 <dt className="flex items-center gap-1">
-                  <YesMark tone="docker" />
+                  <YesMark tone="rival" />
                   <YesMark tone="cleanstart" />
                 </dt>
                 <dd>{UI.legendAvailable}</dd>
