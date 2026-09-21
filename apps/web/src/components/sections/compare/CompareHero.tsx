@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { HeroReveal } from "@/components/ui/Reveal";
-import { HERO_CTA, STANDFIRST, TITLE_PARTS, UI } from "./compare-data";
+import { UI, type CompareContent } from "./compare-types";
 import { Glow } from "./compare-visuals";
 
 /**
- * Comparison hero: the document's title, its standfirst and the two calls to
+ * Comparison hero: the source document's title, its standfirst and the two calls to
  * action, on the site's standard dark hero shell (`bg-cs-hero` mesh plus the
  * shared gridline overlay).
  *
@@ -19,7 +19,12 @@ import { Glow } from "./compare-visuals";
  * mesh's violet is the page's opening colour and a white wash over it read as
  * the hero draining away.
  */
-export function CompareHero(): React.ReactElement {
+export function CompareHero({
+  content,
+}: {
+  content: Pick<CompareContent, "titleParts" | "standfirst" | "heroCta">;
+}): React.ReactElement {
+  const { titleParts, standfirst, heroCta } = content;
   return (
     <section
       data-section="CompareHero"
@@ -64,12 +69,17 @@ export function CompareHero(): React.ReactElement {
                 fontWeight: "var(--fs-display-weight)",
                 letterSpacing: "var(--fs-display-ls)",
                 lineHeight: "var(--fs-display-lh)",
-                maxWidth: "18ch",
+                /* 18ch sets a bare "X vs CleanStart" on two lines. A title
+                   that keeps its ": Secure Container Images Compared" suffix
+                   is three times as long and needs the wider measure, or it
+                   breaks to four lines and strands the colon at a line end. */
+                maxWidth: titleParts.trail ? "26ch" : "18ch",
                 textWrap: "balance",
               }}
             >
-              {TITLE_PARTS.lead}
-              <span className="cs-text-gradient-impact">{TITLE_PARTS.accent}</span>
+              {titleParts.lead}
+              <span className="cs-text-gradient-impact">{titleParts.accent}</span>
+              {titleParts.trail}
             </h1>
           </HeroReveal>
 
@@ -86,14 +96,14 @@ export function CompareHero(): React.ReactElement {
                 marginTop: "clamp(20px, 2vw, 28px)",
               }}
             >
-              {STANDFIRST}
+              {standfirst}
             </p>
 
             <div className="mt-10 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
               {/* Site-standard hero pair: the glass primary the home and Clean
                   Images heroes use, and the solid blue as secondary. */}
               <Link
-                href={HERO_CTA.href}
+                href={heroCta.href}
                 className="cs-btn-glass"
                 style={
                   {
@@ -103,7 +113,7 @@ export function CompareHero(): React.ReactElement {
                   } as React.CSSProperties
                 }
               >
-                <span>{HERO_CTA.label}</span>
+                <span>{heroCta.label}</span>
               </Link>
 
               <Link

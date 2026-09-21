@@ -19,7 +19,7 @@
 
 import Link from "next/link";
 import { Reveal } from "@/components/ui/Reveal";
-import { CTA } from "./compare-data";
+import type { CompareCtaContent } from "./compare-types";
 
 function Bloom({
   className,
@@ -42,7 +42,14 @@ function Bloom({
   );
 }
 
-export function CompareCTA(): React.ReactElement {
+export function CompareCTA({
+  content,
+}: {
+  content: CompareCtaContent;
+}): React.ReactElement {
+  // The catalog lives on another host; the marketing pages do not. Only the
+  // off-site link opens in a new tab.
+  const external = /^https?:\/\//.test(content.href);
   return (
     <div
       data-section="CompareCTA"
@@ -138,7 +145,7 @@ export function CompareCTA(): React.ReactElement {
               margin: 0,
             }}
           >
-            {CTA.heading}
+            {content.heading}
           </h2>
         </Reveal>
 
@@ -159,13 +166,14 @@ export function CompareCTA(): React.ReactElement {
               margin: 0,
             }}
           >
-            {CTA.body}
+            {content.body}
           </p>
 
           <Link
-            href={CTA.href}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={content.href}
+            {...(external
+              ? { target: "_blank", rel: "noopener noreferrer" }
+              : {})}
             className="cs-btn-blue"
             style={
               {
@@ -175,7 +183,7 @@ export function CompareCTA(): React.ReactElement {
               } as React.CSSProperties
             }
           >
-            <span>{CTA.button}</span>
+            <span>{content.button}</span>
           </Link>
         </Reveal>
       </div>

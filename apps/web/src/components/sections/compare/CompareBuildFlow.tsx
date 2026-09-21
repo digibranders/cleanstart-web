@@ -1,7 +1,12 @@
 import { Section, Container } from "@/components/layout";
 import { Reveal } from "@/components/ui/Reveal";
 import { ScaleToFit } from "@/components/ui/ScaleToFit";
-import { BUILD_FLOW, INHERITED_BASE, type BuildFlowColumn } from "./compare-data";
+import type {
+  BuildFlowColumn,
+  BuildFlowSection,
+  CompareTone,
+  InheritedBase,
+} from "./compare-types";
 import { StageGlyph } from "./compare-glyphs";
 import {
   BAND_DARK,
@@ -14,17 +19,17 @@ import {
 } from "./compare-visuals";
 
 /**
- * "How Do Docker Hardened Images and CleanStart Build Secure Container Images?"
+ * The build-process band: both approaches as lanes running to one gate.
  *
- * Both build approaches in the document end at "Production Deployment", so the
+ * Both build approaches in the source document end at the same stage, so the
  * diagram gives them ONE destination: a gate at the right edge that both lanes
- * run into. CleanStart's lane starts at the far left with "Source Code";
- * Docker's lane does not exist until "Base Container Foundation", two stages
- * later. A light pulse travels each lane on a shared six-second clock, lighting
- * every stage as it passes, and both pulses reach the gate together. The motion
- * is the intro's sentence made visible: same destination, different starting
- * points in the lifecycle. Everything is CSS, and all of it stops under
- * `prefers-reduced-motion`, leaving the static lanes.
+ * run into. Where the document gives the rival fewer stages than CleanStart,
+ * its lane starts further right and the stages it skips are drawn as a dashed
+ * ghost (`inheritedBase`) — that is the comparison, made visible. Where both
+ * lanes are the same length they simply run in parallel. A light pulse travels
+ * each lane on a shared six-second clock, lighting every stage as it passes,
+ * and both pulses reach the gate together. Everything is CSS, and all of it
+ * stops under `prefers-reduced-motion`, leaving the static lanes.
  *
  * The diagram is laid out once at a fixed width and scaled uniformly to the
  * panel from `lg` up (the home page's pipeline does the same), so it never
@@ -34,14 +39,42 @@ import {
  * Deployment" back in its own list.
  */
 
-/** Natural width the diagram is composed at; ScaleToFit shrinks it to fit. */
-const DIAGRAM_W = 1160;
+/**
+ * Lane geometry, derived from the content rather than fixed: the longer of the
+ * two lanes sets how many stage columns the grid has, and a shorter lane is
+ * pushed right by the difference. Hard-coding six columns worked while every
+ * document drew at most six on-lane stages; a seventh put a stage in column
+ * zero and off the grid.
+ *
+ * The last step in a lane is the destination both share and is drawn as the
+ * gate, so it does not take a column.
+ */
+interface LaneGeometry {
+  /** Stage columns on the lanes; the final stage is the shared gate. */
+  readonly cols: number;
+  /** Seconds per column; a pulse covers them all in 60% of the period. */
+  readonly step: number;
+  /** Natural width the diagram is composed at; ScaleToFit shrinks it to fit. */
+  readonly width: number;
+}
 
-/** Stage columns on the lanes; the final stage is the shared gate. */
-const LANE_COLS = 6;
 const PERIOD = 6;
-/** Seconds per stage column; a pulse covers the six columns in 60% of the period. */
-const STEP = (PERIOD * 0.6) / LANE_COLS;
+/** Width per stage column, held constant so a longer flow gets a wider canvas
+ *  rather than narrower labels. Tuned on the six-column Docker diagram. */
+const COL_W = 130;
+/** The vendor-name and gate columns either side of the lanes, plus their gaps. */
+const DIAGRAM_CHROME_W = 1160 - 6 * COL_W;
+
+function laneGeometry(columns: BuildFlowSection["columns"]): LaneGeometry {
+  const cols = Math.max(
+    ...columns.map((column) => Math.max(column.steps.length - 1, 1)),
+  );
+  return {
+    cols,
+    step: (PERIOD * 0.6) / cols,
+    width: DIAGRAM_CHROME_W + cols * COL_W,
+  };
+}
 
 /** Tile centre line, matching the lane line's `top`. */
 const TILE = 40;
@@ -50,10 +83,14 @@ function Stage({
   label,
   tone,
   hitAt,
+  align = "center",
 }: {
   label: string;
-  tone: "docker" | "cleanstart";
+  tone: CompareTone;
   hitAt: number;
+  /** Centred under its tile in the wide diagram; beside it in the stacked list,
+   *  where a centred two-line label sits out of line with its neighbours. */
+  align?: "center" | "start";
 }): React.ReactElement {
   const isCleanStart = tone === "cleanstart";
   return (
@@ -90,14 +127,14 @@ function Stage({
         <StageGlyph name={label} size={20} className="relative" />
       </span>
       <span
-        className="font-display text-center"
+        className={`font-display ${align === "center" ? "text-center" : "text-left"}`}
         style={{
           fontSize: "var(--fs-body-sm)",
           fontWeight: 500,
           letterSpacing: "var(--fs-body-ls)",
           lineHeight: "var(--fs-body-sm-lh)",
           color: isCleanStart ? "#ffffff" : "rgba(255,255,255,0.84)",
-          textWrap: "balance",
+          ...(align === "center" ? { textWrap: "balance" as const } : {}),
         }}
       >
         {label}
@@ -107,11 +144,19 @@ function Stage({
 }
 
 /**
- * The base Docker inherits, drawn the way the hero draws it: a dashed ghost
- * tile ahead of the lane's first stage. It is why that lane starts where it
- * does. Decorative; the phrase is the matrix's "Base foundation" cell.
+ * The base the rival inherits, drawn as a dashed ghost tile ahead of the
+ * lane's first stage. It is why that lane starts where it does. Decorative;
+ * the phrase is the matrix's "Base foundation" cell.
  */
-function InheritedGhost({ fromPct, toPct }: { fromPct: number; toPct: number }): React.ReactElement {
+function InheritedGhost({
+  base,
+  fromPct,
+  toPct,
+}: {
+  base: InheritedBase;
+  fromPct: number;
+  toPct: number;
+}): React.ReactElement {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0">
       <span
@@ -135,7 +180,7 @@ function InheritedGhost({ fromPct, toPct }: { fromPct: number; toPct: number }):
             color: "rgba(255,255,255,0.55)",
           }}
         >
-          <StageGlyph name={INHERITED_BASE.label} size={20} />
+          <StageGlyph name={base.label} size={20} />
         </span>
         <span
           className="text-center font-display"
@@ -147,25 +192,38 @@ function InheritedGhost({ fromPct, toPct }: { fromPct: number; toPct: number }):
             textWrap: "balance",
           }}
         >
-          {INHERITED_BASE.label}
+          {base.label}
         </span>
       </div>
     </div>
   );
 }
 
-function Lane({ column }: { column: BuildFlowColumn }): React.ReactElement {
+function Lane({
+  column,
+  geometry,
+  inheritedBase,
+}: {
+  column: BuildFlowColumn;
+  geometry: LaneGeometry;
+  inheritedBase: InheritedBase | undefined;
+}): React.ReactElement {
+  const { cols, step: STEP } = geometry;
   const isCleanStart = column.id === "cleanstart";
   const onLane = column.steps.slice(0, -1);
   const gateStep = column.steps[column.steps.length - 1] ?? "";
-  const offset = LANE_COLS - onLane.length;
-  const fromPct = ((offset + 0.5) / LANE_COLS) * 100;
+  const offset = cols - onLane.length;
+  const fromPct = ((offset + 0.5) / cols) * 100;
   const leaveAt = offset * STEP;
 
   return (
     <div className="relative">
-      {!isCleanStart && offset > 0 && (
-        <InheritedGhost fromPct={(0.5 / LANE_COLS) * 100} toPct={fromPct} />
+      {!isCleanStart && offset > 0 && inheritedBase && (
+        <InheritedGhost
+          base={inheritedBase}
+          fromPct={(0.5 / cols) * 100}
+          toPct={fromPct}
+        />
       )}
 
       {/* The lane line, drawn as segments between the tiles (the tiles are
@@ -177,8 +235,8 @@ function Lane({ column }: { column: BuildFlowColumn }): React.ReactElement {
           aria-hidden
           className="pointer-events-none absolute top-[20px] h-[2px] -translate-y-1/2"
           style={{
-            left: `calc(${((offset + i + 0.5) / LANE_COLS) * 100}% + ${TILE / 2 + 4}px)`,
-            width: `calc(${100 / LANE_COLS}% - ${TILE + 8}px)`,
+            left: `calc(${((offset + i + 0.5) / cols) * 100}% + ${TILE / 2 + 4}px)`,
+            width: `calc(${100 / cols}% - ${TILE + 8}px)`,
             background: isCleanStart
               ? `linear-gradient(90deg, ${BRAND.violetLight}, #82E1FF)`
               : "rgba(255,255,255,0.22)",
@@ -190,7 +248,7 @@ function Lane({ column }: { column: BuildFlowColumn }): React.ReactElement {
         aria-hidden
         className="pointer-events-none absolute top-[20px] h-[2px] -translate-y-1/2"
         style={{
-          left: `calc(${((LANE_COLS - 0.5) / LANE_COLS) * 100}% + ${TILE / 2 + 4}px)`,
+          left: `calc(${((cols - 0.5) / cols) * 100}% + ${TILE / 2 + 4}px)`,
           right: "calc(-2rem - 1px)",
           background: isCleanStart
             ? `linear-gradient(90deg, ${BRAND.violetLight}, #82E1FF)`
@@ -220,7 +278,10 @@ function Lane({ column }: { column: BuildFlowColumn }): React.ReactElement {
       {/* `<ol>` because the stages are an order, not a set. The last stage is
           the gate on wide screens, so its item stays for readers but leaves
           the layout there. */}
-      <ol className="relative m-0 grid list-none grid-cols-6 gap-x-2 p-0">
+      <ol
+        className="relative m-0 grid list-none gap-x-2 p-0"
+        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+      >
         {onLane.map((step, i) => (
           <li
             key={step}
@@ -296,7 +357,7 @@ function Eyebrow({
   tone,
 }: {
   text: string;
-  tone: "docker" | "cleanstart";
+  tone: CompareTone;
 }): React.ReactElement {
   return (
     <p
@@ -317,14 +378,16 @@ function Eyebrow({
 
 function VendorName({
   column,
+  rivalMark,
   size = 32,
 }: {
   column: BuildFlowColumn;
+  rivalMark: string;
   size?: number;
 }): React.ReactElement {
   return (
     <div className="flex items-center gap-3">
-      <VendorMark tone={column.id} size={size} />
+      <VendorMark tone={column.id} rivalMark={rivalMark} size={size} />
       <p
         className="font-display text-white"
         style={{
@@ -340,18 +403,32 @@ function VendorName({
   );
 }
 
-/** Body sentence and the "Key characteristics" list, at real type size. */
+/** True when the document gives this lane prose beneath the diagram. */
+function hasNotes(column: BuildFlowColumn): boolean {
+  return Boolean(column.body) || Boolean(column.traits?.length);
+}
+
+/**
+ * Body sentence and the "Key characteristics" list, at real type size. Returns
+ * `null` where the source document draws the flow and writes nothing under it.
+ */
 function VendorNotes({
   column,
+  rivalMark,
   withName,
 }: {
   column: BuildFlowColumn;
+  rivalMark: string;
   withName: boolean;
-}): React.ReactElement {
+}): React.ReactElement | null {
   const isCleanStart = column.id === "cleanstart";
+  if (!hasNotes(column)) return null;
   return (
-    <div>
-      {withName && <VendorName column={column} size={28} />}
+    // Without its own name the block follows one printed above it, so it keeps
+    // the same gap the name-plus-body pairing has.
+    <div className={withName ? undefined : "mt-3"}>
+      {withName && <VendorName column={column} rivalMark={rivalMark} size={28} />}
+      {column.body ? (
       <p
         className={withName ? "mt-3" : ""}
         style={{
@@ -365,8 +442,12 @@ function VendorNotes({
       >
         {column.body}
       </p>
+      ) : null}
+      {column.traits?.length ? (
       <div className="mt-4">
-        <Eyebrow text={column.traitsLabel} tone={column.id} />
+        {column.traitsLabel ? (
+          <Eyebrow text={column.traitsLabel} tone={column.id} />
+        ) : null}
         <ul className="mt-2 flex flex-col gap-1">
           {column.traits.map((trait) => (
             <li key={trait} className="flex items-start gap-2.5">
@@ -392,49 +473,62 @@ function VendorNotes({
           ))}
         </ul>
       </div>
+      ) : null}
     </div>
   );
 }
 
 /** The wide diagram: vendor names, two lanes, the shared gate. Composed at
-    DIAGRAM_W and scaled to the panel. */
+    the derived lane width and scaled to the panel. */
 function LanesDiagram({
-  docker,
+  rival,
   cleanstart,
+  rivalMark,
+  geometry,
+  inheritedBase,
   gateLabel,
 }: {
-  docker: BuildFlowColumn;
+  rival: BuildFlowColumn;
   cleanstart: BuildFlowColumn;
+  rivalMark: string;
+  geometry: LaneGeometry;
+  inheritedBase: InheritedBase | undefined;
   gateLabel: string;
 }): React.ReactElement {
   return (
-    <ScaleToFit designWidth={DIAGRAM_W}>
+    <ScaleToFit designWidth={geometry.width}>
       <div
         className="grid items-center gap-x-8 gap-y-9"
         style={{
-          width: DIAGRAM_W,
+          width: geometry.width,
           gridTemplateColumns: "220px minmax(0, 1fr) 160px",
           gridTemplateRows: "auto auto auto",
         }}
       >
-        {/* Both columns carry the document's same "Build approach:" lead-in, so
-            it is set once over the lanes rather than repeated per row. */}
-        <div style={{ gridColumn: 2, gridRow: 1, marginBottom: 4 }}>
-          <Eyebrow text={docker.stepsLabel} tone="docker" />
-        </div>
+        {/* Where both columns carry the document's same lead-in, it is set once
+            over the lanes rather than repeated per row. */}
+        {rival.stepsLabel ? (
+          <div style={{ gridColumn: 2, gridRow: 1, marginBottom: 4 }}>
+            <Eyebrow text={rival.stepsLabel} tone="rival" />
+          </div>
+        ) : null}
 
         <div style={{ gridColumn: 1, gridRow: 2 }}>
-          <VendorName column={docker} />
+          <VendorName column={rival} rivalMark={rivalMark} />
         </div>
         <div className="min-w-0" style={{ gridColumn: 2, gridRow: 2 }}>
-          <Lane column={docker} />
+          <Lane
+            column={rival}
+            geometry={geometry}
+            inheritedBase={inheritedBase}
+          />
         </div>
 
         <div style={{ gridColumn: 1, gridRow: 3 }}>
-          <VendorName column={cleanstart} />
+          <VendorName column={cleanstart} rivalMark={rivalMark} />
         </div>
         <div className="min-w-0" style={{ gridColumn: 2, gridRow: 3 }}>
-          <Lane column={cleanstart} />
+          <Lane column={cleanstart} geometry={geometry} inheritedBase={undefined} />
         </div>
 
         <div className="self-stretch" style={{ gridColumn: 3, gridRow: "2 / span 2" }}>
@@ -445,8 +539,40 @@ function LanesDiagram({
   );
 }
 
+/** Narrow layout: one vendor in full — name, any notes, then the steps. */
+function StackedLane({
+  column,
+  rivalMark,
+  geometry,
+}: {
+  column: BuildFlowColumn;
+  rivalMark: string;
+  geometry: LaneGeometry;
+}): React.ReactElement {
+  return (
+    <div className="md:grid md:grid-cols-2 md:gap-x-8">
+      <div>
+        <VendorName column={column} rivalMark={rivalMark} size={28} />
+        <VendorNotes column={column} rivalMark={rivalMark} withName={false} />
+      </div>
+      <div className="max-md:mt-6">
+        {column.stepsLabel ? (
+          <Eyebrow text={column.stepsLabel} tone={column.id} />
+        ) : null}
+        <StackedSteps column={column} geometry={geometry} />
+      </div>
+    </div>
+  );
+}
+
 /** Phone layout: a plain vertical list per vendor. */
-function StackedSteps({ column }: { column: BuildFlowColumn }): React.ReactElement {
+function StackedSteps({
+  column,
+  geometry,
+}: {
+  column: BuildFlowColumn;
+  geometry: LaneGeometry;
+}): React.ReactElement {
   const isCleanStart = column.id === "cleanstart";
   return (
     <div className="mt-4">
@@ -470,7 +596,12 @@ function StackedSteps({ column }: { column: BuildFlowColumn }): React.ReactEleme
                 }}
               />
             )}
-            <Stage label={step} tone={column.id} hitAt={i * STEP} />
+            <Stage
+              label={step}
+              tone={column.id}
+              hitAt={i * geometry.step}
+              align="start"
+            />
           </li>
         ))}
       </ol>
@@ -478,8 +609,17 @@ function StackedSteps({ column }: { column: BuildFlowColumn }): React.ReactEleme
   );
 }
 
-export function CompareBuildFlow(): React.ReactElement {
-  const [docker, cleanstart] = BUILD_FLOW.columns;
+export function CompareBuildFlow({
+  content,
+  rivalMark,
+  inheritedBase,
+}: {
+  content: BuildFlowSection;
+  rivalMark: string;
+  inheritedBase: InheritedBase | undefined;
+}): React.ReactElement {
+  const [rival, cleanstart] = content.columns;
+  const geometry = laneGeometry(content.columns);
   const gateLabel = cleanstart.steps[cleanstart.steps.length - 1] ?? "";
 
   return (
@@ -495,8 +635,8 @@ export function CompareBuildFlow(): React.ReactElement {
       <Container className="relative">
         <BandHeader
           id="how-secure-images-are-built"
-          heading={BUILD_FLOW.heading}
-          intro={BUILD_FLOW.intro}
+          heading={content.heading}
+          intro={content.intro}
           tone="dark"
         />
 
@@ -504,34 +644,37 @@ export function CompareBuildFlow(): React.ReactElement {
           <DarkPanel>
             {/* Wide: the scaled diagram, then the notes in two columns. */}
             <div className="hidden lg:block">
-              <LanesDiagram docker={docker} cleanstart={cleanstart} gateLabel={gateLabel} />
-              <div
-                className="mt-9 grid grid-cols-2 gap-x-10 border-t pt-8"
-                style={{ borderColor: "rgba(255,255,255,0.12)" }}
-              >
-                <VendorNotes column={docker} withName />
-                <VendorNotes column={cleanstart} withName />
-              </div>
+              <LanesDiagram
+                rival={rival}
+                cleanstart={cleanstart}
+                rivalMark={rivalMark}
+                geometry={geometry}
+                inheritedBase={inheritedBase}
+                gateLabel={gateLabel}
+              />
+              {hasNotes(rival) || hasNotes(cleanstart) ? (
+                <div
+                  className="mt-9 grid grid-cols-2 gap-x-10 border-t pt-8"
+                  style={{ borderColor: "rgba(255,255,255,0.12)" }}
+                >
+                  <VendorNotes column={rival} rivalMark={rivalMark} withName />
+                  <VendorNotes column={cleanstart} rivalMark={rivalMark} withName />
+                </div>
+              ) : null}
             </div>
 
             {/* Narrow: each vendor in full, stacked. */}
             <div className="flex flex-col gap-8 lg:hidden">
-              <div className="md:grid md:grid-cols-2 md:gap-x-8">
-                <VendorNotes column={docker} withName />
-                <div className="max-md:mt-6">
-                  <Eyebrow text={docker.stepsLabel} tone="docker" />
-                  <StackedSteps column={docker} />
-                </div>
-              </div>
+              <StackedLane column={rival} rivalMark={rivalMark} geometry={geometry} />
               <div
-                className="border-t pt-8 md:grid md:grid-cols-2 md:gap-x-8"
+                className="border-t pt-8"
                 style={{ borderColor: "rgba(255,255,255,0.12)" }}
               >
-                <VendorNotes column={cleanstart} withName />
-                <div className="max-md:mt-6">
-                  <Eyebrow text={cleanstart.stepsLabel} tone="cleanstart" />
-                  <StackedSteps column={cleanstart} />
-                </div>
+                <StackedLane
+                  column={cleanstart}
+                  rivalMark={rivalMark}
+                  geometry={geometry}
+                />
               </div>
             </div>
           </DarkPanel>

@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import { Section, Container } from "@/components/layout";
 import { Reveal } from "@/components/ui/Reveal";
-import { FAQS, FAQ_HEADING, type CompareFaq } from "./compare-data";
+import type { CompareFaq } from "./compare-types";
 
 /**
- * The eight questions from the document, in the home page's FAQ chrome: two
+ * The document's questions, in the home page's FAQ chrome: two
  * white cards side by side, hairline dividers, plus-to-cross toggles, one
  * item open at a time across both columns. The split waits for `lg`; at
  * tablet width these questions wrap to four lines a piece and the answers
@@ -135,11 +135,17 @@ function Column({
   );
 }
 
-export function CompareFAQ(): React.ReactElement {
-  const [openId, setOpenId] = useState<string | null>(FAQS[0].id);
-  const half = Math.ceil(FAQS.length / 2);
-  const left = FAQS.slice(0, half);
-  const right = FAQS.slice(half);
+export function CompareFAQ({
+  heading,
+  faqs,
+}: {
+  heading: string;
+  faqs: readonly CompareFaq[];
+}): React.ReactElement {
+  const [openId, setOpenId] = useState<string | null>(faqs[0]?.id ?? null);
+  const half = Math.ceil(faqs.length / 2);
+  const left = faqs.slice(0, half);
+  const right = faqs.slice(half);
 
   const toggle = (id: string): void =>
     setOpenId((current) => (current === id ? null : id));
@@ -195,7 +201,7 @@ export function CompareFAQ(): React.ReactElement {
               lineHeight: "var(--fs-h2-lh)",
             }}
           >
-            {FAQ_HEADING}
+            {heading}
           </h2>
         </Reveal>
 

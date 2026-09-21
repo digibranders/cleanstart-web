@@ -4,13 +4,15 @@ import { useMemo, useState } from "react";
 import { Section, Container } from "@/components/layout";
 import { Reveal } from "@/components/ui/Reveal";
 import {
-  MATRIX,
+  matrixDifferenceCount,
+  rowsAgree,
   UI,
-  VENDOR,
+  type CompareTone,
   type MatrixCell,
   type MatrixGroup,
   type MatrixRow,
-} from "./compare-data";
+  type MatrixSection,
+} from "./compare-types";
 import { BandHeader, BRAND, Icon3D, VectorGrid, VendorMark } from "./compare-visuals";
 
 /**
@@ -22,7 +24,7 @@ import { BandHeader, BRAND, Icon3D, VectorGrid, VendorMark } from "./compare-vis
  * headers and `scope="colgroup"` group rows; below `lg` the table parts flip
  * to `display: block` and each row becomes a card. From `md` to `lg` that card
  * is a two-column grid, because a tablet has room to set both answers side by
- * side; below `md` they stack. Rendering a second copy of twenty rows would
+ * side; below `md` they stack. Rendering a second copy of every row would
  * double the markup and duplicate every string.
  *
  * Below `lg` the outer wrapper drops its own border, fill and shadow, or the
@@ -32,15 +34,14 @@ import { BandHeader, BRAND, Icon3D, VectorGrid, VendorMark } from "./compare-vis
  * between the two layouts is a class, never an inline `style`. Inline styles
  * here carry colour and type only.
  *
- * Wayfinding for twenty rows: the four group rows open as chapters (3D icon
+ * Wayfinding for a table this long: the group rows open as chapters (3D icon
  * plus label) and stick while their rows scroll, under the column head on
  * desktop and under the site header on small screens, where the list runs to
- * many times the viewport. The
- * head itself sticks flush to the site header rather than a few pixels below
- * it: that offset let rows scroll through the strip in between, which the
- * dark CleanStart column turned into a visible seam. a
- * chapter index above the table jumps to each; and a "differences only"
- * switch hides the rows where the document gives both vendors the same
+ * many times the viewport. The head itself sticks flush to the site header
+ * rather than a few pixels below it: that offset let rows scroll through the
+ * strip in between, which the dark CleanStart column turned into a visible
+ * seam. A chapter index above the table jumps to each, and a "differences
+ * only" switch hides the rows where the document gives both vendors the same
  * answer. Hidden rows stay in the DOM, so the page source and the table a
  * crawler reads are unchanged.
  *
@@ -69,7 +70,13 @@ const HEAD_CELL =
 const GROUP_CELL =
   "sticky z-10 lg:top-[calc(var(--cs-header-h)+62px)] lg:border-y lg:border-[rgba(17,17,17,0.08)] lg:bg-[#FAFAFC] px-[clamp(16px,1.5vw,26px)] py-2.5 text-left max-lg:top-[var(--cs-header-h)] max-lg:mt-7 max-lg:block max-lg:bg-white max-lg:px-0 max-lg:py-3";
 
-function YesMark({ tone }: { tone: "docker" | "cleanstart" }): React.ReactElement {
+function YesMark({
+  tone,
+  srLabel = UI.available,
+}: {
+  tone: CompareTone;
+  srLabel?: string;
+}): React.ReactElement {
   const isCleanStart = tone === "cleanstart";
   return (
     <span className="inline-flex items-center">
@@ -93,7 +100,7 @@ function YesMark({ tone }: { tone: "docker" | "cleanstart" }): React.ReactElemen
           />
         </svg>
       </span>
-      <span className="sr-only">{UI.available}</span>
+      <span className="sr-only">{srLabel}</span>
     </span>
   );
 }
@@ -111,15 +118,40 @@ function NoMark(): React.ReactElement {
   );
 }
 
+/** The source table's "✓*": the tick, with the asterisk it is written with. */
+function QualifiedMark({ tone }: { tone: CompareTone }): React.ReactElement {
+  return (
+    // The asterisk sits in the top third of its own em box, so it needs both a
+    // larger size and a negative top inset to land level with the tick. At the
+    // table's 14px it rendered as a few pixels of grey and read as an artifact.
+    <span className="inline-flex items-start gap-[3px]">
+      <YesMark tone={tone} srLabel={UI.availableQualified} />
+      <span
+        aria-hidden
+        className="font-display leading-none"
+        style={{
+          fontSize: "20px",
+          fontWeight: 700,
+          marginTop: "-1px",
+          color: tone === "cleanstart" ? BRAND.violet : "rgba(17,17,17,0.7)",
+        }}
+      >
+        *
+      </span>
+    </span>
+  );
+}
+
 function Cell({
   cell,
   tone,
 }: {
   cell: MatrixCell;
-  tone: "docker" | "cleanstart";
+  tone: CompareTone;
 }): React.ReactElement {
   if (cell.kind === "yes") return <YesMark tone={tone} />;
   if (cell.kind === "no") return <NoMark />;
+  if (cell.kind === "qualified") return <QualifiedMark tone={tone} />;
   // "both" is a tick that carries a qualifier. The tick keeps its accessible
   // name, so a screen reader hears "Available" and then the detail.
   if (cell.kind === "both") {
@@ -156,11 +188,13 @@ function Cell({
 /** Column label repeated inside every cell below `lg`, where the head is gone. */
 function CellLabel({
   children,
+  rivalMark,
   tone,
   inline = false,
 }: {
   children: string;
-  tone: "docker" | "cleanstart";
+  rivalMark: string;
+  tone: CompareTone;
   /** Marker answers sit beside their label rather than under it. */
   inline?: boolean;
 }): React.ReactElement {
@@ -176,7 +210,7 @@ function CellLabel({
         color: tone === "cleanstart" ? BRAND.violet : "rgba(17,17,17,0.62)",
       }}
     >
-      <VendorMark tone={tone} size={22} />
+      <VendorMark tone={tone} rivalMark={rivalMark} size={22} />
       {children}
     </span>
   );
@@ -184,10 +218,12 @@ function CellLabel({
 
 function HeadCell({
   vendor,
+  rivalMark,
   tone,
 }: {
   vendor: string;
-  tone: "docker" | "cleanstart";
+  rivalMark: string;
+  tone: CompareTone;
 }): React.ReactElement {
   const isCleanStart = tone === "cleanstart";
   return (
@@ -205,7 +241,7 @@ function HeadCell({
       }}
     >
       <span className="flex items-center gap-2.5">
-        <VendorMark tone={tone} size={26} />
+        <VendorMark tone={tone} rivalMark={rivalMark} size={26} />
         <span
           className="block font-display"
           style={{
@@ -221,17 +257,6 @@ function HeadCell({
       </span>
     </th>
   );
-}
-
-function isSame(row: MatrixRow): boolean {
-  if (row.docker.kind !== row.cleanstart.kind) return false;
-  if (
-    (row.docker.kind === "text" || row.docker.kind === "both") &&
-    (row.cleanstart.kind === "text" || row.cleanstart.kind === "both")
-  ) {
-    return row.docker.value === row.cleanstart.value;
-  }
-  return true;
 }
 
 function GroupRow({ group }: { group: MatrixGroup }): React.ReactElement {
@@ -268,10 +293,14 @@ function GroupRow({ group }: { group: MatrixGroup }): React.ReactElement {
 
 function DataRow({
   row,
+  vendor,
+  rivalMark,
   hidden,
   isFinal,
 }: {
   row: MatrixRow;
+  vendor: { readonly rival: string; readonly cleanstart: string };
+  rivalMark: string;
   hidden: boolean;
   isFinal: boolean;
 }): React.ReactElement {
@@ -280,7 +309,7 @@ function DataRow({
   const edge = isFinal ? " border-b-0" : "";
   // A marker is one glyph, so on small screens it sits on its label's row
   // instead of claiming a line of its own.
-  const dockerInline = row.docker.kind !== "text";
+  const rivalInline = row.rival.kind !== "text";
   const cleanstartInline = row.cleanstart.kind !== "text";
   const inlineCell =
     " max-lg:flex max-lg:items-center max-lg:justify-between max-lg:gap-4";
@@ -305,17 +334,17 @@ function DataRow({
       </th>
 
       <td
-        className={`${CELL}${edge}${dockerInline ? inlineCell : ""} transition-colors max-lg:mt-4 max-lg:border-t max-lg:border-[rgba(17,17,17,0.08)] max-lg:pt-4 lg:group-hover:bg-[rgba(17,17,17,0.03)]`}
+        className={`${CELL}${edge}${rivalInline ? inlineCell : ""} transition-colors max-lg:mt-4 max-lg:border-t max-lg:border-[rgba(17,17,17,0.08)] max-lg:pt-4 lg:group-hover:bg-[rgba(17,17,17,0.03)]`}
         style={{
           fontFamily: "var(--font-sans)",
           fontSize: "var(--fs-table-td)",
           lineHeight: "var(--fs-body-sm-lh)",
         }}
       >
-        <CellLabel tone="docker" inline={dockerInline}>
-          {VENDOR.docker}
+        <CellLabel tone="rival" rivalMark={rivalMark} inline={rivalInline}>
+          {vendor.rival}
         </CellLabel>
-        <Cell cell={row.docker} tone="docker" />
+        <Cell cell={row.rival} tone="rival" />
       </td>
 
       <td
@@ -326,8 +355,8 @@ function DataRow({
           lineHeight: "var(--fs-body-sm-lh)",
         }}
       >
-        <CellLabel tone="cleanstart" inline={cleanstartInline}>
-          {VENDOR.cleanstart}
+        <CellLabel tone="cleanstart" rivalMark={rivalMark} inline={cleanstartInline}>
+          {vendor.cleanstart}
         </CellLabel>
         <Cell cell={row.cleanstart} tone="cleanstart" />
       </td>
@@ -335,25 +364,26 @@ function DataRow({
   );
 }
 
-export function CompareMatrix(): React.ReactElement {
+export function CompareMatrix({
+  matrix,
+  vendor,
+  rivalMark,
+}: {
+  matrix: MatrixSection;
+  vendor: { readonly rival: string; readonly cleanstart: string };
+  rivalMark: string;
+}): React.ReactElement {
   const [diffOnly, setDiffOnly] = useState(false);
 
-  const differenceCount = useMemo(
-    () =>
-      MATRIX.groups.reduce(
-        (total, group) => total + group.rows.filter((row) => !isSame(row)).length,
-        0,
-      ),
-    [],
-  );
+  const differenceCount = useMemo(() => matrixDifferenceCount(matrix), [matrix]);
 
-  const lastGroup = MATRIX.groups[MATRIX.groups.length - 1];
+  const lastGroup = matrix.groups[matrix.groups.length - 1];
   const lastVisibleRowId = (() => {
-    for (let g = MATRIX.groups.length - 1; g >= 0; g -= 1) {
-      const rows = MATRIX.groups[g]?.rows ?? [];
+    for (let g = matrix.groups.length - 1; g >= 0; g -= 1) {
+      const rows = matrix.groups[g]?.rows ?? [];
       for (let r = rows.length - 1; r >= 0; r -= 1) {
         const row = rows[r];
-        if (row && (!diffOnly || !isSame(row))) return row.id;
+        if (row && (!diffOnly || !rowsAgree(row))) return row.id;
       }
     }
     return lastGroup?.rows[lastGroup.rows.length - 1]?.id;
@@ -374,8 +404,8 @@ export function CompareMatrix(): React.ReactElement {
       <Container className="relative">
         <BandHeader
           id="capability-comparison"
-          heading={MATRIX.heading}
-          intro={MATRIX.intro}
+          heading={matrix.heading}
+          intro={matrix.intro}
         />
 
         {/* Controls: chapter index on the left, the differences switch on the
@@ -398,7 +428,7 @@ export function CompareMatrix(): React.ReactElement {
               >
                 {UI.groupIndex}
               </span>
-              {MATRIX.groups.map((group) => (
+              {matrix.groups.map((group) => (
                 <a
                   key={group.id}
                   href={`#matrix-${group.id}`}
@@ -481,7 +511,7 @@ export function CompareMatrix(): React.ReactElement {
               className="w-full max-lg:block"
               style={{ borderCollapse: "separate", borderSpacing: 0 }}
             >
-              <caption className="sr-only">{MATRIX.caption}</caption>
+              <caption className="sr-only">{matrix.caption}</caption>
 
               <colgroup className="max-lg:hidden">
                 <col style={{ width: "24%" }} />
@@ -508,14 +538,22 @@ export function CompareMatrix(): React.ReactElement {
                   >
                     {UI.capability}
                   </th>
-                  <HeadCell vendor={VENDOR.docker} tone="docker" />
-                  <HeadCell vendor={VENDOR.cleanstart} tone="cleanstart" />
+                  <HeadCell
+                    vendor={vendor.rival}
+                    rivalMark={rivalMark}
+                    tone="rival"
+                  />
+                  <HeadCell
+                    vendor={vendor.cleanstart}
+                    rivalMark={rivalMark}
+                    tone="cleanstart"
+                  />
                 </tr>
               </thead>
 
-              {MATRIX.groups.map((group) => {
+              {matrix.groups.map((group) => {
                 const groupHidden =
-                  diffOnly && group.rows.every((row) => isSame(row));
+                  diffOnly && group.rows.every((row) => rowsAgree(row));
                 return (
                   <tbody key={group.id} className="max-lg:block" hidden={groupHidden}>
                     <GroupRow group={group} />
@@ -523,7 +561,9 @@ export function CompareMatrix(): React.ReactElement {
                       <DataRow
                         key={row.id}
                         row={row}
-                        hidden={diffOnly && isSame(row)}
+                        vendor={vendor}
+                        rivalMark={rivalMark}
+                        hidden={diffOnly && rowsAgree(row)}
                         isFinal={row.id === lastVisibleRowId}
                       />
                     ))}
@@ -536,17 +576,32 @@ export function CompareMatrix(): React.ReactElement {
 
         <Reveal delay={0.1} y={16}>
           <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-10">
-            <p
-              className="max-w-[720px]"
-              style={{
-                fontFamily: "var(--font-sans)",
-                fontSize: "var(--fs-caption)",
-                lineHeight: "var(--fs-caption-lh)",
-                color: "rgba(17,17,17,0.62)",
-              }}
-            >
-              {MATRIX.footnote}
-            </p>
+            <div className="max-w-[720px]">
+              {matrix.qualifiedNote ? (
+                <p
+                  className="mb-2"
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "var(--fs-caption)",
+                    lineHeight: "var(--fs-caption-lh)",
+                    color: "rgba(17,17,17,0.62)",
+                  }}
+                >
+                  <span aria-hidden>* </span>
+                  {matrix.qualifiedNote}
+                </p>
+              ) : null}
+              <p
+                style={{
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "var(--fs-caption)",
+                  lineHeight: "var(--fs-caption-lh)",
+                  color: "rgba(17,17,17,0.62)",
+                }}
+              >
+                {matrix.footnote}
+              </p>
+            </div>
             <dl
               className="flex shrink-0 items-center gap-5"
               style={{
@@ -557,7 +612,7 @@ export function CompareMatrix(): React.ReactElement {
             >
               <div className="flex items-center gap-2">
                 <dt className="flex items-center gap-1">
-                  <YesMark tone="docker" />
+                  <YesMark tone="rival" />
                   <YesMark tone="cleanstart" />
                 </dt>
                 <dd>{UI.legendAvailable}</dd>
