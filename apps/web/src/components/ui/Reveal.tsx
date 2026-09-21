@@ -38,7 +38,7 @@ const instantStaggerChild: Variants = {
  * reveals it directly. Below-the-fold content is left for the scroll observer,
  * so the scroll-reveal behaviour is preserved.
  */
-function useRevealInView(
+export function useRevealInView(
   ref: RefObject<HTMLElement | null>,
   viewport: RevealViewport,
 ): boolean {
