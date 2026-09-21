@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Section, Container } from "@/components/layout";
 import { Reveal } from "@/components/ui/Reveal";
 import {
@@ -563,6 +563,88 @@ function ParityLede({
   );
 }
 
+/**
+ * The chapter index: one chip per capability group, always on one line.
+ *
+ * It used to wrap. The Docker comparison has five groups whose chips total
+ * 1244px, and its widest ("Vulnerability Management & Remediation", 350px)
+ * dropped onto a second row alone at 1440, 1280 and 1024. Moving the "Jump
+ * to" label out of the row bought 69px and fixed 1440 only; 1280 and 1024
+ * still stranded it. Wrapping cannot be balanced with `flex-wrap`, and an
+ * equal-width grid strands the same chip in a row of empty cells, so the row
+ * scrolls instead: deterministic at every width and at any group count, and
+ * on a phone it replaces five stacked rows with one.
+ *
+ * The right-edge fade is applied only while the row actually overflows,
+ * because a permanent mask would clip the last chip on a row that fits.
+ */
+function ChapterIndex({ groups }: { groups: readonly MatrixGroup[] }): React.ReactElement {
+  const trackRef = useRef<HTMLSpanElement | null>(null);
+  const [overflowing, setOverflowing] = useState(false);
+
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    const measure = (): void =>
+      setOverflowing(el.scrollWidth - el.clientWidth > 1);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <nav aria-label={UI.groupIndex} className="flex min-w-0 flex-col gap-2.5">
+      <span
+        className="font-display"
+        style={{
+          fontSize: "var(--fs-eyebrow)",
+          fontWeight: "var(--fs-eyebrow-weight)",
+          letterSpacing: "var(--fs-eyebrow-ls)",
+          textTransform: "uppercase",
+          color: "rgba(17,17,17,0.62)",
+        }}
+      >
+        {UI.groupIndex}
+      </span>
+      <span
+        ref={trackRef}
+        className="flex flex-nowrap items-center gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        style={
+          overflowing
+            ? {
+                maskImage:
+                  "linear-gradient(to right, #000 0, #000 calc(100% - 56px), transparent 100%)",
+                WebkitMaskImage:
+                  "linear-gradient(to right, #000 0, #000 calc(100% - 56px), transparent 100%)",
+              }
+            : undefined
+        }
+      >
+        {groups.map((group) => (
+          <a
+            key={group.id}
+            href={`#matrix-${group.id}`}
+            className="inline-flex shrink-0 items-center gap-2 rounded-full bg-white px-3.5 py-2 transition-colors hover:border-[rgba(106,61,240,0.4)] hover:bg-[rgba(106,61,240,0.05)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#33BAEC]"
+            style={{
+              border: "1px solid rgba(17,17,17,0.1)",
+              fontFamily: "var(--font-sans)",
+              fontSize: "var(--fs-button-sm)",
+              fontWeight: "var(--fs-button-weight)",
+              letterSpacing: "var(--fs-button-ls)",
+              color: "#111111",
+              whiteSpace: "nowrap",
+            }}
+          >
+            <Icon3D src={group.icon} size={22} bloom={false} />
+            {group.label}
+          </a>
+        ))}
+      </span>
+    </nav>
+  );
+}
+
 export function CompareMatrix({
   matrix,
   vendor,
@@ -621,41 +703,7 @@ export function CompareMatrix({
         {/* Chapter index. UI chrome, not document copy. */}
         <Reveal delay={0.12} y={16}>
           <div className="mt-6 flex flex-col gap-4 lg:mt-7 lg:flex-row lg:items-center lg:justify-between">
-            <nav
-              aria-label={UI.groupIndex}
-              className="flex flex-wrap items-center gap-2"
-            >
-              <span
-                className="mr-1 font-display"
-                style={{
-                  fontSize: "var(--fs-eyebrow)",
-                  fontWeight: "var(--fs-eyebrow-weight)",
-                  letterSpacing: "var(--fs-eyebrow-ls)",
-                  textTransform: "uppercase",
-                  color: "rgba(17,17,17,0.62)",
-                }}
-              >
-                {UI.groupIndex}
-              </span>
-              {matrix.groups.map((group) => (
-                <a
-                  key={group.id}
-                  href={`#matrix-${group.id}`}
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-2 transition-colors hover:border-[rgba(106,61,240,0.4)] hover:bg-[rgba(106,61,240,0.05)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#33BAEC]"
-                  style={{
-                    border: "1px solid rgba(17,17,17,0.1)",
-                    fontFamily: "var(--font-sans)",
-                    fontSize: "var(--fs-button-sm)",
-                    fontWeight: "var(--fs-button-weight)",
-                    letterSpacing: "var(--fs-button-ls)",
-                    color: "#111111",
-                  }}
-                >
-                  <Icon3D src={group.icon} size={22} bloom={false} />
-                  {group.label}
-                </a>
-              ))}
-            </nav>
+            <ChapterIndex groups={matrix.groups} />
 
           </div>
         </Reveal>

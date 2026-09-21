@@ -46,8 +46,20 @@ Minimus and Echo all show only rows they win, at 4 to 8 rows of prose with no ch
 A reader arriving on a comparison query assumes the page is selling; saying first how much
 is identical is what makes the differences land, and it fixes the scanning problem a
 26-to-32-row tick matrix has on its own. The lede also carries the differences switch,
-which previously sat alone at the right of the chapter index and orphaned a chip onto a
-second row at 1440.
+which previously sat alone at the right of the chapter index.
+
+**The chapter index is one scrolling line, not a wrapping row.** Moving the switch into the
+lede did NOT fix C1's chip wrap, contrary to what commit 3b4c3298 claimed: C1 has five
+groups whose chips total 1244px, and its widest ("Vulnerability Management & Remediation",
+350px) dropped onto a second row alone at 1440, 1280 and 1024. Lifting the "Jump to" label
+out of the row bought 69px and fixed 1440 only. `flex-wrap` cannot be balanced and an
+equal-width grid strands the same chip in a row of empty cells, so `ChapterIndex` scrolls
+horizontally instead, with a right-edge fade applied only while it actually overflows
+(a permanent mask clips the last chip on a row that fits). The track needs `min-w-0` on the
+nav: a flex item defaults to `min-width: auto`, and without it the track grows past its
+container and scrolls the page sideways. Verified no page-level horizontal scroll at 1440,
+1280, 1024, 768 and 375 on C1 and C3. C2 and C3 have four groups and fit without the fade
+down to 1024.
 
 | # | Page Name | URL Slug | Type | Status | Notes |
 |---|-----------|----------|------|--------|-------|
