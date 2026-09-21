@@ -25,9 +25,9 @@ const BLOCK_BACKGROUND =
 
 const CISO_VOICE = HOME_TESTIMONIALS.find((t) => t.company === "IIFL Finance");
 
-// The colored IIFL wordmark vanishes on a dark surface; the white wordmark
-// (orange mandala + white "IIFL FINANCE") reads cleanly here.
-const IIFL_WHITE_LOGO = "/images/testimonials/iifl-finance-white.webp";
+// The colored IIFL wordmark vanishes on a dark surface; `logoSrcDark` is the
+// white lockup (orange mandala + white "IIFL FINANCE") that reads cleanly here.
+const IIFL_WHITE_LOGO = CISO_VOICE?.logoSrcDark ?? CISO_VOICE?.logoSrc;
 
 // Shared style for the opening/closing quote marks framing the testimonial.
 const QUOTE_MARK_STYLE: React.CSSProperties = {
@@ -189,14 +189,16 @@ function ValidationSpotlight(): React.ReactElement | null {
                   className="h-4 w-px shrink-0"
                   style={{ background: "rgba(255,255,255,0.22)" }}
                 />
-                <Image
-                  src={IIFL_WHITE_LOGO}
-                  alt="IIFL Finance"
-                  width={132}
-                  height={26}
-                  sizes="132px"
-                  className="h-[24px] w-auto max-w-[140px] object-contain"
-                />
+                {IIFL_WHITE_LOGO && (
+                  <Image
+                    src={IIFL_WHITE_LOGO}
+                    alt="IIFL Finance"
+                    width={132}
+                    height={26}
+                    sizes="132px"
+                    className="h-[24px] w-auto max-w-[140px] object-contain"
+                  />
+                )}
               </div>
 
               {caseStudyHref && (
