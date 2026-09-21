@@ -2,6 +2,7 @@ import { cache } from "react";
 import type { BlogImage, LexicalRoot } from "@/lib/blog";
 
 import { fetchCMS } from "./cms-fetch";
+import { effectiveWebinarType } from "./webinars-utils";
 
 export type WebinarImage = BlogImage;
 
@@ -24,6 +25,7 @@ export type Webinar = {
   registrationMode: WebinarRegistrationMode;
   registrationUrl?: string | null;
   registrationForm?: { id: string; title?: string } | string | null;
+  recordingUrl?: string | null;
   eventStatus: WebinarEventStatus;
   publishedAt?: string | null;
   displayPublishedAt?: string | null;
@@ -52,7 +54,9 @@ export {
   FILTERABLE_TYPES,
   REGION_LABEL,
   WEBINAR_TYPE_LABEL,
+  effectiveWebinarType,
   formatWebinarDate,
+  isWebinarPast,
   parseRegionParam,
   parseTypeParam,
   regionLabel,
@@ -62,14 +66,18 @@ export {
 export interface WebinarListParams {
   page?: number;
   limit?: number;
-  type?: WebinarType;
   region?: WebinarRegion;
 }
 
+/**
+ * No `type` facet here on purpose: the type a webinar reads as depends on
+ * whether its slot has passed, which the CMS cannot express in a where-clause.
+ * Callers narrow by type in memory, after `withEffectiveTypes` has run
+ * (`selectWebinars` in `WebinarsContent.tsx`).
+ */
 export async function getWebinars({
   page = 1,
   limit = 9,
-  type,
   region,
 }: WebinarListParams = {}): Promise<WebinarsListResponse> {
   const params = new URLSearchParams({
@@ -100,15 +108,32 @@ export async function getWebinars({
     "timezone",
     "registrationMode",
     "registrationUrl",
+    "recordingUrl",
     "eventStatus",
     "publishedAt",
     "displayPublishedAt",
   ]) {
     params.set(`select[${field}]`, "true");
   }
-  if (type) params.set("where[webinarType][equals]", type);
   if (region) params.set("where[region][equals]", region);
-  return fetchCMS<WebinarsListResponse>(`/api/webinars?${params.toString()}`);
+  const data = await fetchCMS<WebinarsListResponse>(
+    `/api/webinars?${params.toString()}`,
+  );
+  return { ...data, docs: withEffectiveTypes(data.docs) };
+}
+
+/**
+ * The schedule, not the stored enum, decides what a webinar is. Rewriting
+ * `webinarType` here is the single choke point, so the listing filter, the
+ * card CTA and every other reader agree that a finished live session is now
+ * on-demand. Freshness is bounded by the route's ISR window.
+ */
+function withEffectiveTypes(docs: Webinar[]): Webinar[] {
+  const now = Date.now();
+  return docs.map((doc) => {
+    const webinarType = effectiveWebinarType(doc, now);
+    return webinarType === doc.webinarType ? doc : { ...doc, webinarType };
+  });
 }
 
 export const getWebinarBySlug = cache(

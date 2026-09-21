@@ -76,3 +76,54 @@ export function formatWebinarDate(
     }).format(new Date(iso));
   }
 }
+
+/**
+ * Types that describe a session held at a fixed time. Only `on-demand` is
+ * already timeless, so it is the one type the date cannot override.
+ */
+const SCHEDULED_TYPES: ReadonlyArray<WebinarType> = ["live", "panel", "demo"];
+
+/**
+ * A scheduled webinar with no explicit `endsAt` stays "live" for the whole of
+ * its start day — editors routinely save `startsAt` at midnight with no time,
+ * so ending it at the start timestamp would retire it before it airs.
+ */
+const IMPLIED_DURATION_MS = 24 * 60 * 60 * 1000;
+
+export type WebinarSchedule = {
+  webinarType: WebinarType;
+  startsAt?: string | null;
+  endsAt?: string | null;
+};
+
+/** Epoch ms the session is over, or `null` when it has no usable date. */
+function scheduleEndsAt(webinar: WebinarSchedule): number | null {
+  if (webinar.endsAt) {
+    const end = Date.parse(webinar.endsAt);
+    if (!Number.isNaN(end)) return end;
+  }
+  if (webinar.startsAt) {
+    const start = Date.parse(webinar.startsAt);
+    if (!Number.isNaN(start)) return start + IMPLIED_DURATION_MS;
+  }
+  return null;
+}
+
+/** True once a scheduled webinar has finished. Dateless rows are never past. */
+export function isWebinarPast(webinar: WebinarSchedule, now: number): boolean {
+  if (!SCHEDULED_TYPES.includes(webinar.webinarType)) return false;
+  const end = scheduleEndsAt(webinar);
+  return end !== null && end <= now;
+}
+
+/**
+ * The type the site presents, which the date decides. A `live` / `panel` /
+ * `demo` webinar whose slot has passed is on-demand from that moment, so the
+ * listing filter moves it without an editor touching the record.
+ */
+export function effectiveWebinarType(
+  webinar: WebinarSchedule,
+  now: number,
+): WebinarType {
+  return isWebinarPast(webinar, now) ? "on-demand" : webinar.webinarType;
+}

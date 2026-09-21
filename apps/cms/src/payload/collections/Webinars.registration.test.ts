@@ -31,6 +31,23 @@ const validateOf = (name: string): ValidateFn =>
 const conditionOf = (name: string): ConditionFn =>
   (namedField(name) as unknown as { admin: { condition: ConditionFn } }).admin.condition;
 
+describe('Webinars startsAt (drives the automatic move to On-demand)', () => {
+  const validate = validateOf('startsAt');
+
+  it('requires a start date for scheduled formats', () => {
+    for (const webinarType of ['live', 'panel', 'demo']) {
+      expect(validate(undefined, { siblingData: { webinarType } })).toMatch(/required/i);
+    }
+    expect(validate('2026-10-01T09:00:00.000Z', { siblingData: { webinarType: 'live' } })).toBe(
+      true,
+    );
+  });
+
+  it('exempts on-demand webinars, which have no slot', () => {
+    expect(validate(undefined, { siblingData: { webinarType: 'on-demand' } })).toBe(true);
+  });
+});
+
 describe('Webinars registrationMode discriminator', () => {
   it('keeps the canonical enum values (internal | external)', () => {
     const mode = namedField('registrationMode') as unknown as {
