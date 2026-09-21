@@ -195,9 +195,22 @@ function QualifiedMark({ tone }: { tone: CompareTone }): React.ReactElement {
 function Cell({
   cell,
   tone,
+  emphasise,
 }: {
   cell: MatrixCell;
   tone: CompareTone;
+  /**
+   * Whether this cell's phrase carries the column's emphasis.
+   *
+   * Emphasis follows the ROW, not the column: it is on only where the two
+   * vendors give different answers, and then only on ours. Where the source
+   * table gives both the same phrase, both cells render the same, because a
+   * row whose two answers are identical should not read as a stronger yes on
+   * one side. The verdict words were already column-independent; these are
+   * the cells that carry a phrase, and two of them on the Docker page
+   * ("Build Level 3", "7 days") were set in two weights.
+   */
+  emphasise: boolean;
 }): React.ReactElement {
   if (cell.kind === "yes") return <YesMark tone={tone} />;
   if (cell.kind === "no") return <NoMark />;
@@ -218,8 +231,8 @@ function Cell({
         <span
           className="block max-w-[40ch]"
           style={{
-            color: tone === "cleanstart" ? "#111111" : "rgba(17,17,17,0.74)",
-            fontWeight: tone === "cleanstart" ? 500 : 400,
+            color: emphasise ? "#111111" : "rgba(17,17,17,0.74)",
+            fontWeight: emphasise ? 500 : 400,
           }}
         >
           {cell.value}
@@ -231,8 +244,8 @@ function Cell({
     <span
       className="block max-w-[44ch]"
       style={{
-        color: tone === "cleanstart" ? "#111111" : "rgba(17,17,17,0.74)",
-        fontWeight: tone === "cleanstart" ? 500 : 400,
+        color: emphasise ? "#111111" : "rgba(17,17,17,0.74)",
+        fontWeight: emphasise ? 500 : 400,
       }}
     >
       {cell.value}
@@ -366,6 +379,11 @@ function DataRow({
   // instead of claiming a line of its own.
   const rivalInline = row.rival.kind !== "text";
   const cleanstartInline = row.cleanstart.kind !== "text";
+  /* Emphasis follows the row, not the column. Where the source table gives
+     both vendors the same phrase, neither cell is emphasised: "Build Level 3"
+     against "Build Level 3" in two weights read as a stronger yes on our side
+     of a row the lede above already concedes is a tie. */
+  const differs = !rowsAgree(row);
   const inlineCell =
     " max-lg:flex max-lg:items-center max-lg:justify-between max-lg:gap-4";
   return (
@@ -399,7 +417,7 @@ function DataRow({
         <CellLabel tone="rival" rivalMark={rivalMark} inline={rivalInline}>
           {vendor.rival}
         </CellLabel>
-        <Cell cell={row.rival} tone="rival" />
+        <Cell cell={row.rival} tone="rival" emphasise={false} />
       </td>
 
       <td
@@ -413,7 +431,7 @@ function DataRow({
         <CellLabel tone="cleanstart" rivalMark={rivalMark} inline={cleanstartInline}>
           {vendor.cleanstart}
         </CellLabel>
-        <Cell cell={row.cleanstart} tone="cleanstart" />
+        <Cell cell={row.cleanstart} tone="cleanstart" emphasise={differs} />
       </td>
     </tr>
   );
