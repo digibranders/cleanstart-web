@@ -33,6 +33,12 @@ export interface PageRegistryEntry {
  * on-demand revalidation on a registry edit), so the values are baked into the
  * page's static HTML — no per-request CMS dependency (INV-1).
  */
+/** Purges every registry read at once. */
+export const PAGE_REGISTRY_TAG = "page-registry";
+
+/** Purges one route's registry read. Must match the CMS hook's tag exactly. */
+export const pageRegistryTag = (path: string): string => `page-registry:${path}`;
+
 export async function getRegistryEntry(path: string): Promise<PageRegistryEntry> {
   try {
     const query = new URLSearchParams({
@@ -40,7 +46,14 @@ export async function getRegistryEntry(path: string): Promise<PageRegistryEntry>
       limit: "1",
       depth: "0",
     });
-    const res = await fetchCMS<PageRegistryResponse>(`/api/pageRegistry?${query.toString()}`);
+    // Tagged, because `revalidatePath` alone cannot fix a stale registry read:
+    // it purges the rendered route, but the re-render is then served this fetch
+    // from the data cache, which runs on the 24h default window. Without a tag
+    // a new row or a changed override could take a day to appear, which defeats
+    // the point of the registry's afterChange revalidation hook.
+    const res = await fetchCMS<PageRegistryResponse>(`/api/pageRegistry?${query.toString()}`, {
+      tags: [PAGE_REGISTRY_TAG, pageRegistryTag(path)],
+    });
     const doc = res.docs?.[0];
     return {
       override: doc?.additionalSchema ?? undefined,
