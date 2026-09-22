@@ -19,7 +19,9 @@ export const revalidate = 21600; // 6h ISR fallback — on-demand publish revali
  * shared with every other comparison.
  *
  * Launched 2026-09-08: the `noindex, nofollow` pair is dropped and the path is
- * listed in the sitemap's STATIC_ROUTES.
+ * listed in the sitemap's STATIC_ROUTES. The Red Hat and Chainguard
+ * comparisons and the `/compare` hub followed on 2026-09-22, so the whole
+ * family is indexable and the breadcrumb now carries a Compare crumb.
  */
 export default async function CleanStartVsDockerHardenedImagesPage(): Promise<React.ReactElement> {
   return <ComparePage content={DHI} />;

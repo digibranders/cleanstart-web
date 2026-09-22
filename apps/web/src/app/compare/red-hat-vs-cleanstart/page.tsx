@@ -8,11 +8,6 @@ export const metadata = buildPageMetadata({
   description: RED_HAT.meta.description,
   path: RED_HAT.path,
   eyebrow: "Comparison",
-  // Held back from search until the copy is signed off. Dropping these two
-  // lines is the launch step, together with adding the path to the sitemap's
-  // STATIC_ROUTES and linking it from the footer's Compare entry.
-  noindex: true,
-  nofollow: true,
 });
 
 export const revalidate = 21600; // 6h ISR fallback — matches the sibling comparison

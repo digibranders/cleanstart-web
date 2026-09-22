@@ -26,9 +26,6 @@ const COL_PRODUCT: FooterLink[] = [
   { label: "CleanSight", href: "/cleansight" },
   { label: "Tricorder", href: "/tricorder" },
   { label: "Pricing", href: "/pricing" },
-  // Labelled by category, not by competitor, so it points at the hub rather
-  // than at whichever comparison happens to be first.
-  { label: "Compare", href: "/compare" },
   { label: "Book a Demo", href: "/book-a-demo" },
 ];
 const COL_SOLUTIONS: FooterLink[] = [
@@ -41,6 +38,10 @@ const COL_SOLUTIONS: FooterLink[] = [
 ];
 const COL_COMPANY: FooterLink[] = [
   { label: "About Us", href: "/about-us" },
+  // The hub, never a single comparison: labelled by category so it does not
+  // have to change when a comparison is added or reordered. This is the only
+  // site-wide internal link the comparison family has.
+  { label: "Compare", href: "/compare" },
   { label: "Careers", href: "/careers" },
   { label: "Partners", href: "/partners" },
   { label: "Newsroom", href: "/news" },
