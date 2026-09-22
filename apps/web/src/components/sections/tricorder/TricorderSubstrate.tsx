@@ -74,7 +74,7 @@ const PRODUCTS: readonly [Product, Product, Product] = [
 ];
 
 function DecisionGlyph({ icon }: { icon: DecisionIcon }): React.ReactElement {
-  const props = { size: 16, strokeWidth: 1.9, 'aria-hidden': true } as const;
+  const props = { size: 20, strokeWidth: 1.9, 'aria-hidden': true } as const;
   switch (icon) {
     case 'release':
       return <Clock3 {...props} />;
@@ -217,19 +217,23 @@ function ProductCard({ product }: { product: Product }): React.ReactElement {
         WebkitBackdropFilter: 'blur(12px)',
       }}
     >
-      {/* The decision point leads the card: the section heading promises three of
-          them, so each card says which one it is before it says what ships it. */}
-      <div
-        className="flex items-center gap-2.5 px-[clamp(22px,2.2vw,30px)] pt-[clamp(20px,2vw,26px)] font-display"
-        style={{
-          color: `color-mix(in srgb, ${product.tint} 70%, #ffffff)`,
-          fontSize: 'var(--fs-body)',
-          fontWeight: 600,
-          letterSpacing: '-0.005em',
-        }}
-      >
-        <DecisionGlyph icon={product.icon} />
-        {product.decision}
+      {/* The decision point is the card's title. The section heading promises
+          three of them, so each card names its own before naming what ships it. */}
+      <div className="flex items-center gap-3 px-[clamp(22px,2.2vw,30px)] pt-[clamp(20px,2vw,26px)]">
+        <span aria-hidden style={{ color: `color-mix(in srgb, ${product.tint} 70%, #ffffff)` }}>
+          <DecisionGlyph icon={product.icon} />
+        </span>
+        <h3
+          className="font-display text-white"
+          style={{
+            fontSize: 'var(--fs-h4)',
+            fontWeight: 600,
+            letterSpacing: '-0.02em',
+            lineHeight: 1.2,
+          }}
+        >
+          {product.decision}
+        </h3>
         <span
           aria-hidden
           className="ml-auto shrink-0 text-white/50 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-white"
@@ -254,19 +258,20 @@ function ProductCard({ product }: { product: Product }): React.ReactElement {
           />
         </div>
         <div className="min-w-0 pt-1">
-          <h3
-            className="font-display text-white"
+          <p
+            className="font-display"
             style={{
-              fontSize: 'var(--fs-h4)',
+              fontSize: 'var(--fs-body)',
               fontWeight: 600,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.2,
+              letterSpacing: '-0.005em',
+              lineHeight: 1.3,
+              color: `color-mix(in srgb, ${product.tint} 70%, #ffffff)`,
             }}
           >
             {product.title}
-          </h3>
+          </p>
           <p
-            className="mt-2 font-sans text-white/72"
+            className="mt-1.5 font-sans text-white/72"
             style={{ fontSize: 'var(--fs-body)', lineHeight: 1.5, letterSpacing: '-0.01em' }}
           >
             {product.desc}
