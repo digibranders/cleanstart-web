@@ -616,6 +616,23 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: requireEnv('DATABASE_URI'),
+      // `pg` defaults to max: 10. That is well under what a single admin
+      // page needs: the dashboard alone issues ~20 concurrent counts, the
+      // nav badges another ~10, and sixteen cron queues compete with all
+      // of it. Past ten in flight, every further query waits for a
+      // connection before it waits for Postgres — which reads to an
+      // editor as "the CMS is slow" with an idle database.
+      //
+      // Keep the ceiling under the server's `max_connections` (100 by
+      // default) divided by the number of app processes; DB_POOL_MAX is
+      // the escape hatch when that maths changes.
+      max: Number.parseInt(process.env.DB_POOL_MAX ?? '25', 10),
+      // Recycle idle connections so a burst doesn't pin 25 sockets open
+      // for the rest of the process's life.
+      idleTimeoutMillis: 30_000,
+      // Fail a checkout that can't be served rather than hanging the
+      // request forever when the pool really is exhausted.
+      connectionTimeoutMillis: 10_000,
     },
     // Migrations are authoritative in staging / prod / CI. Local dev
     // keeps `push: true` so editors can iterate on collection shape

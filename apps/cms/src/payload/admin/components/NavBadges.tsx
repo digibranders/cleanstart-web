@@ -73,6 +73,19 @@ type CountBucket = { draft?: number; published?: number; total?: number };
 let cachedCounts: Record<string, CountBucket> = {};
 
 /**
+ * When `cachedCounts` was last refreshed from the API.
+ *
+ * This component mounts through `admin.components.actions`, which
+ * remounts on EVERY admin navigation. Without this gate each navigation
+ * re-fired one count request per versioned collection — ten parallel
+ * authenticated REST calls racing the page the editor is actually
+ * waiting on, for numbers that had been fetched seconds earlier. The
+ * counts are a glanceable tally, not a live readout, so a remount inside
+ * the poll window repaints from cache and skips the fan-out entirely.
+ */
+let cachedCountsAt = 0;
+
+/**
  * Mounts globally via `admin.components.actions` and renders nothing.
  * On mount + every 60s it fetches draft counts for every versioned
  * content collection, then DOM-injects:
@@ -253,6 +266,7 @@ export const NavBadges = (): ReactElement | null => {
     const fetchAndInject = async (): Promise<void> => {
       const listSlug = listSlugFromPath();
       headerSlug = listSlug;
+      cachedCountsAt = Date.now();
 
       // Sidebar badges only consume the `draft` tally, so fetch those
       // first and inject each as it resolves — badges appear
@@ -283,9 +297,21 @@ export const NavBadges = (): ReactElement | null => {
     };
 
     // Paint cached counts synchronously on (re)mount so the badges never
-    // flash empty during navigation, then refresh in the background.
+    // flash empty during navigation, then refresh in the background —
+    // but only when the cache has actually gone stale (see
+    // `cachedCountsAt`). A navigation inside the poll window still picks
+    // up the current page's header count below, which is one request,
+    // not the whole sidebar fan-out.
+    const cacheAge = Date.now() - cachedCountsAt;
+    const cacheWarm = Object.keys(counts).length > 0 && cacheAge < POLL_INTERVAL_MS;
     if (Object.keys(counts).length > 0) inject();
-    void fetchAndInject();
+    if (cacheWarm) {
+      const listSlug = listSlugFromPath();
+      headerSlug = listSlug;
+      if (listSlug) void fetchHeaderCount(listSlug);
+    } else {
+      void fetchAndInject();
+    }
     const fetchTimer = window.setInterval(() => {
       void fetchAndInject();
     }, POLL_INTERVAL_MS);

@@ -8,6 +8,7 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { QuickCreateDialog } from '@cleanstart/ui';
 
 import { QUICK_CREATE_CONFIG } from '../../lib/quick-create-config';
+import { fetchRelatedDocs } from '../../lib/related-docs';
 import { Popover } from '../ui/Popover';
 import { Spinner } from '../ui/Spinner';
 import { type EntryRef, type StoredValue, normalise, toStored } from './relationship-value';
@@ -162,24 +163,61 @@ const docToResolved = (
   return result;
 };
 
-const fetchOne = async (relationTo: string, id: string): Promise<ResolvedDoc> => {
-  const cacheKey = `${relationTo}:${id}`;
-  const hit = docCache.get(cacheKey);
-  if (hit) return hit;
-  try {
-    const res = await fetch(`/api/${relationTo}/${id}?depth=1`, { credentials: 'include' });
-    if (!res.ok) {
-      const fallback: ResolvedDoc = { id, relationTo, primary: id };
-      docCache.set(cacheKey, fallback);
-      return fallback;
+/**
+ * Every field name any row hint can render, plus the ones `pickThumb`
+ * and the status badge read. Handed to Payload's `select` so resolving a
+ * pill returns a title rather than a whole document — a `relatedPosts`
+ * field used to pull each referenced article's full Lexical body across
+ * the wire to draw a chip.
+ *
+ * Derived from the hints themselves so adding a `secondary` field above
+ * can't silently stop it from being fetched.
+ */
+const PILL_SELECT_FIELDS: readonly string[] = Array.from(
+  new Set<string>([
+    ...[DEFAULT_HINT, ...Object.values(ROW_HINTS)].flatMap((hint) => [
+      ...hint.primary,
+      ...hint.secondary,
+    ]),
+    // pickThumb + status badge inputs.
+    'url',
+    'sizes',
+    'photo',
+    'mimeType',
+    '_status',
+  ]),
+);
+
+/**
+ * Resolve the pills for one relationship target in a single request.
+ *
+ * Goes through the shared `fetchRelatedDocs` batcher, so every
+ * relationship field mounting on the same edit view coalesces into one
+ * request per collection instead of one per selected id. An edit view
+ * with authors, categories and related posts selected used to fire a
+ * dozen serial-ish round-trips before its chips stopped showing raw ids.
+ */
+const fetchMany = async (
+  relationTo: string,
+  ids: ReadonlyArray<string>,
+): Promise<ReadonlyArray<ResolvedDoc>> => {
+  const missing = ids.filter((id) => !docCache.has(`${relationTo}:${id}`));
+  if (missing.length > 0) {
+    const docs = await fetchRelatedDocs(relationTo, missing, {
+      depth: 1,
+      select: PILL_SELECT_FIELDS,
+    });
+    for (const id of missing) {
+      const doc = docs.get(id);
+      docCache.set(
+        `${relationTo}:${id}`,
+        doc ? docToResolved(doc, relationTo) : { id, relationTo, primary: id },
+      );
     }
-    const json = (await res.json()) as Record<string, unknown>;
-    const resolved = docToResolved(json, relationTo);
-    docCache.set(cacheKey, resolved);
-    return resolved;
-  } catch {
-    return { id, relationTo, primary: id };
   }
+  return ids.map(
+    (id) => docCache.get(`${relationTo}:${id}`) ?? { id, relationTo, primary: id },
+  );
 };
 
 type SearchResults = ReadonlyArray<ResolvedDoc>;
@@ -197,6 +235,13 @@ const fetchSearch = async (
       url.searchParams.set('limit', '20');
       url.searchParams.set('depth', '1');
       url.searchParams.set('sort', '-updatedAt');
+      // Same trim as the pill resolver: the dropdown renders a title, a
+      // subtitle and a thumb, so there is no reason for twenty full
+      // documents (Lexical bodies included) to cross the wire per
+      // keystroke-debounce.
+      for (const fieldName of PILL_SELECT_FIELDS) {
+        url.searchParams.set(`select[${fieldName}]`, 'true');
+      }
       const trimmed = query.trim();
       if (trimmed.length > 0) {
         // Search across the most likely title-bearing fields. `or` array
@@ -260,8 +305,32 @@ export const RelationshipField = (props: RelationshipFieldClientProps): ReactEle
         cancelled = true;
       };
     }
-    void Promise.all(entries.map((e) => fetchOne(e.relationTo, e.id))).then((resolved) => {
-      if (!cancelled) setPills(resolved);
+    // Group by target collection so each one is a single batched request,
+    // then re-order back to the editor's selection order.
+    const byCollection = new Map<string, string[]>();
+    for (const entry of entries) {
+      const ids = byCollection.get(entry.relationTo);
+      if (ids) ids.push(entry.id);
+      else byCollection.set(entry.relationTo, [entry.id]);
+    }
+    void Promise.all(
+      Array.from(byCollection, ([relationTo, ids]) => fetchMany(relationTo, ids)),
+    ).then((groups) => {
+      if (cancelled) return;
+      const resolvedByKey = new Map<string, ResolvedDoc>();
+      for (const group of groups) {
+        for (const doc of group) resolvedByKey.set(`${doc.relationTo}:${doc.id}`, doc);
+      }
+      setPills(
+        entries.map(
+          (e) =>
+            resolvedByKey.get(`${e.relationTo}:${e.id}`) ?? {
+              id: e.id,
+              relationTo: e.relationTo,
+              primary: e.id,
+            },
+        ),
+      );
     });
     return () => {
       cancelled = true;
