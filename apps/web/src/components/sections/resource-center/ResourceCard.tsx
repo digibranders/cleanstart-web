@@ -36,7 +36,14 @@ export function ResourceCard({ resource }: ResourceCardProps): React.ReactElemen
       className="relative bg-white overflow-hidden flex flex-col w-full mx-auto"
       style={{
         maxWidth: "328px",
-        minHeight: "clamp(300px, 26vw, 354px)",
+        // Flat, not `clamp(300px, 26vw, 354px)`. The card is a fixed-width
+        // grid cell whose content is absolutely positioned, so min-height IS
+        // its height. Tying that to the viewport shrank the card to the 300px
+        // floor below ~1154px, exactly where the narrower column makes the
+        // title wrap onto more lines: the 3-line clamp then had no room and
+        // the last line was cut mid-glyph against the CTA. 354px is the height
+        // the card already had at desktop, so this only stops the shrinking.
+        minHeight: "354px",
         borderRadius: "32px",
         boxShadow:
           "0px 81px 23px 0px rgba(0,0,0,0), 0px 52px 21px 0px rgba(0,0,0,0), 0px 29px 17px 0px rgba(0,0,0,0.01), 0px 13px 13px 0px rgba(0,0,0,0.01), 0px 3px 7px 0px rgba(0,0,0,0.02)",
