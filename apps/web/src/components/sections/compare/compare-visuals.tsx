@@ -1,9 +1,10 @@
 import Image from "next/image";
 import { cn } from "@/lib/cn";
 import { Reveal } from "@/components/ui/Reveal";
+import type { CompareTone } from "./compare-types";
 
 /**
- * Visual vocabulary for the comparison page.
+ * Visual vocabulary shared by every `/compare/*` page.
  *
  * Every device here resolves to something apps/web already ships: the violet 3D
  * icon set under `public/images`, the shared decorative SVGs (hex-grid unions,
@@ -12,8 +13,8 @@ import { Reveal } from "@/components/ui/Reveal";
  *
  * There is deliberately no accent-colour array. The site's palette runs
  * violet → indigo → blue, and the page spends it on one axis only: CleanStart
- * is violet, Docker Hardened Images is neutral slate. A second accent hue for
- * the comparator would read as a second brand.
+ * is violet, the rival is neutral slate. A second accent hue for the
+ * comparator would read as a second brand.
  */
 
 /* ─────────────────────────── tokens ─────────────────────────── */
@@ -35,8 +36,8 @@ export const BRAND = {
   violetPale: "#DF9BFF",
   indigo: "#131E8F",
   blue: "#076EFF",
-  /** Neutral used for the Docker Hardened Images side, so it reads as the
-   *  comparator rather than as a second brand. */
+  /** Neutral used for the rival side, so it reads as the comparator rather
+   *  than as a second brand. */
   slate: "#334155",
 } as const;
 
@@ -146,12 +147,22 @@ export function BandHeader({
 }: {
   id: string;
   heading: string;
-  intro: string;
+  /** Omitted where the source document writes the heading with no standfirst. */
+  intro?: string | undefined;
   tone?: "light" | "dark";
 }): React.ReactElement {
   const dark = tone === "dark";
   return (
-    <div className="grid gap-y-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-start lg:gap-x-16">
+    // Without an intro the heading takes the band on its own and is given the
+    // wider measure a single column can carry, rather than leaving the right
+    // half of the grid empty.
+    <div
+      className={
+        intro
+          ? "grid gap-y-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-start lg:gap-x-16"
+          : "grid gap-y-5"
+      }
+    >
       <Reveal header>
         <h2
           id={id}
@@ -162,12 +173,13 @@ export function BandHeader({
             letterSpacing: "var(--fs-h2-ls)",
             lineHeight: "var(--fs-h2-lh)",
             color: dark ? "#ffffff" : "#111111",
-            maxWidth: "20ch",
+            maxWidth: intro ? "20ch" : "26ch",
           }}
         >
           <AccentHeading text={heading} />
         </h2>
       </Reveal>
+      {intro ? (
       <Reveal delay={0.1} y={20}>
         <p
           /* A small top inset so the paragraph's first line reads as level
@@ -187,20 +199,24 @@ export function BandHeader({
           {intro}
         </p>
       </Reveal>
+      ) : null}
     </div>
   );
 }
 
 /* ───────────────────────────── vendor marks ───────────────────────────── */
 
-/** Vendor mark: the Docker whale on a white plate, the CleanStart logomark on
+/** Vendor mark: the rival's logo on a white plate, the CleanStart logomark on
     the dark-band tile it needs (the mark is white and cyan, and vanishes on
     any light surface). Decorative; the label names it. */
 export function VendorMark({
   tone,
+  rivalMark,
   size = 36,
 }: {
-  tone: "docker" | "cleanstart";
+  tone: CompareTone;
+  /** The rival's logo. Unused on the CleanStart side, which has its own mark. */
+  rivalMark: string;
   size?: number;
 }): React.ReactElement {
   const isCleanStart = tone === "cleanstart";
@@ -224,11 +240,7 @@ export function VendorMark({
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={
-          isCleanStart
-            ? "/images/security/cs-logomark.svg"
-            : "/images/compare/tools/docker.svg"
-        }
+        src={isCleanStart ? "/images/security/cs-logomark.svg" : rivalMark}
         alt=""
         width={glyph}
         height={glyph}
@@ -583,20 +595,36 @@ export const cornerAt = (index: number): Corner =>
 export function CornerTile({
   corner,
   className,
+  subgridRows,
   children,
 }: {
   corner: Corner;
   className?: string;
+  /**
+   * Lay the tile out as a subgrid spanning this many rows of its parent grid
+   * instead of as a stack, so a row of tiles can align its children with each
+   * other. The tile's own radius, border, fill and padding are unchanged;
+   * only its internal layout mode differs, and the 12px stack gap is dropped
+   * because a subgrid inherits its parent's row gap and the caller spaces
+   * children with margins.
+   */
+  subgridRows?: number;
   children: React.ReactNode;
 }): React.ReactElement {
   return (
     <article
-      className={cn("relative flex h-full flex-col bg-white", className)}
+      className={cn(
+        "relative bg-white",
+        subgridRows ? "grid grid-rows-subgrid" : "flex h-full flex-col",
+        className,
+      )}
       style={{
         borderRadius: CORNER_RADIUS[corner],
         border: "1.5px solid rgba(0,0,0,0.06)",
         padding: "clamp(20px, 1.67vw, 30px)",
-        gap: "12px",
+        ...(subgridRows
+          ? { gridRow: `span ${subgridRows}`, rowGap: 0 }
+          : { gap: "12px" }),
       }}
     >
       {children}

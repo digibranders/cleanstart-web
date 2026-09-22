@@ -88,6 +88,17 @@ describe('buildCsp', () => {
     expect(d['script-src']).toContain('https:');
   });
 
+  it('allows the Microsoft Clarity hosts in connect-src and img-src', () => {
+    const d = parse(buildCsp(base));
+    expect(d['connect-src']).toContain('https://*.clarity.ms');
+    expect(d['img-src']).toContain('https://*.clarity.ms');
+    // Clarity syncs identity through c.bing.com over both fetch and pixel.
+    expect(d['connect-src']).toContain('https://c.bing.com');
+    expect(d['img-src']).toContain('https://c.bing.com');
+    // The www.clarity.ms loader is served over https: (no per-host script-src).
+    expect(d['script-src']).toContain('https:');
+  });
+
   it('locks object-src, base-uri and form-action', () => {
     const d = parse(buildCsp(base));
     expect(d['object-src']).toBe("'none'");

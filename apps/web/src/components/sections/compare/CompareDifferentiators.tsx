@@ -1,6 +1,6 @@
 import { Section, Container } from "@/components/layout";
 import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
-import { DIFFERENTIATORS } from "./compare-data";
+import type { DifferentiatorsSection } from "./compare-types";
 import { AccentHeading, EnterpriseUnions, Icon3D, WASH_LAVENDER } from "./compare-visuals";
 
 /**
@@ -17,7 +17,7 @@ function unbreakable(heading: string): React.ReactNode {
 }
 
 /**
- * "Where CleanStart Differentiates" and its three sub-headings.
+ * "Where CleanStart Differentiates" and its sub-headings.
  *
  * These are the document's only H2s, so they are the page's only H3s. Laid
  * out the way the site's "Why It Matters" bands are: three open columns split
@@ -26,7 +26,11 @@ function unbreakable(heading: string): React.ReactNode {
  * band, and the icons need room to carry it. Three columns need `lg` to hold
  * a readable measure; below it they stack.
  */
-export function CompareDifferentiators(): React.ReactElement {
+export function CompareDifferentiators({
+  content,
+}: {
+  content: DifferentiatorsSection;
+}): React.ReactElement {
   return (
     <Section
       padding="lg"
@@ -49,13 +53,13 @@ export function CompareDifferentiators(): React.ReactElement {
                 lineHeight: "var(--fs-h2-lh)",
               }}
             >
-              <AccentHeading text={DIFFERENTIATORS.heading} />
+              <AccentHeading text={content.heading} />
             </h2>
           </Reveal>
         </div>
 
         <RevealStagger className="mt-12 grid gap-10 lg:mt-16 lg:grid-cols-3 lg:gap-0">
-          {DIFFERENTIATORS.items.map((item, index) => (
+          {content.items.map((item, index) => (
             <RevealItem
               key={item.id}
               className="relative flex flex-col lg:px-[clamp(20px,2.5vw,40px)] lg:first:pl-0 lg:last:pr-0"
@@ -77,7 +81,24 @@ export function CompareDifferentiators(): React.ReactElement {
                 /* The measures are sized for the three-column desktop layout;
                    below lg the column is the full width and a 20ch cap just
                    leaves half the band empty. */
-                className="mt-6 font-display text-[#111111] lg:max-w-[20ch]"
+                /* Two lines, always. With three columns side by side, a
+                   heading that fits on one pulled its paragraph up level with
+                   its neighbours' second line.
+                   18ch is measured, not guessed: across the Docker, Red Hat and
+                   Chainguard headings every one sets to exactly two lines
+                   anywhere from 17.5ch to 19ch. Above 19ch the shortest
+                   ("Discover. Remediate. Verify.") collapses to one line; at
+                   17ch the longest ("Verified Software Across the Supply
+                   Chain") spills to three. 18ch sits a full 1ch clear of both.
+                   `min-h` stays as the backstop for a future heading short
+                   enough to fit on one line anyway.
+                   The floor alone is what aligns the paragraphs, and it needs
+                   no maintenance; the `max-w` exists only because the brief
+                   was that every heading SET to two lines, which needs the
+                   wrap forced. So re-sweep the band when a comparison is
+                   added: count real line boxes (Range#getClientRects), never
+                   height / line-height, which this `min-h` makes lie. */
+                className="mt-6 font-display text-[#111111] lg:min-h-[2lh] lg:max-w-[18ch]"
                 style={{
                   fontSize: "var(--fs-h3)",
                   fontWeight: "var(--fs-h3-weight)",

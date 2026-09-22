@@ -1102,8 +1102,14 @@ body {
      This also keeps the page's primary action on the 44px WCAG 2.5.8 target
      that the same rule cites, instead of below it. Two class selectors outrank
      the single-class rule, which is what lets it win when both are
-     `!important`. */
-  .cs-btn-glass.cs-hero-cta {
+     `!important`.
+
+     `.cs-btn-blue` carries the same escape hatch because a hero may run a
+     solid primary on its own rather than a pair. It matched nothing before
+     `/compare` used it, so adding it cannot resize a button on any existing
+     page. */
+  .cs-btn-glass.cs-hero-cta,
+  .cs-btn-blue.cs-hero-cta {
     --cs-btn-h: 44px !important;
     --cs-btn-fs: var(--cs-hero-cta-fs, 17px) !important;
     height: 44px !important;
@@ -3487,8 +3493,25 @@ body {
   display: block;
 }
 
-/* Scrim on the portrait's inner edge so it fades into the card rather than
-   ending on a hard vertical seam against the quote. */
+.cs-tt-card__monogram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(120% 90% at 30% 20%, rgba(111, 141, 255, 0.38) 0%, rgba(51, 186, 236, 0.14) 48%, rgba(0, 0, 0, 0) 100%),
+    linear-gradient(145deg, #241C4E 0%, #2B2A7A 60%, #3A2790 100%);
+  color: rgba(255, 255, 255, 0.88);
+  font-family: var(--font-display), Manrope, sans-serif;
+  font-weight: 600;
+  font-size: clamp(32px, 4vw, 56px);
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+/* Scrim on the panel's inner edge so the portrait (or the monogram) fades
+   into the card rather than ending on a hard vertical seam against the quote. */
 .cs-tt-card__photo::after {
   content: "";
   position: absolute;

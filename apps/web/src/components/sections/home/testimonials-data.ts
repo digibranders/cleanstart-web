@@ -15,21 +15,12 @@ export interface Testimonial {
   company: string;
   /** Optional logo asset (same files served from BrandMarquee). When
    *  provided, `CompanyMark` renders the wordmark image instead of the
-   *  text-only orb placeholder. */
+   *  text-only orb placeholder. Light surfaces (the home card) use this one. */
   logoSrc?: string;
-  /**
-   * Knockout variant for the dark testimonial card, whose background is the
-   * violet gradient regardless of the section's theme. Most customer marks are
-   * drawn colour-on-light: Coforge's wordmark is near-black and IIFL's is dark
-   * navy, so on the card they disappear. Falls back to `logoSrc` when the mark
-   * already reads on dark (Vi is red on transparent).
-   */
-  logoDarkSrc?: string;
-  /**
-   * Optional headshot. Without one the card renders an initials monogram in
-   * the same slot (see `MonogramPortrait`) — the slot is never left empty,
-   * which is what an earlier missing-fallback produced.
-   */
+  /** Reverse lockup for the dark carousel card. Dark-ink wordmarks (IIFL,
+   *  Coforge) disappear on that surface, so the card prefers this when set. */
+  logoSrcDark?: string;
+  /** Optional headshot. Falls back to the shared placeholder when omitted. */
   photoSrc?: string;
   quote: string;
   caseStudyHref?: string;
@@ -50,7 +41,7 @@ export const HOME_TESTIMONIALS: Testimonial[] = [
     role: "Head, Risk and App security, IIFL Finance",
     company: "IIFL Finance",
     logoSrc: "/images/testimonials/iifl-finance.png",
-    logoDarkSrc: "/images/testimonials/iifl-finance-white.webp",
+    logoSrcDark: "/images/testimonials/iifl-finance-white.webp",
     photoSrc: "/images/testimonials/shanker-ramrakhiani.webp",
     quote:
       "CleanStart helped us standardize our container foundations without slowing development. Tasks that previously required significant manual effort are now eliminated, deployments are faster, and our security team has greater confidence in the images we use.",
@@ -61,7 +52,7 @@ export const HOME_TESTIMONIALS: Testimonial[] = [
     role: "CEO, Aurascape",
     company: "Aurascape",
     logoSrc: "/images/testimonials/aurascape-logo.png",
-    logoDarkSrc: "/images/trusted/08-aurascape.webp",
+    logoSrcDark: "/images/trusted/08-aurascape.webp",
     photoSrc: "/images/testimonials/moinul-khan.webp",
     quote:
       "Standardizing on verified container foundations gave us confidence in the base of every service we deploy and allowed us to shift security much earlier in the build process.",
@@ -72,8 +63,17 @@ export const HOME_TESTIMONIALS: Testimonial[] = [
     role: "VP Enterprise Architecture, Coforge",
     company: "Coforge",
     logoSrc: "/images/testimonials/coforge-logo.svg",
-    logoDarkSrc: "/images/trusted/14-coforge.svg",
+    logoSrcDark: "/images/trusted/14-coforge.svg",
     quote:
       "Modern software depends on open source, but every component must be trusted before deployment. CleanStart provides the verification and assurance we need to innovate confidently while maintaining strong software supply chain security.",
+  },
+  {
+    name: "Narasimha Kamath",
+    role: "Global CISO, o9 Solutions",
+    company: "o9 Solutions",
+    logoSrc: "/images/testimonials/o9-solutions.webp",
+    logoSrcDark: "/images/trusted/07-o9.webp",
+    quote:
+      "Migrating away from public container images was an important step for us. CleanStart enabled a smooth transition by providing secure, verified images, customization support, and greater control over image quality, helping us improve both security posture and operational efficiency.",
   },
 ];

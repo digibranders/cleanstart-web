@@ -16,6 +16,7 @@ import { JsonLdGraph } from '@/components/JsonLdGraph';
 import { buildPageGraph, seoOverride } from '@/lib/seo/compose-page';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { effectiveModifiedAt } from '@/lib/published-date';
 
 export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
   const slugs = await getKnowledgeArticleSlugs();
@@ -50,7 +51,7 @@ export async function generateMetadata({
     eyebrow: article.category?.name ?? 'Knowledge Hub',
     type: 'article',
     publishedTime: article.publishedAt ?? undefined,
-    modifiedTime: article.updatedAt ?? undefined,
+    modifiedTime: effectiveModifiedAt(article),
     ...(seo.noindex ? { noindex: true, nofollow: seo.nofollow } : {}),
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
     ...(seo.image ? { image: seo.image } : {}),
@@ -100,7 +101,7 @@ export default async function KnowledgeHubArticlePage({
               description: article.abstract ?? undefined,
               path: `/knowledge-hub/${article.slug}`,
               publishedAt: article.publishedAt ?? undefined,
-              modifiedAt: article.updatedAt ?? undefined,
+              modifiedAt: effectiveModifiedAt(article),
               imageUrl: articleImage,
               type: article.category?.name,
             }),

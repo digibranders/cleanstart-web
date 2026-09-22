@@ -174,6 +174,7 @@ export interface KhArticle {
   tableOfContents?: TocEntry[] | null;
   seo?: CmsSeo | null;
   publishedAt?: string | null;
+  contentUpdatedAt?: string | null;
   updatedAt?: string | null;
   faqs?: KhFaqItem[] | null;
 }
@@ -181,7 +182,7 @@ export interface KhArticle {
 /** Fetch a single published article by slug (depth 1 for the category name and seo.ogImage). */
 export async function getKnowledgeArticle(slug: string): Promise<KhArticle | null> {
   const res = await fetchCMS<CmsList<KhArticle & { category?: { name: string } | number | null }>>(
-    `/api/knowledgeBase?${PUBLISHED}&depth=1&limit=1&where[slug][equals]=${encodeURIComponent(slug)}&select[title]=true&select[slug]=true&select[abstract]=true&select[videoUrl]=true&select[body]=true&select[tableOfContents]=true&select[category]=true&select[seo]=true&select[publishedAt]=true&select[updatedAt]=true&select[faqs]=true`,
+    `/api/knowledgeBase?${PUBLISHED}&depth=1&limit=1&where[slug][equals]=${encodeURIComponent(slug)}&select[title]=true&select[slug]=true&select[abstract]=true&select[videoUrl]=true&select[body]=true&select[tableOfContents]=true&select[category]=true&select[seo]=true&select[publishedAt]=true&select[contentUpdatedAt]=true&select[updatedAt]=true&select[faqs]=true`,
   );
   const doc = res.docs[0];
   if (!doc) return null;

@@ -1,16 +1,16 @@
 /**
- * Typed GA4 custom-event emitter.
+ * Typed dataLayer event emitter.
  *
- * Fires `gtag('event', …)` against the tag loaded by <Ga4HeadScript/>. GA4
- * measurement is un-gated (analytics_storage is granted by default — see
- * lib/consent/consent-mode-snippet.ts), so events are emitted unconditionally —
+ * Pushes GTM custom events, which the container maps onto GA4 event tags (see
+ * docs/web/TRACKING-TAGS.md). GA4 measurement is un-gated (analytics_storage is
+ * granted by default outside the EEA/UK/CH, see
+ * lib/consent/consent-mode-snippet.ts), so events are pushed unconditionally and
  * caller code never needs to read consent state. Safe on the server (no-ops) and
- * safe before gtag.js finishes loading: the head consent snippet defines the
- * `window.gtag` queue stub, so early events are queued and replayed, and the
- * call short-circuits entirely where the snippet is absent.
+ * safe before the container finishes loading: the head consent snippet creates
+ * `window.dataLayer`, and GTM replays whatever is already queued when it boots.
  *
  * Use only for meaningful conversions/interactions. Automatic + enhanced-
- * measurement events (scroll, outbound click) are already captured by GA4 — do
+ * measurement events (scroll, outbound click) are already captured by GA4, so do
  * NOT re-emit them here. Two exceptions are deliberately manual because
  * enhanced measurement cannot see them on this site:
  *  - `page_view` on SPA route changes (<Ga4RouteTracker/>): the property's
@@ -18,16 +18,12 @@
  *  - `search`: the ⌘K palette / typeahead never put `?q=` in the URL, so GA4's
  *    site-search detection never fires.
  */
-type GtagFn = (
-  command: "event",
-  eventName: string,
-  params?: Record<string, unknown>,
-) => void;
 
 /**
  * Events we emit. GA4 recommended names are used where one exists
  * (`generate_lead`, `file_download`, `search`); the rest are custom
- * snake_case names.
+ * snake_case names. Each needs a matching Custom Event trigger and GA4 event
+ * tag in the GTM container.
  */
 export type Ga4EventName =
   | "generate_lead"
@@ -46,14 +42,53 @@ export type Ga4EventName =
   | "cta_click"
   | "search";
 
-/** Flat, primitive-valued params (GA4 rejects nested objects/arrays). */
-export type Ga4EventParams = Record<string, string | number | boolean | undefined>;
+/**
+ * Every parameter key any event may carry.
+ *
+ * GTM data layer variables persist once set, so a key left over from an earlier
+ * push would silently attach itself to a later, unrelated event. Each emit
+ * therefore sets the whole list to `undefined` in the same push as the event.
+ * `undefined` rather than `null`: GTM's merge still overwrites the stale value,
+ * and a Data Layer Variable resolving to undefined makes the GA4 tag omit the
+ * param instead of sending a literal null. Params are typed against this list, so a
+ * new key at a call site fails typecheck until it is added here, and it also
+ * needs a Data Layer Variable in GTM before GA4 will receive it.
+ */
+const EVENT_PARAM_KEYS = [
+  "form_name",
+  "gated",
+  "job_slug",
+  "marketing_opt_in",
+  "search_term",
+  "search_results",
+  "search_scope",
+  "resource_slug",
+  "resource_title",
+  "cta",
+  "page",
+  "video_id",
+  "page_location",
+  "page_title",
+  "page_referrer",
+] as const;
 
-function emit(name: string, params?: Record<string, unknown>): void {
+type EventParamKey = (typeof EVENT_PARAM_KEYS)[number];
+
+/** Flat, primitive-valued params (GA4 rejects nested objects/arrays). */
+export type Ga4EventParams = Partial<
+  Record<EventParamKey, string | number | boolean | undefined>
+>;
+
+type DataLayer = Array<Record<string, unknown>>;
+
+function emit(name: string, params?: Ga4EventParams): void {
   if (typeof window === "undefined") return;
-  const gtag = (window as Window & { gtag?: GtagFn }).gtag;
-  if (typeof gtag !== "function") return;
-  gtag("event", name, params);
+  const dataLayer = (window as Window & { dataLayer?: DataLayer }).dataLayer;
+  if (!Array.isArray(dataLayer)) return;
+
+  const payload: Record<string, unknown> = { event: name };
+  for (const key of EVENT_PARAM_KEYS) payload[key] = params?.[key];
+  dataLayer.push(payload);
 }
 
 export function trackEvent(name: Ga4EventName, params?: Ga4EventParams): void {
@@ -61,8 +96,8 @@ export function trackEvent(name: Ga4EventName, params?: Ga4EventParams): void {
 }
 
 /**
- * Manual `page_view` for client-side route changes. The initial page load's
- * page_view comes from `gtag('config', …)` in <Ga4HeadScript/>; <Ga4RouteTracker/>
+ * Manual `page_view` for client-side route changes. The hard load's page_view
+ * comes from the GTM Google tag firing on Initialization; <Ga4RouteTracker/>
  * calls this for every subsequent soft navigation with the post-commit
  * document.title (GA4's own history tracking reads the PREVIOUS page's title).
  */

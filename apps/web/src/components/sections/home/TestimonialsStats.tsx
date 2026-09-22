@@ -152,7 +152,7 @@ function TestimonialCard({
       />
 
       {/* Stacking grid — every slide shares one grid cell, so the card always
-          sizes to the TALLEST testimonial (IIFL) and its height never shifts
+          sizes to the TALLEST testimonial and its height never shifts
           when the active slide changes. */}
       <div className="grid">
         {items.map((t, i) => (

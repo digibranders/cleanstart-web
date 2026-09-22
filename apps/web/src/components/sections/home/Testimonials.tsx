@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import type React from 'react';
-import Image from 'next/image';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Reveal } from '@/components/ui/Reveal';
-import { HOME_TESTIMONIALS, type Testimonial } from './testimonials-data';
+import type React from "react";
+import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Reveal } from "@/components/ui/Reveal";
+import { HOME_TESTIMONIALS, type Testimonial } from "./testimonials-data";
 
 /**
  * "Chosen by Engineering Leaders" testimonial carousel.
@@ -20,7 +20,7 @@ export { HOME_TESTIMONIALS, type Testimonial };
 
 const AUTO_ADVANCE_MS = 7000;
 
-type Direction = 'next' | 'prev';
+type Direction = "next" | "prev";
 
 /**
  * Signed offset from `active` for a circular index. Returns -1, 0, or +1 for
@@ -57,7 +57,7 @@ export interface TestimonialsProps {
    * text. "light" = a soft white→lavender band with dark header text, used to
    * break up adjacent dark sections (the self-contained card pops on both).
    */
-  theme?: 'dark' | 'light';
+  theme?: "dark" | "light";
   /**
    * Center the header heading instead of the default left-aligned grid. Used
    * for single-testimonial sections that have no side description.
@@ -71,13 +71,13 @@ export function Testimonials({
   description,
   hideHeader = false,
   reserveFooterCtaSpace = false,
-  theme = 'dark',
+  theme = "dark",
   centerHeader = false,
 }: TestimonialsProps = {}) {
   const TESTIMONIALS = testimonials ?? HOME_TESTIMONIALS;
-  const isLight = theme === 'light';
+  const isLight = theme === "light";
   const [active, setActive] = useState(0);
-  const [direction, setDirection] = useState<Direction>('next');
+  const [direction, setDirection] = useState<Direction>("next");
   const [paused, setPaused] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -90,16 +90,18 @@ export function Testimonials({
   // card (rightward => prev, leftward => next). `dx` is signed in the
   // dir's direction (always positive for a peek-toward-centre drag, and
   // matching the swipe direction for active).
-  const [dragInfo, setDragInfo] = useState<{ dir: 'prev' | 'next'; dx: number } | null>(null);
+  const [dragInfo, setDragInfo] = useState<
+    { dir: "prev" | "next"; dx: number } | null
+  >(null);
 
   const total = TESTIMONIALS.length;
   const goPrev = useCallback(() => {
-    setDirection('prev');
+    setDirection("prev");
     setActive((i) => (i - 1 + total) % total);
     setTransitioning(true);
   }, [total]);
   const goNext = useCallback(() => {
-    setDirection('next');
+    setDirection("next");
     setActive((i) => (i + 1) % total);
     setTransitioning(true);
   }, [total]);
@@ -117,8 +119,8 @@ export function Testimonials({
   useEffect(() => {
     if (paused || total <= 1) return;
     const reduced =
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) return;
     const id = window.setInterval(goNext, AUTO_ADVANCE_MS);
     return () => window.clearInterval(id);
@@ -126,15 +128,15 @@ export function Testimonials({
 
   useEffect(() => {
     const handler = () => setPaused(document.hidden);
-    document.addEventListener('visibilitychange', handler);
-    return () => document.removeEventListener('visibilitychange', handler);
+    document.addEventListener("visibilitychange", handler);
+    return () => document.removeEventListener("visibilitychange", handler);
   }, []);
 
   const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowLeft') {
+    if (e.key === "ArrowLeft") {
       e.preventDefault();
       goPrev();
-    } else if (e.key === 'ArrowRight') {
+    } else if (e.key === "ArrowRight") {
       e.preventDefault();
       goNext();
     }
@@ -185,7 +187,7 @@ export function Testimonials({
     startX: number;
     originPos: -1 | 0 | 1;
     pointerId: number;
-    dir: 'prev' | 'next' | null;
+    dir: "prev" | "next" | null;
     hasMoved: boolean;
   } | null>(null);
   // Set to true on a drag that moved past the dead-zone; the next click
@@ -193,7 +195,12 @@ export function Testimonials({
   const suppressNextClickRef = useRef(false);
 
   const onCardDragStart = useCallback(
-    (originPos: -1 | 0 | 1, startClientX: number, target: HTMLElement, pointerId: number) => {
+    (
+      originPos: -1 | 0 | 1,
+      startClientX: number,
+      target: HTMLElement,
+      pointerId: number,
+    ) => {
       // Always capture so the trailing click still routes here (we can
       // then swallow it via suppressNextClickRef).
       try {
@@ -206,7 +213,7 @@ export function Testimonials({
         originPos,
         pointerId,
         // Peeks lock direction at down; active waits for first 4 px move.
-        dir: originPos === -1 ? 'prev' : originPos === 1 ? 'next' : null,
+        dir: originPos === -1 ? "prev" : originPos === 1 ? "next" : null,
         hasMoved: false,
       };
       setPaused(true);
@@ -229,20 +236,20 @@ export function Testimonials({
             }
             return;
           }
-          const newDir: 'prev' | 'next' = raw > 0 ? 'prev' : 'next';
+          const newDir: "prev" | "next" = raw > 0 ? "prev" : "next";
           if (ref.dir !== newDir) ref.dir = newDir;
         }
         ref.hasMoved = Math.abs(raw) >= 4;
         const dir = ref.dir;
         if (!dir) return;
-        const dx = dir === 'prev' ? Math.max(0, raw) : Math.min(0, raw);
+        const dx = dir === "prev" ? Math.max(0, raw) : Math.min(0, raw);
         setDragInfo({ dir, dx });
       };
 
       const cleanup = () => {
-        window.removeEventListener('pointermove', onMove);
-        window.removeEventListener('pointerup', onUp);
-        window.removeEventListener('pointercancel', onUp);
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+        window.removeEventListener("pointercancel", onUp);
       };
 
       const onUp = (e: PointerEvent) => {
@@ -257,14 +264,14 @@ export function Testimonials({
         setPaused(false);
         if (hasMoved) suppressNextClickRef.current = true;
         if (dir && hasMoved && Math.abs(raw) >= DRAG_COMMIT_PX) {
-          if (dir === 'prev') goPrev();
+          if (dir === "prev") goPrev();
           else goNext();
         }
       };
 
-      window.addEventListener('pointermove', onMove);
-      window.addEventListener('pointerup', onUp);
-      window.addEventListener('pointercancel', onUp);
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
+      window.addEventListener("pointercancel", onUp);
     },
     [goPrev, goNext],
   );
@@ -282,45 +289,49 @@ export function Testimonials({
     };
   }, []);
 
+
   return (
     <section
-      className={`relative w-full overflow-hidden ${isLight ? 'text-[#111]' : 'text-white'}`}
+      className={`relative w-full overflow-hidden ${isLight ? "text-[#111]" : "text-white"}`}
       aria-labelledby="testimonials-title"
       style={{
         background: isLight
-          ? 'linear-gradient(180deg, #ffffff 0%, #f4f1fb 100%)'
-          : 'linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)',
+          ? "linear-gradient(180deg, #ffffff 0%, #f4f1fb 100%)"
+          : "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)",
       }}
     >
       <div
-        className={`relative z-[2] mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 ${reserveFooterCtaSpace ? 'pt-section-sm pb-[var(--spacing-section-cta)]' : 'py-section-sm'}`}
+        className={`relative z-[2] mx-auto w-full max-w-[var(--container-default)] px-6 sm:px-10 ${reserveFooterCtaSpace ? "pt-section-sm pb-[var(--spacing-section-cta)]" : "py-section-sm"}`}
       >
         {!hideHeader && (
           <header
             className={
               centerHeader
-                ? 'flex flex-col items-center text-center'
-                : 'flex flex-col items-start gap-6 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12'
+                ? "flex flex-col items-center text-center"
+                : "flex flex-col items-start gap-6 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-12"
             }
           >
             <Reveal
               header
-              className={centerHeader ? 'mx-auto' : 'justify-self-start'}
-              style={{ maxWidth: '560px' }}
+              className={centerHeader ? "mx-auto" : "justify-self-start"}
+              style={{ maxWidth: "560px" }}
             >
               <h2
                 id="testimonials-title"
                 className="font-display"
                 style={{
-                  fontSize: 'var(--fs-h2)',
+                  fontSize: "var(--fs-h2)",
                   fontWeight: 600,
                   lineHeight: 1.1,
-                  letterSpacing: '-0.04em',
+                  letterSpacing: "-0.04em",
                 }}
               >
                 {heading ?? (
                   <>
-                    Chosen by <span className="cs-text-gradient-impact">Industry Leaders</span>
+                    Chosen by{" "}
+                    <span className="cs-text-gradient-impact">
+                      Industry Leaders
+                    </span>
                   </>
                 )}
               </h2>
@@ -332,7 +343,7 @@ export function Testimonials({
                   className="hidden h-[90px] w-px shrink-0 justify-self-center md:block"
                   style={{
                     background:
-                      'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 47.2%, rgba(255,255,255,0) 100%)',
+                      "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 47.2%, rgba(255,255,255,0) 100%)",
                   }}
                 />
                 <Reveal
@@ -340,16 +351,16 @@ export function Testimonials({
                   delay={0.15}
                   y={20}
                   className="md:justify-self-end"
-                  style={{ maxWidth: '604px' }}
+                  style={{ maxWidth: "604px" }}
                 >
                   <p
                     className="md:text-right"
                     style={{
-                      fontFamily: 'var(--font-sans)',
-                      fontSize: 'var(--fs-lead)',
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "var(--fs-lead)",
                       fontWeight: 400,
                       lineHeight: 1.4,
-                      letterSpacing: '-0.02em',
+                      letterSpacing: "-0.02em",
                       opacity: 0.8,
                     }}
                   >
@@ -376,8 +387,8 @@ export function Testimonials({
           onTouchCancel={onTouchCancel}
         >
           <div className="sr-only" aria-live="polite" aria-atomic="true">
-            Showing testimonial {active + 1} of {total} from {TESTIMONIALS[active]?.name},{' '}
-            {TESTIMONIALS[active]?.role}.
+            Showing testimonial {active + 1} of {total} from{" "}
+            {TESTIMONIALS[active]?.name}, {TESTIMONIALS[active]?.role}.
           </div>
 
           {/* Each testimonial keeps a stable React element across renders
@@ -393,8 +404,8 @@ export function Testimonials({
             style={
               dragInfo
                 ? ({
-                    ['--cs-tt-drag-dx' as never]: `${dragInfo.dx}px`,
-                  } as React.CSSProperties)
+                  ["--cs-tt-drag-dx" as never]: `${dragInfo.dx}px`,
+                } as React.CSSProperties)
                 : undefined
             }
           >
@@ -403,14 +414,17 @@ export function Testimonials({
               if (Math.abs(pos) > 1) return null;
               const isWrap =
                 transitioning &&
-                ((direction === 'next' && pos === 1) || (direction === 'prev' && pos === -1));
+                ((direction === "next" && pos === 1) ||
+                  (direction === "prev" && pos === -1));
               return (
                 <MorphCard
                   key={t.name}
                   testimonial={t}
                   pos={pos}
                   wrap={isWrap}
-                  onClick={wrapClick(pos === -1 ? goPrev : pos === 1 ? goNext : undefined)}
+                  onClick={wrapClick(
+                    pos === -1 ? goPrev : pos === 1 ? goNext : undefined,
+                  )}
                   onCardDragStart={onCardDragStart}
                 />
               );
@@ -425,15 +439,16 @@ export function Testimonials({
               <div
                 aria-hidden
                 className="mx-auto mt-8 h-[3px] w-[280px] overflow-hidden rounded-full"
-                style={{ background: 'rgba(255,255,255,0.10)' }}
+                style={{ background: "rgba(255,255,255,0.10)" }}
               >
                 <div
                   key={`prog-${active}`}
                   className="h-full rounded-full"
                   style={{
-                    background: 'linear-gradient(90deg, #33BAEC 0%, #6F8DFF 50%, #B19CFF 100%)',
+                    background:
+                      "linear-gradient(90deg, #33BAEC 0%, #6F8DFF 50%, #B19CFF 100%)",
                     animation: paused
-                      ? 'none'
+                      ? "none"
                       : `cs-tt-progress ${AUTO_ADVANCE_MS}ms linear forwards`,
                   }}
                 />
@@ -456,15 +471,15 @@ export function Testimonials({
                         aria-selected={isActive}
                         aria-label={`Show testimonial from ${t.name}`}
                         onClick={() => {
-                          setDirection(i > active ? 'next' : 'prev');
+                          setDirection(i > active ? "next" : "prev");
                           setActive(i);
                         }}
                         className="group block h-2.5 rounded-full transition-all duration-300"
                         style={{
                           width: isActive ? 28 : 10,
                           background: isActive
-                            ? 'linear-gradient(90deg, #33BAEC 0%, #B19CFF 100%)'
-                            : 'rgba(255,255,255,0.25)',
+                            ? "linear-gradient(90deg, #33BAEC 0%, #B19CFF 100%)"
+                            : "rgba(255,255,255,0.25)",
                         }}
                       />
                     );
@@ -506,10 +521,12 @@ function MorphCard({
     <article
       className="cs-tt-card cs-tt-morph"
       data-pos={pos}
-      data-wrap={wrap ? 'true' : undefined}
-      role={isActive ? undefined : 'button'}
-      aria-label={isActive ? undefined : `Show testimonial from ${testimonial.name}`}
-      aria-current={isActive ? 'true' : undefined}
+      data-wrap={wrap ? "true" : undefined}
+      role={isActive ? undefined : "button"}
+      aria-label={
+        isActive ? undefined : `Show testimonial from ${testimonial.name}`
+      }
+      aria-current={isActive ? "true" : undefined}
       tabIndex={isActive ? undefined : -1}
       onClick={onClick}
       onPointerDown={(e) => {
@@ -518,23 +535,28 @@ function MorphCard({
         // Bail for non-mouse pointers and below the desktop breakpoint so
         // we don't fight the touch handlers (or, on touchscreen laptops,
         // hijack a finger that the user meant to scroll the page with).
-        if (e.pointerType !== 'mouse') return;
+        if (e.pointerType !== "mouse") return;
         if (window.innerWidth < 1024) return;
         if (e.button !== 0) return;
         // Don't hijack interactive descendants (CTA link, future buttons).
-        if ((e.target as HTMLElement).closest('a, button')) return;
+        if ((e.target as HTMLElement).closest("a, button")) return;
         e.preventDefault();
-        onCardDragStart(pos as -1 | 0 | 1, e.clientX, e.currentTarget as HTMLElement, e.pointerId);
+        onCardDragStart(
+          pos as -1 | 0 | 1,
+          e.clientX,
+          e.currentTarget as HTMLElement,
+          e.pointerId,
+        );
       }}
       onKeyDown={
         isActive || !onClick
           ? undefined
           : (e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onClick();
-              }
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onClick();
             }
+          }
       }
     >
       <div className="cs-tt-card__photo">
@@ -542,23 +564,27 @@ function MorphCard({
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={testimonial.photoSrc}
-            alt={isActive ? `${testimonial.name}, ${testimonial.role}` : ''}
+            alt={isActive ? `${testimonial.name}, ${testimonial.role}` : ""}
             width={160}
             height={160}
             decoding="async"
             loading="eager"
-            style={{ aspectRatio: '1 / 1' }}
+            style={{ aspectRatio: "1 / 1" }}
           />
         ) : (
-          <MonogramPortrait name={testimonial.name} />
+          <span className="cs-tt-card__monogram" aria-hidden>
+            {initialsOf(testimonial.name)}
+          </span>
         )}
       </div>
 
       <div className="cs-tt-card__body">
         {/* The quote leads. Name, role and quote all rendered at the same size
             before, so nothing on the card led and the statement read as
-            metadata about the person rather than the point of the card. */}
-        <p className="cs-tt-card__quote">&ldquo;{testimonial.quote}&rdquo;</p>
+            metadata about the person rather than as the point of the card. */}
+        <p className="cs-tt-card__quote">
+          &ldquo;{testimonial.quote}&rdquo;
+        </p>
 
         <div className="cs-tt-card__attrib">
           <div className="cs-tt-card__foot">
@@ -568,7 +594,7 @@ function MorphCard({
             </div>
             <CompanyMark
               company={testimonial.company}
-              logoSrc={testimonial.logoDarkSrc ?? testimonial.logoSrc}
+              logoSrc={testimonial.logoSrcDark ?? testimonial.logoSrc}
             />
           </div>
 
@@ -592,9 +618,9 @@ function MorphCard({
             </a>
           ) : (
             // Empty spacer keeps the attribution block the same height whether
-            // or not a card has a case-study link, so the quote above it sits at
-            // the same place on every slide and the morph does not jump.
-            // Peek cards (!isActive) intentionally omit the <a> to avoid
+            // or not a card carries a case-study link, so the quote above it
+            // lands in the same place on every slide and the morph does not
+            // jump. Peek cards (!isActive) intentionally omit the <a> to avoid
             // nesting an interactive link inside the role="button" article
             // (axe-core nested-interactive violation; the whole card is
             // clickable to activate it).
@@ -611,7 +637,7 @@ function NavButton({
   onClick,
   label,
 }: {
-  direction: 'prev' | 'next';
+  direction: "prev" | "next";
   onClick: () => void;
   label: string;
 }) {
@@ -645,57 +671,19 @@ function NavButton({
   );
 }
 
-// Renders the real wordmark image when `logoSrc` is supplied; falls back to
-// the gradient-orb + text placeholder for testimonials without a logo file.
-const HONORIFICS = new Set(['mr', 'mrs', 'ms', 'miss', 'dr', 'prof']);
-
-/** "Ankit Agarwal" -> "AA". Honorifics are skipped so "Mr. Moinul Khan" -> "MK". */
+// Not every customer supplies a headshot; the photo panel carries their
+// initials instead of an empty frame. Honorifics never belong in a monogram.
 function initialsOf(name: string): string {
-  const parts = name
+  return name
     .split(/\s+/)
-    .map((part) => part.replace(/\./g, ''))
-    .filter((part) => part.length > 0 && !HONORIFICS.has(part.toLowerCase()));
-  return parts
+    .filter((part) => !/^(mr|mrs|ms|dr|prof)\.?$/i.test(part))
     .slice(0, 2)
     .map((part) => part.charAt(0).toUpperCase())
-    .join('');
+    .join("");
 }
 
-/**
- * Stand-in for a testimonial whose subject has no headshot.
- *
- * The slot is filled rather than removed because the carousel morphs cards
- * between positions: a card with a different internal structure makes the
- * transition jump. It is a monogram rather than a stock avatar because the
- * person is real and named, and rather than the company logo because that
- * already sits in the card head.
- */
-function MonogramPortrait({ name }: { name: string }): React.ReactElement {
-  return (
-    <div
-      aria-hidden
-      className="flex h-full w-full items-center justify-center select-none"
-      style={{
-        background: 'linear-gradient(150deg, #191140 0%, #221C63 62%, #2C2280 100%)',
-        boxShadow: 'inset -1px 0 0 rgba(255,255,255,0.07)',
-      }}
-    >
-      <span
-        className="font-display"
-        style={{
-          fontSize: 'clamp(40px, 4.4vw, 60px)',
-          fontWeight: 600,
-          letterSpacing: '-0.02em',
-          lineHeight: 1,
-          color: 'rgba(255,255,255,0.9)',
-        }}
-      >
-        {initialsOf(name)}
-      </span>
-    </div>
-  );
-}
-
+// Renders the real wordmark image when `logoSrc` is supplied; falls back to
+// the gradient-orb + text placeholder for testimonials without a logo file.
 function CompanyMark({
   company,
   logoSrc,
@@ -713,34 +701,33 @@ function CompanyMark({
     const style: React.CSSProperties = {
       height: h,
       maxWidth: maxW,
-      width: 'auto',
-      objectFit: 'contain',
+      width: "auto",
+      objectFit: "contain",
       opacity: 1,
     };
-    if (logoSrc.endsWith('.svg')) {
+    if (logoSrc.endsWith(".svg")) {
       return (
         // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={logoSrc}
-          alt={company}
-          width={maxW}
-          height={h}
-          loading="lazy"
-          decoding="async"
-          style={style}
-        />
+        <img src={logoSrc} alt={company} width={maxW} height={h} loading="lazy" decoding="async" style={style} />
       );
     }
     return (
-      <Image src={logoSrc} alt={company} width={maxW} height={h} sizes="110px" style={style} />
+      <Image
+        src={logoSrc}
+        alt={company}
+        width={maxW}
+        height={h}
+        sizes="110px"
+        style={style}
+      />
     );
   }
   return (
     <span
-      className={`inline-flex items-center gap-1.5 font-sans text-white/85 ${small ? 'text-body-xs' : 'text-body-sm'}`}
+      className={`inline-flex items-center gap-1.5 font-sans text-white/85 ${small ? "text-body-xs" : "text-body-sm"}`}
       style={{
         fontWeight: 600,
-        letterSpacing: '0.02em',
+        letterSpacing: "0.02em",
       }}
     >
       <span
@@ -749,7 +736,8 @@ function CompanyMark({
         style={{
           width: small ? 8 : 10,
           height: small ? 8 : 10,
-          background: 'radial-gradient(circle at 30% 30%, #B19CFF 0%, #6F8DFF 60%, #33BAEC 100%)',
+          background:
+            "radial-gradient(circle at 30% 30%, #B19CFF 0%, #6F8DFF 60%, #33BAEC 100%)",
         }}
       />
       {company}

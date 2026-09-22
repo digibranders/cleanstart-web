@@ -24,8 +24,8 @@
  * `analytics_storage` — that silently defeats the regional default.
  *
  * Rendered as a STATIC inline <script> in the document head (see
- * components/consent/ConsentModeScript.tsx), immediately BEFORE the GA4
- * bootstrap so these defaults are queued before `gtag('config', …)` runs. It
+ * components/consent/ConsentModeScript.tsx), immediately BEFORE the GTM
+ * bootstrap so these defaults are queued before any tag in the container runs. It
  * runs under the CSP's `script-src 'unsafe-inline'` (see lib/security/csp.ts) —
  * the marketing site is statically prerendered, so a per-request nonce isn't an
  * option (it would force dynamic rendering) and a hash buys nothing once

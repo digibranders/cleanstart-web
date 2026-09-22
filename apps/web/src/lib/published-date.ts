@@ -35,3 +35,29 @@ export function effectivePublishedAt(
   }
   return undefined;
 }
+
+/**
+ * Resolve the "last modified" date the public site may claim for a CMS doc:
+ * sitemap `lastmod`, JSON-LD `dateModified`, `article:modified_time`.
+ *
+ *   contentUpdatedAt > effectivePublishedAt(doc)
+ *
+ * `updatedAt` is deliberately NOT in the chain. Payload moves it on every
+ * write, so two bulk scripts once re-dated 368 documents and the site reported
+ * all of them as freshly edited. `contentUpdatedAt` is stamped by the CMS only
+ * when reader-visible content changes; without it the publish date is the
+ * honest answer.
+ */
+export type ModifiedDateDoc = PublishDateDoc & {
+  contentUpdatedAt?: string | null;
+};
+
+export function effectiveModifiedAt(
+  doc: ModifiedDateDoc | null | undefined,
+): string | undefined {
+  if (!doc) return undefined;
+  if (typeof doc.contentUpdatedAt === 'string' && doc.contentUpdatedAt.length > 0) {
+    return doc.contentUpdatedAt;
+  }
+  return effectivePublishedAt(doc);
+}

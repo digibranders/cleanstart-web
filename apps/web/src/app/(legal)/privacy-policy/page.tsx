@@ -11,6 +11,7 @@ import { JsonLdGraph } from "@/components/JsonLdGraph";
 import { sectionIndexHref } from "@/lib/nav/section-index";
 
 import { getPageGraph } from "@/lib/seo/compose-page";
+import { effectiveModifiedAt } from "@/lib/published-date";
 
 /**
  * Privacy Policy. The content lives in the `legalDocuments` CMS collection
@@ -49,7 +50,7 @@ export async function generateMetadata(): Promise<Metadata> {
     path: "/privacy-policy",
     type: "article",
     publishedTime: legalEffectiveDate(doc),
-    modifiedTime: doc.updatedAt ?? undefined,
+    modifiedTime: effectiveModifiedAt(doc),
     ...(seo.noindex ? { noindex: true, nofollow: seo.nofollow } : {}),
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
   });

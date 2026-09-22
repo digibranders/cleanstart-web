@@ -1,25 +1,32 @@
 import { Section, Container } from "@/components/layout";
 import { RevealStagger, RevealItem } from "@/components/ui/Reveal";
-import { FOUNDATIONS, UI } from "./compare-data";
+import { UI, type FoundationColumn, type FoundationsSection, type CompareTone } from "./compare-types";
 import { BandHeader, BRAND, LightBandDecor, WASH_LIGHT } from "./compare-visuals";
 
 /**
- * "What Are Docker Hardened Images and How Do They Compare With CleanStart?"
+ * The document's opening band: the two approaches, side by side.
  *
- * Two open columns on the wash, split by the site's gradient hairline with a
- * "vs" marker at its midpoint, rather than two boxed cards: the hero has just
- * drawn the two stacks side by side, and this band keeps that axis (Docker on
- * the left, CleanStart on the right) without adding chrome. The CleanStart
- * column sits on a faint violet field; the Docker column sits on the wash.
- * Same structure, same type scale, same bullet count. The page is not hiding
- * the comparison, it is just clear about whose site this is.
+ * Two columns on the wash, split by the site's gradient hairline with a "vs"
+ * marker at its midpoint: the hero has just drawn the two stacks side by side,
+ * and this band keeps that axis, the rival on the left and CleanStart on the
+ * right.
  *
- * The vendor names and the two "focuses on" lead-ins are `<p>`, not headings:
- * the source document does not set them as headings, and promoting them would
- * add an outline level SEO never wrote.
+ * Both columns carry a faint field of their own, violet for ours and neutral
+ * for theirs, at the same weight and inside the same padding. Only ours used
+ * to have one, which left the rival's text reading as flush to the container
+ * gutter while ours sat inside a visible card, and on the one band whose whole
+ * subject is the two approaches side by side that put the comparison's own
+ * axis out of true. Same structure, same type scale, same bullet count, same
+ * shape. The tint and the violet markers are what say whose column is whose.
+ *
+ * The two "focuses on" lead-ins are always `<p>`: no source document sets them
+ * as headings, and promoting them would add an outline level SEO never wrote.
+ * The vendor names follow the document — `<p>` by default, `<h3>` where the
+ * document sets them as headings (`labelAsHeading`). The Docker document does
+ * not; the Chainguard one does.
  */
 
-function Marker({ tone }: { tone: "docker" | "cleanstart" }): React.ReactElement {
+function Marker({ tone }: { tone: CompareTone }): React.ReactElement {
   const isCleanStart = tone === "cleanstart";
   return (
     <span
@@ -46,25 +53,35 @@ function Marker({ tone }: { tone: "docker" | "cleanstart" }): React.ReactElement
 
 function Column({
   column,
-  tone,
+  asHeading,
 }: {
-  column: (typeof FOUNDATIONS.columns)[number];
-  tone: "docker" | "cleanstart";
+  column: FoundationColumn;
+  /** The vendor name is a heading in the source document, not a label. */
+  asHeading: boolean;
 }): React.ReactElement {
+  const tone = column.id;
   const isCleanStart = tone === "cleanstart";
+  const Label = asHeading ? "h3" : "p";
   return (
     <article
       className="relative flex h-full flex-col"
       style={{
         borderRadius: "24px",
         padding: "clamp(22px, 2vw, 34px)",
+        /* Both columns carry a surface, and the same one at the same weight:
+           violet for our side, neutral for theirs. They always had identical
+           padding, but only one had a fill, so the rival's text read as flush
+           to the container gutter while ours sat 24px inside a visible card.
+           On the band this section is about, that put the comparison's own
+           axis out of true. The tint and the violet markers are what say
+           whose column is whose; the shape should not. */
         background: isCleanStart
           ? "linear-gradient(180deg, rgba(106,61,240,0.085) 0%, rgba(106,61,240,0.025) 100%)"
-          : "transparent",
+          : "linear-gradient(180deg, rgba(17,17,17,0.04) 0%, rgba(17,17,17,0.012) 100%)",
       }}
     >
 
-      <p
+      <Label
         className="font-display text-[#111111]"
         style={{
           fontSize: "var(--fs-h3)",
@@ -74,7 +91,7 @@ function Column({
         }}
       >
         {column.label}
-      </p>
+      </Label>
 
       <p
         className="mt-4"
@@ -166,8 +183,13 @@ function Divider(): React.ReactElement {
   );
 }
 
-export function CompareFoundations(): React.ReactElement {
-  const [docker, cleanstart] = FOUNDATIONS.columns;
+export function CompareFoundations({
+  content,
+}: {
+  content: FoundationsSection;
+}): React.ReactElement {
+  const [rival, cleanstart] = content.columns;
+  const asHeading = content.labelAsHeading ?? false;
 
   return (
     <Section
@@ -180,20 +202,20 @@ export function CompareFoundations(): React.ReactElement {
 
       <Container className="relative">
         <BandHeader
-          id="what-are-docker-hardened-images"
-          heading={FOUNDATIONS.heading}
-          intro={FOUNDATIONS.intro}
+          id="two-approaches"
+          heading={content.heading}
+          intro={content.intro}
         />
 
         <RevealStagger className="mt-10 grid gap-2 lg:mt-14 lg:grid-cols-[minmax(0,1fr)_72px_minmax(0,1fr)] lg:gap-0">
           <RevealItem className="h-full">
-            <Column column={docker} tone="docker" />
+            <Column column={rival} asHeading={asHeading} />
           </RevealItem>
           <RevealItem className="h-full self-stretch">
             <Divider />
           </RevealItem>
           <RevealItem className="h-full">
-            <Column column={cleanstart} tone="cleanstart" />
+            <Column column={cleanstart} asHeading={asHeading} />
           </RevealItem>
         </RevealStagger>
       </Container>

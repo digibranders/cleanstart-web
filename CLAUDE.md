@@ -321,6 +321,7 @@ Update this table when adding/changing jobs. Every job needs a test file and the
 | Standard Webhooks | Generic HMAC-signed outbound webhook | `WEBHOOK_GENERIC_URL`, `WEBHOOK_GENERIC_EVENTS`, `WEBHOOK_GENERIC_SIGNING_SECRET` |
 | Meilisearch | Full-text search + analytics | `MEILISEARCH_URL`, `MEILISEARCH_MASTER_KEY`, `MEILISEARCH_API_KEY` |
 | Cloudflare Turnstile | Bot protection on `/api/leads/submit` + deal-reg | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` |
+| Google Tag Manager | Loads every tracking tag on `apps/web` (GA4, Microsoft Clarity, Apollo.io, Leadfeeder). Tags live in the GTM UI; the loader, its host gate, Consent Mode defaults, the dataLayer contract (`lib/analytics/track.ts`) and the CSP stay in code. Inventory: `docs/web/TRACKING-TAGS.md`. | `NEXT_PUBLIC_GTM_ID` |
 | Sentry | Error tracking + PII redaction | `SENTRY_DSN` |
 | IndexNow | Bing/Yandex ping on publish (7 collections) | `INDEXNOW_KEY` |
 | Brevo | Careers/partner transactional email (HR notification + resume on job apps; partner-form pair). Distinct from HubSpot — never receives careers/partner data. | `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `CAREERS_HR_EMAIL`, `PARTNER_USER_TEMPLATE_ID`, `PARTNER_ADMIN_TEMPLATE_ID`, `PARTNERS_NOTIFY_EMAIL` |

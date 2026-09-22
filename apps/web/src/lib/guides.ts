@@ -24,6 +24,7 @@ export type Guide = {
   coverTitle?: string | null;
   authors?: BlogAuthor[] | null;
   publishedAt?: string | null;
+  contentUpdatedAt?: string | null;
   updatedAt?: string | null;
   readingMinutes?: number | null;
   seo?: CmsSeo | null;
@@ -79,6 +80,7 @@ export async function getGuides({
     "abstract",
     "coverTitle",
     "publishedAt",
+    "contentUpdatedAt",
     "updatedAt",
     "readingMinutes",
     "seo",
