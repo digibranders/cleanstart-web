@@ -10,6 +10,16 @@ A running, reverse-chronological log of production incidents and non-obvious bug
 
 ---
 
+## 2026-09-22 — Every publish purged the web cache before its own write committed
+
+- **Area:** `apps/cms` — `lib/web-revalidate.ts`, `hooks/revalidate-web-publish.ts`, `hooks/revalidate-page-registry.ts`.
+- **Symptom:** publishing the Kubernetes whitepaper left `/resources/the-kubernetes-policy-trust-gap` a 404 (`x-vercel-cache: STALE`, `age` frozen at 51 minutes) and kept the new card off `/resource-center`. The same paths purged by hand a few minutes later went live in 15 seconds.
+- **Root cause:** Payload runs afterChange, afterDelete and even afterOperation hooks INSIDE the write transaction; `commitTransaction` is the last thing the operation does (`node_modules/payload/dist/collections/operations/updateByID.js`). The purge therefore reached apps/web while the publish was invisible to every other connection, Next re-rendered against the pre-publish database, and Vercel cached that result: a 404 for a new page, the old content for an edit.
+- **Not the cause, checked and refuted:** the listing-path override (`resources -> /resource-center` was already correct and deployed), `WEB_REVALIDATE_SUPPRESS` (unset), and the Teams webhook 400 raised during the same save (both `webhooks-publish` and `indexnow-publish` swallow their own errors, so the chain was never aborted).
+- **Fix:** `revalidateWebAfterCommit` schedules the purge past the commit and does not make the save wait for it. Hooks pass `req.transactionID`; with no transaction open it behaves exactly as before, so scripts and endpoints are unchanged.
+- **Status:** Fixed, verification pending a CMS deploy. The next publish should go live without a manual purge.
+- **Reusable lesson:** a cache purge fired from an ORM hook is racing that hook's own transaction. Anything that makes an external system re-read your database has to run after the commit, not inside the write, and a purge that arrives too early is worse than none: it re-caches the stale answer for the full TTL.
+
 ## 2026-09-21 — Bulk scripts re-dated 368 articles as "Updated" (sitemap lastmod, dateModified, byline)
 
 - **Area:** `apps/cms` + `apps/web` (technical SEO audit F-06).

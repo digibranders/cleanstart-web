@@ -6,9 +6,14 @@ import {
 } from './revalidate-web-publish';
 
 const revalidateWeb = vi.hoisted(() => vi.fn(async () => ({ ok: true })));
-vi.mock('../lib/web-revalidate', () => ({ revalidateWeb }));
+vi.mock('../lib/web-revalidate', () => ({
+  revalidateWeb,
+  // The hooks purge through the post-commit wrapper; the third argument is the
+  // transaction the write runs in.
+  revalidateWebAfterCommit: revalidateWeb,
+}));
 
-const req = { payload: { logger: { warn: vi.fn() } } } as never;
+const req = { payload: { logger: { warn: vi.fn() } }, transactionID: 'tx-test' } as never;
 
 /** Paths passed to revalidateWeb by the most recent hook invocation. */
 const purgedPaths = (): string[] => {
@@ -109,5 +114,14 @@ describe('sitemap purge on publish', () => {
     } as never);
 
     expect(revalidateWeb).not.toHaveBeenCalled();
+  });
+});
+
+describe('transaction safety', () => {
+  it('passes the write transaction through so the purge waits for the commit', async () => {
+    await publish('resources', 'the-kubernetes-policy-trust-gap');
+
+    const call = revalidateWeb.mock.calls.at(-1) as unknown as unknown[];
+    expect(call?.[2]).toBe('tx-test');
   });
 });

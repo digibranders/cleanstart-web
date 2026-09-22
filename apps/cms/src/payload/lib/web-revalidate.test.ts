@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { revalidateWeb } from './web-revalidate';
+import { revalidateWeb, revalidateWebAfterCommit } from './web-revalidate';
 
 type PayloadArg = Parameters<typeof revalidateWeb>[0];
 
@@ -84,5 +84,47 @@ describe('revalidateWeb result + layoutPaths', () => {
     expect(res.ok).toBe(false);
     expect(res.disabled).toBe(false);
     expect(res.status).toBe(500);
+  });
+});
+
+describe('revalidateWebAfterCommit', () => {
+  it('sends inline when no transaction is open', async () => {
+    const payload = fakePayload();
+
+    const result = await revalidateWebAfterCommit(payload, { paths: ['/blogs'] }, undefined);
+
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(result.deferred).toBeUndefined();
+  });
+
+  it('holds the purge until the write transaction has had time to commit', async () => {
+    // Payload runs every afterChange hook inside the transaction, so a purge
+    // sent inline re-renders apps/web against a database that cannot see the
+    // write yet — which is how a freshly published page cached its own 404.
+    vi.useFakeTimers();
+    const payload = fakePayload();
+
+    const result = await revalidateWebAfterCommit(payload, { paths: ['/resource-center'] }, 'tx-1');
+
+    expect(result.deferred).toBe(true);
+    expect(fetch).not.toHaveBeenCalled();
+
+    await vi.advanceTimersByTimeAsync(2_000);
+
+    expect(fetch).toHaveBeenCalledTimes(1);
+    const [, init] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0] ?? [];
+    expect(JSON.parse((init as { body: string }).body).paths).toEqual(['/resource-center']);
+    vi.useRealTimers();
+  });
+
+  it('never rejects into the surrounding save when the purge fails', async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('web down'); }));
+    const payload = fakePayload();
+
+    await revalidateWebAfterCommit(payload, { paths: ['/blogs'] }, 42);
+    await expect(vi.advanceTimersByTimeAsync(2_000)).resolves.not.toThrow();
+
+    vi.useRealTimers();
   });
 });

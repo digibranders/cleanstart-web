@@ -1,6 +1,6 @@
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload';
 
-import { revalidateWeb } from '../lib/web-revalidate';
+import { revalidateWebAfterCommit } from '../lib/web-revalidate';
 
 export interface RegistryDocShape {
   path?: string | null;
@@ -27,13 +27,13 @@ export const pageRegistryRevalidatePath = (doc: RegistryDocShape): string | null
  */
 export const revalidatePageRegistryHook: CollectionAfterChangeHook = async ({ doc, req }) => {
   const url = pageRegistryRevalidatePath(doc as RegistryDocShape);
-  if (url) await revalidateWeb(req.payload, { paths: [url] });
+  if (url) await revalidateWebAfterCommit(req.payload, { paths: [url] }, req.transactionID);
   return doc;
 };
 
 /** afterDelete — removing a row drops its override; refresh the page. */
 export const revalidatePageRegistryDeleteHook: CollectionAfterDeleteHook = async ({ doc, req }) => {
   const url = pageRegistryRevalidatePath(doc as RegistryDocShape);
-  if (url) await revalidateWeb(req.payload, { paths: [url] });
+  if (url) await revalidateWebAfterCommit(req.payload, { paths: [url] }, req.transactionID);
   return doc;
 };

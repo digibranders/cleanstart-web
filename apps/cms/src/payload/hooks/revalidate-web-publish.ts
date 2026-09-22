@@ -9,7 +9,7 @@ import {
   listingPathForCollection,
   sitemapTag,
 } from '../lib/route-prefixes';
-import { revalidateWeb } from '../lib/web-revalidate';
+import { revalidateWebAfterCommit } from '../lib/web-revalidate';
 
 type StatusDoc = { _status?: string; slug?: string | null; path?: string | null };
 
@@ -59,7 +59,11 @@ export const revalidateWebPublishAfterChangeHook =
       const tags = affectsSitemap(collection) ? [sitemapTag(collection)] : [];
       if (paths.size === 0 && tags.length === 0) return doc;
 
-      await revalidateWeb(req.payload, { paths: Array.from(paths), tags });
+      await revalidateWebAfterCommit(
+        req.payload,
+        { paths: Array.from(paths), tags },
+        req.transactionID,
+      );
     } catch (err) {
       req.payload.logger?.warn?.(
         {
@@ -91,7 +95,11 @@ export const revalidateWebAfterDeleteHook =
       const tags = affectsSitemap(collection) ? [sitemapTag(collection)] : [];
       if (paths.size === 0 && tags.length === 0) return doc;
 
-      await revalidateWeb(req.payload, { paths: Array.from(paths), tags });
+      await revalidateWebAfterCommit(
+        req.payload,
+        { paths: Array.from(paths), tags },
+        req.transactionID,
+      );
     } catch (err) {
       req.payload.logger?.warn?.(
         {
