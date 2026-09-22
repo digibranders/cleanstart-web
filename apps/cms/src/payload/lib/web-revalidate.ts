@@ -45,11 +45,55 @@ export interface RevalidateRequest {
 export interface RevalidateResult {
   /** apps/web acknowledged the purge with a 2xx (or there was nothing to send). */
   ok: boolean;
+  /** Scheduled past the caller's transaction rather than sent inline. */
+  deferred?: boolean;
   /** Cross-process invalidation is off (suppressed, or env vars unset). */
   disabled: boolean;
   status?: number;
   error?: string;
 }
+
+/**
+ * Grace period for the caller's write transaction to commit before the purge
+ * goes out. Commits here run in single-digit milliseconds; the margin is for a
+ * loaded database, and overshooting only delays a cache purge.
+ */
+const COMMIT_GRACE_MS = 2_000;
+
+/**
+ * `revalidateWeb` for callers inside a Payload write.
+ *
+ * Every afterChange / afterDelete / afterOperation hook runs INSIDE the write
+ * transaction: `commitTransaction` is the last thing the operation does. A
+ * purge sent from a hook therefore reaches apps/web while the write is still
+ * invisible to every other connection, so Next re-renders against the
+ * pre-write database and caches that stale result. The Kubernetes whitepaper
+ * published on 2026-09-22 stayed a 404 for its whole ISR window this way, and
+ * its listing kept the old card until someone purged by hand.
+ *
+ * With a transaction open the purge is scheduled past the commit and the
+ * caller does not wait for it: a hook must not block a save on cache
+ * invalidation, and a failure only means the page waits out its TTL. Without
+ * one (scripts, endpoints outside a write) it behaves exactly like
+ * `revalidateWeb`.
+ */
+export const revalidateWebAfterCommit = async (
+  payload: Pick<Payload, 'logger'>,
+  request: RevalidateRequest,
+  // Payload types an open transaction as an id or the promise of one; either
+  // way its presence is what matters, never the value.
+  transactionID: string | number | Promise<string | number> | undefined,
+): Promise<RevalidateResult> => {
+  if (transactionID == null) return revalidateWeb(payload, request);
+
+  const timer = setTimeout(() => {
+    void revalidateWeb(payload, request);
+  }, COMMIT_GRACE_MS);
+  // Never hold the process open for a cache purge.
+  timer.unref?.();
+
+  return { ok: true, disabled: false, deferred: true };
+};
 
 export const revalidateWeb = async (
   payload: Pick<Payload, 'logger'>,
