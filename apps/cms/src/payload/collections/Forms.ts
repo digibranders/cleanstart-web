@@ -232,6 +232,15 @@ export const Forms: CollectionConfig = {
       ],
     },
     {
+      name: 'sendDownloadEmail',
+      type: 'checkbox',
+      defaultValue: true,
+      admin: {
+        description:
+          'Send the download email from the CMS after a gated submission. Untick when the HubSpot form sends its own follow-up email, otherwise the visitor receives two. Only applies to forms used as a resource gate.',
+      },
+    },
+    {
       name: 'crmHandlers',
       type: 'select',
       hasMany: true,

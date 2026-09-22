@@ -208,6 +208,10 @@
       ]
     },
     {
+      "type": "checkbox",
+      "name": "sendDownloadEmail"
+    },
+    {
       "type": "select",
       "name": "crmHandlers",
       "hasMany": true,

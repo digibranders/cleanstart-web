@@ -105,10 +105,12 @@ export const Resources: CollectionConfig = {
       name: 'gateForm',
       type: 'relationship',
       relationTo: 'forms',
-      // Restrict the picker to the dedicated gated-download form so editors
+      // Restrict the picker to the dedicated gated-download forms so editors
       // can't accidentally attach an unrelated lead form (book-a-demo,
-      // contact, …) as a download gate.
-      filterOptions: () => ({ slug: { equals: 'content-gated' } }),
+      // contact, …) as a download gate. An asset that needs its own HubSpot
+      // form and campaign gets its own form, named `content-gated-<asset>`,
+      // which is why this matches the prefix rather than one exact slug.
+      filterOptions: () => ({ slug: { like: 'content-gated' } }),
       admin: {
         description:
           'Form the visitor fills to unlock the download. Required when gated — the validator blocks save until set.',

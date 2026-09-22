@@ -9,6 +9,8 @@ interface ResourceGateModalProps {
   open: boolean;
   onClose: () => void;
   resourceId: string | number;
+  /** The resource's gate form id, routed straight through to the form. */
+  gateFormId: number;
   resourceTitle: string;
   onUnlocked: (downloadUrl: string) => void;
 }
@@ -17,6 +19,7 @@ export function ResourceGateModal({
   open,
   onClose,
   resourceId,
+  gateFormId,
   resourceTitle,
   onUnlocked,
 }: ResourceGateModalProps): React.ReactElement | null {
@@ -181,7 +184,11 @@ export function ResourceGateModal({
               >
                 Enter your details and the download starts straight away.
               </p>
-              <GatedDownloadForm resourceId={resourceId} onUnlocked={handleUnlocked} />
+              <GatedDownloadForm
+                resourceId={resourceId}
+                gateFormId={gateFormId}
+                onUnlocked={handleUnlocked}
+              />
             </>
           ) : null}
         </div>
