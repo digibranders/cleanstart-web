@@ -579,49 +579,54 @@ function MorphCard({
       </div>
 
       <div className="cs-tt-card__body">
-        <div className="cs-tt-card__head">
-          <div>
-            <div className="cs-tt-card__name">{testimonial.name}</div>
-            <div className="cs-tt-card__role">{testimonial.role}</div>
-          </div>
-          <CompanyMark
-            company={testimonial.company}
-            logoSrc={testimonial.logoSrcDark ?? testimonial.logoSrc}
-          />
-        </div>
-
+        {/* The quote leads. Name, role and quote all rendered at the same size
+            before, so nothing on the card led and the statement read as
+            metadata about the person rather than as the point of the card. */}
         <p className="cs-tt-card__quote">
           &ldquo;{testimonial.quote}&rdquo;
         </p>
 
-        {testimonial.caseStudyHref && isActive ? (
-          <a
-            href={testimonial.caseStudyHref}
-            className="cs-tt-card__cta"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <span>Read Case study</span>
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
-              <path
-                d="M4 10h12m0 0l-4-4m4 4l-4 4"
-                stroke="currentColor"
-                strokeWidth="1.75"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </a>
-        ) : (
-          // Empty spacer preserves the body's three-child layout
-          // (head / quote / cta) so the quote stays vertically positioned
-          // identically across cards regardless of CTA presence.
-          // Peek cards (!isActive) intentionally omit the <a> to avoid
-          // nesting an interactive link inside the role="button" article
-          // (axe-core nested-interactive violation; the whole card is
-          // clickable to activate it).
-          <span aria-hidden className="cs-tt-card__cta-spacer" />
-        )}
+        <div className="cs-tt-card__attrib">
+          <div className="cs-tt-card__foot">
+            <div className="cs-tt-card__who">
+              <div className="cs-tt-card__name">{testimonial.name}</div>
+              <div className="cs-tt-card__role">{testimonial.role}</div>
+            </div>
+            <CompanyMark
+              company={testimonial.company}
+              logoSrc={testimonial.logoSrcDark ?? testimonial.logoSrc}
+            />
+          </div>
+
+          {testimonial.caseStudyHref && isActive ? (
+            <a
+              href={testimonial.caseStudyHref}
+              className="cs-tt-card__cta"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span>Read Case study</span>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
+                <path
+                  d="M4 10h12m0 0l-4-4m4 4l-4 4"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </a>
+          ) : (
+            // Empty spacer keeps the attribution block the same height whether
+            // or not a card carries a case-study link, so the quote above it
+            // lands in the same place on every slide and the morph does not
+            // jump. Peek cards (!isActive) intentionally omit the <a> to avoid
+            // nesting an interactive link inside the role="button" article
+            // (axe-core nested-interactive violation; the whole card is
+            // clickable to activate it).
+            <span aria-hidden className="cs-tt-card__cta-spacer" />
+          )}
+        </div>
       </div>
     </article>
   );

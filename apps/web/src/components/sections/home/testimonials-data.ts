@@ -52,6 +52,7 @@ export const HOME_TESTIMONIALS: Testimonial[] = [
     role: "CEO, Aurascape",
     company: "Aurascape",
     logoSrc: "/images/testimonials/aurascape-logo.png",
+    logoSrcDark: "/images/trusted/08-aurascape.webp",
     photoSrc: "/images/testimonials/moinul-khan.webp",
     quote:
       "Standardizing on verified container foundations gave us confidence in the base of every service we deploy and allowed us to shift security much earlier in the build process.",

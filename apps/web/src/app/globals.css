@@ -3510,6 +3510,16 @@ body {
   line-height: 1;
 }
 
+/* Scrim on the panel's inner edge so the portrait (or the monogram) fades
+   into the card rather than ending on a hard vertical seam against the quote. */
+.cs-tt-card__photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgb(31 23 64 / 0) 58%, rgb(31 23 64 / 0.5) 100%);
+}
+
 .cs-tt-card__body {
   display: flex;
   flex: 1 1 0%;
@@ -3518,11 +3528,26 @@ body {
   min-width: 0;
 }
 
-.cs-tt-card__head {
+/* Attribution block: hairline, then name/role beside the company mark, then
+   the optional case-study link. Sits at the foot of the card so the quote
+   above it gets the space. */
+.cs-tt-card__attrib {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 16px;
+  border-top: 1px solid rgb(255 255 255 / 0.12);
+}
+
+.cs-tt-card__foot {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
+}
+
+.cs-tt-card__who {
+  min-width: 0;
 }
 
 .cs-tt-card__name {
@@ -3534,8 +3559,8 @@ body {
 .cs-tt-card__role {
   font-family: var(--font-sans);
   font-weight: 400;
-  letter-spacing: -0.02em;
-  color: rgb(255 255 255 / 0.7);
+  letter-spacing: -0.01em;
+  color: rgb(255 255 255 / 0.58);
 }
 
 .cs-tt-card__quote {
@@ -3586,16 +3611,17 @@ body {
 }
 
 .cs-tt-card--active .cs-tt-card__name {
-  font-size: clamp(16px, 1.4vw, 20px);
+  font-size: clamp(15px, 1.15vw, 17px);
+  font-weight: 600;
 }
 
 .cs-tt-card--active .cs-tt-card__role {
-  font-size: clamp(16px, 1.4vw, 20px);
+  font-size: clamp(13px, 1vw, 15px);
 }
 
 .cs-tt-card--active .cs-tt-card__quote {
-  font-size: clamp(16px, 1.4vw, 20px);
-  line-height: 1.4;
+  font-size: clamp(17px, 1.6vw, 23px);
+  line-height: 1.5;
   margin-top: -6px;
 }
 
@@ -3653,6 +3679,10 @@ body {
     border-radius: 24px 24px 0 0;
   }
 
+  .cs-tt-card__photo::after {
+    background: linear-gradient(180deg, rgb(31 23 64 / 0) 58%, rgb(31 23 64 / 0.55) 100%);
+  }
+
   .cs-tt-card--active .cs-tt-card__body {
     /* L/R padding so quote text doesn't clip against the card's
        overflow:hidden walls when the layout stacks (photo on top). */
@@ -3661,8 +3691,8 @@ body {
   }
 
   .cs-tt-card--active .cs-tt-card__quote {
-    font-size: 16px;
-    line-height: 1.45;
+    font-size: 17px;
+    line-height: 1.5;
   }
 
   .cs-tt-stage {

@@ -2,6 +2,10 @@ import type { CollectionConfig } from 'payload';
 
 import { isAdminOrEditor } from '../access';
 import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
+import {
+  revalidateWebAfterDeleteHook,
+  revalidateWebPublishAfterChangeHook,
+} from '../hooks/revalidate-web-publish';
 import { taxonomyParentCycleGuardHook } from '../hooks/taxonomy-parent-cycle-guard';
 import { buildTaxonomyFields } from '../lib/build-taxonomy-fields';
 
@@ -29,7 +33,14 @@ export const ResourceTypes: CollectionConfig = {
   fields: buildTaxonomyFields('resourceTypes'),
   hooks: {
     beforeChange: [taxonomyParentCycleGuardHook('resourceTypes')],
-    afterChange: [slugChangeRedirectHook('resourceTypes')],
+    // The Resource Center's filter rail is built from this taxonomy, so a new
+    // or renamed term must purge that listing. Without it the rail waits out
+    // the page's 6 h ISR window.
+    afterChange: [
+      slugChangeRedirectHook('resourceTypes'),
+      revalidateWebPublishAfterChangeHook('resourceTypes'),
+    ],
+    afterDelete: [revalidateWebAfterDeleteHook('resourceTypes')],
   },
   versions: { drafts: true },
   timestamps: true,

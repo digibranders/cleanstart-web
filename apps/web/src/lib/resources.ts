@@ -5,12 +5,24 @@ import { cache } from "react";
 import { cmsBaseUrl, fetchCMS } from "./cms-fetch";
 import type { CmsSeo } from "./seo/cms-seo";
 
+/**
+ * The legacy `resources.type` enum values. Still the fallback during the
+ * enum → taxonomy transition, but no longer the closed set of types: editors
+ * add types under Taxonomies → Resource types, which arrive via `typeRef`.
+ */
 export type ResourceType =
   | "whitepaper"
   | "ebook"
   | "datasheet"
   | "architecture-insights"
   | "report";
+
+/** A term from the editor-managed `resourceTypes` taxonomy. */
+export type ResourceTypeTerm = {
+  id: string | number;
+  name: string;
+  slug: string;
+};
 
 export type ResourceImage = {
   id: string;
@@ -24,7 +36,10 @@ export type Resource = {
   id: string;
   title: string;
   slug: string;
+  /** Legacy enum. Hidden in the admin — read `typeRef` first via `resolveResourceType*`. */
   type?: ResourceType | null;
+  /** Editor-managed type. A string/number when the query did not populate it. */
+  typeRef?: ResourceTypeTerm | string | number | null;
   summary?: string | null;
   publishedAt?: string | null;
   displayPublishedAt?: string | null;
@@ -101,6 +116,7 @@ export async function getResources({
     "title",
     "slug",
     "type",
+    "typeRef",
     "summary",
     "publishedAt",
     "displayPublishedAt",
@@ -111,12 +127,73 @@ export async function getResources({
   ]) {
     params.set(`select[${field}]`, "true");
   }
-  if (type) params.set("where[type][equals]", type);
+  // Populate only the two fields the card reads off the type term. Without
+  // this, depth=1 serialises each term's full doc (description, icon, SEO
+  // group) once per card, for no gain.
+  params.set("populate[resourceTypes][name]", "true");
+  params.set("populate[resourceTypes][slug]", "true");
+  // Matches either side of the enum → taxonomy transition, so the filter keeps
+  // working for docs backfilled onto `typeRef` and for any created before the
+  // backfill ran. Drop the `type` arm with the enum column.
+  if (type) {
+    params.set("where[or][0][typeRef.slug][equals]", type);
+    params.set("where[or][1][type][equals]", type);
+  }
   if (search) params.set("where[title][contains]", search);
   return fetchCMS<PayloadListResponse<Resource>>(
     `/api/resources?${params.toString()}`,
   );
 }
+
+/**
+ * Fetch a fixed set of resources by slug, for hand-curated rails (e.g. the
+ * /case-studies "keep reading" row). Returns only the slugs that are still
+ * published, in the order they were requested, so a card whose resource is
+ * unpublished disappears instead of linking into a 404.
+ */
+export async function getResourcesBySlugs(slugs: readonly string[]): Promise<Resource[]> {
+  if (slugs.length === 0) return [];
+  const params = new URLSearchParams({
+    "where[_status][equals]": "published",
+    "where[publishedAt][exists]": "true",
+    "where[slug][in]": slugs.join(","),
+    // depth=1 so `typeRef` arrives as a term (name/slug) rather than an id.
+    depth: "1",
+    limit: String(slugs.length),
+  });
+  for (const field of [
+    "title",
+    "slug",
+    "type",
+    "typeRef",
+    "summary",
+    "gated",
+    "ctaButtonText",
+  ]) {
+    params.set(`select[${field}]`, "true");
+  }
+  params.set("populate[resourceTypes][name]", "true");
+  params.set("populate[resourceTypes][slug]", "true");
+  const data = await fetchCMS<PayloadListResponse<Resource>>(
+    `/api/resources?${params.toString()}`,
+  );
+  const bySlug = new Map(data.docs.map((doc) => [doc.slug, doc]));
+  return slugs
+    .map((slug) => bySlug.get(slug))
+    .filter((doc): doc is Resource => doc !== undefined);
+}
+
+/**
+ * The published `resourceTypes` taxonomy, for the listing filter rail. Editors
+ * manage this list under Taxonomies → Resource types, so a new type reaches
+ * the site without a deploy.
+ */
+export const getResourceTypes = cache(async (): Promise<ResourceTypeTerm[]> => {
+  const res = await fetchCMS<PayloadListResponse<ResourceTypeTerm>>(
+    "/api/resourceTypes?where[_status][equals]=published&depth=0&limit=100&select[name]=true&select[slug]=true",
+  );
+  return res.docs.filter((t) => Boolean(t.name) && Boolean(t.slug));
+});
 
 async function loadResourceBySlug(slug: string, draft = false): Promise<ResourceDetail | null> {
   const filter = draft ? "" : `&${PUBLISHED_FILTER}`;
@@ -142,8 +219,12 @@ export async function getResourceBySlugDraft(slug: string): Promise<ResourceDeta
 // for backward compatibility with existing consumers.
 export {
   RESOURCE_TYPES,
+  orderResourceTypes,
+  resolveResourceTypeLabel,
+  resolveResourceTypeSlug,
   resourceCoverPoster,
   resourceCtaLabel,
   resourceLeadCaptureHeading,
   resourceTypeLabel,
 } from "./resources-utils";
+export type { ResourceTypeOption } from "./resources-utils";

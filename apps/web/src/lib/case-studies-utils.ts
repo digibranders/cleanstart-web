@@ -71,3 +71,19 @@ export function formatFileMeta(asset: CaseStudyMedia | null | undefined): string
   const sizeLabel = mb >= 10 ? `${Math.round(mb)} MB` : `${mb.toFixed(1)} MB`;
   return `${typeLabel} · ${sizeLabel}`;
 }
+
+/**
+ * First paragraph of a case study's summary. Editors write multi-paragraph
+ * summaries for the longer studies; cards and the featured slot show the lead
+ * only, so the layout does not stretch for one outlier.
+ */
+export function summaryLead(summary: string | null | undefined): string {
+  if (!summary) return "";
+  const [lead] = summary.split(/\n\s*\n/);
+  return (lead ?? "").trim();
+}
+
+/** Canonical path for a case study's detail page. */
+export function caseStudyPath(slug: string): string {
+  return `/case-studies/${slug}`;
+}

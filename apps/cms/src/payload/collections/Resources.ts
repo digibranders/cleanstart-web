@@ -32,7 +32,7 @@ export const Resources: CollectionConfig = {
   labels: { singular: 'Resource', plural: 'Resources' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'type', 'gated', 'accessLevel', '_status', 'updatedAt'],
+    defaultColumns: ['title', 'typeRef', 'gated', 'accessLevel', '_status', 'updatedAt'],
     group: 'Content',
     components: {
       edit: docStatusBarEditConfig({ showStats: false, showPublishedAt: true, showPurge: true }),
@@ -51,8 +51,9 @@ export const Resources: CollectionConfig = {
       name: 'type',
       type: 'select',
       admin: {
+        hidden: true,
         description:
-          'Legacy enum — superseded by the Resource type relationship below. Kept during the taxonomy transition; removed once apps/web reads the relationship.',
+          'Legacy enum, superseded by the Type relationship. apps/web now reads the relationship, so this is hidden from editors; the column stays until a migration drops it so an un-backfilled row still resolves.',
       },
       options: [
         { label: 'Whitepaper', value: 'whitepaper' },
@@ -66,9 +67,10 @@ export const Resources: CollectionConfig = {
       name: 'typeRef',
       type: 'relationship',
       relationTo: 'resourceTypes',
+      label: 'Type',
       admin: {
         description:
-          'Resource type taxonomy reference. Seeded/backfilled from the legacy `type` enum; editors manage the list under Taxonomies → Resource types.',
+          'Drives the type badge, cover poster and Resource Center filter. Manage the list under Taxonomies → Resource types.',
       },
     },
     { name: 'summary', type: 'textarea' },

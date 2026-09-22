@@ -1,0 +1,204 @@
+"use client";
+
+import React, { useState } from "react";
+import { Container, Section } from "@/components/layout";
+import { Reveal } from "@/components/ui/Reveal";
+import { CASE_STUDY_FAQS, type CaseStudyFaq } from "./case-studies-faqs";
+
+/**
+ * The page's FAQ, in the site's standard accordion chrome: two white cards at
+ * lg, one column below, one item open at a time across both columns.
+ *
+ * Answers stay in the DOM when collapsed (height animated through a grid row)
+ * so the text is in the page source for crawlers and matches the FAQPage
+ * JSON-LD the route emits. Triggers are `<h3>` inside the section H2 so screen
+ * readers can walk the list.
+ */
+
+const CARD =
+  "flex flex-col gap-5 self-start max-lg:rounded-none max-lg:bg-transparent max-lg:p-0 max-lg:shadow-none lg:rounded-[40px] lg:bg-white lg:p-8 lg:shadow-[0_1px_0_rgba(0,0,0,0.04),_0_24px_48px_-24px_rgba(60,30,150,0.08)]";
+
+function ToggleIcon({ open }: { open: boolean }): React.ReactElement {
+  return (
+    <span
+      aria-hidden
+      className="relative mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center"
+      style={{
+        transition: "transform 320ms cubic-bezier(0.22, 1, 0.36, 1)",
+        transform: open ? "rotate(45deg)" : "rotate(0deg)",
+      }}
+    >
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <rect x="2" y="8" width="14" height="2" rx="1" fill="#111111" />
+        <rect x="8" y="2" width="2" height="14" rx="1" fill="#111111" />
+      </svg>
+    </span>
+  );
+}
+
+function Row({
+  faq,
+  open,
+  onToggle,
+}: {
+  faq: CaseStudyFaq;
+  open: boolean;
+  onToggle: () => void;
+}): React.ReactElement {
+  const panelId = `case-studies-faq-panel-${faq.id}`;
+  const buttonId = `case-studies-faq-trigger-${faq.id}`;
+
+  return (
+    <div>
+      <h3 className="m-0">
+        <button
+          type="button"
+          id={buttonId}
+          aria-expanded={open}
+          aria-controls={panelId}
+          onClick={onToggle}
+          className="group flex w-full cursor-pointer items-start justify-between gap-6 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#33BAEC] lg:gap-10"
+        >
+          <span
+            className="flex-1 font-display text-[#111111] transition-colors duration-200 group-hover:text-[#1B1F4F]"
+            style={{
+              fontSize: "var(--fs-h4)",
+              fontWeight: "var(--fs-h4-weight)",
+              lineHeight: "var(--fs-h4-lh)",
+              letterSpacing: "var(--fs-h4-ls)",
+            }}
+          >
+            {faq.question}
+          </span>
+          <ToggleIcon open={open} />
+        </button>
+      </h3>
+
+      <section
+        id={panelId}
+        aria-labelledby={buttonId}
+        aria-hidden={!open}
+        style={{
+          display: "grid",
+          gridTemplateRows: open ? "1fr" : "0fr",
+          opacity: open ? 1 : 0,
+          transition:
+            "grid-template-rows 320ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease-out",
+        }}
+      >
+        <div style={{ overflow: "hidden", minHeight: 0 }}>
+          <p
+            className="pr-10 pt-3"
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "var(--fs-body)",
+              lineHeight: "var(--fs-body-lh)",
+              letterSpacing: "var(--fs-body-ls)",
+              color: "#333333",
+            }}
+          >
+            {faq.answer}
+          </p>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function Column({
+  items,
+  openId,
+  onToggle,
+}: {
+  items: readonly CaseStudyFaq[];
+  openId: string | null;
+  onToggle: (id: string) => void;
+}): React.ReactElement {
+  return (
+    <div className={CARD}>
+      {items.map((faq, i) => (
+        <React.Fragment key={faq.id}>
+          <Row faq={faq} open={openId === faq.id} onToggle={() => onToggle(faq.id)} />
+          {i < items.length - 1 && <div aria-hidden className="h-px w-full bg-[#D9D9D9]" />}
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
+
+export function CaseStudiesFAQ(): React.ReactElement {
+  const faqs = CASE_STUDY_FAQS;
+  const [openId, setOpenId] = useState<string | null>(faqs[0]?.id ?? null);
+  const half = Math.ceil(faqs.length / 2);
+  const left = faqs.slice(0, half);
+  const right = faqs.slice(half);
+
+  const toggle = (id: string): void =>
+    setOpenId((current) => (current === id ? null : id));
+
+  return (
+    // `padding="none"` with an explicit bottom: this is the last section, so it
+    // owes the footer one CTA-card half of its own background to overlap (see
+    // the layout contract in Footer.tsx).
+    <Section
+      padding="none"
+      data-section="CaseStudiesFAQ"
+      className="relative bg-white pb-[var(--spacing-section-cta)] pt-[var(--spacing-section-lg)]"
+      aria-labelledby="case-studies-faq-title"
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute select-none"
+        style={{
+          right: "162px",
+          top: "143px",
+          width: "262px",
+          height: "262px",
+          borderRadius: "262px",
+          backgroundColor: "#2CC1EB",
+          opacity: 0.18,
+          filter: "blur(101.5px)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute select-none"
+        style={{
+          left: "215px",
+          top: "560px",
+          width: "262px",
+          height: "262px",
+          borderRadius: "262px",
+          backgroundColor: "#DF9BFF",
+          opacity: 0.45,
+          filter: "blur(131.5px)",
+        }}
+      />
+
+      <Container className="relative">
+        <Reveal header style={{ maxWidth: "720px" }}>
+          <h2
+            id="case-studies-faq-title"
+            className="font-display text-[#111111]"
+            style={{
+              fontSize: "var(--fs-h2)",
+              fontWeight: "var(--fs-h2-weight)",
+              letterSpacing: "var(--fs-h2-ls)",
+              lineHeight: "var(--fs-h2-lh)",
+            }}
+          >
+            Questions about these stories
+          </h2>
+        </Reveal>
+
+        <Reveal delay={0.1} y={24} className="mt-8 lg:mt-10">
+          <div className="grid grid-cols-1 items-start gap-5 rounded-[24px] bg-white p-6 max-lg:shadow-[0_1px_0_rgba(0,0,0,0.04),_0_24px_48px_-24px_rgba(60,30,150,0.08)] sm:rounded-[40px] sm:p-8 lg:grid-cols-2 lg:gap-6 lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none">
+            <Column items={left} openId={openId} onToggle={toggle} />
+            <div aria-hidden className="h-px w-full bg-[#D9D9D9] lg:hidden" />
+            <Column items={right} openId={openId} onToggle={toggle} />
+          </div>
+        </Reveal>
+      </Container>
+    </Section>
+  );
+}

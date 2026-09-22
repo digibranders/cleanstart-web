@@ -163,9 +163,20 @@ function entry(path: string, lastModified?: string): MetadataRoute.Sitemap[numbe
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (!isIndexingAllowed()) return [];
 
-  const [blogs, resources, authors, news, events, jobs, guides, legal, knowledgeBase] =
-    await Promise.all([
+  const [
+    blogs,
+    caseStudies,
+    resources,
+    authors,
+    news,
+    events,
+    jobs,
+    guides,
+    legal,
+    knowledgeBase,
+  ] = await Promise.all([
       fetchDocs('blogs', BLOG_FILTER),
+      fetchDocs('case-studies', BLOG_FILTER),
       fetchDocs('resources', BLOG_FILTER),
       fetchDocs('authors', AUTHORS_FILTER),
       fetchDocs('news', NEWS_FILTER),
@@ -181,6 +192,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...knowledgeBase.map((k) => entry(`/knowledge-hub/${k.slug}`, effectiveModifiedAt(k))),
     ...blogs.map((b) => entry(`/blogs/${b.slug}`, effectiveModifiedAt(b))),
     ...resources.map((r) => entry(`/resources/${r.slug}`, effectiveModifiedAt(r))),
+    ...caseStudies.map((c) => entry(`/case-studies/${c.slug}`, effectiveModifiedAt(c))),
     ...authors.map((a) => entry(`/author/${a.slug}`, effectiveModifiedAt(a))),
     ...news.map((n) => entry(`/news/${n.slug}`, effectiveModifiedAt(n))),
     ...events.map((e) => entry(`/event/${e.slug}`, effectiveModifiedAt(e))),

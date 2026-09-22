@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { Resource } from "@/lib/resources";
 import {
-  resourceTypeLabel,
+  resolveResourceTypeLabel,
+  resolveResourceTypeSlug,
   resourceCtaLabel,
   resourceCoverPoster,
 } from "@/lib/resources-utils";
@@ -12,9 +13,10 @@ interface ResourceCardProps {
 }
 
 export function ResourceCard({ resource }: ResourceCardProps): React.ReactElement {
-  const typeLabel = resourceTypeLabel(resource.type);
-  const ctaLabel = resourceCtaLabel(resource.type, resource.ctaButtonText);
-  const coverPoster = resourceCoverPoster(resource.type);
+  const typeSlug = resolveResourceTypeSlug(resource);
+  const typeLabel = resolveResourceTypeLabel(resource);
+  const ctaLabel = resourceCtaLabel(typeSlug, resource.ctaButtonText);
+  const coverPoster = resourceCoverPoster(typeSlug);
 
   // Scale the overlay title down for longer copy so it stays within the cover's
   // dark area. Uses cqw so it tracks the fluid card width.

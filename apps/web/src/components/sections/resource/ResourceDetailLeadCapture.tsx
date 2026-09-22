@@ -2,7 +2,10 @@
 
 import { useRef, useState } from "react";
 import type { ResourceDetail } from "@/lib/resources";
-import { resourceLeadCaptureHeading } from "@/lib/resources-utils";
+import {
+  resolveResourceTypeSlug,
+  resourceLeadCaptureHeading,
+} from "@/lib/resources-utils";
 import { submitLead } from "@/lib/leads/submitLead";
 import { StatusBanner, useFormStatus } from "@/components/forms/StatusBanner";
 
@@ -16,7 +19,7 @@ const RESOURCE_CONSENT_TEXT =
 export function ResourceDetailLeadCapture({
   resource,
 }: ResourceDetailLeadCaptureProps): React.ReactElement {
-  const heading = resourceLeadCaptureHeading(resource.type);
+  const heading = resourceLeadCaptureHeading(resolveResourceTypeSlug(resource));
   const [email, setEmail] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);

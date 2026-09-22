@@ -1,6 +1,12 @@
 // Case Studies data layer — mirrors the resources.ts pattern.
-// Listing-only collection: no detail route, downloads link straight to the
-// public R2 asset URL.
+//
+// Two shapes: `CaseStudy` is the card surface the listing reads, and
+// `CaseStudyDetail` adds the fields only `/case-studies/[slug]` needs. The
+// split keeps the listing's `limit=1000` fetch away from every study's Lexical
+// body, which is what blew past Next's 2 MB data-cache ceiling on the
+// resources listing (see the note on the select whitelist below).
+
+import { cache } from "react";
 
 import { fetchCMS } from "./cms-fetch";
 import {
@@ -52,6 +58,24 @@ export type CaseStudy = {
   summary: string;
   asset?: CaseStudyMedia | null;
   publishedAt?: string | null;
+  /** Editor's listing spotlight. Absent everywhere falls back to the newest. */
+  featured?: boolean | null;
+  quote?: string | null;
+  quoteAuthor?: string | null;
+  quoteRole?: string | null;
+};
+
+/** A headline figure on the detail hero's result card. */
+export type CaseStudyOutcome = { value: string; label: string };
+
+/** A row in the detail page's "At a glance" rail. */
+export type CaseStudyGlanceFact = { label: string; value: string };
+
+export type CaseStudyDetail = CaseStudy & {
+  body?: import("./blog").LexicalRoot | null;
+  outcomes?: CaseStudyOutcome[] | null;
+  glance?: CaseStudyGlanceFact[] | null;
+  seo?: import("./seo/cms-seo").CmsSeo | null;
 };
 
 type PayloadListResponse<T> = {
@@ -96,6 +120,10 @@ export async function getCaseStudies({
     "summary",
     "asset",
     "publishedAt",
+    "featured",
+    "quote",
+    "quoteAuthor",
+    "quoteRole",
   ]) {
     params.set(`select[${field}]`, "true");
   }
@@ -104,3 +132,21 @@ export async function getCaseStudies({
     `/api/case-studies?${params.toString()}`,
   );
 }
+
+/** All published case-study slugs, for `generateStaticParams` (scalar-only query). */
+export async function getCaseStudySlugs(): Promise<string[]> {
+  const res = await fetchCMS<PayloadListResponse<{ slug: string }>>(
+    "/api/case-studies?where[_status][equals]=published&where[publishedAt][exists]=true&depth=0&limit=1000&select[slug]=true",
+  );
+  return res.docs.map((d) => d.slug).filter((s): s is string => Boolean(s));
+}
+
+/** One published case study by slug, with the detail-only fields. */
+export const getCaseStudyBySlug = cache(
+  async (slug: string): Promise<CaseStudyDetail | null> => {
+    const data = await fetchCMS<PayloadListResponse<CaseStudyDetail>>(
+      `/api/case-studies?where[slug][equals]=${encodeURIComponent(slug)}&where[_status][equals]=published&where[publishedAt][exists]=true&depth=1&limit=1`,
+    );
+    return data.docs[0] ?? null;
+  },
+);

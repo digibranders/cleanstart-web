@@ -1,10 +1,12 @@
 import { ResourceCenterSidebar } from "@/components/sections/resource-center/ResourceCenterSidebar";
 import { ResourceGrid } from "@/components/sections/resource-center/ResourceGrid";
 import { FadeUp } from "@/components/ui/FadeUp";
-import type { Resource } from "@/lib/resources";
+import type { Resource, ResourceTypeOption } from "@/lib/resources";
+import { resolveResourceTypeSlug } from "@/lib/resources-utils";
 
 export interface ResourceCenterContentProps {
   resources: Resource[];
+  types: ResourceTypeOption[];
   activeType: string;
   searchQuery: string;
   currentPage: number;
@@ -20,6 +22,7 @@ export interface ResourceCenterContentProps {
  */
 export function ResourceCenterContent({
   resources,
+  types,
   activeType,
   searchQuery,
   currentPage,
@@ -54,6 +57,7 @@ export function ResourceCenterContent({
             <h2 className="sr-only">Resources</h2>
             <div className="flex flex-col lg:flex-row items-stretch lg:items-start gap-6 lg:gap-8">
               <ResourceCenterSidebar
+                types={types}
                 activeType={activeType}
                 searchQuery={searchQuery}
               />
@@ -87,7 +91,7 @@ export function selectResources(
 ): { resources: Resource[]; totalPages: number } {
   const q = search.trim().toLowerCase();
   const filtered = all.filter((r) => {
-    const typeOk = !type || r.type === type;
+    const typeOk = !type || resolveResourceTypeSlug(r) === type;
     const searchOk = !q || r.title.toLowerCase().includes(q);
     return typeOk && searchOk;
   });

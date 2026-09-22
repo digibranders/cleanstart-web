@@ -15,6 +15,7 @@
  */
 export const ROUTE_PREFIX = {
   blogs: '/blogs',
+  'case-studies': '/case-studies',
   news: '/news',
   guides: '/guide',
   resources: '/resources',
@@ -43,15 +44,16 @@ export type RoutePrefixKey = keyof typeof ROUTE_PREFIX;
  */
 const LISTING_PATH_OVERRIDE: Record<string, string> = {
   resources: '/resource-center',
+  // The resource-type taxonomy has no detail route of its own; it renders as
+  // the Resource Center's filter rail, so that listing is what a term change
+  // must purge. `collectionUrlFromDoc` returns null for it (no ROUTE_PREFIX
+  // entry), so the hook purges the listing alone.
+  resourceTypes: '/resource-center',
   events: '/events',
   webinars: '/webinars',
   jobs: '/careers',
-  // case-studies is listing-only on the web (no `/case-studies/[slug]` detail
-  // route) and is intentionally absent from ROUTE_PREFIX, so it has no detail
-  // prefix to fall back to. Without this entry the publish hook revalidates
-  // nothing for a case study — not even its `/case-studies` index — leaving
-  // newly published case studies hidden until the ISR TTL lapses.
-  'case-studies': '/case-studies',
+  // case-studies needs no entry: its listing and its detail prefix are both
+  // `/case-studies`, so the ROUTE_PREFIX fallback already resolves correctly.
 };
 
 /** Index-page path for a collection, preferring an explicit listing override. */
@@ -66,13 +68,14 @@ export const listingPathForCollection = (collection: string): string | null => {
  * /sitemap.xml. Mirrors the `fetchDocs` calls in apps/web/src/app/sitemap.ts —
  * keep the two in sync when a collection starts or stops being listed.
  *
- * Collections that only affect a hard-coded static route (webinars and
- * case-studies list at `/webinars` and `/case-studies`, which are constants in
- * the web sitemap) are excluded: publishing one cannot change the URL set.
- * emailSignatures is excluded because the whole section is noindex.
+ * Collections that only affect a hard-coded static route (webinars list at
+ * `/webinars`, a constant in the web sitemap) are excluded: publishing one
+ * cannot change the URL set. emailSignatures is excluded because the whole
+ * section is noindex.
  */
 const SITEMAP_COLLECTIONS = new Set([
   'blogs',
+  'case-studies',
   'news',
   'guides',
   'resources',

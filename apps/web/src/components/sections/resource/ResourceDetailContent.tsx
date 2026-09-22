@@ -1,7 +1,11 @@
 import Image from "next/image";
 import { RenderLexical } from "@/lib/renderLexical";
 import type { ResourceDetail } from "@/lib/resources";
-import { mediaUrl, resourceCoverPoster } from "@/lib/resources";
+import {
+  mediaUrl,
+  resolveResourceTypeSlug,
+  resourceCoverPoster,
+} from "@/lib/resources";
 
 interface ResourceDetailContentProps {
   resource: ResourceDetail;
@@ -11,7 +15,7 @@ export function ResourceDetailContent({
   resource,
 }: ResourceDetailContentProps): React.ReactElement {
   const coverUrl = mediaUrl(resource.heroImage?.url);
-  const fallbackPoster = resourceCoverPoster(resource.type);
+  const fallbackPoster = resourceCoverPoster(resolveResourceTypeSlug(resource));
 
   // Steps the overlay title down for longer copy so it clears the logo and the
   // booklet edge. Sizes in `cqw` so the title scales with the cover, not the

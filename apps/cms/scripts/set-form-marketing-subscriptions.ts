@@ -20,11 +20,11 @@
  *   2258674941  Marketing Information   <- used here
  *   2258674944  One to One (HubSpot's default for 1:1 sales email)
  *   3005083821  Newsletter              (the newsletter form, left unchanged)
- * The gated-download HubSpot form's own checkbox is wired to One to One, which
- * is wrong for "Keep me updated", so its ID is not the one to copy.
- *
- * Contact is deliberately excluded: its HubSpot form has no consent
- * configuration at all.
+ * Every one of these HubSpot forms now carries the same consent block: an
+ * explicit consent-to-process plus one Marketing Information checkbox. The
+ * gated form used to point its checkbox at One to One, and contact and
+ * become-a-partner had no consent configuration at all, which is why those
+ * two were out of scope here until 22 Sep 2026.
  *
  * Writes via `payload.update`, is idempotent, and supports --dry-run.
  *
@@ -42,6 +42,8 @@ const MARKETING_INFORMATION = '2258674941';
 const TARGETS: Readonly<Record<string, string>> = {
   'book-a-demo': MARKETING_INFORMATION,
   'content-gated': MARKETING_INFORMATION,
+  contact: MARKETING_INFORMATION,
+  'become-a-partner': MARKETING_INFORMATION,
 };
 
 const args = new Set(process.argv.slice(2));
