@@ -560,16 +560,22 @@ function MorphCard({
       }
     >
       <div className="cs-tt-card__photo">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={testimonial.photoSrc}
-          alt={isActive ? `${testimonial.name}, ${testimonial.role}` : ""}
-          width={160}
-          height={160}
-          decoding="async"
-          loading="eager"
-          style={{ aspectRatio: "1 / 1" }}
-        />
+        {testimonial.photoSrc ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={testimonial.photoSrc}
+            alt={isActive ? `${testimonial.name}, ${testimonial.role}` : ""}
+            width={160}
+            height={160}
+            decoding="async"
+            loading="eager"
+            style={{ aspectRatio: "1 / 1" }}
+          />
+        ) : (
+          <span className="cs-tt-card__monogram" aria-hidden>
+            {initialsOf(testimonial.name)}
+          </span>
+        )}
       </div>
 
       <div className="cs-tt-card__body">
@@ -580,7 +586,7 @@ function MorphCard({
           </div>
           <CompanyMark
             company={testimonial.company}
-            logoSrc={testimonial.logoSrc}
+            logoSrc={testimonial.logoSrcDark ?? testimonial.logoSrc}
           />
         </div>
 
@@ -658,6 +664,17 @@ function NavButton({
       </svg>
     </button>
   );
+}
+
+// Not every customer supplies a headshot; the photo panel carries their
+// initials instead of an empty frame. Honorifics never belong in a monogram.
+function initialsOf(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter((part) => !/^(mr|mrs|ms|dr|prof)\.?$/i.test(part))
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
 }
 
 // Renders the real wordmark image when `logoSrc` is supplied; falls back to
