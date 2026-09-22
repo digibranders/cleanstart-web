@@ -88,6 +88,11 @@ const CHANNEL: RegionGroup[] = [
         logo: "/images/partners/global/sandbox-security.png",
       },
       {
+        name: "CYBERAIQ AG",
+        country: "Dubai, UAE",
+        logo: "/images/partners/global/cyberaiq.png",
+      },
+      {
         name: "Surakshate",
         country: "UAE",
         logo: "/images/partners/global/surakshate.webp",
