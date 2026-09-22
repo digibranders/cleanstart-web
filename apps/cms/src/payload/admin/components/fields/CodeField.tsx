@@ -1,16 +1,56 @@
 'use client';
 
-import { css } from '@codemirror/lang-css';
-import { html } from '@codemirror/lang-html';
-import { javascript } from '@codemirror/lang-javascript';
-import { json as jsonLang } from '@codemirror/lang-json';
-import { EditorState, type Extension } from '@codemirror/state';
-import { EditorView, keymap, lineNumbers, highlightActiveLine } from '@codemirror/view';
-import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { useField } from '@payloadcms/ui';
 import type { CodeFieldClientProps } from 'payload';
 import type { ReactElement } from 'react';
-import { useEffect, useId, useRef } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
+
+/**
+ * CodeMirror 6 is ~50 KB gz of editor plus four language grammars, and
+ * `wireCustomFields` stamps this component onto every `code` field in
+ * the config — of which there is exactly one, on `signatureTemplates`.
+ * Statically imported it rode in the admin's shared chunk graph, so
+ * every editor paid for it on every page to serve one set-and-forget
+ * infrastructure collection.
+ *
+ * Loading it on mount instead keeps it out of the initial bundle. The
+ * module promise is cached at module scope so a second code field (or a
+ * remount) reuses the already-resolved chunk rather than re-importing.
+ */
+type CodeMirrorModules = {
+  state: typeof import('@codemirror/state');
+  view: typeof import('@codemirror/view');
+  commands: typeof import('@codemirror/commands');
+  css: typeof import('@codemirror/lang-css');
+  html: typeof import('@codemirror/lang-html');
+  javascript: typeof import('@codemirror/lang-javascript');
+  json: typeof import('@codemirror/lang-json');
+};
+
+let modulesPromise: Promise<CodeMirrorModules> | null = null;
+
+const loadCodeMirror = async (): Promise<CodeMirrorModules> => {
+  if (!modulesPromise) {
+    modulesPromise = Promise.all([
+      import('@codemirror/state'),
+      import('@codemirror/view'),
+      import('@codemirror/commands'),
+      import('@codemirror/lang-css'),
+      import('@codemirror/lang-html'),
+      import('@codemirror/lang-javascript'),
+      import('@codemirror/lang-json'),
+    ]).then(([state, view, commands, css, html, javascript, json]) => ({
+      state,
+      view,
+      commands,
+      css,
+      html,
+      javascript,
+      json,
+    }));
+  }
+  return modulesPromise;
+};
 
 const labelOf = (raw: unknown): string => {
   if (typeof raw === 'string') return raw;
@@ -20,32 +60,39 @@ const labelOf = (raw: unknown): string => {
   return '';
 };
 
-const langExtension = (lang: string | undefined): Extension => {
+const langExtension = (
+  m: CodeMirrorModules,
+  lang: string | undefined,
+): import('@codemirror/state').Extension => {
   switch (lang) {
     case 'js':
     case 'javascript':
     case 'ts':
     case 'typescript':
-      return javascript({ typescript: lang === 'ts' || lang === 'typescript' });
+      return m.javascript.javascript({ typescript: lang === 'ts' || lang === 'typescript' });
     case 'json':
-      return jsonLang();
+      return m.json.json();
     case 'html':
-      return html();
+      return m.html.html();
     case 'css':
     case 'scss':
-      return css();
+      return m.css.css();
     default:
       return [];
   }
 };
 
 /**
- * Custom Code field. CodeMirror 6 — ~50 KB gz, syntax highlighting +
- * undo history + line numbers + active-line + standard keymap.
+ * Custom Code field. CodeMirror 6 — syntax highlighting + undo history +
+ * line numbers + active-line + standard keymap, loaded on demand.
  *
  * Storage shape unchanged: still `string`. The CodeMirror instance is
  * mounted imperatively and synced through Payload's `useField`. Saves
  * fire on any keystroke (debounced through Payload's autosave).
+ *
+ * Until the editor chunk resolves — and permanently if it fails to, so a
+ * chunk-load error can't lock an editor out of the field — the value is
+ * edited through a plain textarea on the same `useField` binding.
  */
 export const CodeField = (props: CodeFieldClientProps): ReactElement => {
   const { field, path } = props;
@@ -64,8 +111,9 @@ export const CodeField = (props: CodeFieldClientProps): ReactElement => {
   const readOnly = field.admin?.readOnly === true;
 
   const hostRef = useRef<HTMLDivElement | null>(null);
-  const viewRef = useRef<EditorView | null>(null);
+  const viewRef = useRef<import('@codemirror/view').EditorView | null>(null);
   const valueRef = useRef<string>(value ?? '');
+  const [enhanced, setEnhanced] = useState(false);
 
   useEffect(() => {
     valueRef.current = value ?? '';
@@ -81,38 +129,58 @@ export const CodeField = (props: CodeFieldClientProps): ReactElement => {
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: editor mounts once per language/readOnly; value/setValue are wired via refs to avoid recreating CodeMirror on every keystroke
   useEffect(() => {
-    if (!hostRef.current) return undefined;
-    const updateExt = EditorView.updateListener.of((update) => {
-      if (!update.docChanged) return;
-      const next = update.state.doc.toString();
-      if (next !== valueRef.current) {
-        valueRef.current = next;
-        setValue(next);
-      }
-    });
+    let cancelled = false;
 
-    const exts: Extension[] = [
-      lineNumbers(),
-      highlightActiveLine(),
-      history(),
-      keymap.of([...defaultKeymap, ...historyKeymap]),
-      EditorView.theme({
-        '&': { fontSize: '13px' },
-        '.cm-content': { fontFamily: 'var(--font-mono)' },
-      }),
-      langExtension(language),
-      updateExt,
-    ];
-    if (readOnly) exts.push(EditorView.editable.of(false));
+    void loadCodeMirror()
+      .then((m) => {
+        if (cancelled) return;
+        setEnhanced(true);
+        // The host div only exists once `enhanced` flips, so build the
+        // editor after React has painted it.
+        queueMicrotask(() => {
+          if (cancelled || !hostRef.current || viewRef.current) return;
 
-    const state = EditorState.create({
-      doc: value ?? '',
-      extensions: exts,
-    });
-    const view = new EditorView({ state, parent: hostRef.current });
-    viewRef.current = view;
+          const { EditorState } = m.state;
+          const { EditorView, keymap, lineNumbers, highlightActiveLine } = m.view;
+          const { defaultKeymap, history, historyKeymap } = m.commands;
+
+          const updateExt = EditorView.updateListener.of((update) => {
+            if (!update.docChanged) return;
+            const next = update.state.doc.toString();
+            if (next !== valueRef.current) {
+              valueRef.current = next;
+              setValue(next);
+            }
+          });
+
+          const exts: import('@codemirror/state').Extension[] = [
+            lineNumbers(),
+            highlightActiveLine(),
+            history(),
+            keymap.of([...defaultKeymap, ...historyKeymap]),
+            EditorView.theme({
+              '&': { fontSize: '13px' },
+              '.cm-content': { fontFamily: 'var(--font-mono)' },
+            }),
+            langExtension(m, language),
+            updateExt,
+          ];
+          if (readOnly) exts.push(EditorView.editable.of(false));
+
+          const state = EditorState.create({
+            doc: valueRef.current,
+            extensions: exts,
+          });
+          viewRef.current = new EditorView({ state, parent: hostRef.current });
+        });
+      })
+      .catch(() => {
+        // Chunk failed to load — the textarea fallback stays in place.
+      });
+
     return () => {
-      view.destroy();
+      cancelled = true;
+      viewRef.current?.destroy();
       viewRef.current = null;
     };
     // Mount once per language/readOnly combination — `value` syncing
@@ -134,7 +202,22 @@ export const CodeField = (props: CodeFieldClientProps): ReactElement => {
           </span>
         ) : null}
       </span>
-      <div aria-labelledby={inputId} ref={hostRef} className="cs-code-field__editor" />
+      {enhanced ? (
+        <div aria-labelledby={inputId} ref={hostRef} className="cs-code-field__editor" />
+      ) : (
+        <textarea
+          aria-labelledby={inputId}
+          className="cs-code-field__editor cs-code-field__fallback"
+          value={value ?? ''}
+          readOnly={readOnly}
+          spellCheck={false}
+          rows={12}
+          onChange={(e) => {
+            valueRef.current = e.target.value;
+            setValue(e.target.value);
+          }}
+        />
+      )}
       {description ? <p className="field-description">{description}</p> : null}
       {showError && errorMessage ? (
         <output className="field-error" aria-live="polite">

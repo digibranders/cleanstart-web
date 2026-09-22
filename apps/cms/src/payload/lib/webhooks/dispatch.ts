@@ -234,6 +234,19 @@ interface DispatchOptions {
   readonly requestId?: string;
 }
 
+/**
+ * Outbound calls on the publish path get an explicit deadline.
+ *
+ * `fetch` has no default timeout in Node: undici only gives up after its
+ * 300 s headers timeout. An integration endpoint that is slow rather
+ * than down therefore blocks whatever awaits it for minutes, and these
+ * calls sit in a Payload `afterChange` hook — i.e. inside the editor's
+ * Publish request and inside the open write transaction. A bounded
+ * failure that logs and retries later is strictly better than an
+ * unbounded wait.
+ */
+const GENERIC_TIMEOUT_MS = 8_000;
+
 const postGeneric = async (
   dest: GenericDestination,
   event: WebhookEvent,
@@ -254,6 +267,7 @@ const postGeneric = async (
       method: 'POST',
       headers: { 'content-type': 'application/json', ...headers },
       body,
+      signal: AbortSignal.timeout(GENERIC_TIMEOUT_MS),
     });
     if (!res.ok) {
       const text = await res.text().catch(() => '');
