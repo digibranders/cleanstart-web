@@ -1,6 +1,6 @@
 import { breadcrumbTrail } from "@cleanstart/schema/builders";
 import type { ResourceDetail } from "@/lib/resources";
-import { mediaUrl } from "@/lib/resources";
+import { mediaUrl, resolveResourceTypeLabel } from "@/lib/resources";
 import { DETAIL_HERO_TITLE_STYLE } from "@/components/sections/_shared/DetailHero";
 import { HeroBreadcrumb } from "@/components/sections/_shared/HeroBreadcrumb";
 import { ResourceDownloadButton } from "@/components/resource/ResourceDownloadButton";
@@ -30,6 +30,16 @@ export function ResourceDetailHero({
       : resource.asset?.url
         ? (mediaUrl(resource.asset.url) ?? "#")
         : "#";
+
+  // "Download" promises a file on click, which is true for the 29 ungated
+  // resources and a lie for the gated ones, where the click opens a form. The
+  // visitor had no way to tell the two apart before committing. "Unlock the
+  // <type>" says a gate is coming; `ctaButtonText` still overrides it for an
+  // editor who wants specific wording.
+  const downloadLabel = gated
+    ? (resource.ctaButtonText?.trim() ||
+      `Unlock the ${resolveResourceTypeLabel(resource)}`)
+    : "Download";
 
   return (
     <section
@@ -151,7 +161,7 @@ export function ResourceDetailHero({
               loading="eager"
               decoding="async"
             />
-            Download
+            {downloadLabel}
           </ResourceDownloadButton>
         </div>
       </div>
