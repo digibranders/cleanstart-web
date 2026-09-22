@@ -6,7 +6,7 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
 import { getPageGraph } from "@/lib/seo/compose-page";
 import {
-  CompareIndexLedger,
+  CompareIndexGrid,
   CompareIndexMethod,
   type CompareIndexCopy,
 } from "@/components/sections/compare/CompareIndex";
@@ -54,6 +54,12 @@ const COPY: CompareIndexCopy = {
   titleAccent: "actually differ",
   standfirst:
     "CleanStart compared with other hardened image providers, one capability at a time. Pick a comparison to see the full table.",
+  request: {
+    heading: "Evaluating a different vendor?",
+    body: "Tell us which hardened image provider is on your shortlist and we will walk you through how CleanStart compares.",
+    label: "Contact us",
+    href: "/contact-us",
+  },
   method: {
     heading: "How these comparisons are made",
     facts: [
@@ -131,7 +137,7 @@ export const revalidate = 21600; // 6h ISR fallback, matching the comparison pag
  * page, and repointing it here would aim all of them at a `noindex` URL.
  * Repoint it to `/compare` at launch, with the crumb.
  *
- * Each row composes itself from the comparison's own `CompareContent`, so
+ * Each card composes itself from the comparison's own `CompareContent`, so
  * listing a fourth comparison is adding it to `COMPARISONS` above.
  */
 export default async function CompareIndexPage(): Promise<React.ReactElement> {
@@ -152,10 +158,10 @@ export default async function CompareIndexPage(): Promise<React.ReactElement> {
       <JsonLdGraph id="compare-index-jsonld" graph={graph} />
       <Header />
       <main id="main-content">
-        {/* The hero and the ledger are one continuous dark frame, and the
-            first comparison sits inside the opening viewport, so the frame is
-            not wrapped in `FadeUp`. Its rows reveal themselves. */}
-        <CompareIndexLedger copy={COPY} comparisons={COMPARISONS} />
+        {/* The hero and the card grid are one continuous dark frame, and the
+            first row of cards sits inside the opening viewport, so the frame
+            is not wrapped in `FadeUp`. Its cards reveal themselves. */}
+        <CompareIndexGrid copy={COPY} comparisons={COMPARISONS} />
         <FadeUp>
           <CompareIndexMethod method={COPY.method} />
         </FadeUp>
