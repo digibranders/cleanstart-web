@@ -1,29 +1,30 @@
 import { Container, Section } from "@/components/layout";
-import { GlassIcon } from "@/components/sections/_shared/GlassIcon";
 import { Reveal } from "@/components/ui/Reveal";
 import { ScaleToFit } from "@/components/ui/ScaleToFit";
 import { SIGNAL } from "./tricorder-palette";
 
 /**
- * "Software Doesn't Exist in Isolation." — the copy doc's own diagram, built in
- * the site's language rather than copied from it.
+ * "Three Ways to Read Software Components": the copy doc's own diagram, built
+ * in the site's language rather than copied from it.
  *
  * Structure and vocabulary are the doc's: three signal groups (History,
  * Behavior, Relationships) each showing what it actually reads, their currents
- * converging into one COMPONENT, which resolves into the TRICORDER VERDICT.
- * Every label, version and item name below is the doc's.
+ * converging into the one COMPONENT all three describe. Every label, version
+ * and item name below is the doc's.
  *
- * Three things are translated, because the doc's mock is styled for a white
- * page and this section is dark:
+ * The verdict is deliberately not here. `TricorderPipeline`, directly below,
+ * ends on it, so repeating it would resolve the same story twice on one page.
+ * This section stops at the component: three readings, one subject.
+ *
+ * Two things are translated, because the doc's mock is styled for a white page
+ * and this section is dark:
  *  - the group panels become glass on the section gradient, the way the Clean
  *    Libraries scenes are built, so the page keeps its light/dark alternation;
- *  - the doc's flat outline-in-a-circle icons become accent tiles, with the
- *    group marks as `GlassIcon` gems, the icon vocabulary the rest of the site uses;
  *  - the doc's green becomes the teal already sanctioned as a card accent
  *    (#2dd4bf) — plain green is not in the CleanStart palette.
  *
- * Cards carry no outlines: depth is fill, sheen and shadow. The verdict card is
- * the brightest object in the scene because it is where the diagram ends.
+ * Cards carry no outlines: depth is fill, sheen and shadow. The component card
+ * is the brightest object in the scene because it is where the diagram lands.
  *
  * The scene is laid out on a fixed 1320-wide canvas and scaled to fit, like the
  * other coded scenes. Below lg it stacks. The only motion is the reused
@@ -42,8 +43,7 @@ type GlyphKey =
   | "code"
   | "user"
   | "cube"
-  | "server"
-  | "shield";
+  | "server";
 
 function Glyph({ name, size }: { name: GlyphKey; size: number }): React.ReactElement {
   const c = {
@@ -133,13 +133,6 @@ function Glyph({ name, size }: { name: GlyphKey; size: number }): React.ReactEle
           <rect x="3.5" y="4" width="17" height="6" rx="1.8" />
           <rect x="3.5" y="14" width="17" height="6" rx="1.8" />
           <path d="M7 7h.01M7 17h.01" />
-        </svg>
-      );
-    case "shield":
-      return (
-        <svg {...c}>
-          <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1Z" />
-          <path d="m9 12 2 2 4-4" />
         </svg>
       );
   }
@@ -381,7 +374,7 @@ const CARD_TITLE_STYLE: React.CSSProperties = {
 
 const COMPONENT_ACCENT = "#7aa6ff";
 
-/** The component the three currents resolve onto. */
+/** The component the three currents resolve onto, and where the diagram ends. */
 function ComponentCard(): React.ReactElement {
   return (
     <div
@@ -392,7 +385,11 @@ function ComponentCard(): React.ReactElement {
           `radial-gradient(90% 120% at 0% 50%, ${tint(COMPONENT_ACCENT, 22)} 0%, transparent 60%)`,
           "linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 100%)",
         ].join(", "),
-        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.16), 0 28px 56px -30px rgba(4,2,30,0.95)",
+        boxShadow: [
+          "inset 0 1px 0 rgba(255,255,255,0.16)",
+          "0 28px 56px -30px rgba(4,2,30,0.95)",
+          "0 0 64px -18px rgba(122,166,255,0.6)",
+        ].join(", "),
         backdropFilter: "blur(14px)",
         WebkitBackdropFilter: "blur(14px)",
       }}
@@ -410,62 +407,9 @@ function ComponentCard(): React.ReactElement {
   );
 }
 
-const VERDICT_ACCENT = "#8b6cff";
+/* ── Desktop scene: fixed 1320 × 402 canvas, scaled to fit ───────────────── */
 
-/**
- * The verdict: the end of the diagram, so it is the brightest object in it.
- * Brand indigo → violet body, a light sheen across the top and a violet halo.
- */
-function VerdictCard(): React.ReactElement {
-  return (
-    <div
-      className="relative flex h-full w-full items-center gap-4 overflow-hidden px-5"
-      style={{
-        borderRadius: "22px",
-        background: "linear-gradient(120deg, #1a2399 0%, #3b22c4 55%, #6a2fe0 100%)",
-        boxShadow: [
-          "inset 0 1px 0 rgba(255,255,255,0.28)",
-          "0 30px 60px -26px rgba(4,2,30,0.95)",
-          "0 0 70px -14px rgba(139,108,255,0.75)",
-        ].join(", "),
-      }}
-    >
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-1/2"
-        style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 100%)" }}
-      />
-      <span
-        aria-hidden
-        className="pointer-events-none absolute rounded-full"
-        style={{
-          right: -60,
-          top: -80,
-          width: 220,
-          height: 220,
-          background: "radial-gradient(closest-side, rgba(201,184,255,0.35), rgba(201,184,255,0))",
-        }}
-      />
-      <span className="relative">
-        <GlassIcon accent={VERDICT_ACCENT} size={52}>
-          <Glyph name="shield" size={26} />
-        </GlassIcon>
-      </span>
-      <div className="relative min-w-0">
-        <p className="font-display text-white" style={CARD_TITLE_STYLE}>
-          Tricorder Verdict
-        </p>
-        <p className="mt-1 text-white/80" style={{ fontSize: "var(--fs-caption)", letterSpacing: "-0.01em" }}>
-          Evidence-backed verdict.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/* ── Desktop scene: fixed 1320 × 538 canvas, scaled to fit ───────────────── */
-
-const VB = { w: 1320, h: 538 } as const;
+const VB = { w: 1320, h: 402 } as const;
 /**
  * Panel geometry: equal thirds, so the Behavior panel is centred on CARD_X and
  * its current drops straight through the junction into the component.
@@ -481,7 +425,6 @@ const PANEL_BOTTOM = PANEL_Y + PANEL_H;
 const BUS_Y = 272;
 const CARD_X = VB.w / 2; // 660
 const COMPONENT = { y: 314, h: 88, w: 380 } as const;
-const VERDICT_CARD = { y: 438, h: 100, w: 440 } as const;
 
 const centreOf = (p: { x: number; w: number }): number => p.x + p.w / 2;
 
@@ -534,23 +477,8 @@ function SceneDesktop(): React.ReactElement {
               </g>
             );
           })}
-          {/* Junction, then the drop into the verdict. */}
+          {/* Where the three currents meet before the drop into the component. */}
           <circle cx={CARD_X} cy={BUS_Y} r="4.5" fill="#c9b8ff" filter="url(#tri-ctx-glow)" />
-          <path
-            d={`M ${CARD_X} ${COMPONENT.y + COMPONENT.h} L ${CARD_X} ${VERDICT_CARD.y}`}
-            stroke="#8b6cff"
-            strokeOpacity="0.5"
-            strokeWidth="6"
-            strokeLinecap="round"
-          />
-          <path
-            className="cs-lep-beam"
-            d={`M ${CARD_X} ${COMPONENT.y + COMPONENT.h} L ${CARD_X} ${VERDICT_CARD.y}`}
-            stroke="#c9b8ff"
-            strokeWidth="2.25"
-            strokeLinecap="round"
-            strokeDasharray="2 9"
-          />
         </svg>
 
         {/* Group panels. */}
@@ -576,12 +504,6 @@ function SceneDesktop(): React.ReactElement {
           style={{ left: CARD_X - COMPONENT.w / 2, top: COMPONENT.y, width: COMPONENT.w, height: COMPONENT.h }}
         >
           <ComponentCard />
-        </div>
-        <div
-          className="absolute"
-          style={{ left: CARD_X - VERDICT_CARD.w / 2, top: VERDICT_CARD.y, width: VERDICT_CARD.w, height: VERDICT_CARD.h }}
-        >
-          <VerdictCard />
         </div>
       </div>
     </ScaleToFit>
@@ -634,10 +556,6 @@ function SceneMobile(): React.ReactElement {
       <div className="w-full max-w-[460px]" style={{ height: "88px" }}>
         <ComponentCard />
       </div>
-      <Drop accent="#8b6cff" />
-      <div className="w-full max-w-[460px]" style={{ height: "100px" }}>
-        <VerdictCard />
-      </div>
     </div>
   );
 }
@@ -672,7 +590,7 @@ export function TricorderContext(): React.ReactElement {
               className="font-display text-white"
               style={{ fontSize: "var(--fs-h2)", fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.08, textWrap: "balance" }}
             >
-              Software Doesn&rsquo;t Exist in Isolation.
+              Three Ways to Read Software Components
             </h2>
             <p
               className="mt-5 font-sans text-white/80"

@@ -6,10 +6,14 @@ import { Container, Section } from '@/components/layout';
 import { Reveal, RevealItem, RevealStagger } from '@/components/ui/Reveal';
 
 /**
- * "One Intelligence Layer. Multiple Security Decisions." The copy doc's own
+ * "One Intelligence Layer. Three Decision Points." The copy doc's own
  * diagram: the Tricorder intelligence cube on top, its current branching down
- * into Clean Images, Clean Libraries and CleanSight, each card carrying the
- * doc's one-liner and the decision it powers.
+ * into Clean Libraries, Clean Images and CleanSight, each card carrying the
+ * doc's one-liner and the decision it powers. The cards run in the order the
+ * sub-head names, which is the order a component meets them in life: build,
+ * then release, then the running fleet. `PRODUCTS` order drives the cards, the
+ * landing dots and the branch gradient together, so it stays the one place to
+ * change it.
  *
  * The hub is the hero's cube rendered on its own, so the page opens and closes
  * on the same object. Below lg the branch becomes a single drop and the cards
@@ -35,21 +39,10 @@ interface Product {
 
 const PRODUCTS: readonly [Product, Product, Product] = [
   {
-    key: 'images',
-    title: 'Clean Images',
-    desc: 'Verify images before release.',
-    decision: 'Release-time decisions',
-    icon: 'release',
-    href: '/cleanstart-images',
-    art: '/images/cleanstart-factory/clean-images-2.webp',
-    artAlt: 'Clean Images badge: a stack of hardened image layers with a verified shield',
-    tint: '#5b9bff',
-  },
-  {
     key: 'libraries',
     title: 'Clean Libraries',
     desc: 'Trust dependencies before they enter your build.',
-    decision: 'Build-time decisions',
+    decision: 'Build-time',
     icon: 'build',
     href: '/clean-libraries',
     art: '/images/cleanstart-factory/clean-libraries-2.webp',
@@ -57,10 +50,21 @@ const PRODUCTS: readonly [Product, Product, Product] = [
     tint: '#2dd4bf',
   },
   {
+    key: 'images',
+    title: 'Clean Images',
+    desc: 'Verify images before release.',
+    decision: 'Release-time',
+    icon: 'release',
+    href: '/cleanstart-images',
+    art: '/images/cleanstart-factory/clean-images-2.webp',
+    artAlt: 'Clean Images badge: a stack of hardened image layers with a verified shield',
+    tint: '#5b9bff',
+  },
+  {
     key: 'cleansight',
     title: 'CleanSight',
     desc: 'Map risk across your container estate.',
-    decision: 'Fleet-level intelligence',
+    decision: 'Fleet-level',
     icon: 'fleet',
     href: '/cleansight',
     art: '/images/cleanstart-factory/cleansight-2.webp',
@@ -155,9 +159,9 @@ function Branch(): React.ReactElement {
             y2="0"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0" stopColor="#5b9bff" />
-            <stop offset="0.5" stopColor="#2dd4bf" />
-            <stop offset="1" stopColor="#a974ff" />
+            {PRODUCTS.map((p, i) => (
+              <stop key={p.key} offset={i / (PRODUCTS.length - 1)} stopColor={p.tint} />
+            ))}
           </linearGradient>
         </defs>
         <path
@@ -213,7 +217,28 @@ function ProductCard({ product }: { product: Product }): React.ReactElement {
         WebkitBackdropFilter: 'blur(12px)',
       }}
     >
-      <div className="flex items-start gap-4 p-[clamp(22px,2.2vw,30px)] pb-6">
+      {/* The decision point leads the card: the section heading promises three of
+          them, so each card says which one it is before it says what ships it. */}
+      <div
+        className="flex items-center gap-2.5 px-[clamp(22px,2.2vw,30px)] pt-[clamp(20px,2vw,26px)] font-display"
+        style={{
+          color: `color-mix(in srgb, ${product.tint} 70%, #ffffff)`,
+          fontSize: 'var(--fs-body)',
+          fontWeight: 600,
+          letterSpacing: '-0.005em',
+        }}
+      >
+        <DecisionGlyph icon={product.icon} />
+        {product.decision}
+        <span
+          aria-hidden
+          className="ml-auto shrink-0 text-white/50 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-white"
+        >
+          ↗
+        </span>
+      </div>
+
+      <div className="flex items-start gap-4 px-[clamp(22px,2.2vw,30px)] pb-[clamp(22px,2.2vw,30px)] pt-4">
         <div
           className="relative shrink-0 transition-transform duration-500 group-hover:scale-105"
           style={{ width: 'clamp(76px, 6.4vw, 92px)', aspectRatio: '1 / 1' }}
@@ -247,25 +272,6 @@ function ProductCard({ product }: { product: Product }): React.ReactElement {
             {product.desc}
           </p>
         </div>
-        <span
-          aria-hidden
-          className="ml-auto shrink-0 text-white/50 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-white"
-        >
-          ↗
-        </span>
-      </div>
-      <div
-        className="mt-auto flex items-center gap-2.5 px-[clamp(22px,2.2vw,30px)] py-4 font-display"
-        style={{
-          borderTop: `1px solid color-mix(in srgb, ${product.tint} 22%, rgba(255,255,255,0.06))`,
-          color: `color-mix(in srgb, ${product.tint} 70%, #ffffff)`,
-          fontSize: 'var(--fs-body)',
-          fontWeight: 600,
-          letterSpacing: '-0.005em',
-        }}
-      >
-        <DecisionGlyph icon={product.icon} />
-        {product.decision}
       </div>
     </Link>
   );
@@ -317,7 +323,7 @@ export function TricorderSubstrate(): React.ReactElement {
               }}
             >
               One Intelligence Layer.{' '}
-              <span className="cs-text-gradient-impact">Multiple Security Decisions.</span>
+              <span className="cs-text-gradient-impact">Three Decision Points.</span>
             </h2>
             <p
               className="mx-auto mt-5 max-w-[700px] font-sans text-white/80"
@@ -329,8 +335,8 @@ export function TricorderSubstrate(): React.ReactElement {
                 textWrap: 'balance',
               }}
             >
-              Tricorder powers CleanStart with a shared intelligence substrate, bringing consistent
-              software analysis wherever components enter and run.
+              Tricorder brings consistent software analysis wherever components enter and run: at
+              build, at release, and across your fleet.
             </p>
           </div>
         </Reveal>
