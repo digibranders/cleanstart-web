@@ -25,15 +25,16 @@ const PATH = "/compare";
  * The hub's own copy, which no source document writes.
  *
  * SEO's comparison-page metadata table (2026-09-21) has a row per comparison
- * and none for the hub, so everything below is written here and wants its own
- * row before the page is indexed. `META` is deliberately descriptive: it says
- * what the comparisons cover and makes no claim a comparison would then have
- * to support.
+ * and none for the hub, so everything below is written here. `META` is
+ * deliberately descriptive: it says what the comparisons cover and makes no
+ * claim a comparison would then have to support. The description is kept
+ * inside the snippet budget, which the per-comparison rows are not: those are
+ * SEO's own copy and are left exactly as the table writes them.
  */
 const META = {
   title: "Compare CleanStart | Hardened Container Image Comparisons",
   description:
-    "Side-by-side capability comparisons of CleanStart and other hardened container image providers, covering image foundations, build process, supply chain verification, and compliance.",
+    "Side-by-side comparisons of CleanStart and other hardened image providers: image foundations, build process, supply chain verification, and compliance.",
 } as const;
 
 const TITLE = "Compare CleanStart";
@@ -99,8 +100,7 @@ const CTA: CompareCtaContent = {
 
 /**
  * Order is the one `docs/web/WEB-PAGES.md` lists them in (C1, C2, C3), which
- * is the order they were built. The Docker comparison is also the only one
- * live, so it leads.
+ * is the order they were built. All three are live as of 2026-09-22.
  */
 const COMPARISONS: readonly CompareContent[] = [DHI, RED_HAT, CHAINGUARD];
 
@@ -110,11 +110,6 @@ export const metadata = buildPageMetadata({
   description: META.description,
   path: PATH,
   eyebrow: "Comparison",
-  // Held back with the two comparisons it lists. A hub that is indexed while
-  // two of its three cards point at `noindex` pages advertises more than the
-  // site is ready to show, so this launches when they do.
-  noindex: true,
-  nofollow: true,
 });
 
 export const revalidate = 21600; // 6h ISR fallback, matching the comparison pages
@@ -126,17 +121,15 @@ export const revalidate = 21600; // 6h ISR fallback, matching the comparison pag
  * links, and a breadcrumb that stopped at Home because a Compare crumb would
  * have pointed at a 404.
  *
- * **The Compare crumb is deliberately still not added to the comparison
- * pages.** `ComparePage` builds `Home > <page>`, and adding the middle crumb
- * now would change the live Docker page's BreadcrumbList to point at a
- * `noindex` URL. Add it in `ComparePage.tsx` at the same moment this page's
- * `noindex, nofollow` pair comes off, not before.
+ * Launched 2026-09-22 together with the Red Hat and Chainguard comparisons:
+ * the `noindex, nofollow` pair came off, the path joined the sitemap's
+ * STATIC_ROUTES, and `ComparePage` gained the middle `Compare` crumb it had
+ * been holding back (that crumb was blocked only because it would have pointed
+ * the live Docker page's BreadcrumbList at a `noindex` URL).
  *
- * **The footer's "Compare" link points here** (`Footer.tsx`, Product column).
- * It is a site-wide link on every live page, so while this route stays
- * `noindex, nofollow` those links resolve to a URL search engines crawl and
- * drop, and the indexed Docker comparison has no site-wide internal link of
- * its own. Dropping the pair below is what settles that.
+ * **The footer's "Compare" link points here** (`Footer.tsx`, Company column).
+ * It is a site-wide link on every live page, so it is also how the comparison
+ * family gets its internal linking.
  *
  * Each card composes itself from the comparison's own `CompareContent`, so
  * listing a fourth comparison is adding it to `COMPARISONS` above.

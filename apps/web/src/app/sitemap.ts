@@ -110,7 +110,10 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   // and shipped noindex, unlinked and unlisted, so nothing was de-ranked. Recover
   // the route and its sections from git history when it is rebuilt.
   { path: '/community' },
+  { path: '/compare' },
+  { path: '/compare/chainguard-vs-cleanstart' },
   { path: '/compare/cleanstart-vs-docker-hardened-images' },
+  { path: '/compare/red-hat-vs-cleanstart' },
   { path: '/contact-us' },
   { path: '/deal-registration' },
   { path: '/events' },

@@ -28,11 +28,14 @@ import type { CompareContent } from "./compare-types";
  * `FadeUp` wraps the below-fold sections only — the hero renders visible so it
  * stays an LCP candidate.
  *
- * `/compare` itself has no page yet, so the breadcrumb stays Home > this page
- * with no Compare crumb; add that crumb only when the hub exists, or it links
- * to a 404. There is no `pageRegistry` row for these paths, so `getPageGraph`
- * contributes Organization and WebSite but no WebPage node; the BreadcrumbList
- * and FAQPage below are passed directly and are unaffected.
+ * The breadcrumb is `Home > Compare > this page`. The middle crumb was held
+ * back until `/compare` existed and was indexable (2026-09-22), because
+ * pointing the live Docker page's BreadcrumbList at a `noindex` URL is worse
+ * than a two-crumb trail.
+ *
+ * Only `/compare/cleanstart-vs-docker-hardened-images` has a `pageRegistry`
+ * row, so the other routes get Organization and WebSite but no WebPage node.
+ * The BreadcrumbList and FAQPage below are passed directly and are unaffected.
  */
 export async function ComparePage({
   content,
@@ -40,7 +43,11 @@ export async function ComparePage({
   content: CompareContent;
 }): Promise<React.ReactElement> {
   const graph = await getPageGraph(content.path, [
-    breadcrumbSchema([{ name: "Home", path: "/" }, { name: content.title }]),
+    breadcrumbSchema([
+      { name: "Home", path: "/" },
+      { name: "Compare", path: "/compare" },
+      { name: content.title },
+    ]),
     faqPageSchema([...content.faqs]),
   ]);
 
