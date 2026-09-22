@@ -10,7 +10,7 @@ import {
   getResourceBySlugDraft,
   getResourceSlugs,
   mediaUrl,
-  resourceTypeLabel,
+  resolveResourceTypeLabel,
 } from "@/lib/resources";
 import { highlightLexical } from "@/lib/highlightLexical";
 import { buildPageMetadata } from "@/lib/seo/canonical";
@@ -66,7 +66,7 @@ export async function generateMetadata({
       resource.summary ??
       "Whitepapers, reports, datasheets, and case studies from CleanStart.",
     path: `/resources/${resource.slug}`,
-    eyebrow: resource.type ? resourceTypeLabel(resource.type) : "Resource",
+    eyebrow: resolveResourceTypeLabel(resource),
     type: "article",
     publishedTime: effectivePublishedAt(resource) ?? resource.publishedAt ?? undefined,
     ...(seo.noindex ? { noindex: true, nofollow: seo.nofollow } : {}),
@@ -116,7 +116,7 @@ export async function renderResourceDetail({
               path: `/resources/${resource.slug}`,
               publishedAt: effectivePublishedAt(resource) ?? resource.publishedAt ?? undefined,
               imageUrl: heroAbsolute,
-              type: resourceTypeLabel(resource.type),
+              type: resolveResourceTypeLabel(resource),
             }),
           ],
           override: seoOverride(resource.seo),

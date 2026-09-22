@@ -3566,11 +3566,11 @@ export interface Resource {
    */
   slug: string;
   /**
-   * Legacy enum — superseded by the Resource type relationship below. Kept during the taxonomy transition; removed once apps/web reads the relationship.
+   * Legacy enum, superseded by the Type relationship. apps/web now reads the relationship, so this is hidden from editors; the column stays until a migration drops it so an un-backfilled row still resolves.
    */
   type?: ('whitepaper' | 'ebook' | 'datasheet' | 'architecture-insights' | 'report') | null;
   /**
-   * Resource type taxonomy reference. Seeded/backfilled from the legacy `type` enum; editors manage the list under Taxonomies → Resource types.
+   * Drives the type badge, cover poster and Resource Center filter. Manage the list under Taxonomies → Resource types.
    */
   typeRef?: (number | null) | ResourceType;
   summary?: string | null;

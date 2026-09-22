@@ -5,10 +5,11 @@ import {
   ResourceCenterContent,
   selectResources,
 } from "@/components/sections/resource-center/ResourceCenterContent";
-import type { Resource } from "@/lib/resources";
+import type { Resource, ResourceTypeOption } from "@/lib/resources";
 
 interface ResourceCenterBrowserProps {
   allResources: Resource[];
+  types: ResourceTypeOption[];
 }
 
 /**
@@ -19,6 +20,7 @@ interface ResourceCenterBrowserProps {
  */
 export function ResourceCenterBrowser({
   allResources,
+  types,
 }: ResourceCenterBrowserProps): React.ReactElement {
   const params = useSearchParams();
   const activeType = params.get("type") ?? "";
@@ -34,6 +36,7 @@ export function ResourceCenterBrowser({
   return (
     <ResourceCenterContent
       resources={resources}
+      types={types}
       activeType={activeType}
       searchQuery={searchQuery}
       currentPage={Math.min(page, totalPages)}

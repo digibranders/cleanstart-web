@@ -10,7 +10,12 @@ import {
 } from "@/components/sections/resource-center/ResourceCenterContent";
 import { ResourceCenterHero } from "@/components/sections/resource-center/ResourceCenterHero";
 import { CrawlableLinkIndex } from "@/components/ui/CrawlableLinkIndex";
-import { getResources } from "@/lib/resources";
+import {
+  getResourceTypes,
+  getResources,
+  orderResourceTypes,
+  RESOURCE_TYPES,
+} from "@/lib/resources";
 import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
 
@@ -45,6 +50,12 @@ export default async function ResourceCenterPage(): Promise<React.ReactElement> 
       totalPages: 1,
     };
   });
+
+  // Falls back to the seeded rail if the taxonomy fetch fails, so a CMS blip
+  // costs the filter its editor-added entries rather than the whole sidebar.
+  const typeTerms = await getResourceTypes().catch(() => []);
+  const types =
+    typeTerms.length > 0 ? orderResourceTypes(typeTerms) : RESOURCE_TYPES;
 
   const allResources = resourcesData.docs;
   const initial = selectResources(allResources, {
@@ -81,6 +92,7 @@ export default async function ResourceCenterPage(): Promise<React.ReactElement> 
           fallback={
             <ResourceCenterContent
               resources={initial.resources}
+              types={types}
               activeType=""
               searchQuery=""
               currentPage={1}
@@ -89,7 +101,7 @@ export default async function ResourceCenterPage(): Promise<React.ReactElement> 
             />
           }
         >
-          <ResourceCenterBrowser allResources={allResources} />
+          <ResourceCenterBrowser allResources={allResources} types={types} />
         </Suspense>
         <CrawlableLinkIndex
           label="All resources"

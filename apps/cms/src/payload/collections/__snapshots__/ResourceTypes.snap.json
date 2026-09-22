@@ -256,8 +256,8 @@
   ],
   "hooks": {
     "beforeChange": 1,
-    "afterChange": 1,
+    "afterChange": 2,
     "beforeValidate": 0,
-    "afterDelete": 0
+    "afterDelete": 1
   }
 }

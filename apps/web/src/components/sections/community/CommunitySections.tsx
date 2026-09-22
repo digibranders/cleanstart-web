@@ -15,8 +15,8 @@ import {
 import { Container } from "@/components/layout";
 import { fetchCommunityImages } from "@/lib/api/community-images";
 import { effectivePublishedAt } from "@/lib/published-date";
-import { getResources, type Resource, type ResourceType } from "@/lib/resources";
-import { resourceTypeLabel } from "@/lib/resources-utils";
+import { getResources, type Resource } from "@/lib/resources";
+import { resolveResourceTypeLabel } from "@/lib/resources-utils";
 
 type NewsItem = {
   date: string;
@@ -166,11 +166,6 @@ function toEventItem(e: CmsEvent): EventItem {
   };
 }
 
-function safeTypeLabel(type: Resource["type"]): string {
-  if (!type) return "Resource";
-  return resourceTypeLabel(type as ResourceType);
-}
-
 async function fetchWhatsNew(): Promise<NewsItem[]> {
   try {
     const data = await getResources({ limit: 4 });
@@ -178,7 +173,7 @@ async function fetchWhatsNew(): Promise<NewsItem[]> {
     if (docs.length === 0) return NEWS_FALLBACK;
     return docs.map((r) => ({
       date: formatArticleDate(effectivePublishedAt(r) ?? r.updatedAt ?? undefined),
-      category: safeTypeLabel(r.type),
+      category: resolveResourceTypeLabel(r),
       title: r.title,
       href: `/resources/${r.slug}`,
     }));

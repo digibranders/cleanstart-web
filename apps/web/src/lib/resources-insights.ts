@@ -36,8 +36,11 @@
 
 import { cmsBaseUrl } from "./cms-fetch";
 import { formatEventDate } from "./events";
-import type { ResourceType } from "./resources";
-import { resourceCoverPoster } from "./resources-utils";
+import type { ResourceType, ResourceTypeTerm } from "./resources";
+import {
+  resolveResourceTypeSlug,
+  resourceCoverPoster,
+} from "./resources-utils";
 
 const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:3000";
 
@@ -102,6 +105,7 @@ interface CmsResource {
   slug: string;
   title: string;
   type?: ResourceType | null;
+  typeRef?: ResourceTypeTerm | string | number | null;
   summary?: string | null;
   asset?: CmsImage | null;
 }
@@ -209,14 +213,14 @@ async function loadBlogs(): Promise<ResourceCard[]> {
 async function loadResources(): Promise<ResourceCard[]> {
   const data = await fetchCollection<CmsResource>(
     "resources",
-    `${PUBLISHED_FILTER}&depth=1&limit=3&sort=-publishedAt&select[title]=true&select[slug]=true&select[type]=true&select[summary]=true&select[asset]=true`,
+    `${PUBLISHED_FILTER}&depth=1&limit=3&sort=-publishedAt&select[title]=true&select[slug]=true&select[type]=true&select[typeRef]=true&select[summary]=true&select[asset]=true&populate[resourceTypes][name]=true&populate[resourceTypes][slug]=true`,
   );
   if (!data) return [];
   return data.docs
     .map((d): ResourceCard | null => {
       if (!d.slug || !d.title) return null;
       return {
-        image: resourceCoverPoster(d.type),
+        image: resourceCoverPoster(resolveResourceTypeSlug(d)),
         title: d.title,
         description: d.summary?.trim() ?? "",
         href: `/resources/${d.slug}`,

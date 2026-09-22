@@ -44,6 +44,11 @@ export type RoutePrefixKey = keyof typeof ROUTE_PREFIX;
  */
 const LISTING_PATH_OVERRIDE: Record<string, string> = {
   resources: '/resource-center',
+  // The resource-type taxonomy has no detail route of its own; it renders as
+  // the Resource Center's filter rail, so that listing is what a term change
+  // must purge. `collectionUrlFromDoc` returns null for it (no ROUTE_PREFIX
+  // entry), so the hook purges the listing alone.
+  resourceTypes: '/resource-center',
   events: '/events',
   webinars: '/webinars',
   jobs: '/careers',

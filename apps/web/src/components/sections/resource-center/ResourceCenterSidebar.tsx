@@ -1,15 +1,18 @@
 import Link from "next/link";
-import { RESOURCE_TYPES } from "@/lib/resources-utils";
+import type { ResourceTypeOption } from "@/lib/resources-utils";
 
 interface ResourceCenterSidebarProps {
+  /** Filter rail entries, in display order. Driven by the CMS taxonomy. */
+  types: ResourceTypeOption[];
   activeType: string;
   searchQuery: string;
 }
 
 /**
  * One distinct, on-theme line icon per category. Keyed by the resource-type
- * value ("" = the "All" entry). Each icon strokes `currentColor`, so the
- * active/inactive colour is set once on the parent link and inherited.
+ * slug ("" = the "All" entry). Each icon strokes `currentColor`, so the
+ * active/inactive colour is set once on the parent link and inherited. A type
+ * an editor adds falls through to the generic grid icon.
  */
 function CategoryIcon({ type }: { type: string }): React.ReactElement {
   const common = {
@@ -82,6 +85,7 @@ function CategoryIcon({ type }: { type: string }): React.ReactElement {
 }
 
 export function ResourceCenterSidebar({
+  types,
   activeType,
   searchQuery,
 }: ResourceCenterSidebarProps): React.ReactElement {
@@ -113,7 +117,7 @@ export function ResourceCenterSidebar({
               )}
             </Link>
           </li>
-          {RESOURCE_TYPES.map(({ value, label }) => {
+          {types.map(({ value, label }) => {
             const isActive = activeType === value;
             return (
               <li key={value} className="shrink-0">
@@ -176,7 +180,7 @@ export function ResourceCenterSidebar({
             </Link>
           </li>
 
-          {RESOURCE_TYPES.map(({ value, label }) => {
+          {types.map(({ value, label }) => {
             const isActive = activeType === value;
             return (
               <li key={value}>
