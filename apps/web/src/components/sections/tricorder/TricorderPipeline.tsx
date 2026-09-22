@@ -41,22 +41,22 @@ const STAGES: readonly [Stage, Stage, Stage, Stage] = [
   {
     icon: ScanSearch,
     title: 'Analyze',
-    body: 'Understand capabilities, purpose, and reachability.',
+    body: 'What it can do, and whether the risk is reachable.',
   },
   {
     icon: GitCompareArrows,
     title: 'Compare',
-    body: 'Identify unexpected changes across versions.',
+    body: 'What changed, and whether the change was declared.',
   },
   {
     icon: Network,
     title: 'Correlate',
-    body: 'Connect packages, maintainers, and infrastructure.',
+    body: 'Shared maintainers, infrastructure, patterns.',
   },
   {
     icon: Radar,
     title: 'Enrich',
-    body: 'Add threat intelligence and vulnerability context.',
+    body: 'Known vulnerabilities and threat intelligence.',
   },
 ];
 
@@ -559,8 +559,8 @@ export function TricorderPipeline(): React.ReactElement {
                 textWrap: 'balance',
               }}
             >
-              Tricorder combines behavioral analysis, package history, cross{'‑'}package signals,
-              and threat intelligence to produce a security verdict.
+              Tricorder puts every component through four steps, adds the context the component
+              can’t provide on its own, and resolves to a single verdict.
             </p>
           </Reveal>
         </div>

@@ -90,6 +90,14 @@ export const NAV_TREE: NavItem[] = [
             description: "Runtime visibility into vulnerabilities and drift.",
             icon: "radar",
           },
+          // Last in the group on purpose: Tricorder is the intelligence layer the
+          // three products above run on, not a fourth thing to buy.
+          {
+            label: "Tricorder",
+            href: "/tricorder",
+            description: "The intelligence layer behind every CleanStart verdict.",
+            icon: "lens",
+          },
         ],
       },
     ],

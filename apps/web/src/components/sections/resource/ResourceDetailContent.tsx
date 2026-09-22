@@ -17,6 +17,15 @@ export function ResourceDetailContent({
   const coverUrl = mediaUrl(resource.heroImage?.url);
   const fallbackPoster = resourceCoverPoster(resolveResourceTypeSlug(resource));
 
+  // `summary` is a textarea, so an editor's paragraph breaks arrive as blank
+  // lines. Rendered in one <p> they collapse to spaces and a multi-paragraph
+  // abstract reads as one wall of text. One <p> per paragraph keeps the copy
+  // as written; a single-paragraph summary renders exactly as before.
+  const summaryParagraphs = (resource.summary ?? "")
+    .split(/\n\s*\n/)
+    .map((para) => para.trim())
+    .filter((para) => para.length > 0);
+
   // Steps the overlay title down for longer copy so it clears the logo and the
   // booklet edge. Sizes in `cqw` so the title scales with the cover, not the
   // viewport — long titles can never overrun the booklet at any screen width.
@@ -114,17 +123,18 @@ export function ResourceDetailContent({
             className="mx-auto pt-6 lg:pt-12 px-6"
             style={{ maxWidth: "840px" }}
           >
-            {resource.summary && (
+            {summaryParagraphs.map((para) => (
               <p
+                key={para.slice(0, 48)}
                 className="text-base lg:text-xl font-normal leading-[1.4] tracking-[-0.04em] mb-4 lg:mb-6"
                 style={{
                   color: "#111",
                   opacity: 0.8,
                 }}
               >
-                {resource.summary}
+                {para}
               </p>
-            )}
+            ))}
             <div
               className="resource-body text-base lg:text-xl leading-[1.5] lg:leading-[1.4] tracking-[-0.04em]"
               style={{ color: "#111" }}

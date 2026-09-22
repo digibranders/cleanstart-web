@@ -7,19 +7,26 @@ import { TricorderContext } from "@/components/sections/tricorder/TricorderConte
 import { TricorderPipeline } from "@/components/sections/tricorder/TricorderPipeline";
 import { TricorderSubstrate } from "@/components/sections/tricorder/TricorderSubstrate";
 import { TricorderCTA } from "@/components/sections/tricorder/TricorderCTA";
-import { buildPageMetadata } from "@/lib/seo/canonical";
+import { absoluteUrl, buildPageMetadata } from "@/lib/seo/canonical";
 import { breadcrumbSchema, softwareApplicationSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
 import { getPageGraph } from "@/lib/seo/compose-page";
 
+// The SERP snippet leads with what the page is searched for; the OG card below
+// keeps the brand line. They are different surfaces and should not be the same
+// sentence.
 const DESCRIPTION =
-  "Tricorder analyzes, compares, correlates, and enriches every software component to produce an evidence-backed verdict before you trust it.";
+  "Tricorder finds malicious and tampered components that pass CVE scans. Behavioral analysis, package history, and threat intelligence resolve to one verdict.";
 
-// On hold pending sign-off on the redesign: noindex,nofollow and left out of
-// the sitemap. To launch, drop both flags and re-add the path to STATIC_ROUTES
-// in app/sitemap.ts.
+/** Longer than the meta description: schema has no snippet-length budget. */
+const SCHEMA_DESCRIPTION =
+  "Tricorder is the intelligence layer behind CleanStart. It analyzes what a component can do, compares it against its own release history, correlates it with shared maintainers and infrastructure, and enriches it with threat intelligence to produce an evidence-backed verdict on every software component.";
+
+/** The hub cube is the page's own artwork, so it is what Google should thumbnail. */
+const PRIMARY_IMAGE = "/images/tricorder/hub-intelligence-cube.webp";
+
 export const metadata = buildPageMetadata({
-  title: "Tricorder: The Intelligence Layer for Software Trust | CleanStart",
+  title: "Malicious Package Detection | Tricorder by CleanStart",
   absoluteTitle: true,
   description: DESCRIPTION,
   path: "/tricorder",
@@ -27,24 +34,27 @@ export const metadata = buildPageMetadata({
   eyebrow: "Products",
   ogTitle: "The Intelligence Layer for Software Trust",
   titleAccent: "Software Trust",
-  noindex: true,
-  nofollow: true,
 });
 
 export const revalidate = 21600; // 6h ISR fallback — on-demand publish revalidation keeps this fresh
 
 export default async function TricorderPage(): Promise<React.ReactElement> {
-  const graph = await getPageGraph("/tricorder", [
-    breadcrumbSchema([
-      { name: "Home", path: "/" },
-      { name: "Tricorder" },
-    ]),
-    softwareApplicationSchema({
-      name: "Tricorder",
-      description: DESCRIPTION,
-      path: "/tricorder",
-    }),
-  ]);
+  const graph = await getPageGraph(
+    "/tricorder",
+    [
+      breadcrumbSchema([
+        { name: "Home", path: "/" },
+        { name: "Tricorder" },
+      ]),
+      softwareApplicationSchema({
+        name: "Tricorder",
+        description: SCHEMA_DESCRIPTION,
+        path: "/tricorder",
+        imageUrl: absoluteUrl(PRIMARY_IMAGE),
+      }),
+    ],
+    { primaryImagePath: PRIMARY_IMAGE },
+  );
   return (
     <>
       <JsonLdGraph id="tricorder-jsonld" graph={graph} />

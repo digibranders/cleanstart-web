@@ -132,10 +132,11 @@ export const revalidate = 21600; // 6h ISR fallback, matching the comparison pag
  * `noindex` URL. Add it in `ComparePage.tsx` at the same moment this page's
  * `noindex, nofollow` pair comes off, not before.
  *
- * **The footer's "Compare" link is deliberately left pointing at the Docker
- * page** (`Footer.tsx`, Product column). It is a site-wide link on every live
- * page, and repointing it here would aim all of them at a `noindex` URL.
- * Repoint it to `/compare` at launch, with the crumb.
+ * **The footer's "Compare" link points here** (`Footer.tsx`, Product column).
+ * It is a site-wide link on every live page, so while this route stays
+ * `noindex, nofollow` those links resolve to a URL search engines crawl and
+ * drop, and the indexed Docker comparison has no site-wide internal link of
+ * its own. Dropping the pair below is what settles that.
  *
  * Each card composes itself from the comparison's own `CompareContent`, so
  * listing a fourth comparison is adding it to `COMPARISONS` above.
