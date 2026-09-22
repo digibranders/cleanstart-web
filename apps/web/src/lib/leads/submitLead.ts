@@ -4,8 +4,10 @@
  * `lead-handlers/payload-schema.ts` is the boundary contract.
  *
  * The statically-built marketing forms key on the stable `formSlug` (the CMS
- * row's DB id differs across environments); the endpoint resolves it to the
- * live form and stamps the current schema version. `fields` is a flat map
+ * row's DB id differs across environments); a gated resource passes `formId`
+ * instead, because its gate form is whichever form the editor attached. The
+ * endpoint resolves either to the live form and stamps the current schema
+ * version. `fields` is a flat map
  * whose keys are the HubSpot internal property names. Consent is sent as a
  * snapshot object, plus an optional Turnstile token and the `website` honeypot.
  *
@@ -25,7 +27,14 @@ export interface LeadConsent {
 
 export interface SubmitLeadInput {
   /** Stable slug of the CMS `forms` row (e.g. "book-a-demo"). */
-  formSlug: string;
+  formSlug?: string;
+  /**
+   * Numeric id of the CMS `forms` row, for a form the page learns at runtime
+   * rather than at build time. A gated resource carries its gate form's id
+   * (the forms collection is not publicly readable, so the slug never reaches
+   * the browser), and the API accepts either key.
+   */
+  formId?: number;
   /**
    * Flat map keyed by the CMS field name. Strings for ordinary inputs; a
    * boolean for a `consent`-type field, which the API validates as
@@ -92,7 +101,8 @@ export async function submitLead(input: SubmitLeadInput): Promise<SubmitLeadResu
       credentials: "include",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        formSlug: input.formSlug,
+        ...(input.formId != null ? { formId: input.formId } : {}),
+        ...(input.formSlug != null ? { formSlug: input.formSlug } : {}),
         fields: input.fields,
         source: input.source,
         consent: input.consent,

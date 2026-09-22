@@ -12,11 +12,16 @@ import { trackEvent } from "@/lib/analytics/track";
 import { emailError, issuesToErrors, optionalText, requiredText } from "@/lib/forms/validate";
 import { type LeadDownload, submitLead } from "@/lib/leads/submitLead";
 
-/** The CMS form a resource download is gated behind. */
-export const GATE_FORM_SLUG = "content-gated";
+/**
+ * GA4 form name for every gated download, whichever CMS form the resource is
+ * gated behind. Assets that need their own HubSpot form and campaign get their
+ * own CMS form, so the id varies per resource; reporting stays on one name and
+ * separates assets by `resource_title` on the download event.
+ */
+const GATE_FORM_EVENT_NAME = "content-gated";
 
 /**
- * Keys are the field names on the CMS `content-gated` form, values the inputs
+ * Keys are the field names on the gated-download CMS form, values the inputs
  * below. The API re-validates every submission against that stored definition,
  * so it is the contract: add or rename a field there and this form has to
  * change with it, or every gated download is rejected.
@@ -41,6 +46,12 @@ const CONSENT_REQUIRED = "Please agree to the Privacy Policy to download.";
 
 interface GatedDownloadFormProps {
   resourceId: string | number;
+  /**
+   * The resource's own gate form. Passed as an id because the forms
+   * collection is admin-only to read, so the public API serialises the
+   * relationship as a bare id and the slug never reaches the browser.
+   */
+  gateFormId: number;
   /** Called once the API has captured the lead and signed a download link. */
   onUnlocked: (download: LeadDownload) => void;
 }
@@ -55,6 +66,7 @@ interface GatedDownloadFormProps {
  */
 export function GatedDownloadForm({
   resourceId,
+  gateFormId,
   onUnlocked,
 }: GatedDownloadFormProps): React.ReactElement {
   const [firstName, setFirstName] = useState("");
@@ -119,7 +131,7 @@ export function GatedDownloadForm({
     const categories = ["storage", ...(fd.get("consent_marketing") != null ? ["marketing"] : [])];
 
     const result = await submitLead({
-      formSlug: GATE_FORM_SLUG,
+      formId: gateFormId,
       fields: {
         firstname: firstName.trim(),
         ...(lastName.trim() ? { lastname: lastName.trim() } : {}),
@@ -141,7 +153,7 @@ export function GatedDownloadForm({
     });
 
     if (result.ok && result.download) {
-      trackEvent("generate_lead", { form_name: GATE_FORM_SLUG, gated: true });
+      trackEvent("generate_lead", { form_name: GATE_FORM_EVENT_NAME, gated: true });
       // Left busy on purpose: the modal is about to close and start the
       // download, and re-enabling the button would allow a second submit.
       onUnlocked(result.download);

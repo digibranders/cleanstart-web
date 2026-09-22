@@ -4198,6 +4198,10 @@ export interface Form {
     url?: string | null;
   };
   /**
+   * Send the download email from the CMS after a gated submission. Untick when the HubSpot form sends its own follow-up email, otherwise the visitor receives two. Only applies to forms used as a resource gate.
+   */
+  sendDownloadEmail?: boolean | null;
+  /**
    * CRM handlers fan out in parallel to the DB write. Handler config (API keys, list IDs) lives in env. Adapter implementations land in Phase E.
    */
   crmHandlers?: ('hubspot' | 'salesforce')[] | null;
@@ -12928,6 +12932,7 @@ export interface FormsSelect<T extends boolean = true> {
         body?: T;
         url?: T;
       };
+  sendDownloadEmail?: T;
   crmHandlers?: T;
   notifyTo?:
     | T

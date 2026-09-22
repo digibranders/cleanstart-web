@@ -205,6 +205,7 @@ export const submitLeadEndpoint: Endpoint = {
       fields?: FormFieldDef[] | null;
       slug?: string | null;
       schemaVersion?: number | null;
+      sendDownloadEmail?: boolean | null;
     };
 
     // Resolve the target form by numeric `formId` (FormRenderer-driven forms,
@@ -217,6 +218,7 @@ export const submitLeadEndpoint: Endpoint = {
       status: string | null | undefined;
       fields: FormFieldDef[];
       slug: string | null | undefined;
+      sendDownloadEmail: boolean;
     } | null> => {
       try {
         if (data.formId != null) {
@@ -236,6 +238,7 @@ export const submitLeadEndpoint: Endpoint = {
             status: doc._status,
             fields: doc.fields ?? [],
             slug: doc.slug,
+            sendDownloadEmail: doc.sendDownloadEmail !== false,
           };
         }
         if (data.formSlug != null) {
@@ -257,6 +260,7 @@ export const submitLeadEndpoint: Endpoint = {
             status: doc._status,
             fields: doc.fields ?? [],
             slug: doc.slug,
+            sendDownloadEmail: doc.sendDownloadEmail !== false,
           };
         }
         return null;
@@ -487,7 +491,11 @@ export const submitLeadEndpoint: Endpoint = {
                 // the entire point of gating it. Sent from here rather than a
                 // lead handler because the signed token does not exist until
                 // this point. Best-effort: the visitor already has the link.
-                const recipient = extractEmail(fieldDefs, data.fields);
+                // A gate whose HubSpot form sends its own follow-up email has
+                // this unticked, so the visitor gets one thank-you, not two.
+                const recipient = resolvedForm.sendDownloadEmail
+                  ? extractEmail(fieldDefs, data.fields)
+                  : null;
                 if (recipient) {
                   const publicBase = (process.env.PAYLOAD_PUBLIC_SERVER_URL ?? '').replace(/\/$/u, '');
                   const firstName = extractName(fieldDefs, data.fields)?.trim().split(/\s+/u)[0];

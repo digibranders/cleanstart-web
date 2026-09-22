@@ -14,7 +14,13 @@ export function ResourceDetailHero({
   resource,
 }: ResourceDetailHeroProps): React.ReactElement {
   const gated = resource.gated === true;
-  const hasGateForm = resource.gateForm != null;
+  // Bare id publicly (forms are admin-only to read), an object for an
+  // authenticated draft preview.
+  const gateFormId =
+    typeof resource.gateForm === "object" && resource.gateForm !== null
+      ? Number(resource.gateForm.id)
+      : Number(resource.gateForm);
+  const hasGateForm = Number.isInteger(gateFormId) && gateFormId > 0;
   // A gated file's URL never reaches the client: the button's props are
   // serialised into the page, so passing it would publish the direct link the
   // gate exists to withhold. The download comes from the signed link instead.
@@ -127,7 +133,7 @@ export function ResourceDetailHero({
             resourceSlug={resource.slug}
             gated={gated}
             assetHref={assetHref}
-            hasGateForm={hasGateForm}
+            gateFormId={hasGateForm ? gateFormId : null}
             className="cs-btn-blue gap-3 font-bold h-11 lg:h-[64px]"
             style={{
               width: "840px",

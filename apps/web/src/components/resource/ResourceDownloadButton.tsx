@@ -11,10 +11,12 @@ interface ResourceDownloadButtonProps {
   gated: boolean;
   assetHref: string;
   /**
-   * Whether the resource names a gate form. The form itself is rendered in
-   * code, so only its presence matters here.
+   * The resource's gate form id, or null when it names none. The form itself
+   * is rendered in code; the id routes the submission to the CMS form the
+   * editor attached, which is what lines the lead up with the right HubSpot
+   * form and campaign.
    */
-  hasGateForm: boolean;
+  gateFormId: number | null;
   className?: string;
   style?: React.CSSProperties;
   children: React.ReactNode;
@@ -28,7 +30,7 @@ export function ResourceDownloadButton({
   resourceSlug,
   gated,
   assetHref,
-  hasGateForm,
+  gateFormId,
   className,
   style,
   children,
@@ -38,7 +40,7 @@ export function ResourceDownloadButton({
 
   // Not gated, or gated without a form to gate behind: the CMS validator blocks
   // the second case on save, so this is the plain download link.
-  if (!gated || !hasGateForm) {
+  if (!gated || gateFormId == null) {
     return (
       <a
         href={assetHref}
@@ -105,6 +107,7 @@ export function ResourceDownloadButton({
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         resourceId={resourceId}
+        gateFormId={gateFormId}
         resourceTitle={resourceTitle}
         onUnlocked={() => {
           /* modal handles its own redirect */
