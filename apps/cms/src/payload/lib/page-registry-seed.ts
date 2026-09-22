@@ -103,6 +103,24 @@ export const PAGE_REGISTRY_SEED: readonly PageRegistrySeedRow[] = [
   { path: '/job/[slug]', title: 'Job posting (template)', kind: 'cms-template', order: 46, backingCollection: 'jobs' },
   { path: '/author/[slug]', title: 'Author profile (template)', kind: 'cms-template', order: 47, backingCollection: 'authors' },
   { path: '/legal/[slug]', title: 'Legal document (template)', kind: 'cms-template', order: 48, backingCollection: 'legalDocuments' },
+
+  // Routes that launched after the Phase 1 seed. Orders start at 50 so every
+  // dashboard position above keeps its number.
+  //
+  // The first three already existed in prod before they were listed here: they
+  // were created out-of-band, so the catalog had drifted from the live table.
+  // Re-running the seed is a no-op for them (existing paths are skipped) and
+  // brings this file back to being the real source of truth.
+  { path: '/industries/financial-services', title: 'Financial Services', kind: 'static', order: 50, webPageType: 'WebPage' },
+  { path: '/industries/software-applications', title: 'SaaS', kind: 'static', order: 51, webPageType: 'WebPage' },
+  { path: '/compare/cleanstart-vs-docker-hardened-images', title: 'Docker Hardened Images vs CleanStart', kind: 'static', order: 52, webPageType: 'WebPage' },
+  // Launched 2026-09-22.
+  { path: '/tricorder', title: 'Tricorder', kind: 'static', order: 53, webPageType: 'WebPage' },
+  // The hub lists the comparisons and emits an ItemList, so CollectionPage is
+  // the accurate functional type, not a plain WebPage.
+  { path: '/compare', title: 'Compare CleanStart', kind: 'static', order: 54, webPageType: 'CollectionPage' },
+  { path: '/compare/red-hat-vs-cleanstart', title: 'Red Hat Hardened Images vs CleanStart', kind: 'static', order: 55, webPageType: 'WebPage' },
+  { path: '/compare/chainguard-vs-cleanstart', title: 'Chainguard vs CleanStart', kind: 'static', order: 56, webPageType: 'WebPage' },
 ] as const;
 
 /** Fail-fast guard: paths unique + well-formed, templates carry a collection. */
