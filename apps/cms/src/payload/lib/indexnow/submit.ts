@@ -14,6 +14,19 @@
  * publish.
  */
 
+/**
+ * Outbound calls on the publish path get an explicit deadline.
+ *
+ * `fetch` has no default timeout in Node: undici only gives up after its
+ * 300 s headers timeout. An integration endpoint that is slow rather
+ * than down therefore blocks whatever awaits it for minutes, and these
+ * calls sit in a Payload `afterChange` hook — i.e. inside the editor's
+ * Publish request and inside the open write transaction. A bounded
+ * failure that logs and retries later is strictly better than an
+ * unbounded wait.
+ */
+const INDEXNOW_TIMEOUT_MS = 5_000;
+
 const DEFAULT_ENDPOINT = 'https://api.indexnow.org/indexnow';
 
 export interface IndexNowSubmission {
@@ -69,6 +82,7 @@ export const submitIndexNow = async (
       method: 'POST',
       headers: { 'content-type': 'application/json; charset=utf-8' },
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(INDEXNOW_TIMEOUT_MS),
     });
     if (!res.ok) {
       // Per IndexNow spec: 200 = ok, 202 = accepted, 400 = invalid

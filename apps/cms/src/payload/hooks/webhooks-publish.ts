@@ -1,20 +1,10 @@
-import type { CollectionAfterChangeHook, Payload } from 'payload';
+import type { CollectionAfterChangeHook } from 'payload';
 
+import { runAfterCommit } from '../lib/after-commit';
 import { type CanonicalDoc, docCanonicalUrl } from '../lib/jsonld/url';
 import { dispatchEvent } from '../lib/webhooks/dispatch';
 import { getRequestId } from '../lib/request-id';
-import { resolveSiteUrl } from '../lib/site-url';
-
-const readBaseUrl = async (payload: Payload): Promise<string> => {
-  try {
-    const settings = (await payload.findGlobal({ slug: 'siteSettings' })) as {
-      baseUrl?: string;
-    };
-    return resolveSiteUrl(settings.baseUrl);
-  } catch {
-    return resolveSiteUrl();
-  }
-};
+import { readSiteBaseUrl } from '../lib/site-base-url';
 
 const adminEditUrl = (collection: string, id: unknown): string | null => {
   const base = process.env.PAYLOAD_PUBLIC_SERVER_URL;
@@ -48,7 +38,7 @@ export const webhooksPublishAfterChangeHook =
 
       const requestId = getRequestId(req.headers as { get(name: string): string | null });
       const typed = doc as Record<string, unknown>;
-      const baseUrl = await readBaseUrl(req.payload);
+      const baseUrl = await readSiteBaseUrl(req.payload);
       const liveUrl = docCanonicalUrl(baseUrl, collection, typed as CanonicalDoc);
       const editUrl = adminEditUrl(collection, typed.id);
 
@@ -66,7 +56,13 @@ export const webhooksPublishAfterChangeHook =
         typeof updatedAt === 'string' &&
         new Date(updatedAt).getTime() - new Date(publishedAt).getTime() > 60_000;
 
-      await dispatchEvent(
+      // Fanning out to Teams / subscriber webhooks is bounded by their
+      // response times, not ours, so it runs past the commit rather than
+      // inside the editor's Publish request. Failures still land in
+      // webhooks_dead_letter and are picked up by the retry cron.
+      await runAfterCommit(
+        () =>
+          dispatchEvent(
         {
           event: 'document.published',
           data: {
@@ -89,6 +85,19 @@ export const webhooksPublishAfterChangeHook =
           logger: req.payload.logger,
           payload: req.payload,
           requestId,
+        },
+          ),
+        req.transactionID,
+        // Deferred work no longer reaches the catch below, so it reports
+        // through the same log line it always did.
+        (err) => {
+          req.payload.logger?.warn?.(
+            {
+              collection,
+              error: err instanceof Error ? err.message : String(err),
+            },
+            'webhooks.afterChange threw',
+          );
         },
       );
     } catch (err) {

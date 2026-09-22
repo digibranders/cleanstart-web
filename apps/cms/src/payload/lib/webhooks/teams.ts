@@ -260,6 +260,19 @@ export interface TeamsDeliveryResult {
  * success. The caller catches and decides what to do on failure;
  * we don't retry here — that's the dispatch layer's job.
  */
+/**
+ * Outbound calls on the publish path get an explicit deadline.
+ *
+ * `fetch` has no default timeout in Node: undici only gives up after its
+ * 300 s headers timeout. An integration endpoint that is slow rather
+ * than down therefore blocks whatever awaits it for minutes, and these
+ * calls sit in a Payload `afterChange` hook — i.e. inside the editor's
+ * Publish request and inside the open write transaction. A bounded
+ * failure that logs and retries later is strictly better than an
+ * unbounded wait.
+ */
+const TEAMS_TIMEOUT_MS = 8_000;
+
 export const postTeamsWebhook = async (
   url: string,
   event: WebhookEvent,
@@ -272,6 +285,7 @@ export const postTeamsWebhook = async (
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body,
+      signal: AbortSignal.timeout(TEAMS_TIMEOUT_MS),
     });
     if (!res.ok) {
       const text = await res.text().catch(() => '');

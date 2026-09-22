@@ -1,20 +1,16 @@
-import type { CollectionAfterChangeHook, Payload } from 'payload';
+import type { CollectionAfterChangeHook } from 'payload';
 
+import { runAfterCommit } from '../lib/after-commit';
 import { submitIndexNow } from '../lib/indexnow/submit';
 import { docCanonicalUrl } from '../lib/jsonld/url';
 import { isIndexingAllowed } from '../lib/seo-env';
-import { resolveSiteUrl } from '../lib/site-url';
-
-const readBaseUrl = async (payload: Payload): Promise<string> => {
-  const settings = (await payload.findGlobal({ slug: 'siteSettings' })) as {
-    baseUrl?: string;
-  };
-  return resolveSiteUrl(settings.baseUrl);
-};
+import { readSiteBaseUrl } from '../lib/site-base-url';
 
 /**
  * afterChange hook factory — pings IndexNow with the doc's canonical
- * URL on the first publish transition. Sibling to
+ * URL on the first publish transition. The ping itself is scheduled past
+ * the write transaction (see `runAfterCommit`) so it never sits inside
+ * the editor's Publish request. Sibling to
  * `webhooksPublishAfterChangeHook` (same gate, different downstream).
  *
  * Only active when `INDEXNOW_KEY` is set in env. Without the key, the
@@ -36,7 +32,7 @@ export const indexNowPublishAfterChangeHook =
       const key = process.env.INDEXNOW_KEY;
       if (!key) return doc;
 
-      const baseUrl = await readBaseUrl(req.payload);
+      const baseUrl = await readSiteBaseUrl(req.payload);
       const url = docCanonicalUrl(
         baseUrl,
         collection,
@@ -44,13 +40,31 @@ export const indexNowPublishAfterChangeHook =
       );
       if (!url) return doc;
 
-      const result = await submitIndexNow({ key, baseUrl, urls: [url] });
-      if (result.kind === 'failed') {
-        req.payload.logger?.warn?.(
-          { collection, url, reason: result.reason },
-          'indexnow.submit failed',
-        );
-      }
+      // Pinging a search engine is not something the editor should wait
+      // on — run it past the commit so Publish returns at DB speed.
+      await runAfterCommit(
+        async () => {
+          const result = await submitIndexNow({ key, baseUrl, urls: [url] });
+          if (result.kind === 'failed') {
+            req.payload.logger?.warn?.(
+              { collection, url, reason: result.reason },
+              'indexnow.submit failed',
+            );
+          }
+        },
+        req.transactionID,
+        // Deferred work no longer reaches the catch below, so it reports
+        // through the same log line it always did.
+        (err) => {
+          req.payload.logger?.warn?.(
+            {
+              collection,
+              error: err instanceof Error ? err.message : String(err),
+            },
+            'indexnow.afterChange threw',
+          );
+        },
+      );
     } catch (err) {
       req.payload.logger?.warn?.(
         {
