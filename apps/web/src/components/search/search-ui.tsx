@@ -6,6 +6,7 @@ import {
   CalendarDays,
   Compass,
   CornerDownLeft,
+  Globe,
   type LucideIcon,
   Mic,
   Newspaper,
@@ -35,6 +36,7 @@ const COLLECTION_META: Record<string, CollectionMeta> = {
   jobs: { Icon: Briefcase, accent: '#0F766E', tint: '#E2F3F1' },
   podcastEpisodes: { Icon: Mic, accent: '#C026D3', tint: '#FAEAFD' },
   authors: { Icon: UserRound, accent: '#475569', tint: '#EEF1F5' },
+  pageRegistry: { Icon: Globe, accent: '#0EA5E9', tint: '#E5F4FD' },
 };
 const DEFAULT_META: CollectionMeta = { Icon: BookOpen, accent: '#6B5BA6', tint: '#F2EFFB' };
 export const metaFor = (collection: string): CollectionMeta =>

@@ -18,6 +18,13 @@ describe('collectionUrlFromSlug / collectionUrlFromDoc (detail URLs)', () => {
     expect(collectionUrlFromSlug('nope', 'x')).toBeNull();
     expect(collectionUrlFromDoc('resources', { slug: '' })).toBeNull();
   });
+
+  it('uses doc.path for pageRegistry rows, same as pages', () => {
+    expect(collectionUrlFromDoc('pageRegistry', { path: '/clean-libraries' })).toBe(
+      '/clean-libraries',
+    );
+    expect(collectionUrlFromDoc('pageRegistry', { path: null })).toBeNull();
+  });
 });
 
 describe('listingPathForCollection (index URLs for revalidation)', () => {

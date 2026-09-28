@@ -112,7 +112,7 @@ export const PAGE_REGISTRY_SEED: readonly PageRegistrySeedRow[] = [
   // Re-running the seed is a no-op for them (existing paths are skipped) and
   // brings this file back to being the real source of truth.
   { path: '/industries/financial-services', title: 'Financial Services', kind: 'static', order: 50, webPageType: 'WebPage' },
-  { path: '/industries/software-applications', title: 'SaaS', kind: 'static', order: 51, webPageType: 'WebPage' },
+  { path: '/industries/software-applications', title: 'Software', kind: 'static', order: 51, webPageType: 'WebPage' },
   { path: '/compare/cleanstart-vs-docker-hardened-images', title: 'Docker Hardened Images vs CleanStart', kind: 'static', order: 52, webPageType: 'WebPage' },
   // Launched 2026-09-22.
   { path: '/tricorder', title: 'Tricorder', kind: 'static', order: 53, webPageType: 'WebPage' },

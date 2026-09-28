@@ -21,6 +21,7 @@ describe('collectionLabel', () => {
   test('maps known collections and falls back to "Result"', () => {
     expect(collectionLabel('knowledgeBase')).toBe('Knowledge Hub');
     expect(collectionLabel('blogs')).toBe('Blog');
+    expect(collectionLabel('pageRegistry')).toBe('Page');
     expect(collectionLabel('mystery')).toBe('Result');
   });
 });

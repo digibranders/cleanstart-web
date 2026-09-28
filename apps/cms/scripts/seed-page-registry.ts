@@ -10,8 +10,17 @@
  * `--force` is passed (which updates title/kind/backingCollection but NEVER
  * touches additionalSchema). `--dry-run` reports the plan without writing.
  *
- * Writing pageRegistry fires no publish/IndexNow/search hooks (the collection
- * has none), so this is safe to run any time.
+ * Writing pageRegistry fires no publish/IndexNow/revalidate-triggering hooks
+ * beyond its own cache purge, so this is safe to run any time. It DOES fire
+ * the search-sync `afterChange` hook — every `static` / `cms-listing` row
+ * created or `--force`-updated here is pushed into the Meilisearch `content`
+ * index (⌘K search), so `--force` doubles as the backfill for that: existing
+ * rows in the DB predate the hook and only get indexed on their next write.
+ * `cms-template` rows are skipped (see `buildSearchDocument`). That hook
+ * defers its actual Meilisearch call past the write's commit (see
+ * `runAfterCommit`), so this script awaits `flushPendingAfterCommitEffects()`
+ * before exiting — otherwise `process.exit()` kills those deferred timers
+ * and the backfill silently never reaches Meilisearch.
  *
  * Run (inside the cms container, env mounted):
  *   pnpm exec tsx --env-file=.env scripts/seed-page-registry.ts --dry-run
@@ -21,6 +30,7 @@
 import { getPayload } from 'payload';
 
 import config from '../src/payload.config.ts';
+import { flushPendingAfterCommitEffects } from '../src/payload/lib/after-commit.ts';
 import {
   PAGE_REGISTRY_SEED,
   assertPageRegistrySeedValid,
@@ -96,6 +106,10 @@ async function run(): Promise<void> {
   payload.logger.info(
     `[seed-page-registry] ${verb}: ${created} created, ${updated} updated, ${skipped} skipped (of ${PAGE_REGISTRY_SEED.length}).`,
   );
+
+  // Let deferred afterCommit effects (search index, IndexNow, webhooks) from
+  // every create/update above actually run before the process dies.
+  if (!dryRun) await flushPendingAfterCommitEffects();
 
   process.exit(0);
 }

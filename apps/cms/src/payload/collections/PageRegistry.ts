@@ -5,6 +5,7 @@ import { pageLiveSchemaEndpoint } from '../endpoints/page-live-schema';
 import { filterToMergeable, validatePartialOverride } from '../lib/jsonld/filter-override';
 import { revalidatePageRegistryHook, revalidatePageRegistryDeleteHook } from '../hooks/revalidate-page-registry';
 import { recordSchemaHistoryHook } from '../hooks/record-schema-history';
+import { searchSyncAfterChangeHook, searchSyncAfterDeleteHook } from '../hooks/search-sync';
 
 /**
  * Page Registry — one row per website ROUTE, so every page (including the
@@ -12,6 +13,12 @@ import { recordSchemaHistoryHook } from '../hooks/record-schema-history';
  * Schema.org override. Powers the Schema Manager dashboard's "every page"
  * list (Phase 2) and feeds the web build's per-page JSON-LD composition for
  * static + listing routes.
+ *
+ * `static` and `cms-listing` rows also feed the site-wide ⌘K search index
+ * (see `searchSyncAfterChangeHook`) — this is the only place a hardcoded
+ * static page (e.g. /clean-libraries, /fips) becomes searchable, since it
+ * has no CMS document of its own. `cms-template` rows are skipped there
+ * (they deep-link a dynamic route, not a real page).
  *
  * CMS-detail pages (blogs, news, …) keep editing schema on the document
  * itself — a registry row would never scale to hundreds of slugs. For those
@@ -82,8 +89,8 @@ export const PageRegistry: CollectionConfig = {
   },
   hooks: {
     beforeChange: [recordSchemaHistoryHook],
-    afterChange: [revalidatePageRegistryHook],
-    afterDelete: [revalidatePageRegistryDeleteHook],
+    afterChange: [revalidatePageRegistryHook, searchSyncAfterChangeHook('pageRegistry')],
+    afterDelete: [revalidatePageRegistryDeleteHook, searchSyncAfterDeleteHook('pageRegistry')],
   },
   endpoints: [pageLiveSchemaEndpoint],
   fields: [

@@ -182,7 +182,7 @@ export const NAV_TREE: NavItem[] = [
             icon: "bank",
           },
           {
-            label: "Software / SaaS",
+            label: "Software",
             href: "/industries/software-applications",
             description: "Ship faster on a verified software foundation.",
             icon: "layers",

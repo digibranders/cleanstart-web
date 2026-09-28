@@ -28,6 +28,7 @@ import { ColumnPicker } from './ColumnPicker';
 import { ColumnResizer } from './ColumnResizer';
 import { BulkActionBar } from './BulkActionBar';
 import { ExportDrawer } from './ExportDrawer';
+import { ListFilterBar } from './filters/ListFilterBar';
 import { ListHeader } from './ListHeader';
 
 /** Dispatched to ColumnResizer to clear all per-editor column widths. */
@@ -232,6 +233,7 @@ export const CmsListView = (props: ListViewClientProps): ReactElement => {
               menuAnchorRef={menuAnchorRef}
               onMenuToggle={() => setMenuOpen((o) => !o)}
             />
+            <ListFilterBar collectionSlug={collectionSlug} />
             <DropdownMenu
               open={menuOpen}
               onClose={() => setMenuOpen(false)}
