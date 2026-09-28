@@ -48,6 +48,7 @@ describe('isSearchIndexedCollection', () => {
 
   it('matches the SEARCH_INDEXED_COLLECTIONS list verbatim', () => {
     expect(SEARCH_INDEXED_COLLECTIONS).toContain('pages');
+    expect(SEARCH_INDEXED_COLLECTIONS).toContain('pageRegistry');
     expect(SEARCH_INDEXED_COLLECTIONS).not.toContain('redirects');
   });
 });
@@ -131,6 +132,42 @@ describe('buildSearchDocument', () => {
       title: 'Pricing',
     });
     expect(doc?.url).toBe('https://cleanstart.com/products/pricing');
+  });
+
+  it('indexes a static pageRegistry row under doc.path', () => {
+    const doc = buildSearchDocument('https://cleanstart.com', 'pageRegistry', {
+      id: 6,
+      path: '/clean-libraries',
+      title: 'Clean Libraries',
+      kind: 'static',
+    });
+    expect(doc).toMatchObject({
+      id: 'pageRegistry_6',
+      collection: 'pageRegistry',
+      title: 'Clean Libraries',
+      url: 'https://cleanstart.com/clean-libraries',
+      isPublished: true,
+    });
+  });
+
+  it('indexes a cms-listing pageRegistry row the same way', () => {
+    const doc = buildSearchDocument('https://cleanstart.com', 'pageRegistry', {
+      id: 7,
+      path: '/blogs',
+      title: 'Blogs',
+      kind: 'cms-listing',
+    });
+    expect(doc?.url).toBe('https://cleanstart.com/blogs');
+  });
+
+  it('skips cms-template pageRegistry rows — they are not a real page', () => {
+    const doc = buildSearchDocument('https://cleanstart.com', 'pageRegistry', {
+      id: 8,
+      path: '/blogs/[slug]',
+      title: 'Blog post (template)',
+      kind: 'cms-template',
+    });
+    expect(doc).toBeNull();
   });
 
   it('uses author.bioShort when description / abstract are absent', () => {

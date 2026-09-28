@@ -84,6 +84,7 @@ const COLLECTION_WEIGHT: Record<string, number> = {
   webinars: 70,
   jobs: 70,
   podcastEpisodes: 70,
+  pageRegistry: 75,
   pages: 60,
   authors: 30,
   categories: 20,
@@ -108,6 +109,7 @@ export const SEARCH_INDEXED_COLLECTIONS: ReadonlyArray<string> = [
   'podcastEpisodes',
   'authors',
   'pages',
+  'pageRegistry',
 ];
 
 export const isSearchIndexedCollection = (slug: string): boolean =>
@@ -165,6 +167,8 @@ interface IndexableDoc {
   publicationDate?: string | null;
   updatedAt?: string | null;
   _status?: string | null;
+  /** pageRegistry only — 'cms-template' rows are placeholders, not real pages. */
+  kind?: string | null;
   authors?: readonly (AuthorLite | number | null | undefined)[] | null;
   categories?: readonly (CategoryLite | number | null | undefined)[] | null;
   newsCategories?: readonly (CategoryLite | number | null | undefined)[] | null;
@@ -245,6 +249,10 @@ export const buildSearchDocument = (
   doc: IndexableDoc,
 ): SearchDocument | null => {
   if (doc.id == null) return null;
+  // `cms-template` rows deep-link a dynamic [slug] route ("Blog post
+  // (template)") — they aren't a real navigable page, so they'd only add
+  // noise next to the actual documents they template for.
+  if (collection === 'pageRegistry' && doc.kind === 'cms-template') return null;
   const title = doc.title ?? doc.name ?? '';
   if (title.length === 0) return null;
 

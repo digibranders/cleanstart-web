@@ -684,3 +684,231 @@ body.cs-col-resizing * {
   cursor: col-resize !important;
   user-select: none !important;
 }
+
+// ─── List-view multiselect filter bar (ListFilterBar) ──────────────
+//
+// One pill per configured field (`LIST_FILTER_FIELDS`), each opening a
+// checkbox popover. Sits directly under the header row, above the
+// bulk-actions bar and table — same 36px control rhythm as search/menu.
+.cs-filter-bar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cs-space-2);
+  margin-bottom: var(--cs-space-4);
+
+  &__clear-all {
+    appearance: none;
+    background: transparent;
+    border: none;
+    border-radius: var(--cs-radius-input);
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    height: 30px;
+    padding-inline: var(--cs-space-2);
+    transition:
+      color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro);
+
+    &:hover {
+      background: var(--theme-elevation-100);
+      color: var(--cs-cyan-500);
+    }
+  }
+}
+
+.cs-filter-pill {
+  &__trigger {
+    align-items: center;
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-input);
+    color: var(--theme-text-soft);
+    display: inline-flex;
+    font-size: 12px;
+    gap: 6px;
+    height: 30px;
+    padding-inline: var(--cs-space-3);
+    transition:
+      border-color var(--cs-motion-micro),
+      color var(--cs-motion-micro);
+
+    &:hover {
+      color: var(--theme-text);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--cs-tint-focus-ring);
+    }
+
+    &.is-active {
+      border-color: var(--cs-tint-brand-medium);
+      color: var(--cs-cyan-500);
+    }
+  }
+
+  &__count {
+    align-items: center;
+    background: var(--cs-tint-brand-soft);
+    border-radius: 999px;
+    color: var(--cs-cyan-500);
+    display: inline-flex;
+    font-size: 11px;
+    font-weight: 600;
+    height: 16px;
+    justify-content: center;
+    min-width: 16px;
+    padding-inline: 4px;
+  }
+
+  &__chevron {
+    color: var(--theme-text-disabled);
+    flex-shrink: 0;
+  }
+
+  &__popover {
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-card);
+    box-shadow: var(--cs-shadow-lift-md);
+    display: flex;
+    flex-direction: column;
+    max-height: 360px;
+    min-width: 220px;
+    padding: var(--cs-space-2);
+  }
+
+  &__header {
+    align-items: center;
+    color: var(--cs-text-heading);
+    display: flex;
+    font-size: 12px;
+    font-weight: 600;
+    justify-content: space-between;
+    padding: 2px var(--cs-space-1) var(--cs-space-2);
+  }
+
+  &__close {
+    align-items: center;
+    appearance: none;
+    background: transparent;
+    border: none;
+    border-radius: var(--cs-radius-input);
+    color: var(--theme-text-soft);
+    display: inline-flex;
+    height: 22px;
+    justify-content: center;
+    transition:
+      color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro);
+    width: 22px;
+
+    &:hover {
+      background: var(--theme-elevation-100);
+      color: var(--theme-text);
+    }
+  }
+
+  &__search {
+    background: var(--theme-input-bg);
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: var(--cs-radius-input);
+    color: var(--theme-text);
+    font-size: 13px;
+    height: 32px;
+    margin-bottom: var(--cs-space-2);
+    padding-inline: var(--cs-space-2);
+
+    &:focus-visible {
+      border-color: var(--cs-cyan-500);
+      outline: none;
+    }
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+  }
+
+  &__option {
+    align-items: center;
+    border-radius: var(--cs-radius-input);
+    color: var(--theme-text);
+    cursor: pointer;
+    display: flex;
+    font-size: 13px;
+    gap: var(--cs-space-2);
+    padding: 6px var(--cs-space-2);
+
+    &:hover {
+      background: var(--theme-elevation-100);
+    }
+
+    input[type='checkbox'] {
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  &__empty {
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    padding: var(--cs-space-2);
+  }
+
+  &__footer {
+    align-items: center;
+    border-top: 1px solid var(--theme-elevation-150);
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--cs-space-2);
+    padding-top: var(--cs-space-2);
+  }
+
+  &__clear {
+    appearance: none;
+    background: transparent;
+    border: none;
+    border-radius: var(--cs-radius-input);
+    color: var(--theme-text-soft);
+    font-size: 12px;
+    height: 26px;
+    padding-inline: var(--cs-space-2);
+    transition:
+      color var(--cs-motion-micro),
+      background-color var(--cs-motion-micro);
+
+    &:hover {
+      background: var(--theme-elevation-100);
+      color: var(--cs-cyan-500);
+    }
+  }
+
+  &__done {
+    appearance: none;
+    background: var(--cs-tint-brand-soft);
+    border: 1px solid var(--cs-tint-brand-medium);
+    border-radius: var(--cs-radius-input);
+    color: var(--cs-cyan-500);
+    font-size: 12px;
+    font-weight: 600;
+    height: 26px;
+    padding-inline: var(--cs-space-3);
+    transition:
+      background-color var(--cs-motion-micro),
+      border-color var(--cs-motion-micro);
+
+    &:hover {
+      background: var(--cs-tint-brand-medium);
+    }
+  }
+}

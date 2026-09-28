@@ -26,28 +26,28 @@ Node ≥ 22 (24.x verified) · pnpm 10.30.3
 
 ## Branching policy
 
-The repo has **exactly three long-lived branches**. All three are kept in sync at the same HEAD after every merge.
+The repo has **exactly two long-lived branches**. Both are kept in sync at the same HEAD after every merge.
 
-| Branch | Owner / device | Purpose | Allowed scope |
-|---|---|---|---|
-| `main` | — | Production truth. Deploys go from here. | Everything |
-| `development` | Primary dev branch on this device (`admin@digibranders.com`) | Day-to-day development for both `apps/cms` and `apps/web`. | Everything |
-| `farheen` | Farheen's primary device | Web-only contributions, **scoped to the page being worked on**. | **`apps/web/` ONLY** — no edits to `apps/cms/`, `packages/`, `migrations/`, `infra/`, `docs/architecture/cleanstart-cms-architecture.html`, or shared config. Touching CMS code on `farheen` is a hard rule violation. |
+| Branch | Purpose | Allowed scope |
+|---|---|---|
+| `main` | Production truth. Deploys go from here. | Everything |
+| `development` | Day-to-day development for both `apps/cms` and `apps/web`. | Everything |
 
 ### No other long-lived branches
 
-- **No feature branches**, **no fix/* branches**, **no integration/* branches**, **no `web` branch**, **no worktrees** for routine development.
-- Hotfixes go directly on the branch that owns them (`development` for CMS, `farheen` for web).
+- **No feature branches**, **no fix/* branches**, **no integration/* branches**, **no worktrees** for routine development.
+- Hotfixes go directly on `development`.
 - Exception: short-lived branches created by another developer (e.g. `feat/yatish-resume`) are tolerated for their owner's use, but they don't enter the merge cycle until promoted to `development`.
 
-### Scoped-change rule on `farheen`
+### Scoped-change discipline
 
-Every commit on `farheen` must be **scoped to the page or feature being worked on**. Other pages, shared utilities, and global config stay untouched.
+Every commit should be **scoped to the page or feature being worked on**. Other pages, shared utilities, and global config stay untouched unless the work genuinely requires them.
 
-- **Working on `/for-developers`?** Only touch `apps/web/src/app/for-developers/`, `apps/web/src/components/sections/for-developers/`, and `apps/web/public/images/for-developers/`. Do not edit `/community`, `/sbom`, `/teams`, etc., nor `globals.css`, `nav-config.ts`, layout primitives, or `tsconfig`/`eslint`/`prettier`/`biome` config.
-- **Adding a new page?** New route under `apps/web/src/app/<page>/`, new sections under `apps/web/src/components/sections/<page>/`, new assets under `apps/web/public/images/<page>/`. The only allowed cross-page edits are:
+- **Working on `/for-developers`?** Only touch `apps/web/src/app/for-developers/`, `apps/web/src/components/sections/for-developers/`, and `apps/web/public/images/for-developers/`. Don't drag in unrelated edits to `/community`, `/sbom`, `/teams`, etc., nor `globals.css`, `nav-config.ts`, layout primitives, or `tsconfig`/`eslint`/`prettier`/`biome` config in the same commit.
+- **Adding a new page?** New route under `apps/web/src/app/<page>/`, new sections under `apps/web/src/components/sections/<page>/`, new assets under `apps/web/public/images/<page>/`. The only expected cross-page edits are:
   - One line in `apps/web/src/lib/nav-config.ts` to add the nav entry.
   - One row in `docs/web/WEB-PAGES.md` for the page inventory.
+  - One row in `apps/cms/src/payload/lib/page-registry-seed.ts` (Schema Manager + ⌘K search — see Component structure below).
 - **Typography comes from the global config — NOT from Figma.** For any new or existing page, **ignore Figma's font sizes, font family, font weights, letter-spacing, and line-heights**. The canonical typography spec is **[`apps/web/docs/TYPOGRAPHY-SYSTEM.md`](apps/web/docs/TYPOGRAPHY-SYSTEM.md)** (v2/v4, 2026-05-27). Consume the role tokens defined there:
   - Hero H1 (marketing/product) → `var(--fs-display)` (36 → 64 px).
   - Listing / detail / legal H1 → `var(--fs-h1)` (32 → 56 px).
@@ -62,19 +62,14 @@ Every commit on `farheen` must be **scoped to the page or feature being worked o
   - Prose (CMS-rendered article content) → `.article-body` + `--prose-*`.
   - Font family → `var(--font-display)` (Manrope) / `var(--font-sans)` (Sora) / `var(--font-mono)`. Never literal `"Figtree"` / `"InterFigmaName"` etc.
   - Font weight → 400 body / 500 nav-meta-button / 600 sub-head + card title + hero / 700 article H1–H3. No `font-weight: 800`. No other weights.
-  Inline `text-[clamp(...)]`, `text-[Xpx]`, `fontSize: "Xpx"`, or any other ad-hoc type sizing is forbidden. **Legacy `--text-hero-*` / `--text-display-*` / `--text-card-title-*` / `--text-body-*` / `--text-t-*` tokens are aliased to the new `--fs-*` family** in `globals.css` for backward compatibility but should not be used in new code. If a role token doesn't exist for what Figma shows, **stop and ask** — adding a new token is a shared change that goes through `development`, not `farheen`.
+  Inline `text-[clamp(...)]`, `text-[Xpx]`, `fontSize: "Xpx"`, or any other ad-hoc type sizing is forbidden. **Legacy `--text-hero-*` / `--text-display-*` / `--text-card-title-*` / `--text-body-*` / `--text-t-*` tokens are aliased to the new `--fs-*` family** in `globals.css` for backward compatibility but should not be used in new code. If a role token doesn't exist for what Figma shows, **stop and ask**.
 - **No bulk formatter sweeps.** Prettier/Biome reflows that touch dozens of unrelated files are forbidden. If formatter config changes, raise it for discussion before applying — never bundle a formatter pass with feature work.
 - **No "while I'm here" cleanups.** Renaming a shared variable, tweaking a layout primitive, or "fixing" an unrelated page in the same commit is out of scope.
-- **Shared files that ARE allowed to change** when justified by the in-scope work: `apps/web/src/lib/nav-config.ts` (nav entry only) and `docs/web/WEB-PAGES.md` (inventory row only). Anything else is out of scope.
-
-If a page genuinely needs a shared change (e.g. a new design token, a new layout primitive, a CSP allow-list entry), pause and coordinate — that work lands separately on `development` first, then `farheen` rebases.
 
 ### Forbidden git actions on this repo
 
 - Force-pushing `main` — never. Use forward merges and back-merges to align.
 - Creating new long-lived branches without updating this section first.
-- Touching `apps/cms/` or other CMS-side paths from the `farheen` branch.
-- Bulk formatter or cross-page commits on the `farheen` branch — see "Scoped-change rule" above.
 
 ---
 
@@ -131,7 +126,8 @@ pnpm --filter @cleanstart/cms typecheck
 pnpm --filter @cleanstart/cms build
 pnpm --filter @cleanstart/cms test       # if tests were touched or added
 
-# apps/web (when that package was touched)
+# apps/web (when a page was added/renamed/removed, or that package was touched)
+pnpm --filter @cleanstart/cms verify:page-registry
 pnpm --filter @cleanstart/web lint
 pnpm --filter @cleanstart/web typecheck
 pnpm --filter @cleanstart/web build
@@ -142,6 +138,7 @@ pnpm --filter @cleanstart/web build
 2. Never skip checks — even for one-line changes.
 3. Report results in your final message: `lint ✓ · typecheck ✓ · build ✓`.
 4. `payload generate:types` runs in CI and fails on drift. If you change a collection, regenerate types locally and commit the result.
+5. `verify:page-registry` (CMS-side, gates CI) fails if any `apps/web` page has no `pageRegistry` row — see "New page?" under Component structure below.
 
 ---
 
@@ -212,6 +209,11 @@ Everything in this section applies only to `apps/web`. It does not override the 
 - Page entry point: `src/app/[page]/page.tsx`
 - All nav links live in **one place only**: `src/lib/nav-config.ts`. Changing a page slug means changing it there — both desktop and mobile nav pick it up automatically.
 - Do not restructure `src/components/` or delete `figma.config.json` without understanding the Figma Code Connect mapping.
+- **New page? It needs a `pageRegistry` row (CMS-side) or it has no Schema.org override and is invisible to ⌘K search.** A static page under `src/app/[page]/page.tsx` has no CMS document, so `apps/cms/src/payload/lib/page-registry-seed.ts` (`PAGE_REGISTRY_SEED`) is the only thing that indexes it — nothing else does. Add a row (`kind: 'static'`), then from `apps/cms`:
+  ```bash
+  pnpm exec tsx --env-file=.env scripts/seed-page-registry.ts
+  ```
+  Creating the row fires the search-sync hook automatically (no `--force` needed). `pnpm --filter @cleanstart/cms verify:page-registry` gates CI on this — it diffs every `apps/web/src/app/**/page.tsx` route against `PAGE_REGISTRY_SEED` and fails on anything missing (deliberately-unindexed routes go in `INTENTIONALLY_UNREGISTERED` in `apps/cms/src/payload/lib/page-registry-coverage.ts` instead).
 
 ### Figma-to-code rules
 
@@ -432,5 +434,6 @@ These are one-shot operations that **must** run against the prod Postgres on the
 - **Integration question?** Read `docs/integrations/INTEGRATIONS-RESEARCH.md` (Teams/webhook deep-dive, Standard Webhooks signing) and `docs/integrations/INTEGRATIONS-RESEARCH-V2.md` (analytics read-back, inbound webhooks, J1/J2/J3 milestones).
 - **Background job question?** Arch doc §`#cron-jobs` + the job file and its co-located test.
 - **Which apps/web page to build next, or what slug/category a page uses?** `docs/web/WEB-PAGES.md`.
+- **New page not showing up in ⌘K search / Schema Manager?** `apps/cms/src/payload/lib/page-registry-seed.ts` — see "New page?" under Component structure above.
 - **`apps/web` production question?** (deploy strategy, security headers, CSP, SEO, sitemap, JSON-LD, AI bots, cookie consent, DNS, rollback) → **`docs/web/WEB-PRODUCTION.md`** (canonical for everything web-prod). The HTML arch doc remains canonical for CMS prod only.
 - **Decision not in arch doc and not in this file?** Stop and ask. Don't invent.

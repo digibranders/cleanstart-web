@@ -111,16 +111,16 @@ export const collectionUrlFromSlug = (collection: string, slug: string): string 
 };
 
 /**
- * URL resolver that prefers the doc-level `path` field for Pages
- * (which encodes the full nested path), uses the nested
- * `/podcast/episode/<slug>` path for podcast episodes, and falls back to
- * `prefix + slug` for everything else.
+ * URL resolver that prefers the doc-level `path` field for Pages and
+ * pageRegistry rows (both encode the full site-relative route directly),
+ * uses the nested `/podcast/episode/<slug>` path for podcast episodes, and
+ * falls back to `prefix + slug` for everything else.
  */
 export const collectionUrlFromDoc = (
   collection: string,
   doc: { slug?: string | null; path?: string | null },
 ): string | null => {
-  if (collection === 'pages') {
+  if (collection === 'pages' || collection === 'pageRegistry') {
     if (typeof doc.path === 'string' && doc.path.length > 0) return doc.path;
     if (typeof doc.slug === 'string' && doc.slug.length > 0) return `/${doc.slug}`;
     return null;

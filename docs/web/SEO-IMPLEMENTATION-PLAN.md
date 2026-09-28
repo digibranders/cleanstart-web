@@ -2,7 +2,7 @@
 
 **Companion to:** [`SEO-AUDIT-REPORT.md`](SEO-AUDIT-REPORT.md)
 **Date:** 2026-05-29
-**Owner branch:** `development` (sitemap/redirects/config are shared infra — not `farheen`-scoped)
+**Owner branch:** `development` (sitemap/redirects/config are shared infra)
 **Goal:** Close the SEO gaps found in the audit and migrate the live Webflow site to the new Next.js site without losing organic ranking equity.
 
 > **Governing principle:** This is a same-domain revamp. The dominant risk is broken URLs, not on-page copy. Sequence the work so that **nothing goes to production until the redirect map and sitemap are complete.**

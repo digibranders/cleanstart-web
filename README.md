@@ -155,15 +155,14 @@ pnpm --filter @cleanstart/web build
 
 ## Branching policy
 
-The repo keeps **exactly three long-lived branches**, all kept in sync at the same HEAD after every merge:
+The repo keeps **exactly two long-lived branches**, both kept in sync at the same HEAD after every merge:
 
 | Branch | Purpose | Scope |
 | --- | --- | --- |
 | `main` | Production truth — deploys originate here | Everything |
 | `development` | Day-to-day development | Everything |
-| `farheen` | Web-only contributions | **`apps/web/` only** |
 
-No feature/fix branches and no worktrees for routine work. See the **Branching policy** section of [`CLAUDE.md`](./CLAUDE.md) for the full rules, including the scoped-change rules on `farheen`.
+No feature/fix branches and no worktrees for routine work. See the **Branching policy** section of [`CLAUDE.md`](./CLAUDE.md) for the full rules.
 
 ---
 

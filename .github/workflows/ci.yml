@@ -110,6 +110,9 @@ jobs:
       - name: Verify @payloadcms/ui import allow-list (Wave 8 lock-in)
         run: pnpm --filter @cleanstart/cms verify:payload-ui
 
+      - name: Verify every apps/web page has a pageRegistry row (Schema Manager + ⌘K search)
+        run: pnpm --filter @cleanstart/cms verify:page-registry
+
       - name: Build
         run: pnpm --filter @cleanstart/cms build
 

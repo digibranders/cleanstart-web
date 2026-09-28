@@ -18,6 +18,7 @@ export const COLLECTION_LABELS: Record<string, string> = {
   podcastEpisodes: 'Podcast',
   authors: 'Author',
   pages: 'Page',
+  pageRegistry: 'Page',
 };
 
 export const collectionLabel = (collection: string): string =>
