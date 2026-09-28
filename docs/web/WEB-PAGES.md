@@ -80,7 +80,7 @@ down to 1024.
 | 23b | Job – Single | `/job/[slug]` | CMS Detail | ✅ | Route at `src/app/job/[slug]/` (singular — sibling to the `/careers` listing). Emits JobPosting + BreadcrumbList JSON-LD (open roles only). |
 | 24 | Community | `/community` | Static | ✅ | Built 2026-05-22 from Figma 732:3192 |
 | 25 | Contact Us | `/contact-us` | Static | ✅ | Built 2026-05-23 from Figma 817:14719 |
-| 26 | Teams | `/teams` | Static | ✅ | All 5 sections built (farheen integration 2026-05-20) |
+| 26 | Teams | `/teams` | Static | ✅ | All 5 sections built (2026-05-20) |
 
 ---
 
@@ -90,10 +90,10 @@ down to 1024.
 
 | # | Page Name | URL Slug | Type | Status | Notes |
 |---|-----------|----------|------|--------|-------|
-| 2 | Attack Surface Reduction | `/attack-surface-reduction` | Static | ✅ | Built on `farheen`; ported from retired `web` branch. |
+| 2 | Attack Surface Reduction | `/attack-surface-reduction` | Static | ✅ | Ported from retired `web` branch. |
 | 4 | FIPS Compliance | `/fips` | Static | ✅ | All 7 sections built |
 | 5 | Vulnerability Remediation | `/vulnerability-remediation` | Static | ✅ | All 7 sections built |
-| 9 | For CISO | `/for-ciso` | Static | ✅ | All 8 sections built (farheen integration 2026-05-20) |
+| 9 | For CISO | `/for-ciso` | Static | ✅ | All 8 sections built (2026-05-20) |
 | 10 | For Developers | `/for-developers` | Static | ✅ | Route at `src/app/for-developers/`. Linked from the homepage AudienceTabs and the nav (`nav-config.ts`). |
 | 12 | Impact Estimator | `/impact-estimator` | Static | ✅ | Interactive Operational Impact simulator (light theme). Client `ImpactSimulator` + isolated `model.ts` engine (client-owned bands from ROI 1.xlsx). Sections: Hero (eyebrow + H1), Simulator (sticky inputs, gauge, KPI cards, hours card, copy-link button beside the trust line, mobile summary strip), How-it's-calculated chain, FAQ (six questions, FAQPage JSON-LD), Footer CTA. Inputs round-trip through the URL via `url-state.ts` (unit-tested; e2e in `tests/e2e/impact-estimator.spec.ts`). Nav-linked under Solutions › Capability since 2026-09-02 (`gauge` glyph); **Indexable 2026-09-02**: `noindex,nofollow` dropped, listed in `STATIC_ROUTES`. `pageRegistry` row (id=44) in place, so the page emits a WebPage node. Renamed from `/roi-calculator` on 2026-09-02; the old path 308s to the new one in `next.config.ts`. |
 | 13 | Financial Services | `/industries/financial-services` | Static | ✅ | Title, description and H1 are the SEO team's, applied verbatim. **Renamed from `/financial-services` 2026-08-31** while that URL was noindex, unlinked and out of the sitemap in production, so nothing was de-ranked; a 301 is registered in the CMS `redirects` collection (id=41) regardless, since it did resolve publicly. **Live 2026-08-31**: indexable (the `noindex,nofollow` pair dropped) and listed in `STATIC_ROUTES`. Nav-linked (Solutions › By industry). Breadcrumb, `JsonLdGraph` and `pageRegistry` row (id=42) in place. **Renamed again 2026-09-08** to `/industries/financial-services`, this time post-launch from an indexed, sitemap-listed, nav-linked URL. Its 301 is in `next.config.ts` (not the CMS) so it deploys with the route move. **Two CMS rows still key on the old path and must be updated at deploy:** `pageRegistry` id=42 (else the JSON-LD graph resolves to nothing) and `redirects` id=41 (else `/financial-services` 301s into a 404). |

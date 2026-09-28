@@ -121,6 +121,10 @@ export const PAGE_REGISTRY_SEED: readonly PageRegistrySeedRow[] = [
   { path: '/compare', title: 'Compare CleanStart', kind: 'static', order: 54, webPageType: 'CollectionPage' },
   { path: '/compare/red-hat-vs-cleanstart', title: 'Red Hat Hardened Images vs CleanStart', kind: 'static', order: 55, webPageType: 'WebPage' },
   { path: '/compare/chainguard-vs-cleanstart', title: 'Chainguard vs CleanStart', kind: 'static', order: 56, webPageType: 'WebPage' },
+  // Case studies got a detail route on 2026-09-21 (was listing-only before);
+  // the cms-template row was never added alongside it. Found by
+  // scripts/check-page-registry-coverage.ts.
+  { path: '/case-studies/[slug]', title: 'Case study (template)', kind: 'cms-template', order: 57, backingCollection: 'case-studies' },
 ] as const;
 
 /** Fail-fast guard: paths unique + well-formed, templates carry a collection. */

@@ -543,7 +543,7 @@ Two HTTP monitors on the production site (`https://www.cleanstart.com`), mirrori
 
 Settings for both: check interval 1 min; ≥ 3 monitoring regions; request timeout 30 s; alert after 2 consecutive failures (~2 min, avoids single-region blips); recovery notification on. Alert channel `admin@digibranders.com` (same as Sentry, §10 Alerts).
 
-**Keyword rationale:** `"@type":"Organization"` is emitted server-side by the root layout's org JSON-LD (`apps/web/src/lib/seo/jsonld.ts`, rendered on every page) — structural, not marketing copy, so content edits (incl. the `farheen` branch) won't trip it, and the `global-error` boundary renders no JSON-LD, so a real SSR failure drops the keyword and fires the alert.
+**Keyword rationale:** `"@type":"Organization"` is emitted server-side by the root layout's org JSON-LD (`apps/web/src/lib/seo/jsonld.ts`, rendered on every page) — structural, not marketing copy, so ordinary content edits won't trip it, and the `global-error` boundary renders no JSON-LD, so a real SSR failure drops the keyword and fires the alert.
 
 **Known blind spot:** both are HTTP probes, so neither catches a **client-side-only hydration crash** — the page SSRs 200 with the org JSON-LD intact, then React throws in the browser (exactly the 2026-06-19 Trusted-Types/CSP incident: every page showed the `global-error` boundary while `/api/health` and the homepage both returned 200). Covering that class requires a BetterStack **browser monitor** (Team plan) that loads `/` and fails on console errors — see the post-launch watch list (§19).
 

@@ -89,7 +89,8 @@ pnpm --filter @cleanstart/cms typecheck
 pnpm --filter @cleanstart/cms build
 pnpm --filter @cleanstart/cms test       # if tests were touched or added
 
-# apps/web (when touched)
+# apps/web (when a page was added, renamed, or removed — also when anything else touched)
+pnpm --filter @cleanstart/cms verify:page-registry
 pnpm --filter @cleanstart/web lint
 pnpm --filter @cleanstart/web typecheck
 pnpm --filter @cleanstart/web build
@@ -99,7 +100,8 @@ pnpm --filter @cleanstart/web build
 2. Never skip, even for one-line changes.
 3. Report: `lint ✓ · typecheck ✓ · build ✓`.
 4. `payload generate:types` runs in CI and fails on drift. If you change a collection, regenerate types locally and commit the result.
-5. **Do not trust `payload migrate:create`.** It diffs the config against the newest `.json` schema snapshot, and the last one committed is `20260611_061406_add_seo_keywords.json` — every migration since is hand-written with no snapshot. Running it emits every schema change made since June (879 statements on 2026-09-21). Use it only to *read* the SQL it proposes for your own tables, then hand-write a focused, `IF NOT EXISTS`-guarded migration in the style of the rest of `src/migrations/`, and delete the generated `.ts` + `.json`.
+5. `verify:page-registry` runs in CI and fails if any `apps/web` page has no `pageRegistry` row — see the "New page?" bullet under Component structure below. It's a `pnpm --filter @cleanstart/cms` script (CMS-side) even though what triggers it is a web-side page add.
+6. **Do not trust `payload migrate:create`.** It diffs the config against the newest `.json` schema snapshot, and the last one committed is `20260611_061406_add_seo_keywords.json` — every migration since is hand-written with no snapshot. Running it emits every schema change made since June (879 statements on 2026-09-21). Use it only to *read* the SQL it proposes for your own tables, then hand-write a focused, `IF NOT EXISTS`-guarded migration in the style of the rest of `src/migrations/`, and delete the generated `.ts` + `.json`.
 
 ---
 
@@ -178,6 +180,11 @@ Use the shared field components in `src/components/forms/`, never a per-form cop
 - One section per file: `src/components/sections/[page]/SectionName.tsx`
 - Page entry: `src/app/[page]/page.tsx`
 - Nav links: `src/lib/nav-config.ts` only. Don't restructure `src/components/` or delete `figma.config.json`.
+- **New page? Add a `pageRegistry` row or it's invisible to Schema Manager and ⌘K search.** Static pages (`src/app/[page]/page.tsx`) have no CMS document, so `apps/cms/src/payload/lib/page-registry-seed.ts` (`PAGE_REGISTRY_SEED`) is the *only* thing that gives them a Schema.org override AND a site-wide search entry — nothing else indexes a hardcoded page. This is a CMS-side change (`apps/cms`), not a web-side one. Add a row (`kind: 'static'`), then from `apps/cms` run:
+  ```bash
+  pnpm exec tsx --env-file=.env scripts/seed-page-registry.ts
+  ```
+  This creates the row and — because creation always fires the search-sync hook — pushes it into the Meilisearch `content` index immediately; no `--force` needed for a brand-new row. `pnpm --filter @cleanstart/cms verify:page-registry` (also gates CI) catches a page shipped without this — it diffs every `apps/web/src/app/**/page.tsx` route against `PAGE_REGISTRY_SEED` and fails on anything missing. A route that's deliberately unindexed (an internal tool, a noindex utility page) goes in `INTENTIONALLY_UNREGISTERED` in `apps/cms/src/payload/lib/page-registry-coverage.ts` instead, with a comment saying why — never silently skip the row.
 
 ### Image rules
 
@@ -368,6 +375,7 @@ The `Integrations` collection (Phase J1) provides editor self-serve config for c
 - **Integration:** `docs/integrations/INTEGRATIONS-RESEARCH.md`, `INTEGRATIONS-RESEARCH-V2.md`.
 - **Background jobs:** arch doc §`#cron-jobs` + job file + test.
 - **Which page to build:** `docs/web/WEB-PAGES.md`.
+- **New page not showing up in ⌘K search / Schema Manager:** `apps/cms/src/payload/lib/page-registry-seed.ts` — see "New page?" under Component structure above.
 - **Web production:** `docs/web/WEB-PRODUCTION.md`.
 - **Prod one-shots:** `docs/operations/PRODUCTION-ROLLOUT.md`.
 - **Past incidents & non-obvious bugs:** `docs/operations/INCIDENTS.md` — check it before deep-debugging a prod issue, and **append a new entry** whenever you fix a prod incident or a bug whose root cause was non-obvious (symptom → root cause → fix → reusable lesson).
