@@ -4,6 +4,7 @@ import {
   orderResourceTypes,
   resolveResourceTypeLabel,
   resolveResourceTypeSlug,
+  resourceCtaLabel,
   type ResourceTypeSource,
 } from "./resources-utils";
 
@@ -84,5 +85,33 @@ describe("orderResourceTypes", () => {
     const fromCms = [term("report", "Report"), term("whitepaper", "Whitepaper")];
     orderResourceTypes(fromCms);
     expect(fromCms.map((t) => t.slug)).toEqual(["report", "whitepaper"]);
+  });
+});
+
+describe("resourceCtaLabel", () => {
+  it("uses the editor's override whenever there is one", () => {
+    // The detail hero used to read this only for gated resources, so 25 of the
+    // 29 ungated ones rendered "Download" while the CMS held "View White Paper".
+    expect(resourceCtaLabel("whitepaper", "View White Paper")).toBe("View White Paper");
+    expect(resourceCtaLabel(null, "Read More")).toBe("Read More");
+  });
+
+  it("names the asset when no override is set", () => {
+    // Bare "Download" was the link's entire accessible name, so the fallback
+    // has to carry the resource type (WCAG 2.4.4, link purpose from link text).
+    expect(resourceCtaLabel("whitepaper")).toBe("Get the Whitepaper");
+    expect(resourceCtaLabel("architecture-insights")).toBe("Read the Insights");
+    expect(resourceCtaLabel("report")).toBe("Read the Report");
+  });
+
+  it("still names something for an unknown or missing type", () => {
+    expect(resourceCtaLabel(undefined)).toBe("Get the Resource");
+    expect(resourceCtaLabel("some-editor-added-type")).toBe("Get the Resource");
+  });
+
+  it("never returns a label that omits the subject", () => {
+    for (const type of [null, undefined, "whitepaper", "ebook", "datasheet", "report"]) {
+      expect(resourceCtaLabel(type)).not.toBe("Download");
+    }
   });
 });
