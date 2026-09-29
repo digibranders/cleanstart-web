@@ -1331,6 +1331,304 @@ body {
   border-bottom-color: rgba(255, 255, 255, 0.04);
 }
 
+/* ── Announcement bar (components/nav/AnnouncementBar.tsx) ─────────────────
+   In normal flow above the fixed header. --cs-announce-h exists only while the
+   bar is rendered and not dismissed; the header's top is that height minus the
+   scroll offset HeaderScrollShell writes, clamped at 0, so the header rides the
+   bar down and docks once it has scrolled away. */
+:root {
+  --cs-announce-bar-h: 2.5rem;
+  --cs-announce-ease: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@media (min-width: 40rem) {
+  :root {
+    --cs-announce-bar-h: 2.75rem;
+  }
+}
+
+:root:not([data-announcement-dismissed]):has(.cs-announce) {
+  --cs-announce-h: var(--cs-announce-bar-h);
+}
+
+[data-announcement-dismissed] .cs-announce {
+  display: none;
+}
+
+.cs-header-dock {
+  top: max(0px, calc(var(--cs-announce-h, 0px) - var(--cs-announce-scroll, 0px)));
+}
+
+.cs-announce {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  height: var(--cs-announce-bar-h);
+  background-color: #0d0918;
+  /* Inner top highlight reads as a machined edge rather than a flat strip. */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Violet bloom centred behind the copy, fading well before the edges. */
+.cs-announce::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(38% 160% at 50% 120%, rgba(106, 61, 240, 0.34), transparent 70%),
+    radial-gradient(22% 120% at 32% -20%, rgba(19, 30, 143, 0.45), transparent 70%),
+    radial-gradient(22% 120% at 68% -20%, rgba(44, 193, 235, 0.10), transparent 70%);
+}
+
+/* Bottom hairline that fades out toward both edges. */
+.cs-announce::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(169, 116, 255, 0.35) 30%,
+    rgba(44, 193, 235, 0.35) 70%,
+    transparent
+  );
+}
+
+.cs-announce-link {
+  position: relative;
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding-inline: 1rem 3rem;
+  font-family: var(--font-sans);
+  font-size: var(--fs-caption);
+  line-height: var(--fs-caption-lh);
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+  white-space: nowrap;
+  outline: none;
+}
+
+@media (min-width: 40rem) {
+  .cs-announce-link {
+    padding-inline: 3rem;
+  }
+}
+
+.cs-announce-link:focus-visible {
+  box-shadow: inset 0 0 0 2px #33baec;
+}
+
+/* One slow light pass on first paint to draw the eye, then stillness. */
+.cs-announce-link::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.07) 50%,
+    transparent 62%
+  );
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cs-announce-link::before {
+    animation: cs-announce-sheen 2.4s var(--cs-announce-ease) 0.8s 1 both;
+  }
+}
+
+@keyframes cs-announce-sheen {
+  0% {
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 1;
+  }
+}
+
+.cs-announce-tag {
+  display: none;
+  align-items: center;
+  height: 1.375rem;
+  padding-inline: 0.625rem;
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #e6dbff;
+  /* Gradient ring via a padding-box fill over a border-box gradient. */
+  border: 1px solid transparent;
+  background:
+    linear-gradient(180deg, rgba(55, 30, 130, 0.9), rgba(30, 18, 72, 0.9)) padding-box,
+    linear-gradient(135deg, rgba(223, 155, 255, 0.7), rgba(7, 110, 255, 0.5)) border-box;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.cs-announce-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+
+.cs-announce-detail {
+  display: none;
+  align-items: center;
+  gap: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Hairline separator between title and supporting line. */
+.cs-announce-detail::before {
+  content: "";
+  width: 1px;
+  height: 0.875rem;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.cs-announce-cta {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  font-weight: 500;
+  color: #fff;
+  transition:
+    background-color 400ms var(--cs-announce-ease),
+    box-shadow 400ms var(--cs-announce-ease),
+    transform 200ms var(--cs-announce-ease);
+}
+
+.cs-announce-cta-label {
+  display: none;
+}
+
+/* Arrow sits in its own disc, flush with the pill's inner edge. */
+/* The disc stays fixed so its inset inside the pill never changes; only the
+   glyph moves on hover, clipped by the disc. */
+.cs-announce-arrow {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  overflow: hidden;
+  border-radius: 999px;
+  color: #151021;
+  background: #fff;
+}
+
+.cs-announce-arrow-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+  transition: transform 500ms var(--cs-announce-ease);
+}
+
+@media (min-width: 40rem) {
+  .cs-announce-tag {
+    display: inline-flex;
+  }
+
+  .cs-announce-cta {
+    height: 1.75rem;
+    padding: 0 0.25rem 0 0.875rem;
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .cs-announce-cta-label {
+    display: inline;
+  }
+}
+
+@media (min-width: 64rem) {
+  .cs-announce-detail {
+    display: inline-flex;
+  }
+}
+
+/* Just above 1024px the full line (about 880px, centred) would crowd the close
+   button. The supporting line is the reason to click, so the chip gives up its
+   width in this narrow band only; by 67.5rem there is room for both. */
+@media (min-width: 64rem) and (max-width: 67.49rem) {
+  .cs-announce-tag {
+    display: none;
+  }
+}
+
+@media (hover: hover) {
+  .cs-announce-link:hover .cs-announce-cta {
+    background: rgba(255, 255, 255, 0.11);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+
+  .cs-announce-link:hover .cs-announce-arrow-icon {
+    transform: translateX(2px);
+  }
+}
+
+.cs-announce-link:active .cs-announce-cta {
+  transform: scale(0.98);
+}
+
+.cs-announce-close {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  display: inline-flex;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-50%);
+  transition:
+    color 300ms var(--cs-announce-ease),
+    background-color 300ms var(--cs-announce-ease);
+  outline: none;
+}
+
+.cs-announce-close:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.cs-announce-close:focus-visible {
+  color: #fff;
+  box-shadow: 0 0 0 2px #33baec;
+}
+
+@media (min-width: 40rem) {
+  .cs-announce-close {
+    right: 1rem;
+  }
+}
+
+@media print {
+  .cs-announce {
+    display: none;
+  }
+}
+
 /* Active route — gradient underline beneath top-level nav links */
 .cs-nav-link {
   padding-bottom: 6px;

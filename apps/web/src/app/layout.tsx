@@ -21,6 +21,7 @@ import { isIndexingAllowed } from "@/lib/seo/indexing";
 import { ogImageUrl } from "@/lib/seo/og";
 import { organizationSchema, webSiteSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
+import { AnnouncementDismissScript } from "@/components/nav/AnnouncementDismissScript";
 import {
   getSeoDefaults,
   orgConfigFromDefaults,
@@ -166,6 +167,8 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
+      // AnnouncementDismissScript may set data-announcement-dismissed before hydration.
+      suppressHydrationWarning
       className={cn("font-sans", manrope.variable, sora.variable, jetbrainsMono.variable)}
       style={{
         ["--font-sans" as string]: "var(--font-sora)",
@@ -183,6 +186,7 @@ export default async function RootLayout({
             before the container boots, so every tag starts in the right state. */}
         <ConsentModeScript />
         <GtmHeadScript />
+        <AnnouncementDismissScript />
       </head>
       <body suppressHydrationWarning>
         {/* Skip-to-content link (WCAG 2.1 A): first focusable element; hidden
