@@ -14,7 +14,7 @@ export interface BuildCspOptions {
 const SENTRY_INGEST = 'https://*.ingest.sentry.io';
 const VERCEL_INSIGHTS = 'https://vitals.vercel-insights.com';
 const VERCEL_SCRIPTS = 'https://va.vercel-scripts.com';
-// gtag.js library host (loaded via script-src 'https:'); also a beacon target.
+// gtag.js library host (also in script-src); also a beacon target.
 const GTM = 'https://www.googletagmanager.com';
 const GA4_COLLECT = 'https://www.google-analytics.com';
 // Regional collect endpoints redirect to subdomains of google-analytics.com
@@ -22,14 +22,15 @@ const GA4_COLLECT = 'https://www.google-analytics.com';
 // NOT cover those, so both families are listed.
 const GA4_COLLECT_REGION = 'https://*.google-analytics.com';
 const GA4_REGION = 'https://*.analytics.google.com';
-// Leadfeeder / Dealfront tracker: loader is sc.lfeeder.com (served via
-// script-src 'https:'); the tracker beacons + pixels back to *.lfeeder.com.
+// Leadfeeder / Dealfront tracker: loader is sc.lfeeder.com (covered by
+// this wildcard in script-src); the tracker beacons + pixels back to *.lfeeder.com.
 const LEADFEEDER = 'https://*.lfeeder.com';
-// Apollo.io website visitor tracker: loader is assets.apollo.io (served via
-// script-src 'https:'); the tracker beacons + pixels back to *.apollo.io.
+// Apollo.io website visitor tracker: loader is assets.apollo.io (see
+// APOLLO_SCRIPTS); the tracker beacons + pixels back to *.apollo.io.
 const APOLLO = 'https://*.apollo.io';
-// Microsoft Clarity, fired from GTM: loader is www.clarity.ms (served via
-// script-src 'https:'); the recorder uploads to *.clarity.ms and syncs identity
+const APOLLO_SCRIPTS = 'https://assets.apollo.io';
+// Microsoft Clarity, fired from GTM: loader is www.clarity.ms (covered by
+// this wildcard in script-src); the recorder uploads to *.clarity.ms and syncs identity
 // through c.bing.com by both fetch and pixel.
 const CLARITY = 'https://*.clarity.ms';
 const CLARITY_SYNC = 'https://c.bing.com';
@@ -39,8 +40,8 @@ const CLARITY_SYNC = 'https://c.bing.com';
 // moment CSP_ENFORCE is set.
 const YOUTUBE_EMBED = 'https://www.youtube-nocookie.com';
 // Cloudflare Turnstile renders its challenge in an iframe from this origin.
-// The loader script is covered by `script-src 'https:'`, but the iframe is
-// not. Without it here, every form that renders <TurnstileWidget> (book-a-demo,
+// The loader script is allowed in script-src, but the iframe is
+// not covered by it. Without it here, every form that renders <TurnstileWidget> (book-a-demo,
 // contact, deal registration, job apply, the partner CTA and the gated resource
 // download) loses bot protection the moment CSP_ENFORCE is set.
 // Confirmed against the live report-only policy, which logs:
@@ -70,8 +71,7 @@ export function buildCsp({
   // route into dynamic rendering (Next reads it from `headers()`), while inline
   // `style=` attributes — pervasive per the Figma-exact-values convention —
   // can never carry a nonce at all. `'unsafe-inline'` covers Next's inline
-  // bootstrap, the JSON-LD, and the consent snippet; `https:` covers GA4 /
-  // Vercel third-party scripts. XSS defence-in-depth comes from the structural
+  // bootstrap, the JSON-LD, and the consent snippet; the named hosts in script-src. XSS defence-in-depth comes from the structural
   // directives below (object-src none, base-uri, form-action, frame-ancestors)
   // rather than from inline-source pinning.
   //
@@ -84,7 +84,22 @@ export function buildCsp({
   // every route and the global-error boundary takes the whole site down; in
   // report-only mode it instead floods /api/csp-report with a false positive
   // per chunk load. Re-introduce only once the framework can satisfy it.
-  const scriptSrc = ["'self'", "'unsafe-inline'", 'https:'];
+  //
+  // script-src names each script host instead of the blanket `https:`, which
+  // let any HTTPS origin serve script. Hosts come from what the production
+  // page loads (verified 2026-09-29) plus the GTM Custom HTML tags in
+  // docs/web/gtm/cleanstart-container.json. A new GTM vendor needs its script
+  // host added here first (docs/web/TRACKING-TAGS.md, "Adding a tag").
+  const scriptSrc = [
+    "'self'",
+    "'unsafe-inline'",
+    GTM,
+    TURNSTILE_FRAME,
+    VERCEL_SCRIPTS,
+    APOLLO_SCRIPTS,
+    LEADFEEDER,
+    CLARITY,
+  ];
 
   const styleSrc = ["'self'", "'unsafe-inline'"];
 
