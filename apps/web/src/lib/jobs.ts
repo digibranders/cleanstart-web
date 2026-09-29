@@ -37,6 +37,16 @@ export type Job = {
     currency?: "USD" | "EUR" | "GBP" | "INR" | null;
   };
   body?: LexicalRoot | null;
+  /**
+   * Optional JD PDF. Already fetched (the detail loader reads at depth 2 with
+   * no `select`), it just had no type and no render site until 2026-09-29.
+   */
+  descriptionPdf?: {
+    url?: string | null;
+    filename?: string | null;
+    mimeType?: string | null;
+    filesize?: number | null;
+  } | number | null;
   seo?: CmsSeo | null;
   publishedAt?: string | null;
   updatedAt?: string | null;
