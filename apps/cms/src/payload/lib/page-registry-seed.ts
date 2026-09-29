@@ -125,6 +125,10 @@ export const PAGE_REGISTRY_SEED: readonly PageRegistrySeedRow[] = [
   // the cms-template row was never added alongside it. Found by
   // scripts/check-page-registry-coverage.ts.
   { path: '/case-studies/[slug]', title: 'Case study (template)', kind: 'cms-template', order: 57, backingCollection: 'case-studies' },
+  // Webinars had a route prefix, a CMS collection with the full routed-collection
+  // machinery, and a getWebinarBySlug fetcher, but no detail route: the nav linked
+  // to /webinar/<slug> on every page and 404'd. Route added 2026-09-29.
+  { path: '/webinar/[slug]', title: 'Webinar (template)', kind: 'cms-template', order: 58, backingCollection: 'webinars' },
 ] as const;
 
 /** Fail-fast guard: paths unique + well-formed, templates carry a collection. */

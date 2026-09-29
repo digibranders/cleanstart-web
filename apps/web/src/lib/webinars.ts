@@ -1,5 +1,6 @@
 import { cache } from "react";
 import type { BlogImage, LexicalRoot } from "@/lib/blog";
+import type { CmsSeo } from "@/lib/seo/cms-seo";
 
 import { fetchCMS } from "./cms-fetch";
 import { effectiveWebinarType } from "./webinars-utils";
@@ -33,6 +34,8 @@ export type Webinar = {
 
 export type WebinarDetail = Webinar & {
   body?: LexicalRoot | null;
+  slidesUrl?: string | null;
+  seo?: CmsSeo | null;
 };
 
 type PayloadListResponse<T> = {
@@ -152,3 +155,17 @@ export const getWebinarBySlug = cache(
   },
 );
 
+/** All published webinar slugs, for generateStaticParams (prerender at build). */
+export async function getWebinarSlugs(): Promise<string[]> {
+  const params = new URLSearchParams({
+    "where[_status][equals]": "published",
+    "where[publishedAt][exists]": "true",
+    depth: "0",
+    limit: "1000",
+    "select[slug]": "true",
+  });
+  const res = await fetchCMS<PayloadListResponse<{ slug: string }>>(
+    `/api/webinars?${params.toString()}`,
+  );
+  return res.docs.map((d) => d.slug).filter((s): s is string => Boolean(s));
+}
