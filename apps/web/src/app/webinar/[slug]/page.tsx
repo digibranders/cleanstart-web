@@ -146,46 +146,25 @@ export async function renderWebinarDetail({
           isPast={isPast}
         />
 
-        {(heroImg || action) && (
+        {heroImg && webinar.heroImage?.width && webinar.heroImage?.height && (
           <section
             className="relative mx-auto max-w-[820px] px-6"
             style={{ paddingTop: "64px" }}
           >
-            {heroImg && webinar.heroImage?.width && webinar.heroImage?.height && (
-              <div
-                className="relative overflow-hidden mx-auto"
-                style={{ borderRadius: "16px", background: "rgba(0,0,0,0.05)" }}
-              >
-                <Image
-                  src={heroImg}
-                  alt={webinar.heroImage?.alt ?? webinar.title}
-                  width={webinar.heroImage.width}
-                  height={webinar.heroImage.height}
-                  className="w-full h-auto block"
-                  sizes="(max-width: 820px) 100vw, 820px"
-                  priority
-                />
-              </div>
-            )}
-
-            {action && (
-              <div className="flex justify-center" style={{ marginTop: "32px" }}>
-                <a
-                  href={action.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="cs-btn-blue gap-2"
-                  style={{
-                    minWidth: "180px",
-                    height: "48px",
-                    padding: "0 24px",
-                    fontSize: "1rem",
-                  }}
-                >
-                  {action.label}
-                </a>
-              </div>
-            )}
+            <div
+              className="relative overflow-hidden mx-auto"
+              style={{ borderRadius: "16px", background: "rgba(0,0,0,0.05)" }}
+            >
+              <Image
+                src={heroImg}
+                alt={webinar.heroImage?.alt ?? webinar.title}
+                width={webinar.heroImage.width}
+                height={webinar.heroImage.height}
+                className="w-full h-auto block"
+                sizes="(max-width: 820px) 100vw, 820px"
+                priority
+              />
+            </div>
           </section>
         )}
 
@@ -223,6 +202,28 @@ export async function renderWebinarDetail({
                   Download the slides
                 </a>
               </p>
+            </div>
+          )}
+
+          {/* The action sits after the copy: a visitor decides to register once
+              they know what the session covers, so the button follows the read
+              rather than interrupting it. */}
+          {action && (
+            <div className="flex justify-center" style={{ marginTop: "48px" }}>
+              <a
+                href={action.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="cs-btn-blue gap-2"
+                style={{
+                  minWidth: "180px",
+                  height: "48px",
+                  padding: "0 24px",
+                  fontSize: "1rem",
+                }}
+              >
+                {action.label}
+              </a>
             </div>
           )}
         </section>
