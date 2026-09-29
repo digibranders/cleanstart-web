@@ -524,6 +524,58 @@ export function eventSchema({
   };
 }
 
+export interface WebinarSchemaInput {
+  title: string;
+  path: string;
+  startDate?: string | null | undefined;
+  endDate?: string | null | undefined;
+  description?: string | null | undefined;
+  /** 'scheduled' | 'postponed' | 'cancelled'. */
+  eventStatus: string;
+  /** Where the attendee actually joins. Falls back to the page itself. */
+  registrationUrl?: string | null | undefined;
+  imageUrl?: string | undefined;
+}
+
+/**
+ * Event structured data for `/webinar/[slug]`.
+ *
+ * Separate from `eventSchema` because a webinar is online: Google requires
+ * `OnlineEventAttendanceMode` plus a `VirtualLocation` carrying the join URL.
+ * Reusing the offline builder would emit a physical `Place` with an empty
+ * venue name and claim in-person attendance, which is wrong on both counts.
+ */
+export function webinarSchema({
+  title,
+  path,
+  startDate,
+  endDate,
+  description,
+  eventStatus,
+  registrationUrl,
+  imageUrl,
+}: WebinarSchemaInput) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: title,
+    url: absoluteUrl(path),
+    ...(startDate ? { startDate } : {}),
+    ...(endDate ? { endDate } : {}),
+    eventStatus: EVENT_STATUS_IRI[eventStatus] ?? EVENT_STATUS_IRI.scheduled,
+    eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
+    location: {
+      "@type": "VirtualLocation",
+      // The registration page is where an attendee goes; when registration is
+      // handled on-site the webinar's own URL is the honest answer.
+      url: registrationUrl ?? absoluteUrl(path),
+    },
+    ...(description ? { description } : {}),
+    ...(imageUrl ? { image: [imageUrl] } : {}),
+    organizer: { "@id": ORGANIZATION_ID },
+  };
+}
+
 export interface FaqItem {
   question: string;
   answer: string;

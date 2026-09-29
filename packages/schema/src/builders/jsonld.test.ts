@@ -10,6 +10,7 @@ import {
   newsArticleSchema,
   reviewSchema,
   videoObjectSchema,
+  webinarSchema,
 } from "./jsonld";
 
 // Builders read SITE_URL from NEXT_PUBLIC_SITE_URL with a fixed fallback.
@@ -236,5 +237,54 @@ describe("author fallback (Google Article requirement)", () => {
       authors: [{ name: "CleanStart Security", slug: "cleanstart-security" }],
     });
     expect(node.author).toEqual([ORG]);
+  });
+});
+
+describe("webinarSchema", () => {
+  const BASE_INPUT = {
+    title: "Anatomy of Modern npm Attacks",
+    path: "/webinar/anatomy-of-modern-npm-attacks",
+    startDate: "2026-10-15T17:00:00.000Z",
+    eventStatus: "scheduled",
+    registrationUrl: "https://web.bigmarker.com/cleanstart-webinars/anatomy",
+  };
+
+  it("declares the webinar online, not in-person", () => {
+    // eventSchema hardcodes OfflineEventAttendanceMode and a physical Place.
+    // Reusing it for a webinar would claim in-person attendance at a venue
+    // with no name, which is why this builder exists separately.
+    const w = webinarSchema(BASE_INPUT);
+
+    expect(w.eventAttendanceMode).toBe("https://schema.org/OnlineEventAttendanceMode");
+    expect(w.location).toEqual({
+      "@type": "VirtualLocation",
+      url: BASE_INPUT.registrationUrl,
+    });
+  });
+
+  it("falls back to the webinar's own URL when registration is handled on-site", () => {
+    const { registrationUrl: _omitted, ...withoutUrl } = BASE_INPUT;
+    const w = webinarSchema(withoutUrl);
+
+    expect(w.location).toEqual({
+      "@type": "VirtualLocation",
+      url: `${BASE}/webinar/anatomy-of-modern-npm-attacks`,
+    });
+  });
+
+  it("maps status to the schema.org IRI and attributes the Organization", () => {
+    const w = webinarSchema({ ...BASE_INPUT, eventStatus: "cancelled" });
+
+    expect(w.eventStatus).toBe("https://schema.org/EventCancelled");
+    expect(w.organizer).toEqual({ "@id": `${BASE}/#organization` });
+  });
+
+  it("omits optional fields rather than emitting empty values", () => {
+    const w = webinarSchema({ title: "T", path: "/webinar/t", eventStatus: "scheduled" });
+
+    expect("startDate" in w).toBe(false);
+    expect("endDate" in w).toBe(false);
+    expect("description" in w).toBe(false);
+    expect("image" in w).toBe(false);
   });
 });
