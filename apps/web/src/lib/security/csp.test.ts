@@ -27,6 +27,13 @@ describe('buildCsp', () => {
     expect(d['style-src']).toContain("'self'");
   });
 
+  it('does not allow arbitrary https: origins to serve script', () => {
+    const d = parse(buildCsp(base));
+    expect((d['script-src'] ?? '').split(' ')).not.toContain('https:');
+    expect(d['script-src']).toContain('https://challenges.cloudflare.com');
+    expect(d['script-src']).toContain('https://va.vercel-scripts.com');
+  });
+
   it('does not use a per-request nonce or strict-dynamic (would force dynamic rendering)', () => {
     const csp = buildCsp(base);
     expect(csp).not.toContain('nonce-');
@@ -56,7 +63,7 @@ describe('buildCsp', () => {
 
   it('allows the Turnstile challenge iframe in frame-src', () => {
     const d = parse(buildCsp(base));
-    // Turnstile's loader is covered by script-src 'https:', but its challenge
+    // Turnstile's loader is allowed in script-src, but its challenge
     // renders in an iframe from this origin. Omitting it strips bot protection
     // from every lead form the moment CSP_ENFORCE is set.
     expect(d['frame-src']).toContain('https://challenges.cloudflare.com');
@@ -68,24 +75,24 @@ describe('buildCsp', () => {
     expect(d['connect-src']).toContain('https://www.google-analytics.com');
     expect(d['connect-src']).toContain('https://*.google-analytics.com');
     expect(d['connect-src']).toContain('https://*.analytics.google.com');
-    // gtag.js library is served over https: (no per-host script-src needed).
-    expect(d['script-src']).toContain('https:');
+    // gtag.js and gtm.js load from the GTM host.
+    expect(d['script-src']).toContain('https://www.googletagmanager.com');
   });
 
   it('allows the Leadfeeder tracker host in connect-src and img-src', () => {
     const d = parse(buildCsp(base));
     expect(d['connect-src']).toContain('https://*.lfeeder.com');
     expect(d['img-src']).toContain('https://*.lfeeder.com');
-    // The sc.lfeeder.com loader is served over https: (no per-host script-src).
-    expect(d['script-src']).toContain('https:');
+    // The sc.lfeeder.com loader is covered by the wildcard.
+    expect(d['script-src']).toContain('https://*.lfeeder.com');
   });
 
   it('allows the Apollo.io tracker host in connect-src and img-src', () => {
     const d = parse(buildCsp(base));
     expect(d['connect-src']).toContain('https://*.apollo.io');
     expect(d['img-src']).toContain('https://*.apollo.io');
-    // The assets.apollo.io loader is served over https: (no per-host script-src).
-    expect(d['script-src']).toContain('https:');
+    // The assets.apollo.io loader is named explicitly.
+    expect(d['script-src']).toContain('https://assets.apollo.io');
   });
 
   it('allows the Microsoft Clarity hosts in connect-src and img-src', () => {
@@ -95,8 +102,8 @@ describe('buildCsp', () => {
     // Clarity syncs identity through c.bing.com over both fetch and pixel.
     expect(d['connect-src']).toContain('https://c.bing.com');
     expect(d['img-src']).toContain('https://c.bing.com');
-    // The www.clarity.ms loader is served over https: (no per-host script-src).
-    expect(d['script-src']).toContain('https:');
+    // The www.clarity.ms loader is covered by the wildcard.
+    expect(d['script-src']).toContain('https://*.clarity.ms');
   });
 
   it('locks object-src, base-uri and form-action', () => {
