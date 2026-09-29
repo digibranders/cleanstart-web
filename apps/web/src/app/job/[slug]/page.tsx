@@ -170,7 +170,11 @@ export async function renderJobDetail({
       <Header />
       <main id="main-content">
         <CareerDetailHero title={job.title} meta={meta} />
-        <CareerDetailContent body={bodyWithoutDeptLine} />
+        <CareerDetailContent
+          body={bodyWithoutDeptLine}
+          descriptionPdf={job.descriptionPdf}
+          jobTitle={job.title}
+        />
         {/* CMS-native, open roles accept applications on-site. ATS roles keep
             their existing external-link behaviour (no form rendered). */}
         {job.source === "cms" && job.hiringStatus === "open" ? (
