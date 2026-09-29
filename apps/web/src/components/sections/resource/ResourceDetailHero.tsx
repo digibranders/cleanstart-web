@@ -1,6 +1,11 @@
 import { breadcrumbTrail } from "@cleanstart/schema/builders";
 import type { ResourceDetail } from "@/lib/resources";
-import { mediaUrl, resolveResourceTypeLabel } from "@/lib/resources";
+import {
+  mediaUrl,
+  resolveResourceTypeLabel,
+  resolveResourceTypeSlug,
+  resourceCtaLabel,
+} from "@/lib/resources";
 import { DETAIL_HERO_TITLE_STYLE } from "@/components/sections/_shared/DetailHero";
 import { HeroBreadcrumb } from "@/components/sections/_shared/HeroBreadcrumb";
 import { ResourceDownloadButton } from "@/components/resource/ResourceDownloadButton";
@@ -31,15 +36,23 @@ export function ResourceDetailHero({
         ? (mediaUrl(resource.asset.url) ?? "#")
         : "#";
 
-  // "Download" promises a file on click, which is true for the 29 ungated
-  // resources and a lie for the gated ones, where the click opens a form. The
-  // visitor had no way to tell the two apart before committing. "Unlock the
-  // <type>" says a gate is coming; `ctaButtonText` still overrides it for an
-  // editor who wants specific wording.
+  // Ungated resources reuse `resourceCtaLabel`, the same helper the listing
+  // card already uses, so both surfaces agree on a resource's CTA copy. This
+  // page previously rolled its own logic and read `ctaButtonText` only on the
+  // gated branch, so 25 of the 29 ungated resources had a label typed in the
+  // CMS that never rendered: the page said "Download" while the record said
+  // "View White Paper".
+  //
+  // Bare "Download" was also the link's whole accessible name, since the icon
+  // beside it is aria-hidden. A screen-reader user listing links heard
+  // "Download" with no idea of what, failing WCAG 2.4.4.
+  //
+  // Gated keeps its own wording rather than the shared helper: "Unlock the
+  // <type>" warns that the click opens a form instead of fetching a file.
   const downloadLabel = gated
     ? (resource.ctaButtonText?.trim() ||
       `Unlock the ${resolveResourceTypeLabel(resource)}`)
-    : "Download";
+    : resourceCtaLabel(resolveResourceTypeSlug(resource), resource.ctaButtonText);
 
   return (
     <section
