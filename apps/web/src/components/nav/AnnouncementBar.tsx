@@ -51,7 +51,9 @@ export function AnnouncementBar() {
         <span className="cs-announce-detail">{detail}</span>
         <span className="cs-announce-cta">
           <span className="cs-announce-cta-label">{cta}</span>
-          <ArrowRight aria-hidden="true" className="cs-announce-arrow" strokeWidth={2} />
+          <span className="cs-announce-arrow" aria-hidden="true">
+            <ArrowRight className="cs-announce-arrow-icon" strokeWidth={2} />
+          </span>
         </span>
       </Link>
       <button

@@ -1517,14 +1517,24 @@ body {
 }
 
 /* Arrow sits in its own disc, flush with the pill's inner edge. */
+/* The disc stays fixed so its inset inside the pill never changes; only the
+   glyph moves on hover, clipped by the disc. */
 .cs-announce-arrow {
-  box-sizing: content-box;
-  width: 0.75rem;
-  height: 0.75rem;
-  padding: 0.25rem;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  overflow: hidden;
   border-radius: 999px;
   color: #151021;
   background: #fff;
+}
+
+.cs-announce-arrow-icon {
+  width: 0.75rem;
+  height: 0.75rem;
   transition: transform 500ms var(--cs-announce-ease);
 }
 
@@ -1553,6 +1563,15 @@ body {
   }
 }
 
+/* Just above 1024px the full line (about 880px, centred) would crowd the close
+   button. The supporting line is the reason to click, so the chip gives up its
+   width in this narrow band only; by 67.5rem there is room for both. */
+@media (min-width: 64rem) and (max-width: 67.49rem) {
+  .cs-announce-tag {
+    display: none;
+  }
+}
+
 @media (hover: hover) {
   .cs-announce-link:hover .cs-announce-cta {
     background: rgba(255, 255, 255, 0.11);
@@ -1561,8 +1580,8 @@ body {
       inset 0 1px 0 rgba(255, 255, 255, 0.14);
   }
 
-  .cs-announce-link:hover .cs-announce-arrow {
-    transform: translateX(2px) scale(1.06);
+  .cs-announce-link:hover .cs-announce-arrow-icon {
+    transform: translateX(2px);
   }
 }
 

@@ -19,10 +19,10 @@ export interface Announcement {
 
 export const ANNOUNCEMENT: Announcement | null = {
   id: "ciso-guide-software-trust-2026",
-  title: "The 2026 CISO Guide to Software Trust is here",
+  title: "The 2026 CISO Guide to Software Trust",
   shortTitle: "2026 CISO Guide to Software Trust",
-  detail: "Build trust across your software supply chain.",
-  cta: "Download the guide",
+  detail: "87% of public container images ship with high or critical CVEs.",
+  cta: "Get the guide",
   href: "/resources/ciso-guide-software-trust",
   hideOn: ["/resources/ciso-guide-software-trust", "/thank-you"],
 };
