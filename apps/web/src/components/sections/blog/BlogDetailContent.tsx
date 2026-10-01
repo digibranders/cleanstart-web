@@ -9,12 +9,15 @@ interface BlogDetailContentProps {
   body?: LexicalRoot | null | undefined;
   tableOfContents?: TocEntry[] | null | undefined;
   heroImage?: BlogImage | undefined;
+  /** Optional third column at xl+, sticky beside the article (the blog CTA rail). */
+  rail?: React.ReactNode;
 }
 
 export function BlogDetailContent({
   body,
   tableOfContents,
   heroImage: _heroImage,
+  rail,
 }: BlogDetailContentProps): React.ReactElement {
   return (
     <section className="relative w-full bg-white overflow-x-clip" data-section="BlogDetailContent">
@@ -49,14 +52,16 @@ export function BlogDetailContent({
         TOC sidebar 260px | gap 48px | content max-w-[680px]
         Leaves natural right breathing room at wide viewports.
         ~680px body column = ~72 chars at 18px — optimal reading line length.
+        With a rail, xl+ becomes TOC 224 | article | rail 272 with 40px gaps,
+        which also centres the article in the viewport.
       */}
-      <div className="relative mx-auto max-w-[1120px] px-6">
+      <div className={`relative mx-auto max-w-[1120px] px-6 ${rail ? "xl:max-w-[1340px]" : ""}`}>
         {/* Mobile uses a tighter top padding so the abstract sits closer to the
             hero's meta/share row; lg+ keeps the original 64px breathing room. */}
-        <div className="relative flex gap-12 pt-6 sm:pt-10 lg:pt-16 pb-28">
+        <div className={`relative flex gap-12 pt-6 sm:pt-10 lg:pt-16 pb-28 ${rail ? "xl:gap-10" : ""}`}>
 
           {/* ── LEFT: Table of Contents (sticky below header) ── */}
-          <aside className="hidden lg:block shrink-0" style={{ width: "260px" }}>
+          <aside className={`hidden lg:block shrink-0 w-[260px] ${rail ? "xl:w-[224px]" : ""}`}>
             <div
               className="sticky"
               style={{ top: "96px", maxHeight: "calc(100vh - 112px)", overflowY: "auto" }}
@@ -73,10 +78,18 @@ export function BlogDetailContent({
               <MobileTableOfContents toc={tableOfContents} />
             </div>
 
-            <div className="article-body">
+            <div className="article-body" data-article-body>
               <RenderLexical content={body} />
             </div>
           </article>
+
+          {rail ? (
+            <aside aria-label="Next steps" className="hidden xl:block w-[272px] shrink-0">
+              <div className="sticky" style={{ top: "calc(var(--cs-header-h) + 24px)" }}>
+                {rail}
+              </div>
+            </aside>
+          ) : null}
         </div>
       </div>
     </section>

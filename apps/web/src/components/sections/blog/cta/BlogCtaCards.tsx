@@ -1,0 +1,384 @@
+"use client";
+
+import { ArrowUpRight } from "lucide-react";
+import { type MotionValue, motion, useMotionTemplate, useMotionValue, useSpring, useTransform } from "motion/react";
+import Image, { getImageProps } from "next/image";
+import Link from "next/link";
+import type React from "react";
+import { preload } from "react-dom";
+
+import { trackBlogCta } from "@/lib/blog-cta/track";
+import type {
+  BlogCtaLayout,
+  BlogCtaPlacement,
+  ExploreCta,
+  ProveCta,
+  ResourceCta,
+} from "@/lib/blog-cta/types";
+import { useHydratedReducedMotion } from "@/lib/use-hydrated-reduced-motion";
+
+export const DARK_BAND = "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)";
+const CARD_BORDER = "1px solid rgba(17, 17, 17, 0.08)";
+const CARD_SHADOW = "0 22px 48px -32px rgba(49, 27, 146, 0.55)";
+const INK_MUTED = "rgba(17, 17, 17, 0.64)";
+const VIOLET = "#4A3BF1";
+
+export interface CtaCardContext {
+  slug: string;
+  layout: BlogCtaLayout;
+  placement: BlogCtaPlacement;
+  /** Reading progress 0 to 1. Drives the slow drift on the cards' 3D marks. */
+  progress?: MotionValue<number>;
+}
+
+/** A still progress value for cards rendered outside a reading context. */
+function useProgressOrStill(progress: MotionValue<number> | undefined): MotionValue<number> {
+  const still = useMotionValue(0);
+  return progress ?? still;
+}
+
+function CatalogLogo({ src, name, size }: { src: string; name: string; size: number }): React.ReactElement {
+  return (
+    <span
+      className="grid shrink-0 place-items-center bg-white"
+      style={{
+        width: size,
+        height: size,
+        borderRadius: size * 0.28,
+        border: "1px solid rgba(74, 59, 241, 0.14)",
+        boxShadow: "0 10px 24px -14px rgba(49, 27, 146, 0.6), inset 0 1px 0 rgba(255,255,255,0.9)",
+      }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt={`${name} logo`}
+        width={size * 0.58}
+        height={size * 0.58}
+        loading="lazy"
+        decoding="async"
+        style={{ width: size * 0.58, height: size * 0.58, objectFit: "contain" }}
+      />
+    </span>
+  );
+}
+
+const captionStyle: React.CSSProperties = {
+  fontSize: "var(--fs-caption)",
+  lineHeight: 1.4,
+  fontWeight: 500,
+  letterSpacing: "0.01em",
+};
+
+const titleStyle: React.CSSProperties = {
+  fontFamily: "var(--font-display)",
+  fontSize: "var(--fs-h6)",
+  lineHeight: 1.3,
+  fontWeight: 600,
+  letterSpacing: "-0.01em",
+  textWrap: "balance",
+};
+
+const bodyStyle: React.CSSProperties = {
+  fontSize: "var(--fs-body-sm)",
+  lineHeight: 1.55,
+};
+
+/* ─── Explore: the catalog image this article is about ──────────────────── */
+
+export function ExploreCard({
+  cta,
+  context,
+}: {
+  cta: ExploreCta;
+  context: CtaCardContext;
+}): React.ReactElement {
+  const reduce = useHydratedReducedMotion();
+  const progress = useProgressOrStill(context.progress);
+  const rotateY = useTransform(progress, [0, 0.35], reduce ? [0, 0] : [-14, 10]);
+  const rotateX = useTransform(progress, [0, 0.35], reduce ? [0, 0] : [8, -4]);
+
+  const onClick = (): void => trackBlogCta({ ...context, stage: "explore" });
+
+  return (
+    <article
+      className="relative overflow-hidden rounded-[20px] bg-white p-5"
+      style={{ border: CARD_BORDER, boxShadow: CARD_SHADOW }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/images/cleanstart-images/hero-vector-grid.svg"
+        alt=""
+        aria-hidden
+        loading="lazy"
+        decoding="async"
+        className="pointer-events-none absolute select-none"
+        style={{ right: -120, top: -150, width: 420, height: 420, opacity: 0.55 }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute select-none"
+        style={{
+          right: -60,
+          top: -70,
+          width: 200,
+          height: 200,
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(169,116,255,0.28) 0%, rgba(169,116,255,0) 70%)",
+        }}
+      />
+
+      {cta.kind === "image" ? (
+        <div className="relative">
+          <div className="flex items-center gap-3.5" style={{ perspective: 600 }}>
+            <motion.div style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}>
+              <CatalogLogo src={cta.logoUrl} name={cta.name} size={56} />
+            </motion.div>
+            <div className="min-w-0">
+              <p style={{ ...captionStyle, color: VIOLET }}>Hardened image</p>
+              <p
+                className="truncate"
+                style={{ fontFamily: "var(--font-mono)", fontSize: "1.0625rem", fontWeight: 500, color: "#111" }}
+              >
+                {cta.name}
+              </p>
+            </div>
+          </div>
+          {cta.description ? (
+            <p className="mt-3.5 line-clamp-3" style={{ ...bodyStyle, color: INK_MUTED }}>
+              {cta.description}
+            </p>
+          ) : null}
+          {cta.hasFips ? (
+            <span
+              className="mt-3 inline-flex items-center rounded-full px-2.5 py-1"
+              style={{ ...captionStyle, fontSize: "var(--fs-badge)", color: "#3B2FC4", background: "rgba(74,59,241,0.08)" }}
+            >
+              FIPS variant available
+            </span>
+          ) : null}
+          <a
+            href={cta.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={onClick}
+            className="cs-btn-blue mt-4 w-full gap-1.5"
+            style={{ ["--cs-btn-fs" as string]: "var(--fs-button-sm)" }}
+          >
+            View in catalog
+            <ArrowUpRight aria-hidden size={16} strokeWidth={2} />
+          </a>
+        </div>
+      ) : (
+        <div className="relative">
+          <div className="flex items-center" style={{ perspective: 600 }}>
+            {cta.featured.map((img, i) => (
+              <motion.div
+                key={img.name}
+                style={{ rotateX, rotateY, marginLeft: i === 0 ? 0 : -10, zIndex: cta.featured.length - i }}
+              >
+                <CatalogLogo src={img.logoUrl} name={img.name} size={42} />
+              </motion.div>
+            ))}
+          </div>
+          <p className="mt-4" style={{ ...titleStyle, color: "#111" }}>
+            {cta.imageCount ? `${cta.imageCount} hardened images` : "Hardened image catalog"}
+          </p>
+          <p className="mt-1.5" style={{ ...bodyStyle, color: INK_MUTED }}>
+            Drop-in replacements for the base images you already run, continuously updated and patched.
+          </p>
+          <a
+            href={cta.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={onClick}
+            className="cs-btn-blue mt-4 w-full gap-1.5"
+            style={{ ["--cs-btn-fs" as string]: "var(--fs-button-sm)" }}
+          >
+            Browse the catalog
+            <ArrowUpRight aria-hidden size={16} strokeWidth={2} />
+          </a>
+        </div>
+      )}
+    </article>
+  );
+}
+
+/* ─── Learn: the related resource, with a cover that tilts under the pointer ─ */
+
+const COVER_SIZES = "(min-width: 1280px) 272px, 360px";
+
+/**
+ * Starts the cover download before the Learn card mounts, so it never
+ * arrives blank when a layout swaps it in. React dedupes repeat calls.
+ */
+export function preloadResourceCover(src: string): void {
+  const { props } = getImageProps({ src, alt: "", fill: true, sizes: COVER_SIZES });
+  preload(props.src, {
+    as: "image",
+    fetchPriority: "low",
+    ...(props.srcSet ? { imageSrcSet: props.srcSet } : {}),
+    ...(props.sizes ? { imageSizes: props.sizes } : {}),
+  });
+}
+
+function TiltCover({ src, alt }: { src: string; alt: string }): React.ReactElement {
+  const reduce = useHydratedReducedMotion();
+  const px = useMotionValue(0.5);
+  const py = useMotionValue(0.5);
+  const spring = { stiffness: 220, damping: 22, mass: 0.6 };
+  const rotateY = useSpring(useTransform(px, [0, 1], [-9, 9]), spring);
+  const rotateX = useSpring(useTransform(py, [0, 1], [7, -7]), spring);
+  const glareX = useTransform(px, (v) => `${v * 100}%`);
+  const glareY = useTransform(py, (v) => `${v * 100}%`);
+  const glare = useMotionTemplate`radial-gradient(circle at ${glareX} ${glareY}, rgba(255,255,255,0.38), rgba(255,255,255,0) 55%)`;
+
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>): void => {
+    if (reduce || e.pointerType !== "mouse") return;
+    const r = e.currentTarget.getBoundingClientRect();
+    px.set((e.clientX - r.left) / r.width);
+    py.set((e.clientY - r.top) / r.height);
+  };
+  const onPointerLeave = (): void => {
+    px.set(0.5);
+    py.set(0.5);
+  };
+
+  return (
+    <div style={{ perspective: 800 }} onPointerMove={onPointerMove} onPointerLeave={onPointerLeave}>
+      <motion.div
+        className="group/cover relative overflow-hidden rounded-[14px]"
+        style={{
+          rotateX: reduce ? 0 : rotateX,
+          rotateY: reduce ? 0 : rotateY,
+          aspectRatio: "16 / 9",
+          background: "#dfe9f5",
+          boxShadow: "0 16px 30px -22px rgba(19, 30, 143, 0.7)",
+        }}
+      >
+        <Image src={src} alt={alt} fill sizes={COVER_SIZES} className="object-cover" />
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover/cover:opacity-100"
+          style={{ background: glare }}
+        />
+      </motion.div>
+    </div>
+  );
+}
+
+export function LearnCard({
+  cta,
+  context,
+}: {
+  cta: ResourceCta;
+  context: CtaCardContext;
+}): React.ReactElement {
+  return (
+    <article
+      className="relative overflow-hidden rounded-[20px] bg-white p-3 pb-5"
+      style={{ border: CARD_BORDER, boxShadow: CARD_SHADOW }}
+    >
+      <TiltCover src={cta.coverUrl} alt={cta.coverAlt} />
+      <div className="px-2 pt-4">
+        <p style={{ ...captionStyle, color: VIOLET }}>
+          {cta.typeLabel}
+          {cta.gated ? " · Free download" : ""}
+        </p>
+        <h3 className="mt-1 line-clamp-3" style={{ ...titleStyle, color: "#111" }}>
+          {cta.title}
+        </h3>
+        {cta.summary ? (
+          <p className="mt-1.5 line-clamp-2" style={{ ...bodyStyle, color: INK_MUTED }}>
+            {cta.summary}
+          </p>
+        ) : null}
+        <Link
+          href={cta.href}
+          onClick={() => trackBlogCta({ ...context, stage: "learn", resourceSlug: cta.slug })}
+          className="cs-btn-blue mt-4 w-full"
+          style={{ ["--cs-btn-fs" as string]: "var(--fs-button-sm)" }}
+        >
+          {cta.ctaLabel}
+        </Link>
+      </div>
+    </article>
+  );
+}
+
+/* ─── Prove: the POC, on the site's dark band with a pointer-following light ─ */
+
+export function ProveCard({
+  cta,
+  context,
+}: {
+  cta: ProveCta;
+  context: CtaCardContext;
+}): React.ReactElement {
+  const reduce = useHydratedReducedMotion();
+  const progress = useProgressOrStill(context.progress);
+  const cubeRotate = useTransform(progress, [0.5, 1], reduce ? [0, 0] : [-18, 14]);
+  const cubeY = useTransform(progress, [0.5, 1], reduce ? [0, 0] : [10, -6]);
+  const lightX = useMotionValue(70);
+  const lightY = useMotionValue(10);
+  const light = useMotionTemplate`radial-gradient(260px circle at ${lightX}% ${lightY}%, rgba(169,116,255,0.42), rgba(169,116,255,0) 70%)`;
+
+  const onPointerMove = (e: React.PointerEvent<HTMLElement>): void => {
+    if (reduce || e.pointerType !== "mouse") return;
+    const r = e.currentTarget.getBoundingClientRect();
+    lightX.set(((e.clientX - r.left) / r.width) * 100);
+    lightY.set(((e.clientY - r.top) / r.height) * 100);
+  };
+
+  return (
+    <article
+      onPointerMove={onPointerMove}
+      className="relative isolate overflow-hidden rounded-[20px] p-5 text-white"
+      style={{ background: DARK_BAND, boxShadow: "0 26px 56px -30px rgba(71, 30, 192, 0.85)" }}
+    >
+      <motion.div aria-hidden className="pointer-events-none absolute inset-0 -z-10" style={{ background: light }} />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/images/blog-detail/cta/cta-union.svg"
+        alt=""
+        aria-hidden
+        loading="lazy"
+        decoding="async"
+        className="pointer-events-none absolute -z-10 select-none"
+        style={{ left: -160, bottom: -260, width: 520, height: 520, opacity: 0.35 }}
+      />
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute select-none"
+        style={{ right: -22, top: -18, width: 112, height: 112, rotate: cubeRotate, y: cubeY }}
+      >
+        <Image src="/images/blog-detail/cta/cta-cube.webp" alt="" fill sizes="112px" className="object-contain opacity-90" />
+      </motion.div>
+
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/images/security/cs-logomark.svg"
+        alt=""
+        aria-hidden
+        width={26}
+        height={30}
+        loading="lazy"
+        decoding="async"
+        className="relative"
+      />
+      <h3 className="relative mt-5 pr-10" style={{ ...titleStyle, fontSize: "var(--fs-h5)", color: "#fff" }}>
+        Prove it on your own workloads
+      </h3>
+      <p className="relative mt-2" style={{ ...bodyStyle, color: "rgba(255,255,255,0.78)" }}>
+        Book a free proof of concept with the CleanStart team.
+      </p>
+      <Link
+        href={cta.href}
+        onClick={() => trackBlogCta({ ...context, stage: "prove" })}
+        className="cs-btn-glass relative mt-5 w-full"
+      >
+        {cta.label}
+      </Link>
+    </article>
+  );
+}
