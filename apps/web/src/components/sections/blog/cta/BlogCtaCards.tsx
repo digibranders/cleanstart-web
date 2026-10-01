@@ -8,6 +8,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { preload } from "react-dom";
 
+import { withDemoSource } from "@/lib/blog-cta/demo-link";
 import { trackBlogCta } from "@/lib/blog-cta/track";
 import { copyText } from "@/lib/clipboard";
 import type {
@@ -478,7 +479,7 @@ export function ProveCard({
         Book a free proof of concept with the CleanStart team.
       </p>
       <Link
-        href={cta.href}
+        href={withDemoSource(cta.href, context)}
         onClick={() => trackBlogCta({ ...context, stage: "prove" })}
         className="cs-btn-glass relative mt-5 w-full"
       >
