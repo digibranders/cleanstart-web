@@ -21,6 +21,9 @@ import { BlogDetailJourneyNav } from "@/components/sections/blog/BlogDetailJourn
 import type { JourneyNavTarget } from "@/components/sections/blog/BlogDetailJourneyNav";
 import { BlogScrollReset } from "@/components/sections/blog/BlogScrollReset";
 import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
+import { BlogCtaBottomBar } from "@/components/sections/blog/cta/BlogCtaBottomBar";
+import { BlogCtaDock } from "@/components/sections/blog/cta/BlogCtaDock";
+import { getBlogCtas } from "@/lib/blog-cta/resolve";
 import { Footer } from "@/components/sections/Footer";
 import { absoluteUrl, buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
@@ -120,7 +123,7 @@ export async function renderBlogDetail({
   const manualNext = toJourneyTarget(post.nextPost);
   const needAutoJourney = !manualPrevious || !manualNext;
 
-  const [relatedPosts, highlightedBody, autoJourney] = await Promise.all([
+  const [relatedPosts, highlightedBody, autoJourney, ctas] = await Promise.all([
     getRelatedBlogs(post.id, categoryIds, post.relatedPosts, { draft }),
     highlightLexical(post.body),
     needAutoJourney
@@ -131,6 +134,7 @@ export async function renderBlogDetail({
           { draft },
         )
       : Promise.resolve({ previous: null, next: null }),
+    getBlogCtas(post),
   ]);
 
   const previousTarget = manualPrevious ?? toJourneyTarget(autoJourney.previous);
@@ -205,6 +209,8 @@ export async function renderBlogDetail({
           tableOfContents={post.tableOfContents}
           heroImage={post.heroImage}
         />
+        <BlogCtaDock ctas={ctas} />
+        <BlogCtaBottomBar ctas={ctas} layout="dock" className="md:hidden" />
 
         <BlogDetailAuthor authors={post.authors} />
 
