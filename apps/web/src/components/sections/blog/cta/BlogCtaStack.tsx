@@ -154,11 +154,18 @@ export function BlogCtaStack({ ctas }: { ctas: BlogCtaSet }): React.ReactElement
             animate={{
               y,
               scale,
-              filter: isFront ? "brightness(1)" : `brightness(${fanned ? 0.99 : 0.96})`,
             }}
             transition={reduce ? { duration: 0 } : SPRING}
           >
-            <div className="overflow-hidden rounded-[20px]" style={{ maxHeight: visibleHeight }}>
+            {/* Depth comes from the shadow each card casts on the one behind it,
+                not from dimming, which reads as grey on the white page. */}
+            <div
+              className="overflow-hidden rounded-[20px]"
+              style={{
+                maxHeight: visibleHeight,
+                boxShadow: depth < n - 1 ? "0 -10px 22px -16px rgba(49, 27, 146, 0.45)" : undefined,
+              }}
+            >
               <div ref={measureRefs[stage]} inert={!isFront}>
                 {cardFor(stage)}
               </div>
@@ -179,7 +186,8 @@ export function BlogCtaStack({ ctas }: { ctas: BlogCtaSet }): React.ReactElement
                   transition={{ duration: 0.18 }}
                   style={{
                     background: stage === "prove" ? "#1A1446" : "#ffffff",
-                    borderBottom: stage === "prove" ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(17,17,17,0.06)",
+                    border: stage === "prove" ? "1px solid rgba(255,255,255,0.10)" : "1px solid rgba(74,59,241,0.14)",
+                    borderBottom: "none",
                   }}
                 >
                   <PeekLabel stage={stage} ctas={ctas} />
