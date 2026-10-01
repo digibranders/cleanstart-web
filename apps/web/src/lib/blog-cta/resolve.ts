@@ -141,6 +141,7 @@ function toResourceCta(row: ResourceRow): ResourceCta {
     ctaLabel: resourceCtaLabel(typeSlug, row.ctaButtonText),
     coverUrl: cover ?? resourceCoverPoster(typeSlug),
     coverAlt: row.heroImage?.alt?.trim() || `${row.title} cover`,
+    coverIsPoster: !cover,
     gated: Boolean(row.gated),
   };
 }
