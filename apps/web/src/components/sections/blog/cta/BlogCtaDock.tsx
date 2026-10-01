@@ -7,6 +7,7 @@ import Link from "next/link";
 import type React from "react";
 import { useEffect, useId, useRef, useState } from "react";
 
+import { withDemoSource } from "@/lib/blog-cta/demo-link";
 import { trackBlogCta } from "@/lib/blog-cta/track";
 import type { BlogCtaSet, BlogCtaStage } from "@/lib/blog-cta/types";
 import { EASE_OUT } from "@/lib/motion";
@@ -85,7 +86,7 @@ function Nudge({
         {learn ? learn.title : "Ready to try it on your own images?"}
       </span>
       <Link
-        href={learn ? learn.href : ctas.prove.href}
+        href={learn ? learn.href : withDemoSource(ctas.prove.href, { slug: ctas.slug, layout: "dock", placement: "dock" })}
         onClick={onClick}
         className="cs-btn-blue mt-3 w-full"
         style={buttonStyle}
