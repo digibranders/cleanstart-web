@@ -22,10 +22,13 @@ import type { BlogCtaSet, ExploreCta, ResourceCta } from "./types";
 
 const CATALOG_ORIGIN = "https://images.cleanstart.com";
 const CATALOG_LOGO_ORIGIN = "https://storage.googleapis.com/cdpimages";
+/** CleanStart's public Docker Hub namespace. The portal's own registry needs an organization login. */
+const DOCKER_HUB_REPOS = "https://hub.docker.com/v2/repositories/cleanstart/?page_size=100";
 const DAY = 60 * 60 * 24;
 /** Shown on the catalog card when the article names no specific image. */
 const FEATURED_IMAGES = ["python", "nginx", "redis", "postgres"] as const;
 
+const pullCommand = (name: string): string => `docker pull cleanstart/${name}:latest`;
 const logoUrl = (name: string): string => `${CATALOG_LOGO_ORIGIN}/${name}/${name}.svg`;
 const imageHref = (name: string): string => `${CATALOG_ORIGIN}/images/${name}/details`;
 
@@ -38,6 +41,20 @@ async function getCatalogImageNames(): Promise<string[]> {
     return [...xml.matchAll(/\/images\/([a-z0-9][a-z0-9.-]*)\/details</g)].map((m) => m[1] as string);
   } catch {
     return [];
+  }
+}
+
+/** Images anyone can pull from Docker Hub without a CleanStart login. Empty on failure. */
+async function getPublicPullNames(): Promise<Set<string>> {
+  try {
+    const res = await fetch(DOCKER_HUB_REPOS, { next: { revalidate: DAY } });
+    if (!res.ok) return new Set();
+    const body = (await res.json()) as { results?: Array<{ name?: unknown }> };
+    return new Set(
+      (body.results ?? []).map((r) => r.name).filter((n): n is string => typeof n === "string"),
+    );
+  } catch {
+    return new Set();
   }
 }
 
@@ -135,7 +152,11 @@ function toResourceCta(row: ResourceRow): ResourceCta {
  */
 export async function getBlogCtas(post: BlogDetail): Promise<BlogCtaSet> {
   const article = toArticleText(post);
-  const [catalogNames, resources] = await Promise.all([getCatalogImageNames(), getResourceRows()]);
+  const [catalogNames, resources, publicPulls] = await Promise.all([
+    getCatalogImageNames(),
+    getResourceRows(),
+    getPublicPullNames(),
+  ]);
 
   const imageName = matchCatalogImage(article, catalogNames);
   let explore: ExploreCta;
@@ -147,6 +168,7 @@ export async function getBlogCtas(post: BlogDetail): Promise<BlogCtaSet> {
       logoUrl: logoUrl(imageName),
       href: imageHref(imageName),
       hasFips: catalogNames.includes(`${imageName}-fips`),
+      pullCommand: publicPulls.has(imageName) ? pullCommand(imageName) : null,
     };
   } else {
     const bases = baseImageNames(catalogNames);
@@ -158,6 +180,7 @@ export async function getBlogCtas(post: BlogDetail): Promise<BlogCtaSet> {
         logoUrl: logoUrl(name),
       })),
       href: CATALOG_ORIGIN,
+      pullCommand: publicPulls.has("python") ? pullCommand("python") : null,
     };
   }
 

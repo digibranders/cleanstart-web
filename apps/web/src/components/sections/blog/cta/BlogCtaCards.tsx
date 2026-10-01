@@ -1,13 +1,15 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Check, Copy } from "lucide-react";
 import { type MotionValue, motion, useMotionTemplate, useMotionValue, useSpring, useTransform } from "motion/react";
 import Image, { getImageProps } from "next/image";
 import Link from "next/link";
 import type React from "react";
+import { useEffect, useState } from "react";
 import { preload } from "react-dom";
 
 import { trackBlogCta } from "@/lib/blog-cta/track";
+import { copyText } from "@/lib/clipboard";
 import type {
   BlogCtaLayout,
   BlogCtaPlacement,
@@ -86,6 +88,56 @@ const bodyStyle: React.CSSProperties = {
 
 /* ─── Explore: the catalog image this article is about ──────────────────── */
 
+/** A terminal line with the public pull command and a copy button. */
+function PullCommand({ command, onCopied }: { command: string; onCopied: () => void }): React.ReactElement {
+  const [state, setState] = useState<"idle" | "copied" | "failed">("idle");
+
+  useEffect(() => {
+    if (state === "idle") return;
+    const t = window.setTimeout(() => setState("idle"), 1800);
+    return () => window.clearTimeout(t);
+  }, [state]);
+
+  const onCopy = async (): Promise<void> => {
+    const ok = await copyText(command);
+    setState(ok ? "copied" : "failed");
+    if (ok) onCopied();
+  };
+
+  return (
+    <div
+      className="mt-4 flex items-start gap-2 rounded-[10px] py-1.5 pr-1.5 pl-3"
+      style={{ background: "#14112A", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06)" }}
+    >
+      {/* Wraps instead of scrolling: the rail is too narrow for the full command on one line. */}
+      <code
+        className="min-w-0 flex-1 py-[5px]"
+        style={{ fontFamily: "var(--font-mono)", fontSize: "0.75rem", lineHeight: 1.5, color: "#E9E7FF", overflowWrap: "anywhere" }}
+      >
+        <span aria-hidden style={{ color: "#8F88C9" }}>
+          ${" "}
+        </span>
+        {command}
+      </code>
+      <button
+        type="button"
+        onClick={onCopy}
+        aria-label={state === "copied" ? "Copied" : "Copy pull command"}
+        className="grid size-7 shrink-0 place-items-center rounded-[7px] transition-colors"
+        style={{
+          background: state === "copied" ? "rgba(44,193,235,0.18)" : "rgba(255,255,255,0.08)",
+          color: state === "copied" ? "#2CC1EB" : "#E9E7FF",
+        }}
+      >
+        {state === "copied" ? <Check aria-hidden size={14} strokeWidth={2.25} /> : <Copy aria-hidden size={14} strokeWidth={2} />}
+      </button>
+      <span className="sr-only" aria-live="polite">
+        {state === "copied" ? "Pull command copied" : state === "failed" ? "Copy failed, select the command to copy it" : ""}
+      </span>
+    </div>
+  );
+}
+
 export function ExploreCard({
   cta,
   context,
@@ -99,6 +151,7 @@ export function ExploreCard({
   const rotateX = useTransform(progress, [0, 0.35], reduce ? [0, 0] : [8, -4]);
 
   const onClick = (): void => trackBlogCta({ ...context, stage: "explore" });
+  const onCopied = (): void => trackBlogCta({ ...context, stage: "explore", action: "copy" });
 
   return (
     <article
@@ -157,6 +210,7 @@ export function ExploreCard({
               FIPS variant available
             </span>
           ) : null}
+          {cta.pullCommand ? <PullCommand command={cta.pullCommand} onCopied={onCopied} /> : null}
           <a
             href={cta.href}
             target="_blank"
@@ -187,6 +241,7 @@ export function ExploreCard({
           <p className="mt-1.5" style={{ ...bodyStyle, color: INK_MUTED }}>
             Drop-in replacements for the base images you already run, continuously updated and patched.
           </p>
+          {cta.pullCommand ? <PullCommand command={cta.pullCommand} onCopied={onCopied} /> : null}
           <a
             href={cta.href}
             target="_blank"
