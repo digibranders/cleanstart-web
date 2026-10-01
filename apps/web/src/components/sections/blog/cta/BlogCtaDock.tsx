@@ -276,7 +276,10 @@ export function BlogCtaDock({ ctas }: { ctas: BlogCtaSet }): React.ReactElement 
                 <X aria-hidden size={18} strokeWidth={2} />
               </button>
             </div>
+            {/* data-lenis-prevent hands wheel events back to this list; without it
+                the page's smooth scroll swallows them and the panel only drags. */}
             <motion.div
+              data-lenis-prevent
               className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 pb-6"
               style={{ overscrollBehavior: "contain" }}
               initial="hidden"
