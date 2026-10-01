@@ -7,6 +7,7 @@ import Link from "next/link";
 import type React from "react";
 import { useEffect, useState } from "react";
 
+import { withDemoSource } from "@/lib/blog-cta/demo-link";
 import { trackBlogCta } from "@/lib/blog-cta/track";
 import type { BlogCtaLayout, BlogCtaSet, BlogCtaStage } from "@/lib/blog-cta/types";
 import { useHydratedReducedMotion } from "@/lib/use-hydrated-reduced-motion";
@@ -45,7 +46,7 @@ interface BarContent {
   resourceSlug?: string | undefined;
 }
 
-function contentFor(stage: BlogCtaStage, ctas: BlogCtaSet): BarContent {
+function contentFor(stage: BlogCtaStage, ctas: BlogCtaSet, layout: BlogCtaLayout): BarContent {
   if (stage === "learn" && ctas.learn) {
     const r = ctas.learn;
     return {
@@ -110,7 +111,7 @@ function contentFor(stage: BlogCtaStage, ctas: BlogCtaSet): BarContent {
     title: ctas.prove.label,
     subtitle: "Prove it on your own workloads",
     action: "Book",
-    href: ctas.prove.href,
+    href: withDemoSource(ctas.prove.href, { slug: ctas.slug, layout, placement: "bar" }),
     external: false,
   };
 }
@@ -141,7 +142,7 @@ export function BlogCtaBottomBar({
   useEffect(() => setDismissed(readDismissed()), []);
   useMotionValueEvent(progress, "change", (p) => setInRange(p >= SHOW_FROM && p < 1));
 
-  const content = contentFor(fixedStage ?? stage, ctas);
+  const content = contentFor(fixedStage ?? stage, ctas, layout);
   const onAction = (): void =>
     trackBlogCta({ layout, placement: "bar", stage: content.stage, slug: ctas.slug, resourceSlug: content.resourceSlug });
   const onDismiss = (): void => {
