@@ -73,11 +73,10 @@ export const CHAINGUARD: CompareContent = {
   },
 
   /**
-   * Chainguard's own logomark, lifted from chainguard.dev and set in the
-   * page's neutral slate rather than its brand blurple (#6226FB). That blurple
-   * is within a few degrees of CleanStart's violet, and this page spends
-   * violet on one axis only: colouring the rival's mark in it would read as
-   * two CleanStarts. Flip the fill in the SVG if marketing wants brand colour.
+   * Chainguard's own logomark, lifted from chainguard.dev in its brand
+   * blurple (#6226FB, their `text-brand-non-text-blurple`). It sits on a white
+   * tile, while CleanStart's mark sits on the dark violet band, so the two
+   * stay distinct even though the hues are close.
    */
   rivalMark: "/images/compare/tools/chainguard.svg",
 
