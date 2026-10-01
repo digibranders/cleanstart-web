@@ -171,7 +171,7 @@ export function BlogCtaDock({ ctas }: { ctas: BlogCtaSet }): React.ReactElement 
 
   return (
     <div className="hidden md:block">
-      {/* Tab on the right wall */}
+      {/* Tab on the right wall. It bleeds 12px past the edge so the hover nudge never opens a gap. */}
       <motion.button
         ref={tabRef}
         type="button"
@@ -179,7 +179,7 @@ export function BlogCtaDock({ ctas }: { ctas: BlogCtaSet }): React.ReactElement 
         onClick={() => (open ? closePanel() : openPanel())}
         aria-expanded={open}
         aria-controls={`${titleId}-panel`}
-        className="fixed right-0 z-40 flex flex-col items-center gap-3 rounded-l-[16px] py-3 pr-2 pl-2.5 text-white"
+        className="fixed -right-3 z-40 flex flex-col items-center gap-3 rounded-l-[16px] py-3 pr-5 pl-2.5 text-white"
         style={{
           top: "50%",
           background: DARK_BAND,
