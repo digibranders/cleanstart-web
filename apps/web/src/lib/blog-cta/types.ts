@@ -17,6 +17,8 @@ export interface CatalogImageCta {
   logoUrl: string;
   href: string;
   hasFips: boolean;
+  /** A command anyone can run, only when the image is public on Docker Hub. */
+  pullCommand: string | null;
 }
 
 /** Shown when no catalog image is a confident match for the article. */
@@ -27,6 +29,8 @@ export interface CatalogFallbackCta {
   /** A few well-known images to show as logos on the card. */
   featured: ReadonlyArray<{ name: string; logoUrl: string }>;
   href: string;
+  /** An example public pull, so the card is useful before the reader clicks through. */
+  pullCommand: string | null;
 }
 
 export type ExploreCta = CatalogImageCta | CatalogFallbackCta;
