@@ -277,7 +277,55 @@ export function preloadResourceCover(src: string): void {
   });
 }
 
-function TiltCover({ src, alt }: { src: string; alt: string }): React.ReactElement {
+/**
+ * Title printed on the dark book of a generic type poster, matching the
+ * resource center card (same anchor box, same length-based scale).
+ */
+function PosterTitle({ title }: { title: string }): React.ReactElement {
+  const len = title.length;
+  const fontSize =
+    len <= 28
+      ? "clamp(0.75rem, 5cqw, 1rem)"
+      : len <= 44
+        ? "clamp(0.7rem, 4.4cqw, 0.9rem)"
+        : len <= 64
+          ? "clamp(0.65rem, 3.8cqw, 0.8rem)"
+          : "clamp(0.6rem, 3.4cqw, 0.72rem)";
+  return (
+    <span
+      aria-hidden
+      className="pointer-events-none absolute overflow-hidden text-white"
+      style={{
+        top: "40%",
+        left: "22%",
+        right: "28%",
+        fontFamily: "var(--font-display)",
+        fontWeight: 600,
+        fontSize,
+        lineHeight: 1.18,
+        letterSpacing: "-0.03em",
+        display: "-webkit-box",
+        WebkitLineClamp: len <= 44 ? 3 : 4,
+        WebkitBoxOrient: "vertical",
+        textShadow: "0 1px 2px rgba(0,0,0,0.25)",
+        overflowWrap: "anywhere",
+      }}
+    >
+      {title}
+    </span>
+  );
+}
+
+function TiltCover({
+  src,
+  alt,
+  posterTitle,
+}: {
+  src: string;
+  alt: string;
+  /** Set when `src` is the generic poster, so the title is drawn onto it. */
+  posterTitle?: string | undefined;
+}): React.ReactElement {
   const reduce = useHydratedReducedMotion();
   const px = useMotionValue(0.5);
   const py = useMotionValue(0.5);
@@ -308,10 +356,12 @@ function TiltCover({ src, alt }: { src: string; alt: string }): React.ReactEleme
           rotateY: reduce ? 0 : rotateY,
           aspectRatio: "16 / 9",
           background: "#dfe9f5",
+          containerType: "inline-size",
           boxShadow: "0 16px 30px -22px rgba(19, 30, 143, 0.7)",
         }}
       >
         <Image src={src} alt={alt} fill sizes={COVER_SIZES} className="object-cover" />
+        {posterTitle ? <PosterTitle title={posterTitle} /> : null}
         <motion.div
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover/cover:opacity-100"
@@ -334,7 +384,7 @@ export function LearnCard({
       className="relative overflow-hidden rounded-[20px] bg-white p-3 pb-5"
       style={{ border: CARD_BORDER, boxShadow: CARD_SHADOW }}
     >
-      <TiltCover src={cta.coverUrl} alt={cta.coverAlt} />
+      <TiltCover src={cta.coverUrl} alt={cta.coverAlt} posterTitle={cta.coverIsPoster ? cta.title : undefined} />
       <div className="px-2 pt-4">
         <p style={{ ...captionStyle, color: VIOLET }}>
           {cta.typeLabel}

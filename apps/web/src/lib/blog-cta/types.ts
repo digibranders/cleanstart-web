@@ -44,6 +44,8 @@ export interface ResourceCta {
   ctaLabel: string;
   coverUrl: string;
   coverAlt: string;
+  /** The cover is the generic type poster, which carries no title of its own. */
+  coverIsPoster: boolean;
   gated: boolean;
 }
 
