@@ -1,7 +1,6 @@
 "use client";
 
 import { X } from "lucide-react";
-import { AnimatePresence, motion, useMotionValueEvent } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import type React from "react";
@@ -10,7 +9,6 @@ import { useEffect, useState } from "react";
 import { withDemoSource } from "@/lib/blog-cta/demo-link";
 import { trackBlogCta } from "@/lib/blog-cta/track";
 import type { BlogCtaLayout, BlogCtaSet, BlogCtaStage } from "@/lib/blog-cta/types";
-import { useHydratedReducedMotion } from "@/lib/use-hydrated-reduced-motion";
 
 import { CatalogLogoTile, DARK_BAND } from "./BlogCtaCards";
 import { useArticleProgress } from "./useArticleProgress";
@@ -108,6 +106,7 @@ function contentFor(stage: BlogCtaStage, ctas: BlogCtaSet, layout: BlogCtaLayout
  * The narrow-screen form of the blog CTAs: one line, docked to the bottom,
  * showing whichever ask fits the reader's depth. Appears after 20% of the
  * article, leaves at the end, and stays gone for the session once dismissed.
+ * Slides and crossfades with CSS, so it needs no animation library.
  */
 export function BlogCtaBottomBar({
   ctas,
@@ -119,14 +118,14 @@ export function BlogCtaBottomBar({
   /** Breakpoint utility that hides the bar where the rail takes over, e.g. `xl:hidden`. */
   className: string;
 }): React.ReactElement {
-  const reduce = useHydratedReducedMotion();
-  const { progress, stage } = useArticleProgress();
+  const { stage, subscribe } = useArticleProgress();
   const [inRange, setInRange] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => setDismissed(readDismissed()), []);
-  useMotionValueEvent(progress, "change", (p) => setInRange(p >= SHOW_FROM && p < 1));
+  useEffect(() => subscribe((p) => setInRange(p >= SHOW_FROM && p < 1)), [subscribe]);
 
+  const show = inRange && !dismissed;
   const content = contentFor(stage, ctas, layout);
   const onAction = (): void =>
     trackBlogCta({ layout, placement: "bar", stage: content.stage, slug: ctas.slug, resourceSlug: content.resourceSlug });
@@ -139,71 +138,60 @@ export function BlogCtaBottomBar({
   const linkStyle = { ["--cs-btn-h" as string]: "40px", ["--cs-btn-px" as string]: "16px" };
 
   return (
-    <AnimatePresence>
-      {inRange && !dismissed ? (
-        <motion.aside
-          aria-label="Suggested next step"
-          className={`fixed inset-x-3 z-40 mx-auto max-w-[560px] ${className}`}
-          style={{ bottom: "calc(12px + env(safe-area-inset-bottom, 0px))" }}
-          initial={reduce ? { opacity: 0 } : { opacity: 0, y: 48 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={reduce ? { opacity: 0 } : { opacity: 0, y: 48 }}
-          transition={{ type: "spring", stiffness: 320, damping: 32 }}
+    <aside
+      aria-label="Suggested next step"
+      inert={!show}
+      className={`fixed inset-x-3 z-40 mx-auto max-w-[560px] transition-[transform,opacity,visibility] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
+        show ? "visible translate-y-0 opacity-100" : "invisible translate-y-12 opacity-0"
+      } ${className}`}
+      style={{ bottom: "calc(12px + env(safe-area-inset-bottom, 0px))" }}
+    >
+      <div
+        className="flex items-center gap-3 rounded-[18px] py-2.5 pr-2.5 pl-3 text-white"
+        style={{ background: DARK_BAND, boxShadow: "0 18px 40px -16px rgba(19, 30, 143, 0.7)" }}
+      >
+        <div
+          key={content.stage}
+          className="flex min-w-0 flex-1 animate-[cs-rail-fade_220ms_ease-out] items-center gap-3 motion-reduce:animate-none"
         >
-          <div
-            className="flex items-center gap-3 rounded-[18px] py-2.5 pr-2.5 pl-3 text-white"
-            style={{ background: DARK_BAND, boxShadow: "0 18px 40px -16px rgba(19, 30, 143, 0.7)" }}
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={content.stage}
-                className="flex min-w-0 flex-1 items-center gap-3"
-                initial={reduce ? false : { opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={reduce ? { opacity: 0 } : { opacity: 0, y: -6 }}
-                transition={{ duration: 0.22 }}
-              >
-                {content.visual}
-                <span className="min-w-0 flex-1">
-                  <span
-                    className="block truncate"
-                    style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "var(--fs-body-sm)" }}
-                  >
-                    {content.title}
-                  </span>
-                  <span className="block truncate" style={{ fontSize: "var(--fs-badge)", color: "rgba(255,255,255,0.72)" }}>
-                    {content.subtitle}
-                  </span>
-                </span>
-                {content.external ? (
-                  <a
-                    href={content.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={onAction}
-                    className={linkClass}
-                    style={linkStyle}
-                  >
-                    {content.action}
-                  </a>
-                ) : (
-                  <Link href={content.href} onClick={onAction} className={linkClass} style={linkStyle}>
-                    {content.action}
-                  </Link>
-                )}
-              </motion.div>
-            </AnimatePresence>
-            <button
-              type="button"
-              onClick={onDismiss}
-              aria-label="Dismiss"
-              className="grid size-9 shrink-0 place-items-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+          {content.visual}
+          <span className="min-w-0 flex-1">
+            <span
+              className="block truncate"
+              style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "var(--fs-body-sm)" }}
             >
-              <X aria-hidden size={16} strokeWidth={2} />
-            </button>
-          </div>
-        </motion.aside>
-      ) : null}
-    </AnimatePresence>
+              {content.title}
+            </span>
+            <span className="block truncate" style={{ fontSize: "var(--fs-badge)", color: "rgba(255,255,255,0.72)" }}>
+              {content.subtitle}
+            </span>
+          </span>
+          {content.external ? (
+            <a
+              href={content.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={onAction}
+              className={linkClass}
+              style={linkStyle}
+            >
+              {content.action}
+            </a>
+          ) : (
+            <Link href={content.href} onClick={onAction} className={linkClass} style={linkStyle}>
+              {content.action}
+            </Link>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={onDismiss}
+          aria-label="Dismiss"
+          className="grid size-9 shrink-0 place-items-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+        >
+          <X aria-hidden size={16} strokeWidth={2} />
+        </button>
+      </div>
+    </aside>
   );
 }

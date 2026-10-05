@@ -658,6 +658,19 @@ body {
   }
 }
 
+/* Blog CTA bottom bar: content swaps in with a short fade and lift. */
+@keyframes cs-rail-fade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* ---------------------------------------------------------------------------
    SOLID BLUE BUTTON — #3960F9, radius 8px, layered box-shadow
    Used by all primary solid-blue CTAs site-wide (contact, how-it-works, careers, view-more, download, etc.)

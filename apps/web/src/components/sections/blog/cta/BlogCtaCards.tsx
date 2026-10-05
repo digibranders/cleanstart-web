@@ -1,12 +1,10 @@
 "use client";
 
 import { ArrowUpRight, Check, Copy } from "lucide-react";
-import { type MotionValue, motion, useMotionTemplate, useMotionValue, useSpring, useTransform } from "motion/react";
-import Image, { getImageProps } from "next/image";
+import Image from "next/image";
 import Link from "next/link";
 import type React from "react";
-import { useEffect, useState } from "react";
-import { preload } from "react-dom";
+import { type RefObject, useEffect, useRef, useState } from "react";
 
 import { withDemoSource } from "@/lib/blog-cta/demo-link";
 import { trackBlogCta } from "@/lib/blog-cta/track";
@@ -21,6 +19,8 @@ import type {
 } from "@/lib/blog-cta/types";
 import { useHydratedReducedMotion } from "@/lib/use-hydrated-reduced-motion";
 
+import type { ProgressSubscribe } from "./useArticleProgress";
+
 export const DARK_BAND = "linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)";
 const CARD_BORDER = "1px solid rgba(17, 17, 17, 0.08)";
 const CARD_SHADOW = "0 22px 48px -32px rgba(49, 27, 146, 0.55)";
@@ -32,13 +32,39 @@ export interface CtaCardContext {
   layout: BlogCtaLayout;
   placement: BlogCtaPlacement;
   /** Reading progress 0 to 1. Drives the slow drift on the cards' 3D marks. */
-  progress?: MotionValue<number>;
+  subscribe?: ProgressSubscribe | undefined;
 }
 
-/** A still progress value for cards rendered outside a reading context. */
-function useProgressOrStill(progress: MotionValue<number> | undefined): MotionValue<number> {
-  const still = useMotionValue(0);
-  return progress ?? still;
+const clamp01 = (n: number): number => Math.min(1, Math.max(0, n));
+
+/**
+ * Writes a scroll-driven style straight to an element on every progress
+ * update, with no React re-render. Skipped under reduced motion.
+ */
+function useScrollStyle(
+  ref: RefObject<HTMLElement | null>,
+  subscribe: ProgressSubscribe | undefined,
+  apply: (el: HTMLElement, progress: number) => void,
+): void {
+  const reduce = useHydratedReducedMotion();
+  useEffect(() => {
+    if (!subscribe || reduce) return;
+    return subscribe((p) => {
+      if (ref.current) apply(ref.current, p);
+    });
+  }, [ref, subscribe, apply, reduce]);
+}
+
+/** The logo tilts from -14 to 10 degrees as the reader moves through the first third. */
+function applyLogoTilt(el: HTMLElement, progress: number): void {
+  const t = clamp01(progress / 0.35);
+  el.style.transform = `rotateX(${(8 - 12 * t).toFixed(2)}deg) rotateY(${(-14 + 24 * t).toFixed(2)}deg)`;
+}
+
+/** The cube turns and lifts over the last half of the article. */
+function applyCubeDrift(el: HTMLElement, progress: number): void {
+  const t = clamp01((progress - 0.5) / 0.5);
+  el.style.transform = `translateY(${(10 - 16 * t).toFixed(2)}px) rotate(${(-18 + 32 * t).toFixed(2)}deg)`;
 }
 
 /**
@@ -163,10 +189,8 @@ export function ExploreCard({
   cta: ExploreCta;
   context: CtaCardContext;
 }): React.ReactElement {
-  const reduce = useHydratedReducedMotion();
-  const progress = useProgressOrStill(context.progress);
-  const rotateY = useTransform(progress, [0, 0.35], reduce ? [0, 0] : [-14, 10]);
-  const rotateX = useTransform(progress, [0, 0.35], reduce ? [0, 0] : [8, -4]);
+  const tiltRef = useRef<HTMLDivElement>(null);
+  useScrollStyle(tiltRef, context.subscribe, applyLogoTilt);
 
   const onClick = (): void => trackBlogCta({ ...context, stage: "explore" });
   const onCopied = (): void => trackBlogCta({ ...context, stage: "explore", action: "copy" });
@@ -202,9 +226,9 @@ export function ExploreCard({
       {cta.kind === "image" ? (
         <div className="relative">
           <div className="flex items-center gap-3.5" style={{ perspective: 600 }}>
-            <motion.div style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}>
+            <div ref={tiltRef} style={{ transformStyle: "preserve-3d" }}>
               <CatalogLogoTile logo={cta.logo} name={cta.name} size={56} />
-            </motion.div>
+            </div>
             <div className="min-w-0">
               <p style={{ ...captionStyle, color: VIOLET }}>Hardened image</p>
               <p
@@ -244,14 +268,13 @@ export function ExploreCard({
       ) : (
         <div className="relative">
           <div className="flex items-center" style={{ perspective: 600 }}>
-            {cta.featured.map((img, i) => (
-              <motion.div
-                key={img.name}
-                style={{ rotateX, rotateY, marginLeft: i === 0 ? 0 : -10, zIndex: cta.featured.length - i }}
-              >
-                <CatalogLogoTile logo={img.logo} name={img.name} size={42} />
-              </motion.div>
-            ))}
+            <div ref={tiltRef} className="flex items-center" style={{ transformStyle: "preserve-3d" }}>
+              {cta.featured.map((img, i) => (
+                <div key={img.name} style={{ marginLeft: i === 0 ? 0 : -10, zIndex: cta.featured.length - i }}>
+                  <CatalogLogoTile logo={img.logo} name={img.name} size={42} />
+                </div>
+              ))}
+            </div>
           </div>
           <p className="mt-4" style={{ ...titleStyle, color: "#111" }}>
             {cta.imageCount ? `${cta.imageCount} hardened images` : "Hardened image catalog"}
@@ -280,23 +303,6 @@ export function ExploreCard({
 /* ─── Learn: the related resource, with a cover that tilts under the pointer ─ */
 
 const COVER_SIZES = "(min-width: 1280px) 272px, 360px";
-
-/**
- * Starts the cover download before the Learn card mounts, so it never
- * arrives blank when a layout swaps it in. React dedupes repeat calls.
- */
-export function preloadResourceCover(src: string): void {
-  const { props } = getImageProps({ src, alt: "", fill: true, sizes: COVER_SIZES });
-  preload(props.src, {
-    as: "image",
-    fetchPriority: "low",
-    // The rail is xl-only. Smaller screens show the cover at 70px in the bar
-    // and load that variant themselves, so skip the preload for them.
-    media: "(min-width: 1280px)",
-    ...(props.srcSet ? { imageSrcSet: props.srcSet } : {}),
-    ...(props.sizes ? { imageSizes: props.sizes } : {}),
-  });
-}
 
 /**
  * Title printed on the dark book of a generic type poster, matching the
@@ -348,33 +354,34 @@ function TiltCover({
   posterTitle?: string | undefined;
 }): React.ReactElement {
   const reduce = useHydratedReducedMotion();
-  const px = useMotionValue(0.5);
-  const py = useMotionValue(0.5);
-  const spring = { stiffness: 220, damping: 22, mass: 0.6 };
-  const rotateY = useSpring(useTransform(px, [0, 1], [-9, 9]), spring);
-  const rotateX = useSpring(useTransform(py, [0, 1], [7, -7]), spring);
-  const glareX = useTransform(px, (v) => `${v * 100}%`);
-  const glareY = useTransform(py, (v) => `${v * 100}%`);
-  const glare = useMotionTemplate`radial-gradient(circle at ${glareX} ${glareY}, rgba(255,255,255,0.38), rgba(255,255,255,0) 55%)`;
+  const coverRef = useRef<HTMLDivElement>(null);
 
+  // Tilt and glare follow the pointer through direct style writes; the CSS
+  // transition smooths them.
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>): void => {
-    if (reduce || e.pointerType !== "mouse") return;
+    const cover = coverRef.current;
+    if (!cover || reduce || e.pointerType !== "mouse") return;
     const r = e.currentTarget.getBoundingClientRect();
-    px.set((e.clientX - r.left) / r.width);
-    py.set((e.clientY - r.top) / r.height);
+    const px = (e.clientX - r.left) / r.width;
+    const py = (e.clientY - r.top) / r.height;
+    cover.style.transform = `rotateX(${((0.5 - py) * 14).toFixed(2)}deg) rotateY(${((px - 0.5) * 18).toFixed(2)}deg)`;
+    cover.style.setProperty("--gx", `${(px * 100).toFixed(1)}%`);
+    cover.style.setProperty("--gy", `${(py * 100).toFixed(1)}%`);
   };
   const onPointerLeave = (): void => {
-    px.set(0.5);
-    py.set(0.5);
+    const cover = coverRef.current;
+    if (!cover) return;
+    cover.style.transform = "";
+    cover.style.removeProperty("--gx");
+    cover.style.removeProperty("--gy");
   };
 
   return (
     <div style={{ perspective: 800 }} onPointerMove={onPointerMove} onPointerLeave={onPointerLeave}>
-      <motion.div
-        className="group/cover relative overflow-hidden rounded-[14px]"
+      <div
+        ref={coverRef}
+        className="group/cover relative overflow-hidden rounded-[14px] transition-transform duration-200 ease-out motion-reduce:transition-none"
         style={{
-          rotateX: reduce ? 0 : rotateX,
-          rotateY: reduce ? 0 : rotateY,
           aspectRatio: "16 / 9",
           background: "#dfe9f5",
           containerType: "inline-size",
@@ -383,12 +390,15 @@ function TiltCover({
       >
         <Image src={src} alt={alt} fill sizes={COVER_SIZES} className="object-cover" />
         {posterTitle ? <PosterTitle title={posterTitle} /> : null}
-        <motion.div
+        <div
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover/cover:opacity-100"
-          style={{ background: glare }}
+          style={{
+            background:
+              "radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,0.38), rgba(255,255,255,0) 55%)",
+          }}
         />
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -442,18 +452,15 @@ export function ProveCard({
   context: CtaCardContext;
 }): React.ReactElement {
   const reduce = useHydratedReducedMotion();
-  const progress = useProgressOrStill(context.progress);
-  const cubeRotate = useTransform(progress, [0.5, 1], reduce ? [0, 0] : [-18, 14]);
-  const cubeY = useTransform(progress, [0.5, 1], reduce ? [0, 0] : [10, -6]);
-  const lightX = useMotionValue(70);
-  const lightY = useMotionValue(10);
-  const light = useMotionTemplate`radial-gradient(260px circle at ${lightX}% ${lightY}%, rgba(169,116,255,0.42), rgba(169,116,255,0) 70%)`;
+  const cubeRef = useRef<HTMLDivElement>(null);
+  useScrollStyle(cubeRef, context.subscribe, applyCubeDrift);
 
+  // The light follows the pointer through two custom properties on the card.
   const onPointerMove = (e: React.PointerEvent<HTMLElement>): void => {
     if (reduce || e.pointerType !== "mouse") return;
     const r = e.currentTarget.getBoundingClientRect();
-    lightX.set(((e.clientX - r.left) / r.width) * 100);
-    lightY.set(((e.clientY - r.top) / r.height) * 100);
+    e.currentTarget.style.setProperty("--lx", `${(((e.clientX - r.left) / r.width) * 100).toFixed(1)}%`);
+    e.currentTarget.style.setProperty("--ly", `${(((e.clientY - r.top) / r.height) * 100).toFixed(1)}%`);
   };
 
   return (
@@ -462,7 +469,14 @@ export function ProveCard({
       className="relative isolate overflow-hidden rounded-[20px] p-5 text-white"
       style={{ background: DARK_BAND, boxShadow: "0 26px 56px -30px rgba(71, 30, 192, 0.85)" }}
     >
-      <motion.div aria-hidden className="pointer-events-none absolute inset-0 -z-10" style={{ background: light }} />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10"
+        style={{
+          background:
+            "radial-gradient(260px circle at var(--lx, 70%) var(--ly, 10%), rgba(169,116,255,0.42), rgba(169,116,255,0) 70%)",
+        }}
+      />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/images/blog-detail/cta/cta-union.svg"
@@ -473,13 +487,14 @@ export function ProveCard({
         className="pointer-events-none absolute -z-10 select-none"
         style={{ left: -160, bottom: -260, width: 520, height: 520, opacity: 0.35 }}
       />
-      <motion.div
+      <div
+        ref={cubeRef}
         aria-hidden
         className="pointer-events-none absolute select-none"
-        style={{ right: -22, top: -18, width: 112, height: 112, rotate: cubeRotate, y: cubeY }}
+        style={{ right: -22, top: -18, width: 112, height: 112 }}
       >
         <Image src="/images/blog-detail/cta/cta-cube.webp" alt="" fill sizes="112px" className="object-contain opacity-90" />
-      </motion.div>
+      </div>
 
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
