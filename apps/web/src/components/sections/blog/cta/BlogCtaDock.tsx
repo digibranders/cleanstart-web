@@ -28,6 +28,18 @@ const RING_C = 2 * Math.PI * RING_R;
 /** How long a nudge stays out before tucking back into the tab. */
 const NUDGE_MS = 8000;
 const SPRING = { type: "spring", stiffness: 340, damping: 32 } as const;
+/** Fixed length for the vertical tab label, so the tab never changes height when it swaps. */
+const TAB_LABEL_LENGTH = 128;
+
+/** The tab names the ask the reader is on, using the same words as the card's own button. */
+function tabLabelFor(stage: BlogCtaStage, ctas: BlogCtaSet): string {
+  if (stage === "learn" && ctas.learn) return ctas.learn.ctaLabel;
+  if (stage === "explore") {
+    const e = ctas.explore;
+    return e.kind === "image" ? `Try ${e.name}` : "Browse images";
+  }
+  return ctas.prove.label;
+}
 
 function Nudge({
   stage,
@@ -169,6 +181,7 @@ export function BlogCtaDock({ ctas }: { ctas: BlogCtaSet }): React.ReactElement 
   };
 
   const context: CtaCardContext = { slug: ctas.slug, layout: "dock", placement: "dock", progress };
+  const tabLabel = open ? "Close" : tabLabelFor(stage, ctas);
 
   return (
     <div className="hidden md:block">
@@ -213,13 +226,26 @@ export function BlogCtaDock({ ctas }: { ctas: BlogCtaSet }): React.ReactElement 
           style={{
             writingMode: "vertical-rl",
             transform: "rotate(180deg)",
+            inlineSize: TAB_LABEL_LENGTH,
             fontFamily: "var(--font-display)",
             fontWeight: 600,
             fontSize: "var(--fs-caption)",
             letterSpacing: "0.02em",
           }}
         >
-          {open ? "Close" : "Free POC"}
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.span
+              key={tabLabel}
+              className="block overflow-hidden text-center"
+              style={{ inlineSize: "100%", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: reduce ? 0 : 0.18 }}
+            >
+              {tabLabel}
+            </motion.span>
+          </AnimatePresence>
         </span>
       </motion.button>
 
