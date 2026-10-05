@@ -16,6 +16,8 @@ import {
   baseImageNames,
   firstSentence,
   matchCatalogImage,
+  pickEditorImage,
+  pickEditorResource,
   pickRelatedResource,
 } from "./relevance";
 import type { BlogCtaSet, ExploreCta, ResourceCta } from "./types";
@@ -81,6 +83,7 @@ function decodeEntities(s: string): string {
 }
 
 type ResourceRow = {
+  id: string | number;
   slug: string;
   title: string;
   summary?: string | null;
@@ -159,7 +162,8 @@ export async function getBlogCtas(post: BlogDetail): Promise<BlogCtaSet> {
     getPublicPullNames(),
   ]);
 
-  const imageName = matchCatalogImage(article, catalogNames);
+  // An editor's pick wins; otherwise match from the article.
+  const imageName = pickEditorImage(post.ctaImage, catalogNames) ?? matchCatalogImage(article, catalogNames);
   let explore: ExploreCta;
   if (imageName) {
     explore = {
@@ -185,15 +189,17 @@ export async function getBlogCtas(post: BlogDetail): Promise<BlogCtaSet> {
     };
   }
 
-  const related = pickRelatedResource(
-    article,
-    resources.map((r) => ({
-      ...r,
-      summary: r.summary ?? "",
-      gated: Boolean(r.gated),
-      publishedAt: r.publishedAt ?? null,
-    })),
-  );
+  const related =
+    pickEditorResource(post.ctaResource, resources) ??
+    pickRelatedResource(
+      article,
+      resources.map((r) => ({
+        ...r,
+        summary: r.summary ?? "",
+        gated: Boolean(r.gated),
+        publishedAt: r.publishedAt ?? null,
+      })),
+    );
 
   return {
     slug: post.slug,

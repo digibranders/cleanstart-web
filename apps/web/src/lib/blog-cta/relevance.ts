@@ -122,8 +122,11 @@ export function baseImageNames(names: readonly string[]): string[] {
 export function matchCatalogImage(article: ArticleText, catalogNames: readonly string[]): string | null {
   let best: { name: string; score: number } | null = null;
   for (const name of baseImageNames(catalogNames)) {
+    // An everyday word like "go" counts only beside a word that makes it the image.
     const phrases = [
-      ...(AMBIGUOUS_IMAGE_NAMES.has(name) ? [] : [name]),
+      ...(AMBIGUOUS_IMAGE_NAMES.has(name)
+        ? [`${name} docker image`, `${name} container image`, `${name} image`, `official ${name}`]
+        : [name]),
       ...(IMAGE_ALIASES[name] ?? []),
     ];
     if (phrases.length === 0) continue;
@@ -148,9 +151,13 @@ const STOPWORDS: ReadonlySet<string> = new Set(
   ).split(" "),
 );
 
+/** Spelled-out terms that readers and titles also write as an abbreviation. */
+const ABBREVIATIONS: ReadonlyArray<readonly [RegExp, string]> = [[/\bsoftware bill of materials\b/g, "sbom"]];
+
 /** Lowercase word tokens with crude plural folding, minus stopwords. */
 export function tokenize(text: string): string[] {
-  return (text.toLowerCase().match(/[a-z0-9][a-z0-9+.-]*[a-z0-9+]|[a-z0-9]/g) ?? [])
+  const normalised = ABBREVIATIONS.reduce((s, [pattern, abbr]) => s.replace(pattern, abbr), text.toLowerCase());
+  return (normalised.match(/[a-z0-9][a-z0-9+.-]*[a-z0-9+]|[a-z0-9]/g) ?? [])
     .map((t) => (t.length > 4 && t.endsWith("s") && !t.endsWith("ss") ? t.slice(0, -1) : t))
     .filter((t) => t.length >= 3 && !STOPWORDS.has(t));
 }
@@ -187,6 +194,7 @@ export function pickRelatedResource<T extends ResourceCandidate>(
 ): T | null {
   if (resources.length === 0) return null;
   const articleWeights = articleTermWeights(article);
+  const headlineTerms = new Set([...tokenize(article.title), ...article.headings.flatMap(tokenize)]);
   const docs = resources.map((resource) => {
     const titleTerms = new Set(tokenize(resource.title));
     return { resource, titleTerms, terms: new Set([...titleTerms, ...tokenize(resource.summary)]) };
@@ -204,6 +212,12 @@ export function pickRelatedResource<T extends ResourceCandidate>(
       const idf = Math.log((n + 1) / ((df.get(t) ?? 0) + 1)) + 1;
       score += a * idf * (titleTerms.has(t) ? 1.5 : 1);
     }
+    // A resource whose whole title appears in the post's title or headings is
+    // about the same thing, however many other terms the summaries share.
+    if (titleTerms.size > 0) {
+      const covered = [...titleTerms].filter((term) => headlineTerms.has(term)).length;
+      score *= 1 + covered / titleTerms.size;
+    }
     if (resource.gated) score *= GATED_BONUS;
     if (!best || score > best.score) best = { resource, score };
   }
@@ -217,6 +231,43 @@ function newestGated<T extends ResourceCandidate>(resources: readonly T[]): T {
     (a, b) => Date.parse(b.publishedAt ?? "") - Date.parse(a.publishedAt ?? ""),
   );
   return byDate.find((r) => r.gated) ?? (byDate[0] as T);
+}
+
+/** The id behind a Payload relationship value, whether it arrived as an id or a hydrated doc. */
+export function relationId(value: unknown): string | null {
+  if (value == null) return null;
+  if (typeof value === "string" || typeof value === "number") return String(value);
+  if (typeof value === "object" && "id" in value) {
+    const id = (value as { id: unknown }).id;
+    if (typeof id === "string" || typeof id === "number") return String(id);
+  }
+  return null;
+}
+
+/**
+ * The resource an editor picked, if it is still among the published rows.
+ * A pick that was unpublished or deleted resolves to null, so the caller
+ * falls back to the automatic match instead of linking to a 404.
+ */
+export function pickEditorResource<T extends { id: string | number }>(
+  chosen: unknown,
+  published: readonly T[],
+): T | null {
+  const id = relationId(chosen);
+  if (id === null) return null;
+  return published.find((r) => String(r.id) === id) ?? null;
+}
+
+/**
+ * The catalog image an editor typed, normalised to its base name, if it
+ * exists in the catalog. `redis-fips` and ` Redis ` both resolve to `redis`.
+ */
+export function pickEditorImage(chosen: string | null | undefined, catalogNames: readonly string[]): string | null {
+  const name = chosen?.trim().toLowerCase();
+  if (!name) return null;
+  const bases = baseImageNames(catalogNames);
+  const base = name.replace(/-fips$/, "");
+  return bases.includes(base) ? base : null;
 }
 
 /** First sentence of a catalog description, which the portal truncates with an ellipsis. */

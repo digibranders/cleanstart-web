@@ -6,7 +6,10 @@ import {
   baseImageNames,
   firstSentence,
   matchCatalogImage,
+  pickEditorImage,
+  pickEditorResource,
   pickRelatedResource,
+  relationId,
   tokenize,
 } from "./relevance";
 
@@ -51,6 +54,16 @@ describe("matchCatalogImage", () => {
   it("still reaches ambiguous names through an alias", () => {
     const a = article({ title: "Hardening Golang services", body: "golang golang" });
     expect(matchCatalogImage(a, CATALOG)).toBe("go");
+  });
+
+  it("matches an everyday-word image name beside a word that makes it the image", () => {
+    const a = article({ title: "Official Go Docker Image vs CleanStart Hardened Go Image" });
+    expect(matchCatalogImage(a, CATALOG)).toBe("go");
+  });
+
+  it("still ignores an everyday-word image name used as a plain word", () => {
+    const a = article({ title: "Why teams go further with hardened images", body: "We go and we node." });
+    expect(matchCatalogImage(a, CATALOG)).toBeNull();
   });
 
   it("does not match inside other words or file names", () => {
@@ -111,6 +124,12 @@ describe("pickRelatedResource", () => {
     expect(pickRelatedResource(a, RESOURCES)?.slug).toBe("kubernetes-policy");
   });
 
+  it("treats SBOM and software bill of materials as the same term", () => {
+    const sbom = resource({ slug: "sbom", title: "Software Bill of Materials", summary: "Inventory of components." });
+    const a = article({ title: "SBOM 101: What It Is and How It Works" });
+    expect(pickRelatedResource(a, [...RESOURCES, sbom])?.slug).toBe("sbom");
+  });
+
   it("falls back to the newest gated resource when nothing is related", () => {
     const a = article({ title: "Our team offsite recap", body: "We went hiking." });
     expect(pickRelatedResource(a, RESOURCES)?.slug).toBe("ciso-guide");
@@ -136,5 +155,60 @@ describe("firstSentence", () => {
 
   it("returns null when the only sentence was cut off", () => {
     expect(firstSentence("A production-ready image built on a minimal…")).toBeNull();
+  });
+});
+
+describe("relationId", () => {
+  it("reads an id, a numeric id, or a hydrated doc", () => {
+    expect(relationId("7")).toBe("7");
+    expect(relationId(7)).toBe("7");
+    expect(relationId({ id: 7, slug: "a" })).toBe("7");
+  });
+
+  it("returns null for empty values", () => {
+    expect(relationId(null)).toBeNull();
+    expect(relationId(undefined)).toBeNull();
+    expect(relationId({})).toBeNull();
+  });
+});
+
+describe("pickEditorResource", () => {
+  const published = [
+    { id: 3, slug: "a" },
+    { id: "5", slug: "b" },
+  ];
+
+  it("returns the picked resource whether the id is a number, a string or a hydrated doc", () => {
+    expect(pickEditorResource(3, published)?.slug).toBe("a");
+    expect(pickEditorResource("5", published)?.slug).toBe("b");
+    expect(pickEditorResource({ id: 3, slug: "a" }, published)?.slug).toBe("a");
+  });
+
+  it("returns null for a pick that is no longer published, so the caller falls back", () => {
+    expect(pickEditorResource(99, published)).toBeNull();
+  });
+
+  it("returns null when nothing is picked", () => {
+    expect(pickEditorResource(null, published)).toBeNull();
+  });
+});
+
+describe("pickEditorImage", () => {
+  it("accepts a catalog slug, ignoring case and spacing", () => {
+    expect(pickEditorImage(" Redis ", CATALOG)).toBe("redis");
+  });
+
+  it("folds a FIPS variant to its base image", () => {
+    expect(pickEditorImage("redis-fips", CATALOG)).toBe("redis");
+  });
+
+  it("ignores a slug that is not in the catalog", () => {
+    expect(pickEditorImage("not-an-image", CATALOG)).toBeNull();
+  });
+
+  it("returns null for empty input", () => {
+    expect(pickEditorImage("  ", CATALOG)).toBeNull();
+    expect(pickEditorImage(null, CATALOG)).toBeNull();
+    expect(pickEditorImage(undefined, CATALOG)).toBeNull();
   });
 });
