@@ -273,6 +273,9 @@ export function preloadResourceCover(src: string): void {
   preload(props.src, {
     as: "image",
     fetchPriority: "low",
+    // The rail is xl-only. Smaller screens show the cover at 70px in the bar
+    // and load that variant themselves, so skip the preload for them.
+    media: "(min-width: 1280px)",
     ...(props.srcSet ? { imageSrcSet: props.srcSet } : {}),
     ...(props.sizes ? { imageSizes: props.sizes } : {}),
   });

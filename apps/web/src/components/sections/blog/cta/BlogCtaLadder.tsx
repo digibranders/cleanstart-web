@@ -63,7 +63,7 @@ export function BlogCtaLadder({
     <div className="flex flex-col gap-4">
       <div>
         <div className="flex items-baseline justify-between" style={{ fontSize: "var(--fs-caption)" }}>
-          <span style={{ color: "rgba(17,17,17,0.5)", fontWeight: 500 }}>Reading</span>
+          <span style={{ color: "rgba(17,17,17,0.66)", fontWeight: 500 }}>Reading</span>
           <motion.span className="tabular-nums" style={{ color: "rgba(17,17,17,0.72)", fontWeight: 500 }}>
             {remaining}
           </motion.span>
@@ -99,7 +99,7 @@ export function BlogCtaLadder({
                 style={{
                   fontSize: "var(--fs-caption)",
                   fontWeight: isActive ? 600 : 500,
-                  color: isActive ? "#111" : isPast ? "#4A3BF1" : "rgba(17,17,17,0.55)",
+                  color: isActive ? "#111" : isPast ? "#4A3BF1" : "rgba(17,17,17,0.66)",
                 }}
               >
                 {isActive ? (

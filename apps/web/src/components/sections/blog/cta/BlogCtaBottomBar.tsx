@@ -125,14 +125,11 @@ export function BlogCtaBottomBar({
   ctas,
   layout,
   className,
-  fixedStage,
 }: {
   ctas: BlogCtaSet;
   layout: BlogCtaLayout;
   /** Breakpoint utility that hides the bar where the rail takes over, e.g. `xl:hidden`. */
   className: string;
-  /** Pin the bar to one ask instead of following reading depth. */
-  fixedStage?: BlogCtaStage;
 }): React.ReactElement {
   const reduce = useHydratedReducedMotion();
   const { progress, stage } = useArticleProgress();
@@ -142,7 +139,7 @@ export function BlogCtaBottomBar({
   useEffect(() => setDismissed(readDismissed()), []);
   useMotionValueEvent(progress, "change", (p) => setInRange(p >= SHOW_FROM && p < 1));
 
-  const content = contentFor(fixedStage ?? stage, ctas, layout);
+  const content = contentFor(stage, ctas, layout);
   const onAction = (): void =>
     trackBlogCta({ layout, placement: "bar", stage: content.stage, slug: ctas.slug, resourceSlug: content.resourceSlug });
   const onDismiss = (): void => {

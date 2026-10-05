@@ -63,7 +63,7 @@ export interface BlogCtaSet {
 }
 
 /** Which of the three review layouts rendered a CTA. Feeds analytics. */
-export type BlogCtaLayout = "ladder" | "stack" | "dock";
+export type BlogCtaLayout = "ladder";
 
 /** Where on the page the CTA sat when it was clicked. */
-export type BlogCtaPlacement = "rail" | "bar" | "dock";
+export type BlogCtaPlacement = "rail" | "bar";

@@ -10,14 +10,14 @@ describe("withDemoSource", () => {
   });
 
   it("keeps existing params and the hash, and never adds utm_ params", () => {
-    const href = withDemoSource("/book-a-demo?plan=team#form", { slug: "a", layout: "dock", placement: "bar" });
-    expect(href).toBe("/book-a-demo?plan=team&source=blog&source_page=a&source_cta=dock-bar#form");
+    const href = withDemoSource("/book-a-demo?plan=team#form", { slug: "a", layout: "ladder", placement: "bar" });
+    expect(href).toBe("/book-a-demo?plan=team&source=blog&source_page=a&source_cta=ladder-bar#form");
     expect(href).not.toContain("utm_");
   });
 
   it("encodes slugs safely", () => {
-    expect(withDemoSource("/book-a-demo", { slug: "a b&c", layout: "stack", placement: "rail" })).toBe(
-      "/book-a-demo?source=blog&source_page=a+b%26c&source_cta=stack-rail",
+    expect(withDemoSource("/book-a-demo", { slug: "a b&c", layout: "ladder", placement: "rail" })).toBe(
+      "/book-a-demo?source=blog&source_page=a+b%26c&source_cta=ladder-rail",
     );
   });
 });
