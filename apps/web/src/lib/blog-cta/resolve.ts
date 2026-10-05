@@ -11,6 +11,7 @@ import {
   resourceCoverPoster,
   resourceCtaLabel,
 } from "@/lib/resources-utils";
+import { prepareLogoSvg } from "./logo";
 import {
   type ArticleText,
   baseImageNames,
@@ -20,7 +21,7 @@ import {
   pickEditorResource,
   pickRelatedResource,
 } from "./relevance";
-import type { BlogCtaSet, ExploreCta, ResourceCta } from "./types";
+import type { BlogCtaSet, CatalogLogo, ExploreCta, ResourceCta } from "./types";
 
 const CATALOG_ORIGIN = "https://images.cleanstart.com";
 const CATALOG_LOGO_ORIGIN = "https://storage.googleapis.com/cdpimages";
@@ -31,6 +32,10 @@ const DAY = 60 * 60 * 24;
 const FEATURED_IMAGES = ["python", "nginx", "redis", "postgres"] as const;
 
 const pullCommand = (name: string): string => `docker pull cleanstart/${name}:latest`;
+/** A rewritten logo is inlined only up to this size, to keep the page payload small. */
+const INLINE_LOGO_MAX = 100_000;
+const NO_LOGO: CatalogLogo = { src: null, tone: "light" };
+
 const logoUrl = (name: string): string => `${CATALOG_LOGO_ORIGIN}/${name}/${name}.svg`;
 const imageHref = (name: string): string => `${CATALOG_ORIGIN}/images/${name}/details`;
 
@@ -43,6 +48,25 @@ async function getCatalogImageNames(): Promise<string[]> {
     return [...xml.matchAll(/\/images\/([a-z0-9][a-z0-9.-]*)\/details</g)].map((m) => m[1] as string);
   } catch {
     return [];
+  }
+}
+
+/**
+ * The logo for one catalog image, from the portal's own storage bucket. It is
+ * read and normalised rather than linked blindly: a logo that switches to
+ * white under a dark system theme would vanish on the card's white tile.
+ */
+async function getCatalogLogo(name: string): Promise<CatalogLogo> {
+  const url = logoUrl(name);
+  try {
+    const res = await fetch(url, { next: { revalidate: DAY } });
+    if (!res.ok) return NO_LOGO;
+    const prepared = prepareLogoSvg(await res.text());
+    if (!prepared) return NO_LOGO;
+    if (!prepared.changed || prepared.svg.length > INLINE_LOGO_MAX) return { src: url, tone: prepared.tone };
+    return { src: `data:image/svg+xml;base64,${Buffer.from(prepared.svg).toString("base64")}`, tone: prepared.tone };
+  } catch {
+    return NO_LOGO;
   }
 }
 
@@ -166,24 +190,31 @@ export async function getBlogCtas(post: BlogDetail): Promise<BlogCtaSet> {
   const imageName = pickEditorImage(post.ctaImage, catalogNames) ?? matchCatalogImage(article, catalogNames);
   let explore: ExploreCta;
   if (imageName) {
+    const [description, logo] = await Promise.all([
+      getCatalogImageDescription(imageName),
+      getCatalogLogo(imageName),
+    ]);
     explore = {
       kind: "image",
       name: imageName,
-      description: await getCatalogImageDescription(imageName),
-      logoUrl: logoUrl(imageName),
+      description,
+      logo,
       href: imageHref(imageName),
       hasFips: catalogNames.includes(`${imageName}-fips`),
       pullCommand: publicPulls.has(imageName) ? pullCommand(imageName) : null,
     };
   } else {
     const bases = baseImageNames(catalogNames);
+    const featuredNames = FEATURED_IMAGES.filter((n) => bases.length === 0 || bases.includes(n));
+    const featuredLogos = await Promise.all(featuredNames.map((name) => getCatalogLogo(name)));
     explore = {
       kind: "catalog",
       imageCount: bases.length > 0 ? bases.length : null,
-      featured: FEATURED_IMAGES.filter((n) => bases.length === 0 || bases.includes(n)).map((name) => ({
-        name,
-        logoUrl: logoUrl(name),
-      })),
+      // A stack of logos, so an image with no logo file is left out rather than drawn as a blank.
+      featured: featuredNames.flatMap((name, i) => {
+        const logo = featuredLogos[i];
+        return logo?.src ? [{ name, logo }] : [];
+      }),
       href: CATALOG_ORIGIN,
       pullCommand: publicPulls.has("python") ? pullCommand("python") : null,
     };
