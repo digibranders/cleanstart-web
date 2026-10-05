@@ -240,6 +240,10 @@ export type BlogDetail = Blog & {
   relatedPosts?: Blog[] | null;
   previousPost?: Blog | string | null;
   nextPost?: Blog | string | null;
+  /** Editor pick for the sidebar's Learn step. Hydrated to `{ id, slug }` by the loader's `populate`. */
+  ctaResource?: { id: string | number; slug?: string } | string | number | null;
+  /** Editor pick for the sidebar's Explore step: a catalog image slug. */
+  ctaImage?: string | null;
   faqs?: BlogFaqItem[] | null;
 };
 
@@ -361,8 +365,11 @@ async function loadBlogBySlug(slug: string, draft = false): Promise<BlogDetail |
   // additionally pulled each related/prev/next post's full Lexical body and
   // nested authors, ballooning the single-doc response to ~540 KB / ~1.8 s for
   // no rendered benefit (related + journey are re-fetched by their own queries).
+  // `populate[resources][slug]` keeps the editor's CTA resource pick to an id
+  // and slug; without it depth=1 would embed the whole resource, Lexical body
+  // included.
   const data = await fetchCMS<PayloadListResponse<BlogDetail>>(
-    `/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}${filter}&depth=1&limit=1`,
+    `/api/blogs?where[slug][equals]=${encodeURIComponent(slug)}${filter}&depth=1&populate[resources][slug]=true&limit=1`,
     { draft },
   );
   const post = data.docs[0] ?? null;

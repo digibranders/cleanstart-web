@@ -153,6 +153,33 @@ export const Blogs: CollectionConfig = {
       },
     },
     {
+      name: 'ctaResource',
+      type: 'relationship',
+      relationTo: 'resources',
+      hasMany: false,
+      // Published only: a draft here would link readers to a 404.
+      filterOptions: { _status: { equals: 'published' } },
+      admin: {
+        description:
+          'Optional. The resource offered in the "Learn" step of the blog sidebar. If unset, the page picks the published resource most related to this post\'s title, abstract and headings, so a manual pick is only needed to override that match.',
+      },
+    },
+    {
+      name: 'ctaImage',
+      type: 'text',
+      maxLength: 80,
+      validate: (value: string | null | undefined): true | string => {
+        if (value == null || value.trim() === '') return true;
+        return /^[a-z0-9][a-z0-9.-]*$/.test(value.trim())
+          ? true
+          : 'Use the catalog slug in lowercase, e.g. redis or cert-manager-controller.';
+      },
+      admin: {
+        description:
+          'Optional. The hardened image shown in the "Explore" step of the blog sidebar, as its catalog slug: the part after /images/ in images.cleanstart.com/images/<slug>/details (e.g. redis). If unset, the page picks the image this post is about. A slug that is not in the catalog is ignored.',
+      },
+    },
+    {
       name: 'journeyMirrorWarning',
       type: 'ui',
       admin: {

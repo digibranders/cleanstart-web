@@ -86,6 +86,15 @@
       "relationTo": "blogs"
     },
     {
+      "type": "relationship",
+      "name": "ctaResource",
+      "relationTo": "resources"
+    },
+    {
+      "type": "text",
+      "name": "ctaImage"
+    },
+    {
       "type": "ui",
       "name": "journeyMirrorWarning"
     },

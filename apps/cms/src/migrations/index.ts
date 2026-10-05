@@ -61,6 +61,7 @@ import * as migration_20260910_060000_add_missing_job_task_slugs from './2026091
 import * as migration_20260921_100000_add_case_study_detail_fields from './20260921_100000_add_case_study_detail_fields';
 import * as migration_20260921_140000_add_content_updated_at from './20260921_140000_add_content_updated_at';
 import * as migration_20260922_090000_add_form_send_download_email from './20260922_090000_add_form_send_download_email';
+import * as migration_20261005_090000_add_blog_cta_picks from './20261005_090000_add_blog_cta_picks';
 
 export const migrations = [
   {
@@ -352,5 +353,10 @@ export const migrations = [
     up: migration_20260922_090000_add_form_send_download_email.up,
     down: migration_20260922_090000_add_form_send_download_email.down,
     name: '20260922_090000_add_form_send_download_email',
+  },
+  {
+    up: migration_20261005_090000_add_blog_cta_picks.up,
+    down: migration_20261005_090000_add_blog_cta_picks.down,
+    name: '20261005_090000_add_blog_cta_picks',
   },
 ];

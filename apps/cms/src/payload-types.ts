@@ -323,6 +323,14 @@ export interface Blog {
    */
   nextPost?: (number | null) | Blog;
   /**
+   * Optional. The resource offered in the "Learn" step of the blog sidebar. If unset, the page picks the published resource most related to this post's title, abstract and headings, so a manual pick is only needed to override that match.
+   */
+  ctaResource?: (number | null) | Resource;
+  /**
+   * Optional. The hardened image shown in the "Explore" step of the blog sidebar, as its catalog slug: the part after /images/ in images.cleanstart.com/images/<slug>/details (e.g. redis). If unset, the page picks the image this post is about. A slug that is not in the catalog is ignored.
+   */
+  ctaImage?: string | null;
+  /**
    * Layer in extra Schema.org types (HowTo, Video, Review, etc.) on top of the auto-emitted JSON-LD. Editors never write raw JSON — every field below maps to a schema.org property.
    */
   schemaAddons?:
@@ -1160,6 +1168,682 @@ export interface Category {
       | boolean
       | null;
   };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resources".
+ */
+export interface Resource {
+  id: number;
+  title: string;
+  /**
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  /**
+   * Legacy enum, superseded by the Type relationship. apps/web now reads the relationship, so this is hidden from editors; the column stays until a migration drops it so an un-backfilled row still resolves.
+   */
+  type?: ('whitepaper' | 'ebook' | 'datasheet' | 'architecture-insights' | 'report') | null;
+  /**
+   * Drives the type badge, cover poster and Resource Center filter. Manage the list under Taxonomies → Resource types.
+   */
+  typeRef?: (number | null) | ResourceType;
+  summary?: string | null;
+  /**
+   * Optional cover shown on the resource detail page. When empty, the detail page falls back to the branded type poster (whitepaper / ebook / etc.). Listing cards always use the type poster.
+   */
+  heroImage?: (number | null) | Media;
+  /**
+   * PDF or ZIP downloadable. Routed to web/resource/.
+   */
+  asset?: (number | null) | Media;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * When enabled, the asset download requires a form submission. Sets accessLevel to lead-gated by default.
+   */
+  gated?: boolean | null;
+  /**
+   * Form the visitor fills to unlock the download. Required when gated — the validator blocks save until set.
+   */
+  gateForm?: (number | null) | Form;
+  accessLevel?: ('public' | 'lead-gated' | 'customer-only') | null;
+  /**
+   * CTA copy on the gated download / view button. Empty falls back to a sensible default by `type` (Whitepapers → "Download whitepaper", Reports → "Read the report", etc).
+   */
+  ctaButtonText?: string | null;
+  /**
+   * Layer in extra Schema.org types (HowTo, Video, Review, etc.) on top of the auto-emitted JSON-LD. Editors never write raw JSON — every field below maps to a schema.org property.
+   */
+  schemaAddons?:
+    | (
+        | {
+            name: string;
+            /**
+             * One-paragraph summary of the procedure.
+             */
+            description: string;
+            /**
+             * ISO 8601 duration (e.g. PT15M = 15 minutes, PT1H30M = 1.5 hours).
+             */
+            totalTime?: string | null;
+            steps?:
+              | {
+                  name: string;
+                  /**
+                   * What the reader should do for this step.
+                   */
+                  text: string;
+                  /**
+                   * Optional supporting image (1200×675 ideal).
+                   */
+                  image?: (number | null) | Media;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'howTo';
+          }
+        | {
+            name: string;
+            description: string;
+            /**
+             * Required by Google. 1200×675 ideal, 16:9 minimum.
+             */
+            thumbnail: number | Media;
+            uploadDate: string;
+            /**
+             * Direct video URL (e.g. .mp4) — used by Google for in-SERP playback. Use embedUrl below for YouTube/Vimeo embeds.
+             */
+            contentUrl: string;
+            /**
+             * Optional iframe-embeddable URL (YouTube/Vimeo). Required by Google when the player is embedded rather than self-hosted.
+             */
+            embedUrl?: string | null;
+            /**
+             * ISO 8601 duration (e.g. PT5M30S).
+             */
+            duration?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'videoObject';
+          }
+        | {
+            /**
+             * Curated Q&A merged into the page FAQPage blob. If the doc already auto-emits FAQ from its `faqs[]` field, these entries are concatenated rather than duplicated.
+             */
+            questions?:
+              | {
+                  question: string;
+                  answer: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'faqPage';
+          }
+        | {
+            itemReviewedType: 'Product' | 'Service' | 'SoftwareApplication' | 'Organization';
+            itemReviewedName: string;
+            /**
+             * 0–5 (use whole or half-stars: 0, 0.5, 1, 1.5, …, 5).
+             */
+            ratingValue: number;
+            reviewBody?: string | null;
+            /**
+             * Reviewer name (Person). Falls back to the doc author.
+             */
+            authorName?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'review';
+          }
+        | {
+            name: string;
+            category:
+              | 'BusinessApplication'
+              | 'DeveloperApplication'
+              | 'SecurityApplication'
+              | 'CommunicationApplication';
+            /**
+             * OS support (e.g. "Linux", "macOS, Windows", "Web").
+             */
+            os: string;
+            /**
+             * Price as a string (e.g. "0", "29.00"). Use "0" for free / open-source.
+             */
+            price: string;
+            currency: 'USD' | 'EUR' | 'GBP' | 'INR';
+            /**
+             * Average rating, 0–5. Optional.
+             */
+            ratingValue?: number | null;
+            /**
+             * Number of ratings. Required if Average rating is set.
+             */
+            ratingCount?: number | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'softwareApp';
+          }
+        | {
+            /**
+             * BreadcrumbList is auto-emitted today. Use this override to suppress the auto crumb on a flat page, or to replace it with custom crumbs.
+             */
+            mode: 'suppress' | 'replace';
+            crumbs?:
+              | {
+                  name: string;
+                  /**
+                   * Site-relative path (e.g. /solutions/pricing) or full URL.
+                   */
+                  path: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'breadcrumbList';
+          }
+      )[]
+    | null;
+  /**
+   * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
+   */
+  publishedAt?: string | null;
+  /**
+   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
+   */
+  displayPublishedAt?: string | null;
+  /**
+   * Set automatically when the title, body, summary or FAQs change. Shown publicly as the "Updated" date.
+   */
+  contentUpdatedAt?: string | null;
+  /**
+   * Automatically incremented each time a visitor downloads this resource.
+   */
+  downloadCount?: number | null;
+  /**
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    useCustomCanonical?: boolean | null;
+    canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     */
+    additionalSchema?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    schemaHistory?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "resourceTypes".
+ */
+export interface ResourceType {
+  id: number;
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  description?: string | null;
+  icon?: (number | null) | Media;
+  /**
+   * Optional parent category for hierarchical taxonomies.
+   */
+  parent?: (number | null) | ResourceType;
+  /**
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    useCustomCanonical?: boolean | null;
+    canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     */
+    additionalSchema?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    schemaHistory?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "forms".
+ */
+export interface Form {
+  id: number;
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  /**
+   * Internal notes for editors. Not shown to visitors.
+   */
+  description?: string | null;
+  /**
+   * Forms with more than 7 fields show measurably higher abandonment per Baymard — consider conditional logic or splitting into multiple steps.
+   */
+  fields: {
+    /**
+     * Machine name. Becomes the JSON key on the lead record.
+     */
+    name: string;
+    type: 'text' | 'email' | 'tel' | 'textarea' | 'select' | 'checkbox' | 'consent';
+    /**
+     * Visitor-facing label.
+     */
+    label?: string | null;
+    /**
+     * Consent fields are always required and cannot be unchecked here.
+     */
+    required?: boolean | null;
+    /**
+     * Reject consumer webmail and disposable mailboxes (gmail, outlook, yahoo, mailinator and ~13,800 more). Leave off for newsletter and gated-download forms, where a personal address is a legitimate signup.
+     */
+    requireBusinessEmail?: boolean | null;
+    placeholder?: string | null;
+    helpText?: string | null;
+    defaultValue?: string | null;
+    options?:
+      | {
+          label: string;
+          value: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Exact text the visitor sees + agrees to. Snapshotted onto every lead record at submit time for GDPR audit defensibility.
+     */
+    consentText?: string | null;
+    /**
+     * Server-enforced via Zod at submit time.
+     */
+    validation?: {
+      minLength?: number | null;
+      maxLength?: number | null;
+      /**
+       * Regular expression source (no leading/trailing slashes).
+       */
+      pattern?: string | null;
+    };
+    /**
+     * Show this field only when the rules below match. Reduces form abandonment by 8–15% per Baymard research.
+     */
+    conditions?: {
+      mode?: ('all' | 'any') | null;
+      rules?:
+        | {
+            fieldName: string;
+            operator: 'equals' | 'notEquals' | 'contains';
+            value: string;
+            id?: string | null;
+          }[]
+        | null;
+    };
+    /**
+     * Override the default validation error. Defaults are inlined per validation type in the form renderer.
+     */
+    errorMessage?: string | null;
+    id?: string | null;
+  }[];
+  submitLabel?: string | null;
+  postSubmit: {
+    kind: 'message' | 'redirect';
+    body?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    url?: string | null;
+  };
+  /**
+   * Send the download email from the CMS after a gated submission. Untick when the HubSpot form sends its own follow-up email, otherwise the visitor receives two. Only applies to forms used as a resource gate.
+   */
+  sendDownloadEmail?: boolean | null;
+  /**
+   * CRM handlers fan out in parallel to the DB write. Handler config (API keys, list IDs) lives in env. Adapter implementations land in Phase E.
+   */
+  crmHandlers?: ('hubspot' | 'salesforce')[] | null;
+  /**
+   * Email addresses that receive the new-lead notification.
+   */
+  notifyTo?:
+    | {
+        email: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * System-managed. Auto-increments when fields[] changes after the form has at least one submission.
+   */
+  schemaVersion?: number | null;
+  /**
+   * GUID of the matching HubSpot form in the "website" folder. Set this to relay submissions to HubSpot via the Forms API. Leave empty to skip HubSpot sync.
+   */
+  hubspotFormGuid?: string | null;
+  /**
+   * Optional. HubSpot subscription type internal id this form opts the contact into (marketing subscription opt-in). Set for the newsletter form; leave empty for forms that should not subscribe.
+   */
+  hubspotSubscriptionTypeId?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -3550,682 +4234,6 @@ export interface LegalDocument {
    * Set automatically when the title, body, summary or FAQs change. Shown publicly as the "Updated" date.
    */
   contentUpdatedAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "resources".
- */
-export interface Resource {
-  id: number;
-  title: string;
-  /**
-   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
-   */
-  slug: string;
-  /**
-   * Legacy enum, superseded by the Type relationship. apps/web now reads the relationship, so this is hidden from editors; the column stays until a migration drops it so an un-backfilled row still resolves.
-   */
-  type?: ('whitepaper' | 'ebook' | 'datasheet' | 'architecture-insights' | 'report') | null;
-  /**
-   * Drives the type badge, cover poster and Resource Center filter. Manage the list under Taxonomies → Resource types.
-   */
-  typeRef?: (number | null) | ResourceType;
-  summary?: string | null;
-  /**
-   * Optional cover shown on the resource detail page. When empty, the detail page falls back to the branded type poster (whitepaper / ebook / etc.). Listing cards always use the type poster.
-   */
-  heroImage?: (number | null) | Media;
-  /**
-   * PDF or ZIP downloadable. Routed to web/resource/.
-   */
-  asset?: (number | null) | Media;
-  body?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * When enabled, the asset download requires a form submission. Sets accessLevel to lead-gated by default.
-   */
-  gated?: boolean | null;
-  /**
-   * Form the visitor fills to unlock the download. Required when gated — the validator blocks save until set.
-   */
-  gateForm?: (number | null) | Form;
-  accessLevel?: ('public' | 'lead-gated' | 'customer-only') | null;
-  /**
-   * CTA copy on the gated download / view button. Empty falls back to a sensible default by `type` (Whitepapers → "Download whitepaper", Reports → "Read the report", etc).
-   */
-  ctaButtonText?: string | null;
-  /**
-   * Layer in extra Schema.org types (HowTo, Video, Review, etc.) on top of the auto-emitted JSON-LD. Editors never write raw JSON — every field below maps to a schema.org property.
-   */
-  schemaAddons?:
-    | (
-        | {
-            name: string;
-            /**
-             * One-paragraph summary of the procedure.
-             */
-            description: string;
-            /**
-             * ISO 8601 duration (e.g. PT15M = 15 minutes, PT1H30M = 1.5 hours).
-             */
-            totalTime?: string | null;
-            steps?:
-              | {
-                  name: string;
-                  /**
-                   * What the reader should do for this step.
-                   */
-                  text: string;
-                  /**
-                   * Optional supporting image (1200×675 ideal).
-                   */
-                  image?: (number | null) | Media;
-                  id?: string | null;
-                }[]
-              | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'howTo';
-          }
-        | {
-            name: string;
-            description: string;
-            /**
-             * Required by Google. 1200×675 ideal, 16:9 minimum.
-             */
-            thumbnail: number | Media;
-            uploadDate: string;
-            /**
-             * Direct video URL (e.g. .mp4) — used by Google for in-SERP playback. Use embedUrl below for YouTube/Vimeo embeds.
-             */
-            contentUrl: string;
-            /**
-             * Optional iframe-embeddable URL (YouTube/Vimeo). Required by Google when the player is embedded rather than self-hosted.
-             */
-            embedUrl?: string | null;
-            /**
-             * ISO 8601 duration (e.g. PT5M30S).
-             */
-            duration?: string | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'videoObject';
-          }
-        | {
-            /**
-             * Curated Q&A merged into the page FAQPage blob. If the doc already auto-emits FAQ from its `faqs[]` field, these entries are concatenated rather than duplicated.
-             */
-            questions?:
-              | {
-                  question: string;
-                  answer: string;
-                  id?: string | null;
-                }[]
-              | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'faqPage';
-          }
-        | {
-            itemReviewedType: 'Product' | 'Service' | 'SoftwareApplication' | 'Organization';
-            itemReviewedName: string;
-            /**
-             * 0–5 (use whole or half-stars: 0, 0.5, 1, 1.5, …, 5).
-             */
-            ratingValue: number;
-            reviewBody?: string | null;
-            /**
-             * Reviewer name (Person). Falls back to the doc author.
-             */
-            authorName?: string | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'review';
-          }
-        | {
-            name: string;
-            category:
-              | 'BusinessApplication'
-              | 'DeveloperApplication'
-              | 'SecurityApplication'
-              | 'CommunicationApplication';
-            /**
-             * OS support (e.g. "Linux", "macOS, Windows", "Web").
-             */
-            os: string;
-            /**
-             * Price as a string (e.g. "0", "29.00"). Use "0" for free / open-source.
-             */
-            price: string;
-            currency: 'USD' | 'EUR' | 'GBP' | 'INR';
-            /**
-             * Average rating, 0–5. Optional.
-             */
-            ratingValue?: number | null;
-            /**
-             * Number of ratings. Required if Average rating is set.
-             */
-            ratingCount?: number | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'softwareApp';
-          }
-        | {
-            /**
-             * BreadcrumbList is auto-emitted today. Use this override to suppress the auto crumb on a flat page, or to replace it with custom crumbs.
-             */
-            mode: 'suppress' | 'replace';
-            crumbs?:
-              | {
-                  name: string;
-                  /**
-                   * Site-relative path (e.g. /solutions/pricing) or full URL.
-                   */
-                  path: string;
-                  id?: string | null;
-                }[]
-              | null;
-            id?: string | null;
-            blockName?: string | null;
-            blockType: 'breadcrumbList';
-          }
-      )[]
-    | null;
-  /**
-   * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
-   */
-  publishedAt?: string | null;
-  /**
-   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
-   */
-  displayPublishedAt?: string | null;
-  /**
-   * Set automatically when the title, body, summary or FAQs change. Shown publicly as the "Updated" date.
-   */
-  contentUpdatedAt?: string | null;
-  /**
-   * Automatically incremented each time a visitor downloads this resource.
-   */
-  downloadCount?: number | null;
-  /**
-   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
-   */
-  seo?: {
-    /**
-     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
-     */
-    title?: string | null;
-    /**
-     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
-     */
-    description?: string | null;
-    /**
-     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
-     */
-    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
-    /**
-     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
-     */
-    ogImage?: (number | null) | Media;
-    /**
-     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
-     */
-    ogImageAlt?: string | null;
-    /**
-     * Show fields to override the og:title / og:description independently of the SEO title / description.
-     */
-    useAdvancedOg?: boolean | null;
-    /**
-     * Defaults to the SEO title. Most editors never need to override this.
-     */
-    ogTitle?: string | null;
-    /**
-     * Defaults to the SEO description.
-     */
-    ogDescription?: string | null;
-    /**
-     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
-     */
-    useAdvancedTwitter?: boolean | null;
-    /**
-     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
-     */
-    twitterCard?: ('summary' | 'summary_large_image') | null;
-    /**
-     * Defaults to ogTitle, then SEO title.
-     */
-    twitterTitle?: string | null;
-    /**
-     * Defaults to ogDescription, then SEO description.
-     */
-    twitterDescription?: string | null;
-    /**
-     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
-     */
-    twitterImage?: (number | null) | Media;
-    useCustomCanonical?: boolean | null;
-    canonicalOverride?: string | null;
-    robotsAdvanced?: {
-      /**
-       * Don't show a cached version in SERP.
-       */
-      noarchive?: boolean | null;
-      /**
-       * Suppress the textual snippet entirely (overrides max-snippet).
-       */
-      nosnippet?: boolean | null;
-      /**
-       * Don't index images on this page.
-       */
-      noimageindex?: boolean | null;
-      /**
-       * Don't show the 'Translate' link on this page.
-       */
-      notranslate?: boolean | null;
-      /**
-       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
-       */
-      maxSnippet?: number | null;
-      /**
-       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
-       */
-      maxImagePreview?: ('standard' | 'large' | 'none') | null;
-      /**
-       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
-       */
-      maxVideoPreview?: number | null;
-      /**
-       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
-       */
-      unavailableAfter?: string | null;
-    };
-    alternates?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    customTags?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    /**
-     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
-     */
-    keywordTarget?: string | null;
-    keywords?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    /**
-     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
-     */
-    speakablePath?:
-      | {
-          selector: string;
-          id?: string | null;
-        }[]
-      | null;
-    /**
-     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
-     */
-    additionalSchema?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    schemaHistory?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "resourceTypes".
- */
-export interface ResourceType {
-  id: number;
-  name: string;
-  /**
-   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
-   */
-  slug: string;
-  description?: string | null;
-  icon?: (number | null) | Media;
-  /**
-   * Optional parent category for hierarchical taxonomies.
-   */
-  parent?: (number | null) | ResourceType;
-  /**
-   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
-   */
-  seo?: {
-    /**
-     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
-     */
-    title?: string | null;
-    /**
-     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
-     */
-    description?: string | null;
-    /**
-     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
-     */
-    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
-    /**
-     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
-     */
-    ogImage?: (number | null) | Media;
-    /**
-     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
-     */
-    ogImageAlt?: string | null;
-    /**
-     * Show fields to override the og:title / og:description independently of the SEO title / description.
-     */
-    useAdvancedOg?: boolean | null;
-    /**
-     * Defaults to the SEO title. Most editors never need to override this.
-     */
-    ogTitle?: string | null;
-    /**
-     * Defaults to the SEO description.
-     */
-    ogDescription?: string | null;
-    /**
-     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
-     */
-    useAdvancedTwitter?: boolean | null;
-    /**
-     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
-     */
-    twitterCard?: ('summary' | 'summary_large_image') | null;
-    /**
-     * Defaults to ogTitle, then SEO title.
-     */
-    twitterTitle?: string | null;
-    /**
-     * Defaults to ogDescription, then SEO description.
-     */
-    twitterDescription?: string | null;
-    /**
-     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
-     */
-    twitterImage?: (number | null) | Media;
-    useCustomCanonical?: boolean | null;
-    canonicalOverride?: string | null;
-    robotsAdvanced?: {
-      /**
-       * Don't show a cached version in SERP.
-       */
-      noarchive?: boolean | null;
-      /**
-       * Suppress the textual snippet entirely (overrides max-snippet).
-       */
-      nosnippet?: boolean | null;
-      /**
-       * Don't index images on this page.
-       */
-      noimageindex?: boolean | null;
-      /**
-       * Don't show the 'Translate' link on this page.
-       */
-      notranslate?: boolean | null;
-      /**
-       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
-       */
-      maxSnippet?: number | null;
-      /**
-       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
-       */
-      maxImagePreview?: ('standard' | 'large' | 'none') | null;
-      /**
-       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
-       */
-      maxVideoPreview?: number | null;
-      /**
-       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
-       */
-      unavailableAfter?: string | null;
-    };
-    alternates?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    customTags?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    /**
-     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
-     */
-    keywordTarget?: string | null;
-    keywords?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    /**
-     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
-     */
-    speakablePath?:
-      | {
-          selector: string;
-          id?: string | null;
-        }[]
-      | null;
-    /**
-     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
-     */
-    additionalSchema?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    schemaHistory?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "forms".
- */
-export interface Form {
-  id: number;
-  name: string;
-  /**
-   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
-   */
-  slug: string;
-  /**
-   * Internal notes for editors. Not shown to visitors.
-   */
-  description?: string | null;
-  /**
-   * Forms with more than 7 fields show measurably higher abandonment per Baymard — consider conditional logic or splitting into multiple steps.
-   */
-  fields: {
-    /**
-     * Machine name. Becomes the JSON key on the lead record.
-     */
-    name: string;
-    type: 'text' | 'email' | 'tel' | 'textarea' | 'select' | 'checkbox' | 'consent';
-    /**
-     * Visitor-facing label.
-     */
-    label?: string | null;
-    /**
-     * Consent fields are always required and cannot be unchecked here.
-     */
-    required?: boolean | null;
-    /**
-     * Reject consumer webmail and disposable mailboxes (gmail, outlook, yahoo, mailinator and ~13,800 more). Leave off for newsletter and gated-download forms, where a personal address is a legitimate signup.
-     */
-    requireBusinessEmail?: boolean | null;
-    placeholder?: string | null;
-    helpText?: string | null;
-    defaultValue?: string | null;
-    options?:
-      | {
-          label: string;
-          value: string;
-          id?: string | null;
-        }[]
-      | null;
-    /**
-     * Exact text the visitor sees + agrees to. Snapshotted onto every lead record at submit time for GDPR audit defensibility.
-     */
-    consentText?: string | null;
-    /**
-     * Server-enforced via Zod at submit time.
-     */
-    validation?: {
-      minLength?: number | null;
-      maxLength?: number | null;
-      /**
-       * Regular expression source (no leading/trailing slashes).
-       */
-      pattern?: string | null;
-    };
-    /**
-     * Show this field only when the rules below match. Reduces form abandonment by 8–15% per Baymard research.
-     */
-    conditions?: {
-      mode?: ('all' | 'any') | null;
-      rules?:
-        | {
-            fieldName: string;
-            operator: 'equals' | 'notEquals' | 'contains';
-            value: string;
-            id?: string | null;
-          }[]
-        | null;
-    };
-    /**
-     * Override the default validation error. Defaults are inlined per validation type in the form renderer.
-     */
-    errorMessage?: string | null;
-    id?: string | null;
-  }[];
-  submitLabel?: string | null;
-  postSubmit: {
-    kind: 'message' | 'redirect';
-    body?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
-    url?: string | null;
-  };
-  /**
-   * Send the download email from the CMS after a gated submission. Untick when the HubSpot form sends its own follow-up email, otherwise the visitor receives two. Only applies to forms used as a resource gate.
-   */
-  sendDownloadEmail?: boolean | null;
-  /**
-   * CRM handlers fan out in parallel to the DB write. Handler config (API keys, list IDs) lives in env. Adapter implementations land in Phase E.
-   */
-  crmHandlers?: ('hubspot' | 'salesforce')[] | null;
-  /**
-   * Email addresses that receive the new-lead notification.
-   */
-  notifyTo?:
-    | {
-        email: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * System-managed. Auto-increments when fields[] changes after the form has at least one submission.
-   */
-  schemaVersion?: number | null;
-  /**
-   * GUID of the matching HubSpot form in the "website" folder. Set this to relay submissions to HubSpot via the Forms API. Leave empty to skip HubSpot sync.
-   */
-  hubspotFormGuid?: string | null;
-  /**
-   * Optional. HubSpot subscription type internal id this form opts the contact into (marketing subscription opt-in). Set for the newsletter form; leave empty for forms that should not subscribe.
-   */
-  hubspotSubscriptionTypeId?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -9638,6 +9646,8 @@ export interface BlogsSelect<T extends boolean = true> {
   relatedPosts?: T;
   previousPost?: T;
   nextPost?: T;
+  ctaResource?: T;
+  ctaImage?: T;
   schemaAddons?:
     | T
     | {

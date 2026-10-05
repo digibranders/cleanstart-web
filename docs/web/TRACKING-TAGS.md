@@ -94,7 +94,13 @@ event tag in GTM.
 | `newsletter_signup` | `form_name` | `useNewsletterSignup.ts` |
 | `thank_you_view` | `form_name` | `ThankYouTracker.tsx` |
 | `cta_click` | `cta`, `page`, `video_id` | `LibrariesHero.tsx` |
+| `cta_click` | `cta`, `page`, `resource_slug` | Blog sidebar CTAs (`blog/cta/`). `cta` is `blog_ladder_<rail\|bar>_<explore\|learn\|prove>`, with a `_copy` suffix for the copied `docker pull` command. Learn clicks carry `resource_slug`. |
 | `search` | `search_term`, `search_results`, `search_scope` | `SearchCommandPalette.tsx`, `SearchAutocomplete.tsx` |
+
+Blog POC links go to `/book-a-demo?source=blog&source_page=<slug>&source_cta=<layout>-<placement>`.
+These are deliberately not `utm_*`: on an internal link they would start a new
+session and replace the lead's last-touch campaign. GA4 still records them in
+`page_location`; a lead field for them is a follow-up.
 
 The GA4 property's Enhanced Measurement "page changes based on browser history
 events" toggle must stay OFF, or every SPA navigation counts twice.
