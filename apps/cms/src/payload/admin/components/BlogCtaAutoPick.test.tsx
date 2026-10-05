@@ -49,7 +49,7 @@ describe('AutoPickNote', () => {
     const out = html(
       <AutoPickNote kind="image" state={ready({ image: { name: 'ollama' } })} overridden />,
     );
-    expect(out).toContain('Your pick overrides the automatic one, which would be <code>ollama</code>.');
+    expect(out).toContain('Your pick overrides the automatic one, which would be <code>ollama</code> (images portal).');
   });
 
   it('explains an empty automatic pick for each kind', () => {
@@ -57,7 +57,7 @@ describe('AutoPickNote', () => {
       'none, because no published resource matches',
     );
     expect(html(<AutoPickNote kind="image" state={ready()} overridden={false} />)).toContain(
-      'none, so the page shows the whole catalog',
+      'none, so the page links to the whole images portal',
     );
   });
 

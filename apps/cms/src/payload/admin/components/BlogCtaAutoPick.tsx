@@ -87,9 +87,11 @@ export const AutoPickNote = ({
         <>none, because no published resource matches</>
       )
     ) : suggestion.image ? (
-      <code>{suggestion.image.name}</code>
+      <>
+        <code>{suggestion.image.name}</code> (images portal)
+      </>
     ) : (
-      <>none, so the page shows the whole catalog</>
+      <>none, so the page links to the whole images portal</>
     );
 
   return (
@@ -104,7 +106,7 @@ export const AutoPickNote = ({
 };
 
 /**
- * Read-only line under the Sidebar resource and Sidebar image fields: which
+ * Read-only line under the Sidebar resource and Images portal entry fields: which
  * one the blog page picks by itself. Without it a blank field looks like
  * nothing is configured. Mounted as a UI field right after each override.
  *

@@ -180,19 +180,19 @@ export const Blogs: CollectionConfig = {
     },
     {
       name: 'ctaImage',
-      label: 'Sidebar image (Explore step)',
+      label: 'Images portal entry (Explore step)',
       type: 'text',
       maxLength: 80,
       validate: (value: string | null | undefined): true | string => {
         if (value == null || value.trim() === '') return true;
         return /^[a-z0-9][a-z0-9.-]*$/.test(value.trim())
           ? true
-          : 'Use the catalog slug in lowercase, e.g. redis or cert-manager-controller.';
+          : 'Use the portal name in lowercase, e.g. redis or cert-manager-controller.';
       },
       admin: {
-        placeholder: 'Automatic, or a catalog slug such as redis',
+        placeholder: 'Automatic, or a portal name such as redis',
         description:
-          'Optional. The hardened image shown in the "Explore" step of the blog sidebar, as its catalog slug: the part after /images/ in images.cleanstart.com/images/<slug>/details (e.g. redis). If unset, the page picks the image this post is about. A slug that is not in the catalog is ignored.',
+          'Optional. The container image from the images portal (images.cleanstart.com) that the "Explore" step of the blog sidebar links to. Not a picture. Type its name as it appears in the portal address: images.cleanstart.com/images/<name>/details (for example redis). If unset, the page picks the image this post is about. A name that is not in the portal is ignored.',
       },
     },
     {
