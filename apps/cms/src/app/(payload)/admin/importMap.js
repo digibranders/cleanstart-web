@@ -43,6 +43,7 @@ import { FaqRowLabel as FaqRowLabel_76d07ae44e07fadd7fac0306f5f777f3 } from '@/p
 import { RelationshipCell as RelationshipCell_f3dabf5ea0e3935f02307aab0be48f9f } from '@/payload/admin/components/RelationshipCell.tsx'
 import { RelationshipField as RelationshipField_093f373a4f5250e712293002deb8de6b } from '@/payload/admin/components/fields/RelationshipField.tsx'
 import { DateCell as DateCell_47ed292baae4a9613f55590463e26125 } from '@/payload/admin/components/DateCell.tsx'
+import { BlogCtaAutoPick as BlogCtaAutoPick_a59bb1161f0af6ea3d55893f84d1a3b2 } from '@/payload/admin/components/BlogCtaAutoPick.tsx'
 import { JourneyMirrorWarning as JourneyMirrorWarning_3abda007c0ebfa53802167f8b499d469 } from '@/payload/admin/components/JourneyMirrorWarning.tsx'
 import { PermalinkField as PermalinkField_ea9054c021397c838baff6eeae171a19 } from '@/payload/admin/components/PermalinkField.tsx'
 import { SelectField as SelectField_9c71ee466fcdbb40e13298a3fa959d0e } from '@/payload/admin/components/fields/SelectField.tsx'
@@ -197,6 +198,7 @@ export const importMap = {
   "@/payload/admin/components/RelationshipCell.tsx#RelationshipCell": RelationshipCell_f3dabf5ea0e3935f02307aab0be48f9f,
   "@/payload/admin/components/fields/RelationshipField.tsx#RelationshipField": RelationshipField_093f373a4f5250e712293002deb8de6b,
   "@/payload/admin/components/DateCell.tsx#DateCell": DateCell_47ed292baae4a9613f55590463e26125,
+  "@/payload/admin/components/BlogCtaAutoPick.tsx#BlogCtaAutoPick": BlogCtaAutoPick_a59bb1161f0af6ea3d55893f84d1a3b2,
   "@/payload/admin/components/JourneyMirrorWarning.tsx#JourneyMirrorWarning": JourneyMirrorWarning_3abda007c0ebfa53802167f8b499d469,
   "@/payload/admin/components/PermalinkField.tsx#PermalinkField": PermalinkField_ea9054c021397c838baff6eeae171a19,
   "@/payload/admin/components/fields/SelectField.tsx#SelectField": SelectField_9c71ee466fcdbb40e13298a3fa959d0e,

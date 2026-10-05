@@ -154,18 +154,33 @@ export const Blogs: CollectionConfig = {
     },
     {
       name: 'ctaResource',
+      label: 'Sidebar resource (Learn step)',
       type: 'relationship',
       relationTo: 'resources',
       hasMany: false,
       // Published only: a draft here would link readers to a 404.
       filterOptions: { _status: { equals: 'published' } },
       admin: {
+        custom: { emptyPlaceholder: 'Automatic, click to choose one' },
         description:
           'Optional. The resource offered in the "Learn" step of the blog sidebar. If unset, the page picks the published resource most related to this post\'s title, abstract and headings, so a manual pick is only needed to override that match.',
       },
     },
     {
+      name: 'ctaResourceAutoPick',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: {
+            path: '@/payload/admin/components/BlogCtaAutoPick.tsx#BlogCtaAutoPick',
+            clientProps: { kind: 'resource' },
+          },
+        },
+      },
+    },
+    {
       name: 'ctaImage',
+      label: 'Sidebar image (Explore step)',
       type: 'text',
       maxLength: 80,
       validate: (value: string | null | undefined): true | string => {
@@ -175,8 +190,21 @@ export const Blogs: CollectionConfig = {
           : 'Use the catalog slug in lowercase, e.g. redis or cert-manager-controller.';
       },
       admin: {
+        placeholder: 'Automatic, or a catalog slug such as redis',
         description:
           'Optional. The hardened image shown in the "Explore" step of the blog sidebar, as its catalog slug: the part after /images/ in images.cleanstart.com/images/<slug>/details (e.g. redis). If unset, the page picks the image this post is about. A slug that is not in the catalog is ignored.',
+      },
+    },
+    {
+      name: 'ctaImageAutoPick',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: {
+            path: '@/payload/admin/components/BlogCtaAutoPick.tsx#BlogCtaAutoPick',
+            clientProps: { kind: 'image' },
+          },
+        },
       },
     },
     {
