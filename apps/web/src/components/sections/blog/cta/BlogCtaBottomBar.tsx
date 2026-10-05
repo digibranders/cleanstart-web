@@ -12,7 +12,7 @@ import { trackBlogCta } from "@/lib/blog-cta/track";
 import type { BlogCtaLayout, BlogCtaSet, BlogCtaStage } from "@/lib/blog-cta/types";
 import { useHydratedReducedMotion } from "@/lib/use-hydrated-reduced-motion";
 
-import { DARK_BAND } from "./BlogCtaCards";
+import { CatalogLogoTile, DARK_BAND } from "./BlogCtaCards";
 import { useArticleProgress } from "./useArticleProgress";
 
 const DISMISS_KEY = "cs-blog-cta-bar-dismissed";
@@ -66,20 +66,8 @@ function contentFor(stage: BlogCtaStage, ctas: BlogCtaSet, layout: BlogCtaLayout
   }
   if (stage === "explore") {
     const e = ctas.explore;
-    const visual = (
-      <span className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-white">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={e.kind === "image" ? e.logoUrl : (e.featured[0]?.logoUrl ?? "/images/security/cs-logomark.svg")}
-          alt=""
-          width={24}
-          height={24}
-          loading="lazy"
-          decoding="async"
-          style={{ width: 24, height: 24, objectFit: "contain" }}
-        />
-      </span>
-    );
+    const logo = e.kind === "image" ? e.logo : (e.featured[0]?.logo ?? { src: null, tone: "light" as const });
+    const visual = <CatalogLogoTile logo={logo} name={e.kind === "image" ? e.name : "Catalog"} size={40} />;
     return e.kind === "image"
       ? {
           stage,

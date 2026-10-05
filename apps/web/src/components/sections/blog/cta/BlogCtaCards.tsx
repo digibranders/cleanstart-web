@@ -14,6 +14,7 @@ import { copyText } from "@/lib/clipboard";
 import type {
   BlogCtaLayout,
   BlogCtaPlacement,
+  CatalogLogo,
   ExploreCta,
   ProveCta,
   ResourceCta,
@@ -40,27 +41,43 @@ function useProgressOrStill(progress: MotionValue<number> | undefined): MotionVa
   return progress ?? still;
 }
 
-function CatalogLogo({ src, name, size }: { src: string; name: string; size: number }): React.ReactElement {
+/**
+ * A catalog image's logo on a rounded tile. Light-ink logos sit on white,
+ * white-only logos on the dark band, and an image with no logo file gets the
+ * CleanStart mark so the tile is never blank.
+ */
+export function CatalogLogoTile({
+  logo,
+  name,
+  size,
+}: {
+  logo: CatalogLogo;
+  name: string;
+  size: number;
+}): React.ReactElement {
+  const onDark = logo.src === null || logo.tone === "dark";
+  const glyph = Math.round(size * 0.58);
   return (
     <span
-      className="grid shrink-0 place-items-center bg-white"
+      className="grid shrink-0 place-items-center"
       style={{
         width: size,
         height: size,
         borderRadius: size * 0.28,
-        border: "1px solid rgba(74, 59, 241, 0.14)",
+        background: onDark ? DARK_BAND : "#ffffff",
+        border: onDark ? "1px solid rgba(255, 255, 255, 0.22)" : "1px solid rgba(74, 59, 241, 0.14)",
         boxShadow: "0 10px 24px -14px rgba(49, 27, 146, 0.6), inset 0 1px 0 rgba(255,255,255,0.9)",
       }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={src}
-        alt={`${name} logo`}
-        width={size * 0.58}
-        height={size * 0.58}
+        src={logo.src ?? "/images/security/cs-logomark.svg"}
+        alt={logo.src ? `${name} logo` : ""}
+        width={glyph}
+        height={glyph}
         loading="lazy"
         decoding="async"
-        style={{ width: size * 0.58, height: size * 0.58, objectFit: "contain" }}
+        style={{ width: glyph, height: glyph, objectFit: "contain" }}
       />
     </span>
   );
@@ -186,7 +203,7 @@ export function ExploreCard({
         <div className="relative">
           <div className="flex items-center gap-3.5" style={{ perspective: 600 }}>
             <motion.div style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}>
-              <CatalogLogo src={cta.logoUrl} name={cta.name} size={56} />
+              <CatalogLogoTile logo={cta.logo} name={cta.name} size={56} />
             </motion.div>
             <div className="min-w-0">
               <p style={{ ...captionStyle, color: VIOLET }}>Hardened image</p>
@@ -232,7 +249,7 @@ export function ExploreCard({
                 key={img.name}
                 style={{ rotateX, rotateY, marginLeft: i === 0 ? 0 : -10, zIndex: cta.featured.length - i }}
               >
-                <CatalogLogo src={img.logoUrl} name={img.name} size={42} />
+                <CatalogLogoTile logo={img.logo} name={img.name} size={42} />
               </motion.div>
             ))}
           </div>
