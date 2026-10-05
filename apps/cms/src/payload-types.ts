@@ -327,7 +327,7 @@ export interface Blog {
    */
   ctaResource?: (number | null) | Resource;
   /**
-   * Optional. The hardened image shown in the "Explore" step of the blog sidebar, as its catalog slug: the part after /images/ in images.cleanstart.com/images/<slug>/details (e.g. redis). If unset, the page picks the image this post is about. A slug that is not in the catalog is ignored.
+   * Optional. The container image from the images portal (images.cleanstart.com) that the "Explore" step of the blog sidebar links to. Not a picture. Type its name as it appears in the portal address: images.cleanstart.com/images/<name>/details (for example redis). If unset, the page picks the image this post is about. A name that is not in the portal is ignored.
    */
   ctaImage?: string | null;
   /**

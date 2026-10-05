@@ -1,6 +1,8 @@
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  // Match the app's automatic JSX runtime, so a .tsx file needs no React import.
+  esbuild: { jsx: 'automatic' },
   test: {
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     environment: 'node',

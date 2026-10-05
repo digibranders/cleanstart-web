@@ -287,6 +287,10 @@ export const RelationshipField = (props: RelationshipFieldClientProps): ReactEle
   const fallbackRelationTo = slugs[0] ?? '';
   const readOnly = field.admin?.readOnly === true;
   const filter = (field as { filterOptions?: Record<string, unknown> }).filterOptions;
+  // A field can say what an empty picker means (e.g. "Automatic") via `admin.custom.emptyPlaceholder`.
+  const customEmpty = (field.admin?.custom as { emptyPlaceholder?: unknown } | undefined)?.emptyPlaceholder;
+  const emptyPlaceholder =
+    typeof customEmpty === 'string' ? customEmpty : `Search ${slugs.join(' / ')}…`;
 
   const entries = useMemo(() => normalise(value, fallbackRelationTo), [value, fallbackRelationTo]);
   const entriesKey = useMemo(
@@ -681,7 +685,7 @@ export const RelationshipField = (props: RelationshipFieldClientProps): ReactEle
                 aria-labelledby={labelId}
                 className="cs-collections-select__input"
                 value={open ? query : (selectedPill?.primary ?? '')}
-                placeholder={isEmpty ? `Search ${slugs.join(' / ')}…` : ''}
+                placeholder={isEmpty ? emptyPlaceholder : ''}
                 onChange={(e) => {
                   setQuery(e.target.value);
                   setOpen(true);
