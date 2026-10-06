@@ -90,8 +90,14 @@ export const NAV_TREE: NavItem[] = [
             description: "Runtime visibility into vulnerabilities and drift.",
             icon: "radar",
           },
-          // Last in the group on purpose: Tricorder is the intelligence layer the
-          // three products above run on, not a fourth thing to buy.
+        ],
+      },
+      {
+        // Its own group on purpose: Tricorder is the platform the three products
+        // above run on, not a fourth thing to buy. PanelProducts gives it a
+        // separate column; MobileNav shows the "Platform" heading.
+        title: "Platform",
+        items: [
           {
             label: "Tricorder",
             href: "/tricorder",
