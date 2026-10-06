@@ -1,9 +1,7 @@
 import { PanelRow } from "@/components/nav/pieces/PanelRow";
 import { PanelShell } from "@/components/nav/panels/PanelShell";
 import { TricorderCard } from "@/components/nav/pieces/TricorderCard";
-import { ImageMeta } from "@/components/nav/pieces/ImageMeta";
-import { CopyableCommand } from "@/components/nav/pieces/CopyableCommand";
-import { ArrowGlyph } from "@/components/nav/pieces/ArrowGlyph";
+import { ImageStrip } from "@/components/nav/pieces/ImageStrip";
 import type { NavMegaItem } from "@/lib/nav-config";
 import type { CommunityImage } from "@/lib/api/community-images";
 
@@ -13,7 +11,7 @@ type Props = { item: NavMegaItem; latestImages: CommunityImage[] };
 const ATMOSPHERE = "rgba(100, 13, 251, 0.05)";
 
 const COLUMN_LABEL =
-  "px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-white/40";
+  "px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-white/40";
 
 export function PanelProducts({ item, latestImages }: Props) {
   const products = item.groups[0]?.items ?? [];
@@ -65,37 +63,7 @@ export function PanelProducts({ item, latestImages }: Props) {
         )}
       </div>
 
-      {/* The catalog strip owns the image action (and the live pull command),
-          so the panel header carries no separate exit link. */}
-      <div className="mt-3.5 flex items-center gap-4 rounded-[12px] bg-white/[0.03] px-4 py-3">
-        <div className="w-[228px] shrink-0">
-          <div className="text-[13px] font-semibold leading-tight text-white/90">
-            Stop patching. Replace the base.
-          </div>
-          <div className="mt-0.5 text-[11px] leading-snug text-white/50">
-            Drop-in hardened images.
-          </div>
-        </div>
-
-        <div className="min-w-0 flex-1">
-          {chosen && (
-            <div className="flex flex-col gap-2">
-              <ImageMeta image={chosen} />
-              <CopyableCommand command={`$ docker pull cleanstart/${chosen.name}:latest`} />
-            </div>
-          )}
-        </div>
-
-        <a
-          href={catalogHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group/cta ml-auto inline-flex shrink-0 items-center gap-1.5 text-[12.5px] font-semibold text-[#2cc1eb]"
-        >
-          {catalogLabel}
-          <ArrowGlyph direction="up-right" size={13} />
-        </a>
-      </div>
+      <ImageStrip image={chosen} href={catalogHref} label={catalogLabel} />
     </PanelShell>
   );
 }
