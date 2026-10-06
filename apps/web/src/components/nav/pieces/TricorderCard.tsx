@@ -27,14 +27,8 @@ export function TricorderCard({ href, label, description, icon }: Props) {
         <div className="cs-chip flex h-11 w-11 shrink-0 items-center justify-center rounded-[8px]">
           <NavIcon id={icon} size={22} className="cs-nav-glyph" />
         </div>
-        <div className="min-w-0">
-          <div className="text-[19px] font-semibold leading-none tracking-[-0.015em] text-white/95">
-            {label}
-          </div>
-          <div className="mt-1.5 inline-flex items-center gap-1.5 text-[10.5px] font-medium text-[#2cc1eb]">
-            <span aria-hidden className="h-1 w-1 rounded-full bg-[#2cc1eb]" />
-            Powers all three products
-          </div>
+        <div className="text-[19px] font-semibold leading-none tracking-[-0.015em] text-white/95">
+          {label}
         </div>
       </div>
 
