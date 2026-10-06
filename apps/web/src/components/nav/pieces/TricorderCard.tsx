@@ -24,8 +24,8 @@ export function TricorderCard({ href, label, description, icon }: Props) {
       className="cs-hero-surface group/cta flex h-full flex-col rounded-[14px] p-[18px] text-white outline-none transition-[box-shadow] duration-200 ease-out hover:shadow-[inset_0_1px_0_rgba(140,120,255,0.4),0_1px_0_rgba(0,0,0,0.25),0_12px_32px_-20px_rgba(0,0,0,0.6)] focus-visible:ring-2 focus-visible:ring-[#33BAEC]"
     >
       <div className="flex items-center gap-3">
-        <div className="cs-chip flex h-11 w-11 shrink-0 items-center justify-center rounded-[8px]">
-          <NavIcon id={icon} size={22} className="cs-nav-glyph" />
+        <div className="cs-chip flex h-14 w-14 shrink-0 items-center justify-center rounded-[10px]">
+          <NavIcon id={icon} size={30} className="cs-nav-glyph" />
         </div>
         <div className="text-[19px] font-semibold leading-none tracking-[-0.015em] text-white/95">
           {label}
