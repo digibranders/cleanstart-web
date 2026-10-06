@@ -937,7 +937,8 @@ export interface ProfilePageSchemaInput {
 
 /**
  * ProfilePage wrapping a Person mainEntity — Google's recommended type for
- * author bio pages. Emitting this enables E-E-A-T author disambiguation and
+ * author bio pages. The house byline is a team account, so its page describes
+ * the publishing Organization (same `@id` as the site-wide node) instead. Emitting this enables E-E-A-T author disambiguation and
  * links back from Article/BlogPosting Person nodes via the `url` property.
  */
 export function profilePageSchema({
@@ -949,6 +950,23 @@ export function profilePageSchema({
   sameAs,
 }: ProfilePageSchemaInput) {
   const profileUrl = absoluteUrl(`/author/${slug}`);
+  if (slug === HOUSE_BYLINE_SLUG) {
+    return {
+      "@context": "https://schema.org",
+      "@type": "ProfilePage",
+      url: profileUrl,
+      mainEntity: {
+        "@type": "Organization",
+        "@id": ORGANIZATION_ID,
+        name: SITE_NAME,
+        ...(name !== SITE_NAME ? { alternateName: name } : {}),
+        url: SITE_URL,
+        ...(imageUrl ? { logo: imageUrl } : {}),
+        ...(description ? { description } : {}),
+        ...(sameAs && sameAs.length > 0 ? { sameAs } : {}),
+      },
+    };
+  }
   return {
     "@context": "https://schema.org",
     "@type": "ProfilePage",
