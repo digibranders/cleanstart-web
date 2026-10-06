@@ -16,12 +16,10 @@ import { PanelSolutions } from "@/components/nav/panels/PanelSolutions";
 import { PanelAudience } from "@/components/nav/panels/PanelAudience";
 import { PanelResources } from "@/components/nav/panels/PanelResources";
 import { PanelCompany } from "@/components/nav/panels/PanelCompany";
-import type { CommunityImage } from "@/lib/api/community-images";
 import type { FeedSource } from "@/components/nav/data/latest-updates-feed";
 import type { SpotlightCard } from "@/components/nav/data/spotlights";
 
 type Props = {
-  latestImages: CommunityImage[];
   latestUpdates: FeedSource[];
   resourcesSpotlight: SpotlightCard;
   companySpotlight: SpotlightCard;
@@ -47,7 +45,6 @@ function collectHrefs(item: NavItem): string[] {
 
 function TopLevelItem({
   item,
-  latestImages,
   latestUpdates,
   resourcesSpotlight,
   companySpotlight,
@@ -76,7 +73,7 @@ function TopLevelItem({
   let body: React.ReactElement | null = null;
   if (item.kind === "mega") {
     if (item.label === "Products") {
-      body = <PanelProducts item={item} latestImages={latestImages} />;
+      body = <PanelProducts item={item} />;
     } else if (item.label === "Resources") {
       body = (
         <PanelResources
@@ -109,7 +106,6 @@ function TopLevelItem({
 }
 
 export function DesktopNav({
-  latestImages,
   latestUpdates,
   resourcesSpotlight,
   companySpotlight,
@@ -122,7 +118,6 @@ export function DesktopNav({
           <TopLevelItem
             key={item.label}
             item={item}
-            latestImages={latestImages}
             latestUpdates={latestUpdates}
             resourcesSpotlight={resourcesSpotlight}
             companySpotlight={companySpotlight}

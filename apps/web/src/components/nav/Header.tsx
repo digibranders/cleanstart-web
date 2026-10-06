@@ -3,7 +3,6 @@ import { DesktopNav } from "@/components/nav/DesktopNav";
 import { MobileNav } from "@/components/nav/MobileNav";
 import { HeaderScrollShell } from "@/components/nav/HeaderScrollShell";
 import { AnnouncementBar } from "@/components/nav/AnnouncementBar";
-import { fetchLatestImages } from "@/components/nav/data/latest-images";
 import { fetchLatestUpdates } from "@/components/nav/data/latest-updates-feed";
 import {
   getResourcesSpotlight,
@@ -13,13 +12,11 @@ import { fetchOpenRolesCount } from "@/components/nav/data/careers-feed";
 
 export async function Header() {
   const [
-    latestImages,
     latestUpdates,
     resourcesSpotlight,
     companySpotlight,
     openRolesCount,
   ] = await Promise.all([
-    fetchLatestImages(),
     fetchLatestUpdates(),
     getResourcesSpotlight(),
     getCompanySpotlight(),
@@ -48,7 +45,6 @@ export async function Header() {
         </Link>
 
         <DesktopNav
-          latestImages={latestImages}
           latestUpdates={latestUpdates}
           resourcesSpotlight={resourcesSpotlight}
           companySpotlight={companySpotlight}
