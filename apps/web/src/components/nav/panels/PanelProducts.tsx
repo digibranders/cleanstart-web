@@ -21,7 +21,7 @@ export function PanelProducts({ item }: Props) {
         ? { exitHref: item.exitHref, exitLabel: item.exitLabel }
         : {})}
     >
-      <div className="grid grid-cols-[1.12fr_1fr] gap-4">
+      <div className="grid grid-cols-[1.12fr_32px_1fr]">
         <div className="flex flex-col gap-1.5">
           {products.map((p) => (
             // flex-1 stretches each row so the column matches the Tricorder
@@ -36,6 +36,14 @@ export function PanelProducts({ item }: Props) {
               />
             </div>
           ))}
+        </div>
+
+        {/* Bracket joins the three product rows (equal thirds, so it runs from
+            the centre of the first to the centre of the last) and feeds the
+            platform card. Decorative. */}
+        <div aria-hidden className="relative">
+          <div className="absolute inset-y-[16.66%] left-1 right-3.5 rounded-r-[6px] border-y border-r border-white/[0.18]" />
+          <div className="absolute left-[calc(100%-14px)] right-0 top-1/2 h-px bg-gradient-to-r from-white/[0.18] to-[#2cc1eb]/70" />
         </div>
 
         {platform && (
