@@ -1,11 +1,9 @@
 import { PanelRow } from "@/components/nav/pieces/PanelRow";
 import { PanelShell } from "@/components/nav/panels/PanelShell";
 import { TricorderCard } from "@/components/nav/pieces/TricorderCard";
-import { ImageStrip } from "@/components/nav/pieces/ImageStrip";
 import type { NavMegaItem } from "@/lib/nav-config";
-import type { CommunityImage } from "@/lib/api/community-images";
 
-type Props = { item: NavMegaItem; latestImages: CommunityImage[] };
+type Props = { item: NavMegaItem };
 
 // Brand-family atmosphere for Products: a 5% indigo wash in the top-right.
 const ATMOSPHERE = "rgba(100, 13, 251, 0.05)";
@@ -13,20 +11,18 @@ const ATMOSPHERE = "rgba(100, 13, 251, 0.05)";
 const COLUMN_LABEL =
   "px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-white/40";
 
-export function PanelProducts({ item, latestImages }: Props) {
+export function PanelProducts({ item }: Props) {
   const products = item.groups[0]?.items ?? [];
   const platform = item.groups[1]?.items[0];
-  // The pool is sorted most-recent-first, so index 0 is the latest-updated image.
-  const chosen = latestImages[0];
-  const catalogHref = item.exitHref ?? "https://images.cleanstart.com";
-  const catalogLabel = item.exitLabel ?? "Browse all images";
-
   return (
     <PanelShell
       width={item.width ?? 880}
       eyebrow={item.label}
       tagline={item.tagline}
       atmosphere={ATMOSPHERE}
+      {...(item.exitHref && item.exitLabel
+        ? { exitHref: item.exitHref, exitLabel: item.exitLabel }
+        : {})}
     >
       <div className="grid grid-cols-[1.12fr_1fr] gap-4">
         <div className="flex flex-col">
@@ -62,8 +58,6 @@ export function PanelProducts({ item, latestImages }: Props) {
           </div>
         )}
       </div>
-
-      <ImageStrip image={chosen} href={catalogHref} label={catalogLabel} />
     </PanelShell>
   );
 }

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { NavIcon } from "@/components/nav/icons/NavIcon";
 import { ArrowGlyph } from "@/components/nav/pieces/ArrowGlyph";
-import { SECTION_LABEL, StageTrack, VerdictPills } from "@/components/nav/pieces/TricorderParts";
+import { SECTION_LABEL, StageTrack } from "@/components/nav/pieces/TricorderParts";
 
 type Props = {
   href: string;
@@ -13,7 +13,7 @@ type Props = {
 /**
  * Tricorder's slot in the Products menu. It is the platform under the three
  * products, not a fourth product, so it sits in its own column on the elevated
- * hero surface and shows what it does (stages in, verdict out) instead of
+ * hero surface and shows what it does (the four stages) instead of
  * reading as another row. Nothing inside is interactive, so the whole card is
  * the link.
  */
@@ -44,10 +44,6 @@ export function TricorderCard({ href, label, description, icon }: Props) {
         <div className="border-t border-white/[0.07] pt-3.5">
           <div className={`${SECTION_LABEL} mb-3`}>How it decides</div>
           <StageTrack />
-          <div className="mt-4 flex items-center justify-between gap-2">
-            <span className={SECTION_LABEL}>Verdict</span>
-            <VerdictPills />
-          </div>
         </div>
 
         <span className="mt-4 inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-[#2cc1eb]">
