@@ -32,60 +32,41 @@
   position: relative;
 }
 .products {
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 2.5%;
 }
-.product {
-  position: relative;
-  isolation: isolate;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 24px 32px 20px;
-  border: 1px solid transparent;
-  border-radius: var(--radius-cs-card);
-  background: linear-gradient(155deg, #1d2054 0%, #151330 58%, #151021 100%) padding-box,
-    linear-gradient(
-      145deg,
-      color-mix(in srgb, var(--product-accent) 55%, #5b4b85),
-      #51417b 45%,
-      #30204f
-    )
-    border-box;
-  box-shadow: 0 12px 32px rgb(16 18 62 / 18%), inset 0 1px 0 rgb(255 255 255 / 5%);
-  transition: box-shadow 260ms cubic-bezier(0.2, 0.9, 0.3, 1);
-}
-.product::before {
+.products::before {
   content: "";
   position: absolute;
-  inset: 0;
   z-index: -1;
-  border-radius: inherit;
-  background: radial-gradient(
-    ellipse at 50% 0%,
-    color-mix(in srgb, var(--product-accent) 10%, transparent),
-    transparent 65%
-  );
+  top: 86px;
+  inset-inline: 32px;
+  height: 100px;
+  border: 1px solid rgb(255 255 255 / 7%);
+  border-radius: var(--radius-cs-card);
+  background: linear-gradient(120deg, #363064 0%, #1b173d 52%, #292153 100%);
+  box-shadow: 0 12px 0 -2px #1b174b, 0 20px 32px rgb(16 18 62 / 16%);
+  transform: perspective(1600px) rotateX(54deg);
+  transform-origin: center top;
   pointer-events: none;
-  opacity: 0.6;
-  transition: opacity 260ms cubic-bezier(0.2, 0.9, 0.3, 1);
 }
-.product:hover,
-.product:focus-within {
-  box-shadow: 0 16px 36px rgb(16 18 62 / 25%), inset 0 1px 0
-    color-mix(in srgb, var(--product-accent) 40%, transparent);
-}
-.product:hover::before,
-.product:focus-within::before {
-  opacity: 1;
+.product {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 32px 24px;
+  text-align: center;
 }
 .artwork {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   width: 100%;
-  min-height: 124px;
+  min-height: 156px;
 }
 .emblem {
   pointer-events: none;
@@ -97,7 +78,7 @@
   transform: translateY(-3px);
 }
 .productName {
-  margin-top: 12px;
+  margin-top: 20px;
   font-family: var(--font-display), sans-serif;
   font-size: var(--fs-h3);
   line-height: var(--fs-h3-lh);
@@ -114,7 +95,7 @@
   text-transform: uppercase;
 }
 .description {
-  max-width: 34ch;
+  max-width: 32ch;
   margin: 16px 0 20px;
   color: rgb(255 255 255 / 80%);
   font-size: var(--fs-body);
@@ -213,25 +194,22 @@
 .junction {
   position: absolute;
   z-index: 1;
-  bottom: -4px;
-  left: calc(50% - 4px);
-  width: 8px;
-  height: 8px;
-  border: 1px solid #e8d6ff;
+  bottom: -3px;
+  left: calc(50% - 3px);
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: #a78af2;
+  background: #a497c4;
 }
 .foundation {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 24px 32px;
-  padding: 28px 32px;
-  border: 1px solid transparent;
+  padding: 32px 36px;
   border-radius: var(--radius-cs-card);
-  background: linear-gradient(110deg, #161330 0%, #1b1b4b 55%, #202158 100%) padding-box,
-    linear-gradient(115deg, #6b5999, #a897d0 45%, #5a4d99 100%) border-box;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%);
+  background: #18172f;
+  box-shadow: 0 16px 40px rgb(16 18 62 / 20%);
 }
 .foundationIdentity {
   display: flex;
@@ -241,7 +219,7 @@
 }
 .foundationEyebrow {
   margin-bottom: 8px;
-  color: var(--color-cs-lavender);
+  color: #bdb2d0;
   font-size: var(--fs-eyebrow);
   line-height: var(--fs-eyebrow-lh);
   letter-spacing: var(--fs-eyebrow-ls);
@@ -314,8 +292,17 @@
     background: linear-gradient(#72caff, #c6adff 48%, #6ce2c4 80%, #dab6f3);
     pointer-events: none;
   }
+  .products::before {
+    display: none;
+  }
   .product {
-    padding: 24px;
+    align-items: flex-start;
+    padding: 8px 16px 24px;
+    text-align: left;
+  }
+  .product + .product {
+    border-top: 1px solid rgb(218 182 243 / 20%);
+    padding-top: 24px;
   }
   .product::after {
     content: "";
@@ -329,6 +316,7 @@
   }
   .artwork {
     justify-content: flex-start;
+    min-height: 124px;
   }
   .description {
     max-width: 40ch;
@@ -372,8 +360,6 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .product,
-  .product::before,
   .emblem,
   .trace,
   .productLink svg,
