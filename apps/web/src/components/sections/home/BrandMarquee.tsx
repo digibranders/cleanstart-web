@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import Image from "next/image";
+import { brandLogoName } from "./brand-logo-name";
 
 function getTrustedLogos(): string[] {
   const dir = path.join(process.cwd(), "public", "images", "trusted");
@@ -28,15 +29,17 @@ export function BrandMarquee() {
         <div className="cs-marquee items-center gap-12 py-2">
           {doubled.map((file, i) => {
             const isMahindra = /mahindra/i.test(file);
+            const isLoopCopy = i >= logos.length;
+            const name = brandLogoName(file);
             return (
               <div
                 key={`${file}-${i}`}
                 className="flex h-10 w-[120px] shrink-0 items-center justify-center"
-                title={file.replace(/\.[^.]+$/, "")}
+                {...(isLoopCopy ? { "aria-hidden": true } : { title: name })}
               >
                 <Image
                   src={`/images/trusted/${file}`}
-                  alt=""
+                  alt={isLoopCopy ? "" : name}
                   width={120}
                   height={32}
                   sizes="120px"
