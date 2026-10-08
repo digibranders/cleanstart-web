@@ -1,8 +1,4 @@
-"use client";
-
-import { useCallback } from "react";
 import { breadcrumbTrail } from "@cleanstart/schema/builders";
-import { copyText } from "@/lib/clipboard";
 import type { PressType } from "@/lib/news";
 import { formatNewsDate, pressTypeLabel } from "@/lib/news-utils";
 import { DetailHero, DetailHeroMetaSeparator } from "@/components/sections/_shared/DetailHero";
@@ -25,22 +21,6 @@ export function NewsDetailHero({
 }: NewsDetailHeroProps): React.ReactElement {
   const encodedUrl = encodeURIComponent(shareUrl);
   const encodedTitle = encodeURIComponent(shareTitle);
-
-  const handleInstagramClick = useCallback(
-    async (event: React.MouseEvent) => {
-      // Instagram has no public share-intent URL; copy the post URL so the
-      // editor can paste it into the IG composer manually. `copyText` adds an
-      // execCommand fallback for non-secure / iframe contexts where the async
-      // Clipboard API is blocked. Only open the default href if even that
-      // fails, so the editor still has a path to share.
-      event.preventDefault();
-      const ok = await copyText(shareUrl);
-      if (!ok && typeof window !== "undefined") {
-        window.open(shareUrl, "_blank", "noopener,noreferrer");
-      }
-    },
-    [shareUrl],
-  );
 
   return (
     <DetailHero
@@ -92,12 +72,6 @@ export function NewsDetailHero({
                 label="Share on LinkedIn"
                 src="/images/news-detail/icon-share-linkedin.svg"
               />
-              <ShareIcon
-                href="https://www.instagram.com/"
-                label="Open Instagram (post URL copied to clipboard)"
-                src="/images/news-detail/icon-share-instagram.svg"
-                onClick={handleInstagramClick}
-              />
             </div>
           </div>
 
@@ -125,17 +99,15 @@ interface ShareIconProps {
   href: string;
   label: string;
   src: string;
-  onClick?: (event: React.MouseEvent) => void;
 }
 
-function ShareIcon({ href, label, src, onClick }: ShareIconProps): React.ReactElement {
+function ShareIcon({ href, label, src }: ShareIconProps): React.ReactElement {
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      onClick={onClick}
       className="inline-flex items-center justify-center shrink-0 transition-opacity hover:opacity-80"
       style={{ width: "32px", height: "32px" }}
     >
