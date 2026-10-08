@@ -12,7 +12,7 @@ import {
 import { formatWebinarDate, isWebinarPast } from "@/lib/webinars-utils";
 import { isLexicalBodyEmpty, mediaUrl } from "@/lib/blog";
 import { RenderLexical } from "@/lib/renderLexical";
-import { buildPageMetadata } from "@/lib/seo/canonical";
+import { buildPageMetadata, clampMetaDescription } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 import { breadcrumbSchema, breadcrumbTrail, webinarSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
@@ -53,8 +53,9 @@ export async function generateMetadata({
 
   return buildPageMetadata({
     title: seo.title ?? webinar.title,
-    description:
+    description: clampMetaDescription(
       seo.description ?? webinar.abstract ?? `Watch the CleanStart webinar: ${webinar.title}.`,
+    ),
     path: `/webinar/${webinar.slug}`,
     eyebrow: "Webinar",
     ...(seo.noindex ? { noindex: true, nofollow: seo.nofollow } : {}),

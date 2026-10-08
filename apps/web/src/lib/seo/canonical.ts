@@ -23,6 +23,23 @@ export function stripBrandSuffix(title: string): string {
   return t || title.trim();
 }
 
+/**
+ * Fit free-form copy (a CMS abstract or summary) into a meta description.
+ * Google shows about 155 to 160 characters; anything longer is truncated in
+ * the result and flagged by every SEO crawler. Cuts at the last word boundary
+ * inside `max` (including the ellipsis), drops dangling punctuation, and only
+ * hard-cuts when the text has no usable space in the second half of the budget.
+ */
+export function clampMetaDescription(text: string, max = 160): string {
+  const clean = text.replace(/\s+/g, " ").trim();
+  if (clean.length <= max) return clean;
+
+  const budget = max - 1;
+  const lastSpace = clean.slice(0, budget + 1).lastIndexOf(" ");
+  const head = lastSpace >= budget / 2 ? clean.slice(0, lastSpace) : clean.slice(0, budget);
+  return `${head.replace(/[\s,;:.\-]+$/, "")}…`;
+}
+
 export type PageImage = {
   url: string;
   width?: number | undefined;

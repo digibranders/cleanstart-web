@@ -116,7 +116,7 @@ function AuthorCard({ author }: { author: GuideAuthor }): React.ReactElement {
         {photoSrc ? (
           <Image
             src={photoSrc}
-            alt={author.photo?.alt ?? author.name}
+            alt={author.name}
             fill
             sizes="(max-width: 640px) 96px, 144px"
             className="object-cover"
