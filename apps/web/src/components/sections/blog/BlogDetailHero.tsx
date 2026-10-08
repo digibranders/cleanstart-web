@@ -125,11 +125,6 @@ export function BlogDetailHero({
                 label="Share on LinkedIn"
                 src="/images/news-detail/icon-share-linkedin.svg"
               />
-              <ShareIconLink
-                href="https://www.instagram.com/"
-                label="Open Instagram"
-                src="/images/news-detail/icon-share-instagram.svg"
-              />
             </div>
           </div>
 
