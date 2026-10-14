@@ -45,7 +45,7 @@ export async function generateMetadata({
   params,
 }: ResourceDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const resource = await getResourceBySlug(slug).catch(() => null);
+  const resource = await getResourceBySlug(slug);
   if (!resource) {
     return buildPageMetadata({
       title: "Resource",
@@ -94,8 +94,8 @@ export async function renderResourceDetail({
   draft?: boolean;
 }): Promise<React.ReactElement> {
   const resource = draft
-    ? await getResourceBySlugDraft(slug).catch(() => null)
-    : await getResourceBySlug(slug).catch(() => null);
+    ? await getResourceBySlugDraft(slug)
+    : await getResourceBySlug(slug);
   if (!resource) notFound();
 
   const heroAbsolute = mediaUrl(resource.heroImage?.url);

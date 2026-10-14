@@ -5362,6 +5362,16 @@ body {
   }
 }
 
+/* Links in CMS rich text (renderLexical.tsx). A class rather than an inline
+   style, so context rules such as the table header band below can recolour
+   them. Not scoped to .article-body: FAQ answers render with their own
+   wrapper class. */
+.article-link {
+  color: #4a3bf1;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 /* ── Article table ───────────────────────────────────────────────────────────
    Panel-style table: rounded bordered wrapper, dark ink header row, hairline
    row dividers only (no vertical grid), zebra striping and row hover. The
@@ -5461,10 +5471,13 @@ body {
   border-bottom: none;
 }
 
-/* Links authored inside the dark header band stay legible. */
+/* Links authored inside the dark header band stay legible: white, with the
+   underline setting them apart from the band's white text. Lavender (#c9bcf4)
+   fell to 2.4:1 toward the blue end of the gradient. A one-cell table, which
+   editors use as a callout card, is all header band, so this covers it too. */
 .article-body .article-table tr:first-child a,
 .article-body .article-table th.article-th-col a {
-  color: #c9bcf4;
+  color: #ffffff;
 }
 
 /* Last row closes flush against the wrapper's rounded border. */

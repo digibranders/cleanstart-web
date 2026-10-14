@@ -38,7 +38,7 @@ export async function generateMetadata({
   params,
 }: WebinarDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const webinar = await getWebinarBySlug(slug).catch(() => null);
+  const webinar = await getWebinarBySlug(slug);
   if (!webinar) {
     return buildPageMetadata({
       title: "Webinar",

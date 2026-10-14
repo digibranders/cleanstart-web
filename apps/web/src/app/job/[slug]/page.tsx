@@ -52,7 +52,7 @@ export async function generateMetadata({
   params,
 }: CareerDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const job = await getJobBySlug(slug).catch(() => null);
+  const job = await getJobBySlug(slug);
   if (!job) {
     return buildPageMetadata({
       title: "Career opening",
@@ -95,8 +95,8 @@ export async function renderJobDetail({
   draft?: boolean;
 }): Promise<React.ReactElement> {
   const job = draft
-    ? await getJobBySlugDraft(slug).catch(() => null)
-    : await getJobBySlug(slug).catch(() => null);
+    ? await getJobBySlugDraft(slug)
+    : await getJobBySlug(slug);
   if (!job) notFound();
 
   // Older CMS bodies prefix the content with a single-line italic department

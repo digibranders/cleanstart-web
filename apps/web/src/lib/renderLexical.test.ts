@@ -1,7 +1,57 @@
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { LexicalNode, LexicalRoot } from "@/lib/blog";
 
-import { embedStyleClass, lexicalToPlainText, resolveLexicalLink } from "./renderLexical";
+import {
+  embedStyleClass,
+  lexicalToPlainText,
+  RenderLexical,
+  resolveLexicalLink,
+} from "./renderLexical";
+
+describe("RenderLexical links", () => {
+  const linkDoc = (url: string): LexicalRoot => ({
+    root: {
+      type: "root",
+      direction: null,
+      format: "",
+      indent: 0,
+      version: 1,
+      children: [
+        {
+          type: "paragraph",
+          version: 1,
+          children: [
+            {
+              type: "link",
+              url,
+              version: 1,
+              children: [{ type: "text", text: "Explore", format: 0, version: 1 }],
+            },
+          ],
+        },
+      ],
+    },
+  });
+
+  const render = (url: string): string =>
+    renderToStaticMarkup(createElement(RenderLexical, { content: linkDoc(url) }));
+
+  // An inline colour beats every stylesheet rule, which left links unreadable
+  // where CSS recolours them, such as a table's dark header band.
+  it("styles internal links with a class, not an inline style", () => {
+    const html = render("/cleanstart-images");
+    expect(html).toMatch(/<a[^>]*class="article-link"[^>]*href="\/cleanstart-images"/);
+    expect(html).not.toMatch(/<a[^>]*style=/);
+  });
+
+  it("styles external links with a class, not an inline style", () => {
+    const html = render("https://kubernetes.io/docs");
+    expect(html).toMatch(/<a[^>]*class="article-link"/);
+    expect(html).not.toMatch(/<a[^>]*style=/);
+  });
+});
 
 describe("resolveLexicalLink", () => {
   it("treats www.cleanstart.com absolute URLs as internal and strips to a path", () => {

@@ -40,7 +40,7 @@ export async function generateMetadata({
   params,
 }: EventDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const event = await getEventBySlug(slug).catch(() => null);
+  const event = await getEventBySlug(slug);
   if (!event) {
     return buildPageMetadata({
       title: "Event",

@@ -60,7 +60,7 @@ export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
 
 export async function generateMetadata({ params }: BlogDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getBlogBySlug(slug).catch(() => null);
+  const post = await getBlogBySlug(slug);
   if (!post) {
     return buildPageMetadata({
       title: "Blog post",

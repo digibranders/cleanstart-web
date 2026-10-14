@@ -165,11 +165,6 @@ function renderNode(node: LexicalNode, key: string): React.ReactNode {
       const rawHref = linkNode.url ?? linkNode.fields?.url;
       const { href, external, specialScheme } = resolveLexicalLink(rawHref);
       const children = renderNodes(linkNode.children ?? [], key);
-      const linkStyle = {
-        color: "#4a3bf1",
-        textDecoration: "underline",
-        textUnderlineOffset: "3px",
-      } as const;
 
       // Internal links navigate in the same tab via the client router. The
       // migrated `newTab` flag is deliberately ignored here: Webflow set it
@@ -181,7 +176,7 @@ function renderNode(node: LexicalNode, key: string): React.ReactNode {
             key={key}
             href={href}
             rel={buildLinkRel(linkNode.fields?.rel, false)}
-            style={linkStyle}
+            className="article-link"
           >
             {children}
           </Link>
@@ -197,7 +192,7 @@ function renderNode(node: LexicalNode, key: string): React.ReactNode {
           href={href}
           target={newTab ? "_blank" : undefined}
           rel={buildLinkRel(linkNode.fields?.rel, newTab)}
-          style={linkStyle}
+          className="article-link"
         >
           {children}
         </a>
