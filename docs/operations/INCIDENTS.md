@@ -10,6 +10,19 @@ A running, reverse-chronological log of production incidents and non-obvious bug
 
 ---
 
+## 2026-10-14 - Published pages served as 404s; web builds failing on CMS 500s
+
+- **Area:** `apps/web` detail routes, `apps/cms` Postgres pool, production droplet Postgres.
+- **Symptom:** a full check of the 486 detail URLs in the production sitemap found 4 published pages returning 404 (`/guide/container-orchestration`, `/guide/kubernetes`, `/resources/embedding-fips-140-2-compliance-at-the-foundation`, `/resources/fips-compliance`). Each new build lost a different handful, so the set moved between deployments (`/guide/sbom` was 404 on one preview and fine in production). Web builds, in CI and on Vercel, also failed intermittently with bursts of `CMS fetch failed: 500`.
+- **Root cause, two layers:**
+  1. **Config mismatch on the CMS.** The droplet's Postgres is tuned to `max_connections = 20` (`ALTER SYSTEM`, see CMS-DEPLOYMENT.md step 6) for its 1 vCPU and 2 GB. On 2026-09-22 the Payload pool was raised to `max: 25` (entry below) with a comment assuming Postgres's default of 100, and `DB_POOL_MAX` was never set in production. A pool whose ceiling is under the server limit queues extra queries; this one tried to open connections 21 to 25, Postgres refused them with `sorry, too many clients already` (301 occurrences in a single 7-minute build window), and each refused query became a 500. Only bursts trigger it, and a build prerendering ~600 pages is a burst, worse when CI and Vercel build at the same time. The CMS connects as the superuser, so it also took the reserved slots and even an operator's `psql` was refused.
+  2. **Errors swallowed into 404s on the web.** Detail routes fetched with `.catch(() => null)` and then called `notFound()`, so a 500 became a cached 404 with no retry. `fetchCMS` already retried 5 times; the route threw that safety away.
+- **Fix:** CMS pool ceiling defaults to 15 through `resolveDbPoolMax` (`payload/lib/db-pool.ts`), which also rejects a malformed `DB_POOL_MAX` at boot instead of passing `NaN` to `pg`. Detail routes (22 call sites, page and `generateMetadata`) let `CmsFetchError` propagate: Next retries the page and fails the build if the CMS stays down, so the previous deployment stays live, and ISR keeps the last good page. A missing slug still 404s. Same PR also fixed rich-text links rendering indigo-on-blue inside table header bands (an inline colour beat the stylesheet).
+- **Status:** web fix verified on a preview (all 486 detail pages 200; 31 CMS 500s retried, none published as 404), production pending. Pool fix built and tested, not yet deployed.
+- **Reusable lessons:** *(1)* an app's DB pool must be sized against the server's actual `max_connections`, not the engine default; read the server (`SHOW max_connections`, or `postgresql.auto.conf` when you cannot connect) before raising a pool; *(2)* never turn a fetch error into "not found" on a cached route: it publishes a transient outage as a durable 404, which is worse than a failed build; *(3)* when the DB refuses even a superuser, count backends from the process list (`ps` inside the container) instead of `pg_stat_activity`.
+
+---
+
 ## 2026-09-22 — CMS admin slow to load, slow to publish (list N+1, unbounded publish fan-out)
 
 - **Area:** `apps/cms` — admin list/edit views, publish `afterChange` hooks, Postgres pool.

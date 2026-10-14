@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 import { postgresAdapter } from '@payloadcms/db-postgres';
 
+import { resolveDbPoolMax } from './payload/lib/db-pool';
 import { brevoEmailAdapter } from './payload/lib/email/payload-adapter';
 import { cleanstartLexicalEditor } from './payload/lib/lexical/editor-config';
 import { s3Storage } from '@payloadcms/storage-s3';
@@ -618,18 +619,12 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: requireEnv('DATABASE_URI'),
-      // `pg` defaults to max: 10. That is well under what a single admin
-      // page needs: the dashboard alone issues ~20 concurrent counts, the
-      // nav badges another ~10, and sixteen cron queues compete with all
-      // of it. Past ten in flight, every further query waits for a
-      // connection before it waits for Postgres — which reads to an
-      // editor as "the CMS is slow" with an idle database.
-      //
-      // Keep the ceiling under the server's `max_connections` (100 by
-      // default) divided by the number of app processes; DB_POOL_MAX is
-      // the escape hatch when that maths changes.
-      max: Number.parseInt(process.env.DB_POOL_MAX ?? '25', 10),
-      // Recycle idle connections so a burst doesn't pin 25 sockets open
+      // `pg` defaults to max: 10, which is under what a single admin page
+      // needs (the dashboard issues ~20 concurrent counts). The ceiling must
+      // still sit below the server's `max_connections`, which is 20 in
+      // production, not Postgres's default of 100. See lib/db-pool.ts.
+      max: resolveDbPoolMax(process.env.DB_POOL_MAX),
+      // Recycle idle connections so a burst doesn't pin the whole pool open
       // for the rest of the process's life.
       idleTimeoutMillis: 30_000,
       // Fail a checkout that can't be served rather than hanging the
