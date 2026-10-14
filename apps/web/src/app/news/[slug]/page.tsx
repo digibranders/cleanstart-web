@@ -42,7 +42,7 @@ export async function generateMetadata({
   params,
 }: NewsDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const item = await getNewsBySlug(slug).catch(() => null);
+  const item = await getNewsBySlug(slug);
   if (!item) {
     return buildPageMetadata({
       title: "News",

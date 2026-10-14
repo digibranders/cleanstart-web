@@ -35,7 +35,7 @@ const FALLBACK_DESCRIPTION =
   "Read CleanStart's Privacy Policy detailing how personal and organizational data is collected, used, stored, and protected across its platform and services.";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const doc = await getLegalBySlug(PRIVACY_POLICY_SLUG).catch(() => null);
+  const doc = await getLegalBySlug(PRIVACY_POLICY_SLUG);
   if (!doc) {
     return buildPageMetadata({
       title: "Privacy Policy",
@@ -57,7 +57,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PrivacyPolicyPage(): Promise<React.ReactElement> {
-  const doc = await getLegalBySlug(PRIVACY_POLICY_SLUG).catch(() => null);
+  const doc = await getLegalBySlug(PRIVACY_POLICY_SLUG);
   if (!doc) notFound();
 
   const graph = await getPageGraph("/privacy-policy", [

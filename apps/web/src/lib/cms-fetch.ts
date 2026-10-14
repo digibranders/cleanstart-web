@@ -23,6 +23,13 @@ import { draftMode } from 'next/headers';
  * NOTE: Next.js redacts thrown-error details on the *client* error boundary in
  * production (only `digest` survives), so this mapping is best-effort there;
  * it is reliable in dev and anywhere the error is read server-side.
+ *
+ * Detail routes must let this propagate rather than catch it into
+ * `notFound()`. A thrown error makes the build retry the page and, if the CMS
+ * stays down, fail instead of publishing a 404; during ISR it keeps the last
+ * good page. Catching it once baked live pages as 404s whenever the CMS
+ * returned a transient 500 under prerender load. `get*BySlug` fetchers return
+ * null only when the CMS answered and no document matched.
  */
 export class CmsFetchError extends Error {
   readonly status: number;

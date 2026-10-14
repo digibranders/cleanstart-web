@@ -56,7 +56,7 @@ export async function generateMetadata({
   params,
 }: GuideDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const guide = await getGuideBySlug(slug).catch(() => null);
+  const guide = await getGuideBySlug(slug);
   if (!guide) {
     return buildPageMetadata({
       title: "Guide",
@@ -103,8 +103,8 @@ export async function renderGuideDetail({
   draft?: boolean;
 }): Promise<React.ReactElement> {
   const guide = draft
-    ? await getGuideBySlugDraft(slug).catch(() => null)
-    : await getGuideBySlug(slug).catch(() => null);
+    ? await getGuideBySlugDraft(slug)
+    : await getGuideBySlug(slug);
   if (!guide) notFound();
 
   const publishedAt = effectivePublishedAt(guide);

@@ -37,7 +37,7 @@ export async function generateMetadata({
   params,
 }: AuthorPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const author = await getAuthorBySlug(slug).catch(() => null);
+  const author = await getAuthorBySlug(slug);
 
   if (!author) {
     return buildPageMetadata({

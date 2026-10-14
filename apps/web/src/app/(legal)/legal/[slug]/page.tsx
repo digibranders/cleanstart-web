@@ -33,7 +33,7 @@ export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
 
 export async function generateMetadata({ params }: LegalPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const doc = await getLegalBySlug(slug).catch(() => null);
+  const doc = await getLegalBySlug(slug);
   if (!doc) {
     return buildPageMetadata({
       title: "Legal",
@@ -61,7 +61,7 @@ export default async function LegalDocumentPage({
   const { slug } = await params;
   // Privacy Policy keeps its pre-migration canonical URL.
   if (slug === PRIVACY_POLICY_SLUG) permanentRedirect("/privacy-policy");
-  const doc = await getLegalBySlug(slug).catch(() => null);
+  const doc = await getLegalBySlug(slug);
   if (!doc) notFound();
 
   // `<h1>` is kept as the FIRST child so the `.article-body > .article-h1:first-child`
@@ -91,8 +91,8 @@ export async function renderLegalDetail({
   draft?: boolean;
 }): Promise<React.ReactElement> {
   const doc = draft
-    ? await getLegalBySlugDraft(slug).catch(() => null)
-    : await getLegalBySlug(slug).catch(() => null);
+    ? await getLegalBySlugDraft(slug)
+    : await getLegalBySlug(slug);
   if (!doc) notFound();
 
   return (

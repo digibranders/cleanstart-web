@@ -64,7 +64,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const caseStudy = await getCaseStudyBySlug(slug).catch(() => null);
+  const caseStudy = await getCaseStudyBySlug(slug);
   if (!caseStudy) {
     return buildPageMetadata({
       title: "Case study",
@@ -109,7 +109,7 @@ export default async function CaseStudyDetailPage({
   const { slug } = await params;
 
   const [caseStudy, all] = await Promise.all([
-    getCaseStudyBySlug(slug).catch(() => null),
+    getCaseStudyBySlug(slug),
     getCaseStudies({ limit: 1000 })
       .then((r) => r.docs)
       .catch(() => []),
