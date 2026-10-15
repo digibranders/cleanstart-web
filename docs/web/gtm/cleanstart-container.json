@@ -759,6 +759,36 @@
             ]
           }
         }
+      },
+      {
+        "accountId": "0",
+        "containerId": "0",
+        "tagId": "13",
+        "name": "Microsoft Clarity",
+        "type": "html",
+        "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "html",
+            "value": "<script>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src=\"https://www.clarity.ms/tag/\"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,\"clarity\",\"script\",\"yy0yvdkhu6\");</script>"
+          },
+          {
+            "type": "BOOLEAN",
+            "key": "supportDocumentWrite",
+            "value": "false"
+          }
+        ],
+        "fingerprint": "0",
+        "firingTriggerId": [
+          "10"
+        ],
+        "tagFiringOption": "ONCE_PER_LOAD",
+        "monitoringMetadata": {
+          "type": "MAP"
+        },
+        "consentSettings": {
+          "consentStatus": "NOT_SET"
+        }
       }
     ],
     "trigger": [
