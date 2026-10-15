@@ -39,7 +39,7 @@ GTM owns the tags. Code owns four things GTM cannot do safely:
 |---|---|---|---|
 | Google Tag Manager | `GTM-TBDDZW9K` | `NEXT_PUBLIC_GTM_ID`, Vercel Production only. Tag config is version-controlled at `docs/web/gtm/cleanstart-container.json` | Every production page. The container itself sets no cookies. |
 | GA4 | `G-S6T47D7PZR` | GTM: Google tag on Initialization, plus one GA4 event tag per event | Every page. Consent Mode only, no extra GTM check, so GA4 stays unmodeled outside the EEA/UK/CH (business decision, 2026-07-22). |
-| Microsoft Clarity | not yet created | GTM: Custom HTML on `cs_consent_update` | `cs_consent_performance` is true |
+| Microsoft Clarity | `yy0yvdkhu6` | GTM: Custom HTML on `cs_consent_update` | `cs_consent_performance` is true |
 | Apollo.io | `691b73cb5443850011f553d1` | GTM: Custom HTML on `cs_consent_update` | `cs_consent_targeting` is true, plus a GTM `ad_storage` consent check |
 | Leadfeeder / Dealfront | `kn9Eq4RXRqJ8RlvP` | GTM: Custom HTML on `cs_consent_update` | `cs_consent_targeting` is true, plus a GTM `ad_storage` consent check |
 
