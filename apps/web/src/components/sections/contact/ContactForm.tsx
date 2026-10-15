@@ -235,7 +235,7 @@ export function ContactForm() {
                   />
                   <TextField
                     id="contact-email"
-                    label="Work Email"
+                    label="Email"
                     type="email"
                     required
                     autoComplete="email"

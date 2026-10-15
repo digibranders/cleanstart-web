@@ -270,7 +270,7 @@ export function DealRegistrationForm(): React.ReactElement {
             />
             <TextField
               id="deal-partnerRepEmail"
-              label="Work Email"
+              label="Email"
               type="email"
               required
               size="md"
@@ -341,7 +341,7 @@ export function DealRegistrationForm(): React.ReactElement {
             />
             <TextField
               id="deal-prospectEmail"
-              label="Work Email"
+              label="Email"
               type="email"
               required
               size="md"

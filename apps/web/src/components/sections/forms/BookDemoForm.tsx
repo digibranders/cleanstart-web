@@ -223,7 +223,7 @@ export function BookDemoForm(): React.ReactElement {
               <TextField
                 id="demo-email"
                 type="email"
-                label="Work Email"
+                label="Email"
                 required
                 autoComplete="email"
                 maxLength={254}
