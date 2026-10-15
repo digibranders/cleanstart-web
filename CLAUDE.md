@@ -172,7 +172,7 @@ Use the shared field components in `src/components/forms/`, never a per-form cop
 - `<TextField>` and `<PhoneField>` render on the one field surface (`field-surface.ts`) and put validation messages **inline underneath the field**. Native browser validation bubbles are not used: every public form is `noValidate`.
 - `<PhoneField>` is the only way to collect a phone number. It composes E.164 from a country selector plus a digits-only input, and the selected country is where the lead's country comes from — do not add a separate country field alongside it.
 - The country preselects from `useDetectedCountry()`, which reads Vercel's `x-vercel-ip-country` via `/api/geo` and falls back to the browser locale. It is a hint: never overwrite a country the visitor has already chosen.
-- Email validation goes through `emailError()` in `lib/forms/validate.ts`. Pass `requireBusiness: false` only where a personal address is legitimate (newsletter, gated downloads, job applications).
+- Email validation goes through `emailError()` in `lib/forms/validate.ts`. Free-mail addresses (gmail, outlook) are accepted on every public form since 2026-10-15; pass `requireBusiness: true` only if a form must reject them again, and tick `requireBusinessEmail` on the CMS form so the server agrees.
 - Client validation is fast feedback, not the gate. The API re-checks every rule and returns `issues[]`; map those back onto fields with `issuesToErrors()` so a server-only rejection still lands under the right input.
 
 ### Component structure

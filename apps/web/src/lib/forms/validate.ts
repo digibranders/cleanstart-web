@@ -32,12 +32,12 @@ export const optionalText = (
 };
 
 /**
- * @param requireBusiness pass false on the forms that legitimately accept a
- *        personal address (newsletter, gated downloads, job applications).
+ * @param requireBusiness pass true to reject free-mail addresses (gmail,
+ *        outlook and the like). Every public form accepts them today.
  */
 export const emailError = (
   value: string,
-  { requireBusiness = true }: { requireBusiness?: boolean } = {},
+  { requireBusiness = false }: { requireBusiness?: boolean } = {},
 ): string | null => {
   const result = validateBusinessEmail(value, {
     freeDomains: COMMON_FREE_EMAIL_DOMAINS,
