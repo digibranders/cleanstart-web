@@ -95,6 +95,13 @@ describe('buildCsp', () => {
     expect(d['script-src']).toContain('https://assets.apollo.io');
   });
 
+  it('allows the Apollo intent-pixel domain in connect-src', () => {
+    // The tracker calls aplo-evnt.com, not apollo.io; without it the
+    // intent_pixel requests are blocked and Apollo sees no visitor data.
+    const d = parse(buildCsp(base));
+    expect(d['connect-src']).toContain('https://aplo-evnt.com');
+  });
+
   it('allows the Microsoft Clarity hosts in connect-src and img-src', () => {
     const d = parse(buildCsp(base));
     expect(d['connect-src']).toContain('https://*.clarity.ms');

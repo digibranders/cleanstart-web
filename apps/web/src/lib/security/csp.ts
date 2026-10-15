@@ -29,6 +29,9 @@ const LEADFEEDER = 'https://*.lfeeder.com';
 // APOLLO_SCRIPTS); the tracker beacons + pixels back to *.apollo.io.
 const APOLLO = 'https://*.apollo.io';
 const APOLLO_SCRIPTS = 'https://assets.apollo.io';
+// The tracker's visitor-intent calls go to this separate domain, not to
+// apollo.io, so without it every intent_pixel request is CSP-blocked.
+const APOLLO_INTENT = 'https://aplo-evnt.com';
 // Microsoft Clarity, fired from GTM: loader is www.clarity.ms (covered by
 // this wildcard in script-src); the recorder uploads to *.clarity.ms and syncs identity
 // through c.bing.com by both fetch and pixel.
@@ -148,6 +151,7 @@ export function buildCsp({
     GA4_REGION,
     LEADFEEDER,
     APOLLO,
+    APOLLO_INTENT,
     CLARITY,
     CLARITY_SYNC,
   ];
