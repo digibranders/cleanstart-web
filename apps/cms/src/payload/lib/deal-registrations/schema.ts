@@ -6,7 +6,7 @@ import { emailField, optionalPhoneField } from '../form-field-schemas';
 const person = z.object({
   firstName: z.string().min(1).max(120),
   lastName: z.string().min(1).max(120),
-  email: emailField({ requireBusiness: true }),
+  email: emailField({ requireBusiness: false }),
   phone: optionalPhoneField(),
 });
 

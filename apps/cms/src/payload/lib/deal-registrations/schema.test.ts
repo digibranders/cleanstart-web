@@ -34,12 +34,17 @@ describe('dealRegistrationSchema', () => {
   });
 });
 
-describe('dealRegistrationSchema — company email and E.164 phone', () => {
-  it('rejects a free-mail address on either person', () => {
-    const badRep = { ...valid, partnerRep: { ...valid.partnerRep, email: 'jane@gmail.com' } };
-    expect(dealRegistrationSchema.safeParse(badRep).success).toBe(false);
-    const badProspect = { ...valid, prospect: { ...valid.prospect, email: 'sam@yahoo.com' } };
-    expect(dealRegistrationSchema.safeParse(badProspect).success).toBe(false);
+describe('dealRegistrationSchema — email and E.164 phone', () => {
+  it('accepts a free-mail address on either person', () => {
+    const rep = { ...valid, partnerRep: { ...valid.partnerRep, email: 'jane@gmail.com' } };
+    expect(dealRegistrationSchema.safeParse(rep).success).toBe(true);
+    const prospect = { ...valid, prospect: { ...valid.prospect, email: 'sam@yahoo.com' } };
+    expect(dealRegistrationSchema.safeParse(prospect).success).toBe(true);
+  });
+
+  it('rejects a malformed email', () => {
+    const bad = { ...valid, prospect: { ...valid.prospect, email: 'not-an-email' } };
+    expect(dealRegistrationSchema.safeParse(bad).success).toBe(false);
   });
 
   it('rejects a phone that is not E.164', () => {
