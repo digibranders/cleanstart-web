@@ -105,6 +105,20 @@ session and replace the lead's last-touch campaign. GA4 still records them in
 The GA4 property's Enhanced Measurement "page changes based on browser history
 events" toggle must stay OFF, or every SPA navigation counts twice.
 
+## Install history
+
+Every tag change on the site, newest first. Add a row in the same change that
+installs, removes or re-points a tag, with the PR that carried the docs.
+
+| Date | Change | Where | PR |
+|---|---|---|---|
+| 2026-10-15 | Apollo.io `aplo-evnt.com` added to CSP `connect-src`. The tracker's intent_pixel calls had been blocked since the GTM migration, so the script loaded but reported no visitor intent. | Code (`csp.ts`) | #302 |
+| 2026-10-15 | Microsoft Clarity `yy0yvdkhu6` installed as a Custom HTML tag on `CE - consent performance granted`, once per page. No code change: the CSP hosts were already allow-listed. | GTM container version 3 | #301 |
+| 2026-09-21 | GA4, Apollo.io and Leadfeeder moved out of React components into GTM container `GTM-TBDDZW9K`. Added the Google tag, nine GA4 event tags, the `cs_consent_update` consent event and its triggers. Deleted `Ga4HeadScript`, `ApolloScript`, `LeadfeederScript` and their id resolvers. | Code + GTM container version 2 | #271 |
+
+Before 2026-09-21 every tag was mounted directly in React. That history is in
+`git log` for `apps/web/src/components/analytics/`.
+
 ## Adding a tag
 
 1. Add the vendor's hosts to `lib/security/csp.ts` with a test in
@@ -113,7 +127,9 @@ events" toggle must stay OFF, or every SPA navigation counts twice.
    `cs_consent_update` with a condition on the right category flag, never on
    "All Pages".
 3. Verify it in GTM Preview against www.cleanstart.com.
-4. Unpause, publish, and add a row to the table above.
+4. Unpause, publish, then update both the Live tags table and the Install
+   history table above, and the container copy at
+   `docs/web/gtm/cleanstart-container.json`.
 
 ## Adding an event or parameter
 
