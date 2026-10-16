@@ -94,6 +94,7 @@ pnpm --filter @cleanstart/cms verify:page-registry
 pnpm --filter @cleanstart/web lint
 pnpm --filter @cleanstart/web typecheck
 pnpm --filter @cleanstart/web build
+pnpm --filter @cleanstart/web verify:copy   # after build: no em/en-dashes in code-owned copy
 ```
 
 1. Fix before reporting — if lint/typecheck/build fails, fix and re-run.

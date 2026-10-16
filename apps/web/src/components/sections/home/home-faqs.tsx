@@ -43,7 +43,7 @@ export const LEFT_FAQS: FaqItem[] = [
   {
     id: "customize",
     q: "Can I customize CleanStart images for my applications?",
-    a: "Yes — CleanStart provides curated base images, allowing you to securely build custom containers that match your unique application needs while maintaining a minimal, secure footprint.",
+    a: "Yes, CleanStart provides curated base images, allowing you to securely build custom containers that match your unique application needs while maintaining a minimal, secure footprint.",
   },
 ];
 
@@ -61,7 +61,7 @@ export const RIGHT_FAQS: FaqItem[] = [
   {
     id: "compliance",
     q: "Does CleanStart support compliance frameworks like FIPS or NIST?",
-    a: "Yes — CleanStart maintains a dedicated set of FIPS-compliant container images for industries with strict security and compliance requirements.",
+    a: "Yes, CleanStart maintains a dedicated set of FIPS-compliant container images for industries with strict security and compliance requirements.",
   },
 ];
 

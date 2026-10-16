@@ -39,7 +39,7 @@ export function AuthorDetails({
                         style={{ color: "rgba(17,17,17,0.55)" }}
                       >
                         {e.fromYear ?? ""}
-                        {e.fromYear && (e.toYear ?? "Present") ? " – " : ""}
+                        {e.fromYear && (e.toYear ?? "Present") ? " to " : ""}
                         {e.toYear ?? (e.fromYear ? "Present" : "")}
                       </span>
                     )}
