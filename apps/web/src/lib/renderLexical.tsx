@@ -232,7 +232,13 @@ function renderNode(node: LexicalNode, key: string): React.ReactNode {
       const lNode = node as Extract<LexicalNode, { type: "list" }>;
       const Tag = lNode.listType === "number" ? "ol" : "ul";
       return (
-        <Tag key={key} className={`article-${Tag}`}>
+        <Tag
+          key={key}
+          className={`article-${Tag}`}
+          // Editors split numbered sections into one list per heading; `start`
+          // carries the running number, without it every section renders "1.".
+          start={Tag === "ol" ? lNode.start : undefined}
+        >
           {(lNode.children ?? []).map((item, i) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: Lexical list items have no stable id
             <li key={`${key}-li-${i}`} className="article-li">
