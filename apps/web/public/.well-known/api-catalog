@@ -6,7 +6,7 @@
         {
           "href": "/api/search",
           "type": "application/json",
-          "title": "CleanStart content search — GET ?q=<query>&type=<collection>&limit=<n> returns JSON hits"
+          "title": "CleanStart content search: GET ?q=<query>&type=<collection>&limit=<n> returns JSON hits"
         }
       ],
       "status": [

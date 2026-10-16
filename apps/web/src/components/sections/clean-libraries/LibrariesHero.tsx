@@ -161,8 +161,8 @@ export function LibrariesHero(): React.ReactElement {
                   aria-controls={VIDEO_PANEL_ID}
                   aria-label={
                     videoOpen
-                      ? "Back to Overview — hide the Clean Libraries product video"
-                      : "See It in Action — play the Clean Libraries product video"
+                      ? "Back to Overview: hide the Clean Libraries product video"
+                      : "See It in Action: play the Clean Libraries product video"
                   }
                   className="cs-btn-ghost"
                 >

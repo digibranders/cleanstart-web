@@ -46,13 +46,13 @@ const STACKS: StackCardData[] = [
     id: 'python',
     name: 'python',
     logoUrl: deviconLogo('python', 'original'),
-    description: 'Minimal, hardened Python runtime — FIPS-ready and free of CVE-laden tooling.',
+    description: 'Minimal, hardened Python runtime, FIPS-ready and free of CVE-laden tooling.',
   },
   {
     id: 'node',
     name: 'node',
     logoUrl: deviconLogo('nodejs', 'original'),
-    description: 'Hardened Node.js base for production apps — no dev shells, no extra packages.',
+    description: 'Hardened Node.js base for production apps, no dev shells, no extra packages.',
   },
   {
     id: 'redis',
@@ -76,7 +76,7 @@ const STACKS: StackCardData[] = [
     id: 'nginx',
     name: 'nginx',
     logoUrl: deviconLogo('nginx', 'original'),
-    description: 'NGINX without the kitchen sink — just the proxy you actually run.',
+    description: 'NGINX without the kitchen sink: just the proxy you actually run.',
     // nginx-original.svg has heavy top/bottom whitespace; scale up so the
     // hexagon+wordmark fills the plate, plate's overflow:hidden crops the rest.
     logoScale: 1.55,
@@ -97,7 +97,7 @@ const STACKS: StackCardData[] = [
     id: 'rust',
     name: 'rust',
     logoUrl: deviconLogo('rust', 'original'),
-    description: 'Rust toolchain image — fast, hardened, ready to drop into your CI.',
+    description: 'Rust toolchain image: fast, hardened, ready to drop into your CI.',
   },
   {
     id: 'ruby',

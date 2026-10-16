@@ -1,5 +1,5 @@
 # CleanStart
-> CleanStart provides hardened, near-zero CVE container base images and a software supply chain security platform — helping engineering and security teams ship trusted software faster.
+> CleanStart provides hardened, near-zero CVE container base images and a software supply chain security platform, helping engineering and security teams ship trusted software faster.
 
 ## Product Pages
 - [CleanStart Images](https://www.cleanstart.com/cleanstart-images): Pre-built, hardened container base images with near-zero CVEs and automatic versioned updates.
@@ -9,7 +9,7 @@
 - [Attack Surface Reduction](https://www.cleanstart.com/attack-surface-reduction): Shrink your container attack surface by removing unnecessary packages and layers.
 - [Vulnerability Remediation](https://www.cleanstart.com/vulnerability-remediation): Automated CVE remediation workflows for container images.
 - [Clean Libraries](https://www.cleanstart.com/clean-libraries): Hardened open-source library builds with security patches backported.
-- [Tricorder](https://www.cleanstart.com/tricorder): The intelligence layer behind CleanStart — behavioral analysis, package history, cross-package correlation and threat intelligence combined into an evidence-backed verdict for every component.
+- [Tricorder](https://www.cleanstart.com/tricorder): The intelligence layer behind CleanStart: behavioral analysis, package history, cross-package correlation and threat intelligence combined into an evidence-backed verdict for every component.
 
 ## Comparisons
 - [Compare CleanStart](https://www.cleanstart.com/compare): Hub for the side-by-side comparisons, and how they are sourced and dated.
@@ -19,7 +19,7 @@
 
 ## Solutions by Role
 - [For CISOs](https://www.cleanstart.com/for-ciso): Executive-level container security posture, compliance reporting, and risk reduction metrics.
-- [For Developers](https://www.cleanstart.com/for-developers): Drop-in hardened base images with zero workflow changes — fewer CVEs, faster builds.
+- [For Developers](https://www.cleanstart.com/for-developers): Drop-in hardened base images with zero workflow changes, with fewer CVEs, faster builds.
 
 ## Company
 - [About CleanStart](https://www.cleanstart.com/about-us): Mission, team, and the story behind the platform.
@@ -35,7 +35,7 @@
 - [Newsroom](https://www.cleanstart.com/news): Press releases, product launches, and company milestones.
 - [Events](https://www.cleanstart.com/events): DevSecOps and cybersecurity conference appearances and meetups.
 - [Webinars](https://www.cleanstart.com/webinars): On-demand and upcoming webinars on container security topics.
-- [Podcast](https://www.cleanstart.com/podcast): Leadership Exchange — industry leaders on container security and software supply chain risk.
+- [Podcast](https://www.cleanstart.com/podcast): Leadership Exchange: industry leaders on container security and software supply chain risk.
 - [Knowledge Hub](https://www.cleanstart.com/knowledge-hub): Academy-style articles covering container fundamentals through advanced supply chain security.
 
 ## Legal & Trust

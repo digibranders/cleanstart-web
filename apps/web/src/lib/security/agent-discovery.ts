@@ -67,7 +67,7 @@ export const API_CATALOG: { linkset: LinkSetContext[] } = {
           href: SEARCH_API_PATH,
           type: "application/json",
           title:
-            "CleanStart content search — GET ?q=<query>&type=<collection>&limit=<n> returns JSON hits",
+            "CleanStart content search: GET ?q=<query>&type=<collection>&limit=<n> returns JSON hits",
         },
       ],
       status: [

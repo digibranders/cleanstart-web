@@ -257,7 +257,7 @@ export function LivePostureReport() {
         {/* The panel */}
         <div
           role="img"
-          aria-label="CleanSight posture report: CleanStart-verified images sharply cut CVE counts — postgres 195 to 4, nginx 104 to 0, alertmanager 46 to 0 — all signed with SBOM, Cosign and SPDX 3.0 at SLSA Level 3."
+          aria-label="CleanSight posture report: CleanStart-verified images sharply cut CVE counts: postgres 195 to 4, nginx 104 to 0, alertmanager 46 to 0. All signed with SBOM, Cosign and SPDX 3.0 at SLSA Level 3."
           className="cs-lpr relative overflow-hidden rounded-[16px]"
           style={{
             containerType: "inline-size",

@@ -100,7 +100,7 @@ export function JobCard({ job }: JobCardProps): React.ReactElement {
               lineHeight: 1.35,
             }}
           >
-            {experience ?? "—"}
+            {experience ?? "Not specified"}
           </span>
         </div>
 

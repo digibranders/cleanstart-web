@@ -22,7 +22,7 @@ export const PARTNER_TESTIMONIALS: PartnerQuote[] = [
     name: "Shaq Khan",
     role: "Founder & CEO, Fortfire (US)",
     quote:
-      "In security, clean starts are rare but game-changing when they happen. That's why we're excited to partner with CleanStart. CleanStart™ flips the script with container and VM images that ship zero critical CVEs, fully hardened and compliance-ready. No patching marathons. No day-zero panic. Just secure infrastructure, from the jump. For modern builders, CleanStart isn't just a product — it's peace of mind baked into your pipeline. Fortfire is all-in on helping teams ship faster, safer, and smarter. CleanStart makes that possible.",
+      "In security, clean starts are rare but game-changing when they happen. That's why we're excited to partner with CleanStart. CleanStart™ flips the script with container and VM images that ship zero critical CVEs, fully hardened and compliance-ready. No patching marathons. No day-zero panic. Just secure infrastructure, from the jump. For modern builders, CleanStart isn't just a product, it's peace of mind baked into your pipeline. Fortfire is all-in on helping teams ship faster, safer, and smarter. CleanStart makes that possible.",
   },
   {
     name: "Kimmo Vesajoki",
