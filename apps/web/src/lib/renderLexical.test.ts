@@ -53,6 +53,46 @@ describe("RenderLexical links", () => {
   });
 });
 
+describe("RenderLexical numbered lists", () => {
+  const listDoc = (start?: number): LexicalRoot => ({
+    root: {
+      type: "root",
+      direction: null,
+      format: "",
+      indent: 0,
+      version: 1,
+      children: [
+        {
+          type: "list",
+          listType: "number",
+          start,
+          version: 1,
+          children: [
+            {
+              type: "listitem",
+              value: start ?? 1,
+              version: 1,
+              children: [{ type: "text", text: "Section", format: 0, version: 1 }],
+            },
+          ],
+        },
+      ],
+    },
+  });
+
+  const render = (start?: number): string =>
+    renderToStaticMarkup(createElement(RenderLexical, { content: listDoc(start) }));
+
+  // Legal docs split "1. DEFINITIONS", "2. ..." into one list per heading.
+  it("continues numbering from the list's start value", () => {
+    expect(render(2)).toMatch(/<ol[^>]*start="2"/);
+  });
+
+  it("omits start when the list has none", () => {
+    expect(render()).not.toMatch(/start=/);
+  });
+});
+
 describe("resolveLexicalLink", () => {
   it("treats www.cleanstart.com absolute URLs as internal and strips to a path", () => {
     const r = resolveLexicalLink("https://www.cleanstart.com/guide/container-runtime");

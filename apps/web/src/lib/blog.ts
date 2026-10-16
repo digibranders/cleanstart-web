@@ -85,6 +85,7 @@ export type LexicalListItemNode = {
 export type LexicalListNode = {
   type: "list";
   listType: "bullet" | "number" | "check";
+  start?: number;
   children: LexicalListItemNode[];
   version: number;
 };
