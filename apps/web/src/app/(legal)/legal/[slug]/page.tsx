@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: LegalPageProps): Promise<Meta
   const seo = resolveCmsSeo(doc.seo, { absolutize: absolutizeCmsUrl });
   return buildPageMetadata({
     title: seo.title ?? doc.title,
-    description: seo.description ?? `${doc.title} — CleanStart legal documents.`,
+    description: seo.description ?? `${doc.title} for CleanStart products and services.`,
     path: `/legal/${doc.slug}`,
     type: "article",
     publishedTime: legalEffectiveDate(doc),
