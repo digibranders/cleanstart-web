@@ -18,7 +18,7 @@ export function NewsDetailBody({ item }: NewsDetailBodyProps): React.ReactElemen
   const datelinePieces: string[] = [];
   if (item.location) datelinePieces.push(item.location);
   if (item.publicationDate) datelinePieces.push(formatNewsDate(item.publicationDate));
-  const dateline = datelinePieces.join(" — ");
+  const dateline = datelinePieces.join(", ");
 
   return (
     <section

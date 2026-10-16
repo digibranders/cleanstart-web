@@ -41,7 +41,7 @@ export default async function CleanLibrariesPage(): Promise<React.ReactElement> 
     softwareApplicationSchema({
       name: "Clean Libraries",
       description:
-        "Discover, validate, and govern every software dependency — including AI-introduced libraries — across the development lifecycle, with policy enforcement built into existing CI/CD and registries.",
+        "Discover, validate, and govern every software dependency, including AI-introduced libraries, across the development lifecycle, with policy enforcement built into existing CI/CD and registries.",
       path: "/clean-libraries",
     }),
     videoObjectSchema({

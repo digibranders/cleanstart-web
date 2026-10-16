@@ -17,7 +17,9 @@
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium",
     "test:e2e:ui": "playwright test --ui",
-    "bundle:budget": "node scripts/bundle-budget.mjs"
+    "bundle:budget": "node scripts/bundle-budget.mjs",
+    "verify:copy": "node scripts/verify-copy.mjs",
+    "cms:dash-report": "node scripts/cms-dash-report.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
