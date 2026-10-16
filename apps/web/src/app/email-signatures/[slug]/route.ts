@@ -102,7 +102,7 @@ export async function GET(
     '<meta charset="utf-8" />',
     '<meta name="viewport" content="width=device-width, initial-scale=1.0" />',
     '<meta name="robots" content="noindex, nofollow" />',
-    `<title>${escapeHtml(signature.name)} — Email signature</title>`,
+    `<title>${escapeHtml(signature.name)} | Email signature</title>`,
     FONT_LINKS,
     "</head>",
     "<body>",
