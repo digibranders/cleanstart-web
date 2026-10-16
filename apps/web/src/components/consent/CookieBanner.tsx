@@ -245,7 +245,7 @@ export function CookieBanner() {
             advertising and analytics partners. If we have detected an opt-out
             preference signal then it will be honored. By clicking Allow All, you
             understand that CleanStart and third-party partners use technology,
-            including cookies, to — among other things — view and retain your site
+            including cookies, to (among other things) view and retain your site
             interactions, improve your experience and help us advertise. Further
             information is available in our{" "}
             {/* Deep-links to the "Information We Collect Automatically" section.

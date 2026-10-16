@@ -46,7 +46,7 @@ export async function generateMetadata({
     description:
       seo.description ??
       article.abstract ??
-      `${article.title} — CleanStart Knowledge Hub.`,
+      `${article.title}: CleanStart Knowledge Hub.`,
     path: `/knowledge-hub/${slug}`,
     eyebrow: article.category?.name ?? 'Knowledge Hub',
     type: 'article',

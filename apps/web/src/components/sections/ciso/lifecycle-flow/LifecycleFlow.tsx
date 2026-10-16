@@ -658,7 +658,7 @@ export function LifecycleFlow(): React.ReactElement {
     <div
       role="img"
       className="w-full"
-      aria-label="Interconnected software ecosystem diagram. Risk sources — open source, AI-generated code, and third-party dependencies — converge into a connected ecosystem of code repositories, build systems, a central artifact registry, deployments, and runtime workloads, then surface as operational impact: compliance drift, operational exposure, and vulnerable workloads. A continuous governance layer underpins it with continuous visibility, provenance and integrity, policy enforcement, and compliance evidence."
+      aria-label="Interconnected software ecosystem diagram. Risk sources (open source, AI-generated code, and third-party dependencies) converge into a connected ecosystem of code repositories, build systems, a central artifact registry, deployments, and runtime workloads, then surface as operational impact: compliance drift, operational exposure, and vulnerable workloads. A continuous governance layer underpins it with continuous visibility, provenance and integrity, policy enforcement, and compliance evidence."
     >
       <FlowCanvas />
     </div>

@@ -11,7 +11,7 @@ const LABELS: Record<CopyState, string> = {
   idle: "Copy signature",
   copying: "Copying…",
   copied: "Copied",
-  error: "Copy failed — open instead",
+  error: "Copy failed, open instead",
 };
 
 /**

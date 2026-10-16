@@ -93,6 +93,11 @@ jobs:
           SENTRY_ORG: ${{ vars.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ vars.SENTRY_WEB_PROJECT }}
 
+      - name: Copy gate (no em/en-dashes in code-owned copy)
+        run: |
+          node --test apps/web/scripts/verify-copy.test.mjs
+          pnpm --filter @cleanstart/web verify:copy
+
       - name: Capture build size
         if: always()
         run: |

@@ -105,7 +105,7 @@ export function HeroAwardSlide(): React.ReactElement {
               letterSpacing: "-0.02em",
             }}
           >
-            By The Hacker News — recognizing excellence in software supply chain
+            By The Hacker News, recognizing excellence in software supply chain
             security.
           </p>
         </HeroReveal>
@@ -163,7 +163,7 @@ export function HeroAwardSlide(): React.ReactElement {
       >
         <div
           role="img"
-          aria-label="CleanStart — Winner of the 2026 Cybersecurity Stars Awards by The Hacker News"
+          aria-label="CleanStart: Winner of the 2026 Cybersecurity Stars Awards by The Hacker News"
           className="aspect-square w-full max-w-[440px] bg-contain bg-center bg-no-repeat drop-shadow-[0_24px_60px_rgba(100,13,251,0.35)]"
           style={{ backgroundImage: "url('/images/home/award-winner-2026.webp')" }}
         />

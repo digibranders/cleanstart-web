@@ -102,14 +102,14 @@ const PLACEHOLDER_ARTICLES_BY_TAB: ResourceCardsByTab = {
       image: "/images/resource-2.webp",
       title: "Annual State of Container Security Report Released",
       description:
-        "Our 2026 industry report finds 78% of breaches start at the container base image — and how leading teams are fighting back.",
+        "Our 2026 industry report finds 78% of breaches start at the container base image, and how leading teams are fighting back.",
       href: "#news-report",
     },
   ],
   events: [
     {
       image: "/images/resource-1.webp",
-      title: "KubeCon + CloudNativeCon NA 2026 — Booth #S42",
+      title: "KubeCon + CloudNativeCon NA 2026, Booth #S42",
       description:
         "Live demos of CleanStart's continuous-rebuild pipeline. Drop by for a one-on-one walkthrough or a CleanStart sticker.",
       href: "#event-kubecon",
@@ -120,7 +120,7 @@ const PLACEHOLDER_ARTICLES_BY_TAB: ResourceCardsByTab = {
       image: "/images/resource-2.webp",
       title: "Webinar: Eliminating Zero-Days at the Base Image",
       description:
-        "Join our security team for a 45-minute deep dive on shifting CVE remediation left to where it belongs — the source.",
+        "Join our security team for a 45-minute deep dive on shifting CVE remediation left to where it belongs: the source.",
       href: "#event-webinar",
       dateLabel: "12 Mar 2026",
       location: "Online",

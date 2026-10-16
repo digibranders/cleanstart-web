@@ -97,7 +97,7 @@ export function resolvedLocations(job: JobDisplayFields): JobLocation[] {
 
 export function locationDisplay(job: JobDisplayFields): string {
   const locs = resolvedLocations(job);
-  if (locs.length === 0) return job.remote ? "Remote (Global)" : "—";
+  if (locs.length === 0) return job.remote ? "Remote (Global)" : "Not specified";
   return locs.map((l) => l.name).join(", ");
 }
 

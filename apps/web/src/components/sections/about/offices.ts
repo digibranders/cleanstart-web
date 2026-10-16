@@ -33,7 +33,7 @@ export const OFFICES: Office[] = [
     country: "India",
     role: "India (Bengaluru)",
     address:
-      "Bhive Platinum Address Maker, 114/5, Old Madras Road, Halasuru, Bengaluru, Karnataka, India – 560008",
+      "Bhive Platinum Address Maker, 114/5, Old Madras Road, Halasuru, Bengaluru, Karnataka, India, 560008",
     color: "cyan",
     coordinates: [77.6, 13.0],
     imageSrc: "/images/about/global/landmark-bengaluru.webp",
