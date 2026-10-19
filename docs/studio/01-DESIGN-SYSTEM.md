@@ -93,6 +93,10 @@ The sign-in brand panel (§7.7) reuses the website's canonical dark band so the 
 | `--brand-glow-violet` | `rgb(106 61 240 / 0.45)` |
 | `--brand-glow-blue` | `rgb(7 110 255 / 0.35)` |
 | `--brand-glow-pink` | `rgb(223 155 255 / 0.25)` |
+| `--brand-ink` | `#131e8f` (text on the lit chip) |
+| `--brand-accent` | `#df9bff` (the full stop after the rolling word) |
+| `--brand-chip` | `rgb(255 255 255 / 0.08)` |
+| `--brand-chip-text` | `rgb(255 255 255 / 0.78)` |
 
 ## 3. Typography
 
@@ -225,7 +229,7 @@ Allowed motion only:
 - Drawer and rail: slide on the x axis.
 - Toast: slide up and fade, exit by fade.
 - Sheet: one 10px rise and fade when a page first mounts (560ms). Never on client-side navigation inside the sheet.
-- Sign-in brand panel: the activity cards drift 8px on a 9s alternate loop. The only looping motion in Studio.
+- Sign-in brand panel: the headline word rolls up one line every 2.4s (a 14.4s loop of six words) and the matching chip lights in sync; the glows drift slowly. The only looping motion in Studio. Under reduced motion it holds on the first word.
 - Press: `scale(0.98)` on buttons.
 - Skeleton: one slow opacity pulse (1.6s), no shimmer.
 
@@ -329,12 +333,13 @@ All overlays restyle the `packages/ui` primitives (native `<dialog>` and anchore
 
 ### 7.7 Sign-in brand panel
 
-The sign-in, forgot-password and reset-password screens use one split layout (S-01 to S-03):
+The sign-in, forgot-password and reset-password screens use one split layout (S-01 to S-03). The panel's job is to say what Studio is for, in one glance:
 
-- Left: the form side on `--bg-surface`. Brand row top-left (mark plus "CleanStart Studio"), the form centred in a 360px column, a footer line bottom-left. No card around the form.
-- Right: a 776px brand panel at `--radius-lg`, inset 8px, filled with `--brand-band`. On it, in this order from the back: three blurred glows (`--brand-glow-*`), the website's faded hero grid (`apps/web/public/images/cleanstart-images/hero-vector-grid.svg`, copied into `apps/cms/public/studio/`), the white brand mark and wordmark top-left, a stack of three glass activity cards (Scheduled, Published, Review requested) that drift slowly, and a headline with one sentence bottom-left.
-- The panel is `aria-hidden` and carries fixed illustrative copy; it never shows real content to a signed-out visitor. Its headline uses `--type-brand` (34/40, 600, -0.035em), the only place that size appears.
-- Below 1100px wide the panel is hidden and the form side fills the window.
+- Left: the form side on `--bg-surface`. Brand row top-left (mark plus "CleanStart Studio"), the form centred in a 360px column, a footer line bottom-left. No card around the form. Heading "Welcome back" (`--type-display`) with "Sign in with your CleanStart work account." below.
+- Right: a 776px brand panel at `--radius-lg`, inset 8px, filled with `--brand-band`, with three blurred glows (`--brand-glow-*`) and the website's faded hero grid (`apps/web/public/images/cleanstart-images/hero-vector-grid.svg`, copied into `apps/cms/public/studio/`) behind the content.
+- Panel content, top to bottom: the white brand mark and "CleanStart"; then a kinetic headline in `--type-brand` (76/92, 600, -0.045em): "Write the next" in white at 60%, and below it a one-line slot that rolls through the content types Studio publishes ("blog post", "guide", "case study", "webinar", "press release", "podcast episode"), each followed by a full stop in `--brand-accent`; then one sentence, "Studio is where every page on cleanstart.com is written, reviewed and published."; then, pinned to the bottom, a row of six chips naming the same types, with the chip of the word on screen lit (white with `--brand-ink` text).
+- Motion: each word holds for 1.8s, then rolls up one line in 0.6s on `--ease-out`; the slot fades its top and bottom edges with a mask so words slide in and out of view. The chips change in step. Glows drift slowly. On mount, the panel copy and the form stagger in (fade and 14px rise), and an invalid field shakes once to mark the error.
+- The panel is `aria-hidden` and carries fixed copy; it never shows real content to a signed-out visitor. Below 1100px wide it is hidden and the form side fills the window.
 
 ## 8. Content and copy rules
 

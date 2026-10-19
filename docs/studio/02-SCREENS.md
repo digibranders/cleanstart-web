@@ -93,9 +93,9 @@ Scoping rule (mirrors `lib/wire-scoped-nav.ts:59-148`): a user whose roles are o
 
 **Replaces:** Payload login plus `CmsLoginHero`, `CmsLoginFooter`.
 
-**Layout:** split (design system §7.7). Left: form side on `--bg-surface`, brand row top-left, form centred in 360px, footer line bottom-left. Right: 776px brand panel inset 8px with the website's dark band, faded hero grid, white mark, three drifting glass activity cards and the headline "Every page on cleanstart.com starts here." with "Write, review and publish blogs, guides, events and resources from one workspace." The panel is decorative (`aria-hidden`) and hidden below 1100px. S-02 and S-03 use the same layout.
+**Layout:** split (design system §7.7). Left: form side on `--bg-surface`, brand row top-left, form centred in 360px, footer line bottom-left. Right: 776px brand panel inset 8px with the website's dark band and faded hero grid, the white mark, and a kinetic headline: "Write the next" over a slot that rolls through "blog post", "guide", "case study", "webinar", "press release" and "podcast episode" every 2.4s, the sentence "Studio is where every page on cleanstart.com is written, reviewed and published.", and a bottom row of chips for the same six types that lights in step with the word. The panel is decorative (`aria-hidden`), holds on the first word under reduced motion, and is hidden below 1100px. S-02 and S-03 use the same layout.
 
-**Content:** title "Sign in" (`--type-display`) with "Use your CleanStart work account." below; Email; Password (show/hide toggle); "Forgot password?" link; primary "Sign in" (ink, 40px, full width); footer line "Need access? Ask an admin." with the help contact used by `CmsLoginFooter`.
+**Content:** title "Welcome back" (`--type-display`) with "Sign in with your CleanStart work account." below; Email; Password (show/hide toggle); "Forgot password?" link; primary "Sign in" (ink, 40px, full width); footer line "Need access? Ask an admin." with the help contact used by `CmsLoginFooter`.
 
 **REST:** `POST /api/users/login` with `{ email, password }`. On success redirect to `?next=` (same-origin paths only) or `/studio`.
 

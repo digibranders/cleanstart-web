@@ -338,6 +338,10 @@ Expected: PASS (5 tests).
   --brand-glow-violet: rgb(106 61 240 / 0.45);
   --brand-glow-blue: rgb(7 110 255 / 0.35);
   --brand-glow-pink: rgb(223 155 255 / 0.25);
+  --brand-ink: #131e8f;
+  --brand-accent: #df9bff;
+  --brand-chip: rgb(255 255 255 / 0.08);
+  --brand-chip-text: rgb(255 255 255 / 0.78);
 }
 
 :root[data-theme='dark'],
@@ -507,10 +511,10 @@ Replace `apps/cms/src/studio/styles/studio.css` with:
   --text-doc-h4--line-height: 24px;
   --text-doc-h4--font-weight: 600;
   --text-doc-h4--letter-spacing: -0.01em;
-  --text-brand: 34px;
-  --text-brand--line-height: 40px;
+  --text-brand: 76px;
+  --text-brand--line-height: 92px;
   --text-brand--font-weight: 600;
-  --text-brand--letter-spacing: -0.035em;
+  --text-brand--letter-spacing: -0.045em;
 }
 
 @theme inline {
@@ -5959,64 +5963,87 @@ Expected: `image/svg+xml`.
 `apps/cms/src/studio/features/auth/BrandPanel.tsx` (design system §7.7; decorative, so it is hidden from assistive tech and shows fixed copy, never real content):
 
 ```tsx
-import { ChatCircle, CheckCircle, Clock } from '@phosphor-icons/react/dist/ssr';
-import type { ReactElement, ReactNode } from 'react';
+import type { ReactElement } from 'react';
 
 import { Icon } from '@/payload/admin/Icon';
 
-function ActivityCard({ icon, kicker, title, meta, className }: { readonly icon: ReactNode; readonly kicker: string; readonly title: string; readonly meta?: string; readonly className: string }): ReactElement {
-  return (
-    <div className={`studio-drift absolute w-95 rounded-lg bg-white/6 p-1.5 shadow-dialog ring-1 ring-white/10 backdrop-blur-lg ${className}`}>
-      <div className="flex flex-col gap-2 rounded-md bg-black/40 px-4 py-3.5">
-        <span className="flex items-center gap-2 text-small text-white/70">
-          {icon}
-          {kicker}
-        </span>
-        <span className="text-body-strong text-white">{title}</span>
-        {meta ? <span className="text-small text-white/65">{meta}</span> : null}
-      </div>
-    </div>
-  );
-}
+// The content types Studio publishes, in roll order. The roll and the chip highlights are timed for
+// exactly six entries in primitives.css; change both together.
+const KINDS = ['blog post', 'guide', 'case study', 'webinar', 'press release', 'podcast episode'] as const;
+const capitalise = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
 
 export function BrandPanel(): ReactElement {
   return (
-    <div aria-hidden="true" className="relative isolate hidden overflow-hidden rounded-lg bg-(image:--brand-band) text-white min-[1100px]:block">
-      <span className="absolute -left-36 -top-30 -z-10 h-105 w-130 rounded-full bg-(--brand-glow-violet) blur-3xl" />
-      <span className="absolute -right-45 top-50 -z-10 h-115 w-140 rounded-full bg-(--brand-glow-blue) blur-3xl" />
-      <span className="absolute -bottom-40 left-30 -z-10 h-75 w-105 rounded-full bg-(--brand-glow-pink) blur-3xl" />
+    <div aria-hidden="true" className="relative isolate hidden flex-col overflow-hidden rounded-lg bg-(image:--brand-band) px-11 pb-11 pt-10 text-white min-[1100px]:flex">
+      <span className="studio-brand-glow absolute -left-36 -top-30 -z-10 h-105 w-130 rounded-full bg-(--brand-glow-violet) blur-3xl" />
+      <span className="studio-brand-glow absolute -right-50 top-65 -z-10 h-115 w-140 rounded-full bg-(--brand-glow-blue) blur-3xl" />
+      <span className="studio-brand-glow absolute -bottom-42 left-35 -z-10 h-75 w-105 rounded-full bg-(--brand-glow-pink) blur-3xl" />
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/studio/hero-grid.svg" alt="" width={730} height={708} className="absolute left-1/2 top-[46%] -z-10 -translate-x-1/2 -translate-y-1/2 opacity-55" />
-      <div className="absolute left-11 top-10 flex items-center gap-2.5 text-heading text-white">
+      <img src="/studio/hero-grid.svg" alt="" width={730} height={708} className="absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2 opacity-40" />
+      <div className="flex items-center gap-2.5 text-heading text-white">
         <Icon />
         CleanStart
       </div>
-      <div className="absolute left-1/2 top-38 h-90 w-109 -translate-x-1/2">
-        <ActivityCard className="left-14 top-0 opacity-70" icon={<Clock size={14} weight="light" />} kicker="Scheduled for Oct 22, 9:00 AM" title="FedRAMP-ready base images, explained" />
-        <ActivityCard className="left-0 top-25 z-10" icon={<CheckCircle size={14} weight="fill" />} kicker="Published to cleanstart.com" title="Zero CVE container images: how we keep the count at zero" meta="Blog, just now" />
-        <ActivityCard className="left-10 top-61 opacity-85" icon={<ChatCircle size={14} weight="light" />} kicker="Review requested" title="BusyBox in production images: the risk most teams miss" meta="Asked by an editor" />
-      </div>
-      <div className="absolute inset-x-11 bottom-11">
-        <p className="max-w-130 text-brand text-balance">Every page on cleanstart.com starts here.</p>
-        <p className="mt-3 max-w-115 text-doc-lead text-white/70">Write, review and publish blogs, guides, events and resources from one workspace.</p>
+      <p className="mt-auto text-brand">
+        <span className="block text-white/60">Write the next</span>
+        <span className="studio-brand-slot block h-23 overflow-hidden">
+          <span className="studio-brand-words block">
+            {[...KINDS, KINDS[0]].map((kind, i) => (
+              <span key={i === KINDS.length ? 'loop' : kind} className="block h-23 whitespace-nowrap">
+                {kind}
+                <span className="text-(--brand-accent)">.</span>
+              </span>
+            ))}
+          </span>
+        </span>
+      </p>
+      <p className="mt-5 max-w-108 text-doc-lead text-white/70">Studio is where every page on cleanstart.com is written, reviewed and published.</p>
+      <div className="studio-brand-chips mt-auto flex flex-wrap gap-2 pt-8">
+        {KINDS.map((kind) => (
+          <span key={kind} className="inline-flex h-7.5 items-center rounded-full px-3.5 text-body-strong ring-1 ring-white/12">
+            {capitalise(kind)}
+          </span>
+        ))}
       </div>
     </div>
   );
 }
 ```
 
-Add the drift animation to `apps/cms/src/studio/styles/primitives.css` inside `@layer components`. It is the only looping motion in Studio and does not use the duration tokens, so it carries its own reduced-motion gate:
+Add the roll, the chip highlights and the glow drift to `apps/cms/src/studio/styles/primitives.css` inside `@layer components`. This is the only looping motion in Studio and does not use the duration tokens, so it carries its own reduced-motion gate; under reduced motion the panel holds on "blog post" with its chip lit:
 
 ```css
-  @media (prefers-reduced-motion: no-preference) {
-    .studio-drift { animation: studio-drift 9s var(--ease-out) infinite alternate; }
-    .studio-drift:nth-child(1) { animation-delay: -3s; }
-    .studio-drift:nth-child(3) { animation-delay: -6s; }
+  /* Sign-in brand panel (design system §7.7): six words, 2.4s each, one 14.4s loop.
+     The word list ends with a copy of the first word, so the jump from the last frame to 0 is invisible. */
+  .studio-brand-slot {
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, var(--color-black) 18%, var(--color-black) 82%, transparent 100%);
+    mask-image: linear-gradient(180deg, transparent 0, var(--color-black) 18%, var(--color-black) 82%, transparent 100%);
   }
-  @keyframes studio-drift { to { translate: 0 -8px; } }
+  .studio-brand-chips > span { background: var(--brand-chip); color: var(--brand-chip-text); }
+  .studio-brand-chips > span:first-child { background: var(--color-white); color: var(--brand-ink); }
+  @media (prefers-reduced-motion: no-preference) {
+    .studio-brand-words { animation: studio-roll 14.4s linear infinite; }
+    @keyframes studio-roll { 0% { transform: translateY(0); } 12.5% { transform: translateY(0px); animation-timing-function: var(--ease-out); } 16.667% { transform: translateY(-92px); } 29.167% { transform: translateY(-92px); animation-timing-function: var(--ease-out); } 33.333% { transform: translateY(-184px); } 45.833% { transform: translateY(-184px); animation-timing-function: var(--ease-out); } 50% { transform: translateY(-276px); } 62.5% { transform: translateY(-276px); animation-timing-function: var(--ease-out); } 66.667% { transform: translateY(-368px); } 79.167% { transform: translateY(-368px); animation-timing-function: var(--ease-out); } 83.333% { transform: translateY(-460px); } 95.833% { transform: translateY(-460px); animation-timing-function: var(--ease-out); } 100% { transform: translateY(-552px); } }
+    .studio-brand-chips > span:nth-child(1) { animation: studio-chip-1 14.4s linear infinite; }
+    @keyframes studio-chip-1 { 0%, 13.5% { background: var(--color-white); color: var(--brand-ink); } 15.5%, 95.833% { background: var(--brand-chip); color: var(--brand-chip-text); } 100% { background: var(--color-white); color: var(--brand-ink); } }
+    .studio-brand-chips > span:nth-child(2) { animation: studio-chip-2 14.4s linear infinite; }
+    @keyframes studio-chip-2 { 0%, 15.667% { background: var(--brand-chip); color: var(--brand-chip-text); } 17.667%, 30.167% { background: var(--color-white); color: var(--brand-ink); } 32.167%, 100% { background: var(--brand-chip); color: var(--brand-chip-text); } }
+    .studio-brand-chips > span:nth-child(3) { animation: studio-chip-3 14.4s linear infinite; }
+    @keyframes studio-chip-3 { 0%, 32.333% { background: var(--brand-chip); color: var(--brand-chip-text); } 34.333%, 46.833% { background: var(--color-white); color: var(--brand-ink); } 48.833%, 100% { background: var(--brand-chip); color: var(--brand-chip-text); } }
+    .studio-brand-chips > span:nth-child(4) { animation: studio-chip-4 14.4s linear infinite; }
+    @keyframes studio-chip-4 { 0%, 49% { background: var(--brand-chip); color: var(--brand-chip-text); } 51%, 63.5% { background: var(--color-white); color: var(--brand-ink); } 65.5%, 100% { background: var(--brand-chip); color: var(--brand-chip-text); } }
+    .studio-brand-chips > span:nth-child(5) { animation: studio-chip-5 14.4s linear infinite; }
+    @keyframes studio-chip-5 { 0%, 65.667% { background: var(--brand-chip); color: var(--brand-chip-text); } 67.667%, 80.167% { background: var(--color-white); color: var(--brand-ink); } 82.167%, 100% { background: var(--brand-chip); color: var(--brand-chip-text); } }
+    .studio-brand-chips > span:nth-child(6) { animation: studio-chip-6 14.4s linear infinite; }
+    @keyframes studio-chip-6 { 0%, 82.333% { background: var(--brand-chip); color: var(--brand-chip-text); } 84.333%, 96.833% { background: var(--color-white); color: var(--brand-ink); } 98.833%, 100% { background: var(--brand-chip); color: var(--brand-chip-text); } }
+    .studio-brand-glow { animation: studio-glow 14s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate; }
+    .studio-brand-glow:nth-child(2) { animation-duration: 17s; animation-delay: -6s; }
+    .studio-brand-glow:nth-child(3) { animation-duration: 12s; animation-delay: -3s; }
+    @keyframes studio-glow { to { transform: translate(36px, -24px) scale(1.12); } }
+  }
 ```
 
-The headline uses `text-brand`, and the panel's translucent whites and blacks use `--color-white` and `--color-black`; both are defined in the `@theme` block of `studio.css` (Task 0.3). Check that `Icon` from `@/payload/admin/Icon` renders the mark in `currentColor` on this dark panel; if its second path is hard-coded dark, pass a `className` that sets `color: white` or render the two paths here from that file.
+The headline uses `text-brand` (76/92), whose line height must stay equal to `h-23` (92px) and to the 92px steps in `studio-roll`. The panel colours come from the `--brand-*` tokens in `tokens.css` and from `--color-white` and `--color-black` in the `@theme` block of `studio.css` (Task 0.3). Check that `Icon` from `@/payload/admin/Icon` renders the mark in `currentColor` on this dark panel; if its second path is hard-coded dark, pass a `className` that sets `color: white` or render the two paths here from that file.
 
 `apps/cms/src/studio/features/auth/AuthCard.tsx`:
 
@@ -6272,7 +6299,7 @@ export default async function Login({ searchParams }: { readonly searchParams: P
   const session = await getSession();
   if (session?.permissions.canAccessAdmin) redirect(target);
   return (
-    <AuthCard title="Sign in" description="Use your CleanStart work account." footer="Need access? Ask an admin.">
+    <AuthCard title="Welcome back" description="Sign in with your CleanStart work account." footer="Need access? Ask an admin.">
       <LoginForm next={target} />
     </AuthCard>
   );
@@ -6321,7 +6348,7 @@ export default async function Reset({ params }: { readonly params: Promise<{ tok
 }
 ```
 
-Check: spacing utilities such as `max-w-90`, `w-95`, `top-38` and `h-115` are multiples of Tailwind's 4px spacing scale (v4 accepts any integer); confirm they compile. Then open `/studio/login` at 1440×900 in both themes and at 1024 wide (panel hidden), and compare against the approved direction B sign-in mockup.
+Check: spacing utilities such as `max-w-90`, `max-w-108`, `h-23` and `h-115` are multiples of Tailwind's 4px spacing scale (v4 accepts any integer); confirm they compile. Then open `/studio/login` at 1440×900 in both themes and at 1024 wide (panel hidden), and compare against the approved direction B sign-in mockup.
 
 - [ ] **Step 7: Verify**
 
