@@ -1,7 +1,6 @@
-import type { Endpoint } from 'payload';
+import { Forbidden, type Endpoint } from 'payload';
 import { z } from 'zod';
 
-import { hasAnyRole } from '../access/typed-user';
 import { ALLOWED_MIME_TYPES, checkUploadSize } from '../lib/upload-limits';
 import { followWithSsrfGuard } from '../lib/url-safety/follow-with-ssrf-guard';
 
@@ -68,14 +67,19 @@ const preserveId = (id: number | string): number | string => {
  *   - The "From URL" tab of the InlineImage insert dialog, for the
  *     same reason.
  *
- * Auth: admin / editor / author. SSRF: rejects loopback, RFC1918,
+ * Auth: whoever `Media.access.create` allows. SSRF: rejects loopback, RFC1918,
  * link-local, and cloud-metadata hosts. Body cap: 25 MB.
  */
 export const mediaIngestUrlEndpoint: Endpoint = {
   path: '/media-ingest-url',
   method: 'post',
   handler: async (req) => {
-    if (!hasAnyRole(req.user, ['admin', 'editor', 'author'])) {
+    if (!req.user) {
+      return json({ ok: false, error: 'unauthorized' }, { status: 401 });
+    }
+    // Checked before the fetch so a user who cannot create media cannot use this as a URL fetcher.
+    const canCreate = await req.payload.collections.media.config.access.create({ req });
+    if (!canCreate) {
       return json({ ok: false, error: 'forbidden' }, { status: 403 });
     }
 
@@ -191,7 +195,8 @@ export const mediaIngestUrlEndpoint: Endpoint = {
         collection: 'media',
         data: docData,
         file: { data, mimetype, name, size: buffer.byteLength },
-        user: req.user ?? undefined,
+        user: req.user,
+        overrideAccess: false,
       })) as MediaDoc;
       return json({
         ok: true,
@@ -206,6 +211,9 @@ export const mediaIngestUrlEndpoint: Endpoint = {
         },
       });
     } catch (err) {
+      if (err instanceof Forbidden) {
+        return json({ ok: false, error: 'forbidden' }, { status: 403 });
+      }
       const message = err instanceof Error ? err.message : 'create_failed';
       return json({ ok: false, error: 'create_failed', detail: message }, { status: 500 });
     }

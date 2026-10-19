@@ -4,7 +4,7 @@ import { topicSuggestionsEndpoint } from './topic-suggestions';
 
 const call = async (
   url: string,
-  user: { role?: string } | null,
+  user: { roles: string[] } | null,
 ): Promise<{ status: number; body: { suggestions?: unknown; error?: string } }> => {
   const res = await (topicSuggestionsEndpoint.handler as (req: unknown) => Promise<Response>)({
     url,
@@ -29,13 +29,18 @@ afterEach(() => {
 });
 
 describe('topicSuggestionsEndpoint', () => {
-  it('403s for non-editors', async () => {
+  it('403s for unauthenticated requests', async () => {
     const { status } = await call('http://x/api/topic-suggestions?q=s', null);
     expect(status).toBe(403);
   });
 
+  it('403s for authors', async () => {
+    const { status } = await call('http://x/api/topic-suggestions?q=s', { roles: ['author'] });
+    expect(status).toBe(403);
+  });
+
   it('returns empty suggestions (200) when Meilisearch is not configured', async () => {
-    const { status, body } = await call('http://x/api/topic-suggestions?q=sbom', { role: 'editor' });
+    const { status, body } = await call('http://x/api/topic-suggestions?q=sbom', { roles: ['editor'] });
     expect(status).toBe(200);
     expect(body.suggestions).toEqual([]);
   });

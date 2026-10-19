@@ -7,7 +7,7 @@ const handler = canonicalCheckEndpoint.handler as (req: unknown) => Promise<Resp
 
 const makeReq = (
   url: string,
-  user: { role?: string } | null = { role: 'editor' },
+  user: { roles: string[] } | null = { roles: ['editor'] },
 ) =>
   ({
     url,
@@ -38,14 +38,19 @@ describe('canonicalCheckEndpoint', () => {
     expect(body).toEqual({ ok: false, error: 'forbidden' });
   });
 
-  it('returns 403 for non-editor users', async () => {
-    const res = await handler(makeReq('http://x?url=https://example.com', { role: 'reader' }));
+  it('returns 403 for authors', async () => {
+    const res = await handler(makeReq('http://x?url=https://example.com', { roles: ['author'] }));
     expect(res.status).toBe(403);
+  });
+
+  it('allows editor role', async () => {
+    const res = await handler(makeReq('http://x?url=https://example.com'));
+    expect(res.status).toBe(200);
   });
 
   it('allows admin role', async () => {
     const res = await handler(
-      makeReq('http://x?url=https://example.com', { role: 'admin' }),
+      makeReq('http://x?url=https://example.com', { roles: ['admin'] }),
     );
     expect(res.status).toBe(200);
   });

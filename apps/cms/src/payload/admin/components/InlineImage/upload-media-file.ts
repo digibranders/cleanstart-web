@@ -148,6 +148,7 @@ const FRIENDLY_INGEST_ERRORS: Record<string, string> = {
   unsupported_mime: 'The URL did not return a supported image format.',
   create_failed: 'Could not save the image to the media library.',
   forbidden: 'You do not have permission to ingest media URLs.',
+  unauthorized: 'Your session has expired. Sign in again to add images.',
 };
 
 /**

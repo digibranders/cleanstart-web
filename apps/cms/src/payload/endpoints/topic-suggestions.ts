@@ -1,6 +1,7 @@
 import type { Endpoint } from 'payload';
 import { z } from 'zod';
 
+import { hasAnyRole } from '../access/typed-user';
 import { createSearchClient, searchClientConfigFromEnv } from '../lib/search/client';
 import { INDEX_UID } from '../lib/search/index-schema';
 import { facetToSuggestions } from '../lib/seo/topic-suggestions';
@@ -12,9 +13,6 @@ const json = (data: unknown, init?: ResponseInit): Response =>
     ...init,
     headers: { 'content-type': 'application/json', ...(init?.headers ?? {}) },
   });
-
-const hasEditorRole = (user: { role?: string | null } | null | undefined): boolean =>
-  user?.role === 'admin' || user?.role === 'editor';
 
 const querySchema = z.object({ q: z.string().max(80).optional() });
 
@@ -30,7 +28,7 @@ export const topicSuggestionsEndpoint: Endpoint = {
   path: '/topic-suggestions',
   method: 'get',
   handler: async (req) => {
-    if (!hasEditorRole(req.user as { role?: string } | null)) {
+    if (!hasAnyRole(req.user, ['admin', 'editor'])) {
       return json({ suggestions: [], error: 'forbidden' }, { status: 403 });
     }
     const parsed = new URL(req.url ?? '', 'http://internal');

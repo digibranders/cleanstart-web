@@ -1,6 +1,7 @@
 import type { Endpoint } from 'payload';
 import { z } from 'zod';
 
+import { hasAnyRole } from '../access/typed-user';
 import { checkCanonicalUrl } from '../lib/canonical-check';
 import { clientIpFromHeaders } from '../lib/client-ip';
 import { type RateLimitConfig, checkAndRecord } from '../lib/rate-limit';
@@ -18,10 +19,6 @@ const json = (data: unknown, init?: ResponseInit): Response =>
       ...(init?.headers ?? {}),
     },
   });
-
-const hasEditorRole = (
-  user: { role?: string | null } | null | undefined,
-): boolean => user?.role === 'admin' || user?.role === 'editor';
 
 /**
  * Boundary schema per CLAUDE.md "Zod at boundaries". Hard-rejects any
@@ -60,7 +57,7 @@ export const canonicalCheckEndpoint: Endpoint = {
       );
     }
 
-    if (!hasEditorRole(req.user as { role?: string } | null)) {
+    if (!hasAnyRole(req.user, ['admin', 'editor'])) {
       return json({ ok: false, error: 'forbidden' }, { status: 403 });
     }
     const parsed = new URL(req.url ?? '', 'http://internal');
