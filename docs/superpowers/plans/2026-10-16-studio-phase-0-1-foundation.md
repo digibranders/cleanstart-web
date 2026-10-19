@@ -6,7 +6,7 @@
 
 **Architecture:** A new route group `apps/cms/src/app/(studio)` with its own root layout serves `/studio`. Implementation lives in `apps/cms/src/studio/`. Server components and server actions call Payload's Local API through one wrapper that always runs as the signed-in user. Forms are client-side (react-hook-form) and driven by a serializable schema built from the live Payload config. Auth uses Payload's REST endpoints. Read `docs/studio/00-MASTER-PLAN.md` (ADR-1 to ADR-11) before starting.
 
-**Tech Stack:** Next.js 16.2 (App Router, server actions), Payload 3.84 Local API, React 19, Tailwind CSS 4.3, `@cleanstart/ui` primitives, react-hook-form 7, Zod 3, `@phosphor-icons/react` 2, Inter Variable (`@fontsource-variable/inter`), Vitest 2, Playwright 1.59.
+**Tech Stack:** Next.js 16.2 (App Router, server actions), Payload 3.84 Local API, React 19, Tailwind CSS 4.3, `@cleanstart/ui` primitives, react-hook-form 7, Zod 3, `@phosphor-icons/react` 2 (Light weight), Geist and Geist Mono (`geist` through `next/font`), Vitest 2, Playwright 1.59.
 
 **Prerequisites:** decisions D-1 to D-9 in `docs/studio/00-MASTER-PLAN.md` were signed off on 2026-10-16. D-6 (author drafting) is implemented in Task 1.19.
 
@@ -110,7 +110,7 @@ Expected: a non-zero line count.
 
 ```bash
 pnpm --filter @cleanstart/cms add -D tailwindcss@4.3.0 @tailwindcss/postcss@4.3.0
-pnpm --filter @cleanstart/cms add @fontsource-variable/inter@^5 @phosphor-icons/react@^2
+pnpm --filter @cleanstart/cms add geist@^1 @phosphor-icons/react@^2
 ```
 
 Expected: `apps/cms/package.json` lists the four packages; `pnpm-lock.yaml` updated.
@@ -142,6 +142,8 @@ export default {
 `apps/cms/src/app/(studio)/layout.tsx`:
 
 ```tsx
+import { GeistMono } from 'geist/font/mono';
+import { GeistSans } from 'geist/font/sans';
 import type { Metadata } from 'next';
 import type { ReactElement, ReactNode } from 'react';
 
@@ -152,9 +154,11 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, googleBot: { index: false, follow: false } },
 };
 
+// next/font serves the Geist files from /_next/static/media (same origin, so the CSP allows them)
+// and exposes them as --font-geist-sans and --font-geist-mono, which tokens.css reads.
 export default function StudioRootLayout({ children }: { readonly children: ReactNode }): ReactElement {
   return (
-    <html lang="en" data-theme="dark" suppressHydrationWarning>
+    <html lang="en" data-theme="dark" className={`${GeistSans.variable} ${GeistMono.variable}`} suppressHydrationWarning>
       <body>{children}</body>
     </html>
   );
@@ -209,6 +213,7 @@ git commit -m "feat(studio): T0.2 Tailwind, fonts and Studio root layout"
 - Create: `apps/cms/src/studio/theme/theme-script.ts`
 - Create: `apps/cms/src/studio/theme/theme-script.test.ts`
 - Create: `apps/cms/src/studio/theme/ThemeProvider.tsx`
+- Create: `apps/cms/src/studio/theme/IconDefaults.tsx`
 - Modify: `apps/cms/src/app/(studio)/layout.tsx`
 
 - [ ] **Step 1: Write the failing test for theme resolution**
@@ -291,32 +296,33 @@ Expected: PASS (5 tests).
 /* Studio design tokens. Source of truth: docs/studio/01-DESIGN-SYSTEM.md.
    Theme-independent values first, then one block per theme. Radius and type
    sizes live in the Tailwind @theme in studio.css. Shadows are named
-   --elevation-* here and exposed to Tailwind as shadow-popover and shadow-dialog.
+   --elevation-* here and exposed to Tailwind as shadow-raised, shadow-sheet,
+   shadow-popover and shadow-dialog.
    Theme blocks also match any [data-theme] container so the lab can show
    both themes side by side. */
 
 :root {
-  --font-ui: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-code: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-ui: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-code: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --control-sm: 24px;
   --control-md: 28px;
   --control-lg: 32px;
   --space-label: 6px;
 
-  --sidebar-width: 240px;
+  --sidebar-width: 232px;
   --sidebar-collapsed-width: 56px;
+  --sheet-inset: 8px;
   --rail-width: 320px;
   --rail-min-width: 280px;
   --rail-max-width: 440px;
-  --content-max-width: 720px;
-  --page-header-height: 48px;
-  --document-header-height: 52px;
+  --content-max-width: 680px;
+  --document-header-height: 54px;
 
   --duration-fast: 100ms;
   --duration-base: 150ms;
   --duration-slow: 200ms;
-  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
 
   --z-sticky: 10;
@@ -327,80 +333,91 @@ Expected: PASS (5 tests).
   --z-toast: 60;
   --z-palette: 70;
 
-  --accent: #06c7f2;
-  --on-accent: #04212a;
+  /* Sign-in brand panel only: the website's dark band, the same in both themes. */
+  --brand-band: linear-gradient(180deg, #151021 0%, #131e8f 62.5%, #471ec0 100%);
+  --brand-glow-violet: rgb(106 61 240 / 0.45);
+  --brand-glow-blue: rgb(7 110 255 / 0.35);
+  --brand-glow-pink: rgb(223 155 255 / 0.25);
 }
 
 :root[data-theme='dark'],
 [data-theme='dark'] {
   color-scheme: dark;
-  --bg-canvas: #0e0f11;
-  --bg-surface: #141518;
-  --bg-raised: #1a1b1f;
-  --bg-overlay: #1e1f24;
+  --bg-canvas: #0b0b0c;
+  --bg-surface: #141415;
+  --bg-raised: #19191b;
+  --bg-overlay: #1f1f22;
   --bg-hover: rgb(255 255 255 / 0.04);
   --bg-active: rgb(255 255 255 / 0.07);
   --border-subtle: rgb(255 255 255 / 0.06);
   --border: rgb(255 255 255 / 0.1);
   --border-strong: rgb(255 255 255 / 0.16);
   --border-control: #6b6d75;
-  --text-primary: #ececee;
-  --text-secondary: #a0a1a8;
-  --text-tertiary: #8b8c95;
+  --text-primary: #f2f2f3;
+  --text-secondary: #a5a5ab;
+  --text-tertiary: #929299;
   --text-disabled: #4d4e55;
-  --accent-hover: #4dd5f7;
-  --accent-text: #4dd5f7;
-  --accent-soft: rgb(6 199 242 / 0.12);
-  --focus-ring: #4dd5f7;
+  --primary: #f2f2f3;
+  --primary-hover: #ffffff;
+  --on-primary: #121214;
+  --accent: #8ea0ff;
+  --accent-hover: #a5b3ff;
+  --on-accent: #0b0b0c;
+  --accent-text: #8ea0ff;
+  --accent-soft: rgb(142 160 255 / 0.12);
+  --focus-ring: #8ea0ff;
   --success: #3ecf8e;
   --success-soft: rgb(62 207 142 / 0.12);
   --warning: #f5a524;
   --warning-soft: rgb(245 165 36 / 0.12);
   --danger: #f2555a;
   --danger-soft: rgb(242 85 90 / 0.12);
-  --elevation-popover: 0 0 0 1px var(--border), 0 8px 24px rgb(0 0 0 / 0.4);
-  --elevation-dialog: 0 0 0 1px var(--border), 0 24px 64px rgb(0 0 0 / 0.55);
-  --backdrop: rgb(0 0 0 / 0.55);
+  --elevation-raised: 0 0 0 1px var(--border-subtle), 0 1px 2px rgb(0 0 0 / 0.3);
+  --elevation-sheet: 0 0 0 1px rgb(255 255 255 / 0.06), inset 0 1px 0 rgb(255 255 255 / 0.04), 0 24px 56px -20px rgb(0 0 0 / 0.7);
+  --elevation-popover: 0 0 0 1px rgb(255 255 255 / 0.09), inset 0 1px 0 rgb(255 255 255 / 0.06), 0 24px 64px -12px rgb(0 0 0 / 0.75);
+  --elevation-dialog: 0 0 0 1px rgb(255 255 255 / 0.09), 0 32px 80px -16px rgb(0 0 0 / 0.8);
+  --backdrop: rgb(9 9 11 / 0.6);
+  --glass: rgb(30 30 35 / 0.72);
 }
 
 :root[data-theme='light'],
 [data-theme='light'] {
   color-scheme: light;
-  --bg-canvas: #ffffff;
-  --bg-surface: #fafafa;
-  --bg-raised: #ffffff;
+  --bg-canvas: #efefed;
+  --bg-surface: #ffffff;
+  --bg-raised: #f8f8f7;
   --bg-overlay: #ffffff;
-  --bg-hover: rgb(15 16 20 / 0.04);
-  --bg-active: rgb(15 16 20 / 0.07);
-  --border-subtle: rgb(15 16 20 / 0.06);
-  --border: rgb(15 16 20 / 0.1);
-  --border-strong: rgb(15 16 20 / 0.16);
-  --border-control: #8a8c94;
-  --text-primary: #17181c;
-  --text-secondary: #5d5e66;
-  --text-tertiary: #6b6c75;
+  --bg-hover: rgb(18 18 20 / 0.04);
+  --bg-active: rgb(18 18 20 / 0.07);
+  --border-subtle: rgb(18 18 20 / 0.06);
+  --border: rgb(18 18 20 / 0.1);
+  --border-strong: rgb(18 18 20 / 0.16);
+  --border-control: #82848c;
+  --text-primary: #121214;
+  --text-secondary: #4d4d53;
+  --text-tertiary: #68686e;
   --text-disabled: #b4b5bb;
-  --accent-hover: #04a3c8;
-  --accent-text: #03758f;
-  --accent-soft: rgb(6 199 242 / 0.1);
-  --focus-ring: #03819f;
-  --success: #15803d;
-  --success-soft: rgb(62 207 142 / 0.12);
-  --warning: #b45309;
-  --warning-soft: rgb(245 165 36 / 0.12);
-  --danger: #dc2626;
-  --danger-soft: rgb(242 85 90 / 0.12);
-  --elevation-popover: 0 0 0 1px var(--border), 0 8px 24px rgb(15 16 20 / 0.1), 0 1px 2px rgb(15 16 20 / 0.06);
-  --elevation-dialog: 0 0 0 1px var(--border), 0 24px 64px rgb(15 16 20 / 0.16);
-  --backdrop: rgb(15 16 20 / 0.3);
-}
-
-@font-face {
-  font-family: "JetBrains Mono";
-  src: url("/fonts/jetbrains-mono.woff2") format("woff2");
-  font-weight: 100 800;
-  font-style: normal;
-  font-display: swap;
+  --primary: #121214;
+  --primary-hover: #2a2a2e;
+  --on-primary: #ffffff;
+  --accent: #3451e6;
+  --accent-hover: #2a44cf;
+  --on-accent: #ffffff;
+  --accent-text: #3451e6;
+  --accent-soft: rgb(52 81 230 / 0.07);
+  --focus-ring: #3451e6;
+  --success: #12733a;
+  --success-soft: rgb(18 115 58 / 0.09);
+  --warning: #9a4a06;
+  --warning-soft: rgb(154 74 6 / 0.09);
+  --danger: #c01c1c;
+  --danger-soft: rgb(192 28 28 / 0.08);
+  --elevation-raised: 0 0 0 1px var(--border-subtle), 0 1px 3px rgb(18 18 20 / 0.06);
+  --elevation-sheet: 0 0 0 1px rgb(18 18 20 / 0.06), 0 1px 2px rgb(18 18 20 / 0.04), 0 16px 40px -18px rgb(18 18 20 / 0.18);
+  --elevation-popover: 0 0 0 1px rgb(18 18 20 / 0.08), 0 2px 6px rgb(18 18 20 / 0.06), 0 18px 48px -12px rgb(18 18 20 / 0.22);
+  --elevation-dialog: 0 0 0 1px rgb(18 18 20 / 0.08), 0 32px 80px -20px rgb(18 18 20 / 0.3);
+  --backdrop: rgb(239 239 237 / 0.55);
+  --glass: rgb(255 255 255 / 0.72);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -418,7 +435,6 @@ Replace `apps/cms/src/studio/styles/studio.css` with:
 
 ```css
 @import "tailwindcss";
-@import "@fontsource-variable/inter";
 @import "./tokens.css";
 
 /* Remove Tailwind's defaults so only Studio tokens produce utilities.
@@ -432,24 +448,29 @@ Replace `apps/cms/src/studio/styles/studio.css` with:
   --inset-shadow-*: initial;
   --drop-shadow-*: initial;
 
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  /* Plain white and black, used only on the sign-in brand panel (Task 1.11). */
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  --radius-xs: 5px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
   --radius-full: 9999px;
 
-  --text-display: 24px;
-  --text-display--line-height: 32px;
+  --text-display: 28px;
+  --text-display--line-height: 34px;
   --text-display--font-weight: 600;
-  --text-display--letter-spacing: -0.02em;
+  --text-display--letter-spacing: -0.03em;
   --text-title: 18px;
   --text-title--line-height: 26px;
   --text-title--font-weight: 600;
-  --text-title--letter-spacing: -0.015em;
+  --text-title--letter-spacing: -0.02em;
   --text-heading: 14px;
   --text-heading--line-height: 20px;
   --text-heading--font-weight: 600;
-  --text-heading--letter-spacing: -0.005em;
+  --text-heading--letter-spacing: -0.01em;
   --text-body: 13px;
   --text-body--line-height: 20px;
   --text-body--font-weight: 400;
@@ -462,23 +483,34 @@ Replace `apps/cms/src/studio/styles/studio.css` with:
   --text-micro: 11px;
   --text-micro--line-height: 14px;
   --text-micro--font-weight: 500;
-  --text-micro--letter-spacing: 0.01em;
   --text-mono: 12px;
   --text-mono--line-height: 18px;
-  --text-doc-title: 28px;
-  --text-doc-title--line-height: 36px;
+  --text-mono--letter-spacing: -0.01em;
+  --text-doc-title: 40px;
+  --text-doc-title--line-height: 46px;
   --text-doc-title--font-weight: 600;
+  --text-doc-title--letter-spacing: -0.035em;
+  --text-doc-lead: 17px;
+  --text-doc-lead--line-height: 27px;
   --text-doc-body: 16px;
-  --text-doc-body--line-height: 26px;
+  --text-doc-body--line-height: 27px;
+  --text-doc-body--letter-spacing: -0.003em;
   --text-doc-h2: 22px;
   --text-doc-h2--line-height: 30px;
   --text-doc-h2--font-weight: 600;
+  --text-doc-h2--letter-spacing: -0.02em;
   --text-doc-h3: 18px;
   --text-doc-h3--line-height: 26px;
   --text-doc-h3--font-weight: 600;
+  --text-doc-h3--letter-spacing: -0.015em;
   --text-doc-h4: 16px;
   --text-doc-h4--line-height: 24px;
   --text-doc-h4--font-weight: 600;
+  --text-doc-h4--letter-spacing: -0.01em;
+  --text-brand: 34px;
+  --text-brand--line-height: 40px;
+  --text-brand--font-weight: 600;
+  --text-brand--letter-spacing: -0.035em;
 }
 
 @theme inline {
@@ -499,6 +531,9 @@ Replace `apps/cms/src/studio/styles/studio.css` with:
   --color-fg-muted: var(--text-secondary);
   --color-fg-subtle: var(--text-tertiary);
   --color-fg-disabled: var(--text-disabled);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-on-primary: var(--on-primary);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-on-accent: var(--on-accent);
@@ -512,7 +547,10 @@ Replace `apps/cms/src/studio/styles/studio.css` with:
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
   --color-backdrop: var(--backdrop);
+  --color-glass: var(--glass);
 
+  --shadow-raised: var(--elevation-raised);
+  --shadow-sheet: var(--elevation-sheet);
   --shadow-popover: var(--elevation-popover);
   --shadow-dialog: var(--elevation-dialog);
 }
@@ -520,7 +558,6 @@ Replace `apps/cms/src/studio/styles/studio.css` with:
 @layer base {
   html {
     font-family: var(--font-ui);
-    font-feature-settings: "cv11", "ss01";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background: var(--bg-canvas);
@@ -552,7 +589,7 @@ Replace `apps/cms/src/studio/styles/studio.css` with:
 @import "./primitives.css";
 ```
 
-`@font-face` for Inter comes from `@fontsource-variable/inter`, which Next serves from `/_next/static/media` (same origin, allowed by `font-src 'self'`).
+There is no `@font-face` here: `geist/font/sans` and `geist/font/mono` are `next/font/local` wrappers, so Next emits the faces and serves the files from `/_next/static/media` (same origin, allowed by `font-src 'self'`). The root layout puts their `variable` classes on `<html>`, which defines `--font-geist-sans` and `--font-geist-mono`.
 
 - [ ] **Step 7: Create the theme provider**
 
@@ -627,14 +664,35 @@ export const useTheme = (): ThemeContextValue => {
 };
 ```
 
+`apps/cms/src/studio/theme/IconDefaults.tsx` (D-2: Light weight everywhere, set once):
+
+```tsx
+'use client';
+
+import { IconContext } from '@phosphor-icons/react';
+import type { IconProps } from '@phosphor-icons/react';
+import type { ReactElement, ReactNode } from 'react';
+
+const DEFAULTS: IconProps = { weight: 'light', size: 16 };
+
+export function IconDefaults({ children }: { readonly children: ReactNode }): ReactElement {
+  return <IconContext.Provider value={DEFAULTS}>{children}</IconContext.Provider>;
+}
+```
+
+Icons imported from `@phosphor-icons/react` read this context. Icons imported from `@phosphor-icons/react/dist/ssr` (server components) cannot read context, so every SSR icon in Studio passes `weight="light"` itself.
+
 - [ ] **Step 8: Wire the bootstrap and provider into the root layout**
 
 Replace `apps/cms/src/app/(studio)/layout.tsx` with:
 
 ```tsx
+import { GeistMono } from 'geist/font/mono';
+import { GeistSans } from 'geist/font/sans';
 import type { Metadata } from 'next';
 import type { ReactElement, ReactNode } from 'react';
 
+import { IconDefaults } from '@/studio/theme/IconDefaults';
 import { ThemeProvider } from '@/studio/theme/ThemeProvider';
 import { THEME_BOOTSTRAP } from '@/studio/theme/theme-script';
 
@@ -647,13 +705,15 @@ export const metadata: Metadata = {
 
 export default function StudioRootLayout({ children }: { readonly children: ReactNode }): ReactElement {
   return (
-    <html lang="en" data-theme="dark" suppressHydrationWarning>
+    <html lang="en" data-theme="dark" className={`${GeistSans.variable} ${GeistMono.variable}`} suppressHydrationWarning>
       <head>
         {/* biome-ignore lint/security/noDangerouslySetInnerHtml: static theme bootstrap with no user input */}
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       </head>
       <body className="bg-canvas text-fg">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <IconDefaults>{children}</IconDefaults>
+        </ThemeProvider>
       </body>
     </html>
   );
@@ -662,7 +722,7 @@ export default function StudioRootLayout({ children }: { readonly children: Reac
 
 - [ ] **Step 9: Verify**
 
-Run the test again (Step 4). Build (`pnpm --filter @cleanstart/cms build`). With `STUDIO_LAB=true`, open `/studio/lab` in the browser pane at 1440×900, toggle the OS theme (or set `localStorage['studio-theme']`), reload, and confirm the background switches between `#0e0f11` and `#ffffff` with no flash.
+Run the test again (Step 4). Build (`pnpm --filter @cleanstart/cms build`). With `STUDIO_LAB=true`, open `/studio/lab` in the browser pane at 1440×900, toggle the OS theme (or set `localStorage['studio-theme']`), reload, and confirm the window background switches between `#0b0b0c` and `#efefed` with no flash, and that text renders in Geist (DevTools, Computed, rendered font).
 
 - [ ] **Step 10: Commit**
 
@@ -720,6 +780,10 @@ const contrast = (a: string, b: string): number => {
 const SURFACES = ['bg-canvas', 'bg-surface', 'bg-raised', 'bg-overlay'] as const;
 const TEXT_AA = ['text-primary', 'text-secondary', 'text-tertiary', 'accent-text', 'success', 'warning', 'danger'] as const;
 const NON_TEXT_3 = ['border-control', 'focus-ring'] as const;
+const FILLS = [
+  ['on-primary', 'primary'],
+  ['on-accent', 'accent'],
+] as const;
 
 describe.each(['dark', 'light'] as const)('%s theme contrast', (theme) => {
   const t = themeBlock(theme);
@@ -741,17 +805,19 @@ describe.each(['dark', 'light'] as const)('%s theme contrast', (theme) => {
       });
     }
   }
-});
 
-it('on-accent text on the accent fill is at least 4.5:1', () => {
-  expect(contrast('#04212a', '#06c7f2')).toBeGreaterThanOrEqual(4.5);
+  for (const [text, fill] of FILLS) {
+    it(`${text} on ${fill} is at least 4.5:1`, () => {
+      expect(contrast(get(text), get(fill))).toBeGreaterThanOrEqual(4.5);
+    });
+  }
 });
 ```
 
 - [ ] **Step 2: Run it**
 
 Run: `pnpm --filter @cleanstart/cms exec vitest run src/studio/styles/tokens.test.ts`
-Expected: PASS (73 tests). The values were pre-checked on 2026-10-16; the smallest margin is `--border-control` on dark `--bg-overlay` at 3.19:1. Any later token change that fails this test is fixed in `tokens.css` and `01-DESIGN-SYSTEM.md` together.
+Expected: PASS (76 tests). The values were pre-checked on 2026-10-19; the smallest margins are `--border-control` on dark `--bg-overlay` at 3.19:1, `--border-control` on the light window at 3.24:1 and `--text-tertiary` on the light window at 4.81:1. Any later token change that fails this test is fixed in `tokens.css` and `01-DESIGN-SYSTEM.md` together.
 
 - [ ] **Step 3: Commit**
 
@@ -797,11 +863,11 @@ git commit -m "test(studio): T0.4 token contrast checks"
   .cs-btn:hover { border-color: var(--border-strong); }
   .cs-btn:active { transform: scale(0.98); }
   .cs-btn:disabled { opacity: 0.5; pointer-events: none; }
-  .cs-btn--primary { background: var(--accent); border-color: transparent; color: var(--on-accent); }
-  .cs-btn--primary:hover { background: var(--accent-hover); }
+  .cs-btn--primary { background: var(--primary); border-color: transparent; color: var(--on-primary); }
+  .cs-btn--primary:hover { background: var(--primary-hover); }
   .cs-btn--subtle { background: transparent; border-color: transparent; color: var(--text-secondary); }
   .cs-btn--subtle:hover { background: var(--bg-hover); color: var(--text-primary); }
-  .cs-btn--danger { background: var(--danger); border-color: transparent; color: var(--bg-canvas); }
+  .cs-btn--danger { background: var(--danger); border-color: transparent; color: var(--bg-surface); }
   .cs-btn--danger:hover { filter: brightness(1.08); }
 
   /* Dialog and Drawer: native <dialog>, top layer. */
@@ -1202,9 +1268,9 @@ describe('Button', () => {
     expect(out).toContain('disabled=""');
   });
 
-  it('uses the accent fill only for the primary variant', () => {
-    expect(html(<Button variant="primary">Publish</Button>)).toContain('bg-accent');
-    expect(html(<Button>Cancel</Button>)).not.toContain('bg-accent');
+  it('uses the ink fill only for the primary variant', () => {
+    expect(html(<Button variant="primary">Publish</Button>)).toContain('bg-primary');
+    expect(html(<Button>Cancel</Button>)).not.toContain('bg-primary');
   });
 });
 
@@ -1327,8 +1393,8 @@ export type ButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'childre
 };
 
 const VARIANT: Record<ButtonVariant, string> = {
-  primary: 'bg-accent text-on-accent hover:bg-accent-hover',
-  secondary: 'bg-raised text-fg border border-line hover:border-line-strong',
+  primary: 'bg-primary text-on-primary hover:bg-primary-hover',
+  secondary: 'bg-surface text-fg border border-line shadow-raised hover:bg-raised',
   ghost: 'text-fg-muted hover:bg-hover hover:text-fg',
   danger: 'bg-raised text-danger border border-line hover:bg-danger-soft',
 };
@@ -1446,7 +1512,7 @@ import { cn } from '../lib/cn';
 export type BadgeTone = 'neutral' | 'accent' | 'success' | 'warning' | 'danger';
 
 const TONE: Record<BadgeTone, string> = {
-  neutral: 'bg-active text-fg-muted',
+  neutral: 'border border-line-subtle bg-raised text-fg-muted',
   accent: 'bg-accent-soft text-accent-fg',
   success: 'bg-success-soft text-success',
   warning: 'bg-warning-soft text-warning',
@@ -1476,7 +1542,7 @@ export function Badge({
     <span
       data-tone={tone}
       className={cn(
-        'inline-flex items-center gap-1.5 whitespace-nowrap rounded-xs px-1.5 text-micro',
+        'inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2 text-micro',
         size === 'sm' ? 'h-5' : 'h-6',
         TONE[tone],
       )}
@@ -1491,9 +1557,8 @@ export function Badge({
 `apps/cms/src/studio/ui/StatusBadge.tsx`:
 
 ```tsx
+import { CheckCircle, CircleDashed, CircleHalf, Clock } from '@phosphor-icons/react/dist/ssr';
 import type { ReactElement } from 'react';
-
-import type { BadgeTone } from './Badge';
 
 export type DocumentStatus = 'draft' | 'published' | 'changed' | 'scheduled';
 
@@ -1504,11 +1569,12 @@ const LABEL: Record<DocumentStatus, string> = {
   scheduled: 'Scheduled',
 };
 
-const DOT_TONE: Record<DocumentStatus, BadgeTone> = {
-  draft: 'neutral',
-  published: 'success',
-  changed: 'warning',
-  scheduled: 'accent',
+// Design system §2.4: a glyph plus a word, never colour alone. Published is the one fill-weight icon.
+const GLYPH: Record<DocumentStatus, ReactElement> = {
+  draft: <CircleDashed size={14} weight="light" aria-hidden="true" className="shrink-0 text-fg-subtle" />,
+  changed: <CircleHalf size={14} weight="light" aria-hidden="true" className="shrink-0 text-warning" />,
+  published: <CheckCircle size={14} weight="fill" aria-hidden="true" className="shrink-0 text-success" />,
+  scheduled: <Clock size={14} weight="light" aria-hidden="true" className="shrink-0 text-accent-fg" />,
 };
 
 export function StatusBadge({
@@ -1520,14 +1586,11 @@ export function StatusBadge({
 }): ReactElement {
   return (
     <span className="inline-flex items-center gap-1.5 text-small text-fg-muted">
-      <span aria-hidden="true" className={`size-1.5 rounded-full ${dotClass(DOT_TONE[status])}`} />
+      {GLYPH[status]}
       {detail ? `${LABEL[status]} · ${detail}` : LABEL[status]}
     </span>
   );
 }
-
-const dotClass = (tone: BadgeTone): string =>
-  ({ neutral: 'bg-fg-subtle', accent: 'bg-accent', success: 'bg-success', warning: 'bg-warning', danger: 'bg-danger' })[tone];
 ```
 
 `apps/cms/src/studio/ui/Banner.tsx`:
@@ -1548,10 +1611,10 @@ const STYLE: Record<BannerTone, string> = {
 };
 
 const ICON: Record<BannerTone, ReactElement> = {
-  info: <Info size={16} aria-hidden="true" />,
-  success: <CheckCircle size={16} aria-hidden="true" />,
-  warning: <Warning size={16} aria-hidden="true" />,
-  danger: <WarningOctagon size={16} aria-hidden="true" />,
+  info: <Info size={16} weight="light" aria-hidden="true" />,
+  success: <CheckCircle size={16} weight="light" aria-hidden="true" />,
+  warning: <Warning size={16} weight="light" aria-hidden="true" />,
+  danger: <WarningOctagon size={16} weight="light" aria-hidden="true" />,
 };
 
 export function Banner({
@@ -1613,7 +1676,7 @@ export function Field({
       {children}
       {error ? (
         <p id={`${id}-error`} className="flex items-center gap-1.5 text-small text-danger">
-          <WarningCircle size={14} aria-hidden="true" />
+          <WarningCircle size={14} weight="light" aria-hidden="true" />
           {error}
         </p>
       ) : null}
@@ -1711,6 +1774,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
 `apps/cms/src/studio/ui/Checkbox.tsx`:
 
 ```tsx
+import { Check } from '@phosphor-icons/react/dist/ssr';
 import { forwardRef } from 'react';
 import type { InputHTMLAttributes } from 'react';
 
@@ -1718,25 +1782,37 @@ export type CheckboxProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> 
   readonly label: string;
   readonly description?: string;
   readonly invalid?: boolean;
+  /** Keeps the label for assistive tech but hides it, for row-selection boxes in tables. */
+  readonly hideLabel?: boolean;
 };
 
+// The check is a Phosphor icon over the native input, so it follows --on-primary in both themes
+// (a data-URI image cannot read a CSS variable).
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox(
-  { id, label, description, invalid = false, ...rest },
+  { id, label, description, invalid = false, hideLabel = false, ...rest },
   ref,
 ) {
   return (
     <div className="flex items-start gap-2">
-      <input
-        ref={ref}
-        id={id}
-        type="checkbox"
-        aria-invalid={invalid || undefined}
-        aria-describedby={description ? `${id}-description` : undefined}
-        className="mt-0.5 size-4 shrink-0 cursor-pointer appearance-none rounded-xs border border-line-control bg-raised checked:border-accent checked:bg-accent checked:[background-image:url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 8.5l2.5 2.5L12 5.5' fill='none' stroke='%2304212a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;)] disabled:cursor-not-allowed disabled:opacity-50"
-        {...rest}
-      />
+      <span className="relative mt-0.5 flex size-4 shrink-0">
+        <input
+          ref={ref}
+          id={id}
+          type="checkbox"
+          aria-invalid={invalid || undefined}
+          aria-describedby={description ? `${id}-description` : undefined}
+          className="peer size-4 cursor-pointer appearance-none rounded-xs border border-line-control bg-raised checked:border-primary checked:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+          {...rest}
+        />
+        <Check
+          size={12}
+          weight="bold"
+          aria-hidden="true"
+          className="pointer-events-none absolute left-0.5 top-0.5 hidden text-on-primary peer-checked:block"
+        />
+      </span>
       <div className="flex flex-col">
-        <label htmlFor={id} className="cursor-pointer text-body text-fg">
+        <label htmlFor={id} className={hideLabel ? 'sr-only' : 'cursor-pointer text-body text-fg'}>
           {label}
         </label>
         {description ? (
@@ -1783,7 +1859,7 @@ export function Switch({
         onClick={() => onChange(!checked)}
         className={cn(
           'relative h-5 w-8 shrink-0 rounded-full border transition-colors duration-(--duration-fast)',
-          checked ? 'border-accent bg-accent' : 'border-line-control bg-raised',
+          checked ? 'border-primary bg-primary' : 'border-line-control bg-raised',
           'disabled:cursor-not-allowed disabled:opacity-50',
         )}
       >
@@ -1791,7 +1867,7 @@ export function Switch({
           aria-hidden="true"
           className={cn(
             'absolute top-0.5 size-3.5 rounded-full transition-transform duration-(--duration-fast)',
-            checked ? 'translate-x-3.5 bg-on-accent' : 'translate-x-0.5 bg-fg-muted',
+            checked ? 'translate-x-3.5 bg-on-primary' : 'translate-x-0.5 bg-fg-muted',
           )}
         />
       </button>
@@ -2069,7 +2145,7 @@ export function Tabs({
     if (next) onChange(next.id);
   };
   return (
-    <div role="tablist" aria-label={label} onKeyDown={onKeyDown} className="flex gap-4 border-b border-line-subtle">
+    <div role="tablist" aria-label={label} onKeyDown={onKeyDown} className="inline-flex gap-0.5 rounded-md bg-active p-0.5">
       {items.map((tab) => {
         const selected = tab.id === active;
         return (
@@ -2083,8 +2159,8 @@ export function Tabs({
             tabIndex={selected ? 0 : -1}
             onClick={() => onChange(tab.id)}
             className={cn(
-              '-mb-px flex h-7 items-center gap-1.5 border-b-2 text-body-strong transition-colors duration-(--duration-base)',
-              selected ? 'border-accent text-fg' : 'border-transparent text-fg-muted hover:text-fg',
+              'flex h-6 items-center gap-1.5 rounded-sm px-3 text-body-strong transition-[background-color,color] duration-(--duration-base) ease-(--ease-out)',
+              selected ? 'bg-surface text-fg shadow-raised' : 'text-fg-muted hover:text-fg',
             )}
           >
             {tab.label}
@@ -2197,10 +2273,10 @@ export function PageHeader({
   readonly actions?: ReactNode;
 }): ReactElement {
   return (
-    <header className="sticky top-0 z-(--z-header) flex h-(--page-header-height) items-center justify-between gap-4 border-b border-line-subtle bg-canvas px-6">
-      <div className="flex min-w-0 items-center gap-2">
+    <header className="flex items-end justify-between gap-4 px-7 pb-3 pt-6">
+      <div className="min-w-0">
         {crumbs.length > 0 ? (
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-body text-fg-muted">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-small text-fg-subtle">
             {crumbs.map((crumb) => (
               <span key={crumb.label} className="flex items-center gap-1">
                 {crumb.href ? (
@@ -2210,15 +2286,17 @@ export function PageHeader({
                 ) : (
                   crumb.label
                 )}
-                <CaretRight size={12} aria-hidden="true" />
+                <CaretRight size={10} weight="light" aria-hidden="true" />
               </span>
             ))}
           </nav>
         ) : null}
-        <h1 className="truncate text-title text-fg">{title}</h1>
-        {typeof count === 'number' ? (
-          <span className="tabular rounded-xs bg-active px-1.5 text-micro text-fg-muted">{count.toLocaleString('en-US')}</span>
-        ) : null}
+        <h1 className="flex min-w-0 items-baseline gap-2.5 text-display text-fg">
+          <span className="truncate">{title}</span>
+          {typeof count === 'number' ? (
+            <span className="tabular text-body-strong text-fg-subtle">{count.toLocaleString('en-US')}</span>
+          ) : null}
+        </h1>
       </div>
       {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
     </header>
@@ -2253,9 +2331,9 @@ export { TextInput, controlClass } from './TextInput';
 
 Notes for the implementer:
 
-- `@phosphor-icons/react/dist/ssr` is the server-safe entry; client components import from `@phosphor-icons/react`. Check both paths exist in the installed version before using them (`ls node_modules/@phosphor-icons/react/dist`).
+- `@phosphor-icons/react/dist/ssr` is the server-safe entry; client components import from `@phosphor-icons/react`. Check both paths exist in the installed version before using them (`ls node_modules/@phosphor-icons/react/dist`). Client icons get the Light weight from `IconDefaults`; every SSR icon passes `weight="light"` (or `"fill"` for the Published glyph) itself, because SSR icons cannot read context.
 - Confirm the `Popover` props used in `Select.tsx` (`matchAnchorWidth`, `role`, `ariaLabel`) against `packages/ui/src/primitives/Popover.tsx`; they are listed in `docs/studio/research/design-inputs.md` §1.
-- The only arbitrary values allowed are the ones above (`scale-[0.98]`, the checkbox check-mark image, `[field-sizing:content]`, `[animation-duration:1.6s]`, the `Kbd` inset line). Task 1.5 adds a check that rejects new arbitrary colours and font sizes.
+- The only arbitrary values allowed are the ones above (`scale-[0.98]`, `[field-sizing:content]`, `[animation-duration:1.6s]`, the `Kbd` inset line). Task 1.5 adds a check that rejects new arbitrary colours and font sizes.
 
 - [ ] **Step 5: Make the shared Tooltip keep its child's ref**
 
@@ -3145,82 +3223,98 @@ export const LIST_ROWS: readonly FixtureRow[] = [
 `apps/cms/src/studio/lab/compositions/ListComposition.tsx`:
 
 ```tsx
-import { Columns, DotsThree, FunnelSimple, MagnifyingGlass, Plus } from '@phosphor-icons/react';
+import { DotsThree, MagnifyingGlass, Plus, SlidersHorizontal, X } from '@phosphor-icons/react';
 import type { ReactElement } from 'react';
 
-import { Badge, Button, IconButton, PageHeader, StatusBadge, TextInput } from '../../ui';
+import { Badge, Button, Checkbox, IconButton, Kbd, PageHeader, StatusBadge } from '../../ui';
 import { LIST_ROWS } from './fixtures';
 
+// The Phase 1 Table layout inside the sheet. The grouped List layout is Phase 5 (02-SCREENS S-10).
 export function ListComposition(): ReactElement {
   return (
-    <div className="overflow-hidden rounded-md border border-line bg-canvas">
-      <PageHeader
-        title="Blogs"
-        count={312}
-        actions={
-          <>
-            <IconButton label="More actions" icon={<DotsThree size={16} aria-hidden="true" />} />
-            <Button variant="primary" icon={<Plus size={14} aria-hidden="true" />}>
-              New blog
+    <div className="rounded-lg bg-canvas p-(--sheet-inset)">
+      <div className="overflow-hidden rounded-lg bg-surface shadow-sheet">
+        <PageHeader
+          title="Blogs"
+          count={312}
+          crumbs={[{ label: 'Content' }]}
+          actions={
+            <>
+              <Button icon={<SlidersHorizontal size={14} aria-hidden="true" />}>Display</Button>
+              <IconButton label="More actions" icon={<DotsThree aria-hidden="true" />} />
+              <Button variant="primary" icon={<Plus size={14} aria-hidden="true" />}>
+                New blog
+              </Button>
+            </>
+          }
+        />
+        <div className="flex items-center gap-2 px-7 pb-3">
+          <Badge tone="accent" size="md">
+            Author is Ana Ramos
+            <X size={12} aria-hidden="true" />
+          </Badge>
+          <Badge size="md">
+            <Plus size={12} aria-hidden="true" />
+            Filter
+          </Badge>
+          <div className="flex-1" />
+          <span className="flex h-8 w-56 items-center gap-2 rounded-sm bg-raised px-2.5 text-body text-fg-subtle shadow-raised">
+            <MagnifyingGlass size={14} aria-hidden="true" />
+            <span className="flex-1">Search blogs</span>
+            <Kbd keys={['/']} />
+          </span>
+        </div>
+        <div className="px-3 pb-3">
+          <table className="w-full table-fixed border-collapse text-body">
+            <thead>
+              <tr className="h-8 text-left text-micro text-fg-muted">
+                <th className="w-10 rounded-l-md bg-raised px-3" aria-label="Select" />
+                <th className="bg-raised px-3">Title</th>
+                <th className="w-44 bg-raised px-3">Authors</th>
+                <th className="w-32 bg-raised px-3">Category</th>
+                <th className="w-48 bg-raised px-3">Status</th>
+                <th className="w-32 bg-raised px-3 text-right">Published</th>
+                <th className="w-28 rounded-r-md bg-raised px-3 text-right">Updated</th>
+              </tr>
+            </thead>
+            <tbody>
+              {LIST_ROWS.map((row) => (
+                <tr key={row.id} className="group h-11 hover:bg-hover">
+                  <td className="rounded-l-sm px-3">
+                    <span className="opacity-0 group-hover:opacity-100">
+                      <Checkbox id={`comp-row-${row.id}`} label={`Select ${row.title}`} hideLabel />
+                    </span>
+                  </td>
+                  <td className="truncate px-3 text-body-strong text-fg">{row.title}</td>
+                  <td className="truncate px-3 text-fg-muted">
+                    {row.authors[0]}
+                    {row.authors.length > 1 ? ` +${row.authors.length - 1}` : ''}
+                  </td>
+                  <td className="px-3">
+                    <Badge>{row.category}</Badge>
+                  </td>
+                  <td className="px-3">
+                    <StatusBadge status={row.status} detail={row.status === 'scheduled' ? 'Oct 18, 9:00 AM' : undefined} />
+                  </td>
+                  <td className="tabular px-3 text-right text-fg-subtle">{row.published ?? ''}</td>
+                  <td className="tabular rounded-r-sm px-3 text-right text-fg-subtle">{row.updated}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <footer className="flex items-center justify-between px-7 py-3 text-small text-fg-subtle">
+          <span className="tabular">1 to 25 of 312</span>
+          <div className="flex gap-1">
+            <Button size="sm" variant="ghost" disabled>
+              Previous
             </Button>
-          </>
-        }
-      />
-      <div className="flex items-center gap-2 border-b border-line-subtle px-6 py-2">
-        <div className="w-64">
-          <TextInput aria-label="Search blogs" placeholder="Search blogs" prefix={<MagnifyingGlass size={14} aria-hidden="true" />} />
-        </div>
-        <Button size="md" variant="ghost" icon={<FunnelSimple size={14} aria-hidden="true" />}>
-          Filter
-        </Button>
-        <Badge>Status is Draft</Badge>
-        <div className="flex-1" />
-        <IconButton label="Columns" icon={<Columns size={16} aria-hidden="true" />} />
+            <Button size="sm" variant="ghost">
+              Next
+            </Button>
+          </div>
+        </footer>
       </div>
-      <table className="w-full table-fixed border-collapse text-body">
-        <thead className="bg-surface">
-          <tr className="h-8 text-left text-micro text-fg-muted">
-            <th className="w-10 px-3" aria-label="Select" />
-            <th className="px-3">Title</th>
-            <th className="w-44 px-3">Authors</th>
-            <th className="w-32 px-3">Category</th>
-            <th className="w-44 px-3">Status</th>
-            <th className="w-32 px-3 text-right">Published</th>
-            <th className="w-28 px-3 text-right">Updated</th>
-          </tr>
-        </thead>
-        <tbody>
-          {LIST_ROWS.map((row) => (
-            <tr key={row.id} className="h-10 border-t border-line-subtle hover:bg-hover">
-              <td className="px-3">
-                <input type="checkbox" aria-label={`Select ${row.title}`} className="size-4" />
-              </td>
-              <td className="truncate px-3 text-fg">{row.title}</td>
-              <td className="truncate px-3 text-fg-muted">
-                {row.authors[0]}
-                {row.authors.length > 1 ? ` +${row.authors.length - 1}` : ''}
-              </td>
-              <td className="truncate px-3 text-fg-muted">{row.category}</td>
-              <td className="px-3">
-                <StatusBadge status={row.status} detail={row.status === 'scheduled' ? 'Oct 18, 9:00 AM' : undefined} />
-              </td>
-              <td className="tabular px-3 text-right text-fg-muted">{row.published ?? ''}</td>
-              <td className="tabular px-3 text-right text-fg-muted">{row.updated}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <footer className="flex items-center justify-between border-t border-line-subtle px-6 py-2 text-small text-fg-muted">
-        <span className="tabular">1 to 25 of 312</span>
-        <div className="flex gap-1">
-          <Button size="sm" variant="ghost" disabled>
-            Previous
-          </Button>
-          <Button size="sm" variant="ghost">
-            Next
-          </Button>
-        </div>
-      </footer>
     </div>
   );
 }
@@ -3231,78 +3325,120 @@ export function ListComposition(): ReactElement {
 `apps/cms/src/studio/lab/compositions/EditComposition.tsx`:
 
 ```tsx
-import { CaretDown, DotsThree, Eye, SidebarSimple } from '@phosphor-icons/react';
+'use client';
+
+import { CalendarBlank, CaretDown, CaretRight, DotsThree, Eye, LinkSimple, Plus, SidebarSimple, Tag } from '@phosphor-icons/react';
+import { useState } from 'react';
 import type { ReactElement } from 'react';
 
-import { Banner, Button, Card, Checkbox, Field, IconButton, Section, StatusBadge, TextInput, Textarea, buttonClass } from '../../ui';
+import { Badge, Banner, Button, Checkbox, Field, IconButton, Section, Tabs, TextInput, Textarea, buttonClass } from '../../ui';
 
+// Writing-first edit view inside the sheet: title, lead, property chips, then fields; a tabbed
+// inspector on the right. Property chips and the SEO and Checklist tabs arrive in Phase 4.
 export function EditComposition(): ReactElement {
+  const [tab, setTab] = useState('details');
   return (
-    <div className="overflow-hidden rounded-md border border-line bg-canvas">
-      <header className="flex h-(--document-header-height) items-center justify-between gap-4 border-b border-line-subtle px-6">
-        <div className="flex min-w-0 items-center gap-3">
-          <span className="text-body text-fg-muted">Blogs</span>
-          <span className="truncate text-body-strong text-fg">Zero CVE container images</span>
-          <StatusBadge status="changed" />
-          <span className="text-small text-warning">Unsaved changes</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button icon={<Eye size={14} aria-hidden="true" />}>Preview</Button>
-          <Button>Save draft</Button>
-          <div className="flex">
-            <Button variant="primary" className="rounded-r-none">
-              Publish
+    <div className="rounded-lg bg-canvas p-(--sheet-inset)">
+      <div className="flex flex-col overflow-hidden rounded-lg bg-surface shadow-sheet">
+        <header className="flex h-(--document-header-height) items-center justify-between gap-4 pl-6 pr-3">
+          <div className="flex min-w-0 items-center gap-2 text-body-strong">
+            <span className="text-fg-subtle">Blogs</span>
+            <CaretRight size={12} aria-hidden="true" className="text-fg-subtle" />
+            <span className="truncate text-fg">Zero CVE container images</span>
+            <span className="ml-1 flex items-center gap-1.5 text-small font-normal text-fg-subtle">
+              <span aria-hidden="true" className="size-1.5 rounded-full bg-warning" />
+              Unsaved changes
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Button variant="ghost" icon={<Eye size={14} aria-hidden="true" />}>
+              Preview
             </Button>
-            <button
-              type="button"
-              aria-label="More publish options"
-              className={buttonClass('primary', 'md', 'rounded-l-none border-l border-on-accent/20 px-1.5')}
-            >
-              <CaretDown size={12} aria-hidden="true" />
-            </button>
+            <IconButton label="More actions" icon={<DotsThree aria-hidden="true" />} />
+            <IconButton label="Toggle inspector" icon={<SidebarSimple aria-hidden="true" />} shortcut="⌘." />
+            <div className="flex">
+              <Button variant="primary" className="rounded-r-none">
+                Publish changes
+              </Button>
+              <button
+                type="button"
+                aria-label="More publish options"
+                className={buttonClass('primary', 'md', 'rounded-l-none border-l border-on-primary/20 px-1.5')}
+              >
+                <CaretDown size={12} aria-hidden="true" />
+              </button>
+            </div>
           </div>
-          <IconButton label="Toggle rail" icon={<SidebarSimple size={16} aria-hidden="true" />} shortcut="⌘." />
-          <IconButton label="More actions" icon={<DotsThree size={16} aria-hidden="true" />} />
-        </div>
-      </header>
-      <div className="flex">
-        <div className="min-w-0 flex-1 px-6 py-8">
-          <div className="mx-auto flex max-w-(--content-max-width) flex-col gap-5">
-            <Banner tone="warning">1 issue blocks publishing: Slug is empty.</Banner>
-            <label htmlFor="comp-title" className="sr-only">
-              Title
-            </label>
-            <input
-              id="comp-title"
-              defaultValue="Zero CVE container images: how we keep the count at zero"
-              className="w-full bg-transparent text-doc-title text-fg outline-none placeholder:text-fg-subtle"
-            />
-            <Field id="comp-abstract" label="Abstract" description="One or two sentences. Used as the meta description when none is set.">
-              <Textarea id="comp-abstract" defaultValue="CleanStart rebuilds every image from source each day, so known vulnerabilities never reach your registry." />
-            </Field>
-            <Section title="Body">
-              <div className="min-h-48 rounded-md border border-line p-4 text-doc-body text-fg-muted">The editor arrives in Phase 3.</div>
-            </Section>
+        </header>
+        <div className="flex">
+          <div className="min-w-0 flex-1 px-6 pb-16 pt-2">
+            <div className="mx-auto flex max-w-(--content-max-width) flex-col gap-5">
+              <Banner tone="warning">1 issue blocks publishing: Slug is empty.</Banner>
+              <label htmlFor="comp-title" className="sr-only">
+                Title
+              </label>
+              <input
+                id="comp-title"
+                defaultValue="Zero CVE container images: how we keep the count at zero"
+                className="mt-4 w-full bg-transparent text-doc-title text-fg outline-none placeholder:text-fg-subtle"
+              />
+              <p className="-mt-2 text-doc-lead text-fg-muted">
+                CleanStart rebuilds every image from source each day, so known vulnerabilities never reach your registry.
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                <Badge size="md">Ana Ramos</Badge>
+                <Badge size="md">
+                  <Tag size={12} aria-hidden="true" />
+                  Security
+                </Badge>
+                <Badge size="md">
+                  <CalendarBlank size={12} aria-hidden="true" />
+                  Oct 16, 2026
+                </Badge>
+                <Badge size="md">
+                  <LinkSimple size={12} aria-hidden="true" />
+                  /blog/zero-cve-container-images
+                </Badge>
+                <Badge size="md">
+                  <Plus size={12} aria-hidden="true" />
+                  Property
+                </Badge>
+              </div>
+              <Field id="comp-abstract" label="Abstract" description="One or two sentences. Used as the meta description when none is set.">
+                <Textarea id="comp-abstract" defaultValue="CleanStart rebuilds every image from source each day, so known vulnerabilities never reach your registry." />
+              </Field>
+              <Section title="Body">
+                <div className="min-h-48 rounded-md bg-raised p-4 text-doc-body text-fg-muted">The editor arrives in Phase 3.</div>
+              </Section>
+            </div>
           </div>
-        </div>
-        <aside aria-label="Document settings" className="flex w-(--rail-width) shrink-0 flex-col gap-3 border-l border-line-subtle bg-surface p-4">
-          <Card title="Publishing">
-            <div className="flex flex-col gap-3">
+          <aside aria-label="Document settings" className="flex w-(--rail-width) shrink-0 flex-col gap-5 border-l border-line-subtle bg-surface px-4 pb-4">
+            <div className="pt-1">
+              <Tabs
+                label="Inspector"
+                idPrefix="comp-inspector"
+                items={[
+                  { id: 'details', label: 'Details' },
+                  { id: 'seo', label: 'SEO' },
+                  { id: 'checklist', label: 'Checklist' },
+                ]}
+                active={tab}
+                onChange={setTab}
+              />
+            </div>
+            <Section title="Publishing">
               <Field id="comp-date" label="Display date">
                 <TextInput id="comp-date" defaultValue="Oct 16, 2026" />
               </Field>
               <Checkbox id="comp-featured" label="Featured" />
-            </div>
-          </Card>
-          <Card title="URL">
-            <Field id="comp-slug" label="Slug" error="Slug is required to publish.">
-              <TextInput id="comp-slug" invalid describedBy="comp-slug-error" className="font-code" />
-            </Field>
-          </Card>
-          <Card title="Search appearance">
-            <p className="text-small text-fg-muted">Title 52 of 60 · Description 148 of 160</p>
-          </Card>
-        </aside>
+            </Section>
+            <Section title="URL">
+              <Field id="comp-slug" label="Slug" error="Slug is required to publish.">
+                <TextInput id="comp-slug" invalid describedBy="comp-slug-error" className="font-code" />
+              </Field>
+            </Section>
+          </aside>
+        </div>
       </div>
     </div>
   );
@@ -3323,7 +3459,7 @@ In `apps/cms/src/studio/lab/LabPage.tsx`, import both compositions and append to
 1. Run Gate A for all of Phase 0 (`docs/studio/05-REVIEW-PROTOCOL.md`).
 2. Take screenshots of every lab section at 1440×900 in light and dark, plus the two compositions.
 3. Gate C review by someone who did not build it, against `01-DESIGN-SYSTEM.md` §10.
-4. Product owner reviews the two compositions and signs off below.
+4. Product owner reviews the two compositions against the approved direction B mockups and signs off below.
 
 ```
 Phase 0 sign-off
@@ -5460,7 +5596,7 @@ export function Sidebar({
     <nav
       aria-label="Studio"
       className={cn(
-        'sticky top-0 z-(--z-sidebar) flex h-dvh shrink-0 flex-col border-r border-line-subtle bg-surface transition-[width] duration-(--duration-slow) ease-(--ease-out)',
+        'sticky top-0 z-(--z-sidebar) flex h-dvh shrink-0 flex-col transition-[width] duration-(--duration-slow) ease-(--ease-out)',
         collapsed ? 'w-(--sidebar-collapsed-width)' : 'w-(--sidebar-width)',
       )}
     >
@@ -5475,10 +5611,10 @@ export function Sidebar({
         <button
           type="button"
           onClick={() => document.dispatchEvent(new CustomEvent('studio:palette:open'))}
-          className="flex h-7 w-full items-center gap-2 rounded-sm border border-line bg-raised px-2 text-body text-fg-subtle hover:border-line-strong"
+          className="flex h-8 w-full items-center gap-2 rounded-md bg-surface px-2.5 text-body text-fg-subtle shadow-raised hover:text-fg-muted"
         >
           <MagnifyingGlass size={14} aria-hidden="true" />
-          {collapsed ? <span className="sr-only">Search or jump to</span> : <span className="flex-1 text-left">Search or jump to…</span>}
+          {collapsed ? <span className="sr-only">Search</span> : <span className="flex-1 text-left">Search</span>}
           {collapsed ? null : <Kbd keys={['⌘', 'K']} />}
         </button>
       </div>
@@ -5487,9 +5623,9 @@ export function Sidebar({
         <Link
           href="/studio"
           aria-current={pathname === '/studio' ? 'page' : undefined}
-          className="flex h-7 items-center gap-2 rounded-sm px-2 text-body-strong text-fg-muted hover:bg-hover hover:text-fg aria-[current=page]:bg-active aria-[current=page]:text-fg"
+          className="flex h-7.5 items-center gap-2.5 rounded-sm px-2 text-body-strong text-fg-muted hover:bg-hover hover:text-fg aria-[current=page]:bg-surface aria-[current=page]:text-fg aria-[current=page]:shadow-raised"
         >
-          <House size={16} aria-hidden="true" />
+          <House size={15} aria-hidden="true" />
           {collapsed ? <span className="sr-only">Home</span> : 'Home'}
         </Link>
 
@@ -5517,7 +5653,7 @@ export function Sidebar({
                       href={item.href}
                       aria-current={isActive(item.href) ? 'page' : undefined}
                       title={collapsed ? item.label : undefined}
-                      className="flex h-7 items-center justify-between gap-2 rounded-sm px-2 text-body-strong text-fg-muted hover:bg-hover hover:text-fg aria-[current=page]:bg-active aria-[current=page]:text-fg"
+                      className="flex h-7.5 items-center justify-between gap-2 rounded-sm px-2 text-body-strong text-fg-muted hover:bg-hover hover:text-fg aria-[current=page]:bg-surface aria-[current=page]:text-fg aria-[current=page]:shadow-raised"
                     >
                       <span className={collapsed ? 'sr-only' : 'truncate'}>{item.label}</span>
                       {!collapsed && item.draftCount > 0 ? (
@@ -5583,11 +5719,14 @@ export function AppShell({ shell, children }: { readonly shell: ShellData; reado
   return (
     <ToastProvider>
       <SkipLink />
-      <div className="flex min-h-dvh bg-canvas text-fg">
+      <div className="flex h-dvh bg-canvas text-fg">
         <Sidebar shell={shell} collapsed={collapsed} onToggle={toggle} />
-        <main id="studio-main" tabIndex={-1} className="min-w-0 flex-1 outline-none">
-          {children}
-        </main>
+        <div className="min-w-0 flex-1 py-(--sheet-inset) pr-(--sheet-inset)">
+          {/* The sheet: the only scroll container, so sticky headers stick to its top edge. */}
+          <main id="studio-main" tabIndex={-1} className="relative h-full overflow-y-auto rounded-lg bg-surface shadow-sheet outline-none">
+            {children}
+          </main>
+        </div>
       </div>
       <div className="fixed inset-0 z-(--z-palette) hidden items-center justify-center bg-canvas p-8 text-center max-[1023px]:flex">
         <p className="max-w-sm text-body text-fg-muted">
@@ -5742,7 +5881,8 @@ git commit -m "feat(studio): T1.10 app shell and navigation"
 ### Task 1.11: Sign in, forgot password, reset password (S-01 to S-03)
 
 **Files:**
-- Create: `apps/cms/src/studio/features/auth/AuthCard.tsx`
+- Create: `apps/cms/src/studio/features/auth/AuthCard.tsx`, `BrandPanel.tsx`
+- Create: `apps/cms/public/studio/hero-grid.svg` (copied from `apps/web/public/images/cleanstart-images/hero-vector-grid.svg`)
 - Create: `apps/cms/src/studio/features/auth/LoginForm.tsx`, `ForgotForm.tsx`, `ResetForm.tsx`
 - Create: `apps/cms/src/studio/features/auth/auth-errors.ts`
 - Test: `apps/cms/src/studio/features/auth/auth-errors.test.ts`
@@ -5804,7 +5944,79 @@ export const loginErrorMessage = (status: number, body: PayloadErrorBody): strin
 
 Run the test again. Expected: PASS (4 tests).
 
-- [ ] **Step 3: The shared card**
+- [ ] **Step 3: The split layout**
+
+Copy the website's faded grid so the CMS serves it from its own origin:
+
+```bash
+mkdir -p apps/cms/public/studio
+cp apps/web/public/images/cleanstart-images/hero-vector-grid.svg apps/cms/public/studio/hero-grid.svg
+file --mime-type -b apps/cms/public/studio/hero-grid.svg
+```
+
+Expected: `image/svg+xml`.
+
+`apps/cms/src/studio/features/auth/BrandPanel.tsx` (design system §7.7; decorative, so it is hidden from assistive tech and shows fixed copy, never real content):
+
+```tsx
+import { ChatCircle, CheckCircle, Clock } from '@phosphor-icons/react/dist/ssr';
+import type { ReactElement, ReactNode } from 'react';
+
+import { Icon } from '@/payload/admin/Icon';
+
+function ActivityCard({ icon, kicker, title, meta, className }: { readonly icon: ReactNode; readonly kicker: string; readonly title: string; readonly meta?: string; readonly className: string }): ReactElement {
+  return (
+    <div className={`studio-drift absolute w-95 rounded-lg bg-white/6 p-1.5 shadow-dialog ring-1 ring-white/10 backdrop-blur-lg ${className}`}>
+      <div className="flex flex-col gap-2 rounded-md bg-black/40 px-4 py-3.5">
+        <span className="flex items-center gap-2 text-small text-white/70">
+          {icon}
+          {kicker}
+        </span>
+        <span className="text-body-strong text-white">{title}</span>
+        {meta ? <span className="text-small text-white/65">{meta}</span> : null}
+      </div>
+    </div>
+  );
+}
+
+export function BrandPanel(): ReactElement {
+  return (
+    <div aria-hidden="true" className="relative isolate hidden overflow-hidden rounded-lg bg-(image:--brand-band) text-white min-[1100px]:block">
+      <span className="absolute -left-36 -top-30 -z-10 h-105 w-130 rounded-full bg-(--brand-glow-violet) blur-3xl" />
+      <span className="absolute -right-45 top-50 -z-10 h-115 w-140 rounded-full bg-(--brand-glow-blue) blur-3xl" />
+      <span className="absolute -bottom-40 left-30 -z-10 h-75 w-105 rounded-full bg-(--brand-glow-pink) blur-3xl" />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/studio/hero-grid.svg" alt="" width={730} height={708} className="absolute left-1/2 top-[46%] -z-10 -translate-x-1/2 -translate-y-1/2 opacity-55" />
+      <div className="absolute left-11 top-10 flex items-center gap-2.5 text-heading text-white">
+        <Icon />
+        CleanStart
+      </div>
+      <div className="absolute left-1/2 top-38 h-90 w-109 -translate-x-1/2">
+        <ActivityCard className="left-14 top-0 opacity-70" icon={<Clock size={14} weight="light" />} kicker="Scheduled for Oct 22, 9:00 AM" title="FedRAMP-ready base images, explained" />
+        <ActivityCard className="left-0 top-25 z-10" icon={<CheckCircle size={14} weight="fill" />} kicker="Published to cleanstart.com" title="Zero CVE container images: how we keep the count at zero" meta="Blog, just now" />
+        <ActivityCard className="left-10 top-61 opacity-85" icon={<ChatCircle size={14} weight="light" />} kicker="Review requested" title="BusyBox in production images: the risk most teams miss" meta="Asked by an editor" />
+      </div>
+      <div className="absolute inset-x-11 bottom-11">
+        <p className="max-w-130 text-brand text-balance">Every page on cleanstart.com starts here.</p>
+        <p className="mt-3 max-w-115 text-doc-lead text-white/70">Write, review and publish blogs, guides, events and resources from one workspace.</p>
+      </div>
+    </div>
+  );
+}
+```
+
+Add the drift animation to `apps/cms/src/studio/styles/primitives.css` inside `@layer components`. It is the only looping motion in Studio and does not use the duration tokens, so it carries its own reduced-motion gate:
+
+```css
+  @media (prefers-reduced-motion: no-preference) {
+    .studio-drift { animation: studio-drift 9s var(--ease-out) infinite alternate; }
+    .studio-drift:nth-child(1) { animation-delay: -3s; }
+    .studio-drift:nth-child(3) { animation-delay: -6s; }
+  }
+  @keyframes studio-drift { to { translate: 0 -8px; } }
+```
+
+The headline uses `text-brand`, and the panel's translucent whites and blacks use `--color-white` and `--color-black`; both are defined in the `@theme` block of `studio.css` (Task 0.3). Check that `Icon` from `@/payload/admin/Icon` renders the mark in `currentColor` on this dark panel; if its second path is hard-coded dark, pass a `className` that sets `color: white` or render the two paths here from that file.
 
 `apps/cms/src/studio/features/auth/AuthCard.tsx`:
 
@@ -5813,20 +6025,39 @@ import type { ReactElement, ReactNode } from 'react';
 
 import { Icon } from '@/payload/admin/Icon';
 
-export function AuthCard({ title, children, footer }: { readonly title: string; readonly children: ReactNode; readonly footer?: ReactNode }): ReactElement {
+import { BrandPanel } from './BrandPanel';
+
+export function AuthCard({
+  title,
+  description,
+  children,
+  footer,
+}: {
+  readonly title: string;
+  readonly description?: string;
+  readonly children: ReactNode;
+  readonly footer?: ReactNode;
+}): ReactElement {
   return (
-    <main className="grid min-h-dvh place-items-center bg-canvas px-4">
-      <div className="w-full max-w-100">
-        <div className="mb-6 flex justify-center">
+    <div className="grid min-h-dvh grid-cols-1 gap-(--sheet-inset) bg-surface p-(--sheet-inset) min-[1100px]:grid-cols-[minmax(0,1fr)_776px]">
+      <main className="flex min-w-0 flex-col px-10 py-7">
+        <div className="flex items-center gap-2.5 text-body-strong text-fg">
           <Icon />
+          CleanStart <span className="text-fg-subtle">Studio</span>
         </div>
-        <section className="rounded-lg border border-line bg-raised p-10">
-          <h1 className="mb-6 text-title text-fg">{title}</h1>
-          {children}
-        </section>
-        {footer ? <p className="mt-6 text-center text-small text-fg-muted">{footer}</p> : null}
-      </div>
-    </main>
+        <div className="grid flex-1 place-items-center py-10">
+          <section className="flex w-full max-w-90 flex-col gap-5">
+            <div>
+              <h1 className="text-display text-fg">{title}</h1>
+              {description ? <p className="mt-1.5 text-body text-fg-muted">{description}</p> : null}
+            </div>
+            {children}
+          </section>
+        </div>
+        {footer ? <p className="text-small text-fg-subtle">{footer}</p> : null}
+      </main>
+      <BrandPanel />
+    </div>
   );
 }
 ```
@@ -6041,7 +6272,7 @@ export default async function Login({ searchParams }: { readonly searchParams: P
   const session = await getSession();
   if (session?.permissions.canAccessAdmin) redirect(target);
   return (
-    <AuthCard title="Sign in to CleanStart Studio" footer="Need access? Ask an admin.">
+    <AuthCard title="Sign in" description="Use your CleanStart work account." footer="Need access? Ask an admin.">
       <LoginForm next={target} />
     </AuthCard>
   );
@@ -6090,7 +6321,7 @@ export default async function Reset({ params }: { readonly params: Promise<{ tok
 }
 ```
 
-Check: `max-w-100` is 400px with Tailwind's 4px spacing scale. Confirm the class compiles (spacing utilities accept any integer in v4).
+Check: spacing utilities such as `max-w-90`, `w-95`, `top-38` and `h-115` are multiples of Tailwind's 4px spacing scale (v4 accepts any integer); confirm they compile. Then open `/studio/login` at 1440×900 in both themes and at 1024 wide (panel hidden), and compare against the approved direction B sign-in mockup.
 
 - [ ] **Step 7: Verify**
 
@@ -7555,7 +7786,7 @@ export function DataTable({
 }): ReactElement {
   return (
     <table className="w-full table-fixed border-collapse text-body">
-      <thead className="sticky top-(--page-header-height) z-(--z-sticky) bg-surface">
+      <thead className="sticky top-0 z-(--z-sticky) bg-raised">
         <tr className="h-8 text-left text-micro text-fg-muted">
           {columns.map((column, index) => {
             const active = query.sort?.replace(/^-/, '') === column.key;
@@ -7570,7 +7801,7 @@ export function DataTable({
                 {column.sortable ? (
                   <Link href={sortHref(basePath, query, column.key)} className={cn('inline-flex items-center gap-1 hover:text-fg', column.align === 'right' && 'flex-row-reverse')}>
                     {column.label}
-                    {active ? (descending ? <ArrowDown size={10} aria-hidden="true" /> : <ArrowUp size={10} aria-hidden="true" />) : null}
+                    {active ? (descending ? <ArrowDown size={10} weight="light" aria-hidden="true" /> : <ArrowUp size={10} weight="light" aria-hidden="true" />) : null}
                   </Link>
                 ) : (
                   column.label
@@ -7793,7 +8024,7 @@ export function ListView({
   const basePath = `/studio/collections/${schema.slug}`;
   const newButton = canCreate ? (
     <Link href={`${basePath}/new`} className={buttonClass('primary', 'md')}>
-      <Plus size={14} aria-hidden="true" />
+      <Plus size={14} weight="light" aria-hidden="true" />
       New {schema.label.singular.toLowerCase()}
     </Link>
   ) : null;
@@ -8619,7 +8850,7 @@ export function DocumentHeader({
   readonly actions: ReactNode;
 }): ReactElement {
   return (
-    <header className="sticky top-0 z-(--z-header) flex h-(--document-header-height) items-center justify-between gap-4 border-b border-line-subtle bg-canvas px-6">
+    <header className="sticky top-0 z-(--z-header) flex h-(--document-header-height) items-center justify-between gap-4 bg-surface pl-6 pr-3">
       <div className="flex min-w-0 items-center gap-3">
         <nav aria-label="Breadcrumb" className="shrink-0">
           <Link href={collectionHref} className="text-body text-fg-muted hover:text-fg">
@@ -8657,7 +8888,7 @@ import { RenderFields } from '@/studio/form/RenderFields';
 import { deleteDocument, saveDocument } from '@/studio/server/actions/document';
 import { updateStudioPreferences } from '@/studio/server/actions/preferences';
 import type { StudioEntitySchema } from '@/studio/server/schema/types';
-import { Card, type DocumentStatus, IconButton } from '@/studio/ui';
+import { type DocumentStatus, IconButton, Section } from '@/studio/ui';
 import { Rail } from '@/studio/ui/Rail';
 
 import { type Issue, buildPatch, flattenErrors, labelForPath } from './build-patch';
@@ -8831,7 +9062,7 @@ export function EditView(props: EditViewProps): ReactElement {
               </>
             }
           />
-          <div className="flex min-h-[calc(100dvh-var(--document-header-height))]">
+          <div className="flex min-h-[calc(100dvh-var(--document-header-height)-2*var(--sheet-inset))]">
             <div className="min-w-0 flex-1 px-6 py-8">
               <form
                 noValidate
@@ -8848,11 +9079,9 @@ export function EditView(props: EditViewProps): ReactElement {
             </div>
             {hasSidebar ? (
               <Rail initialWidth={props.railWidth} collapsed={railCollapsed} label="Document settings">
-                <Card title="Details">
-                  <div className="flex flex-col gap-5">
-                    <RenderFields fields={schema.fields} basePath="" position="sidebar" />
-                  </div>
-                </Card>
+                <Section title="Details">
+                  <RenderFields fields={schema.fields} basePath="" position="sidebar" />
+                </Section>
               </Rail>
             ) : null}
           </div>
@@ -8901,7 +9130,7 @@ export function EditView(props: EditViewProps): ReactElement {
 }
 ```
 
-`min-h-[calc(100dvh-var(--document-header-height))]` is a layout calc, not a colour or font size, so the boundary check allows it.
+`min-h-[calc(100dvh-var(--document-header-height)-2*var(--sheet-inset))]` is a layout calc (the sheet sits 8px inside the window top and bottom), not a colour or font size, so the boundary check allows it.
 
 - [ ] **Step 9: Routes**
 

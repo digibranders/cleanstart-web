@@ -134,12 +134,12 @@ Each decision has an id so reviews can cite it.
 
 ## Decisions (signed off 2026-10-16)
 
-Walked through one by one with the product owner on 2026-10-16.
+Walked through one by one with the product owner on 2026-10-16. D-1 and D-2 were revised and D-10 added on 2026-10-19, when the product owner rejected the first mockups for looking like the current admin and approved direction B (`01-DESIGN-SYSTEM.md`).
 
 | Id | Decision | Outcome |
 |---|---|---|
-| D-1 | UI typeface | **Inter** (variable, self-hosted) for all UI text; JetBrains Mono for code, ids and slugs. |
-| D-2 | Icon set | **`@phosphor-icons/react`**, Regular weight, 16px default, one family everywhere. |
+| D-1 | UI typeface | **Geist** for all UI text; **Geist Mono** for code, ids, slugs and keys. Both from the `geist` package through `next/font` (same-origin files). Revised 2026-10-19; was Inter and JetBrains Mono. |
+| D-2 | Icon set | **`@phosphor-icons/react`**, **Light** weight (through `IconContext` for client components; server components pass it), 16px default, one family everywhere (the Published status glyph uses `fill`). Revised 2026-10-19; was Regular. |
 | D-3 | Default theme | **Follow the system setting**, with a toggle in the user menu and on the Account page. Both themes designed and reviewed. |
 | D-4 | URL | **`/studio`, permanently.** At cutover `/` redirects to `/studio`. |
 | D-5 | Form library | **`react-hook-form`** (ADR-7). |
@@ -147,6 +147,7 @@ Walked through one by one with the product owner on 2026-10-16.
 | D-7 | Preview pane | **Saved-draft iframe** that reloads after each save. |
 | D-8 | Payload admin after cutover | **Admins keep `/admin` for 30 days**, then the Payload admin UI is retired in its own task. |
 | D-9 | Sidebar grouping | **Regrouped navigation** from `02-SCREENS.md` S-00. |
+| D-10 | Visual direction | **Direction B** (2026-10-19): warm neutral greys, a floating sheet inset on a tinted window, ink for primary actions, ultramarine (`#3451e6` light, `#8ea0ff` dark) for focus, selection and links, brand cyan retired from the UI, split sign-in with the website's brand band. Details in `01-DESIGN-SYSTEM.md`. |
 
 ### D-6 in detail: authors draft their own content
 
@@ -195,7 +196,7 @@ Each phase ends with a demo, a product sign-off and a tag (`studio-p<N>`). Every
 
 ### Phase 4: Document workflow and SEO rail (2 weeks)
 
-- Document header, publish control (publish, schedule, unpublish), schedule dialog with upcoming jobs, publish checklist panel, slug guard, SEO length confirm, discard changes, duplicate, delete, purge page, version history with diff and restore, lock banner and takeover, unsaved-changes guard, keyboard save.
+- Document header, publish control (publish, schedule, unpublish), the publish popover (Publish now or Schedule, with upcoming jobs and the checklist summary), property chips under the title, the tabbed inspector (Details, SEO, Checklist), publish checklist panel, slug guard, SEO length confirm, discard changes, duplicate, delete, purge page, version history with diff and restore, lock banner and takeover, unsaved-changes guard, keyboard save.
 - Preview pane, share-link dialog, preview-link list with revoke.
 - The SEO rail: every SEO22 card from the catalog (title, description, indexable, SERP preview, keywords, canonical, social card, redirect, head tags, URL history, schema preview, advanced, health score, permalink).
 - Blog-specific fields: FAQ bulk paste, TOC rows, CTA auto-pick, journey mirror warning, display published date.
@@ -205,7 +206,7 @@ Each phase ends with a demo, a product sign-off and a tag (`studio-p<N>`). Every
 
 - Leads (immutable notice, flagged leads, DSAR find and delete, retry sync, CSV export with truncation notice), partner applications, deal registrations, career applications, resumes.
 - Users (roles, enable/disable, reassign content), integrations (encrypted config, routing multi-selects, health, test, audit trail), page registry and schema manager, email signatures and signature templates (code field and sandboxed preview), broken links, preview audit, audit log, consent log, search log, analytics cache, webhook dead letters, globals.
-- List extras: saved views, column resize, filter pills, export drawer (CSV/XLSX), bulk delete and duplicate.
+- List extras: the grouped List layout (status groups, floating selection bar) as the default for draft-enabled collections with a List and Table switch, view tabs with counts, saved views, column resize, filter chips, export drawer (CSV/XLSX), bulk delete and duplicate.
 - **Exit:** every row in `03` §C is ticked.
 
 ### Phase 6: Dashboards and global tools (1.5 weeks)

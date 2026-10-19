@@ -51,12 +51,12 @@ Conventions:
 
 **Replaces:** Payload's nav and template, `SidebarHeader`, `UserMenu`, `NavOpenOnDesktop`, `NavGroupPersistence`, `NavBadges`, `SkipLink`, `ToastBus`, `CommandPalette` (mount), `ShortcutHelpDialog`, `SaveShortcut` (global part).
 
-**Layout:** sidebar (240px, collapsible to 56px) plus main. No global top bar; each screen owns its `PageHeader`.
+**Layout:** sidebar (232px, collapsible to 56px) sits directly on the window (`--bg-canvas`) with no border; main is one floating sheet (`--bg-surface`, `--radius-lg`, `--shadow-sheet`) inset 8px on top, right and bottom. The sheet is the only scroll container. No global top bar; each screen owns its `PageHeader` inside the sheet. The current nav item is a small raised tile (`--bg-surface`, `--shadow-raised`); other items are `--text-secondary` with 15px icons, so the sidebar recedes.
 
 **Sidebar regions, top to bottom:**
 
-1. Brand row: `Icon` mark plus "CleanStart Studio", collapse button (⌘\).
-2. Search button: "Search or jump to…" with `Kbd` ⌘K. Opens the command palette.
+1. Brand row: monochrome `Icon` mark plus "CleanStart" and a muted "Studio", collapse button (⌘\).
+2. Search button: a raised field-shaped button ("Search", `Kbd` ⌘K). Opens the command palette.
 3. "Home".
 4. Navigation groups. Each group is a `Collapsible`; open state is saved in `users.preferences.navGroups`. Items show the collection's plural label and a draft count badge when drafts exist (replaces `NavBadges`, computed in the shell loader with one `count` query per draft-enabled collection the user can read, cached for 60s).
 5. Bottom: user row (Avatar, name, role) opening the user menu: Account, Theme (System, Light, Dark), Keyboard shortcuts (?), Open published site, Sign out.
@@ -93,9 +93,9 @@ Scoping rule (mirrors `lib/wire-scoped-nav.ts:59-148`): a user whose roles are o
 
 **Replaces:** Payload login plus `CmsLoginHero`, `CmsLoginFooter`.
 
-**Layout:** centred column, 400px card on `--bg-canvas`. Brand mark above. No illustration.
+**Layout:** split (design system §7.7). Left: form side on `--bg-surface`, brand row top-left, form centred in 360px, footer line bottom-left. Right: 776px brand panel inset 8px with the website's dark band, faded hero grid, white mark, three drifting glass activity cards and the headline "Every page on cleanstart.com starts here." with "Write, review and publish blogs, guides, events and resources from one workspace." The panel is decorative (`aria-hidden`) and hidden below 1100px. S-02 and S-03 use the same layout.
 
-**Content:** title "Sign in to CleanStart Studio"; Email; Password (show/hide toggle); "Forgot password?" link; primary "Sign in" (32px, full width); footer line "Need access? Ask an admin." with the help contact used by `CmsLoginFooter`.
+**Content:** title "Sign in" (`--type-display`) with "Use your CleanStart work account." below; Email; Password (show/hide toggle); "Forgot password?" link; primary "Sign in" (ink, 40px, full width); footer line "Need access? Ask an admin." with the help contact used by `CmsLoginFooter`.
 
 **REST:** `POST /api/users/login` with `{ email, password }`. On success redirect to `?next=` (same-origin paths only) or `/studio`.
 
@@ -152,12 +152,27 @@ Scoping rule (mirrors `lib/wire-scoped-nav.ts:59-148`): a user whose roles are o
 **Layout:**
 
 ```
-PageHeader: Blogs  [312]                         [Export] [⋯] [New blog]
-Toolbar:    [Search…  /]  [Saved view ▾]  [+ Filter] [Status is Draft ×]   [Columns] [Density]
-DataTable:  ☐  Title                 Authors   Categories  Status      Published    Updated
-            ☐  Zero CVE images…      Ana R.    Security    ● Published  Oct 12, 2026  2h ago
+PageHeader: Content
+            Blogs 312                         [List|Table] [Display] [Export] [⋯] [New blog]
+Toolbar:    All 312  Drafts 41  Scheduled 1  Published 270   [Author is Ana ×] [+ Filter]   [Search blogs  /]
+
+List layout (default for draft-enabled collections, Phase 5):
+  ▸ ◷ Scheduled 1
+      ◷  FedRAMP-ready base images, explained          Compliance  Oct 22, 9:00 AM   MI   12 min ago
+  ▸ ◐ Published, with changes 1
+      ◐  BusyBox in production images: the risk…       Security                       RM AR  Yesterday
+  ▸ ◌ Drafts 4
+    ☑ ◌  What an SBOM tells you, and what it does not  Security                       AR     3 hr ago
+  ▸ ● Published 27
+                         ╭ 2 selected │ Duplicate  Delete │ esc ╮   floating selection bar
+
+Table layout (Phase 1, and the only layout for collections without drafts):
+            ☐  Title                 Authors   Categories  Status        Published     Updated
+            ☐  Zero CVE images…      Ana R.    Security    ✓ Published   Oct 12, 2026  2h ago
 Footer:     1 to 25 of 312                                   [25 ▾]  ‹  ›
 ```
+
+The List and Table switch is saved per user and collection (`users.preferences.listLayout[collection]`). Groups in the List layout come from one count query per status and one page of rows per open group, so a group is never split by pagination; each group shows "Show 25 more" at its end.
 
 **Columns:** default from `admin.defaultColumns`, else `useAsTitle` plus `updatedAt`. Visibility, order and widths saved per user (`users.preferences.columns[collection]`, same store as `lib/column-widths.ts`). Cells chosen by field type and the custom cell registry (`03` §B).
 
@@ -202,12 +217,12 @@ Same layout as S-12 with an empty document. Title "New blog". Primary actions: "
 ### Layout
 
 ```
-┌ Document header (52, sticky) ─────────────────────────────────────────────────────────────┐
+┌ Document header (54, sticky, no divider) ─────────────────────────────────────────────────────────────┐
 │ Blogs / Zero CVE images for…  ● Published, changes   Unsaved changes   [Preview ▾] [Save draft] [Publish ▾] [⋯] │
 ├ Banner stack ──────────────────────────────────────────────────────────────────────────────┤
 │ (lock) Ana is editing this blog. You can view it; editing is off.        [Take over]        │
 │ (blockers) 1 issue blocks publishing: Slug is empty.                     [Show]            │
-├ Content column (max 720, centred) ──────────────────────┬ Right rail (320) ───────────────┤
+├ Writing column (max 680, centred) ──────────────────────┬ Inspector (320) [Details|SEO|Checklist] ┤
 │ Title                                                    │ Publishing                       │
 │ Abstract                                                 │ URL                              │
 │ Hero image                                               │ Search appearance                │
@@ -229,7 +244,7 @@ Same layout as S-12 with an empty document. Title "New blog". Primary actions: "
 | Meta tooltip on the title | Word count, reading time, created, updated, id (copy) | DocHeader |
 | Preview SplitButton | Main: toggle preview pane. Menu: Open in new tab, Share link…, Manage share links | PreviewMenu, CopyPreviewLink |
 | Save draft | Secondary button, ⌘S. Saves with `draft: true`. Disabled when not modified. | CmsPublishButton, SaveShortcut |
-| Publish SplitButton | Main: Publish (enabled when the user can update and there is something to publish). Menu: Schedule… (⌘⇧S), Unpublish (only if published) | CmsPublishButton, SchedulePublishDialog |
+| Publish SplitButton | Main: opens the publish popover with "Publish now" selected (enabled when the user can update and there is something to publish). Menu: Schedule… (⌘⇧S, opens the popover with "Schedule" selected), Unpublish (only if published) | CmsPublishButton, SchedulePublishDialog |
 | Save (no drafts) | Primary "Save" for collections without drafts | Payload default |
 | More menu | Versions, Duplicate, Discard changes, Purge page from cache, Copy link to this document, Copy API URL, Copy id, Delete | DocKebabExtras, PurgePageButton |
 
@@ -246,17 +261,18 @@ Publish rules (from `CmsPublishButton.tsx:93-124`): Publish enabled when `canPub
 
 ### Content column
 
-- The `useAsTitle` text field renders as the document title in `--type-doc-title`, without a visible label.
+- Optional cover first (the collection's hero image field, in a 6px raised shell), then the `useAsTitle` text field as the document title in `--type-doc-title` without a visible label, then the abstract field (when the collection has one) in `--type-doc-lead`.
+- Property chips under the lead (Phase 4): authors, category, display date and slug as chips that open a popover editor, plus "+ Property" for any other sidebar field the user wants pinned. They edit the same form values as the inspector.
 - Other main-position fields render in config order through the form engine (`03` §A).
-- Tabs render as underline tabs; collapsibles as `Collapsible`; groups as `Section`.
+- Tabs render as segmented `Tabs`; collapsibles as `Collapsible`; groups as `Section`.
 - Field descriptions show below the label (replaces `FieldDescriptionTooltip`).
 - Focus mode (⌘⇧F): hides sidebar, header actions and rail, centres the editor (replaces `EditorFullscreenToggle`; the old ⌘/ binding is not reused).
 
-### Right rail
+### Inspector
 
-Fields with `admin.position: 'sidebar'` grouped into at most 12 cards. The grouping for the SEO22 collections:
+Fields with `admin.position: 'sidebar'`, shown in a tabbed inspector instead of a stack of cards. Phase 1 shows a single Details tab. From Phase 4 the tabs are Details (Publishing, URL, Advanced), SEO (search preview first, then Search appearance, Social, Keywords, Structured data) and Checklist (with a count of open items). Sections inside a tab have a `--type-heading` title and no card. The section grouping for the SEO22 collections:
 
-| Card | Fields (config names) |
+| Section | Fields (config names) |
 |---|---|
 | Publishing | `displayPublishedAt`, `contentUpdatedAt` (read only), `createdBy` (read only, D-6), `featured`, `pinned`, upcoming scheduled jobs |
 | URL | `slug`, `permalink`, `urlChangeHistory`, `redirect` |
@@ -267,7 +283,7 @@ Fields with `admin.position: 'sidebar'` grouped into at most 12 cards. The group
 | Advanced | `canonicalUrl`, `headTags`, `seoAdvanced`, `tocDepth` |
 | Checklist | publish checklist items with status icons; re-fetched after every save (`GET /api/:collection/:id/checklist`) |
 
-Collection-specific sidebar fields not in this table (for example `journeyMirrorWarning` on blogs) go in the card named in `03` §C for that collection. The rail is resizable (280 to 440px, ← and → when the handle is focused) and collapsible; width and collapsed state are saved per user.
+Collection-specific sidebar fields not in this table (for example `journeyMirrorWarning` on blogs) go in the section named in `03` §C for that collection. The inspector is resizable (280 to 440px, ← and → when the handle is focused) and collapsible; width and collapsed state are saved per user.
 
 ### Preview pane
 
@@ -280,9 +296,13 @@ Collection-specific sidebar fields not in this table (for example `journeyMirror
 
 Title "Share a preview link". TTL segmented control (1 hour, 1 day, 3 days, 7 days, 30 days; default 1 day), optional label (120 characters), "Create link" → `POST /api/preview/token`. Result row with Copy. "Manage share links" lists this document's `previewAudit` rows (label, created by, expires, status) with Revoke (`POST /api/preview/revoke`, admin and editor).
 
-### Schedule dialog
+### Publish popover
 
-Replaces `SchedulePublishDialog`. Fields: Action (Publish or Unpublish), Date and time (DateTimePicker, min now), Timezone (defaults to the user's). Lists upcoming schedules for this document from `payload-jobs` (`taskSlug: schedulePublish`, `waitUntil > now`, matching `input.doc`) with Cancel. Action: `scheduleDocument` queues `payload.jobs.queue({ task: 'schedulePublish', input: { type, doc, user: user.id, timezone }, waitUntil })`; cancel deletes the job row (not the empty-job workaround Payload's handler uses).
+Opens from the Publish button or ⌘↵ instead of a modal; ⌘↵ inside it confirms. Shell form (design system §7.4), 380px. Options as a radio list: "Publish now" (with the live URL it goes to) and "Schedule" (date and time with `DateTimePicker`, timezone select). Below the options, the checklist summary ("1 checklist warning. Publishing is still allowed." or the blocker). Footer: ⌘↵ hint, Cancel, and the ink action button that reads "Publish" or "Schedule". A toast confirms with Undo where the action allows it. Authors (D-6) never see the popover; they get Save draft only.
+
+### Schedule details
+
+Replaces `SchedulePublishDialog` (the Schedule option of the publish popover, plus Unpublish scheduling from the More menu). Fields: Action (Publish or Unpublish), Date and time (DateTimePicker, min now), Timezone (defaults to the user's). Lists upcoming schedules for this document from `payload-jobs` (`taskSlug: schedulePublish`, `waitUntil > now`, matching `input.doc`) with Cancel. Action: `scheduleDocument` queues `payload.jobs.queue({ task: 'schedulePublish', input: { type, doc, user: user.id, timezone }, waitUntil })`; cancel deletes the job row (not the empty-job workaround Payload's handler uses).
 
 ### Unsaved changes
 
@@ -294,7 +314,7 @@ Navigating away with changes opens ConfirmDialog "Discard unsaved changes?" (Dis
 
 ### Keyboard
 
-⌘S save draft (or save) · ⌘⇧S schedule · ⌘↵ publish (with confirm when SEO lengths are off) · ⌘⇧P preview pane · ⌘⇧F focus mode · ⌘. toggle rail · Esc closes overlays.
+⌘S save draft (or save) · ⌘⇧S schedule · ⌘↵ opens the publish popover, ⌘↵ again publishes (with confirm when SEO lengths are off) · ⌘⇧P preview pane · ⌘⇧F focus mode · ⌘. toggle inspector · Esc closes overlays.
 
 ### Acceptance
 

@@ -217,7 +217,7 @@ Paths are relative to `apps/cms/src/payload/admin/`. "SEO22" and other set names
 | auth/CmsAccountView.tsx | RET | route page S-04 | 1 |
 | auth/CmsAccountForm.tsx | PORT | `features/account/AccountForm.tsx` | 1 |
 | auth/CmsLoginFooter.tsx | PORT | S-01 footer line | 1 |
-| auth/CmsLoginHero.tsx | PORT | S-01 header | 1 |
+| auth/CmsLoginHero.tsx | PORT | S-01 brand panel (`features/auth/BrandPanel.tsx`, design system §7.7) | 1 |
 | cache/CacheView.tsx | RET | route page S-43 | 6 |
 | cache/CacheClient.tsx | PORT | `reports/cache/CachePurge.tsx` | 6 |
 | cache/PurgePageButton.tsx | PORT | `document/MoreMenu.tsx` item | 4 |
