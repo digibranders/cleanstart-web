@@ -1,5 +1,6 @@
 import type { CollectionSlug, Endpoint } from 'payload';
 
+import { canAuthorInCollection } from '../access';
 import { hasAnyRole } from '../access/typed-user';
 import { runPublishChecks } from '../hooks/publish-gate';
 
@@ -21,7 +22,7 @@ export const publishChecklistEndpoint: Endpoint = {
   path: '/:collection/:id/checklist',
   method: 'get',
   handler: async (req) => {
-    if (!hasAnyRole(req.user, ['admin', 'editor', 'author'])) {
+    if (!hasAnyRole(req.user, ['admin', 'editor', 'author', 'events'])) {
       return json({ ok: false, error: 'forbidden' }, { status: 403 });
     }
 
@@ -29,6 +30,9 @@ export const publishChecklistEndpoint: Endpoint = {
 
     if (!collection || !id) {
       return json({ ok: false, error: 'missing_params' }, { status: 400 });
+    }
+    if (!canAuthorInCollection(req.user, collection)) {
+      return json({ ok: false, error: 'forbidden' }, { status: 403 });
     }
 
     let doc: Record<string, unknown>;

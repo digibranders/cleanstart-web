@@ -1,7 +1,7 @@
 import { ValidationError } from 'payload';
 import { describe, expect, it } from 'vitest';
 
-import { rejectFilenameRename } from './Media';
+import { Media, rejectFilenameRename } from './Media';
 
 const callHook = (args: Parameters<typeof rejectFilenameRename>[0]) =>
   (rejectFilenameRename as (a: typeof args) => unknown)(args);
@@ -66,5 +66,23 @@ describe('rejectFilenameRename', () => {
     const errors = (caught as { data?: { errors?: { path?: string; message?: string }[] } }).data?.errors;
     expect(errors?.[0]?.path).toBe('filename');
     expect(errors?.[0]?.message).toMatch(/rename is not supported/i);
+  });
+});
+
+describe('Media access', () => {
+  const run = (fn: unknown, roles: string[]): unknown =>
+    (fn as (a: { req: { user: unknown } }) => unknown)({ req: { user: { id: 1, roles } } });
+
+  it('lets events upload and edit its own folders but never delete', () => {
+    expect(run(Media.access?.create, ['events'])).toBe(true);
+    expect(run(Media.access?.update, ['events'])).toEqual({
+      folder: { in: ['web/event', 'web/webinar'] },
+    });
+    expect(run(Media.access?.delete, ['events'])).toBe(false);
+  });
+
+  it('still denies upload to other departmental roles', () => {
+    expect(run(Media.access?.create, ['hr'])).toBe(false);
+    expect(run(Media.access?.create, ['legal'])).toBe(false);
   });
 });

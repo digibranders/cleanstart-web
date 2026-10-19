@@ -2,6 +2,7 @@ import type { Access, FieldAccess } from 'payload';
 import { describe, expect, it } from 'vitest';
 
 import {
+  canAuthorInCollection,
   isAdmin,
   isAdminEditorOrEvents,
   isAdminEditorOrHr,
@@ -157,5 +158,28 @@ describe('publishedOrAuthenticated', () => {
     expect(callAccess(publishedOrAuthenticated, undefined)).toEqual({
       _status: { equals: 'published' },
     });
+  });
+});
+
+describe('canAuthorInCollection', () => {
+  it('lets admin, editor and author preview any collection', () => {
+    for (const user of [admin, editor, author]) {
+      expect(canAuthorInCollection(user, 'blogs')).toBe(true);
+      expect(canAuthorInCollection(user, 'events')).toBe(true);
+    }
+  });
+
+  it('limits events to its own domain collections', () => {
+    for (const slug of ['events', 'webinars', 'webinarTypes', 'podcastEpisodes']) {
+      expect(canAuthorInCollection(events, slug)).toBe(true);
+    }
+    expect(canAuthorInCollection(events, 'blogs')).toBe(false);
+    expect(canAuthorInCollection(events, 'legalDocuments')).toBe(false);
+  });
+
+  it('denies other departmental roles and anonymous users', () => {
+    for (const user of [hr, legal, seo, null, undefined]) {
+      expect(canAuthorInCollection(user, 'events')).toBe(false);
+    }
   });
 });

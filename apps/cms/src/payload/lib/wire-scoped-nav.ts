@@ -1,5 +1,6 @@
 import type { CollectionConfig, GlobalConfig } from 'payload';
 
+import { EVENTS_COLLECTION_SLUGS } from '../access';
 import { userRoles } from '../access/typed-user';
 import type { Role } from '../access/typed-user';
 
@@ -22,13 +23,6 @@ export const HR_COLLECTION_SLUGS = [
   // Not a careers collection, but the signature roster is the staff roster:
   // it changes on the same onboarding/offboarding events HR already owns.
   'emailSignatures',
-] as const;
-
-export const EVENTS_COLLECTION_SLUGS = [
-  'events',
-  'webinars',
-  'webinarTypes',
-  'podcastEpisodes',
 ] as const;
 
 export const LEGAL_COLLECTION_SLUGS = ['legalDocuments'] as const;

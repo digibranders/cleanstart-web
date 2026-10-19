@@ -11,6 +11,9 @@ export const isAdmin: Access = ({ req: { user } }) => hasRole(user, 'admin');
 
 export const isAdminFieldLevel: FieldAccess = ({ req: { user } }) => hasRole(user, 'admin');
 
+export const isAdminOrEditorFieldLevel: FieldAccess = ({ req: { user } }) =>
+  hasAnyRole(user, ['admin', 'editor']);
+
 export const isAdminOrEditor: Access = ({ req: { user } }) =>
   hasAnyRole(user, ['admin', 'editor']);
 
@@ -52,6 +55,23 @@ export const isAdminEditorOrHr: Access = ({ req: { user } }) =>
  */
 export const isAdminEditorOrEvents: Access = ({ req: { user } }) =>
   hasAnyRole(user, ['admin', 'editor', 'events']);
+
+/** Collections the departmental `events` role owns; also drives its restricted admin nav. */
+export const EVENTS_COLLECTION_SLUGS = [
+  'events',
+  'webinars',
+  'webinarTypes',
+  'podcastEpisodes',
+] as const;
+
+/**
+ * Draft preview and the publish checklist are open to admin/editor/author on
+ * every collection. `events` gets them only on its own domain, so it cannot
+ * mint a preview link for an unpublished blog post.
+ */
+export const canAuthorInCollection = (user: unknown, collection: string): boolean =>
+  hasAnyRole(user, ['admin', 'editor', 'author']) ||
+  (hasRole(user, 'events') && (EVENTS_COLLECTION_SLUGS as readonly string[]).includes(collection));
 
 /**
  * Legal-domain write access: admin/editor plus the departmental `legal` role.

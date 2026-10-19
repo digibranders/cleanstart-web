@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
-import { isAdminOrEditor } from '../access';
+import { isAdminEditorOrEvents, isAdminOrEditor, isAdminOrEditorFieldLevel } from '../access';
+import { formsUpdateAccess } from '../access/events-scoped';
 import { slugField } from '../fields/slug';
 import { formSchemaVersionHook } from '../hooks/form-schema-version';
 import { formsCoerceHook } from '../hooks/forms-coerce';
@@ -23,9 +24,11 @@ export const Forms: CollectionConfig = {
     // options — exposing them publicly would allow scraping of the schema.
     // The web app fetches form definitions server-side (authenticated) or via
     // a scoped endpoint that returns only the visitor-facing subset.
-    read: isAdminOrEditor,
-    create: isAdminOrEditor,
-    update: isAdminOrEditor,
+    // `events` can read, create, and update the forms attached to its own
+    // events/webinars (see formsUpdateAccess). Delete stays admin/editor.
+    read: isAdminEditorOrEvents,
+    create: isAdminEditorOrEvents,
+    update: formsUpdateAccess,
     delete: isAdminOrEditor,
   },
   fields: [
@@ -201,6 +204,7 @@ export const Forms: CollectionConfig = {
     {
       type: 'group',
       name: 'postSubmit',
+      access: { create: isAdminOrEditorFieldLevel, update: isAdminOrEditorFieldLevel },
       label: 'After submit',
       fields: [
         {
@@ -243,6 +247,7 @@ export const Forms: CollectionConfig = {
     {
       name: 'crmHandlers',
       type: 'select',
+      access: { create: isAdminOrEditorFieldLevel, update: isAdminOrEditorFieldLevel },
       hasMany: true,
       defaultValue: [],
       options: [
@@ -257,6 +262,7 @@ export const Forms: CollectionConfig = {
     {
       name: 'notifyTo',
       type: 'array',
+      access: { create: isAdminOrEditorFieldLevel, update: isAdminOrEditorFieldLevel },
       labels: { singular: 'Recipient', plural: 'Notify recipients' },
       admin: {
         description: 'Email addresses that receive the new-lead notification.',
@@ -280,6 +286,7 @@ export const Forms: CollectionConfig = {
     {
       name: 'hubspotFormGuid',
       type: 'text',
+      access: { create: isAdminOrEditorFieldLevel, update: isAdminOrEditorFieldLevel },
       admin: {
         position: 'sidebar',
         description:
@@ -289,6 +296,7 @@ export const Forms: CollectionConfig = {
     {
       name: 'hubspotSubscriptionTypeId',
       type: 'text',
+      access: { create: isAdminOrEditorFieldLevel, update: isAdminOrEditorFieldLevel },
       admin: {
         position: 'sidebar',
         description:

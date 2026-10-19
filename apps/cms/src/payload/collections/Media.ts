@@ -4,7 +4,8 @@ import { fileURLToPath } from 'node:url';
 import type { CollectionBeforeChangeHook, CollectionConfig } from 'payload';
 import { ValidationError } from 'payload';
 
-import { isAdminOrEditor } from '../access';
+import { isAdminEditorOrEvents, isAdminOrEditor } from '../access';
+import { mediaUpdateAccess } from '../access/events-scoped';
 import { humaniseFilename } from '../lib/humanise-filename';
 import { decodeMediaContextHint } from '../lib/media-context-hint';
 import {
@@ -75,9 +76,11 @@ export const Media: CollectionConfig = {
   access: {
     read: () => true,
     // Authors no longer upload directly — match the rest of the write
-    // surface so role escalation is the only path to add media.
-    create: isAdminOrEditor,
-    update: isAdminOrEditor,
+    // surface so role escalation is the only path to add media. `events`
+    // may add files, and edit those filed under its own folders; it cannot
+    // remove anything from the library every collection renders from.
+    create: isAdminEditorOrEvents,
+    update: mediaUpdateAccess,
     delete: isAdminOrEditor,
   },
   upload: {

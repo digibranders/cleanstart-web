@@ -1,6 +1,7 @@
 import type { Endpoint } from 'payload';
 import { z } from 'zod';
 
+import { canAuthorInCollection } from '../access';
 import { hasAnyRole } from '../access/typed-user';
 import {
   ALLOWED_TTL_PRESETS,
@@ -57,7 +58,7 @@ export const previewTokenMintEndpoint: Endpoint = {
   path: '/preview/token',
   method: 'post',
   handler: async (req) => {
-    if (!hasAnyRole(req.user, ['admin', 'editor', 'author'])) {
+    if (!hasAnyRole(req.user, ['admin', 'editor', 'author', 'events'])) {
       return json({ ok: false, error: 'forbidden' }, { status: 403 });
     }
 
@@ -67,6 +68,9 @@ export const previewTokenMintEndpoint: Endpoint = {
       return json({ ok: false, error: 'invalid_body', issues: parsed.error.issues }, { status: 400 });
     }
     const { collection, docId, ttlSeconds, label } = parsed.data;
+    if (!canAuthorInCollection(req.user, collection)) {
+      return json({ ok: false, error: 'forbidden' }, { status: 403 });
+    }
 
     if (!isPreviewableCollection(collection)) {
       return json({ ok: false, error: 'collection_not_previewable' }, { status: 400 });
@@ -264,7 +268,7 @@ export const previewRedirectEndpoint: Endpoint = {
   path: '/preview/redirect',
   method: 'get',
   handler: async (req) => {
-    if (!hasAnyRole(req.user, ['admin', 'editor', 'author'])) {
+    if (!hasAnyRole(req.user, ['admin', 'editor', 'author', 'events'])) {
       return new Response('Forbidden', { status: 403 });
     }
     const url = new URL(req.url ?? '', 'http://placeholder');
@@ -272,6 +276,9 @@ export const previewRedirectEndpoint: Endpoint = {
     const docId = url.searchParams.get('docId') ?? '';
     if (collection.length === 0 || docId.length === 0) {
       return new Response('Missing collection or docId', { status: 400 });
+    }
+    if (!canAuthorInCollection(req.user, collection)) {
+      return new Response('Forbidden', { status: 403 });
     }
     if (!isPreviewableCollection(collection)) {
       return new Response(`Collection "${collection}" is not previewable`, { status: 400 });
