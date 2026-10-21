@@ -17,6 +17,9 @@ Studio is a custom admin app for the CleanStart CMS. Payload stays as the backen
 | `06-IMPLEMENTER-GUIDE.md` | Read first: rules, file map, recipes, repo traps, when to stop and ask |
 | `07-UI-ISSUES-REGISTER.md` | Every known bug in the current admin (UI-001 to UI-162), how Studio resolves it, the owning task and its acceptance check; backend follow-ups F-1 to F-16 |
 | `08-PHASE-2-7-TASKS.md` | Every task of Phases 2 to 7 with scope, behaviour, tests and acceptance |
+| `10-ENGINEERING-STANDARDS.md` | Do and don't for types, boundaries, errors, React, data, tests, security; the 20-point self-review |
+| `HANDOFF.md` | How to start building: worktree, database, dev server, the task loop, subagents, the kickstart prompt |
+| `PROGRESS.md` | Append-only build log, one line per task event |
 | `09-BEHAVIOUR-CONTRACT.md` | Exact behaviour and copy: status model, permissions, saving and concurrency, locks, publishing, lists, fields, media, preview, keyboard, preferences, screen states |
 | `research/` | Evidence the plan is built on: schema dump, component catalog, workflows and roles, Lexical contract, design inputs |
 | `../superpowers/plans/2026-10-16-studio-phase-0-1-foundation.md` | Step-by-step tasks for Phases 0 and 1 |

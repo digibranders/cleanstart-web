@@ -10,6 +10,7 @@ Studio is a custom admin app for the CleanStart CMS. Payload 3 stays the backend
 
 | You are about to | Read, in this order |
 |---|---|
+| Start a session | `HANDOFF.md`, this file, `10-ENGINEERING-STANDARDS.md`, the last lines of `PROGRESS.md` |
 | Start any task | this file, then the task in its plan file, then every section the task cites |
 | Build or change a component | `01-DESIGN-SYSTEM.md` §1 to §9 for that component, then the lab page for it |
 | Build or change a screen | `02-SCREENS.md` for that screen id, then `01` for every component it uses, then `07-UI-ISSUES-REGISTER.md` rows tagged with that screen |
@@ -81,6 +82,7 @@ Route files stay thin: they parse params with Zod, call a loader, and render one
 6. For anything that renders: open the lab or the screen at 1440×900 in light and dark, and at 1280×800. Capture every state the task touches. Walk it with the keyboard only.
 7. Commit by path with a message that names the task id: `feat(studio): T2.3 array field renderer`.
 8. Write the review record under the task (`05`, "Review record").
+9. Append `started` at step 1 and `done` after the commit to `PROGRESS.md`, one `printf … >>` line each (rules at the top of that file).
 
 Commands, all from the repo root:
 

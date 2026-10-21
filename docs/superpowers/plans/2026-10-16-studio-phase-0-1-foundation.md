@@ -8,13 +8,14 @@
 
 **Tech Stack:** Next.js 16.2 (App Router, server actions), Payload 3.84 Local API, React 19, Tailwind CSS 4.3, `@cleanstart/ui` primitives, react-hook-form 7, Zod 3, `@phosphor-icons/react` 2 (Light weight), Geist and Geist Mono (`geist` through `next/font`), Vitest 2, Playwright 1.59.
 
-**Prerequisites:** decisions D-1 to D-9 in `docs/studio/00-MASTER-PLAN.md` were signed off on 2026-10-16. D-6 (author drafting) is implemented in Task 1.19.
+**Prerequisites:** decisions D-1 to D-9 in `docs/studio/00-MASTER-PLAN.md` were signed off on 2026-10-16 and D-10 (direction B) on 2026-10-19. D-6 (author drafting) is implemented in Task 1.19. Before any task, read `docs/studio/HANDOFF.md`, `06-IMPLEMENTER-GUIDE.md` and `10-ENGINEERING-STANDARDS.md`.
 
 ---
 
 ## Conventions for every task
 
-- Work on `development`. Stage files by path. Never `git add -A`. Commit message format: `feat(studio): T<id> <summary>`.
+- Work in the worktree `.claude/worktrees/studio-build` on branch `feat/studio-build` (setup in `docs/studio/HANDOFF.md`), merged into `development` at each phase sign-off. Stage files by path. Never `git add -A`. Commit message format: `feat(studio): T<id> <summary>`.
+- Append `started` and `done` lines to `docs/studio/PROGRESS.md` for every task (rules at the top of that file).
 - Run commands from the repo root unless a step says otherwise.
 - Tests: Vitest, co-located `*.test.ts(x)`, node environment, components tested with `renderToStaticMarkup` (the existing convention, see `apps/cms/src/payload/admin/components/BlogCtaAutoPick.test.tsx`). Interaction is tested in Playwright under `apps/cms/tests/e2e/studio/`, tagged `@studio`.
 - Before each commit, run Gate A from `docs/studio/05-REVIEW-PROTOCOL.md` and attach Gate B and Gate C results to the task.
