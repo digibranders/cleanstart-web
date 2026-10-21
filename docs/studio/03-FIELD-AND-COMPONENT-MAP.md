@@ -60,7 +60,7 @@ Paths are relative to `apps/cms/src/payload/admin/`. "SEO22" and other set names
 
 | File | Fate | Studio target | Phase |
 |---|---|---|---|
-| Icon.tsx | SHARE | `shell/BrandMark.tsx` imports it | 1 |
+| Icon.tsx | SHARE | `shell/BrandMark.tsx` imports its paths but renders both in `currentColor` (the file's hard-coded cyan is not used; D-10) | 1 |
 | Logo.tsx | SHARE | `shell/BrandMark.tsx`, S-01 | 1 |
 | doc-status-bar-mount.ts | RET | Document header is generic (S-12) | 7 |
 | lib/column-widths.ts | PORT | `server/actions/preferences.ts` (`setColumnWidths`) | 5 |
@@ -140,7 +140,7 @@ Paths are relative to `apps/cms/src/payload/admin/`. "SEO22" and other set names
 | RichPastePlugin.tsx | PORT | `editor/plugins/RichPastePlugin.tsx` | 3 |
 | SaveShortcut.tsx | NEW | `document/EditView.tsx` key handler (⌘S, ⌘↵, ⌘.) | 1 |
 | SavedStateIndicator.tsx | NEW | `document/SaveStatus.tsx` (from form state, no polling) | 1 |
-| SchedulePublishDialog.tsx | PORT | `document/ScheduleDialog.tsx` | 4 |
+| SchedulePublishDialog.tsx | PORT | `document/PublishPopover.tsx` (Schedule option; `09` §5) | 4 |
 | SchemaAddonsAdder.tsx | DROP | Unreferenced | n/a |
 | SchemaPreviewField.tsx | PORT | `seo/StructuredDataCard.tsx` | 4 |
 | ScrollToInvalidField.tsx | NEW | `document/ValidationSummary.tsx` | 1 |
@@ -220,14 +220,14 @@ Paths are relative to `apps/cms/src/payload/admin/`. "SEO22" and other set names
 | auth/CmsLoginHero.tsx | PORT | S-01 brand panel (`features/auth/BrandPanel.tsx`, design system §7.7) | 1 |
 | cache/CacheView.tsx | RET | route page S-43 | 6 |
 | cache/CacheClient.tsx | PORT | `reports/cache/CachePurge.tsx` | 6 |
-| cache/PurgePageButton.tsx | PORT | `document/MoreMenu.tsx` item | 4 |
+| cache/PurgePageButton.tsx | PORT | `document/MoreMenu.tsx` item "Purge page", admin and editor only, on the 12 routed content collections except pages, plus authors and emailSignatures (where `showPurge` is set today) | 4 |
 | CodeBlockButton/CleanstartCodeBlockFeatureClient.ts | RET | n/a | 3 |
 | CodeBlockButton/CodeBlockToolbarButton.tsx | PORT | `editor/toolbar/Toolbar.tsx` | 3 |
 | CodeBlockButton/InlineCodeEscapePlugin.tsx | PORT | `editor/plugins/InlineCodeEscapePlugin.tsx` | 3 |
 | Embed/CleanstartEmbedFeatureClient.ts | RET | n/a | 3 |
 | Embed/EmbedComponent.tsx | PORT | `editor/embed/EmbedCard.tsx` | 3 |
 | Embed/EmbedDialog.tsx | PORT | `editor/embed/EmbedDialog.tsx` | 3 |
-| Embed/EmbedNode.ts | KEEP | Imported by `lib/lexical/embed-feature.ts` (server). Studio's `editor/nodes/EmbedNode.ts` shares its JSON shape through an extracted `embed-node-shape.ts` | 3 |
+| Embed/EmbedNode.ts | KEEP | Imported by `lib/lexical/embed-feature.ts` (server). Studio's `editor/nodes/EmbedNode.ts` shares its JSON shape through an extracted `apps/cms/src/payload/admin/components/Embed/embed-node-shape.ts` (pure types and the JSON shape, imported by both node classes; it survives the admin retirement with `EmbedNode.ts`) | 3 |
 | Embed/EmbedPlugin.tsx | PORT | `editor/plugins/EmbedPlugin.tsx` | 3 |
 | Embed/EmbedToolbarButton.tsx | PORT | `editor/toolbar/Toolbar.tsx` | 3 |
 | Embed/embed-providers.ts | KEEP | Imported by `next.config.ts` for CSP `frame-src`; Studio imports it too | 3 |
@@ -332,7 +332,7 @@ Columns: **List** = list variant and chrome. **Edit** = edit specifics beyond th
 | webinars | default | rich text, registration mode conditions, SEO22, gate | admin, editor, events | 4 | `studio-webinars.spec.ts` | [ ] |
 | podcastEpisodes | default | blocks, uploads, SEO22, preview; no gate | admin, editor, events | 4 | `studio-podcast.spec.ts` | [ ] |
 | jobs | default | rich text, applications join (read only), conditions, SEO22, gate | admin, editor, hr | 4 | `studio-jobs.spec.ts` | [ ] |
-| pages | default | page builder `layout` blocks (19 block types, Section nests), parent and path (read only), SEO22, gate; no purge | admin, editor | 4 | `studio-pages.spec.ts` | [ ] |
+| pages | default | page builder `layout` blocks (19 block types, Section nests), `parent` (editable relationship with the server's cycle check), `path` and breadcrumbs (read only), SEO22, gate; no purge | admin, editor | 4 | `studio-pages.spec.ts` | [ ] |
 
 ### C.2 People, media and taxonomies
 
@@ -340,7 +340,7 @@ Columns: **List** = list variant and chrome. **Edit** = edit specifics beyond th
 |---|---|---|---|---|---|---|
 | authors | default | rich text `bioLong`, 6 arrays, credibility panel, legacy bio viewer, SEO22, purge | admin, editor | 2 (form), 4 (rail) | `studio-authors.spec.ts` | [ ] |
 | aboutGalleries | default | upload array | admin, editor | 2 | `studio-about-galleries.spec.ts` | [ ] |
-| media | library (S-20) | media detail (S-21) | admin, editor; author uploads only (D-6) | 2 | `studio-media.spec.ts` | [ ] |
+| media | library (S-20) | media detail (S-21) | create: admin, editor, events, and authors after D-6; update: admin, editor, and events on `web/event` and `web/webinar` folders only; delete: admin, editor; rename: admin, editor (`09` §2.4, §2.5) | 2 | `studio-media.spec.ts` | [ ] |
 | emailAssets | library | media detail, PNG/JPEG/GIF only | admin | 2 | `studio-email-assets.spec.ts` | [ ] |
 | categories | default | parent (cycle guard on server), SEO22 | admin, editor | 2 (form), 4 (rail) | `studio-taxonomies.spec.ts` | [ ] |
 | newsCategories | default | as categories | admin, editor | 2, 4 | `studio-taxonomies.spec.ts` | [ ] |
@@ -358,12 +358,12 @@ Columns: **List** = list variant and chrome. **Edit** = edit specifics beyond th
 | Collection | List | Edit | Who writes | Phase | Test | Ready |
 |---|---|---|---|---|---|---|
 | leads | S-30 (tabs, privacy drawer, export) | read-only detail, retry sync | create: admin; update: nobody | 5 | `studio-leads.spec.ts` | [ ] |
-| forms | default | 4 arrays, rich text post-submit body, conditions, server coercion | admin, editor | 2 | `studio-forms.spec.ts` | [ ] |
+| forms | default | 4 arrays, rich text post-submit body, conditions, server coercion | read and create: admin, editor, events; update: admin, editor, and events on forms attached as a registration form; delete: admin, editor; five fields admin and editor only (`09` §2.5) | 3 | `studio-forms.spec.ts` | [ ] |
 | partner-applications | export CSV | read only | nobody updates | 5 | `studio-applications.spec.ts` | [ ] |
 | deal-registrations | default | read only | nobody updates | 5 | `studio-applications.spec.ts` | [ ] |
 | career-applications | default | read only, resume link | nobody updates | 5 | `studio-applications.spec.ts` | [ ] |
 | resumes | file list | private file, update meta | admin, editor, hr | 5 | `studio-applications.spec.ts` | [ ] |
-| emailSignatures | default | rendered preview, phone fields | admin, editor, hr | 5 | `studio-signatures.spec.ts` | [ ] |
+| emailSignatures | default | rendered preview, phone fields; versions without drafts (S-13 applies, Save only) | admin, editor, hr | 5 | `studio-signatures.spec.ts` | [ ] |
 | signatureTemplates | default | HTML code field + sandboxed preview, default flag | admin | 5 | `studio-signatures.spec.ts` | [ ] |
 
 ### C.4 SEO, settings and system

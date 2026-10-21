@@ -1,6 +1,6 @@
 # Studio design system
 
-Status: direction B, approved 2026-10-19 (decisions D-1, D-2 and D-10 in `00-MASTER-PLAN.md`). The approved mockups are the review artifact "Studio mockups, direction B"; where a mockup and this file disagree, this file wins.
+Status: direction B, approved 2026-10-19 (decisions D-1, D-2 and D-10 in `00-MASTER-PLAN.md`). The approved mockups are the private artifact "CleanStart Studio mockups" (https://claude.ai/artifact/4fBv4T7CevcGC4eKvJAk9Z, version 4); where a mockup and this file disagree, this file wins. Behaviour and exact copy live in `09-BEHAVIOUR-CONTRACT.md`.
 
 Design read: an internal content admin for CleanStart editors and marketers, in a restrained Linear and Vercel language. Warm neutrals, ink for actions, one ultramarine accent for focus and selection, dense but never cramped, motion only where it explains a change.
 
@@ -54,7 +54,7 @@ The primary action is ink, not a colour. One primary per view.
 
 ### 2.3 Accent (ultramarine)
 
-Ultramarine sits in the same indigo family as the website's dark band (`#131E8F`, `#471EC0`), so Studio and the site feel related without copying the site. It is reserved for focus, selection, links, the active filter and the "scheduled" state. It is never a button fill and never decoration.
+Ultramarine sits in the same indigo family as the website's dark band (`#131E8F`, `#471EC0`), so Studio and the site feel related without copying the site. It is reserved for focus, selection, links, the active filter, the "scheduled" state, the info tone, the upload progress bar and the selected date in the picker. It is never a button fill and never decoration.
 
 | Token | Dark | Light | Use |
 |---|---|---|---|
@@ -72,6 +72,8 @@ Ultramarine sits in the same indigo family as the website's dark band (`#131E8F`
 | `--success` | `#3ecf8e` | `#12733a` | 12% dark, 9% light |
 | `--warning` | `#f5a524` | `#9a4a06` | 12% dark, 9% light |
 | `--danger` | `#f2555a` | `#c01c1c` | 12% dark, 8% light |
+
+Soft fills are separate tokens: `--success-soft`, `--warning-soft` and `--danger-soft` (values in `tokens.css`, Phase 0-1 plan Task 0.3). The danger fill (confirm dialogs only) uses `--on-danger` text: `#0b0b0c` dark, `#ffffff` light; hover `--danger-hover`: `#f46b70` dark, `#a51818` light.
 | `--info` | uses `--accent-text` | uses `--accent-text` | `--accent-soft` |
 
 Document status mapping (used everywhere a status shows). Status is a 14px Phosphor glyph plus a word, never colour alone:
@@ -79,7 +81,7 @@ Document status mapping (used everywhere a status shows). Status is a 14px Phosp
 | Status | Glyph | Colour | Label |
 |---|---|---|---|
 | Draft | `CircleDashed` | `--text-tertiary` | "Draft" |
-| Published, changes | `CircleHalf` | `--warning` | "Published, changes" |
+| Unpublished changes | `CircleHalf` | `--warning` | "Unpublished changes" |
 | Published | `CheckCircle` (fill weight) | `--success` | "Published" |
 | Scheduled | `Clock` | `--accent-text` | "Scheduled", with the date when there is room |
 
@@ -112,6 +114,7 @@ Typeface per D-1: Geist for UI, Geist Mono for code, ids, slugs and keyboard key
 | `--type-small` | 12 / 16 | 400 | 0 | Help text, metadata, timestamps |
 | `--type-micro` | 11 / 14 | 500 | 0 | Badges, counters, table header |
 | `--type-mono` | 12 / 18 | 400 | -0.01em | Slugs, ids, code, JSON |
+| `--type-brand` | 76 / 92 | 600 | -0.045em | The sign-in brand panel headline only (§7.7) |
 
 Editor canvas (rich text and the document title field) uses a reading scale:
 
@@ -160,6 +163,8 @@ Hit targets for icon-only buttons are at least 28×28 even when the icon is 16px
 | `--radius-xl` | 20px | Command palette shell |
 | `--radius-full` | 9999px | Avatars, chips and filter pills, switch track, the floating selection bar |
 
+Tokens here are named `--shadow-*`; in `tokens.css` they are defined as `--elevation-*` per theme and exposed to Tailwind as `shadow-raised`, `shadow-sheet`, `shadow-popover` and `shadow-dialog`. Same values, two names because Tailwind's `@theme` reset owns the `--shadow-*` namespace.
+
 The rule: the radius grows with the size of the container, and a shell is always 4 to 6px rounder than the core it holds. Product buttons are never full pills (that shape is for marketing CTAs on the website).
 
 ### 4.4 Elevation
@@ -199,7 +204,8 @@ Document view (inside the sheet):
 
 ```
 ┌ Document header 54 (no divider) ──────────────────────────┬──────────────┐
-│ Blogs › Title…   Unsaved changes        [Preview] [⋯] [▣] [Publish ▾]   │
+│ Blogs › Title… ◐ Unpublished changes · Unsaved changes                   │
+│                [Preview ▾] [Save draft] [Publish ▾] [⋯] [▣ ⌘.]           │
 ├───────────────────────────────────────────────────────────┤ Inspector    │
 │      Writing column, max 680, centred                     │ 320 default  │
 │      Cover, title (doc-title), lead, property chips,      │ 280 to 440,  │
@@ -217,7 +223,7 @@ Breakpoints: full layout from 1280px. From 1024 to 1279px the sidebar starts col
 | Token | Value | Use |
 |---|---|---|
 | `--duration-fast` | 100ms | Hover, press, checkbox, switch |
-| `--duration-base` | 150ms | Menus, popovers, tooltips, tab underline |
+| `--duration-base` | 150ms | Menus, popovers, tooltips, the selected segment of `Tabs` |
 | `--duration-slow` | 200ms | Dialogs, drawers, palette, rail collapse |
 | `--ease-out` | `cubic-bezier(0.32, 0.72, 0, 1)` | Enter, hover and press |
 | `--ease-in` | `cubic-bezier(0.4, 0, 1, 1)` | Exit (exits use `--duration-fast`) |
@@ -228,7 +234,8 @@ Allowed motion only:
 - Dialog: fade plus scale from 0.98.
 - Drawer and rail: slide on the x axis.
 - Toast: slide up and fade, exit by fade.
-- Sheet: one 10px rise and fade when a page first mounts (560ms). Never on client-side navigation inside the sheet.
+- Sheet: one 10px rise and fade when Studio first loads (`--duration-entrance`, 560ms, token defined with the others). Never on client-side navigation inside the sheet.
+- Invalid field after a failed save: one shake, `translateX` ±4px, 3 cycles in 300ms.
 - Sign-in brand panel: the headline word rolls up one line every 2.4s (a 14.4s loop of six words) and the matching chip lights in sync; the glows drift slowly. The only looping motion in Studio. Under reduced motion it holds on the first word.
 - Press: `scale(0.98)` on buttons.
 - Skeleton: one slow opacity pulse (1.6s), no shimmer.
@@ -237,7 +244,7 @@ Allowed motion only:
 
 ## 6. Iconography
 
-- Per D-2: `@phosphor-icons/react`, Light weight. Client components get it from `IconContext` at the Studio root and never pass `weight`. Server components import from `@phosphor-icons/react/dist/ssr`, which cannot read context, so they pass `weight="light"` themselves. The only other weights are `fill` for the Published status glyph and `bold` for the checkbox tick. 16px in UI, 14px inside `--control-sm` buttons, table cells and nav items, 20px for empty states.
+- Per D-2: `@phosphor-icons/react`, Light weight. Client components get it from `IconContext` at the Studio root and never pass `weight`. Server components import from `@phosphor-icons/react/dist/ssr`, which cannot read context, so they pass `weight="light"` themselves. The only other weights are `fill` for the Published status glyph and `bold` for the checkbox tick. 16px in UI and nav items, 14px inside `--control-sm` buttons and table cells, 20px for empty states.
 - Icons inherit `currentColor`. One weight everywhere, apart from the two exceptions above.
 - No hand-drawn SVG icons. No Unicode glyphs as icons (×, ✓, →). The brand mark and wordmark (`Logo.tsx`, `Icon.tsx`) are the only custom SVGs.
 - An icon-only button always has an `aria-label` and a tooltip with the label and shortcut.
@@ -250,7 +257,7 @@ Every component below lives in `apps/cms/src/studio/ui/` (or restyles a `package
 
 | Component | Variants | Sizes | States | Notes |
 |---|---|---|---|---|
-| `Button` | `primary` (ink fill, `--primary`), `secondary` (sheet fill, `--border`, `--shadow-raised`), `ghost` (no border), `danger` (danger text, danger fill on confirm dialogs only) | sm 24, md 28, lg 32 | default, hover, active, focus-visible, disabled, loading (spinner replaces leading icon, width locked) | `--radius-sm`, never a pill. Label is a verb, 1 to 3 words. Leading icon optional. One `primary` per view. |
+| `Button` | `primary` (ink fill, `--primary`), `secondary` (sheet fill, `--border`, `--shadow-raised`), `ghost` (no border), `danger` (danger text, danger fill on confirm dialogs only) | sm 24, md 28, lg 32, xl 40 (sign-in screens only) | default, hover, active, focus-visible, disabled, loading | `--radius-sm`, never a pill. Hover: primary `--primary-hover`, secondary `--bg-raised`, ghost `--bg-hover`, danger `--danger-soft`. Active: `scale(0.98)`. Disabled: opacity 0.5 (only for controls that need no explanation; otherwise `aria-disabled` with a visible reason, `09` §2.3). Loading: the spinner replaces the leading icon, or the label when there is no icon; width locked; `aria-busy="true"`. Label is a verb, 1 to 3 words. One `primary` per view. |
 | `IconButton` | `ghost`, `secondary` | sm, md | as Button, plus `pressed` for toggles | Required `label` prop, used for `aria-label` and tooltip. |
 | `SplitButton` | primary main action + chevron menu | md, lg | as Button; menu open | Publish control and Preview control use it. |
 | `ButtonGroup` | segmented (for view toggles) | md | selected, focus | Arrow keys move selection. |
@@ -263,7 +270,7 @@ All inputs: height `--control-lg` (32), `--bg-raised`, 1px `--border-control`, `
 
 | Component | Notes |
 |---|---|
-| `Field` | Wrapper: label (13/500), optional "Optional" hint, description (12px, `--text-secondary`), control, error (12px, `--danger`, with a 14px warning icon). Label above control always. `aria-describedby` wires description and error. |
+| `Field` | Wrapper: label (13/500), "Optional" after the label for non-required fields and "Required to publish" for gate fields (`09` §8.3), description (12px, `--text-secondary`), control, error (12px, `--danger`, with a 14px warning icon). Label above control always. `aria-describedby` wires description and error. |
 | `TextInput` | Character counter when `maxLength` is set (shows at 80% of the limit). Prefix and suffix slots. |
 | `Textarea` | Auto-grows from 3 rows to 12, then scrolls. Counter as TextInput. |
 | `NumberInput` | Steppers on hover only. `hasMany` renders as a tag input. |
@@ -287,7 +294,7 @@ All inputs: height `--control-lg` (32), `--bg-raised`, 1px `--border-control`, `
 | `Collapsible` | Disclosure with a chevron that rotates 90°. Remembers open state per user in `users.preferences`. |
 | `Tabs` | Segmented: `--bg-active` track with 2px padding and `--radius-md`; each tab 24px, `--radius-sm`; the selected tab is `--bg-surface` with `--shadow-raised` and `--text-primary`. Arrow keys move, Enter or Space selects. Used for the inspector (Details, SEO, Checklist) and form tabs. |
 | `Divider` | 1px `--border-subtle`. |
-| `Rail` | The inspector: `--bg-surface` with a single `--border-subtle` line on its left, segmented `Tabs` at the top, sections below without cards. Resizable (280 to 440, keyboard resizable with ← and →), collapsible to a 40px icon strip, width saved per user. |
+| `Rail` | The inspector (keyboard resize: 16px per arrow press, 80px with Shift): `--bg-surface` with a single `--border-subtle` line on its left, segmented `Tabs` at the top, sections below without cards. Resizable (280 to 440, keyboard resizable with ← and →), collapsible to a 40px icon strip, width saved per user. |
 | `SplitPane` | Edit plus preview split, draggable divider, double-click resets to 50/50. |
 
 ### 7.4 Overlays
@@ -302,21 +309,21 @@ All overlays restyle the `packages/ui` primitives (native `<dialog>` and anchore
 | `Popover` | `--bg-overlay`, `--shadow-popover`, `--radius-md`, 8px padding. Decision popovers (publish, schedule) use the shell form: a 6px `--glass` shell at `--radius-lg` holding an `--bg-overlay` core at `--radius-md`. |
 | `Menu` | Restyles `DropdownMenu` and `ContextMenu`. Items 28px, icon 16px, shortcut right-aligned in `Kbd`. Danger items in `--danger` text. Groups with 11px labels. Every context menu also opens from a visible "more" button, so nothing is right-click only. |
 | `Tooltip` | 12px text, `--bg-overlay`, delay 400ms, instant when moving between tooltipped items. Shows shortcut in `Kbd` when there is one. Never holds essential information. |
-| `Toast` | One system (`packages/ui` Toast, the `cs:toast` event). Bottom-right stack, max 3. Tones info, success, warning, error. 4s default, errors stay until dismissed. Optional single action ("Undo", "View"). |
+| `Toast` | One system (`packages/ui` Toast, the `cs:toast` event). Bottom-right stack, width 360, max 3. Tones info, success, warning, error. Durations and overflow per `09` §11.1 (4s plain, 10s with an action, errors stay; pause on hover and focus). Optional single action ("Undo", "View", "Retry"). |
 | `CommandPalette` | 640px wide, 112px from the top. Shell form: 6px `--glass` shell at `--radius-xl` holding the core at `--radius-lg`. `--backdrop` behind. Input 56px at 16px text, results grouped (Recent, Go to, Create, Documents, Actions) with status glyphs on documents, footer with key hints. `aria-activedescendant` pattern. |
 
 ### 7.5 Feedback and status
 
 | Component | Notes |
 |---|---|
-| `Badge` | Chip: 20px or 24px tall, `--type-micro`, `--radius-full`, 8px side padding. Tones neutral (`--bg-raised` with a hairline), accent, success, warning, danger (soft fills). Optional 6px dot. |
+| `Badge` | Chip: 20px tall in tables and rows, 24px in headers and filter bars, `--type-micro`, `--radius-full`, 8px side padding. Tones neutral (`--bg-raised` with a hairline), accent, success, warning, danger (soft fills). Optional 6px dot. |
 | `StatusBadge` | Maps document status (§2.4) to its glyph and word. No chip background. |
 | `Banner` | Inline, full width of its container. Tones info, warning, danger, success. Icon, one sentence, optional action. Used for locks, publish blockers, immutable collections. |
 | `Spinner` | Restyles `packages/ui` Spinner. 14px inside buttons, 20px in panels. Only for actions under way, never for loading a page. |
 | `Skeleton` | Shapes that match the final layout (table rows, field rows, cards). Used for every route-level loading state. |
 | `EmptyState` | 20px icon, title (`--type-heading`), one sentence, one action. Different copy for "nothing yet" and "no results for this filter". |
 | `ProgressBar` | Uploads only. 4px, accent fill, no track pattern. |
-| `SaveStatus` | In the document header: "Unsaved changes" (warning dot), "Saving…", "Saved 2 min ago", "Save failed, retry". |
+| `SaveStatus` | In the document header. Exact strings and timing in `09` §11.2. |
 | `Avatar` | 20 or 24px, initials on a neutral tint derived from the user id. |
 
 ### 7.6 Data display
@@ -327,7 +334,7 @@ All overlays restyle the `packages/ui` primitives (native `<dialog>` and anchore
 | `Cell` renderers | Text, Date (relative within 7 days, absolute after, full timestamp in tooltip), Boolean (Badge "Yes" or "No"), Relationship (titles, "+2" overflow with tooltip), Media (32px thumbnail plus filename), Bytes, Status, Select (label not value), Json (mono, truncated), plus the custom cells in `03` §B. |
 | `Pagination` | "1 to 25 of 312", previous and next, page size menu (10, 25, 50, 100). |
 | `FilterBar` | View tabs first (All, Drafts, Scheduled, Published, with counts), then filter chips ("Author is Ana Ramos"); the active filter chip uses `--accent-soft` and `--accent-text`. "+ Filter" opens a field picker then a value picker. Chips are removable. Filters live in the URL. |
-| `GroupedList` | The List layout of a list (Phase 5): rows grouped by status in the order Scheduled, Published with changes, Drafts, Published. Group row 34px on `--bg-raised`, `--radius-md`, with glyph, label and count. Row 44px: checkbox on hover, status glyph, title (`--type-body-strong`), chips, author avatars, relative date, more button on hover. Selecting rows shows the floating selection bar (`--glass`, `--radius-full`, `--shadow-popover`) centred 22px above the sheet bottom. |
+| `GroupedList` | The List layout of a list (Phase 5): rows grouped by status in the order Scheduled, Unpublished changes, Drafts, Published (`09` §1, §7.3). Group row 34px on `--bg-raised`, `--radius-md`, with glyph, label and count. Row 44px: checkbox on hover, status glyph, title (`--type-body-strong`), chips, author avatars, relative date, more button on hover. Selecting rows shows the floating selection bar (`--glass`, `--radius-full`, `--shadow-popover`) centred 22px above the sheet bottom. |
 | `KeyValue` | Two-column metadata list for read-only panels (lead details, audit rows). |
 | Charts | `TrendChart`, `Sparkline`, `BarList`, `Histogram`, `Scatter`: ported from the current analytics components, restyled with tokens. No chart library from a CDN (CSP). |
 
@@ -345,7 +352,7 @@ The sign-in, forgot-password and reset-password screens use one split layout (S-
 
 - Sentence case everywhere, including buttons and page titles.
 - Buttons are verbs: "Publish", "Save draft", "Schedule", "Add block", "Upload". Never "Submit" or "OK".
-- One label per intent across Studio: "Delete" (not Remove, Trash), "Duplicate" (not Copy), "Preview" (not View draft).
+- One label per intent across Studio: "Delete" destroys a record; "Remove" takes something out of the current document (an array row, a block, an image from a field, a link from text); "Duplicate" (not Copy); "Preview" (not View draft). Never "Trash".
 - Errors say what happened and what to do: "Slug is already used by ‘Zero CVE images’. Choose a different slug."
 - Empty states say what goes here and offer the one action that fills it.
 - Dates: "Oct 16, 2026" and "Oct 16, 2026, 2:30 PM" in the user's timezone; relative ("3 min ago") only within 7 days.
@@ -377,3 +384,5 @@ The UI/UX reviewer ticks every line (copied into `05-REVIEW-PROTOCOL.md` Gate C)
 - [ ] No layout shift when data loads (skeleton matches final layout).
 - [ ] Motion follows §5 and is off under reduced motion.
 - [ ] axe reports zero violations.
+- [ ] Nothing in the AI-tell list: no gradient text, no glow (except the sign-in brand panel, §7.7), no decorative dots, no emoji, no three identical cards in a row, no filler copy.
+- [ ] Every `07` issue owned by the task passes its acceptance check.
