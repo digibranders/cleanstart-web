@@ -2,9 +2,21 @@
 
 This file tells Claude Code *how* to work in this repo. It does not duplicate the architecture doc, which tells you *what* to build.
 
+**Kept in sync with `AGENTS.md`** (read by Codex and Google Antigravity). Change the two together.
+
 **Source of truth for *what*:** `docs/architecture/cleanstart-cms-architecture.html`. If this file and the arch doc disagree, the arch doc wins for product/architecture decisions; this file wins for code conventions.
 
 **Current backlog:** `docs/BACKLOG.md`. Phases A–I are done. **Phase J — Integrations dashboard** is active. `apps/web` is live at `www.cleanstart.com`.
+
+## Studio (the custom admin replacing Payload's admin UI)
+
+If your task touches `apps/cms/src/studio/**`, `apps/cms/src/app/(studio)/**` or `docs/studio/**`, or you were asked to build Studio:
+
+1. Read `docs/studio/HANDOFF.md` first and follow it exactly. It sets the worktree (`.claude/worktrees/studio-build`, branch `feat/studio-build`), the separate local database, the dev server port (3200), the per-task loop, the subagent rules and when to stop and ask.
+2. Then read `docs/studio/06-IMPLEMENTER-GUIDE.md` and `docs/studio/10-ENGINEERING-STANDARDS.md`. The task plans are `docs/superpowers/plans/2026-10-16-studio-phase-0-1-foundation.md` (Phases 0 and 1) and `docs/studio/08-PHASE-2-7-TASKS.md`.
+3. Log every task in `docs/studio/PROGRESS.md` with one appended line per event (`printf '%s\n' "…" >> docs/studio/PROGRESS.md`). Never rewrite or edit that file; several agents append to it at once.
+4. The Studio docs decide Studio's behaviour, design and copy (`docs/studio/09-BEHAVIOUR-CONTRACT.md` is final for behaviour). Everything else in this file still applies: git rules, migrations, generated types, secrets, no em-dashes or en-dashes.
+5. If a Studio doc is ambiguous or two docs disagree, stop and ask. Do not guess.
 
 ---
 
