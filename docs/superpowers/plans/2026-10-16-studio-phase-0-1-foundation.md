@@ -1,6 +1,6 @@
 # Studio Phase 0 and 1: Design System and Foundation Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. Every task also passes the gates in `docs/studio/05-REVIEW-PROTOCOL.md` before its commit step.
+> **For agentic workers (any tool):** start with `docs/studio/HANDOFF.md`. Work task by task. In Claude Code, the superpowers:subagent-driven-development or superpowers:executing-plans skills fit this plan; other tools follow the loop in `HANDOFF.md`. Steps use checkbox (`- [ ]`) syntax for tracking. Every task also passes the gates in `docs/studio/05-REVIEW-PROTOCOL.md` before its commit step.
 
 **Goal:** Ship the Studio design system and lab (Phase 0) and a working Studio foundation where redirects and job locations are fully editable (Phase 1), inside `apps/cms`, without touching Payload's admin.
 

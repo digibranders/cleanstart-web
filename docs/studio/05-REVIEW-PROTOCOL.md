@@ -24,7 +24,7 @@ Pass: every command exits 0. Paste the summary line of each into the task notes.
 
 ## Gate B: senior engineer review
 
-Run by a reviewer who did not write the code: Codex (`/codex` review of the task diff) and Claude (`/code-review high` on the same diff). Both reports are attached to the task. Every finding is fixed or answered in writing.
+Run by reviewers who did not write the code. The default pair is Codex (`/codex` review of the task diff) and Claude (`/code-review high` on the same diff); when the implementer is Codex or Gemini, use the other two tools, or any two independent reviewers given the diff. Both reports are attached to the task. Every finding is fixed or answered in writing.
 
 Checklist:
 

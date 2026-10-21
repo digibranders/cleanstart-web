@@ -56,7 +56,7 @@ Playwright against it: `CMS_BASE_URL=http://localhost:3200 pnpm --filter @cleans
 1. Append a `started` line to `docs/studio/PROGRESS.md` (rules in that file; always the one-line `printf … >>` append).
 2. Read the task and everything it cites. Read the `07` rows whose Task column names it.
 3. Write the failing test, implement, and run Gate A (`05`). For UI, capture the Gate C evidence.
-4. Get Gate B: run `/code-review` on the diff if it is available, and fix every finding. If no reviewer is available, write "Gate B pending human review" in the task's review record and continue; the human reviews before the phase sign-off.
+4. Get Gate B: have a reviewer that did not write the code review the diff against `05` Gate B and `10` §9, and fix every finding. Use whatever your tool offers (Claude Code `/code-review`, Codex `/review`, or a fresh session or second model given the diff). If no reviewer is available, write "Gate B pending human review" in the task's review record and continue; the human reviews before the phase sign-off.
 5. Commit in the worktree, staging by path, with the message `feat(studio): T<id> <summary>`, including the `PROGRESS.md` line.
 6. Append the `done` line with the commit sha and gate results, and commit that line with the next task (or on its own: `docs(studio): progress`).
 7. Tick the task's steps (`- [x]`) in its plan file in the same commit.
@@ -86,7 +86,7 @@ Stop that task (others may continue), append a `blocked` line, and ask the produ
 
 ## Kickstart prompt
 
-Paste this into a new coding session (any model) opened in the main checkout:
+Paste this into a new coding session opened in the main checkout. It works the same in Claude Code, Codex and Antigravity: they all read the Studio section of `AGENTS.md` or `CLAUDE.md` at the repo root, which points here.
 
 ```text
 You are building "Studio", a custom Next.js admin that replaces Payload's admin UI in the CleanStart monorepo at /Users/a12345/Desktop/AI/cleanstart/cleanstart-website (app: apps/cms). The full spec is written and approved; your job is to implement it exactly, task by task, without guessing.
@@ -95,7 +95,7 @@ Start by reading docs/studio/HANDOFF.md and do exactly what it says:
 1. Do the one-time setup in its "One-time setup" section: create the worktree .claude/worktrees/studio-build on branch feat/studio-build from origin/development, run pnpm install, copy apps/cms/.env, create the separate cleanstart_studio database and point the worktree's DATABASE_URI at it. Work only inside that worktree from then on. Never run git add -A or git add . and never commit .env.
 2. Read, in order: docs/studio/06-IMPLEMENTER-GUIDE.md, docs/studio/10-ENGINEERING-STANDARDS.md, docs/studio/05-REVIEW-PROTOCOL.md, and the top of docs/superpowers/plans/2026-10-16-studio-phase-0-1-foundation.md.
 3. Read the last 20 lines of docs/studio/PROGRESS.md. Task 0.1 is done; start at Task 0.2 unless the log shows later tasks done.
-4. For each task, follow the loop in HANDOFF.md: append a "started" line to docs/studio/PROGRESS.md with a single printf >> append (never rewrite that file), read every section the task cites (including rows in docs/studio/07-UI-ISSUES-REGISTER.md that name the task and the rules in docs/studio/09-BEHAVIOUR-CONTRACT.md), write the failing test first, implement the plan's code exactly, run Gate A until every command passes, collect Gate C evidence for anything that renders, run /code-review if available and fix all findings, commit by path with "feat(studio): T<id> <summary>", then append a "done" line with the short commit sha and gate results.
+4. For each task, follow the loop in HANDOFF.md: append a "started" line to docs/studio/PROGRESS.md with a single printf >> append (never rewrite that file), read every section the task cites (including rows in docs/studio/07-UI-ISSUES-REGISTER.md that name the task and the rules in docs/studio/09-BEHAVIOUR-CONTRACT.md), write the failing test first, implement the plan's code exactly, run Gate A until every command passes, collect Gate C evidence for anything that renders, get an independent review of the diff (your tool's review command or a second model) and fix all findings, commit by path with "feat(studio): T<id> <summary>", then append a "done" line with the short commit sha and gate results.
 5. If you use subagents: one task each, never two on the same files at once, subagents append their own PROGRESS.md lines but never commit; you review, run the gates and commit.
 6. Stop and ask me (append a "blocked" line first) whenever a doc is ambiguous, two docs disagree, the plan's code does not compile against the real repo, a step needs something the task does not list, a step needs production access (Task 0.9), or a phase is complete and needs my sign-off. Do not invent values, strings, props, endpoints or behaviour.
 
