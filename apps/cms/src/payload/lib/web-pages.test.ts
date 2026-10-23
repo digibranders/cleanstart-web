@@ -10,6 +10,7 @@ describe('isPurgeableCollection', () => {
   it('includes every web-facing collection', () => {
     for (const c of [
       'blogs',
+      'advisories',
       'news',
       'guides',
       'resources',
@@ -25,7 +26,7 @@ describe('isPurgeableCollection', () => {
     ]) {
       expect(isPurgeableCollection(c)).toBe(true);
     }
-    expect(Object.keys(PURGEABLE_COLLECTIONS)).toHaveLength(13);
+    expect(Object.keys(PURGEABLE_COLLECTIONS)).toHaveLength(14);
   });
 
   it('excludes collections with no live web route', () => {

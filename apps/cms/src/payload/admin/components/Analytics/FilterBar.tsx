@@ -9,6 +9,7 @@ const WINDOWS: OverviewWindow[] = ['7d', '28d', '90d'];
 const COLLECTIONS = [
   { value: '', label: 'All content' },
   { value: 'blogs', label: 'Blogs' },
+  { value: 'advisories', label: 'Advisories' },
   { value: 'guides', label: 'Guides' },
   { value: 'knowledgeBase', label: 'Knowledge Hub' },
   { value: 'news', label: 'News' },

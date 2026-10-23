@@ -23,6 +23,7 @@ import { buildWebsiteBlob } from './website';
 /** Collections this dispatcher can emit blobs for. */
 export type EmittableCollection =
   | 'blogs'
+  | 'advisories'
   | 'news'
   | 'guides'
   | 'knowledgeBase'
@@ -35,6 +36,7 @@ export type EmittableCollection =
 
 const isEmittableCollection = (slug: string): slug is EmittableCollection =>
   slug === 'blogs' ||
+  slug === 'advisories' ||
   slug === 'news' ||
   slug === 'guides' ||
   slug === 'knowledgeBase' ||
@@ -219,9 +221,11 @@ const composeArticleBlobs = (
   return blobs;
 };
 
+type ArticleLikeCollection = 'blogs' | 'advisories' | 'news' | 'guides' | 'knowledgeBase';
+
 const dispatchArticleLike = (
   ctx: JsonLdContext,
-  collection: 'blogs' | 'news' | 'guides' | 'knowledgeBase',
+  collection: ArticleLikeCollection,
   doc: AnyDoc,
 ): JsonLdBlob[] => {
   const slug = doc.slug ?? '';
@@ -230,7 +234,11 @@ const dispatchArticleLike = (
   if (!url) return [];
 
   const variant: ArticleSource['variant'] =
-    collection === 'news' ? 'NewsArticle' : collection === 'blogs' ? 'Article' : 'TechArticle';
+    collection === 'news'
+      ? 'NewsArticle'
+      : collection === 'blogs' || collection === 'advisories'
+        ? 'Article'
+        : 'TechArticle';
 
   const about =
     collection === 'blogs'
@@ -274,13 +282,14 @@ const dispatchArticleLike = (
 
 const KIND_BY_COLLECTION = {
   blogs: 'blog',
+  advisories: 'advisory',
   news: 'news',
   guides: 'guide',
   knowledgeBase: 'knowledgeBase',
 } as const;
 
 const breadcrumbsFor = (
-  collection: 'blogs' | 'news' | 'guides' | 'knowledgeBase',
+  collection: ArticleLikeCollection,
   doc: AnyDoc,
 ) =>
   breadcrumbTrail(KIND_BY_COLLECTION[collection], {
@@ -636,7 +645,7 @@ const buildLayerOneBlobs = (
   if (collection === 'resources') return dispatchResource(ctx, doc);
   return dispatchArticleLike(
     ctx,
-    collection as 'blogs' | 'news' | 'guides' | 'knowledgeBase',
+    collection as ArticleLikeCollection,
     doc,
   );
 };

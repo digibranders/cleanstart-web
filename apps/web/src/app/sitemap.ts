@@ -98,6 +98,7 @@ function isIndexable(doc: CmsDoc): boolean {
 const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/' },
   { path: '/about-us' },
+  { path: '/advisories' },
   { path: '/attack-surface-reduction' },
   { path: '/blogs' },
   { path: '/book-a-demo' },
@@ -178,6 +179,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     guides,
     legal,
     knowledgeBase,
+    advisories,
   ] = await Promise.all([
       fetchDocs('blogs', BLOG_FILTER),
       fetchDocs('case-studies', BLOG_FILTER),
@@ -189,12 +191,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       fetchDocs('guides', BLOG_FILTER),
       fetchDocs('legalDocuments', BLOG_FILTER),
       fetchDocs('knowledgeBase', BLOG_FILTER),
+      fetchDocs('advisories', BLOG_FILTER),
     ]);
 
   return [
     ...STATIC_ROUTES.map((r) => entry(r.path)),
     ...knowledgeBase.map((k) => entry(`/knowledge-hub/${k.slug}`, effectiveModifiedAt(k))),
     ...blogs.map((b) => entry(`/blogs/${b.slug}`, effectiveModifiedAt(b))),
+    ...advisories.map((a) => entry(`/advisories/${a.slug}`, effectiveModifiedAt(a))),
     ...resources.map((r) => entry(`/resources/${r.slug}`, effectiveModifiedAt(r))),
     ...caseStudies.map((c) => entry(`/case-studies/${c.slug}`, effectiveModifiedAt(c))),
     ...authors.map((a) => entry(`/author/${a.slug}`, effectiveModifiedAt(a))),

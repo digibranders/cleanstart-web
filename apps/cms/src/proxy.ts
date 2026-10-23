@@ -28,6 +28,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 const CACHEABLE_COLLECTIONS = new Set([
   'authors',
   'blogs',
+  'advisories',
   'case-studies',
   'events',
   'guides',

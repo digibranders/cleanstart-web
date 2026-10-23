@@ -14,6 +14,7 @@ import { resolveSiteUrl } from '../site-url';
  */
 const SCHEMA_EMITTABLE_COLLECTIONS = new Set([
   'blogs',
+  'advisories',
   'news',
   'guides',
   'knowledgeBase',

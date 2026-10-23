@@ -16,6 +16,7 @@ const SLUG_GUARD_PATH =
  */
 const GATED_SLUGS = new Set([
   'blogs',
+  'advisories',
   'news',
   'guides',
   'resources',

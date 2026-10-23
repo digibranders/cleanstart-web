@@ -13,6 +13,7 @@ const PROJECT_NAME = 'CleanStart';
 
 const VERSIONED_CONTENT = [
   'blogs',
+  'advisories',
   'news',
   'guides',
   'resources',
@@ -26,6 +27,7 @@ type VersionedSlug = (typeof VERSIONED_CONTENT)[number];
 
 const COLLECTION_LABELS: Record<VersionedSlug, string> = {
   blogs: 'Blog',
+  advisories: 'Advisory',
   news: 'News',
   guides: 'Guide',
   resources: 'Resource',

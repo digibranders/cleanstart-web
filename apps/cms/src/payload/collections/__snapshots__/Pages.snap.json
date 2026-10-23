@@ -186,6 +186,7 @@
                               "relationTo": [
                                 "pages",
                                 "blogs",
+                                "advisories",
                                 "news",
                                 "guides",
                                 "resources",
@@ -266,6 +267,7 @@
                               "relationTo": [
                                 "pages",
                                 "blogs",
+                                "advisories",
                                 "news",
                                 "guides",
                                 "resources",
@@ -389,6 +391,7 @@
                               "relationTo": [
                                 "pages",
                                 "blogs",
+                                "advisories",
                                 "news",
                                 "guides",
                                 "resources",
@@ -469,6 +472,7 @@
                               "relationTo": [
                                 "pages",
                                 "blogs",
+                                "advisories",
                                 "news",
                                 "guides",
                                 "resources",
@@ -675,6 +679,7 @@
                               "relationTo": [
                                 "pages",
                                 "blogs",
+                                "advisories",
                                 "news",
                                 "guides",
                                 "resources",
@@ -1240,6 +1245,7 @@
                                   "relationTo": [
                                     "pages",
                                     "blogs",
+                                    "advisories",
                                     "news",
                                     "guides",
                                     "resources",
@@ -1492,6 +1498,7 @@
                       "relationTo": [
                         "pages",
                         "blogs",
+                        "advisories",
                         "news",
                         "guides",
                         "resources",
@@ -1572,6 +1579,7 @@
                       "relationTo": [
                         "pages",
                         "blogs",
+                        "advisories",
                         "news",
                         "guides",
                         "resources",
@@ -1695,6 +1703,7 @@
                       "relationTo": [
                         "pages",
                         "blogs",
+                        "advisories",
                         "news",
                         "guides",
                         "resources",
@@ -1775,6 +1784,7 @@
                       "relationTo": [
                         "pages",
                         "blogs",
+                        "advisories",
                         "news",
                         "guides",
                         "resources",
@@ -1981,6 +1991,7 @@
                       "relationTo": [
                         "pages",
                         "blogs",
+                        "advisories",
                         "news",
                         "guides",
                         "resources",
@@ -2546,6 +2557,7 @@
                           "relationTo": [
                             "pages",
                             "blogs",
+                            "advisories",
                             "news",
                             "guides",
                             "resources",

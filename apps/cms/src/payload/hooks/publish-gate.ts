@@ -15,11 +15,12 @@ export interface CheckResult {
 }
 
 /** Collections that have a word-count/reading-minutes field. */
-const WORD_COUNT_COLLECTIONS = new Set(['blogs', 'news', 'guides']);
+const WORD_COUNT_COLLECTIONS = new Set(['blogs', 'advisories', 'news', 'guides']);
 
 /** Collections that have a featuredImage field. */
 const HAS_FEATURED_IMAGE = new Set([
   'blogs',
+  'advisories',
   'news',
   'guides',
   'resources',

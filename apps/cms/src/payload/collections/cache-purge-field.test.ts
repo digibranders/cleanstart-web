@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload';
 import { describe, expect, it } from 'vitest';
 
 import { PURGEABLE_COLLECTIONS } from '../lib/web-pages';
+import { Advisories } from './Advisories';
 import { Authors } from './Authors';
 import { Blogs } from './Blogs';
 import { CaseStudies } from './CaseStudies';
@@ -18,6 +19,7 @@ import { Webinars } from './Webinars';
 
 const COLLECTIONS: CollectionConfig[] = [
   Blogs,
+  Advisories,
   News,
   Guides,
   Resources,

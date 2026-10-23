@@ -17,6 +17,7 @@ const IMAGE_COLLECTIONS: ReadonlyArray<{
   imageField: 'heroImage' | 'photo';
 }> = [
   { collection: 'blogs', imageField: 'heroImage' },
+  { collection: 'advisories', imageField: 'heroImage' },
   { collection: 'news', imageField: 'heroImage' },
   { collection: 'guides', imageField: 'heroImage' },
   { collection: 'knowledgeBase', imageField: 'heroImage' },

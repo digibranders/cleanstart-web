@@ -15,6 +15,7 @@ const PAGE_ROW_LIMIT = 5000;
 
 const CONTENT_COLLECTIONS = [
   'blogs',
+  'advisories',
   'guides',
   'news',
   'knowledgeBase',

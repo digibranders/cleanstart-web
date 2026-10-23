@@ -35,6 +35,10 @@ export const LIST_FILTER_FIELDS: Record<string, ReadonlyArray<ListFilterFieldCon
     { kind: 'relationship', name: 'authors', label: 'Author', relationTo: 'authors' },
     STATUS_FILTER,
   ],
+  advisories: [
+    { kind: 'relationship', name: 'authors', label: 'Author', relationTo: 'authors' },
+    STATUS_FILTER,
+  ],
   news: [
     {
       kind: 'relationship',

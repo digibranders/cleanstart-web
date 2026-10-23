@@ -7,6 +7,7 @@ import { useEffect, type ReactElement } from 'react';
 // (DRAFTS + PUBLISHED).
 const VERSIONED_CONTENT = [
   'blogs',
+  'advisories',
   'news',
   'guides',
   'resources',
@@ -41,6 +42,7 @@ const INJECT_INTERVAL_MS = 3_000;
 // matching the inner `.nav__link-label` text against this map.
 const SLUG_BY_LABEL: Record<string, (typeof VERSIONED_CONTENT)[number]> = {
   Blogs: 'blogs',
+  Advisories: 'advisories',
   News: 'news',
   Guides: 'guides',
   Resources: 'resources',

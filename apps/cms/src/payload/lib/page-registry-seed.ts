@@ -129,6 +129,9 @@ export const PAGE_REGISTRY_SEED: readonly PageRegistrySeedRow[] = [
   // machinery, and a getWebinarBySlug fetcher, but no detail route: the nav linked
   // to /webinar/<slug> on every page and 404'd. Route added 2026-09-29.
   { path: '/webinar/[slug]', title: 'Webinar (template)', kind: 'cms-template', order: 58, backingCollection: 'webinars' },
+  // Security advisories, a Resources section of their own. Launched 2026-10-23.
+  { path: '/advisories', title: 'Advisories', kind: 'cms-listing', order: 59, backingCollection: 'advisories' },
+  { path: '/advisories/[slug]', title: 'Advisory (template)', kind: 'cms-template', order: 60, backingCollection: 'advisories' },
 ] as const;
 
 /** Fail-fast guard: paths unique + well-formed, templates carry a collection. */

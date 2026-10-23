@@ -13,6 +13,7 @@ interface CountedCollection {
 
 const ATTRIBUTED_COLLECTIONS: readonly CountedCollection[] = [
   { slug: 'blogs', label: 'blog post', relationField: 'authors' },
+  { slug: 'advisories', label: 'advisory', relationField: 'authors' },
   { slug: 'news', label: 'news item', relationField: 'authors' },
   { slug: 'guides', label: 'guide', relationField: 'authors' },
   // KnowledgeBase has no `authors` byline — credibility comes from the

@@ -3,13 +3,15 @@
 import { useSearchParams } from "next/navigation";
 import { BlogsContent, selectBlogs } from "@/components/sections/blogs/BlogsContent";
 import type { Blog } from "@/lib/blog";
+import type { ContentSection } from "@/lib/blog-utils";
 
 interface BlogsBrowserProps {
   allPosts: Blog[];
+  section?: ContentSection | undefined;
 }
 
 /**
- * Client driver for the /blogs listing. Reads the category / search / page
+ * Client driver for the /blogs and /advisories listings. Reads the category / search / page
  * filters from the URL (`useSearchParams`) and filters the full card set in
  * memory, so the route stays statically rendered — the existing `<Link>`-based
  * category pills and pagination become instant client-side URL updates against
@@ -21,6 +23,7 @@ interface BlogsBrowserProps {
  */
 export function BlogsBrowser({
   allPosts,
+  section,
 }: BlogsBrowserProps): React.ReactElement {
   const params = useSearchParams();
   const activeCategory = params.get("category") ?? "";
@@ -40,6 +43,7 @@ export function BlogsBrowser({
       searchQuery={searchQuery}
       currentPage={Math.min(page, totalPages)}
       totalPages={totalPages}
+      section={section}
     />
   );
 }

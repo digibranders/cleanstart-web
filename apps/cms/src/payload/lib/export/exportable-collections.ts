@@ -19,6 +19,7 @@
  */
 export const EXPORTABLE_COLLECTION_SLUGS = [
   'blogs',
+  'advisories',
   'news',
   'guides',
   'case-studies',

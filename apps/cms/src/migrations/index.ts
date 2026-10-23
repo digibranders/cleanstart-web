@@ -62,6 +62,7 @@ import * as migration_20260921_100000_add_case_study_detail_fields from './20260
 import * as migration_20260921_140000_add_content_updated_at from './20260921_140000_add_content_updated_at';
 import * as migration_20260922_090000_add_form_send_download_email from './20260922_090000_add_form_send_download_email';
 import * as migration_20261005_090000_add_blog_cta_picks from './20261005_090000_add_blog_cta_picks';
+import * as migration_20261023_120000_add_advisories from './20261023_120000_add_advisories';
 
 export const migrations = [
   {
@@ -358,5 +359,10 @@ export const migrations = [
     up: migration_20261005_090000_add_blog_cta_picks.up,
     down: migration_20261005_090000_add_blog_cta_picks.down,
     name: '20261005_090000_add_blog_cta_picks',
+  },
+  {
+    up: migration_20261023_120000_add_advisories.up,
+    down: migration_20261023_120000_add_advisories.down,
+    name: '20261023_120000_add_advisories',
   },
 ];

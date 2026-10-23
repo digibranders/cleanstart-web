@@ -14,6 +14,7 @@ import type { CollectionConfig, Field } from 'payload';
 const COLLECTIONS_WITH_ANALYTICS = new Set([
   'pages',
   'blogs',
+  'advisories',
   'news',
   'guides',
   'resources',

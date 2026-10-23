@@ -143,3 +143,9 @@ Operator must: (a) run `scripts/setup-hubspot-deal-properties.ts`, (b) set `HUBS
 ### 21. Newsletter subscription opt-in
 
 Operator must: (a) create "Newsletter" subscription type in HubSpot, (b) set `HUBSPOT_NEWSLETTER_SUBSCRIPTION_TYPE_ID`, (c) build HubSpot welcome-email workflow. Requires migration `20260623_140000_add_forms_hubspot_subscription_type_id`.
+
+### 22. Advisories collection + first advisory (PHP2Shell)
+
+Requires migration `20261023_120000_add_advisories` (runs on CMS deploy). Then, in the cms container:
+(a) `/app/node_modules/.bin/tsx scripts/seed-page-registry.ts` adds the `/advisories` and `/advisories/[slug]` rows;
+(b) `/app/node_modules/.bin/tsx scripts/copy-blog-to-advisory.ts --dry-run`, then without `--dry-run`, publishes the PHP2Shell blog as the first advisory and purges `/advisories`. Idempotent: skips if the advisory slug exists. Deploy `apps/web` before (b), or the purge reaches a site that has no `/advisories` route yet.

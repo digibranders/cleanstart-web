@@ -29,6 +29,7 @@ export const SITEMAP_COLLECTIONS: ReadonlyArray<{
   skipDetailDocs?: boolean;
 }> = [
   { collection: 'blogs', defaultPriority: 0.7, defaultChangeFreq: 'weekly', listingPath: '/blogs' },
+  { collection: 'advisories', defaultPriority: 0.7, defaultChangeFreq: 'weekly', listingPath: '/advisories' },
   { collection: 'news', defaultPriority: 0.7, defaultChangeFreq: 'weekly', listingPath: '/news' },
   // No /guide listing page — detail pages use /guide/[slug]; set listingPath: null.
   { collection: 'guides', defaultPriority: 0.8, defaultChangeFreq: 'monthly', listingPath: null },

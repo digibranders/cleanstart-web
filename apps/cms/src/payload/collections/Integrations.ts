@@ -595,6 +595,7 @@ export const Integrations: CollectionConfig = {
           hasMany: true,
           options: [
             { label: 'Blogs', value: 'blogs' },
+            { label: 'Advisories', value: 'advisories' },
             { label: 'News', value: 'news' },
             { label: 'Guides', value: 'guides' },
             { label: 'Resources', value: 'resources' },

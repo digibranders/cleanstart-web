@@ -18,6 +18,7 @@ const bodySchema = z.object({
 /** Collections that carry an `authors` relationship array. */
 const CONTENT_COLLECTIONS = [
   'blogs',
+  'advisories',
   'news',
   'guides',
   'resources',

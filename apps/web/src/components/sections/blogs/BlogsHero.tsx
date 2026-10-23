@@ -2,8 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import type { Blog, BlogCategory } from "@/lib/blog";
-import { formatBlogDate, mediaUrl } from "@/lib/blog-utils";
+import { BLOGS_SECTION, formatBlogDate, mediaUrl } from "@/lib/blog-utils";
+import type { ContentSection } from "@/lib/blog-utils";
 import { BlogsCategoryNav } from "@/components/sections/blogs/BlogsCategoryNav";
+import { CardCoverFallback } from "@/components/ui/CardCoverFallback";
 import { SearchBar } from "@/components/sections/_shared/SearchBar";
 import { HeroReveal, Reveal } from "@/components/ui/Reveal";
 
@@ -14,12 +16,14 @@ interface BlogsHeroProps {
   featuredPost: Blog | null;
   categories: BlogCategory[];
   searchQuery: string;
+  section?: ContentSection | undefined;
 }
 
 export function BlogsHero({
   featuredPost,
   categories,
   searchQuery,
+  section = BLOGS_SECTION,
 }: BlogsHeroProps): React.ReactElement {
   return (
     <section
@@ -69,7 +73,7 @@ export function BlogsHero({
                     letterSpacing: "var(--text-hero-utility-ls)",
                   }}
                 >
-                  Blogs
+                  {section.label}
                 </h1>
               </HeroReveal>
               <HeroReveal y={30} delay={0.2} duration={0.8}>
@@ -82,7 +86,7 @@ export function BlogsHero({
                     opacity: 0.8,
                   }}
                 >
-                  A Curated Collection of Writings, Research, and Solutions
+                  {section.subtitle}
                 </p>
               </HeroReveal>
             </div>
@@ -97,8 +101,8 @@ export function BlogsHero({
             >
               <SearchBar
                 initialQuery={searchQuery}
-                placeholder="Search articles of your interest..."
-                ariaLabel="Search blogs"
+                placeholder={section.searchPlaceholder}
+                ariaLabel={`Search ${section.label.toLowerCase()}`}
               />
             </Suspense>
           </div>
@@ -107,16 +111,18 @@ export function BlogsHero({
               they wrap to multiple centered rows. Self-syncs the active pill from
               the URL (see BlogsCategoryNav) so the hero can live outside the
               listing's Suspense boundary without a duplicate <h1>. */}
-          <Suspense
-            fallback={
-              <div
-                className="flex items-center"
-                style={{ height: "32px", width: "100%" }}
-              />
-            }
-          >
-            <BlogsCategoryNav categories={categories} />
-          </Suspense>
+          {categories.length > 0 && (
+            <Suspense
+              fallback={
+                <div
+                  className="flex items-center"
+                  style={{ height: "32px", width: "100%" }}
+                />
+              }
+            >
+              <BlogsCategoryNav categories={categories} section={section} />
+            </Suspense>
+          )}
         </div>
 
         {featuredPost ? (
@@ -131,7 +137,7 @@ export function BlogsHero({
                   className="text-body-lg font-medium leading-[1.5] tracking-[-0.04em]"
                   style={{ color: "#d8d8d8" }}
                 >
-                  FEATURED ARTICLES
+                  {section.featuredLabel}
                 </p>
                 <div className="flex flex-col gap-4 w-full">
                   <h2
@@ -163,7 +169,7 @@ export function BlogsHero({
 
               {/* Read more link */}
               <Link
-                href={`/blogs/${featuredPost.slug}`}
+                href={`${section.basePath}/${featuredPost.slug}`}
                 className="flex items-center gap-2 text-body-lg font-medium leading-[1.5] text-white text-center"
               >
                 Read more
@@ -210,13 +216,7 @@ export function BlogsHero({
                     priority
                   />
                 ) : (
-                  <div
-                    className="w-full h-full"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #1a1a4e 0%, #2d1b9e 50%, #471ec0 100%)",
-                    }}
-                  />
+                  <CardCoverFallback />
                 )}
               </div>
             </div>

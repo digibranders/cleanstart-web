@@ -482,6 +482,7 @@ export const parseLenientMulti = (input: string): MultiBlobParseResult => {
  */
 export const AUTO_EMITTED_TYPES_BY_COLLECTION: Readonly<Record<string, ReadonlySet<string>>> = {
   blogs: new Set(['Organization', 'WebSite', 'Article', 'Person', 'BreadcrumbList', 'FAQPage']),
+  advisories: new Set(['Organization', 'WebSite', 'Article', 'Person', 'BreadcrumbList', 'FAQPage']),
   news: new Set(['Organization', 'WebSite', 'NewsArticle', 'Person', 'BreadcrumbList', 'FAQPage']),
   guides: new Set(['Organization', 'WebSite', 'TechArticle', 'Person', 'BreadcrumbList', 'FAQPage', 'HowTo']),
   knowledgeBase: new Set(['Organization', 'WebSite', 'TechArticle', 'Person', 'BreadcrumbList', 'FAQPage']),

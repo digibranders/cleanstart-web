@@ -52,6 +52,7 @@ type SchemaPreviewFieldProps = {
 
 const SUPPORTED_COLLECTIONS = new Set([
   'blogs',
+  'advisories',
   'news',
   'guides',
   'knowledgeBase',

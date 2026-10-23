@@ -5,6 +5,7 @@ export const WINDOW_DAYS: Record<OverviewWindow, number> = { '7d': 7, '28d': 28,
 /** Collection slug → GA4 pagePath prefix. Keep in sync with apps/web routes. */
 export const COLLECTION_PATH_PREFIX: Record<string, string> = {
   blogs: '/blogs',
+  advisories: '/advisories',
   guides: '/guide',
   news: '/news',
   knowledgeBase: '/knowledge-hub',

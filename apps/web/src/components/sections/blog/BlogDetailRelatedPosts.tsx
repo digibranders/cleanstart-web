@@ -2,15 +2,21 @@ import Link from "next/link";
 import Image from "next/image";
 import { formatBlogDate, mediaUrl } from "@/lib/blog";
 import type { Blog } from "@/lib/blog";
+import { BLOGS_SECTION } from "@/lib/blog-utils";
+import type { ContentSection } from "@/lib/blog-utils";
 import { effectivePublishedAt } from "@/lib/published-date";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
 import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
 
 interface BlogDetailRelatedPostsProps {
   posts: Blog[];
+  section?: ContentSection | undefined;
 }
 
-export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): React.ReactElement | null {
+export function BlogDetailRelatedPosts({
+  posts,
+  section = BLOGS_SECTION,
+}: BlogDetailRelatedPostsProps): React.ReactElement | null {
   if (!posts.length) return null;
 
   return (
@@ -31,14 +37,14 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
                 backgroundClip: "text",
               }}
             >
-              Blogs
+              {section.label}
             </span>
           </h2>
 
           <Link
-            href="/blogs"
+            href={section.basePath}
             className="flex items-center gap-2 group"
-            aria-label="See all blog posts"
+            aria-label={`See all ${section.label.toLowerCase()}`}
           >
             <span
               className="font-display font-bold leading-none tracking-[-0.05em] text-white group-hover:text-[#2CC1EB] transition-colors duration-200"
@@ -76,7 +82,7 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
               key={post.id}
               className="snap-start shrink-0 w-[80%] min-w-[260px] max-w-[320px] md:w-auto md:min-w-0 md:max-w-none"
             >
-              <RelatedPostCard post={post} />
+              <RelatedPostCard post={post} basePath={section.basePath} />
             </RevealItem>
           ))}
         </RevealStagger>
@@ -85,7 +91,7 @@ export function BlogDetailRelatedPosts({ posts }: BlogDetailRelatedPostsProps): 
   );
 }
 
-function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
+function RelatedPostCard({ post, basePath }: { post: Blog; basePath: string }): React.ReactElement {
   const primaryCategory = post.categories ?? undefined;
 
   return (
@@ -165,7 +171,7 @@ function RelatedPostCard({ post }: { post: Blog }): React.ReactElement {
           )}
 
           <Link
-            href={`/blogs/${post.slug}`}
+            href={`${basePath}/${post.slug}`}
             aria-label={`Read ${post.title}`}
             className="group inline-flex items-center gap-2 mt-auto pt-2 self-start"
           >

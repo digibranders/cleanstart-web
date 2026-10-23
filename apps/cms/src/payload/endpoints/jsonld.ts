@@ -14,6 +14,7 @@ const JSONLD_RATE_LIMITS: RateLimitConfig = {
 
 const SUPPORTED_COLLECTIONS = new Set([
   'blogs',
+  'advisories',
   'news',
   'guides',
   'knowledgeBase',

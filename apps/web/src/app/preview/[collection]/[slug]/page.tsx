@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { renderAdvisoryDetail } from "@/app/advisories/[slug]/page";
 import { renderBlogDetail } from "@/app/blogs/[slug]/page";
 import { renderEventDetail } from "@/app/event/[slug]/page";
 import { renderNewsDetail } from "@/app/news/[slug]/page";
@@ -75,6 +76,7 @@ const reasonToMessage = (reason: string | undefined): string => {
 
 const renderers: Record<string, (args: { slug: string; draft?: boolean }) => Promise<React.ReactElement>> = {
   blogs: renderBlogDetail,
+  advisories: renderAdvisoryDetail,
   news: renderNewsDetail,
   events: renderEventDetail,
   resources: renderResourceDetail,

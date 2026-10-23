@@ -7,6 +7,7 @@ import type { BreadcrumbCrumb } from "./jsonld";
  */
 export type DetailKind =
   | "blog"
+  | "advisory"
   | "guide"
   | "news"
   | "event"
@@ -27,6 +28,7 @@ const HOME: BreadcrumbCrumb = { name: "Home", path: "/" };
 /** Listing crumb per kind. `null` = kind has no listing parent (author). */
 const LISTING: Record<DetailKind, BreadcrumbCrumb | null> = {
   blog: { name: "Blogs", path: "/blogs" },
+  advisory: { name: "Advisories", path: "/advisories" },
   guide: { name: "Guides", path: "/guide" },
   news: { name: "Newsroom", path: "/news" },
   event: { name: "Events", path: "/events" },

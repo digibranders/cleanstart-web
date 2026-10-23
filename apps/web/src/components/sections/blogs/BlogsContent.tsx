@@ -1,6 +1,7 @@
 import { LatestBlogs } from "@/components/sections/blogs/LatestBlogs";
 import { FadeUp } from "@/components/ui/FadeUp";
 import type { Blog } from "@/lib/blog";
+import type { ContentSection } from "@/lib/blog-utils";
 
 export interface BlogsContentProps {
   posts: Blog[];
@@ -8,6 +9,7 @@ export interface BlogsContentProps {
   searchQuery: string;
   currentPage: number;
   totalPages: number;
+  section?: ContentSection | undefined;
 }
 
 /**
@@ -22,6 +24,7 @@ export function BlogsContent({
   searchQuery,
   currentPage,
   totalPages,
+  section,
 }: BlogsContentProps): React.ReactElement {
   return (
     <FadeUp>
@@ -31,6 +34,7 @@ export function BlogsContent({
         totalPages={totalPages}
         activeCategory={activeCategory}
         searchQuery={searchQuery}
+        section={section}
       />
     </FadeUp>
   );

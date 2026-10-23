@@ -15,6 +15,7 @@
  */
 export const ROUTE_PREFIX = {
   blogs: '/blogs',
+  advisories: '/advisories',
   'case-studies': '/case-studies',
   news: '/news',
   guides: '/guide',
@@ -75,6 +76,7 @@ export const listingPathForCollection = (collection: string): string | null => {
  */
 const SITEMAP_COLLECTIONS = new Set([
   'blogs',
+  'advisories',
   'case-studies',
   'news',
   'guides',

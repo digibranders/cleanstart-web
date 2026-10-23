@@ -68,6 +68,7 @@ export interface Config {
   blocks: {};
   collections: {
     blogs: Blog;
+    advisories: Advisory;
     news: News;
     guides: Guide;
     'case-studies': CaseStudy;
@@ -125,6 +126,7 @@ export interface Config {
   };
   collectionsSelect: {
     blogs: BlogsSelect<false> | BlogsSelect<true>;
+    advisories: AdvisoriesSelect<false> | AdvisoriesSelect<true>;
     news: NewsSelect<false> | NewsSelect<true>;
     guides: GuidesSelect<false> | GuidesSelect<true>;
     'case-studies': CaseStudiesSelect<false> | CaseStudiesSelect<true>;
@@ -694,7 +696,6 @@ export interface Media {
    * Photographer / source attribution.
    */
   credit?: string | null;
-  prefix?: string | null;
   /**
    * Smart-crop focal point as percentages (0–100). Drives OG-image and 1:1 thumbnail crops.
    */
@@ -702,6 +703,7 @@ export interface Media {
     x?: number | null;
     y?: number | null;
   };
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -1844,6 +1846,395 @@ export interface Form {
    * Optional. HubSpot subscription type internal id this form opts the contact into (marketing subscription opt-in). Set for the newsletter form; leave empty for forms that should not subscribe.
    */
   hubspotSubscriptionTypeId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "advisories".
+ */
+export interface Advisory {
+  id: number;
+  title: string;
+  /**
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  /**
+   * Drives the SEO description fallback. Aim for ≤ 160 characters.
+   */
+  abstract?: string | null;
+  heroImage?: (number | null) | Media;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  faqs?:
+    | {
+        question: string;
+        answer: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Multi-author supported: every byline is credited in JSON-LD author[]. Authors with "accepting new bylines" off are hidden from the picker.
+   */
+  authors?: (number | Author)[] | null;
+  /**
+   * Author who reviewed this advisory for accuracy. Surfaced in JSON-LD reviewedBy.
+   */
+  reviewedBy?: (number | null) | Author;
+  /**
+   * Date of the most recent review pass. When unset, falls back to updatedAt with a note in the SEO panel.
+   */
+  lastReviewedAt?: string | null;
+  /**
+   * Layer in extra Schema.org types (HowTo, Video, Review, etc.) on top of the auto-emitted JSON-LD. Editors never write raw JSON — every field below maps to a schema.org property.
+   */
+  schemaAddons?:
+    | (
+        | {
+            name: string;
+            /**
+             * One-paragraph summary of the procedure.
+             */
+            description: string;
+            /**
+             * ISO 8601 duration (e.g. PT15M = 15 minutes, PT1H30M = 1.5 hours).
+             */
+            totalTime?: string | null;
+            steps?:
+              | {
+                  name: string;
+                  /**
+                   * What the reader should do for this step.
+                   */
+                  text: string;
+                  /**
+                   * Optional supporting image (1200×675 ideal).
+                   */
+                  image?: (number | null) | Media;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'howTo';
+          }
+        | {
+            name: string;
+            description: string;
+            /**
+             * Required by Google. 1200×675 ideal, 16:9 minimum.
+             */
+            thumbnail: number | Media;
+            uploadDate: string;
+            /**
+             * Direct video URL (e.g. .mp4) — used by Google for in-SERP playback. Use embedUrl below for YouTube/Vimeo embeds.
+             */
+            contentUrl: string;
+            /**
+             * Optional iframe-embeddable URL (YouTube/Vimeo). Required by Google when the player is embedded rather than self-hosted.
+             */
+            embedUrl?: string | null;
+            /**
+             * ISO 8601 duration (e.g. PT5M30S).
+             */
+            duration?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'videoObject';
+          }
+        | {
+            /**
+             * Curated Q&A merged into the page FAQPage blob. If the doc already auto-emits FAQ from its `faqs[]` field, these entries are concatenated rather than duplicated.
+             */
+            questions?:
+              | {
+                  question: string;
+                  answer: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'faqPage';
+          }
+        | {
+            itemReviewedType: 'Product' | 'Service' | 'SoftwareApplication' | 'Organization';
+            itemReviewedName: string;
+            /**
+             * 0–5 (use whole or half-stars: 0, 0.5, 1, 1.5, …, 5).
+             */
+            ratingValue: number;
+            reviewBody?: string | null;
+            /**
+             * Reviewer name (Person). Falls back to the doc author.
+             */
+            authorName?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'review';
+          }
+        | {
+            name: string;
+            category:
+              | 'BusinessApplication'
+              | 'DeveloperApplication'
+              | 'SecurityApplication'
+              | 'CommunicationApplication';
+            /**
+             * OS support (e.g. "Linux", "macOS, Windows", "Web").
+             */
+            os: string;
+            /**
+             * Price as a string (e.g. "0", "29.00"). Use "0" for free / open-source.
+             */
+            price: string;
+            currency: 'USD' | 'EUR' | 'GBP' | 'INR';
+            /**
+             * Average rating, 0–5. Optional.
+             */
+            ratingValue?: number | null;
+            /**
+             * Number of ratings. Required if Average rating is set.
+             */
+            ratingCount?: number | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'softwareApp';
+          }
+        | {
+            /**
+             * BreadcrumbList is auto-emitted today. Use this override to suppress the auto crumb on a flat page, or to replace it with custom crumbs.
+             */
+            mode: 'suppress' | 'replace';
+            crumbs?:
+              | {
+                  name: string;
+                  /**
+                   * Site-relative path (e.g. /solutions/pricing) or full URL.
+                   */
+                  path: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'breadcrumbList';
+          }
+      )[]
+    | null;
+  /**
+   * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
+   */
+  publishedAt?: string | null;
+  /**
+   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
+   */
+  displayPublishedAt?: string | null;
+  /**
+   * Set automatically when the title, body, summary or FAQs change. Shown publicly as the "Updated" date.
+   */
+  contentUpdatedAt?: string | null;
+  readingMinutes?: number | null;
+  wordCount?: number | null;
+  /**
+   * Heading levels that appear in the Table of Contents. Re-save to apply.
+   */
+  tocDepth?: ('h2' | 'h2_h3' | 'h2_h3_h4') | null;
+  tableOfContents?:
+    | {
+        level?: number | null;
+        text?: string | null;
+        anchor?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    useCustomCanonical?: boolean | null;
+    canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     */
+    additionalSchema?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    schemaHistory?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
+  /**
+   * Shown in the /advisories hero. When none is featured, the newest advisory is.
+   */
+  featured?: boolean | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -6249,6 +6640,7 @@ export interface CareerApplication {
  */
 export interface Resume {
   id: number;
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -6334,6 +6726,10 @@ export interface Page {
                             value: number | Blog;
                           } | null)
                         | ({
+                            relationTo: 'advisories';
+                            value: number | Advisory;
+                          } | null)
+                        | ({
                             relationTo: 'news';
                             value: number | News;
                           } | null)
@@ -6403,6 +6799,10 @@ export interface Page {
                         | ({
                             relationTo: 'blogs';
                             value: number | Blog;
+                          } | null)
+                        | ({
+                            relationTo: 'advisories';
+                            value: number | Advisory;
                           } | null)
                         | ({
                             relationTo: 'news';
@@ -6487,6 +6887,10 @@ export interface Page {
                             value: number | Blog;
                           } | null)
                         | ({
+                            relationTo: 'advisories';
+                            value: number | Advisory;
+                          } | null)
+                        | ({
                             relationTo: 'news';
                             value: number | News;
                           } | null)
@@ -6556,6 +6960,10 @@ export interface Page {
                         | ({
                             relationTo: 'blogs';
                             value: number | Blog;
+                          } | null)
+                        | ({
+                            relationTo: 'advisories';
+                            value: number | Advisory;
                           } | null)
                         | ({
                             relationTo: 'news';
@@ -6691,6 +7099,10 @@ export interface Page {
                         | ({
                             relationTo: 'blogs';
                             value: number | Blog;
+                          } | null)
+                        | ({
+                            relationTo: 'advisories';
+                            value: number | Advisory;
                           } | null)
                         | ({
                             relationTo: 'news';
@@ -6941,6 +7353,10 @@ export interface Page {
                               value: number | Blog;
                             } | null)
                           | ({
+                              relationTo: 'advisories';
+                              value: number | Advisory;
+                            } | null)
+                          | ({
                               relationTo: 'news';
                               value: number | News;
                             } | null)
@@ -7106,6 +7522,10 @@ export interface Page {
                       value: number | Blog;
                     } | null)
                   | ({
+                      relationTo: 'advisories';
+                      value: number | Advisory;
+                    } | null)
+                  | ({
                       relationTo: 'news';
                       value: number | News;
                     } | null)
@@ -7175,6 +7595,10 @@ export interface Page {
                   | ({
                       relationTo: 'blogs';
                       value: number | Blog;
+                    } | null)
+                  | ({
+                      relationTo: 'advisories';
+                      value: number | Advisory;
                     } | null)
                   | ({
                       relationTo: 'news';
@@ -7259,6 +7683,10 @@ export interface Page {
                       value: number | Blog;
                     } | null)
                   | ({
+                      relationTo: 'advisories';
+                      value: number | Advisory;
+                    } | null)
+                  | ({
                       relationTo: 'news';
                       value: number | News;
                     } | null)
@@ -7328,6 +7756,10 @@ export interface Page {
                   | ({
                       relationTo: 'blogs';
                       value: number | Blog;
+                    } | null)
+                  | ({
+                      relationTo: 'advisories';
+                      value: number | Advisory;
                     } | null)
                   | ({
                       relationTo: 'news';
@@ -7463,6 +7895,10 @@ export interface Page {
                   | ({
                       relationTo: 'blogs';
                       value: number | Blog;
+                    } | null)
+                  | ({
+                      relationTo: 'advisories';
+                      value: number | Advisory;
                     } | null)
                   | ({
                       relationTo: 'news';
@@ -7711,6 +8147,10 @@ export interface Page {
                     | ({
                         relationTo: 'blogs';
                         value: number | Blog;
+                      } | null)
+                    | ({
+                        relationTo: 'advisories';
+                        value: number | Advisory;
                       } | null)
                     | ({
                         relationTo: 'news';
@@ -8607,6 +9047,7 @@ export interface EmailAsset {
    * Where this asset is used, e.g. "Signature logo (rendered at 140px wide)".
    */
   usage?: string | null;
+  prefix?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -8831,7 +9272,18 @@ export interface Integration {
      * Filter document.published events by collection. Empty = all collections.
      */
     collections?:
-      | ('blogs' | 'news' | 'guides' | 'resources' | 'knowledgeBase' | 'events' | 'webinars' | 'jobs' | 'pages')[]
+      | (
+          | 'blogs'
+          | 'advisories'
+          | 'news'
+          | 'guides'
+          | 'resources'
+          | 'knowledgeBase'
+          | 'events'
+          | 'webinars'
+          | 'jobs'
+          | 'pages'
+        )[]
       | null;
     /**
      * Filter lead.submitted events by form slug. Empty = all forms.
@@ -9405,6 +9857,10 @@ export interface PayloadLockedDocument {
         value: number | Blog;
       } | null)
     | ({
+        relationTo: 'advisories';
+        value: number | Advisory;
+      } | null)
+    | ({
         relationTo: 'news';
         value: number | News;
       } | null)
@@ -9792,6 +10248,173 @@ export interface BlogsSelect<T extends boolean = true> {
       };
   featured?: T;
   pinned?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "advisories_select".
+ */
+export interface AdvisoriesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  abstract?: T;
+  heroImage?: T;
+  body?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  authors?: T;
+  reviewedBy?: T;
+  lastReviewedAt?: T;
+  schemaAddons?:
+    | T
+    | {
+        howTo?:
+          | T
+          | {
+              name?: T;
+              description?: T;
+              totalTime?: T;
+              steps?:
+                | T
+                | {
+                    name?: T;
+                    text?: T;
+                    image?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        videoObject?:
+          | T
+          | {
+              name?: T;
+              description?: T;
+              thumbnail?: T;
+              uploadDate?: T;
+              contentUrl?: T;
+              embedUrl?: T;
+              duration?: T;
+              id?: T;
+              blockName?: T;
+            };
+        faqPage?:
+          | T
+          | {
+              questions?:
+                | T
+                | {
+                    question?: T;
+                    answer?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        review?:
+          | T
+          | {
+              itemReviewedType?: T;
+              itemReviewedName?: T;
+              ratingValue?: T;
+              reviewBody?: T;
+              authorName?: T;
+              id?: T;
+              blockName?: T;
+            };
+        softwareApp?:
+          | T
+          | {
+              name?: T;
+              category?: T;
+              os?: T;
+              price?: T;
+              currency?: T;
+              ratingValue?: T;
+              ratingCount?: T;
+              id?: T;
+              blockName?: T;
+            };
+        breadcrumbList?:
+          | T
+          | {
+              mode?: T;
+              crumbs?:
+                | T
+                | {
+                    name?: T;
+                    path?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+      };
+  publishedAt?: T;
+  displayPublishedAt?: T;
+  contentUpdatedAt?: T;
+  readingMinutes?: T;
+  wordCount?: T;
+  tocDepth?: T;
+  tableOfContents?:
+    | T
+    | {
+        level?: T;
+        text?: T;
+        anchor?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
+        keywordTarget?: T;
+        keywords?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+        additionalSchema?: T;
+        schemaHistory?: T;
+      };
+  featured?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -11214,13 +11837,13 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   credit?: T;
-  prefix?: T;
   focalPoint?:
     | T
     | {
         x?: T;
         y?: T;
       };
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -13142,6 +13765,7 @@ export interface SignatureTemplatesSelect<T extends boolean = true> {
 export interface EmailAssetsSelect<T extends boolean = true> {
   alt?: T;
   usage?: T;
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -13279,6 +13903,7 @@ export interface CareerApplicationsSelect<T extends boolean = true> {
  * via the `definition` "resumes_select".
  */
 export interface ResumesSelect<T extends boolean = true> {
+  prefix?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -14221,6 +14846,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'blogs';
           value: number | Blog;
+        } | null)
+      | ({
+          relationTo: 'advisories';
+          value: number | Advisory;
         } | null)
       | ({
           relationTo: 'news';

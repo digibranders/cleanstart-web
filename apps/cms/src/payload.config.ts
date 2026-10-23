@@ -14,6 +14,7 @@ import { AboutGalleries } from './payload/collections/AboutGalleries';
 import { AuditLog } from './payload/collections/audit-log';
 import { WebhookDeadLetter } from './payload/collections/WebhookDeadLetter';
 import { Authors } from './payload/collections/Authors';
+import { Advisories } from './payload/collections/Advisories';
 import { Blogs } from './payload/collections/Blogs';
 import { BrokenLinks } from './payload/collections/BrokenLinks';
 import { CaseStudies } from './payload/collections/CaseStudies';
@@ -388,6 +389,7 @@ export default buildConfig({
     // with the production workflow; reference records (About galleries,
     // Authors) trail.
     Blogs,
+    Advisories,
     News,
     Guides,
     CaseStudies,

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { breadcrumbTrail } from "@cleanstart/schema/builders";
 import { formatBlogDate } from "@/lib/blog";
+import { BLOGS_SECTION } from "@/lib/blog-utils";
+import type { ContentSection } from "@/lib/blog-utils";
 import type { BlogCategory, BlogAuthor, BlogImage } from "@/lib/blog";
 import { DetailHero, DetailHeroMetaSeparator } from "@/components/sections/_shared/DetailHero";
 import { CalendarIcon, ClockIcon } from "@/components/sections/_shared/DetailHeroIcons";
@@ -14,6 +16,7 @@ interface BlogDetailHeroProps {
   updatedAt?: string | undefined;
   readingMinutes?: number | undefined;
   heroImage?: BlogImage | undefined;
+  section?: ContentSection | undefined;
 }
 
 // Show "Updated" only when the document was meaningfully revised after publish.
@@ -36,19 +39,20 @@ export function BlogDetailHero({
   publishedAt,
   updatedAt,
   readingMinutes,
+  section = BLOGS_SECTION,
 }: BlogDetailHeroProps): React.ReactElement {
   const primaryAuthor = authors?.[0];
   const showUpdated = shouldShowUpdated(publishedAt, updatedAt);
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.cleanstart.com";
-  const shareUrl = `${siteUrl}/blogs/${slug}`;
+  const shareUrl = `${siteUrl}${section.basePath}/${slug}`;
   const encodedUrl = encodeURIComponent(shareUrl);
   const encodedTitle = encodeURIComponent(title);
 
   return (
     <DetailHero
       title={title}
-      breadcrumb={breadcrumbTrail("blog", { title }).slice(1)}
+      breadcrumb={breadcrumbTrail(section.breadcrumbKind, { title }).slice(1)}
       meta={
         <>
           {/* ── Mobile (< lg) ── */}

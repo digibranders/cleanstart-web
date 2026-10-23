@@ -6,6 +6,7 @@ import { mediaUploadField } from './media-upload';
 const INTERNAL_DOC_TARGETS = [
   'pages',
   'blogs',
+  'advisories',
   'news',
   'guides',
   'resources',
