@@ -220,6 +220,7 @@ export const NAV_TREE: NavItem[] = [
         items: [
           { label: "Events", href: "/events", icon: "calendar" },
           { label: "Webinars", href: "/webinars", icon: "play" },
+          { label: "Videos", href: "/videos", icon: "play" },
           { label: "Podcast", href: "/podcast", icon: "mic" },
         ],
       },
