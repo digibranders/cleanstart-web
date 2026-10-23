@@ -149,7 +149,51 @@ export const runPublishChecks = (
     });
   }
 
+  if (collectionSlug === 'videos') checks.push(...videoChecks(data));
+
   return checks;
+};
+
+/**
+ * The sync imports a video as a draft with no format, because a format cannot
+ * be guessed from YouTube. These blockers keep an unreviewed import from going
+ * live; the sync itself only ever saves drafts, so it is never stopped by them.
+ */
+const videoChecks = (data: Record<string, unknown>): CheckResult[] => {
+  const topics = Array.isArray(data.topics) ? data.topics : [];
+  const source = (data.source ?? {}) as Record<string, unknown>;
+  const hasDuration =
+    resolveString(data.durationLabel) != null || typeof source.durationSeconds === 'number';
+  const blocker = (id: string, label: string, pass: boolean, message: string): CheckResult => ({
+    id,
+    label,
+    severity: 'blocker',
+    pass,
+    message: pass ? null : message,
+  });
+
+  return [
+    blocker(
+      'video-format',
+      'Format is chosen',
+      resolveString(data.format) != null,
+      'Choose a format.',
+    ),
+    blocker('video-topics', 'At least one topic', topics.length > 0, 'Add at least one topic.'),
+    blocker(
+      'video-summary',
+      'Summary is written',
+      resolveString(data.summary) != null,
+      'Write the summary shown on the card and in search results.',
+    ),
+    {
+      id: 'video-duration',
+      label: 'Duration is known',
+      severity: 'warn',
+      pass: hasDuration,
+      message: hasDuration ? null : 'No duration: the card and VideoObject schema will omit it.',
+    },
+  ];
 };
 
 /**
