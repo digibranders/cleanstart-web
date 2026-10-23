@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { youtubeEmbedUrl } from "@/lib/podcast-utils";
 import { trackEvent } from "@/lib/analytics/track";
+import { consumeAutoplay } from "@/lib/video-autoplay";
 import { useWatchedVideos } from "@/lib/use-watched-videos";
 import type { Video } from "@/lib/videos-utils";
 import { PlayGlyph } from "./PlayGlyph";
@@ -19,8 +20,11 @@ interface VideoPlayerProps {
   priority?: boolean;
   className?: string;
   radius?: string;
-  /** Start playing on mount. Used by the modal, which only opens after a click. */
-  autoPlay?: boolean;
+  /**
+   * Start playing when this page was opened by clicking a video link (see
+   * `lib/video-autoplay`). A direct visit or refresh still shows the poster.
+   */
+  startWhenOpenedFromClick?: boolean;
 }
 
 export function VideoPlayer({
@@ -29,12 +33,12 @@ export function VideoPlayer({
   priority = false,
   className = "",
   radius = "20px",
-  autoPlay = false,
+  startWhenOpenedFromClick = false,
 }: VideoPlayerProps): React.ReactElement {
   const instanceId = useId();
-  const [playing, setPlaying] = useState(autoPlay);
+  const [playing, setPlaying] = useState(false);
   const { markWatched } = useWatchedVideos();
-  const announced = useRef(false);
+  const checked = useRef(false);
 
   const announceStart = useCallback((): void => {
     window.dispatchEvent(new CustomEvent(PLAY_EVENT, { detail: { id: instanceId } }));
@@ -42,13 +46,16 @@ export function VideoPlayer({
     trackEvent("cta_click", { cta: "video_play", video_id: video.id });
   }, [instanceId, markWatched, video.id]);
 
-  // An auto-started player has no click handler to announce it, so do it once
-  // on mount; that also silences a hero player left running underneath.
+  // The flag lives in sessionStorage, which the server render cannot see, so the
+  // decision happens after mount rather than in the initial state.
   useEffect(() => {
-    if (!autoPlay || announced.current) return;
-    announced.current = true;
-    announceStart();
-  }, [autoPlay, announceStart]);
+    if (!startWhenOpenedFromClick || checked.current) return;
+    checked.current = true;
+    if (consumeAutoplay(video.id)) {
+      setPlaying(true);
+      announceStart();
+    }
+  }, [startWhenOpenedFromClick, video.id, announceStart]);
 
   useEffect(() => {
     if (!playing) return;

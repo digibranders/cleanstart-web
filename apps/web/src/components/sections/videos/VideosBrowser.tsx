@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Container } from "@/components/layout";
-import { VIDEO_FORMATS, VIDEO_TOPICS } from "@/lib/videos-catalog";
+import { VIDEO_FORMATS, VIDEO_TOPICS, type VideoTopicId } from "@/lib/videos-catalog";
 import {
   DEFAULT_VIDEO_FILTERS,
   filterVideos,
@@ -17,6 +17,7 @@ import {
   type VideoSort,
 } from "@/lib/videos-utils";
 import { VideoCard } from "./VideoCard";
+import { VideoSelect } from "./VideoSelect";
 
 export const VIDEOS_PAGE_SIZE = 12;
 const SEARCH_DEBOUNCE_MS = 250;
@@ -148,24 +149,16 @@ function VideosView({ videos, heroId, filters, onChange }: VideosViewProps): Rea
             onSubmit={submitSearch}
             className="flex flex-wrap items-center gap-2 sm:flex-nowrap"
           >
-            <label className="sr-only" htmlFor="videos-topic">
-              Topic
-            </label>
-            <select
-              id="videos-topic"
-              value={filters.topic ?? ""}
-              onChange={(e) =>
-                set({ topic: parseVideoFilters((k) => (k === "topic" ? e.target.value : null)).topic })
-              }
-              className={`${CONTROL} min-w-0 flex-1 text-[14px] sm:flex-none`}
-            >
-              <option value="">All topics</option>
-              {topicCounts.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.label} ({t.count})
-                </option>
-              ))}
-            </select>
+            <VideoSelect<"all" | VideoTopicId>
+              label="Topic"
+              value={filters.topic ?? "all"}
+              onChange={(v) => set({ topic: v === "all" ? undefined : v })}
+              options={[
+                { value: "all", label: "All topics" },
+                ...topicCounts.map((t) => ({ value: t.id, label: t.label, count: t.count })),
+              ]}
+              className="flex-1 sm:w-[210px] sm:flex-none"
+            />
 
             <div className="relative order-first w-full sm:order-none sm:w-[240px]">
               <label className="sr-only" htmlFor="videos-search">
@@ -204,23 +197,13 @@ function VideosView({ videos, heroId, filters, onChange }: VideosViewProps): Rea
               </kbd>
             </div>
 
-            <label className="sr-only" htmlFor="videos-sort">
-              Sort
-            </label>
-            <select
-              id="videos-sort"
+            <VideoSelect<VideoSort>
+              label="Sort"
               value={filters.sort}
-              onChange={(e) =>
-                set({ sort: parseVideoFilters((k) => (k === "sort" ? e.target.value : null)).sort })
-              }
-              className={`${CONTROL} min-w-0 flex-1 text-[14px] sm:flex-none`}
-            >
-              {SORT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => set({ sort: v })}
+              options={SORT_OPTIONS}
+              className="flex-1 sm:w-[190px] sm:flex-none"
+            />
           </form>
         </Container>
       </div>

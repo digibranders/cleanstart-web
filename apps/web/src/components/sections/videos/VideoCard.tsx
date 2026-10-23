@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { formatDurationLabel } from "@/lib/clean-libraries-video";
+import { requestAutoplay } from "@/lib/video-autoplay";
 import { useWatchedVideos } from "@/lib/use-watched-videos";
 import {
   formatPublished,
@@ -27,6 +28,7 @@ export function VideoCard({ video, priority = false }: VideoCardProps): React.Re
   return (
     <Link
       href={videoPath(video.slug)}
+      onClick={() => requestAutoplay(video.id)}
       className="group block rounded-[16px] focus-visible:outline-2 focus-visible:outline-offset-[6px] focus-visible:outline-[#5B2EE0]"
     >
       <div
