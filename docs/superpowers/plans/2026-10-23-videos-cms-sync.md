@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Marketing manages videos, formats and topics in the Payload admin, new YouTube uploads arrive on their own as reviewed drafts with duration, description and suggested topics, and `/videos` reads from the CMS with zero URL changes for the 15 videos already live.
+**Goal:** Marketing manages videos, formats and topics in the Payload admin, new YouTube uploads arrive on their own as reviewed drafts with description, thumbnail and suggested topics (and duration once a YouTube API key is added), and `/videos` reads from the CMS with zero URL changes for the 15 videos already live.
 
 **Architecture:** A new routed collection `videos` (drafts, scheduled publish) plus a lean taxonomy `videoTopics`. An hourly Payload task pulls the channel through the YouTube Data API, plans the changes as a pure function, and applies them: new videos become `needs-review` drafts, existing videos only get their sync-owned `source` snapshot refreshed. The web app reads the CMS through `fetchCMS` with cache tags and on-demand revalidation, behind a `VIDEOS_SOURCE` switch so cutover and rollback are one environment variable.
 
@@ -12,17 +12,23 @@
 
 ---
 
-## 0. Decisions needed before PR 1 starts
+## 0. Decisions
+
+**Made (2026-10-23)**
+
+| # | Decision | Outcome | Consequence for this plan |
+|---|---|---|---|
+| 1 | New YouTube uploads: auto-publish or review? | **Draft for review.** An env switch (`VIDEOS_AUTO_PUBLISH`) is kept for later, but it cannot bypass the publish gate (see Task 7 note). | The review step is also the safety net for the things the RSS feed cannot tell us (see D4). |
+| 2 | How does the sync read YouTube? Needs an API key? | **RSS now, API key later.** No key is needed to build, ship or run the sync. | The sync client is pluggable (D4). With no key it reads the RSS feed and editors enter duration by hand. Adding `YOUTUBE_API_KEY` later switches on automatic duration, privacy and embeddable checks and "missing video" detection with no code change. |
+
+**Still open (not blocking PR 1 or PR 2)**
 
 | # | Decision | Recommendation | Why it matters |
 |---|---|---|---|
-| 1 | New YouTube uploads: auto-publish or land as drafts for review? | Drafts for review, with an env switch (`VIDEOS_AUTO_PUBLISH=true`) if marketing later wants hands-off | Today the failure mode is a video appearing with no category and no topics. A review step costs about 30 seconds per upload and removes that. |
-| 2 | Who owns the YouTube API key? | CleanStart's Google Cloud project, key restricted to "YouTube Data API v3" | Someone with access to the CleanStart Google account must create it. Claude cannot and should not hold it. |
-| 3 | Which host for non-YouTube uploads (Plan 2)? | Vimeo if the client already pays for it, otherwise Cloudflare Stream (CleanStart already runs on Cloudflare) | Not needed for Plan 1, but the `provider` field is designed now so Plan 2 is additive. |
-| 4 | One channel or several? | One channel (`UC13c-XRmRlkWpp6WMG9SDjw`) | Multiple channels are a one-line change later, not a design change. |
-| 5 | Keep the "Videos" link in the Resources menu? | Yes, but only merge it after the CMS cutover | It is its own commit on `feat/videos-page`, so it can ship or wait independently. |
-
-Nothing below needs answers to 3 to 5 to start. Decisions 1 and 2 gate PR 2.
+| 3 | Which host for non-YouTube uploads (Plan 2)? | Vimeo if the client already pays for it, otherwise Cloudflare Stream | The `provider` field is designed now so Plan 2 is additive. |
+| 4 | One channel or several? | One channel (`UC13c-XRmRlkWpp6WMG9SDjw`) | Several channels are a one-line change later. |
+| 5 | Keep the "Videos" link in the Resources menu? | Yes, but merge it only after the CMS cutover | Its own commit on `feat/videos-page`. |
+| 6 | Create the YouTube API key now or later? | Later, when someone has 10 minutes. It restricts to "YouTube Data API v3", read only, free within quota, stored as the GitHub secret `YOUTUBE_API_KEY`. | Only improves data quality (D4). |
 
 ---
 
@@ -77,8 +83,9 @@ Principles:
 | D1 | New Payload collection `videos` is the source of truth | Keep the code catalog and add a webhook | Editorial fields (format, topics, slug, featured) do not exist on YouTube, a review workflow needs draft state, and the CMS already carries ten routed collections with the same machinery. |
 | D2 | `provider` select with `youtube` and `vimeo` now, `vimeo` rejected by a hook until Plan 2 | Add the field in Plan 2 | Adding an enum value later is a Postgres enum migration. One unused value costs nothing today. |
 | D3 | `format` is a fixed `select` (explainer, demo, talk). Topics are a taxonomy collection. | Taxonomy for both | Formats are a page design decision (three tabs), not content. Topics are content and must be editable without a deploy. The repo is still unwinding enum+Ref pairs (see memory `taxonomy-enum-migration-status`), so no new pair is created: `format` has no twin. |
-| D4 | YouTube Data API v3 with an API key | RSS only | RSS caps at 15, has no duration, tags or privacy status. The API costs about 3 quota units per run against a 10,000 per day budget. |
-| D5 | New uploads become drafts with `syncState = needs-review` | Auto-publish | See decision 1. Also guards against unlisted or private videos going public by accident (only `privacyStatus = public` is ever imported). |
+| D4 | **A pluggable YouTube source: RSS feed when there is no key, Data API v3 when `YOUTUBE_API_KEY` is set.** Both implement one `YoutubeClient` interface, so nothing downstream knows which ran. | API key as a hard requirement, or RSS only forever | RSS needs no setup and already carries title, date, thumbnail and the full description with its hashtags, which is what topic suggestion needs. It lacks duration, tags and a full channel history, and cannot tell us a video is non-embeddable. The API adds all of that for about 3 quota units per run. Keeping both means the project never waits on Google Cloud access, and the sync keeps working if a key is revoked or the quota is hit. |
+| D4b | **What RSS mode gives up, and what covers it.** (a) Duration is unknown: editors type it (`durationLabel`), and cards simply show no badge until then. (b) Non-embeddable videos cannot be detected: the draft-review step catches this. (c) "Missing on YouTube" cannot be detected, because the feed only holds the newest 15: RSS mode never flags missing. (d) Maxres poster availability is checked with a HEAD request to `i.ytimg.com`, no key needed. | Guessing | Each gap has a named owner, and none can put a broken video in front of visitors because every import is a reviewed draft (decision 1). |
+| D5 | New uploads become drafts with `syncState = needs-review` (decided) | Auto-publish | See decision 1. Also guards against unlisted or private videos going public by accident (only `privacyStatus = public` is ever imported) and is what makes RSS mode safe (D4b). |
 | D6 | `source` group is read-only and sync-owned. `title` is copied from it once, at creation, then belongs to the editor. | Overwrite title on every sync | Editors fix capitalisation and wording. A sync that undoes their edits would be re-introducing the bug the catalog's `title` override solved. |
 | D7 | Topics are suggested from YouTube `tags` and description hashtags by exact normalised match against `videoTopics.name` plus `aliases`. Format is never guessed. | Fuzzy or LLM classification | Deterministic and testable. A wrong auto-category is worse than a missing one, and the publish gate forces a human to confirm. |
 | D8 | No `schemaAddons` field and no CMS JSON-LD branch | Copy Advisories fully | The CMS "Schema Manager" JSON-LD engine is not what production serves; apps/web composes its own (memory `schema-two-disconnected-systems`). Skipping it removes about 20 `blocks_*` tables from the migration. Verified in Task 2 Step 5. |
@@ -112,9 +119,10 @@ It has no URL of its own (topics are filters on `/videos`), so it skips `buildTa
 | `format` | select explainer / demo / talk | editor | required to publish |
 | `topics` | relationship to `videoTopics`, hasMany | editor, seeded by sync | at least one required to publish |
 | `summary` | textarea, max 320 | editor | card blurb and meta description, required to publish. Pre-filled from the first paragraph of `source.description`. |
+| `durationLabel` | text, optional, validated `m:ss` or `h:mm:ss` | editor | only needed in RSS mode (or to override). The web shows `source.durationSeconds` when the sync knows it, else this. Not required to publish; the publish gate warns, it does not block. |
 | `featured` | checkbox, sidebar | editor | hero pick, newest when none |
 | `transcript` | textarea | editor | stored now, rendered in Plan 2 |
-| `source` | group, every field read-only | sync | `title`, `description`, `durationSeconds`, `publishedAt`, `tags[]`, `privacyStatus`, `embeddable`, `hasMaxres`, `thumbnailUrl`, `contentHash`, `fetchedAt` |
+| `source` | group, every field read-only | sync | `title`, `description`, `durationSeconds` (nullable), `publishedAt`, `tags[]`, `privacyStatus`, `embeddable`, `hasMaxres`, `thumbnailUrl`, `contentHash`, `fetchedAt` |
 | `syncState` | select synced / needs-review / missing / manual | sync | `manual` = created by hand, never touched by sync |
 | `publishedAt`, `displayPublishedAt`, `contentUpdatedAt` | shared fields | hooks | `publishedAt` is set from `source.publishedAt` so old videos keep their real date |
 | `permalink`, SEO sidebar | shared | editor | `descriptionSource: 'summary'` |
@@ -178,7 +186,7 @@ For each hit, add `videos` the same way, with these deliberate exceptions:
 | PR | Content | Visible to visitors? | Estimate |
 |---|---|---|---|
 | 1 | Collections, migration, all wiring, generated types, schema tests | No | 2.5 days (the migration is the long pole) |
-| 2 | YouTube client, planSync, applySync, task, env and deploy plumbing, publish gate, optional Teams event | No (creates drafts only) | 2 days |
+| 2 | YouTube API and RSS clients, planSync, applySync, task, env and deploy plumbing, publish gate, optional Teams event | No (creates drafts only). Works from day one with no key. | 2.5 days |
 | 3 | Backfill script, web CMS reader, source switch, sitemap, guard, preview, search, docs. Merge with `VIDEOS_SOURCE=catalog`. | No until the flip | 2.5 days |
 | flip | Run backfill on prod, verify, set `VIDEOS_SOURCE=cms` in Vercel, redeploy | Yes | 0.5 day |
 | 4 | Delete the catalog and the switch, remove dual-read code | No | 0.5 day, after one week of soak |
@@ -188,7 +196,7 @@ Total about 8 engineer days plus the one-week soak.
 **Rollout order (prod)**
 
 1. Deploy PR 1 (CMS image, migration runs). Verify `/admin` loads and `/api/health` is 200 (a missing migration 500s the admin, see memory `global-without-migration-crashes-admin`).
-2. Deploy PR 2 with `YOUTUBE_API_KEY` set. Run the task once from the admin jobs view. Expect the 15 existing videos to be created as drafts (the sync does not know about the catalog yet).
+2. Deploy PR 2 (no key needed). Run the task once from the admin jobs view and confirm the log says `mode: rss`. Expect the 15 existing videos to be created as drafts (the sync does not know about the catalog yet).
 3. Deploy PR 3. Run the backfill in dry-run, read the report, run `--apply`. It merges onto the synced drafts by `externalId`, sets slugs and editorial fields, publishes. Web still reads the catalog.
 4. Compare: `curl` both sources, assert identical slugs, titles, topics and order (Task 12 provides the script).
 5. Flip `VIDEOS_SOURCE=cms`, redeploy web, run the verification checklist in Task 14.
@@ -411,6 +419,19 @@ export const Videos: CollectionConfig = {
       type: 'checkbox',
       defaultValue: false,
       admin: { position: 'sidebar', description: 'Plays in the /videos hero. When none is featured, the newest video is.' },
+    },
+    {
+      name: 'durationLabel',
+      type: 'text',
+      validate: (value: unknown) =>
+        value == null || value === '' || (typeof value === 'string' && /^\d{1,2}(:\d{2}){1,2}$/.test(value))
+          ? true
+          : 'Use m:ss or h:mm:ss, for example 1:41 or 1:02:10.',
+      admin: {
+        position: 'sidebar',
+        description:
+          'Length shown on cards. Filled automatically when the YouTube API key is set; type it by hand otherwise (1:41).',
+      },
     },
     { name: 'transcript', type: 'textarea', admin: { description: 'Optional. Shown on the watch page once Plan 2 ships.' } },
     {
@@ -648,10 +669,11 @@ git add apps/cms/src/migrations/20261024_100000_add_videos.ts apps/cms/src/migra
 git commit -m "feat(cms): migration for videos and videoTopics"
 ```
 
-### Task 5: YouTube client with Zod at the boundary
+### Task 5: YouTube clients (API with Zod, and RSS) behind one interface
 
 **Files:**
-- Create: `apps/cms/src/payload/lib/videos/youtube-client.ts`, `youtube-client.test.ts`
+- Create: `apps/cms/src/payload/lib/videos/youtube-client.ts`, `youtube-client.test.ts` (the API client, steps 1 to 4)
+- Create: `apps/cms/src/payload/lib/videos/youtube-rss-client.ts`, `youtube-rss-client.test.ts` (the no-key client, step 5)
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -812,7 +834,8 @@ export interface YoutubeVideo {
   readonly title: string;
   readonly description: string;
   readonly publishedAt: string;
-  readonly durationSeconds: number;
+  /** `null` when the source cannot say (the RSS feed carries no duration). */
+  readonly durationSeconds: number | null;
   readonly tags: readonly string[];
   readonly privacyStatus: 'public' | 'unlisted' | 'private';
   readonly embeddable: boolean;
@@ -918,6 +941,181 @@ git add apps/cms/src/payload/lib/videos/youtube-client.ts apps/cms/src/payload/l
 git commit -m "feat(cms): YouTube Data API client with schema-checked responses"
 ```
 
+- [ ] **Step 5: The no-key RSS client (same interface)**
+
+The web app has a regex parser for this feed (`apps/web/src/lib/youtube-feed.ts`). The CMS cannot import from `apps/web`, so this is a deliberate small duplicate, covered by its own tests.
+
+Tests first (`youtube-rss-client.test.ts`):
+
+```ts
+import { describe, expect, it, vi } from 'vitest';
+import { createYoutubeRssClient, parseRssFeed } from './youtube-rss-client';
+
+const FEED = `<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/">
+ <entry>
+  <yt:videoId>AAAAAAAAAAA</yt:videoId>
+  <title>What Is VEX? &amp; why</title>
+  <published>2026-10-13T14:17:14+00:00</published>
+  <media:group><media:description>First paragraph.
+
+#VEX #SBOM</media:description></media:group>
+ </entry>
+ <entry><yt:videoId>BBBBBBBBBBB</yt:videoId><title>Second</title><published>2026-10-12T10:58:15+00:00</published></entry>
+</feed>`;
+
+describe('parseRssFeed', () => {
+  it('reads id, decoded title, date and the multi-line description', () => {
+    const [first, second] = parseRssFeed(FEED);
+    expect(first).toMatchObject({ id: 'AAAAAAAAAAA', title: 'What Is VEX? & why', publishedAt: '2026-10-13T14:17:14+00:00' });
+    expect(first?.description).toBe('First paragraph.\n\n#VEX #SBOM');
+    expect(second?.description).toBe('');
+  });
+  it('returns [] for empty or malformed input', () => {
+    expect(parseRssFeed('')).toEqual([]);
+    expect(parseRssFeed('<feed></feed>')).toEqual([]);
+  });
+});
+
+describe('createYoutubeRssClient', () => {
+  const respond = (url: string, init?: RequestInit): Response => {
+    if (url.includes('feeds/videos.xml')) return { ok: true, status: 200, text: async () => FEED } as Response;
+    // HEAD for the maxres poster: present for A, missing for B.
+    const present = url.includes('AAAAAAAAAAA');
+    return { ok: present, status: present ? 200 : 404 } as Response;
+  };
+
+  it('never claims a complete listing (the feed only holds the newest 15)', async () => {
+    const fetchImpl = vi.fn(async (url: string, init?: RequestInit) => respond(url, init));
+    const client = createYoutubeRssClient({ fetchImpl });
+    expect((await client.listUploadIds('UCabc')).complete).toBe(false);
+  });
+
+  it('returns unknown duration as null, assumes public and embeddable, and checks maxres with HEAD', async () => {
+    const fetchImpl = vi.fn(async (url: string, init?: RequestInit) => respond(url, init));
+    const client = createYoutubeRssClient({ fetchImpl });
+    const { ids } = await client.listUploadIds('UCabc');
+    const videos = await client.getVideos(ids);
+    expect(videos).toHaveLength(2);
+    expect(videos[0]).toMatchObject({ id: 'AAAAAAAAAAA', durationSeconds: null, privacyStatus: 'public', embeddable: true, hasMaxres: true, tags: [] });
+    expect(videos[1]?.hasMaxres).toBe(false);
+    expect(fetchImpl).toHaveBeenCalledWith(expect.stringContaining('maxresdefault.jpg'), expect.objectContaining({ method: 'HEAD' }));
+  });
+
+  it('throws a typed error when the feed itself is unreachable', async () => {
+    const fetchImpl = vi.fn(async () => ({ ok: false, status: 404, text: async () => '' }) as Response);
+    await expect(createYoutubeRssClient({ fetchImpl }).listUploadIds('UCabc')).rejects.toThrow(/feed/i);
+  });
+});
+```
+
+Implementation:
+
+```ts
+import { YoutubeApiError, type YoutubeClient, type YoutubeVideo } from './youtube-client';
+
+const ENTRY = /<entry>([\s\S]*?)<\/entry>/g;
+const ID = /<yt:videoId>([A-Za-z0-9_-]{11})<\/yt:videoId>/;
+const TITLE = /<title>([\s\S]*?)<\/title>/;
+const PUBLISHED = /<published>([\s\S]*?)<\/published>/;
+const DESCRIPTION = /<media:description>([\s\S]*?)<\/media:description>/;
+
+const decode = (value: string): string =>
+  value
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&#(\d+);/g, (_, code: string) => String.fromCodePoint(Number(code)))
+    .replace(/&amp;/g, '&')
+    .trim();
+
+export interface RssEntry {
+  id: string;
+  title: string;
+  publishedAt: string;
+  description: string;
+}
+
+export const parseRssFeed = (xml: string): RssEntry[] => {
+  const out: RssEntry[] = [];
+  for (const match of xml.matchAll(ENTRY)) {
+    const block = match[1] ?? '';
+    const id = ID.exec(block)?.[1];
+    if (!id) continue;
+    out.push({
+      id,
+      title: decode(TITLE.exec(block)?.[1] ?? ''),
+      publishedAt: PUBLISHED.exec(block)?.[1]?.trim() ?? '',
+      description: decode(DESCRIPTION.exec(block)?.[1] ?? ''),
+    });
+  }
+  return out;
+};
+
+interface RssClientOptions {
+  fetchImpl?: typeof fetch;
+  timeoutMs?: number;
+}
+
+export const createYoutubeRssClient = ({
+  fetchImpl = fetch,
+  timeoutMs = 10_000,
+}: RssClientOptions = {}): YoutubeClient => {
+  let cache: RssEntry[] = [];
+  return {
+    async listUploadIds(channelId) {
+      let res: Response;
+      try {
+        res = await fetchImpl(`https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`, {
+          signal: AbortSignal.timeout(timeoutMs),
+        });
+      } catch {
+        throw new YoutubeApiError('YouTube RSS feed request failed');
+      }
+      if (!res.ok) throw new YoutubeApiError(`YouTube RSS feed returned ${res.status}`, res.status);
+      cache = parseRssFeed(await res.text());
+      // The feed holds only the newest 15, so absence from it proves nothing.
+      return { ids: cache.map((e) => e.id), complete: false };
+    },
+
+    async getVideos(ids) {
+      const wanted = new Set(ids);
+      const out: YoutubeVideo[] = [];
+      for (const entry of cache.filter((e) => wanted.has(e.id))) {
+        const poster = await fetchImpl(`https://i.ytimg.com/vi/${entry.id}/maxresdefault.jpg`, {
+          method: 'HEAD',
+          signal: AbortSignal.timeout(timeoutMs),
+        }).catch(() => null);
+        out.push({
+          id: entry.id,
+          title: entry.title,
+          description: entry.description,
+          publishedAt: entry.publishedAt,
+          durationSeconds: null,
+          tags: [],
+          // The feed lists public videos only and cannot report embeddability; the draft review covers it.
+          privacyStatus: 'public',
+          embeddable: true,
+          liveBroadcastContent: 'none',
+          hasMaxres: poster?.ok === true,
+        });
+      }
+      return out;
+    },
+  };
+};
+```
+
+`getVideos` depends on `listUploadIds` having run first (it reads the feed once and keeps it); `runYoutubeSync` always calls them in that order, and Task 8's test asserts it.
+
+- [ ] **Step 6: Run both test files, expect pass, commit**
+
+```bash
+pnpm --filter @cleanstart/cms exec vitest run src/payload/lib/videos
+git add apps/cms/src/payload/lib/videos/youtube-rss-client.ts apps/cms/src/payload/lib/videos/youtube-rss-client.test.ts
+git commit -m "feat(cms): no-key RSS client for the YouTube video sync"
+```
+
 ### Task 6: `planSync`, the pure core
 
 **Files:**
@@ -983,7 +1181,7 @@ describe('planSync', () => {
     const v = video();
     const plan = planSync({
       ...base, fetched: [v],
-      existing: [{ id: 9, externalId: v.id, syncState: 'synced', contentHash: contentHash(toSource(v)), status: 'published' }],
+      existing: [{ id: 9, externalId: v.id, syncState: 'synced', contentHash: contentHash(toSource(v)), status: 'published', durationSeconds: 101 }],
     });
     expect(plan).toMatchObject({ creates: [], updates: [], unchanged: 1 });
   });
@@ -992,19 +1190,30 @@ describe('planSync', () => {
     const v = video({ description: 'edited' });
     const plan = planSync({
       ...base, fetched: [v],
-      existing: [{ id: 9, externalId: v.id, syncState: 'synced', contentHash: 'old', status: 'published' }],
+      existing: [{ id: 9, externalId: v.id, syncState: 'synced', contentHash: 'old', status: 'published', durationSeconds: 101 }],
     });
     expect(plan.updates).toEqual([{ id: 9, source: toSource(v), restoreFromMissing: false }]);
   });
 
   it('flags a vanished video as missing, but only when the listing was complete', () => {
-    const existing = [{ id: 9, externalId: 'GONEGONEGON', syncState: 'synced' as const, contentHash: 'h', status: 'published' as const }];
+    const existing = [{ id: 9, externalId: 'GONEGONEGON', syncState: 'synced' as const, contentHash: 'h', status: 'published' as const, durationSeconds: null }];
     expect(planSync({ ...base, fetched: [], existing }).missing).toEqual([9]);
     expect(planSync({ ...base, fetched: [], existing, complete: false }).missing).toEqual([]);
   });
 
+  it('does not treat an RSS run (no duration) as a change, and never erases a known duration', () => {
+    const withDuration = video();
+    const stored = toSource(withDuration);
+    const rssView = video({ durationSeconds: null });
+    const plan = planSync({
+      ...base, fetched: [rssView],
+      existing: [{ id: 9, externalId: rssView.id, syncState: 'synced', contentHash: contentHash(stored), status: 'published', durationSeconds: 101 }],
+    });
+    expect(plan).toMatchObject({ updates: [], unchanged: 1 });
+  });
+
   it('never touches manual documents', () => {
-    const existing = [{ id: 5, externalId: 'MANUALMANUA', syncState: 'manual' as const, contentHash: null, status: 'published' as const }];
+    const existing = [{ id: 5, externalId: 'MANUALMANUA', syncState: 'manual' as const, contentHash: null, status: 'published' as const, durationSeconds: null }];
     const plan = planSync({ ...base, fetched: [], existing });
     expect(plan.missing).toEqual([]);
   });
@@ -1013,7 +1222,7 @@ describe('planSync', () => {
     const v = video();
     const plan = planSync({
       ...base, fetched: [v],
-      existing: [{ id: 9, externalId: v.id, syncState: 'missing', contentHash: contentHash(toSource(v)), status: 'published' }],
+      existing: [{ id: 9, externalId: v.id, syncState: 'missing', contentHash: contentHash(toSource(v)), status: 'published', durationSeconds: 101 }],
     });
     expect(plan.updates).toEqual([{ id: 9, source: toSource(v), restoreFromMissing: true }]);
   });
@@ -1036,7 +1245,7 @@ type DocId = number | string;
 export interface SourceSnapshot {
   readonly title: string;
   readonly description: string;
-  readonly durationSeconds: number;
+  readonly durationSeconds: number | null;
   readonly publishedAt: string;
   readonly tags: readonly string[];
   readonly privacyStatus: string;
@@ -1051,6 +1260,8 @@ export interface ExistingVideo {
   readonly syncState: SyncState;
   readonly contentHash: string | null;
   readonly status: 'draft' | 'published';
+  /** What the document already stores, so an RSS run (which knows no duration) never erases it. */
+  readonly durationSeconds: number | null;
 }
 
 export interface TopicRef {
@@ -1080,6 +1291,10 @@ export const toSource = (v: YoutubeVideo): SourceSnapshot => ({
   hasMaxres: v.hasMaxres,
   thumbnailUrl: `https://i.ytimg.com/vi/${v.id}/${v.hasMaxres ? 'maxresdefault' : 'hqdefault'}.jpg`,
 });
+
+/** Unknown (null) never overwrites a duration we already have. */
+export const withKnownDuration = (source: SourceSnapshot, existing: number | null): SourceSnapshot =>
+  source.durationSeconds === null && existing !== null ? { ...source, durationSeconds: existing } : source;
 
 export const contentHash = (source: SourceSnapshot): string =>
   createHash('sha256').update(JSON.stringify(source)).digest('hex');
@@ -1131,8 +1346,8 @@ export const planSync = ({
       skipped.push({ externalId: v.id, reason });
       continue;
     }
-    const source = toSource(v);
     const current = byExternalId.get(v.id);
+    const source = withKnownDuration(toSource(v), current?.durationSeconds ?? null);
     if (!current) {
       creates.push({
         externalId: v.id,
@@ -1391,22 +1606,22 @@ Note on `autoPublish`: the env switch exists for decision 1, but publishing requ
 - Create: `apps/cms/src/payload/lib/videos/run-sync.ts`, `apps/cms/src/payload/jobs/sync-youtube-videos.ts`
 - Modify: `apps/cms/src/payload.config.ts`, `apps/cms/src/payload/lib/integrations/credentials.ts`, `apps/cms/.env.example`, `.github/workflows/deploy-cms.yml`, `CLAUDE.md` (jobs table)
 
-- [ ] **Step 1: Credentials resolver** in `credentials.ts`, next to `resolveCruxCredentials`:
+- [ ] **Step 1: Credentials resolver** in `credentials.ts`, next to `resolveCruxCredentials`. Unlike CrUX it never returns null: no key is a supported mode.
 
 ```ts
 export interface YoutubeCredentials {
-  readonly apiKey: string;
+  /** null selects the no-key RSS client. */
+  readonly apiKey: string | null;
   readonly channelId: string;
 }
 
-export const resolveYoutubeCredentials = (): YoutubeCredentials | null => {
-  const apiKey = readEnv('YOUTUBE_API_KEY');
-  if (!apiKey) return null;
-  return { apiKey, channelId: readEnv('YOUTUBE_CHANNEL_ID') ?? 'UC13c-XRmRlkWpp6WMG9SDjw' };
-};
+export const resolveYoutubeCredentials = (): YoutubeCredentials => ({
+  apiKey: readEnv('YOUTUBE_API_KEY'),
+  channelId: readEnv('YOUTUBE_CHANNEL_ID') ?? 'UC13c-XRmRlkWpp6WMG9SDjw',
+});
 ```
 
-- [ ] **Step 2: Orchestrator** `run-sync.ts` loads existing videos and topics (paginated `find`, `overrideAccess: true`, `depth: 0`, `select` only the fields it needs), calls `client.listUploadIds` then `client.getVideos`, `planSync`, `applyPlan`, and returns the counts. Constructor-inject `client` and `payload` so it is testable with the fakes from Tasks 5 and 7. Add a test that runs it end to end with a fake client and fake payload and asserts the counts line up with the plan.
+- [ ] **Step 2: Orchestrator** `run-sync.ts` loads existing videos and topics (paginated `find`, `overrideAccess: true`, `depth: 0`, `select` only the fields it needs), calls `client.listUploadIds` then `client.getVideos`, `planSync`, `applyPlan`, and returns the counts. Constructor-inject `client` and `payload` so it is testable with the fakes from Tasks 5 and 7. It must call `listUploadIds` before `getVideos` (the RSS client relies on that order). Add a test that runs it end to end with a fake client and fake payload, asserts the counts line up with the plan, and asserts the call order. Also load each existing document's `source.durationSeconds` into `ExistingVideo.durationSeconds`.
 
 - [ ] **Step 3: Task** (mirror `refresh-crux.ts`, including the loud log when the key is missing):
 
@@ -1414,13 +1629,15 @@ export const resolveYoutubeCredentials = (): YoutubeCredentials | null => {
 import type { TaskConfig } from 'payload';
 
 import { resolveYoutubeCredentials } from '../lib/integrations/credentials';
-import { createYoutubeClient } from '../lib/videos/youtube-client';
 import { runYoutubeSync } from '../lib/videos/run-sync';
+import { createYoutubeClient } from '../lib/videos/youtube-client';
+import { createYoutubeRssClient } from '../lib/videos/youtube-rss-client';
 
 /**
  * Hourly at minute 7 UTC: imports new public YouTube uploads as needs-review
- * drafts and refreshes the synced snapshot of existing ones. No-op without
- * YOUTUBE_API_KEY (logged, not silent). Gated by PAYLOAD_AUTO_RUN.
+ * drafts and refreshes the synced snapshot of existing ones. Uses the Data API
+ * when YOUTUBE_API_KEY is set (duration, privacy, missing-video detection) and
+ * the RSS feed otherwise. Gated by PAYLOAD_AUTO_RUN.
  */
 export const syncYoutubeVideosTask: TaskConfig<'syncYoutubeVideos'> = {
   slug: 'syncYoutubeVideos',
@@ -1428,17 +1645,16 @@ export const syncYoutubeVideosTask: TaskConfig<'syncYoutubeVideos'> = {
   schedule: [{ cron: '7 * * * *', queue: 'youtubeVideosSync' }],
   handler: async ({ req }) => {
     const creds = resolveYoutubeCredentials();
-    if (!creds) {
-      req.payload.logger.warn('syncYoutubeVideos skipped: YOUTUBE_API_KEY is not set');
-      return { output: { skipped: 'no-api-key' } };
-    }
+    const mode = creds.apiKey ? 'api' : 'rss';
+    // Logged on every run so a missing key is visible, never silent.
+    req.payload.logger.info({ mode }, 'syncYoutubeVideos starting');
     const result = await runYoutubeSync({
       payload: req.payload as unknown as Parameters<typeof runYoutubeSync>[0]['payload'],
-      client: createYoutubeClient({ apiKey: creds.apiKey }),
+      client: creds.apiKey ? createYoutubeClient({ apiKey: creds.apiKey }) : createYoutubeRssClient(),
       channelId: creds.channelId,
       autoPublish: process.env.VIDEOS_AUTO_PUBLISH === 'true',
     });
-    return { output: result };
+    return { output: { mode, ...result } };
   },
 };
 ```
@@ -1452,7 +1668,7 @@ export const syncYoutubeVideosTask: TaskConfig<'syncYoutubeVideos'> = {
       },
 ```
 
-- [ ] **Step 5: Env plumbing.** Add `YOUTUBE_API_KEY=`, `YOUTUBE_CHANNEL_ID=`, `VIDEOS_AUTO_PUBLISH=` (with a comment) to `apps/cms/.env.example`. In `.github/workflows/deploy-cms.yml` add `YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}` beside `CRUX_API_KEY` (line ~167) and `echo "YOUTUBE_API_KEY=${YOUTUBE_API_KEY}"` beside line ~258. The deploy re-renders `/opt/cleanstart/.env` from these on every run, so editing the file on the droplet does not survive (see the Email section of `CLAUDE.md`, which documents the same re-render behaviour). Someone with repo admin adds the GitHub secret; this is decision 2.
+- [ ] **Step 5: Env plumbing.** Add `YOUTUBE_API_KEY=` (optional: leave empty to use the RSS feed), `YOUTUBE_CHANNEL_ID=`, `VIDEOS_AUTO_PUBLISH=` (with comments) to `apps/cms/.env.example`. In `.github/workflows/deploy-cms.yml` add `YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}` beside `CRUX_API_KEY` (line ~167) and `echo "YOUTUBE_API_KEY=${YOUTUBE_API_KEY}"` beside line ~258. The deploy re-renders `/opt/cleanstart/.env` from these on every run, so editing the file on the droplet does not survive (see the Email section of `CLAUDE.md`, which documents the same re-render behaviour). The workflow lines are added now so nothing needs a code change later; someone with repo admin adds the GitHub secret whenever decision 6 is acted on. An empty secret is fine.
 
 - [ ] **Step 6: Regenerate types, update docs, gate**
 
@@ -1474,7 +1690,7 @@ git commit -m "feat(cms): hourly YouTube video sync task"
 **Files:**
 - Modify: `apps/cms/src/payload/hooks/publish-gate.ts`, `apps/cms/src/payload/lib/wire-publish-gate.ts`, the publish-gate test (find it with `rg -l runPublishChecks apps/cms/src`)
 
-- [ ] **Step 1: Failing test** asserting that `runPublishChecks({ title: 'X', summary: '' }, 'videos')` returns blockers `video-format`, `video-topics`, `video-summary`, and that a complete doc returns none of them failing.
+- [ ] **Step 1: Failing test** asserting that `runPublishChecks({ title: 'X', summary: '' }, 'videos')` returns blockers `video-format`, `video-topics`, `video-summary`, a non-blocking warning `video-duration`, and that a complete doc returns none of them failing.
 
 - [ ] **Step 2: Add `'videos'` to `GATED_SLUGS`** in `wire-publish-gate.ts`.
 
@@ -1482,6 +1698,9 @@ git commit -m "feat(cms): hourly YouTube video sync task"
 
 ```ts
   if (collectionSlug === 'videos') {
+    const hasDuration =
+      resolveString(data.durationLabel) != null ||
+      typeof (data.source as { durationSeconds?: unknown } | undefined)?.durationSeconds === 'number';
     const topics = Array.isArray(data.topics) ? data.topics : [];
     const summary = resolveString(data.summary);
     checks.push(
@@ -1506,6 +1725,13 @@ git commit -m "feat(cms): hourly YouTube video sync task"
         pass: summary != null,
         message: summary != null ? null : 'Write the one or two sentence summary shown on cards and in search results.',
       },
+      {
+        id: 'video-duration',
+        label: 'Duration known',
+        severity: 'warn',
+        pass: hasDuration,
+        message: hasDuration ? null : 'Type the length (for example 1:41) so the card can show a time badge.',
+      },
     );
   }
 ```
@@ -1529,7 +1755,7 @@ The CMS app cannot import from `apps/web`, so the catalog is exported once to JS
 
 - [ ] **Step 2: Script behaviour** (follow `backfill-resource-type.ts` conventions: dry run by default, `--apply` to write, idempotent, no `.env` read, runs with `/app/node_modules/.bin/tsx` in the container):
   1. Upsert `videoTopics` by slug (slug equals the old id so `?topic=` URLs keep working).
-  2. For each catalog entry, find the `videos` doc by `externalId`. If the sync already created it (drafts exist after rollout step 2), update it with the catalog's `slug`, `title`, `format`, `topics`, `summary`, set `syncState: 'synced'`, and publish. If it does not exist, create it with `source` fetched live from the YouTube API so `contentHash` matches what the sync will compute (otherwise the next sync would see a spurious change).
+  2. For each catalog entry, find the `videos` doc by `externalId`. If the sync already created it (drafts exist after rollout step 2), update it with the catalog's `slug`, `title`, `format`, `topics`, `summary`, set `syncState: 'synced'`, and publish. If it does not exist, create it with `source` built from the same client the sync uses (RSS or API) and `durationSeconds` taken from the catalog JSON (all 15 are known). Compute `contentHash` with the same `withKnownDuration` + `contentHash` functions as the sync, otherwise the next sync would see a spurious change.
   3. Print a table of created, updated, unchanged, and any slug conflict. A slug conflict (the doc already has a different slug) aborts the run; never silently renumber.
   4. After writing, call `revalidateWeb` itself and wait for it. A script that ends in `process.exit` kills the hook's deferred purge timer (memory `prod-script-skips-deferred-purge`), which is why prod once served stale pages after a backfill.
 
@@ -1570,8 +1796,17 @@ type CmsVideo = {
     hasMaxres?: boolean | null;
   } | null;
   publishedAt?: string | null;
+  durationLabel?: string | null;
 };
 type CmsList = { docs: CmsVideo[] };
+
+/** "1:41" -> 101, "1:02:10" -> 3730, anything else -> null. */
+export const parseDurationLabel = (label: string | null | undefined): number | null => {
+  const match = /^(?:(\d{1,2}):)?(\d{1,2}):(\d{2})$/.exec(label ?? "");
+  if (!match) return null;
+  const [, h = "0", m = "0", s = "0"] = match;
+  return Number(h) * 3600 + Number(m) * 60 + Number(s);
+};
 
 export const mapCmsVideo = (doc: CmsVideo): Video => ({
   id: doc.externalId,
@@ -1580,7 +1815,7 @@ export const mapCmsVideo = (doc: CmsVideo): Video => ({
   format: doc.format ?? null,
   topics: (doc.topics ?? []).filter((t): t is CmsTopic => typeof t === "object").map((t) => ({ slug: t.slug, label: t.name })),
   publishedAt: doc.source?.publishedAt ?? doc.publishedAt ?? "",
-  durationSeconds: doc.source?.durationSeconds ?? undefined,
+  durationSeconds: doc.source?.durationSeconds ?? parseDurationLabel(doc.durationLabel) ?? undefined,
   summary: doc.summary ?? "",
   description: doc.source?.description ?? doc.summary ?? "",
   thumb: doc.source?.hasMaxres === false ? "hq" : "maxres",
@@ -1599,7 +1834,7 @@ export async function getCmsVideos(): Promise<Video[]> {
   return data.docs.filter((d) => d.slug && d.externalId).map(mapCmsVideo);
 }
 ```
-Tests: mapping with populated topics, with unpopulated ids (dropped), with `hasMaxres: false` giving `"hq"`, with a missing duration, and an assertion that a `fetchCMS` rejection propagates (not swallowed).
+Tests: mapping with populated topics, with unpopulated ids (dropped), with `hasMaxres: false` giving `"hq"`, with `source.durationSeconds` absent and `durationLabel: "1:41"` giving 101 (and `"nonsense"` giving no duration), `parseDurationLabel` cases (`1:41`, `1:02:10`, `0:59`, empty, `1:2`), and an assertion that a `fetchCMS` rejection propagates (not swallowed).
 
 - [ ] **Step 3: The switch** in `lib/videos.ts`:
 
@@ -1655,7 +1890,7 @@ Everything else (cards, filters, watch page, JSON-LD) keeps working because `Vid
 | Schema | collections | snapshot tests (`schema-surface`), migration applied to two clones and `pg_dump` diffed, run twice |
 | Web | mapping, source switch, sitemap, guard | Vitest, plus a regression that a CMS failure throws |
 | End to end | the 26 browser checks and axe | Playwright against a local CMS with the backfill applied, in both source modes |
-| Real API | one live smoke | run the sync once with a real key against the real channel in a non-prod DB and eyeball the drafts |
+| Real feed and API | live smokes | run the sync once without a key (RSS) against the real channel in a non-prod DB and eyeball the drafts; repeat with a key when one exists |
 
 The sync is never tested against production data until the dry-run output has been read by a human.
 
@@ -1667,7 +1902,8 @@ The sync is never tested against production data until the dry-run output has be
 |---|---|---|---|
 | Hand-written migration drifts from what Payload expects (2026-06-24 incident class) | Medium | High (admin 500) | Task 4 method: push to clone A, transcribe, apply to clone B, `pg_dump` diff empty, second run no-op. Include `payload_locked_documents_rels`. |
 | API key leaks into logs or errors | Low | High | Client never forwards underlying error text, test asserts it, key lives only in env and GitHub secrets, key restricted to the YouTube Data API. |
-| Quota exhaustion | Very low | Medium | About 3 units per hourly run against 10,000 per day. First full backfill is under 10 units. |
+| Quota exhaustion (API mode only) | Very low | Medium | About 3 units per hourly run against 10,000 per day. If it ever trips, set the key empty and the sync falls back to RSS. |
+| RSS mode cannot see duration, embeddability or deletions | Certain until a key is added | Low | Editors type the duration, the draft review catches a non-embeddable video, and RSS mode never flags "missing". Adding `YOUTUBE_API_KEY` removes all three gaps with no code change. |
 | Sync overwrites editor work | Medium if designed carelessly | High | D6: sync writes only `source` and `syncState`. Tested by `applyPlan` "writes only the source group". |
 | A video is deleted or made private on YouTube | Medium | Medium | Flagged `missing`, shown in the admin, not auto-unpublished (editor decides). Only flagged when the listing was complete. |
 | Slug changes after publish | Medium | High (lost rankings) | Slug is not synced, backfill preserves all 15, `slugChangeRedirectHook` writes a redirect on edits. |
@@ -1682,7 +1918,7 @@ The sync is never tested against production data until the dry-run output has be
 ## 11. Definition of done
 
 - [ ] Marketing can add, edit, recategorise and unpublish a video and a topic in the admin, with no developer.
-- [ ] A new YouTube upload appears as a `needs-review` draft within an hour, with duration, description, thumbnail frame, summary and suggested topics filled in.
+- [ ] A new YouTube upload appears as a `needs-review` draft within an hour, with description, thumbnail frame, summary and suggested topics filled in (and duration too once `YOUTUBE_API_KEY` is set; until then an editor types it).
 - [ ] Publishing requires format, topic and summary; the checklist says what is missing.
 - [ ] All 15 existing URLs return 200, with identical slugs, titles and topics.
 - [ ] `/videos` and `/videos/[slug]` update within seconds of a publish (on-demand revalidation), not after a deploy.
@@ -1712,5 +1948,7 @@ The sync is never tested against production data until the dry-run output has be
 **Placeholder scan.** Tasks 3, 4 and 8 name the exact files and commands but do not reproduce the roughly 45 one-line registry edits or the roughly 400 lines of generated DDL. That is deliberate: the registry edits are found mechanically with the `rg` command in section 5 against the Advisories commit, and the DDL must be transcribed from a real Payload push (Task 4 Step 2), because inventing it here would be wrong in the way that took the admin down in June. Task 12 Step 1 describes the `videos-utils` refactor rather than printing the diff because the existing 26 tests define it; write them red first.
 
 **Type consistency.** `SourceSnapshot`, `SyncPlan`, `ExistingVideo`, `TopicRef`, `YoutubeVideo` are defined in Tasks 5 and 6 and used unchanged in Tasks 7 and 8. The web `Video` shape is unchanged except `topics` becoming `{ slug, label }[]` (Task 12 Step 1), and `mapCmsVideo` returns exactly that. `syncState` values match between the collection (Task 2), the planner (Task 6) and the shell (Task 7). The task slug `syncYoutubeVideos` and queue `youtubeVideosSync` are used identically in Task 8's three places.
+
+**Decisions applied.** Draft-for-review (decision 1) is D5 and Task 7. RSS-now, key-later (decision 2) is D4, D4b, Task 5 Step 5, Task 6's `withKnownDuration`, Task 8's client choice, and the `durationLabel` field.
 
 **Known limits stated, not hidden.** `autoPublish` cannot actually publish until a format rule is agreed (Task 7 note). Whether `schemaAddons` is required is verified rather than assumed (Task 2 Step 5). The Studio admin interaction is a flagged risk, not a solved one.
