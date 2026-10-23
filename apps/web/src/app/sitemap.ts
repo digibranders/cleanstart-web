@@ -168,6 +168,19 @@ function entry(path: string, lastModified?: string): MetadataRoute.Sitemap[numbe
   };
 }
 
+// CMS mode lists the published `videos` documents (a failed read fails the
+// sitemap like every other collection). Catalog mode never touches the CMS
+// collection: the code catalog plus the YouTube feed, which cannot throw, so
+// a feed outage leaves the catalog's videos in place.
+async function videoEntries(): Promise<MetadataRoute.Sitemap> {
+  if (process.env.VIDEOS_SOURCE === 'cms') {
+    const docs = await fetchDocs('videos', BLOG_FILTER);
+    return docs.map((v) => entry(videoPath(v.slug), effectiveModifiedAt(v)));
+  }
+  const videos = await getVideos();
+  return videos.map((v) => entry(videoPath(v.slug), v.publishedAt));
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (!isIndexingAllowed()) return [];
 
@@ -196,9 +209,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       fetchDocs('legalDocuments', BLOG_FILTER),
       fetchDocs('knowledgeBase', BLOG_FILTER),
       fetchDocs('advisories', BLOG_FILTER),
-      // Code catalog plus the YouTube feed, not the CMS. Never throws: a feed
-      // outage leaves the catalog's videos in place.
-      getVideos(),
+      videoEntries(),
     ]);
 
   return [
@@ -213,7 +224,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...events.map((e) => entry(`/event/${e.slug}`, effectiveModifiedAt(e))),
     ...jobs.map((j) => entry(`/job/${j.slug}`, effectiveModifiedAt(j))),
     ...guides.map((g) => entry(`/guide/${g.slug}`, effectiveModifiedAt(g))),
-    ...videos.map((v) => entry(videoPath(v.slug), v.publishedAt)),
+    ...videos,
     // `legalHref` — not `/legal/<slug>` — because the Privacy Policy's canonical
     // public URL is the standalone `/privacy-policy`; `/legal/privacy-policy`
     // permanently redirects to it. Emitting the raw path put a 308 in the

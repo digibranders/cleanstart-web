@@ -59,6 +59,46 @@ describe("sitemap", () => {
     );
   });
 
+  it("in catalog mode never reads the videos collection", async () => {
+    fetchMock.mockImplementation(async () => ok([]));
+    await (await load())();
+    expect(fetchMock.mock.calls.map(([url]) => collectionOf(url as string))).not.toContain("videos");
+  });
+
+  describe("with VIDEOS_SOURCE=cms", () => {
+    beforeEach(() => {
+      vi.stubEnv("VIDEOS_SOURCE", "cms");
+    });
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    it("lists the published videos from the CMS, not the code catalog", async () => {
+      fetchMock.mockImplementation(async (url: string) =>
+        collectionOf(url) === "videos"
+          ? ok([
+              { slug: "from-the-cms", publishedAt: "2026-11-01T08:00:00.000Z" },
+              { slug: "hidden", seo: { indexable: "noindex" } },
+            ])
+          : ok([]),
+      );
+      const entries = await (await load())();
+      const urls = entries.map((e) => e.url);
+      expect(urls).toContain("https://www.cleanstart.com/videos/from-the-cms");
+      expect(urls).not.toContain("https://www.cleanstart.com/videos/hidden");
+      expect(urls).not.toContain("https://www.cleanstart.com/videos/what-is-vex");
+      const videosCall = fetchMock.mock.calls.map(([u]) => u as string).find((u) => collectionOf(u) === "videos");
+      expect(videosCall).toContain("where[_status][equals]=published");
+    });
+
+    it("fails loudly when the videos read errors", async () => {
+      fetchMock.mockImplementation(async (url: string) =>
+        collectionOf(url) === "videos" ? failed(502) : ok([]),
+      );
+      await expect((await load())()).rejects.toThrow(/502/);
+    });
+  });
+
   it("never reports the row-level updatedAt as lastmod", async () => {
     fetchMock.mockImplementation(async (url: string) =>
       collectionOf(url) === "blogs"

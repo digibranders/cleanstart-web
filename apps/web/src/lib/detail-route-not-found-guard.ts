@@ -132,6 +132,9 @@ async function slugExists(route: DetailRoute, slug: string): Promise<boolean> {
 export async function detailRouteExists(pathname: string): Promise<boolean> {
   const match = matchRoute(pathname);
   if (!match) return true;
+  // Catalog mode serves watch pages from code, so the CMS collection may be
+  // empty (or not backfilled yet) and must not be asked.
+  if (match.route.collection === "videos" && process.env.VIDEOS_SOURCE !== "cms") return true;
   if (match.route.prefix === "/legal/" && match.slug === LEGAL_PRIVACY_POLICY_SLUG) {
     return true;
   }

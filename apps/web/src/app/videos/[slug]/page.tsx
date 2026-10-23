@@ -16,7 +16,7 @@ import { toIso8601Duration } from "@/lib/clean-libraries-video";
 import { youtubeThumbnail, youtubeWatchUrl } from "@/lib/podcast-utils";
 import { SITE_URL, buildPageMetadata, clampMetaDescription } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, videoObjectSchema } from "@/lib/seo/jsonld";
-import { getVideoBySlug, getVideos } from "@/lib/videos";
+import { getVideoDetail, getVideos } from "@/lib/videos";
 import { CLEANSTART_YOUTUBE_SUBSCRIBE_URL } from "@/lib/youtube-feed";
 import {
   formatPublished,
@@ -54,7 +54,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const video = await getVideoBySlug(slug);
+  const video = await getVideoDetail(slug);
   if (!video) {
     return buildPageMetadata({
       title: "Video not found",
@@ -79,7 +79,22 @@ export default async function VideoPage({
   params: Promise<Params>;
 }): Promise<React.ReactElement> {
   const { slug } = await params;
-  const [video, all] = await Promise.all([getVideoBySlug(slug), getVideos()]);
+  return renderVideoDetail({ slug });
+}
+
+/**
+ * Shared by the public route and the editor preview route. A draft reads the
+ * unpublished document, so an editor can review a video the sync has just
+ * imported before it goes live.
+ */
+export async function renderVideoDetail({
+  slug,
+  draft = false,
+}: {
+  slug: string;
+  draft?: boolean;
+}): Promise<React.ReactElement> {
+  const [video, all] = await Promise.all([getVideoDetail(slug, { draft }), getVideos()]);
   if (!video) notFound();
 
   const url = `${SITE_URL}${videoPath(video.slug)}`;
