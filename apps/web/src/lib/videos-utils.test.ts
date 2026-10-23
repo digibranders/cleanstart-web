@@ -14,6 +14,7 @@ import {
   relatedVideos,
   sanitizeDescription,
   slugifyTitle,
+  topicCounts,
   topicIndex,
   videoFiltersQuery,
   type Video,
@@ -193,7 +194,7 @@ describe("filters", () => {
     expect(out.length).toBeGreaterThan(0);
     for (const v of out) {
       expect(v.format).toBe("explainer");
-      expect(v.topics).toContain("sbom");
+      expect(v.topics.map((t) => t.slug)).toContain("sbom");
     }
   });
 
@@ -222,7 +223,41 @@ describe("topicIndex", () => {
     const topics = topicIndex(all);
     expect(topics.every((t) => t.count >= 2)).toBe(true);
     expect(topics.map((t) => t.count)).toEqual([...topics.map((t) => t.count)].sort((a, b) => b - a));
-    expect(topics.find((t) => t.id === "ai")).toBeUndefined();
+    expect(topics.find((t) => t.slug === "ai")).toBeUndefined();
+  });
+});
+
+describe("topics as data", () => {
+  it("gives catalog videos topic objects carrying the taxonomy label", () => {
+    const vex = must(all.find((v) => v.slug === "what-is-vex"));
+    expect(vex.topics).toEqual([
+      { slug: "vex", label: "VEX" },
+      { slug: "sbom", label: "SBOM" },
+      { slug: "cves", label: "CVEs" },
+    ]);
+  });
+
+  it("counts every topic with a sample video, honouring a given order then count", () => {
+    const counts = topicCounts(all, ["vex", "base-images"]);
+    expect(counts.slice(0, 2).map((t) => t.slug)).toEqual(["vex", "base-images"]);
+    expect(counts.find((t) => t.slug === "base-images")?.count).toBe(6);
+    expect(counts.find((t) => t.slug === "ai")?.count).toBe(1);
+    const rest = counts.slice(2).map((t) => t.count);
+    expect(rest).toEqual([...rest].sort((a, b) => b - a));
+  });
+
+  it("works for topics the catalog has never heard of (CMS taxonomy)", () => {
+    const cms: Video = { ...must(all[0]), topics: [{ slug: "zero-trust", label: "Zero trust" }] };
+    expect(topicCounts([cms])).toEqual([
+      { slug: "zero-trust", label: "Zero trust", count: 1, sample: cms },
+    ]);
+  });
+
+  it("matches the search box against topic labels from the video itself", () => {
+    const cms: Video = { ...must(all[0]), title: "Plain", summary: "Plain", topics: [{ slug: "zt", label: "Zero trust" }] };
+    expect(matchesQuery(cms, "zero trust")).toBe(true);
+    expect(filterVideos([cms], { ...DEFAULT_VIDEO_FILTERS, topic: "zt" })).toEqual([cms]);
+    expect(filterVideos([cms], { ...DEFAULT_VIDEO_FILTERS, topic: "other" })).toEqual([]);
   });
 });
 
@@ -232,20 +267,28 @@ describe("relatedVideos", () => {
     const out = relatedVideos(base, all, 4);
     expect(out).toHaveLength(4);
     expect(out.find((v) => v.id === base.id)).toBeUndefined();
-    expect(must(out[0]).topics.some((t) => base.topics.includes(t))).toBe(true);
+    expect(must(out[0]).topics.some((t) => base.topics.some((b) => b.slug === t.slug))).toBe(true);
   });
 });
 
 describe("URL filter state", () => {
+  const topics = ["cves", "sbom"];
+
   it("round-trips valid values and omits defaults", () => {
-    const filters = parseVideoFilters((k) => ({ format: "demo", topic: "cves", q: "ide", sort: "old" })[k]);
+    const filters = parseVideoFilters((k) => ({ format: "demo", topic: "cves", q: "ide", sort: "old" })[k], topics);
     expect(videoFiltersQuery(filters)).toBe("?q=ide&format=demo&topic=cves&sort=old");
     expect(isDefaultFilters(DEFAULT_VIDEO_FILTERS)).toBe(true);
     expect(videoFiltersQuery(DEFAULT_VIDEO_FILTERS)).toBe("");
   });
 
   it("ignores unknown formats, topics and sorts", () => {
-    const filters = parseVideoFilters((k) => ({ format: "podcast", topic: "nope", sort: "random" })[k]);
+    const filters = parseVideoFilters((k) => ({ format: "podcast", topic: "nope", sort: "random" })[k], topics);
     expect(filters).toEqual(DEFAULT_VIDEO_FILTERS);
+  });
+
+  it("accepts whatever topic slugs the caller says exist, not a fixed list", () => {
+    const filters = parseVideoFilters((k) => ({ topic: "zero-trust" })[k], ["zero-trust"]);
+    expect(filters.topic).toBe("zero-trust");
+    expect(parseVideoFilters((k) => ({ topic: "cves" })[k], ["zero-trust"]).topic).toBeUndefined();
   });
 });

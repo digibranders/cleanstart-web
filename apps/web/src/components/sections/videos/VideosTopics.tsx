@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { Container } from "@/components/layout";
-import type { VideoTopicId } from "@/lib/videos-catalog";
-import type { Video } from "@/lib/videos-utils";
+import type { TopicCount } from "@/lib/videos-utils";
 import { VideoThumb } from "./VideoThumb";
 
 interface VideosTopicsProps {
-  topics: ReadonlyArray<{ id: VideoTopicId; label: string; count: number; sample: Video }>;
+  topics: readonly TopicCount[];
 }
 
 /** Plain links, so every topic view is crawlable and works before JavaScript loads. */
@@ -26,9 +25,9 @@ export function VideosTopics({ topics }: VideosTopicsProps): React.ReactElement 
         </p>
         <ul className="mt-9 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {topics.map((t) => (
-            <li key={t.id}>
+            <li key={t.slug}>
               <Link
-                href={`/videos?topic=${t.id}#library`}
+                href={`/videos?topic=${t.slug}#library`}
                 className="group grid min-h-[72px] grid-cols-[64px_minmax(0,1fr)_auto] items-center gap-3.5 rounded-[16px] border border-[rgba(18,16,28,0.1)] bg-white p-2.5 pr-[18px] transition-[border-color,box-shadow] duration-200 hover:border-[#5B2EE0] hover:shadow-[0_10px_28px_rgba(40,24,120,0.10)] motion-reduce:transition-none"
               >
                 <span className="relative aspect-video overflow-hidden rounded-[8px] bg-[#E9E6F5]">

@@ -8,6 +8,7 @@ import {
   VideosBrowser,
   VideosBrowserFallback,
   VIDEOS_PAGE_SIZE,
+  type TopicOption,
 } from "@/components/sections/videos/VideosBrowser";
 import {
   VIDEOS_DESCRIPTION,
@@ -17,11 +18,12 @@ import {
 import { VideosTopics } from "@/components/sections/videos/VideosTopics";
 import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
-import { getVideos } from "@/lib/videos";
-import { topicIndex, videoPath } from "@/lib/videos-utils";
+import { getVideos, videoTopicOrder } from "@/lib/videos";
+import { topicCounts, topicIndex, videoPath } from "@/lib/videos-utils";
 
-// Static + ISR. The YouTube feed behind `getVideos` is cached for an hour, so
-// a new upload appears within the hour without a deploy.
+// Static + ISR. The CMS read (or the YouTube feed, in catalog mode) behind
+// `getVideos` is cached, and a CMS publish purges this path, so a change shows
+// up without a deploy.
 export const revalidate = 3600;
 
 export function generateMetadata(): Metadata {
@@ -41,10 +43,12 @@ export function generateMetadata(): Metadata {
  */
 export default async function VideosPage(): Promise<React.ReactElement> {
   const videos = await getVideos();
-  const featured = videos[0] ?? null;
+  // An editor's "featured" pick leads; otherwise the newest video does.
+  const featured = videos.find((v) => v.featured) ?? videos[0] ?? null;
   const heroId = featured?.id ?? null;
   const defaultList = videos.filter((v) => v.id !== heroId);
   const beyondFirstPage = defaultList.slice(VIDEOS_PAGE_SIZE);
+  const topics: TopicOption[] = topicCounts(videos, videoTopicOrder());
 
   return (
     <>
@@ -65,8 +69,8 @@ export default async function VideosPage(): Promise<React.ReactElement> {
       <Header />
       <main id="main-content">
         <VideosHero featured={featured} />
-        <Suspense fallback={<VideosBrowserFallback videos={videos} heroId={heroId} />}>
-          <VideosBrowser videos={videos} heroId={heroId} />
+        <Suspense fallback={<VideosBrowserFallback videos={videos} topics={topics} heroId={heroId} />}>
+          <VideosBrowser videos={videos} topics={topics} heroId={heroId} />
         </Suspense>
         <CrawlableLinkIndex
           label="More CleanStart videos"

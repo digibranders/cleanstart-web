@@ -3,14 +3,13 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Container } from "@/components/layout";
-import { VIDEO_FORMATS, VIDEO_TOPICS, type VideoTopicId } from "@/lib/videos-catalog";
+import { VIDEO_FORMATS } from "@/lib/videos-catalog";
 import {
   DEFAULT_VIDEO_FILTERS,
   filterVideos,
   formatCounts,
   isDefaultFilters,
   parseVideoFilters,
-  topicLabel,
   videoFiltersQuery,
   type Video,
   type VideoFilters,
@@ -18,6 +17,13 @@ import {
 } from "@/lib/videos-utils";
 import { VideoCard } from "./VideoCard";
 import { VideoSelect } from "./VideoSelect";
+
+/** One row of the topic dropdown: the URL slug, the label, and how many videos carry it. */
+export interface TopicOption {
+  readonly slug: string;
+  readonly label: string;
+  readonly count: number;
+}
 
 export const VIDEOS_PAGE_SIZE = 12;
 const SEARCH_DEBOUNCE_MS = 250;
@@ -33,13 +39,15 @@ const CONTROL =
 
 interface VideosViewProps {
   videos: readonly Video[];
+  /** Every topic in use with its video count, in the order the dropdown lists them. */
+  topics: readonly TopicOption[];
   /** The video playing in the hero. Left out of the unfiltered grid so it is not shown twice. */
   heroId: string | null;
   filters: VideoFilters;
   onChange: (next: VideoFilters) => void;
 }
 
-function VideosView({ videos, heroId, filters, onChange }: VideosViewProps): React.ReactElement {
+function VideosView({ videos, topics, heroId, filters, onChange }: VideosViewProps): React.ReactElement {
   const searchRef = useRef<HTMLInputElement>(null);
 
   // The search box is local state so typing never waits on the URL. These three
@@ -88,14 +96,6 @@ function VideosView({ videos, heroId, filters, onChange }: VideosViewProps): Rea
     [results, filters, heroId],
   );
   const counts = useMemo(() => formatCounts(videos, filters), [videos, filters]);
-  const topicCounts = useMemo(
-    () =>
-      VIDEO_TOPICS.map((t) => ({
-        ...t,
-        count: videos.filter((v) => v.topics.includes(t.id)).length,
-      })).filter((t) => t.count > 0),
-    [videos],
-  );
 
   const shown = list.slice(0, visibleCount);
   const remaining = list.length - shown.length;
@@ -149,13 +149,13 @@ function VideosView({ videos, heroId, filters, onChange }: VideosViewProps): Rea
             onSubmit={submitSearch}
             className="flex flex-wrap items-center gap-2 sm:flex-nowrap"
           >
-            <VideoSelect<"all" | VideoTopicId>
+            <VideoSelect<string>
               label="Topic"
               value={filters.topic ?? "all"}
               onChange={(v) => set({ topic: v === "all" ? undefined : v })}
               options={[
                 { value: "all", label: "All topics" },
-                ...topicCounts.map((t) => ({ value: t.id, label: t.label, count: t.count })),
+                ...topics.map((t) => ({ value: t.slug, label: t.label, count: t.count })),
               ]}
               className="flex-1 sm:w-[210px] sm:flex-none"
             />
@@ -225,7 +225,7 @@ function VideosView({ videos, heroId, filters, onChange }: VideosViewProps): Rea
           </p>
           {filters.topic ? (
             <RemovableChip
-              label={`Topic: ${topicLabel(filters.topic)}`}
+              label={`Topic: ${topics.find((t) => t.slug === filters.topic)?.label ?? filters.topic}`}
               onRemove={() => set({ topic: undefined })}
             />
           ) : null}
@@ -313,6 +313,7 @@ function RemovableChip({
 
 interface VideosBrowserProps {
   videos: Video[];
+  topics: readonly TopicOption[];
   heroId: string | null;
 }
 
@@ -321,24 +322,39 @@ interface VideosBrowserProps {
  * memory, so the route stays static. Must sit inside `<Suspense>`, with
  * `VideosBrowserFallback` as the fallback so crawlers get the default view.
  */
-export function VideosBrowser({ videos, heroId }: VideosBrowserProps): React.ReactElement {
+export function VideosBrowser({ videos, topics, heroId }: VideosBrowserProps): React.ReactElement {
   const params = useSearchParams();
   const router = useRouter();
-  const filters = useMemo(() => parseVideoFilters((key) => params.get(key)), [params]);
+  const filters = useMemo(
+    () =>
+      parseVideoFilters(
+        (key) => params.get(key),
+        topics.map((t) => t.slug),
+      ),
+    [params, topics],
+  );
   const onChange = useMemo(
     () =>
       (next: VideoFilters): void =>
         router.replace(`/videos${videoFiltersQuery(next)}`, { scroll: false }),
     [router],
   );
-  return <VideosView videos={videos} heroId={heroId} filters={filters} onChange={onChange} />;
+  return (
+    <VideosView videos={videos} topics={topics} heroId={heroId} filters={filters} onChange={onChange} />
+  );
 }
 
 const noop = (): void => undefined;
 
 /** The unfiltered first view, rendered into the static HTML. */
-export function VideosBrowserFallback({ videos, heroId }: VideosBrowserProps): React.ReactElement {
+export function VideosBrowserFallback({ videos, topics, heroId }: VideosBrowserProps): React.ReactElement {
   return (
-    <VideosView videos={videos} heroId={heroId} filters={DEFAULT_VIDEO_FILTERS} onChange={noop} />
+    <VideosView
+      videos={videos}
+      topics={topics}
+      heroId={heroId}
+      filters={DEFAULT_VIDEO_FILTERS}
+      onChange={noop}
+    />
   );
 }

@@ -6,9 +6,14 @@ import {
   VIDEO_TOPICS,
   type CatalogVideo,
   type VideoFormat,
-  type VideoTopicId,
 } from "./videos-catalog";
 import type { ChannelVideo } from "./youtube-feed";
+
+/** A topic as the page needs it: the URL slug and the label shown to people. */
+export interface VideoTopic {
+  readonly slug: string;
+  readonly label: string;
+}
 
 export interface Video {
   readonly id: string;
@@ -16,7 +21,7 @@ export interface Video {
   readonly title: string;
   /** `null` is a video nobody has filed yet: it shows under "All" only. */
   readonly format: VideoFormat | null;
-  readonly topics: readonly VideoTopicId[];
+  readonly topics: readonly VideoTopic[];
   readonly publishedAt: string;
   readonly durationSeconds: number | undefined;
   /** One short paragraph for cards and the meta description. */
@@ -24,13 +29,15 @@ export interface Video {
   /** Full YouTube description, cleaned for display. */
   readonly description: string;
   readonly thumb: "maxres" | "hq";
+  /** Plays in the /videos hero. Only the CMS can set it; the catalog never does. */
+  readonly featured: boolean;
 }
 
 export type VideoSort = "new" | "old" | "short";
 
 export interface VideoFilters {
   readonly format: VideoFormat | undefined;
-  readonly topic: VideoTopicId | undefined;
+  readonly topic: string | undefined;
   readonly q: string;
   readonly sort: VideoSort;
 }
@@ -44,10 +51,11 @@ export const DEFAULT_VIDEO_FILTERS: VideoFilters = {
 
 const SORTS: readonly VideoSort[] = ["new", "old", "short"];
 const FORMAT_IDS: readonly string[] = VIDEO_FORMATS.map((f) => f.id);
-const TOPIC_IDS: readonly string[] = VIDEO_TOPICS.map((t) => t.id);
 
-export const topicLabel = (id: VideoTopicId): string =>
-  VIDEO_TOPICS.find((t) => t.id === id)?.label ?? id;
+const catalogTopic = (id: string): VideoTopic => ({
+  slug: id,
+  label: VIDEO_TOPICS.find((t) => t.id === id)?.label ?? id,
+});
 
 export const formatLabel = (id: VideoFormat): string =>
   VIDEO_FORMATS.find((f) => f.id === id)?.singular ?? id;
@@ -231,12 +239,13 @@ export const mergeVideos = (
       slug: c.slug,
       title: c.title,
       format: c.format,
-      topics: c.topics,
+      topics: c.topics.map(catalogTopic),
       publishedAt: c.publishedAt,
       durationSeconds: c.durationSeconds,
       summary: c.summary,
       description: fromFeed ? sanitizeDescription(fromFeed) : c.summary,
       thumb: c.thumb ?? "maxres",
+      featured: false,
     };
   });
 
@@ -258,6 +267,7 @@ export const mergeVideos = (
       summary: firstParagraph(description),
       description,
       thumb: "maxres",
+      featured: false,
     });
   }
 
@@ -276,7 +286,7 @@ const SORTERS: Record<VideoSort, (a: Video, b: Video) => number> = {
 };
 
 const searchText = (v: Video): string =>
-  [v.title, v.summary, ...v.topics.map(topicLabel)].join(" ").toLowerCase();
+  [v.title, v.summary, ...v.topics.map((t) => t.label)].join(" ").toLowerCase();
 
 /** Every query word must appear in the title, summary or a topic label. */
 export const matchesQuery = (video: Video, q: string): boolean => {
@@ -292,7 +302,7 @@ export const filterVideos = (
 ): Video[] =>
   videos
     .filter((v) => (filters.format ? v.format === filters.format : true))
-    .filter((v) => (filters.topic ? v.topics.includes(filters.topic) : true))
+    .filter((v) => (filters.topic ? v.topics.some((t) => t.slug === filters.topic) : true))
     .filter((v) => matchesQuery(v, filters.q))
     .sort(SORTERS[filters.sort]);
 
@@ -302,7 +312,7 @@ export const formatCounts = (
   filters: VideoFilters,
 ): Record<"all" | VideoFormat, number> => {
   const pool = videos
-    .filter((v) => (filters.topic ? v.topics.includes(filters.topic) : true))
+    .filter((v) => (filters.topic ? v.topics.some((t) => t.slug === filters.topic) : true))
     .filter((v) => matchesQuery(v, filters.q));
   const counts: Record<"all" | VideoFormat, number> = {
     all: pool.length,
@@ -314,21 +324,47 @@ export const formatCounts = (
   return counts;
 };
 
-/** Topics that cover at least `min` videos, most covered first. */
-export const topicIndex = (
+export interface TopicCount extends VideoTopic {
+  readonly count: number;
+  /** The newest video with this topic, used for the tile thumbnail. */
+  readonly sample: Video;
+}
+
+/**
+ * Every topic that at least one video carries, with how many. Topics named in
+ * `order` come first in that order (the catalog's taxonomy order); the rest
+ * follow, most covered first.
+ */
+export const topicCounts = (
   videos: readonly Video[],
-  min = 2,
-): Array<{ id: VideoTopicId; label: string; count: number; sample: Video }> => {
-  const out: Array<{ id: VideoTopicId; label: string; count: number; sample: Video }> = [];
-  for (const { id, label } of VIDEO_TOPICS) {
-    const matching = videos.filter((v) => v.topics.includes(id));
-    const sample = matching[0];
-    if (sample && matching.length >= min) {
-      out.push({ id, label, count: matching.length, sample });
+  order: readonly string[] = [],
+): TopicCount[] => {
+  const byslug = new Map<string, TopicCount>();
+  for (const video of [...videos].sort(SORTERS.new)) {
+    for (const topic of video.topics) {
+      const seen = byslug.get(topic.slug);
+      byslug.set(
+        topic.slug,
+        seen
+          ? { ...seen, count: seen.count + 1 }
+          : { slug: topic.slug, label: topic.label, count: 1, sample: video },
+      );
     }
   }
-  return out.sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+  const rank = (slug: string): number => {
+    const i = order.indexOf(slug);
+    return i === -1 ? Number.POSITIVE_INFINITY : i;
+  };
+  return [...byslug.values()].sort(
+    (a, b) => rank(a.slug) - rank(b.slug) || b.count - a.count || a.label.localeCompare(b.label),
+  );
 };
+
+/** Topics that cover at least `min` videos, most covered first. */
+export const topicIndex = (videos: readonly Video[], min = 2): TopicCount[] =>
+  topicCounts(videos)
+    .filter((t) => t.count >= min)
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
 
 /** Same-topic videos first, then same-format, newest breaking ties. */
 export const relatedVideos = (
@@ -337,7 +373,7 @@ export const relatedVideos = (
   limit = 6,
 ): Video[] => {
   const score = (v: Video): number =>
-    v.topics.filter((t) => video.topics.includes(t)).length * 2 +
+    v.topics.filter((t) => video.topics.some((o) => o.slug === t.slug)).length * 2 +
     (v.format !== null && v.format === video.format ? 1 : 0);
   return all
     .filter((v) => v.id !== video.id)
@@ -347,13 +383,16 @@ export const relatedVideos = (
 
 type ParamReader = (key: string) => string | null | undefined;
 
-export const parseVideoFilters = (read: ParamReader): VideoFilters => {
+export const parseVideoFilters = (
+  read: ParamReader,
+  topicSlugs: readonly string[],
+): VideoFilters => {
   const format = read("format");
   const topic = read("topic");
   const sort = read("sort");
   return {
     format: format && FORMAT_IDS.includes(format) ? (format as VideoFormat) : undefined,
-    topic: topic && TOPIC_IDS.includes(topic) ? (topic as VideoTopicId) : undefined,
+    topic: topic && topicSlugs.includes(topic) ? topic : undefined,
     q: (read("q") ?? "").slice(0, 80),
     sort: sort && (SORTS as readonly string[]).includes(sort) ? (sort as VideoSort) : "new",
   };
