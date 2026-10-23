@@ -17,7 +17,7 @@ import { youtubeThumbnail, youtubeWatchUrl } from "@/lib/podcast-utils";
 import { SITE_URL, buildPageMetadata, clampMetaDescription } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, videoObjectSchema } from "@/lib/seo/jsonld";
 import { getVideoBySlug, getVideos } from "@/lib/videos";
-import { CLEANSTART_YOUTUBE_HANDLE_URL } from "@/lib/youtube-feed";
+import { CLEANSTART_YOUTUBE_SUBSCRIBE_URL } from "@/lib/youtube-feed";
 import {
   formatPublished,
   relatedVideos,
@@ -191,7 +191,8 @@ export default async function VideoPage({
                     <p className="font-sans text-[13px] text-[#5B5870]">Official channel</p>
                   </div>
                   <a
-                    href={CLEANSTART_YOUTUBE_HANDLE_URL}
+                    href={CLEANSTART_YOUTUBE_SUBSCRIBE_URL}
+                    aria-label="Subscribe to CleanStart on YouTube (opens YouTube)"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="ml-2 inline-flex h-11 items-center rounded-full bg-[#151021] px-5 font-sans text-[14px] font-semibold text-white transition-colors duration-200 hover:bg-[#2A2147] active:translate-y-px motion-reduce:transition-none"

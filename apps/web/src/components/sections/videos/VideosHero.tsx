@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { HeroReveal } from "@/components/ui/Reveal";
-import { CLEANSTART_YOUTUBE_HANDLE_URL } from "@/lib/youtube-feed";
+import { CLEANSTART_YOUTUBE_SUBSCRIBE_URL } from "@/lib/youtube-feed";
 import { videoPath, type Video } from "@/lib/videos-utils";
 import { VideoMeta } from "./VideoMeta";
 import { VideoPlayer } from "./VideoPlayer";
@@ -69,7 +69,7 @@ export function VideosHero({ featured }: VideosHeroProps): React.ReactElement {
           </HeroReveal>
           <HeroReveal y={20} delay={0.35} duration={0.7}>
             <a
-              href={CLEANSTART_YOUTUBE_HANDLE_URL}
+              href={CLEANSTART_YOUTUBE_SUBSCRIBE_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="cs-btn-glass"

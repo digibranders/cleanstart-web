@@ -6,6 +6,13 @@ export const CLEANSTART_YOUTUBE_CHANNEL_ID = "UC13c-XRmRlkWpp6WMG9SDjw";
 export const CLEANSTART_YOUTUBE_HANDLE_URL =
   "https://www.youtube.com/@CleanStartOfficial";
 
+/**
+ * Opens the channel with YouTube's own "Subscribe?" prompt already showing. The
+ * subscription is made on YouTube by the signed-in viewer, so it lands on the
+ * real channel without this site handling anyone's Google account.
+ */
+export const CLEANSTART_YOUTUBE_SUBSCRIBE_URL = `https://www.youtube.com/channel/${CLEANSTART_YOUTUBE_CHANNEL_ID}?sub_confirmation=1`;
+
 const FEED_URL = `https://www.youtube.com/feeds/videos.xml?channel_id=${CLEANSTART_YOUTUBE_CHANNEL_ID}`;
 const FEED_REVALIDATE_SECONDS = 3600;
 

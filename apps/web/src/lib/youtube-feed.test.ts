@@ -1,7 +1,11 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { parseYouTubeFeed } from "./youtube-feed";
+import {
+  CLEANSTART_YOUTUBE_CHANNEL_ID,
+  CLEANSTART_YOUTUBE_SUBSCRIBE_URL,
+  parseYouTubeFeed,
+} from "./youtube-feed";
 
 const fixture = readFileSync(
   join(__dirname, "__fixtures__/youtube-feed.xml"),
@@ -53,5 +57,14 @@ describe("parseYouTubeFeed", () => {
   it("skips entries missing a videoId", () => {
     const broken = "<feed><entry><title>no id</title></entry></feed>";
     expect(parseYouTubeFeed(broken, 6)).toEqual([]);
+  });
+});
+
+describe("CLEANSTART_YOUTUBE_SUBSCRIBE_URL", () => {
+  it("points at the channel id and asks YouTube to show its subscribe prompt", () => {
+    const url = new URL(CLEANSTART_YOUTUBE_SUBSCRIBE_URL);
+    expect(url.origin).toBe("https://www.youtube.com");
+    expect(url.pathname).toBe(`/channel/${CLEANSTART_YOUTUBE_CHANNEL_ID}`);
+    expect(url.searchParams.get("sub_confirmation")).toBe("1");
   });
 });
