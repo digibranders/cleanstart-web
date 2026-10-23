@@ -35,6 +35,9 @@ export const webhooksPublishAfterChangeHook =
       const wasPublished = previous === 'published';
       const isPublished = current === 'published';
       if (!isPublished || wasPublished) return doc;
+      // Bulk scripts (e.g. the videos backfill, which publishes a whole catalog at once)
+      // set this in the write's context so a backfill does not post one card per doc.
+      if ((req.context as Record<string, unknown> | undefined)?.skipPublishWebhooks === true) return doc;
 
       const requestId = getRequestId(req.headers as { get(name: string): string | null });
       const typed = doc as Record<string, unknown>;
