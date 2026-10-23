@@ -14,12 +14,15 @@ export type ChannelVideo = {
   title: string;
   publishedAt: string;
   thumbnailUrl: string;
+  /** Full YouTube description, newlines kept. "" when the feed omits it. */
+  description: string;
 };
 
 const ENTRY_RE = /<entry>([\s\S]*?)<\/entry>/g;
 const VIDEO_ID_RE = /<yt:videoId>([A-Za-z0-9_-]{11})<\/yt:videoId>/;
 const TITLE_RE = /<title>([\s\S]*?)<\/title>/;
 const PUBLISHED_RE = /<published>([\s\S]*?)<\/published>/;
+const DESCRIPTION_RE = /<media:description>([\s\S]*?)<\/media:description>/;
 
 function decodeEntities(value: string): string {
   return value
@@ -50,6 +53,7 @@ export function parseYouTubeFeed(xml: string, limit: number): ChannelVideo[] {
       title,
       publishedAt,
       thumbnailUrl: youtubeThumbnail(videoId, "hqdefault"),
+      description: decodeEntities(DESCRIPTION_RE.exec(block)?.[1] ?? ""),
     });
   }
   return videos;

@@ -17,6 +17,7 @@ describe("parseYouTubeFeed", () => {
       title: "CleanSight: A Complete software security posture management",
       publishedAt: "2026-05-27T13:36:30+00:00",
       thumbnailUrl: "https://i.ytimg.com/vi/GqFPH4KKqpA/hqdefault.jpg",
+      description: "",
     });
   });
 
@@ -29,6 +30,17 @@ describe("parseYouTubeFeed", () => {
     const videos = parseYouTubeFeed(fixture, 1);
     expect(videos[0]?.thumbnailUrl).toContain(
       "https://i.ytimg.com/vi/GqFPH4KKqpA/",
+    );
+  });
+
+  it("reads media:description with its line breaks and entities decoded", () => {
+    const xml =
+      "<feed><entry><yt:videoId>ABCDEFGHIJK</yt:videoId><title>t</title>" +
+      "<published>2026-01-01T00:00:00+00:00</published><media:group>" +
+      "<media:description>Line one &amp; two.\n\nLine three</media:description>" +
+      "</media:group></entry></feed>";
+    expect(parseYouTubeFeed(xml, 1)[0]?.description).toBe(
+      "Line one & two.\n\nLine three",
     );
   });
 
