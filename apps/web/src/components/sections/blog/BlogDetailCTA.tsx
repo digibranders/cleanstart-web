@@ -67,26 +67,28 @@ export function BlogDetailCTA(): React.ReactElement {
         }}
       />
 
-      {/* Cube — top-left. */}
+      {/* Cubes are anchored to the card's corners rather than Figma's 1276px
+          artboard (the slot is narrower), and kept out of the copy: the
+          heading fills only the top of its column, so one cube sits below it
+          and the other peeks into the top-right corner. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
         src="/images/blog-detail/cta/cta-cube.webp"
         alt=""
         className="absolute pointer-events-none select-none hidden xl:block object-contain"
-        style={{ left: "-63px", top: "-63px", width: "206px", height: "207px" , opacity: 0.75,}}
+        style={{ left: "-63px", bottom: "-80px", width: "206px", height: "207px", opacity: 0.75 }}
         loading="lazy"
         decoding="async"
       />
 
-      {/* Cube — top-right. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         aria-hidden
         src="/images/blog-detail/cta/cta-cube.webp"
         alt=""
-        className="absolute pointer-events-none select-none hidden xl:block object-contain"
-        style={{ left: "1130px", top: "-63px", width: "259px", height: "260px" , opacity: 0.75,}}
+        className="absolute pointer-events-none select-none hidden min-[1440px]:block object-contain"
+        style={{ right: "-171px", top: "-146px", width: "259px", height: "260px", opacity: 0.75 }}
         loading="lazy"
         decoding="async"
       />

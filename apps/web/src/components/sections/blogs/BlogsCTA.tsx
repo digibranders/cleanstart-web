@@ -15,12 +15,16 @@ export function BlogsCTA(): React.ReactElement {
       className="absolute inset-0"
       style={{ background: "linear-gradient(180deg, #471ec0 0%, #131e8f 100%)" }}
     >
+      {/* Cubes are anchored to the card's corners, not to Figma's 1276px
+          artboard: the slot is narrower at most widths, and a fixed top-left
+          cube landed under the heading. Bottom-left sits below the heading,
+          which only fills the top of its column (same layout as EventsCTA). */}
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute block"
+        className="pointer-events-none select-none absolute hidden xl:block"
         style={{
-          left: "-20px",
-          top: "-20px",
+          left: "-45px",
+          bottom: "-58px",
           width: "176px",
           height: "178px",
           opacity: 0.75,
@@ -38,10 +42,11 @@ export function BlogsCTA(): React.ReactElement {
 
       <div
         aria-hidden
-        className="pointer-events-none select-none absolute hidden sm:block"
+        // Between xl and 1440px the description runs into this corner.
+        className="pointer-events-none select-none absolute hidden min-[1440px]:block"
         style={{
-          left: "1070px",
-          top: "-20px",
+          right: "-88px",
+          top: "-64px",
           width: "176px",
           height: "178px",
           opacity: 0.75,
