@@ -123,19 +123,32 @@ export default async function VideoPage({
               "radial-gradient(60% 100% at 25% 0%, rgba(71,30,192,0.38) 0%, rgba(19,30,143,0.16) 45%, rgba(14,10,28,0) 80%)",
           }}
         />
-        <Container className="relative pb-[var(--spacing-section-cta)] pt-[calc(var(--cs-header-h)+var(--cs-header-extra)+12px)] lg:pt-[calc(var(--cs-header-h)+var(--cs-header-extra)+28px)]">
-          <nav aria-label="Breadcrumb" className="mb-4 hidden font-sans text-[14px] text-white/70 lg:block">
-            <Link href="/videos" className="inline-flex items-center gap-2 hover:text-white">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M19 12H5M11 6l-6 6 6 6" />
-              </svg>
-              All videos
-            </Link>
-          </nav>
-
-          {/* One grid, so the phone's sticky player stays pinned for the whole page. */}
-          <div className="grid grid-cols-1 gap-x-7 gap-y-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:grid-rows-[auto_1fr] xl:grid-cols-[minmax(0,1fr)_420px]">
-            <div className="sticky top-[var(--cs-header-h)] z-20 -mx-6 bg-black [--watch-radius:0px] sm:-mx-10 lg:static lg:col-start-1 lg:row-start-1 lg:mx-0 lg:bg-transparent lg:[--watch-radius:16px]">
+        <Container className="relative pb-[var(--spacing-section-cta)] pt-[calc(var(--cs-header-h)+var(--cs-header-extra)+12px)] lg:pt-[calc(var(--cs-header-h)+var(--cs-header-extra))]">
+          {/*
+            Phone: one column on one grid, so the sticky player stays pinned for
+            the whole page (the left wrapper is `display: contents` there).
+            Desktop: two panes as tall as the window, each scrolling on its own.
+            The announcement bar's height comes off the pane height so the
+            bottom edge sits on the fold before the page has been scrolled.
+          */}
+          <div className="grid grid-cols-1 gap-x-7 gap-y-6 lg:h-[calc(100dvh-var(--cs-header-h)-var(--cs-header-extra)-var(--cs-announce-h,0px))] lg:grid-cols-[minmax(0,1fr)_380px] lg:grid-rows-1 xl:grid-cols-[minmax(0,1fr)_420px]">
+            <section
+              aria-label="Video and details"
+              // Lenis would otherwise take the wheel and scroll the whole page.
+              data-lenis-prevent
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be focusable or keyboard users cannot scroll it
+              tabIndex={0}
+              className="contents lg:flex lg:min-h-0 lg:flex-col lg:gap-5 lg:overflow-y-auto lg:pb-10 lg:pl-1 lg:pr-3 lg:pt-6 lg:[scrollbar-color:rgba(255,255,255,0.28)_transparent] lg:[scrollbar-width:thin]"
+            >
+              <nav aria-label="Breadcrumb" className="hidden font-sans text-[14px] text-white/70 lg:block">
+                <Link href="/videos" className="inline-flex items-center gap-2 hover:text-white">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M19 12H5M11 6l-6 6 6 6" />
+                  </svg>
+                  All videos
+                </Link>
+              </nav>
+              <div className="sticky top-[var(--cs-header-h)] z-20 -mx-6 bg-black [--watch-radius:0px] sm:-mx-10 lg:static lg:mx-0 lg:bg-transparent lg:[--watch-radius:16px]">
               <VideoPlayer
                 video={video}
                 sizes="(min-width: 1280px) 920px, (min-width: 1024px) 66vw, 100vw"
@@ -146,7 +159,7 @@ export default async function VideoPage({
               />
             </div>
 
-            <div className="flex min-w-0 flex-col gap-5 lg:col-start-1 lg:row-start-2">
+            <div className="flex min-w-0 flex-col gap-5">
               <h1
                 className="font-display font-semibold text-white"
                 style={{ fontSize: "var(--fs-h3)", lineHeight: 1.2, letterSpacing: "-0.02em", textWrap: "balance" }}
@@ -203,7 +216,15 @@ export default async function VideoPage({
               <VideoTopicPills topics={video.topics} tone="dark" />
             </div>
 
-            <aside className="lg:col-start-2 lg:row-span-2 lg:row-start-1">
+            </section>
+
+            <aside
+              aria-label="Up next videos"
+              data-lenis-prevent
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be focusable or keyboard users cannot scroll it
+              tabIndex={0}
+              className="lg:col-start-2 lg:row-start-1 lg:min-h-0 lg:overflow-y-auto lg:pb-10 lg:pl-1 lg:pr-2 lg:pt-6 lg:[scrollbar-color:rgba(255,255,255,0.28)_transparent] lg:[scrollbar-width:thin]"
+            >
               <UpNext videos={related} headingId="up-next-title" />
             </aside>
           </div>

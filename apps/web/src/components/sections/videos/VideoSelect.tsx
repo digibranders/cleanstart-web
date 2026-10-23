@@ -52,7 +52,7 @@ export function VideoSelect<T extends string>({
       </Select.Trigger>
       <Select.Portal>
         <Select.Positioner sideOffset={8} align="end" alignItemWithTrigger={false} className="z-[60] outline-none">
-          <Select.Popup className="max-h-[min(60vh,360px)] min-w-[max(var(--anchor-width),220px)] overflow-y-auto rounded-[16px] border border-[rgba(18,16,28,0.1)] bg-white p-1.5 font-sans shadow-[0_18px_48px_rgba(30,18,90,0.18)] outline-none">
+          <Select.Popup data-lenis-prevent className="max-h-[min(60vh,360px)] min-w-[max(var(--anchor-width),220px)] overflow-y-auto rounded-[16px] border border-[rgba(18,16,28,0.1)] bg-white p-1.5 font-sans shadow-[0_18px_48px_rgba(30,18,90,0.18)] outline-none">
             <Select.List className="outline-none">
               {options.map((o) => (
                 <Select.Item
