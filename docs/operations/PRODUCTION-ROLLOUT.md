@@ -149,3 +149,20 @@ Operator must: (a) create "Newsletter" subscription type in HubSpot, (b) set `HU
 Requires migration `20261023_120000_add_advisories` (runs on CMS deploy). Then, in the cms container:
 (a) `/app/node_modules/.bin/tsx scripts/seed-page-registry.ts` adds the `/advisories` and `/advisories/[slug]` rows;
 (b) `/app/node_modules/.bin/tsx scripts/copy-blog-to-advisory.ts --dry-run`, then without `--dry-run`, publishes the PHP2Shell blog as the first advisory and purges `/advisories`. Idempotent: skips if the advisory slug exists. Deploy `apps/web` before (b), or the purge reaches a site that has no `/advisories` route yet.
+
+### Videos CMS cutover
+
+Until this runs, `/videos` reads `apps/web/src/lib/videos-catalog.ts` plus the YouTube RSS feed. The `videos` and `videoTopics` collections, the hourly `syncYoutubeVideos` task and the web CMS reader are already in the code; `VIDEOS_SOURCE` decides which one the site uses.
+
+1. **Deploy the CMS** (migration `20261024_100000_add_videos` runs on boot). Check `/api/health`, then that the `videos` collection opens in the admin.
+2. **Backfill.** On the droplet, in the cms container:
+   ```bash
+   /app/node_modules/.bin/tsx scripts/seed-videos-from-catalog.ts          # dry run, writes nothing
+   /app/node_modules/.bin/tsx scripts/seed-videos-from-catalog.ts --apply
+   ```
+   Creates 11 topics and 15 published videos with the live slugs. A slug conflict stops the run before any write. Re-running plans nothing. Publish webhooks are skipped and web revalidation is sent once at the end.
+3. **Compare.** Open `/videos` and a watch page with `VIDEOS_SOURCE=cms` on a preview deploy and check they match production.
+4. **Flip.** Set `VIDEOS_SOURCE=cms` in Vercel production env and redeploy. Rollback is unsetting it and redeploying.
+5. **Keep for a week**, then delete `videos-catalog.ts` and the feed merge from `apps/web`.
+
+New uploads land as `needs-review` drafts. An editor sets format, at least one topic and a summary, then publishes (the publish gate blocks otherwise). `YOUTUBE_API_KEY` is optional: unset, the sync uses the RSS feed and editors type the duration in `durationLabel`.
