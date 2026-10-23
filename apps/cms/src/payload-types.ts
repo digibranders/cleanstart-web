@@ -9192,6 +9192,7 @@ export interface PageRegistry {
 export interface User {
   id: number;
   name: string;
+  currentPassword?: string | null;
   /**
    * Uncheck to block this user from logging in. Use the "Disable account" action instead of editing this directly.
    */
@@ -13918,6 +13919,7 @@ export interface ResumesSelect<T extends boolean = true> {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  currentPassword?: T;
   enabled?: T;
   roles?: T;
   preferences?: T;
