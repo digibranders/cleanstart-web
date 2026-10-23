@@ -69,6 +69,8 @@ export interface Config {
   collections: {
     blogs: Blog;
     advisories: Advisory;
+    videos: Video;
+    videoTopics: VideoTopic;
     news: News;
     guides: Guide;
     'case-studies': CaseStudy;
@@ -127,6 +129,8 @@ export interface Config {
   collectionsSelect: {
     blogs: BlogsSelect<false> | BlogsSelect<true>;
     advisories: AdvisoriesSelect<false> | AdvisoriesSelect<true>;
+    videos: VideosSelect<false> | VideosSelect<true>;
+    videoTopics: VideoTopicsSelect<false> | VideoTopicsSelect<true>;
     news: NewsSelect<false> | NewsSelect<true>;
     guides: GuidesSelect<false> | GuidesSelect<true>;
     'case-studies': CaseStudiesSelect<false> | CaseStudiesSelect<true>;
@@ -2238,6 +2242,265 @@ export interface Advisory {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos".
+ */
+export interface Video {
+  id: number;
+  title: string;
+  /**
+   * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  provider: 'youtube' | 'vimeo';
+  /**
+   * The video id on the host (the 11 characters in a YouTube link).
+   */
+  externalId: string;
+  /**
+   * Required to publish. Drives the format tabs on /videos.
+   */
+  format?: ('explainer' | 'demo' | 'talk') | null;
+  /**
+   * At least one is required to publish. Suggested from YouTube hashtags on import.
+   */
+  topics?: (number | VideoTopic)[] | null;
+  /**
+   * Card text and meta description. Required to publish, up to 320 characters.
+   */
+  summary?: string | null;
+  /**
+   * Length shown on cards. Filled automatically when the YouTube API key is set; type it by hand otherwise (1:41).
+   */
+  durationLabel?: string | null;
+  /**
+   * Plays in the /videos hero. When none is featured, the newest video is.
+   */
+  featured?: boolean | null;
+  /**
+   * Optional. Shown on the watch page once Plan 2 ships.
+   */
+  transcript?: string | null;
+  /**
+   * Set by the YouTube sync. "Missing" means the video is gone or private on YouTube; it is not unpublished automatically.
+   */
+  syncState?: ('synced' | 'needs-review' | 'missing' | 'manual') | null;
+  /**
+   * Copied from the host by the sync. Read only.
+   */
+  source?: {
+    title?: string | null;
+    description?: string | null;
+    durationSeconds?: number | null;
+    publishedAt?: string | null;
+    tags?:
+      | {
+          value?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    privacyStatus?: string | null;
+    embeddable?: boolean | null;
+    hasMaxres?: boolean | null;
+    thumbnailUrl?: string | null;
+    contentHash?: string | null;
+    fetchedAt?: string | null;
+  };
+  /**
+   * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
+   */
+  publishedAt?: string | null;
+  /**
+   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
+   */
+  displayPublishedAt?: string | null;
+  /**
+   * Set automatically when the title, body, summary or FAQs change. Shown publicly as the "Updated" date.
+   */
+  contentUpdatedAt?: string | null;
+  /**
+   * Open-graph image, canonical override, and Schema.org speakable selectors. The most-used SEO fields (title, description, indexable) live in the right sidebar.
+   */
+  seo?: {
+    /**
+     * SEO title. Falls back to the document title + site default. Aim for ≤ 60 characters.
+     */
+    title?: string | null;
+    /**
+     * SEO description. Falls back to the document abstract / first paragraph. Aim for ≤ 160 characters.
+     */
+    description?: string | null;
+    /**
+     * When set to no-index, the page is excluded from /sitemap.xml and Google won't show it.
+     */
+    indexable?: ('index' | 'noindex' | 'noindex,nofollow') | null;
+    /**
+     * Falls back to the hero image, then the site default OG image. Derivatives served at 1200×630 (OGP) and 1200×675 (Discover).
+     */
+    ogImage?: (number | null) | Media;
+    /**
+     * Override for the og:image alt text. Falls back to the alt text on the linked media asset.
+     */
+    ogImageAlt?: string | null;
+    /**
+     * Show fields to override the og:title / og:description independently of the SEO title / description.
+     */
+    useAdvancedOg?: boolean | null;
+    /**
+     * Defaults to the SEO title. Most editors never need to override this.
+     */
+    ogTitle?: string | null;
+    /**
+     * Defaults to the SEO description.
+     */
+    ogDescription?: string | null;
+    /**
+     * Show fields to override the X (Twitter) card independently of the OG card. Most editors don't need this — by default the OG fields drive the X card too.
+     */
+    useAdvancedTwitter?: boolean | null;
+    /**
+     * `summary_large_image` is the right choice for almost every page; only switch to `summary` for thin content like author / category index pages.
+     */
+    twitterCard?: ('summary' | 'summary_large_image') | null;
+    /**
+     * Defaults to ogTitle, then SEO title.
+     */
+    twitterTitle?: string | null;
+    /**
+     * Defaults to ogDescription, then SEO description.
+     */
+    twitterDescription?: string | null;
+    /**
+     * Defaults to ogImage, then the site default OG image. Use a different crop here when the OG image is portrait or has wide letterboxing — X clips aggressively at 2:1.
+     */
+    twitterImage?: (number | null) | Media;
+    useCustomCanonical?: boolean | null;
+    canonicalOverride?: string | null;
+    robotsAdvanced?: {
+      /**
+       * Don't show a cached version in SERP.
+       */
+      noarchive?: boolean | null;
+      /**
+       * Suppress the textual snippet entirely (overrides max-snippet).
+       */
+      nosnippet?: boolean | null;
+      /**
+       * Don't index images on this page.
+       */
+      noimageindex?: boolean | null;
+      /**
+       * Don't show the 'Translate' link on this page.
+       */
+      notranslate?: boolean | null;
+      /**
+       * Max characters Google may show as snippet. -1 = no limit (default), 0 = suppress.
+       */
+      maxSnippet?: number | null;
+      /**
+       * `large` is the conventional pick for photo-heavy posts targeting Google Discover.
+       */
+      maxImagePreview?: ('standard' | 'large' | 'none') | null;
+      /**
+       * Max seconds Google may show in a video preview. -1 = no limit, 0 = suppress.
+       */
+      maxVideoPreview?: number | null;
+      /**
+       * Drop the page from the index after this date. Useful for time-bound campaigns / event landings.
+       */
+      unavailableAfter?: string | null;
+    };
+    alternates?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    customTags?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * Target keyword / phrase for this page. Drives the density readout in the sidebar — body 1–2.5% is the conventional sweet spot.
+     */
+    keywordTarget?: string | null;
+    keywords?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    /**
+     * CSS selectors marking paragraphs eligible for Schema.org Speakable JSON-LD (voice assistants and AI agents reading aloud). Empty = the lead + first body paragraph are auto-marked.
+     */
+    speakablePath?:
+      | {
+          selector: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Escape hatch for one-off Schema.org markup. Validated against an allowlist of @types and capped at 16 KB. Every change writes an audit-log row. Edited from the Schema (JSON-LD) sidebar card.
+     */
+    additionalSchema?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    schemaHistory?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videoTopics".
+ */
+export interface VideoTopic {
+  id: number;
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  description?: string | null;
+  /**
+   * YouTube tags and hashtags that suggest this topic on import, e.g. "sbom" or "software bill of materials". Case and spacing are ignored.
+   */
+  aliases?:
+    | {
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -6729,6 +6992,10 @@ export interface Page {
                             value: number | Advisory;
                           } | null)
                         | ({
+                            relationTo: 'videos';
+                            value: number | Video;
+                          } | null)
+                        | ({
                             relationTo: 'news';
                             value: number | News;
                           } | null)
@@ -6802,6 +7069,10 @@ export interface Page {
                         | ({
                             relationTo: 'advisories';
                             value: number | Advisory;
+                          } | null)
+                        | ({
+                            relationTo: 'videos';
+                            value: number | Video;
                           } | null)
                         | ({
                             relationTo: 'news';
@@ -6890,6 +7161,10 @@ export interface Page {
                             value: number | Advisory;
                           } | null)
                         | ({
+                            relationTo: 'videos';
+                            value: number | Video;
+                          } | null)
+                        | ({
                             relationTo: 'news';
                             value: number | News;
                           } | null)
@@ -6963,6 +7238,10 @@ export interface Page {
                         | ({
                             relationTo: 'advisories';
                             value: number | Advisory;
+                          } | null)
+                        | ({
+                            relationTo: 'videos';
+                            value: number | Video;
                           } | null)
                         | ({
                             relationTo: 'news';
@@ -7102,6 +7381,10 @@ export interface Page {
                         | ({
                             relationTo: 'advisories';
                             value: number | Advisory;
+                          } | null)
+                        | ({
+                            relationTo: 'videos';
+                            value: number | Video;
                           } | null)
                         | ({
                             relationTo: 'news';
@@ -7356,6 +7639,10 @@ export interface Page {
                               value: number | Advisory;
                             } | null)
                           | ({
+                              relationTo: 'videos';
+                              value: number | Video;
+                            } | null)
+                          | ({
                               relationTo: 'news';
                               value: number | News;
                             } | null)
@@ -7525,6 +7812,10 @@ export interface Page {
                       value: number | Advisory;
                     } | null)
                   | ({
+                      relationTo: 'videos';
+                      value: number | Video;
+                    } | null)
+                  | ({
                       relationTo: 'news';
                       value: number | News;
                     } | null)
@@ -7598,6 +7889,10 @@ export interface Page {
                   | ({
                       relationTo: 'advisories';
                       value: number | Advisory;
+                    } | null)
+                  | ({
+                      relationTo: 'videos';
+                      value: number | Video;
                     } | null)
                   | ({
                       relationTo: 'news';
@@ -7686,6 +7981,10 @@ export interface Page {
                       value: number | Advisory;
                     } | null)
                   | ({
+                      relationTo: 'videos';
+                      value: number | Video;
+                    } | null)
+                  | ({
                       relationTo: 'news';
                       value: number | News;
                     } | null)
@@ -7759,6 +8058,10 @@ export interface Page {
                   | ({
                       relationTo: 'advisories';
                       value: number | Advisory;
+                    } | null)
+                  | ({
+                      relationTo: 'videos';
+                      value: number | Video;
                     } | null)
                   | ({
                       relationTo: 'news';
@@ -7898,6 +8201,10 @@ export interface Page {
                   | ({
                       relationTo: 'advisories';
                       value: number | Advisory;
+                    } | null)
+                  | ({
+                      relationTo: 'videos';
+                      value: number | Video;
                     } | null)
                   | ({
                       relationTo: 'news';
@@ -8150,6 +8457,10 @@ export interface Page {
                     | ({
                         relationTo: 'advisories';
                         value: number | Advisory;
+                      } | null)
+                    | ({
+                        relationTo: 'videos';
+                        value: number | Video;
                       } | null)
                     | ({
                         relationTo: 'news';
@@ -9273,6 +9584,7 @@ export interface Integration {
       | (
           | 'blogs'
           | 'advisories'
+          | 'videos'
           | 'news'
           | 'guides'
           | 'resources'
@@ -9859,6 +10171,14 @@ export interface PayloadLockedDocument {
         value: number | Advisory;
       } | null)
     | ({
+        relationTo: 'videos';
+        value: number | Video;
+      } | null)
+    | ({
+        relationTo: 'videoTopics';
+        value: number | VideoTopic;
+      } | null)
+    | ({
         relationTo: 'news';
         value: number | News;
       } | null)
@@ -10416,6 +10736,109 @@ export interface AdvisoriesSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos_select".
+ */
+export interface VideosSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  provider?: T;
+  externalId?: T;
+  format?: T;
+  topics?: T;
+  summary?: T;
+  durationLabel?: T;
+  featured?: T;
+  transcript?: T;
+  syncState?: T;
+  source?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        durationSeconds?: T;
+        publishedAt?: T;
+        tags?:
+          | T
+          | {
+              value?: T;
+              id?: T;
+            };
+        privacyStatus?: T;
+        embeddable?: T;
+        hasMaxres?: T;
+        thumbnailUrl?: T;
+        contentHash?: T;
+        fetchedAt?: T;
+      };
+  publishedAt?: T;
+  displayPublishedAt?: T;
+  contentUpdatedAt?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        indexable?: T;
+        ogImage?: T;
+        ogImageAlt?: T;
+        useAdvancedOg?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        useAdvancedTwitter?: T;
+        twitterCard?: T;
+        twitterTitle?: T;
+        twitterDescription?: T;
+        twitterImage?: T;
+        useCustomCanonical?: T;
+        canonicalOverride?: T;
+        robotsAdvanced?:
+          | T
+          | {
+              noarchive?: T;
+              nosnippet?: T;
+              noimageindex?: T;
+              notranslate?: T;
+              maxSnippet?: T;
+              maxImagePreview?: T;
+              maxVideoPreview?: T;
+              unavailableAfter?: T;
+            };
+        alternates?: T;
+        customTags?: T;
+        keywordTarget?: T;
+        keywords?: T;
+        speakablePath?:
+          | T
+          | {
+              selector?: T;
+              id?: T;
+            };
+        additionalSchema?: T;
+        schemaHistory?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videoTopics_select".
+ */
+export interface VideoTopicsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  aliases?:
+    | T
+    | {
+        value?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -14846,6 +15269,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'advisories';
           value: number | Advisory;
+        } | null)
+      | ({
+          relationTo: 'videos';
+          value: number | Video;
         } | null)
       | ({
           relationTo: 'news';

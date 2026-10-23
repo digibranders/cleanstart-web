@@ -24,9 +24,6 @@ export const INTENTIONALLY_UNREGISTERED: ReadonlySet<string> = new Set([
   '/thank-you/[type]',
   // Internal draft-preview harness, never public.
   '/preview/[collection]/[slug]',
-  // Video watch pages are built from a code catalog and the YouTube feed, so
-  // there is no CMS document to hang a schema override or a search entry on.
-  '/videos/[slug]',
 ]);
 
 /** Segment names that don't produce a URL segment (Next.js route groups). */

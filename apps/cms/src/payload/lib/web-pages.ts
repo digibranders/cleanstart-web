@@ -16,6 +16,7 @@ export interface WebPage {
 export const PURGEABLE_COLLECTIONS: Record<string, WebPage> = {
   blogs: { detailPrefix: '/blogs', listingPath: '/blogs' },
   advisories: { detailPrefix: '/advisories', listingPath: '/advisories' },
+  videos: { detailPrefix: '/videos', listingPath: '/videos' },
   news: { detailPrefix: '/news', listingPath: '/news' },
   guides: { detailPrefix: '/guide', listingPath: '/guide' },
   resources: { detailPrefix: '/resources', listingPath: '/resource-center' },

@@ -19,6 +19,7 @@ const ROUTES: Record<string, string> = {
   authors: '/author',
   blogs: '/blog',
   advisories: '/advisories',
+  videos: '/videos',
   events: '/events',
   guides: '/guides',
   jobs: '/careers',

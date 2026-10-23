@@ -50,6 +50,7 @@ interface DetailRoute {
 const DETAIL_ROUTES: readonly DetailRoute[] = [
   { prefix: "/blogs/", collection: "blogs", extraFilter: PUBLISHED_FILTER },
   { prefix: "/advisories/", collection: "advisories", extraFilter: PUBLISHED_FILTER },
+  { prefix: "/videos/", collection: "videos", extraFilter: PUBLISHED_FILTER },
   { prefix: "/event/", collection: "events", extraFilter: PUBLISHED_FILTER },
   // Authors is a pure content collection with no draft/versioning system
   // (see CLAUDE.md "Schema decisions (locked)") — no published-status filter.

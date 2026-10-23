@@ -8,6 +8,7 @@ import { useEffect, type ReactElement } from 'react';
 const VERSIONED_CONTENT = [
   'blogs',
   'advisories',
+  'videos',
   'news',
   'guides',
   'resources',
@@ -43,6 +44,7 @@ const INJECT_INTERVAL_MS = 3_000;
 const SLUG_BY_LABEL: Record<string, (typeof VERSIONED_CONTENT)[number]> = {
   Blogs: 'blogs',
   Advisories: 'advisories',
+  Videos: 'videos',
   News: 'news',
   Guides: 'guides',
   Resources: 'resources',

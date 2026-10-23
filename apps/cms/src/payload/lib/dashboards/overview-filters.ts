@@ -6,6 +6,7 @@ export const WINDOW_DAYS: Record<OverviewWindow, number> = { '7d': 7, '28d': 28,
 export const COLLECTION_PATH_PREFIX: Record<string, string> = {
   blogs: '/blogs',
   advisories: '/advisories',
+  videos: '/videos',
   guides: '/guide',
   news: '/news',
   knowledgeBase: '/knowledge-hub',

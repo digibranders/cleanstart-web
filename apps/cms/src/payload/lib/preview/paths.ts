@@ -19,6 +19,7 @@ import { ROUTE_PREFIX } from '../route-prefixes';
 export const PREVIEWABLE_COLLECTIONS = [
   'blogs',
   'advisories',
+  'videos',
   'news',
   'pages',
   'jobs',

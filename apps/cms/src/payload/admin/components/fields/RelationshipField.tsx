@@ -73,6 +73,8 @@ const ROW_HINTS: Record<string, RowHint> = {
   // Content collections: stacked chips with status badge, no thumbs.
   blogs: { primary: ['title'], secondary: ['slug'], showThumb: false, showCreate: false, chipLayout: 'stacked', typeLabel: 'Blog' },
   advisories: { primary: ['title'], secondary: ['slug'], showThumb: false, showCreate: false, chipLayout: 'stacked', typeLabel: 'Advisory' },
+  videos: { primary: ['title'], secondary: ['slug'], showThumb: false, showCreate: false, chipLayout: 'stacked', typeLabel: 'Video' },
+  videoTopics: { primary: ['name'], secondary: ['slug'], showThumb: false, showCreate: true, chipLayout: 'inline' },
   news: { primary: ['title'], secondary: ['slug'], showThumb: false, showCreate: false, chipLayout: 'stacked', typeLabel: 'News' },
   guides: { primary: ['title'], secondary: ['slug'], showThumb: false, showCreate: false, chipLayout: 'stacked', typeLabel: 'Guide' },
   resources: { primary: ['title'], secondary: ['slug'], showThumb: false, showCreate: false, chipLayout: 'stacked', typeLabel: 'Resource' },

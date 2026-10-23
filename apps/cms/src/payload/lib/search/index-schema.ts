@@ -77,6 +77,7 @@ export const INDEX_UID = 'content';
 const COLLECTION_WEIGHT: Record<string, number> = {
   blogs: 100,
   advisories: 95,
+  videos: 70,
   news: 95,
   guides: 90,
   knowledgeBase: 90,
@@ -101,6 +102,7 @@ const COLLECTION_WEIGHT: Record<string, number> = {
 export const SEARCH_INDEXED_COLLECTIONS: ReadonlyArray<string> = [
   'blogs',
   'advisories',
+  'videos',
   'news',
   'guides',
   'knowledgeBase',

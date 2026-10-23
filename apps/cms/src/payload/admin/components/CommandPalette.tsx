@@ -81,6 +81,7 @@ const CREATE_TARGETS: Array<Omit<Action, 'group'>> = [
 const SEARCHABLE_COLLECTIONS: ReadonlyArray<{ slug: string; label: string }> = [
   { slug: 'blogs', label: 'Blog' },
   { slug: 'advisories', label: 'Advisory' },
+  { slug: 'videos', label: 'Video' },
   { slug: 'news', label: 'News' },
   { slug: 'guides', label: 'Guide' },
   { slug: 'resources', label: 'Resource' },

@@ -39,6 +39,31 @@ export const LIST_FILTER_FIELDS: Record<string, ReadonlyArray<ListFilterFieldCon
     { kind: 'relationship', name: 'authors', label: 'Author', relationTo: 'authors' },
     STATUS_FILTER,
   ],
+  videos: [
+    {
+      kind: 'options',
+      name: 'format',
+      label: 'Format',
+      options: [
+        { label: 'Explainer', value: 'explainer' },
+        { label: 'Product demo', value: 'demo' },
+        { label: 'Talk or webinar', value: 'talk' },
+      ],
+    },
+    {
+      kind: 'options',
+      name: 'syncState',
+      label: 'Sync state',
+      options: [
+        { label: 'Needs review', value: 'needs-review' },
+        { label: 'Synced', value: 'synced' },
+        { label: 'Missing on YouTube', value: 'missing' },
+        { label: 'Manual', value: 'manual' },
+      ],
+    },
+    { kind: 'relationship', name: 'topics', label: 'Topic', relationTo: 'videoTopics' },
+    STATUS_FILTER,
+  ],
   news: [
     {
       kind: 'relationship',

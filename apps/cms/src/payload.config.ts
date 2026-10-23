@@ -16,6 +16,8 @@ import { AuditLog } from './payload/collections/audit-log';
 import { WebhookDeadLetter } from './payload/collections/WebhookDeadLetter';
 import { Authors } from './payload/collections/Authors';
 import { Advisories } from './payload/collections/Advisories';
+import { VideoTopics } from './payload/collections/VideoTopics';
+import { Videos } from './payload/collections/Videos';
 import { Blogs } from './payload/collections/Blogs';
 import { BrokenLinks } from './payload/collections/BrokenLinks';
 import { CaseStudies } from './payload/collections/CaseStudies';
@@ -391,6 +393,8 @@ export default buildConfig({
     // Authors) trail.
     Blogs,
     Advisories,
+    Videos,
+    VideoTopics,
     News,
     Guides,
     CaseStudies,
