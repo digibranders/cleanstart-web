@@ -194,6 +194,19 @@ export const resolveCruxCredentials = (): CruxCredentials | null => {
   return apiKey ? { apiKey } : null;
 };
 
+// ─── YouTube (video sync) ────────────────────────────────────────
+
+export interface YoutubeCredentials {
+  /** null selects the no-key RSS client: a missing key is a supported mode, not an error. */
+  readonly apiKey: string | null;
+  readonly channelId: string;
+}
+
+export const resolveYoutubeCredentials = (): YoutubeCredentials => ({
+  apiKey: readEnv('YOUTUBE_API_KEY'),
+  channelId: readEnv('YOUTUBE_CHANNEL_ID') ?? 'UC13c-XRmRlkWpp6WMG9SDjw',
+});
+
 // ─── MS Clarity ──────────────────────────────────────────────────
 
 export interface ClarityCredentials {

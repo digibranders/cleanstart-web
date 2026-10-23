@@ -224,6 +224,7 @@ export interface Config {
       purgeDealRegistrations: TaskPurgeDealRegistrations;
       refreshContentInsights: TaskRefreshContentInsights;
       refreshCrux: TaskRefreshCrux;
+      syncYoutubeVideos: TaskSyncYoutubeVideos;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -10085,6 +10086,7 @@ export interface PayloadJob {
           | 'purgeDealRegistrations'
           | 'refreshContentInsights'
           | 'refreshCrux'
+          | 'syncYoutubeVideos'
           | 'schedulePublish';
         taskID: string;
         input?:
@@ -10137,6 +10139,7 @@ export interface PayloadJob {
         | 'purgeDealRegistrations'
         | 'refreshContentInsights'
         | 'refreshCrux'
+        | 'syncYoutubeVideos'
         | 'schedulePublish'
       )
     | null;
@@ -15250,6 +15253,14 @@ export interface TaskRefreshContentInsights {
  * via the `definition` "TaskRefreshCrux".
  */
 export interface TaskRefreshCrux {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskSyncYoutubeVideos".
+ */
+export interface TaskSyncYoutubeVideos {
   input?: unknown;
   output?: unknown;
 }
