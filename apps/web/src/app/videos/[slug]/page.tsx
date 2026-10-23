@@ -6,6 +6,7 @@ import { Footer } from "@/components/sections/Footer";
 import { ReadyToSecureCTA } from "@/components/sections/home/ReadyToSecureCTA";
 import { Container } from "@/components/layout";
 import { ExpandableBox } from "@/components/sections/videos/ExpandableBox";
+import { ScrollPane } from "@/components/sections/videos/ScrollPane";
 import { CopyLinkButton } from "@/components/sections/videos/CopyLinkButton";
 import { UpNext } from "@/components/sections/videos/UpNext";
 import { VideoDescription } from "@/components/sections/videos/VideoDescription";
@@ -136,13 +137,14 @@ export default async function VideoPage({
             bottom edge sits on the fold before the page has been scrolled.
           */}
           <div className="grid grid-cols-1 gap-x-7 gap-y-6 lg:h-[calc(100dvh-var(--cs-header-h)-var(--cs-header-extra)-var(--cs-announce-h,0px))] lg:grid-cols-[minmax(0,1fr)_380px] lg:grid-rows-1 xl:grid-cols-[minmax(0,1fr)_420px]">
-            <section
+            <ScrollPane
+              as="section"
               aria-label="Video and details"
               // Lenis would otherwise take the wheel and scroll the whole page.
               data-lenis-prevent
-              // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be focusable or keyboard users cannot scroll it
+              // A scrollable region must be focusable or keyboard users cannot scroll it.
               tabIndex={0}
-              className="contents lg:flex lg:min-h-0 lg:flex-col lg:gap-5 lg:overflow-y-auto lg:pb-10 lg:pl-1 lg:pr-3 lg:pt-6 lg:[scrollbar-color:rgba(18,16,28,0.28)_transparent] lg:[scrollbar-width:thin]"
+              className="contents lg:flex lg:min-h-0 lg:flex-col lg:gap-5 lg:overflow-y-auto lg:pb-10 lg:pl-1 lg:pr-3 lg:pt-6"
             >
               <nav aria-label="Breadcrumb" className="hidden font-sans text-[14px] text-[#5B5870] lg:block">
                 <Link href="/videos" className="inline-flex items-center gap-2 hover:text-[#12101C]">
@@ -220,17 +222,18 @@ export default async function VideoPage({
               <VideoTopicPills topics={video.topics} />
             </div>
 
-            </section>
+            </ScrollPane>
 
-            <aside
+            <ScrollPane
+              as="aside"
               aria-label="Up next videos"
               data-lenis-prevent
-              // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be focusable or keyboard users cannot scroll it
+              // A scrollable region must be focusable or keyboard users cannot scroll it.
               tabIndex={0}
-              className="lg:col-start-2 lg:row-start-1 lg:min-h-0 lg:overflow-y-auto lg:pb-10 lg:pl-1 lg:pr-2 lg:pt-6 lg:[scrollbar-color:rgba(18,16,28,0.28)_transparent] lg:[scrollbar-width:thin]"
+              className="lg:col-start-2 lg:row-start-1 lg:min-h-0 lg:overflow-y-auto lg:pb-10 lg:pl-1 lg:pr-2 lg:pt-6"
             >
               <UpNext videos={related} headingId="up-next-title" />
-            </aside>
+            </ScrollPane>
           </div>
         </Container>
       </main>

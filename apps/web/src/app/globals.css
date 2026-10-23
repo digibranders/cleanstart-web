@@ -7030,3 +7030,17 @@ body {
     opacity: 0;
   }
 }
+
+/* Scrollbar that only shows while its container is scrolling (ScrollPane sets
+   data-scrolling from the scroll event). Colour switches, so the gutter is
+   reserved either way and nothing shifts. Desktop only: below lg the page
+   scrolls as one and these containers do not scroll on their own. */
+@media (min-width: 64rem) {
+  .cs-autoscroll {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+  .cs-autoscroll[data-scrolling="true"] {
+    scrollbar-color: rgba(18, 16, 28, 0.32) transparent;
+  }
+}
