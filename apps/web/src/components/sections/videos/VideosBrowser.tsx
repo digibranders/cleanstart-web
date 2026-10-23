@@ -119,11 +119,8 @@ function VideosView({ videos, heroId, filters, onChange }: VideosViewProps): Rea
 
       <div className="z-30 border-b border-[rgba(18,16,28,0.08)] bg-white/92 backdrop-blur-md md:sticky md:top-[var(--cs-header-h)]">
         <Container className="flex flex-col gap-3 py-3 lg:flex-row lg:items-center lg:justify-between">
-          <div
-            role="group"
-            aria-label="Filter by format"
-            className="-mx-6 flex gap-1.5 overflow-x-auto px-6 pb-1 [scrollbar-width:none] sm:-mx-10 sm:px-10 lg:mx-0 lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden"
-          >
+          <fieldset className="-mx-6 m-0 flex min-w-0 gap-1.5 overflow-x-auto border-0 px-6 pb-1 [scrollbar-width:none] sm:-mx-10 sm:px-10 lg:mx-0 lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden">
+            <legend className="sr-only">Filter by format</legend>
             {[
               { id: undefined, label: "All", count: counts.all },
               ...VIDEO_FORMATS.map((f) => ({ id: f.id, label: f.label, count: counts[f.id] })),
@@ -144,10 +141,10 @@ function VideosView({ videos, heroId, filters, onChange }: VideosViewProps): Rea
                 </button>
               );
             })}
-          </div>
+          </fieldset>
 
           <form
-            role="search"
+            aria-label="Search and filter videos"
             onSubmit={submitSearch}
             className="flex flex-wrap items-center gap-2 sm:flex-nowrap"
           >

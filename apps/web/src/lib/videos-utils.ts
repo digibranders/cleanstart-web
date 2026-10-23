@@ -69,7 +69,7 @@ export const formatPublished = (iso: string): string =>
 export const slugifyTitle = (title: string): string =>
   title
     .normalize("NFKD")
-    .replace(/[̀-ͯ]/g, "")
+    .replace(/\p{M}/gu, "")
     .toLowerCase()
     .replace(/['’]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
@@ -82,11 +82,15 @@ export const slugifyTitle = (title: string): string =>
  * site's no-dash rule on the way in. Also drops control characters and caps
  * runs of blank lines.
  */
+const isPrintable = (ch: string): boolean => {
+  const code = ch.charCodeAt(0);
+  return code === 9 || code === 10 || (code >= 32 && code !== 127);
+};
+
 export const sanitizeDescription = (raw: string): string =>
-  raw
-    .replace(/\r\n?/g, "\n")
-    // eslint-disable-next-line no-control-regex
-    .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "")
+  [...raw.replace(/\r\n?/g, "\n")]
+    .filter(isPrintable)
+    .join("")
     .replace(/[ \t]*[–—][ \t]*/g, " - ")
     // "In this video: -" style lead-ins leave a dangling marker before the list.
     .replace(/[ \t]+-[ \t]*$/gm, "")
@@ -155,18 +159,21 @@ const SENTENCE_END = /[.!?]["”')\]]*$/;
  */
 const groupLeadInItems = (blocks: DescriptionBlock[]): DescriptionBlock[] => {
   const out: DescriptionBlock[] = [];
-  for (let i = 0; i < blocks.length; i += 1) {
-    const block = blocks[i]!;
+  let i = 0;
+  while (i < blocks.length) {
+    const block = blocks[i];
+    if (!block) break;
     out.push(block);
+    i += 1;
     const last = block.lines.at(-1) ?? "";
     if (block.kind !== "text" || !last.endsWith(":")) continue;
     const items: string[] = [];
-    let j = i + 1;
+    let j = i;
     while (j < blocks.length) {
-      const next = blocks[j]!;
-      const line = next.lines[0] ?? "";
+      const next = blocks[j];
+      const line = next?.lines[0] ?? "";
       const qualifies =
-        next.kind === "text" &&
+        next?.kind === "text" &&
         next.lines.length === 1 &&
         line.length < 160 &&
         !SENTENCE_END.test(line) &&
@@ -177,7 +184,7 @@ const groupLeadInItems = (blocks: DescriptionBlock[]): DescriptionBlock[] => {
     }
     if (items.length >= 2) {
       out.push({ kind: "list", lines: items });
-      i = j - 1;
+      i = j;
     }
   }
   return out;

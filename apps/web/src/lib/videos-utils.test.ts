@@ -20,6 +20,11 @@ import {
 } from "./videos-utils";
 import type { ChannelVideo } from "./youtube-feed";
 
+const must = <T,>(value: T | undefined): T => {
+  if (value === undefined) throw new Error("expected a value");
+  return value;
+};
+
 const all = mergeVideos(VIDEO_CATALOG, []);
 
 const feedEntry = (over: Partial<ChannelVideo> = {}): ChannelVideo => ({
@@ -155,11 +160,11 @@ describe("mergeVideos", () => {
   });
 
   it("keeps catalog title and slug but takes the fresher feed description", () => {
-    const entry = VIDEO_CATALOG[0]!;
+    const entry = must(VIDEO_CATALOG[0]);
     const merged = mergeVideos(VIDEO_CATALOG, [
       feedEntry({ videoId: entry.id, title: "Renamed on YouTube", description: "Fresh – text" }),
     ]);
-    const hit = merged.find((v) => v.id === entry.id)!;
+    const hit = must(merged.find((v) => v.id === entry.id));
     expect(hit.title).toBe(entry.title);
     expect(hit.slug).toBe(entry.slug);
     expect(hit.description).toBe("Fresh - text");
@@ -167,7 +172,7 @@ describe("mergeVideos", () => {
 
   it("adds an unfiled upload with a derived slug, no format and no duration", () => {
     const merged = mergeVideos(VIDEO_CATALOG, [feedEntry()]);
-    const added = merged[0]!;
+    const added = must(merged[0]);
     expect(added.slug).toBe("a-brand-new-upload");
     expect(added.format).toBeNull();
     expect(added.durationSeconds).toBeUndefined();
@@ -175,7 +180,7 @@ describe("mergeVideos", () => {
   });
 
   it("never reuses a slug already taken by the catalog", () => {
-    const taken = VIDEO_CATALOG[0]!;
+    const taken = must(VIDEO_CATALOG[0]);
     const merged = mergeVideos(VIDEO_CATALOG, [feedEntry({ title: taken.slug.replace(/-/g, " ") })]);
     const slugs = merged.map((v) => v.slug);
     expect(new Set(slugs).size).toBe(slugs.length);
@@ -193,16 +198,16 @@ describe("filters", () => {
   });
 
   it("requires every query word, across title, summary and topic labels", () => {
-    expect(matchesQuery(all.find((v) => v.slug === "what-is-vex")!, "vex sbom")).toBe(true);
-    expect(matchesQuery(all.find((v) => v.slug === "base-images-explained")!, "vex")).toBe(false);
+    expect(matchesQuery(must(all.find((v) => v.slug === "what-is-vex")), "vex sbom")).toBe(true);
+    expect(matchesQuery(must(all.find((v) => v.slug === "base-images-explained")), "vex")).toBe(false);
     expect(filterVideos(all, { ...DEFAULT_VIDEO_FILTERS, q: "zzzz-no-match" })).toEqual([]);
   });
 
   it("sorts shortest first and puts unknown durations last", () => {
     const withUnknown: Video[] = [...all, ...mergeVideos([], [feedEntry()])];
     const out = filterVideos(withUnknown, { ...DEFAULT_VIDEO_FILTERS, sort: "short" });
-    expect(out[0]!.slug).toBe("base-images-explained");
-    expect(out.at(-1)!.durationSeconds).toBeUndefined();
+    expect(must(out[0]).slug).toBe("base-images-explained");
+    expect(must(out.at(-1)).durationSeconds).toBeUndefined();
   });
 
   it("counts formats against the topic and search but not the active format", () => {
@@ -223,11 +228,11 @@ describe("topicIndex", () => {
 
 describe("relatedVideos", () => {
   it("excludes the video itself and ranks shared topics first", () => {
-    const base = all.find((v) => v.slug === "what-is-attack-surface-in-containers")!;
+    const base = must(all.find((v) => v.slug === "what-is-attack-surface-in-containers"));
     const out = relatedVideos(base, all, 4);
     expect(out).toHaveLength(4);
     expect(out.find((v) => v.id === base.id)).toBeUndefined();
-    expect(out[0]!.topics.some((t) => base.topics.includes(t))).toBe(true);
+    expect(must(out[0]).topics.some((t) => base.topics.includes(t))).toBe(true);
   });
 });
 

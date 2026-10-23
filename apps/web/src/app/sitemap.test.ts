@@ -45,6 +45,20 @@ describe("sitemap", () => {
     expect(urls).not.toContain("https://www.cleanstart.com/blogs/hidden");
   });
 
+  it("lists /videos and a watch page for every catalogued video, even with the feed down", async () => {
+    // The mocked fetch has no text(), so the YouTube feed read fails and only the
+    // code catalog is left: the sitemap must still carry the watch pages.
+    fetchMock.mockImplementation(async () => ok([]));
+    const entries = await (await load())();
+    const urls = entries.map((e) => e.url);
+    expect(urls).toContain("https://www.cleanstart.com/videos");
+    expect(urls).toContain("https://www.cleanstart.com/videos/what-is-vex");
+    const watch = entries.find((e) => e.url.endsWith("/videos/what-is-vex"));
+    expect(watch?.lastModified && new Date(watch.lastModified).toISOString()).toBe(
+      "2026-10-13T14:17:14.000Z",
+    );
+  });
+
   it("never reports the row-level updatedAt as lastmod", async () => {
     fetchMock.mockImplementation(async (url: string) =>
       collectionOf(url) === "blogs"
