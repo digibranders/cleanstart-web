@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 import { postgresAdapter } from '@payloadcms/db-postgres';
 
+import { jobsCollectionOverrides, jobsEndpointAccess } from './payload/access/jobs';
 import { resolveDbPoolMax } from './payload/lib/db-pool';
 import { brevoEmailAdapter } from './payload/lib/email/payload-adapter';
 import { cleanstartLexicalEditor } from './payload/lib/lexical/editor-config';
@@ -510,6 +511,13 @@ export default buildConfig({
     calcomInboundEndpoint,
   ],
   jobs: {
+    // Admin-only job queue: see payload/access/jobs.ts for why every signed-in user must not reach it.
+    access: {
+      run: jobsEndpointAccess,
+      queue: jobsEndpointAccess,
+      cancel: jobsEndpointAccess,
+    },
+    jobsCollectionOverrides,
     tasks: [
       drainLeadQueueTask,
       purgeSearchLogTask,
