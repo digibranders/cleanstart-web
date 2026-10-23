@@ -10,7 +10,7 @@ Phase 3 is done only when all of these pass in CI:
 
 1. **Round trip.** For every fixture document: `parseEditorState(json)` then `editorState.toJSON()` deep-equals the input after the documented normalisations in §6. Fixtures: all 59 blogs in `migrations/webflow-export/transformed/blogs.jsonl`, plus hand-built fixtures for `embed` (iframe and script modes), `upload` (with and without `id`), `block` (codeBlock and inlineCta), tables with header states 1, 2 and 3, merged cells, nested lists, checklists, every text format bit, `linebreak`, `autolink`.
 2. **Server acceptance.** Every fixture saved through `payload.update` as an editor user succeeds (Payload's lexical validation and the `normalizeLexicalHook` run).
-3. **Renderer coverage.** A test walks every node the editor can insert and asserts its type is in the set `apps/web/src/lib/renderLexical.tsx` draws (§3, "renders" column). Nothing the editor offers renders as nothing on the site.
+3. **Renderer coverage.** A test walks every node the editor can insert and asserts its type is in the set `apps/web/src/lib/renderLexical.tsx` draws (§3, "renders" column). Nothing the editor offers renders as nothing on the site, with one listed exception: `embed` in iframe mode (§4.4), which the test skips by name and which the embed dialog warns about.
 4. **Production census.** The read-only census from Phase 0 lists every node type and key set in production. Every type in it loads in Studio without error.
 5. **Visual diff.** Three real posts (one blog, one guide, one knowledge-base article) are opened, edited in one paragraph, saved, and rendered by `apps/web`. A pixel diff of the rendered pages shows change only in the edited paragraph.
 
@@ -22,7 +22,7 @@ Studio defines two configs in `apps/cms/src/studio/editor/configs.ts`. They mirr
 
 Used by: `body` on blogs, news, resources, events, knowledgeBase, webinars, guides, legalDocuments, jobs, case-studies; `bioLong` on authors; `postSubmit.body` on forms; the `RichText.body` and `FormBlock` post-submit body page-builder blocks.
 
-Features: paragraph; headings h1 to h4; bold, italic, underline, strikethrough, subscript, superscript, inline code; quote; bullet, numbered and check lists; horizontal rule; tables (cell merge on, horizontal scroll on, cell background off); align; indent; links with a `rel` select (follow, nofollow, sponsored, ugc); relationship (load and keep only, see §3); embed; code block and inline CTA blocks; upload with per-placement fields (alt, caption, alignment, size, decorative); fixed toolbar; inline toolbar; rich paste; slash menu; insert menu; block drag handle and add-block button (Payload shows both by default: `LexicalEditor.js:126-128`).
+Features (these mirror the Payload config, which Payload's server validation reads; how Studio presents them is §5): paragraph; headings h1 to h4; bold, italic, underline, strikethrough, subscript, superscript, inline code; quote; bullet, numbered and check lists; horizontal rule; tables (cell merge on, horizontal scroll on, cell background off); align; indent; links with a `rel` select (follow, nofollow, sponsored, ugc); relationship (load and keep only, see §3); embed; code block and inline CTA blocks; upload with per-placement fields (alt, caption, alignment, size, decorative); fixed toolbar; inline toolbar; rich paste; slash menu; insert menu; block drag handle and add-block button (Payload shows both by default: `LexicalEditor.js:126-128`).
 
 ### 2.2 FAQ answer (`faqAnswerLexicalEditor`, `lib/lexical/faq-answer-editor.ts:24-50`)
 
@@ -91,7 +91,7 @@ Rules:
 
 ### 4.5 Server normalisation Studio must accept
 
-- `normalizeLexicalHook` merges adjacent lists with the same `listType` and `start` on save (`hooks/normalize-lexical.ts`). After save Studio reloads the document from the save response, so the editor shows what was stored.
+- `normalizeLexicalHook` merges adjacent lists with the same `listType` and `start` on save (`hooks/normalize-lexical.ts`). After a save, the editor takes the stored value from the response only if the user has not typed since the save started; otherwise the user's newer state is kept and the form stays dirty (`09` §3.3). The editor is never re-mounted on save.
 - `bodyStatsHook` writes `wordCount`, `readingMinutes` and `tableOfContents`. These are read-only in Studio.
 
 ## 5. Editor UI
@@ -100,22 +100,21 @@ All UI uses the design system. Components live in `apps/cms/src/studio/editor/`.
 
 | Part | Behaviour | Replaces |
 |---|---|---|
-| Fixed toolbar | Sticky under the document header while the editor is in view. Groups: Text style menu (Paragraph, H2, H3, H4, Quote); Bold, Italic, Underline, More formats menu (Strikethrough, Subscript, Superscript, Inline code); Link; Bullet, Numbered, Check list; Align menu; Indent, Outdent; Insert menu. Every button has a tooltip with its shortcut. | Payload fixed toolbar, `ToolbarTipsPlugin`, `StockToolbarSuppressorPlugin` |
-| Inline toolbar | On text selection: text style, bold, italic, link, inline code. | Payload inline toolbar |
+| Formatting bubble | There is no fixed toolbar (direction B). On a non-empty text selection a bubble appears above the selection (below it when there is no room above; it never covers the selection), in `--primary` with `--on-primary` icons, `--radius-md`. Groups: Text style menu (Paragraph, H2, H3, H4, Quote); Bold, Italic, Underline; More formats menu (Strikethrough, Subscript, Superscript, Inline code); Link; List menu (Bullet, Numbered, Check); Align menu (Left, Centre, Right, Justify); Indent, Outdent. Every button has a tooltip with its shortcut. With the caret inside a table, the bubble adds the cell menu. Keyboard: ⌥F10 moves focus into the bubble; Esc returns focus to the text. | Payload fixed and inline toolbars, `ToolbarTipsPlugin`, `StockToolbarSuppressorPlugin` |
 | Slash menu | `/` at the start of an empty paragraph: H2, H3, Quote, Bullet list, Numbered list, Divider, Table, Image, Embed, Code block, CTA card. Filter by typing, arrows, Enter. | `SlashMenuPlugin` |
-| Insert menu | Same items as the slash menu, from the toolbar. | `AddMenuToolbarButton` |
-| Block handle | Drag handle and "+" to the left of the hovered block. Drag to reorder; "+" opens the insert menu at that position. Keyboard: ⌥⇧↑ and ⌥⇧↓ move the current block. | Payload `DraggableBlockPlugin`, `AddBlockHandlePlugin` |
-| Link popover | ⌘K inside the editor (⌘K elsewhere opens the palette). Tabs Internal (search across published documents, `editor/link/InternalSearch.tsx`) and External (URL). Options: open in new tab, rel. Shows the stored URL. Edit and remove from a hover card on existing links. | `LinkPopover`, `LinkPopoverPlugin`, `LinkInternalSearch` |
+| Insert menu | Same items as the slash menu, opened from the block handle's "+". | `AddMenuToolbarButton` |
+| Block handle | Drag handle and "+" to the left of the hovered or caret block (also shown for the caret block, so keyboard users see it). Drag to reorder; "+" opens the insert menu at that position. Keyboard: ⌥⇧↑ and ⌥⇧↓ move the current block. | Payload `DraggableBlockPlugin`, `AddBlockHandlePlugin` |
+| Link popover | ⌘K inside the editor (⌘K elsewhere opens the palette). Tabs Internal and External (URL). Internal search calls the server action `searchLinkTargets({ q })` (in `src/studio/server/actions/editor.ts`), which runs `find` as the user on each routed collection's `useAsTitle` with `like`, published documents only, 5 per collection, and returns title, collection label and stored URL; UI in `editor/link/InternalSearch.tsx`. Replaces the per-collection REST fetches in `LinkInternalSearch.tsx`. Options: open in new tab, rel. Shows the stored URL. Edit and remove from a hover card on existing links. | `LinkPopover`, `LinkPopoverPlugin`, `LinkInternalSearch` |
 | Table | Insert with a rows × columns grid picker (mouse and arrow keys, Enter inserts; first row is a header row, `headerState` 1). Cell menu: insert row above or below, insert column left or right, delete row, delete column, merge cells, unmerge, toggle header row, toggle header column, delete table. | `TableGridPicker*`, Payload table plugins |
 | Image | Insert dialog (Library, Upload, From URL via S-22). Selected image shows a hover bar: Settings (alt, caption, alignment, size, decorative, plus the media record's alt, credit, folder, rename, focal point), Preview, Replace, Remove. | `InlineImage*` |
 | Embed | Dialog: URL (provider detected by `embed-providers.ts`), mode, title, aspect ratio, caption, style preset; script mode shows a code field for `rawHtml`. Node renders a preview card with Edit and Remove. | `Embed*` |
 | Code block | Inline block card with language select, code area (mono), line numbers toggle, highlight lines. Inline code exits on Space at the end of the run. | `CodeBlockButton/*` |
 | CTA card | Inline block card with heading, button label, URL, variant. | `InlineCtaBlock` admin |
 | Rich paste | HTML from Word, Google Docs, Notion and Webflow: normalised by the shared `lib/normalize-rich-html.ts`, `<pre>` becomes a code block, images are ingested through `/api/media-ingest-url` and become upload nodes, form controls are skipped. Plain text pastes as paragraphs. | `RichPastePlugin` |
-| Focus mode | ⌘⇧F: hides chrome, centres the editor at 720px. Esc exits. | `EditorFullscreenToggle` |
+| Focus mode | ⌘⇧F: hides the sidebar, header actions and inspector and widens the writing column from 680px to 720px. Save status stays visible top right and ⌘S still saves. Esc exits. | `EditorFullscreenToggle` |
 | Word count | Live word count and reading time in the document header meta (client-side estimate; the server value is authoritative after save). | `DocHeader` meta |
 
-Keyboard (in addition to Lexical defaults): ⌘B bold · ⌘I italic · ⌘U underline · ⌘E inline code · ⌘K link · ⌘⌥1 to ⌘⌥4 headings · ⌘⌥0 paragraph · ⌘⇧7 numbered list · ⌘⇧8 bullet list · ⌘⇧9 check list · ⌘⇧> quote · Tab and Shift+Tab indent in lists and move between table cells.
+Keyboard (in addition to Lexical defaults): ⌘B bold · ⌘I italic · ⌘U underline · ⌘E inline code · ⌘K link · ⌘⌥2 to ⌘⌥4 headings H2 to H4 · ⌘⌥0 paragraph · ⌘⌥1 does nothing (H1 is never offered) · ⌘⇧7 numbered list · ⌘⇧8 bullet list · ⌘⇧9 check list · ⌘⇧> quote · Tab and Shift+Tab indent in lists and move between table cells. Outside lists and tables, Tab moves focus out of the editor to the next field (no tab character is inserted), so the editor is never a keyboard trap. Every binding is registered in `shortcuts.ts` (`09` §12).
 
 ## 6. Allowed differences in the round-trip test
 
@@ -134,4 +133,4 @@ A script run inside the production CMS container (`ssh cleanstart-cms`, `/app/no
 2. Counts node types, `version` values, key sets per type, `linkType` values, `headerState` values, block types, embed modes and presence of ids.
 3. Prints the counts only. No content leaves the server and nothing is written.
 
-The output is saved as `docs/studio/research/richtext-census.md` and becomes fixture input for §1.
+The output is saved as `docs/studio/research/richtext-census.md` (created by Task 0.9; it does not exist until then) and becomes fixture input for §1.

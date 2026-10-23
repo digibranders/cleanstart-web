@@ -1,5 +1,7 @@
 # Design inputs (research, 2026-10-16)
 
+> Superseded for visual values by `01-DESIGN-SYSTEM.md` (direction B, 2026-10-19). This file records the old admin's fonts, colours and tokens as evidence only. Do not take values from it.
+
 ## 10 most important design facts
 1. `@cleanstart/ui` has no UI library at all, no Radix or Base UI (`packages/ui/package.json`). Dialog and Drawer are built on the native `<dialog>` element. The other primitives are headless and output BEM `cs-*` class names. All their styling is host SCSS in `apps/cms/src/app/(payload)/styles/_ui-primitives.scss` (2,577 lines).
 2. The token values live in `_tokens.scss` and `_themes.scss`. Brand cyan is `#06c7f2`. Spacing is a whole-pixel 4px grid. Radii are 4/6/8/12/16. Motion is 120/160/200/240/280ms.

@@ -24,7 +24,7 @@ Pass: every command exits 0. Paste the summary line of each into the task notes.
 
 ## Gate B: senior engineer review
 
-Run by a reviewer who did not write the code: Codex (`/codex` review of the task diff) and Claude (`/code-review high` on the same diff). Both reports are attached to the task. Every finding is fixed or answered in writing.
+Run by reviewers who did not write the code. The default pair is Codex (`/codex` review of the task diff) and Claude (`/code-review high` on the same diff); when the implementer is Codex or Gemini, use the other two tools, or any two independent reviewers given the diff. Both reports are attached to the task. Every finding is fixed or answered in writing.
 
 Checklist:
 
@@ -33,7 +33,7 @@ Checklist:
 - [ ] No import of `@payloadcms/ui`, `@payloadcms/next` or `src/payload/admin/**` from `src/studio/**`, except the SHARE and KEEP modules listed in `03` §B.
 - [ ] Server-only modules start with `import 'server-only'`.
 - [ ] Inputs crossing a boundary (server actions, route params, search params, REST responses) are parsed with Zod.
-- [ ] Errors are typed (`ValidationError`, `NotFoundError` and the other `AppError` subclasses); user-facing messages are plain and actionable.
+- [ ] Errors are typed: server actions return `ActionResult` with an `ActionError` of kind `validation`, `forbidden`, `not-found`, `locked`, `conflict` or `unknown` (`src/studio/server/errors.ts`, built on Payload's `ValidationError`, `Forbidden`, `NotFound` and `Locked`; the `AppError` classes named in the repo's CLAUDE.md do not exist). User-facing messages come from `09` §11.5.
 - [ ] TypeScript strict: no `any`, no unchecked casts, explicit return types on exports, `undefined` vs `null` kept distinct.
 - [ ] Tests cover the behaviour, including the failure paths and at least one role that must be denied.
 - [ ] No dead code, no commented-out code, no TODO without an issue link.
@@ -51,19 +51,21 @@ Evidence the implementer attaches:
 - The axe result from the e2e run (zero violations).
 - A short keyboard walkthrough: which keys were pressed and what happened.
 
-Checklist (same as `01-DESIGN-SYSTEM.md` §10):
+Checklist (identical to `01-DESIGN-SYSTEM.md` §10; change both together):
 
 - [ ] Uses tokens only. No raw hex, px font size, radius or shadow in the component.
 - [ ] Matches the lab component, or the lab was updated in the same change.
+- [ ] Ink is the only button fill; ultramarine appears only for focus, selection, links, the active filter and scheduled state.
 - [ ] Every state shown: default, hover, focus, active, disabled, loading, empty, error.
 - [ ] Both themes checked at 1440×900 with screenshots attached.
 - [ ] Keyboard path works, focus visible, focus returns to the trigger after closing an overlay.
 - [ ] One primary action per view.
-- [ ] Copy follows the design system copy rules. No em-dashes or en-dashes.
+- [ ] Copy follows §8. No em-dashes or en-dashes.
 - [ ] No layout shift when data loads (skeleton matches final layout).
-- [ ] Motion follows the motion rules and is off under reduced motion.
+- [ ] Motion follows §5 and is off under reduced motion.
 - [ ] axe reports zero violations.
-- [ ] Nothing in the AI-tell list: no gradient text, no glow, no decorative dots, no emoji, no three identical cards in a row, no filler copy.
+- [ ] Nothing in the AI-tell list: no gradient text, no glow (except the sign-in brand panel, §7.7), no decorative dots, no emoji, no three identical cards in a row, no filler copy.
+- [ ] Every `07` issue owned by the task passes its acceptance check.
 
 ## Gate D: phase sign-off
 

@@ -1,20 +1,21 @@
 # Studio Phase 0 and 1: Design System and Foundation Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. Every task also passes the gates in `docs/studio/05-REVIEW-PROTOCOL.md` before its commit step.
+> **For agentic workers (any tool):** start with `docs/studio/HANDOFF.md`. Work task by task. In Claude Code, the superpowers:subagent-driven-development or superpowers:executing-plans skills fit this plan; other tools follow the loop in `HANDOFF.md`. Steps use checkbox (`- [ ]`) syntax for tracking. Every task also passes the gates in `docs/studio/05-REVIEW-PROTOCOL.md` before its commit step.
 
 **Goal:** Ship the Studio design system and lab (Phase 0) and a working Studio foundation where redirects and job locations are fully editable (Phase 1), inside `apps/cms`, without touching Payload's admin.
 
 **Architecture:** A new route group `apps/cms/src/app/(studio)` with its own root layout serves `/studio`. Implementation lives in `apps/cms/src/studio/`. Server components and server actions call Payload's Local API through one wrapper that always runs as the signed-in user. Forms are client-side (react-hook-form) and driven by a serializable schema built from the live Payload config. Auth uses Payload's REST endpoints. Read `docs/studio/00-MASTER-PLAN.md` (ADR-1 to ADR-11) before starting.
 
-**Tech Stack:** Next.js 16.2 (App Router, server actions), Payload 3.84 Local API, React 19, Tailwind CSS 4.3, `@cleanstart/ui` primitives, react-hook-form 7, Zod 3, `@phosphor-icons/react` 2, Inter Variable (`@fontsource-variable/inter`), Vitest 2, Playwright 1.59.
+**Tech Stack:** Next.js 16.2 (App Router, server actions), Payload 3.84 Local API, React 19, Tailwind CSS 4.3, `@cleanstart/ui` primitives, react-hook-form 7, Zod 3, `@phosphor-icons/react` 2 (Light weight), Geist and Geist Mono (`geist` through `next/font`), Vitest 2, Playwright 1.59.
 
-**Prerequisites:** decisions D-1 to D-9 in `docs/studio/00-MASTER-PLAN.md` were signed off on 2026-10-16. D-6 (author drafting) is implemented in Task 1.19.
+**Prerequisites:** decisions D-1 to D-9 in `docs/studio/00-MASTER-PLAN.md` were signed off on 2026-10-16 and D-10 (direction B) on 2026-10-19. D-6 (author drafting) is implemented in Task 1.19. Before any task, read `docs/studio/HANDOFF.md`, `06-IMPLEMENTER-GUIDE.md` and `10-ENGINEERING-STANDARDS.md`.
 
 ---
 
 ## Conventions for every task
 
-- Work on `development`. Stage files by path. Never `git add -A`. Commit message format: `feat(studio): T<id> <summary>`.
+- Work in the worktree `.claude/worktrees/studio-build` on branch `feat/studio-build` (setup in `docs/studio/HANDOFF.md`), merged into `development` at each phase sign-off. Stage files by path. Never `git add -A`. Commit message format: `feat(studio): T<id> <summary>`.
+- Append `started` and `done` lines to `docs/studio/PROGRESS.md` for every task (rules at the top of that file).
 - Run commands from the repo root unless a step says otherwise.
 - Tests: Vitest, co-located `*.test.ts(x)`, node environment, components tested with `renderToStaticMarkup` (the existing convention, see `apps/cms/src/payload/admin/components/BlogCtaAutoPick.test.tsx`). Interaction is tested in Playwright under `apps/cms/tests/e2e/studio/`, tagged `@studio`.
 - Before each commit, run Gate A from `docs/studio/05-REVIEW-PROTOCOL.md` and attach Gate B and Gate C results to the task.
@@ -26,44 +27,55 @@ Created in this plan (all under `apps/cms/` unless noted):
 
 ```
 postcss.config.mjs                              Tailwind v4 PostCSS plugin
+public/studio/hero-grid.svg                     Sign-in brand panel grid (copied from apps/web)
 src/app/(studio)/layout.tsx                     Studio root layout (html, theme bootstrap, styles)
 src/app/(studio)/studio/lab/page.tsx            Component lab (S-50)
 src/app/(studio)/studio/login/page.tsx          S-01
 src/app/(studio)/studio/forgot-password/page.tsx  S-02
 src/app/(studio)/studio/reset-password/[token]/page.tsx  S-03
+src/app/(studio)/studio/forbidden/page.tsx      S-51 (outside the signed-in group)
 src/app/(studio)/studio/(app)/layout.tsx        Signed-in shell
 src/app/(studio)/studio/(app)/page.tsx          Home placeholder (dashboard is Phase 6)
+src/app/(studio)/studio/(app)/not-found.tsx, error.tsx  S-51
 src/app/(studio)/studio/(app)/account/page.tsx  S-04
 src/app/(studio)/studio/(app)/collections/[collection]/page.tsx        S-10
 src/app/(studio)/studio/(app)/collections/[collection]/new/page.tsx    S-11
 src/app/(studio)/studio/(app)/collections/[collection]/[id]/page.tsx   S-12
-src/app/(studio)/studio/(app)/not-found.tsx, error.tsx, forbidden/page.tsx  S-51
 src/studio/styles/{studio.css,tokens.css,primitives.css,tokens.test.ts}
-src/studio/lib/{cn.ts,format-date.ts,format-date.test.ts}
-src/studio/theme/{ThemeProvider.tsx,theme-script.ts,theme-script.test.ts}
-src/studio/ui/*.tsx (+ ui.test.tsx)              Design system components
-src/studio/lab/*                                Lab registry and compositions
-src/studio/server/{session.ts,payload.ts,permissions.ts,errors.ts,nav.ts,...}
+src/studio/lib/{cn.ts,next-path.ts,next-path.test.ts,format-date.ts,format-date.test.ts}
+src/studio/theme/{ThemeProvider.tsx,IconDefaults.tsx,theme-script.ts,theme-script.test.ts}
+src/studio/ui/*.tsx (+ ui.test.tsx, index.ts, Rail.tsx)  Design system components, PageHeader included
+src/studio/lab/{LabFrame.tsx,demos.tsx,LabPage.tsx,compositions/*}  Lab and the two compositions
+src/studio/server/{session.ts,payload.ts,errors.ts,errors.test.ts,permissions.ts,permissions.test.ts,nav.ts,nav.test.ts,readiness.ts}
 src/studio/server/schema/{types.ts,build-schema.ts,build-schema.test.ts}
-src/studio/server/loaders/{list.ts,document.ts,related-titles.ts,shell.ts}
-src/studio/server/actions/{document.ts,preferences.ts,account.ts}
-src/studio/form/{engine/*,fields/*,registry-manifest.ts,registry.tsx,registry.test.ts,RenderFields.tsx}
-src/studio/list/{ListView.tsx,DataTable.tsx,ListToolbar.tsx,ColumnMenu.tsx,Pagination.tsx,cells/*}
-src/studio/document/{EditView.tsx,DocumentHeader.tsx,PublishControl.tsx,SaveStatus.tsx,ValidationSummary.tsx,useDocumentShortcuts.ts}
-src/studio/shell/{AppShell.tsx,Sidebar.tsx,NavGroup.tsx,UserMenu.tsx,SkipLink.tsx,ShortcutSheet.tsx,shortcuts.ts,BrandMark.tsx,PageHeader.tsx}
-src/studio/features/publishing/SlugField.tsx
+src/studio/server/loaders/{list.ts,list.test.ts,related-titles.ts,document.ts,shell.ts}
+src/studio/server/actions/{document.ts,preferences.ts,account.ts,slug.ts}
+src/studio/form/engine/{types.ts,paths.ts,validation.ts,engine.test.ts,StudioFormContext.tsx,useStudioField.ts,Conditional.tsx}
+src/studio/form/fields/{GenericField.tsx,basic.tsx,basic.test.tsx,PendingField.tsx}
+src/studio/form/{registry-manifest.ts,registry.tsx,registry.test.ts,RenderFields.tsx}
+src/studio/list/{ListView.tsx,DataTable.tsx,ListToolbar.tsx,Pagination.tsx,Cell.tsx}
+src/studio/document/{EditView.tsx,DocumentHeader.tsx,PublishControl.tsx,SaveStatus.tsx,ValidationSummary.tsx,TitleField.tsx,useUnsavedGuard.ts,build-patch.ts,build-patch.test.ts,slug-status.tsx}
+src/studio/shell/{AppShell.tsx,Sidebar.tsx,UserMenu.tsx,SkipLink.tsx,BrandMark.tsx}
+src/studio/features/publishing/{SlugField.tsx,slug-state.ts,slug-state.test.ts}
 src/studio/features/account/AccountForm.tsx
+src/studio/features/auth/{AuthCard.tsx,BrandPanel.tsx,LoginForm.tsx,ForgotForm.tsx,ResetForm.tsx,auth-errors.ts,auth-errors.test.ts}
 src/studio/test/server-only-stub.ts
-src/payload/admin-logic/{conditions.ts,validators.ts,conditions.test.ts,validators.test.ts}
+src/payload/admin-logic/{field-helpers.ts,conditions.ts,validators.ts,validator-registry.ts,registry.test.ts}
+src/payload/fields/created-by.ts
+src/payload/access/author-drafts.test.ts
+src/migrations/20261016_120000_add_created_by.ts
 scripts/check-studio-boundaries.ts
 scripts/check-studio-coverage.ts
 scripts/studio-inventory.ts
 scripts/seed-studio-e2e-users.ts
 scripts/richtext-census.ts
-tests/e2e/studio/*.spec.ts
+tests/e2e/studio/*.spec.ts, helpers.ts
+packages/ui/src/primitives/{date-grid-keys.ts,date-grid-keys.test.ts}  (repo root, not apps/cms)
 ```
 
-Modified: `apps/cms/package.json` (dependencies, scripts), `apps/cms/vitest.config.ts` (server-only alias), `apps/cms/src/payload/lib/wire-custom-fields.ts` (export override maps), every collection, global, field and block file that has an inline `admin.condition` or a pure `validate` (Task 1.6), `packages/ui/src/primitives/DateTimePicker.tsx` (keyboard grid, Task 0.8), `.github/workflows/*` (CI steps, Task 1.18).
+Not created in Phases 0 and 1 (later phases add them): a column menu component, per-type cell files, document shortcut hooks, a shortcut sheet, nav group components. The list's column picker lives in `ListToolbar.tsx` and every cell in `Cell.tsx`.
+
+Modified: `apps/cms/package.json` (dependencies, scripts), `apps/cms/vitest.config.ts` (aliases), `apps/cms/.env.example` (`STUDIO_E2E_PASSWORD`), `apps/cms/src/payload/lib/wire-custom-fields.ts` (export override maps), every collection, global, field and block file that has an inline `admin.condition` or a pure `validate` (Task 1.6, including `fields/slug.ts` and the helper moves in `Forms.ts`, `Integrations.ts` and `Media.ts`), `apps/cms/src/payload/access/index.ts`, `Blogs.ts`, `News.ts`, `Guides.ts`, `KnowledgeBase.ts`, `Resources.ts` and `Media.ts` (Task 1.19), `apps/cms/src/migrations/index.ts`, `apps/cms/src/payload-types.ts` (regenerated), `apps/cms/src/app/(payload)/styles/_ui-primitives.scss` (date grid rows, Task 0.8), `packages/ui/src/primitives/DateTimePicker.tsx` (keyboard grid, Task 0.8), `packages/ui/src/primitives/Tooltip.tsx` (keeps the child's ref, Task 0.6), `packages/ui/src/primitives/Toast.tsx` (close glyph, Task 0.8), `docs/studio/00-MASTER-PLAN.md` (Task 0.1), `.github/workflows/ci.yml` (CI steps, Task 1.18).
 
 ---
 
@@ -110,7 +122,7 @@ Expected: a non-zero line count.
 
 ```bash
 pnpm --filter @cleanstart/cms add -D tailwindcss@4.3.0 @tailwindcss/postcss@4.3.0
-pnpm --filter @cleanstart/cms add @fontsource-variable/inter@^5 @phosphor-icons/react@^2
+pnpm --filter @cleanstart/cms add geist@^1 @phosphor-icons/react@^2
 ```
 
 Expected: `apps/cms/package.json` lists the four packages; `pnpm-lock.yaml` updated.
@@ -142,6 +154,8 @@ export default {
 `apps/cms/src/app/(studio)/layout.tsx`:
 
 ```tsx
+import { GeistMono } from 'geist/font/mono';
+import { GeistSans } from 'geist/font/sans';
 import type { Metadata } from 'next';
 import type { ReactElement, ReactNode } from 'react';
 
@@ -152,9 +166,11 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, googleBot: { index: false, follow: false } },
 };
 
+// next/font serves the Geist files from /_next/static/media (same origin, so the CSP allows them)
+// and exposes them as --font-geist-sans and --font-geist-mono, which tokens.css reads.
 export default function StudioRootLayout({ children }: { readonly children: ReactNode }): ReactElement {
   return (
-    <html lang="en" data-theme="dark" suppressHydrationWarning>
+    <html lang="en" data-theme="dark" className={`${GeistSans.variable} ${GeistMono.variable}`} suppressHydrationWarning>
       <body>{children}</body>
     </html>
   );
@@ -185,10 +201,10 @@ diff <(grep -v studio /tmp/studio-css-before.txt | awk '{print $1}') <(grep -v s
 
 Expected: `0` lines starting with `<` once Studio-only chunks are excluded. If any Payload chunk hash changed, open both versions, find the difference, and scope the plugin (for example by moving the import to a CSS file with `@source none` or restricting via `@tailwindcss/postcss` `base`) until the count is 0.
 
-Then start the dev server (reuse the running one per the dev server policy) and run:
+Then check the routes against the dev server. `STUDIO_LAB` is read by the server, so it must be set when the server starts, not on the `curl` line. If the running dev server was started without it, start a fresh one with `STUDIO_LAB=true pnpm --filter @cleanstart/cms dev` (on a free port per the dev server policy), then run:
 
 ```bash
-STUDIO_LAB=true curl -s -o /dev/null -w '%{http_code}\n' http://localhost:3000/studio/lab
+curl -s -o /dev/null -w '%{http_code}\n' http://localhost:3000/studio/lab
 curl -s -o /dev/null -w '%{http_code}\n' http://localhost:3000/admin/login
 ```
 
@@ -209,6 +225,7 @@ git commit -m "feat(studio): T0.2 Tailwind, fonts and Studio root layout"
 - Create: `apps/cms/src/studio/theme/theme-script.ts`
 - Create: `apps/cms/src/studio/theme/theme-script.test.ts`
 - Create: `apps/cms/src/studio/theme/ThemeProvider.tsx`
+- Create: `apps/cms/src/studio/theme/IconDefaults.tsx`
 - Modify: `apps/cms/src/app/(studio)/layout.tsx`
 
 - [ ] **Step 1: Write the failing test for theme resolution**
@@ -291,32 +308,33 @@ Expected: PASS (5 tests).
 /* Studio design tokens. Source of truth: docs/studio/01-DESIGN-SYSTEM.md.
    Theme-independent values first, then one block per theme. Radius and type
    sizes live in the Tailwind @theme in studio.css. Shadows are named
-   --elevation-* here and exposed to Tailwind as shadow-popover and shadow-dialog.
+   --elevation-* here and exposed to Tailwind as shadow-raised, shadow-sheet,
+   shadow-popover and shadow-dialog.
    Theme blocks also match any [data-theme] container so the lab can show
    both themes side by side. */
 
 :root {
-  --font-ui: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-code: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-ui: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-code: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --control-sm: 24px;
   --control-md: 28px;
   --control-lg: 32px;
   --space-label: 6px;
 
-  --sidebar-width: 240px;
+  --sidebar-width: 232px;
   --sidebar-collapsed-width: 56px;
+  --sheet-inset: 8px;
   --rail-width: 320px;
   --rail-min-width: 280px;
   --rail-max-width: 440px;
-  --content-max-width: 720px;
-  --page-header-height: 48px;
-  --document-header-height: 52px;
+  --content-max-width: 680px;
+  --document-header-height: 54px;
 
   --duration-fast: 100ms;
   --duration-base: 150ms;
   --duration-slow: 200ms;
-  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
 
   --z-sticky: 10;
@@ -327,80 +345,95 @@ Expected: PASS (5 tests).
   --z-toast: 60;
   --z-palette: 70;
 
-  --accent: #06c7f2;
-  --on-accent: #04212a;
+  /* Sign-in brand panel only: the website's dark band, the same in both themes. */
+  --brand-band: linear-gradient(180deg, #151021 0%, #131e8f 62.5%, #471ec0 100%);
+  --brand-glow-violet: rgb(106 61 240 / 0.45);
+  --brand-glow-blue: rgb(7 110 255 / 0.35);
+  --brand-glow-pink: rgb(223 155 255 / 0.25);
+  --brand-ink: #131e8f;
+  --brand-accent: #df9bff;
+  --brand-chip: rgb(255 255 255 / 0.08);
+  --brand-chip-text: rgb(255 255 255 / 0.78);
 }
 
 :root[data-theme='dark'],
 [data-theme='dark'] {
   color-scheme: dark;
-  --bg-canvas: #0e0f11;
-  --bg-surface: #141518;
-  --bg-raised: #1a1b1f;
-  --bg-overlay: #1e1f24;
+  --bg-canvas: #0b0b0c;
+  --bg-surface: #141415;
+  --bg-raised: #19191b;
+  --bg-overlay: #1f1f22;
   --bg-hover: rgb(255 255 255 / 0.04);
   --bg-active: rgb(255 255 255 / 0.07);
   --border-subtle: rgb(255 255 255 / 0.06);
   --border: rgb(255 255 255 / 0.1);
   --border-strong: rgb(255 255 255 / 0.16);
   --border-control: #6b6d75;
-  --text-primary: #ececee;
-  --text-secondary: #a0a1a8;
-  --text-tertiary: #8b8c95;
+  --text-primary: #f2f2f3;
+  --text-secondary: #a5a5ab;
+  --text-tertiary: #929299;
   --text-disabled: #4d4e55;
-  --accent-hover: #4dd5f7;
-  --accent-text: #4dd5f7;
-  --accent-soft: rgb(6 199 242 / 0.12);
-  --focus-ring: #4dd5f7;
+  --primary: #f2f2f3;
+  --primary-hover: #ffffff;
+  --on-primary: #121214;
+  --accent: #8ea0ff;
+  --accent-hover: #a5b3ff;
+  --on-accent: #0b0b0c;
+  --accent-text: #8ea0ff;
+  --accent-soft: rgb(142 160 255 / 0.12);
+  --focus-ring: #8ea0ff;
   --success: #3ecf8e;
   --success-soft: rgb(62 207 142 / 0.12);
   --warning: #f5a524;
   --warning-soft: rgb(245 165 36 / 0.12);
   --danger: #f2555a;
   --danger-soft: rgb(242 85 90 / 0.12);
-  --elevation-popover: 0 0 0 1px var(--border), 0 8px 24px rgb(0 0 0 / 0.4);
-  --elevation-dialog: 0 0 0 1px var(--border), 0 24px 64px rgb(0 0 0 / 0.55);
-  --backdrop: rgb(0 0 0 / 0.55);
+  --elevation-raised: 0 0 0 1px var(--border-subtle), 0 1px 2px rgb(0 0 0 / 0.3);
+  --elevation-sheet: 0 0 0 1px rgb(255 255 255 / 0.06), inset 0 1px 0 rgb(255 255 255 / 0.04), 0 24px 56px -20px rgb(0 0 0 / 0.7);
+  --elevation-popover: 0 0 0 1px rgb(255 255 255 / 0.09), inset 0 1px 0 rgb(255 255 255 / 0.06), 0 24px 64px -12px rgb(0 0 0 / 0.75);
+  --elevation-dialog: 0 0 0 1px rgb(255 255 255 / 0.09), 0 32px 80px -16px rgb(0 0 0 / 0.8);
+  --backdrop: rgb(9 9 11 / 0.6);
+  --glass: rgb(30 30 35 / 0.72);
 }
 
 :root[data-theme='light'],
 [data-theme='light'] {
   color-scheme: light;
-  --bg-canvas: #ffffff;
-  --bg-surface: #fafafa;
-  --bg-raised: #ffffff;
+  --bg-canvas: #efefed;
+  --bg-surface: #ffffff;
+  --bg-raised: #f8f8f7;
   --bg-overlay: #ffffff;
-  --bg-hover: rgb(15 16 20 / 0.04);
-  --bg-active: rgb(15 16 20 / 0.07);
-  --border-subtle: rgb(15 16 20 / 0.06);
-  --border: rgb(15 16 20 / 0.1);
-  --border-strong: rgb(15 16 20 / 0.16);
-  --border-control: #8a8c94;
-  --text-primary: #17181c;
-  --text-secondary: #5d5e66;
-  --text-tertiary: #6b6c75;
+  --bg-hover: rgb(18 18 20 / 0.04);
+  --bg-active: rgb(18 18 20 / 0.07);
+  --border-subtle: rgb(18 18 20 / 0.06);
+  --border: rgb(18 18 20 / 0.1);
+  --border-strong: rgb(18 18 20 / 0.16);
+  --border-control: #82848c;
+  --text-primary: #121214;
+  --text-secondary: #4d4d53;
+  --text-tertiary: #68686e;
   --text-disabled: #b4b5bb;
-  --accent-hover: #04a3c8;
-  --accent-text: #03758f;
-  --accent-soft: rgb(6 199 242 / 0.1);
-  --focus-ring: #03819f;
-  --success: #15803d;
-  --success-soft: rgb(62 207 142 / 0.12);
-  --warning: #b45309;
-  --warning-soft: rgb(245 165 36 / 0.12);
-  --danger: #dc2626;
-  --danger-soft: rgb(242 85 90 / 0.12);
-  --elevation-popover: 0 0 0 1px var(--border), 0 8px 24px rgb(15 16 20 / 0.1), 0 1px 2px rgb(15 16 20 / 0.06);
-  --elevation-dialog: 0 0 0 1px var(--border), 0 24px 64px rgb(15 16 20 / 0.16);
-  --backdrop: rgb(15 16 20 / 0.3);
-}
-
-@font-face {
-  font-family: "JetBrains Mono";
-  src: url("/fonts/jetbrains-mono.woff2") format("woff2");
-  font-weight: 100 800;
-  font-style: normal;
-  font-display: swap;
+  --primary: #121214;
+  --primary-hover: #2a2a2e;
+  --on-primary: #ffffff;
+  --accent: #3451e6;
+  --accent-hover: #2a44cf;
+  --on-accent: #ffffff;
+  --accent-text: #3451e6;
+  --accent-soft: rgb(52 81 230 / 0.07);
+  --focus-ring: #3451e6;
+  --success: #12733a;
+  --success-soft: rgb(18 115 58 / 0.09);
+  --warning: #9a4a06;
+  --warning-soft: rgb(154 74 6 / 0.09);
+  --danger: #c01c1c;
+  --danger-soft: rgb(192 28 28 / 0.08);
+  --elevation-raised: 0 0 0 1px var(--border-subtle), 0 1px 3px rgb(18 18 20 / 0.06);
+  --elevation-sheet: 0 0 0 1px rgb(18 18 20 / 0.06), 0 1px 2px rgb(18 18 20 / 0.04), 0 16px 40px -18px rgb(18 18 20 / 0.18);
+  --elevation-popover: 0 0 0 1px rgb(18 18 20 / 0.08), 0 2px 6px rgb(18 18 20 / 0.06), 0 18px 48px -12px rgb(18 18 20 / 0.22);
+  --elevation-dialog: 0 0 0 1px rgb(18 18 20 / 0.08), 0 32px 80px -20px rgb(18 18 20 / 0.3);
+  --backdrop: rgb(239 239 237 / 0.55);
+  --glass: rgb(255 255 255 / 0.72);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -418,11 +451,11 @@ Replace `apps/cms/src/studio/styles/studio.css` with:
 
 ```css
 @import "tailwindcss";
-@import "@fontsource-variable/inter";
 @import "./tokens.css";
 
 /* Remove Tailwind's defaults so only Studio tokens produce utilities.
-   bg-blue-500, text-sm, rounded-xl and shadow-lg no longer exist here. */
+   bg-blue-500, text-sm and shadow-lg no longer exist here. rounded-xl
+   still works because the Studio radius scale below redefines it. */
 @theme {
   --color-*: initial;
   --font-*: initial;
@@ -432,24 +465,29 @@ Replace `apps/cms/src/studio/styles/studio.css` with:
   --inset-shadow-*: initial;
   --drop-shadow-*: initial;
 
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  /* Plain white and black, used only on the sign-in brand panel (Task 1.11). */
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  --radius-xs: 5px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
   --radius-full: 9999px;
 
-  --text-display: 24px;
-  --text-display--line-height: 32px;
+  --text-display: 28px;
+  --text-display--line-height: 34px;
   --text-display--font-weight: 600;
-  --text-display--letter-spacing: -0.02em;
+  --text-display--letter-spacing: -0.03em;
   --text-title: 18px;
   --text-title--line-height: 26px;
   --text-title--font-weight: 600;
-  --text-title--letter-spacing: -0.015em;
+  --text-title--letter-spacing: -0.02em;
   --text-heading: 14px;
   --text-heading--line-height: 20px;
   --text-heading--font-weight: 600;
-  --text-heading--letter-spacing: -0.005em;
+  --text-heading--letter-spacing: -0.01em;
   --text-body: 13px;
   --text-body--line-height: 20px;
   --text-body--font-weight: 400;
@@ -462,23 +500,34 @@ Replace `apps/cms/src/studio/styles/studio.css` with:
   --text-micro: 11px;
   --text-micro--line-height: 14px;
   --text-micro--font-weight: 500;
-  --text-micro--letter-spacing: 0.01em;
   --text-mono: 12px;
   --text-mono--line-height: 18px;
-  --text-doc-title: 28px;
-  --text-doc-title--line-height: 36px;
+  --text-mono--letter-spacing: -0.01em;
+  --text-doc-title: 40px;
+  --text-doc-title--line-height: 46px;
   --text-doc-title--font-weight: 600;
+  --text-doc-title--letter-spacing: -0.035em;
+  --text-doc-lead: 17px;
+  --text-doc-lead--line-height: 27px;
   --text-doc-body: 16px;
-  --text-doc-body--line-height: 26px;
+  --text-doc-body--line-height: 27px;
+  --text-doc-body--letter-spacing: -0.003em;
   --text-doc-h2: 22px;
   --text-doc-h2--line-height: 30px;
   --text-doc-h2--font-weight: 600;
+  --text-doc-h2--letter-spacing: -0.02em;
   --text-doc-h3: 18px;
   --text-doc-h3--line-height: 26px;
   --text-doc-h3--font-weight: 600;
+  --text-doc-h3--letter-spacing: -0.015em;
   --text-doc-h4: 16px;
   --text-doc-h4--line-height: 24px;
   --text-doc-h4--font-weight: 600;
+  --text-doc-h4--letter-spacing: -0.01em;
+  --text-brand: 76px;
+  --text-brand--line-height: 92px;
+  --text-brand--font-weight: 600;
+  --text-brand--letter-spacing: -0.045em;
 }
 
 @theme inline {
@@ -499,6 +548,9 @@ Replace `apps/cms/src/studio/styles/studio.css` with:
   --color-fg-muted: var(--text-secondary);
   --color-fg-subtle: var(--text-tertiary);
   --color-fg-disabled: var(--text-disabled);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-on-primary: var(--on-primary);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-on-accent: var(--on-accent);
@@ -512,7 +564,10 @@ Replace `apps/cms/src/studio/styles/studio.css` with:
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
   --color-backdrop: var(--backdrop);
+  --color-glass: var(--glass);
 
+  --shadow-raised: var(--elevation-raised);
+  --shadow-sheet: var(--elevation-sheet);
   --shadow-popover: var(--elevation-popover);
   --shadow-dialog: var(--elevation-dialog);
 }
@@ -520,7 +575,6 @@ Replace `apps/cms/src/studio/styles/studio.css` with:
 @layer base {
   html {
     font-family: var(--font-ui);
-    font-feature-settings: "cv11", "ss01";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background: var(--bg-canvas);
@@ -552,7 +606,7 @@ Replace `apps/cms/src/studio/styles/studio.css` with:
 @import "./primitives.css";
 ```
 
-`@font-face` for Inter comes from `@fontsource-variable/inter`, which Next serves from `/_next/static/media` (same origin, allowed by `font-src 'self'`).
+There is no `@font-face` here: `geist/font/sans` and `geist/font/mono` are `next/font/local` wrappers, so Next emits the faces and serves the files from `/_next/static/media` (same origin, allowed by `font-src 'self'`). The root layout puts their `variable` classes on `<html>`, which defines `--font-geist-sans` and `--font-geist-mono`.
 
 - [ ] **Step 7: Create the theme provider**
 
@@ -591,11 +645,14 @@ const readStored = (): ThemePreference => {
 export function ThemeProvider({ children }: { readonly children: ReactNode }): ReactElement {
   const [preference, setPreferenceState] = useState<ThemePreference>('system');
   const [systemLight, setSystemLight] = useState(false);
+  // The bootstrap script already set data-theme; writing before the stored choice is read would flash.
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     setPreferenceState(readStored());
     const query = window.matchMedia('(prefers-color-scheme: light)');
     setSystemLight(query.matches);
+    setReady(true);
     const onChange = (event: MediaQueryListEvent): void => setSystemLight(event.matches);
     query.addEventListener('change', onChange);
     return () => query.removeEventListener('change', onChange);
@@ -604,8 +661,9 @@ export function ThemeProvider({ children }: { readonly children: ReactNode }): R
   const resolved = resolveTheme(preference, systemLight);
 
   useEffect(() => {
+    if (!ready) return;
     document.documentElement.dataset.theme = resolved;
-  }, [resolved]);
+  }, [ready, resolved]);
 
   const setPreference = useCallback((next: ThemePreference): void => {
     setPreferenceState(next);
@@ -627,14 +685,35 @@ export const useTheme = (): ThemeContextValue => {
 };
 ```
 
+`apps/cms/src/studio/theme/IconDefaults.tsx` (D-2: Light weight everywhere, set once):
+
+```tsx
+'use client';
+
+import { IconContext } from '@phosphor-icons/react';
+import type { IconProps } from '@phosphor-icons/react';
+import type { ReactElement, ReactNode } from 'react';
+
+const DEFAULTS: IconProps = { weight: 'light', size: 16 };
+
+export function IconDefaults({ children }: { readonly children: ReactNode }): ReactElement {
+  return <IconContext.Provider value={DEFAULTS}>{children}</IconContext.Provider>;
+}
+```
+
+Icons imported from `@phosphor-icons/react` read this context. Icons imported from `@phosphor-icons/react/dist/ssr` (server components) cannot read context, so every SSR icon in Studio passes `weight="light"` itself.
+
 - [ ] **Step 8: Wire the bootstrap and provider into the root layout**
 
 Replace `apps/cms/src/app/(studio)/layout.tsx` with:
 
 ```tsx
+import { GeistMono } from 'geist/font/mono';
+import { GeistSans } from 'geist/font/sans';
 import type { Metadata } from 'next';
 import type { ReactElement, ReactNode } from 'react';
 
+import { IconDefaults } from '@/studio/theme/IconDefaults';
 import { ThemeProvider } from '@/studio/theme/ThemeProvider';
 import { THEME_BOOTSTRAP } from '@/studio/theme/theme-script';
 
@@ -647,13 +726,15 @@ export const metadata: Metadata = {
 
 export default function StudioRootLayout({ children }: { readonly children: ReactNode }): ReactElement {
   return (
-    <html lang="en" data-theme="dark" suppressHydrationWarning>
+    <html lang="en" data-theme="dark" className={`${GeistSans.variable} ${GeistMono.variable}`} suppressHydrationWarning>
       <head>
         {/* biome-ignore lint/security/noDangerouslySetInnerHtml: static theme bootstrap with no user input */}
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       </head>
       <body className="bg-canvas text-fg">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <IconDefaults>{children}</IconDefaults>
+        </ThemeProvider>
       </body>
     </html>
   );
@@ -662,7 +743,7 @@ export default function StudioRootLayout({ children }: { readonly children: Reac
 
 - [ ] **Step 9: Verify**
 
-Run the test again (Step 4). Build (`pnpm --filter @cleanstart/cms build`). With `STUDIO_LAB=true`, open `/studio/lab` in the browser pane at 1440×900, toggle the OS theme (or set `localStorage['studio-theme']`), reload, and confirm the background switches between `#0e0f11` and `#ffffff` with no flash.
+Run the test again (Step 4). Build (`pnpm --filter @cleanstart/cms build`). With `STUDIO_LAB=true`, open `/studio/lab` in the browser pane at 1440×900, toggle the OS theme (or set `localStorage['studio-theme']`), reload, and confirm the window background switches between `#0b0b0c` and `#efefed` with no flash, and that text renders in Geist (DevTools, Computed, rendered font).
 
 - [ ] **Step 10: Commit**
 
@@ -720,6 +801,10 @@ const contrast = (a: string, b: string): number => {
 const SURFACES = ['bg-canvas', 'bg-surface', 'bg-raised', 'bg-overlay'] as const;
 const TEXT_AA = ['text-primary', 'text-secondary', 'text-tertiary', 'accent-text', 'success', 'warning', 'danger'] as const;
 const NON_TEXT_3 = ['border-control', 'focus-ring'] as const;
+const FILLS = [
+  ['on-primary', 'primary'],
+  ['on-accent', 'accent'],
+] as const;
 
 describe.each(['dark', 'light'] as const)('%s theme contrast', (theme) => {
   const t = themeBlock(theme);
@@ -741,17 +826,19 @@ describe.each(['dark', 'light'] as const)('%s theme contrast', (theme) => {
       });
     }
   }
-});
 
-it('on-accent text on the accent fill is at least 4.5:1', () => {
-  expect(contrast('#04212a', '#06c7f2')).toBeGreaterThanOrEqual(4.5);
+  for (const [text, fill] of FILLS) {
+    it(`${text} on ${fill} is at least 4.5:1`, () => {
+      expect(contrast(get(text), get(fill))).toBeGreaterThanOrEqual(4.5);
+    });
+  }
 });
 ```
 
 - [ ] **Step 2: Run it**
 
 Run: `pnpm --filter @cleanstart/cms exec vitest run src/studio/styles/tokens.test.ts`
-Expected: PASS (73 tests). The values were pre-checked on 2026-10-16; the smallest margin is `--border-control` on dark `--bg-overlay` at 3.19:1. Any later token change that fails this test is fixed in `tokens.css` and `01-DESIGN-SYSTEM.md` together.
+Expected: PASS (76 tests). The values were pre-checked on 2026-10-19; the smallest margins are `--border-control` on dark `--bg-overlay` at 3.19:1, `--border-control` on the light window at 3.24:1 and `--text-tertiary` on the light window at 4.81:1. Any later token change that fails this test is fixed in `tokens.css` and `01-DESIGN-SYSTEM.md` together.
 
 - [ ] **Step 3: Commit**
 
@@ -797,11 +884,11 @@ git commit -m "test(studio): T0.4 token contrast checks"
   .cs-btn:hover { border-color: var(--border-strong); }
   .cs-btn:active { transform: scale(0.98); }
   .cs-btn:disabled { opacity: 0.5; pointer-events: none; }
-  .cs-btn--primary { background: var(--accent); border-color: transparent; color: var(--on-accent); }
-  .cs-btn--primary:hover { background: var(--accent-hover); }
+  .cs-btn--primary { background: var(--primary); border-color: transparent; color: var(--on-primary); }
+  .cs-btn--primary:hover { background: var(--primary-hover); }
   .cs-btn--subtle { background: transparent; border-color: transparent; color: var(--text-secondary); }
   .cs-btn--subtle:hover { background: var(--bg-hover); color: var(--text-primary); }
-  .cs-btn--danger { background: var(--danger); border-color: transparent; color: var(--bg-canvas); }
+  .cs-btn--danger { background: var(--danger); border-color: transparent; color: var(--bg-surface); }
   .cs-btn--danger:hover { filter: brightness(1.08); }
 
   /* Dialog and Drawer: native <dialog>, top layer. */
@@ -875,8 +962,9 @@ git commit -m "test(studio): T0.4 token contrast checks"
   }
   .cs-drawer__header-actions { display: flex; gap: 8px; }
 
+  /* Drawer.tsx puts the side and size classes on the panel, not the dialog. */
   .cs-drawer { margin: 0 0 0 auto; height: 100vh; }
-  .cs-drawer--left { margin: 0 auto 0 0; }
+  .cs-drawer:has(.cs-drawer--left) { margin: 0 auto 0 0; }
   .cs-drawer__panel {
     display: flex;
     flex-direction: column;
@@ -884,10 +972,10 @@ git commit -m "test(studio): T0.4 token contrast checks"
     background: var(--bg-overlay);
     box-shadow: var(--elevation-dialog);
   }
-  .cs-drawer--sm .cs-drawer__panel { width: min(400px, 100vw); }
-  .cs-drawer--md .cs-drawer__panel { width: min(560px, 100vw); }
-  .cs-drawer--lg .cs-drawer__panel { width: min(720px, 100vw); }
-  .cs-drawer--xl .cs-drawer__panel { width: min(960px, 100vw); }
+  .cs-drawer__panel.cs-drawer--sm { width: min(400px, 100vw); }
+  .cs-drawer__panel.cs-drawer--md { width: min(560px, 100vw); }
+  .cs-drawer__panel.cs-drawer--lg { width: min(720px, 100vw); }
+  .cs-drawer__panel.cs-drawer--xl { width: min(960px, 100vw); }
   .cs-drawer[open] .cs-drawer__panel { animation: studio-drawer-in var(--duration-slow) var(--ease-out); }
 
   /* Popover, menu, tooltip */
@@ -902,6 +990,8 @@ git commit -m "test(studio): T0.4 token contrast checks"
   }
   .cs-popover { padding: 8px; }
   .cs-menu { min-width: 200px; padding: 4px; }
+  /* ContextMenu opens at the pointer; a narrower floor keeps it compact. */
+  .cs-menu--context { min-width: 180px; }
   .cs-menu__item {
     display: flex;
     align-items: center;
@@ -1003,6 +1093,7 @@ git commit -m "test(studio): T0.4 token contrast checks"
     color: var(--text-secondary);
   }
   .cs-datetime__clear:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .cs-datetime--has-clear .cs-datetime__trigger { padding-right: 32px; }
   /* The panel renders inside a positioned .cs-popover, which supplies the
      surface, shadow and entry animation. */
   .cs-datetime__panel { width: 280px; padding: 4px; }
@@ -1160,7 +1251,7 @@ grep -oE "\.cs-[a-z0-9_-]+(__[a-z0-9-]+)?(--[a-z0-9-]+)?" apps/cms/src/studio/st
 comm -23 /tmp/emitted.txt /tmp/styled.txt
 ```
 
-Expected output: only the dynamic stems `cs-dialog--`, `cs-drawer--`, `cs-spinner--`, `cs-toast--` (their concrete variants are styled) and `cs-toast-region` children that need no rule. Any other name means a missing rule: add it.
+Expected output: exactly four lines, the dynamic stems `cs-dialog--`, `cs-drawer--`, `cs-spinner--` and `cs-toast--` (their concrete variants are styled). `cs-datetime--has-clear` (DateTimePicker.tsx) and `cs-menu--context` (ContextMenu.tsx) are concrete classes and must not appear; the stylesheet above styles both. Any other name means a missing rule: add it.
 
 - [ ] **Step 3: Commit**
 
@@ -1202,9 +1293,9 @@ describe('Button', () => {
     expect(out).toContain('disabled=""');
   });
 
-  it('uses the accent fill only for the primary variant', () => {
-    expect(html(<Button variant="primary">Publish</Button>)).toContain('bg-accent');
-    expect(html(<Button>Cancel</Button>)).not.toContain('bg-accent');
+  it('uses the ink fill only for the primary variant', () => {
+    expect(html(<Button variant="primary">Publish</Button>)).toContain('bg-primary');
+    expect(html(<Button>Cancel</Button>)).not.toContain('bg-primary');
   });
 });
 
@@ -1227,7 +1318,7 @@ describe('Badge and StatusBadge', () => {
 
   it('pairs every status with a word, not only a colour', () => {
     expect(html(<StatusBadge status="published" />)).toContain('Published');
-    expect(html(<StatusBadge status="changed" />)).toContain('Published, changes');
+    expect(html(<StatusBadge status="changed" />)).toContain('Unpublished changes');
     expect(html(<StatusBadge status="draft" />)).toContain('Draft');
   });
 });
@@ -1316,7 +1407,7 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { cn } from '../lib/cn';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
-export type ButtonSize = 'sm' | 'md' | 'lg';
+export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl';
 
 export type ButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> & {
   readonly variant?: ButtonVariant;
@@ -1327,8 +1418,8 @@ export type ButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'childre
 };
 
 const VARIANT: Record<ButtonVariant, string> = {
-  primary: 'bg-accent text-on-accent hover:bg-accent-hover',
-  secondary: 'bg-raised text-fg border border-line hover:border-line-strong',
+  primary: 'bg-primary text-on-primary hover:bg-primary-hover',
+  secondary: 'bg-surface text-fg border border-line shadow-raised hover:bg-raised',
   ghost: 'text-fg-muted hover:bg-hover hover:text-fg',
   danger: 'bg-raised text-danger border border-line hover:bg-danger-soft',
 };
@@ -1337,6 +1428,8 @@ const SIZE: Record<ButtonSize, string> = {
   sm: 'h-6 gap-1 px-2 text-small',
   md: 'h-7 gap-1.5 px-2.5 text-body-strong',
   lg: 'h-8 gap-2 px-3 text-body-strong',
+  // Sign-in screens only (design system §7.1).
+  xl: 'h-10 gap-2 px-4 text-body-strong',
 };
 
 export const buttonClass = (variant: ButtonVariant, size: ButtonSize, extra?: string): string =>
@@ -1446,7 +1539,7 @@ import { cn } from '../lib/cn';
 export type BadgeTone = 'neutral' | 'accent' | 'success' | 'warning' | 'danger';
 
 const TONE: Record<BadgeTone, string> = {
-  neutral: 'bg-active text-fg-muted',
+  neutral: 'border border-line-subtle bg-raised text-fg-muted',
   accent: 'bg-accent-soft text-accent-fg',
   success: 'bg-success-soft text-success',
   warning: 'bg-warning-soft text-warning',
@@ -1476,7 +1569,7 @@ export function Badge({
     <span
       data-tone={tone}
       className={cn(
-        'inline-flex items-center gap-1.5 whitespace-nowrap rounded-xs px-1.5 text-micro',
+        'inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2 text-micro',
         size === 'sm' ? 'h-5' : 'h-6',
         TONE[tone],
       )}
@@ -1491,24 +1584,24 @@ export function Badge({
 `apps/cms/src/studio/ui/StatusBadge.tsx`:
 
 ```tsx
+import { CheckCircle, CircleDashed, CircleHalf, Clock } from '@phosphor-icons/react/dist/ssr';
 import type { ReactElement } from 'react';
-
-import type { BadgeTone } from './Badge';
 
 export type DocumentStatus = 'draft' | 'published' | 'changed' | 'scheduled';
 
 const LABEL: Record<DocumentStatus, string> = {
   draft: 'Draft',
   published: 'Published',
-  changed: 'Published, changes',
+  changed: 'Unpublished changes',
   scheduled: 'Scheduled',
 };
 
-const DOT_TONE: Record<DocumentStatus, BadgeTone> = {
-  draft: 'neutral',
-  published: 'success',
-  changed: 'warning',
-  scheduled: 'accent',
+// Design system §2.4: a glyph plus a word, never colour alone. Published is the one fill-weight icon.
+const GLYPH: Record<DocumentStatus, ReactElement> = {
+  draft: <CircleDashed size={14} weight="light" aria-hidden="true" className="shrink-0 text-fg-subtle" />,
+  changed: <CircleHalf size={14} weight="light" aria-hidden="true" className="shrink-0 text-warning" />,
+  published: <CheckCircle size={14} weight="fill" aria-hidden="true" className="shrink-0 text-success" />,
+  scheduled: <Clock size={14} weight="light" aria-hidden="true" className="shrink-0 text-accent-fg" />,
 };
 
 export function StatusBadge({
@@ -1516,18 +1609,15 @@ export function StatusBadge({
   detail,
 }: {
   readonly status: DocumentStatus;
-  readonly detail?: string;
+  readonly detail?: string | undefined;
 }): ReactElement {
   return (
     <span className="inline-flex items-center gap-1.5 text-small text-fg-muted">
-      <span aria-hidden="true" className={`size-1.5 rounded-full ${dotClass(DOT_TONE[status])}`} />
+      {GLYPH[status]}
       {detail ? `${LABEL[status]} · ${detail}` : LABEL[status]}
     </span>
   );
 }
-
-const dotClass = (tone: BadgeTone): string =>
-  ({ neutral: 'bg-fg-subtle', accent: 'bg-accent', success: 'bg-success', warning: 'bg-warning', danger: 'bg-danger' })[tone];
 ```
 
 `apps/cms/src/studio/ui/Banner.tsx`:
@@ -1548,10 +1638,10 @@ const STYLE: Record<BannerTone, string> = {
 };
 
 const ICON: Record<BannerTone, ReactElement> = {
-  info: <Info size={16} aria-hidden="true" />,
-  success: <CheckCircle size={16} aria-hidden="true" />,
-  warning: <Warning size={16} aria-hidden="true" />,
-  danger: <WarningOctagon size={16} aria-hidden="true" />,
+  info: <Info size={16} weight="light" aria-hidden="true" />,
+  success: <CheckCircle size={16} weight="light" aria-hidden="true" />,
+  warning: <Warning size={16} weight="light" aria-hidden="true" />,
+  danger: <WarningOctagon size={16} weight="light" aria-hidden="true" />,
 };
 
 export function Banner({
@@ -1593,15 +1683,16 @@ export function Field({
 }: {
   readonly id: string;
   readonly label: string;
-  readonly description?: string;
-  readonly error?: string;
+  readonly description?: string | undefined;
+  readonly error?: string | undefined;
   readonly optional?: boolean;
   readonly hideLabel?: boolean;
   readonly children: ReactNode;
 }): ReactElement {
+  // The label id lets controls that are not labelable (a radio group) use aria-labelledby.
   return (
     <div className="flex flex-col gap-(--space-label)">
-      <label htmlFor={id} className={hideLabel ? 'sr-only' : 'flex items-baseline gap-2 text-body-strong text-fg'}>
+      <label id={`${id}-label`} htmlFor={id} className={hideLabel ? 'sr-only' : 'flex items-baseline gap-2 text-body-strong text-fg'}>
         {label}
         {optional ? <span className="text-small text-fg-subtle">Optional</span> : null}
       </label>
@@ -1613,7 +1704,7 @@ export function Field({
       {children}
       {error ? (
         <p id={`${id}-error`} className="flex items-center gap-1.5 text-small text-danger">
-          <WarningCircle size={14} aria-hidden="true" />
+          <WarningCircle size={14} weight="light" aria-hidden="true" />
           {error}
         </p>
       ) : null}
@@ -1621,7 +1712,10 @@ export function Field({
   );
 }
 
-export const describedBy = (id: string, opts: { description?: string; error?: string }): string | undefined =>
+export const describedBy = (
+  id: string,
+  opts: { readonly description?: string | undefined; readonly error?: string | undefined },
+): string | undefined =>
   [opts.description ? `${id}-description` : null, opts.error ? `${id}-error` : null].filter(Boolean).join(' ') ||
   undefined;
 ```
@@ -1646,7 +1740,7 @@ export const controlClass = (invalid: boolean, extra?: string): string =>
 
 export type TextInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'prefix'> & {
   readonly invalid?: boolean;
-  readonly describedBy?: string;
+  readonly describedBy?: string | undefined;
   readonly prefix?: ReactNode;
   readonly suffix?: ReactNode;
 };
@@ -1686,7 +1780,7 @@ import { controlClass } from './TextInput';
 
 export type TextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   readonly invalid?: boolean;
-  readonly describedBy?: string;
+  readonly describedBy?: string | undefined;
 };
 
 // Grows with its content from 3 rows to 12 using field-sizing; browsers without
@@ -1711,32 +1805,45 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
 `apps/cms/src/studio/ui/Checkbox.tsx`:
 
 ```tsx
+import { Check } from '@phosphor-icons/react/dist/ssr';
 import { forwardRef } from 'react';
 import type { InputHTMLAttributes } from 'react';
 
 export type CheckboxProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> & {
   readonly label: string;
-  readonly description?: string;
+  readonly description?: string | undefined;
   readonly invalid?: boolean;
+  /** Keeps the label for assistive tech but hides it, for row-selection boxes in tables. */
+  readonly hideLabel?: boolean;
 };
 
+// The check is a Phosphor icon over the native input, so it follows --on-primary in both themes
+// (a data-URI image cannot read a CSS variable).
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox(
-  { id, label, description, invalid = false, ...rest },
+  { id, label, description, invalid = false, hideLabel = false, ...rest },
   ref,
 ) {
   return (
     <div className="flex items-start gap-2">
-      <input
-        ref={ref}
-        id={id}
-        type="checkbox"
-        aria-invalid={invalid || undefined}
-        aria-describedby={description ? `${id}-description` : undefined}
-        className="mt-0.5 size-4 shrink-0 cursor-pointer appearance-none rounded-xs border border-line-control bg-raised checked:border-accent checked:bg-accent checked:[background-image:url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 8.5l2.5 2.5L12 5.5' fill='none' stroke='%2304212a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E&quot;)] disabled:cursor-not-allowed disabled:opacity-50"
-        {...rest}
-      />
+      <span className="relative mt-0.5 flex size-4 shrink-0">
+        <input
+          ref={ref}
+          id={id}
+          type="checkbox"
+          aria-invalid={invalid || undefined}
+          aria-describedby={description ? `${id}-description` : undefined}
+          className="peer size-4 cursor-pointer appearance-none rounded-xs border border-line-control bg-raised checked:border-primary checked:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+          {...rest}
+        />
+        <Check
+          size={12}
+          weight="bold"
+          aria-hidden="true"
+          className="pointer-events-none absolute left-0.5 top-0.5 hidden text-on-primary peer-checked:block"
+        />
+      </span>
       <div className="flex flex-col">
-        <label htmlFor={id} className="cursor-pointer text-body text-fg">
+        <label htmlFor={id} className={hideLabel ? 'sr-only' : 'cursor-pointer text-body text-fg'}>
           {label}
         </label>
         {description ? (
@@ -1783,7 +1890,7 @@ export function Switch({
         onClick={() => onChange(!checked)}
         className={cn(
           'relative h-5 w-8 shrink-0 rounded-full border transition-colors duration-(--duration-fast)',
-          checked ? 'border-accent bg-accent' : 'border-line-control bg-raised',
+          checked ? 'border-primary bg-primary' : 'border-line-control bg-raised',
           'disabled:cursor-not-allowed disabled:opacity-50',
         )}
       >
@@ -1791,7 +1898,7 @@ export function Switch({
           aria-hidden="true"
           className={cn(
             'absolute top-0.5 size-3.5 rounded-full transition-transform duration-(--duration-fast)',
-            checked ? 'translate-x-3.5 bg-on-accent' : 'translate-x-0.5 bg-fg-muted',
+            checked ? 'translate-x-3.5 bg-on-primary' : 'translate-x-0.5 bg-fg-muted',
           )}
         />
       </button>
@@ -1808,63 +1915,61 @@ export function Switch({
 ```tsx
 'use client';
 
-import type { KeyboardEvent, ReactElement } from 'react';
-
-import { cn } from '../lib/cn';
+import type { ReactElement } from 'react';
 
 export type RadioOption = { readonly value: string; readonly label: string };
 
-// Segmented control for 2 to 4 short options. Arrow keys move and select,
-// matching the WAI-ARIA radio group pattern.
+// Segmented control for 2 to 4 short options. The inputs are native radios
+// (visually hidden), so arrow keys move focus and select, as the WAI-ARIA
+// radio group pattern requires, without custom key handling.
 export function RadioGroup({
+  id,
   name,
   label,
+  labelledBy,
   options,
   value,
   onChange,
   disabled = false,
 }: {
+  readonly id?: string | undefined;
   readonly name: string;
   readonly label: string;
+  /** Id of a visible label element. When set it replaces the aria-label. */
+  readonly labelledBy?: string | undefined;
   readonly options: readonly RadioOption[];
   readonly value: string | null;
   readonly onChange: (next: string) => void;
   readonly disabled?: boolean;
 }): ReactElement {
-  const index = options.findIndex((o) => o.value === value);
-  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {
-    const step = event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : event.key === 'ArrowLeft' || event.key === 'ArrowUp' ? -1 : 0;
-    if (step === 0) return;
-    event.preventDefault();
-    const next = options[(Math.max(index, 0) + step + options.length) % options.length];
-    if (next) onChange(next.value);
-  };
   return (
     <div
+      id={id}
       role="radiogroup"
-      aria-label={label}
-      onKeyDown={onKeyDown}
+      aria-label={labelledBy ? undefined : label}
+      aria-labelledby={labelledBy}
       className="inline-flex h-7 rounded-sm border border-line-control bg-raised p-0.5"
     >
-      {options.map((option, i) => {
-        const selected = option.value === value;
+      {options.map((option) => {
+        const optionId = `${name}-${option.value}`;
         return (
-          <button
+          <label
             key={option.value}
-            type="button"
-            role="radio"
-            name={name}
-            aria-checked={selected}
-            tabIndex={selected || (index === -1 && i === 0) ? 0 : -1}
-            disabled={disabled}
-            onClick={() => onChange(option.value)}
-            className={cn(
-              'rounded-xs px-2.5 text-body-strong transition-colors duration-(--duration-fast)',
-              selected ? 'bg-active text-fg' : 'text-fg-muted hover:text-fg',
-            )}
+            htmlFor={optionId}
+            className="inline-flex cursor-pointer items-center rounded-xs px-2.5 text-body-strong text-fg-muted transition-colors duration-(--duration-fast) hover:text-fg has-checked:bg-active has-checked:text-fg has-focus-visible:outline-2 has-focus-visible:outline-focus has-disabled:cursor-not-allowed has-disabled:opacity-50"
           >
+            <input
+              id={optionId}
+              type="radio"
+              name={name}
+              value={option.value}
+              checked={option.value === value}
+              disabled={disabled}
+              onChange={() => onChange(option.value)}
+              className="sr-only"
+            />
             {option.label}
-          </button>
+          </label>
         );
       })}
     </div>
@@ -1885,14 +1990,14 @@ import type { ReactElement } from 'react';
 import { cn } from '../lib/cn';
 import { controlClass } from './TextInput';
 
-export type SelectOption = { readonly value: string; readonly label: string; readonly description?: string };
+export type SelectOption = { readonly value: string; readonly label: string; readonly description?: string | undefined };
 
 type Common = {
   readonly id: string;
   readonly options: readonly SelectOption[];
-  readonly placeholder?: string;
+  readonly placeholder?: string | undefined;
   readonly invalid?: boolean;
-  readonly describedBy?: string;
+  readonly describedBy?: string | undefined;
   readonly disabled?: boolean;
   readonly clearable?: boolean;
 };
@@ -1917,7 +2022,7 @@ export function Select(props: SingleProps | MultiProps): ReactElement {
     const q = query.trim().toLowerCase();
     return options
       .filter((o) => !q || o.label.toLowerCase().includes(q))
-      .map((o) => ({ value: o.value, label: o.label, description: o.description }));
+      .map((o) => ({ value: o.value, label: o.label, ...(o.description ? { description: o.description } : {}) }));
   }, [options, query]);
 
   const pick = (value: string): void => {
@@ -1956,10 +2061,11 @@ export function Select(props: SingleProps | MultiProps): ReactElement {
           <X size={12} aria-hidden="true" />
         </button>
       ) : null}
-      <Popover open={open} onClose={() => setOpen(false)} anchorRef={triggerRef} matchAnchorWidth role="dialog" ariaLabel="Choose an option">
+      {/* Popover's role defaults to 'dialog'; passing role="dialog" would trip Biome's useSemanticElements. */}
+      <Popover open={open} onClose={() => setOpen(false)} anchorRef={triggerRef} matchAnchorWidth ariaLabel="Choose an option">
         <Combobox
           options={visible}
-          value={props.multiple ? undefined : props.value ?? undefined}
+          value={props.multiple ? null : props.value}
           onChange={(value) => pick(String(value))}
           query={query}
           onQueryChange={setQuery}
@@ -2035,6 +2141,7 @@ export function Section({
 ```tsx
 'use client';
 
+import { useRef } from 'react';
 import type { KeyboardEvent, ReactElement } from 'react';
 
 import { cn } from '../lib/cn';
@@ -2047,44 +2154,56 @@ export function Tabs({
   active,
   onChange,
   idPrefix,
+  hasPanels = false,
 }: {
   readonly label: string;
   readonly items: readonly TabItem[];
   readonly active: string;
   readonly onChange: (id: string) => void;
   readonly idPrefix: string;
+  /** Set when the caller renders `${idPrefix}-panel-${id}` tab panels; only then do tabs point at them. */
+  readonly hasPanels?: boolean;
 }): ReactElement {
+  const buttons = useRef(new Map<string, HTMLButtonElement>());
+  // Roving tabindex: the newly selected tab must also take focus.
+  const select = (target: TabItem | undefined): void => {
+    if (!target) return;
+    onChange(target.id);
+    buttons.current.get(target.id)?.focus();
+  };
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {
     const index = items.findIndex((t) => t.id === active);
     const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
     if (event.key === 'Home' || event.key === 'End') {
       event.preventDefault();
-      const target = event.key === 'Home' ? items[0] : items[items.length - 1];
-      if (target) onChange(target.id);
+      select(event.key === 'Home' ? items[0] : items[items.length - 1]);
       return;
     }
     if (step === 0) return;
     event.preventDefault();
-    const next = items[(index + step + items.length) % items.length];
-    if (next) onChange(next.id);
+    select(items[(index + step + items.length) % items.length]);
   };
   return (
-    <div role="tablist" aria-label={label} onKeyDown={onKeyDown} className="flex gap-4 border-b border-line-subtle">
+    <div role="tablist" aria-label={label} onKeyDown={onKeyDown} className="inline-flex gap-0.5 rounded-md bg-active p-0.5">
       {items.map((tab) => {
         const selected = tab.id === active;
         return (
           <button
             key={tab.id}
+            ref={(node) => {
+              if (node) buttons.current.set(tab.id, node);
+              else buttons.current.delete(tab.id);
+            }}
             id={`${idPrefix}-tab-${tab.id}`}
             type="button"
             role="tab"
             aria-selected={selected}
-            aria-controls={`${idPrefix}-panel-${tab.id}`}
+            aria-controls={hasPanels ? `${idPrefix}-panel-${tab.id}` : undefined}
             tabIndex={selected ? 0 : -1}
             onClick={() => onChange(tab.id)}
             className={cn(
-              '-mb-px flex h-7 items-center gap-1.5 border-b-2 text-body-strong transition-colors duration-(--duration-base)',
-              selected ? 'border-accent text-fg' : 'border-transparent text-fg-muted hover:text-fg',
+              'flex h-6 items-center gap-1.5 rounded-sm px-3 text-body-strong transition-[background-color,color] duration-(--duration-base) ease-(--ease-out)',
+              selected ? 'bg-surface text-fg shadow-raised' : 'text-fg-muted hover:text-fg',
             )}
           >
             {tab.label}
@@ -2197,10 +2316,10 @@ export function PageHeader({
   readonly actions?: ReactNode;
 }): ReactElement {
   return (
-    <header className="sticky top-0 z-(--z-header) flex h-(--page-header-height) items-center justify-between gap-4 border-b border-line-subtle bg-canvas px-6">
-      <div className="flex min-w-0 items-center gap-2">
+    <header className="flex items-end justify-between gap-4 px-7 pb-3 pt-6">
+      <div className="min-w-0">
         {crumbs.length > 0 ? (
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-body text-fg-muted">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-small text-fg-subtle">
             {crumbs.map((crumb) => (
               <span key={crumb.label} className="flex items-center gap-1">
                 {crumb.href ? (
@@ -2210,15 +2329,17 @@ export function PageHeader({
                 ) : (
                   crumb.label
                 )}
-                <CaretRight size={12} aria-hidden="true" />
+                <CaretRight size={10} weight="light" aria-hidden="true" />
               </span>
             ))}
           </nav>
         ) : null}
-        <h1 className="truncate text-title text-fg">{title}</h1>
-        {typeof count === 'number' ? (
-          <span className="tabular rounded-xs bg-active px-1.5 text-micro text-fg-muted">{count.toLocaleString('en-US')}</span>
-        ) : null}
+        <h1 className="flex min-w-0 items-baseline gap-2.5 text-display text-fg">
+          <span className="truncate">{title}</span>
+          {typeof count === 'number' ? (
+            <span className="tabular text-body-strong text-fg-subtle">{count.toLocaleString('en-US')}</span>
+          ) : null}
+        </h1>
       </div>
       {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
     </header>
@@ -2253,9 +2374,9 @@ export { TextInput, controlClass } from './TextInput';
 
 Notes for the implementer:
 
-- `@phosphor-icons/react/dist/ssr` is the server-safe entry; client components import from `@phosphor-icons/react`. Check both paths exist in the installed version before using them (`ls node_modules/@phosphor-icons/react/dist`).
-- Confirm the `Popover` props used in `Select.tsx` (`matchAnchorWidth`, `role`, `ariaLabel`) against `packages/ui/src/primitives/Popover.tsx`; they are listed in `docs/studio/research/design-inputs.md` §1.
-- The only arbitrary values allowed are the ones above (`scale-[0.98]`, the checkbox check-mark image, `[field-sizing:content]`, `[animation-duration:1.6s]`, the `Kbd` inset line). Task 1.5 adds a check that rejects new arbitrary colours and font sizes.
+- `@phosphor-icons/react/dist/ssr` is the server-safe entry; client components import from `@phosphor-icons/react`. Check both paths exist in the installed version before using them (`ls node_modules/@phosphor-icons/react/dist`). Client icons get the Light weight from `IconDefaults`; every SSR icon passes `weight="light"` (or `"fill"` for the Published glyph) itself, because SSR icons cannot read context.
+- Confirm the `Popover` props used in `Select.tsx` (`matchAnchorWidth`, `ariaLabel`; `role` is left at its `'dialog'` default) against `packages/ui/src/primitives/Popover.tsx`; they are listed in `docs/studio/research/design-inputs.md` §1.
+- The only arbitrary values allowed are the ones above (`scale-[0.98]`, `[field-sizing:content]`, `[animation-duration:1.6s]`, the `Kbd` inset line). Task 1.5 adds a check that rejects new arbitrary colours and font sizes.
 
 - [ ] **Step 5: Make the shared Tooltip keep its child's ref**
 
@@ -2306,6 +2427,8 @@ git commit -m "feat(studio): T0.6 Studio UI kit"
 ```tsx
 import type { ReactElement, ReactNode } from 'react';
 
+// Each demo renders once per theme, so ids and radio names take a per-frame
+// prefix; otherwise labels, aria references and radio groups would collide.
 export function LabFrame({
   id,
   title,
@@ -2315,9 +2438,9 @@ export function LabFrame({
 }: {
   readonly id: string;
   readonly title: string;
-  readonly keyboard?: string;
-  readonly stacked?: boolean;
-  readonly children: ReactNode;
+  readonly keyboard?: string | undefined;
+  readonly stacked?: boolean | undefined;
+  readonly children: (prefix: string) => ReactNode;
 }): ReactElement {
   return (
     <section id={id} className="flex scroll-mt-6 flex-col gap-3">
@@ -2329,7 +2452,7 @@ export function LabFrame({
         {(['dark', 'light'] as const).map((theme) => (
           <div key={theme} data-theme={theme} className="rounded-md border border-line bg-canvas p-6 text-fg">
             <p className="mb-4 text-micro text-fg-subtle">{theme === 'dark' ? 'Dark' : 'Light'}</p>
-            {children}
+            {children(`${id}-${theme}`)}
           </div>
         ))}
       </div>
@@ -2406,7 +2529,9 @@ export function ButtonsDemo(): ReactElement {
   );
 }
 
-export function InputsDemo(): ReactElement {
+type DemoProps = { readonly prefix: string };
+
+export function InputsDemo({ prefix }: DemoProps): ReactElement {
   const [single, setSingle] = useState<string | null>('draft');
   const [multi, setMulti] = useState<string[]>(['security']);
   const [radio, setRadio] = useState<string | null>('internal');
@@ -2414,24 +2539,24 @@ export function InputsDemo(): ReactElement {
   const [date, setDate] = useState<string | null>('2026-10-16T09:30:00.000Z');
   return (
     <div className="flex max-w-md flex-col gap-5">
-      <Field id="lab-title" label="Title" description="Shown in search results and the page heading.">
-        <TextInput id="lab-title" defaultValue="Zero CVE container images" describedBy={describedBy('lab-title', { description: 'x' })} />
+      <Field id={`${prefix}-title`} label="Title" description="Shown in search results and the page heading.">
+        <TextInput id={`${prefix}-title`} defaultValue="Zero CVE container images" describedBy={describedBy(`${prefix}-title`, { description: 'x' })} />
       </Field>
-      <Field id="lab-slug" label="Slug" error="Slug is already used by ‘Zero CVE images’. Choose a different slug.">
-        <TextInput id="lab-slug" defaultValue="zero-cve-images" invalid describedBy="lab-slug-error" className="font-code" />
+      <Field id={`${prefix}-slug`} label="Slug" error="Slug is already used by ‘Zero CVE images’. Choose a different slug.">
+        <TextInput id={`${prefix}-slug`} defaultValue="zero-cve-images" invalid describedBy={`${prefix}-slug-error`} className="font-code" />
       </Field>
-      <Field id="lab-ro" label="Word count">
-        <TextInput id="lab-ro" defaultValue="1,240" readOnly />
+      <Field id={`${prefix}-ro`} label="Word count">
+        <TextInput id={`${prefix}-ro`} defaultValue="1,240" readOnly />
       </Field>
-      <Field id="lab-disabled" label="Disabled field" optional>
-        <TextInput id="lab-disabled" placeholder="Not editable" disabled />
+      <Field id={`${prefix}-disabled`} label="Disabled field" optional>
+        <TextInput id={`${prefix}-disabled`} placeholder="Not editable" disabled />
       </Field>
-      <Field id="lab-abstract" label="Abstract" optional>
-        <Textarea id="lab-abstract" placeholder="One or two sentences that sum up the post." />
+      <Field id={`${prefix}-abstract`} label="Abstract" optional>
+        <Textarea id={`${prefix}-abstract`} placeholder="One or two sentences that sum up the post." />
       </Field>
-      <Field id="lab-status" label="Status">
+      <Field id={`${prefix}-status`} label="Status">
         <Select
-          id="lab-status"
+          id={`${prefix}-status`}
           value={single}
           onChange={setSingle}
           options={[
@@ -2440,9 +2565,9 @@ export function InputsDemo(): ReactElement {
           ]}
         />
       </Field>
-      <Field id="lab-categories" label="Categories">
+      <Field id={`${prefix}-categories`} label="Categories">
         <Select
-          id="lab-categories"
+          id={`${prefix}-categories`}
           multiple
           value={multi}
           onChange={setMulti}
@@ -2453,10 +2578,10 @@ export function InputsDemo(): ReactElement {
           ]}
         />
       </Field>
-      <Checkbox id="lab-featured" label="Featured" description="Pin this post at the top of the blog listing." defaultChecked />
-      <Switch id="lab-switch" label="Compact rows" checked={on} onChange={setOn} />
+      <Checkbox id={`${prefix}-featured`} label="Featured" description="Pin this post at the top of the blog listing." defaultChecked />
+      <Switch id={`${prefix}-switch`} label="Compact rows" checked={on} onChange={setOn} />
       <RadioGroup
-        name="lab-mode"
+        name={`${prefix}-mode`}
         label="Registration mode"
         value={radio}
         onChange={setRadio}
@@ -2465,8 +2590,8 @@ export function InputsDemo(): ReactElement {
           { value: 'external', label: 'External' },
         ]}
       />
-      <Field id="lab-date" label="Display date">
-        <DateTimePicker id="lab-date" mode="datetime" value={date} onChange={setDate} timezone="Asia/Kolkata" />
+      <Field id={`${prefix}-date`} label="Display date">
+        <DateTimePicker id={`${prefix}-date`} mode="datetime" value={date} onChange={setDate} timezone="Asia/Kolkata" />
       </Field>
     </div>
   );
@@ -2508,7 +2633,7 @@ export function FeedbackDemo(): ReactElement {
   );
 }
 
-export function StructureDemo(): ReactElement {
+export function StructureDemo({ prefix }: DemoProps): ReactElement {
   const [tab, setTab] = useState('content');
   return (
     <div className="flex flex-col gap-6">
@@ -2522,7 +2647,7 @@ export function StructureDemo(): ReactElement {
       </div>
       <Tabs
         label="Document sections"
-        idPrefix="lab"
+        idPrefix={prefix}
         active={tab}
         onChange={setTab}
         items={[
@@ -2540,7 +2665,7 @@ export function StructureDemo(): ReactElement {
   );
 }
 
-export function OverlaysDemo(): ReactElement {
+export function OverlaysDemo({ prefix }: DemoProps): ReactElement {
   const [dialog, setDialog] = useState(false);
   const [confirm, setConfirm] = useState(false);
   const [drawer, setDrawer] = useState(false);
@@ -2556,8 +2681,8 @@ export function OverlaysDemo(): ReactElement {
         Menu
       </Button>
       <Button onClick={() => toast.push({ tone: 'success', message: 'Draft saved.' })}>Toast</Button>
-      <Dialog open={dialog} onClose={() => setDialog(false)} labelledBy="lab-dialog-title" size="md">
-        <DialogHeader id="lab-dialog-title" title="Share a preview link" onClose={() => setDialog(false)} />
+      <Dialog open={dialog} onClose={() => setDialog(false)} labelledBy={`${prefix}-dialog-title`} size="md">
+        <DialogHeader id={`${prefix}-dialog-title`} title="Share a preview link" onClose={() => setDialog(false)} />
         <DialogBody>
           <p className="text-body text-fg-muted">Anyone with the link can see this draft until it expires.</p>
         </DialogBody>
@@ -2575,8 +2700,8 @@ export function OverlaysDemo(): ReactElement {
         confirmLabel="Delete"
         tone="danger"
       />
-      <Drawer open={drawer} onClose={() => setDrawer(false)} labelledBy="lab-drawer-title" size="md">
-        <DrawerHeader id="lab-drawer-title" title="Export blogs" onClose={() => setDrawer(false)} />
+      <Drawer open={drawer} onClose={() => setDrawer(false)} labelledBy={`${prefix}-drawer-title`} size="md">
+        <DrawerHeader id={`${prefix}-drawer-title`} title="Export blogs" onClose={() => setDrawer(false)} />
         <DrawerBody>
           <p className="text-body text-fg-muted">Choose columns and a date range.</p>
         </DrawerBody>
@@ -2616,7 +2741,7 @@ type LabSection = {
   readonly title: string;
   readonly keyboard?: string;
   readonly stacked?: boolean;
-  readonly render: () => ReactElement;
+  readonly render: (props: { readonly prefix: string }) => ReactElement;
 };
 
 const SECTIONS: readonly LabSection[] = [
@@ -2646,7 +2771,7 @@ export function LabPage(): ReactElement {
         <main className="flex flex-1 flex-col gap-12 p-8">
           {SECTIONS.map(({ id, title, keyboard, stacked, render: Demo }) => (
             <LabFrame key={id} id={id} title={title} keyboard={keyboard} stacked={stacked}>
-              <Demo />
+              {(prefix) => <Demo prefix={prefix} />}
             </LabFrame>
           ))}
         </main>
@@ -2676,6 +2801,8 @@ export default function Lab(): ReactElement {
 - [ ] **Step 5: Verify in the browser pane**
 
 Start or reuse the dev server with `STUDIO_LAB=true`. Open `/studio/lab` at 1440×900. For every section confirm: both themes render, focus rings show on Tab, the date picker opens, dialogs trap focus and close on Esc returning focus to their button, the toast appears bottom-right. Run axe from the browser console (`await import('https://...')` is blocked by CSP, so use the Playwright check in Task 1.17 instead) and record any issue as a fix in this task.
+
+Lab notes: every demo renders once per theme, and each copy gets its own id prefix (`actions-dark`, `actions-light` and so on), so ids never repeat on the page. `DropdownMenu` portals to `document.body`, outside the frame's `data-theme`, so in the light frame its menu shows the page theme. The toast region sits under `ToastProvider`, outside both frames, so toasts also use the page theme. That is accepted for the lab; the real shell has one theme per page.
 
 - [ ] **Step 6: Commit**
 
@@ -2873,8 +3000,10 @@ Add `KeyboardEvent` to the type import from React.
 5. Replace the whole `<div className="cs-datetime__grid">…</div>` block with:
 
 ```tsx
+          {/* biome-ignore lint/a11y/useSemanticElements: ARIA grid pattern for a date picker; a table cannot hold the roving-focus day buttons */}
           <div role="grid" aria-labelledby={monthLabelId} className="cs-datetime__grid" onKeyDown={onGridKeyDown}>
             {chunk(grid, 7).map((week) => (
+              // biome-ignore lint/a11y/useSemanticElements lint/a11y/useFocusableInteractive: ARIA grid row for a date picker; focus lives on the day buttons
               <div role="row" key={isoOf(week[0] as Date)} className="contents">
                 {week.map((d) => {
                   const inMonth = d.getMonth() === anchorMonth.getMonth();
@@ -2883,6 +3012,7 @@ Add `KeyboardEvent` to the type import from React.
                   const today = sameDay(d, new Date());
                   const key = isoOf(d);
                   return (
+                    // biome-ignore lint/a11y/useSemanticElements lint/a11y/useFocusableInteractive: ARIA gridcell for a date picker; its day button takes focus
                     <div role="gridcell" key={key} aria-selected={selected} className="contents">
                       <button
                         ref={(el) => {
@@ -2918,6 +3048,8 @@ Add `KeyboardEvent` to the type import from React.
             ))}
           </div>
 ```
+
+The three `biome-ignore` comments keep the ARIA grid pattern past Biome's `useSemanticElements` and `useFocusableInteractive` rules. The grid's comment is a `{/* */}` JSX comment because it sits among JSX children; the row and cell comments are `//` line comments because they sit inside `.map()` callbacks, where a JSX comment is not valid.
 
 Native buttons already turn Enter and Space into a click, so the day buttons need no key handler. The class `contents` is used as a plain class name; add `.cs-datetime__grid > [role='row'], .cs-datetime__grid [role='gridcell'] { display: contents; }` to both `apps/cms/src/studio/styles/primitives.css` and `apps/cms/src/app/(payload)/styles/_ui-primitives.scss` so the 7-column grid layout is unchanged in both admins.
 
@@ -3145,82 +3277,99 @@ export const LIST_ROWS: readonly FixtureRow[] = [
 `apps/cms/src/studio/lab/compositions/ListComposition.tsx`:
 
 ```tsx
-import { Columns, DotsThree, FunnelSimple, MagnifyingGlass, Plus } from '@phosphor-icons/react';
+import { DotsThree, MagnifyingGlass, Plus, SlidersHorizontal, X } from '@phosphor-icons/react/dist/ssr';
 import type { ReactElement } from 'react';
 
-import { Badge, Button, IconButton, PageHeader, StatusBadge, TextInput } from '../../ui';
+import { Badge, Button, Checkbox, IconButton, Kbd, PageHeader, StatusBadge } from '../../ui';
 import { LIST_ROWS } from './fixtures';
 
+// A server component: icons come from the SSR entry and pass weight="light" themselves.
+// The Phase 1 Table layout inside the sheet. The grouped List layout is Phase 5 (02-SCREENS S-10).
 export function ListComposition(): ReactElement {
   return (
-    <div className="overflow-hidden rounded-md border border-line bg-canvas">
-      <PageHeader
-        title="Blogs"
-        count={312}
-        actions={
-          <>
-            <IconButton label="More actions" icon={<DotsThree size={16} aria-hidden="true" />} />
-            <Button variant="primary" icon={<Plus size={14} aria-hidden="true" />}>
-              New blog
+    <div className="rounded-lg bg-canvas p-(--sheet-inset)">
+      <div className="overflow-hidden rounded-lg bg-surface shadow-sheet">
+        <PageHeader
+          title="Blogs"
+          count={312}
+          crumbs={[{ label: 'Content' }]}
+          actions={
+            <>
+              <Button icon={<SlidersHorizontal size={14} weight="light" aria-hidden="true" />}>Display</Button>
+              <IconButton label="More actions" icon={<DotsThree size={16} weight="light" aria-hidden="true" />} />
+              <Button variant="primary" icon={<Plus size={14} weight="light" aria-hidden="true" />}>
+                New blog
+              </Button>
+            </>
+          }
+        />
+        <div className="flex items-center gap-2 px-7 pb-3">
+          <Badge tone="accent" size="md">
+            Author is Ana Ramos
+            <X size={12} weight="light" aria-hidden="true" />
+          </Badge>
+          <Badge size="md">
+            <Plus size={12} weight="light" aria-hidden="true" />
+            Filter
+          </Badge>
+          <div className="flex-1" />
+          <span className="flex h-8 w-56 items-center gap-2 rounded-sm bg-raised px-2.5 text-body text-fg-subtle shadow-raised">
+            <MagnifyingGlass size={14} weight="light" aria-hidden="true" />
+            <span className="flex-1">Search blogs</span>
+            <Kbd keys={['/']} />
+          </span>
+        </div>
+        <div className="px-3 pb-3">
+          <table className="w-full table-fixed border-collapse text-body">
+            <thead>
+              <tr className="h-8 text-left text-micro text-fg-muted">
+                <th className="w-10 rounded-l-md bg-raised px-3" aria-label="Select" />
+                <th className="bg-raised px-3">Title</th>
+                <th className="w-44 bg-raised px-3">Authors</th>
+                <th className="w-32 bg-raised px-3">Category</th>
+                <th className="w-48 bg-raised px-3">Status</th>
+                <th className="w-32 bg-raised px-3 text-right">Published</th>
+                <th className="w-28 rounded-r-md bg-raised px-3 text-right">Updated</th>
+              </tr>
+            </thead>
+            <tbody>
+              {LIST_ROWS.map((row) => (
+                <tr key={row.id} className="group h-11 hover:bg-hover">
+                  <td className="rounded-l-sm px-3">
+                    <span className="opacity-0 group-hover:opacity-100">
+                      <Checkbox id={`comp-row-${row.id}`} label={`Select ${row.title}`} hideLabel />
+                    </span>
+                  </td>
+                  <td className="truncate px-3 text-body-strong text-fg">{row.title}</td>
+                  <td className="truncate px-3 text-fg-muted">
+                    {row.authors[0]}
+                    {row.authors.length > 1 ? ` +${row.authors.length - 1}` : ''}
+                  </td>
+                  <td className="px-3">
+                    <Badge>{row.category}</Badge>
+                  </td>
+                  <td className="px-3">
+                    <StatusBadge status={row.status} detail={row.status === 'scheduled' ? 'Oct 18, 9:00 AM' : undefined} />
+                  </td>
+                  <td className="tabular px-3 text-right text-fg-subtle">{row.published ?? ''}</td>
+                  <td className="tabular rounded-r-sm px-3 text-right text-fg-subtle">{row.updated}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <footer className="flex items-center justify-between px-7 py-3 text-small text-fg-subtle">
+          <span className="tabular">1 to 25 of 312</span>
+          <div className="flex gap-1">
+            <Button size="sm" variant="ghost" disabled>
+              Previous
             </Button>
-          </>
-        }
-      />
-      <div className="flex items-center gap-2 border-b border-line-subtle px-6 py-2">
-        <div className="w-64">
-          <TextInput aria-label="Search blogs" placeholder="Search blogs" prefix={<MagnifyingGlass size={14} aria-hidden="true" />} />
-        </div>
-        <Button size="md" variant="ghost" icon={<FunnelSimple size={14} aria-hidden="true" />}>
-          Filter
-        </Button>
-        <Badge>Status is Draft</Badge>
-        <div className="flex-1" />
-        <IconButton label="Columns" icon={<Columns size={16} aria-hidden="true" />} />
+            <Button size="sm" variant="ghost">
+              Next
+            </Button>
+          </div>
+        </footer>
       </div>
-      <table className="w-full table-fixed border-collapse text-body">
-        <thead className="bg-surface">
-          <tr className="h-8 text-left text-micro text-fg-muted">
-            <th className="w-10 px-3" aria-label="Select" />
-            <th className="px-3">Title</th>
-            <th className="w-44 px-3">Authors</th>
-            <th className="w-32 px-3">Category</th>
-            <th className="w-44 px-3">Status</th>
-            <th className="w-32 px-3 text-right">Published</th>
-            <th className="w-28 px-3 text-right">Updated</th>
-          </tr>
-        </thead>
-        <tbody>
-          {LIST_ROWS.map((row) => (
-            <tr key={row.id} className="h-10 border-t border-line-subtle hover:bg-hover">
-              <td className="px-3">
-                <input type="checkbox" aria-label={`Select ${row.title}`} className="size-4" />
-              </td>
-              <td className="truncate px-3 text-fg">{row.title}</td>
-              <td className="truncate px-3 text-fg-muted">
-                {row.authors[0]}
-                {row.authors.length > 1 ? ` +${row.authors.length - 1}` : ''}
-              </td>
-              <td className="truncate px-3 text-fg-muted">{row.category}</td>
-              <td className="px-3">
-                <StatusBadge status={row.status} detail={row.status === 'scheduled' ? 'Oct 18, 9:00 AM' : undefined} />
-              </td>
-              <td className="tabular px-3 text-right text-fg-muted">{row.published ?? ''}</td>
-              <td className="tabular px-3 text-right text-fg-muted">{row.updated}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <footer className="flex items-center justify-between border-t border-line-subtle px-6 py-2 text-small text-fg-muted">
-        <span className="tabular">1 to 25 of 312</span>
-        <div className="flex gap-1">
-          <Button size="sm" variant="ghost" disabled>
-            Previous
-          </Button>
-          <Button size="sm" variant="ghost">
-            Next
-          </Button>
-        </div>
-      </footer>
     </div>
   );
 }
@@ -3231,78 +3380,120 @@ export function ListComposition(): ReactElement {
 `apps/cms/src/studio/lab/compositions/EditComposition.tsx`:
 
 ```tsx
-import { CaretDown, DotsThree, Eye, SidebarSimple } from '@phosphor-icons/react';
+'use client';
+
+import { CalendarBlank, CaretDown, CaretRight, DotsThree, Eye, LinkSimple, Plus, SidebarSimple, Tag } from '@phosphor-icons/react';
+import { useState } from 'react';
 import type { ReactElement } from 'react';
 
-import { Banner, Button, Card, Checkbox, Field, IconButton, Section, StatusBadge, TextInput, Textarea, buttonClass } from '../../ui';
+import { Badge, Banner, Button, Checkbox, Field, IconButton, Section, Tabs, TextInput, Textarea, buttonClass } from '../../ui';
 
+// Writing-first edit view inside the sheet: title, lead, property chips, then fields; a tabbed
+// inspector on the right. Property chips and the SEO and Checklist tabs arrive in Phase 4.
 export function EditComposition(): ReactElement {
+  const [tab, setTab] = useState('details');
   return (
-    <div className="overflow-hidden rounded-md border border-line bg-canvas">
-      <header className="flex h-(--document-header-height) items-center justify-between gap-4 border-b border-line-subtle px-6">
-        <div className="flex min-w-0 items-center gap-3">
-          <span className="text-body text-fg-muted">Blogs</span>
-          <span className="truncate text-body-strong text-fg">Zero CVE container images</span>
-          <StatusBadge status="changed" />
-          <span className="text-small text-warning">Unsaved changes</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button icon={<Eye size={14} aria-hidden="true" />}>Preview</Button>
-          <Button>Save draft</Button>
-          <div className="flex">
-            <Button variant="primary" className="rounded-r-none">
-              Publish
+    <div className="rounded-lg bg-canvas p-(--sheet-inset)">
+      <div className="flex flex-col overflow-hidden rounded-lg bg-surface shadow-sheet">
+        <header className="flex h-(--document-header-height) items-center justify-between gap-4 pl-6 pr-3">
+          <div className="flex min-w-0 items-center gap-2 text-body-strong">
+            <span className="text-fg-subtle">Blogs</span>
+            <CaretRight size={12} aria-hidden="true" className="text-fg-subtle" />
+            <span className="truncate text-fg">Zero CVE container images</span>
+            <span className="ml-1 flex items-center gap-1.5 text-small font-normal text-fg-subtle">
+              <span aria-hidden="true" className="size-1.5 rounded-full bg-warning" />
+              Unsaved changes
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Button variant="ghost" icon={<Eye size={14} aria-hidden="true" />}>
+              Preview
             </Button>
-            <button
-              type="button"
-              aria-label="More publish options"
-              className={buttonClass('primary', 'md', 'rounded-l-none border-l border-on-accent/20 px-1.5')}
-            >
-              <CaretDown size={12} aria-hidden="true" />
-            </button>
+            <IconButton label="More actions" icon={<DotsThree aria-hidden="true" />} />
+            <IconButton label="Toggle inspector" icon={<SidebarSimple aria-hidden="true" />} shortcut="⌘." />
+            <div className="flex">
+              <Button variant="primary" className="rounded-r-none">
+                Publish changes
+              </Button>
+              <button
+                type="button"
+                aria-label="More publish options"
+                className={buttonClass('primary', 'md', 'rounded-l-none border-l border-on-primary/20 px-1.5')}
+              >
+                <CaretDown size={12} aria-hidden="true" />
+              </button>
+            </div>
           </div>
-          <IconButton label="Toggle rail" icon={<SidebarSimple size={16} aria-hidden="true" />} shortcut="⌘." />
-          <IconButton label="More actions" icon={<DotsThree size={16} aria-hidden="true" />} />
-        </div>
-      </header>
-      <div className="flex">
-        <div className="min-w-0 flex-1 px-6 py-8">
-          <div className="mx-auto flex max-w-(--content-max-width) flex-col gap-5">
-            <Banner tone="warning">1 issue blocks publishing: Slug is empty.</Banner>
-            <label htmlFor="comp-title" className="sr-only">
-              Title
-            </label>
-            <input
-              id="comp-title"
-              defaultValue="Zero CVE container images: how we keep the count at zero"
-              className="w-full bg-transparent text-doc-title text-fg outline-none placeholder:text-fg-subtle"
-            />
-            <Field id="comp-abstract" label="Abstract" description="One or two sentences. Used as the meta description when none is set.">
-              <Textarea id="comp-abstract" defaultValue="CleanStart rebuilds every image from source each day, so known vulnerabilities never reach your registry." />
-            </Field>
-            <Section title="Body">
-              <div className="min-h-48 rounded-md border border-line p-4 text-doc-body text-fg-muted">The editor arrives in Phase 3.</div>
-            </Section>
+        </header>
+        <div className="flex">
+          <div className="min-w-0 flex-1 px-6 pb-16 pt-2">
+            <div className="mx-auto flex max-w-(--content-max-width) flex-col gap-5">
+              <Banner tone="warning">1 issue blocks publishing: Slug is empty.</Banner>
+              <label htmlFor="comp-title" className="sr-only">
+                Title
+              </label>
+              <input
+                id="comp-title"
+                defaultValue="Zero CVE container images: how we keep the count at zero"
+                className="mt-4 w-full bg-transparent text-doc-title text-fg outline-none placeholder:text-fg-subtle"
+              />
+              <p className="-mt-2 text-doc-lead text-fg-muted">
+                CleanStart rebuilds every image from source each day, so known vulnerabilities never reach your registry.
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                <Badge size="md">Ana Ramos</Badge>
+                <Badge size="md">
+                  <Tag size={12} aria-hidden="true" />
+                  Security
+                </Badge>
+                <Badge size="md">
+                  <CalendarBlank size={12} aria-hidden="true" />
+                  Oct 16, 2026
+                </Badge>
+                <Badge size="md">
+                  <LinkSimple size={12} aria-hidden="true" />
+                  /blog/zero-cve-container-images
+                </Badge>
+                <Badge size="md">
+                  <Plus size={12} aria-hidden="true" />
+                  Property
+                </Badge>
+              </div>
+              <Field id="comp-abstract" label="Abstract" description="One or two sentences. Used as the meta description when none is set.">
+                <Textarea id="comp-abstract" defaultValue="CleanStart rebuilds every image from source each day, so known vulnerabilities never reach your registry." />
+              </Field>
+              <Section title="Body">
+                <div className="min-h-48 rounded-md bg-raised p-4 text-doc-body text-fg-muted">The editor arrives in Phase 3.</div>
+              </Section>
+            </div>
           </div>
-        </div>
-        <aside aria-label="Document settings" className="flex w-(--rail-width) shrink-0 flex-col gap-3 border-l border-line-subtle bg-surface p-4">
-          <Card title="Publishing">
-            <div className="flex flex-col gap-3">
+          <aside aria-label="Document settings" className="flex w-(--rail-width) shrink-0 flex-col gap-5 border-l border-line-subtle bg-surface px-4 pb-4">
+            <div className="pt-1">
+              <Tabs
+                label="Inspector"
+                idPrefix="comp-inspector"
+                items={[
+                  { id: 'details', label: 'Details' },
+                  { id: 'seo', label: 'SEO' },
+                  { id: 'checklist', label: 'Checklist' },
+                ]}
+                active={tab}
+                onChange={setTab}
+              />
+            </div>
+            <Section title="Publishing">
               <Field id="comp-date" label="Display date">
                 <TextInput id="comp-date" defaultValue="Oct 16, 2026" />
               </Field>
               <Checkbox id="comp-featured" label="Featured" />
-            </div>
-          </Card>
-          <Card title="URL">
-            <Field id="comp-slug" label="Slug" error="Slug is required to publish.">
-              <TextInput id="comp-slug" invalid describedBy="comp-slug-error" className="font-code" />
-            </Field>
-          </Card>
-          <Card title="Search appearance">
-            <p className="text-small text-fg-muted">Title 52 of 60 · Description 148 of 160</p>
-          </Card>
-        </aside>
+            </Section>
+            <Section title="URL">
+              <Field id="comp-slug" label="Slug" error="Slug is required to publish.">
+                <TextInput id="comp-slug" invalid describedBy="comp-slug-error" className="font-code" />
+              </Field>
+            </Section>
+          </aside>
+        </div>
       </div>
     </div>
   );
@@ -3323,7 +3514,7 @@ In `apps/cms/src/studio/lab/LabPage.tsx`, import both compositions and append to
 1. Run Gate A for all of Phase 0 (`docs/studio/05-REVIEW-PROTOCOL.md`).
 2. Take screenshots of every lab section at 1440×900 in light and dark, plus the two compositions.
 3. Gate C review by someone who did not build it, against `01-DESIGN-SYSTEM.md` §10.
-4. Product owner reviews the two compositions and signs off below.
+4. Product owner reviews the two compositions against the approved direction B mockups and signs off below.
 
 ```
 Phase 0 sign-off
@@ -3348,6 +3539,8 @@ git commit -m "feat(studio): T0.10 list and edit compositions, Phase 0 sign-off"
 Exit criteria (from the master plan): authors can draft their own content in both admins (Task 1.19), and `jobLocations` and `redirects` are fully editable in Studio, their e2e specs pass, and the boundary and coverage checks are green in CI. Every other collection opens in Studio for builders (behind `STUDIO_SHOW_UNREADY`), with fields whose renderer belongs to a later phase shown as a placeholder that links to the same document in Payload's admin; their values are never touched by a Studio save, because Studio only sends the fields it rendered as editable (Task 1.16).
 
 ### Task 1.1: Test plumbing for server-only modules
+
+Vitest does not read `tsconfig.json` paths, so the aliases Studio code relies on (`@/`, `@payload-config`, `server-only`) are declared here once.
 
 **Files:**
 - Modify: `apps/cms/package.json`
@@ -3375,11 +3568,20 @@ In `apps/cms/vitest.config.ts`, add at the top `import { fileURLToPath } from 'n
 
 ```ts
   resolve: {
-    alias: {
-      'server-only': fileURLToPath(new URL('./src/studio/test/server-only-stub.ts', import.meta.url)),
-    },
+    alias: [
+      { find: 'server-only', replacement: fileURLToPath(new URL('./src/studio/test/server-only-stub.ts', import.meta.url)) },
+      { find: '@payload-config', replacement: fileURLToPath(new URL('./src/payload.config.ts', import.meta.url)) },
+      // A regex, so '@cleanstart/*' and '@payloadcms/*' are left alone.
+      { find: /^@\//, replacement: fileURLToPath(new URL('./src/', import.meta.url)) },
+    ],
   },
 ```
+
+Rules that follow from this:
+
+- Studio code (`src/studio/**`, `src/app/(studio)/**`) may import `@/...` in files that tests load.
+- Code under `src/payload/**` keeps relative imports (`'../admin-logic/conditions'`), as it does today. Payload's own build and the `tsx` scripts do not read these aliases.
+- A test that imports `@payload-config`, directly or through a module it loads, runs the real Payload config, which needs `PAYLOAD_SECRET` and `DATABASE_URI` in the environment. CI sets both in `.github/workflows/ci.yml`. Locally, export them (or run from `apps/cms` with your `.env` loaded) before running such a test.
 
 - [ ] **Step 3: Verify**
 
@@ -3396,19 +3598,20 @@ git commit -m "chore(studio): T1.1 server-only marker and Vitest stub"
 ### Task 1.2: Session
 
 **Files:**
+- Create: `apps/cms/src/studio/lib/next-path.ts`
+- Test: `apps/cms/src/studio/lib/next-path.test.ts`
 - Create: `apps/cms/src/studio/server/session.ts`
-- Test: `apps/cms/src/studio/server/session.test.ts`
 
 - [ ] **Step 1: Write the failing test**
 
-The redirect targets are the part with logic; test them as a pure function.
+The redirect targets are the part with logic. They live in a pure module, so the test never loads `session.ts` (which imports `next/headers` and the Payload config).
 
-`apps/cms/src/studio/server/session.test.ts`:
+`apps/cms/src/studio/lib/next-path.test.ts`:
 
 ```ts
 import { describe, expect, it } from 'vitest';
 
-import { loginRedirectFor, safeNextPath } from './session';
+import { loginRedirectFor, safeNextPath } from './next-path';
 
 describe('safeNextPath', () => {
   it('keeps Studio paths', () => {
@@ -3433,10 +3636,23 @@ describe('loginRedirectFor', () => {
 
 - [ ] **Step 2: Run and see it fail**
 
-Run: `pnpm --filter @cleanstart/cms exec vitest run src/studio/server/session.test.ts`
-Expected: FAIL, cannot find module `./session`.
+Run: `pnpm --filter @cleanstart/cms exec vitest run src/studio/lib/next-path.test.ts`
+Expected: FAIL, cannot find module `./next-path`.
 
 - [ ] **Step 3: Implement**
+
+`apps/cms/src/studio/lib/next-path.ts`:
+
+```ts
+export const safeNextPath = (value: string | null | undefined): string => {
+  if (!value || !value.startsWith('/studio') || value.startsWith('//')) return '/studio';
+  const url = new URL(value, 'https://studio.invalid');
+  if (url.origin !== 'https://studio.invalid' || !url.pathname.startsWith('/studio')) return '/studio';
+  return `${url.pathname}${url.search}`;
+};
+
+export const loginRedirectFor = (path: string): string => `/studio/login?next=${encodeURIComponent(safeNextPath(path))}`;
+```
 
 `apps/cms/src/studio/server/session.ts`:
 
@@ -3450,21 +3666,13 @@ import { type Payload, type SanitizedPermissions, getPayload } from 'payload';
 import { cache } from 'react';
 
 import type { User } from '@/payload-types';
+import { loginRedirectFor } from '@/studio/lib/next-path';
 
 export type StudioSession = {
   readonly payload: Payload;
   readonly user: User;
   readonly permissions: SanitizedPermissions;
 };
-
-export const safeNextPath = (value: string | null | undefined): string => {
-  if (!value || !value.startsWith('/studio') || value.startsWith('//')) return '/studio';
-  const url = new URL(value, 'https://studio.invalid');
-  if (url.origin !== 'https://studio.invalid' || !url.pathname.startsWith('/studio')) return '/studio';
-  return `${url.pathname}${url.search}`;
-};
-
-export const loginRedirectFor = (path: string): string => `/studio/login?next=${encodeURIComponent(safeNextPath(path))}`;
 
 export const getStudioPayload = cache(async (): Promise<Payload> => getPayload({ config }));
 
@@ -3491,7 +3699,7 @@ export const requireSession = async (path: string): Promise<StudioSession> => {
 
 - [ ] **Step 4: Run and see it pass**
 
-Run: `pnpm --filter @cleanstart/cms exec vitest run src/studio/server/session.test.ts`
+Run: `pnpm --filter @cleanstart/cms exec vitest run src/studio/lib/next-path.test.ts`
 Expected: PASS (3 tests).
 
 - [ ] **Step 5: Typecheck**
@@ -3502,7 +3710,7 @@ Expected: exit 0. If `user.collection` is not on the auth result type in this Pa
 - [ ] **Step 6: Commit**
 
 ```bash
-git add apps/cms/src/studio/server/session.ts apps/cms/src/studio/server/session.test.ts
+git add apps/cms/src/studio/lib/next-path.ts apps/cms/src/studio/lib/next-path.test.ts apps/cms/src/studio/server/session.ts
 git commit -m "feat(studio): T1.2 session and safe redirects"
 ```
 
@@ -3572,7 +3780,7 @@ import { APIError, Forbidden, Locked, NotFound, ValidationError } from 'payload'
 
 export type FieldIssue = { readonly path: string; readonly message: string };
 
-export type ActionErrorKind = 'validation' | 'forbidden' | 'not-found' | 'locked' | 'unknown';
+export type ActionErrorKind = 'validation' | 'forbidden' | 'not-found' | 'locked' | 'conflict' | 'unknown';
 
 export type ActionError = {
   readonly kind: ActionErrorKind;
@@ -3587,6 +3795,7 @@ const MESSAGES: Record<ActionErrorKind, string> = {
   forbidden: 'You do not have permission to do that.',
   'not-found': 'This document no longer exists.',
   locked: 'Someone else is editing this document.',
+  conflict: 'This document changed since you opened it.',
   unknown: 'Something went wrong. Try again.',
 };
 
@@ -3620,7 +3829,7 @@ import 'server-only';
 
 import * as Sentry from '@sentry/nextjs';
 import { headers } from 'next/headers';
-import { type Payload, type PayloadRequest, createLocalReq } from 'payload';
+import { type CollectionSlug, type Payload, type PayloadRequest, createLocalReq } from 'payload';
 
 import { type ActionResult, toActionError } from './errors';
 import type { StudioSession } from './session';
@@ -3637,7 +3846,9 @@ type FindByIDArgs = Strip<Parameters<Payload['findByID']>[0]>;
 type CountArgs = Strip<Parameters<Payload['count']>[0]>;
 type CreateArgs = Strip<Parameters<Payload['create']>[0]>;
 type UpdateByIDArgs = Strip<Extract<Parameters<Payload['update']>[0], { id: unknown }>>;
-type DeleteByIDArgs = Strip<Extract<Parameters<Payload['delete']>[0], { id: unknown }>>;
+// Extract<..., { id: unknown }> on Payload's delete options resolves to never, so this one is spelled out.
+// depth has no `| undefined`: Payload's ByIDOptions declares `depth?: number`, which exactOptionalPropertyTypes enforces.
+type DeleteByIDArgs = { readonly collection: CollectionSlug; readonly id: number | string; readonly depth?: number };
 type DuplicateArgs = Strip<Parameters<Payload['duplicate']>[0]>;
 type FindVersionsArgs = Strip<Parameters<Payload['findVersions']>[0]>;
 type RestoreVersionArgs = Strip<Parameters<Payload['restoreVersion']>[0]>;
@@ -3657,7 +3868,7 @@ const buildApi = (payload: Payload, req: PayloadRequest) => {
     count: (args: CountArgs) => payload.count({ ...args, ...as } as Parameters<Payload['count']>[0]),
     create: (args: CreateArgs) => payload.create({ ...args, ...as } as Parameters<Payload['create']>[0]),
     update: (args: UpdateByIDArgs) => payload.update({ ...args, ...asLocked } as Parameters<Payload['update']>[0]),
-    delete: (args: DeleteByIDArgs) => payload.delete({ ...args, ...asLocked } as Parameters<Payload['delete']>[0]),
+    delete: (args: DeleteByIDArgs) => payload.delete({ ...args, ...asLocked }),
     duplicate: (args: DuplicateArgs) => payload.duplicate({ ...args, ...as } as Parameters<Payload['duplicate']>[0]),
     findVersions: (args: FindVersionsArgs) =>
       payload.findVersions({ ...args, ...as } as Parameters<Payload['findVersions']>[0]),
@@ -3715,6 +3926,10 @@ import { describe, expect, it } from 'vitest';
 
 import { collectionCan, fieldCan, globalCan } from './permissions';
 
+// The sanitized shape (payload/dist/utilities/sanitizePermissions.js): a field
+// whose grants are all true becomes `true`, a denied grant is deleted, and a
+// field with nothing granted is removed. A `fields` map that is all true
+// collapses to `true` itself.
 const permissions = {
   canAccessAdmin: true,
   collections: {
@@ -3722,11 +3937,31 @@ const permissions = {
       create: true,
       read: true,
       update: true,
-      fields: { title: { read: true, update: true }, seo: { read: true, fields: { additionalSchema: { read: true } } } },
+      fields: {
+        title: true,
+        seo: { create: true, read: true, update: true, fields: { title: true, additionalSchema: { create: true, read: true } } },
+      },
     },
-    leads: { read: true, fields: {} },
+    redirects: {
+      create: true,
+      read: true,
+      update: true,
+      delete: true,
+      fields: {
+        from: true,
+        to: true,
+        status: true,
+        notes: true,
+        source: { create: true, read: true },
+        hitCount: { create: true, read: true },
+        lastHitAt: { create: true, read: true },
+      },
+    },
+    jobLocations: { create: true, read: true, update: true, delete: true, fields: true },
+    leads: { read: true, fields: true },
+    news: { read: true, create: true, update: { permission: true, where: { createdBy: { equals: 7 } } }, fields: true },
   },
-  globals: { siteSettings: { read: true, fields: {} } },
+  globals: { siteSettings: { read: true, fields: true } },
 } as unknown as SanitizedPermissions;
 
 describe('collectionCan', () => {
@@ -3737,7 +3972,14 @@ describe('collectionCan', () => {
     expect(collectionCan(permissions, 'missing', 'read')).toBe(false);
   });
 
-  it('treats publish as update (getDocumentPermissions.js:30-37)', () => {
+  it('counts a where-scoped grant as granted (D-6 authors)', () => {
+    expect(collectionCan(permissions, 'news', 'update')).toBe(true);
+    expect(collectionCan(permissions, 'news', 'delete')).toBe(false);
+  });
+
+  // A coarse, collection-level hint only. Whether this user may publish a given
+  // document is decided per document with data { _status: 'published' } (09 §2.2).
+  it('treats publish as update at collection level (getDocumentPermissions.js:30-37)', () => {
     expect(collectionCan(permissions, 'blogs', 'publish')).toBe(true);
     expect(collectionCan(permissions, 'leads', 'publish')).toBe(false);
   });
@@ -3750,8 +3992,20 @@ describe('fieldCan', () => {
     expect(fieldCan(permissions.collections?.blogs?.fields, ['seo', 'additionalSchema'], 'read')).toBe(true);
   });
 
-  it('allows fields Payload left unrestricted', () => {
-    expect(fieldCan(permissions.collections?.blogs?.fields, ['abstract'], 'update')).toBe(true);
+  it('allows a field sanitized to true and denies one Payload omitted', () => {
+    expect(fieldCan(permissions.collections?.blogs?.fields, ['seo', 'title'], 'update')).toBe(true);
+    expect(fieldCan(permissions.collections?.jobLocations?.fields, ['name'], 'update')).toBe(true);
+    expect(fieldCan(permissions.collections?.blogs?.fields, ['abstract'], 'read')).toBe(false);
+    expect(fieldCan(permissions.collections?.blogs?.fields, ['abstract'], 'update')).toBe(false);
+  });
+
+  it('keeps the Redirects system fields read-only while from stays editable', () => {
+    const fields = permissions.collections?.redirects?.fields;
+    expect(fieldCan(fields, ['from'], 'update')).toBe(true);
+    for (const name of ['source', 'hitCount', 'lastHitAt']) {
+      expect(fieldCan(fields, [name], 'read')).toBe(true);
+      expect(fieldCan(fields, [name], 'update')).toBe(false);
+    }
   });
 });
 
@@ -3778,17 +4032,16 @@ import type { SanitizedPermissions } from 'payload';
 export type CollectionOperation = 'read' | 'create' | 'update' | 'delete' | 'publish';
 export type GlobalOperation = 'read' | 'update';
 
-type FieldPermissionNode = {
-  readonly read?: boolean;
-  readonly update?: boolean;
-  readonly create?: boolean;
-  readonly fields?: Record<string, FieldPermissionNode>;
-  readonly blocks?: Record<string, { readonly fields?: Record<string, FieldPermissionNode> }>;
-};
-
 type Grants = { readonly [op: string]: unknown };
 
-const granted = (grants: Grants | undefined, op: string): boolean => grants?.[op] === true;
+// An unconditional grant is sanitized to `true`; a grant scoped by a `where`
+// (for example D-6 authors updating only their own drafts) stays
+// `{ permission: true, where }`. Both mean the user may do it for some
+// documents; the document's own check (`docAccessOperation`) decides per row.
+const granted = (grants: Grants | undefined, op: string): boolean => {
+  const grant: unknown = grants?.[op];
+  return grant === true || (typeof grant === 'object' && grant !== null && (grant as { permission?: unknown }).permission === true);
+};
 
 export const collectionCan = (
   permissions: SanitizedPermissions,
@@ -3802,18 +4055,23 @@ export const collectionCan = (
 export const globalCan = (permissions: SanitizedPermissions, slug: string, op: GlobalOperation): boolean =>
   granted(permissions.globals?.[slug] as Grants | undefined, op);
 
-// Sanitized permissions omit a field when it has no field-level access, which
-// means "allowed". A present node with no grant for `op` means "denied".
-export const fieldCan = (
-  fields: Record<string, unknown> | undefined,
-  path: readonly string[],
-  op: 'read' | 'update' | 'create',
-): boolean => {
-  let level = fields as Record<string, FieldPermissionNode> | undefined;
+const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
+
+const opGranted = (grant: unknown): boolean => grant === true || (isRecord(grant) && grant.permission === true);
+
+// Walks Payload's sanitized field permissions (SanitizedFieldsPermissions in
+// payload/dist/auth/types.d.ts). `true` at any level means everything below is
+// allowed. A field missing from an object level had every grant denied, so it
+// is denied. A present node lists only the grants that are true.
+export const fieldCan = (fields: unknown, path: readonly string[], op: 'read' | 'update' | 'create'): boolean => {
+  let level = fields;
   for (const [index, segment] of path.entries()) {
-    const node = level?.[segment];
-    if (!node) return true;
-    if (index === path.length - 1) return node[op] === true;
+    if (level === undefined || level === true) return true;
+    if (!isRecord(level)) return false;
+    const node = level[segment];
+    if (node === true) return true;
+    if (!isRecord(node)) return false;
+    if (index === path.length - 1) return opGranted(node[op]);
     if (node.read !== true) return false;
     level = node.fields;
   }
@@ -3824,18 +4082,18 @@ export const fieldCan = (
 - [ ] **Step 4: Run and see it pass**
 
 Run: `pnpm --filter @cleanstart/cms exec vitest run src/studio/server/permissions.test.ts`
-Expected: PASS (5 tests).
+Expected: PASS (7 tests).
 
 - [ ] **Step 5: Confirm the sanitized shape against a real user**
 
-The "omitted means allowed" rule matches how Payload sanitizes permissions (it strips fields whose grants all equal the collection's). Confirm it once against real data before relying on it:
+The rules in `fieldCan` follow `payload/dist/utilities/sanitizePermissions.js`: a field whose grants are all true becomes `true`, a false grant is deleted, an emptied field is removed (so an omitted field is denied), and a `fields` map that is all true becomes `true`. Confirm it once against real data before relying on it:
 
 ```bash
 cd apps/cms && pnpm exec tsx --env-file=.env -e "
 import config from './src/payload.config';
 import { getPayload, createLocalReq, getAccessResults } from 'payload';
 const p = await getPayload({ config });
-const { docs } = await p.find({ collection: 'users', where: { roles: { contains: 'editor' } }, limit: 1, overrideAccess: true });
+const { docs } = await p.find({ collection: 'users', where: { roles: { in: ['editor'] } }, limit: 1, overrideAccess: true });
 const req = await createLocalReq({ user: { ...docs[0], collection: 'users' } as never }, p);
 const perms = await getAccessResults({ req });
 console.log(JSON.stringify({ blogs: perms.collections?.blogs, users: perms.collections?.users?.fields }, null, 1).slice(0, 2000));
@@ -3843,7 +4101,7 @@ process.exit(0);
 "
 ```
 
-Expected: `blogs` has `create`, `read`, `update`, `delete` true and `fields.seo.fields.additionalSchema` without `update` (editor cannot write it, `fields/seo.ts:375-390`); `users.fields.roles` without `update`. If the shape differs (for example grants are objects `{ permission: true }`), update `granted` and `fieldCan` and their tests to match before moving on.
+Expected: `blogs` has `create`, `read`, `update`, `delete` true and `fields.seo.fields.additionalSchema` is an object without `update` (editor cannot write it, `fields/seo.ts:375-390`); fields the editor fully controls print as `true`; `users.fields.roles` is an object without `update`. If the shape differs, update `granted` and `fieldCan` and their tests to match before moving on.
 
 - [ ] **Step 6: Commit**
 
@@ -4003,10 +4261,13 @@ How Studio finds a function's key:
 - **Validators** cannot be found by identity alone, because Payload wraps every field without a custom `validate` in its own default validator (`payload/dist/fields/config/sanitize.js:153-166`). So the registry holds the custom ones, and a source test proves every `validate:` in the schema points at a registered function.
 
 **Files:**
+- Create: `apps/cms/src/payload/admin-logic/field-helpers.ts` (browser-safe constants the conditions use)
 - Create: `apps/cms/src/payload/admin-logic/conditions.ts`
 - Create: `apps/cms/src/payload/admin-logic/validators.ts` (pure, browser-safe)
-- Create: `apps/cms/src/payload/admin-logic/validators.server.ts` (server-only entries)
+- Create: `apps/cms/src/payload/admin-logic/validator-registry.ts` (pure and server entries; never imported from client code)
 - Create: `apps/cms/src/payload/admin-logic/registry.test.ts`
+- Modify: `apps/cms/src/payload/fields/slug.ts` (named slug validators)
+- Modify: `apps/cms/scripts/check-studio-boundaries.ts` (client import rule for the registry)
 - Modify: every file in Appendix A and Appendix B
 
 - [ ] **Step 1: Regenerate the site lists**
@@ -4032,7 +4293,7 @@ import { describe, expect, it } from 'vitest';
 
 import { CONDITION_KEYS, conditions } from './conditions';
 import { pureValidators } from './validators';
-import { VALIDATOR_REGISTRY, validatorKeyOf } from './validators.server';
+import { VALIDATOR_REGISTRY, validatorKeyOf } from './validator-registry';
 
 const PAYLOAD_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SCAN = ['collections', 'globals', 'fields', 'blocks', 'lib'];
@@ -4083,7 +4344,44 @@ describe('validators', () => {
 Run: `pnpm --filter @cleanstart/cms exec vitest run src/payload/admin-logic/registry.test.ts`
 Expected: FAIL (modules missing).
 
-- [ ] **Step 3: Create the registry modules**
+- [ ] **Step 3: Move the helpers the conditions depend on**
+
+Some conditions call constants and predicates that live in their collection file: `VISIBLE_LABEL_TYPES`, `PLACEHOLDER_TYPES` and `VALIDATION_TYPES` (`collections/Forms.ts:10-12`, Appendix A rows 10, 12 and 15), `DISPATCHING_KINDS` and `isDispatching` (`collections/Integrations.ts:68-72` and `85-88`, rows 26 to 28) and `isImage` (`collections/Media.ts:37`, rows 37 to 39). Move them first, so the conditions can move without reaching back into a collection file (which would pull server code into the browser bundle).
+
+`apps/cms/src/payload/admin-logic/field-helpers.ts`:
+
+```ts
+// Constants and predicates that field conditions share with their collections.
+// Moved from collections/Forms.ts, Integrations.ts and Media.ts (ADR-6).
+// Browser-safe: no server imports.
+
+export const VISIBLE_LABEL_TYPES = ['text', 'email', 'tel', 'textarea', 'select', 'checkbox', 'consent'];
+export const PLACEHOLDER_TYPES = ['text', 'email', 'textarea'];
+export const VALIDATION_TYPES = ['text', 'email', 'textarea'];
+
+// Which integration kinds subscribe to outbound events (and therefore need routing).
+export const DISPATCHING_KINDS: ReadonlySet<string> = new Set(['teamsWorkflow', 'genericWebhook', 'hubspotCrm']);
+
+export const isDispatching = (sibling: unknown): boolean => {
+  const kind = (sibling as { kind?: string } | null)?.kind;
+  return typeof kind === 'string' && DISPATCHING_KINDS.has(kind);
+};
+
+// Takes unknown because conditions type siblingData as Record<string, unknown>.
+// Same result as the old Boolean(mimeType?.startsWith('image/')) for every input it got.
+export const isImage = (mimeType: unknown): boolean => typeof mimeType === 'string' && mimeType.startsWith('image/');
+```
+
+Then, in each collection, delete the local definitions and import them back (relative imports, as everywhere in `src/payload`):
+
+- `collections/Forms.ts`: delete lines 10 to 12 and add `import { PLACEHOLDER_TYPES, VALIDATION_TYPES, VISIBLE_LABEL_TYPES } from '../admin-logic/field-helpers';`.
+- `collections/Integrations.ts`: delete `DISPATCHING_KINDS` (lines 68 to 72) and `isDispatching` (lines 85 to 88) and add `import { DISPATCHING_KINDS, isDispatching } from '../admin-logic/field-helpers';`. The `export { ACTIVE_KIND_OPTIONS, RESERVED_KIND_OPTIONS, DISPATCHING_KINDS };` line at the end of the file keeps working as a re-export. Nothing else imports `DISPATCHING_KINDS` (`grep -rn DISPATCHING_KINDS apps/cms/src`), so its type widening from `Set<IntegrationKind>` to `ReadonlySet<string>` breaks no caller.
+- `collections/Media.ts`: delete lines 37 and 38 and add `import { isImage } from '../admin-logic/field-helpers';`. Its other callers (the `alt` validator and the `beforeChange` hook) pass a string or nothing, which `isImage` still handles.
+
+Run: `pnpm --filter @cleanstart/cms typecheck && pnpm --filter @cleanstart/cms test`
+Expected: exit 0 and the existing suite unchanged. This step changes no behaviour.
+
+- [ ] **Step 4: Create the registry modules**
 
 `apps/cms/src/payload/admin-logic/conditions.ts` (browser-safe; one entry per row of Appendix A; the entries below are the first rows, the rest follow the same pattern with the code from the appendix's "Current code" column moved byte for byte):
 
@@ -4091,6 +4389,8 @@ Expected: FAIL (modules missing).
 // Field visibility rules shared by the Payload config and Studio's form engine
 // (docs/studio/00-MASTER-PLAN.md ADR-6). Browser-safe: no server imports.
 // Signature matches Payload's admin.condition: (data, siblingData, ctx).
+
+import { PLACEHOLDER_TYPES, isDispatching, isImage } from './field-helpers';
 
 type Data = Record<string, unknown> | undefined;
 type Ctx = { readonly user?: unknown; readonly operation?: 'create' | 'update'; readonly path?: readonly (string | number)[] };
@@ -4111,6 +4411,9 @@ export const conditions = {
   'events.registrationUrl': (_data, sibling) => sibling?.registrationMode === 'external',
   'events.registrationForm': (_data, sibling) => sibling?.registrationMode === 'internal',
   'events.attendeesCap': (_data, sibling) => sibling?.registrationMode === 'internal',
+  // siblingData is Record<string, unknown> here, so the type is narrowed before
+  // includes(). Same result as the old `PLACEHOLDER_TYPES.includes(sibling?.type ?? '')`.
+  'forms.placeholder': (_data, sibling) => typeof sibling?.type === 'string' && PLACEHOLDER_TYPES.includes(sibling.type),
   'integrations.kind.teamsWorkflow': kindIs('teamsWorkflow'),
   'integrations.kind.genericWebhook': kindIs('genericWebhook'),
   'integrations.kind.hubspotCrm': kindIs('hubspotCrm'),
@@ -4119,6 +4422,8 @@ export const conditions = {
   'integrations.kind.msClarity': kindIs('msClarity'),
   'integrations.kind.cloudflareWebAnalytics': kindIs('cloudflareWebAnalytics'),
   'integrations.kind.calComInbound': kindIs('calComInbound'),
+  'integrations.routing': (_, sibling) => isDispatching(sibling),
+  'media.decorative': (_data, siblingData) => isImage(siblingData?.mimeType),
   'seo.ogImageAlt': (_data, sibling) => Boolean(sibling?.ogImage),
   'seo.ogTitle': (_data, sibling) => sibling?.useAdvancedOg === true,
 } satisfies Record<string, Condition>;
@@ -4130,6 +4435,8 @@ export const CONDITION_KEYS: ReadonlyMap<Condition, ConditionKey> = new Map(
 );
 ```
 
+Rows 10 and 15 (`forms.label`, `forms.validation`) take the same `typeof sibling?.type === 'string' && LIST.includes(sibling.type)` narrowing as `forms.placeholder` above, with `VISIBLE_LABEL_TYPES` and `VALIDATION_TYPES`; add those names to the `./field-helpers` import when you add the rows. Every other row moves byte for byte.
+
 Before replacing `kindIs` in `collections/Integrations.ts`, read its full body (`Integrations.ts:90-100`) and make the shared version above behave identically (it must handle the array form, which the variadic form covers). Delete the local `kindIs` once all eight call sites use the registry.
 
 `apps/cms/src/payload/admin-logic/validators.ts` (browser-safe, `pure` entries only):
@@ -4139,7 +4446,7 @@ Before replacing `kindIs` in `collections/Integrations.ts`, read its full body (
 // Shared by the Payload config and Studio's client validation (ADR-6).
 // Browser-safe: no server imports.
 
-import { validateOptionalUrl } from '@/payload/lib/url-shape';
+import { validateOptionalUrl } from '../lib/url-shape';
 
 export const pureValidators = {
   validateOptionalUrl: { kind: 'pure', fn: validateOptionalUrl },
@@ -4148,24 +4455,27 @@ export const pureValidators = {
 } as const;
 ```
 
-Confirm `@/payload/lib/url-shape` imports nothing server-side (`grep -n "^import" apps/cms/src/payload/lib/url-shape.ts`); the planning check on 2026-10-16 found only exports. Apply the same check to every helper added here.
+Confirm `../lib/url-shape` imports nothing server-side (`grep -n "^import" apps/cms/src/payload/lib/url-shape.ts`); the planning check on 2026-10-16 found only exports. Apply the same check to every helper added here.
 
-`apps/cms/src/payload/admin-logic/validators.server.ts`:
+`apps/cms/src/payload/admin-logic/validator-registry.ts`:
 
 ```ts
-import 'server-only';
+// Every registered validator, pure and server. Server entries need req, payload
+// or the database; only Payload runs them, and Studio shows their result from
+// the save response. Not marked server-only, because the tsx scripts
+// (check-studio-coverage.ts, studio-inventory.ts) import it and plain tsx has no
+// react-server condition. scripts/check-studio-boundaries.ts rejects any
+// 'use client' file that imports it.
 
 import type { Validate } from 'payload';
 
+import { slugIsUnique, slugIsUniqueComposite } from '../fields/slug';
 import { pureValidators } from './validators';
 
-// Validators that need req, payload or the database. Only Payload runs them;
-// Studio shows their result from the save response.
-// fields/slug.ts:98-135 (collision lookup) is the first entry.
-import { slugIsUnique } from '@/payload/fields/slug';
-
 const serverValidators = {
+  // fields/slug.ts (collision lookup); Pages uses the composite form (collections/Pages.ts:58).
   'slug.unique': { kind: 'server', fn: slugIsUnique },
+  'slug.uniqueComposite': { kind: 'server', fn: slugIsUniqueComposite },
   // One entry per server row of Appendix B.
 } as const;
 
@@ -4184,15 +4494,89 @@ export const validatorKeyOf = (fn: unknown): ValidatorKey | null =>
   typeof fn === 'function' ? (BY_FN.get(fn as Validate) ?? null) : null;
 ```
 
-`slugIsUnique` is the inline validator at `fields/slug.ts:98` extracted to a named export in that file (Step 4). Because `validators.server.ts` imports `server-only`, Vitest resolves it through the stub from Task 1.1 and Next refuses to bundle it into client code.
+`slugIsUnique` and `slugIsUniqueComposite` replace the inline validator at `fields/slug.ts:98`. That inline function closes over the factory's `composite` option, so it becomes two named functions, one per value of `composite`. In `apps/cms/src/payload/fields/slug.ts`, add above `slugField`:
 
-- [ ] **Step 4: Move each site, one file at a time**
+```ts
+const slugCollision = async (
+  value: string | string[] | null | undefined,
+  options: SlugValidateOptions,
+  composite: boolean,
+): Promise<true | string> => {
+  const lengthResult = validateSlugLength(value);
+  if (lengthResult !== true) return lengthResult;
+
+  if (typeof value !== 'string' || value.trim().length === 0) return true;
+
+  const payload = options.req?.payload;
+  const collectionSlug = options.collectionSlug;
+  if (!payload || !collectionSlug) return true;
+
+  const parent = composite ? (options.siblingData?.parent ?? options.data?.parent ?? null) : null;
+
+  const where = buildCollisionWhere({
+    value,
+    id: options.id,
+    parent,
+    composite,
+  });
+
+  const result = await payload.find({
+    collection: collectionSlug as CollectionSlug,
+    where,
+    limit: 1,
+    depth: 0,
+    pagination: false,
+    overrideAccess: true,
+  });
+
+  if (result.docs.length > 0) {
+    return SLUG_COLLISION_MESSAGE;
+  }
+  return true;
+};
+
+// Slug unique within its collection.
+export const slugIsUnique = (
+  value: string | string[] | null | undefined,
+  options: SlugValidateOptions,
+): Promise<true | string> => slugCollision(value, options, false);
+
+// Slug unique among siblings with the same `parent` (Pages).
+export const slugIsUniqueComposite = (
+  value: string | string[] | null | undefined,
+  options: SlugValidateOptions,
+): Promise<true | string> => slugCollision(value, options, true);
+```
+
+The body is the old inline function unchanged, with `composite` passed in instead of closed over. Then replace the whole `validate: async (...) => { ... },` property inside `slugField` with this one line:
+
+```ts
+  ...(composite ? { validate: slugIsUniqueComposite } : { validate: slugIsUnique }),
+```
+
+The registry test matches the first name after `validate:` on that line (`slugIsUniqueComposite`), and both names are registered, so it passes.
+
+Then add the client rule to `apps/cms/scripts/check-studio-boundaries.ts` (Task 1.5): append this entry to `RULES`:
+
+```ts
+  {
+    id: 'client-registry',
+    test: (_rel, src) =>
+      /^\s*['"]use client['"]/.test(src) && /from\s+['"][^'"]*admin-logic\/validator-registry['"]/.test(src)
+        ? 'imports the validator registry (server validators) from a client component'
+        : null,
+  },
+```
+
+Client code imports `../admin-logic/validators` (pure entries) or `import type` from the registry, never the registry's values.
+
+- [ ] **Step 5: Move each site, one file at a time**
 
 For each file in the appendices, in this order: `fields/*` (shared helpers, used by many collections), `blocks/*`, `globals/*`, `collections/*`, `lib/*`.
 
-1. **Inline condition:** cut the arrow into `conditions.ts` under its appendix key, byte for byte. At the site write `condition: conditions['<key>'],` and add `import { conditions } from '@/payload/admin-logic/conditions';`.
+1. **Inline condition:** cut the arrow into `conditions.ts` under its appendix key, byte for byte. At the site write `condition: conditions['<key>'],` and add the relative import, for example `import { conditions } from '../admin-logic/conditions';` in a collection file.
 2. **`kindIs(...)`:** replace with `conditions['integrations.kind.<kind>']`.
-3. **Inline validator:** move the function body into a named, exported function in the same file (for example `export const slugIsUnique: TextFieldValidation = async (value, options) => { … }`), register it in `validators.ts` (pure) or `validators.server.ts` (server) under the appendix key, and point the site at the named function. The function name must equal the name used at the site, because the source test matches by name.
+3. **Inline validator:** move the function body into a named, exported function in the same file (for example `export const embedUrlIsValid: TextFieldValidation = (value) => { … }`), register it in `validators.ts` (pure) or `validator-registry.ts` (server) under the appendix key, and point the site at the named function. The function name must equal the name used at the site, because the source test matches by name.
 4. **Named helper** (`validateOptionalUrl`, `validatePath`, `validatePartialOverride`, `validateYoutubeUrl`, `validateScheduledDatePresent`, `validateEndsAfterStarts`): leave the site alone; register the helper once in the right module.
 5. Run `pnpm --filter @cleanstart/cms exec vitest run src/payload/admin-logic` after each file; the failing list shrinks.
 
@@ -4205,7 +4589,7 @@ Worked example, `apps/cms/src/payload/fields/seo.ts:79`:
       condition: conditions['seo.ogImageAlt'],
 ```
 
-- [ ] **Step 5: Prove nothing changed**
+- [ ] **Step 6: Prove nothing changed**
 
 ```bash
 pnpm --filter @cleanstart/cms exec vitest run src/payload/admin-logic/registry.test.ts
@@ -4218,10 +4602,10 @@ Expected: registry tests PASS (5), the whole existing suite unchanged, typecheck
 
 Then open three documents in Payload's admin (an event, a blog with an OG image, a Teams integration) and confirm conditional fields show and hide exactly as before, and that saving a blog with a duplicate slug still shows the slug error.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
-git add apps/cms/src/payload/admin-logic apps/cms/src/payload/collections apps/cms/src/payload/globals apps/cms/src/payload/fields apps/cms/src/payload/blocks apps/cms/src/payload/lib
+git add apps/cms/src/payload/admin-logic apps/cms/src/payload/collections apps/cms/src/payload/globals apps/cms/src/payload/fields apps/cms/src/payload/blocks apps/cms/src/payload/lib apps/cms/scripts/check-studio-boundaries.ts
 git commit -m "refactor(cms): T1.6 move field conditions and validators into admin-logic"
 ```
 
@@ -4240,7 +4624,7 @@ git commit -m "refactor(cms): T1.6 move field conditions and validators into adm
 
 ```ts
 import type { ConditionKey } from '@/payload/admin-logic/conditions';
-import type { ValidatorKey } from '@/payload/admin-logic/validators.server';
+import type { ValidatorKey } from '@/payload/admin-logic/validator-registry';
 
 export type StudioOption = { readonly value: string; readonly label: string };
 
@@ -4389,7 +4773,7 @@ import type { Field, SanitizedCollectionConfig, SanitizedConfig, SanitizedGlobal
 import { hasDraftsEnabled, hasScheduledPublishEnabled } from 'payload/shared';
 
 import { CONDITION_KEYS, type Condition } from '@/payload/admin-logic/conditions';
-import { VALIDATOR_REGISTRY, validatorKeyOf } from '@/payload/admin-logic/validators.server';
+import { VALIDATOR_REGISTRY, validatorKeyOf } from '@/payload/admin-logic/validator-registry';
 
 import type { StudioBlock, StudioEntitySchema, StudioField, StudioOption, StudioTab } from './types';
 
@@ -4634,7 +5018,7 @@ export const findField = (fields: readonly StudioField[], path: readonly string[
 - [ ] **Step 4: Run and see it pass**
 
 Run: `pnpm --filter @cleanstart/cms exec vitest run src/studio/server/schema/build-schema.test.ts`
-Expected: PASS (5 tests). They read the sanitized config only and never connect to a database, so they run in CI's unit job unchanged.
+Expected: PASS (5 tests). They read the sanitized config only and never connect to a database, but loading `@payload-config` still calls `requireEnv('PAYLOAD_SECRET')` and `requireEnv('DATABASE_URI')` (`src/payload.config.ts:611,621`). CI's `cms` job sets both (`.github/workflows/ci.yml`), so the tests run there as written. Locally, export both variables in the shell first (any non-empty values work, because no connection is made).
 
 If the "builds without throwing" test fails with `Unregistered admin.condition`, Task 1.6 missed a site: move it and re-run. If it fails with `Unsupported field type`, add the type to `types.ts` and the switch, with a generic renderer in Task 1.13.
 
@@ -4731,7 +5115,9 @@ const GENERIC_FIELD_PATHS = new Set(
 );
 
 const pending = (phase: number, label: string): ManifestEntry => ({ kind: 'pending', phase, label });
-const custom = (label: string): ManifestEntry => ({ kind: 'custom', label });
+// Exported because no entry uses it until Task 1.14 (SlugField); an unused
+// local would fail noUnusedLocals and Biome's noUnusedVariables.
+export const custom = (label: string): ManifestEntry => ({ kind: 'custom', label });
 
 // Change `pending` to `custom` (and add the component to registry.tsx) in the
 // task that builds each Studio component.
@@ -5059,7 +5445,7 @@ git commit -m "chore(studio): T1.9 schema inventory script"
 
 - [ ] **Step 1: Readiness list**
 
-ADR-11: nothing links to a collection in Studio until its row in `03` §C is ticked. Builders see every collection with `STUDIO_SHOW_UNREADY=true`.
+ADR-11: nothing links to a collection in Studio until its row in `03` §C is ticked. Builders see every collection with `STUDIO_SHOW_UNREADY=true`. Globals are not linked at all in Phase 1: their screen (S-15, `/studio/globals/[global]`) arrives in Phase 2 for `seoDefaults` and Phase 5 for the rest, so the sidebar leaves them out until then (Step 3).
 
 `apps/cms/src/studio/server/readiness.ts`:
 
@@ -5123,9 +5509,9 @@ describe('buildNav', () => {
     expect(nav.flatMap((g) => g.items.map((i) => i.slug))).toEqual(['jobs']);
   });
 
-  it('links globals to the global route', () => {
-    const nav = buildNav({ layout: LAYOUT, permissions: perms([], ['siteSettings']), scopedSlugs: null, labels: LABELS, isVisible: () => true, draftCounts: {} });
-    expect(nav[0]?.items[0]?.href).toBe('/studio/globals/siteSettings');
+  it('leaves globals out until their screen exists (S-15)', () => {
+    const nav = buildNav({ layout: LAYOUT, permissions: perms(['users'], ['siteSettings']), scopedSlugs: null, labels: LABELS, isVisible: () => true, draftCounts: {} });
+    expect(nav.flatMap((g) => g.items.map((i) => i.slug))).toEqual(['users']);
   });
 });
 ```
@@ -5140,7 +5526,7 @@ Expected: FAIL, cannot find module `./nav`.
 ```ts
 import type { SanitizedPermissions } from 'payload';
 
-import { collectionCan, globalCan } from './permissions';
+import { collectionCan } from './permissions';
 
 export type NavLayoutItem = { readonly kind: 'collection' | 'global'; readonly slug: string };
 export type NavLayout = ReadonlyArray<{ readonly id: string; readonly label: string; readonly items: readonly NavLayoutItem[] }>;
@@ -5186,16 +5572,21 @@ export const buildNav = (input: {
       id: group.id,
       label: group.label,
       items: group.items
+        // Globals stay in the layout but get no link until S-15 adds
+        // /studio/globals/<slug> (08-PHASE-2-7-TASKS.md T5.9). Phase 1 has no
+        // route for them, so a link would 404. S-15 adds them back here with
+        // globalCan(permissions, slug, 'read') and no departmental scope.
+        .filter((item) => item.kind === 'collection')
         .filter((item) => input.isVisible(item.slug))
-        .filter((item) =>
-          item.kind === 'collection'
-            ? collectionCan(input.permissions, item.slug, 'read') && (input.scopedSlugs === null || input.scopedSlugs.includes(item.slug))
-            : globalCan(input.permissions, item.slug, 'read') && input.scopedSlugs === null,
+        .filter(
+          (item) =>
+            collectionCan(input.permissions, item.slug, 'read') &&
+            (input.scopedSlugs === null || input.scopedSlugs.includes(item.slug)),
         )
         .map((item) => ({
           ...item,
           label: input.labels[item.slug] ?? item.slug,
-          href: item.kind === 'collection' ? `/studio/collections/${item.slug}` : `/studio/globals/${item.slug}`,
+          href: `/studio/collections/${item.slug}`,
           draftCount: input.draftCounts[item.slug] ?? 0,
         })),
     }))
@@ -5223,7 +5614,11 @@ import type { StudioSession } from '../session';
 
 export type ShellUser = { readonly id: number; readonly name: string; readonly email: string; readonly roles: readonly string[] };
 
-export type StudioPreferences = { readonly navGroupsClosed?: readonly string[]; readonly sidebarCollapsed?: boolean };
+// `| undefined` because readPreferences sets a key to undefined when the stored value is malformed.
+export type StudioPreferences = {
+  readonly navGroupsClosed?: readonly string[] | undefined;
+  readonly sidebarCollapsed?: boolean | undefined;
+};
 
 export type ShellData = {
   readonly user: ShellUser;
@@ -5280,6 +5675,8 @@ export const getShellData = async (session: StudioSession): Promise<ShellData> =
 
 import { z } from 'zod';
 
+import type { User } from '@/payload-types';
+
 import type { ActionResult } from '../errors';
 import { runAction, studioApi } from '../payload';
 import { getSession } from '../session';
@@ -5299,7 +5696,10 @@ export async function updateStudioPreferences(input: unknown): Promise<ActionRes
   const patch = PreferencesPatch.parse(input);
   return runAction(async () => {
     const api = await studioApi(session);
-    const current = (session.user.preferences ?? {}) as Record<string, unknown>;
+    // Read the stored row, not the session's copy, so two tabs never overwrite each other's keys (09 §13).
+    const stored = await api.findByID({ collection: 'users', id: session.user.id, depth: 0 });
+    // studioApi's findByID returns the untyped document shape, so name the collection type here.
+    const current = ((stored as User).preferences ?? {}) as Record<string, unknown>;
     const studio = { ...((current.studio as Record<string, unknown> | undefined) ?? {}), ...patch };
     await api.update({ collection: 'users', id: session.user.id, data: { preferences: { ...current, studio } } });
     return null;
@@ -5460,7 +5860,7 @@ export function Sidebar({
     <nav
       aria-label="Studio"
       className={cn(
-        'sticky top-0 z-(--z-sidebar) flex h-dvh shrink-0 flex-col border-r border-line-subtle bg-surface transition-[width] duration-(--duration-slow) ease-(--ease-out)',
+        'sticky top-0 z-(--z-sidebar) flex h-dvh shrink-0 flex-col transition-[width] duration-(--duration-slow) ease-(--ease-out)',
         collapsed ? 'w-(--sidebar-collapsed-width)' : 'w-(--sidebar-width)',
       )}
     >
@@ -5475,10 +5875,10 @@ export function Sidebar({
         <button
           type="button"
           onClick={() => document.dispatchEvent(new CustomEvent('studio:palette:open'))}
-          className="flex h-7 w-full items-center gap-2 rounded-sm border border-line bg-raised px-2 text-body text-fg-subtle hover:border-line-strong"
+          className="flex h-8 w-full items-center gap-2 rounded-md bg-surface px-2.5 text-body text-fg-subtle shadow-raised hover:text-fg-muted"
         >
           <MagnifyingGlass size={14} aria-hidden="true" />
-          {collapsed ? <span className="sr-only">Search or jump to</span> : <span className="flex-1 text-left">Search or jump to…</span>}
+          {collapsed ? <span className="sr-only">Search</span> : <span className="flex-1 text-left">Search</span>}
           {collapsed ? null : <Kbd keys={['⌘', 'K']} />}
         </button>
       </div>
@@ -5487,9 +5887,9 @@ export function Sidebar({
         <Link
           href="/studio"
           aria-current={pathname === '/studio' ? 'page' : undefined}
-          className="flex h-7 items-center gap-2 rounded-sm px-2 text-body-strong text-fg-muted hover:bg-hover hover:text-fg aria-[current=page]:bg-active aria-[current=page]:text-fg"
+          className="flex h-7.5 items-center gap-2.5 rounded-sm px-2 text-body-strong text-fg-muted hover:bg-hover hover:text-fg aria-[current=page]:bg-surface aria-[current=page]:text-fg aria-[current=page]:shadow-raised"
         >
-          <House size={16} aria-hidden="true" />
+          <House size={15} aria-hidden="true" />
           {collapsed ? <span className="sr-only">Home</span> : 'Home'}
         </Link>
 
@@ -5517,7 +5917,7 @@ export function Sidebar({
                       href={item.href}
                       aria-current={isActive(item.href) ? 'page' : undefined}
                       title={collapsed ? item.label : undefined}
-                      className="flex h-7 items-center justify-between gap-2 rounded-sm px-2 text-body-strong text-fg-muted hover:bg-hover hover:text-fg aria-[current=page]:bg-active aria-[current=page]:text-fg"
+                      className="flex h-7.5 items-center justify-between gap-2 rounded-sm px-2 text-body-strong text-fg-muted hover:bg-hover hover:text-fg aria-[current=page]:bg-surface aria-[current=page]:text-fg aria-[current=page]:shadow-raised"
                     >
                       <span className={collapsed ? 'sr-only' : 'truncate'}>{item.label}</span>
                       {!collapsed && item.draftCount > 0 ? (
@@ -5561,13 +5961,13 @@ export function AppShell({ shell, children }: { readonly shell: ShellData; reado
   const [collapsed, setCollapsed] = useState(shell.preferences.sidebarCollapsed ?? false);
   const [, startTransition] = useTransition();
 
+  // The server action runs outside the state updater: React may call an
+  // updater twice (reactStrictMode in dev), which would save twice.
   const toggle = useCallback((): void => {
-    setCollapsed((prev) => {
-      const next = !prev;
-      startTransition(() => void updateStudioPreferences({ sidebarCollapsed: next }));
-      return next;
-    });
-  }, []);
+    const next = !collapsed;
+    setCollapsed(next);
+    startTransition(() => void updateStudioPreferences({ sidebarCollapsed: next }));
+  }, [collapsed]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent): void => {
@@ -5583,11 +5983,14 @@ export function AppShell({ shell, children }: { readonly shell: ShellData; reado
   return (
     <ToastProvider>
       <SkipLink />
-      <div className="flex min-h-dvh bg-canvas text-fg">
+      <div className="flex h-dvh bg-canvas text-fg">
         <Sidebar shell={shell} collapsed={collapsed} onToggle={toggle} />
-        <main id="studio-main" tabIndex={-1} className="min-w-0 flex-1 outline-none">
-          {children}
-        </main>
+        <div className="min-w-0 flex-1 py-(--sheet-inset) pr-(--sheet-inset)">
+          {/* The sheet: the only scroll container, so sticky headers stick to its top edge. */}
+          <main id="studio-main" tabIndex={-1} className="relative h-full overflow-y-auto rounded-lg bg-surface shadow-sheet outline-none">
+            {children}
+          </main>
+        </div>
       </div>
       <div className="fixed inset-0 z-(--z-palette) hidden items-center justify-center bg-canvas p-8 text-center max-[1023px]:flex">
         <p className="max-w-sm text-body text-fg-muted">
@@ -5742,11 +6145,15 @@ git commit -m "feat(studio): T1.10 app shell and navigation"
 ### Task 1.11: Sign in, forgot password, reset password (S-01 to S-03)
 
 **Files:**
-- Create: `apps/cms/src/studio/features/auth/AuthCard.tsx`
+- Create: `apps/cms/src/studio/features/auth/AuthCard.tsx`, `BrandPanel.tsx`
+- Create: `apps/cms/public/studio/hero-grid.svg` (copied from `apps/web/public/images/cleanstart-images/hero-vector-grid.svg`)
 - Create: `apps/cms/src/studio/features/auth/LoginForm.tsx`, `ForgotForm.tsx`, `ResetForm.tsx`
 - Create: `apps/cms/src/studio/features/auth/auth-errors.ts`
 - Test: `apps/cms/src/studio/features/auth/auth-errors.test.ts`
 - Create: `apps/cms/src/app/(studio)/studio/login/page.tsx`, `forgot-password/page.tsx`, `reset-password/[token]/page.tsx`
+- Modify: `apps/cms/src/studio/styles/primitives.css` (brand panel motion)
+
+The reset email does not point at S-03 yet. Payload's forgot-password email links to `/admin/reset/:token` until Task 7.4 (`docs/studio/08-PHASE-2-7-TASKS.md` T7.4) sets `auth.forgotPassword.generateEmailHTML` on the users collection. Until then S-03 is built and e2e-tested by visiting `/studio/reset-password/<token>` directly, with a token taken from the test database or from the link in the email; do not change the users collection's email in this task.
 
 - [ ] **Step 1: Write the failing test for error messages**
 
@@ -5804,7 +6211,101 @@ export const loginErrorMessage = (status: number, body: PayloadErrorBody): strin
 
 Run the test again. Expected: PASS (4 tests).
 
-- [ ] **Step 3: The shared card**
+- [ ] **Step 3: The split layout**
+
+Copy the website's faded grid so the CMS serves it from its own origin:
+
+```bash
+mkdir -p apps/cms/public/studio
+cp apps/web/public/images/cleanstart-images/hero-vector-grid.svg apps/cms/public/studio/hero-grid.svg
+file --mime-type -b apps/cms/public/studio/hero-grid.svg
+```
+
+Expected: `image/svg+xml`.
+
+`apps/cms/src/studio/features/auth/BrandPanel.tsx` (design system §7.7; decorative, so it is hidden from assistive tech and shows fixed copy, never real content):
+
+```tsx
+import type { ReactElement } from 'react';
+
+import { Icon } from '@/payload/admin/Icon';
+
+// The content types Studio publishes, in roll order. The roll and the chip highlights are timed for
+// exactly six entries in primitives.css; change both together.
+const KINDS = ['blog post', 'guide', 'case study', 'webinar', 'press release', 'podcast episode'] as const;
+const capitalise = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
+
+export function BrandPanel(): ReactElement {
+  return (
+    <div aria-hidden="true" className="relative isolate hidden flex-col overflow-hidden rounded-lg bg-(image:--brand-band) px-11 pb-11 pt-10 text-white min-[1100px]:flex">
+      <span className="studio-brand-glow absolute -left-36 -top-30 -z-10 h-105 w-130 rounded-full bg-(--brand-glow-violet) blur-3xl" />
+      <span className="studio-brand-glow absolute -right-50 top-65 -z-10 h-115 w-140 rounded-full bg-(--brand-glow-blue) blur-3xl" />
+      <span className="studio-brand-glow absolute -bottom-42 left-35 -z-10 h-75 w-105 rounded-full bg-(--brand-glow-pink) blur-3xl" />
+      <img src="/studio/hero-grid.svg" alt="" width={730} height={708} className="absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2 opacity-40" />
+      <div className="flex items-center gap-2.5 text-heading text-white">
+        <Icon />
+        CleanStart
+      </div>
+      <p className="mt-auto text-brand">
+        <span className="block text-white/60">Write the next</span>
+        <span className="studio-brand-slot block h-23 overflow-hidden">
+          <span className="studio-brand-words block">
+            {[...KINDS, KINDS[0]].map((kind, i) => (
+              <span key={i === KINDS.length ? 'loop' : kind} className="block h-23 whitespace-nowrap">
+                {kind}
+                <span className="text-(--brand-accent)">.</span>
+              </span>
+            ))}
+          </span>
+        </span>
+      </p>
+      <p className="mt-5 max-w-108 text-doc-lead text-white/70">Studio is where every page on cleanstart.com is written, reviewed and published.</p>
+      <div className="studio-brand-chips mt-auto flex flex-wrap gap-2 pt-8">
+        {KINDS.map((kind) => (
+          <span key={kind} className="inline-flex h-7.5 items-center rounded-full px-3.5 text-body-strong ring-1 ring-white/12">
+            {capitalise(kind)}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+Add the roll, the chip highlights and the glow drift to `apps/cms/src/studio/styles/primitives.css` inside `@layer components`. This is the only looping motion in Studio and does not use the duration tokens, so it carries its own reduced-motion gate; under reduced motion the panel holds on "blog post" with its chip lit:
+
+```css
+  /* Sign-in brand panel (design system §7.7): six words, 2.4s each, one 14.4s loop.
+     The word list ends with a copy of the first word, so the jump from the last frame to 0 is invisible. */
+  .studio-brand-slot {
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, var(--color-black) 18%, var(--color-black) 82%, transparent 100%);
+    mask-image: linear-gradient(180deg, transparent 0, var(--color-black) 18%, var(--color-black) 82%, transparent 100%);
+  }
+  .studio-brand-chips > span { background: var(--brand-chip); color: var(--brand-chip-text); }
+  .studio-brand-chips > span:first-child { background: var(--color-white); color: var(--brand-ink); }
+  @media (prefers-reduced-motion: no-preference) {
+    .studio-brand-words { animation: studio-roll 14.4s linear infinite; }
+    @keyframes studio-roll { 0% { transform: translateY(0); } 12.5% { transform: translateY(0px); animation-timing-function: var(--ease-out); } 16.667% { transform: translateY(-92px); } 29.167% { transform: translateY(-92px); animation-timing-function: var(--ease-out); } 33.333% { transform: translateY(-184px); } 45.833% { transform: translateY(-184px); animation-timing-function: var(--ease-out); } 50% { transform: translateY(-276px); } 62.5% { transform: translateY(-276px); animation-timing-function: var(--ease-out); } 66.667% { transform: translateY(-368px); } 79.167% { transform: translateY(-368px); animation-timing-function: var(--ease-out); } 83.333% { transform: translateY(-460px); } 95.833% { transform: translateY(-460px); animation-timing-function: var(--ease-out); } 100% { transform: translateY(-552px); } }
+    .studio-brand-chips > span:nth-child(1) { animation: studio-chip-1 14.4s linear infinite; }
+    @keyframes studio-chip-1 { 0%, 13.5% { background: var(--color-white); color: var(--brand-ink); } 15.5%, 95.833% { background: var(--brand-chip); color: var(--brand-chip-text); } 100% { background: var(--color-white); color: var(--brand-ink); } }
+    .studio-brand-chips > span:nth-child(2) { animation: studio-chip-2 14.4s linear infinite; }
+    @keyframes studio-chip-2 { 0%, 15.667% { background: var(--brand-chip); color: var(--brand-chip-text); } 17.667%, 30.167% { background: var(--color-white); color: var(--brand-ink); } 32.167%, 100% { background: var(--brand-chip); color: var(--brand-chip-text); } }
+    .studio-brand-chips > span:nth-child(3) { animation: studio-chip-3 14.4s linear infinite; }
+    @keyframes studio-chip-3 { 0%, 32.333% { background: var(--brand-chip); color: var(--brand-chip-text); } 34.333%, 46.833% { background: var(--color-white); color: var(--brand-ink); } 48.833%, 100% { background: var(--brand-chip); color: var(--brand-chip-text); } }
+    .studio-brand-chips > span:nth-child(4) { animation: studio-chip-4 14.4s linear infinite; }
+    @keyframes studio-chip-4 { 0%, 49% { background: var(--brand-chip); color: var(--brand-chip-text); } 51%, 63.5% { background: var(--color-white); color: var(--brand-ink); } 65.5%, 100% { background: var(--brand-chip); color: var(--brand-chip-text); } }
+    .studio-brand-chips > span:nth-child(5) { animation: studio-chip-5 14.4s linear infinite; }
+    @keyframes studio-chip-5 { 0%, 65.667% { background: var(--brand-chip); color: var(--brand-chip-text); } 67.667%, 80.167% { background: var(--color-white); color: var(--brand-ink); } 82.167%, 100% { background: var(--brand-chip); color: var(--brand-chip-text); } }
+    .studio-brand-chips > span:nth-child(6) { animation: studio-chip-6 14.4s linear infinite; }
+    @keyframes studio-chip-6 { 0%, 82.333% { background: var(--brand-chip); color: var(--brand-chip-text); } 84.333%, 96.833% { background: var(--color-white); color: var(--brand-ink); } 98.833%, 100% { background: var(--brand-chip); color: var(--brand-chip-text); } }
+    .studio-brand-glow { animation: studio-glow 14s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate; }
+    .studio-brand-glow:nth-child(2) { animation-duration: 17s; animation-delay: -6s; }
+    .studio-brand-glow:nth-child(3) { animation-duration: 12s; animation-delay: -3s; }
+    @keyframes studio-glow { to { transform: translate(36px, -24px) scale(1.12); } }
+  }
+```
+
+The headline uses `text-brand` (76/92), whose line height must stay equal to `h-23` (92px) and to the 92px steps in `studio-roll`. The panel colours come from the `--brand-*` tokens in `tokens.css` and from `--color-white` and `--color-black` in the `@theme` block of `studio.css` (Task 0.3). Check that `Icon` from `@/payload/admin/Icon` renders the mark in `currentColor` on this dark panel; if its second path is hard-coded dark, pass a `className` that sets `color: white` or render the two paths here from that file.
 
 `apps/cms/src/studio/features/auth/AuthCard.tsx`:
 
@@ -5813,20 +6314,39 @@ import type { ReactElement, ReactNode } from 'react';
 
 import { Icon } from '@/payload/admin/Icon';
 
-export function AuthCard({ title, children, footer }: { readonly title: string; readonly children: ReactNode; readonly footer?: ReactNode }): ReactElement {
+import { BrandPanel } from './BrandPanel';
+
+export function AuthCard({
+  title,
+  description,
+  children,
+  footer,
+}: {
+  readonly title: string;
+  readonly description?: string;
+  readonly children: ReactNode;
+  readonly footer?: ReactNode;
+}): ReactElement {
   return (
-    <main className="grid min-h-dvh place-items-center bg-canvas px-4">
-      <div className="w-full max-w-100">
-        <div className="mb-6 flex justify-center">
+    <div className="grid min-h-dvh grid-cols-1 gap-(--sheet-inset) bg-surface p-(--sheet-inset) min-[1100px]:grid-cols-[minmax(0,1fr)_776px]">
+      <main className="flex min-w-0 flex-col px-10 py-7">
+        <div className="flex items-center gap-2.5 text-body-strong text-fg">
           <Icon />
+          CleanStart <span className="text-fg-subtle">Studio</span>
         </div>
-        <section className="rounded-lg border border-line bg-raised p-10">
-          <h1 className="mb-6 text-title text-fg">{title}</h1>
-          {children}
-        </section>
-        {footer ? <p className="mt-6 text-center text-small text-fg-muted">{footer}</p> : null}
-      </div>
-    </main>
+        <div className="grid flex-1 place-items-center py-10">
+          <section className="flex w-full max-w-90 flex-col gap-5">
+            <div>
+              <h1 className="text-display text-fg">{title}</h1>
+              {description ? <p className="mt-1.5 text-body text-fg-muted">{description}</p> : null}
+            </div>
+            {children}
+          </section>
+        </div>
+        {footer ? <p className="text-small text-fg-subtle">{footer}</p> : null}
+      </main>
+      <BrandPanel />
+    </div>
   );
 }
 ```
@@ -5899,7 +6419,7 @@ export function LoginForm({ next }: { readonly next: string }): ReactElement {
           Forgot password?
         </Link>
       </div>
-      <Button type="submit" variant="primary" size="lg" loading={busy} className="w-full">
+      <Button type="submit" variant="primary" size="xl" loading={busy} className="w-full">
         Sign in
       </Button>
     </form>
@@ -5944,7 +6464,7 @@ export function ForgotForm(): ReactElement {
       <Field id="email" label="Email">
         <TextInput id="email" name="email" type="email" autoComplete="username" required autoFocus />
       </Field>
-      <Button type="submit" variant="primary" size="lg" loading={busy} className="w-full">
+      <Button type="submit" variant="primary" size="xl" loading={busy} className="w-full">
         Send reset link
       </Button>
     </form>
@@ -6012,7 +6532,7 @@ export function ResetForm({ token }: { readonly token: string }): ReactElement {
         <li className={longEnough ? 'text-success' : 'text-fg-muted'}>At least {MIN_LENGTH} characters</li>
         <li className={matches ? 'text-success' : 'text-fg-muted'}>Both passwords match</li>
       </ul>
-      <Button type="submit" variant="primary" size="lg" loading={busy} disabled={!longEnough || !matches} className="w-full">
+      <Button type="submit" variant="primary" size="xl" loading={busy} disabled={!longEnough || !matches} className="w-full">
         Set password
       </Button>
     </form>
@@ -6031,7 +6551,8 @@ import type { ReactElement } from 'react';
 
 import { AuthCard } from '@/studio/features/auth/AuthCard';
 import { LoginForm } from '@/studio/features/auth/LoginForm';
-import { getSession, safeNextPath } from '@/studio/server/session';
+import { safeNextPath } from '@/studio/lib/next-path';
+import { getSession } from '@/studio/server/session';
 
 export const metadata: Metadata = { title: 'Sign in' };
 
@@ -6041,7 +6562,7 @@ export default async function Login({ searchParams }: { readonly searchParams: P
   const session = await getSession();
   if (session?.permissions.canAccessAdmin) redirect(target);
   return (
-    <AuthCard title="Sign in to CleanStart Studio" footer="Need access? Ask an admin.">
+    <AuthCard title="Welcome back" description="Sign in with your CleanStart work account." footer="Need access? Ask an admin.">
       <LoginForm next={target} />
     </AuthCard>
   );
@@ -6090,7 +6611,7 @@ export default async function Reset({ params }: { readonly params: Promise<{ tok
 }
 ```
 
-Check: `max-w-100` is 400px with Tailwind's 4px spacing scale. Confirm the class compiles (spacing utilities accept any integer in v4).
+Check: spacing utilities such as `max-w-90`, `max-w-108`, `h-23` and `h-115` are multiples of Tailwind's 4px spacing scale (v4 accepts any integer); confirm they compile. Then open `/studio/login` at 1440×900 in both themes and at 1024 wide (panel hidden), and compare against the approved direction B sign-in mockup.
 
 - [ ] **Step 7: Verify**
 
@@ -6099,7 +6620,7 @@ Run the unit test again and typecheck. In the browser pane at 1440×900: sign ou
 - [ ] **Step 8: Commit**
 
 ```bash
-git add apps/cms/src/studio/features/auth "apps/cms/src/app/(studio)/studio/login" "apps/cms/src/app/(studio)/studio/forgot-password" "apps/cms/src/app/(studio)/studio/reset-password"
+git add apps/cms/src/studio/features/auth apps/cms/src/studio/styles/primitives.css apps/cms/public/studio/hero-grid.svg "apps/cms/src/app/(studio)/studio/login" "apps/cms/src/app/(studio)/studio/forgot-password" "apps/cms/src/app/(studio)/studio/reset-password"
 git commit -m "feat(studio): T1.11 sign in, forgot and reset password"
 ```
 
@@ -6258,6 +6779,8 @@ export const fieldDomId = (path: string): string => `field-${path.replace(/\./g,
 `apps/cms/src/studio/form/engine/validation.ts`:
 
 ```ts
+import type { Validate } from 'payload';
+
 import { pureValidators } from '@/payload/admin-logic/validators';
 import type { StudioField } from '@/studio/server/schema/types';
 
@@ -6310,7 +6833,8 @@ export const validateValue = async (field: StudioField, value: unknown, ctx: Ctx
     const entry = pureValidators[field.validator.key as keyof typeof pureValidators];
     if (entry) {
       // Pure validators read only the value and data, never req (see admin-logic/validators.ts).
-      const result = await entry.fn(value as never, { ...ctx, operation: 'update' } as never);
+      // Cast to the general Validate signature: each entry's own options type differs.
+      const result = await (entry.fn as Validate)(value, { ...ctx, operation: 'update' } as never);
       if (result !== true) return typeof result === 'string' ? result : 'This value is not valid.';
     }
   }
@@ -6484,6 +7008,24 @@ import { GenericField } from './fields/GenericField';
 import { PendingField } from './fields/PendingField';
 import { resolveField } from './registry';
 
+// A stable React key without array indexes. Names are unique at one level of the
+// schema; an unnamed container (row, collapsible, tabs) borrows the first name
+// found inside it, which is unique for the same reason.
+const firstName = (field: StudioField): string | null => {
+  if (field.name !== null) return field.name;
+  if (field.type === 'tabs') {
+    for (const tab of field.tabs) {
+      const found = tab.name ?? tab.fields.map(firstName).find((n) => n !== null) ?? null;
+      if (found) return found;
+    }
+    return null;
+  }
+  if ('fields' in field) return field.fields.map(firstName).find((n) => n !== null) ?? null;
+  return null;
+};
+
+const fieldKey = (field: StudioField): string => field.name ?? `${field.type}:${firstName(field) ?? field.label ?? 'empty'}`;
+
 function FieldSlot({ field, path }: { readonly field: StudioField; readonly path: string }): ReactElement | null {
   const entry = resolveField(field.component);
   const label = field.label ?? field.name ?? field.type;
@@ -6521,8 +7063,8 @@ export function RenderFields({
     <>
       {fields
         .filter((field) => !field.hidden && (position === undefined || field.position === position))
-        .map((field, index) => (
-          <FieldSlot key={field.name ?? `${field.type}-${index}`} field={field} path={joinPath(basePath, field.name)} />
+        .map((field) => (
+          <FieldSlot key={fieldKey(field)} field={field} path={joinPath(basePath, field.name)} />
         ))}
     </>
   );
@@ -6680,7 +7222,17 @@ export function RadioFieldRenderer({ field, path }: { readonly field: Of<'radio'
   const b = useStudioField(field, path);
   return (
     <Field id={b.id} label={field.label ?? ''} description={field.description ?? undefined} error={b.error} optional={optionalFlag(field)}>
-      <RadioGroup name={b.id} label={field.label ?? ''} options={field.options} value={typeof b.value === 'string' ? b.value : null} onChange={(next) => b.onChange(next)} disabled={b.readOnly} />
+      {/* A radio group is not labelable, so it names itself from Field's label element (id `${b.id}-label`). */}
+      <RadioGroup
+        id={b.id}
+        name={b.id}
+        label={field.label ?? ''}
+        labelledBy={`${b.id}-label`}
+        options={field.options}
+        value={typeof b.value === 'string' ? b.value : null}
+        onChange={(next) => b.onChange(next)}
+        disabled={b.readOnly}
+      />
     </Field>
   );
 }
@@ -6699,6 +7251,8 @@ export function DateFieldRenderer({ field, path }: { readonly field: Of<'date'>;
         }}
         disabled={b.readOnly}
         required={field.required}
+        // Without it the trigger's aria-label falls back to the placeholder and replaces the Field label.
+        ariaLabel={field.label ?? 'Date'}
         timezone={Intl.DateTimeFormat().resolvedOptions().timeZone}
       />
     </Field>
@@ -6951,6 +7505,7 @@ Run the test. Expected: PASS (5 tests). If `slugify` keeps capitals or other cha
 ```ts
 'use server';
 
+import type { CollectionSlug } from 'payload';
 import { z } from 'zod';
 
 import { studioApi } from '../payload';
@@ -6978,7 +7533,7 @@ export async function checkSlug(input: unknown): Promise<SlugCheck> {
   const { docs } = await api.find({ collection: collection as never, where, limit: 1, depth: 0, draft: true });
   const hit = docs[0] as Record<string, unknown> | undefined;
   if (!hit) return { available: true, takenBy: null };
-  const config = session.payload.collections[collection as never]?.config;
+  const config = session.payload.collections[collection as CollectionSlug]?.config;
   const titleKey = typeof config?.admin?.useAsTitle === 'string' ? config.admin.useAsTitle : 'id';
   return { available: false, takenBy: String(hit[titleKey] ?? hit.id) };
 }
@@ -7337,6 +7892,8 @@ Run the test. Expected: PASS (6 tests).
 ```ts
 import 'server-only';
 
+import type { CollectionSlug } from 'payload';
+
 import type { StudioApi } from '../payload';
 import type { ListColumn } from './list';
 
@@ -7379,7 +7936,7 @@ export const resolveRelatedTitles = async (
   }
   const entries = await Promise.all(
     [...wanted.entries()].map(async ([slug, ids]) => {
-      const config = api.payload.collections[slug as never]?.config;
+      const config = api.payload.collections[slug as CollectionSlug]?.config;
       const titleKey = typeof config?.admin?.useAsTitle === 'string' ? config.admin.useAsTitle : 'id';
       const { docs } = await api.find({
         collection: slug as never,
@@ -7390,7 +7947,8 @@ export const resolveRelatedTitles = async (
         select: { [titleKey]: true } as never,
       });
       const map: Record<string, string> = {};
-      for (const doc of docs as Record<string, unknown>[]) map[String(doc.id)] = String(doc[titleKey] ?? doc.id);
+      // studioApi's find is not typed per slug here, so read the docs as plain records.
+      for (const doc of docs as unknown as Record<string, unknown>[]) map[String(doc.id)] = String(doc[titleKey] ?? doc.id);
       return [slug, map] as const;
     }),
   );
@@ -7426,11 +7984,11 @@ In `apps/cms/src/studio/server/loaders/shell.ts`, `export` `readPreferences` and
 
 ```ts
 export type StudioPreferences = {
-  readonly navGroupsClosed?: readonly string[];
-  readonly sidebarCollapsed?: boolean;
-  readonly columns?: Readonly<Record<string, readonly string[]>>;
-  readonly railWidth?: number;
-  readonly railCollapsed?: boolean;
+  readonly navGroupsClosed?: readonly string[] | undefined;
+  readonly sidebarCollapsed?: boolean | undefined;
+  readonly columns?: Readonly<Record<string, readonly string[]>> | undefined;
+  readonly railWidth?: number | undefined;
+  readonly railCollapsed?: boolean | undefined;
 };
 ```
 
@@ -7499,11 +8057,13 @@ export function Cell({ column, row, titles }: { readonly column: ListColumn; rea
   if (field.type === 'relationship' || field.type === 'upload') {
     const list = (Array.isArray(value) ? value : value === null || value === undefined ? [] : [value]) as unknown[];
     if (list.length === 0) return null;
-    const names = list.map((v) =>
-      typeof v === 'object' && v !== null && 'relationTo' in v
-        ? titleOf(titles, (v as { relationTo: string }).relationTo, (v as { value: unknown }).value)
-        : titleOf(titles, field.relationTo[0] ?? '', v),
-    );
+    const names = list.map((v) => {
+      if (typeof v === 'object' && v !== null && 'relationTo' in v) {
+        const poly = v as { relationTo: string; value: unknown };
+        return titleOf(titles, poly.relationTo, poly.value);
+      }
+      return titleOf(titles, field.relationTo[0] ?? '', v);
+    });
     return (
       <span className="truncate" title={names.join(', ')}>
         {names[0]}
@@ -7555,7 +8115,7 @@ export function DataTable({
 }): ReactElement {
   return (
     <table className="w-full table-fixed border-collapse text-body">
-      <thead className="sticky top-(--page-header-height) z-(--z-sticky) bg-surface">
+      <thead className="sticky top-0 z-(--z-sticky) bg-raised">
         <tr className="h-8 text-left text-micro text-fg-muted">
           {columns.map((column, index) => {
             const active = query.sort?.replace(/^-/, '') === column.key;
@@ -7570,7 +8130,7 @@ export function DataTable({
                 {column.sortable ? (
                   <Link href={sortHref(basePath, query, column.key)} className={cn('inline-flex items-center gap-1 hover:text-fg', column.align === 'right' && 'flex-row-reverse')}>
                     {column.label}
-                    {active ? (descending ? <ArrowDown size={10} aria-hidden="true" /> : <ArrowUp size={10} aria-hidden="true" />) : null}
+                    {active ? (descending ? <ArrowDown size={10} weight="light" aria-hidden="true" /> : <ArrowUp size={10} weight="light" aria-hidden="true" />) : null}
                   </Link>
                 ) : (
                   column.label
@@ -7793,7 +8353,7 @@ export function ListView({
   const basePath = `/studio/collections/${schema.slug}`;
   const newButton = canCreate ? (
     <Link href={`${basePath}/new`} className={buttonClass('primary', 'md')}>
-      <Plus size={14} aria-hidden="true" />
+      <Plus size={14} weight="light" aria-hidden="true" />
       New {schema.label.singular.toLowerCase()}
     </Link>
   ) : null;
@@ -7859,16 +8419,18 @@ export default async function CollectionList({ params, searchParams }: Props): P
   const preferences = readPreferences(session.user.preferences);
   const columns = resolveColumns(schema, preferences.columns?.[collection]);
   const api = await studioApi(session);
+  const where = buildSearchWhere(schema, query.q);
   const result = await api.find({
     collection: collection as never,
-    where: buildSearchWhere(schema, query.q),
+    // exactOptionalPropertyTypes: leave the key out rather than pass undefined.
+    ...(where ? { where } : {}),
     page: query.page,
     limit: query.limit,
     sort: query.sort ?? schema.defaultSort ?? '-updatedAt',
     depth: 0,
     draft: schema.drafts,
   });
-  const rows = result.docs as Record<string, unknown>[];
+  const rows = result.docs as unknown as Record<string, unknown>[];
   const titles = await resolveRelatedTitles(api, rows, columns);
 
   return (
@@ -8140,7 +8702,7 @@ Run the test. Expected: PASS (8 tests).
 ```ts
 import 'server-only';
 
-import { NotFound, docAccessOperation } from 'payload';
+import { type CollectionSlug, NotFound, docAccessOperation } from 'payload';
 
 import type { DocumentStatus } from '@/studio/ui';
 
@@ -8169,7 +8731,9 @@ export const documentStatus = async (
   latestStatus: unknown,
 ): Promise<DocumentStatus | null> => {
   if (!schema.drafts) return null;
-  const live = (await api.findByID({ collection: schema.slug as never, id, draft: false, depth: 0, select: { _status: true } as never })) as { _status?: unknown };
+  const live = (await api.findByID({ collection: schema.slug as never, id, draft: false, depth: 0, select: { _status: true } as never })) as unknown as {
+    _status?: unknown;
+  };
   if (live._status !== 'published') return 'draft';
   return latestStatus === 'draft' ? 'changed' : 'published';
 };
@@ -8179,12 +8743,12 @@ export const loadDocument = async (session: StudioSession, slug: string, id: str
   const schema = buildCollectionSchema(session.payload.config, slug);
   let doc: Record<string, unknown>;
   try {
-    doc = (await api.findByID({ collection: slug as never, id, draft: schema.drafts, depth: 0 })) as Record<string, unknown>;
+    doc = (await api.findByID({ collection: slug as never, id, draft: schema.drafts, depth: 0 })) as unknown as Record<string, unknown>;
   } catch (error) {
     if (error instanceof NotFound) return null;
     throw error;
   }
-  const access = await docAccessOperation({ collection: session.payload.collections[slug as never], id, req: api.req });
+  const access = await docAccessOperation({ collection: session.payload.collections[slug as CollectionSlug], id, req: api.req });
   return {
     schema,
     values: doc,
@@ -8248,7 +8812,7 @@ export async function saveDocument(input: unknown): Promise<ActionResult<SaveRes
       id === null
         ? await api.create({ collection: collection as never, data: body as never, draft, depth: 0 })
         : await api.update({ collection: collection as never, id, data: body as never, draft, depth: 0 })
-    ) as Record<string, unknown> & { id: string | number };
+    ) as unknown as Record<string, unknown> & { id: string | number };
     return { id: doc.id, values: doc, status: await documentStatus(api, schema, doc.id, doc._status) };
   });
 }
@@ -8358,7 +8922,6 @@ export function Rail({
   if (collapsed) return null;
   return (
     <aside aria-label={label} style={{ width }} className="relative flex shrink-0 flex-col gap-3 overflow-y-auto border-l border-line-subtle bg-surface p-4">
-      {/* biome-ignore lint/a11y/useSemanticElements: a focusable window splitter is the WAI-ARIA pattern; <hr> cannot take focus */}
       <div
         role="separator"
         aria-orientation="vertical"
@@ -8397,25 +8960,45 @@ export type SaveState =
   | { readonly kind: 'saved'; readonly at: number }
   | { readonly kind: 'error' };
 
-const ago = (at: number, now: number): string => {
+// Strings from docs/studio/09-BEHAVIOUR-CONTRACT.md §11.2.
+export const savedText = (at: number, now: number): string => {
   const minutes = Math.floor((now - at) / 60_000);
-  return minutes < 1 ? 'just now' : `${minutes} min ago`;
+  if (minutes < 1) return 'Saved just now';
+  if (minutes < 60) return `Saved ${minutes} min ago`;
+  return `Saved at ${new Date(at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
 };
 
-export function SaveStatus({ state, dirty }: { readonly state: SaveState; readonly dirty: boolean }): ReactElement | null {
+export function SaveStatus({
+  state,
+  dirty,
+  onRetry,
+}: {
+  readonly state: SaveState;
+  readonly dirty: boolean;
+  readonly onRetry: () => void;
+}): ReactElement | null {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 30_000);
     return () => window.clearInterval(timer);
   }, []);
-  const text =
-    state.kind === 'saving' ? 'Saving…' : state.kind === 'error' ? 'Save failed' : dirty ? 'Unsaved changes' : state.kind === 'saved' ? `Saved ${ago(state.at, now)}` : null;
+  if (state.kind === 'error') {
+    // <output> is the repo's live-region element (admin/components/SavedStateIndicator.tsx:174).
+    return (
+      <output aria-live="polite" className="text-small text-danger">
+        Save failed.{' '}
+        <button type="button" onClick={onRetry} className="underline underline-offset-2">
+          Retry
+        </button>
+      </output>
+    );
+  }
+  const text = state.kind === 'saving' ? 'Saving…' : dirty ? 'Unsaved changes' : state.kind === 'saved' ? savedText(state.at, now) : null;
   if (!text) return null;
-  const tone = state.kind === 'error' ? 'text-danger' : dirty ? 'text-warning' : 'text-fg-subtle';
   return (
-    <span role="status" className={`text-small ${tone}`}>
+    <output aria-live="polite" className={`text-small ${dirty && state.kind !== 'saving' ? 'text-warning' : 'text-fg-subtle'}`}>
       {text}
-    </span>
+    </output>
   );
 }
 ```
@@ -8619,7 +9202,7 @@ export function DocumentHeader({
   readonly actions: ReactNode;
 }): ReactElement {
   return (
-    <header className="sticky top-0 z-(--z-header) flex h-(--document-header-height) items-center justify-between gap-4 border-b border-line-subtle bg-canvas px-6">
+    <header className="sticky top-0 z-(--z-header) flex h-(--document-header-height) items-center justify-between gap-4 bg-surface pl-6 pr-3">
       <div className="flex min-w-0 items-center gap-3">
         <nav aria-label="Breadcrumb" className="shrink-0">
           <Link href={collectionHref} className="text-body text-fg-muted hover:text-fg">
@@ -8657,7 +9240,7 @@ import { RenderFields } from '@/studio/form/RenderFields';
 import { deleteDocument, saveDocument } from '@/studio/server/actions/document';
 import { updateStudioPreferences } from '@/studio/server/actions/preferences';
 import type { StudioEntitySchema } from '@/studio/server/schema/types';
-import { Card, type DocumentStatus, IconButton } from '@/studio/ui';
+import { type DocumentStatus, IconButton, Section } from '@/studio/ui';
 import { Rail } from '@/studio/ui/Rail';
 
 import { type Issue, buildPatch, flattenErrors, labelForPath } from './build-patch';
@@ -8698,6 +9281,7 @@ export function EditView(props: EditViewProps): ReactElement {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [, startTransition] = useTransition();
   const menuAnchor = useRef<HTMLButtonElement>(null);
+  const lastIntent = useRef<'draft' | 'publish' | 'save'>(schema.drafts ? 'draft' : 'save');
   const dirty = methods.formState.isDirty;
   const guard = useUnsavedGuard(dirty && saving === null);
 
@@ -8720,9 +9304,18 @@ export function EditView(props: EditViewProps): ReactElement {
   );
   const slugContext = useMemo(() => ({ status: slugStatus, report: setSlugStatus }), [slugStatus]);
 
+  // The preference save runs outside the state updater: React may call an
+  // updater twice (reactStrictMode in dev), which would save twice.
+  const toggleRail = useCallback((): void => {
+    const next = !railCollapsed;
+    setRailCollapsed(next);
+    startTransition(() => void updateStudioPreferences({ railCollapsed: next }));
+  }, [railCollapsed]);
+
   const save = useCallback(
     async (intent: 'draft' | 'publish' | 'save'): Promise<void> => {
       if (!canSave || saving) return;
+      lastIntent.current = intent;
       setIssues([]);
       if (intent !== 'draft') {
         const valid = await methods.trigger();
@@ -8763,15 +9356,12 @@ export function EditView(props: EditViewProps): ReactElement {
         void save('publish');
       } else if (mod && event.key === '.') {
         event.preventDefault();
-        setRailCollapsed((prev) => {
-          startTransition(() => void updateStudioPreferences({ railCollapsed: !prev }));
-          return !prev;
-        });
+        toggleRail();
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [save, schema.drafts]);
+  }, [save, schema.drafts, toggleRail]);
 
   const remove = async (): Promise<void> => {
     if (docId === null) return;
@@ -8798,7 +9388,7 @@ export function EditView(props: EditViewProps): ReactElement {
             collectionLabel={schema.label.plural}
             title={title}
             status={status}
-            saveStatus={<SaveStatus state={saveState} dirty={dirty} />}
+            saveStatus={<SaveStatus state={saveState} dirty={dirty} onRetry={() => void save(lastIntent.current)} />}
             actions={
               <>
                 <PublishControl
@@ -8817,12 +9407,7 @@ export function EditView(props: EditViewProps): ReactElement {
                     shortcut="⌘."
                     pressed={!railCollapsed}
                     icon={<SidebarSimple size={16} aria-hidden="true" />}
-                    onClick={() =>
-                      setRailCollapsed((prev) => {
-                        startTransition(() => void updateStudioPreferences({ railCollapsed: !prev }));
-                        return !prev;
-                      })
-                    }
+                    onClick={toggleRail}
                   />
                 ) : null}
                 {isCreate ? null : (
@@ -8831,7 +9416,7 @@ export function EditView(props: EditViewProps): ReactElement {
               </>
             }
           />
-          <div className="flex min-h-[calc(100dvh-var(--document-header-height))]">
+          <div className="flex min-h-[calc(100dvh-var(--document-header-height)-2*var(--sheet-inset))]">
             <div className="min-w-0 flex-1 px-6 py-8">
               <form
                 noValidate
@@ -8848,11 +9433,9 @@ export function EditView(props: EditViewProps): ReactElement {
             </div>
             {hasSidebar ? (
               <Rail initialWidth={props.railWidth} collapsed={railCollapsed} label="Document settings">
-                <Card title="Details">
-                  <div className="flex flex-col gap-5">
-                    <RenderFields fields={schema.fields} basePath="" position="sidebar" />
-                  </div>
-                </Card>
+                <Section title="Details">
+                  <RenderFields fields={schema.fields} basePath="" position="sidebar" />
+                </Section>
               </Rail>
             ) : null}
           </div>
@@ -8901,7 +9484,7 @@ export function EditView(props: EditViewProps): ReactElement {
 }
 ```
 
-`min-h-[calc(100dvh-var(--document-header-height))]` is a layout calc, not a colour or font size, so the boundary check allows it.
+`min-h-[calc(100dvh-var(--document-header-height)-2*var(--sheet-inset))]` is a layout calc (the sheet sits 8px inside the window top and bottom), not a colour or font size, so the boundary check allows it.
 
 - [ ] **Step 9: Routes**
 
@@ -9030,7 +9613,7 @@ const Input = z.object({
   password: z.string().min(12, 'Use at least 12 characters.').max(256).optional(),
 });
 
-// Same rules as CmsAccountForm.tsx:51-80. Field access still applies: users
+// Same rules as apps/cms/src/payload/admin/components/auth/CmsAccountForm.tsx:51-80. Field access still applies: users
 // cannot change their own roles or enabled flag (Users.ts:82-99).
 export async function updateAccount(input: unknown): Promise<ActionResult<{ name: string; email: string }>> {
   const parsed = Input.safeParse(input);
@@ -9078,7 +9661,9 @@ export function AccountForm({ name, email }: { readonly name: string; readonly e
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
+    // React clears event.currentTarget once the handler yields, so keep the form before any await.
+    const formEl = event.currentTarget;
+    const form = new FormData(formEl);
     const password = String(form.get('password') ?? '');
     const confirm = String(form.get('confirm') ?? '');
     if (password && password !== confirm) {
@@ -9094,7 +9679,7 @@ export function AccountForm({ name, email }: { readonly name: string; readonly e
       return;
     }
     setErrors({});
-    event.currentTarget.reset();
+    formEl.reset();
     toast.push({ tone: 'success', message: 'Account updated.' });
   };
 
@@ -9292,7 +9877,8 @@ test.describe('@studio auth', () => {
     await page.getByLabel('Email').fill('studio-editor@example.test');
     await page.getByLabel('Password', { exact: true }).fill('definitely-not-the-password');
     await page.getByRole('button', { name: 'Sign in' }).click();
-    await expect(page.getByRole('alert')).toHaveText('Email or password is incorrect.');
+    // Scoped to the form: Next's route announcer is also a role="alert" element.
+    await expect(page.locator('form').getByRole('alert')).toHaveText('Email or password is incorrect.');
   });
 
   test('forgot password always shows the same message', async ({ page }) => {
@@ -9321,11 +9907,12 @@ import { type Role, signIn } from './helpers';
 
 // Visible items among the ready collections (redirects, jobLocations), per role.
 // hr is scoped to its domain (wire-scoped-nav.ts:16-25), which includes jobLocations only.
+// Labels are the collections' plural labels: JobLocations.ts:10 and Redirects.ts:31.
 const EXPECTED: Record<Exclude<Role, 'seo'>, readonly string[]> = {
-  admin: ['Job Locations', 'Redirects'],
-  editor: ['Job Locations', 'Redirects'],
-  author: ['Job Locations', 'Redirects'],
-  hr: ['Job Locations'],
+  admin: ['Job locations', 'Redirects'],
+  editor: ['Job locations', 'Redirects'],
+  author: ['Job locations', 'Redirects'],
+  hr: ['Job locations'],
   events: [],
   legal: [],
 };
@@ -9335,7 +9922,7 @@ for (const [role, items] of Object.entries(EXPECTED) as Array<[Exclude<Role, 'se
     await signIn(page, role);
     await page.goto('/studio');
     const nav = page.getByRole('navigation', { name: 'Studio' });
-    for (const label of ['Job Locations', 'Redirects']) {
+    for (const label of ['Job locations', 'Redirects']) {
       const link = nav.getByRole('link', { name: label, exact: true });
       if (items.includes(label)) await expect(link).toBeVisible();
       else await expect(link).toHaveCount(0);
@@ -9351,7 +9938,7 @@ test('@studio skip link is the first tab stop', async ({ page }) => {
 });
 ```
 
-Before relying on the labels above, read the plural labels from `apps/cms/src/payload/collections/JobLocations.ts` and `Redirects.ts` and use them exactly.
+The labels above match the plural labels in `apps/cms/src/payload/collections/JobLocations.ts:10` (`Job locations`) and `Redirects.ts:31` (`Redirects`) as of 2026-10-21; if either changes, change the spec with it.
 
 `apps/cms/tests/e2e/studio/studio-redirects.spec.ts`:
 
@@ -9383,7 +9970,8 @@ test.describe('@studio redirects', () => {
     await page.getByRole('option', { name: /410/ }).click();
     await expect(page.getByLabel('To')).toHaveCount(0);
     await page.keyboard.press(process.platform === 'darwin' ? 'Meta+s' : 'Control+s');
-    await expect(page.getByRole('status').filter({ hasText: /Saved/ })).toBeVisible();
+    // The exact SaveStatus string (09-BEHAVIOUR-CONTRACT.md §11.2); the toast says "Saved." and must not match.
+    await expect(page.getByText('Saved just now', { exact: true })).toBeVisible();
     expect((await (await page.request.get(`/api/redirects/${id}`)).json()).status).toBe('410');
 
     await page.getByRole('button', { name: 'More actions' }).click();
@@ -9532,7 +10120,7 @@ How publish is blocked: Payload decides publish permission by calling the update
 ```ts
 import { describe, expect, it } from 'vitest';
 
-import { canCreateContent, canDeleteContent, canUpdateContent, isAdminEditorOrAuthor } from './index';
+import { canCreateContent, canDeleteContent, canUpdateContent, isAdminEditorEventsOrAuthor } from './index';
 
 type Args = Parameters<typeof canUpdateContent>[0];
 const call = <T>(fn: (args: Args) => T, roles: string[] | null, data?: Record<string, unknown>): T =>
@@ -9589,10 +10177,11 @@ describe('canDeleteContent', () => {
   });
 });
 
-describe('isAdminEditorOrAuthor (media uploads)', () => {
-  it('allows authors to upload', () => {
-    expect(call(isAdminEditorOrAuthor, ['author'])).toBe(true);
-    expect(call(isAdminEditorOrAuthor, ['legal'])).toBe(false);
+describe('isAdminEditorEventsOrAuthor (media uploads)', () => {
+  it('keeps events and adds authors', () => {
+    expect(call(isAdminEditorEventsOrAuthor, ['author'])).toBe(true);
+    expect(call(isAdminEditorEventsOrAuthor, ['events'])).toBe(true);
+    expect(call(isAdminEditorEventsOrAuthor, ['legal'])).toBe(false);
   });
 });
 ```
@@ -9639,8 +10228,8 @@ export const canDeleteContent: Access = ({ req: { user } }) => {
   return { and: [{ createdBy: { equals: id } }, { _status: { equals: 'draft' } }] };
 };
 
-/** Media uploads: admins, editors, and authors (D-6). Update and delete stay admin/editor. */
-export const isAdminEditorOrAuthor: Access = ({ req: { user } }) => hasAnyRole(user, ['admin', 'editor', 'author']);
+/** Media uploads: admins, editors, events (unchanged) and authors (D-6). Update and delete rules are unchanged. */
+export const isAdminEditorEventsOrAuthor: Access = ({ req: { user } }) => hasAnyRole(user, ['admin', 'editor', 'events', 'author']);
 ```
 
 Run the test. Expected: PASS (11 tests).
@@ -9687,14 +10276,15 @@ In each of `Blogs.ts`, `News.ts`, `Guides.ts`, `KnowledgeBase.ts`, `Resources.ts
 2. Replace the access block's `create`, `update` and `delete` with `canCreateContent`, `canUpdateContent` and `canDeleteContent` (keep `read` as it is).
 3. Add `createdByField` to `fields`, directly after the field that holds `displayPublishedAt` (or after `slug` in collections without it), so it sits in the sidebar's publishing area.
 
-In `Media.ts`, change `create: isAdminOrEditor` to `create: isAdminEditorOrAuthor` and replace the comment at lines 77-78 with:
+In `Media.ts` (access block at lines 75 to 82), change `create: isAdminEditorOrEvents` to `create: isAdminEditorEventsOrAuthor` (import it from `../access`), leave `update` and `delete` exactly as they are (events keeps its folder-scoped update), and replace the comment's first two lines ("Authors no longer upload directly…") with:
 
 ```ts
     // Authors upload images for their own drafts (decision D-6, 2026-10-16).
-    // Editing and deleting existing media stays with admins and editors.
+    // `events` may add files, and edit those filed under its own folders;
+    // nobody but admins and editors can remove anything from the library.
 ```
 
-The endpoint `POST /api/media-ingest-url` already allows authors in its own gate (`media-ingest-url.ts:78`); with this change its Local API call is consistent with Media's create rule.
+The endpoint `POST /api/media-ingest-url` has no role gate of its own: it calls Media's create access (`req.payload.collections.media.config.access.create({ req })`, `media-ingest-url.ts:80`). So this one change also lets authors use it, and it needs no edit.
 
 - [ ] **Step 5: Migration**
 
@@ -9723,7 +10313,7 @@ import { type MigrateDownArgs, type MigrateUpArgs, sql } from '@payloadcms/db-po
 
 const TABLES = ['blogs', 'news', 'guides', 'knowledge_base', 'resources'] as const
 
-const up = (table: (typeof TABLES)[number]) => [
+const statementsFor = (table: (typeof TABLES)[number]) => [
   sql.raw(`ALTER TABLE "${table}" ADD COLUMN IF NOT EXISTS "created_by_id" integer;`),
   sql.raw(`ALTER TABLE "_${table}_v" ADD COLUMN IF NOT EXISTS "version_created_by_id" integer;`),
   sql.raw(
@@ -9737,7 +10327,7 @@ const up = (table: (typeof TABLES)[number]) => [
 ]
 
 export async function up({ db }: MigrateUpArgs): Promise<void> {
-  for (const statement of TABLES.flatMap(up)) {
+  for (const statement of TABLES.flatMap(statementsFor)) {
     await db.execute(statement)
   }
 }
@@ -9781,7 +10371,7 @@ export type DocumentPermissions = {
 ```
 
 ```ts
-  const collectionConfig = session.payload.collections[slug as never];
+  const collectionConfig = session.payload.collections[slug as CollectionSlug];
   const access = await docAccessOperation({ collection: collectionConfig, id, req: api.req });
   const publishAccess = schema.drafts
     ? await docAccessOperation({ collection: collectionConfig, id, data: { ...doc, _status: 'published' }, req: api.req })
@@ -9790,19 +10380,19 @@ export type DocumentPermissions = {
 
 and return `publish: publishAccess.update === true` in `permissions`.
 
-In `apps/cms/src/studio/document/EditView.tsx`: add `readonly publish: boolean` to `permissions` in `EditViewProps`, and pass a new `canPublish={props.permissions.publish}` prop to `PublishControl`. In `PublishControl.tsx`, add `readonly canPublish: boolean` and render the Publish button only when `canPublish` is true (Save draft stays). Also block `save('publish')` in `EditView` when `!props.permissions.publish`, so ⌘↵ does nothing for authors.
+In `apps/cms/src/studio/document/EditView.tsx`: add `readonly publish: boolean` to `permissions` in `EditViewProps`, and pass a new `canPublish={props.permissions.publish}` prop to `PublishControl`. In `PublishControl.tsx`, add `readonly canPublish: boolean` and render the Publish button only when `canPublish` is true (Save draft stays). Also block `save('publish')` in `EditView` when `!props.permissions.publish`, so ⌘↵ does nothing for authors: add `if (intent === 'publish' && !props.permissions.publish) return;` at the top of `save` and add `props.permissions.publish` to its dependency list (Biome's `useExhaustiveDependencies` fails otherwise). Rename the local `canPublish` inside `PublishControl` (the button's enabled state) to `publishable`, so it does not clash with the new prop.
 
 In the create route (`new/page.tsx`), compute it the same way without an id:
 
 ```tsx
-import { docAccessOperation } from 'payload';
+import { type CollectionSlug, docAccessOperation } from 'payload';
 import { studioApi } from '@/studio/server/payload';
 ```
 
 ```tsx
   const api = await studioApi(session);
   const publishCheck = schema.drafts
-    ? await docAccessOperation({ collection: session.payload.collections[collection as never], data: { _status: 'published' }, req: api.req })
+    ? await docAccessOperation({ collection: session.payload.collections[collection as CollectionSlug], data: { _status: 'published' }, req: api.req })
     : null;
 ```
 
@@ -10090,7 +10680,7 @@ Named helpers are registered once, by function. Inline functions are extracted i
 | 55 | `fields/media-upload.ts:86` | `(pass-through, keep)` | `...(opts.validate ? { validate: opts.validate } : {}),` |
 | 56 | `fields/seo.ts:341` | `seo.canonicalOverride` | `validate: (` |
 | 57 | `fields/seo.ts:400` | `seo.additionalSchema` | `validate: ((value: unknown, ctx: unknown): true \| string => {` |
-| 58 | `fields/slug.ts:98` | `slug.slug` | `validate: async (` |
+| 58 | `fields/slug.ts:98` | `slug.unique`, `slug.uniqueComposite` | `validate: async (` |
 | 59 | `blocks/Embed.ts:28` | `embed.url` | `validate: (` |
 | 60 | `blocks/Pricing.ts:29` | `pricing.tiers` | `validate: (` |
 | 61 | `blocks/Table.ts:79` | `table.value` | `validate: (` |

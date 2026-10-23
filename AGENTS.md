@@ -1,315 +1,262 @@
 # AGENTS.md — CleanStart repo
 
-This file tells Codex *how* to work in this repo. It does not duplicate the architecture doc, which tells you *what* to build.
+This file tells coding agents (Codex, Google Antigravity, Claude Code and others) *how* to work in this repo. It does not duplicate the architecture doc, which tells you *what* to build.
 
-**Source of truth for *what*:** `docs/architecture/cleanstart-cms-architecture.html`. Every ticket, every design call, every schema decision references an anchor in that file (e.g. `#new-fields`, `#blocks`, `#publishing-checklist`). If this AGENTS.md and the arch doc disagree, the arch doc wins for product/architecture decisions; this file wins for code conventions.
+**Kept in sync with `CLAUDE.md`** (read by Claude Code). Codex and Google Antigravity read this file. Change the two together; they differ only in this intro, tool-neutral wording and the scoped-change rules below.
 
-**Plan of record:** `~/.Codex/plans/lets-review-the-doc-curried-feigenbaum.md` (CMS-only Phase A–I sequence). The current backlog is at `docs/BACKLOG.md`. Phases A–I are substantially done (see backlog for remaining ops-only gaps). **Currently active scope: Phase J — Integrations dashboard** (`apps/cms` Integrations collection + editor self-serve UI). `apps/web` marketing site is also active as of Phase J (see below).
+**Source of truth for *what*:** `docs/architecture/cleanstart-cms-architecture.html`. If this file and the arch doc disagree, the arch doc wins for product/architecture decisions; this file wins for code conventions.
+
+**Current backlog:** `docs/BACKLOG.md`. Phases A–I are done. **Phase J — Integrations dashboard** is active. `apps/web` is live at `www.cleanstart.com`.
+
+## Studio (the custom admin replacing Payload's admin UI)
+
+If your task touches `apps/cms/src/studio/**`, `apps/cms/src/app/(studio)/**` or `docs/studio/**`, or you were asked to build Studio:
+
+1. Read `docs/studio/HANDOFF.md` first and follow it exactly. It sets the worktree (`.claude/worktrees/studio-build`, branch `feat/studio-build`), the separate local database, the dev server port (3200), the per-task loop, the subagent rules and when to stop and ask.
+2. Then read `docs/studio/06-IMPLEMENTER-GUIDE.md` and `docs/studio/10-ENGINEERING-STANDARDS.md`. The task plans are `docs/superpowers/plans/2026-10-16-studio-phase-0-1-foundation.md` (Phases 0 and 1) and `docs/studio/08-PHASE-2-7-TASKS.md`.
+3. Log every task in `docs/studio/PROGRESS.md` with one appended line per event (`printf '%s\n' "…" >> docs/studio/PROGRESS.md`). Never rewrite or edit that file; several agents append to it at once.
+4. The Studio docs decide Studio's behaviour, design and copy (`docs/studio/09-BEHAVIOUR-CONTRACT.md` is final for behaviour). Everything else in this file still applies: git rules, migrations, generated types, secrets, no em-dashes or en-dashes.
+5. If a Studio doc is ambiguous or two docs disagree, stop and ask. Do not guess.
 
 ---
 
 ## Local dev prerequisites
 
-- **Node 22+** (24.x verified working)
-- **pnpm 10.30.3+**
-- **Postgres 16** running on `localhost:5432`. Local dev uses the host Postgres (Postgres.app / pgAdmin / Homebrew); database `cleanstart`, user `postgres`. Connection string lives in `apps/cms/.env` (gitignored). The `infra/docker-compose.yml` Postgres is for staging/droplet parity, not the local-dev path.
-- **`apps/cms/.env`** must exist with `DATABASE_URI` and `PAYLOAD_SECRET` before `pnpm dev` will start. Copy from `apps/cms/.env.example` and generate the secret with `openssl rand -base64 32`.
+- **Node 22+** (24.x verified) · **pnpm 10.30.3+**
+- **Postgres 16** on `localhost:5432` (Postgres.app / Homebrew). Database `cleanstart`, user `postgres`. The `infra/docker-compose.yml` Postgres is for staging/droplet parity, not local dev.
+- **`apps/cms/.env`** — copy from `.env.example`, generate secret with `openssl rand -base64 32`.
 
 **Key versions:**
+
 ```
-apps/cms:  Next.js 16.2.0 · Payload 3.81.0 · React 19.0.0
+apps/cms:  Next.js 16.2.5 · Payload 3.81.0 · React 19.0.0
 apps/web:  Next.js 16.2.5 · React 19.2.4 · Tailwind CSS v4
-Node ≥ 22 (24.x verified) · pnpm 10.30.3
 ```
 
 ---
 
 ## Branching policy
 
-The repo has **exactly two long-lived branches**. Both are kept in sync at the same HEAD after every merge.
+| Branch        | Purpose                                          | Allowed scope |
+| ------------- | ------------------------------------------------ | ------------- |
+| `main`        | Production. Deploys go from here.                | Everything    |
+| `development` | Day-to-day dev for `apps/cms` + `apps/web`.      | Everything    |
 
-| Branch | Purpose | Allowed scope |
-|---|---|---|
-| `main` | Production truth. Deploys go from here. | Everything |
-| `development` | Day-to-day development for both `apps/cms` and `apps/web`. | Everything |
-
-### No other long-lived branches
-
-- **No feature branches**, **no fix/* branches**, **no integration/* branches**, **no worktrees** for routine development.
-- Hotfixes go directly on `development`.
-- Exception: short-lived branches created by another developer (e.g. `feat/yatish-resume`) are tolerated for their owner's use, but they don't enter the merge cycle until promoted to `development`.
+No other long-lived branches. No feature branches, no worktrees for routine work. Short-lived branches by other developers (e.g. `feat/yatish-resume`) are tolerated but don't enter the merge cycle until promoted to `development`. Both branches are kept in sync at the same HEAD after every merge.
 
 ### Scoped-change discipline
 
-Every commit should be **scoped to the page or feature being worked on**. Other pages, shared utilities, and global config stay untouched unless the work genuinely requires them.
+Every commit is scoped to the page or feature being worked on. Other pages, shared utilities and global config stay untouched unless the work needs them.
 
-- **Working on `/for-developers`?** Only touch `apps/web/src/app/for-developers/`, `apps/web/src/components/sections/for-developers/`, and `apps/web/public/images/for-developers/`. Don't drag in unrelated edits to `/community`, `/sbom`, `/teams`, etc., nor `globals.css`, `nav-config.ts`, layout primitives, or `tsconfig`/`eslint`/`prettier`/`biome` config in the same commit.
-- **Adding a new page?** New route under `apps/web/src/app/<page>/`, new sections under `apps/web/src/components/sections/<page>/`, new assets under `apps/web/public/images/<page>/`. The only expected cross-page edits are:
-  - One line in `apps/web/src/lib/nav-config.ts` to add the nav entry.
-  - One row in `docs/web/WEB-PAGES.md` for the page inventory.
-  - One row in `apps/cms/src/payload/lib/page-registry-seed.ts` (Schema Manager + ⌘K search — see Component structure below).
-- **Typography comes from the global config — NOT from Figma.** For any new or existing page, **ignore Figma's font sizes, font family, font weights, letter-spacing, and line-heights**. The canonical typography spec is **[`apps/web/docs/TYPOGRAPHY-SYSTEM.md`](apps/web/docs/TYPOGRAPHY-SYSTEM.md)** (v2/v4, 2026-05-27). Consume the role tokens defined there:
-  - Hero H1 (marketing/product) → `var(--fs-display)` (36 → 64 px).
-  - Listing / detail / legal H1 → `var(--fs-h1)` (32 → 56 px).
-  - Section H2 → `var(--fs-h2)` (28 → 48 px).
-  - Subsection / card title → `var(--fs-h3)` (22 → 28 px).
-  - Card sub-title → `var(--fs-h4)`; small panel header → `var(--fs-h5)`.
-  - Hero sub-heading / intro → `var(--fs-lead)` (18 → 20 px).
-  - Body copy → `var(--fs-body)` (16 → 17 px); secondary → `var(--fs-body-sm)`; caption/meta → `var(--fs-caption)`.
-  - Buttons → `var(--fs-button)` (16 px) or `var(--fs-button-lg)` (16 → 18 px, hero CTA).
-  - Inputs / textarea / select → `var(--fs-input)` (16 px fixed — iOS zoom rule).
-  - Eyebrow chip → `var(--fs-eyebrow)` (UPPERCASE, 0.08em tracking).
-  - Prose (CMS-rendered article content) → `.article-body` + `--prose-*`.
-  - Font family → `var(--font-display)` (Manrope) / `var(--font-sans)` (Sora) / `var(--font-mono)`. Never literal `"Figtree"` / `"InterFigmaName"` etc.
-  - Font weight → 400 body / 500 nav-meta-button / 600 sub-head + card title + hero / 700 article H1–H3. No `font-weight: 800`. No other weights.
-  Inline `text-[clamp(...)]`, `text-[Xpx]`, `fontSize: "Xpx"`, or any other ad-hoc type sizing is forbidden. **Legacy `--text-hero-*` / `--text-display-*` / `--text-card-title-*` / `--text-body-*` / `--text-t-*` tokens are aliased to the new `--fs-*` family** in `globals.css` for backward compatibility but should not be used in new code. If a role token doesn't exist for what Figma shows, **stop and ask**.
-- **No bulk formatter sweeps.** Prettier/Biome reflows that touch dozens of unrelated files are forbidden. If formatter config changes, raise it for discussion before applying — never bundle a formatter pass with feature work.
-- **No "while I'm here" cleanups.** Renaming a shared variable, tweaking a layout primitive, or "fixing" an unrelated page in the same commit is out of scope.
+- **Working on one page** (for example `/for-developers`): touch only `apps/web/src/app/for-developers/`, `apps/web/src/components/sections/for-developers/` and `apps/web/public/images/for-developers/`. Do not bundle edits to other pages, `globals.css`, `nav-config.ts`, layout primitives, or TypeScript, ESLint, Prettier or Biome config.
+- **Adding a page:** new route, sections and assets go under the page's own folders. The only expected cross-page edits are one entry in `apps/web/src/lib/nav-config.ts`, one row in `docs/web/WEB-PAGES.md` and one row in `apps/cms/src/payload/lib/page-registry-seed.ts`.
+- **No bulk formatter sweeps.** A Prettier or Biome reflow across unrelated files is forbidden. Raise formatter config changes for discussion first, and never bundle them with feature work.
+- **No "while I'm here" cleanups** in the same commit: no renaming shared variables, tweaking layout primitives or fixing unrelated pages.
 
-### Forbidden git actions on this repo
+### Forbidden git actions
 
-- Force-pushing `main` — never. Use forward merges and back-merges to align.
-- Creating new long-lived branches without updating this section first.
+- Never force-push `main`. Use forward merges and back-merges to align.
+- Never create new long-lived branches without updating this section.
+- Never `git add -A` or `git add .` at repo root. Stage specific paths.
+- Never `--no-verify` on commits. If a hook fails, fix it.
+- Never delete data or drop tables without explicit user confirmation, even in dev.
 
 ---
 
 ## Repo layout
-
-This directory (`cleanstart-website/`) is the monorepo root. The arch doc's §09 file map is authoritative.
 
 ```
 cleanstart-website/                  monorepo · pnpm workspaces + Turborepo
 ├── apps/
 │   ├── cms/                         Payload 3 admin + REST API · cms.cleanstart.com · port 3000
 │   │   └── src/payload/{collections,globals,blocks,fields,access,lib,jobs,endpoints,hooks}/
-│   └── web/                         @cleanstart/web marketing site · Next.js 16 · Tailwind v4 · port 3001
+│   └── web/                         Marketing site · www.cleanstart.com · Next.js 16 · Tailwind v4 · port 3001
 │       ├── src/{app,components,lib}/
-│       ├── figma.config.json         Figma Code Connect (include: src/components/**/*.figma.tsx)
-│       └── docs/RESPONSIVE-SYSTEM-AUDIT.md  Authoritative responsive/typography/sizing system (2026-05-21)
-│       └── docs/_archive/           Legacy docs (RESPONSIVE-AUDIT.md, design-tokens.md, typography.md, web-responsiveness plan.md) — do NOT consult or copy from
+│       ├── figma.config.json         Figma Code Connect mapping
+│       └── docs/                    TYPOGRAPHY-SYSTEM.md · RESPONSIVE-SYSTEM-AUDIT.md (canonical)
 ├── packages/
 │   ├── types/                       re-exports apps/cms/payload-types
-│   ├── ui/                          @cleanstart/ui design-system primitives + tokens; consumed by apps/cms and apps/web
+│   ├── ui/                          @cleanstart/ui primitives + tokens (shared by cms + web)
+│   ├── forms/                       @cleanstart/forms — business-email + E.164 rules (shared by cms + web)
 │   └── config/                      tsconfig · biome · eslint
 ├── migrations/webflow-import/       Phase H: ETL scripts
-├── infra/                           docker-compose · Caddy · backup/restore scripts
-├── docs/                            BACKLOG.md · cleanstart-cms-architecture.html · INTEGRATIONS-RESEARCH.md · INTEGRATIONS-RESEARCH-V2.md
-├── cleanstart-logo.svg              brand mark — also embedded as JSX in apps/cms/src/payload/admin/
-└── AGENTS.md                        this file
+├── infra/                           docker-compose · Caddy · backup/restore
+├── docs/                            BACKLOG.md · architecture · integrations · operations
+└── CLAUDE.md                        this file
 ```
 
-**`apps/web`** was re-bootstrapped at commit `ac5a0d0` as a purpose-built Next.js 16.2.5 / React 19 / Tailwind v4 marketing site. It currently has a hero page and Figma Code Connect wired (`figma.config.json`; component stubs live at `src/components/**/*.figma.tsx`). It is **early-stage** — no production deployment yet, no separate CI gate yet. The design/token/routing contracts from the prior wipe are gone; everything in `apps/web` now is built from Figma ground up. When touching `apps/web`, preserve the Code Connect setup: do not delete `figma.config.json` or restructure `src/components/` without understanding the connected Figma component mapping.
+**Page inventory:** `docs/web/WEB-PAGES.md` — canonical list of all pages, slugs, types, build status. Update status when a page is completed.
 
-**Full page inventory:** `docs/web/WEB-PAGES.md` — canonical list of all 31 pages, their URL slugs, types (Static / CMS Listing / CMS Detail / Legal / Utility), build status, and recommended build order. Update the status column there whenever a page is completed.
+**`packages/forms`** is framework-agnostic and holds the rules both apps must agree on: `validateBusinessEmail`, the free-mail/disposable domain corpus, and the E.164 helpers. Two entry points: `@cleanstart/forms` is client-safe (curated ~260-domain list), while `@cleanstart/forms/server` adds the full 13,797-domain corpus and **must never be imported from a client component**. Refresh the corpus with `pnpm --filter @cleanstart/forms refresh-domains`.
 
-**`packages/ui`** hosts the custom React primitives (`Drawer`, `Dialog`, `Popover`, `Combobox`, `ConfirmDialog`, `Spinner`, `Tooltip`, `DropdownMenu`, `ContextMenu`, `DateTimePicker`, `Toast`) plus design tokens. Consumed by both `apps/cms` and `apps/web` — no duplication between the two apps.
+**`packages/ui`** hosts the shared React primitives (`Drawer`, `Dialog`, `Popover`, `Combobox`, `ConfirmDialog`, `Spinner`, `Tooltip`, `DropdownMenu`, `ContextMenu`, `DateTimePicker`, `Toast`) plus design tokens. Consumed by both `apps/cms` and `apps/web` — no duplication between apps.
 
-### `@payloadcms/ui` is a data-layer-only dependency
+When touching `apps/web`, preserve the Figma Code Connect setup: do not delete `figma.config.json` or restructure `src/components/` without understanding the connected Figma component mapping (stubs at `src/components/**/*.figma.tsx`).
 
-CleanStart owns every render path under `/admin`. Imports from `@payloadcms/ui` are limited to the **data layer**:
+### `@payloadcms/ui` is data-layer-only
 
-- Allowed: `useField`, `useFormFields`, `useDocumentInfo`, `useListQuery`, `useTableColumns`, `useSelection`, `useAuth`, `useConfig`, `useLocale`, `useTranslation`, `useDocumentDrawer` (the hook only — render comes from `@cleanstart/ui`).
-- Forbidden: render-side exports (any component, including `Button`, `Drawer`, `Modal`, `Pill`, `useEditDepth`-driven view shells, etc.).
-
-ESLint enforces the allow-list (Wave 8 flips it from warn to error). The `@payloadcms/ui` major is pinned (currently `^3.81.0`); a new major is a *data-layer* upgrade only — never a UI upgrade.
+Allowed imports: `useField`, `useFormFields`, `useDocumentInfo`, `useListQuery`, `useTableColumns`, `useSelection`, `useAuth`, `useConfig`, `useLocale`, `useTranslation`, `useDocumentDrawer` (hook only). No render-side components (`Button`, `Drawer`, `Modal`, `Pill`, `useEditDepth`-driven view shells, etc.). ESLint enforces the allow-list. The `@payloadcms/ui` major is pinned (`^3.81.0`); a new major is a data-layer upgrade only — never a UI upgrade.
 
 ---
 
 ## Mandatory pre-completion checks
 
-Before reporting any code change as done, run these against the package you touched. Scope to what changed — do not re-lint the whole monorepo for a one-file change.
+Scope to what changed — do not re-lint the whole monorepo for a one-file change.
 
 ```bash
-# apps/cms
+# apps/cms (when touched)
 pnpm --filter @cleanstart/cms lint
 pnpm --filter @cleanstart/cms typecheck
 pnpm --filter @cleanstart/cms build
 pnpm --filter @cleanstart/cms test       # if tests were touched or added
 
-# apps/web (when a page was added/renamed/removed, or that package was touched)
+# apps/web (when a page was added, renamed, or removed — also when anything else touched)
 pnpm --filter @cleanstart/cms verify:page-registry
 pnpm --filter @cleanstart/web lint
 pnpm --filter @cleanstart/web typecheck
 pnpm --filter @cleanstart/web build
+pnpm --filter @cleanstart/web verify:copy   # after build: no em/en-dashes in code-owned copy
 ```
 
-**Rules:**
-1. Fix before reporting. If lint/typecheck/build fails, fix and re-run until clean.
-2. Never skip checks — even for one-line changes.
-3. Report results in your final message: `lint ✓ · typecheck ✓ · build ✓`.
+1. Fix before reporting — if lint/typecheck/build fails, fix and re-run.
+2. Never skip, even for one-line changes.
+3. Report: `lint ✓ · typecheck ✓ · build ✓`.
 4. `payload generate:types` runs in CI and fails on drift. If you change a collection, regenerate types locally and commit the result.
-5. `verify:page-registry` (CMS-side, gates CI) fails if any `apps/web` page has no `pageRegistry` row — see "New page?" under Component structure below.
+5. `verify:page-registry` runs in CI and fails if any `apps/web` page has no `pageRegistry` row — see the "New page?" bullet under Component structure below. It's a `pnpm --filter @cleanstart/cms` script (CMS-side) even though what triggers it is a web-side page add.
+6. **Do not trust `payload migrate:create`.** It diffs the config against the newest `.json` schema snapshot, and the last one committed is `20260611_061406_add_seo_keywords.json` — every migration since is hand-written with no snapshot. Running it emits every schema change made since June (879 statements on 2026-09-21). Use it only to *read* the SQL it proposes for your own tables, then hand-write a focused, `IF NOT EXISTS`-guarded migration in the style of the rest of `src/migrations/`, and delete the generated `.ts` + `.json`.
 
 ---
 
 ## Code conventions
 
 - **TypeScript strict.** No `any`. Explicit return types on exported functions.
-- **Zod at boundaries.** REST handlers, lead intake, webhook payloads, ETL inputs — all validated with Zod before crossing the boundary.
+- **Zod at boundaries.** REST handlers, lead intake, webhook payloads, ETL inputs — validated with Zod before crossing the boundary.
 - **No null punning.** Distinguish `undefined` (not set) from `null` (explicitly cleared) — Payload uses both meaningfully.
-- **Errors are typed.** Throw subclasses of a shared `AppError` taxonomy (`ValidationError`, `NotFoundError`, `IntegrationError`, `RateLimitError`). No bare `throw new Error('...')` outside of truly unexpected paths.
-- **No comments unless the WHY is non-obvious.** Don't restate what the code does. Don't reference tickets or PRs.
+- **Errors are typed.** Throw subclasses of `AppError` (`ValidationError`, `NotFoundError`, `IntegrationError`, `RateLimitError`). No bare `throw new Error('...')` outside of truly unexpected paths.
+- **No comments unless the WHY is non-obvious.** Don't restate what the code does.
 - **Three similar lines beats a premature abstraction.** Don't extract helpers until you have a third caller.
 - **Validate at system boundaries only.** Trust internal code. Don't add defensive checks for impossible states.
-- **Lexical nodes** follow the pattern in arch doc §`#table-handling` and §`#link-handling`. Custom nodes live in `apps/cms/src/payload/lib/lexical/`.
+- **Lexical nodes** follow arch doc §`#table-handling` and §`#link-handling`. Custom nodes: `apps/cms/src/payload/lib/lexical/`.
 
 ---
 
-## apps/web — marketing site conventions
+## apps/web conventions
 
-Everything in this section applies only to `apps/web`. It does not override the global code conventions above — it extends them.
+### Layout primitives (use these, never hand-roll)
 
-### Responsive system rules (canonical — supersedes v3 / Figma-tokens / RESPONSIVE-AUDIT)
+- `<Section padding="sm|md|lg|cta|none">` — wraps with `--spacing-section-*` tokens. Default `md`.
+- `<Container variant="default|wide|prose">` — max-width 1440/1600/720. Never hardcode `max-w-[1440px]`.
 
-> **Source of truth: `apps/web/docs/RESPONSIVE-SYSTEM-AUDIT.md` (2026-05-21).**
-> All earlier docs (`apps/web/docs/_archive/RESPONSIVE-AUDIT.md`, `design-tokens.md`, `typography.md`, `web-responsiveness plan.md`) are archived. **Do NOT copy patterns from them**, do not reference them in new code or PRs, do not treat their "v3 Consistency Layer" tables as binding. Anything in those archived docs is historical.
+### Typography
 
-**Layout primitives (use these, do not hand-roll wrappers):**
-> - `<Container variant="default|wide|prose">` (`apps/web/src/components/layout/Container.tsx`) — wraps page content with the correct `--container-{default|wide|prose}` max-width (1440 / 1600 / 720). The 1440 cap, paired with the Container's inner `px-6` (24 px), gives a **constant 24 px side gutter at every viewport from 320 up through 1440**; above 1440 the cap kicks in and auto-margins grow the gutter uniformly. **Never hardcode `max-w-[1276px]` or `max-w-[1440px]`** — consume the token via `<Container>`.
-> - `<Section padding="sm|md|lg|cta|none">` (`apps/web/src/components/layout/Section.tsx`) — wraps a section with one of the `--spacing-section-*` tokens. Default `padding="md"` (64 → 120 px fluid).
+**Source of truth:** `apps/web/docs/TYPOGRAPHY-SYSTEM.md` — the `--fs-*` token family.
 
-**Hero H1 (consume the role token, do not inline clamp):**
-> - Marketing pages (home, about, teams) → `style={{ fontSize: "var(--text-hero-marketing)", letterSpacing: "var(--text-hero-marketing-ls)", lineHeight: "var(--text-hero-lh)" }}` → 40 → 72 px
-> - Product pages (cleansight, cleanstart-images, ASR, FIPS, CISO, SBOM, SCA, vulnerability-remediation) → `var(--text-hero-product)` → 36 → 56 px
-> - Listing + detail pages (blogs, news, events, podcast, webinars, resource-center, *[/slug]*) → `var(--text-hero-utility)` → 32 → 48 px. The shared `_shared/DetailHero.tsx` already consumes this; reuse it instead of building a new hero.
-> - Tokens are fluid below `lg` (1024 px) and lock to fixed px from `lg+`. Do NOT inline `clamp(...)` for a new hero — it diverges from the role system.
+- Consume role tokens (`--fs-display`, `--fs-h1`–`--fs-h5`, `--fs-lead`, `--fs-body`, `--fs-caption`, `--fs-button`, `--fs-eyebrow`, etc.). Never inline `text-[clamp()]` or `fontSize: "Xpx"`.
+- Font family: `var(--font-display)` Manrope / `var(--font-sans)` Sora / `var(--font-mono)`.
+- Font weight: 400 body / 500 nav-meta-button / 600 sub-head+card-title+hero / 700 article H1–H3. No 800.
+- Hero H1 uses `--text-hero-marketing` (40→72px), `--text-hero-product` (36→56px), or `--text-hero-utility` (32→48px). Listing/detail pages reuse `_shared/DetailHero.tsx`.
+- Legacy `--text-hero-*`/`--text-display-*`/`--text-body-*` tokens are aliased to `--fs-*` — don't use in new code.
 
-**Card-grid interior scaling (use container queries, not viewport units):**
-> - For cards in a multi-column grid (Factory pattern, Resources article cards, etc.) where the card width depends on grid columns, add `container-type: inline-size` to the card root and size interiors with `clamp(min, Xcqi, max)`. See `apps/web/src/components/ui/FactoryCard.tsx` (desktop variant) for the reference implementation.
-> - The card's title-to-card-width ratio should land in the **8–13 %** band at every desktop viewport.
-> - Do NOT use viewport-scoped `clamp(min, Xvw, max)` for card interiors — it produces the over-sizing bug that the Factory card had before the container-query refactor.
+### Responsive system
 
-**CMS prose / blog rendering:**
-> - Body content from RenderLexical lives inside `.article-body` (see `apps/web/src/components/sections/blog/BlogDetailContent.tsx`).
-> - `.article-body .article-{paragraph|h1|h2|h3|h4|h5|h6|ul|ol|li|blockquote}` rules in `globals.css` consume the `--prose-*` token family. Body 17 → 18 px / lh 1.6 / column max 680 px / H3 ≥ 22 px (hierarchy must hold above body).
-> - **Do NOT use `text-[clamp(...)]` directly on prose elements** — wrap the content in `.article-body` and let the rules apply.
+**Source of truth:** `apps/web/docs/RESPONSIVE-SYSTEM-AUDIT.md`. All earlier docs in `docs/_archive/` (`RESPONSIVE-AUDIT.md`, `design-tokens.md`, `typography.md`, `web-responsiveness plan.md`) are dead — do NOT copy from them.
 
-**Form inputs (iOS Safari rule):**
-> - `<input>`, `<textarea>`, `<select>` must have `font-size: 16 px` minimum (or `1rem`). Below 16 px, iOS Safari zooms in on focus. `FormRenderer.tsx`'s `fieldInputStyle` already sets this; never override with `text-sm` (14 px).
+- **Figma artboard is 1920px — dev target is 1440px.** Scale interior dimensions (cards, illustrations, gaps, section padding) by ~0.75×. Keep absolute sizes (body text, buttons, form inputs, icons) at industry standards regardless of Figma. See RESPONSIVE-SYSTEM-AUDIT.md §17 decision 6.
+- Card-grid interiors: use container queries (`container-type: inline-size` + `cqi`), NOT viewport `vw` — viewport units produce the over-sizing bug. Card title-to-width ratio: 8–13% band. Ref: `FactoryCard.tsx`.
+- No bare `w-[Xpx]` without `max-w` qualifier. Card widths: `w-full max-w-[Xpx]`. Card heights: `min-h-[clamp()]` or `aspect-ratio`, never `h-[Xpx]`.
+- Every `<Image>` needs `sizes` matching rendered widths per breakpoint. SVGs: `preserveAspectRatio="xMidYMid meet"` (never `"none"`).
+- Buttons: `--btn-fs-*`/`--btn-h-*`/`--btn-px-*`, never `clamp()`. Primary CTAs ≥ 44px tall.
+- Section vertical padding: `--spacing-section-*` tokens via `<Section padding>` or `py-section-*` utilities. Do not invent `pt-Xpx sm:pt-Ypx lg:pt-Zpx` shapes.
+- Form inputs ≥ 16px font-size (iOS Safari zoom rule). The shared field surface (`src/components/forms/field-surface.ts`, used by `TextField` and `PhoneField`) sets this through `--fs-input`; never override with `text-sm` (14 px).
+- No `<br />` in prose — trust `max-width` + `text-wrap: balance` (applied globally on `h1`–`h4` via `@layer base`).
+- Footer CTA-card geometry is owned by `Footer.tsx`. Per-page CTAs paint inside the slot via the `cta` prop.
 
-**Navbar logo:**
-> - Logo `<a>` link uses `shrink-0`, and the `<Image>` uses `shrink-0 object-contain` with explicit `width`/`height` props. The fix in `Header.tsx` / `Logo.tsx` prevents flex from squashing the aspect ratio at narrow viewports.
+### CMS prose / blog rendering
 
-**Carry-over rules from the prior system (still apply):**
-> - **No bare `w-[Xpx]` without a `max-w` qualifier.** Card widths use `w-full max-w-[Xpx]`.
-> - **Card heights → `min-h-[clamp()]` or `aspect-ratio`**, never `h-[Xpx]`.
-> - **Every `<Image>` requires `sizes`** matching its rendered widths per breakpoint.
-> - **SVG with intrinsic ratio uses `preserveAspectRatio="xMidYMid meet"`** (never `"none"`).
-> - **No `<br />` in prose** (`<p>`, `<h1>`, `<h2>`, `<h3>`). Trust `max-width` + `text-wrap: balance` (applied globally on `h1`/`h2`/`h3`/`h4` via `@layer base`).
-> - **Buttons use `--btn-fs-*` / `--btn-h-*` / `--btn-px-*`**, never `clamp()`. Primary CTAs ≥ 44 px tall.
-> - **Section vertical padding uses `--spacing-section-*` tokens** via the `<Section padding>` prop or `py-section-*` utility classes. Do not invent new `pt-Xpx sm:pt-Ypx lg:pt-Zpx` shapes.
-> - **Footer CTA-card geometry is owned by `Footer.tsx`**. Per-page CTAs paint inside the slot via the `cta` prop.
-> - **Font weights**: 400 body / 500 button/nav/meta / 600 sub-head + card title + hero / 700 article body H1-H3. No `font-weight: 800`.
+- Body content from RenderLexical lives inside `.article-body` (see `BlogDetailContent.tsx`).
+- `.article-body .article-{paragraph|h1|h2|h3|...}` rules in `globals.css` consume the `--prose-*` token family. Body 17→18px / lh 1.6 / column max 680px / H3 ≥ 22px.
+- **Do NOT use `text-[clamp()]` directly on prose elements** — wrap content in `.article-body` and let the rules apply.
 
-**The Figma artboard is 1920 px — that is the WRONG primary width.** The dev site targets 1440 as the primary viewport. When porting from Figma, scale interior dimensions (cards, illustrations, gaps, section padding) by ~0.75× where appropriate; keep absolute sizes (body text, buttons, form inputs, icons in text) at industry standards regardless of Figma. See RESPONSIVE-SYSTEM-AUDIT.md §17 decision 6 for the design-team handoff.
+### Section wrapper pattern
 
-### Component structure
-
-- One section per file: `src/components/sections/[page]/SectionName.tsx`
-- Page entry point: `src/app/[page]/page.tsx`
-- All nav links live in **one place only**: `src/lib/nav-config.ts`. Changing a page slug means changing it there — both desktop and mobile nav pick it up automatically.
-- Do not restructure `src/components/` or delete `figma.config.json` without understanding the Figma Code Connect mapping.
-- **New page? It needs a `pageRegistry` row (CMS-side) or it has no Schema.org override and is invisible to ⌘K search.** A static page under `src/app/[page]/page.tsx` has no CMS document, so `apps/cms/src/payload/lib/page-registry-seed.ts` (`PAGE_REGISTRY_SEED`) is the only thing that indexes it — nothing else does. Add a row (`kind: 'static'`), then from `apps/cms`:
-  ```bash
-  pnpm exec tsx --env-file=.env scripts/seed-page-registry.ts
-  ```
-  Creating the row fires the search-sync hook automatically (no `--force` needed). `pnpm --filter @cleanstart/cms verify:page-registry` gates CI on this — it diffs every `apps/web/src/app/**/page.tsx` route against `PAGE_REGISTRY_SEED` and fails on anything missing (deliberately-unindexed routes go in `INTENTIONALLY_UNREGISTERED` in `apps/cms/src/payload/lib/page-registry-coverage.ts` instead).
-
-### Figma-to-code rules
-
-Every section is built directly from Figma design context. These rules are non-negotiable:
-
-**Values must be exact — never approximated** (decorative gradients, shadows, radii):
-- Copy gradient strings verbatim including angle, all stops, and opacities.
-- Letter-spacing in `em` exactly as Figma reports — except when consuming the role tokens (which already encode the correct tracking).
-- Border-radius in exact `px` — `40px` is not `rounded-2xl` (which is `16px`).
-- Shadow strings copied in full including all layers.
-- Use `style={{}}` inline for any value that cannot be expressed as an exact Tailwind class.
-
-**Font sizes — use the token, not inline clamp:** Consume `--text-hero-{marketing|product|utility}`, `--text-display-{sm|md|lg}`, `--text-card-title-{sm|md|lg|xl}`, `--text-body-{xs|sm|md|lg|xl}`, or `--prose-*`. Inline `text-[clamp(...)]` for a new H1/H2 is forbidden — it bypasses the role system and produces the per-page H1-size drift the audit fixed.
-
-**Section wrapper pattern (new code MUST use this):**
 ```tsx
 import { Section, Container } from "@/components/layout";
 
 <Section padding="md" className="relative overflow-hidden ...">
-  {/* decorative elements — absolute positioned, parent of <Section> */}
-  <Container>
-    {/* content */}
-  </Container>
-</section>
+  <Container>{/* content */}</Container>
+</Section>
 ```
-The outer `relative overflow-hidden` clips decorative elements. The inner `relative` wrapper ensures content sits above absolute decorative layers.
 
-### Asset extraction rules
+### Form fields
 
-Before saving any asset downloaded from Figma MCP:
-1. Detect actual format: `file --mime-type -b <file>`
-   - `image/svg+xml` → save as `.svg` even if Figma called it `.png`
-   - `image/png` → `.png` · `image/jpeg` → `.jpg`
-2. Name descriptively: `hero-bg-grid.svg`, `founders-photo.png`, `card-glow.svg`
-3. Save to `public/images/[page-name]/`
-4. Verify the file exists on disk before referencing it in JSX
+Use the shared field components in `src/components/forms/`, never a per-form copy:
 
-Never recreate an SVG asset in code — always extract the actual file from Figma MCP. If MCP did not return it, call `get_design_context` on the specific child node that contains it.
+- `<TextField>` and `<PhoneField>` render on the one field surface (`field-surface.ts`) and put validation messages **inline underneath the field**. Native browser validation bubbles are not used: every public form is `noValidate`.
+- `<PhoneField>` is the only way to collect a phone number. It composes E.164 from a country selector plus a digits-only input, and the selected country is where the lead's country comes from — do not add a separate country field alongside it.
+- The country preselects from `useDetectedCountry()`, which reads Vercel's `x-vercel-ip-country` via `/api/geo` and falls back to the browser locale. It is a hint: never overwrite a country the visitor has already chosen.
+- Email validation goes through `emailError()` in `lib/forms/validate.ts`. Free-mail addresses (gmail, outlook) are accepted on every public form since 2026-10-15; pass `requireBusiness: true` only if a form must reject them again, and tick `requireBusinessEmail` on the CMS form so the server agrees.
+- Client validation is fast feedback, not the gate. The API re-checks every rule and returns `issues[]`; map those back onto fields with `issuesToErrors()` so a server-only rejection still lands under the right input.
 
-### Image component rules
+### Component structure
 
-- `next/image` (`Image`) for all PNG/JPG content images — requires explicit `width` and `height`.
-- Plain `<img>` for decorative SVGs. Always add `// eslint-disable-next-line @next/next/no-img-element` on the line above.
-- Every decorative element must have: `aria-hidden`, `pointer-events-none`, `select-none`, `loading="lazy"`, `decoding="async"`.
+- One section per file: `src/components/sections/[page]/SectionName.tsx`
+- Page entry: `src/app/[page]/page.tsx`
+- Nav links: `src/lib/nav-config.ts` only. Don't restructure `src/components/` or delete `figma.config.json`.
+- **New page? Add a `pageRegistry` row or it's invisible to Schema Manager and ⌘K search.** Static pages (`src/app/[page]/page.tsx`) have no CMS document, so `apps/cms/src/payload/lib/page-registry-seed.ts` (`PAGE_REGISTRY_SEED`) is the *only* thing that gives them a Schema.org override AND a site-wide search entry — nothing else indexes a hardcoded page. This is a CMS-side change (`apps/cms`), not a web-side one. Add a row (`kind: 'static'`), then from `apps/cms` run:
+  ```bash
+  pnpm exec tsx --env-file=.env scripts/seed-page-registry.ts
+  ```
+  This creates the row and — because creation always fires the search-sync hook — pushes it into the Meilisearch `content` index immediately; no `--force` needed for a brand-new row. `pnpm --filter @cleanstart/cms verify:page-registry` (also gates CI) catches a page shipped without this — it diffs every `apps/web/src/app/**/page.tsx` route against `PAGE_REGISTRY_SEED` and fails on anything missing. A route that's deliberately unindexed (an internal tool, a noindex utility page) goes in `INTENTIONALLY_UNREGISTERED` in `apps/cms/src/payload/lib/page-registry-coverage.ts` instead, with a comment saying why — never silently skip the row.
+
+### Image rules
+
+- `next/image` for PNG/JPG content images (explicit `width`/`height`).
+- `<img>` for decorative SVGs — add `// eslint-disable-next-line @next/next/no-img-element`.
+- Decorative elements: `aria-hidden`, `pointer-events-none`, `select-none`, `loading="lazy"`, `decoding="async"`.
+
+### Figma-to-code
+
+- Gradient strings, letter-spacing, border-radius, shadows: **exact** from Figma. Border-radius in exact `px` — `40px` is not `rounded-2xl` (which is `16px`). Use `style={{}}` for values without exact Tailwind classes.
+- Never recreate SVG assets in code — extract from Figma MCP. If MCP didn't return it, call `get_design_context` on the specific child node.
+- Assets saved to `public/images/[page-name]/`. Before saving, detect actual format: `file --mime-type -b <file>` (`image/svg+xml` → `.svg` even if Figma called it `.png`). Verify the file exists on disk before referencing in JSX.
+
+### CTA ↔ Footer overlap
+
+- `mb-[-Xpx]` on the `<section>` element — **not** the card div inside it. `z-20` on the **inner card wrapper div** — not the section.
+- `<Footer />` stays outside `<main>` as a sibling — no extra wrapper needed in `page.tsx`.
+- The section must not have a solid background covering the overlap zone. If it has `bg-white`, replace with a gradient fading to `rgba(0,0,0,0)` at the bottom so the footer dark background bleeds through.
+
+### FadeUp animation
+
+- Wrap every below-fold section in `<FadeUp>` in `page.tsx`. Never wrap the Hero (above the fold).
+- Continuous-frame sections (e.g. Hero + Factory) go inside **one** background wrapper div — not separate `<FadeUp>` wrappers for the background.
+- `FadeUp` accepts `className` via spread — use `<FadeUp className="relative z-10">` if the section's card must render above a following sibling.
 
 ### Background decorative elements
 
-Grids, blobs, guide lines, and glow flares are the most commonly missed detail. Rules:
-
-- Positions use exact Figma `px` coordinates — including negative values. Do not move an element inward to "fix" a negative position; partial off-screen clipping via `overflow-hidden` is intentional.
-- For vertical guide lines, use proportional positioning so they scale: `left: calc(Xpx / 1920 * 100%)` not fixed `px`.
-- Radial gradient blobs are pure CSS `<div>` with `borderRadius: "50%"` — not SVG files.
+- Exact Figma px positions (including negative values). Do not move an element inward to "fix" a negative position; partial off-screen clipping via `overflow-hidden` is intentional.
+- Vertical guide lines: proportional positioning `left: calc(Xpx / 1920 * 100%)`, not fixed px.
+- Radial gradient blobs: CSS `<div>` with `borderRadius: "50%"`, not SVG files.
 - Bottom glow flares: `<div>` pinned `bottom-0 left-0 right-0`, `mix-blend-mode: screen` if Figma shows screen blend.
 - Elements only visible at wide viewports: `className="hidden xl:block"`.
 
-### CTA ↔ Footer overlap pattern
-
-When a CTA card overlaps the Footer's dark background (standard pattern across all pages):
-
-- `mb-[-Xpx]` goes on the `<section>` element — **not** the card div inside it.
-- `z-20` goes on the **inner card wrapper div** — not the section.
-- `<Footer />` stays outside `<main>` as a sibling — no extra wrapper needed in `page.tsx`.
-- The section must not have a solid background that covers the overlap zone. If it has `bg-white`, replace with a gradient overlay that fades to `rgba(0,0,0,0)` at the bottom so the footer dark background bleeds through.
-
-### FadeUp scroll animation
-
-- Wrap every section below the fold in `<FadeUp>` in `page.tsx`.
-- Never wrap the Hero (above the fold).
-- Sections that share a continuous Figma frame (e.g. Hero + Factory) go inside **one** background wrapper div — not separate `FadeUp` wrappers for the background.
-- `FadeUp` accepts `className` via spread — use `<FadeUp className="relative z-10">` if the section's card must render above a following sibling (e.g. footer) and stacking context is needed.
-
 ### Visual verification workflow
 
-- **Always lock Codex Preview to desktop viewport (1440×900) when running `preview_start` / `preview_resize`** — never verify `apps/web` at mobile or tablet widths unless explicitly asked.
-
-`preview_screenshot` only captures at `scrollY=0`. To bring any section into view:
-
-```js
-// Shift the ENTIRE page — use body, not main, so footer moves too
-document.body.style.transform = `translateY(-${top - 100}px)`;
-document.body.style.transformOrigin = 'top left';
-// Reset:
-document.body.style.transform = '';
-```
-
-Force FadeUp/animation wrappers visible before screenshotting:
-```js
-document.querySelectorAll('*').forEach(el => {
-  if (window.getComputedStyle(el).opacity === '0') {
-    el.style.opacity = '1';
-    el.style.transform = 'none';
-  }
-});
-```
-
-A section is not done until its screenshot matches the Figma reference at 1440px.
+- **Always verify at the desktop viewport (1440×900)** in whatever browser preview your tool provides; never verify at mobile or tablet widths unless explicitly asked.
+- Screenshot tools often capture only at `scrollY=0` (Claude Code's `preview_screenshot` does). To bring a section into view:
+  ```js
+  document.body.style.transform = `translateY(-${top - 100}px)`;
+  document.body.style.transformOrigin = 'top left';
+  ```
+- Force FadeUp/animation wrappers visible before screenshotting:
+  ```js
+  document.querySelectorAll('*').forEach(el => {
+    if (window.getComputedStyle(el).opacity === '0') {
+      el.style.opacity = '1'; el.style.transform = 'none';
+    }
+  });
+  ```
+- A section is not done until its screenshot matches the Figma reference at 1440px.
 
 ---
 
@@ -318,64 +265,98 @@ A section is not done until its screenshot matches the Figma reference at 1440px
 These are hard rules. Do not work around them — flag and stop instead.
 
 - **Never edit `apps/cms/payload-types.ts` by hand.** It is generated. Run `pnpm --filter @cleanstart/cms generate:types`.
-- **Never bypass the `LeadHandler` adapter** for lead writes. Even one-off scripts go through it. Arch doc §`#forms` makes the R2 fallback queue load-bearing for "no lead lost during outage" — bypassing it breaks that guarantee.
+- **Never bypass the `LeadHandler` adapter** for lead writes. Even one-off scripts go through it. The R2 fallback queue is load-bearing for "no lead lost during outage".
 - **Never hand-edit the `config` column in the `integrations` table.** Values are encrypted blobs produced by `lib/integrations/secrets.ts`. Use the admin UI or the `encryptJson` helper.
-- **Never rename a Next.js route segment post-launch** (e.g. `/webinar/[slug]` → `/webinars/[slug]`). It breaks every indexed URL. Arch doc §`#migration` last subsection is explicit.
-- **Never commit `.env*`, secrets, R2 keys, Brevo keys, Webflow tokens, or 2FA seeds.** They live in the operator's secrets store (1Password / Bitwarden / macOS Keychain — whichever the team uses), GitHub Actions repository secrets, and `/opt/cleanstart/.env` on the production droplet (chmod 600).
-- **Never enable GraphQL on the Payload admin.** Arch doc §`#decisions`: `graphQL: { disable: true }` at launch.
-- **Never `git add -A` or `git add .`** at repo root. Stage specific paths.
-- **Never `--no-verify`** on commits. If a hook fails, fix it.
-- **Never delete data or drop tables** without explicit user confirmation, even in dev. Postgres on the droplet is shared with staging.
+- **Never rename a Next.js route segment post-launch** (e.g. `/webinar/[slug]` → `/webinars/[slug]`). It breaks every indexed URL.
+- **Never commit `.env*`, secrets, R2 keys, HubSpot tokens, or API keys.** They live in the operator's secrets store, GitHub Actions secrets, and `/opt/cleanstart/.env` on the droplet (chmod 600).
+- **Never enable GraphQL** on the Payload admin (`graphQL: { disable: true }`).
 - **Never bypass the publishing checklist** (arch doc §`#publishing-checklist`). It is the editor-facing safety gate.
 
 ---
 
-## Schema decisions locked
+## Schema decisions (locked)
 
-These resolved the open forks from arch doc §`#decisions`. Build accordingly:
-
-- **Webinar/Event registration:** per-record `registrationMode` discriminator (`'internal' | 'external'`); `registrationForm` (relationship to `forms`) and `registrationUrl` (URL string) are conditionally required based on the discriminator. (Earlier drafts used `'inHouse'` / `'inHouseForm'` / `'externalUrl'`; values were standardised at code time. Renaming would require a Payload migration — keep current values unless that cost is justified.)
-- **Resource gating:** `gateForm` is an optional relationship to `forms` on the `resources` collection. Presence gates the download; absence makes it public.
-- **Authors:** pure content collection. No `linkedUser` field at v1. If multi-author self-editing is ever needed, an additive migration adds an optional `linkedUser` relationship.
-- **Knowledge Hub:** dedicated collections — `knowledgeBase` (versioned + drafts, per-article slug, SEO field group, slug-change-redirect hook) plus `knowledgeCategories` (hierarchical taxonomy with self-referencing `parent`). No URL-parity loss in migration because nothing past `/knowledge-hub` is indexed on the current Webflow site.
+- **Webinar/Event registration:** per-record `registrationMode: 'internal' | 'external'` discriminator; `registrationForm` (relationship to `forms`) and `registrationUrl` (URL string) conditionally required based on the mode.
+- **Resource gating:** `gateForm` is an optional relationship to `forms`. Presence gates the download; absence makes it public.
+- **Authors:** pure content collection. No `linkedUser` at v1. If multi-author self-editing is needed later, an additive migration adds an optional `linkedUser` relationship.
 - **Guest Contributors:** still open. Ship as an additive optional `contributorType: 'staff' | 'guest'` field on the existing `authors` collection — do **not** create a separate collection.
-- **Integrations collection (Phase J1 shipped):** `slug: 'integrations'`; `config` field stores per-kind credentials encrypted at rest via `lib/integrations/secrets.ts` (`encryptJson` / `isEncrypted`). Per-row `routing` group (`events[]`, `collections[]`, `formSlugs[]`, `minLeadScore`). Admin endpoints: `/api/integrations/:id/test`, `/api/integrations/:id/health`, `/api/integrations/:id/audit` (file: `payload/endpoints/integrations-actions.ts`). Dead-letter retry reuses `WebhookDeadLetter` collection. Router wired in `lib/integrations/router.ts`.
+- **Knowledge Hub:** `knowledgeBase` (versioned + drafts, slug-change-redirect hook, SEO field group) + `knowledgeCategories` (hierarchical with self-referencing `parent`).
+- **Case studies:** listing **plus** a detail route at `/case-studies/[slug]` (reversed 2026-09-21; the collection was listing-only before). `summary` is the card blurb, `body` (Lexical) is the article. `outcomes` and `glance` are optional arrays the detail page reshapes around; `quote`/`quoteAuthor`/`quoteRole` are per-study and are **not** read from the homepage testimonial list; `featured` picks the listing spotlight, falling back to newest. Carries the full routed-collection machinery (slug-change redirect, SEO group, IndexNow, search sync) — adding a detail route without those breaks indexed URLs on rename.
+- **Blog sidebar CTAs:** `blogs` carries two optional editor picks, `ctaResource` (relationship to published `resources`, the Learn step) and `ctaImage` (a catalog image slug, the Explore step). Both are overrides: unset, `apps/web/src/lib/blog-cta/` matches from the post's title, abstract, category and headings. A pick that is unpublished or not in the catalog is ignored, never linked. The POC step always points at `/book-a-demo` with `source` params. The admin labels them "Sidebar resource (Learn step)" and "Images portal entry (Explore step)" (not "image", which reads as a picture) and shows the automatic pick under each (`BlogCtaAutoPick`, via the CMS endpoint `GET /api/blog-cta-suggestion?id=`, which asks the web route of the same name using `WEB_REVALIDATE_URL` and `WEB_REVALIDATE_SECRET`); the scoring lives in apps/web only, so do not copy it into the CMS. The other layouts that were reviewed, and how to revive the Edge Dock (kept under the tag `design/blog-cta-edge-dock`), are in `docs/web/BLOG-CTA-VARIANTS.md`.
+- **Integrations (Phase J1):** `config` field encrypted at rest via `lib/integrations/secrets.ts`. Per-row `routing` group (`events[]`, `collections[]`, `formSlugs[]`, `minLeadScore`). Admin endpoints: `/api/integrations/:id/test`, `/health`, `/audit` (file: `payload/endpoints/integrations-actions.ts`). Dead-letter retry reuses `WebhookDeadLetter`. Router: `lib/integrations/router.ts`.
+
+---
+
+## Email
+
+Every email the site sends is built in code and delivered through
+`sendBrevoEmail` as `subject` + `htmlContent`. The registry at
+`apps/cms/src/payload/lib/email/registry.ts` lists all of them with the form
+that triggers each and the file that sends it.
+
+- **One layout.** `lib/email/layout.ts` owns presentation; builders describe
+  content as blocks. Table-based, inline styles, Arial, preheader, plated logo,
+  postal address. Do not hand-write email HTML.
+- **Never use a Brevo dashboard template for a form.** Brevo interpolates
+  `{{ params.* }}` unescaped, so visitor input reaches inboxes as live markup,
+  and a second design source means production sends two different-looking sets
+  of email. `BREVO_TEMPLATE_ID`, `PARTNER_ADMIN_TEMPLATE_ID` and
+  `PARTNER_USER_TEMPLATE_ID` are dead and can be unset.
+- **Payload's own mail** (password reset) goes through the Brevo adapter at
+  `lib/email/payload-adapter.ts`. Without it Payload logs mail to stdout and
+  password resets silently never arrive.
+- **Sender name is pinned in code, not inherited.** Mail that speaks for the
+  site passes `SITE_SENDER_NAME` from `lib/email/brevo.ts`; only careers,
+  partnerships and deal registration override it. `BREVO_SENDER_NAME` is
+  rendered onto the droplet from a GitHub Actions Variable on every deploy, so
+  editing `/opt/cleanstart/.env` does not survive a deploy, and it was set to
+  the careers identity, which signed every demo and contact confirmation
+  "CleanStart Careers".
+- **`apps/cms/emails/` is generated.** Run `pnpm --filter @cleanstart/cms
+  emails:render` after changing a template and commit the result;
+  `emails:check` is the drift gate.
 
 ---
 
 ## Background jobs
 
-Six Payload cron tasks run in `apps/cms/src/payload/jobs/`. All are gated by `PAYLOAD_AUTO_RUN=true` — set this in `.env` to enable; omitting it (e.g. in test runs) prevents spurious fires.
+Twelve cron tasks in `apps/cms/src/payload/jobs/`. All gated by `PAYLOAD_AUTO_RUN=true` — set this in `.env` to enable; omitting it (e.g. in test runs) prevents spurious fires.
 
 | Job | Schedule (UTC) | File |
-|-----|----------------|------|
+|-----|---------------|------|
 | Lead queue drain | every 5 min | `drain-lead-queue.ts` |
 | Webhook retry | every 5 min | `retry-webhook.ts` |
-| Search-log purge (90-day retention) | daily 03:00 | `purge-search-log.ts` |
-| Leads PII redaction (365-day retention) | daily 03:15 | `purge-leads-pii.ts` |
+| Deal-registration sync retry | every 10 min | `retry-deal-sync.ts` |
+| Search-log purge (90-day) | daily 03:00 | `purge-search-log.ts` |
+| Leads PII redaction (365-day) | daily 03:15 | `purge-leads-pii.ts` |
+| Deal-registrations purge (365-day) | daily 03:30 | `purge-deal-registrations.ts` |
+| Career-applications purge (365-day) | daily 03:45 | `purge-career-applications.ts` |
+| Consent-log purge (24-month) | daily 04:00 | `purge-consent-log.ts` |
 | Broken-links scan | daily 04:30 | `check-broken-links.ts` |
-| Meilisearch reindex (drift check + self-heal) | daily 05:00 | `reindex-meili.ts` |
+| Meilisearch reindex | daily 05:00 | `reindex-meili.ts` |
+| Content-insights snapshot rebuild | daily 06:30 | `refresh-content-insights.ts` |
+| Core Web Vitals (CrUX) refresh | daily 06:45 | `refresh-crux.ts` (no-op without `CRUX_API_KEY`) |
 
-Never change a job schedule without updating this table. Every new job needs a test file and must respect the `PAYLOAD_AUTO_RUN` gate.
+Update this table when adding/changing jobs. Every job needs a test file and the `PAYLOAD_AUTO_RUN` gate.
 
 ---
 
 ## Live integrations
 
-These channels are wired and active (env-var configured). See `apps/cms/.env.example` for the full annotated list.
-
 | Integration | Purpose | Key env vars |
-|---|---|---|
+|------------|---------|-------------|
 | Cloudflare R2 | Media storage + lead fallback queue | `R2_BUCKET`, `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_PUBLIC_BASE` |
-| Brevo | Transactional email on `lead.submitted` | `BREVO_API_KEY`, `BREVO_TEMPLATE_ID` |
-| Microsoft Teams (Workflows) | Publish + lead notifications via Adaptive Cards | `WEBHOOK_TEAMS_URL`, `WEBHOOK_TEAMS_EVENTS` |
+| HubSpot | Lead relay → Forms Submissions API (keyed by `forms.hubspotFormGuid`); Deal registration → CRM Deals API (`lib/deal-registrations/hubspot-deal.ts`), gated by `integrations` `hubspotCrm` row. Distinct paths. | `HUBSPOT_PORTAL_ID`, `HUBSPOT_PRIVATE_APP_TOKEN`, `HUBSPOT_DEAL_PIPELINE`, `HUBSPOT_DEAL_STAGE` |
+| Microsoft Teams | Publish + lead notifications via Adaptive Cards | `WEBHOOK_TEAMS_URL`, `WEBHOOK_TEAMS_EVENTS` |
 | Standard Webhooks | Generic HMAC-signed outbound webhook | `WEBHOOK_GENERIC_URL`, `WEBHOOK_GENERIC_EVENTS`, `WEBHOOK_GENERIC_SIGNING_SECRET` |
 | Meilisearch | Full-text search + analytics | `MEILISEARCH_URL`, `MEILISEARCH_MASTER_KEY`, `MEILISEARCH_API_KEY` |
-| Cloudflare Turnstile | Bot protection on `/api/leads/submit` | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` |
-| Sentry | Error tracking + PII redaction | `SENTRY_DSN` (+ auth token, org, project) |
+| Cloudflare Turnstile | Bot protection on `/api/leads/submit` + deal-reg | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` |
+| Google Tag Manager | Loads every tracking tag on `apps/web` (GA4, Microsoft Clarity, Apollo.io, Leadfeeder). Tags live in the GTM UI; the loader, its host gate, Consent Mode defaults, the dataLayer contract (`lib/analytics/track.ts`) and the CSP stay in code. Inventory: `docs/web/TRACKING-TAGS.md`. | `NEXT_PUBLIC_GTM_ID` |
+| Sentry | Error tracking + PII redaction | `SENTRY_DSN` |
 | IndexNow | Bing/Yandex ping on publish (7 collections) | `INDEXNOW_KEY` |
+| Brevo | Careers/partner transactional email (HR notification + resume on job apps; partner-form pair). Distinct from HubSpot — never receives careers/partner data. | `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `CAREERS_HR_EMAIL`, `PARTNER_USER_TEMPLATE_ID`, `PARTNER_ADMIN_TEMPLATE_ID`, `PARTNERS_NOTIFY_EMAIL` |
 
-**Phase J2 planned:** Zoho CRM (OAuth 2.0 — primary CRM, build first), GA4 Measurement Protocol, Google Search Console. See `docs/integrations/INTEGRATIONS-RESEARCH-V2.md` for the full J1/J2/J3 milestone breakdown.
+See `apps/cms/.env.example` for full annotated list. Phase J2 planned: Zoho CRM, GA4, GSC. See `docs/integrations/INTEGRATIONS-RESEARCH-V2.md` for J1/J2/J3 milestones.
 
 The `Integrations` collection (Phase J1) provides editor self-serve config for channels that don't require env-var changes (Teams channels, generic webhooks). The env-var channels above remain env-var-only until a J2 row migrates them.
 
@@ -385,55 +366,40 @@ The `Integrations` collection (Phase J1) provides editor self-serve config for c
 
 - **Unit:** Vitest, co-located as `*.test.ts` next to the file under test.
 - **E2E:** Playwright, in `apps/cms/tests/e2e/`. Each spec tagged with the phase it covers (`@phase-d-preview`, `@phase-e-leads`, etc.) so CI can run a phase's gate suite.
-- **Fixtures:** ETL fixtures (10 docs per collection) live in `migrations/webflow-export/fixtures/` per arch doc Phase 1. Don't seed dev DB from prod data.
+- **Fixtures:** ETL fixtures (10 docs per collection) in `migrations/webflow-export/fixtures/`. Don't seed dev DB from prod data.
 - **Schema-validation tests:** every collection has at least one test asserting `payload generate:types` output matches a snapshot of the public type surface.
 
 ---
 
 ## Deploy rules
 
-- `apps/cms` deploys via **GitHub Actions** (`.github/workflows/deploy-cms.yml`) on push to `main` (production). The workflow builds the Docker image, ships it to the droplet over SSH, and runs `docker compose up -d --wait`. Caddy on the droplet handles TLS termination. There is a **single CMS droplet** (`cleanstart-cms`, served at `cms.cleanstart.com`) — it is the staging server today and will become production later. There is no separate staging machine.
-- `apps/web` has no production deployment yet.
-- Postgres lives on the same droplet, localhost-bound. Migrations run via Payload's migration runner, never raw SQL.
-- Cloudflare WAF sits in front of `cms.cleanstart.com`. Admin access is password-only at v1 — 2FA enrollment is deferred to a later hardening phase (see `docs/BACKLOG.md` A9, and the TOTP backend reserved in `apps/cms/src/payload/admin/components/auth/`). Once the TOTP backend lands, 2FA becomes mandatory for every admin user.
-- Staging is a separate droplet (or DB) per arch doc §`#staging`. Never point staging at prod data.
-- Backup-cron heartbeat is monitored as a P1 alert (arch doc §`#logging-alerting`). If a backup script is changed, verify the heartbeat fires.
+- **`apps/cms`:** GitHub Actions (`.github/workflows/deploy-cms.yml`) on push to `main`. Docker image → droplet → `docker compose up -d --wait`. Caddy handles TLS. Single droplet at `cms.cleanstart.com`. Admin access is password-only at v1 — 2FA deferred (see `docs/BACKLOG.md` A9).
+- **`apps/web`:** Vercel, deploys from `main`. Live at `www.cleanstart.com`. There is no staging domain — `staging.cleanstart.com` was deleted from DNS on 2026-07-29. Non-production QA happens on Vercel preview deploys (`*.vercel.app`), which `isNoindexHost` keeps noindex and untracked.
+- Postgres on the droplet, localhost-bound. Migrations via Payload's migration runner, never raw SQL.
+- Cloudflare WAF in front of `cms.cleanstart.com`.
+- The staging environment is retired (arch doc §`#staging`). Never point a non-production deploy at prod data.
+- Backup-cron heartbeat is P1 alert (arch doc §`#logging-alerting`). If a backup script is changed, verify the heartbeat fires.
 
 ---
 
-## Production rollout checklist (run once when going live)
+## Production rollout checklist
 
-These are one-shot operations that **must** run against the prod Postgres on the droplet before / right after the first production deploy. They are not part of the normal CI deploy. Each item should be checked off in the deploy PR description.
-
-1. **Lexical list-normalisation backfill.** `apps/cms/scripts/normalize-lexical-lists.ts` merges adjacent same-shape `list` nodes inside every Lexical body field. The `normalizeLexicalHook` only fixes docs on save — existing prod content needs this one-shot pass.
-   - **Always run with `--bypass-hooks` in production.** Without it, `payload.update()` re-fires every `afterChange` hook on each updated row: Teams notifications spam the editor channel, IndexNow falsely pings Bing/Yandex, Meilisearch reindexes for nothing, `updatedAt` churn pollutes the sitemap `lastmod` and editor sort order, and a version row is created per doc.
-   - Recommended sequence on the droplet (from inside the `cms` container, with `/opt/cleanstart/.env` mounted):
-     ```bash
-     # 1. Dry-run to see the blast radius (no writes):
-     node --env-file=.env --no-warnings --experimental-strip-types \
-       scripts/normalize-lexical-lists.ts --dry-run
-
-     # 2. Real run, hooks bypassed (no Teams / IndexNow / search-sync side effects):
-     node --env-file=.env --no-warnings --experimental-strip-types \
-       scripts/normalize-lexical-lists.ts --bypass-hooks
-     ```
-   - Re-runnable. Already-clean docs are skipped via `needsListMerge`.
-   - After the run, spot-check one blog and one guide on the live site — bullet lists should render as a single `<ul>`, not one `<ul>` per bullet.
-
-(Add new one-shot production tasks under this list as they come up — Phase H imports, Meilisearch initial index, etc.)
+**Moved to `docs/operations/PRODUCTION-ROLLOUT.md`** — one-shot scripts for prod go-live (backfills, seeds, provisioning). Consult that file when running prod ops.
 
 ---
 
 ## When stuck
 
-- **Schema question?** Read arch doc §`#new-fields` for that collection.
-- **Block question?** Arch doc §`#blocks`.
-- **Editor workflow question?** Arch doc §`#authoring`, §`#publishing-checklist`, §`#preview-workflow`.
-- **Ops/security question?** Arch doc §`#security-headers`, §`#rate-limiting`, §`#privacy-gdpr`.
-- **Migration question?** Arch doc §`#migration` (and the seven subsections under it).
-- **Integration question?** Read `docs/integrations/INTEGRATIONS-RESEARCH.md` (Teams/webhook deep-dive, Standard Webhooks signing) and `docs/integrations/INTEGRATIONS-RESEARCH-V2.md` (analytics read-back, inbound webhooks, J1/J2/J3 milestones).
-- **Background job question?** Arch doc §`#cron-jobs` + the job file and its co-located test.
-- **Which apps/web page to build next, or what slug/category a page uses?** `docs/web/WEB-PAGES.md`.
-- **New page not showing up in ⌘K search / Schema Manager?** `apps/cms/src/payload/lib/page-registry-seed.ts` — see "New page?" under Component structure above.
-- **`apps/web` production question?** (deploy strategy, security headers, CSP, SEO, sitemap, JSON-LD, AI bots, cookie consent, DNS, rollback) → **`docs/web/WEB-PRODUCTION.md`** (canonical for everything web-prod). The HTML arch doc remains canonical for CMS prod only.
-- **Decision not in arch doc and not in this file?** Stop and ask. Don't invent.
+- **Schema:** arch doc §`#new-fields`.
+- **Blocks:** arch doc §`#blocks`.
+- **Editor workflow:** arch doc §`#authoring`, §`#publishing-checklist`, §`#preview-workflow`.
+- **Ops/security:** arch doc §`#security-headers`, §`#rate-limiting`, §`#privacy-gdpr`.
+- **Migration:** arch doc §`#migration`.
+- **Integration:** `docs/integrations/INTEGRATIONS-RESEARCH.md`, `INTEGRATIONS-RESEARCH-V2.md`.
+- **Background jobs:** arch doc §`#cron-jobs` + job file + test.
+- **Which page to build:** `docs/web/WEB-PAGES.md`.
+- **New page not showing up in ⌘K search / Schema Manager:** `apps/cms/src/payload/lib/page-registry-seed.ts` — see "New page?" under Component structure above.
+- **Web production:** `docs/web/WEB-PRODUCTION.md`.
+- **Prod one-shots:** `docs/operations/PRODUCTION-ROLLOUT.md`.
+- **Past incidents & non-obvious bugs:** `docs/operations/INCIDENTS.md` — check it before deep-debugging a prod issue, and **append a new entry** whenever you fix a prod incident or a bug whose root cause was non-obvious (symptom → root cause → fix → reusable lesson).
+- **Decision not documented?** Stop and ask.
