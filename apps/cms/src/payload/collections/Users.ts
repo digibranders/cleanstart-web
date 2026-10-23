@@ -5,6 +5,7 @@ import { ROLES } from '@cleanstart/types';
 
 import { isAdmin, isAdminFieldLevel, isAdminOrSelf, userRoles } from '../access';
 import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
+import { flagCredentialChange, requireCurrentPasswordForSelf, revokeSessionsOnAccountChange } from '../hooks/user-account-protection';
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -57,6 +58,8 @@ export const Users: CollectionConfig = {
     },
   },
   hooks: {
+    beforeChange: [requireCurrentPasswordForSelf, flagCredentialChange],
+    afterChange: [revokeSessionsOnAccountChange],
     // Block disabled users at the login stage — throws before a JWT is issued.
     beforeLogin: [
       async ({ user }) => {
@@ -74,6 +77,14 @@ export const Users: CollectionConfig = {
       name: 'name',
       type: 'text',
       required: true,
+    },
+    {
+      // Input only: proves the owner knows their password before they change their email or password. Never stored or returned.
+      name: 'currentPassword',
+      type: 'text',
+      virtual: true,
+      hidden: true,
+      access: { read: () => false },
     },
     {
       name: 'enabled',
