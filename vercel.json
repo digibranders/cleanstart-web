@@ -3,7 +3,7 @@
   "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "pnpm --filter @cleanstart/web build",
   "outputDirectory": "apps/web/.next",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- apps/web packages pnpm-lock.yaml 2>/dev/null && exit 0 || exit 1",
+  "ignoreCommand": "git diff --quiet ${VERCEL_GIT_PREVIOUS_SHA:-HEAD^} HEAD -- apps/web packages pnpm-lock.yaml 2>/dev/null && exit 0 || exit 1",
   "git": {
     "deploymentEnabled": {
       "main": true,
