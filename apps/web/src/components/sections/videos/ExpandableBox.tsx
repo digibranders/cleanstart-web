@@ -54,7 +54,7 @@ export function ExpandableBox({
           type="button"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="mt-3 inline-flex h-10 cursor-pointer items-center font-sans text-[14px] font-semibold text-white underline-offset-4 hover:underline"
+          className="mt-3 inline-flex h-10 cursor-pointer items-center font-sans text-[14px] font-semibold text-[#12101C] underline-offset-4 hover:text-[#5B2EE0] hover:underline"
         >
           {open ? "Show less" : "Show more"}
         </button>

@@ -114,13 +114,17 @@ export default async function VideoPage({
         })}
       />
       <Header />
-      <main id="main-content" className="relative overflow-x-clip bg-[#0E0A1C] text-white">
+      <main id="main-content" className="relative overflow-x-clip bg-white text-[#12101C]">
+        {/* The site header is built for dark backgrounds, so a dark strip sits behind it
+            and ends just below it. (The announcement bar is above <main>, so it is
+            not part of this height.) The panes start under the header, so nothing
+            scrolls through the strip. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-[520px]"
+          className="pointer-events-none absolute inset-x-0 top-0 h-[calc(var(--cs-header-h)+var(--cs-header-extra)+6px)]"
           style={{
             background:
-              "radial-gradient(60% 100% at 25% 0%, rgba(71,30,192,0.38) 0%, rgba(19,30,143,0.16) 45%, rgba(14,10,28,0) 80%)",
+              "linear-gradient(180deg, #151021 0%, #10123e 70%, rgba(16,18,62,0.85) 100%)",
           }}
         />
         <Container className="relative pb-[var(--spacing-section-cta)] pt-[calc(var(--cs-header-h)+var(--cs-header-extra)+12px)] lg:pt-[calc(var(--cs-header-h)+var(--cs-header-extra))]">
@@ -138,10 +142,10 @@ export default async function VideoPage({
               data-lenis-prevent
               // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be focusable or keyboard users cannot scroll it
               tabIndex={0}
-              className="contents lg:flex lg:min-h-0 lg:flex-col lg:gap-5 lg:overflow-y-auto lg:pb-10 lg:pl-1 lg:pr-3 lg:pt-6 lg:[scrollbar-color:rgba(255,255,255,0.28)_transparent] lg:[scrollbar-width:thin]"
+              className="contents lg:flex lg:min-h-0 lg:flex-col lg:gap-5 lg:overflow-y-auto lg:pb-10 lg:pl-1 lg:pr-3 lg:pt-6 lg:[scrollbar-color:rgba(18,16,28,0.28)_transparent] lg:[scrollbar-width:thin]"
             >
-              <nav aria-label="Breadcrumb" className="hidden font-sans text-[14px] text-white/70 lg:block">
-                <Link href="/videos" className="inline-flex items-center gap-2 hover:text-white">
+              <nav aria-label="Breadcrumb" className="hidden font-sans text-[14px] text-[#5B5870] lg:block">
+                <Link href="/videos" className="inline-flex items-center gap-2 hover:text-[#12101C]">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M19 12H5M11 6l-6 6 6 6" />
                   </svg>
@@ -155,13 +159,13 @@ export default async function VideoPage({
                 priority
                 startWhenOpenedFromClick
                 radius="var(--watch-radius)"
-                className="lg:shadow-[0_30px_80px_rgba(5,4,30,0.6)] lg:ring-1 lg:ring-white/10"
+                className="lg:shadow-[0_24px_60px_rgba(40,24,120,0.22)] lg:ring-1 lg:ring-black/5"
               />
             </div>
 
             <div className="flex min-w-0 flex-col gap-5">
               <h1
-                className="font-display font-semibold text-white"
+                className="font-display font-semibold text-[#12101C]"
                 style={{ fontSize: "var(--fs-h3)", lineHeight: 1.2, letterSpacing: "-0.02em", textWrap: "balance" }}
               >
                 {video.title}
@@ -181,39 +185,39 @@ export default async function VideoPage({
                     />
                   </span>
                   <div className="leading-tight">
-                    <p className="font-sans text-[15px] font-semibold text-white">CleanStart</p>
-                    <p className="font-sans text-[13px] text-white/65">Official channel</p>
+                    <p className="font-sans text-[15px] font-semibold text-[#12101C]">CleanStart</p>
+                    <p className="font-sans text-[13px] text-[#5B5870]">Official channel</p>
                   </div>
                   <a
                     href={CLEANSTART_YOUTUBE_HANDLE_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="ml-2 inline-flex h-11 items-center rounded-full bg-white px-5 font-sans text-[14px] font-semibold text-[#151021] transition-colors duration-200 hover:bg-[#EDE8FF] active:translate-y-px motion-reduce:transition-none"
+                    className="ml-2 inline-flex h-11 items-center rounded-full bg-[#151021] px-5 font-sans text-[14px] font-semibold text-white transition-colors duration-200 hover:bg-[#2A2147] active:translate-y-px motion-reduce:transition-none"
                   >
                     Subscribe
                   </a>
                 </div>
                 <div className="flex flex-wrap gap-2.5">
-                  <CopyLinkButton url={url} />
+                  <CopyLinkButton url={url} tone="light" />
                   <a
                     href={youtubeWatchUrl(video.id)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex h-11 items-center rounded-full border border-white/30 px-[18px] font-sans text-[14px] font-medium text-white transition-colors duration-200 hover:bg-white/10 active:translate-y-px motion-reduce:transition-none"
+                    className="inline-flex h-11 items-center rounded-full border border-[rgba(18,16,28,0.18)] bg-white px-[18px] font-sans text-[14px] font-medium text-[#12101C] transition-colors duration-200 hover:border-[#5B2EE0] hover:text-[#5B2EE0] active:translate-y-px motion-reduce:transition-none"
                   >
                     Watch on YouTube
                   </a>
                 </div>
               </div>
 
-              <div className="rounded-[16px] bg-white/[0.07] p-4 sm:p-5">
-                <p className="mb-3 font-sans text-[14px] font-semibold text-white">{facts}</p>
+              <div className="rounded-[16px] bg-[#F4F2FC] p-4 sm:p-5">
+                <p className="mb-3 font-sans text-[14px] font-semibold text-[#12101C]">{facts}</p>
                 <ExpandableBox collapsedHeight={116}>
-                  <VideoDescription description={video.description} tone="dark" />
+                  <VideoDescription description={video.description} />
                 </ExpandableBox>
               </div>
 
-              <VideoTopicPills topics={video.topics} tone="dark" />
+              <VideoTopicPills topics={video.topics} />
             </div>
 
             </section>
@@ -223,7 +227,7 @@ export default async function VideoPage({
               data-lenis-prevent
               // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be focusable or keyboard users cannot scroll it
               tabIndex={0}
-              className="lg:col-start-2 lg:row-start-1 lg:min-h-0 lg:overflow-y-auto lg:pb-10 lg:pl-1 lg:pr-2 lg:pt-6 lg:[scrollbar-color:rgba(255,255,255,0.28)_transparent] lg:[scrollbar-width:thin]"
+              className="lg:col-start-2 lg:row-start-1 lg:min-h-0 lg:overflow-y-auto lg:pb-10 lg:pl-1 lg:pr-2 lg:pt-6 lg:[scrollbar-color:rgba(18,16,28,0.28)_transparent] lg:[scrollbar-width:thin]"
             >
               <UpNext videos={related} headingId="up-next-title" />
             </aside>
