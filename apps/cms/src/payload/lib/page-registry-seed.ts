@@ -132,6 +132,10 @@ export const PAGE_REGISTRY_SEED: readonly PageRegistrySeedRow[] = [
   // Security advisories, a Resources section of their own. Launched 2026-10-23.
   { path: '/advisories', title: 'Advisories', kind: 'cms-listing', order: 59, backingCollection: 'advisories' },
   { path: '/advisories/[slug]', title: 'Advisory (template)', kind: 'cms-template', order: 60, backingCollection: 'advisories' },
+  // Videos listing. Its detail pages (/videos/[slug]) come from a code catalog and
+  // the YouTube feed rather than a CMS collection, so they are not registry rows:
+  // see INTENTIONALLY_UNREGISTERED. Revisit when videos move into the CMS.
+  { path: '/videos', title: 'Videos', kind: 'static', order: 61, webPageType: 'CollectionPage' },
 ] as const;
 
 /** Fail-fast guard: paths unique + well-formed, templates carry a collection. */
