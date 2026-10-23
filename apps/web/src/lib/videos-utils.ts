@@ -88,6 +88,8 @@ export const sanitizeDescription = (raw: string): string =>
     // eslint-disable-next-line no-control-regex
     .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "")
     .replace(/[ \t]*[–—][ \t]*/g, " - ")
+    // "In this video: -" style lead-ins leave a dangling marker before the list.
+    .replace(/[ \t]+-[ \t]*$/gm, "")
     .replace(/[ \t]+\n/g, "\n")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
@@ -115,6 +117,7 @@ export interface DescriptionBlock {
   readonly lines: readonly string[];
 }
 
+const BULLET = /^[-•*→👉▶]+\s*/u;
 const LIST_LINE = /^(?:[-•*→👉▶]+\s*|\d{1,2}:\d{2}(?::\d{2})?\s+)\S/u;
 
 /**
@@ -133,13 +136,51 @@ export const parseDescription = (description: string): DescriptionBlock[] => {
     if (listed.length === lines.length) {
       blocks.push({
         kind: "list",
-        lines: lines.map((l) => l.replace(/^[-•*→]+\s*/u, "")),
+        lines: lines.map((l) => l.replace(BULLET, "")),
       });
     } else {
       blocks.push({ kind: "text", lines });
     }
   }
-  return blocks;
+  return groupLeadInItems(blocks);
+};
+
+const SENTENCE_END = /[.!?]["”')\]]*$/;
+
+/**
+ * YouTube editors often write "In this video:" and then put each point on its
+ * own line with blank lines between and no bullet. Group those points into one
+ * list. Only short single lines that do not end like a sentence and carry no
+ * link qualify, so a closing "Learn more: https://..." line stays a paragraph.
+ */
+const groupLeadInItems = (blocks: DescriptionBlock[]): DescriptionBlock[] => {
+  const out: DescriptionBlock[] = [];
+  for (let i = 0; i < blocks.length; i += 1) {
+    const block = blocks[i]!;
+    out.push(block);
+    const last = block.lines.at(-1) ?? "";
+    if (block.kind !== "text" || !last.endsWith(":")) continue;
+    const items: string[] = [];
+    let j = i + 1;
+    while (j < blocks.length) {
+      const next = blocks[j]!;
+      const line = next.lines[0] ?? "";
+      const qualifies =
+        next.kind === "text" &&
+        next.lines.length === 1 &&
+        line.length < 160 &&
+        !SENTENCE_END.test(line) &&
+        !/https?:\/\//.test(line);
+      if (!qualifies) break;
+      items.push(line);
+      j += 1;
+    }
+    if (items.length >= 2) {
+      out.push({ kind: "list", lines: items });
+      i = j - 1;
+    }
+  }
+  return out;
 };
 
 export type LinkSegment =
@@ -162,11 +203,6 @@ export const linkify = (text: string): LinkSegment[] => {
   if (last < text.length) out.push({ kind: "text", text: text.slice(last) });
   return out;
 };
-
-const stripLeadingEmoji = (line: string): string =>
-  line.replace(/^[\p{Extended_Pictographic}\s]+/u, "");
-
-export const cleanListLine = stripLeadingEmoji;
 
 /**
  * Catalog first, feed second. A catalog entry is the editorial record: its

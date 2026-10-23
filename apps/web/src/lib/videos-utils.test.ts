@@ -75,6 +75,12 @@ describe("sanitizeDescription", () => {
   });
 });
 
+describe("sanitizeDescription lead-ins", () => {
+  it("drops a dangling dash after a colon", () => {
+    expect(sanitizeDescription("In this video: -  \n\n- One")).toBe("In this video:\n\n- One");
+  });
+});
+
 describe("firstParagraph", () => {
   it("skips hashtag lines and collapses whitespace", () => {
     expect(firstParagraph("#A #B\n\nHello   there\nfriend.\n\nMore")).toBe("Hello there friend.");
@@ -95,6 +101,34 @@ describe("parseDescription", () => {
       { kind: "text", lines: ["Intro text."] },
       { kind: "list", lines: ["One", "Two"] },
       { kind: "list", lines: ["01:29 The threat", "03:31 The fix"] },
+    ]);
+  });
+
+  it("turns unbulleted points after a colon lead-in into one list", () => {
+    const blocks = parseDescription(
+      "In two minutes, this video covers:\n\nWhat VEX is\n\nThe four statuses\n\nWhy a reason matters.\n\nExplore images: https://images.cleanstart.com",
+    );
+    expect(blocks).toEqual([
+      { kind: "text", lines: ["In two minutes, this video covers:"] },
+      { kind: "list", lines: ["What VEX is", "The four statuses"] },
+      { kind: "text", lines: ["Why a reason matters."] },
+      { kind: "text", lines: ["Explore images: https://images.cleanstart.com"] },
+    ]);
+  });
+
+  it("leaves a single point after a colon as a paragraph", () => {
+    expect(parseDescription("Key takeaway:\n\nBuild trust in")).toEqual([
+      { kind: "text", lines: ["Key takeaway:"] },
+      { kind: "text", lines: ["Build trust in"] },
+    ]);
+  });
+
+  it("strips pointer emoji from link lines and keeps the text", () => {
+    expect(parseDescription("👉 Learn more: https://www.cleanstart.com/\n👉 Book a Demo: https://www.cleanstart.com/book-a-demo")).toEqual([
+      {
+        kind: "list",
+        lines: ["Learn more: https://www.cleanstart.com/", "Book a Demo: https://www.cleanstart.com/book-a-demo"],
+      },
     ]);
   });
 });
