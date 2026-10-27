@@ -57,6 +57,13 @@ export async function generateMetadata({ params }: AdvisoryDetailPageProps): Pro
       `${advisoryHeading(advisory)}. CVSS ${advisory.cvssScore} ${cvssRating(advisory.cvssScore)}: affected versions and how to fix it.`,
     path: `${basePath}/${advisory.slug}`,
     eyebrow: "Advisory",
+    ogTitle: advisory.title,
+    ogAdvisory: {
+      cvssScore: advisory.cvssScore,
+      status: advisory.fixStatus,
+      technology: advisory.technology,
+      cves: advisory.cves,
+    },
     type: "article",
     publishedTime: effectivePublishedAt(advisory) ?? advisory.publishedAt,
     modifiedTime: effectiveModifiedAt(advisory),
