@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { AdvisoriesTable } from "@/components/sections/advisories/AdvisoriesTable";
+import { AdvisoriesGrid } from "@/components/sections/advisories/AdvisoriesGrid";
 import { selectAdvisories, type AdvisoryRow } from "@/lib/advisory-utils";
 
 /**
@@ -23,7 +23,7 @@ export function AdvisoriesBrowser({
     q: params.get("q") ?? "",
   };
   return (
-    <AdvisoriesTable
+    <AdvisoriesGrid
       rows={selectAdvisories(allAdvisories, filters)}
       technologies={technologies}
       filters={filters}

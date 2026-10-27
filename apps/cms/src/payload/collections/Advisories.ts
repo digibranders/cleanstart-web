@@ -131,6 +131,16 @@ export const Advisories: CollectionConfig = {
       ],
     },
     {
+      name: 'coverTitle',
+      label: 'Cover title',
+      type: 'text',
+      maxLength: 80,
+      admin: {
+        description:
+          'Text shown on the cover of the listing card. Leave blank to use the vulnerability name. Keep it short: long text is shrunk or clipped on the cover.',
+      },
+    },
+    {
       name: 'abstract',
       label: 'Summary',
       type: 'textarea',

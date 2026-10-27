@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { AdvisoriesBrowser } from "@/components/sections/advisories/AdvisoriesBrowser";
-import { AdvisoriesTable } from "@/components/sections/advisories/AdvisoriesTable";
+import { AdvisoriesGrid } from "@/components/sections/advisories/AdvisoriesGrid";
 import { BlogsHero } from "@/components/sections/blogs/BlogsHero";
 import { BlogsCTA } from "@/components/sections/blogs/BlogsCTA";
 import { getAdvisories } from "@/lib/advisory";
@@ -69,7 +69,7 @@ export default async function AdvisoriesPage(): Promise<React.ReactElement> {
         </div>
         <Suspense
           fallback={
-            <AdvisoriesTable
+            <AdvisoriesGrid
               rows={advisories}
               technologies={technologies}
               filters={{ technology: "", status: "", q: "" }}

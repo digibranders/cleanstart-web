@@ -3,15 +3,9 @@ import { Rss } from "lucide-react";
 import { EmptyState } from "@/components/feedback";
 import { FilterGroup, FilterSidebarCard, MobileTabStrip } from "@/components/sections/_shared/SidebarFilters";
 import { Container, Section } from "@/components/layout";
-import {
-  ADVISORY_STATUSES,
-  advisoryStatusLabel,
-  type AdvisoryFixStatus,
-  type AdvisoryRow,
-} from "@/lib/advisory-utils";
+import { ADVISORY_STATUSES, type AdvisoryRow } from "@/lib/advisory-utils";
 import { ADVISORY_FEED_PATH } from "@/lib/advisory-feed";
-import { formatBlogDate } from "@/lib/blog-utils";
-import { effectivePublishedAt } from "@/lib/published-date";
+import { AdvisoryCard } from "./AdvisoryCard";
 
 const BASE_PATH = "/advisories";
 
@@ -20,14 +14,6 @@ export interface AdvisoryFilters {
   status: string;
   q: string;
 }
-
-/** Status colour pairs (text on tint). Semantic, so each status keeps its own hue. */
-const STATUS_TONE: Record<AdvisoryFixStatus, { color: string; background: string }> = {
-  identified: { color: "#92400E", background: "#FEF3C7" },
-  in_progress: { color: "#1E40AF", background: "#DBEAFE" },
-  fixed: { color: "#065F46", background: "#D1FAE5" },
-  not_affected: { color: "#374151", background: "#EEF0F3" },
-};
 
 function buildHref(filters: AdvisoryFilters): string {
   const params = new URLSearchParams();
@@ -113,32 +99,13 @@ function AdvisorySidebar({
   );
 }
 
-function StatusBadge({ status }: { status: AdvisoryFixStatus }): React.ReactElement {
-  const tone = STATUS_TONE[status];
-  return (
-    <span
-      className="inline-flex items-center whitespace-nowrap font-sans font-medium"
-      style={{ padding: "3px 10px", borderRadius: "30px", fontSize: "var(--fs-caption)", ...tone }}
-    >
-      {advisoryStatusLabel(status)}
-    </span>
-  );
-}
-
-const TH_STYLE: React.CSSProperties = {
-  fontSize: "var(--fs-caption)",
-  fontWeight: 500,
-  color: "rgba(17,17,17,0.55)",
-  padding: "0 16px 12px 0",
-};
-
 /**
  * Advisory listing: technology and status filters in the house sidebar
- * (shared with /careers) beside an outline-free table.
+ * (shared with /careers) beside a grid of cards, as on the Resource Center.
  * Presentational; `AdvisoriesBrowser` feeds it the URL-filtered rows, and the
  * page renders it unfiltered as the static Suspense fallback.
  */
-export function AdvisoriesTable({
+export function AdvisoriesGrid({
   rows,
   technologies,
   filters,
@@ -177,59 +144,13 @@ export function AdvisoriesTable({
                 />
               )
             ) : (
-              <table className="w-full text-left" style={{ borderCollapse: "collapse" }}>
-                <caption className="sr-only">Security advisories</caption>
-                <thead className="hidden md:table-header-group">
-                  <tr>
-                    <th scope="col" style={TH_STYLE}>Technology</th>
-                    <th scope="col" style={TH_STYLE}>Vulnerability</th>
-                    <th scope="col" style={TH_STYLE}>CVE ID</th>
-                    <th scope="col" style={TH_STYLE}>Published</th>
-                    <th scope="col" style={{ ...TH_STYLE, paddingRight: 0 }}>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((a) => (
-                    <tr
-                      key={a.id}
-                      className="flex flex-wrap items-center gap-x-3 gap-y-1.5 py-4 md:table-row md:py-0 transition-colors duration-150 md:hover:bg-white"
-                      style={{ borderTop: "1px solid rgba(17,17,17,0.08)" }}
-                    >
-                      <td
-                        className="w-full md:w-auto md:py-4 md:pr-4 md:align-top"
-                        style={{ fontSize: "var(--fs-body-sm)", color: "rgba(17,17,17,0.6)" }}
-                      >
-                        {a.technology}
-                      </td>
-                      <td className="w-full md:w-auto md:py-4 md:pr-4 md:align-top">
-                        <Link
-                          href={`${BASE_PATH}/${a.slug}`}
-                          className="font-display font-semibold text-[#111] hover:text-[#4a3bf1] transition-colors duration-150"
-                          style={{ fontSize: "var(--fs-body)", lineHeight: 1.35 }}
-                        >
-                          {a.title}
-                        </Link>
-                      </td>
-                      <td className="w-full md:w-auto md:py-4 md:pr-4 md:align-top">
-                        <span className="flex flex-col" style={{ fontFamily: "var(--font-mono)", fontSize: "var(--fs-body-sm)", color: "#2b2b2b" }}>
-                          {a.cves.map((cve) => (
-                            <span key={cve} className="whitespace-nowrap">{cve}</span>
-                          ))}
-                        </span>
-                      </td>
-                      <td
-                        className="md:py-4 md:pr-4 md:align-top whitespace-nowrap"
-                        style={{ fontSize: "var(--fs-body-sm)", color: "rgba(17,17,17,0.6)" }}
-                      >
-                        {formatBlogDate(effectivePublishedAt(a))}
-                      </td>
-                      <td className="md:py-4 md:align-top">
-                        <StatusBadge status={a.fixStatus} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <ul className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8 justify-items-center lg:justify-items-start">
+                {rows.map((a) => (
+                  <li key={a.id} className="flex">
+                    <AdvisoryCard advisory={a} />
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
         </div>

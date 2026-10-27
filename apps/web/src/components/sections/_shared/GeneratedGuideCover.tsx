@@ -43,10 +43,13 @@ function Mark({ style }: { style?: React.CSSProperties }): React.ReactElement {
 interface GeneratedGuideCoverProps {
   /** Topic phrase from `deriveCoverKeyword(title)`. */
   keyword: string;
+  /** Eyebrow beside the logo. */
+  label?: string;
 }
 
 export function GeneratedGuideCover({
   keyword,
+  label = "Guide",
 }: GeneratedGuideCoverProps): React.ReactElement {
   const { cqw } = coverTitleSize(keyword);
   return (
@@ -107,7 +110,7 @@ export function GeneratedGuideCover({
           }}
         />
 
-        {/* eyebrow — the real navbar CleanStart logo + a GUIDE label */}
+        {/* eyebrow — the real navbar CleanStart logo + a label */}
         <div
           style={{ display: "flex", alignItems: "center", gap: "2.5cqw", position: "relative" }}
         >
@@ -131,7 +134,7 @@ export function GeneratedGuideCover({
               whiteSpace: "nowrap",
             }}
           >
-            Guide
+            {label}
           </span>
         </div>
 

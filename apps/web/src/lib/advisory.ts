@@ -35,6 +35,7 @@ const ROW_SELECT = [
   "cvssScore",
   "fixStatus",
   "abstract",
+  "coverTitle",
   "publishedAt",
   "displayPublishedAt",
 ]
