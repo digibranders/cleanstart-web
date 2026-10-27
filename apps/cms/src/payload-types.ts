@@ -1865,7 +1865,7 @@ export interface Advisory {
    */
   slug: string;
   /**
-   * One or more, e.g. CVE-2026-111497. Searchable on the listing.
+   * Type one ID (e.g. CVE-2026-111497) and press Enter. To add more, type the next ID and press Enter again; use the x on an ID to remove it. Searchable on the listing.
    */
   cves: string[];
   /**

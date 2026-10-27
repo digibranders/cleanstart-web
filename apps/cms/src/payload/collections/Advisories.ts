@@ -87,7 +87,10 @@ export const Advisories: CollectionConfig = {
         const bad = value.filter((v) => !CVE_PATTERN.test(String(v).trim().toUpperCase()));
         return bad.length === 0 ? true : `Not a CVE ID: ${bad.join(', ')}. Use the form CVE-2026-111497.`;
       },
-      admin: { description: 'One or more, e.g. CVE-2026-111497. Searchable on the listing.' },
+      admin: {
+        description:
+          'Type one ID (e.g. CVE-2026-111497) and press Enter. To add more, type the next ID and press Enter again; use the x on an ID to remove it. Searchable on the listing.',
+      },
     },
     {
       name: 'technology',
