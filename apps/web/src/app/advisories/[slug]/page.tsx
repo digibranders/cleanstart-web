@@ -114,8 +114,12 @@ function HeroChip({
   );
 }
 
+const hasContent = (content: LexicalRoot | null | undefined): content is LexicalRoot =>
+  Boolean(content?.root?.children?.length);
+
+/** A heading plus its rich text, for advisories that still keep the old three-box layout. */
 function AdvisorySection({ heading, content }: { heading: string; content: LexicalRoot | null | undefined }): React.ReactElement | null {
-  if (!content?.root?.children?.length) return null;
+  if (!hasContent(content)) return null;
   return (
     <section className="article-body">
       <h2 className="article-h2">{heading}</h2>
@@ -141,6 +145,8 @@ export async function renderAdvisoryDetail({
     highlightLexical(advisory.impact),
     highlightLexical(advisory.resolution),
   ]);
+  // Advisories written before the single content box keep their three sections.
+  const legacy = hasContent(impact) || hasContent(resolution);
 
   return (
     <>
@@ -187,7 +193,13 @@ export async function renderAdvisoryDetail({
               className="mx-auto lg:mx-0 w-full max-w-[988px] flex flex-col pt-10 lg:pt-14"
               style={{ gap: "clamp(32px, 4vw, 48px)", paddingBottom: "var(--spacing-section-cta)" }}
             >
-              <AdvisorySection heading="Vulnerability" content={body} />
+              {legacy ? (
+                <AdvisorySection heading="Vulnerability" content={body} />
+              ) : hasContent(body) ? (
+                <section className="article-body">
+                  <RenderLexical content={body} />
+                </section>
+              ) : null}
               <AdvisorySection heading="Impacted packages and versions" content={impact} />
               <AdvisorySection heading="Resolution" content={resolution} />
             </div>

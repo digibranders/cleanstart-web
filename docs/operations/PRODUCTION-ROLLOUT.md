@@ -153,3 +153,7 @@ Requires migration `20261023_120000_add_advisories` (runs on CMS deploy). Then, 
 ### 23. Structured advisories (client brief, 2026-10-27)
 
 Requires migration `20261027_120000_advisories_structured_fields` (additive: CVE IDs, technology, CVSS score, fix status, impact, resolution). The hidden blog-era columns stay until a separately approved migration drops them. To load the first advisory, in the cms container: `/app/node_modules/.bin/tsx scripts/seed-node-brotli-advisory.ts` creates CVE-2026-111497 as a draft; add `--publish` to publish it and purge `/advisories`. Idempotent: skips if the slug exists. Deploy `apps/web` before publishing.
+
+### 24. Single advisory content box (2026-10-28)
+
+No migration. The advisory body is now one rich-text box (`body`, "Advisory content"); `impact` and `resolution` are hidden and their columns stay. Deploy `apps/web` and `apps/cms` first. Then merge the existing advisories in the cms container: `/app/node_modules/.bin/tsx scripts/merge-advisory-sections.ts` is a dry run, add `--apply` to write. It folds Impacted packages and Resolution into `body` under Heading 2s, clears the two old boxes and purges `/advisories`. Idempotent. Until it runs, the page still renders the old three sections for advisories that have them.

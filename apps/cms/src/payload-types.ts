@@ -1885,7 +1885,7 @@ export interface Advisory {
    */
   abstract?: string | null;
   /**
-   * What the vulnerability is and who is at risk.
+   * Paste the whole write-up here. Use a Heading 2 for each section: Vulnerability, Impacted packages and versions, Resolution. Tables, code and the pull command all go in this one box.
    */
   body?: {
     root: {
@@ -1902,9 +1902,6 @@ export interface Advisory {
     };
     [k: string]: unknown;
   } | null;
-  /**
-   * A table of packages and affected versions, plus any notes on who is affected.
-   */
   impact?: {
     root: {
       type: string;
@@ -1920,9 +1917,6 @@ export interface Advisory {
     };
     [k: string]: unknown;
   } | null;
-  /**
-   * How to fix it: the image tag, digests and the pull command.
-   */
   resolution?: {
     root: {
       type: string;

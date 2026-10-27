@@ -43,8 +43,8 @@ const hidden = (field: Field): Field =>
 /**
  * Security advisories, listed at `/advisories` under the Resources menu. One
  * document per vulnerability disclosure: CVE IDs, CVSS score and CleanStart fix
- * status drive the listing table and its filters; Vulnerability, Impacted
- * packages and Resolution are the three sections of the article.
+ * status drive the listing table and its filters; the article is one rich-text
+ * body that editors paste whole.
  */
 export const Advisories: CollectionConfig = {
   slug: 'advisories',
@@ -140,23 +140,18 @@ export const Advisories: CollectionConfig = {
     },
     {
       name: 'body',
-      label: 'Vulnerability',
-      type: 'richText',
-      admin: { description: 'What the vulnerability is and who is at risk.' },
-    },
-    {
-      name: 'impact',
-      label: 'Impacted packages and versions',
+      label: 'Advisory content',
       type: 'richText',
       admin: {
-        description: 'A table of packages and affected versions, plus any notes on who is affected.',
+        description:
+          'Paste the whole write-up here. Use a Heading 2 for each section: Vulnerability, Impacted packages and versions, Resolution. Tables, code and the pull command all go in this one box.',
       },
     },
-    {
-      name: 'resolution',
-      type: 'richText',
-      admin: { description: 'How to fix it: the image tag, digests and the pull command.' },
-    },
+    // Replaced by the single content box above (2026-10-28). Columns stay until
+    // a separately approved migration drops them; the web page still renders
+    // them for any advisory that has not been merged yet.
+    hidden({ name: 'impact', label: 'Impacted packages and versions', type: 'richText' }),
+    hidden({ name: 'resolution', type: 'richText' }),
     hidden(
       mediaUploadField({
         name: 'heroImage',
