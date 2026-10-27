@@ -2,16 +2,12 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
-import { BlogsBrowser } from "@/components/sections/blogs/BlogsBrowser";
-import {
-  BlogsContent,
-  selectBlogs,
-  BLOGS_PAGE_SIZE,
-} from "@/components/sections/blogs/BlogsContent";
+import { AdvisoriesBrowser } from "@/components/sections/advisories/AdvisoriesBrowser";
+import { AdvisoriesTable } from "@/components/sections/advisories/AdvisoriesTable";
 import { BlogsHero } from "@/components/sections/blogs/BlogsHero";
 import { BlogsCTA } from "@/components/sections/blogs/BlogsCTA";
-import { CrawlableLinkIndex } from "@/components/ui/CrawlableLinkIndex";
-import { getAdvisories, pickFeaturedAdvisory } from "@/lib/advisory";
+import { getAdvisories } from "@/lib/advisory";
+import { advisoryHeading, technologyOptions } from "@/lib/advisory-utils";
 import { ADVISORIES_SECTION } from "@/lib/blog-utils";
 import { buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
@@ -31,10 +27,14 @@ export function generateMetadata(): Metadata {
   });
 }
 
-/** Same static-listing model as /blogs: one cached fetch, client-side search and paging. */
+/**
+ * Static listing: the full set is fetched once and filtered in the browser
+ * (`AdvisoriesBrowser`). The Suspense fallback is the unfiltered table, which
+ * is what lands in the static HTML for crawlers and no-JS clients.
+ */
 export default async function AdvisoriesPage(): Promise<React.ReactElement> {
   const advisories = await getAdvisories().catch(() => []);
-  const initial = selectBlogs(advisories, { category: "", search: "", page: 1 });
+  const technologies = technologyOptions(advisories);
   const { basePath } = ADVISORIES_SECTION;
 
   return (
@@ -49,42 +49,26 @@ export default async function AdvisoriesPage(): Promise<React.ReactElement> {
           data={itemListSchema(
             "CleanStart Security Advisories",
             basePath,
-            advisories.map((a) => ({ name: a.title, path: `${basePath}/${a.slug}` })),
+            advisories.map((a) => ({ name: advisoryHeading(a), path: `${basePath}/${a.slug}` })),
           )}
         />
       )}
       <Header />
       <main id="main-content" style={{ background: "#f6f6f6" }}>
         <div className="relative overflow-hidden">
-          <BlogsHero
-            // A lone advisory would show twice (here and in the grid), so the
-            // spotlight waits for a second one.
-            featuredPost={advisories.length > 1 ? pickFeaturedAdvisory(advisories) : null}
-            categories={[]}
-            searchQuery=""
-            section={ADVISORIES_SECTION}
-          />
+          <BlogsHero featuredPost={null} categories={[]} searchQuery="" section={ADVISORIES_SECTION} />
         </div>
         <Suspense
           fallback={
-            <BlogsContent
-              posts={initial.posts}
-              activeCategory=""
-              searchQuery=""
-              currentPage={1}
-              totalPages={initial.totalPages}
-              section={ADVISORIES_SECTION}
+            <AdvisoriesTable
+              rows={advisories}
+              technologies={technologies}
+              filters={{ technology: "", status: "", q: "" }}
             />
           }
         >
-          <BlogsBrowser allPosts={advisories} section={ADVISORIES_SECTION} />
+          <AdvisoriesBrowser allAdvisories={advisories} technologies={technologies} />
         </Suspense>
-        <CrawlableLinkIndex
-          label="All advisories"
-          items={advisories
-            .slice(BLOGS_PAGE_SIZE)
-            .map((a) => ({ href: `${basePath}/${a.slug}`, title: a.title }))}
-        />
       </main>
       <Footer cta={<BlogsCTA />} />
     </>

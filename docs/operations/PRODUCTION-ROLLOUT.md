@@ -148,4 +148,8 @@ Operator must: (a) create "Newsletter" subscription type in HubSpot, (b) set `HU
 
 Requires migration `20261023_120000_add_advisories` (runs on CMS deploy). Then, in the cms container:
 (a) `/app/node_modules/.bin/tsx scripts/seed-page-registry.ts` adds the `/advisories` and `/advisories/[slug]` rows;
-(b) `/app/node_modules/.bin/tsx scripts/copy-blog-to-advisory.ts --dry-run`, then without `--dry-run`, publishes the PHP2Shell blog as the first advisory and purges `/advisories`. Idempotent: skips if the advisory slug exists. Deploy `apps/web` before (b), or the purge reaches a site that has no `/advisories` route yet.
+(b) Done on 2026-10-23 and later reverted: PHP2Shell went back to the blog and its advisory is a draft (the copy script was removed with the 2026-10-27 model change).
+
+### 23. Structured advisories (client brief, 2026-10-27)
+
+Requires migration `20261027_120000_advisories_structured_fields` (additive: CVE IDs, technology, CVSS score, fix status, impact, resolution). The hidden blog-era columns stay until a separately approved migration drops them. To load the first advisory, in the cms container: `/app/node_modules/.bin/tsx scripts/seed-node-brotli-advisory.ts` creates CVE-2026-111497 as a draft; add `--publish` to publish it and purge `/advisories`. Idempotent: skips if the slug exists. Deploy `apps/web` before publishing.

@@ -1856,16 +1856,37 @@ export interface Form {
  */
 export interface Advisory {
   id: number;
+  /**
+   * e.g. Node.js Brotli decoder out-of-bounds write. The CVE IDs are shown before it.
+   */
   title: string;
   /**
    * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
   /**
-   * Drives the SEO description fallback. Aim for ≤ 160 characters.
+   * One or more, e.g. CVE-2026-111497. Searchable on the listing.
+   */
+  cves: string[];
+  /**
+   * e.g. Node.js, PHP, OpenSSL. Free text: the listing filter is built from the values in use, so keep the spelling consistent.
+   */
+  technology: string;
+  /**
+   * e.g. 9.2. The rating (Critical, High, Medium, Low) is derived from the score.
+   */
+  cvssScore: number;
+  /**
+   * Where CleanStart stands on this vulnerability.
+   */
+  fixStatus: 'identified' | 'in_progress' | 'fixed' | 'not_affected';
+  /**
+   * One or two sentences. Used as the SEO description when none is set. Aim for ≤ 160 characters.
    */
   abstract?: string | null;
-  heroImage?: (number | null) | Media;
+  /**
+   * What the vulnerability is and who is at risk.
+   */
   body?: {
     root: {
       type: string;
@@ -1881,6 +1902,43 @@ export interface Advisory {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * A table of packages and affected versions, plus any notes on who is affected.
+   */
+  impact?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * How to fix it: the image tag, digests and the pull command.
+   */
+  resolution?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  heroImage?: (number | null) | Media;
   faqs?:
     | {
         question: string;
@@ -1902,17 +1960,8 @@ export interface Advisory {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Multi-author supported: every byline is credited in JSON-LD author[]. Authors with "accepting new bylines" off are hidden from the picker.
-   */
   authors?: (number | Author)[] | null;
-  /**
-   * Author who reviewed this advisory for accuracy. Surfaced in JSON-LD reviewedBy.
-   */
   reviewedBy?: (number | null) | Author;
-  /**
-   * Date of the most recent review pass. When unset, falls back to updatedAt with a note in the SEO panel.
-   */
   lastReviewedAt?: string | null;
   /**
    * Layer in extra Schema.org types (HowTo, Video, Review, etc.) on top of the auto-emitted JSON-LD. Editors never write raw JSON — every field below maps to a schema.org property.
@@ -2065,9 +2114,6 @@ export interface Advisory {
   contentUpdatedAt?: string | null;
   readingMinutes?: number | null;
   wordCount?: number | null;
-  /**
-   * Heading levels that appear in the Table of Contents. Re-save to apply.
-   */
   tocDepth?: ('h2' | 'h2_h3' | 'h2_h3_h4') | null;
   tableOfContents?:
     | {
@@ -2231,9 +2277,6 @@ export interface Advisory {
       | boolean
       | null;
   };
-  /**
-   * Shown in the /advisories hero. When none is featured, the newest advisory is.
-   */
   featured?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -10257,9 +10300,15 @@ export interface BlogsSelect<T extends boolean = true> {
 export interface AdvisoriesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
+  cves?: T;
+  technology?: T;
+  cvssScore?: T;
+  fixStatus?: T;
   abstract?: T;
-  heroImage?: T;
   body?: T;
+  impact?: T;
+  resolution?: T;
+  heroImage?: T;
   faqs?:
     | T
     | {

@@ -120,7 +120,7 @@ export function BlogsHero({
                 />
               }
             >
-              <BlogsCategoryNav categories={categories} section={section} />
+              <BlogsCategoryNav categories={categories} />
             </Suspense>
           )}
         </div>

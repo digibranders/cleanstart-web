@@ -1,33 +1,20 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import {
-  getAdvisoryBySlug,
-  getAdvisoryBySlugDraft,
-  getAdvisorySlugs,
-  getRelatedAdvisories,
-} from "@/lib/advisory";
-import { mediaUrl } from "@/lib/blog";
-import { ADVISORIES_SECTION } from "@/lib/blog-utils";
+import { breadcrumbTrail } from "@cleanstart/schema/builders";
+import { getAdvisoryBySlug, getAdvisoryBySlugDraft, getAdvisorySlugs } from "@/lib/advisory";
+import { advisoryHeading, cvssRating } from "@/lib/advisory-utils";
+import { ADVISORIES_SECTION, mediaUrl } from "@/lib/blog-utils";
+import type { LexicalRoot } from "@/lib/blog";
 import { highlightLexical } from "@/lib/highlightLexical";
-import { lexicalToPlainText } from "@/lib/renderLexical";
+import { RenderLexical } from "@/lib/renderLexical";
 import { Header } from "@/components/nav/Header";
-import { BlogDetailHero } from "@/components/sections/blog/BlogDetailHero";
-import { BlogDetailContent } from "@/components/sections/blog/BlogDetailContent";
-import { BlogDetailAuthor } from "@/components/sections/blog/BlogDetailAuthor";
-import { BlogDetailFAQ } from "@/components/sections/blog/BlogDetailFAQ";
-import { BlogDetailRelatedPosts } from "@/components/sections/blog/BlogDetailRelatedPosts";
-import { BlogScrollReset } from "@/components/sections/blog/BlogScrollReset";
+import { DetailHero, DetailHeroMetaSeparator } from "@/components/sections/_shared/DetailHero";
 import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
 import { Footer } from "@/components/sections/Footer";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 import { effectiveModifiedAt, effectivePublishedAt } from "@/lib/published-date";
-import {
-  articleSchema,
-  breadcrumbSchema,
-  breadcrumbTrail,
-  faqPageSchema,
-} from "@/lib/seo/jsonld";
+import { articleSchema, breadcrumbSchema } from "@/lib/seo/jsonld";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
 import { buildPageGraph, seoOverride } from "@/lib/seo/compose-page";
 
@@ -61,36 +48,38 @@ export async function generateMetadata({ params }: AdvisoryDetailPageProps): Pro
     });
   }
 
-  const heroAbsolute = mediaUrl(advisory.heroImage?.url);
   const seo = resolveCmsSeo(advisory.seo, { absolutize: mediaUrl });
-
   return buildPageMetadata({
-    title: seo.title ?? advisory.title,
+    title: seo.title ?? advisoryHeading(advisory),
     description:
       seo.description ??
       advisory.abstract ??
-      "A CleanStart security advisory: what is affected and how to fix it.",
+      `${advisoryHeading(advisory)}. CVSS ${advisory.cvssScore} ${cvssRating(advisory.cvssScore)}: affected versions and how to fix it.`,
     path: `${basePath}/${advisory.slug}`,
     eyebrow: "Advisory",
     type: "article",
     publishedTime: effectivePublishedAt(advisory) ?? advisory.publishedAt,
     modifiedTime: effectiveModifiedAt(advisory),
-    authors: advisory.authors?.map((a) => a.name),
     ...(seo.noindex ? { noindex: true, nofollow: seo.nofollow } : {}),
     ...(seo.canonicalUrl ? { canonicalUrl: seo.canonicalUrl } : {}),
-    ...(seo.image
-      ? { image: seo.image }
-      : heroAbsolute && advisory.heroImage
-        ? {
-            image: {
-              url: heroAbsolute,
-              width: advisory.heroImage.width,
-              height: advisory.heroImage.height,
-              alt: advisory.heroImage.alt ?? advisory.title,
-            },
-          }
-        : {}),
+    ...(seo.image ? { image: seo.image } : {}),
   });
+}
+
+function formatLongDate(iso: string | undefined): string {
+  return iso
+    ? new Date(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+    : "";
+}
+
+function AdvisorySection({ heading, content }: { heading: string; content: LexicalRoot | null | undefined }): React.ReactElement | null {
+  if (!content?.root?.children?.length) return null;
+  return (
+    <section className="article-body">
+      <h2 className="article-h2">{heading}</h2>
+      <RenderLexical content={content} />
+    </section>
+  );
 }
 
 export async function renderAdvisoryDetail({
@@ -101,92 +90,73 @@ export async function renderAdvisoryDetail({
   draft?: boolean;
 }): Promise<React.ReactElement> {
   const advisory = draft ? await getAdvisoryBySlugDraft(slug) : await getAdvisoryBySlug(slug);
-
   if (!advisory) notFound();
 
+  const heading = advisoryHeading(advisory);
   const publishedAt = effectivePublishedAt(advisory);
-  const [related, highlightedBody] = await Promise.all([
-    getRelatedAdvisories(String(advisory.id), { draft }).catch(() => []),
+  const [body, impact, resolution] = await Promise.all([
     highlightLexical(advisory.body),
+    highlightLexical(advisory.impact),
+    highlightLexical(advisory.resolution),
   ]);
 
-  // One filtered array feeds both the FAQPage JSON-LD and the accordion, so
-  // the visible content always matches the schema.
-  const validFaqs = (advisory.faqs ?? []).filter(
-    (faq) => (faq.question?.trim().length ?? 0) > 0 && lexicalToPlainText(faq.answer).length > 0,
-  );
-
+  const metaLabel: React.CSSProperties = { color: "rgba(255,255,255,0.65)" };
   return (
     <>
-      <BlogScrollReset />
       <JsonLdGraph
         id={`advisory-jsonld-${advisory.slug}`}
         graph={buildPageGraph({
           nodes: [
-            breadcrumbSchema(breadcrumbTrail("advisory", { title: advisory.title })),
+            breadcrumbSchema(breadcrumbTrail("advisory", { title: heading })),
             articleSchema({
-              title: advisory.title,
+              title: heading,
               description: advisory.abstract ?? undefined,
               path: `${basePath}/${advisory.slug}`,
               publishedAt,
               modifiedAt: effectiveModifiedAt(advisory),
-              imageUrl: mediaUrl(advisory.heroImage?.url),
               type: "Security advisory",
-              authors: advisory.authors?.map((a) => ({ name: a.name, slug: a.slug })),
             }),
-            ...(validFaqs.length > 0
-              ? [
-                  faqPageSchema(
-                    validFaqs.map((faq) => ({
-                      question: faq.question.trim(),
-                      answer: lexicalToPlainText(faq.answer),
-                    })),
-                  ),
-                ]
-              : []),
           ],
           override: seoOverride(advisory.seo),
         })}
       />
       <Header />
       <main id="main-content">
-        <BlogDetailHero
-          title={advisory.title}
-          slug={advisory.slug}
-          authors={advisory.authors}
-          publishedAt={publishedAt}
-          updatedAt={advisory.contentUpdatedAt ?? undefined}
-          readingMinutes={advisory.readingMinutes ?? undefined}
-          heroImage={advisory.heroImage}
-          section={ADVISORIES_SECTION}
+        <DetailHero
+          breadcrumb={breadcrumbTrail("advisory", { title: heading }).slice(1)}
+          title={heading}
+          meta={
+            <div
+              className="flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-2 font-sans text-white"
+              style={{ fontSize: "var(--fs-body)" }}
+            >
+              <span>
+                <span style={metaLabel}>CVSS: </span>
+                <strong className="font-semibold">
+                  {advisory.cvssScore.toFixed(1)} {cvssRating(advisory.cvssScore)}
+                </strong>
+              </span>
+              <DetailHeroMetaSeparator />
+              <span>
+                <span style={metaLabel}>Published: </span>
+                <time dateTime={publishedAt}>{formatLongDate(publishedAt)}</time>
+              </span>
+            </div>
+          }
         />
 
-        <BlogDetailContent
-          body={highlightedBody}
-          tableOfContents={advisory.tableOfContents}
-          heroImage={advisory.heroImage}
-        />
-
-        <BlogDetailAuthor authors={advisory.authors} />
-
-        {validFaqs.length > 0 && <BlogDetailFAQ faqs={validFaqs} />}
-
-        {/* Same CTA clearance as the blog article: each branch subtracts the
-            bottom padding of the last section it follows. */}
-        {related.length > 0 ? (
-          <div
-            style={{
-              background: "linear-gradient(180deg, #151021 0%, #131E8F 62%, #471EC0 100%)",
-              paddingBottom: "calc(var(--spacing-section-cta) - 20px)",
-            }}
-          >
-            <BlogDetailRelatedPosts posts={related} section={ADVISORIES_SECTION} />
+        <div className="bg-white">
+          <div className="relative mx-auto max-w-[1120px] px-6">
+            <div
+              className="mx-auto lg:mx-0 w-full max-w-[988px] flex flex-col pt-10 lg:pt-14"
+              style={{ gap: "clamp(32px, 4vw, 48px)", paddingBottom: "var(--spacing-section-cta)" }}
+            >
+              <AdvisorySection heading="Vulnerability" content={body} />
+              <AdvisorySection heading="Impacted packages and versions" content={impact} />
+              <AdvisorySection heading="Resolution" content={resolution} />
+            </div>
           </div>
-        ) : validFaqs.length > 0 ? (
-          <div aria-hidden className="bg-white" style={{ height: "calc(var(--spacing-section-cta) - 80px)" }} />
-        ) : (
-          <div aria-hidden className="bg-white" style={{ height: "calc(var(--spacing-section-cta) - 64px)" }} />
-        )}
+        </div>
       </main>
 
       <Footer cta={<BlogDetailCTA />} />
