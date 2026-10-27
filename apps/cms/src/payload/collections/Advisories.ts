@@ -69,6 +69,16 @@ export const Advisories: CollectionConfig = {
       label: 'Vulnerability name',
       admin: { description: 'e.g. Node.js Brotli decoder out-of-bounds write. The CVE IDs are shown before it.' },
     },
+    {
+      name: 'coverTitle',
+      label: 'Cover title',
+      type: 'text',
+      maxLength: 80,
+      admin: {
+        description:
+          'Text shown on the cover of the listing card. Leave blank to use the vulnerability name. Keep it short: long text is shrunk or clipped on the cover.',
+      },
+    },
     slugField({ source: 'title' }),
     {
       name: 'cves',
@@ -129,16 +139,6 @@ export const Advisories: CollectionConfig = {
           admin: { width: '50%', description: 'Where CleanStart stands on this vulnerability.' },
         },
       ],
-    },
-    {
-      name: 'coverTitle',
-      label: 'Cover title',
-      type: 'text',
-      maxLength: 80,
-      admin: {
-        description:
-          'Text shown on the cover of the listing card. Leave blank to use the vulnerability name. Keep it short: long text is shrunk or clipped on the cover.',
-      },
     },
     {
       name: 'abstract',

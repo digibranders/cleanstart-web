@@ -1861,6 +1861,10 @@ export interface Advisory {
    */
   title: string;
   /**
+   * Text shown on the cover of the listing card. Leave blank to use the vulnerability name. Keep it short: long text is shrunk or clipped on the cover.
+   */
+  coverTitle?: string | null;
+  /**
    * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
@@ -1880,10 +1884,6 @@ export interface Advisory {
    * Where CleanStart stands on this vulnerability.
    */
   fixStatus: 'identified' | 'in_progress' | 'fixed' | 'not_affected';
-  /**
-   * Text shown on the cover of the listing card. Leave blank to use the vulnerability name. Keep it short: long text is shrunk or clipped on the cover.
-   */
-  coverTitle?: string | null;
   /**
    * One or two sentences. Used as the SEO description when none is set. Aim for ≤ 160 characters.
    */
@@ -10298,12 +10298,12 @@ export interface BlogsSelect<T extends boolean = true> {
  */
 export interface AdvisoriesSelect<T extends boolean = true> {
   title?: T;
+  coverTitle?: T;
   slug?: T;
   cves?: T;
   technology?: T;
   cvssScore?: T;
   fixStatus?: T;
-  coverTitle?: T;
   abstract?: T;
   body?: T;
   impact?: T;
