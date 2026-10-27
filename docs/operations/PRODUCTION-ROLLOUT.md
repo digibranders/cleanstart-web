@@ -157,3 +157,7 @@ Requires migration `20261027_120000_advisories_structured_fields` (additive: CVE
 ### 24. Single advisory content box (2026-10-28)
 
 No migration. The advisory body is now one rich-text box (`body`, "Advisory content"); `impact` and `resolution` are hidden and their columns stay. Deploy `apps/web` and `apps/cms` first. Then merge the existing advisories in the cms container: `/app/node_modules/.bin/tsx scripts/merge-advisory-sections.ts` is a dry run, add `--apply` to write. It folds Impacted packages and Resolution into `body` under Heading 2s, clears the two old boxes and purges `/advisories`. Idempotent. Until it runs, the page still renders the old three sections for advisories that have them.
+
+### 25. Dropped two Knowledge Hub pages (2026-10-28)
+
+Done on prod already; nothing to run. `knowledge-hub/no-shell-read-only` (a stub pointing at two other guides) and `knowledge-hub/rekor-publishing` were deleted with `scripts/drop-knowledge-hub-pages.ts`, which first wrote a 301 for each: to `/knowledge-hub/combined-security-model` and `/knowledge-hub/image-signing-sigstore`. The script purges the web cache, but a script that ends with `process.exit` kills the deferred search-index delete, so the two Meilisearch documents (`knowledgeBase_3`, `knowledgeBase_84`) had to be removed by hand. After any scripted delete, check the index. The sitemap needed its `sitemap:knowledgeBase` tag purged as well.
