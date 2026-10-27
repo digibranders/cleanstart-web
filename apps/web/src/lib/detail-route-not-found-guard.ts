@@ -94,8 +94,10 @@ function matchRoute(pathname: string): RouteMatch | null {
     if (!pathname.startsWith(route.prefix)) continue;
     const rest = pathname.slice(route.prefix.length);
     // Only a bare `[slug]` segment is this route's shape. No match (or a
-    // nested/empty path) means this guard has nothing to say about it.
-    if (!rest || rest.includes("/")) return null;
+    // nested/empty path) means this guard has nothing to say about it. Slugs
+    // never contain a dot (slugify emits [a-z0-9-]), so a dotted segment is a
+    // file route such as /advisories/feed.xml, not a missing document.
+    if (!rest || rest.includes("/") || rest.includes(".")) return null;
     return { route, slug: decodeURIComponent(rest) };
   }
   return null;

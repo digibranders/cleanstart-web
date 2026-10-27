@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Rss } from "lucide-react";
 import { EmptyState } from "@/components/feedback";
 import { Container, Section } from "@/components/layout";
 import {
@@ -7,6 +8,7 @@ import {
   type AdvisoryFixStatus,
   type AdvisoryRow,
 } from "@/lib/advisory-utils";
+import { ADVISORY_FEED_PATH } from "@/lib/advisory-feed";
 import { formatBlogDate } from "@/lib/blog-utils";
 import { effectivePublishedAt } from "@/lib/published-date";
 
@@ -131,11 +133,21 @@ export function AdvisoriesTable({
   return (
     <Section padding="none" style={{ paddingTop: "var(--spacing-section-sm)", paddingBottom: "var(--spacing-section-cta)" }}>
       <Container>
-        <div className="flex flex-col gap-3 md:gap-4">
-          {technologies.length > 0 && (
-            <FilterRow label="Technology" param="technology" options={technologies} filters={filters} />
-          )}
-          <FilterRow label="Status" param="status" options={ADVISORY_STATUSES} filters={filters} />
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between md:gap-8">
+          <div className="flex flex-col gap-3 md:gap-4">
+            {technologies.length > 0 && (
+              <FilterRow label="Technology" param="technology" options={technologies} filters={filters} />
+            )}
+            <FilterRow label="Status" param="status" options={ADVISORY_STATUSES} filters={filters} />
+          </div>
+          <a
+            href={ADVISORY_FEED_PATH}
+            className="inline-flex items-center gap-1.5 self-start shrink-0 font-sans font-medium text-[#4a3bf1] hover:text-[#3928e0] transition-colors duration-150 md:mt-2"
+            style={{ fontSize: "var(--fs-body-sm)" }}
+          >
+            <Rss aria-hidden size={16} strokeWidth={2} />
+            RSS feed
+          </a>
         </div>
 
         <div style={{ marginTop: "clamp(28px, 3.5vw, 48px)" }}>

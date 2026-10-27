@@ -6,7 +6,6 @@ import { fetchCMS } from "./cms-fetch";
 import type { CmsSeo } from "./seo/cms-seo";
 
 export type AdvisoryDetail = AdvisoryRow & {
-  abstract?: string | null;
   body?: LexicalRoot | null;
   impact?: LexicalRoot | null;
   resolution?: LexicalRoot | null;
@@ -35,6 +34,7 @@ const ROW_SELECT = [
   "cves",
   "cvssScore",
   "fixStatus",
+  "abstract",
   "publishedAt",
   "displayPublishedAt",
 ]
@@ -48,10 +48,15 @@ export async function getAdvisorySlugs(): Promise<string[]> {
   return res.docs.map((d) => d.slug).filter((s): s is string => Boolean(s));
 }
 
-/** Every published advisory, newest first, for the client-filtered table. */
+/**
+ * Every published advisory, newest first, for the client-filtered table and
+ * the RSS feed. Tagged like the sitemap reads, so the publish hook's
+ * `sitemap:advisories` purge refreshes the feed route too.
+ */
 export async function getAdvisories(): Promise<AdvisoryRow[]> {
   const res = await fetchCMS<PayloadListResponse<AdvisoryRow>>(
     `/api/advisories?${PUBLISHED_FILTER}&depth=0&limit=1000&sort=-displayPublishedAt&${ROW_SELECT}`,
+    { tags: ["sitemap:advisories"] },
   );
   return res.docs;
 }

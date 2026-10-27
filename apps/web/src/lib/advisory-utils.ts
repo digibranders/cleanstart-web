@@ -23,6 +23,7 @@ export interface AdvisoryRow {
   cves: string[];
   cvssScore: number;
   fixStatus: AdvisoryFixStatus;
+  abstract?: string | null;
   publishedAt?: string;
   displayPublishedAt?: string | null;
 }
