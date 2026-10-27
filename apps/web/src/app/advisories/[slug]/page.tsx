@@ -9,7 +9,7 @@ import { highlightLexical } from "@/lib/highlightLexical";
 import { RenderLexical } from "@/lib/renderLexical";
 import { Header } from "@/components/nav/Header";
 import { DetailHero } from "@/components/sections/_shared/DetailHero";
-import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
+import { BlogsCTA } from "@/components/sections/blogs/BlogsCTA";
 import { Footer } from "@/components/sections/Footer";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
@@ -207,7 +207,7 @@ export async function renderAdvisoryDetail({
         </div>
       </main>
 
-      <Footer cta={<BlogDetailCTA />} />
+      <Footer cta={<BlogsCTA />} />
     </>
   );
 }
