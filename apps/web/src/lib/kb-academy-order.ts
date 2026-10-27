@@ -86,6 +86,7 @@ export const KB_ACADEMY_ORDER: Readonly<Record<string, number>> = {
   "vulnerability-across-all-layers": 71,
   "read-only-filesystem-guide": 72,
   "shell-less-operations-guide": 73,
+  "no-shell-read-only": 74,
   "stage0-compiler-bootstrap": 75,
   "the-11-build-artifacts": 76,
   "the-continuous-trust-loop": 77,
