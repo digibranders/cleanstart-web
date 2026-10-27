@@ -2,13 +2,13 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { breadcrumbTrail } from "@cleanstart/schema/builders";
 import { getAdvisoryBySlug, getAdvisoryBySlugDraft, getAdvisorySlugs } from "@/lib/advisory";
-import { advisoryHeading, cvssRating } from "@/lib/advisory-utils";
+import { advisoryHeading, advisoryStatusLabel, cvssRating, type CvssRating } from "@/lib/advisory-utils";
 import { ADVISORIES_SECTION, mediaUrl } from "@/lib/blog-utils";
 import type { LexicalRoot } from "@/lib/blog";
 import { highlightLexical } from "@/lib/highlightLexical";
 import { RenderLexical } from "@/lib/renderLexical";
 import { Header } from "@/components/nav/Header";
-import { DetailHero, DetailHeroMetaSeparator } from "@/components/sections/_shared/DetailHero";
+import { DetailHero } from "@/components/sections/_shared/DetailHero";
 import { BlogDetailCTA } from "@/components/sections/blog/BlogDetailCTA";
 import { Footer } from "@/components/sections/Footer";
 import { buildPageMetadata } from "@/lib/seo/canonical";
@@ -72,6 +72,41 @@ function formatLongDate(iso: string | undefined): string {
     : "";
 }
 
+/** Chip colours on the dark hero: translucent tint, light text, matching hairline. */
+const SEVERITY_CHIP: Record<CvssRating, { color: string; background: string; border: string }> = {
+  Critical: { color: "#FECACA", background: "rgba(239,68,68,0.20)", border: "rgba(248,113,113,0.45)" },
+  High: { color: "#FED7AA", background: "rgba(249,115,22,0.20)", border: "rgba(251,146,60,0.45)" },
+  Medium: { color: "#FDE68A", background: "rgba(245,158,11,0.18)", border: "rgba(251,191,36,0.40)" },
+  Low: { color: "#BBF7D0", background: "rgba(34,197,94,0.18)", border: "rgba(74,222,128,0.40)" },
+  None: { color: "#E5E7EB", background: "rgba(255,255,255,0.12)", border: "rgba(255,255,255,0.25)" },
+};
+
+const NEUTRAL_CHIP = { color: "#FFFFFF", background: "rgba(255,255,255,0.12)", border: "rgba(255,255,255,0.25)" };
+
+function HeroChip({
+  tone,
+  children,
+}: {
+  tone: { color: string; background: string; border: string };
+  children: React.ReactNode;
+}): React.ReactElement {
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 whitespace-nowrap font-sans font-medium"
+      style={{
+        padding: "6px 14px",
+        borderRadius: "30px",
+        fontSize: "var(--fs-body-sm)",
+        color: tone.color,
+        background: tone.background,
+        border: `1px solid ${tone.border}`,
+      }}
+    >
+      {children}
+    </span>
+  );
+}
+
 function AdvisorySection({ heading, content }: { heading: string; content: LexicalRoot | null | undefined }): React.ReactElement | null {
   if (!content?.root?.children?.length) return null;
   return (
@@ -100,7 +135,6 @@ export async function renderAdvisoryDetail({
     highlightLexical(advisory.resolution),
   ]);
 
-  const metaLabel: React.CSSProperties = { color: "rgba(255,255,255,0.65)" };
   return (
     <>
       <JsonLdGraph
@@ -126,21 +160,16 @@ export async function renderAdvisoryDetail({
           breadcrumb={breadcrumbTrail("advisory", { title: heading }).slice(1)}
           title={heading}
           meta={
-            <div
-              className="flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-2 font-sans text-white"
-              style={{ fontSize: "var(--fs-body)" }}
-            >
-              <span>
-                <span style={metaLabel}>CVSS: </span>
-                <strong className="font-semibold">
-                  {advisory.cvssScore.toFixed(1)} {cvssRating(advisory.cvssScore)}
-                </strong>
-              </span>
-              <DetailHeroMetaSeparator />
-              <span>
-                <span style={metaLabel}>Published: </span>
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5">
+              <HeroChip tone={SEVERITY_CHIP[cvssRating(advisory.cvssScore)]}>
+                CVSS {advisory.cvssScore.toFixed(1)}
+                <span className="font-semibold">{cvssRating(advisory.cvssScore)}</span>
+              </HeroChip>
+              <HeroChip tone={NEUTRAL_CHIP}>{advisoryStatusLabel(advisory.fixStatus)}</HeroChip>
+              <HeroChip tone={NEUTRAL_CHIP}>
+                Published
                 <time dateTime={publishedAt}>{formatLongDate(publishedAt)}</time>
-              </span>
+              </HeroChip>
             </div>
           }
         />
