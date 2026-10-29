@@ -43,17 +43,16 @@ export const LIST_FILTER_FIELDS: Record<string, ReadonlyArray<ListFilterFieldCon
     {
       kind: 'options',
       name: 'format',
-      label: 'Format',
+      label: 'Category',
       options: [
         { label: 'Explainer', value: 'explainer' },
         { label: 'Product demo', value: 'demo' },
-        { label: 'Talk or webinar', value: 'talk' },
       ],
     },
     {
       kind: 'options',
       name: 'syncState',
-      label: 'Sync state',
+      label: 'Review state',
       options: [
         { label: 'Needs review', value: 'needs-review' },
         { label: 'Synced', value: 'synced' },

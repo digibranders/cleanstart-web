@@ -52,14 +52,14 @@ describe('reindexMeiliTask', () => {
 
   it('skips reindex when meili count is within 5% of postgres count', async () => {
     const client = makeClient({
-      getStats: vi.fn().mockResolvedValue({ numberOfDocuments: 140, isIndexing: false }),
+      getStats: vi.fn().mockResolvedValue({ numberOfDocuments: 130, isIndexing: false }),
     });
     vi.spyOn(clientModule, 'createSearchClient').mockReturnValue(client);
-    // postgres count: 14 collections × 10 docs = 140
+    // postgres count: 13 collections × 10 docs = 130
     const payload = makePayload(10);
     const { output } = await handler({ req: { payload } });
     expect(output.reindexed).toBe(0);
-    expect((output.skipped as number) + (output.reindexed as number)).toBe(140);
+    expect((output.skipped as number) + (output.reindexed as number)).toBe(130);
     expect(client.upsertDocuments).not.toHaveBeenCalled();
   });
 

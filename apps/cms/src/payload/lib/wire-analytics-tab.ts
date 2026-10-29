@@ -15,7 +15,6 @@ const COLLECTIONS_WITH_ANALYTICS = new Set([
   'pages',
   'blogs',
   'advisories',
-  'videos',
   'news',
   'guides',
   'resources',

@@ -54,6 +54,9 @@ export const runPublishChecks = (
   data: Record<string, unknown>,
   collectionSlug: string,
 ): CheckResult[] => {
+  // Videos play inline on /videos: no page, slug or SEO block, so none of the page checks apply.
+  if (collectionSlug === 'videos') return videoChecks(data);
+
   const seo = (data.seo ?? {}) as Record<string, unknown>;
   const checks: CheckResult[] = [];
 
@@ -149,8 +152,6 @@ export const runPublishChecks = (
     });
   }
 
-  if (collectionSlug === 'videos') checks.push(...videoChecks(data));
-
   return checks;
 };
 
@@ -175,9 +176,9 @@ const videoChecks = (data: Record<string, unknown>): CheckResult[] => {
   return [
     blocker(
       'video-format',
-      'Format is chosen',
+      'Category is chosen',
       resolveString(data.format) != null,
-      'Choose a format.',
+      'Choose a category.',
     ),
     blocker('video-topics', 'At least one topic', topics.length > 0, 'Add at least one topic.'),
     blocker(
@@ -191,7 +192,7 @@ const videoChecks = (data: Record<string, unknown>): CheckResult[] => {
       label: 'Duration is known',
       severity: 'warn',
       pass: hasDuration,
-      message: hasDuration ? null : 'No duration: the card and VideoObject schema will omit it.',
+      message: hasDuration ? null : 'No length yet: the card will show none. YouTube reports it once the sync has run with an API key.',
     },
   ];
 };

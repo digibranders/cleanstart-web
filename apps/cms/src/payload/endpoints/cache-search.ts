@@ -13,7 +13,6 @@ export interface CacheSearchResult {
 const COLLECTION_LABELS: Record<string, string> = {
   blogs: 'Blog',
   advisories: 'Advisory',
-  videos: 'Video',
   news: 'News',
   guides: 'Guide',
   resources: 'Resource',

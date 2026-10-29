@@ -27,6 +27,13 @@ describe('collectionUrlFromSlug / collectionUrlFromDoc (detail URLs)', () => {
   });
 });
 
+describe('videos have a listing but no detail URL', () => {
+  it('composes no detail URL, because videos play inline', () => {
+    expect(collectionUrlFromSlug('videos', 'x')).toBeNull();
+    expect(collectionUrlFromDoc('videos', { slug: 'x' })).toBeNull();
+  });
+});
+
 describe('listingPathForCollection (index URLs for revalidation)', () => {
   it('overrides collections whose listing route differs from the detail prefix', () => {
     // These differ from ROUTE_PREFIX; revalidating the prefix would purge a
@@ -35,6 +42,7 @@ describe('listingPathForCollection (index URLs for revalidation)', () => {
     expect(listingPathForCollection('events')).toBe('/events');
     expect(listingPathForCollection('webinars')).toBe('/webinars');
     expect(listingPathForCollection('jobs')).toBe('/careers');
+    expect(listingPathForCollection('videos')).toBe('/videos');
   });
 
   it('falls back to ROUTE_PREFIX when the listing matches the detail prefix', () => {

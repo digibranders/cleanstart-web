@@ -7,7 +7,6 @@ const INTERNAL_DOC_TARGETS = [
   'pages',
   'blogs',
   'advisories',
-  'videos',
   'news',
   'guides',
   'resources',

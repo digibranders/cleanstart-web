@@ -16,7 +16,6 @@
 export const ROUTE_PREFIX = {
   blogs: '/blogs',
   advisories: '/advisories',
-  videos: '/videos',
   'case-studies': '/case-studies',
   news: '/news',
   guides: '/guide',
@@ -51,7 +50,9 @@ const LISTING_PATH_OVERRIDE: Record<string, string> = {
   // must purge. `collectionUrlFromDoc` returns null for it (no ROUTE_PREFIX
   // entry), so the hook purges the listing alone.
   resourceTypes: '/resource-center',
-  // Topics render as the /videos filter, so a topic edit must purge that listing.
+  // Videos play inline on the listing (no page per video), so there is no ROUTE_PREFIX entry and
+  // no detail URL: a publish purges the listing alone. Topics are its filter, so they purge it too.
+  videos: '/videos',
   videoTopics: '/videos',
   events: '/events',
   webinars: '/webinars',
@@ -80,7 +81,6 @@ export const listingPathForCollection = (collection: string): string | null => {
 const SITEMAP_COLLECTIONS = new Set([
   'blogs',
   'advisories',
-  'videos',
   'case-studies',
   'news',
   'guides',

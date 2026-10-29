@@ -6,6 +6,10 @@
   "timestamps": true,
   "fields": [
     {
+      "type": "ui",
+      "name": "youtubePreview"
+    },
+    {
       "type": "text",
       "name": "title",
       "required": true
@@ -17,26 +21,7 @@
       "unique": true
     },
     {
-      "type": "select",
-      "name": "provider",
-      "required": true,
-      "options": [
-        {
-          "value": "youtube"
-        },
-        {
-          "value": "vimeo"
-        }
-      ]
-    },
-    {
-      "type": "text",
-      "name": "externalId",
-      "required": true,
-      "unique": true
-    },
-    {
-      "type": "select",
+      "type": "radio",
       "name": "format",
       "options": [
         {
@@ -44,9 +29,6 @@
         },
         {
           "value": "demo"
-        },
-        {
-          "value": "talk"
         }
       ]
     },
@@ -69,10 +51,6 @@
       "name": "featured"
     },
     {
-      "type": "textarea",
-      "name": "transcript"
-    },
-    {
       "type": "select",
       "name": "syncState",
       "options": [
@@ -91,64 +69,96 @@
       ]
     },
     {
-      "type": "group",
-      "name": "source",
+      "type": "collapsible",
       "fields": [
         {
-          "type": "text",
-          "name": "title"
-        },
-        {
-          "type": "textarea",
-          "name": "description"
-        },
-        {
-          "type": "number",
-          "name": "durationSeconds"
-        },
-        {
-          "type": "date",
-          "name": "publishedAt"
-        },
-        {
-          "type": "array",
-          "name": "tags",
-          "fields": [
+          "type": "select",
+          "name": "provider",
+          "required": true,
+          "options": [
             {
-              "type": "text",
-              "name": "value"
+              "value": "youtube"
+            },
+            {
+              "value": "vimeo"
             }
           ]
         },
         {
           "type": "text",
-          "name": "privacyStatus"
+          "name": "externalId",
+          "required": true,
+          "unique": true
         },
         {
-          "type": "checkbox",
-          "name": "embeddable"
-        },
-        {
-          "type": "checkbox",
-          "name": "hasMaxres"
-        },
-        {
-          "type": "text",
-          "name": "thumbnailUrl"
-        },
-        {
-          "type": "text",
-          "name": "contentHash"
-        },
-        {
-          "type": "date",
-          "name": "fetchedAt"
+          "type": "group",
+          "name": "source",
+          "fields": [
+            {
+              "type": "text",
+              "name": "title"
+            },
+            {
+              "type": "textarea",
+              "name": "description"
+            },
+            {
+              "type": "number",
+              "name": "durationSeconds"
+            },
+            {
+              "type": "date",
+              "name": "publishedAt"
+            },
+            {
+              "type": "array",
+              "name": "tags",
+              "fields": [
+                {
+                  "type": "text",
+                  "name": "value"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "name": "privacyStatus"
+            },
+            {
+              "type": "checkbox",
+              "name": "embeddable"
+            },
+            {
+              "type": "checkbox",
+              "name": "hasMaxres"
+            },
+            {
+              "type": "text",
+              "name": "thumbnailUrl"
+            },
+            {
+              "type": "text",
+              "name": "contentHash"
+            },
+            {
+              "type": "date",
+              "name": "fetchedAt"
+            }
+          ]
         }
       ]
     },
     {
       "type": "ui",
-      "name": "permalink"
+      "name": "thumb"
+    },
+    {
+      "type": "ui",
+      "name": "length"
+    },
+    {
+      "type": "ui",
+      "name": "state"
     },
     {
       "type": "date",
@@ -161,235 +171,12 @@
     {
       "type": "date",
       "name": "contentUpdatedAt"
-    },
-    {
-      "type": "ui",
-      "name": "seoHealthScore"
-    },
-    {
-      "type": "ui",
-      "name": "seoTitle"
-    },
-    {
-      "type": "ui",
-      "name": "seoDescription"
-    },
-    {
-      "type": "ui",
-      "name": "seoIndexable"
-    },
-    {
-      "type": "ui",
-      "name": "serpPreview"
-    },
-    {
-      "type": "ui",
-      "name": "schemaPreview"
-    },
-    {
-      "type": "ui",
-      "name": "keywords"
-    },
-    {
-      "type": "ui",
-      "name": "canonicalUrl"
-    },
-    {
-      "type": "ui",
-      "name": "socialCard"
-    },
-    {
-      "type": "ui",
-      "name": "redirect"
-    },
-    {
-      "type": "ui",
-      "name": "headTags"
-    },
-    {
-      "type": "ui",
-      "name": "urlChangeHistory"
-    },
-    {
-      "type": "group",
-      "name": "seo",
-      "fields": [
-        {
-          "type": "text",
-          "name": "title"
-        },
-        {
-          "type": "textarea",
-          "name": "description"
-        },
-        {
-          "type": "select",
-          "name": "indexable",
-          "options": [
-            {
-              "value": "index"
-            },
-            {
-              "value": "noindex"
-            },
-            {
-              "value": "noindex,nofollow"
-            }
-          ]
-        },
-        {
-          "type": "upload",
-          "name": "ogImage",
-          "relationTo": "media"
-        },
-        {
-          "type": "text",
-          "name": "ogImageAlt"
-        },
-        {
-          "type": "checkbox",
-          "name": "useAdvancedOg"
-        },
-        {
-          "type": "text",
-          "name": "ogTitle"
-        },
-        {
-          "type": "textarea",
-          "name": "ogDescription"
-        },
-        {
-          "type": "checkbox",
-          "name": "useAdvancedTwitter"
-        },
-        {
-          "type": "select",
-          "name": "twitterCard",
-          "options": [
-            {
-              "value": "summary"
-            },
-            {
-              "value": "summary_large_image"
-            }
-          ]
-        },
-        {
-          "type": "text",
-          "name": "twitterTitle"
-        },
-        {
-          "type": "textarea",
-          "name": "twitterDescription"
-        },
-        {
-          "type": "upload",
-          "name": "twitterImage",
-          "relationTo": "media"
-        },
-        {
-          "type": "checkbox",
-          "name": "useCustomCanonical"
-        },
-        {
-          "type": "text",
-          "name": "canonicalOverride"
-        },
-        {
-          "type": "group",
-          "name": "robotsAdvanced",
-          "fields": [
-            {
-              "type": "checkbox",
-              "name": "noarchive"
-            },
-            {
-              "type": "checkbox",
-              "name": "nosnippet"
-            },
-            {
-              "type": "checkbox",
-              "name": "noimageindex"
-            },
-            {
-              "type": "checkbox",
-              "name": "notranslate"
-            },
-            {
-              "type": "number",
-              "name": "maxSnippet"
-            },
-            {
-              "type": "select",
-              "name": "maxImagePreview",
-              "options": [
-                {
-                  "value": "standard"
-                },
-                {
-                  "value": "large"
-                },
-                {
-                  "value": "none"
-                }
-              ]
-            },
-            {
-              "type": "number",
-              "name": "maxVideoPreview"
-            },
-            {
-              "type": "date",
-              "name": "unavailableAfter"
-            }
-          ]
-        },
-        {
-          "type": "json",
-          "name": "alternates"
-        },
-        {
-          "type": "json",
-          "name": "customTags"
-        },
-        {
-          "type": "text",
-          "name": "keywordTarget"
-        },
-        {
-          "type": "json",
-          "name": "keywords"
-        },
-        {
-          "type": "array",
-          "name": "speakablePath",
-          "fields": [
-            {
-              "type": "text",
-              "name": "selector",
-              "required": true
-            }
-          ]
-        },
-        {
-          "type": "json",
-          "name": "additionalSchema"
-        },
-        {
-          "type": "json",
-          "name": "schemaHistory"
-        }
-      ]
-    },
-    {
-      "type": "ui",
-      "name": "seoAdvanced"
     }
   ],
   "hooks": {
     "beforeChange": 5,
-    "afterChange": 6,
+    "afterChange": 3,
     "beforeValidate": 0,
-    "afterDelete": 2
+    "afterDelete": 1
   }
 }

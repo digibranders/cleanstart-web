@@ -1,10 +1,9 @@
 import { fetchCMS } from "./cms-fetch";
 import { firstParagraph, sanitizeDescription, type Video } from "./videos-utils";
 
-// `sitemap:videos` is the tag the CMS purges on every video publish
-// (apps/cms route-prefixes `sitemapTag`); `videos` is ours, for anything that
-// wants to purge these reads by name.
-const TAGS = ["videos", "sitemap:videos"] as const;
+// A video publish purges the /videos path (apps/cms route-prefixes), which refreshes this read;
+// `videos` is the tag for anything that wants to purge it by name.
+const TAGS = ["videos"] as const;
 
 type CmsTopic = { id?: number | string; slug: string; name: string };
 type CmsVideo = {

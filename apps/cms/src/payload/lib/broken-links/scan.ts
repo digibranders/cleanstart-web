@@ -16,7 +16,6 @@ import { type ExtractedLink, extractAllLinks } from './extract';
 const SCAN_COLLECTIONS = [
   'blogs',
   'advisories',
-  'videos',
   'news',
   'guides',
   'knowledgeBase',

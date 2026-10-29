@@ -131,6 +131,11 @@ describe('runPublishChecks: videos', () => {
     expect(check?.pass).toBe(true);
   });
 
+  it('runs no page checks (SEO title, slug, meta description) on a video', () => {
+    const ids = runPublishChecks(readyVideo, 'videos').map((c) => c.id);
+    expect(ids.every((id) => id.startsWith('video-'))).toBe(true);
+  });
+
   it('adds no video checks to other collections', () => {
     const ids = runPublishChecks(validBase, 'blogs').map((c) => c.id);
     expect(ids.some((id) => id.startsWith('video-'))).toBe(false);

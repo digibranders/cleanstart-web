@@ -596,7 +596,6 @@ export const Integrations: CollectionConfig = {
           options: [
             { label: 'Blogs', value: 'blogs' },
             { label: 'Advisories', value: 'advisories' },
-            { label: 'Videos', value: 'videos' },
             { label: 'News', value: 'news' },
             { label: 'Guides', value: 'guides' },
             { label: 'Resources', value: 'resources' },

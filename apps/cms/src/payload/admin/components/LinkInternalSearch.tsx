@@ -103,7 +103,6 @@ const COLLECTIONS: readonly CollectionConfig[] = [
   { label: 'Page', slug: 'pages', titleField: 'title' },
   { label: 'Blog', slug: 'blogs', titleField: 'title' },
   { label: 'Advisory', slug: 'advisories', titleField: 'title' },
-  { label: 'Video', slug: 'videos', titleField: 'title' },
   { label: 'News', slug: 'news', titleField: 'title' },
   { label: 'Resource', slug: 'resources', titleField: 'title' },
   { label: 'Knowledge Base', slug: 'knowledgeBase', titleField: 'title' },

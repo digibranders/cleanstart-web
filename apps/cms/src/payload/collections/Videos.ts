@@ -1,4 +1,4 @@
-import type { CollectionBeforeChangeHook, CollectionConfig } from 'payload';
+import type { CollectionAfterChangeHook, CollectionBeforeChangeHook, CollectionConfig, Field, TextField } from 'payload';
 import { ValidationError } from 'payload';
 
 import { isAdminOrEditor, publishedOrAuthenticated } from '../access';
@@ -6,22 +6,16 @@ import { docStatusBarEditConfig } from '../admin/doc-status-bar-mount';
 import { contentUpdatedAtField } from '../fields/content-updated-at';
 import { displayPublishedAtField } from '../fields/display-published-at';
 import { publishedAtField } from '../fields/published-at';
-import { seoFieldsForSidebar, seoSidebarFields } from '../fields/seo';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
 import { contentUpdatedAtHook } from '../hooks/content-updated-at';
 import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
 import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
 import { firstPublishHook } from '../hooks/first-publish';
-import { indexNowPublishAfterChangeHook } from '../hooks/indexnow-publish';
 import {
   revalidateWebAfterDeleteHook,
   revalidateWebPublishAfterChangeHook,
 } from '../hooks/revalidate-web-publish';
-import { searchSyncAfterChangeHook, searchSyncAfterDeleteHook } from '../hooks/search-sync';
-import { slugChangeRedirectHook } from '../hooks/slug-change-redirect';
-import { webhooksPublishAfterChangeHook } from '../hooks/webhooks-publish';
-import { ROUTE_PREFIX } from '../lib/route-prefixes';
 
 /** Plan 2 adds 'vimeo'. The enum value exists now so that is not an enum migration. */
 export const SUPPORTED_PROVIDERS: readonly string[] = ['youtube'];
@@ -52,21 +46,63 @@ export const publishedAtFromSourceHook: CollectionBeforeChangeHook = ({ data, op
 };
 
 /**
+ * Only one video plays in the /videos hero. Publishing a featured video clears the flag on the
+ * others, so an editor never has to untick the old one by hand. A draft is ignored: it is not live,
+ * so it must not take the hero away from the video that is.
+ */
+export const singleFeaturedHook: CollectionAfterChangeHook = async ({ doc, req, context }) => {
+  const current = doc as { id: number | string; featured?: boolean | null; _status?: string };
+  if (context?.singleFeatured || current.featured !== true || current._status !== 'published') return doc;
+  const others = await req.payload.find({
+    collection: 'videos',
+    where: { and: [{ featured: { equals: true } }, { id: { not_equals: current.id } }] },
+    limit: 100,
+    depth: 0,
+    pagination: false,
+    overrideAccess: true,
+    req,
+  });
+  for (const other of others.docs) {
+    await req.payload.update({
+      collection: 'videos',
+      id: other.id,
+      data: { featured: false },
+      overrideAccess: true,
+      depth: 0,
+      context: { singleFeatured: true },
+      req,
+    });
+  }
+  return doc;
+};
+
+/** The slug has no public meaning (videos play inline), so it is generated from the title and not shown. */
+const hiddenSlugField = (): Field => {
+  const field = slugField({ source: 'title' }) as TextField;
+  const { components: _components, position: _position, description: _description, ...admin } = field.admin ?? {};
+  return { ...field, admin: { ...admin, hidden: true } };
+};
+
+/**
  * Editorial videos for /videos. Imported from YouTube by the hourly sync as
  * needs-review drafts (see `lib/videos`). The `source` group is owned by the
- * sync, everything else by editors; neither overwrites the other.
+ * sync, everything else by editors; neither overwrites the other. Videos play
+ * inline on the listing, so there is no per-video page, URL or SEO block here.
  */
 export const Videos: CollectionConfig = {
   slug: 'videos',
   labels: { singular: 'Video', plural: 'Videos' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'format', 'syncState', '_status', 'publishedAt'],
+    defaultColumns: ['thumb', 'title', 'format', 'topics', 'length', 'state', 'featured'],
+    description:
+      'Videos shown on /videos. New YouTube uploads arrive as drafts marked "Needs review": choose a category and topics, write the summary, then publish.',
     group: 'Content',
     components: {
       edit: docStatusBarEditConfig({ showStats: false, showPublishedAt: true, showPurge: true }),
     },
   },
+  defaultSort: '-publishedAt',
   access: {
     read: publishedOrAuthenticated,
     create: isAdminOrEditor,
@@ -74,43 +110,26 @@ export const Videos: CollectionConfig = {
     delete: isAdminOrEditor,
   },
   fields: [
-    contentTitleField,
-    slugField({ source: 'title' }),
     {
-      name: 'provider',
-      type: 'select',
-      required: true,
-      defaultValue: 'youtube',
-      options: [
-        { label: 'YouTube', value: 'youtube' },
-        { label: 'Vimeo', value: 'vimeo' },
-      ],
-      access: readOnly,
-      admin: { position: 'sidebar' },
-    },
-    {
-      name: 'externalId',
-      type: 'text',
-      required: true,
-      unique: true,
-      index: true,
-      access: readOnly,
+      name: 'youtubePreview',
+      type: 'ui',
       admin: {
-        position: 'sidebar',
-        description: 'The video id on the host (the 11 characters in a YouTube link).',
+        components: { Field: '@/payload/admin/components/VideoSourceSummary.tsx#VideoSourceSummary' },
       },
     },
+    { ...contentTitleField, label: 'Title on the website' },
+    hiddenSlugField(),
     {
       name: 'format',
-      type: 'select',
+      type: 'radio',
+      label: 'Category',
       options: [
-        { label: 'Explainer', value: 'explainer' },
-        { label: 'Product demo', value: 'demo' },
-        { label: 'Talk or webinar', value: 'talk' },
+        { label: 'Explainer (what is, fundamentals)', value: 'explainer' },
+        { label: 'Product demo (how to, in the product)', value: 'demo' },
       ],
       admin: {
-        position: 'sidebar',
-        description: 'Required to publish. Drives the format tabs on /videos.',
+        layout: 'horizontal',
+        description: 'Required to publish. Drives the category tabs on /videos.',
       },
     },
     {
@@ -119,7 +138,13 @@ export const Videos: CollectionConfig = {
       relationTo: 'videoTopics',
       hasMany: true,
       admin: {
-        description: 'At least one is required to publish. Suggested from YouTube hashtags on import.',
+        description: 'At least one is required to publish. Drives the topic list on /videos.',
+        components: {
+          Cell: {
+            path: '@/payload/admin/components/RelationshipCell.tsx#RelationshipCell',
+            clientProps: { collectionSlug: 'videoTopics' },
+          },
+        },
       },
     },
     {
@@ -127,12 +152,13 @@ export const Videos: CollectionConfig = {
       type: 'textarea',
       maxLength: SUMMARY_MAX,
       admin: {
-        description: `Card text and meta description. Required to publish, up to ${SUMMARY_MAX} characters.`,
+        description: `Shown on the card. Required to publish, up to ${SUMMARY_MAX} characters.`,
       },
     },
     {
       name: 'durationLabel',
       type: 'text',
+      label: 'Length (only if YouTube has none)',
       validate: (value: string | null | undefined) =>
         value == null || value === '' || DURATION_LABEL.test(value)
           ? true
@@ -140,22 +166,19 @@ export const Videos: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description:
-          'Length shown on cards. Filled automatically when the YouTube API key is set; type it by hand otherwise (1:41).',
+          'The length is read from YouTube. Fill this only when the video shows no length, for example a live stream (1:41).',
       },
     },
     {
       name: 'featured',
       type: 'checkbox',
+      label: 'Show in the hero',
       defaultValue: false,
       admin: {
         position: 'sidebar',
-        description: 'Plays in the /videos hero. When none is featured, the newest video is.',
+        description:
+          'Plays at the top of /videos. Only one video can be featured: publishing this one clears the other. When none is featured, the newest video is.',
       },
-    },
-    {
-      name: 'transcript',
-      type: 'textarea',
-      admin: { description: 'Optional. Shown on the watch page once Plan 2 ships.' },
     },
     {
       name: 'syncState',
@@ -170,51 +193,71 @@ export const Videos: CollectionConfig = {
       access: readOnly,
       admin: {
         position: 'sidebar',
+        readOnly: true,
         description:
           'Set by the YouTube sync. "Missing" means the video is gone or private on YouTube; it is not unpublished automatically.',
       },
     },
     {
-      name: 'source',
-      type: 'group',
-      admin: { description: 'Copied from the host by the sync. Read only.' },
+      type: 'collapsible',
+      label: 'From YouTube (read only)',
+      admin: { initCollapsed: true },
       fields: [
-        { name: 'title', type: 'text', access: readOnly },
-        { name: 'description', type: 'textarea', access: readOnly },
-        { name: 'durationSeconds', type: 'number', access: readOnly },
-        { name: 'publishedAt', type: 'date', access: readOnly },
         {
-          name: 'tags',
-          type: 'array',
+          name: 'provider',
+          type: 'select',
+          required: true,
+          defaultValue: 'youtube',
+          options: [
+            { label: 'YouTube', value: 'youtube' },
+            { label: 'Vimeo', value: 'vimeo' },
+          ],
           access: readOnly,
-          fields: [{ name: 'value', type: 'text' }],
+          admin: { readOnly: true },
         },
-        { name: 'privacyStatus', type: 'text', access: readOnly },
-        { name: 'embeddable', type: 'checkbox', access: readOnly },
-        { name: 'hasMaxres', type: 'checkbox', access: readOnly },
-        { name: 'thumbnailUrl', type: 'text', access: readOnly },
-        { name: 'contentHash', type: 'text', access: readOnly, admin: { hidden: true } },
-        { name: 'fetchedAt', type: 'date', access: readOnly },
-      ],
-    },
-    {
-      name: 'permalink',
-      type: 'ui',
-      admin: {
-        position: 'sidebar',
-        components: {
-          Field: {
-            path: '@/payload/admin/components/PermalinkField.tsx#PermalinkField',
-            clientProps: { pathPrefix: ROUTE_PREFIX.videos },
+        {
+          name: 'externalId',
+          type: 'text',
+          required: true,
+          unique: true,
+          index: true,
+          access: readOnly,
+          admin: {
+            readOnly: true,
+            description: 'The video id on the host (the 11 characters in a YouTube link).',
           },
         },
-      },
+        {
+          name: 'source',
+          type: 'group',
+          admin: { description: 'Copied from the host by the sync. Read only.' },
+          fields: [
+            { name: 'title', type: 'text', access: readOnly },
+            { name: 'description', type: 'textarea', access: readOnly },
+            { name: 'durationSeconds', type: 'number', access: readOnly },
+            { name: 'publishedAt', type: 'date', access: readOnly },
+            {
+              name: 'tags',
+              type: 'array',
+              access: readOnly,
+              fields: [{ name: 'value', type: 'text' }],
+            },
+            { name: 'privacyStatus', type: 'text', access: readOnly },
+            { name: 'embeddable', type: 'checkbox', access: readOnly },
+            { name: 'hasMaxres', type: 'checkbox', access: readOnly },
+            { name: 'thumbnailUrl', type: 'text', access: readOnly },
+            { name: 'contentHash', type: 'text', access: readOnly, admin: { hidden: true } },
+            { name: 'fetchedAt', type: 'date', access: readOnly },
+          ],
+        },
+      ],
     },
+    { name: 'thumb', type: 'ui', admin: { components: { Cell: '@/payload/admin/components/VideoThumbCell.tsx#VideoThumbCell' } } },
+    { name: 'length', type: 'ui', label: 'Length', admin: { components: { Cell: '@/payload/admin/components/VideoLengthCell.tsx#VideoLengthCell' } } },
+    { name: 'state', type: 'ui', label: 'State', admin: { components: { Cell: '@/payload/admin/components/VideoStateCell.tsx#VideoStateCell' } } },
     publishedAtField,
     displayPublishedAtField,
     contentUpdatedAtField,
-    ...seoSidebarFields({ pathPrefix: ROUTE_PREFIX.videos, descriptionSource: 'summary' }),
-    ...seoFieldsForSidebar('videos'),
   ],
   hooks: {
     beforeChange: [
@@ -225,14 +268,11 @@ export const Videos: CollectionConfig = {
       displayPublishedAtBackfillHook,
     ],
     afterChange: [
-      slugChangeRedirectHook('videos'),
       displayPublishedAtAuditHook('videos'),
-      searchSyncAfterChangeHook('videos'),
-      webhooksPublishAfterChangeHook('videos'),
-      indexNowPublishAfterChangeHook('videos'),
+      singleFeaturedHook,
       revalidateWebPublishAfterChangeHook('videos'),
     ],
-    afterDelete: [searchSyncAfterDeleteHook('videos'), revalidateWebAfterDeleteHook('videos')],
+    afterDelete: [revalidateWebAfterDeleteHook('videos')],
   },
   versions: { drafts: { schedulePublish: true }, maxPerDoc: 25 },
   timestamps: true,
