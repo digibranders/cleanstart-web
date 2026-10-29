@@ -17,11 +17,14 @@ type CmsVideo = {
   durationLabel?: string | null;
   featured?: boolean | null;
   publishedAt?: string | null;
+  syncState?: string | null;
   source?: {
     description?: string | null;
     durationSeconds?: number | null;
     publishedAt?: string | null;
     hasMaxres?: boolean | null;
+    privacyStatus?: string | null;
+    embeddable?: boolean | null;
   } | null;
 };
 type CmsList = { docs: CmsVideo[] };
@@ -39,9 +42,15 @@ const isPopulatedTopic = (t: CmsTopic | number | string): t is CmsTopic =>
 
 const byNewest = (a: Video, b: Video): number => b.publishedAt.localeCompare(a.publishedAt);
 
-// Talks and webinars are not part of this page (they live on /webinars and /podcast).
+// Talks and webinars are not part of this page (they live on /webinars and /podcast). A video
+// YouTube no longer plays here (gone, private, embedding off) would show a broken player, so the
+// page hides it until an editor or the next sync sets it right.
 const isUsable = (doc: CmsVideo): boolean =>
-  Boolean(doc.slug && doc.externalId) && doc.format !== "talk";
+  Boolean(doc.slug && doc.externalId) &&
+  doc.format !== "talk" &&
+  doc.syncState !== "missing" &&
+  doc.source?.privacyStatus !== "private" &&
+  doc.source?.embeddable !== false;
 
 export const mapCmsVideo = (doc: CmsVideo): Video => {
   const rawDescription = doc.source?.description;

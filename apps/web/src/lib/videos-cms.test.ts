@@ -137,6 +137,15 @@ describe("getCmsVideos", () => {
     expect(await getCmsVideos()).toHaveLength(1);
   });
 
+  it.each([
+    ["gone from YouTube", { syncState: "missing" }],
+    ["private on YouTube", { source: { privacyStatus: "private" } }],
+    ["not embeddable", { source: { embeddable: false } }],
+  ])("hides a video that is %s, so the page never shows a broken player", async (_name, extra) => {
+    fetchCMS.mockResolvedValue({ docs: [doc({ ...extra, externalId: "BROKENBROKE" }), doc()] });
+    expect((await getCmsVideos()).map((v) => v.id)).toEqual(["uBItoX-x7Do"]);
+  });
+
   it("lets a CMS failure propagate so ISR keeps the last good page", async () => {
     fetchCMS.mockImplementation(async () => {
       throw new Error("CMS fetch failed: 520");
