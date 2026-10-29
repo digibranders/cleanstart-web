@@ -218,7 +218,7 @@ function VideosView({ videos, topics, heroId, filters, onChange }: VideosViewPro
 
       <Container
         id="library-results"
-        className="pb-[var(--spacing-section-md)] pt-8 lg:grid lg:grid-cols-[232px_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[248px_minmax(0,1fr)] xl:gap-14"
+        className="pb-[var(--spacing-section-cta)] pt-8 lg:grid lg:grid-cols-[232px_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[248px_minmax(0,1fr)] xl:gap-14"
         style={{ scrollMarginTop: "calc(var(--cs-header-h) + 76px)" }}
       >
         <TopicRail
@@ -317,8 +317,11 @@ function TopicRail({ topics, total, active, onSelect }: TopicRailProps): React.R
       on ? "bg-[#151021] font-medium text-white" : "text-[#3D3A4F] hover:bg-[#F1EFF8]"
     }`;
   return (
-    <fieldset className="m-0 hidden min-w-0 border-0 p-0 lg:sticky lg:top-[calc(var(--cs-header-h)+96px)] lg:block lg:self-start">
-      <legend className="mb-3 px-3 font-sans text-[13px] font-semibold text-[#5B5870]">Topics</legend>
+    <nav
+      aria-label="Filter by topic"
+      className="hidden min-w-0 lg:sticky lg:top-[calc(var(--cs-header-h)+96px)] lg:block lg:self-start"
+    >
+      <p className="mb-3 px-3 font-sans text-[13px] font-semibold text-[#5B5870]">Topics</p>
       <ul className="flex flex-col gap-0.5">
         <li>
           <button type="button" aria-pressed={active === undefined} onClick={() => onSelect(undefined)} className={row(active === undefined)}>
@@ -338,7 +341,7 @@ function TopicRail({ topics, total, active, onSelect }: TopicRailProps): React.R
           );
         })}
       </ul>
-    </fieldset>
+    </nav>
   );
 }
 

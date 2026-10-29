@@ -19,7 +19,7 @@ interface VideoPlayerProps {
   priority?: boolean;
   className?: string;
   radius?: string;
-  /** Smaller play button, for cards in a grid. */
+  /** Small glass play button for grid cards, so the poster art stays readable behind it. */
   compact?: boolean;
   /** Called when the visitor starts this player. */
   onPlay?: () => void;
@@ -97,14 +97,19 @@ export function VideoPlayer({
           />
           <span
             aria-hidden
-            className={`absolute left-1/2 top-1/2 flex ${compact ? "size-14" : "size-[76px]"} -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-white transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105 group-active:scale-95 motion-reduce:transition-none`}
-            style={{
-              background: "linear-gradient(180deg, #239cff 0%, #005be3 100%)",
-              boxShadow:
-                "0 10px 30px rgba(0, 91, 227, 0.45), 0 0 0 6px rgba(255,255,255,0.18)",
-            }}
+            className={`absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-white transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105 group-active:scale-95 motion-reduce:transition-none ${
+              compact ? "size-12 border border-white/45 bg-white/20 backdrop-blur-[10px]" : "size-[76px]"
+            }`}
+            style={
+              compact
+                ? undefined
+                : {
+                    background: "linear-gradient(180deg, #239cff 0%, #005be3 100%)",
+                    boxShadow: "0 10px 30px rgba(0, 91, 227, 0.45), 0 0 0 6px rgba(255,255,255,0.18)",
+                  }
+            }
           >
-            <PlayGlyph size={compact ? 22 : 28} />
+            <PlayGlyph size={compact ? 20 : 28} />
           </span>
         </button>
       )}
