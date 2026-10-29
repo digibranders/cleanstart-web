@@ -17,9 +17,18 @@ const video = (id: string, over: Partial<YoutubeVideo> = {}): YoutubeVideo => ({
   ...over,
 });
 
-const fakeClient = (videos: YoutubeVideo[], complete: boolean): YoutubeClient => ({
+const fakeClient = (
+  videos: YoutubeVideo[],
+  complete: boolean,
+  playlists: Record<string, string[] | Error> = {},
+): YoutubeClient => ({
   listUploadIds: vi.fn(async () => ({ ids: videos.map((v) => v.id), complete })),
   getVideos: vi.fn(async () => videos),
+  listPlaylistVideoIds: vi.fn(async (playlistId: string) => {
+    const list = playlists[playlistId] ?? [];
+    if (list instanceof Error) throw list;
+    return list;
+  }),
 });
 
 const fakePayload = (existingDocs: Record<string, unknown>[]) => ({
@@ -30,7 +39,7 @@ const fakePayload = (existingDocs: Record<string, unknown>[]) => ({
   ),
   create: vi.fn().mockResolvedValue({ id: 100 }),
   update: vi.fn().mockResolvedValue({ id: 1 }),
-  logger: { info: vi.fn(), error: vi.fn() },
+  logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 });
 
 describe('runYoutubeSync', () => {
@@ -110,5 +119,78 @@ describe('runYoutubeSync', () => {
       autoPublish: false,
     });
     expect(result.markedMissing).toBe(2);
+  });
+  describe('category suggestions from playlists', () => {
+    const playlists = { explainer: 'PLexplainer0001', demo: 'PLdemo000000001' };
+    const run = (client: YoutubeClient, payload = fakePayload([])) =>
+      runYoutubeSync({ payload, client, channelId: 'UCabc', autoPublish: false, playlists }).then((result) => ({
+        result,
+        payload,
+      }));
+    const created = (payload: ReturnType<typeof fakePayload>, n = 0): Record<string, unknown> =>
+      (payload.create.mock.calls[n]?.[0] as { data: Record<string, unknown> }).data;
+
+    it('suggests the category of the playlist a new video is in, and keeps it a needs-review draft', async () => {
+      const client = fakeClient([video('AAAAAAAAAAA'), video('BBBBBBBBBBB'), video('CCCCCCCCCCC')], true, {
+        PLexplainer0001: ['AAAAAAAAAAA'],
+        PLdemo000000001: ['BBBBBBBBBBB'],
+      });
+      const { payload } = await run(client);
+      expect(created(payload, 0)).toMatchObject({ format: 'explainer', syncState: 'needs-review', _status: 'draft' });
+      expect(created(payload, 1)).toMatchObject({ format: 'demo', syncState: 'needs-review', _status: 'draft' });
+      expect(created(payload, 2)).not.toHaveProperty('format');
+    });
+
+    it('gives no suggestion to a video that is in both playlists', async () => {
+      const client = fakeClient([video('AAAAAAAAAAA')], true, {
+        PLexplainer0001: ['AAAAAAAAAAA'],
+        PLdemo000000001: ['AAAAAAAAAAA'],
+      });
+      const { payload } = await run(client);
+      expect(created(payload)).not.toHaveProperty('format');
+    });
+
+    it('survives a failing playlist read: warns, keeps the other list, still creates the video', async () => {
+      const client = fakeClient([video('AAAAAAAAAAA'), video('BBBBBBBBBBB')], true, {
+        PLexplainer0001: new Error('quota'),
+        PLdemo000000001: ['BBBBBBBBBBB'],
+      });
+      const { result, payload } = await run(client);
+      expect(result).toMatchObject({ created: 2, failed: 0 });
+      expect(created(payload, 0)).not.toHaveProperty('format');
+      expect(created(payload, 1)).toMatchObject({ format: 'demo' });
+      expect(payload.logger.warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('never reads a playlist that is not configured', async () => {
+      const client = fakeClient([video('AAAAAAAAAAA')], true);
+      await runYoutubeSync({ payload: fakePayload([]), client, channelId: 'UCabc', autoPublish: false });
+      expect(client.listPlaylistVideoIds).not.toHaveBeenCalled();
+    });
+
+    it('does not touch the category of a video that already exists', async () => {
+      const v = video('AAAAAAAAAAA', { description: 'edited upstream' });
+      const stored = { id: 9, externalId: 'AAAAAAAAAAA', syncState: 'synced', _status: 'published', source: { contentHash: 'old' } };
+      const payload = fakePayload([stored]);
+      const client = fakeClient([v], true, { PLexplainer0001: ['AAAAAAAAAAA'] });
+      await run(client, payload);
+      expect(payload.update).toHaveBeenCalledTimes(1);
+      expect((payload.update.mock.calls[0]?.[0] as { data: Record<string, unknown> }).data).not.toHaveProperty('format');
+    });
+  });
+
+  it('never erases a known duration when a later run (RSS) cannot report one', async () => {
+    const rssView = video('AAAAAAAAAAA', { durationSeconds: null, description: 'edited upstream' });
+    const stored = {
+      id: 9,
+      externalId: 'AAAAAAAAAAA',
+      syncState: 'synced',
+      _status: 'published',
+      source: { contentHash: 'old', durationSeconds: 101 },
+    };
+    const payload = fakePayload([stored]);
+    await runYoutubeSync({ payload, client: fakeClient([rssView], false), channelId: 'UCabc', autoPublish: false });
+    const data = (payload.update.mock.calls[0]?.[0] as { data: { source: { durationSeconds: number | null } } }).data;
+    expect(data.source.durationSeconds).toBe(101);
   });
 });

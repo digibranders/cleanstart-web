@@ -132,7 +132,8 @@ interface AdaptiveOpenUrlAction {
 const isHttpUrl = (raw: unknown): raw is string =>
   typeof raw === 'string' && /^https?:\/\//i.test(raw);
 
-const actionsFromData = (data: Record<string, unknown>): AdaptiveOpenUrlAction[] => {
+const actionsFromData = (event: WebhookEvent): AdaptiveOpenUrlAction[] => {
+  const data = event.data;
   const actions: AdaptiveOpenUrlAction[] = [];
   if (isHttpUrl(data.url)) {
     actions.push({ type: 'Action.OpenUrl', title: 'View live page', url: data.url });
@@ -142,6 +143,10 @@ const actionsFromData = (data: Record<string, unknown>): AdaptiveOpenUrlAction[]
   // everyone else to a login wall, plus it surfaces an internal URL into a
   // potentially wide channel audience. It stays in the event payload for
   // generic-webhook/automation subscribers that want it.
+  // The review list is the one exception: its whole audience is the editors who can open it.
+  if (event.event === 'video.needs-review' && isHttpUrl(data.adminUrl)) {
+    actions.push({ type: 'Action.OpenUrl', title: 'Review in CMS', url: data.adminUrl });
+  }
   return actions;
 };
 
@@ -152,8 +157,29 @@ const actionsFromData = (data: Record<string, unknown>): AdaptiveOpenUrlAction[]
  * slug is intentionally NOT appended (it lives in the FactSet and the
  * "View live page" button) so the title reads cleanly at the top.
  */
+const videoReviewCount = (data: Record<string, unknown>): number =>
+  typeof data.count === 'number' && Number.isFinite(data.count) ? Math.max(0, Math.trunc(data.count)) : 0;
+
+const videoReviewTitles = (data: Record<string, unknown>): string[] =>
+  Array.isArray(data.titles) ? data.titles.filter((t): t is string => typeof t === 'string') : [];
+
+const TITLE_LINE_MAX = 120;
+
+// One subtle bullet per title, then "and N more" when the event carried fewer titles than videos.
+const videoReviewBlocks = (data: Record<string, unknown>): object[] => {
+  const titles = videoReviewTitles(data);
+  const more = videoReviewCount(data) - titles.length;
+  const lines = titles.map((t) => `• ${truncateValue(t, TITLE_LINE_MAX)}`);
+  if (more > 0) lines.push(`and ${more} more`);
+  return lines.map((text, i) => ({ type: 'TextBlock', wrap: true, spacing: i === 0 ? 'Small' : 'None', text }));
+};
+
 const titleFromEvent = (event: WebhookEvent): string => {
   const data = event.data as Record<string, unknown>;
+  if (event.event === 'video.needs-review') {
+    const count = videoReviewCount(data);
+    return count === 1 ? '1 new video needs review' : `${count} new videos need review`;
+  }
   const title = typeof data.title === 'string' && data.title.length > 0 ? data.title : null;
   if (title) return title;
   if (typeof data.email === 'string' && data.email.length > 0) return data.email;
@@ -183,8 +209,8 @@ export const buildTeamsPayload = (
   event: WebhookEvent,
   options: BuildTeamsPayloadOptions = {},
 ): string => {
-  const facts = factsFromData(event.data);
-  const actions = actionsFromData(event.data);
+  const facts = event.event === 'video.needs-review' ? [] : factsFromData(event.data);
+  const actions = actionsFromData(event);
   const eligible = (options.mentions ?? []).filter((m) => isMentionEligible(m, event));
   const entities: TeamsEntity[] = eligible.map((m) => ({
     type: 'mention',
@@ -231,6 +257,7 @@ export const buildTeamsPayload = (
             ...(mentionLine
               ? [{ type: 'TextBlock', wrap: true, text: mentionLine }]
               : []),
+            ...(event.event === 'video.needs-review' ? videoReviewBlocks(event.data) : []),
             ...(facts.length > 0
               ? [
                   {

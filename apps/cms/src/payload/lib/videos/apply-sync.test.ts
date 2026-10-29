@@ -20,7 +20,7 @@ const now = (): Date => new Date('2026-10-23T12:00:00Z');
 const fakePayload = () => ({
   create: vi.fn().mockResolvedValue({ id: 1 }),
   update: vi.fn().mockResolvedValue({ id: 1 }),
-  logger: { info: vi.fn(), error: vi.fn() },
+  logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 });
 
 const callData = (mock: ReturnType<typeof vi.fn>, n = 0): Record<string, unknown> =>
@@ -45,7 +45,7 @@ describe('firstParagraph', () => {
 describe('applyPlan', () => {
   it('creates a needs-review draft with title, summary, topics and the source snapshot', async () => {
     const payload = fakePayload();
-    const plan = { ...emptyPlan, creates: [{ externalId: 'AAAAAAAAAAA', source, suggestedTopicIds: [1, 2] }] };
+    const plan = { ...emptyPlan, creates: [{ externalId: 'AAAAAAAAAAA', source, suggestedTopicIds: [1, 2], suggestedFormat: null }] };
     const result = await applyPlan(payload, plan, { autoPublish: false }, now);
     expect(payload.create).toHaveBeenCalledWith(
       expect.objectContaining({ collection: 'videos', draft: true, overrideAccess: true, depth: 0 }),
@@ -66,6 +66,42 @@ describe('applyPlan', () => {
       },
     });
     expect(result.created).toBe(1);
+  });
+
+  it('writes the suggested category on create, still as a needs-review draft', async () => {
+    const payload = fakePayload();
+    const plan = {
+      ...emptyPlan,
+      creates: [{ externalId: 'AAAAAAAAAAA', source, suggestedTopicIds: [], suggestedFormat: 'demo' as const }],
+    };
+    await applyPlan(payload, plan, { autoPublish: true }, now);
+    expect(callData(payload.create)).toMatchObject({ format: 'demo', syncState: 'needs-review', _status: 'draft' });
+    expect(payload.create).toHaveBeenCalledWith(expect.objectContaining({ draft: true }));
+  });
+
+  it('omits format entirely when nothing is suggested', async () => {
+    const payload = fakePayload();
+    const plan = {
+      ...emptyPlan,
+      creates: [{ externalId: 'AAAAAAAAAAA', source, suggestedTopicIds: [], suggestedFormat: null }],
+    };
+    await applyPlan(payload, plan, { autoPublish: false }, now);
+    expect(callData(payload.create)).not.toHaveProperty('format');
+  });
+
+  it('reports the titles of the videos it created, skipping failures', async () => {
+    const payload = fakePayload();
+    payload.create.mockRejectedValueOnce(new Error('boom')).mockResolvedValueOnce({ id: 2 });
+    const other = { ...source, title: 'Second' };
+    const plan = {
+      ...emptyPlan,
+      creates: [
+        { externalId: 'AAAAAAAAAAA', source, suggestedTopicIds: [], suggestedFormat: null },
+        { externalId: 'BBBBBBBBBBB', source: other, suggestedTopicIds: [], suggestedFormat: null },
+      ],
+    };
+    const result = await applyPlan(payload, plan, { autoPublish: false }, now);
+    expect(result.createdTitles).toEqual(['Second']);
   });
 
   it('writes only the source group when updating', async () => {
@@ -92,8 +128,8 @@ describe('applyPlan', () => {
     const plan = {
       ...emptyPlan,
       creates: [
-        { externalId: 'AAAAAAAAAAA', source, suggestedTopicIds: [] },
-        { externalId: 'BBBBBBBBBBB', source, suggestedTopicIds: [] },
+        { externalId: 'AAAAAAAAAAA', source, suggestedTopicIds: [], suggestedFormat: null },
+        { externalId: 'BBBBBBBBBBB', source, suggestedTopicIds: [], suggestedFormat: null },
       ],
     };
     const result = await applyPlan(payload, plan, { autoPublish: false }, now);
@@ -106,7 +142,7 @@ describe('applyPlan', () => {
 
   it('never publishes on import, even with autoPublish on: no format can be guessed', async () => {
     const payload = fakePayload();
-    const plan = { ...emptyPlan, creates: [{ externalId: 'AAAAAAAAAAA', source, suggestedTopicIds: [1] }] };
+    const plan = { ...emptyPlan, creates: [{ externalId: 'AAAAAAAAAAA', source, suggestedTopicIds: [1], suggestedFormat: null }] };
     await applyPlan(payload, plan, { autoPublish: true }, now);
     expect(callData(payload.create)._status).toBe('draft');
   });

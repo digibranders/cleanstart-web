@@ -42,6 +42,50 @@ describe('createYoutubeClient', () => {
     expect(result.complete).toBe(false);
   });
 
+  it('lists a playlist page by page without resolving a channel first', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce(json({ items: [{ contentDetails: { videoId: 'AAAAAAAAAAA' } }], nextPageToken: 'p2' }))
+      .mockResolvedValueOnce(json({ items: [{ contentDetails: { videoId: 'BBBBBBBBBBB' } }] }));
+    const client = createYoutubeClient({ apiKey: 'k', fetchImpl });
+    expect(await client.listPlaylistVideoIds('PLexplainer0001')).toEqual(['AAAAAAAAAAA', 'BBBBBBBBBBB']);
+    const first = new URL(String(fetchImpl.mock.calls[0]?.[0]));
+    const second = new URL(String(fetchImpl.mock.calls[1]?.[0]));
+    expect(first.pathname).toBe('/youtube/v3/playlistItems');
+    expect(Object.fromEntries(first.searchParams)).toMatchObject({
+      part: 'contentDetails',
+      playlistId: 'PLexplainer0001',
+      maxResults: '50',
+    });
+    expect(second.searchParams.get('pageToken')).toBe('p2');
+  });
+
+  it('stops paging a playlist at the page cap instead of looping forever', async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValue(json({ items: [{ contentDetails: { videoId: 'AAAAAAAAAAA' } }], nextPageToken: 'more' }));
+    const ids = await createYoutubeClient({ apiKey: 'k', fetchImpl }).listPlaylistVideoIds('PLexplainer0001');
+    expect(fetchImpl).toHaveBeenCalledTimes(20);
+    expect(ids).toHaveLength(20);
+  });
+
+  it('rejects a playlist response that does not match the expected shape', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(json({ items: [{ contentDetails: { videoId: 'short' } }] }));
+    await expect(createYoutubeClient({ apiKey: 'k', fetchImpl }).listPlaylistVideoIds('PLx0000000001')).rejects.toThrow(
+      /expected shape/,
+    );
+  });
+
+  it('surfaces a missing playlist (404) as a typed error without the key', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(json({ error: {} }, 404));
+    const error = await createYoutubeClient({ apiKey: 'secret-key', fetchImpl })
+      .listPlaylistVideoIds('PLx0000000001')
+      .catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(YoutubeApiError);
+    expect((error as YoutubeApiError).status).toBe(404);
+    expect((error as YoutubeApiError).message).not.toContain('secret-key');
+  });
+
   it('maps a video, reading maxres from the thumbnails', async () => {
     const fetchImpl = vi.fn().mockResolvedValueOnce(
       json({

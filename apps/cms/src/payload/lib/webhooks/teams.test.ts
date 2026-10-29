@@ -209,6 +209,65 @@ describe('buildTeamsPayload', () => {
   });
 });
 
+describe('buildTeamsPayload for video.needs-review', () => {
+  const card = (data: Record<string, unknown>) =>
+    (
+      JSON.parse(buildTeamsPayload({ event: 'video.needs-review', data })) as {
+        attachments: {
+          content: {
+            body: { type: string; text?: string; facts?: unknown[] }[];
+            actions?: { type: string; title: string; url: string }[];
+          };
+        }[];
+      }
+    ).attachments[0]?.content;
+
+  const adminUrl = 'https://cms.cleanstart.com/admin/collections/videos?where[syncState][equals]=needs-review';
+
+  it('headlines the count, with the event eyebrow below', () => {
+    const body = card({ count: 3, titles: ['A', 'B', 'C'], adminUrl })?.body ?? [];
+    expect(body[0]?.text).toBe('3 new videos need review');
+    expect(body[1]?.text).toBe('CleanStart · video.needs-review');
+  });
+
+  it('uses the singular for one video', () => {
+    expect(card({ count: 1, titles: ['A'] })?.body[0]?.text).toBe('1 new video needs review');
+  });
+
+  it('lists each title as a bullet and says how many more were not listed', () => {
+    const body = card({ count: 8, titles: ['A', 'B', 'C', 'D', 'E'], adminUrl })?.body ?? [];
+    expect(body.slice(2).map((b) => b.text)).toEqual(['• A', '• B', '• C', '• D', '• E', 'and 3 more']);
+  });
+
+  it('adds no "and N more" line when every title is listed', () => {
+    const body = card({ count: 2, titles: ['A', 'B'] })?.body ?? [];
+    expect(body.map((b) => b.text)).not.toContain('and 0 more');
+    expect(body).toHaveLength(4);
+  });
+
+  it('renders no FactSet (count and titles are already on the card)', () => {
+    expect(card({ count: 2, titles: ['A', 'B'], adminUrl })?.body.some((b) => b.type === 'FactSet')).toBe(false);
+  });
+
+  it('opens the Needs review list from a button', () => {
+    expect(card({ count: 1, titles: ['A'], adminUrl })?.actions).toEqual([
+      { type: 'Action.OpenUrl', title: 'Review in CMS', url: adminUrl },
+    ]);
+  });
+
+  it('has no button when the CMS base URL is unknown, and ignores a non-http adminUrl', () => {
+    expect(card({ count: 1, titles: ['A'] })?.actions).toBeUndefined();
+    expect(card({ count: 1, titles: ['A'], adminUrl: 'javascript:alert(1)' })?.actions).toBeUndefined();
+  });
+
+  it('cuts a very long title and tolerates malformed data', () => {
+    const long = 'x'.repeat(500);
+    const body = card({ count: 1, titles: [long] })?.body ?? [];
+    expect((body[2]?.text ?? '').length).toBeLessThanOrEqual(122);
+    expect(card({ count: 'many', titles: 'nope' })?.body[0]?.text).toBe('0 new videos need review');
+  });
+});
+
 describe('postTeamsWebhook', () => {
   it('POSTs the rendered card body to the URL', async () => {
     const fetchMock = vi.fn(async () => new Response(null, { status: 202 }));

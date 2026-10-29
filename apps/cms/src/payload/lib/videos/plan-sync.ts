@@ -5,6 +5,7 @@ import type { YoutubeVideo } from './youtube-client';
 export type SyncState = 'synced' | 'needs-review' | 'missing' | 'manual';
 export type SkipReason = 'not-public' | 'not-embeddable' | 'not-finished';
 export type DocId = number | string;
+export type VideoFormat = 'explainer' | 'demo';
 
 export interface SourceSnapshot {
   readonly title: string;
@@ -35,7 +36,12 @@ export interface TopicRef {
 }
 
 export interface SyncPlan {
-  readonly creates: { externalId: string; source: SourceSnapshot; suggestedTopicIds: DocId[] }[];
+  readonly creates: {
+    externalId: string;
+    source: SourceSnapshot;
+    suggestedTopicIds: DocId[];
+    suggestedFormat: VideoFormat | null;
+  }[];
   readonly updates: { id: DocId; source: SourceSnapshot; restoreFromMissing: boolean }[];
   readonly unchanged: number;
   readonly missing: DocId[];
@@ -91,11 +97,13 @@ export const planSync = ({
   fetched,
   complete,
   topics,
+  formatByVideoId = new Map(),
 }: {
   existing: readonly ExistingVideo[];
   fetched: readonly YoutubeVideo[];
   complete: boolean;
   topics: readonly TopicRef[];
+  formatByVideoId?: ReadonlyMap<string, VideoFormat>;
 }): SyncPlan => {
   const byExternalId = new Map(existing.map((e) => [e.externalId, e]));
   const seen = new Set<string>();
@@ -118,6 +126,7 @@ export const planSync = ({
         externalId: v.id,
         source,
         suggestedTopicIds: suggestTopicIds({ tags: v.tags, description: v.description }, topics),
+        suggestedFormat: formatByVideoId.get(v.id) ?? null,
       });
     } else if (current.syncState === 'manual') {
       unchanged += 1;

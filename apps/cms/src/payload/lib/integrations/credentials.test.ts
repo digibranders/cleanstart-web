@@ -9,6 +9,7 @@ import {
   resolveGscCredentials,
   resolveHubspotCredentials,
   resolveTeamsCredentials,
+  resolveYoutubeCredentials,
 } from './credentials';
 import { encrypt } from './secrets';
 
@@ -23,6 +24,10 @@ const ENV_KEYS = [
   'CLOUDFLARE_ACCOUNT_TAG',
   'CLOUDFLARE_API_TOKEN',
   'CALCOM_SIGNING_SECRET',
+  'YOUTUBE_API_KEY',
+  'YOUTUBE_CHANNEL_ID',
+  'YOUTUBE_EXPLAINER_PLAYLIST_ID',
+  'YOUTUBE_DEMO_PLAYLIST_ID',
 ] as const;
 
 const snapshot: Record<string, string | undefined> = {};
@@ -230,5 +235,38 @@ describe('resolveCalcomCredentials', () => {
       fallbackFormId: null,
     });
     expect(resolveCalcomCredentials({ calcomConfig: { fallbackFormId: 9 } })?.fallbackFormId).toBe(9);
+  });
+});
+
+describe('resolveYoutubeCredentials', () => {
+  it('has no playlists by default and falls back to the CleanStart channel', () => {
+    expect(resolveYoutubeCredentials()).toEqual({
+      apiKey: null,
+      channelId: 'UC13c-XRmRlkWpp6WMG9SDjw',
+      explainerPlaylistId: null,
+      demoPlaylistId: null,
+      invalidPlaylistVars: [],
+    });
+  });
+
+  it('accepts a bare id for one playlist and a full URL for the other', () => {
+    process.env.YOUTUBE_EXPLAINER_PLAYLIST_ID = 'PLexplainer00001';
+    process.env.YOUTUBE_DEMO_PLAYLIST_ID = 'https://www.youtube.com/playlist?list=PLdemo000000001';
+    const creds = resolveYoutubeCredentials();
+    expect(creds).toMatchObject({
+      explainerPlaylistId: 'PLexplainer00001',
+      demoPlaylistId: 'PLdemo000000001',
+      invalidPlaylistVars: [],
+    });
+  });
+
+  it('ignores an invalid value and names the variable so the caller can warn', () => {
+    process.env.YOUTUBE_EXPLAINER_PLAYLIST_ID = 'https://example.com/playlist?list=PLexplainer00001';
+    process.env.YOUTUBE_DEMO_PLAYLIST_ID = 'PLdemo000000001';
+    expect(resolveYoutubeCredentials()).toMatchObject({
+      explainerPlaylistId: null,
+      demoPlaylistId: 'PLdemo000000001',
+      invalidPlaylistVars: ['YOUTUBE_EXPLAINER_PLAYLIST_ID'],
+    });
   });
 });

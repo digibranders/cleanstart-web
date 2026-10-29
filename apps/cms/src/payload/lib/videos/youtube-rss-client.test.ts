@@ -77,6 +77,19 @@ describe('createYoutubeRssClient', () => {
     expect((await client.getVideos(ids)).every((v) => v.hasMaxres === false)).toBe(true);
   });
 
+  it('reads a playlist feed by playlist_id and leaves the channel listing untouched', async () => {
+    const fetchImpl = vi.fn(async (input: RequestInfo | URL, _init?: RequestInit) => respond(String(input)));
+    const client = createYoutubeRssClient({ fetchImpl });
+    expect(await client.listPlaylistVideoIds('PLexplainer0001')).toEqual(['AAAAAAAAAAA', 'BBBBBBBBBBB']);
+    expect(String(fetchImpl.mock.calls[0]?.[0])).toBe('https://www.youtube.com/feeds/videos.xml?playlist_id=PLexplainer0001');
+    expect(await client.getVideos(['AAAAAAAAAAA'])).toEqual([]);
+  });
+
+  it('throws a typed error when the playlist feed is unreachable', async () => {
+    const fetchImpl = vi.fn(async () => ({ ok: false, status: 404, text: async () => '' }) as Response);
+    await expect(createYoutubeRssClient({ fetchImpl }).listPlaylistVideoIds('PLx0000000001')).rejects.toThrow(/feed/i);
+  });
+
   it('throws a typed error when the feed itself is unreachable', async () => {
     const fetchImpl = vi.fn(async () => ({ ok: false, status: 404, text: async () => '' }) as Response);
     await expect(createYoutubeRssClient({ fetchImpl }).listUploadIds('UCabc')).rejects.toThrow(/feed/i);

@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 interface AuditRow {
   id: number | string;
   webhookId: string;
-  event: 'document.published' | 'lead.submitted';
+  event: 'document.published' | 'lead.submitted' | 'video.needs-review';
   attemptCount: number;
   lastError: string | null;
   nextRetryAt: string | null;

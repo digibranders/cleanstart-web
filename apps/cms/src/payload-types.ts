@@ -9370,7 +9370,7 @@ export interface Integration {
    * Choose which activity on the site triggers a notification. Leave all filters empty to receive everything.
    */
   routing?: {
-    events?: ('document.published' | 'lead.submitted')[] | null;
+    events?: ('document.published' | 'lead.submitted' | 'video.needs-review')[] | null;
     /**
      * Filter document.published events by collection. Empty = all collections.
      */
@@ -9421,7 +9421,7 @@ export interface Integration {
           /**
            * Optional — only mention this person for specific event types. Leave empty to mention them on all notifications.
            */
-          triggerOn?: ('document.published' | 'lead.submitted')[] | null;
+          triggerOn?: ('document.published' | 'lead.submitted' | 'video.needs-review')[] | null;
           id?: string | null;
         }[]
       | null;
@@ -9746,7 +9746,7 @@ export interface WebhooksDeadLetter {
    * Unique ID for this delivery attempt (UUID).
    */
   webhookId: string;
-  event: 'document.published' | 'lead.submitted';
+  event: 'document.published' | 'lead.submitted' | 'video.needs-review';
   /**
    * Full event data blob. Used to re-run the delivery on retry.
    */

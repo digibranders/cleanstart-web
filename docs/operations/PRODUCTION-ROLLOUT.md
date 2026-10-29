@@ -160,9 +160,11 @@ Until this runs, `/videos` reads `apps/web/src/lib/videos-catalog.ts` plus the Y
    /app/node_modules/.bin/tsx scripts/seed-videos-from-catalog.ts          # dry run, writes nothing
    /app/node_modules/.bin/tsx scripts/seed-videos-from-catalog.ts --apply
    ```
-   Creates 11 topics and 15 published videos with the live slugs. A slug conflict stops the run before any write. Re-running plans nothing. Publish webhooks are skipped and web revalidation is sent once at the end.
+   Creates 11 topics and 14 published videos (explainers and product demos only) with the slugs from the code catalog. A slug conflict stops the run before any write. Re-running plans nothing. Publish webhooks are skipped and web revalidation is sent once at the end.
 3. **Compare.** Open `/videos` and a watch page with `VIDEOS_SOURCE=cms` on a preview deploy and check they match production.
 4. **Flip.** Set `VIDEOS_SOURCE=cms` in Vercel production env and redeploy. Rollback is unsetting it and redeploying.
 5. **Keep for a week**, then delete `videos-catalog.ts` and the feed merge from `apps/web`.
+
+**Suggested category and the Teams message.** Create two public YouTube playlists on the channel, one for explainers and one for product demos, and set the repository variables `YOUTUBE_EXPLAINER_PLAYLIST_ID` and `YOUTUBE_DEMO_PLAYLIST_ID` (a playlist id or its full `youtube.com/playlist?list=` URL), then redeploy the CMS. Adding a new upload to one of them before the next hourly run pre-fills its Category; a video in both playlists, or in neither, gets no suggestion. The value is written only when the draft is created and is never touched by later syncs. For the "new videos need review" Teams message, add a Teams integration row with the event `video.needs-review` (or leave its events empty for all events); one message goes out per sync run that imports at least one video, with a button to the Needs review list, which is built from `PAYLOAD_PUBLIC_SERVER_URL`. `YOUTUBE_API_KEY` should be set in production so the length is read from YouTube.
 
 New uploads land as `needs-review` drafts. An editor sets format, at least one topic and a summary, then publishes (the publish gate blocks otherwise). `YOUTUBE_API_KEY` is optional: unset, the sync uses the RSS feed and editors type the duration in `durationLabel`.

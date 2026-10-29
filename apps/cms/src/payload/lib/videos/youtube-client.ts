@@ -76,6 +76,8 @@ export interface YoutubeClient {
     options?: { maxPages?: number },
   ): Promise<{ ids: string[]; complete: boolean }>;
   getVideos(ids: readonly string[]): Promise<YoutubeVideo[]>;
+  /** Ids of the videos in a playlist. Unlike `listUploadIds` it never primes state `getVideos` relies on. */
+  listPlaylistVideoIds(playlistId: string): Promise<string[]>;
 }
 
 interface ClientOptions {
@@ -86,6 +88,7 @@ interface ClientOptions {
 
 const BASE = 'https://www.googleapis.com/youtube/v3';
 const BATCH = 50;
+const DEFAULT_MAX_PAGES = 20;
 
 export const createYoutubeClient = ({
   apiKey,
@@ -111,24 +114,35 @@ export const createYoutubeClient = ({
     return parsed.data;
   };
 
+  const walkPlaylist = async (
+    playlistId: string,
+    maxPages: number,
+  ): Promise<{ ids: string[]; complete: boolean }> => {
+    const ids: string[] = [];
+    let pageToken: string | undefined;
+    for (let page = 0; page < maxPages; page += 1) {
+      const res = await get(
+        'playlistItems',
+        { part: 'contentDetails', playlistId, maxResults: String(BATCH), ...(pageToken ? { pageToken } : {}) },
+        PlaylistItemsResponse,
+      );
+      ids.push(...res.items.map((i) => i.contentDetails.videoId));
+      pageToken = res.nextPageToken;
+      if (!pageToken) return { ids, complete: true };
+    }
+    return { ids, complete: false };
+  };
+
   return {
-    async listUploadIds(channelId, { maxPages = 20 } = {}) {
+    async listUploadIds(channelId, { maxPages = DEFAULT_MAX_PAGES } = {}) {
       const channels = await get('channels', { part: 'contentDetails', id: channelId }, ChannelsResponse);
       const uploads = channels.items[0]?.contentDetails.relatedPlaylists.uploads;
       if (!uploads) throw new YoutubeApiError(`No uploads playlist for channel ${channelId}`);
-      const ids: string[] = [];
-      let pageToken: string | undefined;
-      for (let page = 0; page < maxPages; page += 1) {
-        const res = await get(
-          'playlistItems',
-          { part: 'contentDetails', playlistId: uploads, maxResults: String(BATCH), ...(pageToken ? { pageToken } : {}) },
-          PlaylistItemsResponse,
-        );
-        ids.push(...res.items.map((i) => i.contentDetails.videoId));
-        pageToken = res.nextPageToken;
-        if (!pageToken) return { ids, complete: true };
-      }
-      return { ids, complete: false };
+      return walkPlaylist(uploads, maxPages);
+    },
+
+    async listPlaylistVideoIds(playlistId) {
+      return (await walkPlaylist(playlistId, DEFAULT_MAX_PAGES)).ids;
     },
 
     async getVideos(ids) {

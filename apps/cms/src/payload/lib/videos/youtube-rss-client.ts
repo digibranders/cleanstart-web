@@ -46,25 +46,34 @@ interface RssClientOptions {
   timeoutMs?: number;
 }
 
+const FEEDS = 'https://www.youtube.com/feeds/videos.xml';
+
 export const createYoutubeRssClient = ({
   fetchImpl = fetch,
   timeoutMs = 10_000,
 }: RssClientOptions = {}): YoutubeClient => {
   let entries: readonly RssEntry[] = [];
+
+  const readFeed = async (query: string): Promise<RssEntry[]> => {
+    let res: Response;
+    try {
+      res = await fetchImpl(`${FEEDS}?${query}`, { signal: AbortSignal.timeout(timeoutMs) });
+    } catch {
+      throw new YoutubeApiError('YouTube RSS feed request failed');
+    }
+    if (!res.ok) throw new YoutubeApiError(`YouTube RSS feed returned ${res.status}`, res.status);
+    return parseRssFeed(await res.text());
+  };
+
   return {
     async listUploadIds(channelId) {
-      let res: Response;
-      try {
-        res = await fetchImpl(`https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`, {
-          signal: AbortSignal.timeout(timeoutMs),
-        });
-      } catch {
-        throw new YoutubeApiError('YouTube RSS feed request failed');
-      }
-      if (!res.ok) throw new YoutubeApiError(`YouTube RSS feed returned ${res.status}`, res.status);
-      entries = parseRssFeed(await res.text());
+      entries = await readFeed(`channel_id=${encodeURIComponent(channelId)}`);
       // The feed holds only the newest 15, so absence from it proves nothing.
       return { ids: entries.map((e) => e.id), complete: false };
+    },
+
+    async listPlaylistVideoIds(playlistId) {
+      return (await readFeed(`playlist_id=${encodeURIComponent(playlistId)}`)).map((e) => e.id);
     },
 
     async getVideos(ids) {

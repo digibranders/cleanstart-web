@@ -17,6 +17,7 @@ export interface SyncPayload {
   }): Promise<unknown>;
   logger: {
     info(meta: Record<string, unknown>, message: string): void;
+    warn(meta: Record<string, unknown>, message: string): void;
     error(meta: Record<string, unknown>, message: string): void;
   };
 }
@@ -26,6 +27,8 @@ export interface ApplyResult {
   updated: number;
   markedMissing: number;
   failed: number;
+  /** Titles of the videos created this run, in plan order. */
+  createdTitles: string[];
 }
 
 // One below the `summary` field's 320 maxLength, so the closing "." still fits.
@@ -67,7 +70,7 @@ export const applyPlan = async (
   _options: { autoPublish: boolean },
   now: () => Date = () => new Date(),
 ): Promise<ApplyResult> => {
-  const result: ApplyResult = { created: 0, updated: 0, markedMissing: 0, failed: 0 };
+  const result: ApplyResult = { created: 0, updated: 0, markedMissing: 0, failed: 0, createdTitles: [] };
   const fetchedAt = now().toISOString();
 
   // One bad document must never abort the batch.
@@ -98,13 +101,18 @@ export const applyPlan = async (
           title: item.source.title,
           summary: firstParagraph(item.source.description),
           topics: item.suggestedTopicIds,
+          // Create only: an editor's later choice must survive every re-sync.
+          ...(item.suggestedFormat ? { format: item.suggestedFormat } : {}),
           syncState: 'needs-review',
           source: sourceData(item.source, fetchedAt),
           _status: 'draft',
         },
       }),
     );
-    if (ok) result.created += 1;
+    if (ok) {
+      result.created += 1;
+      result.createdTitles.push(item.source.title);
+    }
   }
 
   for (const item of plan.updates) {

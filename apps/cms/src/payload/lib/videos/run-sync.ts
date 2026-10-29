@@ -1,5 +1,12 @@
 import { type ApplyResult, type SyncPayload, applyPlan } from './apply-sync';
-import { type DocId, type ExistingVideo, type SyncState, type TopicRef, planSync } from './plan-sync';
+import {
+  type DocId,
+  type ExistingVideo,
+  type SyncState,
+  type TopicRef,
+  type VideoFormat,
+  planSync,
+} from './plan-sync';
 import type { YoutubeClient } from './youtube-client';
 
 export interface RunSyncPayload extends SyncPayload {
@@ -60,20 +67,55 @@ const toTopic = (doc: Record<string, unknown>): TopicRef => ({
   aliases: ((doc.aliases as { value?: string }[] | undefined) ?? []).flatMap((a) => (a.value ? [a.value] : [])),
 });
 
+export interface FormatPlaylists {
+  readonly explainer: string | null;
+  readonly demo: string | null;
+}
+
+/** videoId to the category its playlist suggests. A video in both playlists is ambiguous, so it gets none. */
+const loadFormatSuggestions = async (
+  client: YoutubeClient,
+  playlists: FormatPlaylists,
+  logger: SyncPayload['logger'],
+): Promise<Map<string, VideoFormat>> => {
+  const read = async (format: VideoFormat, playlistId: string | null): Promise<string[]> => {
+    if (!playlistId) return [];
+    try {
+      return await client.listPlaylistVideoIds(playlistId);
+    } catch (error) {
+      logger.warn(
+        { format, error: error instanceof Error ? error.message : String(error) },
+        'videos sync: playlist read failed, no category suggestion from it',
+      );
+      return [];
+    }
+  };
+  const [explainer, demo] = await Promise.all([read('explainer', playlists.explainer), read('demo', playlists.demo)]);
+  const inDemo = new Set(demo);
+  const inExplainer = new Set(explainer);
+  const out = new Map<string, VideoFormat>();
+  for (const id of explainer) if (!inDemo.has(id)) out.set(id, 'explainer');
+  for (const id of demo) if (!inExplainer.has(id)) out.set(id, 'demo');
+  return out;
+};
+
 export const runYoutubeSync = async ({
   payload,
   client,
   channelId,
   autoPublish,
+  playlists = { explainer: null, demo: null },
 }: {
   payload: RunSyncPayload;
   client: YoutubeClient;
   channelId: string;
   autoPublish: boolean;
+  playlists?: FormatPlaylists;
 }): Promise<RunSyncResult> => {
   // Order matters: the RSS client reads its whole feed in listUploadIds.
   const { ids, complete } = await client.listUploadIds(channelId);
   const fetched = await client.getVideos(ids);
+  const formatByVideoId = await loadFormatSuggestions(client, playlists, payload.logger);
 
   // draft: true reads the latest version, so a draft-only import is seen as existing.
   const [existingDocs, topicDocs] = await Promise.all([
@@ -85,7 +127,7 @@ export const runYoutubeSync = async ({
     return e ? [e] : [];
   });
 
-  const plan = planSync({ existing, fetched, complete, topics: topicDocs.map(toTopic) });
+  const plan = planSync({ existing, fetched, complete, topics: topicDocs.map(toTopic), formatByVideoId });
   const applied = await applyPlan(payload, plan, { autoPublish });
   return { ...applied, unchanged: plan.unchanged, skipped: plan.skipped.length, fetched: fetched.length, complete };
 };

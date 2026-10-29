@@ -74,6 +74,23 @@ describe('planSync', () => {
     expect(plan.creates[0]).toMatchObject({ externalId: 'AAAAAAAAAAA', suggestedTopicIds: [1, 2] });
   });
 
+  it('carries the playlist-suggested category on a create, and null when the video is in no mapped playlist', () => {
+    const formatByVideoId = new Map([['AAAAAAAAAAA', 'demo' as const]]);
+    const plan = planSync({ ...base, fetched: [video(), video({ id: 'BBBBBBBBBBB' })], formatByVideoId });
+    expect(plan.creates.map((c) => c.suggestedFormat)).toEqual(['demo', null]);
+  });
+
+  it('defaults to no suggestion when no map is passed', () => {
+    expect(planSync({ ...base, fetched: [video()] }).creates[0]?.suggestedFormat).toBeNull();
+  });
+
+  it('does not put a suggestion on an update', () => {
+    const formatByVideoId = new Map([['AAAAAAAAAAA', 'demo' as const]]);
+    const plan = planSync({ ...base, existing: [existing({ contentHash: 'old' })], fetched: [video()], formatByVideoId });
+    expect(plan.updates).toHaveLength(1);
+    expect(plan.updates[0]).not.toHaveProperty('suggestedFormat');
+  });
+
   it.each([
     ['unlisted', video({ privacyStatus: 'unlisted' }), 'not-public'],
     ['private', video({ privacyStatus: 'private' }), 'not-public'],
