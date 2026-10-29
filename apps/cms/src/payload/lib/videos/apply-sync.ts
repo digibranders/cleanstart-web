@@ -1,4 +1,7 @@
+import { firstParagraph } from './description-text';
 import { type DocId, type SourceSnapshot, type SyncPlan, contentHash } from './plan-sync';
+
+export { firstParagraph };
 
 export interface SyncPayload {
   create(args: {
@@ -30,23 +33,6 @@ export interface ApplyResult {
   /** Titles of the videos created this run, in plan order. */
   createdTitles: string[];
 }
-
-// One below the `summary` field's 320 maxLength, so the closing "." still fits.
-const SUMMARY_CUT = 319;
-const isHashtagLine = (text: string): boolean => text.split(/\s+/).every((t) => t.startsWith('#'));
-
-/** First real paragraph of a description, whitespace collapsed, cut at a word boundary. */
-export const firstParagraph = (text: string): string => {
-  const paragraph =
-    text
-      .split(/\n\s*\n/)
-      .map((p) => p.replace(/\s+/g, ' ').trim())
-      .find((p) => p.length > 0 && !isHashtagLine(p)) ?? '';
-  if (paragraph.length <= SUMMARY_CUT) return paragraph;
-  const cut = paragraph.slice(0, SUMMARY_CUT);
-  const lastSpace = cut.lastIndexOf(' ');
-  return `${cut.slice(0, lastSpace > 0 ? lastSpace : SUMMARY_CUT).replace(/[,;:\s]+$/, '')}.`;
-};
 
 const sourceData = (source: SourceSnapshot, fetchedAt: string): Record<string, unknown> => ({
   title: source.title,

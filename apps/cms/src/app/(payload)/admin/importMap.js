@@ -154,6 +154,8 @@ import { VideoSourceSummary as VideoSourceSummary_c96fbcdf17e1ea6b0ec94f543434cd
 import { VideoThumbCell as VideoThumbCell_a6fc69bad4fd684c1000e3675bb5a77a } from '@/payload/admin/components/VideoThumbCell.tsx'
 import { VideoLengthCell as VideoLengthCell_4ae28695c16ecdf12c15a176eb6e0774 } from '@/payload/admin/components/VideoLengthCell.tsx'
 import { VideoStateCell as VideoStateCell_70d255ecab4ca7e768a3cff708566031 } from '@/payload/admin/components/VideoStateCell.tsx'
+import { VideoTopicSuggestions as VideoTopicSuggestions_354abe4af848e2bbd6afc4620ae30591 } from '@/payload/admin/components/VideoTopicSuggestions.tsx'
+import { UseDescriptionSummary as UseDescriptionSummary_19de247a3719b8cb4c2371ecb84ed232 } from '@/payload/admin/components/UseDescriptionSummary.tsx'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
@@ -313,4 +315,6 @@ export const importMap = {
   "@/payload/admin/components/VideoThumbCell.tsx#VideoThumbCell": VideoThumbCell_a6fc69bad4fd684c1000e3675bb5a77a,
   "@/payload/admin/components/VideoLengthCell.tsx#VideoLengthCell": VideoLengthCell_4ae28695c16ecdf12c15a176eb6e0774,
   "@/payload/admin/components/VideoStateCell.tsx#VideoStateCell": VideoStateCell_70d255ecab4ca7e768a3cff708566031,
+  "@/payload/admin/components/VideoTopicSuggestions.tsx#VideoTopicSuggestions": VideoTopicSuggestions_354abe4af848e2bbd6afc4620ae30591,
+  "@/payload/admin/components/UseDescriptionSummary.tsx#UseDescriptionSummary": UseDescriptionSummary_19de247a3719b8cb4c2371ecb84ed232,
 }

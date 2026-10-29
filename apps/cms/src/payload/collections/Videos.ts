@@ -94,7 +94,7 @@ export const Videos: CollectionConfig = {
   labels: { singular: 'Video', plural: 'Videos' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['thumb', 'title', 'format', 'topics', 'length', 'state', 'featured'],
+    defaultColumns: ['thumb', 'title', 'state', 'format', 'topics', 'length'],
     description:
       'Videos shown on /videos. New YouTube uploads arrive as drafts marked "Needs review": choose a category and topics, write the summary, then publish.',
     group: 'Content',
@@ -124,12 +124,13 @@ export const Videos: CollectionConfig = {
       type: 'radio',
       label: 'Category',
       options: [
-        { label: 'Explainer (what is, fundamentals)', value: 'explainer' },
-        { label: 'Product demo (how to, in the product)', value: 'demo' },
+        { label: 'Explainer', value: 'explainer' },
+        { label: 'Product demo', value: 'demo' },
       ],
       admin: {
         layout: 'horizontal',
-        description: 'Required to publish. Drives the category tabs on /videos.',
+        description:
+          'Required to publish. Explainer is "what is" and fundamentals; product demo is how to use the product. Drives the category tabs on /videos.',
       },
     },
     {
@@ -138,13 +139,22 @@ export const Videos: CollectionConfig = {
       relationTo: 'videoTopics',
       hasMany: true,
       admin: {
-        description: 'At least one is required to publish. Drives the topic list on /videos.',
+        description:
+          'At least one is required to publish. Drives the topic list on /videos. A topic that does not exist yet can be added from the search box.',
+        custom: { emptyPlaceholder: 'Search topics…' },
         components: {
           Cell: {
             path: '@/payload/admin/components/RelationshipCell.tsx#RelationshipCell',
             clientProps: { collectionSlug: 'videoTopics' },
           },
         },
+      },
+    },
+    {
+      name: 'topicSuggestions',
+      type: 'ui',
+      admin: {
+        components: { Field: '@/payload/admin/components/VideoTopicSuggestions.tsx#VideoTopicSuggestions' },
       },
     },
     {
@@ -156,17 +166,10 @@ export const Videos: CollectionConfig = {
       },
     },
     {
-      name: 'durationLabel',
-      type: 'text',
-      label: 'Length (only if YouTube has none)',
-      validate: (value: string | null | undefined) =>
-        value == null || value === '' || DURATION_LABEL.test(value)
-          ? true
-          : 'Use m:ss or h:mm:ss, for example 1:41 or 1:02:10.',
+      name: 'summaryFromYoutube',
+      type: 'ui',
       admin: {
-        position: 'sidebar',
-        description:
-          'The length is read from YouTube. Fill this only when the video shows no length, for example a live stream (1:41).',
+        components: { Field: '@/payload/admin/components/UseDescriptionSummary.tsx#UseDescriptionSummary' },
       },
     },
     {
@@ -183,6 +186,7 @@ export const Videos: CollectionConfig = {
     {
       name: 'syncState',
       type: 'select',
+      label: 'Review state',
       defaultValue: 'manual',
       options: [
         { label: 'Synced', value: 'synced' },
@@ -196,6 +200,20 @@ export const Videos: CollectionConfig = {
         readOnly: true,
         description:
           'Set by the YouTube sync. "Missing" means the video is gone or private on YouTube; it is not unpublished automatically.',
+      },
+    },
+    {
+      name: 'durationLabel',
+      type: 'text',
+      label: 'Length (only if YouTube has none)',
+      validate: (value: string | null | undefined) =>
+        value == null || value === '' || DURATION_LABEL.test(value)
+          ? true
+          : 'Use m:ss or h:mm:ss, for example 1:41 or 1:02:10.',
+      admin: {
+        position: 'sidebar',
+        description:
+          'The length is read from YouTube. Fill this only when the video shows no length, for example a live stream (1:41).',
       },
     },
     {

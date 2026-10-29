@@ -1,6 +1,10 @@
 import { createHash } from 'node:crypto';
 
 import type { YoutubeVideo } from './youtube-client';
+import { type TopicRef, normaliseTag, suggestTopicIds } from './topic-match';
+
+export { normaliseTag, suggestTopicIds };
+export type { TopicRef };
 
 export type SyncState = 'synced' | 'needs-review' | 'missing' | 'manual';
 export type SkipReason = 'not-public' | 'not-embeddable' | 'not-finished';
@@ -29,12 +33,6 @@ export interface ExistingVideo {
   readonly durationSeconds: number | null;
 }
 
-export interface TopicRef {
-  readonly id: DocId;
-  readonly name: string;
-  readonly aliases: readonly string[];
-}
-
 export interface SyncPlan {
   readonly creates: {
     externalId: string;
@@ -47,8 +45,6 @@ export interface SyncPlan {
   readonly missing: DocId[];
   readonly skipped: { externalId: string; reason: SkipReason }[];
 }
-
-export const normaliseTag = (raw: string): string => raw.toLowerCase().replace(/[^a-z0-9]/g, '');
 
 export const toSource = (v: YoutubeVideo): SourceSnapshot => ({
   title: v.title,
@@ -68,22 +64,6 @@ export const withKnownDuration = (source: SourceSnapshot, existing: number | nul
 
 export const contentHash = (source: SourceSnapshot): string =>
   createHash('sha256').update(JSON.stringify(source)).digest('hex');
-
-// A hashtag must start a word, so "page#vex" in a URL fragment is not one.
-const HASHTAG = /(?:^|\s)#([\p{L}\p{N}_]+)/gu;
-
-export const suggestTopicIds = (
-  input: { tags: readonly string[]; description: string },
-  topics: readonly TopicRef[],
-): DocId[] => {
-  const candidates = new Set<string>([
-    ...input.tags.map(normaliseTag),
-    ...[...input.description.matchAll(HASHTAG)].map((m) => normaliseTag(m[1] ?? '')),
-  ]);
-  return topics
-    .filter((t) => [t.name, ...t.aliases].some((label) => candidates.has(normaliseTag(label))))
-    .map((t) => t.id);
-};
 
 const skipReason = (v: YoutubeVideo): SkipReason | null => {
   if (v.privacyStatus !== 'public') return 'not-public';

@@ -58,7 +58,12 @@ export const VideoSourceSummary = (): ReactElement | null => {
           {typeof privacy === 'string' ? <span style={chip(privacy === 'private' ? 'warn' : 'ok')}>{privacy === 'public' ? 'Public' : privacy === 'unlisted' ? 'Unlisted' : 'Private'}</span> : null}
           {embeddable === true ? <span style={chip('ok')}>Can embed</span> : null}
           {embeddable === false ? <span style={chip('warn')}>Can't be embedded</span> : null}
-          {typeof fetchedAt === 'string' ? <span style={chip('plain')}>Synced {ago(fetchedAt)}</span> : null}
+          {typeof fetchedAt === 'string' ? (
+            // The age depends on the clock, which differs between the server render and the browser.
+            <span style={chip('plain')} suppressHydrationWarning>
+              Synced {ago(fetchedAt)}
+            </span>
+          ) : null}
           <a href={watchUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13 }}>
             Open on YouTube
           </a>

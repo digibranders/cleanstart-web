@@ -39,12 +39,16 @@
       "relationTo": "videoTopics"
     },
     {
+      "type": "ui",
+      "name": "topicSuggestions"
+    },
+    {
       "type": "textarea",
       "name": "summary"
     },
     {
-      "type": "text",
-      "name": "durationLabel"
+      "type": "ui",
+      "name": "summaryFromYoutube"
     },
     {
       "type": "checkbox",
@@ -67,6 +71,10 @@
           "value": "manual"
         }
       ]
+    },
+    {
+      "type": "text",
+      "name": "durationLabel"
     },
     {
       "type": "collapsible",

@@ -859,7 +859,7 @@ export const RelationshipField = (props: RelationshipFieldClientProps): ReactEle
               ref={inputRef}
               type="search"
               className="cs-relationship-field__input"
-              placeholder={pills.length === 0 ? `Search ${slugs.join(' / ')}…` : 'Add more…'}
+              placeholder={pills.length === 0 ? emptyPlaceholder : 'Add more…'}
               value={query}
               onChange={onInputChange}
               onFocus={() => setOpen(true)}

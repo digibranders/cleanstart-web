@@ -2255,21 +2255,17 @@ export interface Video {
   title: string;
   slug: string;
   /**
-   * Required to publish. Drives the category tabs on /videos.
+   * Required to publish. Explainer is "what is" and fundamentals; product demo is how to use the product. Drives the category tabs on /videos.
    */
   format?: ('explainer' | 'demo') | null;
   /**
-   * At least one is required to publish. Drives the topic list on /videos.
+   * At least one is required to publish. Drives the topic list on /videos. A topic that does not exist yet can be added from the search box.
    */
   topics?: (number | VideoTopic)[] | null;
   /**
    * Shown on the card. Required to publish, up to 320 characters.
    */
   summary?: string | null;
-  /**
-   * The length is read from YouTube. Fill this only when the video shows no length, for example a live stream (1:41).
-   */
-  durationLabel?: string | null;
   /**
    * Plays at the top of /videos. Only one video can be featured: publishing this one clears the other. When none is featured, the newest video is.
    */
@@ -2278,6 +2274,10 @@ export interface Video {
    * Set by the YouTube sync. "Missing" means the video is gone or private on YouTube; it is not unpublished automatically.
    */
   syncState?: ('synced' | 'needs-review' | 'missing' | 'manual') | null;
+  /**
+   * The length is read from YouTube. Fill this only when the video shows no length, for example a live stream (1:41).
+   */
+  durationLabel?: string | null;
   provider: 'youtube' | 'vimeo';
   /**
    * The video id on the host (the 11 characters in a YouTube link).
@@ -10542,9 +10542,9 @@ export interface VideosSelect<T extends boolean = true> {
   format?: T;
   topics?: T;
   summary?: T;
-  durationLabel?: T;
   featured?: T;
   syncState?: T;
+  durationLabel?: T;
   provider?: T;
   externalId?: T;
   source?:

@@ -126,20 +126,6 @@
       "thumb": "maxres"
     },
     {
-      "externalId": "80ofihytgDk",
-      "slug": "software-supply-chain-security-in-the-age-of-ai",
-      "title": "Software Supply Chain Security in the Age of AI",
-      "format": "talk",
-      "topics": [
-        "supply-chain",
-        "ai"
-      ],
-      "summary": "In this episode of CleanStart Conversations, Ankit Aggarwal, VP, Enterprise Architecture at Coforge, joins us to discuss the growing challenges of software supply chain security in the age of AI.",
-      "durationSeconds": 1666,
-      "publishedAt": "2026-09-21T18:06:01+00:00",
-      "thumb": "maxres"
-    },
-    {
       "externalId": "dQpZX5vMgqk",
       "slug": "what-is-container-sprawl",
       "title": "What Is Container Sprawl?",
