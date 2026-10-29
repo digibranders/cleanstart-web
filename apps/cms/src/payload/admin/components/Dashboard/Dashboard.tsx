@@ -54,6 +54,8 @@ type RecentEdit = {
 type Pulse = {
   draftsPending: number;
   publishedThisWeek: number;
+  // `null` when the user cannot see videos: the card is omitted, not shown as zero.
+  videosToReview: number | null;
   // `null` for scoped (departmental) users, who don't own leads/redirects —
   // the corresponding cards are omitted rather than shown as zero.
   leadsToday: number | null;
@@ -91,7 +93,7 @@ const fetchPulse = async (
   const dayAgo = new Date(Date.now() - ONE_DAY).toISOString();
   const weekAgo = new Date(Date.now() - SEVEN_DAYS).toISOString();
 
-  const [draftCounts, publishedCounts, leadsToday, redirectsActive] =
+  const [draftCounts, publishedCounts, leadsToday, redirectsActive, videosToReview] =
     await Promise.all([
       Promise.all(
         contentSlugs.map((slug) =>
@@ -114,11 +116,15 @@ const fetchPulse = async (
       includeGlobalStats
         ? safeFind(payload, 'redirects', undefined)
         : Promise.resolve(null),
+      contentSlugs.includes('videos')
+        ? safeFind(payload, 'videos', { syncState: { equals: 'needs-review' } }, true)
+        : Promise.resolve(null),
     ]);
 
   return {
     draftsPending: draftCounts.reduce((acc, n) => acc + n, 0),
     publishedThisWeek: publishedCounts.reduce((acc, n) => acc + n, 0),
+    videosToReview,
     leadsToday,
     redirectsActive,
   };
@@ -551,6 +557,15 @@ export const Dashboard = async (
           href={draftsHref}
           tone={pulse.draftsPending > 0 ? 'amber' : 'neutral'}
         />
+        {pulse.videosToReview !== null ? (
+          <PulseCard
+            label="Videos to review"
+            value={pulse.videosToReview}
+            caption="New YouTube uploads waiting for a category and topics"
+            href="/admin/collections/videos?where[syncState][equals]=needs-review"
+            tone={pulse.videosToReview > 0 ? 'amber' : 'neutral'}
+          />
+        ) : null}
         <PulseCard
           label="Published · 7d"
           value={pulse.publishedThisWeek}
