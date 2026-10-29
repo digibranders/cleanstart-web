@@ -11,7 +11,6 @@
 export const PREVIEWABLE_COLLECTIONS = [
   'blogs',
   'advisories',
-  'videos',
   'news',
   'pages',
   'jobs',
@@ -36,7 +35,6 @@ export const isPreviewableCollection = (slug: string): slug is PreviewableCollec
 const ROUTE_PREFIX: Record<PreviewableCollection, string | null> = {
   blogs: '/blog',
   advisories: '/advisories',
-  videos: '/videos',
   news: '/news',
   pages: null, // pages use the doc-level `path` field
   jobs: '/job',

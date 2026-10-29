@@ -1,18 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const getCmsVideos = vi.fn();
-const getCmsVideoBySlug = vi.fn();
 const getChannelVideos = vi.fn();
 vi.mock("./videos-cms", () => ({
   getCmsVideos: (...a: unknown[]) => getCmsVideos(...a),
-  getCmsVideoBySlug: (...a: unknown[]) => getCmsVideoBySlug(...a),
 }));
 vi.mock("./youtube-feed", () => ({
   getChannelVideos: (...a: unknown[]) => getChannelVideos(...a),
 }));
 
 import { VIDEO_CATALOG } from "./videos-catalog";
-import { getVideoBySlug, getVideoDetail, getVideos, videoTopicOrder } from "./videos";
+import { getVideos, videoTopicOrder } from "./videos";
 
 const fromCms = {
   id: "CMSCMSCMSCM",
@@ -30,7 +28,6 @@ const fromCms = {
 
 beforeEach(() => {
   getCmsVideos.mockReset();
-  getCmsVideoBySlug.mockReset();
   getChannelVideos.mockReset();
   getChannelVideos.mockResolvedValue([]);
 });
@@ -55,13 +52,6 @@ describe("catalog mode (VIDEOS_SOURCE unset)", () => {
   it("keeps the dropdown in the catalog's taxonomy order", () => {
     expect(videoTopicOrder().slice(0, 3)).toEqual(["base-images", "attack-surface", "cves"]);
   });
-
-  it("finds a video by slug, and a draft request still reads the catalog", async () => {
-    const slug = VIDEO_CATALOG[0]?.slug ?? "";
-    expect((await getVideoBySlug(slug))?.slug).toBe(slug);
-    expect((await getVideoDetail(slug, { draft: true }))?.slug).toBe(slug);
-    expect(getCmsVideoBySlug).not.toHaveBeenCalled();
-  });
 });
 
 describe("cms mode (VIDEOS_SOURCE=cms)", () => {
@@ -82,17 +72,5 @@ describe("cms mode (VIDEOS_SOURCE=cms)", () => {
 
   it("has no catalog taxonomy order: topics follow their counts", () => {
     expect(videoTopicOrder()).toEqual([]);
-  });
-
-  it("previews a draft through the CMS single-document read", async () => {
-    getCmsVideoBySlug.mockResolvedValue(fromCms);
-    expect(await getVideoDetail("from-the-cms", { draft: true })).toEqual(fromCms);
-    expect(getCmsVideoBySlug).toHaveBeenCalledWith("from-the-cms", { draft: true });
-  });
-
-  it("serves a published page from the list read", async () => {
-    getCmsVideos.mockResolvedValue([fromCms]);
-    expect(await getVideoDetail("from-the-cms")).toEqual(fromCms);
-    expect(getCmsVideoBySlug).not.toHaveBeenCalled();
   });
 });

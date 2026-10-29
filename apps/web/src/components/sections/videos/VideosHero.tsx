@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { HeroReveal } from "@/components/ui/Reveal";
 import { CLEANSTART_YOUTUBE_SUBSCRIBE_URL } from "@/lib/youtube-feed";
-import { videoPath, type Video } from "@/lib/videos-utils";
+import type { Video } from "@/lib/videos-utils";
 import { VideoMeta } from "./VideoMeta";
 import { VideoPlayer } from "./VideoPlayer";
 
@@ -12,7 +11,7 @@ const HERO_GRADIENT =
 
 export const VIDEOS_TITLE = "CleanStart Videos";
 export const VIDEOS_DESCRIPTION =
-  "Explainers, product demos and talks from CleanStart on container security, SBOMs, VEX, provenance and the software supply chain.";
+  "Explainers and product demos from CleanStart on container security, SBOMs, VEX, provenance and the software supply chain.";
 
 interface VideosHeroProps {
   /** Newest video; plays right here so a visitor can start watching with one click. */
@@ -63,8 +62,7 @@ export function VideosHero({ featured }: VideosHeroProps): React.ReactElement {
                 textWrap: "balance",
               }}
             >
-              Explainers, product demos and talks on container security and the software supply
-              chain.
+              Explainers and product demos on container security and the software supply chain.
             </p>
           </HeroReveal>
           <HeroReveal y={20} delay={0.35} duration={0.7}>
@@ -94,12 +92,7 @@ export function VideosHero({ featured }: VideosHeroProps): React.ReactElement {
                 className="font-display font-semibold text-white"
                 style={{ fontSize: "var(--fs-h4)", lineHeight: 1.25, letterSpacing: "-0.015em" }}
               >
-                <Link
-                  href={videoPath(featured.slug)}
-                  className="transition-colors duration-200 hover:text-[#DAB6F3] motion-reduce:transition-none"
-                >
-                  {featured.title}
-                </Link>
+                {featured.title}
               </h2>
             </div>
           </div>

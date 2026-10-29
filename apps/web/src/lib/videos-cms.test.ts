@@ -6,7 +6,6 @@ vi.mock("./cms-fetch", () => ({
 }));
 
 import {
-  getCmsVideoBySlug,
   getCmsVideos,
   mapCmsVideo,
   parseDurationLabel,
@@ -133,35 +132,15 @@ describe("getCmsVideos", () => {
     expect(await getCmsVideos()).toHaveLength(1);
   });
 
+  it("leaves talks off: they belong to /webinars and /podcast, not this page", async () => {
+    fetchCMS.mockResolvedValue({ docs: [doc({ format: "talk" }), doc()] });
+    expect(await getCmsVideos()).toHaveLength(1);
+  });
+
   it("lets a CMS failure propagate so ISR keeps the last good page", async () => {
     fetchCMS.mockImplementation(async () => {
       throw new Error("CMS fetch failed: 520");
     });
     await expect(getCmsVideos()).rejects.toThrow(/520/);
-  });
-});
-
-describe("getCmsVideoBySlug", () => {
-  it("asks for the published doc by slug", async () => {
-    fetchCMS.mockResolvedValue({ docs: [doc()] });
-    const video = await getCmsVideoBySlug("what-is-vex");
-    expect(video?.slug).toBe("what-is-vex");
-    const [path, options] = fetchCMS.mock.calls[0] as [string, { draft?: boolean }];
-    expect(path).toContain("where%5Bslug%5D%5Bequals%5D=what-is-vex");
-    expect(path).toContain("where%5B_status%5D%5Bequals%5D=published");
-    expect(options.draft).toBeUndefined();
-  });
-
-  it("does not require published when previewing a draft", async () => {
-    fetchCMS.mockResolvedValue({ docs: [doc()] });
-    await getCmsVideoBySlug("what-is-vex", { draft: true });
-    const [path, options] = fetchCMS.mock.calls[0] as [string, { draft?: boolean }];
-    expect(path).not.toContain("_status");
-    expect(options.draft).toBe(true);
-  });
-
-  it("returns null for an unknown slug", async () => {
-    fetchCMS.mockResolvedValue({ docs: [] });
-    expect(await getCmsVideoBySlug("nope")).toBeNull();
   });
 });

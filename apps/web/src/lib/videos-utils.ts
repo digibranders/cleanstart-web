@@ -63,8 +63,6 @@ export const formatLabel = (id: VideoFormat): string =>
 export const videoCategoryLabel = (video: Pick<Video, "format">): string =>
   video.format ? formatLabel(video.format) : "Video";
 
-export const videoPath = (slug: string): string => `/videos/${slug}`;
-
 /** "Oct 13, 2026". Pinned to UTC so server and browser render the same day. */
 export const formatPublished = (iso: string): string =>
   new Date(iso).toLocaleDateString("en-US", {
@@ -122,101 +120,6 @@ export const firstParagraph = (text: string, max = 320): string => {
 const isHashtagLine = (line: string): boolean => {
   const tokens = line.trim().split(/\s+/).filter(Boolean);
   return tokens.length > 0 && tokens.every((t) => t.startsWith("#"));
-};
-
-export interface DescriptionBlock {
-  readonly kind: "text" | "list";
-  readonly lines: readonly string[];
-}
-
-const BULLET = /^[-•*→👉▶]+\s*/u;
-const LIST_LINE = /^(?:[-•*→👉▶]+\s*|\d{1,2}:\d{2}(?::\d{2})?\s+)\S/u;
-
-/**
- * Splits a cleaned description into paragraphs and lists. Hashtag-only lines
- * are dropped: topics already carry that meaning on the page.
- */
-export const parseDescription = (description: string): DescriptionBlock[] => {
-  const blocks: DescriptionBlock[] = [];
-  for (const chunk of description.split(/\n\s*\n/)) {
-    const lines = chunk
-      .split("\n")
-      .map((l) => l.trim())
-      .filter((l) => l.length > 0 && !isHashtagLine(l));
-    if (lines.length === 0) continue;
-    const listed = lines.filter((l) => LIST_LINE.test(l));
-    if (listed.length === lines.length) {
-      blocks.push({
-        kind: "list",
-        lines: lines.map((l) => l.replace(BULLET, "")),
-      });
-    } else {
-      blocks.push({ kind: "text", lines });
-    }
-  }
-  return groupLeadInItems(blocks);
-};
-
-const SENTENCE_END = /[.!?]["”')\]]*$/;
-
-/**
- * YouTube editors often write "In this video:" and then put each point on its
- * own line with blank lines between and no bullet. Group those points into one
- * list. Only short single lines that do not end like a sentence and carry no
- * link qualify, so a closing "Learn more: https://..." line stays a paragraph.
- */
-const groupLeadInItems = (blocks: DescriptionBlock[]): DescriptionBlock[] => {
-  const out: DescriptionBlock[] = [];
-  let i = 0;
-  while (i < blocks.length) {
-    const block = blocks[i];
-    if (!block) break;
-    out.push(block);
-    i += 1;
-    const last = block.lines.at(-1) ?? "";
-    if (block.kind !== "text" || !last.endsWith(":")) continue;
-    const items: string[] = [];
-    let j = i;
-    while (j < blocks.length) {
-      const next = blocks[j];
-      const line = next?.lines[0] ?? "";
-      const qualifies =
-        next?.kind === "text" &&
-        next.lines.length === 1 &&
-        line.length < 160 &&
-        !SENTENCE_END.test(line) &&
-        !/https?:\/\//.test(line);
-      if (!qualifies) break;
-      items.push(line);
-      j += 1;
-    }
-    if (items.length >= 2) {
-      out.push({ kind: "list", lines: items });
-      i = j;
-    }
-  }
-  return out;
-};
-
-export type LinkSegment =
-  | { readonly kind: "text"; readonly text: string }
-  | { readonly kind: "link"; readonly text: string; readonly href: string };
-
-const URL_RE = /https?:\/\/[^\s<>"']+/g;
-
-/** Turns bare http(s) URLs into link segments. Nothing else becomes a link. */
-export const linkify = (text: string): LinkSegment[] => {
-  const out: LinkSegment[] = [];
-  let last = 0;
-  for (const match of text.matchAll(URL_RE)) {
-    const start = match.index ?? 0;
-    const trimmed = match[0].replace(/[.,;:!?)\]]+$/, "");
-    if (start > last) out.push({ kind: "text", text: text.slice(last, start) });
-    out.push({ kind: "link", text: trimmed, href: trimmed });
-    last = start + trimmed.length;
-  }
-  if (last < text.length) out.push({ kind: "text", text: text.slice(last) });
-  return out;
 };
 
 /**
@@ -318,7 +221,6 @@ export const formatCounts = (
     all: pool.length,
     explainer: 0,
     demo: 0,
-    talk: 0,
   };
   for (const v of pool) if (v.format) counts[v.format] += 1;
   return counts;
@@ -358,27 +260,6 @@ export const topicCounts = (
   return [...byslug.values()].sort(
     (a, b) => rank(a.slug) - rank(b.slug) || b.count - a.count || a.label.localeCompare(b.label),
   );
-};
-
-/** Topics that cover at least `min` videos, most covered first. */
-export const topicIndex = (videos: readonly Video[], min = 2): TopicCount[] =>
-  topicCounts(videos)
-    .filter((t) => t.count >= min)
-    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
-
-/** Same-topic videos first, then same-format, newest breaking ties. */
-export const relatedVideos = (
-  video: Video,
-  all: readonly Video[],
-  limit = 6,
-): Video[] => {
-  const score = (v: Video): number =>
-    v.topics.filter((t) => video.topics.some((o) => o.slug === t.slug)).length * 2 +
-    (v.format !== null && v.format === video.format ? 1 : 0);
-  return all
-    .filter((v) => v.id !== video.id)
-    .sort((a, b) => score(b) - score(a) || b.publishedAt.localeCompare(a.publishedAt))
-    .slice(0, limit);
 };
 
 type ParamReader = (key: string) => string | null | undefined;

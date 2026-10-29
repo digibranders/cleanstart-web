@@ -25,7 +25,7 @@ export interface TopicOption {
   readonly count: number;
 }
 
-export const VIDEOS_PAGE_SIZE = 12;
+export const VIDEOS_PAGE_SIZE = 24;
 const SEARCH_DEBOUNCE_MS = 250;
 
 const SORT_OPTIONS: ReadonlyArray<{ value: VideoSort; label: string }> = [
@@ -96,6 +96,14 @@ function VideosView({ videos, topics, heroId, filters, onChange }: VideosViewPro
     [results, filters, heroId],
   );
   const counts = useMemo(() => formatCounts(videos, filters), [videos, filters]);
+  // Topic counts follow the chosen format and search, so a number always matches what the click shows.
+  const topicRows = useMemo(() => {
+    const pool = filterVideos(videos, { ...filters, topic: undefined });
+    const rows = topics
+      .map((t) => ({ ...t, count: pool.filter((v) => v.topics.some((o) => o.slug === t.slug)).length }))
+      .filter((t) => t.count > 0 || t.slug === filters.topic);
+    return { rows, total: pool.length };
+  }, [videos, topics, filters]);
 
   const shown = list.slice(0, visibleCount);
   const remaining = list.length - shown.length;
@@ -155,9 +163,9 @@ function VideosView({ videos, topics, heroId, filters, onChange }: VideosViewPro
               onChange={(v) => set({ topic: v === "all" ? undefined : v })}
               options={[
                 { value: "all", label: "All topics" },
-                ...topics.map((t) => ({ value: t.slug, label: t.label, count: t.count })),
+                ...topicRows.rows.map((t) => ({ value: t.slug, label: t.label, count: t.count })),
               ]}
-              className="flex-1 sm:w-[210px] sm:flex-none"
+              className="flex-1 sm:w-[210px] sm:flex-none lg:hidden"
             />
 
             <div className="relative order-first w-full sm:order-none sm:w-[240px]">
@@ -210,80 +218,127 @@ function VideosView({ videos, topics, heroId, filters, onChange }: VideosViewPro
 
       <Container
         id="library-results"
-        className="pb-[var(--spacing-section-md)] pt-8"
+        className="pb-[var(--spacing-section-md)] pt-8 lg:grid lg:grid-cols-[232px_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[248px_minmax(0,1fr)] xl:gap-14"
         style={{ scrollMarginTop: "calc(var(--cs-header-h) + 76px)" }}
       >
-        <div className="mb-7 flex flex-wrap items-center gap-x-3 gap-y-2">
-          <p
-            aria-live="polite"
-            className="font-sans font-medium text-[#5B5870]"
-            style={{ fontSize: "var(--fs-body-sm)" }}
-          >
-            {hasActiveFilter
-              ? `${list.length} ${noun}`
-              : `Showing ${shown.length} of ${list.length} ${noun}`}
-          </p>
-          {filters.topic ? (
-            <RemovableChip
-              label={`Topic: ${topics.find((t) => t.slug === filters.topic)?.label ?? filters.topic}`}
-              onRemove={() => set({ topic: undefined })}
-            />
-          ) : null}
-          {filters.q.trim() ? (
-            <RemovableChip label={`Search: ${filters.q.trim()}`} onRemove={() => set({ q: "" })} />
-          ) : null}
-          {hasActiveFilter ? (
-            <button
-              type="button"
-              onClick={clearAll}
-              className="cursor-pointer font-sans text-[14px] font-medium text-[#5B2EE0] underline underline-offset-4 hover:text-[#3A1BA8]"
+        <TopicRail
+          topics={topicRows.rows}
+          total={topicRows.total}
+          active={filters.topic}
+          onSelect={(slug) => set({ topic: slug })}
+        />
+
+        <div className="min-w-0">
+          <div className="mb-7 flex flex-wrap items-center gap-x-3 gap-y-2">
+            <p
+              aria-live="polite"
+              className="font-sans font-medium text-[#5B5870]"
+              style={{ fontSize: "var(--fs-body-sm)" }}
             >
-              Clear all
-            </button>
+              {hasActiveFilter
+                ? `${list.length} ${noun}`
+                : `Showing ${shown.length} of ${list.length} ${noun}`}
+            </p>
+            {filters.topic ? (
+              <RemovableChip
+                label={`Topic: ${topics.find((t) => t.slug === filters.topic)?.label ?? filters.topic}`}
+                onRemove={() => set({ topic: undefined })}
+              />
+            ) : null}
+            {filters.q.trim() ? (
+              <RemovableChip label={`Search: ${filters.q.trim()}`} onRemove={() => set({ q: "" })} />
+            ) : null}
+            {hasActiveFilter ? (
+              <button
+                type="button"
+                onClick={clearAll}
+                className="cursor-pointer font-sans text-[14px] font-medium text-[#5B2EE0] underline underline-offset-4 hover:text-[#3A1BA8]"
+              >
+                Clear all
+              </button>
+            ) : null}
+          </div>
+
+          {shown.length > 0 ? (
+            <ul className="grid grid-cols-1 gap-x-7 gap-y-12 sm:grid-cols-2 xl:grid-cols-3">
+              {shown.map((video) => (
+                <VideoCard key={video.id} video={video} />
+              ))}
+            </ul>
+          ) : (
+            <div className="flex flex-col items-center gap-3 rounded-[20px] border border-dashed border-[rgba(18,16,28,0.18)] px-6 py-16 text-center">
+              <p className="font-display text-[22px] font-semibold text-[#12101C]">
+                No videos match that yet
+              </p>
+              <p className="max-w-[420px] font-sans text-[15px] text-[#5B5870]">
+                Try a broader word, or clear the filters to see every video.
+              </p>
+              <button
+                type="button"
+                onClick={clearAll}
+                className="mt-2 inline-flex h-11 cursor-pointer items-center rounded-full border border-[rgba(18,16,28,0.18)] bg-white px-5 font-sans text-[15px] font-medium text-[#12101C] hover:border-[#5B2EE0] hover:text-[#5B2EE0]"
+              >
+                Clear all filters
+              </button>
+            </div>
+          )}
+
+          {remaining > 0 ? (
+            <div className="mt-14 flex justify-center">
+              <button
+                type="button"
+                onClick={() =>
+                  setPageState({ key: filterKey, count: visibleCount + VIDEOS_PAGE_SIZE })
+                }
+                className="inline-flex h-12 cursor-pointer items-center rounded-full border border-[rgba(18,16,28,0.18)] bg-white px-6 font-sans text-[15px] font-medium text-[#12101C] transition-colors duration-200 hover:border-[#5B2EE0] hover:text-[#5B2EE0] active:translate-y-px motion-reduce:transition-none"
+              >
+                Show {Math.min(VIDEOS_PAGE_SIZE, remaining)} more
+              </button>
+            </div>
           ) : null}
         </div>
-
-        {shown.length > 0 ? (
-          <ul className="grid grid-cols-1 gap-x-7 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-            {shown.map((video) => (
-              <li key={video.id}>
-                <VideoCard video={video} />
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="flex flex-col items-center gap-3 rounded-[20px] border border-dashed border-[rgba(18,16,28,0.18)] px-6 py-16 text-center">
-            <p className="font-display text-[22px] font-semibold text-[#12101C]">
-              No videos match that yet
-            </p>
-            <p className="max-w-[420px] font-sans text-[15px] text-[#5B5870]">
-              Try a broader word, or clear the filters to see every video.
-            </p>
-            <button
-              type="button"
-              onClick={clearAll}
-              className="mt-2 inline-flex h-11 cursor-pointer items-center rounded-full border border-[rgba(18,16,28,0.18)] bg-white px-5 font-sans text-[15px] font-medium text-[#12101C] hover:border-[#5B2EE0] hover:text-[#5B2EE0]"
-            >
-              Clear all filters
-            </button>
-          </div>
-        )}
-
-        {remaining > 0 ? (
-          <div className="mt-14 flex justify-center">
-            <button
-              type="button"
-              onClick={() =>
-                setPageState({ key: filterKey, count: visibleCount + VIDEOS_PAGE_SIZE })
-              }
-              className="inline-flex h-12 cursor-pointer items-center rounded-full border border-[rgba(18,16,28,0.18)] bg-white px-6 font-sans text-[15px] font-medium text-[#12101C] transition-colors duration-200 hover:border-[#5B2EE0] hover:text-[#5B2EE0] active:translate-y-px motion-reduce:transition-none"
-            >
-              Show {Math.min(VIDEOS_PAGE_SIZE, remaining)} more
-            </button>
-          </div>
-        ) : null}
       </Container>
     </section>
+  );
+}
+
+interface TopicRailProps {
+  topics: readonly TopicOption[];
+  /** Videos in the current format and search, before the topic is applied. */
+  total: number;
+  active: string | undefined;
+  onSelect: (slug: string | undefined) => void;
+}
+
+/** Topic filter beside the grid on desktop. Below lg the toolbar's Topic dropdown does this job. */
+function TopicRail({ topics, total, active, onSelect }: TopicRailProps): React.ReactElement {
+  const row = (on: boolean): string =>
+    `flex min-h-10 w-full cursor-pointer items-center justify-between gap-3 rounded-[10px] px-3 py-2 text-left font-sans text-[15px] transition-colors duration-200 motion-reduce:transition-none ${
+      on ? "bg-[#151021] font-medium text-white" : "text-[#3D3A4F] hover:bg-[#F1EFF8]"
+    }`;
+  return (
+    <fieldset className="m-0 hidden min-w-0 border-0 p-0 lg:sticky lg:top-[calc(var(--cs-header-h)+96px)] lg:block lg:self-start">
+      <legend className="mb-3 px-3 font-sans text-[13px] font-semibold text-[#5B5870]">Topics</legend>
+      <ul className="flex flex-col gap-0.5">
+        <li>
+          <button type="button" aria-pressed={active === undefined} onClick={() => onSelect(undefined)} className={row(active === undefined)}>
+            All topics
+            <span className="text-[12px] tabular-nums opacity-70">{total}</span>
+          </button>
+        </li>
+        {topics.map((t) => {
+          const on = active === t.slug;
+          return (
+            <li key={t.slug}>
+              <button type="button" aria-pressed={on} onClick={() => onSelect(t.slug)} className={row(on)}>
+                <span className="min-w-0 truncate">{t.label}</span>
+                <span className="text-[12px] tabular-nums opacity-70">{t.count}</span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </fieldset>
   );
 }
 

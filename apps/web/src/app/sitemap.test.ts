@@ -45,58 +45,13 @@ describe("sitemap", () => {
     expect(urls).not.toContain("https://www.cleanstart.com/blogs/hidden");
   });
 
-  it("lists /videos and a watch page for every catalogued video, even with the feed down", async () => {
-    // The mocked fetch has no text(), so the YouTube feed read fails and only the
-    // code catalog is left: the sitemap must still carry the watch pages.
+  it("lists /videos but no per-video URLs, and never reads the videos collection", async () => {
+    // Videos play inline on /videos; there is no page per video to list.
     fetchMock.mockImplementation(async () => ok([]));
-    const entries = await (await load())();
-    const urls = entries.map((e) => e.url);
+    const urls = (await (await load())()).map((e) => e.url);
     expect(urls).toContain("https://www.cleanstart.com/videos");
-    expect(urls).toContain("https://www.cleanstart.com/videos/what-is-vex");
-    const watch = entries.find((e) => e.url.endsWith("/videos/what-is-vex"));
-    expect(watch?.lastModified && new Date(watch.lastModified).toISOString()).toBe(
-      "2026-10-13T14:17:14.000Z",
-    );
-  });
-
-  it("in catalog mode never reads the videos collection", async () => {
-    fetchMock.mockImplementation(async () => ok([]));
-    await (await load())();
+    expect(urls.filter((u) => u.includes("/videos/"))).toEqual([]);
     expect(fetchMock.mock.calls.map(([url]) => collectionOf(url as string))).not.toContain("videos");
-  });
-
-  describe("with VIDEOS_SOURCE=cms", () => {
-    beforeEach(() => {
-      vi.stubEnv("VIDEOS_SOURCE", "cms");
-    });
-    afterEach(() => {
-      vi.unstubAllEnvs();
-    });
-
-    it("lists the published videos from the CMS, not the code catalog", async () => {
-      fetchMock.mockImplementation(async (url: string) =>
-        collectionOf(url) === "videos"
-          ? ok([
-              { slug: "from-the-cms", publishedAt: "2026-11-01T08:00:00.000Z" },
-              { slug: "hidden", seo: { indexable: "noindex" } },
-            ])
-          : ok([]),
-      );
-      const entries = await (await load())();
-      const urls = entries.map((e) => e.url);
-      expect(urls).toContain("https://www.cleanstart.com/videos/from-the-cms");
-      expect(urls).not.toContain("https://www.cleanstart.com/videos/hidden");
-      expect(urls).not.toContain("https://www.cleanstart.com/videos/what-is-vex");
-      const videosCall = fetchMock.mock.calls.map(([u]) => u as string).find((u) => collectionOf(u) === "videos");
-      expect(videosCall).toContain("where[_status][equals]=published");
-    });
-
-    it("fails loudly when the videos read errors", async () => {
-      fetchMock.mockImplementation(async (url: string) =>
-        collectionOf(url) === "videos" ? failed(502) : ok([]),
-      );
-      await expect((await load())()).rejects.toThrow(/502/);
-    });
   });
 
   it("never reports the row-level updatedAt as lastmod", async () => {

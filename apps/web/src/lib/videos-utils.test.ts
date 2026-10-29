@@ -6,16 +6,12 @@ import {
   firstParagraph,
   formatCounts,
   isDefaultFilters,
-  linkify,
   matchesQuery,
   mergeVideos,
-  parseDescription,
   parseVideoFilters,
-  relatedVideos,
   sanitizeDescription,
   slugifyTitle,
   topicCounts,
-  topicIndex,
   videoFiltersQuery,
   type Video,
 } from "./videos-utils";
@@ -38,6 +34,10 @@ const feedEntry = (over: Partial<ChannelVideo> = {}): ChannelVideo => ({
 });
 
 describe("catalog invariants", () => {
+  it("lists explainers and product demos only", () => {
+    expect(new Set(VIDEO_CATALOG.map((v) => v.format))).toEqual(new Set(["explainer", "demo"]));
+  });
+
   it("has unique 11-character ids and unique, URL-safe slugs", () => {
     expect(new Set(VIDEO_CATALOG.map((v) => v.id)).size).toBe(VIDEO_CATALOG.length);
     expect(new Set(VIDEO_CATALOG.map((v) => v.slug)).size).toBe(VIDEO_CATALOG.length);
@@ -95,61 +95,6 @@ describe("firstParagraph", () => {
     const out = firstParagraph("word ".repeat(100), 40);
     expect(out.length).toBeLessThanOrEqual(42);
     expect(out.endsWith("word.")).toBe(true);
-  });
-});
-
-describe("parseDescription", () => {
-  it("groups bullets and timestamps into lists and drops hashtag lines", () => {
-    const blocks = parseDescription(
-      "Intro text.\n\n- One\n- Two\n\n01:29 The threat\n03:31 The fix\n\n#SBOM #VEX",
-    );
-    expect(blocks).toEqual([
-      { kind: "text", lines: ["Intro text."] },
-      { kind: "list", lines: ["One", "Two"] },
-      { kind: "list", lines: ["01:29 The threat", "03:31 The fix"] },
-    ]);
-  });
-
-  it("turns unbulleted points after a colon lead-in into one list", () => {
-    const blocks = parseDescription(
-      "In two minutes, this video covers:\n\nWhat VEX is\n\nThe four statuses\n\nWhy a reason matters.\n\nExplore images: https://images.cleanstart.com",
-    );
-    expect(blocks).toEqual([
-      { kind: "text", lines: ["In two minutes, this video covers:"] },
-      { kind: "list", lines: ["What VEX is", "The four statuses"] },
-      { kind: "text", lines: ["Why a reason matters."] },
-      { kind: "text", lines: ["Explore images: https://images.cleanstart.com"] },
-    ]);
-  });
-
-  it("leaves a single point after a colon as a paragraph", () => {
-    expect(parseDescription("Key takeaway:\n\nBuild trust in")).toEqual([
-      { kind: "text", lines: ["Key takeaway:"] },
-      { kind: "text", lines: ["Build trust in"] },
-    ]);
-  });
-
-  it("strips pointer emoji from link lines and keeps the text", () => {
-    expect(parseDescription("👉 Learn more: https://www.cleanstart.com/\n👉 Book a Demo: https://www.cleanstart.com/book-a-demo")).toEqual([
-      {
-        kind: "list",
-        lines: ["Learn more: https://www.cleanstart.com/", "Book a Demo: https://www.cleanstart.com/book-a-demo"],
-      },
-    ]);
-  });
-});
-
-describe("linkify", () => {
-  it("links http(s) URLs, trims trailing punctuation, ignores other schemes", () => {
-    expect(linkify("See https://www.cleanstart.com/book-a-demo. Or javascript:alert(1)")).toEqual([
-      { kind: "text", text: "See " },
-      {
-        kind: "link",
-        text: "https://www.cleanstart.com/book-a-demo",
-        href: "https://www.cleanstart.com/book-a-demo",
-      },
-      { kind: "text", text: ". Or javascript:alert(1)" },
-    ]);
   });
 });
 
@@ -212,18 +157,9 @@ describe("filters", () => {
   });
 
   it("counts formats against the topic and search but not the active format", () => {
-    const counts = formatCounts(all, { ...DEFAULT_VIDEO_FILTERS, format: "talk" });
+    const counts = formatCounts(all, { ...DEFAULT_VIDEO_FILTERS, format: "demo" });
     expect(counts.all).toBe(all.length);
-    expect(counts.explainer + counts.demo + counts.talk).toBe(all.length);
-  });
-});
-
-describe("topicIndex", () => {
-  it("lists only topics that cover at least two videos, most covered first", () => {
-    const topics = topicIndex(all);
-    expect(topics.every((t) => t.count >= 2)).toBe(true);
-    expect(topics.map((t) => t.count)).toEqual([...topics.map((t) => t.count)].sort((a, b) => b - a));
-    expect(topics.find((t) => t.slug === "ai")).toBeUndefined();
+    expect(counts.explainer + counts.demo).toBe(all.length);
   });
 });
 
@@ -241,7 +177,7 @@ describe("topics as data", () => {
     const counts = topicCounts(all, ["vex", "base-images"]);
     expect(counts.slice(0, 2).map((t) => t.slug)).toEqual(["vex", "base-images"]);
     expect(counts.find((t) => t.slug === "base-images")?.count).toBe(6);
-    expect(counts.find((t) => t.slug === "ai")?.count).toBe(1);
+    expect(counts.find((t) => t.slug === "vex")?.count).toBe(1);
     const rest = counts.slice(2).map((t) => t.count);
     expect(rest).toEqual([...rest].sort((a, b) => b - a));
   });
@@ -258,16 +194,6 @@ describe("topics as data", () => {
     expect(matchesQuery(cms, "zero trust")).toBe(true);
     expect(filterVideos([cms], { ...DEFAULT_VIDEO_FILTERS, topic: "zt" })).toEqual([cms]);
     expect(filterVideos([cms], { ...DEFAULT_VIDEO_FILTERS, topic: "other" })).toEqual([]);
-  });
-});
-
-describe("relatedVideos", () => {
-  it("excludes the video itself and ranks shared topics first", () => {
-    const base = must(all.find((v) => v.slug === "what-is-attack-surface-in-containers"));
-    const out = relatedVideos(base, all, 4);
-    expect(out).toHaveLength(4);
-    expect(out.find((v) => v.id === base.id)).toBeUndefined();
-    expect(must(out[0]).topics.some((t) => base.topics.some((b) => b.slug === t.slug))).toBe(true);
   });
 });
 

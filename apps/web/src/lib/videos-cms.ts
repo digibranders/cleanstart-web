@@ -40,7 +40,9 @@ const isPopulatedTopic = (t: CmsTopic | number | string): t is CmsTopic =>
 
 const byNewest = (a: Video, b: Video): number => b.publishedAt.localeCompare(a.publishedAt);
 
-const isUsable = (doc: CmsVideo): boolean => Boolean(doc.slug && doc.externalId);
+// Talks and webinars are not part of this page (they live on /webinars and /podcast).
+const isUsable = (doc: CmsVideo): boolean =>
+  Boolean(doc.slug && doc.externalId) && doc.format !== "talk";
 
 export const mapCmsVideo = (doc: CmsVideo): Video => {
   const rawDescription = doc.source?.description;
@@ -49,7 +51,7 @@ export const mapCmsVideo = (doc: CmsVideo): Video => {
     id: doc.externalId ?? "",
     slug: doc.slug ?? "",
     title: doc.title ?? "",
-    format: doc.format ?? null,
+    format: doc.format === "talk" ? null : (doc.format ?? null),
     topics: (doc.topics ?? [])
       .filter(isPopulatedTopic)
       .map((t) => ({ slug: t.slug, label: t.name })),
@@ -77,23 +79,4 @@ export async function getCmsVideos(): Promise<Video[]> {
   });
   const data = await fetchCMS<CmsList>(`/api/videos?${params.toString()}`, { tags: TAGS });
   return data.docs.filter(isUsable).map(mapCmsVideo).sort(byNewest);
-}
-
-/** One video by slug. With `draft` it also finds unpublished ones, for the editor preview. */
-export async function getCmsVideoBySlug(
-  slug: string,
-  { draft }: { draft?: boolean } = {},
-): Promise<Video | null> {
-  const params = new URLSearchParams({
-    "where[slug][equals]": slug,
-    depth: "1",
-    limit: "1",
-  });
-  if (!draft) params.set("where[_status][equals]", "published");
-  const data = await fetchCMS<CmsList>(`/api/videos?${params.toString()}`, {
-    tags: TAGS,
-    ...(draft ? { draft: true } : {}),
-  });
-  const doc = data.docs.find(isUsable);
-  return doc ? mapCmsVideo(doc) : null;
 }

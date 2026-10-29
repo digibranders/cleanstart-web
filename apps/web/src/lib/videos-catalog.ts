@@ -8,7 +8,7 @@
  * Slugs are URL commitments: never rename one after launch.
  */
 
-export type VideoFormat = "explainer" | "demo" | "talk";
+export type VideoFormat = "explainer" | "demo";
 
 export const VIDEO_FORMATS: ReadonlyArray<{
   readonly id: VideoFormat;
@@ -17,7 +17,6 @@ export const VIDEO_FORMATS: ReadonlyArray<{
 }> = [
   { id: "explainer", label: "Explainers", singular: "Explainer" },
   { id: "demo", label: "Product demos", singular: "Product demo" },
-  { id: "talk", label: "Talks and webinars", singular: "Talk" },
 ];
 
 export const VIDEO_TOPICS = [
@@ -86,17 +85,6 @@ export const VIDEO_CATALOG: readonly CatalogVideo[] = [
     durationSeconds: 188,
     summary:
       "See Clean Libraries in action inside VS Code. As you code, it scans your project dependencies for known vulnerabilities and flags risky libraries directly in the IDE.",
-  },
-  {
-    id: "80ofihytgDk",
-    slug: "software-supply-chain-security-in-the-age-of-ai",
-    title: "Software Supply Chain Security in the Age of AI",
-    format: "talk",
-    topics: ["supply-chain", "ai"],
-    publishedAt: "2026-09-21T18:06:01+00:00",
-    durationSeconds: 1666,
-    summary:
-      "In this episode of CleanStart Conversations, Ankit Aggarwal, VP, Enterprise Architecture at Coforge, joins us to discuss the growing challenges of software supply chain security in the age of AI.",
   },
   {
     id: "dQpZX5vMgqk",
