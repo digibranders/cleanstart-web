@@ -6,7 +6,8 @@ import { getChannelVideos } from "./youtube-feed";
 // Where /videos reads from. "cms" reads the Payload `videos` collection; anything
 // else keeps the code catalog plus the YouTube RSS feed. Flipping this one env var
 // (and redeploying) is the cutover and the rollback.
-const usesCms = (): boolean => process.env.VIDEOS_SOURCE === "cms";
+// PREVIEW ONLY (throwaway branch): the page reads the CMS unless VIDEOS_SOURCE=catalog.
+const usesCms = (): boolean => process.env.VIDEOS_SOURCE !== "catalog";
 
 // The RSS feed holds the 15 newest uploads; ask for all of them. It is cached
 // for an hour by `getChannelVideos` and returns [] when YouTube is unreachable,
