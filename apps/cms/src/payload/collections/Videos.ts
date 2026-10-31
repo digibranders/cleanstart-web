@@ -99,7 +99,7 @@ export const Videos: CollectionConfig = {
       'Videos shown on /videos. New YouTube uploads arrive as drafts marked "Needs review": choose a category and topics, write the summary, then publish.',
     group: 'Content',
     components: {
-      edit: docStatusBarEditConfig({ showStats: false, showPublishedAt: true, showPurge: false }),
+      edit: docStatusBarEditConfig({ showStats: false, showPublishedAt: true, showPurge: true }),
     },
   },
   defaultSort: '-publishedAt',
