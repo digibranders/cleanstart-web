@@ -29,6 +29,7 @@ const CACHEABLE_COLLECTIONS = new Set([
   'authors',
   'blogs',
   'advisories',
+  'videos',
   'case-studies',
   'events',
   'guides',

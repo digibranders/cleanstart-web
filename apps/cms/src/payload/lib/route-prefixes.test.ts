@@ -27,6 +27,13 @@ describe('collectionUrlFromSlug / collectionUrlFromDoc (detail URLs)', () => {
   });
 });
 
+describe('videos have a listing but no detail URL', () => {
+  it('composes no detail URL, because videos play inline', () => {
+    expect(collectionUrlFromSlug('videos', 'x')).toBeNull();
+    expect(collectionUrlFromDoc('videos', { slug: 'x' })).toBeNull();
+  });
+});
+
 describe('listingPathForCollection (index URLs for revalidation)', () => {
   it('overrides collections whose listing route differs from the detail prefix', () => {
     // These differ from ROUTE_PREFIX; revalidating the prefix would purge a

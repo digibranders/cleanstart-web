@@ -95,6 +95,20 @@ export const QUICK_CREATE_CONFIG: Record<string, QuickCreateConfig | undefined> 
       { name: 'slug', type: 'slug', label: 'Slug', source: 'name' },
     ],
   },
+  videoTopics: {
+    title: 'New video topic',
+    supportsDrafts: false,
+    fields: [
+      {
+        name: 'name',
+        type: 'text',
+        label: 'Name',
+        required: true,
+        maxLength: 120,
+      },
+      { name: 'slug', type: 'slug', label: 'Slug', source: 'name' },
+    ],
+  },
   knowledgeCategories: {
     title: 'New knowledge category',
     supportsDrafts: true,

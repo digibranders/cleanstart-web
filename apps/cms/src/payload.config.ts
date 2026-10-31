@@ -16,6 +16,8 @@ import { AuditLog } from './payload/collections/audit-log';
 import { WebhookDeadLetter } from './payload/collections/WebhookDeadLetter';
 import { Authors } from './payload/collections/Authors';
 import { Advisories } from './payload/collections/Advisories';
+import { VideoTopics } from './payload/collections/VideoTopics';
+import { Videos } from './payload/collections/Videos';
 import { Blogs } from './payload/collections/Blogs';
 import { BrokenLinks } from './payload/collections/BrokenLinks';
 import { CaseStudies } from './payload/collections/CaseStudies';
@@ -109,6 +111,7 @@ import { retryWebhookTask } from './payload/jobs/retry-webhook';
 import { analyticsCachePruneTask } from './payload/jobs/analytics-cache-prune';
 import { refreshContentInsightsTask } from './payload/jobs/refresh-content-insights';
 import { refreshCruxTask } from './payload/jobs/refresh-crux';
+import { syncYoutubeVideosTask } from './payload/jobs/sync-youtube-videos';
 import { dashboardRefreshDailyTask } from './payload/jobs/dashboard-refresh-daily';
 import { dashboardRefreshFrequentTask } from './payload/jobs/dashboard-refresh-frequent';
 import { registerLeadHandlers } from './payload/lib/lead-handlers';
@@ -391,6 +394,8 @@ export default buildConfig({
     // Authors) trail.
     Blogs,
     Advisories,
+    Videos,
+    VideoTopics,
     News,
     Guides,
     CaseStudies,
@@ -535,6 +540,7 @@ export default buildConfig({
       purgeDealRegistrationsTask,
       refreshContentInsightsTask,
       refreshCruxTask,
+      syncYoutubeVideosTask,
     ],
     autoRun: [
       {
@@ -600,6 +606,10 @@ export default buildConfig({
       {
         cron: '45 6 * * *', // daily at 06:45 UTC — Core Web Vitals (CrUX) origin-level cache
         queue: 'cruxRefresh',
+      },
+      {
+        cron: '7 * * * *', // hourly at :07 UTC — YouTube channel sync (new uploads become needs-review drafts)
+        queue: 'youtubeVideosSync',
       },
       {
         cron: '* * * * *', // every minute — Payload built-in schedulePublish jobs land in the `default` queue; wait_until gates actual execution

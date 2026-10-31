@@ -73,6 +73,8 @@ const ROW_HINTS: Record<string, RowHint> = {
   // Content collections: stacked chips with status badge, no thumbs.
   blogs: { primary: ['title'], secondary: ['slug'], showThumb: false, showCreate: false, chipLayout: 'stacked', typeLabel: 'Blog' },
   advisories: { primary: ['title'], secondary: ['slug'], showThumb: false, showCreate: false, chipLayout: 'stacked', typeLabel: 'Advisory' },
+  videos: { primary: ['title'], secondary: ['slug'], showThumb: false, showCreate: false, chipLayout: 'stacked', typeLabel: 'Video' },
+  videoTopics: { primary: ['name'], secondary: ['slug'], showThumb: false, showCreate: true, chipLayout: 'inline' },
   news: { primary: ['title'], secondary: ['slug'], showThumb: false, showCreate: false, chipLayout: 'stacked', typeLabel: 'News' },
   guides: { primary: ['title'], secondary: ['slug'], showThumb: false, showCreate: false, chipLayout: 'stacked', typeLabel: 'Guide' },
   resources: { primary: ['title'], secondary: ['slug'], showThumb: false, showCreate: false, chipLayout: 'stacked', typeLabel: 'Resource' },
@@ -857,7 +859,7 @@ export const RelationshipField = (props: RelationshipFieldClientProps): ReactEle
               ref={inputRef}
               type="search"
               className="cs-relationship-field__input"
-              placeholder={pills.length === 0 ? `Search ${slugs.join(' / ')}…` : 'Add more…'}
+              placeholder={pills.length === 0 ? emptyPlaceholder : 'Add more…'}
               value={query}
               onChange={onInputChange}
               onFocus={() => setOpen(true)}
