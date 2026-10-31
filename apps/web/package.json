@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --port 3001",
-    "build": "next build",
+    "build": "node scripts/wait-for-cms.mjs && next build",
     "analyze": "ANALYZE=1 next build",
     "start": "next start --port 3001",
     "lint": "biome lint src",
