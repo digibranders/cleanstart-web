@@ -7,6 +7,7 @@
 // switch its renderer from <span> to <Link> in MegaMenu / MobileNav.
 
 import { sectionIndexHref } from "@/lib/nav/section-index";
+import { VIDEOS_PAGE_PUBLIC } from "@/lib/videos-launch";
 
 export type NavLeaf = {
   label: string;
@@ -220,6 +221,7 @@ export const NAV_TREE: NavItem[] = [
         items: [
           { label: "Events", href: "/events", icon: "calendar" },
           { label: "Webinars", href: "/webinars", icon: "play" },
+          ...(VIDEOS_PAGE_PUBLIC ? [{ label: "Videos", href: "/videos", icon: "play" as const }] : []),
           { label: "Podcast", href: "/podcast", icon: "mic" },
         ],
       },

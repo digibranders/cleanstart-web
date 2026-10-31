@@ -1,0 +1,418 @@
+"use client";
+
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Container } from "@/components/layout";
+import { VIDEO_FORMATS } from "@/lib/videos-catalog";
+import {
+  DEFAULT_VIDEO_FILTERS,
+  filterVideos,
+  formatCounts,
+  isDefaultFilters,
+  parseVideoFilters,
+  videoFiltersQuery,
+  type Video,
+  type VideoFilters,
+  type VideoSort,
+} from "@/lib/videos-utils";
+import { VideoCard } from "./VideoCard";
+import { VideoSelect } from "./VideoSelect";
+
+/** One row of the topic dropdown: the URL slug, the label, and how many videos carry it. */
+export interface TopicOption {
+  readonly slug: string;
+  readonly label: string;
+  readonly count: number;
+}
+
+export const VIDEOS_PAGE_SIZE = 24;
+const SEARCH_DEBOUNCE_MS = 250;
+
+const SORT_OPTIONS: ReadonlyArray<{ value: VideoSort; label: string }> = [
+  { value: "new", label: "Newest first" },
+  { value: "old", label: "Oldest first" },
+  { value: "short", label: "Shortest first" },
+];
+
+const CONTROL =
+  "h-11 rounded-[12px] border border-[rgba(18,16,28,0.18)] bg-white px-3 font-sans text-[#12101C] outline-none transition-[border-color,box-shadow] duration-200 focus-visible:border-[#5B2EE0] focus-visible:shadow-[0_0_0_4px_rgba(91,46,224,0.14)] motion-reduce:transition-none";
+
+interface VideosViewProps {
+  videos: readonly Video[];
+  /** Every topic in use with its video count, in the order the dropdown lists them. */
+  topics: readonly TopicOption[];
+  /** The video playing in the hero. Left out of the unfiltered grid so it is not shown twice. */
+  heroId: string | null;
+  filters: VideoFilters;
+  onChange: (next: VideoFilters) => void;
+}
+
+function VideosView({ videos, topics, heroId, filters, onChange }: VideosViewProps): React.ReactElement {
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  // The search box is local state so typing never waits on the URL. These three
+  // values stop a debounced push from overwriting characters typed after it,
+  // while still adopting changes that arrive from elsewhere (Clear all, Back).
+  const [draft, setDraft] = useState(filters.q);
+  const [pushedQ, setPushedQ] = useState(filters.q);
+  const [seenUrlQ, setSeenUrlQ] = useState(filters.q);
+  if (filters.q !== seenUrlQ) {
+    setSeenUrlQ(filters.q);
+    if (filters.q !== pushedQ) {
+      setPushedQ(filters.q);
+      setDraft(filters.q);
+    }
+  }
+
+  useEffect(() => {
+    if (draft === pushedQ) return;
+    const timer = window.setTimeout(() => {
+      setPushedQ(draft);
+      onChange({ ...filters, q: draft });
+    }, SEARCH_DEBOUNCE_MS);
+    return () => window.clearTimeout(timer);
+  }, [draft, pushedQ, filters, onChange]);
+
+  // "/" jumps to search, unless the visitor is already typing somewhere.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent): void => {
+      if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) return;
+      const el = event.target as HTMLElement | null;
+      if (el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))) return;
+      event.preventDefault();
+      searchRef.current?.focus();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  const filterKey = videoFiltersQuery(filters);
+  const [pageState, setPageState] = useState({ key: filterKey, count: VIDEOS_PAGE_SIZE });
+  const visibleCount = pageState.key === filterKey ? pageState.count : VIDEOS_PAGE_SIZE;
+
+  const results = useMemo(() => filterVideos(videos, filters), [videos, filters]);
+  const list = useMemo(
+    () => (isDefaultFilters(filters) ? results.filter((v) => v.id !== heroId) : results),
+    [results, filters, heroId],
+  );
+  const counts = useMemo(() => formatCounts(videos, filters), [videos, filters]);
+  // Topic counts follow the chosen format and search, so a number always matches what the click shows.
+  const topicRows = useMemo(() => {
+    const pool = filterVideos(videos, { ...filters, topic: undefined });
+    const rows = topics
+      .map((t) => ({ ...t, count: pool.filter((v) => v.topics.some((o) => o.slug === t.slug)).length }))
+      .filter((t) => t.count > 0 || t.slug === filters.topic);
+    return { rows, total: pool.length };
+  }, [videos, topics, filters]);
+
+  const shown = list.slice(0, visibleCount);
+  const remaining = list.length - shown.length;
+  const hasActiveFilter = !isDefaultFilters(filters);
+  const noun = list.length === 1 ? "video" : "videos";
+
+  const set = (patch: Partial<VideoFilters>): void => onChange({ ...filters, ...patch });
+  const clearAll = (): void => onChange(DEFAULT_VIDEO_FILTERS);
+
+  const submitSearch = (event: React.FormEvent): void => {
+    event.preventDefault();
+    setPushedQ(draft);
+    onChange({ ...filters, q: draft });
+    document.getElementById("library-results")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  return (
+    <section id="library" aria-labelledby="library-title" style={{ scrollMarginTop: "var(--cs-header-h)" }}>
+      <h2 id="library-title" className="sr-only">
+        All videos
+      </h2>
+
+      <div className="z-30 border-b border-[rgba(18,16,28,0.08)] bg-white/92 backdrop-blur-md md:sticky md:top-[var(--cs-header-h)]">
+        <Container className="flex flex-col gap-3 py-3 lg:flex-row lg:items-center lg:justify-between">
+          <fieldset className="-mx-6 m-0 flex min-w-0 gap-1.5 overflow-x-auto border-0 px-6 pb-1 [scrollbar-width:none] sm:-mx-10 sm:px-10 lg:mx-0 lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden">
+            <legend className="sr-only">Filter by format</legend>
+            {[
+              { id: undefined, label: "All", count: counts.all },
+              ...VIDEO_FORMATS.map((f) => ({ id: f.id, label: f.label, count: counts[f.id] })),
+            ].map((tab) => {
+              const on = filters.format === tab.id;
+              return (
+                <button
+                  key={tab.label}
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => set({ format: tab.id })}
+                  className={`inline-flex h-11 shrink-0 cursor-pointer items-center gap-2 rounded-full px-4 font-sans text-[15px] font-medium transition-colors duration-200 motion-reduce:transition-none ${
+                    on ? "bg-[#151021] text-white" : "text-[#3D3A4F] hover:bg-[#F1EFF8]"
+                  }`}
+                >
+                  {tab.label}
+                  <span className="text-[12px] tabular-nums opacity-70">{tab.count}</span>
+                </button>
+              );
+            })}
+          </fieldset>
+
+          <form
+            aria-label="Search and filter videos"
+            onSubmit={submitSearch}
+            className="flex flex-wrap items-center gap-2 sm:flex-nowrap"
+          >
+            <VideoSelect<string>
+              label="Topic"
+              value={filters.topic ?? "all"}
+              onChange={(v) => set({ topic: v === "all" ? undefined : v })}
+              options={[
+                { value: "all", label: "All topics" },
+                ...topicRows.rows.map((t) => ({ value: t.slug, label: t.label, count: t.count })),
+              ]}
+              className="flex-1 sm:w-[210px] sm:flex-none lg:hidden"
+            />
+
+            <div className="relative order-first w-full sm:order-none sm:w-[240px]">
+              <label className="sr-only" htmlFor="videos-search">
+                Search videos
+              </label>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#6E6A82"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                aria-hidden
+                className="pointer-events-none absolute left-3.5 top-3.5"
+              >
+                <circle cx="11" cy="11" r="6.5" />
+                <path d="M20 20l-4.2-4.2" />
+              </svg>
+              <input
+                ref={searchRef}
+                id="videos-search"
+                type="search"
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                placeholder="Search videos"
+                autoComplete="off"
+                maxLength={80}
+                className={`${CONTROL} w-full pl-10 pr-9 text-[16px] placeholder:text-[#6E6A82] md:text-[14px]`}
+              />
+              <kbd
+                aria-hidden
+                className={`pointer-events-none absolute right-3 top-3 hidden h-5 min-w-5 items-center justify-center rounded border border-[rgba(18,16,28,0.2)] px-1 font-sans text-[11px] text-[#5B5870] lg:inline-flex ${draft ? "lg:hidden" : ""}`}
+              >
+                /
+              </kbd>
+            </div>
+
+            <VideoSelect<VideoSort>
+              label="Sort"
+              value={filters.sort}
+              onChange={(v) => set({ sort: v })}
+              options={SORT_OPTIONS}
+              className="flex-1 sm:w-[190px] sm:flex-none"
+            />
+          </form>
+        </Container>
+      </div>
+
+      <Container
+        id="library-results"
+        className="pb-[var(--spacing-section-cta)] pt-8 lg:grid lg:grid-cols-[232px_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[248px_minmax(0,1fr)] xl:gap-14"
+        style={{ scrollMarginTop: "calc(var(--cs-header-h) + 76px)" }}
+      >
+        <TopicRail
+          topics={topicRows.rows}
+          total={topicRows.total}
+          active={filters.topic}
+          onSelect={(slug) => set({ topic: slug })}
+        />
+
+        <div className="min-w-0">
+          <div className="mb-7 flex flex-wrap items-center gap-x-3 gap-y-2">
+            <p
+              aria-live="polite"
+              className="font-sans font-medium text-[#5B5870]"
+              style={{ fontSize: "var(--fs-body-sm)" }}
+            >
+              {hasActiveFilter
+                ? `${list.length} ${noun}`
+                : `Showing ${shown.length} of ${list.length} ${noun}`}
+            </p>
+            {filters.topic ? (
+              <RemovableChip
+                label={`Topic: ${topics.find((t) => t.slug === filters.topic)?.label ?? filters.topic}`}
+                onRemove={() => set({ topic: undefined })}
+              />
+            ) : null}
+            {filters.q.trim() ? (
+              <RemovableChip label={`Search: ${filters.q.trim()}`} onRemove={() => set({ q: "" })} />
+            ) : null}
+            {hasActiveFilter ? (
+              <button
+                type="button"
+                onClick={clearAll}
+                className="cursor-pointer font-sans text-[14px] font-medium text-[#5B2EE0] underline underline-offset-4 hover:text-[#3A1BA8]"
+              >
+                Clear all
+              </button>
+            ) : null}
+          </div>
+
+          {shown.length > 0 ? (
+            <ul className="grid grid-cols-1 gap-x-7 gap-y-12 sm:grid-cols-2 xl:grid-cols-3">
+              {shown.map((video) => (
+                <VideoCard key={video.id} video={video} />
+              ))}
+            </ul>
+          ) : (
+            <div className="flex flex-col items-center gap-3 rounded-[20px] border border-dashed border-[rgba(18,16,28,0.18)] px-6 py-16 text-center">
+              <p className="font-display text-[22px] font-semibold text-[#12101C]">
+                No videos match that yet
+              </p>
+              <p className="max-w-[420px] font-sans text-[15px] text-[#5B5870]">
+                Try a broader word, or clear the filters to see every video.
+              </p>
+              <button
+                type="button"
+                onClick={clearAll}
+                className="mt-2 inline-flex h-11 cursor-pointer items-center rounded-full border border-[rgba(18,16,28,0.18)] bg-white px-5 font-sans text-[15px] font-medium text-[#12101C] hover:border-[#5B2EE0] hover:text-[#5B2EE0]"
+              >
+                Clear all filters
+              </button>
+            </div>
+          )}
+
+          {remaining > 0 ? (
+            <div className="mt-14 flex justify-center">
+              <button
+                type="button"
+                onClick={() =>
+                  setPageState({ key: filterKey, count: visibleCount + VIDEOS_PAGE_SIZE })
+                }
+                className="inline-flex h-12 cursor-pointer items-center rounded-full border border-[rgba(18,16,28,0.18)] bg-white px-6 font-sans text-[15px] font-medium text-[#12101C] transition-colors duration-200 hover:border-[#5B2EE0] hover:text-[#5B2EE0] active:translate-y-px motion-reduce:transition-none"
+              >
+                Show {Math.min(VIDEOS_PAGE_SIZE, remaining)} more
+              </button>
+            </div>
+          ) : null}
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+interface TopicRailProps {
+  topics: readonly TopicOption[];
+  /** Videos in the current format and search, before the topic is applied. */
+  total: number;
+  active: string | undefined;
+  onSelect: (slug: string | undefined) => void;
+}
+
+/** Topic filter beside the grid on desktop. Below lg the toolbar's Topic dropdown does this job. */
+function TopicRail({ topics, total, active, onSelect }: TopicRailProps): React.ReactElement {
+  const row = (on: boolean): string =>
+    `flex min-h-10 w-full cursor-pointer items-center justify-between gap-3 rounded-[10px] px-3 py-2 text-left font-sans text-[15px] transition-colors duration-200 motion-reduce:transition-none ${
+      on ? "bg-[#151021] font-medium text-white" : "text-[#3D3A4F] hover:bg-[#F1EFF8]"
+    }`;
+  return (
+    <nav
+      aria-label="Filter by topic"
+      className="hidden min-w-0 lg:sticky lg:top-[calc(var(--cs-header-h)+96px)] lg:block lg:self-start"
+    >
+      <p className="mb-3 px-3 font-sans text-[13px] font-semibold text-[#5B5870]">Topics</p>
+      <ul className="flex flex-col gap-0.5">
+        <li>
+          <button type="button" aria-pressed={active === undefined} onClick={() => onSelect(undefined)} className={row(active === undefined)}>
+            All topics
+            <span className="text-[12px] tabular-nums opacity-70">{total}</span>
+          </button>
+        </li>
+        {topics.map((t) => {
+          const on = active === t.slug;
+          return (
+            <li key={t.slug}>
+              <button type="button" aria-pressed={on} onClick={() => onSelect(t.slug)} className={row(on)}>
+                <span className="min-w-0 truncate">{t.label}</span>
+                <span className="text-[12px] tabular-nums opacity-70">{t.count}</span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+}
+
+function RemovableChip({
+  label,
+  onRemove,
+}: {
+  label: string;
+  onRemove: () => void;
+}): React.ReactElement {
+  return (
+    <span className="inline-flex h-8 items-center gap-1 rounded-full bg-[#F1EFF8] pl-3 pr-1 font-sans text-[13px] font-medium text-[#3D3A4F]">
+      <span className="max-w-[200px] truncate">{label}</span>
+      <button
+        type="button"
+        onClick={onRemove}
+        aria-label={`Remove filter ${label}`}
+        className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-full hover:bg-[#E3DEF3]"
+      >
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
+      </button>
+    </span>
+  );
+}
+
+interface VideosBrowserProps {
+  videos: Video[];
+  topics: readonly TopicOption[];
+  heroId: string | null;
+}
+
+/**
+ * Client driver for /videos. Reads the filters from the URL and applies them in
+ * memory, so the route stays static. Must sit inside `<Suspense>`, with
+ * `VideosBrowserFallback` as the fallback so crawlers get the default view.
+ */
+export function VideosBrowser({ videos, topics, heroId }: VideosBrowserProps): React.ReactElement {
+  const params = useSearchParams();
+  const router = useRouter();
+  const filters = useMemo(
+    () =>
+      parseVideoFilters(
+        (key) => params.get(key),
+        topics.map((t) => t.slug),
+      ),
+    [params, topics],
+  );
+  const onChange = useMemo(
+    () =>
+      (next: VideoFilters): void =>
+        router.replace(`/videos${videoFiltersQuery(next)}`, { scroll: false }),
+    [router],
+  );
+  return (
+    <VideosView videos={videos} topics={topics} heroId={heroId} filters={filters} onChange={onChange} />
+  );
+}
+
+const noop = (): void => undefined;
+
+/** The unfiltered first view, rendered into the static HTML. */
+export function VideosBrowserFallback({ videos, topics, heroId }: VideosBrowserProps): React.ReactElement {
+  return (
+    <VideosView
+      videos={videos}
+      topics={topics}
+      heroId={heroId}
+      filters={DEFAULT_VIDEO_FILTERS}
+      onChange={noop}
+    />
+  );
+}

@@ -6,6 +6,13 @@ export const CLEANSTART_YOUTUBE_CHANNEL_ID = "UC13c-XRmRlkWpp6WMG9SDjw";
 export const CLEANSTART_YOUTUBE_HANDLE_URL =
   "https://www.youtube.com/@CleanStartOfficial";
 
+/**
+ * Opens the channel with YouTube's own "Subscribe?" prompt already showing. The
+ * subscription is made on YouTube by the signed-in viewer, so it lands on the
+ * real channel without this site handling anyone's Google account.
+ */
+export const CLEANSTART_YOUTUBE_SUBSCRIBE_URL = `https://www.youtube.com/channel/${CLEANSTART_YOUTUBE_CHANNEL_ID}?sub_confirmation=1`;
+
 const FEED_URL = `https://www.youtube.com/feeds/videos.xml?channel_id=${CLEANSTART_YOUTUBE_CHANNEL_ID}`;
 const FEED_REVALIDATE_SECONDS = 3600;
 
@@ -14,12 +21,15 @@ export type ChannelVideo = {
   title: string;
   publishedAt: string;
   thumbnailUrl: string;
+  /** Full YouTube description, newlines kept. "" when the feed omits it. */
+  description: string;
 };
 
 const ENTRY_RE = /<entry>([\s\S]*?)<\/entry>/g;
 const VIDEO_ID_RE = /<yt:videoId>([A-Za-z0-9_-]{11})<\/yt:videoId>/;
 const TITLE_RE = /<title>([\s\S]*?)<\/title>/;
 const PUBLISHED_RE = /<published>([\s\S]*?)<\/published>/;
+const DESCRIPTION_RE = /<media:description>([\s\S]*?)<\/media:description>/;
 
 function decodeEntities(value: string): string {
   return value
@@ -50,6 +60,7 @@ export function parseYouTubeFeed(xml: string, limit: number): ChannelVideo[] {
       title,
       publishedAt,
       thumbnailUrl: youtubeThumbnail(videoId, "hqdefault"),
+      description: decodeEntities(DESCRIPTION_RE.exec(block)?.[1] ?? ""),
     });
   }
   return videos;
