@@ -1,10 +1,12 @@
 import type { BasePayload } from 'payload';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { notifyNeedsReview, needsReviewListUrl } from './notify-needs-review';
 
 const fakePayload = (): BasePayload => ({ logger: { warn: vi.fn() } }) as unknown as BasePayload;
 const SERVER = 'https://cms.cleanstart.com/';
+
+afterEach(() => vi.unstubAllEnvs());
 
 describe('needsReviewListUrl', () => {
   it('points at the videos list filtered to Needs review, without a double slash', () => {
@@ -48,6 +50,8 @@ describe('notifyNeedsReview', () => {
   });
 
   it('omits adminUrl when the CMS base URL is not configured', async () => {
+    // An undefined argument falls back to the environment, so blank the variable the CI job sets.
+    vi.stubEnv('PAYLOAD_PUBLIC_SERVER_URL', '');
     const dispatch = vi.fn().mockResolvedValue([]);
     await notifyNeedsReview({ payload: fakePayload(), count: 1, titles: ['A'], skip: false, serverUrl: undefined, dispatch });
     expect(dispatch.mock.calls[0]?.[0]).toEqual({ event: 'video.needs-review', data: { count: 1, titles: ['A'] } });
