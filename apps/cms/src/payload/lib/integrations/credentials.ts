@@ -1,3 +1,5 @@
+import { parsePlaylistId } from '../videos/playlist-id';
+import type { WebhookEventName } from '../webhooks/dispatch';
 import { decrypt, isEncrypted } from './secrets';
 
 /**
@@ -54,7 +56,7 @@ export interface TeamsCredentials {
     displayName: string;
     aadObjectId: string;
     upn: string;
-    triggerOn?: ReadonlyArray<'document.published' | 'lead.submitted'>;
+    triggerOn?: ReadonlyArray<WebhookEventName>;
   }>;
 }
 
@@ -192,6 +194,44 @@ export interface CruxCredentials {
 export const resolveCruxCredentials = (): CruxCredentials | null => {
   const apiKey = process.env.CRUX_API_KEY;
   return apiKey ? { apiKey } : null;
+};
+
+// ─── YouTube (video sync) ────────────────────────────────────────
+
+export interface YoutubeCredentials {
+  /** null selects the no-key RSS client: a missing key is a supported mode, not an error. */
+  readonly apiKey: string | null;
+  readonly channelId: string;
+  /** Playlist whose members are suggested the Explainer category; null when unset or invalid. */
+  readonly explainerPlaylistId: string | null;
+  readonly demoPlaylistId: string | null;
+  /** Names of playlist env vars that were set but held neither a playlist id nor a youtube.com URL. */
+  readonly invalidPlaylistVars: readonly string[];
+}
+
+const PLAYLIST_VARS = {
+  explainer: 'YOUTUBE_EXPLAINER_PLAYLIST_ID',
+  demo: 'YOUTUBE_DEMO_PLAYLIST_ID',
+} as const;
+
+export const resolveYoutubeCredentials = (): YoutubeCredentials => {
+  const invalidPlaylistVars: string[] = [];
+  const playlist = (name: string): string | null => {
+    const raw = readEnv(name);
+    if (!raw) return null;
+    const id = parsePlaylistId(raw);
+    if (!id) invalidPlaylistVars.push(name);
+    return id;
+  };
+  const explainerPlaylistId = playlist(PLAYLIST_VARS.explainer);
+  const demoPlaylistId = playlist(PLAYLIST_VARS.demo);
+  return {
+    apiKey: readEnv('YOUTUBE_API_KEY'),
+    channelId: readEnv('YOUTUBE_CHANNEL_ID') ?? 'UC13c-XRmRlkWpp6WMG9SDjw',
+    explainerPlaylistId,
+    demoPlaylistId,
+    invalidPlaylistVars,
+  };
 };
 
 // ─── MS Clarity ──────────────────────────────────────────────────

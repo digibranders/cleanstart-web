@@ -161,3 +161,23 @@ No migration. The advisory body is now one rich-text box (`body`, "Advisory cont
 ### 25. Dropped two Knowledge Hub pages (2026-10-28)
 
 Done on prod already; nothing to run. `knowledge-hub/no-shell-read-only` (a stub pointing at two other guides) and `knowledge-hub/rekor-publishing` were deleted with `scripts/drop-knowledge-hub-pages.ts`, which first wrote a 301 for each: to `/knowledge-hub/combined-security-model` and `/knowledge-hub/image-signing-sigstore`. The script purges the web cache, but a script that ends with `process.exit` kills the deferred search-index delete, so the two Meilisearch documents (`knowledgeBase_3`, `knowledgeBase_84`) had to be removed by hand. After any scripted delete, check the index. The sitemap needed its `sitemap:knowledgeBase` tag purged as well.
+
+### 26. Videos CMS cutover
+
+Until this runs, `/videos` reads `apps/web/src/lib/videos-catalog.ts` plus the YouTube RSS feed. The `videos` and `videoTopics` collections, the hourly `syncYoutubeVideos` task and the web CMS reader are already in the code; `VIDEOS_SOURCE` decides which one the site uses.
+
+0. **Create the YouTube API key** (the length of each video is read from YouTube with it, and videos that go private or are removed are hidden from the page). In Google Cloud: create or pick a project, enable "YouTube Data API v3", create an API key under Credentials and restrict it to that API. Add it as the GitHub Actions secret `YOUTUBE_API_KEY`. The key is free for this volume (one small request per hour).
+1. **Deploy the CMS** (migration `20261031_100000_add_videos` runs on boot). Check `/api/health`, then that the `videos` collection opens in the admin.
+2. **Backfill.** On the droplet, in the cms container:
+   ```bash
+   /app/node_modules/.bin/tsx scripts/seed-videos-from-catalog.ts          # dry run, writes nothing
+   /app/node_modules/.bin/tsx scripts/seed-videos-from-catalog.ts --apply
+   ```
+   Creates 11 topics and 14 published videos (explainers and product demos only) with the slugs from the code catalog. A slug conflict stops the run before any write. Re-running plans nothing. Publish webhooks are skipped and web revalidation is sent once at the end.
+3. **Compare.** Open `/videos` with `VIDEOS_SOURCE=cms` on a preview deploy and check it matches production. There are no per-video pages: videos play inline.
+4. **Flip.** Set `VIDEOS_SOURCE=cms` in Vercel production env and redeploy. Rollback is unsetting it and redeploying.
+5. **Keep for a week**, then delete `videos-catalog.ts` and the feed merge from `apps/web`.
+
+**Suggested category and the Teams message.** Create two public YouTube playlists on the channel, one for explainers and one for product demos, and set the repository variables `YOUTUBE_EXPLAINER_PLAYLIST_ID` and `YOUTUBE_DEMO_PLAYLIST_ID` (a playlist id or its full `youtube.com/playlist?list=` URL), then redeploy the CMS. Adding a new upload to one of them before the next hourly run pre-fills its Category; a video in both playlists, or in neither, gets no suggestion. The value is written only when the draft is created and is never touched by later syncs. For the "new videos need review" Teams message, add a Teams integration row with the event `video.needs-review` (or leave its events empty for all events); one message goes out per sync run that imports at least one video, with a button to the Needs review list, which is built from `PAYLOAD_PUBLIC_SERVER_URL`.
+
+New uploads land as `needs-review` drafts. An editor chooses the category, at least one topic and a summary, then publishes (the publish gate blocks otherwise). The admin dashboard shows a "Videos to review" card that opens the filtered list. Without `YOUTUBE_API_KEY` the sync falls back to the YouTube RSS feed, which carries no length and cannot tell that a video was removed, so editors would type the length in the "Length" field; YouTube's feed endpoint has also been seen returning 404, which is another reason to set the key.

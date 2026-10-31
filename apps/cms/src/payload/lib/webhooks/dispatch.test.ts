@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { destinationsFromEnv, dispatchEvent } from './dispatch';
+import { type WebhookEventName, destinationsFromEnv, dispatchEvent } from './dispatch';
 import { verifyWebhook } from './sign';
 
 describe('destinationsFromEnv', () => {
@@ -43,11 +43,11 @@ describe('destinationsFromEnv', () => {
       WEBHOOK_TEAMS_URL: 'https://x',
       WEBHOOK_TEAMS_EVENTS: 'bogus.event',
     } as unknown as NodeJS.ProcessEnv);
-    expect(dests[0]?.routing.events).toEqual(['document.published', 'lead.submitted']);
+    expect(dests[0]?.routing.events).toEqual(['document.published', 'lead.submitted', 'video.needs-review']);
   });
 });
 
-const teamsDest = (id: string, events: ('document.published' | 'lead.submitted')[]) => ({
+const teamsDest = (id: string, events: WebhookEventName[]) => ({
   id,
   source: 'env' as const,
   kind: 'teams' as const,
@@ -93,6 +93,18 @@ describe('dispatchEvent', () => {
       { destinations: [dest], fetch: fetchMock as unknown as typeof fetch },
     );
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('posts a video.needs-review card to a Teams row subscribed to it, and skips one that is not', async () => {
+    const fetchMock = vi.fn(async (_url: string, _init?: RequestInit) => new Response(null, { status: 202 }));
+    const event = { event: 'video.needs-review' as const, data: { count: 2, titles: ['A', 'B'] } };
+    await dispatchEvent(event, {
+      destinations: [teamsDest('other', ['document.published']), teamsDest('videos', ['video.needs-review'])],
+      fetch: fetchMock as unknown as typeof fetch,
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0]?.[0]).toBe('https://videos');
+    expect(String(fetchMock.mock.calls[0]?.[1]?.body)).toContain('2 new videos need review');
   });
 
   it('applies routing.formSlugs filter to lead.submitted events', async () => {

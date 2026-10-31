@@ -256,6 +256,7 @@ const teamsConfigGroup: Field = {
           options: [
             { label: 'When content is published', value: 'document.published' },
             { label: 'When a form is submitted', value: 'lead.submitted' },
+            { label: 'When new videos need review', value: 'video.needs-review' },
           ],
           admin: {
             description: 'Optional — only mention this person for specific event types. Leave empty to mention them on all notifications.',
@@ -580,6 +581,7 @@ export const Integrations: CollectionConfig = {
           options: [
             { label: 'document.published — on first publish of a content doc', value: 'document.published' },
             { label: 'lead.submitted — on every public form submission', value: 'lead.submitted' },
+            { label: 'video.needs-review: when a sync run imports new videos', value: 'video.needs-review' },
           ],
           admin: {
             components: {

@@ -47,6 +47,19 @@ describe('webhooksPublishAfterChangeHook', () => {
     );
   });
 
+  it('stays quiet when the write opts out with skipPublishWebhooks (bulk backfills)', async () => {
+    const hook = webhooksPublishAfterChangeHook('videos');
+    const req = { ...makeReq(), context: { skipPublishWebhooks: true } } as unknown as Parameters<
+      ReturnType<typeof webhooksPublishAfterChangeHook>
+    >[0]['req'];
+    await hook({
+      doc: { id: 1, slug: 'x', title: 'X', _status: 'published', updatedAt: '2026-05-05' },
+      previousDoc: { _status: 'draft' },
+      req,
+    } as unknown as Parameters<ReturnType<typeof webhooksPublishAfterChangeHook>>[0]);
+    expect(dispatchSpy).not.toHaveBeenCalled();
+  });
+
   it('includes updatedAt only when re-publishing older content (publishedAt much earlier)', async () => {
     dispatchSpy.mockResolvedValueOnce([]);
     const hook = webhooksPublishAfterChangeHook('blogs');

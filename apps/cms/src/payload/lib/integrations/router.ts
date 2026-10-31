@@ -7,6 +7,8 @@ import type { WebhookEvent, WebhookEventName } from '../webhooks/dispatch';
  *   collections  — limit `document.published` to specific collection slugs
  *   formSlugs    — limit `lead.submitted` to specific form slugs
  *
+ * `video.needs-review` has no filters beyond `events`.
+ *
  * Empty arrays mean "no filter" for all three. An empty `events` list is
  * "subscribe to everything" — matching the admin UI, which shows an "All
  * events" chip and the guidance "Leave all filters empty to receive

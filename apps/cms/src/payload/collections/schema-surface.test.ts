@@ -3,6 +3,8 @@ import type { CollectionConfig, Field } from 'payload';
 
 import { AboutGalleries } from './AboutGalleries';
 import { Advisories } from './Advisories';
+import { Videos } from './Videos';
+import { VideoTopics } from './VideoTopics';
 import { AuditLog } from './audit-log';
 import { Authors } from './Authors';
 import { Blogs } from './Blogs';
@@ -95,6 +97,8 @@ const collections: { name: string; config: CollectionConfig }[] = [
   { name: 'AboutGalleries', config: AboutGalleries },
   { name: 'AuditLog', config: AuditLog },
   { name: 'Advisories', config: Advisories },
+  { name: 'Videos', config: Videos },
+  { name: 'VideoTopics', config: VideoTopics },
   { name: 'Authors', config: Authors },
   { name: 'Blogs', config: Blogs },
   { name: 'BrokenLinks', config: BrokenLinks },

@@ -1,0 +1,38 @@
+{
+  "slug": "videoTopics",
+  "timestamps": true,
+  "fields": [
+    {
+      "type": "text",
+      "name": "name",
+      "required": true
+    },
+    {
+      "type": "text",
+      "name": "slug",
+      "required": true,
+      "unique": true
+    },
+    {
+      "type": "textarea",
+      "name": "description"
+    },
+    {
+      "type": "array",
+      "name": "aliases",
+      "fields": [
+        {
+          "type": "text",
+          "name": "value",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "hooks": {
+    "beforeChange": 0,
+    "afterChange": 1,
+    "beforeValidate": 0,
+    "afterDelete": 1
+  }
+}

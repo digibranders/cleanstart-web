@@ -150,6 +150,12 @@ import { PointField as PointField_dc800e7ca3d2eb7ea39fd4bc6138c687 } from '@/pay
 import { RadioField as RadioField_31aae9b520654e49d40e444571bafe41 } from '@/payload/admin/components/fields/RadioField.tsx'
 import { TabsField as TabsField_c014faddfba6da88b9efedda256f4990 } from '@/payload/admin/components/fields/TabsField.tsx'
 import { RowField as RowField_1ef7316c3d3f9450222b0eb086a8e243 } from '@/payload/admin/components/fields/RowField.tsx'
+import { VideoSourceSummary as VideoSourceSummary_c96fbcdf17e1ea6b0ec94f543434cd27 } from '@/payload/admin/components/VideoSourceSummary.tsx'
+import { VideoThumbCell as VideoThumbCell_a6fc69bad4fd684c1000e3675bb5a77a } from '@/payload/admin/components/VideoThumbCell.tsx'
+import { VideoLengthCell as VideoLengthCell_4ae28695c16ecdf12c15a176eb6e0774 } from '@/payload/admin/components/VideoLengthCell.tsx'
+import { VideoStateCell as VideoStateCell_70d255ecab4ca7e768a3cff708566031 } from '@/payload/admin/components/VideoStateCell.tsx'
+import { VideoTopicSuggestions as VideoTopicSuggestions_354abe4af848e2bbd6afc4620ae30591 } from '@/payload/admin/components/VideoTopicSuggestions.tsx'
+import { UseDescriptionSummary as UseDescriptionSummary_19de247a3719b8cb4c2371ecb84ed232 } from '@/payload/admin/components/UseDescriptionSummary.tsx'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
@@ -304,5 +310,11 @@ export const importMap = {
   "@/payload/admin/components/fields/PointField.tsx#PointField": PointField_dc800e7ca3d2eb7ea39fd4bc6138c687,
   "@/payload/admin/components/fields/RadioField.tsx#RadioField": RadioField_31aae9b520654e49d40e444571bafe41,
   "@/payload/admin/components/fields/TabsField.tsx#TabsField": TabsField_c014faddfba6da88b9efedda256f4990,
-  "@/payload/admin/components/fields/RowField.tsx#RowField": RowField_1ef7316c3d3f9450222b0eb086a8e243
+  "@/payload/admin/components/fields/RowField.tsx#RowField": RowField_1ef7316c3d3f9450222b0eb086a8e243,
+  "@/payload/admin/components/VideoSourceSummary.tsx#VideoSourceSummary": VideoSourceSummary_c96fbcdf17e1ea6b0ec94f543434cd27,
+  "@/payload/admin/components/VideoThumbCell.tsx#VideoThumbCell": VideoThumbCell_a6fc69bad4fd684c1000e3675bb5a77a,
+  "@/payload/admin/components/VideoLengthCell.tsx#VideoLengthCell": VideoLengthCell_4ae28695c16ecdf12c15a176eb6e0774,
+  "@/payload/admin/components/VideoStateCell.tsx#VideoStateCell": VideoStateCell_70d255ecab4ca7e768a3cff708566031,
+  "@/payload/admin/components/VideoTopicSuggestions.tsx#VideoTopicSuggestions": VideoTopicSuggestions_354abe4af848e2bbd6afc4620ae30591,
+  "@/payload/admin/components/UseDescriptionSummary.tsx#UseDescriptionSummary": UseDescriptionSummary_19de247a3719b8cb4c2371ecb84ed232,
 }

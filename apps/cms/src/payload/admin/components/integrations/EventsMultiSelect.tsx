@@ -15,6 +15,11 @@ const OPTIONS = [
     sublabel: 'on every public form submission',
     value: 'lead.submitted',
   },
+  {
+    label: 'video.needs-review',
+    sublabel: 'when a sync run imports new videos',
+    value: 'video.needs-review',
+  },
 ] as const;
 
 interface Props {
