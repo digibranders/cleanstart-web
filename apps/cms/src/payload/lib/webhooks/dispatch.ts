@@ -13,7 +13,13 @@ import { buildTeamsPayload, postTeamsWebhook, type TeamsMention } from './teams'
  * change — keeping it locked here means TypeScript catches typos
  * at the call site.
  */
-export type WebhookEventName = 'document.published' | 'lead.submitted';
+export type WebhookEventName = 'document.published' | 'lead.submitted' | 'video.needs-review';
+
+export const WEBHOOK_EVENT_NAMES: readonly WebhookEventName[] = [
+  'document.published',
+  'lead.submitted',
+  'video.needs-review',
+];
 
 export interface WebhookEvent {
   readonly event: WebhookEventName;
@@ -43,15 +49,13 @@ interface GenericDestination extends WebhookDestination {
 
 type AnyDestination = TeamsDestination | GenericDestination;
 
-const ALL_EVENTS: readonly WebhookEventName[] = ['document.published', 'lead.submitted'];
-
 const parseEvents = (raw: string | undefined): readonly WebhookEventName[] => {
-  if (!raw) return ALL_EVENTS;
+  if (!raw) return WEBHOOK_EVENT_NAMES;
   const parsed = raw
     .split(',')
     .map((s) => s.trim())
-    .filter((s): s is WebhookEventName => s === 'document.published' || s === 'lead.submitted');
-  return parsed.length > 0 ? parsed : ALL_EVENTS;
+    .filter((s): s is WebhookEventName => (WEBHOOK_EVENT_NAMES as readonly string[]).includes(s));
+  return parsed.length > 0 ? parsed : WEBHOOK_EVENT_NAMES;
 };
 
 /**

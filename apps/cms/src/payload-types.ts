@@ -69,6 +69,8 @@ export interface Config {
   collections: {
     blogs: Blog;
     advisories: Advisory;
+    videos: Video;
+    videoTopics: VideoTopic;
     news: News;
     guides: Guide;
     'case-studies': CaseStudy;
@@ -127,6 +129,8 @@ export interface Config {
   collectionsSelect: {
     blogs: BlogsSelect<false> | BlogsSelect<true>;
     advisories: AdvisoriesSelect<false> | AdvisoriesSelect<true>;
+    videos: VideosSelect<false> | VideosSelect<true>;
+    videoTopics: VideoTopicsSelect<false> | VideoTopicsSelect<true>;
     news: NewsSelect<false> | NewsSelect<true>;
     guides: GuidesSelect<false> | GuidesSelect<true>;
     'case-studies': CaseStudiesSelect<false> | CaseStudiesSelect<true>;
@@ -220,6 +224,7 @@ export interface Config {
       purgeDealRegistrations: TaskPurgeDealRegistrations;
       refreshContentInsights: TaskRefreshContentInsights;
       refreshCrux: TaskRefreshCrux;
+      syncYoutubeVideos: TaskSyncYoutubeVideos;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -2279,6 +2284,106 @@ export interface Advisory {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * Videos shown on /videos. New YouTube uploads arrive as drafts marked "Needs review": choose a category and topics, write the summary, then publish.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos".
+ */
+export interface Video {
+  id: number;
+  title: string;
+  slug: string;
+  /**
+   * Required to publish. Explainer is "what is" and fundamentals; product demo is how to use the product. Drives the category tabs on /videos.
+   */
+  format?: ('explainer' | 'demo') | null;
+  /**
+   * At least one is required to publish. Drives the topic list on /videos. A topic that does not exist yet can be added from the search box.
+   */
+  topics?: (number | VideoTopic)[] | null;
+  /**
+   * Shown on the card. Required to publish, up to 320 characters.
+   */
+  summary?: string | null;
+  /**
+   * Plays at the top of /videos. Only one video can be featured: publishing this one clears the other. When none is featured, the newest video is.
+   */
+  featured?: boolean | null;
+  /**
+   * Set by the YouTube sync. "Missing" means the video is gone or private on YouTube; it is not unpublished automatically.
+   */
+  syncState?: ('synced' | 'needs-review' | 'missing' | 'manual') | null;
+  /**
+   * The length is read from YouTube. Fill this only when the video shows no length, for example a live stream (1:41).
+   */
+  durationLabel?: string | null;
+  provider: 'youtube' | 'vimeo';
+  /**
+   * The video id on the host (the 11 characters in a YouTube link).
+   */
+  externalId: string;
+  /**
+   * Copied from the host by the sync. Read only.
+   */
+  source?: {
+    title?: string | null;
+    description?: string | null;
+    durationSeconds?: number | null;
+    publishedAt?: string | null;
+    tags?:
+      | {
+          value?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    privacyStatus?: string | null;
+    embeddable?: boolean | null;
+    hasMaxres?: boolean | null;
+    thumbnailUrl?: string | null;
+    contentHash?: string | null;
+    fetchedAt?: string | null;
+  };
+  /**
+   * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
+   */
+  publishedAt?: string | null;
+  /**
+   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
+   */
+  displayPublishedAt?: string | null;
+  /**
+   * Set automatically when the title, body, summary or FAQs change. Shown publicly as the "Updated" date.
+   */
+  contentUpdatedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videoTopics".
+ */
+export interface VideoTopic {
+  id: number;
+  name: string;
+  /**
+   * URL-safe slug. Auto-generated from "name" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
+   */
+  slug: string;
+  description?: string | null;
+  /**
+   * YouTube tags and hashtags that suggest this topic on import, e.g. "sbom" or "software bill of materials". Case and spacing are ignored.
+   */
+  aliases?:
+    | {
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -9307,7 +9412,7 @@ export interface Integration {
    * Choose which activity on the site triggers a notification. Leave all filters empty to receive everything.
    */
   routing?: {
-    events?: ('document.published' | 'lead.submitted')[] | null;
+    events?: ('document.published' | 'lead.submitted' | 'video.needs-review')[] | null;
     /**
      * Filter document.published events by collection. Empty = all collections.
      */
@@ -9358,7 +9463,7 @@ export interface Integration {
           /**
            * Optional — only mention this person for specific event types. Leave empty to mention them on all notifications.
            */
-          triggerOn?: ('document.published' | 'lead.submitted')[] | null;
+          triggerOn?: ('document.published' | 'lead.submitted' | 'video.needs-review')[] | null;
           id?: string | null;
         }[]
       | null;
@@ -9683,7 +9788,7 @@ export interface WebhooksDeadLetter {
    * Unique ID for this delivery attempt (UUID).
    */
   webhookId: string;
-  event: 'document.published' | 'lead.submitted';
+  event: 'document.published' | 'lead.submitted' | 'video.needs-review';
   /**
    * Full event data blob. Used to re-run the delivery on retry.
    */
@@ -9815,6 +9920,7 @@ export interface PayloadJob {
           | 'purgeDealRegistrations'
           | 'refreshContentInsights'
           | 'refreshCrux'
+          | 'syncYoutubeVideos'
           | 'schedulePublish';
         taskID: string;
         input?:
@@ -9867,6 +9973,7 @@ export interface PayloadJob {
         | 'purgeDealRegistrations'
         | 'refreshContentInsights'
         | 'refreshCrux'
+        | 'syncYoutubeVideos'
         | 'schedulePublish'
       )
     | null;
@@ -9899,6 +10006,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'advisories';
         value: number | Advisory;
+      } | null)
+    | ({
+        relationTo: 'videos';
+        value: number | Video;
+      } | null)
+    | ({
+        relationTo: 'videoTopics';
+        value: number | VideoTopic;
       } | null)
     | ({
         relationTo: 'news';
@@ -10465,6 +10580,65 @@ export interface AdvisoriesSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos_select".
+ */
+export interface VideosSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  format?: T;
+  topics?: T;
+  summary?: T;
+  featured?: T;
+  syncState?: T;
+  durationLabel?: T;
+  provider?: T;
+  externalId?: T;
+  source?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        durationSeconds?: T;
+        publishedAt?: T;
+        tags?:
+          | T
+          | {
+              value?: T;
+              id?: T;
+            };
+        privacyStatus?: T;
+        embeddable?: T;
+        hasMaxres?: T;
+        thumbnailUrl?: T;
+        contentHash?: T;
+        fetchedAt?: T;
+      };
+  publishedAt?: T;
+  displayPublishedAt?: T;
+  contentUpdatedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videoTopics_select".
+ */
+export interface VideoTopicsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  aliases?:
+    | T
+    | {
+        value?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -14882,6 +15056,14 @@ export interface TaskRefreshCrux {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskSyncYoutubeVideos".
+ */
+export interface TaskSyncYoutubeVideos {
+  input?: unknown;
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "TaskSchedulePublish".
  */
 export interface TaskSchedulePublish {
@@ -14896,6 +15078,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'advisories';
           value: number | Advisory;
+        } | null)
+      | ({
+          relationTo: 'videos';
+          value: number | Video;
         } | null)
       | ({
           relationTo: 'news';

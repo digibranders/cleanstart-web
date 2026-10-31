@@ -57,6 +57,7 @@ export const WebhookDeadLetter: CollectionConfig = {
       options: [
         { label: 'document.published', value: 'document.published' },
         { label: 'lead.submitted', value: 'lead.submitted' },
+        { label: 'video.needs-review', value: 'video.needs-review' },
       ],
     },
     {

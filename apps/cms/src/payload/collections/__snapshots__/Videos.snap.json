@@ -1,0 +1,190 @@
+{
+  "slug": "videos",
+  "versions": {
+    "drafts": true
+  },
+  "timestamps": true,
+  "fields": [
+    {
+      "type": "ui",
+      "name": "youtubePreview"
+    },
+    {
+      "type": "text",
+      "name": "title",
+      "required": true
+    },
+    {
+      "type": "text",
+      "name": "slug",
+      "required": true,
+      "unique": true
+    },
+    {
+      "type": "radio",
+      "name": "format",
+      "options": [
+        {
+          "value": "explainer"
+        },
+        {
+          "value": "demo"
+        }
+      ]
+    },
+    {
+      "type": "relationship",
+      "name": "topics",
+      "hasMany": true,
+      "relationTo": "videoTopics"
+    },
+    {
+      "type": "ui",
+      "name": "topicSuggestions"
+    },
+    {
+      "type": "textarea",
+      "name": "summary"
+    },
+    {
+      "type": "ui",
+      "name": "summaryFromYoutube"
+    },
+    {
+      "type": "checkbox",
+      "name": "featured"
+    },
+    {
+      "type": "select",
+      "name": "syncState",
+      "options": [
+        {
+          "value": "synced"
+        },
+        {
+          "value": "needs-review"
+        },
+        {
+          "value": "missing"
+        },
+        {
+          "value": "manual"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "durationLabel"
+    },
+    {
+      "type": "collapsible",
+      "fields": [
+        {
+          "type": "select",
+          "name": "provider",
+          "required": true,
+          "options": [
+            {
+              "value": "youtube"
+            },
+            {
+              "value": "vimeo"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "name": "externalId",
+          "required": true,
+          "unique": true
+        },
+        {
+          "type": "group",
+          "name": "source",
+          "fields": [
+            {
+              "type": "text",
+              "name": "title"
+            },
+            {
+              "type": "textarea",
+              "name": "description"
+            },
+            {
+              "type": "number",
+              "name": "durationSeconds"
+            },
+            {
+              "type": "date",
+              "name": "publishedAt"
+            },
+            {
+              "type": "array",
+              "name": "tags",
+              "fields": [
+                {
+                  "type": "text",
+                  "name": "value"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "name": "privacyStatus"
+            },
+            {
+              "type": "checkbox",
+              "name": "embeddable"
+            },
+            {
+              "type": "checkbox",
+              "name": "hasMaxres"
+            },
+            {
+              "type": "text",
+              "name": "thumbnailUrl"
+            },
+            {
+              "type": "text",
+              "name": "contentHash"
+            },
+            {
+              "type": "date",
+              "name": "fetchedAt"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ui",
+      "name": "thumb"
+    },
+    {
+      "type": "ui",
+      "name": "length"
+    },
+    {
+      "type": "ui",
+      "name": "state"
+    },
+    {
+      "type": "date",
+      "name": "publishedAt"
+    },
+    {
+      "type": "date",
+      "name": "displayPublishedAt"
+    },
+    {
+      "type": "date",
+      "name": "contentUpdatedAt"
+    }
+  ],
+  "hooks": {
+    "beforeChange": 5,
+    "afterChange": 3,
+    "beforeValidate": 0,
+    "afterDelete": 1
+  }
+}

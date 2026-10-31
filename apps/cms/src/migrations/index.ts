@@ -66,6 +66,7 @@ import * as migration_20261023_120000_add_advisories from './20261023_120000_add
 import * as migration_20261027_120000_advisories_structured_fields from './20261027_120000_advisories_structured_fields';
 import * as migration_20261028_120000_advisories_cover_title from './20261028_120000_advisories_cover_title';
 import * as migration_20261026_120000_add_missing_job_log_task_slugs from './20261026_120000_add_missing_job_log_task_slugs';
+import * as migration_20261031_100000_add_videos from './20261031_100000_add_videos';
 
 export const migrations = [
   {
@@ -382,5 +383,10 @@ export const migrations = [
     up: migration_20261028_120000_advisories_cover_title.up,
     down: migration_20261028_120000_advisories_cover_title.down,
     name: '20261028_120000_advisories_cover_title',
+  },
+  {
+    up: migration_20261031_100000_add_videos.up,
+    down: migration_20261031_100000_add_videos.down,
+    name: '20261031_100000_add_videos',
   },
 ];

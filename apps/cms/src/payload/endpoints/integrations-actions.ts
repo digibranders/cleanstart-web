@@ -8,7 +8,7 @@ import {
 } from '../lib/integrations/credentials';
 import { dispatchEvent } from '../lib/webhooks/dispatch';
 import type { TeamsMention } from '../lib/webhooks/teams';
-import type { WebhookEventName } from '../lib/webhooks/dispatch';
+import type { WebhookEvent, WebhookEventName } from '../lib/webhooks/dispatch';
 
 const json = (data: unknown, init?: ResponseInit): Response =>
   new Response(JSON.stringify(data), {
@@ -37,24 +37,33 @@ interface IntegrationRow {
   } | null;
 }
 
-const fixtureEvent = (event: WebhookEventName) =>
-  event === 'lead.submitted'
-    ? {
-        event: 'lead.submitted' as const,
+const fixtureEvent = (event: WebhookEventName): WebhookEvent => {
+  switch (event) {
+    case 'lead.submitted':
+      return {
+        event,
         data: {
           formSlug: '_integration_test',
           duplicate: false,
           source: 'cms' as const,
         },
-      }
-    : {
-        event: 'document.published' as const,
+      };
+    case 'video.needs-review':
+      return {
+        event,
+        data: { count: 1, titles: ['Integration test video'] },
+      };
+    case 'document.published':
+      return {
+        event,
         data: {
           collection: '_integration_test',
           slug: 'integration-test',
           title: 'Integration test',
         },
       };
+  }
+};
 
 /**
  * POST /api/integrations/:id/test

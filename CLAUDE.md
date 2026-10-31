@@ -311,7 +311,7 @@ that triggers each and the file that sends it.
 
 ## Background jobs
 
-Twelve cron tasks in `apps/cms/src/payload/jobs/`. All gated by `PAYLOAD_AUTO_RUN=true` — set this in `.env` to enable; omitting it (e.g. in test runs) prevents spurious fires.
+Thirteen cron tasks in `apps/cms/src/payload/jobs/`. All gated by `PAYLOAD_AUTO_RUN=true` — set this in `.env` to enable; omitting it (e.g. in test runs) prevents spurious fires.
 
 | Job | Schedule (UTC) | File |
 |-----|---------------|------|
@@ -327,6 +327,7 @@ Twelve cron tasks in `apps/cms/src/payload/jobs/`. All gated by `PAYLOAD_AUTO_RU
 | Meilisearch reindex | daily 05:00 | `reindex-meili.ts` |
 | Content-insights snapshot rebuild | daily 06:30 | `refresh-content-insights.ts` |
 | Core Web Vitals (CrUX) refresh | daily 06:45 | `refresh-crux.ts` (no-op without `CRUX_API_KEY`) |
+| YouTube video sync | hourly :07 | `sync-youtube-videos.ts` (RSS without `YOUTUBE_API_KEY`, Data API with it; new uploads become needs-review drafts) |
 
 Update this table when adding/changing jobs. Every job needs a test file and the `PAYLOAD_AUTO_RUN` gate.
 

@@ -88,3 +88,62 @@ describe('publishGateHook — allows SEO char-length issues through', () => {
     expect(() => runHook(data)).not.toThrow();
   });
 });
+
+describe('runPublishChecks: videos', () => {
+  const readyVideo = {
+    ...validBase,
+    format: 'explainer',
+    topics: [4],
+    summary: 'What the scanner reports and how to read it.',
+    durationLabel: '4:12',
+  };
+  const find = (data: Record<string, unknown>, id: string) =>
+    runPublishChecks(data, 'videos').find((c) => c.id === id);
+
+  it('passes every video check for a complete video', () => {
+    const failing = runPublishChecks(readyVideo, 'videos').filter(
+      (c) => !c.pass && c.id.startsWith('video-'),
+    );
+    expect(failing).toEqual([]);
+  });
+
+  it.each([
+    ['video-format', { format: undefined }],
+    ['video-topics', { topics: [] }],
+    ['video-summary', { summary: '   ' }],
+  ])('blocks publishing without %s', (id, patch) => {
+    const check = find({ ...readyVideo, ...patch }, id);
+    expect(check?.severity).toBe('blocker');
+    expect(check?.pass).toBe(false);
+  });
+
+  it('only warns when the duration is unknown', () => {
+    const check = find({ ...readyVideo, durationLabel: undefined }, 'video-duration');
+    expect(check?.severity).toBe('warn');
+    expect(check?.pass).toBe(false);
+  });
+
+  it('accepts a duration that came from the source', () => {
+    const check = find(
+      { ...readyVideo, durationLabel: undefined, source: { durationSeconds: 252 } },
+      'video-duration',
+    );
+    expect(check?.pass).toBe(true);
+  });
+
+  it('runs no page checks (SEO title, slug, meta description) on a video', () => {
+    const ids = runPublishChecks(readyVideo, 'videos').map((c) => c.id);
+    expect(ids.every((id) => id.startsWith('video-'))).toBe(true);
+  });
+
+  it('adds no video checks to other collections', () => {
+    const ids = runPublishChecks(validBase, 'blogs').map((c) => c.id);
+    expect(ids.some((id) => id.startsWith('video-'))).toBe(false);
+  });
+
+  it('rejects a publish that is missing a format', () => {
+    expect(() =>
+      runHook({ ...readyVideo, format: undefined, _status: 'published' }, 'videos'),
+    ).toThrow(ValidationError);
+  });
+});
