@@ -5486,6 +5486,18 @@ body {
   border-bottom: none;
 }
 
+/* Tables that carry inline code (digests, flags, versions) size columns to
+   their content and let long tokens wrap, so a 64-character digest never
+   pushes the table wider than its wrapper and hides the first column. */
+.article-body .article-table:has(.cs-inline-code) {
+  table-layout: auto;
+}
+
+.article-body .article-table .cs-inline-code {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
 /* Tighter cell padding on small screens so more columns fit before the
    wrapper starts scrolling. */
 @media (max-width: 640px) {

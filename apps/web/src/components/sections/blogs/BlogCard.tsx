@@ -1,18 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Blog } from "@/lib/blog";
-import { BLOGS_SECTION, formatBlogDate, mediaUrl } from "@/lib/blog-utils";
-import type { ContentSection } from "@/lib/blog-utils";
+import { formatBlogDate, mediaUrl } from "@/lib/blog-utils";
 import { effectivePublishedAt } from "@/lib/published-date";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
 import { CardCoverFallback } from "@/components/ui/CardCoverFallback";
 
 interface BlogCardProps {
   post: Blog;
-  section?: ContentSection | undefined;
 }
 
-export function BlogCard({ post, section = BLOGS_SECTION }: BlogCardProps): React.ReactElement {
+export function BlogCard({ post }: BlogCardProps): React.ReactElement {
   const date = formatBlogDate(effectivePublishedAt(post));
   const readTime = post.readingMinutes ? `${post.readingMinutes} min read` : null;
   const primaryCategory = post.categories ?? undefined;
@@ -140,7 +138,7 @@ export function BlogCard({ post, section = BLOGS_SECTION }: BlogCardProps): Reac
         </div>
 
         <Link
-          href={`${section.basePath}/${post.slug}`}
+          href={`/blogs/${post.slug}`}
           className="flex items-center"
           style={{ gap: "8px" }}
           aria-label={`Read more about ${post.title}`}

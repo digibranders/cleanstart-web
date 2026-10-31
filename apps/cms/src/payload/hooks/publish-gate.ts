@@ -20,7 +20,6 @@ const WORD_COUNT_COLLECTIONS = new Set(['blogs', 'advisories', 'news', 'guides']
 /** Collections that have a featuredImage field. */
 const HAS_FEATURED_IMAGE = new Set([
   'blogs',
-  'advisories',
   'news',
   'guides',
   'resources',

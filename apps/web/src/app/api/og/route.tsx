@@ -1,6 +1,8 @@
 import { ImageResponse } from "next/og";
 import { pickTitleSize, splitTitleAccent } from "./render";
+import { ADVISORY_STATUSES, type AdvisoryFixStatus } from "@/lib/advisory-utils";
 import type { OgVariant } from "@/lib/seo/og";
+import { AdvisoryCard } from "./advisory-card";
 
 export const runtime = "edge";
 
@@ -29,7 +31,8 @@ const fonts = (async () => {
 
 export async function GET(req: Request): Promise<ImageResponse> {
   const { searchParams, origin } = new URL(req.url);
-  const variant = (searchParams.get("variant") === "hero" ? "hero" : "default") as OgVariant;
+  const requested = searchParams.get("variant");
+  const variant = (requested === "hero" ? "hero" : "default") as OgVariant;
   const title = (searchParams.get("title") || FALLBACK_TITLE).slice(0, 200);
   const eyebrow = (searchParams.get("eyebrow") || "").slice(0, 40);
   const accent = (searchParams.get("accent") || "").slice(0, 120);
@@ -38,6 +41,35 @@ export async function GET(req: Request): Promise<ImageResponse> {
   const { lead, accent: accentText } = splitTitleAccent(title, accent);
   const titleSize = pickTitleSize(title, variant);
   const fontData = await fonts;
+  const imageOptions = {
+    width: WIDTH,
+    height: HEIGHT,
+    fonts: fontData,
+    headers: { "cache-control": "public, immutable, no-transform, max-age=31536000" },
+  };
+
+  // An advisory card needs a real score and a known status; anything else falls
+  // through to the generic card rather than printing "NaN".
+  const cvssScore = Number(searchParams.get("cvss"));
+  const status = ADVISORY_STATUSES.find((s) => s.value === searchParams.get("status"))?.value;
+  if (requested === "advisory" && Number.isFinite(cvssScore) && cvssScore >= 0 && cvssScore <= 10 && status) {
+    return new ImageResponse(
+      (
+        <AdvisoryCard
+          origin={origin}
+          width={WIDTH}
+          height={HEIGHT}
+          gridSvg={GRID_SVG}
+          title={title}
+          cvssScore={cvssScore}
+          status={status as AdvisoryFixStatus}
+          technology={(searchParams.get("tech") || "").slice(0, 40)}
+          cves={(searchParams.get("cves") || "").split(",").map((c) => c.trim()).filter(Boolean).slice(0, 6)}
+        />
+      ),
+      imageOptions,
+    );
+  }
 
   return new ImageResponse(
     (
@@ -105,11 +137,6 @@ export async function GET(req: Request): Promise<ImageResponse> {
         </div>
       </div>
     ),
-    {
-      width: WIDTH,
-      height: HEIGHT,
-      fonts: fontData,
-      headers: { "cache-control": "public, immutable, no-transform, max-age=31536000" },
-    },
+    imageOptions,
   );
 }

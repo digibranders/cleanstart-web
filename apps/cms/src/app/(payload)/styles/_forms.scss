@@ -55,11 +55,12 @@
 //      and the button stack at the left.
 //   2. Re-pin the badge to the right via `margin-left: auto` on the
 //      LAST non-button child. (No badge → selector matches nothing,
-//      no-op for plain text labels.)
+//      no-op for plain text labels.) The required asterisk is not a
+//      badge: it stays next to the label text.
 .field-label:has(.cs-field-info) {
   justify-content: flex-start;
 
-  > :last-child:not(.cs-field-info) {
+  > :last-child:not(.cs-field-info, .required) {
     margin-left: auto;
   }
 }

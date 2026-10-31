@@ -3,8 +3,6 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import type { BlogCategory } from "@/lib/blog";
-import { BLOGS_SECTION } from "@/lib/blog-utils";
-import type { ContentSection } from "@/lib/blog-utils";
 
 /**
  * Category pill row for the blogs hero. Reads the active category straight from
@@ -16,23 +14,21 @@ import type { ContentSection } from "@/lib/blog-utils";
  */
 export function BlogsCategoryNav({
   categories,
-  section = BLOGS_SECTION,
 }: {
   categories: BlogCategory[];
-  section?: ContentSection | undefined;
 }): React.ReactElement {
   const active = useSearchParams().get("category") ?? "";
   return (
     <nav
       className="-mx-6 sm:mx-0 lg:flex-wrap lg:justify-center flex items-center gap-[10px] overflow-x-auto lg:overflow-visible px-6 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden w-screen sm:w-auto"
-      aria-label={`${section.label} categories`}
+      aria-label="Blog categories"
     >
-      <CategoryPill label="All" href={section.basePath} active={active === ""} />
+      <CategoryPill label="All" href="/blogs" active={active === ""} />
       {categories.map((cat) => (
         <CategoryPill
           key={cat.id}
           label={cat.name}
-          href={`${section.basePath}?category=${cat.slug}`}
+          href={`/blogs?category=${cat.slug}`}
           active={active === cat.slug}
         />
       ))}

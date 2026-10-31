@@ -4,7 +4,6 @@
 //
 // Type-only import — erased at runtime, so this does not create a runtime cycle
 // with `blog.ts` (which re-exports these for server-side backward compat).
-import type { DetailKind } from "@cleanstart/schema/builders";
 import type { BlogImage } from "./blog";
 
 // `NEXT_PUBLIC_CMS_URL` is inlined at build time, so this is safe on the client
@@ -46,9 +45,9 @@ export function formatBlogDate(iso?: string): string {
 }
 
 /**
- * Which listing a blog-shaped card or page belongs to. Blogs and Advisories
- * share the listing and article components; this carries the bits that differ
- * (URL prefix, visible label, breadcrumb trail). Components default to Blogs.
+ * Which listing the shared listing hero belongs to. Blogs and Advisories
+ * share `BlogsHero`; this carries the bits that differ
+ * (URL prefix and copy). Components default to Blogs.
  */
 export interface ContentSection {
   basePath: string;
@@ -56,7 +55,6 @@ export interface ContentSection {
   subtitle: string;
   featuredLabel: string;
   searchPlaceholder: string;
-  breadcrumbKind: DetailKind;
 }
 
 export const BLOGS_SECTION: ContentSection = {
@@ -65,7 +63,6 @@ export const BLOGS_SECTION: ContentSection = {
   subtitle: "A Curated Collection of Writings, Research, and Solutions",
   featuredLabel: "FEATURED ARTICLES",
   searchPlaceholder: "Search articles of your interest...",
-  breadcrumbKind: "blog",
 };
 
 export const ADVISORIES_SECTION: ContentSection = {
@@ -73,6 +70,5 @@ export const ADVISORIES_SECTION: ContentSection = {
   label: "Advisories",
   subtitle: "Critical Vulnerabilities, Affected Versions, and Fixes",
   featuredLabel: "FEATURED ADVISORY",
-  searchPlaceholder: "Search advisories...",
-  breadcrumbKind: "advisory",
+  searchPlaceholder: "Search by CVE ID or name...",
 };

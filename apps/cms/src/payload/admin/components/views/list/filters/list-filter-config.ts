@@ -1,3 +1,5 @@
+import { ADVISORY_STATUS_OPTIONS } from '../../../../../lib/advisory-status';
+
 export type ListFilterFieldConfig =
   | {
       readonly kind: 'options';
@@ -36,7 +38,7 @@ export const LIST_FILTER_FIELDS: Record<string, ReadonlyArray<ListFilterFieldCon
     STATUS_FILTER,
   ],
   advisories: [
-    { kind: 'relationship', name: 'authors', label: 'Author', relationTo: 'authors' },
+    { kind: 'options', name: 'fixStatus', label: 'Status', options: ADVISORY_STATUS_OPTIONS },
     STATUS_FILTER,
   ],
   videos: [

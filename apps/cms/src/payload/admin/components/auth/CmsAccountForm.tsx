@@ -9,6 +9,7 @@ import { showToast } from '../ToastBus';
 type FormState = {
   name: string;
   email: string;
+  currentPassword: string;
   newPassword: string;
   confirmPassword: string;
 };
@@ -25,6 +26,7 @@ export const CmsAccountForm = (): ReactElement => {
   const [form, setForm] = useState<FormState>({
     name: '',
     email: '',
+    currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
@@ -37,6 +39,7 @@ export const CmsAccountForm = (): ReactElement => {
         ? String((user as Record<string, unknown>).name)
         : '',
       email: typeof user.email === 'string' ? user.email : '',
+      currentPassword: '',
       newPassword: '',
       confirmPassword: '',
     });
@@ -63,6 +66,7 @@ export const CmsAccountForm = (): ReactElement => {
         email: form.email,
       };
       if (form.newPassword) body.password = form.newPassword;
+      if (form.currentPassword) body.currentPassword = form.currentPassword;
       const res = await fetch(`${apiBase}/users/${user.id}`, {
         method: 'PATCH',
         credentials: 'include',
@@ -85,7 +89,7 @@ export const CmsAccountForm = (): ReactElement => {
         return;
       }
       showToast({ message: 'Account updated.', type: 'success' });
-      setForm((prev) => ({ ...prev, newPassword: '', confirmPassword: '' }));
+      setForm((prev) => ({ ...prev, currentPassword: '', newPassword: '', confirmPassword: '' }));
     } finally {
       setBusy(false);
     }
@@ -124,6 +128,16 @@ export const CmsAccountForm = (): ReactElement => {
       <fieldset className="cs-account__group">
         <legend>Change password</legend>
         <label className="cs-account__field">
+          <span>Current password</span>
+          <input
+            type="password"
+            className="cs-text-field__input"
+            value={form.currentPassword}
+            onChange={onChange('currentPassword')}
+            autoComplete="current-password"
+          />
+        </label>
+        <label className="cs-account__field">
           <span>New password</span>
           <input
             type="password"
@@ -146,7 +160,7 @@ export const CmsAccountForm = (): ReactElement => {
           />
         </label>
         <p className="cs-account__hint">
-          Leave blank to keep your current password. Minimum 12 characters.
+          Leave blank to keep your current password. Minimum 12 characters. Your current password is also needed to change your email.
         </p>
       </fieldset>
 

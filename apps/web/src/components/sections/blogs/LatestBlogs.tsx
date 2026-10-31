@@ -1,7 +1,5 @@
 import Link from "next/link";
 import type { Blog } from "@/lib/blog";
-import { BLOGS_SECTION } from "@/lib/blog-utils";
-import type { ContentSection } from "@/lib/blog-utils";
 import { EmptyState } from "@/components/feedback";
 import { Pagination } from "@/components/ui/Pagination";
 import { Reveal, RevealStagger, RevealItem } from "@/components/ui/Reveal";
@@ -13,21 +11,19 @@ interface LatestBlogsProps {
   totalPages: number;
   activeCategory: string;
   searchQuery: string;
-  section?: ContentSection | undefined;
 }
 
 function buildPageHref(
   page: number,
   activeCategory: string,
   searchQuery: string,
-  basePath: string,
 ): string {
   const params = new URLSearchParams();
   if (activeCategory) params.set("category", activeCategory);
   if (searchQuery) params.set("q", searchQuery);
   if (page > 1) params.set("page", String(page));
   const qs = params.toString();
-  return qs ? `${basePath}?${qs}` : basePath;
+  return qs ? `/blogs?${qs}` : "/blogs";
 }
 
 export function LatestBlogs({
@@ -36,7 +32,6 @@ export function LatestBlogs({
   totalPages,
   activeCategory,
   searchQuery,
-  section = BLOGS_SECTION,
 }: LatestBlogsProps): React.ReactElement {
   return (
     <section
@@ -136,7 +131,7 @@ export function LatestBlogs({
               paddingBottom: "clamp(28px, 3.5vw, 56px)",
             }}
           >
-            Latest {section.label}
+            Latest Blogs
           </h2>
         </Reveal>
 
@@ -146,7 +141,7 @@ export function LatestBlogs({
               variant="no-results"
               actions={
                 <Link
-                  href={section.basePath}
+                  href="/blogs"
                   className="font-medium text-[#4a3bf1] underline underline-offset-4"
                   style={{ fontSize: "var(--fs-body)" }}
                 >
@@ -169,7 +164,7 @@ export function LatestBlogs({
             >
               {posts.map((post) => (
                 <RevealItem key={post.id}>
-                  <BlogCard post={post} section={section} />
+                  <BlogCard post={post} />
                 </RevealItem>
               ))}
             </RevealStagger>
@@ -179,7 +174,7 @@ export function LatestBlogs({
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
-                buildHref={(p) => buildPageHref(p, activeCategory, searchQuery, section.basePath)}
+                buildHref={(p) => buildPageHref(p, activeCategory, searchQuery)}
               />
             </div>
 
@@ -189,7 +184,7 @@ export function LatestBlogs({
                 currentPage={currentPage}
                 totalPages={totalPages}
                 buildHref={(p) =>
-                  buildPageHref(p, activeCategory, searchQuery, section.basePath)
+                  buildPageHref(p, activeCategory, searchQuery)
                 }
               />
             )}

@@ -63,7 +63,10 @@ import * as migration_20260921_140000_add_content_updated_at from './20260921_14
 import * as migration_20260922_090000_add_form_send_download_email from './20260922_090000_add_form_send_download_email';
 import * as migration_20261005_090000_add_blog_cta_picks from './20261005_090000_add_blog_cta_picks';
 import * as migration_20261023_120000_add_advisories from './20261023_120000_add_advisories';
-import * as migration_20261024_100000_add_videos from './20261024_100000_add_videos';
+import * as migration_20261027_120000_advisories_structured_fields from './20261027_120000_advisories_structured_fields';
+import * as migration_20261028_120000_advisories_cover_title from './20261028_120000_advisories_cover_title';
+import * as migration_20261026_120000_add_missing_job_log_task_slugs from './20261026_120000_add_missing_job_log_task_slugs';
+import * as migration_20261031_100000_add_videos from './20261031_100000_add_videos';
 
 export const migrations = [
   {
@@ -367,8 +370,23 @@ export const migrations = [
     name: '20261023_120000_add_advisories',
   },
   {
-    up: migration_20261024_100000_add_videos.up,
-    down: migration_20261024_100000_add_videos.down,
-    name: '20261024_100000_add_videos',
+    up: migration_20261026_120000_add_missing_job_log_task_slugs.up,
+    down: migration_20261026_120000_add_missing_job_log_task_slugs.down,
+    name: '20261026_120000_add_missing_job_log_task_slugs',
+  },
+  {
+    up: migration_20261027_120000_advisories_structured_fields.up,
+    down: migration_20261027_120000_advisories_structured_fields.down,
+    name: '20261027_120000_advisories_structured_fields',
+  },
+  {
+    up: migration_20261028_120000_advisories_cover_title.up,
+    down: migration_20261028_120000_advisories_cover_title.down,
+    name: '20261028_120000_advisories_cover_title',
+  },
+  {
+    up: migration_20261031_100000_add_videos.up,
+    down: migration_20261031_100000_add_videos.down,
+    name: '20261031_100000_add_videos',
   },
 ];

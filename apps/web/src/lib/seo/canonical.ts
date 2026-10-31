@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { isIndexingAllowed } from "./indexing";
-import { ogImageUrl, type OgVariant } from "./og";
+import { ogImageUrl, type OgAdvisoryParams, type OgVariant } from "./og";
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.cleanstart.com";
 export const SITE_NAME = "CleanStart";
@@ -87,6 +87,8 @@ interface BuildPageMetadataInput {
   titleAccent?: string | undefined;
   /** Overrides the card title only (page <title> stays `title`). */
   ogTitle?: string | undefined;
+  /** Renders the advisory card (CVSS score, status, CVE IDs) instead of the generic one. */
+  ogAdvisory?: OgAdvisoryParams | undefined;
 }
 
 /**
@@ -111,6 +113,7 @@ export function buildPageMetadata({
   eyebrow,
   titleAccent,
   ogTitle,
+  ogAdvisory,
 }: BuildPageMetadataInput): Metadata {
   const url = `${SITE_URL}${path}`;
   // Build-time gate (no request host) — the per-host backstop is proxy.ts.
@@ -133,6 +136,7 @@ export function buildPageMetadata({
       eyebrow,
       titleAccent,
       sub: description,
+      advisory: ogAdvisory,
     }),
     width: 1200,
     height: 630,

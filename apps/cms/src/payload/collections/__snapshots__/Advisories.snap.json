@@ -12,26 +12,74 @@
     },
     {
       "type": "text",
+      "name": "coverTitle"
+    },
+    {
+      "type": "text",
       "name": "slug",
       "required": true,
       "unique": true
+    },
+    {
+      "type": "text",
+      "name": "cves",
+      "required": true,
+      "hasMany": true
+    },
+    {
+      "type": "text",
+      "name": "technology",
+      "required": true
+    },
+    {
+      "type": "row",
+      "fields": [
+        {
+          "type": "number",
+          "name": "cvssScore",
+          "required": true
+        },
+        {
+          "type": "select",
+          "name": "fixStatus",
+          "required": true,
+          "options": [
+            {
+              "value": "identified"
+            },
+            {
+              "value": "in_progress"
+            },
+            {
+              "value": "fixed"
+            },
+            {
+              "value": "not_affected"
+            }
+          ]
+        }
+      ]
     },
     {
       "type": "textarea",
       "name": "abstract"
     },
     {
-      "type": "upload",
-      "name": "heroImage",
-      "relationTo": "media"
-    },
-    {
       "type": "richText",
       "name": "body"
     },
     {
-      "type": "ui",
-      "name": "faqsBulkPaste"
+      "type": "richText",
+      "name": "impact"
+    },
+    {
+      "type": "richText",
+      "name": "resolution"
+    },
+    {
+      "type": "upload",
+      "name": "heroImage",
+      "relationTo": "media"
     },
     {
       "type": "array",

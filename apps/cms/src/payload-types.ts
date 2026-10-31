@@ -1861,16 +1861,41 @@ export interface Form {
  */
 export interface Advisory {
   id: number;
+  /**
+   * e.g. Node.js Brotli decoder out-of-bounds write. The CVE IDs are shown before it.
+   */
   title: string;
+  /**
+   * Text shown on the cover of the listing card. Leave blank to use the vulnerability name. Keep it short: long text is shrunk or clipped on the cover.
+   */
+  coverTitle?: string | null;
   /**
    * URL-safe slug. Auto-generated from "title" on first save; safe to edit later (a redirect row is created automatically when you do). Cap 120 characters.
    */
   slug: string;
   /**
-   * Drives the SEO description fallback. Aim for ≤ 160 characters.
+   * Type one ID (e.g. CVE-2026-111497) and press Enter. To add more, type the next ID and press Enter again; use the x on an ID to remove it. Searchable on the listing.
+   */
+  cves: string[];
+  /**
+   * e.g. Node.js, PHP, OpenSSL. Free text: the listing filter is built from the values in use, so keep the spelling consistent.
+   */
+  technology: string;
+  /**
+   * e.g. 9.2. The rating (Critical, High, Medium, Low) is derived from the score.
+   */
+  cvssScore: number;
+  /**
+   * Where CleanStart stands on this vulnerability.
+   */
+  fixStatus: 'identified' | 'in_progress' | 'fixed' | 'not_affected';
+  /**
+   * One or two sentences. Used as the SEO description when none is set. Aim for ≤ 160 characters.
    */
   abstract?: string | null;
-  heroImage?: (number | null) | Media;
+  /**
+   * Paste the whole write-up here. Use a Heading 2 for each section: Vulnerability, Impacted packages and versions, Resolution. Tables, code and the pull command all go in this one box.
+   */
   body?: {
     root: {
       type: string;
@@ -1886,6 +1911,37 @@ export interface Advisory {
     };
     [k: string]: unknown;
   } | null;
+  impact?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  resolution?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  heroImage?: (number | null) | Media;
   faqs?:
     | {
         question: string;
@@ -1907,17 +1963,8 @@ export interface Advisory {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Multi-author supported: every byline is credited in JSON-LD author[]. Authors with "accepting new bylines" off are hidden from the picker.
-   */
   authors?: (number | Author)[] | null;
-  /**
-   * Author who reviewed this advisory for accuracy. Surfaced in JSON-LD reviewedBy.
-   */
   reviewedBy?: (number | null) | Author;
-  /**
-   * Date of the most recent review pass. When unset, falls back to updatedAt with a note in the SEO panel.
-   */
   lastReviewedAt?: string | null;
   /**
    * Layer in extra Schema.org types (HowTo, Video, Review, etc.) on top of the auto-emitted JSON-LD. Editors never write raw JSON — every field below maps to a schema.org property.
@@ -2070,9 +2117,6 @@ export interface Advisory {
   contentUpdatedAt?: string | null;
   readingMinutes?: number | null;
   wordCount?: number | null;
-  /**
-   * Heading levels that appear in the Table of Contents. Re-save to apply.
-   */
   tocDepth?: ('h2' | 'h2_h3' | 'h2_h3_h4') | null;
   tableOfContents?:
     | {
@@ -2236,9 +2280,6 @@ export interface Advisory {
       | boolean
       | null;
   };
-  /**
-   * Shown in the /advisories hero. When none is featured, the newest advisory is.
-   */
   featured?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -9297,6 +9338,7 @@ export interface PageRegistry {
 export interface User {
   id: number;
   name: string;
+  currentPassword?: string | null;
   /**
    * Uncheck to block this user from logging in. Use the "Disable account" action instead of editing this directly.
    */
@@ -10371,10 +10413,17 @@ export interface BlogsSelect<T extends boolean = true> {
  */
 export interface AdvisoriesSelect<T extends boolean = true> {
   title?: T;
+  coverTitle?: T;
   slug?: T;
+  cves?: T;
+  technology?: T;
+  cvssScore?: T;
+  fixStatus?: T;
   abstract?: T;
-  heroImage?: T;
   body?: T;
+  impact?: T;
+  resolution?: T;
+  heroImage?: T;
   faqs?:
     | T
     | {
@@ -14092,6 +14141,7 @@ export interface ResumesSelect<T extends boolean = true> {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  currentPassword?: T;
   enabled?: T;
   roles?: T;
   preferences?: T;

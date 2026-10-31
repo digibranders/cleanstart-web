@@ -443,6 +443,26 @@
   -webkit-box-decoration-break: clone;
 }
 
+// Tables. Payload's stock table is `table-layout: fixed; width: fit-content`
+// with ~90px default columns, so a pasted three-column table collapses to a
+// 270px strip and a 64-character digest wraps into a column of tiny chips.
+// Fill the editor width and size columns to their content instead; code chips
+// inside cells wrap like the published page (apps/web globals.css).
+.LexicalEditorTheme__table {
+  width: 100%;
+  table-layout: auto;
+}
+
+.LexicalEditorTheme__tableCell {
+  min-width: 96px;
+  padding: 8px 12px;
+  overflow-wrap: anywhere;
+
+  .LexicalEditorTheme__textCode {
+    white-space: normal;
+  }
+}
+
 .LexicalEditorTheme__link {
   color: var(--cs-text-link);
   text-decoration: none;

@@ -148,14 +148,26 @@ Operator must: (a) create "Newsletter" subscription type in HubSpot, (b) set `HU
 
 Requires migration `20261023_120000_add_advisories` (runs on CMS deploy). Then, in the cms container:
 (a) `/app/node_modules/.bin/tsx scripts/seed-page-registry.ts` adds the `/advisories` and `/advisories/[slug]` rows;
-(b) `/app/node_modules/.bin/tsx scripts/copy-blog-to-advisory.ts --dry-run`, then without `--dry-run`, publishes the PHP2Shell blog as the first advisory and purges `/advisories`. Idempotent: skips if the advisory slug exists. Deploy `apps/web` before (b), or the purge reaches a site that has no `/advisories` route yet.
+(b) Done on 2026-10-23 and later reverted: PHP2Shell went back to the blog and its advisory is a draft (the copy script was removed with the 2026-10-27 model change).
 
-### Videos CMS cutover
+### 23. Structured advisories (client brief, 2026-10-27)
+
+Requires migration `20261027_120000_advisories_structured_fields` (additive: CVE IDs, technology, CVSS score, fix status, impact, resolution). The hidden blog-era columns stay until a separately approved migration drops them. To load the first advisory, in the cms container: `/app/node_modules/.bin/tsx scripts/seed-node-brotli-advisory.ts` creates CVE-2026-111497 as a draft; add `--publish` to publish it and purge `/advisories`. Idempotent: skips if the slug exists. Deploy `apps/web` before publishing.
+
+### 24. Single advisory content box (2026-10-28)
+
+No migration. The advisory body is now one rich-text box (`body`, "Advisory content"); `impact` and `resolution` are hidden and their columns stay. Deploy `apps/web` and `apps/cms` first. Then merge the existing advisories in the cms container: `/app/node_modules/.bin/tsx scripts/merge-advisory-sections.ts` is a dry run, add `--apply` to write. It folds Impacted packages and Resolution into `body` under Heading 2s, clears the two old boxes and purges `/advisories`. Idempotent. Until it runs, the page still renders the old three sections for advisories that have them.
+
+### 25. Dropped two Knowledge Hub pages (2026-10-28)
+
+Done on prod already; nothing to run. `knowledge-hub/no-shell-read-only` (a stub pointing at two other guides) and `knowledge-hub/rekor-publishing` were deleted with `scripts/drop-knowledge-hub-pages.ts`, which first wrote a 301 for each: to `/knowledge-hub/combined-security-model` and `/knowledge-hub/image-signing-sigstore`. The script purges the web cache, but a script that ends with `process.exit` kills the deferred search-index delete, so the two Meilisearch documents (`knowledgeBase_3`, `knowledgeBase_84`) had to be removed by hand. After any scripted delete, check the index. The sitemap needed its `sitemap:knowledgeBase` tag purged as well.
+
+### 26. Videos CMS cutover
 
 Until this runs, `/videos` reads `apps/web/src/lib/videos-catalog.ts` plus the YouTube RSS feed. The `videos` and `videoTopics` collections, the hourly `syncYoutubeVideos` task and the web CMS reader are already in the code; `VIDEOS_SOURCE` decides which one the site uses.
 
 0. **Create the YouTube API key** (the length of each video is read from YouTube with it, and videos that go private or are removed are hidden from the page). In Google Cloud: create or pick a project, enable "YouTube Data API v3", create an API key under Credentials and restrict it to that API. Add it as the GitHub Actions secret `YOUTUBE_API_KEY`. The key is free for this volume (one small request per hour).
-1. **Deploy the CMS** (migration `20261024_100000_add_videos` runs on boot). Check `/api/health`, then that the `videos` collection opens in the admin.
+1. **Deploy the CMS** (migration `20261031_100000_add_videos` runs on boot). Check `/api/health`, then that the `videos` collection opens in the admin.
 2. **Backfill.** On the droplet, in the cms container:
    ```bash
    /app/node_modules/.bin/tsx scripts/seed-videos-from-catalog.ts          # dry run, writes nothing

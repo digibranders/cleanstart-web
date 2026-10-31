@@ -1388,6 +1388,46 @@
   resize: none;
 }
 
+// hasMany text field: removable value chips above the add input.
+.cs-text-field__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.cs-text-field__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 4px 3px 10px;
+  border: 1px solid var(--theme-elevation-200, rgba(0, 0, 0, 0.12));
+  border-radius: 999px;
+  background: var(--theme-elevation-50);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.cs-text-field__chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover { background: var(--theme-elevation-150, rgba(0, 0, 0, 0.08)); }
+  &:focus-visible { outline: 2px solid var(--cs-cyan-500); outline-offset: 1px; }
+}
+
 .cs-text-field--error .cs-text-field__input,
 .cs-textarea-field--error .cs-textarea-field__input,
 .cs-number-field--error .cs-number-field__input,
