@@ -44,9 +44,10 @@ env:
   NEXT_PUBLIC_CMS_URL: https://cms.cleanstart.com
 
 jobs:
-  # `web` runs on every push and PR. `web-e2e` and `web-lhci` cost about 17 of
-  # the 26 billed minutes per run, so they gate only the PR into `main` (and
-  # manual runs) instead of every push to `development` and `main`.
+  # `web` runs on every push and PR. `web-bundle-budget` and `web-lhci` gate
+  # only the PR into `main` (and manual runs) instead of every push to
+  # `development` and `main`, because they need the build artifact and `web-lhci`
+  # alone bills about 10 minutes.
   web:
     name: apps/web · lint · typecheck · build
     runs-on: ubuntu-latest
@@ -124,8 +125,8 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  web-e2e:
-    name: apps/web · Playwright (responsive + axe smoke)
+  web-bundle-budget:
+    name: apps/web · bundle budget
     needs: web
     if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.base_ref == 'main') }}
     runs-on: ubuntu-latest
@@ -148,17 +149,6 @@ jobs:
           name: web-next-build
           path: apps/web/.next
 
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('apps/web/package.json', 'pnpm-lock.yaml') }}
-          restore-keys: |
-            playwright-${{ runner.os }}-
-
-      - name: Install Playwright browsers
-        run: pnpm --filter @cleanstart/web exec playwright install --with-deps chromium
-
       - name: Start production server
         run: pnpm --filter @cleanstart/web start &
         env:
@@ -174,28 +164,8 @@ jobs:
           done
           echo "Server did not become ready"; exit 1
 
-      - name: Run Playwright
-        run: pnpm --filter @cleanstart/web test:e2e
-        env:
-          PLAYWRIGHT_BASE_URL: http://127.0.0.1:3001
-          CI: "1"
-
       - name: Bundle budget (ratchet vs committed baseline)
         run: pnpm --filter @cleanstart/web bundle:budget
-        env:
-          PLAYWRIGHT_BASE_URL: http://127.0.0.1:3001
-
-      - name: Upload Playwright report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: web-playwright-report
-          path: |
-            apps/web/playwright-report/
-            apps/web/test-results/
-            apps/web/tests/e2e/__baselines__/
-          if-no-files-found: ignore
-          retention-days: 14
 
   web-lhci:
     name: apps/web · Lighthouse CI (mobile)

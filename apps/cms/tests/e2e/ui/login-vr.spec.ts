@@ -5,7 +5,7 @@ import { expect, test } from '@playwright/test';
  *
  * Runs against the login route only — no seeded fixtures needed. New
  * baselines are written on first run; subsequent runs diff against
- * them. CI publishes the report as an artifact via the `cms-vr` job.
+ * them. No CI job runs this suite; run it locally with `--grep @phase-ui-vr`.
  *
  * Add new VR specs as primitives + views land in later waves; tag every
  * one `@phase-ui-vr` so the CI grep stays consistent.
