@@ -11,8 +11,10 @@ import { type MigrateDownArgs, type MigrateUpArgs, sql } from '@payloadcms/db-po
  *   - `payload_locked_documents_rels.videos_id` / `.video_topics_id`: Payload
  *     loads that whole row on any document-lock read, so leaving them out breaks
  *     every collection's list and edit view (the 2026-06-24 taxonomy incident).
- *   - `enum_integrations_routing_events` gains 'video.needs-review' (the webhook
- *     event the sync fires when a new upload arrives as a draft).
+ *   - `enum_integrations_routing_events`, `enum_integrations_teams_config_mentions_trigger_on`
+ *     and `enum_webhooks_dead_letter_event` gain 'video.needs-review' (the webhook
+ *     event the sync fires when a new upload arrives as a draft; the dead-letter
+ *     row for a failed delivery stores it).
  *   - `enum_payload_jobs_task_slug` and `enum_payload_jobs_log_task_slug` gain
  *     'syncYoutubeVideos' (the hourly sync task; a scheduled job whose slug is
  *     not in the enum fails to enqueue).
@@ -44,6 +46,8 @@ const UP = [
   sql`DO $$ BEGIN CREATE TYPE "public"."enum_videos_status" AS ENUM('draft', 'published'); EXCEPTION WHEN duplicate_object THEN null; END $$;`,
   sql`DO $$ BEGIN CREATE TYPE "public"."enum_videos_sync_state" AS ENUM('synced', 'needs-review', 'missing', 'manual'); EXCEPTION WHEN duplicate_object THEN null; END $$;`,
   sql`ALTER TYPE "public"."enum_integrations_routing_events" ADD VALUE IF NOT EXISTS 'video.needs-review';`,
+  sql`ALTER TYPE "public"."enum_integrations_teams_config_mentions_trigger_on" ADD VALUE IF NOT EXISTS 'video.needs-review';`,
+  sql`ALTER TYPE "public"."enum_webhooks_dead_letter_event" ADD VALUE IF NOT EXISTS 'video.needs-review';`,
   sql`ALTER TYPE "public"."enum_payload_jobs_task_slug" ADD VALUE IF NOT EXISTS 'syncYoutubeVideos' BEFORE 'schedulePublish';`,
   sql`ALTER TYPE "public"."enum_payload_jobs_log_task_slug" ADD VALUE IF NOT EXISTS 'syncYoutubeVideos' BEFORE 'schedulePublish';`,
   sql`CREATE TABLE IF NOT EXISTS "_videos_v" (
@@ -222,6 +226,7 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
   await db.execute(sql`DROP TYPE IF EXISTS "public"."enum_videos_status";`)
   await db.execute(sql`DROP TYPE IF EXISTS "public"."enum_videos_sync_state";`)
   // Postgres cannot drop a single enum label, so 'video.needs-review' stays on
-  // enum_integrations_routing_events and 'syncYoutubeVideos' on the two
-  // payload_jobs task-slug enums. Unused labels are harmless.
+  // enum_integrations_routing_events, enum_integrations_teams_config_mentions_trigger_on and
+  // enum_webhooks_dead_letter_event, and 'syncYoutubeVideos' on the two payload_jobs
+  // task-slug enums. Unused labels are harmless.
 }
