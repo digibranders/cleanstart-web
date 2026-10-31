@@ -3,6 +3,8 @@
 import { useFormFields } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
 
+import { youtubeIdFrom } from '../../lib/videos/youtube-id';
+
 const chip = (tone: 'ok' | 'warn' | 'plain'): React.CSSProperties => ({
   display: 'inline-block',
   padding: '2px 8px',
@@ -27,14 +29,17 @@ const ago = (iso: string): string => {
  * been saved yet, because there is no YouTube id to show.
  */
 export const VideoSourceSummary = (): ReactElement | null => {
-  const [externalId, youtubeTitle, privacy, embeddable, fetchedAt] = useFormFields(([fields]) => [
+  const [rawId, youtubeTitle, privacy, embeddable, fetchedAt] = useFormFields(([fields]) => [
     fields.externalId?.value,
     fields['source.title']?.value,
     fields['source.privacyStatus']?.value,
     fields['source.embeddable']?.value,
     fields['source.fetchedAt']?.value,
   ]);
-  if (typeof externalId !== 'string' || externalId.length === 0) return null;
+  // Works on a pasted link too, so the thumbnail appears as soon as a valid link is typed.
+  const externalId = youtubeIdFrom(typeof rawId === 'string' ? rawId : null);
+  if (externalId === null) return null;
+  const synced = typeof youtubeTitle === 'string' && youtubeTitle.length > 0;
 
   const watchUrl = `https://www.youtube.com/watch?v=${externalId}`;
   return (
@@ -50,10 +55,16 @@ export const VideoSourceSummary = (): ReactElement | null => {
         />
       </a>
       <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: 12, color: 'var(--theme-elevation-600)' }}>Title on YouTube</div>
-        <div style={{ fontSize: 16, fontWeight: 500, marginBottom: 8 }}>
-          {typeof youtubeTitle === 'string' && youtubeTitle ? youtubeTitle : 'Not synced yet'}
-        </div>
+        {synced ? (
+          <>
+            <div style={{ fontSize: 12, color: 'var(--theme-elevation-600)' }}>Title on YouTube</div>
+            <div style={{ fontSize: 16, fontWeight: 500, marginBottom: 8 }}>{youtubeTitle}</div>
+          </>
+        ) : (
+          <div style={{ fontSize: 13, color: 'var(--theme-elevation-600)', marginBottom: 8 }}>
+            The title, length and thumbnail details are copied from YouTube by the hourly sync.
+          </div>
+        )}
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
           {typeof privacy === 'string' ? <span style={chip(privacy === 'private' ? 'warn' : 'ok')}>{privacy === 'public' ? 'Public' : privacy === 'unlisted' ? 'Unlisted' : 'Private'}</span> : null}
           {embeddable === true ? <span style={chip('ok')}>Can embed</span> : null}

@@ -11,6 +11,12 @@
     },
     {
       "type": "text",
+      "name": "externalId",
+      "required": true,
+      "unique": true
+    },
+    {
+      "type": "text",
       "name": "title",
       "required": true
     },
@@ -91,12 +97,6 @@
               "value": "vimeo"
             }
           ]
-        },
-        {
-          "type": "text",
-          "name": "externalId",
-          "required": true,
-          "unique": true
         },
         {
           "type": "group",

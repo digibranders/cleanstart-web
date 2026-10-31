@@ -394,11 +394,11 @@ export default buildConfig({
     // Authors) trail.
     Blogs,
     Advisories,
-    Videos,
     VideoTopics,
     News,
     Guides,
     CaseStudies,
+    Videos,
     KnowledgeBase,
     LegalDocuments,
     Resources,
