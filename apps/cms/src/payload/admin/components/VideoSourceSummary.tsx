@@ -3,6 +3,7 @@
 import { useFormFields } from '@payloadcms/ui';
 import type { ReactElement } from 'react';
 
+import { videoLength } from '../../lib/videos/video-state';
 import { youtubeIdFrom } from '../../lib/videos/youtube-id';
 
 const chip = (tone: 'ok' | 'warn' | 'plain'): React.CSSProperties => ({
@@ -29,13 +30,19 @@ const ago = (iso: string): string => {
  * been saved yet, because there is no YouTube id to show.
  */
 export const VideoSourceSummary = (): ReactElement | null => {
-  const [rawId, youtubeTitle, privacy, embeddable, fetchedAt] = useFormFields(([fields]) => [
+  const [rawId, youtubeTitle, privacy, embeddable, fetchedAt, seconds, typedLength] = useFormFields(([fields]) => [
     fields.externalId?.value,
     fields['source.title']?.value,
     fields['source.privacyStatus']?.value,
     fields['source.embeddable']?.value,
     fields['source.fetchedAt']?.value,
+    fields['source.durationSeconds']?.value,
+    fields.durationLabel?.value,
   ]);
+  const length = videoLength({
+    source: { durationSeconds: typeof seconds === 'number' ? seconds : null },
+    durationLabel: typeof typedLength === 'string' ? typedLength : null,
+  });
   // Works on a pasted link too, so the thumbnail appears as soon as a valid link is typed.
   const externalId = youtubeIdFrom(typeof rawId === 'string' ? rawId : null);
   if (externalId === null) return null;
@@ -67,6 +74,11 @@ export const VideoSourceSummary = (): ReactElement | null => {
         )}
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
           {typeof privacy === 'string' ? <span style={chip(privacy === 'private' ? 'warn' : 'ok')}>{privacy === 'public' ? 'Public' : privacy === 'unlisted' ? 'Unlisted' : 'Private'}</span> : null}
+          {length !== null ? (
+            <span style={chip('plain')}>Length {length}</span>
+          ) : (
+            <span style={chip('warn')}>No length yet</span>
+          )}
           {embeddable === true ? <span style={chip('ok')}>Can embed</span> : null}
           {embeddable === false ? <span style={chip('warn')}>Can't be embedded</span> : null}
           {typeof fetchedAt === 'string' ? (
