@@ -5,10 +5,14 @@ import { getAdvisoryBySlug, getAdvisoryBySlugDraft, getAdvisorySlugs } from "@/l
 import { advisoryHeading, advisoryStatusLabel, cvssRating, type CvssRating } from "@/lib/advisory-utils";
 import { ADVISORIES_SECTION, mediaUrl } from "@/lib/blog-utils";
 import type { LexicalRoot } from "@/lib/blog";
+import { getAdvisoryCtas } from "@/lib/blog-cta/resolve";
 import { highlightLexical } from "@/lib/highlightLexical";
 import { RenderLexical } from "@/lib/renderLexical";
 import { Header } from "@/components/nav/Header";
 import { DetailHero } from "@/components/sections/_shared/DetailHero";
+import { BlogCtaBottomBar } from "@/components/sections/blog/cta/BlogCtaBottomBar";
+import { BlogCtaStack } from "@/components/sections/blog/cta/BlogCtaStack";
+import { StickyRail } from "@/components/sections/blog/cta/StickyRail";
 import { BlogsCTA } from "@/components/sections/blogs/BlogsCTA";
 import { Footer } from "@/components/sections/Footer";
 import { buildPageMetadata } from "@/lib/seo/canonical";
@@ -140,10 +144,11 @@ export async function renderAdvisoryDetail({
 
   const heading = advisoryHeading(advisory);
   const publishedAt = effectivePublishedAt(advisory);
-  const [body, impact, resolution] = await Promise.all([
+  const [body, impact, resolution, ctas] = await Promise.all([
     highlightLexical(advisory.body),
     highlightLexical(advisory.impact),
     highlightLexical(advisory.resolution),
+    getAdvisoryCtas(advisory),
   ]);
   // Advisories written before the single content box keep their three sections.
   const legacy = hasContent(impact) || hasContent(resolution);
@@ -190,21 +195,35 @@ export async function renderAdvisoryDetail({
         <div className="bg-white">
           <div className="relative mx-auto max-w-[1120px] px-6">
             <div
-              className="mx-auto lg:mx-0 w-full max-w-[988px] flex flex-col pt-10 lg:pt-14"
-              style={{ gap: "clamp(32px, 4vw, 48px)", paddingBottom: "var(--spacing-section-cta)" }}
+              className="grid grid-cols-1 pt-10 lg:pt-14 xl:grid-cols-[minmax(0,1fr)_272px] xl:gap-12"
+              style={{ paddingBottom: "var(--spacing-section-cta)" }}
             >
-              {legacy ? (
-                <AdvisorySection heading="Vulnerability" content={body} />
-              ) : hasContent(body) ? (
-                <section className="article-body">
-                  <RenderLexical content={body} />
-                </section>
-              ) : null}
-              <AdvisorySection heading="Impacted packages and versions" content={impact} />
-              <AdvisorySection heading="Resolution" content={resolution} />
+              {/* The article is a few screens at most, so the rail shows all its asks at once. */}
+              <div
+                data-article-body
+                className="mx-auto lg:mx-0 w-full min-w-0 max-w-[988px] flex flex-col"
+                style={{ gap: "clamp(32px, 4vw, 48px)" }}
+              >
+                {legacy ? (
+                  <AdvisorySection heading="Vulnerability" content={body} />
+                ) : hasContent(body) ? (
+                  <section className="article-body">
+                    <RenderLexical content={body} />
+                  </section>
+                ) : null}
+                <AdvisorySection heading="Impacted packages and versions" content={impact} />
+                <AdvisorySection heading="Resolution" content={resolution} />
+              </div>
+
+              <aside aria-label="Next steps" className="hidden xl:block">
+                <StickyRail>
+                  <BlogCtaStack ctas={ctas} />
+                </StickyRail>
+              </aside>
             </div>
           </div>
         </div>
+        <BlogCtaBottomBar ctas={ctas} layout="stacked" fixedStage="prove" className="xl:hidden" />
       </main>
 
       <Footer cta={<BlogsCTA />} />

@@ -4,6 +4,7 @@ import { toSuggestion } from "./suggestion";
 import type { BlogCtaSet } from "./types";
 
 const base: BlogCtaSet = {
+  surface: "blog",
   slug: "post",
   explore: { kind: "catalog", imageCount: 654, featured: [], href: "https://images.cleanstart.com", pullCommand: null },
   learn: null,

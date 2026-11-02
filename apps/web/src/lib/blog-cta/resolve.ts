@@ -1,6 +1,8 @@
 import "server-only";
 
 import { fetchCMS } from "@/lib/cms-fetch";
+import type { AdvisoryDetail } from "@/lib/advisory";
+import { advisoryHeading } from "@/lib/advisory-utils";
 import type { BlogDetail } from "@/lib/blog";
 import { lexicalToPlainText } from "@/lib/renderLexical";
 import { mediaUrl } from "@/lib/resources";
@@ -17,11 +19,12 @@ import {
   baseImageNames,
   firstSentence,
   matchCatalogImage,
+  matchImageHint,
   pickEditorImage,
   pickEditorResource,
   pickRelatedResource,
 } from "./relevance";
-import type { BlogCtaSet, CatalogLogo, ExploreCta, ResourceCta } from "./types";
+import type { BlogCtaSet, BlogCtaSurface, CatalogLogo, ExploreCta, ResourceCta } from "./types";
 
 const CATALOG_ORIGIN = "https://images.cleanstart.com";
 const CATALOG_LOGO_ORIGIN = "https://storage.googleapis.com/cdpimages";
@@ -173,21 +176,36 @@ function toResourceCta(row: ResourceRow): ResourceCta {
   };
 }
 
+/** What the rail needs to know about the page it sits on. */
+interface ArticleCtaSource {
+  surface: BlogCtaSurface;
+  slug: string;
+  article: ArticleText;
+  /** An editor's pick, when the page has the fields for one. */
+  editorImage?: string | null | undefined;
+  editorResource?: unknown;
+  /** A label on the page that names the image outright, e.g. an advisory's technology. */
+  imageHint?: string | null | undefined;
+}
+
 /**
  * The three CTAs for one article: the catalog image it is most about, the
  * resource most related to it, and the POC. Each lookup degrades on its own,
  * so a catalog or CMS outage never breaks the article.
  */
-export async function getBlogCtas(post: BlogDetail): Promise<BlogCtaSet> {
-  const article = toArticleText(post);
+async function getArticleCtas(source: ArticleCtaSource): Promise<BlogCtaSet> {
+  const { article } = source;
   const [catalogNames, resources, publicPulls] = await Promise.all([
     getCatalogImageNames(),
     getResourceRows(),
     getPublicPullNames(),
   ]);
 
-  // An editor's pick wins; otherwise match from the article.
-  const imageName = pickEditorImage(post.ctaImage, catalogNames) ?? matchCatalogImage(article, catalogNames);
+  // An editor's pick wins, then a label on the page, then a match from the text.
+  const imageName =
+    pickEditorImage(source.editorImage, catalogNames) ??
+    matchImageHint(source.imageHint, catalogNames) ??
+    matchCatalogImage(article, catalogNames);
   let explore: ExploreCta;
   if (imageName) {
     const [description, logo] = await Promise.all([
@@ -221,7 +239,7 @@ export async function getBlogCtas(post: BlogDetail): Promise<BlogCtaSet> {
   }
 
   const related =
-    pickEditorResource(post.ctaResource, resources) ??
+    pickEditorResource(source.editorResource, resources) ??
     pickRelatedResource(
       article,
       resources.map((r) => ({
@@ -233,9 +251,34 @@ export async function getBlogCtas(post: BlogDetail): Promise<BlogCtaSet> {
     );
 
   return {
-    slug: post.slug,
+    surface: source.surface,
+    slug: source.slug,
     explore,
     learn: related ? toResourceCta(related) : null,
     prove: { href: "/book-a-demo", label: "Book a free POC" },
   };
 }
+
+export const getBlogCtas = (post: BlogDetail): Promise<BlogCtaSet> =>
+  getArticleCtas({
+    surface: "blog",
+    slug: post.slug,
+    article: toArticleText(post),
+    editorImage: post.ctaImage,
+    editorResource: post.ctaResource,
+  });
+
+/** Advisories have no editor picks yet: the technology label and the text decide. */
+export const getAdvisoryCtas = (advisory: AdvisoryDetail): Promise<BlogCtaSet> =>
+  getArticleCtas({
+    surface: "advisory",
+    slug: advisory.slug,
+    article: {
+      title: advisoryHeading(advisory),
+      abstract: advisory.abstract ?? "",
+      category: advisory.technology,
+      headings: [],
+      body: [advisory.body, advisory.impact, advisory.resolution].map(lexicalToPlainText).join(" "),
+    },
+    imageHint: advisory.technology,
+  });

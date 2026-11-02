@@ -63,7 +63,13 @@ export function BlogCtaLadder({
     [subscribe, readingMinutes],
   );
 
-  const context: CtaCardContext = { slug: ctas.slug, layout: "ladder", placement: "rail", subscribe };
+  const context: CtaCardContext = {
+    surface: ctas.surface,
+    slug: ctas.slug,
+    layout: "ladder",
+    placement: "rail",
+    subscribe,
+  };
 
   const cards: ReadonlyArray<{ stage: BlogCtaStage; node: React.ReactElement }> = [
     { stage: "explore", node: <ExploreCard cta={ctas.explore} context={context} /> },

@@ -63,7 +63,11 @@ export interface ProveCta {
   label: string;
 }
 
+/** The kind of page a rail sits on. Names the GA4 event and the demo link's `source`. */
+export type BlogCtaSurface = "blog" | "advisory";
+
 export interface BlogCtaSet {
+  surface: BlogCtaSurface;
   slug: string;
   explore: ExploreCta;
   /** Null only when the CMS returned no published resources at all. */
@@ -71,8 +75,11 @@ export interface BlogCtaSet {
   prove: ProveCta;
 }
 
-/** Which of the three review layouts rendered a CTA. Feeds analytics. */
-export type BlogCtaLayout = "ladder";
+/**
+ * How the rail presents the asks. `ladder` steps through them by reading depth;
+ * `stacked` shows all three at once, for pages short enough to read in one screen.
+ */
+export type BlogCtaLayout = "ladder" | "stacked";
 
 /** Where on the page the CTA sat when it was clicked. */
 export type BlogCtaPlacement = "rail" | "bar";

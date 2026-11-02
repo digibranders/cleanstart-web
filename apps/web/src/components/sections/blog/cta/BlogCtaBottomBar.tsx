@@ -97,7 +97,7 @@ function contentFor(stage: BlogCtaStage, ctas: BlogCtaSet, layout: BlogCtaLayout
     title: ctas.prove.label,
     subtitle: "Prove it on your own workloads",
     action: "Book",
-    href: withDemoSource(ctas.prove.href, { slug: ctas.slug, layout, placement: "bar" }),
+    href: withDemoSource(ctas.prove.href, { surface: ctas.surface, slug: ctas.slug, layout, placement: "bar" }),
     external: false,
   };
 }
@@ -111,14 +111,18 @@ function contentFor(stage: BlogCtaStage, ctas: BlogCtaSet, layout: BlogCtaLayout
 export function BlogCtaBottomBar({
   ctas,
   layout,
+  fixedStage,
   className,
 }: {
   ctas: BlogCtaSet;
   layout: BlogCtaLayout;
+  /** Show this ask the whole time instead of following reading depth, for pages too short to step through. */
+  fixedStage?: BlogCtaStage | undefined;
   /** Breakpoint utility that hides the bar where the rail takes over, e.g. `xl:hidden`. */
   className: string;
 }): React.ReactElement {
-  const { stage, subscribe } = useArticleProgress();
+  const { stage: readingStage, subscribe } = useArticleProgress();
+  const stage = fixedStage ?? readingStage;
   const [inRange, setInRange] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
@@ -128,7 +132,14 @@ export function BlogCtaBottomBar({
   const show = inRange && !dismissed;
   const content = contentFor(stage, ctas, layout);
   const onAction = (): void =>
-    trackBlogCta({ layout, placement: "bar", stage: content.stage, slug: ctas.slug, resourceSlug: content.resourceSlug });
+    trackBlogCta({
+      surface: ctas.surface,
+      layout,
+      placement: "bar",
+      stage: content.stage,
+      slug: ctas.slug,
+      resourceSlug: content.resourceSlug,
+    });
   const onDismiss = (): void => {
     writeDismissed();
     setDismissed(true);

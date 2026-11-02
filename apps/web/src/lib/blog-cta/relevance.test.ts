@@ -6,6 +6,7 @@ import {
   baseImageNames,
   firstSentence,
   matchCatalogImage,
+  matchImageHint,
   pickEditorImage,
   pickEditorResource,
   pickRelatedResource,
@@ -210,5 +211,35 @@ describe("pickEditorImage", () => {
     expect(pickEditorImage("  ", CATALOG)).toBeNull();
     expect(pickEditorImage(null, CATALOG)).toBeNull();
     expect(pickEditorImage(undefined, CATALOG)).toBeNull();
+  });
+});
+
+describe("matchImageHint", () => {
+  it("maps a technology label to its catalog base name", () => {
+    expect(matchImageHint("Node.js", CATALOG)).toBe("node");
+    expect(matchImageHint("nodejs", CATALOG)).toBe("node");
+    expect(matchImageHint("Python", CATALOG)).toBe("python");
+    expect(matchImageHint(" NGINX ", CATALOG)).toBe("nginx");
+  });
+
+  it("ignores a trailing version", () => {
+    expect(matchImageHint("Python 3.12", CATALOG)).toBe("python");
+    expect(matchImageHint("redis:7.2", CATALOG)).toBe("redis");
+  });
+
+  it("folds a fips variant into its base image", () => {
+    expect(matchImageHint("redis-fips", CATALOG)).toBe("redis");
+  });
+
+  it("knows the common long names", () => {
+    expect(matchImageHint("Golang", CATALOG)).toBe("go");
+    expect(matchImageHint("PostgreSQL", CATALOG)).toBe("postgres");
+  });
+
+  it("returns null when the catalog has no such image", () => {
+    expect(matchImageHint("PHP", CATALOG)).toBeNull();
+    expect(matchImageHint("", CATALOG)).toBeNull();
+    expect(matchImageHint(null, CATALOG)).toBeNull();
+    expect(matchImageHint(undefined, CATALOG)).toBeNull();
   });
 });
