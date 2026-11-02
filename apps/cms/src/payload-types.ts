@@ -69,11 +69,11 @@ export interface Config {
   collections: {
     blogs: Blog;
     advisories: Advisory;
-    videos: Video;
     videoTopics: VideoTopic;
     news: News;
     guides: Guide;
     'case-studies': CaseStudy;
+    videos: Video;
     knowledgeBase: KnowledgeBase;
     legalDocuments: LegalDocument;
     resources: Resource;
@@ -129,11 +129,11 @@ export interface Config {
   collectionsSelect: {
     blogs: BlogsSelect<false> | BlogsSelect<true>;
     advisories: AdvisoriesSelect<false> | AdvisoriesSelect<true>;
-    videos: VideosSelect<false> | VideosSelect<true>;
     videoTopics: VideoTopicsSelect<false> | VideoTopicsSelect<true>;
     news: NewsSelect<false> | NewsSelect<true>;
     guides: GuidesSelect<false> | GuidesSelect<true>;
     'case-studies': CaseStudiesSelect<false> | CaseStudiesSelect<true>;
+    videos: VideosSelect<false> | VideosSelect<true>;
     knowledgeBase: KnowledgeBaseSelect<false> | KnowledgeBaseSelect<true>;
     legalDocuments: LegalDocumentsSelect<false> | LegalDocumentsSelect<true>;
     resources: ResourcesSelect<false> | ResourcesSelect<true>;
@@ -2286,82 +2286,6 @@ export interface Advisory {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Videos shown on /videos. New YouTube uploads arrive as drafts marked "Needs review": choose a category and topics, write the summary, then publish.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "videos".
- */
-export interface Video {
-  id: number;
-  title: string;
-  slug: string;
-  /**
-   * Required to publish. Explainer is "what is" and fundamentals; product demo is how to use the product. Drives the category tabs on /videos.
-   */
-  format?: ('explainer' | 'demo') | null;
-  /**
-   * At least one is required to publish. Drives the topic list on /videos. A topic that does not exist yet can be added from the search box.
-   */
-  topics?: (number | VideoTopic)[] | null;
-  /**
-   * Shown on the card. Required to publish, up to 320 characters.
-   */
-  summary?: string | null;
-  /**
-   * Plays at the top of /videos. Only one video can be featured: publishing this one clears the other. When none is featured, the newest video is.
-   */
-  featured?: boolean | null;
-  /**
-   * Set by the YouTube sync. "Missing" means the video is gone or private on YouTube; it is not unpublished automatically.
-   */
-  syncState?: ('synced' | 'needs-review' | 'missing' | 'manual') | null;
-  /**
-   * The length is read from YouTube. Fill this only when the video shows no length, for example a live stream (1:41).
-   */
-  durationLabel?: string | null;
-  provider: 'youtube' | 'vimeo';
-  /**
-   * The video id on the host (the 11 characters in a YouTube link).
-   */
-  externalId: string;
-  /**
-   * Copied from the host by the sync. Read only.
-   */
-  source?: {
-    title?: string | null;
-    description?: string | null;
-    durationSeconds?: number | null;
-    publishedAt?: string | null;
-    tags?:
-      | {
-          value?: string | null;
-          id?: string | null;
-        }[]
-      | null;
-    privacyStatus?: string | null;
-    embeddable?: boolean | null;
-    hasMaxres?: boolean | null;
-    thumbnailUrl?: string | null;
-    contentHash?: string | null;
-    fetchedAt?: string | null;
-  };
-  /**
-   * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
-   */
-  publishedAt?: string | null;
-  /**
-   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
-   */
-  displayPublishedAt?: string | null;
-  /**
-   * Set automatically when the title, body, summary or FAQs change. Shown publicly as the "Updated" date.
-   */
-  contentUpdatedAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "videoTopics".
  */
@@ -4125,6 +4049,82 @@ export interface Industry {
       | boolean
       | null;
   };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Videos shown on /videos. New YouTube uploads arrive as drafts marked "Needs review": choose a category and topics, write the summary, then publish.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos".
+ */
+export interface Video {
+  id: number;
+  /**
+   * Paste the link of the video. It is saved as the video ID and cannot be changed afterwards. The video shows on /videos only once it has a category, a topic and a summary and is published.
+   */
+  externalId: string;
+  title: string;
+  slug: string;
+  /**
+   * Required to publish. Explainer is "what is" and fundamentals; product demo is how to use the product. Drives the category tabs on /videos.
+   */
+  format?: ('explainer' | 'demo') | null;
+  /**
+   * At least one is required to publish. Drives the topic list on /videos. A topic that does not exist yet can be added from the search box.
+   */
+  topics?: (number | VideoTopic)[] | null;
+  /**
+   * Shown on the card. Required to publish, up to 320 characters.
+   */
+  summary?: string | null;
+  /**
+   * Plays at the top of /videos. Only one video can be featured: publishing this one clears the other. When none is featured, the newest video is.
+   */
+  featured?: boolean | null;
+  /**
+   * Set by the YouTube sync. "Missing" means the video is gone or private on YouTube; it is not unpublished automatically.
+   */
+  syncState?: ('synced' | 'needs-review' | 'missing' | 'manual') | null;
+  /**
+   * The length is read from YouTube. Fill this only when the video shows no length, for example a live stream (1:41).
+   */
+  durationLabel?: string | null;
+  provider: 'youtube' | 'vimeo';
+  /**
+   * Copied from the host by the sync. Read only.
+   */
+  source?: {
+    title?: string | null;
+    description?: string | null;
+    durationSeconds?: number | null;
+    publishedAt?: string | null;
+    tags?:
+      | {
+          value?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    privacyStatus?: string | null;
+    embeddable?: boolean | null;
+    hasMaxres?: boolean | null;
+    thumbnailUrl?: string | null;
+    contentHash?: string | null;
+    fetchedAt?: string | null;
+  };
+  /**
+   * Auto-set on first publish. Read-only — backdating is intentionally locked. Use the Payload Local API with overrideAccess for legacy imports.
+   */
+  publishedAt?: string | null;
+  /**
+   * The date Google sees as the original publish date. Defaults to publish time. Backdating beyond 30 days can trigger spam-policy flags.
+   */
+  displayPublishedAt?: string | null;
+  /**
+   * Set automatically when the title, body, summary or FAQs change. Shown publicly as the "Updated" date.
+   */
+  contentUpdatedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -10008,10 +10008,6 @@ export interface PayloadLockedDocument {
         value: number | Advisory;
       } | null)
     | ({
-        relationTo: 'videos';
-        value: number | Video;
-      } | null)
-    | ({
         relationTo: 'videoTopics';
         value: number | VideoTopic;
       } | null)
@@ -10026,6 +10022,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'case-studies';
         value: number | CaseStudy;
+      } | null)
+    | ({
+        relationTo: 'videos';
+        value: number | Video;
       } | null)
     | ({
         relationTo: 'knowledgeBase';
@@ -10583,48 +10583,6 @@ export interface AdvisoriesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "videos_select".
- */
-export interface VideosSelect<T extends boolean = true> {
-  title?: T;
-  slug?: T;
-  format?: T;
-  topics?: T;
-  summary?: T;
-  featured?: T;
-  syncState?: T;
-  durationLabel?: T;
-  provider?: T;
-  externalId?: T;
-  source?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        durationSeconds?: T;
-        publishedAt?: T;
-        tags?:
-          | T
-          | {
-              value?: T;
-              id?: T;
-            };
-        privacyStatus?: T;
-        embeddable?: T;
-        hasMaxres?: T;
-        thumbnailUrl?: T;
-        contentHash?: T;
-        fetchedAt?: T;
-      };
-  publishedAt?: T;
-  displayPublishedAt?: T;
-  contentUpdatedAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "videoTopics_select".
  */
 export interface VideoTopicsSelect<T extends boolean = true> {
@@ -11052,6 +11010,48 @@ export interface CaseStudiesSelect<T extends boolean = true> {
         additionalSchema?: T;
         schemaHistory?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos_select".
+ */
+export interface VideosSelect<T extends boolean = true> {
+  externalId?: T;
+  title?: T;
+  slug?: T;
+  format?: T;
+  topics?: T;
+  summary?: T;
+  featured?: T;
+  syncState?: T;
+  durationLabel?: T;
+  provider?: T;
+  source?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        durationSeconds?: T;
+        publishedAt?: T;
+        tags?:
+          | T
+          | {
+              value?: T;
+              id?: T;
+            };
+        privacyStatus?: T;
+        embeddable?: T;
+        hasMaxres?: T;
+        thumbnailUrl?: T;
+        contentHash?: T;
+        fetchedAt?: T;
+      };
+  publishedAt?: T;
+  displayPublishedAt?: T;
+  contentUpdatedAt?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -15080,10 +15080,6 @@ export interface TaskSchedulePublish {
           value: number | Advisory;
         } | null)
       | ({
-          relationTo: 'videos';
-          value: number | Video;
-        } | null)
-      | ({
           relationTo: 'news';
           value: number | News;
         } | null)
@@ -15094,6 +15090,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'case-studies';
           value: number | CaseStudy;
+        } | null)
+      | ({
+          relationTo: 'videos';
+          value: number | Video;
         } | null)
       | ({
           relationTo: 'knowledgeBase';

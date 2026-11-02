@@ -31,6 +31,8 @@ on:
       - "turbo.json"
       - ".github/workflows/web.yml"
 
+  workflow_dispatch:
+
 concurrency:
   group: web-${{ github.ref }}
   cancel-in-progress: true
@@ -42,6 +44,9 @@ env:
   NEXT_PUBLIC_CMS_URL: https://cms.cleanstart.com
 
 jobs:
+  # `web` runs on every push and PR. `web-e2e` and `web-lhci` cost about 17 of
+  # the 26 billed minutes per run, so they gate only the PR into `main` (and
+  # manual runs) instead of every push to `development` and `main`.
   web:
     name: apps/web · lint · typecheck · build
     runs-on: ubuntu-latest
@@ -95,7 +100,7 @@ jobs:
 
       - name: Copy gate (no em/en-dashes in code-owned copy)
         run: |
-          node --test apps/web/scripts/verify-copy.test.mjs
+          node --test apps/web/scripts/verify-copy.test.mjs apps/web/scripts/wait-for-cms.test.mjs
           pnpm --filter @cleanstart/web verify:copy
 
       - name: Capture build size
@@ -122,6 +127,7 @@ jobs:
   web-e2e:
     name: apps/web · Playwright (responsive + axe smoke)
     needs: web
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.base_ref == 'main') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -194,6 +200,7 @@ jobs:
   web-lhci:
     name: apps/web · Lighthouse CI (mobile)
     needs: web
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.base_ref == 'main') }}
     runs-on: ubuntu-latest
     # Sprint 1 Day 3 (v3 responsive plan): re-enabled with a trimmed URL
     # allowlist (static, non-CMS-fetching routes only). Detail / listing pages

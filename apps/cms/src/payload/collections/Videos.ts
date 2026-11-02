@@ -8,6 +8,7 @@ import { displayPublishedAtField } from '../fields/display-published-at';
 import { publishedAtField } from '../fields/published-at';
 import { slugField } from '../fields/slug';
 import { contentTitleField } from '../fields/title';
+import { youtubeIdFrom } from '../lib/videos/youtube-id';
 import { contentUpdatedAtHook } from '../hooks/content-updated-at';
 import { displayPublishedAtAuditHook } from '../hooks/display-published-at-audit';
 import { displayPublishedAtBackfillHook } from '../hooks/display-published-at-backfill';
@@ -117,6 +118,25 @@ export const Videos: CollectionConfig = {
         components: { Field: '@/payload/admin/components/VideoSourceSummary.tsx#VideoSourceSummary' },
       },
     },
+    {
+      name: 'externalId',
+      type: 'text',
+      label: 'YouTube link or video ID',
+      required: true,
+      unique: true,
+      index: true,
+      access: readOnly,
+      hooks: {
+        // A pasted link becomes the 11-character id; anything else is left for `validate` to refuse.
+        beforeValidate: [({ value }) => (typeof value === 'string' ? (youtubeIdFrom(value) ?? value.trim()) : value)],
+      },
+      validate: (value: string | null | undefined) =>
+        youtubeIdFrom(value) !== null ? true : 'Paste a YouTube link or the 11-character video ID.',
+      admin: {
+        description:
+          'Paste the link of the video. It is saved as the video ID and cannot be changed afterwards. The video shows on /videos only once it has a category, a topic and a summary and is published.',
+      },
+    },
     { ...contentTitleField, label: 'Title on the website' },
     hiddenSlugField(),
     {
@@ -198,6 +218,7 @@ export const Videos: CollectionConfig = {
       admin: {
         position: 'sidebar',
         readOnly: true,
+        condition: (_data, _siblingData, { operation }) => operation !== 'create',
         description:
           'Set by the YouTube sync. "Missing" means the video is gone or private on YouTube; it is not unpublished automatically.',
       },
@@ -219,7 +240,7 @@ export const Videos: CollectionConfig = {
     {
       type: 'collapsible',
       label: 'From YouTube (read only)',
-      admin: { initCollapsed: true },
+      admin: { initCollapsed: true, condition: (_data, _siblingData, { operation }) => operation !== 'create' },
       fields: [
         {
           name: 'provider',
@@ -232,18 +253,6 @@ export const Videos: CollectionConfig = {
           ],
           access: readOnly,
           admin: { readOnly: true },
-        },
-        {
-          name: 'externalId',
-          type: 'text',
-          required: true,
-          unique: true,
-          index: true,
-          access: readOnly,
-          admin: {
-            readOnly: true,
-            description: 'The video id on the host (the 11 characters in a YouTube link).',
-          },
         },
         {
           name: 'source',
