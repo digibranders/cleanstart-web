@@ -10,7 +10,7 @@ describe("thank-you types", () => {
       "contact",
       "deal-registration",
       "job-application",
-      "cleansight-demo-request",
+      "cleansight-campaign",
     ]);
   });
 

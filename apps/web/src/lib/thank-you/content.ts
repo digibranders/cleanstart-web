@@ -72,7 +72,7 @@ export const THANK_YOU_CONTENT = {
     metaTitle: "Application received",
     metaDescription: "Your application to CleanStart has been received.",
   },
-  "cleansight-demo-request": {
+  "cleansight-campaign": {
     headline: "Your scan request is in",
     body: "A CleanStart specialist will contact you to set up your free container security scan.",
     whatHappensNext:

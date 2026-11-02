@@ -17,7 +17,7 @@ import { submitLead } from '@/lib/leads/submitLead';
 
 import { FormCard, FormSectionTitle, SubmitButton } from './FormCard';
 
-const FORM_SLUG = 'cleansight-demo-request';
+const FORM_SLUG = 'cleansight-campaign';
 
 /** Form field key → CMS field name (the HubSpot internal property name). */
 const FIELD_NAMES = {

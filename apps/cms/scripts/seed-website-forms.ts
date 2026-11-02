@@ -109,10 +109,10 @@ const FORMS: readonly SeedForm[] = [
     ],
   },
   {
-    // Campaign page /cleansight-demo-request. No HubSpot GUID yet: leads are
+    // Campaign page /cleansight-campaign. No HubSpot GUID yet: leads are
     // stored in the CMS until the HubSpot form is created, then set
     // `hubspotFormGuid` here (or in the admin) and re-run with this slug.
-    slug: 'cleansight-demo-request',
+    slug: 'cleansight-campaign',
     name: 'CleanSight Scan Request',
     submitLabel: 'Get my free scan',
     fields: [
@@ -131,7 +131,7 @@ const run = async (): Promise<void> => {
   const payload = await getPayload({ config: payloadConfig });
 
   // Optional slug filter, so adding one form does not re-save the others:
-  //   ... scripts/seed-website-forms.ts cleansight-demo-request
+  //   ... scripts/seed-website-forms.ts cleansight-campaign
   const only = process.argv.slice(2);
   const targets = only.length > 0 ? FORMS.filter((f) => only.includes(f.slug)) : FORMS;
   if (targets.length === 0) throw new Error(`No form matches: ${only.join(', ')}`);

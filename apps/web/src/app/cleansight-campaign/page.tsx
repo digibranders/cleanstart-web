@@ -11,7 +11,7 @@ import { buildPageMetadata } from "@/lib/seo/canonical";
 import { getPageGraph } from "@/lib/seo/compose-page";
 import { breadcrumbSchema } from "@/lib/seo/jsonld";
 
-// Campaign landing page restored from the old Webflow /cleansight-demo-request.
+// Campaign landing page restored from the old Webflow /cleansight-demo-request page.
 // noindex until the team signs it off: it overlaps /cleansight and should not
 // compete with it in search.
 export const metadata = buildPageMetadata({
@@ -19,14 +19,14 @@ export const metadata = buildPageMetadata({
   absoluteTitle: true,
   description:
     "Find hidden container risk across your hybrid environment. Request a free CleanSight scan to see inherited vulnerabilities, where they run, and how to fix them.",
-  path: "/cleansight-demo-request",
+  path: "/cleansight-campaign",
   noindex: true,
 });
 
 export const revalidate = 21600;
 
 export default async function CleanSightScanRequestPage(): Promise<React.ReactElement> {
-  const graph = await getPageGraph("/cleansight-demo-request", [
+  const graph = await getPageGraph("/cleansight-campaign", [
     breadcrumbSchema([
       { name: "Home", path: "/" },
       { name: "CleanSight", path: "/cleansight" },
