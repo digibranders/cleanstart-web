@@ -26,6 +26,7 @@ export const THANK_YOU_TYPES = [
   "contact",
   "deal-registration",
   "job-application",
+  "cleansight-demo-request",
 ] as const;
 
 export type ThankYouType = (typeof THANK_YOU_TYPES)[number];

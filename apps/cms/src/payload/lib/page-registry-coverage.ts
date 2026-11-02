@@ -24,6 +24,9 @@ export const INTENTIONALLY_UNREGISTERED: ReadonlySet<string> = new Set([
   '/thank-you/[type]',
   // Internal draft-preview harness, never public.
   '/preview/[collection]/[slug]',
+  // Campaign landing page, noindex until signed off (apps/web/src/app/cleansight-demo-request).
+  // Add a pageRegistry row when it is released to search.
+  '/cleansight-demo-request',
 ]);
 
 /** Segment names that don't produce a URL segment (Next.js route groups). */

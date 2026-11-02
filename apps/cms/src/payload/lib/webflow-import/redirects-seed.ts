@@ -36,6 +36,7 @@ export const REDIRECTS_SEED: readonly RedirectSeed[] = [
   { from: '/attack-surface', to: '/attack-surface-reduction', status: '301', note: WEBFLOW },
   { from: '/cso-page', to: '/for-ciso', status: '301', note: WEBFLOW },
   { from: '/for-cso', to: '/for-ciso', status: '301', note: WEBFLOW },
+  { from: '/cleansight-campaign', to: '/cleansight-demo-request', status: '301', note: WEBFLOW },
   { from: '/deal-reg', to: '/deal-registration', status: '301', note: WEBFLOW },
   { from: '/event', to: '/events', status: '301', note: WEBFLOW },
   { from: '/fips-dekstop', to: '/fips', status: '301', note: WEBFLOW },
@@ -64,13 +65,6 @@ export const REDIRECTS_SEED: readonly RedirectSeed[] = [
   },
 
   // ── Remapped: Webflow target no longer exists on the new site ──────────
-  {
-    from: '/cleansight-campaign',
-    to: '/cleansight',
-    status: '301',
-    originalTarget: '/cleansight-demo-request',
-    note: `${WEBFLOW} Webflow target /cleansight-demo-request has no equivalent route; remapped to the CleanSight product page.`,
-  },
   {
     from: '/cleanstart-hitachi',
     to: '/community',
