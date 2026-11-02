@@ -1,6 +1,7 @@
 import { KnowledgeHubArticle } from '@/components/sections/knowledge-hub/KnowledgeHubArticle';
 import { mediaUrl } from '@/lib/blog';
 import { getKnowledgeArticle, getKnowledgeArticleSlugs } from '@/lib/knowledge-hub';
+import { resolveLexicalVideos } from '@/lib/lexical-videos';
 import { buildPageMetadata } from '@/lib/seo/canonical';
 import { resolveCmsSeo } from '@/lib/seo/cms-seo';
 import { ogImageUrl } from '@/lib/seo/og';
@@ -131,7 +132,9 @@ export default async function KnowledgeHubArticlePage({
           override: seoOverride(article.seo),
         })}
       />
-      <KnowledgeHubArticle article={{ ...article, faqs: validFaqs }} />
+      <KnowledgeHubArticle
+        article={{ ...article, body: (await resolveLexicalVideos(article.body)) ?? null, faqs: validFaqs }}
+      />
     </>
   );
 }

@@ -12,6 +12,7 @@ import { GuideDetailFAQ } from "@/components/sections/guide/GuideDetailFAQ";
 import { GuideDetailRelatedGuides } from "@/components/sections/guide/GuideDetailRelatedGuides";
 import { GuidesCTA } from "@/components/sections/guides/GuidesCTA";
 import { highlightLexical } from "@/lib/highlightLexical";
+import { resolveLexicalVideos } from "@/lib/lexical-videos";
 import { lexicalToPlainText } from "@/lib/renderLexical";
 import {
   getGuideBySlug,
@@ -117,7 +118,7 @@ export async function renderGuideDetail({
 
   const [relatedGuides, highlightedBody, autoJourney] = await Promise.all([
     getRelatedGuides(String(guide.id), guide.relatedGuides, { draft }),
-    highlightLexical(guide.body ?? null),
+    highlightLexical(guide.body ?? null).then(resolveLexicalVideos),
     needAutoJourney
       ? getGuideJourneyTargets(String(guide.id), publishedAt ?? undefined, { draft })
       : Promise.resolve({ previous: null, next: null }),

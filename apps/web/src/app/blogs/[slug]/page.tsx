@@ -10,6 +10,7 @@ import {
 } from "@/lib/blog";
 import type { Blog } from "@/lib/blog";
 import { highlightLexical } from "@/lib/highlightLexical";
+import { resolveLexicalVideos } from "@/lib/lexical-videos";
 import { lexicalToPlainText } from "@/lib/renderLexical";
 import { Header } from "@/components/nav/Header";
 import { BlogDetailHero } from "@/components/sections/blog/BlogDetailHero";
@@ -125,7 +126,7 @@ export async function renderBlogDetail({
 
   const [relatedPosts, highlightedBody, autoJourney, ctas] = await Promise.all([
     getRelatedBlogs(post.id, categoryIds, post.relatedPosts, { draft }),
-    highlightLexical(post.body),
+    highlightLexical(post.body).then(resolveLexicalVideos),
     needAutoJourney
       ? getAutoJourneyTargets(
           String(post.id),

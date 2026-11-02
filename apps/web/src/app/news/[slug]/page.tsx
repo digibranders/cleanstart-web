@@ -8,6 +8,7 @@ import {
   getRelatedNews,
 } from "@/lib/news";
 import { highlightLexical } from "@/lib/highlightLexical";
+import { resolveLexicalVideos } from "@/lib/lexical-videos";
 import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { NewsDetailHero } from "@/components/sections/news-detail/NewsDetailHero";
@@ -93,7 +94,7 @@ export async function renderNewsDetail({
   const categoryIds = item.newsCategories?.map((c) => c.id) ?? [];
   const [related, highlightedBody] = await Promise.all([
     getRelatedNews(item.id, categoryIds, 3, { draft }).catch(() => []),
-    highlightLexical(item.body ?? null),
+    highlightLexical(item.body ?? null).then(resolveLexicalVideos),
   ]);
   const itemWithHighlighted = { ...item, body: highlightedBody ?? null };
 

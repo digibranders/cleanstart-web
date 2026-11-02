@@ -7,6 +7,7 @@ vi.mock("./cms-fetch", () => ({
 
 import {
   getCmsVideos,
+  getCmsVideosByIds,
   mapCmsVideo,
   parseDurationLabel,
 } from "./videos-cms";
@@ -151,5 +152,45 @@ describe("getCmsVideos", () => {
       throw new Error("CMS fetch failed: 520");
     });
     await expect(getCmsVideos()).rejects.toThrow(/520/);
+  });
+});
+
+describe("getCmsVideosByIds", () => {
+  it("makes no request when nothing is asked for", async () => {
+    expect((await getCmsVideosByIds([])).size).toBe(0);
+    expect(fetchCMS).not.toHaveBeenCalled();
+  });
+
+  it("asks for just those published videos and keys them by CMS id", async () => {
+    fetchCMS.mockResolvedValue({ docs: [doc({ id: 7 }), doc({ id: 9, externalId: "abc123", slug: "other" })] });
+    const found = await getCmsVideosByIds(["7", "9"]);
+    const url = fetchCMS.mock.calls[0]?.[0] as string;
+    expect(url).toContain("where%5B_status%5D%5Bequals%5D=published");
+    expect(url).toContain("where%5Bid%5D%5Bin%5D=7%2C9");
+    expect(found.get("7")?.id).toBe("uBItoX-x7Do");
+    expect(found.get("9")?.id).toBe("abc123");
+  });
+
+  it("keeps talks, which the /videos page hides", async () => {
+    fetchCMS.mockResolvedValue({ docs: [doc({ id: 7, format: "talk" })] });
+    expect((await getCmsVideosByIds(["7"])).has("7")).toBe(true);
+  });
+
+  it("drops a video YouTube would not play", async () => {
+    fetchCMS.mockResolvedValue({
+      docs: [
+        doc({ id: 1, syncState: "missing" }),
+        doc({ id: 2, source: { privacyStatus: "private" } }),
+        doc({ id: 3, source: { embeddable: false } }),
+        doc({ id: 4, externalId: null }),
+        doc({ id: 5 }),
+      ],
+    });
+    expect([...(await getCmsVideosByIds(["1", "2", "3", "4", "5"])).keys()]).toEqual(["5"]);
+  });
+
+  it("returns nothing, rather than failing the article, when the CMS is down", async () => {
+    fetchCMS.mockRejectedValue(new Error("down"));
+    expect((await getCmsVideosByIds(["7"])).size).toBe(0);
   });
 });

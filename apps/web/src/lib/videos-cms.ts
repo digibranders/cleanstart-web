@@ -42,15 +42,16 @@ const isPopulatedTopic = (t: CmsTopic | number | string): t is CmsTopic =>
 
 const byNewest = (a: Video, b: Video): number => b.publishedAt.localeCompare(a.publishedAt);
 
-// Talks and webinars are not part of this page (they live on /webinars and /podcast). A video
-// YouTube no longer plays here (gone, private, embedding off) would show a broken player, so the
-// page hides it until an editor or the next sync sets it right.
-const isUsable = (doc: CmsVideo): boolean =>
+// Whether YouTube will play it here. A video that is gone, private or has embedding off would show a
+// broken player, so it is hidden until an editor or the next sync sets it right.
+const isEmbeddable = (doc: CmsVideo): boolean =>
   Boolean(doc.slug && doc.externalId) &&
-  doc.format !== "talk" &&
   doc.syncState !== "missing" &&
   doc.source?.privacyStatus !== "private" &&
   doc.source?.embeddable !== false;
+
+// Talks and webinars are not part of the /videos page (they live on /webinars and /podcast).
+const isUsable = (doc: CmsVideo): boolean => isEmbeddable(doc) && doc.format !== "talk";
 
 export const mapCmsVideo = (doc: CmsVideo): Video => {
   const rawDescription = doc.source?.description;
@@ -87,4 +88,27 @@ export async function getCmsVideos(): Promise<Video[]> {
   });
   const data = await fetchCMS<CmsList>(`/api/videos?${params.toString()}`, { tags: TAGS });
   return data.docs.filter(isUsable).map(mapCmsVideo).sort(byNewest);
+}
+
+/**
+ * Published videos by CMS id, for the video blocks inside articles. Unlike the
+ * /videos page this keeps talks. A CMS failure returns nothing instead of
+ * throwing: a missing optional video must not take the article down with it.
+ */
+export async function getCmsVideosByIds(ids: readonly string[]): Promise<Map<string, Video>> {
+  if (ids.length === 0) return new Map();
+  const params = new URLSearchParams({
+    "where[_status][equals]": "published",
+    "where[id][in]": ids.join(","),
+    depth: "0",
+    limit: String(ids.length),
+  });
+  try {
+    const data = await fetchCMS<CmsList>(`/api/videos?${params.toString()}`, { tags: TAGS });
+    return new Map(
+      data.docs.filter(isEmbeddable).map((doc) => [String(doc.id), mapCmsVideo(doc)] as const),
+    );
+  } catch {
+    return new Map();
+  }
 }

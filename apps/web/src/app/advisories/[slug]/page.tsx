@@ -7,6 +7,7 @@ import { ADVISORIES_SECTION, mediaUrl } from "@/lib/blog-utils";
 import type { LexicalRoot } from "@/lib/blog";
 import { getAdvisoryCtas } from "@/lib/blog-cta/resolve";
 import { highlightLexical } from "@/lib/highlightLexical";
+import { resolveLexicalVideos } from "@/lib/lexical-videos";
 import { RenderLexical } from "@/lib/renderLexical";
 import { Header } from "@/components/nav/Header";
 import { DetailHero } from "@/components/sections/_shared/DetailHero";
@@ -145,9 +146,9 @@ export async function renderAdvisoryDetail({
   const heading = advisoryHeading(advisory);
   const publishedAt = effectivePublishedAt(advisory);
   const [body, impact, resolution, ctas] = await Promise.all([
-    highlightLexical(advisory.body),
-    highlightLexical(advisory.impact),
-    highlightLexical(advisory.resolution),
+    highlightLexical(advisory.body).then(resolveLexicalVideos),
+    highlightLexical(advisory.impact).then(resolveLexicalVideos),
+    highlightLexical(advisory.resolution).then(resolveLexicalVideos),
     getAdvisoryCtas(advisory),
   ]);
   // Advisories written before the single content box keep their three sections.

@@ -249,3 +249,32 @@ describe("embedStyleClass", () => {
     expect(embedStyleClass(null)).toBe("");
   });
 });
+
+describe("video blocks", () => {
+  const videoBlock = (fields: Record<string, unknown>): LexicalNode =>
+    ({ type: "block", version: 2, fields: { blockType: "videoEmbed", ...fields } }) as unknown as LexicalNode;
+  const render = (...children: LexicalNode[]): string =>
+    renderToStaticMarkup(
+      createElement(RenderLexical, { content: { root: { type: "root", children } } as unknown as LexicalRoot }),
+    );
+  const resolved = { id: "uBItoX-x7Do", title: "What Is VEX?", thumb: "maxres", durationSeconds: 101 };
+
+  it("draws a resolved video as a figure with a play button, its length and a no-script link", () => {
+    const html = render(videoBlock({ video: 7, _video: resolved }));
+    expect(html).toContain("article-figure");
+    expect(html).toContain('aria-label="Play What Is VEX?"');
+    expect(html).toContain("<figcaption>What Is VEX?");
+    expect(html).toContain("1:41");
+    expect(html).toContain("https://www.youtube.com/watch?v=uBItoX-x7Do");
+  });
+
+  it("prefers the editor's caption over the video title", () => {
+    expect(render(videoBlock({ _video: resolved, caption: "See the walkthrough" }))).toContain(
+      "<figcaption>See the walkthrough",
+    );
+  });
+
+  it("draws nothing for a block whose video was never resolved", () => {
+    expect(render(videoBlock({ video: 7 }))).not.toContain("article-figure");
+  });
+});

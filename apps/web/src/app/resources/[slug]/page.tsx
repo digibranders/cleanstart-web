@@ -13,6 +13,7 @@ import {
   resolveResourceTypeLabel,
 } from "@/lib/resources";
 import { highlightLexical } from "@/lib/highlightLexical";
+import { resolveLexicalVideos } from "@/lib/lexical-videos";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { resolveCmsSeo } from "@/lib/seo/cms-seo";
 import { effectivePublishedAt } from "@/lib/published-date";
@@ -100,7 +101,7 @@ export async function renderResourceDetail({
 
   const heroAbsolute = mediaUrl(resource.heroImage?.url);
 
-  const highlightedBody = await highlightLexical(resource.body ?? null);
+  const highlightedBody = await highlightLexical(resource.body ?? null).then(resolveLexicalVideos);
   const resourceWithHighlighted = { ...resource, body: highlightedBody ?? null };
 
   return (
