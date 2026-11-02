@@ -292,3 +292,41 @@ export const videoFiltersQuery = (filters: VideoFilters): string => {
 
 export const isDefaultFilters = (filters: VideoFilters): boolean =>
   videoFiltersQuery(filters) === "";
+
+/** An explainer this short is a good first click. */
+const QUICK_START_MAX_SECONDS = 120;
+
+/**
+ * The short explainers for the "Quick starts" row: under two minutes, newest
+ * first. Fewer than two is not a row, so it returns nothing.
+ */
+export const quickStarts = (
+  videos: readonly Video[],
+  limit = 4,
+  excludeId?: string,
+): Video[] => {
+  const picks = videos
+    .filter(
+      (v) =>
+        v.format === "explainer" &&
+        v.id !== excludeId &&
+        v.durationSeconds !== undefined &&
+        v.durationSeconds < QUICK_START_MAX_SECONDS,
+    )
+    .sort(SORTERS.new);
+  return picks.length < 2 ? [] : picks.slice(0, limit);
+};
+
+/**
+ * What to offer after `current`: same topic first, then same format, then the
+ * rest, newest first inside each group.
+ */
+export const upNext = (videos: readonly Video[], current: Video, limit = 5): Video[] => {
+  const topics = new Set(current.topics.map((t) => t.slug));
+  const rank = (v: Video): number =>
+    v.topics.some((t) => topics.has(t.slug)) ? 0 : v.format !== null && v.format === current.format ? 1 : 2;
+  return videos
+    .filter((v) => v.id !== current.id)
+    .sort((a, b) => rank(a) - rank(b) || SORTERS.new(a, b))
+    .slice(0, limit);
+};

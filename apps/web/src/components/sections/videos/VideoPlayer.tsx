@@ -21,6 +21,8 @@ interface VideoPlayerProps {
   radius?: string;
   /** Small glass play button for grid cards, so the poster art stays readable behind it. */
   compact?: boolean;
+  /** Start playing as soon as it mounts, for a player opened by a click elsewhere. */
+  autoPlay?: boolean;
   /** Called when the visitor starts this player. */
   onPlay?: () => void;
   /** Called when another player on the page took over and this one went back to its poster. */
@@ -34,11 +36,12 @@ export function VideoPlayer({
   className = "",
   radius = "20px",
   compact = false,
+  autoPlay = false,
   onPlay,
   onStop,
 }: VideoPlayerProps): React.ReactElement {
   const instanceId = useId();
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(autoPlay);
   const { markWatched } = useWatchedVideos();
 
   const announceStart = useCallback((): void => {
@@ -46,6 +49,10 @@ export function VideoPlayer({
     markWatched(video.id);
     trackEvent("cta_click", { cta: "video_play", video_id: video.id });
   }, [instanceId, markWatched, video.id]);
+
+  useEffect(() => {
+    if (autoPlay) announceStart();
+  }, [autoPlay, announceStart]);
 
   useEffect(() => {
     if (!playing) return;

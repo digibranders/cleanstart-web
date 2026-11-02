@@ -10,13 +10,18 @@ import {
   formatCounts,
   isDefaultFilters,
   parseVideoFilters,
+  quickStarts,
+  upNext,
   videoFiltersQuery,
   type Video,
   type VideoFilters,
   type VideoSort,
 } from "@/lib/videos-utils";
+import { FilterSheet } from "./FilterSheet";
+import { QuickStarts } from "./QuickStarts";
 import { VideoCard } from "./VideoCard";
 import { VideoSelect } from "./VideoSelect";
+import { VideoTheatre } from "./VideoTheatre";
 
 /** One row of the topic dropdown: the URL slug, the label, and how many videos carry it. */
 export interface TopicOption {
@@ -49,6 +54,10 @@ interface VideosViewProps {
 
 function VideosView({ videos, topics, heroId, filters, onChange }: VideosViewProps): React.ReactElement {
   const searchRef = useRef<HTMLInputElement>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  // `n` changes on every pick so choosing the playing video again scrolls back to the player.
+  const [theatre, setTheatre] = useState<{ video: Video; n: number } | null>(null);
+  const play = (video: Video): void => setTheatre((t) => ({ video, n: (t?.n ?? 0) + 1 }));
 
   // The search box is local state so typing never waits on the URL. These three
   // values stop a debounced push from overwriting characters typed after it,
@@ -105,6 +114,14 @@ function VideosView({ videos, topics, heroId, filters, onChange }: VideosViewPro
     return { rows, total: pool.length };
   }, [videos, topics, filters]);
 
+  const quick = useMemo(
+    () => (isDefaultFilters(filters) ? quickStarts(videos, 4, heroId ?? undefined) : []),
+    [videos, filters, heroId],
+  );
+  const queue = useMemo(() => (theatre ? upNext(videos, theatre.video) : []), [videos, theatre]);
+  const sheetActive =
+    (filters.format ? 1 : 0) + (filters.topic ? 1 : 0) + (filters.sort !== "new" ? 1 : 0);
+
   const shown = list.slice(0, visibleCount);
   const remaining = list.length - shown.length;
   const hasActiveFilter = !isDefaultFilters(filters);
@@ -126,9 +143,9 @@ function VideosView({ videos, topics, heroId, filters, onChange }: VideosViewPro
         All videos
       </h2>
 
-      <div className="z-30 border-b border-[rgba(18,16,28,0.08)] bg-white/92 backdrop-blur-md md:sticky md:top-[var(--cs-header-h)]">
+      <div className="sticky top-[var(--cs-header-h)] z-30 border-b border-[rgba(18,16,28,0.08)] bg-white/92 backdrop-blur-md">
         <Container className="flex flex-col gap-3 py-3 lg:flex-row lg:items-center lg:justify-between">
-          <fieldset className="-mx-6 m-0 flex min-w-0 gap-1.5 overflow-x-auto border-0 px-6 pb-1 [scrollbar-width:none] sm:-mx-10 sm:px-10 lg:mx-0 lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden">
+          <fieldset className="-mx-6 m-0 hidden min-w-0 gap-1.5 md:flex overflow-x-auto border-0 px-6 pb-1 [scrollbar-width:none] sm:-mx-10 sm:px-10 md:mx-0 md:px-0 md:pb-0 lg:mx-0 lg:overflow-visible [&::-webkit-scrollbar]:hidden">
             <legend className="sr-only">Filter by format</legend>
             {[
               { id: undefined, label: "All", count: counts.all },
@@ -155,7 +172,7 @@ function VideosView({ videos, topics, heroId, filters, onChange }: VideosViewPro
           <form
             aria-label="Search and filter videos"
             onSubmit={submitSearch}
-            className="flex flex-wrap items-center gap-2 sm:flex-nowrap"
+            className="flex items-center gap-2"
           >
             <VideoSelect<string>
               label="Topic"
@@ -165,10 +182,10 @@ function VideosView({ videos, topics, heroId, filters, onChange }: VideosViewPro
                 { value: "all", label: "All topics" },
                 ...topicRows.rows.map((t) => ({ value: t.slug, label: t.label, count: t.count })),
               ]}
-              className="flex-1 sm:w-[210px] sm:flex-none lg:hidden"
+              className="max-md:hidden md:w-[210px] lg:hidden"
             />
 
-            <div className="relative order-first w-full sm:order-none sm:w-[240px]">
+            <div className="relative min-w-0 flex-1 md:w-[240px] md:flex-none">
               <label className="sr-only" htmlFor="videos-search">
                 Search videos
               </label>
@@ -210,8 +227,21 @@ function VideosView({ videos, topics, heroId, filters, onChange }: VideosViewPro
               value={filters.sort}
               onChange={(v) => set({ sort: v })}
               options={SORT_OPTIONS}
-              className="flex-1 sm:w-[190px] sm:flex-none"
+              className="max-md:hidden md:w-[190px]"
             />
+
+            <button
+              type="button"
+              onClick={() => setSheetOpen(true)}
+              className="relative inline-flex h-11 shrink-0 cursor-pointer items-center gap-2 rounded-[12px] border border-[rgba(18,16,28,0.18)] bg-white px-4 font-sans text-[15px] font-medium text-[#12101C] md:hidden"
+            >
+              Filter
+              {sheetActive > 0 ? (
+                <span className="flex size-5 items-center justify-center rounded-full bg-[#5B2EE0] text-[12px] tabular-nums text-white">
+                  {sheetActive}
+                </span>
+              ) : null}
+            </button>
           </form>
         </Container>
       </div>
@@ -229,6 +259,18 @@ function VideosView({ videos, topics, heroId, filters, onChange }: VideosViewPro
         />
 
         <div className="min-w-0">
+          {theatre ? (
+            <VideoTheatre
+              video={theatre.video}
+              queue={queue}
+              focusKey={theatre.n}
+              onSelect={play}
+              onClose={() => setTheatre(null)}
+            />
+          ) : null}
+
+          {quick.length > 0 ? <QuickStarts videos={quick} onPlay={play} /> : null}
+
           <div className="mb-7 flex flex-wrap items-center gap-x-3 gap-y-2">
             <p
               aria-live="polite"
@@ -262,7 +304,13 @@ function VideosView({ videos, topics, heroId, filters, onChange }: VideosViewPro
           {shown.length > 0 ? (
             <ul className="grid grid-cols-1 gap-x-7 gap-y-12 sm:grid-cols-2 xl:grid-cols-3">
               {shown.map((video) => (
-                <VideoCard key={video.id} video={video} />
+                <VideoCard
+                  key={video.id}
+                  video={video}
+                  playing={theatre?.video.id === video.id}
+                  onPlay={play}
+                  onTopic={(slug) => set({ topic: slug })}
+                />
               ))}
             </ul>
           ) : (
@@ -298,6 +346,18 @@ function VideosView({ videos, topics, heroId, filters, onChange }: VideosViewPro
           ) : null}
         </div>
       </Container>
+
+      <FilterSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        filters={filters}
+        onChange={set}
+        onClear={clearAll}
+        formatCounts={counts}
+        topics={topicRows.rows.map((t) => ({ value: t.slug, label: t.label, count: t.count }))}
+        sorts={SORT_OPTIONS}
+        resultCount={list.length}
+      />
     </section>
   );
 }

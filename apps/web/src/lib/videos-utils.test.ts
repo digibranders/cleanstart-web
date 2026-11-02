@@ -9,9 +9,11 @@ import {
   matchesQuery,
   mergeVideos,
   parseVideoFilters,
+  quickStarts,
   sanitizeDescription,
   slugifyTitle,
   topicCounts,
+  upNext,
   videoFiltersQuery,
   type Video,
 } from "./videos-utils";
@@ -216,5 +218,78 @@ describe("URL filter state", () => {
     const filters = parseVideoFilters((k) => ({ topic: "zero-trust" })[k], ["zero-trust"]);
     expect(filters.topic).toBe("zero-trust");
     expect(parseVideoFilters((k) => ({ topic: "cves" })[k], ["zero-trust"]).topic).toBeUndefined();
+  });
+});
+
+const clip = (id: string, over: Partial<Video> = {}): Video => ({
+  id,
+  slug: id.toLowerCase(),
+  title: `Video ${id}`,
+  format: "explainer",
+  topics: [],
+  publishedAt: "2026-10-01T00:00:00Z",
+  durationSeconds: 90,
+  summary: "",
+  description: "",
+  thumb: "maxres",
+  featured: false,
+  ...over,
+});
+
+describe("quickStarts", () => {
+  it("keeps explainers under two minutes, newest first, up to the limit", () => {
+    const pool = [
+      clip("a", { publishedAt: "2026-10-01T00:00:00Z" }),
+      clip("b", { publishedAt: "2026-10-05T00:00:00Z" }),
+      clip("c", { durationSeconds: 120 }),
+      clip("d", { format: "demo" }),
+      clip("e", { durationSeconds: undefined }),
+      clip("f", { format: null }),
+      clip("g", { publishedAt: "2026-10-03T00:00:00Z" }),
+    ];
+    expect(quickStarts(pool, 2).map((v) => v.id)).toEqual(["b", "g"]);
+  });
+
+  it("returns nothing when fewer than two qualify, so the row is not shown for one card", () => {
+    expect(quickStarts([clip("a"), clip("c", { durationSeconds: 300 })])).toEqual([]);
+  });
+
+  it("skips the excluded video", () => {
+    const pool = [
+      clip("a", { publishedAt: "2026-10-03T00:00:00Z" }),
+      clip("b", { publishedAt: "2026-10-02T00:00:00Z" }),
+      clip("c", { publishedAt: "2026-10-01T00:00:00Z" }),
+    ];
+    expect(quickStarts(pool, 4, "a").map((v) => v.id)).toEqual(["b", "c"]);
+  });
+});
+
+describe("upNext", () => {
+  const t = (slug: string) => ({ slug, label: slug });
+  const current = clip("cur", { topics: [t("x")], format: "demo", publishedAt: "2026-10-10T00:00:00Z" });
+
+  it("ranks same topic, then same format, then the rest, newest first inside each group", () => {
+    const pool = [
+      current,
+      clip("rest-new", { format: "explainer", publishedAt: "2026-10-09T00:00:00Z" }),
+      clip("fmt-old", { format: "demo", publishedAt: "2026-09-01T00:00:00Z" }),
+      clip("topic-old", { topics: [t("x")], format: "explainer", publishedAt: "2026-08-01T00:00:00Z" }),
+      clip("fmt-new", { format: "demo", publishedAt: "2026-09-20T00:00:00Z" }),
+      clip("topic-new", { topics: [t("x")], format: "demo", publishedAt: "2026-09-15T00:00:00Z" }),
+    ];
+    expect(upNext(pool, current, 10).map((v) => v.id)).toEqual([
+      "topic-new",
+      "topic-old",
+      "fmt-new",
+      "fmt-old",
+      "rest-new",
+    ]);
+  });
+
+  it("never lists the current video and honours the limit", () => {
+    const pool = [current, clip("a"), clip("b"), clip("c")];
+    const out = upNext(pool, current, 2);
+    expect(out).toHaveLength(2);
+    expect(out.map((v) => v.id)).not.toContain("cur");
   });
 });
