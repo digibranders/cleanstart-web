@@ -21,12 +21,12 @@ const UNAVAILABLE: Suggestion = { available: false, resource: null, image: null 
 const CACHE_MS = 20_000;
 const inflight = new Map<string, { at: number; promise: Promise<Suggestion> }>();
 
-const loadSuggestion = (id: string, version: string): Promise<Suggestion> => {
-  const key = `${id}:${version}`;
+const loadSuggestion = (id: string, collection: string, version: string): Promise<Suggestion> => {
+  const key = `${collection}:${id}:${version}`;
   const hit = inflight.get(key);
   if (hit && Date.now() - hit.at < CACHE_MS) return hit.promise;
 
-  const promise = fetch(`/api/blog-cta-suggestion?id=${encodeURIComponent(id)}`, {
+  const promise = fetch(`/api/blog-cta-suggestion?id=${encodeURIComponent(id)}&collection=${encodeURIComponent(collection)}`, {
     credentials: 'include',
   })
     .then(async (res): Promise<Suggestion> => {
@@ -68,7 +68,7 @@ export const AutoPickNote = ({
   overridden: boolean;
 }): ReactElement => {
   if (state.phase === 'unsaved') {
-    return <output style={noteStyle}>Save the post to see which one the page picks automatically.</output>;
+    return <output style={noteStyle}>Save it to see which one the page picks automatically.</output>;
   }
   if (state.phase === 'loading') return <output style={noteStyle}>Checking the automatic pick…</output>;
 
@@ -114,7 +114,7 @@ export const AutoPickNote = ({
  * CMS endpoint so the shared secret never reaches the browser.
  */
 export const BlogCtaAutoPick = ({ kind }: { kind: Kind }): ReactElement => {
-  const { id, savedDocumentData } = useDocumentInfo();
+  const { id, collectionSlug, savedDocumentData } = useDocumentInfo();
   const { value } = useField<unknown>({ path: kind === 'resource' ? 'ctaResource' : 'ctaImage' });
   const version = (savedDocumentData as { updatedAt?: string } | undefined)?.updatedAt ?? '';
 
@@ -124,13 +124,13 @@ export const BlogCtaAutoPick = ({ kind }: { kind: Kind }): ReactElement => {
     if (id == null) return;
     let cancelled = false;
     setSuggestion(null);
-    loadSuggestion(String(id), version).then((s) => {
+    loadSuggestion(String(id), collectionSlug ?? 'blogs', version).then((s) => {
       if (!cancelled) setSuggestion(s);
     });
     return () => {
       cancelled = true;
     };
-  }, [id, version]);
+  }, [id, collectionSlug, version]);
 
   const state: AutoPickState =
     id == null ? { phase: 'unsaved' } : suggestion === null ? { phase: 'loading' } : { phase: 'ready', suggestion };

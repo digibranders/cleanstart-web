@@ -23,7 +23,7 @@ describe("withDemoSource", () => {
 
   it("names the surface that sent the click", () => {
     expect(
-      withDemoSource("/book-a-demo", { slug: "cve-1", layout: "stacked", placement: "rail", surface: "advisory" }),
-    ).toBe("/book-a-demo?source=advisory&source_page=cve-1&source_cta=stacked-rail");
+      withDemoSource("/book-a-demo", { slug: "cve-1", layout: "ladder", placement: "rail", surface: "advisory" }),
+    ).toBe("/book-a-demo?source=advisory&source_page=cve-1&source_cta=ladder-rail");
   });
 });

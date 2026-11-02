@@ -67,6 +67,7 @@ import * as migration_20261027_120000_advisories_structured_fields from './20261
 import * as migration_20261028_120000_advisories_cover_title from './20261028_120000_advisories_cover_title';
 import * as migration_20261026_120000_add_missing_job_log_task_slugs from './20261026_120000_add_missing_job_log_task_slugs';
 import * as migration_20261031_100000_add_videos from './20261031_100000_add_videos';
+import * as migration_20261102_120000_advisories_cta_picks from './20261102_120000_advisories_cta_picks';
 
 export const migrations = [
   {
@@ -388,5 +389,10 @@ export const migrations = [
     up: migration_20261031_100000_add_videos.up,
     down: migration_20261031_100000_add_videos.down,
     name: '20261031_100000_add_videos',
+  },
+  {
+    up: migration_20261102_120000_advisories_cta_picks.up,
+    down: migration_20261102_120000_advisories_cta_picks.down,
+    name: '20261102_120000_advisories_cta_picks',
   },
 ];

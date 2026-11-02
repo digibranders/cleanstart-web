@@ -156,6 +156,7 @@ import { VideoLengthCell as VideoLengthCell_4ae28695c16ecdf12c15a176eb6e0774 } f
 import { VideoStateCell as VideoStateCell_70d255ecab4ca7e768a3cff708566031 } from '@/payload/admin/components/VideoStateCell.tsx'
 import { VideoTopicSuggestions as VideoTopicSuggestions_354abe4af848e2bbd6afc4620ae30591 } from '@/payload/admin/components/VideoTopicSuggestions.tsx'
 import { UseDescriptionSummary as UseDescriptionSummary_19de247a3719b8cb4c2371ecb84ed232 } from '@/payload/admin/components/UseDescriptionSummary.tsx'
+import { CatalogImagePicker as CatalogImagePicker_2327e75ccd37996d4075a1fbf8a8a049 } from '@/payload/admin/components/CatalogImagePicker.tsx'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
@@ -317,4 +318,5 @@ export const importMap = {
   "@/payload/admin/components/VideoStateCell.tsx#VideoStateCell": VideoStateCell_70d255ecab4ca7e768a3cff708566031,
   "@/payload/admin/components/VideoTopicSuggestions.tsx#VideoTopicSuggestions": VideoTopicSuggestions_354abe4af848e2bbd6afc4620ae30591,
   "@/payload/admin/components/UseDescriptionSummary.tsx#UseDescriptionSummary": UseDescriptionSummary_19de247a3719b8cb4c2371ecb84ed232,
+  "@/payload/admin/components/CatalogImagePicker.tsx#CatalogImagePicker": CatalogImagePicker_2327e75ccd37996d4075a1fbf8a8a049,
 }

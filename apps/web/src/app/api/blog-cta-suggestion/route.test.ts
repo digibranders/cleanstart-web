@@ -1,11 +1,14 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-const { getBlogBySlugDraft, getBlogCtas } = vi.hoisted(() => ({
+const { getBlogBySlugDraft, getBlogCtas, getAdvisoryBySlugDraft, getAdvisoryCtas } = vi.hoisted(() => ({
   getBlogBySlugDraft: vi.fn(),
   getBlogCtas: vi.fn(),
+  getAdvisoryBySlugDraft: vi.fn(),
+  getAdvisoryCtas: vi.fn(),
 }));
 vi.mock("@/lib/blog", () => ({ getBlogBySlugDraft }));
-vi.mock("@/lib/blog-cta/resolve", () => ({ getBlogCtas }));
+vi.mock("@/lib/advisory", () => ({ getAdvisoryBySlugDraft }));
+vi.mock("@/lib/blog-cta/resolve", () => ({ getBlogCtas, getAdvisoryCtas }));
 
 import { GET } from "./route";
 
@@ -63,5 +66,29 @@ describe("GET /api/blog-cta-suggestion", () => {
     expect(res.headers.get("cache-control")).toBe("no-store");
     expect(await res.json()).toEqual({ ok: true, resource: { title: "A resource", typeLabel: "Report", slug: "r" }, image: null });
     expect(getBlogCtas).toHaveBeenCalledWith(expect.objectContaining({ ctaResource: null, ctaImage: null }));
+  });
+
+  it("rejects a collection it does not serve", async () => {
+    vi.stubEnv("WEB_REVALIDATE_SECRET", "s3cret");
+    expect((await call("?slug=post&collection=users", "s3cret")).status).toBe(400);
+  });
+
+  it("serves an advisory's automatic pick, with its picks cleared", async () => {
+    vi.stubEnv("WEB_REVALIDATE_SECRET", "s3cret");
+    getAdvisoryBySlugDraft.mockResolvedValue({ slug: "a-cve", ctaResource: 3, ctaImage: "node" });
+    getAdvisoryCtas.mockResolvedValue(ctas);
+
+    const res = await call("?slug=a-cve&collection=advisories", "s3cret");
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ ok: true, resource: { title: "A resource", typeLabel: "Report", slug: "r" }, image: null });
+    expect(getAdvisoryCtas).toHaveBeenCalledWith(expect.objectContaining({ ctaResource: null, ctaImage: null }));
+    expect(getBlogBySlugDraft).not.toHaveBeenCalled();
+  });
+
+  it("is 404 for an advisory that does not exist", async () => {
+    vi.stubEnv("WEB_REVALIDATE_SECRET", "s3cret");
+    getAdvisoryBySlugDraft.mockResolvedValue(null);
+    expect((await call("?slug=missing&collection=advisories", "s3cret")).status).toBe(404);
   });
 });

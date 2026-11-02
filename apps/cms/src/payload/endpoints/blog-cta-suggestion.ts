@@ -22,6 +22,10 @@ const webAnswerSchema = z.object({
 
 export type WebAnswer = z.infer<typeof webAnswerSchema>;
 
+/** The collections whose pages have the sidebar CTAs. */
+const collectionSchema = z.enum(['blogs', 'advisories']);
+export type SuggestionCollection = z.infer<typeof collectionSchema>;
+
 export type BlogCtaSuggestionResult =
   | { status: 200; body: { ok: true; available: true; resource: WebAnswer['resource']; image: WebAnswer['image'] } }
   | { status: 200; body: { ok: true; available: false; reason: 'web_not_configured' | 'web_unavailable' } }
@@ -30,20 +34,22 @@ export type BlogCtaSuggestionResult =
 export interface SuggestionDeps {
   env: Readonly<Record<string, string | undefined>>;
   fetchImpl: typeof fetch;
-  /** The post's slug, draft included. Null when there is no such post. */
-  loadSlug: (id: number) => Promise<string | null>;
+  /** The document's slug, draft included. Null when there is no such document. */
+  loadSlug: (id: number, collection: SuggestionCollection) => Promise<string | null>;
 }
 
 /** URL of the apps/web suggestion route, built from the same env the revalidate hooks use. */
 export const webSuggestionUrl = (
   env: SuggestionDeps['env'],
   slug: string,
+  collection: SuggestionCollection = 'blogs',
 ): string | null => {
   const base = env.WEB_REVALIDATE_URL;
   if (!base || !env.WEB_REVALIDATE_SECRET) return null;
   try {
     const url = new URL('/api/blog-cta-suggestion', base);
     url.searchParams.set('slug', slug);
+    if (collection !== 'blogs') url.searchParams.set('collection', collection);
     return url.toString();
   } catch {
     return null;
@@ -51,7 +57,7 @@ export const webSuggestionUrl = (
 };
 
 /**
- * The automatic sidebar pick for one blog post, asked of apps/web (which owns
+ * The automatic sidebar pick for one blog post or advisory, asked of apps/web (which owns
  * the matching). Editors only. A web outage or missing config is a soft
  * "not available", never an error: it must not get in the way of editing.
  */
@@ -59,6 +65,7 @@ export const resolveSuggestion = async (
   user: unknown,
   rawId: string | null,
   deps: SuggestionDeps,
+  rawCollection: string | null = null,
 ): Promise<BlogCtaSuggestionResult> => {
   if (!user) return { status: 401, body: { ok: false, error: 'unauthorized' } };
   if (!hasAnyRole(user, ['admin', 'editor'])) {
@@ -68,10 +75,13 @@ export const resolveSuggestion = async (
   const id = z.coerce.number().int().positive().safeParse(rawId);
   if (!id.success) return { status: 400, body: { ok: false, error: 'invalid_id' } };
 
-  const slug = await deps.loadSlug(id.data);
+  const collection = collectionSchema.safeParse(rawCollection ?? 'blogs');
+  if (!collection.success) return { status: 400, body: { ok: false, error: 'invalid_collection' } };
+
+  const slug = await deps.loadSlug(id.data, collection.data);
   if (!slug) return { status: 404, body: { ok: false, error: 'not_found' } };
 
-  const url = webSuggestionUrl(deps.env, slug);
+  const url = webSuggestionUrl(deps.env, slug, collection.data);
   if (!url) return { status: 200, body: { ok: true, available: false, reason: 'web_not_configured' } };
 
   try {
@@ -93,7 +103,7 @@ export const resolveSuggestion = async (
 };
 
 /**
- * GET /api/blog-cta-suggestion?id=<blog id> — the automatic sidebar pick,
+ * GET /api/blog-cta-suggestion?id=<doc id>[&collection=advisories] — the automatic sidebar pick,
  * shown under the Cta Resource and Cta Image fields. Config-level
  * (single-segment) endpoint, cookie-authed; the web secret stays server-side.
  */
@@ -104,13 +114,17 @@ export const blogCtaSuggestionEndpoint: Endpoint = {
     const rawId =
       req.searchParams?.get?.('id') ?? new URL(req.url ?? '', 'http://internal').searchParams.get('id');
 
+    const rawCollection =
+      req.searchParams?.get?.('collection') ??
+      new URL(req.url ?? '', 'http://internal').searchParams.get('collection');
+
     const result = await resolveSuggestion(req.user, rawId, {
       env: process.env,
       fetchImpl: fetch,
-      loadSlug: async (id) => {
+      loadSlug: async (id, collection) => {
         try {
           const doc = (await req.payload.findByID({
-            collection: 'blogs',
+            collection,
             id,
             depth: 0,
             draft: true,
@@ -122,7 +136,7 @@ export const blogCtaSuggestionEndpoint: Endpoint = {
           return null;
         }
       },
-    });
+    }, rawCollection);
     return json(result.body, { status: result.status });
   },
 };

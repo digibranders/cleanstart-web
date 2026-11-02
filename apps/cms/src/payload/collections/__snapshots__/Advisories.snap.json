@@ -77,6 +77,23 @@
       "name": "resolution"
     },
     {
+      "type": "relationship",
+      "name": "ctaResource",
+      "relationTo": "resources"
+    },
+    {
+      "type": "ui",
+      "name": "ctaResourceAutoPick"
+    },
+    {
+      "type": "text",
+      "name": "ctaImage"
+    },
+    {
+      "type": "ui",
+      "name": "ctaImageAutoPick"
+    },
+    {
       "type": "upload",
       "name": "heroImage",
       "relationTo": "media"

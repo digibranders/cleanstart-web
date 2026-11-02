@@ -13,8 +13,8 @@ describe("ctaEventName", () => {
   });
 
   it("prefixes advisory clicks with the advisory surface", () => {
-    expect(ctaEventName({ surface: "advisory", layout: "stacked", placement: "rail", stage: "prove" })).toBe(
-      "advisory_stacked_rail_prove",
+    expect(ctaEventName({ surface: "advisory", layout: "ladder", placement: "rail", stage: "prove" })).toBe(
+      "advisory_ladder_rail_prove",
     );
   });
 });

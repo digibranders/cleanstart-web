@@ -12,8 +12,7 @@ import { RenderLexical } from "@/lib/renderLexical";
 import { Header } from "@/components/nav/Header";
 import { DetailHero } from "@/components/sections/_shared/DetailHero";
 import { BlogCtaBottomBar } from "@/components/sections/blog/cta/BlogCtaBottomBar";
-import { BlogCtaStack } from "@/components/sections/blog/cta/BlogCtaStack";
-import { StickyRail } from "@/components/sections/blog/cta/StickyRail";
+import { BlogCtaLadder } from "@/components/sections/blog/cta/BlogCtaLadder";
 import { BlogsCTA } from "@/components/sections/blogs/BlogsCTA";
 import { Footer } from "@/components/sections/Footer";
 import { buildPageMetadata } from "@/lib/seo/canonical";
@@ -199,7 +198,6 @@ export async function renderAdvisoryDetail({
               className="grid grid-cols-1 pt-10 lg:pt-14 xl:grid-cols-[minmax(0,1fr)_272px] xl:gap-12"
               style={{ paddingBottom: "var(--spacing-section-cta)" }}
             >
-              {/* The article is a few screens at most, so the rail shows all its asks at once. */}
               <div
                 data-article-body
                 className="mx-auto lg:mx-0 w-full min-w-0 max-w-[988px] flex flex-col"
@@ -217,14 +215,14 @@ export async function renderAdvisoryDetail({
               </div>
 
               <aside aria-label="Next steps" className="hidden xl:block">
-                <StickyRail>
-                  <BlogCtaStack ctas={ctas} />
-                </StickyRail>
+                <div className="sticky" style={{ top: "calc(var(--cs-header-h) + 24px)" }}>
+                  <BlogCtaLadder ctas={ctas} readingMinutes={advisory.readingMinutes ?? undefined} />
+                </div>
               </aside>
             </div>
           </div>
         </div>
-        <BlogCtaBottomBar ctas={ctas} layout="stacked" fixedStage="prove" className="xl:hidden" />
+        <BlogCtaBottomBar ctas={ctas} layout="ladder" className="xl:hidden" />
       </main>
 
       <Footer cta={<BlogsCTA />} />

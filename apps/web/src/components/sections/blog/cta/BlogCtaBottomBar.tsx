@@ -111,18 +111,14 @@ function contentFor(stage: BlogCtaStage, ctas: BlogCtaSet, layout: BlogCtaLayout
 export function BlogCtaBottomBar({
   ctas,
   layout,
-  fixedStage,
   className,
 }: {
   ctas: BlogCtaSet;
   layout: BlogCtaLayout;
-  /** Show this ask the whole time instead of following reading depth, for pages too short to step through. */
-  fixedStage?: BlogCtaStage | undefined;
   /** Breakpoint utility that hides the bar where the rail takes over, e.g. `xl:hidden`. */
   className: string;
 }): React.ReactElement {
-  const { stage: readingStage, subscribe } = useArticleProgress();
-  const stage = fixedStage ?? readingStage;
+  const { stage, subscribe } = useArticleProgress();
   const [inRange, setInRange] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 

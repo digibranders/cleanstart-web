@@ -268,7 +268,7 @@ export const getBlogCtas = (post: BlogDetail): Promise<BlogCtaSet> =>
     editorResource: post.ctaResource,
   });
 
-/** Advisories have no editor picks yet: the technology label and the text decide. */
+/** An editor's pick wins, then the technology label names the image, then the text decides. */
 export const getAdvisoryCtas = (advisory: AdvisoryDetail): Promise<BlogCtaSet> =>
   getArticleCtas({
     surface: "advisory",
@@ -280,5 +280,7 @@ export const getAdvisoryCtas = (advisory: AdvisoryDetail): Promise<BlogCtaSet> =
       headings: [],
       body: [advisory.body, advisory.impact, advisory.resolution].map(lexicalToPlainText).join(" "),
     },
+    editorImage: advisory.ctaImage,
+    editorResource: advisory.ctaResource,
     imageHint: advisory.technology,
   });
