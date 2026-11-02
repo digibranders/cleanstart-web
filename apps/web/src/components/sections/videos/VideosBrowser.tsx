@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Container } from "@/components/layout";
 import { VIDEO_FORMATS } from "@/lib/videos-catalog";
 import {
@@ -442,7 +442,6 @@ interface VideosBrowserProps {
  */
 export function VideosBrowser({ videos, topics, heroId }: VideosBrowserProps): React.ReactElement {
   const params = useSearchParams();
-  const router = useRouter();
   const filters = useMemo(
     () =>
       parseVideoFilters(
@@ -451,12 +450,13 @@ export function VideosBrowser({ videos, topics, heroId }: VideosBrowserProps): R
       ),
     [params, topics],
   );
-  const onChange = useMemo(
-    () =>
-      (next: VideoFilters): void =>
-        router.replace(`/videos${videoFiltersQuery(next)}`, { scroll: false }),
-    [router],
-  );
+  // Not router.replace: after a hard load on /videos?topic=x, Next resolves a
+  // replace to bare /videos against the entry it seeded from that load and
+  // keeps the old URL, so "Clear all" did nothing in production builds.
+  // replaceState feeds useSearchParams and needs no request for a static page.
+  const onChange = useCallback((next: VideoFilters): void => {
+    window.history.replaceState(null, "", `/videos${videoFiltersQuery(next)}`);
+  }, []);
   return (
     <VideosView videos={videos} topics={topics} heroId={heroId} filters={filters} onChange={onChange} />
   );
