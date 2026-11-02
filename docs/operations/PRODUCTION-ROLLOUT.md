@@ -168,12 +168,21 @@ Until this runs, `/videos` reads `apps/web/src/lib/videos-catalog.ts` plus the Y
 
 0. **Create the YouTube API key** (the length of each video is read from YouTube with it, and videos that go private or are removed are hidden from the page). In Google Cloud: create or pick a project, enable "YouTube Data API v3", create an API key under Credentials and restrict it to that API. Add it as the GitHub Actions secret `YOUTUBE_API_KEY`. The key is free for this volume (one small request per hour).
 1. **Deploy the CMS** (migration `20261031_100000_add_videos` runs on boot). Check `/api/health`, then that the `videos` collection opens in the admin.
-2. **Backfill.** On the droplet, in the cms container:
+2. **Backfill.** The production image does not ship `scripts/`, so copy the script and its data file into the container first (both ASCII-only; the data file is re-encoded with `\u` escapes so nothing depends on the SSH pipe), check the checksums, then run it. From a checkout at `origin/main`:
    ```bash
-   /app/node_modules/.bin/tsx scripts/seed-videos-from-catalog.ts          # dry run, writes nothing
-   /app/node_modules/.bin/tsx scripts/seed-videos-from-catalog.ts --apply
+   git show origin/main:apps/cms/scripts/seed-videos-from-catalog.ts > /tmp/seed-videos-from-catalog.ts
+   git show origin/main:apps/cms/scripts/data/videos-catalog.json \
+     | python3 -c 'import json,sys; sys.stdout.write(json.dumps(json.load(sys.stdin), indent=2, ensure_ascii=True)+"\n")' > /tmp/videos-catalog.json
+   cat /tmp/seed-videos-from-catalog.ts | ssh cleanstart-cms 'docker exec -i cleanstart-cms-1 sh -c "cat > /app/apps/cms/scripts/seed-videos-from-catalog.ts"'
+   cat /tmp/videos-catalog.json | ssh cleanstart-cms 'docker exec -i cleanstart-cms-1 sh -c "mkdir -p /app/apps/cms/scripts/data && cat > /app/apps/cms/scripts/data/videos-catalog.json"'
+   ssh cleanstart-cms 'docker exec cleanstart-cms-1 sha256sum /app/apps/cms/scripts/seed-videos-from-catalog.ts /app/apps/cms/scripts/data/videos-catalog.json'
+   shasum -a 256 /tmp/seed-videos-from-catalog.ts /tmp/videos-catalog.json   # must match the two lines above
    ```
-   Creates 11 topics and 14 published videos (explainers and product demos only) with the slugs from the code catalog. A slug conflict stops the run before any write. Re-running plans nothing. Publish webhooks are skipped and web revalidation is sent once at the end.
+   Dry run (writes nothing; `PAYLOAD_AUTO_RUN=false` stops this one-off process from starting the cron jobs):
+   ```bash
+   ssh cleanstart-cms 'docker exec -w /app/apps/cms -e PAYLOAD_AUTO_RUN=false cleanstart-cms-1 /app/node_modules/.bin/tsx scripts/seed-videos-from-catalog.ts'
+   ```
+   Read the plan it prints: `conflicts` must be empty. Videos the hourly sync already imported as needs-review drafts show up under `videosUpdate` (they are adopted, keeping the catalog slug). Then add `--apply` to the same command to write. It creates 11 topics and publishes the 14 explainers and product demos with the slugs from the code catalog. A slug conflict stops the run before any write. Re-running plans nothing. Publish webhooks are skipped and web revalidation is sent once at the end. The copied files vanish on the next deploy.
 3. **Compare.** Open `/videos` with `VIDEOS_SOURCE=cms` on a preview deploy and check it matches production. There are no per-video pages: videos play inline.
 4. **Flip.** Set `VIDEOS_SOURCE=cms` in Vercel production env and redeploy. Rollback is unsetting it and redeploying.
 5. **Keep for a week**, then delete `videos-catalog.ts` and the feed merge from `apps/web`.
