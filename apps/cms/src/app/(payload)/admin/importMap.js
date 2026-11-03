@@ -78,6 +78,17 @@ import { PreviewMenu as PreviewMenu_50b93d8a0176cb6161ede3dcf4f0f442 } from '@/p
 import { DocKebabExtras as DocKebabExtras_6380547e5dd048a503ca7dedfff6bec0 } from '@/payload/admin/components/DocKebabExtras.tsx'
 import { CmsPublishButton as CmsPublishButton_c651128bf4837d4639a448413057b93f } from '@/payload/admin/components/CmsPublishButton.tsx'
 import { CmsListView as CmsListView_339f71bcd64a39b547313d733bae8857 } from '@/payload/admin/components/views/list/CmsListView.tsx'
+import { RowField as RowField_1ef7316c3d3f9450222b0eb086a8e243 } from '@/payload/admin/components/fields/RowField.tsx'
+import { CatalogImagePicker as CatalogImagePicker_2327e75ccd37996d4075a1fbf8a8a049 } from '@/payload/admin/components/CatalogImagePicker.tsx'
+import { VideoSourceSummary as VideoSourceSummary_c96fbcdf17e1ea6b0ec94f543434cd27 } from '@/payload/admin/components/VideoSourceSummary.tsx'
+import { VideoTitleCell as VideoTitleCell_97af48f797dcdd14d8fbf98424a4fbcf } from '@/payload/admin/components/VideoTitleCell.tsx'
+import { RadioField as RadioField_31aae9b520654e49d40e444571bafe41 } from '@/payload/admin/components/fields/RadioField.tsx'
+import { VideoTopicSuggestions as VideoTopicSuggestions_354abe4af848e2bbd6afc4620ae30591 } from '@/payload/admin/components/VideoTopicSuggestions.tsx'
+import { UseDescriptionSummary as UseDescriptionSummary_19de247a3719b8cb4c2371ecb84ed232 } from '@/payload/admin/components/UseDescriptionSummary.tsx'
+import { CollapsibleField as CollapsibleField_e8aff66100db6bf10de9866e9f9ca5a8 } from '@/payload/admin/components/fields/CollapsibleField.tsx'
+import { VideoThumbCell as VideoThumbCell_a6fc69bad4fd684c1000e3675bb5a77a } from '@/payload/admin/components/VideoThumbCell.tsx'
+import { VideoLengthCell as VideoLengthCell_4ae28695c16ecdf12c15a176eb6e0774 } from '@/payload/admin/components/VideoLengthCell.tsx'
+import { VideoStateCell as VideoStateCell_70d255ecab4ca7e768a3cff708566031 } from '@/payload/admin/components/VideoStateCell.tsx'
 import { GateFormLabel as GateFormLabel_c191dd670871074ae1a1cea086f78af8 } from '@/payload/admin/components/GateFormLabel.tsx'
 import { DateField as DateField_a74145b29e7a0acd050f8f68af83aab6 } from '@/payload/admin/components/fields/DateField.tsx'
 import { JoinField as JoinField_bd3b4cc9a58da6642d24527d78f5c3b6 } from '@/payload/admin/components/fields/JoinField.tsx'
@@ -118,7 +129,6 @@ import { HealthBadge as HealthBadge_89f48d3894398c6d1021775cfdeaf211 } from '@/p
 import { TestButton as TestButton_0a975e83e531dadfb4f8fa6589a5704a } from '@/payload/admin/components/integrations/TestButton.tsx'
 import { AuditTrail as AuditTrail_eca9fb91faa70a942f7e3507305e451c } from '@/payload/admin/components/integrations/AuditTrail.tsx'
 import { GlobalSchemaView as GlobalSchemaView_962751a33d0bde2910843d19f617ee83 } from '../../../payload/admin/components/SchemaManager/GlobalSchemaView.tsx'
-import { CollapsibleField as CollapsibleField_e8aff66100db6bf10de9866e9f9ca5a8 } from '@/payload/admin/components/fields/CollapsibleField.tsx'
 import { Icon as Icon_c822e198d4078a1912cce52e024df304 } from '../../../payload/admin/Icon.tsx'
 import { Logo as Logo_dcbc6ddf8fe8d700973cf459e9b44aa4 } from '../../../payload/admin/Logo.tsx'
 import { SkipLink as SkipLink_27a678dd284d4042d03686d8b9a9b8e9 } from '../../../payload/admin/components/SkipLink.tsx'
@@ -147,16 +157,7 @@ import { LeadAttributionView as LeadAttributionView_09cce16329a31c9c0551fcad8db2
 import { CacheView as CacheView_53dd99c40bf5dfa0411c06d06a42a42b } from '../../../payload/admin/components/cache/CacheView.tsx'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { PointField as PointField_dc800e7ca3d2eb7ea39fd4bc6138c687 } from '@/payload/admin/components/fields/PointField.tsx'
-import { RadioField as RadioField_31aae9b520654e49d40e444571bafe41 } from '@/payload/admin/components/fields/RadioField.tsx'
 import { TabsField as TabsField_c014faddfba6da88b9efedda256f4990 } from '@/payload/admin/components/fields/TabsField.tsx'
-import { RowField as RowField_1ef7316c3d3f9450222b0eb086a8e243 } from '@/payload/admin/components/fields/RowField.tsx'
-import { VideoSourceSummary as VideoSourceSummary_c96fbcdf17e1ea6b0ec94f543434cd27 } from '@/payload/admin/components/VideoSourceSummary.tsx'
-import { VideoThumbCell as VideoThumbCell_a6fc69bad4fd684c1000e3675bb5a77a } from '@/payload/admin/components/VideoThumbCell.tsx'
-import { VideoLengthCell as VideoLengthCell_4ae28695c16ecdf12c15a176eb6e0774 } from '@/payload/admin/components/VideoLengthCell.tsx'
-import { VideoStateCell as VideoStateCell_70d255ecab4ca7e768a3cff708566031 } from '@/payload/admin/components/VideoStateCell.tsx'
-import { VideoTopicSuggestions as VideoTopicSuggestions_354abe4af848e2bbd6afc4620ae30591 } from '@/payload/admin/components/VideoTopicSuggestions.tsx'
-import { UseDescriptionSummary as UseDescriptionSummary_19de247a3719b8cb4c2371ecb84ed232 } from '@/payload/admin/components/UseDescriptionSummary.tsx'
-import { CatalogImagePicker as CatalogImagePicker_2327e75ccd37996d4075a1fbf8a8a049 } from '@/payload/admin/components/CatalogImagePicker.tsx'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
@@ -240,6 +241,17 @@ export const importMap = {
   "@/payload/admin/components/DocKebabExtras.tsx#DocKebabExtras": DocKebabExtras_6380547e5dd048a503ca7dedfff6bec0,
   "@/payload/admin/components/CmsPublishButton.tsx#CmsPublishButton": CmsPublishButton_c651128bf4837d4639a448413057b93f,
   "@/payload/admin/components/views/list/CmsListView.tsx#CmsListView": CmsListView_339f71bcd64a39b547313d733bae8857,
+  "@/payload/admin/components/fields/RowField.tsx#RowField": RowField_1ef7316c3d3f9450222b0eb086a8e243,
+  "@/payload/admin/components/CatalogImagePicker.tsx#CatalogImagePicker": CatalogImagePicker_2327e75ccd37996d4075a1fbf8a8a049,
+  "@/payload/admin/components/VideoSourceSummary.tsx#VideoSourceSummary": VideoSourceSummary_c96fbcdf17e1ea6b0ec94f543434cd27,
+  "@/payload/admin/components/VideoTitleCell.tsx#VideoTitleCell": VideoTitleCell_97af48f797dcdd14d8fbf98424a4fbcf,
+  "@/payload/admin/components/fields/RadioField.tsx#RadioField": RadioField_31aae9b520654e49d40e444571bafe41,
+  "@/payload/admin/components/VideoTopicSuggestions.tsx#VideoTopicSuggestions": VideoTopicSuggestions_354abe4af848e2bbd6afc4620ae30591,
+  "@/payload/admin/components/UseDescriptionSummary.tsx#UseDescriptionSummary": UseDescriptionSummary_19de247a3719b8cb4c2371ecb84ed232,
+  "@/payload/admin/components/fields/CollapsibleField.tsx#CollapsibleField": CollapsibleField_e8aff66100db6bf10de9866e9f9ca5a8,
+  "@/payload/admin/components/VideoThumbCell.tsx#VideoThumbCell": VideoThumbCell_a6fc69bad4fd684c1000e3675bb5a77a,
+  "@/payload/admin/components/VideoLengthCell.tsx#VideoLengthCell": VideoLengthCell_4ae28695c16ecdf12c15a176eb6e0774,
+  "@/payload/admin/components/VideoStateCell.tsx#VideoStateCell": VideoStateCell_70d255ecab4ca7e768a3cff708566031,
   "@/payload/admin/components/GateFormLabel.tsx#GateFormLabel": GateFormLabel_c191dd670871074ae1a1cea086f78af8,
   "@/payload/admin/components/fields/DateField.tsx#DateField": DateField_a74145b29e7a0acd050f8f68af83aab6,
   "@/payload/admin/components/fields/JoinField.tsx#JoinField": JoinField_bd3b4cc9a58da6642d24527d78f5c3b6,
@@ -280,7 +292,6 @@ export const importMap = {
   "@/payload/admin/components/integrations/TestButton.tsx#TestButton": TestButton_0a975e83e531dadfb4f8fa6589a5704a,
   "@/payload/admin/components/integrations/AuditTrail.tsx#AuditTrail": AuditTrail_eca9fb91faa70a942f7e3507305e451c,
   "./payload/admin/components/SchemaManager/GlobalSchemaView.tsx#GlobalSchemaView": GlobalSchemaView_962751a33d0bde2910843d19f617ee83,
-  "@/payload/admin/components/fields/CollapsibleField.tsx#CollapsibleField": CollapsibleField_e8aff66100db6bf10de9866e9f9ca5a8,
   "./payload/admin/Icon.tsx#Icon": Icon_c822e198d4078a1912cce52e024df304,
   "./payload/admin/Logo.tsx#Logo": Logo_dcbc6ddf8fe8d700973cf459e9b44aa4,
   "./payload/admin/components/SkipLink.tsx#SkipLink": SkipLink_27a678dd284d4042d03686d8b9a9b8e9,
@@ -309,14 +320,5 @@ export const importMap = {
   "./payload/admin/components/cache/CacheView.tsx#CacheView": CacheView_53dd99c40bf5dfa0411c06d06a42a42b,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@/payload/admin/components/fields/PointField.tsx#PointField": PointField_dc800e7ca3d2eb7ea39fd4bc6138c687,
-  "@/payload/admin/components/fields/RadioField.tsx#RadioField": RadioField_31aae9b520654e49d40e444571bafe41,
-  "@/payload/admin/components/fields/TabsField.tsx#TabsField": TabsField_c014faddfba6da88b9efedda256f4990,
-  "@/payload/admin/components/fields/RowField.tsx#RowField": RowField_1ef7316c3d3f9450222b0eb086a8e243,
-  "@/payload/admin/components/VideoSourceSummary.tsx#VideoSourceSummary": VideoSourceSummary_c96fbcdf17e1ea6b0ec94f543434cd27,
-  "@/payload/admin/components/VideoThumbCell.tsx#VideoThumbCell": VideoThumbCell_a6fc69bad4fd684c1000e3675bb5a77a,
-  "@/payload/admin/components/VideoLengthCell.tsx#VideoLengthCell": VideoLengthCell_4ae28695c16ecdf12c15a176eb6e0774,
-  "@/payload/admin/components/VideoStateCell.tsx#VideoStateCell": VideoStateCell_70d255ecab4ca7e768a3cff708566031,
-  "@/payload/admin/components/VideoTopicSuggestions.tsx#VideoTopicSuggestions": VideoTopicSuggestions_354abe4af848e2bbd6afc4620ae30591,
-  "@/payload/admin/components/UseDescriptionSummary.tsx#UseDescriptionSummary": UseDescriptionSummary_19de247a3719b8cb4c2371ecb84ed232,
-  "@/payload/admin/components/CatalogImagePicker.tsx#CatalogImagePicker": CatalogImagePicker_2327e75ccd37996d4075a1fbf8a8a049,
+  "@/payload/admin/components/fields/TabsField.tsx#TabsField": TabsField_c014faddfba6da88b9efedda256f4990
 }

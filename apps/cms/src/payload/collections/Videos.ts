@@ -77,7 +77,7 @@ export const singleFeaturedHook: CollectionAfterChangeHook = async ({ doc, req, 
   return doc;
 };
 
-/** The slug has no public meaning (videos play inline), so it is generated from the title and not shown. */
+/** The slug is the video page's URL (/videos/[slug]). It is filled once from the title and hidden, so editing the title never moves a published URL. */
 const hiddenSlugField = (): Field => {
   const field = slugField({ source: 'title' }) as TextField;
   const { components: _components, position: _position, description: _description, ...admin } = field.admin ?? {};
@@ -87,8 +87,9 @@ const hiddenSlugField = (): Field => {
 /**
  * Editorial videos for /videos. Imported from YouTube by the hourly sync as
  * needs-review drafts (see `lib/videos`). The `source` group is owned by the
- * sync, everything else by editors; neither overwrites the other. Videos play
- * inline on the listing, so there is no per-video page, URL or SEO block here.
+ * sync, everything else by editors; neither overwrites the other. Each video has
+ * its own page at /videos/[slug], whose title and description come from the
+ * title and summary fields, so there is no separate SEO block here.
  */
 export const Videos: CollectionConfig = {
   slug: 'videos',
@@ -137,7 +138,11 @@ export const Videos: CollectionConfig = {
           'Paste the link of the video. It is saved as the video ID and cannot be changed afterwards. The video shows on /videos only once it has a category, a topic and a summary and is published.',
       },
     },
-    { ...contentTitleField, label: 'Title on the website' },
+    {
+      ...contentTitleField,
+      label: 'Title on the website',
+      admin: { components: { Cell: '@/payload/admin/components/VideoTitleCell.tsx#VideoTitleCell' } },
+    },
     hiddenSlugField(),
     {
       name: 'format',

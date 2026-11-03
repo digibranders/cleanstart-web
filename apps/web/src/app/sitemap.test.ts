@@ -46,12 +46,13 @@ describe("sitemap", () => {
     expect(urls).not.toContain("https://www.cleanstart.com/blogs/hidden");
   });
 
-  it("lists /videos only once the page is public, never per-video URLs, and never reads the videos collection", async () => {
-    // Videos play inline on /videos; there is no page per video to list.
+  it("lists /videos and every video page only once the page is public, without reading the videos collection", async () => {
     fetchMock.mockImplementation(async () => ok([]));
     const urls = (await (await load())()).map((e) => e.url);
     expect(urls.includes("https://www.cleanstart.com/videos")).toBe(VIDEOS_PAGE_PUBLIC);
-    expect(urls.filter((u) => u.includes("/videos/"))).toEqual([]);
+    const videoPages = urls.filter((u) => u.includes("/videos/"));
+    expect(videoPages.length > 0).toBe(VIDEOS_PAGE_PUBLIC);
+    expect(urls.filter((u) => u.endsWith("/videos/")).length).toBe(0);
     expect(fetchMock.mock.calls.map(([url]) => collectionOf(url as string))).not.toContain("videos");
   });
 

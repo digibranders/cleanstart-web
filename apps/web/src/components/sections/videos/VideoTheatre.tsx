@@ -1,8 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { formatDurationLabel } from "@/lib/clean-libraries-video";
-import { formatPublished, videoCategoryLabel, type Video } from "@/lib/videos-utils";
+import { formatPublished, videoCategoryLabel, videoHref, type Video } from "@/lib/videos-utils";
 import { FormatTag } from "./FormatTag";
 import { VideoPlayer } from "./VideoPlayer";
 import { VideoThumb } from "./VideoThumb";
@@ -70,7 +71,9 @@ export function VideoTheatre({
                 className="mt-2 font-display font-semibold text-[#12101C]"
                 style={{ fontSize: "var(--fs-h4)", lineHeight: 1.3, letterSpacing: "-0.01em" }}
               >
-                {video.title}
+                <Link href={videoHref(video)} prefetch={false} className="hover:text-[#5B2EE0]">
+                  {video.title}
+                </Link>
               </h3>
             </div>
             <button

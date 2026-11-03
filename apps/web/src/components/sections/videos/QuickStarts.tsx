@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { formatDurationLabel } from "@/lib/clean-libraries-video";
-import type { Video } from "@/lib/videos-utils";
+import { videoHref, type Video } from "@/lib/videos-utils";
 import { PlayGlyph } from "./PlayGlyph";
 import { VideoThumb } from "./VideoThumb";
 
@@ -15,13 +16,13 @@ export function QuickStarts({ videos, onPlay }: QuickStartsProps): React.ReactEl
   return (
     <section aria-labelledby="quick-starts-title" className="mb-12">
       <div className="mb-4 flex flex-wrap items-baseline gap-x-3">
-        <h3
+        <h2
           id="quick-starts-title"
           className="font-display font-semibold text-[#12101C]"
           style={{ fontSize: "var(--fs-h5)", letterSpacing: "-0.01em" }}
         >
           Quick starts
-        </h3>
+        </h2>
         <p className="font-sans text-[#5B5870]" style={{ fontSize: "var(--fs-caption)" }}>
           Explainers under two minutes
         </p>
@@ -32,6 +33,7 @@ export function QuickStarts({ videos, onPlay }: QuickStartsProps): React.ReactEl
             <button
               type="button"
               onClick={() => onPlay(video)}
+              aria-label={`Play ${video.title}`}
               className="group block w-full cursor-pointer text-left"
             >
               <span className="relative block aspect-video overflow-hidden rounded-[12px] bg-black">
@@ -48,13 +50,15 @@ export function QuickStarts({ videos, onPlay }: QuickStartsProps): React.ReactEl
                   </span>
                 ) : null}
               </span>
-              <span
-                className="mt-2.5 line-clamp-2 block font-sans font-medium text-[#12101C] group-hover:text-[#5B2EE0]"
-                style={{ fontSize: "var(--fs-body-sm)", lineHeight: 1.35 }}
-              >
-                {video.title}
-              </span>
             </button>
+            <Link
+              href={videoHref(video)}
+              prefetch={false}
+              className="mt-2.5 line-clamp-2 block font-sans font-medium text-[#12101C] hover:text-[#5B2EE0]"
+              style={{ fontSize: "var(--fs-body-sm)", lineHeight: 1.35 }}
+            >
+              {video.title}
+            </Link>
           </li>
         ))}
       </ul>

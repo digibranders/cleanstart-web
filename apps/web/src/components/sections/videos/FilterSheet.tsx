@@ -106,7 +106,7 @@ export function FilterSheet({
     >
       <div className="flex max-h-[88dvh] flex-col">
         <div className="flex items-center justify-between px-5 pb-2 pt-5">
-          <h2 className="font-display text-[20px] font-semibold text-[#12101C]">Filter videos</h2>
+          <p className="font-display text-[20px] font-semibold text-[#12101C]">Filter videos</p>
           <button
             type="button"
             onClick={onClose}

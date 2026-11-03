@@ -2,7 +2,9 @@ import { fetchCMS } from '@/lib/cms-fetch';
 import { effectiveModifiedAt } from '@/lib/published-date';
 import { SITE_URL } from '@/lib/seo/canonical';
 import { legalHref } from '@/lib/legal';
+import { getVideos } from '@/lib/videos';
 import { VIDEOS_PAGE_PUBLIC } from '@/lib/videos-launch';
+import { videoHref, type Video } from '@/lib/videos-utils';
 import { isIndexingAllowed } from '@/lib/seo/indexing';
 import type { MetadataRoute } from 'next';
 
@@ -142,7 +144,6 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/software-bill-materials' },
   { path: '/teams' },
   { path: '/tricorder' },
-  ...(VIDEOS_PAGE_PUBLIC ? [{ path: '/videos' }] : []),
   { path: '/vulnerability-remediation' },
   { path: '/webinars' },
 ];
@@ -167,6 +168,16 @@ function entry(path: string, lastModified?: string): MetadataRoute.Sitemap[numbe
   };
 }
 
+/** Empty until the page is public; a YouTube or CMS outage leaves the rest of the sitemap intact. */
+async function publicVideos(): Promise<Video[]> {
+  if (!VIDEOS_PAGE_PUBLIC) return [];
+  try {
+    return await getVideos();
+  } catch {
+    return [];
+  }
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (!isIndexingAllowed()) return [];
 
@@ -182,6 +193,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     legal,
     knowledgeBase,
     advisories,
+    videos,
   ] = await Promise.all([
       fetchDocs('blogs', BLOG_FILTER),
       fetchDocs('case-studies', BLOG_FILTER),
@@ -194,10 +206,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       fetchDocs('legalDocuments', BLOG_FILTER),
       fetchDocs('knowledgeBase', BLOG_FILTER),
       fetchDocs('advisories', BLOG_FILTER),
+      publicVideos(),
     ]);
 
   return [
     ...STATIC_ROUTES.map((r) => entry(r.path)),
+    // `getVideos` is newest first, so the first video dates the listing.
+    ...(videos.length > 0 ? [entry('/videos', videos[0]?.publishedAt)] : []),
+    ...videos.map((v) => entry(videoHref(v), v.publishedAt)),
     ...knowledgeBase.map((k) => entry(`/knowledge-hub/${k.slug}`, effectiveModifiedAt(k))),
     ...blogs.map((b) => entry(`/blogs/${b.slug}`, effectiveModifiedAt(b))),
     ...advisories.map((a) => entry(`/advisories/${a.slug}`, effectiveModifiedAt(a))),

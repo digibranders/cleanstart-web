@@ -60,6 +60,9 @@ const catalogTopic = (id: string): VideoTopic => ({
 export const formatLabel = (id: VideoFormat): string =>
   VIDEO_FORMATS.find((f) => f.id === id)?.singular ?? id;
 
+/** The video's own page. The slug is the catalog or CMS slug, so it is stable once published. */
+export const videoHref = (video: Pick<Video, "slug">): string => `/videos/${video.slug}`;
+
 export const videoCategoryLabel = (video: Pick<Video, "format">): string =>
   video.format ? formatLabel(video.format) : "Video";
 
@@ -120,6 +123,21 @@ export const firstParagraph = (text: string, max = 320): string => {
 const isHashtagLine = (line: string): boolean => {
   const tokens = line.trim().split(/\s+/).filter(Boolean);
   return tokens.length > 0 && tokens.every((t) => t.startsWith("#"));
+};
+
+/**
+ * The paragraphs of the long description a video page prints under the player.
+ * The summary is shown on its own as the lead, so a description that opens with
+ * it does not repeat it, and hashtag-only lines are dropped.
+ */
+export const descriptionParagraphs = (video: Pick<Video, "summary" | "description">): string[] => {
+  const paragraphs = video.description
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0 && !isHashtagLine(p));
+  const lead = video.summary.replace(/\s+/g, " ").trim();
+  const first = paragraphs[0]?.replace(/\s+/g, " ");
+  return first !== undefined && first === lead ? paragraphs.slice(1) : paragraphs;
 };
 
 /**

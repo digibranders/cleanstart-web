@@ -133,8 +133,9 @@ export const PAGE_REGISTRY_SEED: readonly PageRegistrySeedRow[] = [
   { path: '/advisories', title: 'Advisories', kind: 'cms-listing', order: 59, backingCollection: 'advisories' },
   { path: '/advisories/[slug]', title: 'Advisory (template)', kind: 'cms-template', order: 60, backingCollection: 'advisories' },
   // Videos: editorial collection fed by the YouTube sync (apps/cms videos + videoTopics). The page plays
-  // videos inline, so there is no per-video template route.
+  // videos inline, so there was no per-video route until each video got its own page for search.
   { path: '/videos', title: 'Videos', kind: 'cms-listing', order: 61, backingCollection: 'videos' },
+  { path: '/videos/[slug]', title: 'Video (template)', kind: 'cms-template', order: 62, backingCollection: 'videos' },
 ] as const;
 
 /** Fail-fast guard: paths unique + well-formed, templates carry a collection. */
