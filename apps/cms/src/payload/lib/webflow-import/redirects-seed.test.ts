@@ -25,7 +25,7 @@ describe('REDIRECTS_SEED', () => {
   it('records `originalTarget` on every remapped row (and only those)', () => {
     const remapped = REDIRECTS_SEED.filter((r) => r.originalTarget);
     expect(remapped.map((r) => r.from).sort()).toEqual(
-      ['/cleansight-campaign', '/cleanstart-hitachi', '/cleanstart-survey', '/new-year-event'].sort(),
+      ['/cleanstart-hitachi', '/cleanstart-survey', '/new-year-event'].sort(),
     );
     // A remapped row's live target must differ from its dead Webflow target.
     for (const r of remapped) expect(r.to).not.toBe(r.originalTarget);

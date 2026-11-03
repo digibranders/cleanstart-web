@@ -4,12 +4,13 @@ import { THANK_YOU_CONTENT } from "./content";
 import { THANK_YOU_TYPES, isThankYouType, thankYouTypeSchema } from "./types";
 
 describe("thank-you types", () => {
-  it("covers exactly the four redirecting forms", () => {
+  it("covers exactly the redirecting forms", () => {
     expect([...THANK_YOU_TYPES]).toEqual([
       "book-a-demo",
       "contact",
       "deal-registration",
       "job-application",
+      "cleansight-campaign",
     ]);
   });
 

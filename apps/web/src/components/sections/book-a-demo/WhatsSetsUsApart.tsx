@@ -79,7 +79,7 @@ export function WhatsSetsUsApart(): React.ReactElement {
   );
 }
 
-function ShieldCheckIcon(): React.ReactElement {
+export function ShieldCheckIcon(): React.ReactElement {
   return (
     <svg
       width="18"

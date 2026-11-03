@@ -34,7 +34,8 @@ type SeedField = {
 type SeedForm = {
   slug: string;
   name: string;
-  hubspotFormGuid: string;
+  /** Omit until the matching HubSpot form exists; the lead is still stored in the CMS. */
+  hubspotFormGuid?: string;
   hubspotSubscriptionTypeId?: string;
   submitLabel?: string;
   fields: SeedField[];
@@ -107,20 +108,43 @@ const FORMS: readonly SeedForm[] = [
       },
     ],
   },
+  {
+    // Campaign page /cleansight-campaign. No HubSpot GUID yet: leads are
+    // stored in the CMS until the HubSpot form is created, then set
+    // `hubspotFormGuid` here (or in the admin) and re-run with this slug.
+    slug: 'cleansight-campaign',
+    name: 'CleanSight Scan Request',
+    submitLabel: 'Get my free scan',
+    fields: [
+      { name: 'firstname', type: 'text', label: 'First name', required: true },
+      { name: 'lastname', type: 'text', label: 'Last name', required: true },
+      { name: 'email', type: 'email', label: 'Email', required: true },
+      { name: 'company', type: 'text', label: 'Company', required: true },
+      { name: 'jobtitle', type: 'text', label: 'Job title', required: true },
+      { name: 'phone', type: 'text', label: 'Phone' },
+      { name: 'country', type: 'text', label: 'Country/Region' },
+    ],
+  },
 ];
 
 const run = async (): Promise<void> => {
   const payload = await getPayload({ config: payloadConfig });
 
-  for (const form of FORMS) {
+  // Optional slug filter, so adding one form does not re-save the others:
+  //   ... scripts/seed-website-forms.ts cleansight-campaign
+  const only = process.argv.slice(2);
+  const targets = only.length > 0 ? FORMS.filter((f) => only.includes(f.slug)) : FORMS;
+  if (targets.length === 0) throw new Error(`No form matches: ${only.join(', ')}`);
+
+  for (const form of targets) {
     const data = {
       name: form.name,
       slug: form.slug,
       fields: form.fields,
       submitLabel: form.submitLabel ?? 'Submit',
       postSubmit: { kind: 'message' as const },
-      crmHandlers: ['hubspot' as const],
-      hubspotFormGuid: form.hubspotFormGuid,
+      crmHandlers: form.hubspotFormGuid ? ['hubspot' as const] : [],
+      hubspotFormGuid: form.hubspotFormGuid ?? null,
       ...(form.hubspotSubscriptionTypeId
         ? { hubspotSubscriptionTypeId: form.hubspotSubscriptionTypeId }
         : {}),

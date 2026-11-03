@@ -72,4 +72,14 @@ export const THANK_YOU_CONTENT = {
     metaTitle: "Application received",
     metaDescription: "Your application to CleanStart has been received.",
   },
+  "cleansight-campaign": {
+    headline: "Your scan request is in",
+    body: "A CleanStart specialist will contact you to set up your free container security scan.",
+    whatHappensNext:
+      "Your request is with the team. To make the first call count, note which clusters and registries you want covered and who owns them.",
+    primary: { label: "Explore CleanSight", href: "/cleansight" },
+    secondary: { label: "Browse the resource center", href: "/resource-center" },
+    metaTitle: "Scan requested",
+    metaDescription: "Your CleanSight container security scan request has been received.",
+  },
 } satisfies Record<ThankYouType, ThankYouContent>;
