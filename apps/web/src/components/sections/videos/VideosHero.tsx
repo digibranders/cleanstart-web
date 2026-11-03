@@ -1,17 +1,20 @@
+import Link from "next/link";
 import { HeroReveal } from "@/components/ui/Reveal";
 import { CLEANSTART_YOUTUBE_SUBSCRIBE_URL } from "@/lib/youtube-feed";
-import type { Video } from "@/lib/videos-utils";
+import { videoHref, type Video } from "@/lib/videos-utils";
 import { VideoMeta } from "./VideoMeta";
 import { VideoPlayer } from "./VideoPlayer";
 
 // Fades to transparent at the foot so the band does not cut a hard line where it
 // meets the white filter bar. Same tail as the demo and thank-you heroes.
-const HERO_GRADIENT =
+export const HERO_GRADIENT =
   "linear-gradient(180deg, rgba(21, 16, 33, 1) 0%, rgba(16, 18, 62, 1) 28%, rgba(19, 30, 143, 1) 52%, rgba(71, 30, 192, 1) 74%, rgba(71, 31, 195, 1) 84%, rgba(70, 30, 191, 0.85) 90%, rgba(66, 30, 188, 0.4) 96%, rgba(66, 30, 188, 0) 100%)";
 
-export const VIDEOS_TITLE = "CleanStart Videos";
+/** The H1. The page <title> is `VIDEOS_TITLE`, which adds the topics people search for. */
+export const VIDEOS_HEADING = "Container security videos";
+export const VIDEOS_TITLE = "Container Security Videos: SBOM and VEX";
 export const VIDEOS_DESCRIPTION =
-  "Explainers and product demos from CleanStart on container security, SBOMs, VEX, provenance and the software supply chain.";
+  "Short explainers and product demos from CleanStart on container security, SBOMs, VEX, provenance and software supply chain risk. Watch in minutes.";
 
 interface VideosHeroProps {
   /** Newest video; plays right here so a visitor can start watching with one click. */
@@ -48,7 +51,7 @@ export function VideosHero({ featured }: VideosHeroProps): React.ReactElement {
                 letterSpacing: "var(--text-hero-utility-ls)",
               }}
             >
-              {VIDEOS_TITLE}
+              {VIDEOS_HEADING}
             </h1>
           </HeroReveal>
           <HeroReveal y={30} delay={0.2} duration={0.8}>
@@ -62,7 +65,7 @@ export function VideosHero({ featured }: VideosHeroProps): React.ReactElement {
                 textWrap: "balance",
               }}
             >
-              Explainers and product demos on container security and the software supply chain.
+              Explainers and product demos on container security, SBOMs, VEX, provenance and the software supply chain.
             </p>
           </HeroReveal>
           <HeroReveal y={20} delay={0.35} duration={0.7}>
@@ -92,7 +95,9 @@ export function VideosHero({ featured }: VideosHeroProps): React.ReactElement {
                 className="font-display font-semibold text-white"
                 style={{ fontSize: "var(--fs-h4)", lineHeight: 1.25, letterSpacing: "-0.015em" }}
               >
-                {featured.title}
+                <Link href={videoHref(featured)} prefetch={false} className="hover:underline underline-offset-4">
+                  {featured.title}
+                </Link>
               </h2>
             </div>
           </div>

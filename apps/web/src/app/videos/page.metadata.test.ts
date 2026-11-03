@@ -1,17 +1,11 @@
-import { describe, expect, it, vi } from "vitest";
-
-vi.mock("next/headers", () => ({ draftMode: async () => ({ isEnabled: false }) }));
+import { describe, expect, it } from "vitest";
 
 import { VIDEOS_PAGE_PUBLIC } from "@/lib/videos-launch";
-import { generateMetadata } from "./page";
 
+// The robots directive is decided by buildPageMetadata's production gate, which is closed
+// under test, so this guards the launch flag that page.tsx passes into it.
 describe("/videos launch gate", () => {
-  it("is not public yet", () => {
-    expect(VIDEOS_PAGE_PUBLIC).toBe(false);
-  });
-
-  it("is noindex and nofollow until it is made public", () => {
-    const robots = generateMetadata().robots;
-    expect(robots).toMatchObject({ index: false, follow: false });
+  it("is public", () => {
+    expect(VIDEOS_PAGE_PUBLIC).toBe(true);
   });
 });

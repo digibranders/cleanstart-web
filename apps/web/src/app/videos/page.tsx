@@ -10,16 +10,15 @@ import {
 } from "@/components/sections/videos/VideosBrowser";
 import {
   VIDEOS_DESCRIPTION,
+  VIDEOS_HEADING,
   VIDEOS_TITLE,
   VideosHero,
 } from "@/components/sections/videos/VideosHero";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { VIDEOS_PAGE_PUBLIC } from "@/lib/videos-launch";
-import { toIso8601Duration } from "@/lib/clean-libraries-video";
-import { youtubeThumbnail, youtubeWatchUrl } from "@/lib/podcast-utils";
-import { JsonLd, breadcrumbSchema, videoObjectSchema } from "@/lib/seo/jsonld";
+import { JsonLd, absoluteUrl, breadcrumbSchema, webPageSchema } from "@/lib/seo/jsonld";
 import { getVideos, videoTopicOrder } from "@/lib/videos";
-import { topicCounts, type Video } from "@/lib/videos-utils";
+import { topicCounts, videoHref, type Video } from "@/lib/videos-utils";
 
 // Static + ISR. The CMS read (or the YouTube feed, in catalog mode) behind
 // `getVideos` is cached, and a CMS publish purges this path, so a change shows
@@ -32,37 +31,31 @@ export function generateMetadata(): Metadata {
     description: VIDEOS_DESCRIPTION,
     path: "/videos",
     eyebrow: "Videos",
-    // Until final approval: noindex AND nofollow (see lib/videos-launch.ts).
+    // noindex AND nofollow while the page is dark (see lib/videos-launch.ts).
     noindex: !VIDEOS_PAGE_PUBLIC,
     nofollow: !VIDEOS_PAGE_PUBLIC,
   });
 }
 
-// Videos play inline on this page, so the list itself is what search engines
-// index: one VideoObject per embed, in a single ItemList.
+// Every video has its own page (/videos/[slug]) that carries the VideoObject, so this
+// list only points at them: the shape Google reads as a video carousel.
 const videoListSchema = (videos: readonly Video[]): Record<string, unknown> => ({
   "@context": "https://schema.org",
   "@type": "ItemList",
-  name: VIDEOS_TITLE,
-  itemListElement: videos.map((v, i) => {
-    const { "@context": _context, ...video } = videoObjectSchema({
-      name: v.title,
-      description: v.summary,
-      contentUrl: youtubeWatchUrl(v.id),
-      embedUrl: `https://www.youtube.com/embed/${v.id}`,
-      uploadDate: v.publishedAt,
-      thumbnailUrl: youtubeThumbnail(v.id, v.thumb === "hq" ? "hqdefault" : "maxresdefault"),
-      ...(v.durationSeconds !== undefined ? { duration: toIso8601Duration(v.durationSeconds) } : {}),
-    });
-    return { "@type": "ListItem", position: i + 1, item: video };
-  }),
+  name: VIDEOS_HEADING,
+  itemListElement: videos.map((v, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    url: absoluteUrl(videoHref(v)),
+    name: v.title,
+  })),
 });
 
 /**
  * Filters live in the URL and are applied in memory by `VideosBrowser`, so the
  * route stays static. The Suspense fallback is the unfiltered first view, which
- * is what the static HTML carries; `CrawlableLinkIndex` adds the cards beyond
- * the first page as plain links. Same shape as /webinars and /blogs.
+ * is what the static HTML carries; every card title links to its own page
+ * (`/videos/[slug]`), so crawlers reach every video from the HTML.
  */
 export default async function VideosPage(): Promise<React.ReactElement> {
   const videos = await getVideos();
@@ -76,6 +69,15 @@ export default async function VideosPage(): Promise<React.ReactElement> {
       <JsonLd
         id="videos-breadcrumbs"
         data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Videos" }])}
+      />
+      <JsonLd
+        id="videos-page"
+        data={webPageSchema({
+          type: "CollectionPage",
+          path: "/videos",
+          name: VIDEOS_HEADING,
+          description: VIDEOS_DESCRIPTION,
+        })}
       />
       {videos.length > 0 && <JsonLd id="videos-list" data={videoListSchema(videos)} />}
       <Header />

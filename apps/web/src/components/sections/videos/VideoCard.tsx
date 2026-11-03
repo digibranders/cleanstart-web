@@ -1,8 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { formatDurationLabel } from "@/lib/clean-libraries-video";
 import { useWatchedVideos } from "@/lib/use-watched-videos";
-import { formatPublished, type Video } from "@/lib/videos-utils";
+import { formatPublished, videoHref, type Video } from "@/lib/videos-utils";
 import { FormatTag } from "./FormatTag";
 import { PlayGlyph } from "./PlayGlyph";
 import { VideoThumb } from "./VideoThumb";
@@ -86,7 +87,9 @@ export function VideoCard({ video, playing, onPlay, onTopic }: VideoCardProps): 
         className="mt-2 font-display font-semibold text-[#12101C]"
         style={{ fontSize: "var(--fs-h5)", lineHeight: 1.35, letterSpacing: "-0.01em" }}
       >
-        {video.title}
+        <Link href={videoHref(video)} prefetch={false} className="hover:text-[#5B2EE0]">
+          {video.title}
+        </Link>
       </h3>
       {video.summary ? (
         <p

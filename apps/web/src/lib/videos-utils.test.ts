@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { VIDEO_CATALOG, VIDEO_TOPICS } from "./videos-catalog";
 import {
   DEFAULT_VIDEO_FILTERS,
+  descriptionParagraphs,
   filterVideos,
   firstParagraph,
   formatCounts,
@@ -15,6 +16,7 @@ import {
   topicCounts,
   upNext,
   videoFiltersQuery,
+  videoHref,
   type Video,
 } from "./videos-utils";
 import type { ChannelVideo } from "./youtube-feed";
@@ -291,5 +293,38 @@ describe("upNext", () => {
     const out = upNext(pool, current, 2);
     expect(out).toHaveLength(2);
     expect(out.map((v) => v.id)).not.toContain("cur");
+  });
+});
+
+describe("videoHref", () => {
+  it("is the video's own page under /videos", () => {
+    expect(videoHref({ slug: "what-is-vex" })).toBe("/videos/what-is-vex");
+  });
+
+  it("gives every catalog video a distinct page", () => {
+    const hrefs = all.map(videoHref);
+    expect(new Set(hrefs).size).toBe(hrefs.length);
+  });
+});
+
+describe("descriptionParagraphs", () => {
+  it("drops hashtag lines and the paragraph that repeats the summary", () => {
+    const paragraphs = descriptionParagraphs({
+      summary: "First paragraph here.",
+      description: "First paragraph here.\n\nSecond paragraph.\n\n#Tag #Other",
+    });
+    expect(paragraphs).toEqual(["Second paragraph."]);
+  });
+
+  it("keeps every paragraph when the description does not open with the summary", () => {
+    const paragraphs = descriptionParagraphs({
+      summary: "A short card blurb.",
+      description: "The long version.\n\nMore detail.",
+    });
+    expect(paragraphs).toEqual(["The long version.", "More detail."]);
+  });
+
+  it("is empty when the description is only the summary", () => {
+    expect(descriptionParagraphs({ summary: "Only this.", description: "Only this." })).toEqual([]);
   });
 });

@@ -35,6 +35,7 @@
 - [Newsroom](https://www.cleanstart.com/news): Press releases, product launches, and company milestones.
 - [Events](https://www.cleanstart.com/events): DevSecOps and cybersecurity conference appearances and meetups.
 - [Webinars](https://www.cleanstart.com/webinars): On-demand and upcoming webinars on container security topics.
+- [Videos](https://www.cleanstart.com/videos): Short explainers and product demos on container security, SBOMs, VEX, provenance and the software supply chain.
 - [Podcast](https://www.cleanstart.com/podcast): Leadership Exchange: industry leaders on container security and software supply chain risk.
 - [Knowledge Hub](https://www.cleanstart.com/knowledge-hub): Academy-style articles covering container fundamentals through advanced supply chain security.
 

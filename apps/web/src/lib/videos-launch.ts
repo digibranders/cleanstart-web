@@ -1,6 +1,7 @@
 /**
- * The /videos page ships dark: reachable by its URL (for review), but marked
- * noindex and nofollow, left out of the sitemap and not linked from the Resources
- * menu. Flip this to `true` on final approval and all three switch on together.
+ * Whether /videos is live. `true` makes the page indexable, adds it to the
+ * sitemap and links it from the Resources menu, all together. Set it back to
+ * `false` to return the page to a dark launch (noindex, nofollow, no sitemap
+ * entry, no menu link) while it stays reachable by its URL.
  */
-export const VIDEOS_PAGE_PUBLIC = false;
+export const VIDEOS_PAGE_PUBLIC = true;

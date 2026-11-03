@@ -23,3 +23,7 @@ export async function getVideos(): Promise<Video[]> {
 export function videoTopicOrder(): readonly string[] {
   return usesCms() ? [] : VIDEO_TOPICS.map((t) => t.id);
 }
+
+export async function getVideoBySlug(slug: string): Promise<Video | null> {
+  return (await getVideos()).find((v) => v.slug === slug) ?? null;
+}
