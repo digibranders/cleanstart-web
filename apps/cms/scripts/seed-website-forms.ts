@@ -109,10 +109,10 @@ const FORMS: readonly SeedForm[] = [
     ],
   },
   {
-    // Campaign page /cleansight-campaign. No HubSpot GUID yet: leads are
-    // stored in the CMS until the HubSpot form is created, then set
-    // `hubspotFormGuid` here (or in the admin) and re-run with this slug.
+    // Campaign page /cleansight-campaign. HubSpot form `website-cleansight-campaign`
+    // (website folder): firstname, lastname, email, phone, company, jobtitle, country.
     slug: 'cleansight-campaign',
+    hubspotFormGuid: 'cf85e3d4-8982-4799-9051-0429c9947866',
     name: 'CleanSight Scan Request',
     submitLabel: 'Get my free scan',
     fields: [
