@@ -162,6 +162,68 @@ export const Advisories: CollectionConfig = {
     // them for any advisory that has not been merged yet.
     hidden({ name: 'impact', label: 'Impacted packages and versions', type: 'richText' }),
     hidden({ name: 'resolution', type: 'richText' }),
+    {
+      name: 'ctaResource',
+      label: 'Sidebar resource (Learn step)',
+      type: 'relationship',
+      relationTo: 'resources',
+      hasMany: false,
+      // Published only: a draft here would link readers to a 404.
+      filterOptions: { _status: { equals: 'published' } },
+      admin: {
+        custom: { emptyPlaceholder: 'Automatic, click to choose one' },
+        description:
+          'Optional. The resource offered in the "Learn" step of the advisory sidebar. If unset, the page picks the published resource most related to this advisory, which is a keyword match, so choose one here when none of the automatic picks fits.',
+      },
+    },
+    {
+      name: 'ctaResourceAutoPick',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: {
+            path: '@/payload/admin/components/BlogCtaAutoPick.tsx#BlogCtaAutoPick',
+            clientProps: { kind: 'resource' },
+          },
+        },
+      },
+    },
+    {
+      name: 'ctaImage',
+      label: 'Images portal entry (Explore step)',
+      type: 'text',
+      maxLength: 80,
+      validate: (value: string | null | undefined): true | string => {
+        if (value == null || value.trim() === '') return true;
+        return /^[a-z0-9][a-z0-9.-]*$/.test(value.trim())
+          ? true
+          : 'Use the portal name in lowercase, e.g. redis or cert-manager-controller.';
+      },
+      admin: {
+        components: {
+          Field: {
+            path: '@/payload/admin/components/CatalogImagePicker.tsx#CatalogImagePicker',
+            clientProps: {
+              label: 'Images portal entry (Explore step)',
+              description:
+                'Optional. The container image from the images portal (images.cleanstart.com) that the "Explore" step of the advisory sidebar links to. Not a picture. If unset, the page uses the image named by the Technology field, then the one this advisory is about.',
+            },
+          },
+        },
+      },
+    },
+    {
+      name: 'ctaImageAutoPick',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: {
+            path: '@/payload/admin/components/BlogCtaAutoPick.tsx#BlogCtaAutoPick',
+            clientProps: { kind: 'image' },
+          },
+        },
+      },
+    },
     hidden(
       mediaUploadField({
         name: 'heroImage',

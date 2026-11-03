@@ -60,6 +60,7 @@ import { SearchLog } from './payload/collections/SearchLog';
 import { Users } from './payload/collections/Users';
 import { Webinars } from './payload/collections/Webinars';
 import { blogCtaSuggestionEndpoint } from './payload/endpoints/blog-cta-suggestion';
+import { catalogImagesEndpoint } from './payload/endpoints/catalog-images';
 import { cachePurgeEndpoint } from './payload/endpoints/cache-purge';
 import { cacheSearchEndpoint } from './payload/endpoints/cache-search';
 import { canonicalCheckEndpoint } from './payload/endpoints/canonical-check';
@@ -488,6 +489,7 @@ export default buildConfig({
     canonicalCheckEndpoint,
     cachePurgeEndpoint,
     blogCtaSuggestionEndpoint,
+    catalogImagesEndpoint,
     cacheSearchEndpoint,
     searchQueryEndpoint,
     searchAnalyticsEndpoint,

@@ -9,6 +9,7 @@ import { fetchCMS } from './cms-fetch';
 export const COLLECTION_LABELS: Record<string, string> = {
   blogs: 'Blog',
   advisories: 'Advisory',
+  videos: 'Video',
   news: 'News',
   guides: 'Guide',
   knowledgeBase: 'Knowledge Hub',

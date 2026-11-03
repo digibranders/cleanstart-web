@@ -1,4 +1,4 @@
-import type { BlogCtaLayout, BlogCtaPlacement } from "./types";
+import type { BlogCtaLayout, BlogCtaPlacement, BlogCtaSurface } from "./types";
 
 /**
  * Tags an internal demo link with where the click came from.
@@ -10,10 +10,15 @@ import type { BlogCtaLayout, BlogCtaPlacement } from "./types";
  */
 export function withDemoSource(
   href: string,
-  { slug, layout, placement }: { slug: string; layout: BlogCtaLayout; placement: BlogCtaPlacement },
+  {
+    slug,
+    layout,
+    placement,
+    surface = "blog",
+  }: { slug: string; layout: BlogCtaLayout; placement: BlogCtaPlacement; surface?: BlogCtaSurface | undefined },
 ): string {
   const url = new URL(href, "https://www.cleanstart.com");
-  url.searchParams.set("source", "blog");
+  url.searchParams.set("source", surface);
   url.searchParams.set("source_page", slug);
   url.searchParams.set("source_cta", `${layout}-${placement}`);
   return `${url.pathname}${url.search}${url.hash}`;

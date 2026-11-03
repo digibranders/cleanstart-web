@@ -139,6 +139,31 @@ export function matchCatalogImage(article: ArticleText, catalogNames: readonly s
   return best?.name ?? null;
 }
 
+/** Long names that the catalog files under a shorter slug. */
+const HINT_ALIASES: Readonly<Record<string, string>> = { golang: "go", postgresql: "postgres" };
+
+/**
+ * The catalog image for a technology label an editor typed on the page itself
+ * (an advisory's "Node.js", "Python 3.12"). That label is a firmer signal than
+ * mentions in the text, so it is tried before the text match. Null when the
+ * catalog has no such image, so the caller falls back to the text match.
+ */
+export function matchImageHint(hint: string | null | undefined, catalogNames: readonly string[]): string | null {
+  const label = hint
+    ?.trim()
+    .toLowerCase()
+    .replace(/[\s@:-]*v?\d[\d.]*$/, "")
+    .replace(/-fips$/, "");
+  if (!label) return null;
+  const bases = baseImageNames(catalogNames);
+  const candidates = [label, label.replace(/\.?js$/, ""), label.replace(/\s+/g, "-")];
+  for (const candidate of candidates) {
+    const name = HINT_ALIASES[candidate] ?? candidate;
+    if (bases.includes(name)) return name;
+  }
+  return null;
+}
+
 const STOPWORDS: ReadonlySet<string> = new Set(
   (
     "the and for with that this from your you are was were have has had not but all can will " +

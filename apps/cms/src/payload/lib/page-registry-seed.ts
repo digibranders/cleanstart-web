@@ -132,6 +132,9 @@ export const PAGE_REGISTRY_SEED: readonly PageRegistrySeedRow[] = [
   // Security advisories, a Resources section of their own. Launched 2026-10-23.
   { path: '/advisories', title: 'Advisories', kind: 'cms-listing', order: 59, backingCollection: 'advisories' },
   { path: '/advisories/[slug]', title: 'Advisory (template)', kind: 'cms-template', order: 60, backingCollection: 'advisories' },
+  // Videos: editorial collection fed by the YouTube sync (apps/cms videos + videoTopics). The page plays
+  // videos inline, so there is no per-video template route.
+  { path: '/videos', title: 'Videos', kind: 'cms-listing', order: 61, backingCollection: 'videos' },
 ] as const;
 
 /** Fail-fast guard: paths unique + well-formed, templates carry a collection. */

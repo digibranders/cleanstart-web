@@ -1941,6 +1941,11 @@ export interface Advisory {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Optional. The resource offered in the "Learn" step of the advisory sidebar. If unset, the page picks the published resource most related to this advisory, which is a keyword match, so choose one here when none of the automatic picks fits.
+   */
+  ctaResource?: (number | null) | Resource;
+  ctaImage?: string | null;
   heroImage?: (number | null) | Media;
   faqs?:
     | {
@@ -10423,6 +10428,8 @@ export interface AdvisoriesSelect<T extends boolean = true> {
   body?: T;
   impact?: T;
   resolution?: T;
+  ctaResource?: T;
+  ctaImage?: T;
   heroImage?: T;
   faqs?:
     | T

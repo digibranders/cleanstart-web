@@ -15,6 +15,7 @@ import { LegalDocuments } from './Legal';
 import { News } from './News';
 import { PodcastEpisodes } from './PodcastEpisodes';
 import { Resources } from './Resources';
+import { Videos } from './Videos';
 import { Webinars } from './Webinars';
 
 const COLLECTIONS: CollectionConfig[] = [
@@ -23,6 +24,7 @@ const COLLECTIONS: CollectionConfig[] = [
   News,
   Guides,
   Resources,
+  Videos,
   Events,
   Jobs,
   KnowledgeBase,

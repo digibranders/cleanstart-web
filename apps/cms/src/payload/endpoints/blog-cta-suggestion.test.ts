@@ -18,6 +18,15 @@ describe('webSuggestionUrl', () => {
     expect(webSuggestionUrl(env, 'my-post')).toBe('https://www.cleanstart.com/api/blog-cta-suggestion?slug=my-post');
   });
 
+  it('names the collection for advisories and leaves blog URLs as they were', () => {
+    expect(webSuggestionUrl(env, 'a-cve', 'advisories')).toBe(
+      'https://www.cleanstart.com/api/blog-cta-suggestion?slug=a-cve&collection=advisories',
+    );
+    expect(webSuggestionUrl(env, 'my-post', 'blogs')).toBe(
+      'https://www.cleanstart.com/api/blog-cta-suggestion?slug=my-post',
+    );
+  });
+
   it('is null without the URL or the secret', () => {
     expect(webSuggestionUrl({}, 'x')).toBeNull();
     expect(webSuggestionUrl({ WEB_REVALIDATE_URL: env.WEB_REVALIDATE_URL }, 'x')).toBeNull();
@@ -39,6 +48,18 @@ describe('resolveSuggestion', () => {
 
   it('is 404 when the post does not exist', async () => {
     expect((await resolveSuggestion(editor, '1', deps({ loadSlug: async () => null }))).status).toBe(404);
+  });
+
+  it('rejects a collection that is not blogs or advisories', async () => {
+    expect((await resolveSuggestion(editor, '1', deps(), 'users')).status).toBe(400);
+  });
+
+  it('passes the collection on to the lookup and to the web app', async () => {
+    const d = deps();
+    await resolveSuggestion(editor, '5', d, 'advisories');
+    expect(d.loadSlug).toHaveBeenCalledWith(5, 'advisories');
+    const url = (d.fetchImpl as unknown as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as string;
+    expect(url).toContain('collection=advisories');
   });
 
   it('asks the web app with the secret and returns its pick', async () => {

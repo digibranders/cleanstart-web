@@ -63,7 +63,11 @@ export interface ProveCta {
   label: string;
 }
 
+/** The kind of page a rail sits on. Names the GA4 event and the demo link's `source`. */
+export type BlogCtaSurface = "blog" | "advisory";
+
 export interface BlogCtaSet {
+  surface: BlogCtaSurface;
   slug: string;
   explore: ExploreCta;
   /** Null only when the CMS returned no published resources at all. */

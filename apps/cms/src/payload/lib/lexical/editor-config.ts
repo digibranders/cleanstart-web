@@ -27,6 +27,7 @@ import {
 
 import { CodeBlock } from '../../blocks/CodeBlock';
 import { InlineCtaBlock } from '../../blocks/InlineCtaBlock';
+import { VideoEmbedBlock } from '../../blocks/VideoEmbedBlock';
 import { cleanstartAddMenuFeature } from './add-menu-feature';
 import { cleanstartCodeBlockFeature } from './code-block-feature';
 import { cleanstartEmbedFeature } from './embed-feature';
@@ -82,9 +83,10 @@ export const cleanstartLexicalEditor = () =>
 
       // Embedded blocks inside rich text. CodeBlock reuses the page-builder
       // block schema 1:1; InlineCtaBlock is body-only and inserted via the
-      // slash menu (see SlashMenuPlugin). Both render through the `block`
+      // slash menu (see SlashMenuPlugin). VideoEmbedBlock picks from the Videos
+      // library. All render through the `block`
       // branch of the web renderLexical.
-      BlocksFeature({ blocks: [CodeBlock, InlineCtaBlock] }),
+      BlocksFeature({ blocks: [CodeBlock, InlineCtaBlock, VideoEmbedBlock] }),
 
       // Single `<>` toolbar button that inserts the CodeBlock above. It
       // takes the slot the inline-code button used to occupy and stands in

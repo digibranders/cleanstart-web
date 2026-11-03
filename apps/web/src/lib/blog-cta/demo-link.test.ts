@@ -20,4 +20,10 @@ describe("withDemoSource", () => {
       "/book-a-demo?source=blog&source_page=a+b%26c&source_cta=ladder-rail",
     );
   });
+
+  it("names the surface that sent the click", () => {
+    expect(
+      withDemoSource("/book-a-demo", { slug: "cve-1", layout: "ladder", placement: "rail", surface: "advisory" }),
+    ).toBe("/book-a-demo?source=advisory&source_page=cve-1&source_cta=ladder-rail");
+  });
 });

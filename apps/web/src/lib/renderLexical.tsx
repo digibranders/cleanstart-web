@@ -4,7 +4,9 @@ import Link from "next/link";
 import { EMBED_STYLE_SLUGS } from "@cleanstart/types";
 import type { LexicalNode, LexicalRoot, LexicalTableNode } from "@/lib/blog";
 import { CodeBlock } from "@/components/code/CodeBlock";
+import { ArticleVideo } from "@/components/article/ArticleVideo";
 import { InlineCtaCard } from "@/components/article/InlineCtaCard";
+import type { ArticleVideoData } from "@/lib/lexical-videos";
 import { SITE_URL } from "@/lib/seo/canonical";
 
 // Hosts that resolve to THIS marketing site (apps/web). Internal links must
@@ -105,6 +107,12 @@ type CodeBlockFields = {
   content?: string | null;
   showLineNumbers?: boolean | null;
   highlightLines?: string | null;
+};
+
+/** `_video` is written by `resolveLexicalVideos` before render; a block without it is skipped. */
+type VideoEmbedFields = {
+  caption?: string;
+  _video?: ArticleVideoData;
 };
 
 type InlineCtaFields = {
@@ -311,6 +319,10 @@ function renderNode(node: LexicalNode, key: string): React.ReactNode {
             variant={cta.variant ?? "soft"}
           />
         );
+      }
+      if (fields?.blockType === "videoEmbed") {
+        const embed = fields as VideoEmbedFields;
+        return embed._video ? <ArticleVideo key={key} video={embed._video} caption={embed.caption} /> : null;
       }
       return null;
     }

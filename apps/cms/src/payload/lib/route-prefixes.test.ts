@@ -42,6 +42,7 @@ describe('listingPathForCollection (index URLs for revalidation)', () => {
     expect(listingPathForCollection('events')).toBe('/events');
     expect(listingPathForCollection('webinars')).toBe('/webinars');
     expect(listingPathForCollection('jobs')).toBe('/careers');
+    expect(listingPathForCollection('videos')).toBe('/videos');
   });
 
   it('falls back to ROUTE_PREFIX when the listing matches the detail prefix', () => {

@@ -10,6 +10,9 @@ export type AdvisoryDetail = AdvisoryRow & {
   impact?: LexicalRoot | null;
   resolution?: LexicalRoot | null;
   contentUpdatedAt?: string | null;
+  readingMinutes?: number | null;
+  ctaResource?: unknown;
+  ctaImage?: string | null;
   updatedAt?: string;
   seo?: CmsSeo | null;
 };

@@ -2,6 +2,7 @@ import { fetchCMS } from '@/lib/cms-fetch';
 import { effectiveModifiedAt } from '@/lib/published-date';
 import { SITE_URL } from '@/lib/seo/canonical';
 import { legalHref } from '@/lib/legal';
+import { VIDEOS_PAGE_PUBLIC } from '@/lib/videos-launch';
 import { isIndexingAllowed } from '@/lib/seo/indexing';
 import type { MetadataRoute } from 'next';
 
@@ -141,6 +142,7 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/software-bill-materials' },
   { path: '/teams' },
   { path: '/tricorder' },
+  ...(VIDEOS_PAGE_PUBLIC ? [{ path: '/videos' }] : []),
   { path: '/vulnerability-remediation' },
   { path: '/webinars' },
 ];

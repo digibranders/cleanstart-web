@@ -282,6 +282,13 @@ const nextConfig: NextConfig = {
         pathname: "/cdpimages/**",
       },
       {
+        // YouTube poster frames for /videos. Only i.ytimg.com/vi/<id>/*.jpg is
+        // ever requested: the URL is built from the video id, never from feed data.
+        protocol: "https",
+        hostname: "i.ytimg.com",
+        pathname: "/vi/**",
+      },
+      {
         // Brand-colored stack logos (devicons) served via jsDelivr CDN
         protocol: "https",
         hostname: "cdn.jsdelivr.net",

@@ -16,7 +16,7 @@ const html = (el: ReturnType<typeof AutoPickNote>) => renderToStaticMarkup(el);
 describe('AutoPickNote', () => {
   it('asks to save a new post first', () => {
     expect(html(<AutoPickNote kind="resource" state={{ phase: 'unsaved' }} overridden={false} />)).toContain(
-      'Save the post to see which one the page picks automatically.',
+      'Save it to see which one the page picks automatically.',
     );
   });
 

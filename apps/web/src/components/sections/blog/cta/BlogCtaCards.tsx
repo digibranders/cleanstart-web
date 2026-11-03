@@ -12,6 +12,7 @@ import { copyText } from "@/lib/clipboard";
 import type {
   BlogCtaLayout,
   BlogCtaPlacement,
+  BlogCtaSurface,
   CatalogLogo,
   ExploreCta,
   ProveCta,
@@ -28,6 +29,8 @@ const INK_MUTED = "rgba(17, 17, 17, 0.64)";
 const VIOLET = "#4A3BF1";
 
 export interface CtaCardContext {
+  /** Defaults to the blog. */
+  surface?: BlogCtaSurface | undefined;
   slug: string;
   layout: BlogCtaLayout;
   placement: BlogCtaPlacement;

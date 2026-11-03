@@ -1,7 +1,11 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { parseYouTubeFeed } from "./youtube-feed";
+import {
+  CLEANSTART_YOUTUBE_CHANNEL_ID,
+  CLEANSTART_YOUTUBE_SUBSCRIBE_URL,
+  parseYouTubeFeed,
+} from "./youtube-feed";
 
 const fixture = readFileSync(
   join(__dirname, "__fixtures__/youtube-feed.xml"),
@@ -17,6 +21,7 @@ describe("parseYouTubeFeed", () => {
       title: "CleanSight: A Complete software security posture management",
       publishedAt: "2026-05-27T13:36:30+00:00",
       thumbnailUrl: "https://i.ytimg.com/vi/GqFPH4KKqpA/hqdefault.jpg",
+      description: "",
     });
   });
 
@@ -32,6 +37,17 @@ describe("parseYouTubeFeed", () => {
     );
   });
 
+  it("reads media:description with its line breaks and entities decoded", () => {
+    const xml =
+      "<feed><entry><yt:videoId>ABCDEFGHIJK</yt:videoId><title>t</title>" +
+      "<published>2026-01-01T00:00:00+00:00</published><media:group>" +
+      "<media:description>Line one &amp; two.\n\nLine three</media:description>" +
+      "</media:group></entry></feed>";
+    expect(parseYouTubeFeed(xml, 1)[0]?.description).toBe(
+      "Line one & two.\n\nLine three",
+    );
+  });
+
   it("returns [] for empty or malformed input", () => {
     expect(parseYouTubeFeed("", 6)).toEqual([]);
     expect(parseYouTubeFeed("<feed></feed>", 6)).toEqual([]);
@@ -41,5 +57,14 @@ describe("parseYouTubeFeed", () => {
   it("skips entries missing a videoId", () => {
     const broken = "<feed><entry><title>no id</title></entry></feed>";
     expect(parseYouTubeFeed(broken, 6)).toEqual([]);
+  });
+});
+
+describe("CLEANSTART_YOUTUBE_SUBSCRIBE_URL", () => {
+  it("points at the channel id and asks YouTube to show its subscribe prompt", () => {
+    const url = new URL(CLEANSTART_YOUTUBE_SUBSCRIBE_URL);
+    expect(url.origin).toBe("https://www.youtube.com");
+    expect(url.pathname).toBe(`/channel/${CLEANSTART_YOUTUBE_CHANNEL_ID}`);
+    expect(url.searchParams.get("sub_confirmation")).toBe("1");
   });
 });

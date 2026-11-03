@@ -50,6 +50,10 @@ const LISTING_PATH_OVERRIDE: Record<string, string> = {
   // must purge. `collectionUrlFromDoc` returns null for it (no ROUTE_PREFIX
   // entry), so the hook purges the listing alone.
   resourceTypes: '/resource-center',
+  // Videos play inline on the listing (no page per video), so there is no ROUTE_PREFIX entry and
+  // no detail URL: a publish purges the listing alone. Topics are its filter, so they purge it too.
+  videos: '/videos',
+  videoTopics: '/videos',
   events: '/events',
   webinars: '/webinars',
   jobs: '/careers',

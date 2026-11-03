@@ -2,14 +2,16 @@ import { timingSafeEqual } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
+import { getAdvisoryBySlugDraft } from "@/lib/advisory";
 import { getBlogBySlugDraft } from "@/lib/blog";
-import { getBlogCtas } from "@/lib/blog-cta/resolve";
+import { getAdvisoryCtas, getBlogCtas } from "@/lib/blog-cta/resolve";
 import { toSuggestion } from "@/lib/blog-cta/suggestion";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const slugSchema = z.string().regex(/^[a-z0-9][a-z0-9-]*$/).max(160);
+const collectionSchema = z.enum(["blogs", "advisories"]).default("blogs");
 
 const NO_STORE = { "Cache-Control": "no-store" } as const;
 
@@ -20,9 +22,9 @@ function tokenMatches(given: string, expected: string): boolean {
 }
 
 /**
- * GET /api/blog-cta-suggestion?slug=<blog slug>
+ * GET /api/blog-cta-suggestion?slug=<slug>[&collection=advisories]
  *
- * What the blog sidebar would show for this post with no editor picks: the
+ * What the blog or advisory sidebar would show for this page with no editor picks: the
  * catalog image and the resource the page would choose by itself. Called by
  * the CMS admin (server to server) so an editor can see the automatic pick
  * under the override fields. Uses the draft when there is one, so it reflects
@@ -47,12 +49,25 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ ok: false, error: "invalid_slug" }, { status: 400, headers: NO_STORE });
   }
 
-  const post = await getBlogBySlugDraft(slug.data);
-  if (!post) {
-    return NextResponse.json({ ok: false, error: "not_found" }, { status: 404, headers: NO_STORE });
+  const collection = collectionSchema.safeParse(new URL(req.url).searchParams.get("collection") ?? undefined);
+  if (!collection.success) {
+    return NextResponse.json({ ok: false, error: "invalid_collection" }, { status: 400, headers: NO_STORE });
   }
 
   // Picks cleared: this is the automatic match, whatever the editor has set.
-  const ctas = await getBlogCtas({ ...post, ctaResource: null, ctaImage: null });
+  let ctas: Awaited<ReturnType<typeof getBlogCtas>>;
+  if (collection.data === "advisories") {
+    const advisory = await getAdvisoryBySlugDraft(slug.data);
+    if (!advisory) {
+      return NextResponse.json({ ok: false, error: "not_found" }, { status: 404, headers: NO_STORE });
+    }
+    ctas = await getAdvisoryCtas({ ...advisory, ctaResource: null, ctaImage: null });
+  } else {
+    const post = await getBlogBySlugDraft(slug.data);
+    if (!post) {
+      return NextResponse.json({ ok: false, error: "not_found" }, { status: 404, headers: NO_STORE });
+    }
+    ctas = await getBlogCtas({ ...post, ctaResource: null, ctaImage: null });
+  }
   return NextResponse.json({ ok: true, ...toSuggestion(ctas) }, { headers: NO_STORE });
 }
