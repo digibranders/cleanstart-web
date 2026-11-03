@@ -1,6 +1,7 @@
 import { companyFromDomainHandler } from './company-from-domain';
 import { confirmationHandler } from './confirmation';
 import { hubspotHandler } from './hubspot';
+import { notificationHandler } from './notification';
 import { registerSecondaryHandler } from './registry';
 
 // Secondary chain:
@@ -8,6 +9,7 @@ import { registerSecondaryHandler } from './registry';
 //   - hubspot              (primary CRM — Phase J3; reads DB-backed
 //                           integration row, no env gate)
 //   - confirmation-email   (visitor acknowledgement over Brevo)
+//   - notification-email   (internal alert to marketing@, per form slug)
 //
 // The visitor acknowledgement is ours rather than a HubSpot form follow-up.
 // A follow-up is a marketing send gated on subscription status, so anyone
@@ -29,9 +31,10 @@ export const registerLeadHandlers = (): void => {
   registerSecondaryHandler(companyFromDomainHandler);
   registerSecondaryHandler(hubspotHandler);
   registerSecondaryHandler(confirmationHandler);
+  registerSecondaryHandler(notificationHandler);
 };
 
-export { companyFromDomainHandler, confirmationHandler, hubspotHandler };
+export { companyFromDomainHandler, confirmationHandler, hubspotHandler, notificationHandler };
 export { hubspotGdprDeleteByEmail } from './hubspot';
 export {
   registerSecondaryHandler,

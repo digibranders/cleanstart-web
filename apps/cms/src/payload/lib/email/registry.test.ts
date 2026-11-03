@@ -42,6 +42,7 @@ describe('EMAIL_TEMPLATES', () => {
       'become-a-partner',
       'deal-registration',
       'job application',
+      'cleansight-campaign',
     ]) {
       expect([...forms].some((f) => f.includes(expected)), expected).toBe(true);
     }

@@ -9,6 +9,7 @@ import {
   buildDemoConfirmationEmail,
   buildNewsletterWelcomeEmail,
   buildResourceDownloadEmail,
+  buildScanRequestNotificationEmail,
 } from './lead-emails';
 
 /**
@@ -100,6 +101,25 @@ export const EMAIL_TEMPLATES: readonly EmailTemplateEntry[] = [
         resourceTitle: 'The 2026 Container Hardening Playbook',
         downloadUrl: 'https://cms.cleanstart.com/api/resources/example/download?token=sample',
         expiresAt: Date.now() + 24 * 3_600_000,
+      }),
+  },
+  {
+    key: 'scan-request-notification',
+    form: 'cleansight-campaign',
+    audience: 'internal',
+    sentFrom: 'lead-handlers/notification.ts',
+    sample: () =>
+      buildScanRequestNotificationEmail({
+        firstName: 'Priya',
+        lastName: 'Nair',
+        email: 'priya.nair@example.com',
+        company: 'Northgate Security',
+        jobTitle: 'Head of Platform',
+        phone: '+919876543210',
+        country: 'India',
+        source: 'https://www.cleanstart.com/cleansight-campaign',
+        campaign: 'cleansight-q4',
+        leadUrl: 'https://cms.cleanstart.com/admin/collections/leads/123',
       }),
   },
   {

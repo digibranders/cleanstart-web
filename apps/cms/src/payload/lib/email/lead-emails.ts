@@ -125,3 +125,56 @@ export const buildResourceDownloadEmail = (
     }),
   };
 };
+
+export type ScanRequestNotificationInput = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  company: string;
+  jobTitle: string;
+  phone?: string | undefined;
+  country?: string | undefined;
+  /** Page the visitor submitted from. */
+  source?: string | undefined;
+  campaign?: string | undefined;
+  /** Link to the stored lead in the CMS. */
+  leadUrl?: string | undefined;
+};
+
+/** Internal alert to marketing for a new CleanSight scan request. */
+export const buildScanRequestNotificationEmail = (
+  input: ScanRequestNotificationInput,
+): { subject: string; htmlContent: string } => {
+  const fullName = `${input.firstName} ${input.lastName}`.trim();
+  return {
+    subject: `New CleanSight scan request: ${input.company}, ${fullName}`,
+    htmlContent: renderEmail({
+      preheader: `${fullName}, ${input.jobTitle} at ${input.company}, asked for a free container security scan.`,
+      eyebrow: 'CleanSight scan',
+      heading: 'New scan request',
+      blocks: [
+        {
+          kind: 'paragraph',
+          text: `${fullName} from ${input.company} requested a free CleanSight container security scan. Follow up to set it up.`,
+        },
+        {
+          kind: 'details',
+          rows: [
+            ['Name', fullName],
+            ['Email', input.email],
+            ['Company', input.company],
+            ['Job title', input.jobTitle],
+            ['Phone', input.phone],
+            ['Country', input.country],
+            ['Campaign', input.campaign],
+            ['Submitted from', input.source],
+          ],
+        },
+        ...(input.leadUrl
+          ? [{ kind: 'button' as const, label: 'Open the lead in the CMS', url: input.leadUrl }]
+          : []),
+      ],
+      footerNote: 'Sent automatically from the CleanSight scan request form on cleanstart.com.',
+    }),
+  };
+};
