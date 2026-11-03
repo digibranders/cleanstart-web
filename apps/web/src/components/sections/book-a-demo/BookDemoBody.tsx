@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
  */
 export function BookDemoBody({ children }: { children: ReactNode }): React.ReactElement {
   return (
-    <section className="relative bg-white overflow-hidden">
+    <section className="relative bg-white overflow-clip">
       {/* Right purple radial. */}
       <div
         aria-hidden

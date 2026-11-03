@@ -1,12 +1,9 @@
 import { Header } from "@/components/nav/Header";
 import { Footer } from "@/components/sections/Footer";
 import { JsonLdGraph } from "@/components/JsonLdGraph";
-import { ScanHero } from "@/components/sections/cleansight-scan/ScanHero";
-import { ScanIdentifies } from "@/components/sections/cleansight-scan/ScanIdentifies";
-import { ScanReceive } from "@/components/sections/cleansight-scan/ScanReceive";
-import { ScanFallsShort } from "@/components/sections/cleansight-scan/ScanFallsShort";
-import { ScanDifferentiators } from "@/components/sections/cleansight-scan/ScanDifferentiators";
-import { FadeUp } from "@/components/ui/FadeUp";
+import { BookDemoBody } from "@/components/sections/book-a-demo/BookDemoBody";
+import { DemoHero } from "@/components/sections/book-a-demo/DemoHero";
+import { ScanBody } from "@/components/sections/cleansight-scan/ScanBody";
 import { buildPageMetadata } from "@/lib/seo/canonical";
 import { getPageGraph } from "@/lib/seo/compose-page";
 import { breadcrumbSchema } from "@/lib/seo/jsonld";
@@ -37,20 +34,11 @@ export default async function CleanSightScanRequestPage(): Promise<React.ReactEl
     <>
       <JsonLdGraph id="cleansight-scan-jsonld" graph={graph} />
       <Header />
-      <main id="main-content">
-        <ScanHero />
-        <FadeUp>
-          <ScanIdentifies />
-        </FadeUp>
-        <FadeUp>
-          <ScanReceive />
-        </FadeUp>
-        <FadeUp>
-          <ScanFallsShort />
-        </FadeUp>
-        <FadeUp>
-          <ScanDifferentiators />
-        </FadeUp>
+      <main id="main-content" className="bg-white">
+        <DemoHero title="Discover Hidden Container Risk Across Your Hybrid Environment" />
+        <BookDemoBody>
+          <ScanBody />
+        </BookDemoBody>
       </main>
       <Footer />
     </>
