@@ -10,6 +10,15 @@ A running, reverse-chronological log of production incidents and non-obvious bug
 
 ---
 
+## 2026-11-04 - Admin uploads over 10 MB failed with "Something went wrong."
+
+- **Area:** `apps/cms` - media uploads from the admin (`MediaField` posts to `/api/media`), Next 16 proxy.
+- **Symptom:** Replacing the PDF on a resource (14 MB) showed a red "Something went wrong." under the Asset field. The same file uploaded fine from a script inside the container.
+- **Root cause:** `src/proxy.ts` matches `/api/:path*`, and Next 16 buffers the body of every proxied request, cutting it at 10 MB (`experimental.proxyClientMaxBodySize`, default 10 MB). Payload received a multipart body that ended mid-file and threw `Unexpected end of form`, which it reports to the client as a generic 500. The container log had the only clue: `Request body exceeded 10MB for /api/media`. Payload's own size limit (50 MB for PDFs) never got a chance to apply.
+- **Fix:** `next.config.ts` sets `experimental.proxyClientMaxBodySize` from `MAX_UPLOAD_BYTES` (the largest per-type limit in `upload-limits.ts`, plus 1 MB of multipart headroom). The PDF itself was swapped with a one-shot script run in the prod container.
+- **Status:** Fixed in code; verification pending the next deploy (retry a >10 MB upload in the admin).
+- **Reusable lesson:** A Next proxy (middleware) matcher that covers an upload route caps the body at 10 MB regardless of what the route handler allows. "Unexpected end of form" plus a generic 500 means a truncated body, not a bad file. Check the server log for the `Request body exceeded` line before touching the client.
+
 ## 2026-10-14 - Published pages served as 404s; web builds failing on CMS 500s
 
 - **Area:** `apps/web` detail routes, `apps/cms` Postgres pool, production droplet Postgres.

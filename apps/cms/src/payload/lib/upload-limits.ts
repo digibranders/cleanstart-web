@@ -13,6 +13,11 @@ const VIDEO_LIMIT = 200 * MB;
 const ZIP_LIMIT = 100 * MB;
 export const RESUME_LIMIT = 10 * MB;
 
+// Largest single upload any type may send. The Next proxy buffers request
+// bodies and cuts them at its own cap, so next.config.ts raises that cap to
+// this value (plus multipart framing headroom).
+export const MAX_UPLOAD_BYTES = Math.max(IMAGE_LIMIT, PDF_LIMIT, VIDEO_LIMIT, ZIP_LIMIT);
+
 const FALLBACK_LIMIT = IMAGE_LIMIT;
 
 export type UploadLimitResult = { ok: true } | { ok: false; reason: string };

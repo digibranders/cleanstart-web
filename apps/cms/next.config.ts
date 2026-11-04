@@ -5,6 +5,7 @@ import { withPayload } from '@payloadcms/next/withPayload';
 import { withSentryConfig } from '@sentry/nextjs';
 
 import { EMBED_FRAME_SRC_ORIGINS } from './src/payload/admin/components/Embed/embed-providers';
+import { MAX_UPLOAD_BYTES } from './src/payload/lib/upload-limits';
 
 const r2PublicHost = (() => {
   const raw = process.env.R2_PUBLIC_BASE;
@@ -89,6 +90,13 @@ const apiNoindexHeader = { key: 'X-Robots-Tag', value: 'noindex, nofollow' };
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // src/proxy.ts matches /api/*, so Next buffers every API request body and
+  // silently truncates it at 10 MB. Any upload past that (a 14 MB PDF) reached
+  // Payload cut off mid-multipart and failed with "Unexpected end of form".
+  // Per-type size limits are enforced in Media's beforeValidate hook.
+  experimental: {
+    proxyClientMaxBodySize: MAX_UPLOAD_BYTES + 1024 * 1024,
+  },
   // Keep the Google API client libraries external (required from node_modules
   // at runtime) instead of letting Next bundle them into the server chunks.
   // `@google-analytics/data` (gRPC via google-gax) and `googleapis` rely on

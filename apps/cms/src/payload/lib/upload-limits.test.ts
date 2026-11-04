@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   ALLOWED_MIME_TYPES,
+  MAX_UPLOAD_BYTES,
   RESUME_LIMIT,
   RESUME_MIME_TYPES,
   checkUploadSize,
@@ -74,5 +75,12 @@ describe('resume upload limits', () => {
 
   it('exports RESUME_LIMIT as a hard 10 MB cap', () => {
     expect(RESUME_LIMIT).toBe(10 * 1024 * 1024);
+  });
+
+  it('MAX_UPLOAD_BYTES covers every per-type limit and exceeds the 10 MB proxy default', () => {
+    for (const mime of ['image/png', 'application/pdf', 'video/mp4', 'application/zip']) {
+      expect(MAX_UPLOAD_BYTES).toBeGreaterThanOrEqual(limitForMime(mime));
+    }
+    expect(MAX_UPLOAD_BYTES).toBeGreaterThan(10 * MB);
   });
 });
