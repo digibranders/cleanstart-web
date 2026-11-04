@@ -5,6 +5,7 @@ import { Footer } from "@/components/sections/Footer";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { ResourceDetailHero } from "@/components/sections/resource/ResourceDetailHero";
 import { ResourceDetailContent } from "@/components/sections/resource/ResourceDetailContent";
+import { BESPOKE_RESOURCE_LANDINGS } from "@/components/sections/resource/bespoke-landings";
 import {
   getResourceBySlug,
   getResourceBySlugDraft,
@@ -101,28 +102,42 @@ export async function renderResourceDetail({
 
   const heroAbsolute = mediaUrl(resource.heroImage?.url);
 
+  const jsonLd = (
+    <JsonLdGraph
+      id={`resource-jsonld-${resource.slug}`}
+      graph={buildPageGraph({
+        nodes: [
+          breadcrumbSchema(breadcrumbTrail("resource", { title: resource.title })),
+          articleSchema({
+            title: resource.title,
+            description: resource.summary ?? undefined,
+            path: `/resources/${resource.slug}`,
+            publishedAt: effectivePublishedAt(resource) ?? resource.publishedAt ?? undefined,
+            imageUrl: heroAbsolute,
+            type: resolveResourceTypeLabel(resource),
+          }),
+        ],
+        override: seoOverride(resource.seo),
+      })}
+    />
+  );
+
+  const Landing = BESPOKE_RESOURCE_LANDINGS[resource.slug];
+  if (Landing) {
+    return (
+      <>
+        {jsonLd}
+        <Landing resource={resource} />
+      </>
+    );
+  }
+
   const highlightedBody = await highlightLexical(resource.body ?? null).then(resolveLexicalVideos);
   const resourceWithHighlighted = { ...resource, body: highlightedBody ?? null };
 
   return (
     <>
-      <JsonLdGraph
-        id={`resource-jsonld-${resource.slug}`}
-        graph={buildPageGraph({
-          nodes: [
-            breadcrumbSchema(breadcrumbTrail("resource", { title: resource.title })),
-            articleSchema({
-              title: resource.title,
-              description: resource.summary ?? undefined,
-              path: `/resources/${resource.slug}`,
-              publishedAt: effectivePublishedAt(resource) ?? resource.publishedAt ?? undefined,
-              imageUrl: heroAbsolute,
-              type: resolveResourceTypeLabel(resource),
-            }),
-          ],
-          override: seoOverride(resource.seo),
-        })}
-      />
+      {jsonLd}
       <Header />
       <main
         id="main-content"

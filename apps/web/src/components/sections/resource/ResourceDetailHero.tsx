@@ -1,7 +1,6 @@
 import { breadcrumbTrail } from "@cleanstart/schema/builders";
 import type { ResourceDetail } from "@/lib/resources";
 import {
-  mediaUrl,
   resolveResourceTypeLabel,
   resolveResourceTypeSlug,
   resourceCtaLabel,
@@ -9,6 +8,7 @@ import {
 import { DETAIL_HERO_TITLE_STYLE } from "@/components/sections/_shared/DetailHero";
 import { HeroBreadcrumb } from "@/components/sections/_shared/HeroBreadcrumb";
 import { ResourceDownloadButton } from "@/components/resource/ResourceDownloadButton";
+import { resolveResourceGate } from "@/lib/resource-gate";
 import { HeroReveal } from "@/components/ui/Reveal";
 
 interface ResourceDetailHeroProps {
@@ -18,23 +18,7 @@ interface ResourceDetailHeroProps {
 export function ResourceDetailHero({
   resource,
 }: ResourceDetailHeroProps): React.ReactElement {
-  const gated = resource.gated === true;
-  // Bare id publicly (forms are admin-only to read), an object for an
-  // authenticated draft preview.
-  const gateFormId =
-    typeof resource.gateForm === "object" && resource.gateForm !== null
-      ? Number(resource.gateForm.id)
-      : Number(resource.gateForm);
-  const hasGateForm = Number.isInteger(gateFormId) && gateFormId > 0;
-  // A gated file's URL never reaches the client: the button's props are
-  // serialised into the page, so passing it would publish the direct link the
-  // gate exists to withhold. The download comes from the signed link instead.
-  const assetHref =
-    gated && hasGateForm
-      ? "#"
-      : resource.asset?.url
-        ? (mediaUrl(resource.asset.url) ?? "#")
-        : "#";
+  const { gated, gateFormId, assetHref } = resolveResourceGate(resource);
 
   // Ungated resources reuse `resourceCtaLabel`, the same helper the listing
   // card already uses, so both surfaces agree on a resource's CTA copy. This
@@ -156,7 +140,7 @@ export function ResourceDetailHero({
             resourceSlug={resource.slug}
             gated={gated}
             assetHref={assetHref}
-            gateFormId={hasGateForm ? gateFormId : null}
+            gateFormId={gateFormId}
             className="cs-btn-blue gap-3 font-bold h-11 lg:h-[64px]"
             style={{
               width: "840px",

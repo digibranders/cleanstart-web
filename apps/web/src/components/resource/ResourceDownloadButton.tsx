@@ -24,39 +24,22 @@ interface ResourceDownloadButtonProps {
 
 const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:3000";
 
-export function ResourceDownloadButton({
-  resourceId,
+/**
+ * The unlock flow behind every gated download button: a browser that already
+ * unlocked the resource downloads straight away, anyone else gets the gate
+ * form. Shared so a page with several buttons can open one modal between them.
+ */
+export function useResourceUnlock({
   resourceTitle,
   resourceSlug,
-  gated,
-  assetHref,
-  gateFormId,
-  className,
-  style,
-  children,
-}: ResourceDownloadButtonProps): React.ReactElement {
+}: {
+  resourceTitle: string;
+  resourceSlug: string;
+}): { unlock: () => Promise<void>; checking: boolean; modalOpen: boolean; closeModal: () => void } {
   const [modalOpen, setModalOpen] = useState(false);
   const [checking, setChecking] = useState(false);
 
-  // Not gated, or gated without a form to gate behind: the CMS validator blocks
-  // the second case on save, so this is the plain download link.
-  if (!gated || gateFormId == null) {
-    return (
-      <a
-        href={assetHref}
-        download={assetHref !== "#"}
-        className={className}
-        style={style}
-      >
-        {children}
-      </a>
-    );
-  }
-
-  const handleClick = async (
-    e: React.MouseEvent<HTMLButtonElement>,
-  ): Promise<void> => {
-    e.preventDefault();
+  const unlock = async (): Promise<void> => {
     if (checking) return;
     setChecking(true);
     try {
@@ -92,6 +75,45 @@ export function ResourceDownloadButton({
     }
   };
 
+  return { unlock, checking, modalOpen, closeModal: () => setModalOpen(false) };
+}
+
+export function ResourceDownloadButton({
+  resourceId,
+  resourceTitle,
+  resourceSlug,
+  gated,
+  assetHref,
+  gateFormId,
+  className,
+  style,
+  children,
+}: ResourceDownloadButtonProps): React.ReactElement {
+  const { unlock, checking, modalOpen, closeModal } = useResourceUnlock({
+    resourceTitle,
+    resourceSlug,
+  });
+
+  // Not gated, or gated without a form to gate behind: the CMS validator blocks
+  // the second case on save, so this is the plain download link.
+  if (!gated || gateFormId == null) {
+    return (
+      <a
+        href={assetHref}
+        download={assetHref !== "#"}
+        className={className}
+        style={style}
+      >
+        {children}
+      </a>
+    );
+  }
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
+    e.preventDefault();
+    void unlock();
+  };
+
   return (
     <>
       <button
@@ -105,7 +127,7 @@ export function ResourceDownloadButton({
       </button>
       <ResourceGateModal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={closeModal}
         resourceId={resourceId}
         gateFormId={gateFormId}
         resourceTitle={resourceTitle}
