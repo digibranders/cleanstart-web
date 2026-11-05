@@ -6,13 +6,9 @@ const FAQS: readonly { question: string; answer: string }[] = [
   { question: "Is the scan really free?", answer: "Yes." },
   { question: "Do I need to install anything?", answer: "No agents are required." },
   {
-    question: "How long does it take?",
-    answer: "Your report is ready within minutes of connecting your environment.",
-  },
-  {
     question: "What happens after the scan?",
     answer:
-      "You keep the report. If you’d like help acting on it, our team can walk you through the remediation plan.",
+      "You keep the report. If you’d like help acting on it, our team can connect with you to assist further.",
   },
   {
     question: "Does the scan fix a LiteLLM credential leak?",
