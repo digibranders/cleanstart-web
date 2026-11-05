@@ -6,7 +6,13 @@ import { HeroReveal } from "@/components/ui/Reveal";
  * Dark gradient hero band for the Book a Demo page. A centred "Book a Demo"
  * title (with a gradient "Demo" word) flanked by two iridescent cube images.
  */
-export function DemoHero({ title = "Book a Demo" }: { title?: ReactNode }): React.ReactElement {
+export function DemoHero({
+  title = "Book a Demo",
+  subtitle,
+}: {
+  title?: ReactNode;
+  subtitle?: ReactNode;
+}): React.ReactElement {
   return (
     <section className="relative w-full overflow-hidden">
       {/* Background gradient — bleeds beyond the 1440 viewport on each side. */}
@@ -92,6 +98,22 @@ export function DemoHero({ title = "Book a Demo" }: { title?: ReactNode }): Reac
           >
             {title}
           </h1>
+          {subtitle ? (
+            <p
+              className="mx-auto mt-6 text-white/80"
+              style={{
+                fontFamily: "var(--font-sans), 'Sora', sans-serif",
+                fontWeight: 400,
+                fontSize: "var(--fs-lead-sm)",
+                lineHeight: 1.5,
+                letterSpacing: "-0.03em",
+                maxWidth: "760px",
+                textWrap: "balance",
+              }}
+            >
+              {subtitle}
+            </p>
+          ) : null}
         </HeroReveal>
       </div>
     </section>

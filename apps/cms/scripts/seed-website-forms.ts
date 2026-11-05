@@ -114,7 +114,7 @@ const FORMS: readonly SeedForm[] = [
     slug: 'cleansight-campaign',
     hubspotFormGuid: 'cf85e3d4-8982-4799-9051-0429c9947866',
     name: 'CleanSight Scan Request',
-    submitLabel: 'Get my free scan',
+    submitLabel: 'Get My Exposure Report',
     fields: [
       { name: 'firstname', type: 'text', label: 'First name', required: true },
       { name: 'lastname', type: 'text', label: 'Last name', required: true },
