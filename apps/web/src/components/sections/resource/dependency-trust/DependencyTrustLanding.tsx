@@ -6,10 +6,10 @@ import type { ResourceDetail } from "@/lib/resources";
 import { AboutCleanStart } from "./AboutCleanStart";
 import { AboutResearch } from "./AboutResearch";
 import { DependencyTrustHero } from "./DependencyTrustHero";
-import { DownloadBand } from "./DownloadBand";
 import { ExecutiveSummary } from "./ExecutiveSummary";
 import { FindingsGlance } from "./FindingsGlance";
 import { LeadershipQuote } from "./LeadershipQuote";
+import { ReportCta } from "./ReportCta";
 import { ReportGateProvider } from "./ReportGate";
 import { ResearchFindings } from "./ResearchFindings";
 
@@ -33,13 +33,12 @@ export function DependencyTrustLanding({
         <DependencyTrustHero resource={resource} />
         <ExecutiveSummary />
         <FindingsGlance />
-        <ResearchFindings resource={resource} />
+        <ResearchFindings />
         <LeadershipQuote />
         <AboutResearch />
-        <DownloadBand resource={resource} />
         <AboutCleanStart />
       </main>
-      <Footer />
+      <Footer cta={<ReportCta resource={resource} />} />
     </>
   );
 

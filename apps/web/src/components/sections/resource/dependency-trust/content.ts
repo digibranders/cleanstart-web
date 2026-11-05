@@ -7,7 +7,6 @@
 const ICONS = "/images/resources/dependency-trust";
 
 export const HERO = {
-  eyebrow: "2026 Research Report | CleanStart",
   title: "State of Software Dependency Trust 2026",
   subtitle: "From Dependency Management to Verified Software Foundations",
   cta: "Download the Full Report",
@@ -167,7 +166,6 @@ export const FINDINGS = {
 } as const;
 
 export const LEADERSHIP = {
-  label: "Perspective from CleanStart leadership",
   heading: "A shift in how we approach software security",
   quote: [
     "Software security cannot begin and end with finding vulnerabilities. Organizations need to know what they are bringing into their environments, where it comes from and whether its integrity can be verified.",

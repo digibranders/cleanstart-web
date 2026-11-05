@@ -101,23 +101,9 @@ export function DependencyTrustHero({
       >
         <div className="grid items-center gap-14 lg:grid-cols-[1.06fr_0.94fr] lg:gap-8">
           <div className="flex flex-col items-start">
-            <HeroReveal y={24} duration={0.8}>
-              <p
-                className="inline-flex items-center rounded-full border border-white/20 bg-white/[0.06] px-4 py-1.5 text-white/85 backdrop-blur-sm"
-                style={{
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "var(--fs-eyebrow)",
-                  fontWeight: 500,
-                  letterSpacing: "0.02em",
-                }}
-              >
-                {HERO.eyebrow}
-              </p>
-            </HeroReveal>
-
             <HeroReveal y={50} delay={0.08} duration={1} lcp>
               <h1
-                className="mt-6 text-white"
+                className="text-white"
                 style={{
                   fontFamily: "var(--font-display)",
                   fontSize: "var(--fs-display)",

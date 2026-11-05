@@ -1,104 +1,105 @@
-import Image from 'next/image';
+import Image from "next/image";
 
-import { Container, Section } from '@/components/layout';
-import { FadeUp } from '@/components/ui/FadeUp';
-import type { ResourceDetail } from '@/lib/resources';
+import { Reveal } from "@/components/ui/Reveal";
 
-import { FINDINGS, HERO, type Run } from './content';
-import { FindingsRail } from './FindingsRail';
-import { ReportDownloadButton } from './ReportDownloadButton';
+import { FINDINGS, type Run } from "./content";
+import { GradientTitle, HAIRLINE_CARD, LightSection, STAT_GRADIENT } from "./parts";
 
-const runText = (run: Run): string => (typeof run === 'string' ? run : run.strong);
+const runText = (run: Run): string => (typeof run === "string" ? run : run.strong);
 
-export function ResearchFindings({ resource }: { resource: ResourceDetail }): React.ReactElement {
+export function ResearchFindings(): React.ReactElement {
   return (
-    <Section padding="lg" data-section="ResearchFindings" className="bg-white">
-      <Container>
-        <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
-          <div className="lg:col-span-4">
-            <FindingsRail
-              heading={FINDINGS.heading}
-              items={FINDINGS.items}
-              cta={<ReportDownloadButton resource={resource} label={HERO.cta} tone="blue" />}
-            />
-          </div>
+    <LightSection dataSection="ResearchFindings">
+      <Reveal header>
+        <GradientTitle text={FINDINGS.heading} accent="reveals" />
+      </Reveal>
 
-          <div className="flex flex-col gap-14 lg:col-span-8 lg:gap-20">
-            {FINDINGS.items.map((finding) => (
-              <article key={finding.id} id={finding.id} className="scroll-mt-32">
-                {/* The article stays outside FadeUp: FadeUp swaps its wrapper element for
-                    content below the fold, which would replace the node the rail watches. */}
-                <FadeUp y={24}>
-                  <div className="flex flex-col gap-6 sm:flex-row sm:gap-8">
-                    <div className="flex h-[128px] w-[128px] shrink-0 items-center justify-center rounded-[24px] bg-[#F3EFFF]">
-                      <Image
-                        src={finding.icon}
-                        alt=""
-                        aria-hidden
-                        width={360}
-                        height={360}
-                        sizes="112px"
-                        className="h-[112px] w-[112px] object-contain"
-                      />
-                    </div>
-                    <div className="max-w-[62ch]">
+      <div className="mx-auto mt-10 flex max-w-[1120px] flex-col gap-5 lg:mt-14 lg:gap-6">
+        {FINDINGS.items.map((finding, index) => (
+          <Reveal key={finding.id} y={24}>
+            <article
+              id={finding.id}
+              className="relative overflow-hidden"
+              style={{ ...HAIRLINE_CARD, padding: "clamp(24px, 3vw, 44px)" }}
+            >
+              <div
+                aria-hidden
+                className="pointer-events-none absolute opacity-70"
+                style={{
+                  [index % 2 ? "left" : "right"]: "-60px",
+                  bottom: "-60px",
+                  width: "262px",
+                  height: "262px",
+                  background:
+                    "radial-gradient(50% 50% at 50% 50%, rgba(223, 155, 255, 0.28) 0%, rgba(223, 155, 255, 0) 70%)",
+                }}
+              />
+              <div
+                className={`relative flex flex-col gap-6 lg:items-center lg:gap-12 ${
+                  index % 2 ? "lg:flex-row-reverse" : "lg:flex-row"
+                }`}
+              >
+                <div className="relative mx-auto flex h-[168px] w-[168px] shrink-0 items-center justify-center lg:mx-0">
+                  <div
+                    aria-hidden
+                    className="absolute inset-0 rounded-full"
+                    style={{
+                      background:
+                        "radial-gradient(closest-side, rgba(169, 116, 255, 0.22) 0%, rgba(44, 193, 235, 0.08) 70%, rgba(255,255,255,0) 100%)",
+                    }}
+                  />
+                  <Image
+                    src={finding.icon}
+                    alt=""
+                    aria-hidden
+                    width={360}
+                    height={360}
+                    sizes="168px"
+                    className="relative h-[168px] w-[168px] object-contain"
+                  />
+                </div>
+                <div className="max-w-[64ch]">
+                  <h3
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      fontSize: "var(--fs-h3)",
+                      fontWeight: 700,
+                      letterSpacing: "-0.04em",
+                      lineHeight: 1.15,
+                      color: "#1a1a1a",
+                      textWrap: "balance",
+                    }}
+                  >
+                    <span style={STAT_GRADIENT}>{finding.number}</span> {finding.title}
+                  </h3>
+                  <div className="mt-4 flex flex-col gap-3">
+                    {finding.paragraphs.map((paragraph) => (
                       <p
-                        className="text-[#6A3DF0] tabular-nums"
+                        key={paragraph.map(runText).join("").slice(0, 48)}
+                        className="text-[#444444] [&_strong]:font-semibold [&_strong]:text-[#1a1a1a]"
                         style={{
-                          fontFamily: 'var(--font-display)',
-                          fontSize: 'var(--fs-body-sm)',
-                          fontWeight: 600,
-                          letterSpacing: '0.04em',
+                          fontFamily: "var(--font-sans)",
+                          fontSize: "var(--fs-body)",
+                          letterSpacing: "-0.02em",
+                          lineHeight: 1.5,
                         }}
                       >
-                        {finding.number}
+                        {paragraph.map((run) =>
+                          typeof run === "string" ? (
+                            run
+                          ) : (
+                            <strong key={run.strong}>{run.strong}</strong>
+                          ),
+                        )}
                       </p>
-                      <h3
-                        className="mt-2 text-[#111]"
-                        style={{
-                          fontFamily: 'var(--font-display)',
-                          fontSize: 'var(--fs-h3)',
-                          fontWeight: 600,
-                          letterSpacing: '-0.02em',
-                          lineHeight: 'var(--fs-h3-lh)',
-                          textWrap: 'balance',
-                        }}
-                      >
-                        {finding.title}
-                      </h3>
-                      <div className="mt-5 flex flex-col gap-4">
-                        {finding.paragraphs.map((paragraph) => (
-                          <p
-                            key={paragraph.map(runText).join('').slice(0, 48)}
-                            className="text-[rgba(17,17,17,0.8)] [&_strong]:font-semibold [&_strong]:text-[#111]"
-                            style={{
-                              fontFamily: 'var(--font-sans)',
-                              fontSize: 'var(--fs-body)',
-                              lineHeight: 'var(--fs-body-lh)',
-                            }}
-                          >
-                            {paragraph.map((run) =>
-                              typeof run === 'string' ? (
-                                run
-                              ) : (
-                                <strong key={run.strong}>{run.strong}</strong>
-                              ),
-                            )}
-                          </p>
-                        ))}
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                </FadeUp>
-              </article>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-12 lg:hidden">
-          <ReportDownloadButton resource={resource} label={HERO.cta} tone="blue" />
-        </div>
-      </Container>
-    </Section>
+                </div>
+              </div>
+            </article>
+          </Reveal>
+        ))}
+      </div>
+    </LightSection>
   );
 }
