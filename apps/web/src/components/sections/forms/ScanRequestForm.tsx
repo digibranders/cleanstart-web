@@ -192,12 +192,12 @@ export function ScanRequestForm(): React.ReactElement {
   return (
     <FormCard maxWidth={520}>
       <div className="mb-5 flex flex-col gap-1.5">
-        <FormSectionTitle>Get your free container security scan</FormSectionTitle>
+        <FormSectionTitle>Find Out If You’re Exposed</FormSectionTitle>
         <p
           className="text-[#4B5563]"
           style={{ fontSize: 'var(--fs-body-sm)', lineHeight: 'var(--fs-body-sm-lh)' }}
         >
-          See your risks. Get expert insights. Take action with confidence.
+          Know where you’re affected, what’s running in production, and what to do next.
         </p>
       </div>
 
@@ -285,7 +285,7 @@ export function ScanRequestForm(): React.ReactElement {
 
         <TurnstileWidget />
         <SubmitButton busy={submitting} busyLabel="Submitting…">
-          Get my free scan
+          Get My Exposure Report
         </SubmitButton>
       </form>
     </FormCard>
