@@ -25,7 +25,7 @@ export function LeadershipQuote(): React.ReactElement {
       className="relative w-full overflow-hidden text-white"
       style={{
         background:
-          "linear-gradient(180deg, #151021 0%, #10123E 30%, #131E8F 72%, #471EC0 100%)",
+          "linear-gradient(180deg, #0B0716 0%, #10123E 24%, #1A1FA6 52%, #10123E 80%, #0B0716 100%)",
         paddingTop: "clamp(56px, 6.25vw, 120px)",
         paddingBottom: "clamp(56px, 6.25vw, 120px)",
       }}
@@ -43,7 +43,7 @@ export function LeadershipQuote(): React.ReactElement {
       />
       <Container className="relative z-[2]">
         <Reveal header>
-          <GradientTitle text={LEADERSHIP.heading} accent="software security" tone="dark" />
+          <GradientTitle text={LEADERSHIP.heading} accent="software security" />
         </Reveal>
 
         <Reveal y={28} delay={0.12} className="mx-auto mt-10 sm:mt-12" style={{ maxWidth: "980px" }}>

@@ -34,7 +34,7 @@ export function AboutCleanStart(): React.ReactElement {
       />
       <Container className="relative z-[2]">
         <Reveal header>
-          <GradientTitle text={ABOUT_CLEANSTART.heading} accent="CleanStart" tone="dark" />
+          <GradientTitle text={ABOUT_CLEANSTART.heading} accent="CleanStart" />
         </Reveal>
 
         <Reveal y={24} delay={0.08}>

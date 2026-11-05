@@ -3,91 +3,98 @@ import Image from "next/image";
 import { Reveal } from "@/components/ui/Reveal";
 
 import { EXECUTIVE_SUMMARY } from "./content";
-import { GradientTitle, HAIRLINE_CARD, LightSection } from "./parts";
+import { Bezel, DarkSection, GradientTitle } from "./parts";
+
+const STATEMENT_ACCENT = "establishing confidence in software before it is adopted";
 
 const BODY_STYLE = {
   fontFamily: "var(--font-sans)",
   fontSize: "var(--fs-body)",
   fontWeight: 400,
   letterSpacing: "-0.02em",
-  lineHeight: 1.5,
-  color: "#444444",
+  lineHeight: 1.6,
+  color: "rgba(255, 255, 255, 0.68)",
 } as const;
 
 export function ExecutiveSummary(): React.ReactElement {
   const [lead, ...rest] = EXECUTIVE_SUMMARY.paragraphs;
+  const { statement } = EXECUTIVE_SUMMARY;
+  const accentAt = statement.indexOf(STATEMENT_ACCENT);
+  const statementBefore = accentAt < 0 ? statement : statement.slice(0, accentAt);
 
   return (
-    <LightSection dataSection="ExecutiveSummary">
-      <Reveal header>
-        <GradientTitle text={EXECUTIVE_SUMMARY.heading} accent="Summary" />
-      </Reveal>
+    <DarkSection dataSection="ExecutiveSummary" fromHero>
+      <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
+        <Reveal header className="lg:col-span-5">
+          <div className="lg:sticky lg:top-32">
+            <GradientTitle text={EXECUTIVE_SUMMARY.heading} accent="Summary" align="left" />
+          </div>
+        </Reveal>
 
-      <div className="mt-10 grid gap-5 lg:mt-14 lg:grid-cols-12 lg:gap-6">
-        <Reveal y={24} className="lg:col-span-7">
-          <div className="h-full" style={{ ...HAIRLINE_CARD, padding: "clamp(24px, 3vw, 44px)" }}>
+        <Reveal y={24} delay={0.08} className="lg:col-span-7">
+          <div className="flex flex-col gap-6">
             <p
               style={{
                 ...BODY_STYLE,
                 fontSize: "var(--fs-lead-sm)",
                 fontWeight: 500,
-                color: "#1a1a1a",
+                lineHeight: 1.5,
+                color: "rgba(255, 255, 255, 0.94)",
               }}
             >
               {lead}
             </p>
-            <div className="mt-6 flex flex-col gap-5">
-              {rest.map((paragraph) => (
-                <p key={paragraph} style={BODY_STYLE}>
-                  {paragraph}
-                </p>
-              ))}
-            </div>
+            {rest.map((paragraph) => (
+              <p key={paragraph} style={BODY_STYLE}>
+                {paragraph}
+              </p>
+            ))}
           </div>
         </Reveal>
+      </div>
 
-        <Reveal y={24} delay={0.1} className="lg:col-span-5">
-          <aside
-            className="cs-grad-border relative flex h-full min-h-[300px] flex-col justify-between overflow-hidden rounded-[24px] text-white"
+      <Reveal y={28} className="mt-14 lg:mt-24">
+        <Bezel
+          innerClassName="px-7 py-10 sm:px-12 sm:py-14 lg:px-20 lg:py-20"
+          innerStyle={{
+            background:
+              "radial-gradient(70% 120% at 100% 0%, rgba(79, 30, 192, 0.55) 0%, rgba(79, 30, 192, 0) 60%), linear-gradient(160deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%)",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            aria-hidden
+            src="/images/cleanstart-images/env-union-hex.svg"
+            alt=""
+            className="pointer-events-none absolute -right-24 -top-20 hidden w-[520px] max-w-none select-none opacity-30 md:block"
+            loading="lazy"
+            decoding="async"
+          />
+          <Image
+            src="/images/security/cs-logomark.svg"
+            alt=""
+            aria-hidden
+            width={44}
+            height={44}
+            sizes="44px"
+            className="relative"
+          />
+          <p
+            className="relative mt-8 max-w-[26ch] text-white sm:max-w-[30ch]"
             style={{
-              padding: "clamp(24px, 3vw, 44px)",
-              background: "linear-gradient(160deg, #151021 0%, #131E8F 62%, #471EC0 100%)",
-              boxShadow: "0 40px 90px -30px rgba(8,4,24,0.6), inset 0 1px 0 rgba(255,255,255,0.10)",
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--fs-h2)",
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.15,
+              textWrap: "balance",
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              aria-hidden
-              src="/images/cleanstart-images/env-union-hex.svg"
-              alt=""
-              className="pointer-events-none absolute -right-24 -top-16 w-[420px] max-w-none select-none opacity-40"
-              loading="lazy"
-              decoding="async"
-            />
-            <Image
-              src="/images/security/cs-logomark.svg"
-              alt=""
-              aria-hidden
-              width={44}
-              height={44}
-              className="relative"
-            />
-            <p
-              className="relative mt-10"
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "var(--fs-h3)",
-                fontWeight: 600,
-                letterSpacing: "-0.04em",
-                lineHeight: 1.2,
-                textWrap: "balance",
-              }}
-            >
-              {EXECUTIVE_SUMMARY.statement}
-            </p>
-          </aside>
-        </Reveal>
-      </div>
-    </LightSection>
+            {statementBefore}
+            {accentAt >= 0 && <span className="cs-text-gradient-impact">{STATEMENT_ACCENT}</span>}
+          </p>
+        </Bezel>
+      </Reveal>
+    </DarkSection>
   );
 }
