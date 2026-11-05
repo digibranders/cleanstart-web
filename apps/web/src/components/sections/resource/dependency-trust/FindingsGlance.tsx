@@ -2,7 +2,7 @@ import { Reveal } from "@/components/ui/Reveal";
 
 import { CountUp } from "./CountUp";
 import { GLANCE } from "./content";
-import { Bezel, CARD_PADDING, DarkSection, GradientTitle, STAT_GRADIENT } from "./parts";
+import { Bezel, CARD_PADDING, GradientTitle, PageSection, STAT_GRADIENT } from "./parts";
 
 const NUMERAL_STYLE = {
   fontFamily: "var(--font-display)",
@@ -27,7 +27,7 @@ export function FindingsGlance(): React.ReactElement {
   const { vulnerabilities, components, age, malicious, ai } = GLANCE.stats;
 
   return (
-    <DarkSection dataSection="FindingsGlance">
+    <PageSection dataSection="FindingsGlance" tone="dark">
       <Reveal header>
         <GradientTitle text={GLANCE.heading} accent="at a glance" />
       </Reveal>
@@ -151,6 +151,6 @@ export function FindingsGlance(): React.ReactElement {
           </Bezel>
         </Reveal>
       </div>
-    </DarkSection>
+    </PageSection>
   );
 }

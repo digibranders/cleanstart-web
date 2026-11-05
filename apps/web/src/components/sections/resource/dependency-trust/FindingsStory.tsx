@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 import type { Finding, Run } from "./content";
-import { Bezel, STAT_GRADIENT } from "./parts";
+import { Bezel, type Tone, TONES } from "./parts";
 
 const runText = (run: Run): string => (typeof run === "string" ? run : run.strong);
 
@@ -16,7 +16,8 @@ const FADE = "transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.3
  * reader always knows where they are; the other findings dim. On small screens
  * there is no stage: each finding carries its own icon and reads at full strength.
  */
-export function FindingsStory({ items }: { items: readonly Finding[] }): React.ReactElement {
+export function FindingsStory({ items, tone }: { items: readonly Finding[]; tone: Tone }): React.ReactElement {
+  const t = TONES[tone];
   const [active, setActive] = useState(0);
   const articles = useRef<(HTMLElement | null)[]>([]);
 
@@ -37,12 +38,12 @@ export function FindingsStory({ items }: { items: readonly Finding[] }): React.R
     <div className="grid gap-14 lg:grid-cols-12 lg:gap-12">
       <div className="hidden lg:col-span-5 lg:block" aria-hidden>
         <div className="sticky top-[17vh]">
-          <Bezel className="mx-auto max-w-[480px]" innerClassName="aspect-[1/1.02]">
+          <Bezel tone={tone} className="mx-auto max-w-[480px]" innerClassName="aspect-[1/1.02]">
             <div
               className="absolute inset-0"
               style={{
                 background:
-                  "radial-gradient(60% 55% at 50% 45%, rgba(112, 60, 255, 0.45) 0%, rgba(44, 193, 235, 0.12) 55%, rgba(0,0,0,0) 100%)",
+                  "radial-gradient(60% 55% at 50% 45%, rgba(154, 81, 255, 0.22) 0%, rgba(44, 193, 235, 0.07) 55%, rgba(255,255,255,0) 100%)",
               }}
             />
             {items.map((finding, index) => (
@@ -64,7 +65,7 @@ export function FindingsStory({ items }: { items: readonly Finding[] }): React.R
                 />
                 <p
                   style={{
-                    ...STAT_GRADIENT,
+                    ...t.stat,
                     fontFamily: "var(--font-display)",
                     fontSize: "var(--fs-display)",
                     fontWeight: 700,
@@ -84,7 +85,7 @@ export function FindingsStory({ items }: { items: readonly Finding[] }): React.R
                 className={`h-1.5 rounded-full ${FADE}`}
                 style={{
                   width: active === index ? 40 : 14,
-                  background: active === index ? "linear-gradient(90deg, #9A51FF, #4FD1F5)" : "rgba(255,255,255,0.22)",
+                  background: active === index ? "linear-gradient(90deg, #9A51FF, #4FD1F5)" : t.tick,
                 }}
               />
             ))}
@@ -114,8 +115,8 @@ export function FindingsStory({ items }: { items: readonly Finding[] }): React.R
               className="mb-6 h-28 w-28 object-contain lg:hidden"
             />
             <h3
-              className="text-white"
               style={{
+                color: t.heading,
                 fontFamily: "var(--font-display)",
                 fontSize: "var(--fs-h3)",
                 fontWeight: 700,
@@ -124,7 +125,7 @@ export function FindingsStory({ items }: { items: readonly Finding[] }): React.R
                 textWrap: "balance",
               }}
             >
-              <span className="lg:hidden" style={STAT_GRADIENT}>
+              <span className="lg:hidden" style={t.stat}>
                 {finding.number}{" "}
               </span>
               {finding.title}
@@ -133,8 +134,9 @@ export function FindingsStory({ items }: { items: readonly Finding[] }): React.R
               {finding.paragraphs.map((paragraph) => (
                 <p
                   key={paragraph.map(runText).join("").slice(0, 48)}
-                  className="text-white/70 [&_strong]:font-semibold [&_strong]:text-white"
+                  className="[&_strong]:font-semibold"
                   style={{
+                    color: t.body,
                     fontFamily: "var(--font-sans)",
                     fontSize: "var(--fs-body)",
                     letterSpacing: "-0.02em",
@@ -142,7 +144,13 @@ export function FindingsStory({ items }: { items: readonly Finding[] }): React.R
                   }}
                 >
                   {paragraph.map((run) =>
-                    typeof run === "string" ? run : <strong key={run.strong}>{run.strong}</strong>,
+                    typeof run === "string" ? (
+                      run
+                    ) : (
+                      <strong key={run.strong} style={{ color: t.strong }}>
+                        {run.strong}
+                      </strong>
+                    ),
                   )}
                 </p>
               ))}

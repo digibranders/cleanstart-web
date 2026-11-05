@@ -3,8 +3,9 @@ import Image from "next/image";
 import { Reveal } from "@/components/ui/Reveal";
 
 import { EXECUTIVE_SUMMARY } from "./content";
-import { Bezel, DarkSection, GradientTitle } from "./parts";
+import { Bezel, GradientTitle, PageSection, TONES } from "./parts";
 
+const TONE = "light";
 const STATEMENT_ACCENT = "establishing confidence in software before it is adopted";
 
 const BODY_STYLE = {
@@ -13,7 +14,7 @@ const BODY_STYLE = {
   fontWeight: 400,
   letterSpacing: "-0.02em",
   lineHeight: 1.6,
-  color: "rgba(255, 255, 255, 0.68)",
+  color: TONES[TONE].body,
 } as const;
 
 export function ExecutiveSummary(): React.ReactElement {
@@ -23,11 +24,11 @@ export function ExecutiveSummary(): React.ReactElement {
   const statementBefore = accentAt < 0 ? statement : statement.slice(0, accentAt);
 
   return (
-    <DarkSection dataSection="ExecutiveSummary" fromHero>
+    <PageSection dataSection="ExecutiveSummary" tone={TONE} fromHero>
       <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
         <Reveal header className="lg:col-span-5">
           <div className="lg:sticky lg:top-32">
-            <GradientTitle text={EXECUTIVE_SUMMARY.heading} accent="Summary" align="left" />
+            <GradientTitle text={EXECUTIVE_SUMMARY.heading} accent="Summary" tone={TONE} align="left" />
           </div>
         </Reveal>
 
@@ -39,7 +40,7 @@ export function ExecutiveSummary(): React.ReactElement {
                 fontSize: "var(--fs-lead-sm)",
                 fontWeight: 500,
                 lineHeight: 1.5,
-                color: "rgba(255, 255, 255, 0.94)",
+                color: TONES[TONE].lead,
               }}
             >
               {lead}
@@ -53,20 +54,19 @@ export function ExecutiveSummary(): React.ReactElement {
         </Reveal>
       </div>
 
+      {/* The one dark object on this light band: the report's conclusion. */}
       <Reveal y={28} className="mt-14 lg:mt-24">
         <Bezel
-          innerClassName="px-7 py-10 sm:px-12 sm:py-14 lg:px-20 lg:py-20"
-          innerStyle={{
-            background:
-              "radial-gradient(70% 120% at 100% 0%, rgba(79, 30, 192, 0.55) 0%, rgba(79, 30, 192, 0) 60%), linear-gradient(160deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%)",
-          }}
+          tone={TONE}
+          innerClassName="px-7 py-10 text-white sm:px-12 sm:py-14 lg:px-20 lg:py-20"
+          innerStyle={{ background: "linear-gradient(160deg, #151021 0%, #131E8F 62%, #471EC0 100%)" }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             aria-hidden
             src="/images/cleanstart-images/env-union-hex.svg"
             alt=""
-            className="pointer-events-none absolute -right-24 -top-20 hidden w-[520px] max-w-none select-none opacity-30 md:block"
+            className="pointer-events-none absolute -right-24 -top-20 hidden w-[520px] max-w-none select-none opacity-35 md:block"
             loading="lazy"
             decoding="async"
           />
@@ -80,7 +80,7 @@ export function ExecutiveSummary(): React.ReactElement {
             className="relative"
           />
           <p
-            className="relative mt-8 max-w-[26ch] text-white sm:max-w-[30ch]"
+            className="relative mt-8 max-w-[26ch] sm:max-w-[30ch]"
             style={{
               fontFamily: "var(--font-display)",
               fontSize: "var(--fs-h2)",
@@ -95,6 +95,6 @@ export function ExecutiveSummary(): React.ReactElement {
           </p>
         </Bezel>
       </Reveal>
-    </DarkSection>
+    </PageSection>
   );
 }
