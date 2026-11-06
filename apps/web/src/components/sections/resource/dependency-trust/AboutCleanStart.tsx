@@ -69,9 +69,9 @@ export function AboutCleanStart(): React.ReactElement {
             {ABOUT_CLEANSTART.body}
           </p>
 
-          <div className="mx-auto mt-14 max-w-[1120px] rounded-[32px] bg-white/[0.04] p-1.5 ring-1 ring-white/10">
+          <div className="mx-auto mt-14 max-w-[1120px]">
             <div
-              className="relative overflow-hidden rounded-[26px]"
+              className="relative overflow-hidden rounded-[32px]"
               style={{
                 background:
                   "linear-gradient(180deg, rgba(255,255,255,0.075) 0%, rgba(255,255,255,0.02) 100%)",
