@@ -212,9 +212,9 @@ export const ABOUT_CLEANSTART = {
   heading: "About CleanStart",
   body: "CleanStart is a provider of verified software artifacts for modern software supply chains. Through Clean Images, Clean Libraries and CleanSight, CleanStart helps organizations discover software assets, adopt hardened software foundations and establish verifiable evidence across the software they build, acquire and deploy.",
   products: [
-    { label: "Clean Images", href: "/cleanstart-images" },
-    { label: "Clean Libraries", href: "/clean-libraries" },
-    { label: "CleanSight", href: "/cleansight" },
+    { label: "Clean Images", href: "/cleanstart-images", emblem: "/images/cleanstart-factory/emblem-images.webp" },
+    { label: "Clean Libraries", href: "/clean-libraries", emblem: "/images/cleanstart-factory/emblem-libraries.webp" },
+    { label: "CleanSight", href: "/cleansight", emblem: "/images/cleanstart-factory/emblem-cleansight.webp" },
   ],
   linkLabel: "images.cleanstart.com",
   linkHref: "https://images.cleanstart.com",
