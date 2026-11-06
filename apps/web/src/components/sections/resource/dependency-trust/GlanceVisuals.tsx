@@ -50,6 +50,17 @@ export function GrowBars({ from, to }: { from: number; to: number }): React.Reac
 
   return (
     <div ref={ref} aria-hidden className="relative flex items-end gap-4 [--bar-max:150px] lg:[--bar-max:232px]">
+      {/* Four faint scale lines behind the bars, so the pair reads as a chart. */}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0"
+        style={{
+          height: "calc(var(--bar-max) + 1px)",
+          backgroundImage:
+            "repeating-linear-gradient(to top, rgba(255,255,255,0.16) 0, rgba(255,255,255,0.16) 1px, rgba(255,255,255,0) 1px, rgba(255,255,255,0) calc(var(--bar-max) / 4))",
+          maskImage: "linear-gradient(90deg, #000 0%, rgba(0,0,0,0) 100%)",
+          WebkitMaskImage: "linear-gradient(90deg, #000 0%, rgba(0,0,0,0) 100%)",
+        }}
+      />
       {bars.map((bar) => (
         <div key={bar.value} className="flex w-[88px] flex-col items-start gap-2 lg:w-[104px]">
           <span

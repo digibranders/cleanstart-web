@@ -157,14 +157,16 @@ export function DarkSection({ dataSection, children }: DarkSectionProps): React.
       className="relative overflow-hidden text-white"
       style={{ background: "linear-gradient(180deg, #151021 0%, #10123E 55%, #131E8F 100%)" }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <div
         aria-hidden
-        src="/images/cleanstart-images/env-union-hex.svg"
-        alt=""
-        className="pointer-events-none absolute -left-40 -top-24 hidden w-[720px] max-w-none select-none opacity-25 lg:block"
-        loading="lazy"
-        decoding="async"
+        className="pointer-events-none absolute inset-0 select-none"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.05) 1px, rgba(255,255,255,0) 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, rgba(255,255,255,0) 1px)",
+          backgroundSize: "64px 64px",
+          maskImage: "radial-gradient(70% 70% at 50% 30%, #000 0%, rgba(0,0,0,0) 100%)",
+          WebkitMaskImage: "radial-gradient(70% 70% at 50% 30%, #000 0%, rgba(0,0,0,0) 100%)",
+        }}
       />
       <div
         className="relative mx-auto"
