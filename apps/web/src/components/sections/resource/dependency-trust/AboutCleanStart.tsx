@@ -1,12 +1,20 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
+import type { CSSProperties } from "react";
 
 import { Container } from "@/components/layout";
 import { Reveal } from "@/components/ui/Reveal";
 
 import { ABOUT_CLEANSTART } from "./content";
 import { DARK_BAND, GradientTitle } from "./parts";
+
+/** Same sizing as the hero call to action, so the button reads as the site's own. */
+const PORTAL_BUTTON_VARS = {
+  "--cs-btn-px": "22px",
+  "--cs-btn-fs": "16px",
+  "--cs-btn-h": "3rem",
+} as CSSProperties;
 
 /**
  * The last block before the footer. Its bottom padding is the card-overlap
@@ -156,26 +164,11 @@ export function AboutCleanStart(): React.ReactElement {
           <div className="mt-10 flex justify-center">
             <a
               href={ABOUT_CLEANSTART.linkHref}
-              className="group inline-flex min-h-12 items-center gap-3 rounded-[8px] border border-white/25 bg-white/[0.07] py-1.5 pl-5 pr-1.5 text-white outline-offset-4 transition-colors duration-300 hover:border-[#4FD1F5]/60 hover:bg-white/[0.13] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#33BAEC] motion-reduce:transition-none"
-              style={{
-                fontFamily: "var(--font-sora), ui-sans-serif, system-ui, sans-serif",
-                fontSize: "var(--fs-button)",
-                fontWeight: 500,
-                letterSpacing: "-0.01em",
-                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.14)",
-              }}
+              className="cs-btn-glass cs-hero-cta gap-2.5"
+              style={PORTAL_BUTTON_VARS}
             >
               <span>{ABOUT_CLEANSTART.linkLabel}</span>
-              <span
-                aria-hidden
-                className="inline-flex h-9 w-9 items-center justify-center rounded-[6px] bg-white/[0.12] text-[#4FD1F5]"
-              >
-                <ArrowUpRight
-                  size={18}
-                  strokeWidth={2}
-                  className="transition-transform duration-300 group-hover:-translate-y-px group-hover:translate-x-0.5 motion-reduce:transition-none"
-                />
-              </span>
+              <ArrowUpRight aria-hidden size={18} strokeWidth={2} />
             </a>
           </div>
         </Reveal>

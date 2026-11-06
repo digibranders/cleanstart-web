@@ -216,6 +216,6 @@ export const ABOUT_CLEANSTART = {
     { label: "Clean Libraries", href: "/clean-libraries", emblem: "/images/cleanstart-factory/emblem-libraries.webp" },
     { label: "CleanSight", href: "/cleansight", emblem: "/images/cleanstart-factory/emblem-cleansight.webp" },
   ],
-  linkLabel: "images.cleanstart.com",
+  linkLabel: "Explore the Images portal",
   linkHref: "https://images.cleanstart.com",
 } as const;
