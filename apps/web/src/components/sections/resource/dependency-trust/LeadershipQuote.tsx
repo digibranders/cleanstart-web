@@ -43,7 +43,7 @@ export function LeadershipQuote(): React.ReactElement {
       />
       <Container className="relative z-[2]">
         <Reveal header>
-          <GradientTitle text={LEADERSHIP.heading} accent="software security" />
+          <GradientTitle text={LEADERSHIP.heading} accent="software security" tone="dark" />
         </Reveal>
 
         <Reveal y={28} delay={0.12} className="mx-auto mt-10 sm:mt-12" style={{ maxWidth: "980px" }}>
