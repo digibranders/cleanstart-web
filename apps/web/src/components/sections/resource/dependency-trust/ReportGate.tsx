@@ -12,11 +12,15 @@ interface UnlockState {
 
 const UnlockContext = createContext<UnlockState | null>(null);
 
-interface ReportGateProviderProps {
+/** What the page needs to know about the report it gates. */
+export interface ReportGateConfig {
   resourceId: string | number;
   resourceTitle: string;
   resourceSlug: string;
   gateFormId: number;
+}
+
+interface ReportGateProviderProps extends ReportGateConfig {
   children: React.ReactNode;
 }
 

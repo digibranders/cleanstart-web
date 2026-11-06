@@ -5,7 +5,6 @@ import { Footer } from "@/components/sections/Footer";
 import { FadeUp } from "@/components/ui/FadeUp";
 import { ResourceDetailHero } from "@/components/sections/resource/ResourceDetailHero";
 import { ResourceDetailContent } from "@/components/sections/resource/ResourceDetailContent";
-import { BESPOKE_RESOURCE_LANDINGS } from "@/components/sections/resource/bespoke-landings";
 import {
   getResourceBySlug,
   getResourceBySlugDraft,
@@ -121,16 +120,6 @@ export async function renderResourceDetail({
       })}
     />
   );
-
-  const Landing = BESPOKE_RESOURCE_LANDINGS[resource.slug];
-  if (Landing) {
-    return (
-      <>
-        {jsonLd}
-        <Landing resource={resource} />
-      </>
-    );
-  }
 
   const highlightedBody = await highlightLexical(resource.body ?? null).then(resolveLexicalVideos);
   const resourceWithHighlighted = { ...resource, body: highlightedBody ?? null };

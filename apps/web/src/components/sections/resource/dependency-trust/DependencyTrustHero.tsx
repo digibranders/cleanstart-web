@@ -1,7 +1,6 @@
 import Image from "next/image";
 
 import { HeroReveal } from "@/components/ui/Reveal";
-import type { ResourceDetail } from "@/lib/resources";
 
 import { HERO } from "./content";
 import { ReportDownloadButton } from "./ReportDownloadButton";
@@ -69,11 +68,7 @@ function ReportStack(): React.ReactElement {
   );
 }
 
-export function DependencyTrustHero({
-  resource,
-}: {
-  resource: ResourceDetail;
-}): React.ReactElement {
+export function DependencyTrustHero(): React.ReactElement {
   return (
     <section
       data-section="DependencyTrustHero"
@@ -136,7 +131,7 @@ export function DependencyTrustHero({
 
             <HeroReveal y={30} delay={0.32} duration={0.8}>
               <div className="mt-9">
-                <ReportDownloadButton resource={resource} label={HERO.cta} tone="glass" />
+                <ReportDownloadButton label={HERO.cta} tone="glass" />
               </div>
             </HeroReveal>
           </div>

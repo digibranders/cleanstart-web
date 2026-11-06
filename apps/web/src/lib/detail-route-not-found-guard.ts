@@ -64,6 +64,11 @@ const DETAIL_ROUTES: readonly DetailRoute[] = [
   { prefix: "/legal/", collection: "legalDocuments", extraFilter: PUBLISHED_FILTER },
 ];
 
+// Paths under a detail prefix that a static page serves itself, so the CMS has
+// no published document to find for them. The static segment wins routing, but
+// this guard runs first and would 404 them.
+const STATIC_PAGE_PATHS: ReadonlySet<string> = new Set(["/resources/state-of-software-dependency-trust"]);
+
 // `/legal/privacy-policy` is a redirect target, not a `legalDocuments` doc —
 // `app/(legal)/legal/[slug]/page.tsx` permanentRedirect()s it to
 // `/privacy-policy` before ever querying the collection. Never gate it here.
@@ -131,6 +136,7 @@ async function slugExists(route: DetailRoute, slug: string): Promise<boolean> {
  * cover, a slug that exists, or a lookup that failed (fail open).
  */
 export async function detailRouteExists(pathname: string): Promise<boolean> {
+  if (STATIC_PAGE_PATHS.has(pathname)) return true;
   const match = matchRoute(pathname);
   if (!match) return true;
   if (match.route.prefix === "/legal/" && match.slug === LEGAL_PRIVACY_POLICY_SLUG) {

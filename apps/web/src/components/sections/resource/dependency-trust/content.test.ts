@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 
-import { BESPOKE_RESOURCE_LANDINGS } from "../bespoke-landings";
 import * as content from "./content";
 
 const strings = (value: unknown): string[] => {
@@ -30,9 +29,5 @@ describe("State of Software Dependency Trust landing content", () => {
 
   it("keeps the five findings numbered 01 to 05 in order", () => {
     expect(content.FINDINGS.items.map((item) => item.number)).toEqual(["01", "02", "03", "04", "05"]);
-  });
-
-  it("is registered at the slug of its resource", () => {
-    expect(Object.keys(BESPOKE_RESOURCE_LANDINGS)).toContain("state-of-software-dependency-trust");
   });
 });

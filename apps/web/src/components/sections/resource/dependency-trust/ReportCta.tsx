@@ -1,7 +1,5 @@
 import Image from "next/image";
 
-import type { ResourceDetail } from "@/lib/resources";
-
 import { DOWNLOAD } from "./content";
 import { ReportDownloadButton } from "./ReportDownloadButton";
 
@@ -30,7 +28,7 @@ const DESC_STYLE = {
  * closing card: white card, soft purple corner glows, the report cover where
  * the other cards carry a cube.
  */
-export function ReportCta({ resource }: { resource: ResourceDetail }): React.ReactElement {
+export function ReportCta(): React.ReactElement {
   return (
     <div className="relative h-full w-full overflow-hidden" style={{ background: "#ffffff" }}>
       <div
@@ -64,7 +62,7 @@ export function ReportCta({ resource }: { resource: ResourceDetail }): React.Rea
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 text-center sm:hidden">
         <p style={TITLE_STYLE}>{DOWNLOAD.heading}</p>
         <p style={DESC_STYLE}>{DOWNLOAD.body}</p>
-        <ReportDownloadButton resource={resource} label={DOWNLOAD.cta} tone="blue" />
+        <ReportDownloadButton label={DOWNLOAD.cta} tone="blue" />
       </div>
 
       <div
@@ -90,7 +88,7 @@ export function ReportCta({ resource }: { resource: ResourceDetail }): React.Rea
         <div className="relative flex flex-col" style={{ maxWidth: "min(480px, 100%)", gap: "clamp(16px, 1.25vw, 24px)" }}>
           <p style={DESC_STYLE}>{DOWNLOAD.body}</p>
           <div className="self-start">
-            <ReportDownloadButton resource={resource} label={DOWNLOAD.cta} tone="blue" />
+            <ReportDownloadButton label={DOWNLOAD.cta} tone="blue" />
           </div>
         </div>
       </div>
