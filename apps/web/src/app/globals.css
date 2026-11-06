@@ -7091,3 +7091,295 @@ body {
     display: none;
   }
 }
+
+/* Telecom journey art (TelecomJourneyArt): Discover, Standardize, Operate
+   assembled from separate layers. Intros run once on reveal (`[data-on]`),
+   loops are slow, hover is driven by the card (`.cs-tj-card`). Transform and
+   opacity only; everything settles to its final state under reduced motion. */
+.cs-tj-layer {
+  position: absolute;
+  display: block;
+}
+
+/* Discover: the lens drops in, then sweeps; the spot on the platform follows. */
+.cs-tj-lens-in {
+  opacity: 0;
+}
+
+[data-on] .cs-tj-lens-in {
+  animation: cs-tj-drop 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s both;
+}
+
+.cs-tj-lens-hover {
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Hover only where a pointer can hover: touch browsers leave :hover stuck after a tap. */
+@media (hover: hover) {
+  .cs-tj-card:hover .cs-tj-lens-hover {
+    transform: translateY(-7%) scale(1.04);
+  }
+}
+
+[data-on] .cs-tj-lens-scan {
+  animation: cs-tj-scan 7s ease-in-out 1s infinite;
+}
+
+.cs-tj-spot {
+  opacity: 0;
+  background: radial-gradient(closest-side, rgba(110, 200, 255, 0.55), rgba(124, 79, 240, 0.18) 60%, rgba(124, 79, 240, 0) 100%);
+}
+
+[data-on] .cs-tj-spot {
+  animation: cs-tj-spot 7s ease-in-out 1s infinite;
+}
+
+@keyframes cs-tj-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-16%);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cs-tj-scan {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  25% {
+    transform: translate(-10%, 5%) rotate(-5deg);
+  }
+
+  50% {
+    transform: translate(2%, 10%) rotate(2deg);
+  }
+
+  75% {
+    transform: translate(11%, 4%) rotate(5deg);
+  }
+}
+
+/* Same path as the lens, in the spot's own units (it is ~half the lens's
+   width and a quarter of its height). */
+@keyframes cs-tj-spot {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: translate(0, 0);
+  }
+
+  25% {
+    opacity: 0.9;
+    transform: translate(-18%, 18%);
+  }
+
+  50% {
+    opacity: 0.7;
+    transform: translate(4%, 34%);
+  }
+
+  75% {
+    opacity: 0.9;
+    transform: translate(20%, 14%);
+  }
+}
+
+/* Standardize: scattered and askew, then straightened, then stacked. */
+.cs-tj-tile-in {
+  opacity: 0;
+}
+
+[data-on] .cs-tj-tile-in {
+  animation: cs-tj-standardize 2.6s cubic-bezier(0.22, 0.8, 0.24, 1) var(--d, 0s) both;
+}
+
+.cs-tj-tile-lift {
+  transition: transform 0.65s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Hover only where a pointer can hover: touch browsers leave :hover stuck after a tap. */
+@media (hover: hover) {
+  .cs-tj-card:hover .cs-tj-tile-lift {
+    transform: translateY(var(--lift));
+  }
+}
+
+@keyframes cs-tj-standardize {
+  0% {
+    opacity: 0;
+    transform: translate(var(--jx), calc(var(--lift) - 30%)) rotate(var(--jr));
+  }
+
+  24%,
+  42% {
+    opacity: 1;
+    transform: translate(var(--jx), var(--lift)) rotate(var(--jr));
+  }
+
+  68% {
+    opacity: 1;
+    transform: translate(0, var(--lift)) rotate(0deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Operate: an upright gear turning in its own plane. */
+.cs-tj-gear-in {
+  opacity: 0;
+}
+
+[data-on] .cs-tj-gear-in {
+  animation: cs-tj-rise 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s both;
+}
+
+.cs-tj-gear-plane {
+  transform-style: preserve-3d;
+  transform: rotateY(-34deg) rotateX(4deg);
+}
+
+.cs-tj-gear-boost,
+.cs-tj-gear-spin {
+  transform-style: preserve-3d;
+}
+
+[data-on] .cs-tj-gear-spin {
+  animation: cs-tj-spin 18s linear infinite;
+}
+
+[data-on] .cs-tj-gear-boost {
+  animation: cs-tj-spin 3.2s linear infinite paused;
+}
+
+/* Hover only where a pointer can hover: touch browsers leave :hover stuck after a tap. */
+@media (hover: hover) {
+  .cs-tj-card:hover [data-on] .cs-tj-gear-boost {
+    animation-play-state: running;
+  }
+}
+
+.cs-tj-gear-depth {
+  transform: translateZ(var(--z));
+  filter: brightness(var(--b));
+}
+
+.cs-tj-glow {
+  background: radial-gradient(closest-side, rgba(110, 200, 255, 0.5), rgba(124, 79, 240, 0) 100%);
+  opacity: 0.4;
+}
+
+[data-on] .cs-tj-glow {
+  animation: cs-tj-glow 3.6s ease-in-out infinite;
+}
+
+@keyframes cs-tj-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14%);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cs-tj-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cs-tj-glow {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-tj-lens-in,
+  .cs-tj-tile-in,
+  .cs-tj-gear-in,
+  [data-on] .cs-tj-lens-in,
+  [data-on] .cs-tj-tile-in,
+  [data-on] .cs-tj-gear-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  [data-on] .cs-tj-lens-scan,
+  [data-on] .cs-tj-spot,
+  [data-on] .cs-tj-gear-spin,
+  [data-on] .cs-tj-gear-boost,
+  [data-on] .cs-tj-glow {
+    animation: none;
+  }
+
+  .cs-tj-lens-hover,
+  .cs-tj-tile-lift {
+    transition: none;
+  }
+}
+
+/* Telecom journey fibre links (TelecomJourney): dashes flow toward the next
+   station, and a light packet crosses each link in turn (the second link is delayed
+   half a cycle). The dash strip is one period (12px) wider than the link and
+   slides by exactly one period, so the loop is seamless. Transform/opacity
+   only; static under reduced motion. */
+.cs-tj-link-flow {
+  animation: cs-tj-link-flow 0.9s linear infinite;
+}
+
+.cs-tj-link-packet {
+  opacity: 0;
+  animation: cs-tj-link-packet 3.2s cubic-bezier(0.45, 0, 0.55, 1) var(--d, 0s) infinite;
+}
+
+@keyframes cs-tj-link-flow {
+  to {
+    transform: translateX(12px);
+  }
+}
+
+@keyframes cs-tj-link-packet {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+
+  8%,
+  42% {
+    opacity: 1;
+  }
+
+  50%,
+  100% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-tj-link-flow {
+    animation: none;
+  }
+
+  .cs-tj-link-packet {
+    display: none;
+  }
+}
