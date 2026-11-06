@@ -22,13 +22,18 @@
  * same list into its in-browser host check (lib/analytics/gtm-snippet.ts) rather
  * than hardcoding a second copy that could drift from this one.
  *
- * Intentionally EMPTY since 2026-07-29: `staging.cleanstart.com` was deleted
- * from DNS, so there is no longer a named non-production alias. Preview deploys
- * are still covered by `NOINDEX_HOST_SUFFIXES` below. Add a host here (not a
- * second list elsewhere) if a named alias is ever reintroduced — doing so also
- * keeps every GTM tag off it automatically.
+ * `staging.cleanstart.com` was deleted from DNS on 2026-07-29. Preview deploys
+ * are covered by `NOINDEX_HOST_SUFFIXES` below, plus the named alias here.
+ * Add a host here (not a second list elsewhere) whenever a named alias exists;
+ * doing so also keeps every GTM tag off it automatically.
+ *
+ * `preview.cleanstart.com` is the Vercel domain bound to the `development`
+ * branch. Preview builds already run with `VERCEL_ENV=preview` (never
+ * indexable) and ship no GTM id, so today this is a backstop: it keeps search
+ * and tracking off the host even if a GTM id or a production build ever
+ * reaches it.
  */
-export const NOINDEX_HOSTS: readonly string[] = [];
+export const NOINDEX_HOSTS: readonly string[] = ["preview.cleanstart.com"];
 
 /** Host suffixes we never index (Vercel preview aliases). Same rationale. */
 export const NOINDEX_HOST_SUFFIXES: readonly string[] = [".vercel.app"];

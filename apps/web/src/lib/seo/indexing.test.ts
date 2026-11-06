@@ -11,6 +11,11 @@ describe("isNoindexHost", () => {
     expect(isNoindexHost("CleanStart-Web.VERCEL.app:443")).toBe(true);
   });
 
+  it("flags the named preview alias, ignoring port and case", () => {
+    expect(isNoindexHost("preview.cleanstart.com")).toBe(true);
+    expect(isNoindexHost("Preview.CleanStart.com:443")).toBe(true);
+  });
+
   it("does not flag the production host or an empty host", () => {
     expect(isNoindexHost("www.cleanstart.com")).toBe(false);
     expect(isNoindexHost(null)).toBe(false);
@@ -30,6 +35,7 @@ describe("isIndexingAllowed", () => {
     vi.stubEnv("VERCEL_ENV", "production");
     expect(isIndexingAllowed("www.cleanstart.com")).toBe(true);
     expect(isIndexingAllowed("anything.vercel.app")).toBe(false);
+    expect(isIndexingAllowed("preview.cleanstart.com")).toBe(false);
   });
 
   it("treats a host-less (build-time) production call as indexable", () => {
