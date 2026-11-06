@@ -24,10 +24,11 @@ import { getPageGraph } from '@/lib/seo/compose-page';
  * the keyword for the SERP. Title and description are ours, not the SEO team's:
  * get them signed off before launch.
  *
- * DRAFT for search: noindex and absent from the sitemap's STATIC_ROUTES, but
- * linked from the Solutions > By industry nav (added 2026-11-06 on request).
- * The pageRegistry row exists already (it gates CI). To launch for search:
- * drop `noindex` and add the path to STATIC_ROUTES.
+ * LIVE BUT DRAFT FOR SEARCH (released 2026-11-06): reachable at its URL, but
+ * noindex, absent from the sitemap's STATIC_ROUTES and from the
+ * Solutions > By industry nav. The pageRegistry row exists already (it gates
+ * CI). To launch: drop `noindex`, add the path to STATIC_ROUTES and add the
+ * nav item in nav-config.ts.
  *
  * Breadcrumb is Home > Telecom with no Industries crumb, because /industries
  * has no page (see financial-services/page.tsx).

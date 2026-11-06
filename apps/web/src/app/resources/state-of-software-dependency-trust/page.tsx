@@ -24,12 +24,19 @@ const GATE: ReportGateConfig = {
   gateFormId: 11,
 };
 
+/**
+ * Live but noindex: the page is reachable and its form works, but it is kept out
+ * of search and out of the sitemap until the title and description are signed
+ * off and the report's CMS record is published. To launch for search, drop
+ * `noindex` here.
+ */
 export const metadata = buildPageMetadata({
   title: `${REPORT_TITLE} Report`,
   description: DESCRIPTION,
   path: PATH,
   eyebrow: "Resources",
   type: "article",
+  noindex: true,
 });
 
 export const revalidate = 21600;
