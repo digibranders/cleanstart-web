@@ -174,7 +174,10 @@ export const NAV_TREE: NavItem[] = [
         ],
       },
       {
-        // Both /industries/* pages are live: indexable and listed in the sitemap.
+        // Financial Services and Software are live: indexable and in the
+        // sitemap. Telecom is nav-linked but still noindex and out of the
+        // sitemap until its title and description are signed off (see
+        // app/industries/telecom/page.tsx).
         //
         // Labels stay short. The pages are titled "Container Security for
         // Financial Services" / "... for SaaS Companies" for search, but the nav
@@ -193,6 +196,12 @@ export const NAV_TREE: NavItem[] = [
             href: "/industries/software-applications",
             description: "Ship faster on a verified software foundation.",
             icon: "layers",
+          },
+          {
+            label: "Telecom",
+            href: "/industries/telecom",
+            description: "Verified software foundations for carrier networks.",
+            icon: "network",
           },
         ],
       },
