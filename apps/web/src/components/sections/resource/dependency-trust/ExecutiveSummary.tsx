@@ -29,12 +29,9 @@ export function ExecutiveSummary(): React.ReactElement {
 
   return (
     <LightSection dataSection="ExecutiveSummary">
-      <Reveal header>
-        <GradientTitle text={EXECUTIVE_SUMMARY.heading} accent="Summary" />
-      </Reveal>
-
-      <div className="mt-10 grid gap-5 lg:mt-14 lg:grid-cols-12 lg:gap-6">
-        <Reveal y={24} className="flex flex-col justify-center lg:col-span-7">
+      <div className="grid gap-5 lg:grid-cols-12 lg:gap-6">
+        <Reveal y={24} className="flex flex-col justify-center gap-6 lg:col-span-7 lg:gap-8">
+          <GradientTitle text={EXECUTIVE_SUMMARY.heading} accent="Summary" align="left" />
           <p
             style={{
               fontFamily: "var(--font-display)",

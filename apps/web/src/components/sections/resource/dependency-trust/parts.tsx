@@ -42,19 +42,26 @@ interface GradientTitleProps {
   /** The words that carry the gradient. They must appear in `text`. */
   accent: string;
   tone?: "light" | "dark";
+  align?: "center" | "left";
 }
 
-/** A centered section heading with its key words in the brand gradient. */
-export function GradientTitle({ text, accent, tone = "light" }: GradientTitleProps): React.ReactElement {
+/** A section heading with its key words in the brand gradient. Centered unless told otherwise. */
+export function GradientTitle({
+  text,
+  accent,
+  tone = "light",
+  align = "center",
+}: GradientTitleProps): React.ReactElement {
   const at = text.lastIndexOf(accent);
   const before = at < 0 ? text : text.slice(0, at);
   const after = at < 0 ? "" : text.slice(at + accent.length);
   const dark = tone === "dark";
+  const centered = align === "center";
   return (
     <h2
-      className="mx-auto text-center"
+      className={centered ? "mx-auto text-center" : "text-left"}
       style={{
-        maxWidth: "760px",
+        maxWidth: centered ? "760px" : "none",
         fontFamily: "var(--font-display)",
         fontSize: "var(--fs-h2)",
         fontWeight: 600,
