@@ -2,6 +2,7 @@ import { Reveal } from "@/components/ui/Reveal";
 
 import { CountUp } from "./CountUp";
 import { GLANCE } from "./content";
+import { GrowBars, ShareRing } from "./GlanceVisuals";
 import { CARD_PADDING, DarkSection, GLASS_CARD, GradientTitle, STAT_GRADIENT } from "./parts";
 
 const NUMERAL_STYLE = {
@@ -20,7 +21,18 @@ const CAPTION_STYLE = {
   lineHeight: 1.4,
 } as const;
 
-const CELL = "relative flex h-full flex-col justify-between gap-8 overflow-hidden";
+const CELL =
+  "relative flex h-full flex-col justify-between gap-8 overflow-hidden transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:translate-y-0";
+
+/** The two values behind the 107% figure; they match its caption. */
+const COMPARE = { from: 280, to: 581 } as const;
+
+const DOT_FIELD = {
+  backgroundImage: "radial-gradient(circle, rgba(177, 126, 255, 0.6) 1.3px, rgba(177, 126, 255, 0) 1.8px)",
+  backgroundSize: "15px 15px",
+  maskImage: "radial-gradient(farthest-corner at 100% 100%, #000 0%, rgba(0,0,0,0) 85%)",
+  WebkitMaskImage: "radial-gradient(farthest-corner at 100% 100%, #000 0%, rgba(0,0,0,0) 85%)",
+} as const;
 
 export function FindingsGlance(): React.ReactElement {
   const { vulnerabilities, components, age, malicious, ai } = GLANCE.stats;
@@ -47,7 +59,7 @@ export function FindingsGlance(): React.ReactElement {
               aria-hidden
               src="/images/cleanstart-images/env-union-hex.svg"
               alt=""
-              className="pointer-events-none absolute -right-28 -top-20 w-[460px] max-w-none select-none opacity-35"
+              className="pointer-events-none absolute -right-28 -top-20 w-[460px] max-w-none select-none opacity-25"
               loading="lazy"
               decoding="async"
             />
@@ -59,26 +71,7 @@ export function FindingsGlance(): React.ReactElement {
                 {vulnerabilities.caption}
               </p>
             </div>
-            <div aria-hidden className="relative flex flex-col gap-3">
-              <div className="flex items-center gap-4">
-                <span className="w-10 text-right text-white/70 tabular-nums" style={CAPTION_STYLE}>
-                  280
-                </span>
-                <div className="h-3 rounded-full bg-white/35" style={{ width: "48.2%" }} />
-              </div>
-              <div className="flex items-center gap-4">
-                <span className="w-10 text-right font-semibold tabular-nums" style={CAPTION_STYLE}>
-                  581
-                </span>
-                <div
-                  className="h-3 rounded-full"
-                  style={{
-                    width: "100%",
-                    background: "linear-gradient(90deg, #2CC1EB 0%, #9A51FF 100%)",
-                  }}
-                />
-              </div>
-            </div>
+            <GrowBars from={COMPARE.from} to={COMPARE.to} />
           </div>
         </Reveal>
 
@@ -108,9 +101,12 @@ export function FindingsGlance(): React.ReactElement {
 
         <Reveal y={24} delay={0.16} className="lg:col-span-3">
           <div className={`${CELL} cs-grad-border rounded-[24px]`} style={{ ...GLASS_CARD, padding: CARD_PADDING }}>
-            <p style={{ ...NUMERAL_STYLE, ...STAT_GRADIENT }}>
-              <CountUp value={age.value} suffix={age.suffix} />
-            </p>
+            <div className="flex items-start justify-between gap-3">
+              <p style={{ ...NUMERAL_STYLE, ...STAT_GRADIENT }}>
+                <CountUp value={age.value} suffix={age.suffix} />
+              </p>
+              <ShareRing percent={age.value} />
+            </div>
             <p className="max-w-[26ch] text-white/80" style={CAPTION_STYLE}>
               {age.caption}
             </p>
@@ -119,14 +115,7 @@ export function FindingsGlance(): React.ReactElement {
 
         <Reveal y={24} delay={0.08} className="lg:col-span-4">
           <div className={`${CELL} cs-grad-border rounded-[24px]`} style={{ ...GLASS_CARD, padding: CARD_PADDING }}>
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -bottom-16 -right-16 h-[262px] w-[262px] opacity-70"
-              style={{
-                background:
-                  "radial-gradient(50% 50% at 50% 50%, rgba(223, 155, 255, 0.28) 0%, rgba(223, 155, 255, 0) 70%)",
-              }}
-            />
+            <div aria-hidden className="pointer-events-none absolute bottom-0 right-0 h-[85%] w-[75%]" style={DOT_FIELD} />
             <p className="relative" style={{ ...NUMERAL_STYLE, ...STAT_GRADIENT }}>
               <CountUp value={malicious.value} suffix={malicious.suffix} />
             </p>
@@ -148,6 +137,15 @@ export function FindingsGlance(): React.ReactElement {
             <p style={NUMERAL_STYLE}>
               <CountUp value={ai.value} suffix={ai.suffix} />
             </p>
+            <div aria-hidden className="flex gap-1.5">
+              {[0, 1, 2, 3, 4].map((block) => (
+                <span
+                  key={block}
+                  className="h-7 w-7 rounded-[8px]"
+                  style={block === 0 ? { background: "#ffffff" } : { border: "1.5px solid rgba(255,255,255,0.55)" }}
+                />
+              ))}
+            </div>
             <p className="max-w-[28ch] text-white/90" style={CAPTION_STYLE}>
               {ai.caption}
             </p>
