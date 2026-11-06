@@ -1,104 +1,108 @@
 import Image from "next/image";
+import type { CSSProperties } from "react";
 
-import { Container, Section } from "@/components/layout";
-import { FadeUp } from "@/components/ui/FadeUp";
+import { Reveal } from "@/components/ui/Reveal";
 
 import { EXECUTIVE_SUMMARY } from "./content";
+import { GradientTitle, HAIRLINE_CARD, LightSection } from "./parts";
 
-const BODY_STYLE = {
+const BODY_STYLE: CSSProperties = {
   fontFamily: "var(--font-sans)",
   fontSize: "var(--fs-body)",
-  lineHeight: "var(--fs-body-lh)",
-  color: "rgba(17, 17, 17, 0.8)",
-} as const;
+  fontWeight: 400,
+  letterSpacing: "-0.02em",
+  lineHeight: 1.5,
+  color: "#444444",
+};
+
+/** The paragraph's own first sentence, so it can lead without any new copy. */
+function splitLead(paragraph: string): { lead: string; rest: string } {
+  const match = /^(.+?[.:])\s+(.+)$/s.exec(paragraph);
+  const lead = match?.[1];
+  const rest = match?.[2];
+  return lead !== undefined && rest !== undefined ? { lead, rest } : { lead: paragraph, rest: "" };
+}
 
 export function ExecutiveSummary(): React.ReactElement {
-  const [lead, ...rest] = EXECUTIVE_SUMMARY.paragraphs;
+  const [opening, ...points] = EXECUTIVE_SUMMARY.paragraphs;
+  const { lead, rest } = splitLead(opening);
 
   return (
-    <Section padding="lg" data-section="ExecutiveSummary" className="bg-white">
-      <Container>
-        <FadeUp>
-          <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
-            <div className="lg:col-span-7">
-              <h2
-                className="text-[#111]"
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "var(--fs-h2)",
-                  fontWeight: 600,
-                  letterSpacing: "-0.03em",
-                  lineHeight: "var(--fs-h2-lh)",
-                  textWrap: "balance",
-                }}
-              >
-                {EXECUTIVE_SUMMARY.heading}
-              </h2>
+    <LightSection dataSection="ExecutiveSummary">
+      <div className="grid gap-5 lg:grid-cols-12 lg:gap-6">
+        <Reveal y={24} className="flex flex-col justify-center gap-6 lg:col-span-7 lg:gap-8">
+          <GradientTitle text={EXECUTIVE_SUMMARY.heading} accent="Summary" align="left" />
+          <p
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "var(--fs-h3)",
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.25,
+              color: "#111111",
+              textWrap: "balance",
+            }}
+          >
+            {lead} <span style={{ color: "#6b6b7a", fontWeight: 500 }}>{rest}</span>
+          </p>
+        </Reveal>
 
-              <p
-                className="mt-8 max-w-[62ch] text-[#111]"
-                style={{
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "var(--fs-lead-sm)",
-                  fontWeight: 500,
-                  letterSpacing: "-0.01em",
-                  lineHeight: 1.5,
-                }}
-              >
-                {lead}
+        <Reveal y={24} delay={0.1} className="lg:col-span-5">
+          <aside
+            className="cs-grad-border relative flex h-full flex-col items-start gap-6 overflow-hidden rounded-[24px] text-white"
+            style={{
+              padding: "clamp(28px, 4vw, 56px)",
+              background: "linear-gradient(160deg, #151021 0%, #131E8F 62%, #471EC0 100%)",
+              boxShadow: "0 40px 90px -30px rgba(8,4,24,0.6), inset 0 1px 0 rgba(255,255,255,0.10)",
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              aria-hidden
+              src="/images/cleanstart-images/env-union-hex.svg"
+              alt=""
+              className="pointer-events-none absolute -right-24 -top-20 w-[460px] max-w-none select-none opacity-40"
+              loading="lazy"
+              decoding="async"
+            />
+            <Image
+              src="/images/security/cs-logomark.svg"
+              alt=""
+              aria-hidden
+              width={40}
+              height={40}
+              sizes="40px"
+              className="relative"
+            />
+            <p
+              className="relative max-w-[30ch]"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "var(--fs-h3)",
+                fontWeight: 600,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.2,
+                textWrap: "balance",
+              }}
+            >
+              {EXECUTIVE_SUMMARY.statement}
+            </p>
+          </aside>
+        </Reveal>
+      </div>
+
+      <Reveal y={24} className="mt-5">
+        <div className="grid md:grid-cols-3 md:divide-x md:divide-[#9A51FF]/15" style={HAIRLINE_CARD}>
+          {points.map((point) => {
+            const part = splitLead(point);
+            return (
+              <p key={point.slice(0, 32)} className="p-6 md:p-8" style={BODY_STYLE}>
+                <span style={{ fontWeight: 600, color: "#1a1a1a" }}>{part.lead}</span> {part.rest}
               </p>
-              <div className="mt-6 flex max-w-[62ch] flex-col gap-5">
-                {rest.map((paragraph) => (
-                  <p key={paragraph} style={BODY_STYLE}>
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-            </div>
-
-            <aside className="lg:col-span-5">
-              <div
-                className="relative flex h-full min-h-[320px] flex-col justify-between overflow-hidden rounded-[24px] p-8 text-white lg:p-10"
-                style={{
-                  background:
-                    "linear-gradient(160deg, #151021 0%, #131E8F 62%, #471EC0 100%)",
-                }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  aria-hidden
-                  src="/images/cleanstart-images/env-union-hex.svg"
-                  alt=""
-                  className="pointer-events-none absolute -right-24 -top-16 w-[420px] max-w-none select-none opacity-40"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <Image
-                  src="/images/security/cs-logomark.svg"
-                  alt=""
-                  aria-hidden
-                  width={44}
-                  height={44}
-                  className="relative"
-                />
-                <p
-                  className="relative mt-10"
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "var(--fs-h3)",
-                    fontWeight: 600,
-                    letterSpacing: "-0.02em",
-                    lineHeight: "var(--fs-h3-lh)",
-                    textWrap: "balance",
-                  }}
-                >
-                  {EXECUTIVE_SUMMARY.statement}
-                </p>
-              </div>
-            </aside>
-          </div>
-        </FadeUp>
-      </Container>
-    </Section>
+            );
+          })}
+        </div>
+      </Reveal>
+    </LightSection>
   );
 }

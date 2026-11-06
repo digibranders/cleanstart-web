@@ -7,7 +7,6 @@
 const ICONS = "/images/resources/dependency-trust";
 
 export const HERO = {
-  eyebrow: "2026 Research Report | CleanStart",
   title: "State of Software Dependency Trust 2026",
   subtitle: "From Dependency Management to Verified Software Foundations",
   cta: "Download the Full Report",
@@ -167,7 +166,6 @@ export const FINDINGS = {
 } as const;
 
 export const LEADERSHIP = {
-  label: "Perspective from CleanStart leadership",
   heading: "A shift in how we approach software security",
   quote: [
     "Software security cannot begin and end with finding vulnerabilities. Organizations need to know what they are bringing into their environments, where it comes from and whether its integrity can be verified.",
@@ -214,10 +212,10 @@ export const ABOUT_CLEANSTART = {
   heading: "About CleanStart",
   body: "CleanStart is a provider of verified software artifacts for modern software supply chains. Through Clean Images, Clean Libraries and CleanSight, CleanStart helps organizations discover software assets, adopt hardened software foundations and establish verifiable evidence across the software they build, acquire and deploy.",
   products: [
-    { label: "Clean Images", href: "/cleanstart-images" },
-    { label: "Clean Libraries", href: "/clean-libraries" },
-    { label: "CleanSight", href: "/cleansight" },
+    { label: "Clean Images", href: "/cleanstart-images", emblem: "/images/cleanstart-factory/emblem-images.webp" },
+    { label: "Clean Libraries", href: "/clean-libraries", emblem: "/images/cleanstart-factory/emblem-libraries.webp" },
+    { label: "CleanSight", href: "/cleansight", emblem: "/images/cleanstart-factory/emblem-cleansight.webp" },
   ],
-  linkLabel: "images.cleanstart.com",
+  linkLabel: "Explore the Images portal",
   linkHref: "https://images.cleanstart.com",
 } as const;

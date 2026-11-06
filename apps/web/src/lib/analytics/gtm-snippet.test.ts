@@ -66,6 +66,12 @@ describe("buildGtmSnippet host gating", () => {
     expect(win().dataLayer).toBeUndefined();
   });
 
+  it("loads no container on the named preview alias", () => {
+    runSnippetOn("preview.cleanstart.com");
+    expect(document.head.querySelector(LOADER)).toBeNull();
+    expect(win().dataLayer).toBeUndefined();
+  });
+
   it("matches noindex hosts case-insensitively", () => {
     runSnippetOn("CleanStart-Web.VERCEL.app");
     expect(document.head.querySelector(LOADER)).toBeNull();

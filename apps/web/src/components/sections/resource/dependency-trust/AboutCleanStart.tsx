@@ -1,96 +1,178 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
+import type { CSSProperties } from "react";
 
-import { Container, Section } from "@/components/layout";
-import { FadeUp } from "@/components/ui/FadeUp";
+import { Container } from "@/components/layout";
+import { Reveal } from "@/components/ui/Reveal";
 
 import { ABOUT_CLEANSTART } from "./content";
+import { DARK_BAND, GradientTitle } from "./parts";
 
+/** Same sizing as the hero call to action, so the button reads as the site's own. */
+const PORTAL_BUTTON_VARS = {
+  "--cs-btn-px": "22px",
+  "--cs-btn-fs": "16px",
+  "--cs-btn-h": "3rem",
+} as CSSProperties;
+
+/**
+ * The last block before the footer. Its bottom padding is the card-overlap
+ * reservation the footer's CTA slot needs, painted by the same band so the card
+ * sits on the violet gradient, as on the other pages.
+ *
+ * The three products share one lit panel: each emblem stands on its own glow,
+ * a thin line runs behind them to say they are one platform, and the whole
+ * column is the link.
+ */
 export function AboutCleanStart(): React.ReactElement {
   return (
-    <Section padding="md" data-section="AboutCleanStart" className="bg-white">
-      <Container>
-        <FadeUp>
-          <div className="grid items-start gap-10 lg:grid-cols-12 lg:gap-16">
-            <div className="lg:col-span-7">
-              <div className="flex items-center gap-4">
-                <span
-                  className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[16px]"
-                  style={{ background: "linear-gradient(160deg, #151021 0%, #131E8F 100%)" }}
-                >
-                  <Image
-                    src="/images/security/cs-logomark.svg"
-                    alt=""
-                    aria-hidden
-                    width={30}
-                    height={30}
-                  />
-                </span>
-                <h2
-                  className="text-[#111]"
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "var(--fs-h3)",
-                    fontWeight: 600,
-                    letterSpacing: "-0.02em",
-                    lineHeight: "var(--fs-h3-lh)",
-                  }}
-                >
-                  {ABOUT_CLEANSTART.heading}
-                </h2>
-              </div>
-              <p
-                className="mt-6 max-w-[68ch] text-[rgba(17,17,17,0.8)]"
-                style={{
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "var(--fs-body)",
-                  lineHeight: "var(--fs-body-lh)",
-                }}
-              >
-                {ABOUT_CLEANSTART.body}
-              </p>
-              <a
-                href={ABOUT_CLEANSTART.linkHref}
-                className="mt-6 inline-flex items-center gap-1.5 rounded-[8px] text-[#3960F9] underline-offset-4 outline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3960F9]"
-                style={{
-                  fontFamily: "var(--font-sora), ui-sans-serif, system-ui, sans-serif",
-                  fontSize: "var(--fs-body)",
-                  fontWeight: 500,
-                }}
-              >
-                {ABOUT_CLEANSTART.linkLabel}
-                <ArrowUpRight aria-hidden size={18} strokeWidth={2} />
-              </a>
-            </div>
+    <section
+      data-section="AboutCleanStart"
+      className="relative w-full overflow-hidden text-white"
+      style={{
+        background: DARK_BAND,
+        paddingTop: "clamp(64px, 7vw, 132px)",
+        paddingBottom: "var(--spacing-section-cta)",
+      }}
+    >
+      {/* Stage light behind the panel, and a faint dot grid that fades out from it. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 select-none"
+        style={{
+          background:
+            "radial-gradient(52% 46% at 50% 56%, rgba(96, 56, 255, 0.34) 0%, rgba(96, 56, 255, 0) 100%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 select-none"
+        style={{
+          backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.16) 1px, rgba(255,255,255,0) 1.5px)",
+          backgroundSize: "28px 28px",
+          maskImage: "radial-gradient(60% 55% at 50% 55%, #000 0%, rgba(0,0,0,0) 100%)",
+          WebkitMaskImage: "radial-gradient(60% 55% at 50% 55%, #000 0%, rgba(0,0,0,0) 100%)",
+        }}
+      />
 
-            <ul className="flex flex-col gap-3 lg:col-span-5">
-              {ABOUT_CLEANSTART.products.map((product) => (
-                <li key={product.href}>
-                  <Link
-                    href={product.href}
-                    className="group flex items-center justify-between rounded-[16px] border border-black/[0.06] bg-[#F5F3FF] px-5 py-4 text-[#111] outline-offset-4 transition-colors duration-200 hover:bg-[#EAE4FF] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3960F9]"
-                    style={{
-                      fontFamily: "var(--font-display)",
-                      fontSize: "var(--fs-h5)",
-                      fontWeight: 600,
-                      letterSpacing: "-0.01em",
-                    }}
+      <Container className="relative z-[2]">
+        <Reveal header>
+          <GradientTitle text={ABOUT_CLEANSTART.heading} accent="CleanStart" tone="dark" />
+        </Reveal>
+
+        <Reveal y={24} delay={0.08}>
+          <p
+            className="mx-auto mt-8 max-w-[800px] text-center"
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: "var(--fs-lead-sm)",
+              fontWeight: 400,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.5,
+              color: "rgba(255,255,255,0.8)",
+              textWrap: "pretty",
+            }}
+          >
+            {ABOUT_CLEANSTART.body}
+          </p>
+
+          <div className="mx-auto mt-14 max-w-[1120px]">
+            <div
+              className="relative overflow-hidden rounded-[32px]"
+              style={{
+                background:
+                  "linear-gradient(180deg, rgba(255,255,255,0.075) 0%, rgba(255,255,255,0.02) 100%)",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.14), 0 50px 100px -40px rgba(6,3,28,0.9)",
+              }}
+            >
+              <div
+                aria-hidden
+                className="pointer-events-none absolute left-[16.6%] right-[16.6%] top-[148px] hidden h-px md:block"
+                style={{
+                  background:
+                    "linear-gradient(90deg, rgba(79,209,245,0) 0%, rgba(79,209,245,0.55) 28%, rgba(154,81,255,0.55) 72%, rgba(154,81,255,0) 100%)",
+                }}
+              />
+              <ul className="relative grid md:grid-cols-3">
+                {ABOUT_CLEANSTART.products.map((product) => (
+                  <li
+                    key={product.href}
+                    className="border-t border-white/10 first:border-t-0 md:border-l md:border-t-0 md:first:border-l-0"
                   >
-                    {product.label}
-                    <ArrowRight
-                      aria-hidden
-                      size={20}
-                      strokeWidth={2}
-                      className="text-[#471EC0] transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transition-none"
-                    />
-                  </Link>
-                </li>
-              ))}
-            </ul>
+                    <Link
+                      href={product.href}
+                      className="group relative flex h-full items-center gap-5 px-6 py-5 outline-offset-[-4px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#33BAEC] md:flex-col md:gap-0 md:px-8 md:pb-10 md:pt-12"
+                    >
+                      <span
+                        aria-hidden
+                        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 motion-reduce:transition-none"
+                        style={{
+                          background:
+                            "radial-gradient(70% 60% at 50% 0%, rgba(111, 70, 255, 0.3) 0%, rgba(111, 70, 255, 0) 100%)",
+                        }}
+                      />
+                      <span className="relative flex shrink-0 items-end justify-center md:h-[200px] md:w-full">
+                        <span
+                          aria-hidden
+                          className="absolute bottom-[10px] left-1/2 hidden h-[34px] w-[170px] -translate-x-1/2 rounded-[50%] opacity-70 transition-opacity duration-500 group-hover:opacity-100 motion-reduce:transition-none md:block"
+                          style={{
+                            background:
+                              "radial-gradient(closest-side, rgba(79, 209, 245, 0.55) 0%, rgba(79, 209, 245, 0) 100%)",
+                          }}
+                        />
+                        <Image
+                          src={product.emblem}
+                          alt=""
+                          aria-hidden
+                          width={768}
+                          height={768}
+                          sizes="(min-width: 768px) 176px, 72px"
+                          className="relative h-[72px] w-[72px] object-contain transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-2 group-hover:scale-105 motion-reduce:transition-none md:h-[176px] md:w-[176px]"
+                          style={{ filter: "drop-shadow(0 22px 28px rgba(8, 4, 40, 0.65))" }}
+                        />
+                      </span>
+                      <span
+                        className="relative flex flex-1 items-center justify-between gap-4 md:mt-8 md:flex-none md:flex-col md:gap-6"
+                        style={{
+                          fontFamily: "var(--font-display)",
+                          fontSize: "var(--fs-h4)",
+                          fontWeight: 600,
+                          letterSpacing: "-0.03em",
+                          lineHeight: 1.15,
+                        }}
+                      >
+                        {product.label}
+                        <span
+                          aria-hidden
+                          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/[0.06] text-[#4FD1F5] transition-colors duration-300 group-hover:border-[#4FD1F5]/60 group-hover:bg-white/[0.14] motion-reduce:transition-none"
+                        >
+                          <ArrowRight
+                            size={20}
+                            strokeWidth={2}
+                            className="transition-transform duration-300 group-hover:translate-x-0.5 motion-reduce:transition-none"
+                          />
+                        </span>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-        </FadeUp>
+
+          <div className="mt-10 flex justify-center">
+            <a
+              href={ABOUT_CLEANSTART.linkHref}
+              className="cs-btn-glass cs-hero-cta gap-2.5"
+              style={PORTAL_BUTTON_VARS}
+            >
+              <span>{ABOUT_CLEANSTART.linkLabel}</span>
+              <ArrowUpRight aria-hidden size={18} strokeWidth={2} />
+            </a>
+          </div>
+        </Reveal>
       </Container>
-    </Section>
+    </section>
   );
 }

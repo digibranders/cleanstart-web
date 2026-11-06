@@ -14,6 +14,13 @@ describe("detailRouteExists", () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
+  it("lets a static page under a detail prefix through without asking the CMS", async () => {
+    const fetchSpy = vi.fn();
+    vi.stubGlobal("fetch", fetchSpy);
+    await expect(detailRouteExists("/resources/state-of-software-dependency-trust")).resolves.toBe(true);
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
   it("still 404s a bare slug the CMS does not have", async () => {
     vi.stubGlobal(
       "fetch",
