@@ -7042,3 +7042,52 @@ body {
     opacity: 0;
   }
 }
+
+/* Telecom "Need More" backbone (TelecomNetwork): a light pulse runs the signal
+   rail left to right and each node pings as it passes. The pulse layer is the
+   rail's full width with the spot at its centre, so translating it by +/-60%
+   carries the spot from -10% to 110% of the rail. Ping delays in the component
+   are derived from this 4.8s linear timing; change both together.
+   Transform/opacity only; both hidden under reduced motion (static rail stays). */
+@keyframes cs-tel-signal {
+  from {
+    transform: translateX(-60%);
+  }
+
+  to {
+    transform: translateX(60%);
+  }
+}
+
+@keyframes cs-tel-ping {
+  0% {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+
+  4% {
+    opacity: 0.9;
+  }
+
+  30%,
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+.cs-tel-signal {
+  animation: cs-tel-signal 4.8s linear infinite;
+}
+
+.cs-tel-ping {
+  opacity: 0;
+  animation: cs-tel-ping 4.8s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-tel-signal,
+  .cs-tel-ping {
+    display: none;
+  }
+}
