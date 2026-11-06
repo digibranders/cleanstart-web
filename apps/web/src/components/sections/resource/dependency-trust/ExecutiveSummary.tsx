@@ -59,15 +59,14 @@ export function ExecutiveSummary(): React.ReactElement {
               boxShadow: "0 40px 90px -30px rgba(8,4,24,0.6), inset 0 1px 0 rgba(255,255,255,0.10)",
             }}
           >
-            <div
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               aria-hidden
-              className="pointer-events-none absolute -right-28 -top-28 h-[480px] w-[480px] select-none rounded-full"
-              style={{
-                backgroundImage:
-                  "repeating-radial-gradient(circle closest-side, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 1px, rgba(255,255,255,0) 1px, rgba(255,255,255,0) 32px)",
-                maskImage: "radial-gradient(closest-side, #000 25%, rgba(0,0,0,0) 100%)",
-                WebkitMaskImage: "radial-gradient(closest-side, #000 25%, rgba(0,0,0,0) 100%)",
-              }}
+              src="/images/cleanstart-images/env-union-hex.svg"
+              alt=""
+              className="pointer-events-none absolute -right-24 -top-20 w-[460px] max-w-none select-none opacity-40"
+              loading="lazy"
+              decoding="async"
             />
             <Image
               src="/images/security/cs-logomark.svg"
