@@ -66,8 +66,11 @@ export const Advisories: CollectionConfig = {
   fields: [
     {
       ...contentTitleField,
-      label: 'Vulnerability name',
-      admin: { description: 'e.g. Node.js Brotli decoder out-of-bounds write. The CVE IDs are shown before it.' },
+      label: 'Advisory Title',
+      admin: {
+        description:
+          'The page heading and the card title, shown exactly as typed. Put a CVE ID in it only if you want it in the heading; the CVE IDs field below is for search and filters.',
+      },
     },
     {
       name: 'coverTitle',
@@ -76,7 +79,7 @@ export const Advisories: CollectionConfig = {
       maxLength: 80,
       admin: {
         description:
-          'Text shown on the cover of the listing card. Leave blank to use the vulnerability name. Keep it short: long text is shrunk or clipped on the cover.',
+          'Text shown on the cover of the listing card. Leave blank to use the advisory title. Keep it short: long text is shrunk or clipped on the cover.',
       },
     },
     slugField({ source: 'title' }),
@@ -99,7 +102,7 @@ export const Advisories: CollectionConfig = {
       },
       admin: {
         description:
-          'Type one ID (e.g. CVE-2026-111497) and press Enter. To add more, type the next ID and press Enter again; use the x on an ID to remove it. Searchable on the listing.',
+          'Type one ID (e.g. CVE-2026-111497) and press Enter. To add more, type the next ID and press Enter again; use the x on an ID to remove it. Shown as chips under the heading and searchable on the listing.',
       },
     },
     {

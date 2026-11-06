@@ -1,4 +1,4 @@
-import { advisoryHeading, advisoryStatusLabel, cvssRating, type AdvisoryRow } from "./advisory-utils";
+import { advisoryStatusLabel, cvssRating, type AdvisoryRow } from "./advisory-utils";
 import { effectivePublishedAt } from "./published-date";
 
 export const ADVISORY_FEED_PATH = "/advisories/feed.xml";
@@ -30,7 +30,7 @@ export function buildAdvisoryFeed(advisories: AdvisoryRow[], siteUrl: string): s
       .join(" ");
     return [
       "<item>",
-      `<title>${escapeXml(advisoryHeading(a))}</title>`,
+      `<title>${escapeXml(a.title)}</title>`,
       `<link>${escapeXml(url)}</link>`,
       `<guid isPermaLink="true">${escapeXml(url)}</guid>`,
       publishedAt ? `<pubDate>${rfc822(publishedAt)}</pubDate>` : "",

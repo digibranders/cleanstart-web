@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  advisoryHeading,
   cvssRating,
   selectAdvisories,
   technologyOptions,
@@ -36,15 +35,6 @@ describe("cvssRating", () => {
     expect(cvssRating(3.9)).toBe("Low");
     expect(cvssRating(0.1)).toBe("Low");
     expect(cvssRating(0)).toBe("None");
-  });
-});
-
-describe("advisoryHeading", () => {
-  it("prefixes every CVE ID", () => {
-    expect(advisoryHeading(row({ title: "PHP2Shell", cves: ["CVE-2026-109618", "CVE-2026-109619"] }))).toBe("CVE-2026-109618, CVE-2026-109619: PHP2Shell");
-  });
-  it("falls back to the name when no CVE is set", () => {
-    expect(advisoryHeading(row({ cves: [] }))).toBe("Node.js Brotli decoder out-of-bounds write");
   });
 });
 

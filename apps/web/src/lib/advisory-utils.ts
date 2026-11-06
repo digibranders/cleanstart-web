@@ -40,11 +40,6 @@ export function cvssRating(score: number): CvssRating {
   return "None";
 }
 
-/** "CVE-A, CVE-B: Name", the advisory's H1 and page title. */
-export function advisoryHeading(a: Pick<AdvisoryRow, "cves" | "title">): string {
-  return a.cves.length > 0 ? `${a.cves.join(", ")}: ${a.title}` : a.title;
-}
-
 const technologyKey = (technology: string): string => technology.trim().toLowerCase();
 
 /** Technology filter options from the values editors typed, merged by case and spacing. */

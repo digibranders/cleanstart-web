@@ -2,7 +2,6 @@ import "server-only";
 
 import { fetchCMS } from "@/lib/cms-fetch";
 import type { AdvisoryDetail } from "@/lib/advisory";
-import { advisoryHeading } from "@/lib/advisory-utils";
 import type { BlogDetail } from "@/lib/blog";
 import { lexicalToPlainText } from "@/lib/renderLexical";
 import { mediaUrl } from "@/lib/resources";
@@ -274,7 +273,7 @@ export const getAdvisoryCtas = (advisory: AdvisoryDetail): Promise<BlogCtaSet> =
     surface: "advisory",
     slug: advisory.slug,
     article: {
-      title: advisoryHeading(advisory),
+      title: advisory.title,
       abstract: advisory.abstract ?? "",
       category: advisory.technology,
       headings: [],

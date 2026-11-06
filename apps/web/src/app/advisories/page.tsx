@@ -8,7 +8,7 @@ import { BlogsHero } from "@/components/sections/blogs/BlogsHero";
 import { BlogsCTA } from "@/components/sections/blogs/BlogsCTA";
 import { getAdvisories } from "@/lib/advisory";
 import { ADVISORY_FEED_PATH, ADVISORY_FEED_TITLE } from "@/lib/advisory-feed";
-import { advisoryHeading, technologyOptions } from "@/lib/advisory-utils";
+import { technologyOptions } from "@/lib/advisory-utils";
 import { ADVISORIES_SECTION } from "@/lib/blog-utils";
 import { SITE_URL, buildListingMetadata } from "@/lib/seo/canonical";
 import { JsonLd, breadcrumbSchema, itemListSchema } from "@/lib/seo/jsonld";
@@ -58,7 +58,7 @@ export default async function AdvisoriesPage(): Promise<React.ReactElement> {
           data={itemListSchema(
             "CleanStart Security Advisories",
             basePath,
-            advisories.map((a) => ({ name: advisoryHeading(a), path: `${basePath}/${a.slug}` })),
+            advisories.map((a) => ({ name: a.title, path: `${basePath}/${a.slug}` })),
           )}
         />
       )}

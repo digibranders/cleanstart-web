@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { breadcrumbTrail } from "@cleanstart/schema/builders";
 import { getAdvisoryBySlug, getAdvisoryBySlugDraft, getAdvisorySlugs } from "@/lib/advisory";
-import { advisoryHeading, advisoryStatusLabel, cvssRating, type CvssRating } from "@/lib/advisory-utils";
+import { advisoryStatusLabel, cvssRating, type CvssRating } from "@/lib/advisory-utils";
 import { ADVISORIES_SECTION, mediaUrl } from "@/lib/blog-utils";
 import type { LexicalRoot } from "@/lib/blog";
 import { getAdvisoryCtas } from "@/lib/blog-cta/resolve";
@@ -54,11 +54,11 @@ export async function generateMetadata({ params }: AdvisoryDetailPageProps): Pro
 
   const seo = resolveCmsSeo(advisory.seo, { absolutize: mediaUrl });
   return buildPageMetadata({
-    title: seo.title ?? advisoryHeading(advisory),
+    title: seo.title ?? advisory.title,
     description:
       seo.description ??
       advisory.abstract ??
-      `${advisoryHeading(advisory)}. CVSS ${advisory.cvssScore} ${cvssRating(advisory.cvssScore)}: affected versions and how to fix it.`,
+      `${advisory.title}. CVSS ${advisory.cvssScore} ${cvssRating(advisory.cvssScore)}: affected versions and how to fix it.`,
     path: `${basePath}/${advisory.slug}`,
     eyebrow: "Advisory",
     ogTitle: advisory.title,
@@ -142,7 +142,7 @@ export async function renderAdvisoryDetail({
   const advisory = draft ? await getAdvisoryBySlugDraft(slug) : await getAdvisoryBySlug(slug);
   if (!advisory) notFound();
 
-  const heading = advisoryHeading(advisory);
+  const heading = advisory.title;
   const publishedAt = effectivePublishedAt(advisory);
   const [body, impact, resolution, ctas] = await Promise.all([
     highlightLexical(advisory.body).then(resolveLexicalVideos),
@@ -179,6 +179,11 @@ export async function renderAdvisoryDetail({
           title={heading}
           meta={
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5">
+              {advisory.cves.map((cve) => (
+                <HeroChip key={cve} tone={NEUTRAL_CHIP}>
+                  <span style={{ fontFamily: "var(--font-mono)" }}>{cve}</span>
+                </HeroChip>
+              ))}
               <HeroChip tone={SEVERITY_CHIP[cvssRating(advisory.cvssScore)]}>
                 CVSS {advisory.cvssScore.toFixed(1)}
                 <span className="font-semibold">{cvssRating(advisory.cvssScore)}</span>

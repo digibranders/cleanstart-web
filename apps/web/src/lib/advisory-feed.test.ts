@@ -27,8 +27,8 @@ describe("buildAdvisoryFeed", () => {
     );
   });
 
-  it("titles each item with its CVE IDs and links to the advisory", () => {
-    expect(xml).toContain("<title>CVE-2026-111497: Node.js Brotli decoder out-of-bounds write</title>");
+  it("titles each item with the advisory name and links to the advisory", () => {
+    expect(xml).toContain("<title>Node.js Brotli decoder out-of-bounds write</title>");
     expect(xml).toContain(
       "<link>https://www.cleanstart.com/advisories/cve-2026-111497-nodejs-brotli</link>",
     );
