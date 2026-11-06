@@ -106,17 +106,17 @@ export const Advisories: CollectionConfig = {
       },
     },
     {
-      name: 'technology',
-      type: 'text',
-      required: true,
-      admin: {
-        description:
-          'e.g. Node.js, PHP, OpenSSL. Free text: the listing filter is built from the values in use, so keep the spelling consistent.',
-      },
-    },
-    {
       type: 'row',
       fields: [
+        {
+          name: 'technology',
+          type: 'text',
+          required: true,
+          admin: {
+            description:
+              'e.g. Node.js, PHP, OpenSSL. Free text: the listing filter is built from the values in use, so keep the spelling consistent.',
+          },
+        },
         {
           name: 'cvssScore',
           label: 'CVSS score',
@@ -126,7 +126,6 @@ export const Advisories: CollectionConfig = {
           max: 10,
           admin: {
             step: 0.1,
-            width: '50%',
             description: 'e.g. 9.2. The rating (Critical, High, Medium, Low) is derived from the score.',
           },
         },
@@ -139,7 +138,7 @@ export const Advisories: CollectionConfig = {
           required: true,
           defaultValue: 'identified',
           options: [...ADVISORY_STATUS_OPTIONS],
-          admin: { width: '50%', description: 'Where CleanStart stands on this vulnerability.' },
+          admin: { description: 'Where CleanStart stands on this vulnerability.' },
         },
       ],
     },

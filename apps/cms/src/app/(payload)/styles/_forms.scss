@@ -437,6 +437,15 @@
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
+// RenderFields wraps a row's children in one `.render-fields` div, so the grid
+// above sees a single item. On advisories, lay the three short fields out as
+// columns (they stack on narrow screens).
+.collection-edit--advisories .cs-row > .render-fields {
+  display: grid;
+  gap: var(--cs-space-3);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
 // Array field (Wave 2 part 2) — drag-sort + add/remove
 .cs-array,
 .cs-blocks {

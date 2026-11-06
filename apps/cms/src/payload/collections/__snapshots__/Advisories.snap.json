@@ -27,13 +27,13 @@
       "hasMany": true
     },
     {
-      "type": "text",
-      "name": "technology",
-      "required": true
-    },
-    {
       "type": "row",
       "fields": [
+        {
+          "type": "text",
+          "name": "technology",
+          "required": true
+        },
         {
           "type": "number",
           "name": "cvssScore",
