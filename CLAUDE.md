@@ -18,6 +18,16 @@ If your task touches `apps/cms/src/studio/**`, `apps/cms/src/app/(studio)/**` or
 4. The Studio docs decide Studio's behaviour, design and copy (`docs/studio/09-BEHAVIOUR-CONTRACT.md` is final for behaviour). Everything else in this file still applies: git rules, migrations, generated types, secrets, no em-dashes or en-dashes.
 5. If a Studio doc is ambiguous or two docs disagree, stop and ask. Do not guess.
 
+## Partner portal (apps/portal, the real build)
+
+If your task touches `apps/portal/**`, `docs/partner-portal/**` or the partner portal plans in `docs/superpowers/plans/`, or you were asked to build the partner portal:
+
+1. Read `docs/partner-portal/BUILD-HANDOFF.md` first and follow it exactly. It sets the worktrees and branches (`feat/portal-build` and the short-lived track branches), the separate local databases, the ports, the waves and tracks, the gates, the allowed paths and when to stop and ask. This is the approved exception to the "no feature branches" rule below; the branches are deleted after the merge to `development`.
+2. The plans are `docs/superpowers/plans/2026-11-11-partner-portal-master-plan.md` (the whole app) and `docs/superpowers/plans/2026-11-11-partner-portal-hubspot-integration.md` (HubSpot). Prefix task ids `M` and `H`, because both plans number tasks 4.x.
+3. Log every task in `docs/partner-portal/PROGRESS.md` (main checkout, absolute path) with one appended line per event. Never rewrite or edit that file; several agents append to it at once.
+4. Never push, never touch the droplet or production credentials, and never edit `apps/cms`, `apps/web` or `packages/` from a portal task. Everything else in this file still applies: git rules, secrets, no em-dashes or en-dashes.
+5. If a portal doc is ambiguous or two docs disagree, stop and ask. Do not guess.
+
 ---
 
 ## Local dev prerequisites
