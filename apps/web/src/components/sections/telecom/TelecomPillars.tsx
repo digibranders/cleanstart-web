@@ -120,7 +120,7 @@ export function TelecomPillars(): React.ReactElement {
                     .join(' ')}
                   style={{
                     borderColor: RULE,
-                    padding: 'clamp(28px, 2.6vw, 36px) clamp(22px, 2vw, 30px)',
+                    padding: 'clamp(28px, 2.6vw, 36px) clamp(16px, 1.4vw, 24px)',
                   }}
                 >
                   <div className="relative flex h-20 w-20 items-center justify-center md:justify-start">
