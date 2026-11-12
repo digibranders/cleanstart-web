@@ -34,11 +34,11 @@ export function TelecomHero(): React.ReactElement {
 
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 mx-auto hidden select-none xl:block"
+        className="pointer-events-none absolute inset-x-0 top-0 mx-auto hidden select-none lg:block"
         style={{ maxWidth: 'var(--container-default)', height: '100%' }}
       >
         <div
-          className="absolute"
+          className="absolute w-[clamp(260px,26vw,500px)] xl:w-[clamp(400px,33vw,500px)]"
           style={{
             // Same 40px inset the copy column is padded by, so the render ends
             // on the text's mirror line instead of hanging past the grid.
@@ -47,7 +47,6 @@ export function TelecomHero(): React.ReactElement {
             right: '56px',
             top: 'calc(50% + 28px)',
             transform: 'translateY(-50%)',
-            width: 'clamp(400px, 33vw, 500px)',
             aspectRatio: '730 / 759',
           }}
         >
@@ -63,9 +62,8 @@ export function TelecomHero(): React.ReactElement {
 
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 select-none"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-16 select-none md:h-[200px]"
         style={{
-          height: '200px',
           background:
             'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.45) 55%, rgba(255,255,255,0.92) 88%, #ffffff 100%)',
         }}
@@ -78,7 +76,7 @@ export function TelecomHero(): React.ReactElement {
           paddingBottom: 'clamp(56px, 6vw, 96px)',
         }}
       >
-        <div className="relative flex max-w-[700px] flex-col items-center text-center md:items-start md:text-left xl:max-w-[clamp(580px,48vw,670px)]">
+        <div className="relative flex max-w-[700px] flex-col items-center text-center md:items-start md:text-left">
           <HeroReveal y={50} duration={1.0} lcp>
             <h1
               className="text-white"
@@ -88,11 +86,16 @@ export function TelecomHero(): React.ReactElement {
                 fontWeight: 600,
                 letterSpacing: 'var(--text-hero-product-ls, -0.04em)',
                 lineHeight: 'var(--text-hero-lh, 1.05)',
+                // In em so the break points hold at every font size: 9.5em sits
+                // between the widest line and the width at which "Run" would wrap.
+                maxWidth: '9.5em',
                 marginBottom: 'clamp(24px, 2.5vw, 36px)',
               }}
             >
               Telecom Networks Run on Software.{' '}
-              <span className="cs-text-gradient-impact">Security Must Keep Up.</span>
+              <span className="cs-text-gradient-impact" style={{ fontSize: '0.9em', fontWeight: 400 }}>
+                Security Must Keep Up.
+              </span>
             </h1>
           </HeroReveal>
 

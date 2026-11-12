@@ -19,7 +19,8 @@ import { H2_STYLE } from './type';
  * Below lg the rail is dropped and the four stack two-up: a backbone that
  * wraps onto two lines reads as two networks.
  *
- * Copy is the brief's, verbatim.
+ * Copy is the brief's, except the Network Functions line, where "telecom" is
+ * dropped so the text sets on two lines like the other three.
  */
 
 interface Surface {
@@ -42,7 +43,7 @@ const SURFACES: readonly [Surface, Surface, Surface, Surface] = [
     icon: '/images/telecom/icon-network-functions.webp',
     iconAlt: '3D cluster of stacked violet server modules',
     title: 'Network Functions',
-    body: 'Modern network services operate across distributed telecom environments.',
+    body: 'Modern network services operate across distributed environments.',
     pingDelay: '1.9s',
   },
   {

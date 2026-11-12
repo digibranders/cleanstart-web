@@ -31,7 +31,7 @@ const PILLARS: readonly [Pillar, Pillar, Pillar, Pillar] = [
     icon: '/images/compare/icon-signed-artifact.webp',
     iconAlt: '3D icon of a signed and sealed artifact',
     title: 'Integrity',
-    body: 'SLSA Level 3 provenance, cryptographic signing and reproducible builds.',
+    body: 'SLSA Level 3 provenance, cryptographic signing and reproducible builds across environments.',
   },
   {
     icon: '/images/compare/icon-sbom.webp',
