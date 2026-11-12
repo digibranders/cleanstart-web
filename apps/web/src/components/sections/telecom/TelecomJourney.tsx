@@ -189,7 +189,7 @@ export function TelecomJourney(): React.ReactElement {
         </Reveal>
 
         <div
-          className="relative mx-auto max-w-[1180px] overflow-hidden"
+          className="relative mx-auto max-w-[1180px]"
           style={{
             marginTop: 'clamp(40px, 4.4vw, 64px)',
             borderRadius: '32px',
@@ -200,26 +200,32 @@ export function TelecomJourney(): React.ReactElement {
           }}
         >
           {/* Dot field, fading out at the edges, and the destination's glow
-              bleeding in from the Operate end. */}
+              bleeding in from the Operate end. Only this layer clips: the
+              stage itself must not, or the tiles dropping in from above the
+              frame get cut off at its top edge. */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{
-              backgroundImage: 'radial-gradient(rgba(124,79,240,0.16) 1px, transparent 1.4px)',
-              backgroundSize: '20px 20px',
-              maskImage: 'radial-gradient(ellipse 70% 75% at 50% 45%, #000 30%, transparent 100%)',
-              WebkitMaskImage:
-                'radial-gradient(ellipse 70% 75% at 50% 45%, #000 30%, transparent 100%)',
-            }}
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -right-[10%] top-[-20%] hidden aspect-square w-[46%] rounded-full lg:block"
-            style={{
-              background:
-                'radial-gradient(closest-side, rgba(124,79,240,0.16) 0%, rgba(124,79,240,0) 100%)',
-            }}
-          />
+            className="pointer-events-none absolute inset-0 overflow-hidden"
+            style={{ borderRadius: 'inherit' }}
+          >
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: 'radial-gradient(rgba(124,79,240,0.16) 1px, transparent 1.4px)',
+                backgroundSize: '20px 20px',
+                maskImage: 'radial-gradient(ellipse 70% 75% at 50% 45%, #000 30%, transparent 100%)',
+                WebkitMaskImage:
+                  'radial-gradient(ellipse 70% 75% at 50% 45%, #000 30%, transparent 100%)',
+              }}
+            />
+            <div
+              className="absolute -right-[10%] top-[-20%] hidden aspect-square w-[46%] rounded-full lg:block"
+              style={{
+                background:
+                  'radial-gradient(closest-side, rgba(124,79,240,0.16) 0%, rgba(124,79,240,0) 100%)',
+              }}
+            />
+          </div>
 
           <RevealStagger
             gap={0.12}

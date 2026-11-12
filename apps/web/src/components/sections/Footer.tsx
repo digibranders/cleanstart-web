@@ -35,6 +35,9 @@ const COL_SOLUTIONS: FooterLink[] = [
   { label: "Verifiable SBOMs", href: "/software-bill-materials" },
   { label: "For Developers", href: "/for-developers" },
   { label: "For CISO", href: "/for-ciso" },
+  { label: "Financial Services", href: "/industries/financial-services" },
+  { label: "Software", href: "/industries/software-applications" },
+  { label: "Telecom", href: "/industries/telecom" },
 ];
 const COL_COMPANY: FooterLink[] = [
   { label: "About Us", href: "/about-us" },

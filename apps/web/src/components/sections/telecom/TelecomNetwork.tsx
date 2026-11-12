@@ -19,7 +19,8 @@ import { H2_STYLE } from './type';
  * Below lg the rail is dropped and the four stack two-up: a backbone that
  * wraps onto two lines reads as two networks.
  *
- * Copy is the brief's, verbatim.
+ * Copy is the brief's, except the Network Functions line, where "telecom" is
+ * dropped so the text sets on two lines like the other three.
  */
 
 interface Surface {
@@ -42,7 +43,7 @@ const SURFACES: readonly [Surface, Surface, Surface, Surface] = [
     icon: '/images/telecom/icon-network-functions.webp',
     iconAlt: '3D cluster of stacked violet server modules',
     title: 'Network Functions',
-    body: 'Modern network services operate across distributed telecom environments.',
+    body: 'Modern network services operate across distributed environments.',
     pingDelay: '1.9s',
   },
   {
@@ -124,7 +125,7 @@ export function TelecomNetwork(): React.ReactElement {
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
             style={{ columnGap: 'clamp(20px, 2.4vw, 36px)', rowGap: 'clamp(40px, 5vw, 56px)' }}
           >
-            {SURFACES.map((s) => (
+            {SURFACES.map((s, i) => (
               <RevealItem key={s.title} className="flex flex-col items-center text-center">
                 <div
                   className="group relative flex w-full items-end justify-center"
@@ -145,6 +146,7 @@ export function TelecomNetwork(): React.ReactElement {
                     width={240}
                     height={240}
                     sizes="140px"
+                    priority={i === 0}
                     className="relative object-contain transition-transform duration-300 group-hover:-translate-y-1"
                     style={{
                       width: 'auto',
