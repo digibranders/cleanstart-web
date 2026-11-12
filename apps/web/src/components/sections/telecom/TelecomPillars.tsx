@@ -1,5 +1,6 @@
 import type React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Container, Section } from '@/components/layout';
 import { Reveal } from '@/components/ui/Reveal';
 import { H2_STYLE } from './type';
@@ -10,14 +11,26 @@ import { H2_STYLE } from './type';
  * SaasDelivery / FinanceRequirements family). One sentence per pillar because
  * that is all the brief gives; every ribbon entry appears in that copy.
  *
- * Copy is the brief's, verbatim.
+ * Copy is the brief's, verbatim. A few words link to the page that covers
+ * them, so the page has contextual internal links beyond the product cards.
  */
 
 interface Pillar {
   icon: string;
   iconAlt: string;
   title: string;
-  body: string;
+  body: React.ReactNode;
+}
+
+function BodyLink({ href, children }: { href: string; children: React.ReactNode }): React.ReactElement {
+  return (
+    <Link
+      href={href}
+      className="underline decoration-[rgba(124,79,240,0.4)] underline-offset-[3px] transition-colors hover:text-[#6D3FE0] hover:decoration-[#6D3FE0]"
+    >
+      {children}
+    </Link>
+  );
 }
 
 const PILLARS: readonly [Pillar, Pillar, Pillar, Pillar] = [
@@ -25,25 +38,39 @@ const PILLARS: readonly [Pillar, Pillar, Pillar, Pillar] = [
     icon: '/images/attack-surface-reduction/approach-icon-secure.webp',
     iconAlt: '3D icon of a security padlock',
     title: 'Security',
-    body: 'Hardened foundations, near-zero known CVEs and reduced attack surface.',
+    body: (
+      <>
+        Hardened foundations, <BodyLink href="/vulnerability-remediation">near-zero known CVEs</BodyLink> and{' '}
+        <BodyLink href="/attack-surface-reduction">reduced attack surface</BodyLink>.
+      </>
+    ),
   },
   {
     icon: '/images/compare/icon-signed-artifact.webp',
     iconAlt: '3D icon of a signed and sealed artifact',
     title: 'Integrity',
-    body: 'SLSA Level 3 provenance, cryptographic signing and reproducible builds across environments.',
+    body: 'SLSA Level 3 provenance, cryptographic signing and reproducible builds.',
   },
   {
     icon: '/images/compare/icon-sbom.webp',
     iconAlt: '3D icon of a software bill of materials document',
     title: 'Transparency',
-    body: 'SBOMs, AI BOMs and visibility into software components and dependencies.',
+    body: (
+      <>
+        <BodyLink href="/software-bill-materials">SBOMs</BodyLink>, AI BOMs and visibility into software components
+        and dependencies.
+      </>
+    ),
   },
   {
     icon: '/images/compare/icon-fips.webp',
     iconAlt: '3D icon of a compliance shield',
     title: 'Compliance',
-    body: 'FIPS 140-3, CIS Benchmarks, DISA STIG and support for software assurance requirements.',
+    body: (
+      <>
+        <BodyLink href="/fips">FIPS 140-3</BodyLink>, CIS Benchmarks, DISA STIG and support for software assurance.
+      </>
+    ),
   },
 ];
 

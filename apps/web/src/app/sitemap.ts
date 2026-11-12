@@ -128,6 +128,7 @@ const STATIC_ROUTES: ReadonlyArray<{ path: string }> = [
   { path: '/impact-estimator' },
   { path: '/industries/financial-services' },
   { path: '/industries/software-applications' },
+  { path: '/industries/telecom' },
   // `/industries` itself has no page, so there is no hub URL to list.
   // `/knowledge-hub` is a redirect to the first article (no standalone listing) —
   // excluded here. The individual /knowledge-hub/<slug> articles are emitted below.

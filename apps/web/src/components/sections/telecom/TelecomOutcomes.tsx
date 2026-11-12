@@ -89,7 +89,7 @@ function OutcomeFigure({ Icon, line1, line2, body }: Outcome): React.ReactElemen
           lineHeight: 1.25,
         }}
       >
-        <span className="block">{line1}</span>
+        <span className="block">{line1}</span>{' '}
         <span className="block">{line2}</span>
       </h3>
       <p
@@ -160,10 +160,9 @@ export function TelecomOutcomes(): React.ReactElement {
           </h2>
         </Reveal>
 
-        <RevealStagger
-          className="hidden lg:flex lg:items-center lg:justify-between"
-          style={{ gap: 'clamp(16px, 2vw, 32px)' }}
-        >
+        {/* One list at every width: separate desktop and mobile branches put
+            each heading in the DOM twice. */}
+        <RevealStagger className="grid grid-cols-1 gap-x-[clamp(24px,4vw,56px)] gap-y-[clamp(32px,4.5vw,48px)] sm:grid-cols-2 lg:flex lg:items-center lg:justify-between lg:gap-[clamp(16px,2vw,32px)]">
           {OUTCOMES.map((o, i) => (
             <Fragment key={o.line1 + o.line2}>
               <RevealItem className="min-w-0 flex-1">
@@ -171,17 +170,6 @@ export function TelecomOutcomes(): React.ReactElement {
               </RevealItem>
               {i < OUTCOMES.length - 1 ? <GlowBar /> : null}
             </Fragment>
-          ))}
-        </RevealStagger>
-
-        <RevealStagger
-          className="grid grid-cols-1 sm:grid-cols-2 lg:hidden"
-          style={{ columnGap: 'clamp(24px, 4vw, 56px)', rowGap: 'clamp(32px, 4.5vw, 48px)' }}
-        >
-          {OUTCOMES.map((o) => (
-            <RevealItem key={o.line1 + o.line2}>
-              <OutcomeFigure {...o} />
-            </RevealItem>
           ))}
         </RevealStagger>
       </div>

@@ -21,14 +21,12 @@ import { getPageGraph } from '@/lib/seo/compose-page';
  * Third page under /industries, built from the client's Telecom brief. The H1
  * is the brief's slogan and carries "Telecom" but not the head term, so the
  * title follows the siblings' shape ("Container Security for ...") and holds
- * the keyword for the SERP. Title and description are ours, not the SEO team's:
- * get them signed off before launch.
+ * the keyword for the SERP.
  *
- * LIVE BUT DRAFT FOR SEARCH (released 2026-11-06): reachable at its URL, but
- * noindex, absent from the sitemap's STATIC_ROUTES and from the
- * Solutions > By industry nav. The pageRegistry row exists already (it gates
- * CI). To launch: drop `noindex`, add the path to STATIC_ROUTES and add the
- * nav item in nav-config.ts.
+ * LIVE and indexable (launched 2026-11-12): listed in the sitemap's
+ * STATIC_ROUTES and linked from Solutions > By industry and the footer. Its
+ * pageRegistry row supplies the WebPage JSON-LD node, so the row must exist in
+ * prod (seed-page-registry.ts) or that node drops out of the graph.
  *
  * Breadcrumb is Home > Telecom with no Industries crumb, because /industries
  * has no page (see financial-services/page.tsx).
@@ -43,7 +41,6 @@ export const metadata = buildPageMetadata({
     'Secure cloud-native telecom networks with hardened container images, verified open source libraries, SBOMs, SLSA Level 3 provenance and FIPS 140-3 support.',
   path: '/industries/telecom',
   eyebrow: 'Solutions',
-  noindex: true,
 });
 
 export const revalidate = 21600; // 6h ISR fallback; on-demand publish revalidation keeps this fresh

@@ -125,7 +125,7 @@ export function TelecomNetwork(): React.ReactElement {
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
             style={{ columnGap: 'clamp(20px, 2.4vw, 36px)', rowGap: 'clamp(40px, 5vw, 56px)' }}
           >
-            {SURFACES.map((s) => (
+            {SURFACES.map((s, i) => (
               <RevealItem key={s.title} className="flex flex-col items-center text-center">
                 <div
                   className="group relative flex w-full items-end justify-center"
@@ -146,6 +146,7 @@ export function TelecomNetwork(): React.ReactElement {
                     width={240}
                     height={240}
                     sizes="140px"
+                    priority={i === 0}
                     className="relative object-contain transition-transform duration-300 group-hover:-translate-y-1"
                     style={{
                       width: 'auto',
