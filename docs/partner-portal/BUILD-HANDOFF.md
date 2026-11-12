@@ -4,33 +4,62 @@ For the coding session that builds the real partner portal (`apps/portal`), incl
 
 ## Where things stand (2026-11-12)
 
-- Two plans are written and committed on `development` (`2b56b861`): `docs/superpowers/plans/2026-11-11-partner-portal-master-plan.md` (the whole app, task level) and `docs/superpowers/plans/2026-11-11-partner-portal-hubspot-integration.md` (HubSpot, code level).
+- The master plan (`docs/superpowers/plans/2026-11-11-partner-portal-master-plan.md`, task level) and the HubSpot plan (`2026-11-11-partner-portal-hubspot-integration.md`, code level) were written first (`2b56b861`). On 12 November seven more documents were written against a shared contracts file and reviewed together on 13 November (`docs/partner-portal/PLAN-REVIEW.md`): `2026-11-12-partner-portal-00-contracts.md` (every shared interface; it wins over the master plan wherever they differ), then the area plans `01-foundations` (Wave 0, part 1), `02-auth-and-email` (Wave 0, part 2), `03-identity` (track P), `04-registrations` (track R), `05-documents` (track D) and `06-admin-infra-hardening` (track A and Wave 2). The "Plans" table below maps every task id to its plan file.
 - `apps/portal` is a clickable mock (commit `58747992`, not deployed). No backend, no database, no auth. The build converts it screen by screen into the real app.
-- Nothing from the plans has been built. The code samples in the HubSpot plan have not been compiled; treat a sample that does not compile against the real repo as a `blocked` case (see "When to stop").
+- Nothing from the plans has been built. The code in the plans was compiled and tested in scratch environments, not in the real repo; treat a sample that does not compile against the real repo as a `blocked` case (see "When to stop").
 - Decisions D1 to D10 are settled (master plan section 2). Auth library is Better Auth, with Auth.js v5 as the fallback if the Task 0.7 spike fails.
 
 ## Reading order
 
 1. This file.
-2. Master plan sections 1 to 5 (architecture, decisions, layout, data model, permissions), then the section for the task in hand.
-3. HubSpot plan sections 1 to 3 and the task in hand (HubSpot tasks only).
-4. `CLAUDE.md` at the repo root (git rules, conventions, no em-dashes or en-dashes anywhere).
-5. The last 20 lines of the progress log (see "Progress log").
+2. The contracts, `docs/superpowers/plans/2026-11-12-partner-portal-00-contracts.md`: sections B to F and the registry entries (H) your task touches, plus K.3 (which task may edit which shared file). It is the authority for names, signatures, columns and paths; the area plans implement it.
+3. The plan file that holds your task (the "Plans" table), the section for the task, and the plan's own preamble ("How to work this plan", conventions, prerequisites). The plan's last two sections, "Contract change requests" and "Known unknowns", carry the integration review's decision on each request; read them before a step that touches the same area.
+4. Master plan sections 1 to 5 (architecture, decisions, layout, data model, permissions) for background only: where it differs from the contracts, the contracts win.
+5. HubSpot plan sections 1 to 3 and the task in hand (H tasks only).
+6. `CLAUDE.md` at the repo root (git rules, conventions, no em-dashes or en-dashes anywhere).
+7. The last 20 lines of the progress log (see "Progress log").
 
 ## Task ids
 
-Both plans number tasks 4.x. In every log line, commit and brief, prefix the id: `M` for the master plan (`M1.2`, `M4.3`) and `H` for the HubSpot plan (`H4.4`). Master plan Task 2.5 is satisfied by the whole `H` track.
+The master plan and the HubSpot plan both number tasks 4.x. In every log line, commit and brief, prefix the id: `M` for the master plan (`M1.2`, `M4.3`) and `H` for the HubSpot plan (`H4.4`). Master plan Task 2.5 is satisfied by the whole `H` track. The area plans use the master plan's ids (plus `M1.2b`, `M1.3b`, `M1.7b`, `M0.5a` to `M0.5d`, `M1.1a` to `M1.1g`, `M0.7-F`, `E2E` and `V`, which are sub-tasks or additions).
+
+## Plans
+
+Every task id, the plan file that holds its steps (under `docs/superpowers/plans/`) and the heading to find. The plan file is the task's brief: the steps, the code, the tests and the commands are there. Master tasks M0.1, M5.6, M5.7 and M5.8 are not planned (a person does them, see the overnight table).
+
+| Task id | Plan file | Heading |
+|---|---|---|
+| M0.1 (stub only) | `2026-11-12-partner-portal-01-foundations.md` | Task M0.2, Step 7 |
+| M0.2 (W0-a) | `2026-11-12-partner-portal-01-foundations.md` | Task M0.2 |
+| M0.3 (W0-b) | `2026-11-12-partner-portal-01-foundations.md` | Task M0.3 |
+| M0.4 (W0-c) | `2026-11-12-partner-portal-01-foundations.md` | Task M0.4 |
+| M1.2 (W0-d) | `2026-11-12-partner-portal-01-foundations.md` | Task M1.2 |
+| M0.7 (W0-e), fallback M0.7-F | `2026-11-12-partner-portal-02-auth-and-email.md` | Task M0.7, Task M0.7-F |
+| M1.1a to M1.1g (W0-f) | `2026-11-12-partner-portal-02-auth-and-email.md` | Tasks M1.1a to M1.1g |
+| M1.2b (W0-fb) | `2026-11-12-partner-portal-01-foundations.md` | Task M1.2b |
+| M0.5a to M0.5d (W0-g) | `2026-11-12-partner-portal-02-auth-and-email.md` | Tasks M0.5a to M0.5d |
+| M1.3, M1.3b, M1.4, M1.5, M1.6, M1.8, M1.7, M1.7b, M4.1 (track P) | `2026-11-12-partner-portal-03-identity.md` | the task of the same id |
+| M2.1, M2.3, M2.2, M2.4, M2.6, M4.4 (track R) | `2026-11-12-partner-portal-04-registrations.md` | the task of the same id |
+| M3.1, M3.2, M3.3 (track D) | `2026-11-12-partner-portal-05-documents.md` | the task of the same id |
+| M0.6, M4.3, M4.2 (track A) | `2026-11-12-partner-portal-06-admin-infra-hardening.md` | Part 1, the task of the same id |
+| M5.4 (W2-a, with its Step 0), E2E (W2-b), M5.1 (W2-c), M5.2 (W2-d), M5.3 (W2-e), M5.5 and M5.9 (W2-f), V (W2-g, W2-h) | `2026-11-12-partner-portal-06-admin-infra-hardening.md` | Part 2, the task of the same id |
+| H4.1 to H4.10 (track H; master task 2.5) | `2026-11-11-partner-portal-hubspot-integration.md` | Task 4.1 to Task 4.10 (section 4) |
+
+Before the run, the contracts, the six area plans, the master plan, the HubSpot plan and this file must be committed on `development` (a person does that; the plans are untracked today), because the worktree is cut from `origin/development` and `scripts/contract-block.sh` copies code blocks out of the contracts file.
 
 ## Amendments to the plans
 
 These override the plans where they differ.
 
-1. **Dependencies are installed once, in `W0-a`.** The agent reads the plan code, lists every package it imports (expected: `drizzle-orm`, `drizzle-kit`, `pg`, `zod`, `better-auth`, `@hubspot/api-client`, `node-cron`, `vitest`, `@sentry/nextjs`, `@aws-sdk/client-s3`, `@aws-sdk/s3-request-presigner`, `@playwright/test`), and adds them all, so later tracks never edit `package.json` and `pnpm-lock.yaml` cannot conflict. A later task that needs another package is `blocked`; the orchestrator adds it.
+1. **Dependencies are installed once, in `W0-a`.** Plan 01 Task M0.2 Step 4 is the authoritative list (`drizzle-orm`, `drizzle-kit`, `pg`, `zod`, `better-auth` pinned, `@hubspot/api-client`, `node-cron`, `vitest`, `@sentry/nextjs`, `@aws-sdk/client-s3`, `@aws-sdk/s3-request-presigner`, `@playwright/test`, `tsx`, and the workspace package `@cleanstart/forms`), so later tracks never edit `package.json` and `pnpm-lock.yaml` cannot conflict. A Wave 1 task that needs another package is `blocked`; the orchestrator adds it. Wave 2 (E2E, M5.1, M5.4) edits `package.json` itself, serially (contracts K.3).
 2. **Test database name comes from the environment** (`PORTAL_TEST_DATABASE_URL`), not a hard-coded `cleanstart_portal_test`, so every worktree runs tests against its own database. `testDb` and `testPool` in `src/db/test-helpers.ts` read it.
 3. **Task M0.3 also delivers `scripts/db-create.sh <name>`**: idempotently creates the `portal_owner` and `portal_app` roles (cluster-wide, so a `DO` block that checks `pg_roles`), a database owned by `portal_owner`, `REVOKE ALL ... FROM PUBLIC`, and grants for `portal_app`. Used for every local and test database.
 4. **Task M0.3 migrations include `CREATE EXTENSION IF NOT EXISTS pg_trgm`** and trigram indexes for the Task M4.3 search (registrations, partners, documents, people). Only Wave 0 writes migrations. A later task that needs a schema change is `blocked`; the orchestrator batches schema changes into one numbered migration.
 5. **Dev port.** The mock's script uses 3004. In worktrees run `next dev --port <n>` with the track's own port (table below). Never kill a process to free a port.
 6. **Pure functions that tests pin (mappers, expiry maths) take the clock as an argument** instead of calling `Date.now()` inside, so tests need no fake timers.
+7. **The contracts file is copied mechanically.** `scripts/contract-block.sh` (created in M0.2) prints a code block of the contracts, and Wave 0 creates its files with it. Where a plan and the contracts differ, the contracts win; where a plan needs a contract changed, it says so in its "Contract change requests" and does not code against the change (the integration review has already decided every request that exists today).
+8. **Schema needs, once, in Wave 0.** `drizzle/0000_init.sql` already includes everything the plans need (including the three extra `auth_two_factor` columns); there is no `0001` migration. A later schema need is `blocked`, and the orchestrator writes `0001` and edits the contracts' C.1 and `rls.sql` list.
+9. **Shared files** (`shell.tsx`, layouts, `routes.ts`, `portal.css`, `components/ui/**`, `db/schema.ts`, `env.ts`, `package.json`, `proxy.ts`, `next.config.ts`) have one editing task per phase, listed in contracts K.3. Wave 1 tracks never edit them; planned wiring that waits for Wave 2 (notifications and search in `shell.tsx`) is a `note` line, not a `blocked` line.
 
 ## What an overnight run can and cannot finish
 
@@ -45,11 +74,12 @@ These override the plans where they differ.
 | Legal agreement text | `agreement_version` is the placeholder `draft-0`, shown on the invite screen as is. | Legal text and the real version label. |
 | Deal rules still open | Defaults from the proposal, all in `deal-rules.ts`. | Confirm. |
 | M5.5 backups | Edit `infra/scripts/backup.sh` and run `bash -n` on it. Log "heartbeat not verified". | Verify the heartbeat and run the restore drill. |
+| Postgres `max_connections` on the droplet (20 today, needs about 50), `portal_app` `CONNECTION LIMIT` 20 | Write the commands in `docs/operations/PARTNER-PORTAL.md`; never `ssh`. | The operator approves and runs the change; it restarts the production database. |
 | M5.6, M5.7, M5.8 | Do not start. | Pilot, production provisioning, cutover. |
 
 ## Ground rules for an unattended run
 
-- **Allowed paths only:** `apps/portal/**`, `docs/partner-portal/**`, `docs/operations/PARTNER-PORTAL.md`, `docs/superpowers/plans/2026-11-11-partner-portal-*.md` (tick steps, and record the M0.7 result in the Decisions table), `.github/workflows/portal.yml`, `.github/workflows/deploy-portal.yml`, `infra/docker-compose.yml`, `infra/scripts/backup.sh`, `pnpm-lock.yaml` (orchestrator only). Anything under `apps/cms`, `apps/web` or `packages/` is `blocked`.
+- **Allowed paths only:** `apps/portal/**`, `docs/partner-portal/**`, `docs/operations/PARTNER-PORTAL.md`, `docs/superpowers/plans/2026-1*-partner-portal-*.md` (tick steps, and record the M0.7 result in the master plan's Decisions table), `docs/operations/INCIDENTS.md` (M5.9, append only), `.github/workflows/portal.yml`, `.github/workflows/deploy-portal.yml`, `infra/docker-compose.yml`, `infra/scripts/backup.sh`, `infra/scripts/restore-portal-drill.sh` (M5.5), `pnpm-lock.yaml` (orchestrator only). Anything under `apps/cms`, `apps/web` or `packages/` is `blocked`.
 - **Never:** `git push`, open a PR, `ssh` to the droplet, use a production token or the CMS `.env` secrets, call HubSpot or Brevo or R2 for real, `git add -A` or `git add .`, `--no-verify`, commit `.env*`, drop a database other than the track's own, kill a process on a port, edit `apps/cms/payload-types.ts`.
 - **Gates are the definition of done.** A task without a green Gate A and a Gate B record is not `done`.
 - **No em-dashes or en-dashes** in code, comments, copy, commit messages or docs.
@@ -57,6 +87,8 @@ These override the plans where they differ.
 ## Setup
 
 The build lives in its own git worktree on the short-lived branch `feat/portal-build`, so the shared checkout (where other sessions work) is never touched. This follows the Studio precedent and needs a short pointer in `CLAUDE.md` and `AGENTS.md` (same text in both): "Portal build: read `docs/partner-portal/BUILD-HANDOFF.md` first". `CLAUDE.md` bans feature branches for routine work; the product owner approved this one by asking for the overnight build. Delete the branch after the merge to `development`.
+
+Before the first command below, a person commits the contracts, the plans and this file to `development` and pushes (the run itself never pushes): the worktree is cut from `origin/development`, and Wave 0 reads the contracts file from it.
 
 Integration worktree (orchestrator):
 
@@ -91,12 +123,13 @@ A **track** is an ordered list of tasks worked by one agent at a time. Tracks ru
 
 | Step | Task | Notes |
 |---|---|---|
-| W0-a | M0.2, plus the dependency set (amendment 1) | Tag `portal-mock-v1` on `58747992` first. |
-| W0-b | M0.3 | Schema, RLS, roles, migrations, helpers, `seed-dev.ts`, `db-create.sh`, trigram indexes. |
-| W0-c | M0.4 | `env.ts`, logging, Sentry config. |
-| W0-d | M1.2 | Tenant isolation layer and the isolation matrix. Everything after this adds its repo functions to the matrix. |
-| W0-e | M0.7 | Auth spike, then record the result in the master plan Decisions table. |
-| W0-f | M1.1 | Sessions, guards, `getViewer()`, `policies.ts`, sign in. |
+| W0-a | M0.2, plus the dependency set (amendment 1) | Tag `portal-mock-v1` on `58747992` first. Also `next.config.ts` (standalone output) and `scripts/contract-block.sh`. |
+| W0-b | M0.3 | `env.ts` (moved here from W0-c: `client.ts` imports it), schema (including the three extra `auth_two_factor` columns), RLS, roles, migrations, helpers, `seed-dev.ts`, `db-create.sh`, trigram indexes. |
+| W0-c | M0.4 | `.env.example`, logging, Sentry config, the job stubs and the `announce.ts` stub. |
+| W0-d | M1.2 | Tenant isolation layer, `rate-limit.ts` (moved here from W0-c: it throws `RateLimitError`), and the isolation matrix. Everything after this adds its repo functions to the matrix. |
+| W0-e | M0.7 | Auth spike, then record the result in the master plan Decisions table. Step 6b adds passwords to the W0-b helpers and the seed. |
+| W0-f | M1.1 | Sessions, guards, `getViewer()`, `policies.ts`, sign in, `proxy.ts`. |
+| W0-fb | M1.2b | The server action runner `run.ts` (it needs `requireActionViewer` from W0-f). |
 | W0-g | M0.5 | Email module (small, own folder). |
 
 **Exit:** all Gate A commands green on `feat/portal-build`, isolation matrix passing, tag `portal-w0`. If W0 cannot finish, stop the whole run and write the report: nothing in Wave 1 can proceed safely.
@@ -105,28 +138,56 @@ A **track** is an ordered list of tasks worked by one agent at a time. Tracks ru
 
 | Track | Tasks in order | Starts when | Owns (no other track edits these) |
 |---|---|---|---|
-| **H** HubSpot | H4.1, H4.2, H4.3, H4.4, H4.5, H4.6, H4.7, H4.8, H4.9, H4.10 | `portal-w0` | `src/server/hubspot/**`, `src/server/jobs/**`, `scripts/*hubspot*`, `src/app/api/hubspot/**`, health panel |
-| **P** Identity | M1.3, M1.3b, M1.4, M1.5, M1.6, M1.7, M1.8, M4.1 | `portal-w0` | `Apply*`, `SignIn`, `AcceptInvite`, `PartnerWelcome`, `Team`, `Account`, `Company`, `AdminTeam`, `AdminPartners`, `components/partners/**`, `components/people/**`, `src/server/intake/**`, `repo/{applications,invites,team,account,staff}.ts` |
-| **D** Documents | M3.1, M3.2, M3.3 | `portal-w0` | `Documents`, `AdminDocuments`, `components/documents/**`, `src/server/files/**`, `repo/documents.ts` |
-| **A** Admin and infra | M0.6, M4.2, M4.3 | `portal-w0` | `AdminAudit`, `AuditDrawer`, search, `Dockerfile`, workflows, compose, `src/app/api/health/**` |
-| **R** Registrations | M2.1, M2.3, M2.2, M2.4, M2.6, M4.4 | `H4.2` merged for M2.1; `H4.4` merged before M2.2 and M2.4; start when D or A finishes (the 4 track cap) | `Deals`, `DealDetail`, `RegisterDeal`, `AdminApprovals`, `PartnerOverview`, `AdminReports`, `components/{deals,reports}/**`, `repo/{registrations,messages,notifications,overview,reports}.ts` |
+| **H** HubSpot | H4.1, H4.2, H4.7, H4.3, H4.4, H4.5, H4.6, H4.8, H4.9, H4.10 (H4.7 moved up: it needs only H4.2 and unblocks R) | `portal-w0` | `src/server/hubspot/**`, `src/server/jobs/{hubspot-outbox,hubspot-poll,reconcile,expiry}.ts`, `scripts/*hubspot*`, `scripts/import-partners*`, `src/app/api/hubspot/**`, `src/server/repo/integration-health*`, `docs/partner-portal/HUBSPOT-PROVISIONING.md` |
+| **P** Identity | M1.3, M1.3b, M1.4, M1.5, M1.6, M1.8, M1.7, M1.7b, M4.1 (M1.8 moved before M1.7: R needs `listManagerOptions`, and M1.8 depends only on M1.6) | `portal-w0` | `Apply*`, `SignIn` (the three request views, M1.6), `AcceptInvite`, `PartnerWelcome`, `Team`, `Account`, `Company`, `AdminTeam`, `AdminPartners`, `ResetPassword`, `components/partners/**`, `components/people/{PasswordCard,TwoStepCard,SessionsCard,InviteCard,AccessRequests,RequestAccessForm,RowAction,Seg,StaffInviteDrawer}`, `src/server/intake/**`, `src/server/jobs/intake.ts`, `repo/{applications,invites,team,account,staff,partners}.ts`, `actions/{apply,applications,invites,team,account,staff,partners}.ts` |
+| **D** Documents | M3.1, M3.2, M3.3 | `portal-w0` | `Documents`, `AdminDocuments`, `components/documents/**`, `src/server/files/**`, `repo/documents.ts`, `actions/documents.ts`, `src/server/jobs/document-purge.ts`, `src/app/api/files/**` |
+| **A** Admin and infra | M0.6, M4.3, M4.2 (M4.3 before M4.2: M4.2's health card steps 7 to 9 need H4.10, which merges late) | `portal-w0` | `AdminAudit`, `AuditDrawer`, `components/audit/**`, `components/shell/search-palette.tsx`, `repo/{audit,search}.ts`, `actions/{audit,search}.ts`, `src/lib/{audit-filters,audit-csv,search-pages}.ts`, `Dockerfile`, workflows, compose, `src/app/api/health/**` |
+| **R** Registrations | M2.1, M2.3, M2.2, M2.4, M2.6, M4.4 | M2.1 needs `H4.2` and `H4.7` merged, and P's `M1.5` and `M1.8` merged (see the dependency table); start when D or A finishes (the 4 track cap) | `Deals`, `DealDetail`, `RegisterDeal`, `AdminApprovals`, `PartnerOverview`, `AdminReports`, `components/{deals,reports}/**`, `components/shell/notifications-popover.tsx`, `repo/{registrations,messages,notifications,overview,reports}.ts`, `actions/{registrations,decisions,extension,notifications}.ts`, `src/server/registrations/**`, `src/server/jobs/expiry-reminders.ts` |
 
-M2.5 is the H track. R uses the `HubspotApi` interface and `FakeHubspot` from H4.2, and calls the outbox `enqueue` from H4.4; it never imports the real client.
+M2.5 is the H track. R reaches HubSpot only through `hubspotForRequest`, `lookupCustomer` and `conflictingDeals` (H4.7), the `HubspotApi` interface, `FakeHubspot` (H4.2) and the outbox `enqueue` (H4.4); it never imports `createHubspot` or the real client.
 
-Shared files that no track edits directly: `shell.tsx`, `routes.ts`, `portal.css`, `components/ui/**`, `src/db/schema.ts`, `src/env.ts`, `package.json`. A track that needs a change there writes a `blocked` line naming the file and the change, and carries on with a task that does not need it. The orchestrator makes the change on `feat/portal-build` and the track merges it in.
+Shared files that no track edits directly: `shell.tsx` and the two layouts, `routes.ts`, `portal.css`, `components/ui/**`, `src/db/schema.ts`, `src/env.ts`, `package.json`, `proxy.ts`, `next.config.ts`. Contracts K.3 names the one task per phase that edits each. A track that needs a change there writes a `blocked` line naming the file and the change, and carries on with a task that does not need it; a change that is already planned for Wave 2 (notifications and search in `shell.tsx`, W2-a step 0) is a `note` line. The orchestrator makes the change on `feat/portal-build` and the track merges it in.
+
+### Task dependencies across tracks (from the plans' imports and prerequisites)
+
+A task starts only when everything in its row is merged into `feat/portal-build` and the track has merged `feat/portal-build` into its own branch. There is no cycle: H needs only Wave 0, P needs H4.4 for its enqueue steps, R needs H, P and D, A needs H for one step.
+
+| Task | Needs merged first | Why |
+|---|---|---|
+| H4.2, H4.3 (H4.7 after H4.2), H4.1 | Wave 0 (`portal-w0`) | `HubspotApi`, mappers and `lookup.ts` build on the contracts only |
+| H4.4 | H4.2, H4.3 | `enqueue` and the drain use the types and `nextDelayMs` |
+| H4.5, H4.6 | H4.4 | handlers fill the outbox `Handlers` map |
+| H4.8 | H4.3, H4.4 | `decideInbound`, `enqueue`; calls the W0-c `announce.ts` stub, so it does not wait for R |
+| H4.9 | H4.8 | the webhook calls `triggerPoll` |
+| H4.10 | H4.4 | reads `hubspot_outbox` |
+| P M1.3, M1.3b, M1.4 | Wave 0 | M1.4 and M1.5 have steps marked "Requires H4.4" (`enqueue`); if H4.4 is not merged, log `blocked`, skip only those steps, and the orchestrator finishes them after the merge |
+| P M1.5, M1.6, M1.8 | M1.4, M1.5, M1.6 in order | invite core, invites repo |
+| P M1.7, M1.7b | M1.5 (partners repo) | company and account screens |
+| P M4.1 | M1.4, M1.5, M1.7; H4.4 for the `partner.upsert` enqueue | partners list and detail |
+| D M3.1, M3.2, M3.3 | Wave 0 (W0-g templates `buildDocumentMaterialRequest` and `buildNewDocumentNotice`, W0-fb `run.ts`) | |
+| A M0.6 | Wave 0 | needs `migrate.ts`, `db-create.sh`, `next.config.ts`, the `/api/health` exemption in `proxy.ts` |
+| A M4.3 | Wave 0 | no cross-track import |
+| A M4.2 | Wave 0; H4.10 for steps 7 to 9 | `integration-health.ts` |
+| R M2.1 | H4.2, H4.7, P M1.5, P M1.8 | `HubspotApi`, `lookupCustomer`, `hubspotForRequest`; `sendManagerMessageAction` (M1.5); `listManagerOptions` (M1.8) |
+| R M2.3 | M2.1 | thread and notifications; replaces the `announce.ts` stub |
+| R M2.2 | M2.1, M2.3, H4.4, H4.7 | `enqueue`; the HubSpot conflict hint |
+| R M2.4 | M2.2, H4.4, H4.8 | `registration.update_end`; the black box test of `expireRegistrations` |
+| R M2.6 | M2.4, D M3.2 | `listNewDocuments` |
+| R M4.4 | M2.3 | popover over the notifications repo |
+| W2-a to W2-h | every Wave 1 track merged (`portal-w1`) | serial |
 
 ### Wave 2: convergence (after every Wave 1 track is merged, serial)
 
 | Step | Task | Notes |
 |---|---|---|
-| W2-a | M5.4 | Remove the mock banner, tour, Driver.js, `slice.ts`, personas and seed slices. Keep `seed-dev.ts`. |
+| W2-a | M5.4 (Step 0 first) | Step 0 wires the shell and the two layouts: notifications (plan 04, Contract change request 5), then search (plan 06, CCR-3). Then remove the mock banner, tour, Driver.js, `slice.ts`, personas and seed slices. Keep `seed-dev.ts`. |
 | W2-b | E2E | Playwright `@portal` suite from master plan section 7, using `FakeHubspot`. |
 | W2-c | M5.1 | Security pass. |
 | W2-d | M5.2 | Accessibility pass. |
 | W2-e | M5.3 | Retention jobs (mirror the CMS purge jobs; reuse `jobs/lock.ts` and `schedule.ts`). |
 | W2-f | M5.5, M5.9 | Backup script edit, runbook `docs/operations/PARTNER-PORTAL.md`, incident template. |
 | W2-g | H section 6 | Run the HubSpot verification checklist and record each line. |
-| W2-h | Report | Write `docs/partner-portal/OVERNIGHT-REPORT.md`. |
+| W2-h | Report | Write `docs/partner-portal/OVERNIGHT-REPORT.md`, with the open decisions below and every `UNVERIFIED` and `PROVISIONAL` item. |
 
 A run may stop anywhere. Each wave boundary is a tag (`portal-w0`, `portal-w1`, `portal-w2`) so the morning review can start from the last good point.
 
@@ -144,12 +205,13 @@ The mock keeps state in `src/lib/slice.ts` and seed arrays in `src/data/*`. The 
 
 | Route | Component | Real data source | Task |
 |---|---|---|---|
-| `/sign-in` | `SignIn`, `people/{PasswordCard,TwoStepCard}` | auth, sessions | M1.1 |
+| `/sign-in` | `SignIn` | auth, sessions | M1.1g |
+| `/reset-password` | `ResetPassword` (new) | Better Auth reset endpoints | M1.7b |
 | `/apply`, `/apply/done` | `Apply`, `ApplyDone` | `applications` | M1.3 |
 | `/accept-invite` | `AcceptInvite`, `people/InviteCard` | `invites` | M1.5 |
 | `/partner/welcome` | `PartnerWelcome` | `users`, agreement | M1.5 |
 | `/partner/team` | `Team`, `people/*` | `users`, `invites`, `access_requests` | M1.6 |
-| `/partner/account` | `Account` | `users`, sessions | M1.7 |
+| `/partner/account` | `Account`, `people/{PasswordCard,TwoStepCard,SessionsCard}` | `users`, sessions, Better Auth | M1.7, M1.7b |
 | `/partner/company` | `Company` | `partners` | M1.7 |
 | `/admin/team` | `AdminTeam`, `StaffInviteDrawer` | `users`, `staff_scopes` | M1.8 |
 | `/admin/partners` | `AdminPartners`, `partners/*` | `partners`, `applications` | M1.4, M4.1 |
@@ -234,6 +296,18 @@ Append only, one shell append per line. Never open this file in an editor tool.
 printf '%s\n' "2026-11-12 23:40 IST | H4.2 | done | H | 1a2b3c4 | A ok, B ok | HubspotApi, RealHubspot, FakeHubspot" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
+That line is a sample (the time, sha and task are made up). The plans print similar lines with `$(date '+%Y-%m-%d %H:%M IST')`; use the real time.
+
+## Open decisions (for the product owner, not for an agent)
+
+Full reasoning is in `docs/partner-portal/PLAN-REVIEW.md`. None of these blocks Wave 0.
+
+1. **Second sign-in step: required or optional.** The build makes it optional per user (the proposal lists it as open). Recommendation: required for CleanStart staff, optional for partners, revisit after the pilot.
+2. **Postgres `max_connections` on the droplet (20 today).** The CMS pool takes 15 and the portal 14, so it must be raised to about 50 before launch. It restarts the production database; the operator approves and runs it (handover item 1.3). Nothing in the build touches it.
+3. **Next.js advisories.** `next@16.2.5` has critical and high advisories; M5.1 bumps the portal only. `apps/cms` and `apps/web` carry the same advisories and are outside this plan: someone should bump them.
+4. **`DATABASE_OWNER_URL` inside the app container.** The container migrates on start, so the owner credential (which bypasses row level security) is in its environment. A one-shot migration service removes that exposure (plan 06 CCR-5b). Recommendation: do it before real partner data goes in.
+5. **Product limits kept for v1.** No QR code in two-step enrolment (key and link only), no purge of declined access requests, videos download instead of streaming, no email for a partner-manager change, the agreement PDF is not served yet, `agreement_version` is `draft-0`. Each is cheap to add later.
+
 ## Morning report
 
 At the end (or at the hard stop time) the orchestrator writes `docs/partner-portal/OVERNIGHT-REPORT.md` on `feat/portal-build`: tasks done and their shas, tasks blocked and what each needs, every `UNVERIFIED` and `PROVISIONAL` item, the Gate B findings that were deferred, the last good tag, and the three commands to run the app locally. Nothing is pushed; the product owner reads the report, then decides on the push and the PR.
@@ -252,10 +326,10 @@ Paste this into a new session opened in the main checkout, with the hard stop ti
 ```text
 You are the orchestrator for the build of the real CleanStart partner portal (apps/portal) in the monorepo at /Users/a12345/Desktop/AI/cleanstart/cleanstart-website. The plans are written and approved; implement them without guessing.
 
-Start by reading docs/partner-portal/BUILD-HANDOFF.md and follow it exactly:
+Start by reading docs/partner-portal/BUILD-HANDOFF.md and follow it exactly (its "Plans" table says which plan file under docs/superpowers/plans/ holds each task; the contracts file 2026-11-12-partner-portal-00-contracts.md is the authority for shared names and signatures):
 1. Do the Setup: worktree .claude/worktrees/portal-build on branch feat/portal-build from origin/development; create the progress log in the main checkout with its header. Work only in worktrees. Never push, never ssh to the droplet, never use production credentials, never git add -A.
-2. Run Wave 0 in order, one agent at a time, each task through the loop in the handoff (failing test first, Gate A, an independent Gate B reviewer that did not write the code, commit by path, progress line). Tag portal-w0 when the exit criteria hold. If Wave 0 cannot finish, stop and write the report.
-3. Then run Wave 1 as parallel tracks H, P, D, A and R in their own worktrees, at most 4 at once, one subagent per task, never two subagents on the same files, merging each finished task into feat/portal-build yourself and running Gate A and the isolation matrix after every merge.
+2. Run Wave 0 in order (W0-a, W0-b, W0-c, W0-d, W0-e, W0-f, W0-fb, W0-g), one agent at a time, each task through the loop in the handoff (failing test first, Gate A, an independent Gate B reviewer that did not write the code, commit by path, progress line). Tag portal-w0 when the exit criteria hold. If Wave 0 cannot finish, stop and write the report.
+3. Then run Wave 1 as parallel tracks H, P, D, A and R in their own worktrees, at most 4 at once, in the task order and with the cross-track dependencies given in the handoff, one subagent per task, never two subagents on the same files, merging each finished task into feat/portal-build yourself and running Gate A and the isolation matrix after every merge.
 4. Then Wave 2, then write docs/partner-portal/OVERNIGHT-REPORT.md.
 5. A task that needs a person, a credential, the droplet, a shared file, a new dependency or a schema change is blocked: log it and move on. Do not invent values or behaviour. Keep the allowed paths rule. No em-dashes or en-dashes anywhere.
 
@@ -270,7 +344,7 @@ The orchestrator sends this, filled in, to each task agent:
 
 ```text
 Task <id> of the partner portal build. Worktree: <path>. Branch: <branch>. Database: <db> (test: <testdb>). Port: <port>.
-Read docs/partner-portal/BUILD-HANDOFF.md (ground rules, loop, stop rules), then <plan file> task <id> and the sections it cites, and the mock files for this screen from the screen table.
+Read docs/partner-portal/BUILD-HANDOFF.md (ground rules, loop, stop rules), then your plan file, <plan file under docs/superpowers/plans/, from the Plans table>: its preamble and Task <id> (its steps are your instructions), the contracts sections the task cites in docs/superpowers/plans/2026-11-12-partner-portal-00-contracts.md, and the mock files for this screen from the screen table.
 You own only these paths: <owned paths>. Do not edit any other file; if you need to, append a blocked line and stop that step.
 Write the failing test first, implement, and run Gate A until it passes. Append started and done lines to the progress log by absolute path with one printf. Commit by path as "feat(portal): <id> <summary>", with the plan steps ticked. Do not merge, push or create branches. Reply with: the commit sha, the Gate A result, anything blocked, and anything the reviewer should look at.
 ```
