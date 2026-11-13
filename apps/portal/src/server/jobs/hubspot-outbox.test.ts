@@ -35,6 +35,9 @@ describe('runHubspotOutbox', () => {
     mocks.createHubspot.mockReturnValue(new FakeHubspot());
     const partner = await makePartner(db, {});
     await enqueue(db, { op: 'partner.upsert', subjectId: partner.id, version: '1' });
+    // A new row is due from the database's now() (microseconds); the job compares it with the app clock (milliseconds,
+    // taken a moment later), so a drain in the same millisecond finds it not yet due. Make it due, as it is a tick later.
+    await db.update(hubspotOutbox).set({ nextAttemptAt: new Date(Date.now() - 60_000) });
     await runHubspotOutbox();
     expect((await db.select().from(hubspotOutbox))[0]!.status).toBe('done');
     expect((await db.select().from(partners))[0]!.hubspotCompanyId).toBeTruthy();
