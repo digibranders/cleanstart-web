@@ -3123,13 +3123,13 @@ printf '%s\n' "2026-11-13 00:00 IST | M0.4 | done | W0 | $(git rev-parse --short
 
 This task is what makes tenant isolation checkable: after it, a repo module that exports a function nobody registered in the matrix fails the build, and a partner can never read another partner's rows even through a repo bug, because row level security answers first. Everything after this adds its repo functions to the matrix.
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "2026-11-13 00:00 IST | M1.2 | started | W0 | - | - | errors, context, audit, notify, isolation matrix" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Write the failing errors test**
+- [x] **Step 2: Write the failing errors test**
 
 Create `apps/portal/src/server/errors.test.ts`:
 
@@ -3203,7 +3203,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/errors.test.ts
 
 Expected: FAIL, `Failed to load url ./errors`.
 
-- [ ] **Step 3: Create the error hierarchy**
+- [x] **Step 3: Create the error hierarchy**
 
 ```bash
 bash apps/portal/scripts/contract-block.sh "## E. Errors" 1 > apps/portal/src/server/errors.ts
@@ -3212,7 +3212,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/errors.test.ts
 
 Expected: PASS, `Tests  5 passed (5)`. (There is no `AppError` alias: CLAUDE.md names one, but the portal uses `PortalError`; contracts M.3 decision 4.)
 
-- [ ] **Step 4: Write the failing rate limit test**
+- [x] **Step 4: Write the failing rate limit test**
 
 Create `apps/portal/src/server/rate-limit.test.ts`:
 
@@ -3256,7 +3256,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/rate-limit.tes
 
 Expected: FAIL, `Failed to load url ./rate-limit`.
 
-- [ ] **Step 5: Create the rate limiter**
+- [x] **Step 5: Create the rate limiter**
 
 The contracts' signature is `rateLimit(key, rule): void`; the optional third argument is the clock, so the test needs no fake timers (handoff amendment 6). Create `apps/portal/src/server/rate-limit.ts`:
 
@@ -3306,7 +3306,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/rate-limit.tes
 
 Expected: PASS, `Tests  3 passed (3)`.
 
-- [ ] **Step 6: Write the failing tests for the repository context and the action result**
+- [x] **Step 6: Write the failing tests for the repository context and the action result**
 
 Create `apps/portal/src/server/repo/context.test.ts`:
 
@@ -3391,7 +3391,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/context.t
 
 Expected: FAIL, `Failed to load url ./context` and `Failed to load url ./result`.
 
-- [ ] **Step 7: Create the isolation registry types, `seedTwoTenants`, the context and the result helpers**
+- [x] **Step 7: Create the isolation registry types, `seedTwoTenants`, the context and the result helpers**
 
 The registry file is types and one identity function, copied from the contracts:
 
@@ -3495,7 +3495,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/context.t
 
 Expected: PASS, `Test Files  2 passed (2)`, `Tests  7 passed (7)`. The context test proves the three settings are transaction local, that a pooled connection carries nothing into the next request (`app_kind()` is `none` outside a transaction on the request pool), and that a thrown callback rolls everything back. This is contracts M.1 item 1 (`set_config` in a transaction); record it at the end of the task.
 
-- [ ] **Step 8: Write the failing audit test, then create `record.ts`**
+- [x] **Step 8: Write the failing audit test, then create `record.ts`**
 
 Create `apps/portal/src/server/audit/record.test.ts`:
 
@@ -3588,7 +3588,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/audit/record.test.ts
 
 Expected: PASS, `Tests  4 passed (4)`. The partner case matters: a partner transaction inserts an audit row even though the partner cannot read `audit_log` (insert is allowed for every identity, select is staff only), which is why `recordAudit` never uses `.returning()`.
 
-- [ ] **Step 9: Write the failing notification test, then create `notify.ts`**
+- [x] **Step 9: Write the failing notification test, then create `notify.ts`**
 
 Create `apps/portal/src/server/notify.test.ts`:
 
@@ -3653,7 +3653,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/notify.test.ts
 
 Expected: PASS, `Tests  3 passed (3)`.
 
-- [ ] **Step 10: Write the import rules test and prove it bites**
+- [x] **Step 10: Write the import rules test and prove it bites**
 
 The rule (contracts F.1): only `src/server/repo/context.ts` may import `appDb` from `@/db/client`, and nothing under `src/server/repo/**` or `src/server/actions/**` may import `db`, `systemDb` or `pool` as a value. Test files are exempt (the context test needs `appDb` to prove that identities do not leak). Create `apps/portal/src/server/repo/imports.test.ts`:
 
@@ -3734,7 +3734,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/repo/imports.test.ts
 
 Expected: PASS again.
 
-- [ ] **Step 11: Write the isolation matrix test (it fails until `seedTwoTenants` exists, which Step 7 did; so first prove it fails for the right reason)**
+- [x] **Step 11: Write the isolation matrix test (it fails until `seedTwoTenants` exists, which Step 7 did; so first prove it fails for the right reason)**
 
 This is the contracts' F.6 test with three edits: it imports `sql` from `drizzle-orm`; the repo modules are loaded by absolute path with `@vite-ignore` (Vite warns about a variable import inside the file's own directory); and it has a first test that seeds two tenants and asserts, through `withViewer`, that every partner scoped table shows each partner only its own rows, so the file has a real test even before the first repo module exists. Create `apps/portal/src/server/repo/isolation.test.ts`:
 
@@ -3833,7 +3833,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/isolation
 
 Expected: PASS, `Tests  1 passed (1)`: `seeds two tenants that cannot see each other through withViewer`. (The two per-module tests are generated per repo file; there are none yet.)
 
-- [ ] **Step 12: Prove the matrix catches a missing registration and a leak**
+- [x] **Step 12: Prove the matrix catches a missing registration and a leak**
 
 Create a throwaway repo module that registers its one function correctly:
 
@@ -3886,7 +3886,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/repo/isolation.test.
 
 Expected: PASS, `Tests  1 passed (1)`.
 
-- [ ] **Step 13: Record the verification and run the whole suite**
+- [x] **Step 13: Record the verification and run the whole suite**
 
 ```bash
 printf '%s\n' "2026-11-13 00:00 IST | M1.2 | note | W0 | - | - | verified: withViewer set_config is transaction local and never leaks across a pooled connection; matrix fails on an unregistered export and on a leak; import rules fail on appDb/db in repo and actions" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
@@ -3895,7 +3895,7 @@ pnpm --filter @cleanstart/portal test
 
 Expected: PASS, no Vite warning about `dynamic-import-vars`. At the time of writing: `Test Files  24 passed (24)`, `Tests  112 passed (112)`.
 
-- [ ] **Step 14: Stage, run Gate A, run Gate B**
+- [x] **Step 14: Stage, run Gate A, run Gate B**
 
 ```bash
 git add apps/portal/src/server apps/portal/src/db/test-helpers.ts
@@ -3904,7 +3904,7 @@ git status --short | grep -v '^[AM] '; echo "unstaged check done"
 
 Expected: the filter prints nothing before the echo. Run Gate A (lint, typecheck, test, build), then Gate B. The reviewer looks specifically at: `withViewer` is the only caller of `appDb`; no repo-facing export takes `db` or `pool`; `seedTwoTenants` inserts as the system role and never as a viewer; and the matrix file loads modules without a glob that could silently skip one.
 
-- [ ] **Step 15: Commit and log**
+- [x] **Step 15: Commit and log**
 
 ```bash
 git add docs/superpowers/plans/2026-11-12-partner-portal-01-foundations.md

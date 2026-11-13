@@ -5,11 +5,14 @@ import { db, type Db, pool } from '@/db/client';
 import {
   accessRequests,
   applications,
+  auditLog,
   documentAudience,
+  documentOpens,
   documents,
   invites,
   partners,
   registrationContacts,
+  registrationMessages,
   registrations,
   staffScopes,
   users,
@@ -25,6 +28,7 @@ import type {
   StaffRole,
 } from '@/lib/domain';
 import type { PartnerViewer, StaffViewer, Viewer } from '@/server/auth/types';
+import type { IsolationContext, TenantFixture } from '@/server/repo/isolation.registry';
 
 /** System scope db for the worker's database (portal_app, app.kind = 'system'). Same object every call. */
 export const testDb = (): Db => db;
@@ -380,4 +384,80 @@ export async function asPartner(
   );
   if (viewer.kind !== 'partner') throw new Error('test helper: asPartner produced a staff viewer');
   return viewer;
+}
+
+const seedTenant = async (database: Db, name: string): Promise<TenantFixture> => {
+  const partner = await makePartner(database, { name });
+  const admin = await makeUser(database, { partnerId: partner.id, role: 'partner_admin', name: `${name} Admin` });
+  const sales = await makeUser(database, { partnerId: partner.id, role: 'sales', name: `${name} Sales` });
+  const adminViewer = await viewerFor(database, admin);
+  const salesViewer = await viewerFor(database, sales);
+  if (adminViewer.kind !== 'partner' || salesViewer.kind !== 'partner') throw new Error('test helper: tenant users must be partner users');
+  const registration = await makeRegistration(database, {
+    partnerId: partner.id,
+    customerName: `${name} Customer`,
+    registeredBy: sales.id,
+    contacts: [{ name: `${name} Contact`, email: `contact@${partner.domain}` }],
+  });
+  const contact = first(await database.select({ id: registrationContacts.id }).from(registrationContacts).where(eq(registrationContacts.registrationId, registration.id)), 'contact');
+  const message = first(
+    await database
+      .insert(registrationMessages)
+      .values({ registrationId: registration.id, authorId: sales.id, authorName: sales.name, authorOrg: name, side: 'partner', body: `Note from ${name}` })
+      .returning({ id: registrationMessages.id }),
+    'message',
+  );
+  const { invite } = await makeInvite(database, { partnerId: partner.id, role: 'sales' });
+  const request = await makeAccessRequest(database, { partnerId: partner.id });
+  const document = await makeDocument(database, { title: `${name} only`, partnerIds: [partner.id] });
+  const open = first(
+    await database
+      .insert(documentOpens)
+      .values({ documentId: document.id, userId: sales.id, partnerId: partner.id })
+      .returning({ id: documentOpens.id }),
+    'document open',
+  );
+  return {
+    partnerId: partner.id,
+    viewer: adminViewer,
+    adminViewer,
+    salesViewer,
+    userId: sales.id,
+    registrationId: registration.id,
+    messageId: message.id,
+    contactId: contact.id,
+    inviteId: invite.id,
+    accessRequestId: request.id,
+    documentId: document.id,
+    openId: open.id,
+  };
+};
+
+/**
+ * Partners A and B, each with an admin, a sales user (userId is the sales user, the "other user of the same partner"
+ * for own-user probes), a registration with a message and a contact, an invite, an access request, a document named
+ * to that partner only and an open of it; plus a staff partner manager, an application and an audit row.
+ * `documentForBOnly` is B's document.
+ */
+export async function seedTwoTenants(database: Db): Promise<IsolationContext> {
+  const a = await seedTenant(database, 'Alpha');
+  const b = await seedTenant(database, 'Beta');
+  const staff = await asStaff(database, 'partner_manager', 'all');
+  const application = await makeApplication(database, {});
+  const audit = first(
+    await database
+      .insert(auditLog)
+      .values({ actorLabel: 'Seed', who: 'staff', kind: 'partners', event: 'partner.created', text: 'Added partner: Alpha', partnerId: a.partnerId })
+      .returning({ id: auditLog.id }),
+    'audit row',
+  );
+  return {
+    a,
+    b,
+    staff,
+    documentForBOnly: b.documentId,
+    applicationId: application.id,
+    staffUserId: staff.id,
+    auditId: audit.id,
+  };
 }
