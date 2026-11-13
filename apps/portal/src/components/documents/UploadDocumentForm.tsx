@@ -164,6 +164,7 @@ export function UploadDocumentForm({
             className={`field${titleErr ? ' field-err' : ''}`}
             type="text"
             value={title}
+            placeholder="The name partners will see"
             onChange={(e) => setTitle(e.target.value)}
             disabled={busy}
             aria-invalid={titleErr ? true : undefined}
@@ -212,6 +213,9 @@ export function UploadDocumentForm({
           error={audienceErr}
           disabled={busy}
         />
+        {draft.kind === 'categories' && draft.categories.length === 0 && !audienceErr ? (
+          <span className="hint">Nobody can open this until you choose who.</span>
+        ) : null}
         <div className="note note-violet">
           <Icon name="lock" />
           <span>Partners get a short-lived link each time they open it.</span>

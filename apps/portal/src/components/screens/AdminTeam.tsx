@@ -93,10 +93,18 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
               <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Role</th>
-                <th scope="col">Region</th>
-                <th scope="col">Partners managed</th>
-                <th scope="col">Last active</th>
-                <th scope="col">Status</th>
+                <th scope="col" className="hide-sm">
+                  Region
+                </th>
+                <th scope="col" className="hide-sm">
+                  Partners managed
+                </th>
+                <th scope="col" className="hide-sm">
+                  Last active
+                </th>
+                <th scope="col" className="hide-sm">
+                  Status
+                </th>
                 <th scope="col" className="r">
                   <span className="sr">Actions</span>
                 </th>
@@ -105,7 +113,7 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
             <tbody>
               {people.map((p) => (
                 <tr key={p.id}>
-                  <td>
+                  <td style={{ whiteSpace: "normal" }}>
                     <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <span className="av av-1 av-r">{initialsOf(p.name)}</span>
                       <span className="li-t">
@@ -120,7 +128,9 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
                             </>
                           ) : null}
                         </span>
-                        <span className="li-s">{p.email}</span>
+                        <span className="li-s" style={{ overflowWrap: "anywhere" }}>
+                          {p.email}
+                        </span>
                       </span>
                     </span>
                   </td>
@@ -140,12 +150,12 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
                       />
                     )}
                   </td>
-                  <td className="t-sec">{STAFF_REGION_LABEL[p.region]}</td>
-                  <td className="t-sec" title={p.partners.join(", ")}>
+                  <td className="t-sec hide-sm">{STAFF_REGION_LABEL[p.region]}</td>
+                  <td className="t-sec hide-sm" title={p.partners.join(", ")}>
                     {p.partners.length ? `${p.partners.length} partners` : "None"}
                   </td>
-                  <td className="t-sec">{lastActive(p)}</td>
-                  <td>
+                  <td className="t-sec hide-sm">{lastActive(p)}</td>
+                  <td className="hide-sm">
                     <Badge tone={p.status === "active" ? "accepted" : "pending"}>
                       {p.status === "active" ? "Active" : "Invited"}
                     </Badge>

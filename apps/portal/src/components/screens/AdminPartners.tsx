@@ -11,7 +11,7 @@ import { CategoryDialog, ManagerDialog } from "@/components/partners/partner-dia
 import { type PartnerTab as Tab, partnerTabs } from "@/components/partners/partner-tabs";
 import { CATEGORY_FOR_FILTER, type CategoryFilter, PartnersTable } from "@/components/partners/partners-table";
 import { useToast } from "@/components/ui/toast";
-import { daysBetween } from "@/lib/dates";
+import { daysBetween, plural } from "@/lib/dates";
 import { PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PARTNER_STATUS_LABEL } from "@/lib/domain";
 import type { ApplicationDto, ManagerOptionDto, PartnerDetailDto, PartnerListRow } from "@/lib/dto";
 import { codeFromLabel, lastSeenLabel } from "@/lib/people";
@@ -71,6 +71,7 @@ export function AdminPartners({
   const [region, setRegion] = useState("All regions");
   const [status, setStatus] = useState("Any status");
   const [dialog, setDialog] = useState<"add" | "category" | "manager" | null>(null);
+  const [focusId, setFocusId] = useState<string | null>(null);
 
   const wantedCategory = CATEGORY_FOR_FILTER[category];
   const wantedRegion = region === "All regions" ? null : codeFromLabel(PARTNER_REGION_LABEL, region);
@@ -81,6 +82,15 @@ export function AdminPartners({
       (!wantedRegion || p.region === wantedRegion) &&
       (!wantedStatus || p.status === wantedStatus),
   );
+
+  // Picking a partner loads its detail below the list: bring it into view and hand it focus once it has rendered.
+  useEffect(() => {
+    if (!focusId || detail?.id !== focusId) return;
+    setFocusId(null);
+    const card = document.getElementById("partner-detail");
+    card?.scrollIntoView({ block: "start" });
+    document.getElementById("partner-detail-h")?.focus({ preventScroll: true });
+  }, [focusId, detail?.id]);
 
   const total = partners.length;
   const active = partners.filter((p) => p.status === "active").length;
@@ -93,7 +103,14 @@ export function AdminPartners({
   const protectedDeals = partners.reduce((sum, p) => sum + p.protectedCount, 0);
   const protectingPartners = partners.filter((p) => p.protectedCount > 0).length;
 
+  const waitingApplications = applications.filter((a) => a.status === "new");
+  const oldestApplicationDays = waitingApplications.reduce(
+    (max, a) => Math.max(max, daysBetween(a.submittedAt.slice(0, 10), today)),
+    0,
+  );
+
   const select = (id: string): void => {
+    setFocusId(id);
     const params = new URLSearchParams(searchParams.toString());
     params.set("selected", id);
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
@@ -182,9 +199,11 @@ export function AdminPartners({
         </div>
         {canReadApplications ? (
           <div className="kpi">
-            <span className="kpi-l">Applications</span>
-            <span className="kpi-v t-amber">{waiting}</span>
-            <span className="kpi-f">Waiting for a decision</span>
+            <span className="kpi-l">Oldest application</span>
+            <span className="kpi-v t-amber">
+              {waitingApplications.length === 0 ? "None" : oldestApplicationDays === 0 ? "Today" : plural(oldestApplicationDays, "day")}
+            </span>
+            <span className="kpi-f">{waitingApplications.length === 0 ? "Nothing waiting" : "Still waiting for a decision"}</span>
           </div>
         ) : null}
         <div className="kpi">

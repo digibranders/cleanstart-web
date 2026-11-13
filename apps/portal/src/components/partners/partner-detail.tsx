@@ -39,8 +39,13 @@ export function PartnerDetail({
 
   return (
     <aside
+      id="partner-detail"
       aria-label="Selected partner"
       style={{
+        // Picking a partner scrolls this under the 48 px top bar. It is the last block, so it needs about a screenful of
+        // height or the page runs out of scroll before the card reaches the top.
+        scrollMarginTop: 64,
+        minHeight: "calc(100dvh - 24px)",
         flex: "1 1 100%",
         minWidth: 0,
         display: "grid",
@@ -54,10 +59,12 @@ export function PartnerDetail({
           <span className="av av-1" style={{ width: 36, height: 36, borderRadius: 9, fontSize: 13 }}>
             {initialsOf(p.name)}
           </span>
-          <span className="li-t">
-            <span style={{ fontSize: 14, fontWeight: 700 }}>{p.name}</span>
+          <div className="li-t">
+            <h2 id="partner-detail-h" tabIndex={-1} style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>
+              {p.name}
+            </h2>
             <span className="li-s">{p.domain}</span>
-          </span>
+          </div>
           <PartnerStatusBadge status={p.status} />
         </div>
         <hr className="hr" />

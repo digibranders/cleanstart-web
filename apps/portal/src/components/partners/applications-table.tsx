@@ -1,7 +1,6 @@
 "use client";
 
 import { Fragment, useState } from "react";
-import { Icon } from "@/components/icon";
 import { Badge } from "@/components/ui/badge";
 import { fmtLong } from "@/lib/dates";
 import {
@@ -30,33 +29,6 @@ interface ApplicationsTableProps {
   onApprove: (application: ApplicationDto, choice: { category: PartnerCategory; region: PartnerRegion }) => void;
   onDecline: (application: ApplicationDto, reason: string) => void;
   onUndo: (application: ApplicationDto) => void;
-}
-
-/** Icon row action, same markup as ActButton. */
-function RowAction({
-  label,
-  tip,
-  tone,
-  icon,
-  onClick,
-}: {
-  label: string;
-  tip: string;
-  tone: "ok" | "no";
-  icon: "check" | "x";
-  onClick: () => void;
-}): React.JSX.Element {
-  return (
-    <button
-      type="button"
-      className={`act act-${tone}`}
-      aria-label={label}
-      data-tip={tip}
-      onClick={onClick}
-    >
-      <Icon name={icon} />
-    </button>
-  );
 }
 
 export function ApplicationsTable({
@@ -123,10 +95,18 @@ export function ApplicationsTable({
           <thead>
             <tr>
               <th scope="col">Company</th>
-              <th scope="col">Applicant</th>
-              <th scope="col">Wants to be</th>
-              <th scope="col">Region</th>
-              <th scope="col">Submitted</th>
+              <th scope="col" className="hide-sm">
+                Applicant
+              </th>
+              <th scope="col" className="hide-sm">
+                Wants to be
+              </th>
+              <th scope="col" className="hide-sm">
+                Region
+              </th>
+              <th scope="col" className="hide-sm">
+                Submitted
+              </th>
               <th scope="col" className="r">
                 Decision
               </th>
@@ -150,32 +130,40 @@ export function ApplicationsTable({
                         </span>
                       </span>
                     </td>
-                    <td>
+                    <td className="hide-sm">
                       <span className="li-t">
                         <span>{a.applicantName}</span>
                         <span className="li-s">{a.role ?? a.email}</span>
                       </span>
                     </td>
-                    <td>{a.category ? <PartnerCategoryBadge category={a.category} /> : <span className="t-muted">Not set</span>}</td>
-                    <td className="t-sec">{a.region ? PARTNER_REGION_LABEL[a.region] : <span className="t-muted">Not set</span>}</td>
-                    <td className="tnum t-sec">{fmtLong(a.submittedAt)}</td>
-                    <td className="r">
+                    <td className="hide-sm">
+                      {a.category ? <PartnerCategoryBadge category={a.category} /> : <span className="t-muted">Not set</span>}
+                    </td>
+                    <td className="t-sec hide-sm">
+                      {a.region ? PARTNER_REGION_LABEL[a.region] : <span className="t-muted">Not set</span>}
+                    </td>
+                    <td className="tnum t-sec hide-sm">{fmtLong(a.submittedAt)}</td>
+                    <td className="r" style={{ whiteSpace: "normal" }}>
                       {a.status === "new" && !rejecting && !approving && canDecide ? (
-                        <span className="acts">
-                          <RowAction
-                            label={`Reject ${a.company}`}
-                            tip="Reject with a reason"
-                            tone="no"
-                            icon="x"
+                        <span className="acts" style={{ gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
+                          <button
+                            type="button"
+                            className="btn btn-d"
+                            aria-label={`Decline ${a.company}`}
+                            title="Decline with a reason"
                             onClick={() => startReject(a.id)}
-                          />
-                          <RowAction
-                            label={`Approve ${a.company}`}
-                            tip="Approve and send the invite"
-                            tone="ok"
-                            icon="check"
+                          >
+                            Decline
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-p"
+                            aria-label={`Approve and invite ${a.company}`}
+                            title="Creates the partner company, makes the applicant its partner admin and emails an invite"
                             onClick={() => startApprove(a)}
-                          />
+                          >
+                            Approve and invite
+                          </button>
                         </span>
                       ) : null}
                       {a.status === "new" && rejecting ? <Badge tone="neutral">Add a reason below</Badge> : null}
@@ -276,6 +264,7 @@ export function ApplicationsTable({
                               id={`ar-${a.id}`}
                               className={`field${reasonTried && !reason.trim() ? " field-err" : ""}`}
                               type="text"
+                              placeholder="For example, we already have a partner covering this region"
                               value={reason}
                               onChange={(e) => setReason(e.target.value)}
                               aria-invalid={reasonTried && !reason.trim() ? true : undefined}
@@ -291,7 +280,7 @@ export function ApplicationsTable({
                             Cancel
                           </button>
                           <button type="button" className="btn btn-dd" onClick={() => confirmReject(a)}>
-                            Reject and email
+                            Decline and email
                           </button>
                         </div>
                       </td>

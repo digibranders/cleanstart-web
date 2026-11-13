@@ -66,7 +66,7 @@ test.describe('@portal partner lifecycle', () => {
 
   test('a partner manager approves the application and the invite goes out', async () => {
     await openApplicationsTab(staffPage);
-    await staffPage.getByRole('button', { name: `Approve ${COMPANY}` }).click();
+    await staffPage.getByRole('button', { name: `Approve and invite ${COMPANY}` }).click();
     await expect(staffPage.getByText('Approved, invite sent')).toBeVisible();
     expect((await partnerByName(COMPANY)).status).toBe('onboarding');
   });

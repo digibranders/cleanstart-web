@@ -128,8 +128,10 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
   );
 
   const waiting = rows.filter((r) => r.state === "open" || r.state === "rejecting");
-  const overCount = waiting.filter((r) => r.over).length;
-  const conflictCount = waiting.filter((r) => r.check.kind === "conflict").length;
+  const inScope = waiting.filter((r) => view === "all" || inMyQueue(r.deal));
+  const overCount = inScope.filter((r) => r.over).length;
+  const conflictCount = inScope.filter((r) => r.check.kind === "conflict").length;
+  const oldest = inScope.reduce<QueueRow | null>((top, r) => (top === null || r.age > top.age ? r : top), null);
   const viewing = rows.find((r) => r.deal.id === viewingId);
   const recentDecisions = queue.recentDecisions;
   const visibleExtensions = extensions.filter((d) => view === "all" || inMyQueue(d));
@@ -253,8 +255,8 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
 
       <section aria-label="Queue summary" className="card kpis">
         <div className="kpi">
-          <span className="kpi-l">Waiting</span>
-          <span className="kpi-v">{waiting.length}</span>
+          <span className="kpi-l">{view === "mine" ? "Waiting, my queue" : "Waiting, all regions"}</span>
+          <span className="kpi-v">{inScope.length}</span>
           <span className={`kpi-f${overCount ? " t-amber" : ""}`}>
             {overCount ? `${overCount} over the 2-day target` : "All within 2 days"}
           </span>
@@ -265,16 +267,9 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
           <span className="kpi-f">Same customer and product</span>
         </div>
         <div className="kpi">
-          <span className="kpi-l">Decided, last 7 days</span>
-          <span className="kpi-v">{queue.counts.acceptedLast7Days + queue.counts.rejectedLast7Days}</span>
-          <span className="kpi-f">
-            Accepted {queue.counts.acceptedLast7Days}, rejected {queue.counts.rejectedLast7Days}
-          </span>
-        </div>
-        <div className="kpi">
-          <span className="kpi-l">Expiring in 14 days</span>
-          <span className="kpi-v t-amber">{queue.counts.expiringIn14Days}</span>
-          <span className="kpi-f">Partners reminded</span>
+          <span className="kpi-l">Oldest waiting</span>
+          <span className="kpi-v">{oldest ? ageLabel(oldest.age) : "None"}</span>
+          <span className="kpi-f">{oldest ? oldest.deal.customer : "Nothing waiting"}</span>
         </div>
       </section>
 
@@ -302,7 +297,7 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
               id="aq"
               className="finput"
               type="search"
-              placeholder="Filter by partner or customer"
+              placeholder="Partner or customer"
               value={q}
               onChange={(e) => setQ(e.target.value)}
             />
@@ -317,11 +312,19 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
           <table className="tbl">
             <thead>
               <tr>
-                <th scope="col">Partner</th>
+                <th scope="col" className="hide-sm">
+                  Partner
+                </th>
                 <th scope="col">Customer</th>
-                <th scope="col">Product</th>
-                <th scope="col">Region</th>
-                <th scope="col">Waiting</th>
+                <th scope="col" className="hide-sm">
+                  Product
+                </th>
+                <th scope="col" className="hide-sm">
+                  Region
+                </th>
+                <th scope="col" className="hide-sm">
+                  Waiting
+                </th>
                 <th scope="col">Checks</th>
                 <th scope="col" className="r">
                   Decision
@@ -335,7 +338,7 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
                 const reasonErr = entry?.tried && !entry.reason.trim();
                 const tr = (
                   <tr key={deal.id}>
-                    <td>
+                    <td className="hide-sm">
                       <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <span className={`av ${avOf(deal.partnerName)}`}>{initialsOf(deal.partnerName)}</span>
                         <span className="li-n" style={{ fontSize: 13 }}>
@@ -348,40 +351,40 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
                         {deal.customer}
                       </button>
                     </td>
-                    <td>
+                    <td className="hide-sm">
                       <ProductChip product={CHIP_PRODUCT[deal.product]} />
                     </td>
-                    <td className="t-sec">{PARTNER_REGION_LABEL[deal.region]}</td>
-                    <td className={`tnum ${row.over ? "t-amber" : "t-sec"}`} title={`Submitted ${fmtLong(reviewSince(deal))}`}>
+                    <td className="t-sec hide-sm">{PARTNER_REGION_LABEL[deal.region]}</td>
+                    <td className={`tnum hide-sm ${row.over ? "t-amber" : "t-sec"}`} title={`Submitted ${fmtLong(reviewSince(deal))}`}>
                       {ageLabel(row.age)}
                       {row.over ? <span className="why why-amber">Over 2-day target</span> : null}
                     </td>
                     <td style={{ whiteSpace: "normal" }}>
                       <span className={`badge b-${check.tone}`}>{check.label}</span>
-                      {check.why && state !== "rejecting" ? <span className={check.whyCls}>{check.why}</span> : null}
+                      {check.why && state !== "rejecting" ? <span className={`${check.whyCls} hide-sm`}>{check.why}</span> : null}
                     </td>
                     <td className="r">
                       {state === "open" ? (
-                        <span className="acts">
+                        <span className="acts" style={{ gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
                           <button
                             type="button"
-                            className="act act-no"
+                            className="btn btn-d"
                             onClick={() => startReject(row)}
                             disabled={busyId === deal.id}
                             aria-label={`Reject ${deal.customer} from ${deal.partnerName}`}
-                            data-tip="Reject with a reason"
+                            title="Reject with a reason"
                           >
-                            <Icon name="x" />
+                            Reject
                           </button>
                           <button
                             type="button"
-                            className="act act-ok"
+                            className="btn btn-p"
                             onClick={() => accept(row)}
                             disabled={busyId === deal.id}
                             aria-label={`Accept ${deal.customer} from ${deal.partnerName}`}
-                            data-tip="Accept and create the HubSpot deal"
+                            title="Accept and create the HubSpot deal"
                           >
-                            <Icon name="checkIcon" />
+                            Accept
                           </button>
                         </span>
                       ) : null}
@@ -424,12 +427,13 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
                       >
                         <div className="fg" style={{ flex: "1 1 360px" }}>
                           <label htmlFor={`reason-${deal.id}`} className="lbl">
-                            Reason the partner will see
+                            Reason the partner will see <span className="t-muted">(required)</span>
                           </label>
                           <input
                             id={`reason-${deal.id}`}
                             className={`field${reasonErr ? " field-err" : ""}`}
                             type="text"
+                            placeholder="For example, already registered by another partner"
                             value={entry.reason}
                             onChange={(e) =>
                               setRejecting((prev) => ({ ...prev, [deal.id]: { reason: e.target.value, tried: entry.tried } }))
@@ -474,8 +478,12 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
                 <tr>
                   <th scope="col">Partner</th>
                   <th scope="col">Customer</th>
-                  <th scope="col">Product</th>
-                  <th scope="col">Protected until</th>
+                  <th scope="col" className="hide-sm">
+                    Product
+                  </th>
+                  <th scope="col" className="hide-sm">
+                    Protected until
+                  </th>
                   <th scope="col">Reason</th>
                   <th scope="col" className="r">
                     Decision
@@ -487,10 +495,10 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
                   <tr key={d.id}>
                     <td>{d.partnerName}</td>
                     <td style={{ fontWeight: 600 }}>{d.customer}</td>
-                    <td>
+                    <td className="hide-sm">
                       <ProductChip product={CHIP_PRODUCT[d.product]} />
                     </td>
-                    <td className="tnum t-sec">{d.protectionEnd ? fmtLong(d.protectionEnd) : ""}</td>
+                    <td className="tnum t-sec hide-sm">{d.protectionEnd ? fmtLong(d.protectionEnd) : ""}</td>
                     <td className="t-sec" style={{ whiteSpace: "normal", maxWidth: 360 }}>
                       {d.extensionReason}
                     </td>
@@ -519,36 +527,46 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
           </h2>
           <span className="card-meta">Last 7 days</span>
         </div>
-        <table className="tbl">
-          <thead>
-            <tr>
-              <th scope="col">Decided</th>
-              <th scope="col">Partner</th>
-              <th scope="col">Customer</th>
-              <th scope="col">Product</th>
-              <th scope="col">Decision</th>
-              <th scope="col">HubSpot</th>
-            </tr>
-          </thead>
-          <tbody>
-            {recentDecisions.map((d) => (
-              <tr key={d.id}>
-                <td className="tnum t-sec">{fmtShort(d.decidedOn ?? today)}</td>
-                <td>{d.partnerName}</td>
-                <td style={{ fontWeight: 600 }}>{d.customer}</td>
-                <td>
-                  <ProductChip product={CHIP_PRODUCT[d.product]} />
-                </td>
-                <td>
-                  <span className={`badge ${d.status === "rejected" ? "b-rejected" : "b-accepted"}`}>
-                    {d.status === "rejected" ? "Rejected" : "Accepted"}
-                  </span>
-                </td>
-                <td className="tnum t-sec">{d.crmRef ?? (d.status === "rejected" ? "Not created" : "Queued")}</td>
+        {recentDecisions.length === 0 ? (
+          <div className="empty">No decisions in the last 7 days.</div>
+        ) : (
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th scope="col" className="hide-sm">
+                  Decided
+                </th>
+                <th scope="col">Partner</th>
+                <th scope="col">Customer</th>
+                <th scope="col" className="hide-sm">
+                  Product
+                </th>
+                <th scope="col">Decision</th>
+                <th scope="col" className="hide-sm">
+                  HubSpot
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {recentDecisions.map((d) => (
+                <tr key={d.id}>
+                  <td className="tnum t-sec hide-sm">{fmtShort(d.decidedOn ?? today)}</td>
+                  <td>{d.partnerName}</td>
+                  <td style={{ fontWeight: 600 }}>{d.customer}</td>
+                  <td className="hide-sm">
+                    <ProductChip product={CHIP_PRODUCT[d.product]} />
+                  </td>
+                  <td>
+                    <span className={`badge ${d.status === "rejected" ? "b-rejected" : "b-accepted"}`}>
+                      {d.status === "rejected" ? "Rejected" : "Accepted"}
+                    </span>
+                  </td>
+                  <td className="tnum t-sec hide-sm">{d.crmRef ?? (d.status === "rejected" ? "Not created" : "Queued")}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </section>
 
       {viewing ? (
