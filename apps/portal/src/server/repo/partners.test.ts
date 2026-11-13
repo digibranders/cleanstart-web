@@ -1,11 +1,26 @@
 import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { partners } from '@/db/schema';
+import { invites, partners } from '@/db/schema';
 import { asPartner, asStaff, makeInvite, makePartner, makeRegistration, makeUser, resetDb, testDb } from '@/db/test-helpers';
 import { fixedClock } from '@/lib/clock';
+import { hashToken } from '@/server/auth/tokens';
 import { publicActor } from '@/server/auth/types';
 import { withSystem, withViewer } from './context';
-import { getChecklist, getCompany, listPartnerAdminRecipients, tickChecklistStep, updateCompanyProfile } from './partners';
+import {
+  createPartner,
+  getChecklist,
+  getCompany,
+  getPartnerDetail,
+  listPartnerAdminRecipients,
+  listPartners,
+  resendPartnerInvites,
+  restorePartner,
+  setPartnerCategory,
+  setPartnerManager,
+  suspendPartner,
+  tickChecklistStep,
+  updateCompanyProfile,
+} from './partners';
 
 const db = testDb();
 const clock = fixedClock('2026-11-12T10:00:00Z');
@@ -137,5 +152,157 @@ describe('updateCompanyProfile', () => {
     const manager = await asStaff(db, 'partner_manager', 'india');
     const result = await withViewer(manager, (tx) => updateCompanyProfile(tx, manager, { partnerId: other.id, website: 'ok.example', phone: null, address: null, about: null }));
     expect(result.company.website).toBe('ok.example');
+  });
+});
+
+const today = new Date().toISOString().slice(0, 10);
+const future = new Date('2099-01-01T00:00:00Z');
+
+describe('listPartners', () => {
+  it('lists every partner for a partner manager with the real counts and filters', async () => {
+    const manager = await asStaff(db, 'partner_manager', 'india');
+    const a = await makePartner(db, { name: 'Kestrel Systems', domain: 'kestrelsystems.in', region: 'india', category: 'channel', status: 'active' });
+    const b = await makePartner(db, { name: 'Arbor Cyber', domain: 'arborcyber.ae', region: 'middle_east', category: 'integrator', status: 'onboarding' });
+    await makeUser(db, { partnerId: a.id, role: 'partner_admin' });
+    await makeRegistration(db, { partnerId: a.id, status: 'pending' });
+    await makeRegistration(db, { partnerId: a.id, status: 'accepted' });
+    await makeRegistration(db, { partnerId: a.id, status: 'won', registeredOn: today, closedOn: today });
+    const all = await withViewer(manager, (tx) => listPartners(tx, manager, {}));
+    expect(all.map((p) => p.name)).toEqual(['Arbor Cyber', 'Kestrel Systems']);
+    expect(all.find((p) => p.id === a.id)).toMatchObject({ users: 1, pending: 1, protectedCount: 1, won: 1 });
+    expect((await withViewer(manager, (tx) => listPartners(tx, manager, { status: 'onboarding' }))).map((p) => p.id)).toEqual([b.id]);
+    expect((await withViewer(manager, (tx) => listPartners(tx, manager, { q: 'kestrel' }))).map((p) => p.id)).toEqual([a.id]);
+  });
+
+  it('shows staff sales only the partners in their region, and refuses partner viewers', async () => {
+    await makePartner(db, { region: 'india' });
+    const gulf = await makePartner(db, { region: 'middle_east' });
+    const sales = await asStaff(db, 'sales', 'middle_east');
+    expect((await withViewer(sales, (tx) => listPartners(tx, sales, {}))).map((p) => p.id)).toEqual([gulf.id]);
+    const partner = await asPartner(db, {});
+    await expect(withViewer(partner, (tx) => listPartners(tx, partner, {}))).rejects.toMatchObject({ code: 'forbidden' });
+  });
+});
+
+describe('getPartnerDetail', () => {
+  it('returns profile, people with invited ones, the open invite count and the five newest deals', async () => {
+    const manager = await asStaff(db, 'partner_manager', 'india');
+    const partner = await makePartner(db, { name: 'Kestrel Systems', domain: 'kestrelsystems.in' });
+    await db.update(partners).set({ website: 'kestrelsystems.in', phone: '+91 80 4718 2290', about: 'Security reseller.' }).where(eq(partners.id, partner.id));
+    await makeUser(db, { partnerId: partner.id, role: 'partner_admin', name: 'Aditi Rao' });
+    await makeInvite(db, { kind: 'partner', partnerId: partner.id, role: 'sales', email: 'vikram.sethi@kestrelsystems.in', expiresAt: future });
+    for (let n = 1; n <= 6; n += 1) {
+      await makeRegistration(db, { partnerId: partner.id, customerName: `Customer ${n}`, product: 'cleansight', registeredOn: `2026-11-0${n}`, status: 'rejected' });
+    }
+    const detail = await withViewer(manager, (tx) => getPartnerDetail(tx, manager, partner.id));
+    expect(detail).toMatchObject({ name: 'Kestrel Systems', website: 'kestrelsystems.in', phone: '+91 80 4718 2290', address: null, about: 'Security reseller.', openInvites: 1 });
+    expect(detail.people.map((p) => [p.name, p.status, p.role])).toEqual([['Aditi Rao', 'active', 'partner_admin'], ['Vikram Sethi', 'invited', 'sales']]);
+    expect(detail.recentDeals.map((d) => d.customer)).toEqual(['Customer 6', 'Customer 5', 'Customer 4', 'Customer 3', 'Customer 2']);
+    expect(detail.recentDeals[0]).toMatchObject({ product: 'cleansight', registeredOn: '2026-11-06', status: 'rejected' });
+  });
+
+  it('hides a partner outside the region of staff sales and an unknown id', async () => {
+    const gulf = await makePartner(db, { region: 'middle_east' });
+    const sales = await asStaff(db, 'sales', 'india');
+    await expect(withViewer(sales, (tx) => getPartnerDetail(tx, sales, gulf.id))).rejects.toMatchObject({ code: 'not_found' });
+    await expect(withViewer(sales, (tx) => getPartnerDetail(tx, sales, '00000000-0000-0000-0000-000000000001'))).rejects.toMatchObject({ code: 'not_found' });
+  });
+});
+
+describe('createPartner', () => {
+  const base = { name: 'Dunes Networks', website: 'https://www.dunesnetworks.ae', category: 'channel' as const, region: 'middle_east' as const, adminName: 'Faisal Rahman', adminEmail: 'faisal@dunesnetworks.ae', sendInvite: true };
+
+  it('creates an onboarding partner routed to the regional manager with a partner admin invite', async () => {
+    const gulf = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'middle_east', name: 'Omar Nasser' });
+    const manager = await asStaff(db, 'partner_manager', 'india');
+    const result = await withViewer(manager, (tx) => createPartner(tx, manager, base, clock));
+    expect(result.partner).toMatchObject({ name: 'Dunes Networks', domain: 'dunesnetworks.ae', status: 'onboarding', managerId: gulf.id, users: 1, adminName: 'Faisal' });
+    expect(result.invite?.invite).toMatchObject({ role: 'partner_admin', email: 'faisal@dunesnetworks.ae', kind: 'partner' });
+    const [row] = await db.select().from(invites).where(eq(invites.id, result.invite?.invite.id ?? ''));
+    expect(row?.tokenHash).toBe(hashToken(result.invite?.token ?? ''));
+  });
+
+  it('records the admin invite even when it is not sent yet, but returns no token', async () => {
+    const manager = await asStaff(db, 'partner_manager', 'india');
+    const result = await withViewer(manager, (tx) => createPartner(tx, manager, { ...base, sendInvite: false }, clock));
+    expect(result.invite).toBeNull();
+    expect(await db.select().from(invites)).toHaveLength(1);
+    expect(result.partner.users).toBe(1);
+  });
+
+  it('falls back to the admin email domain, and refuses a taken domain, a login that exists and bad input', async () => {
+    const manager = await asStaff(db, 'partner_manager', 'india');
+    const viaEmail = await withViewer(manager, (tx) => createPartner(tx, manager, { ...base, website: '' }, clock));
+    expect(viaEmail.partner.domain).toBe('dunesnetworks.ae');
+    await expect(withViewer(manager, (tx) => createPartner(tx, manager, { ...base, name: 'Copy' }, clock))).rejects.toMatchObject({ reason: 'domain_is_partner' });
+    await expect(withViewer(manager, (tx) => createPartner(tx, manager, { ...base, name: 'Other', website: 'other.example', adminEmail: manager.email }, clock))).rejects.toMatchObject({ reason: 'already_has_login' });
+    await expect(withViewer(manager, (tx) => createPartner(tx, manager, { ...base, name: '  ', website: 'x.example' }, clock))).rejects.toMatchObject({ code: 'validation' });
+    await expect(withViewer(manager, (tx) => createPartner(tx, manager, { ...base, website: 'x.example', adminEmail: 'nope' }, clock))).rejects.toMatchObject({ code: 'validation' });
+  });
+});
+
+describe('partner mutations', () => {
+  it('sets the partner manager and reports the previous one', async () => {
+    const actor = await asStaff(db, 'partner_manager', 'india');
+    const farhan = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', name: 'Farhan Qureshi' });
+    const omar = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'middle_east', name: 'Omar Nasser' });
+    const partner = await makePartner(db, { managerId: farhan.id });
+    const result = await withViewer(actor, (tx) => setPartnerManager(tx, actor, { id: partner.id, managerId: omar.id }, clock));
+    expect(result).toMatchObject({ partner: { managerId: omar.id, managerName: 'Omar Nasser' }, previousManagerName: 'Farhan Qureshi' });
+    const sales = await makeUser(db, { kind: 'staff', role: 'sales', region: 'india' });
+    await expect(withViewer(actor, (tx) => setPartnerManager(tx, actor, { id: partner.id, managerId: sales.id }, clock))).rejects.toMatchObject({ code: 'validation' });
+  });
+
+  it('changes the category and reports the previous one', async () => {
+    const actor = await asStaff(db, 'partner_manager', 'india');
+    const partner = await makePartner(db, { category: 'channel' });
+    const result = await withViewer(actor, (tx) => setPartnerCategory(tx, actor, { id: partner.id, category: 'distributor' }, clock));
+    expect(result).toMatchObject({ partner: { category: 'distributor' }, previousCategory: 'channel' });
+  });
+
+  it('suspends and restores, putting the earlier status back, and both are idempotent', async () => {
+    const actor = await asStaff(db, 'partner_manager', 'india');
+    const partner = await makePartner(db, { status: 'onboarding' });
+    const suspended = await withViewer(actor, (tx) => suspendPartner(tx, actor, { id: partner.id }, clock));
+    expect(suspended).toMatchObject({ status: 'suspended', statusBeforeSuspend: 'onboarding' });
+    expect((await withViewer(actor, (tx) => suspendPartner(tx, actor, { id: partner.id }, clock))).statusBeforeSuspend).toBe('onboarding');
+    const restored = await withViewer(actor, (tx) => restorePartner(tx, actor, { id: partner.id }, clock));
+    expect(restored).toMatchObject({ status: 'onboarding', statusBeforeSuspend: null });
+    expect((await withViewer(actor, (tx) => restorePartner(tx, actor, { id: partner.id }, clock))).status).toBe('onboarding');
+  });
+
+  it('restores to active when no earlier status was recorded', async () => {
+    const actor = await asStaff(db, 'partner_manager', 'india');
+    const partner = await makePartner(db, { status: 'suspended' });
+    expect((await withViewer(actor, (tx) => restorePartner(tx, actor, { id: partner.id }, clock))).status).toBe('active');
+  });
+
+  it('is not allowed for partner viewers', async () => {
+    const partner = await makePartner(db, {});
+    const viewer = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
+    await expect(withViewer(viewer, (tx) => suspendPartner(tx, viewer, { id: partner.id }, clock))).rejects.toMatchObject({ code: 'forbidden' });
+    await expect(withViewer(viewer, (tx) => setPartnerCategory(tx, viewer, { id: partner.id, category: 'distributor' }, clock))).rejects.toMatchObject({ code: 'forbidden' });
+  });
+});
+
+describe('resendPartnerInvites', () => {
+  it('rotates every open invite of the partner and returns the new tokens once', async () => {
+    const actor = await asStaff(db, 'partner_manager', 'india');
+    const partner = await makePartner(db, { name: 'Qamar Solutions' });
+    const first = await makeInvite(db, { kind: 'partner', partnerId: partner.id, role: 'partner_admin', email: 'yasmin.haddad@qamarsolutions.ae', expiresAt: future });
+    await makeInvite(db, { kind: 'partner', partnerId: partner.id, role: 'sales', email: 'zaid.omar@qamarsolutions.ae', expiresAt: future });
+    await makeInvite(db, { kind: 'partner', partnerId: partner.id, role: 'sales', email: 'done@qamarsolutions.ae', expiresAt: future, acceptedAt: new Date('2026-11-01T00:00:00Z') });
+    const result = await withViewer(actor, (tx) => resendPartnerInvites(tx, actor, { id: partner.id }, clock));
+    expect(result.partner.name).toBe('Qamar Solutions');
+    expect(result.invites.map((i) => [i.invite.email, i.inviteeName]).sort()).toEqual([['yasmin.haddad@qamarsolutions.ae', 'Yasmin Haddad'], ['zaid.omar@qamarsolutions.ae', 'Zaid Omar']]);
+    const rotated = result.invites.find((i) => i.invite.id === first.invite.id);
+    expect(rotated?.token).not.toBe(first.token);
+    expect(rotated?.invite.resentCount).toBe(1);
+  });
+
+  it('returns nothing when everyone has accepted', async () => {
+    const actor = await asStaff(db, 'partner_manager', 'india');
+    const partner = await makePartner(db, {});
+    expect((await withViewer(actor, (tx) => resendPartnerInvites(tx, actor, { id: partner.id }, clock))).invites).toEqual([]);
   });
 });

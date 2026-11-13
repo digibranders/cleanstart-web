@@ -12197,7 +12197,7 @@ Implements master task 4.1. The Partners tab becomes real: the list with real co
 - Modify: `src/components/partners/badges.tsx`, `partners-table.tsx`, `partner-detail.tsx`, `partner-dialogs.tsx`, `add-partner-drawer.tsx`
 - Modify: `src/components/screens/AdminPartners.tsx`, `src/app/admin/partners/page.tsx`
 
-- [ ] **Step 1: Write the failing repo tests for list and detail**
+- [x] **Step 1: Write the failing repo tests for list and detail**
 
 Append to `src/server/repo/partners.test.ts`. Extend the imports: add `createPartner, getPartnerDetail, listPartners, resendPartnerInvites, restorePartner, setPartnerCategory, setPartnerManager, suspendPartner` to the `./partners` import, `invites` to the `@/db/schema` import, `hashToken` from `@/server/auth/tokens`,.
 
@@ -12360,7 +12360,7 @@ The admin is only an invite until they accept, so `adminName` is derived from th
 `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/partners.test.ts`
 Expected: FAIL, the new functions are not exported by `./partners`.
 
-- [ ] **Step 2: Implement the list, detail and mutation functions**
+- [x] **Step 2: Implement the list, detail and mutation functions**
 
 In `src/server/repo/partners.ts` extend the imports:
 
@@ -12614,7 +12614,7 @@ export const isolation = defineIsolation<
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/partners.test.ts src/server/repo/isolation.test.ts`
 Expected: PASS (partners: 25 tests; isolation passes).
 
-- [ ] **Step 3: Write the failing action tests**
+- [x] **Step 3: Write the failing action tests**
 
 Append to `src/server/actions/partners.test.ts`. Extend the imports: from `@/db/schema` add `invites`; from `@/db/test-helpers` add `makeInvite`; add `revokeAllSessions` mocking by adding this line next to the other `vi.mock` calls (it is hoisted): `vi.mock('@/server/auth/sessions', () => ({ revokeAllSessions: vi.fn(async () => undefined) }));` and `import { revokeAllSessions } from '@/server/auth/sessions';` after them; add `createPartnerAction, resendPartnerInvitesAction, restorePartnerAction, setPartnerCategoryAction, setPartnerManagerAction, suspendPartnerAction` to the `./partners` import. In `beforeEach` add `vi.mocked(revokeAllSessions).mockClear();`.
 
@@ -12711,7 +12711,7 @@ describe('partner management actions', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/partners.test.ts`
 Expected: FAIL, `createPartnerAction` is not a function.
 
-- [ ] **Step 4: Implement the partner management actions**
+- [x] **Step 4: Implement the partner management actions**
 
 In `src/server/actions/partners.ts` extend the imports:
 
@@ -12939,7 +12939,7 @@ The templates import is one line: `import { buildManagerMessage, buildTeamInvite
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/partners.test.ts`
 Expected: PASS, 17 tests.
 
-- [ ] **Step 5: Replace `badges.tsx`**
+- [x] **Step 5: Replace `badges.tsx`**
 
 Replace `src/components/partners/badges.tsx` in full. All four components now take the stored codes (the label lookups moved in; the M1.4 wrapper names stay, and `CategoryBadge` and `StatusBadge` are gone because nothing uses them after this task):
 
@@ -13007,7 +13007,7 @@ export function ProductMark({ product }: { product: Product }): React.JSX.Elemen
 }
 ```
 
-- [ ] **Step 6: Replace `partners-table.tsx`**
+- [x] **Step 6: Replace `partners-table.tsx`**
 
 Replace `src/components/partners/partners-table.tsx` in full:
 
@@ -13137,7 +13137,7 @@ export function PartnersTable({
 }
 ```
 
-- [ ] **Step 7: Replace `partner-detail.tsx`**
+- [x] **Step 7: Replace `partner-detail.tsx`**
 
 Replace `src/components/partners/partner-detail.tsx` in full:
 
@@ -13357,7 +13357,7 @@ export function PartnerDetail({
 }
 ```
 
-- [ ] **Step 8: Replace `partner-dialogs.tsx`**
+- [x] **Step 8: Replace `partner-dialogs.tsx`**
 
 Replace `src/components/partners/partner-dialogs.tsx` in full. The manager dialog lists the active partner managers from the server (names as the options); its hint no longer promises an email:
 
@@ -13465,7 +13465,7 @@ export function ManagerDialog({
 }
 ```
 
-- [ ] **Step 9: Replace `add-partner-drawer.tsx`**
+- [x] **Step 9: Replace `add-partner-drawer.tsx`**
 
 Replace `src/components/partners/add-partner-drawer.tsx` in full. The drawer now waits for the server: `onAdd` returns an error message to show in the form, or null on success.
 
@@ -13642,7 +13642,7 @@ export function AddPartnerDrawer({ partners, onClose, onAdd }: AddPartnerDrawerP
 }
 ```
 
-- [ ] **Step 10: Replace `AdminPartners.tsx`**
+- [x] **Step 10: Replace `AdminPartners.tsx`**
 
 Replace `src/components/screens/AdminPartners.tsx` in full (this supersedes the M1.4 version). Differences from the mock: the data arrives as props; selecting a partner navigates to `?selected=<id>` so the server loads that partner's detail; the totals come from the loaded rows (the "11 other active partners" are real rows now); the two KPIs the DTOs cannot supply (partner users active this month, deals this quarter) become "partners signed in this month" and "protected deals" (contract change request item 2); staff who are not partner managers see the list read-only without Applications and Add partner.
 
@@ -13961,7 +13961,7 @@ export function AdminPartners({
 }
 ```
 
-- [ ] **Step 11: Write the final partners page**
+- [x] **Step 11: Write the final partners page**
 
 Replace `src/app/admin/partners/page.tsx` in full (supersedes the M1.4 version):
 
@@ -14015,7 +14015,7 @@ export default async function Page({
 
 Behaviour difference from the mock, for the product owner: when a filter hides the selected partner, its detail stays on screen (the mock jumped to the first row); selecting a row loads that partner's detail from the server.
 
-- [ ] **Step 12: Prove nothing in this plan's components reads the mock data any more**
+- [x] **Step 12: Prove nothing in this plan's components reads the mock data any more**
 
 Run:
 
@@ -14025,7 +14025,7 @@ grep -rn "@/data/\|@/lib/slice" src/components/partners src/components/people sr
 
 Expected: no output. (`SignIn.tsx` belongs to plan 02 and is checked there, apart from the request views, which Task M1.6 already verified. `PasswordCard.tsx` and `TwoStepCard.tsx` still import `@/data/team` until plan 02 converts them.)
 
-- [ ] **Step 13: Gate A**
+- [x] **Step 13: Gate A**
 
 Run the Gate A block. The last command must list only this task's Files block.
 
@@ -14040,7 +14040,7 @@ Run the Gate A block. The last command must list only this task's Files block.
 7. "Add partner": name `Dunes Test`, website `dunestest.ae`, Channel partner, Middle East, admin `Test Admin`, `test.admin@dunestest.ae`, send invite on: toast "Invite sent to test.admin@dunestest.ae", the new partner is selected with status Onboarding, manager Omar Nasser. Adding the same website again shows "Another partner already uses this domain." in the drawer.
 8. Sign in as `rahul.menon@cleanstart.com` (staff sales, India): only India partners are listed, there is no Applications tab, no Add partner button and the detail card has no action buttons.
 
-- [ ] **Step 15: Commit**
+- [x] **Step 15: Commit**
 
 ```bash
 git add apps/portal/src/server/repo/partners.ts apps/portal/src/server/repo/partners.test.ts \

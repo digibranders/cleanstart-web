@@ -2,17 +2,26 @@
 
 import { useState } from "react";
 import { Dialog } from "@/components/ui/overlay";
-import { CATEGORIES, MANAGERS, type Partner, type PartnerCategory } from "@/data/partners";
+import { PARTNER_CATEGORIES, PARTNER_CATEGORY_LABEL, type PartnerCategory } from "@/lib/domain";
+import type { ManagerOptionDto } from "@/lib/dto";
+import { codeFromLabel } from "@/lib/people";
 import { Seg } from "./seg";
 
 interface DialogProps {
-  partner: Partner;
+  partner: { name: string };
   onClose: () => void;
 }
 
+const CATEGORY_OPTIONS: readonly string[] = PARTNER_CATEGORIES.map((c) => PARTNER_CATEGORY_LABEL[c]);
+
 /** Both dialogs are mounted only while open, so each opening starts from the partner's current value. */
-export function CategoryDialog({ partner, onClose, onSave }: DialogProps & { onSave: (value: PartnerCategory) => void }): React.JSX.Element {
-  const [value, setValue] = useState<PartnerCategory>(partner.category);
+export function CategoryDialog({
+  partner,
+  current,
+  onClose,
+  onSave,
+}: DialogProps & { current: PartnerCategory; onSave: (value: PartnerCategory) => void }): React.JSX.Element {
+  const [label, setLabel] = useState<string>(PARTNER_CATEGORY_LABEL[current]);
   return (
     <Dialog
       open
@@ -24,7 +33,14 @@ export function CategoryDialog({ partner, onClose, onSave }: DialogProps & { onS
           <button type="button" className="btn btn-s" onClick={onClose}>
             Cancel
           </button>
-          <button type="button" className="btn btn-p" onClick={() => onSave(value)}>
+          <button
+            type="button"
+            className="btn btn-p"
+            onClick={() => {
+              const code = codeFromLabel(PARTNER_CATEGORY_LABEL, label);
+              if (code) onSave(code);
+            }}
+          >
             Save
           </button>
         </>
@@ -34,14 +50,21 @@ export function CategoryDialog({ partner, onClose, onSave }: DialogProps & { onS
         <span id="cat-l" className="lbl">
           Category
         </span>
-        <Seg options={CATEGORIES} value={value} onChange={setValue} labelledBy="cat-l" />
+        <Seg options={CATEGORY_OPTIONS} value={label} onChange={setLabel} labelledBy="cat-l" />
       </div>
     </Dialog>
   );
 }
 
-export function ManagerDialog({ partner, onClose, onSave }: DialogProps & { onSave: (value: string) => void }): React.JSX.Element {
-  const [value, setValue] = useState(partner.manager);
+export function ManagerDialog({
+  partner,
+  currentId,
+  managers,
+  onClose,
+  onSave,
+}: DialogProps & { currentId: string | null; managers: readonly ManagerOptionDto[]; onSave: (managerId: string) => void }): React.JSX.Element {
+  const names = managers.map((m) => m.name);
+  const [name, setName] = useState<string>(managers.find((m) => m.id === currentId)?.name ?? names[0] ?? "");
   return (
     <Dialog
       open
@@ -53,7 +76,14 @@ export function ManagerDialog({ partner, onClose, onSave }: DialogProps & { onSa
           <button type="button" className="btn btn-s" onClick={onClose}>
             Cancel
           </button>
-          <button type="button" className="btn btn-p" onClick={() => onSave(value)}>
+          <button
+            type="button"
+            className="btn btn-p"
+            onClick={() => {
+              const chosen = managers.find((m) => m.name === name);
+              if (chosen) onSave(chosen.id);
+            }}
+          >
             Save
           </button>
         </>
@@ -63,8 +93,8 @@ export function ManagerDialog({ partner, onClose, onSave }: DialogProps & { onSa
         <span id="pm-l" className="lbl">
           Partner manager
         </span>
-        <Seg options={MANAGERS} value={value} onChange={setValue} labelledBy="pm-l" />
-        <span className="hint">The partner admin is told by email who their new partner manager is.</span>
+        <Seg options={names} value={name} onChange={setName} labelledBy="pm-l" />
+        <span className="hint">The partner's deal approvals and messages move to the new manager.</span>
       </div>
     </Dialog>
   );

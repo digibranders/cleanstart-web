@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { auditLog, hubspotOutbox, partnerChecklist, partners } from '@/db/schema';
-import { asPartner, asStaff, makePartner, makeUser, resetDb, testDb } from '@/db/test-helpers';
+import { auditLog, hubspotOutbox, invites, partnerChecklist, partners } from '@/db/schema';
+import { asPartner, asStaff, makeInvite, makePartner, makeUser, resetDb, testDb } from '@/db/test-helpers';
 import type { Viewer } from '@/server/auth/types';
 import type { FakeEmailTransport } from '@/server/email/fake';
 import type { EmailMessage } from '@/server/email/transport';
@@ -16,6 +16,7 @@ vi.mock('next/headers', () => ({
 }));
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
 vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }));
+vi.mock('@/server/auth/sessions', () => ({ revokeAllSessions: vi.fn(async () => undefined) }));
 vi.mock('@/server/auth/viewer', async () => {
   const { UnauthenticatedError } = await import('@/server/errors');
   return {
@@ -31,7 +32,18 @@ vi.mock('@/server/email/send', async () => {
   return { sendEmail: (message: EmailMessage) => fake.send(message), fake };
 });
 
-import { sendManagerMessageAction, tickChecklistStepAction, updateCompanyProfileAction } from './partners';
+import { revokeAllSessions } from '@/server/auth/sessions';
+import {
+  createPartnerAction,
+  resendPartnerInvitesAction,
+  restorePartnerAction,
+  sendManagerMessageAction,
+  setPartnerCategoryAction,
+  setPartnerManagerAction,
+  suspendPartnerAction,
+  tickChecklistStepAction,
+  updateCompanyProfileAction,
+} from './partners';
 
 const db = testDb();
 let fake: FakeEmailTransport;
@@ -43,6 +55,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   await resetDb(db);
   fake.clear();
+  vi.mocked(revokeAllSessions).mockClear();
   harness.viewer = null;
 });
 
@@ -147,5 +160,93 @@ describe('updateCompanyProfileAction', () => {
     const partner = await makePartner(db, {});
     harness.viewer = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
     expect(await updateCompanyProfileAction({ ...fields, about: 'x'.repeat(1001) })).toMatchObject({ ok: false, error: { code: 'validation' } });
+  });
+});
+
+describe('partner management actions', () => {
+  const manager = () => asStaff(db, 'partner_manager', 'india');
+  const newPartner = { name: 'Dunes Networks', website: 'dunesnetworks.ae', category: 'channel', region: 'middle_east', adminName: 'Faisal Rahman', adminEmail: 'faisal@dunesnetworks.ae', sendInvite: true };
+
+  it('adds a partner: audit, partner.upsert version 1, and an invite email addressed to the admin', async () => {
+    harness.viewer = await manager();
+    const result = await createPartnerAction(newPartner);
+    expect(result).toMatchObject({ ok: true, data: { name: 'Dunes Networks', status: 'onboarding', users: 1 } });
+    expect(JSON.stringify(result)).not.toContain('token');
+    const created = result.ok ? result.data : null;
+    expect((await db.select().from(auditLog)).map((a) => a.event)).toEqual(['partner.created']);
+    expect((await db.select().from(hubspotOutbox))[0]).toMatchObject({ op: 'partner.upsert', subjectId: created?.id, idempotencyKey: `partner.upsert:${created?.id}:1` });
+    const mail = fake.only('faisal@dunesnetworks.ae');
+    expect(mail.htmlContent).toMatch(/accept-invite\?token=/u);
+  });
+
+  it('adds a partner without sending the invite', async () => {
+    harness.viewer = await manager();
+    expect(await createPartnerAction({ ...newPartner, sendInvite: false })).toMatchObject({ ok: true });
+    expect(fake.sent).toHaveLength(0);
+    expect(await db.select().from(invites)).toHaveLength(1);
+  });
+
+  it('is for partner managers only and reports a domain conflict', async () => {
+    harness.viewer = await asStaff(db, 'sales', 'india');
+    expect(await createPartnerAction(newPartner)).toMatchObject({ ok: false, error: { code: 'forbidden' } });
+    harness.viewer = await asPartner(db, { role: 'partner_admin' });
+    expect(await createPartnerAction(newPartner)).toMatchObject({ ok: false, error: { code: 'forbidden' } });
+    harness.viewer = await manager();
+    await makePartner(db, { domain: 'dunesnetworks.ae' });
+    expect(await createPartnerAction(newPartner)).toMatchObject({ ok: false, error: { code: 'conflict', message: 'Another partner already uses this domain.' } });
+  });
+
+  it('changes manager and category with audit notes and a fresh outbox key each time', async () => {
+    harness.viewer = await manager();
+    const farhan = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india', name: 'Farhan Qureshi' });
+    const omar = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'middle_east', name: 'Omar Nasser' });
+    const partner = await makePartner(db, { name: 'Arbor Cyber', managerId: farhan.id, category: 'integrator' });
+    expect(await setPartnerManagerAction({ id: partner.id, managerId: omar.id })).toMatchObject({ ok: true, data: { managerName: 'Omar Nasser' } });
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    expect(await setPartnerCategoryAction({ id: partner.id, category: 'distributor' })).toMatchObject({ ok: true, data: { category: 'distributor' } });
+    expect((await db.select().from(auditLog)).map((a) => [a.event, a.note]).sort()).toEqual([
+      ['partner.category_changed', 'System integrator to Distributor'],
+      ['partner.manager_changed', 'Farhan Qureshi to Omar Nasser'],
+    ]);
+    const keys = (await db.select().from(hubspotOutbox)).map((o) => o.idempotencyKey);
+    expect(keys).toHaveLength(2);
+    expect(new Set(keys).size).toBe(2);
+  });
+
+  it('does not audit or queue anything when nothing changes', async () => {
+    harness.viewer = await manager();
+    const farhan = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india' });
+    const partner = await makePartner(db, { managerId: farhan.id, category: 'channel' });
+    await setPartnerManagerAction({ id: partner.id, managerId: farhan.id });
+    await setPartnerCategoryAction({ id: partner.id, category: 'channel' });
+    expect(await db.select().from(auditLog)).toHaveLength(0);
+    expect(await db.select().from(hubspotOutbox)).toHaveLength(0);
+  });
+
+  it('suspends: audit, outbox, and every person of the partner is signed out; restore audits too', async () => {
+    harness.viewer = await manager();
+    const partner = await makePartner(db, { name: 'Ironleaf', status: 'active' });
+    const admin = await makeUser(db, { partnerId: partner.id, role: 'partner_admin' });
+    const sales = await makeUser(db, { partnerId: partner.id, role: 'sales' });
+    expect(await suspendPartnerAction({ id: partner.id })).toMatchObject({ ok: true, data: { status: 'suspended' } });
+    expect(vi.mocked(revokeAllSessions).mock.calls.map((c) => c[0]).sort()).toEqual([admin.id, sales.id].sort());
+    await suspendPartnerAction({ id: partner.id });
+    expect(await restorePartnerAction({ id: partner.id })).toMatchObject({ ok: true, data: { status: 'active' } });
+    expect((await db.select().from(auditLog)).map((a) => a.event).sort()).toEqual(['partner.restored', 'partner.suspended']);
+    expect(await db.select().from(hubspotOutbox)).toHaveLength(2);
+  });
+
+  it('resends every open invite, emails each, audits once, and says when nobody is left', async () => {
+    harness.viewer = await manager();
+    const partner = await makePartner(db, { name: 'Qamar Solutions' });
+    await makeInvite(db, { kind: 'partner', partnerId: partner.id, role: 'partner_admin', email: 'yasmin.haddad@qamarsolutions.ae', expiresAt: new Date('2099-01-01T00:00:00Z') });
+    await makeInvite(db, { kind: 'partner', partnerId: partner.id, role: 'sales', email: 'zaid.omar@qamarsolutions.ae', expiresAt: new Date('2099-01-01T00:00:00Z') });
+    expect(await resendPartnerInvitesAction({ id: partner.id })).toEqual({ ok: true, data: { count: 2 } });
+    expect(fake.to('yasmin.haddad@qamarsolutions.ae')).toHaveLength(1);
+    expect(fake.to('zaid.omar@qamarsolutions.ae')).toHaveLength(1);
+    expect((await db.select().from(auditLog)).map((a) => [a.event, a.note])).toEqual([['team.invite_resent', '2 people']]);
+    const empty = await makePartner(db, {});
+    expect(await resendPartnerInvitesAction({ id: empty.id })).toEqual({ ok: true, data: { count: 0 } });
+    expect(await db.select().from(auditLog)).toHaveLength(1);
   });
 });

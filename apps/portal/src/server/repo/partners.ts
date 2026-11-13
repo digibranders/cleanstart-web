@@ -1,14 +1,18 @@
-import { and, eq, isNull, ne } from 'drizzle-orm';
+import { and, asc, desc, eq, isNull, ne } from 'drizzle-orm';
 import { invites, partnerChecklist, partners, registrations, staffScopes, users } from '@/db/schema';
 import { type Clock, systemClock } from '@/lib/clock';
-import { CHECKLIST_STEPS, type ChecklistStep } from '@/lib/domain';
-import type { ChecklistDto, CompanyDto, IsoTimestamp } from '@/lib/dto';
-import { staffTeamLabel } from '@/lib/people';
+import { CHECKLIST_STEPS, type ChecklistStep, type PartnerCategory, type PartnerRegion, type PartnerStatus, type StaffRegion } from '@/lib/domain';
+import type { ChecklistDto, CompanyDto, CreatedInviteDto, IsoTimestamp, PartnerDetailDto, PartnerListRow } from '@/lib/dto';
+import { emailDomain, isPlausibleDomain, isValidEmail, nameFromEmail, normaliseDomain, staffTeamLabel } from '@/lib/people';
 import type { Viewer } from '@/server/auth/types';
 import { ForbiddenError, NotFoundError, ValidationError } from '@/server/errors';
+import { issueInvite, rotateInviteToken } from '@/server/invite-core';
+import { loadPartnerPeople } from '@/server/partner-people';
+import { assertActiveManager, insertOnboardingPartner, pickManagerId } from '@/server/partner-routing';
+import { partnerListRows } from '@/server/partner-rows';
 import { iso } from '@/server/people';
 import { resolvePartnerScope } from '@/server/partner-scope';
-import type { Tx } from './context';
+import { assertStaff, type Tx } from './context';
 import { defineIsolation } from './isolation.registry';
 
 type PartnerRow = typeof partners.$inferSelect;
@@ -139,8 +143,205 @@ export async function listPartnerAdminRecipients(
     .orderBy(users.createdAt);
 }
 
+export interface ListPartnersInput {
+  q?: string;
+  status?: PartnerStatus;
+  category?: PartnerCategory;
+  region?: PartnerRegion;
+}
+
+export interface NewPartnerInput {
+  name: string;
+  website: string;
+  category: PartnerCategory;
+  region: PartnerRegion;
+  adminName: string;
+  adminEmail: string;
+  sendInvite: boolean;
+}
+
+/** Staff sales only see partners in their own region; partner managers see all. */
+const regionScope = (viewer: Viewer): StaffRegion | undefined =>
+  viewer.kind === 'staff' && viewer.role === 'sales' ? viewer.region : undefined;
+
+const rowFor = async (tx: Tx, id: string): Promise<PartnerListRow> => {
+  const [row] = await partnerListRows(tx, { ids: [id] });
+  if (!row) throw new NotFoundError('partner');
+  return row;
+};
+
+const lockPartner = async (tx: Tx, id: string) => {
+  const [row] = await tx.select().from(partners).where(eq(partners.id, id)).limit(1).for('update');
+  if (!row) throw new NotFoundError('partner');
+  return row;
+};
+
+/** Staff. Staff sales: only partners in their region. */
+export async function listPartners(tx: Tx, viewer: Viewer, input: ListPartnersInput): Promise<PartnerListRow[]> {
+  assertStaff(viewer);
+  const scope = regionScope(viewer);
+  return partnerListRows(tx, {
+    ...(input.q ? { q: input.q } : {}),
+    ...(input.status ? { status: input.status } : {}),
+    ...(input.category ? { category: input.category } : {}),
+    ...(input.region ? { region: input.region } : {}),
+    ...(scope ? { scopeRegion: scope } : {}),
+  });
+}
+
+export async function getPartnerDetail(tx: Tx, viewer: Viewer, id: string): Promise<PartnerDetailDto> {
+  assertStaff(viewer);
+  const scope = regionScope(viewer);
+  const [row] = await partnerListRows(tx, { ids: [id], ...(scope ? { scopeRegion: scope } : {}) });
+  const [partner] = await tx.select().from(partners).where(eq(partners.id, id)).limit(1);
+  if (!row || !partner) throw new NotFoundError('partner');
+  const people = await loadPartnerPeople(tx, partner.id);
+  const deals = await tx
+    .select({ id: registrations.id, customer: registrations.customerName, product: registrations.product, registeredOn: registrations.registeredOn, status: registrations.status })
+    .from(registrations)
+    .where(eq(registrations.partnerId, partner.id))
+    .orderBy(desc(registrations.registeredOn), desc(registrations.createdAt))
+    .limit(5);
+  return {
+    ...row,
+    website: partner.website,
+    phone: partner.phone,
+    address: partner.address,
+    about: partner.about,
+    people: people.map((p) => ({
+      id: p.id,
+      name: p.name,
+      email: p.email,
+      role: p.role,
+      status: p.status,
+      lastActiveAt: iso(p.lastLoginAt),
+      invitedAt: iso(p.invitedAt),
+    })),
+    openInvites: people.filter((p) => p.status === 'invited').length,
+    recentDeals: deals.map((d) => ({ registrationId: d.id, customer: d.customer, product: d.product, registeredOn: d.registeredOn, status: d.status })),
+  };
+}
+
+/**
+ * Partner manager (M4.1, "Add partner"). Creates the partner (status 'onboarding', manager routed by region) and the
+ * partner_admin invite. Throws ConflictError('domain_is_partner') and ConflictError('already_has_login'). The invite
+ * row is always created so the admin's email is recorded; `invite` (with its one time token) is returned only when
+ * sendInvite is true, otherwise Resend invites sends it later.
+ */
+export async function createPartner(
+  tx: Tx,
+  viewer: Viewer,
+  input: NewPartnerInput,
+  clock: Clock,
+): Promise<{ partner: PartnerListRow; invite: CreatedInviteDto | null }> {
+  assertStaff(viewer);
+  const issues = [
+    ...(input.name.trim() ? [] : [{ path: 'name', message: 'Enter the company name.' }]),
+    ...(isValidEmail(input.adminEmail) ? [] : [{ path: 'adminEmail', message: 'Enter a valid work email.' }]),
+  ];
+  const site = normaliseDomain(input.website);
+  const domain = isPlausibleDomain(site) ? site : emailDomain(input.adminEmail);
+  if (!isPlausibleDomain(domain)) issues.push({ path: 'website', message: 'Enter the company website.' });
+  if (issues.length > 0) throw new ValidationError(issues);
+
+  const managerId = await pickManagerId(tx, input.region);
+  const partner = await insertOnboardingPartner(tx, {
+    name: input.name.trim(),
+    domain,
+    category: input.category,
+    region: input.region,
+    managerId,
+  });
+  const invite = await issueInvite(
+    tx,
+    { kind: 'partner', partnerId: partner.id, email: input.adminEmail, role: 'partner_admin', staffRegion: null, invitedBy: viewer.id },
+    clock,
+  );
+  return { partner: await rowFor(tx, partner.id), invite: input.sendInvite ? invite : null };
+}
+
+export async function setPartnerManager(
+  tx: Tx,
+  viewer: Viewer,
+  input: { id: string; managerId: string },
+  _clock: Clock,
+): Promise<{ partner: PartnerListRow; previousManagerName: string | null }> {
+  assertStaff(viewer);
+  await assertActiveManager(tx, input.managerId);
+  const current = await lockPartner(tx, input.id);
+  const before = await rowFor(tx, current.id);
+  if (current.managerId !== input.managerId) {
+    await tx.update(partners).set({ managerId: input.managerId }).where(eq(partners.id, current.id));
+  }
+  return { partner: await rowFor(tx, current.id), previousManagerName: before.managerName };
+}
+
+export async function setPartnerCategory(
+  tx: Tx,
+  viewer: Viewer,
+  input: { id: string; category: PartnerCategory },
+  _clock: Clock,
+): Promise<{ partner: PartnerListRow; previousCategory: PartnerCategory }> {
+  assertStaff(viewer);
+  const current = await lockPartner(tx, input.id);
+  if (current.category !== input.category) {
+    await tx.update(partners).set({ category: input.category }).where(eq(partners.id, current.id));
+  }
+  return { partner: await rowFor(tx, current.id), previousCategory: current.category };
+}
+
+/**
+ * Sets status 'suspended' and status_before_suspend (M4.1). Idempotent. The people lose access at once because
+ * getViewer() returns null for a suspended partner; deleting their Better Auth sessions is the action's job after
+ * commit (auth_session is system-only under RLS).
+ */
+export async function suspendPartner(tx: Tx, viewer: Viewer, input: { id: string }, _clock: Clock): Promise<PartnerListRow> {
+  assertStaff(viewer);
+  const current = await lockPartner(tx, input.id);
+  if (current.status !== 'suspended') {
+    await tx.update(partners).set({ status: 'suspended', statusBeforeSuspend: current.status }).where(eq(partners.id, current.id));
+  }
+  return rowFor(tx, current.id);
+}
+
+/** Puts status_before_suspend back (default 'active'). Idempotent. */
+export async function restorePartner(tx: Tx, viewer: Viewer, input: { id: string }, _clock: Clock): Promise<PartnerListRow> {
+  assertStaff(viewer);
+  const current = await lockPartner(tx, input.id);
+  if (current.status === 'suspended') {
+    await tx.update(partners).set({ status: current.statusBeforeSuspend ?? 'active', statusBeforeSuspend: null }).where(eq(partners.id, current.id));
+  }
+  return rowFor(tx, current.id);
+}
+
+/** Partner manager. Returns the invites it re-sent (token included, once) so the action can email them. */
+export async function resendPartnerInvites(
+  tx: Tx,
+  viewer: Viewer,
+  input: { id: string },
+  clock: Clock,
+): Promise<{ partner: PartnerListRow; invites: Array<CreatedInviteDto & { inviteeName: string | null }> }> {
+  assertStaff(viewer);
+  const partner = await lockPartner(tx, input.id);
+  const open = await tx
+    .select()
+    .from(invites)
+    .where(and(eq(invites.partnerId, partner.id), eq(invites.kind, 'partner'), isNull(invites.acceptedAt), isNull(invites.revokedAt)))
+    .orderBy(asc(invites.createdAt));
+  const resent: Array<CreatedInviteDto & { inviteeName: string | null }> = [];
+  for (const invite of open) {
+    const rotated = await rotateInviteToken(tx, invite.id, clock);
+    if (!rotated) continue;
+    const [known] = await tx.select({ name: users.name }).from(users).where(eq(users.email, invite.email)).limit(1);
+    resent.push({ ...rotated, inviteeName: known?.name ?? nameFromEmail(invite.email) });
+  }
+  return { partner: await rowFor(tx, partner.id), invites: resent };
+}
+
 export const isolation = defineIsolation<
-  'getCompany' | 'getChecklist' | 'tickChecklistStep' | 'listPartnerAdminRecipients' | 'updateCompanyProfile'
+  | 'getCompany' | 'getChecklist' | 'tickChecklistStep' | 'listPartnerAdminRecipients' | 'updateCompanyProfile'
+  | 'listPartners' | 'getPartnerDetail' | 'createPartner' | 'setPartnerManager' | 'setPartnerCategory'
+  | 'suspendPartner' | 'restorePartner' | 'resendPartnerInvites'
 >({
   getCompany: { scope: 'tenant', probe: (tx, viewer, ctx) => getCompany(tx, viewer, { partnerId: ctx.b.partnerId }), expect: 'not_found' },
   getChecklist: { scope: 'tenant', probe: (tx, viewer) => getChecklist(tx, viewer), expect: 'unchanged' },
@@ -152,4 +353,16 @@ export const isolation = defineIsolation<
     expect: 'not_found',
     untouched: (ctx) => [{ table: 'partners', id: ctx.b.partnerId }],
   },
+  listPartners: { scope: 'staff-only', probe: (tx, viewer) => listPartners(tx, viewer, {}), expect: 'forbidden' },
+  getPartnerDetail: { scope: 'staff-only', probe: (tx, viewer, ctx) => getPartnerDetail(tx, viewer, ctx.b.partnerId), expect: 'forbidden' },
+  createPartner: {
+    scope: 'staff-only',
+    probe: (tx, viewer) => createPartner(tx, viewer, { name: 'Probe', website: 'probe.example', category: 'channel', region: 'india', adminName: 'P', adminEmail: 'p@probe.example', sendInvite: false }, systemClock),
+    expect: 'forbidden',
+  },
+  setPartnerManager: { scope: 'staff-only', probe: (tx, viewer, ctx) => setPartnerManager(tx, viewer, { id: ctx.b.partnerId, managerId: ctx.staffUserId }, systemClock), expect: 'forbidden' },
+  setPartnerCategory: { scope: 'staff-only', probe: (tx, viewer, ctx) => setPartnerCategory(tx, viewer, { id: ctx.b.partnerId, category: 'distributor' }, systemClock), expect: 'forbidden' },
+  suspendPartner: { scope: 'staff-only', probe: (tx, viewer, ctx) => suspendPartner(tx, viewer, { id: ctx.b.partnerId }, systemClock), expect: 'forbidden' },
+  restorePartner: { scope: 'staff-only', probe: (tx, viewer, ctx) => restorePartner(tx, viewer, { id: ctx.b.partnerId }, systemClock), expect: 'forbidden' },
+  resendPartnerInvites: { scope: 'staff-only', probe: (tx, viewer, ctx) => resendPartnerInvites(tx, viewer, { id: ctx.b.partnerId }, systemClock), expect: 'forbidden' },
 });
