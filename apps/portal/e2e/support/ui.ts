@@ -34,7 +34,8 @@ export async function fillApplication(page: Page, a: ApplicantInput): Promise<vo
   await page.locator('#ap-title').fill(a.title);
   await page.locator('#ap-email').fill(a.email);
   await page.locator('#ap-phone').fill(a.phone);
-  await page.getByRole('button', { name: 'Channel partner', exact: true }).click();
+  // The phone layout shortens the option to "Channel" (UX WP5), the desktop one says "Channel partner".
+  await page.getByRole('button', { name: /^Channel( partner)?$/ }).click();
   await page.getByRole('button', { name: 'India', exact: true }).click();
   await page.locator('#ap-how').fill('Found CleanStart through a customer evaluation.');
   // The always-pass widget needs a moment to issue its token; submitting earlier shows "Confirm you are not a robot".
