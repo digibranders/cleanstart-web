@@ -25,6 +25,8 @@
 # script fails before the heartbeat, so a missing portal backup is an alert and never a silent gap. If the portal
 # database does not exist on this server yet, the script logs a WARNING and skips it.
 set -euo pipefail
+# Dumps hold partner details and password hashes: owner-only files, whatever umask cron runs with.
+umask 077
 
 : "${DATABASE_URI:?DATABASE_URI is required}"
 : "${R2_ENDPOINT:?R2_ENDPOINT is required}"
@@ -86,7 +88,10 @@ if [[ ! "${PORTAL_DB_NAME}" =~ ^[a-z_][a-z0-9_]*$ ]]; then
   exit 1
 fi
 
-PORTAL_EXISTS=$(psql "${DATABASE_URI}" -Atqc "SELECT 1 FROM pg_database WHERE datname = '${PORTAL_DB_NAME}'")
+for tool in psql pg_restore; do
+  command -v "${tool}" >/dev/null || { log "psql and pg_restore are required for the portal backup"; exit 1; }
+done
+PORTAL_EXISTS=$(psql -X "${DATABASE_URI}" -Atqc "SELECT 1 FROM pg_database WHERE datname = '${PORTAL_DB_NAME}'")
 if [[ "${PORTAL_EXISTS}" == "1" ]]; then
   [[ -r "${PORTAL_ENV_FILE}" ]] || { log "${PORTAL_DB_NAME} exists but ${PORTAL_ENV_FILE} is not readable"; exit 1; }
   PORTAL_ENDPOINT=$(env_file_value "${PORTAL_ENV_FILE}" R2_ENDPOINT)
