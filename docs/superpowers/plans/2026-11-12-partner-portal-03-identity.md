@@ -2542,7 +2542,7 @@ process.exit(0);
 
 Run the Gate A block (Conventions). The last command must list only: `src/server/repo/applications.ts`, `src/server/repo/applications.test.ts`, `src/server/intake/website-applications.ts`, `src/server/intake/website-applications.test.ts`, `src/server/intake/stub-cms.ts`, `src/server/jobs/intake.ts`, `src/server/jobs/intake.test.ts`, `scripts/stub-cms.ts`, `scripts/run-intake.ts` (under `apps/portal/`).
 
-- [ ] **Step 10: Manual check (dev database with seed-dev data)**
+- [x] **Step 10: Manual check (dev database with seed-dev data)**
 
 1. Terminal A: `pnpm --filter @cleanstart/portal exec tsx scripts/stub-cms.ts`. Expected: `Stub CMS listening at http://127.0.0.1:3290`.
 2. Put `CMS_API_URL=http://127.0.0.1:3290` and `CMS_INTAKE_API_KEY=stub-key` in `apps/portal/.env`. Terminal B: `pnpm --filter @cleanstart/portal exec tsx --env-file=.env scripts/run-intake.ts`. Expected log line: `website intake finished` with `fetched: 3, imported: 2, skipped: { honeypot: 1, ... }` and a cursor.
@@ -3519,7 +3519,7 @@ export interface ApplicationApprovalDto {
 }
 ```
 
-- [ ] **Step 10: Write the failing action tests**
+- [x] **Step 10: Write the failing action tests**
 
 Create `src/server/actions/applications.test.ts`. Requires H4.4 (`enqueue`) for the outbox assertions.
 
@@ -3657,7 +3657,7 @@ Run:
 `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/applications.test.ts`
 Expected: FAIL, `Failed to resolve import "./applications"`.
 
-- [ ] **Step 11: Implement the actions**
+- [x] **Step 11: Implement the actions**
 
 Create `src/server/actions/applications.ts`. Requires H4.4 (`@/server/hubspot/outbox`).
 

@@ -9,6 +9,7 @@ import { recordAudit } from '@/server/audit/record';
 import { assertCan } from '@/server/auth/policies';
 import { sendEmail } from '@/server/email/send';
 import { buildApplicationApproved, buildApplicationDeclined } from '@/server/email/templates';
+import { enqueue } from '@/server/hubspot/outbox';
 import { withViewer } from '@/server/repo/context';
 import {
   approveApplication,
@@ -49,6 +50,12 @@ export async function approveApplicationAction(raw: unknown): Promise<ActionResu
         note: `Created ${result.partner.name} as ${PARTNER_CATEGORY_LABEL[input.category]}, ${PARTNER_REGION_LABEL[input.region]}. Invite sent to ${before.applicantName}.`,
         partnerId: result.partner.id,
         subject: { type: 'application', id: before.id },
+      });
+      // '1' for a new partner; a reopened application reuses its partner, so that second sync needs a new key (contracts G).
+      await enqueue(tx, {
+        op: 'partner.upsert',
+        subjectId: result.partner.id,
+        version: before.partnerId === null ? '1' : String(ctx.clock.now().getTime()),
       });
       return { before, result };
     });
@@ -111,6 +118,9 @@ export async function reopenApplicationAction(raw: unknown): Promise<ActionResul
         ...(result.partnerId ? { partnerId: result.partnerId } : {}),
         subject: { type: 'application', id: result.id },
       });
+      if (before.status === 'approved' && result.partnerId) {
+        await enqueue(tx, { op: 'partner.upsert', subjectId: result.partnerId, version: String(ctx.clock.now().getTime()) });
+      }
       return result;
     });
     ctx.revalidate(ROUTES.admin.partners);

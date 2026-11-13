@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { applications, auditLog, invites, partners } from '@/db/schema';
+import { applications, auditLog, hubspotOutbox, invites, partners } from '@/db/schema';
 import { asPartner, asStaff, makeApplication, makePartner, makeUser, resetDb, testDb } from '@/db/test-helpers';
 import type { Viewer } from '@/server/auth/types';
 import type { FakeEmailTransport } from '@/server/email/fake';
@@ -50,13 +50,16 @@ const open = (overrides: Partial<typeof applications.$inferInsert> = {}) =>
   makeApplication(db, { company: 'Tidewater Infosec', domain: 'tidewaterinfosec.in', applicantName: 'Neha Joshi', email: 'neha.joshi@tidewaterinfosec.in', source: 'portal', ...overrides });
 
 describe('approveApplicationAction', () => {
-  it('creates the partner, audits and emails the invite link', async () => {
+  it('creates the partner, queues partner.upsert, audits and emails the invite link', async () => {
     const app = await open();
     const result = await approveApplicationAction({ id: app.id, category: 'channel', region: 'india' });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.data.partner).toMatchObject({ name: 'Tidewater Infosec', status: 'onboarding' });
     expect(JSON.stringify(result.data)).not.toContain('token');
+    const outbox = await db.select().from(hubspotOutbox);
+    expect(outbox).toHaveLength(1);
+    expect(outbox[0]).toMatchObject({ op: 'partner.upsert', subjectId: result.data.partner.id, idempotencyKey: `partner.upsert:${result.data.partner.id}:1`, status: 'pending' });
     expect((await db.select().from(auditLog)).map((a) => a.event)).toEqual(['application.approved']);
     const mail = fake.only('neha.joshi@tidewaterinfosec.in');
     const token = /accept-invite\?token=([A-Za-z0-9_-]+)/u.exec(mail.htmlContent)?.[1];
@@ -64,13 +67,16 @@ describe('approveApplicationAction', () => {
     expect(await db.select().from(invites)).toHaveLength(1);
   });
 
-  it('approves a reopened application again with the same partner', async () => {
+  it('uses a fresh outbox version when a reopened application is approved again', async () => {
     await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india' });
     const app = await open();
     const first = await approveApplicationAction({ id: app.id, category: 'channel', region: 'india' });
     await reopenApplicationAction({ id: app.id });
     const second = await approveApplicationAction({ id: app.id, category: 'channel', region: 'india' });
     expect(first.ok && second.ok).toBe(true);
+    const keys = (await db.select().from(hubspotOutbox)).map((o) => o.idempotencyKey);
+    expect(new Set(keys).size).toBe(keys.length);
+    expect(keys.length).toBeGreaterThanOrEqual(2);
     expect(await db.select().from(partners)).toHaveLength(1);
   });
 
@@ -99,6 +105,7 @@ describe('declineApplicationAction', () => {
     expect(result).toMatchObject({ ok: true, data: { status: 'declined', declineReason: 'We already have a partner in Pune.' } });
     expect((await db.select().from(auditLog)).map((a) => [a.event, a.note])).toEqual([['application.declined', 'We already have a partner in Pune.']]);
     expect(fake.only('neha.joshi@tidewaterinfosec.in').htmlContent).toContain('We already have a partner in Pune.');
+    expect(await db.select().from(hubspotOutbox)).toHaveLength(0);
   });
 });
 
@@ -108,6 +115,16 @@ describe('reopenApplicationAction', () => {
     const result = await reopenApplicationAction({ id: app.id });
     expect(result).toMatchObject({ ok: true, data: { status: 'new' } });
     expect((await db.select().from(auditLog)).map((a) => [a.event, a.note])).toEqual([['application.reopened', 'Decline undone']]);
+  });
+
+  it('queues a partner.upsert with a fresh version when an approval is undone', async () => {
+    await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'india' });
+    const app = await open();
+    await approveApplicationAction({ id: app.id, category: 'channel', region: 'india' });
+    const before = (await db.select().from(hubspotOutbox)).length;
+    const result = await reopenApplicationAction({ id: app.id });
+    expect(result.ok).toBe(true);
+    expect(await db.select().from(hubspotOutbox)).toHaveLength(before + 1);
   });
 
   it('reports partner_not_reopenable as a conflict', async () => {
