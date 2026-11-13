@@ -7,9 +7,9 @@ import { ROUTES } from "@/lib/routes";
 import { KESTREL } from "../shell/personas";
 import { Icon } from "../icon";
 import type { IconName } from "../icon-paths";
-import { daysLeft, fmtShort, plural, TODAY } from "../deals/dates";
-import { PRODUCT_SHORT, waitDays } from "../deals/derive";
-import { CustomerMark, PLUS_PATH, ProtectionCell, StatusBadge } from "../deals/parts";
+import { daysLeft, fmtShort, plural, TODAY } from "../deals/mock/dates";
+import { PRODUCT_SHORT, waitDays } from "../deals/mock/derive";
+import { CustomerMark, PLUS_PATH, ProtectionCell, StatusBadge } from "../deals/mock/parts";
 import { Badge, ProductChip } from "../ui/badge";
 
 interface Kpi {

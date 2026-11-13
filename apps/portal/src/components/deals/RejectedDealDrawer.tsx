@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { type Deal, resubmitDeal } from "@/data/deals";
+import { PRODUCT_LABEL } from "@/lib/domain";
+import type { RegistrationListItem } from "@/lib/dto";
+import { resubmitRegistrationAction } from "@/server/actions/registrations";
 import { Icon } from "../icon";
 import { Drawer } from "../ui/overlay";
 import { useToast } from "../ui/toast";
 import { fmtShort } from "./dates";
+import { firstWord } from "./derive";
 
 const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -15,7 +18,7 @@ export function RejectedDealDrawer({
   onClose,
   onMessage,
 }: {
-  deal: Deal;
+  deal: RegistrationListItem;
   onClose: () => void;
   onMessage: () => void;
 }): React.JSX.Element {
@@ -25,38 +28,52 @@ export function RejectedDealDrawer({
   const [email, setEmail] = useState("");
   const [note, setNote] = useState("");
   const [tried, setTried] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const nameErr = tried && !name.trim();
   const emailErr = tried && !EMAIL.test(email.trim());
 
-  const submit = (event: React.FormEvent): void => {
+  const submit = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
     if (!name.trim() || !EMAIL.test(email.trim())) {
       setTried(true);
       return;
     }
-    resubmitDeal(deal.id, { name, title, email, note });
+    setBusy(true);
+    const result = await resubmitRegistrationAction({
+      id: deal.id,
+      contact: { name, role: title, email },
+      note,
+    });
+    setBusy(false);
+    if (!result.ok) {
+      setFormError(result.error.message);
+      return;
+    }
     toast("Resubmitted. CleanStart will review it again.");
     onClose();
   };
 
-  const decided = deal.decidedOn ? ` Not accepted on ${fmtShort(deal.decidedOn)} by ${deal.decidedBy ?? "CleanStart"}.` : "";
+  const decided = deal.decidedOn
+    ? ` Not accepted on ${fmtShort(deal.decidedOn)} by ${deal.decidedByLabel ?? "CleanStart"}.`
+    : "";
 
   return (
     <Drawer
       open
       onClose={onClose}
       title={deal.customer}
-      subtitle={`${deal.product}.${decided}`}
+      subtitle={`${PRODUCT_LABEL[deal.product]}.${decided}`}
       onSubmit={submit}
       footer={
         <>
           <button type="button" className="btn btn-g" onClick={onMessage} style={{ marginRight: "auto" }}>
-            Message Farhan
+            Message {firstWord(deal.managerName ?? "your partner manager")}
           </button>
           <button type="button" className="btn btn-s" onClick={onClose}>
             Cancel
           </button>
-          <button type="submit" className="btn btn-p">
+          <button type="submit" className="btn btn-p" disabled={busy}>
             Resubmit
           </button>
         </>
@@ -125,6 +142,11 @@ export function RejectedDealDrawer({
         </label>
         <textarea id="rs-note" className="field" rows={3} value={note} onChange={(e) => setNote(e.target.value)} />
       </div>
+      {formError ? (
+        <span className="err" role="alert">
+          {formError}
+        </span>
+      ) : null}
     </Drawer>
   );
 }

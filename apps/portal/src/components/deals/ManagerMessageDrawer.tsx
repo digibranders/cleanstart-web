@@ -1,33 +1,43 @@
 "use client";
 
 import { useState } from "react";
+import { sendManagerMessageAction } from "@/server/actions/partners";
 import { Icon } from "../icon";
-import type { Persona } from "../shell/personas";
 import { Drawer } from "../ui/overlay";
 import { useToast } from "../ui/toast";
+import { initialsOf } from "./derive";
+import type { ManagerContact } from "./types";
 
 /** The "Message your partner manager" drawer, opened from a screen with a subject already filled in. */
 export function ManagerMessageDrawer({
-  persona,
+  manager,
+  senderEmail,
   initialSubject,
   onClose,
 }: {
-  persona: Persona;
+  manager: ManagerContact;
+  senderEmail: string;
   initialSubject: string;
   onClose: () => void;
-}): React.JSX.Element | null {
+}): React.JSX.Element {
   const toast = useToast();
   const [subject, setSubject] = useState(initialSubject);
   const [body, setBody] = useState("");
   const [tried, setTried] = useState(false);
-  const manager = persona.manager;
-  if (!manager) return null;
+  const [busy, setBusy] = useState(false);
   const invalid = tried && !body.trim();
 
-  const send = (event: React.FormEvent): void => {
+  const send = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
     if (!body.trim()) {
       setTried(true);
+      return;
+    }
+    setBusy(true);
+    const result = await sendManagerMessageAction({ subject, body });
+    setBusy(false);
+    if (!result.ok) {
+      toast(result.error.message);
       return;
     }
     toast(`Message sent to ${manager.name}`);
@@ -40,17 +50,15 @@ export function ManagerMessageDrawer({
       onClose={onClose}
       title={`Message ${manager.name}`}
       subtitle={`Your CleanStart partner manager, ${manager.team.replace("CleanStart ", "")}. Replies come to your email.`}
-      lead={<span className="av av-2">{manager.initials}</span>}
+      lead={<span className="av av-2">{initialsOf(manager.name)}</span>}
       onSubmit={send}
       footer={
         <>
-          <span className="hint">
-            Sent from {persona.user.toLowerCase().replace(" ", ".")}@{persona.org.toLowerCase().replace(/\s+/g, "")}.com
-          </span>
+          <span className="hint">Sent from {senderEmail}</span>
           <button type="button" className="btn btn-s" onClick={onClose}>
             Cancel
           </button>
-          <button type="submit" className="btn btn-p">
+          <button type="submit" className="btn btn-p" disabled={busy}>
             <Icon name="send" />
             Send
           </button>

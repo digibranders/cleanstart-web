@@ -1,17 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import { type Deal, type DealStatus, useDeals } from "@/data/deals";
+import { useState } from "react";
+import { PARTNER_REGION_LABEL, PRODUCT_LABEL, REGISTRATION_STATUS_LABEL } from "@/lib/domain";
+import type { RegistrationListItem } from "@/lib/dto";
 import { ROUTES } from "@/lib/routes";
 import { downloadCsv } from "../deals/csv";
 import { fmtShort } from "../deals/dates";
+import { CHIP_PRODUCT, protectionView } from "../deals/derive";
 import { ManagerMessageDrawer } from "../deals/ManagerMessageDrawer";
 import { CustomerMark, PLUS_PATH, ProtectionCell, StatusBadge } from "../deals/parts";
-import { protectionView } from "../deals/derive";
 import { RejectedDealDrawer } from "../deals/RejectedDealDrawer";
+import type { ManagerContact } from "../deals/types";
 import { Icon } from "../icon";
-import { KESTREL } from "../shell/personas";
 import { ProductChip } from "../ui/badge";
 import { Dropdown } from "../ui/dropdown";
 import { useToast } from "../ui/toast";
@@ -24,17 +25,21 @@ const ALL_REGIONS = "All regions";
 const ANY_MANAGER = "Any account manager";
 const PRODUCT_OPTIONS = [ALL_PRODUCTS, "CleanStart Images", "Clean Libraries", "CleanSight"];
 const REGION_OPTIONS = [ALL_REGIONS, "India", "Middle East"];
-const MANAGER_OPTIONS = [ANY_MANAGER, "Farhan Qureshi", "Omar Nasser"];
-
-function protectionText(deal: Deal): string {
-  const view = protectionView(deal, "deals");
+function protectionText(deal: RegistrationListItem, today: string): string {
+  const view = protectionView(deal, "deals", today);
   return `${view.until} ${view.left}`.trim();
 }
 
-export function Deals(): React.JSX.Element {
+interface DealsProps {
+  deals: RegistrationListItem[];
+  today: string;
+  partnerManager: ManagerContact | null;
+  senderEmail: string;
+}
+
+export function Deals({ deals, today, partnerManager, senderEmail }: DealsProps): React.JSX.Element {
   const toast = useToast();
-  const all = useDeals();
-  const deals = useMemo(() => all.filter((d) => d.partner === KESTREL.org), [all]);
+  const managerOptions = [ANY_MANAGER, ...new Set(deals.flatMap((d) => (d.managerName ? [d.managerName] : [])))];
 
   const [tab, setTab] = useState<Tab>("All");
   const [q, setQ] = useState("");
@@ -47,16 +52,16 @@ export function Deals(): React.JSX.Element {
   const needle = q.trim().toLowerCase();
   const rows = deals.filter(
     (d) =>
-      (tab === "All" || d.status === tab) &&
+      (tab === "All" || REGISTRATION_STATUS_LABEL[d.status] === tab) &&
       (!needle || d.customer.toLowerCase().includes(needle)) &&
-      (product === ALL_PRODUCTS || d.product === product) &&
-      (region === ALL_REGIONS || d.region === region) &&
-      (manager === ANY_MANAGER || d.manager === manager),
+      (product === ALL_PRODUCTS || PRODUCT_LABEL[d.product] === product) &&
+      (region === ALL_REGIONS || PARTNER_REGION_LABEL[d.region] === region) &&
+      (manager === ANY_MANAGER || d.managerName === manager),
   );
   const filtered = tab !== "All" || Boolean(needle) || product !== ALL_PRODUCTS || region !== ALL_REGIONS || manager !== ANY_MANAGER;
   const countFor = (label: Tab): number =>
-    label === "All" ? deals.length : deals.filter((d) => d.status === (label as DealStatus)).length;
-  const rejected = deals.find((d) => d.id === rejectedId && d.status === "Rejected");
+    label === "All" ? deals.length : deals.filter((d) => REGISTRATION_STATUS_LABEL[d.status] === label).length;
+  const rejected = deals.find((d) => d.id === rejectedId && d.status === "rejected");
 
   const clear = (): void => {
     setTab("All");
@@ -71,13 +76,13 @@ export function Deals(): React.JSX.Element {
       ["Customer", "Product", "Status", "Stage", "Account manager", "Registered by", "Registered", "Protection"],
       ...rows.map((d) => [
         d.customer,
-        d.product,
-        d.status,
+        PRODUCT_LABEL[d.product],
+        REGISTRATION_STATUS_LABEL[d.status],
         d.stage,
-        d.manager,
-        d.registeredBy ?? "",
-        fmtShort(d.registered),
-        protectionText(d),
+        d.managerName ?? "",
+        d.registeredByName,
+        fmtShort(d.registeredOn),
+        protectionText(d, today),
       ]),
     ]);
     toast(`Exported ${rows.length} deals to CSV`);
@@ -136,7 +141,7 @@ export function Deals(): React.JSX.Element {
               id="fm"
               ariaLabel="Account manager"
               value={manager}
-              options={MANAGER_OPTIONS}
+              options={managerOptions}
               onChange={setManager}
             />
           </div>
@@ -178,7 +183,7 @@ export function Deals(): React.JSX.Element {
               {rows.map((d) => (
                 <tr key={d.id}>
                   <td>
-                    {d.status === "Rejected" ? (
+                    {d.status === "rejected" ? (
                       <button type="button" className="cust linkbtn" onClick={() => setRejectedId(d.id)}>
                         <CustomerMark name={d.customer} />
                         {d.customer}
@@ -191,16 +196,16 @@ export function Deals(): React.JSX.Element {
                     )}
                   </td>
                   <td>
-                    <ProductChip product={d.product} />
+                    <ProductChip product={CHIP_PRODUCT[d.product]} />
                   </td>
                   <td>
                     <StatusBadge status={d.status} />
                   </td>
                   <td className="t-sec">{d.stage}</td>
-                  <td className="t-sec">{d.manager}</td>
-                  <td className="t-sec">{d.registeredBy}</td>
-                  <td className="tnum r t-sec">{fmtShort(d.registered)}</td>
-                  <ProtectionCell deal={d} mode="deals" />
+                  <td className="t-sec">{d.managerName}</td>
+                  <td className="t-sec">{d.registeredByName}</td>
+                  <td className="tnum r t-sec">{fmtShort(d.registeredOn)}</td>
+                  <ProtectionCell deal={d} mode="deals" today={today} />
                 </tr>
               ))}
             </tbody>
@@ -216,14 +221,15 @@ export function Deals(): React.JSX.Element {
           onClose={() => setRejectedId(null)}
           onMessage={() => {
             setRejectedId(null);
-            setMessageSubject(`${rejected.customer}, ${rejected.product}`);
+            setMessageSubject(`${rejected.customer}, ${PRODUCT_LABEL[rejected.product]}`);
           }}
         />
       ) : null}
-      {messageSubject !== null ? (
+      {messageSubject !== null && partnerManager ? (
         <ManagerMessageDrawer
           key={messageSubject}
-          persona={KESTREL}
+          manager={partnerManager}
+          senderEmail={senderEmail}
           initialSubject={messageSubject}
           onClose={() => setMessageSubject(null)}
         />

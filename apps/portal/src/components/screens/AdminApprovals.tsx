@@ -3,8 +3,8 @@
 import { useMemo, useState } from "react";
 import { acceptDeal, type Deal, rejectDeal, undoDecision, useDeals } from "@/data/deals";
 import { downloadCsv } from "../deals/csv";
-import { daysBetween, fmtLong, fmtShort, plural, TODAY } from "../deals/dates";
-import { avOf, type Check, checksFor, initialsOf, OVER_TARGET_DAYS, reviewSince, waitDays } from "../deals/derive";
+import { daysBetween, fmtLong, fmtShort, plural, TODAY } from "../deals/mock/dates";
+import { avOf, type Check, checksFor, initialsOf, OVER_TARGET_DAYS, reviewSince, waitDays } from "../deals/mock/derive";
 import { Icon } from "../icon";
 import { ProductChip } from "../ui/badge";
 import { Dropdown } from "../ui/dropdown";
