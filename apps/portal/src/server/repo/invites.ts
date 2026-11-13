@@ -1,12 +1,14 @@
-import { and, eq } from 'drizzle-orm';
+import { and, desc, eq, isNull } from 'drizzle-orm';
 import { applications, authAccounts, authTwoFactors, invites, partners, staffScopes, users } from '@/db/schema';
-import type { Clock } from '@/lib/clock';
-import type { PartnerRole, StaffRole, UserKind } from '@/lib/domain';
-import type { InvitePreviewDto, InviteState } from '@/lib/dto';
-import type { SystemActor } from '@/server/auth/types';
+import { type Clock, systemClock } from '@/lib/clock';
+import type { PartnerRole, StaffRegion, StaffRole, UserKind } from '@/lib/domain';
+import type { CreatedInviteDto, InviteDto, InvitePreviewDto, InviteState } from '@/lib/dto';
+import { isValidEmail } from '@/lib/people';
+import type { SystemActor, Viewer } from '@/server/auth/types';
 import { hashToken, inviteState } from '@/server/auth/tokens';
 import { ConflictError, NotFoundError, ValidationError } from '@/server/errors';
-import type { Tx } from './context';
+import { issueInvite, rotateInviteToken, toInviteDto } from '@/server/invite-core';
+import { assertStaff, type Tx } from './context';
 import { defineIsolation } from './isolation.registry';
 
 export interface AcceptInviteInput {
@@ -177,7 +179,101 @@ export async function acceptInvite(tx: Tx, _actor: SystemActor, input: AcceptInv
   };
 }
 
-export const isolation = defineIsolation<'previewInvite' | 'acceptInvite'>({
+export type NewInviteInput =
+  | { kind: 'partner'; partnerId: string; email: string; role: PartnerRole }
+  | { kind: 'staff'; email: string; role: StaffRole; region: StaffRegion };
+
+/** Partner admin on own company, partner manager on any, partner manager for staff invites (M1.6, M1.8). */
+export async function createInvite(tx: Tx, viewer: Viewer, input: NewInviteInput, clock: Clock): Promise<CreatedInviteDto> {
+  if (!isValidEmail(input.email)) throw new ValidationError([{ path: 'email', message: 'Enter a valid work email.' }]);
+  if (input.kind === 'staff') {
+    assertStaff(viewer);
+    return issueInvite(tx, { kind: 'staff', partnerId: null, email: input.email, role: input.role, staffRegion: input.region, invitedBy: viewer.id }, clock);
+  }
+  if (viewer.kind === 'partner' && input.partnerId !== viewer.partnerId) throw new NotFoundError('partner');
+  const [partner] = await tx.select({ id: partners.id }).from(partners).where(eq(partners.id, input.partnerId)).limit(1);
+  if (!partner) throw new NotFoundError('partner');
+  return issueInvite(tx, { kind: 'partner', partnerId: partner.id, email: input.email, role: input.role, staffRegion: null, invitedBy: viewer.id }, clock);
+}
+
+const loadOpenForUpdate = async (tx: Tx, viewer: Viewer, inviteId: string) => {
+  const [row] = await tx.select().from(invites).where(eq(invites.id, inviteId)).limit(1).for('update');
+  // Another company's invite (and any staff invite, for a partner viewer) is invisible: same answer as a missing id.
+  if (!row || (viewer.kind === 'partner' && row.partnerId !== viewer.partnerId)) throw new NotFoundError('invite');
+  if (row.kind === 'staff') assertStaff(viewer);
+  if (row.acceptedAt) throw new ConflictError('invite_used', 'This invite was already accepted.');
+  if (row.revokedAt) throw new ConflictError('invite_revoked', 'This invite was withdrawn.');
+  return row;
+};
+
+/** Rotates the token, extends the expiry by INVITE_TTL_DAYS from now, increments resentCount (M1.6, M1.8). Only for open invites. */
+export async function resendInvite(tx: Tx, viewer: Viewer, input: { inviteId: string }, clock: Clock): Promise<CreatedInviteDto> {
+  const row = await loadOpenForUpdate(tx, viewer, input.inviteId);
+  const rotated = await rotateInviteToken(tx, row.id, clock);
+  if (!rotated) throw new ConflictError('invite_used', 'This invite is no longer open.');
+  return rotated;
+}
+
+/** Sets revoked_at (M1.6, M1.8). */
+export async function revokeInvite(tx: Tx, viewer: Viewer, input: { inviteId: string }, clock: Clock): Promise<InviteDto> {
+  const row = await loadOpenForUpdate(tx, viewer, input.inviteId);
+  const [revoked] = await tx.update(invites).set({ revokedAt: clock.now() }).where(eq(invites.id, row.id)).returning();
+  if (!revoked) throw new Error('invite revoke returned no row');
+  return toInviteDto(revoked, clock.now());
+}
+
+/** Open invites of one partner (partner viewers: their own), or all staff invites when kind is 'staff' (M1.6, M1.8). Expired ones are included, flagged by state. */
+export async function listOpenInvites(
+  tx: Tx,
+  viewer: Viewer,
+  input: { kind: UserKind; partnerId?: string },
+  clock: Clock,
+): Promise<InviteDto[]> {
+  if (input.kind === 'staff') assertStaff(viewer);
+  else if (viewer.kind === 'partner' && input.partnerId !== undefined && input.partnerId !== viewer.partnerId) {
+    throw new NotFoundError('partner');
+  }
+  const partnerId = viewer.kind === 'partner' ? viewer.partnerId : input.partnerId;
+  const rows = await tx
+    .select()
+    .from(invites)
+    .where(
+      and(
+        eq(invites.kind, input.kind),
+        isNull(invites.acceptedAt),
+        isNull(invites.revokedAt),
+        input.kind === 'partner' && partnerId ? eq(invites.partnerId, partnerId) : undefined,
+      ),
+    )
+    .orderBy(desc(invites.createdAt));
+  return rows.map((row) => toInviteDto(row, clock.now()));
+}
+
+export const isolation = defineIsolation<
+  'previewInvite' | 'acceptInvite' | 'createInvite' | 'resendInvite' | 'revokeInvite' | 'listOpenInvites'
+>({
   previewInvite: { scope: 'public', reason: 'Public invite page. Takes a SystemActor; covered by invites.test.ts.' },
   acceptInvite: { scope: 'public', reason: 'Public invite flow. Takes a SystemActor; covered by invites.test.ts and actions/invites.test.ts.' },
+  createInvite: {
+    scope: 'tenant',
+    probe: (tx, viewer, ctx) => createInvite(tx, viewer, { kind: 'partner', partnerId: ctx.b.partnerId, email: 'probe@example.com', role: 'sales' }, systemClock),
+    expect: 'not_found',
+  },
+  resendInvite: {
+    scope: 'tenant',
+    probe: (tx, viewer, ctx) => resendInvite(tx, viewer, { inviteId: ctx.b.inviteId }, systemClock),
+    expect: 'not_found',
+    untouched: (ctx) => [{ table: 'invites', id: ctx.b.inviteId }],
+  },
+  revokeInvite: {
+    scope: 'tenant',
+    probe: (tx, viewer, ctx) => revokeInvite(tx, viewer, { inviteId: ctx.b.inviteId }, systemClock),
+    expect: 'not_found',
+    untouched: (ctx) => [{ table: 'invites', id: ctx.b.inviteId }],
+  },
+  listOpenInvites: {
+    scope: 'tenant',
+    probe: (tx, viewer, ctx) => listOpenInvites(tx, viewer, { kind: 'partner', partnerId: ctx.b.partnerId }, systemClock),
+    expect: 'not_found',
+  },
 });

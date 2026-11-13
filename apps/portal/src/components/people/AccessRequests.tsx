@@ -1,50 +1,43 @@
 "use client";
 
+import { useState } from "react";
 import { useToast } from "@/components/ui/toast";
-import { appendAudit } from "@/data/audit";
-import { type AccessRequest, initialsOf, teamSlice } from "@/data/team";
+import { fmtShort } from "@/lib/dates";
+import { ACCESS_REQUEST_ROLES, type AccessRequestRole, PARTNER_ROLE_LABEL } from "@/lib/domain";
+import type { AccessRequestDto } from "@/lib/dto";
+import { codeFromLabel, emailDomain, initialsOf } from "@/lib/people";
+import { decideAccessRequestAction } from "@/server/actions/team";
 import { RowAction } from "./RowAction";
 import { Seg } from "./Seg";
 
-const REQUEST_ROLES = ["Sales", "Technical"] as const;
+const REQUEST_ROLES: readonly string[] = ACCESS_REQUEST_ROLES.map((role) => PARTNER_ROLE_LABEL[role]);
 
-export function AccessRequests({ requests }: { requests: AccessRequest[] }): React.JSX.Element | null {
+export function AccessRequests({
+  requests,
+  today,
+}: {
+  requests: AccessRequestDto[];
+  today: string;
+}): React.JSX.Element | null {
   const toast = useToast();
+  // The role the admin picked per request; until then the role the person asked for.
+  const [picked, setPicked] = useState<Record<string, AccessRequestRole>>({});
   if (requests.length === 0) return null;
 
-  const setRole = (email: string, role: AccessRequest["role"]): void =>
-    teamSlice.set((prev) => ({
-      ...prev,
-      requests: prev.requests.map((r) => (r.email === email ? { ...r, role } : r)),
-    }));
+  const roleOf = (rq: AccessRequestDto): AccessRequestRole => picked[rq.id] ?? rq.role;
 
-  const approve = (rq: AccessRequest): void => {
-    teamSlice.set((prev) => ({
-      requests: prev.requests.filter((r) => r.email !== rq.email),
-      members: [
-        ...prev.members,
-        { name: rq.name, email: rq.email, role: rq.role, status: "Invited", last: "Approved today", deals: 0 },
-      ],
-    }));
-    appendAudit({
-      actor: "Aditi Rao",
-      action: "Approved an access request",
-      target: `${rq.name}, ${rq.role.toLowerCase()}, at Kestrel Systems`,
-      source: "Portal",
-    });
-    toast(`${rq.name} can now set a password and sign in`);
+  const approve = async (rq: AccessRequestDto): Promise<void> => {
+    const result = await decideAccessRequestAction({ id: rq.id, decision: "approve", role: roleOf(rq) });
+    toast(result.ok ? `${rq.name} can now set a password and sign in` : result.error.message);
   };
 
-  const decline = (rq: AccessRequest): void => {
-    teamSlice.set((prev) => ({ ...prev, requests: prev.requests.filter((r) => r.email !== rq.email) }));
-    appendAudit({
-      actor: "Aditi Rao",
-      action: "Declined an access request",
-      target: `${rq.name}, at Kestrel Systems`,
-      source: "Portal",
-    });
-    toast(`Request declined. ${rq.name} gets an email.`);
+  const decline = async (rq: AccessRequestDto): Promise<void> => {
+    const result = await decideAccessRequestAction({ id: rq.id, decision: "decline" });
+    toast(result.ok ? `Request declined. ${rq.name} gets an email.` : result.error.message);
   };
+
+  const asked = (rq: AccessRequestDto): string =>
+    rq.requestedAt.slice(0, 10) === today ? "Asked today" : `Asked ${fmtShort(rq.requestedAt.slice(0, 10))}`;
 
   return (
     <section
@@ -57,11 +50,13 @@ export function AccessRequests({ requests }: { requests: AccessRequest[] }): Rea
         <h2 id="reqs" className="card-t">
           Access requests
         </h2>
-        <span className="card-meta">People at kestrelsystems.in who asked for a login</span>
+        <span className="card-meta">
+          People at {emailDomain(requests[0]?.email ?? "")} who asked for a login
+        </span>
       </div>
       {requests.map((rq) => (
         <div
-          key={rq.email}
+          key={rq.id}
           className="li"
           style={{ padding: "10px 12px", alignItems: "flex-start", flexWrap: "wrap", gap: "10px 12px" }}
         >
@@ -71,25 +66,28 @@ export function AccessRequests({ requests }: { requests: AccessRequest[] }): Rea
               {rq.name} <span className="t-muted" style={{ fontWeight: 500 }}>{rq.email}</span>
             </span>
             <span className="li-s" style={{ whiteSpace: "normal" }}>
-              {rq.when}. "{rq.note}"
+              {asked(rq)}.{rq.note ? ` "${rq.note}"` : ""}
             </span>
           </span>
           <span style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: "auto" }}>
             <Seg
               options={REQUEST_ROLES}
-              value={rq.role}
-              onChange={(role) => setRole(rq.email, role)}
+              value={PARTNER_ROLE_LABEL[roleOf(rq)]}
+              onChange={(label) => {
+                const code = codeFromLabel(PARTNER_ROLE_LABEL, label);
+                if (code === "sales" || code === "technical") setPicked((prev) => ({ ...prev, [rq.id]: code }));
+              }}
               ariaLabel={`Role for ${rq.name}`}
               compact
             />
             <span className="acts">
-              <RowAction label={`Decline ${rq.name}`} tip="Decline" icon="x" tone="no" onClick={() => decline(rq)} />
+              <RowAction label={`Decline ${rq.name}`} tip="Decline" icon="x" tone="no" onClick={() => void decline(rq)} />
               <RowAction
                 label={`Approve ${rq.name}`}
                 tip="Approve and send a login link"
                 icon="check"
                 tone="ok"
-                onClick={() => approve(rq)}
+                onClick={() => void approve(rq)}
               />
             </span>
           </span>

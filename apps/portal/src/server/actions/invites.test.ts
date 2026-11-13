@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { auditLog, hubspotOutbox, invites, notifications, partners, staffScopes, users } from '@/db/schema';
+import { accessRequests, auditLog, hubspotOutbox, invites, notifications, partners, staffScopes, users } from '@/db/schema';
 import { makeInvite, makePartner, makeUser, resetDb, testDb } from '@/db/test-helpers';
 import type { Viewer } from '@/server/auth/types';
 import type { FakeEmailTransport } from '@/server/email/fake';
@@ -42,7 +42,7 @@ vi.mock('@/server/auth/auth', () => ({
 }));
 
 import { auth } from '@/server/auth/auth';
-import { acceptInviteAction, previewInviteAction } from './invites';
+import { acceptInviteAction, previewInviteAction, requestAccessAction } from './invites';
 
 const db = testDb();
 let fake: FakeEmailTransport;
@@ -175,5 +175,67 @@ describe('previewInviteAction', () => {
     const { token } = await firstAdmin();
     expect(await previewInviteAction({ token })).toMatchObject({ ok: true, data: { state: 'ok', needsAgreement: true } });
     expect(await previewInviteAction({ token: 'nope' })).toEqual({ ok: true, data: { state: 'unknown' } });
+  });
+});
+
+describe('requestAccessAction', () => {
+  const ask = (overrides: Record<string, unknown> = {}) =>
+    requestAccessAction({ name: 'Rohit Desai', email: 'rohit.desai@kestrelsystems.in', note: 'I lead the Mumbai sales team.', ...overrides });
+  const kestrel = async () => {
+    const partner = await makePartner(db, { name: 'Kestrel Systems', domain: 'kestrelsystems.in' });
+    const admin = await makeUser(db, { partnerId: partner.id, role: 'partner_admin', email: 'aditi.rao@kestrelsystems.in', name: 'Aditi Rao' });
+    return { partner, admin };
+  };
+
+  it('answers exactly the same whether or not the domain is a partner, and the same for a person who already has a login', async () => {
+    const { partner } = await kestrel();
+    await makeUser(db, { partnerId: partner.id, email: 'has.login@kestrelsystems.in' });
+    const matched = await ask();
+    const unknown = await ask({ email: 'someone@not-a-partner.example' });
+    const hasLogin = await ask({ email: 'has.login@kestrelsystems.in' });
+    expect(matched).toEqual({ ok: true, data: { confirmation: 'sent' } });
+    expect(unknown).toEqual(matched);
+    expect(hasLogin).toEqual(matched);
+  });
+
+  it('for a matching domain: one open request, a notification and an email to the partner admin, an audit entry', async () => {
+    const { admin } = await kestrel();
+    await ask();
+    expect(await db.select().from(accessRequests)).toHaveLength(1);
+    expect((await db.select().from(notifications)).map((n) => [n.userId, n.kind])).toEqual([[admin.id, 'access_requested']]);
+    expect((await db.select().from(auditLog)).map((a) => a.event)).toEqual(['team.access_requested']);
+    await vi.waitFor(() => expect(fake.to('aditi.rao@kestrelsystems.in')).toHaveLength(1));
+    expect(fake.to('aditi.rao@kestrelsystems.in')[0]?.htmlContent).toContain('Rohit Desai');
+  });
+
+  it('for any other domain: nothing is stored and nobody is emailed', async () => {
+    await kestrel();
+    await ask({ email: 'someone@not-a-partner.example' });
+    expect(await db.select().from(accessRequests)).toHaveLength(0);
+    expect(await db.select().from(notifications)).toHaveLength(0);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(fake.sent).toHaveLength(0);
+  });
+
+  it('asking twice keeps one open request and sends the admin one email', async () => {
+    await kestrel();
+    await ask();
+    await ask({ note: 'second try' });
+    expect(await db.select().from(accessRequests)).toHaveLength(1);
+    await vi.waitFor(() => expect(fake.to('aditi.rao@kestrelsystems.in')).toHaveLength(1));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(fake.to('aditi.rao@kestrelsystems.in')).toHaveLength(1);
+  });
+
+  it('rejects free-mail addresses, needs a name, and rate limits by IP and by email', async () => {
+    await kestrel();
+    expect(await ask({ email: 'rohit@gmail.com' })).toMatchObject({ ok: false, error: { code: 'validation', issues: [{ path: 'email' }] } });
+    expect(await ask({ name: ' ' })).toMatchObject({ ok: false, error: { code: 'validation' } });
+    for (let i = 0; i < 3; i += 1) await ask({ email: 'same@kestrelsystems.in' });
+    expect(await ask({ email: 'same@kestrelsystems.in' })).toMatchObject({ ok: false, error: { code: 'rate_limited' } });
+    ipCounter += 1;
+    harness.ip = `203.0.113.${ipCounter}`;
+    for (let i = 0; i < 5; i += 1) await ask({ email: `p${i}@kestrelsystems.in` });
+    expect(await ask({ email: 'p9@kestrelsystems.in' })).toMatchObject({ ok: false, error: { code: 'rate_limited' } });
   });
 });

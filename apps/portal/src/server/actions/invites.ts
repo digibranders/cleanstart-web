@@ -1,5 +1,7 @@
 'use server';
 
+import { validateBusinessEmail } from '@cleanstart/forms';
+import { FREE_EMAIL_DOMAINS } from '@cleanstart/forms/server';
 import { headers } from 'next/headers';
 import { z } from 'zod';
 import { env } from '@/env';
@@ -13,7 +15,8 @@ import { auth } from '@/server/auth/auth';
 import { assertPasswordOk, hashPassword } from '@/server/auth/passwords';
 import { type SystemActor, publicActor } from '@/server/auth/types';
 import { sendEmail } from '@/server/email/send';
-import { buildTeamChangeNotice } from '@/server/email/templates';
+import { buildAccessRequest, buildTeamChangeNotice } from '@/server/email/templates';
+import { ValidationError } from '@/server/errors';
 import { enqueue } from '@/server/hubspot/outbox';
 import { loadInvitePreview } from '@/server/invite-preview';
 import { log } from '@/server/log';
@@ -22,8 +25,18 @@ import { rateLimit } from '@/server/rate-limit';
 import { withSystem } from '@/server/repo/context';
 import { acceptInvite } from '@/server/repo/invites';
 import { listPartnerAdminRecipients } from '@/server/repo/partners';
+import { createAccessRequest } from '@/server/repo/team';
+import { absoluteUrl } from '@/server/urls';
 import type { ActionResult } from './result';
 import { runPublicAction } from './run';
+
+const requestSchema = z.object({
+  name: z.string().trim().min(1, 'Enter your name.').max(120),
+  email: z.string().trim().max(254),
+  note: z.string().trim().max(500).optional(),
+});
+const REQUEST_IP_RULE = { limit: 5, windowSeconds: 600 } as const;
+const REQUEST_EMAIL_RULE = { limit: 3, windowSeconds: 3600 } as const;
 
 const previewSchema = z.object({ token: z.string().min(1).max(200) });
 
@@ -135,5 +148,66 @@ export async function acceptInviteAction(raw: unknown): Promise<ActionResult<Acc
       signedIn,
       redirectTo: signedIn ? landingPathFor(accepted.result.kind, accepted.result.role) : ROUTES.signIn,
     };
+  });
+}
+
+/**
+ * "Request access" on the sign-in page. The answer is the same whether or not the domain is a partner, whether or not
+ * the person already has a login, and whether or not a request was created, so it cannot be used to discover accounts.
+ * The admin email is sent without being awaited, so the response time does not depend on the match either.
+ */
+export async function requestAccessAction(raw: unknown): Promise<ActionResult<{ confirmation: 'sent' }>> {
+  return runPublicAction({ name: 'access.request', schema: requestSchema }, raw, async (ctx, input): Promise<{ confirmation: 'sent' }> => {
+    const checked = validateBusinessEmail(input.email, { freeDomains: FREE_EMAIL_DOMAINS, requireBusiness: true });
+    if (!checked.ok) {
+      throw new ValidationError([
+        { path: 'email', message: checked.reason === 'free-mail' ? 'Use your company email, not a personal address.' : 'Enter a valid work email.' },
+      ]);
+    }
+    if (ctx.ip) rateLimit(`access:ip:${ctx.ip}`, REQUEST_IP_RULE);
+    rateLimit(`access:email:${checked.email}`, REQUEST_EMAIL_RULE);
+
+    const actor = publicActor(input.name);
+    const found = await withSystem(actor, async (tx) => {
+      const result = await createAccessRequest(tx, actor, { email: checked.email, name: input.name, note: input.note ?? null }, ctx.clock);
+      let items: NewNotification[] = [];
+      if (result.matched && result.partnerId && result.requestId) {
+        await recordAudit(tx, actor, {
+          event: 'team.access_requested',
+          target: `${input.name}, at ${result.partnerName ?? ''}`,
+          partnerId: result.partnerId,
+          subject: { type: 'user', id: result.requestId },
+        });
+        items = result.adminRecipients.map((admin) => ({
+          userId: admin.userId,
+          kind: 'access_requested' as const,
+          title: `${input.name} asked for access`,
+          body: checked.email,
+          link: ROUTES.partner.team,
+        }));
+        await notifyUsers(tx, items);
+      }
+      return { result, items };
+    });
+
+    if (found.items.length > 0) {
+      ctx.afterCommit(async () => {
+        void (async () => {
+          const to = (await resolveEmailRecipients(found.items)).map((r) => ({ email: r.email, name: r.name }));
+          if (to.length === 0) return;
+          await sendEmail(
+            buildAccessRequest({
+              to,
+              requesterName: input.name,
+              requesterEmail: checked.email,
+              note: input.note ?? null,
+              companyName: found.result.partnerName ?? '',
+              reviewUrl: absoluteUrl(ROUTES.partner.team),
+            }),
+          );
+        })();
+      });
+    }
+    return { confirmation: 'sent' };
   });
 }

@@ -1,11 +1,12 @@
 import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { authAccounts, authTwoFactors, invites, partners, staffScopes, users } from '@/db/schema';
-import { makeApplication, makeInvite, makePartner, makeUser, resetDb, testDb } from '@/db/test-helpers';
+import { asPartner, asStaff, makeApplication, makeInvite, makePartner, makeUser, resetDb, testDb } from '@/db/test-helpers';
 import { fixedClock } from '@/lib/clock';
+import { hashToken, INVITE_TTL_DAYS } from '@/server/auth/tokens';
 import { publicActor } from '@/server/auth/types';
-import { withSystem } from './context';
-import { type AcceptInviteInput, acceptInvite, previewInvite } from './invites';
+import { withSystem, withViewer } from './context';
+import { type AcceptInviteInput, acceptInvite, createInvite, listOpenInvites, previewInvite, resendInvite, revokeInvite } from './invites';
 
 const db = testDb();
 const clock = fixedClock('2026-11-12T10:00:00Z');
@@ -152,5 +153,109 @@ describe('acceptInvite', () => {
     expect(result).toMatchObject({ kind: 'staff', role: 'sales', partnerId: null, partnerName: null, agreementAccepted: false });
     const [scope] = await db.select().from(staffScopes).where(eq(staffScopes.userId, result.userId));
     expect(scope?.region).toBe('middle_east');
+  });
+});
+
+describe('createInvite', () => {
+  it('lets a partner admin invite into their own company and returns the token once', async () => {
+    const partner = await makePartner(db, {});
+    const admin = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
+    const created = await withViewer(admin, (tx) => createInvite(tx, admin, { kind: 'partner', partnerId: partner.id, email: ' Meera.Pillai@Kestrel.example ', role: 'sales' }, clock));
+    expect(created.invite).toMatchObject({ email: 'meera.pillai@kestrel.example', role: 'sales', kind: 'partner', partnerId: partner.id, state: 'ok' });
+    const [row] = await db.select().from(invites).where(eq(invites.id, created.invite.id));
+    expect(row?.tokenHash).toBe(hashToken(created.token));
+    expect(row?.invitedBy).toBe(admin.id);
+    expect(row?.expiresAt.getTime()).toBe(clock.now().getTime() + INVITE_TTL_DAYS * 86_400_000);
+  });
+
+  it('refuses another company for a partner viewer, a bad email, and a person who already has a login', async () => {
+    const partner = await makePartner(db, {});
+    const other = await makePartner(db, {});
+    const admin = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
+    await expect(withViewer(admin, (tx) => createInvite(tx, admin, { kind: 'partner', partnerId: other.id, email: 'a@b.example', role: 'sales' }, clock))).rejects.toMatchObject({ code: 'not_found' });
+    await expect(withViewer(admin, (tx) => createInvite(tx, admin, { kind: 'partner', partnerId: partner.id, email: 'nope', role: 'sales' }, clock))).rejects.toMatchObject({ code: 'validation', issues: [{ path: 'email' }] });
+    await expect(withViewer(admin, (tx) => createInvite(tx, admin, { kind: 'partner', partnerId: partner.id, email: admin.email, role: 'sales' }, clock))).rejects.toMatchObject({ reason: 'already_has_login' });
+  });
+
+  it('lets a partner manager invite anywhere and create staff invites; partner viewers cannot', async () => {
+    const partner = await makePartner(db, {});
+    const manager = await asStaff(db, 'partner_manager', 'india');
+    const forPartner = await withViewer(manager, (tx) => createInvite(tx, manager, { kind: 'partner', partnerId: partner.id, email: 'x@p.example', role: 'technical' }, clock));
+    expect(forPartner.invite.partnerId).toBe(partner.id);
+    const staff = await withViewer(manager, (tx) => createInvite(tx, manager, { kind: 'staff', email: 'kunal@cleanstart.com', role: 'sales', region: 'india' }, clock));
+    expect(staff.invite).toMatchObject({ kind: 'staff', partnerId: null, staffRegion: 'india', role: 'sales' });
+    const admin = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
+    await expect(withViewer(admin, (tx) => createInvite(tx, admin, { kind: 'staff', email: 'y@cleanstart.com', role: 'sales', region: 'india' }, clock))).rejects.toMatchObject({ code: 'forbidden' });
+  });
+});
+
+describe('resendInvite and revokeInvite', () => {
+  it('resending replaces the token, extends the expiry and counts it; the old link stops working', async () => {
+    const partner = await makePartner(db, {});
+    const admin = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
+    const { invite, token } = await makeInvite(db, { kind: 'partner', partnerId: partner.id, role: 'sales', email: 'v@p.example', expiresAt: new Date('2026-11-13T00:00:00Z') });
+    const resent = await withViewer(admin, (tx) => resendInvite(tx, admin, { inviteId: invite.id }, clock));
+    expect(resent.invite).toMatchObject({ id: invite.id, resentCount: 1, state: 'ok' });
+    expect(resent.invite.expiresAt).toBe(new Date(clock.now().getTime() + INVITE_TTL_DAYS * 86_400_000).toISOString());
+    expect(resent.token).not.toBe(token);
+    expect(await preview(token)).toEqual({ state: 'unknown' });
+    expect(await preview(resent.token)).toMatchObject({ state: 'ok' });
+  });
+
+  it('refuses to resend or revoke an accepted or withdrawn invite, or one at another company', async () => {
+    const partner = await makePartner(db, {});
+    const other = await makePartner(db, {});
+    const admin = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
+    const used = await makeInvite(db, { kind: 'partner', partnerId: partner.id, role: 'sales', email: 'u@p.example', expiresAt: future, acceptedAt: new Date('2026-11-05T00:00:00Z') });
+    const revoked = await makeInvite(db, { kind: 'partner', partnerId: partner.id, role: 'sales', email: 'r@p.example', expiresAt: future, revokedAt: new Date('2026-11-05T00:00:00Z') });
+    const foreign = await makeInvite(db, { kind: 'partner', partnerId: other.id, role: 'sales', email: 'f@o.example', expiresAt: future });
+    await expect(withViewer(admin, (tx) => resendInvite(tx, admin, { inviteId: used.invite.id }, clock))).rejects.toMatchObject({ reason: 'invite_used' });
+    await expect(withViewer(admin, (tx) => resendInvite(tx, admin, { inviteId: revoked.invite.id }, clock))).rejects.toMatchObject({ reason: 'invite_revoked' });
+    await expect(withViewer(admin, (tx) => revokeInvite(tx, admin, { inviteId: used.invite.id }, clock))).rejects.toMatchObject({ reason: 'invite_used' });
+    await expect(withViewer(admin, (tx) => resendInvite(tx, admin, { inviteId: foreign.invite.id }, clock))).rejects.toMatchObject({ code: 'not_found' });
+    await expect(withViewer(admin, (tx) => revokeInvite(tx, admin, { inviteId: foreign.invite.id }, clock))).rejects.toMatchObject({ code: 'not_found' });
+    const [untouched] = await db.select().from(invites).where(eq(invites.id, foreign.invite.id));
+    expect(untouched?.revokedAt).toBeNull();
+  });
+
+  it('revoking withdraws the invite so its link reports as withdrawn', async () => {
+    const partner = await makePartner(db, {});
+    const admin = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
+    const { invite, token } = await makeInvite(db, { kind: 'partner', partnerId: partner.id, role: 'sales', email: 'w@p.example', expiresAt: future });
+    const dto = await withViewer(admin, (tx) => revokeInvite(tx, admin, { inviteId: invite.id }, clock));
+    expect(dto.state).toBe('revoked');
+    expect(await preview(token)).toEqual({ state: 'revoked' });
+  });
+
+  it('only a partner manager touches staff invites', async () => {
+    const partner = await makePartner(db, {});
+    const admin = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
+    const manager = await asStaff(db, 'partner_manager', 'india');
+    const { invite } = await makeInvite(db, { kind: 'staff', partnerId: null, role: 'sales', staffRegion: 'india', email: 'k@cleanstart.com', expiresAt: future });
+    await expect(withViewer(admin, (tx) => resendInvite(tx, admin, { inviteId: invite.id }, clock))).rejects.toMatchObject({ code: 'not_found' });
+    expect((await withViewer(manager, (tx) => resendInvite(tx, manager, { inviteId: invite.id }, clock))).invite.resentCount).toBe(1);
+  });
+});
+
+describe('listOpenInvites', () => {
+  it('lists the open invites of the viewer company, newest first, including expired ones', async () => {
+    const partner = await makePartner(db, {});
+    const other = await makePartner(db, {});
+    const admin = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
+    const first = await makeInvite(db, { kind: 'partner', partnerId: partner.id, role: 'sales', email: 'a@p.example', expiresAt: future, createdAt: new Date('2026-11-01T00:00:00Z') });
+    const second = await makeInvite(db, { kind: 'partner', partnerId: partner.id, role: 'sales', email: 'b@p.example', expiresAt: new Date('2026-11-02T00:00:00Z'), createdAt: new Date('2026-11-02T00:00:00Z') });
+    await makeInvite(db, { kind: 'partner', partnerId: partner.id, role: 'sales', email: 'c@p.example', expiresAt: future, acceptedAt: new Date('2026-11-03T00:00:00Z') });
+    await makeInvite(db, { kind: 'partner', partnerId: other.id, role: 'sales', email: 'd@o.example', expiresAt: future });
+    const list = await withViewer(admin, (tx) => listOpenInvites(tx, admin, { kind: 'partner' }, clock));
+    expect(list.map((i) => [i.id, i.state])).toEqual([[second.invite.id, 'expired'], [first.invite.id, 'ok']]);
+    await expect(withViewer(admin, (tx) => listOpenInvites(tx, admin, { kind: 'partner', partnerId: other.id }, clock))).rejects.toMatchObject({ code: 'not_found' });
+    await expect(withViewer(admin, (tx) => listOpenInvites(tx, admin, { kind: 'staff' }, clock))).rejects.toMatchObject({ code: 'forbidden' });
+  });
+
+  it('lists staff invites for a partner manager', async () => {
+    const manager = await asStaff(db, 'partner_manager', 'india');
+    const { invite } = await makeInvite(db, { kind: 'staff', partnerId: null, role: 'sales', staffRegion: 'india', email: 'k@cleanstart.com', expiresAt: future });
+    const list = await withViewer(manager, (tx) => listOpenInvites(tx, manager, { kind: 'staff' }, clock));
+    expect(list.map((i) => i.id)).toEqual([invite.id]);
   });
 });
