@@ -68,7 +68,7 @@ const schema = z
     SENTRY_DSN: z.string().url().optional(),
     SENTRY_ENVIRONMENT: z.string().default('development'),
 
-    // Review gate of the hosted mock. It stays until launch: M5.4 removes the mock scaffolding, not the gate.
+    // Shared password gate in front of the hosted portal. It stays until launch; removing it is a launch step.
     PORTAL_REVIEW_PASSWORD: optionalString,
 
     // Tests only. Never read by application code.

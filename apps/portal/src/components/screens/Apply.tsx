@@ -142,7 +142,6 @@ export function Apply({ turnstileSiteKey }: { turnstileSiteKey: string }): React
       <form
         onSubmit={submit}
         noValidate
-        data-tour="apply-form"
         style={{ width: "100%", maxWidth: 560, margin: "0 auto", display: "flex", flexDirection: "column", gap: 14 }}
       >
         <PublicHeading title="Apply to become a partner">
@@ -208,7 +207,7 @@ export function Apply({ turnstileSiteKey }: { turnstileSiteKey: string }): React
               onChange={(e) => set("title", e.target.value)}
             />
           </div>
-          <div className="fg" data-tour="apply-email">
+          <div className="fg">
             <label htmlFor="ap-email" className="lbl">
               Work email
             </label>

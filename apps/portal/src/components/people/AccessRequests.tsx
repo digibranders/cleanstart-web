@@ -44,7 +44,6 @@ export function AccessRequests({
       aria-labelledby="reqs"
       className="card clip"
       style={{ borderColor: "#E3DDFA" }}
-      data-tour="team-requests"
     >
       <div className="card-h" style={{ background: "#FAF8FF" }}>
         <h2 id="reqs" className="card-t">

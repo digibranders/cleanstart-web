@@ -151,7 +151,6 @@ export function AcceptInvite({ token, preview }: { token: string; preview: Invit
       <form
         onSubmit={submit}
         noValidate
-        data-tour="invite-form"
         style={{ width: "100%", maxWidth: 400, margin: "0 auto", display: "flex", flexDirection: "column", gap: 14 }}
       >
         <PublicHeading title="Set up your account">
@@ -205,7 +204,7 @@ export function AcceptInvite({ token, preview }: { token: string; preview: Invit
             onChange={setPw}
             {...(pwErr ? { error: "Choose a password that meets every rule below." } : {})}
           />
-          <div data-tour="invite-rules" role="group" aria-label="Password rules">
+          <div role="group" aria-label="Password rules">
             <PasswordRules value={pw} />
           </div>
         </div>

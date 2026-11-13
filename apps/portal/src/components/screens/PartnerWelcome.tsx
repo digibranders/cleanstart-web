@@ -112,7 +112,7 @@ export function PartnerWelcome({ firstName, company, checklist, viewerEmail }: P
         </Link>
       </div>
 
-      <section aria-labelledby="setup" className="card clip" data-tour="welcome-checklist">
+      <section aria-labelledby="setup" className="card clip">
         <div className="card-h">
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <h2 id="setup" className="card-t">

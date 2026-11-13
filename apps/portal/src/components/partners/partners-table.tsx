@@ -59,7 +59,7 @@ export function PartnersTable({
           Showing {partners.length} of {total}
         </span>
       </div>
-      <div style={{ overflowX: "auto" }} data-tour="partners-table">
+      <div style={{ overflowX: "auto" }}>
         <table className="tbl">
           <thead>
             <tr>

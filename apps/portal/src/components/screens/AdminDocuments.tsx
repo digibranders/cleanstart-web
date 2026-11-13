@@ -43,7 +43,6 @@ export function AdminDocuments({
           <button
             type="button"
             className="btn btn-p"
-            data-tour="admin-docs-upload"
             onClick={() => setUploadOpen(true)}
           >
             <Icon name="upload" />
@@ -59,7 +58,6 @@ export function AdminDocuments({
           aria-labelledby="lib"
           className="card clip"
           style={{ flex: '1 1 620px', minWidth: 0 }}
-          data-tour="admin-docs-table"
         >
           <div className="card-h">
             <h2 id="lib" className="card-t">

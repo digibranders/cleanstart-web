@@ -239,7 +239,7 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
         </div>
       ) : null}
 
-      <section aria-label="Deal summary" className="card" data-tour="deal-stage">
+      <section aria-label="Deal summary" className="card">
         <div className="kpis">
           {summary.map((k) => (
             <div className="kpi" key={k.label}>
@@ -364,7 +364,7 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
             </table>
           </section>
 
-          <section aria-labelledby="conv" className="card clip" data-tour="deal-thread">
+          <section aria-labelledby="conv" className="card clip">
             <div className="card-h">
               <h2 id="conv" className="card-t">
                 Conversation with CleanStart

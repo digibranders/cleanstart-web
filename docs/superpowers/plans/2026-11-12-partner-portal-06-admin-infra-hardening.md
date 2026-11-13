@@ -3184,7 +3184,7 @@ Expected: `portal-w1`, then all three green. If any is red, stop: the merge of W
 
 **Gate A for this task:** the standard block, plus the removal greps in Step 8.
 
-- [ ] **Step 0: Wire the shell (the single owner of these `shell.tsx` and layout edits)**
+- [x] **Step 0: Wire the shell (the single owner of these `shell.tsx` and layout edits)**
 
 Apply, in this order, on `feat/portal-build`: first the notifications change (plan 04, "Contract change requests", item 5, which edits `shell.tsx`, `src/app/partner/layout.tsx` and `src/app/admin/layout.tsx`), then CCR-3 below (the search palette). Both are written against the mock regions that W0-f leaves alone. Check: `grep -n "searchOpen\|PARTNER_SEARCH\|notesRead\|partnerNotes" apps/portal/src/components/shell/shell.tsx` prints nothing; typecheck and the build are clean.
 
@@ -3195,7 +3195,7 @@ Apply, in this order, on `feat/portal-build`: first the notifications change (pl
 
 Decision recorded: `PORTAL_REVIEW_PASSWORD` and the review gate in `src/proxy.ts` **stay**. The master plan keeps the gate on until launch and the pilot is invite-only behind it; the `env.ts` comment that said "removed in M5.4" was wrong and the contracts now say "stays until launch" (CCR-5a). Removing the gate is a launch step on the handover checklist.
 
-- [ ] **Step 1: Baseline what still points at the scaffolding**
+- [x] **Step 1: Baseline what still points at the scaffolding**
 
 ```bash
 cd apps/portal
@@ -3204,7 +3204,7 @@ grep -rnE "@/lib/slice|createSlice|shell/personas|\./personas|@/tour|driver\.js|
 
 Expected after Wave 1: only the files that are about to be deleted, plus `src/app/layout.tsx` (TourProvider) and `src/components/shell/shell.tsx`. Any other hit is a screen a track did not finish converting: read its import, replace it with the DTO from `src/lib/dto.ts` ("Mock to DTO" table in the contracts, H.0) and the repo call its page already makes, or append a `blocked` line naming the file and stop. `createSlice` inside `shell.tsx` means Step 0 did not apply the notifications change: do it now, because this task must not delete the state the popover still reads.
 
-- [ ] **Step 2: Remove every `data-tour` attribute**
+- [x] **Step 2: Remove every `data-tour` attribute**
 
 The walkthrough is going, so its anchors go with it. They appear as plain strings and as JSX expressions, so a small script with a brace matcher does it (about 45 sites on the mock). Save this as `/tmp/strip-data-tour.mjs`, run it, delete it:
 
@@ -3269,7 +3269,7 @@ grep -rn "data-tour" apps/portal/src | grep -v "^apps/portal/src/tour/"
 
 Expected: `removed <n> data-tour attributes`, and no remaining hit. One component prop remains by hand: the `tour` parameter of `RowAction` in `src/components/partners/applications-table.tsx` (it existed only to carry `data-tour`). Find it with `grep -n "tour" apps/portal/src/components/partners/applications-table.tsx` and delete the destructured `tour,` parameter, the `tour?: string;` member and the `{...(a.id === firstOpenId ? { tour: "application-approve" } : {})}` spread, then `firstOpenId` if it is now unused (typecheck says).
 
-- [ ] **Step 3: Delete the scaffolding files**
+- [x] **Step 3: Delete the scaffolding files**
 
 ```bash
 cd apps/portal
@@ -3280,7 +3280,7 @@ cd ../..
 
 Expected: `git rm` lists 11 files; `ls` says both directories no longer exist.
 
-- [ ] **Step 4: Edit the layout, the shell and the password field**
+- [x] **Step 4: Edit the layout, the shell and the password field**
 
 `src/app/layout.tsx`: remove the `TourProvider` import and element, and drop "(mock)" from the titles. Replace the metadata and the body:
 
@@ -3323,7 +3323,7 @@ export function passwordRules(value: string): PasswordRule[] {
 
 (keep the `PasswordRule` interface where it is; put the import with the other imports.)
 
-- [ ] **Step 5: Remove the mock styles**
+- [x] **Step 5: Remove the mock styles**
 
 Save as `/tmp/strip-mock-css.py`, run, delete. It drops the `.mock-banner`, `.tour-*` and `.driver-*` rules (one rule per line in this file), removes the `--banner-h` variable and makes `.app` the full viewport height again (it used to subtract the 28 px banner):
 
@@ -3353,7 +3353,7 @@ grep -n "^\.app{display:grid" apps/portal/src/styles/portal.css | cut -c1-200
 
 Expected: `removed 23 rule lines` on the mock's CSS, `css clean`, and the `.app` rule containing `height:100dvh`. If `--banner-h` is used by a rule the script did not know (a Wave 1 addition), `grep -n "banner-h" apps/portal/src/styles/portal.css` shows it: replace `calc(100dvh - var(--banner-h))` with `100dvh` there too.
 
-- [ ] **Step 6: Remove Driver.js and the mock wording**
+- [x] **Step 6: Remove Driver.js and the mock wording**
 
 ```bash
 pnpm --filter @cleanstart/portal remove driver.js
@@ -3404,7 +3404,7 @@ pnpm --filter @cleanstart/portal e2e             # needs bash apps/portal/script
 - `e2e/`: the Playwright `@portal` and `@a11y` suites.
 ````
 
-- [ ] **Step 7: Rebuild and fix what the removal exposed**
+- [x] **Step 7: Rebuild and fix what the removal exposed**
 
 ```bash
 pnpm --filter @cleanstart/portal typecheck
@@ -3412,7 +3412,7 @@ pnpm --filter @cleanstart/portal typecheck
 
 Expected: no errors. Each error is an import or an unused local that the deleted code used to satisfy: fix it in the file the error names, keeping the edit as small as possible. Do not restore a deleted file.
 
-- [ ] **Step 8: Prove the scaffolding is gone**
+- [x] **Step 8: Prove the scaffolding is gone**
 
 ```bash
 cd apps/portal
@@ -3424,7 +3424,7 @@ cd ../..
 
 Expected: each grep prints nothing and `exit=1` (no match). A `localStorage` hit is the mock's persisted state: it must be gone; a legitimate use (a remembered tab) needs a comment saying why. Only `scripts/seed-dev.ts` and `src/db/fixtures.ts` may mention the mock's seed data, and neither imports from `src/data`.
 
-- [ ] **Step 9: Gate A and commit**
+- [x] **Step 9: Gate A and commit**
 
 Run the standard Gate A block, then Gate B, then stage the exact paths (list the modified files from `git status --short`; the command below is the shape):
 

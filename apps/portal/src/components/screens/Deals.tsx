@@ -100,7 +100,7 @@ export function Deals({ deals, today, partnerManager, senderEmail }: DealsProps)
             <Icon name="dl" />
             Export CSV
           </button>
-          <Link href={ROUTES.partner.newDeal} className="btn btn-p" data-tour="deals-register">
+          <Link href={ROUTES.partner.newDeal} className="btn btn-p">
             <Icon d={PLUS_PATH} />
             Register deal
           </Link>
@@ -122,7 +122,7 @@ export function Deals({ deals, today, partnerManager, senderEmail }: DealsProps)
             </button>
           ))}
         </div>
-        <div className="toolbar" data-tour="deals-filters">
+        <div className="toolbar">
           <div className="filters">
             <label className="sr" htmlFor="q">
               Search customers
@@ -161,7 +161,7 @@ export function Deals({ deals, today, partnerManager, senderEmail }: DealsProps)
             </span>
           </span>
         </div>
-        <div style={{ overflowX: "auto" }} data-tour="deals-table">
+        <div style={{ overflowX: "auto" }}>
           <table className="tbl">
             <thead>
               <tr>

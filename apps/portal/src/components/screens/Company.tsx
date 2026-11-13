@@ -291,7 +291,7 @@ export function Company({ company, canEdit, viewerEmail }: CompanyProps): React.
             )}
           </section>
 
-          <section aria-labelledby="tier" className="card clip" data-tour="company-tier">
+          <section aria-labelledby="tier" className="card clip">
             <div className="card-h">
               <h2 id="tier" className="card-t">
                 Tier

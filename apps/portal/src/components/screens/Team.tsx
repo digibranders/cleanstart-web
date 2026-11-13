@@ -92,7 +92,6 @@ export function Team({ team, today }: { team: TeamDto; today: string }): React.J
           aria-labelledby="people"
           className="card clip"
           style={{ flex: "1 1 620px", minWidth: 0 }}
-          data-tour="team-members"
         >
           <div className="card-h">
             <h2 id="people" className="card-t">

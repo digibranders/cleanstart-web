@@ -20,7 +20,7 @@ export function SessionsCard({ sessions, today }: { sessions: SessionDto[]; toda
   };
 
   return (
-    <section aria-labelledby="sess" className="card clip" data-tour="account-sessions">
+    <section aria-labelledby="sess" className="card clip">
       <div className="card-h">
         <h2 id="sess" className="card-t">
           Where you are signed in

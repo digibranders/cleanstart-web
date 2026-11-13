@@ -127,7 +127,7 @@ export function TwoStepCard({ enabled }: { enabled: boolean }): React.JSX.Elemen
 
   return (
     <>
-      <section aria-labelledby="tfa" className="card clip" data-tour="account-2fa">
+      <section aria-labelledby="tfa" className="card clip">
         <div className="card-h">
           <h2 id="tfa" className="card-t">
             Two-step sign-in

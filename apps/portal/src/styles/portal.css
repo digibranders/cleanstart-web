@@ -347,7 +347,6 @@ button.search:hover{background:#EEEDF3}
 /* portal app additions */
 .app{font-family:var(--font-manrope),Manrope,ui-sans-serif,system-ui,sans-serif}
 .logo img{filter:brightness(0) invert(1)}
-.mock-banner{font-family:var(--font-manrope),Manrope,ui-sans-serif,system-ui,sans-serif;background:#151021;color:#D9D3F5;font-size:12px;text-align:center;padding:5px 12px}
 .eye-wrap{position:relative;display:block}
 .eye-wrap .field{padding-right:38px}
 .eye-btn{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:28px;height:28px;border:0;border-radius:6px;background:transparent;color:#6B687D;display:grid;place-items:center;cursor:pointer}
@@ -355,35 +354,11 @@ button.search:hover{background:#EEEDF3}
 .public{min-height:100dvh;background:#FAFAFB;font-family:var(--font-manrope),Manrope,ui-sans-serif,system-ui,sans-serif;font-size:13.5px;color:#0F0E17;-webkit-font-smoothing:antialiased}
 .btn[disabled]{opacity:.5;cursor:not-allowed}
 
-/* walkthrough panel */
-.tour-fab{position:fixed;right:16px;bottom:16px;z-index:50;display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border:0;border-radius:99px;background:#151021;color:#FFFFFF;font:inherit;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(16,14,30,.28)}
-.tour-fab:hover{background:#1F1833}
-.tour-panel{position:fixed;right:16px;bottom:60px;z-index:50;width:min(340px,calc(100vw - 32px));max-height:min(560px,calc(100dvh - 96px));display:flex;flex-direction:column;background:#FFFFFF;border:1px solid #E6E4EC;border-radius:12px;box-shadow:0 16px 48px rgba(23,16,52,.22);overflow:hidden;font-family:var(--font-manrope),Manrope,ui-sans-serif,system-ui,sans-serif;font-size:13px;color:#0F0E17}
-.tour-h{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid #F0EFF4}
-.tour-t{margin:0;font-size:13px;font-weight:700}
-.tour-body{overflow:auto;padding:6px}
-.tour-g{padding:8px 8px 4px;font-size:11.5px;font-weight:600;color:#6B687D}
-.tour-step{display:flex;align-items:flex-start;gap:10px;width:100%;padding:7px 8px;border:0;border-radius:7px;background:transparent;font:inherit;text-align:left;color:#0F0E17;cursor:pointer}
-.tour-step:hover{background:#F4F3F7}
-.tour-step-on,.tour-step-on:hover{background:#F1EEFB}
-.tour-n{width:20px;height:20px;border-radius:99px;display:grid;place-items:center;flex:none;font-size:11px;font-weight:700;background:#F1F0F4;color:#4A4858}
-.tour-step-on .tour-n{background:#4B23C8;color:#FFFFFF}
-.tour-s{display:flex;flex-direction:column;min-width:0}
-.tour-sn{font-weight:600}
-.tour-ss{font-size:11.5px;color:#6B687D}
-.tour-f{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-top:1px solid #F0EFF4;background:#FCFCFD}
-.driver-popover{font-family:var(--font-manrope),Manrope,ui-sans-serif,system-ui,sans-serif;border-radius:10px;padding:14px;max-width:340px}
-.driver-popover-title{font-size:14px;font-weight:700;color:#0F0E17}
-.driver-popover-description{font-size:13px;line-height:1.5;color:#2A2838}
-.driver-popover-footer button{font-family:inherit;font-size:12.5px;font-weight:600;border-radius:6px;padding:4px 10px;text-shadow:none}
-.driver-popover-next-btn{background:#4B23C8!important;color:#FFFFFF!important;border-color:#4B23C8!important}
-
 /* app shell: fixed sidebar, sticky top bar, only the content area scrolls */
-:root{--banner-h:28px;--side-w:228px}
+:root{--side-w:228px}
 html,body{height:100%}
 body:has(.app){overflow:hidden}
-.mock-banner{height:var(--banner-h);display:grid;place-items:center;padding:0 12px;line-height:1}
-.app{display:grid;grid-template-columns:var(--side-w) minmax(0,1fr);grid-template-rows:minmax(0,1fr);height:calc(100dvh - var(--banner-h));min-height:0;overflow:hidden;flex-wrap:nowrap}
+.app{display:grid;grid-template-columns:var(--side-w) minmax(0,1fr);grid-template-rows:minmax(0,1fr);height:100dvh;min-height:0;overflow:hidden;flex-wrap:nowrap}
 .side{flex:none;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.14) transparent}
 .main{flex:none;min-height:0;overflow-y:auto;overflow-x:hidden;scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:#D4D2DC transparent}
 .top{position:sticky;top:0;z-index:20;flex:none}

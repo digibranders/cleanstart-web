@@ -85,7 +85,7 @@ export function InviteCard({ existingEmails }: { existingEmails: readonly string
             }}
           />
         </div>
-        <button type="submit" className="btn btn-p" style={{ alignSelf: "flex-start" }} data-tour="team-invite" disabled={busy}>
+        <button type="submit" className="btn btn-p" style={{ alignSelf: "flex-start" }} disabled={busy}>
           <Icon name="userplus" />
           Send invite
         </button>

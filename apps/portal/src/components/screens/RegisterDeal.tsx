@@ -240,7 +240,7 @@ export function RegisterDeal({ mine, managers, partnerName, today }: RegisterDea
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   <div className="grid2">
-                    <div className="fg" style={{ position: "relative" }} data-tour="reg-customer">
+                    <div className="fg" style={{ position: "relative" }}>
                       <label htmlFor="customer" className="lbl">
                         Company name
                       </label>
@@ -382,7 +382,7 @@ export function RegisterDeal({ mine, managers, partnerName, today }: RegisterDea
                     <span id="plabel" className="lbl">
                       Products <span className="hint">(pick one or more; each becomes its own registration)</span>
                     </span>
-                    <div role="group" aria-labelledby="plabel" className="grid3" data-tour="reg-products">
+                    <div role="group" aria-labelledby="plabel" className="grid3">
                       {PRODUCTS.map((product) => {
                         const on = form.picked.includes(product);
                         return (
@@ -512,7 +512,7 @@ export function RegisterDeal({ mine, managers, partnerName, today }: RegisterDea
                   <Link href={ROUTES.partner.deals} className="btn btn-s">
                     Cancel
                   </Link>
-                  <button type="submit" className="btn btn-p" data-tour="reg-submit" disabled={busy}>
+                  <button type="submit" className="btn btn-p" disabled={busy}>
                     Submit for approval
                   </button>
                 </span>

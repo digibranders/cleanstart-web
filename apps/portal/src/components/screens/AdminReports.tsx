@@ -64,7 +64,7 @@ export function AdminReports({ report, today }: AdminReportsProps): React.JSX.El
         </div>
       </div>
 
-      <section aria-label="Quarter summary" className="card kpis" data-tour="reports-kpis">
+      <section aria-label="Quarter summary" className="card kpis">
         <div className="kpi">
           <span className="kpi-l">Registered</span>
           <span className="kpi-v">{report.totalRegistered}</span>
@@ -87,7 +87,7 @@ export function AdminReports({ report, today }: AdminReportsProps): React.JSX.El
         </div>
       </section>
 
-      <section aria-labelledby="pbp" className="card clip" data-tour="reports-partners">
+      <section aria-labelledby="pbp" className="card clip">
         <div className="card-h">
           <h2 id="pbp" className="card-t">
             Pipeline by partner

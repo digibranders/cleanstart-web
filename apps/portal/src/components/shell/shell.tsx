@@ -5,124 +5,16 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { settleAuth } from "@/lib/auth-call";
 import { authClient } from "@/lib/auth-client";
-import type { ShellDto } from "@/lib/dto";
+import type { NotificationsDto, ShellDto } from "@/lib/dto";
 import { initialsOf } from "@/lib/initials";
-import { createSlice } from "@/lib/slice";
 import { type NavItem, type PortalKind, ROUTES } from "@/lib/routes";
+import { sendManagerMessageAction } from "@/server/actions/partners";
 import { Icon } from "../icon";
-import type { IconName } from "../icon-paths";
 import { Avatar } from "../ui/badge";
 import { Drawer } from "../ui/overlay";
 import { useToast } from "../ui/toast";
-
-interface SearchEntry {
-  label: string;
-  href: string;
-  icon: IconName;
-  hint: string;
-}
-
-interface Note {
-  title: string;
-  when: string;
-  href: string;
-  icon: IconName;
-  unread: boolean;
-}
-
-const slug = (s: string): string => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-$/, "");
-
-const PARTNER_SEARCH: Record<string, SearchEntry[]> = {
-  Pages: [
-    { label: "Overview", href: ROUTES.partner.overview, icon: "dash", hint: "" },
-    { label: "Deals", href: ROUTES.partner.deals, icon: "deals", hint: "" },
-    { label: "Register a deal", href: ROUTES.partner.newDeal, icon: "reg", hint: "" },
-    { label: "Documents", href: ROUTES.partner.documents, icon: "docs", hint: "" },
-    { label: "Team", href: ROUTES.partner.team, icon: "team", hint: "" },
-    { label: "Company and tier", href: ROUTES.partner.company, icon: "bld", hint: "" },
-    { label: "Your account", href: ROUTES.partner.account, icon: "team", hint: "" },
-  ],
-  Deals: [
-    ["Vardhan Capital", "CleanSight, accepted"],
-    ["Gulfway Freight", "CleanStart Images, pending"],
-    ["Tejas Health Network", "CleanSight, accepted"],
-    ["Al Noor Logistics", "Clean Libraries, accepted"],
-    ["Indus Paytech", "CleanStart Images, won"],
-    ["Saffron Retail Group", "CleanStart Images, rejected"],
-  ].map(([label = "", hint = ""]) => ({
-    label: label as string,
-    href: ROUTES.partner.deal(slug(label as string)),
-    icon: "deals" as const,
-    hint: hint as string,
-  })),
-  Documents: [
-    ["CleanSight product walkthrough", "Video", "play"],
-    ["Clean Libraries solution sheet", "Solution sheet", "file"],
-    ["Partner sales playbook 2026", "Enablement guide", "file"],
-    ["Competitive battlecard", "Battlecard", "file"],
-  ].map(([label, hint, icon]) => ({
-    label: label as string,
-    href: ROUTES.partner.documents,
-    icon: icon as IconName,
-    hint: hint as string,
-  })),
-};
-
-const ADMIN_SEARCH: Record<string, SearchEntry[]> = {
-  Pages: [
-    { label: "Deal approvals", href: ROUTES.admin.approvals, icon: "approve", hint: "" },
-    { label: "Partners", href: ROUTES.admin.partners, icon: "bld", hint: "" },
-    { label: "Documents", href: ROUTES.admin.documents, icon: "docs", hint: "" },
-    { label: "Reports", href: ROUTES.admin.reports, icon: "chart", hint: "" },
-    { label: "CleanStart team", href: ROUTES.admin.team, icon: "team", hint: "" },
-    { label: "Audit log", href: ROUTES.admin.audit, icon: "clk", hint: "" },
-  ],
-  "Waiting for approval": [
-    ["Gulfway Freight", "Kestrel Systems, conflict"],
-    ["Vardhan Capital", "Kestrel Systems"],
-    ["Gulfway Freight", "Arbor Cyber, conflict"],
-    ["Meridian Insurance", "Saffron Secure"],
-  ].map(([label = "", hint = ""]) => ({
-    label,
-    href: ROUTES.admin.approvals,
-    icon: "approve" as const,
-    hint,
-  })),
-  Partners: [
-    ["Kestrel Systems", "India"],
-    ["Saffron Secure", "India"],
-    ["Arbor Cyber", "Middle East"],
-    ["Dunes Networks", "Middle East"],
-    ["Harbourline IT", "Middle East"],
-    ["Vyom Digital", "India"],
-    ["Coralbay Technologies", "Middle East"],
-    ["Meghdoot Systems", "India"],
-    ["Qamar Solutions", "Middle East"],
-    ["Ironleaf Consulting", "India"],
-  ].map(([label = "", hint = ""]) => ({
-    label,
-    href: ROUTES.admin.partners,
-    icon: "bld" as const,
-    hint,
-  })),
-};
-
-const partnerNotes = (): [string, string, string, IconName, boolean][] => [
-  ["Rohit Desai asked for a login", "Today", ROUTES.partner.team, "team", true],
-  ["Gulfway Freight is waiting for review", "3 days ago", ROUTES.partner.deals, "clk", true],
-  ["New document: CleanSight product walkthrough", "4 Nov", ROUTES.partner.documents, "play", true],
-  ["Vardhan Capital moved to Proposal sent", "28 Oct", ROUTES.partner.deal("vardhan-capital"), "deals", false],
-];
-const adminNotes = (): [string, string, string, IconName, boolean][] => [
-  ["Arbor Cyber registered Gulfway Freight, a conflict", "1 day ago", ROUTES.admin.approvals, "warn", true],
-  ["Lattice Cloud Services applied to be a partner", "1 day ago", ROUTES.admin.partners, "bld", true],
-  ["5 protected deals end in the next 14 days", "6 Nov", ROUTES.admin.reports, "hg", false],
-];
-
-const notesRead = createSlice<{ partner: boolean; admin: boolean }>("notes-read", {
-  partner: false,
-  admin: false,
-});
+import { NotificationsPopover } from "./notifications-popover";
+import { OPEN_SEARCH_EVENT, SearchPalette } from "./search-palette";
 
 function crumbFor(nav: readonly NavItem[], pathname: string): string {
   if (pathname.startsWith(ROUTES.partner.account)) return "Your account";
@@ -137,11 +29,17 @@ export function Shell({
   kind,
   shell,
   nav,
+  notifications,
+  today,
   children,
 }: {
   kind: PortalKind;
   /** The signed in viewer, their company and the nav counts, from getShell(). */
   shell: ShellDto;
+  /** The viewer's own recent notifications, from listNotifications(). */
+  notifications: NotificationsDto;
+  /** The server's UTC date, so "Today" reads the same on every device. */
+  today: string;
   /** The sidebar items this viewer may open, from navFor(). */
   nav: readonly NavItem[];
   children: React.ReactNode;
@@ -158,14 +56,12 @@ export function Shell({
     manager: shell.manager ? { ...shell.manager, initials: initialsOf(shell.manager.name) } : undefined,
   };
   const waiting = shell.waitingApprovals;
-  const read = notesRead.use()[kind];
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [pop, setPop] = useState<"help" | "notes" | null>(null);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [query, setQuery] = useState("");
   const [msg, setMsg] = useState<{ subject: string; body: string; tried: boolean } | null>(null);
+  const [sending, setSending] = useState(false);
 
   // close transient UI on navigation
   // biome-ignore lint/correctness/useExhaustiveDependencies: pathname is the trigger
@@ -177,15 +73,9 @@ export function Shell({
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent): void => {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        setSearchOpen(true);
-        setQuery("");
-        setPop(null);
-      } else if (event.key === "Escape") {
+      if (event.key === "Escape") {
         setPop(null);
         setProfileOpen(false);
-        setSearchOpen(false);
         setMenuOpen(false);
       }
     };
@@ -193,32 +83,24 @@ export function Shell({
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const searchData = kind === "partner" ? PARTNER_SEARCH : ADMIN_SEARCH;
-  const q = query.trim().toLowerCase();
-  const groups = Object.entries(searchData)
-    .map(([name, items]) => ({
-      name,
-      items: items
-        .filter((i) => !q || `${i.label} ${i.hint}`.toLowerCase().includes(q))
-        .slice(0, q ? 8 : name === "Pages" ? 8 : 3),
-    }))
-    .filter((g) => g.items.length > 0);
-
-  const notes: Note[] = (kind === "partner" ? partnerNotes() : adminNotes()).map(
-    ([title, when, href, icon, unread]) => ({ title, when, href, icon, unread: unread && !read }),
-  );
-  const unreadCount = notes.filter((n) => n.unread).length;
   const crumb = crumbFor(nav, pathname);
 
-  const sendMessage = (event: React.FormEvent): void => {
+  const sendMessage = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
-    if (!msg) return;
+    if (!msg || sending) return;
     if (!msg.body.trim()) {
       setMsg({ ...msg, tried: true });
       return;
     }
+    setSending(true);
+    const result = await sendManagerMessageAction({ subject: msg.subject, body: msg.body });
+    setSending(false);
+    if (!result.ok) {
+      toast(result.error.issues?.[0]?.message ?? result.error.message);
+      return;
+    }
     setMsg(null);
-    toast(`Message sent to ${me.manager?.name ?? "your partner manager"}`);
+    toast(`Message sent to ${result.data.managerName}`);
   };
 
   const countFor = (item: NavItem): string => (item.count === "approvals" && waiting > 0 ? String(waiting) : "");
@@ -235,9 +117,6 @@ export function Shell({
 
   return (
     <>
-      <div className="mock-banner">
-        Clickable mock for review. All names and numbers are made up and nothing is sent.
-      </div>
       <div className="app">
         <nav aria-label={kind === "partner" ? "Partner portal" : "Admin"} className={`side${menuOpen ? " side-open" : ""}`}>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -259,7 +138,6 @@ export function Shell({
                     href={item.href}
                     className={`nav-a${on ? " nav-on" : ""}`}
                     aria-current={on ? "page" : undefined}
-                    data-tour={`nav-${slug(item.label)}`}
                   >
                     <Icon name={item.icon} />
                     {item.label}
@@ -285,7 +163,6 @@ export function Shell({
                 className="who-btn"
                 aria-haspopup="menu"
                 aria-expanded={profileOpen}
-                data-tour="profile-menu"
                 onClick={() => setProfileOpen((o) => !o)}
               >
                 <Avatar initials={me.userInitials} round me />
@@ -378,11 +255,10 @@ export function Shell({
                 type="button"
                 className="search"
                 aria-haspopup="dialog"
-                data-tour="search"
+                aria-label={kind === "partner" ? "Search deals and documents" : "Search partners and registrations"}
                 onClick={() => {
-                  setSearchOpen(true);
-                  setQuery("");
                   setPop(null);
+                  window.dispatchEvent(new Event(OPEN_SEARCH_EVENT));
                 }}
               >
                 <Icon name="search" small />
@@ -415,8 +291,7 @@ export function Shell({
                         style={{ width: "100%" }}
                         onClick={() => {
                           setPop(null);
-                          setSearchOpen(true);
-                          setQuery("");
+                          window.dispatchEvent(new Event(OPEN_SEARCH_EVENT));
                         }}
                       >
                         <span className="li-ic">
@@ -478,112 +353,20 @@ export function Shell({
                   </>
                 ) : null}
               </div>
-              <div className="pop-wrap">
-                <button
-                  type="button"
-                  className="ibtn"
-                  aria-label={unreadCount ? `Notifications, ${unreadCount} unread` : "Notifications"}
-                  aria-haspopup="dialog"
-                  aria-expanded={pop === "notes"}
-                  onClick={() => setPop(pop === "notes" ? null : "notes")}
-                >
-                  <Icon d={BELL} />
-                  {unreadCount ? <span className="ping" aria-hidden="true" /> : null}
-                </button>
-                {pop === "notes" ? (
-                  <>
-                    <div className="dd-scrim" onClick={() => setPop(null)} aria-hidden="true" />
-                    <div className="pop" role="dialog" aria-label="Notifications">
-                      <div className="pop-h">
-                        <h2 className="pop-t">Notifications</h2>
-                        {unreadCount ? (
-                          <button
-                            type="button"
-                            className="btn btn-t"
-                            onClick={() => notesRead.set((s) => ({ ...s, [kind]: true }))}
-                          >
-                            Mark all read
-                          </button>
-                        ) : null}
-                      </div>
-                      {notes.map((n) => (
-                        <Link key={n.title} href={n.href} className="li" style={{ alignItems: "flex-start" }}>
-                          <span className="li-ic">
-                            <Icon name={n.icon} />
-                          </span>
-                          <span className="li-t">
-                            <span className="li-n" style={{ whiteSpace: "normal" }}>
-                              {n.title}
-                            </span>
-                            <span className="li-s">{n.when}</span>
-                          </span>
-                          {n.unread ? <span className="unread" role="img" aria-label="Unread" /> : null}
-                        </Link>
-                      ))}
-                    </div>
-                  </>
-                ) : null}
-              </div>
+              <NotificationsPopover
+                notifications={notifications}
+                today={today}
+                open={pop === "notes"}
+                onToggle={() => setPop(pop === "notes" ? null : "notes")}
+                onClose={() => setPop(null)}
+              />
             </div>
           </header>
           <main className="content">{children}</main>
         </div>
       </div>
 
-      {searchOpen ? (
-        <>
-          <div className="cs-scrim" onClick={() => setSearchOpen(false)} aria-hidden="true" />
-          <div className="dialog palette" role="dialog" aria-modal="true" aria-label="Search">
-            <div className="pal-in">
-              <Icon name="search" />
-              <label className="sr" htmlFor="pal-q">
-                Search
-              </label>
-              <input
-                id="pal-q"
-                type="search"
-                placeholder={kind === "partner" ? "Search deals, documents and pages" : "Search partners, registrations and pages"}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                // biome-ignore lint/a11y/noAutofocus: the palette exists to be typed into
-                autoFocus
-                autoComplete="off"
-              />
-              <button
-                type="button"
-                className="ibtn"
-                onClick={() => setSearchOpen(false)}
-                aria-label="Close search"
-                style={{ width: 26, height: 26 }}
-              >
-                <Icon name="x" />
-              </button>
-            </div>
-            <div className="pal-list">
-              {groups.map((g) => (
-                <div key={g.name}>
-                  <div className="pal-g">{g.name}</div>
-                  {g.items.map((it) => (
-                    <Link
-                      key={`${it.label}-${it.hint}`}
-                      href={it.href}
-                      className="pal-item"
-                      onClick={() => setSearchOpen(false)}
-                    >
-                      <span className="li-ic">
-                        <Icon name={it.icon} />
-                      </span>
-                      <span>{it.label}</span>
-                      <span className="li-s">{it.hint}</span>
-                    </Link>
-                  ))}
-                </div>
-              ))}
-              {groups.length === 0 ? <div className="empty">Nothing matches {query}.</div> : null}
-            </div>
-          </div>
-        </>
-      ) : null}
+      <SearchPalette kind={kind} nav={nav} />
 
       {kind === "partner" && me.manager ? (
         <Drawer
@@ -599,7 +382,7 @@ export function Shell({
               <button type="button" className="btn btn-s" onClick={() => setMsg(null)}>
                 Cancel
               </button>
-              <button type="submit" className="btn btn-p">
+              <button type="submit" className="btn btn-p" disabled={sending}>
                 <Icon name="send" />
                 Send
               </button>
@@ -644,5 +427,3 @@ const MENU =
   "M222,128a6,6,0,0,1-6,6H40a6,6,0,0,1,0-12H216A6,6,0,0,1,222,128ZM40,70H216a6,6,0,0,0,0-12H40a6,6,0,0,0,0,12ZM216,186H40a6,6,0,0,0,0,12H216a6,6,0,0,0,0-12Z";
 const HELP =
   "M138,180a10,10,0,1,1-10-10A10,10,0,0,1,138,180ZM128,74c-21,0-38,15.25-38,34v4a6,6,0,0,0,12,0v-4c0-12.13,11.66-22,26-22s26,9.87,26,22-11.66,22-26,22a6,6,0,0,0-6,6v8a6,6,0,0,0,12,0v-2.42c18.11-2.58,32-16.66,32-33.58C166,89.25,149,74,128,74Zm102,54A102,102,0,1,1,128,26,102.12,102.12,0,0,1,230,128Zm-12,0a90,90,0,1,0-90,90A90.1,90.1,0,0,0,218,128Z";
-const BELL =
-  "M220.07,176.94C214.41,167.2,206,139.73,206,104a78,78,0,1,0-156,0c0,35.74-8.42,63.2-14.08,72.94A14,14,0,0,0,48,198H90.48a38,38,0,0,0,75,0H208a14,14,0,0,0,12.06-21.06ZM128,218a26,26,0,0,1-25.29-20h50.58A26,26,0,0,1,128,218Zm81.71-33a1.9,1.9,0,0,1-1.7,1H48a1.9,1.9,0,0,1-1.7-1,2,2,0,0,1,0-2C53.87,170,62,139.69,62,104a66,66,0,1,1,132,0c0,35.68,8.14,65.95,15.71,79A2,2,0,0,1,209.71,185Z";

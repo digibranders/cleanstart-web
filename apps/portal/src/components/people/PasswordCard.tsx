@@ -61,7 +61,6 @@ export function PasswordCard({ passwordChangedAt }: { passwordChangedAt: string 
       noValidate
       aria-labelledby="pwh"
       className="card clip"
-      data-tour="account-password"
     >
       <div className="card-h">
         <h2 id="pwh" className="card-t">

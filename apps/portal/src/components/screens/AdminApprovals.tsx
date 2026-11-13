@@ -129,8 +129,6 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
   const waiting = rows.filter((r) => r.state === "open" || r.state === "rejecting");
   const overCount = waiting.filter((r) => r.over).length;
   const conflictCount = waiting.filter((r) => r.check.kind === "conflict").length;
-  const firstOpenId = visible.find((r) => r.state === "open")?.deal.id;
-  const firstConflictId = visible.find((r) => r.check.kind === "conflict")?.deal.id;
   const viewing = rows.find((r) => r.deal.id === viewingId);
   const recentDecisions = queue.recentDecisions;
   const visibleExtensions = extensions.filter((d) => view === "all" || inMyQueue(d));
@@ -260,7 +258,7 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
             {overCount ? `${overCount} over the 2-day target` : "All within 2 days"}
           </span>
         </div>
-        <div className="kpi" data-tour={firstConflictId ? undefined : "approvals-conflict"}>
+        <div className="kpi">
           <span className="kpi-l">With a conflict</span>
           <span className="kpi-v t-amber">{conflictCount}</span>
           <span className="kpi-f">Same customer and product</span>
@@ -279,7 +277,7 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
         </div>
       </section>
 
-      <section aria-label="Queue" className="card clip" data-tour="approvals-queue">
+      <section aria-label="Queue" className="card clip">
         <div className="toolbar">
           <div className="filters">
             <div className="seg" role="group" aria-label="Whose queue" style={{ marginRight: 4 }}>
@@ -335,7 +333,7 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
                 const entry = rejecting[deal.id];
                 const reasonErr = entry?.tried && !entry.reason.trim();
                 const tr = (
-                  <tr key={deal.id} data-tour={deal.id === firstConflictId ? "approvals-conflict" : undefined}>
+                  <tr key={deal.id}>
                     <td>
                       <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <span className={`av ${avOf(deal.partnerName)}`}>{initialsOf(deal.partnerName)}</span>
@@ -381,7 +379,6 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
                             disabled={busyId === deal.id}
                             aria-label={`Accept ${deal.customer} from ${deal.partnerName}`}
                             data-tip="Accept and create the HubSpot deal"
-                            data-tour={deal.id === firstOpenId ? "approvals-accept" : undefined}
                           >
                             <Icon name="checkIcon" />
                           </button>

@@ -38,7 +38,7 @@ export function PartnerOverview({ overview, today, asOf }: PartnerOverviewProps)
         </div>
       </div>
 
-      <section aria-label="Key figures" className="card kpis" data-tour="overview-kpis">
+      <section aria-label="Key figures" className="card kpis">
         {kpis.map((k) => (
           <div className="kpi" key={k.label}>
             <span className="kpi-l">{k.label}</span>
@@ -101,7 +101,7 @@ export function PartnerOverview({ overview, today, asOf }: PartnerOverviewProps)
         </div>
 
         <div style={{ flex: "0 1 320px", minWidth: 280, display: "flex", flexDirection: "column", gap: 12 }}>
-          <section aria-labelledby="attention" className="card clip" data-tour="overview-attention">
+          <section aria-labelledby="attention" className="card clip">
             <div className="card-h">
               <h2 id="attention" className="card-t">
                 Needs attention

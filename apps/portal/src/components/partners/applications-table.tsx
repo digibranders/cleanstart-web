@@ -31,21 +31,19 @@ interface ApplicationsTableProps {
   onUndo: (application: ApplicationDto) => void;
 }
 
-/** Icon row action, same markup as ActButton but able to carry a tour anchor. */
+/** Icon row action, same markup as ActButton. */
 function RowAction({
   label,
   tip,
   tone,
   icon,
   onClick,
-  tour,
 }: {
   label: string;
   tip: string;
   tone: "ok" | "no";
   icon: "check" | "x";
   onClick: () => void;
-  tour?: string;
 }): React.JSX.Element {
   return (
     <button
@@ -53,7 +51,6 @@ function RowAction({
       className={`act act-${tone}`}
       aria-label={label}
       data-tip={tip}
-      data-tour={tour}
       onClick={onClick}
     >
       <Icon name={icon} />
@@ -75,7 +72,6 @@ export function ApplicationsTable({
   const [reasonTried, setReasonTried] = useState(false);
   const [categoryLabel, setCategoryLabel] = useState<string>(PARTNER_CATEGORY_LABEL.channel);
   const [regionLabel, setRegionLabel] = useState<string>(PARTNER_REGION_LABEL.india);
-  const firstOpenId = applications.find((a) => a.status === "new")?.id;
 
   const startReject = (id: string): void => {
     setApprovingId(null);
@@ -121,7 +117,7 @@ export function ApplicationsTable({
         </span>
         <span className="card-meta tnum">{waiting} waiting</span>
       </div>
-      <div style={{ overflowX: "auto" }} data-tour="applications-list">
+      <div style={{ overflowX: "auto" }}>
         <table className="tbl">
           <thead>
             <tr>
@@ -178,7 +174,6 @@ export function ApplicationsTable({
                             tone="ok"
                             icon="check"
                             onClick={() => startApprove(a)}
-                            {...(a.id === firstOpenId ? { tour: "application-approve" } : {})}
                           />
                         </span>
                       ) : null}

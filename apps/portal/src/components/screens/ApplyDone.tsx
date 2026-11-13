@@ -55,7 +55,6 @@ export function ApplyDone({ receipt }: { receipt: ApplyReceipt }): React.JSX.Ele
     >
       <div
         role="status"
-        data-tour="apply-done"
         style={{ width: "100%", maxWidth: 420, margin: "0 auto", display: "flex", flexDirection: "column", gap: 18 }}
       >
         <StatusIcon d={CHECK_D} tone="green" />

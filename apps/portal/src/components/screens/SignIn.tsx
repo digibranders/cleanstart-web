@@ -206,7 +206,7 @@ export function SignIn({ providers }: { providers: SocialAvailability }): React.
       }
     >
         {view === "signin" ? (
-          <form onSubmit={submitSignin} noValidate style={FORM_STYLE} data-tour="signin-form">
+          <form onSubmit={submitSignin} noValidate style={FORM_STYLE}>
             <PublicHeading title="Sign in">Use the work email your partner admin invited.</PublicHeading>
             {socialError ? (
               <span className="err" role="alert">
@@ -215,7 +215,7 @@ export function SignIn({ providers }: { providers: SocialAvailability }): React.
             ) : null}
             {providers.google || providers.microsoft ? (
               <>
-                <div style={{ display: "grid", gap: 8 }} data-tour="signin-sso">
+                <div style={{ display: "grid", gap: 8 }}>
                   {providers.google ? (
                     <button type="button" className="btn btn-s" style={BTN_BIG} onClick={() => void signInWith("google")}>
                       <Icon d={GOOGLE_D} />

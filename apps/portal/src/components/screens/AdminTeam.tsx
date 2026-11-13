@@ -71,13 +71,13 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
             People at CleanStart who use this admin. A role decides what each person can see and do.
           </span>
         </div>
-        <button type="button" className="btn btn-p" onClick={() => setInviteOpen(true)} data-tour="staff-add">
+        <button type="button" className="btn btn-p" onClick={() => setInviteOpen(true)}>
           <Icon name="userplus" />
           Invite teammate
         </button>
       </div>
 
-      <section aria-labelledby="ppl" className="card clip" data-tour="staff-table">
+      <section aria-labelledby="ppl" className="card clip">
         <div className="card-h">
           <h2 id="ppl" className="card-t">
             People

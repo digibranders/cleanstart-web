@@ -201,7 +201,7 @@ export function AdminPartners({
 
       <div className="row">
         <section aria-label="Partners and applications" className="card clip" style={{ flex: "1 1 100%", minWidth: 0 }}>
-          <div className="tabs" role="group" aria-label="View" style={{ padding: "0 8px" }} data-tour="partners-tabs">
+          <div className="tabs" role="group" aria-label="View" style={{ padding: "0 8px" }}>
             {tabs.map(([label, count]) => (
               <button
                 key={label}

@@ -121,7 +121,7 @@ export function Documents({
             </button>
           ))}
         </div>
-        <div className="toolbar" data-tour="docs-filters">
+        <div className="toolbar">
           <div className="filters">
             <label className="sr" htmlFor="dq">
               Search documents
@@ -151,7 +151,7 @@ export function Documents({
           </div>
           <span className="card-meta tnum">{rows.length} documents</span>
         </div>
-        <div style={{ overflowX: 'auto' }} data-tour="docs-library">
+        <div style={{ overflowX: 'auto' }}>
           <table className="tbl">
             <thead>
               <tr>

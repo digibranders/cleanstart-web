@@ -21,9 +21,9 @@ function sameSecret(a: string, b: string): boolean {
 }
 
 /**
- * Optional shared-password gate for the hosted review copy. Active only when
- * PORTAL_REVIEW_PASSWORD is set, so local development stays open. Removed with the mock in M5.4.
- * shortcut: HTTP Basic with one shared password, enough for a made-up-data mock.
+ * Optional shared-password gate in front of the hosted portal. Active only when
+ * PORTAL_REVIEW_PASSWORD is set, so local development stays open. It stays until launch; removing it is a launch step.
+ * shortcut: HTTP Basic with one shared password, enough for an invite-only pilot.
  */
 function reviewGate(request: NextRequest): NextResponse | null {
   const password = process.env.PORTAL_REVIEW_PASSWORD;

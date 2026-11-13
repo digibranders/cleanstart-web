@@ -2,12 +2,6 @@ import { randomBytes, scryptSync } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import {
-  PASSWORD_LETTER,
-  PASSWORD_MIN_LENGTH,
-  PASSWORD_NUMBER,
-  PASSWORD_SPECIAL,
-} from '@/lib/password-rules';
 import { ValidationError } from '@/server/errors';
 import { assertPasswordOk, checkPassword, hashPassword, verifyPassword } from './passwords';
 
@@ -84,13 +78,10 @@ describe('checkPassword', () => {
     expect(result.ok).toBe(length && letter && number && special);
   });
 
-  it('uses the same four tests as the mock password field', () => {
-    const mock = readFileSync(join(process.cwd(), 'src/components/ui/password-field.tsx'), 'utf8');
-    expect(mock).toContain(`value.length >= ${PASSWORD_MIN_LENGTH}`);
-    for (const pattern of [PASSWORD_LETTER, PASSWORD_NUMBER, PASSWORD_SPECIAL]) {
-      expect(mock).toContain(String(pattern));
-    }
-    for (const label of LABELS) expect(mock).toContain(label);
+  it('gives the password field these same rules, so the client and the server cannot disagree', () => {
+    const field = readFileSync(join(process.cwd(), 'src/components/ui/password-field.tsx'), 'utf8');
+    expect(field).toContain('checkPassword(value).rules');
+    expect(field).not.toMatch(/value\.length >=|\/\[A-Za-z\]\//);
   });
 });
 
