@@ -1204,7 +1204,7 @@ export const runHubspotOutbox = async (): Promise<void> => {
 - Create: `apps/portal/src/server/hubspot/handlers.ts`
 - Test: `apps/portal/src/server/hubspot/handlers.partner.test.ts`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```ts
 // handlers.partner.test.ts
@@ -1265,9 +1265,9 @@ describe('user.upsert', () => {
 
 The category value in HubSpot is `channel_partner` because `opt('Channel partner')` slugs the label; the handler maps the portal enum (`distributor`, `channel`, `integrator`) to the three labels through a lookup table, not by slugging the portal value.
 
-- [ ] **Step 2: Run and confirm it fails.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/handlers.partner.test.ts`. Expected: FAIL, "Cannot find module './handlers'".
+- [x] **Step 2: Run and confirm it fails.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/handlers.partner.test.ts`. Expected: FAIL, "Cannot find module './handlers'".
 
-- [ ] **Step 3: Implement the first two handlers**
+- [x] **Step 3: Implement the first two handlers**
 
 ```ts
 // handlers.ts
@@ -1322,11 +1322,11 @@ export const buildHandlers = (db: Db, hs: HubspotApi, _pipelineId: string): Hand
 
 The three stubs above are replaced in the next task, in the same file; they exist only so the file typechecks between commits.
 
-- [ ] **Step 4: Run the tests.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/handlers.partner.test.ts`. Expected: PASS, 4 tests.
+- [x] **Step 4: Run the tests.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/handlers.partner.test.ts`. Expected: PASS, 4 tests.
 
-- [ ] **Step 5: Confirm what the enqueue calls must look like (no edits here).** The two handlers above are driven by calls that track P writes in its own files (contracts G): `partner.upsert` with `version: '1'` inside the approve-application and Add partner transactions (`actions/applications.ts`, `actions/partners.ts`), `partner.upsert` with `version: String(updatedAt.getTime())` after a profile, category, manager or status edit so every edit syncs, and `user.upsert` with `version: '1'` when an invite is accepted (`actions/invites.ts`). P adds an outbox assertion to each of those action tests. This task edits no file under `src/server/actions/`; the idempotency key shape and a call made inside `withViewer` are already pinned by the Task 4.4 tests.
+- [x] **Step 5: Confirm what the enqueue calls must look like (no edits here).** The two handlers above are driven by calls that track P writes in its own files (contracts G): `partner.upsert` with `version: '1'` inside the approve-application and Add partner transactions (`actions/applications.ts`, `actions/partners.ts`), `partner.upsert` with `version: String(updatedAt.getTime())` after a profile, category, manager or status edit so every edit syncs, and `user.upsert` with `version: '1'` when an invite is accepted (`actions/invites.ts`). P adds an outbox assertion to each of those action tests. This task edits no file under `src/server/actions/`; the idempotency key shape and a call made inside `withViewer` are already pinned by the Task 4.4 tests.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/portal/src/server/hubspot/handlers.ts apps/portal/src/server/hubspot/handlers.partner.test.ts
