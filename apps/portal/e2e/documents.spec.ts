@@ -51,8 +51,10 @@ test.describe('@portal documents', () => {
     test('is turned away from the file route', async ({ request }) => {
       const id = await documentIdByTitle(OPEN_DOC);
       const response = await request.get(`/api/files/${id}`, { maxRedirects: 0 });
-      expect([401, 302, 307, 404]).toContain(response.status());
-      expect(response.headers().location ?? '').not.toContain('localhost:9');
+      expect([302, 307]).toContain(response.status());
+      const location = response.headers().location ?? '';
+      expect(location).toContain('/sign-in');
+      expect(location).not.toContain('localhost:9');
     });
   });
 });

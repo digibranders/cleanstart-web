@@ -4,7 +4,8 @@ import { KESTREL, PERSONAS } from './support/env';
 
 /** Types into the palette and waits for the server action's answer, so an empty list is the real answer. */
 async function searchFor(page: Page, dialog: Locator, text: string): Promise<void> {
-  const answered = page.waitForResponse((response) => response.request().method() === 'POST');
+  // A server action is a POST to the page's own URL that carries a Next-Action header.
+  const answered = page.waitForResponse((response) => response.request().method() === 'POST' && 'next-action' in response.request().headers());
   await dialog.getByRole('searchbox').fill(text);
   await answered;
 }

@@ -1,6 +1,10 @@
 // Environment for the Playwright run. Imported by the config, the global setup and every spec, so the test process,
 // the helpers it imports from src/ and the Next dev server all see the same database and the same fakes.
 
+import { existsSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { parseEnv } from 'node:util';
+
 const PORT = 3290;
 const DB = 'cleanstart_portal_e2e';
 const APP_URL = `postgresql://portal_app:portal_app_dev@localhost:5432/${DB}`;
@@ -22,10 +26,36 @@ const SCRUBBED = [
   'GOOGLE_CLIENT_SECRET',
   'MICROSOFT_CLIENT_ID',
   'MICROSOFT_CLIENT_SECRET',
+  'HUBSPOT_PORTAL_ID',
+  'HUBSPOT_DEV_PORTAL_ID',
+  'PARTNER_AGREEMENT_KEY',
+  'CMS_API_URL',
 ];
 for (const key of SCRUBBED) delete process.env[key];
 
+/**
+ * Deleting a key from process.env does not stop `next dev` from reading it out of the app's own env files, and an
+ * empty value is rejected by env.ts. So the run refuses to start when any scrubbed key is defined in a file Next
+ * loads in development, instead of letting the app under test reach a real service. Next never overrides a variable
+ * that is already set, so the explicit values in serverEnv below cannot be replaced by those files.
+ */
+const NEXT_DEV_ENV_FILES = ['.env', '.env.local', '.env.development', '.env.development.local'];
+const appDir = fileURLToPath(new URL('../../', import.meta.url));
+const definedInFiles: string[] = [];
+for (const file of NEXT_DEV_ENV_FILES) {
+  const full = `${appDir}${file}`;
+  if (!existsSync(full)) continue;
+  const parsed = parseEnv(readFileSync(full, 'utf8'));
+  for (const key of SCRUBBED) if (key in parsed) definedInFiles.push(`${key} in ${file}`);
+}
+if (definedInFiles.length > 0) {
+  throw new Error(
+    `The e2e run would let the app under test load real service settings from its env files: ${definedInFiles.join(', ')}. Remove or comment those lines (the e2e run supplies its own fakes), then run it again.`,
+  );
+}
+
 const serverEnv: Record<string, string> = {
+  NODE_ENV: 'development',
   APP_URL: `http://localhost:${PORT}`,
   DATABASE_URL: APP_URL,
   DATABASE_OWNER_URL: OWNER_URL,
@@ -48,6 +78,15 @@ Object.assign(process.env, serverEnv, {
   PORTAL_TEST_DATABASE_URL: APP_URL,
   PORTAL_TEST_OWNER_URL: OWNER_URL,
 });
+
+/** The run truncates this database. Refuse anything else, and anything that is not on this machine. */
+export function assertE2eDatabase(url: string): void {
+  const parsed = new URL(url);
+  const local = ['localhost', '127.0.0.1', '[::1]'].includes(parsed.hostname);
+  if (!local || parsed.pathname !== `/${DB}`) {
+    throw new Error(`Refusing to reset ${parsed.hostname}${parsed.pathname}: the e2e run only touches ${DB} on this machine.`);
+  }
+}
 
 export const E2E = {
   port: PORT,

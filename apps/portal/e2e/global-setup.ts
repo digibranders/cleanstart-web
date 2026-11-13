@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { chromium, type FullConfig } from '@playwright/test';
 import { migrateDatabase } from '../scripts/migrate';
 import { seedBase } from './support/db';
-import { E2E, PERSONAS, type PersonaKey } from './support/env';
+import { assertE2eDatabase, E2E, PERSONAS, type PersonaKey } from './support/env';
 import { signIn } from './support/ui';
 
 /**
@@ -14,6 +14,7 @@ import { signIn } from './support/ui';
  */
 export default async function globalSetup(config: FullConfig): Promise<void> {
   const root = process.cwd();
+  assertE2eDatabase(process.env.PORTAL_TEST_OWNER_URL ?? '');
   await migrateDatabase({
     url: process.env.PORTAL_TEST_OWNER_URL ?? '',
     migrationsFolder: join(root, 'drizzle'),

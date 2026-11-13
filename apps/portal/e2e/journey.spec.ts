@@ -1,3 +1,5 @@
+// Must be first: sets the database and the fakes before any src/ module reads the environment.
+import './support/env';
 import { type Browser, type BrowserContext, expect, type Page, test } from '@playwright/test';
 import { eq } from 'drizzle-orm';
 import { invites } from '@/db/schema';
@@ -5,7 +7,7 @@ import { viewerFor } from '@/db/test-helpers';
 import { systemClock } from '@/lib/clock';
 import { withViewer } from '@/server/repo/context';
 import { resendInvite } from '@/server/repo/invites';
-import { db, partnerByName, registrationByCustomer, userByEmail } from './support/db';
+import { db, outboxRowsFor, partnerByName, registrationByCustomer, userByEmail } from './support/db';
 import { PERSONAS } from './support/env';
 import { drainOutboxNow, hubspot, pollNow } from './support/hubspot';
 import {
@@ -127,6 +129,24 @@ test.describe('@portal partner lifecycle', () => {
 
     await partnerPage.goto(`/partner/deals/${registrationId}`);
     await expect(partnerPage.getByText('Technical evaluation').first()).toBeVisible();
+  });
+
+  test('the partner asks for an extension, staff grant it, the end date moves and HubSpot is told', async () => {
+    const before = await registrationByCustomer(CUSTOMER);
+    await partnerPage.goto(`/partner/deals/${registrationId}`);
+    await partnerPage.getByRole('button', { name: 'Request extension' }).click();
+    await partnerPage.getByLabel('Why do you need more time?').fill('The customer security review runs past the protection window.');
+    await partnerPage.getByRole('button', { name: 'Send request' }).click();
+    await expect(partnerPage.getByText('Extension requested, CleanStart will reply by email').first()).toBeVisible();
+    expect((await registrationByCustomer(CUSTOMER)).extensionStatus).toBe('requested');
+
+    await staffPage.goto('/admin/approvals');
+    await staffPage.getByRole('button', { name: /^Grant \d+ days$/ }).click();
+    await expect.poll(async () => (await registrationByCustomer(CUSTOMER)).extensionStatus).toBe('granted');
+    const after = await registrationByCustomer(CUSTOMER);
+    expect(after.protectionEnd).not.toBe(before.protectionEnd);
+    expect(new Date(after.protectionEnd ?? '').getTime()).toBeGreaterThan(new Date(before.protectionEnd ?? '').getTime());
+    expect(await outboxRowsFor(registrationId, 'registration.update_end')).toBe(1);
   });
 
   test('every step left an audit entry that the partner manager can read', async () => {

@@ -2,16 +2,18 @@
 import './env';
 import { eq } from 'drizzle-orm';
 import type { Db } from '@/db/client';
-import { auditLog, documents, partners, registrations, users } from '@/db/schema';
-import { makeDocument, makePartner, makeRegistration, makeUser, resetDb, testDb } from '@/db/test-helpers';
+import { auditLog, documents, hubspotOutbox, partners, registrations, users } from '@/db/schema';
+import { makeDocument, makeInvite, makePartner, makeRegistration, makeUser, resetDb, testDb } from '@/db/test-helpers';
 import { recordAudit } from '@/server/audit/record';
 import { SYSTEM_ACTORS } from '@/server/auth/types';
-import { ARBOR, E2E, KESTREL, OPEN_DOC, PERSONAS, RESTRICTED_DOC } from './env';
+import { ARBOR, assertE2eDatabase, E2E, KESTREL, OPEN_DOC, PERSONAS, RESTRICTED_DOC } from './env';
 
 export const db = (): Db => testDb();
 
 /** Two partners, their people, two staff, two documents and a few audit rows. Runs once, before the browser tests. */
 export async function seedBase(): Promise<void> {
+  assertE2eDatabase(process.env.PORTAL_TEST_DATABASE_URL ?? '');
+  assertE2eDatabase(process.env.PORTAL_TEST_OWNER_URL ?? '');
   const d = db();
   await resetDb(d);
 
@@ -73,4 +75,14 @@ export async function partnerByName(name: string): Promise<typeof partners.$infe
 
 export async function auditCount(): Promise<number> {
   return (await db().select().from(auditLog)).length;
+}
+
+/** A pending partner invite for a seeded company, with its clear token (only the hash is stored). */
+export async function seedInviteToken(partner: string, email: string): Promise<string> {
+  const { token } = await makeInvite(db(), { partnerId: (await partnerByName(partner)).id, email, role: 'sales' });
+  return token;
+}
+
+export async function outboxRowsFor(subjectId: string, op: string): Promise<number> {
+  return (await db().select().from(hubspotOutbox).where(eq(hubspotOutbox.subjectId, subjectId))).filter((r) => r.op === op).length;
 }

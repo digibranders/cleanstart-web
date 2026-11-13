@@ -1,8 +1,8 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test, type TestInfo } from '@playwright/test';
-import { seededRegistrationId } from './support/db';
-import { PERSONAS, type PersonaKey } from './support/env';
-import { settled } from './support/ui';
+import { seededRegistrationId, seedInviteToken } from './support/db';
+import { KESTREL, PERSONAS, type PersonaKey } from './support/env';
+import { fillApplication, settled } from './support/ui';
 
 /**
  * Accessibility: axe on every route as the role that uses it, then the keyboard behaviour axe cannot see.
@@ -33,7 +33,8 @@ const GROUPS: Group[] = [
       '/partner/account',
     ],
   },
-  { as: 'kestrelTechnical', paths: ['/partner/documents'] },
+  { as: 'kestrelSales', paths: ['/partner/overview', '/partner/deals', '/partner/documents'] },
+  { as: 'kestrelTechnical', paths: ['/partner/overview', '/partner/documents'] },
   { as: 'manager', paths: ['/admin/approvals', '/admin/partners', '/admin/documents', '/admin/reports', '/admin/team', '/admin/audit'] },
   { as: 'marketing', paths: ['/admin/documents'] },
 ];
@@ -64,6 +65,32 @@ for (const group of GROUPS) {
     }
   });
 }
+
+test.describe('@a11y axe, signed out flows that need data', () => {
+  test.use({ storageState: { cookies: [], origins: [] } });
+
+  test('/accept-invite with a valid invite', async ({ page }, testInfo) => {
+    const token = await seedInviteToken(KESTREL, `axe-invitee-${Date.now()}@kestrel-e2e.test`);
+    await page.goto(`/accept-invite?token=${encodeURIComponent(token)}`);
+    await settled(page);
+    await expect(page.locator('#name')).toBeVisible();
+    await scan(page, 'signed out /accept-invite', testInfo);
+  });
+
+  test('/apply/done after an application', async ({ page }, testInfo) => {
+    await fillApplication(page, {
+      company: `Axe Applicant ${Date.now()} E2E`,
+      website: 'axe-applicant-e2e.test',
+      name: 'Axe Applicant',
+      title: 'Alliances lead',
+      email: `axe-${Date.now()}@axe-applicant-e2e.test`,
+      phone: '+91 98765 43210',
+    });
+    await expect(page).toHaveURL(/\/apply\/done/);
+    await settled(page);
+    await scan(page, 'signed out /apply/done', testInfo);
+  });
+});
 
 test.describe('@a11y keyboard', () => {
   test.use({ storageState: PERSONAS.kestrelAdmin.file });
