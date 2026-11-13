@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { trapTarget } from "./focus-trap";
+import { focusReturnTarget, isInertExempt, trapTarget } from "./focus-trap";
 
 const items = ["close", "name", "save"];
 
@@ -34,5 +34,44 @@ describe("trapTarget", () => {
   it("does nothing when there is nothing to focus", () => {
     expect(trapTarget([], null, false)).toBeNull();
     expect(trapTarget([], null, true)).toBeNull();
+  });
+});
+
+describe("isInertExempt", () => {
+  const el = (tag: string, classes: string[] = [], inert = false) => ({ tag, classes, inert });
+
+  it("leaves the click-away layers, the toast and page furniture alone", () => {
+    expect(isInertExempt(el("DIV", ["cs-scrim"]))).toBe(true);
+    expect(isInertExempt(el("DIV", ["dd-scrim"]))).toBe(true);
+    expect(isInertExempt(el("DIV", ["toast"]))).toBe(true);
+    expect(isInertExempt(el("SCRIPT"))).toBe(true);
+    expect(isInertExempt(el("STYLE"))).toBe(true);
+    expect(isInertExempt(el("NEXT-ROUTE-ANNOUNCER"))).toBe(true);
+    expect(isInertExempt(el("NEXTJS-PORTAL"))).toBe(true);
+  });
+
+  it("leaves an element that is already inert alone, so it is not un-inerted later", () => {
+    expect(isInertExempt(el("DIV", [], true))).toBe(true);
+  });
+
+  it("makes page content inert, including wrappers that merely contain a status note", () => {
+    expect(isInertExempt(el("DIV", ["app"]))).toBe(false);
+    expect(isInertExempt(el("SECTION", ["card", "note"]))).toBe(false);
+    expect(isInertExempt(el("MAIN"))).toBe(false);
+  });
+});
+
+describe("focusReturnTarget", () => {
+  it("returns focus to the opener while it is still on the page", () => {
+    expect(focusReturnTarget({ isConnected: true, id: "opener" }, { isConnected: true, id: "main" })?.id).toBe("opener");
+  });
+
+  it("falls back when the opener has been removed, for example an approved row", () => {
+    expect(focusReturnTarget({ isConnected: false, id: "opener" }, { isConnected: true, id: "main" })?.id).toBe("main");
+    expect(focusReturnTarget(null, { isConnected: true, id: "main" })?.id).toBe("main");
+  });
+
+  it("returns null when there is nowhere to go", () => {
+    expect(focusReturnTarget(null, null)).toBeNull();
   });
 });

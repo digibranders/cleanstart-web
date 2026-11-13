@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef } from "react";
-import { FOCUSABLE_SELECTOR, trapTarget } from "@/lib/focus-trap";
+import { FOCUSABLE_SELECTOR, focusReturnTarget, isInertExempt, trapTarget } from "@/lib/focus-trap";
 import { Icon } from "../icon";
 import { Scrim } from "./scrim";
 
@@ -25,15 +25,11 @@ const openOverlays: HTMLElement[] = [];
 /** Makes everything outside the overlay inert (unreachable by keyboard, pointer and screen readers) and returns the undo. */
 function inertBackground(overlay: HTMLElement): () => void {
   const changed: Element[] = [];
-  for (let node: HTMLElement = overlay; node.parentElement; node = node.parentElement) {
+  for (let node: HTMLElement = overlay; node !== document.body && node.parentElement; node = node.parentElement) {
     for (const sibling of Array.from(node.parentElement.children)) {
-      const keep =
-        sibling === node ||
-        sibling.hasAttribute("inert") ||
-        sibling.matches("script, style, .cs-scrim, .dd-scrim") ||
-        sibling.querySelector('[role="status"]') !== null ||
-        sibling.getAttribute("role") === "status";
-      if (keep) continue;
+      if (sibling === node) continue;
+      const exempt = isInertExempt({ tag: sibling.tagName, classes: Array.from(sibling.classList), inert: sibling.hasAttribute("inert") });
+      if (exempt) continue;
       sibling.setAttribute("inert", "");
       changed.push(sibling);
     }
@@ -57,6 +53,8 @@ function useOverlayBehaviour(open: boolean, onClose: () => void): React.RefObjec
     const restoreBackground = inertBackground(overlay);
     const onKey = (event: KeyboardEvent): void => {
       if (openOverlays.at(-1) !== overlay) return;
+      // Another dialog that is not an overlay (the search palette, opened with Ctrl K) handles its own keys.
+      if (event.target instanceof Element && !overlay.contains(event.target) && event.target.closest('[role="dialog"]')) return;
       if (event.key === "Escape") {
         closeRef.current();
         return;
@@ -76,7 +74,7 @@ function useOverlayBehaviour(open: boolean, onClose: () => void): React.RefObjec
       document.removeEventListener("keydown", onKey);
       restoreBackground();
       openOverlays.splice(openOverlays.indexOf(overlay), 1);
-      previous?.focus?.();
+      focusReturnTarget(previous, document.getElementById("main"))?.focus();
     };
   }, [open]);
   return ref;

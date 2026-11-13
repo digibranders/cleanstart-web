@@ -63,9 +63,9 @@ Drawer and dialog behaviour (`src/components/ui/overlay.tsx`, helper `src/lib/fo
 
 - focus moves in on open, to the first field or the primary button;
 - Tab and Shift+Tab wrap inside the dialog and pull focus back in if it ever lands outside;
-- Escape closes, and focus returns to the control that opened it;
-- everything outside the dialog is made `inert` while it is open (no keyboard, pointer or screen reader access), except the click-away layer and the toast. The attribute is removed on close;
-- with a dialog open from inside a drawer, only the top one answers Escape and Tab;
+- Escape closes, and focus returns to the control that opened it, or to the main content when that control has left the page (an approved row);
+- everything outside the dialog is made `inert` while it is open (no keyboard, pointer or screen reader access), except the click-away layers, the toast and the Next.js route announcer (matched on the element itself, not on what it contains). The walk stops at `body`. The attribute is removed on close;
+- with a dialog open from inside a drawer, only the top one answers Escape and Tab, and keys typed in the search palette opened over a drawer are left to the palette;
 - the effect no longer re-runs when the parent re-renders with a new `onClose`, which would have pulled focus back to the first field on every parent re-render.
 
 A skip link ("Skip to main content") is the first Tab stop on every signed-in page, and `<main>` has `id="main"`.
