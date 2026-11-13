@@ -1119,7 +1119,7 @@ git add apps/portal/src/server/hubspot/outbox.ts apps/portal/src/server/hubspot/
 git commit -m "feat(portal): H4.4 HubSpot outbox with idempotent enqueue, retries and backoff"
 ```
 
-- [ ] **Step 6: Write the failing job test**
+- [x] **Step 6: Write the failing job test**
 
 `buildHandlers` reaches its final four argument form in Task 4.6, so the job body and its test are written now but compiled, run and committed at the end of Task 4.6 (its step 5 stages them). That keeps every commit compiling. The scheduled job runs under the advisory lock that W0-c's `schedule.ts` applies to every `JOBS` entry, so this task tests only the job body. HubSpot may be unconfigured (the token and pipeline id are optional outside production, contracts I and M.2 item 17): the job must then log a warning and leave the outbox untouched, never throw.
 
@@ -1168,7 +1168,7 @@ describe('runHubspotOutbox', () => {
 });
 ```
 
-- [ ] **Step 7: Implement the job body**
+- [x] **Step 7: Implement the job body**
 
 Replace the stub in `src/server/jobs/hubspot-outbox.ts`; do not touch `jobs/index.ts`, it already registers this job every minute.
 
@@ -1196,7 +1196,7 @@ export const runHubspotOutbox = async (): Promise<void> => {
 };
 ```
 
-- [ ] **Step 8: Hand over to Task 4.6.** Leave `hubspot-outbox.ts` and `hubspot-outbox.test.ts` uncommitted; Task 4.6 step 5 runs `vitest run src/server/hubspot src/server/jobs/hubspot-outbox.test.ts` and commits them. The registered job and its schedule (every minute) are already in W0-c's `JOBS`.
+- [x] **Step 8: Hand over to Task 4.6.** Leave `hubspot-outbox.ts` and `hubspot-outbox.test.ts` uncommitted; Task 4.6 step 5 runs `vitest run src/server/hubspot src/server/jobs/hubspot-outbox.test.ts` and commits them. The registered job and its schedule (every minute) are already in W0-c's `JOBS`.
 
 ### Task 4.5: Partner and user handlers
 
@@ -1339,7 +1339,7 @@ git commit -m "feat(portal): H4.5 sync partner companies and users to HubSpot th
 - Modify: `apps/portal/src/server/hubspot/handlers.ts`
 - Test: `apps/portal/src/server/hubspot/handlers.registration.test.ts`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```ts
 // handlers.registration.test.ts
@@ -1455,9 +1455,9 @@ describe('registration.update_end and registration.expire', () => {
 
 The tests set `product` and `region` as display labels in `setup` and as stored codes in the mapping test: `makeRegistration` accepts either and stores the code (contracts J.3), so the handler must always go through the label maps.
 
-- [ ] **Step 2: Run and confirm it fails.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/handlers.registration.test.ts`. Expected: FAIL ("implemented in task 4.6").
+- [x] **Step 2: Run and confirm it fails.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/handlers.registration.test.ts`. Expected: FAIL ("implemented in task 4.6").
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```ts
 // handlers.ts (replace the three stubs; add the pipeline and clock parameters)
@@ -1540,11 +1540,11 @@ export const buildHandlers = (db: Db, hs: HubspotApi, pipelineId: string, clock:
 
 The imports at the top of the block join the existing ones in `handlers.ts`. Note the order inside `registration.create`: the deal id is stored before the associations, so a failed association retries against the same deal (the `findDealByRegistrationId` check covers the case where the portal crashed before saving the id).
 
-- [ ] **Step 4: Run the tests.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot src/server/jobs/hubspot-outbox.test.ts`. Expected: PASS for every file in the folder, including the Task 4.4 job test (both of its cases now run against the real handlers).
+- [x] **Step 4: Run the tests.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot src/server/jobs/hubspot-outbox.test.ts`. Expected: PASS for every file in the folder, including the Task 4.4 job test (both of its cases now run against the real handlers).
 
-- [ ] **Step 5: Confirm what the enqueue calls must look like (no edits here).** Track R writes them in its own files (contracts G): `actions/decisions.ts` enqueues `registration.create` on accept with `version: String(Date.parse(decidedAt))`, the decision time in milliseconds, not `'1'`; an undone and re-accepted registration then gets a new key instead of colliding with the first (undo is only allowed while no deal exists, `ConflictError('deal_in_crm')` otherwise). `actions/extension.ts` enqueues `registration.update_end` with the new `protection_end` as the version when an extension is granted. `jobs/expiry.ts` enqueues `registration.expire` (Task 4.8). R asserts the outbox row in each action's test. This task edits no file under `src/server/actions/`.
+- [x] **Step 5: Confirm what the enqueue calls must look like (no edits here).** Track R writes them in its own files (contracts G): `actions/decisions.ts` enqueues `registration.create` on accept with `version: String(Date.parse(decidedAt))`, the decision time in milliseconds, not `'1'`; an undone and re-accepted registration then gets a new key instead of colliding with the first (undo is only allowed while no deal exists, `ConflictError('deal_in_crm')` otherwise). `actions/extension.ts` enqueues `registration.update_end` with the new `protection_end` as the version when an extension is granted. `jobs/expiry.ts` enqueues `registration.expire` (Task 4.8). R asserts the outbox row in each action's test. This task edits no file under `src/server/actions/`.
 
-- [ ] **Step 6: Commit** (this commit also stages the Task 4.4 job body and its test, which could not compile before `buildHandlers` had its final form)
+- [x] **Step 6: Commit** (this commit also stages the Task 4.4 job body and its test, which could not compile before `buildHandlers` had its final form)
 
 ```bash
 git add apps/portal/src/server/hubspot/handlers.ts apps/portal/src/server/hubspot/handlers.registration.test.ts apps/portal/src/server/jobs/hubspot-outbox.ts apps/portal/src/server/jobs/hubspot-outbox.test.ts
