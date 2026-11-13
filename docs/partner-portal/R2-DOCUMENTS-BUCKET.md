@@ -51,7 +51,7 @@ Downloads are a top level navigation to a presigned URL that carries `Content-Di
 - Key scheme: `documents/<document id>/v<version>/<uuid>-<sanitised file name>`. A purged document's row holds `purged/<document id>` and no object.
 - A replaced file stays for 30 days (`document_versions.purge_after`); a deleted document's files go 30 days after deletion. The `document-purge` job (03:20 UTC) deletes both from the database and then from R2. If an R2 delete fails the job logs the key at error level and reports to Sentry: delete that object by hand.
 - Abandoned uploads (a ticket was issued, the browser uploaded, nobody confirmed) leave an unreferenced object. They are private and small in number; v1 has no sweep.
-- The nightly backup does not cover this bucket. R2 durability is the plan for documents; the originals live with marketing.
+- The nightly backup does not cover the documents in this bucket. R2 durability is the plan for documents; the originals live with marketing. The portal database dump is stored in the same bucket under `portal-backups/`.
 
 ## Checks after setup
 

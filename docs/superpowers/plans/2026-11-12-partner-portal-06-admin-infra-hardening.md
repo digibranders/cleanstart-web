@@ -6384,7 +6384,7 @@ git commit -m "feat(portal): M5.9 partner portal runbook and incident entry temp
 
 The orchestrator writes this report at the end of the run (BUILD-HANDOFF, "Morning report"). Nothing here is pushed.
 
-- [ ] **Step 1: Run every check once, on the final tree, and keep the output**
+- [x] **Step 1: Run every check once, on the final tree, and keep the output**
 
 ```bash
 pnpm --filter @cleanstart/portal lint
@@ -6405,7 +6405,7 @@ REPO="$(git rev-parse --show-toplevel)"; rm -rf /tmp/p06ctx && mkdir -p /tmp/p06
 
 Expected: every command exits 0, `pnpm test` includes the isolation matrix and every suite from this plan, Playwright reports 64 passed (45 desktop, 19 mobile). Any failure stops this task: fix it in the owning task, rerun, and note it in the report.
 
-- [ ] **Step 2: Run the HubSpot plan's section 6 checklist**
+- [x] **Step 2: Run the HubSpot plan's section 6 checklist**
 
 HubSpot plan section 6 has ten lines. Most need a live HubSpot, which this run does not have, so each line is answered with the automated evidence that exists and an honest status. Run the evidence commands:
 
@@ -6429,7 +6429,7 @@ Then record each line in the report with one of three statuses: **PASS (automate
 | The 6 existing deals in the default Sales Pipeline are untouched | provisioning script is dry-run first (H4.1) and never writes to the default pipeline | UNVERIFIED (needs live HubSpot) |
 | A partner user cannot read another partner's deal through the customer lookup, the deal page or the thread | isolation matrix (`getRegistration`, `listMessages`, `customerSuggestions`), `search.test.ts`, `e2e/admin.spec.ts` search isolation | PASS (automated) |
 
-- [ ] **Step 3: Write `docs/partner-portal/OVERNIGHT-REPORT.md`**
+- [x] **Step 3: Write `docs/partner-portal/OVERNIGHT-REPORT.md`**
 
 Use this template. Every table row is filled from a command, never from memory. The commands that fill the first three tables read the progress log (columns: `time | task | event | track | sha | gates | note`):
 
@@ -6503,7 +6503,7 @@ Sign in as any seeded user (emails and the shared development password are in `a
 Link to the "Handover checklist for a person" section of plan 06, with the three that block the pilot named first.
 ````
 
-- [ ] **Step 4: Tag and commit**
+- [x] **Step 4: Tag and commit**
 
 ```bash
 git add docs/partner-portal/OVERNIGHT-REPORT.md docs/superpowers/plans/2026-11-12-partner-portal-06-admin-infra-hardening.md
