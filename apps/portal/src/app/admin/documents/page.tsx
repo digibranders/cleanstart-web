@@ -5,7 +5,7 @@ import { requireCan } from '@/server/auth/viewer';
 import { withViewer } from '@/server/repo/context';
 import { listAudiencePartners, listDocuments } from '@/server/repo/documents';
 
-export const metadata: Metadata = { title: 'Manage documents' };
+export const metadata: Metadata = { title: 'Documents' };
 
 export default async function Page(): Promise<React.JSX.Element> {
   const viewer = await requireCan('document.upload');

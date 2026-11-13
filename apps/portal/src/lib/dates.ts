@@ -9,12 +9,17 @@ const parse = (iso: string): number => {
 
 export const daysBetween = (fromIso: string, toIso: string): number => Math.round((parse(toIso) - parse(fromIso)) / DAY_MS);
 export const addDays = (iso: string, days: number): string => new Date(parse(iso) + days * DAY_MS).toISOString().slice(0, 10);
-/** "4 Nov" */
-export const fmtShort = (iso: string): string => `${new Date(parse(iso)).getUTCDate()} ${MONTHS[new Date(parse(iso)).getUTCMonth()] ?? ''}`;
-/** "4 Nov 2026" */
-export const fmtLong = (iso: string): string => `${fmtShort(iso)} ${new Date(parse(iso)).getUTCFullYear()}`;
+const dayMonth = (iso: string): string => `${new Date(parse(iso)).getUTCDate()} ${MONTHS[new Date(parse(iso)).getUTCMonth()] ?? ''}`;
+const yearOf = (iso: string): number => new Date(parse(iso)).getUTCFullYear();
+/** "4 Nov" in the current year, "4 Nov 2025" in any other. `today` defaults to the system date; pass it where a test needs a fixed clock. */
+export const fmtShort = (iso: string, today: string = new Date().toISOString().slice(0, 10)): string =>
+  yearOf(iso) === yearOf(today) ? dayMonth(iso) : `${dayMonth(iso)} ${yearOf(iso)}`;
+/** "4 Nov 2026", always with the year. */
+export const fmtLong = (iso: string): string => `${dayMonth(iso)} ${yearOf(iso)}`;
 /** Days from `today` to `endIso`; negative once the date has passed. */
 export const daysLeft = (endIso: string, today: string): number => daysBetween(today, endIso);
+/** "60 days left" under a protection end date; the date itself is printed separately. */
+export const daysLeftLabel = (days: number): string => (days < 0 ? 'Ended' : days === 0 ? 'Ends today' : `${plural(days, 'day')} left`);
 export const plural = (count: number, word: string): string => `${count} ${word}${count === 1 ? '' : 's'}`;
 /** Weekdays in the half open range (from, to]. Saturdays and Sundays do not count; no holiday calendar. */
 export const businessDaysBetween = (fromIso: string, toIso: string): number => {
@@ -29,6 +34,6 @@ export const businessDaysBetween = (fromIso: string, toIso: string): number => {
 export const fmtTimestamp = (iso: string, today: string): string => {
   const date = iso.slice(0, 10);
   const time = iso.slice(11, 16);
-  const lead = date === today ? 'Today' : date === addDays(today, -1) ? 'Yesterday' : fmtShort(date);
+  const lead = date === today ? 'Today' : date === addDays(today, -1) ? 'Yesterday' : fmtShort(date, today);
   return `${lead}, ${time}`;
 };

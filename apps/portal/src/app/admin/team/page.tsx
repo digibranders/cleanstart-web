@@ -5,7 +5,7 @@ import { requireCan } from "@/server/auth/viewer";
 import { withViewer } from "@/server/repo/context";
 import { listStaff } from "@/server/repo/staff";
 
-export const metadata: Metadata = { title: "CleanStart team" };
+export const metadata: Metadata = { title: "Team" };
 
 export default async function Page(): Promise<React.JSX.Element> {
   const viewer = await requireCan("staff.read");

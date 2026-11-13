@@ -303,7 +303,7 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
                 <dd>{PRODUCT_LABEL[deal.product]}</dd>
                 <dt>Region</dt>
                 <dd>{PARTNER_REGION_LABEL[deal.region]}</dd>
-                <dt>Account manager</dt>
+                <dt>Partner manager</dt>
                 <dd>{deal.managerName ?? "Not assigned"}</dd>
               </dl>
               <dl className="dl">

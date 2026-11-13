@@ -8,7 +8,17 @@ import { getShell } from "@/server/repo/account";
 import { withViewer } from "@/server/repo/context";
 import { getRegistration, listRegistrations } from "@/server/repo/registrations";
 
-export const metadata: Metadata = { title: "Deal detail" };
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const viewer = await requireCan("registration.read");
+  try {
+    const deal = await withViewer(viewer, (tx) => getRegistration(tx, viewer, id));
+    return { title: deal.customer };
+  } catch (error) {
+    if (error instanceof NotFoundError) return { title: "Deal not found" };
+    throw error;
+  }
+}
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }): Promise<React.JSX.Element> {
   const { id } = await params;
