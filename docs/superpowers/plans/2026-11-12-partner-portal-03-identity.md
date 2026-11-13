@@ -1784,7 +1784,7 @@ Implements master task 1.3b against a local stub CMS server (no CMS service user
 - Modify: `src/server/jobs/intake.ts` (replace the W0-c stub body), create `src/server/jobs/intake.test.ts`
 - Modify: `src/server/repo/applications.ts`, `src/server/repo/applications.test.ts`
 
-- [ ] **Step 1: Write the failing repo tests for `insertWebsiteApplication`**
+- [x] **Step 1: Write the failing repo tests for `insertWebsiteApplication`**
 
 Append to `src/server/repo/applications.test.ts`. Add `insertWebsiteApplication` to the existing import from `./applications`, and add `auditLog, notifications` to the import from `@/db/schema`. Then append:
 
@@ -1855,7 +1855,7 @@ Also add `import { SYSTEM_ACTORS, publicActor } from '@/server/auth/types';` rep
 `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/applications.test.ts`
 Expected: FAIL, `insertWebsiteApplication is not a function` (or a TypeScript import error).
 
-- [ ] **Step 2: Implement `insertWebsiteApplication`**
+- [x] **Step 2: Implement `insertWebsiteApplication`**
 
 In `src/server/repo/applications.ts` extend the imports:
 
@@ -1951,7 +1951,7 @@ export const isolation = defineIsolation<
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/applications.test.ts`
 Expected: PASS, 9 tests.
 
-- [ ] **Step 3: Write the stub CMS server**
+- [x] **Step 3: Write the stub CMS server**
 
 Create `src/server/intake/stub-cms.ts`. It mimics Payload's REST `find` for one collection: the `users API-Key` auth header, `sort`, `limit`, `page`, `depth` and `where[createdAt][greater_than|greater_than_equal]` query parameters, and the paginated response shape. It is a test and local development helper, never imported by application code.
 
@@ -2056,7 +2056,7 @@ export async function startStubCms(rows: StubCmsRow[], options: StubCmsOptions =
 }
 ```
 
-- [ ] **Step 4: Write the failing intake tests**
+- [x] **Step 4: Write the failing intake tests**
 
 Create `src/server/intake/website-applications.test.ts`:
 
@@ -2243,7 +2243,7 @@ describe('mapCmsApplication', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/intake/website-applications.test.ts`
 Expected: FAIL, `Failed to resolve import "./website-applications"`.
 
-- [ ] **Step 5: Implement the intake module**
+- [x] **Step 5: Implement the intake module**
 
 Create `src/server/intake/website-applications.ts` (the exports and shapes are contracts H.16; `createCmsClient` gains an optional config argument so tests need not mutate the environment, and the client asks for `greater_than_equal` so two rows with the same timestamp cannot be missed, the unique index absorbing the repeat):
 
@@ -2437,7 +2437,7 @@ export async function importWebsiteApplications(deps: { db: Db; cms: CmsClient; 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/intake/website-applications.test.ts`
 Expected: PASS, 11 tests. If `z.SafeParseReturnType` is not exported by the installed Zod 3 minor, replace the `let parsed` line with `let parsed: ReturnType<typeof pageSchema.safeParse>;`.
 
-- [ ] **Step 6: Write the failing job test**
+- [x] **Step 6: Write the failing job test**
 
 Create `src/server/jobs/intake.test.ts`:
 
@@ -2481,7 +2481,7 @@ describe('website-intake job', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs/intake.test.ts`
 Expected: FAIL, `runIntakeWith` is not exported by `./intake`.
 
-- [ ] **Step 7: Replace the job stub body**
+- [x] **Step 7: Replace the job stub body**
 
 Replace `src/server/jobs/intake.ts` entirely (W0-c created it as `export const runIntake = async (): Promise<void> => {}`; the export name and signature stay):
 
@@ -2507,7 +2507,7 @@ export const runIntake = async (): Promise<void> => runIntakeWith({ db, cms: cre
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs/intake.test.ts`
 Expected: PASS, 2 tests.
 
-- [ ] **Step 8: Add the two local development scripts**
+- [x] **Step 8: Add the two local development scripts**
 
 Create `scripts/stub-cms.ts` (a stub CMS on a fixed port so `.env` stays stable):
 
@@ -2538,7 +2538,7 @@ await runIntake();
 process.exit(0);
 ```
 
-- [ ] **Step 9: Gate A**
+- [x] **Step 9: Gate A**
 
 Run the Gate A block (Conventions). The last command must list only: `src/server/repo/applications.ts`, `src/server/repo/applications.test.ts`, `src/server/intake/website-applications.ts`, `src/server/intake/website-applications.test.ts`, `src/server/intake/stub-cms.ts`, `src/server/jobs/intake.ts`, `src/server/jobs/intake.test.ts`, `scripts/stub-cms.ts`, `scripts/run-intake.ts` (under `apps/portal/`).
 
@@ -2549,7 +2549,7 @@ Run the Gate A block (Conventions). The last command must list only: `src/server
 3. `psql cleanstart_portal_p -c "select reference, company, source, personal_email, existing_domain, category, region from applications order by created_at"`. Expected: Falcon Ridge IT and Nair Security Consulting with `source = website`, the second with `personal_email = t`, both with null category and region, references `APP-<yymm>-0045` and `0046`.
 4. Run step 2 again. Expected: `imported: 0`, `duplicate: 1`, no new rows. Remove the two `.env` lines afterwards (they are never committed).
 
-- [ ] **Step 11: Commit**
+- [x] **Step 11: Commit**
 
 ```bash
 git add apps/portal/src/server/repo/applications.ts apps/portal/src/server/repo/applications.test.ts \

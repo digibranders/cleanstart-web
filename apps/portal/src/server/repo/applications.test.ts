@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { applications } from '@/db/schema';
+import { applications, auditLog, notifications } from '@/db/schema';
 import { makeApplication, makePartner, makeUser, resetDb, testDb } from '@/db/test-helpers';
 import { fixedClock } from '@/lib/clock';
-import { publicActor } from '@/server/auth/types';
+import { SYSTEM_ACTORS, publicActor } from '@/server/auth/types';
 import { withSystem } from './context';
-import { createPortalApplication, findPartnerByDomain, listManagerRecipients, type NewApplicationRecord } from './applications';
+import { createPortalApplication, findPartnerByDomain, insertWebsiteApplication, listManagerRecipients, type NewApplicationRecord } from './applications';
 
 const db = testDb();
 const clock = fixedClock('2026-11-12T10:00:00Z');
@@ -82,5 +82,65 @@ describe('listManagerRecipients', () => {
     await makeUser(db, { kind: 'partner', partnerId: partner.id, role: 'partner_admin' });
     const recipients = await withSystem(actor, (tx) => listManagerRecipients(tx, actor));
     expect(recipients.map((r) => r.userId)).toEqual([manager.id]);
+  });
+});
+
+const intake = SYSTEM_ACTORS.intake;
+const websiteRecord = (overrides: Partial<NewApplicationRecord> = {}): NewApplicationRecord => ({
+  company: 'Falcon Ridge IT',
+  domain: 'falconridge.ae',
+  applicantName: 'Sameer Al Harthy',
+  email: 'sameer@falconridge.ae',
+  role: null,
+  phone: null,
+  category: null,
+  region: null,
+  reason: 'Value-added distributor.',
+  source: 'website',
+  sourceRef: 'cms-17',
+  personalEmail: false,
+  existingDomain: false,
+  submittedAt: new Date('2026-10-30T08:15:00Z'),
+  ...overrides,
+});
+const insertWebsite = (input: NewApplicationRecord) =>
+  withSystem(intake, (tx) => insertWebsiteApplication(tx, intake, input, clock));
+
+describe('insertWebsiteApplication', () => {
+  it('inserts once per (source, source_ref), keeps the CMS time and reads the reference month from it', async () => {
+    const manager = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'middle_east' });
+    expect(await insertWebsite(websiteRecord())).toEqual({ inserted: true });
+    expect(await insertWebsite(websiteRecord())).toEqual({ inserted: false });
+    const rows = await db.select().from(applications);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({
+      source: 'website',
+      sourceRef: 'cms-17',
+      status: 'new',
+      category: null,
+      region: null,
+      reference: 'APP-2610-0001',
+    });
+    expect(rows[0]?.createdAt.toISOString()).toBe('2026-10-30T08:15:00.000Z');
+    const audit = await db.select().from(auditLog);
+    expect(audit).toHaveLength(1);
+    expect(audit[0]).toMatchObject({ event: 'application.submitted', note: 'Website form', who: 'sync', source: 'system' });
+    expect((await db.select().from(notifications)).map((n) => [n.userId, n.kind])).toEqual([[manager.id, 'application_new']]);
+  });
+
+  it('stores the personal email and existing domain flags as given', async () => {
+    await insertWebsite(websiteRecord({ personalEmail: true, existingDomain: true }));
+    const [row] = await db.select().from(applications);
+    expect(row).toMatchObject({ personalEmail: true, existingDomain: true });
+  });
+
+  it('refuses a website entry without a source ref', async () => {
+    await expect(insertWebsite(websiteRecord({ sourceRef: null }))).rejects.toMatchObject({ code: 'validation' });
+  });
+
+  it('does not collide with a portal application from the same email', async () => {
+    await create(record({ email: 'sameer@falconridge.ae' }));
+    expect(await insertWebsite(websiteRecord())).toEqual({ inserted: true });
+    expect(await db.select().from(applications)).toHaveLength(2);
   });
 });

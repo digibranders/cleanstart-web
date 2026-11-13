@@ -3,8 +3,11 @@ import { applications, partners, users } from '@/db/schema';
 import type { Clock } from '@/lib/clock';
 import type { ApplicationSource, PartnerCategory, PartnerRegion } from '@/lib/domain';
 import type { ApplicationDto } from '@/lib/dto';
+import { ROUTES } from '@/lib/routes';
+import { recordAudit } from '@/server/audit/record';
 import type { SystemActor } from '@/server/auth/types';
-import { ConflictError } from '@/server/errors';
+import { ConflictError, ValidationError } from '@/server/errors';
+import { notifyUsers } from '@/server/notify';
 import type { Tx } from './context';
 import { defineIsolation } from './isolation.registry';
 
@@ -151,8 +154,76 @@ export async function listManagerRecipients(tx: Tx, _actor: SystemActor): Promis
   return managersOf(tx);
 }
 
-export const isolation = defineIsolation<'createPortalApplication' | 'findPartnerByDomain' | 'listManagerRecipients'>({
+/**
+ * Public (M1.3b). Idempotent on (source, source_ref): returns false when the row already existed. Writes the audit entry
+ * and the in-app notification to the partner managers itself because the job that calls it has no action layer.
+ * The CMS sends its own emails for website entries, so none are sent here.
+ */
+export async function insertWebsiteApplication(
+  tx: Tx,
+  actor: SystemActor,
+  input: NewApplicationRecord,
+  clock: Clock,
+): Promise<{ inserted: boolean }> {
+  if (input.sourceRef === null) {
+    throw new ValidationError([{ path: 'sourceRef', message: 'A website application needs the CMS id.' }]);
+  }
+  const [known] = await tx
+    .select({ id: applications.id })
+    .from(applications)
+    .where(and(eq(applications.source, 'website'), eq(applications.sourceRef, input.sourceRef)))
+    .limit(1);
+  if (known) return { inserted: false };
+
+  const submittedAt = input.submittedAt ?? clock.now();
+  const [created] = await tx
+    .insert(applications)
+    .values({
+      reference: await nextReference(tx, submittedAt),
+      company: input.company,
+      domain: input.domain,
+      applicantName: input.applicantName,
+      email: input.email,
+      role: input.role,
+      phone: input.phone,
+      category: input.category,
+      region: input.region,
+      reason: input.reason,
+      source: 'website',
+      sourceRef: input.sourceRef,
+      personalEmail: input.personalEmail,
+      existingDomain: input.existingDomain,
+      createdAt: submittedAt,
+    })
+    .onConflictDoNothing({ target: [applications.source, applications.sourceRef] })
+    .returning({ id: applications.id });
+  if (!created) return { inserted: false };
+
+  await recordAudit(tx, actor, {
+    event: 'application.submitted',
+    target: input.company,
+    note: 'Website form',
+    subject: { type: 'application', id: created.id },
+  });
+  const managers = await managersOf(tx);
+  await notifyUsers(
+    tx,
+    managers.map((manager) => ({
+      userId: manager.userId,
+      kind: 'application_new' as const,
+      title: `New application from ${input.company}`,
+      body: `Website form, ${input.applicantName}`,
+      link: `${ROUTES.admin.partners}?tab=applications`,
+    })),
+  );
+  return { inserted: true };
+}
+
+export const isolation = defineIsolation<
+  'createPortalApplication' | 'findPartnerByDomain' | 'listManagerRecipients' | 'insertWebsiteApplication'
+>({
   createPortalApplication: { scope: 'public', reason: 'Public apply flow. Takes a SystemActor; covered by applications.test.ts and actions/apply.test.ts.' },
   findPartnerByDomain: { scope: 'public', reason: 'Public apply flow and website intake. Returns only id and name; covered by applications.test.ts.' },
   listManagerRecipients: { scope: 'public', reason: 'Public flows notify the active partner managers. Takes a SystemActor; covered by applications.test.ts.' },
+  insertWebsiteApplication: { scope: 'public', reason: 'Website intake job, system actor only; covered by applications.test.ts and website-applications.test.ts.' },
 });
