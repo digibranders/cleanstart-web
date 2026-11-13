@@ -3923,7 +3923,7 @@ printf '%s\n' "2026-11-13 00:00 IST | M1.2 | done | W0 | $(git rev-parse --short
 
 **Gate A at the end:** all four commands run.
 
-- [ ] **Step 1: Check the prerequisite, log the start**
+- [x] **Step 1: Check the prerequisite, log the start**
 
 ```bash
 grep -n "export async function requireActionViewer\|export const requireActionViewer" apps/portal/src/server/auth/viewer.ts
@@ -3932,7 +3932,7 @@ printf '%s\n' "2026-11-13 00:00 IST | M1.2b | started | W0 | - | - | runViewerAc
 
 Expected: one matching line. If `viewer.ts` or the export is missing, W0-f has not landed: write a `blocked` line and stop.
 
-- [ ] **Step 2: Write the failing runner test**
+- [x] **Step 2: Write the failing runner test**
 
 The test mocks `@/server/auth/viewer`, `next/cache`, `next/headers`, `@sentry/nextjs` and the logger, so it needs no session and no database. Create `apps/portal/src/server/actions/run.test.ts`:
 
@@ -4066,7 +4066,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/run.te
 
 Expected: FAIL, `Failed to load url ./run`.
 
-- [ ] **Step 3: Create the runner from the contracts**
+- [x] **Step 3: Create the runner from the contracts**
 
 ```bash
 bash apps/portal/scripts/contract-block.sh "### F.7 " 2 > apps/portal/src/server/actions/run.ts
@@ -4077,7 +4077,7 @@ Expected: PASS, `Tests  10 passed (10)`. This also settles contracts M.1 item 8 
 
 Contracts M.1 item 9 (`'use server'` files export only async functions) is not exercised here: `run.ts` is not a `'use server'` file. The first action file (track P, `actions/apply.ts`) is the check.
 
-- [ ] **Step 4: Stage, run Gate A, run Gate B, commit, log**
+- [x] **Step 4: Stage, run Gate A, run Gate B, commit, log**
 
 ```bash
 git add apps/portal/src/server/actions/run.ts apps/portal/src/server/actions/run.test.ts docs/superpowers/plans/2026-11-12-partner-portal-01-foundations.md
