@@ -9230,7 +9230,7 @@ Prerequisite: M2.3 merged (`listNotifications`, `markAllNotificationsReadAction`
 
 Rules this task implements: the bell shows the viewer's own notifications, newest first, and the unread ones carry a dot; the ping shows while any notification is unread (the total, not only the ten shown); "Mark all read" and opening one mark them read; a notification with no safe app relative link is shown but not clickable; the list is refreshed each time the popover opens. The help popover needs no new data code: its "Message your partner manager" entry and the profile menu's "Message <name>" read the manager from `ShellDto.manager`, which `getShell` (M1.1) already loads, and that replaces the mock's `persona.manager` in the same W0-f change that replaces the persona. This task verifies it in the manual check instead of duplicating it.
 
-- [ ] **Step 1: Write the failing tests for the pure helpers**
+- [x] **Step 1: Write the failing tests for the pure helpers**
 
 ```ts
 // src/lib/notification-view.test.ts
@@ -9276,7 +9276,7 @@ describe('isAppLink', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/lib/notification-view.test.ts`
 Expected: FAIL, "Cannot find module './notification-view'".
 
-- [ ] **Step 2: Implement `src/lib/notification-view.ts`**
+- [x] **Step 2: Implement `src/lib/notification-view.ts`**
 
 Days 2 to 6 read "N days ago"; from 7 days the date is shown.
 
@@ -9322,7 +9322,7 @@ export const isAppLink = (link: string | null): link is string => link !== null 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/lib/notification-view.test.ts`
 Expected: PASS, 4 tests.
 
-- [ ] **Step 3: Write `src/components/shell/notifications-popover.tsx`**
+- [x] **Step 3: Write `src/components/shell/notifications-popover.tsx`**
 
 The markup and classes are the mock's bell block, moved into a component: `pop-wrap`, `ibtn`, `ping`, `dd-scrim`, `pop`, `pop-h`, `pop-t`, `btn btn-t`, `li`, `li-ic`, `li-t`, `li-n`, `li-s`, `unread`. The only new element is the empty state, which reuses `empty`.
 
@@ -9444,7 +9444,7 @@ export function NotificationsPopover({ notifications, today, open, onToggle, onC
 }
 ```
 
-- [ ] **Step 4: Prepare the shell change (Contract change request 5)**
+- [x] **Step 4: Prepare the shell change (Contract change request 5)**
 
 Nothing is edited in the shared files. The exact change is printed in the section "Contract change requests", item 5, and is copied into the task's progress-log `done` line as a pointer so the orchestrator finds it. Append, with one `printf`, a `note` line to the progress log: `M4.4 | note | R | notifications-popover ready, shell.tsx and layouts need Contract change request 5`.
 
@@ -9460,7 +9460,7 @@ Manual check, done on `feat/portal-build` after the orchestrator applies Contrac
 - Sign in as Farhan: his bell shows "<partner> asked for more time on <customer>" after Aditi requests an extension, linking to `/admin/approvals`.
 - Help (the question mark) in the partner portal: the "Message your partner manager" entry names the real manager and team of the signed in company (for Kestrel, "Farhan Qureshi, CleanStart India"), and the profile menu reads "Message Farhan Qureshi". Sign in as a user of a company managed by Omar to see the other name.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/portal/src/lib/notification-view.ts apps/portal/src/lib/notification-view.test.ts \
