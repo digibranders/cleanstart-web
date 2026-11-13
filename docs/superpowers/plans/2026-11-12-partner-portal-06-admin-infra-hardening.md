@@ -4448,7 +4448,7 @@ Decisions recorded:
 - **Rate limits are layered.** Better Auth's own limiter per client address (enabled explicitly, because the library enables it only in production), a per email limit in a `hooks.before` handler, and `rateLimit()` calls in every public server action.
 - **`DATABASE_OWNER_URL` is inside the app container** (the migration runs on start, contracts C.5). A code execution bug in the app would therefore hold the owner credentials and could bypass row level security. Accepted for the pilot and recorded as CCR-5 (run migrations as a one-shot job and make the variable optional in production).
 
-- [ ] **Step 1: Baseline the dependency audit**
+- [x] **Step 1: Baseline the dependency audit**
 
 `pnpm audit` covers the whole monorepo, so a small script keeps only the advisories whose path starts at `apps__portal` and fails on high or critical.
 
@@ -4505,7 +4505,7 @@ process.exit(blocking.length > 0 ? 1 : 0);
 Run: `node apps/portal/scripts/audit-portal.mjs; echo "exit=$?"`
 Expected on 13 November 2026 (the numbers move as advisories are published): `21 advisories for apps/portal, 12 high or critical.`, every line about `next@16.2.5`, the highest fix `>=16.4.1`, `exit=1`.
 
-- [ ] **Step 2: Upgrade Next.js for the portal**
+- [x] **Step 2: Upgrade Next.js for the portal**
 
 ```bash
 pnpm --filter @cleanstart/portal add --save-exact next@16.4.6
@@ -4514,7 +4514,7 @@ node apps/portal/scripts/audit-portal.mjs; echo "exit=$?"
 
 Expected: `0 high or critical`, `exit=0`. Anything still listed is triaged in `SECURITY-PASS.md` (fix, or accept with a reason and an expiry). The pin in `CLAUDE.md` ("Next.js 16.2.5") is for `apps/cms` and `apps/web`; the portal deviates on purpose. `apps/cms` and `apps/web` carry the same advisories: put one line in the report for their owner. Then re-run the three quick gates (`lint`, `typecheck`, `test`) and a build, because a framework bump can change behaviour. **Verify (known unknown U1):** read `apps/portal/node_modules/next/dist/docs/01-app/02-guides/content-security-policy.md` again; if nonce handling or the `proxy.ts` API changed since 16.2.5, adapt Step 4 and record it.
 
-- [ ] **Step 3: Write the failing policy tests**
+- [x] **Step 3: Write the failing policy tests**
 
 `csp.test.ts` pins the policy directive by directive (nonce and `strict-dynamic`, no `unsafe-inline` or `unsafe-eval` for scripts in production, inline style attributes only, frame, object, base and form restrictions, Turnstile and the document bucket in `connect-src`, upgrade in production only, development additions). `headers.test.ts` loads `next.config.ts` fresh for each environment and pins the static headers, HSTS in production only, the closed API policy and the standalone switch.
 
@@ -4643,7 +4643,7 @@ describe('next.config security headers', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/security/csp.test.ts src/server/security/headers.test.ts`
 Expected: FAIL (`./csp` cannot be resolved; the headers test fails on the missing headers).
 
-- [ ] **Step 4: Implement the policy and the static headers**
+- [x] **Step 4: Implement the policy and the static headers**
 
 ```ts
 /**
@@ -4755,7 +4755,7 @@ export default nextConfig;
 
 Run the two test files. Expected: PASS, 12 tests.
 
-- [ ] **Step 5: Wire the policy into `proxy.ts`**
+- [x] **Step 5: Wire the policy into `proxy.ts`**
 
 First read the file the Wave 0 session left: `grep -n "export\|matcher\|OPEN\|health" apps/portal/src/proxy.ts`. W0-f added a session redirect beside the review gate; the edit below keeps all of that exactly as it is by renaming the existing function and wrapping it, so it works whatever the redirect looks like. Three edits:
 
@@ -4860,7 +4860,7 @@ describe('proxy review gate', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/proxy.test.ts`
 Expected: PASS, 4 tests. (If W0-f's gate redirects signed out visitors, add one case for it: a redirect response comes back unchanged and carries no policy.)
 
-- [ ] **Step 6: Write the failing session, cookie and rate limit tests**
+- [x] **Step 6: Write the failing session, cookie and rate limit tests**
 
 `auth-session.test.ts` drives the real Better Auth handler (`auth.handler(new Request(...))`) against the test database: the session cookie is `HttpOnly`, `SameSite=Lax`, site wide and expiring; `useSecureCookies` is set explicitly; a session cookie planted before sign in is ignored and a new one is issued; every sign in gets its own session; sign out ends the session on the server (the cookie no longer returns a user and the `auth_session` row is gone); a wrong password, an unknown address, a disabled user and a suspended partner's user all get the same status and body (no account discovery); the library limiter is on; repeated sign ins from one address, repeated sign ins on one account from many addresses, and repeated second step guesses all end in 429. `per-email-limit.test.ts` tests the per email function on its own.
 
@@ -5032,7 +5032,7 @@ Expected: `per-email-limit` fails to resolve `./auth-rate-limit`; in `auth-sessi
 
 **Verify (known unknown U5):** the tests assume the sign in endpoint is `POST /api/auth/sign-in/email`, the session cookie name contains `session_token`, and the handler trusts `APP_URL` as origin (set by `src/db/test-setup.ts`). If the handler rejects the request with an origin error, look at `trustedOrigins` in `src/server/auth/auth.ts`; if it needs the `nextCookies` plugin's request context, the plugin skips safely outside Next (checked in the library source), so the failure is something else, read the response body printed by the assertion.
 
-- [ ] **Step 7: Implement the limits and wire them into `auth.ts`**
+- [x] **Step 7: Implement the limits and wire them into `auth.ts`**
 
 `limits.ts` holds the Better Auth limiter options (explicitly enabled; sign in 10 per minute per address, second step 5, password reset 5 per 10 minutes) and the per email rules. `auth-rate-limit.ts` holds the per email check and a ready made hook.
 
@@ -5110,7 +5110,7 @@ Open `apps/portal/src/server/auth/auth.ts` (W0-e and W0-f wrote it) and make exa
 
 Run both test files again. Expected: PASS, 10 tests in `auth-session` and 2 in `per-email-limit`. **Verify (known unknown U5):** `customRules` keys must match the library's paths; the flood test proves it for sign in and the second step. If `/two-factor/verify-totp` is not the path (the TOTP plugin in the installed version names it differently), print the real path from the library's rate limit rules in `node_modules/better-auth/dist/plugins/two-factor` and change the two keys in `limits.ts`.
 
-- [ ] **Step 8: Prove every public server action is rate limited**
+- [x] **Step 8: Prove every public server action is rate limited**
 
 Apply, request access, invite preview and accept, and password reset have no session, so a script can hit them. The test reads the action files and fails for any function that calls `runPublicAction(` without calling `rateLimit(`. It also pins the set of public actions to the six the contracts name, so a seventh needs a deliberate edit here.
 
@@ -5166,7 +5166,7 @@ rateLimit(`<action-name>:ip:${ctx.ip ?? 'unknown'}`, { limit: 10, windowSeconds:
 
 with `import { rateLimit } from '@/server/rate-limit';`. Use the action's name as the key prefix (`invite-preview`, `invite-accept`, `access-request`, `apply`); `invite-preview` and `invite-accept` limit token guessing, so keep them at 10 per minute. A `RateLimitError` becomes an `ActionResult` failure with code `rate_limited` through `runPublicAction`, and the screens already show `error.message`.
 
-- [ ] **Step 9: Run the isolation matrix and the repository checks**
+- [x] **Step 9: Run the isolation matrix and the repository checks**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/repo/isolation.test.ts src/server/repo/imports.test.ts src/db/schema.test.ts
@@ -5176,7 +5176,7 @@ git grep -nE "(AKIA[0-9A-Z]{16}|xox[bp]-[0-9A-Za-z-]+|-----BEGIN (RSA|EC|OPENSSH
 
 Expected: the three suites pass (the matrix covers every repo export, the import test proves only `context.ts` imports `appDb`, `schema.test.ts` proves `portal_app` is not the owner and cannot touch `audit_log`); both greps print nothing and `exit=1`. The master plan says "run against the staging database": there is none (CLAUDE.md deploy rules), so the matrix runs against the freshly migrated local test database, which is built by the same `migrate.ts` and `rls.sql` as production. Record that sentence in the report.
 
-- [ ] **Step 10: Run the browser security spec**
+- [x] **Step 10: Run the browser security spec**
 
 ```bash
 pnpm --filter @cleanstart/portal exec playwright test e2e/security.spec.ts --project=desktop
@@ -5184,7 +5184,7 @@ pnpm --filter @cleanstart/portal exec playwright test e2e/security.spec.ts --pro
 
 Expected: `6 passed`. A CSP failure names the directive and the blocked URL (`script-src blocked inline`, `connect-src blocked https://...`): fix the policy in `csp.ts` (and its test) or, if the blocked thing is wrong, the code that loads it. Never add `'unsafe-inline'` to scripts. If Turnstile is blocked, check the widget loads from `https://challenges.cloudflare.com` and that `frame-src` and `connect-src` list it (they do).
 
-- [ ] **Step 11: Write the report**
+- [x] **Step 11: Write the report**
 
 Create `docs/partner-portal/SECURITY-PASS.md` and fill every row with the real output (a pasted line, not a summary):
 
@@ -5222,7 +5222,7 @@ Date, commit, who ran it.
 List anything a check could not cover, with the owner.
 ````
 
-- [ ] **Step 12: Gate A and commit**
+- [x] **Step 12: Gate A and commit**
 
 Run the standard Gate A block, then the audit script (`exit=0`), then Gate B, then:
 

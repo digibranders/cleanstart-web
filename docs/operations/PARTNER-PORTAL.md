@@ -59,6 +59,18 @@ partners.cleanstart.com {
 }
 ```
 
+### Client address and rate limits (the trusted proxy)
+
+Per address rate limits (sign in, one time codes, apply, invites) are only as good as the client address. The app never uses the leftmost `X-Forwarded-For` entry, because a client can write it and rotate it to get a fresh allowance on every request. `src/proxy.ts` resolves the address once, from the setting `PORTAL_TRUSTED_PROXY_HOPS`, and passes it on in an internal header that a client cannot set:
+
+| Setting | Meaning |
+|---|---|
+| `0` or unset (the default, also for development) | No proxy is trusted. Every client counts as unknown and shares one rate limit bucket. Safe, but a busy site is throttled together. |
+| `1` (production) | One proxy, Caddy, writes `X-Forwarded-For`. The app takes the last entry, the address Caddy saw or wrote. |
+| `2` to `5` | That many proxies append to the header; the app skips them from the right. |
+
+`deploy-portal.yml` renders `PORTAL_TRUSTED_PROXY_HOPS=1` into `/opt/cleanstart/portal.env`. This is only correct while the Caddy block above overwrites the header (`header_up X-Forwarded-For {http.request.header.CF-Connecting-IP}`; a `header_up` replaces the value, it does not append) and port 443 is reachable only from Cloudflare (step 1.8). Do not remove either: with a directly reachable Caddy a visitor could send their own `CF-Connecting-IP`. Symptoms of a wrong setting: with `0` in production, applications and invite links start returning "too many attempts" under normal traffic (one shared bucket), and the log shows `Rate limiting could not determine a client IP`; with a value that is too high, every request counts as unknown.
+
 ## 2. GitHub settings (a person, once)
 
 Repository variables (Settings, Secrets and variables, Variables):
@@ -74,7 +86,7 @@ Repository variables (Settings, Secrets and variables, Variables):
 | `PARTNERS_NOTIFY_EMAIL` | fallback staff address |
 | `HUBSPOT_PARTNER_PIPELINE_ID`, `HUBSPOT_PORTAL_ID`, `HUBSPOT_USE_ASSOCIATION_LABELS` | from `docs/partner-portal/HUBSPOT-PROVISIONING.md` |
 | `PORTAL_JOBS_ENABLED` | leave unset (the workflow renders `true`) |
-| `PORTAL_GOOGLE_CLIENT_ID`, `PORTAL_MICROSOFT_CLIENT_ID`, `PORTAL_MICROSOFT_TENANT_ID` | optional, only when sign in with Google or Microsoft is enabled |
+| `PORTAL_GOOGLE_CLIENT_ID`, `PORTAL_MICROSOFT_CLIENT_ID`, `PORTAL_MICROSOFT_TENANT_ID` | optional, only when sign in with Google or Microsoft is enabled. The tenant id defaults to `common`, which accepts an account from any Entra tenant and personal Microsoft accounts. Linking still needs the `xms_edov` claim (add it as an optional claim on the app registration) and an existing active user with that exact email, but set the tenant id to CleanStart's own tenant, or `organizations`, before enabling it for partners. |
 
 Repository secrets: `PORTAL_OWNER_DB_PASSWORD`, `PORTAL_APP_DB_PASSWORD` (the two hex passwords from step 1.4), `PORTAL_AUTH_SECRET` (`openssl rand -base64 32`), `BREVO_API_KEY` (shared with the CMS: it is the same Brevo account), `PORTAL_R2_ACCESS_KEY_ID`, `PORTAL_R2_SECRET_ACCESS_KEY` (scoped to the private bucket only), `PORTAL_HUBSPOT_TOKEN`, `PORTAL_HUBSPOT_WEBHOOK_SECRET`, `PORTAL_CMS_INTAKE_API_KEY` (the CMS service user's API key), `PORTAL_TURNSTILE_SECRET_KEY`, `PORTAL_SENTRY_DSN`, and optionally `PORTAL_REVIEW_PASSWORD`, `PORTAL_GOOGLE_CLIENT_SECRET`, `PORTAL_MICROSOFT_CLIENT_SECRET`. `DROPLET_SSH_KEY`, `DROPLET_HOST` and `DROPLET_USER` already exist for the CMS deploy.
 

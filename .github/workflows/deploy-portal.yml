@@ -189,6 +189,8 @@ jobs:
             emit SENTRY_DSN "$SENTRY_DSN"
             emit SENTRY_ENVIRONMENT production
             emit PORTAL_REVIEW_PASSWORD "$PORTAL_REVIEW_PASSWORD"
+            # Caddy (which overwrites X-Forwarded-For) is the one proxy in front of the container: see the runbook, "Client address and rate limits".
+            emit PORTAL_TRUSTED_PROXY_HOPS 1
           } | ssh -i ~/.ssh/id_deploy \
             ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} \
             'umask 077 && cat > /opt/cleanstart/portal.env && chmod 600 /opt/cleanstart/portal.env'
