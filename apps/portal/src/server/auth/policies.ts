@@ -1,0 +1,207 @@
+import type { DealRegion, PartnerRegion } from '@/lib/domain';
+import { ForbiddenError } from '@/server/errors';
+import type { Viewer } from './types';
+import { roleKey } from './types';
+
+export const ACTIONS = [
+  // Partner applications (master 1.3, 1.4)
+  'application.read',
+  'application.approve',
+  'application.decline',
+  'application.reopen',
+  // Partners and companies (master 1.4, 1.7, 4.1)
+  'partner.read',
+  'partner.create',
+  'partner.update_profile',
+  'partner.change_category',
+  'partner.change_manager',
+  'partner.suspend',
+  'partner.restore',
+  'partner.resend_invites',
+  'partner.update_checklist',
+  // A partner's own people (master 1.5, 1.6)
+  'team.read',
+  'team.invite',
+  'team.resend_invite',
+  'team.revoke_invite',
+  'team.change_role',
+  'team.remove',
+  'access_request.decide',
+  // CleanStart staff (master 1.8)
+  'staff.read',
+  'staff.invite',
+  'staff.resend_invite',
+  'staff.change_role',
+  'staff.change_region',
+  'staff.remove',
+  // The signed-in person's own account (master 1.7). Always self only.
+  'account.update_profile',
+  'account.change_password',
+  'account.manage_two_factor',
+  'account.manage_sessions',
+  'account.update_notifications',
+  // Deal registrations (master 2.1 to 2.4)
+  'registration.create',
+  'registration.read',
+  'registration.read_queue',
+  'registration.resubmit',
+  'registration.decide',
+  'registration.undo_decision',
+  'registration.message',
+  'registration.request_extension',
+  'registration.decide_extension',
+  'registration.lookup_customer',
+  'manager.message',
+  // Dashboards (master 2.6)
+  'overview.read',
+  'report.read',
+  // Documents (master 3.1, 3.2)
+  'document.read',
+  'document.open',
+  'document.upload',
+  'document.replace',
+  'document.edit',
+  'document.delete',
+  'document.read_stats',
+  'document.request_material',
+  // Cross cutting (master 4.2 to 4.4, HubSpot 4.10)
+  'audit.read',
+  'audit.export',
+  'search.use',
+  'notification.read',
+  'integration.read_health',
+  'integration.retry_failed',
+] as const;
+
+export type Action = (typeof ACTIONS)[number];
+
+/**
+ * What an action is about. Every field is optional: an omitted field means "not specified" and the check
+ * passes on that dimension (list screens pass no subject; the repo then scopes the rows). A present field
+ * is checked. null means "specified and unknown", which fails the check.
+ */
+export interface PolicySubject {
+  /** The partner that owns the record. */
+  partnerId?: string | null;
+  /** Region of the record (a deal's region, or a partner's region). */
+  region?: PartnerRegion | DealRegion | null;
+  /** The user who created the record (registrations.registered_by). */
+  ownerUserId?: string | null;
+  /** The user being acted on (account actions must target the viewer; team actions may not target the viewer's own role). */
+  targetUserId?: string | null;
+}
+
+type Rule = (viewer: Viewer, subject: PolicySubject | undefined) => boolean;
+
+const ownCompany = (v: Viewer, s: PolicySubject | undefined): boolean =>
+  v.kind === 'partner' && (s?.partnerId === undefined || s.partnerId === v.partnerId);
+
+const mine = (v: Viewer, s: PolicySubject | undefined): boolean =>
+  v.kind === 'partner' && (s?.ownerUserId === undefined || s.ownerUserId === v.id);
+
+const inScope = (v: Viewer, s: PolicySubject | undefined): boolean =>
+  v.kind === 'staff' && (s?.region === undefined || v.region === 'all' || s.region === v.region);
+
+const self = (v: Viewer, s: PolicySubject | undefined): boolean =>
+  s?.targetUserId === undefined || s.targetUserId === v.id;
+
+const isPartnerManager = (v: Viewer): boolean => v.kind === 'staff' && v.role === 'partner_manager';
+const isStaffSales = (v: Viewer): boolean => v.kind === 'staff' && v.role === 'sales';
+const isMarketing = (v: Viewer): boolean => v.kind === 'staff' && v.role === 'marketing';
+const isPartnerAdmin = (v: Viewer): boolean => v.kind === 'partner' && v.role === 'partner_admin';
+const isPartnerSales = (v: Viewer): boolean => v.kind === 'partner' && v.role === 'sales';
+
+/** Partner admin on own company, or a partner manager on any. */
+const teamAdmin: Rule = (v, s) => (isPartnerAdmin(v) && ownCompany(v, s)) || isPartnerManager(v);
+/** Partner admin or partner sales on their own company. */
+const dealUser: Rule = (v, s) => (isPartnerAdmin(v) || isPartnerSales(v)) && ownCompany(v, s);
+/** Partner admin on any own deal; partner sales only on deals they registered. */
+const ownDeals: Rule = (v, s) =>
+  ownCompany(v, s) && (isPartnerAdmin(v) || (isPartnerSales(v) && mine(v, s)));
+const staffDeals: Rule = (v, s) => isPartnerManager(v) || (isStaffSales(v) && inScope(v, s));
+const anyone: Rule = () => true;
+const managerOnly: Rule = (v) => isPartnerManager(v);
+
+const RULES: Record<Action, Rule> = {
+  'application.read': managerOnly,
+  'application.approve': managerOnly,
+  'application.decline': managerOnly,
+  'application.reopen': managerOnly,
+
+  'partner.read': (v, s) => ownCompany(v, s) || isPartnerManager(v) || (isStaffSales(v) && inScope(v, s)),
+  'partner.create': managerOnly,
+  'partner.update_profile': (v, s) => (isPartnerAdmin(v) && ownCompany(v, s)) || isPartnerManager(v),
+  'partner.change_category': managerOnly,
+  'partner.change_manager': managerOnly,
+  'partner.suspend': managerOnly,
+  'partner.restore': managerOnly,
+  'partner.resend_invites': managerOnly,
+  'partner.update_checklist': (v, s) => isPartnerAdmin(v) && ownCompany(v, s),
+
+  'team.read': teamAdmin,
+  'team.invite': teamAdmin,
+  'team.resend_invite': teamAdmin,
+  'team.revoke_invite': teamAdmin,
+  'team.change_role': teamAdmin,
+  'team.remove': teamAdmin,
+  'access_request.decide': teamAdmin,
+
+  'staff.read': managerOnly,
+  'staff.invite': managerOnly,
+  'staff.resend_invite': managerOnly,
+  'staff.change_role': managerOnly,
+  'staff.change_region': managerOnly,
+  'staff.remove': managerOnly,
+
+  'account.update_profile': self,
+  'account.change_password': self,
+  'account.manage_two_factor': self,
+  'account.manage_sessions': self,
+  'account.update_notifications': self,
+
+  'registration.create': (v, s) => dealUser(v, s) || isPartnerManager(v),
+  'registration.read': (v, s) => ownDeals(v, s) || isPartnerManager(v) || (isStaffSales(v) && inScope(v, s)),
+  'registration.read_queue': (v) => isPartnerManager(v) || isStaffSales(v),
+  'registration.resubmit': ownDeals,
+  'registration.decide': staffDeals,
+  'registration.undo_decision': staffDeals,
+  'registration.message': (v, s) => ownDeals(v, s) || staffDeals(v, s),
+  'registration.request_extension': ownDeals,
+  'registration.decide_extension': staffDeals,
+  'registration.lookup_customer': dealUser,
+  'manager.message': (v) => v.kind === 'partner',
+
+  'overview.read': (v) => isPartnerAdmin(v) || isPartnerSales(v),
+  'report.read': (v) => isPartnerManager(v) || isStaffSales(v),
+
+  'document.read': anyone,
+  'document.open': anyone,
+  'document.upload': (v) => isPartnerManager(v) || isMarketing(v),
+  'document.replace': (v) => isPartnerManager(v) || isMarketing(v),
+  'document.edit': (v) => isPartnerManager(v) || isMarketing(v),
+  'document.delete': (v) => isPartnerManager(v) || isMarketing(v),
+  'document.read_stats': (v) => isPartnerManager(v) || isMarketing(v),
+  'document.request_material': (v) => v.kind === 'partner',
+
+  'audit.read': managerOnly,
+  'audit.export': managerOnly,
+  'search.use': anyone,
+  'notification.read': anyone,
+  'integration.read_health': managerOnly,
+  'integration.retry_failed': managerOnly,
+};
+
+/** Pure. Never reads the database. */
+export function can(viewer: Viewer, action: Action, subject?: PolicySubject): boolean {
+  return RULES[action](viewer, subject);
+}
+
+/** Throws ForbiddenError (httpStatus 403, safe message "You do not have access to this.") when can() is false. */
+export function assertCan(viewer: Viewer, action: Action, subject?: PolicySubject): void {
+  if (!can(viewer, action, subject)) {
+    throw new ForbiddenError(`${roleKey(viewer)} may not ${action}`);
+  }
+}
+
+/** For the permission test: the actions a role may attempt with no subject. */
+export const allowedActions = (viewer: Viewer): Action[] => ACTIONS.filter((a) => can(viewer, a));

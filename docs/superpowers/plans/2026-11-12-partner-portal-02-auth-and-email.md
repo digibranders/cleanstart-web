@@ -1545,13 +1545,13 @@ printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M1.1a | done | W0 | $(git rev-par
 - Create: `apps/portal/src/server/auth/policies.ts`
 - Test: `apps/portal/src/server/auth/policies.test.ts`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M1.1b | started | W0 | - | - | policies and matrix test" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Write the matrix test**
+- [x] **Step 2: Write the matrix test**
 
 Create `apps/portal/src/server/auth/policies.test.ts`. Every `Action` has a row, every row has six cells in the order partner admin, partner sales, partner technical, staff partner manager, staff sales, staff marketing, and the six cell kinds (`-`, `Y`, `own`, `mine`, `region`, `self`) each get their own assertions.
 
@@ -1762,7 +1762,7 @@ describe('role keys', () => {
 });
 ```
 
-- [ ] **Step 3: Run it and see it fail**
+- [x] **Step 3: Run it and see it fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/auth/policies.test.ts
@@ -1770,7 +1770,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/auth/policies.test.t
 
 Expected: FAIL with `Failed to resolve import "./policies"`.
 
-- [ ] **Step 4: Create `policies.ts`**
+- [x] **Step 4: Create `policies.ts`**
 
 Create `apps/portal/src/server/auth/policies.ts` (the contracts' D.2, D.3 and D.4 merged, imports at the top, unchanged rules):
 
@@ -1985,7 +1985,7 @@ export function assertCan(viewer: Viewer, action: Action, subject?: PolicySubjec
 export const allowedActions = (viewer: Viewer): Action[] => ACTIONS.filter((a) => can(viewer, a));
 ```
 
-- [ ] **Step 5: Run it and see it pass**
+- [x] **Step 5: Run it and see it pass**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/auth/policies.test.ts
@@ -1993,11 +1993,11 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/auth/policies.test.t
 
 Expected: `Test Files  1 passed (1)`, `Tests  355 passed (355)`.
 
-- [ ] **Step 6: Run Gate A, then Gate B**
+- [x] **Step 6: Run Gate A, then Gate B**
 
 Run the three fast commands, then the full Gate A block. Expected: all exit 0.
 
-- [ ] **Step 7: Commit and log**
+- [x] **Step 7: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build
