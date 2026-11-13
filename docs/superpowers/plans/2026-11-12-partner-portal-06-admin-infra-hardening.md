@@ -2104,7 +2104,7 @@ export default async function Page({
 Run: `pnpm --filter @cleanstart/portal typecheck`
 Expected: no errors. If `requireCan` is typed differently from contracts H.18 (`requireCan(action: Action, subject?: PolicySubject): Promise<Viewer>`), fix only the call here.
 
-- [ ] **Step 7: Check that H4.10 is merged** (needed for Steps 8 and 9)
+- [x] **Step 7: Check that H4.10 is merged** (needed for Steps 8 and 9)
 
 ```bash
 git merge feat/portal-build
@@ -2113,7 +2113,7 @@ ls apps/portal/src/server/repo/integration-health.ts
 
 Expected: the file exists. If not, append `blocked | M4.2 | steps 8 and 9 need H4.10 (integration-health.ts)`, skip to Step 10 (Gate A and commit the rest), and come back when the orchestrator reports H4.10 merged. The screen works without the card.
 
-- [ ] **Step 8: Add the retry action and its tests**
+- [x] **Step 8: Add the retry action and its tests**
 
 `retryFailedOutboxAction` sets failed HubSpot rows back to `pending` (H's `retryFailedOutbox`) and writes one `integration.outbox_retried` audit entry in the same transaction. Replace `src/server/actions/audit.ts` with the full file and `src/server/actions/audit.test.ts` with the full test:
 
@@ -2244,7 +2244,7 @@ describe('retryFailedOutboxAction', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/audit.test.ts`
 Expected: PASS, 5 tests (export x3, retry x2).
 
-- [ ] **Step 9: Add the health card and wire it into the page**
+- [x] **Step 9: Add the health card and wire it into the page**
 
 The card shows four figures from `IntegrationHealthDto` (waiting, failed with a Retry button, last HubSpot check, last error). It uses the existing `card kpis` classes. Create `src/components/audit/IntegrationHealthCard.tsx`, then replace the page with the full version:
 
