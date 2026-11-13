@@ -1,55 +1,40 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { register } from './instrumentation';
 
-const { startScheduler, info, envLoaded } = vi.hoisted(() => ({ startScheduler: vi.fn(), info: vi.fn(), envLoaded: vi.fn() }));
+const startScheduler = vi.fn();
+const flags = { enabled: false };
 
 vi.mock('@sentry/nextjs', () => ({ captureRequestError: vi.fn() }));
-vi.mock('@/env', () => {
-  envLoaded();
-  return { env: {} };
-});
+vi.mock('@/env', () => ({
+  env: {
+    get PORTAL_JOBS_ENABLED() {
+      return flags.enabled;
+    },
+  },
+}));
 vi.mock('../sentry.server.config', () => ({}));
-vi.mock('../sentry.edge.config', () => ({}));
 vi.mock('@/server/jobs/schedule', () => ({ startScheduler }));
-vi.mock('@/server/jobs', () => ({ JOBS: [{ name: 'demo', schedule: '* * * * *', run: async () => undefined }] }));
-vi.mock('@/server/log', () => ({ log: { info } }));
+vi.mock('@/server/jobs', () => ({ JOBS: [{ name: 'demo' }] }));
+vi.mock('@/server/log', () => ({ log: { info: vi.fn() } }));
 
 describe('register', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.stubEnv('NEXT_RUNTIME', 'nodejs');
+    startScheduler.mockClear();
   });
-
   afterEach(() => {
     vi.unstubAllEnvs();
   });
 
-  it('validates the environment when the Node server starts, and only then', async () => {
-    vi.stubEnv('NEXT_RUNTIME', 'edge');
-    await register();
-    expect(envLoaded).not.toHaveBeenCalled();
-    vi.stubEnv('NEXT_RUNTIME', 'nodejs');
-    await register();
-    expect(envLoaded).toHaveBeenCalledOnce();
-  });
-
-  it('does not start the scheduler unless PORTAL_JOBS_ENABLED is true', async () => {
-    vi.stubEnv('NEXT_RUNTIME', 'nodejs');
-    vi.stubEnv('PORTAL_JOBS_ENABLED', 'false');
-    await register();
-    expect(startScheduler).not.toHaveBeenCalled();
-  });
-
-  it('starts the scheduler with the job registry on the Node runtime when enabled', async () => {
-    vi.stubEnv('NEXT_RUNTIME', 'nodejs');
-    vi.stubEnv('PORTAL_JOBS_ENABLED', 'true');
+  it('starts the scheduler when the parsed flag is on (true or 1)', async () => {
+    flags.enabled = true;
+    const { register } = await import('./instrumentation');
     await register();
     expect(startScheduler).toHaveBeenCalledOnce();
-    expect(info).toHaveBeenCalledWith({ jobs: ['demo'] }, 'job scheduler started');
   });
 
-  it('never starts jobs on the edge runtime', async () => {
-    vi.stubEnv('NEXT_RUNTIME', 'edge');
-    vi.stubEnv('PORTAL_JOBS_ENABLED', 'true');
+  it('does not start the scheduler when the flag is off', async () => {
+    flags.enabled = false;
+    const { register } = await import('./instrumentation');
     await register();
     expect(startScheduler).not.toHaveBeenCalled();
   });

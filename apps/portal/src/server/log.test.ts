@@ -14,6 +14,12 @@ describe('logger', () => {
     expect(lines).toEqual([{ level: 'info', time: '2026-11-06T14:02:00.000Z', msg: 'done', action: 'registration.accept' }]);
   });
 
+  it('does not let a caller field overwrite level, time or msg', () => {
+    const { lines, logger } = capture();
+    logger.info({ level: 'debug', time: 'never', msg: 'spoofed' }, 'real');
+    expect(lines).toEqual([{ level: 'info', time: '2026-11-06T14:02:00.000Z', msg: 'real' }]);
+  });
+
   it('drops entries below the level', () => {
     const { lines, logger } = capture('warn');
     logger.debug({}, 'a');

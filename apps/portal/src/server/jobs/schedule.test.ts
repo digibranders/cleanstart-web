@@ -1,12 +1,14 @@
 import * as Sentry from '@sentry/nextjs';
 import cron from 'node-cron';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { log } from '@/server/log';
 import { runLocked } from './lock';
 import { startScheduler } from './schedule';
 
 vi.mock('node-cron', () => ({ default: { schedule: vi.fn(), validate: vi.fn() } }));
 vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }));
 vi.mock('@/db/client', () => ({ pool: { tag: 'system-pool' } }));
+vi.mock('@/server/log', () => ({ log: { error: vi.fn(), info: vi.fn() } }));
 vi.mock('./lock', () => ({ runLocked: vi.fn() }));
 
 const tick = (index: number): (() => void) => {
@@ -40,5 +42,13 @@ describe('startScheduler', () => {
     startScheduler([{ name: 'demo', schedule: '* * * * *', run: vi.fn() }]);
     tick(0)();
     await vi.waitFor(() => expect(Sentry.captureException).toHaveBeenCalledWith(failure, { tags: { job: 'demo' } }));
+  });
+
+  it('logs a failing job so it is visible without Sentry', async () => {
+    const failure = new Error('boom');
+    vi.mocked(runLocked).mockRejectedValue(failure);
+    startScheduler([{ name: 'demo', schedule: '* * * * *', run: vi.fn() }]);
+    tick(0)();
+    await vi.waitFor(() => expect(log.error).toHaveBeenCalledWith({ job: 'demo', err: failure }, 'job failed'));
   });
 });

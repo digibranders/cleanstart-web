@@ -1,3 +1,4 @@
+import type { Pool, PoolClient } from 'pg';
 import { describe, expect, it, vi } from 'vitest';
 import { testPool } from '@/db/test-helpers';
 import { runLocked } from './lock';
@@ -34,5 +35,22 @@ describe('runLocked', () => {
     });
     expect(outer).toBe(true);
     expect(inner).toBe(true);
+  });
+
+  it('destroys the connection when the unlock query fails', async () => {
+    const failure = new Error('connection lost');
+    const query = vi.fn().mockResolvedValueOnce({ rows: [{ ok: true }] }).mockRejectedValueOnce(failure);
+    const release = vi.fn();
+    const fake = { connect: vi.fn().mockResolvedValue({ query, release } as unknown as PoolClient) } as unknown as Pool;
+    await expect(runLocked(fake, 'demo', vi.fn().mockResolvedValue(undefined))).rejects.toThrow('connection lost');
+    expect(release).toHaveBeenCalledWith(failure);
+  });
+
+  it('returns the connection normally after a clean run', async () => {
+    const query = vi.fn().mockResolvedValue({ rows: [{ ok: true }] });
+    const release = vi.fn();
+    const fake = { connect: vi.fn().mockResolvedValue({ query, release } as unknown as PoolClient) } as unknown as Pool;
+    await runLocked(fake, 'demo', vi.fn().mockResolvedValue(undefined));
+    expect(release).toHaveBeenCalledWith(undefined);
   });
 });

@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs';
 import cron from 'node-cron';
 import { pool } from '@/db/client';
+import { log } from '@/server/log';
 import { runLocked } from './lock';
 
 export interface JobSpec {
@@ -17,7 +18,10 @@ export const startScheduler = (jobs: readonly JobSpec[]): void => {
     cron.schedule(
       job.schedule,
       () => {
-        runLocked(pool, job.name, job.run).catch((error: unknown) => Sentry.captureException(error, { tags: { job: job.name } }));
+        runLocked(pool, job.name, job.run).catch((error: unknown) => {
+          log.error({ job: job.name, err: error }, 'job failed');
+          Sentry.captureException(error, { tags: { job: job.name } });
+        });
       },
       { timezone: 'UTC', name: job.name, noOverlap: true },
     );

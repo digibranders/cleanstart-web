@@ -45,7 +45,7 @@ export const createLogger = ({ level, write, now = () => new Date() }: LoggerOpt
   const emit = (at: LogLevel, fields: Record<string, unknown>, message: string): void => {
     if (ORDER[at] < ORDER[level]) return;
     const body = redact(fields) as Record<string, unknown>;
-    write(JSON.stringify({ level: at, time: now().toISOString(), msg: message, ...body }));
+    write(JSON.stringify({ ...body, level: at, time: now().toISOString(), msg: message }));
   };
   return {
     debug: (fields, message) => emit('debug', fields, message),
