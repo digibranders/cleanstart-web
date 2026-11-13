@@ -6208,7 +6208,7 @@ git commit -m "feat(portal): M5.5 nightly backup dumps the portal database to it
 - Modify: `docs/operations/PARTNER-PORTAL.md` (M0.6 wrote sections 1 to 3; this adds 4 to 11)
 - Modify: `docs/operations/INCIDENTS.md` (an entry template for the portal; CCR-6)
 
-- [ ] **Step 1: Append sections 4 to 11 to `docs/operations/PARTNER-PORTAL.md`**
+- [x] **Step 1: Append sections 4 to 11 to `docs/operations/PARTNER-PORTAL.md`**
 
 ````markdown
 ## 4. What runs where
@@ -6330,7 +6330,9 @@ docker compose exec -T postgres psql -U postgres -d cleanstart_portal -c "select
 Secrets and where they rotate: `PORTAL_AUTH_SECRET` (signs everyone out), database passwords (`ALTER ROLE portal_app PASSWORD '...'` as the superuser, update the GitHub secret, deploy), HubSpot token and webhook secret (section 7), `BREVO_API_KEY` (shared with the CMS, rotate both), R2 keys (the private bucket token only), Turnstile secret, Sentry DSN, `PORTAL_REVIEW_PASSWORD` (the pilot gate). All live in GitHub secrets; a deploy writes them to `portal.env`.
 ````
 
-- [ ] **Step 2: Add the incident template to `docs/operations/INCIDENTS.md`**
+Written against the repo as it is in the `portal-t` worktree, so some text differs from the block above: names follow `src/env.ts` and `deploy-portal.yml` (`portal.env` holds `AUTH_SECRET`, the GitHub secret is `PORTAL_AUTH_SECRET`); job log lines are described as `job failed` (not every job line has a `job` field); the BetterStack host monitors line follows `docs/operations/CMS-DEPLOYMENT.md` (host metrics come from the DigitalOcean agent); the drill snippet reads `POSTGRES_PASSWORD` with `grep` instead of sourcing `.env`; the restore steps pass the owner password by prompt and load the data through `docker compose exec` with `-n public`. Added: the trusted proxy row in section 11, `access_requests` and backups in section 10, and the note that the `retention` job body comes from M5.3.
+
+- [x] **Step 2: Add the incident template to `docs/operations/INCIDENTS.md`**
 
 Insert this block directly under the paragraph that starts "**Format:**" (above the first dated entry). It adds the portal's extra fields and a copy-paste entry; the existing entries and the "newest first" rule do not change.
 
@@ -6354,7 +6356,7 @@ Copy this for a new entry, newest first:
 ```
 ````
 
-- [ ] **Step 3: Check the runbook against the repo**
+- [x] **Step 3: Check the runbook against the repo**
 
 ```bash
 for f in infra/docker-compose.yml infra/scripts/backup.sh infra/scripts/restore-portal-drill.sh infra/scripts/run-backup.sh apps/portal/scripts/db-bootstrap.sql .github/workflows/deploy-portal.yml docs/partner-portal/HUBSPOT-PROVISIONING.md; do [ -e "$f" ] && echo "ok  $f" || echo "MISSING  $f"; done
@@ -6363,7 +6365,7 @@ node -e "const d=new RegExp('['+String.fromCharCode(8211,8212)+']');let bad=0;fo
 
 Expected: `ok` for every path (if `HUBSPOT-PROVISIONING.md` is MISSING, track H has not written it: list it in the report) and no dash output.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add docs/operations/PARTNER-PORTAL.md docs/operations/INCIDENTS.md docs/superpowers/plans/2026-11-12-partner-portal-06-admin-infra-hardening.md

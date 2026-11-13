@@ -6,6 +6,24 @@ A running, reverse-chronological log of production incidents and non-obvious bug
 
 **Format:** newest first. Keep each entry tight. Mark **Status** honestly (`Fixed & verified`, `Fixed, verification pending`, `Mitigated`, `Open`). Call out the **Reusable lesson** — the part that generalises beyond this codebase.
 
+> **Partner portal entries (`apps/portal`).** Name the layer in **Area**: screen, server action, repo, job, HubSpot sync, deploy, database, proxy or Caddy. Add **Impact** (which partners or staff, how many, for how long), **Detection** (alert or person, and how long it was broken before anyone knew), and **Data** (was any partner data wrong, lost or exposed, and what was done about the audit log and the HubSpot outbox). A cross-tenant leak, a wrong approval or a lost registration is always an incident, even if it was fixed in minutes.
+
+Copy this for a new entry, newest first:
+
+```markdown
+## YYYY-MM-DD - one line: what the user saw
+
+- **Area:** `apps/portal` - layer (screen | server action | repo | job | HubSpot sync | deploy | database | proxy or Caddy), file or job name.
+- **Symptom:** what a partner or staff member saw, with the time it started and stopped.
+- **Impact:** who and how many; whether any partner could see or change another partner's data.
+- **Detection:** how it was noticed and how long it ran before that.
+- **Root cause:** the actual cause, one or two sentences, with the evidence that proves it (log line, query, commit).
+- **Fix:** what changed (commit or PR), and any one-off data repair (what was run, by whom, in a transaction or not).
+- **Data:** records wrong, lost or exposed; HubSpot deals that needed repair; whether the audit log shows it.
+- **Status:** Fixed and verified | Fixed, verification pending | Mitigated | Open.
+- **Reusable lesson:** the part that generalises beyond this bug.
+```
+
 > This log complements Claude Code's per-session auto-memory (`~/.claude/projects/<proj>/memory/`). The memory is auto-loaded each session for *this* repo; this file is committed so it travels with the code and is visible to every developer and every project checkout.
 
 ---
