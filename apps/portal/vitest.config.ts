@@ -10,7 +10,8 @@ export default defineConfig({
     globalSetup: ['./src/db/test-global-setup.ts'],
     setupFiles: ['./src/db/test-setup.ts'],
     pool: 'forks',
-    poolOptions: { forks: { maxForks: 4, minForks: 1 } },
+    // One database clone per worker (test-global-setup WORKERS): never more than 4 workers.
+    maxWorkers: 4,
     fileParallelism: true,
     testTimeout: 20_000,
     hookTimeout: 30_000,

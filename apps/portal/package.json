@@ -16,17 +16,18 @@
     "db:seed": "tsx --env-file=.env scripts/seed-dev.ts",
     "e2e": "playwright test",
     "e2e:install": "playwright install chromium",
-    "verify:copy": "node scripts/verify-copy.mjs"
+    "verify:copy": "node scripts/verify-copy.mjs",
+    "audit:deps": "node scripts/audit-portal.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1042.0",
     "@aws-sdk/s3-request-presigner": "^3.1042.0",
     "@cleanstart/forms": "workspace:*",
     "@hubspot/api-client": "^13.5.0",
-    "@sentry/nextjs": "^9.47.1",
+    "@sentry/nextjs": "^9.47.2",
     "better-auth": "1.7.22",
     "drizzle-orm": "^0.45.4",
-    "next": "16.2.5",
+    "next": "16.4.6",
     "node-cron": "^4.6.0",
     "pg": "^8.21.0",
     "react": "19.2.4",
@@ -44,6 +45,7 @@
     "drizzle-kit": "^0.31.11",
     "tsx": "^4.21.0",
     "typescript": "^5.7.3",
-    "vitest": "^2.1.9"
+    "vite": "^6.4.6",
+    "vitest": "^4.1.12"
   }
 }
