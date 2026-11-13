@@ -96,7 +96,11 @@ export function PasswordCard({ passwordChangedAt }: { passwordChangedAt: string 
             label="New password"
             value={next}
             onChange={edit(setNext)}
-            {...(tried && weak ? { error: "Meet all four rules below." } : {})}
+            {...(tried && weak
+              ? { error: "Meet all four rules below." }
+              : serverErrors.newPassword
+                ? { error: serverErrors.newPassword }
+                : {})}
           />
           <ul
             aria-label="Password rules"

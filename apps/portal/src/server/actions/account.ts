@@ -11,10 +11,11 @@ import { assertPasswordOk } from '@/server/auth/passwords';
 import { assertCan } from '@/server/auth/policies';
 import { revokeSession } from '@/server/auth/sessions';
 import { throwFieldError } from '@/server/auth-errors';
+import { ValidationError } from '@/server/errors';
 import { sendEmail } from '@/server/email/send';
 import { buildPasswordChanged } from '@/server/email/templates';
 import { rateLimit } from '@/server/rate-limit';
-import { recordPasswordChanged, setNotificationPrefs, updateProfile } from '@/server/repo/account';
+import { getProfile, recordPasswordChanged, setNotificationPrefs, updateProfile } from '@/server/repo/account';
 import { withViewer } from '@/server/repo/context';
 import type { ActionResult } from './result';
 import { runViewerAction } from './run';
@@ -22,7 +23,7 @@ import { runViewerAction } from './run';
 const changePasswordSchema = z
   .object({
     currentPassword: z.string().min(1, 'Enter your current password.').max(200),
-    newPassword: z.string().min(1).max(200),
+    newPassword: z.string().min(1).max(128, 'Use 128 characters or fewer.'),
     confirmPassword: z.string().max(200),
   })
   .refine((value) => value.newPassword === value.confirmPassword, { path: ['confirmPassword'], message: 'The passwords do not match.' });
@@ -90,7 +91,13 @@ export async function changePasswordAction(raw: unknown): Promise<ActionResult<{
   return runViewerAction({ name: 'account.change_password', schema: changePasswordSchema }, raw, async (ctx, input): Promise<{ changedAt: IsoTimestamp }> => {
     assertCan(ctx.viewer, 'account.change_password');
     rateLimit(`password:user:${ctx.viewer.id}`, PASSWORD_RULE);
-    assertPasswordOk(input.newPassword);
+    try {
+      assertPasswordOk(input.newPassword);
+    } catch (error) {
+      // The rule failure belongs under the new password field, not a generic "password" path.
+      if (error instanceof ValidationError) throw new ValidationError(error.issues.map((issue) => ({ ...issue, path: 'newPassword' })), error.safeMessage);
+      throw error;
+    }
     try {
       await auth.api.changePassword({
         body: { currentPassword: input.currentPassword, newPassword: input.newPassword, revokeOtherSessions: true },
@@ -139,19 +146,22 @@ export async function verifyTwoFactorAction(raw: unknown): Promise<ActionResult<
   return runViewerAction({ name: 'account.verify_two_factor', schema: codeSchema }, raw, async (ctx, input): Promise<{ enabled: true }> => {
     assertCan(ctx.viewer, 'account.manage_two_factor');
     rateLimit(`2fa:user:${ctx.viewer.id}`, PASSWORD_RULE);
+    const wasEnabled = (await withViewer(ctx.viewer, (tx) => getProfile(tx, ctx.viewer))).twoFactorEnabled;
     try {
       await auth.api.verifyTOTP({ body: { code: input.code }, headers: await headers() });
     } catch (error) {
       throwFieldError(error, 'password');
     }
-    await withViewer(ctx.viewer, (tx) =>
-      recordAudit(tx, ctx.viewer, {
-        event: 'account.two_factor_enabled',
-        target: `${ctx.viewer.name}, ${ctx.viewer.email}`,
-        partnerId: ctx.viewer.partnerId,
-        subject: { type: 'user', id: ctx.viewer.id },
-      }),
-    );
+    if (!wasEnabled) {
+      await withViewer(ctx.viewer, (tx) =>
+        recordAudit(tx, ctx.viewer, {
+          event: 'account.two_factor_enabled',
+          target: `${ctx.viewer.name}, ${ctx.viewer.email}`,
+          partnerId: ctx.viewer.partnerId,
+          subject: { type: 'user', id: ctx.viewer.id },
+        }),
+      );
+    }
     ctx.revalidate(ROUTES.partner.account);
     return { enabled: true };
   });

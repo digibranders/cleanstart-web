@@ -5,7 +5,7 @@ import { CHECKLIST_STEPS, type ChecklistStep, type PartnerCategory, type Partner
 import type { ChecklistDto, CompanyDto, CreatedInviteDto, IsoTimestamp, PartnerDetailDto, PartnerListRow } from '@/lib/dto';
 import { emailDomain, isPlausibleDomain, isValidEmail, nameFromEmail, normaliseDomain, staffTeamLabel } from '@/lib/people';
 import type { Viewer } from '@/server/auth/types';
-import { ForbiddenError, NotFoundError, ValidationError } from '@/server/errors';
+import { ConflictError, ForbiddenError, NotFoundError, ValidationError } from '@/server/errors';
 import { issueInvite, rotateInviteToken } from '@/server/invite-core';
 import { loadPartnerPeople } from '@/server/partner-people';
 import { assertActiveManager, insertOnboardingPartner, pickManagerId } from '@/server/partner-routing';
@@ -323,6 +323,9 @@ export async function resendPartnerInvites(
 ): Promise<{ partner: PartnerListRow; invites: Array<CreatedInviteDto & { inviteeName: string | null }> }> {
   assertStaff(viewer);
   const partner = await lockPartner(tx, input.id);
+  if (partner.status === 'suspended') {
+    throw new ConflictError('partner_suspended', 'This partner is suspended. Restore it before sending new invite links.');
+  }
   const open = await tx
     .select()
     .from(invites)

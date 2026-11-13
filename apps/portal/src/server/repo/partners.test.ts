@@ -300,6 +300,16 @@ describe('resendPartnerInvites', () => {
     expect(rotated?.invite.resentCount).toBe(1);
   });
 
+  it('refuses to email fresh links for a suspended partner and leaves the invites as they were', async () => {
+    const actor = await asStaff(db, 'partner_manager', 'india');
+    const partner = await makePartner(db, { status: 'suspended' });
+    const { invite, token } = await makeInvite(db, { kind: 'partner', partnerId: partner.id, role: 'sales', email: 's@s.example', expiresAt: future });
+    await expect(withViewer(actor, (tx) => resendPartnerInvites(tx, actor, { id: partner.id }, clock))).rejects.toMatchObject({ reason: 'partner_suspended' });
+    const [row] = await db.select().from(invites).where(eq(invites.id, invite.id));
+    expect(row?.tokenHash).toBe(hashToken(token));
+    expect(row?.resentCount).toBe(0);
+  });
+
   it('returns nothing when everyone has accepted', async () => {
     const actor = await asStaff(db, 'partner_manager', 'india');
     const partner = await makePartner(db, {});

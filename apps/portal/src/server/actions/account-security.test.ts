@@ -82,9 +82,19 @@ describe('changePasswordAction', () => {
   it('applies the password rule on the server and checks the confirmation before calling Better Auth', async () => {
     expect(await changePasswordAction(form({ newPassword: 'abcdefgh', confirmPassword: 'abcdefgh' }))).toMatchObject({
       ok: false,
-      error: { code: 'validation', issues: [{ path: 'password', message: 'Meet all four password rules.' }] },
+      error: { code: 'validation', issues: [{ path: 'newPassword', message: 'Meet all four password rules.' }] },
     });
     expect(await changePasswordAction(form({ confirmPassword: 'Different-1!' }))).toMatchObject({ ok: false, error: { issues: [{ path: 'confirmPassword' }] } });
+    expect(authApi.changePassword).not.toHaveBeenCalled();
+  });
+
+  it('caps the new password at 128 characters on the newPassword field, before calling Better Auth', async () => {
+    const long = `Aa1!${'x'.repeat(125)}`;
+    expect(long).toHaveLength(129);
+    expect(await changePasswordAction(form({ newPassword: long, confirmPassword: long }))).toMatchObject({
+      ok: false,
+      error: { code: 'validation', issues: [{ path: 'newPassword' }] },
+    });
     expect(authApi.changePassword).not.toHaveBeenCalled();
   });
 
@@ -129,6 +139,14 @@ describe('two-step sign-in actions', () => {
     expect(await verifyTwoFactorAction({ code: '000000' })).toMatchObject({ ok: false, error: { issues: [{ path: 'code' }] } });
     expect(await verifyTwoFactorAction({ code: 'abc' })).toMatchObject({ ok: false, error: { code: 'validation' } });
     expect(await events()).toEqual(['account.two_factor_enabled']);
+  });
+
+  it('verify does not audit again when two-step was already on', async () => {
+    const viewer = harness.viewer as Viewer;
+    await db.update(users).set({ twoFactorEnabled: true }).where(eq(users.id, viewer.id));
+    authApi.verifyTOTP.mockResolvedValueOnce({ token: 't' });
+    expect(await verifyTwoFactorAction({ code: '123456' })).toEqual({ ok: true, data: { enabled: true } });
+    expect(await events()).toEqual([]);
   });
 
   it('disable needs the password and audits it', async () => {

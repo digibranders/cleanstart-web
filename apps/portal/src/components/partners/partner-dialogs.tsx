@@ -5,6 +5,7 @@ import { Dialog } from "@/components/ui/overlay";
 import { PARTNER_CATEGORIES, PARTNER_CATEGORY_LABEL, type PartnerCategory } from "@/lib/domain";
 import type { ManagerOptionDto } from "@/lib/dto";
 import { codeFromLabel } from "@/lib/people";
+import { managerChoices } from "./manager-options";
 import { Seg } from "./seg";
 
 interface DialogProps {
@@ -63,8 +64,9 @@ export function ManagerDialog({
   onClose,
   onSave,
 }: DialogProps & { currentId: string | null; managers: readonly ManagerOptionDto[]; onSave: (managerId: string) => void }): React.JSX.Element {
-  const names = managers.map((m) => m.name);
-  const [name, setName] = useState<string>(managers.find((m) => m.id === currentId)?.name ?? names[0] ?? "");
+  const choices = managerChoices(managers);
+  const [chosenId, setChosenId] = useState<string | null>(managers.find((m) => m.id === currentId)?.id ?? choices[0]?.id ?? null);
+  const chosenLabel = choices.find((c) => c.id === chosenId)?.label ?? "";
   return (
     <Dialog
       open
@@ -80,8 +82,7 @@ export function ManagerDialog({
             type="button"
             className="btn btn-p"
             onClick={() => {
-              const chosen = managers.find((m) => m.name === name);
-              if (chosen) onSave(chosen.id);
+              if (chosenId) onSave(chosenId);
             }}
           >
             Save
@@ -93,7 +94,12 @@ export function ManagerDialog({
         <span id="pm-l" className="lbl">
           Partner manager
         </span>
-        <Seg options={names} value={name} onChange={setName} labelledBy="pm-l" />
+        <Seg
+          options={choices.map((c) => c.label)}
+          value={chosenLabel}
+          onChange={(label) => setChosenId(choices.find((c) => c.label === label)?.id ?? null)}
+          labelledBy="pm-l"
+        />
         <span className="hint">The partner's deal approvals and messages move to the new manager.</span>
       </div>
     </Dialog>
