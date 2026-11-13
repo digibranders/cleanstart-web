@@ -2406,7 +2406,7 @@ Not edited here: `AdminAudit.tsx` and the health card. Track A builds `src/compo
 
 `integrationHealth` and `retryFailedOutbox` are the contracts H.13b signatures. `integrationHealth` takes `Pick<Db | Tx, 'select'>` and no viewer: it is registered in the isolation matrix with scope `rls-only`, and its page calls it inside `withViewer` for a partner manager, where row level security gives a partner transaction zeros. Like every repo module, the file ends with an `isolation` export (contracts F.6); the central isolation test fails when a function is missing from it.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // integration-health.test.ts
@@ -2466,7 +2466,7 @@ describe('retryFailedOutbox', () => {
 });
 ```
 
-- [ ] **Step 2: Run and confirm it fails, implement, run again.**
+- [x] **Step 2: Run and confirm it fails, implement, run again.**
 
 ```ts
 // integration-health.ts
@@ -2515,7 +2515,7 @@ export const isolation = defineIsolation<keyof typeof exportedFns>({
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/integration-health.test.ts src/server/repo/isolation.test.ts`. Expected: FAIL first, then PASS (the isolation test picks the new module up automatically). The card shows pending, failed, last poll time, the last error and a Retry button; the button, the audit entry and the card are track A's.
 
-- [ ] **Step 3: Write the failing import test, then the import script.** The 20 or so current partners are imported once, in master Task 5.7, from a JSON file the product owner supplies (`[{ "name": "...", "domain": "...", "category": "channel", "region": "india" }]`). The script creates each partner as `onboarding` (the first registered deal moves it to `active`), writes one `partner.created` audit entry, and enqueues `partner.upsert` with version `'1'` so the company appears in HubSpot through the normal outbox. It skips a domain that already exists, defaults to a dry run and needs `--apply`. Inviting the partners' admins is the Add partner flow (track P), not this script.
+- [x] **Step 3: Write the failing import test, then the import script.** The 20 or so current partners are imported once, in master Task 5.7, from a JSON file the product owner supplies (`[{ "name": "...", "domain": "...", "category": "channel", "region": "india" }]`). The script creates each partner as `onboarding` (the first registered deal moves it to `active`), writes one `partner.created` audit entry, and enqueues `partner.upsert` with version `'1'` so the company appears in HubSpot through the normal outbox. It skips a domain that already exists, defaults to a dry run and needs `--apply`. Inviting the partners' admins is the Add partner flow (track P), not this script.
 
 ```ts
 // scripts/import-partners.test.ts
@@ -2630,16 +2630,16 @@ if (process.argv[1]?.endsWith('import-partners.ts')) {
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run scripts/import-partners.test.ts`. Expected: FAIL first ("Cannot find module './import-partners'"), then PASS, 3 tests.
 
-- [ ] **Step 4: Smoke script (manual, developer account only).** `scripts/hubspot-smoke.ts` runs the real client end to end: upsert a test partner company, create a deal with `portal_registration_id = smoke-<timestamp>`, associate, move it to Discovery, run `pollDeals` (with `clock: systemClock`) against the development database, then archive the test records it created. It refuses to run unless `HUBSPOT_PORTAL_ID` equals the value in `HUBSPOT_DEV_PORTAL_ID`, so it cannot touch production. It is never run overnight (no real HubSpot call without a person, BUILD-HANDOFF).
+- [x] **Step 4: Smoke script (manual, developer account only).** `scripts/hubspot-smoke.ts` runs the real client end to end: upsert a test partner company, create a deal with `portal_registration_id = smoke-<timestamp>`, associate, move it to Discovery, run `pollDeals` (with `clock: systemClock`) against the development database, then archive the test records it created. It refuses to run unless `HUBSPOT_PORTAL_ID` equals the value in `HUBSPOT_DEV_PORTAL_ID`, so it cannot touch production. It is never run overnight (no real HubSpot call without a person, BUILD-HANDOFF).
 
-- [ ] **Step 5: Production provisioning runbook** (write to `docs/partner-portal/HUBSPOT-PROVISIONING.md`, which W2-f links from `docs/operations/PARTNER-PORTAL.md`; executed only in master Task 5.7 after explicit approval):
+- [x] **Step 5: Production provisioning runbook** (write to `docs/partner-portal/HUBSPOT-PROVISIONING.md`, which W2-f links from `docs/operations/PARTNER-PORTAL.md`; executed only in master Task 5.7 after explicit approval):
   1. Create the production private app with the scopes in section 3. Add the token and the webhook client secret as GitHub secrets (`HUBSPOT_PORTAL_TOKEN`, `HUBSPOT_WEBHOOK_SECRET`); the deploy workflow renders them into `/opt/cleanstart/portal.env` on the droplet (chmod 600). Never put them in `/opt/cleanstart/.env`, which is the CMS's file. All three HubSpot variables are required in production and optional everywhere else (contracts I): the app refuses to start in production without them.
   2. Run `provision-hubspot.ts` in dry run and read it. Get the go-ahead. Run with `--apply`. Record the pipeline id in `HUBSPOT_PARTNER_PIPELINE_ID`.
   3. Import the roughly 20 current partners: `import-partners.ts` (dry run first, then `--apply`) creates them in the portal and enqueues `partner.upsert`. Confirm each company appears in HubSpot with `cleanstart_partner = true`.
   4. Approve one test registration for a partner contact, watch it appear in the Partner deals pipeline, move its stage in HubSpot, and confirm the partner sees the change within 5 minutes. Then delete that deal.
   5. Check the health card shows 0 failed and a recent poll time before inviting partners.
 
-- [ ] **Step 6: Run the full gate and commit**
+- [x] **Step 6: Run the full gate and commit**
 
 Run Gate A from `docs/partner-portal/BUILD-HANDOFF.md` (lint, typecheck, test, the locked `build`, the dash check and the allowed-paths check).
 Expected: every command passes.

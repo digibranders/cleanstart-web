@@ -15,3 +15,21 @@ Flags:
 ## partner_name must already exist
 
 `dealProperties` (`src/server/hubspot/mappers.ts`) writes the deal property `partner_name`, but this script does not create it. It is expected to exist in the HubSpot account already, created by the older CMS deal-property setup. A deal create that names a missing property is rejected by HubSpot, so confirm `partner_name` exists on deals before `registration.create` runs. The dry run prints this warning every time.
+
+## Production provisioning runbook
+
+Executed only in master Task 5.7, after explicit approval. W2-f links to this file from `docs/operations/PARTNER-PORTAL.md`.
+
+1. Create the production private app with the scopes in the HubSpot plan, section 3. Add the token and the webhook client secret as GitHub secrets (`HUBSPOT_PORTAL_TOKEN`, `HUBSPOT_WEBHOOK_SECRET`); the deploy workflow renders them into `/opt/cleanstart/portal.env` on the droplet (chmod 600). Never put them in `/opt/cleanstart/.env`, which is the CMS's file. All three HubSpot variables (`HUBSPOT_PORTAL_TOKEN`, `HUBSPOT_PARTNER_PIPELINE_ID`, `HUBSPOT_WEBHOOK_SECRET`) are required in production and optional everywhere else: the app refuses to start in production without them.
+2. Run `provision-hubspot.ts` in dry run and read it. Get the go-ahead. Run with `--apply`. Record the pipeline id in `HUBSPOT_PARTNER_PIPELINE_ID`.
+3. Import the roughly 20 current partners with `import-partners.ts <partners.json>` (dry run first, then `--apply`). The file is `[{ "name": "...", "domain": "...", "category": "channel", "region": "india" }]`. It creates each partner as `onboarding`, writes a `partner.created` audit entry and enqueues `partner.upsert`. Confirm each company appears in HubSpot with `cleanstart_partner = true`. Inviting the partners' admins is the Add partner flow, not this script.
+4. Approve one test registration for a partner contact, watch it appear in the Partner deals pipeline, move its stage in HubSpot, and confirm the partner sees the change within 5 minutes. Then delete that deal.
+5. Check the health card shows 0 failed and a recent poll time before inviting partners.
+
+## Smoke script (development account only)
+
+`scripts/hubspot-smoke.ts` runs the real client end to end: it creates a test partner company and a deal with `portal_registration_id = smoke-<timestamp>`, associates them, moves the deal to Discovery, runs `pollDeals` against the local database and archives what it created. It refuses to run unless `HUBSPOT_PORTAL_ID` equals `HUBSPOT_DEV_PORTAL_ID`. It needs a person; it is never run unattended.
+
+```bash
+cd apps/portal && pnpm exec tsx --env-file=.env scripts/hubspot-smoke.ts
+```
