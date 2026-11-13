@@ -2297,7 +2297,7 @@ The webhook makes stage changes show up in seconds instead of minutes; the 5 min
 - Modify (add one export; W0-c created the file with `runHubspotPoll`, which Task 4.8 filled): `apps/portal/src/server/jobs/hubspot-poll.ts`
 - Test: `apps/portal/src/server/hubspot/signature.test.ts`, `apps/portal/src/app/api/hubspot/webhook/route.test.ts`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // signature.test.ts
@@ -2328,9 +2328,9 @@ describe('verifyV3', () => {
 });
 ```
 
-- [ ] **Step 2: Run and confirm it fails.** Expected: FAIL, "Cannot find module './signature'".
+- [x] **Step 2: Run and confirm it fails.** Expected: FAIL, "Cannot find module './signature'".
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```ts
 // signature.ts
@@ -2346,7 +2346,7 @@ export const verifyV3 = (i: {
 };
 ```
 
-- [ ] **Step 4: The route.** It answers 503 when `HUBSPOT_WEBHOOK_SECRET` is unset (the secret is optional outside production, contracts I and L), otherwise verifies the signature and triggers the same poll the scheduler runs. The lock makes an overlapping trigger a no-op, and the next scheduled poll catches anything that arrived while one was running. Sign the URL HubSpot called, not the internal one Caddy forwards to, so use `APP_URL`.
+- [x] **Step 4: The route.** It answers 503 when `HUBSPOT_WEBHOOK_SECRET` is unset (the secret is optional outside production, contracts I and L), otherwise verifies the signature and triggers the same poll the scheduler runs. The lock makes an overlapping trigger a no-op, and the next scheduled poll catches anything that arrived while one was running. Sign the URL HubSpot called, not the internal one Caddy forwards to, so use `APP_URL`.
 
 ```ts
 // src/app/api/hubspot/webhook/route.ts
@@ -2389,7 +2389,7 @@ The route test (`webhook/route.test.ts`) mocks `@/env` (the secret set, then uns
 
 - [ ] **Step 5: Configure the subscription (manual, developer account or sandbox first).** In the private app's Webhooks settings: target URL `https://partners.cleanstart.com/api/hubspot/webhook`, subscriptions `deal.propertyChange` for `dealstage` and for `protection_end_date`. While developing, expose the local server with a Cloudflare Tunnel (`cloudflared`), not ngrok, whose interstitial page breaks requests. In production, make sure the Cloudflare WAF rule set in front of `partners.cleanstart.com` does not challenge HubSpot's requests to `/api/hubspot/webhook` (a skip rule scoped to that path, with the signature check as the real gate).
 
-- [ ] **Step 6: Run tests, commit**
+- [x] **Step 6: Run tests, commit**
 
 ```bash
 git add apps/portal/src/app/api/hubspot apps/portal/src/server/hubspot/signature.ts apps/portal/src/server/hubspot/signature.test.ts apps/portal/src/server/jobs/hubspot-poll.ts
