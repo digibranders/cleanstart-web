@@ -216,7 +216,7 @@ export async function decideAccessRequestAction(raw: unknown): Promise<ActionRes
             ? `${request.name}, ${lower(input.role)}, at ${team.partnerName}`
             : `${request.name}, at ${team.partnerName}`,
         partnerId: team.partnerId,
-        subject: { type: 'user', id: request.id },
+        subject: { type: 'access_request', id: request.id },
       });
       return { result, request, companyName: team.partnerName };
     });

@@ -8741,7 +8741,7 @@ Implements master task 1.7. Profile, notification preferences, active sessions w
 - Create: `src/components/people/SessionsCard.tsx`
 - Modify: `src/components/screens/Account.tsx`, `src/components/screens/Company.tsx`, `src/app/partner/account/page.tsx`, `src/app/partner/company/page.tsx`
 
-- [ ] **Step 1: Verify the files this task extends, and the session API**
+- [x] **Step 1: Verify the files this task extends, and the session API**
 
 ```bash
 grep -n "export async function getShell" src/server/repo/account.ts
@@ -8752,7 +8752,7 @@ grep -n "getSession" apps/portal/node_modules/better-auth/dist/api/routes/sessio
 
 Expected: the first prints the `getShell` line (if not, M1.1 is not merged: write `blocked`, stop this task); the second prints `listSessions` and `revokeSession`; the third tells you whether Step 7 creates or appends; the fourth prints the `getSession` endpoint line. Better Auth's server API `auth.api.getSession({ headers })` returns `{ session, user } | null`, with `session.token`; the Account page uses it to mark the current session.
 
-- [ ] **Step 2: Write the failing repo tests for profile and preferences**
+- [x] **Step 2: Write the failing repo tests for profile and preferences**
 
 Create `src/server/repo/account.test.ts` (if W0-f already created it, append the `describe` blocks and merge the imports):
 
@@ -8848,7 +8848,7 @@ describe('recordPasswordChanged', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/account.test.ts`
 Expected: FAIL, `getProfile` is not exported by `./account`.
 
-- [ ] **Step 3: Implement the four functions**
+- [x] **Step 3: Implement the four functions**
 
 In `src/server/repo/account.ts` add to the imports (merge with the existing lines; add the line when the name is not imported yet):
 
@@ -8938,7 +8938,7 @@ Add these four entries to the existing `defineIsolation<...>({ ... })` call, and
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/account.test.ts src/server/repo/isolation.test.ts`
 Expected: PASS.
 
-- [ ] **Step 4: Write the failing repo tests for the company profile**
+- [x] **Step 4: Write the failing repo tests for the company profile**
 
 Append to `src/server/repo/partners.test.ts`. Add `updateCompanyProfile` to the `./partners` import:
 
@@ -8980,7 +8980,7 @@ describe('updateCompanyProfile', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/partners.test.ts`
 Expected: FAIL, `updateCompanyProfile` is not exported.
 
-- [ ] **Step 5: Implement `updateCompanyProfile`**
+- [x] **Step 5: Implement `updateCompanyProfile`**
 
 In `src/server/repo/partners.ts` add `IsoTimestamp` to the dto import (`import type { ChecklistDto, CompanyDto, IsoTimestamp } from '@/lib/dto';`) and add after `getCompany`:
 
@@ -9026,7 +9026,7 @@ export const isolation = defineIsolation<
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/partners.test.ts src/server/repo/isolation.test.ts`
 Expected: PASS (partners: 10 tests).
 
-- [ ] **Step 6: Write the failing tests for the profile, notification and session actions**
+- [x] **Step 6: Write the failing tests for the profile, notification and session actions**
 
 Create `src/server/actions/account-profile.test.ts` (named apart from any test plan 02 adds for the password and two-step actions in `account.test.ts`):
 
@@ -9128,7 +9128,7 @@ describe('revokeSessionAction', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/account-profile.test.ts`
 Expected: FAIL (`./account` is missing or does not export these actions).
 
-- [ ] **Step 7: Implement the account actions**
+- [x] **Step 7: Implement the account actions**
 
 If `src/server/actions/account.ts` does not exist (Step 1), create it with the header and the three actions below. If plan 02 created it, keep its content and only merge the new imports into its import block and append the three functions at the end.
 
@@ -9203,7 +9203,7 @@ export async function revokeSessionAction(raw: unknown): Promise<ActionResult<{ 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/account-profile.test.ts`
 Expected: PASS, 7 tests.
 
-- [ ] **Step 8: Write the failing tests for the company profile action**
+- [x] **Step 8: Write the failing tests for the company profile action**
 
 Append to `src/server/actions/partners.test.ts`. Extend the imports: from `@/db/schema` add `auditLog, hubspotOutbox, partners`; from `@/db/test-helpers` nothing new; add `updateCompanyProfileAction` to the `./partners` import. Then append:
 
@@ -9263,7 +9263,7 @@ describe('updateCompanyProfileAction', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/partners.test.ts`
 Expected: FAIL, `updateCompanyProfileAction` is not a function.
 
-- [ ] **Step 9: Implement `updateCompanyProfileAction`**
+- [x] **Step 9: Implement `updateCompanyProfileAction`**
 
 In `src/server/actions/partners.ts` extend the imports:
 
@@ -9336,7 +9336,7 @@ export async function updateCompanyProfileAction(raw: unknown): Promise<ActionRe
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/partners.test.ts`
 Expected: PASS, 10 tests.
 
-- [ ] **Step 10: Create the sessions card**
+- [x] **Step 10: Create the sessions card**
 
 Create `src/components/people/SessionsCard.tsx`. It uses classes the Account screen already uses (`card`, `card-h`, `li`, `badge`); the mock had no sessions list, so this card is new markup in the existing style:
 
@@ -9403,7 +9403,7 @@ export function SessionsCard({ sessions, today }: { sessions: SessionDto[]; toda
 }
 ```
 
-- [ ] **Step 11: Convert `Account.tsx`**
+- [x] **Step 11: Convert `Account.tsx`**
 
 Edit `src/components/screens/Account.tsx`.
 
@@ -9600,7 +9600,7 @@ After:
                 onChange={(e) => void toggle(key, e.target.checked)}
 ```
 
-- [ ] **Step 12: Write the account page**
+- [x] **Step 12: Write the account page**
 
 Replace `src/app/partner/account/page.tsx` in full:
 
@@ -9626,7 +9626,7 @@ export default async function Page(): Promise<React.JSX.Element> {
 }
 ```
 
-- [ ] **Step 13: Replace `Company.tsx`**
+- [x] **Step 13: Replace `Company.tsx`**
 
 Replace `src/components/screens/Company.tsx` in full. Changes from the mock: DTO input, the company name is read-only (the contract's `updateCompanyProfile` does not take a name; the partner manager changes it), people who are not partner admins see the form read-only, the agreement card reads the stored version and time, "Accepted by" is gone (the DTO has no such field, request in "Contract change requests", item 2), and "Download PDF" explains that the PDF is not available yet (no download route exists, item 10).
 
@@ -9957,7 +9957,7 @@ export function Company({ company, canEdit, viewerEmail }: CompanyProps): React.
 }
 ```
 
-- [ ] **Step 14: Write the company page**
+- [x] **Step 14: Write the company page**
 
 Replace `src/app/partner/company/page.tsx` in full:
 
@@ -9979,12 +9979,12 @@ export default async function Page(): Promise<React.JSX.Element> {
 }
 ```
 
-- [ ] **Step 15: Prove no slice import is left**
+- [x] **Step 15: Prove no slice import is left**
 
 Run: `grep -n "@/data/\|@/lib/slice\|accountSlice\|partnersSlice" src/components/screens/Account.tsx src/components/screens/Company.tsx src/components/people/SessionsCard.tsx`
 Expected: no output.
 
-- [ ] **Step 16: Gate A**
+- [x] **Step 16: Gate A**
 
 Run the Gate A block. The last command must list only this task's Files block.
 
@@ -9997,7 +9997,7 @@ Run the Gate A block. The last command must list only this task's Files block.
 5. Sign in as Karan Malhotra (sales) and open `/partner/company`: the fields are read-only and there is no Save button. Click "Download PDF": the toast says the PDF is not in the portal yet.
 6. "Message" next to the partner manager opens the drawer addressed to Farhan Qureshi.
 
-- [ ] **Step 18: Commit**
+- [x] **Step 18: Commit**
 
 ```bash
 git add apps/portal/src/server/repo/account.ts apps/portal/src/server/repo/account.test.ts \
@@ -10026,7 +10026,7 @@ What it does: `changePasswordAction` (Better Auth `changePassword`, then the por
 - Replace: `src/components/people/TwoStepCard.tsx`
 - Create: `src/components/screens/ResetPassword.tsx`, `src/app/(public)/reset-password/page.tsx`
 
-- [ ] **Step 1: Verify the Better Auth endpoints, the client and what `auth.ts` already does**
+- [x] **Step 1: Verify the Better Auth endpoints, the client and what `auth.ts` already does**
 
 ```bash
 D=apps/portal/node_modules/better-auth/dist
@@ -10038,7 +10038,7 @@ grep -n "change-password\|onPasswordChange\|account.password_changed" apps/porta
 
 Expected: the first two commands print the endpoint declarations; the third prints the `authClient` export (plan 02, K.2); the fourth shows where `account.password_changed` is written. If it is written for the reset flow only (plan 02's `onPasswordReset`), continue as written. If `auth.ts` also records the change for `/change-password`, delete the `recordPasswordChanged`, `recordAudit` and `sendEmail` calls from `changePasswordAction` below (keep the Better Auth call) and the matching assertions in its test, so a change is never audited or mailed twice.
 
-- [ ] **Step 2: Write the failing test for the Better Auth error mapper**
+- [x] **Step 2: Write the failing test for the Better Auth error mapper**
 
 Create `src/server/auth-errors.test.ts`:
 
@@ -10093,7 +10093,7 @@ describe('throwFieldError', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/auth-errors.test.ts`
 Expected: FAIL, `Failed to resolve import "./auth-errors"`.
 
-- [ ] **Step 3: Implement the error mapper**
+- [x] **Step 3: Implement the error mapper**
 
 Create `src/server/auth-errors.ts`:
 
@@ -10137,7 +10137,7 @@ export function throwFieldError(error: unknown, passwordPath: string): never {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/auth-errors.test.ts`
 Expected: PASS, 5 tests.
 
-- [ ] **Step 4: Write the failing tests for the five security actions**
+- [x] **Step 4: Write the failing tests for the five security actions**
 
 Create `src/server/actions/account-security.test.ts`. The Better Auth API is mocked here: plan 02 tests the real library behaviour; this file pins what the portal sends, stores, audits and mails.
 
@@ -10294,7 +10294,7 @@ describe('two-step sign-in actions', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/account-security.test.ts`
 Expected: FAIL, `changePasswordAction` is not exported by `./account`.
 
-- [ ] **Step 5: Append the five actions**
+- [x] **Step 5: Append the five actions**
 
 In `src/server/actions/account.ts` merge these imports into the import block (merge with the names already imported there):
 
@@ -10446,7 +10446,7 @@ Add `'account.manage_two_factor'` is already in the Action union (D.2) and the m
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/account-security.test.ts src/server/actions/account-profile.test.ts`
 Expected: PASS (account-security: 9 tests, account-profile: 7 tests).
 
-- [ ] **Step 6: Convert `PasswordCard.tsx`**
+- [x] **Step 6: Convert `PasswordCard.tsx`**
 
 Edit `src/components/people/PasswordCard.tsx`.
 
@@ -10591,7 +10591,7 @@ After:
         </button>
 ```
 
-- [ ] **Step 7: Replace `TwoStepCard.tsx`**
+- [x] **Step 7: Replace `TwoStepCard.tsx`**
 
 Replace `src/components/people/TwoStepCard.tsx` in full. Changes from the mock: the card reads the real state; turning on, turning off and making new backup codes first ask for the password (Better Auth requires it), the setup key and link come from the server (no QR library is installed, so the QR box holds an "Open in your authenticator app" link until one is added, CCR item 16), the verify step calls the server, and "Backup codes" makes a fresh set instead of re-reading old ones.
 
@@ -10918,7 +10918,7 @@ export function TwoStepCard({ enabled }: { enabled: boolean }): React.JSX.Elemen
 }
 ```
 
-- [ ] **Step 8: Give the two cards their props in `Account.tsx`**
+- [x] **Step 8: Give the two cards their props in `Account.tsx`**
 
 Edit `src/components/screens/Account.tsx`. Before (the state after Task M1.7):
 
@@ -10936,7 +10936,7 @@ After:
           <SessionsCard sessions={sessions} today={today} />
 ```
 
-- [ ] **Step 9: Create the reset-password screen and page**
+- [x] **Step 9: Create the reset-password screen and page**
 
 Better Auth sends the reset link to `/reset-password?token=...` (plan 02, `resetPasswordUrl`) and serves the endpoint; this page asks for the new password and calls the client method plan 02 exposes in `src/lib/auth-client.ts` (Step 1 checked it exists).
 
@@ -11075,12 +11075,12 @@ export default async function Page({
 
 `PasswordRules` and `passwordRules` are exported by `components/ui/password-field.tsx` (the mock's AcceptInvite imports them from there); `passwordRules("")` returns the four rules with their labels.
 
-- [ ] **Step 10: Prove the cards no longer read the mock data**
+- [x] **Step 10: Prove the cards no longer read the mock data**
 
 Run: `grep -n "@/data/\|@/lib/slice\|accountSlice" src/components/people/PasswordCard.tsx src/components/people/TwoStepCard.tsx src/components/screens/Account.tsx src/components/screens/ResetPassword.tsx`
 Expected: no output.
 
-- [ ] **Step 11: Gate A**
+- [x] **Step 11: Gate A**
 
 Run the Gate A block. The last command must list only this task's Files block.
 
@@ -11091,7 +11091,7 @@ Run the Gate A block. The last command must list only this task's Files block.
 3. "New backup codes": password, then a new set appears; an old code no longer works at sign in. "Turn off": password, the badge reads "Off"; `audit_log` has `account.two_factor_enabled` and `account.two_factor_disabled`.
 4. Forgot password: on `/sign-in` request a reset for Aditi (dev log has no body, so run `select value from auth_verification order by created_at desc limit 1` to read the token, or use plan 02's helper), open `/reset-password?token=<token>`: the page shows "Set a new password"; a weak password shows the rule error; a strong one toasts and returns to sign in. Open `/reset-password` with no token: "This reset link is not valid".
 
-- [ ] **Step 13: Commit**
+- [x] **Step 13: Commit**
 
 ```bash
 git add apps/portal/src/server/auth-errors.ts apps/portal/src/server/auth-errors.test.ts \
@@ -12197,7 +12197,7 @@ Implements master task 4.1. The Partners tab becomes real: the list with real co
 - Modify: `src/components/partners/badges.tsx`, `partners-table.tsx`, `partner-detail.tsx`, `partner-dialogs.tsx`, `add-partner-drawer.tsx`
 - Modify: `src/components/screens/AdminPartners.tsx`, `src/app/admin/partners/page.tsx`
 
-- [ ] **Step 1: Write the failing repo tests for list and detail**
+- [x] **Step 1: Write the failing repo tests for list and detail**
 
 Append to `src/server/repo/partners.test.ts`. Extend the imports: add `createPartner, getPartnerDetail, listPartners, resendPartnerInvites, restorePartner, setPartnerCategory, setPartnerManager, suspendPartner` to the `./partners` import, `invites` to the `@/db/schema` import, `hashToken` from `@/server/auth/tokens`,.
 
@@ -12360,7 +12360,7 @@ The admin is only an invite until they accept, so `adminName` is derived from th
 `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/partners.test.ts`
 Expected: FAIL, the new functions are not exported by `./partners`.
 
-- [ ] **Step 2: Implement the list, detail and mutation functions**
+- [x] **Step 2: Implement the list, detail and mutation functions**
 
 In `src/server/repo/partners.ts` extend the imports:
 
@@ -12614,7 +12614,7 @@ export const isolation = defineIsolation<
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/partners.test.ts src/server/repo/isolation.test.ts`
 Expected: PASS (partners: 25 tests; isolation passes).
 
-- [ ] **Step 3: Write the failing action tests**
+- [x] **Step 3: Write the failing action tests**
 
 Append to `src/server/actions/partners.test.ts`. Extend the imports: from `@/db/schema` add `invites`; from `@/db/test-helpers` add `makeInvite`; add `revokeAllSessions` mocking by adding this line next to the other `vi.mock` calls (it is hoisted): `vi.mock('@/server/auth/sessions', () => ({ revokeAllSessions: vi.fn(async () => undefined) }));` and `import { revokeAllSessions } from '@/server/auth/sessions';` after them; add `createPartnerAction, resendPartnerInvitesAction, restorePartnerAction, setPartnerCategoryAction, setPartnerManagerAction, suspendPartnerAction` to the `./partners` import. In `beforeEach` add `vi.mocked(revokeAllSessions).mockClear();`.
 
@@ -12711,7 +12711,7 @@ describe('partner management actions', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/partners.test.ts`
 Expected: FAIL, `createPartnerAction` is not a function.
 
-- [ ] **Step 4: Implement the partner management actions**
+- [x] **Step 4: Implement the partner management actions**
 
 In `src/server/actions/partners.ts` extend the imports:
 
@@ -12939,7 +12939,7 @@ The templates import is one line: `import { buildManagerMessage, buildTeamInvite
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/partners.test.ts`
 Expected: PASS, 17 tests.
 
-- [ ] **Step 5: Replace `badges.tsx`**
+- [x] **Step 5: Replace `badges.tsx`**
 
 Replace `src/components/partners/badges.tsx` in full. All four components now take the stored codes (the label lookups moved in; the M1.4 wrapper names stay, and `CategoryBadge` and `StatusBadge` are gone because nothing uses them after this task):
 
@@ -13007,7 +13007,7 @@ export function ProductMark({ product }: { product: Product }): React.JSX.Elemen
 }
 ```
 
-- [ ] **Step 6: Replace `partners-table.tsx`**
+- [x] **Step 6: Replace `partners-table.tsx`**
 
 Replace `src/components/partners/partners-table.tsx` in full:
 
@@ -13137,7 +13137,7 @@ export function PartnersTable({
 }
 ```
 
-- [ ] **Step 7: Replace `partner-detail.tsx`**
+- [x] **Step 7: Replace `partner-detail.tsx`**
 
 Replace `src/components/partners/partner-detail.tsx` in full:
 
@@ -13357,7 +13357,7 @@ export function PartnerDetail({
 }
 ```
 
-- [ ] **Step 8: Replace `partner-dialogs.tsx`**
+- [x] **Step 8: Replace `partner-dialogs.tsx`**
 
 Replace `src/components/partners/partner-dialogs.tsx` in full. The manager dialog lists the active partner managers from the server (names as the options); its hint no longer promises an email:
 
@@ -13465,7 +13465,7 @@ export function ManagerDialog({
 }
 ```
 
-- [ ] **Step 9: Replace `add-partner-drawer.tsx`**
+- [x] **Step 9: Replace `add-partner-drawer.tsx`**
 
 Replace `src/components/partners/add-partner-drawer.tsx` in full. The drawer now waits for the server: `onAdd` returns an error message to show in the form, or null on success.
 
@@ -13642,7 +13642,7 @@ export function AddPartnerDrawer({ partners, onClose, onAdd }: AddPartnerDrawerP
 }
 ```
 
-- [ ] **Step 10: Replace `AdminPartners.tsx`**
+- [x] **Step 10: Replace `AdminPartners.tsx`**
 
 Replace `src/components/screens/AdminPartners.tsx` in full (this supersedes the M1.4 version). Differences from the mock: the data arrives as props; selecting a partner navigates to `?selected=<id>` so the server loads that partner's detail; the totals come from the loaded rows (the "11 other active partners" are real rows now); the two KPIs the DTOs cannot supply (partner users active this month, deals this quarter) become "partners signed in this month" and "protected deals" (contract change request item 2); staff who are not partner managers see the list read-only without Applications and Add partner.
 
@@ -13961,7 +13961,7 @@ export function AdminPartners({
 }
 ```
 
-- [ ] **Step 11: Write the final partners page**
+- [x] **Step 11: Write the final partners page**
 
 Replace `src/app/admin/partners/page.tsx` in full (supersedes the M1.4 version):
 
@@ -14015,7 +14015,7 @@ export default async function Page({
 
 Behaviour difference from the mock, for the product owner: when a filter hides the selected partner, its detail stays on screen (the mock jumped to the first row); selecting a row loads that partner's detail from the server.
 
-- [ ] **Step 12: Prove nothing in this plan's components reads the mock data any more**
+- [x] **Step 12: Prove nothing in this plan's components reads the mock data any more**
 
 Run:
 
@@ -14025,7 +14025,7 @@ grep -rn "@/data/\|@/lib/slice" src/components/partners src/components/people sr
 
 Expected: no output. (`SignIn.tsx` belongs to plan 02 and is checked there, apart from the request views, which Task M1.6 already verified. `PasswordCard.tsx` and `TwoStepCard.tsx` still import `@/data/team` until plan 02 converts them.)
 
-- [ ] **Step 13: Gate A**
+- [x] **Step 13: Gate A**
 
 Run the Gate A block. The last command must list only this task's Files block.
 
@@ -14040,7 +14040,7 @@ Run the Gate A block. The last command must list only this task's Files block.
 7. "Add partner": name `Dunes Test`, website `dunestest.ae`, Channel partner, Middle East, admin `Test Admin`, `test.admin@dunestest.ae`, send invite on: toast "Invite sent to test.admin@dunestest.ae", the new partner is selected with status Onboarding, manager Omar Nasser. Adding the same website again shows "Another partner already uses this domain." in the drawer.
 8. Sign in as `rahul.menon@cleanstart.com` (staff sales, India): only India partners are listed, there is no Applications tab, no Add partner button and the detail card has no action buttons.
 
-- [ ] **Step 15: Commit**
+- [x] **Step 15: Commit**
 
 ```bash
 git add apps/portal/src/server/repo/partners.ts apps/portal/src/server/repo/partners.test.ts \

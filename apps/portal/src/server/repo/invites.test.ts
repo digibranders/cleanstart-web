@@ -147,6 +147,15 @@ describe('acceptInvite', () => {
     expect(await db.select().from(authTwoFactors).where(eq(authTwoFactors.userId, gone.id))).toHaveLength(0);
   });
 
+  it('refuses an invite into a suspended partner, consumes nothing and creates no user', async () => {
+    const { partner, invite, token } = await firstAdmin();
+    await db.update(partners).set({ status: 'suspended' }).where(eq(partners.id, partner.id));
+    await expect(accept(token)).rejects.toMatchObject({ reason: 'partner_suspended' });
+    const [row] = await db.select().from(invites).where(eq(invites.id, invite.id));
+    expect(row?.acceptedAt).toBeNull();
+    expect(await db.select().from(users)).toHaveLength(0);
+  });
+
   it('creates the staff scope for a staff invite and no agreement is stamped', async () => {
     const { token } = await makeInvite(db, { kind: 'staff', partnerId: null, role: 'sales', staffRegion: 'middle_east', email: 'sara@cleanstart.com', expiresAt: future });
     const result = await accept(token, { name: 'Sara Al Mansoori' });

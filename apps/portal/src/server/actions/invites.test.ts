@@ -3,6 +3,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { accessRequests, auditLog, hubspotOutbox, invites, notifications, partners, staffScopes, users } from '@/db/schema';
 import { makeInvite, makePartner, makeUser, resetDb, testDb } from '@/db/test-helpers';
 import type { Viewer } from '@/server/auth/types';
+import { resetRateLimits } from '@/server/rate-limit';
 import type { FakeEmailTransport } from '@/server/email/fake';
 import type { EmailMessage } from '@/server/email/transport';
 
@@ -56,6 +57,7 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await resetDb(db);
+  resetRateLimits();
   fake.clear();
   harness.cookieJar.clear();
   harness.signInFails = false;
@@ -204,6 +206,8 @@ describe('requestAccessAction', () => {
     expect(await db.select().from(accessRequests)).toHaveLength(1);
     expect((await db.select().from(notifications)).map((n) => [n.userId, n.kind])).toEqual([[admin.id, 'access_requested']]);
     expect((await db.select().from(auditLog)).map((a) => a.event)).toEqual(['team.access_requested']);
+    const [request] = await db.select().from(accessRequests);
+    expect((await db.select().from(auditLog))[0]).toMatchObject({ subjectType: 'access_request', subjectId: request?.id });
     await vi.waitFor(() => expect(fake.to('aditi.rao@kestrelsystems.in')).toHaveLength(1));
     expect(fake.to('aditi.rao@kestrelsystems.in')[0]?.htmlContent).toContain('Rohit Desai');
   });
@@ -215,6 +219,21 @@ describe('requestAccessAction', () => {
     expect(await db.select().from(notifications)).toHaveLength(0);
     await new Promise((resolve) => setTimeout(resolve, 50));
     expect(fake.sent).toHaveLength(0);
+  });
+
+  it('caps requests per partner domain whatever the IP or the local part, so a known domain cannot be flooded', async () => {
+    await kestrel();
+    for (let i = 0; i < 10; i += 1) {
+      ipCounter += 1;
+      harness.ip = `203.0.113.${ipCounter}`;
+      expect((await ask({ email: `flood${i}@kestrelsystems.in` })).ok).toBe(true);
+    }
+    ipCounter += 1;
+    harness.ip = `203.0.113.${ipCounter}`;
+    expect(await ask({ email: 'flood10@kestrelsystems.in' })).toMatchObject({ ok: false, error: { code: 'rate_limited' } });
+    expect(await db.select().from(accessRequests)).toHaveLength(10);
+    // The cap is per domain, so another domain is not affected.
+    expect((await ask({ email: 'someone@other-company.example' })).ok).toBe(true);
   });
 
   it('asking twice keeps one open request and sends the admin one email', async () => {

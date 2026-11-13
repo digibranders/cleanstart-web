@@ -75,8 +75,9 @@ describe('approveApplicationAction', () => {
     const second = await approveApplicationAction({ id: app.id, category: 'channel', region: 'india' });
     expect(first.ok && second.ok).toBe(true);
     const keys = (await db.select().from(hubspotOutbox)).map((o) => o.idempotencyKey);
-    expect(new Set(keys).size).toBe(keys.length);
-    expect(keys.length).toBeGreaterThanOrEqual(2);
+    expect(keys).toHaveLength(3);
+    expect(new Set(keys).size).toBe(3);
+    expect(keys.filter((key) => key.endsWith(':1'))).toHaveLength(1);
     expect(await db.select().from(partners)).toHaveLength(1);
   });
 

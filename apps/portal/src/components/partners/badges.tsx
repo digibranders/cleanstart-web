@@ -1,47 +1,54 @@
-import type { IconName } from "@/components/icon-paths";
 import { Icon } from "@/components/icon";
-import { Badge, type BadgeTone, type Product } from "@/components/ui/badge";
-import type { PartnerCategory, PartnerDealStatus, PartnerStatus } from "@/data/partners";
-import { PARTNER_CATEGORY_LABEL, PARTNER_STATUS_LABEL, type PartnerCategory as PartnerCategoryCode, type PartnerStatus as PartnerStatusCode } from "@/lib/domain";
+import type { IconName } from "@/components/icon-paths";
+import { Badge, type BadgeTone } from "@/components/ui/badge";
+import {
+  PARTNER_CATEGORY_LABEL,
+  PARTNER_STATUS_LABEL,
+  type PartnerCategory,
+  type PartnerStatus,
+  type Product,
+  REGISTRATION_STATUS_LABEL,
+  type RegistrationStatus,
+} from "@/lib/domain";
 
 const CATEGORY_TONE: Record<PartnerCategory, BadgeTone> = {
-  Distributor: "violet",
-  "Channel partner": "blue",
-  "System integrator": "cyan",
+  distributor: "violet",
+  channel: "blue",
+  integrator: "cyan",
 };
 
 const STATUS_TONE: Record<PartnerStatus, BadgeTone> = {
-  Active: "accepted",
-  Onboarding: "pending",
-  Inactive: "expired",
-  Suspended: "rejected",
+  active: "accepted",
+  onboarding: "pending",
+  inactive: "expired",
+  suspended: "rejected",
 };
 
-const DEAL_TONE: Record<PartnerDealStatus, BadgeTone> = {
-  Pending: "pending",
-  Accepted: "accepted",
-  Won: "won",
-  Lost: "lost",
-  Rejected: "rejected",
+const DEAL_TONE: Record<RegistrationStatus, BadgeTone> = {
+  pending: "pending",
+  accepted: "accepted",
+  won: "won",
+  lost: "lost",
+  rejected: "rejected",
+  expired: "expired",
 };
 
 const PRODUCT_MARK: Record<Product, { cls: string; icon: IconName }> = {
-  "CleanStart Images": { cls: "pm-img", icon: "img" },
-  "Clean Libraries": { cls: "pm-lib", icon: "lib" },
-  CleanSight: { cls: "pm-sight", icon: "sight" },
-  "All products": { cls: "pm-all", icon: "all" },
+  images: { cls: "pm-img", icon: "img" },
+  libraries: { cls: "pm-lib", icon: "lib" },
+  cleansight: { cls: "pm-sight", icon: "sight" },
 };
 
-export function CategoryBadge({ category }: { category: PartnerCategory }): React.JSX.Element {
-  return <Badge tone={CATEGORY_TONE[category]}>{category}</Badge>;
+export function PartnerCategoryBadge({ category }: { category: PartnerCategory }): React.JSX.Element {
+  return <Badge tone={CATEGORY_TONE[category]}>{PARTNER_CATEGORY_LABEL[category]}</Badge>;
 }
 
-export function StatusBadge({ status }: { status: PartnerStatus }): React.JSX.Element {
-  return <Badge tone={STATUS_TONE[status]}>{status}</Badge>;
+export function PartnerStatusBadge({ status }: { status: PartnerStatus }): React.JSX.Element {
+  return <Badge tone={STATUS_TONE[status]}>{PARTNER_STATUS_LABEL[status]}</Badge>;
 }
 
-export function DealStatusBadge({ status }: { status: PartnerDealStatus }): React.JSX.Element {
-  return <Badge tone={DEAL_TONE[status]}>{status}</Badge>;
+export function DealStatusBadge({ status }: { status: RegistrationStatus }): React.JSX.Element {
+  return <Badge tone={DEAL_TONE[status]}>{REGISTRATION_STATUS_LABEL[status]}</Badge>;
 }
 
 export function ProductMark({ product }: { product: Product }): React.JSX.Element {
@@ -51,13 +58,4 @@ export function ProductMark({ product }: { product: Product }): React.JSX.Elemen
       <Icon name={mark.icon} />
     </span>
   );
-}
-
-/** Same badges, fed with the stored codes instead of the mock's display strings. */
-export function PartnerCategoryBadge({ category }: { category: PartnerCategoryCode }): React.JSX.Element {
-  return <CategoryBadge category={PARTNER_CATEGORY_LABEL[category] as PartnerCategory} />;
-}
-
-export function PartnerStatusBadge({ status }: { status: PartnerStatusCode }): React.JSX.Element {
-  return <StatusBadge status={PARTNER_STATUS_LABEL[status] as PartnerStatus} />;
 }

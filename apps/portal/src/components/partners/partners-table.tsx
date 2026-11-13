@@ -2,9 +2,10 @@
 
 import { Avatar } from "@/components/ui/badge";
 import { Dropdown } from "@/components/ui/dropdown";
-import type { Partner } from "@/data/partners";
-import { initialsOf } from "@/data/partners";
-import { CategoryBadge, StatusBadge } from "./badges";
+import { PARTNER_REGION_LABEL, type PartnerCategory } from "@/lib/domain";
+import type { PartnerListRow } from "@/lib/dto";
+import { initialsOf, lastSeenLabel } from "@/lib/people";
+import { PartnerCategoryBadge, PartnerStatusBadge } from "./badges";
 import { Seg } from "./seg";
 
 export const CATEGORY_FILTERS = ["All", "Distributors", "Channel", "SIs"] as const;
@@ -12,17 +13,18 @@ export type CategoryFilter = (typeof CATEGORY_FILTERS)[number];
 export const REGION_FILTERS = ["All regions", "India", "Middle East"] as const;
 export const STATUS_FILTERS = ["Any status", "Active", "Onboarding", "Inactive", "Suspended"] as const;
 
-export const CATEGORY_FOR_FILTER: Record<CategoryFilter, Partner["category"] | null> = {
+export const CATEGORY_FOR_FILTER: Record<CategoryFilter, PartnerCategory | null> = {
   All: null,
-  Distributors: "Distributor",
-  Channel: "Channel partner",
-  SIs: "System integrator",
+  Distributors: "distributor",
+  Channel: "channel",
+  SIs: "integrator",
 };
 
 interface PartnersTableProps {
-  partners: readonly Partner[];
+  partners: readonly PartnerListRow[];
   total: number;
   selectedId: string;
+  today: string;
   category: CategoryFilter;
   region: string;
   status: string;
@@ -36,6 +38,7 @@ export function PartnersTable({
   partners,
   total,
   selectedId,
+  today,
   category,
   region,
   status,
@@ -99,16 +102,16 @@ export function PartnersTable({
                   </button>
                 </td>
                 <td>
-                  <CategoryBadge category={p.category} />
+                  <PartnerCategoryBadge category={p.category} />
                 </td>
-                <td className="t-sec">{p.region}</td>
+                <td className="t-sec">{PARTNER_REGION_LABEL[p.region]}</td>
                 <td>
-                  <StatusBadge status={p.status} />
+                  <PartnerStatusBadge status={p.status} />
                 </td>
                 <td className="tnum r">{p.pending}</td>
-                <td className="tnum r">{p.protected}</td>
+                <td className="tnum r">{p.protectedCount}</td>
                 <td className="tnum r">{p.won}</td>
-                <td className="tnum r t-sec">{p.last}</td>
+                <td className="tnum r t-sec">{lastSeenLabel(p.lastActiveAt, today)}</td>
               </tr>
             ))}
           </tbody>

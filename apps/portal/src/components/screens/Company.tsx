@@ -3,55 +3,81 @@
 import { useState } from "react";
 import { Icon } from "@/components/icon";
 import { MessageDrawer } from "@/components/partners/message-drawer";
+import { PartnerCategoryBadge, PartnerStatusBadge } from "@/components/partners/badges";
 import { Avatar, Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/toast";
-import {
-  type CompanyProfile,
-  initialsOf,
-  KESTREL_ID,
-  partnersSlice,
-  saveCompanyProfile,
-} from "@/data/partners";
-import { CategoryBadge, StatusBadge } from "@/components/partners/badges";
+import { fmtLong } from "@/lib/dates";
+import { PARTNER_REGION_LABEL } from "@/lib/domain";
+import type { CompanyDto } from "@/lib/dto";
+import { initialsOf } from "@/lib/people";
+import { updateCompanyProfileAction } from "@/server/actions/partners";
 
-const SAME = (a: CompanyProfile, b: CompanyProfile): boolean =>
-  a.name === b.name && a.website === b.website && a.phone === b.phone && a.address === b.address && a.about === b.about;
+interface ProfileFields {
+  website: string;
+  phone: string;
+  address: string;
+  about: string;
+}
 
-export function Company(): React.JSX.Element {
+const fieldsOf = (company: CompanyDto): ProfileFields => ({
+  website: company.website ?? "",
+  phone: company.phone ?? "",
+  address: company.address ?? "",
+  about: company.about ?? "",
+});
+
+const SAME = (a: ProfileFields, b: ProfileFields): boolean =>
+  a.website === b.website && a.phone === b.phone && a.address === b.address && a.about === b.about;
+
+interface CompanyProps {
+  company: CompanyDto;
+  /** Partner admins edit the profile; other roles read it. */
+  canEdit: boolean;
+  viewerEmail: string;
+}
+
+export function Company({ company, canEdit, viewerEmail }: CompanyProps): React.JSX.Element {
   const toast = useToast();
-  const { partners, profile } = partnersSlice.use();
-  const partner = partners.find((p) => p.id === KESTREL_ID);
+  const saved = fieldsOf(company);
   // null until the admin types: the form then shows the saved profile without copying it into state.
-  const [draft, setDraft] = useState<CompanyProfile | null>(null);
-  const [tried, setTried] = useState(false);
+  const [draft, setDraft] = useState<ProfileFields | null>(null);
   const [messageOpen, setMessageOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const form = draft ?? profile;
-  const dirty = draft !== null && !SAME(draft, profile);
-  const nameErr = tried && !form.name.trim();
-  const edit = (key: keyof CompanyProfile) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void =>
+  const form = draft ?? saved;
+  const dirty = draft !== null && !SAME(draft, saved);
+  const edit = (key: keyof ProfileFields) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void =>
     setDraft({ ...form, [key]: event.target.value });
 
-  const save = (event: React.FormEvent): void => {
+  const save = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
-    if (!form.name.trim()) {
-      setTried(true);
+    if (!dirty) {
+      setDraft(null);
       return;
     }
-    if (dirty) saveCompanyProfile(form);
+    setSaving(true);
+    setError(null);
+    const result = await updateCompanyProfileAction(form);
+    setSaving(false);
+    if (!result.ok) {
+      setError(result.error.message);
+      return;
+    }
     setDraft(null);
-    setTried(false);
+    toast("Company profile saved");
   };
 
-  const manager = partner?.manager ?? "Farhan Qureshi";
-  const team = partner?.region === "Middle East" ? "Middle East" : "India";
+  const manager = company.manager;
+  const teamName = manager ? manager.team.replace(/^CleanStart\s*/, "") : "";
+  const signed = company.agreementAcceptedAt !== null;
 
   return (
     <div className="wrap">
       <div className="head">
         <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
           <h1 className="h1">Company</h1>
-          <span className="h1-sub">How CleanStart sees Kestrel Systems. Partner admins can edit the profile.</span>
+          <span className="h1-sub">How CleanStart sees {company.name}. Partner admins can edit the profile.</span>
         </div>
       </div>
 
@@ -79,39 +105,50 @@ export function Company(): React.JSX.Element {
                 <label htmlFor="cn" className="lbl">
                   Company name
                 </label>
-                <input
-                  id="cn"
-                  className={`field${nameErr ? " field-err" : ""}`}
-                  type="text"
-                  value={form.name}
-                  onChange={edit("name")}
-                  aria-invalid={nameErr ? true : undefined}
-                  aria-describedby="cn-err"
-                />
-                {nameErr ? (
-                  <span className="err" id="cn-err">
-                    Enter the company name.
-                  </span>
-                ) : null}
+                <input id="cn" className="field" type="text" value={company.name} readOnly aria-describedby="cn-hint" />
+                <span id="cn-hint" className="hint">
+                  Ask your partner manager to change the name.
+                </span>
               </div>
               <div className="fg">
                 <label htmlFor="cw" className="lbl">
                   Website
                 </label>
-                <input id="cw" className="field" type="text" value={form.website} onChange={edit("website")} />
+                <input
+                  id="cw"
+                  className="field"
+                  type="text"
+                  value={form.website}
+                  onChange={edit("website")}
+                  readOnly={!canEdit}
+                />
               </div>
               <div className="fg">
                 <label htmlFor="cp" className="lbl">
                   Main phone
                 </label>
-                <input id="cp" className="field" type="tel" value={form.phone} onChange={edit("phone")} />
+                <input
+                  id="cp"
+                  className="field"
+                  type="tel"
+                  value={form.phone}
+                  onChange={edit("phone")}
+                  readOnly={!canEdit}
+                />
               </div>
             </div>
             <div className="fg">
               <label htmlFor="ca" className="lbl">
                 Address
               </label>
-              <input id="ca" className="field" type="text" value={form.address} onChange={edit("address")} />
+              <input
+                id="ca"
+                className="field"
+                type="text"
+                value={form.address}
+                onChange={edit("address")}
+                readOnly={!canEdit}
+              />
             </div>
             <div className="fg">
               <label htmlFor="cb" className="lbl">
@@ -123,12 +160,18 @@ export function Company(): React.JSX.Element {
                 rows={3}
                 value={form.about}
                 onChange={edit("about")}
+                readOnly={!canEdit}
                 aria-describedby="cb-hint"
               />
               <span id="cb-hint" className="hint">
                 Shown to your CleanStart partner manager.
               </span>
             </div>
+            {error ? (
+              <span className="err" role="alert">
+                {error}
+              </span>
+            ) : null}
           </div>
           <hr className="hr" />
           <div className="card-b" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -138,42 +181,48 @@ export function Company(): React.JSX.Element {
             </div>
             <dl className="dl">
               <dt>Partner category</dt>
-              <dd>{partner ? <CategoryBadge category={partner.category} /> : null}</dd>
+              <dd>
+                <PartnerCategoryBadge category={company.category} />
+              </dd>
               <dt>Region</dt>
-              <dd>{partner?.region ?? "India"}</dd>
+              <dd>{PARTNER_REGION_LABEL[company.region]}</dd>
               <dt>Partner since</dt>
-              <dd>{partner?.since ?? "12 Mar 2026"}</dd>
+              <dd>{fmtLong(company.since)}</dd>
               <dt>Status</dt>
-              <dd>{partner ? <StatusBadge status={partner.status} /> : null}</dd>
+              <dd>
+                <PartnerStatusBadge status={company.status} />
+              </dd>
             </dl>
           </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-end",
-              gap: 6,
-              padding: "10px 12px",
-              borderTop: "1px solid #F0EFF4",
-              background: "#FCFCFD",
-            }}
-          >
-            {dirty ? (
-              <button
-                type="button"
-                className="btn btn-g"
-                onClick={() => {
-                  setDraft(null);
-                  setTried(false);
-                }}
-              >
-                Discard
+          {canEdit ? (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end",
+                gap: 6,
+                padding: "10px 12px",
+                borderTop: "1px solid #F0EFF4",
+                background: "#FCFCFD",
+              }}
+            >
+              {dirty ? (
+                <button
+                  type="button"
+                  className="btn btn-g"
+                  onClick={() => {
+                    setDraft(null);
+                    setError(null);
+                  }}
+                >
+                  Discard
+                </button>
+              ) : null}
+              <button type="submit" className="btn btn-p" disabled={saving}>
+                Save changes
               </button>
-            ) : null}
-            <button type="submit" className="btn btn-p">
-              Save changes
-            </button>
-          </div>
+            </div>
+          ) : null}
         </form>
 
         <aside
@@ -185,22 +234,24 @@ export function Company(): React.JSX.Element {
               <h2 id="agr" className="card-t">
                 Partner agreement
               </h2>
-              <Badge tone="accepted">Signed</Badge>
+              <Badge tone={signed ? "accepted" : "pending"}>{signed ? "Signed" : "Not signed"}</Badge>
             </div>
             <div className="card-b" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <dl className="dl" style={{ gridTemplateColumns: "96px minmax(0, 1fr)" }}>
                 <dt>Version</dt>
-                <dd>1.2</dd>
+                <dd>{company.agreementVersion ?? "Not accepted yet"}</dd>
                 <dt>Accepted</dt>
-                <dd>12 Mar 2026, 14:06</dd>
-                <dt>Accepted by</dt>
-                <dd>Aditi Rao</dd>
+                <dd>
+                  {company.agreementAcceptedAt
+                    ? `${fmtLong(company.agreementAcceptedAt.slice(0, 10))}, ${company.agreementAcceptedAt.slice(11, 16)}`
+                    : "Not accepted yet"}
+                </dd>
               </dl>
               <button
                 type="button"
                 className="btn btn-s"
                 style={{ alignSelf: "flex-start" }}
-                onClick={() => toast("Downloading partner agreement, version 1.2")}
+                onClick={() => toast("The agreement PDF is not in the portal yet. Ask your partner manager for a copy.")}
               >
                 <Icon name="dl" />
                 Download PDF
@@ -217,21 +268,27 @@ export function Company(): React.JSX.Element {
                 Your partner manager
               </h2>
             </div>
-            <div className="li" style={{ borderBottom: 0 }}>
-              <Avatar initials={initialsOf(manager)} />
-              <span className="li-t">
-                <span className="li-n">{manager}</span>
-                <span className="li-s">CleanStart, {team}</span>
-              </span>
-              <button
-                type="button"
-                className="btn btn-s"
-                style={{ marginLeft: "auto", height: 26, padding: "0 8px", fontSize: 12 }}
-                onClick={() => setMessageOpen(true)}
-              >
-                Message
-              </button>
-            </div>
+            {manager ? (
+              <div className="li" style={{ borderBottom: 0 }}>
+                <Avatar initials={initialsOf(manager.name)} />
+                <span className="li-t">
+                  <span className="li-n">{manager.name}</span>
+                  <span className="li-s">CleanStart{teamName ? `, ${teamName}` : ""}</span>
+                </span>
+                <button
+                  type="button"
+                  className="btn btn-s"
+                  style={{ marginLeft: "auto", height: 26, padding: "0 8px", fontSize: 12 }}
+                  onClick={() => setMessageOpen(true)}
+                >
+                  Message
+                </button>
+              </div>
+            ) : (
+              <p style={{ margin: 0, padding: 12, fontSize: 12.5, color: "#6B687D" }}>
+                CleanStart has not assigned a partner manager yet.
+              </p>
+            )}
           </section>
 
           <section aria-labelledby="tier" className="card clip" data-tour="company-tier">
@@ -243,22 +300,23 @@ export function Company(): React.JSX.Element {
             </div>
             <div className="card-b">
               <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: "#5E5B6E" }}>
-                CleanStart has not launched partner tiers yet. Farhan will share the tier rules with you before they
-                start.
+                CleanStart has not launched partner tiers yet.{" "}
+                {manager ? manager.name.split(" ")[0] : "Your partner manager"} will share the tier rules with you
+                before they start.
               </p>
             </div>
           </section>
         </aside>
       </div>
 
-      {messageOpen ? (
+      {messageOpen && manager ? (
         <MessageDrawer
           open
           onClose={() => setMessageOpen(false)}
-          manager={manager}
-          team={team}
-          subject="Kestrel Systems company profile"
-          from="aditi.rao@kestrelsystems.in"
+          manager={manager.name}
+          team={teamName || "CleanStart"}
+          subject={`${company.name} company profile`}
+          from={viewerEmail}
         />
       ) : null}
     </div>

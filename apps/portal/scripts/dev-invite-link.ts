@@ -7,6 +7,10 @@ import { withSystem } from '../src/server/repo/context';
 import { inviteUrl } from '../src/server/urls';
 
 if (process.env.NODE_ENV === 'production') throw new Error('dev-invite-link is for local development only');
+const databaseHost = new URL(process.env.DATABASE_URL ?? 'postgres://invalid').hostname;
+if (!['localhost', '127.0.0.1', '::1', '[::1]'].includes(databaseHost)) {
+  throw new Error(`dev-invite-link refuses a database that is not on this machine (${databaseHost})`);
+}
 const email = process.argv[2]?.trim().toLowerCase();
 if (!email) throw new Error('Usage: tsx --env-file=.env scripts/dev-invite-link.ts <email>');
 
