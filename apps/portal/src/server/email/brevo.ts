@@ -49,7 +49,7 @@ export function createBrevoTransport(config: BrevoConfig): EmailTransport {
         });
       } catch (error) {
         const reason = error instanceof Error ? error.message : String(error);
-        return { status: 'failed', error: /timeout|abort/i.test(reason) ? 'timeout' : `network: ${reason}` };
+        return { status: 'failed', error: /timeout|abort/i.test(reason) ? 'timeout' : `network: ${reason}`.slice(0, MAX_ERROR_LENGTH) };
       }
       if (!response.ok) return { status: 'failed', error: await describeFailure(response) };
       const data = (await response.json().catch(() => null)) as { messageId?: unknown } | null;

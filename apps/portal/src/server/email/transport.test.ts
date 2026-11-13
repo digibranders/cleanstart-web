@@ -33,7 +33,8 @@ describe('PORTAL_SENDER_NAME', () => {
 });
 
 describe('createEmailTransport', () => {
-  it('skips, and logs the subject and the links but never the body, when Brevo is not configured', async () => {
+  it('skips, and logs the subject and the links but never the body, when Brevo is not configured in development', async () => {
+    vi.stubEnv('NODE_ENV', 'development');
     const result = await createEmailTransport({ apiKey: undefined, senderEmail: undefined }).send(message);
     expect(result).toEqual({ status: 'skipped', reason: 'brevo-not-configured' });
     expect(logged.calls).toHaveLength(1);
@@ -42,8 +43,8 @@ describe('createEmailTransport', () => {
     expect(JSON.stringify(logged.calls)).not.toContain('secret body text');
   });
 
-  it('does not log links in production', async () => {
-    vi.stubEnv('NODE_ENV', 'production');
+  it.each(['production', 'test', 'staging'])('does not log links when NODE_ENV is %s', async (env) => {
+    vi.stubEnv('NODE_ENV', env);
     await createEmailTransport({ apiKey: undefined, senderEmail: undefined }).send(message);
     expect(logged.calls[0]?.[0]).toEqual({ subject: 'Set your password', recipients: 1 });
   });

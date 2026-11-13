@@ -39,7 +39,7 @@ const linksIn = (html: string): string[] =>
   [...html.matchAll(HREF)].map((match) => (match[1] ?? '').replaceAll('&amp;', '&')).filter((link) => link !== '');
 
 /**
- * What development uses when Brevo is not configured. It logs the subject and, outside production, the links in the
+ * What development uses when Brevo is not configured. It logs the subject and, only when NODE_ENV is development, the links in the
  * message, so an invite or a reset link can be followed without sending anything. It never logs the body.
  */
 export function createLogTransport(): EmailTransport {
@@ -49,7 +49,7 @@ export function createLogTransport(): EmailTransport {
         {
           subject: message.subject,
           recipients: message.to.length,
-          ...(process.env.NODE_ENV === 'production' ? {} : { links: linksIn(message.htmlContent) }),
+          ...(process.env.NODE_ENV === 'development' ? { links: linksIn(message.htmlContent) } : {}),
         },
         'email skipped: Brevo is not configured',
       );
