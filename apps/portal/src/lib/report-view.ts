@@ -47,8 +47,12 @@ export function filterPartnerRows(
   return views.sort(compare[sort]);
 }
 
+/** A cell that starts with = + - @ tab or CR is read as a formula by Excel and Sheets, so it gets a leading apostrophe. */
+const FORMULA_START = /^[=+\-@\t\r]/;
+
 const csvCell = (value: string | number): string => {
-  const text = String(value);
+  const raw = String(value);
+  const text = FORMULA_START.test(raw) ? `'${raw}` : raw;
   return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 };
 

@@ -10,6 +10,7 @@ import {
   rejectRegistrationAction,
   undoDecisionAction,
 } from "@/server/actions/decisions";
+import { EXTENSION_DAYS } from "@/lib/deal-rules";
 import { decideExtensionAction } from "@/server/actions/extension";
 import { postMessageAction } from "@/server/actions/registrations";
 import { issuesToErrors } from "@/server/actions/result";
@@ -136,15 +137,18 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
 
   const decideExt = async (deal: RegistrationDetailDto, decision: "grant" | "decline"): Promise<void> => {
     setBusyId(deal.id);
-    const result = await decideExtensionAction({ id: deal.id, decision, note: null });
-    setBusyId(null);
-    toast(
-      result.ok
-        ? decision === "grant"
-          ? `Extension granted for ${deal.customer}.`
-          : `Extension declined for ${deal.customer}.`
-        : result.error.message,
-    );
+    try {
+      const result = await decideExtensionAction({ id: deal.id, decision, note: null });
+      toast(
+        result.ok
+          ? decision === "grant"
+            ? `Extension granted for ${deal.customer}.`
+            : `Extension declined for ${deal.customer}.`
+          : result.error.message,
+      );
+    } finally {
+      setBusyId(null);
+    }
   };
 
   const accept = async (row: QueueRow): Promise<void> => {
@@ -498,7 +502,7 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
                           Decline
                         </button>
                         <button type="button" className="btn btn-p" onClick={() => decideExt(d, "grant")} disabled={busyId === d.id} style={SMALL_BTN}>
-                          Grant 30 days
+                          Grant {EXTENSION_DAYS} days
                         </button>
                       </span>
                     </td>

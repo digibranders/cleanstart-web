@@ -51,3 +51,11 @@ describe('partnersToCsv', () => {
     ]);
   });
 });
+
+describe('partnersToCsv formula cells', () => {
+  it('prefixes an apostrophe to a name a spreadsheet would run', () => {
+    const rows = ['=SUM(A1)', '+1', '-1', '@x', '\tx', '\rx'].map((name) => ({ ...row({ name }), rate: null }));
+    const lines = partnersToCsv(rows).split('\n').slice(1);
+    expect(lines.map((l) => l.split(',')[0])).toEqual(["'=SUM(A1)", "'+1", "'-1", "'@x", "'\tx", "'\rx"].map((c) => (/[",\n]/.test(c) ? `"${c}"` : c)));
+  });
+});

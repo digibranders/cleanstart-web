@@ -167,15 +167,18 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
       return;
     }
     setExtBusy(true);
-    const result = await requestExtensionAction({ id: deal.id, reason: extWhy });
-    setExtBusy(false);
-    if (!result.ok) {
-      toast(result.error.message);
-      return;
+    try {
+      const result = await requestExtensionAction({ id: deal.id, reason: extWhy });
+      if (!result.ok) {
+        toast(result.error.message);
+        return;
+      }
+      setExtOpen(false);
+      setExtWhy("");
+      toast("Extension requested. CleanStart will reply by email.");
+    } finally {
+      setExtBusy(false);
     }
-    setExtOpen(false);
-    setExtWhy("");
-    toast("Extension requested. CleanStart will reply by email.");
   };
 
   return (

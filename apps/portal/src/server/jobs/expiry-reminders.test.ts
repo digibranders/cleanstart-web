@@ -22,6 +22,15 @@ const setup = async () => {
 };
 
 describe('sendExpiryReminders', () => {
+  it('notifies once when two runs overlap', async () => {
+    await setup();
+    const transport = new FakeEmailTransport();
+    await Promise.all([sendExpiryReminders({ clock, transport }), sendExpiryReminders({ clock, transport })]);
+    expect(await db.select().from(notifications)).toHaveLength(2);
+    expect(await db.select().from(registrationReminders)).toHaveLength(1);
+    expect(transport.sent).toHaveLength(2);
+  });
+
   it('notifies and emails the registrant and the admin 14 days before, once', async () => {
     const { sales, admin, reg } = await setup();
     const transport = new FakeEmailTransport();

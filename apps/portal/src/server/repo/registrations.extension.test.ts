@@ -8,6 +8,7 @@ import { ForbiddenError, NotFoundError, ValidationError } from '@/server/errors'
 import { withViewer } from './context';
 import {
   decideExtension,
+  listExtensionRequests,
   listReminderCandidates,
   markReminderSent,
   requestExtension,
@@ -152,5 +153,26 @@ describe('reminder candidates', () => {
     await db.update(registrations).set({ protectionEnd: '2026-12-20' }).where(eq(registrations.id, reg.id));
     const later = await db.transaction((tx) => listReminderCandidates(tx, actor, fixedClock('2026-12-06T05:00:00Z')));
     expect(later.map((c) => [c.daysBefore, c.protectionEnd])).toEqual([[14, '2026-12-20']]);
+  });
+});
+
+describe('listExtensionRequests', () => {
+  it('lists only requested extensions, oldest request first, for the staff scope', async () => {
+    const { farhan, partner, reg } = await setup();
+    const other = await makeRegistration(db, { partnerId: partner.id, customerName: 'Gulf Co', status: 'accepted', region: 'middle_east' });
+    await makeRegistration(db, { partnerId: partner.id, customerName: 'No request', status: 'accepted' });
+    await db.update(registrations).set({ extensionStatus: 'requested', extensionRequestedAt: new Date('2026-11-05T10:00:00Z'), extensionReason: 'later' }).where(eq(registrations.id, reg.id));
+    await db.update(registrations).set({ extensionStatus: 'requested', extensionRequestedAt: new Date('2026-11-04T10:00:00Z'), extensionReason: 'earlier' }).where(eq(registrations.id, other.id));
+    const all = await withViewer(farhan, (tx) => listExtensionRequests(tx, farhan));
+    expect(all.map((r) => r.extensionReason)).toEqual(['earlier', 'later']);
+    const staffIndia = await asStaff(db, 'sales', 'india');
+    const seen = await withViewer(staffIndia, (tx) => listExtensionRequests(tx, staffIndia));
+    expect(seen.map((r) => r.id)).toEqual([reg.id]);
+  });
+
+  it('is staff only', async () => {
+    const { partner } = await setup();
+    const viewer = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
+    await expect(withViewer(viewer, (tx) => listExtensionRequests(tx, viewer))).rejects.toBeInstanceOf(ForbiddenError);
   });
 });

@@ -749,17 +749,28 @@ export async function listReminderCandidates(tx: Tx, _actor: SystemActor, clock:
   return candidates;
 }
 
-/** Public. Inserts the registration_reminders row. Idempotent. */
+/** Public. Inserts the registration_reminders row. Idempotent; true only for the call that created the row. */
 export async function markReminderSent(
   tx: Tx,
   _actor: SystemActor,
   input: { registrationId: string; daysBefore: number; protectionEnd: string },
   clock: Clock,
-): Promise<void> {
-  await tx
+): Promise<boolean> {
+  const created = await tx
     .insert(registrationReminders)
     .values({ registrationId: input.registrationId, daysBefore: input.daysBefore, protectionEnd: input.protectionEnd, sentAt: clock.now() })
-    .onConflictDoNothing();
+    .onConflictDoNothing()
+    .returning({ id: registrationReminders.registrationId });
+  return created.length > 0;
+}
+
+/** Staff. Accepted registrations with an extension request waiting, oldest request first, in the viewer's scope. */
+export async function listExtensionRequests(tx: Tx, viewer: Viewer): Promise<RegistrationDetailDto[]> {
+  assertStaff(viewer);
+  const rows = await selectRows(tx)
+    .where(and(registrationScope(viewer), eq(registrations.status, 'accepted'), eq(registrations.extensionStatus, 'requested')))
+    .orderBy(asc(registrations.extensionRequestedAt), asc(registrations.id));
+  return loadDetails(tx, rows);
 }
 
 const probeClock = fixedClock('2026-11-06T14:02:00Z');
@@ -768,7 +779,7 @@ export const isolation = defineIsolation<
   | 'listRegistrations' | 'getRegistration' | 'lockRegistration' | 'createRegistrations' | 'resubmitRegistration'
   | 'customerSuggestions' | 'acceptRegistration' | 'rejectRegistration' | 'undoDecision' | 'conflictChecks'
   | 'listApprovalQueue' | 'countWaiting' | 'conflictInputs' | 'requestExtension' | 'decideExtension'
-  | 'listReminderCandidates' | 'markReminderSent'
+  | 'listReminderCandidates' | 'markReminderSent' | 'listExtensionRequests'
 >({
   listRegistrations: {
     scope: 'tenant',
@@ -817,6 +828,7 @@ export const isolation = defineIsolation<
     expect: 'forbidden',
     probe: (tx, viewer, ctx) => decideExtension(tx, viewer, { id: ctx.b.registrationId, decision: 'grant', note: null }, probeClock),
   },
+  listExtensionRequests: { scope: 'staff-only', expect: 'forbidden', probe: (tx, viewer) => listExtensionRequests(tx, viewer) },
   listReminderCandidates: { scope: 'public', reason: 'Takes a SystemActor and is called only by jobs/expiry-reminders.ts through withSystem.' },
   markReminderSent: { scope: 'public', reason: 'Takes a SystemActor and is called only by jobs/expiry-reminders.ts through withSystem.' },
 });

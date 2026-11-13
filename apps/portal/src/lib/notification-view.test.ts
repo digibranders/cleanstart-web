@@ -32,6 +32,9 @@ describe('isAppLink', () => {
     expect(isAppLink('//evil.example/x')).toBe(false);
     expect(isAppLink('https://evil.example')).toBe(false);
     expect(isAppLink('javascript:alert(1)')).toBe(false);
+    expect(isAppLink('/\\evil.com')).toBe(false);
+    expect(isAppLink('/\t/evil.com')).toBe(false);
+    expect(isAppLink('/partner/deals?x=1#y')).toBe(true);
     expect(isAppLink(null)).toBe(false);
   });
 });

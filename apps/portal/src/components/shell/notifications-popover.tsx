@@ -61,14 +61,29 @@ export function NotificationsPopover({ notifications, today, open, onToggle, onC
 
   const markAll = async (): Promise<void> => {
     setAllRead(true);
-    const result = await markAllNotificationsReadAction({});
-    if (result.ok) router.refresh();
+    try {
+      const result = await markAllNotificationsReadAction({});
+      if (result.ok) router.refresh();
+      else setAllRead(false);
+    } catch {
+      setAllRead(false);
+    }
   };
 
   const markOne = (n: NotificationDto): void => {
     if (isUnread(n)) {
       setReadHere((prev) => new Set(prev).add(n.id));
-      void markNotificationReadAction({ id: n.id });
+      const undo = (): void =>
+        setReadHere((prev) => {
+          const next = new Set(prev);
+          next.delete(n.id);
+          return next;
+        });
+      markNotificationReadAction({ id: n.id })
+        .then((result) => {
+          if (!result.ok) undo();
+        })
+        .catch(undo);
     }
     onClose();
   };

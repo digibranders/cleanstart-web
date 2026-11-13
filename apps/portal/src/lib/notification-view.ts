@@ -33,4 +33,7 @@ export function notificationWhen(createdAt: string, today: string): string {
 }
 
 /** Only paths inside this app are links. A stored link is our own, but a bell must never become an open redirect. */
-export const isAppLink = (link: string | null): link is string => link?.startsWith('/') === true && !link.startsWith('//');
+export const isAppLink = (link: string | null): link is string => {
+  if (link === null || !link.startsWith('/') || link[1] === '/' || link[1] === '\\') return false;
+  return [...link].every((char) => char !== '\\' && char.charCodeAt(0) > 31);
+};
