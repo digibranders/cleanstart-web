@@ -47,7 +47,8 @@ export const isProtectedPath = (pathname: string): boolean => /^\/(partner|admin
  */
 export function proxy(request: NextRequest): NextResponse {
   // The container health check, the deploy smoke probe and `compose --wait` must not need the review password (plan 06 M0.6).
-  if (request.nextUrl.pathname === "/api/health") return NextResponse.next();
+  // The HubSpot webhook cannot send Basic auth; the route verifies the HubSpot v3 signature itself (and answers 503 when its secret is unset).
+  if (request.nextUrl.pathname === "/api/health" || request.nextUrl.pathname === "/api/hubspot/webhook") return NextResponse.next();
   const blocked = reviewGate(request);
   if (blocked) return blocked;
 

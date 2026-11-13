@@ -91,6 +91,12 @@ describe("review gate", () => {
     expect(proxy(request("/api/health")).status).toBe(200);
   });
 
+  it("leaves the HubSpot webhook open while the gate is on, because the route verifies its own signature", () => {
+    vi.stubEnv("PORTAL_REVIEW_PASSWORD", "let-me-in");
+    expect(proxy(request("/api/hubspot/webhook")).status).toBe(200);
+    expect(proxy(request("/api/hubspot/webhook/other")).status).toBe(401);
+  });
+
   it("opens with the right password and still applies the session redirect", () => {
     vi.stubEnv("PORTAL_REVIEW_PASSWORD", "let-me-in");
     const authorization = basic("let-me-in");
