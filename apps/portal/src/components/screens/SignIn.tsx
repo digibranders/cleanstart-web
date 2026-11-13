@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Icon } from "@/components/icon";
 import {
@@ -12,6 +11,8 @@ import {
   StatusIcon,
 } from "@/components/partners/public-frame";
 import { PasswordField } from "@/components/ui/password-field";
+import { authClient } from "@/lib/auth-client";
+import { safeNext } from "@/lib/next-path";
 import {
   emailDomain,
   findPartnerByDomain,
@@ -23,9 +24,13 @@ import { ROUTES } from "@/lib/routes";
 
 type View = "signin" | "code" | "request" | "requested" | "nopartner" | "forgot" | "sent";
 
-const DEMO_EMAIL = "aditi.rao@kestrelsystems.in";
-const DEMO_PASSWORD = "sample-password";
-const STAFF_DOMAIN = "cleanstart.com";
+const TOO_MANY = "Too many attempts. Try again in a moment.";
+
+/** Which social buttons to show: only providers whose keys are configured on the server. */
+interface SocialAvailability {
+  google: boolean;
+  microsoft: boolean;
+}
 
 const GOOGLE_D =
   "M222,128a94,94,0,1,1-21.49-59.82,6,6,0,1,1-9.25,7.64A82,82,0,1,0,209.78,134H128a6,6,0,0,1,0-12h88A6,6,0,0,1,222,128Z";
@@ -47,54 +52,104 @@ const FORM_STYLE: React.CSSProperties = {
 
 const BTN_BIG: React.CSSProperties = { height: 38, fontSize: 13.5 };
 
-export function SignIn(): React.JSX.Element {
-  const router = useRouter();
+export function SignIn({ providers }: { providers: SocialAvailability }): React.JSX.Element {
   const { partners } = partnersSlice.use();
   const [view, setView] = useState<View>("signin");
-  const [email, setEmail] = useState(DEMO_EMAIL);
-  const [password, setPassword] = useState(DEMO_PASSWORD);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [keepSignedIn, setKeepSignedIn] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [signinError, setSigninError] = useState("");
+  const [socialError, setSocialError] = useState(false);
+  const [codeError, setCodeError] = useState("");
+  const [resetError, setResetError] = useState("");
   const [signinTried, setSigninTried] = useState(false);
   const [code, setCode] = useState("");
   const [backup, setBackup] = useState(false);
   const [codeTried, setCodeTried] = useState(false);
   const [rq, setRq] = useState({ name: "", email: "", note: "" });
   const [rqTried, setRqTried] = useState(false);
-  const [resetEmail, setResetEmail] = useState(DEMO_EMAIL);
+  const [resetEmail, setResetEmail] = useState("");
   const [resetTried, setResetTried] = useState(false);
 
   // The Apply page links here with ?request=1 when an applicant's company is already a partner.
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("request") === "1") setView("request");
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("request") === "1") setView("request");
+    if (params.get("error")) setSocialError(true);
   }, []);
 
-  const enter = (address: string): void => {
-    router.push(emailDomain(address) === STAFF_DOMAIN ? ROUTES.admin.approvals : ROUTES.partner.overview);
+  // A full navigation: the session cookie was just set, and "/" sends each role to its own home.
+  const enter = (): void => {
+    window.location.assign(safeNext(new URLSearchParams(window.location.search).get("next")) ?? "/");
+  };
+
+  const signInWith = async (provider: "google" | "microsoft"): Promise<void> => {
+    setSocialError(false);
+    await authClient.signIn.social({
+      provider,
+      callbackURL: safeNext(new URLSearchParams(window.location.search).get("next")) ?? "/",
+      errorCallbackURL: ROUTES.signIn,
+    });
   };
 
   const emailBad = !isValidEmail(email);
   const passwordBad = !password;
-  const submitSignin = (event: React.FormEvent): void => {
+  const submitSignin = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
     if (emailBad || passwordBad) {
       setSigninTried(true);
       return;
     }
-    setCode("");
-    setCodeTried(false);
-    setBackup(false);
-    setView("code");
+    setBusy(true);
+    setSigninError("");
+    const { data, error } = await authClient.signIn.email({
+      email: email.trim().toLowerCase(),
+      password,
+      rememberMe: keepSignedIn,
+    });
+    setBusy(false);
+    if (error) {
+      setSigninError(error.status === 429 ? TOO_MANY : "That email and password do not match.");
+      return;
+    }
+    if ((data as { twoFactorRedirect?: boolean } | null)?.twoFactorRedirect) {
+      setCode("");
+      setCodeTried(false);
+      setCodeError("");
+      setBackup(false);
+      setView("code");
+      return;
+    }
+    enter();
   };
 
-  const codeRaw = code.replace(/\s/g, "");
+  // Backup codes are shown as "XXXXX XXXXX" and stored as "XXXXX-XXXXX"; accept either, with or without the gap.
+  const codeRaw = code.replace(/[\s-]/g, "");
   const codeReady = backup ? /^[A-Za-z0-9]{10}$/.test(codeRaw) : /^\d{6}$/.test(codeRaw);
-  const verify = (event: React.FormEvent): void => {
+  const verify = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
     if (!codeReady) {
       setCodeTried(true);
       return;
     }
-    enter(email);
+    setBusy(true);
+    setCodeError("");
+    const { error } = backup
+      ? await authClient.twoFactor.verifyBackupCode({ code: `${codeRaw.slice(0, 5)}-${codeRaw.slice(5)}` })
+      : await authClient.twoFactor.verifyTotp({ code: codeRaw });
+    setBusy(false);
+    if (error) {
+      setCodeError(
+        error.status === 429
+          ? TOO_MANY
+          : backup
+            ? "That backup code did not work. Check it and try again."
+            : "That code did not work. Check it and try again.",
+      );
+      return;
+    }
+    enter();
   };
 
   const rqEmailFree = isFreeEmail(rq.email);
@@ -111,10 +166,21 @@ export function SignIn(): React.JSX.Element {
   };
 
   const resetBad = !isValidEmail(resetEmail);
-  const sendReset = (event: React.FormEvent): void => {
+  const sendReset = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
     if (resetBad) {
       setResetTried(true);
+      return;
+    }
+    setBusy(true);
+    setResetError("");
+    const { error } = await authClient.requestPasswordReset({
+      email: resetEmail.trim().toLowerCase(),
+      redirectTo: ROUTES.resetPassword,
+    });
+    setBusy(false);
+    if (error) {
+      setResetError(error.status === 429 ? TOO_MANY : "We could not send the link. Try again in a moment.");
       return;
     }
     setView("sent");
@@ -150,34 +216,37 @@ export function SignIn(): React.JSX.Element {
         {view === "signin" ? (
           <form onSubmit={submitSignin} noValidate style={FORM_STYLE} data-tour="signin-form">
             <PublicHeading title="Sign in">Use the work email your partner admin invited.</PublicHeading>
-            <div style={{ display: "grid", gap: 8 }} data-tour="signin-sso">
-              <button
-                type="button"
-                className="btn btn-s"
-                style={BTN_BIG}
-                onClick={() => enter(isValidEmail(email) ? email : DEMO_EMAIL)}
-              >
-                <Icon d={GOOGLE_D} />
-                Continue with Google
-              </button>
-              <button
-                type="button"
-                className="btn btn-s"
-                style={BTN_BIG}
-                onClick={() => enter(isValidEmail(email) ? email : DEMO_EMAIL)}
-              >
-                <Icon d={MICROSOFT_D} />
-                Continue with Microsoft
-              </button>
-            </div>
-            <div
-              role="separator"
-              style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12, color: "#6B687D" }}
-            >
-              <span style={{ flex: 1, height: 1, background: "#ECEBF1" }} />
-              or with your work email
-              <span style={{ flex: 1, height: 1, background: "#ECEBF1" }} />
-            </div>
+            {socialError ? (
+              <span className="err" role="alert">
+                That sign-in did not work. Use the email your partner admin invited, or sign in with your password.
+              </span>
+            ) : null}
+            {providers.google || providers.microsoft ? (
+              <>
+                <div style={{ display: "grid", gap: 8 }} data-tour="signin-sso">
+                  {providers.google ? (
+                    <button type="button" className="btn btn-s" style={BTN_BIG} onClick={() => void signInWith("google")}>
+                      <Icon d={GOOGLE_D} />
+                      Continue with Google
+                    </button>
+                  ) : null}
+                  {providers.microsoft ? (
+                    <button type="button" className="btn btn-s" style={BTN_BIG} onClick={() => void signInWith("microsoft")}>
+                      <Icon d={MICROSOFT_D} />
+                      Continue with Microsoft
+                    </button>
+                  ) : null}
+                </div>
+                <div
+                  role="separator"
+                  style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12, color: "#6B687D" }}
+                >
+                  <span style={{ flex: 1, height: 1, background: "#ECEBF1" }} />
+                  or with your work email
+                  <span style={{ flex: 1, height: 1, background: "#ECEBF1" }} />
+                </div>
+              </>
+            ) : null}
             <div className="fg">
               <label htmlFor="email" className="lbl">
                 Work email
@@ -227,7 +296,12 @@ export function SignIn(): React.JSX.Element {
               />
               Keep me signed in
             </label>
-            <button type="submit" className="btn btn-p" style={BTN_BIG}>
+            {signinError ? (
+              <span className="err" role="alert">
+                {signinError}
+              </span>
+            ) : null}
+            <button type="submit" className="btn btn-p" style={BTN_BIG} disabled={busy}>
               Sign in
             </button>
             <div style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 6, fontSize: 12.5, color: "#5E5B6E" }}>
@@ -242,22 +316,6 @@ export function SignIn(): React.JSX.Element {
                 Not a partner yet?{" "}
                 <Link href={ROUTES.apply} style={{ fontWeight: 600 }}>
                   Apply to become a partner
-                </Link>
-              </span>
-            </div>
-            <div className="note note-violet" style={{ flexDirection: "column", gap: 8 }}>
-              <b>Demo shortcuts</b>
-              <span>
-                This is a mock with made-up data. The form is prefilled with Aditi Rao's sample login
-                (aditi.rao@kestrelsystems.in, password sample-password). Any email and password work, and the two-step code is any 6 digits (for example 123456). An
-                address ending in @cleanstart.com opens the staff side.
-              </span>
-              <span style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                <Link href={ROUTES.partner.overview} className="btn btn-s">
-                  Open as partner (Kestrel Systems)
-                </Link>
-                <Link href={ROUTES.admin.approvals} className="btn btn-s">
-                  Open as CleanStart staff
                 </Link>
               </span>
             </div>
@@ -296,7 +354,12 @@ export function SignIn(): React.JSX.Element {
                 </span>
               ) : null}
             </div>
-            <button type="submit" className="btn btn-p" style={BTN_BIG}>
+            {codeError ? (
+              <span className="err" role="alert">
+                {codeError}
+              </span>
+            ) : null}
+            <button type="submit" className="btn btn-p" style={BTN_BIG} disabled={busy}>
               Verify and sign in
             </button>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
@@ -444,7 +507,12 @@ export function SignIn(): React.JSX.Element {
                 </span>
               ) : null}
             </div>
-            <button type="submit" className="btn btn-p" style={BTN_BIG}>
+            {resetError ? (
+              <span className="err" role="alert">
+                {resetError}
+              </span>
+            ) : null}
+            <button type="submit" className="btn btn-p" style={BTN_BIG} disabled={busy}>
               Send reset link
             </button>
             <button type="button" className="btn btn-g" onClick={backToSignin} style={{ alignSelf: "flex-start" }}>

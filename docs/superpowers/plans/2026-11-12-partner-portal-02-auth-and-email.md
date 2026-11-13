@@ -3952,13 +3952,13 @@ Invoke the `design-taste-frontend` skill before editing markup. This task change
 **Files:**
 - Modify: `apps/portal/src/components/screens/SignIn.tsx`, `apps/portal/src/app/(public)/sign-in/page.tsx`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M1.1g | started | W0 | - | - | SignIn conversion" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Replace the sign in page**
+- [x] **Step 2: Replace the sign in page**
 
 The page is a Server Component: a signed in viewer is redirected home, and the client screen learns which social providers are configured (from the same env builder `auth.ts` uses, so the buttons and the routes cannot disagree). Replace `apps/portal/src/app/(public)/sign-in/page.tsx`:
 
@@ -3980,7 +3980,7 @@ export default async function Page(): Promise<React.JSX.Element> {
 }
 ```
 
-- [ ] **Step 3: Apply the screen edits**
+- [x] **Step 3: Apply the screen edits**
 
 Apply these edits to `apps/portal/src/components/screens/SignIn.tsx` in order G1 to G13. Each Find text must match exactly once.
 
@@ -4419,7 +4419,7 @@ Replace with:
             </button>
 ```
 
-- [ ] **Step 4: Typecheck**
+- [x] **Step 4: Typecheck**
 
 ```bash
 pnpm --filter @cleanstart/portal typecheck
@@ -4428,7 +4428,7 @@ pnpm --filter @cleanstart/portal lint
 
 Expected: both exit 0. (`useRouter` is gone, `emailDomain`, `findPartnerByDomain`, `isFreeEmail`, `isValidEmail` and `partnersSlice` are still used by the request access views.)
 
-- [ ] **Step 5: Run the whole suite**
+- [x] **Step 5: Run the whole suite**
 
 ```bash
 pnpm --filter @cleanstart/portal test
@@ -4436,7 +4436,7 @@ pnpm --filter @cleanstart/portal test
 
 Expected: all test files pass.
 
-- [ ] **Step 6: Check it by hand**
+- [x] **Step 6: Check it by hand**
 
 Start or reuse the dev server (`lsof -nP -iTCP:3204 -sTCP:LISTEN` first; never kill a process for a port), seed (`pnpm --filter @cleanstart/portal db:seed`), and in the Browser pane at 1440 by 900 open `http://localhost:3204/sign-in`. The password for every seeded login is `DEV_SEED_PASSWORD` in `src/db/fixtures.ts`.
 
@@ -4450,11 +4450,11 @@ Start or reuse the dev server (`lsof -nP -iTCP:3204 -sTCP:LISTEN` first; never k
 
 The two step view needs a user with the second step on; the screen to turn it on is built by the P track in M1.7, so that view is first exercised end to end by the W2-b E2E. Its server calls are pinned by the HTTP second step test (Task M1.1c). If no browser is available, write `not visually checked` in the `done` line.
 
-- [ ] **Step 7: Run Gate A, then Gate B**
+- [x] **Step 7: Run Gate A, then Gate B**
 
 Run the three fast commands, then the full Gate A block. Expected: all exit 0. Gate B must confirm that the edits kept every class name and every piece of copy that was not an error line, the demo note and the demo values.
 
-- [ ] **Step 8: Commit and log**
+- [x] **Step 8: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build
