@@ -86,7 +86,7 @@ export async function previewInvite(tx: Tx, _actor: SystemActor, token: string, 
  * Public (M1.5). One transaction: marks the invite accepted (single use), creates the users row (status 'active'),
  * the Better Auth credential account with `passwordHash`, the staff_scopes row for a staff invite, stamps the partner
  * agreement for a partner admin of an onboarding partner, and returns what the action needs to enqueue user.upsert,
- * audit and notify. Throws ConflictError('invite_expired' | 'invite_used' | 'invite_revoked' | 'invite_unknown'),
+ * audit and notify. Throws ConflictError('invite_expired' | 'invite_used' | 'invite_revoked' | 'invite_unknown' | 'partner_suspended'),
  * ConflictError('already_has_login') and ValidationError when the agreement is required and not accepted.
  * The invite row is locked first, so two simultaneous accepts serialise and the second sees it as used.
  */
@@ -101,6 +101,9 @@ export async function acceptInvite(tx: Tx, _actor: SystemActor, input: AcceptInv
     ? await tx.select().from(partners).where(eq(partners.id, invite.partnerId)).limit(1).for('update')
     : [];
   if (invite.kind === 'partner' && !partner) throw new NotFoundError('partner');
+  if (partner?.status === 'suspended') {
+    throw new ConflictError('partner_suspended', 'This company is suspended, so the invite cannot be used. Contact your CleanStart partner manager.');
+  }
 
   const needsAgreement = needsAgreementFor(invite, partner);
   const name = input.name.trim();

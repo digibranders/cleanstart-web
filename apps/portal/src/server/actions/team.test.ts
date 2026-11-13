@@ -175,6 +175,8 @@ describe('decideAccessRequestAction', () => {
     expect(result).toMatchObject({ ok: true, data: { id: request.id, status: 'approved' } });
     expect(fake.only('rohit@kestrelsystems.in').htmlContent).toMatch(/accept-invite\?token=/u);
     expect(await events()).toEqual(['team.access_request_approved']);
+    const [entry] = await db.select().from(auditLog);
+    expect(entry).toMatchObject({ subjectType: 'access_request', subjectId: request.id });
     expect(await db.select().from(invites)).toHaveLength(1);
   });
 

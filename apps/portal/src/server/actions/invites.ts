@@ -37,6 +37,8 @@ const requestSchema = z.object({
 });
 const REQUEST_IP_RULE = { limit: 5, windowSeconds: 600 } as const;
 const REQUEST_EMAIL_RULE = { limit: 3, windowSeconds: 3600 } as const;
+/** Applies to every domain, partner or not, and whatever the IP: varying the local part must not flood a partner's admins. */
+const REQUEST_DOMAIN_RULE = { limit: 10, windowSeconds: 3600 } as const;
 
 const previewSchema = z.object({ token: z.string().min(1).max(200) });
 
@@ -166,6 +168,7 @@ export async function requestAccessAction(raw: unknown): Promise<ActionResult<{ 
     }
     if (ctx.ip) rateLimit(`access:ip:${ctx.ip}`, REQUEST_IP_RULE);
     rateLimit(`access:email:${checked.email}`, REQUEST_EMAIL_RULE);
+    rateLimit(`access:domain:${checked.domain}`, REQUEST_DOMAIN_RULE);
 
     const actor = publicActor(input.name);
     const found = await withSystem(actor, async (tx) => {
@@ -176,7 +179,7 @@ export async function requestAccessAction(raw: unknown): Promise<ActionResult<{ 
           event: 'team.access_requested',
           target: `${input.name}, at ${result.partnerName ?? ''}`,
           partnerId: result.partnerId,
-          subject: { type: 'user', id: result.requestId },
+          subject: { type: 'access_request', id: result.requestId },
         });
         items = result.adminRecipients.map((admin) => ({
           userId: admin.userId,
