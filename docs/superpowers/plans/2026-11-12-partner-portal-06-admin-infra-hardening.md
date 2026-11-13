@@ -2411,7 +2411,7 @@ Matching: `ILIKE '%q%'` (uses the trigram index, `%` and `_` in the query are es
 
 Known limit: a staff member's hit on a deal opens `/admin/approvals`, a partner hit opens `/admin/partners`, and a document or person hit opens the owning list. The staff screens have no per-record route in the contracts' route map, so the palette cannot deep link. A later task can add `?focus=<id>` handling to those screens.
 
-- [ ] **Step 1: Write the failing "Pages" group test**
+- [x] **Step 1: Write the failing "Pages" group test**
 
 ```ts
 import { describe, expect, it } from 'vitest';
@@ -2445,7 +2445,7 @@ describe('buildPageHits', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/lib/search-pages.test.ts`
 Expected: FAIL, `./search-pages` cannot be resolved.
 
-- [ ] **Step 2: Implement the "Pages" group**
+- [x] **Step 2: Implement the "Pages" group**
 
 It is built from the viewer's own sidebar (`PARTNER_NAV` or `ADMIN_NAV`, or whatever `navFor(viewer)` returns, passed in by the shell) plus the account page for partners, so it can never list a screen the viewer cannot open. `SEARCH_MIN_CHARS` is shared with the server.
 
@@ -2480,7 +2480,7 @@ export function buildPageHits(nav: readonly NavItem[], kind: PortalKind, q: stri
 
 Run the test. Expected: PASS, 4 tests.
 
-- [ ] **Step 3: Write the failing repo test**
+- [x] **Step 3: Write the failing repo test**
 
 It seeds partner A (Kestrel Systems, channel, India) and partner B (Kestrel Gulf Networks, distributor, Middle East), their people and deals, documents with every audience kind, and runs `searchAll` as a partner manager, staff sales, marketing, a partner admin, partner sales and partner technical. It proves: group order and hints, typo tolerance, no hits for one or two characters or for `%` and `_`, the per group cap, soft deleted documents and disabled people hidden, regional limits, one partner never seeing another partner's deals, record or colleagues, and the document audience (all, matching category, named, not another partner's).
 
@@ -2652,7 +2652,7 @@ describe('searchAll as a partner', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/search.test.ts`
 Expected: FAIL, `./search` cannot be resolved.
 
-- [ ] **Step 4: Implement `repo/search.ts`**
+- [x] **Step 4: Implement `repo/search.ts`**
 
 The `isolation` entry is scope `tenant`: as partner A it searches broadly and returns only the hits that point at partner B's deal (none may). The explicit tests above are the stronger proof; the entry keeps the matrix's "every export is registered" rule satisfied.
 
@@ -2838,7 +2838,7 @@ export const isolation = defineIsolation<'searchAll'>({
 
 Run the repo test. Expected: PASS, 12 tests. Then the matrix: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/isolation.test.ts`. Expected: PASS with `search` among the modules.
 
-- [ ] **Step 5: Write the failing action test, then the action**
+- [x] **Step 5: Write the failing action test, then the action**
 
 `searchAction` is the only caller of `searchAll`: Zod (`q` at most 80 characters, `limit` 1 to 10, default 5), `assertCan(viewer, 'search.use')`, a rate limit of 30 searches per 10 seconds per person (the palette debounces at 150 ms, so normal typing stays far below it), a short query answered without touching the database, then `withViewer`. The test mocks the session, `next/cache`, `next/headers` and Sentry only.
 
@@ -2918,7 +2918,7 @@ export async function searchAction(raw: unknown): Promise<ActionResult<SearchHit
 
 Run it again. Expected: PASS, 4 tests.
 
-- [ ] **Step 6: Build the palette component**
+- [x] **Step 6: Build the palette component**
 
 It keeps the mock's markup and classes (`dialog palette`, `pal-in`, `pal-list`, `pal-g`, `pal-item`). It owns its own state and the Ctrl K shortcut, and opens when anything dispatches `OPEN_SEARCH_EVENT` on `window`, so the shell needs no shared state. Behaviour: opens with the field focused; Escape closes and returns focus to what opened it; Tab stays inside; ArrowDown moves from the field into the results and back; Enter opens the first result; answers arrive in order (a slow reply to "ke" never replaces the reply to "kestrel"); a failed search says so and the Pages group keeps working. The click-away layer is a real button with `tabIndex={-1}` and an accessible name, so it does not need a lint suppression.
 
@@ -3142,7 +3142,7 @@ export function SearchPalette({ kind, nav }: { kind: PortalKind; nav: readonly N
 
 Run: `pnpm --filter @cleanstart/portal typecheck`. Expected: no errors.
 
-- [ ] **Step 7: Ask for the shell wiring**
+- [x] **Step 7: Ask for the shell wiring**
 
 `shell.tsx` is a shared file that this track does not edit. The orchestrator applies CCR-3 in W2-a step 0 (delete the mock's search data and state, replace the inline palette with `<SearchPalette kind={kind} nav={nav} />`, make both openers dispatch `OPEN_SEARCH_EVENT`, name the top bar button for screen readers). This is planned work, not a blocker: append a `note` line and carry on.
 
@@ -3150,11 +3150,11 @@ Run: `pnpm --filter @cleanstart/portal typecheck`. Expected: no errors.
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M IST') | M4.3 | note | A | - | - | search-palette.tsx ready; shell.tsx wiring is W2-a step 0 (CCR-3 in plan 06)" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 8: Check it in the browser** (only possible once W2-a step 0 has wired the shell; in Wave 1 the palette is covered by its unit and action tests, so write `not visually checked` in the `done` line)
+- [x] **Step 8: Check it in the browser** (only possible once W2-a step 0 has wired the shell; in Wave 1 the palette is covered by its unit and action tests, so write `not visually checked` in the `done` line)
 
 Run `pnpm --filter @cleanstart/portal exec next dev --port 3254` (check the port first), sign in as the seeded partner manager, press Ctrl K on `/admin/approvals`: the palette opens with the field focused and the six admin pages listed; type `kest`: Partners shows Kestrel Systems with "Channel partner, India" and Deals shows Kestrel's deals; Escape closes and focus returns to the top bar button. Sign in as the seeded Kestrel partner admin: search `arbor` shows nothing from another partner. At 375 px wide the top bar search button is announced as "Search deals and documents" (no empty button name). If CCR-3 is not merged yet, skip this step and say so in the `done` line; the E2E task (`e2e/admin.spec.ts`) proves it later.
 
-- [ ] **Step 9: Gate A and commit**
+- [x] **Step 9: Gate A and commit**
 
 Run the standard Gate A block, then Gate B, then:
 
