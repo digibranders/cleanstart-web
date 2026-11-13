@@ -63,6 +63,26 @@ describe('registration.create', () => {
     expect(hs.associations.map((a) => a.kind).sort()).toEqual(['deal-company:customer', 'deal-company:partner', 'deal-contact']);
   });
 
+  it('does not store the deal id when the registration was undone between the HubSpot create and the database write', async () => {
+    const { hs, h, reg } = await setup();
+    const create = hs.createDeal.bind(hs);
+    hs.createDeal = async (properties: Record<string, string>) => {
+      const deal = await create(properties);
+      await db.update(registrations).set({ status: 'pending' }).where(eq(registrations.id, reg.id));
+      return deal;
+    };
+    await expect(h['registration.create'](reg.id, {})).resolves.toBeUndefined();
+    const saved = (await db.select().from(registrations).where(eq(registrations.id, reg.id)))[0]!;
+    expect(saved).toMatchObject({ status: 'pending', hubspotDealId: null, hubspotStageId: null });
+    expect(hs.associations).toEqual([]);
+
+    // Accepting again queues a new create; it finds the deal that was left behind instead of making a second one.
+    await db.update(registrations).set({ status: 'accepted' }).where(eq(registrations.id, reg.id));
+    await h['registration.create'](reg.id, {});
+    expect(hs.deals.size).toBe(1);
+    expect((await db.select().from(registrations).where(eq(registrations.id, reg.id)))[0]!.hubspotDealId).toBeTruthy();
+  });
+
   it('reuses an existing customer company', async () => {
     const { hs, h, reg } = await setup();
     await hs.createOrUpdateCompany({ existingId: null, name: 'Vardhan Capital Pvt Ltd', domain: 'vardhancapital.in', properties: {} });
