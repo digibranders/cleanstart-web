@@ -10,6 +10,7 @@ import {
   rejectRegistrationAction,
   undoDecisionAction,
 } from "@/server/actions/decisions";
+import { decideExtensionAction } from "@/server/actions/extension";
 import { postMessageAction } from "@/server/actions/registrations";
 import { issuesToErrors } from "@/server/actions/result";
 import { downloadCsv } from "../deals/csv";
@@ -59,13 +60,14 @@ function ageLabel(days: number): string {
 
 interface AdminApprovalsProps {
   queue: ApprovalQueueDto;
+  extensions: RegistrationDetailDto[];
   viewerId: string;
   viewerRegion: StaffRegion;
   managers: ManagerOptionDto[];
   today: string;
 }
 
-export function AdminApprovals({ queue, viewerId, viewerRegion, managers, today }: AdminApprovalsProps): React.JSX.Element {
+export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, managers, today }: AdminApprovalsProps): React.JSX.Element {
   const toast = useToast();
 
   const [view, setView] = useState<"mine" | "all">("mine");
@@ -130,6 +132,20 @@ export function AdminApprovals({ queue, viewerId, viewerRegion, managers, today 
   const firstConflictId = visible.find((r) => r.check.kind === "conflict")?.deal.id;
   const viewing = rows.find((r) => r.deal.id === viewingId);
   const recentDecisions = queue.recentDecisions;
+  const visibleExtensions = extensions.filter((d) => view === "all" || inMyQueue(d));
+
+  const decideExt = async (deal: RegistrationDetailDto, decision: "grant" | "decline"): Promise<void> => {
+    setBusyId(deal.id);
+    const result = await decideExtensionAction({ id: deal.id, decision, note: null });
+    setBusyId(null);
+    toast(
+      result.ok
+        ? decision === "grant"
+          ? `Extension granted for ${deal.customer}.`
+          : `Extension declined for ${deal.customer}.`
+        : result.error.message,
+    );
+  };
 
   const accept = async (row: QueueRow): Promise<void> => {
     setBusyId(row.deal.id);
@@ -441,6 +457,58 @@ export function AdminApprovals({ queue, viewerId, viewerRegion, managers, today 
           {visible.length === 0 ? <div className="empty">No registrations match these filters.</div> : null}
         </div>
       </section>
+
+      {visibleExtensions.length > 0 ? (
+        <section aria-labelledby="extreq" className="card clip">
+          <div className="card-h">
+            <h2 id="extreq" className="card-t">
+              Extension requests
+            </h2>
+            <span className="card-meta">{visibleExtensions.length}</span>
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th scope="col">Partner</th>
+                  <th scope="col">Customer</th>
+                  <th scope="col">Product</th>
+                  <th scope="col">Protected until</th>
+                  <th scope="col">Reason</th>
+                  <th scope="col" className="r">
+                    Decision
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {visibleExtensions.map((d) => (
+                  <tr key={d.id}>
+                    <td>{d.partnerName}</td>
+                    <td style={{ fontWeight: 600 }}>{d.customer}</td>
+                    <td>
+                      <ProductChip product={CHIP_PRODUCT[d.product]} />
+                    </td>
+                    <td className="tnum t-sec">{d.protectionEnd ? fmtLong(d.protectionEnd) : ""}</td>
+                    <td className="t-sec" style={{ whiteSpace: "normal", maxWidth: 360 }}>
+                      {d.extensionReason}
+                    </td>
+                    <td className="r">
+                      <span style={{ display: "inline-flex", gap: 6 }}>
+                        <button type="button" className="btn btn-s" onClick={() => decideExt(d, "decline")} disabled={busyId === d.id} style={SMALL_BTN}>
+                          Decline
+                        </button>
+                        <button type="button" className="btn btn-p" onClick={() => decideExt(d, "grant")} disabled={busyId === d.id} style={SMALL_BTN}>
+                          Grant 30 days
+                        </button>
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      ) : null}
 
       <section aria-labelledby="recentdec" className="card clip">
         <div className="card-h">

@@ -8,6 +8,14 @@ import { log } from '@/server/log';
 import { type NewNotification, resolveEmailRecipients } from '@/server/notify';
 import { absoluteUrl } from '@/server/urls';
 
+/** The deal manager's address from their notification, or PARTNERS_NOTIFY_EMAIL when the deal has no manager. May be empty. */
+export async function staffRecipients(items: readonly NewNotification[]): Promise<EmailAddress[]> {
+  const recipients = await resolveEmailRecipients(items);
+  const to: EmailAddress[] = recipients.map((r) => ({ email: r.email, name: r.name }));
+  if (to.length === 0 && env.PARTNERS_NOTIFY_EMAIL) to.push({ email: env.PARTNERS_NOTIFY_EMAIL });
+  return to;
+}
+
 export interface SubmissionAlert {
   partnerName: string;
   customer: string;
@@ -21,9 +29,7 @@ export interface SubmissionAlert {
 
 /** After commit. Emails the deal's manager, or PARTNERS_NOTIFY_EMAIL when the deal has no manager. */
 export async function sendSubmissionAlert(alert: SubmissionAlert): Promise<void> {
-  const recipients = await resolveEmailRecipients(alert.items);
-  const to: EmailAddress[] = recipients.map((r) => ({ email: r.email, name: r.name }));
-  if (to.length === 0 && env.PARTNERS_NOTIFY_EMAIL) to.push({ email: env.PARTNERS_NOTIFY_EMAIL });
+  const to = await staffRecipients(alert.items);
   if (to.length === 0) {
     log.warn({ customer: alert.customer }, 'no staff recipient for a registration alert');
     return;

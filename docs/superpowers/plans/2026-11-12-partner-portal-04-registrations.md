@@ -6541,7 +6541,7 @@ Rules this task implements (contracts H.7, H.19, G):
 - Reminders: the daily job `expiry-reminders` (05:00 UTC) finds `accepted` registrations whose `protection_end` is exactly 14 or exactly 3 days from today, writes an in-app notification and sends the email to the registrant plus the partner admins, and records `registration_reminders (registration_id, days_before, protection_end)` so a second run, a job restart or an overlap sends nothing twice. A granted extension changes `protection_end`, so the new date gets its own 14 and 3 day reminders. A day on which the job did not run loses that day's reminder (exact match, per the contracts).
 - The nightly job that sets `expired` and enqueues `registration.expire` is H4.8's `expireRegistrations`. It expires a registration only when `protection_end` is before today, so the end date itself is still protected, and the 3 day reminder always precedes expiry. The black box test below pins both facts without editing that file.
 
-- [ ] **Step 1: Write the failing repo tests**
+- [x] **Step 1: Write the failing repo tests**
 
 ```ts
 // src/server/repo/registrations.extension.test.ts
@@ -6706,7 +6706,7 @@ describe('reminder candidates', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/registrations.extension.test.ts`
 Expected: FAIL, "requestExtension is not a function".
 
-- [ ] **Step 2: Implement the four repo functions**
+- [x] **Step 2: Implement the four repo functions**
 
 Edit the import block of `src/server/repo/registrations.ts`: add `notExists` to the `drizzle-orm` import; add `registrationReminders` to the `@/db/schema` import; add `EXPIRY_REMINDER_DAYS`, `EXTENSION_DAYS` and `extendedEnd` to the `@/lib/deal-rules` import; add `ExtensionDecisionResult`, `ExtensionResult` and `ReminderCandidateDto` to the `@/lib/dto` type import; change the recipients import to `import { decisionRecipients, threadRecipients } from '@/server/registrations/recipients';`; add `import type { SystemActor } from '@/server/auth/types';` next to the existing `Viewer` import (one statement: `import type { SystemActor, Viewer } from '@/server/auth/types';`). Append before `const probeClock`:
 
@@ -6929,7 +6929,7 @@ export const isolation = defineIsolation<
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/registrations.extension.test.ts src/server/repo/isolation.test.ts`
 Expected: PASS, 10 tests in the extension file and the isolation matrix green.
 
-- [ ] **Step 3: Extract `staffRecipients` in `staff-alert.ts`**
+- [x] **Step 3: Extract `staffRecipients` in `staff-alert.ts`**
 
 Replace `src/server/registrations/staff-alert.ts` with:
 
@@ -6985,7 +6985,7 @@ export async function sendSubmissionAlert(alert: SubmissionAlert): Promise<void>
 }
 ```
 
-- [ ] **Step 4: Write the failing action tests**
+- [x] **Step 4: Write the failing action tests**
 
 ```ts
 // src/server/actions/extension.test.ts
@@ -7102,7 +7102,7 @@ describe('decideExtensionAction', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/extension.test.ts`
 Expected: FAIL, "Cannot find module './extension'".
 
-- [ ] **Step 5: Implement `src/server/actions/extension.ts`**
+- [x] **Step 5: Implement `src/server/actions/extension.ts`**
 
 ```ts
 // src/server/actions/extension.ts
@@ -7260,7 +7260,7 @@ export async function decideExtensionAction(raw: unknown): Promise<ActionResult<
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/extension.test.ts`
 Expected: PASS, 5 tests.
 
-- [ ] **Step 6: Write the failing job tests**
+- [x] **Step 6: Write the failing job tests**
 
 ```ts
 // src/server/jobs/expiry-reminders.test.ts
@@ -7368,7 +7368,7 @@ describe('with the nightly expiry job (H4.8, black box)', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs/expiry-reminders.test.ts`
 Expected: FAIL, `sendExpiryReminders` is not exported (the W0-c stub exports only `runExpiryReminders`).
 
-- [ ] **Step 7: Implement `src/server/jobs/expiry-reminders.ts`**
+- [x] **Step 7: Implement `src/server/jobs/expiry-reminders.ts`**
 
 ```ts
 // src/server/jobs/expiry-reminders.ts
@@ -7444,7 +7444,7 @@ export const runExpiryReminders = async (): Promise<void> => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs/expiry-reminders.test.ts`
 Expected: PASS, 6 tests.
 
-- [ ] **Step 8: Rewrite the approvals page to load the extension requests**
+- [x] **Step 8: Rewrite the approvals page to load the extension requests**
 
 Replace `src/app/admin/approvals/page.tsx` with:
 
@@ -7488,7 +7488,7 @@ export default async function Page(): Promise<React.JSX.Element> {
 }
 ```
 
-- [ ] **Step 9: Edit `AdminApprovals.tsx` for the extension requests**
+- [x] **Step 9: Edit `AdminApprovals.tsx` for the extension requests**
 
 Additions (new markup, existing classes only): a card "Extension requests" between the queue and Recent decisions, rendered only when there are requests, so a database with none looks exactly like the reviewed screen.
 
@@ -7597,7 +7597,7 @@ After:
       <section aria-labelledby="recentdec" className="card clip">
 ```
 
-- [ ] **Step 10: Edit `DealDetail.tsx` for the extension**
+- [x] **Step 10: Edit `DealDetail.tsx` for the extension**
 
 Edit 1, the import. Before: `import { requestExtension } from "@/data/deals";` After: `import { requestExtensionAction } from "@/server/actions/extension";` (keep it with the other `@/server/actions` import, after `postMessageAction`; Biome does not enforce order).
 
@@ -7691,7 +7691,7 @@ Manual check (seed-dev data; `PORTAL_JOBS_ENABLED=false` in `.env` so nothing ru
 - Decline path: request on Al Noor Logistics, then Decline: the status goes to `declined`, the request button comes back, no outbox row.
 - Reminders: `update registrations set protection_end = (current_date + 14)::text::date where customer_name = 'Tejas Health Network'` then run `pnpm --filter @cleanstart/portal exec tsx --env-file=.env -e "import('./src/server/jobs/expiry-reminders').then((m) => m.runExpiryReminders())"`. A "protection ends in 14 days" notification row exists for Aditi and for Karan, one `registration_reminders` row exists, and a second run adds nothing.
 
-- [ ] **Step 12: Commit**
+- [x] **Step 12: Commit**
 
 ```bash
 git add apps/portal/src/server/repo/registrations.ts apps/portal/src/server/repo/registrations.extension.test.ts \

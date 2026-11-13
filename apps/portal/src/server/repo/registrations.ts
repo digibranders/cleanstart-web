@@ -1,10 +1,11 @@
 import { randomUUID } from 'node:crypto';
-import { and, asc, desc, eq, gte, ilike, inArray, isNotNull, isNull, lte, ne, or, sql, type SQL } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, ilike, inArray, isNotNull, isNull, lte, ne, notExists, or, sql, type SQL } from 'drizzle-orm';
 import {
   partners,
   registrationContacts,
   registrationEvents,
   registrationMessages,
+  registrationReminders,
   registrations,
 } from '@/db/schema';
 import { type Clock, fixedClock } from '@/lib/clock';
@@ -12,6 +13,9 @@ import { normalizeDomain } from '@/lib/customer';
 import { addDays, fmtLong } from '@/lib/dates';
 import {
   EXPIRING_SOON_DAYS,
+  EXPIRY_REMINDER_DAYS,
+  EXTENSION_DAYS,
+  extendedEnd,
   isOverSla,
   protectionEndFor,
   RECENT_DECISION_DAYS,
@@ -32,15 +36,18 @@ import type {
   ApprovalRowDto,
   CustomerSuggestionDto,
   DecisionResult,
+  ExtensionDecisionResult,
+  ExtensionResult,
+  ReminderCandidateDto,
   RegistrationCheckDto,
   RegistrationDetailDto,
   RegistrationListItem,
 } from '@/lib/dto';
-import type { Viewer } from '@/server/auth/types';
+import type { SystemActor, Viewer } from '@/server/auth/types';
 import { ConflictError, ForbiddenError, NotFoundError, ValidationError } from '@/server/errors';
 import { computeChecks, loadDetails, selectRows, toListItem } from '@/server/registrations/mappers';
 import { isUniqueViolation } from '@/server/registrations/pg-errors';
-import { decisionRecipients } from '@/server/registrations/recipients';
+import { decisionRecipients, threadRecipients } from '@/server/registrations/recipients';
 import { assertUuid, registrationScope } from '@/server/registrations/scope';
 import { assertStaff, type Tx } from './context';
 import { defineIsolation } from './isolation.registry';
@@ -602,12 +609,166 @@ export async function conflictInputs(tx: Tx, viewer: Viewer, input: { registrati
   }));
 }
 
+const MAX_EXTENSION_REASON = 1000;
+
+/** Partner. Accepted only, once (MAX_EXTENSIONS). Throws ConflictError('extension_already_used'). */
+export async function requestExtension(
+  tx: Tx,
+  viewer: Viewer,
+  input: { id: string; reason: string },
+  clock: Clock,
+): Promise<ExtensionResult> {
+  const reason = input.reason.trim();
+  if (!reason) throw new ValidationError([{ path: 'reason', message: 'Tell CleanStart why you need more time.' }]);
+  if (reason.length > MAX_EXTENSION_REASON) {
+    throw new ValidationError([{ path: 'reason', message: `Keep it under ${MAX_EXTENSION_REASON} characters.` }]);
+  }
+  const current = await lockRegistration(tx, viewer, input.id);
+  if (current.status !== 'accepted') throw new ConflictError('not_accepted', 'Only an accepted registration can be extended.');
+  if (current.extensionStatus === 'requested') {
+    throw new ConflictError('extension_already_used', 'An extension for this registration is already waiting for a decision.');
+  }
+  if (current.extensionStatus === 'granted') {
+    throw new ConflictError('extension_already_used', 'This registration already had its one extension.');
+  }
+  const now = clock.now();
+  await tx
+    .update(registrations)
+    .set({ extensionStatus: 'requested', extensionRequestedAt: now, extensionReason: reason, extensionGrantedAt: null, extensionDays: null })
+    .where(eq(registrations.id, current.id));
+  await tx.insert(registrationEvents).values({
+    registrationId: current.id,
+    at: now,
+    text: `Extension requested: ${reason}`,
+    byLabel: viewer.name,
+    source: 'portal',
+  });
+  const registration = await getRegistration(tx, viewer, current.id);
+  return { registration, partnerName: registration.partnerName, managerUserId: registration.managerId };
+}
+
+/**
+ * Staff. Needs extension_status 'requested' (else ConflictError('extension_not_requested')). Granting adds
+ * EXTENSION_DAYS to protection_end; the action enqueues registration.update_end with version newProtectionEnd.
+ */
+export async function decideExtension(
+  tx: Tx,
+  viewer: Viewer,
+  input: { id: string; decision: 'grant' | 'decline'; note: string | null },
+  clock: Clock,
+): Promise<ExtensionDecisionResult> {
+  assertStaff(viewer);
+  const current = await lockRegistration(tx, viewer, input.id);
+  if (current.extensionStatus !== 'requested') {
+    throw new ConflictError('extension_not_requested', 'There is no extension request to decide.');
+  }
+  const note = input.note?.trim() || null;
+  const suffix = note ? `: ${note}` : '';
+  const now = clock.now();
+  let newProtectionEnd: string | null = null;
+  if (input.decision === 'grant') {
+    if (current.status !== 'accepted' || !current.protectionEnd) {
+      throw new ConflictError('not_accepted', 'Only an accepted registration can be extended.');
+    }
+    newProtectionEnd = extendedEnd(current.protectionEnd);
+    await tx
+      .update(registrations)
+      .set({ protectionEnd: newProtectionEnd, extensionStatus: 'granted', extensionGrantedAt: now, extensionDays: EXTENSION_DAYS })
+      .where(eq(registrations.id, current.id));
+    await tx.insert(registrationEvents).values({
+      registrationId: current.id,
+      at: now,
+      text: `Extension granted, protected until ${fmtLong(newProtectionEnd)}${suffix}`,
+      byLabel: viewer.name,
+      source: 'portal',
+    });
+  } else {
+    await tx.update(registrations).set({ extensionStatus: 'declined' }).where(eq(registrations.id, current.id));
+    await tx.insert(registrationEvents).values({
+      registrationId: current.id,
+      at: now,
+      text: `Extension declined${suffix}`,
+      byLabel: viewer.name,
+      source: 'portal',
+    });
+  }
+  const registration = await getRegistration(tx, viewer, current.id);
+  const recipientUserIds = await decisionRecipients(tx, { partnerId: registration.partnerId, registeredById: registration.registeredById });
+  return { registration, partnerName: registration.partnerName, granted: input.decision === 'grant', newProtectionEnd, recipientUserIds };
+}
+
+/**
+ * Public (system actor, jobs/expiry-reminders.ts, M2.4). Accepted registrations whose protection ends in exactly
+ * 14 or 3 days from today and that have no registration_reminders row for (id, daysBefore, protectionEnd).
+ */
+export async function listReminderCandidates(tx: Tx, _actor: SystemActor, clock: Clock): Promise<ReminderCandidateDto[]> {
+  const today = clock.today();
+  const candidates: ReminderCandidateDto[] = [];
+  for (const daysBefore of EXPIRY_REMINDER_DAYS) {
+    const end = addDays(today, daysBefore);
+    const rows = await tx
+      .select({
+        id: registrations.id,
+        customer: registrations.customerName,
+        product: registrations.product,
+        partnerId: registrations.partnerId,
+        registeredBy: registrations.registeredBy,
+      })
+      .from(registrations)
+      .where(
+        and(
+          eq(registrations.status, 'accepted'),
+          eq(registrations.protectionEnd, end),
+          notExists(
+            tx
+              .select({ one: sql`1` })
+              .from(registrationReminders)
+              .where(
+                and(
+                  eq(registrationReminders.registrationId, registrations.id),
+                  eq(registrationReminders.daysBefore, daysBefore),
+                  eq(registrationReminders.protectionEnd, end),
+                ),
+              ),
+          ),
+        ),
+      )
+      .orderBy(asc(registrations.createdAt), asc(registrations.id));
+    for (const row of rows) {
+      candidates.push({
+        registrationId: row.id,
+        customer: row.customer,
+        product: row.product,
+        partnerId: row.partnerId,
+        protectionEnd: end,
+        daysBefore,
+        recipientUserIds: await threadRecipients(tx, { partnerId: row.partnerId, registeredById: row.registeredBy }),
+      });
+    }
+  }
+  return candidates;
+}
+
+/** Public. Inserts the registration_reminders row. Idempotent. */
+export async function markReminderSent(
+  tx: Tx,
+  _actor: SystemActor,
+  input: { registrationId: string; daysBefore: number; protectionEnd: string },
+  clock: Clock,
+): Promise<void> {
+  await tx
+    .insert(registrationReminders)
+    .values({ registrationId: input.registrationId, daysBefore: input.daysBefore, protectionEnd: input.protectionEnd, sentAt: clock.now() })
+    .onConflictDoNothing();
+}
+
 const probeClock = fixedClock('2026-11-06T14:02:00Z');
 
 export const isolation = defineIsolation<
   | 'listRegistrations' | 'getRegistration' | 'lockRegistration' | 'createRegistrations' | 'resubmitRegistration'
   | 'customerSuggestions' | 'acceptRegistration' | 'rejectRegistration' | 'undoDecision' | 'conflictChecks'
-  | 'listApprovalQueue' | 'countWaiting' | 'conflictInputs'
+  | 'listApprovalQueue' | 'countWaiting' | 'conflictInputs' | 'requestExtension' | 'decideExtension'
+  | 'listReminderCandidates' | 'markReminderSent'
 >({
   listRegistrations: {
     scope: 'tenant',
@@ -646,4 +807,16 @@ export const isolation = defineIsolation<
   listApprovalQueue: { scope: 'staff-only', expect: 'forbidden', probe: (tx, viewer) => listApprovalQueue(tx, viewer, { scope: 'all' }, probeClock) },
   countWaiting: { scope: 'staff-only', expect: 'forbidden', probe: (tx, viewer) => countWaiting(tx, viewer) },
   conflictInputs: { scope: 'staff-only', expect: 'forbidden', probe: (tx, viewer, ctx) => conflictInputs(tx, viewer, { registrationIds: [ctx.b.registrationId] }) },
+  requestExtension: {
+    scope: 'tenant',
+    expect: 'not_found',
+    probe: (tx, viewer, ctx) => requestExtension(tx, viewer, { id: ctx.b.registrationId, reason: 'isolation probe' }, probeClock),
+  },
+  decideExtension: {
+    scope: 'staff-only',
+    expect: 'forbidden',
+    probe: (tx, viewer, ctx) => decideExtension(tx, viewer, { id: ctx.b.registrationId, decision: 'grant', note: null }, probeClock),
+  },
+  listReminderCandidates: { scope: 'public', reason: 'Takes a SystemActor and is called only by jobs/expiry-reminders.ts through withSystem.' },
+  markReminderSent: { scope: 'public', reason: 'Takes a SystemActor and is called only by jobs/expiry-reminders.ts through withSystem.' },
 });
