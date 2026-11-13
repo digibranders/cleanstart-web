@@ -3456,7 +3456,7 @@ How the suite runs (decisions, all recorded in `playwright.config.ts`):
 - The Apply step needs outbound HTTPS to `challenges.cloudflare.com` (the Turnstile widget and its check). That is the only external call.
 - Local only: `localhost`, never `127.0.0.1` (a dev server reached by IP does not hydrate).
 
-- [ ] **Step 1: Dependencies, scripts, gitignore, database**
+- [x] **Step 1: Dependencies, scripts, gitignore, database**
 
 ```bash
 pnpm --filter @cleanstart/portal add -D @axe-core/playwright@^4.11.3
@@ -3477,7 +3477,7 @@ lsof -nP -iTCP:3290 -sTCP:LISTEN
 
 Edit `apps/portal/tsconfig.json`: add `"e2e/**/*.ts"` and `"playwright.config.ts"` to the `include` array (exact edit: `".next/types/**/*.ts"]` becomes `".next/types/**/*.ts", "e2e/**/*.ts", "playwright.config.ts"]`). Check: `grep -n '"include"' apps/portal/tsconfig.json`.
 
-- [ ] **Step 2: Environment and database helpers**
+- [x] **Step 2: Environment and database helpers**
 
 `env.ts` is imported by the config, the global setup and every spec, so the test process, the app's modules it imports and the dev server all see the same database and fakes. It removes (never blanks) every variable that would make the app contact a real service, because an empty string fails env validation.
 
@@ -3639,7 +3639,7 @@ export async function auditCount(): Promise<number> {
 }
 ```
 
-- [ ] **Step 3: HubSpot and UI helpers**
+- [x] **Step 3: HubSpot and UI helpers**
 
 `hubspot.ts` plays the scheduler. `drainOutboxNow` runs the real outbox drain; a handler that waits for a related record reschedules itself a minute out, so later passes use a clock two minutes ahead. Signatures are the HubSpot plan's: `buildHandlers(db, hs, pipelineId, clock?)`, `drainOutbox({ db, handlers, clock })`, `pollDeals({ db, hs, pipelineId, clock })`.
 
@@ -3753,7 +3753,7 @@ export const acceptButton = (page: Page, customer: string, partner: string) =>
   page.getByRole('button', { name: `Accept ${customer} from ${partner}` });
 ```
 
-- [ ] **Step 4: Global setup and config**
+- [x] **Step 4: Global setup and config**
 
 The global setup migrates the e2e database exactly as production does (the contracts' `migrateDatabase`: Drizzle migrations, then `rls.sql`), seeds it and signs every persona in once, saving a session file per persona. Playwright starts the dev server before it runs.
 
@@ -3846,7 +3846,7 @@ export default defineConfig({
 });
 ```
 
-- [ ] **Step 5: Verify that specs can import the app's modules** (the one thing this plan could not assume)
+- [x] **Step 5: Verify that specs can import the app's modules** (the one thing this plan could not assume)
 
 A temporary probe checks that Playwright's TypeScript loader resolves the `@/` paths, that the contracts' `testDb()` reaches the e2e database, and that the support files load. It uses its own config, so no server or setup runs.
 
@@ -3878,13 +3878,13 @@ Expected: `1 passed`. The same probe passed in the scratch harness with Playwrig
 
 **Verify (fallback):** if `@/` imports fail, `testDb()` ignores `PORTAL_TEST_DATABASE_URL`, or the HubSpot modules throw on import, do not rewrite the helpers. Make `e2e/support/db.ts` build its own pool and Drizzle client from `process.env.DATABASE_URL` (`new Pool({ connectionString, options: '-c app.kind=system' })` and `drizzle(pool, { schema })`), import the repo, HubSpot and invite modules by relative path (`../../src/...`), and record the change in the progress log. The specs themselves stay as written.
 
-- [ ] **Step 6: Delete the probe**
+- [x] **Step 6: Delete the probe**
 
 ```bash
 rm apps/portal/e2e/probe.spec.ts apps/portal/e2e/probe.config.ts
 ```
 
-- [ ] **Step 7: The lifecycle spec (failing first)**
+- [x] **Step 7: The lifecycle spec (failing first)**
 
 `journey.spec.ts` is one serial run with each actor in their own browser context: a company applies and sees its `APP-YYMM-NNNN` reference; the partner manager approves it (the partner exists with status `onboarding`); the invited person accepts the invite and the agreement and is signed in (the test also accepts a redirect to `/sign-in`, which P's flow may use); the partner registers a deal; staff accept it and protection starts; the outbox drain creates exactly one HubSpot deal and stores its id; a stage change made in the fake is applied by the poll and shown on the partner's deal page; the audit log shows approval, acceptance and the stage change. A last test checks that a partner cannot open `/admin/audit`.
 
@@ -4041,7 +4041,7 @@ test.describe('@portal sign in', () => {
 Run: `pnpm --filter @cleanstart/portal exec playwright test e2e/journey.spec.ts --project=desktop`
 Expected before the screens match the selectors: FAIL at the first step that names a label that differs. Expected once they match: `8 passed`.
 
-- [ ] **Step 8: The documents spec**
+- [x] **Step 8: The documents spec**
 
 An outsider and a missing id get byte-identical 404s; the library never lists the restricted document for the outsider; the audience partner is redirected to a link that expires in at most 60 seconds and no response contains a storage key; a signed out request never reaches storage.
 
@@ -4109,7 +4109,7 @@ test.describe('@portal documents', () => {
 Run: `pnpm --filter @cleanstart/portal exec playwright test e2e/documents.spec.ts --project=desktop`
 Expected: `5 passed`.
 
-- [ ] **Step 9: The audit log and search spec**
+- [x] **Step 9: The audit log and search spec**
 
 ```ts
 import { readFile } from 'node:fs/promises';
@@ -4189,7 +4189,7 @@ test.describe('@portal search', () => {
 Run: `pnpm --filter @cleanstart/portal exec playwright test e2e/admin.spec.ts --project=desktop`
 Expected: `4 passed` (needs CCR-3 merged for the two search tests).
 
-- [ ] **Step 10: The security and accessibility specs**
+- [x] **Step 10: The security and accessibility specs**
 
 `security.spec.ts` checks the headers on real responses and proves the policy does not block the app: the browser reports every blocked resource as a `securitypolicyviolation` event and none may occur across the signed out pages, the partner admin pages, the palette and the manager pages. (It passes fully only after M5.1 installs the policy; until then its first group fails, which is the point of writing it here.) `a11y.spec.ts` runs axe (WCAG 2.0 and 2.1, A and AA) on every route as the role that uses it, at desktop width and, through the `mobile` project, at 393 px, failing on serious and critical violations and attaching the rest; then three keyboard tests: the palette (focus in, Tab stays inside, Escape returns focus), a drawer (focus trap, Escape, focus return) and a Tab walk over the deals page that compares each stop's paint with and without focus, so an element with no visible indicator fails.
 
@@ -4412,7 +4412,7 @@ test.describe('@a11y keyboard', () => {
 });
 ```
 
-- [ ] **Step 11: Run the whole suite and sweep the selectors**
+- [x] **Step 11: Run the whole suite and sweep the selectors**
 
 ```bash
 pnpm --filter @cleanstart/portal exec playwright test
@@ -4420,7 +4420,7 @@ pnpm --filter @cleanstart/portal exec playwright test
 
 Expected counts: desktop 45 tests (journey 8, documents 5, admin 4, security 6, axe 19, keyboard 3) and mobile 19 (axe only), 64 in total. The `security` headers tests and the `a11y` failures that M5.1 and M5.2 fix are allowed to fail at this point; every other failure is a selector or a real defect. For a selector failure, open the trace (`pnpm exec playwright show-report`), correct the label in `e2e/support/ui.ts` only, and rerun the file. For a real defect, fix it in the file that owns it if it is inside this plan's scope, otherwise append a `blocked` line naming the owner and the symptom. Do not weaken an assertion to make a test pass.
 
-- [ ] **Step 12: Gate A and commit**
+- [x] **Step 12: Gate A and commit**
 
 Run the standard Gate A block (its `typecheck` now includes `e2e/**` and `playwright.config.ts`), then `pnpm --filter @cleanstart/portal exec playwright test` once more, then Gate B, then:
 
