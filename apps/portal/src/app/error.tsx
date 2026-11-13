@@ -17,6 +17,7 @@ export default function ErrorPage({
 
   return (
     <main className="public state-page">
+      <title>Something went wrong | CleanStart Partner Portal</title>
       <div className="state-card">
         <span className="state-code">Something went wrong</span>
         <h1 className="state-h">This screen could not load</h1>

@@ -205,7 +205,7 @@ export function Deals({ deals, today, partnerManager, senderEmail }: DealsProps)
                 <tbody>
                   {rows.map((d) => (
                     <tr key={d.id}>
-                      <td>
+                      <td style={{ whiteSpace: "normal" }}>
                         {d.status === "rejected" ? (
                           <button type="button" className="cust linkbtn" onClick={() => setRejectedId(d.id)}>
                             <CustomerMark name={d.customer} />

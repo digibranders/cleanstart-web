@@ -23,7 +23,7 @@ describe('buildOverviewKpis', () => {
       wonThisYear: { count: 2, customers: ['Indus Paytech', 'Kaveri Biotech'] },
     }));
     expect(kpis).toEqual([
-      { label: 'Waiting', value: '2', foot: 'Oldest 3 days', cls: '' },
+      { label: 'Pending', value: '2', foot: 'Oldest 3 days', cls: '' },
       { label: 'Protected', value: '3', foot: '2 CleanSight, 1 Libraries', cls: '' },
       { label: 'Expiring in 14 days', value: '1', foot: 'Tejas Health Network', cls: 't-amber' },
       { label: 'Won this year', value: '2', foot: 'Indus Paytech, Kaveri Biotech', cls: '' },
@@ -32,7 +32,7 @@ describe('buildOverviewKpis', () => {
 
   it('says so when there is nothing', () => {
     expect(buildOverviewKpis(overview({})).map((k) => [k.value, k.foot, k.cls])).toEqual([
-      ['0', 'Nothing waiting', ''], ['0', 'None yet', ''], ['0', 'None', ''], ['0', 'None yet', ''],
+      ['0', 'Nothing pending', ''], ['0', 'None yet', ''], ['0', 'None', ''], ['0', 'None yet', ''],
     ]);
     expect(buildOverviewKpis(overview({ waiting: { count: 1, oldestDays: 1 } }))[0]?.foot).toBe('Oldest 1 day');
   });

@@ -39,19 +39,18 @@ export function IntegrationHealthCard({
   return (
     <section aria-label="HubSpot sync" className="card kpis">
       <div className="kpi">
-        <span className="kpi-l">Waiting to send</span>
+        <span className="kpi-l">Sync queue</span>
         <span className="kpi-v">{health.pending}</span>
-        <span className="kpi-f">Changes queued for HubSpot</span>
-      </div>
-      <div className="kpi">
-        <span className="kpi-l">Failed</span>
-        <span className={`kpi-v${health.failed > 0 ? ' t-amber' : ''}`}>{health.failed}</span>
         {health.failed > 0 ? (
-          <button type="button" className="linkbtn" onClick={retry} disabled={retrying} style={{ alignSelf: 'flex-start' }}>
-            {retrying ? 'Retrying' : 'Retry failed syncs'}
-          </button>
+          <span className="kpi-f">
+            <span className="t-amber">{health.failed} failed</span>
+            {', '}
+            <button type="button" className="linkbtn" onClick={retry} disabled={retrying} aria-label="Retry failed syncs">
+              {retrying ? 'Retrying' : 'Retry'}
+            </button>
+          </span>
         ) : (
-          <span className="kpi-f">Nothing stuck</span>
+          <span className="kpi-f">Waiting to send, none failed</span>
         )}
       </div>
       <div className="kpi">
@@ -59,13 +58,14 @@ export function IntegrationHealthCard({
         <span className="kpi-v" style={{ fontSize: 14 }}>
           {health.lastPollAt ? fmtTimestamp(health.lastPollAt.toISOString(), today) : 'Never'}
         </span>
-        <span className="kpi-f">Checked every 5 minutes</span>
+        <span className="kpi-f">{health.lastPollAt ? 'Checked every 5 minutes' : 'No check has run yet'}</span>
       </div>
       <div className="kpi">
         <span className="kpi-l">Last error</span>
         <span className="kpi-v" style={{ fontSize: 13, fontWeight: 600, overflowWrap: 'anywhere' }}>
           {health.lastError ?? 'None'}
         </span>
+        <span className="kpi-f">{health.lastError ? 'Most recent sync problem' : 'No problems recorded'}</span>
       </div>
     </section>
   );

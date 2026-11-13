@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { settleAuth } from "@/lib/auth-call";
 import { authClient } from "@/lib/auth-client";
 import type { NotificationsDto, ShellDto } from "@/lib/dto";
@@ -103,6 +103,7 @@ export function Shell({
   const [pop, setPop] = useState<"help" | "notes" | null>(null);
   const [msg, setMsg] = useState<{ subject: string; body: string; tried: boolean } | null>(null);
   const [sending, setSending] = useState(false);
+  const msgBodyRef = useRef<HTMLTextAreaElement>(null);
 
   // close transient UI on navigation
   // biome-ignore lint/correctness/useExhaustiveDependencies: pathname is the trigger
@@ -478,6 +479,7 @@ export function Shell({
           subtitle={`Your CleanStart partner manager, ${me.manager.team.replace("CleanStart ", "")}. Replies come to your email.`}
           lead={<span className="av av-2">{me.manager.initials}</span>}
           onSubmit={sendMessage}
+          initialFocus={msgBodyRef}
           footer={
             <>
               <span className="hint">Sent from {shell.viewerEmail}</span>
@@ -509,6 +511,7 @@ export function Shell({
             </label>
             <textarea
               id="msg-b"
+              ref={msgBodyRef}
               className={`field${msg?.tried && !msg.body.trim() ? " field-err" : ""}`}
               rows={8}
               value={msg?.body ?? ""}

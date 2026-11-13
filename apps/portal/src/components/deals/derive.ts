@@ -3,7 +3,7 @@ import { sameCustomer } from "@/lib/customer";
 import { acceptedOnFor, EXPIRING_SOON_DAYS, isOverSla, REVIEW_SLA_BUSINESS_DAYS, waitingBusinessDays } from "@/lib/deal-rules";
 import { DEAL_REGIONS, type DealRegion, PARTNER_REGION_LABEL, PRODUCT_LABEL, type Product, type RegistrationStatus } from "@/lib/domain";
 import type { ManagerOptionDto, RegistrationCheckDto, RegistrationListItem } from "@/lib/dto";
-import { daysLeft, fmtLong, fmtShort, plural } from "./dates";
+import { daysLeft, daysLeftLabel, fmtLong, fmtShort, plural } from "./dates";
 import type { HubspotHintDto } from "./types";
 
 export { sameCustomer };
@@ -72,7 +72,7 @@ export function protectionView(deal: ProtectionInput, mode: "deals" | "overview"
       const days = waitDays(deal, today);
       const late = isOverTarget(deal, today);
       return {
-        until: days === 0 ? "Sent today" : `Waiting ${plural(days, "day")}`,
+        until: days === 0 ? "Sent today" : `Pending ${plural(days, "day")}`,
         left: mode === "deals" && late ? `over ${OVER_TARGET_DAYS}-day target` : "",
         cls: late ? "t-amber" : "t-muted",
       };
@@ -81,7 +81,7 @@ export function protectionView(deal: ProtectionInput, mode: "deals" | "overview"
       const end = deal.protectionEnd;
       if (!end) return { until: "", left: "", cls: "t-ink" };
       const days = daysLeft(end, today);
-      return { until: fmtLong(end), left: `${days}d`, cls: days <= EXPIRING_SOON_DAYS ? "t-amber" : "t-ink" };
+      return { until: fmtLong(end), left: daysLeftLabel(days), cls: days <= EXPIRING_SOON_DAYS ? "t-amber" : "t-ink" };
     }
     case "won":
     case "lost":

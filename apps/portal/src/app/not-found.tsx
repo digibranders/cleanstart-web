@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { backLink } from "./not-found-link";
+
+export const metadata: Metadata = { title: "Page not found" };
 
 export default async function NotFound(): Promise<React.JSX.Element> {
   const back = await backLink();

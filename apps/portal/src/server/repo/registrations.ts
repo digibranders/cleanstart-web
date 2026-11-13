@@ -156,7 +156,7 @@ async function resolveManager(
   const options = await listManagerOptions(tx, viewer);
   if (requested) {
     if (!options.some((o) => o.id === requested)) {
-      throw new ValidationError([{ path: 'managerId', message: 'Pick one of the listed account managers.' }]);
+      throw new ValidationError([{ path: 'managerId', message: 'Pick one of the listed partner managers.' }]);
     }
     return requested;
   }

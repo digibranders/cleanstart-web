@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Icon } from "@/components/icon";
 import { Avatar } from "@/components/ui/badge";
 import { Drawer } from "@/components/ui/overlay";
@@ -25,6 +25,7 @@ export function MessageDrawer({ open, onClose, manager, team, subject, from }: M
   const [subjectText, setSubjectText] = useState(subject);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
   const invalid = tried && !body.trim();
 
   const close = (): void => {
@@ -57,6 +58,7 @@ export function MessageDrawer({ open, onClose, manager, team, subject, from }: M
       open={open}
       onClose={close}
       onSubmit={send}
+      initialFocus={bodyRef}
       title={`Message ${manager}`}
       subtitle={`Your CleanStart partner manager, ${team}. Replies come to your email.`}
       lead={<Avatar initials={initialsOf(manager)} />}
@@ -91,6 +93,7 @@ export function MessageDrawer({ open, onClose, manager, team, subject, from }: M
         </label>
         <textarea
           id="co-msg-b"
+          ref={bodyRef}
           className={`field${invalid ? " field-err" : ""}`}
           rows={8}
           value={body}
