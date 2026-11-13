@@ -93,14 +93,19 @@ export function Shell({
       return;
     }
     setSending(true);
-    const result = await sendManagerMessageAction({ subject: msg.subject, body: msg.body });
-    setSending(false);
-    if (!result.ok) {
-      toast(result.error.issues?.[0]?.message ?? result.error.message);
-      return;
+    try {
+      const result = await sendManagerMessageAction({ subject: msg.subject, body: msg.body });
+      if (!result.ok) {
+        toast(result.error.issues?.[0]?.message ?? result.error.message);
+        return;
+      }
+      setMsg(null);
+      toast(`Message sent to ${result.data.managerName}`);
+    } catch {
+      toast("Could not reach the server. Check your connection and try again.");
+    } finally {
+      setSending(false);
     }
-    setMsg(null);
-    toast(`Message sent to ${result.data.managerName}`);
   };
 
   const countFor = (item: NavItem): string => (item.count === "approvals" && waiting > 0 ? String(waiting) : "");
