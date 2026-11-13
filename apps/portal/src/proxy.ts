@@ -1,3 +1,4 @@
+import { createHash, timingSafeEqual } from "node:crypto";
 import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
 import { PATH_HEADER } from "@/lib/next-path";
@@ -14,6 +15,11 @@ function basicPassword(header: string | null): string | null {
   }
 }
 
+/** Constant time compare: equal length SHA-256 digests, so neither the content nor the length of the password leaks. */
+function sameSecret(a: string, b: string): boolean {
+  return timingSafeEqual(createHash("sha256").update(a).digest(), createHash("sha256").update(b).digest());
+}
+
 /**
  * Optional shared-password gate for the hosted review copy. Active only when
  * PORTAL_REVIEW_PASSWORD is set, so local development stays open. Removed with the mock in M5.4.
@@ -22,7 +28,8 @@ function basicPassword(header: string | null): string | null {
 function reviewGate(request: NextRequest): NextResponse | null {
   const password = process.env.PORTAL_REVIEW_PASSWORD;
   if (!password) return null;
-  if (basicPassword(request.headers.get("authorization")) === password) return null;
+  const supplied = basicPassword(request.headers.get("authorization"));
+  if (supplied !== null && sameSecret(supplied, password)) return null;
   return new NextResponse("Password required.", {
     status: 401,
     headers: { "WWW-Authenticate": 'Basic realm="CleanStart partner portal review"' },

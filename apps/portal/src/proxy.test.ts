@@ -78,6 +78,14 @@ describe("review gate", () => {
     expect(proxy(request("/sign-in", { authorization: "Basic %%%not-base64%%%" })).status).toBe(401);
   });
 
+  it("compares the password by digest: an equal length near miss and a longer string are refused", () => {
+    vi.stubEnv("PORTAL_REVIEW_PASSWORD", "let-me-in");
+    expect(proxy(request("/sign-in", { authorization: basic("let-me-iN") })).status).toBe(401);
+    expect(proxy(request("/sign-in", { authorization: basic("let-me-in!") })).status).toBe(401);
+    expect(proxy(request("/sign-in", { authorization: basic("") })).status).toBe(401);
+    expect(proxy(request("/sign-in", { authorization: basic("let-me-in") })).status).toBe(200);
+  });
+
   it("leaves /api/health open while the gate is on, for the container health check", () => {
     vi.stubEnv("PORTAL_REVIEW_PASSWORD", "let-me-in");
     expect(proxy(request("/api/health")).status).toBe(200);

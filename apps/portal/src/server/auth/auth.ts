@@ -39,7 +39,7 @@ const NEW_PASSWORD_PATHS = new Set(['/reset-password', '/change-password']);
 const REFUSAL_HASH: Promise<string> = hashPassword(randomBytes(32).toString('hex'));
 
 async function spendVerifyTime(password: unknown): Promise<void> {
-  await verifyPassword({ hash: await REFUSAL_HASH, password: typeof password === 'string' ? password : '' });
+  await verifyPassword({ hash: await REFUSAL_HASH, password: typeof password === 'string' ? password.slice(0, 256) : '' });
 }
 
 /**

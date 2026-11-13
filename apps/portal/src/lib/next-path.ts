@@ -7,8 +7,9 @@ const ORIGIN = 'https://portal.invalid';
 
 /**
  * The same-site path to return to after sign in, or null. Anything that resolves to another origin
- * (`//evil.com`, `/\evil.com`, `https://evil.com`, `javascript:`), the sign in page itself (a loop) and the
- * API are refused. The result is the parsed path and query, never the raw input.
+ * (`//evil.com`, `/\evil.com`, `https://evil.com`, `javascript:`), the sign in page itself in any case or
+ * trailing form (a loop), a result that starts with `//` or holds a backslash, and the API are refused.
+ * The result is the parsed path and query, never the raw input.
  */
 export function safeNext(value: string | null | undefined): string | null {
   if (!value || value.length > 500 || !value.trimStart().startsWith('/')) return null;
@@ -19,6 +20,10 @@ export function safeNext(value: string | null | undefined): string | null {
     return null;
   }
   if (url.origin !== ORIGIN) return null;
-  if (url.pathname === ROUTES.signIn || url.pathname.startsWith('/api/')) return null;
-  return `${url.pathname}${url.search}`;
+  const folded = url.pathname.toLowerCase().replace(/\/+$/, '');
+  if (folded === ROUTES.signIn || folded.startsWith(`${ROUTES.signIn}/`) || url.pathname.startsWith('/api/')) return null;
+  const path = `${url.pathname}${url.search}`;
+  // Dot segments can collapse `/..//host` to `//host`, a protocol relative URL once it reaches a redirect.
+  if (path.startsWith('//') || path.includes('\\')) return null;
+  return path;
 }
