@@ -291,7 +291,7 @@ export function Apply({ turnstileSiteKey }: { turnstileSiteKey: string }): React
         </div>
         <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: "#6B687D" }}>
           We use these details only to review your application.{" "}
-          <a href="https://www.cleanstart.com/privacy-policy" target="_blank" rel="noreferrer noopener">
+          <a href="https://www.cleanstart.com/privacy-policy" target="_blank" rel="noreferrer noopener" style={{ textDecoration: "underline" }}>
             Privacy policy
           </a>
         </p>

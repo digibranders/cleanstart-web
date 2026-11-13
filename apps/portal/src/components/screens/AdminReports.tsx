@@ -22,6 +22,7 @@ import {
   type ReportSort,
 } from '@/lib/report-view';
 import { ROUTES } from '@/lib/routes';
+import { ScrollRegion } from "@/components/ui/scroll-region";
 
 interface AdminReportsProps {
   report: AdminReportsDto;
@@ -117,7 +118,7 @@ export function AdminReports({ report, today }: AdminReportsProps): React.JSX.El
             />
           </div>
         </div>
-        <div style={{ overflowX: 'auto' }}>
+        <ScrollRegion label="Partner report">
           <table className="tbl">
             <thead>
               <tr>
@@ -183,7 +184,7 @@ export function AdminReports({ report, today }: AdminReportsProps): React.JSX.El
               </button>
             </div>
           ) : null}
-        </div>
+        </ScrollRegion>
       </section>
 
       <div className="row">

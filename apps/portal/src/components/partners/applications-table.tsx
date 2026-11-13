@@ -16,6 +16,7 @@ import type { ApplicationDto } from "@/lib/dto";
 import { codeFromLabel } from "@/lib/people";
 import { PartnerCategoryBadge } from "./badges";
 import { Seg } from "./seg";
+import { ScrollRegion } from "@/components/ui/scroll-region";
 
 const DEFAULT_REASON = "We already have a partner covering this region and segment.";
 const CATEGORY_OPTIONS: readonly string[] = PARTNER_CATEGORIES.map((c) => PARTNER_CATEGORY_LABEL[c]);
@@ -117,7 +118,7 @@ export function ApplicationsTable({
         </span>
         <span className="card-meta tnum">{waiting} waiting</span>
       </div>
-      <div style={{ overflowX: "auto" }}>
+      <ScrollRegion label="Applications">
         <table className="tbl">
           <thead>
             <tr>
@@ -302,7 +303,7 @@ export function ApplicationsTable({
           </tbody>
         </table>
         {applications.length === 0 ? <div className="empty">No applications yet.</div> : null}
-      </div>
+      </ScrollRegion>
       <div style={{ padding: "10px 12px", borderTop: "1px solid #F0EFF4" }}>
         <span className="hint">
           Approving creates the partner company, makes the applicant its partner admin, and emails them an invite to

@@ -11,6 +11,7 @@ import type { AudiencePartnerDto } from '@/lib/document-upload';
 import { DOCUMENT_TYPE_LABEL } from '@/lib/domain';
 import type { DocumentDto } from '@/lib/dto';
 import { audienceLabel, formatLabel } from '@/server/files/rules';
+import { ScrollRegion } from "@/components/ui/scroll-region";
 
 export function AdminDocuments({
   docs,
@@ -65,7 +66,7 @@ export function AdminDocuments({
             </h2>
             <span className="card-meta">Newest first</span>
           </div>
-          <div style={{ overflowX: 'auto' }}>
+          <ScrollRegion label="Document library">
             <table className="tbl">
               <thead>
                 <tr>
@@ -122,7 +123,7 @@ export function AdminDocuments({
             {docs.length === 0 ? (
               <div className="empty">No documents yet. Upload the first one.</div>
             ) : null}
-          </div>
+          </ScrollRegion>
         </section>
       </div>
 

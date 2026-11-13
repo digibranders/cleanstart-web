@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useState } from "react";
 import { Icon } from "../icon";
+import { Scrim } from "./scrim";
 
 export interface DropdownOption {
   value: string;
@@ -62,7 +63,8 @@ export function Dropdown({
       </button>
       {open ? (
         <>
-          <div className="dd-scrim" onClick={() => setOpen(false)} aria-hidden="true" />
+          <Scrim className="dd-scrim" onClose={() => setOpen(false)} />
+          {/* biome-ignore lint/a11y/useFocusableInteractive: the options are buttons and focusable; the list itself is not a tab stop */}
           <div className="dd-menu" role="listbox" aria-labelledby={triggerId}>
             {items.map((o) => (
               <button

@@ -16,6 +16,7 @@ import { Icon } from "../icon";
 import { ProductChip } from "../ui/badge";
 import { Dropdown } from "../ui/dropdown";
 import { useToast } from "../ui/toast";
+import { ScrollRegion } from "@/components/ui/scroll-region";
 
 const TABS = ["All", "Pending", "Accepted", "Rejected", "Expired", "Won", "Lost"] as const;
 type Tab = (typeof TABS)[number];
@@ -161,7 +162,7 @@ export function Deals({ deals, today, partnerManager, senderEmail }: DealsProps)
             </span>
           </span>
         </div>
-        <div style={{ overflowX: "auto" }}>
+        <ScrollRegion label="Registrations">
           <table className="tbl">
             <thead>
               <tr>
@@ -211,7 +212,7 @@ export function Deals({ deals, today, partnerManager, senderEmail }: DealsProps)
             </tbody>
           </table>
           {rows.length === 0 ? <div className="empty">No deals match these filters.</div> : null}
-        </div>
+        </ScrollRegion>
       </section>
 
       {rejected ? (

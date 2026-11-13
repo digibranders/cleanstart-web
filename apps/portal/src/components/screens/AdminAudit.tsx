@@ -22,6 +22,7 @@ import { fmtTimestamp, plural } from '@/lib/dates';
 import { AUDIT_KINDS, AUDIT_WHO, EVENT_SOURCE_LABEL, isOneOf } from '@/lib/domain';
 import type { AuditEntryDto, PageDto } from '@/lib/dto';
 import { exportAuditAction } from '@/server/actions/audit';
+import { ScrollRegion } from "@/components/ui/scroll-region";
 
 const SEARCH_DEBOUNCE_MS = 300;
 
@@ -124,7 +125,7 @@ export function AdminAudit({ page, view, today, healthSlot }: AdminAuditProps): 
           </div>
           <span className="card-meta tnum">{plural(page.total, 'event')}</span>
         </div>
-        <div style={{ overflowX: 'auto' }}>
+        <ScrollRegion label="Audit log">
           <table className="tbl">
             <thead>
               <tr>
@@ -173,7 +174,7 @@ export function AdminAudit({ page, view, today, healthSlot }: AdminAuditProps): 
               ) : null}
             </div>
           ) : null}
-        </div>
+        </ScrollRegion>
         {view.cursor || page.nextCursor ? (
           <div className="toolbar" style={{ justifyContent: 'space-between' }}>
             {view.cursor ? (

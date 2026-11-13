@@ -7,6 +7,7 @@ import type { PartnerListRow } from "@/lib/dto";
 import { initialsOf, lastSeenLabel } from "@/lib/people";
 import { PartnerCategoryBadge, PartnerStatusBadge } from "./badges";
 import { Seg } from "./seg";
+import { ScrollRegion } from "@/components/ui/scroll-region";
 
 export const CATEGORY_FILTERS = ["All", "Distributors", "Channel", "SIs"] as const;
 export type CategoryFilter = (typeof CATEGORY_FILTERS)[number];
@@ -59,7 +60,7 @@ export function PartnersTable({
           Showing {partners.length} of {total}
         </span>
       </div>
-      <div style={{ overflowX: "auto" }}>
+      <ScrollRegion label="Partners">
         <table className="tbl">
           <thead>
             <tr>
@@ -117,7 +118,7 @@ export function PartnersTable({
           </tbody>
         </table>
         {partners.length === 0 ? <div className="empty">No partners match these filters.</div> : null}
-      </div>
+      </ScrollRegion>
     </>
   );
 }

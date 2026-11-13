@@ -14,6 +14,7 @@ import { DOCUMENT_TYPE_LABEL, type DocumentType, PRODUCT_LABEL, PRODUCTS } from 
 import type { DocumentDto } from '@/lib/dto';
 import type { PublicDatasheetDto } from '@/server/files/public-resources';
 import { formatLabel } from '@/server/files/rules';
+import { ScrollRegion } from "@/components/ui/scroll-region";
 
 const ANY_PRODUCT = 'any';
 const PRODUCT_FILTER = [
@@ -151,7 +152,7 @@ export function Documents({
           </div>
           <span className="card-meta tnum">{rows.length} documents</span>
         </div>
-        <div style={{ overflowX: 'auto' }}>
+        <ScrollRegion label="Documents">
           <table className="tbl">
             <thead>
               <tr>
@@ -230,7 +231,7 @@ export function Documents({
               </button>
             </div>
           ) : null}
-        </div>
+        </ScrollRegion>
       </section>
 
       {publicDatasheets.length > 0 ? (
@@ -241,7 +242,7 @@ export function Documents({
             </h2>
             <span className="card-meta">On cleanstart.com, no sign-in needed</span>
           </div>
-          <div style={{ overflowX: 'auto' }}>
+          <ScrollRegion label="Public datasheets">
             <table className="tbl">
               <thead>
                 <tr>
@@ -291,7 +292,7 @@ export function Documents({
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollRegion>
         </section>
       ) : null}
 

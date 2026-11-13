@@ -9,6 +9,9 @@ a:hover{text-decoration:underline}
 .tnum{font-variant-numeric:tabular-nums}
 
 .app{min-height:100vh;display:flex;flex-wrap:wrap;font-family:Manrope,ui-sans-serif,system-ui,sans-serif;font-size:13.5px;color:#0F0E17;background:#FAFAFB;-webkit-font-smoothing:antialiased}
+.skip{position:fixed;left:8px;top:8px;z-index:100;padding:8px 12px;border-radius:6px;background:#151021;color:#FFFFFF;font-weight:600;transform:translateY(-200%)}
+.skip:focus{transform:none}
+.content:focus{outline:none}
 .side{flex:1 1 212px;background:#FFFFFF;border-right:1px solid #ECEBF1;padding:12px 10px;display:flex;flex-direction:column;justify-content:space-between;gap:20px}
 .brand{display:flex;align-items:center;gap:9px;padding:4px 6px}
 .logo{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;background:#151021;flex:none}
@@ -220,6 +223,7 @@ select.field{padding-right:28px}
 
 /* audit fixes */
 a:focus-visible,button:focus-visible,select:focus-visible,summary:focus-visible,input[type=checkbox]:focus-visible,input[type=radio]:focus-visible{outline:2px solid #5B2FE2;outline-offset:2px}
+[role=region][tabindex="0"]:focus-visible{outline:2px solid #5B2FE2;outline-offset:-2px}
 .btn:focus-visible,.opt:focus-visible,.seg-b:focus-visible,.tab:focus-visible,.nav-a:focus-visible,.ibtn:focus-visible{outline:2px solid #5B2FE2;outline-offset:2px}
 .side a:focus-visible,.side button:focus-visible{outline-color:#B9A6FF}
 .search{width:280px}

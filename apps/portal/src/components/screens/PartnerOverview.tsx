@@ -9,6 +9,7 @@ import { CHIP_PRODUCT } from "../deals/derive";
 import { ATTENTION_STYLE, buildOverviewKpis, docIcon, docMeta } from "../deals/overview";
 import { CustomerMark, PLUS_PATH, ProtectionCell, StatusBadge } from "../deals/parts";
 import { Badge, ProductChip } from "../ui/badge";
+import { ScrollRegion } from "@/components/ui/scroll-region";
 
 interface PartnerOverviewProps {
   overview: PartnerOverviewDto;
@@ -62,7 +63,7 @@ export function PartnerOverview({ overview, today, asOf }: PartnerOverviewProps)
                 </Link>
               </span>
             </div>
-            <div style={{ overflowX: "auto" }}>
+            <ScrollRegion label="Recent registrations">
               <table className="tbl">
                 <thead>
                   <tr>
@@ -96,7 +97,7 @@ export function PartnerOverview({ overview, today, asOf }: PartnerOverviewProps)
                   ))}
                 </tbody>
               </table>
-            </div>
+            </ScrollRegion>
           </section>
         </div>
 

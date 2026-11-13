@@ -18,6 +18,7 @@ import {
   resendInviteAction,
   revokeInviteAction,
 } from "@/server/actions/team";
+import { ScrollRegion } from "@/components/ui/scroll-region";
 
 const ROLE_ORDER: readonly PartnerRole[] = ["sales", "technical", "partner_admin"];
 const ROLE_OPTIONS: readonly DropdownOption[] = ROLE_ORDER.map((value) => ({ value, label: PARTNER_ROLE_LABEL[value] }));
@@ -101,7 +102,7 @@ export function Team({ team, today }: { team: TeamDto; today: string }): React.J
               {members.length} people, {members.filter((m) => m.status !== "active").length} invited
             </span>
           </div>
-          <div style={{ overflowX: "auto" }}>
+          <ScrollRegion label="Team members">
             <table className="tbl">
               <thead>
                 <tr>
@@ -209,7 +210,7 @@ export function Team({ team, today }: { team: TeamDto; today: string }): React.J
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollRegion>
         </section>
 
         <aside style={{ flex: "0 1 320px", minWidth: 280, display: "flex", flexDirection: "column", gap: 12 }}>

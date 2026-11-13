@@ -122,6 +122,7 @@ export function PartnerWelcome({ firstName, company, checklist, viewerEmail }: P
               {doneCount} of {STEPS.length} done
             </span>
           </div>
+          {/* biome-ignore lint/a11y/useFocusableInteractive: a read-only progress display, not an interactive widget */}
           <span
             className="bar"
             style={{ width: 180 }}

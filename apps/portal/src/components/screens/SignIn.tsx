@@ -229,6 +229,7 @@ export function SignIn({ providers }: { providers: SocialAvailability }): React.
                     </button>
                   ) : null}
                 </div>
+                {/* biome-ignore lint/a11y/useFocusableInteractive: a static divider, not a focusable separator widget */}
                 <div
                   role="separator"
                   style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12, color: "#6B687D" }}

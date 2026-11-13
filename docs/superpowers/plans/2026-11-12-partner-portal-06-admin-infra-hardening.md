@@ -5253,7 +5253,7 @@ What the master plan asks for: keyboard, focus, contrast, and the a11y lint rule
 
 Axe baseline of the mock (19 routes at 1440 px, WCAG 2.0 and 2.1 A and AA): `/apply` Privacy policy link contrast 1.64:1 against the surrounding text (`link-in-text-block`), `/partner/deals/new` `aria-controls="cust-sugg"` pointing at an element that is not rendered (`aria-valid-attr-value`, critical); at 375 px the top bar search button has no accessible name (`button-name`, fixed by CCR-3). Everything else was clean. The conversion may have added more; the suite finds them.
 
-- [ ] **Step 1: Measure the lint baseline on the converted tree**
+- [x] **Step 1: Measure the lint baseline on the converted tree**
 
 ```bash
 mkdir -p /tmp/p06biome && cat > /tmp/p06biome/biome.json <<EOF
@@ -5272,7 +5272,7 @@ cd ../..
 
 Expected: a count per rule close to the mock's (the exact numbers depend on Wave 1). Keep `/tmp/p06-a11y-sites.txt`: it is the worklist and the "before" column of the report.
 
-- [ ] **Step 2: The shared click-away layer**
+- [x] **Step 2: The shared click-away layer**
 
 Create `src/components/ui/scrim.tsx`. Verified in the scratch harness: lint with all four rules on reports nothing for it.
 
@@ -5330,7 +5330,7 @@ grep -rnE 'className="(cs|dd)-scrim"' apps/portal/src | grep -v "<Scrim"
 
 Expected on the mock: `shell.tsx: 5 replaced` (4 after CCR-3 removed the palette's own), `dropdown.tsx: 1 replaced`, `overlay.tsx: 1 replaced`; the grep prints nothing. Any other file with a layer of this kind shows in the lint output of Step 1: run the script on it too.
 
-- [ ] **Step 3: A real focus trap for drawers and dialogs**
+- [x] **Step 3: A real focus trap for drawers and dialogs**
 
 The mock's overlay moves focus in, closes on Escape and returns focus, but lets Tab leave the dialog (its own comment says "no focus trap"). In `src/components/ui/overlay.tsx` replace everything from the comment `// shortcut: no focus trap...` through the end of the function `useOverlayBehaviour` with the version below (the `Scrim` import was added by Step 2). Verified compiled in the scratch harness with the mock's own overlay file:
 
@@ -5380,7 +5380,7 @@ function useOverlayBehaviour(open: boolean, onClose: () => void): React.RefObjec
 }
 ```
 
-- [ ] **Step 4: Skip link and the main landmark**
+- [x] **Step 4: Skip link and the main landmark**
 
 Keyboard users otherwise tab through the whole sidebar on every page (WCAG 2.4.1). In `src/components/shell/shell.tsx` add as the first child of the returned fragment (before `<div className="app">`):
 
@@ -5398,7 +5398,7 @@ and change `<main className="content">` to `<main id="main" className="content" 
 .content:focus{outline:none}
 ```
 
-- [ ] **Step 5: The three findings the mock already has**
+- [x] **Step 5: The three findings the mock already has**
 
 1. `src/components/screens/Apply.tsx`: the Privacy policy link is indistinguishable from the text around it. Find it with `grep -n "privacy-policy" apps/portal/src/components/screens/Apply.tsx` and add an underline to that anchor:
 
@@ -5409,7 +5409,7 @@ and change `<main className="content">` to `<main id="main" className="content" 
 2. `src/components/screens/RegisterDeal.tsx`: the customer field points at a suggestion list that is only rendered when there are suggestions. Replace `aria-controls="cust-sugg"` with `aria-controls={suggestions.length > 0 ? "cust-sugg" : undefined}`.
 3. The top bar search button's name is fixed by CCR-3 (`aria-label`). Check: `grep -n 'aria-label={kind === "partner" ? "Search deals and documents"' apps/portal/src/components/shell/shell.tsx`.
 
-- [ ] **Step 6: Turn the lint rules on and clear the worklist**
+- [x] **Step 6: Turn the lint rules on and clear the worklist**
 
 Replace `apps/portal/biome.json` (only `useSemanticElements` stays off; the other three are on):
 
@@ -5439,7 +5439,7 @@ Run `pnpm --filter @cleanstart/portal lint`. Every remaining diagnostic is handl
 - `noSvgWithoutTitle`: add `aria-hidden="true"` for a decorative icon, or a `<title>` for one that carries meaning.
 No other suppression is allowed, and each suppression has a reason in the comment. Expected end state: lint passes.
 
-- [ ] **Step 7: Run the axe and keyboard suite, and fix what it finds**
+- [x] **Step 7: Run the axe and keyboard suite, and fix what it finds**
 
 ```bash
 pnpm --filter @cleanstart/portal exec playwright test --grep @a11y
@@ -5447,7 +5447,7 @@ pnpm --filter @cleanstart/portal exec playwright test --grep @a11y
 
 Expected: 19 axe tests on `desktop`, 19 on `mobile`, 3 keyboard tests on `desktop`, all green. A failure names the rule, the impact and up to three selectors. Fix in the component, not in the test. The usual causes and fixes: `color-contrast` (darken the foreground token in `portal.css` until the ratio is at least 4.5:1, or 3:1 for text of 18.66 px bold or 24 px and up; do not change a background that carries brand colour without asking), `label` or `button-name` (add a visible label or `aria-label` that contains the visible text), `aria-valid-attr-value` (render the target or drop the attribute), `region` (content outside a landmark), `target-size` (the mobile project, controls under 24 by 24 px). A rule that cannot be fixed (a third party widget) is disabled by id in `a11y.spec.ts` with a one line reason and listed in the report.
 
-- [ ] **Step 8: Write the report**
+- [x] **Step 8: Write the report**
 
 Create `docs/partner-portal/A11Y-PASS.md` with the real numbers:
 
@@ -5483,7 +5483,7 @@ Palette, drawers and the Tab walk: pass counts. Skip link added.
 Screen reader testing (VoiceOver, NVDA), zoom to 400 percent, forced colors and reduced motion were not run. A person should do a 30 minute pass with a screen reader before the pilot.
 ````
 
-- [ ] **Step 9: Gate A and commit**
+- [x] **Step 9: Gate A and commit**
 
 Run the standard Gate A block, the a11y suite once more, then Gate B, then:
 

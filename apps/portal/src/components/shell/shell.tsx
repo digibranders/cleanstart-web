@@ -15,6 +15,7 @@ import { Drawer } from "../ui/overlay";
 import { useToast } from "../ui/toast";
 import { NotificationsPopover } from "./notifications-popover";
 import { OPEN_SEARCH_EVENT, SearchPalette } from "./search-palette";
+import { Scrim } from "@/components/ui/scrim";
 
 function crumbFor(nav: readonly NavItem[], pathname: string): string {
   if (pathname.startsWith(ROUTES.partner.account)) return "Your account";
@@ -122,6 +123,9 @@ export function Shell({
 
   return (
     <>
+      <a className="skip" href="#main">
+        Skip to main content
+      </a>
       <div className="app">
         <nav aria-label={kind === "partner" ? "Partner portal" : "Admin"} className={`side${menuOpen ? " side-open" : ""}`}>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -179,7 +183,7 @@ export function Shell({
               </button>
               {profileOpen ? (
                 <>
-                  <div className="dd-scrim" onClick={() => setProfileOpen(false)} aria-hidden="true" />
+                  <Scrim className="dd-scrim" onClose={() => setProfileOpen(false)} />
                   <div className="pop pop-up" role="menu" aria-label="Profile">
                     <div className="pop-h" style={{ gap: 10, justifyContent: "flex-start" }}>
                       <Avatar initials={me.userInitials} round me />
@@ -237,7 +241,7 @@ export function Shell({
             </div>
           </div>
         </nav>
-        {menuOpen ? <div className="cs-scrim" onClick={() => setMenuOpen(false)} aria-hidden="true" style={{ zIndex: 40 }} /> : null}
+        {menuOpen ? <Scrim className="cs-scrim" onClose={() => setMenuOpen(false)} style={{ zIndex: 40 }} /> : null}
 
         <div className="main">
           <header className="top">
@@ -285,7 +289,7 @@ export function Shell({
                 </button>
                 {pop === "help" ? (
                   <>
-                    <div className="dd-scrim" onClick={() => setPop(null)} aria-hidden="true" />
+                    <Scrim className="dd-scrim" onClose={() => setPop(null)} />
                     <div className="pop" role="dialog" aria-label="Help">
                       <div className="pop-h">
                         <h2 className="pop-t">Help</h2>
@@ -367,7 +371,9 @@ export function Shell({
               />
             </div>
           </header>
-          <main className="content">{children}</main>
+          <main id="main" className="content" tabIndex={-1}>
+            {children}
+          </main>
         </div>
       </div>
 

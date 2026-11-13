@@ -264,6 +264,7 @@ export function RegisterDeal({ mine, managers, partnerName, today }: RegisterDea
                         </span>
                       ) : null}
                       {hasSuggestions ? (
+                        // biome-ignore lint/a11y/useFocusableInteractive: the options are buttons and focusable; the list itself is not a tab stop
                         <div className="sugg" id="cust-sugg" role="listbox" aria-label="Your existing customers">
                           {suggestions.length > 0 ? <div className="sugg-h">Your customers</div> : null}
                           {suggestions.map((c) => (

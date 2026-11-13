@@ -14,6 +14,7 @@ import { initialsOf, lastSeenLabel, rowKey } from "@/lib/people";
 import { ROUTES } from "@/lib/routes";
 import type { ActionResult } from "@/server/actions/result";
 import { changeStaffRoleAction, removeStaffAction } from "@/server/actions/staff";
+import { ScrollRegion } from "@/components/ui/scroll-region";
 
 const ROLE_OPTIONS: readonly DropdownOption[] = STAFF_ROLES.map((value) => ({ value, label: STAFF_ROLE_LABEL[value] }));
 
@@ -86,7 +87,7 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
             {people.length} people, {people.filter((p) => p.status === "invited").length} invited
           </span>
         </div>
-        <div style={{ overflowX: "auto" }}>
+        <ScrollRegion label="Staff">
           <table className="tbl">
             <thead>
               <tr>
@@ -184,7 +185,7 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
               ))}
             </tbody>
           </table>
-        </div>
+        </ScrollRegion>
         {warned ? (
           <div className="card-b" style={{ borderTop: "1px solid #F0EFF4" }}>
             <div className="note note-amber" role="status">

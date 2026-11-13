@@ -32,6 +32,7 @@ import { ProductChip } from "../ui/badge";
 import { Dropdown } from "../ui/dropdown";
 import { Drawer } from "../ui/overlay";
 import { useToast } from "../ui/toast";
+import { ScrollRegion } from "@/components/ui/scroll-region";
 
 const ALL_PRODUCTS = "All products";
 const ALL_REGIONS = "All regions";
@@ -312,7 +313,7 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
             {visible.length} shown, oldest first. {routingText(managers)}
           </span>
         </div>
-        <div style={{ overflowX: "auto" }}>
+        <ScrollRegion label="Approval queue">
           <table className="tbl">
             <thead>
               <tr>
@@ -456,7 +457,7 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
             </tbody>
           </table>
           {visible.length === 0 ? <div className="empty">No registrations match these filters.</div> : null}
-        </div>
+        </ScrollRegion>
       </section>
 
       {visibleExtensions.length > 0 ? (
@@ -467,7 +468,7 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
             </h2>
             <span className="card-meta">{visibleExtensions.length}</span>
           </div>
-          <div style={{ overflowX: "auto" }}>
+          <ScrollRegion label="Extension requests">
             <table className="tbl">
               <thead>
                 <tr>
@@ -507,7 +508,7 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollRegion>
         </section>
       ) : null}
 
