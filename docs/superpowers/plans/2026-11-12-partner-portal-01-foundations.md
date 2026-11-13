@@ -2334,13 +2334,13 @@ printf '%s\n' "2026-11-13 00:00 IST | M0.3 | done | W0 | $(git rev-parse --short
 
 **Gate A at the end:** all four commands run.
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "2026-11-13 00:00 IST | M0.4 | started | W0 | - | - | .env.example, logger, Sentry, job infrastructure" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Write the failing `.env.example` test**
+- [x] **Step 2: Write the failing `.env.example` test**
 
 The test keeps the example honest: a copy of it, with only the secret filled in, must be a valid environment, so an optional variable left as an empty `KEY=` line (which the schema rejects) cannot slip in. Create `apps/portal/src/env.example.test.ts`:
 
@@ -2369,7 +2369,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/env.example.test.ts`
 
 Expected: FAIL, the suite cannot load: `Error: ENOENT: no such file or directory, open '.../apps/portal/.env.example'` and `Tests  no tests`.
 
-- [ ] **Step 3: Create `.env.example`**
+- [x] **Step 3: Create `.env.example`**
 
 Create `apps/portal/.env.example`:
 
@@ -2457,7 +2457,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/env.example.test.ts`
 
 Expected: PASS, `Tests  2 passed (2)`.
 
-- [ ] **Step 4: Write the failing logger test**
+- [x] **Step 4: Write the failing logger test**
 
 Create `apps/portal/src/server/log.test.ts`:
 
@@ -2511,7 +2511,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/log.test.ts`
 
 Expected: FAIL, `Failed to load url ./log`.
 
-- [ ] **Step 5: Create the logger**
+- [x] **Step 5: Create the logger**
 
 The contracts describe `log` as "pino style" with `log.info(obj, msg)` and redaction of `authorization`, `password`, `token` and `cookie`. `pino` is not in the handoff's package list, so this is a small logger with the same call shape (and it redacts `secret` keys too). Create `apps/portal/src/server/log.ts`:
 
@@ -2584,7 +2584,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/log.test.ts`
 
 Expected: PASS, `Tests  4 passed (4)`.
 
-- [ ] **Step 6: Create the Sentry configuration**
+- [x] **Step 6: Create the Sentry configuration**
 
 No unit test: these files only call `Sentry.init` when a DSN is set, and the build in Gate A plus the smoke test in Step 16 exercise them. The server config strips personal data from error reports the same way `apps/web` does. The client config sends nothing without `NEXT_PUBLIC_SENTRY_DSN` and never records replays.
 
@@ -2675,7 +2675,7 @@ export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
 
 `withSentryConfig` is not used: the portal has no ad-blocker tunnel to configure and no source map upload yet, and `next.config.ts` stays untouched (a shared file). Add it later, in a task that owns `next.config.ts`, when an auth token exists.
 
-- [ ] **Step 7: Write the failing lock test**
+- [x] **Step 7: Write the failing lock test**
 
 Every scheduled job runs under a Postgres advisory lock (session level, taken and released on one connection). Create `apps/portal/src/server/jobs/lock.test.ts`:
 
@@ -2724,7 +2724,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs/lock.test
 
 Expected: FAIL, `Failed to load url ./lock`.
 
-- [ ] **Step 8: Create the lock**
+- [x] **Step 8: Create the lock**
 
 Create `apps/portal/src/server/jobs/lock.ts`:
 
@@ -2754,7 +2754,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs/lock.test
 
 Expected: PASS, `Tests  4 passed (4)`.
 
-- [ ] **Step 9: Write the failing scheduler test**
+- [x] **Step 9: Write the failing scheduler test**
 
 `node-cron` and Sentry are mocked; the test pins how each job is registered (UTC, its own name, no in-process overlap), that a tick goes through the advisory lock on the system pool, and that a failing job is reported to Sentry without stopping anything. Create `apps/portal/src/server/jobs/schedule.test.ts`:
 
@@ -2809,7 +2809,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs/schedule.
 
 Expected: FAIL, `Failed to load url ./schedule`.
 
-- [ ] **Step 10: Create the scheduler**
+- [x] **Step 10: Create the scheduler**
 
 Create `apps/portal/src/server/jobs/schedule.ts`:
 
@@ -2845,7 +2845,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs/schedule.
 
 Expected: PASS, `Tests  3 passed (3)`.
 
-- [ ] **Step 11: Write the failing registry test, then create the eight job stubs and the registry**
+- [x] **Step 11: Write the failing registry test, then create the eight job stubs and the registry**
 
 Create `apps/portal/src/server/jobs/index.test.ts`:
 
@@ -2925,7 +2925,7 @@ Expected: PASS, `Test Files  3 passed (3)`, `Tests  9 passed (9)`.
 
 The owners, for the record (contracts H.17): `hubspot-outbox` H4.4, `hubspot-poll` and `reconcile` and `expiry` H4.8, `expiry-reminders` M2.4, `intake` M1.3b, `document-purge` M3.2, `retention` M5.3 (W2-e). `hubspot-poll.ts` also gains `triggerPoll` in H4.9.
 
-- [ ] **Step 11b: Create the announce stub (contracts H.17)**
+- [x] **Step 11b: Create the announce stub (contracts H.17)**
 
 The HubSpot poll and the expiry job (H4.8) tell partners about a stage change, a changed end date or an expiry by calling `announceRegistrationChange` after the change commits. Track R owns the real body (M2.3), but H4.8 may run before R starts, so W0-c creates the file with the final types and an empty body; R replaces the body and widens `deps` to `{ db: Db; transport?: EmailTransport }`.
 
@@ -2949,7 +2949,7 @@ export async function announceRegistrationChange(_deps: { db: Db }, _change: Reg
 
 Run `pnpm --filter @cleanstart/portal typecheck` and `pnpm --filter @cleanstart/portal exec biome lint src/server/registrations`. Expected: both clean (biome's `noEmptyBlockStatements` is not enabled in this repo; if it is, give the body a `return;`).
 
-- [ ] **Step 12: Write the failing instrumentation test**
+- [x] **Step 12: Write the failing instrumentation test**
 
 Create `apps/portal/src/instrumentation.test.ts`:
 
@@ -3016,7 +3016,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/instrumentation.test.
 
 Expected: FAIL, `Failed to load url ./instrumentation`.
 
-- [ ] **Step 13: Create `src/instrumentation.ts`**
+- [x] **Step 13: Create `src/instrumentation.ts`**
 
 It validates the environment when the Node server starts (importing `@/env` throws a message naming every missing or invalid variable, so a production container with a missing secret never serves), registers Sentry for the Node and edge runtimes, and starts the scheduler only on the Node runtime when `PORTAL_JOBS_ENABLED` is `true` (the same gate as `PAYLOAD_AUTO_RUN` in the CMS). With a `src/` folder Next only picks the hook up from `src/instrumentation.ts`. Create `apps/portal/src/instrumentation.ts`:
 
@@ -3051,7 +3051,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/instrumentation.test.
 
 Expected: PASS, `Tests  4 passed (4)`.
 
-- [ ] **Step 14: Make the build skip environment validation**
+- [x] **Step 14: Make the build skip environment validation**
 
 The contracts (I) say a `next build` sets `SKIP_ENV_VALIDATION=1`: nothing may read a secret at build time, and the build has none. In `apps/portal/package.json` change the `build` script to:
 
@@ -3059,7 +3059,7 @@ The contracts (I) say a `next build` sets `SKIP_ENV_VALIDATION=1`: nothing may r
     "build": "SKIP_ENV_VALIDATION=1 next build",
 ```
 
-- [ ] **Step 15: Stage and run Gate A**
+- [x] **Step 15: Stage and run Gate A**
 
 ```bash
 git add apps/portal/.env.example apps/portal/package.json apps/portal/sentry.server.config.ts apps/portal/sentry.edge.config.ts apps/portal/sentry.client.config.ts apps/portal/src/env.example.test.ts apps/portal/src/instrumentation.ts apps/portal/src/instrumentation.test.ts apps/portal/src/instrumentation-client.ts apps/portal/src/server/log.ts apps/portal/src/server/log.test.ts apps/portal/src/server/registrations apps/portal/src/server/jobs
@@ -3067,7 +3067,7 @@ git add apps/portal/.env.example apps/portal/package.json apps/portal/sentry.ser
 
 Run Gate A (lint, typecheck, test, build). At the time of writing `pnpm --filter @cleanstart/portal test` reports `Test Files  16 passed (16)` and `Tests  86 passed (86)`.
 
-- [ ] **Step 16: Smoke test the scheduler in a production build (contracts M.1, item 14)**
+- [x] **Step 16: Smoke test the scheduler in a production build (contracts M.1, item 14)**
 
 It needs the production build that Gate A just made. The step proves three things the unit tests cannot: `register()` runs once in a real `next start`, it does not run during `next build`, and a production start refuses to boot without its required variables.
 
@@ -3099,7 +3099,7 @@ printf '%s\n' "2026-11-13 00:00 IST | M0.4 | note | W0 | - | - | verified: instr
 
 If `register()` runs during the build or twice at runtime, use the fallback in contracts M.1 item 14 (a small custom entry) only after writing a `blocked` line: it changes the Docker command and is task M0.6's call.
 
-- [ ] **Step 17: Run Gate B, commit and log**
+- [x] **Step 17: Run Gate B, commit and log**
 
 Run Gate B (the reviewer checklist) on `git diff origin/development`; fix findings and rerun Gate A and Step 16.
 
