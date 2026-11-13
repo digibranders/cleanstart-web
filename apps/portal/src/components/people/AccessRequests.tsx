@@ -7,8 +7,10 @@ import { ACCESS_REQUEST_ROLES, type AccessRequestRole, PARTNER_ROLE_LABEL } from
 import type { AccessRequestDto } from "@/lib/dto";
 import { codeFromLabel, emailDomain, initialsOf } from "@/lib/people";
 import { decideAccessRequestAction } from "@/server/actions/team";
-import { RowAction } from "./RowAction";
 import { Seg } from "./Seg";
+
+// The row's `.li .btn` rule shrinks buttons to 18px, so the standard size is set here.
+const BUTTON_STYLE = { height: 30, padding: "0 10px", fontSize: 13 } as const;
 
 const REQUEST_ROLES: readonly string[] = ACCESS_REQUEST_ROLES.map((role) => PARTNER_ROLE_LABEL[role]);
 
@@ -62,8 +64,9 @@ export function AccessRequests({
           <span className="av av-1 av-r">{initialsOf(rq.name)}</span>
           <span className="li-t" style={{ flex: "1 1 260px" }}>
             <span className="li-n" style={{ fontSize: 13 }}>
-              {rq.name} <span className="t-muted" style={{ fontWeight: 500 }}>{rq.email}</span>
+              {rq.name}
             </span>
+            <span className="li-s">{rq.email}</span>
             <span className="li-s" style={{ whiteSpace: "normal" }}>
               {asked(rq)}.{rq.note ? ` "${rq.note}"` : ""}
             </span>
@@ -79,15 +82,26 @@ export function AccessRequests({
               ariaLabel={`Role for ${rq.name}`}
               compact
             />
-            <span className="acts">
-              <RowAction label={`Decline ${rq.name}`} tip="Decline" icon="x" tone="no" onClick={() => void decline(rq)} />
-              <RowAction
-                label={`Approve ${rq.name}`}
-                tip="Approve and send a login link"
-                icon="check"
-                tone="ok"
+            <span style={{ display: "flex", gap: 8 }}>
+              <button
+                type="button"
+                className="btn btn-s"
+                style={BUTTON_STYLE}
+                aria-label={`Decline, ${rq.name}`}
+                onClick={() => void decline(rq)}
+              >
+                Decline
+              </button>
+              <button
+                type="button"
+                className="btn btn-p"
+                style={BUTTON_STYLE}
+                aria-label={`Approve as ${PARTNER_ROLE_LABEL[roleOf(rq)]}, ${rq.name}`}
+                title="Sends a login link"
                 onClick={() => void approve(rq)}
-              />
+              >
+                Approve as {PARTNER_ROLE_LABEL[roleOf(rq)]}
+              </button>
             </span>
           </span>
         </div>

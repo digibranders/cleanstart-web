@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { sendManagerMessageAction } from "@/server/actions/partners";
 import { Icon } from "../icon";
 import { Drawer } from "../ui/overlay";
@@ -26,6 +26,12 @@ export function ManagerMessageDrawer({
   const [tried, setTried] = useState(false);
   const [busy, setBusy] = useState(false);
   const invalid = tried && !body.trim();
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
+
+  // The subject is already filled in, so the cursor belongs in the message. This runs after the drawer's own focus move.
+  useEffect(() => {
+    bodyRef.current?.focus();
+  }, []);
 
   const send = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
@@ -83,6 +89,7 @@ export function ManagerMessageDrawer({
         </label>
         <textarea
           id="mm-body"
+          ref={bodyRef}
           className={`field${invalid ? " field-err" : ""}`}
           rows={8}
           value={body}

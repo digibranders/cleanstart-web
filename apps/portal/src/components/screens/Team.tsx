@@ -10,7 +10,7 @@ import { Dropdown, type DropdownOption } from "@/components/ui/dropdown";
 import { useToast } from "@/components/ui/toast";
 import { isOneOf, PARTNER_ROLE_LABEL, PARTNER_ROLES, type PartnerRole } from "@/lib/domain";
 import type { TeamDto, TeamMemberDto } from "@/lib/dto";
-import { initialsOf, invitedLabel, lastSeenLabel, rowKey } from "@/lib/people";
+import { emailDomain, initialsOf, invitedLabel, lastSeenLabel, rowKey } from "@/lib/people";
 import type { ActionResult } from "@/server/actions/result";
 import {
   changeMemberRoleAction,
@@ -108,9 +108,13 @@ export function Team({ team, today }: { team: TeamDto; today: string }): React.J
                 <tr>
                   <th scope="col">Name</th>
                   <th scope="col">Role</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Last active</th>
-                  <th scope="col" className="r">
+                  <th scope="col" className="hide-sm">
+                    Status
+                  </th>
+                  <th scope="col" className="hide-sm">
+                    Last active
+                  </th>
+                  <th scope="col" className="r hide-sm">
                     Deals
                   </th>
                   <th scope="col" className="r">
@@ -121,7 +125,7 @@ export function Team({ team, today }: { team: TeamDto; today: string }): React.J
               <tbody>
                 {members.map((m, i) => (
                   <tr key={m.id}>
-                    <td>
+                    <td style={{ whiteSpace: "normal" }}>
                       <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         <span className={`av av-r ${m.isYou ? "av-me" : (AVATARS[i % AVATARS.length] ?? "av-1")}`}>
                           {initialsOf(m.name)}
@@ -136,7 +140,9 @@ export function Team({ team, today }: { team: TeamDto; today: string }): React.J
                               </span>
                             ) : null}
                           </span>
-                          <span className="li-s">{m.email}</span>
+                          <span className="li-s" style={{ overflowWrap: "anywhere" }}>
+                            {m.email}
+                          </span>
                         </span>
                       </span>
                     </td>
@@ -156,13 +162,13 @@ export function Team({ team, today }: { team: TeamDto; today: string }): React.J
                         />
                       )}
                     </td>
-                    <td>
+                    <td className="hide-sm">
                       <Badge tone={m.status === "active" ? "accepted" : "pending"}>
                         {m.status === "active" ? "Active" : "Invited"}
                       </Badge>
                     </td>
-                    <td className="t-sec">{lastActive(m)}</td>
-                    <td className="tnum r">{m.deals}</td>
+                    <td className="t-sec hide-sm">{lastActive(m)}</td>
+                    <td className="tnum r hide-sm">{m.deals}</td>
                     <td className="r">
                       {m.isYou ? null : confirming === m.id ? (
                         <span className="confirm">
@@ -214,7 +220,10 @@ export function Team({ team, today }: { team: TeamDto; today: string }): React.J
         </section>
 
         <aside style={{ flex: "0 1 320px", minWidth: 280, display: "flex", flexDirection: "column", gap: 12 }}>
-          <InviteCard existingEmails={members.map((m) => m.email)} />
+          <InviteCard
+            existingEmails={members.map((m) => m.email)}
+            partnerDomain={emailDomain(members.find((m) => m.isYou)?.email ?? "")}
+          />
           <section aria-labelledby="roles" className="card clip">
             <div className="card-h">
               <h2 id="roles" className="card-t">

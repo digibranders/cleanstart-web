@@ -121,7 +121,13 @@ export function Company({ company, canEdit, viewerEmail }: CompanyProps): React.
                   value={form.website}
                   onChange={edit("website")}
                   readOnly={!canEdit}
+                  aria-describedby={canEdit ? "cw-hint" : undefined}
                 />
+                {canEdit ? (
+                  <span id="cw-hint" className="hint">
+                    For example, https://example.com
+                  </span>
+                ) : null}
               </div>
               <div className="fg">
                 <label htmlFor="cp" className="lbl">
@@ -134,7 +140,13 @@ export function Company({ company, canEdit, viewerEmail }: CompanyProps): React.
                   value={form.phone}
                   onChange={edit("phone")}
                   readOnly={!canEdit}
+                  aria-describedby={canEdit ? "cp-hint" : undefined}
                 />
+                {canEdit ? (
+                  <span id="cp-hint" className="hint">
+                    With country code, for example +91 98765 43210
+                  </span>
+                ) : null}
               </div>
             </div>
             <div className="fg">
@@ -148,7 +160,13 @@ export function Company({ company, canEdit, viewerEmail }: CompanyProps): React.
                 value={form.address}
                 onChange={edit("address")}
                 readOnly={!canEdit}
+                aria-describedby={canEdit ? "ca-hint" : undefined}
               />
+              {canEdit ? (
+                <span id="ca-hint" className="hint">
+                  Your main office: street, city and country
+                </span>
+              ) : null}
             </div>
             <div className="fg">
               <label htmlFor="cb" className="lbl">
@@ -218,7 +236,7 @@ export function Company({ company, canEdit, viewerEmail }: CompanyProps): React.
                   Discard
                 </button>
               ) : null}
-              <button type="submit" className="btn btn-p" disabled={saving}>
+              <button type="submit" className="btn btn-p" disabled={!dirty || saving}>
                 Save changes
               </button>
             </div>

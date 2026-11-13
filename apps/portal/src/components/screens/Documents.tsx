@@ -157,9 +157,13 @@ export function Documents({
             <thead>
               <tr>
                 <th scope="col">Name</th>
-                <th scope="col">Type</th>
-                <th scope="col">Product</th>
-                <th scope="col" className="r">
+                <th scope="col" className="hide-sm">
+                  Type
+                </th>
+                <th scope="col" className="hide-sm">
+                  Product
+                </th>
+                <th scope="col" className="r hide-sm">
                   Updated
                 </th>
                 <th scope="col" className="r">
@@ -172,7 +176,7 @@ export function Documents({
                 const isVideo = d.type === 'video';
                 return (
                   <tr key={d.id}>
-                    <td style={{ whiteSpace: 'normal', minWidth: 320 }}>
+                    <td style={{ whiteSpace: 'normal', minWidth: 'min(320px, 62vw)' }}>
                       <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <span className={`li-ic ${TYPE_TONE[d.type]}`}>
                           <Icon name={TYPE_ICON[d.type]} />
@@ -195,11 +199,11 @@ export function Documents({
                         </span>
                       </span>
                     </td>
-                    <td className="t-sec">{DOCUMENT_TYPE_LABEL[d.type]}</td>
-                    <td>
+                    <td className="t-sec hide-sm">{DOCUMENT_TYPE_LABEL[d.type]}</td>
+                    <td className="hide-sm">
                       <ProductChip product={CHIP_PRODUCT[d.product]} />
                     </td>
-                    <td className="tnum r t-sec">{fmtLong(d.updatedAt)}</td>
+                    <td className="tnum r t-sec hide-sm">{fmtLong(d.updatedAt)}</td>
                     <td className="r">
                       <button
                         type="button"
@@ -247,7 +251,7 @@ export function Documents({
               <thead>
                 <tr>
                   <th scope="col">Name</th>
-                  <th scope="col" className="r">
+                  <th scope="col" className="r hide-sm">
                     Updated
                   </th>
                   <th scope="col" className="r">
@@ -258,7 +262,7 @@ export function Documents({
               <tbody>
                 {publicDatasheets.map((d) => (
                   <tr key={d.id}>
-                    <td style={{ whiteSpace: 'normal', minWidth: 320 }}>
+                    <td style={{ whiteSpace: 'normal', minWidth: 'min(320px, 40vw)' }}>
                       <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <span className="li-ic tone-blue">
                           <Icon name="file" />
@@ -277,7 +281,7 @@ export function Documents({
                         </span>
                       </span>
                     </td>
-                    <td className="tnum r t-sec">{d.updatedAt ? fmtLong(d.updatedAt) : ''}</td>
+                    <td className="tnum r t-sec hide-sm">{d.updatedAt ? fmtLong(d.updatedAt) : ''}</td>
                     <td className="r">
                       <a
                         className="btn btn-s"
