@@ -619,7 +619,7 @@ export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, mana
             <dd>{PRODUCT_LABEL[viewing.deal.product]}</dd>
             <dt>Region</dt>
             <dd>{PARTNER_REGION_LABEL[viewing.deal.region]}</dd>
-            <dt>Account manager</dt>
+            <dt>Partner manager</dt>
             <dd>{viewing.deal.managerName ?? "Not assigned"}</dd>
             <dt>Partner</dt>
             <dd>{viewing.deal.partnerName}</dd>

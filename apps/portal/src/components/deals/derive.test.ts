@@ -40,15 +40,17 @@ describe('review target', () => {
 describe('protectionView', () => {
   it('describes a waiting registration, flagging the target only in the deals list', () => {
     expect(protectionView({ ...base, registeredOn: '2026-11-06' }, 'deals', '2026-11-06')).toEqual({ until: 'Sent today', left: '', cls: 't-muted' });
-    expect(protectionView(base, 'deals', '2026-11-06')).toEqual({ until: 'Waiting 4 days', left: 'over 2-day target', cls: 't-amber' });
-    expect(protectionView(base, 'overview', '2026-11-06')).toEqual({ until: 'Waiting 4 days', left: '', cls: 't-amber' });
+    expect(protectionView(base, 'deals', '2026-11-06')).toEqual({ until: 'Pending 4 days', left: 'over 2-day target', cls: 't-amber' });
+    expect(protectionView(base, 'overview', '2026-11-06')).toEqual({ until: 'Pending 4 days', left: '', cls: 't-amber' });
     expect(protectionView({ ...base, resubmittedOn: '2026-11-06' }, 'deals', '2026-11-06')).toEqual({ until: 'Resent today', left: '', cls: 't-muted' });
   });
 
   it('shows days left for protected deals and turns amber at 14 days', () => {
     const accepted = { ...base, status: 'accepted' as const, stage: 'Discovery' };
-    expect(protectionView({ ...accepted, protectionEnd: '2027-01-12' }, 'deals', '2026-11-06')).toEqual({ until: '12 Jan 2027', left: '67d', cls: 't-ink' });
-    expect(protectionView({ ...accepted, protectionEnd: '2026-11-20' }, 'deals', '2026-11-06')).toEqual({ until: '20 Nov 2026', left: '14d', cls: 't-amber' });
+    expect(protectionView({ ...accepted, protectionEnd: '2027-01-12' }, 'deals', '2026-11-06')).toEqual({ until: '12 Jan 2027', left: '67 days left', cls: 't-ink' });
+    expect(protectionView({ ...accepted, protectionEnd: '2026-11-20' }, 'deals', '2026-11-06')).toEqual({ until: '20 Nov 2026', left: '14 days left', cls: 't-amber' });
+    expect(protectionView({ ...accepted, protectionEnd: '2026-11-07' }, 'deals', '2026-11-06').left).toBe('1 day left');
+    expect(protectionView({ ...accepted, protectionEnd: '2026-11-06' }, 'deals', '2026-11-06').left).toBe('Ends today');
   });
 
   it('describes closed, expired and rejected registrations', () => {

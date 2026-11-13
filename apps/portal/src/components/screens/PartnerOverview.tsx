@@ -111,7 +111,7 @@ export function PartnerOverview({ overview, today, asOf }: PartnerOverviewProps)
                   <tbody>
                     {recent.map((d) => (
                       <tr key={d.id}>
-                        <td>
+                        <td style={{ whiteSpace: "normal" }}>
                           <Link href={ROUTES.partner.deal(d.id)} className="cust">
                             <CustomerMark name={d.customer} />
                             {d.customer}

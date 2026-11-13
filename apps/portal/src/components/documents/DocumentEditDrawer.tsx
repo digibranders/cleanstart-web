@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { AudiencePicker } from '@/components/documents/AudiencePicker';
 import {
   adminUpdatedLabel,
@@ -44,6 +44,7 @@ export function DocumentEditDrawer({
   const [progress, setProgress] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState(doc.title);
+  const titleRef = useRef<HTMLInputElement>(null);
   const [draft, setDraft] = useState<AudienceDraft>(() => draftFromAudience(doc.audience));
 
   const audience = draftToInput(draft, partners);
@@ -125,6 +126,7 @@ export function DocumentEditDrawer({
     <Drawer
       open
       onClose={onClose}
+      initialFocus={titleRef}
       title={doc.title}
       subtitle={`${DOCUMENT_TYPE_LABEL[doc.type]}, ${formatLabel(doc)}`}
       footer={
@@ -205,6 +207,7 @@ export function DocumentEditDrawer({
         </label>
         <input
           id="ed-title"
+          ref={titleRef}
           className={`field${title.trim() === '' ? ' field-err' : ''}`}
           type="text"
           value={title}

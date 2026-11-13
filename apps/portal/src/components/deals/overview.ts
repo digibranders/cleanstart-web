@@ -14,9 +14,9 @@ export function buildOverviewKpis(o: PartnerOverviewDto): Kpi[] {
   const byProduct = o.protectedNow.byProduct.map((x) => `${x.count} ${PRODUCT_SHORT_LABEL[x.product]}`);
   return [
     {
-      label: "Waiting",
+      label: "Pending",
       value: String(o.waiting.count),
-      foot: o.waiting.count ? `Oldest ${plural(o.waiting.oldestDays, "day")}` : "Nothing waiting",
+      foot: o.waiting.count ? `Oldest ${plural(o.waiting.oldestDays, "day")}` : "Nothing pending",
       cls: "",
     },
     {

@@ -27,7 +27,8 @@ export function ProtectionCell({
   const view = protectionView(deal, mode, today);
   return (
     <td className="tnum r">
-      <span className={view.cls}>{view.until}</span> <span className="t-muted">{view.left}</span>
+      <span className={view.cls}>{view.until}</span>
+      {view.left ? <div className="li-s">{view.left}</div> : null}
     </td>
   );
 }

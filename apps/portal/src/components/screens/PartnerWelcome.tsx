@@ -109,7 +109,7 @@ export function PartnerWelcome({ firstName, company, checklist, viewerEmail }: P
         </div>
         <Link href={ROUTES.partner.newDeal} className="btn btn-p">
           <Icon name="reg" />
-          Register a deal
+          Register deal
         </Link>
       </div>
 
