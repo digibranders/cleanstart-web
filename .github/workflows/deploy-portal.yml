@@ -1,0 +1,237 @@
+name: Deploy Portal
+
+# Same shape as deploy-cms.yml: ship only a commit that Portal CI verified, build the image on the runner,
+# send it to the droplet with `docker save | scp`, render the env file, restart one compose service, probe it.
+#
+# Nothing deploys until the repository variable PORTAL_DEPLOY_ENABLED is 'true'. The operator sets it after the
+# droplet steps in docs/operations/PARTNER-PORTAL.md are done (database, compose file, Caddy block, DNS).
+# Manual override stays via workflow_dispatch (input SHA, no CI check), still gated by the same variable.
+on:
+  workflow_run:
+    workflows: ['Portal CI']
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: 'Optional git SHA to deploy (defaults to the branch HEAD this run was triggered from)'
+        required: false
+
+# The job only reads the repository (checkout); it ships the image over SSH and pushes nothing to a registry.
+permissions:
+  contents: read
+
+# Serialize deploys to the prod droplet: no two builds racing the same `portal:current` tag.
+concurrency:
+  group: deploy-portal-prod
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # workflow_run on branch main also matches a pull request from a fork whose branch is named main, so a
+    # workflow_run deploy additionally requires that the CI run was triggered by a push.
+    if: >-
+      ${{ vars.PORTAL_DEPLOY_ENABLED == 'true' &&
+          (github.event_name == 'workflow_dispatch' ||
+           (github.event.workflow_run.conclusion == 'success' &&
+            github.event.workflow_run.event == 'push')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DEPLOY_SHA: >-
+        ${{ inputs.sha
+            || github.event.workflow_run.head_sha
+            || github.sha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # NEXT_PUBLIC_* values are inlined into the browser bundle at build time, so the Turnstile site key is a
+      # build argument. It is public by design. Secrets never go into the image.
+      - name: Build image (portal:${{ env.DEPLOY_SHA }})
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: apps/portal/Dockerfile
+          tags: portal:${{ env.DEPLOY_SHA }}
+          load: true
+          build-args: |
+            NEXT_PUBLIC_TURNSTILE_SITE_KEY=${{ vars.PORTAL_TURNSTILE_SITE_KEY }}
+          cache-from: type=gha,scope=portal-deploy
+          cache-to: type=gha,scope=portal-deploy,mode=max
+
+      - name: Save image tarball
+        run: docker save portal:${{ env.DEPLOY_SHA }} | gzip > /tmp/portal.tar.gz
+
+      - name: Set up SSH to droplet
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.DROPLET_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan ${{ secrets.DROPLET_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Ship image to droplet
+        run: |
+          scp -i ~/.ssh/id_deploy /tmp/portal.tar.gz \
+            ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }}:/tmp/portal.tar.gz
+
+      # Known caveat (BUILD-HANDOFF open decision 4, plan 06 CCR-5b): the container runs the migrations on start,
+      # so DATABASE_OWNER_URL, the owner credential that bypasses row level security, is in the app container's
+      # environment. Recommended before real partner data goes in: a one-shot migration service that holds the
+      # owner URL, so the app container only gets DATABASE_URL. Behaviour is unchanged here.
+      #
+      # Renders /opt/cleanstart/portal.env, the portal's own file (never the CMS's .env). Empty values are not
+      # written: env.ts rejects an empty string for an optional variable, so `KEY=` would crash the container.
+      # Required production variables are checked first so a missing one fails the deploy with its name, not the
+      # container with a crash loop.
+      - name: Render portal.env to droplet
+        env:
+          # Variables
+          APP_URL: ${{ vars.PORTAL_APP_URL }}
+          PARTNER_AGREEMENT_VERSION: ${{ vars.PARTNER_AGREEMENT_VERSION }}
+          BREVO_SENDER_EMAIL: ${{ vars.PORTAL_BREVO_SENDER_EMAIL }}
+          PARTNERS_NOTIFY_EMAIL: ${{ vars.PARTNERS_NOTIFY_EMAIL }}
+          R2_ENDPOINT: ${{ vars.PORTAL_R2_ENDPOINT }}
+          R2_BUCKET: ${{ vars.PORTAL_R2_BUCKET }}
+          HUBSPOT_PARTNER_PIPELINE_ID: ${{ vars.HUBSPOT_PARTNER_PIPELINE_ID }}
+          HUBSPOT_USE_ASSOCIATION_LABELS: ${{ vars.HUBSPOT_USE_ASSOCIATION_LABELS }}
+          HUBSPOT_PORTAL_ID: ${{ vars.HUBSPOT_PORTAL_ID }}
+          PORTAL_JOBS_ENABLED: ${{ vars.PORTAL_JOBS_ENABLED }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PORTAL_TURNSTILE_SITE_KEY }}
+          MICROSOFT_TENANT_ID: ${{ vars.PORTAL_MICROSOFT_TENANT_ID }}
+          GOOGLE_CLIENT_ID: ${{ vars.PORTAL_GOOGLE_CLIENT_ID }}
+          MICROSOFT_CLIENT_ID: ${{ vars.PORTAL_MICROSOFT_CLIENT_ID }}
+          # Secrets
+          PORTAL_OWNER_DB_PASSWORD: ${{ secrets.PORTAL_OWNER_DB_PASSWORD }}
+          PORTAL_APP_DB_PASSWORD: ${{ secrets.PORTAL_APP_DB_PASSWORD }}
+          AUTH_SECRET: ${{ secrets.PORTAL_AUTH_SECRET }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.PORTAL_GOOGLE_CLIENT_SECRET }}
+          MICROSOFT_CLIENT_SECRET: ${{ secrets.PORTAL_MICROSOFT_CLIENT_SECRET }}
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          R2_ACCESS_KEY_ID: ${{ secrets.PORTAL_R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.PORTAL_R2_SECRET_ACCESS_KEY }}
+          HUBSPOT_PORTAL_TOKEN: ${{ secrets.PORTAL_HUBSPOT_TOKEN }}
+          HUBSPOT_WEBHOOK_SECRET: ${{ secrets.PORTAL_HUBSPOT_WEBHOOK_SECRET }}
+          CMS_INTAKE_API_KEY: ${{ secrets.PORTAL_CMS_INTAKE_API_KEY }}
+          TURNSTILE_SECRET_KEY: ${{ secrets.PORTAL_TURNSTILE_SECRET_KEY }}
+          SENTRY_DSN: ${{ secrets.PORTAL_SENTRY_DSN }}
+          PORTAL_REVIEW_PASSWORD: ${{ secrets.PORTAL_REVIEW_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          # emit writes KEY=VALUE as one line, unquoted. A secret value that contains a newline is not supported,
+          # and compose interpolates a `$` in an env_file value, so avoid both when generating secrets.
+          missing=""
+          for key in APP_URL PORTAL_OWNER_DB_PASSWORD PORTAL_APP_DB_PASSWORD AUTH_SECRET BREVO_API_KEY \
+                     BREVO_SENDER_EMAIL R2_ENDPOINT R2_BUCKET R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY \
+                     HUBSPOT_PORTAL_TOKEN HUBSPOT_PARTNER_PIPELINE_ID HUBSPOT_WEBHOOK_SECRET \
+                     TURNSTILE_SECRET_KEY NEXT_PUBLIC_TURNSTILE_SITE_KEY SENTRY_DSN; do
+            if [ -z "${!key:-}" ]; then missing="$missing $key"; fi
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Missing required portal settings:$missing"
+            exit 1
+          fi
+
+          # The database passwords go into connection URLs, so they must be URL safe (use: openssl rand -hex 24).
+          for key in PORTAL_OWNER_DB_PASSWORD PORTAL_APP_DB_PASSWORD; do
+            if ! [[ "${!key}" =~ ^[A-Za-z0-9]+$ ]]; then
+              echo "::error::$key must be letters and digits only (openssl rand -hex 24)"
+              exit 1
+            fi
+          done
+          if [ "${#AUTH_SECRET}" -lt 32 ]; then
+            echo "::error::PORTAL_AUTH_SECRET must be at least 32 characters (openssl rand -base64 32)"
+            exit 1
+          fi
+
+          emit() { if [ -n "${2:-}" ]; then printf '%s=%s\n' "$1" "$2"; fi; }
+
+          {
+            emit NODE_ENV production
+            emit PORT 3004
+            emit HOSTNAME 0.0.0.0
+            emit APP_URL "$APP_URL"
+            emit DATABASE_URL "postgres://portal_app:${PORTAL_APP_DB_PASSWORD}@postgres:5432/cleanstart_portal"
+            emit DATABASE_OWNER_URL "postgres://portal_owner:${PORTAL_OWNER_DB_PASSWORD}@postgres:5432/cleanstart_portal"
+            emit AUTH_SECRET "$AUTH_SECRET"
+            emit GOOGLE_CLIENT_ID "$GOOGLE_CLIENT_ID"
+            emit GOOGLE_CLIENT_SECRET "$GOOGLE_CLIENT_SECRET"
+            emit MICROSOFT_CLIENT_ID "$MICROSOFT_CLIENT_ID"
+            emit MICROSOFT_CLIENT_SECRET "$MICROSOFT_CLIENT_SECRET"
+            emit MICROSOFT_TENANT_ID "$MICROSOFT_TENANT_ID"
+            emit PARTNER_AGREEMENT_VERSION "$PARTNER_AGREEMENT_VERSION"
+            emit BREVO_API_KEY "$BREVO_API_KEY"
+            emit BREVO_SENDER_EMAIL "$BREVO_SENDER_EMAIL"
+            emit PARTNERS_NOTIFY_EMAIL "$PARTNERS_NOTIFY_EMAIL"
+            emit R2_ENDPOINT "$R2_ENDPOINT"
+            emit R2_BUCKET "$R2_BUCKET"
+            emit R2_ACCESS_KEY_ID "$R2_ACCESS_KEY_ID"
+            emit R2_SECRET_ACCESS_KEY "$R2_SECRET_ACCESS_KEY"
+            emit HUBSPOT_PORTAL_TOKEN "$HUBSPOT_PORTAL_TOKEN"
+            emit HUBSPOT_PARTNER_PIPELINE_ID "$HUBSPOT_PARTNER_PIPELINE_ID"
+            emit HUBSPOT_USE_ASSOCIATION_LABELS "$HUBSPOT_USE_ASSOCIATION_LABELS"
+            emit HUBSPOT_WEBHOOK_SECRET "$HUBSPOT_WEBHOOK_SECRET"
+            emit HUBSPOT_PORTAL_ID "$HUBSPOT_PORTAL_ID"
+            emit PORTAL_JOBS_ENABLED "${PORTAL_JOBS_ENABLED:-true}"
+            emit CMS_API_URL http://cms:3000
+            emit CMS_INTAKE_API_KEY "$CMS_INTAKE_API_KEY"
+            emit TURNSTILE_SECRET_KEY "$TURNSTILE_SECRET_KEY"
+            emit NEXT_PUBLIC_TURNSTILE_SITE_KEY "$NEXT_PUBLIC_TURNSTILE_SITE_KEY"
+            emit SENTRY_DSN "$SENTRY_DSN"
+            emit SENTRY_ENVIRONMENT production
+            emit PORTAL_REVIEW_PASSWORD "$PORTAL_REVIEW_PASSWORD"
+          } | ssh -i ~/.ssh/id_deploy \
+            ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} \
+            'umask 077 && cat > /opt/cleanstart/portal.env && chmod 600 /opt/cleanstart/portal.env'
+
+      - name: Load image + restart portal
+        run: |
+          ssh -i ~/.ssh/id_deploy \
+            ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} \
+            'set -e
+             cd /opt/cleanstart
+             docker load < /tmp/portal.tar.gz
+             docker tag portal:${{ env.DEPLOY_SHA }} portal:current
+             docker compose --profile portal up -d --wait --wait-timeout 300 portal
+
+             # Retention: keep portal:current + 2 most recent SHA tags for fast rollback.
+             docker images portal --format "{{.Tag}}\t{{.CreatedAt}}" \
+               | grep -v "^current\b" \
+               | sort -k2 -r \
+               | tail -n +3 \
+               | awk "{print \$1}" \
+               | xargs -r -I{} docker rmi "portal:{}" || true
+             docker image prune -f
+
+             rm -f /tmp/portal.tar.gz
+             echo "--- portal container status ---"
+             docker ps --filter name=cleanstart-portal-1 --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+             echo "--- last 20 lines of portal log ---"
+             docker logs --tail 20 cleanstart-portal-1
+             echo "--- droplet disk after deploy ---"
+             df -h / | tail -1'
+
+      - name: Smoke probe
+        run: |
+          # compose --wait already gated on the container healthcheck; retry the local probe (6 x 5s) so a slow
+          # first response does not red an otherwise-healthy deploy. A sustained failure still fails the job.
+          ssh -i ~/.ssh/id_deploy \
+            ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} \
+            'for i in $(seq 1 6); do
+               code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 10 http://127.0.0.1:3004/api/health || echo 000)
+               echo "attempt $i: local 127.0.0.1:3004/api/health -> HTTP $code"
+               [ "$code" = "200" ] && exit 0
+               [ "$i" -lt 6 ] && sleep 5
+             done
+             echo "local health probe failed after 6 attempts"
+             exit 1'
+          curl -sS -o /dev/null -w "public partners.cleanstart.com -> HTTP %{http_code}\n" --max-time 10 https://partners.cleanstart.com/api/health || true

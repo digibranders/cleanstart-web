@@ -136,7 +136,7 @@ Start: `git worktree add .claude/worktrees/portal-a -b feat/portal-a feat/portal
 
 Nothing here runs on the droplet. The workflows cannot run until the branch is pushed, which this plan never does: say so in the progress log line.
 
-- [ ] **Step 1: Preconditions**
+- [x] **Step 1: Preconditions**
 
 ```bash
 git tag | grep -x portal-w0
@@ -146,7 +146,7 @@ grep -n "output" apps/portal/next.config.ts || echo "no output setting yet"
 
 Expected: `portal-w0`, the four paths listed, and a `next.config.ts` line containing `standalone` (M0.2 Step 5b wrote it). If a path is missing Wave 0 did not finish: append a `blocked` line and stop.
 
-- [ ] **Step 2: Check the two shared-file changes that Wave 0 made**
+- [x] **Step 2: Check the two shared-file changes that Wave 0 made**
 
 The standalone build needs `output: 'standalone'` and the monorepo tracing root (CCR-1, written by M0.2 Step 5b), and the review gate must not cover `/api/health` (CCR-2, written by M1.1e). Check both, and carry on; if either is missing, append a `blocked` line naming it (the code is in "Contract change requests").
 
@@ -157,7 +157,7 @@ grep -n '"/api/health"' apps/portal/src/proxy.ts
 
 Expected: the first prints the `standalone` and `outputFileTracingRoot` lines, the second prints the `/api/health` exemption.
 
-- [ ] **Step 3: Write the failing health route test**
+- [x] **Step 3: Write the failing health route test**
 
 Create `apps/portal/src/app/api/health/route.test.ts`:
 
@@ -190,7 +190,7 @@ describe('GET /api/health', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/app/api/health/route.test.ts`
 Expected: FAIL, `Failed to resolve import "./route"`.
 
-- [ ] **Step 4: Implement the health route**
+- [x] **Step 4: Implement the health route**
 
 Create `apps/portal/src/app/api/health/route.ts`. It is the system `db` (contracts L: public, no auth, no write) and returns no internal detail:
 
@@ -218,7 +218,7 @@ export async function GET(): Promise<NextResponse> {
 
 Run the test again. Expected: PASS, 2 tests.
 
-- [ ] **Step 5: Create the dash check script**
+- [x] **Step 5: Create the dash check script**
 
 `apps/portal/scripts/verify-copy.mjs` is the portal's counterpart of `apps/web`'s `verify:copy` (CLAUDE.md: no em-dashes or en-dashes in code-owned copy). It is built from code points so the file itself contains neither character. CI calls it directly, so no `package.json` change is needed.
 
@@ -277,7 +277,7 @@ console.info(`verify:copy ok (${files.length} files)`);
 Run: `node apps/portal/scripts/verify-copy.mjs`
 Expected: `verify:copy ok (<n> files)`, exit 0.
 
-- [ ] **Step 6: Create the migration bundler**
+- [x] **Step 6: Create the migration bundler**
 
 `scripts/migrate.ts` runs the Drizzle migrations and then `src/db/rls.sql` (contracts C.5). The standalone image has neither `tsx` nor the migrator, so this script bundles the entry to one CommonJS file at image build time. esbuild is resolved through `tsx` (a root devDependency that depends on it), so nothing is added to `package.json`.
 
@@ -324,7 +324,7 @@ cd ../..
 
 Expected: both runs exit 0 and the second changes nothing. **Verify (contracts M.1 item 18):** if the bundle cannot find `drizzle/` or `src/db/rls.sql`, `scripts/migrate.ts` resolves them from somewhere other than `process.cwd()` or its own folder. The image runs the bundle from `apps/portal` with both paths present (Step 7), so the fix is in `scripts/migrate.ts` (a W0-b file): append a `blocked` line asking for `process.cwd()`-relative paths. `migrate.cjs` is generated: it is ignored by the `apps/portal/.gitignore` line added in Step 12 and never committed.
 
-- [ ] **Step 7: Create the Dockerfile and its ignore file**
+- [x] **Step 7: Create the Dockerfile and its ignore file**
 
 The build context is the repository root (a pnpm workspace). `Dockerfile.dockerignore` sits next to the Dockerfile and replaces the root `.dockerignore` for this build (BuildKit looks for `<Dockerfile name>.dockerignore` first); `apps/cms` and `apps/web` stay in the context because pnpm checks the lockfile against every workspace `package.json`.
 
@@ -436,7 +436,7 @@ rm -rf /tmp/p06ctx && mkdir -p /tmp/p06ctx/apps/portal && cp apps/portal/Dockerf
 
 Expected: `Check complete, no warnings found.`
 
-- [ ] **Step 8: Reconcile and extend `infra/docker-compose.yml`**
+- [x] **Step 8: Reconcile and extend `infra/docker-compose.yml`**
 
 The repo copy is out of date: it has no `cms` service and publishes Postgres and Meilisearch on all interfaces. The droplet's file (`/opt/cleanstart/compose.yml`, documented as section 6.1 of `docs/operations/CMS-DEPLOYMENT.md`) binds to `127.0.0.1`, tunes Meilisearch and has the `cms` service. The droplet file is never read here (no `ssh`); section 6.1 is the evidence. `profiles` are added because `deploy-cms.yml` already runs `docker compose --profile cms up -d --wait cms`. Replace the whole file:
 
@@ -532,7 +532,7 @@ Expected: `meilisearch`, `postgres`, `portal`.
 
 The operator compares this file with the droplet's before copying it (handover item 2). The reconciliation is by documentation only, so the compare is the real check.
 
-- [ ] **Step 9: Write `portal.yml`**
+- [x] **Step 9: Write `portal.yml`**
 
 CI on `apps/portal/**`, `packages/forms/**`, `packages/ui/**`: a Postgres 16 service with the superuser `postgres`, the two roles and the test database created by the track's own `scripts/db-create.sh`, then lint, typecheck, test (which includes the isolation matrix), the dash check and the build with `SKIP_ENV_VALIDATION=1`. A second job runs the browser suite for pull requests into `main` and on demand (it is slow, like the web `lhci` job). The CI Postgres service user differs from contracts J.2's statement ("PORTAL_TEST_OWNER_URL points at the superuser"): here the owner URL is `portal_owner`, which `db-create.sh` creates with `CREATEDB`, so CI exercises the same role split as production.
 
@@ -700,7 +700,7 @@ jobs:
           retention-days: 14
 ```
 
-- [ ] **Step 10: Write `deploy-portal.yml`**
+- [x] **Step 10: Write `deploy-portal.yml`**
 
 A copy of `deploy-cms.yml` in shape (wait for green CI on the same SHA, buildx and the GHA cache, `docker save | scp`, render the env file, `docker compose up -d --wait`, retention of the current image plus two tags, a retried local smoke probe on `127.0.0.1:3004/api/health`), with these deliberate differences: it renders `/opt/cleanstart/portal.env`, the portal's own file; it writes only non-empty values (`env.ts` rejects `KEY=` for optional variables, which would crash the container); it fails the deploy by variable name when a required production setting is missing, and when a database password is not URL safe; the Turnstile site key goes in as a build argument because `NEXT_PUBLIC_*` values are inlined into the browser bundle; and nothing deploys until the repository variable `PORTAL_DEPLOY_ENABLED` is `true` (set by the operator after the droplet steps, handover item 1).
 
@@ -930,7 +930,7 @@ jobs:
           curl -sS -o /dev/null -w "public partners.cleanstart.com -> HTTP %{http_code}\n" --max-time 10 https://partners.cleanstart.com/api/health || true
 ```
 
-- [ ] **Step 11: Lint both workflows and the env rendering**
+- [x] **Step 11: Lint both workflows and the env rendering**
 
 ```bash
 actionlint .github/workflows/portal.yml .github/workflows/deploy-portal.yml && echo ACTIONLINT_OK
@@ -960,7 +960,7 @@ PY
 
 Expected: `complete -> 0`; `no secret -> (1, ['::error::Missing required portal settings: AUTH_SECRET'])`; `bad pw -> (1, ['::error::PORTAL_APP_DB_PASSWORD must be letters and digits only (openssl rand -hex 24)'])`.
 
-- [ ] **Step 12: Run the image locally** (needs the Wave 0 `next.config.ts` and `proxy.ts` changes checked in Step 2)
+- [x] **Step 12: Run the image locally** (needs the Wave 0 `next.config.ts` and `proxy.ts` changes checked in Step 2)
 
 Add the generated bundle to `apps/portal/.gitignore` (a new file inside the portal), build, and run the container against the local Postgres with throwaway values. The production environment check demands every production variable, so the placeholders below satisfy it; nothing sends mail or calls HubSpot from `/api/health`.
 
@@ -988,7 +988,7 @@ docker rm -f portal-local
 
 Expected: the image size is a few hundred MB; the log shows the migration finishing and `Ready`; the health call is `HTTP/1.1 200`, body `{"status":"ok"}` with `Cache-Control: no-store` and `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'` once M5.1 has landed; the health status becomes `healthy`. **Verify (contracts M.1 item 18):** if the container exits with `Cannot find module '/app/apps/portal/server.js'`, the standalone folder is not nested (tracing root not applied): `docker run --rm --entrypoint sh portal:local -c 'find /app -maxdepth 3 -name server.js'` shows where it is. Fix the `COPY` and `WORKDIR` lines of the Dockerfile to that path and record it in the progress log. If the container exits before the migration, read the error: the usual cause is a variable the production check requires.
 
-- [ ] **Step 13: Write the runbook sections 1 to 3**
+- [x] **Step 13: Write the runbook sections 1 to 3**
 
 Create `docs/operations/PARTNER-PORTAL.md` (if H or another track already created it, append the sections below instead of overwriting). M5.9 adds sections 4 to 11 later. These are the one-time droplet steps, as a person will run them; each is "read the command first".
 
@@ -1073,7 +1073,7 @@ curl -fsS http://127.0.0.1:3004/api/health
 Migrations only move forward. A release that added a column is rolled back to an image that ignores it; never drop a column in the same release that stops using it.
 ````
 
-- [ ] **Step 14: Gate A and commit**
+- [x] **Step 14: Gate A and commit**
 
 Run the standard Gate A block. Extra checks for this task:
 
@@ -1109,7 +1109,7 @@ Design decisions (all recorded here, none changes a contract):
 - The CSV is built in the browser from the rows `exportAuditAction` returns (cap 5000, `ValidationError` above). A cell that starts with `=`, `+`, `-`, `@` or a control character gets a leading apostrophe, because partner names and notes are typed by visitors and a spreadsheet would run them as formulas.
 - The health card is passed to the screen as a ReactNode slot by the page, so the screen does not depend on track H's `integration-health.ts`. Steps 1 to 6 do not need H4.10; steps 7 to 9 do.
 
-- [ ] **Step 1: Write the failing library tests**
+- [x] **Step 1: Write the failing library tests**
 
 Create `src/lib/audit-filters.test.ts` and `src/lib/audit-csv.test.ts`:
 
@@ -1222,7 +1222,7 @@ describe('auditToCsv', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/lib/audit-filters.test.ts src/lib/audit-csv.test.ts`
 Expected: FAIL, both modules cannot be resolved.
 
-- [ ] **Step 2: Implement the two libraries**
+- [x] **Step 2: Implement the two libraries**
 
 Both are pure and client safe (no `@/db`, no `next/*`).
 
@@ -1364,7 +1364,7 @@ export function auditToCsv(rows: readonly AuditEntryDto[]): string {
 
 Run the same command. Expected: PASS, 14 tests.
 
-- [ ] **Step 3: Write the failing repo test**
+- [x] **Step 3: Write the failing repo test**
 
 Create `src/server/repo/audit.test.ts`. It runs against the real test database with row level security on, through `withViewer`, and covers: period and total, filters, search with `%` and `_` as plain characters, paging over rows that share one timestamp, a bad cursor, the entry `recordAudit` writes for the HubSpot sync actor, the 5000 row export cap, and a partner viewer being refused.
 
@@ -1538,7 +1538,7 @@ describe('exportAudit', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/audit.test.ts`
 Expected: FAIL, `./audit` cannot be resolved.
 
-- [ ] **Step 4: Implement `repo/audit.ts`**
+- [x] **Step 4: Implement `repo/audit.ts`**
 
 Staff only (`assertStaff` first, so a partner gets `ForbiddenError` before row level security is consulted). No function here writes: the write helper is `recordAudit` (contracts F.4). Only `listAudit` and `exportAudit` are exported as functions, which keeps the isolation test's "every export is registered" rule satisfied; helpers stay private.
 
@@ -1693,7 +1693,7 @@ export const isolation = defineIsolation<'listAudit' | 'exportAudit'>({
 
 Run the repo test. Expected: PASS, 10 tests. Run the isolation matrix: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/isolation.test.ts`. Expected: PASS, with `audit` among the modules it iterates (`registers every exported function in isolation` and `leaks nothing across tenants`).
 
-- [ ] **Step 5: Write the failing export action test, then the action**
+- [x] **Step 5: Write the failing export action test, then the action**
 
 Create `src/server/actions/audit.test.ts` (this version covers the export only; Step 8 extends it), then `src/server/actions/audit.ts`. `exportAuditAction` follows the F.8 pattern: Zod parse, `assertCan(viewer, 'audit.export')`, repo call inside `withViewer`. Validation errors come back as `{ ok: false, error: { code: 'validation', issues } }`.
 
@@ -1781,7 +1781,7 @@ export async function exportAuditAction(raw: unknown): Promise<ActionResult<Audi
 
 Run it again. Expected: PASS, 3 tests.
 
-- [ ] **Step 6: Convert the screen, the drawer and the page**
+- [x] **Step 6: Convert the screen, the drawer and the page**
 
 The markup and class names are the mock's. What changes: props instead of `useAudit()`, the DTO instead of `AuditEntry`, filters in the URL, `exportAuditAction` instead of the local CSV code, the "Older events" and "Newest events" links for paging, the source shown through `EVENT_SOURCE_LABEL`, and no `data-tour` attributes (the walkthrough is removed in M5.4). `downloadCsv` is the mock's existing helper in `components/reports/download-csv.ts`.
 
@@ -2368,7 +2368,7 @@ export default async function Page({
 
 Run: `pnpm --filter @cleanstart/portal typecheck`. Expected: no errors.
 
-- [ ] **Step 10: Look at it**
+- [x] **Step 10: Look at it**
 
 ```bash
 lsof -nP -iTCP:3254 -sTCP:LISTEN            # must print nothing
@@ -2377,7 +2377,7 @@ pnpm --filter @cleanstart/portal exec next dev --port 3254
 
 In another shell seed the track database (`pnpm --filter @cleanstart/portal db:seed`), open `http://localhost:3254/sign-in` in a browser at 1440 by 900 and sign in as the seeded partner manager, Farhan Qureshi (his email and the shared development password `DEV_SEED_PASSWORD` are in `src/db/fixtures.ts`). Check against the mock's numbers (contracts J.5): `/admin/audit` shows **12 events** for the default 30 days and **13** for Last 90 days; the newest row is the HubSpot sync "Stage changed" entry (the seed resolves the mock's relative days against the day you seeded, so seed and look on the same day); clicking an action opens the drawer with Before and After for "Accepted the partner agreement"; typing `pearl` narrows the list and the URL gains `?q=pearl`; Export CSV downloads `cleanstart-audit-log.csv` whose first line is `"When","Who","Role","Action","On","Source","Details"`. Signed in as a partner admin the page redirects to `/partner/overview`. Stop the dev server with Ctrl C (never kill another process).
 
-- [ ] **Step 11: Gate A and commit**
+- [x] **Step 11: Gate A and commit**
 
 Run the standard Gate A block, then Gate B, then (stage the health card paths only if Step 8 and 9 were done; otherwise omit them and the commit message ends "without the health card"):
 
@@ -2411,7 +2411,7 @@ Matching: `ILIKE '%q%'` (uses the trigram index, `%` and `_` in the query are es
 
 Known limit: a staff member's hit on a deal opens `/admin/approvals`, a partner hit opens `/admin/partners`, and a document or person hit opens the owning list. The staff screens have no per-record route in the contracts' route map, so the palette cannot deep link. A later task can add `?focus=<id>` handling to those screens.
 
-- [ ] **Step 1: Write the failing "Pages" group test**
+- [x] **Step 1: Write the failing "Pages" group test**
 
 ```ts
 import { describe, expect, it } from 'vitest';
@@ -2445,7 +2445,7 @@ describe('buildPageHits', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/lib/search-pages.test.ts`
 Expected: FAIL, `./search-pages` cannot be resolved.
 
-- [ ] **Step 2: Implement the "Pages" group**
+- [x] **Step 2: Implement the "Pages" group**
 
 It is built from the viewer's own sidebar (`PARTNER_NAV` or `ADMIN_NAV`, or whatever `navFor(viewer)` returns, passed in by the shell) plus the account page for partners, so it can never list a screen the viewer cannot open. `SEARCH_MIN_CHARS` is shared with the server.
 
@@ -2480,7 +2480,7 @@ export function buildPageHits(nav: readonly NavItem[], kind: PortalKind, q: stri
 
 Run the test. Expected: PASS, 4 tests.
 
-- [ ] **Step 3: Write the failing repo test**
+- [x] **Step 3: Write the failing repo test**
 
 It seeds partner A (Kestrel Systems, channel, India) and partner B (Kestrel Gulf Networks, distributor, Middle East), their people and deals, documents with every audience kind, and runs `searchAll` as a partner manager, staff sales, marketing, a partner admin, partner sales and partner technical. It proves: group order and hints, typo tolerance, no hits for one or two characters or for `%` and `_`, the per group cap, soft deleted documents and disabled people hidden, regional limits, one partner never seeing another partner's deals, record or colleagues, and the document audience (all, matching category, named, not another partner's).
 
@@ -2652,7 +2652,7 @@ describe('searchAll as a partner', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/search.test.ts`
 Expected: FAIL, `./search` cannot be resolved.
 
-- [ ] **Step 4: Implement `repo/search.ts`**
+- [x] **Step 4: Implement `repo/search.ts`**
 
 The `isolation` entry is scope `tenant`: as partner A it searches broadly and returns only the hits that point at partner B's deal (none may). The explicit tests above are the stronger proof; the entry keeps the matrix's "every export is registered" rule satisfied.
 
@@ -2838,7 +2838,7 @@ export const isolation = defineIsolation<'searchAll'>({
 
 Run the repo test. Expected: PASS, 12 tests. Then the matrix: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/isolation.test.ts`. Expected: PASS with `search` among the modules.
 
-- [ ] **Step 5: Write the failing action test, then the action**
+- [x] **Step 5: Write the failing action test, then the action**
 
 `searchAction` is the only caller of `searchAll`: Zod (`q` at most 80 characters, `limit` 1 to 10, default 5), `assertCan(viewer, 'search.use')`, a rate limit of 30 searches per 10 seconds per person (the palette debounces at 150 ms, so normal typing stays far below it), a short query answered without touching the database, then `withViewer`. The test mocks the session, `next/cache`, `next/headers` and Sentry only.
 
@@ -2918,7 +2918,7 @@ export async function searchAction(raw: unknown): Promise<ActionResult<SearchHit
 
 Run it again. Expected: PASS, 4 tests.
 
-- [ ] **Step 6: Build the palette component**
+- [x] **Step 6: Build the palette component**
 
 It keeps the mock's markup and classes (`dialog palette`, `pal-in`, `pal-list`, `pal-g`, `pal-item`). It owns its own state and the Ctrl K shortcut, and opens when anything dispatches `OPEN_SEARCH_EVENT` on `window`, so the shell needs no shared state. Behaviour: opens with the field focused; Escape closes and returns focus to what opened it; Tab stays inside; ArrowDown moves from the field into the results and back; Enter opens the first result; answers arrive in order (a slow reply to "ke" never replaces the reply to "kestrel"); a failed search says so and the Pages group keeps working. The click-away layer is a real button with `tabIndex={-1}` and an accessible name, so it does not need a lint suppression.
 
@@ -3142,7 +3142,7 @@ export function SearchPalette({ kind, nav }: { kind: PortalKind; nav: readonly N
 
 Run: `pnpm --filter @cleanstart/portal typecheck`. Expected: no errors.
 
-- [ ] **Step 7: Ask for the shell wiring**
+- [x] **Step 7: Ask for the shell wiring**
 
 `shell.tsx` is a shared file that this track does not edit. The orchestrator applies CCR-3 in W2-a step 0 (delete the mock's search data and state, replace the inline palette with `<SearchPalette kind={kind} nav={nav} />`, make both openers dispatch `OPEN_SEARCH_EVENT`, name the top bar button for screen readers). This is planned work, not a blocker: append a `note` line and carry on.
 
@@ -3150,11 +3150,11 @@ Run: `pnpm --filter @cleanstart/portal typecheck`. Expected: no errors.
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M IST') | M4.3 | note | A | - | - | search-palette.tsx ready; shell.tsx wiring is W2-a step 0 (CCR-3 in plan 06)" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 8: Check it in the browser** (only possible once W2-a step 0 has wired the shell; in Wave 1 the palette is covered by its unit and action tests, so write `not visually checked` in the `done` line)
+- [x] **Step 8: Check it in the browser** (only possible once W2-a step 0 has wired the shell; in Wave 1 the palette is covered by its unit and action tests, so write `not visually checked` in the `done` line)
 
 Run `pnpm --filter @cleanstart/portal exec next dev --port 3254` (check the port first), sign in as the seeded partner manager, press Ctrl K on `/admin/approvals`: the palette opens with the field focused and the six admin pages listed; type `kest`: Partners shows Kestrel Systems with "Channel partner, India" and Deals shows Kestrel's deals; Escape closes and focus returns to the top bar button. Sign in as the seeded Kestrel partner admin: search `arbor` shows nothing from another partner. At 375 px wide the top bar search button is announced as "Search deals and documents" (no empty button name). If CCR-3 is not merged yet, skip this step and say so in the `done` line; the E2E task (`e2e/admin.spec.ts`) proves it later.
 
-- [ ] **Step 9: Gate A and commit**
+- [x] **Step 9: Gate A and commit**
 
 Run the standard Gate A block, then Gate B, then:
 

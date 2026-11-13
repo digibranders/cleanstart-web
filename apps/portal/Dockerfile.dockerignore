@@ -1,0 +1,32 @@
+# Used instead of the repository .dockerignore when building apps/portal/Dockerfile (BuildKit looks for
+# <Dockerfile name>.dockerignore next to the Dockerfile first). Same rules, plus the large directories the
+# portal build does not need. apps/cms and apps/web stay in the context because pnpm checks the lockfile
+# against every workspace package.json.
+.git
+.gitignore
+.claude
+.claude-brain
+.gstack
+.impeccable
+.superpowers
+.vercel
+.playwright-mcp
+docs
+infra
+migrations
+**/node_modules
+**/.next
+**/out
+**/.env
+**/.env.local
+**/.env.development
+**/.env.production
+**/.turbo
+**/coverage
+**/playwright-report
+**/test-results
+**/*.log
+.DS_Store
+**/.DS_Store
+.idea
+.vscode
