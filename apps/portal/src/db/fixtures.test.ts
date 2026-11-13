@@ -1,7 +1,7 @@
 import { sql } from 'drizzle-orm';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { fixedClock } from '@/lib/clock';
-import { parseLastSeen, parseMockDate, seedDevDatabase, seedMockData, type SeedSummary } from './fixtures';
+import { assertDevSeedAllowed, parseLastSeen, parseMockDate, seedDevDatabase, seedMockData, type SeedSummary } from './fixtures';
 import { resetDb, testDb } from './test-helpers';
 
 const clock = fixedClock('2026-11-06T14:02:00Z');
@@ -83,5 +83,33 @@ describe('seedDevDatabase', () => {
     expect((await seedDevDatabase(testDb(), clock)).partners).toBe(21);
     await expect(seedDevDatabase(testDb(), clock)).rejects.toThrow(/already has partners/);
     expect((await rows('select count(*)::int as n from partners'))[0]).toEqual({ n: 21 });
+  });
+});
+
+describe('dev seed guard', () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  it('allows a local, non-production database', () => {
+    expect(() => assertDevSeedAllowed({ NODE_ENV: 'development', DATABASE_URL: 'postgresql://u:p@localhost:5432/d' })).not.toThrow();
+    expect(() => assertDevSeedAllowed({ DATABASE_URL: 'postgresql://u:p@127.0.0.1:5432/d' })).not.toThrow();
+    expect(() => assertDevSeedAllowed({ DATABASE_URL: 'postgresql://u:p@[::1]:5432/d' })).not.toThrow();
+  });
+
+  it('refuses production and any non-local host', () => {
+    expect(() => assertDevSeedAllowed({ NODE_ENV: 'production', DATABASE_URL: 'postgresql://u:p@localhost:5432/d' })).toThrow(/production/);
+    expect(() => assertDevSeedAllowed({ DATABASE_URL: 'postgresql://u:p@db.example.com:5432/d' })).toThrow(/not localhost/);
+    expect(() => assertDevSeedAllowed({ DATABASE_URL: 'postgresql://u:p@localhost.evil.test:5432/d' })).toThrow(/not localhost/);
+    expect(() => assertDevSeedAllowed({})).toThrow(/DATABASE_URL is not set/);
+    expect(() => assertDevSeedAllowed({ DATABASE_URL: 'not a url' })).toThrow(/not a valid URL/);
+  });
+
+  it('seedDevDatabase refuses before touching the database', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    await resetDb();
+    await expect(seedDevDatabase(testDb(), clock)).rejects.toThrow(/production/);
+    expect((await rows('select count(*)::int as n from partners'))[0]).toEqual({ n: 0 });
+    vi.stubEnv('NODE_ENV', 'test');
+    vi.stubEnv('DATABASE_URL', 'postgresql://u:p@db.example.com:5432/d');
+    await expect(seedDevDatabase(testDb(), clock)).rejects.toThrow(/not localhost/);
   });
 });

@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { sql } from 'drizzle-orm';
+import { z } from 'zod';
 import type { Db } from '@/db/client';
 import {
   accessRequests,
@@ -59,45 +60,56 @@ export interface SeedOptions {
 
 /* ---------------------------------------------------------------- the shapes of the extracted mock data */
 
-interface MockPerson { name: string; role: string; last: string }
-interface MockPartner {
-  id: string; name: string; domain: string; category: string; region: string; status: string; last: string; since: string;
-  agreement: string; admin: string; manager: string; hs: string; people: MockPerson[];
-}
-interface MockContact { name: string; role?: string; email?: string; phone?: string }
-interface MockMessage { id: string; who: string; org: string; self: boolean; when: string; text: string; auto?: boolean }
-interface MockEvent { when: string; text: string; by: string; source: string; auto?: boolean }
-interface MockDeal {
-  id: string; customer: string; website?: string; partner: string; product: string; region: string; manager: string;
-  registeredBy?: string; registered: string; registeredTime?: string; resubmittedOn?: string; status: string; stage: string;
-  protectionEnd?: string; closedOn?: string; decidedOn?: string; decidedBy?: string; rejectionReason?: string; crmRef?: string;
-  crmSynced?: string; extensionRequested?: boolean; notes?: string; contacts: MockContact[]; thread: MockMessage[]; history: MockEvent[];
-}
-interface MockApplication {
-  reference: string; company: string; domain: string; applicant: string; email?: string; role: string; phone?: string;
-  category: string; region: string; submitted: string; reason: string; status: string;
-}
-interface MockDocument {
-  title: string; id: string; type: string; format: string; product: string; summary?: string; updated: string;
-  audience: { kind: 'all' } | { kind: 'categories'; categories: string[] } | { kind: 'partners'; partners: string[] };
-  opens: number; partnerCount: number; ownOpens: number;
-}
-interface MockAuditEntry {
-  id: string; ageDays: number; when: string; who: string; whoRole: string; whoKind: 'staff' | 'partner' | 'sync'; kind: string;
-  action: string; target: string; source: string; before: string; after: string; note: string;
-}
-interface MockTeamMember { name: string; email: string; role: string; status: string; last: string }
-interface MockAccessRequest { name: string; email: string; note: string; role: string }
-interface MockStaff { name: string; email: string; role: string; region: string; last: string; status: string }
+const mockPersonSchema = z.object({ name: z.string(), role: z.string(), last: z.string() });
+const mockPartnerSchema = z.object({
+  id: z.string(), name: z.string(), domain: z.string(), category: z.string(), region: z.string(), status: z.string(), last: z.string(),
+  since: z.string(), agreement: z.string(), admin: z.string(), manager: z.string(), hs: z.string(), people: z.array(mockPersonSchema),
+});
+const mockContactSchema = z.object({ name: z.string(), role: z.string().optional(), email: z.string().optional(), phone: z.string().optional() });
+const mockMessageSchema = z.object({
+  id: z.string(), who: z.string(), org: z.string(), self: z.boolean(), when: z.string(), text: z.string(), auto: z.boolean().optional(),
+});
+const mockEventSchema = z.object({ when: z.string(), text: z.string(), by: z.string(), source: z.string(), auto: z.boolean().optional() });
+const mockDealSchema = z.object({
+  id: z.string(), customer: z.string(), website: z.string().optional(), partner: z.string(), product: z.string(), region: z.string(),
+  manager: z.string(), registeredBy: z.string().optional(), registered: z.string(), registeredTime: z.string().optional(),
+  resubmittedOn: z.string().optional(), status: z.string(), stage: z.string(), protectionEnd: z.string().optional(),
+  closedOn: z.string().optional(), decidedOn: z.string().optional(), decidedBy: z.string().optional(), rejectionReason: z.string().optional(),
+  crmRef: z.string().optional(), crmSynced: z.string().optional(), extensionRequested: z.boolean().optional(), notes: z.string().optional(),
+  contacts: z.array(mockContactSchema), thread: z.array(mockMessageSchema), history: z.array(mockEventSchema),
+});
+const mockApplicationSchema = z.object({
+  reference: z.string(), company: z.string(), domain: z.string(), applicant: z.string(), email: z.string().optional(), role: z.string(),
+  phone: z.string().optional(), category: z.string(), region: z.string(), submitted: z.string(), reason: z.string(), status: z.string(),
+});
+const mockDocumentSchema = z.object({
+  title: z.string(), id: z.string(), type: z.string(), format: z.string(), product: z.string(), summary: z.string().optional(), updated: z.string(),
+  audience: z.discriminatedUnion('kind', [
+    z.object({ kind: z.literal('all') }),
+    z.object({ kind: z.literal('categories'), categories: z.array(z.string()) }),
+    z.object({ kind: z.literal('partners'), partners: z.array(z.string()) }),
+  ]),
+  opens: z.number(), partnerCount: z.number(), ownOpens: z.number(),
+});
+const mockAuditEntrySchema = z.object({
+  id: z.string(), ageDays: z.number(), when: z.string(), who: z.string(), whoRole: z.string(), whoKind: z.enum(['staff', 'partner', 'sync']),
+  kind: z.string(), action: z.string(), target: z.string(), source: z.string(), before: z.string(), after: z.string(), note: z.string(),
+});
+const mockTeamSchema = z.object({
+  members: z.array(z.object({ name: z.string(), email: z.string(), role: z.string(), status: z.string(), last: z.string() })),
+  requests: z.array(z.object({ name: z.string(), email: z.string(), note: z.string(), role: z.string() })),
+});
+const mockStaffSchema = z.object({ name: z.string(), email: z.string(), role: z.string(), region: z.string(), last: z.string(), status: z.string() });
+const mockAccountSchema = z.object({ name: z.string(), title: z.string(), phone: z.string(), notify: z.record(z.boolean()), twoStepOn: z.boolean() });
 
-const partnersData = mockPartners as unknown as MockPartner[];
-const dealsData = mockDeals as unknown as MockDeal[];
-const applicationsData = mockApplications as unknown as MockApplication[];
-const documentsData = mockDocuments as unknown as MockDocument[];
-const auditData = mockAudit as unknown as MockAuditEntry[];
-const teamData = mockTeam as unknown as { members: MockTeamMember[]; requests: MockAccessRequest[] };
-const staffData = mockStaff as unknown as MockStaff[];
-const accountData = mockAccount as unknown as { name: string; title: string; phone: string; notify: Record<string, boolean>; twoStepOn: boolean };
+const partnersData = z.array(mockPartnerSchema).parse(mockPartners);
+const dealsData = z.array(mockDealSchema).parse(mockDeals);
+const applicationsData = z.array(mockApplicationSchema).parse(mockApplications);
+const documentsData = z.array(mockDocumentSchema).parse(mockDocuments);
+const auditData = z.array(mockAuditEntrySchema).parse(mockAudit);
+const teamData = mockTeamSchema.parse(mockTeam);
+const staffData = z.array(mockStaffSchema).parse(mockStaff);
+const accountData = mockAccountSchema.parse(mockAccount);
 
 /* ---------------------------------------------------------------- small parsers for the mock's display strings */
 
@@ -484,8 +496,25 @@ export async function seedMockData(db: Db, opts: SeedOptions): Promise<SeedSumma
   };
 }
 
+const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '::1', '[::1]']);
+
+/** The dev seed writes fake partners and a known password, so it only runs against a local, non-production database. */
+export function assertDevSeedAllowed(env: Record<string, string | undefined>): void {
+  if (env.NODE_ENV === 'production') throw new Error('Refusing to seed the dev data: NODE_ENV is "production".');
+  const url = env.DATABASE_URL;
+  if (!url) throw new Error('Refusing to seed the dev data: DATABASE_URL is not set.');
+  let host: string;
+  try {
+    host = new URL(url).hostname;
+  } catch {
+    throw new Error('Refusing to seed the dev data: DATABASE_URL is not a valid URL.');
+  }
+  if (!LOCAL_HOSTS.has(host)) throw new Error(`Refusing to seed the dev data: DATABASE_URL host "${host}" is not localhost, 127.0.0.1 or ::1.`);
+}
+
 /** What `pnpm db:seed` runs. Refuses a database that already has partners: it never deletes data (CLAUDE.md). */
 export async function seedDevDatabase(db: Db, clock: Clock): Promise<SeedSummary> {
+  assertDevSeedAllowed(process.env);
   const existing = Number((await db.execute(sql`select count(*)::int as n from partners`)).rows[0]?.n ?? 0);
   if (existing > 0) {
     throw new Error('The database already has partners. Seed a fresh database: scripts/db-create.sh <name>, then pnpm db:migrate, then pnpm db:seed.');

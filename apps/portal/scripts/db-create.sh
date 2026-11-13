@@ -13,6 +13,14 @@ if [[ ! "$name" =~ ^[a-z][a-z0-9_]{0,62}$ ]]; then
 fi
 
 admin_url="${PORTAL_PG_ADMIN_URL:-postgresql://postgres@localhost:5432/postgres}"
+admin_host="$(printf '%s' "$admin_url" | sed -E 's#^[a-z]+://([^@/]*@)?(\[[^]]*\]|[^:/]*).*$#\2#')"
+case "$admin_host" in
+  localhost|127.0.0.1|'[::1]'|'::1') ;;
+  *)
+    echo "refusing to run: PORTAL_PG_ADMIN_URL host \"$admin_host\" is not localhost, 127.0.0.1 or ::1. This script creates and drops databases and is for local use only." >&2
+    exit 2
+    ;;
+esac
 here="$(cd "$(dirname "$0")" && pwd)"
 
 if [[ "${2:-}" == "--recreate" ]]; then

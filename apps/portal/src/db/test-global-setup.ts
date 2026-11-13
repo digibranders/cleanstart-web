@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { Client } from 'pg';
-import { loadDotEnv } from './test-env';
+import { assertTestDatabaseUrl, loadDotEnv } from './test-env';
 
 const WORKERS = 4;
 const withDb = (url: string, name: string): string => {
@@ -15,7 +15,8 @@ export default async function setup(): Promise<void> {
   const env = loadDotEnv();
   const baseUrl = env.PORTAL_TEST_OWNER_URL;
   if (!baseUrl) throw new Error('PORTAL_TEST_OWNER_URL is not set. Create the test database with scripts/db-create.sh and put it in apps/portal/.env.');
-  const baseName = new URL(baseUrl).pathname.slice(1);
+  const baseName = assertTestDatabaseUrl('PORTAL_TEST_OWNER_URL', baseUrl);
+  if (env.PORTAL_TEST_DATABASE_URL) assertTestDatabaseUrl('PORTAL_TEST_DATABASE_URL', env.PORTAL_TEST_DATABASE_URL);
 
   // 1. Migrate the base database exactly as production does: drizzle migrations, then rls.sql.
   const { migrateDatabase } = await import('../../scripts/migrate');
