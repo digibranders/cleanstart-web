@@ -2,7 +2,7 @@ import { and, eq, isNull, ne } from 'drizzle-orm';
 import { invites, partnerChecklist, partners, registrations, staffScopes, users } from '@/db/schema';
 import { type Clock, systemClock } from '@/lib/clock';
 import { CHECKLIST_STEPS, type ChecklistStep } from '@/lib/domain';
-import type { ChecklistDto, CompanyDto } from '@/lib/dto';
+import type { ChecklistDto, CompanyDto, IsoTimestamp } from '@/lib/dto';
 import { staffTeamLabel } from '@/lib/people';
 import type { Viewer } from '@/server/auth/types';
 import { ForbiddenError, NotFoundError, ValidationError } from '@/server/errors';
@@ -50,6 +50,24 @@ export async function getCompany(tx: Tx, viewer: Viewer, input: { partnerId?: st
     throw new NotFoundError('partner');
   }
   return toCompany(tx, partner);
+}
+
+const blank = (value: string | null): string | null => value?.trim() || null;
+
+/** Partner admin on own company, partner manager on any. Returns the row after the update; its updatedAt is the outbox version. (M1.7) */
+export async function updateCompanyProfile(
+  tx: Tx,
+  viewer: Viewer,
+  input: { partnerId?: string; website: string | null; phone: string | null; address: string | null; about: string | null },
+): Promise<{ company: CompanyDto; updatedAt: IsoTimestamp }> {
+  const partnerId = resolvePartnerScope(viewer, input.partnerId);
+  const [row] = await tx
+    .update(partners)
+    .set({ website: blank(input.website), phone: blank(input.phone), address: blank(input.address), about: blank(input.about) })
+    .where(eq(partners.id, partnerId))
+    .returning();
+  if (!row) throw new NotFoundError('partner');
+  return { company: await toCompany(tx, row), updatedAt: row.updatedAt.toISOString() };
 }
 
 /** The welcome checklist of the viewer's partner (M1.5). Partner viewers only. */
@@ -121,13 +139,17 @@ export async function listPartnerAdminRecipients(
     .orderBy(users.createdAt);
 }
 
-export const isolation = defineIsolation<'getCompany' | 'getChecklist' | 'tickChecklistStep' | 'listPartnerAdminRecipients'>({
+export const isolation = defineIsolation<
+  'getCompany' | 'getChecklist' | 'tickChecklistStep' | 'listPartnerAdminRecipients' | 'updateCompanyProfile'
+>({
   getCompany: { scope: 'tenant', probe: (tx, viewer, ctx) => getCompany(tx, viewer, { partnerId: ctx.b.partnerId }), expect: 'not_found' },
   getChecklist: { scope: 'tenant', probe: (tx, viewer) => getChecklist(tx, viewer), expect: 'unchanged' },
-  tickChecklistStep: {
-    scope: 'tenant',
-    probe: (tx, viewer) => tickChecklistStep(tx, viewer, { step: 'kickoff' }, systemClock),
-    expect: 'unchanged',
-  },
+  tickChecklistStep: { scope: 'tenant', probe: (tx, viewer) => tickChecklistStep(tx, viewer, { step: 'kickoff' }, systemClock), expect: 'unchanged' },
   listPartnerAdminRecipients: { scope: 'tenant', probe: (tx, _viewer, ctx) => listPartnerAdminRecipients(tx, { partnerId: ctx.b.partnerId }), expect: 'empty' },
+  updateCompanyProfile: {
+    scope: 'tenant',
+    probe: (tx, viewer, ctx) => updateCompanyProfile(tx, viewer, { partnerId: ctx.b.partnerId, website: 'probe.example', phone: null, address: null, about: null }),
+    expect: 'not_found',
+    untouched: (ctx) => [{ table: 'partners', id: ctx.b.partnerId }],
+  },
 });

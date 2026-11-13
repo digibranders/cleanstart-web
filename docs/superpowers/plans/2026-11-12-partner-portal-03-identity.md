@@ -8741,7 +8741,7 @@ Implements master task 1.7. Profile, notification preferences, active sessions w
 - Create: `src/components/people/SessionsCard.tsx`
 - Modify: `src/components/screens/Account.tsx`, `src/components/screens/Company.tsx`, `src/app/partner/account/page.tsx`, `src/app/partner/company/page.tsx`
 
-- [ ] **Step 1: Verify the files this task extends, and the session API**
+- [x] **Step 1: Verify the files this task extends, and the session API**
 
 ```bash
 grep -n "export async function getShell" src/server/repo/account.ts
@@ -8752,7 +8752,7 @@ grep -n "getSession" apps/portal/node_modules/better-auth/dist/api/routes/sessio
 
 Expected: the first prints the `getShell` line (if not, M1.1 is not merged: write `blocked`, stop this task); the second prints `listSessions` and `revokeSession`; the third tells you whether Step 7 creates or appends; the fourth prints the `getSession` endpoint line. Better Auth's server API `auth.api.getSession({ headers })` returns `{ session, user } | null`, with `session.token`; the Account page uses it to mark the current session.
 
-- [ ] **Step 2: Write the failing repo tests for profile and preferences**
+- [x] **Step 2: Write the failing repo tests for profile and preferences**
 
 Create `src/server/repo/account.test.ts` (if W0-f already created it, append the `describe` blocks and merge the imports):
 
@@ -8848,7 +8848,7 @@ describe('recordPasswordChanged', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/account.test.ts`
 Expected: FAIL, `getProfile` is not exported by `./account`.
 
-- [ ] **Step 3: Implement the four functions**
+- [x] **Step 3: Implement the four functions**
 
 In `src/server/repo/account.ts` add to the imports (merge with the existing lines; add the line when the name is not imported yet):
 
@@ -8938,7 +8938,7 @@ Add these four entries to the existing `defineIsolation<...>({ ... })` call, and
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/account.test.ts src/server/repo/isolation.test.ts`
 Expected: PASS.
 
-- [ ] **Step 4: Write the failing repo tests for the company profile**
+- [x] **Step 4: Write the failing repo tests for the company profile**
 
 Append to `src/server/repo/partners.test.ts`. Add `updateCompanyProfile` to the `./partners` import:
 
@@ -8980,7 +8980,7 @@ describe('updateCompanyProfile', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/partners.test.ts`
 Expected: FAIL, `updateCompanyProfile` is not exported.
 
-- [ ] **Step 5: Implement `updateCompanyProfile`**
+- [x] **Step 5: Implement `updateCompanyProfile`**
 
 In `src/server/repo/partners.ts` add `IsoTimestamp` to the dto import (`import type { ChecklistDto, CompanyDto, IsoTimestamp } from '@/lib/dto';`) and add after `getCompany`:
 
@@ -9026,7 +9026,7 @@ export const isolation = defineIsolation<
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/partners.test.ts src/server/repo/isolation.test.ts`
 Expected: PASS (partners: 10 tests).
 
-- [ ] **Step 6: Write the failing tests for the profile, notification and session actions**
+- [x] **Step 6: Write the failing tests for the profile, notification and session actions**
 
 Create `src/server/actions/account-profile.test.ts` (named apart from any test plan 02 adds for the password and two-step actions in `account.test.ts`):
 
@@ -9128,7 +9128,7 @@ describe('revokeSessionAction', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/account-profile.test.ts`
 Expected: FAIL (`./account` is missing or does not export these actions).
 
-- [ ] **Step 7: Implement the account actions**
+- [x] **Step 7: Implement the account actions**
 
 If `src/server/actions/account.ts` does not exist (Step 1), create it with the header and the three actions below. If plan 02 created it, keep its content and only merge the new imports into its import block and append the three functions at the end.
 
@@ -9203,7 +9203,7 @@ export async function revokeSessionAction(raw: unknown): Promise<ActionResult<{ 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/account-profile.test.ts`
 Expected: PASS, 7 tests.
 
-- [ ] **Step 8: Write the failing tests for the company profile action**
+- [x] **Step 8: Write the failing tests for the company profile action**
 
 Append to `src/server/actions/partners.test.ts`. Extend the imports: from `@/db/schema` add `auditLog, hubspotOutbox, partners`; from `@/db/test-helpers` nothing new; add `updateCompanyProfileAction` to the `./partners` import. Then append:
 
@@ -9263,7 +9263,7 @@ describe('updateCompanyProfileAction', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/partners.test.ts`
 Expected: FAIL, `updateCompanyProfileAction` is not a function.
 
-- [ ] **Step 9: Implement `updateCompanyProfileAction`**
+- [x] **Step 9: Implement `updateCompanyProfileAction`**
 
 In `src/server/actions/partners.ts` extend the imports:
 
@@ -9336,7 +9336,7 @@ export async function updateCompanyProfileAction(raw: unknown): Promise<ActionRe
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/partners.test.ts`
 Expected: PASS, 10 tests.
 
-- [ ] **Step 10: Create the sessions card**
+- [x] **Step 10: Create the sessions card**
 
 Create `src/components/people/SessionsCard.tsx`. It uses classes the Account screen already uses (`card`, `card-h`, `li`, `badge`); the mock had no sessions list, so this card is new markup in the existing style:
 
@@ -9403,7 +9403,7 @@ export function SessionsCard({ sessions, today }: { sessions: SessionDto[]; toda
 }
 ```
 
-- [ ] **Step 11: Convert `Account.tsx`**
+- [x] **Step 11: Convert `Account.tsx`**
 
 Edit `src/components/screens/Account.tsx`.
 
@@ -9600,7 +9600,7 @@ After:
                 onChange={(e) => void toggle(key, e.target.checked)}
 ```
 
-- [ ] **Step 12: Write the account page**
+- [x] **Step 12: Write the account page**
 
 Replace `src/app/partner/account/page.tsx` in full:
 
@@ -9626,7 +9626,7 @@ export default async function Page(): Promise<React.JSX.Element> {
 }
 ```
 
-- [ ] **Step 13: Replace `Company.tsx`**
+- [x] **Step 13: Replace `Company.tsx`**
 
 Replace `src/components/screens/Company.tsx` in full. Changes from the mock: DTO input, the company name is read-only (the contract's `updateCompanyProfile` does not take a name; the partner manager changes it), people who are not partner admins see the form read-only, the agreement card reads the stored version and time, "Accepted by" is gone (the DTO has no such field, request in "Contract change requests", item 2), and "Download PDF" explains that the PDF is not available yet (no download route exists, item 10).
 
@@ -9957,7 +9957,7 @@ export function Company({ company, canEdit, viewerEmail }: CompanyProps): React.
 }
 ```
 
-- [ ] **Step 14: Write the company page**
+- [x] **Step 14: Write the company page**
 
 Replace `src/app/partner/company/page.tsx` in full:
 
@@ -9979,12 +9979,12 @@ export default async function Page(): Promise<React.JSX.Element> {
 }
 ```
 
-- [ ] **Step 15: Prove no slice import is left**
+- [x] **Step 15: Prove no slice import is left**
 
 Run: `grep -n "@/data/\|@/lib/slice\|accountSlice\|partnersSlice" src/components/screens/Account.tsx src/components/screens/Company.tsx src/components/people/SessionsCard.tsx`
 Expected: no output.
 
-- [ ] **Step 16: Gate A**
+- [x] **Step 16: Gate A**
 
 Run the Gate A block. The last command must list only this task's Files block.
 
@@ -9997,7 +9997,7 @@ Run the Gate A block. The last command must list only this task's Files block.
 5. Sign in as Karan Malhotra (sales) and open `/partner/company`: the fields are read-only and there is no Save button. Click "Download PDF": the toast says the PDF is not in the portal yet.
 6. "Message" next to the partner manager opens the drawer addressed to Farhan Qureshi.
 
-- [ ] **Step 18: Commit**
+- [x] **Step 18: Commit**
 
 ```bash
 git add apps/portal/src/server/repo/account.ts apps/portal/src/server/repo/account.test.ts \

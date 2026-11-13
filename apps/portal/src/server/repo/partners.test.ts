@@ -5,7 +5,7 @@ import { asPartner, asStaff, makeInvite, makePartner, makeRegistration, makeUser
 import { fixedClock } from '@/lib/clock';
 import { publicActor } from '@/server/auth/types';
 import { withSystem, withViewer } from './context';
-import { getChecklist, getCompany, listPartnerAdminRecipients, tickChecklistStep } from './partners';
+import { getChecklist, getCompany, listPartnerAdminRecipients, tickChecklistStep, updateCompanyProfile } from './partners';
 
 const db = testDb();
 const clock = fixedClock('2026-11-12T10:00:00Z');
@@ -104,5 +104,38 @@ describe('listPartnerAdminRecipients', () => {
     const actor = publicActor('x');
     const rows = await withSystem(actor, (tx) => listPartnerAdminRecipients(tx, { partnerId: a.id }));
     expect(rows).toEqual([{ userId: admin.id, email: 'aditi@a.example', name: 'Aditi' }]);
+  });
+});
+
+describe('updateCompanyProfile', () => {
+  it('saves trimmed profile fields, blanks become null, and returns the company with the row time', async () => {
+    const partner = await makePartner(db, { name: 'Kestrel Systems' });
+    const admin = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
+    const result = await withViewer(admin, (tx) =>
+      updateCompanyProfile(tx, admin, { website: ' kestrelsystems.in ', phone: '+91 80 4718 2290', address: '  ', about: 'Security reseller.' }),
+    );
+    expect(result.company).toMatchObject({ name: 'Kestrel Systems', website: 'kestrelsystems.in', phone: '+91 80 4718 2290', address: null, about: 'Security reseller.' });
+    const [row] = await db.select().from(partners).where(eq(partners.id, partner.id));
+    expect(result.updatedAt).toBe(row?.updatedAt.toISOString());
+  });
+
+  it('never changes the name, category, region or status', async () => {
+    const partner = await makePartner(db, { name: 'Kestrel Systems', category: 'channel', region: 'india', status: 'active' });
+    const admin = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
+    await withViewer(admin, (tx) => updateCompanyProfile(tx, admin, { website: 'x.example', phone: null, address: null, about: null }));
+    const [row] = await db.select().from(partners).where(eq(partners.id, partner.id));
+    expect(row).toMatchObject({ name: 'Kestrel Systems', category: 'channel', region: 'india', status: 'active' });
+  });
+
+  it('is limited to the viewer company for a partner and open to a partner manager by id', async () => {
+    const mine = await makePartner(db, {});
+    const other = await makePartner(db, {});
+    const admin = await asPartner(db, { partnerId: mine.id, role: 'partner_admin' });
+    await expect(withViewer(admin, (tx) => updateCompanyProfile(tx, admin, { partnerId: other.id, website: 'evil.example', phone: null, address: null, about: null }))).rejects.toMatchObject({ code: 'not_found' });
+    const [untouched] = await db.select().from(partners).where(eq(partners.id, other.id));
+    expect(untouched?.website).toBeNull();
+    const manager = await asStaff(db, 'partner_manager', 'india');
+    const result = await withViewer(manager, (tx) => updateCompanyProfile(tx, manager, { partnerId: other.id, website: 'ok.example', phone: null, address: null, about: null }));
+    expect(result.company.website).toBe('ok.example');
   });
 });

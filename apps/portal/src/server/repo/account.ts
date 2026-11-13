@@ -1,16 +1,23 @@
-import { and, count, eq, isNull } from 'drizzle-orm';
-import { notifications, partners, registrations, staffScopes, users } from '@/db/schema';
+import { and, count, eq, isNull, sql } from 'drizzle-orm';
+import { notificationPrefs, notifications, partners, registrations, staffScopes, users } from '@/db/schema';
+import { type Clock, systemClock } from '@/lib/clock';
 import {
+  NOTIFICATION_CATEGORIES,
+  type NotificationCategory,
   PARTNER_CATEGORY_LABEL,
   PARTNER_REGION_LABEL,
   PARTNER_ROLE_LABEL,
+  type PartnerRole,
   STAFF_REGION_LABEL,
   STAFF_ROLE_LABEL,
   type StaffRegion,
+  type StaffRole,
 } from '@/lib/domain';
-import type { ShellDto } from '@/lib/dto';
+import type { ProfileDto, ShellDto } from '@/lib/dto';
 import type { Viewer } from '@/server/auth/types';
-import { NotFoundError } from '@/server/errors';
+import { NotFoundError, ValidationError } from '@/server/errors';
+import { NOTIFICATION_PREF_DEFAULTS } from '@/server/notify';
+import { iso } from '@/server/people';
 import type { Tx } from './context';
 import { defineIsolation } from './isolation.registry';
 
@@ -81,7 +88,60 @@ export async function getShell(tx: Tx, viewer: Viewer): Promise<ShellDto> {
   };
 }
 
-const exportedFns = { getShell };
+export async function getProfile(tx: Tx, viewer: Viewer): Promise<ProfileDto> {
+  const [user] = await tx.select().from(users).where(eq(users.id, viewer.id)).limit(1);
+  if (!user) throw new NotFoundError('user');
+  const stored = await tx.select().from(notificationPrefs).where(eq(notificationPrefs.userId, viewer.id));
+  const notifications: Record<NotificationCategory, boolean> = { ...NOTIFICATION_PREF_DEFAULTS };
+  for (const pref of stored) notifications[pref.category] = pref.email;
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    title: user.title,
+    phone: user.phone,
+    kind: user.kind,
+    role: user.role as PartnerRole | StaffRole,
+    partnerName: viewer.partnerName,
+    twoFactorEnabled: user.twoFactorEnabled,
+    passwordChangedAt: iso(user.passwordChangedAt),
+    notifications,
+  };
+}
+
+export async function updateProfile(
+  tx: Tx,
+  viewer: Viewer,
+  input: { name: string; title: string | null; phone: string | null },
+): Promise<ProfileDto> {
+  const name = input.name.trim();
+  if (!name) throw new ValidationError([{ path: 'name', message: 'Enter your name.' }]);
+  await tx
+    .update(users)
+    .set({ name, title: input.title?.trim() || null, phone: input.phone?.trim() || null })
+    .where(eq(users.id, viewer.id));
+  return getProfile(tx, viewer);
+}
+
+/** Stores one notification_prefs row per category. */
+export async function setNotificationPrefs(
+  tx: Tx,
+  viewer: Viewer,
+  input: Record<NotificationCategory, boolean>,
+): Promise<Record<NotificationCategory, boolean>> {
+  await tx
+    .insert(notificationPrefs)
+    .values(NOTIFICATION_CATEGORIES.map((category) => ({ userId: viewer.id, category, email: input[category] })))
+    .onConflictDoUpdate({ target: [notificationPrefs.userId, notificationPrefs.category], set: { email: sql`excluded.email` } });
+  return { ...input };
+}
+
+/** Called by the change-password action after Better Auth has stored the new hash. Sets users.password_changed_at. */
+export async function recordPasswordChanged(tx: Tx, viewer: Viewer, clock: Clock): Promise<void> {
+  await tx.update(users).set({ passwordChangedAt: clock.now() }).where(eq(users.id, viewer.id));
+}
+
+const exportedFns = { getShell, getProfile, updateProfile, setNotificationPrefs, recordPasswordChanged };
 
 export const isolation = defineIsolation<keyof typeof exportedFns>({
   // A viewer forged to claim company B must find no company row, because row level security hides it.
@@ -90,4 +150,12 @@ export const isolation = defineIsolation<keyof typeof exportedFns>({
     probe: (tx, viewer, ctx) => getShell(tx, { ...viewer, partnerId: ctx.b.partnerId }),
     expect: 'not_found',
   },
+  getProfile: { scope: 'tenant', probe: (tx, viewer) => getProfile(tx, viewer), expect: 'unchanged' },
+  updateProfile: { scope: 'tenant', probe: (tx, viewer) => updateProfile(tx, viewer, { name: viewer.name, title: null, phone: null }), expect: 'unchanged' },
+  setNotificationPrefs: {
+    scope: 'tenant',
+    probe: (tx, viewer) => setNotificationPrefs(tx, viewer, { decision: true, stage: true, expiry: true, docs: false, team: true }),
+    expect: 'unchanged',
+  },
+  recordPasswordChanged: { scope: 'tenant', probe: (tx, viewer) => recordPasswordChanged(tx, viewer, systemClock), expect: 'unchanged' },
 });

@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { partnerChecklist } from '@/db/schema';
+import { auditLog, hubspotOutbox, partnerChecklist, partners } from '@/db/schema';
 import { asPartner, asStaff, makePartner, makeUser, resetDb, testDb } from '@/db/test-helpers';
 import type { Viewer } from '@/server/auth/types';
 import type { FakeEmailTransport } from '@/server/email/fake';
@@ -31,7 +31,7 @@ vi.mock('@/server/email/send', async () => {
   return { sendEmail: (message: EmailMessage) => fake.send(message), fake };
 });
 
-import { sendManagerMessageAction, tickChecklistStepAction } from './partners';
+import { sendManagerMessageAction, tickChecklistStepAction, updateCompanyProfileAction } from './partners';
 
 const db = testDb();
 let fake: FakeEmailTransport;
@@ -96,5 +96,56 @@ describe('sendManagerMessageAction', () => {
     expect(await sendManagerMessageAction({ subject: 'Hi', body: 'Hello' })).toMatchObject({ ok: false, error: { code: 'integration' } });
     harness.viewer = await asStaff(db, 'partner_manager', 'india');
     expect(await sendManagerMessageAction({ subject: 'Hi', body: 'Hello' })).toMatchObject({ ok: false, error: { code: 'forbidden' } });
+  });
+});
+
+describe('updateCompanyProfileAction', () => {
+  const fields = { website: 'kestrelsystems.in', phone: '+91 80 4718 2290', address: '4th floor, Prestige Tech Park', about: 'Security reseller.' };
+
+  it('lets a partner admin save, audits what changed and queues a partner.upsert keyed by the row time', async () => {
+    const partner = await makePartner(db, { name: 'Kestrel Systems' });
+    harness.viewer = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
+    const result = await updateCompanyProfileAction(fields);
+    expect(result).toMatchObject({ ok: true, data: { website: 'kestrelsystems.in', about: 'Security reseller.' } });
+    const [entry] = await db.select().from(auditLog);
+    expect(entry).toMatchObject({ event: 'partner.profile_updated', note: 'Updated website, phone, address and what you sell' });
+    const [row] = await db.select().from(partners).where(eq(partners.id, partner.id));
+    const outbox = await db.select().from(hubspotOutbox);
+    expect(outbox).toHaveLength(1);
+    expect(outbox[0]?.idempotencyKey).toBe(`partner.upsert:${partner.id}:${row?.updatedAt.getTime()}`);
+  });
+
+  it('does nothing when nothing changed: no audit entry, no outbox row', async () => {
+    const partner = await makePartner(db, {});
+    harness.viewer = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
+    await updateCompanyProfileAction(fields);
+    const queued = (await db.select().from(hubspotOutbox)).length;
+    const again = await updateCompanyProfileAction(fields);
+    expect(again.ok).toBe(true);
+    expect(await db.select().from(auditLog)).toHaveLength(1);
+    expect(await db.select().from(hubspotOutbox)).toHaveLength(queued);
+  });
+
+  it('is forbidden for partner sales and technical users and for another company', async () => {
+    const partner = await makePartner(db, {});
+    const other = await makePartner(db, {});
+    harness.viewer = await asPartner(db, { partnerId: partner.id, role: 'sales' });
+    expect(await updateCompanyProfileAction(fields)).toMatchObject({ ok: false, error: { code: 'forbidden' } });
+    harness.viewer = await asPartner(db, { partnerId: partner.id, role: 'technical' });
+    expect(await updateCompanyProfileAction(fields)).toMatchObject({ ok: false, error: { code: 'forbidden' } });
+    harness.viewer = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
+    expect(await updateCompanyProfileAction({ ...fields, partnerId: other.id })).toMatchObject({ ok: false, error: { code: 'forbidden' } });
+  });
+
+  it('lets a partner manager edit any company by id', async () => {
+    const partner = await makePartner(db, {});
+    harness.viewer = await asStaff(db, 'partner_manager', 'india');
+    expect(await updateCompanyProfileAction({ ...fields, partnerId: partner.id })).toMatchObject({ ok: true, data: { partnerId: partner.id } });
+  });
+
+  it('limits field lengths', async () => {
+    const partner = await makePartner(db, {});
+    harness.viewer = await asPartner(db, { partnerId: partner.id, role: 'partner_admin' });
+    expect(await updateCompanyProfileAction({ ...fields, about: 'x'.repeat(1001) })).toMatchObject({ ok: false, error: { code: 'validation' } });
   });
 });
