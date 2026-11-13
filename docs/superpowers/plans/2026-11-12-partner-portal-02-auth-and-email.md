@@ -4473,13 +4473,13 @@ The portal builds its own emails in code and sends `subject` plus `htmlContent` 
 - Create: `apps/portal/src/server/email/{transport,brevo,send,fake,layout}.ts`, `apps/portal/src/server/urls.ts`
 - Test: `apps/portal/src/server/email/{layout,brevo,transport,send,fake}.test.ts`, `apps/portal/src/server/urls.test.ts`, and the snapshot `apps/portal/src/server/email/__snapshots__/layout.test.ts.snap`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M0.5a | started | W0 | - | - | email layout and transport" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Verify the Brevo request shape against the CMS, which already sends in production**
+- [x] **Step 2: Verify the Brevo request shape against the CMS, which already sends in production**
 
 Verify: endpoint, header names, body fields and the success response.
 
@@ -4490,7 +4490,7 @@ grep -n "v3/smtp/email\|'api-key'\|sender\|replyTo\|htmlContent\|messageId" apps
 
 Expected: the endpoint `https://api.brevo.com/v3/smtp/email`, the `api-key` header, a `sender` object with `email` and `name`, `to`, `replyTo`, `subject`, `htmlContent`, and a `messageId` read from the JSON response. If anything differs, fix `brevo.ts` in Step 5 to match the CMS file (read only, never edit it).
 
-- [ ] **Step 3: Write the tests (they fail first)**
+- [x] **Step 3: Write the tests (they fail first)**
 
 Create `apps/portal/src/server/email/layout.test.ts`. The snapshot test writes `__snapshots__/layout.test.ts.snap` on first run; commit it. The other cases pin the structure that the snapshot would also catch, so a failure says what broke.
 
@@ -4862,7 +4862,7 @@ describe('urls', () => {
 });
 ```
 
-- [ ] **Step 4: Run them and see them fail**
+- [x] **Step 4: Run them and see them fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/email src/server/urls.test.ts
@@ -4870,7 +4870,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/email src/server/url
 
 Expected: FAIL: `Failed to resolve import` for `./layout`, `./brevo`, `./transport`, `./send`, `./fake` and `./urls`.
 
-- [ ] **Step 5: Implement the module**
+- [x] **Step 5: Implement the module**
 
 Create `apps/portal/src/server/email/transport.ts`:
 
@@ -5267,7 +5267,7 @@ export function resetPasswordUrl(token: string): string {
 }
 ```
 
-- [ ] **Step 6: Run them and see them pass**
+- [x] **Step 6: Run them and see them pass**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/email src/server/urls.test.ts
@@ -5275,11 +5275,11 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/email src/server/url
 
 Expected: `Test Files  6 passed (6)`, `Tests  32 passed (32)` (layout 11, brevo 7, transport 5, send 3, fake 3, urls 3), and `Snapshots  1 written`. Run the same command again: `Snapshots  1 passed`.
 
-- [ ] **Step 7: Run Gate A, then Gate B**
+- [x] **Step 7: Run Gate A, then Gate B**
 
 Run the three fast commands, then the full Gate A block. Expected: all exit 0.
 
-- [ ] **Step 8: Commit and log**
+- [x] **Step 8: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build
