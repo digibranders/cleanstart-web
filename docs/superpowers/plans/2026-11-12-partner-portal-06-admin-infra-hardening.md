@@ -5517,7 +5517,7 @@ What is purged, and what is deliberately not:
 
 Open question for the owner (listed in the report): `audit_log` text contains customer and person names forever. A retention rule for it needs a decision (and a grant), so v1 keeps it.
 
-- [ ] **Step 1: Write the failing retention test**
+- [x] **Step 1: Write the failing retention test**
 
 Five tests: declined applications older than a year are removed and everything else kept (recent declined, old approved, old `new`); an old rejected registration is removed with its contacts, messages and timeline; recent rejections and any registration that was ever accepted are kept however old; batches work and the second run is a no-op; documents and the audit log are never touched. It uses `makeApplication`, `makePartner`, `makeRegistration`, `makeDocument` from the contracts' J.3 helpers.
 
@@ -5614,7 +5614,7 @@ describe('purgeExpiredRecords', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs/retention.test.ts`
 Expected: FAIL (`purgeExpiredRecords is not a function`: the Wave 0 stub only exports `runRetention`).
 
-- [ ] **Step 2: Implement the job**
+- [x] **Step 2: Implement the job**
 
 Replace the whole of `src/server/jobs/retention.ts`. It runs on the system `db` (jobs may import `db`, contracts F.1), deletes children before parents (the foreign keys have no cascade), and never throws on an empty table.
 
@@ -5701,7 +5701,7 @@ export const runRetention = async (): Promise<void> => {
 
 Run the test. Expected: PASS, 5 tests.
 
-- [ ] **Step 3: Test the jobs together and the registry**
+- [x] **Step 3: Test the jobs together and the registry**
 
 `purge-jobs.test.ts` runs the retention job and track D's `purgeDocumentFiles` against the same database with a `FakeFileStorage`: only the two expired R2 keys are deleted, live documents and their keys are untouched, old rejected registrations and declined applications are gone, and a second run changes nothing. It follows plan 05's documented behaviour (the purge tombstones a soft deleted document by setting `file_key` to `purged/<id>`); if D's job differs, fix this test to D's documented behaviour, not the job. `registry.test.ts` pins the schedule.
 
@@ -5790,7 +5790,7 @@ describe('job registry', () => {
 Create both files, then run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs`
 Expected: PASS for `retention.test.ts` (5), `purge-jobs.test.ts` (1), `registry.test.ts` (3), and track D's `document-purge.test.ts` (3, plan 05 step 24).
 
-- [ ] **Step 4: Gate A and commit**
+- [x] **Step 4: Gate A and commit**
 
 Run the standard Gate A block, then Gate B, then:
 
