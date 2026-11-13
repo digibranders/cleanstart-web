@@ -296,7 +296,7 @@ git commit -m "feat(portal): H4.1 HubSpot schema spec and idempotent provisionin
 - Create: `apps/portal/src/server/hubspot/types.ts`, `client.ts`, `fake.ts`
 - Test: `apps/portal/src/server/hubspot/client.test.ts`
 
-- [ ] **Step 1: Write the types (the contract every later task uses)**
+- [x] **Step 1: Write the types (the contract every later task uses)**
 
 ```ts
 // types.ts
@@ -349,7 +349,7 @@ export class HubspotError extends Error {
 
 `DependencyPending` (thrown by an outbox handler when a record it needs has not been synced yet, retried without counting as a failure) is the `PortalError` subclass in `src/server/errors.ts` (contracts E). `HubspotError` stays a plain `Error` subclass: the outbox treats every thrown error except `DependencyPending` as retryable. `types.ts` and `mappers.ts` import nothing that is server only, so the contracts' `deal-rules.ts` can re-export `STAGE_LABELS` and `STAGE_TO_STATUS` into client code.
 
-- [ ] **Step 2: Write the fake (used by every later test)**
+- [x] **Step 2: Write the fake (used by every later test)**
 
 `FakeHubspot` is imported as is by W0-b's `makeSyncedDeal` (contracts J.3, J.4) and by tracks P and R through the `HubspotApi` interface. Keep the public members `stageIds`, `createDeal`, `deals`, `companies`, `associations`, `failNext` and `calls` under these names.
 
@@ -440,7 +440,7 @@ export class FakeHubspot implements HubspotApi {
 
 The page size of 2 in `searchDealsModifiedSince` is deliberate: it forces the poller tests through the paging path.
 
-- [ ] **Step 3: Write the failing contract test for the real client**
+- [x] **Step 3: Write the failing contract test for the real client**
 
 The real client takes an `apiRequest` function so the test can assert the request bodies without a network.
 
@@ -506,12 +506,12 @@ describe('configuration', () => {
 });
 ```
 
-- [ ] **Step 4: Run the test and confirm it fails**
+- [x] **Step 4: Run the test and confirm it fails**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/client.test.ts`
 Expected: FAIL, "Cannot find module './client'".
 
-- [ ] **Step 5: Implement the real client**
+- [x] **Step 5: Implement the real client**
 
 ```ts
 // client.ts
@@ -699,12 +699,12 @@ export const createHubspot = (): HubspotApi => {
 
 `HUBSPOT_PORTAL_TOKEN`, `HUBSPOT_PARTNER_PIPELINE_ID` and `HUBSPOT_USE_ASSOCIATION_LABELS` already exist in `src/env.ts` and `.env.example` (W0-b and W0-c, contracts I; the first two are optional outside production, the labels flag defaults to `false`), so this task edits neither file. `createHubspot()` is the only place that needs the token and it throws a typed `IntegrationError` when it is unset; callers that must degrade (the jobs, and track R's lookup action) check `readHubspotConfig()` first or treat the thrown error as "HubSpot unavailable". If the installed `@hubspot/api-client` has no `apiRequest` (contracts M.1 item 15), replace the body of the arrow function with a thin `fetch` wrapper that sends the bearer token and retries a 429; `RealHubspot` takes any function with that shape.
 
-- [ ] **Step 6: Run the tests**
+- [x] **Step 6: Run the tests**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/client.test.ts`
 Expected: PASS, 5 tests.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add apps/portal/src/server/hubspot
