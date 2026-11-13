@@ -49,6 +49,9 @@ const BLANK: FormState = {
 
 const EMPTY_OWN: CustomerSuggestionDto[] = [];
 
+/** The same rule the server applies to a contact email. */
+const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
 interface Submitted {
   customer: string;
   products: Product[];
@@ -71,6 +74,7 @@ export function RegisterDeal({ mine, managers, partnerName, today }: RegisterDea
   const toast = useToast();
   const [form, setForm] = useState<FormState>({ ...BLANK, managerId: managerFor(managers, "india") });
   const [tried, setTried] = useState(false);
+  const [emailLeft, setEmailLeft] = useState(false);
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -143,13 +147,21 @@ export function RegisterDeal({ mine, managers, partnerName, today }: RegisterDea
   const hasSuggestions = suggestions.length > 0 || crmSuggestions.length > 0;
   const customerErr = tried && !customer;
   const productErr = tried && form.picked.length === 0;
+  // The server stores a contact only with a name, so an email or phone alone would be dropped without a word.
+  const contactEmail = form.contactEmail.trim();
+  const contactNameErr =
+    tried && !form.contactName.trim() && (contactEmail !== "" || form.contactPhone.trim() !== "");
+  const contactEmailBad = contactEmail !== "" && !EMAIL.test(contactEmail);
+  const contactEmailErr = (emailLeft || tried) && contactEmailBad ? "Enter a valid email." : errors["contact.email"];
+  const lookupDone = remote?.q === customer;
 
   const togglePicked = (product: Product): void =>
     patch({ picked: form.picked.includes(product) ? form.picked.filter((p) => p !== product) : [...form.picked, product] });
 
   const submit = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
-    if (!customer || form.picked.length === 0) {
+    const contactBlocked = !form.contactName.trim() && (contactEmail !== "" || form.contactPhone.trim() !== "");
+    if (!customer || form.picked.length === 0 || contactBlocked || contactEmailBad) {
       setTried(true);
       return;
     }
@@ -328,38 +340,46 @@ export function RegisterDeal({ mine, managers, partnerName, today }: RegisterDea
                   <div className="grid3">
                     <div className="fg">
                       <label htmlFor="contact" className="lbl">
-                        Contact name
+                        Contact name <span className="hint">(optional)</span>
                       </label>
                       <input
                         id="contact"
-                        className="field"
+                        className={`field${contactNameErr ? " field-err" : ""}`}
                         type="text"
                         value={form.contactName}
                         onChange={(e) => patch({ contactName: e.target.value })}
+                        aria-invalid={contactNameErr || undefined}
+                        aria-describedby={contactNameErr ? "contact-err" : undefined}
                       />
+                      {contactNameErr ? (
+                        <span className="err" id="contact-err">
+                          Add the contact's name or clear these fields.
+                        </span>
+                      ) : null}
                     </div>
                     <div className="fg">
                       <label htmlFor="cemail" className="lbl">
-                        Contact email
+                        Contact email <span className="hint">(optional)</span>
                       </label>
                       <input
                         id="cemail"
-                        className={`field${errors["contact.email"] ? " field-err" : ""}`}
+                        className={`field${contactEmailErr ? " field-err" : ""}`}
                         type="email"
                         value={form.contactEmail}
                         onChange={(e) => patch({ contactEmail: e.target.value })}
-                        aria-invalid={errors["contact.email"] ? true : undefined}
-                        aria-describedby={errors["contact.email"] ? "cemail-err" : undefined}
+                        onBlur={() => setEmailLeft(true)}
+                        aria-invalid={contactEmailErr ? true : undefined}
+                        aria-describedby={contactEmailErr ? "cemail-err" : undefined}
                       />
-                      {errors["contact.email"] ? (
+                      {contactEmailErr ? (
                         <span className="err" id="cemail-err">
-                          {errors["contact.email"]}
+                          {contactEmailErr}
                         </span>
                       ) : null}
                     </div>
                     <div className="fg">
                       <label htmlFor="cphone" className="lbl">
-                        Contact phone
+                        Contact phone <span className="hint">(optional)</span>
                       </label>
                       <input
                         id="cphone"
@@ -544,15 +564,20 @@ export function RegisterDeal({ mine, managers, partnerName, today }: RegisterDea
               ))}
             </section>
           ) : (
-            <section aria-labelledby="newc" className="card clip">
+            <section aria-labelledby="dup" className="card clip">
               <div className="card-h">
-                <h2 id="newc" className="card-t">
-                  New customer for you
+                <h2 id="dup" className="card-t">
+                  {customer.length >= 3 && !hasSuggestions && lookupDone ? "New customer for you" : "Duplicate check"}
                 </h2>
               </div>
               <div className="card-b" style={{ fontSize: 12.5, lineHeight: 1.55, color: "#5E5B6E" }}>
-                {partnerName} has no registrations at {customer || "this customer"} yet. CleanStart still checks other
-                partners when it reviews.
+                {customer.length < 3
+                  ? "Type the company name to check for existing registrations."
+                  : hasSuggestions
+                    ? "Pick a match from the list to see your deals at that customer."
+                    : lookupDone
+                      ? `${partnerName} has no registrations for this customer yet. CleanStart still checks other partners when it reviews.`
+                      : "Checking for existing registrations."}
               </div>
             </section>
           )}

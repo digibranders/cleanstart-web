@@ -166,7 +166,7 @@ export function Account({ profile, sessions, today }: AccountProps): React.JSX.E
                 Role: <b style={{ color: "#2A2838" }}>{roleLabel}</b>. Another partner admin can change it on
                 the Team page.
               </span>
-              <button type="submit" className="btn btn-p">
+              <button type="submit" className="btn btn-p" disabled={!dirty}>
                 Save profile
               </button>
             </div>

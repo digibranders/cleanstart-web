@@ -80,7 +80,8 @@ const STARTERS: { title: string; meta: string; icon: IconName }[] = [
   { title: "Competitive battlecard", meta: "Battlecard, PDF", icon: "file" },
 ];
 
-const ACTION_STYLE = { marginLeft: "auto", height: 28 } as const;
+// The row's `.li .btn` rule shrinks buttons to 18px, so the standard size is set here.
+const ACTION_STYLE = { marginLeft: "auto", height: 30, padding: "0 10px", fontSize: 13 } as const;
 
 interface PartnerWelcomeProps {
   firstName: string;
@@ -188,53 +189,55 @@ export function PartnerWelcome({ firstName, company, checklist, viewerEmail }: P
       </section>
 
       <div className="row">
-        <section aria-labelledby="mydeals" className="card clip" style={{ flex: "1 1 420px", minWidth: 0 }}>
-          <div className="card-h">
-            <h2 id="mydeals" className="card-t">
-              Your deals
-            </h2>
-          </div>
-          <div
-            className="card-b"
-            style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, padding: "24px 16px" }}
-          >
-            <span className="li-ic tone-violet" style={{ width: 32, height: 32 }}>
-              <Icon name="deals" />
-            </span>
-            <span style={{ fontSize: 14, fontWeight: 700 }}>{done.deal ? "You have registered deals" : "No deals yet"}</span>
-            <span style={{ fontSize: 12.5, lineHeight: 1.55, color: "#5E5B6E", maxWidth: "46ch" }}>
-              {done.deal
-                ? "Follow their status and messages from CleanStart on the Deals page."
-                : "Register a customer you are working with. Once CleanStart accepts it, nobody else can claim it for 90 days."}
-            </span>
-            <Link href={done.deal ? ROUTES.partner.deals : ROUTES.partner.newDeal} className="btn btn-p" style={{ marginTop: 4 }}>
-              {done.deal ? "Open your deals" : "Register your first deal"}
-            </Link>
-          </div>
-        </section>
-        <section aria-labelledby="myteam" className="card clip" style={{ flex: "1 1 300px", minWidth: 0 }}>
-          <div className="card-h">
-            <h2 id="myteam" className="card-t">
-              Your team
-            </h2>
-            <span className="card-meta">{done.team ? "Colleagues invited" : "1 person"}</span>
-          </div>
-          <div
-            className="card-b"
-            style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, padding: "24px 16px" }}
-          >
-            <span className="li-ic" style={{ width: 32, height: 32 }}>
-              <Icon name="team" />
-            </span>
-            <span style={{ fontSize: 14, fontWeight: 700 }}>{done.team ? "Your colleagues are set up" : "Only you so far"}</span>
-            <span style={{ fontSize: 12.5, lineHeight: 1.55, color: "#5E5B6E" }}>
-              Sales and technical colleagues get their own login. Their deals stay with {company.name} if they leave.
-            </span>
-            <Link href={ROUTES.partner.team} className="btn btn-s" style={{ marginTop: 4 }}>
-              {done.team ? "Manage the team" : "Invite colleagues"}
-            </Link>
-          </div>
-        </section>
+        {done.deal ? null : (
+          <section aria-labelledby="mydeals" className="card clip" style={{ flex: "1 1 420px", minWidth: 0 }}>
+            <div className="card-h">
+              <h2 id="mydeals" className="card-t">
+                Your deals
+              </h2>
+            </div>
+            <div
+              className="card-b"
+              style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, padding: "24px 16px" }}
+            >
+              <span className="li-ic tone-violet" style={{ width: 32, height: 32 }}>
+                <Icon name="deals" />
+              </span>
+              <span style={{ fontSize: 14, fontWeight: 700 }}>No deals yet</span>
+              <span style={{ fontSize: 12.5, lineHeight: 1.55, color: "#5E5B6E", maxWidth: "46ch" }}>
+                Register a customer you are working with. Once CleanStart accepts it, nobody else can claim it for 90 days.
+              </span>
+              <Link href={ROUTES.partner.newDeal} className="btn btn-p" style={{ marginTop: 4 }}>
+                Register your first deal
+              </Link>
+            </div>
+          </section>
+        )}
+        {done.team ? null : (
+          <section aria-labelledby="myteam" className="card clip" style={{ flex: "1 1 300px", minWidth: 0 }}>
+            <div className="card-h">
+              <h2 id="myteam" className="card-t">
+                Your team
+              </h2>
+              <span className="card-meta">1 person</span>
+            </div>
+            <div
+              className="card-b"
+              style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, padding: "24px 16px" }}
+            >
+              <span className="li-ic" style={{ width: 32, height: 32 }}>
+                <Icon name="team" />
+              </span>
+              <span style={{ fontSize: 14, fontWeight: 700 }}>Only you so far</span>
+              <span style={{ fontSize: 12.5, lineHeight: 1.55, color: "#5E5B6E" }}>
+                Sales and technical colleagues get their own login. Their deals stay with {company.name} if they leave.
+              </span>
+              <Link href={ROUTES.partner.team} className="btn btn-s" style={{ marginTop: 4 }}>
+                Invite colleagues
+              </Link>
+            </div>
+          </section>
+        )}
         <section aria-labelledby="start" className="card clip" style={{ flex: "1 1 300px", minWidth: 0 }}>
           <div className="card-h">
             <h2 id="start" className="card-t">
