@@ -3448,13 +3448,13 @@ Invoke the `design-taste-frontend` skill before editing markup (repo rule for an
 - Create: `apps/portal/src/lib/initials.ts`
 - Test: `apps/portal/src/lib/routes.test.ts`, `apps/portal/src/lib/initials.test.ts`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M1.1f | started | W0 | - | - | routes, layouts, shell" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Write the two tests**
+- [x] **Step 2: Write the two tests**
 
 Create `apps/portal/src/lib/routes.test.ts` (the nav per role is the list in the contracts' section L):
 
@@ -3537,7 +3537,7 @@ describe("initialsOf", () => {
 });
 ```
 
-- [ ] **Step 3: Run them and see them fail**
+- [x] **Step 3: Run them and see them fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/lib/routes.test.ts src/lib/initials.test.ts
@@ -3545,7 +3545,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/lib/routes.test.ts src/lib/
 
 Expected: FAIL: `Tests  7 failed (7)` with `TypeError: (0 , navFor) is not a function` in `routes.test.ts`, and `Failed to resolve import "./initials"` in `initials.test.ts`.
 
-- [ ] **Step 4: Replace `routes.ts` and create `initials.ts`**
+- [x] **Step 4: Replace `routes.ts` and create `initials.ts`**
 
 Replace `apps/portal/src/lib/routes.ts`. It adds `resetPassword` to `ROUTES`, an `action` on every nav item (the same permission the page checks, so the sidebar and the page cannot disagree), and `navFor(viewer)`:
 
@@ -3633,7 +3633,7 @@ export function initialsOf(name: string): string {
 }
 ```
 
-- [ ] **Step 5: Run the tests and see them pass**
+- [x] **Step 5: Run the tests and see them pass**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/lib/routes.test.ts src/lib/initials.test.ts
@@ -3641,7 +3641,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/lib/routes.test.ts src/lib/
 
 Expected: `Test Files  2 passed (2)`, `Tests  13 passed (13)` (7 and 6).
 
-- [ ] **Step 6: Replace the layouts and index pages**
+- [x] **Step 6: Replace the layouts and index pages**
 
 Each layout calls `requireKind` (a partner opening `/admin` lands on their own home, signed out goes to sign in with a return path), loads `getShell` inside `withViewer`, and passes the nav for that viewer. Typecheck stays red until Step 7 (the layouts pass props `Shell` does not accept yet).
 
@@ -3720,7 +3720,7 @@ export default async function Home(): Promise<never> {
 }
 ```
 
-- [ ] **Step 7: Apply the shell edits**
+- [x] **Step 7: Apply the shell edits**
 
 Apply these edits to `apps/portal/src/components/shell/shell.tsx` in order, S1 to S8. Every Find text must match exactly once (S8 matches 20 times and is replaced everywhere, and must be applied last).
 
@@ -3905,7 +3905,7 @@ Replace with:
 me.
 ```
 
-- [ ] **Step 8: Typecheck and run the whole suite**
+- [x] **Step 8: Typecheck and run the whole suite**
 
 ```bash
 pnpm --filter @cleanstart/portal typecheck
@@ -3914,7 +3914,7 @@ pnpm --filter @cleanstart/portal test
 
 Expected: typecheck prints nothing and exits 0. `test` passes. `grep -rn "persona" apps/portal/src/components/shell/shell.tsx` prints nothing.
 
-- [ ] **Step 9: Look at it**
+- [x] **Step 9: Look at it**
 
 Per the Dev Server Policy in `CLAUDE.md`: check what is listening first, reuse a server that belongs to this worktree, never kill a process to free a port.
 
@@ -3926,11 +3926,11 @@ pnpm --filter @cleanstart/portal exec next dev --port 3204
 
 Sign in is converted in the next task, so for this check create a session without the UI: with the dev server running, sign in over HTTP with a seeded user (`aditi.rao@kestrelsystems.in`, the password is `DEV_SEED_PASSWORD` in `src/db/fixtures.ts`) and copy the `better-auth.session_token` cookie into the Browser pane, or wait and do this check at the end of Task M1.1g. Locked to 1440 by 900, open `/partner/overview` as Aditi (sidebar shows Kestrel Systems, "Channel partner, India", "Partner admin"), then as `farhan.qureshi@cleanstart.com` open `/admin/approvals` (sidebar shows the waiting count, "Partner manager, India"), and `/partner/overview` as Farhan, which must land on `/admin/approvals`. If no browser is available (overnight run), write `not visually checked` in the `done` line.
 
-- [ ] **Step 10: Run Gate A, then Gate B**
+- [x] **Step 10: Run Gate A, then Gate B**
 
 Run the three fast commands, then the full Gate A block. Expected: all exit 0; the build route table shows every `/partner/*` and `/admin/*` route as `ƒ` (dynamic).
 
-- [ ] **Step 11: Commit and log**
+- [x] **Step 11: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build

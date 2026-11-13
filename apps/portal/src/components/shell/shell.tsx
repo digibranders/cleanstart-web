@@ -3,15 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useWaitingApprovals } from "@/data/deals";
+import { authClient } from "@/lib/auth-client";
+import type { ShellDto } from "@/lib/dto";
+import { initialsOf } from "@/lib/initials";
 import { createSlice } from "@/lib/slice";
-import { ADMIN_NAV, type NavItem, PARTNER_NAV, type PortalKind, ROUTES } from "@/lib/routes";
+import { type NavItem, type PortalKind, ROUTES } from "@/lib/routes";
 import { Icon } from "../icon";
 import type { IconName } from "../icon-paths";
 import { Avatar } from "../ui/badge";
 import { Drawer } from "../ui/overlay";
 import { useToast } from "../ui/toast";
-import { KESTREL, type Persona, QAMAR, STAFF } from "./personas";
 
 interface SearchEntry {
   label: string;
@@ -122,11 +123,6 @@ const notesRead = createSlice<{ partner: boolean; admin: boolean }>("notes-read"
   admin: false,
 });
 
-function personaFor(kind: PortalKind, pathname: string): Persona {
-  if (kind === "admin") return STAFF;
-  return pathname.startsWith(ROUTES.partner.welcome) ? QAMAR : KESTREL;
-}
-
 function crumbFor(nav: readonly NavItem[], pathname: string): string {
   if (pathname.startsWith(ROUTES.partner.account)) return "Your account";
   if (pathname.startsWith(ROUTES.partner.welcome)) return "Overview";
@@ -138,16 +134,29 @@ function crumbFor(nav: readonly NavItem[], pathname: string): string {
 
 export function Shell({
   kind,
+  shell,
+  nav,
   children,
 }: {
   kind: PortalKind;
+  /** The signed in viewer, their company and the nav counts, from getShell(). */
+  shell: ShellDto;
+  /** The sidebar items this viewer may open, from navFor(). */
+  nav: readonly NavItem[];
   children: React.ReactNode;
 }): React.JSX.Element {
   const pathname = usePathname();
   const toast = useToast();
-  const persona = personaFor(kind, pathname);
-  const nav = kind === "partner" ? PARTNER_NAV : ADMIN_NAV;
-  const waiting = useWaitingApprovals();
+  const me = {
+    org: shell.orgName,
+    orgSub: shell.orgSub,
+    orgInitials: initialsOf(shell.orgName),
+    user: shell.viewerName,
+    userInitials: initialsOf(shell.viewerName),
+    role: shell.roleLabel,
+    manager: shell.manager ? { ...shell.manager, initials: initialsOf(shell.manager.name) } : undefined,
+  };
+  const waiting = shell.waitingApprovals;
   const read = notesRead.use()[kind];
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -208,10 +217,16 @@ export function Shell({
       return;
     }
     setMsg(null);
-    toast(`Message sent to ${persona.manager?.name ?? "your partner manager"}`);
+    toast(`Message sent to ${me.manager?.name ?? "your partner manager"}`);
   };
 
   const countFor = (item: NavItem): string => (item.count === "approvals" && waiting > 0 ? String(waiting) : "");
+
+  const signOut = async (): Promise<void> => {
+    await authClient.signOut();
+    // A full navigation, so no signed in page survives in the client router cache.
+    window.location.assign(ROUTES.signIn);
+  };
 
   return (
     <>
@@ -252,10 +267,10 @@ export function Shell({
           <div className="side-foot">
             {kind === "partner" ? (
               <div className="who">
-                <Avatar initials={persona.orgInitials} />
+                <Avatar initials={me.orgInitials} />
                 <span className="who-t">
-                  <span className="who-n">{persona.org}</span>
-                  <span className="who-s">{persona.orgSub}</span>
+                  <span className="who-n">{me.org}</span>
+                  <span className="who-s">{me.orgSub}</span>
                 </span>
               </div>
             ) : null}
@@ -268,10 +283,10 @@ export function Shell({
                 data-tour="profile-menu"
                 onClick={() => setProfileOpen((o) => !o)}
               >
-                <Avatar initials={persona.userInitials} round me />
+                <Avatar initials={me.userInitials} round me />
                 <span className="who-t">
-                  <span className="who-n">{persona.user}</span>
-                  <span className="who-s">{persona.role}</span>
+                  <span className="who-n">{me.user}</span>
+                  <span className="who-s">{me.role}</span>
                 </span>
                 <Icon name="caret" className={`ic car${profileOpen ? " car-up" : ""}`} />
               </button>
@@ -280,13 +295,13 @@ export function Shell({
                   <div className="dd-scrim" onClick={() => setProfileOpen(false)} aria-hidden="true" />
                   <div className="pop pop-up" role="menu" aria-label="Profile">
                     <div className="pop-h" style={{ gap: 10, justifyContent: "flex-start" }}>
-                      <Avatar initials={persona.userInitials} round me />
+                      <Avatar initials={me.userInitials} round me />
                       <span className="who-t">
                         <span className="who-n" style={{ color: "#0F0E17" }}>
-                          {persona.user}
+                          {me.user}
                         </span>
                         <span className="who-s" style={{ color: "#6B687D" }}>
-                          {kind === "partner" ? `${persona.role}, ${persona.org}` : persona.role}
+                          {kind === "partner" ? `${me.role}, ${me.org}` : me.role}
                         </span>
                       </span>
                     </div>
@@ -315,33 +330,20 @@ export function Shell({
                             <Icon name="send" />
                           </span>
                           <span className="li-t">
-                            <span className="li-n">Message {persona.manager?.name}</span>
+                            <span className="li-n">Message {me.manager?.name}</span>
                             <span className="li-s">Your partner manager</span>
                           </span>
                         </button>
                       </>
                     ) : null}
-                    <Link
-                      href={kind === "partner" ? ROUTES.admin.approvals : ROUTES.partner.overview}
-                      role="menuitem"
-                      className="li"
-                    >
-                      <span className="li-ic">
-                        <Icon name={kind === "partner" ? "approve" : "deals"} />
-                      </span>
-                      <span className="li-t">
-                        <span className="li-n">{kind === "partner" ? "View as CleanStart staff" : "View as a partner"}</span>
-                        <span className="li-s">Review mode, switch role</span>
-                      </span>
-                    </Link>
-                    <Link href={ROUTES.signIn} role="menuitem" className="li">
+                    <button type="button" role="menuitem" className="li linkbtn" style={{ width: "100%" }} onClick={signOut}>
                       <span className="li-ic">
                         <Icon d={SIGN_OUT} />
                       </span>
                       <span className="li-t">
                         <span className="li-n">Sign out</span>
                       </span>
-                    </Link>
+                    </button>
                   </div>
                 </>
               ) : null}
@@ -362,7 +364,7 @@ export function Shell({
               <Icon d={MENU} />
             </button>
             <nav aria-label="Breadcrumb" className="crumb">
-              <span>{persona.org}</span>
+              <span>{me.org}</span>
               <span>/</span>
               <b>{crumb}</b>
             </nav>
@@ -449,7 +451,7 @@ export function Shell({
                             <span className="li-t">
                               <span className="li-n">Message your partner manager</span>
                               <span className="li-s">
-                                {persona.manager?.name}, {persona.manager?.team}
+                                {me.manager?.name}, {me.manager?.team}
                               </span>
                             </span>
                           </button>
@@ -578,17 +580,17 @@ export function Shell({
         </>
       ) : null}
 
-      {kind === "partner" && persona.manager ? (
+      {kind === "partner" && me.manager ? (
         <Drawer
           open={msg !== null}
           onClose={() => setMsg(null)}
-          title={`Message ${persona.manager.name}`}
-          subtitle={`Your CleanStart partner manager, ${persona.manager.team.replace("CleanStart ", "")}. Replies come to your email.`}
-          lead={<span className="av av-2">{persona.manager.initials}</span>}
+          title={`Message ${me.manager.name}`}
+          subtitle={`Your CleanStart partner manager, ${me.manager.team.replace("CleanStart ", "")}. Replies come to your email.`}
+          lead={<span className="av av-2">{me.manager.initials}</span>}
           onSubmit={sendMessage}
           footer={
             <>
-              <span className="hint">Sent from {persona.user.toLowerCase().replace(" ", ".")}@{persona.org.toLowerCase().replace(/\s+/g, "")}.com</span>
+              <span className="hint">Sent from {shell.viewerEmail}</span>
               <button type="button" className="btn btn-s" onClick={() => setMsg(null)}>
                 Cancel
               </button>
