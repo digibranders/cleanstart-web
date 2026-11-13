@@ -3,9 +3,12 @@
 import { z } from 'zod';
 import { AUDIT_KINDS, AUDIT_WHO } from '@/lib/domain';
 import type { AuditEntryDto } from '@/lib/dto';
+import { ROUTES } from '@/lib/routes';
+import { recordAudit } from '@/server/audit/record';
 import { assertCan } from '@/server/auth/policies';
 import { exportAudit } from '@/server/repo/audit';
 import { withViewer } from '@/server/repo/context';
+import { retryFailedOutbox } from '@/server/repo/integration-health';
 import type { ActionResult } from './result';
 import { runViewerAction } from './run';
 
@@ -29,5 +32,26 @@ export async function exportAuditAction(raw: unknown): Promise<ActionResult<Audi
       ...(input.partnerId ? { partnerId: input.partnerId } : {}),
     };
     return withViewer(ctx.viewer, (tx) => exportAudit(tx, ctx.viewer, filter, ctx.clock));
+  });
+}
+
+const retrySchema = z.object({});
+
+/** Sets failed HubSpot sync rows back to pending (health card on the Audit log screen). */
+export async function retryFailedOutboxAction(raw: unknown): Promise<ActionResult<{ retried: number }>> {
+  return runViewerAction({ name: 'integration.retry_failed', schema: retrySchema }, raw, async (ctx) => {
+    assertCan(ctx.viewer, 'integration.retry_failed');
+    const retried = await withViewer(ctx.viewer, async (tx) => {
+      const count = await retryFailedOutbox(tx, ctx.viewer);
+      if (count > 0) {
+        await recordAudit(tx, ctx.viewer, {
+          event: 'integration.outbox_retried',
+          target: `${count} failed HubSpot ${count === 1 ? 'sync' : 'syncs'}`,
+        });
+      }
+      return count;
+    });
+    ctx.revalidate(ROUTES.admin.audit);
+    return { retried };
   });
 }

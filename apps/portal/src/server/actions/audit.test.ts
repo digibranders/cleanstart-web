@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { auditLog } from '@/db/schema';
+import { auditLog, hubspotOutbox } from '@/db/schema';
 import { asPartner, asStaff, resetDb, testDb } from '@/db/test-helpers';
 import { requireActionViewer } from '@/server/auth/viewer';
-import { exportAuditAction } from './audit';
+import { exportAuditAction, retryFailedOutboxAction } from './audit';
 
 vi.mock('@/server/auth/viewer', () => ({ requireActionViewer: vi.fn() }));
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
@@ -37,5 +37,35 @@ describe('exportAuditAction', () => {
     signedInAs(await asStaff(db));
     const result = await exportAuditAction({ period: '1y', kind: 'everything' });
     expect(result).toMatchObject({ ok: false, error: { code: 'validation' } });
+  });
+});
+
+describe('retryFailedOutboxAction', () => {
+  it('puts failed rows back to pending and writes one audit entry', async () => {
+    const staff = await asStaff(db, 'partner_manager');
+    signedInAs(staff);
+    await db.insert(hubspotOutbox).values([
+      { op: 'partner.upsert', subjectId: 'a', idempotencyKey: 'a', status: 'failed', attempts: 6, lastError: 'boom' },
+      { op: 'partner.upsert', subjectId: 'b', idempotencyKey: 'b', status: 'done' },
+    ]);
+    expect(await retryFailedOutboxAction({})).toEqual({ ok: true, data: { retried: 1 } });
+    const rows = await db.select().from(hubspotOutbox);
+    expect(rows.find((r) => r.subjectId === 'a')).toMatchObject({ status: 'pending', attempts: 0 });
+    const audit = await db.select().from(auditLog);
+    expect(audit).toHaveLength(1);
+    expect(audit[0]).toMatchObject({ event: 'integration.outbox_retried', target: '1 failed HubSpot sync', actorId: staff.id });
+  });
+
+  it('writes no audit entry when nothing failed, so a second click changes nothing', async () => {
+    signedInAs(await asStaff(db, 'partner_manager'));
+    await db.insert(hubspotOutbox).values({ op: 'partner.upsert', subjectId: 'a', idempotencyKey: 'a', status: 'failed', attempts: 6 });
+    expect(await retryFailedOutboxAction({})).toEqual({ ok: true, data: { retried: 1 } });
+    expect(await retryFailedOutboxAction({})).toEqual({ ok: true, data: { retried: 0 } });
+    expect(await db.select().from(auditLog)).toHaveLength(1);
+  });
+
+  it('is forbidden for everyone but a partner manager', async () => {
+    signedInAs(await asStaff(db, 'marketing'));
+    expect(await retryFailedOutboxAction({})).toMatchObject({ ok: false, error: { code: 'forbidden' } });
   });
 });

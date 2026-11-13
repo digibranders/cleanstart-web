@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
+import { IntegrationHealthCard } from '@/components/audit/IntegrationHealthCard';
 import { AdminAudit } from '@/components/screens/AdminAudit';
 import { parseAuditView } from '@/lib/audit-filters';
 import { systemClock } from '@/lib/clock';
 import { requireCan } from '@/server/auth/viewer';
 import { listAudit } from '@/server/repo/audit';
 import { withViewer } from '@/server/repo/context';
+import { integrationHealth } from '@/server/repo/integration-health';
 
 export const metadata: Metadata = { title: 'Audit log' };
 export const dynamic = 'force-dynamic';
@@ -16,8 +18,9 @@ export default async function Page({
 }): Promise<React.JSX.Element> {
   const viewer = await requireCan('audit.read');
   const view = parseAuditView(await searchParams);
-  const page = await withViewer(viewer, (tx) =>
-    listAudit(
+  const today = systemClock.today();
+  const { page, health } = await withViewer(viewer, async (tx) => ({
+    page: await listAudit(
       tx,
       viewer,
       {
@@ -29,6 +32,14 @@ export default async function Page({
       },
       systemClock,
     ),
+    health: await integrationHealth(tx),
+  }));
+  return (
+    <AdminAudit
+      page={page}
+      view={view}
+      today={today}
+      healthSlot={<IntegrationHealthCard health={health} today={today} />}
+    />
   );
-  return <AdminAudit page={page} view={view} today={systemClock.today()} healthSlot={null} />;
 }
