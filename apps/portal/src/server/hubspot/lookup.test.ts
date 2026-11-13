@@ -42,11 +42,24 @@ describe('conflictingDeals', () => {
   it('returns open deals on the customer that belong to another partner', async () => {
     const hs = new FakeHubspot();
     const customer = await hs.createOrUpdateCompany({ existingId: null, name: 'Gulfway Freight', domain: 'gulfwayfreight.ae', properties: {} });
-    const mine = await hs.createDeal({ dealstage: hs.stageIds.Accepted, partner_company_id: '1' });
-    const theirs = await hs.createDeal({ dealstage: hs.stageIds.Discovery, partner_company_id: '2' });
+    const mine = await hs.createDeal({ dealstage: hs.stageIds.Accepted, pipeline: 'p', partner_company_id: '1' });
+    const theirs = await hs.createDeal({ dealstage: hs.stageIds.Discovery, pipeline: 'p', partner_company_id: '2' });
     await hs.associateDealWithCompany(mine.id, customer.id, 'customer');
     await hs.associateDealWithCompany(theirs.id, customer.id, 'customer');
     const found = await conflictingDeals(hs, { customerCompanyId: customer.id, partnerCompanyId: '1', pipelineId: 'p' });
     expect(found.map((d) => d.id)).toEqual([theirs.id]);
+  });
+
+  it('ignores another partner deal that is closed lost, closed won or expired, or in another pipeline', async () => {
+    const hs = new FakeHubspot();
+    const customer = await hs.createOrUpdateCompany({ existingId: null, name: 'Gulfway Freight', domain: 'gulfwayfreight.ae', properties: {} });
+    const closed = [hs.stageIds['Closed lost'], hs.stageIds['Closed won'], hs.stageIds['Registration expired']];
+    for (const stage of closed) {
+      const d = await hs.createDeal({ dealstage: stage, pipeline: 'p', partner_company_id: '2' });
+      await hs.associateDealWithCompany(d.id, customer.id, 'customer');
+    }
+    const elsewhere = await hs.createDeal({ dealstage: hs.stageIds.Accepted, pipeline: 'other', partner_company_id: '2' });
+    await hs.associateDealWithCompany(elsewhere.id, customer.id, 'customer');
+    expect(await conflictingDeals(hs, { customerCompanyId: customer.id, partnerCompanyId: '1', pipelineId: 'p' })).toEqual([]);
   });
 });

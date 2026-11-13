@@ -2,7 +2,7 @@
 import type {
   AssociationRole, DealSearchPage, HsCompany, HsDeal, HubspotApi, StageIds,
 } from './types';
-import { STAGE_LABELS } from './types';
+import { HubspotError, STAGE_LABELS } from './types';
 
 export class FakeHubspot implements HubspotApi {
   companies = new Map<string, HsCompany & { properties: Record<string, string> }>();
@@ -22,7 +22,7 @@ export class FakeHubspot implements HubspotApi {
     if (this.failNext) { const e = this.failNext; this.failNext = null; throw e; }
   }
 
-  async getStageIds(): Promise<StageIds> { return this.stageIds; }
+  async getStageIds(): Promise<StageIds> { this.maybeFail('getStageIds'); return this.stageIds; }
 
   async findCompany({ domain, name }: { domain: string | null; name: string }): Promise<HsCompany | null> {
     this.maybeFail('findCompany');
@@ -30,6 +30,7 @@ export class FakeHubspot implements HubspotApi {
     return (domain ? all.find((c) => c.domain === domain) : undefined) ?? all.find((c) => c.name?.toLowerCase() === name.toLowerCase()) ?? null;
   }
   async searchCompanies(query: string): Promise<HsCompany[]> {
+    this.maybeFail('searchCompanies');
     return [...this.companies.values()].filter((c) => `${c.name} ${c.domain}`.toLowerCase().includes(query.toLowerCase()));
   }
   async createOrUpdateCompany(i: { existingId: string | null; name: string; domain: string | null; properties: Record<string, string> }): Promise<{ id: string }> {
@@ -38,7 +39,7 @@ export class FakeHubspot implements HubspotApi {
     this.companies.set(id, { id, name: i.name, domain: i.domain, properties: i.properties });
     return { id };
   }
-  async upsertContact(i: { email: string }): Promise<{ id: string }> {
+  async upsertContact(i: { email: string; firstName: string; lastName: string; phone?: string }): Promise<{ id: string }> {
     this.maybeFail('upsertContact');
     const found = [...this.contacts.values()].find((c) => c.email === i.email);
     if (found) return { id: found.id };
@@ -46,8 +47,9 @@ export class FakeHubspot implements HubspotApi {
     this.contacts.set(id, { id, email: i.email });
     return { id };
   }
-  async associateContactWithCompany(c: string, co: string): Promise<void> { this.associations.push({ from: c, to: co, kind: 'contact-company' }); }
+  async associateContactWithCompany(c: string, co: string): Promise<void> { this.maybeFail('associateContactWithCompany'); this.associations.push({ from: c, to: co, kind: 'contact-company' }); }
   async findDealByRegistrationId(rid: string): Promise<HsDeal | null> {
+    this.maybeFail('findDealByRegistrationId');
     return [...this.deals.values()].find((d) => d.properties.portal_registration_id === rid) ?? null;
   }
   async createDeal(properties: Record<string, string>): Promise<HsDeal> {
@@ -61,12 +63,12 @@ export class FakeHubspot implements HubspotApi {
   async updateDeal(id: string, properties: Record<string, string>): Promise<void> {
     this.maybeFail('updateDeal');
     const d = this.deals.get(id);
-    if (!d) throw new Error(`no deal ${id}`);
+    if (!d) throw new HubspotError(404, '', `HubSpot PATCH /crm/v3/objects/deals/${id} failed with 404`);
     this.clock += 1;
     this.deals.set(id, { ...d, properties: { ...d.properties, ...properties }, stageId: properties.dealstage ?? d.stageId, modifiedAt: this.clock });
   }
-  async associateDealWithCompany(d: string, c: string, role: AssociationRole): Promise<void> { this.associations.push({ from: d, to: c, kind: `deal-company:${role}` }); }
-  async associateDealWithContact(d: string, c: string): Promise<void> { this.associations.push({ from: d, to: c, kind: 'deal-contact' }); }
+  async associateDealWithCompany(d: string, c: string, role: AssociationRole): Promise<void> { this.maybeFail('associateDealWithCompany'); this.associations.push({ from: d, to: c, kind: `deal-company:${role}` }); }
+  async associateDealWithContact(d: string, c: string): Promise<void> { this.maybeFail('associateDealWithContact'); this.associations.push({ from: d, to: c, kind: 'deal-contact' }); }
   async searchDealsModifiedSince(_p: string, sinceMs: number, after: string | null): Promise<DealSearchPage> {
     this.maybeFail('searchDealsModifiedSince');
     const rows = [...this.deals.values()].filter((d) => d.modifiedAt >= sinceMs).sort((a, b) => a.modifiedAt - b.modifiedAt);
@@ -74,9 +76,11 @@ export class FakeHubspot implements HubspotApi {
     const page = rows.slice(start, start + 2);
     return { deals: page, next: start + 2 < rows.length ? String(start + 2) : null };
   }
-  async readDeals(ids: string[]): Promise<HsDeal[]> { return ids.flatMap((id) => this.deals.get(id) ?? []); }
-  async listOpenDealsForCompany(companyId: string): Promise<HsDeal[]> {
+  async readDeals(ids: string[]): Promise<HsDeal[]> { this.maybeFail('readDeals'); return ids.flatMap((id) => this.deals.get(id) ?? []); }
+  async listOpenDealsForCompany(companyId: string, pipelineId: string): Promise<HsDeal[]> {
+    this.maybeFail('listOpenDealsForCompany');
+    const closed = new Set([this.stageIds['Closed won'], this.stageIds['Closed lost'], this.stageIds['Registration expired']]);
     const dealIds = this.associations.filter((a) => a.kind.startsWith('deal-company') && a.to === companyId).map((a) => a.from);
-    return dealIds.flatMap((id) => this.deals.get(id) ?? []);
+    return dealIds.flatMap((id) => this.deals.get(id) ?? []).filter((d) => d.properties.pipeline === pipelineId && !closed.has(d.stageId));
   }
 }

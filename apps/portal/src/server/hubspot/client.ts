@@ -11,10 +11,31 @@ import {
 interface HttpResponse {
   ok: boolean;
   status: number;
+  headers: { get(name: string): string | null };
   text(): Promise<string>;
   json(): Promise<unknown>;
 }
 type ApiRequest = (opts: { method: string; path: string; body?: unknown }) => Promise<HttpResponse>;
+
+const MAX_TRIES = 3;
+const MAX_RETRY_WAIT_MS = 10_000;
+const DEFAULT_RETRY_WAIT_MS = 1_000;
+const DEFAULT_TIMEOUT_MS = 15_000;
+const BATCH_READ_LIMIT = 100;
+const CLOSED_STAGES = ['Closed won', 'Closed lost', 'Registration expired'] as const;
+
+export interface RealHubspotOptions {
+  /** Injected in tests so a 429 wait does not take real time. */
+  sleep?: (ms: number) => Promise<void>;
+  timeoutMs?: number;
+}
+
+const realSleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+
+const retryWaitMs = (header: string | null): number => {
+  const seconds = Number(header);
+  return Math.min(header !== null && Number.isFinite(seconds) && seconds > 0 ? seconds * 1000 : DEFAULT_RETRY_WAIT_MS, MAX_RETRY_WAIT_MS);
+};
 
 const DEAL_PROPS = ['dealname', 'dealstage', 'pipeline', 'closedate', 'hs_lastmodifieddate',
   'portal_registration_id', 'protection_end_date', 'partner_company_id'];
@@ -29,13 +50,35 @@ const toDeal = (raw: RawDeal): HsDeal => ({
 });
 
 export class RealHubspot implements HubspotApi {
-  private stageCache: { at: number; ids: StageIds } | null = null;
+  private readonly stageCache = new Map<string, { at: number; ids: StageIds }>();
   private labelIds: { partner: number; customer: number } | null | undefined;
+  private readonly sleep: (ms: number) => Promise<void>;
+  private readonly timeoutMs: number;
 
-  constructor(private readonly apiRequest: ApiRequest) {}
+  constructor(private readonly apiRequest: ApiRequest, options: RealHubspotOptions = {}) {
+    this.sleep = options.sleep ?? realSleep;
+    this.timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  }
+
+  // The SDK's apiRequest does not throw on a non-2xx response, so its own retry never fires; the bounded 429 retry lives here.
+  private async send(method: string, path: string, body?: unknown): Promise<HttpResponse> {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const timeout = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => reject(new HubspotError(0, 'timeout', `HubSpot ${method} ${path} timed out after ${this.timeoutMs} ms`)), this.timeoutMs);
+    });
+    try {
+      return await Promise.race([this.apiRequest({ method, path, ...(body !== undefined ? { body } : {}) }), timeout]);
+    } finally {
+      clearTimeout(timer);
+    }
+  }
 
   private async call<T>(method: string, path: string, body?: unknown): Promise<T> {
-    const res = await this.apiRequest({ method, path, ...(body !== undefined ? { body } : {}) });
+    let res = await this.send(method, path, body);
+    for (let tries = 1; res.status === 429 && tries < MAX_TRIES; tries += 1) {
+      await this.sleep(retryWaitMs(res.headers.get('retry-after')));
+      res = await this.send(method, path, body);
+    }
     if (!res.ok) {
       const text = await res.text();
       throw new HubspotError(res.status, text, `HubSpot ${method} ${path} failed with ${res.status}`);
@@ -44,7 +87,8 @@ export class RealHubspot implements HubspotApi {
   }
 
   async getStageIds(pipelineId: string): Promise<StageIds> {
-    if (this.stageCache && Date.now() - this.stageCache.at < 600_000) return this.stageCache.ids;
+    const cached = this.stageCache.get(pipelineId);
+    if (cached && Date.now() - cached.at < 600_000) return cached.ids;
     const pipe = await this.call<{ stages: Array<{ id: string; label: string }> }>('GET', `/crm/v3/pipelines/deals/${pipelineId}`);
     const ids = {} as StageIds;
     for (const label of STAGE_LABELS) {
@@ -52,7 +96,7 @@ export class RealHubspot implements HubspotApi {
       if (!s) throw new HubspotError(500, '', `Pipeline ${pipelineId} has no stage "${label}". Run provision-hubspot.ts.`);
       ids[label] = s.id;
     }
-    this.stageCache = { at: Date.now(), ids };
+    this.stageCache.set(pipelineId, { at: Date.now(), ids });
     return ids;
   }
 
@@ -161,17 +205,21 @@ export class RealHubspot implements HubspotApi {
   }
 
   async readDeals(ids: string[]): Promise<HsDeal[]> {
-    if (ids.length === 0) return [];
-    const r = await this.call<{ results: RawDeal[] }>('POST', '/crm/v3/objects/deals/batch/read', {
-      properties: DEAL_PROPS, inputs: ids.map((id) => ({ id })),
-    });
-    return r.results.map(toDeal);
+    const deals: HsDeal[] = [];
+    for (let i = 0; i < ids.length; i += BATCH_READ_LIMIT) {
+      const r = await this.call<{ results: RawDeal[] }>('POST', '/crm/v3/objects/deals/batch/read', {
+        properties: DEAL_PROPS, inputs: ids.slice(i, i + BATCH_READ_LIMIT).map((id) => ({ id })),
+      });
+      deals.push(...r.results.map(toDeal));
+    }
+    return deals;
   }
 
   async listOpenDealsForCompany(companyId: string, pipelineId: string): Promise<HsDeal[]> {
     const assoc = await this.call<{ results: Array<{ toObjectId: number }> }>('GET', `/crm/v4/objects/companies/${companyId}/associations/deals`);
-    const deals = await this.readDeals(assoc.results.map((a) => String(a.toObjectId)));
-    return deals.filter((d) => d.properties.pipeline === pipelineId);
+    const [deals, stageIds] = await Promise.all([this.readDeals(assoc.results.map((a) => String(a.toObjectId))), this.getStageIds(pipelineId)]);
+    const closed = new Set<string>(CLOSED_STAGES.map((label) => stageIds[label]));
+    return deals.filter((d) => d.properties.pipeline === pipelineId && !closed.has(d.stageId));
   }
 }
 

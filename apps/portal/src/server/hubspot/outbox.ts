@@ -11,6 +11,8 @@ import { DependencyPending } from './types';
 
 export type { OutboxOp };
 
+const MAX_ERROR_LENGTH = 500;
+
 export type Handlers = Record<OutboxOp, (subjectId: string, payload: Record<string, unknown>) => Promise<void>>;
 
 /** Contracts G. Safe inside withViewer: hubspot_outbox allows INSERT for every identity. */
@@ -46,7 +48,7 @@ export const drainOutbox = async (deps: {
         await tx.update(hubspotOutbox).set({ status: 'done', lastError: null, updatedAt: sql`now()` }).where(eq(hubspotOutbox.id, row.id));
         result.done += 1;
       } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
+        const message = (err instanceof Error ? err.message : String(err)).slice(0, MAX_ERROR_LENGTH);
         if (err instanceof DependencyPending) {
           await tx.update(hubspotOutbox).set({ nextAttemptAt: new Date(deps.clock.now().getTime() + 60_000), lastError: message }).where(eq(hubspotOutbox.id, row.id));
           result.waiting += 1;

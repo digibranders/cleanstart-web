@@ -42,6 +42,16 @@ describe('enqueue', () => {
   });
 });
 
+describe('enqueue from two viewers', () => {
+  it('stores one row and raises no error when two partner viewers insert the same key', async () => {
+    const [a, b] = [await asPartner(db), await asPartner(db)];
+    const input = { op: 'partner.upsert' as const, subjectId: 'shared-subject', version: '1' };
+    await withViewer(a, (tx) => enqueue(tx, input));
+    await expect(withViewer(b, (tx) => enqueue(tx, input))).resolves.toBeUndefined();
+    expect(await db.select().from(hubspotOutbox)).toHaveLength(1);
+  });
+});
+
 describe('drainOutbox', () => {
   it('marks a successful operation done', async () => {
     await enqueue(db, { op: 'partner.upsert', subjectId: 'p1', version: '1' });
@@ -58,6 +68,23 @@ describe('drainOutbox', () => {
     const r = await row();
     expect(r).toMatchObject({ status: 'pending', attempts: 1, lastError: 'boom' });
     expect(r.nextAttemptAt.getTime()).toBe(NOW.getTime() + 60_000);
+  });
+
+  it('truncates a long error to 500 characters on retry, wait and failure', async () => {
+    const long = 'x'.repeat(2000);
+    const pending = async (err: Error, attempts: number): Promise<typeof hubspotOutbox.$inferSelect> => {
+      await resetDb(db);
+      await enqueue(db, { op: 'partner.upsert', subjectId: 'p1', version: '1' });
+      await db.update(hubspotOutbox).set({ attempts });
+      const handlers = { 'partner.upsert': vi.fn().mockRejectedValue(err) } as unknown as Handlers;
+      await drainOutbox({ db, handlers, clock });
+      return row();
+    };
+    expect((await pending(new Error(long), 0)).lastError).toHaveLength(500);
+    expect((await pending(new DependencyPending(long), 0)).lastError).toHaveLength(500);
+    const failed = await pending(new Error(long), 5);
+    expect(failed.status).toBe('failed');
+    expect(failed.lastError).toHaveLength(500);
   });
 
   it('marks the operation failed after the fifth attempt', async () => {

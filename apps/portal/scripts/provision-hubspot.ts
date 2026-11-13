@@ -2,12 +2,16 @@ import { Client } from '@hubspot/api-client';
 import {
   COMPANY_PROPERTIES,
   DEAL_PROPERTIES,
+  EXTERNAL_DEAL_PROPERTIES,
   GROUP,
   PIPELINE_SPEC,
   type PropertySpec,
+  withoutUniqueValues,
 } from '../src/server/hubspot/schema-spec';
 
 const apply = process.argv.includes('--apply');
+// HUBSPOT-CAPABILITIES.md row (d): plain text properties for an account that refuses unique-value properties.
+const noUnique = process.argv.includes('--no-unique');
 const token = process.env.HUBSPOT_PORTAL_TOKEN;
 if (!token) throw new Error('HUBSPOT_PORTAL_TOKEN is required');
 const client = new Client({ accessToken: token, numberOfApiCallRetries: 3 });
@@ -36,8 +40,15 @@ const ensureProperties = async (object: 'companies' | 'deals', props: PropertySp
 
 const main = async (): Promise<void> => {
   console.info(apply ? 'APPLY mode' : 'DRY RUN (pass --apply to write)');
-  await ensureProperties('companies', COMPANY_PROPERTIES);
-  await ensureProperties('deals', DEAL_PROPERTIES);
+  if (noUnique) console.info('--no-unique: unique-value properties are created as plain text properties');
+  if (!apply) {
+    console.warn(
+      `WARNING: deal properties ${EXTERNAL_DEAL_PROPERTIES.join(', ')} are written by dealProperties but not created by this script. ` +
+        'They must already exist in the HubSpot account (see HUBSPOT-PROVISIONING.md) before registration.create works.',
+    );
+  }
+  await ensureProperties('companies', noUnique ? withoutUniqueValues(COMPANY_PROPERTIES) : COMPANY_PROPERTIES);
+  await ensureProperties('deals', noUnique ? withoutUniqueValues(DEAL_PROPERTIES) : DEAL_PROPERTIES);
 
   const existing = (await (await call('GET', '/crm/v3/pipelines/deals')).json()) as {
     results: Array<{ id: string; label: string }>;

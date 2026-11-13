@@ -60,6 +60,13 @@ export const DEAL_PROPERTIES: PropertySpec[] = [
   { name: 'partner_company_id', label: 'Partner company id', type: 'string', fieldType: 'text' },
 ];
 
+/** Row (d) of HUBSPOT-CAPABILITIES.md: the fallback when the account refuses unique-value properties. */
+export const withoutUniqueValues = (props: readonly PropertySpec[]): PropertySpec[] =>
+  props.map(({ hasUniqueValue: _unique, ...rest }) => rest);
+
+/** Deal properties that mappers.dealProperties writes but this spec does not create. */
+export const EXTERNAL_DEAL_PROPERTIES = ['partner_name'] as const;
+
 const stage = (label: string, displayOrder: number, probability: string) => ({
   label,
   displayOrder,
