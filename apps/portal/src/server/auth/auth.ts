@@ -6,6 +6,7 @@ import type { GoogleOptions, MicrosoftOptions } from 'better-auth/social-provide
 import { db } from '@/db/client';
 import { authAccounts, authSessions, authTwoFactors, authVerifications, users } from '@/db/schema';
 import { type Env, env } from '@/env';
+import { log } from '@/server/log';
 import { sendPasswordResetEmail } from './auth-mail';
 import { hashPassword, verifyPassword } from './passwords';
 
@@ -91,6 +92,9 @@ function createAuth() {
           to: { email: user.email, name: user.name },
           token,
           expiresInMinutes: RESET_TOKEN_SECONDS / 60,
+        }).catch((error: unknown) => {
+          // Only the error name: a transport message can carry the address.
+          log.error({ errorName: error instanceof Error ? error.name : 'unknown' }, 'password reset email failed');
         });
       },
     },

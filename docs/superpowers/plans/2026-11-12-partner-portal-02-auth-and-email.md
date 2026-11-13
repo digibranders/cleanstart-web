@@ -955,7 +955,7 @@ pnpm --filter @cleanstart/portal test
 
 Expected: all exit 0; `test` includes `src/server/auth/auth.spike.test.ts (7 tests)`. Then run the full Gate A block from the handoff (build, dash check, path check). The files in `git diff --name-only feat/portal-build` must be those in this task's Files block.
 
-- [ ] **Step 15: Gate B, commit, log**
+- [x] **Step 15: Gate B, commit, log**
 
 Gate B as in Conventions. Then:
 

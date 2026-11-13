@@ -10,7 +10,7 @@ import { dirname, join } from 'node:path';
  * Run: pnpm --filter @cleanstart/portal exec tsx scripts/auth-spike-gate.ts
  */
 const SPIKE_FILE = 'src/server/auth/auth.spike.test.ts';
-/** S6 only checks the OAuth configuration. Signing in with Google or Microsoft needs a dev OAuth app. */
+/** S6 only checks the OAuth configuration, so a pass is not proof of an OAuth sign in (that needs a dev OAuth app). A failing S6 still fails the gate. */
 const CONFIG_ONLY = 'S6';
 
 interface Assertion {
@@ -42,8 +42,8 @@ let failed = items.length === 0;
 for (const item of items) {
   const id = item.title.split(' ')[0] ?? '?';
   const ok = item.status === 'passed';
-  if (!ok && id !== CONFIG_ONLY) failed = true;
-  console.info(`${ok ? 'pass' : 'FAIL'}  ${item.title}`);
+  if (!ok) failed = true;
+  console.info(`${ok ? 'pass' : 'FAIL'}  ${item.title}${ok && id === CONFIG_ONLY ? ' (config only, sign in unproven)' : ''}`);
 }
 
 if (failed) {
