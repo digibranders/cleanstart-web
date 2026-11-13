@@ -21,14 +21,19 @@ export function IntegrationHealthCard({
 
   const retry = async (): Promise<void> => {
     setRetrying(true);
-    const result = await retryFailedOutboxAction({});
-    setRetrying(false);
-    if (!result.ok) {
-      toast(result.error.message);
-      return;
+    try {
+      const result = await retryFailedOutboxAction({});
+      if (!result.ok) {
+        toast(result.error.message);
+        return;
+      }
+      toast(`${plural(result.data.retried, 'failed sync')} queued again`);
+      router.refresh();
+    } catch {
+      toast('Could not reach the server. Try again.');
+    } finally {
+      setRetrying(false);
     }
-    toast(`${plural(result.data.retried, 'failed sync')} queued again`);
-    router.refresh();
   };
 
   return (

@@ -43,10 +43,12 @@ export async function retryFailedOutboxAction(raw: unknown): Promise<ActionResul
     assertCan(ctx.viewer, 'integration.retry_failed');
     const retried = await withViewer(ctx.viewer, async (tx) => {
       const count = await retryFailedOutbox(tx, ctx.viewer);
-      await recordAudit(tx, ctx.viewer, {
-        event: 'integration.outbox_retried',
-        target: `${count} failed HubSpot ${count === 1 ? 'sync' : 'syncs'}`,
-      });
+      if (count > 0) {
+        await recordAudit(tx, ctx.viewer, {
+          event: 'integration.outbox_retried',
+          target: `${count} failed HubSpot ${count === 1 ? 'sync' : 'syncs'}`,
+        });
+      }
       return count;
     });
     ctx.revalidate(ROUTES.admin.audit);

@@ -56,6 +56,14 @@ describe('retryFailedOutboxAction', () => {
     expect(audit[0]).toMatchObject({ event: 'integration.outbox_retried', target: '1 failed HubSpot sync', actorId: staff.id });
   });
 
+  it('writes no audit entry when nothing failed, so a second click changes nothing', async () => {
+    signedInAs(await asStaff(db, 'partner_manager'));
+    await db.insert(hubspotOutbox).values({ op: 'partner.upsert', subjectId: 'a', idempotencyKey: 'a', status: 'failed', attempts: 6 });
+    expect(await retryFailedOutboxAction({})).toEqual({ ok: true, data: { retried: 1 } });
+    expect(await retryFailedOutboxAction({})).toEqual({ ok: true, data: { retried: 0 } });
+    expect(await db.select().from(auditLog)).toHaveLength(1);
+  });
+
   it('is forbidden for everyone but a partner manager', async () => {
     signedInAs(await asStaff(db, 'marketing'));
     expect(await retryFailedOutboxAction({})).toMatchObject({ ok: false, error: { code: 'forbidden' } });
