@@ -1,4 +1,8 @@
 import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
+import { checkPassword, PASSWORD_RULES_MESSAGE } from '@/lib/password-rules';
+import { ValidationError } from '@/server/errors';
+
+export { type PasswordCheck, type PasswordRuleResult, checkPassword } from '@/lib/password-rules';
 
 const N = 16384;
 const R = 16;
@@ -43,5 +47,12 @@ export async function verifyPassword(input: { hash: string; password: string }):
   } catch {
     // scrypt rejects parameters that are not valid (N must be a power of two): a broken hash never verifies.
     return false;
+  }
+}
+
+/** Throws ValidationError with path "password" when the password breaks the rule. */
+export function assertPasswordOk(password: string): void {
+  if (!checkPassword(password).ok) {
+    throw new ValidationError([{ path: 'password', message: PASSWORD_RULES_MESSAGE }], PASSWORD_RULES_MESSAGE);
   }
 }

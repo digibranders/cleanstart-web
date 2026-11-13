@@ -1197,13 +1197,13 @@ Run Gate A. Commit with the paths changed in this task and `docs/partner-portal/
 - Modify: `apps/portal/src/server/auth/passwords.ts`
 - Test: `apps/portal/src/server/auth/passwords.test.ts`, `apps/portal/src/server/auth/tokens.test.ts`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M1.1a | started | W0 | - | - | password rule, tokens" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Write the tests (they fail first)**
+- [x] **Step 2: Write the tests (they fail first)**
 
 Create `apps/portal/src/server/auth/passwords.test.ts`. The 8 rule cases are the M1.1 table. The "same four tests as the mock field" case reads `components/ui/password-field.tsx` as text, because Vitest runs in Node and that file is a React component; it keeps the server rule and the mock field from drifting apart until M5.4 re-points the field at `checkPassword`.
 
@@ -1366,7 +1366,7 @@ describe('numeric codes', () => {
 });
 ```
 
-- [ ] **Step 3: Run them and see them fail**
+- [x] **Step 3: Run them and see them fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/auth/passwords.test.ts src/server/auth/tokens.test.ts
@@ -1374,7 +1374,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/auth/passwords.test.
 
 Expected: FAIL. `passwords.test.ts` with `Failed to resolve import "@/lib/password-rules"`, `tokens.test.ts` with `Failed to resolve import "./tokens"`.
 
-- [ ] **Step 4: Implement the rule and the tokens**
+- [x] **Step 4: Implement the rule and the tokens**
 
 Create `apps/portal/src/lib/password-rules.ts`:
 
@@ -1514,7 +1514,7 @@ export function verifyCode(input: { code: string; salt: string; expectedHash: st
 }
 ```
 
-- [ ] **Step 5: Run them and see them pass**
+- [x] **Step 5: Run them and see them pass**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/auth/passwords.test.ts src/server/auth/tokens.test.ts
@@ -1522,11 +1522,11 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/auth/passwords.test.
 
 Expected: `Test Files  2 passed (2)`, `Tests  23 passed (23)` (13 in `passwords.test.ts`, 10 in `tokens.test.ts`).
 
-- [ ] **Step 6: Run Gate A, then Gate B**
+- [x] **Step 6: Run Gate A, then Gate B**
 
 Run the three fast commands from Conventions, then the full Gate A block from the handoff. Expected: all exit 0; the dash grep prints nothing.
 
-- [ ] **Step 7: Commit and log**
+- [x] **Step 7: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build
