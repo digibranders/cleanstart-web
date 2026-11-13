@@ -4,10 +4,15 @@ import { eq } from 'drizzle-orm';
 import { makePartner, makeRegistration, resetDb, testDb } from '@/db/test-helpers';
 import { auditLog, hubspotOutbox, registrations } from '@/db/schema';
 import { fixedClock } from '@/lib/clock';
+import { recordAudit } from '@/server/audit/record';
 import { announceRegistrationChange } from '@/server/registrations/announce';
 import { expireRegistrations, runExpiry } from './expiry';
 
 vi.mock('@/server/hubspot/client', () => ({ readHubspotConfig: () => null }));
+vi.mock('@/server/audit/record', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/server/audit/record')>();
+  return { ...actual, recordAudit: vi.fn(actual.recordAudit) };
+});
 vi.mock('@/server/registrations/announce', () => ({ announceRegistrationChange: vi.fn(async () => undefined) }));
 
 const db = testDb();
@@ -64,6 +69,39 @@ describe('expireRegistrations', () => {
     await expireRegistrations({ db, clock });
     expect((await expireRegistrations({ db, clock })).expired).toBe(0);
     expect(await db.select().from(hubspotOutbox)).toHaveLength(1);
+  });
+});
+
+describe('expireRegistrations with a failing row', () => {
+  it('expires the other rows, then reports the failure', async () => {
+    const p = await makePartner(db, {});
+    const bad = await makeRegistration(db, { partnerId: p.id, status: 'accepted', protectionEnd: '2026-11-04', customerName: 'Bad Co' });
+    const good = await makeRegistration(db, { partnerId: p.id, status: 'accepted', protectionEnd: '2026-11-05', customerName: 'Good Co' });
+    vi.mocked(recordAudit).mockRejectedValueOnce(new Error('audit insert failed'));
+    await expect(expireRegistrations({ db, clock: fixedClock('2026-11-06T00:10:00Z') })).rejects.toThrow('1 registration');
+    const rows = await db.select().from(registrations);
+    expect(rows.find((r) => r.id === bad.id)?.status).toBe('accepted');
+    expect(rows.find((r) => r.id === good.id)?.status).toBe('expired');
+    expect((await db.select().from(hubspotOutbox)).map((r) => r.subjectId)).toEqual([good.id]);
+  });
+
+  it('does not expire a registration whose end date was extended after the due list was read', async () => {
+    const p = await makePartner(db, {});
+    const reg = await makeRegistration(db, { partnerId: p.id, status: 'accepted', protectionEnd: '2026-11-05' });
+    const racing = new Proxy(db, {
+      get(target, prop, receiver) {
+        if (prop !== 'transaction') return Reflect.get(target, prop, receiver);
+        return async (fn: Parameters<typeof db.transaction>[0]) => {
+          await db.update(registrations).set({ protectionEnd: '2027-03-04', extensionStatus: 'granted' }).where(eq(registrations.id, reg.id));
+          return target.transaction(fn);
+        };
+      },
+    });
+    const out = await expireRegistrations({ db: racing, clock: fixedClock('2026-11-06T00:10:00Z') });
+    expect(out.expired).toBe(0);
+    expect((await db.select().from(registrations).where(eq(registrations.id, reg.id)))[0]).toMatchObject({ status: 'accepted', protectionEnd: '2027-03-04' });
+    expect(await db.select().from(hubspotOutbox)).toHaveLength(0);
+    expect(announceRegistrationChange).not.toHaveBeenCalled();
   });
 });
 

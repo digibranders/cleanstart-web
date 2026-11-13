@@ -52,6 +52,19 @@ describe('POST /api/hubspot/webhook', () => {
     expect(mocks.triggerPoll).not.toHaveBeenCalled();
   });
 
+  it('answers 413 for a body above 1 MB before checking the signature, and does not poll', async () => {
+    const res = await POST(signed('x'.repeat(1_048_577)));
+    expect(res.status).toBe(413);
+    expect(mocks.triggerPoll).not.toHaveBeenCalled();
+  });
+
+  it('answers 413 from the content-length header without reading the body', async () => {
+    const req = new Request(URI, { method: 'POST', body: BODY, headers: { 'content-length': '2000000' } });
+    const text = vi.spyOn(req, 'text');
+    expect((await POST(req)).status).toBe(413);
+    expect(text).not.toHaveBeenCalled();
+  });
+
   it('answers 200 and polls once for a valid signature', async () => {
     const res = await POST(signed(BODY));
     expect(res.status).toBe(200);

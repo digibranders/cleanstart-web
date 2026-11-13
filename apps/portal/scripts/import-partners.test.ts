@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { eq } from 'drizzle-orm';
 import { resetDb, testDb } from '@/db/test-helpers';
 import { auditLog, hubspotOutbox, partners } from '@/db/schema';
-import { importPartners, type PartnerImportRow } from './import-partners';
+import { assertLocalDatabase, importPartners, normalizeDomain, partnerFileSchema, type PartnerImportRow } from './import-partners';
 
 const db = testDb();
 beforeEach(() => resetDb(db));
@@ -31,5 +31,37 @@ describe('importPartners', () => {
     await importPartners(db, ROWS, true);
     expect(await importPartners(db, ROWS, true)).toEqual({ created: 0, skipped: 1 });
     expect(await db.select().from(hubspotOutbox)).toHaveLength(1);
+  });
+});
+
+describe('normalizeDomain', () => {
+  it('lowercases and strips the scheme, www., path and trailing dot', () => {
+    expect(normalizeDomain('  HTTPS://WWW.Kestrel-Systems.IN/about?x=1 ')).toBe('kestrel-systems.in');
+    expect(normalizeDomain('kestrelsystems.in.')).toBe('kestrelsystems.in');
+    expect(normalizeDomain('www2.example.com')).toBe('www2.example.com');
+  });
+
+  it('is applied when the partner file is parsed', () => {
+    const rows = partnerFileSchema.parse([{ name: 'Kestrel', domain: 'https://www.KestrelSystems.in/', category: 'channel', region: 'india' }]);
+    expect(rows[0]?.domain).toBe('kestrelsystems.in');
+  });
+});
+
+describe('importPartners duplicates', () => {
+  it('counts a repeated domain in the file as skipped, in a dry run and when applying', async () => {
+    const twice: readonly PartnerImportRow[] = [...ROWS, { ...ROWS[0]!, name: 'Kestrel Systems (again)' }];
+    expect(await importPartners(db, twice, false)).toEqual({ created: 1, skipped: 1 });
+    expect(await importPartners(db, twice, true)).toEqual({ created: 1, skipped: 1 });
+    expect(await db.select().from(partners)).toHaveLength(1);
+  });
+});
+
+describe('assertLocalDatabase', () => {
+  it('accepts a local database and refuses any other host unless remote is allowed', () => {
+    expect(() => assertLocalDatabase('postgresql://u:p@localhost:5432/cleanstart_portal_h', false)).not.toThrow();
+    expect(() => assertLocalDatabase('postgresql://u:p@127.0.0.1:5432/x', false)).not.toThrow();
+    expect(() => assertLocalDatabase('postgresql://u:p@db.example.com:5432/x', false)).toThrow('--allow-remote');
+    expect(() => assertLocalDatabase('postgresql://u:p@db.example.com:5432/x', true)).not.toThrow();
+    expect(() => assertLocalDatabase(undefined, false)).toThrow('DATABASE_URL');
   });
 });

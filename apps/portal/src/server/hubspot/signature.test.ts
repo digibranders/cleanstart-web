@@ -23,4 +23,9 @@ describe('verifyV3', () => {
     const old = String(now - 6 * 60_000);
     expect(verifyV3({ secret, method: 'POST', uri, body, timestamp: old, signature: sign('POST', uri, body, old), now })).toBe(false);
   });
+  it('fails closed on a timestamp that is not a number, even with a matching signature', () => {
+    for (const bad of ['', 'abc', 'NaN', 'Infinity']) {
+      expect(verifyV3({ secret, method: 'POST', uri, body, timestamp: bad, signature: sign('POST', uri, body, bad), now })).toBe(false);
+    }
+  });
 });

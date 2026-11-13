@@ -45,6 +45,24 @@ describe('registration.create', () => {
     expect(hs.deals.size).toBe(1);
   });
 
+  it('retries after a failed association step and still links partner, customer and contact (the deal id was already saved)', async () => {
+    const { hs, h, reg } = await setup();
+    const link = hs.associateDealWithCompany.bind(hs);
+    let failed = false;
+    hs.associateDealWithCompany = async (...args: Parameters<typeof link>): Promise<void> => {
+      if (!failed) {
+        failed = true;
+        throw new Error('association failed');
+      }
+      return link(...args);
+    };
+    await expect(h['registration.create'](reg.id, {})).rejects.toThrow('association failed');
+    expect((await db.select().from(registrations).where(eq(registrations.id, reg.id)))[0]!.hubspotDealId).toBeTruthy();
+    await h['registration.create'](reg.id, {});
+    expect(hs.deals.size).toBe(1);
+    expect(hs.associations.map((a) => a.kind).sort()).toEqual(['deal-company:customer', 'deal-company:partner', 'deal-contact']);
+  });
+
   it('reuses an existing customer company', async () => {
     const { hs, h, reg } = await setup();
     await hs.createOrUpdateCompany({ existingId: null, name: 'Vardhan Capital Pvt Ltd', domain: 'vardhancapital.in', properties: {} });
@@ -93,9 +111,19 @@ describe('registration.update_end and registration.expire', () => {
   it('moves the deal to Registration expired', async () => {
     const { hs, h, reg } = await setup();
     await h['registration.create'](reg.id, {});
+    await db.update(registrations).set({ status: 'expired' }).where(eq(registrations.id, reg.id));
     await h['registration.expire'](reg.id, {});
     const dealId = (await db.select().from(registrations).where(eq(registrations.id, reg.id)))[0]!.hubspotDealId!;
     expect(hs.deals.get(dealId)?.stageId).toBe(hs.stageIds['Registration expired']);
+  });
+
+  it('leaves a deal alone when the registration is no longer expired (HubSpot moved it back)', async () => {
+    const { hs, h, reg } = await setup();
+    await h['registration.create'](reg.id, {});
+    const row = (await db.select().from(registrations).where(eq(registrations.id, reg.id)))[0]!;
+    await h['registration.expire'](reg.id, {});
+    expect(hs.deals.get(row.hubspotDealId!)?.stageId).toBe(hs.stageIds.Accepted);
+    expect((await db.select().from(registrations).where(eq(registrations.id, reg.id)))[0]!.hubspotStageId).toBe(hs.stageIds.Accepted);
   });
 
   it('has nothing to move when an expired registration never reached HubSpot', async () => {

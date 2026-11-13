@@ -60,47 +60,56 @@ export const pollDeals = async (deps: {
 
   const result: PollResult = { applied: 0, unchanged: 0, unknown: 0 };
   let newest = cursor;
+  let failed = 0;
   let after: string | null = null;
   do {
     const page = await hs.searchDealsModifiedSince(deps.pipelineId, Math.max(0, cursor - OVERLAP_MS), after);
     for (const deal of page.deals) {
       newest = Math.max(newest, deal.modifiedAt);
-      const reg = (await db.select().from(registrations).where(eq(registrations.hubspotDealId, deal.id)))[0];
-      if (!reg) { result.unknown += 1; continue; }
-      const seen: HsDeal = await portalEndDateWins(db, reg, isoDate(deal.properties.protection_end_date))
-        ? { ...deal, properties: { ...deal.properties, protection_end_date: null } }
-        : deal;
-      const change = decideInbound(
-        { status: reg.status, hubspotStageId: reg.hubspotStageId, protectionEnd: reg.protectionEnd },
-        seen, labelById, deps.clock.today(),
-      );
-      if (!change) { result.unchanged += 1; continue; }
-      await db.transaction(async (tx) => {
-        await tx.update(registrations).set({
-          status: change.status, stage: change.stage, hubspotStageId: change.stageId, hubspotSyncedAt: deps.clock.now(),
-          hubspotMissing: false, ...(change.closedOn ? { closedOn: change.closedOn } : {}),
-          ...(change.protectionEnd ? { protectionEnd: change.protectionEnd } : {}),
-        }).where(eq(registrations.id, reg.id));
-        await tx.insert(registrationEvents).values({
-          registrationId: reg.id, text: change.eventText, byLabel: 'HubSpot', source: 'crm',
+      try {
+        const reg = (await db.select().from(registrations).where(eq(registrations.hubspotDealId, deal.id)))[0];
+        if (!reg) { result.unknown += 1; continue; }
+        const seen: HsDeal = await portalEndDateWins(db, reg, isoDate(deal.properties.protection_end_date))
+          ? { ...deal, properties: { ...deal.properties, protection_end_date: null } }
+          : deal;
+        const change = decideInbound(
+          { status: reg.status, hubspotStageId: reg.hubspotStageId, protectionEnd: reg.protectionEnd },
+          seen, labelById, deps.clock.today(),
+        );
+        if (!change) { result.unchanged += 1; continue; }
+        await db.transaction(async (tx) => {
+          await tx.update(registrations).set({
+            status: change.status, stage: change.stage, hubspotStageId: change.stageId, hubspotSyncedAt: deps.clock.now(),
+            hubspotMissing: false, ...(change.closedOn ? { closedOn: change.closedOn } : {}),
+            ...(change.protectionEnd ? { protectionEnd: change.protectionEnd } : {}),
+          }).where(eq(registrations.id, reg.id));
+          await tx.insert(registrationEvents).values({
+            registrationId: reg.id, text: change.eventText, byLabel: 'HubSpot', source: 'crm',
+          });
+          await recordAudit(tx, SYSTEM_ACTORS.hubspot, {
+            event: change.changed === 'stage' ? 'registration.stage_changed' : 'registration.protection_end_changed',
+            source: 'crm',
+            target: `${reg.customerName}, ${PRODUCT_LABEL[reg.product]}`,
+            note: change.eventText,
+            partnerId: reg.partnerId,
+            subject: { type: 'registration', id: reg.id },
+          });
         });
-        await recordAudit(tx, SYSTEM_ACTORS.hubspot, {
-          event: change.changed === 'stage' ? 'registration.stage_changed' : 'registration.protection_end_changed',
-          source: 'crm',
-          target: `${reg.customerName}, ${PRODUCT_LABEL[reg.product]}`,
-          note: change.eventText,
-          partnerId: reg.partnerId,
-          subject: { type: 'registration', id: reg.id },
-        });
-      });
-      result.applied += 1;
-      const announcement = announcementFor(reg, change);
-      if (announcement) {
-        await announceRegistrationChange({ db }, announcement).catch((error: unknown) => log.warn({ err: error }, 'announce failed'));
+        result.applied += 1;
+        const announcement = announcementFor(reg, change);
+        if (announcement) {
+          await announceRegistrationChange({ db }, announcement).catch((error: unknown) => log.warn({ err: error }, 'announce failed'));
+        }
+      } catch (error) {
+        // One bad deal must not stop the others. The cursor is held below, so this deal is read again next time.
+        failed += 1;
+        log.error({ job: 'hubspot-poll', dealId: deal.id, error: error instanceof Error ? error.name : 'unknown' }, 'could not apply a deal');
       }
     }
     after = page.next;
   } while (after);
+
+  if (failed > 0) throw new Error(`${failed} deal(s) failed to apply; the others were applied and the cursor was not moved`);
 
   // Written after every successful run, even when nothing moved: updated_at is the last poll time the health card reports.
   await db.insert(hubspotSyncState).values({ key: CURSOR_KEY, value: { ms: newest } })

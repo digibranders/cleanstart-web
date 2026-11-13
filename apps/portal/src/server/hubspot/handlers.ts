@@ -57,36 +57,49 @@ export const buildHandlers = (db: Db, hs: HubspotApi, pipelineId: string, clock:
 
     'registration.create': async (registrationId) => {
       const { reg, partner } = await loadReg(registrationId);
-      if (reg.status !== 'accepted' || reg.hubspotDealId) return;
+      if (reg.status !== 'accepted') return;
       if (!partner.hubspotCompanyId) throw new DependencyPending(`partner ${partner.id} is not in HubSpot yet`);
       if (!reg.protectionEnd) throw new Error(`registration ${reg.id} is accepted without a protection end`);
 
-      const stageIds = await hs.getStageIds(pipelineId);
-      let deal = await hs.findDealByRegistrationId(reg.id);
-      if (!deal) {
-        deal = await hs.createDeal(dealProperties(
-          {
-            id: reg.id, customerName: reg.customerName, product: PRODUCT_LABEL[reg.product],
-            region: PARTNER_REGION_LABEL[reg.region], protectionEnd: reg.protectionEnd,
-          },
-          { name: partner.name, hubspotCompanyId: partner.hubspotCompanyId }, stageIds, pipelineId,
-        ));
+      // A stored deal id means an earlier run got as far as the deal: skip the create and redo the links, which are idempotent.
+      let dealId = reg.hubspotDealId;
+      if (!dealId) {
+        const stageIds = await hs.getStageIds(pipelineId);
+        const deal =
+          (await hs.findDealByRegistrationId(reg.id)) ??
+          (await hs.createDeal(
+            dealProperties(
+              {
+                id: reg.id,
+                customerName: reg.customerName,
+                product: PRODUCT_LABEL[reg.product],
+                region: PARTNER_REGION_LABEL[reg.region],
+                protectionEnd: reg.protectionEnd,
+              },
+              { name: partner.name, hubspotCompanyId: partner.hubspotCompanyId },
+              stageIds,
+              pipelineId,
+            ),
+          ));
+        // Save the id before the links: a failure below retries against the same deal, and the stored id is what routes that retry to the links.
+        await db
+          .update(registrations)
+          .set({ hubspotDealId: deal.id, hubspotStageId: deal.stageId, hubspotSyncedAt: clock.now() })
+          .where(eq(registrations.id, reg.id));
+        dealId = deal.id;
       }
-      // Save the id first: a failure in the association calls below then retries against the same deal.
-      await db.update(registrations).set({ hubspotDealId: deal.id, hubspotStageId: deal.stageId, hubspotSyncedAt: clock.now() })
-        .where(eq(registrations.id, reg.id));
 
       const customer = (await hs.findCompany({ domain: reg.customerDomain, name: reg.customerName }))
         ?? (await hs.createOrUpdateCompany({ existingId: null, name: reg.customerName, domain: reg.customerDomain, properties: {} }));
-      await hs.associateDealWithCompany(deal.id, partner.hubspotCompanyId, 'partner');
-      await hs.associateDealWithCompany(deal.id, customer.id, 'customer');
+      await hs.associateDealWithCompany(dealId, partner.hubspotCompanyId, 'partner');
+      await hs.associateDealWithCompany(dealId, customer.id, 'customer');
 
       const contacts = await db.select().from(registrationContacts).where(eq(registrationContacts.registrationId, reg.id));
       for (const c of contacts) {
         if (!c.email) continue;
         const [firstName = '', ...rest] = c.name.split(' ');
         const { id } = await hs.upsertContact({ email: c.email, firstName, lastName: rest.join(' '), ...(c.phone ? { phone: c.phone } : {}) });
-        await hs.associateDealWithContact(deal.id, id);
+        await hs.associateDealWithContact(dealId, id);
         await db.update(registrationContacts).set({ hubspotContactId: id }).where(eq(registrationContacts.id, c.id));
       }
     },
@@ -100,9 +113,10 @@ export const buildHandlers = (db: Db, hs: HubspotApi, pipelineId: string, clock:
 
     'registration.expire': async (registrationId) => {
       const { reg } = await loadReg(registrationId);
+      // Only a registration that is still expired in the portal is pushed: HubSpot may have moved the deal back since this was queued.
       // An expired registration that never got a deal (its create never ran, and now never will) has nothing to move.
-      if (!reg.hubspotDealId && reg.status === 'expired') return;
-      const dealId = requireDeal(reg);
+      if (reg.status !== 'expired' || !reg.hubspotDealId) return;
+      const dealId = reg.hubspotDealId;
       const stageIds = await hs.getStageIds(pipelineId);
       await hs.updateDeal(dealId, { dealstage: stageIds['Registration expired'] });
       await db.update(registrations).set({ hubspotStageId: stageIds['Registration expired'], hubspotSyncedAt: clock.now() }).where(eq(registrations.id, reg.id));

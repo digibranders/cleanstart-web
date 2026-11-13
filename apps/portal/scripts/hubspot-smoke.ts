@@ -16,6 +16,10 @@ const main = async (): Promise<void> => {
   if (!portalId || !devPortalId || portalId !== devPortalId) {
     throw new Error('Refusing to run: HUBSPOT_PORTAL_ID must be set and equal HUBSPOT_DEV_PORTAL_ID (the development portal).');
   }
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl || !['localhost', '127.0.0.1', '[::1]', '::1'].includes(new URL(databaseUrl).hostname)) {
+    throw new Error('Refusing to run: DATABASE_URL must point at a local database (the poll step writes to it).');
+  }
   const config = readHubspotConfig();
   if (!config) throw new Error('HUBSPOT_PORTAL_TOKEN and HUBSPOT_PARTNER_PIPELINE_ID are required');
 
@@ -54,8 +58,12 @@ const main = async (): Promise<void> => {
     console.info('poll result', await pollDeals({ db, hs, pipelineId: config.pipelineId, clock: systemClock }));
   } finally {
     for (const { path, id } of created.reverse()) {
-      const res = await raw.apiRequest({ method: 'DELETE', path: `${path}/${id}` });
-      console.info(`archive ${path}/${id}: HTTP ${res.status}`);
+      try {
+        const res = await raw.apiRequest({ method: 'DELETE', path: `${path}/${id}` });
+        console.info(`archive ${path}/${id}: HTTP ${res.status}`);
+      } catch (error) {
+        console.error(`archive ${path}/${id} failed, delete it by hand: ${error instanceof Error ? error.message : 'unknown error'}`);
+      }
     }
     await db.$client.end();
   }

@@ -4,11 +4,16 @@ import { eq } from 'drizzle-orm';
 import { makePartner, makeSyncedDeal, resetDb, testDb } from '@/db/test-helpers';
 import { auditLog, hubspotOutbox, hubspotSyncState, registrationEvents, registrations } from '@/db/schema';
 import { fixedClock } from '@/lib/clock';
+import { recordAudit } from '@/server/audit/record';
 import { announceRegistrationChange } from '@/server/registrations/announce';
 import { FakeHubspot } from './fake';
 import { enqueue } from './outbox';
 import { pollDeals, reconcileDeals } from './poll';
 
+vi.mock('@/server/audit/record', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/server/audit/record')>();
+  return { ...actual, recordAudit: vi.fn(actual.recordAudit) };
+});
 vi.mock('@/server/registrations/announce', () => ({ announceRegistrationChange: vi.fn(async () => undefined) }));
 
 const db = testDb();
@@ -182,6 +187,27 @@ describe('pollDeals', () => {
     hs.failNext = new Error('429');
     await expect(pollDeals({ db, hs, pipelineId: PIPE, clock })).rejects.toThrow('429');
     expect(await db.select().from(hubspotSyncState)).toHaveLength(0);
+  });
+});
+
+describe('pollDeals with a failing row', () => {
+  it('applies the other rows, reports the failure at the end and holds the cursor so the row is retried', async () => {
+    const hs = new FakeHubspot();
+    const [bad, good] = await seed(hs, 2);
+    await hs.updateDeal(bad!.dealId, { dealstage: hs.stageIds.Discovery });
+    await hs.updateDeal(good!.dealId, { dealstage: hs.stageIds['Technical evaluation'] });
+    vi.mocked(recordAudit).mockRejectedValueOnce(new Error('audit insert failed'));
+    await expect(pollDeals({ db, hs, pipelineId: PIPE, clock })).rejects.toThrow('1 deal');
+    const rows = await db.select().from(registrations);
+    const stageOf = (id: string): string | undefined => rows.find((r) => r.id === id)?.stage;
+    expect(stageOf(bad!.id)).not.toBe('Discovery');
+    expect(stageOf(good!.id)).toBe('Technical evaluation');
+    expect(await db.select().from(hubspotSyncState)).toHaveLength(0);
+
+    const out = await pollDeals({ db, hs, pipelineId: PIPE, clock });
+    expect(out.applied).toBe(1);
+    expect((await db.select().from(registrations).where(eq(registrations.id, bad!.id)))[0]!.stage).toBe('Discovery');
+    expect(await db.select().from(hubspotSyncState)).toHaveLength(1);
   });
 });
 
