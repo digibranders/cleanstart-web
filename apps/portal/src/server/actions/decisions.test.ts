@@ -132,6 +132,19 @@ describe('undoDecisionAction', () => {
     expect(await db.select().from(auditLog).where(eq(auditLog.event, 'registration.decision_undone'))).toHaveLength(1);
   });
 
+  it('queues a second create under its own key when a decision is undone and taken again (HubSpot checklist line 7)', async () => {
+    const { farhan, reg } = await setup();
+    session.viewer = farhan;
+    expect((await acceptRegistrationAction({ id: reg.id })).ok).toBe(true);
+    expect((await undoDecisionAction({ id: reg.id })).ok).toBe(true);
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    expect((await acceptRegistrationAction({ id: reg.id })).ok).toBe(true);
+    const outbox = await db.select().from(hubspotOutbox).where(eq(hubspotOutbox.op, 'registration.create'));
+    expect(outbox).toHaveLength(2);
+    expect(new Set(outbox.map((row) => row.idempotencyKey)).size).toBe(2);
+    expect((await db.select().from(registrations).where(eq(registrations.id, reg.id)))[0]?.status).toBe('accepted');
+  });
+
   it('is refused after the window and once a deal exists, with a message the screen can show', async () => {
     const { farhan, reg } = await setup();
     session.viewer = farhan;
