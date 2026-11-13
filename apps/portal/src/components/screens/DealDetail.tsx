@@ -8,7 +8,6 @@ import {
   PARTNER_REGION_LABEL,
   PRODUCT_LABEL,
   PRODUCTS,
-  REGISTRATION_STATUS_LABEL,
 } from "@/lib/domain";
 import type { RegistrationDetailDto, RegistrationListItem } from "@/lib/dto";
 import { ROUTES } from "@/lib/routes";
@@ -78,17 +77,17 @@ function summaryFor(deal: RegistrationDetailDto, today: string): SummaryKpi[] {
       return [
         { label: "Protection", value: "Not protected", foot: deal.decidedOn ? `Not accepted ${fmtShort(deal.decidedOn)}` : "Not accepted", small: true },
         { label: "Reviewed by", value: deal.decidedByLabel ?? deal.managerName ?? "CleanStart", foot: "Partner manager", small: true },
-        crm,
+        ...(deal.crmRef ? [crm] : []),
       ];
     default:
+      // The status badge beside the customer name already says the outcome, and "Not recorded" says nothing.
       return [
         {
           label: deal.status === "expired" ? "Ended" : "Closed",
           value: fmtLong(deal.closedOn ?? deal.registeredOn),
           foot: deal.stage,
         },
-        { label: "Outcome", value: REGISTRATION_STATUS_LABEL[deal.status], foot: "From CleanStart's CRM" },
-        crm,
+        ...(deal.crmRef ? [crm] : []),
       ];
   }
 }
@@ -308,8 +307,12 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
                 <dd>{deal.managerName ?? "Not assigned"}</dd>
               </dl>
               <dl className="dl">
-                <dt>Contact</dt>
-                <dd>{primary?.name ?? "Not recorded"}</dd>
+                {primary ? (
+                  <>
+                    <dt>Contact</dt>
+                    <dd>{primary.name}</dd>
+                  </>
+                ) : null}
                 {primary?.email ? (
                   <>
                     <dt>Email</dt>
