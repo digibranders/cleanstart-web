@@ -123,21 +123,25 @@ export function AdminReports({ report, today }: AdminReportsProps): React.JSX.El
             <thead>
               <tr>
                 <th scope="col">Partner</th>
-                <th scope="col">Category</th>
-                <th scope="col">Region</th>
+                <th scope="col" className="hide-sm">
+                  Category
+                </th>
+                <th scope="col" className="hide-sm">
+                  Region
+                </th>
                 <th scope="col" className="r">
                   Registered
                 </th>
-                <th scope="col" className="r">
+                <th scope="col" className="r hide-sm">
                   Accepted
                 </th>
                 <th scope="col" className="r">
                   Accept rate
                 </th>
-                <th scope="col" className="r">
+                <th scope="col" className="r hide-sm">
                   Won
                 </th>
-                <th scope="col" className="r">
+                <th scope="col" className="r hide-sm">
                   Protected now
                 </th>
               </tr>
@@ -151,19 +155,19 @@ export function AdminReports({ report, today }: AdminReportsProps): React.JSX.El
                       {p.name}
                     </Link>
                   </td>
-                  <td>
+                  <td className="hide-sm">
                     <span className={`badge ${CATEGORY_BADGE[p.category]}`}>{PARTNER_CATEGORY_LABEL[p.category]}</span>
                   </td>
-                  <td className="t-sec">{PARTNER_REGION_LABEL[p.region]}</td>
+                  <td className="t-sec hide-sm">{PARTNER_REGION_LABEL[p.region]}</td>
                   <td className="tnum r">{p.registered}</td>
-                  <td className="tnum r">{p.accepted}</td>
+                  <td className="tnum r hide-sm">{p.accepted}</td>
                   <td
                     className={`tnum r ${p.rate === null ? 't-muted' : p.rate < 60 ? 't-amber' : ''}`}
                   >
                     {p.rate === null ? 'None yet' : `${p.rate}%`}
                   </td>
-                  <td className="tnum r">{p.won}</td>
-                  <td className="tnum r">{p.protectedNow}</td>
+                  <td className="tnum r hide-sm">{p.won}</td>
+                  <td className="tnum r hide-sm">{p.protectedNow}</td>
                 </tr>
               ))}
             </tbody>

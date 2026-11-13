@@ -8,6 +8,7 @@ import { CHIP_PRODUCT, TYPE_ICON, TYPE_TONE } from '@/components/documents/doc-s
 import { adminUpdatedLabel, audienceTone } from '@/components/documents/doc-view';
 import { Badge, ProductChip } from '@/components/ui/badge';
 import type { AudiencePartnerDto } from '@/lib/document-upload';
+import { plural } from '@/lib/dates';
 import { DOCUMENT_TYPE_LABEL } from '@/lib/domain';
 import type { DocumentDto } from '@/lib/dto';
 import { audienceLabel, formatLabel } from '@/server/files/rules';
@@ -71,23 +72,25 @@ export function AdminDocuments({
               <thead>
                 <tr>
                   <th scope="col">Document</th>
-                  <th scope="col">Product</th>
+                  <th scope="col" className="hide-sm">
+                    Product
+                  </th>
                   <th scope="col">Who can open it</th>
-                  <th scope="col" className="r">
+                  <th scope="col" className="r hide-sm">
                     Updated
                   </th>
                   <th scope="col" className="r">
                     Opens
                   </th>
-                  <th scope="col" className="r">
-                    Partners
+                  <th scope="col" className="r hide-sm">
+                    Opened by
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {docs.map((d) => (
                   <tr key={d.id}>
-                    <td style={{ whiteSpace: 'normal', minWidth: 280 }}>
+                    <td style={{ whiteSpace: 'normal', minWidth: 150 }}>
                       <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <span className={`li-ic ${TYPE_TONE[d.type]}`}>
                           <Icon name={TYPE_ICON[d.type]} />
@@ -107,15 +110,15 @@ export function AdminDocuments({
                         </span>
                       </span>
                     </td>
-                    <td>
+                    <td className="hide-sm">
                       <ProductChip product={CHIP_PRODUCT[d.product]} />
                     </td>
                     <td>
                       <Badge tone={audienceTone(d.audience.kind)}>{audienceLabel(d.audience)}</Badge>
                     </td>
-                    <td className="tnum r t-sec">{adminUpdatedLabel(d.updatedAt, today)}</td>
+                    <td className="tnum r t-sec hide-sm">{adminUpdatedLabel(d.updatedAt, today)}</td>
                     <td className="tnum r">{d.opens ?? 0}</td>
-                    <td className="tnum r t-sec">{d.partnerCount ?? 0}</td>
+                    <td className="tnum r t-sec hide-sm">{plural(d.partnerCount ?? 0, 'partner')}</td>
                   </tr>
                 ))}
               </tbody>

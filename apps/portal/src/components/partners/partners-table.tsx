@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Avatar } from "@/components/ui/badge";
 import { Dropdown } from "@/components/ui/dropdown";
 import { PARTNER_REGION_LABEL, type PartnerCategory } from "@/lib/domain";
@@ -8,6 +9,8 @@ import { initialsOf, lastSeenLabel } from "@/lib/people";
 import { PartnerCategoryBadge, PartnerStatusBadge } from "./badges";
 import { Seg } from "./seg";
 import { ScrollRegion } from "@/components/ui/scroll-region";
+
+const PAGE_SIZE = 50;
 
 export const CATEGORY_FILTERS = ["All", "Distributors", "Channel", "SIs"] as const;
 export type CategoryFilter = (typeof CATEGORY_FILTERS)[number];
@@ -48,6 +51,8 @@ export function PartnersTable({
   onStatus,
   onSelect,
 }: PartnersTableProps): React.JSX.Element {
+  const [limit, setLimit] = useState(PAGE_SIZE);
+  const visible = partners.slice(0, limit);
   return (
     <>
       <div className="toolbar">
@@ -57,7 +62,7 @@ export function PartnersTable({
           <Dropdown value={status} options={STATUS_FILTERS} onChange={onStatus} ariaLabel="Status" />
         </div>
         <span className="card-meta tnum">
-          Showing {partners.length} of {total}
+          Showing {visible.length} of {total}
         </span>
       </div>
       <ScrollRegion label="Partners">
@@ -65,25 +70,29 @@ export function PartnersTable({
           <thead>
             <tr>
               <th scope="col">Partner</th>
-              <th scope="col">Category</th>
-              <th scope="col">Region</th>
+              <th scope="col" className="hide-sm">
+                Category
+              </th>
+              <th scope="col" className="hide-sm">
+                Region
+              </th>
               <th scope="col">Status</th>
-              <th scope="col" className="r">
+              <th scope="col" className="r hide-sm">
                 Pending
               </th>
-              <th scope="col" className="r">
+              <th scope="col" className="r hide-sm">
                 Protected
               </th>
-              <th scope="col" className="r">
+              <th scope="col" className="r hide-sm">
                 Won YTD
               </th>
-              <th scope="col" className="r">
+              <th scope="col" className="r hide-sm">
                 Last active
               </th>
             </tr>
           </thead>
           <tbody>
-            {partners.map((p) => (
+            {visible.map((p) => (
               <tr key={p.id} style={p.id === selectedId ? { background: "#F7F5FE" } : undefined}>
                 <td>
                   <button
@@ -102,23 +111,30 @@ export function PartnersTable({
                     </span>
                   </button>
                 </td>
-                <td>
+                <td className="hide-sm">
                   <PartnerCategoryBadge category={p.category} />
                 </td>
-                <td className="t-sec">{PARTNER_REGION_LABEL[p.region]}</td>
+                <td className="t-sec hide-sm">{PARTNER_REGION_LABEL[p.region]}</td>
                 <td>
                   <PartnerStatusBadge status={p.status} />
                 </td>
-                <td className="tnum r">{p.pending}</td>
-                <td className="tnum r">{p.protectedCount}</td>
-                <td className="tnum r">{p.won}</td>
-                <td className="tnum r t-sec">{lastSeenLabel(p.lastActiveAt, today)}</td>
+                <td className="tnum r hide-sm">{p.pending}</td>
+                <td className="tnum r hide-sm">{p.protectedCount}</td>
+                <td className="tnum r hide-sm">{p.won}</td>
+                <td className="tnum r t-sec hide-sm">{lastSeenLabel(p.lastActiveAt, today)}</td>
               </tr>
             ))}
           </tbody>
         </table>
         {partners.length === 0 ? <div className="empty">No partners match these filters.</div> : null}
       </ScrollRegion>
+      {partners.length > visible.length ? (
+        <div className="toolbar" style={{ justifyContent: "center" }}>
+          <button type="button" className="btn btn-s" onClick={() => setLimit(limit + PAGE_SIZE)}>
+            Show {Math.min(PAGE_SIZE, partners.length - visible.length)} more
+          </button>
+        </div>
+      ) : null}
     </>
   );
 }

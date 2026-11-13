@@ -100,7 +100,7 @@ export function AdminAudit({ page, view, today, healthSlot }: AdminAuditProps): 
               id="aq"
               className="finput"
               type="search"
-              placeholder="Filter by partner, customer or person"
+              placeholder="Search the log"
               value={q}
               onChange={(e) => setQ(e.target.value)}
             />
@@ -132,29 +132,37 @@ export function AdminAudit({ page, view, today, healthSlot }: AdminAuditProps): 
                 <th scope="col">When</th>
                 <th scope="col">Who</th>
                 <th scope="col">Action</th>
-                <th scope="col">On</th>
-                <th scope="col">Source</th>
+                <th scope="col" className="hide-sm">
+                  On
+                </th>
+                <th scope="col" className="hide-sm">
+                  Source
+                </th>
               </tr>
             </thead>
             <tbody>
               {page.rows.map((e) => (
                 <tr key={e.id}>
-                  <td className="tnum t-sec">{fmtTimestamp(e.at, today)}</td>
-                  <td>
+                  <td className="tnum t-sec" style={{ whiteSpace: 'normal' }}>
+                    {fmtTimestamp(e.at, today)}
+                  </td>
+                  <td style={{ whiteSpace: 'normal' }}>
                     <span className="li-t">
                       <span className="li-n" style={{ fontSize: 13 }}>
                         {e.actorLabel}
                       </span>
-                      <span className="li-s">{e.actorRole ?? ''}</span>
+                      <span className="li-s hide-sm">{e.actorRole ?? ''}</span>
                     </span>
                   </td>
-                  <td>
+                  <td style={{ whiteSpace: 'normal' }}>
                     <button type="button" className="linkbtn" onClick={() => setViewing(e.id)}>
                       {e.action}
                     </button>
                   </td>
-                  <td style={{ whiteSpace: 'normal' }}>{e.target}</td>
-                  <td className="t-muted">{EVENT_SOURCE_LABEL[e.source]}</td>
+                  <td className="hide-sm" style={{ whiteSpace: 'normal' }}>
+                    {e.target}
+                  </td>
+                  <td className="t-muted hide-sm">{EVENT_SOURCE_LABEL[e.source]}</td>
                 </tr>
               ))}
             </tbody>

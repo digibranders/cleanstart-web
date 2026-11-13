@@ -179,7 +179,7 @@ export function DocumentEditDrawer({
               onClick={() => (changed ? void save() : onClose())}
               disabled={busy}
             >
-              {changed ? 'Save changes' : 'Done'}
+              {changed ? 'Save changes' : 'Close'}
             </button>
           </>
         )
