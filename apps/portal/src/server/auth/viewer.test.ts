@@ -1,0 +1,153 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { makePartner, makeUser, resetDb, testDb } from '@/db/test-helpers';
+import { PATH_HEADER } from '@/lib/next-path';
+import { UnauthenticatedError } from '@/server/errors';
+import { auth } from './auth';
+import { type Action, can } from './policies';
+import type { RoleKey, Viewer } from './types';
+import { getViewer, homeFor, requireActionViewer, requireCan, requireKind, requireViewer } from './viewer';
+
+const mocks = vi.hoisted(() => ({ requestHeaders: new Headers() }));
+vi.mock('next/headers', () => ({ headers: async () => mocks.requestHeaders }));
+vi.mock('next/navigation', () => ({
+  redirect: (url: string) => {
+    throw new Error(`REDIRECT ${url}`);
+  },
+}));
+vi.mock('./auth-mail', () => ({
+  sendPasswordResetEmail: vi.fn(async () => undefined),
+  sendPasswordChangedEmail: vi.fn(async () => undefined),
+}));
+
+const PASSWORD = 'Sample#Pass1';
+
+/** Signs the user in and makes the next request carry that session cookie (and the path the proxy would add). */
+const signInAs = async (email: string, path?: string): Promise<void> => {
+  const { headers } = await auth.api.signInEmail({ body: { email, password: PASSWORD }, returnHeaders: true });
+  const cookie = headers
+    .getSetCookie()
+    .map((c) => c.split(';')[0])
+    .join('; ');
+  mocks.requestHeaders = new Headers(path ? { cookie, [PATH_HEADER]: path } : { cookie });
+};
+
+const redirectOf = async (run: () => Promise<unknown>): Promise<string | null> => {
+  try {
+    await run();
+    return null;
+  } catch (error) {
+    const match = /^REDIRECT (.+)$/.exec((error as Error).message);
+    if (!match) throw error;
+    return match[1] ?? null;
+  }
+};
+
+beforeEach(async () => {
+  mocks.requestHeaders = new Headers();
+  await resetDb(testDb());
+});
+
+describe('homeFor', () => {
+  const partner = (role: 'partner_admin' | 'sales' | 'technical'): Viewer => ({
+    id: 'u',
+    kind: 'partner',
+    role,
+    partnerId: 'p',
+    partnerName: 'P',
+    email: 'e@x.co',
+    name: 'N',
+  });
+  const staff = (role: 'partner_manager' | 'sales' | 'marketing'): Viewer => ({
+    id: 'u',
+    kind: 'staff',
+    role,
+    partnerId: null,
+    partnerName: null,
+    region: 'india',
+    email: 'e@x.co',
+    name: 'N',
+  });
+
+  const HOMES: Array<[RoleKey, Viewer, string, Action]> = [
+    ['partner.partner_admin', partner('partner_admin'), '/partner/overview', 'overview.read'],
+    ['partner.sales', partner('sales'), '/partner/overview', 'overview.read'],
+    ['partner.technical', partner('technical'), '/partner/documents', 'document.read'],
+    ['staff.partner_manager', staff('partner_manager'), '/admin/approvals', 'registration.read_queue'],
+    ['staff.sales', staff('sales'), '/admin/approvals', 'registration.read_queue'],
+    ['staff.marketing', staff('marketing'), '/admin/documents', 'document.upload'],
+  ];
+
+  it.each(HOMES)('%s lands on %s and may open it', (_key, viewer, home, action) => {
+    expect(homeFor(viewer)).toBe(home);
+    expect(can(viewer, action)).toBe(true);
+  });
+});
+
+describe('guards', () => {
+  it('sends a signed out visitor to sign in with the page they asked for', async () => {
+    mocks.requestHeaders = new Headers({ [PATH_HEADER]: '/partner/deals?status=pending' });
+    expect(await redirectOf(requireViewer)).toBe('/sign-in?next=%2Fpartner%2Fdeals%3Fstatus%3Dpending');
+  });
+
+  it('sends a signed out visitor to plain sign in when the path is unknown or unsafe', async () => {
+    expect(await redirectOf(requireViewer)).toBe('/sign-in');
+    mocks.requestHeaders = new Headers({ [PATH_HEADER]: '//evil.example.com' });
+    expect(await redirectOf(requireViewer)).toBe('/sign-in');
+  });
+
+  it('sends a stale cookie the same way as no cookie', async () => {
+    mocks.requestHeaders = new Headers({
+      cookie: 'better-auth.session_token=not-a-real-token.signature',
+      [PATH_HEADER]: '/admin/audit',
+    });
+    expect(await redirectOf(requireViewer)).toBe('/sign-in?next=%2Fadmin%2Faudit');
+  });
+
+  it('sends a partner who opens /admin to /partner/overview, and a technical user to Documents', async () => {
+    const partner = await makePartner(testDb(), {});
+    const admin = await makeUser(testDb(), { partnerId: partner.id, role: 'partner_admin', password: PASSWORD });
+    const technical = await makeUser(testDb(), { partnerId: partner.id, role: 'technical', password: PASSWORD });
+    await signInAs(admin.email);
+    expect(await redirectOf(() => requireKind('staff'))).toBe('/partner/overview');
+    await signInAs(technical.email);
+    expect(await redirectOf(() => requireKind('staff'))).toBe('/partner/documents');
+  });
+
+  it('sends staff who open /partner to their own home', async () => {
+    const manager = await makeUser(testDb(), { kind: 'staff', role: 'partner_manager', password: PASSWORD });
+    const marketing = await makeUser(testDb(), { kind: 'staff', role: 'marketing', password: PASSWORD });
+    await signInAs(manager.email);
+    expect(await redirectOf(() => requireKind('partner'))).toBe('/admin/approvals');
+    await signInAs(marketing.email);
+    expect(await redirectOf(() => requireKind('partner'))).toBe('/admin/documents');
+  });
+
+  it('returns the viewer when the kind matches', async () => {
+    const manager = await makeUser(testDb(), { kind: 'staff', role: 'partner_manager', password: PASSWORD });
+    await signInAs(manager.email);
+    expect((await requireKind('staff')).id).toBe(manager.id);
+  });
+
+  it('requireCan lets a role through and bounces one that may not', async () => {
+    const partner = await makePartner(testDb(), {});
+    const sales = await makeUser(testDb(), { partnerId: partner.id, role: 'sales', password: PASSWORD });
+    await signInAs(sales.email);
+    expect((await requireCan('registration.create')).id).toBe(sales.id);
+    expect(await redirectOf(() => requireCan('team.read'))).toBe('/partner/overview');
+    expect(await redirectOf(() => requireCan('registration.read', { partnerId: 'another-company' }))).toBe('/partner/overview');
+  });
+
+  it('requireActionViewer throws instead of redirecting', async () => {
+    await expect(requireActionViewer()).rejects.toBeInstanceOf(UnauthenticatedError);
+    const user = await makeUser(testDb(), { password: PASSWORD });
+    await signInAs(user.email);
+    expect((await requireActionViewer()).id).toBe(user.id);
+  });
+
+  it('getViewer reads the request headers', async () => {
+    expect(await getViewer()).toBeNull();
+    const user = await makeUser(testDb(), { password: PASSWORD });
+    await signInAs(user.email);
+    expect((await getViewer())?.id).toBe(user.id);
+  });
+});

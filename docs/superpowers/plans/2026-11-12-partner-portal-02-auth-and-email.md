@@ -2514,13 +2514,13 @@ printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M1.1c | done | W0 | $(git rev-par
 - Modify: `apps/portal/src/server/auth/viewer.ts` (replaced)
 - Test: `apps/portal/src/lib/next-path.test.ts`, `apps/portal/src/server/auth/sessions.test.ts`, `apps/portal/src/server/auth/viewer.test.ts`, `apps/portal/src/server/repo/account.test.ts`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M1.1d | started | W0 | - | - | sessions, guards, getShell" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Write the four test files**
+- [x] **Step 2: Write the four test files**
 
 Create `apps/portal/src/lib/next-path.test.ts`:
 
@@ -2905,7 +2905,7 @@ describe('getShell, staff viewer', () => {
 });
 ```
 
-- [ ] **Step 3: Run them and see them fail**
+- [x] **Step 3: Run them and see them fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/lib/next-path.test.ts src/server/auth/sessions.test.ts src/server/auth/viewer.test.ts src/server/repo/account.test.ts
@@ -2913,7 +2913,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/lib/next-path.test.ts src/s
 
 Expected: FAIL: `Failed to resolve import` for `./next-path`, `./sessions` and `./account`, and `viewer.test.ts` reports `Tests  14 failed | 1 passed (15)` with `TypeError: homeFor is not a function`, `requireCan is not a function` and `requireActionViewer is not a function`.
 
-- [ ] **Step 4: Create `next-path.ts`**
+- [x] **Step 4: Create `next-path.ts`**
 
 Create `apps/portal/src/lib/next-path.ts`:
 
@@ -2944,7 +2944,7 @@ export function safeNext(value: string | null | undefined): string | null {
 }
 ```
 
-- [ ] **Step 5: Create `sessions.ts`**
+- [x] **Step 5: Create `sessions.ts`**
 
 Create `apps/portal/src/server/auth/sessions.ts` (system database, as the contracts say; the user id is part of every match):
 
@@ -2997,7 +2997,7 @@ export async function revokeAllSessions(userId: string): Promise<void> {
 }
 ```
 
-- [ ] **Step 6: Replace `viewer.ts` with the version that has the guards**
+- [x] **Step 6: Replace `viewer.ts` with the version that has the guards**
 
 Replace `apps/portal/src/server/auth/viewer.ts`:
 
@@ -3103,7 +3103,7 @@ export async function requireActionViewer(): Promise<Viewer> {
 }
 ```
 
-- [ ] **Step 7: Create `repo/account.ts` with `getShell` and its isolation entry**
+- [x] **Step 7: Create `repo/account.ts` with `getShell` and its isolation entry**
 
 Create `apps/portal/src/server/repo/account.ts`. The isolation probe forges a viewer that claims company B; row level security hides company B's row from a transaction opened as company A, so `getShell` throws `NotFoundError`, which is the `not_found` outcome the central matrix expects. P adds its functions to `exportedFns` and to `isolation` in M1.7.
 
@@ -3203,7 +3203,7 @@ export const isolation = defineIsolation<keyof typeof exportedFns>({
 });
 ```
 
-- [ ] **Step 8: Run the four files and the central isolation test**
+- [x] **Step 8: Run the four files and the central isolation test**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/lib/next-path.test.ts src/server/auth/sessions.test.ts src/server/auth/viewer.test.ts src/server/repo/account.test.ts
@@ -3212,11 +3212,11 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/repo/isolation.test.
 
 Expected: the first prints `Test Files  4 passed (4)`, `Tests  44 passed (44)` (16, 5, 15 and 8). The second passes and now includes the `account` module: its two cases (`registers every exported function in isolation`, `leaks nothing across tenants`) both pass. If the `getShell` probe does not throw `NotFoundError` (row level security let company B's row through), the policy for `partners` in `src/db/rls.sql` is wrong: report it to the orchestrator as `blocked`, do not weaken the probe.
 
-- [ ] **Step 9: Run Gate A, then Gate B**
+- [x] **Step 9: Run Gate A, then Gate B**
 
 Run the three fast commands, then the full Gate A block. Expected: all exit 0.
 
-- [ ] **Step 10: Commit and log**
+- [x] **Step 10: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build

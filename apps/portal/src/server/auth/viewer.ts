@@ -1,11 +1,16 @@
 import { eq } from 'drizzle-orm';
 import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { cache } from 'react';
 import { db } from '@/db/client';
 import { partners, staffScopes, users } from '@/db/schema';
-import { isOneOf, PARTNER_ROLES, STAFF_ROLES } from '@/lib/domain';
+import { isOneOf, PARTNER_ROLES, STAFF_ROLES, type UserKind } from '@/lib/domain';
+import { PATH_HEADER, safeNext } from '@/lib/next-path';
+import { ROUTES } from '@/lib/routes';
+import { UnauthenticatedError } from '@/server/errors';
 import { log } from '@/server/log';
 import { getAuth } from './auth';
+import { type Action, can, type PolicySubject } from './policies';
 import type { Viewer } from './types';
 
 /**
@@ -53,3 +58,42 @@ export async function viewerFromHeaders(requestHeaders: Headers): Promise<Viewer
 
 /** The signed-in viewer for this request, or null. Cached per request, so layouts and pages share one lookup. */
 export const getViewer = cache(async (): Promise<Viewer | null> => viewerFromHeaders(await headers()));
+
+/** Where a viewer lands after sign in and when bounced. Every home is a page that viewer's role may open. */
+export function homeFor(viewer: Viewer): string {
+  if (viewer.kind === 'partner') return viewer.role === 'technical' ? ROUTES.partner.documents : ROUTES.partner.overview;
+  return viewer.role === 'marketing' ? ROUTES.admin.documents : ROUTES.admin.approvals;
+}
+
+async function signInUrl(): Promise<string> {
+  const next = safeNext((await headers()).get(PATH_HEADER));
+  return next ? `${ROUTES.signIn}?next=${encodeURIComponent(next)}` : ROUTES.signIn;
+}
+
+/** Pages. No session: redirect to /sign-in?next=<path>. */
+export async function requireViewer(): Promise<Viewer> {
+  const viewer = await getViewer();
+  if (!viewer) redirect(await signInUrl());
+  return viewer;
+}
+
+/** Pages and layouts. The wrong kind of viewer goes to its own home, so a partner on /admin lands on /partner/overview. */
+export async function requireKind(kind: UserKind): Promise<Viewer> {
+  const viewer = await requireViewer();
+  if (viewer.kind !== kind) redirect(homeFor(viewer));
+  return viewer;
+}
+
+/** Pages. requireViewer plus can(); a viewer who may not is redirected to their home. */
+export async function requireCan(action: Action, subject?: PolicySubject): Promise<Viewer> {
+  const viewer = await requireViewer();
+  if (!can(viewer, action, subject)) redirect(homeFor(viewer));
+  return viewer;
+}
+
+/** Server actions. Throws UnauthenticatedError instead of redirecting. */
+export async function requireActionViewer(): Promise<Viewer> {
+  const viewer = await getViewer();
+  if (!viewer) throw new UnauthenticatedError();
+  return viewer;
+}
