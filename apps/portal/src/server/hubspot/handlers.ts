@@ -1,8 +1,9 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import type { Db } from '@/db/client';
 import { partners, registrationContacts, registrations, users } from '@/db/schema';
 import { type Clock, systemClock } from '@/lib/clock';
 import { PARTNER_REGION_LABEL, PRODUCT_LABEL } from '@/lib/domain';
+import { log } from '@/server/log';
 import { dealProperties } from './mappers';
 import type { Handlers } from './outbox';
 import { DependencyPending, type HubspotApi } from './types';
@@ -82,10 +83,17 @@ export const buildHandlers = (db: Db, hs: HubspotApi, pipelineId: string, clock:
             ),
           ));
         // Save the id before the links: a failure below retries against the same deal, and the stored id is what routes that retry to the links.
-        await db
+        // The status guard is in the same statement: a registration undone since the create started must not get a deal id.
+        const saved = await db
           .update(registrations)
           .set({ hubspotDealId: deal.id, hubspotStageId: deal.stageId, hubspotSyncedAt: clock.now() })
-          .where(eq(registrations.id, reg.id));
+          .where(and(eq(registrations.id, reg.id), eq(registrations.status, 'accepted')))
+          .returning({ id: registrations.id });
+        if (saved.length === 0) {
+          // HubspotApi has no archive call, so the deal stays in HubSpot. A later accept finds it by portal_registration_id.
+          log.warn({ registrationId: reg.id, dealId: deal.id }, 'registration was undone while its HubSpot deal was created; deal left in HubSpot, id not stored');
+          return;
+        }
         dealId = deal.id;
       }
 
