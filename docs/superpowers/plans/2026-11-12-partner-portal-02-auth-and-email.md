@@ -6107,13 +6107,13 @@ The other eleven builders, and the full `index.ts`. Same harness as Task M0.5b.
 - Modify: `apps/portal/src/server/email/templates/index.ts` (replaced)
 - Test: `apps/portal/src/server/email/templates/deals.test.ts`, `apps/portal/src/server/email/templates/index.test.ts`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M0.5c | started | W0 | - | - | deal templates" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Write the tests (they fail first)**
+- [x] **Step 2: Write the tests (they fail first)**
 
 Create `apps/portal/src/server/email/templates/deals.test.ts` (13 cases for 11 builders: the staff alert and the extension decision each have two variants):
 
@@ -6389,7 +6389,7 @@ describe('template index', () => {
 });
 ```
 
-- [ ] **Step 3: Run them and see them fail**
+- [x] **Step 3: Run them and see them fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/email/templates/deals.test.ts src/server/email/templates/index.test.ts
@@ -6397,7 +6397,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/email/templates/deal
 
 Expected: FAIL: the deal builders are not exported by `./index` (`TypeError: (0 , buildDealAccepted) is not a function`), and `index.test.ts` reports 10 of the 21 names.
 
-- [ ] **Step 4: Implement the eleven builders and the full index**
+- [x] **Step 4: Implement the eleven builders and the full index**
 
 Create `apps/portal/src/server/email/templates/deal-accepted.ts`:
 
@@ -6901,7 +6901,7 @@ export * from './password-changed';
 export * from './password-reset';
 ```
 
-- [ ] **Step 5: Run the whole email folder and see it pass**
+- [x] **Step 5: Run the whole email folder and see it pass**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/email
@@ -6909,11 +6909,11 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/email
 
 Expected: `Test Files  8 passed (8)`, `Tests  155 passed (155)` (29 from Task M0.5a, then 60 in `onboarding.test.ts`, 65 in `deals.test.ts` and 1 in `index.test.ts`).
 
-- [ ] **Step 6: Run Gate A, then Gate B**
+- [x] **Step 6: Run Gate A, then Gate B**
 
 Run the three fast commands, then the full Gate A block. Expected: all exit 0.
 
-- [ ] **Step 7: Commit and log**
+- [x] **Step 7: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build
