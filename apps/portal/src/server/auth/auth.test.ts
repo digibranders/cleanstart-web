@@ -3,8 +3,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { auditLog, authSessions, users } from '@/db/schema';
 import { makePartner, makeUser, resetDb, testDb } from '@/db/test-helpers';
 import { auth } from './auth';
+import { verifyPassword } from './passwords';
 import { sendPasswordChangedEmail, sendPasswordResetEmail } from './auth-mail';
 import { totpCode } from './test-totp';
+
+vi.mock('./passwords', async (importOriginal) => {
+  const original = await importOriginal<typeof import('./passwords')>();
+  return { ...original, verifyPassword: vi.fn(original.verifyPassword) };
+});
 
 vi.mock('./auth-mail', () => ({
   sendPasswordResetEmail: vi.fn(async () => undefined),
@@ -51,6 +57,28 @@ describe('sign in gate', () => {
       expect(refused.body, email).toEqual(reference.body);
     }
     expect(await db.select().from(authSessions)).toHaveLength(0);
+  });
+
+  it('runs one password verify for a refused account, as it does for a wrong password, before answering', async () => {
+    const db = testDb();
+    const disabled = await makeUser(db, { password: PASSWORD, status: 'disabled' });
+    const invited = await makeUser(db, { password: PASSWORD, status: 'invited' });
+    const suspendedPartner = await makePartner(db, { status: 'suspended' });
+    const suspended = await makeUser(db, { partnerId: suspendedPartner.id, password: PASSWORD });
+    const active = await makeUser(db, { password: PASSWORD });
+
+    vi.mocked(verifyPassword).mockClear();
+    await errorOf(() => signIn(active.email, 'wrong-password-1'));
+    expect(verifyPassword).toHaveBeenCalledTimes(1);
+
+    for (const user of [disabled, invited, suspended]) {
+      vi.mocked(verifyPassword).mockClear();
+      const refused = await errorOf(() => signIn(user.email));
+      expect(verifyPassword, user.email).toHaveBeenCalledTimes(1);
+      const [call] = vi.mocked(verifyPassword).mock.calls;
+      expect(call?.[0].hash, user.email).toMatch(/^scrypt\$16384\$16\$1\$/);
+      expect(refused.body.code).toBe('INVALID_EMAIL_OR_PASSWORD');
+    }
   });
 
   it('refuses a session at the second step when the user was disabled after the password step', async () => {

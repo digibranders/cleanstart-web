@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { APIError, createAuthMiddleware } from 'better-auth/api';
@@ -29,6 +30,17 @@ const SIGN_IN_PER_EMAIL = { limit: 10, windowSeconds: 600 } as const;
 const RESET_PER_EMAIL = { limit: 3, windowSeconds: 3_600 } as const;
 /** Paths whose body carries a new password: the portal rule is checked before Better Auth sees it. */
 const NEW_PASSWORD_PATHS = new Set(['/reset-password', '/change-password']);
+
+/**
+ * A refused sign in still pays for one scrypt verify, so its timing matches an active user with a wrong password and
+ * does not reveal the account state. The hash comes from a random secret nobody holds, with the real hashPassword
+ * parameters, so it can never be a credential.
+ */
+const REFUSAL_HASH: Promise<string> = hashPassword(randomBytes(32).toString('hex'));
+
+async function spendVerifyTime(password: unknown): Promise<void> {
+  await verifyPassword({ hash: await REFUSAL_HASH, password: typeof password === 'string' ? password : '' });
+}
 
 /**
  * Whether a user may hold a session: active, and the company is not suspended. Null when there is no such user,
@@ -152,7 +164,10 @@ function createAuth() {
         if (ctx.path === '/sign-in/email') {
           const email = emailOf(ctx.body);
           limitPerEmail(`signin:email:${email}`, SIGN_IN_PER_EMAIL);
-          if ((await mayHoldSession(eq(users.email, email))) === false) throw new APIError('UNAUTHORIZED', INVALID_LOGIN);
+          if ((await mayHoldSession(eq(users.email, email))) === false) {
+            await spendVerifyTime((ctx.body as { password?: unknown } | null)?.password);
+            throw new APIError('UNAUTHORIZED', INVALID_LOGIN);
+          }
         }
         if (ctx.path === '/request-password-reset') limitPerEmail(`reset:email:${emailOf(ctx.body)}`, RESET_PER_EMAIL);
         if (NEW_PASSWORD_PATHS.has(ctx.path)) {
