@@ -8,32 +8,45 @@ import { ApplicationsTable } from "@/components/partners/applications-table";
 import { downloadCsv } from "@/components/partners/csv";
 import { PartnerDetail } from "@/components/partners/partner-detail";
 import { CategoryDialog, ManagerDialog } from "@/components/partners/partner-dialogs";
+import { type PartnerTab as Tab, partnerTabs } from "@/components/partners/partner-tabs";
 import { CATEGORY_FOR_FILTER, type CategoryFilter, PartnersTable } from "@/components/partners/partners-table";
 import { useToast } from "@/components/ui/toast";
 import {
   addPartner,
-  approveApplication,
-  declineApplication,
   type NewPartnerInput,
   partnersSlice,
-  reopenApplication,
   resendInvites,
   setPartnerCategory,
   setPartnerManager,
   setPartnerSuspended,
   UNLISTED_ACTIVE_PARTNERS,
 } from "@/data/partners";
+import type { ApplicationDto } from "@/lib/dto";
+import type { ActionResult } from "@/server/actions/result";
+import {
+  approveApplicationAction,
+  declineApplicationAction,
+  reopenApplicationAction,
+} from "@/server/actions/applications";
 
-type Tab = "Partners" | "Applications";
+interface AdminPartnersProps {
+  applications: ApplicationDto[];
+  /** Applications with status new, from countNewApplications. */
+  waiting: number;
+  /** Holders of `application.read` see the Applications tab and its count. */
+  canRead: boolean;
+  /** Holders of `application.approve` get the approve, decline and undo buttons. */
+  canDecide: boolean;
+}
 
-export function AdminPartners(): React.JSX.Element {
+export function AdminPartners({ applications, waiting, canRead, canDecide }: AdminPartnersProps): React.JSX.Element {
   const toast = useToast();
-  const { partners, applications } = partnersSlice.use();
+  const { partners } = partnersSlice.use();
   const [tab, setTab] = useState<Tab>("Partners");
   const requestedTab = useSearchParams().get("tab");
   useEffect(() => {
-    if (requestedTab === "applications") setTab("Applications");
-  }, [requestedTab]);
+    if (requestedTab === "applications" && canRead) setTab("Applications");
+  }, [requestedTab, canRead]);
   const [category, setCategory] = useState<CategoryFilter>("All");
   const [region, setRegion] = useState("All regions");
   const [status, setStatus] = useState("Any status");
@@ -54,7 +67,11 @@ export function AdminPartners(): React.JSX.Element {
   const active = UNLISTED_ACTIVE_PARTNERS + partners.filter((p) => p.status === "Active").length;
   const onboarding = partners.filter((p) => p.status === "Onboarding").length;
   const inactive = partners.filter((p) => p.status === "Inactive").length;
-  const waiting = applications.filter((a) => a.status === "New").length;
+
+  const report = async (result: Promise<ActionResult<unknown>>, success: string): Promise<void> => {
+    const done = await result;
+    toast(done.ok ? success : done.error.message);
+  };
 
   const exportCsv = (): void => {
     downloadCsv(
@@ -98,10 +115,7 @@ export function AdminPartners(): React.JSX.Element {
     toast(input.sendInvite ? `Invite sent to ${input.email.trim()}` : `${added.name} added, invite not sent yet`);
   };
 
-  const tabs: readonly (readonly [Tab, number])[] = [
-    ["Partners", total],
-    ["Applications", waiting],
-  ];
+  const tabs = partnerTabs(total, waiting, canRead);
 
   return (
     <div className="wrap">
@@ -130,11 +144,13 @@ export function AdminPartners(): React.JSX.Element {
             {onboarding} onboarding, {inactive} inactive
           </span>
         </div>
-        <div className="kpi">
-          <span className="kpi-l">Applications</span>
-          <span className="kpi-v t-amber">{waiting}</span>
-          <span className="kpi-f">Waiting for a decision</span>
-        </div>
+        {canRead ? (
+          <div className="kpi">
+            <span className="kpi-l">Applications</span>
+            <span className="kpi-v t-amber">{waiting}</span>
+            <span className="kpi-f">Waiting for a decision</span>
+          </div>
+        ) : null}
         <div className="kpi">
           <span className="kpi-l">Partner users</span>
           <span className="kpi-v">64</span>
@@ -181,18 +197,20 @@ export function AdminPartners(): React.JSX.Element {
             <ApplicationsTable
               applications={applications}
               waiting={waiting}
-              onApprove={(a) => {
-                approveApplication(a.id);
-                toast(`Approved ${a.company}. Invite sent to ${a.applicant}`);
-              }}
-              onDecline={(a, reason) => {
-                declineApplication(a.id, reason);
-                toast(`Rejected ${a.company}. ${a.applicant} has been emailed`);
-              }}
-              onUndo={(a) => {
-                reopenApplication(a.id);
-                toast(`${a.company} is back in the queue`);
-              }}
+              canDecide={canDecide}
+              onApprove={(a, choice) =>
+                void report(
+                  approveApplicationAction({ id: a.id, category: choice.category, region: choice.region }),
+                  `Approved ${a.company}. Invite sent to ${a.applicantName}`,
+                )
+              }
+              onDecline={(a, reason) =>
+                void report(
+                  declineApplicationAction({ id: a.id, reason }),
+                  `Rejected ${a.company}. ${a.applicantName} has been emailed`,
+                )
+              }
+              onUndo={(a) => void report(reopenApplicationAction({ id: a.id }), `${a.company} is back in the queue`)}
             />
           )}
         </section>

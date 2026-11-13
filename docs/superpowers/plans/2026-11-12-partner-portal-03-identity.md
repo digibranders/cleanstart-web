@@ -109,7 +109,7 @@ Implements master task 1.3. Rules: company email required (free-mail rejected wi
 - Create: `src/components/partners/turnstile-widget.tsx`
 - Modify: `src/components/screens/Apply.tsx`, `src/components/screens/ApplyDone.tsx`, `src/app/(public)/apply/page.tsx`, `src/app/(public)/apply/done/page.tsx`
 
-- [ ] **Step 1: Write the failing test for the client-safe helpers**
+- [x] **Step 1: Write the failing test for the client-safe helpers**
 
 Create `src/lib/people.test.ts`:
 
@@ -210,12 +210,12 @@ describe('display helpers', () => {
 });
 ```
 
-- [ ] **Step 2: Run it and see it fail**
+- [x] **Step 2: Run it and see it fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/lib/people.test.ts`
 Expected: FAIL, `Error: Failed to resolve import "./people" from "src/lib/people.test.ts"`.
 
-- [ ] **Step 3: Implement the helpers**
+- [x] **Step 3: Implement the helpers**
 
 Create `src/lib/people.ts`:
 
@@ -333,12 +333,12 @@ export const landingPathFor = (kind: UserKind, role: PartnerRole | StaffRole): s
 };
 ```
 
-- [ ] **Step 4: Run the helper tests and see them pass**
+- [x] **Step 4: Run the helper tests and see them pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/lib/people.test.ts`
 Expected: PASS, `Test Files  1 passed (1)`.
 
-- [ ] **Step 5: Create the apply types**
+- [x] **Step 5: Create the apply types**
 
 Create `src/lib/apply.ts`:
 
@@ -369,7 +369,7 @@ export const APPLY_IP_RULE = { limit: 5, windowSeconds: 600 } as const;
 export const APPLY_EMAIL_RULE = { limit: 3, windowSeconds: 600 } as const;
 ```
 
-- [ ] **Step 6: Write the failing test for the server helpers**
+- [x] **Step 6: Write the failing test for the server helpers**
 
 Create `src/server/people.test.ts`:
 
@@ -406,7 +406,7 @@ describe('server people helpers', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/people.test.ts`
 Expected: FAIL, `Failed to resolve import "./people"`.
 
-- [ ] **Step 7: Implement the server helpers**
+- [x] **Step 7: Implement the server helpers**
 
 Create `src/server/people.ts`:
 
@@ -446,7 +446,7 @@ export const alertAddresses = (people: readonly AddressSource[], notifyEmail: st
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/people.test.ts`
 Expected: PASS.
 
-- [ ] **Step 8: Write the failing Turnstile test**
+- [x] **Step 8: Write the failing Turnstile test**
 
 Create `src/server/turnstile.test.ts`:
 
@@ -504,7 +504,7 @@ describe('verifyTurnstile', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/turnstile.test.ts`
 Expected: FAIL, `Failed to resolve import "./turnstile"`.
 
-- [ ] **Step 9: Implement Turnstile**
+- [x] **Step 9: Implement Turnstile**
 
 Create `src/server/turnstile.ts` (the signature is contracts H.18):
 
@@ -546,7 +546,7 @@ export async function verifyTurnstile(input: { token: string | null; ip: string 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/turnstile.test.ts`
 Expected: PASS, 4 tests.
 
-- [ ] **Step 10: Write the failing receipt test**
+- [x] **Step 10: Write the failing receipt test**
 
 Create `src/server/apply-receipt.test.ts`:
 
@@ -590,7 +590,7 @@ describe('apply receipt cookie', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/apply-receipt.test.ts`
 Expected: FAIL, `Failed to resolve import "./apply-receipt"`.
 
-- [ ] **Step 11: Implement the receipt**
+- [x] **Step 11: Implement the receipt**
 
 Create `src/server/apply-receipt.ts`:
 
@@ -648,7 +648,7 @@ export function verifyApplyReceipt(value: string, now: Date): ApplyReceipt | nul
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/apply-receipt.test.ts`
 Expected: PASS, 3 tests.
 
-- [ ] **Step 12: Write the failing repo test for M1.3**
+- [x] **Step 12: Write the failing repo test for M1.3**
 
 Create `src/server/repo/applications.test.ts` (later tasks append to it):
 
@@ -744,7 +744,7 @@ describe('listManagerRecipients', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/applications.test.ts`
 Expected: FAIL, `Failed to resolve import "./applications"`.
 
-- [ ] **Step 13: Implement the M1.3 part of the applications repo**
+- [x] **Step 13: Implement the M1.3 part of the applications repo**
 
 Create `src/server/repo/applications.ts`. Types are exported exactly as contracts H.1; the file grows in M1.3b and M1.4.
 
@@ -912,7 +912,7 @@ export const isolation = defineIsolation<'createPortalApplication' | 'findPartne
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/applications.test.ts`
 Expected: PASS, 5 tests.
 
-- [ ] **Step 14: Write the failing action test**
+- [x] **Step 14: Write the failing action test**
 
 Create `src/server/actions/apply.test.ts`. The mock block at the top is the standard block described under Conventions.
 
@@ -1060,7 +1060,7 @@ describe('submitApplicationAction', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/apply.test.ts`
 Expected: FAIL, `Failed to resolve import "./apply"`.
 
-- [ ] **Step 15: Implement the apply action**
+- [x] **Step 15: Implement the apply action**
 
 Create `src/server/actions/apply.ts`:
 
@@ -1235,7 +1235,7 @@ export async function submitApplicationAction(raw: unknown): Promise<ActionResul
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/apply.test.ts`
 Expected: PASS, 8 tests. If the receipt cookie assertion fails because `next/headers` was not mocked, check that the `vi.mock('next/headers', ...)` block is the first statement after the imports.
 
-- [ ] **Step 16: Create the Turnstile widget component**
+- [x] **Step 16: Create the Turnstile widget component**
 
 Create `src/components/partners/turnstile-widget.tsx`. Verified against Cloudflare's explicit rendering docs: script `https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit`, `turnstile.render(container, { sitekey, callback })`, `turnstile.reset(id)`, `turnstile.remove(id)`.
 
@@ -1314,7 +1314,7 @@ export function TurnstileWidget({ siteKey, onToken, resetKey }: TurnstileWidgetP
 }
 ```
 
-- [ ] **Step 17: Convert `Apply.tsx`**
+- [x] **Step 17: Convert `Apply.tsx`**
 
 Apply each of these region edits to `src/components/screens/Apply.tsx`.
 
@@ -1620,7 +1620,7 @@ After:
         </div>
 ```
 
-- [ ] **Step 18: Write the Apply page and the receipt-driven ApplyDone**
+- [x] **Step 18: Write the Apply page and the receipt-driven ApplyDone**
 
 Replace `src/app/(public)/apply/page.tsx` in full (the site key comes from the server `env`, which supplies Cloudflare's always-pass key outside production; a client component must not import `@/env`):
 
@@ -1739,12 +1739,12 @@ After:
           <dd>{PARTNER_REGION_LABEL[receipt.region]}</dd>
 ```
 
-- [ ] **Step 19: Prove no slice import is left in the converted screens**
+- [x] **Step 19: Prove no slice import is left in the converted screens**
 
 Run: `grep -n "@/data/\|@/lib/slice" src/components/screens/Apply.tsx src/components/screens/ApplyDone.tsx`
 Expected: no output.
 
-- [ ] **Step 20: Gate A**
+- [x] **Step 20: Gate A**
 
 Run the Gate A block from "Conventions". Expected as stated there. The last command must list only: `src/lib/apply.ts`, `src/lib/people.ts`, `src/lib/people.test.ts`, `src/server/people.ts`, `src/server/people.test.ts`, `src/server/turnstile.ts`, `src/server/turnstile.test.ts`, `src/server/apply-receipt.ts`, `src/server/apply-receipt.test.ts`, `src/server/repo/applications.ts`, `src/server/repo/applications.test.ts`, `src/server/actions/apply.ts`, `src/server/actions/apply.test.ts`, `src/components/partners/turnstile-widget.tsx`, `src/components/screens/Apply.tsx`, `src/components/screens/ApplyDone.tsx`, `src/app/(public)/apply/page.tsx`, `src/app/(public)/apply/done/page.tsx` (paths under `apps/portal/`).
 
@@ -1757,7 +1757,7 @@ Run the Gate A block from "Conventions". Expected as stated there. The last comm
 5. Submit the Tidewater form a second time with a different reason: still 4 rows, the reason updated.
 6. Submit six times quickly from one browser with different emails: the sixth shows "Too many attempts. Try again in a moment."
 
-- [ ] **Step 22: Commit**
+- [x] **Step 22: Commit**
 
 ```bash
 git add apps/portal/src/lib/apply.ts apps/portal/src/lib/people.ts apps/portal/src/lib/people.test.ts \
@@ -1784,7 +1784,7 @@ Implements master task 1.3b against a local stub CMS server (no CMS service user
 - Modify: `src/server/jobs/intake.ts` (replace the W0-c stub body), create `src/server/jobs/intake.test.ts`
 - Modify: `src/server/repo/applications.ts`, `src/server/repo/applications.test.ts`
 
-- [ ] **Step 1: Write the failing repo tests for `insertWebsiteApplication`**
+- [x] **Step 1: Write the failing repo tests for `insertWebsiteApplication`**
 
 Append to `src/server/repo/applications.test.ts`. Add `insertWebsiteApplication` to the existing import from `./applications`, and add `auditLog, notifications` to the import from `@/db/schema`. Then append:
 
@@ -1855,7 +1855,7 @@ Also add `import { SYSTEM_ACTORS, publicActor } from '@/server/auth/types';` rep
 `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/applications.test.ts`
 Expected: FAIL, `insertWebsiteApplication is not a function` (or a TypeScript import error).
 
-- [ ] **Step 2: Implement `insertWebsiteApplication`**
+- [x] **Step 2: Implement `insertWebsiteApplication`**
 
 In `src/server/repo/applications.ts` extend the imports:
 
@@ -1951,7 +1951,7 @@ export const isolation = defineIsolation<
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/applications.test.ts`
 Expected: PASS, 9 tests.
 
-- [ ] **Step 3: Write the stub CMS server**
+- [x] **Step 3: Write the stub CMS server**
 
 Create `src/server/intake/stub-cms.ts`. It mimics Payload's REST `find` for one collection: the `users API-Key` auth header, `sort`, `limit`, `page`, `depth` and `where[createdAt][greater_than|greater_than_equal]` query parameters, and the paginated response shape. It is a test and local development helper, never imported by application code.
 
@@ -2056,7 +2056,7 @@ export async function startStubCms(rows: StubCmsRow[], options: StubCmsOptions =
 }
 ```
 
-- [ ] **Step 4: Write the failing intake tests**
+- [x] **Step 4: Write the failing intake tests**
 
 Create `src/server/intake/website-applications.test.ts`:
 
@@ -2243,7 +2243,7 @@ describe('mapCmsApplication', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/intake/website-applications.test.ts`
 Expected: FAIL, `Failed to resolve import "./website-applications"`.
 
-- [ ] **Step 5: Implement the intake module**
+- [x] **Step 5: Implement the intake module**
 
 Create `src/server/intake/website-applications.ts` (the exports and shapes are contracts H.16; `createCmsClient` gains an optional config argument so tests need not mutate the environment, and the client asks for `greater_than_equal` so two rows with the same timestamp cannot be missed, the unique index absorbing the repeat):
 
@@ -2437,7 +2437,7 @@ export async function importWebsiteApplications(deps: { db: Db; cms: CmsClient; 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/intake/website-applications.test.ts`
 Expected: PASS, 11 tests. If `z.SafeParseReturnType` is not exported by the installed Zod 3 minor, replace the `let parsed` line with `let parsed: ReturnType<typeof pageSchema.safeParse>;`.
 
-- [ ] **Step 6: Write the failing job test**
+- [x] **Step 6: Write the failing job test**
 
 Create `src/server/jobs/intake.test.ts`:
 
@@ -2481,7 +2481,7 @@ describe('website-intake job', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs/intake.test.ts`
 Expected: FAIL, `runIntakeWith` is not exported by `./intake`.
 
-- [ ] **Step 7: Replace the job stub body**
+- [x] **Step 7: Replace the job stub body**
 
 Replace `src/server/jobs/intake.ts` entirely (W0-c created it as `export const runIntake = async (): Promise<void> => {}`; the export name and signature stay):
 
@@ -2507,7 +2507,7 @@ export const runIntake = async (): Promise<void> => runIntakeWith({ db, cms: cre
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs/intake.test.ts`
 Expected: PASS, 2 tests.
 
-- [ ] **Step 8: Add the two local development scripts**
+- [x] **Step 8: Add the two local development scripts**
 
 Create `scripts/stub-cms.ts` (a stub CMS on a fixed port so `.env` stays stable):
 
@@ -2538,7 +2538,7 @@ await runIntake();
 process.exit(0);
 ```
 
-- [ ] **Step 9: Gate A**
+- [x] **Step 9: Gate A**
 
 Run the Gate A block (Conventions). The last command must list only: `src/server/repo/applications.ts`, `src/server/repo/applications.test.ts`, `src/server/intake/website-applications.ts`, `src/server/intake/website-applications.test.ts`, `src/server/intake/stub-cms.ts`, `src/server/jobs/intake.ts`, `src/server/jobs/intake.test.ts`, `scripts/stub-cms.ts`, `scripts/run-intake.ts` (under `apps/portal/`).
 
@@ -2549,7 +2549,7 @@ Run the Gate A block (Conventions). The last command must list only: `src/server
 3. `psql cleanstart_portal_p -c "select reference, company, source, personal_email, existing_domain, category, region from applications order by created_at"`. Expected: Falcon Ridge IT and Nair Security Consulting with `source = website`, the second with `personal_email = t`, both with null category and region, references `APP-<yymm>-0045` and `0046`.
 4. Run step 2 again. Expected: `imported: 0`, `duplicate: 1`, no new rows. Remove the two `.env` lines afterwards (they are never committed).
 
-- [ ] **Step 11: Commit**
+- [x] **Step 11: Commit**
 
 ```bash
 git add apps/portal/src/server/repo/applications.ts apps/portal/src/server/repo/applications.test.ts \
@@ -2577,7 +2577,7 @@ Interim state: after this task the Applications tab is real while the Partners t
 - Create: `src/server/actions/applications.ts`, `src/server/actions/applications.test.ts`
 - Modify: `src/components/partners/badges.tsx`, `src/components/partners/applications-table.tsx`, `src/components/screens/AdminPartners.tsx`, `src/app/admin/partners/page.tsx`
 
-- [ ] **Step 1: Write the failing invite-core test**
+- [x] **Step 1: Write the failing invite-core test**
 
 Create `src/server/invite-core.test.ts`:
 
@@ -2673,7 +2673,7 @@ describe('toInviteDto', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/invite-core.test.ts`
 Expected: FAIL, `Failed to resolve import "./invite-core"`.
 
-- [ ] **Step 2: Implement `invite-core.ts`**
+- [x] **Step 2: Implement `invite-core.ts`**
 
 Create `src/server/invite-core.ts` (not under `repo/`, so it needs no isolation entry; it is called only by repo functions that already run in a viewer or system transaction):
 
@@ -2767,7 +2767,7 @@ export async function rotateInviteToken(tx: Tx, inviteId: string, clock: Clock):
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/invite-core.test.ts`
 Expected: PASS, 7 tests.
 
-- [ ] **Step 3: Write the failing routing test**
+- [x] **Step 3: Write the failing routing test**
 
 Create `src/server/partner-routing.test.ts`:
 
@@ -2830,7 +2830,7 @@ describe('insertOnboardingPartner', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/partner-routing.test.ts`
 Expected: FAIL, `Failed to resolve import "./partner-routing"`.
 
-- [ ] **Step 4: Implement partner routing**
+- [x] **Step 4: Implement partner routing**
 
 Create `src/server/partner-routing.ts`:
 
@@ -2901,7 +2901,7 @@ export async function insertOnboardingPartner(tx: Tx, input: NewOnboardingPartne
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/partner-routing.test.ts`
 Expected: PASS, 6 tests.
 
-- [ ] **Step 5: Write the failing partner rows test**
+- [x] **Step 5: Write the failing partner rows test**
 
 Create `src/server/partner-rows.test.ts`:
 
@@ -2989,7 +2989,7 @@ describe('partnerListRows', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/partner-rows.test.ts`
 Expected: FAIL, `Failed to resolve import "./partner-rows"`.
 
-- [ ] **Step 6: Implement the partner rows builder**
+- [x] **Step 6: Implement the partner rows builder**
 
 Create `src/server/partner-rows.ts`:
 
@@ -3130,7 +3130,7 @@ export async function partnerListRows(tx: Tx, filter: PartnerRowFilter): Promise
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/partner-rows.test.ts`
 Expected: PASS, 4 tests.
 
-- [ ] **Step 7: Write the failing repo tests for review**
+- [x] **Step 7: Write the failing repo tests for review**
 
 Append to `src/server/repo/applications.test.ts`. Extend the imports: from `@/db/schema` add `invites, partners`; from `@/db/test-helpers` add `asPartner, asStaff`; from `./applications` add `approveApplication, countNewApplications, declineApplication, getApplication, listApplications, reopenApplication`; add `import { eq } from 'drizzle-orm';`, `import { hashToken, INVITE_TTL_DAYS } from '@/server/auth/tokens';` and replace the existing `import { withSystem } from './context';` with `import { type Tx, withSystem, withViewer } from './context';`. Then append:
 
@@ -3258,7 +3258,7 @@ describe('reopenApplication', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/applications.test.ts`
 Expected: FAIL, the new imports are not exported by `./applications`.
 
-- [ ] **Step 8: Implement the review functions**
+- [x] **Step 8: Implement the review functions**
 
 In `src/server/repo/applications.ts` replace the import block at the top with:
 
@@ -3507,7 +3507,7 @@ Add `import { systemClock } from '@/lib/clock';` to the import block (next to th
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/applications.test.ts src/server/repo/isolation.test.ts`
 Expected: PASS (applications: 22 tests; the isolation test passes for `applications` because every export is registered).
 
-- [ ] **Step 9: Add the shared result type**
+- [x] **Step 9: Add the shared result type**
 
 In `src/lib/apply.ts` add `import type { ApplicationDto, PartnerListRow } from '@/lib/dto';` under the existing import, then append:
 
@@ -3796,7 +3796,7 @@ export async function reopenApplicationAction(raw: unknown): Promise<ActionResul
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/applications.test.ts`
 Expected: PASS, 8 tests.
 
-- [ ] **Step 12: Add code-based badge wrappers**
+- [x] **Step 12: Add code-based badge wrappers**
 
 In `src/components/partners/badges.tsx` add this line to the import block at the top:
 
@@ -3819,7 +3819,7 @@ export function PartnerStatusBadge({ status }: { status: PartnerStatusCode }): R
 
 The label strings of `PARTNER_CATEGORY_LABEL` ("Distributor", "Channel partner", "System integrator") and `PARTNER_STATUS_LABEL` ("Active", "Onboarding", "Inactive", "Suspended") equal the mock's unions, so they type-check against `PartnerCategory` and `PartnerStatus` from `@/data/partners`.
 
-- [ ] **Step 13: Replace `applications-table.tsx`**
+- [x] **Step 13: Replace `applications-table.tsx`**
 
 Replace `src/components/partners/applications-table.tsx` in full. Changes from the mock: DTO input, `fmtLong` for the date, a "Website form" or "Portal form" chip plus "Personal email" and "Domain already a partner" badges, the Approve button opens a category and region panel when the application has none, and the actions are only shown to a viewer who may decide.
 
@@ -4145,7 +4145,7 @@ export function ApplicationsTable({
 }
 ```
 
-- [ ] **Step 14: Convert the Applications tab in `AdminPartners.tsx`**
+- [x] **Step 14: Convert the Applications tab in `AdminPartners.tsx`**
 
 Edit `src/components/screens/AdminPartners.tsx`.
 
@@ -4271,7 +4271,7 @@ After:
             />
 ```
 
-- [ ] **Step 15: Load the applications in the page**
+- [x] **Step 15: Load the applications in the page**
 
 Replace `src/app/admin/partners/page.tsx` in full. At this stage it passes the Applications tab data; M4.1 extends it with the partner list.
 
@@ -4303,12 +4303,12 @@ export default async function Page(): Promise<React.JSX.Element> {
 }
 ```
 
-- [ ] **Step 16: Prove the Applications tab has no slice left**
+- [x] **Step 16: Prove the Applications tab has no slice left**
 
 Run: `grep -n "approveApplication\|declineApplication\|reopenApplication\|\.applications" src/components/screens/AdminPartners.tsx src/components/partners/applications-table.tsx`
 Expected: only the three `...ApplicationAction` imports and calls and the `applications` prop; no import from `@/data/partners` of those functions.
 
-- [ ] **Step 17: Gate A**
+- [x] **Step 17: Gate A**
 
 Run the Gate A block. The last command must list only the files in this task's Files block plus `src/server/repo/applications.test.ts`.
 
@@ -4321,7 +4321,7 @@ Run the Gate A block. The last command must list only the files in this task's F
 5. Reject "Nair Security Consulting" with the default reason: toast, row shows "Rejected, emailed", the dev email log line shows an email was built for the applicant.
 6. Sign in as `rahul.menon@cleanstart.com` (staff sales): the tab loads but the Approve and Reject buttons are absent.
 
-- [ ] **Step 19: Commit**
+- [x] **Step 19: Commit**
 
 ```bash
 git add apps/portal/src/server/invite-core.ts apps/portal/src/server/invite-core.test.ts \
