@@ -5820,7 +5820,7 @@ Design (every point is covered by the local test in Step 4):
 - **`DRY_RUN`** still does nothing and touches no database; it now prints the plan for both dumps.
 - **Retention:** the CMS bucket's lifecycle rule covers `backups/`. The portal prefix needs its own rule on the private bucket (handover item 6).
 
-- [ ] **Step 1: Baseline**
+- [x] **Step 1: Baseline**
 
 ```bash
 bash -n infra/scripts/backup.sh && shellcheck infra/scripts/backup.sh && echo BASELINE_OK
@@ -5828,7 +5828,7 @@ bash -n infra/scripts/backup.sh && shellcheck infra/scripts/backup.sh && echo BA
 
 Expected: `BASELINE_OK` (the current script is clean).
 
-- [ ] **Step 2: Replace `infra/scripts/backup.sh`**
+- [x] **Step 2: Replace `infra/scripts/backup.sh`**
 
 ```bash
 #!/usr/bin/env bash
@@ -5953,7 +5953,7 @@ log "Backup finished successfully - ${TIMESTAMP}"
 
 Keep the file executable: `chmod +x infra/scripts/backup.sh`.
 
-- [ ] **Step 3: Create the restore drill script**
+- [x] **Step 3: Create the restore drill script**
 
 It never touches the live database: it restores a dump into a scratch database (`cleanstart_portal_drill` by default; it refuses `cleanstart_portal`, `cleanstart` and `postgres` as the scratch name), counts rows in the key tables, prints the newest `audit_log` entry, and drops the scratch database on exit. It needs `ALLOW_RESTORE=yes` like `restore.sh`. With no argument it lists the portal backups; with a timestamp it downloads `portal-backups/<timestamp>.dump` from the bucket named in `portal.env`; with `--file` it uses a local dump.
 
@@ -6070,7 +6070,7 @@ log "drill passed in $(( $(date -u +%s) - START )) seconds. Add a line to docs/o
 
 `chmod +x infra/scripts/restore-portal-drill.sh`.
 
-- [ ] **Step 4: Run the local test**
+- [x] **Step 4: Run the local test**
 
 The test creates two scratch databases on your own Postgres, stubs `aws` (it copies into a temp folder) and `curl` (it logs the heartbeat), and checks 17 things: both scripts pass `bash -n`; a dry run does nothing; both dumps land in their own buckets and exactly one heartbeat follows; temp files are removed; a failed portal upload fails the run with no heartbeat; a missing portal database warns, skips and still pings; the CMS bucket, an incomplete env file and a bad database name are all refused with no heartbeat; the drill restores into a scratch database, counts rows and drops it, refuses the live name and needs `ALLOW_RESTORE`. Save it as `/tmp/backup-local-test.sh` and run it from the repository root:
 
@@ -6183,7 +6183,9 @@ rm /tmp/backup-local-test.sh
 
 Expected: `SHELLCHECK_OK`, 17 `ok:` lines and `ALL OK`. This ran in the scratch harness against Postgres 16.14 with exactly these scripts. What it cannot prove: the real `aws` download and `ls` paths of the drill (only uploads are stubbed), Cloudflare lifecycle rules, and the real heartbeat.
 
-- [ ] **Step 5: Record what is not verified**
+Run in the `portal-t` worktree with stub `pg_dump`, `pg_restore`, `psql`, `aws` and `curl` programs on `PATH` and no database (never against a real one), not with this scratch Postgres version. The stub run checks the same behaviours (both dumps land in their own buckets, one heartbeat after both, a failed portal dump or upload, an unreadable or incomplete `portal.env`, the CMS bucket and a bad database name fail without a heartbeat, a missing portal database skips with a warning and still pings, empty or unset portal settings keep the old behaviour) and a drill run with stubs. The scratch Postgres version of the test, and the real `aws` download and `ls` paths of the drill, are left for a person.
+
+- [x] **Step 5: Record what is not verified**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M IST') | M5.5 | note | ORCH | - | local test ALL OK | backup.sh edited and tested locally with stub aws and curl. LIVE HEARTBEAT NOT VERIFIED: needs the droplet. Restore drill never run against real R2. Portal dump bucket and lifecycle rule for portal-backups/ not created." >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
@@ -6191,7 +6193,7 @@ printf '%s\n' "$(date '+%Y-%m-%d %H:%M IST') | M5.5 | note | ORCH | - | local te
 
 The report (final task) lists this under UNVERIFIED, and the handover checklist has the person steps: copy the script to `/opt/cleanstart/scripts/backup.sh`, run it with `DRY_RUN=1` and then for real, confirm the heartbeat arrives, create the lifecycle rule, run the drill, add a line to `docs/operations/RESTORE-LOG.md`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add infra/scripts/backup.sh infra/scripts/restore-portal-drill.sh docs/superpowers/plans/2026-11-12-partner-portal-06-admin-infra-hardening.md
