@@ -2,15 +2,25 @@
 
 import Link from "next/link";
 import { useCallback, useState } from "react";
-import { type Deal, PRODUCTS, postDealMessage, requestExtension, useDeals } from "@/data/deals";
+import { requestExtension } from "@/data/deals";
+import { fmtTimestamp } from "@/lib/dates";
+import {
+  EVENT_SOURCE_LABEL,
+  PARTNER_REGION_LABEL,
+  PRODUCT_LABEL,
+  PRODUCTS,
+  REGISTRATION_STATUS_LABEL,
+} from "@/lib/domain";
+import type { RegistrationDetailDto, RegistrationListItem } from "@/lib/dto";
 import { ROUTES } from "@/lib/routes";
-import { acceptedOn, sameCustomer, stageTrack, waitDays } from "../deals/mock/derive";
-import { daysLeft, fmtLong, fmtShort, plural, PROTECTION_DAYS } from "../deals/mock/dates";
-import { ManagerMessageDrawer } from "../deals/mock/ManagerMessageDrawer";
-import { ProductMark, StatusBadge } from "../deals/mock/parts";
-import { RejectedDealDrawer } from "../deals/mock/RejectedDealDrawer";
+import { postMessageAction } from "@/server/actions/registrations";
+import { daysLeft, fmtLong, fmtShort, plural, PROTECTION_DAYS } from "../deals/dates";
+import { acceptedOn, firstWord, initialsOf, stageTrack, waitDays } from "../deals/derive";
+import { ManagerMessageDrawer } from "../deals/ManagerMessageDrawer";
+import { ProductMark, StatusBadge } from "../deals/parts";
+import { RejectedDealDrawer } from "../deals/RejectedDealDrawer";
+import type { ManagerContact } from "../deals/types";
 import { Icon } from "../icon";
-import { KESTREL } from "../shell/personas";
 import { Dialog } from "../ui/overlay";
 import { useToast } from "../ui/toast";
 
@@ -21,17 +31,21 @@ interface SummaryKpi {
   small?: boolean;
 }
 
-function summaryFor(deal: Deal): SummaryKpi[] {
+function summaryFor(deal: RegistrationDetailDto, today: string): SummaryKpi[] {
   const crm: SummaryKpi = {
     label: "CRM reference",
-    value: deal.crmRef ?? (deal.status === "Pending" || deal.status === "Rejected" ? "Not created" : "Not recorded"),
-    foot: deal.crmSynced ?? (deal.status === "Pending" ? "Created when accepted" : "In CleanStart's CRM"),
+    value: deal.crmRef ?? (deal.status === "pending" || deal.status === "rejected" ? "Not created" : "Not recorded"),
+    foot: deal.crmSyncedAt
+      ? `Synced ${fmtTimestamp(deal.crmSyncedAt, today)}`
+      : deal.status === "pending"
+        ? "Created when accepted"
+        : "In CleanStart's CRM",
     small: true,
   };
   switch (deal.status) {
-    case "Accepted": {
-      const end = deal.protectionEnd ?? deal.registered;
-      const left = daysLeft(end);
+    case "accepted": {
+      const end = deal.protectionEnd ?? deal.registeredOn;
+      const left = daysLeft(end, today);
       const accepted = acceptedOn(deal);
       return [
         { label: "Protected until", value: fmtLong(end), foot: accepted ? `Accepted ${fmtLong(accepted)}` : "Protected" },
@@ -52,28 +66,28 @@ function summaryFor(deal: Deal): SummaryKpi[] {
         crm,
       ];
     }
-    case "Pending": {
-      const days = waitDays(deal);
+    case "pending": {
+      const days = waitDays(deal, today);
       return [
         { label: "Protection", value: "Starts when accepted", foot: `${PROTECTION_DAYS} days from acceptance`, small: true },
         { label: "Waiting", value: days === 0 ? "Today" : plural(days, "day"), foot: "CleanStart reviews within 2 business days" },
         crm,
       ];
     }
-    case "Rejected":
+    case "rejected":
       return [
         { label: "Protection", value: "Not protected", foot: deal.decidedOn ? `Not accepted ${fmtShort(deal.decidedOn)}` : "Not accepted", small: true },
-        { label: "Reviewed by", value: deal.decidedBy ?? deal.manager, foot: "Partner manager", small: true },
+        { label: "Reviewed by", value: deal.decidedByLabel ?? deal.managerName ?? "CleanStart", foot: "Partner manager", small: true },
         crm,
       ];
     default:
       return [
         {
-          label: deal.status === "Expired" ? "Ended" : "Closed",
-          value: fmtLong(deal.closedOn ?? deal.registered),
+          label: deal.status === "expired" ? "Ended" : "Closed",
+          value: fmtLong(deal.closedOn ?? deal.registeredOn),
           foot: deal.stage,
         },
-        { label: "Outcome", value: deal.status, foot: "From CleanStart's CRM" },
+        { label: "Outcome", value: REGISTRATION_STATUS_LABEL[deal.status], foot: "From CleanStart's CRM" },
         crm,
       ];
   }
@@ -97,12 +111,19 @@ function NotFound(): React.JSX.Element {
   );
 }
 
-export function DealDetail({ id }: { id: string }): React.JSX.Element {
+interface DealDetailProps {
+  deal: RegistrationDetailDto | null;
+  siblings: RegistrationListItem[];
+  today: string;
+  partnerManager: ManagerContact | null;
+  senderEmail: string;
+}
+
+export function DealDetail({ deal, siblings, today, partnerManager, senderEmail }: DealDetailProps): React.JSX.Element {
   const toast = useToast();
-  const all = useDeals();
-  const deal = all.find((d) => d.id === id && d.partner === KESTREL.org);
 
   const [draft, setDraft] = useState("");
+  const [sending, setSending] = useState(false);
   const [draftTried, setDraftTried] = useState(false);
   const [extOpen, setExtOpen] = useState(false);
   const [extWhy, setExtWhy] = useState("");
@@ -115,19 +136,25 @@ export function DealDetail({ id }: { id: string }): React.JSX.Element {
   if (!deal) return <NotFound />;
 
   const track = stageTrack(deal);
-  const summary = summaryFor(deal);
+  const summary = summaryFor(deal, today);
   const primary = deal.contacts[0];
-  const siblings = all.filter((d) => d.partner === deal.partner && sameCustomer(d.customer, deal.customer));
+  const managerFirst = firstWord(deal.managerName ?? "your partner manager");
   const draftErr = draftTried && !draft.trim();
   const extErr = extTried && !extWhy.trim();
 
-  const sendNote = (event: React.FormEvent): void => {
+  const sendNote = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
     if (!draft.trim()) {
       setDraftTried(true);
       return;
     }
-    postDealMessage(deal.id, draft);
+    setSending(true);
+    const result = await postMessageAction({ registrationId: deal.id, body: draft });
+    setSending(false);
+    if (!result.ok) {
+      toast(result.error.message);
+      return;
+    }
     setDraft("");
     setDraftTried(false);
   };
@@ -152,11 +179,11 @@ export function DealDetail({ id }: { id: string }): React.JSX.Element {
           <StatusBadge status={deal.status} />
           <span className="badge b-neutral">
             <ProductMark product={deal.product} size={14} />
-            {deal.product}
+            {PRODUCT_LABEL[deal.product]}
           </span>
         </div>
         <div style={{ display: "flex", gap: 6 }}>
-          {deal.status === "Accepted" && !deal.extensionRequested ? (
+          {deal.status === "accepted" && (deal.extensionStatus === "none" || deal.extensionStatus === "declined") ? (
             <button
               type="button"
               className="btn btn-s"
@@ -168,12 +195,12 @@ export function DealDetail({ id }: { id: string }): React.JSX.Element {
               Request extension
             </button>
           ) : null}
-          {deal.extensionRequested ? (
+          {deal.extensionStatus === "requested" ? (
             <span className="badge b-violet" style={{ height: 30, padding: "0 10px" }}>
               Extension requested, CleanStart will reply by email
             </span>
           ) : null}
-          {deal.status === "Rejected" ? (
+          {deal.status === "rejected" ? (
             <button type="button" className="btn btn-p" onClick={() => setFixing(true)}>
               Fix and resubmit
             </button>
@@ -181,14 +208,14 @@ export function DealDetail({ id }: { id: string }): React.JSX.Element {
           <button
             type="button"
             className="btn btn-s"
-            onClick={() => setMessageSubject(`${deal.customer}, ${deal.product}`)}
+            onClick={() => setMessageSubject(`${deal.customer}, ${PRODUCT_LABEL[deal.product]}`)}
           >
             Message partner manager
           </button>
         </div>
       </div>
 
-      {deal.status === "Rejected" && deal.rejectionReason ? (
+      {deal.status === "rejected" && deal.rejectionReason ? (
         <div className="note note-amber">
           <Icon name="warn" />
           <span>
@@ -248,8 +275,7 @@ export function DealDetail({ id }: { id: string }): React.JSX.Element {
                 Registration
               </h2>
               <span className="card-meta">
-                Submitted {fmtLong(deal.registered)}
-                {deal.registeredTime ? `, ${deal.registeredTime}` : ""}
+                Submitted {fmtLong(deal.registeredOn)}, {deal.registeredAt.slice(11, 16)}
               </span>
             </div>
             <div
@@ -260,11 +286,11 @@ export function DealDetail({ id }: { id: string }): React.JSX.Element {
                 <dt>Customer</dt>
                 <dd>{deal.customer}</dd>
                 <dt>Product</dt>
-                <dd>{deal.product}</dd>
+                <dd>{PRODUCT_LABEL[deal.product]}</dd>
                 <dt>Region</dt>
-                <dd>{deal.region}</dd>
+                <dd>{PARTNER_REGION_LABEL[deal.region]}</dd>
                 <dt>Account manager</dt>
-                <dd>{deal.manager}</dd>
+                <dd>{deal.managerName ?? "Not assigned"}</dd>
               </dl>
               <dl className="dl">
                 <dt>Contact</dt>
@@ -282,7 +308,7 @@ export function DealDetail({ id }: { id: string }): React.JSX.Element {
                   </>
                 ) : null}
                 <dt>Registered by</dt>
-                <dd>{deal.registeredBy ?? deal.partner}</dd>
+                <dd>{deal.registeredByName}</dd>
               </dl>
             </div>
             {deal.notes ? (
@@ -311,12 +337,12 @@ export function DealDetail({ id }: { id: string }): React.JSX.Element {
                 </tr>
               </thead>
               <tbody>
-                {deal.history.map((e, index) => (
-                  <tr key={`${e.when}-${index}`}>
-                    <td className="tnum t-sec">{e.when}</td>
+                {deal.history.map((e) => (
+                  <tr key={e.id}>
+                    <td className="tnum t-sec">{fmtLong(e.at.slice(0, 10))}</td>
                     <td>{e.text}</td>
-                    <td className="t-sec">{e.by}</td>
-                    <td className="t-muted">{e.source}</td>
+                    <td className="t-sec">{e.byLabel}</td>
+                    <td className="t-muted">{EVENT_SOURCE_LABEL[e.source]}</td>
                   </tr>
                 ))}
               </tbody>
@@ -328,7 +354,7 @@ export function DealDetail({ id }: { id: string }): React.JSX.Element {
               <h2 id="conv" className="card-t">
                 Conversation with CleanStart
               </h2>
-              <span className="card-meta">Farhan gets an email for each message</span>
+              <span className="card-meta">{managerFirst} gets an email for each message</span>
             </div>
             {deal.thread.length > 0 ? (
               <ol style={{ margin: 0, padding: "4px 0", listStyle: "none" }}>
@@ -337,21 +363,21 @@ export function DealDetail({ id }: { id: string }): React.JSX.Element {
                     key={m.id}
                     style={{ display: "grid", gridTemplateColumns: "26px minmax(0, 1fr)", gap: 10, padding: "8px 12px" }}
                   >
-                    <span className={`av av-r ${m.self ? "av-me" : "av-2"}`}>{m.initials}</span>
+                    <span className={`av av-r ${m.side === "partner" ? "av-me" : "av-2"}`}>{initialsOf(m.authorName)}</span>
                     <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                       <span style={{ fontSize: 12.5 }}>
-                        <b style={{ fontWeight: 600 }}>{m.who}</b>{" "}
+                        <b style={{ fontWeight: 600 }}>{m.authorName}</b>{" "}
                         <span className="t-muted">
-                          {m.org}, {m.when}
+                          {m.authorOrg}, {fmtTimestamp(m.createdAt, today)}
                         </span>
                       </span>
-                      <span style={{ fontSize: 13, lineHeight: 1.55, color: "#2A2838" }}>{m.text}</span>
+                      <span style={{ fontSize: 13, lineHeight: 1.55, color: "#2A2838" }}>{m.body}</span>
                     </span>
                   </li>
                 ))}
               </ol>
             ) : (
-              <div className="empty">No messages yet. Write to Farhan about this deal.</div>
+              <div className="empty">No messages yet. Write to {managerFirst} about this deal.</div>
             )}
             <form
               onSubmit={sendNote}
@@ -373,14 +399,14 @@ export function DealDetail({ id }: { id: string }): React.JSX.Element {
                   id="conv-in"
                   className={`field${draftErr ? " field-err" : ""}`}
                   rows={2}
-                  placeholder="Write to Farhan about this deal"
+                  placeholder={`Write to ${managerFirst} about this deal`}
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   aria-invalid={draftErr || undefined}
                 />
                 {draftErr ? <span className="err">Write a message first.</span> : null}
               </div>
-              <button type="submit" className="btn btn-p">
+              <button type="submit" className="btn btn-p" disabled={sending}>
                 <Icon name="send" />
                 Send
               </button>
@@ -404,10 +430,10 @@ export function DealDetail({ id }: { id: string }): React.JSX.Element {
                 <div className="li" key={product}>
                   <ProductMark product={product} />
                   <span className="li-t">
-                    <span className="li-n">{product}</span>
+                    <span className="li-n">{PRODUCT_LABEL[product]}</span>
                     <span className="li-s">
                       {other
-                        ? `Registered ${fmtShort(other.registered)}${other.registeredBy ? `, ${other.registeredBy}` : ""}`
+                        ? `Registered ${fmtShort(other.registeredOn)}, ${other.registeredByName}`
                         : "Not registered yet"}
                     </span>
                   </span>
@@ -455,7 +481,7 @@ export function DealDetail({ id }: { id: string }): React.JSX.Element {
         open={extOpen}
         onClose={closeExt}
         title="Request an extension"
-        subtitle={`${deal.customer}, ${deal.product}. Protection ends ${deal.protectionEnd ? fmtLong(deal.protectionEnd) : "when the registration closes"}.`}
+        subtitle={`${deal.customer}, ${PRODUCT_LABEL[deal.product]}. Protection ends ${deal.protectionEnd ? fmtLong(deal.protectionEnd) : "when the registration closes"}.`}
         onSubmit={sendExtension}
         footer={
           <>
@@ -490,20 +516,21 @@ export function DealDetail({ id }: { id: string }): React.JSX.Element {
         <span className="hint">Your partner manager decides and replies by email.</span>
       </Dialog>
 
-      {fixing && deal.status === "Rejected" ? (
+      {fixing && deal.status === "rejected" ? (
         <RejectedDealDrawer
           deal={deal}
           onClose={() => setFixing(false)}
           onMessage={() => {
             setFixing(false);
-            setMessageSubject(`${deal.customer}, ${deal.product}`);
+            setMessageSubject(`${deal.customer}, ${PRODUCT_LABEL[deal.product]}`);
           }}
         />
       ) : null}
-      {messageSubject !== null ? (
+      {messageSubject !== null && partnerManager ? (
         <ManagerMessageDrawer
           key={messageSubject}
-          persona={KESTREL}
+          manager={partnerManager}
+          senderEmail={senderEmail}
           initialSubject={messageSubject}
           onClose={() => setMessageSubject(null)}
         />

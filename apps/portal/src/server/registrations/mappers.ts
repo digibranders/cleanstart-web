@@ -8,7 +8,7 @@ import {
   users,
 } from '@/db/schema';
 import type { PartnerCategory } from '@/lib/domain';
-import type { RegistrationDetailDto, RegistrationListItem } from '@/lib/dto';
+import type { RegistrationDetailDto, RegistrationListItem, RegistrationMessageDto } from '@/lib/dto';
 import type { Tx } from '@/server/repo/context';
 
 export type RegistrationRow = typeof registrations.$inferSelect;
@@ -64,6 +64,17 @@ export const toListItem = (row: ListRow): RegistrationListItem => ({
   extensionStatus: row.extensionStatus,
 });
 
+export const toMessageDto = (m: MessageRow): RegistrationMessageDto => ({
+  id: m.id,
+  authorId: m.authorId,
+  authorName: m.authorName,
+  authorOrg: m.authorOrg,
+  side: m.side,
+  body: m.body,
+  createdAt: m.createdAt.toISOString(),
+  auto: m.auto,
+});
+
 const toDetail = (
   row: ListRow,
   parts: { contacts: ContactRow[]; messages: MessageRow[]; events: EventRow[] },
@@ -78,16 +89,7 @@ const toDetail = (
   hubspotMissing: row.hubspotMissing,
   decidedAt: row.decidedAt ? row.decidedAt.toISOString() : null,
   contacts: parts.contacts.map((c) => ({ id: c.id, name: c.name, role: c.role, email: c.email, phone: c.phone })),
-  thread: parts.messages.map((m) => ({
-    id: m.id,
-    authorId: m.authorId,
-    authorName: m.authorName,
-    authorOrg: m.authorOrg,
-    side: m.side,
-    body: m.body,
-    createdAt: m.createdAt.toISOString(),
-    auto: m.auto,
-  })),
+  thread: parts.messages.map(toMessageDto),
   history: parts.events.map((e) => ({
     id: e.id,
     at: e.at.toISOString(),

@@ -4,22 +4,27 @@ import { z } from 'zod';
 import type { CustomerLookupResult } from '@/components/deals/types';
 import { normalizeDomain, sameCustomer } from '@/lib/customer';
 import { DEAL_REGIONS, PRODUCT_LABEL, PRODUCTS } from '@/lib/domain';
-import type { RegistrationListItem } from '@/lib/dto';
+import type { RegistrationListItem, RegistrationMessageDto } from '@/lib/dto';
 import { ROUTES } from '@/lib/routes';
 import { recordAudit } from '@/server/audit/record';
 import { assertCan } from '@/server/auth/policies';
-import { type NewNotification, notifyUsers } from '@/server/notify';
+import { sendEmail } from '@/server/email/send';
+import { buildDealMessage } from '@/server/email/templates';
+import { type NewNotification, notifyUsers, resolveEmailRecipients } from '@/server/notify';
 import { rateLimit } from '@/server/rate-limit';
 import { crmSuggestions } from '@/server/registrations/customer-lookup';
 import { readOnlyHubspot } from '@/server/registrations/hubspot-read';
 import { sendSubmissionAlert } from '@/server/registrations/staff-alert';
 import { withViewer } from '@/server/repo/context';
+import { postMessage } from '@/server/repo/messages';
 import {
   createRegistrations,
   customerSuggestions,
+  getRegistration,
   lockRegistration,
   resubmitRegistration,
 } from '@/server/repo/registrations';
+import { absoluteUrl } from '@/server/urls';
 import type { ActionResult } from './result';
 import { runViewerAction } from './run';
 
@@ -185,5 +190,55 @@ export async function lookupCustomerAction(raw: unknown): Promise<ActionResult<C
     const own = await withViewer(ctx.viewer, (tx) => customerSuggestions(tx, ctx.viewer, { q: input.q }));
     const crm = await crmSuggestions(readOnlyHubspot(), input.q);
     return { own, crm: crm.filter((c) => !own.some((o) => sameCustomer(o.name, c.name))) };
+  });
+}
+
+const postMessageSchema = z.object({
+  registrationId: z.string().uuid(),
+  body: z.string().trim().min(1, 'Write a message first.').max(4000),
+});
+
+const EXCERPT_CHARS = 280;
+
+export async function postMessageAction(raw: unknown): Promise<ActionResult<RegistrationMessageDto>> {
+  return runViewerAction({ name: 'registration.post_message', schema: postMessageSchema }, raw, async (ctx, input) => {
+    const outcome = await withViewer(ctx.viewer, async (tx) => {
+      const current = await getRegistration(tx, ctx.viewer, input.registrationId);
+      assertCan(ctx.viewer, 'registration.message', {
+        partnerId: current.partnerId,
+        region: current.region,
+        ownerUserId: current.registeredById,
+      });
+      const posted = await postMessage(tx, ctx.viewer, input, ctx.clock);
+      const toPartner = ctx.viewer.kind === 'staff';
+      const items: NewNotification[] = posted.recipientUserIds.map((userId) => ({
+        userId,
+        kind: 'registration_message',
+        title: `${posted.message.authorName} wrote about ${posted.registration.customer}`,
+        body: posted.message.body.slice(0, EXCERPT_CHARS),
+        link: toPartner ? ROUTES.partner.deal(posted.registration.id) : ROUTES.admin.approvals,
+      }));
+      await notifyUsers(tx, items);
+      return { posted, items, toPartner };
+    });
+
+    ctx.revalidate(ROUTES.partner.deal(outcome.posted.registration.id));
+    ctx.revalidate(ROUTES.admin.approvals);
+    ctx.afterCommit(async () => {
+      for (const to of await resolveEmailRecipients(outcome.items)) {
+        await sendEmail(
+          buildDealMessage({
+            to: { email: to.email, name: to.name },
+            recipientName: to.name,
+            authorName: outcome.posted.message.authorName,
+            authorOrg: outcome.posted.message.authorOrg,
+            customer: outcome.posted.registration.customer,
+            excerpt: outcome.posted.message.body.slice(0, EXCERPT_CHARS),
+            dealUrl: absoluteUrl(outcome.toPartner ? ROUTES.partner.deal(outcome.posted.registration.id) : ROUTES.admin.approvals),
+          }),
+        );
+      }
+    });
+    return outcome.posted.message;
   });
 }

@@ -3140,7 +3140,7 @@ Append to the progress log with one `printf` (BUILD-HANDOFF), then tell the orch
 
 Rules this task implements: every message and every status change creates an in-app notification, and an email where the recipient's Account switch allows it (`resolveEmailRecipients`); a message from staff goes to the person who registered the deal and the partner admins, a message from a partner goes to the deal's manager; a decision or a HubSpot stage change goes to the person who registered the deal, or the partner admins when that person has left; the author never notifies themselves; messages are not audited (a message is not a state change; the mock does not audit them either).
 
-- [ ] **Step 1: Write the failing tests for recipients and announcements**
+- [x] **Step 1: Write the failing tests for recipients and announcements**
 
 ```ts
 // src/server/registrations/recipients.test.ts
@@ -3253,7 +3253,7 @@ describe('announceRegistrationChange', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/registrations/recipients.test.ts src/server/registrations/announce.test.ts`
 Expected: FAIL, "Cannot find module './recipients'".
 
-- [ ] **Step 2: Implement `recipients.ts` and `announce.ts`**
+- [x] **Step 2: Implement `recipients.ts` and `announce.ts`**
 
 `announce.ts` already exists (contracts H.17, W0-c stub): the HubSpot poll and the expiry job (H4.8) call `announceRegistrationChange({ db }, change)` after each committed change and compile against the stub. Replace the whole file with the code below; the exported type and the call shape do not change, `deps` only gains the optional `transport`.
 
@@ -3380,7 +3380,7 @@ export async function announceRegistrationChange(
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/registrations/recipients.test.ts src/server/registrations/announce.test.ts`
 Expected: PASS, 7 tests.
 
-- [ ] **Step 3: Write the failing repo tests for messages and notifications**
+- [x] **Step 3: Write the failing repo tests for messages and notifications**
 
 ```ts
 // src/server/repo/messages.test.ts
@@ -3523,7 +3523,7 @@ describe('markAllRead and markRead', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/messages.test.ts src/server/repo/notifications.test.ts`
 Expected: FAIL, "Cannot find module './messages'".
 
-- [ ] **Step 4: Implement `toMessageDto`, `repo/messages.ts` and `repo/notifications.ts`**
+- [x] **Step 4: Implement `toMessageDto`, `repo/messages.ts` and `repo/notifications.ts`**
 
 In `src/server/registrations/mappers.ts` add (and use it in `toDetail`):
 
@@ -3744,7 +3744,7 @@ export const isolation = defineIsolation<'listNotifications' | 'markAllRead' | '
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/messages.test.ts src/server/repo/notifications.test.ts src/server/repo/isolation.test.ts`
 Expected: PASS (5 and 3 tests, and the isolation matrix with `messages` and `notifications` listed).
 
-- [ ] **Step 5: Write the failing action tests**
+- [x] **Step 5: Write the failing action tests**
 
 ```ts
 // src/server/actions/registrations.messages.test.ts
@@ -3886,7 +3886,7 @@ describe('notification actions', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/registrations.messages.test.ts src/server/actions/notifications.test.ts`
 Expected: FAIL, "postMessageAction is not a function" and "Cannot find module './notifications'".
 
-- [ ] **Step 6: Implement `postMessageAction` and the notification actions**
+- [x] **Step 6: Implement `postMessageAction` and the notification actions**
 
 Add these imports to `src/server/actions/registrations.ts`: `import type { RegistrationMessageDto } from '@/lib/dto';` (merge into the existing dto import), `import { resolveEmailRecipients } from '@/server/notify';` (merge into the `@/server/notify` import), `import { sendEmail } from '@/server/email/send';`, `import { buildDealMessage } from '@/server/email/templates';`, `import { absoluteUrl } from '@/server/urls';`, `import { postMessage } from '@/server/repo/messages';`, and `getRegistration` into the `@/server/repo/registrations` import list. Append:
 
@@ -3975,7 +3975,7 @@ Neither notification action calls `revalidate`: the bell reads through the layou
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions`
 Expected: PASS, including the 3 message tests and the 2 notification tests, and the 11 registration tests from M2.1 still green.
 
-- [ ] **Step 7: Rewrite the page `src/app/partner/deals/[id]/page.tsx`**
+- [x] **Step 7: Rewrite the page `src/app/partner/deals/[id]/page.tsx`**
 
 ```tsx
 import type { Metadata } from "next";
@@ -4018,7 +4018,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
 A deal that does not exist, belongs to another company, or belongs to a colleague of a sales user, renders the mock's "Deal not found" card, the same for all three, so ids cannot be probed.
 
-- [ ] **Step 8: Edit `DealDetail.tsx`**
+- [x] **Step 8: Edit `DealDetail.tsx`**
 
 The extension request (`requestExtension` import and `sendExtension` body) stays on the mock slice until M2.4 replaces both; every other region converts now.
 
@@ -4444,7 +4444,7 @@ Manual check (seed-dev data, signed in as Aditi Rao, Kestrel partner admin):
 - Open `/partner/deals/00000000-0000-0000-0000-000000000000` and another company's deal id: both render "Deal not found".
 - "Request extension" still opens the old mock dialog and does nothing durable until M2.4.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git add apps/portal/src/server/registrations apps/portal/src/server/repo/messages.ts apps/portal/src/server/repo/messages.test.ts \
