@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useCallback, useState } from "react";
-import { requestExtension } from "@/data/deals";
 import { fmtTimestamp } from "@/lib/dates";
 import {
   EVENT_SOURCE_LABEL,
@@ -13,6 +12,7 @@ import {
 } from "@/lib/domain";
 import type { RegistrationDetailDto, RegistrationListItem } from "@/lib/dto";
 import { ROUTES } from "@/lib/routes";
+import { requestExtensionAction } from "@/server/actions/extension";
 import { postMessageAction } from "@/server/actions/registrations";
 import { daysLeft, fmtLong, fmtShort, plural, PROTECTION_DAYS } from "../deals/dates";
 import { acceptedOn, firstWord, initialsOf, stageTrack, waitDays } from "../deals/derive";
@@ -128,6 +128,7 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
   const [extOpen, setExtOpen] = useState(false);
   const [extWhy, setExtWhy] = useState("");
   const [extTried, setExtTried] = useState(false);
+  const [extBusy, setExtBusy] = useState(false);
   const [fixing, setFixing] = useState(false);
   const [messageSubject, setMessageSubject] = useState<string | null>(null);
   // stable, because the overlay re-focuses its first field whenever onClose changes
@@ -159,16 +160,25 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
     setDraftTried(false);
   };
 
-  const sendExtension = (event: React.FormEvent): void => {
+  const sendExtension = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
     if (!extWhy.trim()) {
       setExtTried(true);
       return;
     }
-    requestExtension(deal.id, extWhy);
-    setExtOpen(false);
-    setExtWhy("");
-    toast("Extension requested. CleanStart will reply by email.");
+    setExtBusy(true);
+    try {
+      const result = await requestExtensionAction({ id: deal.id, reason: extWhy });
+      if (!result.ok) {
+        toast(result.error.message);
+        return;
+      }
+      setExtOpen(false);
+      setExtWhy("");
+      toast("Extension requested. CleanStart will reply by email.");
+    } finally {
+      setExtBusy(false);
+    }
   };
 
   return (
@@ -198,6 +208,11 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
           {deal.extensionStatus === "requested" ? (
             <span className="badge b-violet" style={{ height: 30, padding: "0 10px" }}>
               Extension requested, CleanStart will reply by email
+            </span>
+          ) : null}
+          {deal.extensionStatus === "granted" && deal.protectionEnd ? (
+            <span className="badge b-accepted" style={{ height: 30, padding: "0 10px" }}>
+              Extension granted, protected until {fmtLong(deal.protectionEnd)}
             </span>
           ) : null}
           {deal.status === "rejected" ? (
@@ -488,7 +503,7 @@ export function DealDetail({ deal, siblings, today, partnerManager, senderEmail 
             <button type="button" className="btn btn-s" onClick={closeExt}>
               Cancel
             </button>
-            <button type="submit" className="btn btn-p">
+            <button type="submit" className="btn btn-p" disabled={extBusy}>
               Send request
             </button>
           </>

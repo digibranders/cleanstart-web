@@ -125,9 +125,14 @@ export function RegisterDeal({ mine, managers, partnerName, today }: RegisterDea
       return;
     }
     let cancelled = false;
-    const timer = setTimeout(async () => {
-      const result = await lookupCustomerAction({ q: customer });
-      if (!cancelled && result.ok) setRemote({ q: customer, data: result.data });
+    const timer = setTimeout(() => {
+      lookupCustomerAction({ q: customer })
+        .then((result) => {
+          if (!cancelled && result.ok) setRemote({ q: customer, data: result.data });
+        })
+        .catch(() => {
+          if (!cancelled) setRemote(null);
+        });
     }, 300);
     return () => {
       cancelled = true;

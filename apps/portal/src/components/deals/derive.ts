@@ -175,11 +175,11 @@ export function describeCheck(deal: CheckedDeal, check: RegistrationCheckDto, hi
   return { kind: "none", label: "Clear", tone: "accepted", why: "", whyCls: "why" };
 }
 
-/** The reason the reject box starts with when another partner registered the same customer and product first. */
+/** The reason the reject box starts with when another partner registered first. It never names that partner: the text is sent to the rejected one. */
 export function defaultRejectReason(deal: CheckedDeal, check: Check): string {
   const rival = check.rival;
   if (rival?.registeredFirst) {
-    return `${rival.partnerName} registered this customer for ${PRODUCT_LABEL[deal.product]} on ${fmtShort(rival.registeredOn)}.`;
+    return `Another partner registered this customer for ${PRODUCT_LABEL[deal.product]} on ${fmtShort(rival.registeredOn)}.`;
   }
   return "";
 }

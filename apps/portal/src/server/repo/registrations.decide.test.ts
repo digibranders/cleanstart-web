@@ -210,6 +210,8 @@ describe('conflictChecks', () => {
     const arbor = await makePartner(db, { name: 'Arbor Cyber' });
     const first = await makeRegistration(db, { partnerId: kestrel.id, customerName: 'Gulfway Freight', product: 'images', registeredOn: '2026-11-03' });
     const second = await makeRegistration(db, { partnerId: arbor.id, customerName: 'gulfway freight', product: 'images', registeredOn: '2026-11-05' });
+    await db.update(registrations).set({ createdAt: new Date('2026-11-03T10:00:00Z') }).where(eq(registrations.id, first.id));
+    await db.update(registrations).set({ createdAt: new Date('2026-11-05T10:00:00Z') }).where(eq(registrations.id, second.id));
     const checks = await withViewer(farhan, (tx) => conflictChecks(tx, farhan, { registrationIds: [first.id, second.id] }));
     expect(checks[first.id]).toEqual({ kind: 'conflict', other: { id: second.id, partnerName: 'Arbor Cyber', product: 'images', status: 'pending', registeredOn: '2026-11-05', protectionEnd: null, registeredFirst: false } });
     expect(checks[second.id]).toMatchObject({ kind: 'conflict', other: { id: first.id, partnerName: 'Kestrel Systems', registeredFirst: true } });

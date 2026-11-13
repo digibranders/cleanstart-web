@@ -22,6 +22,7 @@ vi.mock('@/server/email/send', () => ({
 import { notificationPrefs, notifications } from '@/db/schema';
 import { asPartner, asStaff, makePartner, makeRegistration, makeUser, resetDb, testDb, viewerFor } from '@/db/test-helpers';
 import { FakeEmailTransport } from '@/server/email/fake';
+import { resetRateLimits } from '@/server/rate-limit';
 import { postMessageAction } from './registrations';
 
 const db = testDb();
@@ -29,6 +30,7 @@ beforeEach(async () => {
   await resetDb(db);
   mail.transport = new FakeEmailTransport();
   session.viewer = null;
+  resetRateLimits();
 });
 
 const setup = async () => {
@@ -41,6 +43,13 @@ const setup = async () => {
 };
 
 describe('postMessageAction', () => {
+  it('allows 30 messages in 10 minutes per user and refuses the 31st', async () => {
+    const { manager, reg } = await setup();
+    session.viewer = manager;
+    for (let i = 0; i < 30; i += 1) expect((await postMessageAction({ registrationId: reg.id, body: `Note ${i}` })).ok).toBe(true);
+    expect(await postMessageAction({ registrationId: reg.id, body: 'One more' })).toMatchObject({ ok: false, error: { code: 'rate_limited' } });
+  });
+
   it('lets staff write to the partner: the registrant and the admin are told in the app, and by email when their switch allows', async () => {
     const { manager, salesUser, adminUser, reg } = await setup();
     await db.insert(notificationPrefs).values({ userId: adminUser.id, category: 'decision', email: false });

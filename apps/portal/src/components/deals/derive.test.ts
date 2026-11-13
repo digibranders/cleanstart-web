@@ -135,7 +135,7 @@ describe('defaultRejectReason', () => {
   it('pre-fills the reason when another partner registered first, and is empty otherwise', () => {
     const deal = { partnerName: 'Kestrel Systems', registeredOn: '2026-11-05', product: 'images' as const };
     const first = describeCheck(deal, { kind: 'conflict', other: { id: 'o', partnerName: 'Arbor Cyber', product: 'images', status: 'pending', registeredOn: '2026-11-03', protectionEnd: null, registeredFirst: true } });
-    expect(defaultRejectReason(deal, first)).toBe('Arbor Cyber registered this customer for CleanStart Images on 3 Nov.');
+    expect(defaultRejectReason(deal, first)).toBe('Another partner registered this customer for CleanStart Images on 3 Nov.');
     expect(defaultRejectReason(deal, describeCheck(deal, { kind: 'none' }))).toBe('');
   });
 });
