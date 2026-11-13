@@ -5,7 +5,8 @@ import { Icon } from "@/components/icon";
 import { Avatar } from "@/components/ui/badge";
 import { Drawer } from "@/components/ui/overlay";
 import { useToast } from "@/components/ui/toast";
-import { initialsOf } from "@/data/partners";
+import { initialsOf } from "@/lib/people";
+import { sendManagerMessageAction } from "@/server/actions/partners";
 
 interface MessageDrawerProps {
   open: boolean;
@@ -22,21 +23,32 @@ export function MessageDrawer({ open, onClose, manager, team, subject, from }: M
   const [body, setBody] = useState("");
   const [tried, setTried] = useState(false);
   const [subjectText, setSubjectText] = useState(subject);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const invalid = tried && !body.trim();
 
   const close = (): void => {
     setBody("");
     setTried(false);
+    setError(null);
     onClose();
   };
 
-  const send = (event: React.FormEvent<HTMLFormElement>): void => {
+  const send = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     if (!body.trim()) {
       setTried(true);
       return;
     }
-    toast(`Message sent to ${manager}`);
+    setBusy(true);
+    setError(null);
+    const result = await sendManagerMessageAction({ subject: subjectText, body });
+    setBusy(false);
+    if (!result.ok) {
+      setError(result.error.issues?.[0]?.message ?? result.error.message);
+      return;
+    }
+    toast(`Message sent to ${result.data.managerName}`);
     close();
   };
 
@@ -54,7 +66,7 @@ export function MessageDrawer({ open, onClose, manager, team, subject, from }: M
           <button type="button" className="btn btn-s" onClick={close}>
             Cancel
           </button>
-          <button type="submit" className="btn btn-p">
+          <button type="submit" className="btn btn-p" disabled={busy}>
             <Icon name="send" />
             Send
           </button>
@@ -89,6 +101,11 @@ export function MessageDrawer({ open, onClose, manager, team, subject, from }: M
         {invalid ? (
           <span id="co-msg-err" className="err">
             Write a message first.
+          </span>
+        ) : null}
+        {error ? (
+          <span className="err" role="alert">
+            {error}
           </span>
         ) : null}
       </div>

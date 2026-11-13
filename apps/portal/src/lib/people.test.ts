@@ -14,6 +14,7 @@ import {
   nameFromEmail,
   normaliseDomain,
   rowKey,
+  staffTeamLabel,
 } from './people';
 
 describe('email and domain helpers', () => {
@@ -90,5 +91,14 @@ describe('display helpers', () => {
     expect(landingPathFor('partner', 'technical')).toBe('/partner/documents');
     expect(landingPathFor('staff', 'partner_manager')).toBe('/admin/approvals');
     expect(landingPathFor('staff', 'marketing')).toBe('/admin/documents');
+  });
+});
+
+describe('staffTeamLabel', () => {
+  it('names the CleanStart team for a region', () => {
+    expect(staffTeamLabel('india')).toBe('CleanStart India');
+    expect(staffTeamLabel('middle_east')).toBe('CleanStart Middle East');
+    expect(staffTeamLabel('all')).toBe('CleanStart');
+    expect(staffTeamLabel(null)).toBe('CleanStart');
   });
 });
