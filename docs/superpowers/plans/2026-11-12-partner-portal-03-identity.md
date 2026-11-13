@@ -11114,7 +11114,7 @@ Implements master task 1.8. Only partner managers add, change or remove CleanSta
 - Create: `src/server/actions/staff.ts`, `src/server/actions/staff.test.ts`
 - Modify: `src/components/screens/AdminTeam.tsx`, `src/components/people/StaffInviteDrawer.tsx`, `src/app/admin/team/page.tsx`
 
-- [ ] **Step 1: Write the failing repo tests**
+- [x] **Step 1: Write the failing repo tests**
 
 Create `src/server/repo/staff.test.ts`:
 
@@ -11250,7 +11250,7 @@ The repo guards who may call by staff kind only; the action checks the role, so 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/staff.test.ts`
 Expected: FAIL, `Failed to resolve import "./staff"`.
 
-- [ ] **Step 2: Implement the staff repo**
+- [x] **Step 2: Implement the staff repo**
 
 Create `src/server/repo/staff.ts`:
 
@@ -11424,7 +11424,7 @@ Merge the two `@/lib/clock` imports into `import { type Clock, systemClock } fro
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/staff.test.ts src/server/repo/isolation.test.ts`
 Expected: PASS (staff: 11 tests; isolation passes for `staff`).
 
-- [ ] **Step 3: Write the failing action tests**
+- [x] **Step 3: Write the failing action tests**
 
 Create `src/server/actions/staff.test.ts`:
 
@@ -11572,7 +11572,7 @@ describe('removeStaffAction', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/staff.test.ts`
 Expected: FAIL, `Failed to resolve import "./staff"`.
 
-- [ ] **Step 4: Implement the staff actions**
+- [x] **Step 4: Implement the staff actions**
 
 Create `src/server/actions/staff.ts`:
 
@@ -11730,7 +11730,7 @@ export async function removeStaffAction(raw: unknown): Promise<ActionResult<{ id
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/staff.test.ts`
 Expected: PASS, 8 tests.
 
-- [ ] **Step 5: Replace `StaffInviteDrawer.tsx`**
+- [x] **Step 5: Replace `StaffInviteDrawer.tsx`**
 
 Replace `src/components/people/StaffInviteDrawer.tsx` in full:
 
@@ -11888,7 +11888,7 @@ export function StaffInviteDrawer({
 }
 ```
 
-- [ ] **Step 6: Replace `AdminTeam.tsx`**
+- [x] **Step 6: Replace `AdminTeam.tsx`**
 
 Replace `src/components/screens/AdminTeam.tsx` in full. Changes from the mock: DTO input; roles through a dropdown of `{ value, label }` options; a teammate who has only been invited shows a badge for the role and "Invite pending" for last active (the DTO carries no invite date, "Contract change requests" item 2); removing an invited teammate withdraws the invite.
 
@@ -12133,7 +12133,7 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
 }
 ```
 
-- [ ] **Step 7: Write the staff page**
+- [x] **Step 7: Write the staff page**
 
 Replace `src/app/admin/team/page.tsx` in full:
 
@@ -12156,12 +12156,12 @@ export default async function Page(): Promise<React.JSX.Element> {
 
 The list already contains invited teammates, so the page does not call `listOpenInvites` as the route map lists ("Contract change requests", item 14).
 
-- [ ] **Step 8: Prove no slice import is left**
+- [x] **Step 8: Prove no slice import is left**
 
 Run: `grep -n "@/data/\|@/lib/slice\|staffSlice" src/components/screens/AdminTeam.tsx src/components/people/StaffInviteDrawer.tsx`
 Expected: no output.
 
-- [ ] **Step 9: Gate A**
+- [x] **Step 9: Gate A**
 
 Run the Gate A block. The last command must list only this task's Files block.
 
@@ -12174,7 +12174,7 @@ Run the Gate A block. The last command must list only this task's Files block.
 5. Remove Kunal (invited): confirm, the row disappears and the invite is withdrawn. Remove Ishita: the row disappears; `select status from users where name = 'Ishita Bose'` is `disabled`.
 6. Sign in as `rahul.menon@cleanstart.com` (now Marketing): opening `/admin/team` redirects to the Documents home page (no `staff.read`).
 
-- [ ] **Step 11: Commit**
+- [x] **Step 11: Commit**
 
 ```bash
 git add apps/portal/src/server/repo/staff.ts apps/portal/src/server/repo/staff.test.ts \

@@ -1,18 +1,21 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useState } from "react";
 import { Icon } from "@/components/icon";
 import { RowAction } from "@/components/people/RowAction";
 import { StaffInviteDrawer } from "@/components/people/StaffInviteDrawer";
 import { Badge } from "@/components/ui/badge";
-import { Dropdown } from "@/components/ui/dropdown";
+import { Dropdown, type DropdownOption } from "@/components/ui/dropdown";
 import { useToast } from "@/components/ui/toast";
-import { appendAudit } from "@/data/audit";
-import { initialsOf, rowKey, type StaffMember, type StaffRole, staffSlice } from "@/data/team";
+import { isOneOf, STAFF_REGION_LABEL, STAFF_ROLE_LABEL, STAFF_ROLES, type StaffRole } from "@/lib/domain";
+import type { StaffMemberDto } from "@/lib/dto";
+import { initialsOf, lastSeenLabel, rowKey } from "@/lib/people";
 import { ROUTES } from "@/lib/routes";
-import Link from "next/link";
+import type { ActionResult } from "@/server/actions/result";
+import { changeStaffRoleAction, removeStaffAction } from "@/server/actions/staff";
 
-const ROLES: readonly StaffRole[] = ["Partner manager", "Sales", "Marketing"];
+const ROLE_OPTIONS: readonly DropdownOption[] = STAFF_ROLES.map((value) => ({ value, label: STAFF_ROLE_LABEL[value] }));
 
 // [action, partner manager, sales, marketing]
 const PERMISSIONS: ReadonlyArray<readonly [string, string, string, string]> = [
@@ -25,49 +28,39 @@ const PERMISSIONS: ReadonlyArray<readonly [string, string, string, string]> = [
   ["Download documents", "Yes", "Yes", "Yes"],
 ];
 
-function isStaffRole(value: string): value is StaffRole {
-  return (ROLES as readonly string[]).includes(value);
-}
-
 function roleToast(name: string, role: StaffRole): string {
-  const phrase = role === "Sales" ? "in sales" : role === "Marketing" ? "in marketing" : "a partner manager";
+  const phrase = role === "sales" ? "in sales" : role === "marketing" ? "in marketing" : "a partner manager";
   return `${name} is now ${phrase}`;
 }
 
-export function AdminTeam(): React.JSX.Element {
+export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: string }): React.JSX.Element {
   const toast = useToast();
-  const people = staffSlice.use();
   const [confirming, setConfirming] = useState<string | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [warnFor, setWarnFor] = useState<string | null>(null);
   const closeInvite = useCallback((): void => setInviteOpen(false), []);
 
-  const changeRole = (person: StaffMember, role: StaffRole): void => {
-    staffSlice.set((prev) => prev.map((p) => (p.email === person.email ? { ...p, role } : p)));
-    setWarnFor(person.partners.length > 0 && role !== "Partner manager" ? person.name : null);
-    appendAudit({
-      actor: "Farhan Qureshi",
-      action: "Changed a role",
-      target: `${person.name}, CleanStart team`,
-      detail: `${person.role} to ${role}.`,
-      source: "Portal",
-    });
+  const report = async (pending: Promise<ActionResult<unknown>>): Promise<boolean> => {
+    const result = await pending;
+    if (!result.ok) toast(result.error.message);
+    return result.ok;
+  };
+
+  const changeRole = async (person: StaffMemberDto, role: StaffRole): Promise<void> => {
+    if (!(await report(changeStaffRoleAction({ userId: person.id, role })))) return;
+    setWarnFor(person.partners.length > 0 && role !== "partner_manager" ? person.id : null);
     toast(roleToast(person.name, role));
   };
 
-  const remove = (person: StaffMember): void => {
-    staffSlice.set((prev) => prev.filter((p) => p.email !== person.email));
+  const remove = async (person: StaffMemberDto): Promise<void> => {
     setConfirming(null);
-    appendAudit({
-      actor: "Farhan Qureshi",
-      action: "Removed a teammate",
-      target: `${person.name}, ${person.role.toLowerCase()}, ${person.region}`,
-      source: "Portal",
-    });
-    toast(`Removed access for ${person.name}`);
+    if (await report(removeStaffAction({ id: person.id }))) toast(`Removed access for ${person.name}`);
   };
 
-  const warned = people.find((p) => p.name === warnFor && p.role !== "Partner manager");
+  const lastActive = (p: StaffMemberDto): string =>
+    p.isYou ? "Now" : p.status === "invited" ? "Invite pending" : lastSeenLabel(p.lastActiveAt, today);
+
+  const warned = people.find((p) => p.id === warnFor && p.role !== "partner_manager");
 
   return (
     <div className="wrap">
@@ -90,7 +83,7 @@ export function AdminTeam(): React.JSX.Element {
             People
           </h2>
           <span className="card-meta tnum">
-            {people.length} people, {people.filter((p) => p.status === "Invited").length} invited
+            {people.length} people, {people.filter((p) => p.status === "invited").length} invited
           </span>
         </div>
         <div style={{ overflowX: "auto" }}>
@@ -110,14 +103,14 @@ export function AdminTeam(): React.JSX.Element {
             </thead>
             <tbody>
               {people.map((p) => (
-                <tr key={p.email}>
+                <tr key={p.id}>
                   <td>
                     <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
                       <span className="av av-1 av-r">{initialsOf(p.name)}</span>
                       <span className="li-t">
                         <span className="li-n" style={{ fontSize: 13 }}>
                           {p.name}
-                          {p.you ? (
+                          {p.isYou ? (
                             <>
                               {" "}
                               <span className="t-muted" style={{ fontWeight: 500 }}>
@@ -131,36 +124,38 @@ export function AdminTeam(): React.JSX.Element {
                     </span>
                   </td>
                   <td>
-                    {p.you ? (
-                      <Badge tone="neutral">{p.role}</Badge>
+                    {p.isYou || p.status === "invited" ? (
+                      <Badge tone="neutral">{STAFF_ROLE_LABEL[p.role]}</Badge>
                     ) : (
                       <Dropdown
                         variant="rsel"
                         id={`trole-${rowKey(p.email)}`}
                         ariaLabel={`Role for ${p.name}`}
                         value={p.role}
-                        options={ROLES}
+                        options={ROLE_OPTIONS}
                         onChange={(v) => {
-                          if (isStaffRole(v) && v !== p.role) changeRole(p, v);
+                          if (isOneOf(STAFF_ROLES, v) && v !== p.role) void changeRole(p, v);
                         }}
                       />
                     )}
                   </td>
-                  <td className="t-sec">{p.region}</td>
+                  <td className="t-sec">{STAFF_REGION_LABEL[p.region]}</td>
                   <td className="t-sec" title={p.partners.join(", ")}>
                     {p.partners.length ? `${p.partners.length} partners` : "None"}
                   </td>
-                  <td className="t-sec">{p.last}</td>
+                  <td className="t-sec">{lastActive(p)}</td>
                   <td>
-                    <Badge tone={p.status === "Active" ? "accepted" : "pending"}>{p.status}</Badge>
+                    <Badge tone={p.status === "active" ? "accepted" : "pending"}>
+                      {p.status === "active" ? "Active" : "Invited"}
+                    </Badge>
                   </td>
                   <td className="r">
-                    {p.you ? null : confirming === p.email ? (
+                    {p.isYou ? null : confirming === p.id ? (
                       <span className="acts">
                         <button
                           type="button"
                           className="btn btn-dd"
-                          onClick={() => remove(p)}
+                          onClick={() => void remove(p)}
                           style={{ height: 26, padding: "0 8px", fontSize: 12 }}
                         >
                           Remove access
@@ -181,7 +176,7 @@ export function AdminTeam(): React.JSX.Element {
                         tip="Remove access"
                         icon="trash"
                         tone="no"
-                        onClick={() => setConfirming(p.email)}
+                        onClick={() => setConfirming(p.id)}
                       />
                     )}
                   </td>
@@ -195,8 +190,8 @@ export function AdminTeam(): React.JSX.Element {
             <div className="note note-amber" role="status">
               <Icon name="warn" />
               <span>
-                {warned.name} still manages {warned.partners.length} partners in {warned.region}. Those partners
-                need a new partner manager.{" "}
+                {warned.name} still manages {warned.partners.length} partners in {STAFF_REGION_LABEL[warned.region]}.
+                Those partners need a new partner manager.{" "}
                 <Link href={ROUTES.admin.partners} style={{ fontWeight: 600 }}>
                   Reassign on Partners
                 </Link>
@@ -237,7 +232,7 @@ export function AdminTeam(): React.JSX.Element {
         </table>
       </section>
 
-      <StaffInviteDrawer open={inviteOpen} onClose={closeInvite} />
+      <StaffInviteDrawer open={inviteOpen} onClose={closeInvite} existingEmails={people.map((p) => p.email)} />
     </div>
   );
 }
