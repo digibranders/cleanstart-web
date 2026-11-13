@@ -6,3 +6,7 @@ onlyBuiltDependencies:
   - "@biomejs/biome"
   - esbuild
   - sharp
+
+overrides:
+  "vitest@4>vite": 6.4.6
+  "vite@6.4.6>postcss": 8.5.23
