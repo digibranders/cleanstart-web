@@ -3,17 +3,32 @@
 import { Fragment, useState } from "react";
 import { Icon } from "@/components/icon";
 import { Badge } from "@/components/ui/badge";
-import type { Application } from "@/data/partners";
-import { CategoryBadge } from "./badges";
+import { fmtLong } from "@/lib/dates";
+import {
+  PARTNER_CATEGORIES,
+  PARTNER_CATEGORY_LABEL,
+  PARTNER_REGION_LABEL,
+  PARTNER_REGIONS,
+  type PartnerCategory,
+  type PartnerRegion,
+} from "@/lib/domain";
+import type { ApplicationDto } from "@/lib/dto";
+import { codeFromLabel } from "@/lib/people";
+import { PartnerCategoryBadge } from "./badges";
+import { Seg } from "./seg";
 
 const DEFAULT_REASON = "We already have a partner covering this region and segment.";
+const CATEGORY_OPTIONS: readonly string[] = PARTNER_CATEGORIES.map((c) => PARTNER_CATEGORY_LABEL[c]);
+const REGION_OPTIONS: readonly string[] = PARTNER_REGIONS.map((r) => PARTNER_REGION_LABEL[r]);
 
 interface ApplicationsTableProps {
-  applications: readonly Application[];
+  applications: readonly ApplicationDto[];
   waiting: number;
-  onApprove: (application: Application) => void;
-  onDecline: (application: Application, reason: string) => void;
-  onUndo: (application: Application) => void;
+  /** Only partner managers decide; other staff see the queue read-only. */
+  canDecide: boolean;
+  onApprove: (application: ApplicationDto, choice: { category: PartnerCategory; region: PartnerRegion }) => void;
+  onDecline: (application: ApplicationDto, reason: string) => void;
+  onUndo: (application: ApplicationDto) => void;
 }
 
 /** Icon row action, same markup as ActButton but able to carry a tour anchor. */
@@ -49,22 +64,47 @@ function RowAction({
 export function ApplicationsTable({
   applications,
   waiting,
+  canDecide,
   onApprove,
   onDecline,
   onUndo,
 }: ApplicationsTableProps): React.JSX.Element {
   const [rejectingId, setRejectingId] = useState<string | null>(null);
+  const [approvingId, setApprovingId] = useState<string | null>(null);
   const [reason, setReason] = useState(DEFAULT_REASON);
   const [reasonTried, setReasonTried] = useState(false);
-  const firstOpenId = applications.find((a) => a.status === "New")?.id;
+  const [categoryLabel, setCategoryLabel] = useState<string>(PARTNER_CATEGORY_LABEL.channel);
+  const [regionLabel, setRegionLabel] = useState<string>(PARTNER_REGION_LABEL.india);
+  const firstOpenId = applications.find((a) => a.status === "new")?.id;
 
   const startReject = (id: string): void => {
+    setApprovingId(null);
     setRejectingId(id);
     setReason(DEFAULT_REASON);
     setReasonTried(false);
   };
 
-  const confirmReject = (application: Application): void => {
+  const startApprove = (application: ApplicationDto): void => {
+    // A portal application already carries a category and region; a website entry needs the manager to set them.
+    if (application.category && application.region) {
+      onApprove(application, { category: application.category, region: application.region });
+      return;
+    }
+    setRejectingId(null);
+    setApprovingId(application.id);
+    setCategoryLabel(application.category ? PARTNER_CATEGORY_LABEL[application.category] : PARTNER_CATEGORY_LABEL.channel);
+    setRegionLabel(application.region ? PARTNER_REGION_LABEL[application.region] : PARTNER_REGION_LABEL.india);
+  };
+
+  const confirmApprove = (application: ApplicationDto): void => {
+    const category = codeFromLabel(PARTNER_CATEGORY_LABEL, categoryLabel);
+    const region = codeFromLabel(PARTNER_REGION_LABEL, regionLabel);
+    if (!category || !region) return;
+    setApprovingId(null);
+    onApprove(application, { category, region });
+  };
+
+  const confirmReject = (application: ApplicationDto): void => {
     if (!reason.trim()) {
       setReasonTried(true);
       return;
@@ -97,7 +137,8 @@ export function ApplicationsTable({
           </thead>
           <tbody>
             {applications.map((a) => {
-              const rejecting = rejectingId === a.id && a.status === "New";
+              const rejecting = rejectingId === a.id && a.status === "new";
+              const approving = approvingId === a.id && a.status === "new";
               return (
                 <Fragment key={a.id}>
                   <tr>
@@ -105,21 +146,24 @@ export function ApplicationsTable({
                       <span className="li-t">
                         <span style={{ fontWeight: 600 }}>{a.company}</span>
                         <span className="li-s">{a.domain}</span>
+                        <span style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 2 }}>
+                          <Badge tone="neutral">{a.source === "website" ? "Website form" : "Portal form"}</Badge>
+                          {a.personalEmail ? <Badge tone="pending">Personal email</Badge> : null}
+                          {a.existingDomain ? <Badge tone="violet">Domain already a partner</Badge> : null}
+                        </span>
                       </span>
                     </td>
                     <td>
                       <span className="li-t">
-                        <span>{a.applicant}</span>
-                        <span className="li-s">{a.role}</span>
+                        <span>{a.applicantName}</span>
+                        <span className="li-s">{a.role ?? a.email}</span>
                       </span>
                     </td>
-                    <td>
-                      <CategoryBadge category={a.category} />
-                    </td>
-                    <td className="t-sec">{a.region}</td>
-                    <td className="tnum t-sec">{a.submitted}</td>
+                    <td>{a.category ? <PartnerCategoryBadge category={a.category} /> : <span className="t-muted">Not set</span>}</td>
+                    <td className="t-sec">{a.region ? PARTNER_REGION_LABEL[a.region] : <span className="t-muted">Not set</span>}</td>
+                    <td className="tnum t-sec">{fmtLong(a.submittedAt)}</td>
                     <td className="r">
-                      {a.status === "New" && !rejecting ? (
+                      {a.status === "new" && !rejecting && !approving && canDecide ? (
                         <span className="acts">
                           <RowAction
                             label={`Reject ${a.company}`}
@@ -133,27 +177,30 @@ export function ApplicationsTable({
                             tip="Approve and send the invite"
                             tone="ok"
                             icon="check"
-                            onClick={() => onApprove(a)}
+                            onClick={() => startApprove(a)}
                             {...(a.id === firstOpenId ? { tour: "application-approve" } : {})}
                           />
                         </span>
                       ) : null}
-                      {a.status === "New" && rejecting ? <Badge tone="neutral">Add a reason below</Badge> : null}
-                      {a.status !== "New" ? (
+                      {a.status === "new" && rejecting ? <Badge tone="neutral">Add a reason below</Badge> : null}
+                      {a.status === "new" && approving ? <Badge tone="neutral">Choose below</Badge> : null}
+                      {a.status !== "new" ? (
                         <span style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
-                          {a.status === "Approved" ? (
+                          {a.status === "approved" ? (
                             <Badge tone="accepted">Approved, invite sent</Badge>
                           ) : (
                             <Badge tone="rejected">Rejected, emailed</Badge>
                           )}
-                          <button
-                            type="button"
-                            className="btn btn-g"
-                            onClick={() => onUndo(a)}
-                            style={{ height: 24, padding: "0 6px", fontSize: 12 }}
-                          >
-                            Undo
-                          </button>
+                          {canDecide ? (
+                            <button
+                              type="button"
+                              className="btn btn-g"
+                              onClick={() => onUndo(a)}
+                              style={{ height: 24, padding: "0 6px", fontSize: 12 }}
+                            >
+                              Undo
+                            </button>
+                          ) : null}
                         </span>
                       ) : null}
                     </td>
@@ -162,7 +209,7 @@ export function ApplicationsTable({
                     <td colSpan={6} style={{ paddingTop: 0, whiteSpace: "normal" }}>
                       <div className="note note-violet">
                         <span>
-                          <b>Why they want to partner:</b> {a.reason}
+                          <b>Why they want to partner:</b> {a.reason ?? "Not given."}
                           {a.declineReason ? (
                             <>
                               <br />
@@ -173,6 +220,43 @@ export function ApplicationsTable({
                       </div>
                     </td>
                   </tr>
+                  {approving ? (
+                    <tr>
+                      <td colSpan={6} style={{ paddingTop: 0, whiteSpace: "normal" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: 12,
+                            alignItems: "flex-end",
+                            flexWrap: "wrap",
+                            padding: "8px 10px",
+                            borderRadius: 7,
+                            background: "#FCFCFD",
+                            border: "1px solid #F0EFF4",
+                          }}
+                        >
+                          <div className="fg">
+                            <span id={`aa-cat-${a.id}`} className="lbl">
+                              Partner type
+                            </span>
+                            <Seg options={CATEGORY_OPTIONS} value={categoryLabel} onChange={setCategoryLabel} labelledBy={`aa-cat-${a.id}`} />
+                          </div>
+                          <div className="fg">
+                            <span id={`aa-reg-${a.id}`} className="lbl">
+                              Region
+                            </span>
+                            <Seg options={REGION_OPTIONS} value={regionLabel} onChange={setRegionLabel} labelledBy={`aa-reg-${a.id}`} />
+                          </div>
+                          <button type="button" className="btn btn-s" onClick={() => setApprovingId(null)}>
+                            Cancel
+                          </button>
+                          <button type="button" className="btn btn-p" onClick={() => confirmApprove(a)}>
+                            Approve and send invite
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : null}
                   {rejecting ? (
                     <tr>
                       <td colSpan={6} style={{ paddingTop: 0, whiteSpace: "normal" }}>

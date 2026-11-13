@@ -12,23 +12,35 @@ import { CATEGORY_FOR_FILTER, type CategoryFilter, PartnersTable } from "@/compo
 import { useToast } from "@/components/ui/toast";
 import {
   addPartner,
-  approveApplication,
-  declineApplication,
   type NewPartnerInput,
   partnersSlice,
-  reopenApplication,
   resendInvites,
   setPartnerCategory,
   setPartnerManager,
   setPartnerSuspended,
   UNLISTED_ACTIVE_PARTNERS,
 } from "@/data/partners";
+import type { ApplicationDto } from "@/lib/dto";
+import type { ActionResult } from "@/server/actions/result";
+import {
+  approveApplicationAction,
+  declineApplicationAction,
+  reopenApplicationAction,
+} from "@/server/actions/applications";
 
 type Tab = "Partners" | "Applications";
 
-export function AdminPartners(): React.JSX.Element {
+interface AdminPartnersProps {
+  applications: ApplicationDto[];
+  /** Applications with status new, from countNewApplications. */
+  waiting: number;
+  /** Partner managers decide on applications; other staff see the list. */
+  canDecide: boolean;
+}
+
+export function AdminPartners({ applications, waiting, canDecide }: AdminPartnersProps): React.JSX.Element {
   const toast = useToast();
-  const { partners, applications } = partnersSlice.use();
+  const { partners } = partnersSlice.use();
   const [tab, setTab] = useState<Tab>("Partners");
   const requestedTab = useSearchParams().get("tab");
   useEffect(() => {
@@ -54,7 +66,11 @@ export function AdminPartners(): React.JSX.Element {
   const active = UNLISTED_ACTIVE_PARTNERS + partners.filter((p) => p.status === "Active").length;
   const onboarding = partners.filter((p) => p.status === "Onboarding").length;
   const inactive = partners.filter((p) => p.status === "Inactive").length;
-  const waiting = applications.filter((a) => a.status === "New").length;
+
+  const report = async (result: Promise<ActionResult<unknown>>, success: string): Promise<void> => {
+    const done = await result;
+    toast(done.ok ? success : done.error.message);
+  };
 
   const exportCsv = (): void => {
     downloadCsv(
@@ -181,18 +197,20 @@ export function AdminPartners(): React.JSX.Element {
             <ApplicationsTable
               applications={applications}
               waiting={waiting}
-              onApprove={(a) => {
-                approveApplication(a.id);
-                toast(`Approved ${a.company}. Invite sent to ${a.applicant}`);
-              }}
-              onDecline={(a, reason) => {
-                declineApplication(a.id, reason);
-                toast(`Rejected ${a.company}. ${a.applicant} has been emailed`);
-              }}
-              onUndo={(a) => {
-                reopenApplication(a.id);
-                toast(`${a.company} is back in the queue`);
-              }}
+              canDecide={canDecide}
+              onApprove={(a, choice) =>
+                void report(
+                  approveApplicationAction({ id: a.id, category: choice.category, region: choice.region }),
+                  `Approved ${a.company}. Invite sent to ${a.applicantName}`,
+                )
+              }
+              onDecline={(a, reason) =>
+                void report(
+                  declineApplicationAction({ id: a.id, reason }),
+                  `Rejected ${a.company}. ${a.applicantName} has been emailed`,
+                )
+              }
+              onUndo={(a) => void report(reopenApplicationAction({ id: a.id }), `${a.company} is back in the queue`)}
             />
           )}
         </section>

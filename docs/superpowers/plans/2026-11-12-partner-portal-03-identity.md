@@ -2577,7 +2577,7 @@ Interim state: after this task the Applications tab is real while the Partners t
 - Create: `src/server/actions/applications.ts`, `src/server/actions/applications.test.ts`
 - Modify: `src/components/partners/badges.tsx`, `src/components/partners/applications-table.tsx`, `src/components/screens/AdminPartners.tsx`, `src/app/admin/partners/page.tsx`
 
-- [ ] **Step 1: Write the failing invite-core test**
+- [x] **Step 1: Write the failing invite-core test**
 
 Create `src/server/invite-core.test.ts`:
 
@@ -2673,7 +2673,7 @@ describe('toInviteDto', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/invite-core.test.ts`
 Expected: FAIL, `Failed to resolve import "./invite-core"`.
 
-- [ ] **Step 2: Implement `invite-core.ts`**
+- [x] **Step 2: Implement `invite-core.ts`**
 
 Create `src/server/invite-core.ts` (not under `repo/`, so it needs no isolation entry; it is called only by repo functions that already run in a viewer or system transaction):
 
@@ -2767,7 +2767,7 @@ export async function rotateInviteToken(tx: Tx, inviteId: string, clock: Clock):
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/invite-core.test.ts`
 Expected: PASS, 7 tests.
 
-- [ ] **Step 3: Write the failing routing test**
+- [x] **Step 3: Write the failing routing test**
 
 Create `src/server/partner-routing.test.ts`:
 
@@ -2830,7 +2830,7 @@ describe('insertOnboardingPartner', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/partner-routing.test.ts`
 Expected: FAIL, `Failed to resolve import "./partner-routing"`.
 
-- [ ] **Step 4: Implement partner routing**
+- [x] **Step 4: Implement partner routing**
 
 Create `src/server/partner-routing.ts`:
 
@@ -2901,7 +2901,7 @@ export async function insertOnboardingPartner(tx: Tx, input: NewOnboardingPartne
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/partner-routing.test.ts`
 Expected: PASS, 6 tests.
 
-- [ ] **Step 5: Write the failing partner rows test**
+- [x] **Step 5: Write the failing partner rows test**
 
 Create `src/server/partner-rows.test.ts`:
 
@@ -2989,7 +2989,7 @@ describe('partnerListRows', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/partner-rows.test.ts`
 Expected: FAIL, `Failed to resolve import "./partner-rows"`.
 
-- [ ] **Step 6: Implement the partner rows builder**
+- [x] **Step 6: Implement the partner rows builder**
 
 Create `src/server/partner-rows.ts`:
 
@@ -3130,7 +3130,7 @@ export async function partnerListRows(tx: Tx, filter: PartnerRowFilter): Promise
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/partner-rows.test.ts`
 Expected: PASS, 4 tests.
 
-- [ ] **Step 7: Write the failing repo tests for review**
+- [x] **Step 7: Write the failing repo tests for review**
 
 Append to `src/server/repo/applications.test.ts`. Extend the imports: from `@/db/schema` add `invites, partners`; from `@/db/test-helpers` add `asPartner, asStaff`; from `./applications` add `approveApplication, countNewApplications, declineApplication, getApplication, listApplications, reopenApplication`; add `import { eq } from 'drizzle-orm';`, `import { hashToken, INVITE_TTL_DAYS } from '@/server/auth/tokens';` and replace the existing `import { withSystem } from './context';` with `import { type Tx, withSystem, withViewer } from './context';`. Then append:
 
@@ -3258,7 +3258,7 @@ describe('reopenApplication', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/applications.test.ts`
 Expected: FAIL, the new imports are not exported by `./applications`.
 
-- [ ] **Step 8: Implement the review functions**
+- [x] **Step 8: Implement the review functions**
 
 In `src/server/repo/applications.ts` replace the import block at the top with:
 
@@ -3507,7 +3507,7 @@ Add `import { systemClock } from '@/lib/clock';` to the import block (next to th
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/applications.test.ts src/server/repo/isolation.test.ts`
 Expected: PASS (applications: 22 tests; the isolation test passes for `applications` because every export is registered).
 
-- [ ] **Step 9: Add the shared result type**
+- [x] **Step 9: Add the shared result type**
 
 In `src/lib/apply.ts` add `import type { ApplicationDto, PartnerListRow } from '@/lib/dto';` under the existing import, then append:
 
@@ -3796,7 +3796,7 @@ export async function reopenApplicationAction(raw: unknown): Promise<ActionResul
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/applications.test.ts`
 Expected: PASS, 8 tests.
 
-- [ ] **Step 12: Add code-based badge wrappers**
+- [x] **Step 12: Add code-based badge wrappers**
 
 In `src/components/partners/badges.tsx` add this line to the import block at the top:
 
@@ -3819,7 +3819,7 @@ export function PartnerStatusBadge({ status }: { status: PartnerStatusCode }): R
 
 The label strings of `PARTNER_CATEGORY_LABEL` ("Distributor", "Channel partner", "System integrator") and `PARTNER_STATUS_LABEL` ("Active", "Onboarding", "Inactive", "Suspended") equal the mock's unions, so they type-check against `PartnerCategory` and `PartnerStatus` from `@/data/partners`.
 
-- [ ] **Step 13: Replace `applications-table.tsx`**
+- [x] **Step 13: Replace `applications-table.tsx`**
 
 Replace `src/components/partners/applications-table.tsx` in full. Changes from the mock: DTO input, `fmtLong` for the date, a "Website form" or "Portal form" chip plus "Personal email" and "Domain already a partner" badges, the Approve button opens a category and region panel when the application has none, and the actions are only shown to a viewer who may decide.
 
@@ -4145,7 +4145,7 @@ export function ApplicationsTable({
 }
 ```
 
-- [ ] **Step 14: Convert the Applications tab in `AdminPartners.tsx`**
+- [x] **Step 14: Convert the Applications tab in `AdminPartners.tsx`**
 
 Edit `src/components/screens/AdminPartners.tsx`.
 
@@ -4271,7 +4271,7 @@ After:
             />
 ```
 
-- [ ] **Step 15: Load the applications in the page**
+- [x] **Step 15: Load the applications in the page**
 
 Replace `src/app/admin/partners/page.tsx` in full. At this stage it passes the Applications tab data; M4.1 extends it with the partner list.
 
@@ -4303,12 +4303,12 @@ export default async function Page(): Promise<React.JSX.Element> {
 }
 ```
 
-- [ ] **Step 16: Prove the Applications tab has no slice left**
+- [x] **Step 16: Prove the Applications tab has no slice left**
 
 Run: `grep -n "approveApplication\|declineApplication\|reopenApplication\|\.applications" src/components/screens/AdminPartners.tsx src/components/partners/applications-table.tsx`
 Expected: only the three `...ApplicationAction` imports and calls and the `applications` prop; no import from `@/data/partners` of those functions.
 
-- [ ] **Step 17: Gate A**
+- [x] **Step 17: Gate A**
 
 Run the Gate A block. The last command must list only the files in this task's Files block plus `src/server/repo/applications.test.ts`.
 
@@ -4321,7 +4321,7 @@ Run the Gate A block. The last command must list only the files in this task's F
 5. Reject "Nair Security Consulting" with the default reason: toast, row shows "Rejected, emailed", the dev email log line shows an email was built for the applicant.
 6. Sign in as `rahul.menon@cleanstart.com` (staff sales): the tab loads but the Approve and Reject buttons are absent.
 
-- [ ] **Step 19: Commit**
+- [x] **Step 19: Commit**
 
 ```bash
 git add apps/portal/src/server/invite-core.ts apps/portal/src/server/invite-core.test.ts \

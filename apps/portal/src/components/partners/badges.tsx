@@ -2,6 +2,7 @@ import type { IconName } from "@/components/icon-paths";
 import { Icon } from "@/components/icon";
 import { Badge, type BadgeTone, type Product } from "@/components/ui/badge";
 import type { PartnerCategory, PartnerDealStatus, PartnerStatus } from "@/data/partners";
+import { PARTNER_CATEGORY_LABEL, PARTNER_STATUS_LABEL, type PartnerCategory as PartnerCategoryCode, type PartnerStatus as PartnerStatusCode } from "@/lib/domain";
 
 const CATEGORY_TONE: Record<PartnerCategory, BadgeTone> = {
   Distributor: "violet",
@@ -50,4 +51,13 @@ export function ProductMark({ product }: { product: Product }): React.JSX.Elemen
       <Icon name={mark.icon} />
     </span>
   );
+}
+
+/** Same badges, fed with the stored codes instead of the mock's display strings. */
+export function PartnerCategoryBadge({ category }: { category: PartnerCategoryCode }): React.JSX.Element {
+  return <CategoryBadge category={PARTNER_CATEGORY_LABEL[category] as PartnerCategory} />;
+}
+
+export function PartnerStatusBadge({ status }: { status: PartnerStatusCode }): React.JSX.Element {
+  return <StatusBadge status={PARTNER_STATUS_LABEL[status] as PartnerStatus} />;
 }
