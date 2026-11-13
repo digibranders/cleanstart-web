@@ -6,7 +6,7 @@ import { withViewer } from "@/server/repo/context";
 import { listRegistrations } from "@/server/repo/registrations";
 import { listManagerOptions } from "@/server/repo/staff";
 
-export const metadata: Metadata = { title: "Register a deal" };
+export const metadata: Metadata = { title: "Register deal" };
 
 export default async function Page(): Promise<React.JSX.Element> {
   const viewer = await requireCan("registration.create");

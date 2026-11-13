@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addDays, businessDaysBetween, daysBetween, daysLeft, fmtLong, fmtShort, fmtTimestamp, plural } from './dates';
+import { addDays, businessDaysBetween, daysBetween, daysLeft, daysLeftLabel, fmtLong, fmtShort, fmtTimestamp, plural } from './dates';
 
 describe('dates', () => {
   it('counts and adds calendar days across a month and a year end', () => {
@@ -9,10 +9,23 @@ describe('dates', () => {
   });
 
   it('formats short and long dates and plurals', () => {
-    expect(fmtShort('2026-11-04')).toBe('4 Nov');
     expect(fmtLong('2026-11-04')).toBe('4 Nov 2026');
     expect(plural(1, 'day')).toBe('1 day');
     expect(plural(3, 'day')).toBe('3 days');
+  });
+
+  it('leaves the year off a short date in the current year and adds it in any other', () => {
+    expect(fmtShort('2026-11-04', '2026-11-13')).toBe('4 Nov');
+    expect(fmtShort('2025-05-28', '2026-11-13')).toBe('28 May 2025');
+    expect(fmtShort('2027-01-12', '2026-11-13')).toBe('12 Jan 2027');
+    expect(fmtShort(`${new Date().getUTCFullYear()}-03-02`)).toBe('2 Mar');
+  });
+
+  it('words the days left under a protection date', () => {
+    expect(daysLeftLabel(60)).toBe('60 days left');
+    expect(daysLeftLabel(1)).toBe('1 day left');
+    expect(daysLeftLabel(0)).toBe('Ends today');
+    expect(daysLeftLabel(-3)).toBe('Ended');
   });
 
   it('gives days left, negative once the date has passed', () => {
@@ -30,5 +43,6 @@ describe('dates', () => {
     expect(fmtTimestamp('2026-11-06T14:02:00.000Z', '2026-11-06')).toBe('Today, 14:02');
     expect(fmtTimestamp('2026-11-05T16:40:00.000Z', '2026-11-06')).toBe('Yesterday, 16:40');
     expect(fmtTimestamp('2026-10-29T10:12:00.000Z', '2026-11-06')).toBe('29 Oct, 10:12');
+    expect(fmtTimestamp('2025-10-29T10:12:00.000Z', '2026-11-06')).toBe('29 Oct 2025, 10:12');
   });
 });

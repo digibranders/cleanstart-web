@@ -23,7 +23,7 @@ type Tab = (typeof TABS)[number];
 
 const ALL_PRODUCTS = "All products";
 const ALL_REGIONS = "All regions";
-const ANY_MANAGER = "Any account manager";
+const ANY_MANAGER = "Any partner manager";
 const PRODUCT_OPTIONS = [ALL_PRODUCTS, "CleanStart Images", "Clean Libraries", "CleanSight"];
 const REGION_OPTIONS = [ALL_REGIONS, "India", "Middle East"];
 function protectionText(deal: RegistrationListItem, today: string): string {
@@ -74,7 +74,7 @@ export function Deals({ deals, today, partnerManager, senderEmail }: DealsProps)
 
   const exportCsv = (): void => {
     downloadCsv("deals.csv", [
-      ["Customer", "Product", "Status", "Stage", "Account manager", "Registered by", "Registered", "Protection"],
+      ["Customer", "Product", "Status", "Stage", "Partner manager", "Registered by", "Registered", "Protection"],
       ...rows.map((d) => [
         d.customer,
         PRODUCT_LABEL[d.product],
@@ -154,7 +154,7 @@ export function Deals({ deals, today, partnerManager, senderEmail }: DealsProps)
                 <Dropdown id="fr" ariaLabel="Region" value={region} options={REGION_OPTIONS} onChange={setRegion} />
                 <Dropdown
                   id="fm"
-                  ariaLabel="Account manager"
+                  ariaLabel="Partner manager"
                   value={manager}
                   options={managerOptions}
                   onChange={setManager}
@@ -189,7 +189,7 @@ export function Deals({ deals, today, partnerManager, senderEmail }: DealsProps)
                       Stage
                     </th>
                     <th scope="col" className="hide-sm">
-                      Account manager
+                      Partner manager
                     </th>
                     <th scope="col" className="hide-sm">
                       Registered by

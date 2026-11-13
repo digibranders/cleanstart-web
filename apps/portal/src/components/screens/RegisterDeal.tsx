@@ -466,7 +466,7 @@ export function RegisterDeal({ mine, managers, partnerName, today }: RegisterDea
                     </div>
                     <div className="fg">
                       <label htmlFor="am" className="lbl">
-                        Account manager
+                        Partner manager
                       </label>
                       <Dropdown
                         id="am"

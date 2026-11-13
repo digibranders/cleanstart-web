@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { sendManagerMessageAction } from "@/server/actions/partners";
 import { Icon } from "../icon";
 import { Drawer } from "../ui/overlay";
@@ -28,11 +28,6 @@ export function ManagerMessageDrawer({
   const invalid = tried && !body.trim();
   const bodyRef = useRef<HTMLTextAreaElement>(null);
 
-  // The subject is already filled in, so the cursor belongs in the message. This runs after the drawer's own focus move.
-  useEffect(() => {
-    bodyRef.current?.focus();
-  }, []);
-
   const send = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
     if (!body.trim()) {
@@ -58,6 +53,7 @@ export function ManagerMessageDrawer({
       subtitle={`Your CleanStart partner manager, ${manager.team.replace("CleanStart ", "")}. Replies come to your email.`}
       lead={<span className="av av-2">{initialsOf(manager.name)}</span>}
       onSubmit={send}
+      initialFocus={bodyRef}
       footer={
         <>
           <span className="hint">Sent from {senderEmail}</span>
