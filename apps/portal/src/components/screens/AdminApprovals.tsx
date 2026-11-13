@@ -88,9 +88,13 @@ export function AdminApprovals({ queue, viewerId, viewerRegion, managers, today 
   useEffect(() => {
     if (!waitingIds) return;
     let cancelled = false;
-    void hubspotConflictHintsAction({ ids: waitingIds.split(",").slice(0, HINT_LIMIT) }).then((result) => {
-      if (!cancelled && result.ok) setHints(result.data);
-    });
+    hubspotConflictHintsAction({ ids: waitingIds.split(",").slice(0, HINT_LIMIT) })
+      .then((result) => {
+        if (!cancelled && result.ok) setHints(result.data);
+      })
+      .catch(() => {
+        if (!cancelled) setHints({});
+      });
     return () => {
       cancelled = true;
     };

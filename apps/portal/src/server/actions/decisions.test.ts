@@ -94,6 +94,20 @@ describe('acceptRegistrationAction', () => {
   });
 });
 
+describe('simultaneous decisions', () => {
+  it('give exactly one success and one already_decided, and one outbox row', async () => {
+    const { farhan, reg } = await setup();
+    session.viewer = farhan;
+    const results = await Promise.all([acceptRegistrationAction({ id: reg.id }), rejectRegistrationAction({ id: reg.id, reason: 'Duplicate.' })]);
+    expect(results.filter((r) => r.ok)).toHaveLength(1);
+    const failed = results.find((r) => !r.ok);
+    expect(failed).toMatchObject({ ok: false, error: { code: 'conflict' } });
+    expect(failed && !failed.ok && failed.error.message).toContain('already decided');
+    const outbox = await db.select().from(hubspotOutbox);
+    expect(outbox.length).toBeLessThanOrEqual(1);
+  });
+});
+
 describe('rejectRegistrationAction', () => {
   it('needs a reason, then rejects with the reason in the audit entry, the notification and the email', async () => {
     const { farhan, sales, reg } = await setup();

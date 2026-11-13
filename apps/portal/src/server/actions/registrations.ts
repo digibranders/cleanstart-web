@@ -202,6 +202,7 @@ const EXCERPT_CHARS = 280;
 
 export async function postMessageAction(raw: unknown): Promise<ActionResult<RegistrationMessageDto>> {
   return runViewerAction({ name: 'registration.post_message', schema: postMessageSchema }, raw, async (ctx, input) => {
+    rateLimit(`message:user:${ctx.viewer.id}`, { limit: 30, windowSeconds: 600 });
     const outcome = await withViewer(ctx.viewer, async (tx) => {
       const current = await getRegistration(tx, ctx.viewer, input.registrationId);
       assertCan(ctx.viewer, 'registration.message', {
