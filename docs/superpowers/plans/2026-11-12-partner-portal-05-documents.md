@@ -98,7 +98,7 @@ Master plan task 3.1. Covers the `FileStorage` interface, the R2 adapter (presig
 
 **Gate A (this task):** the standard block in the last step of this task, all green, plus the isolation matrix (`src/server/repo/isolation.test.ts`) picking up `documents.ts` with both functions registered. **Gate B:** an independent reviewer with the handoff checklist, with extra attention to: the route never returns an R2 key, a missing id and a forbidden id are byte-identical 404s, the open is recorded only for partner viewers, no R2 call inside a transaction.
 
-- [ ] **Step 1: Write the failing R2 adapter test**
+- [x] **Step 1: Write the failing R2 adapter test**
 
 This test is also the verification of contracts unknown 13: it runs the real SDK presigner offline (no network, fake credentials) and pins the request shape.
 
@@ -237,12 +237,12 @@ describe('createFileStorage', () => {
 });
 ```
 
-- [ ] **Step 2: Run it and see it fail**
+- [x] **Step 2: Run it and see it fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/r2.test.ts`
 Expected: FAIL with `Failed to resolve import "./r2" from "src/server/files/r2.test.ts". Does the file exist?`
 
-- [ ] **Step 3: Create the storage interface**
+- [x] **Step 3: Create the storage interface**
 
 Create `apps/portal/src/server/files/storage.ts` (verbatim from contracts H.14):
 
@@ -270,7 +270,7 @@ export interface FileStorage {
 }
 ```
 
-- [ ] **Step 4: Create the R2 adapter**
+- [x] **Step 4: Create the R2 adapter**
 
 Create `apps/portal/src/server/files/r2.ts`:
 
@@ -418,12 +418,12 @@ export function createFileStorage(): FileStorage {
 }
 ```
 
-- [ ] **Step 5: Run the adapter test and see it pass**
+- [x] **Step 5: Run the adapter test and see it pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/r2.test.ts`
 Expected: PASS. If the `X-Amz-SignedHeaders` or checksum assertions fail on a newer SDK, that is the unknown-13 fallback: sign `PutObjectCommand` without `ContentLength` (drop `content-length` from the expected header list), keep the `head()` size check in `verifyUpload`, and record the change in the progress log. If the `Résumé` case differs only in the underscore count, the test and `asciiOnly` are the source of truth: one underscore per non-ASCII code point.
 
-- [ ] **Step 6: Write the failing fake test**
+- [x] **Step 6: Write the failing fake test**
 
 Create `apps/portal/src/server/files/fake.test.ts`:
 
@@ -470,12 +470,12 @@ describe('FakeFileStorage', () => {
 });
 ```
 
-- [ ] **Step 7: Run it and see it fail**
+- [x] **Step 7: Run it and see it fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/fake.test.ts`
 Expected: FAIL with `Failed to resolve import "./fake"`.
 
-- [ ] **Step 8: Create FakeFileStorage**
+- [x] **Step 8: Create FakeFileStorage**
 
 Create `apps/portal/src/server/files/fake.ts`:
 
@@ -557,12 +557,12 @@ export const fakeRangeFetch =
   };
 ```
 
-- [ ] **Step 9: Run the fake test and see it pass**
+- [x] **Step 9: Run the fake test and see it pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/fake.test.ts`
 Expected: PASS, 3 tests.
 
-- [ ] **Step 10: Write the failing repo test for the open functions (the 404 rule at the data layer)**
+- [x] **Step 10: Write the failing repo test for the open functions (the 404 rule at the data layer)**
 
 Create `apps/portal/src/server/repo/documents.open.test.ts`:
 
@@ -660,12 +660,12 @@ describe('recordDocumentOpen', () => {
 });
 ```
 
-- [ ] **Step 11: Run it and see it fail**
+- [x] **Step 11: Run it and see it fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/documents.open.test.ts`
 Expected: FAIL with `Failed to resolve import "./documents"`.
 
-- [ ] **Step 12: Create the repo file with the two open functions**
+- [x] **Step 12: Create the repo file with the two open functions**
 
 Create `apps/portal/src/server/repo/documents.ts` (M3.2 replaces this file with the complete version, which contains these two functions unchanged):
 
@@ -742,17 +742,17 @@ export const isolation = defineIsolation<'getDocumentForOpen' | 'recordDocumentO
 });
 ```
 
-- [ ] **Step 13: Run the repo test and see it pass**
+- [x] **Step 13: Run the repo test and see it pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/documents.open.test.ts`
 Expected: PASS, 8 tests.
 
-- [ ] **Step 14: Run the isolation matrix and see `documents` picked up**
+- [x] **Step 14: Run the isolation matrix and see `documents` picked up**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/isolation.test.ts -t documents`
 Expected: PASS, the two `documents` cases (`registers every exported function in isolation`, `leaks nothing across tenants`).
 
-- [ ] **Step 15: Write the failing route handler test**
+- [x] **Step 15: Write the failing route handler test**
 
 Create `apps/portal/src/server/files/open-route.test.ts`:
 
@@ -830,12 +830,12 @@ describe('handleFileOpen', () => {
 });
 ```
 
-- [ ] **Step 16: Run it and see it fail**
+- [x] **Step 16: Run it and see it fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/open-route.test.ts`
 Expected: FAIL with `Failed to resolve import "./open-route"`.
 
-- [ ] **Step 17: Create the handler and the instance getter**
+- [x] **Step 17: Create the handler and the instance getter**
 
 Create `apps/portal/src/server/files/open-route.ts`:
 
@@ -906,12 +906,12 @@ export function getFileStorage(): FileStorage {
 }
 ```
 
-- [ ] **Step 18: Run the handler test and see it pass**
+- [x] **Step 18: Run the handler test and see it pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/open-route.test.ts`
 Expected: PASS, 4 tests.
 
-- [ ] **Step 19: Write the failing route test (signed out and rate limit)**
+- [x] **Step 19: Write the failing route test (signed out and rate limit)**
 
 Create `apps/portal/src/app/api/files/[id]/route.test.ts`:
 
@@ -962,12 +962,12 @@ describe('GET /api/files/[id]', () => {
 });
 ```
 
-- [ ] **Step 20: Run it and see it fail**
+- [x] **Step 20: Run it and see it fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run "src/app/api/files/[id]/route.test.ts"`
 Expected: FAIL with `Failed to resolve import "./route"`.
 
-- [ ] **Step 21: Create the route**
+- [x] **Step 21: Create the route**
 
 Create `apps/portal/src/app/api/files/[id]/route.ts`:
 
@@ -1002,12 +1002,12 @@ export async function GET(request: Request, ctx: { params: Promise<{ id: string 
 }
 ```
 
-- [ ] **Step 22: Run the route test and see it pass**
+- [x] **Step 22: Run the route test and see it pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run "src/app/api/files/[id]/route.test.ts"`
 Expected: PASS, 3 tests.
 
-- [ ] **Step 23: Run Gate A**
+- [x] **Step 23: Run Gate A**
 
 Run from the track worktree (the byte escapes stand for the em-dash and en-dash characters, so this plan stays free of them):
 
@@ -1036,7 +1036,7 @@ Expected: lint, typecheck, test and build exit 0; the dash grep prints nothing; 
 5. `curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' http://localhost:3234/api/files/<any id>` with no cookie. Expected: `302` to `/sign-in?next=%2Fapi%2Ffiles%2F<id>`.
 6. `PGOPTIONS='-c app.kind=system' psql "$DATABASE_URL" -c "select count(*) from document_opens"` is unchanged after steps 3 and 5 and grows by one only after a `302` for a partner.
 
-- [ ] **Step 25: Commit**
+- [x] **Step 25: Commit**
 
 ```bash
 git add apps/portal/src/server/files/storage.ts apps/portal/src/server/files/r2.ts apps/portal/src/server/files/r2.test.ts apps/portal/src/server/files/fake.ts apps/portal/src/server/files/fake.test.ts apps/portal/src/server/files/instance.ts apps/portal/src/server/files/open-route.ts apps/portal/src/server/files/open-route.test.ts apps/portal/src/server/repo/documents.ts apps/portal/src/server/repo/documents.open.test.ts "apps/portal/src/app/api/files/[id]/route.ts" "apps/portal/src/app/api/files/[id]/route.test.ts" docs/superpowers/plans/2026-11-12-partner-portal-05-documents.md
@@ -1070,7 +1070,7 @@ Master plan task 3.2. Covers `rules.canPartnerOpen` moved from the mock, `repo/d
 
 #### Part A: the pure rules
 
-- [ ] **Step 1: Write the failing rules test**
+- [x] **Step 1: Write the failing rules test**
 
 Create `apps/portal/src/server/files/rules.test.ts`:
 
@@ -1220,12 +1220,12 @@ describe('audienceLabel', () => {
 });
 ```
 
-- [ ] **Step 2: Run it and see it fail**
+- [x] **Step 2: Run it and see it fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/rules.test.ts`
 Expected: FAIL with `Failed to resolve import "./rules"`.
 
-- [ ] **Step 3: Create `rules.ts`**
+- [x] **Step 3: Create `rules.ts`**
 
 Create `apps/portal/src/server/files/rules.ts`. This module is pure and client safe on purpose (no `node:` imports, no database, no env): client components import `formatLabel`, `audienceLabel` and `UPLOAD_ACCEPT` from it.
 
@@ -1383,14 +1383,14 @@ export function assertUploadAllowed(input: { size: number; mime: string; origina
 }
 ```
 
-- [ ] **Step 4: Run the rules test and see it pass**
+- [x] **Step 4: Run the rules test and see it pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/rules.test.ts`
 Expected: PASS (every `it` and `it.each` row in the file).
 
 #### Part B: the repository
 
-- [ ] **Step 5: Write the failing repository test**
+- [x] **Step 5: Write the failing repository test**
 
 Create `apps/portal/src/server/repo/documents.test.ts`:
 
@@ -1724,12 +1724,12 @@ describe('listAudiencePartners and listMaterialRequestRecipients', () => {
 });
 ```
 
-- [ ] **Step 6: Run it and see it fail**
+- [x] **Step 6: Run it and see it fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/documents.test.ts`
 Expected: FAIL. `createDocument`, `listDocuments` and the other new exports are not defined by the M3.1 version of `documents.ts`, so the first test reports `TypeError: listDocuments is not a function`.
 
-- [ ] **Step 7: Replace `repo/documents.ts` with the complete file**
+- [x] **Step 7: Replace `repo/documents.ts` with the complete file**
 
 Replace the whole of `apps/portal/src/server/repo/documents.ts` with the following. `getDocumentForOpen` and `recordDocumentOpen` are the M3.1 functions unchanged; the isolation export now lists all 13 functions and uses `systemClock`.
 
@@ -2367,19 +2367,19 @@ export const isolation = defineIsolation<
 });
 ```
 
-- [ ] **Step 8: Run the repository test and see it pass**
+- [x] **Step 8: Run the repository test and see it pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/documents.test.ts src/server/repo/documents.open.test.ts`
 Expected: PASS for both files (the open test has 8 cases). If `for('update')` or the `.innerJoin(documents, eq(documents.id, input.id))` join does not type check against the installed drizzle version, apply the fallback below and record it in the progress log: lock with `await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${id}))`)` before a plain select, and replace the constant join by a second query that first loads the document row.
 
-- [ ] **Step 9: Run the isolation matrix and see all 13 functions registered and clean**
+- [x] **Step 9: Run the isolation matrix and see all 13 functions registered and clean**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/isolation.test.ts -t documents`
 Expected: PASS, both `documents` cases. A failure of `registers every exported function in isolation` means a function was exported without an entry or an entry names a missing function.
 
 #### Part C: the upload helpers
 
-- [ ] **Step 10: Write the failing upload test**
+- [x] **Step 10: Write the failing upload test**
 
 Create `apps/portal/src/server/files/upload.test.ts`:
 
@@ -2520,12 +2520,12 @@ describe('matchesMagic', () => {
 });
 ```
 
-- [ ] **Step 11: Run it and see it fail**
+- [x] **Step 11: Run it and see it fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/upload.test.ts`
 Expected: FAIL with `Failed to resolve import "./upload"`.
 
-- [ ] **Step 12: Create `upload.ts`**
+- [x] **Step 12: Create `upload.ts`**
 
 Create `apps/portal/src/server/files/upload.ts`:
 
@@ -2631,14 +2631,14 @@ export async function verifyUpload(
 }
 ```
 
-- [ ] **Step 13: Run the upload test and see it pass**
+- [x] **Step 13: Run the upload test and see it pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/upload.test.ts`
 Expected: PASS (every case in the file).
 
 #### Part D: the action bodies, the action file and the purge job
 
-- [ ] **Step 14: Create the client safe types**
+- [x] **Step 14: Create the client safe types**
 
 Create `apps/portal/src/lib/document-upload.ts`:
 
@@ -2675,7 +2675,7 @@ export interface UploadedFileRef {
 }
 ```
 
-- [ ] **Step 15: Create the handler test helper**
+- [x] **Step 15: Create the handler test helper**
 
 Create `apps/portal/src/server/files/test-ctx.ts` (used only by tests; it builds the `ActionContext` that `runViewerAction` would give a handler):
 
@@ -2710,7 +2710,7 @@ export function makeActionCtx(viewer: Viewer, clock: Clock = fixedClock('2026-11
 }
 ```
 
-- [ ] **Step 16: Write the failing service test**
+- [x] **Step 16: Write the failing service test**
 
 Create `apps/portal/src/server/files/document-service.test.ts`:
 
@@ -2957,12 +2957,12 @@ describe('handleRequestMaterial', () => {
 });
 ```
 
-- [ ] **Step 17: Run it and see it fail**
+- [x] **Step 17: Run it and see it fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/document-service.test.ts`
 Expected: FAIL with `Failed to resolve import "./document-service"`.
 
-- [ ] **Step 18: Create `document-service.ts`**
+- [x] **Step 18: Create `document-service.ts`**
 
 Create `apps/portal/src/server/files/document-service.ts`. This is not a `'use server'` module, so it can export schemas and the `handle*` functions; `actions/documents.ts` wraps them.
 
@@ -3290,12 +3290,12 @@ export async function handleRequestMaterial(
 }
 ```
 
-- [ ] **Step 19: Run the service test and see it pass**
+- [x] **Step 19: Run the service test and see it pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/document-service.test.ts`
 Expected: PASS. If the HTML assertions in the material test fail because the template renders the request inside a different but still escaped structure, keep the two escaping assertions (they are the contract: escaped text present, raw tag absent) and relax only the `Kestrel Systems` line.
 
-- [ ] **Step 20: Create the server action file**
+- [x] **Step 20: Create the server action file**
 
 Create `apps/portal/src/server/actions/documents.ts` (every export is an `async function`; no types or constants are exported, contracts unknown 9):
 
@@ -3362,7 +3362,7 @@ export async function requestMaterialAction(raw: unknown): Promise<ActionResult<
 }
 ```
 
-- [ ] **Step 21: Write the failing purge job test**
+- [x] **Step 21: Write the failing purge job test**
 
 Create `apps/portal/src/server/jobs/document-purge.test.ts`:
 
@@ -3445,12 +3445,12 @@ describe('purgeDocumentFiles', () => {
 });
 ```
 
-- [ ] **Step 22: Run it and see it fail**
+- [x] **Step 22: Run it and see it fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs/document-purge.test.ts`
 Expected: FAIL with `purgeDocumentFiles is not a function` (the W0-c stub only exports `runDocumentPurge`).
 
-- [ ] **Step 23: Replace the stub body of `jobs/document-purge.ts`**
+- [x] **Step 23: Replace the stub body of `jobs/document-purge.ts`**
 
 Replace the whole of `apps/portal/src/server/jobs/document-purge.ts`. The name `runDocumentPurge` and its signature `() => Promise<void>` are fixed by contracts H.17 (the scheduler in `jobs/index.ts` calls it at `20 3 * * *`; nothing here edits `index.ts`).
 
@@ -3507,14 +3507,14 @@ export const runDocumentPurge = async (): Promise<void> => {
 };
 ```
 
-- [ ] **Step 24: Run the job test and see it pass**
+- [x] **Step 24: Run the job test and see it pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs/document-purge.test.ts`
 Expected: PASS, 3 tests.
 
 #### Part E: the client helpers
 
-- [ ] **Step 25: Write the failing doc-view and upload-client tests**
+- [x] **Step 25: Write the failing doc-view and upload-client tests**
 
 Create `apps/portal/src/components/documents/doc-view.test.ts`:
 
@@ -3682,12 +3682,12 @@ describe('uploadFile', () => {
 });
 ```
 
-- [ ] **Step 26: Run them and see them fail**
+- [x] **Step 26: Run them and see them fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/components/documents/doc-view.test.ts src/components/documents/upload-client.test.ts`
 Expected: FAIL with `Failed to resolve import "./doc-view"` and `Failed to resolve import "./upload-client"`.
 
-- [ ] **Step 27: Create `doc-view.ts` and `upload-client.ts`**
+- [x] **Step 27: Create `doc-view.ts` and `upload-client.ts`**
 
 Create `apps/portal/src/components/documents/doc-view.ts` (pure, client safe):
 
@@ -3817,7 +3817,7 @@ export async function uploadFile(args: {
 }
 ```
 
-- [ ] **Step 28: Run the client helper tests and see them pass**
+- [x] **Step 28: Run the client helper tests and see them pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/components/documents/doc-view.test.ts src/components/documents/upload-client.test.ts`
 Expected: PASS.
@@ -3826,7 +3826,7 @@ Expected: PASS.
 
 How to apply an edit below: open the file, find the "Before" text exactly as shown (it is copied from the mock at commit `58747992`, so it matches), and replace it with the "After" text. The markup, class names and copy are unchanged except where a decision in "Decisions made by this plan" says otherwise. Run `pnpm --filter @cleanstart/portal typecheck` after each file; the first typecheck after a partial conversion reports errors in files not yet converted, which is expected until Step 38.
 
-- [ ] **Step 29: Create `AudiencePicker.tsx` (the audience controls, moved out of `UploadDocumentForm`)**
+- [x] **Step 29: Create `AudiencePicker.tsx` (the audience controls, moved out of `UploadDocumentForm`)**
 
 Create `apps/portal/src/components/documents/AudiencePicker.tsx`. The markup is the mock's audience section (segmented control, category badges, partner name field) with ids prefixed so two instances can exist on one page.
 
@@ -3957,7 +3957,7 @@ export function AudiencePicker({
 }
 ```
 
-- [ ] **Step 30: Convert `doc-style.ts`**
+- [x] **Step 30: Convert `doc-style.ts`**
 
 Replace the whole of `apps/portal/src/components/documents/doc-style.ts`.
 
@@ -4020,7 +4020,7 @@ export const CHIP_PRODUCT: Record<DocProduct, ChipProduct> = {
 };
 ```
 
-- [ ] **Step 31: Convert `DocumentPreview.tsx`**
+- [x] **Step 31: Convert `DocumentPreview.tsx`**
 
 Edit 1. Before:
 
@@ -4150,7 +4150,7 @@ After:
       </dl>
 ```
 
-- [ ] **Step 32: Convert `RequestMaterialDialog.tsx`**
+- [x] **Step 32: Convert `RequestMaterialDialog.tsx`**
 
 Edit 1. Before:
 
@@ -4313,7 +4313,7 @@ After:
     </Dialog>
 ```
 
-- [ ] **Step 33: Convert `UploadDocumentForm.tsx`**
+- [x] **Step 33: Convert `UploadDocumentForm.tsx`**
 
 Edit 1 (imports, types and helpers). Before:
 
@@ -4714,7 +4714,7 @@ After:
         </button>
 ```
 
-- [ ] **Step 34: Convert `DocumentEditDrawer.tsx`**
+- [x] **Step 34: Convert `DocumentEditDrawer.tsx`**
 
 Edit 1 (imports). Before:
 
@@ -5082,7 +5082,7 @@ After:
       ) : null}
 ```
 
-- [ ] **Step 35: Convert `Documents.tsx`**
+- [x] **Step 35: Convert `Documents.tsx`**
 
 Edit 1 (imports and constants). Before:
 
@@ -5367,7 +5367,7 @@ After:
 
 `<DocumentPreview doc={viewing} onClose={closeView} onDownload={download} />` and `<RequestMaterialDialog open={requestOpen} onClose={closeRequest} />` stay as they are.
 
-- [ ] **Step 36: Convert `AdminDocuments.tsx`**
+- [x] **Step 36: Convert `AdminDocuments.tsx`**
 
 Edit 1 (imports). Before:
 
@@ -5525,7 +5525,7 @@ After:
       ) : null}
 ```
 
-- [ ] **Step 37: Convert the two pages**
+- [x] **Step 37: Convert the two pages**
 
 Replace the whole of `apps/portal/src/app/partner/documents/page.tsx`.
 
@@ -5600,14 +5600,14 @@ export default async function Page(): Promise<React.JSX.Element> {
 
 `requireCan` redirects a viewer who may not (for example a partner who types `/admin/documents`, or staff sales) to their own home, and a signed out visitor to `/sign-in?next=...`. The partner and admin layouts (W0-f) already enforce the kind. Loading is the parent `loading.tsx`; an exception thrown by a repo call goes to `src/app/error.tsx`.
 
-- [ ] **Step 38: Typecheck and lint the converted screens**
+- [x] **Step 38: Typecheck and lint the converted screens**
 
 Run: `pnpm --filter @cleanstart/portal typecheck && pnpm --filter @cleanstart/portal lint`
 Expected: both exit 0. If typecheck reports an unused import in a converted file (`noUnusedLocals` is on), remove it; the only candidates are `Badge` and `Icon` in files whose markup no longer uses them. Biome 1.9 has no rule against an `async` handler passed as `onSubmit`; if a later Biome flags it, wrap the call in the component that owns the form (`onSubmit={(e) => void submit(e)}`) and change nothing else.
 
 #### Part G: the bucket note, Gate A and the manual checks
 
-- [ ] **Step 39: Write the bucket note for the operator**
+- [x] **Step 39: Write the bucket note for the operator**
 
 Create `docs/partner-portal/R2-DOCUMENTS-BUCKET.md`:
 
@@ -5675,7 +5675,7 @@ Downloads are a top level navigation to a presigned URL that carries `Content-Di
 4. As a partner outside the audience, open `/api/files/<id>` directly: the response is a 404 JSON body, not a redirect.
 ````
 
-- [ ] **Step 40: Run Gate A**
+- [x] **Step 40: Run Gate A**
 
 Run from the track worktree (byte escapes stand for the em-dash and en-dash characters, so this plan stays free of them):
 
@@ -5716,7 +5716,7 @@ Staff library, as the partner manager (Farhan Qureshi) at `/admin/documents`:
 12. Sign in as marketing (Ishita Bose): `/admin/documents` is the home page and the same screen works, including the audience picker (the partner list comes from `listAudiencePartners`). As staff sales, `/admin/documents` redirects to the sales home page.
 13. As a partner, open `/admin/documents`: redirected to `/partner/overview`.
 
-- [ ] **Step 42: Commit**
+- [x] **Step 42: Commit**
 
 ```bash
 git add apps/portal/src/server/files/rules.ts apps/portal/src/server/files/rules.test.ts apps/portal/src/server/files/upload.ts apps/portal/src/server/files/upload.test.ts apps/portal/src/server/files/document-service.ts apps/portal/src/server/files/document-service.test.ts apps/portal/src/server/files/test-ctx.ts apps/portal/src/lib/document-upload.ts apps/portal/src/server/actions/documents.ts apps/portal/src/server/jobs/document-purge.ts apps/portal/src/server/jobs/document-purge.test.ts apps/portal/src/server/repo/documents.ts apps/portal/src/server/repo/documents.test.ts apps/portal/src/components/documents/doc-view.ts apps/portal/src/components/documents/doc-view.test.ts apps/portal/src/components/documents/upload-client.ts apps/portal/src/components/documents/upload-client.test.ts apps/portal/src/components/documents/AudiencePicker.tsx apps/portal/src/components/documents/doc-style.ts apps/portal/src/components/documents/DocumentPreview.tsx apps/portal/src/components/documents/DocumentEditDrawer.tsx apps/portal/src/components/documents/RequestMaterialDialog.tsx apps/portal/src/components/documents/UploadDocumentForm.tsx apps/portal/src/components/screens/Documents.tsx apps/portal/src/components/screens/AdminDocuments.tsx apps/portal/src/app/partner/documents/page.tsx apps/portal/src/app/admin/documents/page.tsx docs/partner-portal/R2-DOCUMENTS-BUCKET.md docs/superpowers/plans/2026-11-12-partner-portal-05-documents.md
@@ -5741,7 +5741,7 @@ Master plan task 3.3: read the published datasheets from the CMS REST API with a
 
 **Gate A (this task):** the standard block in the last step of this task, plus the manual list. **Gate B:** an independent reviewer with the handoff checklist, extra attention to: no `asset` or `body` in the query, gated rows dropped in code (not only in the query), no CMS credential needed or logged, the fetch has a timeout and a failure degrades to "no card", never a broken page.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `apps/portal/src/server/files/public-resources.test.ts`:
 
@@ -5865,12 +5865,12 @@ describe('listPublicDatasheets', () => {
 });
 ```
 
-- [ ] **Step 2: Run it and see it fail**
+- [x] **Step 2: Run it and see it fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/public-resources.test.ts`
 Expected: FAIL with `Failed to resolve import "./public-resources"`.
 
-- [ ] **Step 3: Create `public-resources.ts`**
+- [x] **Step 3: Create `public-resources.ts`**
 
 Create `apps/portal/src/server/files/public-resources.ts`. It is imported only by Server Components (the partner Documents page); it reads `@/env`, so it must never be imported by a client component, and the only thing a client component may import from it is the `PublicDatasheetDto` type.
 
@@ -5985,12 +5985,12 @@ export async function listPublicDatasheets(options: ListPublicDatasheetsOptions 
 }
 ```
 
-- [ ] **Step 4: Run the test and see it pass**
+- [x] **Step 4: Run the test and see it pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/public-resources.test.ts`
 Expected: PASS, 7 tests. If the `connection refused` case is slow or hangs on a machine that has something listening on port 1, change the unreachable URL in that one test to a port you know is closed.
 
-- [ ] **Step 5: Add the card to `Documents.tsx`**
+- [x] **Step 5: Add the card to `Documents.tsx`**
 
 Edit 1 (a new import). Before:
 
@@ -6113,7 +6113,7 @@ After:
       <DocumentPreview doc={viewing} onClose={closeView} onDownload={download} />
 ```
 
-- [ ] **Step 6: Load the datasheets in the partner page**
+- [x] **Step 6: Load the datasheets in the partner page**
 
 Replace the whole of `apps/portal/src/app/partner/documents/page.tsx` with the M3.2 version plus the CMS read. A CMS outage or an unconfigured `CMS_API_URL` must not break the page, so the read degrades to "no card" and logs a warning.
 
@@ -6148,12 +6148,12 @@ export default async function Page(): Promise<React.JSX.Element> {
 }
 ```
 
-- [ ] **Step 7: Typecheck and lint**
+- [x] **Step 7: Typecheck and lint**
 
 Run: `pnpm --filter @cleanstart/portal typecheck && pnpm --filter @cleanstart/portal lint`
 Expected: both exit 0 (the page now passes the `publicDatasheets` prop that Step 5 added).
 
-- [ ] **Step 8: Run Gate A**
+- [x] **Step 8: Run Gate A**
 
 Run from the track worktree (byte escapes stand for the em-dash and en-dash characters, so this plan stays free of them):
 
@@ -6173,7 +6173,7 @@ git diff --name-only feat/portal-build
 
 Expected: all exit 0; the dash grep prints nothing; the name list is limited to the paths in this task's Files block and the plan file.
 
-- [ ] **Step 9: Manual check with a local stub of the CMS (no CMS service user or production access needed)**
+- [x] **Step 9: Manual check with a local stub of the CMS (no CMS service user or production access needed)**
 
 1. Start a stub that answers like the CMS: `node -e "require('http').createServer((q,r)=>{r.setHeader('content-type','application/json');r.end(JSON.stringify({docs:[{id:1,title:'CleanStart Images datasheet',slug:'cleanstart-images-datasheet',summary:'Catalogue and update cadence',updatedAt:'2026-10-14T00:00:00.000Z',gated:false},{id:2,title:'Gated whitepaper',slug:'gated-whitepaper',gated:true}]}))}).listen(3999)"` (check `lsof -nP -iTCP:3999 -sTCP:LISTEN` is empty first), and set `CMS_API_URL=http://localhost:3999` in `apps/portal/.env`, then restart `next dev --port 3234` (the environment is read once at start).
 2. As Kestrel's partner admin at `/partner/documents`: below the library a "Public datasheets" card appears with one row, "CleanStart Images datasheet", summary "Catalogue and update cadence", Updated "14 Oct 2026". The gated row is absent. The link and the "Open on cleanstart.com" button both go to `https://www.cleanstart.com/resources/cleanstart-images-datasheet` in a new tab.
@@ -6182,7 +6182,7 @@ Expected: all exit 0; the dash grep prints nothing; the name list is limited to 
 5. Stop the stub, stop the dev server, delete `apps/portal/.next/dev/cache/fetch-cache` (that is the Next 16 dev fetch cache path; clearing `.next/cache` does nothing), start the dev server again and reload: the card is gone, the rest of the page works, and the dev server log has one line `public datasheets unavailable, the card is hidden`.
 6. Restore `CMS_API_URL` in `.env` to what the worktree had before.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git add apps/portal/src/server/files/public-resources.ts apps/portal/src/server/files/public-resources.test.ts apps/portal/src/components/screens/Documents.tsx apps/portal/src/app/partner/documents/page.tsx docs/superpowers/plans/2026-11-12-partner-portal-05-documents.md

@@ -2,35 +2,37 @@
 
 import { Icon } from '@/components/icon';
 import { Drawer } from '@/components/ui/overlay';
-import type { PortalDocument } from '@/data/documents';
+import { fmtLong } from '@/lib/dates';
+import { DOC_PRODUCT_LABEL, DOCUMENT_TYPE_LABEL } from '@/lib/domain';
+import type { DocumentDto } from '@/lib/dto';
+import { formatLabel } from '@/server/files/rules';
 
 export function DocumentPreview({
   doc,
   onClose,
   onDownload,
 }: {
-  doc: PortalDocument | null;
+  doc: DocumentDto | null;
   onClose: () => void;
-  onDownload: (d: PortalDocument) => void;
+  onDownload: (d: DocumentDto) => void;
 }): React.JSX.Element | null {
   if (!doc) return null;
-  const isVideo = doc.type === 'Video';
+  const isVideo = doc.type === 'video';
+  const format = formatLabel(doc);
   return (
     <Drawer
       open
       onClose={onClose}
       title={doc.title}
-      subtitle={`${doc.type}, ${doc.product}`}
+      subtitle={`${DOCUMENT_TYPE_LABEL[doc.type]}, ${DOC_PRODUCT_LABEL[doc.product]}`}
       footer={
         <>
           <button type="button" className="btn btn-s" onClick={onClose}>
             Close
           </button>
-          {isVideo ? null : (
-            <button type="button" className="btn btn-p" onClick={() => onDownload(doc)}>
-              Download
-            </button>
-          )}
+          <button type="button" className="btn btn-p" onClick={() => onDownload(doc)}>
+            Download
+          </button>
         </>
       }
     >
@@ -56,24 +58,24 @@ export function DocumentPreview({
             }}
           >
             <Icon name="play" className="ic" />
-            {doc.format}
+            {format}
           </span>
         </div>
       ) : null}
       <p style={{ margin: 0, fontSize: 13, lineHeight: 1.55, color: '#4A4858' }}>
-        {doc.summary ?? `${doc.type}, ${doc.format}`}
+        {doc.summary ?? `${DOCUMENT_TYPE_LABEL[doc.type]}, ${format}`}
       </p>
       <dl className="dl">
         <dt>Type</dt>
-        <dd>{doc.type}</dd>
+        <dd>{DOCUMENT_TYPE_LABEL[doc.type]}</dd>
         <dt>Product</dt>
-        <dd>{doc.product}</dd>
+        <dd>{DOC_PRODUCT_LABEL[doc.product]}</dd>
         <dt>Format</dt>
-        <dd>{doc.format}</dd>
+        <dd>{format}</dd>
         <dt>Updated</dt>
-        <dd>{doc.updated}</dd>
+        <dd>{fmtLong(doc.updatedAt)}</dd>
         <dt>Opened by your team</dt>
-        <dd className="tnum">{doc.ownOpens} times</dd>
+        <dd className="tnum">{doc.ownOpens ?? 0} times</dd>
       </dl>
       <div className="note note-violet">
         <Icon name="lock" />

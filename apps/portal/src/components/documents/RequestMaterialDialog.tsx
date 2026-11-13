@@ -3,14 +3,11 @@
 import { useCallback, useState } from 'react';
 import { Dialog } from '@/components/ui/overlay';
 import { useToast } from '@/components/ui/toast';
-import type { Product } from '@/components/ui/badge';
+import { DOC_PRODUCT_LABEL, type DocProduct } from '@/lib/domain';
+import { requestMaterialAction } from '@/server/actions/documents';
 
-const PRODUCTS: readonly Product[] = [
-  'All products',
-  'CleanStart Images',
-  'Clean Libraries',
-  'CleanSight',
-];
+/** The mock's order: All products first. */
+const PRODUCT_ORDER: readonly DocProduct[] = ['all', 'images', 'libraries', 'cleansight'];
 
 export function RequestMaterialDialog({
   open,
@@ -21,19 +18,31 @@ export function RequestMaterialDialog({
 }): React.JSX.Element | null {
   const toast = useToast();
   const [text, setText] = useState('');
-  const [product, setProduct] = useState<Product>('All products');
+  const [product, setProduct] = useState<DocProduct>('all');
   const [tried, setTried] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const invalid = tried && text.trim() === '';
 
   const close = useCallback((): void => {
     setTried(false);
+    setError(null);
     onClose();
   }, [onClose]);
 
-  const submit = (event: React.FormEvent<HTMLFormElement>): void => {
+  const submit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
+    if (busy) return;
     if (text.trim() === '') {
       setTried(true);
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    const result = await requestMaterialAction({ request: text.trim(), product });
+    setBusy(false);
+    if (!result.ok) {
+      setError(result.error.message);
       return;
     }
     setText('');
@@ -54,8 +63,8 @@ export function RequestMaterialDialog({
           <button type="button" className="btn btn-s" onClick={close}>
             Cancel
           </button>
-          <button type="submit" className="btn btn-p">
-            Send request
+          <button type="submit" className="btn btn-p" disabled={busy}>
+            {busy ? 'Sending' : 'Send request'}
           </button>
         </>
       }
@@ -89,19 +98,25 @@ export function RequestMaterialDialog({
           aria-labelledby="req-p"
           style={{ alignSelf: 'flex-start' }}
         >
-          {PRODUCTS.map((p) => (
+          {PRODUCT_ORDER.map((p) => (
             <button
               key={p}
               type="button"
               className={`seg-b${p === product ? ' seg-on' : ''}`}
               aria-pressed={p === product}
+              disabled={busy}
               onClick={() => setProduct(p)}
             >
-              {p}
+              {DOC_PRODUCT_LABEL[p]}
             </button>
           ))}
         </div>
       </div>
+      {error ? (
+        <div className="note note-amber" role="alert">
+          <span>{error}</span>
+        </div>
+      ) : null}
     </Dialog>
   );
 }
