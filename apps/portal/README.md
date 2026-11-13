@@ -1,6 +1,14 @@
-# CleanStart partner portal (clickable mock)
+# CleanStart partner portal
 
-A real Next.js app with seeded mock data and no backend, built so the CleanStart team can walk through the whole partner portal and review it screen by screen. Every name, number and email is made up. Nothing is sent anywhere.
+This app started as a clickable mock (tag `portal-mock-v1`, commit `58747992`) and is being converted screen by screen into the real partner portal. Until the mock scaffolding is removed (task M5.4) the walkthrough, the banner and the seeded browser state still work as described below. The build plan is in `docs/partner-portal/BUILD-HANDOFF.md`.
+
+## Tests
+
+```bash
+pnpm --filter @cleanstart/portal test        # Vitest; needs the databases from "Local database" below
+pnpm --filter @cleanstart/portal typecheck
+pnpm --filter @cleanstart/portal lint
+```
 
 ## Run it
 

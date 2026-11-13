@@ -131,7 +131,7 @@ Every file this plan creates or modifies, with its responsibility. Paths are rel
 
 **Gate A at the end:** all four commands run (`test` passes through `src/structure.test.ts`; the Vitest global setup from M0.3 does not exist yet, so no database is needed).
 
-- [ ] **Step 1: Log the start and tag the mock**
+- [x] **Step 1: Log the start and tag the mock**
 
 ```bash
 printf '%s\n' "2026-11-13 00:00 IST | M0.2 | started | W0 | - | - | tag, structure, dependencies, vitest" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
@@ -141,7 +141,7 @@ git rev-parse 'portal-mock-v1^{commit}'
 
 Expected: the last command prints `58747992b690f93582a847818625d56565acc3c0`. If the tag already exists, `git tag` prints `fatal: tag 'portal-mock-v1' already exists`; then check that `git rev-parse 'portal-mock-v1^{commit}'` prints the same hash and carry on. Replace the time in the log line with the real time.
 
-- [ ] **Step 2: Install Vitest only, then write the failing structure test**
+- [x] **Step 2: Install Vitest only, then write the failing structure test**
 
 The test must be able to run before the rest of the dependencies exist, so that its first failure is about the missing packages and not about a missing test runner.
 
@@ -214,13 +214,13 @@ describe('portal structure', () => {
 });
 ```
 
-- [ ] **Step 3: Run it and confirm it fails**
+- [x] **Step 3: Run it and confirm it fails**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/structure.test.ts`
 
 Expected: FAIL. Every `has <package> installed` case except `vitest` fails with `<package> is not installed`, the three folder cases fail with `<folder>/README.md is missing`, and `keeps the package scripts the plans call` fails on `script test` (the first script that is missing).
 
-- [ ] **Step 4: Install the full dependency set, once**
+- [x] **Step 4: Install the full dependency set, once**
 
 The handoff expects these packages (amendment 1); the plans' code imports exactly these, plus the `@cleanstart/forms` workspace package that the P track needs (contracts M.2, item 20). `better-auth` is pinned to `1.7.22`, the version plan 02's code and tests ran against (integration review). pnpm 10 edits `pnpm-workspace.yaml` (it adds `minimumReleaseAgeExclude` entries) for versions published within the last day, and `1.7.22` was released on 12 November; that file is outside the allowed paths, so if the install edits it, revert the file, install `better-auth@1.7.18` instead and say so in the progress log (W0-e Step 1 then checks the installed version).
 
@@ -232,7 +232,7 @@ git diff --stat pnpm-workspace.yaml
 
 Expected: both installs succeed (the `@cleanstart/forms@workspace:*` argument is quoted because zsh would otherwise try to expand the `*`) and the last command prints nothing (revert it with `git checkout pnpm-workspace.yaml` if it does). Do not add `@types/node-cron`: `node-cron` 4 ships its own types (`node_modules/node-cron/dist/node-cron.d.ts`). Do not add `pino`: M0.4 writes a small logger. `apps/portal/package.json` now lists all of them; open it and confirm `zod` resolved to `3.25.x` (contracts M.1, item 16). If `better-auth@1.7.22` and `better-auth@1.7.18` are both rejected by pnpm, run `npm view better-auth time --json` and pin the newest 1.7.x version that is more than three days old.
 
-- [ ] **Step 5: Update the scripts and the description in `package.json`**
+- [x] **Step 5: Update the scripts and the description in `package.json`**
 
 Open `apps/portal/package.json`. Replace the `description` value and the whole `scripts` object so that they read exactly:
 
@@ -253,7 +253,7 @@ Open `apps/portal/package.json`. Replace the `description` value and the whole `
 
 Leave `name`, `version`, `private`, `type`, the dependency blocks and everything else as pnpm wrote them. The `db:*` scripts point at files that M0.3 creates; nothing runs them before that.
 
-- [ ] **Step 5b: Replace `next.config.ts` with the standalone-ready version**
+- [x] **Step 5b: Replace `next.config.ts` with the standalone-ready version**
 
 The Docker image (plan 06, M0.6) runs the Next standalone server, which needs `output: 'standalone'` and a tracing root at the repository root. Write this here, once, so the A track never edits the file (contracts K.3; M5.1 later adds the security headers in Wave 2). Replace the whole of `apps/portal/next.config.ts` with:
 
@@ -282,7 +282,7 @@ export default nextConfig;
 
 Run `pnpm --filter @cleanstart/portal typecheck` (it must stay green).
 
-- [ ] **Step 6: Create the folders with a README each, and the contract copy helper**
+- [x] **Step 6: Create the folders with a README each, and the contract copy helper**
 
 ```bash
 mkdir -p apps/portal/src/server apps/portal/src/db apps/portal/scripts
@@ -328,7 +328,7 @@ bash apps/portal/scripts/contract-block.sh "### D.5 " 9; echo "exit $?"
 
 Expected: the first command prints nothing, the `head -3` prints `// src/lib/clock.ts`, `export interface Clock {`, `  now(): Date;`, and the last pair prints `contract-block: no block 9 under "### D.5 "` then `exit 1`.
 
-- [ ] **Step 7: Write the M0.1 stub**
+- [x] **Step 7: Write the M0.1 stub**
 
 The handoff says an unattended run skips the HubSpot capability check and writes this stub (BUILD-HANDOFF, "What an overnight run can and cannot finish"; contracts K.2 assigns the file to W0-a). Create `docs/partner-portal/HUBSPOT-CAPABILITIES.md`:
 
@@ -348,7 +348,7 @@ Status: UNVERIFIED. The check needs a HubSpot developer test account and a priva
 Decided by these answers: HubSpot plan Tasks 4.1 (schema provisioning) and 4.9 (webhook).
 ```
 
-- [ ] **Step 8: Update the portal README**
+- [x] **Step 8: Update the portal README**
 
 Open `apps/portal/README.md`. Replace the first line `# CleanStart partner portal (clickable mock)` and the paragraph under it with:
 
@@ -368,13 +368,13 @@ pnpm --filter @cleanstart/portal lint
 
 Keep every other section of the README as it is.
 
-- [ ] **Step 9: Run the structure test and see it pass**
+- [x] **Step 9: Run the structure test and see it pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/structure.test.ts`
 
 Expected: PASS, `Tests  19 passed (19)` (15 packages, 3 folders, 1 scripts case).
 
-- [ ] **Step 10: Stage, run Gate A, run Gate B**
+- [x] **Step 10: Stage, run Gate A, run Gate B**
 
 ```bash
 git add apps/portal/package.json apps/portal/next.config.ts apps/portal/vitest.config.ts apps/portal/README.md apps/portal/src/structure.test.ts apps/portal/src/server/README.md apps/portal/src/db/README.md apps/portal/scripts/README.md apps/portal/scripts/contract-block.sh docs/partner-portal/HUBSPOT-CAPABILITIES.md pnpm-lock.yaml
@@ -382,7 +382,7 @@ git add apps/portal/package.json apps/portal/next.config.ts apps/portal/vitest.c
 
 Then Gate A (the block under "How to work this plan", item 6): lint, typecheck, test and build must all pass. `git diff --name-only origin/development` may list only the paths above plus earlier commits of this branch. Then Gate B.
 
-- [ ] **Step 11: Commit and log**
+- [x] **Step 11: Commit and log**
 
 ```bash
 git add docs/superpowers/plans/2026-11-12-partner-portal-01-foundations.md

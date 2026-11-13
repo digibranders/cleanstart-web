@@ -1,7 +1,7 @@
 {
   "name": "@cleanstart/portal",
   "version": "0.0.1",
-  "description": "CleanStart partner portal: clickable mock with seeded data for team walkthroughs. No backend, no real data.",
+  "description": "CleanStart partner portal. The tag portal-mock-v1 is the clickable mock; this branch builds the real app (docs/partner-portal/BUILD-HANDOFF.md).",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,19 +9,38 @@
     "build": "next build",
     "start": "next start --port 3004",
     "lint": "biome lint src",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx --env-file=.env scripts/migrate.ts",
+    "db:seed": "tsx --env-file=.env scripts/seed-dev.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1042.0",
+    "@aws-sdk/s3-request-presigner": "^3.1042.0",
+    "@cleanstart/forms": "workspace:*",
+    "@hubspot/api-client": "^13.5.0",
+    "@sentry/nextjs": "^9.47.1",
+    "better-auth": "1.7.22",
     "driver.js": "^1.3.6",
+    "drizzle-orm": "^0.45.4",
     "next": "16.2.5",
+    "node-cron": "^4.6.0",
+    "pg": "^8.21.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@cleanstart/config": "workspace:*",
+    "@playwright/test": "^1.59.1",
     "@types/node": "^22.10.0",
+    "@types/pg": "^8.20.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.7.3"
+    "drizzle-kit": "^0.31.11",
+    "tsx": "^4.21.0",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.9"
   }
 }
