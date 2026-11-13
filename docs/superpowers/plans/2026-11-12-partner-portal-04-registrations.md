@@ -7728,7 +7728,7 @@ Rules this task implements (contracts H.10, M.3 item 5):
 - "Expiring in 14 days" is accepted registrations whose `protection_end` is from today to today plus 14 days, the same definition on the approvals screen, the Overview and Reports.
 - Reports have no quarter filter in the contracts (`getAdminReports(tx, viewer, clock)` takes no period), so the screen says "All time" where the mock said "Q4 2026 so far", and every list partner appears (the mock hid 11 partners behind a hard coded "of 21").
 
-- [ ] **Step 1: Write the failing tests for the pure report view**
+- [x] **Step 1: Write the failing tests for the pure report view**
 
 ```ts
 // src/lib/report-view.test.ts
@@ -7790,7 +7790,7 @@ describe('partnersToCsv', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/lib/report-view.test.ts`
 Expected: FAIL, "Cannot find module './report-view'".
 
-- [ ] **Step 2: Implement `src/lib/report-view.ts`**
+- [x] **Step 2: Implement `src/lib/report-view.ts`**
 
 ```ts
 import {
@@ -7870,7 +7870,7 @@ export function partnersToCsv(rows: readonly PartnerReportView[]): string {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/lib/report-view.test.ts`
 Expected: PASS, 5 tests.
 
-- [ ] **Step 3: Write the failing tests for the overview view helpers**
+- [x] **Step 3: Write the failing tests for the overview view helpers**
 
 ```ts
 // src/components/deals/overview.test.ts
@@ -7934,7 +7934,7 @@ describe('new document rows', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/components/deals/overview.test.ts`
 Expected: FAIL, "Cannot find module './overview'".
 
-- [ ] **Step 4: Implement `src/components/deals/overview.ts`**
+- [x] **Step 4: Implement `src/components/deals/overview.ts`**
 
 ```ts
 import { fmtShort, plural } from "@/lib/dates";
@@ -8000,7 +8000,7 @@ export const docIcon = (doc: DocumentListItemDto): IconName => (doc.type === "vi
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/components/deals/overview.test.ts`
 Expected: PASS, 4 tests.
 
-- [ ] **Step 5: Write the failing repo tests for the overview**
+- [x] **Step 5: Write the failing repo tests for the overview**
 
 ```ts
 // src/server/repo/overview.test.ts
@@ -8115,7 +8115,7 @@ Counting check for the first test (Kestrel, clock 6 Nov, a Friday): pending rows
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/overview.test.ts`
 Expected: FAIL, "Cannot find module './overview'".
 
-- [ ] **Step 6: Implement `src/server/repo/overview.ts`**
+- [x] **Step 6: Implement `src/server/repo/overview.ts`**
 
 ```ts
 // src/server/repo/overview.ts
@@ -8302,7 +8302,7 @@ export const isolation = defineIsolation<'getPartnerOverview'>({
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/overview.test.ts`
 Expected: PASS, 5 tests.
 
-- [ ] **Step 7: Write the failing repo tests for the reports**
+- [x] **Step 7: Write the failing repo tests for the reports**
 
 ```ts
 // src/server/repo/reports.test.ts
@@ -8415,7 +8415,7 @@ describe('getAdminReports', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/reports.test.ts`
 Expected: FAIL, "Cannot find module './reports'".
 
-- [ ] **Step 8: Implement `src/server/repo/reports.ts`**
+- [x] **Step 8: Implement `src/server/repo/reports.ts`**
 
 ```ts
 // src/server/repo/reports.ts
@@ -8575,7 +8575,7 @@ export const isolation = defineIsolation<'getAdminReports'>({
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/reports.test.ts src/server/repo/overview.test.ts src/server/repo/isolation.test.ts`
 Expected: PASS, 5 tests in the reports file (1 seed test and 4 more), 5 in the overview file, and the isolation matrix green with both new modules listed.
 
-- [ ] **Step 9: Rewrite the report components**
+- [x] **Step 9: Rewrite the report components**
 
 `src/components/reports/partner-ui.ts` (complete file):
 
@@ -8705,7 +8705,7 @@ export function ProductBreakdown({ rows, total }: { rows: ProductReportRow[]; to
 }
 ```
 
-- [ ] **Step 10: Rewrite the two pages**
+- [x] **Step 10: Rewrite the two pages**
 
 `src/app/partner/overview/page.tsx`:
 
@@ -8746,7 +8746,7 @@ export default async function Page(): Promise<React.JSX.Element> {
 }
 ```
 
-- [ ] **Step 11: Edit `PartnerOverview.tsx`**
+- [x] **Step 11: Edit `PartnerOverview.tsx`**
 
 Copy changes: "Updated 6 Nov 2026, 14:20" now prints the time the page was rendered; the "New documents" rows come from the documents the viewer's audience allows (the mock listed three fixed titles). Nothing else in the visible text changes.
 
@@ -9010,7 +9010,7 @@ After:
             ))}
 ```
 
-- [ ] **Step 12: Edit `AdminReports.tsx`**
+- [x] **Step 12: Edit `AdminReports.tsx`**
 
 Copy changes (forced by the contracts' report, which has no quarter): the header sub reads "All time, up to 6 Nov 2026." instead of "Q4 2026 so far, 1 Oct to 6 Nov."; the CSV file is named `partner-report-<date>.csv` instead of `partner-report-q4-2026.csv`.
 
@@ -9200,7 +9200,7 @@ Manual check (seed-dev data, dev date 6 Nov 2026 or later):
 - `/admin/reports` as Farhan (partner manager): Registered 15, "From 4 partners" (partners that have a registration), Accepted and rate computed from the seed, Won 3, Protected now and "N end in the next 14 days". The table lists 21 partners; the Kestrel row reads Registered 10, Accepted 7, Accept rate 88%, Won 2, Protected now 3. Filtering to "Middle East" and sorting "Name" works; "Export CSV" downloads `partner-report-<today>.csv` with labels in the Category and Region columns. "Partners to follow up" lists Qamar Solutions, Meghdoot Systems and Ironleaf Consulting with reasons built from the seeded dates.
 - Sign in as Rahul Menon (staff sales, India): only India partners and India deals are counted; as Ishita Bose (marketing) `/admin/reports` redirects to the documents home.
 
-- [ ] **Step 14: Commit**
+- [x] **Step 14: Commit**
 
 ```bash
 git add apps/portal/src/lib/report-view.ts apps/portal/src/lib/report-view.test.ts \

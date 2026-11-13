@@ -1,9 +1,9 @@
-import type { PartnerCategory } from '@/data/reports';
+import type { PartnerCategory } from '@/lib/domain';
 
 export const CATEGORY_BADGE: Record<PartnerCategory, string> = {
-  Distributor: 'b-violet',
-  'Channel partner': 'b-blue',
-  'System integrator': 'b-cyan',
+  distributor: 'b-violet',
+  channel: 'b-blue',
+  integrator: 'b-cyan',
 };
 
 export const initialsOf = (name: string): string =>

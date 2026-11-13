@@ -1,9 +1,9 @@
 import Link from 'next/link';
+import type { FollowUpDto } from '@/lib/dto';
 import { ROUTES } from '@/lib/routes';
-import { FOLLOW_UPS } from '@/data/reports';
 import { avatarClass, initialsOf } from './partner-ui';
 
-export function FollowUpList(): React.JSX.Element {
+export function FollowUpList({ items }: { items: FollowUpDto[] }): React.JSX.Element {
   return (
     <section
       aria-labelledby="fu"
@@ -14,20 +14,20 @@ export function FollowUpList(): React.JSX.Element {
         <h2 id="fu" className="card-t">
           Partners to follow up
         </h2>
-        <span className="card-meta">{FOLLOW_UPS.length}</span>
+        <span className="card-meta">{items.length}</span>
       </div>
-      {FOLLOW_UPS.map((f, i) => (
-        <Link key={f.name} href={ROUTES.admin.partners} className="li">
+      {items.map((f, i) => (
+        <Link key={f.partnerId} href={ROUTES.admin.partners} className="li">
           <span className={`av ${avatarClass(i + 2)}`}>{initialsOf(f.name)}</span>
           <span className="li-t">
             <span className="li-n">{f.name}</span>
             <span className="li-s">{f.why}</span>
           </span>
           <span
-            className={`badge ${f.status === 'Inactive' ? 'b-expired' : 'b-pending'}`}
+            className={`badge ${f.status === 'inactive' ? 'b-expired' : 'b-pending'}`}
             style={{ marginLeft: 'auto' }}
           >
-            {f.status}
+            {f.status === 'inactive' ? 'Inactive' : 'Onboarding'}
           </span>
         </Link>
       ))}
