@@ -5,22 +5,16 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { NumberedSteps, PublicHeading, PublicSplit } from "@/components/partners/public-frame";
 import { Seg } from "@/components/partners/seg";
+import { TurnstileWidget } from "@/components/partners/turnstile-widget";
 import { useToast } from "@/components/ui/toast";
-import {
-  CATEGORIES,
-  emailDomain,
-  findPartnerByDomain,
-  isFreeEmail,
-  isValidEmail,
-  normaliseDomain,
-  type PartnerCategory,
-  type PartnerRegion,
-  partnersSlice,
-  submitApplication,
-} from "@/data/partners";
+import { PARTNER_CATEGORIES, PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PARTNER_REGIONS } from "@/lib/domain";
+import { codeFromLabel, emailDomain, isFreeEmail, isValidEmail, normaliseDomain } from "@/lib/people";
 import { ROUTES } from "@/lib/routes";
+import { submitApplicationAction } from "@/server/actions/apply";
+import { issuesToErrors } from "@/server/actions/result";
 
-const REGIONS: readonly PartnerRegion[] = ["India", "Middle East", "Elsewhere"];
+const CATEGORY_OPTIONS: readonly string[] = PARTNER_CATEGORIES.map((code) => PARTNER_CATEGORY_LABEL[code]);
+const REGIONS: readonly string[] = PARTNER_REGIONS.map((code) => PARTNER_REGION_LABEL[code]);
 
 const STEPS = [
   { title: "Apply", text: "Tell us about your company. It takes about 3 minutes." },
@@ -36,23 +30,22 @@ interface Fields {
   title: string;
   email: string;
   phone: string;
-  category: PartnerCategory;
-  region: PartnerRegion;
+  /** Display label of the selected option; converted to a code when the form is sent. */
+  category: string;
+  region: string;
   how: string;
 }
 
-// Sample applicant from the board, so a reviewer can submit without typing.
-// Re-applying with this email refreshes the open Tidewater Infosec application instead of adding a second one.
-const SAMPLE: Fields = {
-  company: "Tidewater Infosec",
-  site: "tidewaterinfosec.in",
-  name: "Neha Joshi",
-  title: "CTO",
-  email: "neha.joshi@tidewaterinfosec.in",
-  phone: "+91 98200 41377",
-  category: "Channel partner",
-  region: "India",
-  how: "We resell security tooling to mid-size banks and NBFCs in Pune and Mumbai, and customers are asking for hardened base images. Team of 18, 6 in pre-sales.",
+const EMPTY: Fields = {
+  company: "",
+  site: "",
+  name: "",
+  title: "",
+  email: "",
+  phone: "",
+  category: PARTNER_CATEGORY_LABEL.channel,
+  region: PARTNER_REGION_LABEL.india,
+  how: "",
 };
 
 function ErrorText({ id, children }: { id: string; children: React.ReactNode }): React.JSX.Element {
@@ -63,46 +56,64 @@ function ErrorText({ id, children }: { id: string; children: React.ReactNode }):
   );
 }
 
-export function Apply(): React.JSX.Element {
+export function Apply({ turnstileSiteKey }: { turnstileSiteKey: string }): React.JSX.Element {
   const router = useRouter();
   const toast = useToast();
-  const { partners } = partnersSlice.use();
-  const [f, setF] = useState<Fields>(SAMPLE);
+  const [f, setF] = useState<Fields>(EMPTY);
   const [tried, setTried] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
+  const [resetKey, setResetKey] = useState(0);
+  const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
+  const [formError, setFormError] = useState<string | null>(null);
   const set = <K extends keyof Fields>(key: K, value: Fields[K]): void => setF((prev) => ({ ...prev, [key]: value }));
 
   const emailValid = isValidEmail(f.email);
   const domain = emailDomain(f.email);
   const free = isFreeEmail(f.email);
-  const existing = findPartnerByDomain(partners, domain);
   const siteDomain = normaliseDomain(f.site);
 
   const companyErr = tried && !f.company.trim();
   const nameErr = tried && !f.name.trim();
-  const emailErr = (tried && (!emailValid || free)) || (emailValid && free);
+  const emailErr = (tried && (!emailValid || free)) || (emailValid && free) || serverErrors.email !== undefined;
   const howErr = tried && !f.how.trim();
-  const domainMismatch = emailValid && !free && !existing && siteDomain !== "" && siteDomain !== domain;
+  const domainMismatch = emailValid && !free && siteDomain !== "" && siteDomain !== domain;
 
-  const submit = (event: React.FormEvent): void => {
+  const submit = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
     setTried(true);
+    setFormError(null);
     if (!f.company.trim() || !f.name.trim() || !emailValid || free || !f.how.trim()) return;
-    if (existing) {
-      toast(`${existing.name} is already a partner. Request access instead.`);
+    const category = codeFromLabel(PARTNER_CATEGORY_LABEL, f.category);
+    const region = codeFromLabel(PARTNER_REGION_LABEL, f.region);
+    if (!category || !region) return;
+    setBusy(true);
+    const result = await submitApplicationAction({
+      company: f.company,
+      website: f.site,
+      name: f.name,
+      title: f.title,
+      email: f.email,
+      phone: f.phone,
+      category,
+      region,
+      reason: f.how,
+      turnstileToken: token,
+    });
+    setBusy(false);
+    if (!result.ok) {
+      setServerErrors(issuesToErrors(result.error));
+      setFormError(result.error.issues?.length ? null : result.error.message);
+      setToken(null);
+      setResetKey((n) => n + 1);
+      return;
+    }
+    setServerErrors({});
+    if (result.data.outcome === "existing_partner") {
+      toast(`${result.data.partnerName} is already a partner. Request access instead.`);
       router.push(`${ROUTES.signIn}?request=1`);
       return;
     }
-    submitApplication({
-      company: f.company,
-      website: f.site,
-      applicant: f.name,
-      role: f.title,
-      email: f.email,
-      phone: f.phone,
-      category: f.category,
-      region: f.region,
-      reason: f.how,
-    });
     router.push(ROUTES.applyDone);
   };
 
@@ -213,7 +224,8 @@ export function Apply(): React.JSX.Element {
             />
             {emailErr ? (
               <ErrorText id="ap-email-msg">
-                {free ? "Use your company email, not a personal address." : "Enter a valid work email."}
+                {serverErrors.email ??
+                  (free ? "Use your company email, not a personal address." : "Enter a valid work email.")}
               </ErrorText>
             ) : (
               <span className="hint" id="ap-email-msg">
@@ -235,17 +247,6 @@ export function Apply(): React.JSX.Element {
             />
           </div>
         </div>
-        {existing ? (
-          <div className="note note-violet" role="status">
-            <span>
-              <b>{existing.name} is already a CleanStart partner.</b> You do not need to apply.{" "}
-              <Link href={`${ROUTES.signIn}?request=1`} style={{ fontWeight: 600 }}>
-                Request access
-              </Link>{" "}
-              and {existing.admin}, their partner admin, can let you in.
-            </span>
-          </div>
-        ) : null}
         {domainMismatch ? (
           <div className="note note-amber" role="status">
             <span>
@@ -259,7 +260,7 @@ export function Apply(): React.JSX.Element {
             <span id="ap-cat" className="lbl">
               Partner type
             </span>
-            <Seg options={CATEGORIES} value={f.category} onChange={(v) => set("category", v)} labelledBy="ap-cat" />
+            <Seg options={CATEGORY_OPTIONS} value={f.category} onChange={(v) => set("category", v)} labelledBy="ap-cat" />
           </div>
           <div className="fg">
             <span id="ap-reg" className="lbl">
@@ -295,8 +296,19 @@ export function Apply(): React.JSX.Element {
             Privacy policy
           </a>
         </p>
+        <TurnstileWidget siteKey={turnstileSiteKey} onToken={setToken} resetKey={resetKey} />
+        {serverErrors.turnstile || formError ? (
+          <span className="err" role="alert">
+            {serverErrors.turnstile ?? formError}
+          </span>
+        ) : null}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <button type="submit" className="btn btn-p" style={{ height: 38, fontSize: 13.5, padding: "0 16px" }}>
+          <button
+            type="submit"
+            className="btn btn-p"
+            style={{ height: 38, fontSize: 13.5, padding: "0 16px" }}
+            disabled={busy}
+          >
             Submit application
           </button>
           <span className="hint">Takes about 3 minutes.</span>

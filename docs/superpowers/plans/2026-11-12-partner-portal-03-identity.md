@@ -109,7 +109,7 @@ Implements master task 1.3. Rules: company email required (free-mail rejected wi
 - Create: `src/components/partners/turnstile-widget.tsx`
 - Modify: `src/components/screens/Apply.tsx`, `src/components/screens/ApplyDone.tsx`, `src/app/(public)/apply/page.tsx`, `src/app/(public)/apply/done/page.tsx`
 
-- [ ] **Step 1: Write the failing test for the client-safe helpers**
+- [x] **Step 1: Write the failing test for the client-safe helpers**
 
 Create `src/lib/people.test.ts`:
 
@@ -210,12 +210,12 @@ describe('display helpers', () => {
 });
 ```
 
-- [ ] **Step 2: Run it and see it fail**
+- [x] **Step 2: Run it and see it fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/lib/people.test.ts`
 Expected: FAIL, `Error: Failed to resolve import "./people" from "src/lib/people.test.ts"`.
 
-- [ ] **Step 3: Implement the helpers**
+- [x] **Step 3: Implement the helpers**
 
 Create `src/lib/people.ts`:
 
@@ -333,12 +333,12 @@ export const landingPathFor = (kind: UserKind, role: PartnerRole | StaffRole): s
 };
 ```
 
-- [ ] **Step 4: Run the helper tests and see them pass**
+- [x] **Step 4: Run the helper tests and see them pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/lib/people.test.ts`
 Expected: PASS, `Test Files  1 passed (1)`.
 
-- [ ] **Step 5: Create the apply types**
+- [x] **Step 5: Create the apply types**
 
 Create `src/lib/apply.ts`:
 
@@ -369,7 +369,7 @@ export const APPLY_IP_RULE = { limit: 5, windowSeconds: 600 } as const;
 export const APPLY_EMAIL_RULE = { limit: 3, windowSeconds: 600 } as const;
 ```
 
-- [ ] **Step 6: Write the failing test for the server helpers**
+- [x] **Step 6: Write the failing test for the server helpers**
 
 Create `src/server/people.test.ts`:
 
@@ -406,7 +406,7 @@ describe('server people helpers', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/people.test.ts`
 Expected: FAIL, `Failed to resolve import "./people"`.
 
-- [ ] **Step 7: Implement the server helpers**
+- [x] **Step 7: Implement the server helpers**
 
 Create `src/server/people.ts`:
 
@@ -446,7 +446,7 @@ export const alertAddresses = (people: readonly AddressSource[], notifyEmail: st
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/people.test.ts`
 Expected: PASS.
 
-- [ ] **Step 8: Write the failing Turnstile test**
+- [x] **Step 8: Write the failing Turnstile test**
 
 Create `src/server/turnstile.test.ts`:
 
@@ -504,7 +504,7 @@ describe('verifyTurnstile', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/turnstile.test.ts`
 Expected: FAIL, `Failed to resolve import "./turnstile"`.
 
-- [ ] **Step 9: Implement Turnstile**
+- [x] **Step 9: Implement Turnstile**
 
 Create `src/server/turnstile.ts` (the signature is contracts H.18):
 
@@ -546,7 +546,7 @@ export async function verifyTurnstile(input: { token: string | null; ip: string 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/turnstile.test.ts`
 Expected: PASS, 4 tests.
 
-- [ ] **Step 10: Write the failing receipt test**
+- [x] **Step 10: Write the failing receipt test**
 
 Create `src/server/apply-receipt.test.ts`:
 
@@ -590,7 +590,7 @@ describe('apply receipt cookie', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/apply-receipt.test.ts`
 Expected: FAIL, `Failed to resolve import "./apply-receipt"`.
 
-- [ ] **Step 11: Implement the receipt**
+- [x] **Step 11: Implement the receipt**
 
 Create `src/server/apply-receipt.ts`:
 
@@ -648,7 +648,7 @@ export function verifyApplyReceipt(value: string, now: Date): ApplyReceipt | nul
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/apply-receipt.test.ts`
 Expected: PASS, 3 tests.
 
-- [ ] **Step 12: Write the failing repo test for M1.3**
+- [x] **Step 12: Write the failing repo test for M1.3**
 
 Create `src/server/repo/applications.test.ts` (later tasks append to it):
 
@@ -744,7 +744,7 @@ describe('listManagerRecipients', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/applications.test.ts`
 Expected: FAIL, `Failed to resolve import "./applications"`.
 
-- [ ] **Step 13: Implement the M1.3 part of the applications repo**
+- [x] **Step 13: Implement the M1.3 part of the applications repo**
 
 Create `src/server/repo/applications.ts`. Types are exported exactly as contracts H.1; the file grows in M1.3b and M1.4.
 
@@ -912,7 +912,7 @@ export const isolation = defineIsolation<'createPortalApplication' | 'findPartne
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/applications.test.ts`
 Expected: PASS, 5 tests.
 
-- [ ] **Step 14: Write the failing action test**
+- [x] **Step 14: Write the failing action test**
 
 Create `src/server/actions/apply.test.ts`. The mock block at the top is the standard block described under Conventions.
 
@@ -1060,7 +1060,7 @@ describe('submitApplicationAction', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/apply.test.ts`
 Expected: FAIL, `Failed to resolve import "./apply"`.
 
-- [ ] **Step 15: Implement the apply action**
+- [x] **Step 15: Implement the apply action**
 
 Create `src/server/actions/apply.ts`:
 
@@ -1235,7 +1235,7 @@ export async function submitApplicationAction(raw: unknown): Promise<ActionResul
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/apply.test.ts`
 Expected: PASS, 8 tests. If the receipt cookie assertion fails because `next/headers` was not mocked, check that the `vi.mock('next/headers', ...)` block is the first statement after the imports.
 
-- [ ] **Step 16: Create the Turnstile widget component**
+- [x] **Step 16: Create the Turnstile widget component**
 
 Create `src/components/partners/turnstile-widget.tsx`. Verified against Cloudflare's explicit rendering docs: script `https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit`, `turnstile.render(container, { sitekey, callback })`, `turnstile.reset(id)`, `turnstile.remove(id)`.
 
@@ -1314,7 +1314,7 @@ export function TurnstileWidget({ siteKey, onToken, resetKey }: TurnstileWidgetP
 }
 ```
 
-- [ ] **Step 17: Convert `Apply.tsx`**
+- [x] **Step 17: Convert `Apply.tsx`**
 
 Apply each of these region edits to `src/components/screens/Apply.tsx`.
 
@@ -1620,7 +1620,7 @@ After:
         </div>
 ```
 
-- [ ] **Step 18: Write the Apply page and the receipt-driven ApplyDone**
+- [x] **Step 18: Write the Apply page and the receipt-driven ApplyDone**
 
 Replace `src/app/(public)/apply/page.tsx` in full (the site key comes from the server `env`, which supplies Cloudflare's always-pass key outside production; a client component must not import `@/env`):
 
@@ -1739,12 +1739,12 @@ After:
           <dd>{PARTNER_REGION_LABEL[receipt.region]}</dd>
 ```
 
-- [ ] **Step 19: Prove no slice import is left in the converted screens**
+- [x] **Step 19: Prove no slice import is left in the converted screens**
 
 Run: `grep -n "@/data/\|@/lib/slice" src/components/screens/Apply.tsx src/components/screens/ApplyDone.tsx`
 Expected: no output.
 
-- [ ] **Step 20: Gate A**
+- [x] **Step 20: Gate A**
 
 Run the Gate A block from "Conventions". Expected as stated there. The last command must list only: `src/lib/apply.ts`, `src/lib/people.ts`, `src/lib/people.test.ts`, `src/server/people.ts`, `src/server/people.test.ts`, `src/server/turnstile.ts`, `src/server/turnstile.test.ts`, `src/server/apply-receipt.ts`, `src/server/apply-receipt.test.ts`, `src/server/repo/applications.ts`, `src/server/repo/applications.test.ts`, `src/server/actions/apply.ts`, `src/server/actions/apply.test.ts`, `src/components/partners/turnstile-widget.tsx`, `src/components/screens/Apply.tsx`, `src/components/screens/ApplyDone.tsx`, `src/app/(public)/apply/page.tsx`, `src/app/(public)/apply/done/page.tsx` (paths under `apps/portal/`).
 
@@ -1757,7 +1757,7 @@ Run the Gate A block from "Conventions". Expected as stated there. The last comm
 5. Submit the Tidewater form a second time with a different reason: still 4 rows, the reason updated.
 6. Submit six times quickly from one browser with different emails: the sixth shows "Too many attempts. Try again in a moment."
 
-- [ ] **Step 22: Commit**
+- [x] **Step 22: Commit**
 
 ```bash
 git add apps/portal/src/lib/apply.ts apps/portal/src/lib/people.ts apps/portal/src/lib/people.test.ts \
