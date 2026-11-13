@@ -1,11 +1,12 @@
 import { createHash } from 'node:crypto';
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { Db } from '@/db/client';
 import {
   accessRequests,
   applications,
   auditLog,
+  authAccounts,
   documentAudience,
   documentOpens,
   documents,
@@ -56,6 +57,8 @@ export interface SeedSummary {
 
 export interface SeedOptions {
   clock: Clock;
+  /** A scrypt hash from hashPassword. When given, every active seeded user gets a credential login with it. */
+  passwordHash?: string;
 }
 
 /* ---------------------------------------------------------------- the shapes of the extracted mock data */
@@ -484,6 +487,13 @@ export async function seedMockData(db: Db, opts: SeedOptions): Promise<SeedSumma
     });
   }
 
+  if (opts.passwordHash !== undefined) {
+    const active = await db.select({ id: users.id }).from(users).where(eq(users.status, 'active'));
+    if (active.length > 0) {
+      await db.insert(authAccounts).values(active.map((user) => ({ userId: user.id, providerId: 'credential', accountId: user.id, password: opts.passwordHash })));
+    }
+  }
+
   const count = async (table: string): Promise<number> => Number((await db.execute(sql.raw(`select count(*)::int as n from ${table}`))).rows[0]?.n ?? 0);
   return {
     partners: await count('partners'),
@@ -513,11 +523,11 @@ export function assertDevSeedAllowed(env: Record<string, string | undefined>): v
 }
 
 /** What `pnpm db:seed` runs. Refuses a database that already has partners: it never deletes data (CLAUDE.md). */
-export async function seedDevDatabase(db: Db, clock: Clock): Promise<SeedSummary> {
+export async function seedDevDatabase(db: Db, clock: Clock, passwordHash?: string): Promise<SeedSummary> {
   assertDevSeedAllowed(process.env);
   const existing = Number((await db.execute(sql`select count(*)::int as n from partners`)).rows[0]?.n ?? 0);
   if (existing > 0) {
     throw new Error('The database already has partners. Seed a fresh database: scripts/db-create.sh <name>, then pnpm db:migrate, then pnpm db:seed.');
   }
-  return seedMockData(db, { clock });
+  return seedMockData(db, { clock, ...(passwordHash === undefined ? {} : { passwordHash }) });
 }

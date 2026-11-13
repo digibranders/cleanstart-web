@@ -6,6 +6,7 @@ import {
   accessRequests,
   applications,
   auditLog,
+  authAccounts,
   documentAudience,
   documentOpens,
   documents,
@@ -28,6 +29,7 @@ import type {
   StaffRole,
 } from '@/lib/domain';
 import type { PartnerViewer, StaffViewer, Viewer } from '@/server/auth/types';
+import { hashPassword } from '@/server/auth/passwords';
 import type { IsolationContext, TenantFixture } from '@/server/repo/isolation.registry';
 
 /** System scope db for the worker's database (portal_app, app.kind = 'system'). Same object every call. */
@@ -124,6 +126,8 @@ export interface MakeUserInput {
   name?: string;
   status?: 'invited' | 'active' | 'disabled';
   region?: StaffRegion;
+  /** Inserts a Better Auth credential account hashed with hashPassword (added by M0.7). */
+  password?: string;
   hubspotContactId?: string | null;
 }
 
@@ -150,6 +154,11 @@ export async function makeUser(database: Db, input: MakeUserInput): Promise<User
     .returning();
   const user = first(rows, 'user');
   if (kind === 'staff') await database.insert(staffScopes).values({ userId: user.id, region: input.region ?? 'all' });
+  if (input.password !== undefined) {
+    await database
+      .insert(authAccounts)
+      .values({ userId: user.id, providerId: 'credential', accountId: user.id, password: await hashPassword(input.password) });
+  }
   return user;
 }
 

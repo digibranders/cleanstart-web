@@ -1,6 +1,8 @@
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { authAccounts, users } from '@/db/schema';
 import { fixedClock } from '@/lib/clock';
+import { hashPassword } from '@/server/auth/passwords';
 import { assertDevSeedAllowed, parseLastSeen, parseMockDate, seedDevDatabase, seedMockData, type SeedSummary } from './fixtures';
 import { resetDb, testDb } from './test-helpers';
 
@@ -111,5 +113,16 @@ describe('dev seed guard', () => {
     vi.stubEnv('NODE_ENV', 'test');
     vi.stubEnv('DATABASE_URL', 'postgresql://u:p@db.example.com:5432/d');
     await expect(seedDevDatabase(testDb(), clock)).rejects.toThrow(/not localhost/);
+  });
+});
+
+describe('seedMockData with a password hash', () => {
+  it('gives every active user one credential login and the invited users none', async () => {
+    await resetDb();
+    await seedMockData(testDb(), { clock, passwordHash: await hashPassword('Portal-dev-2026!') });
+    const accounts = await testDb().select({ userId: authAccounts.userId, providerId: authAccounts.providerId }).from(authAccounts);
+    const active = await testDb().select({ id: users.id }).from(users).where(eq(users.status, 'active'));
+    expect(accounts).toHaveLength(active.length);
+    expect(new Set(accounts.map((account) => account.providerId))).toEqual(new Set(['credential']));
   });
 });

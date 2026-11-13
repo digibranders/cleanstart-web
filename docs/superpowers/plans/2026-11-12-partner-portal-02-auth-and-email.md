@@ -112,7 +112,7 @@ The checklist:
 - Modify: `apps/portal/src/db/test-helpers.ts`, `apps/portal/src/db/fixtures.ts`, `apps/portal/src/db/fixtures.test.ts`, `apps/portal/scripts/seed-dev.ts` (passwords, Step 6b), `docs/superpowers/plans/2026-11-11-partner-portal-master-plan.md`
 - Test: `apps/portal/src/server/auth/auth.spike.test.ts`
 
-- [ ] **Step 1: Log the start and check the install**
+- [x] **Step 1: Log the start and check the install**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M0.7 | started | W0 | - | - | auth spike" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
@@ -123,7 +123,7 @@ pnpm --filter @cleanstart/portal exec tsx --version
 
 Expected: `better-auth 1.7.x`, `drizzle-orm 0.45.x`, `drizzle-kit 0.31.x`, `vitest`, `zod 3.x` listed, and a `tsx` version printed (the `db:migrate` and `db:seed` scripts already need it). This plan was verified against better-auth 1.7.22. If the minor version is not 1.7, stop and re-run Step 8 and Step 10 before trusting any later step; a different minor may change option names. If `better-auth` is missing, the orchestrator adds it (W0-a owns `package.json`); log `blocked`.
 
-- [ ] **Step 2: Verify the three library facts that change the schema and the build**
+- [x] **Step 2: Verify the three library facts that change the schema and the build**
 
 Verify: the schema check, the lazy construction and the two-factor columns, using the installed version.
 
@@ -135,7 +135,7 @@ grep -n "default secret\|BETTER_AUTH_SECRET is missing" apps/portal/node_modules
 
 Expected: the first prints the three field definitions (`verified`, `failedVerificationCount`, `lockedUntil`); the second prints the `validateSecret` lines that throw. If the first prints fewer fields, the installed version differs from 1.7.22: drop the column that is missing from the schema, as Step 5 describes. If the second prints nothing, the secret check moved; keep the lazy `getAuth()` anyway.
 
-- [ ] **Step 3: Write the spike test (fails first)**
+- [x] **Step 3: Write the spike test (fails first)**
 
 Create `apps/portal/src/server/auth/test-totp.ts`:
 
@@ -354,7 +354,7 @@ describe('M0.7 auth spike', () => {
 });
 ```
 
-- [ ] **Step 4: Run it and see it fail**
+- [x] **Step 4: Run it and see it fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/auth/auth.spike.test.ts
@@ -362,7 +362,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/auth/auth.spike.test
 
 Expected: FAIL with `Failed to resolve import "./auth"` (the module does not exist yet).
 
-- [ ] **Step 5: Check the three `auth_two_factor` columns (already in the schema and in `0000_init`)**
+- [x] **Step 5: Check the three `auth_two_factor` columns (already in the schema and in `0000_init`)**
 
 Better Auth 1.7 refuses to start unless `auth_two_factor` has `verified`, `failed_verification_count` and `locked_until`. They are part of the contracts' C.1 and therefore of `src/db/schema.ts` and `drizzle/0000_init.sql` since W0-b (integration review: there is no `0001` migration). If W0-b formatted the table differently, that is fine; check that the columns are there:
 
@@ -374,7 +374,7 @@ grep -nE '"verified"|"failed_verification_count"|"locked_until"' apps/portal/dri
 
 Expected: three hits in each file (the `schema.ts` hits for `verified` may include other lines such as `emailVerified`; the three `auth_two_factor` ones are inside `authTwoFactors`). If the installed Better Auth needs a different set (Step 2 printed it), edit `schema.ts`, delete `drizzle/0000_init.sql` and `drizzle/meta`, run `pnpm --filter @cleanstart/portal exec drizzle-kit generate --name init`, put the `CREATE EXTENSION IF NOT EXISTS pg_trgm;--> statement-breakpoint` line back at the top, and run `scripts/db-create.sh <name> --recreate` for each of this worktree's databases (the Drizzle migrator re-applies a changed first migration). Wave 0 owns the schema until the `portal-w0` tag and no database holds data yet, so this is allowed (contracts M.1 items 2 and 3). Record the change in the progress log and in the contracts' C.1.
 
-- [ ] **Step 6: Create the password hashing module**
+- [x] **Step 6: Create the password hashing module**
 
 Create `apps/portal/src/server/auth/passwords.ts` (if W0-b created a stub with these two function names, replace it):
 
@@ -421,7 +421,7 @@ export async function verifyPassword(input: { hash: string; password: string }):
 }
 ```
 
-- [ ] **Step 6b: Add passwords to the W0-b helpers and the dev seed**
+- [x] **Step 6b: Add passwords to the W0-b helpers and the dev seed**
 
 The spike test and every later auth test call `makeUser(db, { password })`, and the manual checks sign in as a seeded user with `DEV_SEED_PASSWORD`. W0-b could not provide either because `hashPassword` did not exist yet (contracts J.3 and J.5); this step adds them. It edits W0-b files, which Wave 0 allows (single owner: this step).
 
@@ -548,7 +548,7 @@ describe('seedMockData with a password hash', () => {
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/db/fixtures.test.ts`. Expected: PASS, one test more than before (the previous total was 10 in plan 01 Step 21).
 
-- [ ] **Step 7: Create the mail bridge**
+- [x] **Step 7: Create the mail bridge**
 
 Better Auth must call something when it needs to send a reset link, but the email module is built later (Task M0.5). This file is the seam: it only logs, never logs the token, and Task M0.5d replaces both bodies. Create `apps/portal/src/server/auth/auth-mail.ts`:
 
@@ -579,7 +579,7 @@ export async function sendPasswordChangedEmail(input: PasswordChangedMail): Prom
 }
 ```
 
-- [ ] **Step 8: Create the Better Auth instance**
+- [x] **Step 8: Create the Better Auth instance**
 
 Create `apps/portal/src/server/auth/auth.ts`. The options that matter: `generateId: false` (Postgres makes ids), the `additionalFields` for the four portal columns, scrypt functions, `disableSignUp: true` (accounts exist only through `acceptInvite`), `disableSignUp: true` on both social providers (a Google or Microsoft identity signs in an existing user, it never creates one), `trustedProviders: []` with `allowDifferentEmails: false` (link only by a provider verified email), `revokeSessionsOnPasswordReset: true`, and the lazy `getAuth()`.
 
@@ -706,7 +706,7 @@ export const auth: Auth = new Proxy({} as Auth, {
 });
 ```
 
-- [ ] **Step 9: Create the route handler, the browser client and the viewer**
+- [x] **Step 9: Create the route handler, the browser client and the viewer**
 
 Create `apps/portal/src/app/api/auth/[...all]/route.ts`:
 
@@ -794,7 +794,7 @@ export async function viewerFromHeaders(requestHeaders: Headers): Promise<Viewer
 export const getViewer = cache(async (): Promise<Viewer | null> => viewerFromHeaders(await headers()));
 ```
 
-- [ ] **Step 10: Run the spike and see it pass**
+- [x] **Step 10: Run the spike and see it pass**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/auth/auth.spike.test.ts
@@ -802,7 +802,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/auth/auth.spike.test
 
 Expected: `Test Files  1 passed (1)`, `Tests  7 passed (7)`. Better Auth prints a few `WARN [Better Auth]: Invalid password` and `User not found` lines to stderr; those are the refusals the tests provoke and are not failures.
 
-- [ ] **Step 11: Create the gate script and run it**
+- [x] **Step 11: Create the gate script and run it**
 
 Create `apps/portal/scripts/auth-spike-gate.ts`:
 
@@ -882,7 +882,7 @@ exit=0
 
 **Decision gate.** `exit=0`: continue with Step 12. Any `FAIL` on S1 to S5 or S7, or `DECISION: authjs-v5`, `exit=1`: do not continue with this task. Run Task M0.7-F, and write the failing item and the error text in `docs/partner-portal/AUTH-SPIKE.md` using the "Failed" text in Step 12.
 
-- [ ] **Step 12: Write the result file**
+- [x] **Step 12: Write the result file**
 
 Create `docs/partner-portal/AUTH-SPIKE.md` (pass case):
 
@@ -929,7 +929,7 @@ configuration only. Signing in with either needs a dev OAuth app, which an unatt
 
 Failed case (use instead only if the gate failed): the same file with `Decision: **Auth.js v5**`, `Status: FALLBACK TAKEN`, the failing item and its error text under "Result", and the Auth.js facts from the top of this plan under "What the spike found".
 
-- [ ] **Step 13: Record the decision in the master plan**
+- [x] **Step 13: Record the decision in the master plan**
 
 Edit `docs/superpowers/plans/2026-11-11-partner-portal-master-plan.md`. Find:
 
@@ -945,7 +945,7 @@ Task 0.7 is a one day spike with Auth.js v5 as the fallback. **Spike result: Bet
 
 (Failed case: `**Spike result: Auth.js v5, Better Auth failed item S<n>, see docs/partner-portal/AUTH-SPIKE.md.**`.)
 
-- [ ] **Step 14: Run Gate A**
+- [x] **Step 14: Run Gate A**
 
 ```bash
 pnpm --filter @cleanstart/portal lint
