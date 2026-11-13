@@ -1,9 +1,10 @@
 import type { Product as ChipProduct, BadgeTone } from "../ui/badge";
 import { sameCustomer } from "@/lib/customer";
 import { acceptedOnFor, EXPIRING_SOON_DAYS, isOverSla, REVIEW_SLA_BUSINESS_DAYS, waitingBusinessDays } from "@/lib/deal-rules";
-import type { DealRegion, Product, RegistrationStatus } from "@/lib/domain";
-import type { ManagerOptionDto, RegistrationListItem } from "@/lib/dto";
+import { DEAL_REGIONS, type DealRegion, PARTNER_REGION_LABEL, PRODUCT_LABEL, type Product, type RegistrationStatus } from "@/lib/domain";
+import type { ManagerOptionDto, RegistrationCheckDto, RegistrationListItem } from "@/lib/dto";
 import { daysLeft, fmtLong, fmtShort, plural } from "./dates";
+import type { HubspotHintDto } from "./types";
 
 export { sameCustomer };
 
@@ -118,4 +119,76 @@ export function stageTrack(deal: Pick<RegistrationListItem, "status" | "stage">)
 /** The manager the Register form preselects: the one covering the deal region, else the first. */
 export function managerFor(managers: readonly ManagerOptionDto[], region: DealRegion): string {
   return (managers.find((m) => m.region === region) ?? managers.find((m) => m.region === "all") ?? managers[0])?.id ?? "";
+}
+
+export interface Check {
+  kind: "conflict" | "info" | "none";
+  label: string;
+  tone: BadgeTone;
+  why: string;
+  whyCls: string;
+  /** The other partner's registration, when two partners claim the same customer and product. */
+  rival?: { partnerName: string; registeredOn: string; registeredFirst: boolean };
+}
+
+type CheckedDeal = Pick<RegistrationListItem, "partnerName" | "registeredOn" | "product">;
+
+/** The approvals "Checks" column: a rival registration, the same customer under another product, or clear. */
+export function describeCheck(deal: CheckedDeal, check: RegistrationCheckDto, hint?: HubspotHintDto): Check {
+  const other = check.other;
+  if (check.kind === "conflict" && other) {
+    let why: string;
+    if (other.status === "accepted") {
+      why = `${other.partnerName} already holds this, protected until ${fmtLong(other.protectionEnd ?? deal.registeredOn)}.`;
+    } else if (!other.registeredFirst) {
+      why = `${other.partnerName} also registered it on ${fmtShort(other.registeredOn)}. ${firstWord(deal.partnerName)} was first.`;
+    } else {
+      why = `${other.partnerName} registered it first, on ${fmtShort(other.registeredOn)}.`;
+    }
+    return {
+      kind: "conflict",
+      label: "Conflict",
+      tone: "pending",
+      why,
+      whyCls: "why why-amber",
+      rival: { partnerName: other.partnerName, registeredOn: other.registeredOn, registeredFirst: other.registeredFirst },
+    };
+  }
+  if (hint) {
+    return {
+      kind: "conflict",
+      label: "Conflict",
+      tone: "pending",
+      why: `${hint.holder ?? "Another partner"} already has an open deal for this customer in HubSpot.`,
+      whyCls: "why why-amber",
+    };
+  }
+  if (check.kind === "info" && other?.protectionEnd) {
+    return {
+      kind: "info",
+      label: "Same customer",
+      tone: "violet",
+      why: `${firstWord(deal.partnerName)} already holds ${PRODUCT_LABEL[other.product]} here, until ${fmtLong(other.protectionEnd)}.`,
+      whyCls: "why",
+    };
+  }
+  return { kind: "none", label: "Clear", tone: "accepted", why: "", whyCls: "why" };
+}
+
+/** The reason the reject box starts with when another partner registered the same customer and product first. */
+export function defaultRejectReason(deal: CheckedDeal, check: Check): string {
+  const rival = check.rival;
+  if (rival?.registeredFirst) {
+    return `${rival.partnerName} registered this customer for ${PRODUCT_LABEL[deal.product]} on ${fmtShort(rival.registeredOn)}.`;
+  }
+  return "";
+}
+
+/** "India goes to Farhan, Middle East to Omar." from the managers partners can pick. */
+export function routingText(managers: readonly ManagerOptionDto[]): string {
+  const parts = DEAL_REGIONS.flatMap((region) => {
+    const manager = managers.find((m) => m.region === region);
+    return manager ? [{ region, first: firstWord(manager.name) }] : [];
+  }).map((p, index) => `${PARTNER_REGION_LABEL[p.region]} ${index === 0 ? "goes to" : "to"} ${p.first}`);
+  return parts.length ? `${parts.join(", ")}.` : "";
 }

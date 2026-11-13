@@ -1,4 +1,4 @@
-import { asc, desc, eq, getTableColumns, inArray } from 'drizzle-orm';
+import { and, asc, desc, eq, getTableColumns, inArray, or, sql } from 'drizzle-orm';
 import {
   partners,
   registrationContacts,
@@ -8,7 +8,7 @@ import {
   users,
 } from '@/db/schema';
 import type { PartnerCategory } from '@/lib/domain';
-import type { RegistrationDetailDto, RegistrationListItem, RegistrationMessageDto } from '@/lib/dto';
+import type { RegistrationCheckDto, RegistrationDetailDto, RegistrationListItem, RegistrationMessageDto } from '@/lib/dto';
 import type { Tx } from '@/server/repo/context';
 
 export type RegistrationRow = typeof registrations.$inferSelect;
@@ -139,4 +139,59 @@ export async function loadDetails(tx: Tx, rows: readonly ListRow[]): Promise<Reg
       events: byEvent.get(row.id) ?? [],
     }),
   );
+}
+
+const sameNameIs = (name: string) => sql`lower(${registrations.customerName}) = ${name.toLowerCase()}`;
+
+/** Accepted rivals first, then the earliest registration. */
+const strongest = (a: ListRow, b: ListRow): number =>
+  Number(b.status === 'accepted') - Number(a.status === 'accepted') || a.createdAt.getTime() - b.createdAt.getTime();
+
+/**
+ * Staff only data. Another partner's pending or accepted registration for the same customer and product is a conflict;
+ * the same partner already holding an accepted registration for another product of that customer is information.
+ * Region is not applied: the point of the check is to see across regions.
+ */
+export async function computeChecks(tx: Tx, rows: readonly ListRow[]): Promise<Record<string, RegistrationCheckDto>> {
+  const checks: Record<string, RegistrationCheckDto> = {};
+  const names = [...new Set(rows.map((r) => r.customerName.toLowerCase()))];
+  if (names.length === 0) return checks;
+  const others = await selectRows(tx).where(
+    and(or(...names.map(sameNameIs)), inArray(registrations.status, ['pending', 'accepted'])),
+  );
+  for (const row of rows) {
+    const same = others.filter((o) => o.id !== row.id && o.customerName.toLowerCase() === row.customerName.toLowerCase());
+    const rival = same.filter((o) => o.product === row.product && o.partnerId !== row.partnerId).sort(strongest)[0];
+    if (rival) {
+      checks[row.id] = {
+        kind: 'conflict',
+        other: {
+          id: rival.id,
+          partnerName: rival.partnerName,
+          product: rival.product,
+          status: rival.status,
+          registeredOn: rival.registeredOn,
+          protectionEnd: rival.protectionEnd,
+          registeredFirst: rival.createdAt.getTime() < row.createdAt.getTime(),
+        },
+      };
+      continue;
+    }
+    const held = same.find((o) => o.partnerId === row.partnerId && o.product !== row.product && o.status === 'accepted' && o.protectionEnd);
+    checks[row.id] = held
+      ? {
+          kind: 'info',
+          other: {
+            id: held.id,
+            partnerName: held.partnerName,
+            product: held.product,
+            status: held.status,
+            registeredOn: held.registeredOn,
+            protectionEnd: held.protectionEnd,
+            registeredFirst: false,
+          },
+        }
+      : { kind: 'none' };
+  }
+  return checks;
 }

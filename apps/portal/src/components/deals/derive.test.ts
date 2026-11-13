@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { PROTECTION_DAYS } from './dates';
-import { acceptedOn, isOverTarget, managerFor, protectionView, reviewSince, stageTrack, waitDays } from './derive';
+import { acceptedOn, defaultRejectReason, describeCheck, isOverTarget, managerFor, protectionView, reviewSince, routingText, stageTrack, waitDays } from './derive';
 
 const base = {
   registeredOn: '2026-11-02',
@@ -88,5 +88,63 @@ describe('managerFor', () => {
     expect(managerFor(managers, 'middle_east')).toBe('m-me');
     expect(managerFor([managers[0]!], 'middle_east')).toBe('m-in');
     expect(managerFor([], 'india')).toBe('');
+  });
+});
+
+describe('describeCheck', () => {
+  const deal = { partnerName: 'Kestrel Systems', registeredOn: '2026-11-03', product: 'images' as const };
+  const rival = (over: Record<string, unknown> = {}) => ({
+    kind: 'conflict' as const,
+    other: {
+      id: 'o', partnerName: 'Arbor Cyber', product: 'images' as const, status: 'pending' as const,
+      registeredOn: '2026-11-05', protectionEnd: null, registeredFirst: false, ...over,
+    },
+  });
+
+  it('says who was first when two partners wait', () => {
+    expect(describeCheck(deal, rival())).toMatchObject({
+      kind: 'conflict', label: 'Conflict', tone: 'pending', whyCls: 'why why-amber',
+      why: 'Arbor Cyber also registered it on 5 Nov. Kestrel was first.',
+    });
+    expect(describeCheck(deal, rival({ registeredFirst: true })).why).toBe('Arbor Cyber registered it first, on 5 Nov.');
+  });
+
+  it('says the other partner already holds an accepted registration', () => {
+    const accepted = rival({ status: 'accepted', protectionEnd: '2027-02-02', registeredFirst: true });
+    expect(describeCheck(deal, accepted).why).toBe('Arbor Cyber already holds this, protected until 2 Feb 2027.');
+  });
+
+  it('reports the same customer under another product the partner already holds', () => {
+    const info = { kind: 'info' as const, other: { id: 'o', partnerName: 'Kestrel Systems', product: 'libraries' as const, status: 'accepted' as const, registeredOn: '2026-10-01', protectionEnd: '2027-01-12', registeredFirst: false } };
+    expect(describeCheck(deal, info)).toMatchObject({ kind: 'info', label: 'Same customer', tone: 'violet', why: 'Kestrel already holds Clean Libraries here, until 12 Jan 2027.', whyCls: 'why' });
+  });
+
+  it('is clear without a conflict, and a HubSpot hint turns a clear row into a conflict', () => {
+    expect(describeCheck(deal, { kind: 'none' })).toMatchObject({ kind: 'none', label: 'Clear', tone: 'accepted', why: '' });
+    const hinted = describeCheck(deal, { kind: 'none' }, { registrationId: 'r', holder: 'Dunes Networks', openDeals: 1 });
+    expect(hinted).toMatchObject({ kind: 'conflict', why: 'Dunes Networks already has an open deal for this customer in HubSpot.' });
+    expect(describeCheck(deal, { kind: 'none' }, { registrationId: 'r', holder: null, openDeals: 2 }).why).toBe('Another partner already has an open deal for this customer in HubSpot.');
+  });
+
+  it('keeps a portal conflict when HubSpot also reports one', () => {
+    expect(describeCheck(deal, rival(), { registrationId: 'r', holder: 'X', openDeals: 1 }).why).toContain('Arbor Cyber');
+  });
+});
+
+describe('defaultRejectReason', () => {
+  it('pre-fills the reason when another partner registered first, and is empty otherwise', () => {
+    const deal = { partnerName: 'Kestrel Systems', registeredOn: '2026-11-05', product: 'images' as const };
+    const first = describeCheck(deal, { kind: 'conflict', other: { id: 'o', partnerName: 'Arbor Cyber', product: 'images', status: 'pending', registeredOn: '2026-11-03', protectionEnd: null, registeredFirst: true } });
+    expect(defaultRejectReason(deal, first)).toBe('Arbor Cyber registered this customer for CleanStart Images on 3 Nov.');
+    expect(defaultRejectReason(deal, describeCheck(deal, { kind: 'none' }))).toBe('');
+  });
+});
+
+describe('routingText', () => {
+  const m = (name: string, region: 'india' | 'middle_east' | 'all') => ({ id: name, name, region, team: 'x' });
+  it('names the manager each region goes to', () => {
+    expect(routingText([m('Farhan Qureshi', 'india'), m('Omar Nasser', 'middle_east')])).toBe('India goes to Farhan, Middle East to Omar.');
+    expect(routingText([m('Farhan Qureshi', 'india')])).toBe('India goes to Farhan.');
+    expect(routingText([])).toBe('');
   });
 });

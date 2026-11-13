@@ -4480,7 +4480,7 @@ Rules this task implements (contracts H.7, H.19, M.3):
 - Conflict hint: a pending or accepted registration of another partner for the same customer and product (portal data), plus the HubSpot open deal check (`conflictingDeals`) fetched after the page renders through `hubspotConflictHintsAction`, never blocking the page or a decision. Staff only; partners never see these checks.
 - A decision is never blocked by HubSpot being down: the action only writes the outbox row.
 
-- [ ] **Step 1: Write the failing tests for the check wording and the routing text**
+- [x] **Step 1: Write the failing tests for the check wording and the routing text**
 
 Append to `src/components/deals/derive.test.ts` (add `defaultRejectReason`, `describeCheck`, `routingText` to its import from `./derive`):
 
@@ -4547,7 +4547,7 @@ describe('routingText', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/components/deals/derive.test.ts`
 Expected: FAIL, `describeCheck is not a function` (and the two other new exports).
 
-- [ ] **Step 2: Implement the three derived helpers**
+- [x] **Step 2: Implement the three derived helpers**
 
 Append to `src/components/deals/derive.ts`. Its existing `@/lib/domain` import is type only, so add a separate value import `import { DEAL_REGIONS, PARTNER_REGION_LABEL, PRODUCT_LABEL } from "@/lib/domain";`, add `RegistrationCheckDto` to its dto type import (`ManagerOptionDto` is already there), and add `import type { HubspotHintDto } from "./types";`:
 
@@ -4628,7 +4628,7 @@ export function routingText(managers: readonly ManagerOptionDto[]): string {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/components/deals/derive.test.ts`
 Expected: PASS, 18 tests.
 
-- [ ] **Step 3: Write the failing hint service tests**
+- [x] **Step 3: Write the failing hint service tests**
 
 ```ts
 // src/server/registrations/conflict-hints.test.ts
@@ -4685,7 +4685,7 @@ describe('hubspotConflictHints', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/registrations/conflict-hints.test.ts`
 Expected: FAIL, "Cannot find module './conflict-hints'".
 
-- [ ] **Step 4: Implement `conflict-hints.ts`**
+- [x] **Step 4: Implement `conflict-hints.ts`**
 
 ```ts
 // src/server/registrations/conflict-hints.ts
@@ -4747,7 +4747,7 @@ export async function hubspotConflictHints(
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/registrations/conflict-hints.test.ts`
 Expected: PASS, 3 tests.
 
-- [ ] **Step 5: Write the failing repo tests for decisions, queue and checks**
+- [x] **Step 5: Write the failing repo tests for decisions, queue and checks**
 
 ```ts
 // src/server/repo/registrations.decide.test.ts
@@ -5031,7 +5031,7 @@ describe('detail after a decision', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/registrations.decide.test.ts`
 Expected: FAIL, "acceptRegistration is not a function" (the module exists from M2.1 but lacks the new exports).
 
-- [ ] **Step 6: Add `computeChecks` to `src/server/registrations/mappers.ts`**
+- [x] **Step 6: Add `computeChecks` to `src/server/registrations/mappers.ts`**
 
 Add `or, sql, and` to the `drizzle-orm` import (`import { and, asc, desc, eq, getTableColumns, inArray, or, sql } from 'drizzle-orm';`) and `RegistrationCheckDto` to the dto type import, then append:
 
@@ -5092,7 +5092,7 @@ export async function computeChecks(tx: Tx, rows: readonly ListRow[]): Promise<R
 }
 ```
 
-- [ ] **Step 7: Implement the decision functions in `src/server/repo/registrations.ts`**
+- [x] **Step 7: Implement the decision functions in `src/server/repo/registrations.ts`**
 
 Replace the import block at the top of the file with:
 
@@ -5474,7 +5474,7 @@ export const isolation = defineIsolation<
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/registrations.decide.test.ts src/server/repo/registrations.create.test.ts src/server/repo/isolation.test.ts`
 Expected: PASS: 20 tests in the decide file, 17 in the create file, and the isolation matrix green. If the `undoDecision` test fails with "no automatic timeline event" the DELETE policy of Contract change request 2 is missing: write a `blocked` line, do not work around it.
 
-- [ ] **Step 8: Write the failing action tests**
+- [x] **Step 8: Write the failing action tests**
 
 ```ts
 // src/server/actions/decisions.test.ts
@@ -5642,7 +5642,7 @@ describe('hubspotConflictHintsAction', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/decisions.test.ts`
 Expected: FAIL, "Cannot find module './decisions'".
 
-- [ ] **Step 9: Implement `src/server/actions/decisions.ts`**
+- [x] **Step 9: Implement `src/server/actions/decisions.ts`**
 
 The accept action is the worked example of contracts F.8 with two differences: the audit note uses the formatted date, and the HubSpot hint action is added.
 
@@ -5821,7 +5821,7 @@ export async function hubspotConflictHintsAction(raw: unknown): Promise<ActionRe
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/decisions.test.ts`
 Expected: PASS, 8 tests.
 
-- [ ] **Step 10: Rewrite the page `src/app/admin/approvals/page.tsx`**
+- [x] **Step 10: Rewrite the page `src/app/admin/approvals/page.tsx`**
 
 ```tsx
 import type { Metadata } from "next";
@@ -5854,7 +5854,7 @@ export default async function Page(): Promise<React.JSX.Element> {
 }
 ```
 
-- [ ] **Step 11: Edit `AdminApprovals.tsx`**
+- [x] **Step 11: Edit `AdminApprovals.tsx`**
 
 Copy changes in this task (all forced by real data): the KPI "Decided this month" is "Decided, last 7 days" (contracts H.0 counts seven days); the routing sentence names the managers from data; the accept toast and the accepted badge say the HubSpot deal is queued, because the outbox creates it within a minute; the Recent decisions HubSpot cell reads "Queued" for an accepted registration that has no deal yet. Additions (required by the route table, which lists `postMessageAction` for this screen): the drawer gets the deal conversation and a reply box. The extension requests card is added in M2.4.
 
@@ -6508,7 +6508,7 @@ Manual check (seed-dev data, HubSpot env unset, signed in as Farhan Qureshi, sta
 - Sign in as Rahul Menon (staff sales, India): only India rows appear.
 - With a HubSpot developer account configured in `.env`, a customer that another partner holds in HubSpot shows "Conflict" with "<partner> already has an open deal for this customer in HubSpot." a moment after the page loads; with HubSpot unreachable the page still loads and shows the portal checks only.
 
-- [ ] **Step 13: Commit**
+- [x] **Step 13: Commit**
 
 ```bash
 git add apps/portal/src/server/registrations apps/portal/src/server/repo/registrations.ts \
