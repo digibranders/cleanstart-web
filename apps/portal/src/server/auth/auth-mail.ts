@@ -1,4 +1,7 @@
-import { log } from '@/server/log';
+import { sendEmail } from '@/server/email/send';
+import { buildPasswordChanged, buildPasswordReset } from '@/server/email/templates';
+import type { EmailTransport } from '@/server/email/transport';
+import { resetPasswordUrl } from '@/server/urls';
 
 export interface PasswordResetMail {
   to: { email: string; name: string };
@@ -11,14 +14,23 @@ export interface PasswordChangedMail {
   changedAt: Date;
 }
 
-/**
- * Wave 0 bridge. Better Auth calls these two functions; the email module arrives in task M0.5, which replaces
- * both bodies with the real sends. Until then they only log, and never log the token.
- */
-export async function sendPasswordResetEmail(input: PasswordResetMail): Promise<void> {
-  log.info({ expiresInMinutes: input.expiresInMinutes }, 'password reset requested, email module not wired yet');
+/** What Better Auth calls when someone asks to reset a password. The second argument is for tests. */
+export async function sendPasswordResetEmail(input: PasswordResetMail, transport?: EmailTransport): Promise<void> {
+  await sendEmail(
+    buildPasswordReset({
+      to: input.to,
+      name: input.to.name,
+      resetUrl: resetPasswordUrl(input.token),
+      expiresInMinutes: input.expiresInMinutes,
+    }),
+    transport,
+  );
 }
 
-export async function sendPasswordChangedEmail(input: PasswordChangedMail): Promise<void> {
-  log.info({ changedAt: input.changedAt.toISOString() }, 'password changed, email module not wired yet');
+/** What Better Auth calls after a password was reset with an emailed link. */
+export async function sendPasswordChangedEmail(input: PasswordChangedMail, transport?: EmailTransport): Promise<void> {
+  await sendEmail(
+    buildPasswordChanged({ to: input.to, name: input.to.name, changedAt: input.changedAt.toISOString() }),
+    transport,
+  );
 }

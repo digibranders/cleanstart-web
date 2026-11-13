@@ -6932,13 +6932,13 @@ Task M0.7 left `auth-mail.ts` as a bridge that only logs. This replaces both bod
 - Modify: `apps/portal/src/server/auth/auth-mail.ts` (replaced)
 - Test: `apps/portal/src/server/auth/auth-mail.test.ts`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M0.5d | started | W0 | - | - | wire auth mail" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Write the test (it fails first)**
+- [x] **Step 2: Write the test (it fails first)**
 
 Create `apps/portal/src/server/auth/auth-mail.test.ts`:
 
@@ -6982,7 +6982,7 @@ describe('sendPasswordChangedEmail', () => {
 });
 ```
 
-- [ ] **Step 3: Run it and see it fail**
+- [x] **Step 3: Run it and see it fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/auth/auth-mail.test.ts
@@ -6990,7 +6990,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/auth/auth-mail.test.
 
 Expected: FAIL, `Tests  3 failed (3)`: `expected exactly one email to aditi@kestrel.example, found 0` (the bridge sends nothing).
 
-- [ ] **Step 4: Replace the bridge**
+- [x] **Step 4: Replace the bridge**
 
 Replace `apps/portal/src/server/auth/auth-mail.ts`:
 
@@ -7033,7 +7033,7 @@ export async function sendPasswordChangedEmail(input: PasswordChangedMail, trans
 }
 ```
 
-- [ ] **Step 5: Run it and the auth tests**
+- [x] **Step 5: Run it and the auth tests**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/auth
@@ -7041,11 +7041,11 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/auth
 
 Expected: every file under `src/server/auth` passes. `auth-mail.test.ts` reports `Tests  3 passed (3)`. The other auth tests still mock `./auth-mail`, so they never send.
 
-- [ ] **Step 6: Run Gate A, then Gate B**
+- [x] **Step 6: Run Gate A, then Gate B**
 
 Run the three fast commands, then the full Gate A block. Expected: all exit 0. This is also the end of Wave 0 for this plan: confirm `pnpm --filter @cleanstart/portal exec tsx scripts/auth-spike-gate.ts` still prints the seven `pass` lines.
 
-- [ ] **Step 7: Commit and log**
+- [x] **Step 7: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build
