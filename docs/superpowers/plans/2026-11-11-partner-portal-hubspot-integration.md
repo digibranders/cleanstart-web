@@ -923,7 +923,7 @@ git commit -m "feat(portal): H4.3 HubSpot mappers for deal properties, inbound d
 
 This task relies on Wave 0 and edits none of it: the `hubspot_outbox` table (contracts C.1), the `db` and `pool` exports of `@/db/client` (C.2), `testDb` and `resetDb` (J.3), `src/server/jobs/{lock,schedule,index}.ts` with `JOBS` already listing `hubspot-outbox` (H.17), `src/instrumentation.ts`, `node-cron` and `@sentry/nextjs` (W0-a). The advisory lock helper `runLocked` and its test (`lock.test.ts`) belong to W0-c; this task only uses the registered job. The op names and the exact `version` each caller passes are fixed by contracts section G; the enqueue calls themselves are written by tracks P and R.
 
-- [ ] **Step 1: Write the failing tests** (real test database, one per Vitest worker, truncated before each test; fake HubSpot)
+- [x] **Step 1: Write the failing tests** (real test database, one per Vitest worker, truncated before each test; fake HubSpot)
 
 ```ts
 // outbox.test.ts
@@ -1029,12 +1029,12 @@ describe('drainOutbox', () => {
 });
 ```
 
-- [ ] **Step 2: Run and confirm it fails**
+- [x] **Step 2: Run and confirm it fails**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/outbox.test.ts`
 Expected: FAIL, "Cannot find module './outbox'".
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```ts
 // outbox.ts
@@ -1107,12 +1107,12 @@ export const drainOutbox = async (deps: {
 };
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/outbox.test.ts`
 Expected: PASS, 10 tests.
 
-- [ ] **Step 5: Commit the outbox**
+- [x] **Step 5: Commit the outbox**
 
 ```bash
 git add apps/portal/src/server/hubspot/outbox.ts apps/portal/src/server/hubspot/outbox.test.ts
