@@ -1673,7 +1673,7 @@ git commit -m "feat(portal): H4.7 HubSpot customer lookup and cross-partner conf
 
 Do not edit `jobs/index.ts`: W0-c already registers `hubspot-poll` (every 5 minutes), `expiry` (00:10 UTC) and `hubspot-reconcile` (02:30 UTC). The reminder emails 14 and 3 days before the end are `jobs/expiry-reminders.ts`, which track R owns; this task only expires. After a change commits, the poll and the expiry job call `announceRegistrationChange` from track R's `src/server/registrations/announce.ts`, which W0-c created as a no-op stub (contracts H.17): import it, never edit it, and keep the call wrapped so a failure only logs. Every state change here writes its audit entry through `recordAudit` (contracts F.4) and never inserts into `audit_log` directly; the poll's `registration_events` insert is unchanged (`partner_id` is filled by the child trigger).
 
-- [ ] **Step 1: Write the failing poll tests**
+- [x] **Step 1: Write the failing poll tests**
 
 ```ts
 // poll.test.ts
@@ -1877,9 +1877,9 @@ describe('reconcileDeals', () => {
 
 `makeSyncedDeal` is a Wave 0 helper (contracts J.3, `src/db/test-helpers.ts`): it creates an accepted registration and the matching deal in the fake, stores the deal id and the Accepted stage id on the registration, and returns `{ id, dealId }`. It relies only on `FakeHubspot.stageIds` and `FakeHubspot.createDeal`, which Task 4.2 must not rename.
 
-- [ ] **Step 2: Run and confirm it fails.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/poll.test.ts`. Expected: FAIL, "Cannot find module './poll'".
+- [x] **Step 2: Run and confirm it fails.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/poll.test.ts`. Expected: FAIL, "Cannot find module './poll'".
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```ts
 // poll.ts
@@ -2012,9 +2012,9 @@ export const reconcileDeals = async (deps: { db: Db; hs: HubspotApi }): Promise<
 };
 ```
 
-- [ ] **Step 4: Run the tests.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/poll.test.ts`. Expected: PASS, 16 tests (7 new: four for the extension rule, two for announcements and one for a failing announcement). Why the cursor test passes: the poller only writes the cursor after the loop completes, so a thrown error leaves it untouched.
+- [x] **Step 4: Run the tests.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/poll.test.ts`. Expected: PASS, 16 tests (7 new: four for the extension rule, two for announcements and one for a failing announcement). Why the cursor test passes: the poller only writes the cursor after the loop completes, so a thrown error leaves it untouched.
 
-- [ ] **Step 5: Write the failing expiry tests**
+- [x] **Step 5: Write the failing expiry tests**
 
 `expireRegistrations` is the pure core (the clock is an argument); `runExpiry` is the job body. Expiry is a portal rule and does not depend on HubSpot: with HubSpot unconfigured the job still expires registrations and still queues `registration.expire` (a database write), the queued rows wait in the outbox until HubSpot is configured, and the job logs a warning.
 
@@ -2101,7 +2101,7 @@ describe('runExpiry', () => {
 
 Protection runs through the end date, so a registration whose `protection_end` is today is still protected (the `live` row), matching the mock's `daysLeft`.
 
-- [ ] **Step 6: Implement the expiry job**
+- [x] **Step 6: Implement the expiry job**
 
 ```ts
 // src/server/jobs/expiry.ts
@@ -2153,7 +2153,7 @@ export const runExpiry = async (): Promise<void> => {
 };
 ```
 
-- [ ] **Step 7: Run the tests and write the poll and reconcile job bodies.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot src/server/jobs/expiry.test.ts`. Expected: PASS. Then replace the two stubs. Each job reads the configuration first and returns with a warning when the token or the pipeline id is unset, builds its dependencies the way `hubspot-outbox.ts` does, and reads the date through `systemClock`:
+- [x] **Step 7: Run the tests and write the poll and reconcile job bodies.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot src/server/jobs/expiry.test.ts`. Expected: PASS. Then replace the two stubs. Each job reads the configuration first and returns with a warning when the token or the pipeline id is unset, builds its dependencies the way `hubspot-outbox.ts` does, and reads the date through `systemClock`:
 
 ```ts
 // src/server/jobs/hubspot-poll.ts
@@ -2281,7 +2281,7 @@ describe('runReconcile', () => {
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs`. Expected: PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add apps/portal/src/server/hubspot/poll.ts apps/portal/src/server/hubspot/poll.test.ts apps/portal/src/server/jobs/hubspot-poll.ts apps/portal/src/server/jobs/hubspot-poll.test.ts apps/portal/src/server/jobs/expiry.ts apps/portal/src/server/jobs/expiry.test.ts apps/portal/src/server/jobs/reconcile.ts apps/portal/src/server/jobs/reconcile.test.ts
