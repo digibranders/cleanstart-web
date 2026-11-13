@@ -1561,7 +1561,7 @@ This task is read-only HubSpot logic and edits no action file and not `AdminAppr
 
 Rules: the partner-facing lookup returns only name and domain of a matching HubSpot company, and a boolean "known customer". It never returns deals, owners or other partners. The staff-facing conflict check returns the open deals on the customer company that belong to a different partner.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```ts
 // lookup.test.ts
@@ -1619,9 +1619,9 @@ describe('conflictingDeals', () => {
 });
 ```
 
-- [ ] **Step 2: Run and confirm it fails.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/lookup.test.ts`. Expected: FAIL, "Cannot find module './lookup'".
+- [x] **Step 2: Run and confirm it fails.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/lookup.test.ts`. Expected: FAIL, "Cannot find module './lookup'".
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```ts
 // lookup.ts
@@ -1653,11 +1653,11 @@ export const conflictingDeals = async (
 };
 ```
 
-- [ ] **Step 4: Run the tests.** Expected: PASS, 5 tests (2 for `hubspotForRequest`, 2 for `lookupCustomer`, 1 for `conflictingDeals`).
+- [x] **Step 4: Run the tests.** Expected: PASS, 5 tests (2 for `hubspotForRequest`, 2 for `lookupCustomer`, 1 for `conflictingDeals`).
 
-- [ ] **Step 5: Confirm how track R uses it (no edits here).** R's `lookupCustomerAction(query)` (partner roles that may register deals; rate limited to 10 calls per 60 seconds per user through `rateLimit('lookup:user:<id>', ...)`) gets the client from `hubspotForRequest()` and calls `lookupCustomer(hs, query)`; it returns the same response shape to every user and no deal data. R's approvals screen calls `hs.findCompany` for the customer, then `conflictingDeals(hs, { customerCompanyId, partnerCompanyId, pipelineId })` with `partners.hubspot_company_id` and the pipeline id from `hubspotForRequest()`, and shows the existing hint ("Another partner already holds this customer"). Any error from HubSpot, and a null from `hubspotForRequest()` (HubSpot not configured), degrades to "no suggestions" and the portal-only check: a decision is never blocked on HubSpot being up. R gets its client from `hubspotForRequest()` (contracts H.13c, added in this task); it never imports `createHubspot` itself. The signatures `lookupCustomer(hs, query)`, `conflictingDeals(hs, input)` and `hubspotForRequest()` are fixed so R can code against them.
+- [x] **Step 5: Confirm how track R uses it (no edits here).** R's `lookupCustomerAction(query)` (partner roles that may register deals; rate limited to 10 calls per 60 seconds per user through `rateLimit('lookup:user:<id>', ...)`) gets the client from `hubspotForRequest()` and calls `lookupCustomer(hs, query)`; it returns the same response shape to every user and no deal data. R's approvals screen calls `hs.findCompany` for the customer, then `conflictingDeals(hs, { customerCompanyId, partnerCompanyId, pipelineId })` with `partners.hubspot_company_id` and the pipeline id from `hubspotForRequest()`, and shows the existing hint ("Another partner already holds this customer"). Any error from HubSpot, and a null from `hubspotForRequest()` (HubSpot not configured), degrades to "no suggestions" and the portal-only check: a decision is never blocked on HubSpot being up. R gets its client from `hubspotForRequest()` (contracts H.13c, added in this task); it never imports `createHubspot` itself. The signatures `lookupCustomer(hs, query)`, `conflictingDeals(hs, input)` and `hubspotForRequest()` are fixed so R can code against them.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/portal/src/server/hubspot/lookup.ts apps/portal/src/server/hubspot/lookup.test.ts
