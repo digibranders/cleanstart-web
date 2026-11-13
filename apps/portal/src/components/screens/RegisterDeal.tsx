@@ -140,6 +140,7 @@ export function RegisterDeal({ mine, managers, partnerName, today }: RegisterDea
     };
   }, [customer]);
 
+  const hasSuggestions = suggestions.length > 0 || crmSuggestions.length > 0;
   const customerErr = tried && !customer;
   const productErr = tried && form.picked.length === 0;
 
@@ -248,7 +249,7 @@ export function RegisterDeal({ mine, managers, partnerName, today }: RegisterDea
                         id="customer"
                         autoComplete="off"
                         aria-autocomplete="list"
-                        aria-controls="cust-sugg"
+                        aria-controls={hasSuggestions ? "cust-sugg" : undefined}
                         className={`field${customerErr ? " field-err" : ""}`}
                         type="text"
                         value={form.customer}
@@ -262,7 +263,7 @@ export function RegisterDeal({ mine, managers, partnerName, today }: RegisterDea
                           Enter the customer's company name.
                         </span>
                       ) : null}
-                      {suggestions.length > 0 || crmSuggestions.length > 0 ? (
+                      {hasSuggestions ? (
                         <div className="sugg" id="cust-sugg" role="listbox" aria-label="Your existing customers">
                           {suggestions.length > 0 ? <div className="sugg-h">Your customers</div> : null}
                           {suggestions.map((c) => (
