@@ -1,4 +1,23 @@
+"use client";
+
+import { useSyncExternalStore } from "react";
 import { Icon } from "@/components/icon";
+
+/** Below this width the dark side panel is dropped: it only repeats what the form page already says. */
+const PHONE_MAX = 760;
+
+/** True while the viewport is at most `maxWidth` px wide. False on the server and during hydration. */
+export function useNarrow(maxWidth: number): boolean {
+  return useSyncExternalStore(
+    (notify) => {
+      const query = window.matchMedia(`(max-width: ${maxWidth}px)`);
+      query.addEventListener("change", notify);
+      return () => query.removeEventListener("change", notify);
+    },
+    () => window.matchMedia(`(max-width: ${maxWidth}px)`).matches,
+    () => false,
+  );
+}
 
 const FOOTER_LINK = { color: "#6B687D" } as const;
 
@@ -9,7 +28,7 @@ export function PublicBrand({ tag }: { tag: string }): React.JSX.Element {
         <img src="/logo-mark.svg" alt="CleanStart" style={{ width: 15, height: 17 }} />
       </span>
       <span style={{ fontWeight: 700, fontSize: 15, letterSpacing: "-0.01em" }}>CleanStart</span>
-      <span style={{ fontSize: 12.5, color: "#6B687D", fontWeight: 500 }}>{tag}</span>
+      <span style={{ fontSize: 12.5, color: "#6B687D", fontWeight: 500, whiteSpace: "nowrap" }}>{tag}</span>
     </div>
   );
 }
@@ -66,45 +85,50 @@ export function PublicSplit({
   asideBasis = 520,
   children,
 }: PublicSplitProps): React.JSX.Element {
+  const phone = useNarrow(PHONE_MAX);
   return (
     <div style={{ minHeight: "100dvh", display: "flex", flexWrap: "wrap", background: "#FFFFFF" }}>
-      <section
+      <main
         aria-label={label}
         style={{
-          flex: `1 1 ${basis}px`,
+          flex: `1 1 ${phone ? 0 : basis}px`,
+          minWidth: 0,
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between",
           gap: 24,
-          padding: "28px 40px",
+          padding: phone ? "20px 16px" : "28px 40px",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", columnGap: 12, rowGap: 4 }}>
           <PublicBrand tag={tag} />
-          {brandExtra ? <span style={{ marginLeft: "auto" }}>{brandExtra}</span> : null}
+          {brandExtra ? <span style={{ marginLeft: "auto", whiteSpace: "nowrap" }}>{brandExtra}</span> : null}
         </div>
-        {children}
+        <div style={{ flex: "1 0 auto", display: "flex", flexDirection: "column", justifyContent: "center", gap: 14 }}>
+          {children}
+        </div>
         <PublicFooter left={footerLeft} />
-      </section>
-      <section
-        aria-label={asideLabel}
-        style={{
-          position: "relative",
-          overflow: "hidden",
-          flex: `1 1 ${asideBasis}px`,
-          minHeight: 600,
-          background:
-            "radial-gradient(70% 55% at 75% 30%, rgba(91,47,226,0.35) 0%, rgba(18,14,32,0) 70%), #120E20",
-          color: "#FFFFFF",
-          padding: "40px 48px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          gap: 28,
-        }}
-      >
-        {aside}
-      </section>
+      </main>
+      {phone ? null : (
+        <section
+          aria-label={asideLabel}
+          style={{
+            position: "relative",
+            overflow: "hidden",
+            flex: `1 1 ${asideBasis}px`,
+            minHeight: 600,
+            background:
+              "radial-gradient(70% 55% at 75% 30%, rgba(91,47,226,0.35) 0%, rgba(18,14,32,0) 70%), #120E20",
+            color: "#FFFFFF",
+            padding: "40px 48px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: 28,
+          }}
+        >
+          {aside}
+        </section>
+      )}
     </div>
   );
 }

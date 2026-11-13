@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { NumberedSteps, PublicHeading, PublicSplit } from "@/components/partners/public-frame";
+import { NumberedSteps, PublicHeading, PublicSplit, useNarrow } from "@/components/partners/public-frame";
 import { Seg } from "@/components/partners/seg";
 import { TurnstileWidget } from "@/components/partners/turnstile-widget";
 import { useToast } from "@/components/ui/toast";
@@ -14,6 +14,15 @@ import { submitApplicationAction } from "@/server/actions/apply";
 import { issuesToErrors } from "@/server/actions/result";
 
 const CATEGORY_OPTIONS: readonly string[] = PARTNER_CATEGORIES.map((code) => PARTNER_CATEGORY_LABEL[code]);
+/** Shorter labels for the segmented control on a phone, where "System integrator" does not fit on one line. */
+const SHORT_CATEGORY: Record<string, string> = {
+  [PARTNER_CATEGORY_LABEL.channel]: "Channel",
+  [PARTNER_CATEGORY_LABEL.integrator]: "Integrator",
+};
+const FULL_CATEGORY: Record<string, string> = Object.fromEntries(
+  Object.entries(SHORT_CATEGORY).map(([full, short]) => [short, full]),
+);
+const SEG_SHORT_MAX = 480;
 const REGIONS: readonly string[] = PARTNER_REGIONS.map((code) => PARTNER_REGION_LABEL[code]);
 
 const STEPS = [
@@ -66,6 +75,8 @@ export function Apply({ turnstileSiteKey }: { turnstileSiteKey: string }): React
   const [resetKey, setResetKey] = useState(0);
   const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
+  const narrow = useNarrow(SEG_SHORT_MAX);
+  const shown = (label: string): string => (narrow ? (SHORT_CATEGORY[label] ?? label) : label);
   const set = <K extends keyof Fields>(key: K, value: Fields[K]): void => setF((prev) => ({ ...prev, [key]: value }));
 
   const emailValid = isValidEmail(f.email);
@@ -167,7 +178,7 @@ export function Apply({ turnstileSiteKey }: { turnstileSiteKey: string }): React
           </div>
           <div className="fg">
             <label htmlFor="ap-site" className="lbl">
-              Company website
+              Company website <span className="hint">(optional)</span>
             </label>
             <input
               id="ap-site"
@@ -196,7 +207,7 @@ export function Apply({ turnstileSiteKey }: { turnstileSiteKey: string }): React
           </div>
           <div className="fg">
             <label htmlFor="ap-title" className="lbl">
-              Job title
+              Job title <span className="hint">(optional)</span>
             </label>
             <input
               id="ap-title"
@@ -259,7 +270,12 @@ export function Apply({ turnstileSiteKey }: { turnstileSiteKey: string }): React
             <span id="ap-cat" className="lbl">
               Partner type
             </span>
-            <Seg options={CATEGORY_OPTIONS} value={f.category} onChange={(v) => set("category", v)} labelledBy="ap-cat" />
+            <Seg
+              options={CATEGORY_OPTIONS.map(shown)}
+              value={shown(f.category)}
+              onChange={(v) => set("category", FULL_CATEGORY[v] ?? v)}
+              labelledBy="ap-cat"
+            />
           </div>
           <div className="fg">
             <span id="ap-reg" className="lbl">
