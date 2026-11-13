@@ -6,7 +6,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import type { IconName } from '@/components/icon-paths';
 import type { SearchHitDto } from '@/lib/dto';
 import { buildPageHits, SEARCH_MIN_CHARS } from '@/lib/search-pages';
-import type { NavItem, PortalKind } from '@/lib/routes';
+import { joinWords, type NavItem, type PortalKind, searchNouns } from '@/lib/routes';
 import { searchAction } from '@/server/actions/search';
 import { Icon } from '../icon';
 
@@ -19,10 +19,6 @@ const GROUP_LABEL: Record<SearchHitDto['group'], string> = {
   partners: 'Partners',
   documents: 'Documents',
   people: 'People',
-};
-const PLACEHOLDER: Record<PortalKind, string> = {
-  partner: 'Search deals, documents and pages',
-  admin: 'Search partners, registrations and pages',
 };
 
 interface Row {
@@ -182,7 +178,7 @@ export function SearchPalette({ kind, nav }: { kind: PortalKind; nav: readonly N
           <input
             id={`${titleId}-q`}
             type="search"
-            placeholder={PLACEHOLDER[kind]}
+            placeholder={`Search ${joinWords([...searchNouns(kind, nav), 'pages'])}`}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             autoComplete="off"

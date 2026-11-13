@@ -28,6 +28,8 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: repoRoot,
   turbopack: { root: repoRoot },
   poweredByHeader: false,
+  // The dev-only "N" badge sits on the sidebar user name. It has no effect on a production build.
+  devIndicators: false,
   async headers() {
     return [
       { source: "/:path*", headers: SECURITY_HEADERS },

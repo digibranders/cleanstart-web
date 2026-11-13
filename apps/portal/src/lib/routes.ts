@@ -64,3 +64,25 @@ export function navFor(viewer: Viewer): NavItem[] {
   const items = viewer.kind === "partner" ? PARTNER_NAV : ADMIN_NAV;
   return items.filter((item) => can(viewer, item.action));
 }
+
+/** The href of the sidebar item for the page being shown: the longest match, so /partner/deals/new lights only Register deal. */
+export function activeNavHref(nav: readonly NavItem[], pathname: string): string | null {
+  const path = pathname.startsWith(ROUTES.partner.welcome) ? ROUTES.partner.overview : pathname;
+  const match = [...nav].sort((a, b) => b.href.length - a.href.length).find((n) => path === n.href || path.startsWith(`${n.href}/`));
+  return match?.href ?? null;
+}
+
+/** What this viewer can search, from the pages in their sidebar: marketing finds documents, never partners or deals. */
+export function searchNouns(kind: PortalKind, nav: readonly NavItem[]): string[] {
+  const has = (href: string): boolean => nav.some((item) => item.href === href);
+  const nouns =
+    kind === "partner"
+      ? [has(ROUTES.partner.deals) && "deals", has(ROUTES.partner.documents) && "documents"]
+      : [has(ROUTES.admin.partners) && "partners", has(ROUTES.admin.approvals) && "deals", has(ROUTES.admin.documents) && "documents"];
+  return nouns.filter((noun): noun is string => noun !== false);
+}
+
+/** "a", "a and b", "a, b and c". */
+export function joinWords(words: readonly string[]): string {
+  return words.length < 2 ? (words[0] ?? "") : `${words.slice(0, -1).join(", ")} and ${words[words.length - 1]}`;
+}
