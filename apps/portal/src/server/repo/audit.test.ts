@@ -109,6 +109,14 @@ describe('listAudit', () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
+  it('rejects a well formed cursor whose timestamp is not a timestamp', async () => {
+    const staff = await asStaff(db);
+    const forged = Buffer.from(JSON.stringify({ at: '2026-13-45 99:99:99', id: '3f2b8c1e-5d4a-4f6b-9c7d-1a2b3c4d5e6f' })).toString('base64url');
+    await expect(
+      withViewer(staff, (tx) => listAudit(tx, staff, { period: '30d', cursor: forged }, clock)),
+    ).rejects.toBeInstanceOf(ValidationError);
+  });
+
   it('shows what recordAudit wrote, including the HubSpot sync actor', async () => {
     const staff = await asStaff(db);
     await db.transaction(async (tx) => {

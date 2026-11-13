@@ -59,4 +59,7 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=5 \
   CMD wget -qO- http://127.0.0.1:3004/api/health || exit 1
 
 # Migrations are idempotent (drizzle journal, then rls.sql), so running them on every start is safe.
+# Caveat (BUILD-HANDOFF open decision 4, plan 06 CCR-5b): because the container migrates on start, the owner
+# credential DATABASE_OWNER_URL, which bypasses row level security, is in this container's environment. Before
+# real partner data goes in, move migration to a one-shot service and drop that variable from the app container.
 CMD ["sh", "-c", "node scripts/migrate.cjs && node server.js"]

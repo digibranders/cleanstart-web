@@ -13,12 +13,29 @@ Nothing here is automated. Read each command before you run it. Take a droplet s
 | 1.1 | Take a DigitalOcean snapshot of the droplet. | snapshot listed |
 | 1.2 | Resize one size up (CPU and RAM only, reversible). The portal, the CMS and Postgres share one vCPU and 2 GB. | `free -m` shows the new RAM |
 | 1.3 | Raise Postgres connections. The droplet runs `max_connections = 20` (INCIDENTS 2026-10-14); the CMS pool takes 15 and the portal up to 14 (6 request, 8 system, `CONNECTION LIMIT` 20). `docker compose -f /opt/cleanstart/compose.yml exec -T postgres psql -U postgres -c "ALTER SYSTEM SET max_connections = 50;"` then restart Postgres in a quiet minute: `docker compose -f /opt/cleanstart/compose.yml restart postgres`. This restarts the database the production CMS uses, so it needs the operator's explicit approval. | `SHOW max_connections;` prints 50 |
-| 1.4 | Create the roles and the database. Copy `apps/portal/scripts/db-bootstrap.sql` to the droplet, read it, then run it as the Postgres superuser with passwords made by `openssl rand -hex 24` (hex keeps them URL safe): `psql -v ON_ERROR_STOP=1 -v dbname=cleanstart_portal -v owner_password=<hex> -v app_password=<hex> -v conn_limit=20 -v allow_createdb=off -f db-bootstrap.sql` against the `postgres` database of the compose Postgres. | `\l` lists `cleanstart_portal` owned by `portal_owner`; `\du` lists `portal_owner` and `portal_app` |
-| 1.5 | Add the `portal` service from `infra/docker-compose.yml` to `/opt/cleanstart/compose.yml` (it has `profiles: ["portal"]`, so `docker compose up -d` with no profile still starts only Postgres and Meilisearch). Compare the two files with `diff` first and keep everything else in the droplet's file as it is. | `docker compose config --services` lists the `portal` service |
+| 1.4 | Create the roles and the database with the commands under the table (run on the droplet, inside the compose Postgres container, like step 1.3). The two passwords are made by `openssl rand -hex 24` (hex keeps them URL safe) and are also the GitHub secrets `PORTAL_OWNER_DB_PASSWORD` and `PORTAL_APP_DB_PASSWORD`. | `\l` lists `cleanstart_portal` owned by `portal_owner`; `\du` lists `portal_owner` and `portal_app` |
+| 1.5 | Add the `portal` service from `infra/docker-compose.yml` to `/opt/cleanstart/compose.yml` (it has `profiles: ["portal"]`, so `docker compose up -d` with no profile still starts only Postgres and Meilisearch). Compare the two files with `diff` first and keep everything else in the droplet's file as it is. Then confirm that `docker compose --profile cms up -d --wait cms` still works with the droplet's Compose version while `/opt/cleanstart/portal.env` does not exist yet (the existing CMS deploy runs that command; a service whose `env_file` is missing must not break a profile it is not part of). | `docker compose --profile portal config --services` lists `portal` (with `postgres` and `meilisearch`), and the `cms` profile command above still succeeds |
 | 1.6 | Add the Caddy block below to `/etc/caddy/Caddyfile`, then `caddy validate --config /etc/caddy/Caddyfile` and `systemctl reload caddy`. | validate prints "Valid configuration" |
 | 1.7 | Cloudflare: an `A` record `partners` to the droplet (proxied, SSL Full strict, as for `cms`), and the same WAF rule set that `cms.cleanstart.com` has. | the record resolves |
 | 1.8 | Firewall: accept port 443 only from Cloudflare's published ranges (`ufw`), so a visitor cannot reach Caddy directly and invent a client address (the Caddy block trusts `CF-Connecting-IP`). | `ufw status` shows the Cloudflare ranges |
 | 1.9 | Check that the Brevo account allows the droplet's address (it already does for the CMS). | a test send from the portal succeeds later |
+
+Step 1.4 commands. The `postgres` superuser needs no password here: `psql` runs inside the container over its local socket, the same way step 1.3 runs it. Do not put the passwords in `-v` options: they would land in your shell history and in the process list (`ps`) of the droplet. This reads them from a prompt and passes them on standard input only:
+
+```bash
+cd /opt/cleanstart
+# paste the two hex passwords when prompted; nothing is echoed, stored in history or shown in ps
+read -rs -p "owner password: " OWNER_PW; echo
+read -rs -p "app password: " APP_PW; echo
+{
+  printf '\\set owner_password %s\n\\set app_password %s\n' "$OWNER_PW" "$APP_PW"
+  printf '\\set dbname cleanstart_portal\n\\set conn_limit 20\n\\set allow_createdb off\n'
+  cat db-bootstrap.sql   # copy apps/portal/scripts/db-bootstrap.sql to /opt/cleanstart first, and read it
+} | docker compose -f compose.yml exec -T postgres psql -U postgres -d postgres -v ON_ERROR_STOP=1
+unset OWNER_PW APP_PW
+```
+
+If you would rather connect from the host over TCP, the superuser password is `POSTGRES_PASSWORD` in `/opt/cleanstart/.env`; supply it through a `PGPASSFILE` (mode 600) and not on the command line.
 
 Caddy block (same log settings as `cms.cleanstart.com`, a separate file):
 
@@ -76,3 +93,9 @@ curl -fsS http://127.0.0.1:3004/api/health
 ```
 
 Migrations only move forward. A release that added a column is rolled back to an image that ignores it; never drop a column in the same release that stops using it.
+
+### Known caveats
+
+- **Owner credential in the app container.** The portal container runs the migrations on start, so `DATABASE_OWNER_URL` (the `portal_owner` role, which bypasses row level security) is in the app container's environment, and a code execution bug in the app would expose it. Recommended before real partner data goes in: a one-shot migration service (plan 06, CCR-5b) that holds the owner URL, so the app container only gets `DATABASE_URL`. Nothing in the build changes this today (BUILD-HANDOFF open decision 4).
+- **Deploy trigger.** `deploy-portal.yml` deploys a `workflow_run` only when the `Portal CI` run was started by a `push` to `main`. `workflow_run` filtered by branch alone also matches a pull request from a fork whose branch is named `main`. `deploy-cms.yml` has the same shape and does not have that check; it belongs to the CMS and is not changed here, so someone should review it.
+- **Secrets with special characters.** The deploy renders `portal.env` with unquoted `KEY=VALUE` lines. A secret with a newline is not supported, and compose interpolates `$` in an `env_file`, so generate secrets with `openssl rand` (hex or base64) and avoid `$`.

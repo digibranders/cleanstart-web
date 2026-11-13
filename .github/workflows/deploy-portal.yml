@@ -17,6 +17,10 @@ on:
         description: 'Optional git SHA to deploy (defaults to the branch HEAD this run was triggered from)'
         required: false
 
+# The job only reads the repository (checkout); it ships the image over SSH and pushes nothing to a registry.
+permissions:
+  contents: read
+
 # Serialize deploys to the prod droplet: no two builds racing the same `portal:current` tag.
 concurrency:
   group: deploy-portal-prod
@@ -24,10 +28,13 @@ concurrency:
 
 jobs:
   deploy:
+    # workflow_run on branch main also matches a pull request from a fork whose branch is named main, so a
+    # workflow_run deploy additionally requires that the CI run was triggered by a push.
     if: >-
       ${{ vars.PORTAL_DEPLOY_ENABLED == 'true' &&
           (github.event_name == 'workflow_dispatch' ||
-           github.event.workflow_run.conclusion == 'success') }}
+           (github.event.workflow_run.conclusion == 'success' &&
+            github.event.workflow_run.event == 'push')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -76,6 +83,11 @@ jobs:
           scp -i ~/.ssh/id_deploy /tmp/portal.tar.gz \
             ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }}:/tmp/portal.tar.gz
 
+      # Known caveat (BUILD-HANDOFF open decision 4, plan 06 CCR-5b): the container runs the migrations on start,
+      # so DATABASE_OWNER_URL, the owner credential that bypasses row level security, is in the app container's
+      # environment. Recommended before real partner data goes in: a one-shot migration service that holds the
+      # owner URL, so the app container only gets DATABASE_URL. Behaviour is unchanged here.
+      #
       # Renders /opt/cleanstart/portal.env, the portal's own file (never the CMS's .env). Empty values are not
       # written: env.ts rejects an empty string for an optional variable, so `KEY=` would crash the container.
       # Required production variables are checked first so a missing one fails the deploy with its name, not the
@@ -115,6 +127,8 @@ jobs:
         run: |
           set -euo pipefail
 
+          # emit writes KEY=VALUE as one line, unquoted. A secret value that contains a newline is not supported,
+          # and compose interpolates a `$` in an env_file value, so avoid both when generating secrets.
           missing=""
           for key in APP_URL PORTAL_OWNER_DB_PASSWORD PORTAL_APP_DB_PASSWORD AUTH_SECRET BREVO_API_KEY \
                      BREVO_SENDER_EMAIL R2_ENDPOINT R2_BUCKET R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY \

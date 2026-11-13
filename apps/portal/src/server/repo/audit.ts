@@ -25,7 +25,13 @@ const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 200;
 const EXPORT_CAP = 5000;
 
-const cursorSchema = z.object({ at: z.string().min(1).max(40), id: z.string().uuid() });
+/** A timestamptz as Postgres prints it: `2026-11-12 09:14:03.123456+00`. Checked here so a forged cursor never reaches a SQL cast. */
+const PG_TIMESTAMP = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\.\d{1,6})?[+-]\d{2}(:\d{2})?$/;
+
+const cursorSchema = z.object({
+  at: z.string().max(40).regex(PG_TIMESTAMP).refine((value) => !Number.isNaN(Date.parse(value))),
+  id: z.string().uuid(),
+});
 
 /** The cursor carries the timestamp as Postgres prints it (microseconds), because a JS Date keeps only milliseconds. */
 const encodeCursor = (at: string, id: string): string => Buffer.from(JSON.stringify({ at, id })).toString('base64url');

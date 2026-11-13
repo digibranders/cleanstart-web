@@ -28,6 +28,10 @@ on:
       - '.github/workflows/portal.yml'
   workflow_dispatch:
 
+# Least privilege: the jobs only read the repository. The test Postgres is a service container, not a package.
+permissions:
+  contents: read
+
 concurrency:
   group: portal-${{ github.ref }}
   cancel-in-progress: true

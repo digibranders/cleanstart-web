@@ -2,6 +2,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { db } from '@/db/client';
 import { GET } from './route';
 
+vi.mock('@/server/log', () => ({ log: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() } }));
+
 afterEach(() => vi.restoreAllMocks());
 
 describe('GET /api/health', () => {
