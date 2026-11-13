@@ -19,6 +19,7 @@ import { log } from '@/server/log';
 import { type NewNotification, notifyUsers } from '@/server/notify';
 import { alertAddresses } from '@/server/people';
 import { rateLimit } from '@/server/rate-limit';
+import { UNKNOWN_IP_BUCKET } from '@/server/security/client-ip';
 import { withSystem } from '@/server/repo/context';
 import { createPortalApplication, findPartnerByDomain, listManagerRecipients } from '@/server/repo/applications';
 import { verifyTurnstile } from '@/server/turnstile';
@@ -56,7 +57,7 @@ const workEmail = (value: string): string => {
 export async function submitApplicationAction(raw: unknown): Promise<ActionResult<ApplyOutcome>> {
   return runPublicAction({ name: 'application.submit', schema: applySchema }, raw, async (ctx, input): Promise<ApplyOutcome> => {
     const email = workEmail(input.email);
-    if (ctx.ip) rateLimit(`apply:ip:${ctx.ip}`, APPLY_IP_RULE);
+    rateLimit(`apply:ip:${ctx.ip ?? UNKNOWN_IP_BUCKET}`, APPLY_IP_RULE);
     rateLimit(`apply:email:${email}`, APPLY_EMAIL_RULE);
     await verifyTurnstile({ token: input.turnstileToken, ip: ctx.ip });
 

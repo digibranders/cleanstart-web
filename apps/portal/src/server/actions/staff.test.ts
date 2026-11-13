@@ -8,7 +8,7 @@ import type { EmailMessage } from '@/server/email/transport';
 
 const harness = vi.hoisted(() => ({ viewer: null as Viewer | null, ip: '198.51.100.1', cookieJar: new Map<string, string>() }));
 vi.mock('next/headers', () => ({
-  headers: async () => new Headers({ 'x-forwarded-for': harness.ip }),
+  headers: async () => new Headers({ 'x-portal-client-ip': harness.ip }),
   cookies: async () => ({
     set: (name: string, value: string) => void harness.cookieJar.set(name, value),
     get: (name: string) => (harness.cookieJar.has(name) ? { value: harness.cookieJar.get(name) } : undefined),

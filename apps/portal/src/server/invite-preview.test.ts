@@ -29,4 +29,9 @@ describe('loadInvitePreview', () => {
     for (let i = 0; i < 20; i += 1) expect(await loadInvitePreview('nope', same, clock)).toEqual({ state: 'unknown' });
     await expect(loadInvitePreview('nope', same, clock)).rejects.toBeInstanceOf(RateLimitError);
   });
+
+  it('limits an unknown address too, in one shared bucket, instead of skipping the limit', async () => {
+    for (let i = 0; i < 20; i += 1) expect(await loadInvitePreview('nope', null, clock)).toEqual({ state: 'unknown' });
+    await expect(loadInvitePreview('nope', null, clock)).rejects.toBeInstanceOf(RateLimitError);
+  });
 });

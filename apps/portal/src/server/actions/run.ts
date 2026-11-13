@@ -6,6 +6,7 @@ import type { z } from 'zod';
 import { type Clock, systemClock } from '@/lib/clock';
 import { log } from '@/server/log';
 import { requireActionViewer } from '@/server/auth/viewer';
+import { clientIp } from '@/server/security/client-ip';
 import type { Viewer } from '@/server/auth/types';
 import { describeError, isPortalError, ValidationError } from '@/server/errors';
 import { type ActionResult, fail, ok } from './result';
@@ -27,7 +28,7 @@ export interface ActionContext {
 
 export interface PublicActionContext {
   clock: Clock;
-  /** First address in x-forwarded-for, or null. For rate limiting and Turnstile. */
+  /** The client address src/proxy.ts resolved from the trusted proxy hop, or null. Key rate limits on `ctx.ip ?? UNKNOWN_IP_BUCKET`, never skip them. */
   ip: string | null;
   afterCommit(effect: () => Promise<void>): void;
   revalidate(path: string): void;
@@ -96,9 +97,7 @@ export async function runPublicAction<S extends z.ZodType, T>(
   const { effects, afterCommit, revalidate } = collector();
   try {
     const input = parseInput(spec.schema, raw);
-    const forwarded = (await headers()).get('x-forwarded-for');
-    const ip = forwarded ? (forwarded.split(',')[0]?.trim() ?? null) : null;
-    const data = await handler({ clock: systemClock, ip, afterCommit, revalidate }, input);
+    const data = await handler({ clock: systemClock, ip: clientIp(await headers()), afterCommit, revalidate }, input);
     await flush(spec.name, effects);
     return ok(data);
   } catch (error) {

@@ -15,7 +15,7 @@ const authApi = vi.hoisted(() => ({
   generateBackupCodes: vi.fn(),
 }));
 vi.mock('next/headers', () => ({
-  headers: async () => new Headers({ 'x-forwarded-for': harness.ip, cookie: 'session=1' }),
+  headers: async () => new Headers({ 'x-portal-client-ip': harness.ip, cookie: 'session=1' }),
   cookies: async () => ({ set: () => undefined, get: () => undefined }),
 }));
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));

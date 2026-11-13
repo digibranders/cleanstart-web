@@ -103,13 +103,15 @@ describe('runPublicAction', () => {
     vi.clearAllMocks();
   });
 
-  it('reads the first address of x-forwarded-for', async () => {
-    vi.mocked(headers).mockResolvedValue(new Headers({ 'x-forwarded-for': '203.0.113.9, 10.0.0.1' }) as never);
+  it('reads the address the proxy resolved, and never a forwarded header a client can write', async () => {
+    vi.mocked(headers).mockResolvedValue(new Headers({ 'x-portal-client-ip': '203.0.113.9', 'x-forwarded-for': '6.6.6.6' }) as never);
     const result = await runPublicAction(spec, goodInput, async (ctx) => ctx.ip);
     expect(result).toEqual({ ok: true, data: '203.0.113.9' });
+    vi.mocked(headers).mockResolvedValue(new Headers({ 'x-forwarded-for': '6.6.6.6' }) as never);
+    expect(await runPublicAction(spec, goodInput, async (ctx) => ctx.ip)).toEqual({ ok: true, data: null });
   });
 
-  it('gives a null ip when the header is absent and never loads a viewer', async () => {
+  it('gives a null ip when the proxy header is absent and never loads a viewer', async () => {
     vi.mocked(headers).mockResolvedValue(new Headers() as never);
     const result = await runPublicAction(spec, goodInput, async (ctx) => ctx.ip);
     expect(result).toEqual({ ok: true, data: null });

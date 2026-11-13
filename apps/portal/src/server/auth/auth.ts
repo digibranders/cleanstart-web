@@ -6,6 +6,7 @@ import { nextCookies } from 'better-auth/next-js';
 import { twoFactor } from 'better-auth/plugins/two-factor';
 import type { GoogleOptions, MicrosoftOptions } from 'better-auth/social-providers';
 import { eq, type SQL } from 'drizzle-orm';
+import { after } from 'next/server';
 import { db } from '@/db/client';
 import { authAccounts, authSessions, authTwoFactors, authVerifications, partners, users } from '@/db/schema';
 import { type Env, env } from '@/env';
@@ -15,6 +16,8 @@ import { recordAudit } from '@/server/audit/record';
 import { RateLimitError } from '@/server/errors';
 import { log } from '@/server/log';
 import { rateLimit } from '@/server/rate-limit';
+import { assertSecureAppUrl, usesSecureCookies } from '@/server/security/app-url';
+import { CLIENT_IP_HEADER } from '@/server/security/client-ip';
 import { sendPasswordChangedEmail, sendPasswordResetEmail } from './auth-mail';
 import { checkPassword, hashPassword, verifyPassword } from './passwords';
 import type { SystemActor } from './types';
@@ -77,6 +80,20 @@ const logMailFailure = (message: string) => (error: unknown) => {
   log.error({ errorName: error instanceof Error ? error.name : 'unknown' }, message);
 };
 
+/**
+ * Runs a task after the response has gone out, so a slow send cannot tell a caller whether the address exists and a
+ * worker that is frozen once the response is sent cannot drop it. Next's `after` only exists inside a request; in
+ * tests and scripts there is no request scope, so the task simply runs and is not awaited. A failure is always logged.
+ */
+function afterResponse(task: () => Promise<void>, failureMessage: string): void {
+  const guarded = (): Promise<void> => task().catch(logMailFailure(failureMessage));
+  try {
+    after(guarded);
+  } catch {
+    void guarded();
+  }
+}
+
 /** The audit actor for a change made from a signed out reset link. */
 const resetLinkActor = (name: string): SystemActor => ({
   kind: 'system',
@@ -96,6 +113,10 @@ type OAuthEnv = Pick<
  * Microsoft does not send email_verified, so the profile is mapped from xms_edov (the "email domain owner verified"
  * optional claim, which the Entra app registration must add). Without that claim the email is unverified and the
  * account is not linked, which fails closed.
+ * Risk to know about: MICROSOFT_TENANT_ID defaults to "common", which accepts a work or school account from any
+ * Entra tenant and personal Microsoft accounts. Linking is still gated on xms_edov and on an existing active user with
+ * that exact email, but a tenant that can claim a domain it does not own is a trust decision. Set the tenant id to
+ * CleanStart's own tenant, or to "organizations", before enabling Microsoft sign in for partners (docs/operations/PARTNER-PORTAL.md, section 2).
  */
 export function buildSocialProviders(source: OAuthEnv): { google?: GoogleOptions; microsoft?: MicrosoftOptions } {
   const providers: { google?: GoogleOptions; microsoft?: MicrosoftOptions } = {};
@@ -122,6 +143,7 @@ export function buildSocialProviders(source: OAuthEnv): { google?: GoogleOptions
 }
 
 function createAuth() {
+  assertSecureAppUrl(env.NODE_ENV, env.APP_URL);
   return betterAuth({
     appName: APP_NAME,
     baseURL: env.APP_URL,
@@ -137,7 +159,14 @@ function createAuth() {
       },
     }),
     // Postgres generates every id (gen_random_uuid), as for every other table.
-    advanced: { database: { generateId: false } },
+    advanced: {
+      database: { generateId: false },
+      // Explicit, not the library default: Secure exactly when the site is https in production (assertSecureAppUrl above).
+      useSecureCookies: usesSecureCookies(env.NODE_ENV, env.APP_URL),
+      // The client address comes from the header src/proxy.ts resolves from the trusted proxy hop, never from the
+      // leftmost x-forwarded-for entry a client can rotate (client-ip.ts). Without it the limiter uses one shared bucket.
+      ipAddress: { ipAddressHeaders: [CLIENT_IP_HEADER] },
+    },
     user: {
       additionalFields: {
         kind: { type: 'string', required: true, input: false },
@@ -199,13 +228,12 @@ function createAuth() {
       resetPasswordTokenExpiresIn: RESET_TOKEN_SECONDS,
       revokeSessionsOnPasswordReset: true,
       sendResetPassword: async ({ user, token }) => {
-        // Invited and disabled users get no reset link. Not awaited: a slow send must not tell a caller whether the address exists.
+        // Invited and disabled users get no reset link. The send runs after the response: a slow send must not tell a caller whether the address exists.
         if ((user as { status?: string }).status !== 'active') return;
-        void sendPasswordResetEmail({
-          to: { email: user.email, name: user.name },
-          token,
-          expiresInMinutes: RESET_TOKEN_SECONDS / 60,
-        }).catch(logMailFailure('password reset email failed'));
+        afterResponse(
+          () => sendPasswordResetEmail({ to: { email: user.email, name: user.name }, token, expiresInMinutes: RESET_TOKEN_SECONDS / 60 }),
+          'password reset email failed',
+        );
       },
       onPasswordReset: async ({ user }) => {
         const changedAt = systemClock.now();

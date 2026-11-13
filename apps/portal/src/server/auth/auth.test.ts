@@ -165,7 +165,7 @@ describe('rate limits', () => {
       auth.handler(
         new Request('http://localhost:3004/api/auth/sign-in/email', {
           method: 'POST',
-          headers: { 'content-type': 'application/json', 'x-forwarded-for': '203.0.113.50' },
+          headers: { 'content-type': 'application/json', 'x-portal-client-ip': '203.0.113.50' },
           body: JSON.stringify({ email: `nobody-${Math.random()}@example.com`, password: 'wrong-password-1' }),
         }),
       );

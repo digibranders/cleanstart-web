@@ -22,6 +22,7 @@ import { loadInvitePreview } from '@/server/invite-preview';
 import { log } from '@/server/log';
 import { type NewNotification, notifyUsers, resolveEmailRecipients } from '@/server/notify';
 import { rateLimit } from '@/server/rate-limit';
+import { UNKNOWN_IP_BUCKET } from '@/server/security/client-ip';
 import { withSystem } from '@/server/repo/context';
 import { acceptInvite } from '@/server/repo/invites';
 import { listPartnerAdminRecipients } from '@/server/repo/partners';
@@ -63,7 +64,7 @@ export async function previewInviteAction(raw: unknown): Promise<ActionResult<In
 
 export async function acceptInviteAction(raw: unknown): Promise<ActionResult<AcceptInviteOutcome>> {
   return runPublicAction({ name: 'invite.accept', schema: acceptSchema }, raw, async (ctx, input): Promise<AcceptInviteOutcome> => {
-    if (ctx.ip) rateLimit(`invite:ip:${ctx.ip}`, INVITE_IP_RULE);
+    rateLimit(`invite:ip:${ctx.ip ?? UNKNOWN_IP_BUCKET}`, INVITE_IP_RULE);
     assertPasswordOk(input.password);
     const passwordHash = await hashPassword(input.password);
     const actor = publicActor(input.name);
@@ -166,7 +167,7 @@ export async function requestAccessAction(raw: unknown): Promise<ActionResult<{ 
         { path: 'email', message: checked.reason === 'free-mail' ? 'Use your company email, not a personal address.' : 'Enter a valid work email.' },
       ]);
     }
-    if (ctx.ip) rateLimit(`access:ip:${ctx.ip}`, REQUEST_IP_RULE);
+    rateLimit(`access:ip:${ctx.ip ?? UNKNOWN_IP_BUCKET}`, REQUEST_IP_RULE);
     rateLimit(`access:email:${checked.email}`, REQUEST_EMAIL_RULE);
     rateLimit(`access:domain:${checked.domain}`, REQUEST_DOMAIN_RULE);
 

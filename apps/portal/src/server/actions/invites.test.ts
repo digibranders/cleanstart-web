@@ -9,7 +9,7 @@ import type { EmailMessage } from '@/server/email/transport';
 
 const harness = vi.hoisted(() => ({ viewer: null as Viewer | null, ip: '198.51.100.1', cookieJar: new Map<string, string>(), signInFails: false }));
 vi.mock('next/headers', () => ({
-  headers: async () => new Headers({ 'x-forwarded-for': harness.ip }),
+  headers: async () => new Headers({ 'x-portal-client-ip': harness.ip }),
   cookies: async () => ({
     set: (name: string, value: string) => void harness.cookieJar.set(name, value),
     get: (name: string) => (harness.cookieJar.has(name) ? { value: harness.cookieJar.get(name) } : undefined),
@@ -167,6 +167,14 @@ describe('acceptInviteAction', () => {
   });
 
   it('rate limits by IP', async () => {
+    for (let i = 0; i < 20; i += 1) await acceptInviteAction(form('nope'));
+    expect(await acceptInviteAction(form('nope'))).toMatchObject({ ok: false, error: { code: 'rate_limited' } });
+  });
+});
+
+describe('an unknown client address', () => {
+  it('is limited in one shared bucket on accept, not skipped', async () => {
+    harness.ip = '';
     for (let i = 0; i < 20; i += 1) await acceptInviteAction(form('nope'));
     expect(await acceptInviteAction(form('nope'))).toMatchObject({ ok: false, error: { code: 'rate_limited' } });
   });

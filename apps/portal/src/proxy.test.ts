@@ -104,3 +104,64 @@ describe("review gate", () => {
     expect(proxy(request("/partner/deals", { authorization })).status).toBe(307);
   });
 });
+
+const nonceOf = (csp: string | null): string => /'nonce-([^']+)'/.exec(csp ?? "")?.[1] ?? "";
+
+describe("content security policy", () => {
+  it("gives each page request its own nonce, in the response policy and in the request header Next reads", () => {
+    const a = proxy(request("/sign-in"));
+    const b = proxy(request("/sign-in"));
+    const csp = a.headers.get("Content-Security-Policy");
+    expect(csp).toContain("script-src 'self' 'nonce-");
+    expect(nonceOf(csp)).not.toBe("");
+    expect(nonceOf(csp)).not.toBe(nonceOf(b.headers.get("Content-Security-Policy")));
+    expect(a.headers.get("x-middleware-override-headers")).toContain("content-security-policy");
+    expect(a.headers.get("x-middleware-request-x-nonce")).toBe(nonceOf(csp));
+    expect(a.headers.get("x-middleware-request-content-security-policy")).toBe(csp);
+  });
+
+  it("puts the policy on signed in pages too, and leaves API routes to the closed policy in next.config", () => {
+    const signedIn = proxy(request("/partner/deals", { cookie: "better-auth.session_token=abc.def" }));
+    expect(signedIn.headers.get("Content-Security-Policy")).toContain("object-src 'none'");
+    expect(proxy(request("/api/auth/get-session")).headers.get("Content-Security-Policy")).toBeNull();
+  });
+
+  it("does not hold the open paths back: the health check and the HubSpot webhook get no policy and no gate", () => {
+    vi.stubEnv("PORTAL_REVIEW_PASSWORD", "let-me-in");
+    for (const path of ["/api/health", "/api/hubspot/webhook"]) {
+      const response = proxy(request(path));
+      expect(response.status, path).toBe(200);
+      expect(response.headers.get("Content-Security-Policy"), path).toBeNull();
+    }
+  });
+
+  it("does not add the policy to the review gate answer or to a redirect", () => {
+    vi.stubEnv("PORTAL_REVIEW_PASSWORD", "let-me-in");
+    expect(proxy(request("/sign-in")).headers.get("Content-Security-Policy")).toBeNull();
+    expect(proxy(request("/partner/deals", { authorization: basic("let-me-in") })).headers.get("Content-Security-Policy")).toBeNull();
+  });
+});
+
+describe("client address header", () => {
+  const forwarded = { "x-forwarded-for": "6.6.6.6, 203.0.113.9" };
+
+  it("is never taken from the client, and is not set when no proxy is trusted", () => {
+    const response = proxy(request("/sign-in", { ...forwarded, "x-portal-client-ip": "9.9.9.9" }));
+    expect(response.headers.get("x-middleware-request-x-portal-client-ip")).toBeNull();
+    // Next hands the app only the headers named here, so the client's own value is gone.
+    expect(response.headers.get("x-middleware-override-headers")).not.toContain("x-portal-client-ip");
+  });
+
+  it("is the address the trusted proxy saw, never the first entry a client can write", () => {
+    vi.stubEnv("PORTAL_TRUSTED_PROXY_HOPS", "1");
+    const response = proxy(request("/api/auth/sign-in/email", { ...forwarded, "x-portal-client-ip": "9.9.9.9" }));
+    expect(response.headers.get("x-middleware-request-x-portal-client-ip")).toBe("203.0.113.9");
+  });
+
+  it("is also overwritten on the open paths", () => {
+    vi.stubEnv("PORTAL_REVIEW_PASSWORD", "let-me-in");
+    vi.stubEnv("PORTAL_TRUSTED_PROXY_HOPS", "1");
+    const response = proxy(request("/api/hubspot/webhook", { ...forwarded, "x-portal-client-ip": "9.9.9.9" }));
+    expect(response.headers.get("x-middleware-request-x-portal-client-ip")).toBe("203.0.113.9");
+  });
+});

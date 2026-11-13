@@ -11,7 +11,7 @@ import { verifyTurnstile } from '@/server/turnstile';
 
 const harness = vi.hoisted(() => ({ viewer: null as Viewer | null, ip: '198.51.100.1', cookieJar: new Map<string, string>() }));
 vi.mock('next/headers', () => ({
-  headers: async () => new Headers({ 'x-forwarded-for': harness.ip }),
+  headers: async () => new Headers({ 'x-portal-client-ip': harness.ip }),
   cookies: async () => ({
     set: (name: string, value: string) => void harness.cookieJar.set(name, value),
     get: (name: string) => (harness.cookieJar.has(name) ? { value: harness.cookieJar.get(name) } : undefined),
@@ -123,6 +123,14 @@ describe('submitApplicationAction', () => {
     const sixth = await submitApplicationAction(form({ email: 'person6@tidewaterinfosec.in' }));
     expect(sixth).toMatchObject({ ok: false, error: { code: 'rate_limited' } });
     expect(await db.select().from(applications)).toHaveLength(5);
+  });
+
+  it('still limits submissions when the client address is unknown, all in one shared bucket', async () => {
+    harness.ip = '';
+    for (let n = 1; n <= 5; n += 1) {
+      expect((await submitApplicationAction(form({ email: `noip${n}@tidewaterinfosec.in` }))).ok).toBe(true);
+    }
+    expect(await submitApplicationAction(form({ email: 'noip6@tidewaterinfosec.in' }))).toMatchObject({ ok: false, error: { code: 'rate_limited' } });
   });
 
   it('stops when the Turnstile check fails', async () => {

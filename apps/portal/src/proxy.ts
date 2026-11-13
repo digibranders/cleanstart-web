@@ -3,6 +3,11 @@ import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
 import { PATH_HEADER } from "@/lib/next-path";
 import { ROUTES } from "@/lib/routes";
+import { buildCsp, createNonce, originsFromEnv } from "@/server/security/csp";
+import { CLIENT_IP_HEADER, clientIpFromForwardedFor, parseTrustedProxyHops } from "@/server/security/client-ip";
+
+/** Paths that answer without the review password: the container health check and the signed HubSpot webhook. */
+const OPEN_PATHS: readonly string[] = ["/api/health", "/api/hubspot/webhook"];
 
 /** The password part of an HTTP Basic header, or null when the header is absent or is not valid base64. */
 function basicPassword(header: string | null): string | null {
@@ -40,19 +45,36 @@ function reviewGate(request: NextRequest): NextResponse | null {
 export const isProtectedPath = (pathname: string): boolean => /^\/(partner|admin)(\/|$)/.test(pathname);
 
 /**
- * Two jobs. A signed out visit to a signed in area is sent to sign in with the page it asked for. This only looks
- * for the session cookie, it does not read the database: a stale cookie passes here and is caught by the layout
- * guard (requireKind), which is the real check. Then the path is handed to Server Components in a request header,
- * always overwritten so a client cannot choose it.
+ * What every request does first: the request headers Server Components and route handlers will see. The client
+ * address header is always deleted and then written from the trusted x-forwarded-for entry (or left out), so a client
+ * can neither choose its own address nor pick a fresh rate limit bucket by rotating x-forwarded-for (see client-ip.ts).
+ */
+function requestHeadersFor(request: NextRequest): Headers {
+  const headers = new Headers(request.headers);
+  headers.delete(CLIENT_IP_HEADER);
+  const ip = clientIpFromForwardedFor(request.headers.get("x-forwarded-for"), parseTrustedProxyHops(process.env.PORTAL_TRUSTED_PROXY_HOPS));
+  if (ip) headers.set(CLIENT_IP_HEADER, ip);
+  return headers;
+}
+
+/**
+ * Four jobs. The open paths pass straight through. A signed out visit to a signed in area is sent to sign in with the
+ * page it asked for; this only looks for the session cookie, it does not read the database: a stale cookie passes
+ * here and is caught by the layout guard (requireKind), which is the real check. The path is handed to Server
+ * Components in a request header, always overwritten so a client cannot choose it. Pages get a
+ * Content-Security-Policy with a fresh nonce: Next reads the nonce from the request's CSP header while it renders,
+ * so the header goes on the request as well as the response (Next docs, "Content Security Policy"). API routes
+ * return JSON, so next.config.ts gives them a closed policy instead.
  */
 export function proxy(request: NextRequest): NextResponse {
+  const requestHeaders = requestHeadersFor(request);
+  const { pathname, search } = request.nextUrl;
   // The container health check, the deploy smoke probe and `compose --wait` must not need the review password (plan 06 M0.6).
   // The HubSpot webhook cannot send Basic auth; the route verifies the HubSpot v3 signature itself (and answers 503 when its secret is unset).
-  if (request.nextUrl.pathname === "/api/health" || request.nextUrl.pathname === "/api/hubspot/webhook") return NextResponse.next();
+  if (OPEN_PATHS.includes(pathname)) return NextResponse.next({ request: { headers: requestHeaders } });
   const blocked = reviewGate(request);
   if (blocked) return blocked;
 
-  const { pathname, search } = request.nextUrl;
   if (isProtectedPath(pathname) && !getSessionCookie(request)) {
     const url = request.nextUrl.clone();
     url.pathname = ROUTES.signIn;
@@ -60,9 +82,16 @@ export function proxy(request: NextRequest): NextResponse {
     return NextResponse.redirect(url);
   }
 
-  const requestHeaders = new Headers(request.headers);
   requestHeaders.set(PATH_HEADER, `${pathname}${search}`);
-  return NextResponse.next({ request: { headers: requestHeaders } });
+  if (pathname.startsWith("/api/")) return NextResponse.next({ request: { headers: requestHeaders } });
+
+  const nonce = createNonce();
+  const csp = buildCsp({ nonce, isDev: process.env.NODE_ENV === "development", connectOrigins: originsFromEnv(process.env) });
+  requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("Content-Security-Policy", csp);
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.headers.set("Content-Security-Policy", csp);
+  return response;
 }
 
 export const config = {
