@@ -131,7 +131,7 @@ Every file this plan creates or modifies, with its responsibility. Paths are rel
 
 **Gate A at the end:** all four commands run (`test` passes through `src/structure.test.ts`; the Vitest global setup from M0.3 does not exist yet, so no database is needed).
 
-- [ ] **Step 1: Log the start and tag the mock**
+- [x] **Step 1: Log the start and tag the mock**
 
 ```bash
 printf '%s\n' "2026-11-13 00:00 IST | M0.2 | started | W0 | - | - | tag, structure, dependencies, vitest" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
@@ -141,7 +141,7 @@ git rev-parse 'portal-mock-v1^{commit}'
 
 Expected: the last command prints `58747992b690f93582a847818625d56565acc3c0`. If the tag already exists, `git tag` prints `fatal: tag 'portal-mock-v1' already exists`; then check that `git rev-parse 'portal-mock-v1^{commit}'` prints the same hash and carry on. Replace the time in the log line with the real time.
 
-- [ ] **Step 2: Install Vitest only, then write the failing structure test**
+- [x] **Step 2: Install Vitest only, then write the failing structure test**
 
 The test must be able to run before the rest of the dependencies exist, so that its first failure is about the missing packages and not about a missing test runner.
 
@@ -214,13 +214,13 @@ describe('portal structure', () => {
 });
 ```
 
-- [ ] **Step 3: Run it and confirm it fails**
+- [x] **Step 3: Run it and confirm it fails**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/structure.test.ts`
 
 Expected: FAIL. Every `has <package> installed` case except `vitest` fails with `<package> is not installed`, the three folder cases fail with `<folder>/README.md is missing`, and `keeps the package scripts the plans call` fails on `script test` (the first script that is missing).
 
-- [ ] **Step 4: Install the full dependency set, once**
+- [x] **Step 4: Install the full dependency set, once**
 
 The handoff expects these packages (amendment 1); the plans' code imports exactly these, plus the `@cleanstart/forms` workspace package that the P track needs (contracts M.2, item 20). `better-auth` is pinned to `1.7.22`, the version plan 02's code and tests ran against (integration review). pnpm 10 edits `pnpm-workspace.yaml` (it adds `minimumReleaseAgeExclude` entries) for versions published within the last day, and `1.7.22` was released on 12 November; that file is outside the allowed paths, so if the install edits it, revert the file, install `better-auth@1.7.18` instead and say so in the progress log (W0-e Step 1 then checks the installed version).
 
@@ -232,7 +232,7 @@ git diff --stat pnpm-workspace.yaml
 
 Expected: both installs succeed (the `@cleanstart/forms@workspace:*` argument is quoted because zsh would otherwise try to expand the `*`) and the last command prints nothing (revert it with `git checkout pnpm-workspace.yaml` if it does). Do not add `@types/node-cron`: `node-cron` 4 ships its own types (`node_modules/node-cron/dist/node-cron.d.ts`). Do not add `pino`: M0.4 writes a small logger. `apps/portal/package.json` now lists all of them; open it and confirm `zod` resolved to `3.25.x` (contracts M.1, item 16). If `better-auth@1.7.22` and `better-auth@1.7.18` are both rejected by pnpm, run `npm view better-auth time --json` and pin the newest 1.7.x version that is more than three days old.
 
-- [ ] **Step 5: Update the scripts and the description in `package.json`**
+- [x] **Step 5: Update the scripts and the description in `package.json`**
 
 Open `apps/portal/package.json`. Replace the `description` value and the whole `scripts` object so that they read exactly:
 
@@ -253,7 +253,7 @@ Open `apps/portal/package.json`. Replace the `description` value and the whole `
 
 Leave `name`, `version`, `private`, `type`, the dependency blocks and everything else as pnpm wrote them. The `db:*` scripts point at files that M0.3 creates; nothing runs them before that.
 
-- [ ] **Step 5b: Replace `next.config.ts` with the standalone-ready version**
+- [x] **Step 5b: Replace `next.config.ts` with the standalone-ready version**
 
 The Docker image (plan 06, M0.6) runs the Next standalone server, which needs `output: 'standalone'` and a tracing root at the repository root. Write this here, once, so the A track never edits the file (contracts K.3; M5.1 later adds the security headers in Wave 2). Replace the whole of `apps/portal/next.config.ts` with:
 
@@ -282,7 +282,7 @@ export default nextConfig;
 
 Run `pnpm --filter @cleanstart/portal typecheck` (it must stay green).
 
-- [ ] **Step 6: Create the folders with a README each, and the contract copy helper**
+- [x] **Step 6: Create the folders with a README each, and the contract copy helper**
 
 ```bash
 mkdir -p apps/portal/src/server apps/portal/src/db apps/portal/scripts
@@ -328,7 +328,7 @@ bash apps/portal/scripts/contract-block.sh "### D.5 " 9; echo "exit $?"
 
 Expected: the first command prints nothing, the `head -3` prints `// src/lib/clock.ts`, `export interface Clock {`, `  now(): Date;`, and the last pair prints `contract-block: no block 9 under "### D.5 "` then `exit 1`.
 
-- [ ] **Step 7: Write the M0.1 stub**
+- [x] **Step 7: Write the M0.1 stub**
 
 The handoff says an unattended run skips the HubSpot capability check and writes this stub (BUILD-HANDOFF, "What an overnight run can and cannot finish"; contracts K.2 assigns the file to W0-a). Create `docs/partner-portal/HUBSPOT-CAPABILITIES.md`:
 
@@ -348,7 +348,7 @@ Status: UNVERIFIED. The check needs a HubSpot developer test account and a priva
 Decided by these answers: HubSpot plan Tasks 4.1 (schema provisioning) and 4.9 (webhook).
 ```
 
-- [ ] **Step 8: Update the portal README**
+- [x] **Step 8: Update the portal README**
 
 Open `apps/portal/README.md`. Replace the first line `# CleanStart partner portal (clickable mock)` and the paragraph under it with:
 
@@ -368,13 +368,13 @@ pnpm --filter @cleanstart/portal lint
 
 Keep every other section of the README as it is.
 
-- [ ] **Step 9: Run the structure test and see it pass**
+- [x] **Step 9: Run the structure test and see it pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/structure.test.ts`
 
 Expected: PASS, `Tests  19 passed (19)` (15 packages, 3 folders, 1 scripts case).
 
-- [ ] **Step 10: Stage, run Gate A, run Gate B**
+- [x] **Step 10: Stage, run Gate A, run Gate B**
 
 ```bash
 git add apps/portal/package.json apps/portal/next.config.ts apps/portal/vitest.config.ts apps/portal/README.md apps/portal/src/structure.test.ts apps/portal/src/server/README.md apps/portal/src/db/README.md apps/portal/scripts/README.md apps/portal/scripts/contract-block.sh docs/partner-portal/HUBSPOT-CAPABILITIES.md pnpm-lock.yaml
@@ -382,7 +382,7 @@ git add apps/portal/package.json apps/portal/next.config.ts apps/portal/vitest.c
 
 Then Gate A (the block under "How to work this plan", item 6): lint, typecheck, test and build must all pass. `git diff --name-only origin/development` may list only the paths above plus earlier commits of this branch. Then Gate B.
 
-- [ ] **Step 11: Commit and log**
+- [x] **Step 11: Commit and log**
 
 ```bash
 git add docs/superpowers/plans/2026-11-12-partner-portal-01-foundations.md
@@ -404,7 +404,7 @@ printf '%s\n' "2026-11-13 00:00 IST | M0.2 | done | W0 | $(git rev-parse --short
 
 Order inside this task matters: environment first (`client.ts` imports it), then the pure libraries, then the schema and migration, then the database infrastructure and its tests, then the seed.
 
-- [ ] **Step 1: Log the start and check Postgres**
+- [x] **Step 1: Log the start and check Postgres**
 
 ```bash
 printf '%s\n' "2026-11-13 00:00 IST | M0.3 | started | W0 | - | - | database, roles, migrations, RLS, helpers, seed" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
@@ -414,7 +414,7 @@ psql "postgresql://postgres@localhost:5432/postgres" -Atc "select name from pg_a
 
 Expected: `16.14` (any `16.x`) and `pg_trgm`. Anything else, or a password prompt you cannot satisfy, is a `blocked` line (note 11 under "How to work this plan" covers the password).
 
-- [ ] **Step 2: Create the role bootstrap and `scripts/db-create.sh`**
+- [x] **Step 2: Create the role bootstrap and `scripts/db-create.sh`**
 
 The bootstrap SQL is the contracts' C.4 block (roles `portal_owner` and `portal_app`, the database, `REVOKE ALL ... FROM PUBLIC`, `pg_trgm`, default privileges). It is idempotent, which is what handoff amendment 3 asks for.
 
@@ -484,7 +484,7 @@ apps/portal/scripts/db-create.sh Bad-Name; echo "exit $?"
 
 Expected: the usage line `usage: scripts/db-create.sh <database-name> [--recreate]  (lower case letters, digits and underscores)` on stderr, then `exit 2`.
 
-- [ ] **Step 3: Create this worktree's two databases, twice**
+- [x] **Step 3: Create this worktree's two databases, twice**
 
 The handoff table names them: `cleanstart_portal` and `cleanstart_portal_test` for `portal-build` (other worktrees use their own names).
 
@@ -498,7 +498,7 @@ psql "postgresql://postgres@localhost:5432/postgres" -Atc "select datname || ' o
 
 Expected: each of the first three commands prints `Database <name> is ready. Put these in apps/portal/.env:` followed by two URL lines (the third run proves idempotence: no error; a psql line `NOTICE:  extension "pg_trgm" already exists, skipping` is normal). The role query prints `portal_app bypassrls=false super=false` and `portal_owner bypassrls=false super=false`. The database query prints `cleanstart_portal owner=portal_owner` and `cleanstart_portal_test owner=portal_owner`.
 
-- [ ] **Step 4: Write `apps/portal/.env` (never committed)**
+- [x] **Step 4: Write `apps/portal/.env` (never committed)**
 
 ```bash
 cat > apps/portal/.env <<ENV_EOF
@@ -514,7 +514,7 @@ git check-ignore -v apps/portal/.env
 
 Expected: `.gitignore:31:.env	apps/portal/.env`. The `.env` is ignored; never stage it.
 
-- [ ] **Step 5: Write the failing environment test**
+- [x] **Step 5: Write the failing environment test**
 
 The environment module comes first because `src/db/client.ts` imports it. Create `apps/portal/src/env.test.ts`:
 
@@ -595,13 +595,13 @@ describe('loadEnv', () => {
 });
 ```
 
-- [ ] **Step 6: Run it and confirm it fails**
+- [x] **Step 6: Run it and confirm it fails**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/env.test.ts`
 
 Expected: FAIL, `Failed to load url ./env` (the module does not exist).
 
-- [ ] **Step 7: Create `src/env.ts` from the contracts and see the test pass**
+- [x] **Step 7: Create `src/env.ts` from the contracts and see the test pass**
 
 ```bash
 bash apps/portal/scripts/contract-block.sh "## I. Environment" 1 > apps/portal/src/env.ts
@@ -610,7 +610,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/env.test.ts
 
 Expected: PASS, `Tests  8 passed (8)`. (The contracts' "Environment" section lists `env.ts` under W0-c; it is created here because M0.3's `client.ts` imports it. M0.4 adds `.env.example` and the rest of the environment work.)
 
-- [ ] **Step 8: Write the failing tests for the pure libraries and the auth types**
+- [x] **Step 8: Write the failing tests for the pure libraries and the auth types**
 
 Create these five files.
 
@@ -761,13 +761,13 @@ describe('auth types', () => {
 });
 ```
 
-- [ ] **Step 9: Run them and confirm they fail**
+- [x] **Step 9: Run them and confirm they fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/lib src/server/auth`
 
 Expected: FAIL, five suites each with `Failed to load url ./dates` (and the same for `./clock`, `./deal-rules`, `./domain`, `./types`).
 
-- [ ] **Step 10: Create the libraries, the DTO file and the auth types from the contracts**
+- [x] **Step 10: Create the libraries, the DTO file and the auth types from the contracts**
 
 ```bash
 mkdir -p apps/portal/src/lib apps/portal/src/server/auth
@@ -786,7 +786,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/lib src/server/auth`
 
 Expected: PASS, `Test Files  5 passed (5)`, `Tests  16 passed (16)`. `dto.ts` is types only and has no test; the typecheck in Gate A covers it.
 
-- [ ] **Step 11: Create the schema and the drizzle config**
+- [x] **Step 11: Create the schema and the drizzle config**
 
 ```bash
 bash apps/portal/scripts/contract-block.sh "### C.1 " 1 > apps/portal/src/db/schema.ts
@@ -810,7 +810,7 @@ export default defineConfig({
 });
 ```
 
-- [ ] **Step 12: Generate the first migration and review it by hand**
+- [x] **Step 12: Generate the first migration and review it by hand**
 
 (Contracts M.1, item 11: drizzle-kit must accept every feature C.1 uses.)
 
@@ -844,7 +844,7 @@ cd ../..
 
 Expected: the first two lines are the extension line and `CREATE SEQUENCE "public"."application_reference_seq" ...`; `25` tables; `1` sequence; `3` for the three `auth_two_factor` columns that Better Auth 1.7 requires (`verified`, `failed_verification_count`, `locked_until`; they are in `0000_init`, there is no separate auth migration); `5` GIN trigram indexes (`partners_name_trgm`, `users_name_trgm`, `users_email_trgm`, `registrations_customer_trgm`, `documents_title_trgm`); four partial unique index lines that each end in a `WHERE` clause (`status in ('pending', 'accepted')` for the registrations one, `status = 'new' and source = 'portal'` for the applications one, `status = 'open'` and `hubspot_deal_id is not null` for the other two); `0` and `0` for the last two counts: row level security, grants and policies belong to `rls.sql`, not to the migration (column names such as `extension_granted_at` are why the grant check anchors on `^GRANT `).
 
-- [ ] **Step 13: Write the failing database tests**
+- [x] **Step 13: Write the failing database tests**
 
 Create `apps/portal/src/db/schema.test.ts`:
 
@@ -1078,13 +1078,13 @@ describe('row level security', () => {
 });
 ```
 
-- [ ] **Step 14: Run them and confirm they fail**
+- [x] **Step 14: Run them and confirm they fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/db/schema.test.ts src/db/rls.test.ts`
 
 Expected: FAIL, `Cannot find module '@/db/test-helpers'` for both files.
 
-- [ ] **Step 15: Create the database infrastructure**
+- [x] **Step 15: Create the database infrastructure**
 
 `src/db/rls.sql` and the Vitest files that come from the contracts:
 
@@ -1561,7 +1561,7 @@ export async function asPartner(
 }
 ```
 
-- [ ] **Step 16: Run the database tests and see them pass**
+- [x] **Step 16: Run the database tests and see them pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/db/schema.test.ts src/db/rls.test.ts`
 
@@ -1577,7 +1577,7 @@ printf '%s\n' "2026-11-13 00:00 IST | M0.3 | note | W0 | - | - | verified: set_c
 
 If any of those failed and you used a fallback from contracts M.1, name the fallback in that line instead.
 
-- [ ] **Step 17: Apply the migration to the dev database, twice**
+- [x] **Step 17: Apply the migration to the dev database, twice**
 
 ```bash
 pnpm --filter @cleanstart/portal db:migrate
@@ -1587,7 +1587,7 @@ psql "postgresql://portal_owner:portal_owner_dev@localhost:5432/cleanstart_porta
 
 Expected: both runs print `migrations and row level security applied` after pnpm's own two header lines and nothing else; the count is `25` (acceptance of M0.3: a fresh database migrates twice, idempotently).
 
-- [ ] **Step 18: Type-check `scripts/` and the root config files too**
+- [x] **Step 18: Type-check `scripts/` and the root config files too**
 
 Open `apps/portal/tsconfig.json` and replace the `include` array with:
 
@@ -1599,7 +1599,7 @@ Run: `pnpm --filter @cleanstart/portal typecheck`
 
 Expected: no output. (`next build` type-checks the same set, so a type error in a script would otherwise fail the build late.)
 
-- [ ] **Step 19: Extract the mock's seed data once**
+- [x] **Step 19: Extract the mock's seed data once**
 
 `src/db/fixtures.ts` must not import from the mock (the mock is deleted in M5.4), so the data is copied out once as JSON. The mock keeps each collection in a slice whose `get()` returns the seed when there is no browser, except the audit seed, which is not exported; export it for the length of this step.
 
@@ -1650,7 +1650,7 @@ rm apps/portal/scripts/extract-mock-fixtures.ts
 
 Expected: `wrote 8 fixture files to .../apps/portal/src/db/mock-data`, then these sizes in bytes (the mock at `58747992` has not changed, so they are exact): `226 mock-account.json`, `1389 mock-applications.json`, `5617 mock-audit.json`, `13373 mock-deals.json`, `4900 mock-documents.json`, `9103 mock-partners.json`, `1467 mock-staff.json`, `995 mock-team.json`. `git status --short apps/portal/src/data` prints nothing after the checkout.
 
-- [ ] **Step 20: Write the failing fixtures test**
+- [x] **Step 20: Write the failing fixtures test**
 
 Create `apps/portal/src/db/fixtures.test.ts`:
 
@@ -1748,7 +1748,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/db/fixtures.test.ts`
 
 Expected: FAIL, `Failed to load url ./fixtures`.
 
-- [ ] **Step 21: Create `src/db/fixtures.ts`**
+- [x] **Step 21: Create `src/db/fixtures.ts`**
 
 It needs `src/server/audit/events.ts` (the closed audit vocabulary) for the reverse lookup from an action text to an event name. That file is part of M1.2; copy it now from the contracts, unchanged, and M1.2 will find it in place:
 
@@ -2260,7 +2260,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/db/fixtures.test.ts`
 
 Expected: PASS, `Tests  10 passed (10)`. The figures it asserts are the ones in contracts J.5: 21 partners, 15 registrations (4 pending, 5 accepted, 2 rejected, 2 won, 1 lost, 1 expired), 3 applications, 12 documents, 13 audit entries, Kestrel with 4 people and one open access request, and document open counts that reproduce the mock's `opens`, `partnerCount` and Kestrel's `ownOpens`.
 
-- [ ] **Step 22: Create `scripts/seed-dev.ts` and seed the dev database**
+- [x] **Step 22: Create `scripts/seed-dev.ts` and seed the dev database**
 
 Create `apps/portal/scripts/seed-dev.ts`:
 
@@ -2285,7 +2285,7 @@ pnpm --filter @cleanstart/portal db:seed; echo "exit $?"
 
 Expected for the first run: `seeded the mock data { partners: 21, users: 38, registrations: 15, applications: 3, documents: 12, documentOpens: 508, auditEntries: 13 }`. Expected for the second: the message `The database already has partners. Seed a fresh database: scripts/db-create.sh <name>, then pnpm db:migrate, then pnpm db:seed.` and `exit 1` (the seed never deletes data; CLAUDE.md).
 
-- [ ] **Step 23: Document the local database commands**
+- [x] **Step 23: Document the local database commands**
 
 Append to `apps/portal/README.md`:
 
@@ -2305,7 +2305,7 @@ pnpm --filter @cleanstart/portal db:seed                  # the mock's data; ref
 `db-create.sh <name> --recreate` drops and recreates a database (and the four `_w1` to `_w4` clones of a `_test` one). Use it only on your own worktree's databases, for example after `drizzle/0000_init.sql` is regenerated.
 ````
 
-- [ ] **Step 24: Stage, run Gate A, run Gate B**
+- [x] **Step 24: Stage, run Gate A, run Gate B**
 
 ```bash
 git add apps/portal/scripts/db-bootstrap.sql apps/portal/scripts/db-create.sh apps/portal/scripts/migrate.ts apps/portal/scripts/seed-dev.ts apps/portal/drizzle.config.ts apps/portal/drizzle apps/portal/vitest.config.ts apps/portal/tsconfig.json apps/portal/README.md apps/portal/src/env.ts apps/portal/src/env.test.ts apps/portal/src/lib apps/portal/src/server/auth apps/portal/src/server/audit/events.ts apps/portal/src/db
@@ -2314,7 +2314,7 @@ git status --short | grep -v '^[AM] ' ; echo "unstaged check done"
 
 Expected: the `git status` filter prints nothing before the final echo (every changed path is staged; `.env` is ignored). Run Gate A (lint, typecheck, test, build), then Gate B with the reviewer checklist; in particular the reviewer checks that `rls.sql` grants nothing beyond contracts C.3 and that no test pierces row level security by connecting as `portal_owner` or `postgres` to read data. After Gate A, `pnpm --filter @cleanstart/portal test` reports `Test Files  10 passed (10)` and `Tests  67 passed (67)` at the time of writing.
 
-- [ ] **Step 25: Commit and log**
+- [x] **Step 25: Commit and log**
 
 ```bash
 git add docs/superpowers/plans/2026-11-12-partner-portal-01-foundations.md
@@ -2334,13 +2334,13 @@ printf '%s\n' "2026-11-13 00:00 IST | M0.3 | done | W0 | $(git rev-parse --short
 
 **Gate A at the end:** all four commands run.
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "2026-11-13 00:00 IST | M0.4 | started | W0 | - | - | .env.example, logger, Sentry, job infrastructure" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Write the failing `.env.example` test**
+- [x] **Step 2: Write the failing `.env.example` test**
 
 The test keeps the example honest: a copy of it, with only the secret filled in, must be a valid environment, so an optional variable left as an empty `KEY=` line (which the schema rejects) cannot slip in. Create `apps/portal/src/env.example.test.ts`:
 
@@ -2369,7 +2369,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/env.example.test.ts`
 
 Expected: FAIL, the suite cannot load: `Error: ENOENT: no such file or directory, open '.../apps/portal/.env.example'` and `Tests  no tests`.
 
-- [ ] **Step 3: Create `.env.example`**
+- [x] **Step 3: Create `.env.example`**
 
 Create `apps/portal/.env.example`:
 
@@ -2457,7 +2457,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/env.example.test.ts`
 
 Expected: PASS, `Tests  2 passed (2)`.
 
-- [ ] **Step 4: Write the failing logger test**
+- [x] **Step 4: Write the failing logger test**
 
 Create `apps/portal/src/server/log.test.ts`:
 
@@ -2511,7 +2511,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/log.test.ts`
 
 Expected: FAIL, `Failed to load url ./log`.
 
-- [ ] **Step 5: Create the logger**
+- [x] **Step 5: Create the logger**
 
 The contracts describe `log` as "pino style" with `log.info(obj, msg)` and redaction of `authorization`, `password`, `token` and `cookie`. `pino` is not in the handoff's package list, so this is a small logger with the same call shape (and it redacts `secret` keys too). Create `apps/portal/src/server/log.ts`:
 
@@ -2584,7 +2584,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/log.test.ts`
 
 Expected: PASS, `Tests  4 passed (4)`.
 
-- [ ] **Step 6: Create the Sentry configuration**
+- [x] **Step 6: Create the Sentry configuration**
 
 No unit test: these files only call `Sentry.init` when a DSN is set, and the build in Gate A plus the smoke test in Step 16 exercise them. The server config strips personal data from error reports the same way `apps/web` does. The client config sends nothing without `NEXT_PUBLIC_SENTRY_DSN` and never records replays.
 
@@ -2675,7 +2675,7 @@ export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
 
 `withSentryConfig` is not used: the portal has no ad-blocker tunnel to configure and no source map upload yet, and `next.config.ts` stays untouched (a shared file). Add it later, in a task that owns `next.config.ts`, when an auth token exists.
 
-- [ ] **Step 7: Write the failing lock test**
+- [x] **Step 7: Write the failing lock test**
 
 Every scheduled job runs under a Postgres advisory lock (session level, taken and released on one connection). Create `apps/portal/src/server/jobs/lock.test.ts`:
 
@@ -2724,7 +2724,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs/lock.test
 
 Expected: FAIL, `Failed to load url ./lock`.
 
-- [ ] **Step 8: Create the lock**
+- [x] **Step 8: Create the lock**
 
 Create `apps/portal/src/server/jobs/lock.ts`:
 
@@ -2754,7 +2754,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs/lock.test
 
 Expected: PASS, `Tests  4 passed (4)`.
 
-- [ ] **Step 9: Write the failing scheduler test**
+- [x] **Step 9: Write the failing scheduler test**
 
 `node-cron` and Sentry are mocked; the test pins how each job is registered (UTC, its own name, no in-process overlap), that a tick goes through the advisory lock on the system pool, and that a failing job is reported to Sentry without stopping anything. Create `apps/portal/src/server/jobs/schedule.test.ts`:
 
@@ -2809,7 +2809,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs/schedule.
 
 Expected: FAIL, `Failed to load url ./schedule`.
 
-- [ ] **Step 10: Create the scheduler**
+- [x] **Step 10: Create the scheduler**
 
 Create `apps/portal/src/server/jobs/schedule.ts`:
 
@@ -2845,7 +2845,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs/schedule.
 
 Expected: PASS, `Tests  3 passed (3)`.
 
-- [ ] **Step 11: Write the failing registry test, then create the eight job stubs and the registry**
+- [x] **Step 11: Write the failing registry test, then create the eight job stubs and the registry**
 
 Create `apps/portal/src/server/jobs/index.test.ts`:
 
@@ -2925,7 +2925,7 @@ Expected: PASS, `Test Files  3 passed (3)`, `Tests  9 passed (9)`.
 
 The owners, for the record (contracts H.17): `hubspot-outbox` H4.4, `hubspot-poll` and `reconcile` and `expiry` H4.8, `expiry-reminders` M2.4, `intake` M1.3b, `document-purge` M3.2, `retention` M5.3 (W2-e). `hubspot-poll.ts` also gains `triggerPoll` in H4.9.
 
-- [ ] **Step 11b: Create the announce stub (contracts H.17)**
+- [x] **Step 11b: Create the announce stub (contracts H.17)**
 
 The HubSpot poll and the expiry job (H4.8) tell partners about a stage change, a changed end date or an expiry by calling `announceRegistrationChange` after the change commits. Track R owns the real body (M2.3), but H4.8 may run before R starts, so W0-c creates the file with the final types and an empty body; R replaces the body and widens `deps` to `{ db: Db; transport?: EmailTransport }`.
 
@@ -2949,7 +2949,7 @@ export async function announceRegistrationChange(_deps: { db: Db }, _change: Reg
 
 Run `pnpm --filter @cleanstart/portal typecheck` and `pnpm --filter @cleanstart/portal exec biome lint src/server/registrations`. Expected: both clean (biome's `noEmptyBlockStatements` is not enabled in this repo; if it is, give the body a `return;`).
 
-- [ ] **Step 12: Write the failing instrumentation test**
+- [x] **Step 12: Write the failing instrumentation test**
 
 Create `apps/portal/src/instrumentation.test.ts`:
 
@@ -3016,7 +3016,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/instrumentation.test.
 
 Expected: FAIL, `Failed to load url ./instrumentation`.
 
-- [ ] **Step 13: Create `src/instrumentation.ts`**
+- [x] **Step 13: Create `src/instrumentation.ts`**
 
 It validates the environment when the Node server starts (importing `@/env` throws a message naming every missing or invalid variable, so a production container with a missing secret never serves), registers Sentry for the Node and edge runtimes, and starts the scheduler only on the Node runtime when `PORTAL_JOBS_ENABLED` is `true` (the same gate as `PAYLOAD_AUTO_RUN` in the CMS). With a `src/` folder Next only picks the hook up from `src/instrumentation.ts`. Create `apps/portal/src/instrumentation.ts`:
 
@@ -3051,7 +3051,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/instrumentation.test.
 
 Expected: PASS, `Tests  4 passed (4)`.
 
-- [ ] **Step 14: Make the build skip environment validation**
+- [x] **Step 14: Make the build skip environment validation**
 
 The contracts (I) say a `next build` sets `SKIP_ENV_VALIDATION=1`: nothing may read a secret at build time, and the build has none. In `apps/portal/package.json` change the `build` script to:
 
@@ -3059,7 +3059,7 @@ The contracts (I) say a `next build` sets `SKIP_ENV_VALIDATION=1`: nothing may r
     "build": "SKIP_ENV_VALIDATION=1 next build",
 ```
 
-- [ ] **Step 15: Stage and run Gate A**
+- [x] **Step 15: Stage and run Gate A**
 
 ```bash
 git add apps/portal/.env.example apps/portal/package.json apps/portal/sentry.server.config.ts apps/portal/sentry.edge.config.ts apps/portal/sentry.client.config.ts apps/portal/src/env.example.test.ts apps/portal/src/instrumentation.ts apps/portal/src/instrumentation.test.ts apps/portal/src/instrumentation-client.ts apps/portal/src/server/log.ts apps/portal/src/server/log.test.ts apps/portal/src/server/registrations apps/portal/src/server/jobs
@@ -3067,7 +3067,7 @@ git add apps/portal/.env.example apps/portal/package.json apps/portal/sentry.ser
 
 Run Gate A (lint, typecheck, test, build). At the time of writing `pnpm --filter @cleanstart/portal test` reports `Test Files  16 passed (16)` and `Tests  86 passed (86)`.
 
-- [ ] **Step 16: Smoke test the scheduler in a production build (contracts M.1, item 14)**
+- [x] **Step 16: Smoke test the scheduler in a production build (contracts M.1, item 14)**
 
 It needs the production build that Gate A just made. The step proves three things the unit tests cannot: `register()` runs once in a real `next start`, it does not run during `next build`, and a production start refuses to boot without its required variables.
 
@@ -3099,7 +3099,7 @@ printf '%s\n' "2026-11-13 00:00 IST | M0.4 | note | W0 | - | - | verified: instr
 
 If `register()` runs during the build or twice at runtime, use the fallback in contracts M.1 item 14 (a small custom entry) only after writing a `blocked` line: it changes the Docker command and is task M0.6's call.
 
-- [ ] **Step 17: Run Gate B, commit and log**
+- [x] **Step 17: Run Gate B, commit and log**
 
 Run Gate B (the reviewer checklist) on `git diff origin/development`; fix findings and rerun Gate A and Step 16.
 
@@ -3123,13 +3123,13 @@ printf '%s\n' "2026-11-13 00:00 IST | M0.4 | done | W0 | $(git rev-parse --short
 
 This task is what makes tenant isolation checkable: after it, a repo module that exports a function nobody registered in the matrix fails the build, and a partner can never read another partner's rows even through a repo bug, because row level security answers first. Everything after this adds its repo functions to the matrix.
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "2026-11-13 00:00 IST | M1.2 | started | W0 | - | - | errors, context, audit, notify, isolation matrix" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Write the failing errors test**
+- [x] **Step 2: Write the failing errors test**
 
 Create `apps/portal/src/server/errors.test.ts`:
 
@@ -3203,7 +3203,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/errors.test.ts
 
 Expected: FAIL, `Failed to load url ./errors`.
 
-- [ ] **Step 3: Create the error hierarchy**
+- [x] **Step 3: Create the error hierarchy**
 
 ```bash
 bash apps/portal/scripts/contract-block.sh "## E. Errors" 1 > apps/portal/src/server/errors.ts
@@ -3212,7 +3212,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/errors.test.ts
 
 Expected: PASS, `Tests  5 passed (5)`. (There is no `AppError` alias: CLAUDE.md names one, but the portal uses `PortalError`; contracts M.3 decision 4.)
 
-- [ ] **Step 4: Write the failing rate limit test**
+- [x] **Step 4: Write the failing rate limit test**
 
 Create `apps/portal/src/server/rate-limit.test.ts`:
 
@@ -3256,7 +3256,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/rate-limit.tes
 
 Expected: FAIL, `Failed to load url ./rate-limit`.
 
-- [ ] **Step 5: Create the rate limiter**
+- [x] **Step 5: Create the rate limiter**
 
 The contracts' signature is `rateLimit(key, rule): void`; the optional third argument is the clock, so the test needs no fake timers (handoff amendment 6). Create `apps/portal/src/server/rate-limit.ts`:
 
@@ -3306,7 +3306,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/rate-limit.tes
 
 Expected: PASS, `Tests  3 passed (3)`.
 
-- [ ] **Step 6: Write the failing tests for the repository context and the action result**
+- [x] **Step 6: Write the failing tests for the repository context and the action result**
 
 Create `apps/portal/src/server/repo/context.test.ts`:
 
@@ -3391,7 +3391,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/context.t
 
 Expected: FAIL, `Failed to load url ./context` and `Failed to load url ./result`.
 
-- [ ] **Step 7: Create the isolation registry types, `seedTwoTenants`, the context and the result helpers**
+- [x] **Step 7: Create the isolation registry types, `seedTwoTenants`, the context and the result helpers**
 
 The registry file is types and one identity function, copied from the contracts:
 
@@ -3495,7 +3495,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/context.t
 
 Expected: PASS, `Test Files  2 passed (2)`, `Tests  7 passed (7)`. The context test proves the three settings are transaction local, that a pooled connection carries nothing into the next request (`app_kind()` is `none` outside a transaction on the request pool), and that a thrown callback rolls everything back. This is contracts M.1 item 1 (`set_config` in a transaction); record it at the end of the task.
 
-- [ ] **Step 8: Write the failing audit test, then create `record.ts`**
+- [x] **Step 8: Write the failing audit test, then create `record.ts`**
 
 Create `apps/portal/src/server/audit/record.test.ts`:
 
@@ -3588,7 +3588,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/audit/record.test.ts
 
 Expected: PASS, `Tests  4 passed (4)`. The partner case matters: a partner transaction inserts an audit row even though the partner cannot read `audit_log` (insert is allowed for every identity, select is staff only), which is why `recordAudit` never uses `.returning()`.
 
-- [ ] **Step 9: Write the failing notification test, then create `notify.ts`**
+- [x] **Step 9: Write the failing notification test, then create `notify.ts`**
 
 Create `apps/portal/src/server/notify.test.ts`:
 
@@ -3653,7 +3653,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/notify.test.ts
 
 Expected: PASS, `Tests  3 passed (3)`.
 
-- [ ] **Step 10: Write the import rules test and prove it bites**
+- [x] **Step 10: Write the import rules test and prove it bites**
 
 The rule (contracts F.1): only `src/server/repo/context.ts` may import `appDb` from `@/db/client`, and nothing under `src/server/repo/**` or `src/server/actions/**` may import `db`, `systemDb` or `pool` as a value. Test files are exempt (the context test needs `appDb` to prove that identities do not leak). Create `apps/portal/src/server/repo/imports.test.ts`:
 
@@ -3734,7 +3734,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/repo/imports.test.ts
 
 Expected: PASS again.
 
-- [ ] **Step 11: Write the isolation matrix test (it fails until `seedTwoTenants` exists, which Step 7 did; so first prove it fails for the right reason)**
+- [x] **Step 11: Write the isolation matrix test (it fails until `seedTwoTenants` exists, which Step 7 did; so first prove it fails for the right reason)**
 
 This is the contracts' F.6 test with three edits: it imports `sql` from `drizzle-orm`; the repo modules are loaded by absolute path with `@vite-ignore` (Vite warns about a variable import inside the file's own directory); and it has a first test that seeds two tenants and asserts, through `withViewer`, that every partner scoped table shows each partner only its own rows, so the file has a real test even before the first repo module exists. Create `apps/portal/src/server/repo/isolation.test.ts`:
 
@@ -3833,7 +3833,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/isolation
 
 Expected: PASS, `Tests  1 passed (1)`: `seeds two tenants that cannot see each other through withViewer`. (The two per-module tests are generated per repo file; there are none yet.)
 
-- [ ] **Step 12: Prove the matrix catches a missing registration and a leak**
+- [x] **Step 12: Prove the matrix catches a missing registration and a leak**
 
 Create a throwaway repo module that registers its one function correctly:
 
@@ -3886,7 +3886,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/repo/isolation.test.
 
 Expected: PASS, `Tests  1 passed (1)`.
 
-- [ ] **Step 13: Record the verification and run the whole suite**
+- [x] **Step 13: Record the verification and run the whole suite**
 
 ```bash
 printf '%s\n' "2026-11-13 00:00 IST | M1.2 | note | W0 | - | - | verified: withViewer set_config is transaction local and never leaks across a pooled connection; matrix fails on an unregistered export and on a leak; import rules fail on appDb/db in repo and actions" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
@@ -3895,7 +3895,7 @@ pnpm --filter @cleanstart/portal test
 
 Expected: PASS, no Vite warning about `dynamic-import-vars`. At the time of writing: `Test Files  24 passed (24)`, `Tests  112 passed (112)`.
 
-- [ ] **Step 14: Stage, run Gate A, run Gate B**
+- [x] **Step 14: Stage, run Gate A, run Gate B**
 
 ```bash
 git add apps/portal/src/server apps/portal/src/db/test-helpers.ts
@@ -3904,7 +3904,7 @@ git status --short | grep -v '^[AM] '; echo "unstaged check done"
 
 Expected: the filter prints nothing before the echo. Run Gate A (lint, typecheck, test, build), then Gate B. The reviewer looks specifically at: `withViewer` is the only caller of `appDb`; no repo-facing export takes `db` or `pool`; `seedTwoTenants` inserts as the system role and never as a viewer; and the matrix file loads modules without a glob that could silently skip one.
 
-- [ ] **Step 15: Commit and log**
+- [x] **Step 15: Commit and log**
 
 ```bash
 git add docs/superpowers/plans/2026-11-12-partner-portal-01-foundations.md
@@ -3923,7 +3923,7 @@ printf '%s\n' "2026-11-13 00:00 IST | M1.2 | done | W0 | $(git rev-parse --short
 
 **Gate A at the end:** all four commands run.
 
-- [ ] **Step 1: Check the prerequisite, log the start**
+- [x] **Step 1: Check the prerequisite, log the start**
 
 ```bash
 grep -n "export async function requireActionViewer\|export const requireActionViewer" apps/portal/src/server/auth/viewer.ts
@@ -3932,7 +3932,7 @@ printf '%s\n' "2026-11-13 00:00 IST | M1.2b | started | W0 | - | - | runViewerAc
 
 Expected: one matching line. If `viewer.ts` or the export is missing, W0-f has not landed: write a `blocked` line and stop.
 
-- [ ] **Step 2: Write the failing runner test**
+- [x] **Step 2: Write the failing runner test**
 
 The test mocks `@/server/auth/viewer`, `next/cache`, `next/headers`, `@sentry/nextjs` and the logger, so it needs no session and no database. Create `apps/portal/src/server/actions/run.test.ts`:
 
@@ -4066,7 +4066,7 @@ Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/run.te
 
 Expected: FAIL, `Failed to load url ./run`.
 
-- [ ] **Step 3: Create the runner from the contracts**
+- [x] **Step 3: Create the runner from the contracts**
 
 ```bash
 bash apps/portal/scripts/contract-block.sh "### F.7 " 2 > apps/portal/src/server/actions/run.ts
@@ -4077,7 +4077,7 @@ Expected: PASS, `Tests  10 passed (10)`. This also settles contracts M.1 item 8 
 
 Contracts M.1 item 9 (`'use server'` files export only async functions) is not exercised here: `run.ts` is not a `'use server'` file. The first action file (track P, `actions/apply.ts`) is the check.
 
-- [ ] **Step 4: Stage, run Gate A, run Gate B, commit, log**
+- [x] **Step 4: Stage, run Gate A, run Gate B, commit, log**
 
 ```bash
 git add apps/portal/src/server/actions/run.ts apps/portal/src/server/actions/run.test.ts docs/superpowers/plans/2026-11-12-partner-portal-01-foundations.md

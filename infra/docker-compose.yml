@@ -33,6 +33,27 @@ services:
       timeout: 5s
       retries: 3
 
+  portal:
+    image: portal:current # deploy-portal.yml tags the built image as portal:<sha> and portal:current
+    # `docker compose --profile portal up -d portal` starts only this service; Postgres and Meilisearch have no profile.
+    profiles: ["portal"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # The portal has its own env file, so it never sees the CMS secrets and the CMS never sees the portal's.
+    env_file: portal.env
+    ports:
+      - "127.0.0.1:3004:3004"
+    # 2 GB droplet shared with Postgres and the CMS. The image also sets --max-old-space-size=384.
+    mem_limit: 512m
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3004/api/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
 volumes:
   pgdata:
   meilidata:

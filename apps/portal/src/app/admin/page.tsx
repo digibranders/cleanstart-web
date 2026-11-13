@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import { ROUTES } from "@/lib/routes";
+import { homeFor, requireKind } from "@/server/auth/viewer";
 
-export default function AdminIndex(): never {
-  redirect(ROUTES.admin.approvals);
+export default async function AdminIndex(): Promise<never> {
+  redirect(homeFor(await requireKind("staff")));
 }

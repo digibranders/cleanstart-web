@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import { checkPassword } from "@/lib/password-rules";
 import { Icon } from "../icon";
 
 interface PasswordFieldProps {
@@ -73,12 +74,7 @@ export interface PasswordRule {
 
 /** Portal password rule: 8+ characters with a letter, a number and a special character. */
 export function passwordRules(value: string): PasswordRule[] {
-  return [
-    { label: "At least 8 characters", met: value.length >= 8 },
-    { label: "A letter", met: /[A-Za-z]/.test(value) },
-    { label: "A number", met: /\d/.test(value) },
-    { label: "A special character", met: /[^A-Za-z0-9]/.test(value) },
-  ];
+  return checkPassword(value).rules;
 }
 
 export function PasswordRules({ value }: { value: string }): React.JSX.Element {

@@ -2,49 +2,51 @@
 
 import { useState } from "react";
 import { Icon } from "@/components/icon";
-import { Dropdown } from "@/components/ui/dropdown";
+import { Dropdown, type DropdownOption } from "@/components/ui/dropdown";
 import { useToast } from "@/components/ui/toast";
-import { appendAudit } from "@/data/audit";
-import { isEmail, nameFromEmail, type PartnerRole, teamSlice } from "@/data/team";
+import { isOneOf, PARTNER_ROLE_LABEL, PARTNER_ROLES, type PartnerRole } from "@/lib/domain";
+import { emailDomain, isValidEmail } from "@/lib/people";
+import { inviteMemberAction } from "@/server/actions/team";
+import { issuesToErrors } from "@/server/actions/result";
 
-const ROLES: readonly PartnerRole[] = ["Sales", "Technical", "Partner admin"];
+const ROLE_ORDER: readonly PartnerRole[] = ["sales", "technical", "partner_admin"];
+const ROLE_OPTIONS: readonly DropdownOption[] = ROLE_ORDER.map((value) => ({ value, label: PARTNER_ROLE_LABEL[value] }));
 
-function isRole(value: string): value is PartnerRole {
-  return (ROLES as readonly string[]).includes(value);
-}
-
-export function InviteCard(): React.JSX.Element {
+export function InviteCard({
+  existingEmails,
+  partnerDomain,
+}: {
+  existingEmails: readonly string[];
+  /** The company's own email domain; an invite to any other address gets a one-line note. */
+  partnerDomain: string;
+}): React.JSX.Element {
   const toast = useToast();
-  const members = teamSlice.use().members;
-  const [email, setEmail] = useState("meera.pillai@kestrelsystems.in");
-  const [role, setRole] = useState<PartnerRole>("Sales");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState<PartnerRole>("sales");
   const [tried, setTried] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const address = email.trim().toLowerCase();
-  const valid = isEmail(address);
-  const duplicate = members.some((m) => m.email === address);
-  const showError = tried && (!valid || duplicate);
+  const valid = isValidEmail(address);
+  const duplicate = existingEmails.includes(address);
+  const showError = (tried && (!valid || duplicate)) || serverError !== null;
+  const otherDomain = valid && partnerDomain !== "" && emailDomain(address) !== partnerDomain;
 
-  const submit = (event: React.FormEvent<HTMLFormElement>): void => {
+  const submit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
+    setServerError(null);
     if (!valid || duplicate) {
       setTried(true);
       return;
     }
-    const name = nameFromEmail(address);
-    teamSlice.set((prev) => ({
-      ...prev,
-      members: [
-        ...prev.members,
-        { name, email: address, role, status: "Invited", last: "Invited today", deals: 0 },
-      ],
-    }));
-    appendAudit({
-      actor: "Aditi Rao",
-      action: "Invited a user",
-      target: `${name}, ${role.toLowerCase()}, at Kestrel Systems`,
-      source: "Portal",
-    });
+    setBusy(true);
+    const result = await inviteMemberAction({ email: address, role });
+    setBusy(false);
+    if (!result.ok) {
+      setServerError(issuesToErrors(result.error).email ?? result.error.message);
+      return;
+    }
     setEmail("");
     setTried(false);
     toast(`Invite sent to ${address}`);
@@ -69,11 +71,15 @@ export function InviteCard(): React.JSX.Element {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             aria-invalid={showError}
-            aria-describedby={showError ? "ie-err" : undefined}
+            aria-describedby={showError ? "ie-err" : otherDomain ? "ie-note" : undefined}
           />
           {showError ? (
             <span className="err" id="ie-err">
-              {duplicate ? "This person already has a login." : "Enter a valid work email."}
+              {serverError ?? (duplicate ? "This person already has a login." : "Enter a valid work email.")}
+            </span>
+          ) : otherDomain ? (
+            <span className="hint" id="ie-note">
+              This address is not at {partnerDomain}.
             </span>
           ) : null}
         </div>
@@ -85,13 +91,13 @@ export function InviteCard(): React.JSX.Element {
             id="ir"
             variant="field"
             value={role}
-            options={ROLES}
+            options={ROLE_OPTIONS}
             onChange={(v) => {
-              if (isRole(v)) setRole(v);
+              if (isOneOf(PARTNER_ROLES, v)) setRole(v);
             }}
           />
         </div>
-        <button type="submit" className="btn btn-p" style={{ alignSelf: "flex-start" }} data-tour="team-invite">
+        <button type="submit" className="btn btn-p" style={{ alignSelf: "flex-start" }} disabled={busy}>
           <Icon name="userplus" />
           Send invite
         </button>

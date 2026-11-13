@@ -1,14 +1,15 @@
+import { CHIP_PRODUCT } from '@/components/deals/derive';
 import { ProductChip } from '@/components/ui/badge';
-import { PRODUCT_ROWS, TOTAL_REGISTERED } from '@/data/reports';
+import type { ProductReportRow } from '@/lib/dto';
 
-export function ProductBreakdown(): React.JSX.Element {
+export function ProductBreakdown({ rows, total }: { rows: ProductReportRow[]; total: number }): React.JSX.Element {
   return (
     <section aria-labelledby="bp" className="card clip" style={{ flex: '1 1 520px', minWidth: 0 }}>
       <div className="card-h">
         <h2 id="bp" className="card-t">
           By product
         </h2>
-        <span className="card-meta">Registered this quarter</span>
+        <span className="card-meta">Registered, all time</span>
       </div>
       <table className="tbl">
         <thead>
@@ -29,12 +30,12 @@ export function ProductBreakdown(): React.JSX.Element {
           </tr>
         </thead>
         <tbody>
-          {PRODUCT_ROWS.map((b) => {
-            const share = Math.round((b.registered / TOTAL_REGISTERED) * 100);
+          {rows.map((b) => {
+            const share = total ? Math.round((b.registered / total) * 100) : 0;
             return (
               <tr key={b.product}>
                 <td>
-                  <ProductChip product={b.product} />
+                  <ProductChip product={CHIP_PRODUCT[b.product]} />
                 </td>
                 <td className="tnum r">{b.registered}</td>
                 <td className="tnum r">{b.accepted}</td>

@@ -1,32 +1,50 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { acceptDeal, type Deal, rejectDeal, undoDecision, useDeals } from "@/data/deals";
+import { useEffect, useMemo, useState } from "react";
+import { fmtTimestamp } from "@/lib/dates";
+import { PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL, PRODUCT_LABEL, type StaffRegion } from "@/lib/domain";
+import type { ApprovalQueueDto, ManagerOptionDto, RegistrationDetailDto } from "@/lib/dto";
+import {
+  acceptRegistrationAction,
+  hubspotConflictHintsAction,
+  rejectRegistrationAction,
+  undoDecisionAction,
+} from "@/server/actions/decisions";
+import { EXTENSION_DAYS } from "@/lib/deal-rules";
+import { decideExtensionAction } from "@/server/actions/extension";
+import { postMessageAction } from "@/server/actions/registrations";
+import { issuesToErrors } from "@/server/actions/result";
 import { downloadCsv } from "../deals/csv";
-import { daysBetween, fmtLong, fmtShort, plural, TODAY } from "../deals/dates";
-import { avOf, type Check, checksFor, initialsOf, OVER_TARGET_DAYS, reviewSince, waitDays } from "../deals/derive";
+import { fmtLong, fmtShort, plural } from "../deals/dates";
+import {
+  avOf,
+  CHIP_PRODUCT,
+  type Check,
+  defaultRejectReason,
+  describeCheck,
+  initialsOf,
+  reviewSince,
+  routingText,
+} from "../deals/derive";
+import type { HubspotHintDto } from "../deals/types";
 import { Icon } from "../icon";
 import { ProductChip } from "../ui/badge";
 import { Dropdown } from "../ui/dropdown";
 import { Drawer } from "../ui/overlay";
 import { useToast } from "../ui/toast";
+import { ScrollRegion } from "@/components/ui/scroll-region";
 
-const MY_REGION = "India";
 const ALL_PRODUCTS = "All products";
 const ALL_REGIONS = "All regions";
 const PRODUCT_OPTIONS = [ALL_PRODUCTS, "CleanStart Images", "Clean Libraries", "CleanSight"];
 const REGION_OPTIONS = [ALL_REGIONS, "India", "Middle East"];
-/** Decisions this month that are not in the slice: 12 accepted and 2 rejected before this session. */
-const BASE_ACCEPTED = 12;
-const BASE_REJECTED = 2;
-/** Protected deals ending in 14 days across all partners. Only Kestrel's are in the slice, so this is fixed. */
-const EXPIRING_ALL_PARTNERS = 5;
 const SMALL_BTN = { height: 24, padding: "0 6px", fontSize: 12 } as const;
+const HINT_LIMIT = 50;
 
 type RowState = "open" | "rejecting" | "approved" | "rejected";
 
 interface QueueRow {
-  deal: Deal;
+  deal: RegistrationDetailDto;
   check: Check;
   state: RowState;
   age: number;
@@ -42,79 +60,107 @@ function ageLabel(days: number): string {
   return days === 0 ? "Today" : plural(days, "day");
 }
 
-function defaultReason(deal: Deal, check: Check): string {
-  const rival = check.rival;
-  if (rival && rival.registered < deal.registered) {
-    return `${rival.partner} registered this customer for ${deal.product} on ${fmtShort(rival.registered)}.`;
-  }
-  return "";
+interface AdminApprovalsProps {
+  queue: ApprovalQueueDto;
+  extensions: RegistrationDetailDto[];
+  viewerId: string;
+  viewerRegion: StaffRegion;
+  managers: ManagerOptionDto[];
+  today: string;
 }
 
-export function AdminApprovals(): React.JSX.Element {
+export function AdminApprovals({ queue, extensions, viewerId, viewerRegion, managers, today }: AdminApprovalsProps): React.JSX.Element {
   const toast = useToast();
-  const deals = useDeals();
 
-  const [queue, setQueue] = useState<"mine" | "all">("mine");
+  const [view, setView] = useState<"mine" | "all">("mine");
   const [q, setQ] = useState("");
   const [product, setProduct] = useState(ALL_PRODUCTS);
   const [region, setRegion] = useState(ALL_REGIONS);
   const [viewingId, setViewingId] = useState<string | null>(null);
   const [rejecting, setRejecting] = useState<Record<string, Rejecting>>({});
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [hints, setHints] = useState<Record<string, HubspotHintDto>>({});
+  const [reply, setReply] = useState("");
+  const [replyTried, setReplyTried] = useState(false);
+  const [replying, setReplying] = useState(false);
+
+  const waitingIds = queue.rows
+    .filter((r) => r.registration.status === "pending")
+    .map((r) => r.registration.id)
+    .join(",");
+
+  useEffect(() => {
+    if (!waitingIds) return;
+    let cancelled = false;
+    hubspotConflictHintsAction({ ids: waitingIds.split(",").slice(0, HINT_LIMIT) })
+      .then((result) => {
+        if (!cancelled && result.ok) setHints(result.data);
+      })
+      .catch(() => {
+        if (!cancelled) setHints({});
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [waitingIds]);
 
   const rows = useMemo<QueueRow[]>(
     () =>
-      deals
-        .filter((d) => d.status === "Pending" || (d.decidedLive && (d.status === "Accepted" || d.status === "Rejected")))
-        .sort((a, b) => reviewSince(a).localeCompare(reviewSince(b)))
-        .map((deal) => {
-          const age = waitDays(deal);
-          const state: RowState =
-            deal.status === "Accepted" ? "approved" : deal.status === "Rejected" ? "rejected" : deal.id in rejecting ? "rejecting" : "open";
-          return {
-            deal,
-            check: checksFor(deal, deals),
-            state,
-            age,
-            over: deal.status === "Pending" && age > OVER_TARGET_DAYS,
-          };
-        }),
-    [deals, rejecting],
+      queue.rows.map((entry) => {
+        const deal = entry.registration;
+        const state: RowState =
+          deal.status === "accepted" ? "approved" : deal.status === "rejected" ? "rejected" : deal.id in rejecting ? "rejecting" : "open";
+        return { deal, check: describeCheck(deal, entry.check, hints[deal.id]), state, age: entry.waitingBusinessDays, over: entry.overSla };
+      }),
+    [queue.rows, rejecting, hints],
   );
+
+  const inMyQueue = (deal: RegistrationDetailDto): boolean =>
+    viewerRegion === "all" ? deal.managerId === viewerId : deal.region === viewerRegion;
 
   const needle = q.trim().toLowerCase();
   const visible = rows.filter(
     ({ deal }) =>
-      (queue === "all" || deal.region === MY_REGION) &&
-      (!needle || `${deal.partner} ${deal.customer}`.toLowerCase().includes(needle)) &&
-      (product === ALL_PRODUCTS || deal.product === product) &&
-      (region === ALL_REGIONS || deal.region === region),
+      (view === "all" || inMyQueue(deal)) &&
+      (!needle || `${deal.partnerName} ${deal.customer}`.toLowerCase().includes(needle)) &&
+      (product === ALL_PRODUCTS || PRODUCT_LABEL[deal.product] === product) &&
+      (region === ALL_REGIONS || PARTNER_REGION_LABEL[deal.region] === region),
   );
 
   const waiting = rows.filter((r) => r.state === "open" || r.state === "rejecting");
-  const overCount = waiting.filter((r) => r.over).length;
-  const conflictCount = waiting.filter((r) => r.check.kind === "conflict").length;
-  const liveAccepted = rows.filter((r) => r.state === "approved").length;
-  const liveRejected = rows.filter((r) => r.state === "rejected").length;
-  const firstOpenId = visible.find((r) => r.state === "open")?.deal.id;
-  const firstConflictId = visible.find((r) => r.check.kind === "conflict")?.deal.id;
+  const inScope = waiting.filter((r) => view === "all" || inMyQueue(r.deal));
+  const overCount = inScope.filter((r) => r.over).length;
+  const conflictCount = inScope.filter((r) => r.check.kind === "conflict").length;
+  const oldest = inScope.reduce<QueueRow | null>((top, r) => (top === null || r.age > top.age ? r : top), null);
   const viewing = rows.find((r) => r.deal.id === viewingId);
+  const recentDecisions = queue.recentDecisions;
+  const visibleExtensions = extensions.filter((d) => view === "all" || inMyQueue(d));
 
-  const recentDecisions = deals
-    .filter(
-      (d) =>
-        (d.status === "Accepted" || d.status === "Rejected") &&
-        d.decidedOn !== undefined &&
-        daysBetween(d.decidedOn, TODAY) <= 7,
-    )
-    .sort((a, b) => (b.decidedOn ?? "").localeCompare(a.decidedOn ?? ""));
+  const decideExt = async (deal: RegistrationDetailDto, decision: "grant" | "decline"): Promise<void> => {
+    setBusyId(deal.id);
+    try {
+      const result = await decideExtensionAction({ id: deal.id, decision, note: null });
+      toast(
+        result.ok
+          ? decision === "grant"
+            ? `Extension granted for ${deal.customer}.`
+            : `Extension declined for ${deal.customer}.`
+          : result.error.message,
+      );
+    } finally {
+      setBusyId(null);
+    }
+  };
 
-  const accept = (row: QueueRow): void => {
-    acceptDeal(row.deal.id);
-    toast(`${row.deal.customer} accepted. HubSpot deal created.`);
+  const accept = async (row: QueueRow): Promise<void> => {
+    setBusyId(row.deal.id);
+    const result = await acceptRegistrationAction({ id: row.deal.id });
+    setBusyId(null);
+    toast(result.ok ? `${row.deal.customer} accepted. HubSpot deal queued.` : result.error.message);
   };
 
   const startReject = (row: QueueRow): void =>
-    setRejecting((prev) => ({ ...prev, [row.deal.id]: { reason: defaultReason(row.deal, row.check), tried: false } }));
+    setRejecting((prev) => ({ ...prev, [row.deal.id]: { reason: defaultRejectReason(row.deal, row.check), tried: false } }));
 
   const cancelReject = (id: string): void =>
     setRejecting((prev) => {
@@ -122,31 +168,60 @@ export function AdminApprovals(): React.JSX.Element {
       return rest;
     });
 
-  const confirmReject = (row: QueueRow): void => {
+  const confirmReject = async (row: QueueRow): Promise<void> => {
     const entry = rejecting[row.deal.id];
     if (!entry) return;
     if (!entry.reason.trim()) {
       setRejecting((prev) => ({ ...prev, [row.deal.id]: { ...entry, tried: true } }));
       return;
     }
-    rejectDeal(row.deal.id, entry.reason);
+    setBusyId(row.deal.id);
+    const result = await rejectRegistrationAction({ id: row.deal.id, reason: entry.reason });
+    setBusyId(null);
+    if (!result.ok) {
+      toast(issuesToErrors(result.error).reason ?? result.error.message);
+      return;
+    }
     cancelReject(row.deal.id);
     toast(`${row.deal.customer} rejected. The partner has been emailed.`);
   };
 
-  const undo = (row: QueueRow): void => {
-    if (row.state === "rejecting") cancelReject(row.deal.id);
-    else undoDecision(row.deal.id);
+  const undo = async (row: QueueRow): Promise<void> => {
+    if (row.state === "rejecting") {
+      cancelReject(row.deal.id);
+      return;
+    }
+    setBusyId(row.deal.id);
+    const result = await undoDecisionAction({ id: row.deal.id });
+    setBusyId(null);
+    if (!result.ok) toast(result.error.message);
+  };
+
+  const sendReply = async (event: React.FormEvent, deal: RegistrationDetailDto): Promise<void> => {
+    event.preventDefault();
+    if (!reply.trim()) {
+      setReplyTried(true);
+      return;
+    }
+    setReplying(true);
+    const result = await postMessageAction({ registrationId: deal.id, body: reply });
+    setReplying(false);
+    if (!result.ok) {
+      toast(result.error.message);
+      return;
+    }
+    setReply("");
+    setReplyTried(false);
   };
 
   const exportCsv = (): void => {
     downloadCsv("deal-approvals.csv", [
       ["Partner", "Customer", "Product", "Region", "Submitted", "Waiting", "Checks", "Decision"],
       ...visible.map((r) => [
-        r.deal.partner,
+        r.deal.partnerName,
         r.deal.customer,
-        r.deal.product,
-        r.deal.region,
+        PRODUCT_LABEL[r.deal.product],
+        PARTNER_REGION_LABEL[r.deal.region],
         fmtLong(reviewSince(r.deal)),
         ageLabel(r.age),
         r.check.label,
@@ -157,7 +232,7 @@ export function AdminApprovals(): React.JSX.Element {
   };
 
   const queues: { key: "mine" | "all"; label: string; count: number }[] = [
-    { key: "mine", label: "My queue", count: waiting.filter((r) => r.deal.region === MY_REGION).length },
+    { key: "mine", label: "My queue", count: waiting.filter((r) => inMyQueue(r.deal)).length },
     { key: "all", label: "All regions", count: waiting.length },
   ];
 
@@ -180,32 +255,25 @@ export function AdminApprovals(): React.JSX.Element {
 
       <section aria-label="Queue summary" className="card kpis">
         <div className="kpi">
-          <span className="kpi-l">Waiting</span>
-          <span className="kpi-v">{waiting.length}</span>
+          <span className="kpi-l">{view === "mine" ? "Waiting, my queue" : "Waiting, all regions"}</span>
+          <span className="kpi-v">{inScope.length}</span>
           <span className={`kpi-f${overCount ? " t-amber" : ""}`}>
             {overCount ? `${overCount} over the 2-day target` : "All within 2 days"}
           </span>
         </div>
-        <div className="kpi" data-tour={firstConflictId ? undefined : "approvals-conflict"}>
+        <div className="kpi">
           <span className="kpi-l">With a conflict</span>
           <span className="kpi-v t-amber">{conflictCount}</span>
           <span className="kpi-f">Same customer and product</span>
         </div>
         <div className="kpi">
-          <span className="kpi-l">Decided this month</span>
-          <span className="kpi-v">{BASE_ACCEPTED + BASE_REJECTED + liveAccepted + liveRejected}</span>
-          <span className="kpi-f">
-            Accepted {BASE_ACCEPTED + liveAccepted}, rejected {BASE_REJECTED + liveRejected}
-          </span>
-        </div>
-        <div className="kpi">
-          <span className="kpi-l">Expiring in 14 days</span>
-          <span className="kpi-v t-amber">{EXPIRING_ALL_PARTNERS}</span>
-          <span className="kpi-f">Partners reminded</span>
+          <span className="kpi-l">Oldest waiting</span>
+          <span className="kpi-v">{oldest ? ageLabel(oldest.age) : "None"}</span>
+          <span className="kpi-f">{oldest ? oldest.deal.customer : "Nothing waiting"}</span>
         </div>
       </section>
 
-      <section aria-label="Queue" className="card clip" data-tour="approvals-queue">
+      <section aria-label="Queue" className="card clip">
         <div className="toolbar">
           <div className="filters">
             <div className="seg" role="group" aria-label="Whose queue" style={{ marginRight: 4 }}>
@@ -213,9 +281,9 @@ export function AdminApprovals(): React.JSX.Element {
                 <button
                   type="button"
                   key={qv.key}
-                  className={`seg-b${queue === qv.key ? " seg-on" : ""}`}
-                  aria-pressed={queue === qv.key}
-                  onClick={() => setQueue(qv.key)}
+                  className={`seg-b${view === qv.key ? " seg-on" : ""}`}
+                  aria-pressed={view === qv.key}
+                  onClick={() => setView(qv.key)}
                   style={{ height: 24, padding: "0 10px" }}
                 >
                   {qv.label} <span className="cnt">{qv.count}</span>
@@ -229,7 +297,7 @@ export function AdminApprovals(): React.JSX.Element {
               id="aq"
               className="finput"
               type="search"
-              placeholder="Filter by partner or customer"
+              placeholder="Partner or customer"
               value={q}
               onChange={(e) => setQ(e.target.value)}
             />
@@ -237,18 +305,26 @@ export function AdminApprovals(): React.JSX.Element {
             <Dropdown id="ar" ariaLabel="Region" value={region} options={REGION_OPTIONS} onChange={setRegion} />
           </div>
           <span className="card-meta tnum">
-            {visible.length} shown, oldest first. India goes to Farhan, Middle East to Omar.
+            {visible.length} shown, oldest first. {routingText(managers)}
           </span>
         </div>
-        <div style={{ overflowX: "auto" }}>
+        <ScrollRegion label="Approval queue">
           <table className="tbl">
             <thead>
               <tr>
-                <th scope="col">Partner</th>
+                <th scope="col" className="hide-sm">
+                  Partner
+                </th>
                 <th scope="col">Customer</th>
-                <th scope="col">Product</th>
-                <th scope="col">Region</th>
-                <th scope="col">Waiting</th>
+                <th scope="col" className="hide-sm">
+                  Product
+                </th>
+                <th scope="col" className="hide-sm">
+                  Region
+                </th>
+                <th scope="col" className="hide-sm">
+                  Waiting
+                </th>
                 <th scope="col">Checks</th>
                 <th scope="col" className="r">
                   Decision
@@ -261,12 +337,12 @@ export function AdminApprovals(): React.JSX.Element {
                 const entry = rejecting[deal.id];
                 const reasonErr = entry?.tried && !entry.reason.trim();
                 const tr = (
-                  <tr key={deal.id} data-tour={deal.id === firstConflictId ? "approvals-conflict" : undefined}>
-                    <td>
+                  <tr key={deal.id}>
+                    <td className="hide-sm">
                       <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <span className={`av ${avOf(deal.partner)}`}>{initialsOf(deal.partner)}</span>
+                        <span className={`av ${avOf(deal.partnerName)}`}>{initialsOf(deal.partnerName)}</span>
                         <span className="li-n" style={{ fontSize: 13 }}>
-                          {deal.partner}
+                          {deal.partnerName}
                         </span>
                       </span>
                     </td>
@@ -275,46 +351,47 @@ export function AdminApprovals(): React.JSX.Element {
                         {deal.customer}
                       </button>
                     </td>
-                    <td>
-                      <ProductChip product={deal.product} />
+                    <td className="hide-sm">
+                      <ProductChip product={CHIP_PRODUCT[deal.product]} />
                     </td>
-                    <td className="t-sec">{deal.region}</td>
-                    <td className={`tnum ${row.over ? "t-amber" : "t-sec"}`} title={`Submitted ${fmtLong(reviewSince(deal))}`}>
+                    <td className="t-sec hide-sm">{PARTNER_REGION_LABEL[deal.region]}</td>
+                    <td className={`tnum hide-sm ${row.over ? "t-amber" : "t-sec"}`} title={`Submitted ${fmtLong(reviewSince(deal))}`}>
                       {ageLabel(row.age)}
                       {row.over ? <span className="why why-amber">Over 2-day target</span> : null}
                     </td>
                     <td style={{ whiteSpace: "normal" }}>
                       <span className={`badge b-${check.tone}`}>{check.label}</span>
-                      {check.why && state !== "rejecting" ? <span className={check.whyCls}>{check.why}</span> : null}
+                      {check.why && state !== "rejecting" ? <span className={`${check.whyCls} hide-sm`}>{check.why}</span> : null}
                     </td>
                     <td className="r">
                       {state === "open" ? (
-                        <span className="acts">
+                        <span className="acts" style={{ gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
                           <button
                             type="button"
-                            className="act act-no"
+                            className="btn btn-d"
                             onClick={() => startReject(row)}
-                            aria-label={`Reject ${deal.customer} from ${deal.partner}`}
-                            data-tip="Reject with a reason"
+                            disabled={busyId === deal.id}
+                            aria-label={`Reject ${deal.customer} from ${deal.partnerName}`}
+                            title="Reject with a reason"
                           >
-                            <Icon name="x" />
+                            Reject
                           </button>
                           <button
                             type="button"
-                            className="act act-ok"
+                            className="btn btn-p"
                             onClick={() => accept(row)}
-                            aria-label={`Accept ${deal.customer} from ${deal.partner}`}
-                            data-tip="Accept and create the HubSpot deal"
-                            data-tour={deal.id === firstOpenId ? "approvals-accept" : undefined}
+                            disabled={busyId === deal.id}
+                            aria-label={`Accept ${deal.customer} from ${deal.partnerName}`}
+                            title="Accept and create the HubSpot deal"
                           >
-                            <Icon name="checkIcon" />
+                            Accept
                           </button>
                         </span>
                       ) : null}
                       {state === "approved" ? (
                         <span style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
-                          <span className="badge b-accepted">Accepted, in HubSpot</span>
-                          <button type="button" className="btn btn-g" onClick={() => undo(row)} style={SMALL_BTN}>
+                          <span className="badge b-accepted">Accepted, syncing to HubSpot</span>
+                          <button type="button" className="btn btn-g" onClick={() => undo(row)} disabled={busyId === deal.id} style={SMALL_BTN}>
                             Undo
                           </button>
                         </span>
@@ -322,7 +399,7 @@ export function AdminApprovals(): React.JSX.Element {
                       {state === "rejected" ? (
                         <span style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
                           <span className="badge b-rejected">Rejected, emailed</span>
-                          <button type="button" className="btn btn-g" onClick={() => undo(row)} style={SMALL_BTN}>
+                          <button type="button" className="btn btn-g" onClick={() => undo(row)} disabled={busyId === deal.id} style={SMALL_BTN}>
                             Undo
                           </button>
                         </span>
@@ -350,12 +427,13 @@ export function AdminApprovals(): React.JSX.Element {
                       >
                         <div className="fg" style={{ flex: "1 1 360px" }}>
                           <label htmlFor={`reason-${deal.id}`} className="lbl">
-                            Reason the partner will see
+                            Reason the partner will see <span className="t-muted">(required)</span>
                           </label>
                           <input
                             id={`reason-${deal.id}`}
                             className={`field${reasonErr ? " field-err" : ""}`}
                             type="text"
+                            placeholder="For example, already registered by another partner"
                             value={entry.reason}
                             onChange={(e) =>
                               setRejecting((prev) => ({ ...prev, [deal.id]: { reason: e.target.value, tried: entry.tried } }))
@@ -372,7 +450,7 @@ export function AdminApprovals(): React.JSX.Element {
                         <button type="button" className="btn btn-s" onClick={() => undo(row)}>
                           Cancel
                         </button>
-                        <button type="button" className="btn btn-dd" onClick={() => confirmReject(row)}>
+                        <button type="button" className="btn btn-dd" onClick={() => confirmReject(row)} disabled={busyId === deal.id}>
                           Reject and email
                         </button>
                       </div>
@@ -383,8 +461,64 @@ export function AdminApprovals(): React.JSX.Element {
             </tbody>
           </table>
           {visible.length === 0 ? <div className="empty">No registrations match these filters.</div> : null}
-        </div>
+        </ScrollRegion>
       </section>
+
+      {visibleExtensions.length > 0 ? (
+        <section aria-labelledby="extreq" className="card clip">
+          <div className="card-h">
+            <h2 id="extreq" className="card-t">
+              Extension requests
+            </h2>
+            <span className="card-meta">{visibleExtensions.length}</span>
+          </div>
+          <ScrollRegion label="Extension requests">
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th scope="col">Partner</th>
+                  <th scope="col">Customer</th>
+                  <th scope="col" className="hide-sm">
+                    Product
+                  </th>
+                  <th scope="col" className="hide-sm">
+                    Protected until
+                  </th>
+                  <th scope="col">Reason</th>
+                  <th scope="col" className="r">
+                    Decision
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {visibleExtensions.map((d) => (
+                  <tr key={d.id}>
+                    <td>{d.partnerName}</td>
+                    <td style={{ fontWeight: 600 }}>{d.customer}</td>
+                    <td className="hide-sm">
+                      <ProductChip product={CHIP_PRODUCT[d.product]} />
+                    </td>
+                    <td className="tnum t-sec hide-sm">{d.protectionEnd ? fmtLong(d.protectionEnd) : ""}</td>
+                    <td className="t-sec" style={{ whiteSpace: "normal", maxWidth: 360 }}>
+                      {d.extensionReason}
+                    </td>
+                    <td className="r">
+                      <span style={{ display: "inline-flex", gap: 6 }}>
+                        <button type="button" className="btn btn-s" onClick={() => decideExt(d, "decline")} disabled={busyId === d.id} style={SMALL_BTN}>
+                          Decline
+                        </button>
+                        <button type="button" className="btn btn-p" onClick={() => decideExt(d, "grant")} disabled={busyId === d.id} style={SMALL_BTN}>
+                          Grant {EXTENSION_DAYS} days
+                        </button>
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </ScrollRegion>
+        </section>
+      ) : null}
 
       <section aria-labelledby="recentdec" className="card clip">
         <div className="card-h">
@@ -393,34 +527,46 @@ export function AdminApprovals(): React.JSX.Element {
           </h2>
           <span className="card-meta">Last 7 days</span>
         </div>
-        <table className="tbl">
-          <thead>
-            <tr>
-              <th scope="col">Decided</th>
-              <th scope="col">Partner</th>
-              <th scope="col">Customer</th>
-              <th scope="col">Product</th>
-              <th scope="col">Decision</th>
-              <th scope="col">HubSpot</th>
-            </tr>
-          </thead>
-          <tbody>
-            {recentDecisions.map((d) => (
-              <tr key={d.id}>
-                <td className="tnum t-sec">{fmtShort(d.decidedOn ?? TODAY)}</td>
-                <td>{d.partner}</td>
-                <td style={{ fontWeight: 600 }}>{d.customer}</td>
-                <td>
-                  <ProductChip product={d.product} />
-                </td>
-                <td>
-                  <span className={`badge ${d.status === "Accepted" ? "b-accepted" : "b-rejected"}`}>{d.status}</span>
-                </td>
-                <td className="tnum t-sec">{d.crmRef ?? "Not created"}</td>
+        {recentDecisions.length === 0 ? (
+          <div className="empty">No decisions in the last 7 days.</div>
+        ) : (
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th scope="col" className="hide-sm">
+                  Decided
+                </th>
+                <th scope="col">Partner</th>
+                <th scope="col">Customer</th>
+                <th scope="col" className="hide-sm">
+                  Product
+                </th>
+                <th scope="col">Decision</th>
+                <th scope="col" className="hide-sm">
+                  HubSpot
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {recentDecisions.map((d) => (
+                <tr key={d.id}>
+                  <td className="tnum t-sec hide-sm">{fmtShort(d.decidedOn ?? today)}</td>
+                  <td>{d.partnerName}</td>
+                  <td style={{ fontWeight: 600 }}>{d.customer}</td>
+                  <td className="hide-sm">
+                    <ProductChip product={CHIP_PRODUCT[d.product]} />
+                  </td>
+                  <td>
+                    <span className={`badge ${d.status === "rejected" ? "b-rejected" : "b-accepted"}`}>
+                      {d.status === "rejected" ? "Rejected" : "Accepted"}
+                    </span>
+                  </td>
+                  <td className="tnum t-sec hide-sm">{d.crmRef ?? (d.status === "rejected" ? "Not created" : "Queued")}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </section>
 
       {viewing ? (
@@ -428,7 +574,7 @@ export function AdminApprovals(): React.JSX.Element {
           open
           onClose={() => setViewingId(null)}
           title={viewing.deal.customer}
-          subtitle={`Registered by ${viewing.deal.partner}, ${viewing.deal.partnerCategory}`}
+          subtitle={`Registered by ${viewing.deal.partnerName}, ${PARTNER_CATEGORY_LABEL[viewing.deal.partnerCategory]}`}
           footer={
             viewing.state === "open" ? (
               <>
@@ -470,13 +616,13 @@ export function AdminApprovals(): React.JSX.Element {
             <dt>Contact</dt>
             <dd>{viewing.deal.contacts[0]?.name ?? "Not recorded"}</dd>
             <dt>Product</dt>
-            <dd>{viewing.deal.product}</dd>
+            <dd>{PRODUCT_LABEL[viewing.deal.product]}</dd>
             <dt>Region</dt>
-            <dd>{viewing.deal.region}</dd>
-            <dt>Account manager</dt>
-            <dd>{viewing.deal.manager}</dd>
+            <dd>{PARTNER_REGION_LABEL[viewing.deal.region]}</dd>
+            <dt>Partner manager</dt>
+            <dd>{viewing.deal.managerName ?? "Not assigned"}</dd>
             <dt>Partner</dt>
-            <dd>{viewing.deal.partner}</dd>
+            <dd>{viewing.deal.partnerName}</dd>
             <dt>Submitted</dt>
             <dd>{fmtLong(reviewSince(viewing.deal))}</dd>
           </dl>
@@ -494,6 +640,49 @@ export function AdminApprovals(): React.JSX.Element {
           <div className="note note-violet">
             <span>Accepting creates the deal in HubSpot, starts 90 days of protection and emails the partner.</span>
           </div>
+          <div className="fg">
+            <span className="lbl">Conversation with the partner</span>
+            {viewing.deal.thread.length > 0 ? (
+              <ol style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 8 }}>
+                {viewing.deal.thread.map((m) => (
+                  <li key={m.id} style={{ display: "grid", gridTemplateColumns: "26px minmax(0, 1fr)", gap: 10 }}>
+                    <span className={`av av-r ${m.side === "partner" ? "av-2" : "av-me"}`}>{initialsOf(m.authorName)}</span>
+                    <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                      <span style={{ fontSize: 12.5 }}>
+                        <b style={{ fontWeight: 600 }}>{m.authorName}</b>{" "}
+                        <span className="t-muted">
+                          {m.authorOrg}, {fmtTimestamp(m.createdAt, today)}
+                        </span>
+                      </span>
+                      <span style={{ fontSize: 13, lineHeight: 1.55, color: "#2A2838" }}>{m.body}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <span className="hint">No messages yet.</span>
+            )}
+          </div>
+          <form onSubmit={(event) => sendReply(event, viewing.deal)} noValidate className="fg">
+            <label htmlFor="appr-reply" className="lbl">
+              Reply to {viewing.deal.partnerName}
+            </label>
+            <textarea
+              id="appr-reply"
+              className={`field${replyTried && !reply.trim() ? " field-err" : ""}`}
+              rows={3}
+              value={reply}
+              onChange={(e) => setReply(e.target.value)}
+              aria-invalid={replyTried && !reply.trim() ? true : undefined}
+            />
+            {replyTried && !reply.trim() ? <span className="err">Write a message first.</span> : null}
+            <span>
+              <button type="submit" className="btn btn-s" disabled={replying}>
+                <Icon name="send" />
+                Send
+              </button>
+            </span>
+          </form>
         </Drawer>
       ) : null}
     </div>

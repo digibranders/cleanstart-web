@@ -136,7 +136,7 @@ Start: `git worktree add .claude/worktrees/portal-a -b feat/portal-a feat/portal
 
 Nothing here runs on the droplet. The workflows cannot run until the branch is pushed, which this plan never does: say so in the progress log line.
 
-- [ ] **Step 1: Preconditions**
+- [x] **Step 1: Preconditions**
 
 ```bash
 git tag | grep -x portal-w0
@@ -146,7 +146,7 @@ grep -n "output" apps/portal/next.config.ts || echo "no output setting yet"
 
 Expected: `portal-w0`, the four paths listed, and a `next.config.ts` line containing `standalone` (M0.2 Step 5b wrote it). If a path is missing Wave 0 did not finish: append a `blocked` line and stop.
 
-- [ ] **Step 2: Check the two shared-file changes that Wave 0 made**
+- [x] **Step 2: Check the two shared-file changes that Wave 0 made**
 
 The standalone build needs `output: 'standalone'` and the monorepo tracing root (CCR-1, written by M0.2 Step 5b), and the review gate must not cover `/api/health` (CCR-2, written by M1.1e). Check both, and carry on; if either is missing, append a `blocked` line naming it (the code is in "Contract change requests").
 
@@ -157,7 +157,7 @@ grep -n '"/api/health"' apps/portal/src/proxy.ts
 
 Expected: the first prints the `standalone` and `outputFileTracingRoot` lines, the second prints the `/api/health` exemption.
 
-- [ ] **Step 3: Write the failing health route test**
+- [x] **Step 3: Write the failing health route test**
 
 Create `apps/portal/src/app/api/health/route.test.ts`:
 
@@ -190,7 +190,7 @@ describe('GET /api/health', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/app/api/health/route.test.ts`
 Expected: FAIL, `Failed to resolve import "./route"`.
 
-- [ ] **Step 4: Implement the health route**
+- [x] **Step 4: Implement the health route**
 
 Create `apps/portal/src/app/api/health/route.ts`. It is the system `db` (contracts L: public, no auth, no write) and returns no internal detail:
 
@@ -218,7 +218,7 @@ export async function GET(): Promise<NextResponse> {
 
 Run the test again. Expected: PASS, 2 tests.
 
-- [ ] **Step 5: Create the dash check script**
+- [x] **Step 5: Create the dash check script**
 
 `apps/portal/scripts/verify-copy.mjs` is the portal's counterpart of `apps/web`'s `verify:copy` (CLAUDE.md: no em-dashes or en-dashes in code-owned copy). It is built from code points so the file itself contains neither character. CI calls it directly, so no `package.json` change is needed.
 
@@ -277,7 +277,7 @@ console.info(`verify:copy ok (${files.length} files)`);
 Run: `node apps/portal/scripts/verify-copy.mjs`
 Expected: `verify:copy ok (<n> files)`, exit 0.
 
-- [ ] **Step 6: Create the migration bundler**
+- [x] **Step 6: Create the migration bundler**
 
 `scripts/migrate.ts` runs the Drizzle migrations and then `src/db/rls.sql` (contracts C.5). The standalone image has neither `tsx` nor the migrator, so this script bundles the entry to one CommonJS file at image build time. esbuild is resolved through `tsx` (a root devDependency that depends on it), so nothing is added to `package.json`.
 
@@ -324,7 +324,7 @@ cd ../..
 
 Expected: both runs exit 0 and the second changes nothing. **Verify (contracts M.1 item 18):** if the bundle cannot find `drizzle/` or `src/db/rls.sql`, `scripts/migrate.ts` resolves them from somewhere other than `process.cwd()` or its own folder. The image runs the bundle from `apps/portal` with both paths present (Step 7), so the fix is in `scripts/migrate.ts` (a W0-b file): append a `blocked` line asking for `process.cwd()`-relative paths. `migrate.cjs` is generated: it is ignored by the `apps/portal/.gitignore` line added in Step 12 and never committed.
 
-- [ ] **Step 7: Create the Dockerfile and its ignore file**
+- [x] **Step 7: Create the Dockerfile and its ignore file**
 
 The build context is the repository root (a pnpm workspace). `Dockerfile.dockerignore` sits next to the Dockerfile and replaces the root `.dockerignore` for this build (BuildKit looks for `<Dockerfile name>.dockerignore` first); `apps/cms` and `apps/web` stay in the context because pnpm checks the lockfile against every workspace `package.json`.
 
@@ -436,7 +436,7 @@ rm -rf /tmp/p06ctx && mkdir -p /tmp/p06ctx/apps/portal && cp apps/portal/Dockerf
 
 Expected: `Check complete, no warnings found.`
 
-- [ ] **Step 8: Reconcile and extend `infra/docker-compose.yml`**
+- [x] **Step 8: Reconcile and extend `infra/docker-compose.yml`**
 
 The repo copy is out of date: it has no `cms` service and publishes Postgres and Meilisearch on all interfaces. The droplet's file (`/opt/cleanstart/compose.yml`, documented as section 6.1 of `docs/operations/CMS-DEPLOYMENT.md`) binds to `127.0.0.1`, tunes Meilisearch and has the `cms` service. The droplet file is never read here (no `ssh`); section 6.1 is the evidence. `profiles` are added because `deploy-cms.yml` already runs `docker compose --profile cms up -d --wait cms`. Replace the whole file:
 
@@ -532,7 +532,7 @@ Expected: `meilisearch`, `postgres`, `portal`.
 
 The operator compares this file with the droplet's before copying it (handover item 2). The reconciliation is by documentation only, so the compare is the real check.
 
-- [ ] **Step 9: Write `portal.yml`**
+- [x] **Step 9: Write `portal.yml`**
 
 CI on `apps/portal/**`, `packages/forms/**`, `packages/ui/**`: a Postgres 16 service with the superuser `postgres`, the two roles and the test database created by the track's own `scripts/db-create.sh`, then lint, typecheck, test (which includes the isolation matrix), the dash check and the build with `SKIP_ENV_VALIDATION=1`. A second job runs the browser suite for pull requests into `main` and on demand (it is slow, like the web `lhci` job). The CI Postgres service user differs from contracts J.2's statement ("PORTAL_TEST_OWNER_URL points at the superuser"): here the owner URL is `portal_owner`, which `db-create.sh` creates with `CREATEDB`, so CI exercises the same role split as production.
 
@@ -700,7 +700,7 @@ jobs:
           retention-days: 14
 ```
 
-- [ ] **Step 10: Write `deploy-portal.yml`**
+- [x] **Step 10: Write `deploy-portal.yml`**
 
 A copy of `deploy-cms.yml` in shape (wait for green CI on the same SHA, buildx and the GHA cache, `docker save | scp`, render the env file, `docker compose up -d --wait`, retention of the current image plus two tags, a retried local smoke probe on `127.0.0.1:3004/api/health`), with these deliberate differences: it renders `/opt/cleanstart/portal.env`, the portal's own file; it writes only non-empty values (`env.ts` rejects `KEY=` for optional variables, which would crash the container); it fails the deploy by variable name when a required production setting is missing, and when a database password is not URL safe; the Turnstile site key goes in as a build argument because `NEXT_PUBLIC_*` values are inlined into the browser bundle; and nothing deploys until the repository variable `PORTAL_DEPLOY_ENABLED` is `true` (set by the operator after the droplet steps, handover item 1).
 
@@ -930,7 +930,7 @@ jobs:
           curl -sS -o /dev/null -w "public partners.cleanstart.com -> HTTP %{http_code}\n" --max-time 10 https://partners.cleanstart.com/api/health || true
 ```
 
-- [ ] **Step 11: Lint both workflows and the env rendering**
+- [x] **Step 11: Lint both workflows and the env rendering**
 
 ```bash
 actionlint .github/workflows/portal.yml .github/workflows/deploy-portal.yml && echo ACTIONLINT_OK
@@ -960,7 +960,7 @@ PY
 
 Expected: `complete -> 0`; `no secret -> (1, ['::error::Missing required portal settings: AUTH_SECRET'])`; `bad pw -> (1, ['::error::PORTAL_APP_DB_PASSWORD must be letters and digits only (openssl rand -hex 24)'])`.
 
-- [ ] **Step 12: Run the image locally** (needs the Wave 0 `next.config.ts` and `proxy.ts` changes checked in Step 2)
+- [x] **Step 12: Run the image locally** (needs the Wave 0 `next.config.ts` and `proxy.ts` changes checked in Step 2)
 
 Add the generated bundle to `apps/portal/.gitignore` (a new file inside the portal), build, and run the container against the local Postgres with throwaway values. The production environment check demands every production variable, so the placeholders below satisfy it; nothing sends mail or calls HubSpot from `/api/health`.
 
@@ -988,7 +988,7 @@ docker rm -f portal-local
 
 Expected: the image size is a few hundred MB; the log shows the migration finishing and `Ready`; the health call is `HTTP/1.1 200`, body `{"status":"ok"}` with `Cache-Control: no-store` and `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'` once M5.1 has landed; the health status becomes `healthy`. **Verify (contracts M.1 item 18):** if the container exits with `Cannot find module '/app/apps/portal/server.js'`, the standalone folder is not nested (tracing root not applied): `docker run --rm --entrypoint sh portal:local -c 'find /app -maxdepth 3 -name server.js'` shows where it is. Fix the `COPY` and `WORKDIR` lines of the Dockerfile to that path and record it in the progress log. If the container exits before the migration, read the error: the usual cause is a variable the production check requires.
 
-- [ ] **Step 13: Write the runbook sections 1 to 3**
+- [x] **Step 13: Write the runbook sections 1 to 3**
 
 Create `docs/operations/PARTNER-PORTAL.md` (if H or another track already created it, append the sections below instead of overwriting). M5.9 adds sections 4 to 11 later. These are the one-time droplet steps, as a person will run them; each is "read the command first".
 
@@ -1073,7 +1073,7 @@ curl -fsS http://127.0.0.1:3004/api/health
 Migrations only move forward. A release that added a column is rolled back to an image that ignores it; never drop a column in the same release that stops using it.
 ````
 
-- [ ] **Step 14: Gate A and commit**
+- [x] **Step 14: Gate A and commit**
 
 Run the standard Gate A block. Extra checks for this task:
 
@@ -1109,7 +1109,7 @@ Design decisions (all recorded here, none changes a contract):
 - The CSV is built in the browser from the rows `exportAuditAction` returns (cap 5000, `ValidationError` above). A cell that starts with `=`, `+`, `-`, `@` or a control character gets a leading apostrophe, because partner names and notes are typed by visitors and a spreadsheet would run them as formulas.
 - The health card is passed to the screen as a ReactNode slot by the page, so the screen does not depend on track H's `integration-health.ts`. Steps 1 to 6 do not need H4.10; steps 7 to 9 do.
 
-- [ ] **Step 1: Write the failing library tests**
+- [x] **Step 1: Write the failing library tests**
 
 Create `src/lib/audit-filters.test.ts` and `src/lib/audit-csv.test.ts`:
 
@@ -1222,7 +1222,7 @@ describe('auditToCsv', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/lib/audit-filters.test.ts src/lib/audit-csv.test.ts`
 Expected: FAIL, both modules cannot be resolved.
 
-- [ ] **Step 2: Implement the two libraries**
+- [x] **Step 2: Implement the two libraries**
 
 Both are pure and client safe (no `@/db`, no `next/*`).
 
@@ -1364,7 +1364,7 @@ export function auditToCsv(rows: readonly AuditEntryDto[]): string {
 
 Run the same command. Expected: PASS, 14 tests.
 
-- [ ] **Step 3: Write the failing repo test**
+- [x] **Step 3: Write the failing repo test**
 
 Create `src/server/repo/audit.test.ts`. It runs against the real test database with row level security on, through `withViewer`, and covers: period and total, filters, search with `%` and `_` as plain characters, paging over rows that share one timestamp, a bad cursor, the entry `recordAudit` writes for the HubSpot sync actor, the 5000 row export cap, and a partner viewer being refused.
 
@@ -1538,7 +1538,7 @@ describe('exportAudit', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/audit.test.ts`
 Expected: FAIL, `./audit` cannot be resolved.
 
-- [ ] **Step 4: Implement `repo/audit.ts`**
+- [x] **Step 4: Implement `repo/audit.ts`**
 
 Staff only (`assertStaff` first, so a partner gets `ForbiddenError` before row level security is consulted). No function here writes: the write helper is `recordAudit` (contracts F.4). Only `listAudit` and `exportAudit` are exported as functions, which keeps the isolation test's "every export is registered" rule satisfied; helpers stay private.
 
@@ -1693,7 +1693,7 @@ export const isolation = defineIsolation<'listAudit' | 'exportAudit'>({
 
 Run the repo test. Expected: PASS, 10 tests. Run the isolation matrix: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/isolation.test.ts`. Expected: PASS, with `audit` among the modules it iterates (`registers every exported function in isolation` and `leaks nothing across tenants`).
 
-- [ ] **Step 5: Write the failing export action test, then the action**
+- [x] **Step 5: Write the failing export action test, then the action**
 
 Create `src/server/actions/audit.test.ts` (this version covers the export only; Step 8 extends it), then `src/server/actions/audit.ts`. `exportAuditAction` follows the F.8 pattern: Zod parse, `assertCan(viewer, 'audit.export')`, repo call inside `withViewer`. Validation errors come back as `{ ok: false, error: { code: 'validation', issues } }`.
 
@@ -1781,7 +1781,7 @@ export async function exportAuditAction(raw: unknown): Promise<ActionResult<Audi
 
 Run it again. Expected: PASS, 3 tests.
 
-- [ ] **Step 6: Convert the screen, the drawer and the page**
+- [x] **Step 6: Convert the screen, the drawer and the page**
 
 The markup and class names are the mock's. What changes: props instead of `useAudit()`, the DTO instead of `AuditEntry`, filters in the URL, `exportAuditAction` instead of the local CSV code, the "Older events" and "Newest events" links for paging, the source shown through `EVENT_SOURCE_LABEL`, and no `data-tour` attributes (the walkthrough is removed in M5.4). `downloadCsv` is the mock's existing helper in `components/reports/download-csv.ts`.
 
@@ -2104,7 +2104,7 @@ export default async function Page({
 Run: `pnpm --filter @cleanstart/portal typecheck`
 Expected: no errors. If `requireCan` is typed differently from contracts H.18 (`requireCan(action: Action, subject?: PolicySubject): Promise<Viewer>`), fix only the call here.
 
-- [ ] **Step 7: Check that H4.10 is merged** (needed for Steps 8 and 9)
+- [x] **Step 7: Check that H4.10 is merged** (needed for Steps 8 and 9)
 
 ```bash
 git merge feat/portal-build
@@ -2113,7 +2113,7 @@ ls apps/portal/src/server/repo/integration-health.ts
 
 Expected: the file exists. If not, append `blocked | M4.2 | steps 8 and 9 need H4.10 (integration-health.ts)`, skip to Step 10 (Gate A and commit the rest), and come back when the orchestrator reports H4.10 merged. The screen works without the card.
 
-- [ ] **Step 8: Add the retry action and its tests**
+- [x] **Step 8: Add the retry action and its tests**
 
 `retryFailedOutboxAction` sets failed HubSpot rows back to `pending` (H's `retryFailedOutbox`) and writes one `integration.outbox_retried` audit entry in the same transaction. Replace `src/server/actions/audit.ts` with the full file and `src/server/actions/audit.test.ts` with the full test:
 
@@ -2244,7 +2244,7 @@ describe('retryFailedOutboxAction', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/audit.test.ts`
 Expected: PASS, 5 tests (export x3, retry x2).
 
-- [ ] **Step 9: Add the health card and wire it into the page**
+- [x] **Step 9: Add the health card and wire it into the page**
 
 The card shows four figures from `IntegrationHealthDto` (waiting, failed with a Retry button, last HubSpot check, last error). It uses the existing `card kpis` classes. Create `src/components/audit/IntegrationHealthCard.tsx`, then replace the page with the full version:
 
@@ -2368,7 +2368,7 @@ export default async function Page({
 
 Run: `pnpm --filter @cleanstart/portal typecheck`. Expected: no errors.
 
-- [ ] **Step 10: Look at it**
+- [x] **Step 10: Look at it**
 
 ```bash
 lsof -nP -iTCP:3254 -sTCP:LISTEN            # must print nothing
@@ -2377,7 +2377,7 @@ pnpm --filter @cleanstart/portal exec next dev --port 3254
 
 In another shell seed the track database (`pnpm --filter @cleanstart/portal db:seed`), open `http://localhost:3254/sign-in` in a browser at 1440 by 900 and sign in as the seeded partner manager, Farhan Qureshi (his email and the shared development password `DEV_SEED_PASSWORD` are in `src/db/fixtures.ts`). Check against the mock's numbers (contracts J.5): `/admin/audit` shows **12 events** for the default 30 days and **13** for Last 90 days; the newest row is the HubSpot sync "Stage changed" entry (the seed resolves the mock's relative days against the day you seeded, so seed and look on the same day); clicking an action opens the drawer with Before and After for "Accepted the partner agreement"; typing `pearl` narrows the list and the URL gains `?q=pearl`; Export CSV downloads `cleanstart-audit-log.csv` whose first line is `"When","Who","Role","Action","On","Source","Details"`. Signed in as a partner admin the page redirects to `/partner/overview`. Stop the dev server with Ctrl C (never kill another process).
 
-- [ ] **Step 11: Gate A and commit**
+- [x] **Step 11: Gate A and commit**
 
 Run the standard Gate A block, then Gate B, then (stage the health card paths only if Step 8 and 9 were done; otherwise omit them and the commit message ends "without the health card"):
 
@@ -2411,7 +2411,7 @@ Matching: `ILIKE '%q%'` (uses the trigram index, `%` and `_` in the query are es
 
 Known limit: a staff member's hit on a deal opens `/admin/approvals`, a partner hit opens `/admin/partners`, and a document or person hit opens the owning list. The staff screens have no per-record route in the contracts' route map, so the palette cannot deep link. A later task can add `?focus=<id>` handling to those screens.
 
-- [ ] **Step 1: Write the failing "Pages" group test**
+- [x] **Step 1: Write the failing "Pages" group test**
 
 ```ts
 import { describe, expect, it } from 'vitest';
@@ -2445,7 +2445,7 @@ describe('buildPageHits', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/lib/search-pages.test.ts`
 Expected: FAIL, `./search-pages` cannot be resolved.
 
-- [ ] **Step 2: Implement the "Pages" group**
+- [x] **Step 2: Implement the "Pages" group**
 
 It is built from the viewer's own sidebar (`PARTNER_NAV` or `ADMIN_NAV`, or whatever `navFor(viewer)` returns, passed in by the shell) plus the account page for partners, so it can never list a screen the viewer cannot open. `SEARCH_MIN_CHARS` is shared with the server.
 
@@ -2480,7 +2480,7 @@ export function buildPageHits(nav: readonly NavItem[], kind: PortalKind, q: stri
 
 Run the test. Expected: PASS, 4 tests.
 
-- [ ] **Step 3: Write the failing repo test**
+- [x] **Step 3: Write the failing repo test**
 
 It seeds partner A (Kestrel Systems, channel, India) and partner B (Kestrel Gulf Networks, distributor, Middle East), their people and deals, documents with every audience kind, and runs `searchAll` as a partner manager, staff sales, marketing, a partner admin, partner sales and partner technical. It proves: group order and hints, typo tolerance, no hits for one or two characters or for `%` and `_`, the per group cap, soft deleted documents and disabled people hidden, regional limits, one partner never seeing another partner's deals, record or colleagues, and the document audience (all, matching category, named, not another partner's).
 
@@ -2652,7 +2652,7 @@ describe('searchAll as a partner', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/search.test.ts`
 Expected: FAIL, `./search` cannot be resolved.
 
-- [ ] **Step 4: Implement `repo/search.ts`**
+- [x] **Step 4: Implement `repo/search.ts`**
 
 The `isolation` entry is scope `tenant`: as partner A it searches broadly and returns only the hits that point at partner B's deal (none may). The explicit tests above are the stronger proof; the entry keeps the matrix's "every export is registered" rule satisfied.
 
@@ -2838,7 +2838,7 @@ export const isolation = defineIsolation<'searchAll'>({
 
 Run the repo test. Expected: PASS, 12 tests. Then the matrix: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/isolation.test.ts`. Expected: PASS with `search` among the modules.
 
-- [ ] **Step 5: Write the failing action test, then the action**
+- [x] **Step 5: Write the failing action test, then the action**
 
 `searchAction` is the only caller of `searchAll`: Zod (`q` at most 80 characters, `limit` 1 to 10, default 5), `assertCan(viewer, 'search.use')`, a rate limit of 30 searches per 10 seconds per person (the palette debounces at 150 ms, so normal typing stays far below it), a short query answered without touching the database, then `withViewer`. The test mocks the session, `next/cache`, `next/headers` and Sentry only.
 
@@ -2918,7 +2918,7 @@ export async function searchAction(raw: unknown): Promise<ActionResult<SearchHit
 
 Run it again. Expected: PASS, 4 tests.
 
-- [ ] **Step 6: Build the palette component**
+- [x] **Step 6: Build the palette component**
 
 It keeps the mock's markup and classes (`dialog palette`, `pal-in`, `pal-list`, `pal-g`, `pal-item`). It owns its own state and the Ctrl K shortcut, and opens when anything dispatches `OPEN_SEARCH_EVENT` on `window`, so the shell needs no shared state. Behaviour: opens with the field focused; Escape closes and returns focus to what opened it; Tab stays inside; ArrowDown moves from the field into the results and back; Enter opens the first result; answers arrive in order (a slow reply to "ke" never replaces the reply to "kestrel"); a failed search says so and the Pages group keeps working. The click-away layer is a real button with `tabIndex={-1}` and an accessible name, so it does not need a lint suppression.
 
@@ -3142,7 +3142,7 @@ export function SearchPalette({ kind, nav }: { kind: PortalKind; nav: readonly N
 
 Run: `pnpm --filter @cleanstart/portal typecheck`. Expected: no errors.
 
-- [ ] **Step 7: Ask for the shell wiring**
+- [x] **Step 7: Ask for the shell wiring**
 
 `shell.tsx` is a shared file that this track does not edit. The orchestrator applies CCR-3 in W2-a step 0 (delete the mock's search data and state, replace the inline palette with `<SearchPalette kind={kind} nav={nav} />`, make both openers dispatch `OPEN_SEARCH_EVENT`, name the top bar button for screen readers). This is planned work, not a blocker: append a `note` line and carry on.
 
@@ -3150,11 +3150,11 @@ Run: `pnpm --filter @cleanstart/portal typecheck`. Expected: no errors.
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M IST') | M4.3 | note | A | - | - | search-palette.tsx ready; shell.tsx wiring is W2-a step 0 (CCR-3 in plan 06)" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 8: Check it in the browser** (only possible once W2-a step 0 has wired the shell; in Wave 1 the palette is covered by its unit and action tests, so write `not visually checked` in the `done` line)
+- [x] **Step 8: Check it in the browser** (only possible once W2-a step 0 has wired the shell; in Wave 1 the palette is covered by its unit and action tests, so write `not visually checked` in the `done` line)
 
 Run `pnpm --filter @cleanstart/portal exec next dev --port 3254` (check the port first), sign in as the seeded partner manager, press Ctrl K on `/admin/approvals`: the palette opens with the field focused and the six admin pages listed; type `kest`: Partners shows Kestrel Systems with "Channel partner, India" and Deals shows Kestrel's deals; Escape closes and focus returns to the top bar button. Sign in as the seeded Kestrel partner admin: search `arbor` shows nothing from another partner. At 375 px wide the top bar search button is announced as "Search deals and documents" (no empty button name). If CCR-3 is not merged yet, skip this step and say so in the `done` line; the E2E task (`e2e/admin.spec.ts`) proves it later.
 
-- [ ] **Step 9: Gate A and commit**
+- [x] **Step 9: Gate A and commit**
 
 Run the standard Gate A block, then Gate B, then:
 
@@ -3184,7 +3184,7 @@ Expected: `portal-w1`, then all three green. If any is red, stop: the merge of W
 
 **Gate A for this task:** the standard block, plus the removal greps in Step 8.
 
-- [ ] **Step 0: Wire the shell (the single owner of these `shell.tsx` and layout edits)**
+- [x] **Step 0: Wire the shell (the single owner of these `shell.tsx` and layout edits)**
 
 Apply, in this order, on `feat/portal-build`: first the notifications change (plan 04, "Contract change requests", item 5, which edits `shell.tsx`, `src/app/partner/layout.tsx` and `src/app/admin/layout.tsx`), then CCR-3 below (the search palette). Both are written against the mock regions that W0-f leaves alone. Check: `grep -n "searchOpen\|PARTNER_SEARCH\|notesRead\|partnerNotes" apps/portal/src/components/shell/shell.tsx` prints nothing; typecheck and the build are clean.
 
@@ -3195,7 +3195,7 @@ Apply, in this order, on `feat/portal-build`: first the notifications change (pl
 
 Decision recorded: `PORTAL_REVIEW_PASSWORD` and the review gate in `src/proxy.ts` **stay**. The master plan keeps the gate on until launch and the pilot is invite-only behind it; the `env.ts` comment that said "removed in M5.4" was wrong and the contracts now say "stays until launch" (CCR-5a). Removing the gate is a launch step on the handover checklist.
 
-- [ ] **Step 1: Baseline what still points at the scaffolding**
+- [x] **Step 1: Baseline what still points at the scaffolding**
 
 ```bash
 cd apps/portal
@@ -3204,7 +3204,7 @@ grep -rnE "@/lib/slice|createSlice|shell/personas|\./personas|@/tour|driver\.js|
 
 Expected after Wave 1: only the files that are about to be deleted, plus `src/app/layout.tsx` (TourProvider) and `src/components/shell/shell.tsx`. Any other hit is a screen a track did not finish converting: read its import, replace it with the DTO from `src/lib/dto.ts` ("Mock to DTO" table in the contracts, H.0) and the repo call its page already makes, or append a `blocked` line naming the file and stop. `createSlice` inside `shell.tsx` means Step 0 did not apply the notifications change: do it now, because this task must not delete the state the popover still reads.
 
-- [ ] **Step 2: Remove every `data-tour` attribute**
+- [x] **Step 2: Remove every `data-tour` attribute**
 
 The walkthrough is going, so its anchors go with it. They appear as plain strings and as JSX expressions, so a small script with a brace matcher does it (about 45 sites on the mock). Save this as `/tmp/strip-data-tour.mjs`, run it, delete it:
 
@@ -3269,7 +3269,7 @@ grep -rn "data-tour" apps/portal/src | grep -v "^apps/portal/src/tour/"
 
 Expected: `removed <n> data-tour attributes`, and no remaining hit. One component prop remains by hand: the `tour` parameter of `RowAction` in `src/components/partners/applications-table.tsx` (it existed only to carry `data-tour`). Find it with `grep -n "tour" apps/portal/src/components/partners/applications-table.tsx` and delete the destructured `tour,` parameter, the `tour?: string;` member and the `{...(a.id === firstOpenId ? { tour: "application-approve" } : {})}` spread, then `firstOpenId` if it is now unused (typecheck says).
 
-- [ ] **Step 3: Delete the scaffolding files**
+- [x] **Step 3: Delete the scaffolding files**
 
 ```bash
 cd apps/portal
@@ -3280,7 +3280,7 @@ cd ../..
 
 Expected: `git rm` lists 11 files; `ls` says both directories no longer exist.
 
-- [ ] **Step 4: Edit the layout, the shell and the password field**
+- [x] **Step 4: Edit the layout, the shell and the password field**
 
 `src/app/layout.tsx`: remove the `TourProvider` import and element, and drop "(mock)" from the titles. Replace the metadata and the body:
 
@@ -3323,7 +3323,7 @@ export function passwordRules(value: string): PasswordRule[] {
 
 (keep the `PasswordRule` interface where it is; put the import with the other imports.)
 
-- [ ] **Step 5: Remove the mock styles**
+- [x] **Step 5: Remove the mock styles**
 
 Save as `/tmp/strip-mock-css.py`, run, delete. It drops the `.mock-banner`, `.tour-*` and `.driver-*` rules (one rule per line in this file), removes the `--banner-h` variable and makes `.app` the full viewport height again (it used to subtract the 28 px banner):
 
@@ -3353,7 +3353,7 @@ grep -n "^\.app{display:grid" apps/portal/src/styles/portal.css | cut -c1-200
 
 Expected: `removed 23 rule lines` on the mock's CSS, `css clean`, and the `.app` rule containing `height:100dvh`. If `--banner-h` is used by a rule the script did not know (a Wave 1 addition), `grep -n "banner-h" apps/portal/src/styles/portal.css` shows it: replace `calc(100dvh - var(--banner-h))` with `100dvh` there too.
 
-- [ ] **Step 6: Remove Driver.js and the mock wording**
+- [x] **Step 6: Remove Driver.js and the mock wording**
 
 ```bash
 pnpm --filter @cleanstart/portal remove driver.js
@@ -3404,7 +3404,7 @@ pnpm --filter @cleanstart/portal e2e             # needs bash apps/portal/script
 - `e2e/`: the Playwright `@portal` and `@a11y` suites.
 ````
 
-- [ ] **Step 7: Rebuild and fix what the removal exposed**
+- [x] **Step 7: Rebuild and fix what the removal exposed**
 
 ```bash
 pnpm --filter @cleanstart/portal typecheck
@@ -3412,7 +3412,7 @@ pnpm --filter @cleanstart/portal typecheck
 
 Expected: no errors. Each error is an import or an unused local that the deleted code used to satisfy: fix it in the file the error names, keeping the edit as small as possible. Do not restore a deleted file.
 
-- [ ] **Step 8: Prove the scaffolding is gone**
+- [x] **Step 8: Prove the scaffolding is gone**
 
 ```bash
 cd apps/portal
@@ -3424,7 +3424,7 @@ cd ../..
 
 Expected: each grep prints nothing and `exit=1` (no match). A `localStorage` hit is the mock's persisted state: it must be gone; a legitimate use (a remembered tab) needs a comment saying why. Only `scripts/seed-dev.ts` and `src/db/fixtures.ts` may mention the mock's seed data, and neither imports from `src/data`.
 
-- [ ] **Step 9: Gate A and commit**
+- [x] **Step 9: Gate A and commit**
 
 Run the standard Gate A block, then Gate B, then stage the exact paths (list the modified files from `git status --short`; the command below is the shape):
 
@@ -3456,7 +3456,7 @@ How the suite runs (decisions, all recorded in `playwright.config.ts`):
 - The Apply step needs outbound HTTPS to `challenges.cloudflare.com` (the Turnstile widget and its check). That is the only external call.
 - Local only: `localhost`, never `127.0.0.1` (a dev server reached by IP does not hydrate).
 
-- [ ] **Step 1: Dependencies, scripts, gitignore, database**
+- [x] **Step 1: Dependencies, scripts, gitignore, database**
 
 ```bash
 pnpm --filter @cleanstart/portal add -D @axe-core/playwright@^4.11.3
@@ -3477,7 +3477,7 @@ lsof -nP -iTCP:3290 -sTCP:LISTEN
 
 Edit `apps/portal/tsconfig.json`: add `"e2e/**/*.ts"` and `"playwright.config.ts"` to the `include` array (exact edit: `".next/types/**/*.ts"]` becomes `".next/types/**/*.ts", "e2e/**/*.ts", "playwright.config.ts"]`). Check: `grep -n '"include"' apps/portal/tsconfig.json`.
 
-- [ ] **Step 2: Environment and database helpers**
+- [x] **Step 2: Environment and database helpers**
 
 `env.ts` is imported by the config, the global setup and every spec, so the test process, the app's modules it imports and the dev server all see the same database and fakes. It removes (never blanks) every variable that would make the app contact a real service, because an empty string fails env validation.
 
@@ -3639,7 +3639,7 @@ export async function auditCount(): Promise<number> {
 }
 ```
 
-- [ ] **Step 3: HubSpot and UI helpers**
+- [x] **Step 3: HubSpot and UI helpers**
 
 `hubspot.ts` plays the scheduler. `drainOutboxNow` runs the real outbox drain; a handler that waits for a related record reschedules itself a minute out, so later passes use a clock two minutes ahead. Signatures are the HubSpot plan's: `buildHandlers(db, hs, pipelineId, clock?)`, `drainOutbox({ db, handlers, clock })`, `pollDeals({ db, hs, pipelineId, clock })`.
 
@@ -3753,7 +3753,7 @@ export const acceptButton = (page: Page, customer: string, partner: string) =>
   page.getByRole('button', { name: `Accept ${customer} from ${partner}` });
 ```
 
-- [ ] **Step 4: Global setup and config**
+- [x] **Step 4: Global setup and config**
 
 The global setup migrates the e2e database exactly as production does (the contracts' `migrateDatabase`: Drizzle migrations, then `rls.sql`), seeds it and signs every persona in once, saving a session file per persona. Playwright starts the dev server before it runs.
 
@@ -3846,7 +3846,7 @@ export default defineConfig({
 });
 ```
 
-- [ ] **Step 5: Verify that specs can import the app's modules** (the one thing this plan could not assume)
+- [x] **Step 5: Verify that specs can import the app's modules** (the one thing this plan could not assume)
 
 A temporary probe checks that Playwright's TypeScript loader resolves the `@/` paths, that the contracts' `testDb()` reaches the e2e database, and that the support files load. It uses its own config, so no server or setup runs.
 
@@ -3878,13 +3878,13 @@ Expected: `1 passed`. The same probe passed in the scratch harness with Playwrig
 
 **Verify (fallback):** if `@/` imports fail, `testDb()` ignores `PORTAL_TEST_DATABASE_URL`, or the HubSpot modules throw on import, do not rewrite the helpers. Make `e2e/support/db.ts` build its own pool and Drizzle client from `process.env.DATABASE_URL` (`new Pool({ connectionString, options: '-c app.kind=system' })` and `drizzle(pool, { schema })`), import the repo, HubSpot and invite modules by relative path (`../../src/...`), and record the change in the progress log. The specs themselves stay as written.
 
-- [ ] **Step 6: Delete the probe**
+- [x] **Step 6: Delete the probe**
 
 ```bash
 rm apps/portal/e2e/probe.spec.ts apps/portal/e2e/probe.config.ts
 ```
 
-- [ ] **Step 7: The lifecycle spec (failing first)**
+- [x] **Step 7: The lifecycle spec (failing first)**
 
 `journey.spec.ts` is one serial run with each actor in their own browser context: a company applies and sees its `APP-YYMM-NNNN` reference; the partner manager approves it (the partner exists with status `onboarding`); the invited person accepts the invite and the agreement and is signed in (the test also accepts a redirect to `/sign-in`, which P's flow may use); the partner registers a deal; staff accept it and protection starts; the outbox drain creates exactly one HubSpot deal and stores its id; a stage change made in the fake is applied by the poll and shown on the partner's deal page; the audit log shows approval, acceptance and the stage change. A last test checks that a partner cannot open `/admin/audit`.
 
@@ -4041,7 +4041,7 @@ test.describe('@portal sign in', () => {
 Run: `pnpm --filter @cleanstart/portal exec playwright test e2e/journey.spec.ts --project=desktop`
 Expected before the screens match the selectors: FAIL at the first step that names a label that differs. Expected once they match: `8 passed`.
 
-- [ ] **Step 8: The documents spec**
+- [x] **Step 8: The documents spec**
 
 An outsider and a missing id get byte-identical 404s; the library never lists the restricted document for the outsider; the audience partner is redirected to a link that expires in at most 60 seconds and no response contains a storage key; a signed out request never reaches storage.
 
@@ -4109,7 +4109,7 @@ test.describe('@portal documents', () => {
 Run: `pnpm --filter @cleanstart/portal exec playwright test e2e/documents.spec.ts --project=desktop`
 Expected: `5 passed`.
 
-- [ ] **Step 9: The audit log and search spec**
+- [x] **Step 9: The audit log and search spec**
 
 ```ts
 import { readFile } from 'node:fs/promises';
@@ -4189,7 +4189,7 @@ test.describe('@portal search', () => {
 Run: `pnpm --filter @cleanstart/portal exec playwright test e2e/admin.spec.ts --project=desktop`
 Expected: `4 passed` (needs CCR-3 merged for the two search tests).
 
-- [ ] **Step 10: The security and accessibility specs**
+- [x] **Step 10: The security and accessibility specs**
 
 `security.spec.ts` checks the headers on real responses and proves the policy does not block the app: the browser reports every blocked resource as a `securitypolicyviolation` event and none may occur across the signed out pages, the partner admin pages, the palette and the manager pages. (It passes fully only after M5.1 installs the policy; until then its first group fails, which is the point of writing it here.) `a11y.spec.ts` runs axe (WCAG 2.0 and 2.1, A and AA) on every route as the role that uses it, at desktop width and, through the `mobile` project, at 393 px, failing on serious and critical violations and attaching the rest; then three keyboard tests: the palette (focus in, Tab stays inside, Escape returns focus), a drawer (focus trap, Escape, focus return) and a Tab walk over the deals page that compares each stop's paint with and without focus, so an element with no visible indicator fails.
 
@@ -4412,7 +4412,7 @@ test.describe('@a11y keyboard', () => {
 });
 ```
 
-- [ ] **Step 11: Run the whole suite and sweep the selectors**
+- [x] **Step 11: Run the whole suite and sweep the selectors**
 
 ```bash
 pnpm --filter @cleanstart/portal exec playwright test
@@ -4420,7 +4420,7 @@ pnpm --filter @cleanstart/portal exec playwright test
 
 Expected counts: desktop 45 tests (journey 8, documents 5, admin 4, security 6, axe 19, keyboard 3) and mobile 19 (axe only), 64 in total. The `security` headers tests and the `a11y` failures that M5.1 and M5.2 fix are allowed to fail at this point; every other failure is a selector or a real defect. For a selector failure, open the trace (`pnpm exec playwright show-report`), correct the label in `e2e/support/ui.ts` only, and rerun the file. For a real defect, fix it in the file that owns it if it is inside this plan's scope, otherwise append a `blocked` line naming the owner and the symptom. Do not weaken an assertion to make a test pass.
 
-- [ ] **Step 12: Gate A and commit**
+- [x] **Step 12: Gate A and commit**
 
 Run the standard Gate A block (its `typecheck` now includes `e2e/**` and `playwright.config.ts`), then `pnpm --filter @cleanstart/portal exec playwright test` once more, then Gate B, then:
 
@@ -4448,7 +4448,7 @@ Decisions recorded:
 - **Rate limits are layered.** Better Auth's own limiter per client address (enabled explicitly, because the library enables it only in production), a per email limit in a `hooks.before` handler, and `rateLimit()` calls in every public server action.
 - **`DATABASE_OWNER_URL` is inside the app container** (the migration runs on start, contracts C.5). A code execution bug in the app would therefore hold the owner credentials and could bypass row level security. Accepted for the pilot and recorded as CCR-5 (run migrations as a one-shot job and make the variable optional in production).
 
-- [ ] **Step 1: Baseline the dependency audit**
+- [x] **Step 1: Baseline the dependency audit**
 
 `pnpm audit` covers the whole monorepo, so a small script keeps only the advisories whose path starts at `apps__portal` and fails on high or critical.
 
@@ -4505,7 +4505,7 @@ process.exit(blocking.length > 0 ? 1 : 0);
 Run: `node apps/portal/scripts/audit-portal.mjs; echo "exit=$?"`
 Expected on 13 November 2026 (the numbers move as advisories are published): `21 advisories for apps/portal, 12 high or critical.`, every line about `next@16.2.5`, the highest fix `>=16.4.1`, `exit=1`.
 
-- [ ] **Step 2: Upgrade Next.js for the portal**
+- [x] **Step 2: Upgrade Next.js for the portal**
 
 ```bash
 pnpm --filter @cleanstart/portal add --save-exact next@16.4.6
@@ -4514,7 +4514,7 @@ node apps/portal/scripts/audit-portal.mjs; echo "exit=$?"
 
 Expected: `0 high or critical`, `exit=0`. Anything still listed is triaged in `SECURITY-PASS.md` (fix, or accept with a reason and an expiry). The pin in `CLAUDE.md` ("Next.js 16.2.5") is for `apps/cms` and `apps/web`; the portal deviates on purpose. `apps/cms` and `apps/web` carry the same advisories: put one line in the report for their owner. Then re-run the three quick gates (`lint`, `typecheck`, `test`) and a build, because a framework bump can change behaviour. **Verify (known unknown U1):** read `apps/portal/node_modules/next/dist/docs/01-app/02-guides/content-security-policy.md` again; if nonce handling or the `proxy.ts` API changed since 16.2.5, adapt Step 4 and record it.
 
-- [ ] **Step 3: Write the failing policy tests**
+- [x] **Step 3: Write the failing policy tests**
 
 `csp.test.ts` pins the policy directive by directive (nonce and `strict-dynamic`, no `unsafe-inline` or `unsafe-eval` for scripts in production, inline style attributes only, frame, object, base and form restrictions, Turnstile and the document bucket in `connect-src`, upgrade in production only, development additions). `headers.test.ts` loads `next.config.ts` fresh for each environment and pins the static headers, HSTS in production only, the closed API policy and the standalone switch.
 
@@ -4643,7 +4643,7 @@ describe('next.config security headers', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/security/csp.test.ts src/server/security/headers.test.ts`
 Expected: FAIL (`./csp` cannot be resolved; the headers test fails on the missing headers).
 
-- [ ] **Step 4: Implement the policy and the static headers**
+- [x] **Step 4: Implement the policy and the static headers**
 
 ```ts
 /**
@@ -4755,7 +4755,7 @@ export default nextConfig;
 
 Run the two test files. Expected: PASS, 12 tests.
 
-- [ ] **Step 5: Wire the policy into `proxy.ts`**
+- [x] **Step 5: Wire the policy into `proxy.ts`**
 
 First read the file the Wave 0 session left: `grep -n "export\|matcher\|OPEN\|health" apps/portal/src/proxy.ts`. W0-f added a session redirect beside the review gate; the edit below keeps all of that exactly as it is by renaming the existing function and wrapping it, so it works whatever the redirect looks like. Three edits:
 
@@ -4860,7 +4860,7 @@ describe('proxy review gate', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/proxy.test.ts`
 Expected: PASS, 4 tests. (If W0-f's gate redirects signed out visitors, add one case for it: a redirect response comes back unchanged and carries no policy.)
 
-- [ ] **Step 6: Write the failing session, cookie and rate limit tests**
+- [x] **Step 6: Write the failing session, cookie and rate limit tests**
 
 `auth-session.test.ts` drives the real Better Auth handler (`auth.handler(new Request(...))`) against the test database: the session cookie is `HttpOnly`, `SameSite=Lax`, site wide and expiring; `useSecureCookies` is set explicitly; a session cookie planted before sign in is ignored and a new one is issued; every sign in gets its own session; sign out ends the session on the server (the cookie no longer returns a user and the `auth_session` row is gone); a wrong password, an unknown address, a disabled user and a suspended partner's user all get the same status and body (no account discovery); the library limiter is on; repeated sign ins from one address, repeated sign ins on one account from many addresses, and repeated second step guesses all end in 429. `per-email-limit.test.ts` tests the per email function on its own.
 
@@ -5032,7 +5032,7 @@ Expected: `per-email-limit` fails to resolve `./auth-rate-limit`; in `auth-sessi
 
 **Verify (known unknown U5):** the tests assume the sign in endpoint is `POST /api/auth/sign-in/email`, the session cookie name contains `session_token`, and the handler trusts `APP_URL` as origin (set by `src/db/test-setup.ts`). If the handler rejects the request with an origin error, look at `trustedOrigins` in `src/server/auth/auth.ts`; if it needs the `nextCookies` plugin's request context, the plugin skips safely outside Next (checked in the library source), so the failure is something else, read the response body printed by the assertion.
 
-- [ ] **Step 7: Implement the limits and wire them into `auth.ts`**
+- [x] **Step 7: Implement the limits and wire them into `auth.ts`**
 
 `limits.ts` holds the Better Auth limiter options (explicitly enabled; sign in 10 per minute per address, second step 5, password reset 5 per 10 minutes) and the per email rules. `auth-rate-limit.ts` holds the per email check and a ready made hook.
 
@@ -5110,7 +5110,7 @@ Open `apps/portal/src/server/auth/auth.ts` (W0-e and W0-f wrote it) and make exa
 
 Run both test files again. Expected: PASS, 10 tests in `auth-session` and 2 in `per-email-limit`. **Verify (known unknown U5):** `customRules` keys must match the library's paths; the flood test proves it for sign in and the second step. If `/two-factor/verify-totp` is not the path (the TOTP plugin in the installed version names it differently), print the real path from the library's rate limit rules in `node_modules/better-auth/dist/plugins/two-factor` and change the two keys in `limits.ts`.
 
-- [ ] **Step 8: Prove every public server action is rate limited**
+- [x] **Step 8: Prove every public server action is rate limited**
 
 Apply, request access, invite preview and accept, and password reset have no session, so a script can hit them. The test reads the action files and fails for any function that calls `runPublicAction(` without calling `rateLimit(`. It also pins the set of public actions to the six the contracts name, so a seventh needs a deliberate edit here.
 
@@ -5166,7 +5166,7 @@ rateLimit(`<action-name>:ip:${ctx.ip ?? 'unknown'}`, { limit: 10, windowSeconds:
 
 with `import { rateLimit } from '@/server/rate-limit';`. Use the action's name as the key prefix (`invite-preview`, `invite-accept`, `access-request`, `apply`); `invite-preview` and `invite-accept` limit token guessing, so keep them at 10 per minute. A `RateLimitError` becomes an `ActionResult` failure with code `rate_limited` through `runPublicAction`, and the screens already show `error.message`.
 
-- [ ] **Step 9: Run the isolation matrix and the repository checks**
+- [x] **Step 9: Run the isolation matrix and the repository checks**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/repo/isolation.test.ts src/server/repo/imports.test.ts src/db/schema.test.ts
@@ -5176,7 +5176,7 @@ git grep -nE "(AKIA[0-9A-Z]{16}|xox[bp]-[0-9A-Za-z-]+|-----BEGIN (RSA|EC|OPENSSH
 
 Expected: the three suites pass (the matrix covers every repo export, the import test proves only `context.ts` imports `appDb`, `schema.test.ts` proves `portal_app` is not the owner and cannot touch `audit_log`); both greps print nothing and `exit=1`. The master plan says "run against the staging database": there is none (CLAUDE.md deploy rules), so the matrix runs against the freshly migrated local test database, which is built by the same `migrate.ts` and `rls.sql` as production. Record that sentence in the report.
 
-- [ ] **Step 10: Run the browser security spec**
+- [x] **Step 10: Run the browser security spec**
 
 ```bash
 pnpm --filter @cleanstart/portal exec playwright test e2e/security.spec.ts --project=desktop
@@ -5184,7 +5184,7 @@ pnpm --filter @cleanstart/portal exec playwright test e2e/security.spec.ts --pro
 
 Expected: `6 passed`. A CSP failure names the directive and the blocked URL (`script-src blocked inline`, `connect-src blocked https://...`): fix the policy in `csp.ts` (and its test) or, if the blocked thing is wrong, the code that loads it. Never add `'unsafe-inline'` to scripts. If Turnstile is blocked, check the widget loads from `https://challenges.cloudflare.com` and that `frame-src` and `connect-src` list it (they do).
 
-- [ ] **Step 11: Write the report**
+- [x] **Step 11: Write the report**
 
 Create `docs/partner-portal/SECURITY-PASS.md` and fill every row with the real output (a pasted line, not a summary):
 
@@ -5222,7 +5222,7 @@ Date, commit, who ran it.
 List anything a check could not cover, with the owner.
 ````
 
-- [ ] **Step 12: Gate A and commit**
+- [x] **Step 12: Gate A and commit**
 
 Run the standard Gate A block, then the audit script (`exit=0`), then Gate B, then:
 
@@ -5253,7 +5253,7 @@ What the master plan asks for: keyboard, focus, contrast, and the a11y lint rule
 
 Axe baseline of the mock (19 routes at 1440 px, WCAG 2.0 and 2.1 A and AA): `/apply` Privacy policy link contrast 1.64:1 against the surrounding text (`link-in-text-block`), `/partner/deals/new` `aria-controls="cust-sugg"` pointing at an element that is not rendered (`aria-valid-attr-value`, critical); at 375 px the top bar search button has no accessible name (`button-name`, fixed by CCR-3). Everything else was clean. The conversion may have added more; the suite finds them.
 
-- [ ] **Step 1: Measure the lint baseline on the converted tree**
+- [x] **Step 1: Measure the lint baseline on the converted tree**
 
 ```bash
 mkdir -p /tmp/p06biome && cat > /tmp/p06biome/biome.json <<EOF
@@ -5272,7 +5272,7 @@ cd ../..
 
 Expected: a count per rule close to the mock's (the exact numbers depend on Wave 1). Keep `/tmp/p06-a11y-sites.txt`: it is the worklist and the "before" column of the report.
 
-- [ ] **Step 2: The shared click-away layer**
+- [x] **Step 2: The shared click-away layer**
 
 Create `src/components/ui/scrim.tsx`. Verified in the scratch harness: lint with all four rules on reports nothing for it.
 
@@ -5330,7 +5330,7 @@ grep -rnE 'className="(cs|dd)-scrim"' apps/portal/src | grep -v "<Scrim"
 
 Expected on the mock: `shell.tsx: 5 replaced` (4 after CCR-3 removed the palette's own), `dropdown.tsx: 1 replaced`, `overlay.tsx: 1 replaced`; the grep prints nothing. Any other file with a layer of this kind shows in the lint output of Step 1: run the script on it too.
 
-- [ ] **Step 3: A real focus trap for drawers and dialogs**
+- [x] **Step 3: A real focus trap for drawers and dialogs**
 
 The mock's overlay moves focus in, closes on Escape and returns focus, but lets Tab leave the dialog (its own comment says "no focus trap"). In `src/components/ui/overlay.tsx` replace everything from the comment `// shortcut: no focus trap...` through the end of the function `useOverlayBehaviour` with the version below (the `Scrim` import was added by Step 2). Verified compiled in the scratch harness with the mock's own overlay file:
 
@@ -5380,7 +5380,7 @@ function useOverlayBehaviour(open: boolean, onClose: () => void): React.RefObjec
 }
 ```
 
-- [ ] **Step 4: Skip link and the main landmark**
+- [x] **Step 4: Skip link and the main landmark**
 
 Keyboard users otherwise tab through the whole sidebar on every page (WCAG 2.4.1). In `src/components/shell/shell.tsx` add as the first child of the returned fragment (before `<div className="app">`):
 
@@ -5398,7 +5398,7 @@ and change `<main className="content">` to `<main id="main" className="content" 
 .content:focus{outline:none}
 ```
 
-- [ ] **Step 5: The three findings the mock already has**
+- [x] **Step 5: The three findings the mock already has**
 
 1. `src/components/screens/Apply.tsx`: the Privacy policy link is indistinguishable from the text around it. Find it with `grep -n "privacy-policy" apps/portal/src/components/screens/Apply.tsx` and add an underline to that anchor:
 
@@ -5409,7 +5409,7 @@ and change `<main className="content">` to `<main id="main" className="content" 
 2. `src/components/screens/RegisterDeal.tsx`: the customer field points at a suggestion list that is only rendered when there are suggestions. Replace `aria-controls="cust-sugg"` with `aria-controls={suggestions.length > 0 ? "cust-sugg" : undefined}`.
 3. The top bar search button's name is fixed by CCR-3 (`aria-label`). Check: `grep -n 'aria-label={kind === "partner" ? "Search deals and documents"' apps/portal/src/components/shell/shell.tsx`.
 
-- [ ] **Step 6: Turn the lint rules on and clear the worklist**
+- [x] **Step 6: Turn the lint rules on and clear the worklist**
 
 Replace `apps/portal/biome.json` (only `useSemanticElements` stays off; the other three are on):
 
@@ -5439,7 +5439,7 @@ Run `pnpm --filter @cleanstart/portal lint`. Every remaining diagnostic is handl
 - `noSvgWithoutTitle`: add `aria-hidden="true"` for a decorative icon, or a `<title>` for one that carries meaning.
 No other suppression is allowed, and each suppression has a reason in the comment. Expected end state: lint passes.
 
-- [ ] **Step 7: Run the axe and keyboard suite, and fix what it finds**
+- [x] **Step 7: Run the axe and keyboard suite, and fix what it finds**
 
 ```bash
 pnpm --filter @cleanstart/portal exec playwright test --grep @a11y
@@ -5447,7 +5447,7 @@ pnpm --filter @cleanstart/portal exec playwright test --grep @a11y
 
 Expected: 19 axe tests on `desktop`, 19 on `mobile`, 3 keyboard tests on `desktop`, all green. A failure names the rule, the impact and up to three selectors. Fix in the component, not in the test. The usual causes and fixes: `color-contrast` (darken the foreground token in `portal.css` until the ratio is at least 4.5:1, or 3:1 for text of 18.66 px bold or 24 px and up; do not change a background that carries brand colour without asking), `label` or `button-name` (add a visible label or `aria-label` that contains the visible text), `aria-valid-attr-value` (render the target or drop the attribute), `region` (content outside a landmark), `target-size` (the mobile project, controls under 24 by 24 px). A rule that cannot be fixed (a third party widget) is disabled by id in `a11y.spec.ts` with a one line reason and listed in the report.
 
-- [ ] **Step 8: Write the report**
+- [x] **Step 8: Write the report**
 
 Create `docs/partner-portal/A11Y-PASS.md` with the real numbers:
 
@@ -5483,7 +5483,7 @@ Palette, drawers and the Tab walk: pass counts. Skip link added.
 Screen reader testing (VoiceOver, NVDA), zoom to 400 percent, forced colors and reduced motion were not run. A person should do a 30 minute pass with a screen reader before the pilot.
 ````
 
-- [ ] **Step 9: Gate A and commit**
+- [x] **Step 9: Gate A and commit**
 
 Run the standard Gate A block, the a11y suite once more, then Gate B, then:
 
@@ -5517,7 +5517,7 @@ What is purged, and what is deliberately not:
 
 Open question for the owner (listed in the report): `audit_log` text contains customer and person names forever. A retention rule for it needs a decision (and a grant), so v1 keeps it.
 
-- [ ] **Step 1: Write the failing retention test**
+- [x] **Step 1: Write the failing retention test**
 
 Five tests: declined applications older than a year are removed and everything else kept (recent declined, old approved, old `new`); an old rejected registration is removed with its contacts, messages and timeline; recent rejections and any registration that was ever accepted are kept however old; batches work and the second run is a no-op; documents and the audit log are never touched. It uses `makeApplication`, `makePartner`, `makeRegistration`, `makeDocument` from the contracts' J.3 helpers.
 
@@ -5614,7 +5614,7 @@ describe('purgeExpiredRecords', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs/retention.test.ts`
 Expected: FAIL (`purgeExpiredRecords is not a function`: the Wave 0 stub only exports `runRetention`).
 
-- [ ] **Step 2: Implement the job**
+- [x] **Step 2: Implement the job**
 
 Replace the whole of `src/server/jobs/retention.ts`. It runs on the system `db` (jobs may import `db`, contracts F.1), deletes children before parents (the foreign keys have no cascade), and never throws on an empty table.
 
@@ -5701,7 +5701,7 @@ export const runRetention = async (): Promise<void> => {
 
 Run the test. Expected: PASS, 5 tests.
 
-- [ ] **Step 3: Test the jobs together and the registry**
+- [x] **Step 3: Test the jobs together and the registry**
 
 `purge-jobs.test.ts` runs the retention job and track D's `purgeDocumentFiles` against the same database with a `FakeFileStorage`: only the two expired R2 keys are deleted, live documents and their keys are untouched, old rejected registrations and declined applications are gone, and a second run changes nothing. It follows plan 05's documented behaviour (the purge tombstones a soft deleted document by setting `file_key` to `purged/<id>`); if D's job differs, fix this test to D's documented behaviour, not the job. `registry.test.ts` pins the schedule.
 
@@ -5790,7 +5790,7 @@ describe('job registry', () => {
 Create both files, then run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs`
 Expected: PASS for `retention.test.ts` (5), `purge-jobs.test.ts` (1), `registry.test.ts` (3), and track D's `document-purge.test.ts` (3, plan 05 step 24).
 
-- [ ] **Step 4: Gate A and commit**
+- [x] **Step 4: Gate A and commit**
 
 Run the standard Gate A block, then Gate B, then:
 
@@ -5820,7 +5820,7 @@ Design (every point is covered by the local test in Step 4):
 - **`DRY_RUN`** still does nothing and touches no database; it now prints the plan for both dumps.
 - **Retention:** the CMS bucket's lifecycle rule covers `backups/`. The portal prefix needs its own rule on the private bucket (handover item 6).
 
-- [ ] **Step 1: Baseline**
+- [x] **Step 1: Baseline**
 
 ```bash
 bash -n infra/scripts/backup.sh && shellcheck infra/scripts/backup.sh && echo BASELINE_OK
@@ -5828,7 +5828,7 @@ bash -n infra/scripts/backup.sh && shellcheck infra/scripts/backup.sh && echo BA
 
 Expected: `BASELINE_OK` (the current script is clean).
 
-- [ ] **Step 2: Replace `infra/scripts/backup.sh`**
+- [x] **Step 2: Replace `infra/scripts/backup.sh`**
 
 ```bash
 #!/usr/bin/env bash
@@ -5953,7 +5953,7 @@ log "Backup finished successfully - ${TIMESTAMP}"
 
 Keep the file executable: `chmod +x infra/scripts/backup.sh`.
 
-- [ ] **Step 3: Create the restore drill script**
+- [x] **Step 3: Create the restore drill script**
 
 It never touches the live database: it restores a dump into a scratch database (`cleanstart_portal_drill` by default; it refuses `cleanstart_portal`, `cleanstart` and `postgres` as the scratch name), counts rows in the key tables, prints the newest `audit_log` entry, and drops the scratch database on exit. It needs `ALLOW_RESTORE=yes` like `restore.sh`. With no argument it lists the portal backups; with a timestamp it downloads `portal-backups/<timestamp>.dump` from the bucket named in `portal.env`; with `--file` it uses a local dump.
 
@@ -6070,7 +6070,7 @@ log "drill passed in $(( $(date -u +%s) - START )) seconds. Add a line to docs/o
 
 `chmod +x infra/scripts/restore-portal-drill.sh`.
 
-- [ ] **Step 4: Run the local test**
+- [x] **Step 4: Run the local test**
 
 The test creates two scratch databases on your own Postgres, stubs `aws` (it copies into a temp folder) and `curl` (it logs the heartbeat), and checks 17 things: both scripts pass `bash -n`; a dry run does nothing; both dumps land in their own buckets and exactly one heartbeat follows; temp files are removed; a failed portal upload fails the run with no heartbeat; a missing portal database warns, skips and still pings; the CMS bucket, an incomplete env file and a bad database name are all refused with no heartbeat; the drill restores into a scratch database, counts rows and drops it, refuses the live name and needs `ALLOW_RESTORE`. Save it as `/tmp/backup-local-test.sh` and run it from the repository root:
 
@@ -6183,7 +6183,9 @@ rm /tmp/backup-local-test.sh
 
 Expected: `SHELLCHECK_OK`, 17 `ok:` lines and `ALL OK`. This ran in the scratch harness against Postgres 16.14 with exactly these scripts. What it cannot prove: the real `aws` download and `ls` paths of the drill (only uploads are stubbed), Cloudflare lifecycle rules, and the real heartbeat.
 
-- [ ] **Step 5: Record what is not verified**
+Run in the `portal-t` worktree with stub `pg_dump`, `pg_restore`, `psql`, `aws` and `curl` programs on `PATH` and no database (never against a real one), not with this scratch Postgres version. The stub run checks the same behaviours (both dumps land in their own buckets, one heartbeat after both, a failed portal dump or upload, an unreadable or incomplete `portal.env`, the CMS bucket and a bad database name fail without a heartbeat, a missing portal database skips with a warning and still pings, empty or unset portal settings keep the old behaviour) and a drill run with stubs. The scratch Postgres version of the test, and the real `aws` download and `ls` paths of the drill, are left for a person.
+
+- [x] **Step 5: Record what is not verified**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M IST') | M5.5 | note | ORCH | - | local test ALL OK | backup.sh edited and tested locally with stub aws and curl. LIVE HEARTBEAT NOT VERIFIED: needs the droplet. Restore drill never run against real R2. Portal dump bucket and lifecycle rule for portal-backups/ not created." >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
@@ -6191,7 +6193,7 @@ printf '%s\n' "$(date '+%Y-%m-%d %H:%M IST') | M5.5 | note | ORCH | - | local te
 
 The report (final task) lists this under UNVERIFIED, and the handover checklist has the person steps: copy the script to `/opt/cleanstart/scripts/backup.sh`, run it with `DRY_RUN=1` and then for real, confirm the heartbeat arrives, create the lifecycle rule, run the drill, add a line to `docs/operations/RESTORE-LOG.md`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add infra/scripts/backup.sh infra/scripts/restore-portal-drill.sh docs/superpowers/plans/2026-11-12-partner-portal-06-admin-infra-hardening.md
@@ -6206,7 +6208,7 @@ git commit -m "feat(portal): M5.5 nightly backup dumps the portal database to it
 - Modify: `docs/operations/PARTNER-PORTAL.md` (M0.6 wrote sections 1 to 3; this adds 4 to 11)
 - Modify: `docs/operations/INCIDENTS.md` (an entry template for the portal; CCR-6)
 
-- [ ] **Step 1: Append sections 4 to 11 to `docs/operations/PARTNER-PORTAL.md`**
+- [x] **Step 1: Append sections 4 to 11 to `docs/operations/PARTNER-PORTAL.md`**
 
 ````markdown
 ## 4. What runs where
@@ -6328,7 +6330,9 @@ docker compose exec -T postgres psql -U postgres -d cleanstart_portal -c "select
 Secrets and where they rotate: `PORTAL_AUTH_SECRET` (signs everyone out), database passwords (`ALTER ROLE portal_app PASSWORD '...'` as the superuser, update the GitHub secret, deploy), HubSpot token and webhook secret (section 7), `BREVO_API_KEY` (shared with the CMS, rotate both), R2 keys (the private bucket token only), Turnstile secret, Sentry DSN, `PORTAL_REVIEW_PASSWORD` (the pilot gate). All live in GitHub secrets; a deploy writes them to `portal.env`.
 ````
 
-- [ ] **Step 2: Add the incident template to `docs/operations/INCIDENTS.md`**
+Written against the repo as it is in the `portal-t` worktree, so some text differs from the block above: names follow `src/env.ts` and `deploy-portal.yml` (`portal.env` holds `AUTH_SECRET`, the GitHub secret is `PORTAL_AUTH_SECRET`); job log lines are described as `job failed` (not every job line has a `job` field); the BetterStack host monitors line follows `docs/operations/CMS-DEPLOYMENT.md` (host metrics come from the DigitalOcean agent); the drill snippet reads `POSTGRES_PASSWORD` with `grep` instead of sourcing `.env`; the restore steps pass the owner password by prompt and load the data through `docker compose exec` with `-n public`. Added: the trusted proxy row in section 11, `access_requests` and backups in section 10, and the note that the `retention` job body comes from M5.3.
+
+- [x] **Step 2: Add the incident template to `docs/operations/INCIDENTS.md`**
 
 Insert this block directly under the paragraph that starts "**Format:**" (above the first dated entry). It adds the portal's extra fields and a copy-paste entry; the existing entries and the "newest first" rule do not change.
 
@@ -6352,7 +6356,7 @@ Copy this for a new entry, newest first:
 ```
 ````
 
-- [ ] **Step 3: Check the runbook against the repo**
+- [x] **Step 3: Check the runbook against the repo**
 
 ```bash
 for f in infra/docker-compose.yml infra/scripts/backup.sh infra/scripts/restore-portal-drill.sh infra/scripts/run-backup.sh apps/portal/scripts/db-bootstrap.sql .github/workflows/deploy-portal.yml docs/partner-portal/HUBSPOT-PROVISIONING.md; do [ -e "$f" ] && echo "ok  $f" || echo "MISSING  $f"; done
@@ -6361,7 +6365,7 @@ node -e "const d=new RegExp('['+String.fromCharCode(8211,8212)+']');let bad=0;fo
 
 Expected: `ok` for every path (if `HUBSPOT-PROVISIONING.md` is MISSING, track H has not written it: list it in the report) and no dash output.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add docs/operations/PARTNER-PORTAL.md docs/operations/INCIDENTS.md docs/superpowers/plans/2026-11-12-partner-portal-06-admin-infra-hardening.md
@@ -6380,7 +6384,7 @@ git commit -m "feat(portal): M5.9 partner portal runbook and incident entry temp
 
 The orchestrator writes this report at the end of the run (BUILD-HANDOFF, "Morning report"). Nothing here is pushed.
 
-- [ ] **Step 1: Run every check once, on the final tree, and keep the output**
+- [x] **Step 1: Run every check once, on the final tree, and keep the output**
 
 ```bash
 pnpm --filter @cleanstart/portal lint
@@ -6401,7 +6405,7 @@ REPO="$(git rev-parse --show-toplevel)"; rm -rf /tmp/p06ctx && mkdir -p /tmp/p06
 
 Expected: every command exits 0, `pnpm test` includes the isolation matrix and every suite from this plan, Playwright reports 64 passed (45 desktop, 19 mobile). Any failure stops this task: fix it in the owning task, rerun, and note it in the report.
 
-- [ ] **Step 2: Run the HubSpot plan's section 6 checklist**
+- [x] **Step 2: Run the HubSpot plan's section 6 checklist**
 
 HubSpot plan section 6 has ten lines. Most need a live HubSpot, which this run does not have, so each line is answered with the automated evidence that exists and an honest status. Run the evidence commands:
 
@@ -6425,7 +6429,7 @@ Then record each line in the report with one of three statuses: **PASS (automate
 | The 6 existing deals in the default Sales Pipeline are untouched | provisioning script is dry-run first (H4.1) and never writes to the default pipeline | UNVERIFIED (needs live HubSpot) |
 | A partner user cannot read another partner's deal through the customer lookup, the deal page or the thread | isolation matrix (`getRegistration`, `listMessages`, `customerSuggestions`), `search.test.ts`, `e2e/admin.spec.ts` search isolation | PASS (automated) |
 
-- [ ] **Step 3: Write `docs/partner-portal/OVERNIGHT-REPORT.md`**
+- [x] **Step 3: Write `docs/partner-portal/OVERNIGHT-REPORT.md`**
 
 Use this template. Every table row is filled from a command, never from memory. The commands that fill the first three tables read the progress log (columns: `time | task | event | track | sha | gates | note`):
 
@@ -6499,7 +6503,7 @@ Sign in as any seeded user (emails and the shared development password are in `a
 Link to the "Handover checklist for a person" section of plan 06, with the three that block the pilot named first.
 ````
 
-- [ ] **Step 4: Tag and commit**
+- [x] **Step 4: Tag and commit**
 
 ```bash
 git add docs/partner-portal/OVERNIGHT-REPORT.md docs/superpowers/plans/2026-11-12-partner-portal-06-admin-infra-hardening.md

@@ -2,8 +2,13 @@
 
 import { useState } from "react";
 import { PasswordCard } from "@/components/people/PasswordCard";
+import { SessionsCard } from "@/components/people/SessionsCard";
 import { TwoStepCard } from "@/components/people/TwoStepCard";
-import { accountSlice, type NotificationPrefs } from "@/data/team";
+import { useToast } from "@/components/ui/toast";
+import { type NotificationCategory, PARTNER_ROLE_LABEL, STAFF_ROLE_LABEL } from "@/lib/domain";
+import type { ProfileDto, SessionDto } from "@/lib/dto";
+import { setNotificationPrefsAction, updateProfileAction } from "@/server/actions/account";
+import { issuesToErrors } from "@/server/actions/result";
 
 interface ProfileDraft {
   name: string;
@@ -11,7 +16,14 @@ interface ProfileDraft {
   phone: string;
 }
 
-const NOTIFICATIONS: ReadonlyArray<readonly [keyof NotificationPrefs, string, string]> = [
+interface AccountProps {
+  profile: ProfileDto;
+  sessions: SessionDto[];
+  /** Server date, so "Today" labels are stable across hydration. */
+  today: string;
+}
+
+const NOTIFICATIONS: ReadonlyArray<readonly [NotificationCategory, string, string]> = [
   ["decision", "Deal accepted or rejected", "When CleanStart decides on a deal you registered."],
   ["stage", "Deal stage changes", "When a deal moves stage in CleanStart's CRM."],
   ["expiry", "Protection ending", "14 days before a deal's protection ends."],
@@ -19,9 +31,16 @@ const NOTIFICATIONS: ReadonlyArray<readonly [keyof NotificationPrefs, string, st
   ["team", "Team changes", "When a colleague accepts an invite or is removed."],
 ];
 
-export function Account(): React.JSX.Element {
-  const saved = accountSlice.use();
-  // Edits live here until saved, as overrides, so a reload that restores the slice never shows stale text.
+export function Account({ profile, sessions, today }: AccountProps): React.JSX.Element {
+  const toast = useToast();
+  const [saved, setSaved] = useState<ProfileDraft>({
+    name: profile.name,
+    title: profile.title ?? "",
+    phone: profile.phone ?? "",
+  });
+  const [notify, setNotify] = useState<Record<NotificationCategory, boolean>>(profile.notifications);
+  const [nameError, setNameError] = useState<string | null>(null);
+  // Edits live here until saved, as overrides.
   const [draft, setDraft] = useState<Partial<ProfileDraft>>({});
   const value: ProfileDraft = {
     name: draft.name ?? saved.name,
@@ -29,11 +48,32 @@ export function Account(): React.JSX.Element {
     phone: draft.phone ?? saved.phone,
   };
   const dirty = value.name !== saved.name || value.title !== saved.title || value.phone !== saved.phone;
+  const roleLabel =
+    profile.kind === "staff"
+      ? STAFF_ROLE_LABEL[profile.role as keyof typeof STAFF_ROLE_LABEL]
+      : PARTNER_ROLE_LABEL[profile.role as keyof typeof PARTNER_ROLE_LABEL];
 
-  const saveProfile = (event: React.FormEvent<HTMLFormElement>): void => {
+  const saveProfile = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
-    accountSlice.set((prev) => ({ ...prev, ...value }));
+    setNameError(null);
+    const result = await updateProfileAction(value);
+    if (!result.ok) {
+      setNameError(issuesToErrors(result.error).name ?? result.error.message);
+      return;
+    }
+    setSaved({ name: result.data.name, title: result.data.title ?? "", phone: result.data.phone ?? "" });
     setDraft({});
+  };
+
+  // Saved as you change them: the switch flips at once and flips back with a message if the save fails.
+  const toggle = async (key: NotificationCategory, checked: boolean): Promise<void> => {
+    const previous = notify;
+    setNotify({ ...notify, [key]: checked });
+    const result = await setNotificationPrefsAction({ ...notify, [key]: checked });
+    if (!result.ok) {
+      setNotify(previous);
+      toast(result.error.message);
+    }
   };
 
   return (
@@ -70,7 +110,9 @@ export function Account(): React.JSX.Element {
                   autoComplete="name"
                   value={value.name}
                   onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
+                  aria-invalid={nameError ? true : undefined}
                 />
+                {nameError ? <span className="err">{nameError}</span> : null}
               </div>
               <div className="fg">
                 <span className="lbl">Work email</span>
@@ -78,7 +120,7 @@ export function Account(): React.JSX.Element {
                   className="field"
                   style={{ display: "flex", alignItems: "center", background: "#FAFAFB", color: "#4A4858" }}
                 >
-                  aditi.rao@kestrelsystems.in
+                  {profile.email}
                 </span>
                 <span className="hint">Your sign-in. Your partner manager can change it.</span>
               </div>
@@ -121,17 +163,18 @@ export function Account(): React.JSX.Element {
               }}
             >
               <span className="hint">
-                Role: <b style={{ color: "#2A2838" }}>Partner admin</b>. Another partner admin can change it on
+                Role: <b style={{ color: "#2A2838" }}>{roleLabel}</b>. Another partner admin can change it on
                 the Team page.
               </span>
-              <button type="submit" className="btn btn-p">
+              <button type="submit" className="btn btn-p" disabled={!dirty}>
                 Save profile
               </button>
             </div>
           </form>
 
-          <PasswordCard />
-          <TwoStepCard />
+          <PasswordCard passwordChangedAt={profile.passwordChangedAt} />
+          <TwoStepCard enabled={profile.twoFactorEnabled} />
+          <SessionsCard sessions={sessions} today={today} />
         </div>
 
         <section aria-labelledby="nt" className="card clip" style={{ flex: "0 1 400px", minWidth: 300 }}>
@@ -151,10 +194,8 @@ export function Account(): React.JSX.Element {
               </span>
               <input
                 type="checkbox"
-                checked={saved.notify[key]}
-                onChange={(e) =>
-                  accountSlice.set((prev) => ({ ...prev, notify: { ...prev.notify, [key]: e.target.checked } }))
-                }
+                checked={notify[key]}
+                onChange={(e) => void toggle(key, e.target.checked)}
                 style={{ width: 15, height: 15, margin: "2px 0 0 auto", flex: "none", accentColor: "#4B23C8" }}
               />
             </label>

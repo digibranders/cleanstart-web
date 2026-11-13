@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { welcomeSlice } from "@/data/deals";
+import { MessageDrawer } from "@/components/partners/message-drawer";
+import { fmtShort } from "@/lib/dates";
+import type { ChecklistDto, CompanyDto } from "@/lib/dto";
+import { formatAgreement } from "@/lib/people";
 import { ROUTES } from "@/lib/routes";
-import { ManagerMessageDrawer } from "../deals/ManagerMessageDrawer";
+import { tickChecklistStepAction } from "@/server/actions/partners";
 import { Icon } from "../icon";
 import type { IconName } from "../icon-paths";
-import { QAMAR } from "../shell/personas";
 
 interface Step {
   key: string;
@@ -19,11 +21,11 @@ interface Step {
   icon: IconName;
 }
 
-const STEPS: readonly Step[] = [
+const buildSteps = (company: CompanyDto): readonly Step[] => [
   {
     key: "agreement",
     title: "Accept the partner agreement",
-    text: "Version 1.2, accepted today.",
+    text: company.agreementAcceptedAt ? `${formatAgreement(company.agreementVersion, company.agreementAcceptedAt)}.` : "Not accepted yet.",
     target: null,
     action: "",
     icon: "file",
@@ -47,7 +49,9 @@ const STEPS: readonly Step[] = [
   {
     key: "kickoff",
     title: "Book your kickoff call",
-    text: "A 30-minute call with Omar Nasser, your partner manager.",
+    text: company.manager
+      ? `A 30-minute call with ${company.manager.name}, your partner manager.`
+      : "A 30-minute call with your partner manager.",
     target: "message",
     action: "Book a call",
     icon: "clk",
@@ -63,7 +67,7 @@ const STEPS: readonly Step[] = [
   {
     key: "deal",
     title: "Register your first deal",
-    text: "Qamar Solutions shows as onboarding until this is done.",
+    text: `${company.name} shows as onboarding until this is done.`,
     target: ROUTES.partner.newDeal,
     action: "Register",
     icon: "reg",
@@ -76,28 +80,40 @@ const STARTERS: { title: string; meta: string; icon: IconName }[] = [
   { title: "Competitive battlecard", meta: "Battlecard, PDF", icon: "file" },
 ];
 
-const ACTION_STYLE = { marginLeft: "auto", height: 28 } as const;
+// The row's `.li .btn` rule shrinks buttons to 18px, so the standard size is set here.
+const ACTION_STYLE = { marginLeft: "auto", height: 30, padding: "0 10px", fontSize: 13 } as const;
 
-export function PartnerWelcome(): React.JSX.Element {
-  const done = welcomeSlice.use();
+interface PartnerWelcomeProps {
+  firstName: string;
+  company: CompanyDto;
+  checklist: ChecklistDto;
+  viewerEmail: string;
+}
+
+export function PartnerWelcome({ firstName, company, checklist, viewerEmail }: PartnerWelcomeProps): React.JSX.Element {
+  const STEPS = buildSteps(company);
+  const done: Record<string, boolean> = Object.fromEntries(checklist.steps.map((s) => [s.step, s.done]));
   const [messaging, setMessaging] = useState(false);
   const doneCount = STEPS.filter((s) => done[s.key]).length;
-  const percent = Math.round((doneCount / STEPS.length) * 100);
+  const percent = checklist.percent;
+  const tick = (step: "kickoff" | "playbook"): void => void tickChecklistStepAction({ step });
 
   return (
     <div className="wrap">
       <div className="head">
         <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
-          <h1 className="h1">Welcome, Yasmin</h1>
-          <span className="h1-sub">Qamar Solutions joined the CleanStart partner program on 27 Oct.</span>
+          <h1 className="h1">Welcome, {firstName}</h1>
+          <span className="h1-sub">
+            {company.name} joined the CleanStart partner program on {fmtShort(company.since)}.
+          </span>
         </div>
         <Link href={ROUTES.partner.newDeal} className="btn btn-p">
           <Icon name="reg" />
-          Register a deal
+          Register deal
         </Link>
       </div>
 
-      <section aria-labelledby="setup" className="card clip" data-tour="welcome-checklist">
+      <section aria-labelledby="setup" className="card clip">
         <div className="card-h">
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <h2 id="setup" className="card-t">
@@ -107,6 +123,7 @@ export function PartnerWelcome(): React.JSX.Element {
               {doneCount} of {STEPS.length} done
             </span>
           </div>
+          {/* biome-ignore lint/a11y/useFocusableInteractive: a read-only progress display, not an interactive widget */}
           <span
             className="bar"
             style={{ width: 180 }}
@@ -139,7 +156,12 @@ export function PartnerWelcome(): React.JSX.Element {
                 </span>
               </span>
               {!isDone && step.target && step.target !== "message" ? (
-                <Link href={step.target} className="btn btn-s" style={ACTION_STYLE}>
+                <Link
+                  href={step.target}
+                  className="btn btn-s"
+                  style={ACTION_STYLE}
+                  {...(step.key === "playbook" ? { onClick: () => tick("playbook") } : {})}
+                >
                   {step.action}
                 </Link>
               ) : null}
@@ -150,7 +172,7 @@ export function PartnerWelcome(): React.JSX.Element {
                   style={ACTION_STYLE}
                   onClick={() => {
                     setMessaging(true);
-                    welcomeSlice.set((prev) => ({ ...prev, [step.key]: true }));
+                    tick("kickoff");
                   }}
                 >
                   {step.action}
@@ -167,52 +189,55 @@ export function PartnerWelcome(): React.JSX.Element {
       </section>
 
       <div className="row">
-        <section aria-labelledby="mydeals" className="card clip" style={{ flex: "1 1 420px", minWidth: 0 }}>
-          <div className="card-h">
-            <h2 id="mydeals" className="card-t">
-              Your deals
-            </h2>
-          </div>
-          <div
-            className="card-b"
-            style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, padding: "24px 16px" }}
-          >
-            <span className="li-ic tone-violet" style={{ width: 32, height: 32 }}>
-              <Icon name="deals" />
-            </span>
-            <span style={{ fontSize: 14, fontWeight: 700 }}>No deals yet</span>
-            <span style={{ fontSize: 12.5, lineHeight: 1.55, color: "#5E5B6E", maxWidth: "46ch" }}>
-              Register a customer you are working with. Once CleanStart accepts it, nobody else can claim it for 90
-              days.
-            </span>
-            <Link href={ROUTES.partner.newDeal} className="btn btn-p" style={{ marginTop: 4 }}>
-              Register your first deal
-            </Link>
-          </div>
-        </section>
-        <section aria-labelledby="myteam" className="card clip" style={{ flex: "1 1 300px", minWidth: 0 }}>
-          <div className="card-h">
-            <h2 id="myteam" className="card-t">
-              Your team
-            </h2>
-            <span className="card-meta">1 person</span>
-          </div>
-          <div
-            className="card-b"
-            style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, padding: "24px 16px" }}
-          >
-            <span className="li-ic" style={{ width: 32, height: 32 }}>
-              <Icon name="team" />
-            </span>
-            <span style={{ fontSize: 14, fontWeight: 700 }}>Only you so far</span>
-            <span style={{ fontSize: 12.5, lineHeight: 1.55, color: "#5E5B6E" }}>
-              Sales and technical colleagues get their own login. Their deals stay with Qamar Solutions if they leave.
-            </span>
-            <Link href={ROUTES.partner.team} className="btn btn-s" style={{ marginTop: 4 }}>
-              Invite colleagues
-            </Link>
-          </div>
-        </section>
+        {done.deal ? null : (
+          <section aria-labelledby="mydeals" className="card clip" style={{ flex: "1 1 420px", minWidth: 0 }}>
+            <div className="card-h">
+              <h2 id="mydeals" className="card-t">
+                Your deals
+              </h2>
+            </div>
+            <div
+              className="card-b"
+              style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, padding: "24px 16px" }}
+            >
+              <span className="li-ic tone-violet" style={{ width: 32, height: 32 }}>
+                <Icon name="deals" />
+              </span>
+              <span style={{ fontSize: 14, fontWeight: 700 }}>No deals yet</span>
+              <span style={{ fontSize: 12.5, lineHeight: 1.55, color: "#5E5B6E", maxWidth: "46ch" }}>
+                Register a customer you are working with. Once CleanStart accepts it, nobody else can claim it for 90 days.
+              </span>
+              <Link href={ROUTES.partner.newDeal} className="btn btn-p" style={{ marginTop: 4 }}>
+                Register your first deal
+              </Link>
+            </div>
+          </section>
+        )}
+        {done.team ? null : (
+          <section aria-labelledby="myteam" className="card clip" style={{ flex: "1 1 300px", minWidth: 0 }}>
+            <div className="card-h">
+              <h2 id="myteam" className="card-t">
+                Your team
+              </h2>
+              <span className="card-meta">1 person</span>
+            </div>
+            <div
+              className="card-b"
+              style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, padding: "24px 16px" }}
+            >
+              <span className="li-ic" style={{ width: 32, height: 32 }}>
+                <Icon name="team" />
+              </span>
+              <span style={{ fontSize: 14, fontWeight: 700 }}>Only you so far</span>
+              <span style={{ fontSize: 12.5, lineHeight: 1.55, color: "#5E5B6E" }}>
+                Sales and technical colleagues get their own login. Their deals stay with {company.name} if they leave.
+              </span>
+              <Link href={ROUTES.partner.team} className="btn btn-s" style={{ marginTop: 4 }}>
+                Invite colleagues
+              </Link>
+            </div>
+          </section>
+        )}
         <section aria-labelledby="start" className="card clip" style={{ flex: "1 1 300px", minWidth: 0 }}>
           <div className="card-h">
             <h2 id="start" className="card-t">
@@ -236,11 +261,14 @@ export function PartnerWelcome(): React.JSX.Element {
         </section>
       </div>
 
-      {messaging ? (
-        <ManagerMessageDrawer
-          persona={QAMAR}
-          initialSubject="Kickoff call for Qamar Solutions"
+      {messaging && company.manager ? (
+        <MessageDrawer
+          open
           onClose={() => setMessaging(false)}
+          manager={company.manager.name}
+          team={company.manager.team.replace("CleanStart ", "")}
+          subject={`Kickoff call for ${company.name}`}
+          from={viewerEmail}
         />
       ) : null}
     </div>

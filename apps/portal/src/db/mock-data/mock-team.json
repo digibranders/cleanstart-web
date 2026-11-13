@@ -1,0 +1,46 @@
+{
+  "members": [
+    {
+      "name": "Aditi Rao",
+      "email": "aditi.rao@kestrelsystems.in",
+      "role": "Partner admin",
+      "status": "Active",
+      "last": "Now",
+      "deals": 5,
+      "you": true
+    },
+    {
+      "name": "Karan Malhotra",
+      "email": "karan.malhotra@kestrelsystems.in",
+      "role": "Sales",
+      "status": "Active",
+      "last": "Yesterday",
+      "deals": 4
+    },
+    {
+      "name": "Sneha Iyer",
+      "email": "sneha.iyer@kestrelsystems.in",
+      "role": "Technical",
+      "status": "Active",
+      "last": "2 Nov 2026",
+      "deals": 1
+    },
+    {
+      "name": "Vikram Sethi",
+      "email": "vikram.sethi@kestrelsystems.in",
+      "role": "Sales",
+      "status": "Invited",
+      "last": "Invited 5 Nov",
+      "deals": 0
+    }
+  ],
+  "requests": [
+    {
+      "name": "Rohit Desai",
+      "email": "rohit.desai@kestrelsystems.in",
+      "when": "Asked today",
+      "note": "I lead the Mumbai sales team.",
+      "role": "Sales"
+    }
+  ]
+}

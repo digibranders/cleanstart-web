@@ -1,70 +1,79 @@
 "use client";
 
 import { Fragment, useState } from "react";
-import { Icon } from "@/components/icon";
 import { Badge } from "@/components/ui/badge";
-import type { Application } from "@/data/partners";
-import { CategoryBadge } from "./badges";
+import { fmtLong } from "@/lib/dates";
+import {
+  PARTNER_CATEGORIES,
+  PARTNER_CATEGORY_LABEL,
+  PARTNER_REGION_LABEL,
+  PARTNER_REGIONS,
+  type PartnerCategory,
+  type PartnerRegion,
+} from "@/lib/domain";
+import type { ApplicationDto } from "@/lib/dto";
+import { codeFromLabel } from "@/lib/people";
+import { PartnerCategoryBadge } from "./badges";
+import { Seg } from "./seg";
+import { ScrollRegion } from "@/components/ui/scroll-region";
 
 const DEFAULT_REASON = "We already have a partner covering this region and segment.";
+const CATEGORY_OPTIONS: readonly string[] = PARTNER_CATEGORIES.map((c) => PARTNER_CATEGORY_LABEL[c]);
+const REGION_OPTIONS: readonly string[] = PARTNER_REGIONS.map((r) => PARTNER_REGION_LABEL[r]);
 
 interface ApplicationsTableProps {
-  applications: readonly Application[];
+  applications: readonly ApplicationDto[];
   waiting: number;
-  onApprove: (application: Application) => void;
-  onDecline: (application: Application, reason: string) => void;
-  onUndo: (application: Application) => void;
-}
-
-/** Icon row action, same markup as ActButton but able to carry a tour anchor. */
-function RowAction({
-  label,
-  tip,
-  tone,
-  icon,
-  onClick,
-  tour,
-}: {
-  label: string;
-  tip: string;
-  tone: "ok" | "no";
-  icon: "check" | "x";
-  onClick: () => void;
-  tour?: string;
-}): React.JSX.Element {
-  return (
-    <button
-      type="button"
-      className={`act act-${tone}`}
-      aria-label={label}
-      data-tip={tip}
-      data-tour={tour}
-      onClick={onClick}
-    >
-      <Icon name={icon} />
-    </button>
-  );
+  /** Only partner managers decide; other staff see the queue read-only. */
+  canDecide: boolean;
+  onApprove: (application: ApplicationDto, choice: { category: PartnerCategory; region: PartnerRegion }) => void;
+  onDecline: (application: ApplicationDto, reason: string) => void;
+  onUndo: (application: ApplicationDto) => void;
 }
 
 export function ApplicationsTable({
   applications,
   waiting,
+  canDecide,
   onApprove,
   onDecline,
   onUndo,
 }: ApplicationsTableProps): React.JSX.Element {
   const [rejectingId, setRejectingId] = useState<string | null>(null);
+  const [approvingId, setApprovingId] = useState<string | null>(null);
   const [reason, setReason] = useState(DEFAULT_REASON);
   const [reasonTried, setReasonTried] = useState(false);
-  const firstOpenId = applications.find((a) => a.status === "New")?.id;
+  const [categoryLabel, setCategoryLabel] = useState<string>(PARTNER_CATEGORY_LABEL.channel);
+  const [regionLabel, setRegionLabel] = useState<string>(PARTNER_REGION_LABEL.india);
 
   const startReject = (id: string): void => {
+    setApprovingId(null);
     setRejectingId(id);
     setReason(DEFAULT_REASON);
     setReasonTried(false);
   };
 
-  const confirmReject = (application: Application): void => {
+  const startApprove = (application: ApplicationDto): void => {
+    // A portal application already carries a category and region; a website entry needs the manager to set them.
+    if (application.category && application.region) {
+      onApprove(application, { category: application.category, region: application.region });
+      return;
+    }
+    setRejectingId(null);
+    setApprovingId(application.id);
+    setCategoryLabel(application.category ? PARTNER_CATEGORY_LABEL[application.category] : PARTNER_CATEGORY_LABEL.channel);
+    setRegionLabel(application.region ? PARTNER_REGION_LABEL[application.region] : PARTNER_REGION_LABEL.india);
+  };
+
+  const confirmApprove = (application: ApplicationDto): void => {
+    const category = codeFromLabel(PARTNER_CATEGORY_LABEL, categoryLabel);
+    const region = codeFromLabel(PARTNER_REGION_LABEL, regionLabel);
+    if (!category || !region) return;
+    setApprovingId(null);
+    onApprove(application, { category, region });
+  };
+
+  const confirmReject = (application: ApplicationDto): void => {
     if (!reason.trim()) {
       setReasonTried(true);
       return;
@@ -81,15 +90,23 @@ export function ApplicationsTable({
         </span>
         <span className="card-meta tnum">{waiting} waiting</span>
       </div>
-      <div style={{ overflowX: "auto" }} data-tour="applications-list">
+      <ScrollRegion label="Applications">
         <table className="tbl">
           <thead>
             <tr>
               <th scope="col">Company</th>
-              <th scope="col">Applicant</th>
-              <th scope="col">Wants to be</th>
-              <th scope="col">Region</th>
-              <th scope="col">Submitted</th>
+              <th scope="col" className="hide-sm">
+                Applicant
+              </th>
+              <th scope="col" className="hide-sm">
+                Wants to be
+              </th>
+              <th scope="col" className="hide-sm">
+                Region
+              </th>
+              <th scope="col" className="hide-sm">
+                Submitted
+              </th>
               <th scope="col" className="r">
                 Decision
               </th>
@@ -97,7 +114,8 @@ export function ApplicationsTable({
           </thead>
           <tbody>
             {applications.map((a) => {
-              const rejecting = rejectingId === a.id && a.status === "New";
+              const rejecting = rejectingId === a.id && a.status === "new";
+              const approving = approvingId === a.id && a.status === "new";
               return (
                 <Fragment key={a.id}>
                   <tr>
@@ -105,55 +123,68 @@ export function ApplicationsTable({
                       <span className="li-t">
                         <span style={{ fontWeight: 600 }}>{a.company}</span>
                         <span className="li-s">{a.domain}</span>
+                        <span style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 2 }}>
+                          <Badge tone="neutral">{a.source === "website" ? "Website form" : "Portal form"}</Badge>
+                          {a.personalEmail ? <Badge tone="pending">Personal email</Badge> : null}
+                          {a.existingDomain ? <Badge tone="violet">Domain already a partner</Badge> : null}
+                        </span>
                       </span>
                     </td>
-                    <td>
+                    <td className="hide-sm">
                       <span className="li-t">
-                        <span>{a.applicant}</span>
-                        <span className="li-s">{a.role}</span>
+                        <span>{a.applicantName}</span>
+                        <span className="li-s">{a.role ?? a.email}</span>
                       </span>
                     </td>
-                    <td>
-                      <CategoryBadge category={a.category} />
+                    <td className="hide-sm">
+                      {a.category ? <PartnerCategoryBadge category={a.category} /> : <span className="t-muted">Not set</span>}
                     </td>
-                    <td className="t-sec">{a.region}</td>
-                    <td className="tnum t-sec">{a.submitted}</td>
-                    <td className="r">
-                      {a.status === "New" && !rejecting ? (
-                        <span className="acts">
-                          <RowAction
-                            label={`Reject ${a.company}`}
-                            tip="Reject with a reason"
-                            tone="no"
-                            icon="x"
+                    <td className="t-sec hide-sm">
+                      {a.region ? PARTNER_REGION_LABEL[a.region] : <span className="t-muted">Not set</span>}
+                    </td>
+                    <td className="tnum t-sec hide-sm">{fmtLong(a.submittedAt)}</td>
+                    <td className="r" style={{ whiteSpace: "normal" }}>
+                      {a.status === "new" && !rejecting && !approving && canDecide ? (
+                        <span className="acts" style={{ gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
+                          <button
+                            type="button"
+                            className="btn btn-d"
+                            aria-label={`Decline ${a.company}`}
+                            title="Decline with a reason"
                             onClick={() => startReject(a.id)}
-                          />
-                          <RowAction
-                            label={`Approve ${a.company}`}
-                            tip="Approve and send the invite"
-                            tone="ok"
-                            icon="check"
-                            onClick={() => onApprove(a)}
-                            {...(a.id === firstOpenId ? { tour: "application-approve" } : {})}
-                          />
+                          >
+                            Decline
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-p"
+                            aria-label={`Approve and invite ${a.company}`}
+                            title="Creates the partner company, makes the applicant its partner admin and emails an invite"
+                            onClick={() => startApprove(a)}
+                          >
+                            Approve and invite
+                          </button>
                         </span>
                       ) : null}
-                      {a.status === "New" && rejecting ? <Badge tone="neutral">Add a reason below</Badge> : null}
-                      {a.status !== "New" ? (
+                      {a.status === "new" && rejecting ? <Badge tone="neutral">Add a reason below</Badge> : null}
+                      {a.status === "new" && approving ? <Badge tone="neutral">Choose below</Badge> : null}
+                      {a.status !== "new" ? (
                         <span style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
-                          {a.status === "Approved" ? (
+                          {a.status === "approved" ? (
                             <Badge tone="accepted">Approved, invite sent</Badge>
                           ) : (
                             <Badge tone="rejected">Rejected, emailed</Badge>
                           )}
-                          <button
-                            type="button"
-                            className="btn btn-g"
-                            onClick={() => onUndo(a)}
-                            style={{ height: 24, padding: "0 6px", fontSize: 12 }}
-                          >
-                            Undo
-                          </button>
+                          {canDecide ? (
+                            <button
+                              type="button"
+                              className="btn btn-g"
+                              onClick={() => onUndo(a)}
+                              style={{ height: 24, padding: "0 6px", fontSize: 12 }}
+                            >
+                              Undo
+                            </button>
+                          ) : null}
                         </span>
                       ) : null}
                     </td>
@@ -162,7 +193,7 @@ export function ApplicationsTable({
                     <td colSpan={6} style={{ paddingTop: 0, whiteSpace: "normal" }}>
                       <div className="note note-violet">
                         <span>
-                          <b>Why they want to partner:</b> {a.reason}
+                          <b>Why they want to partner:</b> {a.reason ?? "Not given."}
                           {a.declineReason ? (
                             <>
                               <br />
@@ -173,6 +204,43 @@ export function ApplicationsTable({
                       </div>
                     </td>
                   </tr>
+                  {approving ? (
+                    <tr>
+                      <td colSpan={6} style={{ paddingTop: 0, whiteSpace: "normal" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: 12,
+                            alignItems: "flex-end",
+                            flexWrap: "wrap",
+                            padding: "8px 10px",
+                            borderRadius: 7,
+                            background: "#FCFCFD",
+                            border: "1px solid #F0EFF4",
+                          }}
+                        >
+                          <div className="fg">
+                            <span id={`aa-cat-${a.id}`} className="lbl">
+                              Partner type
+                            </span>
+                            <Seg options={CATEGORY_OPTIONS} value={categoryLabel} onChange={setCategoryLabel} labelledBy={`aa-cat-${a.id}`} />
+                          </div>
+                          <div className="fg">
+                            <span id={`aa-reg-${a.id}`} className="lbl">
+                              Region
+                            </span>
+                            <Seg options={REGION_OPTIONS} value={regionLabel} onChange={setRegionLabel} labelledBy={`aa-reg-${a.id}`} />
+                          </div>
+                          <button type="button" className="btn btn-s" onClick={() => setApprovingId(null)}>
+                            Cancel
+                          </button>
+                          <button type="button" className="btn btn-p" onClick={() => confirmApprove(a)}>
+                            Approve and send invite
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : null}
                   {rejecting ? (
                     <tr>
                       <td colSpan={6} style={{ paddingTop: 0, whiteSpace: "normal" }}>
@@ -196,6 +264,7 @@ export function ApplicationsTable({
                               id={`ar-${a.id}`}
                               className={`field${reasonTried && !reason.trim() ? " field-err" : ""}`}
                               type="text"
+                              placeholder="For example, we already have a partner covering this region"
                               value={reason}
                               onChange={(e) => setReason(e.target.value)}
                               aria-invalid={reasonTried && !reason.trim() ? true : undefined}
@@ -211,7 +280,7 @@ export function ApplicationsTable({
                             Cancel
                           </button>
                           <button type="button" className="btn btn-dd" onClick={() => confirmReject(a)}>
-                            Reject and email
+                            Decline and email
                           </button>
                         </div>
                       </td>
@@ -223,7 +292,7 @@ export function ApplicationsTable({
           </tbody>
         </table>
         {applications.length === 0 ? <div className="empty">No applications yet.</div> : null}
-      </div>
+      </ScrollRegion>
       <div style={{ padding: "10px 12px", borderTop: "1px solid #F0EFF4" }}>
         <span className="hint">
           Approving creates the partner company, makes the applicant its partner admin, and emails them an invite to

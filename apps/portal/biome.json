@@ -6,10 +6,7 @@
   "linter": {
     "rules": {
       "a11y": {
-        "noSvgWithoutTitle": "off",
-        "useKeyWithClickEvents": "off",
-        "useSemanticElements": "off",
-        "useFocusableInteractive": "off"
+        "useSemanticElements": "off"
       },
       "suspicious": {
         "noArrayIndexKey": "off"

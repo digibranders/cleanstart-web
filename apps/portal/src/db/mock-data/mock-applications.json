@@ -1,0 +1,43 @@
+[
+  {
+    "id": "a1",
+    "reference": "APP-2611-0042",
+    "company": "Tidewater Infosec",
+    "domain": "tidewaterinfosec.in",
+    "applicant": "Neha Joshi",
+    "email": "neha.joshi@tidewaterinfosec.in",
+    "role": "CTO",
+    "phone": "+91 98200 41377",
+    "category": "Channel partner",
+    "region": "India",
+    "submitted": "2 Nov 2026",
+    "reason": "We resell security tooling to mid-size banks and NBFCs in Pune and Mumbai, and customers are asking for hardened base images.",
+    "status": "New"
+  },
+  {
+    "id": "a2",
+    "reference": "APP-2611-0043",
+    "company": "Falcon Ridge IT",
+    "domain": "falconridge.ae",
+    "applicant": "Sameer Al Harthy",
+    "role": "Managing Director",
+    "category": "Distributor",
+    "region": "Middle East",
+    "submitted": "4 Nov 2026",
+    "reason": "Value-added distributor across Oman and the UAE with 30 resellers; looking to add container security to our portfolio.",
+    "status": "New"
+  },
+  {
+    "id": "a3",
+    "reference": "APP-2611-0044",
+    "company": "Lattice Cloud Services",
+    "domain": "latticecloud.in",
+    "applicant": "Ritu Menon",
+    "role": "Head of Alliances",
+    "category": "System integrator",
+    "region": "India",
+    "submitted": "5 Nov 2026",
+    "reason": "We run Kubernetes platform engagements for insurers and want CleanStart Images as the default base layer.",
+    "status": "New"
+  }
+]

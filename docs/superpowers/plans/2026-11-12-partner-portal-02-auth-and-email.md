@@ -112,7 +112,7 @@ The checklist:
 - Modify: `apps/portal/src/db/test-helpers.ts`, `apps/portal/src/db/fixtures.ts`, `apps/portal/src/db/fixtures.test.ts`, `apps/portal/scripts/seed-dev.ts` (passwords, Step 6b), `docs/superpowers/plans/2026-11-11-partner-portal-master-plan.md`
 - Test: `apps/portal/src/server/auth/auth.spike.test.ts`
 
-- [ ] **Step 1: Log the start and check the install**
+- [x] **Step 1: Log the start and check the install**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M0.7 | started | W0 | - | - | auth spike" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
@@ -123,7 +123,7 @@ pnpm --filter @cleanstart/portal exec tsx --version
 
 Expected: `better-auth 1.7.x`, `drizzle-orm 0.45.x`, `drizzle-kit 0.31.x`, `vitest`, `zod 3.x` listed, and a `tsx` version printed (the `db:migrate` and `db:seed` scripts already need it). This plan was verified against better-auth 1.7.22. If the minor version is not 1.7, stop and re-run Step 8 and Step 10 before trusting any later step; a different minor may change option names. If `better-auth` is missing, the orchestrator adds it (W0-a owns `package.json`); log `blocked`.
 
-- [ ] **Step 2: Verify the three library facts that change the schema and the build**
+- [x] **Step 2: Verify the three library facts that change the schema and the build**
 
 Verify: the schema check, the lazy construction and the two-factor columns, using the installed version.
 
@@ -135,7 +135,7 @@ grep -n "default secret\|BETTER_AUTH_SECRET is missing" apps/portal/node_modules
 
 Expected: the first prints the three field definitions (`verified`, `failedVerificationCount`, `lockedUntil`); the second prints the `validateSecret` lines that throw. If the first prints fewer fields, the installed version differs from 1.7.22: drop the column that is missing from the schema, as Step 5 describes. If the second prints nothing, the secret check moved; keep the lazy `getAuth()` anyway.
 
-- [ ] **Step 3: Write the spike test (fails first)**
+- [x] **Step 3: Write the spike test (fails first)**
 
 Create `apps/portal/src/server/auth/test-totp.ts`:
 
@@ -354,7 +354,7 @@ describe('M0.7 auth spike', () => {
 });
 ```
 
-- [ ] **Step 4: Run it and see it fail**
+- [x] **Step 4: Run it and see it fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/auth/auth.spike.test.ts
@@ -362,7 +362,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/auth/auth.spike.test
 
 Expected: FAIL with `Failed to resolve import "./auth"` (the module does not exist yet).
 
-- [ ] **Step 5: Check the three `auth_two_factor` columns (already in the schema and in `0000_init`)**
+- [x] **Step 5: Check the three `auth_two_factor` columns (already in the schema and in `0000_init`)**
 
 Better Auth 1.7 refuses to start unless `auth_two_factor` has `verified`, `failed_verification_count` and `locked_until`. They are part of the contracts' C.1 and therefore of `src/db/schema.ts` and `drizzle/0000_init.sql` since W0-b (integration review: there is no `0001` migration). If W0-b formatted the table differently, that is fine; check that the columns are there:
 
@@ -374,7 +374,7 @@ grep -nE '"verified"|"failed_verification_count"|"locked_until"' apps/portal/dri
 
 Expected: three hits in each file (the `schema.ts` hits for `verified` may include other lines such as `emailVerified`; the three `auth_two_factor` ones are inside `authTwoFactors`). If the installed Better Auth needs a different set (Step 2 printed it), edit `schema.ts`, delete `drizzle/0000_init.sql` and `drizzle/meta`, run `pnpm --filter @cleanstart/portal exec drizzle-kit generate --name init`, put the `CREATE EXTENSION IF NOT EXISTS pg_trgm;--> statement-breakpoint` line back at the top, and run `scripts/db-create.sh <name> --recreate` for each of this worktree's databases (the Drizzle migrator re-applies a changed first migration). Wave 0 owns the schema until the `portal-w0` tag and no database holds data yet, so this is allowed (contracts M.1 items 2 and 3). Record the change in the progress log and in the contracts' C.1.
 
-- [ ] **Step 6: Create the password hashing module**
+- [x] **Step 6: Create the password hashing module**
 
 Create `apps/portal/src/server/auth/passwords.ts` (if W0-b created a stub with these two function names, replace it):
 
@@ -421,7 +421,7 @@ export async function verifyPassword(input: { hash: string; password: string }):
 }
 ```
 
-- [ ] **Step 6b: Add passwords to the W0-b helpers and the dev seed**
+- [x] **Step 6b: Add passwords to the W0-b helpers and the dev seed**
 
 The spike test and every later auth test call `makeUser(db, { password })`, and the manual checks sign in as a seeded user with `DEV_SEED_PASSWORD`. W0-b could not provide either because `hashPassword` did not exist yet (contracts J.3 and J.5); this step adds them. It edits W0-b files, which Wave 0 allows (single owner: this step).
 
@@ -548,7 +548,7 @@ describe('seedMockData with a password hash', () => {
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/db/fixtures.test.ts`. Expected: PASS, one test more than before (the previous total was 10 in plan 01 Step 21).
 
-- [ ] **Step 7: Create the mail bridge**
+- [x] **Step 7: Create the mail bridge**
 
 Better Auth must call something when it needs to send a reset link, but the email module is built later (Task M0.5). This file is the seam: it only logs, never logs the token, and Task M0.5d replaces both bodies. Create `apps/portal/src/server/auth/auth-mail.ts`:
 
@@ -579,7 +579,7 @@ export async function sendPasswordChangedEmail(input: PasswordChangedMail): Prom
 }
 ```
 
-- [ ] **Step 8: Create the Better Auth instance**
+- [x] **Step 8: Create the Better Auth instance**
 
 Create `apps/portal/src/server/auth/auth.ts`. The options that matter: `generateId: false` (Postgres makes ids), the `additionalFields` for the four portal columns, scrypt functions, `disableSignUp: true` (accounts exist only through `acceptInvite`), `disableSignUp: true` on both social providers (a Google or Microsoft identity signs in an existing user, it never creates one), `trustedProviders: []` with `allowDifferentEmails: false` (link only by a provider verified email), `revokeSessionsOnPasswordReset: true`, and the lazy `getAuth()`.
 
@@ -706,7 +706,7 @@ export const auth: Auth = new Proxy({} as Auth, {
 });
 ```
 
-- [ ] **Step 9: Create the route handler, the browser client and the viewer**
+- [x] **Step 9: Create the route handler, the browser client and the viewer**
 
 Create `apps/portal/src/app/api/auth/[...all]/route.ts`:
 
@@ -794,7 +794,7 @@ export async function viewerFromHeaders(requestHeaders: Headers): Promise<Viewer
 export const getViewer = cache(async (): Promise<Viewer | null> => viewerFromHeaders(await headers()));
 ```
 
-- [ ] **Step 10: Run the spike and see it pass**
+- [x] **Step 10: Run the spike and see it pass**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/auth/auth.spike.test.ts
@@ -802,7 +802,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/auth/auth.spike.test
 
 Expected: `Test Files  1 passed (1)`, `Tests  7 passed (7)`. Better Auth prints a few `WARN [Better Auth]: Invalid password` and `User not found` lines to stderr; those are the refusals the tests provoke and are not failures.
 
-- [ ] **Step 11: Create the gate script and run it**
+- [x] **Step 11: Create the gate script and run it**
 
 Create `apps/portal/scripts/auth-spike-gate.ts`:
 
@@ -882,7 +882,7 @@ exit=0
 
 **Decision gate.** `exit=0`: continue with Step 12. Any `FAIL` on S1 to S5 or S7, or `DECISION: authjs-v5`, `exit=1`: do not continue with this task. Run Task M0.7-F, and write the failing item and the error text in `docs/partner-portal/AUTH-SPIKE.md` using the "Failed" text in Step 12.
 
-- [ ] **Step 12: Write the result file**
+- [x] **Step 12: Write the result file**
 
 Create `docs/partner-portal/AUTH-SPIKE.md` (pass case):
 
@@ -929,7 +929,7 @@ configuration only. Signing in with either needs a dev OAuth app, which an unatt
 
 Failed case (use instead only if the gate failed): the same file with `Decision: **Auth.js v5**`, `Status: FALLBACK TAKEN`, the failing item and its error text under "Result", and the Auth.js facts from the top of this plan under "What the spike found".
 
-- [ ] **Step 13: Record the decision in the master plan**
+- [x] **Step 13: Record the decision in the master plan**
 
 Edit `docs/superpowers/plans/2026-11-11-partner-portal-master-plan.md`. Find:
 
@@ -945,7 +945,7 @@ Task 0.7 is a one day spike with Auth.js v5 as the fallback. **Spike result: Bet
 
 (Failed case: `**Spike result: Auth.js v5, Better Auth failed item S<n>, see docs/partner-portal/AUTH-SPIKE.md.**`.)
 
-- [ ] **Step 14: Run Gate A**
+- [x] **Step 14: Run Gate A**
 
 ```bash
 pnpm --filter @cleanstart/portal lint
@@ -955,7 +955,7 @@ pnpm --filter @cleanstart/portal test
 
 Expected: all exit 0; `test` includes `src/server/auth/auth.spike.test.ts (7 tests)`. Then run the full Gate A block from the handoff (build, dash check, path check). The files in `git diff --name-only feat/portal-build` must be those in this task's Files block.
 
-- [ ] **Step 15: Gate B, commit, log**
+- [x] **Step 15: Gate B, commit, log**
 
 Gate B as in Conventions. Then:
 
@@ -1197,13 +1197,13 @@ Run Gate A. Commit with the paths changed in this task and `docs/partner-portal/
 - Modify: `apps/portal/src/server/auth/passwords.ts`
 - Test: `apps/portal/src/server/auth/passwords.test.ts`, `apps/portal/src/server/auth/tokens.test.ts`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M1.1a | started | W0 | - | - | password rule, tokens" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Write the tests (they fail first)**
+- [x] **Step 2: Write the tests (they fail first)**
 
 Create `apps/portal/src/server/auth/passwords.test.ts`. The 8 rule cases are the M1.1 table. The "same four tests as the mock field" case reads `components/ui/password-field.tsx` as text, because Vitest runs in Node and that file is a React component; it keeps the server rule and the mock field from drifting apart until M5.4 re-points the field at `checkPassword`.
 
@@ -1366,7 +1366,7 @@ describe('numeric codes', () => {
 });
 ```
 
-- [ ] **Step 3: Run them and see them fail**
+- [x] **Step 3: Run them and see them fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/auth/passwords.test.ts src/server/auth/tokens.test.ts
@@ -1374,7 +1374,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/auth/passwords.test.
 
 Expected: FAIL. `passwords.test.ts` with `Failed to resolve import "@/lib/password-rules"`, `tokens.test.ts` with `Failed to resolve import "./tokens"`.
 
-- [ ] **Step 4: Implement the rule and the tokens**
+- [x] **Step 4: Implement the rule and the tokens**
 
 Create `apps/portal/src/lib/password-rules.ts`:
 
@@ -1514,7 +1514,7 @@ export function verifyCode(input: { code: string; salt: string; expectedHash: st
 }
 ```
 
-- [ ] **Step 5: Run them and see them pass**
+- [x] **Step 5: Run them and see them pass**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/auth/passwords.test.ts src/server/auth/tokens.test.ts
@@ -1522,11 +1522,11 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/auth/passwords.test.
 
 Expected: `Test Files  2 passed (2)`, `Tests  23 passed (23)` (13 in `passwords.test.ts`, 10 in `tokens.test.ts`).
 
-- [ ] **Step 6: Run Gate A, then Gate B**
+- [x] **Step 6: Run Gate A, then Gate B**
 
 Run the three fast commands from Conventions, then the full Gate A block from the handoff. Expected: all exit 0; the dash grep prints nothing.
 
-- [ ] **Step 7: Commit and log**
+- [x] **Step 7: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build
@@ -1545,13 +1545,13 @@ printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M1.1a | done | W0 | $(git rev-par
 - Create: `apps/portal/src/server/auth/policies.ts`
 - Test: `apps/portal/src/server/auth/policies.test.ts`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M1.1b | started | W0 | - | - | policies and matrix test" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Write the matrix test**
+- [x] **Step 2: Write the matrix test**
 
 Create `apps/portal/src/server/auth/policies.test.ts`. Every `Action` has a row, every row has six cells in the order partner admin, partner sales, partner technical, staff partner manager, staff sales, staff marketing, and the six cell kinds (`-`, `Y`, `own`, `mine`, `region`, `self`) each get their own assertions.
 
@@ -1762,7 +1762,7 @@ describe('role keys', () => {
 });
 ```
 
-- [ ] **Step 3: Run it and see it fail**
+- [x] **Step 3: Run it and see it fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/auth/policies.test.ts
@@ -1770,7 +1770,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/auth/policies.test.t
 
 Expected: FAIL with `Failed to resolve import "./policies"`.
 
-- [ ] **Step 4: Create `policies.ts`**
+- [x] **Step 4: Create `policies.ts`**
 
 Create `apps/portal/src/server/auth/policies.ts` (the contracts' D.2, D.3 and D.4 merged, imports at the top, unchanged rules):
 
@@ -1985,7 +1985,7 @@ export function assertCan(viewer: Viewer, action: Action, subject?: PolicySubjec
 export const allowedActions = (viewer: Viewer): Action[] => ACTIONS.filter((a) => can(viewer, a));
 ```
 
-- [ ] **Step 5: Run it and see it pass**
+- [x] **Step 5: Run it and see it pass**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/auth/policies.test.ts
@@ -1993,11 +1993,11 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/auth/policies.test.t
 
 Expected: `Test Files  1 passed (1)`, `Tests  355 passed (355)`.
 
-- [ ] **Step 6: Run Gate A, then Gate B**
+- [x] **Step 6: Run Gate A, then Gate B**
 
 Run the three fast commands, then the full Gate A block. Expected: all exit 0.
 
-- [ ] **Step 7: Commit and log**
+- [x] **Step 7: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build
@@ -2016,13 +2016,13 @@ Better Auth only knows the user table and the passwords. This task adds the port
 - Modify: `apps/portal/src/server/auth/auth.ts` (replaced)
 - Test: `apps/portal/src/server/auth/auth.test.ts`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M1.1c | started | W0 | - | - | sign in gate, rate limits" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Write the tests**
+- [x] **Step 2: Write the tests**
 
 Create `apps/portal/src/server/auth/auth.test.ts`. It mocks `./auth-mail` (the module that Task M0.5d completes), so it never sends mail. The per IP test goes through `auth.handler` with a `Request`, because Better Auth's IP limiter only sees HTTP requests, not `auth.api` calls. The second step test also goes over HTTP, the way the browser client calls it.
 
@@ -2242,7 +2242,7 @@ describe('password reset', () => {
 });
 ```
 
-- [ ] **Step 3: Run it and see it fail**
+- [x] **Step 3: Run it and see it fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/auth/auth.test.ts
@@ -2250,7 +2250,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/auth/auth.test.ts
 
 Expected: FAIL, `Tests  10 failed | 1 passed (11)`. The one that passes is the second step over HTTP, which the Task M0.7 instance already handles. The 10 failures are the gate, the rate limits, the password rule, the last login time and the reset audit.
 
-- [ ] **Step 4: Replace `auth.ts` with the hardened version**
+- [x] **Step 4: Replace `auth.ts` with the hardened version**
 
 Replace `apps/portal/src/server/auth/auth.ts`. Compared with the Task M0.7 file it adds `hooks.before` (per email limits, the sign in gate, the password rule), `databaseHooks.session.create` (the last gate, and `last_login_at`), `rateLimit.customRules` (per IP), `onPasswordReset`, and a `sendResetPassword` that skips users who are not active. Two shortcuts are marked in the code: the per email limiter is in process (one container, reset on restart), and a determined attacker can still make one address unable to sign in for ten minutes by spamming it; the per IP rules are the main defence.
 
@@ -2482,7 +2482,7 @@ export const auth: Auth = new Proxy({} as Auth, {
 });
 ```
 
-- [ ] **Step 5: Run the tests and see them pass**
+- [x] **Step 5: Run the tests and see them pass**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/auth/auth.test.ts src/server/auth/auth.spike.test.ts
@@ -2490,11 +2490,11 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/auth/auth.test.ts sr
 
 Expected: `Test Files  2 passed (2)`, `Tests  18 passed (18)` (11 and 7).
 
-- [ ] **Step 6: Run Gate A, then Gate B**
+- [x] **Step 6: Run Gate A, then Gate B**
 
 Run the three fast commands, then the full Gate A block. Expected: all exit 0.
 
-- [ ] **Step 7: Commit and log**
+- [x] **Step 7: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build
@@ -2514,13 +2514,13 @@ printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M1.1c | done | W0 | $(git rev-par
 - Modify: `apps/portal/src/server/auth/viewer.ts` (replaced)
 - Test: `apps/portal/src/lib/next-path.test.ts`, `apps/portal/src/server/auth/sessions.test.ts`, `apps/portal/src/server/auth/viewer.test.ts`, `apps/portal/src/server/repo/account.test.ts`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M1.1d | started | W0 | - | - | sessions, guards, getShell" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Write the four test files**
+- [x] **Step 2: Write the four test files**
 
 Create `apps/portal/src/lib/next-path.test.ts`:
 
@@ -2905,7 +2905,7 @@ describe('getShell, staff viewer', () => {
 });
 ```
 
-- [ ] **Step 3: Run them and see them fail**
+- [x] **Step 3: Run them and see them fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/lib/next-path.test.ts src/server/auth/sessions.test.ts src/server/auth/viewer.test.ts src/server/repo/account.test.ts
@@ -2913,7 +2913,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/lib/next-path.test.ts src/s
 
 Expected: FAIL: `Failed to resolve import` for `./next-path`, `./sessions` and `./account`, and `viewer.test.ts` reports `Tests  14 failed | 1 passed (15)` with `TypeError: homeFor is not a function`, `requireCan is not a function` and `requireActionViewer is not a function`.
 
-- [ ] **Step 4: Create `next-path.ts`**
+- [x] **Step 4: Create `next-path.ts`**
 
 Create `apps/portal/src/lib/next-path.ts`:
 
@@ -2944,7 +2944,7 @@ export function safeNext(value: string | null | undefined): string | null {
 }
 ```
 
-- [ ] **Step 5: Create `sessions.ts`**
+- [x] **Step 5: Create `sessions.ts`**
 
 Create `apps/portal/src/server/auth/sessions.ts` (system database, as the contracts say; the user id is part of every match):
 
@@ -2997,7 +2997,7 @@ export async function revokeAllSessions(userId: string): Promise<void> {
 }
 ```
 
-- [ ] **Step 6: Replace `viewer.ts` with the version that has the guards**
+- [x] **Step 6: Replace `viewer.ts` with the version that has the guards**
 
 Replace `apps/portal/src/server/auth/viewer.ts`:
 
@@ -3103,7 +3103,7 @@ export async function requireActionViewer(): Promise<Viewer> {
 }
 ```
 
-- [ ] **Step 7: Create `repo/account.ts` with `getShell` and its isolation entry**
+- [x] **Step 7: Create `repo/account.ts` with `getShell` and its isolation entry**
 
 Create `apps/portal/src/server/repo/account.ts`. The isolation probe forges a viewer that claims company B; row level security hides company B's row from a transaction opened as company A, so `getShell` throws `NotFoundError`, which is the `not_found` outcome the central matrix expects. P adds its functions to `exportedFns` and to `isolation` in M1.7.
 
@@ -3203,7 +3203,7 @@ export const isolation = defineIsolation<keyof typeof exportedFns>({
 });
 ```
 
-- [ ] **Step 8: Run the four files and the central isolation test**
+- [x] **Step 8: Run the four files and the central isolation test**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/lib/next-path.test.ts src/server/auth/sessions.test.ts src/server/auth/viewer.test.ts src/server/repo/account.test.ts
@@ -3212,11 +3212,11 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/repo/isolation.test.
 
 Expected: the first prints `Test Files  4 passed (4)`, `Tests  44 passed (44)` (16, 5, 15 and 8). The second passes and now includes the `account` module: its two cases (`registers every exported function in isolation`, `leaks nothing across tenants`) both pass. If the `getShell` probe does not throw `NotFoundError` (row level security let company B's row through), the policy for `partners` in `src/db/rls.sql` is wrong: report it to the orchestrator as `blocked`, do not weaken the probe.
 
-- [ ] **Step 9: Run Gate A, then Gate B**
+- [x] **Step 9: Run Gate A, then Gate B**
 
 Run the three fast commands, then the full Gate A block. Expected: all exit 0.
 
-- [ ] **Step 10: Commit and log**
+- [x] **Step 10: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build
@@ -3235,13 +3235,13 @@ The proxy does two things. A signed out visit to `/partner` or `/admin` is redir
 - Modify: `apps/portal/src/proxy.ts` (replaced)
 - Test: `apps/portal/src/proxy.test.ts`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M1.1e | started | W0 | - | - | proxy session redirect" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Verify the two proxy facts**
+- [x] **Step 2: Verify the two proxy facts**
 
 Verify: the installed Next runs `proxy.ts` on the Node runtime and `getSessionCookie` accepts a `Request`.
 
@@ -3253,7 +3253,7 @@ grep -n "getSessionCookie: (request: Request | Headers" apps/portal/node_modules
 
 Expected: one line each. If the first is missing, check the Next release notes: the proxy may be edge only, in which case `better-auth/cookies` still works (it uses no Node API) but nothing in this file may import the database. If the second is missing, use `request.cookies.get('better-auth.session_token')` and the `__Secure-` variant.
 
-- [ ] **Step 3: Write the test**
+- [x] **Step 3: Write the test**
 
 Create `apps/portal/src/proxy.test.ts`. It builds real `NextRequest` objects and asserts the redirect target, the cookie names (plain and `__Secure-`), the public paths, that a client supplied path header is overwritten, and the review gate (off without the variable, 401 without or with a wrong password, open with the right one and still redirecting a signed out visit to `/partner`).
 
@@ -3342,7 +3342,7 @@ describe("review gate", () => {
 });
 ```
 
-- [ ] **Step 4: Run it and see it fail**
+- [x] **Step 4: Run it and see it fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/proxy.test.ts
@@ -3350,7 +3350,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/proxy.test.ts
 
 Expected: FAIL, `Tests  17 failed | 4 passed (21)`: `TypeError: (0 , isProtectedPath) is not a function` for the path cases, and `expected 200 to be 307` for the redirect cases (the mock proxy never redirects).
 
-- [ ] **Step 5: Replace `proxy.ts`**
+- [x] **Step 5: Replace `proxy.ts`**
 
 Replace `apps/portal/src/proxy.ts`:
 
@@ -3414,7 +3414,7 @@ export const config = {
 };
 ```
 
-- [ ] **Step 6: Run it and see it pass**
+- [x] **Step 6: Run it and see it pass**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/proxy.test.ts
@@ -3422,11 +3422,11 @@ pnpm --filter @cleanstart/portal exec vitest run src/proxy.test.ts
 
 Expected: `Test Files  1 passed (1)`, `Tests  22 passed (22)` (21 plus the `/api/health` case added at the integration review).
 
-- [ ] **Step 7: Run Gate A, then Gate B**
+- [x] **Step 7: Run Gate A, then Gate B**
 
 Run the three fast commands, then the full Gate A block. The build output lists `ƒ Proxy (Middleware)`. Expected: all exit 0.
 
-- [ ] **Step 8: Commit and log**
+- [x] **Step 8: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build
@@ -3448,13 +3448,13 @@ Invoke the `design-taste-frontend` skill before editing markup (repo rule for an
 - Create: `apps/portal/src/lib/initials.ts`
 - Test: `apps/portal/src/lib/routes.test.ts`, `apps/portal/src/lib/initials.test.ts`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M1.1f | started | W0 | - | - | routes, layouts, shell" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Write the two tests**
+- [x] **Step 2: Write the two tests**
 
 Create `apps/portal/src/lib/routes.test.ts` (the nav per role is the list in the contracts' section L):
 
@@ -3537,7 +3537,7 @@ describe("initialsOf", () => {
 });
 ```
 
-- [ ] **Step 3: Run them and see them fail**
+- [x] **Step 3: Run them and see them fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/lib/routes.test.ts src/lib/initials.test.ts
@@ -3545,7 +3545,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/lib/routes.test.ts src/lib/
 
 Expected: FAIL: `Tests  7 failed (7)` with `TypeError: (0 , navFor) is not a function` in `routes.test.ts`, and `Failed to resolve import "./initials"` in `initials.test.ts`.
 
-- [ ] **Step 4: Replace `routes.ts` and create `initials.ts`**
+- [x] **Step 4: Replace `routes.ts` and create `initials.ts`**
 
 Replace `apps/portal/src/lib/routes.ts`. It adds `resetPassword` to `ROUTES`, an `action` on every nav item (the same permission the page checks, so the sidebar and the page cannot disagree), and `navFor(viewer)`:
 
@@ -3633,7 +3633,7 @@ export function initialsOf(name: string): string {
 }
 ```
 
-- [ ] **Step 5: Run the tests and see them pass**
+- [x] **Step 5: Run the tests and see them pass**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/lib/routes.test.ts src/lib/initials.test.ts
@@ -3641,7 +3641,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/lib/routes.test.ts src/lib/
 
 Expected: `Test Files  2 passed (2)`, `Tests  13 passed (13)` (7 and 6).
 
-- [ ] **Step 6: Replace the layouts and index pages**
+- [x] **Step 6: Replace the layouts and index pages**
 
 Each layout calls `requireKind` (a partner opening `/admin` lands on their own home, signed out goes to sign in with a return path), loads `getShell` inside `withViewer`, and passes the nav for that viewer. Typecheck stays red until Step 7 (the layouts pass props `Shell` does not accept yet).
 
@@ -3720,7 +3720,7 @@ export default async function Home(): Promise<never> {
 }
 ```
 
-- [ ] **Step 7: Apply the shell edits**
+- [x] **Step 7: Apply the shell edits**
 
 Apply these edits to `apps/portal/src/components/shell/shell.tsx` in order, S1 to S8. Every Find text must match exactly once (S8 matches 20 times and is replaced everywhere, and must be applied last).
 
@@ -3905,7 +3905,7 @@ Replace with:
 me.
 ```
 
-- [ ] **Step 8: Typecheck and run the whole suite**
+- [x] **Step 8: Typecheck and run the whole suite**
 
 ```bash
 pnpm --filter @cleanstart/portal typecheck
@@ -3914,7 +3914,7 @@ pnpm --filter @cleanstart/portal test
 
 Expected: typecheck prints nothing and exits 0. `test` passes. `grep -rn "persona" apps/portal/src/components/shell/shell.tsx` prints nothing.
 
-- [ ] **Step 9: Look at it**
+- [x] **Step 9: Look at it**
 
 Per the Dev Server Policy in `CLAUDE.md`: check what is listening first, reuse a server that belongs to this worktree, never kill a process to free a port.
 
@@ -3926,11 +3926,11 @@ pnpm --filter @cleanstart/portal exec next dev --port 3204
 
 Sign in is converted in the next task, so for this check create a session without the UI: with the dev server running, sign in over HTTP with a seeded user (`aditi.rao@kestrelsystems.in`, the password is `DEV_SEED_PASSWORD` in `src/db/fixtures.ts`) and copy the `better-auth.session_token` cookie into the Browser pane, or wait and do this check at the end of Task M1.1g. Locked to 1440 by 900, open `/partner/overview` as Aditi (sidebar shows Kestrel Systems, "Channel partner, India", "Partner admin"), then as `farhan.qureshi@cleanstart.com` open `/admin/approvals` (sidebar shows the waiting count, "Partner manager, India"), and `/partner/overview` as Farhan, which must land on `/admin/approvals`. If no browser is available (overnight run), write `not visually checked` in the `done` line.
 
-- [ ] **Step 10: Run Gate A, then Gate B**
+- [x] **Step 10: Run Gate A, then Gate B**
 
 Run the three fast commands, then the full Gate A block. Expected: all exit 0; the build route table shows every `/partner/*` and `/admin/*` route as `ƒ` (dynamic).
 
-- [ ] **Step 11: Commit and log**
+- [x] **Step 11: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build
@@ -3952,13 +3952,13 @@ Invoke the `design-taste-frontend` skill before editing markup. This task change
 **Files:**
 - Modify: `apps/portal/src/components/screens/SignIn.tsx`, `apps/portal/src/app/(public)/sign-in/page.tsx`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M1.1g | started | W0 | - | - | SignIn conversion" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Replace the sign in page**
+- [x] **Step 2: Replace the sign in page**
 
 The page is a Server Component: a signed in viewer is redirected home, and the client screen learns which social providers are configured (from the same env builder `auth.ts` uses, so the buttons and the routes cannot disagree). Replace `apps/portal/src/app/(public)/sign-in/page.tsx`:
 
@@ -3980,7 +3980,7 @@ export default async function Page(): Promise<React.JSX.Element> {
 }
 ```
 
-- [ ] **Step 3: Apply the screen edits**
+- [x] **Step 3: Apply the screen edits**
 
 Apply these edits to `apps/portal/src/components/screens/SignIn.tsx` in order G1 to G13. Each Find text must match exactly once.
 
@@ -4419,7 +4419,7 @@ Replace with:
             </button>
 ```
 
-- [ ] **Step 4: Typecheck**
+- [x] **Step 4: Typecheck**
 
 ```bash
 pnpm --filter @cleanstart/portal typecheck
@@ -4428,7 +4428,7 @@ pnpm --filter @cleanstart/portal lint
 
 Expected: both exit 0. (`useRouter` is gone, `emailDomain`, `findPartnerByDomain`, `isFreeEmail`, `isValidEmail` and `partnersSlice` are still used by the request access views.)
 
-- [ ] **Step 5: Run the whole suite**
+- [x] **Step 5: Run the whole suite**
 
 ```bash
 pnpm --filter @cleanstart/portal test
@@ -4436,7 +4436,7 @@ pnpm --filter @cleanstart/portal test
 
 Expected: all test files pass.
 
-- [ ] **Step 6: Check it by hand**
+- [x] **Step 6: Check it by hand**
 
 Start or reuse the dev server (`lsof -nP -iTCP:3204 -sTCP:LISTEN` first; never kill a process for a port), seed (`pnpm --filter @cleanstart/portal db:seed`), and in the Browser pane at 1440 by 900 open `http://localhost:3204/sign-in`. The password for every seeded login is `DEV_SEED_PASSWORD` in `src/db/fixtures.ts`.
 
@@ -4450,11 +4450,11 @@ Start or reuse the dev server (`lsof -nP -iTCP:3204 -sTCP:LISTEN` first; never k
 
 The two step view needs a user with the second step on; the screen to turn it on is built by the P track in M1.7, so that view is first exercised end to end by the W2-b E2E. Its server calls are pinned by the HTTP second step test (Task M1.1c). If no browser is available, write `not visually checked` in the `done` line.
 
-- [ ] **Step 7: Run Gate A, then Gate B**
+- [x] **Step 7: Run Gate A, then Gate B**
 
 Run the three fast commands, then the full Gate A block. Expected: all exit 0. Gate B must confirm that the edits kept every class name and every piece of copy that was not an error line, the demo note and the demo values.
 
-- [ ] **Step 8: Commit and log**
+- [x] **Step 8: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build
@@ -4473,13 +4473,13 @@ The portal builds its own emails in code and sends `subject` plus `htmlContent` 
 - Create: `apps/portal/src/server/email/{transport,brevo,send,fake,layout}.ts`, `apps/portal/src/server/urls.ts`
 - Test: `apps/portal/src/server/email/{layout,brevo,transport,send,fake}.test.ts`, `apps/portal/src/server/urls.test.ts`, and the snapshot `apps/portal/src/server/email/__snapshots__/layout.test.ts.snap`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M0.5a | started | W0 | - | - | email layout and transport" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Verify the Brevo request shape against the CMS, which already sends in production**
+- [x] **Step 2: Verify the Brevo request shape against the CMS, which already sends in production**
 
 Verify: endpoint, header names, body fields and the success response.
 
@@ -4490,7 +4490,7 @@ grep -n "v3/smtp/email\|'api-key'\|sender\|replyTo\|htmlContent\|messageId" apps
 
 Expected: the endpoint `https://api.brevo.com/v3/smtp/email`, the `api-key` header, a `sender` object with `email` and `name`, `to`, `replyTo`, `subject`, `htmlContent`, and a `messageId` read from the JSON response. If anything differs, fix `brevo.ts` in Step 5 to match the CMS file (read only, never edit it).
 
-- [ ] **Step 3: Write the tests (they fail first)**
+- [x] **Step 3: Write the tests (they fail first)**
 
 Create `apps/portal/src/server/email/layout.test.ts`. The snapshot test writes `__snapshots__/layout.test.ts.snap` on first run; commit it. The other cases pin the structure that the snapshot would also catch, so a failure says what broke.
 
@@ -4862,7 +4862,7 @@ describe('urls', () => {
 });
 ```
 
-- [ ] **Step 4: Run them and see them fail**
+- [x] **Step 4: Run them and see them fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/email src/server/urls.test.ts
@@ -4870,7 +4870,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/email src/server/url
 
 Expected: FAIL: `Failed to resolve import` for `./layout`, `./brevo`, `./transport`, `./send`, `./fake` and `./urls`.
 
-- [ ] **Step 5: Implement the module**
+- [x] **Step 5: Implement the module**
 
 Create `apps/portal/src/server/email/transport.ts`:
 
@@ -5267,7 +5267,7 @@ export function resetPasswordUrl(token: string): string {
 }
 ```
 
-- [ ] **Step 6: Run them and see them pass**
+- [x] **Step 6: Run them and see them pass**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/email src/server/urls.test.ts
@@ -5275,11 +5275,11 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/email src/server/url
 
 Expected: `Test Files  6 passed (6)`, `Tests  32 passed (32)` (layout 11, brevo 7, transport 5, send 3, fake 3, urls 3), and `Snapshots  1 written`. Run the same command again: `Snapshots  1 passed`.
 
-- [ ] **Step 7: Run Gate A, then Gate B**
+- [x] **Step 7: Run Gate A, then Gate B**
 
 Run the three fast commands, then the full Gate A block. Expected: all exit 0.
 
-- [ ] **Step 8: Commit and log**
+- [x] **Step 8: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build
@@ -5298,13 +5298,13 @@ Ten of the 21 builders. Each is pure and returns an `EmailMessage`. The test har
 - Create: `apps/portal/src/server/email/templates/shared.ts`, `application-received.ts`, `application-staff-alert.ts`, `application-approved.ts`, `application-declined.ts`, `team-invite.ts`, `access-request.ts`, `access-request-declined.ts`, `team-change-notice.ts`, `password-changed.ts`, `password-reset.ts`, `index.ts` (all under `apps/portal/src/server/email/templates/`)
 - Test: `apps/portal/src/server/email/templates/test-harness.ts`, `apps/portal/src/server/email/templates/onboarding.test.ts`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M0.5b | started | W0 | - | - | onboarding templates" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Write the harness and the tests (they fail first)**
+- [x] **Step 2: Write the harness and the tests (they fail first)**
 
 Create `apps/portal/src/server/email/templates/test-harness.ts`:
 
@@ -5586,7 +5586,7 @@ const CASES: TemplateCase[] = [
 describeTemplates(CASES);
 ```
 
-- [ ] **Step 3: Run it and see it fail**
+- [x] **Step 3: Run it and see it fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/email/templates/onboarding.test.ts
@@ -5594,7 +5594,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/email/templates/onbo
 
 Expected: FAIL with `Failed to resolve import "./index"`.
 
-- [ ] **Step 4: Implement the shared helpers and the ten builders**
+- [x] **Step 4: Implement the shared helpers and the ten builders**
 
 Create `apps/portal/src/server/email/templates/shared.ts` (subject and heading text is collapsed to one line, an empty optional field reads "Not given", and the footnotes are the only boilerplate):
 
@@ -6075,7 +6075,7 @@ export * from './team-change-notice';
 export * from './team-invite';
 ```
 
-- [ ] **Step 5: Run it and see it pass**
+- [x] **Step 5: Run it and see it pass**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/email/templates/onboarding.test.ts
@@ -6083,11 +6083,11 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/email/templates/onbo
 
 Expected: `Test Files  1 passed (1)`, `Tests  60 passed (60)` (12 cases, 5 checks each).
 
-- [ ] **Step 6: Run Gate A, then Gate B**
+- [x] **Step 6: Run Gate A, then Gate B**
 
 Run the three fast commands, then the full Gate A block. Expected: all exit 0. Gate B reads the copy once more for filler words and exclamation marks.
 
-- [ ] **Step 7: Commit and log**
+- [x] **Step 7: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build
@@ -6107,13 +6107,13 @@ The other eleven builders, and the full `index.ts`. Same harness as Task M0.5b.
 - Modify: `apps/portal/src/server/email/templates/index.ts` (replaced)
 - Test: `apps/portal/src/server/email/templates/deals.test.ts`, `apps/portal/src/server/email/templates/index.test.ts`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M0.5c | started | W0 | - | - | deal templates" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Write the tests (they fail first)**
+- [x] **Step 2: Write the tests (they fail first)**
 
 Create `apps/portal/src/server/email/templates/deals.test.ts` (13 cases for 11 builders: the staff alert and the extension decision each have two variants):
 
@@ -6389,7 +6389,7 @@ describe('template index', () => {
 });
 ```
 
-- [ ] **Step 3: Run them and see them fail**
+- [x] **Step 3: Run them and see them fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/email/templates/deals.test.ts src/server/email/templates/index.test.ts
@@ -6397,7 +6397,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/email/templates/deal
 
 Expected: FAIL: the deal builders are not exported by `./index` (`TypeError: (0 , buildDealAccepted) is not a function`), and `index.test.ts` reports 10 of the 21 names.
 
-- [ ] **Step 4: Implement the eleven builders and the full index**
+- [x] **Step 4: Implement the eleven builders and the full index**
 
 Create `apps/portal/src/server/email/templates/deal-accepted.ts`:
 
@@ -6901,7 +6901,7 @@ export * from './password-changed';
 export * from './password-reset';
 ```
 
-- [ ] **Step 5: Run the whole email folder and see it pass**
+- [x] **Step 5: Run the whole email folder and see it pass**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/email
@@ -6909,11 +6909,11 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/email
 
 Expected: `Test Files  8 passed (8)`, `Tests  155 passed (155)` (29 from Task M0.5a, then 60 in `onboarding.test.ts`, 65 in `deals.test.ts` and 1 in `index.test.ts`).
 
-- [ ] **Step 6: Run Gate A, then Gate B**
+- [x] **Step 6: Run Gate A, then Gate B**
 
 Run the three fast commands, then the full Gate A block. Expected: all exit 0.
 
-- [ ] **Step 7: Commit and log**
+- [x] **Step 7: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build
@@ -6932,13 +6932,13 @@ Task M0.7 left `auth-mail.ts` as a bridge that only logs. This replaces both bod
 - Modify: `apps/portal/src/server/auth/auth-mail.ts` (replaced)
 - Test: `apps/portal/src/server/auth/auth-mail.test.ts`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M0.5d | started | W0 | - | - | wire auth mail" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Write the test (it fails first)**
+- [x] **Step 2: Write the test (it fails first)**
 
 Create `apps/portal/src/server/auth/auth-mail.test.ts`:
 
@@ -6982,7 +6982,7 @@ describe('sendPasswordChangedEmail', () => {
 });
 ```
 
-- [ ] **Step 3: Run it and see it fail**
+- [x] **Step 3: Run it and see it fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/auth/auth-mail.test.ts
@@ -6990,7 +6990,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/auth/auth-mail.test.
 
 Expected: FAIL, `Tests  3 failed (3)`: `expected exactly one email to aditi@kestrel.example, found 0` (the bridge sends nothing).
 
-- [ ] **Step 4: Replace the bridge**
+- [x] **Step 4: Replace the bridge**
 
 Replace `apps/portal/src/server/auth/auth-mail.ts`:
 
@@ -7033,7 +7033,7 @@ export async function sendPasswordChangedEmail(input: PasswordChangedMail, trans
 }
 ```
 
-- [ ] **Step 5: Run it and the auth tests**
+- [x] **Step 5: Run it and the auth tests**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/auth
@@ -7041,11 +7041,11 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/auth
 
 Expected: every file under `src/server/auth` passes. `auth-mail.test.ts` reports `Tests  3 passed (3)`. The other auth tests still mock `./auth-mail`, so they never send.
 
-- [ ] **Step 6: Run Gate A, then Gate B**
+- [x] **Step 6: Run Gate A, then Gate B**
 
 Run the three fast commands, then the full Gate A block. Expected: all exit 0. This is also the end of Wave 0 for this plan: confirm `pnpm --filter @cleanstart/portal exec tsx scripts/auth-spike-gate.ts` still prints the seven `pass` lines.
 
-- [ ] **Step 7: Commit and log**
+- [x] **Step 7: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build

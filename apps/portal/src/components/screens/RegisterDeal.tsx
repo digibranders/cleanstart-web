@@ -1,32 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import {
-  type Deal,
-  type ManagerName,
-  PRODUCTS,
-  type ProductName,
-  type Region,
-  registerDeals,
-  useDeals,
-} from "@/data/deals";
+import { useEffect, useMemo, useState } from "react";
+import { DEAL_REGIONS, type DealRegion, PARTNER_REGION_LABEL, PRODUCT_LABEL, PRODUCTS, type Product } from "@/lib/domain";
+import type { CustomerSuggestionDto, ManagerOptionDto, RegistrationListItem } from "@/lib/dto";
 import { ROUTES } from "@/lib/routes";
+import { lookupCustomerAction, registerDealsAction } from "@/server/actions/registrations";
+import { issuesToErrors } from "@/server/actions/result";
 import { fmtLong, fmtShort } from "../deals/dates";
-import { protectionView, reviewSince, sameCustomer } from "../deals/derive";
+import { managerFor, protectionView, reviewSince, sameCustomer } from "../deals/derive";
 import { ProductMark, StatusBadge } from "../deals/parts";
+import type { CustomerLookupResult } from "../deals/types";
 import { Icon } from "../icon";
-import { KESTREL } from "../shell/personas";
 import { Dropdown } from "../ui/dropdown";
 import { useToast } from "../ui/toast";
 
-const PRODUCT_DESC: Record<ProductName, string> = {
-  "CleanStart Images": "Zero-CVE hardened images",
-  "Clean Libraries": "Verified dependencies",
-  CleanSight: "Vulnerability detection",
+const PRODUCT_DESC: Record<Product, string> = {
+  images: "Zero-CVE hardened images",
+  libraries: "Verified dependencies",
+  cleansight: "Vulnerability detection",
 };
-const REGIONS: readonly Region[] = ["India", "Middle East"];
-const MANAGERS: readonly ManagerName[] = ["Farhan Qureshi", "Omar Nasser"];
 
 interface FormState {
   customer: string;
@@ -34,25 +27,12 @@ interface FormState {
   contactName: string;
   contactEmail: string;
   contactPhone: string;
-  picked: ProductName[];
-  region: Region;
-  manager: ManagerName;
+  picked: Product[];
+  region: DealRegion;
+  managerId: string;
   close: string;
   details: string;
 }
-
-const PREFILLED: FormState = {
-  customer: "Vardhan Capital",
-  site: "vardhancapital.in",
-  contactName: "Rohan Mehta",
-  contactEmail: "rohan.mehta@vardhancapital.in",
-  contactPhone: "+91 98204 31786",
-  picked: ["CleanSight"],
-  region: "India",
-  manager: "Farhan Qureshi",
-  close: "March 2027",
-  details: "Security team wants vulnerability detection across the payments cluster ahead of the Q1 audit.",
-};
 
 const BLANK: FormState = {
   customer: "",
@@ -61,85 +41,158 @@ const BLANK: FormState = {
   contactEmail: "",
   contactPhone: "",
   picked: [],
-  region: "India",
-  manager: "Farhan Qureshi",
+  region: "india",
+  managerId: "",
   close: "",
   details: "",
 };
 
+const EMPTY_OWN: CustomerSuggestionDto[] = [];
+
+/** The same rule the server applies to a contact email. */
+const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
 interface Submitted {
   customer: string;
-  products: ProductName[];
+  products: Product[];
 }
 
-function dealMeta(deal: Deal): string {
-  if (deal.status === "Accepted" && deal.protectionEnd) return `Protected until ${fmtLong(deal.protectionEnd)}`;
-  if (deal.status === "Pending") return `Sent ${fmtShort(reviewSince(deal))}`;
-  return protectionView(deal, "overview").until;
+function dealMeta(deal: RegistrationListItem, today: string): string {
+  if (deal.status === "accepted" && deal.protectionEnd) return `Protected until ${fmtLong(deal.protectionEnd)}`;
+  if (deal.status === "pending") return `Sent ${fmtShort(reviewSince(deal))}`;
+  return protectionView(deal, "overview", today).until;
 }
 
-export function RegisterDeal(): React.JSX.Element {
+interface RegisterDealProps {
+  mine: RegistrationListItem[];
+  managers: ManagerOptionDto[];
+  partnerName: string;
+  today: string;
+}
+
+export function RegisterDeal({ mine, managers, partnerName, today }: RegisterDealProps): React.JSX.Element {
   const toast = useToast();
-  const all = useDeals();
-  const mine = useMemo(() => all.filter((d) => d.partner === KESTREL.org), [all]);
-  const [form, setForm] = useState<FormState>(PREFILLED);
+  const [form, setForm] = useState<FormState>({ ...BLANK, managerId: managerFor(managers, "india") });
   const [tried, setTried] = useState(false);
+  const [emailLeft, setEmailLeft] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formError, setFormError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState<Submitted | null>(null);
+  const [remote, setRemote] = useState<{ q: string; data: CustomerLookupResult } | null>(null);
 
   const patch = (change: Partial<FormState>): void => setForm((prev) => ({ ...prev, ...change }));
   const customer = form.customer.trim();
   const needle = customer.toLowerCase();
 
+  const remoteOwn = remote?.q === customer ? remote.data.own : EMPTY_OWN;
   const known = useMemo(() => {
-    const byName = new Map<string, { name: string; site: string; deals: Deal[] }>();
+    const byName = new Map<string, { name: string; site: string; count: number }>();
     for (const d of mine) {
       const key = d.customer.toLowerCase();
-      const entry = byName.get(key) ?? { name: d.customer, site: "", deals: [] };
+      const entry = byName.get(key) ?? { name: d.customer, site: "", count: 0 };
       entry.site = entry.site || d.website || "";
-      entry.deals.push(d);
+      entry.count += 1;
       byName.set(key, entry);
     }
+    for (const s of remoteOwn) {
+      const key = s.name.toLowerCase();
+      if (!byName.has(key)) byName.set(key, { name: s.name, site: s.website ?? "", count: s.registrations.length });
+    }
     return [...byName.values()];
-  }, [mine]);
+  }, [mine, remoteOwn]);
 
   const exact = known.find((c) => c.name.toLowerCase() === needle);
-  const exactDeals = exact ? [...exact.deals].sort((a, b) => a.registered.localeCompare(b.registered)) : [];
+  const exactDeals = mine
+    .filter((d) => sameCustomer(d.customer, customer))
+    .sort((a, b) => a.registeredOn.localeCompare(b.registeredOn));
   const suggestions =
     needle.length >= 2 && !exact
       ? known.filter((c) => `${c.name} ${c.site}`.toLowerCase().includes(needle)).slice(0, 5)
       : [];
 
   const held = form.picked.flatMap((product) => {
-    const deal = mine.find((d) => sameCustomer(d.customer, customer) && d.product === product && d.status === "Accepted");
-    return deal?.protectionEnd ? [{ deal, end: deal.protectionEnd }] : [];
+    const deal = mine.find(
+      (d) => sameCustomer(d.customer, customer) && d.product === product && (d.status === "accepted" || d.status === "pending"),
+    );
+    return deal ? [{ deal }] : [];
   });
 
+  const crmSuggestions =
+    remote?.q === customer && !exact
+      ? remote.data.crm.filter((c) => !known.some((k) => k.name.toLowerCase() === c.name.toLowerCase())).slice(0, 5)
+      : [];
+
+  useEffect(() => {
+    if (customer.length < 3) {
+      setRemote(null);
+      return;
+    }
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      lookupCustomerAction({ q: customer })
+        .then((result) => {
+          if (!cancelled && result.ok) setRemote({ q: customer, data: result.data });
+        })
+        .catch(() => {
+          if (!cancelled) setRemote(null);
+        });
+    }, 300);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [customer]);
+
+  const hasSuggestions = suggestions.length > 0 || crmSuggestions.length > 0;
   const customerErr = tried && !customer;
   const productErr = tried && form.picked.length === 0;
+  // The server stores a contact only with a name, so an email or phone alone would be dropped without a word.
+  const contactEmail = form.contactEmail.trim();
+  const contactNameErr =
+    tried && !form.contactName.trim() && (contactEmail !== "" || form.contactPhone.trim() !== "");
+  const contactEmailBad = contactEmail !== "" && !EMAIL.test(contactEmail);
+  const contactEmailErr = (emailLeft || tried) && contactEmailBad ? "Enter a valid email." : errors["contact.email"];
+  const lookupDone = remote?.q === customer;
 
-  const togglePicked = (product: ProductName): void =>
+  const togglePicked = (product: Product): void =>
     patch({ picked: form.picked.includes(product) ? form.picked.filter((p) => p !== product) : [...form.picked, product] });
 
-  const submit = (event: React.FormEvent): void => {
+  const submit = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
-    if (!customer || form.picked.length === 0) {
+    const contactBlocked = !form.contactName.trim() && (contactEmail !== "" || form.contactPhone.trim() !== "");
+    if (!customer || form.picked.length === 0 || contactBlocked || contactEmailBad) {
       setTried(true);
       return;
     }
-    const created = registerDeals({
+    if (held.length > 0) {
+      setFormError("Take the products you already registered for this customer out of your picks to continue.");
+      return;
+    }
+    setBusy(true);
+    const result = await registerDealsAction({
       customer,
       website: form.site,
       products: form.picked,
       region: form.region,
-      manager: form.manager,
-      contactName: form.contactName,
-      contactEmail: form.contactEmail,
-      contactPhone: form.contactPhone,
+      managerId: form.managerId || null,
+      contact: form.contactName.trim()
+        ? { name: form.contactName, role: null, email: form.contactEmail, phone: form.contactPhone }
+        : null,
+      expectedClose: form.close,
       notes: form.details,
     });
-    setSubmitted({ customer, products: created.map((d) => d.product) });
+    setBusy(false);
+    if (!result.ok) {
+      setErrors(issuesToErrors(result.error));
+      setFormError(result.error.issues?.length ? null : result.error.message);
+      return;
+    }
+    setErrors({});
+    setFormError(null);
+    setSubmitted({ customer, products: result.data.map((d) => d.product) });
     setTried(false);
-    toast(created.length > 1 ? `${created.length} registrations sent for approval` : "Submitted for approval");
+    toast(result.data.length > 1 ? `${result.data.length} registrations sent for approval` : "Submitted for approval");
   };
 
   return (
@@ -169,7 +222,7 @@ export function RegisterDeal(): React.JSX.Element {
                     : "Submitted for approval"}
                 </h2>
                 <p style={{ margin: 0, fontSize: 13, color: "#5E5B6E" }}>
-                  {submitted.customer}: {submitted.products.join(", ")}.{" "}
+                  {submitted.customer}: {submitted.products.map((p) => PRODUCT_LABEL[p]).join(", ")}.{" "}
                   {submitted.products.length > 1 ? "Each one is" : "It is"} pending until CleanStart reviews it. You get
                   an email for every decision.
                 </p>
@@ -200,7 +253,7 @@ export function RegisterDeal(): React.JSX.Element {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   <div className="grid2">
-                    <div className="fg" style={{ position: "relative" }} data-tour="reg-customer">
+                    <div className="fg" style={{ position: "relative" }}>
                       <label htmlFor="customer" className="lbl">
                         Company name
                       </label>
@@ -208,7 +261,7 @@ export function RegisterDeal(): React.JSX.Element {
                         id="customer"
                         autoComplete="off"
                         aria-autocomplete="list"
-                        aria-controls="cust-sugg"
+                        aria-controls={hasSuggestions ? "cust-sugg" : undefined}
                         className={`field${customerErr ? " field-err" : ""}`}
                         type="text"
                         value={form.customer}
@@ -222,9 +275,10 @@ export function RegisterDeal(): React.JSX.Element {
                           Enter the customer's company name.
                         </span>
                       ) : null}
-                      {suggestions.length > 0 ? (
+                      {hasSuggestions ? (
+                        // biome-ignore lint/a11y/useFocusableInteractive: the options are buttons and focusable; the list itself is not a tab stop
                         <div className="sugg" id="cust-sugg" role="listbox" aria-label="Your existing customers">
-                          <div className="sugg-h">Your customers</div>
+                          {suggestions.length > 0 ? <div className="sugg-h">Your customers</div> : null}
                           {suggestions.map((c) => (
                             <button
                               type="button"
@@ -238,8 +292,25 @@ export function RegisterDeal(): React.JSX.Element {
                               <span className="li-t">
                                 <span className="li-n">{c.name}</span>
                                 <span className="li-s">
-                                  {c.site}, {c.deals.length} {c.deals.length === 1 ? "deal" : "deals"} with you
+                                  {c.site}, {c.count} {c.count === 1 ? "deal" : "deals"} with you
                                 </span>
+                              </span>
+                            </button>
+                          ))}
+                          {crmSuggestions.length > 0 ? <div className="sugg-h">Known to CleanStart</div> : null}
+                          {crmSuggestions.map((c) => (
+                            <button
+                              type="button"
+                              role="option"
+                              aria-selected={false}
+                              className="dd-opt"
+                              key={c.name}
+                              onClick={() => patch({ customer: c.name, site: c.website ?? "" })}
+                              style={{ height: "auto", padding: "6px 8px" }}
+                            >
+                              <span className="li-t">
+                                <span className="li-n">{c.name}</span>
+                                <span className="li-s">{c.website ?? "No website on record"}</span>
                               </span>
                             </button>
                           ))}
@@ -252,41 +323,63 @@ export function RegisterDeal(): React.JSX.Element {
                       </label>
                       <input
                         id="site"
-                        className="field"
+                        className={`field${errors.website ? " field-err" : ""}`}
                         type="text"
                         value={form.site}
                         onChange={(e) => patch({ site: e.target.value })}
+                        aria-invalid={errors.website ? true : undefined}
+                        aria-describedby={errors.website ? "site-err" : undefined}
                       />
+                      {errors.website ? (
+                        <span className="err" id="site-err">
+                          {errors.website}
+                        </span>
+                      ) : null}
                     </div>
                   </div>
                   <div className="grid3">
                     <div className="fg">
                       <label htmlFor="contact" className="lbl">
-                        Contact name
+                        Contact name <span className="hint">(optional)</span>
                       </label>
                       <input
                         id="contact"
-                        className="field"
+                        className={`field${contactNameErr ? " field-err" : ""}`}
                         type="text"
                         value={form.contactName}
                         onChange={(e) => patch({ contactName: e.target.value })}
+                        aria-invalid={contactNameErr || undefined}
+                        aria-describedby={contactNameErr ? "contact-err" : undefined}
                       />
+                      {contactNameErr ? (
+                        <span className="err" id="contact-err">
+                          Add the contact's name or clear these fields.
+                        </span>
+                      ) : null}
                     </div>
                     <div className="fg">
                       <label htmlFor="cemail" className="lbl">
-                        Contact email
+                        Contact email <span className="hint">(optional)</span>
                       </label>
                       <input
                         id="cemail"
-                        className="field"
+                        className={`field${contactEmailErr ? " field-err" : ""}`}
                         type="email"
                         value={form.contactEmail}
                         onChange={(e) => patch({ contactEmail: e.target.value })}
+                        onBlur={() => setEmailLeft(true)}
+                        aria-invalid={contactEmailErr ? true : undefined}
+                        aria-describedby={contactEmailErr ? "cemail-err" : undefined}
                       />
+                      {contactEmailErr ? (
+                        <span className="err" id="cemail-err">
+                          {contactEmailErr}
+                        </span>
+                      ) : null}
                     </div>
                     <div className="fg">
                       <label htmlFor="cphone" className="lbl">
-                        Contact phone
+                        Contact phone <span className="hint">(optional)</span>
                       </label>
                       <input
                         id="cphone"
@@ -311,7 +404,7 @@ export function RegisterDeal(): React.JSX.Element {
                     <span id="plabel" className="lbl">
                       Products <span className="hint">(pick one or more; each becomes its own registration)</span>
                     </span>
-                    <div role="group" aria-labelledby="plabel" className="grid3" data-tour="reg-products">
+                    <div role="group" aria-labelledby="plabel" className="grid3">
                       {PRODUCTS.map((product) => {
                         const on = form.picked.includes(product);
                         return (
@@ -324,7 +417,7 @@ export function RegisterDeal(): React.JSX.Element {
                           >
                             <ProductMark product={product} large />
                             <span style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
-                              <span style={{ fontSize: 13, fontWeight: 700 }}>{product}</span>
+                              <span style={{ fontSize: 13, fontWeight: 700 }}>{PRODUCT_LABEL[product]}</span>
                               <span style={{ fontSize: 11.5, color: "#6B687D" }}>{PRODUCT_DESC[product]}</span>
                             </span>
                             <span className="chk">
@@ -340,12 +433,15 @@ export function RegisterDeal(): React.JSX.Element {
                       </span>
                     ) : null}
                   </div>
-                  {held.map(({ deal, end }) => (
+                  {held.map(({ deal }) => (
                     <div className="note note-amber" role="status" key={deal.id}>
                       <Icon name="warn" />
                       <span>
-                        <b>Already registered.</b> Your company holds an accepted {deal.product} deal at {deal.customer},
-                        protected until {fmtLong(end)}. You can still submit; CleanStart will see both.
+                        <b>Already registered.</b>{" "}
+                        {deal.status === "accepted" && deal.protectionEnd
+                          ? `Your company holds an accepted ${PRODUCT_LABEL[deal.product]} deal at ${deal.customer}, protected until ${fmtLong(deal.protectionEnd)}.`
+                          : `Your company already has ${PRODUCT_LABEL[deal.product]} at ${deal.customer} waiting for review.`}{" "}
+                        Take it out of your picks to continue.
                       </span>
                     </div>
                   ))}
@@ -355,29 +451,29 @@ export function RegisterDeal(): React.JSX.Element {
                         Region
                       </span>
                       <div className="seg" role="group" aria-labelledby="rlabel" style={{ alignSelf: "flex-start" }}>
-                        {REGIONS.map((region) => (
+                        {DEAL_REGIONS.map((region) => (
                           <button
                             type="button"
                             key={region}
                             className={`seg-b${form.region === region ? " seg-on" : ""}`}
                             aria-pressed={form.region === region}
-                            onClick={() => patch({ region })}
+                            onClick={() => patch({ region, managerId: managerFor(managers, region) })}
                           >
-                            {region}
+                            {PARTNER_REGION_LABEL[region]}
                           </button>
                         ))}
                       </div>
                     </div>
                     <div className="fg">
                       <label htmlFor="am" className="lbl">
-                        Account manager
+                        Partner manager
                       </label>
                       <Dropdown
                         id="am"
                         variant="field"
-                        value={form.manager}
-                        options={MANAGERS}
-                        onChange={(manager) => patch({ manager: manager as ManagerName })}
+                        value={form.managerId}
+                        options={managers.map((m) => ({ value: m.id, label: m.name }))}
+                        onChange={(managerId) => patch({ managerId })}
                       />
                     </div>
                     <div className="fg">
@@ -413,6 +509,12 @@ export function RegisterDeal(): React.JSX.Element {
                   onChange={(e) => patch({ details: e.target.value })}
                 />
               </fieldset>
+              {formError ? (
+                <div className="note note-amber" role="alert" style={{ margin: "0 14px 10px" }}>
+                  <Icon name="warn" />
+                  <span>{formError}</span>
+                </div>
+              ) : null}
               <div
                 style={{
                   display: "flex",
@@ -432,7 +534,7 @@ export function RegisterDeal(): React.JSX.Element {
                   <Link href={ROUTES.partner.deals} className="btn btn-s">
                     Cancel
                   </Link>
-                  <button type="submit" className="btn btn-p" data-tour="reg-submit">
+                  <button type="submit" className="btn btn-p" disabled={busy}>
                     Submit for approval
                   </button>
                 </span>
@@ -448,29 +550,34 @@ export function RegisterDeal(): React.JSX.Element {
                 <h2 id="existing" className="card-t">
                   Your deals at this customer
                 </h2>
-                <span className="card-meta">{exact.deals.length}</span>
+                <span className="card-meta">{exactDeals.length}</span>
               </div>
               {exactDeals.map((d) => (
                 <div className="li" key={d.id}>
                   <ProductMark product={d.product} />
                   <span className="li-t">
-                    <span className="li-n">{d.product}</span>
-                    <span className="li-s">{dealMeta(d)}</span>
+                    <span className="li-n">{PRODUCT_LABEL[d.product]}</span>
+                    <span className="li-s">{dealMeta(d, today)}</span>
                   </span>
                   <StatusBadge status={d.status} />
                 </div>
               ))}
             </section>
           ) : (
-            <section aria-labelledby="newc" className="card clip">
+            <section aria-labelledby="dup" className="card clip">
               <div className="card-h">
-                <h2 id="newc" className="card-t">
-                  New customer for you
+                <h2 id="dup" className="card-t">
+                  {customer.length >= 3 && !hasSuggestions && lookupDone ? "New customer for you" : "Duplicate check"}
                 </h2>
               </div>
               <div className="card-b" style={{ fontSize: 12.5, lineHeight: 1.55, color: "#5E5B6E" }}>
-                Kestrel Systems has no registrations at {customer || "this customer"} yet. CleanStart still checks other
-                partners when it reviews.
+                {customer.length < 3
+                  ? "Type the company name to check for existing registrations."
+                  : hasSuggestions
+                    ? "Pick a match from the list to see your deals at that customer."
+                    : lookupDone
+                      ? `${partnerName} has no registrations for this customer yet. CleanStart still checks other partners when it reviews.`
+                      : "Checking for existing registrations."}
               </div>
             </section>
           )}

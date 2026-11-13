@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useId, useRef } from "react";
+import { FOCUSABLE_SELECTOR, focusReturnTarget, isInertExempt, trapTarget } from "@/lib/focus-trap";
 import { Icon } from "../icon";
+import { Scrim } from "./scrim";
 
 interface OverlayProps {
   open: boolean;
@@ -15,34 +17,76 @@ interface OverlayProps {
   /** Render as a form so Enter submits; onSubmit receives the form event. */
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
   className?: string;
+  /** The field that gets focus on open. Without it, the first text field or the primary button does. */
+  initialFocus?: React.RefObject<HTMLElement | null>;
 }
 
-// shortcut: no focus trap, only focus-in, Escape and focus-return. Fine for a review mock.
-function useOverlayBehaviour(open: boolean, onClose: () => void): React.RefObject<HTMLElement | null> {
+/** Open overlays, innermost last: only the top one answers the keyboard, so a dialog opened from a drawer does not fight it. */
+const openOverlays: HTMLElement[] = [];
+
+/** Makes everything outside the overlay inert (unreachable by keyboard, pointer and screen readers) and returns the undo. */
+function inertBackground(overlay: HTMLElement): () => void {
+  const changed: Element[] = [];
+  for (let node: HTMLElement = overlay; node !== document.body && node.parentElement; node = node.parentElement) {
+    for (const sibling of Array.from(node.parentElement.children)) {
+      if (sibling === node) continue;
+      const exempt = isInertExempt({ tag: sibling.tagName, classes: Array.from(sibling.classList), inert: sibling.hasAttribute("inert") });
+      if (exempt) continue;
+      sibling.setAttribute("inert", "");
+      changed.push(sibling);
+    }
+  }
+  return () => {
+    for (const el of changed) el.removeAttribute("inert");
+  };
+}
+
+/** Focus goes in when the overlay opens, stays inside while it is open (Tab and Shift+Tab wrap), Escape closes it, and focus returns to what opened it. */
+function useOverlayBehaviour(open: boolean, onClose: () => void, initialFocus?: React.RefObject<HTMLElement | null>): React.RefObject<HTMLElement | null> {
   const ref = useRef<HTMLElement | null>(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
   useEffect(() => {
-    if (!open) return;
+    const overlay = ref.current;
+    if (!open || !overlay) return;
     const previous = document.activeElement as HTMLElement | null;
-    const first = ref.current?.querySelector<HTMLElement>(
-      "[autofocus], input:not([type=hidden]), textarea, select, button.btn-p",
-    );
-    first?.focus();
+    const target = initialFocus?.current ?? overlay.querySelector<HTMLElement>("[autofocus], input:not([type=hidden]), textarea, select, button.btn-p");
+    target?.focus();
+    openOverlays.push(overlay);
+    const restoreBackground = inertBackground(overlay);
     const onKey = (event: KeyboardEvent): void => {
-      if (event.key === "Escape") onClose();
+      if (openOverlays.at(-1) !== overlay) return;
+      // Another dialog that is not an overlay (the search palette, opened with Ctrl K) handles its own keys.
+      if (event.target instanceof Element && !overlay.contains(event.target) && event.target.closest('[role="dialog"]')) return;
+      if (event.key === "Escape") {
+        closeRef.current();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const items = Array.from(overlay.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+        (el) => el.getClientRects().length > 0 && !el.closest("[inert]"),
+      );
+      const target = trapTarget(items, document.activeElement as HTMLElement | null, event.shiftKey);
+      if (target) {
+        event.preventDefault();
+        target.focus();
+      }
     };
     document.addEventListener("keydown", onKey);
     return () => {
       document.removeEventListener("keydown", onKey);
-      previous?.focus?.();
+      restoreBackground();
+      openOverlays.splice(openOverlays.indexOf(overlay), 1);
+      focusReturnTarget(previous, document.getElementById("main"))?.focus();
     };
-  }, [open, onClose]);
+  }, [open, initialFocus]);
   return ref;
 }
 
 function OverlayBody(props: OverlayProps & { kind: "drawer" | "dialog" }): React.JSX.Element | null {
-  const { open, onClose, title, subtitle, children, footer, lead, onSubmit, kind, className } = props;
+  const { open, onClose, title, subtitle, children, footer, lead, onSubmit, kind, className, initialFocus } = props;
   const labelId = useId();
-  const ref = useOverlayBehaviour(open, onClose);
+  const ref = useOverlayBehaviour(open, onClose, initialFocus);
   if (!open) return null;
 
   const inner = (
@@ -75,7 +119,7 @@ function OverlayBody(props: OverlayProps & { kind: "drawer" | "dialog" }): React
 
   return (
     <>
-      <div className="cs-scrim" onClick={onClose} aria-hidden="true" />
+      <Scrim className="cs-scrim" onClose={onClose} />
       {onSubmit ? (
         <form
           ref={ref as React.RefObject<HTMLFormElement>}

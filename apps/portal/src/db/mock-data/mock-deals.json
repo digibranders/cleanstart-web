@@ -1,0 +1,520 @@
+[
+  {
+    "id": "vardhan-capital-libraries",
+    "customer": "Vardhan Capital",
+    "website": "vardhancapital.in",
+    "partner": "Kestrel Systems",
+    "partnerCategory": "Channel partner",
+    "product": "Clean Libraries",
+    "region": "India",
+    "manager": "Farhan Qureshi",
+    "registeredBy": "Aditi Rao",
+    "registered": "2026-11-04",
+    "status": "Pending",
+    "stage": "Awaiting review",
+    "contacts": [
+      {
+        "name": "Rohan Mehta",
+        "role": "Head of Security",
+        "email": "rohan.mehta@vardhancapital.in",
+        "phone": "+91 98204 31786"
+      }
+    ],
+    "thread": [],
+    "history": [
+      {
+        "when": "4 Nov 2026",
+        "text": "Registered",
+        "by": "Aditi Rao",
+        "source": "Portal"
+      }
+    ]
+  },
+  {
+    "id": "gulfway-freight",
+    "customer": "Gulfway Freight",
+    "website": "gulfwayfreight.ae",
+    "partner": "Kestrel Systems",
+    "partnerCategory": "Channel partner",
+    "product": "CleanStart Images",
+    "region": "Middle East",
+    "manager": "Omar Nasser",
+    "registeredBy": "Karan Malhotra",
+    "registered": "2026-11-03",
+    "status": "Pending",
+    "stage": "Awaiting review",
+    "contacts": [
+      {
+        "name": "Yusuf Al Amiri"
+      }
+    ],
+    "thread": [],
+    "history": [
+      {
+        "when": "3 Nov 2026",
+        "text": "Registered",
+        "by": "Karan Malhotra",
+        "source": "Portal"
+      }
+    ]
+  },
+  {
+    "id": "tejas-health-network",
+    "customer": "Tejas Health Network",
+    "website": "tejashealth.in",
+    "partner": "Kestrel Systems",
+    "partnerCategory": "Channel partner",
+    "product": "CleanSight",
+    "region": "India",
+    "manager": "Farhan Qureshi",
+    "registeredBy": "Aditi Rao",
+    "registered": "2026-08-17",
+    "status": "Accepted",
+    "stage": "Technical evaluation",
+    "protectionEnd": "2026-11-15",
+    "decidedOn": "2026-08-18",
+    "decidedBy": "Farhan Qureshi",
+    "crmRef": "HS-47866",
+    "contacts": [],
+    "thread": [],
+    "history": [
+      {
+        "when": "18 Aug 2026",
+        "text": "Accepted, protected until 15 Nov 2026",
+        "by": "Farhan Qureshi",
+        "source": "Portal"
+      },
+      {
+        "when": "17 Aug 2026",
+        "text": "Registered",
+        "by": "Aditi Rao",
+        "source": "Portal"
+      }
+    ]
+  },
+  {
+    "id": "al-noor-logistics",
+    "customer": "Al Noor Logistics",
+    "website": "alnoorlogistics.ae",
+    "partner": "Kestrel Systems",
+    "partnerCategory": "Channel partner",
+    "product": "Clean Libraries",
+    "region": "Middle East",
+    "manager": "Omar Nasser",
+    "registeredBy": "Karan Malhotra",
+    "registered": "2026-09-22",
+    "status": "Accepted",
+    "stage": "Discovery",
+    "protectionEnd": "2026-12-21",
+    "decidedOn": "2026-10-31",
+    "decidedBy": "Omar Nasser",
+    "crmRef": "HS-48201",
+    "contacts": [],
+    "thread": [],
+    "history": [
+      {
+        "when": "23 Sep 2026",
+        "text": "Accepted, protected until 21 Dec 2026",
+        "by": "Omar Nasser",
+        "source": "Portal"
+      },
+      {
+        "when": "22 Sep 2026",
+        "text": "Registered",
+        "by": "Karan Malhotra",
+        "source": "Portal"
+      }
+    ]
+  },
+  {
+    "id": "vardhan-capital",
+    "customer": "Vardhan Capital",
+    "website": "vardhancapital.in",
+    "partner": "Kestrel Systems",
+    "partnerCategory": "Channel partner",
+    "product": "CleanSight",
+    "region": "India",
+    "manager": "Farhan Qureshi",
+    "registeredBy": "Aditi Rao",
+    "registered": "2026-10-14",
+    "registeredTime": "11:42",
+    "status": "Accepted",
+    "stage": "Proposal sent",
+    "protectionEnd": "2027-01-12",
+    "decidedOn": "2026-10-15",
+    "decidedBy": "Farhan Qureshi",
+    "crmRef": "HS-48213",
+    "crmSynced": "Synced 6 Nov, 14:02",
+    "notes": "Security team wants vulnerability detection across the payments cluster ahead of the Q1 audit.",
+    "contacts": [
+      {
+        "name": "Rohan Mehta",
+        "role": "Head of Security",
+        "email": "rohan.mehta@vardhancapital.in",
+        "phone": "+91 98204 31786"
+      },
+      {
+        "name": "Priya Shetty",
+        "role": "Platform Engineering lead"
+      }
+    ],
+    "thread": [
+      {
+        "id": "vardhan-capital-m1",
+        "who": "Aditi Rao",
+        "org": "Kestrel Systems",
+        "initials": "AR",
+        "self": true,
+        "when": "29 Oct, 10:12",
+        "text": "Their CISO wants a reference customer in banking before the proposal review. Do you have one we can share?"
+      },
+      {
+        "id": "vardhan-capital-m2",
+        "who": "Farhan Qureshi",
+        "org": "CleanStart",
+        "initials": "FQ",
+        "self": false,
+        "when": "29 Oct, 15:40",
+        "text": "Yes. I will set up a reference call with one of our bank customers next week and send you two dates."
+      }
+    ],
+    "history": [
+      {
+        "when": "6 Nov 2026",
+        "text": "Stage moved to Proposal sent",
+        "by": "Farhan Qureshi",
+        "source": "CRM"
+      },
+      {
+        "when": "18 Oct 2026",
+        "text": "Stage moved to Technical evaluation",
+        "by": "Farhan Qureshi",
+        "source": "CRM"
+      },
+      {
+        "when": "15 Oct 2026",
+        "text": "Accepted, protected until 12 Jan 2027",
+        "by": "Farhan Qureshi",
+        "source": "Portal"
+      },
+      {
+        "when": "14 Oct 2026",
+        "text": "Contact Priya Shetty added",
+        "by": "Aditi Rao",
+        "source": "Portal"
+      },
+      {
+        "when": "14 Oct 2026",
+        "text": "Registered",
+        "by": "Aditi Rao",
+        "source": "Portal"
+      }
+    ]
+  },
+  {
+    "id": "saffron-retail-group",
+    "customer": "Saffron Retail Group",
+    "website": "saffronretail.in",
+    "partner": "Kestrel Systems",
+    "partnerCategory": "Channel partner",
+    "product": "CleanStart Images",
+    "region": "India",
+    "manager": "Farhan Qureshi",
+    "registeredBy": "Karan Malhotra",
+    "registered": "2026-09-09",
+    "status": "Rejected",
+    "stage": "Not accepted",
+    "decidedOn": "2026-09-10",
+    "decidedBy": "Farhan Qureshi",
+    "rejectionReason": "We could not confirm the opportunity. Add the person who owns the security budget at Saffron Retail Group, with their work email, and resubmit.",
+    "contacts": [],
+    "thread": [],
+    "history": [
+      {
+        "when": "10 Sep 2026",
+        "text": "Not accepted: we could not confirm the opportunity",
+        "by": "Farhan Qureshi",
+        "source": "Portal"
+      },
+      {
+        "when": "9 Sep 2026",
+        "text": "Registered",
+        "by": "Karan Malhotra",
+        "source": "Portal"
+      }
+    ]
+  },
+  {
+    "id": "indus-paytech",
+    "customer": "Indus Paytech",
+    "website": "induspaytech.in",
+    "partner": "Kestrel Systems",
+    "partnerCategory": "Channel partner",
+    "product": "CleanStart Images",
+    "region": "India",
+    "manager": "Farhan Qureshi",
+    "registeredBy": "Aditi Rao",
+    "registered": "2026-07-02",
+    "status": "Won",
+    "stage": "Closed won",
+    "closedOn": "2026-09-19",
+    "crmRef": "HS-47102",
+    "contacts": [],
+    "thread": [],
+    "history": [
+      {
+        "when": "19 Sep 2026",
+        "text": "Stage moved to Closed won",
+        "by": "Farhan Qureshi",
+        "source": "CRM"
+      },
+      {
+        "when": "2 Jul 2026",
+        "text": "Registered",
+        "by": "Aditi Rao",
+        "source": "Portal"
+      }
+    ]
+  },
+  {
+    "id": "kaveri-biotech",
+    "customer": "Kaveri Biotech",
+    "website": "kaveribiotech.in",
+    "partner": "Kestrel Systems",
+    "partnerCategory": "Channel partner",
+    "product": "CleanStart Images",
+    "region": "India",
+    "manager": "Farhan Qureshi",
+    "registeredBy": "Sneha Iyer",
+    "registered": "2026-05-28",
+    "status": "Won",
+    "stage": "Closed won",
+    "closedOn": "2026-08-11",
+    "crmRef": "HS-46540",
+    "contacts": [],
+    "thread": [],
+    "history": [
+      {
+        "when": "11 Aug 2026",
+        "text": "Stage moved to Closed won",
+        "by": "Farhan Qureshi",
+        "source": "CRM"
+      },
+      {
+        "when": "28 May 2026",
+        "text": "Registered",
+        "by": "Sneha Iyer",
+        "source": "Portal"
+      }
+    ]
+  },
+  {
+    "id": "meridian-insurance",
+    "customer": "Meridian Insurance",
+    "website": "meridianinsure.in",
+    "partner": "Kestrel Systems",
+    "partnerCategory": "Channel partner",
+    "product": "Clean Libraries",
+    "region": "India",
+    "manager": "Farhan Qureshi",
+    "registeredBy": "Karan Malhotra",
+    "registered": "2026-06-12",
+    "status": "Lost",
+    "stage": "Closed lost",
+    "closedOn": "2026-10-02",
+    "contacts": [],
+    "thread": [],
+    "history": [
+      {
+        "when": "2 Oct 2026",
+        "text": "Stage moved to Closed lost",
+        "by": "Farhan Qureshi",
+        "source": "CRM"
+      },
+      {
+        "when": "12 Jun 2026",
+        "text": "Registered",
+        "by": "Karan Malhotra",
+        "source": "Portal"
+      }
+    ]
+  },
+  {
+    "id": "dunes-hospitality",
+    "customer": "Dunes Hospitality",
+    "website": "duneshospitality.ae",
+    "partner": "Kestrel Systems",
+    "partnerCategory": "Channel partner",
+    "product": "CleanSight",
+    "region": "Middle East",
+    "manager": "Omar Nasser",
+    "registeredBy": "Aditi Rao",
+    "registered": "2026-05-01",
+    "status": "Expired",
+    "stage": "No activity",
+    "closedOn": "2026-07-30",
+    "contacts": [],
+    "thread": [],
+    "history": [
+      {
+        "when": "30 Jul 2026",
+        "text": "Protection ended, no activity",
+        "by": "CleanStart",
+        "source": "System"
+      },
+      {
+        "when": "1 May 2026",
+        "text": "Registered",
+        "by": "Aditi Rao",
+        "source": "Portal"
+      }
+    ]
+  },
+  {
+    "id": "gulfway-freight-arbor",
+    "customer": "Gulfway Freight",
+    "partner": "Arbor Cyber",
+    "partnerCategory": "System integrator",
+    "product": "CleanStart Images",
+    "region": "Middle East",
+    "manager": "Omar Nasser",
+    "registered": "2026-11-05",
+    "status": "Pending",
+    "stage": "Awaiting review",
+    "contacts": [
+      {
+        "name": "Layla Haddad"
+      }
+    ],
+    "thread": [],
+    "history": [
+      {
+        "when": "5 Nov 2026",
+        "text": "Registered",
+        "by": "Arbor Cyber",
+        "source": "Portal"
+      }
+    ]
+  },
+  {
+    "id": "meridian-insurance-saffron",
+    "customer": "Meridian Insurance",
+    "partner": "Saffron Secure",
+    "partnerCategory": "Distributor",
+    "product": "CleanSight",
+    "region": "India",
+    "manager": "Farhan Qureshi",
+    "registered": "2026-11-05",
+    "status": "Pending",
+    "stage": "Awaiting review",
+    "contacts": [
+      {
+        "name": "Ananya Kulkarni"
+      }
+    ],
+    "thread": [],
+    "history": [
+      {
+        "when": "5 Nov 2026",
+        "text": "Registered",
+        "by": "Saffron Secure",
+        "source": "Portal"
+      }
+    ]
+  },
+  {
+    "id": "pearl-gulf-bank",
+    "customer": "Pearl Gulf Bank",
+    "partner": "Dunes Networks",
+    "partnerCategory": "Channel partner",
+    "product": "CleanSight",
+    "region": "Middle East",
+    "manager": "Omar Nasser",
+    "registered": "2026-11-03",
+    "status": "Accepted",
+    "stage": "Accepted",
+    "protectionEnd": "2027-02-02",
+    "decidedOn": "2026-11-05",
+    "decidedBy": "Omar Nasser",
+    "crmRef": "HS-48377",
+    "contacts": [],
+    "thread": [],
+    "history": [
+      {
+        "when": "5 Nov 2026",
+        "text": "Accepted, protected until 2 Feb 2027",
+        "by": "Omar Nasser",
+        "source": "Portal"
+      },
+      {
+        "when": "3 Nov 2026",
+        "text": "Registered",
+        "by": "Dunes Networks",
+        "source": "Portal"
+      }
+    ]
+  },
+  {
+    "id": "tejas-labs",
+    "customer": "Tejas Labs",
+    "partner": "Saffron Secure",
+    "partnerCategory": "Distributor",
+    "product": "Clean Libraries",
+    "region": "India",
+    "manager": "Farhan Qureshi",
+    "registered": "2026-11-02",
+    "status": "Accepted",
+    "stage": "Accepted",
+    "protectionEnd": "2027-02-01",
+    "decidedOn": "2026-11-04",
+    "decidedBy": "Farhan Qureshi",
+    "crmRef": "HS-48352",
+    "contacts": [],
+    "thread": [],
+    "history": [
+      {
+        "when": "4 Nov 2026",
+        "text": "Accepted, protected until 1 Feb 2027",
+        "by": "Farhan Qureshi",
+        "source": "Portal"
+      },
+      {
+        "when": "2 Nov 2026",
+        "text": "Registered",
+        "by": "Saffron Secure",
+        "source": "Portal"
+      }
+    ]
+  },
+  {
+    "id": "coastline-telecom",
+    "customer": "Coastline Telecom",
+    "partner": "Arbor Cyber",
+    "partnerCategory": "System integrator",
+    "product": "CleanStart Images",
+    "region": "Middle East",
+    "manager": "Omar Nasser",
+    "registered": "2026-11-02",
+    "status": "Rejected",
+    "stage": "Not accepted",
+    "decidedOn": "2026-11-03",
+    "decidedBy": "Omar Nasser",
+    "rejectionReason": "This customer is already registered for this product.",
+    "contacts": [],
+    "thread": [],
+    "history": [
+      {
+        "when": "3 Nov 2026",
+        "text": "Not accepted: this customer is already registered for this product",
+        "by": "Omar Nasser",
+        "source": "Portal"
+      },
+      {
+        "when": "2 Nov 2026",
+        "text": "Registered",
+        "by": "Arbor Cyber",
+        "source": "Portal"
+      }
+    ]
+  }
+]

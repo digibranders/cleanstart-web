@@ -2,7 +2,9 @@
 
 import { Icon } from "@/components/icon";
 import { BulletList, CHECK_D, PublicHeading, PublicSplit, StatusIcon } from "@/components/partners/public-frame";
-import { partnersSlice } from "@/data/partners";
+import { fmtLong } from "@/lib/dates";
+import { PARTNER_CATEGORY_LABEL, PARTNER_REGION_LABEL } from "@/lib/domain";
+import type { ApplyReceipt } from "@/server/apply-receipt";
 
 const DOT_D =
   "M128,26A102,102,0,1,0,230,128,102.12,102.12,0,0,0,128,26Zm0,192a90,90,0,1,1,90-90A90.1,90.1,0,0,1,128,218Z";
@@ -16,16 +18,10 @@ const DOT_STYLE: Record<StepState, React.CSSProperties> = {
   next: { background: "#F1F0F4", color: "#8D87A8" },
 };
 
-export function ApplyDone(): React.JSX.Element {
-  const { applications, lastApplicationId } = partnersSlice.use();
-  // Opening the page directly shows the sample application from the board.
-  const app =
-    applications.find((a) => a.id === lastApplicationId) ?? applications.find((a) => a.id === "a1") ?? applications[0];
-  if (!app) return <></>;
-
-  const firstName = app.applicant.split(" ")[0] ?? app.applicant;
+export function ApplyDone({ receipt }: { receipt: ApplyReceipt }): React.JSX.Element {
+  const firstName = receipt.firstName;
   const steps: { title: string; text: string; state: StepState }[] = [
-    { title: "Application received", text: app.submitted, state: "done" },
+    { title: "Application received", text: fmtLong(receipt.submittedOn), state: "done" },
     {
       title: "Review by a partner manager",
       text: "They check your company and may call you to learn how you sell.",
@@ -59,13 +55,12 @@ export function ApplyDone(): React.JSX.Element {
     >
       <div
         role="status"
-        data-tour="apply-done"
         style={{ width: "100%", maxWidth: 420, margin: "0 auto", display: "flex", flexDirection: "column", gap: 18 }}
       >
         <StatusIcon d={CHECK_D} tone="green" />
         <PublicHeading title="Application received">
-          Thanks, {firstName}. {app.company}'s application is with the CleanStart partner team.
-          {app.email ? ` We sent a copy to ${app.email}.` : ""}
+          Thanks, {firstName}. {receipt.company}'s application is with the CleanStart partner team.
+          {receipt.email ? ` We sent a copy to ${receipt.email}.` : ""}
         </PublicHeading>
         <ol
           aria-label="What happens next"
@@ -109,13 +104,13 @@ export function ApplyDone(): React.JSX.Element {
           }}
         >
           <dt>Reference</dt>
-          <dd className="tnum">{app.reference}</dd>
+          <dd className="tnum">{receipt.reference}</dd>
           <dt>Company</dt>
-          <dd>{app.company}</dd>
+          <dd>{receipt.company}</dd>
           <dt>Category</dt>
-          <dd>{app.category}</dd>
+          <dd>{PARTNER_CATEGORY_LABEL[receipt.category]}</dd>
           <dt>Region</dt>
-          <dd>{app.region}</dd>
+          <dd>{PARTNER_REGION_LABEL[receipt.region]}</dd>
         </dl>
         <p style={{ margin: 0, fontSize: 12.5, color: "#6B687D" }}>
           Questions? Reply to the confirmation email and it reaches the partner team.

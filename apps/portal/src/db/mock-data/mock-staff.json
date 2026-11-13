@@ -1,0 +1,69 @@
+[
+  {
+    "name": "Farhan Qureshi",
+    "email": "farhan.qureshi@cleanstart.com",
+    "role": "Partner manager",
+    "region": "India",
+    "partners": [
+      "Kestrel Systems",
+      "Saffron Secure",
+      "Vyom Digital",
+      "Meghdoot Systems",
+      "Ironleaf Consulting"
+    ],
+    "last": "Now",
+    "status": "Active",
+    "you": true
+  },
+  {
+    "name": "Omar Nasser",
+    "email": "omar.nasser@cleanstart.com",
+    "role": "Partner manager",
+    "region": "Middle East",
+    "partners": [
+      "Arbor Cyber",
+      "Dunes Networks",
+      "Harbourline IT",
+      "Coralbay Technologies",
+      "Qamar Solutions"
+    ],
+    "last": "Today",
+    "status": "Active"
+  },
+  {
+    "name": "Rahul Menon",
+    "email": "rahul.menon@cleanstart.com",
+    "role": "Sales",
+    "region": "India",
+    "partners": [],
+    "last": "Yesterday",
+    "status": "Active"
+  },
+  {
+    "name": "Sara Al Mansoori",
+    "email": "sara.almansoori@cleanstart.com",
+    "role": "Sales",
+    "region": "Middle East",
+    "partners": [],
+    "last": "4 Nov",
+    "status": "Active"
+  },
+  {
+    "name": "Ishita Bose",
+    "email": "ishita.bose@cleanstart.com",
+    "role": "Marketing",
+    "region": "All regions",
+    "partners": [],
+    "last": "4 Nov",
+    "status": "Active"
+  },
+  {
+    "name": "Kunal Shah",
+    "email": "kunal.shah@cleanstart.com",
+    "role": "Sales",
+    "region": "India",
+    "partners": [],
+    "last": "Invited 5 Nov",
+    "status": "Invited"
+  }
+]

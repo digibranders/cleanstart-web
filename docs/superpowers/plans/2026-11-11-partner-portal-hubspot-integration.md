@@ -112,7 +112,7 @@ Testing: every test here runs against the real Postgres of its Vitest worker (on
 
 The spec is a pure object so it can be tested; the script only applies it. The script defaults to a dry run and needs `--apply`. It must never run against production without the explicit go-ahead in master Task 5.7.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // schema-spec.test.ts
@@ -144,12 +144,12 @@ describe('schema spec', () => {
 });
 ```
 
-- [ ] **Step 2: Run it and confirm it fails**
+- [x] **Step 2: Run it and confirm it fails**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/schema-spec.test.ts`
 Expected: FAIL, "Cannot find module './schema-spec'".
 
-- [ ] **Step 3: Implement the spec**
+- [x] **Step 3: Implement the spec**
 
 ```ts
 // schema-spec.ts
@@ -205,12 +205,12 @@ export const PIPELINE_SPEC = {
 } as const;
 ```
 
-- [ ] **Step 4: Run the test and confirm it passes**
+- [x] **Step 4: Run the test and confirm it passes**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/schema-spec.test.ts`
 Expected: PASS, 3 tests.
 
-- [ ] **Step 5: Write the script (applies the spec, idempotent, dry run by default)**
+- [x] **Step 5: Write the script (applies the spec, idempotent, dry run by default)**
 
 ```ts
 // scripts/provision-hubspot.ts
@@ -283,7 +283,7 @@ Run: `cd apps/portal && pnpm exec tsx --env-file=.env scripts/provision-hubspot.
 Expected: lines starting `[dry-run] would create` for every property, the pipeline and both labels.
 Run: `pnpm exec tsx --env-file=.env scripts/provision-hubspot.ts --apply`, then run it again. Expected: second run prints `exists, skipped` for everything and the pipeline id line.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add apps/portal/scripts/provision-hubspot.ts apps/portal/src/server/hubspot/schema-spec.ts apps/portal/src/server/hubspot/schema-spec.test.ts
@@ -296,7 +296,7 @@ git commit -m "feat(portal): H4.1 HubSpot schema spec and idempotent provisionin
 - Create: `apps/portal/src/server/hubspot/types.ts`, `client.ts`, `fake.ts`
 - Test: `apps/portal/src/server/hubspot/client.test.ts`
 
-- [ ] **Step 1: Write the types (the contract every later task uses)**
+- [x] **Step 1: Write the types (the contract every later task uses)**
 
 ```ts
 // types.ts
@@ -349,7 +349,7 @@ export class HubspotError extends Error {
 
 `DependencyPending` (thrown by an outbox handler when a record it needs has not been synced yet, retried without counting as a failure) is the `PortalError` subclass in `src/server/errors.ts` (contracts E). `HubspotError` stays a plain `Error` subclass: the outbox treats every thrown error except `DependencyPending` as retryable. `types.ts` and `mappers.ts` import nothing that is server only, so the contracts' `deal-rules.ts` can re-export `STAGE_LABELS` and `STAGE_TO_STATUS` into client code.
 
-- [ ] **Step 2: Write the fake (used by every later test)**
+- [x] **Step 2: Write the fake (used by every later test)**
 
 `FakeHubspot` is imported as is by W0-b's `makeSyncedDeal` (contracts J.3, J.4) and by tracks P and R through the `HubspotApi` interface. Keep the public members `stageIds`, `createDeal`, `deals`, `companies`, `associations`, `failNext` and `calls` under these names.
 
@@ -440,7 +440,7 @@ export class FakeHubspot implements HubspotApi {
 
 The page size of 2 in `searchDealsModifiedSince` is deliberate: it forces the poller tests through the paging path.
 
-- [ ] **Step 3: Write the failing contract test for the real client**
+- [x] **Step 3: Write the failing contract test for the real client**
 
 The real client takes an `apiRequest` function so the test can assert the request bodies without a network.
 
@@ -506,12 +506,12 @@ describe('configuration', () => {
 });
 ```
 
-- [ ] **Step 4: Run the test and confirm it fails**
+- [x] **Step 4: Run the test and confirm it fails**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/client.test.ts`
 Expected: FAIL, "Cannot find module './client'".
 
-- [ ] **Step 5: Implement the real client**
+- [x] **Step 5: Implement the real client**
 
 ```ts
 // client.ts
@@ -699,12 +699,12 @@ export const createHubspot = (): HubspotApi => {
 
 `HUBSPOT_PORTAL_TOKEN`, `HUBSPOT_PARTNER_PIPELINE_ID` and `HUBSPOT_USE_ASSOCIATION_LABELS` already exist in `src/env.ts` and `.env.example` (W0-b and W0-c, contracts I; the first two are optional outside production, the labels flag defaults to `false`), so this task edits neither file. `createHubspot()` is the only place that needs the token and it throws a typed `IntegrationError` when it is unset; callers that must degrade (the jobs, and track R's lookup action) check `readHubspotConfig()` first or treat the thrown error as "HubSpot unavailable". If the installed `@hubspot/api-client` has no `apiRequest` (contracts M.1 item 15), replace the body of the arrow function with a thin `fetch` wrapper that sends the bearer token and retries a 429; `RealHubspot` takes any function with that shape.
 
-- [ ] **Step 6: Run the tests**
+- [x] **Step 6: Run the tests**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/client.test.ts`
 Expected: PASS, 5 tests.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add apps/portal/src/server/hubspot
@@ -717,7 +717,7 @@ git commit -m "feat(portal): H4.2 HubspotApi interface, real client and in-memor
 - Create: `apps/portal/src/server/hubspot/mappers.ts`
 - Test: `apps/portal/src/server/hubspot/mappers.test.ts`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```ts
 // mappers.test.ts
@@ -807,12 +807,12 @@ describe('STAGE_TO_STATUS', () => {
 
 `dealProperties` takes display labels (`'Clean Libraries'`, `'India'`), not the stored codes (`libraries`, `india`): the enumeration values must match the spec's `opt()` helper exactly (`clean_libraries`, `cleanstart_images`, `india`, `middle_east`), which is why the test spells them out. The `registration.create` handler maps the stored codes to labels before calling it (Task 4.6).
 
-- [ ] **Step 2: Run it and confirm it fails**
+- [x] **Step 2: Run it and confirm it fails**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/mappers.test.ts`
 Expected: FAIL, "Cannot find module './mappers'".
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```ts
 // mappers.ts
@@ -901,12 +901,12 @@ const DELAYS_MS = [60_000, 300_000, 1_800_000, 7_200_000, 43_200_000];
 export const nextDelayMs = (attempts: number): number | null => DELAYS_MS[attempts - 1] ?? null;
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/mappers.test.ts`
 Expected: PASS, all tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/portal/src/server/hubspot/mappers.ts apps/portal/src/server/hubspot/mappers.test.ts
@@ -923,7 +923,7 @@ git commit -m "feat(portal): H4.3 HubSpot mappers for deal properties, inbound d
 
 This task relies on Wave 0 and edits none of it: the `hubspot_outbox` table (contracts C.1), the `db` and `pool` exports of `@/db/client` (C.2), `testDb` and `resetDb` (J.3), `src/server/jobs/{lock,schedule,index}.ts` with `JOBS` already listing `hubspot-outbox` (H.17), `src/instrumentation.ts`, `node-cron` and `@sentry/nextjs` (W0-a). The advisory lock helper `runLocked` and its test (`lock.test.ts`) belong to W0-c; this task only uses the registered job. The op names and the exact `version` each caller passes are fixed by contracts section G; the enqueue calls themselves are written by tracks P and R.
 
-- [ ] **Step 1: Write the failing tests** (real test database, one per Vitest worker, truncated before each test; fake HubSpot)
+- [x] **Step 1: Write the failing tests** (real test database, one per Vitest worker, truncated before each test; fake HubSpot)
 
 ```ts
 // outbox.test.ts
@@ -1029,12 +1029,12 @@ describe('drainOutbox', () => {
 });
 ```
 
-- [ ] **Step 2: Run and confirm it fails**
+- [x] **Step 2: Run and confirm it fails**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/outbox.test.ts`
 Expected: FAIL, "Cannot find module './outbox'".
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```ts
 // outbox.ts
@@ -1107,19 +1107,19 @@ export const drainOutbox = async (deps: {
 };
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/outbox.test.ts`
 Expected: PASS, 10 tests.
 
-- [ ] **Step 5: Commit the outbox**
+- [x] **Step 5: Commit the outbox**
 
 ```bash
 git add apps/portal/src/server/hubspot/outbox.ts apps/portal/src/server/hubspot/outbox.test.ts
 git commit -m "feat(portal): H4.4 HubSpot outbox with idempotent enqueue, retries and backoff"
 ```
 
-- [ ] **Step 6: Write the failing job test**
+- [x] **Step 6: Write the failing job test**
 
 `buildHandlers` reaches its final four argument form in Task 4.6, so the job body and its test are written now but compiled, run and committed at the end of Task 4.6 (its step 5 stages them). That keeps every commit compiling. The scheduled job runs under the advisory lock that W0-c's `schedule.ts` applies to every `JOBS` entry, so this task tests only the job body. HubSpot may be unconfigured (the token and pipeline id are optional outside production, contracts I and M.2 item 17): the job must then log a warning and leave the outbox untouched, never throw.
 
@@ -1168,7 +1168,7 @@ describe('runHubspotOutbox', () => {
 });
 ```
 
-- [ ] **Step 7: Implement the job body**
+- [x] **Step 7: Implement the job body**
 
 Replace the stub in `src/server/jobs/hubspot-outbox.ts`; do not touch `jobs/index.ts`, it already registers this job every minute.
 
@@ -1196,7 +1196,7 @@ export const runHubspotOutbox = async (): Promise<void> => {
 };
 ```
 
-- [ ] **Step 8: Hand over to Task 4.6.** Leave `hubspot-outbox.ts` and `hubspot-outbox.test.ts` uncommitted; Task 4.6 step 5 runs `vitest run src/server/hubspot src/server/jobs/hubspot-outbox.test.ts` and commits them. The registered job and its schedule (every minute) are already in W0-c's `JOBS`.
+- [x] **Step 8: Hand over to Task 4.6.** Leave `hubspot-outbox.ts` and `hubspot-outbox.test.ts` uncommitted; Task 4.6 step 5 runs `vitest run src/server/hubspot src/server/jobs/hubspot-outbox.test.ts` and commits them. The registered job and its schedule (every minute) are already in W0-c's `JOBS`.
 
 ### Task 4.5: Partner and user handlers
 
@@ -1204,7 +1204,7 @@ export const runHubspotOutbox = async (): Promise<void> => {
 - Create: `apps/portal/src/server/hubspot/handlers.ts`
 - Test: `apps/portal/src/server/hubspot/handlers.partner.test.ts`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```ts
 // handlers.partner.test.ts
@@ -1265,9 +1265,9 @@ describe('user.upsert', () => {
 
 The category value in HubSpot is `channel_partner` because `opt('Channel partner')` slugs the label; the handler maps the portal enum (`distributor`, `channel`, `integrator`) to the three labels through a lookup table, not by slugging the portal value.
 
-- [ ] **Step 2: Run and confirm it fails.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/handlers.partner.test.ts`. Expected: FAIL, "Cannot find module './handlers'".
+- [x] **Step 2: Run and confirm it fails.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/handlers.partner.test.ts`. Expected: FAIL, "Cannot find module './handlers'".
 
-- [ ] **Step 3: Implement the first two handlers**
+- [x] **Step 3: Implement the first two handlers**
 
 ```ts
 // handlers.ts
@@ -1322,11 +1322,11 @@ export const buildHandlers = (db: Db, hs: HubspotApi, _pipelineId: string): Hand
 
 The three stubs above are replaced in the next task, in the same file; they exist only so the file typechecks between commits.
 
-- [ ] **Step 4: Run the tests.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/handlers.partner.test.ts`. Expected: PASS, 4 tests.
+- [x] **Step 4: Run the tests.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/handlers.partner.test.ts`. Expected: PASS, 4 tests.
 
-- [ ] **Step 5: Confirm what the enqueue calls must look like (no edits here).** The two handlers above are driven by calls that track P writes in its own files (contracts G): `partner.upsert` with `version: '1'` inside the approve-application and Add partner transactions (`actions/applications.ts`, `actions/partners.ts`), `partner.upsert` with `version: String(updatedAt.getTime())` after a profile, category, manager or status edit so every edit syncs, and `user.upsert` with `version: '1'` when an invite is accepted (`actions/invites.ts`). P adds an outbox assertion to each of those action tests. This task edits no file under `src/server/actions/`; the idempotency key shape and a call made inside `withViewer` are already pinned by the Task 4.4 tests.
+- [x] **Step 5: Confirm what the enqueue calls must look like (no edits here).** The two handlers above are driven by calls that track P writes in its own files (contracts G): `partner.upsert` with `version: '1'` inside the approve-application and Add partner transactions (`actions/applications.ts`, `actions/partners.ts`), `partner.upsert` with `version: String(updatedAt.getTime())` after a profile, category, manager or status edit so every edit syncs, and `user.upsert` with `version: '1'` when an invite is accepted (`actions/invites.ts`). P adds an outbox assertion to each of those action tests. This task edits no file under `src/server/actions/`; the idempotency key shape and a call made inside `withViewer` are already pinned by the Task 4.4 tests.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/portal/src/server/hubspot/handlers.ts apps/portal/src/server/hubspot/handlers.partner.test.ts
@@ -1339,7 +1339,7 @@ git commit -m "feat(portal): H4.5 sync partner companies and users to HubSpot th
 - Modify: `apps/portal/src/server/hubspot/handlers.ts`
 - Test: `apps/portal/src/server/hubspot/handlers.registration.test.ts`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```ts
 // handlers.registration.test.ts
@@ -1455,9 +1455,9 @@ describe('registration.update_end and registration.expire', () => {
 
 The tests set `product` and `region` as display labels in `setup` and as stored codes in the mapping test: `makeRegistration` accepts either and stores the code (contracts J.3), so the handler must always go through the label maps.
 
-- [ ] **Step 2: Run and confirm it fails.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/handlers.registration.test.ts`. Expected: FAIL ("implemented in task 4.6").
+- [x] **Step 2: Run and confirm it fails.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/handlers.registration.test.ts`. Expected: FAIL ("implemented in task 4.6").
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```ts
 // handlers.ts (replace the three stubs; add the pipeline and clock parameters)
@@ -1540,11 +1540,11 @@ export const buildHandlers = (db: Db, hs: HubspotApi, pipelineId: string, clock:
 
 The imports at the top of the block join the existing ones in `handlers.ts`. Note the order inside `registration.create`: the deal id is stored before the associations, so a failed association retries against the same deal (the `findDealByRegistrationId` check covers the case where the portal crashed before saving the id).
 
-- [ ] **Step 4: Run the tests.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot src/server/jobs/hubspot-outbox.test.ts`. Expected: PASS for every file in the folder, including the Task 4.4 job test (both of its cases now run against the real handlers).
+- [x] **Step 4: Run the tests.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot src/server/jobs/hubspot-outbox.test.ts`. Expected: PASS for every file in the folder, including the Task 4.4 job test (both of its cases now run against the real handlers).
 
-- [ ] **Step 5: Confirm what the enqueue calls must look like (no edits here).** Track R writes them in its own files (contracts G): `actions/decisions.ts` enqueues `registration.create` on accept with `version: String(Date.parse(decidedAt))`, the decision time in milliseconds, not `'1'`; an undone and re-accepted registration then gets a new key instead of colliding with the first (undo is only allowed while no deal exists, `ConflictError('deal_in_crm')` otherwise). `actions/extension.ts` enqueues `registration.update_end` with the new `protection_end` as the version when an extension is granted. `jobs/expiry.ts` enqueues `registration.expire` (Task 4.8). R asserts the outbox row in each action's test. This task edits no file under `src/server/actions/`.
+- [x] **Step 5: Confirm what the enqueue calls must look like (no edits here).** Track R writes them in its own files (contracts G): `actions/decisions.ts` enqueues `registration.create` on accept with `version: String(Date.parse(decidedAt))`, the decision time in milliseconds, not `'1'`; an undone and re-accepted registration then gets a new key instead of colliding with the first (undo is only allowed while no deal exists, `ConflictError('deal_in_crm')` otherwise). `actions/extension.ts` enqueues `registration.update_end` with the new `protection_end` as the version when an extension is granted. `jobs/expiry.ts` enqueues `registration.expire` (Task 4.8). R asserts the outbox row in each action's test. This task edits no file under `src/server/actions/`.
 
-- [ ] **Step 6: Commit** (this commit also stages the Task 4.4 job body and its test, which could not compile before `buildHandlers` had its final form)
+- [x] **Step 6: Commit** (this commit also stages the Task 4.4 job body and its test, which could not compile before `buildHandlers` had its final form)
 
 ```bash
 git add apps/portal/src/server/hubspot/handlers.ts apps/portal/src/server/hubspot/handlers.registration.test.ts apps/portal/src/server/jobs/hubspot-outbox.ts apps/portal/src/server/jobs/hubspot-outbox.test.ts
@@ -1561,7 +1561,7 @@ This task is read-only HubSpot logic and edits no action file and not `AdminAppr
 
 Rules: the partner-facing lookup returns only name and domain of a matching HubSpot company, and a boolean "known customer". It never returns deals, owners or other partners. The staff-facing conflict check returns the open deals on the customer company that belong to a different partner.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```ts
 // lookup.test.ts
@@ -1619,9 +1619,9 @@ describe('conflictingDeals', () => {
 });
 ```
 
-- [ ] **Step 2: Run and confirm it fails.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/lookup.test.ts`. Expected: FAIL, "Cannot find module './lookup'".
+- [x] **Step 2: Run and confirm it fails.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/lookup.test.ts`. Expected: FAIL, "Cannot find module './lookup'".
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```ts
 // lookup.ts
@@ -1653,11 +1653,11 @@ export const conflictingDeals = async (
 };
 ```
 
-- [ ] **Step 4: Run the tests.** Expected: PASS, 5 tests (2 for `hubspotForRequest`, 2 for `lookupCustomer`, 1 for `conflictingDeals`).
+- [x] **Step 4: Run the tests.** Expected: PASS, 5 tests (2 for `hubspotForRequest`, 2 for `lookupCustomer`, 1 for `conflictingDeals`).
 
-- [ ] **Step 5: Confirm how track R uses it (no edits here).** R's `lookupCustomerAction(query)` (partner roles that may register deals; rate limited to 10 calls per 60 seconds per user through `rateLimit('lookup:user:<id>', ...)`) gets the client from `hubspotForRequest()` and calls `lookupCustomer(hs, query)`; it returns the same response shape to every user and no deal data. R's approvals screen calls `hs.findCompany` for the customer, then `conflictingDeals(hs, { customerCompanyId, partnerCompanyId, pipelineId })` with `partners.hubspot_company_id` and the pipeline id from `hubspotForRequest()`, and shows the existing hint ("Another partner already holds this customer"). Any error from HubSpot, and a null from `hubspotForRequest()` (HubSpot not configured), degrades to "no suggestions" and the portal-only check: a decision is never blocked on HubSpot being up. R gets its client from `hubspotForRequest()` (contracts H.13c, added in this task); it never imports `createHubspot` itself. The signatures `lookupCustomer(hs, query)`, `conflictingDeals(hs, input)` and `hubspotForRequest()` are fixed so R can code against them.
+- [x] **Step 5: Confirm how track R uses it (no edits here).** R's `lookupCustomerAction(query)` (partner roles that may register deals; rate limited to 10 calls per 60 seconds per user through `rateLimit('lookup:user:<id>', ...)`) gets the client from `hubspotForRequest()` and calls `lookupCustomer(hs, query)`; it returns the same response shape to every user and no deal data. R's approvals screen calls `hs.findCompany` for the customer, then `conflictingDeals(hs, { customerCompanyId, partnerCompanyId, pipelineId })` with `partners.hubspot_company_id` and the pipeline id from `hubspotForRequest()`, and shows the existing hint ("Another partner already holds this customer"). Any error from HubSpot, and a null from `hubspotForRequest()` (HubSpot not configured), degrades to "no suggestions" and the portal-only check: a decision is never blocked on HubSpot being up. R gets its client from `hubspotForRequest()` (contracts H.13c, added in this task); it never imports `createHubspot` itself. The signatures `lookupCustomer(hs, query)`, `conflictingDeals(hs, input)` and `hubspotForRequest()` are fixed so R can code against them.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/portal/src/server/hubspot/lookup.ts apps/portal/src/server/hubspot/lookup.test.ts
@@ -1673,7 +1673,7 @@ git commit -m "feat(portal): H4.7 HubSpot customer lookup and cross-partner conf
 
 Do not edit `jobs/index.ts`: W0-c already registers `hubspot-poll` (every 5 minutes), `expiry` (00:10 UTC) and `hubspot-reconcile` (02:30 UTC). The reminder emails 14 and 3 days before the end are `jobs/expiry-reminders.ts`, which track R owns; this task only expires. After a change commits, the poll and the expiry job call `announceRegistrationChange` from track R's `src/server/registrations/announce.ts`, which W0-c created as a no-op stub (contracts H.17): import it, never edit it, and keep the call wrapped so a failure only logs. Every state change here writes its audit entry through `recordAudit` (contracts F.4) and never inserts into `audit_log` directly; the poll's `registration_events` insert is unchanged (`partner_id` is filled by the child trigger).
 
-- [ ] **Step 1: Write the failing poll tests**
+- [x] **Step 1: Write the failing poll tests**
 
 ```ts
 // poll.test.ts
@@ -1877,9 +1877,9 @@ describe('reconcileDeals', () => {
 
 `makeSyncedDeal` is a Wave 0 helper (contracts J.3, `src/db/test-helpers.ts`): it creates an accepted registration and the matching deal in the fake, stores the deal id and the Accepted stage id on the registration, and returns `{ id, dealId }`. It relies only on `FakeHubspot.stageIds` and `FakeHubspot.createDeal`, which Task 4.2 must not rename.
 
-- [ ] **Step 2: Run and confirm it fails.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/poll.test.ts`. Expected: FAIL, "Cannot find module './poll'".
+- [x] **Step 2: Run and confirm it fails.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/poll.test.ts`. Expected: FAIL, "Cannot find module './poll'".
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```ts
 // poll.ts
@@ -2012,9 +2012,9 @@ export const reconcileDeals = async (deps: { db: Db; hs: HubspotApi }): Promise<
 };
 ```
 
-- [ ] **Step 4: Run the tests.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/poll.test.ts`. Expected: PASS, 16 tests (7 new: four for the extension rule, two for announcements and one for a failing announcement). Why the cursor test passes: the poller only writes the cursor after the loop completes, so a thrown error leaves it untouched.
+- [x] **Step 4: Run the tests.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/poll.test.ts`. Expected: PASS, 16 tests (7 new: four for the extension rule, two for announcements and one for a failing announcement). Why the cursor test passes: the poller only writes the cursor after the loop completes, so a thrown error leaves it untouched.
 
-- [ ] **Step 5: Write the failing expiry tests**
+- [x] **Step 5: Write the failing expiry tests**
 
 `expireRegistrations` is the pure core (the clock is an argument); `runExpiry` is the job body. Expiry is a portal rule and does not depend on HubSpot: with HubSpot unconfigured the job still expires registrations and still queues `registration.expire` (a database write), the queued rows wait in the outbox until HubSpot is configured, and the job logs a warning.
 
@@ -2101,7 +2101,7 @@ describe('runExpiry', () => {
 
 Protection runs through the end date, so a registration whose `protection_end` is today is still protected (the `live` row), matching the mock's `daysLeft`.
 
-- [ ] **Step 6: Implement the expiry job**
+- [x] **Step 6: Implement the expiry job**
 
 ```ts
 // src/server/jobs/expiry.ts
@@ -2153,7 +2153,7 @@ export const runExpiry = async (): Promise<void> => {
 };
 ```
 
-- [ ] **Step 7: Run the tests and write the poll and reconcile job bodies.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot src/server/jobs/expiry.test.ts`. Expected: PASS. Then replace the two stubs. Each job reads the configuration first and returns with a warning when the token or the pipeline id is unset, builds its dependencies the way `hubspot-outbox.ts` does, and reads the date through `systemClock`:
+- [x] **Step 7: Run the tests and write the poll and reconcile job bodies.** Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot src/server/jobs/expiry.test.ts`. Expected: PASS. Then replace the two stubs. Each job reads the configuration first and returns with a warning when the token or the pipeline id is unset, builds its dependencies the way `hubspot-outbox.ts` does, and reads the date through `systemClock`:
 
 ```ts
 // src/server/jobs/hubspot-poll.ts
@@ -2281,7 +2281,7 @@ describe('runReconcile', () => {
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/jobs`. Expected: PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add apps/portal/src/server/hubspot/poll.ts apps/portal/src/server/hubspot/poll.test.ts apps/portal/src/server/jobs/hubspot-poll.ts apps/portal/src/server/jobs/hubspot-poll.test.ts apps/portal/src/server/jobs/expiry.ts apps/portal/src/server/jobs/expiry.test.ts apps/portal/src/server/jobs/reconcile.ts apps/portal/src/server/jobs/reconcile.test.ts
@@ -2297,7 +2297,7 @@ The webhook makes stage changes show up in seconds instead of minutes; the 5 min
 - Modify (add one export; W0-c created the file with `runHubspotPoll`, which Task 4.8 filled): `apps/portal/src/server/jobs/hubspot-poll.ts`
 - Test: `apps/portal/src/server/hubspot/signature.test.ts`, `apps/portal/src/app/api/hubspot/webhook/route.test.ts`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // signature.test.ts
@@ -2328,9 +2328,9 @@ describe('verifyV3', () => {
 });
 ```
 
-- [ ] **Step 2: Run and confirm it fails.** Expected: FAIL, "Cannot find module './signature'".
+- [x] **Step 2: Run and confirm it fails.** Expected: FAIL, "Cannot find module './signature'".
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```ts
 // signature.ts
@@ -2346,7 +2346,7 @@ export const verifyV3 = (i: {
 };
 ```
 
-- [ ] **Step 4: The route.** It answers 503 when `HUBSPOT_WEBHOOK_SECRET` is unset (the secret is optional outside production, contracts I and L), otherwise verifies the signature and triggers the same poll the scheduler runs. The lock makes an overlapping trigger a no-op, and the next scheduled poll catches anything that arrived while one was running. Sign the URL HubSpot called, not the internal one Caddy forwards to, so use `APP_URL`.
+- [x] **Step 4: The route.** It answers 503 when `HUBSPOT_WEBHOOK_SECRET` is unset (the secret is optional outside production, contracts I and L), otherwise verifies the signature and triggers the same poll the scheduler runs. The lock makes an overlapping trigger a no-op, and the next scheduled poll catches anything that arrived while one was running. Sign the URL HubSpot called, not the internal one Caddy forwards to, so use `APP_URL`.
 
 ```ts
 // src/app/api/hubspot/webhook/route.ts
@@ -2389,7 +2389,7 @@ The route test (`webhook/route.test.ts`) mocks `@/env` (the secret set, then uns
 
 - [ ] **Step 5: Configure the subscription (manual, developer account or sandbox first).** In the private app's Webhooks settings: target URL `https://partners.cleanstart.com/api/hubspot/webhook`, subscriptions `deal.propertyChange` for `dealstage` and for `protection_end_date`. While developing, expose the local server with a Cloudflare Tunnel (`cloudflared`), not ngrok, whose interstitial page breaks requests. In production, make sure the Cloudflare WAF rule set in front of `partners.cleanstart.com` does not challenge HubSpot's requests to `/api/hubspot/webhook` (a skip rule scoped to that path, with the signature check as the real gate).
 
-- [ ] **Step 6: Run tests, commit**
+- [x] **Step 6: Run tests, commit**
 
 ```bash
 git add apps/portal/src/app/api/hubspot apps/portal/src/server/hubspot/signature.ts apps/portal/src/server/hubspot/signature.test.ts apps/portal/src/server/jobs/hubspot-poll.ts
@@ -2406,7 +2406,7 @@ Not edited here: `AdminAudit.tsx` and the health card. Track A builds `src/compo
 
 `integrationHealth` and `retryFailedOutbox` are the contracts H.13b signatures. `integrationHealth` takes `Pick<Db | Tx, 'select'>` and no viewer: it is registered in the isolation matrix with scope `rls-only`, and its page calls it inside `withViewer` for a partner manager, where row level security gives a partner transaction zeros. Like every repo module, the file ends with an `isolation` export (contracts F.6); the central isolation test fails when a function is missing from it.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // integration-health.test.ts
@@ -2466,7 +2466,7 @@ describe('retryFailedOutbox', () => {
 });
 ```
 
-- [ ] **Step 2: Run and confirm it fails, implement, run again.**
+- [x] **Step 2: Run and confirm it fails, implement, run again.**
 
 ```ts
 // integration-health.ts
@@ -2515,7 +2515,7 @@ export const isolation = defineIsolation<keyof typeof exportedFns>({
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/integration-health.test.ts src/server/repo/isolation.test.ts`. Expected: FAIL first, then PASS (the isolation test picks the new module up automatically). The card shows pending, failed, last poll time, the last error and a Retry button; the button, the audit entry and the card are track A's.
 
-- [ ] **Step 3: Write the failing import test, then the import script.** The 20 or so current partners are imported once, in master Task 5.7, from a JSON file the product owner supplies (`[{ "name": "...", "domain": "...", "category": "channel", "region": "india" }]`). The script creates each partner as `onboarding` (the first registered deal moves it to `active`), writes one `partner.created` audit entry, and enqueues `partner.upsert` with version `'1'` so the company appears in HubSpot through the normal outbox. It skips a domain that already exists, defaults to a dry run and needs `--apply`. Inviting the partners' admins is the Add partner flow (track P), not this script.
+- [x] **Step 3: Write the failing import test, then the import script.** The 20 or so current partners are imported once, in master Task 5.7, from a JSON file the product owner supplies (`[{ "name": "...", "domain": "...", "category": "channel", "region": "india" }]`). The script creates each partner as `onboarding` (the first registered deal moves it to `active`), writes one `partner.created` audit entry, and enqueues `partner.upsert` with version `'1'` so the company appears in HubSpot through the normal outbox. It skips a domain that already exists, defaults to a dry run and needs `--apply`. Inviting the partners' admins is the Add partner flow (track P), not this script.
 
 ```ts
 // scripts/import-partners.test.ts
@@ -2630,16 +2630,16 @@ if (process.argv[1]?.endsWith('import-partners.ts')) {
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run scripts/import-partners.test.ts`. Expected: FAIL first ("Cannot find module './import-partners'"), then PASS, 3 tests.
 
-- [ ] **Step 4: Smoke script (manual, developer account only).** `scripts/hubspot-smoke.ts` runs the real client end to end: upsert a test partner company, create a deal with `portal_registration_id = smoke-<timestamp>`, associate, move it to Discovery, run `pollDeals` (with `clock: systemClock`) against the development database, then archive the test records it created. It refuses to run unless `HUBSPOT_PORTAL_ID` equals the value in `HUBSPOT_DEV_PORTAL_ID`, so it cannot touch production. It is never run overnight (no real HubSpot call without a person, BUILD-HANDOFF).
+- [x] **Step 4: Smoke script (manual, developer account only).** `scripts/hubspot-smoke.ts` runs the real client end to end: upsert a test partner company, create a deal with `portal_registration_id = smoke-<timestamp>`, associate, move it to Discovery, run `pollDeals` (with `clock: systemClock`) against the development database, then archive the test records it created. It refuses to run unless `HUBSPOT_PORTAL_ID` equals the value in `HUBSPOT_DEV_PORTAL_ID`, so it cannot touch production. It is never run overnight (no real HubSpot call without a person, BUILD-HANDOFF).
 
-- [ ] **Step 5: Production provisioning runbook** (write to `docs/partner-portal/HUBSPOT-PROVISIONING.md`, which W2-f links from `docs/operations/PARTNER-PORTAL.md`; executed only in master Task 5.7 after explicit approval):
+- [x] **Step 5: Production provisioning runbook** (write to `docs/partner-portal/HUBSPOT-PROVISIONING.md`, which W2-f links from `docs/operations/PARTNER-PORTAL.md`; executed only in master Task 5.7 after explicit approval):
   1. Create the production private app with the scopes in section 3. Add the token and the webhook client secret as GitHub secrets (`HUBSPOT_PORTAL_TOKEN`, `HUBSPOT_WEBHOOK_SECRET`); the deploy workflow renders them into `/opt/cleanstart/portal.env` on the droplet (chmod 600). Never put them in `/opt/cleanstart/.env`, which is the CMS's file. All three HubSpot variables are required in production and optional everywhere else (contracts I): the app refuses to start in production without them.
   2. Run `provision-hubspot.ts` in dry run and read it. Get the go-ahead. Run with `--apply`. Record the pipeline id in `HUBSPOT_PARTNER_PIPELINE_ID`.
   3. Import the roughly 20 current partners: `import-partners.ts` (dry run first, then `--apply`) creates them in the portal and enqueues `partner.upsert`. Confirm each company appears in HubSpot with `cleanstart_partner = true`.
   4. Approve one test registration for a partner contact, watch it appear in the Partner deals pipeline, move its stage in HubSpot, and confirm the partner sees the change within 5 minutes. Then delete that deal.
   5. Check the health card shows 0 failed and a recent poll time before inviting partners.
 
-- [ ] **Step 6: Run the full gate and commit**
+- [x] **Step 6: Run the full gate and commit**
 
 Run Gate A from `docs/partner-portal/BUILD-HANDOFF.md` (lint, typecheck, test, the locked `build`, the dash check and the allowed-paths check).
 Expected: every command passes.

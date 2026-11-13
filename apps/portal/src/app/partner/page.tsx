@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import { ROUTES } from "@/lib/routes";
+import { homeFor, requireKind } from "@/server/auth/viewer";
 
-export default function PartnerIndex(): never {
-  redirect(ROUTES.partner.overview);
+export default async function PartnerIndex(): Promise<never> {
+  redirect(homeFor(await requireKind("partner")));
 }

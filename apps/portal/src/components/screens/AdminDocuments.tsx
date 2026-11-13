@@ -4,18 +4,31 @@ import { useCallback, useState } from 'react';
 import { Icon } from '@/components/icon';
 import { DocumentEditDrawer } from '@/components/documents/DocumentEditDrawer';
 import { UploadDocumentForm } from '@/components/documents/UploadDocumentForm';
-import { TYPE_ICON, TYPE_TONE } from '@/components/documents/doc-style';
+import { CHIP_PRODUCT, TYPE_ICON, TYPE_TONE } from '@/components/documents/doc-style';
+import { adminUpdatedLabel, audienceTone } from '@/components/documents/doc-view';
 import { Badge, ProductChip } from '@/components/ui/badge';
-import { adminUpdatedLabel, audienceLabel, audienceTone, useDocuments } from '@/data/documents';
+import type { AudiencePartnerDto } from '@/lib/document-upload';
+import { plural } from '@/lib/dates';
+import { DOCUMENT_TYPE_LABEL } from '@/lib/domain';
+import type { DocumentDto } from '@/lib/dto';
+import { audienceLabel, formatLabel } from '@/server/files/rules';
+import { ScrollRegion } from "@/components/ui/scroll-region";
 
-export function AdminDocuments(): React.JSX.Element {
-  const docs = useDocuments();
+export function AdminDocuments({
+  docs,
+  partners,
+  today,
+}: {
+  docs: readonly DocumentDto[];
+  partners: readonly AudiencePartnerDto[];
+  today: string;
+}): React.JSX.Element {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const closeUpload = useCallback((): void => setUploadOpen(false), []);
   const closeEdit = useCallback((): void => setEditingId(null), []);
 
-  const opensTotal = docs.reduce((n, d) => n + d.opens, 0);
+  const opensTotal = docs.reduce((n, d) => n + (d.opens ?? 0), 0);
   const editing = editingId ? (docs.find((d) => d.id === editingId) ?? null) : null;
 
   return (
@@ -32,7 +45,6 @@ export function AdminDocuments(): React.JSX.Element {
           <button
             type="button"
             className="btn btn-p"
-            data-tour="admin-docs-upload"
             onClick={() => setUploadOpen(true)}
           >
             <Icon name="upload" />
@@ -42,13 +54,12 @@ export function AdminDocuments(): React.JSX.Element {
       </div>
 
       <div className="row">
-        {uploadOpen ? <UploadDocumentForm onClose={closeUpload} /> : null}
+        {uploadOpen ? <UploadDocumentForm onClose={closeUpload} partners={partners} /> : null}
 
         <section
           aria-labelledby="lib"
           className="card clip"
           style={{ flex: '1 1 620px', minWidth: 0 }}
-          data-tour="admin-docs-table"
         >
           <div className="card-h">
             <h2 id="lib" className="card-t">
@@ -56,28 +67,30 @@ export function AdminDocuments(): React.JSX.Element {
             </h2>
             <span className="card-meta">Newest first</span>
           </div>
-          <div style={{ overflowX: 'auto' }}>
+          <ScrollRegion label="Document library">
             <table className="tbl">
               <thead>
                 <tr>
                   <th scope="col">Document</th>
-                  <th scope="col">Product</th>
+                  <th scope="col" className="hide-sm">
+                    Product
+                  </th>
                   <th scope="col">Who can open it</th>
-                  <th scope="col" className="r">
+                  <th scope="col" className="r hide-sm">
                     Updated
                   </th>
                   <th scope="col" className="r">
                     Opens
                   </th>
-                  <th scope="col" className="r">
-                    Partners
+                  <th scope="col" className="r hide-sm">
+                    Opened by
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {docs.map((d) => (
                   <tr key={d.id}>
-                    <td style={{ whiteSpace: 'normal', minWidth: 280 }}>
+                    <td style={{ whiteSpace: 'normal', minWidth: 150 }}>
                       <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <span className={`li-ic ${TYPE_TONE[d.type]}`}>
                           <Icon name={TYPE_ICON[d.type]} />
@@ -92,29 +105,40 @@ export function AdminDocuments(): React.JSX.Element {
                             {d.title}
                           </button>
                           <span className="li-s">
-                            {d.type}, {d.format}
+                            {DOCUMENT_TYPE_LABEL[d.type]}, {formatLabel(d)}
                           </span>
                         </span>
                       </span>
                     </td>
-                    <td>
-                      <ProductChip product={d.product} />
+                    <td className="hide-sm">
+                      <ProductChip product={CHIP_PRODUCT[d.product]} />
                     </td>
                     <td>
-                      <Badge tone={audienceTone(d.audience)}>{audienceLabel(d.audience)}</Badge>
+                      <Badge tone={audienceTone(d.audience.kind)}>{audienceLabel(d.audience)}</Badge>
                     </td>
-                    <td className="tnum r t-sec">{adminUpdatedLabel(d)}</td>
-                    <td className="tnum r">{d.opens}</td>
-                    <td className="tnum r t-sec">{d.partnerCount}</td>
+                    <td className="tnum r t-sec hide-sm">{adminUpdatedLabel(d.updatedAt, today)}</td>
+                    <td className="tnum r">{d.opens ?? 0}</td>
+                    <td className="tnum r t-sec hide-sm">{plural(d.partnerCount ?? 0, 'partner')}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
+            {docs.length === 0 ? (
+              <div className="empty">No documents yet. Upload the first one.</div>
+            ) : null}
+          </ScrollRegion>
         </section>
       </div>
 
-      {editing ? <DocumentEditDrawer key={editing.id} doc={editing} onClose={closeEdit} /> : null}
+      {editing ? (
+        <DocumentEditDrawer
+          key={editing.id}
+          doc={editing}
+          partners={partners}
+          today={today}
+          onClose={closeEdit}
+        />
+      ) : null}
     </div>
   );
 }

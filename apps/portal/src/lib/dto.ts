@@ -1,0 +1,576 @@
+import type {
+  AccessRequestRole,
+  AccessRequestStatus,
+  ApplicationSource,
+  ApplicationStatus,
+  AudienceKind,
+  AuditKind,
+  AuditWho,
+  ChecklistStep,
+  DealRegion,
+  DocProduct,
+  DocumentType,
+  EventSource,
+  ExtensionStatus,
+  MessageSide,
+  NotificationCategory,
+  NotificationKind,
+  PartnerCategory,
+  PartnerRegion,
+  PartnerRole,
+  PartnerStatus,
+  Product,
+  RegistrationStatus,
+  StaffRegion,
+  StaffRole,
+  UserKind,
+} from './domain';
+
+export type IsoDate = string; // YYYY-MM-DD
+export type IsoTimestamp = string; // 2026-11-06T14:02:00.000Z
+
+export interface PageDto<T> {
+  rows: T[];
+  total: number;
+  /** Opaque cursor for the next page, or null. */
+  nextCursor: string | null;
+}
+
+/* ---------------------------------------------------------------- shell, account, people */
+
+export interface ShellDto {
+  viewerId: string;
+  viewerName: string;
+  viewerEmail: string;
+  kind: UserKind;
+  /** The role label shown under the name, e.g. "Partner admin" or "Partner manager, India". */
+  roleLabel: string;
+  /** Company line in the sidebar. Partners: the partner. Staff: "CleanStart", sub "Partnerships". */
+  orgName: string;
+  orgSub: string;
+  /** The viewer's partner manager (partner viewers only). */
+  manager: { id: string; name: string; email: string; team: string } | null;
+  /** Staff only: pending registrations in the viewer's scope. Drives the nav count. */
+  waitingApprovals: number;
+  unreadNotifications: number;
+}
+
+export interface ProfileDto {
+  id: string;
+  name: string;
+  email: string;
+  title: string | null;
+  phone: string | null;
+  kind: UserKind;
+  role: PartnerRole | StaffRole;
+  partnerName: string | null;
+  twoFactorEnabled: boolean;
+  passwordChangedAt: IsoTimestamp | null;
+  notifications: Record<NotificationCategory, boolean>;
+}
+
+export interface SessionDto {
+  id: string;
+  createdAt: IsoTimestamp;
+  userAgent: string | null;
+  ipAddress: string | null;
+  current: boolean;
+}
+
+export interface TeamMemberDto {
+  id: string;
+  name: string;
+  email: string;
+  role: PartnerRole;
+  status: 'active' | 'invited';
+  lastActiveAt: IsoTimestamp | null;
+  invitedAt: IsoTimestamp | null;
+  /** Registrations this person registered. */
+  deals: number;
+  isYou: boolean;
+  /** The open invite for an invited member, for resend and withdraw. */
+  inviteId: string | null;
+}
+
+export interface AccessRequestDto {
+  id: string;
+  name: string;
+  email: string;
+  requestedAt: IsoTimestamp;
+  note: string | null;
+  role: AccessRequestRole;
+  status: AccessRequestStatus;
+}
+
+export interface TeamDto {
+  partnerId: string;
+  partnerName: string;
+  members: TeamMemberDto[];
+  requests: AccessRequestDto[];
+}
+
+export interface StaffMemberDto {
+  id: string;
+  name: string;
+  email: string;
+  role: StaffRole;
+  region: StaffRegion;
+  /** Names of the partners this person manages (partner managers only). */
+  partners: string[];
+  status: 'active' | 'invited';
+  lastActiveAt: IsoTimestamp | null;
+  inviteId: string | null;
+  isYou: boolean;
+}
+
+export interface ManagerOptionDto {
+  id: string;
+  name: string;
+  region: StaffRegion;
+  /** "CleanStart India", "CleanStart Middle East". */
+  team: string;
+}
+
+export type InviteState = 'ok' | 'expired' | 'used' | 'revoked' | 'unknown';
+
+export interface InviteDto {
+  id: string;
+  email: string;
+  kind: UserKind;
+  role: PartnerRole | StaffRole;
+  partnerId: string | null;
+  staffRegion: StaffRegion | null;
+  createdAt: IsoTimestamp;
+  expiresAt: IsoTimestamp;
+  resentCount: number;
+  state: InviteState;
+}
+
+/** The token is returned once, to the caller that emails it. It is never stored in clear. */
+export interface CreatedInviteDto {
+  invite: InviteDto;
+  token: string;
+}
+
+export interface InvitePreviewDto {
+  state: InviteState;
+  /** The fields below are present only when state is 'ok'. */
+  email?: string;
+  kind?: UserKind;
+  role?: PartnerRole | StaffRole;
+  partnerName?: string | null;
+  /** Suggested display name (the applicant's name for a partner admin invite). */
+  name?: string | null;
+  /** True when accepting this invite also accepts the partner agreement (a new partner's first admin). */
+  needsAgreement?: boolean;
+  agreementVersion?: string;
+}
+
+/* ---------------------------------------------------------------- applications and partners */
+
+export interface ApplicationDto {
+  id: string;
+  reference: string;
+  company: string;
+  domain: string;
+  applicantName: string;
+  email: string;
+  role: string | null;
+  phone: string | null;
+  category: PartnerCategory | null;
+  region: PartnerRegion | null;
+  reason: string | null;
+  submittedAt: IsoTimestamp;
+  status: ApplicationStatus;
+  source: ApplicationSource;
+  personalEmail: boolean;
+  existingDomain: boolean;
+  declineReason: string | null;
+  decidedAt: IsoTimestamp | null;
+  partnerId: string | null;
+}
+
+export interface PartnerListRow {
+  id: string;
+  name: string;
+  domain: string;
+  category: PartnerCategory;
+  region: PartnerRegion;
+  status: PartnerStatus;
+  statusBeforeSuspend: PartnerStatus | null;
+  /** People with a login (active or invited). */
+  users: number;
+  pending: number;
+  protectedCount: number;
+  won: number;
+  lastActiveAt: IsoTimestamp | null;
+  since: IsoDate;
+  agreementVersion: string | null;
+  agreementAcceptedAt: IsoTimestamp | null;
+  adminName: string | null;
+  managerId: string | null;
+  managerName: string | null;
+  hubspotCompanyId: string | null;
+}
+
+export interface PartnerPersonDto {
+  id: string;
+  name: string;
+  email: string;
+  role: PartnerRole;
+  status: 'active' | 'invited';
+  lastActiveAt: IsoTimestamp | null;
+  invitedAt: IsoTimestamp | null;
+}
+
+export interface PartnerDealRow {
+  registrationId: string;
+  customer: string;
+  product: Product;
+  registeredOn: IsoDate;
+  status: RegistrationStatus;
+}
+
+export interface PartnerDetailDto extends PartnerListRow {
+  website: string | null;
+  phone: string | null;
+  address: string | null;
+  about: string | null;
+  people: PartnerPersonDto[];
+  openInvites: number;
+  recentDeals: PartnerDealRow[];
+}
+
+export interface CompanyDto {
+  partnerId: string;
+  name: string;
+  domain: string;
+  category: PartnerCategory;
+  region: PartnerRegion;
+  status: PartnerStatus;
+  website: string | null;
+  phone: string | null;
+  address: string | null;
+  about: string | null;
+  /** Tiers are out of scope for v1; always null and the screen shows "Not assigned". */
+  tier: null;
+  since: IsoDate;
+  manager: { id: string; name: string; email: string; team: string } | null;
+  agreementVersion: string | null;
+  agreementAcceptedAt: IsoTimestamp | null;
+}
+
+export interface ChecklistDto {
+  steps: Array<{ step: ChecklistStep; done: boolean; doneAt: IsoTimestamp | null }>;
+  /** Whole percent of steps done. */
+  percent: number;
+}
+
+/* ---------------------------------------------------------------- registrations */
+
+export interface RegistrationContactDto {
+  id: string;
+  name: string;
+  role: string | null;
+  email: string | null;
+  phone: string | null;
+}
+
+export interface RegistrationMessageDto {
+  id: string;
+  authorId: string | null;
+  authorName: string;
+  authorOrg: string;
+  side: MessageSide;
+  body: string;
+  createdAt: IsoTimestamp;
+  auto: boolean;
+}
+
+export interface RegistrationEventDto {
+  id: string;
+  at: IsoTimestamp;
+  text: string;
+  byLabel: string;
+  source: EventSource;
+  auto: boolean;
+}
+
+export interface RegistrationListItem {
+  id: string;
+  customer: string;
+  website: string | null;
+  partnerId: string;
+  partnerName: string;
+  partnerCategory: PartnerCategory;
+  product: Product;
+  region: DealRegion;
+  managerId: string | null;
+  managerName: string | null;
+  registeredById: string | null;
+  registeredByName: string;
+  registeredOn: IsoDate;
+  registeredAt: IsoTimestamp;
+  resubmittedOn: IsoDate | null;
+  status: RegistrationStatus;
+  stage: string;
+  protectionEnd: IsoDate | null;
+  closedOn: IsoDate | null;
+  decidedOn: IsoDate | null;
+  decidedByLabel: string | null;
+  rejectionReason: string | null;
+  /** "HS-<hubspot deal id>", or null before the deal exists. */
+  crmRef: string | null;
+  crmSyncedAt: IsoTimestamp | null;
+  extensionStatus: ExtensionStatus;
+}
+
+export interface RegistrationDetailDto extends RegistrationListItem {
+  expectedClose: string | null;
+  notes: string | null;
+  extensionRequestedAt: IsoTimestamp | null;
+  extensionReason: string | null;
+  extensionGrantedAt: IsoTimestamp | null;
+  extensionDays: number | null;
+  hubspotMissing: boolean;
+  decidedAt: IsoTimestamp | null;
+  contacts: RegistrationContactDto[];
+  /** Oldest first. */
+  thread: RegistrationMessageDto[];
+  /** Newest first. */
+  history: RegistrationEventDto[];
+}
+
+export interface RegistrationCheckDto {
+  kind: 'conflict' | 'info' | 'none';
+  /** Present for 'conflict' and 'info': the other registration. */
+  other?: {
+    id: string;
+    partnerName: string;
+    product: Product;
+    status: RegistrationStatus;
+    registeredOn: IsoDate;
+    protectionEnd: IsoDate | null;
+    /** True when the other partner registered first (earlier registeredOn). */
+    registeredFirst: boolean;
+  };
+}
+
+export interface ApprovalRowDto {
+  registration: RegistrationDetailDto;
+  check: RegistrationCheckDto;
+  /** Business days waiting since registeredOn or resubmittedOn. 0 for the same day. */
+  waitingBusinessDays: number;
+  overSla: boolean;
+  /** True for a decision this viewer took within the undo window; the row stays with an Undo button. */
+  canUndo: boolean;
+}
+
+export interface ApprovalQueueDto {
+  rows: ApprovalRowDto[];
+  counts: {
+    waiting: number;
+    overSla: number;
+    conflicts: number;
+    acceptedLast7Days: number;
+    rejectedLast7Days: number;
+    /** Protected deals ending within 14 days across every partner in the viewer's scope. */
+    expiringIn14Days: number;
+  };
+  recentDecisions: RegistrationListItem[];
+}
+
+export interface CustomerSuggestionDto {
+  name: string;
+  website: string | null;
+  /** The partner's own registrations for this customer, oldest first. */
+  registrations: Array<{ id: string; product: Product; status: RegistrationStatus; protectionEnd: IsoDate | null }>;
+}
+
+export interface DecisionResult {
+  registration: RegistrationDetailDto;
+  partnerName: string;
+  decidedAt: IsoTimestamp;
+  /** Partner users to notify: the person who registered it, or the partner admins when that person is gone. */
+  recipientUserIds: string[];
+}
+
+export interface ExtensionResult {
+  registration: RegistrationDetailDto;
+  partnerName: string;
+  /** The deal's partner manager (staff user id) to notify, or null when none. */
+  managerUserId: string | null;
+}
+
+export interface ExtensionDecisionResult {
+  registration: RegistrationDetailDto;
+  partnerName: string;
+  granted: boolean;
+  /** The new protection end when granted, otherwise null. Used as the outbox `version`. */
+  newProtectionEnd: IsoDate | null;
+  recipientUserIds: string[];
+}
+
+export interface ReminderCandidateDto {
+  registrationId: string;
+  customer: string;
+  product: Product;
+  partnerId: string;
+  protectionEnd: IsoDate;
+  daysBefore: number;
+  /** Partner users who should be told: the registrant plus partner admins, deduplicated. */
+  recipientUserIds: string[];
+}
+
+/* ---------------------------------------------------------------- overview and reports */
+
+export interface AttentionItemDto {
+  key: string;
+  kind: 'access_request' | 'expiring' | 'late' | 'declined' | 'invite_pending';
+  title: string;
+  meta: string;
+  href: string;
+}
+
+export interface PartnerOverviewDto {
+  /** Salespeople see only their own deals; true tells the screen to say so. */
+  ownDealsOnly: boolean;
+  waiting: { count: number; oldestDays: number };
+  protectedNow: { count: number; byProduct: Array<{ product: Product; count: number }> };
+  expiring14: { count: number; customers: string[] };
+  wonThisYear: { count: number; customers: string[] };
+  attention: AttentionItemDto[];
+  recent: RegistrationListItem[];
+  newDocuments: DocumentListItemDto[];
+}
+
+export interface PartnerReportRow {
+  partnerId: string;
+  name: string;
+  category: PartnerCategory;
+  region: PartnerRegion;
+  registered: number;
+  waiting: number;
+  /** Ever accepted: status accepted, won, lost or expired. */
+  accepted: number;
+  rejected: number;
+  won: number;
+  protectedNow: number;
+}
+
+export interface ProductReportRow {
+  product: Product;
+  registered: number;
+  accepted: number;
+  won: number;
+}
+
+export interface FollowUpDto {
+  partnerId: string;
+  name: string;
+  /** "Invited 27 Oct, has not accepted the agreement". Built by the repo from real dates. */
+  why: string;
+  status: 'onboarding' | 'inactive';
+}
+
+export interface AdminReportsDto {
+  totalPartners: number;
+  totalRegistered: number;
+  partners: PartnerReportRow[];
+  products: ProductReportRow[];
+  followUps: FollowUpDto[];
+  expiringIn14Days: number;
+}
+
+/* ---------------------------------------------------------------- documents */
+
+export interface DocumentAudienceDto {
+  kind: AudienceKind;
+  categories: PartnerCategory[];
+  /** Named partners. Empty for partner viewers. */
+  partners: Array<{ id: string; name: string }>;
+}
+
+export interface DocumentListItemDto {
+  id: string;
+  title: string;
+  type: DocumentType;
+  product: DocProduct;
+  summary: string | null;
+  durationMinutes: number | null;
+  fileSize: number;
+  mime: string;
+  originalName: string;
+  version: number;
+  updatedAt: IsoTimestamp;
+}
+
+export interface DocumentDto extends DocumentListItemDto {
+  audience: DocumentAudienceDto;
+  uploadedByName: string | null;
+  createdAt: IsoTimestamp;
+  /** Staff only: total opens and distinct partners. Null for partner viewers. */
+  opens: number | null;
+  partnerCount: number | null;
+  /** Partner only: opens by the viewer's own company. Null for staff. */
+  ownOpens: number | null;
+}
+
+export interface DocumentOpenTarget {
+  fileKey: string;
+  originalName: string;
+  mime: string;
+}
+
+/* ---------------------------------------------------------------- audit, search, notifications, health */
+
+export interface AuditEntryDto {
+  id: string;
+  at: IsoTimestamp;
+  actorId: string | null;
+  actorLabel: string;
+  actorRole: string | null;
+  whoKind: AuditWho;
+  kind: AuditKind;
+  event: string;
+  action: string;
+  target: string;
+  source: EventSource;
+  before: string | null;
+  after: string | null;
+  note: string | null;
+  partnerId: string | null;
+}
+
+export type AuditPeriod = '7d' | '30d' | '90d';
+
+export interface SearchHitDto {
+  group: 'registrations' | 'partners' | 'documents' | 'people';
+  label: string;
+  hint: string;
+  href: string;
+  icon: 'deals' | 'bld' | 'file' | 'play' | 'team' | 'approve';
+}
+
+export interface NotificationDto {
+  id: string;
+  kind: NotificationKind;
+  title: string;
+  body: string | null;
+  link: string | null;
+  readAt: IsoTimestamp | null;
+  createdAt: IsoTimestamp;
+}
+
+export interface NotificationsDto {
+  items: NotificationDto[];
+  unread: number;
+}
+
+/** Exception to the string-dates rule: the HubSpot plan returns a Date, and a Date crosses the server to client boundary. */
+export interface IntegrationHealthDto {
+  pending: number;
+  failed: number;
+  lastPollAt: Date | null;
+  lastError: string | null;
+}
