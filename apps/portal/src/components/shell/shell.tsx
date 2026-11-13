@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { settleAuth } from "@/lib/auth-call";
 import { authClient } from "@/lib/auth-client";
 import type { NotificationsDto, ShellDto } from "@/lib/dto";
 import { initialsOf } from "@/lib/initials";
-import { type NavItem, type PortalKind, ROUTES } from "@/lib/routes";
+import { activeNavHref, joinWords, type NavItem, type PortalKind, ROUTES, searchNouns } from "@/lib/routes";
 import { sendManagerMessageAction } from "@/server/actions/partners";
 import { Icon } from "../icon";
 import { Avatar } from "../ui/badge";
@@ -17,13 +17,53 @@ import { NotificationsPopover } from "./notifications-popover";
 import { OPEN_SEARCH_EVENT, SearchPalette } from "./search-palette";
 import { Scrim } from "@/components/ui/scrim";
 
-function crumbFor(nav: readonly NavItem[], pathname: string): string {
-  if (pathname.startsWith(ROUTES.partner.account)) return "Your account";
-  if (pathname.startsWith(ROUTES.partner.welcome)) return "Overview";
-  const match = [...nav]
-    .sort((a, b) => b.href.length - a.href.length)
-    .find((n) => pathname === n.href || pathname.startsWith(`${n.href}/`));
-  return match?.label ?? "";
+const NARROW = "(max-width: 760px)";
+const DENIED_MESSAGE = "You do not have access to that page.";
+
+/** True under the breakpoint where portal.css turns the sidebar into a slide-in menu. */
+function useNarrow(): boolean {
+  return useSyncExternalStore(
+    (onChange) => {
+      const query = window.matchMedia(NARROW);
+      query.addEventListener("change", onChange);
+      return () => query.removeEventListener("change", onChange);
+    },
+    () => window.matchMedia(NARROW).matches,
+    () => false,
+  );
+}
+
+/** "Ctrl K" or the command symbol, decided after mount so the server and first client render agree. */
+function useShortcutHint(): string {
+  const [hint, setHint] = useState("Ctrl K");
+  useEffect(() => {
+    if (/Mac|iPhone|iPad/.test(navigator.platform)) setHint("\u2318K");
+  }, []);
+  return hint;
+}
+
+/** The customer on a deal page. The layout does not know it, so read the page's own heading once it renders. */
+function useDealName(pathname: string): string | null {
+  const [name, setName] = useState<string | null>(null);
+  const onDeal = pathname.startsWith(`${ROUTES.partner.deals}/`) && pathname !== ROUTES.partner.newDeal;
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the path is the trigger
+  useEffect(() => {
+    setName(null);
+    const main = document.getElementById("main");
+    if (!onDeal || !main) return;
+    const read = (): boolean => {
+      const text = main.querySelector("h1")?.textContent?.trim();
+      if (text) setName(text);
+      return Boolean(text);
+    };
+    if (read()) return;
+    const observer = new MutationObserver(() => {
+      if (read()) observer.disconnect();
+    });
+    observer.observe(main, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [pathname, onDeal]);
+  return name;
 }
 
 export function Shell({
@@ -84,7 +124,59 @@ export function Shell({
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const crumb = crumbFor(nav, pathname);
+  // A redirect from a page the role cannot open arrives as ?denied=1: say so once, then clean the address.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the path is the trigger
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("denied") !== "1") return;
+    toast(DENIED_MESSAGE);
+    params.delete("denied");
+    const rest = params.toString();
+    window.history.replaceState(window.history.state, "", `${pathname}${rest ? `?${rest}` : ""}${window.location.hash}`);
+  }, [pathname]);
+
+  const activeHref = activeNavHref(nav, pathname);
+  const narrow = useNarrow();
+  const dealName = useDealName(pathname);
+  const shortcut = useShortcutHint();
+  const nouns = searchNouns(kind, nav);
+  const searchLabel = `Search ${joinWords(nouns.slice(0, 2)) || "pages"}`;
+  const hasDocuments = nav.some((item) => item.href === ROUTES.partner.documents);
+
+  // The crumb says only what the heading below does not: the organisation on mobile, the way back on a deal page.
+  const underDeals = kind === "partner" && pathname.startsWith(`${ROUTES.partner.deals}/`);
+  let crumb: React.JSX.Element;
+  if (narrow) {
+    crumb = (
+      <nav aria-label="Breadcrumb" className="crumb">
+        <b>{me.org}</b>
+      </nav>
+    );
+  } else if (underDeals) {
+    crumb = (
+      <nav aria-label="Breadcrumb" className="crumb">
+        <Link href={ROUTES.partner.deals}>Deals</Link>
+        <span>/</span>
+        <b aria-current="page">{pathname === ROUTES.partner.newDeal ? "Register deal" : (dealName ?? "Deal")}</b>
+      </nav>
+    );
+  } else if (kind === "partner" && pathname.startsWith(ROUTES.partner.welcome)) {
+    crumb = (
+      <nav aria-label="Breadcrumb" className="crumb">
+        <span>{me.org}</span>
+        <span>/</span>
+        <b>Overview</b>
+      </nav>
+    );
+  } else if (kind === "partner") {
+    crumb = (
+      <nav aria-label="Breadcrumb" className="crumb">
+        <b>{me.org}</b>
+      </nav>
+    );
+  } else {
+    crumb = <div className="crumb" />;
+  }
 
   const sendMessage = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
@@ -138,8 +230,7 @@ export function Shell({
             </div>
             <div className="nav">
               {nav.map((item) => {
-                const on = pathname === item.href || pathname.startsWith(`${item.href}/`) ||
-                  (item.href === ROUTES.partner.overview && pathname.startsWith(ROUTES.partner.welcome));
+                const on = item.href === activeHref;
                 const count = countFor(item);
                 return (
                   <Link
@@ -150,7 +241,11 @@ export function Shell({
                   >
                     <Icon name={item.icon} />
                     {item.label}
-                    {count ? <span className="nav-cnt">{count}</span> : null}
+                    {count ? (
+                      <span className="nav-cnt" title={`${count} ${waiting === 1 ? "deal" : "deals"} waiting for review`}>
+                        {count}
+                      </span>
+                    ) : null}
                   </Link>
                 );
               })}
@@ -254,27 +349,21 @@ export function Shell({
             >
               <Icon d={MENU} />
             </button>
-            <nav aria-label="Breadcrumb" className="crumb">
-              <span>{me.org}</span>
-              <span>/</span>
-              <b>{crumb}</b>
-            </nav>
+            {crumb}
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
               <button
                 type="button"
                 className="search"
                 aria-haspopup="dialog"
-                aria-label={kind === "partner" ? "Search deals and documents" : "Search partners and registrations"}
+                aria-label={searchLabel}
                 onClick={() => {
                   setPop(null);
                   window.dispatchEvent(new Event(OPEN_SEARCH_EVENT));
                 }}
               >
                 <Icon name="search" small />
-                <span className="search-t">
-                  {kind === "partner" ? "Search deals and documents" : "Search partners and registrations"}
-                </span>
-                <span className="kbd">Ctrl K</span>
+                <span className="search-t">{searchLabel}</span>
+                <span className="kbd">{shortcut}</span>
               </button>
               <div className="pop-wrap">
                 <button
@@ -309,22 +398,24 @@ export function Shell({
                         <span className="li-t">
                           <span className="li-n">Search the portal</span>
                           <span className="li-s">
-                            {kind === "partner" ? "Deals, documents and pages" : "Partners, registrations and pages"}
+                            {capitalise(joinWords([...nouns, "pages"]))}
                           </span>
                         </span>
-                        <span className="kbd">Ctrl K</span>
+                        <span className="kbd">{shortcut}</span>
                       </button>
                       {kind === "partner" ? (
                         <>
-                          <Link href={ROUTES.partner.documents} className="li">
-                            <span className="li-ic">
-                              <Icon name="file" />
-                            </span>
-                            <span className="li-t">
-                              <span className="li-n">Partner sales playbook 2026</span>
-                              <span className="li-s">How deal registration and protection work</span>
-                            </span>
-                          </Link>
+                          {hasDocuments ? (
+                            <Link href={ROUTES.partner.documents} className="li">
+                              <span className="li-ic">
+                                <Icon name="file" />
+                              </span>
+                              <span className="li-t">
+                                <span className="li-n">Documents</span>
+                                <span className="li-s">Guides and sales material</span>
+                              </span>
+                            </Link>
+                          ) : null}
                           <button
                             type="button"
                             className="li linkbtn"
@@ -431,6 +522,8 @@ export function Shell({
     </>
   );
 }
+
+const capitalise = (text: string): string => text.charAt(0).toUpperCase() + text.slice(1);
 
 const SIGN_OUT =
   "M118,216a6,6,0,0,1-6,6H48a6,6,0,0,1-6-6V40a6,6,0,0,1,6-6h64a6,6,0,0,1,0,12H54V210h58A6,6,0,0,1,118,216Zm110.24-92.24-40-40a6,6,0,0,0-8.48,8.48L209.51,122H112a6,6,0,0,0,0,12h97.51l-29.75,29.76a6,6,0,1,0,8.48,8.48l40-40A6,6,0,0,0,228.24,123.76Z";

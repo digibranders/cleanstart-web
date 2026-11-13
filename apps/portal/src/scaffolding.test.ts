@@ -74,7 +74,7 @@ describe('the shell reads real data (M5.4 step 0)', () => {
   it('mounts the search palette and the notifications popover', () => {
     expect(shell).toContain('<SearchPalette kind={kind} nav={nav} />');
     expect(shell).toContain('<NotificationsPopover');
-    expect(shell).toContain('aria-label={kind === "partner" ? "Search deals and documents" : "Search partners and registrations"}');
+    expect(shell).toContain("aria-label={searchLabel}");
   });
 
   it.each(['src/app/partner/layout.tsx', 'src/app/admin/layout.tsx'])('%s loads the viewer notifications', (layout) => {
