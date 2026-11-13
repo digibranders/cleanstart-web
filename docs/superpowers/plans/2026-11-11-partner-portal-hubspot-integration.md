@@ -717,7 +717,7 @@ git commit -m "feat(portal): H4.2 HubspotApi interface, real client and in-memor
 - Create: `apps/portal/src/server/hubspot/mappers.ts`
 - Test: `apps/portal/src/server/hubspot/mappers.test.ts`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```ts
 // mappers.test.ts
@@ -807,12 +807,12 @@ describe('STAGE_TO_STATUS', () => {
 
 `dealProperties` takes display labels (`'Clean Libraries'`, `'India'`), not the stored codes (`libraries`, `india`): the enumeration values must match the spec's `opt()` helper exactly (`clean_libraries`, `cleanstart_images`, `india`, `middle_east`), which is why the test spells them out. The `registration.create` handler maps the stored codes to labels before calling it (Task 4.6).
 
-- [ ] **Step 2: Run it and confirm it fails**
+- [x] **Step 2: Run it and confirm it fails**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/mappers.test.ts`
 Expected: FAIL, "Cannot find module './mappers'".
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 ```ts
 // mappers.ts
@@ -901,12 +901,12 @@ const DELAYS_MS = [60_000, 300_000, 1_800_000, 7_200_000, 43_200_000];
 export const nextDelayMs = (attempts: number): number | null => DELAYS_MS[attempts - 1] ?? null;
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/mappers.test.ts`
 Expected: PASS, all tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/portal/src/server/hubspot/mappers.ts apps/portal/src/server/hubspot/mappers.test.ts
