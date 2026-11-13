@@ -14,7 +14,7 @@ vi.mock('@/server/files/open-route', async (importOriginal) => {
   };
 });
 
-import { GET } from './route';
+import { GET, HEAD } from './route';
 
 const call = (id: string) => GET(new Request(`http://localhost:3004/api/files/${id}`), { params: Promise.resolve({ id }) });
 
@@ -40,5 +40,13 @@ describe('GET /api/files/[id]', () => {
     const res = await call('doc-1');
     expect(res.status).toBe(429);
     expect(Number(res.headers.get('Retry-After'))).toBeGreaterThan(0);
+  });
+  it('answers HEAD with 405 and never reaches the open handler, so a link preview counts nothing', async () => {
+    state.viewer = { id: 'user-head', kind: 'partner', role: 'sales', partnerId: 'p1', partnerName: 'P', email: 'a@b.co', name: 'A' };
+    state.handled.length = 0;
+    const res = await HEAD();
+    expect(res.status).toBe(405);
+    expect(res.headers.get('Allow')).toBe('GET');
+    expect(state.handled).toHaveLength(0);
   });
 });

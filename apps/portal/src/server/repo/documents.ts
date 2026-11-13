@@ -30,6 +30,7 @@ import {
   type PartnerCategory,
 } from '@/lib/domain';
 import type { DocumentAudienceDto, DocumentDto, DocumentListItemDto, DocumentOpenTarget } from '@/lib/dto';
+import { can } from '@/server/auth/policies';
 import type { SystemActor, Viewer } from '@/server/auth/types';
 import { NotFoundError, ValidationError } from '@/server/errors';
 import {
@@ -101,11 +102,14 @@ const toListItem = (row: DocumentRow): DocumentListItemDto => ({
   updatedAt: row.updatedAt.toISOString(),
 });
 
-/** Adds audience, open counts and the uploader. Partners get no audience detail and only their own company's opens. */
+/**
+ * Adds audience, open counts and the uploader. Only staff who hold document.read_stats get the detail; partners get
+ * no audience detail and only their own company's opens; staff without the permission get the same shape with nulls.
+ */
 async function hydrate(tx: Tx, viewer: Viewer, rows: readonly DocumentRow[]): Promise<DocumentDto[]> {
   if (rows.length === 0) return [];
   const ids = rows.map((row) => row.id);
-  const staff = viewer.kind === 'staff';
+  const staff = viewer.kind === 'staff' && can(viewer, 'document.read_stats');
   const own =
     viewer.kind === 'partner'
       ? sql<number>`(count(*) filter (where ${documentOpens.partnerId} = ${viewer.partnerId}::uuid))::int`
@@ -152,7 +156,7 @@ async function hydrate(tx: Tx, viewer: Viewer, rows: readonly DocumentRow[]): Pr
       createdAt: row.createdAt.toISOString(),
       opens: staff ? (s?.opens ?? 0) : null,
       partnerCount: staff ? (s?.partnerCount ?? 0) : null,
-      ownOpens: staff ? null : (s?.own ?? 0),
+      ownOpens: viewer.kind === 'staff' ? null : (s?.own ?? 0),
     };
   });
 }

@@ -79,6 +79,24 @@ describe('listDocuments', () => {
     expect((await withViewer(staff, (tx) => listDocuments(tx, staff, { product: 'images' }))).map((d) => d.title)).toEqual(['Alpha sheet']);
   });
 
+  it('gives open counts, named partners and the uploader only to staff who may read stats', async () => {
+    const manager = await asStaff(db, 'partner_manager');
+    const marketing = await asStaff(db, 'marketing');
+    const sales = await asStaff(db, 'sales');
+    const partner = await makePartner(db, {});
+    const user = await makeUser(db, { partnerId: partner.id, role: 'sales' });
+    const doc = await makeDocument(db, { audienceKind: 'named', partnerIds: [partner.id], uploadedBy: manager.id });
+    await db.insert(documentOpens).values({ documentId: doc.id, userId: user.id, partnerId: partner.id });
+    for (const allowed of [manager, marketing]) {
+      const [row] = await withViewer(allowed, (tx) => listDocuments(tx, allowed, {}));
+      expect(row).toMatchObject({ opens: 1, partnerCount: 1, uploadedByName: expect.any(String) });
+      expect(row?.audience.partners).toHaveLength(1);
+    }
+    const [hidden] = await withViewer(sales, (tx) => listDocuments(tx, sales, {}));
+    expect(hidden).toMatchObject({ opens: null, partnerCount: null, ownOpens: null, uploadedByName: null });
+    expect(hidden?.audience).toEqual({ kind: 'named', categories: [], partners: [] });
+  });
+
   it('returns file details but never the file key, and hides the audience from partners', async () => {
     const channel = await partnerFixture('channel');
     await makeDocument(db, { originalName: 'x.pdf', mime: 'application/pdf', fileSize: 2048, audienceKind: 'categories', audienceCategories: ['channel'] });
