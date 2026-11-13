@@ -10,8 +10,9 @@ export const metadata: Metadata = { title: "Partners" };
 
 export default async function Page(): Promise<React.JSX.Element> {
   const viewer = await requireCan("partner.read");
+  const canRead = can(viewer, "application.read");
   const canDecide = can(viewer, "application.approve");
-  const data = canDecide
+  const data = canRead
     ? await withViewer(viewer, async (tx) => ({
         applications: await listApplications(tx, viewer, {}),
         waiting: await countNewApplications(tx, viewer),
@@ -19,7 +20,7 @@ export default async function Page(): Promise<React.JSX.Element> {
     : { applications: [], waiting: 0 };
   return (
     <Suspense fallback={null}>
-      <AdminPartners applications={data.applications} waiting={data.waiting} canDecide={canDecide} />
+      <AdminPartners applications={data.applications} waiting={data.waiting} canRead={canRead} canDecide={canDecide} />
     </Suspense>
   );
 }

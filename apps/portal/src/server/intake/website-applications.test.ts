@@ -69,6 +69,13 @@ describe('importWebsiteApplications', () => {
     expect((await db.select().from(applications)).map((a) => a.sourceRef)).toEqual(['cms-4']);
   });
 
+  it('skips a row it cannot import, keeps going, and never takes the cursor from the bad row', async () => {
+    stub = await startStubCms([row(1), row(2, { createdAt: 'not-a-date' }), row(3)]);
+    const result = await run();
+    expect(result).toMatchObject({ fetched: 3, imported: 2, failed: 1, cursor: '2026-11-03T09:00:00.000Z' });
+    expect((await db.select().from(applications)).map((a) => a.sourceRef).sort()).toEqual(['cms-1', 'cms-3']);
+  });
+
   it('imports a personal address with the badge instead of rejecting it', async () => {
     stub = await startStubCms([row(1, { email: 'neha@gmail.com' })]);
     await run();

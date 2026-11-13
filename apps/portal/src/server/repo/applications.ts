@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, isNull, or, sql, type SQL } from 'drizzle-orm';
+import { and, desc, eq, ilike, isNotNull, isNull, ne, or, sql, type SQL } from 'drizzle-orm';
 import { applications, invites, partners, users } from '@/db/schema';
 import type { Clock } from '@/lib/clock';
 import type { ApplicationSource, ApplicationStatus, PartnerCategory, PartnerRegion } from '@/lib/domain';
@@ -377,7 +377,7 @@ export async function declineApplication(
 
 /**
  * Staff (M1.4). Undo. Revokes the open invite and marks the created partner 'inactive' (never deletes it), only while
- * the partner is still 'onboarding' and has not accepted the agreement; otherwise ConflictError('partner_not_reopenable').
+ * the partner is still 'onboarding' with no agreement, no accepted invite and no non-disabled user; otherwise ConflictError('partner_not_reopenable').
  * The application returns to 'new' and keeps `partnerId` so a second approval reuses the partner.
  */
 export async function reopenApplication(
@@ -393,6 +393,19 @@ export async function reopenApplication(
     const [partner] = await tx.select().from(partners).where(eq(partners.id, row.partnerId)).limit(1).for('update');
     if (!partner || partner.status !== 'onboarding' || partner.agreementAcceptedAt !== null) {
       throw new ConflictError('partner_not_reopenable', 'The partner has already signed in, so the approval cannot be undone.');
+    }
+    const [login] = await tx
+      .select({ id: users.id })
+      .from(users)
+      .where(and(eq(users.partnerId, partner.id), ne(users.status, 'disabled')))
+      .limit(1);
+    const [accepted] = await tx
+      .select({ id: invites.id })
+      .from(invites)
+      .where(and(eq(invites.partnerId, partner.id), isNotNull(invites.acceptedAt)))
+      .limit(1);
+    if (login || accepted) {
+      throw new ConflictError('partner_not_reopenable', 'The partner already has people signed in, so the approval cannot be undone.');
     }
     await tx
       .update(invites)

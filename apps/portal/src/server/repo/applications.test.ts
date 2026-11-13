@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { eq } from 'drizzle-orm';
 import { applications, auditLog, invites, notifications, partners } from '@/db/schema';
-import { asPartner, asStaff, makeApplication, makePartner, makeUser, resetDb, testDb } from '@/db/test-helpers';
+import { asPartner, asStaff, makeApplication, makeInvite, makePartner, makeUser, resetDb, testDb } from '@/db/test-helpers';
 import { fixedClock } from '@/lib/clock';
 import { hashToken, INVITE_TTL_DAYS } from '@/server/auth/tokens';
 import { SYSTEM_ACTORS, publicActor } from '@/server/auth/types';
@@ -269,6 +269,30 @@ describe('reopenApplication', () => {
     await db.update(partners).set({ agreementAcceptedAt: new Date('2026-11-10T00:00:00Z'), agreementVersion: 'draft-0' }).where(eq(partners.id, partner.id));
     const app = await makeApplication(db, { domain: 'signed.example', email: 's@signed.example', source: 'portal', status: 'approved', partnerId: partner.id });
     await expect(withViewer(viewer, (tx) => reopenApplication(tx, viewer, { id: app.id }, clock))).rejects.toMatchObject({ reason: 'partner_not_reopenable' });
+  });
+
+  it('refuses to undo once a person has a login for the partner, even before the agreement is accepted', async () => {
+    const viewer = await asManager();
+    const partner = await makePartner(db, { domain: 'people.example', status: 'onboarding' });
+    await makeUser(db, { partnerId: partner.id, role: 'partner_admin', status: 'active' });
+    const app = await makeApplication(db, { domain: 'people.example', email: 'p@people.example', source: 'portal', status: 'approved', partnerId: partner.id });
+    await expect(withViewer(viewer, (tx) => reopenApplication(tx, viewer, { id: app.id }, clock))).rejects.toMatchObject({
+      reason: 'partner_not_reopenable',
+      safeMessage: 'The partner already has people signed in, so the approval cannot be undone.',
+    });
+    expect((await db.select().from(partners).where(eq(partners.id, partner.id)))[0]?.status).toBe('onboarding');
+  });
+
+  it('refuses to undo once an invite was accepted, and still allows it when only disabled users exist', async () => {
+    const viewer = await asManager();
+    const accepted = await makePartner(db, { domain: 'accepted.example', status: 'onboarding' });
+    await makeInvite(db, { kind: 'partner', partnerId: accepted.id, role: 'partner_admin', email: 'a@accepted.example', acceptedAt: new Date('2026-11-10T00:00:00Z') });
+    const first = await makeApplication(db, { domain: 'accepted.example', email: 'a@accepted.example', source: 'portal', status: 'approved', partnerId: accepted.id });
+    await expect(withViewer(viewer, (tx) => reopenApplication(tx, viewer, { id: first.id }, clock))).rejects.toMatchObject({ reason: 'partner_not_reopenable' });
+    const quiet = await makePartner(db, { domain: 'quiet.example', status: 'onboarding' });
+    await makeUser(db, { partnerId: quiet.id, role: 'partner_admin', status: 'disabled' });
+    const second = await makeApplication(db, { domain: 'quiet.example', email: 'q@quiet.example', source: 'portal', status: 'approved', partnerId: quiet.id });
+    await expect(withViewer(viewer, (tx) => reopenApplication(tx, viewer, { id: second.id }, clock))).resolves.toMatchObject({ status: 'new' });
   });
 
   it('refuses an application that is already open', async () => {

@@ -9,6 +9,7 @@ import type { Clock } from '@/lib/clock';
 import { emailDomain, isPlausibleDomain, normaliseDomain } from '@/lib/people';
 import { SYSTEM_ACTORS } from '@/server/auth/types';
 import { IntegrationError } from '@/server/errors';
+import { log } from '@/server/log';
 import { insertWebsiteApplication, type NewApplicationRecord } from '@/server/repo/applications';
 import { withSystem } from '@/server/repo/context';
 
@@ -94,6 +95,8 @@ export interface IntakeResult {
   fetched: number;
   imported: number;
   skipped: { honeypot: number; redacted: number; turnstile: number; duplicate: number };
+  /** Rows that could not be imported (bad data or a failed insert); they are logged by CMS id and the run goes on. */
+  failed: number;
   cursor: string | null;
 }
 
@@ -142,15 +145,19 @@ export async function importWebsiteApplications(deps: { db: Db; cms: CmsClient; 
     fetched: 0,
     imported: 0,
     skipped: { honeypot: 0, redacted: 0, turnstile: 0, duplicate: 0 },
+    failed: 0,
     cursor: since,
   };
   let newest = since;
+  // A row that failed with a valid timestamp is retried next run, so the cursor must not move past it.
+  let holdCursor = false;
 
   for (let page = 1; page <= MAX_PAGES; page += 1) {
     const batch = await cms.listPartnerApplications({ since, page, limit: PAGE_LIMIT });
     for (const row of batch.docs) {
       result.fetched += 1;
-      if (newest === null || Date.parse(row.createdAt) > Date.parse(newest)) newest = row.createdAt;
+      const createdAtMs = Date.parse(row.createdAt);
+      if (!Number.isNaN(createdAtMs) && (newest === null || createdAtMs > Date.parse(newest))) newest = row.createdAt;
       if (row.piiRedactedAt) {
         result.skipped.redacted += 1;
         continue;
@@ -163,17 +170,25 @@ export async function importWebsiteApplications(deps: { db: Db; cms: CmsClient; 
         result.skipped.turnstile += 1;
         continue;
       }
-      const record = mapCmsApplication(row, partnerDomains);
-      const { inserted } = await withSystem(SYSTEM_ACTORS.intake, (tx) =>
-        insertWebsiteApplication(tx, SYSTEM_ACTORS.intake, record, clock),
-      );
-      if (inserted) result.imported += 1;
-      else result.skipped.duplicate += 1;
+      try {
+        if (Number.isNaN(createdAtMs)) throw new RangeError('createdAt is not a date');
+        const record = mapCmsApplication(row, partnerDomains);
+        const { inserted } = await withSystem(SYSTEM_ACTORS.intake, (tx) =>
+          insertWebsiteApplication(tx, SYSTEM_ACTORS.intake, record, clock),
+        );
+        if (inserted) result.imported += 1;
+        else result.skipped.duplicate += 1;
+      } catch (error) {
+        result.failed += 1;
+        if (!Number.isNaN(createdAtMs)) holdCursor = true;
+        // CMS id and error name only: the row holds the applicant's personal data.
+        log.warn({ cmsId: row.id, error: error instanceof Error ? error.name : 'unknown' }, 'website application skipped');
+      }
     }
     if (!batch.hasNextPage) break;
   }
 
-  if (newest !== null && newest !== since) {
+  if (!holdCursor && newest !== null && newest !== since) {
     await db
       .insert(hubspotSyncState)
       .values({ key: CURSOR_KEY, value: { createdAt: newest } })

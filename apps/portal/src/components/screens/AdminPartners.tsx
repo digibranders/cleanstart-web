@@ -8,6 +8,7 @@ import { ApplicationsTable } from "@/components/partners/applications-table";
 import { downloadCsv } from "@/components/partners/csv";
 import { PartnerDetail } from "@/components/partners/partner-detail";
 import { CategoryDialog, ManagerDialog } from "@/components/partners/partner-dialogs";
+import { type PartnerTab as Tab, partnerTabs } from "@/components/partners/partner-tabs";
 import { CATEGORY_FOR_FILTER, type CategoryFilter, PartnersTable } from "@/components/partners/partners-table";
 import { useToast } from "@/components/ui/toast";
 import {
@@ -28,24 +29,24 @@ import {
   reopenApplicationAction,
 } from "@/server/actions/applications";
 
-type Tab = "Partners" | "Applications";
-
 interface AdminPartnersProps {
   applications: ApplicationDto[];
   /** Applications with status new, from countNewApplications. */
   waiting: number;
-  /** Partner managers decide on applications; other staff see the list. */
+  /** Holders of `application.read` see the Applications tab and its count. */
+  canRead: boolean;
+  /** Holders of `application.approve` get the approve, decline and undo buttons. */
   canDecide: boolean;
 }
 
-export function AdminPartners({ applications, waiting, canDecide }: AdminPartnersProps): React.JSX.Element {
+export function AdminPartners({ applications, waiting, canRead, canDecide }: AdminPartnersProps): React.JSX.Element {
   const toast = useToast();
   const { partners } = partnersSlice.use();
   const [tab, setTab] = useState<Tab>("Partners");
   const requestedTab = useSearchParams().get("tab");
   useEffect(() => {
-    if (requestedTab === "applications") setTab("Applications");
-  }, [requestedTab]);
+    if (requestedTab === "applications" && canRead) setTab("Applications");
+  }, [requestedTab, canRead]);
   const [category, setCategory] = useState<CategoryFilter>("All");
   const [region, setRegion] = useState("All regions");
   const [status, setStatus] = useState("Any status");
@@ -114,10 +115,7 @@ export function AdminPartners({ applications, waiting, canDecide }: AdminPartner
     toast(input.sendInvite ? `Invite sent to ${input.email.trim()}` : `${added.name} added, invite not sent yet`);
   };
 
-  const tabs: readonly (readonly [Tab, number])[] = [
-    ["Partners", total],
-    ["Applications", waiting],
-  ];
+  const tabs = partnerTabs(total, waiting, canRead);
 
   return (
     <div className="wrap">
@@ -146,11 +144,13 @@ export function AdminPartners({ applications, waiting, canDecide }: AdminPartner
             {onboarding} onboarding, {inactive} inactive
           </span>
         </div>
-        <div className="kpi">
-          <span className="kpi-l">Applications</span>
-          <span className="kpi-v t-amber">{waiting}</span>
-          <span className="kpi-f">Waiting for a decision</span>
-        </div>
+        {canRead ? (
+          <div className="kpi">
+            <span className="kpi-l">Applications</span>
+            <span className="kpi-v t-amber">{waiting}</span>
+            <span className="kpi-f">Waiting for a decision</span>
+          </div>
+        ) : null}
         <div className="kpi">
           <span className="kpi-l">Partner users</span>
           <span className="kpi-v">64</span>
