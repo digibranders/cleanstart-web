@@ -12,7 +12,8 @@ import {
 } from '@/db/schema';
 import { makeApplication, makeDocument, makePartner, makeRegistration, resetDb, testDb } from '@/db/test-helpers';
 import { fixedClock } from '@/lib/clock';
-import { purgeExpiredRecords, RETENTION_DAYS } from './retention';
+import { ConflictError } from '@/server/errors';
+import { purgeBatch, purgeExpiredRecords, RETENTION_DAYS } from './retention';
 
 const db = testDb();
 const clock = fixedClock('2026-11-06T14:02:00Z');
@@ -107,5 +108,87 @@ describe('purgeExpiredRecords', () => {
     await purgeExpiredRecords({ clock });
     expect(await db.select().from(documents)).toHaveLength(1);
     expect(await db.select().from(auditLog)).toHaveLength(1);
+  });
+
+  it('keeps a row exactly RETENTION_DAYS old and removes one a millisecond older', async () => {
+    const partner = await makePartner(db, {});
+    const edge = await makeRegistration(db, { partnerId: partner.id, status: 'rejected' });
+    const past = await makeRegistration(db, { partnerId: partner.id, status: 'rejected' });
+    const cutoff = daysAgo(RETENTION_DAYS);
+    await db.update(registrations).set({ decidedAt: cutoff }).where(eq(registrations.id, edge.id));
+    await db.update(registrations).set({ decidedAt: new Date(cutoff.getTime() - 1) }).where(eq(registrations.id, past.id));
+    const keptApp = await makeApplication(db, { status: 'declined', decidedAt: cutoff });
+    await makeApplication(db, { status: 'declined', decidedAt: new Date(cutoff.getTime() - 1) });
+
+    expect(await purgeExpiredRecords({ clock })).toEqual({ applications: 1, registrations: 1 });
+    expect((await db.select({ id: registrations.id }).from(registrations)).map((r) => r.id)).toEqual([edge.id]);
+    expect((await db.select({ id: applications.id }).from(applications)).map((a) => a.id)).toEqual([keptApp.id]);
+  });
+
+  it('does not delete a registration that a partner resubmitted while the job was selecting it', async () => {
+    const partner = await makePartner(db, {});
+    const flipped = await makeRegistration(db, { partnerId: partner.id, status: 'rejected' });
+    await decidedLongAgo(flipped.id, RETENTION_DAYS + 5);
+    await withChildren(flipped.id, partner.id);
+
+    let commitResubmit: () => void = () => {};
+    const gate = new Promise<void>((resolve) => {
+      commitResubmit = resolve;
+    });
+    let flipStarted: () => void = () => {};
+    const started = new Promise<void>((resolve) => {
+      flipStarted = resolve;
+    });
+    // The resubmit transaction holds the row lock, uncommitted, while the job runs.
+    const resubmit = db.transaction(async (tx) => {
+      await tx.update(registrations).set({ status: 'pending', decidedAt: null }).where(eq(registrations.id, flipped.id));
+      flipStarted();
+      await gate;
+    });
+    await started;
+    const job = purgeExpiredRecords({ clock });
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    commitResubmit();
+    await resubmit;
+
+    expect(await job).toEqual({ applications: 0, registrations: 0 });
+    const [row] = await db.select().from(registrations).where(eq(registrations.id, flipped.id));
+    expect(row?.status).toBe('pending');
+    expect(await db.select().from(registrationContacts)).toHaveLength(1);
+  });
+});
+
+describe('purgeBatch', () => {
+  it('removes children for the locked ids and returns the number of parents deleted', async () => {
+    const steps: string[] = [];
+    const removed = await purgeBatch({
+      lock: async () => ['a', 'b'],
+      removeChildren: async (ids) => void steps.push(`children:${ids.join(',')}`),
+      removeParents: async (ids) => {
+        steps.push(`parents:${ids.join(',')}`);
+        return ids;
+      },
+    });
+    expect(removed).toBe(2);
+    expect(steps).toEqual(['children:a,b', 'parents:a,b']);
+  });
+
+  it('removes nothing and reports 0 when no row is due', async () => {
+    const removed = await purgeBatch({
+      lock: async () => [],
+      removeChildren: async () => {
+        throw new Error('must not run');
+      },
+      removeParents: async () => {
+        throw new Error('must not run');
+      },
+    });
+    expect(removed).toBe(0);
+  });
+
+  it('throws when fewer parents were deleted than were locked, so the transaction rolls back', async () => {
+    await expect(
+      purgeBatch({ lock: async () => ['a', 'b'], removeChildren: async () => {}, removeParents: async () => ['a'] }),
+    ).rejects.toBeInstanceOf(ConflictError);
   });
 });

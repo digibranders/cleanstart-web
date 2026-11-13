@@ -9,6 +9,7 @@ import {
 } from '@/db/schema';
 import { type Clock, systemClock } from '@/lib/clock';
 import { SYSTEM_ACTORS } from '@/server/auth/types';
+import { ConflictError } from '@/server/errors';
 import { log } from '@/server/log';
 import { withSystem } from '@/server/repo/context';
 
@@ -21,6 +22,29 @@ const BATCH_SIZE = 500;
 export interface RetentionResult {
   applications: number;
   registrations: number;
+}
+
+interface BatchSteps {
+  /** Selects the due ids with FOR UPDATE: a row a concurrent transaction just changed is re-checked against the WHERE and drops out. */
+  lock: () => Promise<string[]>;
+  removeChildren: (ids: string[]) => Promise<void>;
+  /** Deletes the parents (re-checking their status) and returns the ids it really deleted. */
+  removeParents: (ids: string[]) => Promise<string[]>;
+}
+
+/**
+ * One batch, to run inside one transaction. Throws when a parent that was locked was not deleted, so the caller's
+ * transaction rolls back the children with it; the next daily run retries.
+ */
+export async function purgeBatch(steps: BatchSteps): Promise<number> {
+  const ids = await steps.lock();
+  if (ids.length === 0) return 0;
+  await steps.removeChildren(ids);
+  const deleted = await steps.removeParents(ids);
+  if (deleted.length !== ids.length) {
+    throw new ConflictError('retention_batch_mismatch', `locked ${ids.length} rows but deleted ${deleted.length}; batch rolled back`);
+  }
+  return deleted.length;
 }
 
 /**
@@ -40,37 +64,49 @@ export async function purgeExpiredRecords(deps: { clock: Clock; batchSize?: numb
   const result: RetentionResult = { applications: 0, registrations: 0 };
 
   for (;;) {
-    const removed = await withSystem(SYSTEM_ACTORS.portal, async (tx) => {
-      const due = await tx
-        .select({ id: applications.id })
-        .from(applications)
-        .where(and(eq(applications.status, 'declined'), sql`coalesce(${applications.decidedAt}, ${applications.updatedAt}) < ${cutoff}`))
-        .limit(batchSize);
-      const ids = due.map((a) => a.id);
-      if (ids.length > 0) await tx.delete(applications).where(inArray(applications.id, ids));
-      return ids.length;
-    });
+    const removed = await withSystem(SYSTEM_ACTORS.portal, (tx) =>
+      purgeBatch({
+        lock: async () =>
+          (
+            await tx
+              .select({ id: applications.id })
+              .from(applications)
+              .where(and(eq(applications.status, 'declined'), sql`coalesce(${applications.decidedAt}, ${applications.updatedAt}) < ${cutoff}`))
+              .limit(batchSize)
+              .for('update')
+          ).map((a) => a.id),
+        removeChildren: async () => {},
+        removeParents: async (ids) =>
+          (await tx.delete(applications).where(and(inArray(applications.id, ids), eq(applications.status, 'declined'))).returning({ id: applications.id })).map((a) => a.id),
+      }),
+    );
     result.applications += removed;
     if (removed < batchSize) break;
   }
 
   for (;;) {
     // Children first: the foreign keys have no cascade.
-    const removed = await withSystem(SYSTEM_ACTORS.portal, async (tx) => {
-      const due = await tx
-        .select({ id: registrations.id })
-        .from(registrations)
-        .where(and(eq(registrations.status, 'rejected'), sql`coalesce(${registrations.decidedAt}, ${registrations.updatedAt}) < ${cutoff}`))
-        .limit(batchSize);
-      const ids = due.map((r) => r.id);
-      if (ids.length === 0) return 0;
-      await tx.delete(registrationReminders).where(inArray(registrationReminders.registrationId, ids));
-      await tx.delete(registrationContacts).where(inArray(registrationContacts.registrationId, ids));
-      await tx.delete(registrationMessages).where(inArray(registrationMessages.registrationId, ids));
-      await tx.delete(registrationEvents).where(inArray(registrationEvents.registrationId, ids));
-      await tx.delete(registrations).where(inArray(registrations.id, ids));
-      return ids.length;
-    });
+    const removed = await withSystem(SYSTEM_ACTORS.portal, (tx) =>
+      purgeBatch({
+        lock: async () =>
+          (
+            await tx
+              .select({ id: registrations.id })
+              .from(registrations)
+              .where(and(eq(registrations.status, 'rejected'), sql`coalesce(${registrations.decidedAt}, ${registrations.updatedAt}) < ${cutoff}`))
+              .limit(batchSize)
+              .for('update')
+          ).map((r) => r.id),
+        removeChildren: async (ids) => {
+          await tx.delete(registrationReminders).where(inArray(registrationReminders.registrationId, ids));
+          await tx.delete(registrationContacts).where(inArray(registrationContacts.registrationId, ids));
+          await tx.delete(registrationMessages).where(inArray(registrationMessages.registrationId, ids));
+          await tx.delete(registrationEvents).where(inArray(registrationEvents.registrationId, ids));
+        },
+        removeParents: async (ids) =>
+          (await tx.delete(registrations).where(and(inArray(registrations.id, ids), eq(registrations.status, 'rejected'))).returning({ id: registrations.id })).map((r) => r.id),
+      }),
+    );
     result.registrations += removed;
     if (removed < batchSize) break;
   }
