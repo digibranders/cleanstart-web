@@ -19,6 +19,7 @@ Nothing here is automated. Read each command before you run it. Take a droplet s
 | 1.7 | Cloudflare: an `A` record `partners` to the droplet (proxied, SSL Full strict, as for `cms`), and the same WAF rule set that `cms.cleanstart.com` has. | the record resolves |
 | 1.8 | Firewall: accept port 443 only from Cloudflare's published ranges (`ufw`), so a visitor cannot reach Caddy directly and invent a client address (the Caddy block trusts `CF-Connecting-IP`). | `ufw status` shows the Cloudflare ranges |
 | 1.9 | Check that the Brevo account allows the droplet's address (it already does for the CMS). | a test send from the portal succeeds later |
+| 1.10 | Install the backup scripts, after the first portal deploy has rendered `/opt/cleanstart/portal.env` and not before. Deploys do not copy scripts, so copy `infra/scripts/backup.sh` and `infra/scripts/restore-portal-drill.sh` to `/opt/cleanstart/scripts/`. Until you do, the old `backup.sh` keeps sending a green heartbeat while the portal has no backup, which is a silent gap. If you install the new one while `cleanstart_portal` exists (step 1.4) but `portal.env` does not, every night fails before the heartbeat and the missing heartbeat is a P1. Then run the checks in section 9: `command -v psql pg_dump pg_restore aws`, a `DRY_RUN` run, a real run. | both `backups/` and `portal-backups/` have a new object and the heartbeat monitor shows a ping |
 
 Step 1.4 commands. The `postgres` superuser needs no password here: `psql` runs inside the container over its local socket, the same way step 1.3 runs it. Do not put the passwords in `-v` options: they would land in your shell history and in the process list (`ps`) of the droplet. This reads them from a prompt and passes them on standard input only:
 
@@ -153,7 +154,7 @@ Setting names: `portal.env` holds the names `src/env.ts` reads (`AUTH_SECRET`, `
   docker compose exec -T postgres psql -U postgres -c "show max_connections"
   ```
 
-  The two changes below are written here and are not run by the build. Each needs the operator's approval; the first restarts the production database:
+  The two changes below are written here and are not run by the build. Each needs the operator's approval. `ALTER SYSTEM` does not restart anything: the new `max_connections` applies only after the separate restart of Postgres, and that restart interrupts the production database (the CMS uses it too):
 
   ```bash
   docker compose exec -T postgres psql -U postgres -c "ALTER SYSTEM SET max_connections = 50;"   # then restart postgres in a quiet minute
@@ -212,9 +213,9 @@ The nightly cron (02:00 UTC, `/etc/cron.d/cleanstart-backup`, through `run-backu
 2. If the database `cleanstart_portal` exists, dumps it, checks the dump with `pg_restore --list`, and uploads it to `portal-backups/<UTC timestamp>.dump` in the private bucket named in `/opt/cleanstart/portal.env`. The script refuses to use the CMS bucket for this. If the database does not exist yet, it logs a WARNING and skips this step.
 3. Pings the BetterStack heartbeat, only if every earlier step succeeded.
 
-A missing heartbeat therefore means at least one backup did not happen: read the cron log first. Once the portal database exists, a portal dump that fails, or a `portal.env` that is unreadable or lacks `R2_ENDPOINT`, `R2_BUCKET`, `R2_ACCESS_KEY_ID` or `R2_SECRET_ACCESS_KEY`, fails the run before the heartbeat. The CMS dump has been uploaded by then. The script needs `psql`, `pg_dump`, `pg_restore` and `aws` on the host, and the cron user must be able to read `portal.env` (mode 600).
+A missing heartbeat therefore means at least one backup did not happen: read the cron log first. Once the portal database exists, a portal dump that fails, or a `portal.env` that is unreadable or lacks `R2_ENDPOINT`, `R2_BUCKET`, `R2_ACCESS_KEY_ID` or `R2_SECRET_ACCESS_KEY`, fails the run before the heartbeat. The CMS dump has been uploaded by then. The script needs `psql`, `pg_dump`, `pg_restore` and `aws` on the host (without `psql` or `pg_restore` it stops with a message after the CMS upload and sends no heartbeat), and the cron user must be able to read `portal.env` (mode 600). Install the new `backup.sh` only after the first portal deploy has rendered `portal.env` (step 1.10): if `cleanstart_portal` exists and `portal.env` does not, every night fails before the heartbeat. Dump files are written owner-only (`umask 077`).
 
-The deploy workflows do not copy the scripts. After any change to `backup.sh` or `restore-portal-drill.sh`, copy both from `infra/scripts/` to `/opt/cleanstart/scripts/`, then:
+The deploy workflows do not copy the scripts, and the old `backup.sh` keeps a green heartbeat with no portal backup, so a script that is not copied is a silent gap. After any change to `backup.sh` or `restore-portal-drill.sh`, copy both from `infra/scripts/` to `/opt/cleanstart/scripts/`, then:
 
 ```bash
 command -v psql pg_dump pg_restore aws                        # all four must print a path
@@ -222,18 +223,18 @@ DRY_RUN=1 /opt/cleanstart/scripts/run-backup.sh               # prints the plan,
 /opt/cleanstart/scripts/run-backup.sh                         # a real run, the way cron runs it
 ```
 
-Then confirm that `backups/` in the CMS bucket and `portal-backups/` in the private bucket each have a new object, and that the BetterStack heartbeat monitor shows a ping. The heartbeat and the first real portal dump are not verified yet. The portal prefix also needs its own lifecycle rule on the private bucket, matching the rule on the CMS bucket's `backups/` prefix. The portal's R2 token can read and write the whole bucket, so it can read `portal-backups/` too; a separate bucket and token for backups would be stricter and needs a change to `backup.sh`.
+Then confirm that `backups/` in the CMS bucket and `portal-backups/` in the private bucket each have a new object, and that the BetterStack heartbeat monitor shows a ping. The heartbeat and the first real portal dump are not verified yet. The portal prefix also needs its own lifecycle rule on the private bucket, matching the rule on the CMS bucket's `backups/` prefix. The portal app's R2 token can read, overwrite and delete every object in the bucket, so a compromised app could also read, overwrite or delete `portal-backups/`. The bucket has no versioning, and no lifecycle rule is configured for the prefix (`docs/operations/CMS-DEPLOYMENT.md` covers the CMS bucket only). The stricter follow-up is a separate bucket and token for backups, which needs a change to `backup.sh`.
 
-Restore drill (before launch, then every quarter). It restores a backup into a scratch database `cleanstart_portal_drill`, counts rows in the main tables, prints the newest audit log time, and drops the scratch database. It never touches the live database.
+Restore drill (before launch, then every quarter). It restores a backup into a scratch database `cleanstart_portal_drill`, counts rows in the main tables, prints the newest audit log time, and drops the scratch database. It never touches the live database: the scratch name must contain `drill`, and the script refuses the live name. By default it connects as `postgres` to `127.0.0.1:5432`; set `PORTAL_DRILL_ADMIN_URI` (without a password) to change that.
 
 ```bash
 cd /opt/cleanstart
-# read the one line; never source .env (a value with a space breaks it, as it did for run-backup.sh)
-POSTGRES_PASSWORD=$(grep '^POSTGRES_PASSWORD=' .env | cut -d= -f2-)
-export DATABASE_URI="postgres://postgres:${POSTGRES_PASSWORD}@127.0.0.1:5432/cleanstart"
+# The password goes in PGPASSWORD, never in a connection string, so it stays out of every command line and `ps`.
+# Read the one line; never source .env (a value with a space breaks it, as it did for run-backup.sh).
+export PGPASSWORD=$(grep '^POSTGRES_PASSWORD=' .env | cut -d= -f2-)
 ALLOW_RESTORE=yes ./scripts/restore-portal-drill.sh                       # lists the portal backups
 ALLOW_RESTORE=yes ./scripts/restore-portal-drill.sh 2026-12-01T02:00:00Z  # restores that one into the scratch database
-unset POSTGRES_PASSWORD DATABASE_URI
+unset PGPASSWORD
 ```
 
 Expected: a row count per table, the newest audit log time, "drill passed in N seconds". Add a line to `docs/operations/RESTORE-LOG.md` (date, backup, duration, who). `restore.sh` is for the CMS database only: it reads the `backups/` prefix and replaces the database named in `DATABASE_URI`.
@@ -241,7 +242,7 @@ Expected: a row count per table, the newest audit log time, "drill passed in N s
 A real restore, when the live database is damaged. The drill shows that a dump is readable and complete. It does not rehearse the swap below, so do the swap once on the droplet before launch and write down anything that differs. The path keeps ownership, grants and row level security exactly as the migrations make them, by loading only the data into a freshly migrated database:
 
 1. Snapshot the droplet. Stop the portal: `docker compose --profile portal stop portal`.
-2. Create a new empty database with the bootstrap script. The roles already exist, so the two passwords below are never used:
+2. Create a new empty database with the bootstrap script. First check the roles: run `docker compose exec -T postgres psql -U postgres -c '\du'`. If it does not list both `portal_owner` and `portal_app`, stop and use step 1.4 with real passwords instead. Only when both exist, run the commands below; the two passwords in them are never used:
 
    ```bash
    cd /opt/cleanstart                                                  # apps/portal/scripts/db-bootstrap.sql copied here
@@ -265,6 +266,7 @@ A real restore, when the live database is damaged. The drill shows that a dump i
 
    ```bash
    cd /opt/cleanstart
+   umask 077                                                           # the dump holds partner details
    v() { grep "^$1=" portal.env | cut -d= -f2-; }
    AWS_ACCESS_KEY_ID="$(v R2_ACCESS_KEY_ID)" AWS_SECRET_ACCESS_KEY="$(v R2_SECRET_ACCESS_KEY)" \
      aws --endpoint-url "$(v R2_ENDPOINT)" s3 cp "s3://$(v R2_BUCKET)/portal-backups/<timestamp>.dump" /tmp/portal-restore.dump
