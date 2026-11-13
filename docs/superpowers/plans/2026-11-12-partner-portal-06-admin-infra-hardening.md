@@ -136,7 +136,7 @@ Start: `git worktree add .claude/worktrees/portal-a -b feat/portal-a feat/portal
 
 Nothing here runs on the droplet. The workflows cannot run until the branch is pushed, which this plan never does: say so in the progress log line.
 
-- [ ] **Step 1: Preconditions**
+- [x] **Step 1: Preconditions**
 
 ```bash
 git tag | grep -x portal-w0
@@ -146,7 +146,7 @@ grep -n "output" apps/portal/next.config.ts || echo "no output setting yet"
 
 Expected: `portal-w0`, the four paths listed, and a `next.config.ts` line containing `standalone` (M0.2 Step 5b wrote it). If a path is missing Wave 0 did not finish: append a `blocked` line and stop.
 
-- [ ] **Step 2: Check the two shared-file changes that Wave 0 made**
+- [x] **Step 2: Check the two shared-file changes that Wave 0 made**
 
 The standalone build needs `output: 'standalone'` and the monorepo tracing root (CCR-1, written by M0.2 Step 5b), and the review gate must not cover `/api/health` (CCR-2, written by M1.1e). Check both, and carry on; if either is missing, append a `blocked` line naming it (the code is in "Contract change requests").
 
@@ -157,7 +157,7 @@ grep -n '"/api/health"' apps/portal/src/proxy.ts
 
 Expected: the first prints the `standalone` and `outputFileTracingRoot` lines, the second prints the `/api/health` exemption.
 
-- [ ] **Step 3: Write the failing health route test**
+- [x] **Step 3: Write the failing health route test**
 
 Create `apps/portal/src/app/api/health/route.test.ts`:
 
@@ -190,7 +190,7 @@ describe('GET /api/health', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/app/api/health/route.test.ts`
 Expected: FAIL, `Failed to resolve import "./route"`.
 
-- [ ] **Step 4: Implement the health route**
+- [x] **Step 4: Implement the health route**
 
 Create `apps/portal/src/app/api/health/route.ts`. It is the system `db` (contracts L: public, no auth, no write) and returns no internal detail:
 
@@ -218,7 +218,7 @@ export async function GET(): Promise<NextResponse> {
 
 Run the test again. Expected: PASS, 2 tests.
 
-- [ ] **Step 5: Create the dash check script**
+- [x] **Step 5: Create the dash check script**
 
 `apps/portal/scripts/verify-copy.mjs` is the portal's counterpart of `apps/web`'s `verify:copy` (CLAUDE.md: no em-dashes or en-dashes in code-owned copy). It is built from code points so the file itself contains neither character. CI calls it directly, so no `package.json` change is needed.
 
@@ -277,7 +277,7 @@ console.info(`verify:copy ok (${files.length} files)`);
 Run: `node apps/portal/scripts/verify-copy.mjs`
 Expected: `verify:copy ok (<n> files)`, exit 0.
 
-- [ ] **Step 6: Create the migration bundler**
+- [x] **Step 6: Create the migration bundler**
 
 `scripts/migrate.ts` runs the Drizzle migrations and then `src/db/rls.sql` (contracts C.5). The standalone image has neither `tsx` nor the migrator, so this script bundles the entry to one CommonJS file at image build time. esbuild is resolved through `tsx` (a root devDependency that depends on it), so nothing is added to `package.json`.
 
@@ -324,7 +324,7 @@ cd ../..
 
 Expected: both runs exit 0 and the second changes nothing. **Verify (contracts M.1 item 18):** if the bundle cannot find `drizzle/` or `src/db/rls.sql`, `scripts/migrate.ts` resolves them from somewhere other than `process.cwd()` or its own folder. The image runs the bundle from `apps/portal` with both paths present (Step 7), so the fix is in `scripts/migrate.ts` (a W0-b file): append a `blocked` line asking for `process.cwd()`-relative paths. `migrate.cjs` is generated: it is ignored by the `apps/portal/.gitignore` line added in Step 12 and never committed.
 
-- [ ] **Step 7: Create the Dockerfile and its ignore file**
+- [x] **Step 7: Create the Dockerfile and its ignore file**
 
 The build context is the repository root (a pnpm workspace). `Dockerfile.dockerignore` sits next to the Dockerfile and replaces the root `.dockerignore` for this build (BuildKit looks for `<Dockerfile name>.dockerignore` first); `apps/cms` and `apps/web` stay in the context because pnpm checks the lockfile against every workspace `package.json`.
 
@@ -436,7 +436,7 @@ rm -rf /tmp/p06ctx && mkdir -p /tmp/p06ctx/apps/portal && cp apps/portal/Dockerf
 
 Expected: `Check complete, no warnings found.`
 
-- [ ] **Step 8: Reconcile and extend `infra/docker-compose.yml`**
+- [x] **Step 8: Reconcile and extend `infra/docker-compose.yml`**
 
 The repo copy is out of date: it has no `cms` service and publishes Postgres and Meilisearch on all interfaces. The droplet's file (`/opt/cleanstart/compose.yml`, documented as section 6.1 of `docs/operations/CMS-DEPLOYMENT.md`) binds to `127.0.0.1`, tunes Meilisearch and has the `cms` service. The droplet file is never read here (no `ssh`); section 6.1 is the evidence. `profiles` are added because `deploy-cms.yml` already runs `docker compose --profile cms up -d --wait cms`. Replace the whole file:
 
@@ -532,7 +532,7 @@ Expected: `meilisearch`, `postgres`, `portal`.
 
 The operator compares this file with the droplet's before copying it (handover item 2). The reconciliation is by documentation only, so the compare is the real check.
 
-- [ ] **Step 9: Write `portal.yml`**
+- [x] **Step 9: Write `portal.yml`**
 
 CI on `apps/portal/**`, `packages/forms/**`, `packages/ui/**`: a Postgres 16 service with the superuser `postgres`, the two roles and the test database created by the track's own `scripts/db-create.sh`, then lint, typecheck, test (which includes the isolation matrix), the dash check and the build with `SKIP_ENV_VALIDATION=1`. A second job runs the browser suite for pull requests into `main` and on demand (it is slow, like the web `lhci` job). The CI Postgres service user differs from contracts J.2's statement ("PORTAL_TEST_OWNER_URL points at the superuser"): here the owner URL is `portal_owner`, which `db-create.sh` creates with `CREATEDB`, so CI exercises the same role split as production.
 
@@ -700,7 +700,7 @@ jobs:
           retention-days: 14
 ```
 
-- [ ] **Step 10: Write `deploy-portal.yml`**
+- [x] **Step 10: Write `deploy-portal.yml`**
 
 A copy of `deploy-cms.yml` in shape (wait for green CI on the same SHA, buildx and the GHA cache, `docker save | scp`, render the env file, `docker compose up -d --wait`, retention of the current image plus two tags, a retried local smoke probe on `127.0.0.1:3004/api/health`), with these deliberate differences: it renders `/opt/cleanstart/portal.env`, the portal's own file; it writes only non-empty values (`env.ts` rejects `KEY=` for optional variables, which would crash the container); it fails the deploy by variable name when a required production setting is missing, and when a database password is not URL safe; the Turnstile site key goes in as a build argument because `NEXT_PUBLIC_*` values are inlined into the browser bundle; and nothing deploys until the repository variable `PORTAL_DEPLOY_ENABLED` is `true` (set by the operator after the droplet steps, handover item 1).
 
@@ -930,7 +930,7 @@ jobs:
           curl -sS -o /dev/null -w "public partners.cleanstart.com -> HTTP %{http_code}\n" --max-time 10 https://partners.cleanstart.com/api/health || true
 ```
 
-- [ ] **Step 11: Lint both workflows and the env rendering**
+- [x] **Step 11: Lint both workflows and the env rendering**
 
 ```bash
 actionlint .github/workflows/portal.yml .github/workflows/deploy-portal.yml && echo ACTIONLINT_OK
@@ -960,7 +960,7 @@ PY
 
 Expected: `complete -> 0`; `no secret -> (1, ['::error::Missing required portal settings: AUTH_SECRET'])`; `bad pw -> (1, ['::error::PORTAL_APP_DB_PASSWORD must be letters and digits only (openssl rand -hex 24)'])`.
 
-- [ ] **Step 12: Run the image locally** (needs the Wave 0 `next.config.ts` and `proxy.ts` changes checked in Step 2)
+- [x] **Step 12: Run the image locally** (needs the Wave 0 `next.config.ts` and `proxy.ts` changes checked in Step 2)
 
 Add the generated bundle to `apps/portal/.gitignore` (a new file inside the portal), build, and run the container against the local Postgres with throwaway values. The production environment check demands every production variable, so the placeholders below satisfy it; nothing sends mail or calls HubSpot from `/api/health`.
 
@@ -988,7 +988,7 @@ docker rm -f portal-local
 
 Expected: the image size is a few hundred MB; the log shows the migration finishing and `Ready`; the health call is `HTTP/1.1 200`, body `{"status":"ok"}` with `Cache-Control: no-store` and `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'` once M5.1 has landed; the health status becomes `healthy`. **Verify (contracts M.1 item 18):** if the container exits with `Cannot find module '/app/apps/portal/server.js'`, the standalone folder is not nested (tracing root not applied): `docker run --rm --entrypoint sh portal:local -c 'find /app -maxdepth 3 -name server.js'` shows where it is. Fix the `COPY` and `WORKDIR` lines of the Dockerfile to that path and record it in the progress log. If the container exits before the migration, read the error: the usual cause is a variable the production check requires.
 
-- [ ] **Step 13: Write the runbook sections 1 to 3**
+- [x] **Step 13: Write the runbook sections 1 to 3**
 
 Create `docs/operations/PARTNER-PORTAL.md` (if H or another track already created it, append the sections below instead of overwriting). M5.9 adds sections 4 to 11 later. These are the one-time droplet steps, as a person will run them; each is "read the command first".
 
@@ -1073,7 +1073,7 @@ curl -fsS http://127.0.0.1:3004/api/health
 Migrations only move forward. A release that added a column is rolled back to an image that ignores it; never drop a column in the same release that stops using it.
 ````
 
-- [ ] **Step 14: Gate A and commit**
+- [x] **Step 14: Gate A and commit**
 
 Run the standard Gate A block. Extra checks for this task:
 

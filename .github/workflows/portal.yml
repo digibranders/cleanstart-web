@@ -1,0 +1,161 @@
+name: Portal CI
+
+# Fires only when something the portal build can be affected by changes (same allow-list idea as ci.yml and web.yml).
+on:
+  push:
+    branches: [main, development]
+    paths:
+      - 'apps/portal/**'
+      - '!apps/portal/**/*.md'
+      - 'packages/forms/**'
+      - 'packages/ui/**'
+      - '!packages/ui/**/*.md'
+      - 'packages/config/**'
+      - 'pnpm-lock.yaml'
+      - 'turbo.json'
+      - '.github/workflows/portal.yml'
+  pull_request:
+    branches: [main, development]
+    paths:
+      - 'apps/portal/**'
+      - '!apps/portal/**/*.md'
+      - 'packages/forms/**'
+      - 'packages/ui/**'
+      - '!packages/ui/**/*.md'
+      - 'packages/config/**'
+      - 'pnpm-lock.yaml'
+      - 'turbo.json'
+      - '.github/workflows/portal.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: portal-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 24
+
+jobs:
+  portal:
+    name: apps/portal · lint · typecheck · test · build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # scripts/db-create.sh reads these two; it creates portal_owner and portal_app with the development passwords.
+      PGPASSWORD: postgres
+      PORTAL_PG_ADMIN_URL: postgresql://postgres@localhost:5432/postgres
+      PORTAL_TEST_DATABASE_URL: postgresql://portal_app:portal_app_dev@localhost:5432/cleanstart_portal_test
+      PORTAL_TEST_OWNER_URL: postgresql://portal_owner:portal_owner_dev@localhost:5432/cleanstart_portal_test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspace dependencies
+        run: pnpm --filter "@cleanstart/portal^..." --if-present build
+
+      - name: Create the test database
+        run: bash apps/portal/scripts/db-create.sh cleanstart_portal_test
+
+      - name: Lint
+        run: pnpm --filter @cleanstart/portal lint
+
+      - name: Typecheck
+        run: pnpm --filter @cleanstart/portal typecheck
+
+      # Includes the tenant isolation matrix (src/server/repo/isolation.test.ts), which must stay green.
+      - name: Test
+        run: pnpm --filter @cleanstart/portal test
+
+      - name: Verify no em-dashes or en-dashes in code-owned copy
+        run: node apps/portal/scripts/verify-copy.mjs
+
+      - name: Build
+        run: pnpm --filter @cleanstart/portal build
+        env:
+          # env.ts must not validate at build time; nothing reads a secret during the build.
+          SKIP_ENV_VALIDATION: '1'
+
+  # Browser suite. Slow, so it runs for pull requests into main and on demand, like the web lhci job.
+  e2e:
+    name: apps/portal · e2e (@portal) · axe
+    needs: portal
+    if: github.event_name == 'workflow_dispatch' || github.base_ref == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGPASSWORD: postgres
+      PORTAL_PG_ADMIN_URL: postgresql://postgres@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspace dependencies
+        run: pnpm --filter "@cleanstart/portal^..." --if-present build
+
+      - name: Install Chromium
+        run: pnpm --filter @cleanstart/portal exec playwright install --with-deps chromium
+
+      - name: Create the e2e database
+        run: bash apps/portal/scripts/db-create.sh cleanstart_portal_e2e
+
+      - name: E2E
+        run: pnpm --filter @cleanstart/portal exec playwright test
+        env:
+          CI: 'true'
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: portal-playwright-report
+          path: |
+            apps/portal/playwright-report/
+            apps/portal/test-results/
+          if-no-files-found: ignore
+          retention-days: 14
