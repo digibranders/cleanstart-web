@@ -26,7 +26,7 @@ const CLIENT_NAMES = ['appDb', 'db', 'systemDb', 'pool'];
 const SERVER_OWNERS: ReadonlyArray<{ match: RegExp; names: readonly string[] }> = [
   { match: /^server\/repo\/context\.ts$/, names: ['appDb', 'systemDb'] },
   { match: /^server\/notify\.ts$/, names: ['db'] },
-  { match: /^server\/jobs\//, names: ['db', 'systemDb', 'pool'] },
+  { match: /^server\/(jobs|hubspot|auth|intake)\//, names: ['db', 'systemDb', 'pool'] },
 ];
 
 interface ClientImports {
