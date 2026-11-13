@@ -112,7 +112,7 @@ Testing: every test here runs against the real Postgres of its Vitest worker (on
 
 The spec is a pure object so it can be tested; the script only applies it. The script defaults to a dry run and needs `--apply`. It must never run against production without the explicit go-ahead in master Task 5.7.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // schema-spec.test.ts
@@ -144,12 +144,12 @@ describe('schema spec', () => {
 });
 ```
 
-- [ ] **Step 2: Run it and confirm it fails**
+- [x] **Step 2: Run it and confirm it fails**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/schema-spec.test.ts`
 Expected: FAIL, "Cannot find module './schema-spec'".
 
-- [ ] **Step 3: Implement the spec**
+- [x] **Step 3: Implement the spec**
 
 ```ts
 // schema-spec.ts
@@ -205,12 +205,12 @@ export const PIPELINE_SPEC = {
 } as const;
 ```
 
-- [ ] **Step 4: Run the test and confirm it passes**
+- [x] **Step 4: Run the test and confirm it passes**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/hubspot/schema-spec.test.ts`
 Expected: PASS, 3 tests.
 
-- [ ] **Step 5: Write the script (applies the spec, idempotent, dry run by default)**
+- [x] **Step 5: Write the script (applies the spec, idempotent, dry run by default)**
 
 ```ts
 // scripts/provision-hubspot.ts
@@ -283,7 +283,7 @@ Run: `cd apps/portal && pnpm exec tsx --env-file=.env scripts/provision-hubspot.
 Expected: lines starting `[dry-run] would create` for every property, the pipeline and both labels.
 Run: `pnpm exec tsx --env-file=.env scripts/provision-hubspot.ts --apply`, then run it again. Expected: second run prints `exists, skipped` for everything and the pipeline id line.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add apps/portal/scripts/provision-hubspot.ts apps/portal/src/server/hubspot/schema-spec.ts apps/portal/src/server/hubspot/schema-spec.test.ts
