@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { settleAuth } from "@/lib/auth-call";
 import { authClient } from "@/lib/auth-client";
 import type { ShellDto } from "@/lib/dto";
 import { initialsOf } from "@/lib/initials";
@@ -223,7 +224,11 @@ export function Shell({
   const countFor = (item: NavItem): string => (item.count === "approvals" && waiting > 0 ? String(waiting) : "");
 
   const signOut = async (): Promise<void> => {
-    await authClient.signOut();
+    const { error } = await settleAuth(() => authClient.signOut());
+    if (error) {
+      toast("Could not sign out. Check your connection and try again.");
+      return;
+    }
     // A full navigation, so no signed in page survives in the client router cache.
     window.location.assign(ROUTES.signIn);
   };

@@ -12,6 +12,7 @@ import {
 } from "@/components/partners/public-frame";
 import { PasswordField } from "@/components/ui/password-field";
 import { authClient } from "@/lib/auth-client";
+import { NETWORK_FAILURE_STATUS, settleAuth } from "@/lib/auth-call";
 import { safeNext } from "@/lib/next-path";
 import {
   emailDomain,
@@ -25,6 +26,13 @@ import { ROUTES } from "@/lib/routes";
 type View = "signin" | "code" | "request" | "requested" | "nopartner" | "forgot" | "sent";
 
 const TOO_MANY = "Too many attempts. Try again in a moment.";
+const NETWORK = "We could not reach the server. Check your connection and try again.";
+
+/** The line to show for a failed auth call: rate limit and network failure have their own copy. */
+function failMessage(error: { status?: number }, fallback: string): string {
+  if (error.status === 429) return TOO_MANY;
+  return error.status === NETWORK_FAILURE_STATUS ? NETWORK : fallback;
+}
 
 /** Which social buttons to show: only providers whose keys are configured on the server. */
 interface SocialAvailability {
@@ -86,11 +94,14 @@ export function SignIn({ providers }: { providers: SocialAvailability }): React.
 
   const signInWith = async (provider: "google" | "microsoft"): Promise<void> => {
     setSocialError(false);
-    await authClient.signIn.social({
-      provider,
-      callbackURL: safeNext(new URLSearchParams(window.location.search).get("next")) ?? "/",
-      errorCallbackURL: ROUTES.signIn,
-    });
+    const { error } = await settleAuth(() =>
+      authClient.signIn.social({
+        provider,
+        callbackURL: safeNext(new URLSearchParams(window.location.search).get("next")) ?? "/",
+        errorCallbackURL: ROUTES.signIn,
+      }),
+    );
+    if (error) setSocialError(true);
   };
 
   const emailBad = !isValidEmail(email);
@@ -103,14 +114,16 @@ export function SignIn({ providers }: { providers: SocialAvailability }): React.
     }
     setBusy(true);
     setSigninError("");
-    const { data, error } = await authClient.signIn.email({
-      email: email.trim().toLowerCase(),
-      password,
-      rememberMe: keepSignedIn,
-    });
+    const { data, error } = await settleAuth(() =>
+      authClient.signIn.email({
+        email: email.trim().toLowerCase(),
+        password,
+        rememberMe: keepSignedIn,
+      }),
+    );
     setBusy(false);
     if (error) {
-      setSigninError(error.status === 429 ? TOO_MANY : "That email and password do not match.");
+      setSigninError(failMessage(error, "That email and password do not match."));
       return;
     }
     if ((data as { twoFactorRedirect?: boolean } | null)?.twoFactorRedirect) {
@@ -135,17 +148,20 @@ export function SignIn({ providers }: { providers: SocialAvailability }): React.
     }
     setBusy(true);
     setCodeError("");
-    const { error } = backup
-      ? await authClient.twoFactor.verifyBackupCode({ code: `${codeRaw.slice(0, 5)}-${codeRaw.slice(5)}` })
-      : await authClient.twoFactor.verifyTotp({ code: codeRaw });
+    const { error } = await settleAuth(() =>
+      backup
+        ? authClient.twoFactor.verifyBackupCode({ code: `${codeRaw.slice(0, 5)}-${codeRaw.slice(5)}` })
+        : authClient.twoFactor.verifyTotp({ code: codeRaw }),
+    );
     setBusy(false);
     if (error) {
       setCodeError(
-        error.status === 429
-          ? TOO_MANY
-          : backup
+        failMessage(
+          error,
+          backup
             ? "That backup code did not work. Check it and try again."
             : "That code did not work. Check it and try again.",
+        ),
       );
       return;
     }
@@ -174,13 +190,15 @@ export function SignIn({ providers }: { providers: SocialAvailability }): React.
     }
     setBusy(true);
     setResetError("");
-    const { error } = await authClient.requestPasswordReset({
-      email: resetEmail.trim().toLowerCase(),
-      redirectTo: ROUTES.resetPassword,
-    });
+    const { error } = await settleAuth(() =>
+      authClient.requestPasswordReset({
+        email: resetEmail.trim().toLowerCase(),
+        redirectTo: ROUTES.resetPassword,
+      }),
+    );
     setBusy(false);
     if (error) {
-      setResetError(error.status === 429 ? TOO_MANY : "We could not send the link. Try again in a moment.");
+      setResetError(failMessage(error, "We could not send the link. Try again in a moment."));
       return;
     }
     setView("sent");
