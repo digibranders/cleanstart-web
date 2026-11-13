@@ -26,3 +26,8 @@ export async function GET(request: Request, ctx: { params: Promise<{ id: string 
     return response;
   }
 }
+
+/** Next would answer HEAD from GET, so a link preview or a crawler would count an open. */
+export function HEAD(): Response {
+  return new Response(null, { status: 405, headers: { Allow: 'GET', 'Cache-Control': 'no-store' } });
+}

@@ -77,4 +77,15 @@ describe('handleFileOpen', () => {
     expect((await handleFileOpen('00000000-0000-4000-8000-000000000000', { viewer, storage: unconfigured, clock })).status).toBe(404);
     expect((await handleFileOpen(doc.id, { viewer, storage: unconfigured, clock })).status).toBe(502);
   });
+  it('records no open when signing fails, however often the partner retries', async () => {
+    const viewer = await channelViewer();
+    const doc = await makeDocument(db, {});
+    const failing = (): never => {
+      throw new IntegrationError('r2', 'R2 is not configured');
+    };
+    for (let n = 0; n < 3; n += 1) {
+      expect((await handleFileOpen(doc.id, { viewer, storage: failing, clock })).status).toBe(502);
+    }
+    expect(await db.select().from(documentOpens)).toHaveLength(0);
+  });
 });

@@ -23,29 +23,33 @@ export function fileErrorResponse(error: unknown): Response {
 }
 
 /**
- * Audience check, open record, then a 302 to a 60 second presigned GET. The database work is one transaction; the R2
- * signing happens after it commits. The R2 key is never in the response body or headers except inside the signed URL.
+ * Audience check, then the signed URL, then the open record, then a 302 to the 60 second presigned GET. Each database
+ * step is its own short transaction and the R2 signing sits between them, so no R2 call happens inside a transaction
+ * and a signing failure records no open. The second transaction re-checks visibility, so a document deleted in
+ * between answers 404. The R2 key is never in the response body or headers except inside the signed URL.
  */
 export async function handleFileOpen(id: string, deps: FileOpenDeps): Promise<Response> {
   const clock = deps.clock ?? systemClock;
   let target: DocumentOpenTarget;
   try {
-    target = await withViewer(deps.viewer, async (tx) => {
-      const found = await getDocumentForOpen(tx, deps.viewer, id);
-      await recordDocumentOpen(tx, deps.viewer, { id }, clock);
-      return found;
-    });
+    target = await withViewer(deps.viewer, (tx) => getDocumentForOpen(tx, deps.viewer, id));
+  } catch (error) {
+    return fileErrorResponse(error);
+  }
+  let url: string;
+  try {
+    const storage = typeof deps.storage === 'function' ? deps.storage() : deps.storage;
+    ({ url } = await storage.presignGet({ key: target.fileKey, filename: target.originalName }));
   } catch (error) {
     return fileErrorResponse(error);
   }
   try {
-    const storage = typeof deps.storage === 'function' ? deps.storage() : deps.storage;
-    const { url } = await storage.presignGet({ key: target.fileKey, filename: target.originalName });
-    return new Response(null, {
-      status: 302,
-      headers: { Location: url, 'Cache-Control': 'private, no-store', 'Referrer-Policy': 'no-referrer' },
-    });
+    await withViewer(deps.viewer, (tx) => recordDocumentOpen(tx, deps.viewer, { id }, clock));
   } catch (error) {
     return fileErrorResponse(error);
   }
+  return new Response(null, {
+    status: 302,
+    headers: { Location: url, 'Cache-Control': 'private, no-store', 'Referrer-Policy': 'no-referrer' },
+  });
 }
