@@ -3,60 +3,71 @@
 import { useState } from "react";
 import { Drawer } from "@/components/ui/overlay";
 import { useToast } from "@/components/ui/toast";
-import { appendAudit } from "@/data/audit";
-import { isEmail, type StaffRegion, type StaffRole, staffSlice } from "@/data/team";
+import {
+  STAFF_REGION_LABEL,
+  STAFF_REGIONS,
+  STAFF_ROLE_LABEL,
+  STAFF_ROLES,
+  type StaffRegion,
+  type StaffRole,
+} from "@/lib/domain";
+import { codeFromLabel, isValidEmail } from "@/lib/people";
+import { inviteStaffAction } from "@/server/actions/staff";
+import { issuesToErrors } from "@/server/actions/result";
 import { Seg } from "./Seg";
 
-const ROLES: readonly StaffRole[] = ["Partner manager", "Sales", "Marketing"];
-const REGIONS: readonly StaffRegion[] = ["India", "Middle East", "All regions"];
+const ROLES: readonly string[] = STAFF_ROLES.map((r) => STAFF_ROLE_LABEL[r]);
+const REGIONS: readonly string[] = STAFF_REGIONS.map((r) => STAFF_REGION_LABEL[r]);
 const ROLE_HINT: Record<StaffRole, string> = {
-  "Partner manager": "Approves deals and applications, and manages partners.",
-  Sales: "Sees and approves deals in their own region.",
-  Marketing: "Publishes documents for partners.",
+  partner_manager: "Approves deals and applications, and manages partners.",
+  sales: "Sees and approves deals in their own region.",
+  marketing: "Publishes documents for partners.",
 };
 
 export function StaffInviteDrawer({
   open,
   onClose,
+  existingEmails,
 }: {
   open: boolean;
   onClose: () => void;
+  existingEmails: readonly string[];
 }): React.JSX.Element | null {
   const toast = useToast();
-  const people = staffSlice.use();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<StaffRole>("Sales");
-  const [region, setRegion] = useState<StaffRegion>("India");
+  const [roleLabel, setRoleLabel] = useState<string>(STAFF_ROLE_LABEL.sales);
+  const [regionLabel, setRegionLabel] = useState<string>(STAFF_REGION_LABEL.india);
   const [tried, setTried] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const address = email.trim().toLowerCase();
-  const emailOk = isEmail(address);
-  const duplicate = people.some((p) => p.email === address);
+  const emailOk = isValidEmail(address);
+  const duplicate = existingEmails.includes(address);
   const nameErr = tried && name.trim() === "";
-  const emailErr = tried && (!emailOk || duplicate);
+  const emailErr = (tried && (!emailOk || duplicate)) || serverError !== null;
+  const role: StaffRole = codeFromLabel(STAFF_ROLE_LABEL, roleLabel) ?? "sales";
+  const region: StaffRegion = codeFromLabel(STAFF_REGION_LABEL, regionLabel) ?? "india";
 
-  const submit = (event: React.FormEvent<HTMLFormElement>): void => {
+  const submit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
+    setServerError(null);
     if (name.trim() === "" || !emailOk || duplicate) {
       setTried(true);
       return;
     }
-    const person = name.trim();
-    staffSlice.set((prev) => [
-      ...prev,
-      { name: person, email: address, role, region, partners: [], last: "Invited today", status: "Invited" },
-    ]);
-    appendAudit({
-      actor: "Farhan Qureshi",
-      action: "Invited a teammate",
-      target: `${person}, ${role.toLowerCase()}, ${region}`,
-      source: "Portal",
-    });
+    setBusy(true);
+    const result = await inviteStaffAction({ name, email: address, role, region });
+    setBusy(false);
+    if (!result.ok) {
+      setServerError(issuesToErrors(result.error).email ?? result.error.message);
+      return;
+    }
     setName("");
     setEmail("");
-    setRole("Sales");
-    setRegion("India");
+    setRoleLabel(STAFF_ROLE_LABEL.sales);
+    setRegionLabel(STAFF_REGION_LABEL.india);
     setTried(false);
     onClose();
     toast(`Invite sent to ${address}`);
@@ -74,7 +85,7 @@ export function StaffInviteDrawer({
           <button type="button" className="btn btn-s" onClick={onClose}>
             Cancel
           </button>
-          <button type="submit" className="btn btn-p">
+          <button type="submit" className="btn btn-p" disabled={busy}>
             Send invite
           </button>
         </>
@@ -114,7 +125,7 @@ export function StaffInviteDrawer({
         />
         {emailErr ? (
           <span className="err" id="inv-email-err">
-            {duplicate ? "This person is already on the team." : "Enter a valid work email."}
+            {serverError ?? (duplicate ? "This person is already on the team." : "Enter a valid work email.")}
           </span>
         ) : null}
       </div>
@@ -123,7 +134,7 @@ export function StaffInviteDrawer({
           Role
         </span>
         <div style={{ alignSelf: "flex-start" }}>
-          <Seg options={ROLES} value={role} onChange={setRole} labelledBy="inv-role" />
+          <Seg options={ROLES} value={roleLabel} onChange={setRoleLabel} labelledBy="inv-role" />
         </div>
         <span className="hint">{ROLE_HINT[role]}</span>
       </div>
@@ -132,7 +143,7 @@ export function StaffInviteDrawer({
           Region
         </span>
         <div style={{ alignSelf: "flex-start" }}>
-          <Seg options={REGIONS} value={region} onChange={setRegion} labelledBy="inv-reg" />
+          <Seg options={REGIONS} value={regionLabel} onChange={setRegionLabel} labelledBy="inv-reg" />
         </div>
       </div>
     </Drawer>

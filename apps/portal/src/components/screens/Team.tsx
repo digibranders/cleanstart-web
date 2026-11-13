@@ -1,21 +1,30 @@
 "use client";
 
 import { useState } from "react";
+import { Icon } from "@/components/icon";
 import { AccessRequests } from "@/components/people/AccessRequests";
 import { InviteCard } from "@/components/people/InviteCard";
-import { Icon } from "@/components/icon";
 import { RowAction } from "@/components/people/RowAction";
 import { Badge, type BadgeTone } from "@/components/ui/badge";
-import { Dropdown } from "@/components/ui/dropdown";
+import { Dropdown, type DropdownOption } from "@/components/ui/dropdown";
 import { useToast } from "@/components/ui/toast";
-import { appendAudit } from "@/data/audit";
-import { initialsOf, type PartnerRole, rowKey, type TeamMember, teamSlice } from "@/data/team";
+import { isOneOf, PARTNER_ROLE_LABEL, PARTNER_ROLES, type PartnerRole } from "@/lib/domain";
+import type { TeamDto, TeamMemberDto } from "@/lib/dto";
+import { initialsOf, invitedLabel, lastSeenLabel, rowKey } from "@/lib/people";
+import type { ActionResult } from "@/server/actions/result";
+import {
+  changeMemberRoleAction,
+  removeMemberAction,
+  resendInviteAction,
+  revokeInviteAction,
+} from "@/server/actions/team";
 
-const ROLES: readonly PartnerRole[] = ["Sales", "Technical", "Partner admin"];
+const ROLE_ORDER: readonly PartnerRole[] = ["sales", "technical", "partner_admin"];
+const ROLE_OPTIONS: readonly DropdownOption[] = ROLE_ORDER.map((value) => ({ value, label: PARTNER_ROLE_LABEL[value] }));
 const ROLE_TONE: Record<PartnerRole, BadgeTone> = {
-  "Partner admin": "violet",
-  Sales: "blue",
-  Technical: "cyan",
+  partner_admin: "violet",
+  sales: "blue",
+  technical: "cyan",
 };
 const AVATARS = ["av-1", "av-2", "av-3", "av-4"] as const;
 
@@ -26,53 +35,44 @@ const PERMISSIONS: ReadonlyArray<readonly [string, boolean, boolean, boolean]> =
   ["Edit company profile", true, false, false],
 ];
 
-function isRole(value: string): value is PartnerRole {
-  return (ROLES as readonly string[]).includes(value);
-}
-
 function Perm({ yes }: { yes: boolean }): React.JSX.Element {
   return <td className={`r ${yes ? "t-green" : "t-muted"}`}>{yes ? "Yes" : "No"}</td>;
 }
 
-export function Team(): React.JSX.Element {
+export function Team({ team, today }: { team: TeamDto; today: string }): React.JSX.Element {
   const toast = useToast();
-  const { members, requests } = teamSlice.use();
+  const { members, requests } = team;
   const [confirming, setConfirming] = useState<string | null>(null);
 
-  const changeRole = (member: TeamMember, role: PartnerRole): void => {
-    teamSlice.set((prev) => ({
-      ...prev,
-      members: prev.members.map((m) => (m.email === member.email ? { ...m, role } : m)),
-    }));
-    appendAudit({
-      actor: "Aditi Rao",
-      action: "Changed a role",
-      target: `${member.name}, at Kestrel Systems`,
-      detail: `${member.role} to ${role}.`,
-      source: "Portal",
-    });
+  // A failed action shows its safe message (for example "Every company needs at least one partner admin.").
+  const report = async (pending: Promise<ActionResult<unknown>>, success?: string): Promise<void> => {
+    const result = await pending;
+    if (!result.ok) toast(result.error.message);
+    else if (success) toast(success);
   };
 
-  const remove = (member: TeamMember): void => {
-    teamSlice.set((prev) => ({ ...prev, members: prev.members.filter((m) => m.email !== member.email) }));
+  const changeRole = (member: TeamMemberDto, role: PartnerRole): void =>
+    void report(changeMemberRoleAction({ userId: member.id, role }));
+
+  // Someone who only has an invite has no account to remove: removing them withdraws the invite.
+  const isInviteOnly = (member: TeamMemberDto): boolean => member.inviteId !== null && member.inviteId === member.id;
+
+  const remove = (member: TeamMemberDto): void => {
     setConfirming(null);
-    appendAudit({
-      actor: "Aditi Rao",
-      action: "Removed a user",
-      target: `${member.name}, ${member.role.toLowerCase()}, at Kestrel Systems`,
-      source: "Portal",
-    });
+    void report(
+      isInviteOnly(member) && member.inviteId
+        ? revokeInviteAction({ inviteId: member.inviteId })
+        : removeMemberAction({ userId: member.id }),
+    );
   };
 
-  const resend = (member: TeamMember): void => {
-    appendAudit({
-      actor: "Aditi Rao",
-      action: "Resent an invite",
-      target: `${member.name}, at Kestrel Systems`,
-      source: "Portal",
-    });
-    toast(`Invite resent to ${member.email}`);
+  const resend = (member: TeamMemberDto): void => {
+    if (!member.inviteId) return;
+    void report(resendInviteAction({ inviteId: member.inviteId }), `Invite resent to ${member.email}`);
   };
+
+  const lastActive = (m: TeamMemberDto): string =>
+    m.isYou ? "Now" : m.status === "invited" ? invitedLabel(m.invitedAt) : lastSeenLabel(m.lastActiveAt, today);
 
   return (
     <div className="wrap">
@@ -80,12 +80,12 @@ export function Team(): React.JSX.Element {
         <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
           <h1 className="h1">Team</h1>
           <span className="h1-sub">
-            Everyone at Kestrel Systems with a login. Deals stay with the company when someone leaves.
+            Everyone at {team.partnerName} with a login. Deals stay with the company when someone leaves.
           </span>
         </div>
       </div>
 
-      <AccessRequests requests={requests} />
+      <AccessRequests requests={requests} today={today} />
 
       <div className="row">
         <section
@@ -99,7 +99,7 @@ export function Team(): React.JSX.Element {
               People
             </h2>
             <span className="card-meta tnum">
-              {members.length} people, {members.filter((m) => m.status !== "Active").length} invited
+              {members.length} people, {members.filter((m) => m.status !== "active").length} invited
             </span>
           </div>
           <div style={{ overflowX: "auto" }}>
@@ -120,16 +120,16 @@ export function Team(): React.JSX.Element {
               </thead>
               <tbody>
                 {members.map((m, i) => (
-                  <tr key={m.email}>
+                  <tr key={m.id}>
                     <td>
                       <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <span className={`av av-r ${m.you ? "av-me" : (AVATARS[i % AVATARS.length] ?? "av-1")}`}>
+                        <span className={`av av-r ${m.isYou ? "av-me" : (AVATARS[i % AVATARS.length] ?? "av-1")}`}>
                           {initialsOf(m.name)}
                         </span>
                         <span className="li-t">
                           <span className="li-n" style={{ fontSize: 13 }}>
                             {m.name}
-                            {m.you ? (
+                            {m.isYou ? (
                               <span className="t-muted" style={{ fontWeight: 500 }}>
                                 {" "}
                                 (you)
@@ -141,28 +141,30 @@ export function Team(): React.JSX.Element {
                       </span>
                     </td>
                     <td>
-                      {m.you ? (
-                        <Badge tone={ROLE_TONE[m.role]}>{m.role}</Badge>
+                      {m.isYou || m.status === "invited" ? (
+                        <Badge tone={ROLE_TONE[m.role]}>{PARTNER_ROLE_LABEL[m.role]}</Badge>
                       ) : (
                         <Dropdown
                           variant="rsel"
                           id={`role-${rowKey(m.email)}`}
                           ariaLabel={`Role for ${m.name}`}
                           value={m.role}
-                          options={ROLES}
+                          options={ROLE_OPTIONS}
                           onChange={(v) => {
-                            if (isRole(v) && v !== m.role) changeRole(m, v);
+                            if (isOneOf(PARTNER_ROLES, v) && v !== m.role) changeRole(m, v);
                           }}
                         />
                       )}
                     </td>
                     <td>
-                      <Badge tone={m.status === "Active" ? "accepted" : "pending"}>{m.status}</Badge>
+                      <Badge tone={m.status === "active" ? "accepted" : "pending"}>
+                        {m.status === "active" ? "Active" : "Invited"}
+                      </Badge>
                     </td>
-                    <td className="t-sec">{m.last}</td>
+                    <td className="t-sec">{lastActive(m)}</td>
                     <td className="tnum r">{m.deals}</td>
                     <td className="r">
-                      {m.you ? null : confirming === m.email ? (
+                      {m.isYou ? null : confirming === m.id ? (
                         <span className="confirm">
                           <button
                             type="button"
@@ -186,7 +188,7 @@ export function Team(): React.JSX.Element {
                         </span>
                       ) : (
                         <span className="acts">
-                          {m.status === "Invited" ? (
+                          {m.status === "invited" ? (
                             <RowAction
                               label={`Resend invite to ${m.name}`}
                               tip="Resend invite"
@@ -199,7 +201,7 @@ export function Team(): React.JSX.Element {
                             tip="Remove access"
                             icon="trash"
                             tone="no"
-                            onClick={() => setConfirming(m.email)}
+                            onClick={() => setConfirming(m.id)}
                           />
                         </span>
                       )}
@@ -212,7 +214,7 @@ export function Team(): React.JSX.Element {
         </section>
 
         <aside style={{ flex: "0 1 320px", minWidth: 280, display: "flex", flexDirection: "column", gap: 12 }}>
-          <InviteCard />
+          <InviteCard existingEmails={members.map((m) => m.email)} />
           <section aria-labelledby="roles" className="card clip">
             <div className="card-h">
               <h2 id="roles" className="card-t">

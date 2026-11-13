@@ -2542,7 +2542,7 @@ process.exit(0);
 
 Run the Gate A block (Conventions). The last command must list only: `src/server/repo/applications.ts`, `src/server/repo/applications.test.ts`, `src/server/intake/website-applications.ts`, `src/server/intake/website-applications.test.ts`, `src/server/intake/stub-cms.ts`, `src/server/jobs/intake.ts`, `src/server/jobs/intake.test.ts`, `scripts/stub-cms.ts`, `scripts/run-intake.ts` (under `apps/portal/`).
 
-- [ ] **Step 10: Manual check (dev database with seed-dev data)**
+- [x] **Step 10: Manual check (dev database with seed-dev data)**
 
 1. Terminal A: `pnpm --filter @cleanstart/portal exec tsx scripts/stub-cms.ts`. Expected: `Stub CMS listening at http://127.0.0.1:3290`.
 2. Put `CMS_API_URL=http://127.0.0.1:3290` and `CMS_INTAKE_API_KEY=stub-key` in `apps/portal/.env`. Terminal B: `pnpm --filter @cleanstart/portal exec tsx --env-file=.env scripts/run-intake.ts`. Expected log line: `website intake finished` with `fetched: 3, imported: 2, skipped: { honeypot: 1, ... }` and a cursor.
@@ -3519,7 +3519,7 @@ export interface ApplicationApprovalDto {
 }
 ```
 
-- [ ] **Step 10: Write the failing action tests**
+- [x] **Step 10: Write the failing action tests**
 
 Create `src/server/actions/applications.test.ts`. Requires H4.4 (`enqueue`) for the outbox assertions.
 
@@ -3657,7 +3657,7 @@ Run:
 `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/applications.test.ts`
 Expected: FAIL, `Failed to resolve import "./applications"`.
 
-- [ ] **Step 11: Implement the actions**
+- [x] **Step 11: Implement the actions**
 
 Create `src/server/actions/applications.ts`. Requires H4.4 (`@/server/hubspot/outbox`).
 
@@ -4353,7 +4353,7 @@ Implements master task 1.5. A token is 32 random bytes, stored only as SHA-256, 
 - Create: `scripts/dev-invite-link.ts`
 - Modify: `src/components/screens/AcceptInvite.tsx`, `src/components/screens/PartnerWelcome.tsx`, `src/components/partners/message-drawer.tsx`, `src/app/(public)/accept-invite/page.tsx`, `src/app/partner/welcome/page.tsx`
 
-- [ ] **Step 1: Verify the Better Auth server sign-in API (fallback documented)**
+- [x] **Step 1: Verify the Better Auth server sign-in API (fallback documented)**
 
 The accept action signs the new user in on the server so they land on the welcome page without a second form. Verify the installed Better Auth exposes `auth.api.signInEmail` and the Next cookie plugin:
 
@@ -4365,7 +4365,7 @@ grep -n "nextCookies" apps/portal/src/server/auth/auth.ts
 
 Expected: each command prints at least one line. If the third prints nothing, the W0-f auth instance lacks the `nextCookies` plugin, so cookies set inside a server action would not persist: do not edit `auth.ts` (not this plan's file); write a `blocked` line naming `src/server/auth/auth.ts` (add `nextCookies()` last in `plugins`) and carry on: the action below already degrades to `signedIn: false` and sends the person to `/sign-in`, which is the documented fallback.
 
-- [ ] **Step 2: Add the staff team label helper**
+- [x] **Step 2: Add the staff team label helper**
 
 Append to `src/lib/people.test.ts` (inside a new `describe`) and `src/lib/people.ts`:
 
@@ -4393,7 +4393,7 @@ export const staffTeamLabel = (region: StaffRegion | null): string =>
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/lib/people.test.ts`
 Expected: PASS.
 
-- [ ] **Step 3: Create the shared invite types**
+- [x] **Step 3: Create the shared invite types**
 
 Create `src/lib/invites.ts`:
 
@@ -4408,7 +4408,7 @@ export interface AcceptInviteOutcome {
 export const INVITE_IP_RULE = { limit: 20, windowSeconds: 600 } as const;
 ```
 
-- [ ] **Step 4: Write the failing repo tests for preview and accept**
+- [x] **Step 4: Write the failing repo tests for preview and accept**
 
 Create `src/server/repo/invites.test.ts` (M1.6 appends to it):
 
@@ -4576,7 +4576,7 @@ Run:
 `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/invites.test.ts`
 Expected: FAIL, `Failed to resolve import "./invites"`.
 
-- [ ] **Step 5: Implement preview and accept**
+- [x] **Step 5: Implement preview and accept**
 
 Create `src/server/repo/invites.ts` (M1.6 adds the other four functions):
 
@@ -4769,7 +4769,7 @@ export const isolation = defineIsolation<'previewInvite' | 'acceptInvite'>({
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/invites.test.ts`
 Expected: PASS, 11 tests.
 
-- [ ] **Step 6: Write the failing partner repo tests (company and checklist)**
+- [x] **Step 6: Write the failing partner repo tests (company and checklist)**
 
 Create `src/server/repo/partners.test.ts` (M1.7 and M4.1 append to it):
 
@@ -4887,7 +4887,7 @@ describe('listPartnerAdminRecipients', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/partners.test.ts`
 Expected: FAIL, `Failed to resolve import "./partners"`.
 
-- [ ] **Step 7: Implement the partner scope helper and the M1.5 partner repo functions**
+- [x] **Step 7: Implement the partner scope helper and the M1.5 partner repo functions**
 
 Create `src/server/partner-scope.ts`:
 
@@ -5050,7 +5050,7 @@ export const isolation = defineIsolation<'getCompany' | 'getChecklist' | 'tickCh
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/partners.test.ts src/server/repo/isolation.test.ts`
 Expected: PASS (partners: 7 tests; isolation passes for `invites` and `partners`).
 
-- [ ] **Step 8: Write the failing invite preview helper test**
+- [x] **Step 8: Write the failing invite preview helper test**
 
 The page and `previewInviteAction` share one loader that rate limits, reads the invite and adds the configured agreement version.
 
@@ -5091,7 +5091,7 @@ describe('loadInvitePreview', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/invite-preview.test.ts`
 Expected: FAIL, `Failed to resolve import "./invite-preview"`.
 
-- [ ] **Step 9: Implement the preview loader**
+- [x] **Step 9: Implement the preview loader**
 
 Create `src/server/invite-preview.ts`:
 
@@ -5118,7 +5118,7 @@ export async function loadInvitePreview(token: string, ip: string | null, clock:
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/invite-preview.test.ts`
 Expected: PASS, 2 tests.
 
-- [ ] **Step 10: Write the failing action tests for invites**
+- [x] **Step 10: Write the failing action tests for invites**
 
 Create `src/server/actions/invites.test.ts` (M1.6 appends the `requestAccessAction` tests). Requires H4.4 for the outbox assertion.
 
@@ -5306,7 +5306,7 @@ describe('previewInviteAction', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/invites.test.ts`
 Expected: FAIL, `Failed to resolve import "./invites"`.
 
-- [ ] **Step 11: Implement the invite actions**
+- [x] **Step 11: Implement the invite actions**
 
 Create `src/server/actions/invites.ts` (M1.6 adds `requestAccessAction`). Requires H4.4 for `enqueue`.
 
@@ -5455,7 +5455,7 @@ export async function acceptInviteAction(raw: unknown): Promise<ActionResult<Acc
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/invites.test.ts`
 Expected: PASS, 9 tests. If the `redirectTo` assertion for the second-admin test fails with `/partner/welcome`, check that `landingPathFor('partner', 'sales')` returns the overview path.
 
-- [ ] **Step 12: Write the failing partner action tests (checklist and manager message)**
+- [x] **Step 12: Write the failing partner action tests (checklist and manager message)**
 
 Create `src/server/actions/partners.test.ts` (M1.7 and M4.1 append to it):
 
@@ -5565,7 +5565,7 @@ describe('sendManagerMessageAction', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/partners.test.ts`
 Expected: FAIL, `Failed to resolve import "./partners"`.
 
-- [ ] **Step 13: Implement the partner actions (checklist and manager message)**
+- [x] **Step 13: Implement the partner actions (checklist and manager message)**
 
 Create `src/server/actions/partners.ts`:
 
@@ -5625,7 +5625,7 @@ export async function sendManagerMessageAction(raw: unknown): Promise<ActionResu
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/partners.test.ts`
 Expected: PASS, 5 tests.
 
-- [ ] **Step 14: Add the dev helper that prints a fresh invite link**
+- [x] **Step 14: Add the dev helper that prints a fresh invite link**
 
 Create `scripts/dev-invite-link.ts`. Local development only: the dev email transport logs and skips, so the invite link is otherwise never visible. It rotates the token of the open invite for an email (the previous link stops working) and prints the URL.
 
@@ -5658,7 +5658,7 @@ console.log(url ?? `No open invite for ${email}. Approve an application or add a
 process.exit(0);
 ```
 
-- [ ] **Step 15: Convert `AcceptInvite.tsx`**
+- [x] **Step 15: Convert `AcceptInvite.tsx`**
 
 Edit `src/components/screens/AcceptInvite.tsx`.
 
@@ -6023,7 +6023,7 @@ After:
 
 Copy changes versus the mock, for the product owner: the footer reads "CleanStart Partner Portal" (the inviter's name is not stored on the invite), the kickoff step says "your partner manager" without a name, and non-admin and staff invites show a shorter list. The agreement text stays the placeholder.
 
-- [ ] **Step 16: Write the accept-invite page**
+- [x] **Step 16: Write the accept-invite page**
 
 Replace `src/app/(public)/accept-invite/page.tsx` in full:
 
@@ -6051,7 +6051,7 @@ export default async function Page({
 }
 ```
 
-- [ ] **Step 17: Convert `message-drawer.tsx`**
+- [x] **Step 17: Convert `message-drawer.tsx`**
 
 Edit `src/components/partners/message-drawer.tsx`.
 
@@ -6172,7 +6172,7 @@ After:
         ) : null}
 ```
 
-- [ ] **Step 18: Convert `PartnerWelcome.tsx`**
+- [x] **Step 18: Convert `PartnerWelcome.tsx`**
 
 Edit `src/components/screens/PartnerWelcome.tsx`.
 
@@ -6445,7 +6445,7 @@ After:
 
 The "Start here" starter documents block stays static (the document library is track D's data); it links to the Documents page.
 
-- [ ] **Step 19: Write the welcome page**
+- [x] **Step 19: Write the welcome page**
 
 Replace `src/app/partner/welcome/page.tsx` in full:
 
@@ -6475,12 +6475,12 @@ export default async function Page(): Promise<React.JSX.Element> {
 }
 ```
 
-- [ ] **Step 20: Prove no slice import is left**
+- [x] **Step 20: Prove no slice import is left**
 
 Run: `grep -n "@/data/\|@/lib/slice\|personas\|welcomeSlice" src/components/screens/AcceptInvite.tsx src/components/screens/PartnerWelcome.tsx src/components/partners/message-drawer.tsx`
 Expected: no output.
 
-- [ ] **Step 21: Gate A**
+- [x] **Step 21: Gate A**
 
 Run the Gate A block. The last command must list only the files in this task's Files block, plus `src/server/partner-scope.ts`.
 
@@ -6493,7 +6493,7 @@ Run the Gate A block. The last command must list only the files in this task's F
 5. Reopen the same invite URL: "This invite was already used". Change the last character of the token: "This invite link is not valid". Generate a link for an invite and edit `expires_at` to the past in psql: "This invite has expired".
 6. `select op, subject_id from hubspot_outbox where op = 'user.upsert'` has Yasmin's user id; `select event from audit_log order by at desc limit 2` shows `partner.agreement_accepted` and `team.invite_accepted`.
 
-- [ ] **Step 23: Commit**
+- [x] **Step 23: Commit**
 
 ```bash
 git add apps/portal/src/lib/people.ts apps/portal/src/lib/people.test.ts apps/portal/src/lib/invites.ts \
@@ -6527,7 +6527,7 @@ Where the contracts say the repo deletes Better Auth sessions (`removeMember`), 
 - Modify: `src/components/screens/Team.tsx`, `src/components/people/InviteCard.tsx`, `src/components/people/AccessRequests.tsx`, `src/components/screens/SignIn.tsx` (request views only), `src/app/partner/team/page.tsx`
 - Create: `src/components/people/RequestAccessForm.tsx`
 
-- [ ] **Step 1: Write the failing test for the shared people loader**
+- [x] **Step 1: Write the failing test for the shared people loader**
 
 Create `src/server/partner-people.test.ts`:
 
@@ -6576,7 +6576,7 @@ describe('loadPartnerPeople', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/partner-people.test.ts`
 Expected: FAIL, `Failed to resolve import "./partner-people"`.
 
-- [ ] **Step 2: Implement the people loader**
+- [x] **Step 2: Implement the people loader**
 
 Create `src/server/partner-people.ts`:
 
@@ -6648,7 +6648,7 @@ export async function loadPartnerPeople(tx: Tx, partnerId: string): Promise<Pers
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/partner-people.test.ts`
 Expected: PASS, 2 tests.
 
-- [ ] **Step 3: Write the failing repo tests for team and access requests**
+- [x] **Step 3: Write the failing repo tests for team and access requests**
 
 Create `src/server/repo/team.test.ts`:
 
@@ -6846,7 +6846,7 @@ describe('decideAccessRequest', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/team.test.ts`
 Expected: FAIL, `Failed to resolve import "./team"`.
 
-- [ ] **Step 4: Implement the team repo**
+- [x] **Step 4: Implement the team repo**
 
 Create `src/server/repo/team.ts`:
 
@@ -7094,7 +7094,7 @@ export const isolation = defineIsolation<'getTeam' | 'changeMemberRole' | 'remov
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/team.test.ts src/server/repo/isolation.test.ts`
 Expected: PASS (team: 16 tests; isolation passes for `team`).
 
-- [ ] **Step 5: Write the failing repo tests for invite management**
+- [x] **Step 5: Write the failing repo tests for invite management**
 
 Append to `src/server/repo/invites.test.ts`. Extend the imports: add `asPartner, asStaff` to the `@/db/test-helpers` import, `hashToken` and `INVITE_TTL_DAYS` from `@/server/auth/tokens`, `withViewer` to the `./context` import, and `createInvite, listOpenInvites, resendInvite, revokeInvite` to the `./invites` import. Then append:
 
@@ -7207,7 +7207,7 @@ describe('listOpenInvites', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/invites.test.ts`
 Expected: FAIL, `createInvite` is not exported by `./invites`.
 
-- [ ] **Step 6: Implement invite management**
+- [x] **Step 6: Implement invite management**
 
 In `src/server/repo/invites.ts` extend the imports:
 
@@ -7334,7 +7334,7 @@ Add `import { type Clock, systemClock } from '@/lib/clock';` replacing `import t
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/invites.test.ts src/server/repo/isolation.test.ts`
 Expected: PASS (invites: 22 tests).
 
-- [ ] **Step 7: Write the failing tests for the team actions**
+- [x] **Step 7: Write the failing tests for the team actions**
 
 Create `src/server/actions/team.test.ts`:
 
@@ -7534,7 +7534,7 @@ describe('decideAccessRequestAction', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/team.test.ts`
 Expected: FAIL, `Failed to resolve import "./team"`.
 
-- [ ] **Step 8: Implement the team actions**
+- [x] **Step 8: Implement the team actions**
 
 Create `src/server/actions/team.ts`:
 
@@ -7793,7 +7793,7 @@ The `subject` of the access request audit uses type `'user'` because the audit s
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/team.test.ts`
 Expected: PASS, 11 tests.
 
-- [ ] **Step 9: Write the failing tests for `requestAccessAction`**
+- [x] **Step 9: Write the failing tests for `requestAccessAction`**
 
 Append to `src/server/actions/invites.test.ts`. Add `accessRequests` to the `@/db/schema` import and `makeUser` is already imported; extend the actions import to `import { acceptInviteAction, previewInviteAction, requestAccessAction } from './invites';`. Then append:
 
@@ -7864,7 +7864,7 @@ describe('requestAccessAction', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/invites.test.ts`
 Expected: FAIL, `requestAccessAction` is not a function.
 
-- [ ] **Step 10: Implement `requestAccessAction`**
+- [x] **Step 10: Implement `requestAccessAction`**
 
 In `src/server/actions/invites.ts` extend the imports:
 
@@ -7957,7 +7957,7 @@ export async function requestAccessAction(raw: unknown): Promise<ActionResult<{ 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/invites.test.ts`
 Expected: PASS, 14 tests.
 
-- [ ] **Step 11: Convert `InviteCard.tsx`**
+- [x] **Step 11: Convert `InviteCard.tsx`**
 
 Replace `src/components/people/InviteCard.tsx` in full:
 
@@ -8059,7 +8059,7 @@ export function InviteCard({ existingEmails }: { existingEmails: readonly string
 }
 ```
 
-- [ ] **Step 12: Convert `AccessRequests.tsx`**
+- [x] **Step 12: Convert `AccessRequests.tsx`**
 
 Replace `src/components/people/AccessRequests.tsx` in full:
 
@@ -8164,7 +8164,7 @@ export function AccessRequests({
 }
 ```
 
-- [ ] **Step 13: Convert `Team.tsx`**
+- [x] **Step 13: Convert `Team.tsx`**
 
 Replace `src/components/screens/Team.tsx` in full:
 
@@ -8428,7 +8428,7 @@ export function Team({ team, today }: { team: TeamDto; today: string }): React.J
 
 Behaviour differences from the mock, for the product owner: someone who has only been invited shows their role as a badge (the role is fixed on the invite; withdraw and re-invite to change it), and the sample email in "Invite a colleague" is gone.
 
-- [ ] **Step 14: Write the team page**
+- [x] **Step 14: Write the team page**
 
 Replace `src/app/partner/team/page.tsx` in full:
 
@@ -8449,7 +8449,7 @@ export default async function Page(): Promise<React.JSX.Element> {
 }
 ```
 
-- [ ] **Step 15: Create the request-access form and wire it into `SignIn.tsx`**
+- [x] **Step 15: Create the request-access form and wire it into `SignIn.tsx`**
 
 Create `src/components/people/RequestAccessForm.tsx`. It replaces the mock's three views ("request", "requested", "nopartner") with two: the form, and one confirmation that reads the same for every address.
 
@@ -8693,12 +8693,12 @@ Edit 3, the three views. Delete the three JSX blocks that start with `{view === 
 
 End state check: `grep -n "partnersSlice\|findPartnerByDomain\|rqPartner\|requested\|nopartner" src/components/screens/SignIn.tsx` prints nothing.
 
-- [ ] **Step 16: Prove no slice import is left**
+- [x] **Step 16: Prove no slice import is left**
 
 Run: `grep -n "@/data/\|@/lib/slice\|teamSlice" src/components/screens/Team.tsx src/components/people/InviteCard.tsx src/components/people/AccessRequests.tsx src/components/people/RequestAccessForm.tsx src/components/screens/SignIn.tsx`
 Expected: no output.
 
-- [ ] **Step 17: Gate A**
+- [x] **Step 17: Gate A**
 
 Run the Gate A block. The last command must list only this task's Files block plus `src/components/people/RequestAccessForm.tsx`.
 
@@ -8711,7 +8711,7 @@ Run the Gate A block. The last command must list only this task's Files block pl
 5. Approve Rohit's request as Technical: toast "Rohit Desai can now set a password and sign in"; the request card disappears and Rohit shows as Invited. Check `psql ... -c "select event from audit_log order by at desc limit 5"`.
 6. Signed out, open `/sign-in?request=1`: submit `someone@gmail.com` (inline free-mail error), then `someone@not-a-partner.example` and `rohit.desai@kestrelsystems.in`: both land on the identical "Request sent" panel. `select count(*) from access_requests where status = 'open'` rose by at most one.
 
-- [ ] **Step 19: Commit**
+- [x] **Step 19: Commit**
 
 ```bash
 git add apps/portal/src/server/partner-people.ts apps/portal/src/server/partner-people.test.ts \
@@ -11114,7 +11114,7 @@ Implements master task 1.8. Only partner managers add, change or remove CleanSta
 - Create: `src/server/actions/staff.ts`, `src/server/actions/staff.test.ts`
 - Modify: `src/components/screens/AdminTeam.tsx`, `src/components/people/StaffInviteDrawer.tsx`, `src/app/admin/team/page.tsx`
 
-- [ ] **Step 1: Write the failing repo tests**
+- [x] **Step 1: Write the failing repo tests**
 
 Create `src/server/repo/staff.test.ts`:
 
@@ -11250,7 +11250,7 @@ The repo guards who may call by staff kind only; the action checks the role, so 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/staff.test.ts`
 Expected: FAIL, `Failed to resolve import "./staff"`.
 
-- [ ] **Step 2: Implement the staff repo**
+- [x] **Step 2: Implement the staff repo**
 
 Create `src/server/repo/staff.ts`:
 
@@ -11424,7 +11424,7 @@ Merge the two `@/lib/clock` imports into `import { type Clock, systemClock } fro
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/staff.test.ts src/server/repo/isolation.test.ts`
 Expected: PASS (staff: 11 tests; isolation passes for `staff`).
 
-- [ ] **Step 3: Write the failing action tests**
+- [x] **Step 3: Write the failing action tests**
 
 Create `src/server/actions/staff.test.ts`:
 
@@ -11572,7 +11572,7 @@ describe('removeStaffAction', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/staff.test.ts`
 Expected: FAIL, `Failed to resolve import "./staff"`.
 
-- [ ] **Step 4: Implement the staff actions**
+- [x] **Step 4: Implement the staff actions**
 
 Create `src/server/actions/staff.ts`:
 
@@ -11730,7 +11730,7 @@ export async function removeStaffAction(raw: unknown): Promise<ActionResult<{ id
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/staff.test.ts`
 Expected: PASS, 8 tests.
 
-- [ ] **Step 5: Replace `StaffInviteDrawer.tsx`**
+- [x] **Step 5: Replace `StaffInviteDrawer.tsx`**
 
 Replace `src/components/people/StaffInviteDrawer.tsx` in full:
 
@@ -11888,7 +11888,7 @@ export function StaffInviteDrawer({
 }
 ```
 
-- [ ] **Step 6: Replace `AdminTeam.tsx`**
+- [x] **Step 6: Replace `AdminTeam.tsx`**
 
 Replace `src/components/screens/AdminTeam.tsx` in full. Changes from the mock: DTO input; roles through a dropdown of `{ value, label }` options; a teammate who has only been invited shows a badge for the role and "Invite pending" for last active (the DTO carries no invite date, "Contract change requests" item 2); removing an invited teammate withdraws the invite.
 
@@ -12133,7 +12133,7 @@ export function AdminTeam({ people, today }: { people: StaffMemberDto[]; today: 
 }
 ```
 
-- [ ] **Step 7: Write the staff page**
+- [x] **Step 7: Write the staff page**
 
 Replace `src/app/admin/team/page.tsx` in full:
 
@@ -12156,12 +12156,12 @@ export default async function Page(): Promise<React.JSX.Element> {
 
 The list already contains invited teammates, so the page does not call `listOpenInvites` as the route map lists ("Contract change requests", item 14).
 
-- [ ] **Step 8: Prove no slice import is left**
+- [x] **Step 8: Prove no slice import is left**
 
 Run: `grep -n "@/data/\|@/lib/slice\|staffSlice" src/components/screens/AdminTeam.tsx src/components/people/StaffInviteDrawer.tsx`
 Expected: no output.
 
-- [ ] **Step 9: Gate A**
+- [x] **Step 9: Gate A**
 
 Run the Gate A block. The last command must list only this task's Files block.
 
@@ -12174,7 +12174,7 @@ Run the Gate A block. The last command must list only this task's Files block.
 5. Remove Kunal (invited): confirm, the row disappears and the invite is withdrawn. Remove Ishita: the row disappears; `select status from users where name = 'Ishita Bose'` is `disabled`.
 6. Sign in as `rahul.menon@cleanstart.com` (now Marketing): opening `/admin/team` redirects to the Documents home page (no `staff.read`).
 
-- [ ] **Step 11: Commit**
+- [x] **Step 11: Commit**
 
 ```bash
 git add apps/portal/src/server/repo/staff.ts apps/portal/src/server/repo/staff.test.ts \

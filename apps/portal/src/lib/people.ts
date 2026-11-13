@@ -1,6 +1,6 @@
 import { COMMON_FREE_EMAIL_DOMAINS, validateBusinessEmail } from '@cleanstart/forms';
 import { fmtLong, fmtShort, addDays } from '@/lib/dates';
-import type { PartnerRole, StaffRole, UserKind } from '@/lib/domain';
+import type { PartnerRole, StaffRegion, StaffRole, UserKind } from '@/lib/domain';
 import { ROUTES } from '@/lib/routes';
 
 const NO_FREE_DOMAINS: ReadonlySet<string> = new Set();
@@ -109,3 +109,7 @@ export const landingPathFor = (kind: UserKind, role: PartnerRole | StaffRole): s
   }
   return role === 'marketing' ? ROUTES.admin.documents : ROUTES.admin.approvals;
 };
+
+/** "CleanStart India", "CleanStart Middle East", or plain "CleanStart" for every region or an unknown one. */
+export const staffTeamLabel = (region: StaffRegion | null): string =>
+  region === 'india' ? 'CleanStart India' : region === 'middle_east' ? 'CleanStart Middle East' : 'CleanStart';

@@ -10,20 +10,15 @@ import {
   PublicSplit,
   StatusIcon,
 } from "@/components/partners/public-frame";
+import { RequestAccessForm } from "@/components/people/RequestAccessForm";
 import { PasswordField } from "@/components/ui/password-field";
 import { authClient } from "@/lib/auth-client";
 import { NETWORK_FAILURE_STATUS, settleAuth } from "@/lib/auth-call";
 import { safeNext } from "@/lib/next-path";
-import {
-  emailDomain,
-  findPartnerByDomain,
-  isFreeEmail,
-  isValidEmail,
-  partnersSlice,
-} from "@/data/partners";
+import { isValidEmail } from "@/lib/people";
 import { ROUTES } from "@/lib/routes";
 
-type View = "signin" | "code" | "request" | "requested" | "nopartner" | "forgot" | "sent";
+type View = "signin" | "code" | "request" | "forgot" | "sent";
 
 const TOO_MANY = "Too many attempts. Try again in a moment.";
 const NETWORK = "We could not reach the server. Check your connection and try again.";
@@ -46,8 +41,6 @@ const MICROSOFT_D =
   "M208,138H128a6,6,0,0,0-6,6v57.45a6,6,0,0,0,4.93,5.91l80,14.54a5.46,5.46,0,0,0,1.07.1,6,6,0,0,0,6-6V144A6,6,0,0,0,208,138Zm-6,70.81-68-12.36V150h68ZM96,138H32a6,6,0,0,0-6,6v40a6,6,0,0,0,4.93,5.9l64,11.64a6.36,6.36,0,0,0,1.07.1,6,6,0,0,0,6-6V144A6,6,0,0,0,96,138Zm-6,50.45L38,179V150H90ZM211.84,35.39a6,6,0,0,0-4.91-1.29l-80,14.54A6,6,0,0,0,122,54.55V112a6,6,0,0,0,6,6h80a6,6,0,0,0,6-6V40A6,6,0,0,0,211.84,35.39ZM202,106H134V59.55l68-12.36Z";
 const PHONE_D =
   "M176,18H80A22,22,0,0,0,58,40V216a22,22,0,0,0,22,22h96a22,22,0,0,0,22-22V40A22,22,0,0,0,176,18ZM70,62H186V194H70ZM80,30h96a10,10,0,0,1,10,10V50H70V40A10,10,0,0,1,80,30Zm96,196H80a10,10,0,0,1-10-10V206H186v10A10,10,0,0,1,176,226Z";
-const HELP_D =
-  "M138,180a10,10,0,1,1-10-10A10,10,0,0,1,138,180ZM128,74c-21,0-38,15.25-38,34v4a6,6,0,0,0,12,0v-4c0-12.13,11.66-22,26-22s26,9.87,26,22-11.66,22-26,22a6,6,0,0,0-6,6v8a6,6,0,0,0,12,0v-2.42c18.11-2.58,32-16.66,32-33.58C166,89.25,149,74,128,74Zm102,54A102,102,0,1,1,128,26,102.12,102.12,0,0,1,230,128Zm-12,0a90,90,0,1,0-90,90A90.1,90.1,0,0,0,218,128Z";
 
 const FORM_STYLE: React.CSSProperties = {
   width: "100%",
@@ -61,7 +54,6 @@ const FORM_STYLE: React.CSSProperties = {
 const BTN_BIG: React.CSSProperties = { height: 38, fontSize: 13.5 };
 
 export function SignIn({ providers }: { providers: SocialAvailability }): React.JSX.Element {
-  const { partners } = partnersSlice.use();
   const [view, setView] = useState<View>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -75,8 +67,6 @@ export function SignIn({ providers }: { providers: SocialAvailability }): React.
   const [code, setCode] = useState("");
   const [backup, setBackup] = useState(false);
   const [codeTried, setCodeTried] = useState(false);
-  const [rq, setRq] = useState({ name: "", email: "", note: "" });
-  const [rqTried, setRqTried] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetTried, setResetTried] = useState(false);
 
@@ -168,19 +158,6 @@ export function SignIn({ providers }: { providers: SocialAvailability }): React.
     enter();
   };
 
-  const rqEmailFree = isFreeEmail(rq.email);
-  const rqEmailBad = !isValidEmail(rq.email) || rqEmailFree;
-  const rqNameBad = !rq.name.trim();
-  const rqPartner = findPartnerByDomain(partners, emailDomain(rq.email));
-  const sendRequest = (event: React.FormEvent): void => {
-    event.preventDefault();
-    if (rqNameBad || rqEmailBad) {
-      setRqTried(true);
-      return;
-    }
-    setView(rqPartner ? "requested" : "nopartner");
-  };
-
   const resetBad = !isValidEmail(resetEmail);
   const sendReset = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
@@ -204,10 +181,7 @@ export function SignIn({ providers }: { providers: SocialAvailability }): React.
     setView("sent");
   };
 
-  const showRequest = (): void => {
-    setRqTried(false);
-    setView("request");
-  };
+  const showRequest = (): void => setView("request");
   const backToSignin = (): void => setView("signin");
 
   return (
@@ -400,105 +374,7 @@ export function SignIn({ providers }: { providers: SocialAvailability }): React.
           </form>
         ) : null}
 
-        {view === "request" ? (
-          <form onSubmit={sendRequest} noValidate style={FORM_STYLE}>
-            <PublicHeading title="Request access">
-              For people at a company that is already a CleanStart partner. Your partner admin approves the request.
-            </PublicHeading>
-            <div className="fg">
-              <label htmlFor="rq-name" className="lbl">
-                Full name
-              </label>
-              <input
-                id="rq-name"
-                className={`field${rqTried && rqNameBad ? " field-err" : ""}`}
-                type="text"
-                autoComplete="name"
-                value={rq.name}
-                onChange={(e) => setRq({ ...rq, name: e.target.value })}
-                aria-invalid={rqTried && rqNameBad ? true : undefined}
-                aria-describedby="rq-name-err"
-              />
-              {rqTried && rqNameBad ? (
-                <span className="err" id="rq-name-err">
-                  Enter your name.
-                </span>
-              ) : null}
-            </div>
-            <div className="fg">
-              <label htmlFor="rq-email" className="lbl">
-                Work email
-              </label>
-              <input
-                id="rq-email"
-                className={`field${rqTried && rqEmailBad ? " field-err" : ""}`}
-                type="email"
-                autoComplete="email"
-                value={rq.email}
-                onChange={(e) => setRq({ ...rq, email: e.target.value })}
-                aria-invalid={rqTried && rqEmailBad ? true : undefined}
-                aria-describedby="rq-email-err"
-              />
-              {rqTried && rqEmailBad ? (
-                <span className="err" id="rq-email-err">
-                  {rqEmailFree ? "Use your company email, not a personal address." : "Enter a valid work email."}
-                </span>
-              ) : null}
-            </div>
-            <div className="fg">
-              <label htmlFor="rq-note" className="lbl">
-                Note to your partner admin <span className="hint">(optional)</span>
-              </label>
-              <textarea
-                id="rq-note"
-                className="field"
-                rows={2}
-                value={rq.note}
-                onChange={(e) => setRq({ ...rq, note: e.target.value })}
-              />
-            </div>
-            <button type="submit" className="btn btn-p" style={BTN_BIG}>
-              Send request
-            </button>
-            <button type="button" className="btn btn-g" onClick={backToSignin} style={{ alignSelf: "flex-start" }}>
-              Back to sign in
-            </button>
-          </form>
-        ) : null}
-
-        {view === "requested" ? (
-          <div role="status" style={FORM_STYLE}>
-            <StatusIcon
-              d={CHECK_D}
-              tone="green"
-            />
-            <PublicHeading title="Request sent">
-              {rqPartner?.admin}, the partner admin at {rqPartner?.name}, will review it. You get an email with a
-              link to set your password once they approve.
-            </PublicHeading>
-            <button type="button" className="btn btn-s" onClick={backToSignin} style={{ alignSelf: "flex-start" }}>
-              Back to sign in
-            </button>
-          </div>
-        ) : null}
-
-        {view === "nopartner" ? (
-          <div role="status" style={FORM_STYLE}>
-            <StatusIcon d={HELP_D} />
-            <PublicHeading title="Your company is not a partner yet">
-              No CleanStart partner uses {emailDomain(rq.email)}. If your company wants to sell CleanStart, apply to
-              the partner program first.
-            </PublicHeading>
-            <div style={{ display: "flex", gap: 8 }}>
-              <Link href={ROUTES.apply} className="btn btn-p">
-                Apply to become a partner
-              </Link>
-              <button type="button" className="btn btn-s" onClick={showRequest}>
-                Use another email
-              </button>
-            </div>
-          </div>
-        ) : null}
+        {view === "request" ? <RequestAccessForm onBack={backToSignin} /> : null}
 
         {view === "forgot" ? (
           <form onSubmit={sendReset} noValidate style={FORM_STYLE}>
