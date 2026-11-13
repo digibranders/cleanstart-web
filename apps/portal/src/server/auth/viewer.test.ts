@@ -133,8 +133,8 @@ describe('guards', () => {
     const sales = await makeUser(testDb(), { partnerId: partner.id, role: 'sales', password: PASSWORD });
     await signInAs(sales.email);
     expect((await requireCan('registration.create')).id).toBe(sales.id);
-    expect(await redirectOf(() => requireCan('team.read'))).toBe('/partner/overview');
-    expect(await redirectOf(() => requireCan('registration.read', { partnerId: 'another-company' }))).toBe('/partner/overview');
+    expect(await redirectOf(() => requireCan('team.read'))).toBe('/partner/overview?denied=1');
+    expect(await redirectOf(() => requireCan('registration.read', { partnerId: 'another-company' }))).toBe('/partner/overview?denied=1');
   });
 
   it('requireActionViewer throws instead of redirecting', async () => {

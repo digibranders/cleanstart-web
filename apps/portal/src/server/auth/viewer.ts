@@ -87,7 +87,7 @@ export async function requireKind(kind: UserKind): Promise<Viewer> {
 /** Pages. requireViewer plus can(); a viewer who may not is redirected to their home. */
 export async function requireCan(action: Action, subject?: PolicySubject): Promise<Viewer> {
   const viewer = await requireViewer();
-  if (!can(viewer, action, subject)) redirect(homeFor(viewer));
+  if (!can(viewer, action, subject)) redirect(`${homeFor(viewer)}?denied=1`);
   return viewer;
 }
 
