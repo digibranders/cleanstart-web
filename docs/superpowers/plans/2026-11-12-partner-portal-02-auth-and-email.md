@@ -3235,13 +3235,13 @@ The proxy does two things. A signed out visit to `/partner` or `/admin` is redir
 - Modify: `apps/portal/src/proxy.ts` (replaced)
 - Test: `apps/portal/src/proxy.test.ts`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M1.1e | started | W0 | - | - | proxy session redirect" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Verify the two proxy facts**
+- [x] **Step 2: Verify the two proxy facts**
 
 Verify: the installed Next runs `proxy.ts` on the Node runtime and `getSessionCookie` accepts a `Request`.
 
@@ -3253,7 +3253,7 @@ grep -n "getSessionCookie: (request: Request | Headers" apps/portal/node_modules
 
 Expected: one line each. If the first is missing, check the Next release notes: the proxy may be edge only, in which case `better-auth/cookies` still works (it uses no Node API) but nothing in this file may import the database. If the second is missing, use `request.cookies.get('better-auth.session_token')` and the `__Secure-` variant.
 
-- [ ] **Step 3: Write the test**
+- [x] **Step 3: Write the test**
 
 Create `apps/portal/src/proxy.test.ts`. It builds real `NextRequest` objects and asserts the redirect target, the cookie names (plain and `__Secure-`), the public paths, that a client supplied path header is overwritten, and the review gate (off without the variable, 401 without or with a wrong password, open with the right one and still redirecting a signed out visit to `/partner`).
 
@@ -3342,7 +3342,7 @@ describe("review gate", () => {
 });
 ```
 
-- [ ] **Step 4: Run it and see it fail**
+- [x] **Step 4: Run it and see it fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/proxy.test.ts
@@ -3350,7 +3350,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/proxy.test.ts
 
 Expected: FAIL, `Tests  17 failed | 4 passed (21)`: `TypeError: (0 , isProtectedPath) is not a function` for the path cases, and `expected 200 to be 307` for the redirect cases (the mock proxy never redirects).
 
-- [ ] **Step 5: Replace `proxy.ts`**
+- [x] **Step 5: Replace `proxy.ts`**
 
 Replace `apps/portal/src/proxy.ts`:
 
@@ -3414,7 +3414,7 @@ export const config = {
 };
 ```
 
-- [ ] **Step 6: Run it and see it pass**
+- [x] **Step 6: Run it and see it pass**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/proxy.test.ts
@@ -3422,11 +3422,11 @@ pnpm --filter @cleanstart/portal exec vitest run src/proxy.test.ts
 
 Expected: `Test Files  1 passed (1)`, `Tests  22 passed (22)` (21 plus the `/api/health` case added at the integration review).
 
-- [ ] **Step 7: Run Gate A, then Gate B**
+- [x] **Step 7: Run Gate A, then Gate B**
 
 Run the three fast commands, then the full Gate A block. The build output lists `ƒ Proxy (Middleware)`. Expected: all exit 0.
 
-- [ ] **Step 8: Commit and log**
+- [x] **Step 8: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build
