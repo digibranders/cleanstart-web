@@ -10026,7 +10026,7 @@ What it does: `changePasswordAction` (Better Auth `changePassword`, then the por
 - Replace: `src/components/people/TwoStepCard.tsx`
 - Create: `src/components/screens/ResetPassword.tsx`, `src/app/(public)/reset-password/page.tsx`
 
-- [ ] **Step 1: Verify the Better Auth endpoints, the client and what `auth.ts` already does**
+- [x] **Step 1: Verify the Better Auth endpoints, the client and what `auth.ts` already does**
 
 ```bash
 D=apps/portal/node_modules/better-auth/dist
@@ -10038,7 +10038,7 @@ grep -n "change-password\|onPasswordChange\|account.password_changed" apps/porta
 
 Expected: the first two commands print the endpoint declarations; the third prints the `authClient` export (plan 02, K.2); the fourth shows where `account.password_changed` is written. If it is written for the reset flow only (plan 02's `onPasswordReset`), continue as written. If `auth.ts` also records the change for `/change-password`, delete the `recordPasswordChanged`, `recordAudit` and `sendEmail` calls from `changePasswordAction` below (keep the Better Auth call) and the matching assertions in its test, so a change is never audited or mailed twice.
 
-- [ ] **Step 2: Write the failing test for the Better Auth error mapper**
+- [x] **Step 2: Write the failing test for the Better Auth error mapper**
 
 Create `src/server/auth-errors.test.ts`:
 
@@ -10093,7 +10093,7 @@ describe('throwFieldError', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/auth-errors.test.ts`
 Expected: FAIL, `Failed to resolve import "./auth-errors"`.
 
-- [ ] **Step 3: Implement the error mapper**
+- [x] **Step 3: Implement the error mapper**
 
 Create `src/server/auth-errors.ts`:
 
@@ -10137,7 +10137,7 @@ export function throwFieldError(error: unknown, passwordPath: string): never {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/auth-errors.test.ts`
 Expected: PASS, 5 tests.
 
-- [ ] **Step 4: Write the failing tests for the five security actions**
+- [x] **Step 4: Write the failing tests for the five security actions**
 
 Create `src/server/actions/account-security.test.ts`. The Better Auth API is mocked here: plan 02 tests the real library behaviour; this file pins what the portal sends, stores, audits and mails.
 
@@ -10294,7 +10294,7 @@ describe('two-step sign-in actions', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/account-security.test.ts`
 Expected: FAIL, `changePasswordAction` is not exported by `./account`.
 
-- [ ] **Step 5: Append the five actions**
+- [x] **Step 5: Append the five actions**
 
 In `src/server/actions/account.ts` merge these imports into the import block (merge with the names already imported there):
 
@@ -10446,7 +10446,7 @@ Add `'account.manage_two_factor'` is already in the Action union (D.2) and the m
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/account-security.test.ts src/server/actions/account-profile.test.ts`
 Expected: PASS (account-security: 9 tests, account-profile: 7 tests).
 
-- [ ] **Step 6: Convert `PasswordCard.tsx`**
+- [x] **Step 6: Convert `PasswordCard.tsx`**
 
 Edit `src/components/people/PasswordCard.tsx`.
 
@@ -10591,7 +10591,7 @@ After:
         </button>
 ```
 
-- [ ] **Step 7: Replace `TwoStepCard.tsx`**
+- [x] **Step 7: Replace `TwoStepCard.tsx`**
 
 Replace `src/components/people/TwoStepCard.tsx` in full. Changes from the mock: the card reads the real state; turning on, turning off and making new backup codes first ask for the password (Better Auth requires it), the setup key and link come from the server (no QR library is installed, so the QR box holds an "Open in your authenticator app" link until one is added, CCR item 16), the verify step calls the server, and "Backup codes" makes a fresh set instead of re-reading old ones.
 
@@ -10918,7 +10918,7 @@ export function TwoStepCard({ enabled }: { enabled: boolean }): React.JSX.Elemen
 }
 ```
 
-- [ ] **Step 8: Give the two cards their props in `Account.tsx`**
+- [x] **Step 8: Give the two cards their props in `Account.tsx`**
 
 Edit `src/components/screens/Account.tsx`. Before (the state after Task M1.7):
 
@@ -10936,7 +10936,7 @@ After:
           <SessionsCard sessions={sessions} today={today} />
 ```
 
-- [ ] **Step 9: Create the reset-password screen and page**
+- [x] **Step 9: Create the reset-password screen and page**
 
 Better Auth sends the reset link to `/reset-password?token=...` (plan 02, `resetPasswordUrl`) and serves the endpoint; this page asks for the new password and calls the client method plan 02 exposes in `src/lib/auth-client.ts` (Step 1 checked it exists).
 
@@ -11075,12 +11075,12 @@ export default async function Page({
 
 `PasswordRules` and `passwordRules` are exported by `components/ui/password-field.tsx` (the mock's AcceptInvite imports them from there); `passwordRules("")` returns the four rules with their labels.
 
-- [ ] **Step 10: Prove the cards no longer read the mock data**
+- [x] **Step 10: Prove the cards no longer read the mock data**
 
 Run: `grep -n "@/data/\|@/lib/slice\|accountSlice" src/components/people/PasswordCard.tsx src/components/people/TwoStepCard.tsx src/components/screens/Account.tsx src/components/screens/ResetPassword.tsx`
 Expected: no output.
 
-- [ ] **Step 11: Gate A**
+- [x] **Step 11: Gate A**
 
 Run the Gate A block. The last command must list only this task's Files block.
 
@@ -11091,7 +11091,7 @@ Run the Gate A block. The last command must list only this task's Files block.
 3. "New backup codes": password, then a new set appears; an old code no longer works at sign in. "Turn off": password, the badge reads "Off"; `audit_log` has `account.two_factor_enabled` and `account.two_factor_disabled`.
 4. Forgot password: on `/sign-in` request a reset for Aditi (dev log has no body, so run `select value from auth_verification order by created_at desc limit 1` to read the token, or use plan 02's helper), open `/reset-password?token=<token>`: the page shows "Set a new password"; a weak password shows the rule error; a strong one toasts and returns to sign in. Open `/reset-password` with no token: "This reset link is not valid".
 
-- [ ] **Step 13: Commit**
+- [x] **Step 13: Commit**
 
 ```bash
 git add apps/portal/src/server/auth-errors.ts apps/portal/src/server/auth-errors.test.ts \

@@ -3,16 +3,23 @@
 import { useState } from "react";
 import { Icon } from "@/components/icon";
 import { PasswordField, passwordRules } from "@/components/ui/password-field";
+import { fmtLong } from "@/lib/dates";
+import { changePasswordAction } from "@/server/actions/account";
+import { issuesToErrors } from "@/server/actions/result";
 
 const CIRCLE =
   "M128,26A102,102,0,1,0,230,128,102.12,102.12,0,0,0,128,26Zm0,192a90,90,0,1,1,90-90A90.1,90.1,0,0,1,128,218Z";
 
-export function PasswordCard(): React.JSX.Element {
+export function PasswordCard({ passwordChangedAt }: { passwordChangedAt: string | null }): React.JSX.Element {
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [confirm, setConfirm] = useState("");
   const [tried, setTried] = useState(false);
   const [done, setDone] = useState(false);
+  const [changedAt, setChangedAt] = useState<string | null>(passwordChangedAt);
+  const [busy, setBusy] = useState(false);
+  const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
+  const [formError, setFormError] = useState<string | null>(null);
 
   const rules = passwordRules(next);
   const weak = rules.some((r) => !r.met);
@@ -24,12 +31,23 @@ export function PasswordCard(): React.JSX.Element {
     setDone(false);
   };
 
-  const submit = (event: React.FormEvent<HTMLFormElement>): void => {
+  const submit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
+    setFormError(null);
     if (missingCurrent || weak || mismatch) {
       setTried(true);
       return;
     }
+    setBusy(true);
+    const result = await changePasswordAction({ currentPassword: current, newPassword: next, confirmPassword: confirm });
+    setBusy(false);
+    if (!result.ok) {
+      setServerErrors(issuesToErrors(result.error));
+      setFormError(result.error.issues?.length ? null : result.error.message);
+      return;
+    }
+    setServerErrors({});
+    setChangedAt(result.data.changedAt);
     setCurrent("");
     setNext("");
     setConfirm("");
@@ -49,7 +67,9 @@ export function PasswordCard(): React.JSX.Element {
         <h2 id="pwh" className="card-t">
           Password
         </h2>
-        <span className="card-meta">Last changed 12 Mar 2026</span>
+        <span className="card-meta">
+          {changedAt ? `Last changed ${fmtLong(changedAt.slice(0, 10))}` : "Not changed yet"}
+        </span>
       </div>
       {done ? (
         <div className="card-b" style={{ paddingBottom: 0 }}>
@@ -65,7 +85,11 @@ export function PasswordCard(): React.JSX.Element {
           autoComplete="current-password"
           value={current}
           onChange={edit(setCurrent)}
-          {...(tried && missingCurrent ? { error: "Enter your current password." } : {})}
+          {...(tried && missingCurrent
+            ? { error: "Enter your current password." }
+            : serverErrors.currentPassword
+              ? { error: serverErrors.currentPassword }
+              : {})}
         />
         <div>
           <PasswordField
@@ -118,7 +142,12 @@ export function PasswordCard(): React.JSX.Element {
           background: "#FCFCFD",
         }}
       >
-        <button type="submit" className="btn btn-s">
+        {formError ? (
+          <span className="err" role="alert" style={{ marginRight: "auto" }}>
+            {formError}
+          </span>
+        ) : null}
+        <button type="submit" className="btn btn-s" disabled={busy}>
           Update password
         </button>
       </div>

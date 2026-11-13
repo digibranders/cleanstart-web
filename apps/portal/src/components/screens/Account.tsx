@@ -172,8 +172,8 @@ export function Account({ profile, sessions, today }: AccountProps): React.JSX.E
             </div>
           </form>
 
-          <PasswordCard />
-          <TwoStepCard />
+          <PasswordCard passwordChangedAt={profile.passwordChangedAt} />
+          <TwoStepCard enabled={profile.twoFactorEnabled} />
           <SessionsCard sessions={sessions} today={today} />
         </div>
 
