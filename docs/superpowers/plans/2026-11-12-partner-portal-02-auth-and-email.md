@@ -5298,13 +5298,13 @@ Ten of the 21 builders. Each is pure and returns an `EmailMessage`. The test har
 - Create: `apps/portal/src/server/email/templates/shared.ts`, `application-received.ts`, `application-staff-alert.ts`, `application-approved.ts`, `application-declined.ts`, `team-invite.ts`, `access-request.ts`, `access-request-declined.ts`, `team-change-notice.ts`, `password-changed.ts`, `password-reset.ts`, `index.ts` (all under `apps/portal/src/server/email/templates/`)
 - Test: `apps/portal/src/server/email/templates/test-harness.ts`, `apps/portal/src/server/email/templates/onboarding.test.ts`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M0.5b | started | W0 | - | - | onboarding templates" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Write the harness and the tests (they fail first)**
+- [x] **Step 2: Write the harness and the tests (they fail first)**
 
 Create `apps/portal/src/server/email/templates/test-harness.ts`:
 
@@ -5586,7 +5586,7 @@ const CASES: TemplateCase[] = [
 describeTemplates(CASES);
 ```
 
-- [ ] **Step 3: Run it and see it fail**
+- [x] **Step 3: Run it and see it fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/email/templates/onboarding.test.ts
@@ -5594,7 +5594,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/email/templates/onbo
 
 Expected: FAIL with `Failed to resolve import "./index"`.
 
-- [ ] **Step 4: Implement the shared helpers and the ten builders**
+- [x] **Step 4: Implement the shared helpers and the ten builders**
 
 Create `apps/portal/src/server/email/templates/shared.ts` (subject and heading text is collapsed to one line, an empty optional field reads "Not given", and the footnotes are the only boilerplate):
 
@@ -6075,7 +6075,7 @@ export * from './team-change-notice';
 export * from './team-invite';
 ```
 
-- [ ] **Step 5: Run it and see it pass**
+- [x] **Step 5: Run it and see it pass**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/email/templates/onboarding.test.ts
@@ -6083,11 +6083,11 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/email/templates/onbo
 
 Expected: `Test Files  1 passed (1)`, `Tests  60 passed (60)` (12 cases, 5 checks each).
 
-- [ ] **Step 6: Run Gate A, then Gate B**
+- [x] **Step 6: Run Gate A, then Gate B**
 
 Run the three fast commands, then the full Gate A block. Expected: all exit 0. Gate B reads the copy once more for filler words and exclamation marks.
 
-- [ ] **Step 7: Commit and log**
+- [x] **Step 7: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build
