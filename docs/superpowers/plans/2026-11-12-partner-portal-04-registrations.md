@@ -185,7 +185,7 @@ it('scratch: drizzle error shape, getTableColumns select and FOR UPDATE after LI
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/registrations/verify.scratch.test.ts`
 Expected: PASS and one `VERIFY` line. If `direct` is `23505` the driver error is thrown as is; if only `wrapped` is `23505` Drizzle wraps it. `isUniqueViolation` in step 5 reads both, so either result is fine. If the select with `getTableColumns` or `.limit(1).for('update')` fails to type check or run, stop: write a `blocked` line, because `mappers.ts` and `lockRegistration` depend on both. Then `rm apps/portal/src/server/registrations/verify.scratch.test.ts`.
 
-- [ ] **Step 2: Write the failing tests for the pure customer helpers**
+- [x] **Step 2: Write the failing tests for the pure customer helpers**
 
 ```ts
 // src/lib/customer.test.ts
@@ -218,7 +218,7 @@ describe('normalizeDomain', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/lib/customer.test.ts`
 Expected: FAIL, "Cannot find module './customer'".
 
-- [ ] **Step 3: Implement `src/lib/customer.ts`**
+- [x] **Step 3: Implement `src/lib/customer.ts`**
 
 ```ts
 /** Same rule as the registrations_open_unique index: trimmed and case insensitive. */
@@ -240,7 +240,7 @@ export const normalizeDomain = (input: string | null | undefined): string | null
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/lib/customer.test.ts`
 Expected: PASS, 3 tests.
 
-- [ ] **Step 4: Write the failing tests for the derived values**
+- [x] **Step 4: Write the failing tests for the derived values**
 
 The mock's `derive.ts` and `dates.ts` read a global `TODAY`. Every function now takes `today` from the caller. This file holds every test for the file; M2.2 appends the checks tests to it.
 
@@ -343,7 +343,7 @@ describe('managerFor', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/components/deals/derive.test.ts`
 Expected: FAIL, the new exports (`managerFor`, `isOverTarget`) and the `today` parameters do not exist yet.
 
-- [ ] **Step 5: Rewrite `src/components/deals/dates.ts` and `derive.ts`, add `types.ts`**
+- [x] **Step 5: Rewrite `src/components/deals/dates.ts` and `derive.ts`, add `types.ts`**
 
 `dates.ts` becomes a re-export (the mock's `TODAY`, `NOW_TIME` and the local helpers are deleted; `daysLeft` now takes `today`):
 
@@ -511,7 +511,7 @@ export function managerFor(managers: readonly ManagerOptionDto[], region: DealRe
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/components/deals/derive.test.ts`
 Expected: PASS, 11 tests.
 
-- [ ] **Step 6: Rewrite `src/components/deals/parts.tsx`**
+- [x] **Step 6: Rewrite `src/components/deals/parts.tsx`**
 
 The three helpers read DTOs and codes; `ProtectionCell` needs the server `today`.
 
@@ -585,7 +585,7 @@ export function ProductMark({
 
 (The only addition to `ProductMark` is the `title` attribute, which gives the tile an accessible name now that callers pass a code instead of a label.)
 
-- [ ] **Step 7: Write the failing tests for the helper modules**
+- [x] **Step 7: Write the failing tests for the helper modules**
 
 ```ts
 // src/server/registrations/pg-errors.test.ts
@@ -653,7 +653,7 @@ describe('crmSuggestions', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/registrations`
 Expected: FAIL, "Cannot find module" for the three modules.
 
-- [ ] **Step 8: Implement the helper modules**
+- [x] **Step 8: Implement the helper modules**
 
 ```ts
 // src/server/registrations/pg-errors.ts
@@ -954,7 +954,7 @@ export async function sendSubmissionAlert(alert: SubmissionAlert): Promise<void>
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/registrations`
 Expected: PASS, 8 tests (3 in pg-errors, 3 in hubspot-read, 2 in customer-lookup).
 
-- [ ] **Step 9: Write the failing repo tests**
+- [x] **Step 9: Write the failing repo tests**
 
 ```ts
 // src/server/repo/registrations.create.test.ts
@@ -1195,7 +1195,7 @@ describe('customerSuggestions', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/registrations.create.test.ts`
 Expected: FAIL, "Cannot find module './registrations'".
 
-- [ ] **Step 10: Implement `src/server/repo/registrations.ts` (M2.1 part)**
+- [x] **Step 10: Implement `src/server/repo/registrations.ts` (M2.1 part)**
 
 ```ts
 // src/server/repo/registrations.ts
@@ -1545,12 +1545,12 @@ export const isolation = defineIsolation<
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/registrations.create.test.ts`
 Expected: PASS, 17 tests.
 
-- [ ] **Step 11: Run the isolation matrix**
+- [x] **Step 11: Run the isolation matrix**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/isolation.test.ts`
 Expected: PASS, and the `registrations` file appears in the output with both of its tests green. Failure "registrations.ts must export `isolation`" or a key mismatch means a function is exported but not registered (or the reverse).
 
-- [ ] **Step 12: Write the failing action tests**
+- [x] **Step 12: Write the failing action tests**
 
 ```ts
 // src/server/actions/registrations.test.ts
@@ -1732,7 +1732,7 @@ describe('lookupCustomerAction', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/registrations.test.ts`
 Expected: FAIL, "Cannot find module './registrations'".
 
-- [ ] **Step 13: Implement `src/server/actions/registrations.ts`**
+- [x] **Step 13: Implement `src/server/actions/registrations.ts`**
 
 ```ts
 // src/server/actions/registrations.ts
@@ -1930,7 +1930,7 @@ export async function lookupCustomerAction(raw: unknown): Promise<ActionResult<C
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/registrations.test.ts`
 Expected: PASS, 11 tests.
 
-- [ ] **Step 14: Convert the pages**
+- [x] **Step 14: Convert the pages**
 
 `src/app/partner/deals/page.tsx` (complete file):
 
@@ -1985,7 +1985,7 @@ export default async function Page(): Promise<React.JSX.Element> {
 }
 ```
 
-- [ ] **Step 15: Edit `ManagerMessageDrawer.tsx`**
+- [x] **Step 15: Edit `ManagerMessageDrawer.tsx`**
 
 Edit 1, imports. Before:
 
@@ -2116,7 +2116,7 @@ After:
 
 The subtitle line `subtitle={\`Your CleanStart partner manager, ${manager.team.replace("CleanStart ", "")}. Replies come to your email.\`}` and the title `Message ${manager.name}` are unchanged.
 
-- [ ] **Step 16: Edit `RejectedDealDrawer.tsx`**
+- [x] **Step 16: Edit `RejectedDealDrawer.tsx`**
 
 Edit 1, imports. Before:
 
@@ -2263,7 +2263,7 @@ After:
     </Drawer>
 ```
 
-- [ ] **Step 17: Edit `Deals.tsx`**
+- [x] **Step 17: Edit `Deals.tsx`**
 
 Edit 1, imports. Before:
 
@@ -2472,7 +2472,7 @@ After:
 
 Nothing else in the file changes: tabs, toolbar, empty state, `data-tour` attributes and classes stay.
 
-- [ ] **Step 18: Edit `RegisterDeal.tsx`, part A (everything except the remote suggestions)**
+- [x] **Step 18: Edit `RegisterDeal.tsx`, part A (everything except the remote suggestions)**
 
 Edit 1, imports. Before:
 
@@ -3003,7 +3003,7 @@ After:
 
 Before: `Kestrel Systems has no registrations at {customer || "this customer"} yet. CleanStart still checks other` After: `{partnerName} has no registrations at {customer || "this customer"} yet. CleanStart still checks other`.
 
-- [ ] **Step 19: Edit `RegisterDeal.tsx`, part B (remote suggestions; needs `lookupCustomerAction`, written in step 13)**
+- [x] **Step 19: Edit `RegisterDeal.tsx`, part B (remote suggestions; needs `lookupCustomerAction`, written in step 13)**
 
 Edit 13, imports. Change `import { useMemo, useState } from "react";` to `import { useEffect, useMemo, useState } from "react";`; change `import { registerDealsAction } from "@/server/actions/registrations";` to `import { lookupCustomerAction, registerDealsAction } from "@/server/actions/registrations";`; add `import type { CustomerLookupResult } from "../deals/types";` below the `../deals/parts` import.
 
@@ -3108,7 +3108,7 @@ Manual check with `pnpm --filter @cleanstart/portal db:seed` data, dev server on
 - `/partner/deals/new`: the form is blank. Type "Vard": suggestions list Vardhan Capital with "2 deals with you". Pick it, pick CleanSight: an amber "Already registered" note names the protected until date. Pick Clean Libraries: the pending variant. Submit is refused client side until they are removed. Register "Test Customer Ltd" with CleanStart Images and CleanSight, region India: success card says "2 registrations sent for approval"; `/partner/deals` lists both, and signed in as Farhan, `/admin/approvals` lists them (the approvals screen is converted in M2.2, so until then check the rows in the database with `select customer_name, product, status from registrations order by created_at desc limit 3`). Register the same customer and product again: an amber form level note, nothing is created.
 - Sign in as a Kestrel sales user: `/partner/deals` shows only their own registrations.
 
-- [ ] **Step 21: Commit**
+- [x] **Step 21: Commit**
 
 ```bash
 git add apps/portal/src/lib/customer.ts apps/portal/src/lib/customer.test.ts \
@@ -3140,7 +3140,7 @@ Append to the progress log with one `printf` (BUILD-HANDOFF), then tell the orch
 
 Rules this task implements: every message and every status change creates an in-app notification, and an email where the recipient's Account switch allows it (`resolveEmailRecipients`); a message from staff goes to the person who registered the deal and the partner admins, a message from a partner goes to the deal's manager; a decision or a HubSpot stage change goes to the person who registered the deal, or the partner admins when that person has left; the author never notifies themselves; messages are not audited (a message is not a state change; the mock does not audit them either).
 
-- [ ] **Step 1: Write the failing tests for recipients and announcements**
+- [x] **Step 1: Write the failing tests for recipients and announcements**
 
 ```ts
 // src/server/registrations/recipients.test.ts
@@ -3253,7 +3253,7 @@ describe('announceRegistrationChange', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/registrations/recipients.test.ts src/server/registrations/announce.test.ts`
 Expected: FAIL, "Cannot find module './recipients'".
 
-- [ ] **Step 2: Implement `recipients.ts` and `announce.ts`**
+- [x] **Step 2: Implement `recipients.ts` and `announce.ts`**
 
 `announce.ts` already exists (contracts H.17, W0-c stub): the HubSpot poll and the expiry job (H4.8) call `announceRegistrationChange({ db }, change)` after each committed change and compile against the stub. Replace the whole file with the code below; the exported type and the call shape do not change, `deps` only gains the optional `transport`.
 
@@ -3380,7 +3380,7 @@ export async function announceRegistrationChange(
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/registrations/recipients.test.ts src/server/registrations/announce.test.ts`
 Expected: PASS, 7 tests.
 
-- [ ] **Step 3: Write the failing repo tests for messages and notifications**
+- [x] **Step 3: Write the failing repo tests for messages and notifications**
 
 ```ts
 // src/server/repo/messages.test.ts
@@ -3523,7 +3523,7 @@ describe('markAllRead and markRead', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/messages.test.ts src/server/repo/notifications.test.ts`
 Expected: FAIL, "Cannot find module './messages'".
 
-- [ ] **Step 4: Implement `toMessageDto`, `repo/messages.ts` and `repo/notifications.ts`**
+- [x] **Step 4: Implement `toMessageDto`, `repo/messages.ts` and `repo/notifications.ts`**
 
 In `src/server/registrations/mappers.ts` add (and use it in `toDetail`):
 
@@ -3744,7 +3744,7 @@ export const isolation = defineIsolation<'listNotifications' | 'markAllRead' | '
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/messages.test.ts src/server/repo/notifications.test.ts src/server/repo/isolation.test.ts`
 Expected: PASS (5 and 3 tests, and the isolation matrix with `messages` and `notifications` listed).
 
-- [ ] **Step 5: Write the failing action tests**
+- [x] **Step 5: Write the failing action tests**
 
 ```ts
 // src/server/actions/registrations.messages.test.ts
@@ -3886,7 +3886,7 @@ describe('notification actions', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/registrations.messages.test.ts src/server/actions/notifications.test.ts`
 Expected: FAIL, "postMessageAction is not a function" and "Cannot find module './notifications'".
 
-- [ ] **Step 6: Implement `postMessageAction` and the notification actions**
+- [x] **Step 6: Implement `postMessageAction` and the notification actions**
 
 Add these imports to `src/server/actions/registrations.ts`: `import type { RegistrationMessageDto } from '@/lib/dto';` (merge into the existing dto import), `import { resolveEmailRecipients } from '@/server/notify';` (merge into the `@/server/notify` import), `import { sendEmail } from '@/server/email/send';`, `import { buildDealMessage } from '@/server/email/templates';`, `import { absoluteUrl } from '@/server/urls';`, `import { postMessage } from '@/server/repo/messages';`, and `getRegistration` into the `@/server/repo/registrations` import list. Append:
 
@@ -3975,7 +3975,7 @@ Neither notification action calls `revalidate`: the bell reads through the layou
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions`
 Expected: PASS, including the 3 message tests and the 2 notification tests, and the 11 registration tests from M2.1 still green.
 
-- [ ] **Step 7: Rewrite the page `src/app/partner/deals/[id]/page.tsx`**
+- [x] **Step 7: Rewrite the page `src/app/partner/deals/[id]/page.tsx`**
 
 ```tsx
 import type { Metadata } from "next";
@@ -4018,7 +4018,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
 A deal that does not exist, belongs to another company, or belongs to a colleague of a sales user, renders the mock's "Deal not found" card, the same for all three, so ids cannot be probed.
 
-- [ ] **Step 8: Edit `DealDetail.tsx`**
+- [x] **Step 8: Edit `DealDetail.tsx`**
 
 The extension request (`requestExtension` import and `sendExtension` body) stays on the mock slice until M2.4 replaces both; every other region converts now.
 
@@ -4444,7 +4444,7 @@ Manual check (seed-dev data, signed in as Aditi Rao, Kestrel partner admin):
 - Open `/partner/deals/00000000-0000-0000-0000-000000000000` and another company's deal id: both render "Deal not found".
 - "Request extension" still opens the old mock dialog and does nothing durable until M2.4.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git add apps/portal/src/server/registrations apps/portal/src/server/repo/messages.ts apps/portal/src/server/repo/messages.test.ts \
@@ -4480,7 +4480,7 @@ Rules this task implements (contracts H.7, H.19, M.3):
 - Conflict hint: a pending or accepted registration of another partner for the same customer and product (portal data), plus the HubSpot open deal check (`conflictingDeals`) fetched after the page renders through `hubspotConflictHintsAction`, never blocking the page or a decision. Staff only; partners never see these checks.
 - A decision is never blocked by HubSpot being down: the action only writes the outbox row.
 
-- [ ] **Step 1: Write the failing tests for the check wording and the routing text**
+- [x] **Step 1: Write the failing tests for the check wording and the routing text**
 
 Append to `src/components/deals/derive.test.ts` (add `defaultRejectReason`, `describeCheck`, `routingText` to its import from `./derive`):
 
@@ -4547,7 +4547,7 @@ describe('routingText', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/components/deals/derive.test.ts`
 Expected: FAIL, `describeCheck is not a function` (and the two other new exports).
 
-- [ ] **Step 2: Implement the three derived helpers**
+- [x] **Step 2: Implement the three derived helpers**
 
 Append to `src/components/deals/derive.ts`. Its existing `@/lib/domain` import is type only, so add a separate value import `import { DEAL_REGIONS, PARTNER_REGION_LABEL, PRODUCT_LABEL } from "@/lib/domain";`, add `RegistrationCheckDto` to its dto type import (`ManagerOptionDto` is already there), and add `import type { HubspotHintDto } from "./types";`:
 
@@ -4628,7 +4628,7 @@ export function routingText(managers: readonly ManagerOptionDto[]): string {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/components/deals/derive.test.ts`
 Expected: PASS, 18 tests.
 
-- [ ] **Step 3: Write the failing hint service tests**
+- [x] **Step 3: Write the failing hint service tests**
 
 ```ts
 // src/server/registrations/conflict-hints.test.ts
@@ -4685,7 +4685,7 @@ describe('hubspotConflictHints', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/registrations/conflict-hints.test.ts`
 Expected: FAIL, "Cannot find module './conflict-hints'".
 
-- [ ] **Step 4: Implement `conflict-hints.ts`**
+- [x] **Step 4: Implement `conflict-hints.ts`**
 
 ```ts
 // src/server/registrations/conflict-hints.ts
@@ -4747,7 +4747,7 @@ export async function hubspotConflictHints(
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/registrations/conflict-hints.test.ts`
 Expected: PASS, 3 tests.
 
-- [ ] **Step 5: Write the failing repo tests for decisions, queue and checks**
+- [x] **Step 5: Write the failing repo tests for decisions, queue and checks**
 
 ```ts
 // src/server/repo/registrations.decide.test.ts
@@ -5031,7 +5031,7 @@ describe('detail after a decision', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/registrations.decide.test.ts`
 Expected: FAIL, "acceptRegistration is not a function" (the module exists from M2.1 but lacks the new exports).
 
-- [ ] **Step 6: Add `computeChecks` to `src/server/registrations/mappers.ts`**
+- [x] **Step 6: Add `computeChecks` to `src/server/registrations/mappers.ts`**
 
 Add `or, sql, and` to the `drizzle-orm` import (`import { and, asc, desc, eq, getTableColumns, inArray, or, sql } from 'drizzle-orm';`) and `RegistrationCheckDto` to the dto type import, then append:
 
@@ -5092,7 +5092,7 @@ export async function computeChecks(tx: Tx, rows: readonly ListRow[]): Promise<R
 }
 ```
 
-- [ ] **Step 7: Implement the decision functions in `src/server/repo/registrations.ts`**
+- [x] **Step 7: Implement the decision functions in `src/server/repo/registrations.ts`**
 
 Replace the import block at the top of the file with:
 
@@ -5474,7 +5474,7 @@ export const isolation = defineIsolation<
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/registrations.decide.test.ts src/server/repo/registrations.create.test.ts src/server/repo/isolation.test.ts`
 Expected: PASS: 20 tests in the decide file, 17 in the create file, and the isolation matrix green. If the `undoDecision` test fails with "no automatic timeline event" the DELETE policy of Contract change request 2 is missing: write a `blocked` line, do not work around it.
 
-- [ ] **Step 8: Write the failing action tests**
+- [x] **Step 8: Write the failing action tests**
 
 ```ts
 // src/server/actions/decisions.test.ts
@@ -5642,7 +5642,7 @@ describe('hubspotConflictHintsAction', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/decisions.test.ts`
 Expected: FAIL, "Cannot find module './decisions'".
 
-- [ ] **Step 9: Implement `src/server/actions/decisions.ts`**
+- [x] **Step 9: Implement `src/server/actions/decisions.ts`**
 
 The accept action is the worked example of contracts F.8 with two differences: the audit note uses the formatted date, and the HubSpot hint action is added.
 
@@ -5821,7 +5821,7 @@ export async function hubspotConflictHintsAction(raw: unknown): Promise<ActionRe
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/actions/decisions.test.ts`
 Expected: PASS, 8 tests.
 
-- [ ] **Step 10: Rewrite the page `src/app/admin/approvals/page.tsx`**
+- [x] **Step 10: Rewrite the page `src/app/admin/approvals/page.tsx`**
 
 ```tsx
 import type { Metadata } from "next";
@@ -5854,7 +5854,7 @@ export default async function Page(): Promise<React.JSX.Element> {
 }
 ```
 
-- [ ] **Step 11: Edit `AdminApprovals.tsx`**
+- [x] **Step 11: Edit `AdminApprovals.tsx`**
 
 Copy changes in this task (all forced by real data): the KPI "Decided this month" is "Decided, last 7 days" (contracts H.0 counts seven days); the routing sentence names the managers from data; the accept toast and the accepted badge say the HubSpot deal is queued, because the outbox creates it within a minute; the Recent decisions HubSpot cell reads "Queued" for an accepted registration that has no deal yet. Additions (required by the route table, which lists `postMessageAction` for this screen): the drawer gets the deal conversation and a reply box. The extension requests card is added in M2.4.
 
@@ -6508,7 +6508,7 @@ Manual check (seed-dev data, HubSpot env unset, signed in as Farhan Qureshi, sta
 - Sign in as Rahul Menon (staff sales, India): only India rows appear.
 - With a HubSpot developer account configured in `.env`, a customer that another partner holds in HubSpot shows "Conflict" with "<partner> already has an open deal for this customer in HubSpot." a moment after the page loads; with HubSpot unreachable the page still loads and shows the portal checks only.
 
-- [ ] **Step 13: Commit**
+- [x] **Step 13: Commit**
 
 ```bash
 git add apps/portal/src/server/registrations apps/portal/src/server/repo/registrations.ts \

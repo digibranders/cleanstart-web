@@ -1,4 +1,5 @@
-import type { Deal, ProductName } from "@/data/deals";
+import { PRODUCT_LABEL, type Product, REGISTRATION_STATUS_LABEL, type RegistrationStatus } from "@/lib/domain";
+import type { RegistrationListItem } from "@/lib/dto";
 import { ICONS, type IconName } from "../icon-paths";
 import { Badge } from "../ui/badge";
 import { avOf, initialsOf, protectionView, statusTone } from "./derive";
@@ -6,16 +7,24 @@ import { avOf, initialsOf, protectionView, statusTone } from "./derive";
 export const PLUS_PATH =
   "M222,128a6,6,0,0,1-6,6H134v82a6,6,0,0,1-12,0V134H40a6,6,0,0,1,0-12h82V40a6,6,0,0,1,12,0v82h82A6,6,0,0,1,222,128Z";
 
-export function StatusBadge({ status }: { status: Deal["status"] }): React.JSX.Element {
-  return <Badge tone={statusTone(status)}>{status}</Badge>;
+export function StatusBadge({ status }: { status: RegistrationStatus }): React.JSX.Element {
+  return <Badge tone={statusTone(status)}>{REGISTRATION_STATUS_LABEL[status]}</Badge>;
 }
 
 export function CustomerMark({ name }: { name: string }): React.JSX.Element {
   return <span className={`av ${avOf(name)}`}>{initialsOf(name)}</span>;
 }
 
-export function ProtectionCell({ deal, mode }: { deal: Deal; mode: "deals" | "overview" }): React.JSX.Element {
-  const view = protectionView(deal, mode);
+export function ProtectionCell({
+  deal,
+  mode,
+  today,
+}: {
+  deal: Pick<RegistrationListItem, "status" | "registeredOn" | "resubmittedOn" | "protectionEnd" | "closedOn">;
+  mode: "deals" | "overview";
+  today: string;
+}): React.JSX.Element {
+  const view = protectionView(deal, mode, today);
   return (
     <td className="tnum r">
       <span className={view.cls}>{view.until}</span> <span className="t-muted">{view.left}</span>
@@ -23,10 +32,10 @@ export function ProtectionCell({ deal, mode }: { deal: Deal; mode: "deals" | "ov
   );
 }
 
-const PRODUCT_MARK: Record<ProductName, { cls: string; icon: IconName }> = {
-  "CleanStart Images": { cls: "pm-img", icon: "img" },
-  "Clean Libraries": { cls: "pm-lib", icon: "lib" },
-  CleanSight: { cls: "pm-sight", icon: "sight" },
+const PRODUCT_MARK: Record<Product, { cls: string; icon: IconName }> = {
+  images: { cls: "pm-img", icon: "img" },
+  libraries: { cls: "pm-lib", icon: "lib" },
+  cleansight: { cls: "pm-sight", icon: "sight" },
 };
 
 /** The small coloured product tile on its own, for rows that print the product name themselves. */
@@ -35,14 +44,14 @@ export function ProductMark({
   size,
   large,
 }: {
-  product: ProductName;
+  product: Product;
   size?: number;
   large?: boolean;
 }): React.JSX.Element {
   const mark = PRODUCT_MARK[product];
   const box = size ? { width: size, height: size, borderRadius: 4 } : undefined;
   return (
-    <span className={`pm${large ? " pm-lg" : ""} ${mark.cls}`} style={box}>
+    <span className={`pm${large ? " pm-lg" : ""} ${mark.cls}`} style={box} title={PRODUCT_LABEL[product]}>
       <svg
         className="ic"
         viewBox="0 0 256 256"
