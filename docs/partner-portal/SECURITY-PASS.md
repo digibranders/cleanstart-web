@@ -1,6 +1,6 @@
 # Partner portal security pass (M5.1)
 
-Date: 2026-11-13. Branch `feat/portal-build`. Run by the orchestrator (Wave 2, W2-c). The independent review of this pass is Gate B, pending.
+Date: 2026-11-13. Branch `feat/portal-build`. Run by the orchestrator (Wave 2, W2-c). Gate B found a lockfile problem and four documentation and deploy gaps; all are fixed in the follow-up commits and the lockfile claim below is the corrected one.
 
 | Check | Command or test | Result |
 |---|---|---|
@@ -24,7 +24,8 @@ Production smoke on a real `next start` (production variables, `PORTAL_TRUSTED_P
 
 ## What changed
 
-- Next.js 16.4.6 (portal only), Sentry 9.47.2, Vitest 4 (with `vite` ^6.4.6 as a direct dev dependency so the test runner does not resolve the vulnerable 6.4.2, and `maxWorkers: 4` in place of `poolOptions`). `audit-portal.mjs` reports only the advisories on the path `apps__portal` and exits 1 on high or critical.
+- Next.js 16.4.6 (portal only), Sentry 9.47.2, Vitest 4 (`maxWorkers: 4` in place of `poolOptions`). Two scoped overrides in `pnpm-workspace.yaml` keep the test runner off the vulnerable toolchain: `vitest@4>vite` pins vite 6.4.6 and `vite@6.4.6>postcss` pins postcss 8.5.23. Only the portal uses Vitest 4 and vite 6.4.6, so no other workspace is affected.
+- Release age exception: `next@16.4.6` and `vite@6.4.6` were published on 9 Nov 2026, under two weeks before this pass. They are security fixes that plan 06 M5.1 mandates, so the age rule is waived for them. `audit-portal.mjs` reports only the advisories on the path `apps__portal` and exits 1 on high or critical.
 - Content Security Policy with a per request nonce in `src/proxy.ts`; the static headers and the closed API policy in `next.config.ts`; no `unsafe-inline` or `unsafe-eval` for scripts in production. The development server injects inline `<style>` elements with no nonce, so development (only) allows inline styles; the production build has none, which the production browser run confirms.
 - The client address is resolved once in `src/proxy.ts` from `PORTAL_TRUSTED_PROXY_HOPS` and passed on in `x-portal-client-ip`, which the proxy deletes from every incoming request first. Better Auth's limiter and session record (`advanced.ipAddress.ipAddressHeaders`), `ctx.ip` and the accept-invite page read only that header. Default `0` trusts no forwarded header: every client is unknown and shares one bucket. Production sets `1` (Caddy overwrites `X-Forwarded-For`). If the address is unknown, rate limits still apply with the shared `unknown` bucket; none is skipped.
 - The password reset email is sent with `after()` from `next/server`, so a frozen worker cannot drop it and the response does not depend on whether the address exists. Outside a request scope (tests, scripts) it runs immediately and is logged on failure.
@@ -34,11 +35,11 @@ Production smoke on a real `next start` (production variables, `PORTAL_TRUSTED_P
 
 - CSP in `proxy.ts` with a nonce, `style-src-attr 'unsafe-inline'` for the screens' inline styles (reason in the plan). The prerendered `/_not-found` page is static, so it has no nonce and its scripts are blocked; the page is plain HTML.
 - Next.js is 16.4.6 in the portal (advisories fixed); `apps/cms` and `apps/web` are still on 16.2.5 and carry the same advisories (to report to their owner).
-- `pnpm-lock.yaml` also moved some peer suffixes for other workspaces (a Terser patch version in the resolution key); no specifier of `apps/cms`, `apps/web` or `packages/*` changed.
+- `pnpm-lock.yaml` was regenerated from the pre-M5.1 lockfile so that no version resolved for `apps/cms`, `apps/web` or `packages/*` moves (checked with a transitive closure comparison of every non-portal importer against `946298b7`). One residual difference: the `@ladle/react` entry of `packages/ui` gains an optional peer resolution of `@swc/helpers@0.5.23` (a version `next@16.4.6` brings into the lockfile). No version that `packages/ui` already resolved changed.
 - `DATABASE_OWNER_URL` is present in the app container because migrations run on start. Follow up: run migrations as a one-shot job (CCR-5).
 - `src/env.ts` was not edited (contracts K.3: no one edits it after M0.3). Two gaps stay open until the owner accepts a change: `APP_URL` is not checked for https there (enforced in `auth.ts` instead, so the first sign in request fails loudly in production), and `DATABASE_OWNER_URL` is named as missing only after `DATABASE_URL` and `AUTH_SECRET` are set (the production check lists every missing variable together; only a missing `DATABASE_URL` or `AUTH_SECRET` hides it from that first message). `PORTAL_TRUSTED_PROXY_HOPS` is read by `proxy.ts` directly from the environment, as `PORTAL_REVIEW_PASSWORD` is, for the same reason.
 - `MICROSOFT_TENANT_ID` defaults to `common`. Sign in with Microsoft accepts an account from any Entra tenant and personal accounts; account linking still needs the `xms_edov` claim and an existing active user with that email. Set the tenant to CleanStart's own tenant or `organizations` before enabling Microsoft for partners. Documented in `auth.ts` and the runbook.
-- Rate limits are in memory and reset on restart (one container). IPv6 clients are keyed by full address, not by /64, so a client that owns a /64 can rotate through it.
+- Rate limits are in memory and reset on restart (one container). IPv6 clients are keyed by full address, not by /64, in the app's own `rateLimit()`, which covers the per address limits on applications (`apply:ip`), invite preview and accept (`invite:ip`) and access requests (`access:ip`). A client that owns a /64 can rotate through it there; the per email and per domain limits on applications and access requests still apply. Better Auth's built in limiter (sign in, second step, password reset endpoints) normalises IPv6 to /64 by default, so it is not affected. The per user limits do not use an address.
 - The unknown address bucket is shared: with `PORTAL_TRUSTED_PROXY_HOPS` wrong in production, applications and invite lookups are throttled together. That is the safe failure; the runbook lists the symptom.
 - The Caddy block overwrites `X-Forwarded-For` with `CF-Connecting-IP`; the droplet firewall must accept 443 from Cloudflare only (handover item 7). Not verifiable from the repo.
 - CSRF and origin checks: none were added. Better Auth checks the `Origin` of its own endpoints and Next checks the `Origin` of server actions. The HubSpot webhook and the health check are exempt from the review gate in `proxy.ts` and get no per request policy, so nothing added here can block them (tested in `proxy.test.ts`).
@@ -46,7 +47,7 @@ Production smoke on a real `next start` (production variables, `PORTAL_TRUSTED_P
 
 ## Open items
 
-- Gate B (independent review) of this pass: pending.
+- Gate B follow-ups (lockfile, https deploy check, ignore rules) are done; the reviewer's confirmation is not yet recorded.
 - Report to the owners of `apps/cms` and `apps/web`: Next 16.2.5 advisories, Sentry 9.47.1.
 - CCR-5b (migration as a one-shot service) and the `env.ts` changes above need the product owner or the contracts owner.
 - Production `PORTAL_TRUSTED_PROXY_HOPS=1` is rendered by `deploy-portal.yml`; the first deploy must confirm the Caddy block really overwrites the header (a person, droplet).

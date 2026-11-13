@@ -141,6 +141,13 @@ jobs:
             exit 1
           fi
 
+          # Secure cookies and the Better Auth origin need https; an http APP_URL would pass the health probe and
+          # fail only at the first sign-in.
+          case "$APP_URL" in
+            https://*) ;;
+            *) echo "::error::PORTAL_APP_URL must start with https://"; exit 1 ;;
+          esac
+
           # The database passwords go into connection URLs, so they must be URL safe (use: openssl rand -hex 24).
           for key in PORTAL_OWNER_DB_PASSWORD PORTAL_APP_DB_PASSWORD; do
             if ! [[ "${!key}" =~ ^[A-Za-z0-9]+$ ]]; then

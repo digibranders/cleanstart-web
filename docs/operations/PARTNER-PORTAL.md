@@ -78,7 +78,7 @@ Repository variables (Settings, Secrets and variables, Variables):
 | Variable | Value |
 |---|---|
 | `PORTAL_DEPLOY_ENABLED` | `true` only after section 1 is finished. Until then the deploy workflow does nothing. |
-| `PORTAL_APP_URL` | `https://partners.cleanstart.com` |
+| `PORTAL_APP_URL` | `https://partners.cleanstart.com`. Must start with `https://`: the deploy refuses anything else. |
 | `PORTAL_TURNSTILE_SITE_KEY` | the portal's own Turnstile widget (hostname `partners.cleanstart.com`), public |
 | `PORTAL_BREVO_SENDER_EMAIL` | the verified sender address |
 | `PORTAL_R2_ENDPOINT`, `PORTAL_R2_BUCKET` | the private documents bucket (`cleanstart-partner-docs`) |
@@ -103,6 +103,8 @@ docker tag portal:<previous-sha> portal:current
 docker compose --profile portal up -d --wait portal
 curl -fsS http://127.0.0.1:3004/api/health
 ```
+
+The render step fails the deploy when `PORTAL_APP_URL` does not start with `https://`. `src/env.ts` does not check the scheme yet (the change is proposed, see `docs/partner-portal/SECURITY-PASS.md`); until it does, an http `APP_URL` in production passes `/api/health` and the deploy smoke test and fails at the first sign in, because `createAuth()` refuses it. If you ever render `portal.env` by hand, check the scheme yourself.
 
 Migrations only move forward. A release that added a column is rolled back to an image that ignores it; never drop a column in the same release that stops using it.
 
