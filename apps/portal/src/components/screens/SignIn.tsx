@@ -20,7 +20,7 @@ import { ROUTES } from "@/lib/routes";
 
 type View = "signin" | "code" | "request" | "forgot" | "sent";
 
-const TOO_MANY = "Too many attempts. Try again in a moment.";
+const TOO_MANY = "Too many attempts. Wait a minute and try again.";
 const NETWORK = "We could not reach the server. Check your connection and try again.";
 
 /** The line to show for a failed auth call: rate limit and network failure have their own copy. */
@@ -287,7 +287,7 @@ export function SignIn({ providers }: { providers: SocialAvailability }): React.
                 onChange={(e) => setKeepSignedIn(e.target.checked)}
                 style={{ width: 14, height: 14, margin: 0, accentColor: "#4B23C8" }}
               />
-              Keep me signed in
+              Keep me signed in on this device
             </label>
             {signinError ? (
               <span className="err" role="alert">
@@ -301,9 +301,8 @@ export function SignIn({ providers }: { providers: SocialAvailability }): React.
               <span>
                 No login yet?{" "}
                 <button type="button" className="linkbtn" onClick={showRequest} style={{ color: "#4B23C8" }}>
-                  Request access
-                </button>{" "}
-                from your partner admin.
+                  Ask your partner admin to invite you
+                </button>
               </span>
               <span>
                 Not a partner yet?{" "}
