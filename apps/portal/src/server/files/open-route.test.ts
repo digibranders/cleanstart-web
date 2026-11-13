@@ -68,4 +68,13 @@ describe('handleFileOpen', () => {
     expect(res.status).toBe(502);
     expect(await res.text()).not.toContain(doc.fileKey);
   });
+  it('answers 404 for an unknown id even when R2 is not configured, and 502 only once a file is allowed', async () => {
+    const viewer = await channelViewer();
+    const doc = await makeDocument(db, {});
+    const unconfigured = (): never => {
+      throw new IntegrationError('r2', 'R2 is not configured');
+    };
+    expect((await handleFileOpen('00000000-0000-4000-8000-000000000000', { viewer, storage: unconfigured, clock })).status).toBe(404);
+    expect((await handleFileOpen(doc.id, { viewer, storage: unconfigured, clock })).status).toBe(502);
+  });
 });

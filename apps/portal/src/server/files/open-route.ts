@@ -9,7 +9,8 @@ import type { FileStorage } from './storage';
 
 export interface FileOpenDeps {
   viewer: Viewer;
-  storage: FileStorage;
+  /** A getter lets a missing R2 configuration surface only after the audience check, so a bad id still answers 404. */
+  storage: FileStorage | (() => FileStorage);
   clock?: Clock;
 }
 
@@ -38,7 +39,8 @@ export async function handleFileOpen(id: string, deps: FileOpenDeps): Promise<Re
     return fileErrorResponse(error);
   }
   try {
-    const { url } = await deps.storage.presignGet({ key: target.fileKey, filename: target.originalName });
+    const storage = typeof deps.storage === 'function' ? deps.storage() : deps.storage;
+    const { url } = await storage.presignGet({ key: target.fileKey, filename: target.originalName });
     return new Response(null, {
       status: 302,
       headers: { Location: url, 'Cache-Control': 'private, no-store', 'Referrer-Policy': 'no-referrer' },

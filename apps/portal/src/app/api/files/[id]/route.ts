@@ -19,7 +19,7 @@ export async function GET(request: Request, ctx: { params: Promise<{ id: string 
   }
   try {
     rateLimit(`files:user:${viewer.id}`, { limit: OPENS_PER_MINUTE, windowSeconds: 60 });
-    return await handleFileOpen(id, { viewer, storage: getFileStorage() });
+    return await handleFileOpen(id, { viewer, storage: getFileStorage });
   } catch (error) {
     const response = fileErrorResponse(error);
     if (error instanceof RateLimitError) response.headers.set('Retry-After', String(error.retryAfterSeconds));
