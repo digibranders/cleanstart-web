@@ -2016,13 +2016,13 @@ Better Auth only knows the user table and the passwords. This task adds the port
 - Modify: `apps/portal/src/server/auth/auth.ts` (replaced)
 - Test: `apps/portal/src/server/auth/auth.test.ts`
 
-- [ ] **Step 1: Log the start**
+- [x] **Step 1: Log the start**
 
 ```bash
 printf '%s\n' "$(date '+%Y-%m-%d %H:%M') IST | M1.1c | started | W0 | - | - | sign in gate, rate limits" >> /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/docs/partner-portal/PROGRESS.md
 ```
 
-- [ ] **Step 2: Write the tests**
+- [x] **Step 2: Write the tests**
 
 Create `apps/portal/src/server/auth/auth.test.ts`. It mocks `./auth-mail` (the module that Task M0.5d completes), so it never sends mail. The per IP test goes through `auth.handler` with a `Request`, because Better Auth's IP limiter only sees HTTP requests, not `auth.api` calls. The second step test also goes over HTTP, the way the browser client calls it.
 
@@ -2242,7 +2242,7 @@ describe('password reset', () => {
 });
 ```
 
-- [ ] **Step 3: Run it and see it fail**
+- [x] **Step 3: Run it and see it fail**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/auth/auth.test.ts
@@ -2250,7 +2250,7 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/auth/auth.test.ts
 
 Expected: FAIL, `Tests  10 failed | 1 passed (11)`. The one that passes is the second step over HTTP, which the Task M0.7 instance already handles. The 10 failures are the gate, the rate limits, the password rule, the last login time and the reset audit.
 
-- [ ] **Step 4: Replace `auth.ts` with the hardened version**
+- [x] **Step 4: Replace `auth.ts` with the hardened version**
 
 Replace `apps/portal/src/server/auth/auth.ts`. Compared with the Task M0.7 file it adds `hooks.before` (per email limits, the sign in gate, the password rule), `databaseHooks.session.create` (the last gate, and `last_login_at`), `rateLimit.customRules` (per IP), `onPasswordReset`, and a `sendResetPassword` that skips users who are not active. Two shortcuts are marked in the code: the per email limiter is in process (one container, reset on restart), and a determined attacker can still make one address unable to sign in for ten minutes by spamming it; the per IP rules are the main defence.
 
@@ -2482,7 +2482,7 @@ export const auth: Auth = new Proxy({} as Auth, {
 });
 ```
 
-- [ ] **Step 5: Run the tests and see them pass**
+- [x] **Step 5: Run the tests and see them pass**
 
 ```bash
 pnpm --filter @cleanstart/portal exec vitest run src/server/auth/auth.test.ts src/server/auth/auth.spike.test.ts
@@ -2490,11 +2490,11 @@ pnpm --filter @cleanstart/portal exec vitest run src/server/auth/auth.test.ts sr
 
 Expected: `Test Files  2 passed (2)`, `Tests  18 passed (18)` (11 and 7).
 
-- [ ] **Step 6: Run Gate A, then Gate B**
+- [x] **Step 6: Run Gate A, then Gate B**
 
 Run the three fast commands, then the full Gate A block. Expected: all exit 0.
 
-- [ ] **Step 7: Commit and log**
+- [x] **Step 7: Commit and log**
 
 ```bash
 cd /Users/a12345/Desktop/AI/cleanstart/cleanstart-website/.claude/worktrees/portal-build
