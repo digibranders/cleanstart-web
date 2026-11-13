@@ -1,0 +1,13 @@
+{
+  "name": "Aditi Rao",
+  "title": "Head of Alliances",
+  "phone": "+91 98450 22617",
+  "notify": {
+    "decision": true,
+    "stage": true,
+    "expiry": true,
+    "docs": false,
+    "team": true
+  },
+  "twoStepOn": false
+}

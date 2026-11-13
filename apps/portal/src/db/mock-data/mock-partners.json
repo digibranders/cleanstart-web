@@ -1,0 +1,414 @@
+[
+  {
+    "id": "kestrel-systems",
+    "name": "Kestrel Systems",
+    "domain": "kestrelsystems.in",
+    "category": "Channel partner",
+    "region": "India",
+    "status": "Active",
+    "users": 4,
+    "pending": 2,
+    "protected": 3,
+    "won": 2,
+    "last": "2 hours ago",
+    "since": "12 Mar 2026",
+    "agreement": "v1.2, accepted 12 Mar 2026",
+    "admin": "Aditi Rao",
+    "manager": "Farhan Qureshi",
+    "hs": "91822044",
+    "people": [
+      {
+        "name": "Aditi Rao",
+        "role": "Partner admin",
+        "last": "Now"
+      },
+      {
+        "name": "Karan Malhotra",
+        "role": "Sales",
+        "last": "Yesterday"
+      },
+      {
+        "name": "Sneha Iyer",
+        "role": "Technical",
+        "last": "2 Nov"
+      },
+      {
+        "name": "Vikram Sethi",
+        "role": "Sales",
+        "last": "Invited 5 Nov"
+      }
+    ],
+    "deals": [
+      {
+        "customer": "Vardhan Capital",
+        "product": "Clean Libraries",
+        "when": "4 Nov",
+        "status": "Pending"
+      },
+      {
+        "customer": "Gulfway Freight",
+        "product": "CleanStart Images",
+        "when": "3 Nov",
+        "status": "Pending"
+      },
+      {
+        "customer": "Vardhan Capital",
+        "product": "CleanSight",
+        "when": "14 Oct",
+        "status": "Accepted"
+      }
+    ]
+  },
+  {
+    "id": "saffron-secure",
+    "name": "Saffron Secure",
+    "domain": "saffronsecure.com",
+    "category": "Distributor",
+    "region": "India",
+    "status": "Active",
+    "users": 9,
+    "pending": 1,
+    "protected": 6,
+    "won": 4,
+    "last": "Today",
+    "since": "4 Feb 2026",
+    "agreement": "v1.2, accepted 4 Feb 2026",
+    "admin": "Rahul Bhatia",
+    "manager": "Farhan Qureshi",
+    "hs": "91820117",
+    "people": [
+      {
+        "name": "Rahul Bhatia",
+        "role": "Partner admin",
+        "last": "Today"
+      },
+      {
+        "name": "Ananya Kulkarni",
+        "role": "Sales",
+        "last": "Today"
+      },
+      {
+        "name": "Dev Khanna",
+        "role": "Technical",
+        "last": "3 Nov"
+      }
+    ],
+    "deals": [
+      {
+        "customer": "Meridian Insurance",
+        "product": "CleanSight",
+        "when": "5 Nov",
+        "status": "Pending"
+      },
+      {
+        "customer": "Tejas Labs",
+        "product": "Clean Libraries",
+        "when": "4 Nov",
+        "status": "Accepted"
+      },
+      {
+        "customer": "Orbit Retail",
+        "product": "CleanStart Images",
+        "when": "20 Oct",
+        "status": "Won"
+      }
+    ]
+  },
+  {
+    "id": "arbor-cyber",
+    "name": "Arbor Cyber",
+    "domain": "arborcyber.ae",
+    "category": "System integrator",
+    "region": "Middle East",
+    "status": "Active",
+    "users": 5,
+    "pending": 1,
+    "protected": 2,
+    "won": 1,
+    "last": "Yesterday",
+    "since": "19 Apr 2026",
+    "agreement": "v1.2, accepted 19 Apr 2026",
+    "admin": "Layla Haddad",
+    "manager": "Omar Nasser",
+    "hs": "91823390",
+    "people": [
+      {
+        "name": "Layla Haddad",
+        "role": "Partner admin",
+        "last": "Yesterday"
+      },
+      {
+        "name": "Tariq Mansour",
+        "role": "Technical",
+        "last": "4 Nov"
+      },
+      {
+        "name": "Rana Saleh",
+        "role": "Sales",
+        "last": "1 Nov"
+      }
+    ],
+    "deals": [
+      {
+        "customer": "Gulfway Freight",
+        "product": "CleanStart Images",
+        "when": "5 Nov",
+        "status": "Pending"
+      },
+      {
+        "customer": "Coastline Telecom",
+        "product": "CleanStart Images",
+        "when": "3 Nov",
+        "status": "Rejected"
+      },
+      {
+        "customer": "Desert Rose Health",
+        "product": "CleanSight",
+        "when": "9 Sep",
+        "status": "Won"
+      }
+    ]
+  },
+  {
+    "id": "dunes-networks",
+    "name": "Dunes Networks",
+    "domain": "dunesnetworks.ae",
+    "category": "Channel partner",
+    "region": "Middle East",
+    "status": "Active",
+    "users": 3,
+    "pending": 0,
+    "protected": 4,
+    "won": 3,
+    "last": "5 Nov",
+    "since": "2 Jan 2026",
+    "agreement": "v1.1, accepted 2 Jan 2026",
+    "admin": "Faisal Rahman",
+    "manager": "Omar Nasser",
+    "hs": "91819002",
+    "people": [
+      {
+        "name": "Faisal Rahman",
+        "role": "Partner admin",
+        "last": "5 Nov"
+      },
+      {
+        "name": "Mariam Yousef",
+        "role": "Sales",
+        "last": "5 Nov"
+      }
+    ],
+    "deals": [
+      {
+        "customer": "Pearl Gulf Bank",
+        "product": "CleanSight",
+        "when": "5 Nov",
+        "status": "Accepted"
+      },
+      {
+        "customer": "Oasis Freight",
+        "product": "Clean Libraries",
+        "when": "12 Oct",
+        "status": "Accepted"
+      }
+    ]
+  },
+  {
+    "id": "harbourline-it",
+    "name": "Harbourline IT",
+    "domain": "harbourline.ae",
+    "category": "Distributor",
+    "region": "Middle East",
+    "status": "Active",
+    "users": 7,
+    "pending": 0,
+    "protected": 5,
+    "won": 1,
+    "last": "4 Nov",
+    "since": "28 Jan 2026",
+    "agreement": "v1.2, accepted 28 Jan 2026",
+    "admin": "Omar Siddiqui",
+    "manager": "Omar Nasser",
+    "hs": "91819874",
+    "people": [
+      {
+        "name": "Omar Siddiqui",
+        "role": "Partner admin",
+        "last": "4 Nov"
+      },
+      {
+        "name": "Hana Qasim",
+        "role": "Sales",
+        "last": "2 Nov"
+      }
+    ],
+    "deals": [
+      {
+        "customer": "Gulfstar Energy",
+        "product": "CleanStart Images",
+        "when": "30 Oct",
+        "status": "Accepted"
+      }
+    ]
+  },
+  {
+    "id": "vyom-digital",
+    "name": "Vyom Digital",
+    "domain": "vyomdigital.in",
+    "category": "System integrator",
+    "region": "India",
+    "status": "Active",
+    "users": 6,
+    "pending": 0,
+    "protected": 3,
+    "won": 2,
+    "last": "2 Nov",
+    "since": "9 Feb 2026",
+    "agreement": "v1.2, accepted 9 Feb 2026",
+    "admin": "Ishaan Verma",
+    "manager": "Farhan Qureshi",
+    "hs": "91820540",
+    "people": [
+      {
+        "name": "Ishaan Verma",
+        "role": "Partner admin",
+        "last": "2 Nov"
+      },
+      {
+        "name": "Kavya Nair",
+        "role": "Technical",
+        "last": "1 Nov"
+      }
+    ],
+    "deals": [
+      {
+        "customer": "Sahyadri Bank",
+        "product": "CleanSight",
+        "when": "28 Oct",
+        "status": "Accepted"
+      },
+      {
+        "customer": "Nirmala Pharma",
+        "product": "Clean Libraries",
+        "when": "2 Sep",
+        "status": "Won"
+      }
+    ]
+  },
+  {
+    "id": "coralbay-technologies",
+    "name": "Coralbay Technologies",
+    "domain": "coralbay.ae",
+    "category": "Channel partner",
+    "region": "Middle East",
+    "status": "Active",
+    "users": 2,
+    "pending": 0,
+    "protected": 1,
+    "won": 0,
+    "last": "3 Nov",
+    "since": "15 Jun 2026",
+    "agreement": "v1.2, accepted 15 Jun 2026",
+    "admin": "Nadia Karim",
+    "manager": "Omar Nasser",
+    "hs": "91824415",
+    "people": [
+      {
+        "name": "Nadia Karim",
+        "role": "Partner admin",
+        "last": "3 Nov"
+      }
+    ],
+    "deals": [
+      {
+        "customer": "Marina Hotels",
+        "product": "CleanStart Images",
+        "when": "22 Oct",
+        "status": "Accepted"
+      }
+    ]
+  },
+  {
+    "id": "meghdoot-systems",
+    "name": "Meghdoot Systems",
+    "domain": "meghdoot.in",
+    "category": "Channel partner",
+    "region": "India",
+    "status": "Onboarding",
+    "users": 1,
+    "pending": 0,
+    "protected": 0,
+    "won": 0,
+    "last": "30 Oct",
+    "since": "28 Oct 2026",
+    "agreement": "v1.2, accepted 30 Oct 2026",
+    "admin": "Arjun Pillai",
+    "manager": "Farhan Qureshi",
+    "hs": "91826021",
+    "people": [
+      {
+        "name": "Arjun Pillai",
+        "role": "Partner admin",
+        "last": "30 Oct"
+      }
+    ],
+    "deals": []
+  },
+  {
+    "id": "qamar-solutions",
+    "name": "Qamar Solutions",
+    "domain": "qamarsolutions.ae",
+    "category": "Channel partner",
+    "region": "Middle East",
+    "status": "Onboarding",
+    "users": 2,
+    "pending": 0,
+    "protected": 0,
+    "won": 0,
+    "last": "28 Oct",
+    "since": "27 Oct 2026",
+    "agreement": "Not accepted yet",
+    "admin": "Yasmin Haddad",
+    "manager": "Omar Nasser",
+    "hs": "91826110",
+    "people": [
+      {
+        "name": "Yasmin Haddad",
+        "role": "Partner admin",
+        "last": "Invited 27 Oct"
+      },
+      {
+        "name": "Zaid Omar",
+        "role": "Sales",
+        "last": "Invited 27 Oct"
+      }
+    ],
+    "deals": []
+  },
+  {
+    "id": "ironleaf-consulting",
+    "name": "Ironleaf Consulting",
+    "domain": "ironleaf.in",
+    "category": "System integrator",
+    "region": "India",
+    "status": "Inactive",
+    "users": 2,
+    "pending": 0,
+    "protected": 0,
+    "won": 0,
+    "last": "2 Aug",
+    "since": "6 May 2026",
+    "agreement": "v1.1, accepted 6 May 2026",
+    "admin": "Manish Rao",
+    "manager": "Farhan Qureshi",
+    "hs": "91822760",
+    "people": [
+      {
+        "name": "Manish Rao",
+        "role": "Partner admin",
+        "last": "2 Aug"
+      }
+    ],
+    "deals": []
+  }
+]

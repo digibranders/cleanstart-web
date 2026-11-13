@@ -44,3 +44,17 @@ State is kept in the browser's local storage so a reload does not lose your plac
 ## Not in this app
 
 No real authentication, no HubSpot connection, no file storage and no email. Those belong to the real portal build.
+
+## Local database
+
+One database and one test database per worktree (names in `docs/partner-portal/BUILD-HANDOFF.md`). The Postgres on `localhost:5432` needs only the `postgres` superuser; the script creates the `portal_owner` and `portal_app` roles.
+
+```bash
+apps/portal/scripts/db-create.sh cleanstart_portal        # prints DATABASE_URL and DATABASE_OWNER_URL
+apps/portal/scripts/db-create.sh cleanstart_portal_test   # prints PORTAL_TEST_DATABASE_URL and PORTAL_TEST_OWNER_URL
+# put the four URLs and AUTH_SECRET (openssl rand -base64 32) in apps/portal/.env, see .env.example
+pnpm --filter @cleanstart/portal db:migrate               # Drizzle migrations, then src/db/rls.sql; safe to repeat
+pnpm --filter @cleanstart/portal db:seed                  # the mock's data; refuses a database that has partners
+```
+
+`db-create.sh <name> --recreate` drops and recreates a database (and the four `_w1` to `_w4` clones of a `_test` one). Use it only on your own worktree's databases, for example after `drizzle/0000_init.sql` is regenerated.

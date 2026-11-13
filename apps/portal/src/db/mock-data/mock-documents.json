@@ -1,0 +1,199 @@
+[
+  {
+    "id": "cleansight-product-walkthrough",
+    "title": "CleanSight product walkthrough",
+    "type": "Video",
+    "format": "MP4, 14 min",
+    "product": "CleanSight",
+    "audience": {
+      "kind": "all"
+    },
+    "updated": "4 Nov 2026",
+    "opens": 38,
+    "partnerCount": 14,
+    "ownOpens": 9,
+    "summary": "From first scan to fix, for a technical audience"
+  },
+  {
+    "id": "clean-libraries-solution-sheet",
+    "title": "Clean Libraries solution sheet",
+    "type": "Solution sheet",
+    "format": "PDF, 1.1 MB",
+    "product": "Clean Libraries",
+    "audience": {
+      "kind": "all"
+    },
+    "updated": "30 Oct 2026",
+    "opens": 61,
+    "partnerCount": 17,
+    "ownOpens": 6,
+    "summary": "What it replaces, who buys it, questions to ask"
+  },
+  {
+    "id": "partner-sales-playbook-2026",
+    "title": "Partner sales playbook 2026",
+    "type": "Enablement guide",
+    "format": "PDF, 3.4 MB",
+    "product": "All products",
+    "audience": {
+      "kind": "categories",
+      "categories": [
+        "Distributors",
+        "Channel partners"
+      ]
+    },
+    "updated": "27 Oct 2026",
+    "opens": 112,
+    "partnerCount": 18,
+    "ownOpens": 14,
+    "summary": "Ideal customers, discovery, positioning, deal registration"
+  },
+  {
+    "id": "selling-hardened-images-to-banks",
+    "title": "Selling hardened images to banks",
+    "type": "Video",
+    "format": "MP4, 22 min",
+    "product": "CleanStart Images",
+    "audience": {
+      "kind": "all"
+    },
+    "updated": "21 Oct 2026",
+    "opens": 29,
+    "partnerCount": 11,
+    "ownOpens": 5,
+    "summary": "Recorded partner session on BFSI and audit-driven deals"
+  },
+  {
+    "id": "competitive-battlecard",
+    "title": "Competitive battlecard",
+    "type": "Battlecard",
+    "format": "PDF, 640 KB",
+    "product": "All products",
+    "audience": {
+      "kind": "categories",
+      "categories": [
+        "Distributors",
+        "Channel partners"
+      ]
+    },
+    "updated": "20 Oct 2026",
+    "opens": 87,
+    "partnerCount": 16,
+    "ownOpens": 11,
+    "summary": "How CleanStart compares with other hardened-image vendors"
+  },
+  {
+    "id": "cleanstart-images-datasheet",
+    "title": "CleanStart Images datasheet",
+    "type": "Datasheet",
+    "format": "PDF, 820 KB",
+    "product": "CleanStart Images",
+    "audience": {
+      "kind": "all"
+    },
+    "updated": "14 Oct 2026",
+    "opens": 44,
+    "partnerCount": 13,
+    "ownOpens": 8,
+    "summary": "Catalogue, update cadence, FIPS and STIG coverage"
+  },
+  {
+    "id": "cleansight-datasheet",
+    "title": "CleanSight datasheet",
+    "type": "Datasheet",
+    "format": "PDF, 950 KB",
+    "product": "CleanSight",
+    "audience": {
+      "kind": "all"
+    },
+    "updated": "14 Oct 2026",
+    "opens": 36,
+    "partnerCount": 12,
+    "ownOpens": 4,
+    "summary": "Capabilities, deployment options, integrations"
+  },
+  {
+    "id": "technical-onboarding-for-partner-engineers",
+    "title": "Technical onboarding for partner engineers",
+    "type": "Enablement guide",
+    "format": "PDF, 2.2 MB",
+    "product": "All products",
+    "audience": {
+      "kind": "all"
+    },
+    "updated": "12 Oct 2026",
+    "opens": 24,
+    "partnerCount": 7,
+    "ownOpens": 3,
+    "summary": "Lab setup, pulling images, running a proof of concept"
+  },
+  {
+    "id": "clean-libraries-datasheet",
+    "title": "Clean Libraries datasheet",
+    "type": "Datasheet",
+    "format": "PDF, 780 KB",
+    "product": "Clean Libraries",
+    "audience": {
+      "kind": "all"
+    },
+    "updated": "8 Oct 2026",
+    "opens": 28,
+    "partnerCount": 10,
+    "ownOpens": 2,
+    "summary": "Supported ecosystems and verification process"
+  },
+  {
+    "id": "partner-logo-and-brand-kit",
+    "title": "Partner logo and brand kit",
+    "type": "Enablement guide",
+    "format": "ZIP, 18 MB",
+    "product": "All products",
+    "audience": {
+      "kind": "all"
+    },
+    "updated": "1 Oct 2026",
+    "opens": 19,
+    "partnerCount": 9,
+    "ownOpens": 7,
+    "summary": "Logos, colours and co-branding rules"
+  },
+  {
+    "id": "gulf-region-price-list",
+    "title": "Gulf region price list",
+    "type": "Price list",
+    "format": "PDF, 310 KB",
+    "product": "All products",
+    "audience": {
+      "kind": "partners",
+      "partners": [
+        "Arbor Cyber",
+        "Harbourline IT"
+      ]
+    },
+    "updated": "1 Oct 2026",
+    "opens": 9,
+    "partnerCount": 2,
+    "ownOpens": 0
+  },
+  {
+    "id": "india-region-price-list",
+    "title": "India region price list",
+    "type": "Price list",
+    "format": "PDF, 290 KB",
+    "product": "All products",
+    "audience": {
+      "kind": "partners",
+      "partners": [
+        "Saffron Secure",
+        "Vyom Digital",
+        "Meghdoot Systems",
+        "Ironleaf Consulting",
+        "Dunes Networks"
+      ]
+    },
+    "updated": "1 Oct 2026",
+    "opens": 21,
+    "partnerCount": 5,
+    "ownOpens": 0
+  }
+]
