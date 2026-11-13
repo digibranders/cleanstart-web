@@ -98,7 +98,7 @@ Master plan task 3.1. Covers the `FileStorage` interface, the R2 adapter (presig
 
 **Gate A (this task):** the standard block in the last step of this task, all green, plus the isolation matrix (`src/server/repo/isolation.test.ts`) picking up `documents.ts` with both functions registered. **Gate B:** an independent reviewer with the handoff checklist, with extra attention to: the route never returns an R2 key, a missing id and a forbidden id are byte-identical 404s, the open is recorded only for partner viewers, no R2 call inside a transaction.
 
-- [ ] **Step 1: Write the failing R2 adapter test**
+- [x] **Step 1: Write the failing R2 adapter test**
 
 This test is also the verification of contracts unknown 13: it runs the real SDK presigner offline (no network, fake credentials) and pins the request shape.
 
@@ -237,12 +237,12 @@ describe('createFileStorage', () => {
 });
 ```
 
-- [ ] **Step 2: Run it and see it fail**
+- [x] **Step 2: Run it and see it fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/r2.test.ts`
 Expected: FAIL with `Failed to resolve import "./r2" from "src/server/files/r2.test.ts". Does the file exist?`
 
-- [ ] **Step 3: Create the storage interface**
+- [x] **Step 3: Create the storage interface**
 
 Create `apps/portal/src/server/files/storage.ts` (verbatim from contracts H.14):
 
@@ -270,7 +270,7 @@ export interface FileStorage {
 }
 ```
 
-- [ ] **Step 4: Create the R2 adapter**
+- [x] **Step 4: Create the R2 adapter**
 
 Create `apps/portal/src/server/files/r2.ts`:
 
@@ -418,12 +418,12 @@ export function createFileStorage(): FileStorage {
 }
 ```
 
-- [ ] **Step 5: Run the adapter test and see it pass**
+- [x] **Step 5: Run the adapter test and see it pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/r2.test.ts`
 Expected: PASS. If the `X-Amz-SignedHeaders` or checksum assertions fail on a newer SDK, that is the unknown-13 fallback: sign `PutObjectCommand` without `ContentLength` (drop `content-length` from the expected header list), keep the `head()` size check in `verifyUpload`, and record the change in the progress log. If the `Résumé` case differs only in the underscore count, the test and `asciiOnly` are the source of truth: one underscore per non-ASCII code point.
 
-- [ ] **Step 6: Write the failing fake test**
+- [x] **Step 6: Write the failing fake test**
 
 Create `apps/portal/src/server/files/fake.test.ts`:
 
@@ -470,12 +470,12 @@ describe('FakeFileStorage', () => {
 });
 ```
 
-- [ ] **Step 7: Run it and see it fail**
+- [x] **Step 7: Run it and see it fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/fake.test.ts`
 Expected: FAIL with `Failed to resolve import "./fake"`.
 
-- [ ] **Step 8: Create FakeFileStorage**
+- [x] **Step 8: Create FakeFileStorage**
 
 Create `apps/portal/src/server/files/fake.ts`:
 
@@ -557,12 +557,12 @@ export const fakeRangeFetch =
   };
 ```
 
-- [ ] **Step 9: Run the fake test and see it pass**
+- [x] **Step 9: Run the fake test and see it pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/fake.test.ts`
 Expected: PASS, 3 tests.
 
-- [ ] **Step 10: Write the failing repo test for the open functions (the 404 rule at the data layer)**
+- [x] **Step 10: Write the failing repo test for the open functions (the 404 rule at the data layer)**
 
 Create `apps/portal/src/server/repo/documents.open.test.ts`:
 
@@ -660,12 +660,12 @@ describe('recordDocumentOpen', () => {
 });
 ```
 
-- [ ] **Step 11: Run it and see it fail**
+- [x] **Step 11: Run it and see it fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/documents.open.test.ts`
 Expected: FAIL with `Failed to resolve import "./documents"`.
 
-- [ ] **Step 12: Create the repo file with the two open functions**
+- [x] **Step 12: Create the repo file with the two open functions**
 
 Create `apps/portal/src/server/repo/documents.ts` (M3.2 replaces this file with the complete version, which contains these two functions unchanged):
 
@@ -742,17 +742,17 @@ export const isolation = defineIsolation<'getDocumentForOpen' | 'recordDocumentO
 });
 ```
 
-- [ ] **Step 13: Run the repo test and see it pass**
+- [x] **Step 13: Run the repo test and see it pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/documents.open.test.ts`
 Expected: PASS, 8 tests.
 
-- [ ] **Step 14: Run the isolation matrix and see `documents` picked up**
+- [x] **Step 14: Run the isolation matrix and see `documents` picked up**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/isolation.test.ts -t documents`
 Expected: PASS, the two `documents` cases (`registers every exported function in isolation`, `leaks nothing across tenants`).
 
-- [ ] **Step 15: Write the failing route handler test**
+- [x] **Step 15: Write the failing route handler test**
 
 Create `apps/portal/src/server/files/open-route.test.ts`:
 
@@ -830,12 +830,12 @@ describe('handleFileOpen', () => {
 });
 ```
 
-- [ ] **Step 16: Run it and see it fail**
+- [x] **Step 16: Run it and see it fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/open-route.test.ts`
 Expected: FAIL with `Failed to resolve import "./open-route"`.
 
-- [ ] **Step 17: Create the handler and the instance getter**
+- [x] **Step 17: Create the handler and the instance getter**
 
 Create `apps/portal/src/server/files/open-route.ts`:
 
@@ -906,12 +906,12 @@ export function getFileStorage(): FileStorage {
 }
 ```
 
-- [ ] **Step 18: Run the handler test and see it pass**
+- [x] **Step 18: Run the handler test and see it pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/open-route.test.ts`
 Expected: PASS, 4 tests.
 
-- [ ] **Step 19: Write the failing route test (signed out and rate limit)**
+- [x] **Step 19: Write the failing route test (signed out and rate limit)**
 
 Create `apps/portal/src/app/api/files/[id]/route.test.ts`:
 
@@ -962,12 +962,12 @@ describe('GET /api/files/[id]', () => {
 });
 ```
 
-- [ ] **Step 20: Run it and see it fail**
+- [x] **Step 20: Run it and see it fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run "src/app/api/files/[id]/route.test.ts"`
 Expected: FAIL with `Failed to resolve import "./route"`.
 
-- [ ] **Step 21: Create the route**
+- [x] **Step 21: Create the route**
 
 Create `apps/portal/src/app/api/files/[id]/route.ts`:
 
@@ -1002,12 +1002,12 @@ export async function GET(request: Request, ctx: { params: Promise<{ id: string 
 }
 ```
 
-- [ ] **Step 22: Run the route test and see it pass**
+- [x] **Step 22: Run the route test and see it pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run "src/app/api/files/[id]/route.test.ts"`
 Expected: PASS, 3 tests.
 
-- [ ] **Step 23: Run Gate A**
+- [x] **Step 23: Run Gate A**
 
 Run from the track worktree (the byte escapes stand for the em-dash and en-dash characters, so this plan stays free of them):
 
@@ -1036,7 +1036,7 @@ Expected: lint, typecheck, test and build exit 0; the dash grep prints nothing; 
 5. `curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' http://localhost:3234/api/files/<any id>` with no cookie. Expected: `302` to `/sign-in?next=%2Fapi%2Ffiles%2F<id>`.
 6. `PGOPTIONS='-c app.kind=system' psql "$DATABASE_URL" -c "select count(*) from document_opens"` is unchanged after steps 3 and 5 and grows by one only after a `302` for a partner.
 
-- [ ] **Step 25: Commit**
+- [x] **Step 25: Commit**
 
 ```bash
 git add apps/portal/src/server/files/storage.ts apps/portal/src/server/files/r2.ts apps/portal/src/server/files/r2.test.ts apps/portal/src/server/files/fake.ts apps/portal/src/server/files/fake.test.ts apps/portal/src/server/files/instance.ts apps/portal/src/server/files/open-route.ts apps/portal/src/server/files/open-route.test.ts apps/portal/src/server/repo/documents.ts apps/portal/src/server/repo/documents.open.test.ts "apps/portal/src/app/api/files/[id]/route.ts" "apps/portal/src/app/api/files/[id]/route.test.ts" docs/superpowers/plans/2026-11-12-partner-portal-05-documents.md
