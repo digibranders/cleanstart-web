@@ -1109,7 +1109,7 @@ Design decisions (all recorded here, none changes a contract):
 - The CSV is built in the browser from the rows `exportAuditAction` returns (cap 5000, `ValidationError` above). A cell that starts with `=`, `+`, `-`, `@` or a control character gets a leading apostrophe, because partner names and notes are typed by visitors and a spreadsheet would run them as formulas.
 - The health card is passed to the screen as a ReactNode slot by the page, so the screen does not depend on track H's `integration-health.ts`. Steps 1 to 6 do not need H4.10; steps 7 to 9 do.
 
-- [ ] **Step 1: Write the failing library tests**
+- [x] **Step 1: Write the failing library tests**
 
 Create `src/lib/audit-filters.test.ts` and `src/lib/audit-csv.test.ts`:
 
@@ -1222,7 +1222,7 @@ describe('auditToCsv', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/lib/audit-filters.test.ts src/lib/audit-csv.test.ts`
 Expected: FAIL, both modules cannot be resolved.
 
-- [ ] **Step 2: Implement the two libraries**
+- [x] **Step 2: Implement the two libraries**
 
 Both are pure and client safe (no `@/db`, no `next/*`).
 
@@ -1364,7 +1364,7 @@ export function auditToCsv(rows: readonly AuditEntryDto[]): string {
 
 Run the same command. Expected: PASS, 14 tests.
 
-- [ ] **Step 3: Write the failing repo test**
+- [x] **Step 3: Write the failing repo test**
 
 Create `src/server/repo/audit.test.ts`. It runs against the real test database with row level security on, through `withViewer`, and covers: period and total, filters, search with `%` and `_` as plain characters, paging over rows that share one timestamp, a bad cursor, the entry `recordAudit` writes for the HubSpot sync actor, the 5000 row export cap, and a partner viewer being refused.
 
@@ -1538,7 +1538,7 @@ describe('exportAudit', () => {
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/audit.test.ts`
 Expected: FAIL, `./audit` cannot be resolved.
 
-- [ ] **Step 4: Implement `repo/audit.ts`**
+- [x] **Step 4: Implement `repo/audit.ts`**
 
 Staff only (`assertStaff` first, so a partner gets `ForbiddenError` before row level security is consulted). No function here writes: the write helper is `recordAudit` (contracts F.4). Only `listAudit` and `exportAudit` are exported as functions, which keeps the isolation test's "every export is registered" rule satisfied; helpers stay private.
 
@@ -1693,7 +1693,7 @@ export const isolation = defineIsolation<'listAudit' | 'exportAudit'>({
 
 Run the repo test. Expected: PASS, 10 tests. Run the isolation matrix: `pnpm --filter @cleanstart/portal exec vitest run src/server/repo/isolation.test.ts`. Expected: PASS, with `audit` among the modules it iterates (`registers every exported function in isolation` and `leaks nothing across tenants`).
 
-- [ ] **Step 5: Write the failing export action test, then the action**
+- [x] **Step 5: Write the failing export action test, then the action**
 
 Create `src/server/actions/audit.test.ts` (this version covers the export only; Step 8 extends it), then `src/server/actions/audit.ts`. `exportAuditAction` follows the F.8 pattern: Zod parse, `assertCan(viewer, 'audit.export')`, repo call inside `withViewer`. Validation errors come back as `{ ok: false, error: { code: 'validation', issues } }`.
 
@@ -1781,7 +1781,7 @@ export async function exportAuditAction(raw: unknown): Promise<ActionResult<Audi
 
 Run it again. Expected: PASS, 3 tests.
 
-- [ ] **Step 6: Convert the screen, the drawer and the page**
+- [x] **Step 6: Convert the screen, the drawer and the page**
 
 The markup and class names are the mock's. What changes: props instead of `useAudit()`, the DTO instead of `AuditEntry`, filters in the URL, `exportAuditAction` instead of the local CSV code, the "Older events" and "Newest events" links for paging, the source shown through `EVENT_SOURCE_LABEL`, and no `data-tour` attributes (the walkthrough is removed in M5.4). `downloadCsv` is the mock's existing helper in `components/reports/download-csv.ts`.
 
@@ -2368,7 +2368,7 @@ export default async function Page({
 
 Run: `pnpm --filter @cleanstart/portal typecheck`. Expected: no errors.
 
-- [ ] **Step 10: Look at it**
+- [x] **Step 10: Look at it**
 
 ```bash
 lsof -nP -iTCP:3254 -sTCP:LISTEN            # must print nothing
@@ -2377,7 +2377,7 @@ pnpm --filter @cleanstart/portal exec next dev --port 3254
 
 In another shell seed the track database (`pnpm --filter @cleanstart/portal db:seed`), open `http://localhost:3254/sign-in` in a browser at 1440 by 900 and sign in as the seeded partner manager, Farhan Qureshi (his email and the shared development password `DEV_SEED_PASSWORD` are in `src/db/fixtures.ts`). Check against the mock's numbers (contracts J.5): `/admin/audit` shows **12 events** for the default 30 days and **13** for Last 90 days; the newest row is the HubSpot sync "Stage changed" entry (the seed resolves the mock's relative days against the day you seeded, so seed and look on the same day); clicking an action opens the drawer with Before and After for "Accepted the partner agreement"; typing `pearl` narrows the list and the URL gains `?q=pearl`; Export CSV downloads `cleanstart-audit-log.csv` whose first line is `"When","Who","Role","Action","On","Source","Details"`. Signed in as a partner admin the page redirects to `/partner/overview`. Stop the dev server with Ctrl C (never kill another process).
 
-- [ ] **Step 11: Gate A and commit**
+- [x] **Step 11: Gate A and commit**
 
 Run the standard Gate A block, then Gate B, then (stage the health card paths only if Step 8 and 9 were done; otherwise omit them and the commit message ends "without the health card"):
 

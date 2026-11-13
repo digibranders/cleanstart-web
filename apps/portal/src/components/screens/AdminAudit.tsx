@@ -1,97 +1,96 @@
-"use client";
+'use client';
 
-import { useCallback, useState } from "react";
-import { Icon } from "@/components/icon";
-import { AuditDrawer } from "@/components/people/AuditDrawer";
-import { Dropdown } from "@/components/ui/dropdown";
-import { useToast } from "@/components/ui/toast";
-import { type AuditEntry, useAudit } from "@/data/audit";
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState, useTransition } from 'react';
+import { Icon } from '@/components/icon';
+import { AuditDrawer } from '@/components/people/AuditDrawer';
+import { downloadCsv } from '@/components/reports/download-csv';
+import { Dropdown } from '@/components/ui/dropdown';
+import { useToast } from '@/components/ui/toast';
+import { auditToCsv } from '@/lib/audit-csv';
+import {
+  AUDIT_PERIODS,
+  type AuditView,
+  auditViewToExportFilter,
+  auditViewToQuery,
+  KIND_CHOICES,
+  PERIOD_CHOICES,
+  WHO_CHOICES,
+} from '@/lib/audit-filters';
+import { fmtTimestamp, plural } from '@/lib/dates';
+import { AUDIT_KINDS, AUDIT_WHO, EVENT_SOURCE_LABEL, isOneOf } from '@/lib/domain';
+import type { AuditEntryDto, PageDto } from '@/lib/dto';
+import { exportAuditAction } from '@/server/actions/audit';
 
-const ACTIONS = ["All actions", "Deal decisions", "Partners", "Documents", "People and access"] as const;
-const WHO = ["Anyone", "CleanStart team", "Partner users", "HubSpot sync"] as const;
-const PERIODS = ["Last 7 days", "Last 30 days", "Last 90 days"] as const;
-const PERIOD_DAYS: Record<(typeof PERIODS)[number], number> = {
-  "Last 7 days": 7,
-  "Last 30 days": 30,
-  "Last 90 days": 90,
-};
-const WHO_KIND: Record<Exclude<(typeof WHO)[number], "Anyone">, AuditEntry["whoKind"]> = {
-  "CleanStart team": "staff",
-  "Partner users": "partner",
-  "HubSpot sync": "sync",
-};
+const SEARCH_DEBOUNCE_MS = 300;
 
-type ActionFilter = (typeof ACTIONS)[number];
-type WhoFilter = (typeof WHO)[number];
-type PeriodFilter = (typeof PERIODS)[number];
-
-function pick<T extends string>(options: readonly T[], value: string, fallback: T): T {
-  return options.find((o) => o === value) ?? fallback;
+export interface AdminAuditProps {
+  page: PageDto<AuditEntryDto>;
+  view: AuditView;
+  /** The server's UTC date, for "Today" and "Yesterday" labels. */
+  today: string;
+  /** The HubSpot sync health card, rendered by the page (a server component) so this screen does not depend on it. */
+  healthSlot: React.ReactNode;
 }
 
-function csvCell(value: string): string {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
-function downloadCsv(rows: AuditEntry[]): void {
-  const header = ["When", "Who", "Role", "Action", "On", "Source", "Details"];
-  const lines = rows.map((e) =>
-    [e.full, e.who, e.whoRole, e.action, e.target, e.source, e.note].map(csvCell).join(","),
-  );
-  const blob = new Blob([[header.map(csvCell).join(","), ...lines].join("\n")], {
-    type: "text/csv;charset=utf-8",
-  });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "cleanstart-audit-log.csv";
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-export function AdminAudit(): React.JSX.Element {
+export function AdminAudit({ page, view, today, healthSlot }: AdminAuditProps): React.JSX.Element {
   const toast = useToast();
-  const all = useAudit();
-  const [q, setQ] = useState("");
-  const [action, setAction] = useState<ActionFilter>("All actions");
-  const [who, setWho] = useState<WhoFilter>("Anyone");
-  const [period, setPeriod] = useState<PeriodFilter>("Last 30 days");
+  const router = useRouter();
+  const pathname = usePathname();
+  const [, startTransition] = useTransition();
+  const [q, setQ] = useState(view.q);
   const [viewing, setViewing] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
   const closeView = useCallback((): void => setViewing(null), []);
 
-  const needle = q.trim().toLowerCase();
-  const events = all.filter(
-    (e) =>
-      e.ageDays < PERIOD_DAYS[period] &&
-      (action === "All actions" || e.kind === action) &&
-      (who === "Anyone" || e.whoKind === WHO_KIND[who]) &&
-      (!needle || `${e.who} ${e.target} ${e.action}`.toLowerCase().includes(needle)),
+  const go = useCallback(
+    (next: AuditView): void => startTransition(() => router.replace(`${pathname}${auditViewToQuery(next)}`)),
+    [router, pathname],
   );
-  const countText = `${events.length} ${events.length === 1 ? "event" : "events"}`;
-  const selected = all.find((e) => e.id === viewing) ?? null;
+
+  // After a navigation (Clear filters, browser back) show the URL's search text.
+  useEffect(() => setQ(view.q), [view.q]);
+
+  // The URL, and so the server query, follows the box 300 ms after the last keystroke.
+  useEffect(() => {
+    if (q.trim() === view.q) return;
+    const timer = setTimeout(() => go({ ...view, q: q.trim(), cursor: null }), SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [q, view, go]);
+
+  const exportCsv = async (): Promise<void> => {
+    setExporting(true);
+    const result = await exportAuditAction(auditViewToExportFilter(view));
+    setExporting(false);
+    if (!result.ok) {
+      toast(result.error.message);
+      return;
+    }
+    downloadCsv('cleanstart-audit-log.csv', auditToCsv(result.data));
+    toast(`Exported ${plural(result.data.length, 'event')} to CSV`);
+  };
+
+  const selected = page.rows.find((e) => e.id === viewing) ?? null;
+  const filtered = view.kind !== null || view.who !== null || view.q !== '';
 
   return (
     <div className="wrap">
       <div className="head">
-        <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
           <h1 className="h1">Audit log</h1>
           <span className="h1-sub">Every approval, upload and access change in the portal, newest first.</span>
         </div>
-        <button
-          type="button"
-          className="btn btn-s"
-          onClick={() => {
-            downloadCsv(events);
-            toast(`Exported ${countText} to CSV`);
-          }}
-        >
+        <button type="button" className="btn btn-s" onClick={exportCsv} disabled={exporting}>
           <Icon name="dl" />
           Export CSV
         </button>
       </div>
 
+      {healthSlot}
+
       <section aria-label="Events" className="card clip">
-        <div className="toolbar" data-tour="audit-filters">
+        <div className="toolbar">
           <div className="filters">
             <label className="sr" htmlFor="aq">
               Search
@@ -106,21 +105,26 @@ export function AdminAudit(): React.JSX.Element {
             />
             <Dropdown
               ariaLabel="Action"
-              value={action}
-              options={ACTIONS}
-              onChange={(v) => setAction(pick(ACTIONS, v, "All actions"))}
+              value={view.kind ?? ''}
+              options={KIND_CHOICES}
+              onChange={(v) => go({ ...view, kind: isOneOf(AUDIT_KINDS, v) ? v : null, cursor: null })}
             />
-            <Dropdown ariaLabel="Who" value={who} options={WHO} onChange={(v) => setWho(pick(WHO, v, "Anyone"))} />
+            <Dropdown
+              ariaLabel="Who"
+              value={view.who ?? ''}
+              options={WHO_CHOICES}
+              onChange={(v) => go({ ...view, who: isOneOf(AUDIT_WHO, v) ? v : null, cursor: null })}
+            />
             <Dropdown
               ariaLabel="Period"
-              value={period}
-              options={PERIODS}
-              onChange={(v) => setPeriod(pick(PERIODS, v, "Last 30 days"))}
+              value={view.period}
+              options={PERIOD_CHOICES}
+              onChange={(v) => go({ ...view, period: isOneOf(AUDIT_PERIODS, v) ? v : view.period, cursor: null })}
             />
           </div>
-          <span className="card-meta tnum">{countText}</span>
+          <span className="card-meta tnum">{plural(page.total, 'event')}</span>
         </div>
-        <div style={{ overflowX: "auto" }} data-tour="audit-table">
+        <div style={{ overflowX: 'auto' }}>
           <table className="tbl">
             <thead>
               <tr>
@@ -132,15 +136,15 @@ export function AdminAudit(): React.JSX.Element {
               </tr>
             </thead>
             <tbody>
-              {events.map((e) => (
+              {page.rows.map((e) => (
                 <tr key={e.id}>
-                  <td className="tnum t-sec">{e.when}</td>
+                  <td className="tnum t-sec">{fmtTimestamp(e.at, today)}</td>
                   <td>
                     <span className="li-t">
                       <span className="li-n" style={{ fontSize: 13 }}>
-                        {e.who}
+                        {e.actorLabel}
                       </span>
-                      <span className="li-s">{e.whoRole}</span>
+                      <span className="li-s">{e.actorRole ?? ''}</span>
                     </span>
                   </td>
                   <td>
@@ -148,31 +152,44 @@ export function AdminAudit(): React.JSX.Element {
                       {e.action}
                     </button>
                   </td>
-                  <td style={{ whiteSpace: "normal" }}>{e.target}</td>
-                  <td className="t-muted">{e.source}</td>
+                  <td style={{ whiteSpace: 'normal' }}>{e.target}</td>
+                  <td className="t-muted">{EVENT_SOURCE_LABEL[e.source]}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-          {events.length === 0 ? (
+          {page.rows.length === 0 ? (
             <div className="empty">
-              No events match these filters.{" "}
-              <button
-                type="button"
-                className="btn btn-g"
-                onClick={() => {
-                  setQ("");
-                  setAction("All actions");
-                  setWho("Anyone");
-                  setPeriod("Last 90 days");
-                }}
-                style={{ height: 24, padding: "0 6px", fontSize: 12 }}
-              >
-                Clear filters
-              </button>
+              No events match these filters.{' '}
+              {filtered || view.period !== '90d' ? (
+                <button
+                  type="button"
+                  className="btn btn-g"
+                  onClick={() => go({ period: '90d', kind: null, who: null, q: '', cursor: null })}
+                  style={{ height: 24, padding: '0 6px', fontSize: 12 }}
+                >
+                  Clear filters
+                </button>
+              ) : null}
             </div>
           ) : null}
         </div>
+        {view.cursor || page.nextCursor ? (
+          <div className="toolbar" style={{ justifyContent: 'space-between' }}>
+            {view.cursor ? (
+              <Link href={`${pathname}${auditViewToQuery({ ...view, cursor: null })}`} className="btn btn-g">
+                Newest events
+              </Link>
+            ) : (
+              <span />
+            )}
+            {page.nextCursor ? (
+              <Link href={`${pathname}${auditViewToQuery({ ...view, cursor: page.nextCursor })}`} className="btn btn-s">
+                Older events
+              </Link>
+            ) : null}
+          </div>
+        ) : null}
       </section>
 
       <AuditDrawer entry={selected} onClose={closeView} />
