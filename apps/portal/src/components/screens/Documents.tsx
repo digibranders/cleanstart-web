@@ -12,6 +12,7 @@ import { useToast } from '@/components/ui/toast';
 import { fmtLong } from '@/lib/dates';
 import { DOCUMENT_TYPE_LABEL, type DocumentType, PRODUCT_LABEL, PRODUCTS } from '@/lib/domain';
 import type { DocumentDto } from '@/lib/dto';
+import type { PublicDatasheetDto } from '@/server/files/public-resources';
 import { formatLabel } from '@/server/files/rules';
 
 const ANY_PRODUCT = 'any';
@@ -31,9 +32,11 @@ const BASE_TABS: readonly DocumentType[] = [
 
 export function Documents({
   docs,
+  publicDatasheets,
   today,
 }: {
   docs: readonly DocumentDto[];
+  publicDatasheets: readonly PublicDatasheetDto[];
   today: string;
 }): React.JSX.Element {
   const toast = useToast();
@@ -229,6 +232,68 @@ export function Documents({
           ) : null}
         </div>
       </section>
+
+      {publicDatasheets.length > 0 ? (
+        <section aria-labelledby="pub" className="card clip">
+          <div className="card-h">
+            <h2 id="pub" className="card-t">
+              Public datasheets
+            </h2>
+            <span className="card-meta">On cleanstart.com, no sign-in needed</span>
+          </div>
+          <div style={{ overflowX: 'auto' }}>
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col" className="r">
+                    Updated
+                  </th>
+                  <th scope="col" className="r">
+                    <span className="sr">Action</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {publicDatasheets.map((d) => (
+                  <tr key={d.id}>
+                    <td style={{ whiteSpace: 'normal', minWidth: 320 }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <span className="li-ic tone-blue">
+                          <Icon name="file" />
+                        </span>
+                        <span className="li-t">
+                          <a
+                            className="linkbtn li-n"
+                            style={{ fontSize: 13 }}
+                            href={d.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {d.title}
+                          </a>
+                          {d.summary ? <span className="li-s">{d.summary}</span> : null}
+                        </span>
+                      </span>
+                    </td>
+                    <td className="tnum r t-sec">{d.updatedAt ? fmtLong(d.updatedAt) : ''}</td>
+                    <td className="r">
+                      <a
+                        className="btn btn-s"
+                        href={d.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Open on cleanstart.com
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      ) : null}
 
       <DocumentPreview doc={viewing} onClose={closeView} onDownload={download} />
       <RequestMaterialDialog open={requestOpen} onClose={closeRequest} />

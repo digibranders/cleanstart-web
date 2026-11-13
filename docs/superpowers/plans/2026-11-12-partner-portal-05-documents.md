@@ -5741,7 +5741,7 @@ Master plan task 3.3: read the published datasheets from the CMS REST API with a
 
 **Gate A (this task):** the standard block in the last step of this task, plus the manual list. **Gate B:** an independent reviewer with the handoff checklist, extra attention to: no `asset` or `body` in the query, gated rows dropped in code (not only in the query), no CMS credential needed or logged, the fetch has a timeout and a failure degrades to "no card", never a broken page.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `apps/portal/src/server/files/public-resources.test.ts`:
 
@@ -5865,12 +5865,12 @@ describe('listPublicDatasheets', () => {
 });
 ```
 
-- [ ] **Step 2: Run it and see it fail**
+- [x] **Step 2: Run it and see it fail**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/public-resources.test.ts`
 Expected: FAIL with `Failed to resolve import "./public-resources"`.
 
-- [ ] **Step 3: Create `public-resources.ts`**
+- [x] **Step 3: Create `public-resources.ts`**
 
 Create `apps/portal/src/server/files/public-resources.ts`. It is imported only by Server Components (the partner Documents page); it reads `@/env`, so it must never be imported by a client component, and the only thing a client component may import from it is the `PublicDatasheetDto` type.
 
@@ -5985,12 +5985,12 @@ export async function listPublicDatasheets(options: ListPublicDatasheetsOptions 
 }
 ```
 
-- [ ] **Step 4: Run the test and see it pass**
+- [x] **Step 4: Run the test and see it pass**
 
 Run: `pnpm --filter @cleanstart/portal exec vitest run src/server/files/public-resources.test.ts`
 Expected: PASS, 7 tests. If the `connection refused` case is slow or hangs on a machine that has something listening on port 1, change the unreachable URL in that one test to a port you know is closed.
 
-- [ ] **Step 5: Add the card to `Documents.tsx`**
+- [x] **Step 5: Add the card to `Documents.tsx`**
 
 Edit 1 (a new import). Before:
 
@@ -6113,7 +6113,7 @@ After:
       <DocumentPreview doc={viewing} onClose={closeView} onDownload={download} />
 ```
 
-- [ ] **Step 6: Load the datasheets in the partner page**
+- [x] **Step 6: Load the datasheets in the partner page**
 
 Replace the whole of `apps/portal/src/app/partner/documents/page.tsx` with the M3.2 version plus the CMS read. A CMS outage or an unconfigured `CMS_API_URL` must not break the page, so the read degrades to "no card" and logs a warning.
 
@@ -6148,12 +6148,12 @@ export default async function Page(): Promise<React.JSX.Element> {
 }
 ```
 
-- [ ] **Step 7: Typecheck and lint**
+- [x] **Step 7: Typecheck and lint**
 
 Run: `pnpm --filter @cleanstart/portal typecheck && pnpm --filter @cleanstart/portal lint`
 Expected: both exit 0 (the page now passes the `publicDatasheets` prop that Step 5 added).
 
-- [ ] **Step 8: Run Gate A**
+- [x] **Step 8: Run Gate A**
 
 Run from the track worktree (byte escapes stand for the em-dash and en-dash characters, so this plan stays free of them):
 
@@ -6173,7 +6173,7 @@ git diff --name-only feat/portal-build
 
 Expected: all exit 0; the dash grep prints nothing; the name list is limited to the paths in this task's Files block and the plan file.
 
-- [ ] **Step 9: Manual check with a local stub of the CMS (no CMS service user or production access needed)**
+- [x] **Step 9: Manual check with a local stub of the CMS (no CMS service user or production access needed)**
 
 1. Start a stub that answers like the CMS: `node -e "require('http').createServer((q,r)=>{r.setHeader('content-type','application/json');r.end(JSON.stringify({docs:[{id:1,title:'CleanStart Images datasheet',slug:'cleanstart-images-datasheet',summary:'Catalogue and update cadence',updatedAt:'2026-10-14T00:00:00.000Z',gated:false},{id:2,title:'Gated whitepaper',slug:'gated-whitepaper',gated:true}]}))}).listen(3999)"` (check `lsof -nP -iTCP:3999 -sTCP:LISTEN` is empty first), and set `CMS_API_URL=http://localhost:3999` in `apps/portal/.env`, then restart `next dev --port 3234` (the environment is read once at start).
 2. As Kestrel's partner admin at `/partner/documents`: below the library a "Public datasheets" card appears with one row, "CleanStart Images datasheet", summary "Catalogue and update cadence", Updated "14 Oct 2026". The gated row is absent. The link and the "Open on cleanstart.com" button both go to `https://www.cleanstart.com/resources/cleanstart-images-datasheet` in a new tab.
@@ -6182,7 +6182,7 @@ Expected: all exit 0; the dash grep prints nothing; the name list is limited to 
 5. Stop the stub, stop the dev server, delete `apps/portal/.next/dev/cache/fetch-cache` (that is the Next 16 dev fetch cache path; clearing `.next/cache` does nothing), start the dev server again and reload: the card is gone, the rest of the page works, and the dev server log has one line `public datasheets unavailable, the card is hidden`.
 6. Restore `CMS_API_URL` in `.env` to what the worktree had before.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git add apps/portal/src/server/files/public-resources.ts apps/portal/src/server/files/public-resources.test.ts apps/portal/src/components/screens/Documents.tsx apps/portal/src/app/partner/documents/page.tsx docs/superpowers/plans/2026-11-12-partner-portal-05-documents.md
