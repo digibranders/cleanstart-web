@@ -117,7 +117,9 @@ export async function acceptInvite(tx: Tx, _actor: SystemActor, input: AcceptInv
   const [existing] = await tx.select().from(users).where(eq(users.email, invite.email)).limit(1).for('update');
   let userId: string;
   if (existing) {
-    if (existing.status === 'active') {
+    // A pending row is only adopted by an invite for the same kind and company; it is never moved (that would leave a staff scope on a partner user).
+    const foreignPending = existing.status === 'invited' && (existing.kind !== invite.kind || existing.partnerId !== invite.partnerId);
+    if (existing.status === 'active' || foreignPending) {
       throw new ConflictError('already_has_login', 'This email already has a portal login. Sign in instead.');
     }
     // A removed person invited again, or a pending person whose users row was created with the invite (the dev seed),
