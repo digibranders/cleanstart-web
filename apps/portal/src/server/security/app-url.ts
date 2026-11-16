@@ -18,5 +18,6 @@ export function assertSecureAppUrl(nodeEnv: string, appUrl: string): void {
   throw new Error(`APP_URL must be https in production (got ${url.origin}): cookies, invite links and reset links would travel in the clear.`);
 }
 
-/** Secure cookies exactly when the site is served over https in production. */
-export const usesSecureCookies = (nodeEnv: string, appUrl: string): boolean => nodeEnv === 'production' && appUrl.startsWith('https://');
+/** Secure cookies exactly when the site is served over https in production. Parsed, so it agrees with isHttpsOrLoopback. */
+export const usesSecureCookies = (nodeEnv: string, appUrl: string): boolean =>
+  nodeEnv === 'production' && URL.canParse(appUrl) && new URL(appUrl).protocol === 'https:';

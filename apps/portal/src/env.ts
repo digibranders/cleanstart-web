@@ -17,7 +17,8 @@ const schema = z
     LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
 
     // Public origin of this app. Must match the dev port of the worktree (handoff table), no trailing slash.
-    APP_URL: z.string().url().default('http://localhost:3004'),
+    // Optional here so production can report an unset one with the other required variables; the transform applies the development default.
+    APP_URL: z.string().url().optional(),
 
     // Database: portal_app for the running app, portal_owner for migrations only.
     // Optional in the object so a missing one does not stop the production checks below from running: superRefine
@@ -78,7 +79,7 @@ const schema = z
       if (!value[key]) ctx.addIssue({ code: z.ZodIssueCode.custom, path: [key], message: `${key} is required` });
     }
     if (value.NODE_ENV !== 'production') return;
-    if (!isHttpsOrLoopback(value.APP_URL)) {
+    if (value.APP_URL !== undefined && !isHttpsOrLoopback(value.APP_URL)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['APP_URL'],
@@ -86,7 +87,7 @@ const schema = z
       });
     }
     const required = [
-      'DATABASE_OWNER_URL', 'BREVO_API_KEY', 'BREVO_SENDER_EMAIL', 'R2_ENDPOINT', 'R2_BUCKET', 'R2_ACCESS_KEY_ID',
+      'APP_URL', 'DATABASE_OWNER_URL', 'BREVO_API_KEY', 'BREVO_SENDER_EMAIL', 'R2_ENDPOINT', 'R2_BUCKET', 'R2_ACCESS_KEY_ID',
       'R2_SECRET_ACCESS_KEY', 'HUBSPOT_PORTAL_TOKEN', 'HUBSPOT_PARTNER_PIPELINE_ID', 'HUBSPOT_WEBHOOK_SECRET',
       'TURNSTILE_SECRET_KEY', 'NEXT_PUBLIC_TURNSTILE_SITE_KEY', 'SENTRY_DSN',
     ] as const;
@@ -96,6 +97,7 @@ const schema = z
   })
   .transform((value) => ({
     ...value,
+    APP_URL: value.APP_URL ?? 'http://localhost:3004',
     // superRefine has already failed the parse when either is missing, so these never fall back.
     DATABASE_URL: value.DATABASE_URL ?? '',
     AUTH_SECRET: value.AUTH_SECRET ?? '',

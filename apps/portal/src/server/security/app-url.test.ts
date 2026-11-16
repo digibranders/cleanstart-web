@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { assertSecureAppUrl, usesSecureCookies } from './app-url';
+import { assertSecureAppUrl, isHttpsOrLoopback, usesSecureCookies } from './app-url';
 
 describe('assertSecureAppUrl', () => {
   it('refuses a plain http public origin in production, because cookies, invite links and reset links would travel in the clear', () => {
@@ -18,7 +18,33 @@ describe('assertSecureAppUrl', () => {
   });
 });
 
+describe('isHttpsOrLoopback', () => {
+  it.each(['http://localhost.evil.com', 'http://localhost@evil.com', 'http://127.0.0.1.evil.com', 'http://0.0.0.0', 'http://evil.com/localhost'])(
+    'rejects the look-alike host %s',
+    (appUrl) => {
+      expect(isHttpsOrLoopback(appUrl)).toBe(false);
+      expect(() => assertSecureAppUrl('production', appUrl)).toThrow(/APP_URL must be https/);
+    },
+  );
+
+  it('rejects a string that is not a URL', () => {
+    expect(isHttpsOrLoopback('not a url')).toBe(false);
+  });
+
+  it('accepts loopback hosts and https, whatever the case of the scheme', () => {
+    expect(isHttpsOrLoopback('http://[::1]:3004')).toBe(true);
+    expect(isHttpsOrLoopback('HTTPS://partners.cleanstart.com')).toBe(true);
+  });
+});
+
 describe('usesSecureCookies', () => {
+  it('agrees with the parsed URL: an uppercase scheme or surrounding spaces still get Secure cookies', () => {
+    expect(usesSecureCookies('production', 'HTTPS://partners.cleanstart.com')).toBe(true);
+    expect(usesSecureCookies('production', '  https://partners.cleanstart.com  ')).toBe(true);
+    expect(usesSecureCookies('production', '  http://localhost:3004 ')).toBe(false);
+    expect(usesSecureCookies('production', 'not a url')).toBe(false);
+  });
+
   it('is on for https in production only', () => {
     expect(usesSecureCookies('production', 'https://partners.cleanstart.com')).toBe(true);
     expect(usesSecureCookies('production', 'http://localhost:3004')).toBe(false);

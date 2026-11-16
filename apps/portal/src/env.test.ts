@@ -14,6 +14,7 @@ const base = {
 const production = {
   ...base,
   NODE_ENV: 'production',
+  APP_URL: 'https://partners.cleanstart.com',
   DATABASE_OWNER_URL: 'postgresql://portal_owner:pw@localhost:5432/cleanstart_portal',
   BREVO_API_KEY: 'k',
   BREVO_SENDER_EMAIL: 'partners@cleanstart.com',
@@ -86,6 +87,21 @@ describe('loadEnv', () => {
   it('refuses an http APP_URL in production, naming the variable and the scheme', () => {
     expect(() => loadEnv({ ...production, APP_URL: 'http://partners.cleanstart.com' })).toThrow(
       /APP_URL must start with https:\/\/ in production/,
+    );
+  });
+
+  it.each(['http://localhost.evil.com', 'http://localhost@evil.com', 'http://127.0.0.1.evil.com', 'http://0.0.0.0'])(
+    'refuses the look-alike loopback host %s in production',
+    (APP_URL) => {
+      expect(() => loadEnv({ ...production, APP_URL })).toThrow(/APP_URL must start with https:\/\//);
+    },
+  );
+
+  it('treats an unset APP_URL in production as missing, reported with the other required variables', () => {
+    const { APP_URL: _omitted, ...rest } = production;
+    expect(() => loadEnv(rest)).toThrow(/APP_URL is required in production/);
+    expect(() => loadEnv({ NODE_ENV: 'production' })).toThrow(
+      /DATABASE_URL is required[\s\S]*AUTH_SECRET is required[\s\S]*APP_URL is required in production[\s\S]*DATABASE_OWNER_URL is required in production/,
     );
   });
 
