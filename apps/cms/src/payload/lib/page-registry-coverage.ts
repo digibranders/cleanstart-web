@@ -27,6 +27,10 @@ export const INTENTIONALLY_UNREGISTERED: ReadonlySet<string> = new Set([
   // Campaign landing page, noindex until signed off (apps/web/src/app/cleansight-campaign).
   // Add a pageRegistry row when it is released to search.
   '/cleansight-campaign',
+  // Post-quantum cryptography landing page, noindex and unlinked until the copy
+  // is signed off (apps/web/src/app/post-quantum-cryptography). Add a
+  // pageRegistry row when it launches.
+  '/post-quantum-cryptography',
 ]);
 
 /** Segment names that don't produce a URL segment (Next.js route groups). */
