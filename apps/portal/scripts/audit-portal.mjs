@@ -1,6 +1,7 @@
 // Dependency audit for the portal only. `pnpm audit` covers the whole monorepo; this keeps the advisories whose
 // dependency path starts at apps__portal, prints them, and exits 1 when any is high or critical (2 when the audit
-// could not be read). Run from anywhere in the repo: pnpm --filter @cleanstart/portal audit:deps
+// could not be read: not JSON, a registry error body, or no advisories object). Production and dev dependencies are
+// both audited, so the vite/vitest/postcss overrides in pnpm-workspace.yaml are covered. Run from anywhere in the repo: pnpm --filter @cleanstart/portal audit:deps
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -10,7 +11,7 @@ const BLOCKING = new Set(['high', 'critical']);
 const ORDER = ['critical', 'high', 'moderate', 'low', 'info'];
 
 // pnpm audit exits non-zero whenever it finds anything, so the exit code is not used; the JSON is.
-const run = spawnSync('pnpm', ['audit', '--prod', '--json'], { cwd: repoRoot, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+const run = spawnSync('pnpm', ['audit', '--json'], { cwd: repoRoot, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
 let report;
 try {
   report = JSON.parse(run.stdout);
@@ -20,8 +21,15 @@ try {
   process.exit(2);
 }
 
+// An unreachable registry still prints JSON: {"error":{"code":"ECONNREFUSED",...}} with no advisories. That is not a clean audit.
+if (report?.error || typeof report?.advisories !== 'object' || report.advisories === null) {
+  console.error('pnpm audit returned no advisory data:');
+  console.error(JSON.stringify(report?.error ?? report));
+  process.exit(2);
+}
+
 const rows = new Map();
-for (const advisory of Object.values(report.advisories ?? {})) {
+for (const advisory of Object.values(report.advisories)) {
   for (const finding of advisory.findings ?? []) {
     for (const dependencyPath of finding.paths ?? []) {
       if (!dependencyPath.startsWith('apps__portal>')) continue;
