@@ -1,0 +1,27 @@
+/*
+ * The quote is set large and lit word by word as it scrolls through the middle
+ * of the screen, so it is read at the pace of the scroll. Browsers without
+ * scroll-driven animations, and visitors who prefer reduced motion, get the
+ * whole quote at full strength.
+ */
+
+.word {
+  color: #111111;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .word {
+      color: rgba(17, 17, 17, 0.16);
+      animation: light linear both;
+      animation-timeline: view();
+      animation-range: cover 12% cover 40%;
+    }
+  }
+}
+
+@keyframes light {
+  to {
+    color: #111111;
+  }
+}
