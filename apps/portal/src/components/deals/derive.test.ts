@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { PROTECTION_DAYS } from './dates';
-import { acceptedOn, defaultRejectReason, describeCheck, isOverTarget, managerFor, protectionView, reviewSince, routingText, stageTrack, waitDays } from './derive';
+import { acceptedOn, defaultRejectReason, describeCheck, isOverTarget, managerFor, protectionLength, protectionView, reviewSince, routingText, stageTrack, waitDays } from './derive';
 
 const base = {
   registeredOn: '2026-11-02',
@@ -14,8 +14,19 @@ const base = {
 describe('protection arithmetic', () => {
   it('counts the acceptance day: protection ends 89 days after it', () => {
     expect(PROTECTION_DAYS).toBe(90);
-    expect(acceptedOn({ protectionEnd: '2027-02-02' })).toBe('2026-11-05');
-    expect(acceptedOn({ protectionEnd: null })).toBeNull();
+    expect(acceptedOn({ protectionEnd: '2027-02-02', decidedOn: null })).toBe('2026-11-05');
+    expect(acceptedOn({ protectionEnd: null, decidedOn: null })).toBeNull();
+  });
+
+  it('keeps the real acceptance day after an extension moves the end date', () => {
+    expect(acceptedOn({ protectionEnd: '2027-02-11', decidedOn: '2026-10-15' })).toBe('2026-10-15');
+  });
+
+  it('counts a granted extension in the protection length', () => {
+    expect(protectionLength({ extensionStatus: 'none', extensionDays: null })).toBe(90);
+    expect(protectionLength({ extensionStatus: 'requested', extensionDays: null })).toBe(90);
+    expect(protectionLength({ extensionStatus: 'declined', extensionDays: null })).toBe(90);
+    expect(protectionLength({ extensionStatus: 'granted', extensionDays: 30 })).toBe(120);
   });
 });
 
