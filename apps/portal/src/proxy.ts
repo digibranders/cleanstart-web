@@ -41,8 +41,22 @@ function reviewGate(request: NextRequest): NextResponse | null {
   });
 }
 
-/** The signed in areas. Everything else (sign in, apply, accept invite, reset password, the API) is public. */
-export const isProtectedPath = (pathname: string): boolean => /^\/(partner|admin)(\/|$)/.test(pathname);
+const PROTECTED_AREA = /^\/(partner|admin)(\/|$)/;
+
+/** One round of percent decoding, the way Next.js matches routes; a malformed escape leaves the path as it is. */
+function decodePath(pathname: string): string {
+  try {
+    return decodeURIComponent(pathname);
+  } catch {
+    return pathname;
+  }
+}
+
+/**
+ * The signed in areas. Everything else (sign in, apply, accept invite, reset password, the API) is public. The raw and
+ * the decoded path are both checked, so `/%61dmin/approvals` cannot skip the session redirect that `/admin/approvals` gets.
+ */
+export const isProtectedPath = (pathname: string): boolean => PROTECTED_AREA.test(pathname) || PROTECTED_AREA.test(decodePath(pathname));
 
 /**
  * What every request does first: the request headers Server Components and route handlers will see. The client
