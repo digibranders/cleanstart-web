@@ -1,4 +1,5 @@
 import type { Pool } from 'pg';
+import { log } from '@/server/log';
 
 /** Returns false without running `fn` when another connection already holds the lock for `name`. */
 export const runLocked = async (pool: Pool, name: string, fn: () => Promise<void>): Promise<boolean> => {
@@ -21,7 +22,9 @@ export const runLocked = async (pool: Pool, name: string, fn: () => Promise<void
     } catch (error) {
       // An unreleased session lock must not return to the pool: destroying the connection frees it.
       discard = error instanceof Error ? error : new Error(String(error));
-      throw error;
+      // When the job failed too, its error is the one the caller needs; the unlock failure is logged instead of masking it.
+      if (!failed) throw error;
+      log.error({ job: name, err: error }, 'advisory unlock failed after the job failed');
     }
     if (failed) throw jobError;
     return true;

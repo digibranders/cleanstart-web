@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest';
-import { escapeHtml, renderEmail } from './layout';
+import { describe, expect, it, vi } from 'vitest';
+import { log } from '@/server/log';
+import { escapeHtml, isSafeEmailUrl, renderEmail } from './layout';
 
 const sample = () =>
   renderEmail({
@@ -81,6 +82,23 @@ describe('renderEmail', () => {
     expect(html).not.toContain('>Also click<');
   });
 
+  it('warns, naming the email and the button but never the URL, when it drops a button', () => {
+    const warn = vi.spyOn(log, 'warn').mockImplementation(() => undefined);
+    renderEmail({ preheader: 'p', heading: 'Reset your password', blocks: [{ type: 'button', label: 'Set a new password', url: 'javascript:TOKEN-SECRET' }] });
+    expect(warn).toHaveBeenCalledTimes(1);
+    const [fields] = warn.mock.calls[0] ?? [];
+    expect(fields).toEqual({ heading: 'Reset your password', label: 'Set a new password' });
+    expect(JSON.stringify(warn.mock.calls)).not.toContain('TOKEN-SECRET');
+    warn.mockRestore();
+  });
+
+  it('does not warn for a safe button', () => {
+    const warn = vi.spyOn(log, 'warn').mockImplementation(() => undefined);
+    sample();
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
   it('escapes the heading, preheader, facts, notes and footnote', () => {
     const evil = '<img src=x onerror=alert(1)>';
     const html = renderEmail({
@@ -100,5 +118,18 @@ describe('renderEmail', () => {
   it('omits the footnote paragraph when there is none', () => {
     const html = renderEmail({ preheader: 'p', heading: 'h', blocks: [] });
     expect(html).not.toContain('You received this email');
+  });
+});
+
+describe('isSafeEmailUrl', () => {
+  it.each([
+    ['https://partners.example.com/x?y=1', true],
+    ['http://localhost:3004/x', true],
+    ['javascript:alert(1)', false],
+    ['ftp://example.com', false],
+    ['/relative', false],
+    ['', false],
+  ])('%s -> %s', (url, expected) => {
+    expect(isSafeEmailUrl(url)).toBe(expected);
   });
 });

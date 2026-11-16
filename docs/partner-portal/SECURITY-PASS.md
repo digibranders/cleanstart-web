@@ -8,19 +8,25 @@ Date: 2026-11-13. Branch `feat/portal-build`. Run by the orchestrator (Wave 2, W
 | Dependency audit after | `pnpm --filter @cleanstart/portal audit:deps` | `0 advisories for apps/portal, 0 high or critical.` |
 | Security headers | `vitest run src/server/security/headers.test.ts src/proxy.test.ts` | 37 passed |
 | CSP unit tests | `vitest run src/server/security/csp.test.ts` | 8 passed |
-| CSP in a browser (development server) | `playwright test e2e/security.spec.ts --project=desktop` | 6 passed (the three header tests and the three `securitypolicyviolation` tests). Full suite: 73 passed, 5 failed, all five accessibility findings that M5.2 owns. |
+| CSP in a browser (development server) | `playwright test e2e/security.spec.ts --project=desktop` | 6 passed (the three header tests and the three `securitypolicyviolation` tests). Historical: a full e2e run during the 2026-11-13 pass (before commit `2c83f7f3`) reported 73 passed and 5 failed accessibility findings; no log of that run is kept and it has not been repeated since, so treat it as unverified. |
 | CSP in a browser (production build) | a one-off Playwright script against `next start`, signed out, as a partner admin and as a partner manager, 15 routes including `/apply` with Turnstile | 0 `securitypolicyviolation` events |
 | CSP header on a production build | `next start` with production variables, `curl /sign-in` | every `<script>` and stylesheet link carries the request nonce; the header carries `strict-dynamic`, HSTS and `upgrade-insecure-requests` |
 | Cookie flags | `auth-session.test.ts` "session cookie" | passed (8 in the file) |
 | Session fixation and logout | `auth-session.test.ts` "session fixation and logout" | passed |
 | No account discovery | `auth.test.ts` "sign in gate" (W0-f) | passed |
 | Rate limits: sign in, second step, per email | `auth.test.ts` "rate limits" (W0-f), `auth-session.test.ts` "which client address is trusted" | passed |
-| Rate limits: public actions | `rate-limit-coverage.test.ts` | 5 passed |
+| Rate limits: public actions | `rate-limit-coverage.test.ts` | 20 passed on 2026-11-16 (the stricter round 2 version: comments stripped, every `ctx.ip` use checked, `invite-preview.ts` scanned, bypass fixtures) |
 | Client address is not spoofable | `client-ip.test.ts`, `proxy.test.ts` "client address header", production smoke (below) | passed |
-| Isolation matrix | `vitest run src/server/repo/isolation.test.ts` | 31 passed. The matrix ran against the freshly migrated local test database, built by the same `migrate.ts` and `rls.sql` as production; there is no staging database (CLAUDE.md deploy rules). |
+| Isolation matrix | `vitest run src/server/repo/isolation.test.ts` | 31 tests passed, measured again on 2026-11-16 (portal round 2, branch `feat/portal-s` cut from `47cc7d4a`). The global setup migrates the test database with `migrate.ts` and `rls.sql`, the same inputs as production; there is no staging database (CLAUDE.md deploy rules). |
 | Tracked env files, secret scan | the two greps in plan 06 M5.1 step 9 | both print nothing, `exit=1` |
 
 Production smoke on a real `next start` (production variables, `PORTAL_TRUSTED_PROXY_HOPS=1`): twelve sign in attempts with a different leftmost `X-Forwarded-For` entry and the same last entry returned `401` ten times and then `429` twice; a request with another last entry still got `401`. `/api/health` answered `200` with `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'` and HSTS.
+
+## Verification status (2026-11-16)
+
+Re-measured in round 2: the isolation matrix (31 passed) and the dependency audit (`audit:deps` now audits production and development dependencies and fails with exit 2 when the registry cannot be read; 0 advisories for apps/portal). The per file test counts in the table above are from 2026-11-13 and have changed since (several of those files gained cases in round 2), so they are history, not a current count.
+
+Not re-verified in round 2, and not provable from the repository: the Playwright runs (development server, production build and the 15 route CSP check), the production smoke with `PORTAL_TRUSTED_PROXY_HOPS=1`, and the two greps in plan 06 M5.1 step 9. They were run by hand on 2026-11-13 and left no log in the repository.
 
 ## What changed
 
