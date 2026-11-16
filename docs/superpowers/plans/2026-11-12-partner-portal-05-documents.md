@@ -1027,7 +1027,7 @@ git diff --name-only feat/portal-build
 
 Expected: lint, typecheck, test and build exit 0; the dash grep prints nothing; the name list contains only the paths in this task's Files block and the plan file.
 
-- [ ] **Step 24: Manual check (no screen in this task; the route is checked with seed-dev data)**
+- [x] **Step 24: Manual check (no screen in this task; the route is checked with seed-dev data)**
 
 1. `lsof -nP -iTCP:3234 -sTCP:LISTEN` shows nothing, then `pnpm --filter @cleanstart/portal exec next dev --port 3234`. With `R2_*` unset (development default) the checks below show the 502 case.
 2. Find two ids (read with the system setting, because `portal_app` sees nothing without an identity): `PGOPTIONS='-c app.kind=system' psql "$DATABASE_URL" -c "select id, title from documents where title in ('Competitive battlecard','Gulf region price list')"`.
