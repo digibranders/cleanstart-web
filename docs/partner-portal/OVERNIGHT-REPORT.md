@@ -6,6 +6,20 @@ Written on 2026-11-13 (IST) by the Wave 2 final verification session (task V). B
 
 The portal is built and runs locally end to end against a fake HubSpot: apply, approve, invite, accept, register a deal, accept the deal, create it in HubSpot, move its stage there and see it on the partner page, request and grant an extension. Every check in step 1 passes on the final tree (1682 unit tests, 78 browser tests, 0 dependency advisories). It has never run against anything real: not HubSpot, R2, Brevo, Turnstile, Google or Microsoft sign in, the droplet, Caddy, Cloudflare, or GitHub Actions. A person must do the droplet and key work first (section "What a person must do next"), then run the HubSpot checklist against a developer account, then the pilot.
 
+
+## Round 2 update (2026-11-16)
+
+A second round ran on `feat/portal-build` after the product owner's decisions. Nothing was pushed.
+
+- **Sign in is email and password only.** Google and Microsoft sign in are removed: provider code, env variables, buttons, OAuth callback handling, tests, the deploy render step and the docs. Better Auth stays with the password rule, rate limits, optional two-step and password reset. An independent reviewer read the Better Auth code: with no providers the social endpoints answer `PROVIDER_NOT_FOUND` and cannot create a user or session.
+- **HubSpot answers recorded** in `HUBSPOT-CAPABILITIES.md`: (b) poll only, no webhook subscription; (d) unique-value properties allowed, so provisioning runs without `--no-unique` (the flag is deleted); (a) association labels: UI check passed, flag stays off; (c) and (e) stay `UNVERIFIED`.
+- **`env.ts` production checks** (authorised by the product owner): https `APP_URL` (loopback excepted, parsed hostname, look-alike hosts refused), and one missing-variable message naming `DATABASE_URL`, `AUTH_SECRET`, `DATABASE_OWNER_URL` and `APP_URL`.
+- **Manual click-through steps run in a headless browser** against the seeded app: identity (nine steps), registrations and documents (eight). All pass except M3.2 Step 41, which needs a real R2 bucket and stays unticked. Five defects were found and fixed with tests: invite acceptance for a seeded `invited` user, the render after a password change using the revoked session (`getViewer` now reads `cookies()`), removal leaving an open invite usable, `listStaff` managed-partner counts, and the deal page showing the wrong accepted date and length after a granted extension.
+- **E2E suite re-reviewed** by an independent reviewer (5 must-fix, 8 should-fix, all fixed): the env-file refusal now uses Next's own loader, scans assert the page rendered, the CSP collector sees every page, tenant search and journey assertions are real, hydration waits replace races, and an intermittent axe contrast failure was root-caused (the page's own fade-in was still running when axe scanned) and fixed. The suite is 116 scenarios (92 desktop, 24 mobile).
+- **M5.1 security pass re-reviewed** by an independent reviewer: no must-fix. Follow-ups done: `audit-portal.mjs` fails closed and audits dev dependencies, a stricter rate-limit coverage test, proxy path tests (and a real fix: encoded paths such as `/%61dmin/...` now get the session redirect), email builders throw on unsafe links, subjects are sanitised and capped, Sentry and log redaction widened, job lock error masking fixed, job schedules pinned.
+- **Final checks on the merged tree (2026-11-16):** lint, typecheck and 1831 unit tests pass, the build exits 0, `verify-copy` is ok, the dependency audit reports 0 advisories, and the Playwright suite passes 116 of 116 (after the animation fix it was run on the final tree). The isolation matrix is part of the unit run. Docker and CI were not re-run.
+- **Still needs a person:** everything in "What a person must do next" (droplet, GitHub settings, real keys, HubSpot smoke and provisioning against portal 245478611, backups, legal text, screen reader pass), plus: a real R2 bucket for M3.2 Step 41; `HUBSPOT_WEBHOOK_SECRET` is still required in production by `env.ts` although nothing subscribes (make it optional if you want); delete any unused `PORTAL_GOOGLE_*` and `PORTAL_MICROSOFT_*` GitHub settings; the "Keep me signed in" default stays ticked (the product owner chose).
+
 ## Step 1: checks on the final tree
 
 Run in the worktree on 2026-11-13 between 14:03 and 14:15 IST. The unit run, lint, typecheck and build were repeated after the last test commit (`8d5f7bf5`); the other commands ran on `43f5cbad`, which differs only by that one test.
@@ -43,7 +57,7 @@ Source: the progress log (`docs/partner-portal/PROGRESS.md`). "Gates" is Gate A 
 | M0.3 | `cb45f3e5`, `7996814b` | A ok, B ok | 25 tables, row level security, roles, `0000_init`, `db-create.sh`, seed |
 | M0.4 | `7cdb4544`, `858df971` | A ok, B ok | env example, logger, Sentry config, job stubs |
 | M1.2 | `c2489ba6`, `ffa225a2`, `bd85850d` | A ok, B ok | tenant layer, rate limiter, isolation matrix |
-| M0.7 | `3f26adaa`, `ed26e02d` | A ok, B ok | Better Auth kept; OAuth `PROVISIONAL (OAuth unverified)` |
+| M0.7 | `3f26adaa`, `ed26e02d` | A ok, B ok | Better Auth kept. Google and Microsoft sign in were removed on 2026-11-16 by decision of the product owner: sign in is email and password only (see the round 2 update) |
 | M1.1a to M1.1c | `56774e70`, `7f0b6f60`, `5f77cfb1`, `7b2c3cf2` | A ok, B fixed | passwords, policies (355 cell tests), sign in gate |
 | M1.1d, M1.1e | `d8daa59b`, `a5c8da84`, `f03ced75` | A ok, B must-fix fixed | open redirect through dot segments in `safeNext` fixed |
 | M1.1f, M1.1g | `6e11955d`, `fa326d0e`, `61501ee9` | A ok, B fixed | shell, layouts, real sign in screen |
@@ -92,14 +106,14 @@ Not planned, left to a person: M0.1 (HubSpot capability check, stub only), M5.6 
 |---|---|---|
 | M4.2 steps 8 and 9 | A | Was blocked on H4.10. Resolved: done in `6658527b` after H4.10 merged. Nothing needed now. |
 | M1.4 enqueue steps | P | Was blocked on H4.4. Resolved: done in `8330c8d5`. Nothing needed now. |
-| M5.1 `env.ts` check | O | Still open. Contracts K.3 says nobody edits `src/env.ts` after M0.3. Wanted change: in the production check require `APP_URL` to start with `https://` (loopback excepted), and name `DATABASE_OWNER_URL` in the first missing-variable message. Done instead: `assertSecureAppUrl` in `auth.ts` (the first auth use fails in production) and `deploy-portal.yml` fails its render step when `APP_URL` is not https. Needs a contracts owner decision. |
+| M5.1 `env.ts` check | O | Done on 2026-11-16 (the product owner authorised the edit): in production `APP_URL` must be https (loopback excepted) and the first missing-variable message names `DATABASE_URL`, `AUTH_SECRET` and `DATABASE_OWNER_URL` together. History: it was blocked by contracts K.3. |
 
 Manual steps left unticked in the plans (the code and its automated tests are done; each step needs a person, a credential or a live service):
 
 | Plan task | Unticked step | Why |
 |---|---|---|
 | HubSpot 4.1 | Step 6, dry run then apply against a developer account | needs a HubSpot developer account token |
-| HubSpot 4.9 | Step 5, webhook subscription and the Cloudflare skip rule | needs the private app and the production host |
+| HubSpot 4.9 | Step 5, webhook subscription and the Cloudflare skip rule | not needed: the product owner decided on 2026-11-16 to poll only and not subscribe. The receiver stays deployed and unsubscribed |
 | HubSpot 4.10 / section 6 | ten checklist lines | see the table below; none ticked, because six need a live HubSpot |
 | 02 M0.7-F | Steps 1 to 9 | Auth.js fallback, not needed: Better Auth passed the spike |
 | 03 M1.3, M1.4, M1.5, M1.6, M1.7, M1.7b, M1.8, M4.1 | the "Manual check" step of each (21, 18, 22, 18, 17, 12, 10, 14) | click-through on seed data not run; the repo and action tests and the E2E journey cover the same flows |
@@ -112,9 +126,9 @@ Manual steps left unticked in the plans (the code and its automated tests are do
 
 | Item | Why it could not be verified |
 |---|---|
-| Google and Microsoft sign in (M0.7) | `PROVISIONAL (OAuth unverified)`. Needs dev OAuth apps. The provider code is behind environment variables and was never run against a provider. `MICROSOFT_TENANT_ID` defaults to `common`: set CleanStart's tenant or `organizations` before enabling it for partners. |
-| HubSpot capabilities, master task M0.1 | `docs/partner-portal/HUBSPOT-CAPABILITIES.md` is a stub: all five answers `UNVERIFIED` (association labels, webhooks on our plan, unique property, rate limit, `hs_lastmodifieddate` search). Fallbacks are in the stub. Answer e (search by modified date) has no fallback: the inbound poll depends on it. |
-| HubSpot against a live portal | `provision-hubspot.ts` (H4.1 step 6), `hubspot-smoke.ts` and the webhook subscription (H4.9 step 5) were never run. The webhook header names and which secret signs a private app's webhooks are `UNVERIFIED` (checked only against the plan's assumptions). |
+| Google and Microsoft sign in (M0.7) | Removed on 2026-11-16 (product owner decision). Nothing to verify. The unused `PORTAL_GOOGLE_*` and `PORTAL_MICROSOFT_*` GitHub variables and secrets, if they were ever created, can be deleted; an existing `portal.env` on the droplet may still hold the old variables, which `env.ts` ignores. |
+| HubSpot capabilities, master task M0.1 | `docs/partner-portal/HUBSPOT-CAPABILITIES.md`: (a) association labels: UI check passed on 2026-11-16 (custom labels can be created; not yet tried through a private app token; the build default `HUBSPOT_USE_ASSOCIATION_LABELS=false` stays); (b) webhooks: decided poll only, no subscription; (d) unique-value properties: allowed, reported by the product owner (no screenshot); (c) rate limit and (e) `hs_lastmodifieddate` search: `UNVERIFIED`. Answer e has no fallback: the inbound poll depends on it, so the smoke script must run against the real portal before the pilot. |
+| HubSpot against a live portal | `provision-hubspot.ts` (now run without `--no-unique`; H4.1 step 6) and `hubspot-smoke.ts` were never run. There is no webhook subscription (poll only). The webhook header names and signing secret for a private app stay `UNVERIFIED`, now moot while unsubscribed. |
 | Cloudflare R2 | The adapter was verified offline. No real upload, download, CORS, `HEAD` content type or ranged read. The bucket `cleanstart-partner-docs` does not exist yet. |
 | Brevo | The adapter was tested against a stubbed `fetch`. No real send. The sender and droplet address are not set up. |
 | Cloudflare Turnstile | Cloudflare's always-pass test keys only, in development and test. The production widget and key do not exist. |
@@ -164,9 +178,9 @@ Counts: PASS (automated) 4 (lines 6, 7, 8, 10), PARTIAL (automated) 5 (lines 1 t
 | Task | Finding | Why deferred | Owner |
 |---|---|---|---|
 | M0.3 | review nits 5 and 6 | cosmetic, skipped | none |
-| M0.4 | `env.ts` check does not name `DATABASE_OWNER_URL` until `DATABASE_URL` and `AUTH_SECRET` are set; log redaction nits | `env.ts` is frozen by contracts K.3 (same item as the blocked M5.1 line) | contracts owner |
+| M0.4 | `env.ts` check did not name `DATABASE_OWNER_URL` until `DATABASE_URL` and `AUTH_SECRET` were set; log redaction nits | fixed on 2026-11-16 (env check) and in package S (redaction) | done |
 | M1.2 | the isolation test's unchanged-probe does not snapshot untouched rows (contract F.6 change request); nits 4 to 8 | contract text change | contracts owner |
-| M0.7 | two-step lockout untested; `MICROSOFT_TENANT_ID` defaults to `common` | documented in `auth.ts`, runbook and SECURITY-PASS | operator, before enabling Microsoft |
+| M0.7 | two-step lockout untested | Better Auth's default lockout is on; no test covers it | operator or a later pass |
 | M1.1a to M1.1c | D.3 and D.4 differ on the wording for a null region; the code follows D.4 | contract text discrepancy | contracts owner |
 | M1.1a to M1.1c | per-IP limits trusted `x-forwarded-for` | fixed in M5.1 with `PORTAL_TRUSTED_PROXY_HOPS`; the model still depends on Caddy overwriting `X-Forwarded-For` and the firewall admitting Cloudflare only, which nobody could test | operator, first deploy |
 | M5.1 | in the app's own `rateLimit()` an IPv6 client is keyed by full address, not /64 | a client with a /64 can rotate there; the per email and per domain limits still apply; Better Auth's limiter does normalise to /64 | later |
@@ -179,7 +193,7 @@ Counts: PASS (automated) 4 (lines 6, 7, 8, 10), PARTIAL (automated) 5 (lines 1 t
 | M2.2 | reject reason prefill is neutral and no longer names the rival partner | deliberate deviation from the plan text (avoids cross-tenant disclosure) | product owner to confirm |
 | M2.3 | a partner message on a deal with no manager notifies nobody | the plan names a fallback only for submissions | product owner |
 | H4.4 | `enqueue` uses `ON CONFLICT DO NOTHING` without a target, because partner transactions have no SELECT policy on `hubspot_outbox` | signature unchanged; contracts G and plan 4.4 wording should say so (change request) | contracts owner |
-| H4.9 | webhook header names and signing secret for a private app unverified | needs a live app | person with HubSpot access |
+| H4.9 | webhook header names and signing secret for a private app unverified | moot while the receiver stays unsubscribed (poll only); needs a live app if subscribing later | person with HubSpot access |
 | M3.1, M3.2 | an open is recorded without de-duplication; the download toast cannot see the response; other nits not recorded in the log | S1 and S2 were fixed; the rest is an accepted v1 limit (contracts M.5 item 28) | later |
 | M4.2 | the audit note for a retry does not carry the op counts | needs a change in `repo/integration-health.ts` | later |
 | M5.2 | one vitest run showed one unidentified failure, then four clean reruns | the flaky hubspot-outbox test was root-caused and fixed in `a1318946` (database `now()` has microseconds, the app clock milliseconds); the unidentified one may have been the same | watch in CI |
@@ -237,4 +251,4 @@ The full list is "Handover checklist for a person" at the end of Part 2 of `docs
 2. GitHub: every variable and secret in runbook section 2 (use the `PORTAL_` secret names), set `PORTAL_DEPLOY_ENABLED=true`, run the deploy once by hand, and check the first Portal CI run and the first Docker build on GitHub (neither has ever run).
 3. Real keys: the private R2 bucket and its scoped token, Brevo sender, Turnstile widget, Sentry DSN, the CMS service user for website intake, and the HubSpot private app, capability check (M0.1), provisioning dry run and apply, webhook subscription, and the section 6 checklist above. Explicit go-ahead before anything touches production HubSpot.
 
-Then: backups (copy `backup.sh`, dry run, real run, confirm the heartbeat, run the restore drill), the Google and Microsoft OAuth apps, the legal text and its version label, a 30 minute screen reader pass, and the decisions above. M5.6 (pilot), M5.7 (production provisioning) and M5.8 (cutover) follow.
+Then: backups (copy `backup.sh`, dry run, real run, confirm the heartbeat, run the restore drill), the legal text and its version label, a 30 minute screen reader pass, and the decisions above. M5.6 (pilot), M5.7 (production provisioning) and M5.8 (cutover) follow.
