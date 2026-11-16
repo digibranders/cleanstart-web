@@ -19,7 +19,7 @@ const PAGE_CLASS =
  */
 function ReportStack(): React.ReactElement {
   return (
-    <div className="group relative mx-auto aspect-[1/1.04] w-[90%] max-w-[440px] lg:max-w-[500px]">
+    <div className="group relative mx-auto aspect-[1/1.04] w-[90%] max-w-[440px] lg:max-w-[500px] min-[1360px]:ml-0">
       <div
         aria-hidden
         className="pointer-events-none absolute -left-[12%] top-[2%] h-[62%] w-[62%] rounded-full opacity-90 blur-[56px]"
