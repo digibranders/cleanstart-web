@@ -1,0 +1,96 @@
+/*
+ * Pictures drawn from the report's own numbers. Every rule here has a final
+ * state that applies with no script and under reduced motion; the "waiting"
+ * state only exists once the page has hydrated and the picture is still below
+ * the fold, so nothing is ever stranded invisible.
+ */
+
+.root {
+  display: block;
+}
+
+.col {
+  opacity: 1;
+}
+
+/* Components: every dot starts as a live component, the aged share goes hollow. */
+.estate .base {
+  fill: #2cc1eb;
+  fill-opacity: 0.92;
+}
+
+.estate .marked {
+  fill: #2cc1eb;
+  fill-opacity: 0.06;
+  stroke: #b19cff;
+  stroke-opacity: 0.85;
+  stroke-width: 1.1;
+}
+
+/* Tested recommendations: all cells are dim, the valid and clean ones are lit. */
+.assure .base {
+  fill: #ffffff;
+  fill-opacity: 0.1;
+}
+
+.assure .marked {
+  fill: #2cc1eb;
+  fill-opacity: 1;
+}
+
+/* Bars: two columns that grow from the floor. No track behind them. */
+.bar {
+  transform-origin: bottom;
+}
+
+.barLabel {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .col {
+    transition: opacity 0.5s ease-out;
+    transition-delay: calc(var(--col) * 14ms);
+  }
+
+  .estate .marked,
+  .assure .marked {
+    transition:
+      fill 0.8s ease,
+      fill-opacity 0.8s ease,
+      stroke-opacity 0.8s ease;
+    transition-delay: calc(900ms + var(--col) * 9ms);
+  }
+
+  .root[data-state="waiting"] .col {
+    opacity: 0;
+  }
+
+  .root[data-state="waiting"].estate .marked {
+    fill-opacity: 0.92;
+    stroke-opacity: 0;
+  }
+
+  .root[data-state="waiting"].assure .marked {
+    fill: #ffffff;
+    fill-opacity: 0.1;
+  }
+
+  .bar {
+    transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: var(--delay, 0ms);
+  }
+
+  .barLabel {
+    transition: opacity 0.5s ease-out;
+    transition-delay: calc(var(--delay, 0ms) + 700ms);
+  }
+
+  .root[data-state="waiting"] .bar {
+    transform: scaleY(0);
+  }
+
+  .root[data-state="waiting"] .barLabel {
+    opacity: 0;
+  }
+}
