@@ -60,6 +60,7 @@ export async function viewerFromHeaders(requestHeaders: Headers): Promise<Viewer
 export const getViewer = cache(async (): Promise<Viewer | null> => {
   // The cookie comes from cookies(), not from the request header: after a server action replaced the session
   // (a password change), the render that follows must see the new cookie, and the header still holds the old one.
+  // In an action phase cookies().toString() appends attributes to cookies set earlier in the request (harmless to Better Auth); the render phase uses the clean request cookies.
   const requestHeaders = new Headers(await headers());
   requestHeaders.set('cookie', (await cookies()).toString());
   return viewerFromHeaders(requestHeaders);
