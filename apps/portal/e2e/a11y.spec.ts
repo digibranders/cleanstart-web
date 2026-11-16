@@ -2,7 +2,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, type Page, test, type TestInfo } from '@playwright/test';
 import { seededRegistrationId, seedInviteToken } from './support/db';
 import { KESTREL, PERSONAS, type PersonaKey } from './support/env';
-import { expectRedirectedTo, expectRendered, fillApplication, hydrated, openSearchPalette, pathOf, settled } from './support/ui';
+import { animationsSettled, expectRedirectedTo, expectRendered, fillApplication, hydrated, openSearchPalette, pathOf, settled } from './support/ui';
 
 /**
  * Accessibility: axe on every route as the role that uses it, then the keyboard behaviour axe cannot see.
@@ -43,6 +43,7 @@ const GROUPS: Group[] = [
 
 async function scan(page: Page, label: string, testInfo: TestInfo, path: string): Promise<void> {
   await expectRendered(page, path);
+  await animationsSettled(page);
   const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
   const blocking = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
   const advisory = results.violations.filter((v) => v.impact !== 'serious' && v.impact !== 'critical');
