@@ -1,5 +1,5 @@
 import { JsonLdGraph } from "@/components/JsonLdGraph";
-import { ReportLanding } from "@/components/sections/resource/dependency-trust-report/ReportLanding";
+import { DependencyTrustLanding } from "@/components/sections/resource/dependency-trust/DependencyTrustLanding";
 import type { ReportGateConfig } from "@/components/sections/resource/dependency-trust/ReportGate";
 import { buildPageMetadata, SITE_URL } from "@/lib/seo/canonical";
 import { getPageGraph } from "@/lib/seo/compose-page";
@@ -56,7 +56,7 @@ export default async function DependencyTrustReportPage(): Promise<React.ReactEl
   return (
     <>
       <JsonLdGraph id="dependency-trust-report-jsonld" graph={graph} />
-      <ReportLanding gate={GATE} />
+      <DependencyTrustLanding gate={GATE} />
     </>
   );
 }
