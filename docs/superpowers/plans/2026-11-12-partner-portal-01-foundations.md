@@ -1,5 +1,7 @@
 # Partner portal foundations Implementation Plan
 
+> **Update 2026-11-16:** Google and Microsoft sign-in were removed by decision of the product owner. Sign in is email and password with the optional second step. Every mention of Google, Microsoft, OAuth, social sign in, the `GOOGLE_*` and `MICROSOFT_*` variables or `PROVISIONAL (OAuth unverified)` below is historical and no longer applies; the code, `.env.example` and `deploy-portal.yml` no longer carry them (see `docs/partner-portal/AUTH-SPIKE.md`).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build Wave 0 of the real partner portal on `feat/portal-build`: the tagged and restructured app with every dependency installed once (M0.2), the database with roles, migrations, row level security, test helpers, a dev seed and `db-create.sh` (M0.3), the environment, logging, Sentry and the job infrastructure (M0.4), and the tenant isolation layer with the isolation registry and matrix (M1.2). When this plan is done, every later track can write repo functions, actions and jobs without touching a shared file.

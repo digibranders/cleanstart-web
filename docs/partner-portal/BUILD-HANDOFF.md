@@ -66,7 +66,7 @@ These override the plans where they differ.
 | Item | Overnight form | Left for a person |
 |---|---|---|
 | M0.1 HubSpot capability check | Skip. Write `docs/partner-portal/HUBSPOT-CAPABILITIES.md` as a stub where each of the five answers is marked `UNVERIFIED` and names the fallback the HubSpot plan already provides (association labels off, polling only, and for the unique property the fallback in HubSpot plan section 5). | Run the check on a HubSpot developer account. |
-| M0.7 auth spike | Prove email and password, email one-time code, database sessions and `getViewer()` locally. Google and Microsoft sign-in cannot be proven without a dev OAuth app: write the provider config behind env vars and mark the spike result `PROVISIONAL (OAuth unverified)`. Better Auth is kept if the other items pass. | Create the dev OAuth apps and confirm. |
+| M0.7 auth spike | Prove email and password, email one-time code, database sessions and `getViewer()` locally. Google and Microsoft sign-in were removed on 2026-11-16 by decision of the product owner: sign in is email and password only, so there is no OAuth step and the spike result is not provisional. Better Auth is kept if the other items pass. | Nothing. |
 | Droplet, Caddy, Cloudflare, resize, DNS (M0.3, M0.6) | Write the files in the repo only (compose service, Caddy block as a snippet in `docs/operations/PARTNER-PORTAL.md`). Never `ssh`. | Everything on the droplet. |
 | M0.6 workflows | Write `portal.yml` and `deploy-portal.yml`. They cannot run before a push. | First CI run and first deploy. |
 | M1.3b website intake | Test against a local stub HTTP server that mimics the CMS REST shape. No CMS service user exists. | Create the CMS service user and API key. |

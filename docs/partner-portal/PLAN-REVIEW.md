@@ -139,7 +139,7 @@ This is a copy of contracts M.5.
 | 7 | `node-cron` started from `instrumentation.ts` runs once per process, not in `next build`; `register()` in `next start` and in the standalone image (M.1 14, 18; 01 5; U2, U3, U13) | W0-c, M0.4 Step 16; standalone in A, M0.6 Step 12 | start the scheduler from a small custom server entry; copy `drizzle/` and `rls.sql` explicitly in the Dockerfile |
 | 8 | Next 16 server actions: `revalidatePath` after the handler returns, plain objects reach a client component, `'use server'` exports (M.1 8, 9; 01 9; 05 2) | W0-d, M1.2b Step 2, then the first converted screen | call `revalidatePath` inside the handler; `router.refresh()` in the client |
 | 9 | Better Auth with `users` as the user model, Postgres generated ids, the `auth_*` table shapes, scrypt hashing, accept-invite credential rows, `twoFactor` TOTP with 10 backup codes (M.1 2 to 5; 02 1; 01 2) | W0-e, M0.7 Steps 1 to 11 (the S1 to S7 gate) | `auth_user` table; default hasher; email-code second step; Auth.js v5 (M0.7-F, unrun code) |
-| 10 | Google and Microsoft sign in end to end, including the Entra optional claims `email` and `xms_edov` (M.1 6; 02 2) | a person, with dev OAuth apps (result stays `PROVISIONAL (OAuth unverified)`) | Google only, or Auth.js |
+| 10 | Google and Microsoft sign in end to end, including the Entra optional claims `email` and `xms_edov` (M.1 6; 02 2) | nobody: removed 2026-11-16, there is no OAuth sign in to verify | Google only, or Auth.js |
 | 11 | The Next 16 `proxy.ts` runs on Node, `getSessionCookie` reads the cookie, the path header name `x-middleware-request-x-portal-path` (M.1 7; 02 6) | W0-f, M1.1e Steps 2 and 6 | proxy only checks that a session cookie exists; read `x-middleware-override-headers` |
 | 12 | Real Postgres RLS against the plan 02 tests that ran on PGlite: the `getShell` isolation probe and the manager and `staff_scopes` lookup as a partner (02 3) | W0-f, M1.1d Steps 8 and 9 | report `blocked`, do not weaken the test; check the policies against C.3 |
 | 13 | The per IP limit key behind Caddy and Cloudflare trusts `x-forwarded-for` (02 5; U6) | M5.1 (W2-c), then the first real request after deploy | `trusted_proxies` for Cloudflare ranges; `advanced.ipAddress.ipAddressHeaders` |
@@ -173,7 +173,7 @@ This is a copy of contracts M.5.
 6. **Deal rules to confirm** (all in `deal-rules.ts`): 90 day protection counting the acceptance day, one 30 day extension, 2 business day review target, UTC calendar (a registration submitted between 00:00 and 05:30 IST carries the previous Indian date), a partner manager may decide any region, only partner managers manage CleanStart staff, staff marketing may upload documents, a technical partner user sees no deals. Recommendation: confirm with the core team before the pilot.
 7. **Email is best effort with no email outbox** (contracts M.3 item 15): a crash between commit and send loses that email; invites and resets have a resend, deal emails have the in-app notification. Recommendation: accept.
 8. **Plans must be committed and pushed to `development` before the run** (the worktree is cut from `origin/development` and Wave 0 copies code out of the contracts file). They are untracked today.
-9. **Operator tasks the build cannot do:** Google and Microsoft OAuth apps (including the Entra claims `email` and `xms_edov`), the CMS service user and API key for website intake, Turnstile production keys, the private R2 bucket and CORS, the production HubSpot private app and webhook secret, the Brevo sender, DNS and Caddy for `partners.cleanstart.com`.
+9. **Operator tasks the build cannot do:** the CMS service user and API key for website intake, Turnstile production keys, the private R2 bucket and CORS, the production HubSpot private app and webhook secret, the Brevo sender, DNS and Caddy for `partners.cleanstart.com`.
 
 ## (f) Residual risks I could not resolve
 
@@ -192,10 +192,10 @@ This is a copy of contracts M.5.
 
 1. pnpm editing `pnpm-workspace.yaml` or rejecting `better-auth@1.7.22` at install (fallback written).
 2. The first real run of drizzle-kit on the full schema or of the RLS script (M.5 rows 3 to 5); the plans carry fallbacks, but a failure there blocks everything after it.
-3. The Better Auth spike (M.5 row 9): OAuth stays `PROVISIONAL`, the rest has a fallback chain ending in Auth.js.
+3. The Better Auth spike (M.5 row 9): OAuth was removed on 2026-11-16, so the result is no longer provisional; the rest has a fallback chain ending in Auth.js.
 4. Local Postgres or disk state on the Mac (the memory notes a machine-wide `node_modules` wipe on 1 October: run `ls node_modules` before blaming a Turbopack crash).
 
-Wave 1 can start from the `portal-w0` tag with the orders above. The droplet changes, the production HubSpot app, the OAuth apps and the CMS service user are not on the critical path of the build.
+Wave 1 can start from the `portal-w0` tag with the orders above. The droplet changes, the production HubSpot app and the CMS service user are not on the critical path of the build.
 
 ## What was and was not checked
 
