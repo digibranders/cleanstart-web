@@ -132,6 +132,17 @@ describe('acceptInvite', () => {
     expect(row?.acceptedAt).toBeNull();
   });
 
+  it('adopts the invited user row that sits beside an open invite (the dev seed shape) and activates it', async () => {
+    const { partner, token } = await firstAdmin();
+    const pending = await makeUser(db, { partnerId: partner.id, email: 'yasmin.haddad@qamarsolutions.ae', status: 'invited', role: 'partner_admin' });
+    const result = await accept(token);
+    expect(result.userId).toBe(pending.id);
+    const [user] = await db.select().from(users).where(eq(users.id, pending.id));
+    expect(user).toMatchObject({ status: 'active', name: 'Yasmin Haddad', emailVerified: true });
+    const accounts = await db.select().from(authAccounts).where(eq(authAccounts.userId, pending.id));
+    expect(accounts.map((a) => a.password)).toEqual(['scrypt$test$hash']);
+  });
+
   it('gives a removed person their account back with the new password and no two-step secret', async () => {
     const partner = await makePartner(db, { status: 'active' });
     const gone = await makeUser(db, { partnerId: partner.id, email: 'back@example.com', status: 'disabled', role: 'sales', password: 'OldPassw0rd!' });
