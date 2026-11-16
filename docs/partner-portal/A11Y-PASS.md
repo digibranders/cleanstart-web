@@ -30,12 +30,12 @@ Two older suppressions for `noAutofocus` in `SignIn.tsx` (the one-field code and
 
 ## Axe
 
-Axe runs on 25 pages as the role that uses each (WCAG 2.0 and 2.1, levels A and AA; serious and critical fail the test), at 1440 px (`desktop`) and 393 px (`mobile`).
+Axe runs on 24 pages as the role that uses each (WCAG 2.0 and 2.1, levels A and AA; serious and critical fail the test), at 1440 px (`desktop`) and 393 px (`mobile`). Correction from the E2E review (round 2): the first run measured the `mobile` project at Playwright's Pixel 7 width of 412 px, not 393; it is now an explicit 393 px viewport. The same review found that the scans did not check which page they scanned, and that the technical user's `/partner/overview` scan had been scanning `/partner/documents` after a redirect (a technical user may not open the overview). That entry is gone, hence 24 pages instead of 25, and every scan now fails if the browser ended on another route or drew no main landmark. A separate `@a11y access` test per role-limited user checks which routes open and which redirect.
 
 | Project | Pages | Failing before | Failing now |
 |---|---|---|---|
-| desktop 1440 | 25 | 1 (`/apply`) | 0 |
-| mobile 393 | 25 | 3 (`/apply`, `/admin/approvals`, `/partner/deals` as the sales user) | 0 |
+| desktop 1440 | 24 | 1 (`/apply`) | 0 |
+| mobile 393 | 24 | 3 (`/apply`, `/admin/approvals`, `/partner/deals` as the sales user) | 0 |
 
 Fixes:
 
