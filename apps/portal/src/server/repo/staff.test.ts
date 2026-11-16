@@ -76,6 +76,15 @@ describe('changeStaffRole', () => {
     await expect(withViewer(actor, (tx) => changeStaffRole(tx, actor, { userId: sole.id, role: 'sales' }))).rejects.toMatchObject({ reason: 'last_partner_manager' });
   });
 
+  it('still lists the partners a demoted manager manages, so the screen can warn that they need a new manager', async () => {
+    const stays = await asStaff(db, 'partner_manager', 'india');
+    const demoted = await makeUser(db, { kind: 'staff', role: 'partner_manager', region: 'middle_east', name: 'Omar Nasser' });
+    await makePartner(db, { name: 'Dunes Networks', managerId: demoted.id });
+    await makePartner(db, { name: 'Harbourline', managerId: demoted.id });
+    const changed = await withViewer(stays, (tx) => changeStaffRole(tx, stays, { userId: demoted.id, role: 'sales' }));
+    expect(changed).toMatchObject({ role: 'sales', partners: ['Dunes Networks', 'Harbourline'] });
+  });
+
   it('does not find a person who is only invited', async () => {
     const manager = await asStaff(db, 'partner_manager', 'india');
     const { invite } = await makeInvite(db, { kind: 'staff', partnerId: null, role: 'sales', staffRegion: 'india', email: 'k@cleanstart.com', expiresAt: future });

@@ -25,11 +25,12 @@ export async function listStaff(tx: Tx, viewer: Viewer): Promise<StaffMemberDto[
     .from(invites)
     .where(and(eq(invites.kind, 'staff'), isNull(invites.acceptedAt), isNull(invites.revokedAt)))
     .orderBy(asc(invites.createdAt));
-  const managerIds = rows.filter((r) => r.user.role === 'partner_manager').map((r) => r.user.id);
+  // Every person, not only partner managers: a demoted manager keeps the partners until they are reassigned.
+  const staffIds = rows.map((r) => r.user.id);
   const managed =
-    managerIds.length === 0
+    staffIds.length === 0
       ? []
-      : await tx.select({ managerId: partners.managerId, name: partners.name }).from(partners).where(inArray(partners.managerId, managerIds)).orderBy(asc(partners.name));
+      : await tx.select({ managerId: partners.managerId, name: partners.name }).from(partners).where(inArray(partners.managerId, staffIds)).orderBy(asc(partners.name));
 
   const members: StaffMemberDto[] = rows.map(({ user, region }) => ({
     id: user.id,
