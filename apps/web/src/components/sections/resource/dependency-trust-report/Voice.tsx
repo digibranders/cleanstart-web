@@ -92,8 +92,8 @@ export function Voice(): React.ReactElement {
                 <Image
                   src={VOICE.photo}
                   alt={`${VOICE.name}, ${VOICE.role}`}
-                  width={500}
-                  height={602}
+                  width={1000}
+                  height={1206}
                   sizes="(min-width: 1024px) 400px, 260px"
                   className={`${styles.portrait} w-[230px] sm:w-[280px] lg:w-[min(400px,84%)]`}
                 />
