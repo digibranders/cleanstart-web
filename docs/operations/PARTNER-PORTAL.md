@@ -104,7 +104,7 @@ docker compose --profile portal up -d --wait portal
 curl -fsS http://127.0.0.1:3004/api/health
 ```
 
-The render step fails the deploy when `PORTAL_APP_URL` does not start with `https://`. `src/env.ts` does not check the scheme yet (the change is proposed, see `docs/partner-portal/SECURITY-PASS.md`); until it does, an http `APP_URL` in production passes `/api/health` and the deploy smoke test and fails at the first sign in, because `createAuth()` refuses it. If you ever render `portal.env` by hand, check the scheme yourself.
+The render step fails the deploy when `PORTAL_APP_URL` does not start with `https://`, and `src/env.ts` repeats the check at start: in production the app refuses to boot when `APP_URL` is not https (loopback hosts `localhost`, `127.0.0.1` and `[::1]` excepted, for a local smoke test), so an http `APP_URL` can no longer pass `/api/health`. The same check names every missing required variable in one message, `DATABASE_URL`, `AUTH_SECRET` and `DATABASE_OWNER_URL` included. If you ever render `portal.env` by hand, the container will say what is wrong instead of starting.
 
 Migrations only move forward. A release that added a column is rolled back to an image that ignores it; never drop a column in the same release that stops using it.
 

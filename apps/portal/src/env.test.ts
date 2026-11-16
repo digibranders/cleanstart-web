@@ -71,4 +71,37 @@ describe('loadEnv', () => {
     const { HUBSPOT_PORTAL_TOKEN: _omitted, ...rest } = production;
     expect(() => loadEnv(rest)).toThrow(/HUBSPOT_PORTAL_TOKEN is required in production/);
   });
+
+  it('names DATABASE_URL, AUTH_SECRET and DATABASE_OWNER_URL together for a clean production start', () => {
+    expect(() => loadEnv({ NODE_ENV: 'production' })).toThrow(
+      /DATABASE_URL is required[\s\S]*AUTH_SECRET is required[\s\S]*DATABASE_OWNER_URL is required in production/,
+    );
+  });
+
+  it('names DATABASE_OWNER_URL even when only DATABASE_URL is missing in production', () => {
+    const { DATABASE_URL: _omitted, DATABASE_OWNER_URL: _owner, ...rest } = production;
+    expect(() => loadEnv(rest)).toThrow(/DATABASE_URL is required[\s\S]*DATABASE_OWNER_URL is required in production/);
+  });
+
+  it('refuses an http APP_URL in production, naming the variable and the scheme', () => {
+    expect(() => loadEnv({ ...production, APP_URL: 'http://partners.cleanstart.com' })).toThrow(
+      /APP_URL must start with https:\/\/ in production/,
+    );
+  });
+
+  it('accepts an https APP_URL in production', () => {
+    expect(loadEnv({ ...production, APP_URL: 'https://partners.cleanstart.com' }).APP_URL).toBe('https://partners.cleanstart.com');
+  });
+
+  it.each(['http://localhost:3004', 'http://127.0.0.1:3004', 'http://[::1]:3004'])(
+    'accepts a loopback APP_URL in production for a local smoke test: %s',
+    (APP_URL) => {
+      expect(loadEnv({ ...production, APP_URL }).APP_URL).toBe(APP_URL);
+    },
+  );
+
+  it('leaves an http APP_URL alone in development and test', () => {
+    expect(loadEnv({ ...base, APP_URL: 'http://partners.example.test' }).APP_URL).toBe('http://partners.example.test');
+    expect(loadEnv({ ...base, NODE_ENV: 'test', APP_URL: 'http://partners.example.test' }).NODE_ENV).toBe('test');
+  });
 });

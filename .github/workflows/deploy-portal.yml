@@ -136,8 +136,8 @@ jobs:
             exit 1
           fi
 
-          # Secure cookies and the Better Auth origin need https; an http APP_URL would pass the health probe and
-          # fail only at the first sign-in.
+          # Secure cookies and the Better Auth origin need https. src/env.ts refuses an http APP_URL in production too;
+          # this check fails the deploy before the container is built and started.
           case "$APP_URL" in
             https://*) ;;
             *) echo "::error::PORTAL_APP_URL must start with https://"; exit 1 ;;
