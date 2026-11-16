@@ -7419,7 +7419,7 @@ body {
 }
 
 /* How It Works: one 9s cycle. The packet crosses the rail in 6s (stations light
-   at 0, 2, 4, 6s), then the return packet runs the bracket in the last 3s. */
+   at 0, 2, 4, 6s), then rests for the last 3s before the next pass. */
 .cs-pqc-packet {
   opacity: 0;
   animation: cs-pqc-packet 9s linear infinite;
@@ -7440,34 +7440,6 @@ body {
   100% {
     opacity: 0;
     transform: translateX(100cqw);
-  }
-}
-
-.cs-pqc-return {
-  opacity: 0;
-  animation: cs-pqc-return 9s linear infinite;
-}
-
-@keyframes cs-pqc-return {
-
-  0%,
-  67% {
-    opacity: 0;
-    transform: translate(50%, 50%);
-  }
-
-  69% {
-    opacity: 1;
-  }
-
-  98% {
-    opacity: 1;
-    transform: translate(calc(50% - 100cqw), 50%);
-  }
-
-  100% {
-    opacity: 0;
-    transform: translate(calc(50% - 100cqw), 50%);
   }
 }
 
@@ -7539,68 +7511,476 @@ body {
   }
 }
 
-/* Industries accordion. Below xl every panel is a flat, fully lit row. */
-.cs-pqc-panel {
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.05) 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+/* Challenge stage: the dependency stack answers the problem at the middle of the viewport (data-step 0 to 3).
+   Sized in cqw so the scene scales as one piece; slab motion uses transform/filter on an inner wrapper so the float keyframe is untouched. */
+.cs-pqc-ch-stage {
+  container-type: inline-size;
 }
 
-.cs-pqc-panel-icon,
-.cs-pqc-panel-glow,
-.cs-pqc-panel-arrow {
-  transition: scale 500ms cubic-bezier(0.16, 1, 0.3, 1), opacity 400ms ease;
+.cs-pqc-ch-slab {
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
 }
 
-@media (min-width: 1280px) {
-  .cs-pqc-panel {
-    transition: flex-grow 600ms cubic-bezier(0.16, 1, 0.3, 1), border-color 400ms ease, background-color 400ms ease, box-shadow 400ms ease;
-    background: rgba(255, 255, 255, 0.05);
-    box-shadow: none;
-  }
+.cs-pqc-ch-beam {
+  position: absolute;
+  left: 50%;
+  top: 22%;
+  bottom: 9%;
+  width: 2px;
+  translate: -50% 0;
+  border-radius: 999px;
+  transition: opacity 0.5s ease;
+}
 
-  .cs-pqc-panel[data-open="true"] {
-    border-color: rgba(44, 193, 235, 0.5);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.05) 100%);
-    box-shadow: 0 40px 70px -40px rgba(44, 193, 235, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.28);
-  }
+.cs-pqc-ch-beam-a {
+  background: linear-gradient(180deg, rgba(44, 193, 235, 0) 0%, #6ec8ff 30%, #9a51ff 100%);
+  box-shadow: 0 0 18px 2px rgba(110, 200, 255, 0.45);
+}
 
-  .cs-pqc-panel[data-open="false"] .cs-pqc-panel-icon {
-    opacity: 0.72;
-    scale: 0.82;
-  }
+.cs-pqc-ch-beam-b {
+  top: 58%;
+  opacity: 0;
+  background: linear-gradient(180deg, rgba(245, 165, 36, 0) 0%, #f5a524 100%);
+  box-shadow: 0 0 18px 2px rgba(245, 165, 36, 0.5);
+}
 
-  .cs-pqc-panel[data-open="false"] .cs-pqc-panel-glow {
+.cs-pqc-ch-packet {
+  position: absolute;
+  left: 50%;
+  top: 22%;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(circle, #fff 0%, #6ec8ff 55%, #9a51ff 100%);
+  box-shadow: 0 0 14px 4px rgba(110, 200, 255, 0.6);
+  transition: opacity 0.4s ease;
+}
+
+.cs-pqc-ch-links {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.6s ease 0.15s;
+}
+
+.cs-pqc-ch-links path {
+  stroke: #6ec8ff;
+  stroke-width: 0.7;
+  stroke-dasharray: 2.4 2.4;
+}
+
+.cs-pqc-ch-links circle {
+  fill: #151021;
+  stroke: #9a51ff;
+  stroke-width: 0.8;
+}
+
+.cs-pqc-ch-ring {
+  position: absolute;
+  left: 50%;
+  top: 72cqw;
+  width: 92cqw;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(110, 200, 255, 0.45);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+/* 0: a signal runs down through every layer. */
+.cs-pqc-ch-stage[data-step="0"] .cs-pqc-ch-packet,
+.cs-pqc-ch-stage[data-step="3"] .cs-pqc-ch-packet {
+  opacity: 1;
+  animation: cs-pqc-ch-drop 2.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+/* 1: the lower layers age; the signal stops at them. */
+.cs-pqc-ch-stage[data-step="1"] .cs-pqc-ch-slab {
+  filter: sepia(1) saturate(2.4) hue-rotate(-14deg) brightness(0.82);
+}
+
+.cs-pqc-ch-stage[data-step="1"] .cs-pqc-ch-slab[data-layer="0"] {
+  filter: none;
+}
+
+.cs-pqc-ch-stage[data-step="1"] .cs-pqc-ch-beam-b {
+  opacity: 1;
+}
+
+/* 2: the layers pull apart and are joined by links. */
+.cs-pqc-ch-stage[data-step="2"] .cs-pqc-ch-slab {
+  transform: translateX(calc(var(--side) * 6cqw));
+}
+
+.cs-pqc-ch-stage[data-step="2"] .cs-pqc-ch-beam-a {
+  opacity: 0;
+}
+
+.cs-pqc-ch-stage[data-step="2"] .cs-pqc-ch-links {
+  opacity: 1;
+}
+
+.cs-pqc-ch-stage[data-step="2"] .cs-pqc-ch-links path {
+  animation: cs-pqc-ch-dash 1.2s linear infinite;
+}
+
+/* 3: each layer is refreshed in turn, inside a slow ring. */
+.cs-pqc-ch-stage[data-step="3"] .cs-pqc-ch-slab {
+  animation: cs-pqc-ch-refresh 3.6s ease-in-out calc(var(--i) * 0.5s) infinite;
+}
+
+.cs-pqc-ch-stage[data-step="3"] .cs-pqc-ch-ring {
+  opacity: 1;
+  animation: cs-pqc-ch-spin 40s linear infinite;
+}
+
+@keyframes cs-pqc-ch-drop {
+  0% {
+    transform: translateY(0);
     opacity: 0;
   }
 
-  .cs-pqc-panel[data-open="false"] .cs-pqc-panel-arrow {
-    opacity: 0.45;
+  12% {
+    opacity: 1;
+  }
+
+  88% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(70cqw);
+    opacity: 0;
+  }
+}
+
+@keyframes cs-pqc-ch-dash {
+  to {
+    stroke-dashoffset: -4.8;
+  }
+}
+
+@keyframes cs-pqc-ch-refresh {
+  0%,
+  60%,
+  100% {
+    filter: brightness(1);
+    scale: 1;
+  }
+
+  22% {
+    filter: brightness(1.35) saturate(1.2);
+    scale: 1.045;
+  }
+}
+
+@keyframes cs-pqc-ch-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+/* Industries stage: a lit pedestal ringed by two flat orbits, with each industry's
+   icon standing on it. Everything is sized in the stage's own width (cqw) so the scene scales as one piece. */
+.cs-pqc-ind-stage {
+  container-type: inline-size;
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.03) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 50px 90px -50px rgba(8, 4, 40, 0.8);
+}
+
+.cs-pqc-ind-grid {
+  opacity: 0.4;
+  -webkit-mask-image: radial-gradient(closest-side at 50% 64%, #000 35%, transparent 100%);
+  mask-image: radial-gradient(closest-side at 50% 64%, #000 35%, transparent 100%);
+}
+
+.cs-pqc-ind-glow {
+  position: absolute;
+  left: 50%;
+  top: 40cqw;
+  width: 96cqw;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(154, 81, 255, 0.5) 0%, rgba(44, 193, 235, 0.14) 58%, rgba(154, 81, 255, 0) 100%);
+}
+
+.cs-pqc-ind-world {
+  position: absolute;
+  inset: 0;
+  perspective: 1000px;
+}
+
+.cs-pqc-ind-plane {
+  position: absolute;
+  left: 50%;
+  top: 56cqw;
+  width: 80cqw;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) rotateX(68deg);
+  transform-style: preserve-3d;
+}
+
+.cs-pqc-ind-plane > * {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  border-radius: 50%;
+}
+
+.cs-pqc-ind-ring-a {
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(110, 200, 255, 0.34);
+}
+
+.cs-pqc-ind-ring-b {
+  width: 74%;
+  height: 74%;
+  border: 1px solid rgba(154, 81, 255, 0.55);
+  box-shadow: 0 0 40px rgba(154, 81, 255, 0.3), inset 0 0 40px rgba(154, 81, 255, 0.2);
+}
+
+.cs-pqc-ind-disc {
+  width: 46%;
+  height: 46%;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  background: radial-gradient(circle, rgba(154, 81, 255, 0.6) 0%, rgba(71, 30, 192, 0.4) 55%, rgba(110, 200, 255, 0.3) 100%);
+  box-shadow: 0 0 70px rgba(154, 81, 255, 0.55), inset 0 0 0 14px rgba(255, 255, 255, 0.05);
+}
+
+.cs-pqc-ind-pulse {
+  width: 46%;
+  height: 46%;
+  border: 2px solid rgba(110, 200, 255, 0.85);
+  animation: cs-pqc-ind-pulse 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes cs-pqc-ind-pulse {
+  from {
+    scale: 0.7;
+    opacity: 0.9;
+  }
+
+  to {
+    scale: 2.1;
+    opacity: 0;
+  }
+}
+
+.cs-pqc-ind-orbit {
+  animation: cs-pqc-ind-spin 18s linear infinite;
+}
+
+.cs-pqc-ind-orbit-a {
+  width: 100%;
+  height: 100%;
+}
+
+.cs-pqc-ind-orbit-b {
+  width: 74%;
+  height: 74%;
+  animation-duration: 26s;
+  animation-direction: reverse;
+}
+
+@keyframes cs-pqc-ind-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.cs-pqc-ind-dot {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 12px;
+  height: 12px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, #6ec8ff 50%, #2cc1eb 100%);
+  box-shadow: 0 0 16px 5px rgba(110, 200, 255, 0.6);
+}
+
+.cs-pqc-ind-dot-violet {
+  background: radial-gradient(circle, #ffffff 0%, #c9a8ff 50%, #9a51ff 100%);
+  box-shadow: 0 0 16px 5px rgba(154, 81, 255, 0.65);
+}
+
+.cs-pqc-ind-shadow {
+  position: absolute;
+  left: 50%;
+  top: 56cqw;
+  width: 34cqw;
+  height: 6cqw;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(6, 3, 30, 0.6) 0%, rgba(6, 3, 30, 0) 100%);
+}
+
+.cs-pqc-ind-slot {
+  position: absolute;
+  left: 50%;
+  bottom: 18cqw;
+  height: 56cqw;
+  aspect-ratio: 1;
+  translate: -50% 0;
+}
+
+.cs-pqc-ind-icon {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  perspective: 900px;
+  pointer-events: none;
+  transform: translateY(28px) scale(0.9);
+  transition: opacity 500ms ease, transform 750ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cs-pqc-ind-icon[data-active="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+.cs-pqc-ind-tilt {
+  position: absolute;
+  inset: 0;
+  transform: translate3d(calc(var(--px, 0) * 12px), calc(var(--py, 0) * 7px), 0) rotateY(calc(var(--px, 0) * 9deg)) rotateX(calc(var(--py, 0) * -7deg));
+  transition: transform 350ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cs-pqc-ind-row {
+  position: relative;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.cs-pqc-ind-name {
+  display: block;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--font-display);
+  font-size: var(--fs-h4);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  text-wrap: balance;
+  transition: color 300ms ease, translate 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cs-pqc-ind-name:hover {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.cs-pqc-ind-row[data-active="true"] .cs-pqc-ind-name {
+  color: #ffffff;
+  translate: 10px 0;
+}
+
+@media (min-width: 1024px) {
+  .cs-pqc-ind-name {
+    font-size: var(--fs-h3);
+  }
+}
+
+.cs-pqc-ind-go {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  opacity: 0.5;
+  transition: opacity 300ms ease, background-color 300ms ease, border-color 300ms ease;
+}
+
+.cs-pqc-ind-row[data-active="true"] .cs-pqc-ind-go {
+  opacity: 1;
+  border-color: rgba(110, 200, 255, 0.7);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.cs-pqc-ind-go:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.cs-pqc-ind-fill {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #9a51ff, #2cc1eb);
+  transform-origin: left;
+}
+
+.cs-pqc-ind-fill[data-auto="true"] {
+  transform: scaleX(0);
+  animation: cs-pqc-ind-fill 5.5s linear forwards;
+}
+
+[data-paused="true"] .cs-pqc-ind-fill {
+  animation-play-state: paused;
+}
+
+@keyframes cs-pqc-ind-fill {
+  to {
+    transform: scaleX(1);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .cs-pqc-ch-slab,
+  .cs-pqc-ch-beam,
+  .cs-pqc-ch-links,
+  .cs-pqc-ch-ring {
+    transition: none;
+  }
+
+  .cs-pqc-ch-stage .cs-pqc-ch-slab,
+  .cs-pqc-ch-stage .cs-pqc-ch-ring,
+  .cs-pqc-ch-stage .cs-pqc-ch-links path {
+    animation: none;
+  }
+
+  .cs-pqc-ch-stage .cs-pqc-ch-packet {
+    display: none;
+  }
+
 
   .cs-pqc-float,
   .cs-pqc-comet,
-  .cs-pqc-disc::after {
+  .cs-pqc-disc::after,
+  .cs-pqc-ind-orbit {
     animation: none;
   }
 
   .cs-pqc-packet,
-  .cs-pqc-return {
+  .cs-pqc-ind-pulse {
     display: none;
   }
 
-  .cs-pqc-panel {
+  .cs-pqc-ind-icon {
+    transform: none;
+    transition: opacity 300ms ease;
+  }
+
+  .cs-pqc-ind-tilt {
+    transform: none;
     transition: none;
   }
 
-  .cs-pqc-panel-icon,
-  .cs-pqc-panel-glow,
-  .cs-pqc-panel-arrow {
+  .cs-pqc-ind-name,
+  .cs-pqc-ind-go {
     transition: none;
+  }
+
+  .cs-pqc-ind-fill[data-auto="true"] {
+    animation: none;
+    transform: scaleX(1);
   }
 }
 

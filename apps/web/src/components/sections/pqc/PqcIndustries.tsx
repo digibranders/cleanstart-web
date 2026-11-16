@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
@@ -9,20 +9,28 @@ import { Reveal } from '@/components/ui/Reveal';
 import { H2_STYLE } from './type';
 
 /*
- * "Industries We Secure": four industries as an accordion of glass panels on
- * the dark band. One panel is open at a time and it takes the width the others
- * give up; hovering or focusing another passes the open state to it. The open
- * panel lifts its 3D icon to full size and picks up a cyan edge, which is the
- * only thing that moves, so the row reads as a single object with one focus.
+ * "Industries We Secure": a selector and a stage on the dark band.
  *
- * Panels for industries that have a page on this site link to it (Financial
- * Services, Telecommunications); the other two have no page yet and are
- * plain. Below xl (1280px; the narrow panels clip their labels any earlier) every panel is a flat row with its icon, two across from sm, with no accordion.
+ * The four industries are a list of large names on the left. The stage on the
+ * right is one lit pedestal ringed by two orbits (the hero's motif, laid flat),
+ * and each industry's 3D icon stands on it. Choosing a name lifts that icon
+ * onto the pedestal and sends a ring pulse outward; the previous icon sinks
+ * away. Moving the mouse over the stage tilts the icon a few degrees.
+ *
+ * With no input the stage walks through the four in turn. The active name's
+ * underline fills as the timer, and the walk stops for good the moment the
+ * visitor picks one, and pauses while the pointer or focus is inside, or the
+ * section is off screen. Reduced motion removes the walk, the orbits, the float
+ * and the tilt; the icon change stays as a plain fade.
+ *
+ * Names for industries that have a page on this site (Financial Services,
+ * Telecommunications) carry an arrow link beside them; the other two have no
+ * page yet and are selectable only. Below lg the stage sits above the list.
  *
  * As the last band before the Footer's overlapping CTA card, bottom padding is
  * --spacing-section-cta (the footer contract).
  *
- * Labels are the brief's, verbatim.
+ * Labels are the brief's, verbatim. All motion is transform and opacity.
  */
 
 interface Industry {
@@ -30,6 +38,8 @@ interface Industry {
   image: string;
   alt: string;
   href?: string;
+  /** Optional enlargement for icons whose artwork leaves more empty margin than its siblings. */
+  scale?: number;
 }
 
 const INDUSTRIES: readonly [Industry, Industry, Industry, Industry] = [
@@ -41,8 +51,9 @@ const INDUSTRIES: readonly [Industry, Industry, Industry, Industry] = [
   },
   {
     label: 'Government & Public Sector',
-    image: '/images/pqc/industry-government.webp',
-    alt: '3D icon of a domed government building on a platform',
+    image: '/images/pqc/industry-government-v2.webp',
+    alt: '3D icon of a government building with columns, a pediment and two flags',
+    scale: 1.3,
   },
   {
     label: 'Telecommunications',
@@ -57,10 +68,43 @@ const INDUSTRIES: readonly [Industry, Industry, Industry, Industry] = [
   },
 ];
 
-const OPEN_GROW = 2;
-
 export function PqcIndustries(): React.ReactElement {
+  const rootRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
+  const [auto, setAuto] = useState(true);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const paused = hovered || focused || !visible;
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return undefined;
+    const observer = new IntersectionObserver(([entry]) => setVisible(entry?.isIntersecting ?? false), {
+      threshold: 0.35,
+    });
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, []);
+
+  const choose = (index: number): void => {
+    setActive(index);
+    setAuto(false);
+  };
+
+  const advance = (): void => setActive((current) => (current + 1) % INDUSTRIES.length);
+
+  const tilt = (event: React.PointerEvent<HTMLDivElement>): void => {
+    if (event.pointerType !== 'mouse') return;
+    const box = event.currentTarget.getBoundingClientRect();
+    event.currentTarget.style.setProperty('--px', String(((event.clientX - box.left) / box.width - 0.5) * 2));
+    event.currentTarget.style.setProperty('--py', String(((event.clientY - box.top) / box.height - 0.5) * 2));
+  };
+
+  const level = (event: React.PointerEvent<HTMLDivElement>): void => {
+    event.currentTarget.style.setProperty('--px', '0');
+    event.currentTarget.style.setProperty('--py', '0');
+  };
 
   return (
     <section
@@ -97,75 +141,123 @@ export function PqcIndustries(): React.ReactElement {
         </Reveal>
 
         <Reveal delay={0.12} y={24}>
-          <ul className="m-0 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2 xl:flex xl:h-[clamp(380px,32vw,460px)] xl:flex-row xl:gap-4">
-            {INDUSTRIES.map((industry, i) => {
-              const open = active === i;
-              return (
-                <li
-                  key={industry.label}
-                  className="cs-pqc-panel relative min-h-[112px] overflow-hidden xl:min-h-0 xl:min-w-0 xl:basis-0 xl:[flex-grow:var(--g)]"
-                  data-open={open}
-                  style={{ '--g': open ? OPEN_GROW : 1 } as React.CSSProperties}
-                  onPointerEnter={() => setActive(i)}
-                >
-                  <div className="relative flex h-full items-center gap-5 p-4 xl:block xl:p-0">
-                    <div className="cs-pqc-panel-icon relative aspect-square w-[88px] shrink-0 xl:absolute xl:left-1/2 xl:top-[6%] xl:w-[min(80%,300px)] xl:-translate-x-1/2">
-                      <span
-                        aria-hidden
-                        className="cs-pqc-panel-glow absolute left-1/2 top-1/2 hidden aspect-square w-[120%] -translate-x-1/2 -translate-y-1/2 rounded-full xl:block"
-                        style={{
-                          background:
-                            'radial-gradient(closest-side, rgba(154,81,255,0.5) 0%, rgba(44,193,235,0.12) 60%, rgba(154,81,255,0) 100%)',
-                        }}
-                      />
-                      <Image
-                        src={industry.image}
-                        alt={industry.alt}
-                        fill
-                        sizes="(min-width: 1280px) 300px, 88px"
-                        className="object-contain"
-                        style={{ filter: 'drop-shadow(0 18px 24px rgba(10,5,40,0.5))' }}
-                      />
-                    </div>
+          <div
+            ref={rootRef}
+            data-paused={paused}
+            className="mx-auto grid max-w-[1200px] grid-cols-1 items-stretch gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-[clamp(32px,4vw,64px)]"
+            onPointerEnter={() => setHovered(true)}
+            onPointerLeave={() => setHovered(false)}
+            onFocus={() => setFocused(true)}
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false);
+            }}
+          >
+            <div
+              className="cs-pqc-ind-stage relative order-first aspect-[6/5] w-full lg:order-last"
+              onPointerMove={tilt}
+              onPointerLeave={level}
+            >
+              <div aria-hidden className="cs-pqc-ind-glow" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                aria-hidden
+                src="/images/cleanstart-images/hero-vector-grid.svg"
+                alt=""
+                className="cs-pqc-ind-grid pointer-events-none absolute inset-0 h-full w-full select-none object-cover"
+                loading="lazy"
+                decoding="async"
+              />
 
-                    <div className="flex min-w-0 flex-1 items-end justify-between gap-3 xl:absolute xl:inset-x-0 xl:bottom-0 xl:p-6">
-                      <h3
-                        className="text-[1.25rem] text-white xl:text-[1.125rem] min-[1360px]:text-[1.25rem]"
-                        style={{
-                          margin: 0,
-                          fontFamily: 'var(--font-display)',
-                          fontWeight: 600,
-                          letterSpacing: '-0.03em',
-                          lineHeight: 1.25,
-                          textWrap: 'balance',
-                        }}
-                      >
-                        {industry.label}
-                      </h3>
-                      {industry.href ? (
-                        <span
-                          aria-hidden
-                          className="cs-pqc-panel-arrow flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white"
-                          style={{ border: '1px solid rgba(255,255,255,0.32)' }}
-                        >
-                          <ArrowUpRight size={18} strokeWidth={1.75} />
-                        </span>
-                      ) : null}
+              <div aria-hidden className="cs-pqc-ind-world">
+                <div className="cs-pqc-ind-plane">
+                  <span className="cs-pqc-ind-ring-a" />
+                  <span className="cs-pqc-ind-ring-b" />
+                  <span className="cs-pqc-ind-disc" />
+                  <span key={active} className="cs-pqc-ind-pulse" />
+                  <span className="cs-pqc-ind-orbit cs-pqc-ind-orbit-a">
+                    <span className="cs-pqc-ind-dot" />
+                  </span>
+                  <span className="cs-pqc-ind-orbit cs-pqc-ind-orbit-b">
+                    <span className="cs-pqc-ind-dot cs-pqc-ind-dot-violet" />
+                  </span>
+                </div>
+              </div>
+              <span aria-hidden className="cs-pqc-ind-shadow" />
+
+              <div className="cs-pqc-ind-slot">
+                {INDUSTRIES.map((industry, i) => (
+                  <div
+                    key={industry.label}
+                    className="cs-pqc-ind-icon"
+                    data-active={active === i}
+                    aria-hidden={active === i ? undefined : true}
+                  >
+                    <div className="cs-pqc-ind-tilt">
+                      <div className="cs-pqc-float absolute inset-0" style={{ animationDelay: `${-i * 1.3}s` }}>
+                        <Image
+                          src={industry.image}
+                          alt={industry.alt}
+                          fill
+                          sizes="(min-width: 1024px) 440px, 70vw"
+                          className="object-contain"
+                          style={{
+                            filter: 'drop-shadow(0 22px 28px rgba(8,4,40,0.55))',
+                            transform: industry.scale ? `scale(${industry.scale})` : undefined,
+                            transformOrigin: '50% 62%',
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
+                ))}
+              </div>
+            </div>
 
-                  {industry.href ? (
-                    <Link
-                      href={industry.href}
-                      aria-label={industry.label}
-                      className="absolute inset-0 z-[2] rounded-[24px] focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[#33BAEC]"
-                      onFocus={() => setActive(i)}
-                    />
-                  ) : null}
-                </li>
-              );
-            })}
-          </ul>
+            <ul className="m-0 flex list-none flex-col justify-center p-0">
+              {INDUSTRIES.map((industry, i) => {
+                const on = active === i;
+                return (
+                  <li key={industry.label} className="cs-pqc-ind-row" data-active={on}>
+                    <div className="flex items-center gap-4 py-[clamp(16px,1.8vw,26px)]">
+                      <h3 className="m-0 min-w-0 flex-1">
+                        <button
+                          type="button"
+                          aria-pressed={on}
+                          className="cs-pqc-ind-name w-full cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#33BAEC]"
+                          onClick={() => choose(i)}
+                          onFocus={() => setActive(i)}
+                          onPointerEnter={(event) => {
+                            if (event.pointerType === 'mouse') choose(i);
+                          }}
+                        >
+                          {industry.label}
+                        </button>
+                      </h3>
+                      {industry.href ? (
+                        <Link
+                          href={industry.href}
+                          aria-label={`${industry.label} page`}
+                          className="cs-pqc-ind-go flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#33BAEC]"
+                        >
+                          <ArrowUpRight size={18} strokeWidth={1.75} aria-hidden />
+                        </Link>
+                      ) : null}
+                    </div>
+                    {on ? (
+                      <span
+                        aria-hidden
+                        className="cs-pqc-ind-fill"
+                        data-auto={auto}
+                        onAnimationEnd={(event) => {
+                          if (event.animationName === 'cs-pqc-ind-fill') advance();
+                        }}
+                      />
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </Reveal>
       </div>
     </section>

@@ -1,4 +1,7 @@
+'use client';
+
 import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import type { LucideIcon } from 'lucide-react';
 import { Boxes, FileClock, Network, RefreshCw } from 'lucide-react';
@@ -16,9 +19,12 @@ import { BODY_STYLE, H2_STYLE } from './type';
  *
  * The left column sticks while the chain scrolls past: a dark card holding a
  * stack of glass slabs under the page's padlock cube, the dependency layers the
- * first problem names. The stack is composed from the site's existing slab
- * renders (the telecom journey's), each floating on its own delay, with a line
- * of light running down through all of them.
+ * first problem names. The stack answers whichever problem is at the middle of
+ * the viewport: it carries a signal down through its layers (dependencies),
+ * the lower layers turn amber (legacy), the layers pull apart and are joined by
+ * dashed links (migration), then each layer is refreshed in turn (adaptation).
+ * No text is added; the state change is the only message. Slabs are the telecom
+ * journey's existing renders, each floating on its own delay.
  *
  * Line icons in violet tiles, as in TelecomRisks: these are hazards, and
  * drawing them as the glossy 3D objects used for the solution would make them
@@ -57,40 +63,53 @@ const CHALLENGES: readonly [Challenge, Challenge, Challenge, Challenge] = [
 ];
 
 const SLABS = [
-  { src: '/images/telecom/journey/standardize-tile.webp', top: '43%', width: '60%', delay: '-1.4s' },
-  { src: '/images/telecom/journey/standardize-tile.webp', top: '56%', width: '64%', delay: '-2.8s' },
-  { src: '/images/telecom/journey/standardize-base.webp', top: '68%', width: '70%', delay: '-4.2s' },
+  { src: '/images/telecom/journey/standardize-tile.webp', top: '43%', width: '60%', delay: '-1.4s', side: -1 },
+  { src: '/images/telecom/journey/standardize-tile.webp', top: '56%', width: '64%', delay: '-2.8s', side: 1 },
+  { src: '/images/telecom/journey/standardize-base.webp', top: '68%', width: '70%', delay: '-4.2s', side: -1 },
 ] as const;
 
 function DependencyStack(): React.ReactElement {
   return (
     <div aria-hidden className="absolute inset-0">
-      <span
-        className="absolute left-1/2 top-[22%] bottom-[9%] w-[2px] -translate-x-1/2 rounded-full"
-        style={{
-          background: 'linear-gradient(180deg, rgba(44,193,235,0) 0%, #6EC8FF 30%, #9A51FF 100%)',
-          boxShadow: '0 0 18px 2px rgba(110,200,255,0.45)',
-        }}
-      />
-      {SLABS.map((slab) => (
+      <span className="cs-pqc-ch-ring" />
+
+      <span className="cs-pqc-ch-beam cs-pqc-ch-beam-a" />
+      <span className="cs-pqc-ch-beam cs-pqc-ch-beam-b" />
+      <span className="cs-pqc-ch-packet" />
+
+      {SLABS.map((slab, i) => (
         <div
           key={slab.top}
           className="cs-pqc-float absolute left-1/2 aspect-[379/199] -translate-x-1/2"
           style={{ top: slab.top, width: slab.width, animationDelay: slab.delay }}
         >
-          <Image
-            src={slab.src}
-            alt=""
-            fill
-            sizes="(min-width: 1024px) 24vw, 70vw"
-            className="object-contain"
-            style={{ filter: 'drop-shadow(0 14px 18px rgba(10,5,40,0.45))' }}
-          />
+          <div
+            className="cs-pqc-ch-slab absolute inset-0"
+            data-layer={i}
+            style={{ '--i': i, '--side': slab.side } as React.CSSProperties}
+          >
+            <Image
+              src={slab.src}
+              alt=""
+              fill
+              sizes="(min-width: 1024px) 24vw, 70vw"
+              className="object-contain"
+              style={{ filter: 'drop-shadow(0 14px 18px rgba(10,5,40,0.45))' }}
+            />
+          </div>
         </div>
       ))}
-      <div className="cs-pqc-float absolute left-1/2 top-[-5%] aspect-square w-[78%] -translate-x-1/2">
+
+      <svg className="cs-pqc-ch-links" viewBox="0 0 100 105" preserveAspectRatio="xMidYMid meet" fill="none">
+        <path d="M44 61 L56 76 L44 90" />
+        <circle cx="44" cy="61" r="1.6" />
+        <circle cx="56" cy="76" r="1.6" />
+        <circle cx="44" cy="90" r="1.6" />
+      </svg>
+
+      <div className="cs-pqc-float absolute left-1/2 top-[-6%] aspect-square w-[70%] -translate-x-1/2">
         <Image
-          src="/images/pqc/hero-lock.webp"
+          src="/images/pqc/challenge-components.webp"
           alt=""
           fill
           sizes="(min-width: 1024px) 24vw, 70vw"
@@ -102,6 +121,24 @@ function DependencyStack(): React.ReactElement {
 }
 
 export function PqcChallenge(): React.ReactElement {
+  const listRef = useRef<HTMLOListElement>(null);
+  const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return undefined;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setStep(Number((entry.target as HTMLElement).dataset.step ?? 0));
+        }
+      },
+      { rootMargin: '-42% 0px -42% 0px' },
+    );
+    for (const row of list.querySelectorAll('li')) observer.observe(row);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <Section data-section="PqcChallenge" className="overflow-hidden bg-white">
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -125,7 +162,8 @@ export function PqcChallenge(): React.ReactElement {
 
             <Reveal delay={0.12} y={24}>
               <div
-                className="relative mx-auto mt-8 aspect-[4/4.2] w-full max-w-[460px] overflow-hidden lg:mx-0 lg:mt-10"
+                data-step={step}
+                className="cs-pqc-ch-stage relative mx-auto mt-8 aspect-[4/4.2] w-full max-w-[460px] overflow-hidden lg:mx-0 lg:mt-10"
                 style={{
                   borderRadius: '28px',
                   background: 'linear-gradient(180deg, #151021 0%, #131E8F 62.5%, #471EC0 100%)',
@@ -146,11 +184,11 @@ export function PqcChallenge(): React.ReactElement {
             </Reveal>
           </div>
 
-          <ol className="m-0 list-none p-0">
+          <ol ref={listRef} className="m-0 list-none p-0">
             {CHALLENGES.map(({ Icon, title, body }, i) => {
               const last = i === CHALLENGES.length - 1;
               return (
-                <li key={title} className="cs-pqc-row flex gap-5 sm:gap-7">
+                <li key={title} data-step={i} className="cs-pqc-row flex gap-5 sm:gap-7">
                   <div className="flex shrink-0 flex-col items-center">
                     <span
                       aria-hidden

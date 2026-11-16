@@ -1,24 +1,23 @@
 import type React from 'react';
 import Image from 'next/image';
-import { ArrowUp, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Container, Section } from '@/components/layout';
 import { Reveal } from '@/components/ui/Reveal';
 import { H2_STYLE } from './type';
 
 /*
- * "How It Works": four stages on one rail, closed into a loop.
+ * "How It Works": four stages on one straight rail, as in the brief's mock.
  *
  * One packet runs the rail left to right and each station lights as it
  * arrives (a 9s cycle: the packet takes 6s, so stations light at 0, 2, 4 and
- * 6s). The last 3s belong to the return path: a dashed bracket under the row
- * carries a second packet from Continuous Updates back to Hardened Images,
- * which is the point of the last stage. All motion is CSS keyframes on
- * transform and opacity; positions use container-query units, so the packet
- * travels the rail's own width at any viewport.
+ * 6s, then it rests for 3s). All motion is CSS keyframes on transform and
+ * opacity; positions use container-query units, so the packet travels the
+ * rail's own width at any viewport.
  *
- * The brief gives titles only, so the stations carry no body copy. Below lg the
- * stations stack as rows on a vertical rail, with no packet and no bracket;
- * each station still lights in turn.
+ * The brief gives titles only, so the stations carry no body copy. The rail is
+ * the only connection drawn: nothing implies a return path, which the brief
+ * does not state. Below lg the stations stack as rows on a vertical rail with
+ * no packet; each station still lights in turn.
  */
 
 interface Stage {
@@ -182,39 +181,6 @@ export function PqcHowItWorks(): React.ReactElement {
               ))}
             </ol>
 
-            {/* Return path: Continuous Updates feeds back into Hardened Images. */}
-            <div
-              aria-hidden
-              className="pointer-events-none relative mx-auto hidden lg:block"
-              style={{
-                width: '75%',
-                height: 'clamp(36px, 3.4vw, 50px)',
-                marginTop: '22px',
-                containerType: 'inline-size',
-              }}
-            >
-              <span
-                className="absolute inset-0"
-                style={{
-                  border: '1.5px dashed rgba(124,79,240,0.4)',
-                  borderTop: 'none',
-                  borderRadius: '0 0 26px 26px',
-                }}
-              />
-              <ArrowUp
-                size={16}
-                strokeWidth={2.25}
-                className="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2"
-                style={{ color: '#7C4FF0' }}
-              />
-              <span
-                className="cs-pqc-return absolute bottom-0 right-0 h-3 w-3 translate-x-1/2 translate-y-1/2 rounded-full"
-                style={{
-                  background: 'radial-gradient(circle, #FFFFFF 0%, #6EC8FF 45%, #7C4FF0 100%)',
-                  boxShadow: '0 0 14px 4px rgba(110,200,255,0.55)',
-                }}
-              />
-            </div>
           </div>
         </Reveal>
       </Container>
