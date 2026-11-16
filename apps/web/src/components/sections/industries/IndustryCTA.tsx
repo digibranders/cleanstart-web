@@ -19,7 +19,16 @@ interface IndustryCTAProps {
   description: string;
   buttonLabel: string;
   buttonHref: string;
+  /** Optional second, outlined button beside the primary. Both props are needed to render it. */
+  secondaryLabel?: string;
+  secondaryHref?: string;
 }
+
+const BUTTON_VARS = {
+  '--cs-btn-h': '44px',
+  '--cs-btn-px': '20px',
+  '--cs-btn-fs': '16px',
+} as React.CSSProperties;
 
 export function IndustryCTA({
   section,
@@ -27,6 +36,8 @@ export function IndustryCTA({
   description,
   buttonLabel,
   buttonHref,
+  secondaryLabel,
+  secondaryHref,
 }: IndustryCTAProps): React.ReactElement {
   return (
     <div
@@ -217,19 +228,16 @@ export function IndustryCTA({
             {description}
           </p>
 
-          <Link
-            href={buttonHref}
-            className="cs-btn-blue"
-            style={
-              {
-                '--cs-btn-h': '44px',
-                '--cs-btn-px': '20px',
-                '--cs-btn-fs': '16px',
-              } as React.CSSProperties
-            }
-          >
-            <span>{buttonLabel}</span>
-          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+            <Link href={buttonHref} className="cs-btn-blue" style={BUTTON_VARS}>
+              <span>{buttonLabel}</span>
+            </Link>
+            {secondaryLabel && secondaryHref ? (
+              <Link href={secondaryHref} className="cs-btn-outline-blue" style={BUTTON_VARS}>
+                <span>{secondaryLabel}</span>
+              </Link>
+            ) : null}
+          </div>
         </Reveal>
       </div>
     </div>
