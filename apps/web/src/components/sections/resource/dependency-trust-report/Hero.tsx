@@ -150,7 +150,8 @@ export function Hero(): React.ReactElement {
             </HeroReveal>
           </div>
 
-          <HeroReveal y={40} delay={0.2} duration={1} className="hidden w-full lg:block">
+          {/* The report cover is the desktop LCP element, so it paints at full opacity and only slides in. */}
+          <HeroReveal y={40} delay={0.2} duration={1} lcp className="hidden w-full lg:block">
             <ReportStack />
           </HeroReveal>
         </div>
