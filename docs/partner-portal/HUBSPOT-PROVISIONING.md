@@ -10,6 +10,7 @@ HUBSPOT_PORTAL_TOKEN=... pnpm --filter @cleanstart/portal exec tsx scripts/provi
 Flags:
 
 - `--apply`: write to HubSpot. Without it the script only prints what it would create.
+
 There is no flag for unique-value properties: `portal_registration_id` and `partner_portal_id` are always created as unique-value properties (HUBSPOT-CAPABILITIES.md row d: allowed, reported by the product owner on 2026-11-16). Every create also searches by `portal_registration_id` first, so a retried create cannot duplicate a deal.
 
 The script also creates the deal to company labels "Partner" and "Customer". Keep `HUBSPOT_USE_ASSOCIATION_LABELS=false` (the build default): row a of the capability check passed in the HubSpot UI but has not been tried through a private app token, and turning the flag on is a later decision, once provisioning has run against this portal.

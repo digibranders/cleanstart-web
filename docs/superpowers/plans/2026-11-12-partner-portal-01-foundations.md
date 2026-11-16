@@ -332,6 +332,8 @@ Expected: the first command prints nothing, the `head -3` prints `// src/lib/clo
 
 - [x] **Step 7: Write the M0.1 stub**
 
+> **Update 2026-11-16:** the stub's answers moved on, see `docs/partner-portal/HUBSPOT-CAPABILITIES.md`: (b) is decided as poll only, no webhook subscription; (a) association labels passed a UI check and (d) unique-value properties are allowed (reported by the product owner); (c) rate limit and (e) `hs_lastmodifieddate` search are still UNVERIFIED.
+
 The handoff says an unattended run skips the HubSpot capability check and writes this stub (BUILD-HANDOFF, "What an overnight run can and cannot finish"; contracts K.2 assigns the file to W0-a). Create `docs/partner-portal/HUBSPOT-CAPABILITIES.md`:
 
 ```markdown
