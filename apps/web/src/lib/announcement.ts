@@ -18,13 +18,16 @@ export interface Announcement {
 }
 
 export const ANNOUNCEMENT: Announcement | null = {
-  id: "ciso-guide-software-trust-2026",
-  title: "The 2026 CISO Guide to Software Trust",
-  shortTitle: "2026 CISO Guide to Software Trust",
-  detail: "87% of public container images ship with high or critical CVEs.",
-  cta: "Get the guide",
-  href: "/resources/ciso-guide-software-trust",
-  hideOn: ["/resources/ciso-guide-software-trust", "/thank-you"],
+  id: "dependency-trust-report-2026",
+  title: "State of Software Dependency Trust 2026",
+  shortTitle: "Dependency Trust 2026 Report",
+  detail: "68% of observed components were more than two years old.",
+  cta: "Get the report",
+  href: "/resources/state-of-software-dependency-trust",
+  hideOn: [
+    "/resources/state-of-software-dependency-trust",
+    "/thank-you",
+  ],
 };
 
 export const ANNOUNCEMENT_STORAGE_KEY = "cs-announcement-dismissed";
