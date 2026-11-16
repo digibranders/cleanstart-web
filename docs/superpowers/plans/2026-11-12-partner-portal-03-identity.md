@@ -1748,7 +1748,7 @@ Expected: no output.
 
 Run the Gate A block from "Conventions". Expected as stated there. The last command must list only: `src/lib/apply.ts`, `src/lib/people.ts`, `src/lib/people.test.ts`, `src/server/people.ts`, `src/server/people.test.ts`, `src/server/turnstile.ts`, `src/server/turnstile.test.ts`, `src/server/apply-receipt.ts`, `src/server/apply-receipt.test.ts`, `src/server/repo/applications.ts`, `src/server/repo/applications.test.ts`, `src/server/actions/apply.ts`, `src/server/actions/apply.test.ts`, `src/components/partners/turnstile-widget.tsx`, `src/components/screens/Apply.tsx`, `src/components/screens/ApplyDone.tsx`, `src/app/(public)/apply/page.tsx`, `src/app/(public)/apply/done/page.tsx` (paths under `apps/portal/`).
 
-- [ ] **Step 21: Manual check (dev server on port 3224 with seed-dev data, `APP_URL=http://localhost:3224`)**
+- [x] **Step 21: Manual check (dev server on port 3224 with seed-dev data, `APP_URL=http://localhost:3224`)**
 
 1. `/apply` shows an empty form (no sample values), the Turnstile test widget under the privacy line, and "Submit application" enabled.
 2. Type `neha@gmail.com` as the work email: the red "Use your company email, not a personal address." appears at once. Replace with `neha.joshi@tidewaterinfosec.in`, website `tidewaterinfosec.in`, name `Neha Joshi`, a reason; submit. You land on `/apply/done` showing "Thanks, Neha", reference `APP-<yymm>-0045` (the seed leaves the sequence past 44), category "Channel partner", region "India".
@@ -1756,6 +1756,8 @@ Run the Gate A block from "Conventions". Expected as stated there. The last comm
 4. Submit `/apply` again with `aditi@kestrelsystems.in` (Kestrel's domain): a toast says Kestrel Systems is already a partner and you land on `/sign-in?request=1`; no new row exists (`select count(*) from applications` stays at 4).
 5. Submit the Tidewater form a second time with a different reason: still 4 rows, the reason updated.
 6. Submit six times quickly from one browser with different emails: the sixth shows "Too many attempts. Try again in a moment."
+
+Run 2026-11-16 on port 3364 (track P round 2): PASS. The dev seed already holds Tidewater Infosec (0042, neha.joshi@tidewaterinfosec.in), so submitting the Tidewater values updates that row instead of adding a fourth; steps 2 to 5 were run with Brightwater Security (neha.joshi@brightwatersec.in) and gave 0045, count 4, reason updated. The IP limit is 5 per 10 minutes in memory, so step 6 needs a restarted dev server (or a 10 minute wait) after steps 2 to 5.
 
 - [x] **Step 22: Commit**
 
@@ -4312,7 +4314,7 @@ Expected: only the three `...ApplicationAction` imports and calls and the `appli
 
 Run the Gate A block. The last command must list only the files in this task's Files block plus `src/server/repo/applications.test.ts`.
 
-- [ ] **Step 18: Manual check (signed in as `farhan.qureshi@cleanstart.com`, the seed password from `DEV_SEED_PASSWORD`, route `/admin/partners?tab=applications`)**
+- [x] **Step 18: Manual check (signed in as `farhan.qureshi@cleanstart.com`, the seed password from `DEV_SEED_PASSWORD`, route `/admin/partners?tab=applications`)**
 
 1. Applications tab shows the 3 seed applications (Tidewater, Falcon Ridge, Lattice Cloud) plus any from M1.3 and M1.3b, each with a "Portal form" or "Website form" chip; the website rows show "Not set" under category and region and the Nair row shows "Personal email".
 2. Approve "Lattice Cloud Services" (a portal row): toast "Approved Lattice Cloud Services. Invite sent to Ritu Menon". The row shows "Approved, invite sent" and Undo. `psql ... -c "select op, subject_id, idempotency_key from hubspot_outbox"` has a `partner.upsert` row with key ending `:1`; `select event, note from audit_log order by at desc limit 1` shows `application.approved`.
@@ -4320,6 +4322,8 @@ Run the Gate A block. The last command must list only the files in this task's F
 4. Approve the "Falcon Ridge IT" website row: an inline panel appears with partner type and region; choose Distributor and Middle East, then "Approve and send invite". The partner is routed to Omar Nasser.
 5. Reject "Nair Security Consulting" with the default reason: toast, row shows "Rejected, emailed", the dev email log line shows an email was built for the applicant.
 6. Sign in as `rahul.menon@cleanstart.com` (staff sales): the tab loads but the Approve and Reject buttons are absent.
+
+Run 2026-11-16 (track P round 2): PASS. Step 6: staff sales sees no Applications tab at all (M4.1), so Approve and Decline are absent. The seed has an audit row dated later today (19:32), so audit queries need `where at <= now()` before 19:32 local.
 
 - [x] **Step 19: Commit**
 
@@ -6484,7 +6488,7 @@ Expected: no output.
 
 Run the Gate A block. The last command must list only the files in this task's Files block, plus `src/server/partner-scope.ts`.
 
-- [ ] **Step 22: Manual check (seed-dev data, dev server on 3224)**
+- [x] **Step 22: Manual check (seed-dev data, dev server on 3224)**
 
 1. Get a link: `pnpm --filter @cleanstart/portal exec tsx --env-file=.env scripts/dev-invite-link.ts yasmin.haddad@qamarsolutions.ae` (Qamar Solutions is the seed partner with an unaccepted admin invite; if it prints "No open invite", approve an application in M1.4 and use that applicant's email). Expected: a URL `http://localhost:3224/accept-invite?token=...`.
 2. Open it signed out: "Set up your account", "Qamar Solutions is now a CleanStart partner. You will be its partner admin.", the email field read-only, the name pre-filled, the agreement block with "Version draft-0".
@@ -6492,6 +6496,8 @@ Run the Gate A block. The last command must list only the files in this task's F
 4. Welcome shows "Welcome, Yasmin", "Qamar Solutions joined the CleanStart partner program on <today>", "1 of 6 done" with the agreement line "draft-0, accepted <today>". Click "Book a call": the drawer opens with "Message Omar Nasser" and the checklist ticks (reload to confirm it persists). Send a message: toast "Message sent to Omar Nasser"; the dev log shows the email subject.
 5. Reopen the same invite URL: "This invite was already used". Change the last character of the token: "This invite link is not valid". Generate a link for an invite and edit `expires_at` to the past in psql: "This invite has expired".
 6. `select op, subject_id from hubspot_outbox where op = 'user.upsert'` has Yasmin's user id; `select event from audit_log order by at desc limit 2` shows `partner.agreement_accepted` and `team.invite_accepted`.
+
+Run 2026-11-16 (track P round 2): PASS after fix 60ea7da0 (the seeded users row with status invited made accept answer "already has a login"). Qamar Solutions is a seeded partner (joined 27 Oct, a second invited colleague), so "joined on today" and "1 of 6 done" were checked on Falcon Ridge IT, approved in M1.4 the same day (1 of 6, then 2 of 6 after Book a call and a reload).
 
 - [x] **Step 23: Commit**
 
@@ -8702,7 +8708,7 @@ Expected: no output.
 
 Run the Gate A block. The last command must list only this task's Files block plus `src/components/people/RequestAccessForm.tsx`.
 
-- [ ] **Step 18: Manual check (signed in as `aditi.rao@kestrelsystems.in`, seed password, route `/partner/team`)**
+- [x] **Step 18: Manual check (signed in as `aditi.rao@kestrelsystems.in`, seed password, route `/partner/team`)**
 
 1. The page shows "Team", "Everyone at Kestrel Systems with a login...", the access request from Rohit Desai ("Asked today", his note), and four people: Aditi (you), Karan, Sneha, and Vikram Sethi as Invited with a Resend and a Remove button.
 2. Change Karan to Technical in the dropdown: it sticks on reload. Try to change Aditi: she is a badge, not a dropdown. Make Karan "Partner admin", then remove Aditi... you cannot remove yourself (no button). Sign in as Karan, demote the only other admin: the toast reads "Every company needs at least one partner admin." when it would leave none.
@@ -8710,6 +8716,8 @@ Run the Gate A block. The last command must list only this task's Files block pl
 4. Resend Vikram's invite: toast. Remove Vikram: confirm, the row disappears (the invite is withdrawn). Remove Sneha: confirm, the row disappears; `select status from users where name = 'Sneha Iyer'` is `disabled` and her deals still list Kestrel.
 5. Approve Rohit's request as Technical: toast "Rohit Desai can now set a password and sign in"; the request card disappears and Rohit shows as Invited. Check `psql ... -c "select event from audit_log order by at desc limit 5"`.
 6. Signed out, open `/sign-in?request=1`: submit `someone@gmail.com` (inline free-mail error), then `someone@not-a-partner.example` and `rohit.desai@kestrelsystems.in`: both land on the identical "Request sent" panel. `select count(*) from access_requests where status = 'open'` rose by at most one.
+
+Run 2026-11-16 (track P round 2): PASS after fix e87cadd1 (removing Vikram left his invite open, so the row stayed). Resend and Remove are icon buttons; Remove asks "Remove access" inline. The existing-address error shows under the email field, not as a toast. "Every company needs at least one partner admin." cannot be produced from the UI while two admins exist (own role is a badge); team.test.ts covers it.
 
 - [x] **Step 19: Commit**
 
@@ -9988,7 +9996,7 @@ Expected: no output.
 
 Run the Gate A block. The last command must list only this task's Files block.
 
-- [ ] **Step 17: Manual check (seed-dev data)**
+- [x] **Step 17: Manual check (seed-dev data)**
 
 1. Signed in as `aditi.rao@kestrelsystems.in`, `/partner/account`: Profile shows her name, `aditi.rao@kestrelsystems.in`, title "Head of Alliances", role "Partner admin". Change the title and Save profile: "All changes saved" returns; reload keeps it. Clear the name: the error "Enter your name." shows and nothing is saved.
 2. Toggle "New documents" on and reload: it stays on. `select category, email from notification_prefs` shows one row per category after the first toggle.
@@ -9996,6 +10004,8 @@ Run the Gate A block. The last command must list only this task's Files block.
 4. `/partner/company` as Aditi: form editable. Change the address, Save changes: toast "Company profile saved"; `select op, idempotency_key from hubspot_outbox where op = 'partner.upsert'` shows a new row keyed by the update time; `select event, note from audit_log order by at desc limit 1` shows `partner.profile_updated` and "Updated address". Save again with no change: no new audit row.
 5. Sign in as Karan Malhotra (sales) and open `/partner/company`: the fields are read-only and there is no Save button. Click "Download PDF": the toast says the PDF is not in the portal yet.
 6. "Message" next to the partner manager opens the drawer addressed to Farhan Qureshi.
+
+Run 2026-11-16 (track P round 2): PASS. The seed already holds a notification_prefs row for every category, so step 2 saw the stored values flip, not a first insert. Save changes is disabled when nothing changed, so a second save adds no audit row.
 
 - [x] **Step 18: Commit**
 
@@ -11084,12 +11094,14 @@ Expected: no output.
 
 Run the Gate A block. The last command must list only this task's Files block.
 
-- [ ] **Step 12: Manual check (seed-dev data, signed in as `aditi.rao@kestrelsystems.in`, route `/partner/account`)**
+- [x] **Step 12: Manual check (seed-dev data, signed in as `aditi.rao@kestrelsystems.in`, route `/partner/account`)**
 
 1. Password card: "Last changed" shows the date of the seed (or "Not changed yet"). Enter a wrong current password and a strong new one: "That password is not right." under the current password field, nothing changed. Enter the right one: "Password updated.", the header shows today's date, `select event from audit_log order by at desc limit 1` is `account.password_changed`, the dev log shows a "password changed" email built for Aditi, and other browsers are signed out.
 2. Two-step card: "Turn on", enter the password: the setup dialog shows a setup key in groups of four and an "Open in your authenticator app" link. Type a wrong 6-digit code: the dialog shows "That code is not right. Check the 6 digits and try again." Add the key to an authenticator app (or compute the code with `scripts` from plan 02's `test-totp.ts`), enter the code: toast "Two-step sign-in is on" and the ten backup codes appear once, with a Download button. The badge reads "On"; sign out and in again: the sign-in screen asks for the code.
 3. "New backup codes": password, then a new set appears; an old code no longer works at sign in. "Turn off": password, the badge reads "Off"; `audit_log` has `account.two_factor_enabled` and `account.two_factor_disabled`.
 4. Forgot password: on `/sign-in` request a reset for Aditi (dev log has no body, so run `select value from auth_verification order by created_at desc limit 1` to read the token, or use plan 02's helper), open `/reset-password?token=<token>`: the page shows "Set a new password"; a weak password shows the rule error; a strong one toasts and returns to sign in. Open `/reset-password` with no token: "This reset link is not valid".
+
+Run 2026-11-16 (track P round 2): PASS after fix e476caea (a password change replaced the session and the page re-render read the old cookie, so the person landed on the Overview and never saw Password updated). `/reset-password` with no token now shows the request form (UX audit item 5), not "This reset link is not valid"; a bad token shows "This reset link is invalid or has expired." Ten sign-ins of one email in 10 minutes trip the per-email limit.
 
 - [x] **Step 13: Commit**
 
@@ -12165,7 +12177,7 @@ Expected: no output.
 
 Run the Gate A block. The last command must list only this task's Files block.
 
-- [ ] **Step 10: Manual check (seed-dev data, signed in as `farhan.qureshi@cleanstart.com`, route `/admin/team`)**
+- [x] **Step 10: Manual check (seed-dev data, signed in as `farhan.qureshi@cleanstart.com`, route `/admin/team`)**
 
 1. Six people: Farhan (you), Omar Nasser, Rahul Menon, Sara Al Mansoori, Ishita Bose, and Kunal Shah as Invited ("Invite pending", a role badge). Farhan and Omar show "5 partners" each.
 2. Change Rahul to Marketing: toast "Rahul Menon is now in marketing". Change Omar to Sales: toast, and the amber note "Omar Nasser still manages 5 partners in Middle East. Those partners need a new partner manager." appears with the "Reassign on Partners" link.
@@ -12173,6 +12185,8 @@ Run the Gate A block. The last command must list only this task's Files block.
 4. Invite a teammate: "Invite teammate", name `Test Person`, email `test.person@cleanstart.com`, Sales, India: toast "Invite sent to test.person@cleanstart.com", a new Invited row. `select event, target from audit_log order by at desc limit 1` shows `staff.invited` and "Test Person, sales, India". Invite the same address again: "This person already has a login." (or "This person is already on the team." from the form before sending).
 5. Remove Kunal (invited): confirm, the row disappears and the invite is withdrawn. Remove Ishita: the row disappears; `select status from users where name = 'Ishita Bose'` is `disabled`.
 6. Sign in as `rahul.menon@cleanstart.com` (now Marketing): opening `/admin/team` redirects to the Documents home page (no `staff.read`).
+
+Run 2026-11-16 (track P round 2): PASS after fixes e87cadd1 (removing Kunal left his invite open) and 02242819 (the demotion warning said "manages 0 partners"). The partner counts are read off the data (Farhan 11, Omar 10 on a fresh seed), not 5. The last-manager guard cannot be produced from the UI (own row is a badge); staff.test.ts covers it.
 
 - [x] **Step 11: Commit**
 
@@ -14029,7 +14043,7 @@ Expected: no output. (`SignIn.tsx` belongs to plan 02 and is checked there, apar
 
 Run the Gate A block. The last command must list only this task's Files block.
 
-- [ ] **Step 14: Manual check (seed-dev data, signed in as `farhan.qureshi@cleanstart.com`, route `/admin/partners`)**
+- [x] **Step 14: Manual check (seed-dev data, signed in as `farhan.qureshi@cleanstart.com`, route `/admin/partners`)**
 
 1. Four KPI tiles: "Active partners" 19 (21 partners with 2 onboarding is 17 active plus the 11 seeded fillers; read the number off the data: it equals `select count(*) from partners where status = 'active'`), "Applications" 3, "Partner users" (the sum of users), "Protected deals". The tab counts read "Partners 21" and "Applications 3".
 2. The table lists 21 partners sorted by name with the real pending, protected, won and last-active values; Kestrel Systems shows 2 pending, 3 protected, 2 won. The first partner alphabetically is selected; click Kestrel: the URL gains `?selected=<id>` and the detail card shows Kestrel's agreement "v1.2, accepted 12 Mar 2026", partner manager Farhan Qureshi, admin Aditi Rao, HubSpot company 91822044, its four people (Vikram "Invited 5 Nov") and its three recent deals.
@@ -14039,6 +14053,8 @@ Run the Gate A block. The last command must list only this task's Files block.
 6. Suspend Ironleaf Consulting: confirm, status badge becomes Suspended and the button becomes "Restore access"; sign in as one of its users in a private window: sign-in fails with the generic message. Restore: status returns to Inactive (what it was before).
 7. "Add partner": name `Dunes Test`, website `dunestest.ae`, Channel partner, Middle East, admin `Test Admin`, `test.admin@dunestest.ae`, send invite on: toast "Invite sent to test.admin@dunestest.ae", the new partner is selected with status Onboarding, manager Omar Nasser. Adding the same website again shows "Another partner already uses this domain." in the drawer.
 8. Sign in as `rahul.menon@cleanstart.com` (staff sales, India): only India partners are listed, there is no Applications tab, no Add partner button and the detail card has no action buttons.
+
+Run 2026-11-16 (track P round 2): PASS, on a truncated and reseeded database (steps in M1.6 remove Kestrel's people). Active partners 18 and Applications 3 were read off the data. Selecting a partner is a click on its name button, not the row. The detail card lists five recent deals (limit 5), not three. The duplicate website in the drawer shows the client precheck wording "<name> already uses <domain>."; the server wording "Another partner already uses this domain." is covered by partner-routing tests.
 
 - [x] **Step 15: Commit**
 
