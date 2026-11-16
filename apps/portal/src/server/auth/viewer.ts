@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { cache } from 'react';
 import { db } from '@/db/client';
@@ -57,7 +57,13 @@ export async function viewerFromHeaders(requestHeaders: Headers): Promise<Viewer
 }
 
 /** The signed-in viewer for this request, or null. Cached per request, so layouts and pages share one lookup. */
-export const getViewer = cache(async (): Promise<Viewer | null> => viewerFromHeaders(await headers()));
+export const getViewer = cache(async (): Promise<Viewer | null> => {
+  // The cookie comes from cookies(), not from the request header: after a server action replaced the session
+  // (a password change), the render that follows must see the new cookie, and the header still holds the old one.
+  const requestHeaders = new Headers(await headers());
+  requestHeaders.set('cookie', (await cookies()).toString());
+  return viewerFromHeaders(requestHeaders);
+});
 
 /** Where a viewer lands after sign in and when bounced. Every home is a page that viewer's role may open. */
 export function homeFor(viewer: Viewer): string {

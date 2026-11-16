@@ -7,8 +7,12 @@ import { type Action, can } from './policies';
 import type { RoleKey, Viewer } from './types';
 import { getViewer, homeFor, requireActionViewer, requireCan, requireKind, requireViewer } from './viewer';
 
-const mocks = vi.hoisted(() => ({ requestHeaders: new Headers() }));
-vi.mock('next/headers', () => ({ headers: async () => mocks.requestHeaders }));
+const mocks = vi.hoisted(() => ({ requestHeaders: new Headers(), cookieStore: null as string | null }));
+// cookies() answers with the cookie store of the render: the request cookie, or what a server action has just set.
+vi.mock('next/headers', () => ({
+  headers: async () => mocks.requestHeaders,
+  cookies: async () => ({ toString: () => mocks.cookieStore ?? mocks.requestHeaders.get('cookie') ?? '' }),
+}));
 vi.mock('next/navigation', () => ({
   redirect: (url: string) => {
     throw new Error(`REDIRECT ${url}`);
@@ -44,6 +48,7 @@ const redirectOf = async (run: () => Promise<unknown>): Promise<string | null> =
 
 beforeEach(async () => {
   mocks.requestHeaders = new Headers();
+  mocks.cookieStore = null;
   await resetDb(testDb());
 });
 
@@ -148,6 +153,17 @@ describe('guards', () => {
     expect(await getViewer()).toBeNull();
     const user = await makeUser(testDb(), { password: PASSWORD });
     await signInAs(user.email);
+    expect((await getViewer())?.id).toBe(user.id);
+  });
+
+  it('getViewer follows a session cookie replaced during the request, as when a server action changes the password', async () => {
+    const user = await makeUser(testDb(), { password: PASSWORD });
+    await signInAs(user.email);
+    const staleCookie = mocks.requestHeaders.get('cookie') ?? '';
+    await signInAs(user.email);
+    mocks.cookieStore = mocks.requestHeaders.get('cookie');
+    await auth.api.signOut({ headers: new Headers({ cookie: staleCookie }) });
+    mocks.requestHeaders = new Headers({ cookie: staleCookie });
     expect((await getViewer())?.id).toBe(user.id);
   });
 });
