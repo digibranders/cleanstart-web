@@ -24,10 +24,7 @@ export const ANNOUNCEMENT: Announcement | null = {
   detail: "68% of observed components were more than two years old.",
   cta: "Get the report",
   href: "/resources/state-of-software-dependency-trust",
-  hideOn: [
-    "/resources/state-of-software-dependency-trust",
-    "/thank-you",
-  ],
+  hideOn: ["/thank-you"],
 };
 
 export const ANNOUNCEMENT_STORAGE_KEY = "cs-announcement-dismissed";
