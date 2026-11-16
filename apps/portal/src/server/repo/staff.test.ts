@@ -95,6 +95,17 @@ describe('changeStaffRegion', () => {
 });
 
 describe('removeStaff', () => {
+  it('withdraws the open invite of a teammate who was only invited, so the invite link and the row both go', async () => {
+    const manager = await asStaff(db, 'partner_manager', 'india');
+    const pending = await makeUser(db, { kind: 'staff', role: 'sales', region: 'india', status: 'invited', email: 'kunal.shah@cleanstart.com' });
+    const { invite } = await makeInvite(db, { kind: 'staff', partnerId: null, role: 'sales', staffRegion: 'india', email: pending.email, expiresAt: future });
+    await withViewer(manager, (tx) => removeStaff(tx, manager, { userId: pending.id }, clock));
+    const [row] = await db.select().from(invites).where(eq(invites.id, invite.id));
+    expect(row?.revokedAt?.toISOString()).toBe('2026-11-12T10:00:00.000Z');
+    const list = await withViewer(manager, (tx) => listStaff(tx, manager));
+    expect(list.map((p) => p.email)).toEqual([manager.email]);
+  });
+
   it('disables a teammate and stamps removed_at', async () => {
     const manager = await asStaff(db, 'partner_manager', 'india');
     const rahul = await makeUser(db, { kind: 'staff', role: 'sales', region: 'india', name: 'Rahul Menon', email: 'rahul@cleanstart.com' });

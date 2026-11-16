@@ -140,6 +140,11 @@ export async function removeStaff(
     if (target.id === viewer.id) throw new ConflictError('cannot_remove_self', 'You cannot remove yourself.');
     if (target.role === 'partner_manager') await assertAnotherManager(tx, target.id);
     await tx.update(users).set({ status: 'disabled', removedAt: clock.now() }).where(eq(users.id, target.id));
+    // A teammate who was only invited still has an open invite; leaving it would keep the row and the link alive.
+    await tx
+      .update(invites)
+      .set({ revokedAt: clock.now() })
+      .where(and(eq(invites.email, target.email), eq(invites.kind, 'staff'), isNull(invites.acceptedAt), isNull(invites.revokedAt)));
     return { userId: target.id, name: target.name, email: target.email };
   }
   const [invite] = await tx

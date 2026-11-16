@@ -1,5 +1,5 @@
-import { and, asc, eq, ne, sql } from 'drizzle-orm';
-import { accessRequests, partners, registrations, users } from '@/db/schema';
+import { and, asc, eq, isNull, ne, sql } from 'drizzle-orm';
+import { accessRequests, invites, partners, registrations, users } from '@/db/schema';
 import { type Clock, systemClock } from '@/lib/clock';
 import { ACCESS_REQUEST_ROLES, type AccessRequestRole, type PartnerRole } from '@/lib/domain';
 import type { AccessRequestDto, CreatedInviteDto, TeamDto, TeamMemberDto } from '@/lib/dto';
@@ -128,6 +128,11 @@ export async function removeMember(
   if (target.id === viewer.id) throw new ConflictError('cannot_remove_self', 'You cannot remove yourself.');
   if (target.role === 'partner_admin') await assertAnotherAdmin(tx, target.partnerId, target.id);
   await tx.update(users).set({ status: 'disabled', removedAt: clock.now() }).where(eq(users.id, target.id));
+  // A person who was only invited still has an open invite; leaving it would keep the row and the link alive.
+  await tx
+    .update(invites)
+    .set({ revokedAt: clock.now() })
+    .where(and(eq(invites.email, target.email), eq(invites.partnerId, target.partnerId), isNull(invites.acceptedAt), isNull(invites.revokedAt)));
   return { userId: target.id, name: target.name, email: target.email, role: target.role as PartnerRole, partnerId: target.partnerId };
 }
 
