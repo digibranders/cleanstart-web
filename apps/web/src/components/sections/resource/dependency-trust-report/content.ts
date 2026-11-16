@@ -84,7 +84,10 @@ export const VOICE = {
     "The challenge is no longer just identifying vulnerabilities in software. It is knowing what we are bringing into our environments, where it comes from and whether its integrity can be verified.",
   name: "Nilesh Jain",
   role: "CEO and Co-founder, CleanStart",
+  /** Transparent cut-out, 500 x 602. */
   photo: "/images/teams/nilesh-jain.webp",
+  /** The closing words of the quote, swept with the highlighter once the words land. */
+  highlight: "whether its integrity can be verified.",
 } as const;
 
 /** How the research was put together: a note about the whole report, not part of the quote. */
