@@ -1029,6 +1029,8 @@ Expected: lint, typecheck, test and build exit 0; the dash grep prints nothing; 
 
 - [x] **Step 24: Manual check (no screen in this task; the route is checked with seed-dev data)**
 
+Caveat on the tick (round 2, 16 Nov 2026): item 4 with a real bucket was not run. The 302 case was checked only with a local presign against dummy `R2_*` values and an `.invalid` host (nothing contacted): the `Location` host and path, `X-Amz-Expires=60` and the attachment `response-content-disposition` were seen, and `document_opens` grew by one. Whether a real dev bucket accepts the signed URL still needs a person with dev R2 keys.
+
 1. `lsof -nP -iTCP:3234 -sTCP:LISTEN` shows nothing, then `pnpm --filter @cleanstart/portal exec next dev --port 3234`. With `R2_*` unset (development default) the checks below show the 502 case.
 2. Find two ids (read with the system setting, because `portal_app` sees nothing without an identity): `PGOPTIONS='-c app.kind=system' psql "$DATABASE_URL" -c "select id, title from documents where title in ('Competitive battlecard','Gulf region price list')"`.
 3. Sign in as the Kestrel admin from seed-dev (Aditi Rao, password `DEV_SEED_PASSWORD` in `src/db/fixtures.ts`), copy the session cookie from DevTools, then: `curl -s -o /dev/null -w '%{http_code}\n' -H 'Cookie: <name>=<value>' http://localhost:3234/api/files/<Gulf price list id>`. Expected: `404` (Kestrel is a channel partner and the Gulf list is named for two other partners).

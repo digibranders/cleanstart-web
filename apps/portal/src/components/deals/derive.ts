@@ -3,7 +3,7 @@ import { sameCustomer } from "@/lib/customer";
 import { acceptedOnFor, EXPIRING_SOON_DAYS, isOverSla, PROTECTION_DAYS, REVIEW_SLA_BUSINESS_DAYS, waitingBusinessDays } from "@/lib/deal-rules";
 import { DEAL_REGIONS, type DealRegion, PARTNER_REGION_LABEL, PRODUCT_LABEL, type Product, type RegistrationStatus } from "@/lib/domain";
 import type { ManagerOptionDto, RegistrationCheckDto, RegistrationDetailDto, RegistrationListItem } from "@/lib/dto";
-import { daysLeft, daysLeftLabel, fmtLong, fmtShort, plural } from "./dates";
+import { addDays, daysBetween, daysLeft, daysLeftLabel, fmtLong, fmtShort, plural } from "./dates";
 import type { HubspotHintDto } from "./types";
 
 export { sameCustomer };
@@ -51,13 +51,24 @@ export const waitDays = (deal: Reviewable, today: string): number => waitingBusi
 export const isOverTarget = (deal: Reviewable & Pick<RegistrationListItem, "status">, today: string): boolean =>
   deal.status === "pending" && isOverSla(reviewSince(deal), today);
 
-/** The day protection started: the decision day, else the last day minus 89 (the acceptance day counts). An extension moves the end, never the start. */
-export const acceptedOn = (deal: Pick<RegistrationListItem, "protectionEnd" | "decidedOn">): string | null =>
-  deal.decidedOn ?? (deal.protectionEnd ? acceptedOnFor(deal.protectionEnd) : null);
+type Accepted = Pick<RegistrationDetailDto, "protectionEnd" | "decidedOn" | "extensionStatus" | "extensionDays">;
 
-/** Days of protection in all: 90, plus the days of a granted extension. */
-export const protectionLength = (deal: Pick<RegistrationDetailDto, "extensionStatus" | "extensionDays">): number =>
-  PROTECTION_DAYS + (deal.extensionStatus === "granted" ? (deal.extensionDays ?? 0) : 0);
+/**
+ * The day protection started: the decision day. Every accepted row has one (the accept action sets it), so the fallback
+ * only serves rows without it: the last day minus the granted extension days minus 89 (the acceptance day counts).
+ */
+export const acceptedOn = (deal: Accepted): string | null => {
+  if (deal.decidedOn) return deal.decidedOn;
+  if (!deal.protectionEnd) return null;
+  const granted = deal.extensionStatus === "granted" ? (deal.extensionDays ?? 0) : 0;
+  return acceptedOnFor(addDays(deal.protectionEnd, -granted));
+};
+
+/** Days of protection in all, from the dates, so a portal extension and an end date edited in HubSpot both count. */
+export const protectionLength = (deal: Accepted): number => {
+  const start = acceptedOn(deal);
+  return start && deal.protectionEnd ? daysBetween(start, deal.protectionEnd) + 1 : PROTECTION_DAYS;
+};
 
 export interface ProtectionView {
   until: string;
