@@ -49,6 +49,12 @@ The `RegisterDeal.tsx` `aria-controls` fix and the top bar search button name fr
 
 Moderate and minor advisories: the suite attaches them to the report when axe finds any. The full run attached none.
 
+## Scans wait for motion to finish (round 2 flake)
+
+The palette scan (`Ctrl K opens the palette ...`) failed about 1 run in 5 on a loaded machine (7 of 30 with six busy processes running) with `color-contrast (serious)` on text behind the palette, such as `.h1-sub` and `.kpi-l`. Cause: the scan ran while the page was still animating. `.content > *` fades in from opacity 0 over 0.22 s (`cs-page-in`), the scrim and dialog fade in over 0.16 s and 0.18 s, and the loading skeleton shimmers. Axe reads the colour as painted at that instant, so text at partial opacity fails. The settled page passes with the scrim and dialog open (30 of 30), so the dimmed page behind the scrim does not fail contrast, and the scrim colour was not changed. No app change was needed.
+
+Fix: every scan first waits until no finite animation is running and no `.skel` skeleton is showing (`animationsSettled` in `e2e/support/ui.ts`). The check itself is unchanged: it still scans the whole page with the overlay open, and the blocking rules are the same. The drawer scan did not fail in 30 runs, but had the same exposure and is covered by the same wait. Result with the wait, same load: palette 30 of 30, drawer 30 of 30.
+
 ## Keyboard
 
 Three tests on desktop, all green:

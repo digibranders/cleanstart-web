@@ -139,3 +139,17 @@ export async function openSearchPalette(page: Page, from?: Locator): Promise<Loc
   }).toPass();
   return dialog;
 }
+
+/**
+ * Waits until nothing on the page is mid-animation and no loading skeleton is showing. The content area fades in over
+ * 0.22 s (opacity from 0) and the overlays fade in over 0.16 to 0.18 s, and axe reads the colour as painted at that
+ * instant: text at half opacity fails contrast. That is a frame of motion, not a defect, so the scan waits for the
+ * settled page. Endless animations (the skeleton shimmer) are not waited for; the skeleton itself is.
+ */
+export async function animationsSettled(page: Page): Promise<void> {
+  await page.waitForFunction(
+    () =>
+      !document.querySelector('.skel') &&
+      document.getAnimations().every((a) => a.playState === 'finished' || a.effect?.getComputedTiming().endTime === Number.POSITIVE_INFINITY),
+  );
+}
