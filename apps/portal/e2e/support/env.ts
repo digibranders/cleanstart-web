@@ -1,9 +1,8 @@
 // Environment for the Playwright run. Imported by the config, the global setup and every spec, so the test process,
 // the helpers it imports from src/ and the Next dev server all see the same database and the same fakes.
 
-import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { parseEnv } from 'node:util';
+import { definedInNextEnvFiles } from './env-files';
 
 const PORT = 3290;
 const DB = 'cleanstart_portal_e2e';
@@ -23,32 +22,24 @@ const SCRUBBED = [
   'TURNSTILE_SECRET_KEY',
   'SENTRY_DSN',
   'NEXT_PUBLIC_SENTRY_DSN',
-  'GOOGLE_CLIENT_ID',
-  'GOOGLE_CLIENT_SECRET',
-  'MICROSOFT_CLIENT_ID',
-  'MICROSOFT_CLIENT_SECRET',
   'HUBSPOT_PORTAL_ID',
   'HUBSPOT_DEV_PORTAL_ID',
   'PARTNER_AGREEMENT_KEY',
   'CMS_API_URL',
 ];
-for (const key of SCRUBBED) delete process.env[key];
+/** Also removed: SKIP_ENV_VALIDATION would switch the app's environment checks off. */
+const FORBIDDEN = [...SCRUBBED, 'SKIP_ENV_VALIDATION'];
+for (const key of FORBIDDEN) delete process.env[key];
 
 /**
  * Deleting a key from process.env does not stop `next dev` from reading it out of the app's own env files, and an
  * empty value is rejected by env.ts. So the run refuses to start when any scrubbed key is defined in a file Next
- * loads in development, instead of letting the app under test reach a real service. Next never overrides a variable
- * that is already set, so the explicit values in serverEnv below cannot be replaced by those files.
+ * loads in development (read with Next's own loader, see env-files.ts), instead of letting the app under test reach
+ * a real service. Next never overrides a variable that is already set, so the explicit values in serverEnv below
+ * cannot be replaced by those files.
  */
-const NEXT_DEV_ENV_FILES = ['.env', '.env.local', '.env.development', '.env.development.local'];
 const appDir = fileURLToPath(new URL('../../', import.meta.url));
-const definedInFiles: string[] = [];
-for (const file of NEXT_DEV_ENV_FILES) {
-  const full = `${appDir}${file}`;
-  if (!existsSync(full)) continue;
-  const parsed = parseEnv(readFileSync(full, 'utf8'));
-  for (const key of SCRUBBED) if (key in parsed) definedInFiles.push(`${key} in ${file}`);
-}
+const definedInFiles = definedInNextEnvFiles(appDir, FORBIDDEN, fileURLToPath(import.meta.url));
 if (definedInFiles.length > 0) {
   throw new Error(
     `The e2e run would let the app under test load real service settings from its env files: ${definedInFiles.join(', ')}. Remove or comment those lines (the e2e run supplies its own fakes), then run it again.`,
@@ -62,6 +53,10 @@ const serverEnv: Record<string, string> = {
   DATABASE_OWNER_URL: OWNER_URL,
   AUTH_SECRET: 'e2e-secret-e2e-secret-e2e-secret-1234',
   PORTAL_JOBS_ENABLED: 'false',
+  // No proxy in front of the dev server: trust no forwarded header.
+  PORTAL_TRUSTED_PROXY_HOPS: '0',
+  // The env default (http://cms:3000) could resolve to the real CMS on a Docker network; nothing listens here.
+  CMS_API_URL: 'http://localhost:9',
   // Presigned links are computed locally; nothing is ever sent to this address.
   R2_ENDPOINT: 'http://localhost:9',
   R2_BUCKET: 'e2e-docs',

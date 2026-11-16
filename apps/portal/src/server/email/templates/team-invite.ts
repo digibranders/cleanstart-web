@@ -2,7 +2,7 @@ import { fmtLong } from '@/lib/dates';
 import type { IsoDate } from '@/lib/dto';
 import { type EmailBlock, renderEmail } from '../layout';
 import type { EmailAddress, EmailMessage } from '../transport';
-import { asList, FOOTNOTES, hello, oneLine } from './shared';
+import { asList, FOOTNOTES, hello, oneLine, requireSafeLink } from './shared';
 
 /** Colleague invite (audience 'partner') and CleanStart teammate invite (audience 'staff'). Also sent for Add partner and approved access requests. */
 export interface TeamInviteInput {
@@ -17,6 +17,7 @@ export interface TeamInviteInput {
 }
 
 export function buildTeamInvite(input: TeamInviteInput): EmailMessage {
+  const inviteUrl = requireSafeLink('team-invite', input.inviteUrl);
   const joinsCompany = input.audience === 'partner' && input.companyName;
   const intro = joinsCompany
     ? `${input.inviterName} invited you to join ${input.companyName} on the CleanStart Partner Portal as ${input.roleLabel}. The portal is where you register deals, follow their approval and open sales material.`
@@ -24,7 +25,7 @@ export function buildTeamInvite(input: TeamInviteInput): EmailMessage {
   const blocks: EmailBlock[] = [
     { type: 'paragraph', text: hello(input.inviteeName) },
     { type: 'paragraph', text: intro },
-    { type: 'button', label: 'Accept the invite', url: input.inviteUrl },
+    { type: 'button', label: 'Accept the invite', url: inviteUrl },
     { type: 'note', text: `This invite works once and expires on ${fmtLong(input.expiresOn)}.` },
   ];
   return {

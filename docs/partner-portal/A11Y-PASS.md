@@ -30,12 +30,12 @@ Two older suppressions for `noAutofocus` in `SignIn.tsx` (the one-field code and
 
 ## Axe
 
-Axe runs on 25 pages as the role that uses each (WCAG 2.0 and 2.1, levels A and AA; serious and critical fail the test), at 1440 px (`desktop`) and 393 px (`mobile`).
+Axe runs on 24 pages as the role that uses each (WCAG 2.0 and 2.1, levels A and AA; serious and critical fail the test), at 1440 px (`desktop`) and 393 px (`mobile`). Correction from the E2E review (round 2): the first run measured the `mobile` project at Playwright's Pixel 7 width of 412 px, not 393; it is now an explicit 393 px viewport. The same review found that the scans did not check which page they scanned, and that the technical user's `/partner/overview` scan had been scanning `/partner/documents` after a redirect (a technical user may not open the overview). That entry is gone, hence 24 pages instead of 25, and every scan now fails if the browser ended on another route or drew no main landmark. A separate `@a11y access` test per role-limited user checks which routes open and which redirect.
 
 | Project | Pages | Failing before | Failing now |
 |---|---|---|---|
-| desktop 1440 | 25 | 1 (`/apply`) | 0 |
-| mobile 393 | 25 | 3 (`/apply`, `/admin/approvals`, `/partner/deals` as the sales user) | 0 |
+| desktop 1440 | 24 | 1 (`/apply`) | 0 |
+| mobile 393 | 24 | 3 (`/apply`, `/admin/approvals`, `/partner/deals` as the sales user) | 0 |
 
 Fixes:
 
@@ -48,6 +48,12 @@ Fixes:
 The `RegisterDeal.tsx` `aria-controls` fix and the top bar search button name from the plan were already in the converted tree. No contrast token was changed, and no brand colour was touched.
 
 Moderate and minor advisories: the suite attaches them to the report when axe finds any. The full run attached none.
+
+## Scans wait for motion to finish (round 2 flake)
+
+The palette scan (`Ctrl K opens the palette ...`) failed about 1 run in 5 on a loaded machine (7 of 30 with six busy processes running) with `color-contrast (serious)` on text behind the palette, such as `.h1-sub` and `.kpi-l`. Cause: the scan ran while the page was still animating. `.content > *` fades in from opacity 0 over 0.22 s (`cs-page-in`), the scrim and dialog fade in over 0.16 s and 0.18 s, and the loading skeleton shimmers. Axe reads the colour as painted at that instant, so text at partial opacity fails. The settled page passes with the scrim and dialog open (30 of 30), so the dimmed page behind the scrim does not fail contrast, and the scrim colour was not changed. No app change was needed.
+
+Fix: every scan first waits until no finite animation is running and no `.skel` skeleton is showing (`animationsSettled` in `e2e/support/ui.ts`). The check itself is unchanged: it still scans the whole page with the overlay open, and the blocking rules are the same. The drawer scan did not fail in 30 runs, but had the same exposure and is covered by the same wait. Result with the wait, same load: palette 30 of 30, drawer 30 of 30.
 
 ## Keyboard
 

@@ -3097,7 +3097,7 @@ and, directly before the closing `</div>` of that `.sugg` box (after the `sugges
 
 The `held` block in edit 3 already reads company wide registrations only through `mine`; to warn a sales user about a colleague's registration too, extend it: in edit 3's `held` replace the `mine.find(...)` source with `[...mine, ...remoteOwnRegistrations]` where `remoteOwnRegistrations` is not defined. Leave `held` on `mine`: a sales user who submits a duplicate of a colleague's registration gets the server's `duplicate_registration` message in the form level note instead. (Recorded as a known limit.)
 
-- [ ] **Step 20: Gate A and the manual check**
+- [x] **Step 20: Gate A and the manual check**
 
 Run the Gate A block from "Conventions". Expected: all green; the changed paths are the ones in the Files block.
 
@@ -4432,7 +4432,7 @@ After:
 
 `NotFound`, the stage tracker, the extension dialog markup and every class stay unchanged. `sendExtension` still calls the mock `requestExtension(deal.id, extWhy)`; that is replaced in M2.4 step 11.
 
-- [ ] **Step 9: Gate A and the manual check**
+- [x] **Step 9: Gate A and the manual check**
 
 Run the Gate A block. Expected: all green; changed paths are the Files block.
 
@@ -6495,7 +6495,7 @@ After:
 
 The Drawer's own footer form is not used (`onSubmit` is not set on this `Drawer`), so the nested `<form>` is valid.
 
-- [ ] **Step 12: Gate A and the manual check**
+- [x] **Step 12: Gate A and the manual check**
 
 Run the Gate A block. Expected: all green; changed paths are the Files block.
 
@@ -7681,7 +7681,7 @@ After:
             </button>
 ```
 
-- [ ] **Step 11: Gate A and the manual check**
+- [x] **Step 11: Gate A and the manual check**
 
 Run the Gate A block. Expected: all green; changed paths are the Files block.
 
@@ -9190,7 +9190,7 @@ After:
         <FollowUpList items={report.followUps} />
 ```
 
-- [ ] **Step 13: Gate A and the manual check**
+- [x] **Step 13: Gate A and the manual check**
 
 Run the Gate A block. Expected: all green; changed paths are the Files block.
 
@@ -9448,7 +9448,7 @@ export function NotificationsPopover({ notifications, today, open, onToggle, onC
 
 Nothing is edited in the shared files. The exact change is printed in the section "Contract change requests", item 5, and is copied into the task's progress-log `done` line as a pointer so the orchestrator finds it. Append, with one `printf`, a `note` line to the progress log: `M4.4 | note | R | notifications-popover ready, shell.tsx and layouts need Contract change request 5`.
 
-- [ ] **Step 5: Gate A and the manual check**
+- [x] **Step 5: Gate A and the manual check**
 
 Run the Gate A block. Expected: all green; changed paths are the Files block.
 

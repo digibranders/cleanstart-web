@@ -9,6 +9,8 @@
  *  - Every string is HTML escaped here, once. Builders pass raw text.
  */
 
+import { log } from '@/server/log';
+
 const BRAND = {
   blue: '#3960f9',
   heading: '#0f172a',
@@ -44,6 +46,8 @@ const safeUrl = (url: string): string | null => {
   }
 };
 
+export const isSafeEmailUrl = (url: string): boolean => safeUrl(url) !== null;
+
 export type EmailBlock =
   | { type: 'paragraph'; text: string }
   | { type: 'button'; label: string; url: string }
@@ -68,9 +72,13 @@ const facts = (rows: Array<{ label: string; value: string }>): string => {
   return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:0 0 20px;width:100%;">${cells}</table>`;
 };
 
-const button = (label: string, url: string): string => {
+const button = (label: string, url: string, heading: string): string => {
   const href = safeUrl(url);
-  if (!href) return '';
+  if (!href) {
+    // The URL is never logged: invite and reset links carry a token.
+    log.warn({ heading, label }, 'email button dropped: its URL is not http or https');
+    return '';
+  }
   // Padding sits on the cell, not the anchor: Word based Outlook handles padding on inline elements badly.
   return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0 24px;border-collapse:separate;">
     <tr><td class="cs-btn" align="center" bgcolor="${BRAND.blue}" style="padding:14px 28px;border-radius:8px;mso-padding-alt:14px 28px;">
@@ -84,12 +92,12 @@ const note = (text: string): string =>
     <tr><td bgcolor="${BRAND.canvas}" style="padding:14px 16px;border-radius:8px;font-family:${FONT};font-size:14px;line-height:1.5;color:${BRAND.muted};white-space:pre-wrap;">${escapeHtml(text)}</td></tr>
   </table>`;
 
-const renderBlock = (block: EmailBlock): string => {
+const renderBlock = (block: EmailBlock, heading: string): string => {
   switch (block.type) {
     case 'paragraph':
       return paragraph(block.text);
     case 'button':
-      return button(block.label, block.url);
+      return button(block.label, block.url, heading);
     case 'facts':
       return facts(block.rows);
     case 'note':
@@ -99,7 +107,7 @@ const renderBlock = (block: EmailBlock): string => {
 
 /** Returns the full HTML document. */
 export function renderEmail(input: { preheader: string; heading: string; blocks: EmailBlock[]; footnote?: string }): string {
-  const body = input.blocks.map(renderBlock).join('\n');
+  const body = input.blocks.map((block) => renderBlock(block, input.heading)).join('\n');
   return `<!doctype html>
 <html lang="en">
 <head>

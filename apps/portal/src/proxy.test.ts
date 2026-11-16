@@ -165,3 +165,49 @@ describe("client address header", () => {
     expect(response.headers.get("x-middleware-request-x-portal-client-ip")).toBe("203.0.113.9");
   });
 });
+
+// Odd spellings of the open and the signed in paths. Next.js matches routes on the decoded path, so a spelling the
+// proxy does not recognise must never lose a gate that the plain spelling has.
+describe("odd path variants", () => {
+  const gate = { PORTAL_REVIEW_PASSWORD: "let-me-in" };
+
+  it.each([
+    ["/api/health/", "trailing slash"],
+    ["/API/health", "upper case"],
+    ["/api/%68ealth", "percent encoded letter"],
+    ["/api/hubspot/webhook/", "webhook with a trailing slash"],
+    ["/api/hubspot/webhook/../x", "webhook with a dot segment"],
+    ["/api/hubspot/%77ebhook", "webhook with a percent encoded letter"],
+  ])("keeps the review gate on %s (%s): only the exact open paths skip it", (path) => {
+    vi.stubEnv("PORTAL_REVIEW_PASSWORD", gate.PORTAL_REVIEW_PASSWORD);
+    expect(proxy(request(path)).status, path).toBe(401);
+    expect(proxy(request(path, { authorization: basic("let-me-in") })).status, path).toBe(200);
+  });
+
+  it.each([
+    ["/%61dmin/approvals", "percent encoded letter in admin"],
+    ["/%70artner/overview", "percent encoded letter in partner"],
+    ["/partner%2Fdeals", "encoded slash after partner"],
+    ["/admin%2f..%2fadmin", "encoded dot segment"],
+  ])("sends a signed out visit to %s (%s) to sign in", (path) => {
+    const response = proxy(request(path));
+    expect(response.status, path).toBe(307);
+    expect(new URL(response.headers.get("location") ?? "").pathname, path).toBe("/sign-in");
+  });
+
+  it("treats a differently cased /Partner/overview as a public path: Next.js routes are case sensitive, so no page answers it", () => {
+    expect(isProtectedPath("/Partner/overview")).toBe(false);
+    expect(proxy(request("/Partner/overview")).status).toBe(200);
+  });
+
+  it("leaves a path with only a malformed percent escape public, and answers it rather than throwing", () => {
+    expect(proxy(request("/%E0%A4%A")).status).toBe(200);
+  });
+
+  it("decodes per segment, so one malformed escape does not hide the protected area from the check", () => {
+    expect(isProtectedPath("/%61dmin/x%zz")).toBe(true);
+    const response = proxy(request("/%61dmin/x%zz"));
+    expect(response.status).toBe(307);
+    expect(new URL(response.headers.get("location") ?? "").pathname).toBe("/sign-in");
+  });
+});

@@ -105,6 +105,8 @@ Testing: every test here runs against the real Postgres of its Vitest worker (on
 
 ### Task 4.1: Provision the HubSpot schema
 
+> **Update 2026-11-16:** unique-value properties are allowed (row d of `docs/partner-portal/HUBSPOT-CAPABILITIES.md`, reported by the product owner), so the `--no-unique` flag and `withoutUniqueValues` mentioned below were removed from the code. Association labels (row a) passed a UI check; the build default stays `HUBSPOT_USE_ASSOCIATION_LABELS=false`.
+
 **Files:**
 - Create: `apps/portal/scripts/provision-hubspot.ts`
 - Create: `apps/portal/src/server/hubspot/schema-spec.ts`
@@ -2289,6 +2291,8 @@ git commit -m "feat(portal): H4.8 poll HubSpot deal stages, expire registrations
 ```
 
 ### Task 4.9: Webhook trigger
+
+> **Update 2026-11-16:** the product owner decided on polling only (row b of `docs/partner-portal/HUBSPOT-CAPABILITIES.md`): do not subscribe to webhooks. The receiver built here stays deployed but unsubscribed, so the subscription and Cloudflare skip rule steps in `docs/partner-portal/HUBSPOT-PROVISIONING.md` are no longer part of the rollout.
 
 The webhook makes stage changes show up in seconds instead of minutes; the 5 minute poll stays as the safety net, so a missed or delayed webhook costs nothing. Build the receiver as written, but confirm in Task 0.1 that our plan lets the private app subscribe to `deal.propertyChange` for `dealstage` and `protection_end_date`. If it does not, skip this task and ship polling alone. In an unattended build the capability check is a stub (`docs/partner-portal/HUBSPOT-CAPABILITIES.md`, every answer `UNVERIFIED`): build the receiver as written, since it is exercised only by unit tests until a person configures the subscription, and note the `UNVERIFIED` item in the progress log.
 

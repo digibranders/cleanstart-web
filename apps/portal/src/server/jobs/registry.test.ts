@@ -17,6 +17,19 @@ describe('job registry', () => {
     expect(at('retention')).toBe('40 3 * * *');
   });
 
+  it('pins every schedule to contracts H.17 (cron, evaluated in UTC)', () => {
+    expect(Object.fromEntries(JOBS.map((j) => [j.name, j.schedule]))).toEqual({
+      'hubspot-outbox': '* * * * *',
+      'hubspot-poll': '*/5 * * * *',
+      'hubspot-reconcile': '30 2 * * *',
+      expiry: '10 0 * * *',
+      'expiry-reminders': '0 5 * * *',
+      'website-intake': '*/5 * * * *',
+      'document-purge': '20 3 * * *',
+      retention: '40 3 * * *',
+    });
+  });
+
   it('names the eight jobs of contracts H.17', () => {
     expect(JOBS.map((j) => j.name).sort()).toEqual(
       ['document-purge', 'expiry', 'expiry-reminders', 'hubspot-outbox', 'hubspot-poll', 'hubspot-reconcile', 'retention', 'website-intake'],

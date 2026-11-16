@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { authSessions, partners, users } from '@/db/schema';
 import { makePartner, makeUser, resetDb, testDb } from '@/db/test-helpers';
-import { auth, buildSocialProviders } from './auth';
+import { auth } from './auth';
 import { sendPasswordResetEmail } from './auth-mail';
 import { totpCode } from './test-totp';
 import { viewerFromHeaders } from './viewer';
@@ -144,22 +144,9 @@ describe('M0.7 auth spike', () => {
     expect(unknown.status).toBe(true);
   });
 
-  it('S6 Google and Microsoft: configured only from env, never create users, link by verified email only', () => {
-    expect(buildSocialProviders({ MICROSOFT_TENANT_ID: 'common' })).toEqual({});
-    const google = buildSocialProviders({ GOOGLE_CLIENT_ID: 'id', GOOGLE_CLIENT_SECRET: 'secret', MICROSOFT_TENANT_ID: 'common' });
-    expect(google.google?.disableSignUp).toBe(true);
-    expect(google.microsoft).toBeUndefined();
-    const microsoft = buildSocialProviders({
-      MICROSOFT_CLIENT_ID: 'id',
-      MICROSOFT_CLIENT_SECRET: 'secret',
-      MICROSOFT_TENANT_ID: 'tenant-1',
-    });
-    expect(microsoft.microsoft?.disableSignUp).toBe(true);
-    expect(microsoft.microsoft?.tenantId).toBe('tenant-1');
-    const mapped = microsoft.microsoft?.mapProfileToUser;
-    expect(mapped?.({ xms_edov: true } as never)).toEqual({ emailVerified: true });
-    expect(mapped?.({} as never)).toEqual({ emailVerified: false });
-    expect(auth.options.account?.accountLinking).toMatchObject({ enabled: true, allowDifferentEmails: false });
+  it('S6 email and password is the only way in: no social provider and no account linking is configured', () => {
+    expect(Object.keys(auth.options)).not.toContain('socialProviders');
+    expect(Object.keys(auth.options)).not.toContain('account');
   });
 
   it('S7 importing the auth module builds nothing, so next build works without secrets', async () => {

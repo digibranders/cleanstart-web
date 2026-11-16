@@ -1,9 +1,9 @@
 import { env } from '@/env';
+import { SENSITIVE_KEY } from './redaction';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 const ORDER: Record<LogLevel, number> = { debug: 10, info: 20, warn: 30, error: 40 };
-const SENSITIVE_KEY = /authorization|password|token|cookie|secret/i;
 const MAX_DEPTH = 6;
 
 /** Copies `value` for logging: sensitive keys become "[redacted]", errors become plain objects, depth is capped. */

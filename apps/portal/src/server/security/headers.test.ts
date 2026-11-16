@@ -26,6 +26,7 @@ describe('next.config security headers', () => {
     expect(headers.get('Referrer-Policy')).toBe('strict-origin-when-cross-origin');
     expect(headers.get('Permissions-Policy')).toContain('camera=()');
     expect(headers.get('Cross-Origin-Opener-Policy')).toBe('same-origin');
+    expect(headers.get('Cross-Origin-Resource-Policy')).toBe('same-origin');
     expect(headers.get('X-Robots-Tag')).toBe('noindex, nofollow');
   });
 

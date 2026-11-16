@@ -132,6 +132,52 @@ describe('acceptInvite', () => {
     expect(row?.acceptedAt).toBeNull();
   });
 
+  it('adopts the invited user row that sits beside an open invite (the dev seed shape) and activates it', async () => {
+    const { partner, token } = await firstAdmin();
+    const pending = await makeUser(db, { partnerId: partner.id, email: 'yasmin.haddad@qamarsolutions.ae', status: 'invited', role: 'partner_admin' });
+    const result = await accept(token);
+    expect(result.userId).toBe(pending.id);
+    const [user] = await db.select().from(users).where(eq(users.id, pending.id));
+    expect(user).toMatchObject({ status: 'active', name: 'Yasmin Haddad', emailVerified: true });
+    const accounts = await db.select().from(authAccounts).where(eq(authAccounts.userId, pending.id));
+    expect(accounts.map((a) => a.password)).toEqual(['scrypt$test$hash']);
+  });
+
+  it('keeps the role of the invite when the invited row carries another role', async () => {
+    const { partner, token } = await firstAdmin();
+    const pending = await makeUser(db, { partnerId: partner.id, email: 'yasmin.haddad@qamarsolutions.ae', status: 'invited', role: 'sales' });
+    await accept(token);
+    const [user] = await db.select().from(users).where(eq(users.id, pending.id));
+    expect(user).toMatchObject({ status: 'active', role: 'partner_admin', partnerId: partner.id });
+  });
+
+  it('refuses an invited row that belongs to another partner and leaves the row and the invite untouched', async () => {
+    const { invite, token } = await firstAdmin();
+    const other = await makePartner(db, { name: 'Other Co', domain: 'other.example' });
+    const pending = await makeUser(db, { partnerId: other.id, email: 'yasmin.haddad@qamarsolutions.ae', status: 'invited', role: 'sales' });
+    await expect(accept(token)).rejects.toMatchObject({ reason: 'already_has_login' });
+    const [user] = await db.select().from(users).where(eq(users.id, pending.id));
+    expect(user).toMatchObject({ status: 'invited', partnerId: other.id, role: 'sales' });
+    const [row] = await db.select().from(invites).where(eq(invites.id, invite.id));
+    expect(row?.acceptedAt).toBeNull();
+  });
+
+  it('refuses a staff invited row for a partner invite, so a staff scope never ends up on a partner user', async () => {
+    const { token } = await firstAdmin();
+    const staff = await makeUser(db, { kind: 'staff', role: 'sales', region: 'india', status: 'invited', email: 'yasmin.haddad@qamarsolutions.ae' });
+    await expect(accept(token)).rejects.toMatchObject({ reason: 'already_has_login' });
+    const [user] = await db.select().from(users).where(eq(users.id, staff.id));
+    expect(user).toMatchObject({ kind: 'staff', status: 'invited', partnerId: null });
+    expect(await db.select().from(staffScopes).where(eq(staffScopes.userId, staff.id))).toHaveLength(1);
+  });
+
+  it('refuses an active user with a credential and adds no second credential', async () => {
+    const { partner, token } = await firstAdmin();
+    const active = await makeUser(db, { partnerId: partner.id, email: 'yasmin.haddad@qamarsolutions.ae', status: 'active', password: 'OldPassw0rd!' });
+    await expect(accept(token)).rejects.toMatchObject({ reason: 'already_has_login' });
+    expect(await db.select().from(authAccounts).where(eq(authAccounts.userId, active.id))).toHaveLength(1);
+  });
+
   it('gives a removed person their account back with the new password and no two-step secret', async () => {
     const partner = await makePartner(db, { status: 'active' });
     const gone = await makeUser(db, { partnerId: partner.id, email: 'back@example.com', status: 'disabled', role: 'sales', password: 'OldPassw0rd!' });

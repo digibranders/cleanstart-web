@@ -1,5 +1,7 @@
 # Partner portal auth and email Implementation Plan
 
+> **Update 2026-11-16:** Google and Microsoft sign-in were removed by decision of the product owner. Sign in is email and password with the optional second step. Every mention of Google, Microsoft, OAuth, social sign in, the `GOOGLE_*` and `MICROSOFT_*` variables or `PROVISIONAL (OAuth unverified)` below is historical and no longer applies; the code, `.env.example` and `deploy-portal.yml` no longer carry them (see `docs/partner-portal/AUTH-SPIKE.md`).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Give the partner portal its sign-in layer and its email module: a Better Auth backed login (email and password, an authenticator app as second step, database sessions, Google and Microsoft behind environment variables) with a scripted spike gate that falls back to Auth.js v5; the permission matrix, guards, proxy redirect, `getViewer()` and the converted Sign in screen; and the portal's own email layout, Brevo transport and all 21 templates with real copy.
@@ -940,7 +942,7 @@ Task 0.7 is a one day spike with Auth.js v5 as the fallback. | Costly after Phas
 Replace with:
 
 ```text
-Task 0.7 is a one day spike with Auth.js v5 as the fallback. **Spike result: Better Auth kept, PROVISIONAL (OAuth unverified); second step is an authenticator app with backup codes, see docs/partner-portal/AUTH-SPIKE.md.** | Costly after Phase 1 |
+Task 0.7 is a one day spike with Auth.js v5 as the fallback. **Spike result: Better Auth kept, PASS (OAuth removed 2026-11-16); second step is an authenticator app with backup codes, see docs/partner-portal/AUTH-SPIKE.md.** | Costly after Phase 1 |
 ```
 
 (Failed case: `**Spike result: Auth.js v5, Better Auth failed item S<n>, see docs/partner-portal/AUTH-SPIKE.md.**`.)

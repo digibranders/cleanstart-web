@@ -96,6 +96,17 @@ describe('removeMember', () => {
     expect(kept?.registeredBy).toBe(member.id);
   });
 
+  it('withdraws the open invite of a person who was only invited, so the invite link and the row both go', async () => {
+    const { partner, admin } = await company();
+    const pending = await makeUser(db, { partnerId: partner.id, role: 'sales', status: 'invited', email: 'vikram.sethi@kestrelsystems.in' });
+    const { invite } = await makeInvite(db, { kind: 'partner', partnerId: partner.id, role: 'sales', email: pending.email, expiresAt: future });
+    await as(admin, (tx) => removeMember(tx, admin, { userId: pending.id }, clock));
+    const [row] = await db.select().from(invites).where(eq(invites.id, invite.id));
+    expect(row?.revokedAt?.toISOString()).toBe('2026-11-12T10:00:00.000Z');
+    const team = await as(admin, (tx) => getTeam(tx, admin, {}));
+    expect(team.members.map((m) => m.email)).toEqual([admin.email]);
+  });
+
   it('refuses removing yourself and a person at another company', async () => {
     const { admin } = await company();
     await expect(as(admin, (tx) => removeMember(tx, admin, { userId: admin.id }, clock))).rejects.toMatchObject({ reason: 'cannot_remove_self' });

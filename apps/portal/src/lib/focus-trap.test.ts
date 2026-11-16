@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { focusReturnTarget, isInertExempt, trapTarget } from "./focus-trap";
+import { FOCUSABLE_SELECTOR, focusReturnTarget, isInertExempt, trapTarget } from "./focus-trap";
 
 const items = ["close", "name", "save"];
 
@@ -73,5 +73,17 @@ describe("focusReturnTarget", () => {
 
   it("returns null when there is nowhere to go", () => {
     expect(focusReturnTarget(null, null)).toBeNull();
+  });
+});
+
+describe("FOCUSABLE_SELECTOR", () => {
+  const parts = FOCUSABLE_SELECTOR.split(/,\s*/);
+
+  it.each(["a[href]", "summary", "iframe", 'input:not([disabled]):not([type=hidden])', '[tabindex]:not([tabindex="-1"])'])("includes %s", (part) => {
+    expect(parts).toContain(part);
+  });
+
+  it("includes editable regions but not ones switched off", () => {
+    expect(parts).toContain('[contenteditable]:not([contenteditable="false"])');
   });
 });

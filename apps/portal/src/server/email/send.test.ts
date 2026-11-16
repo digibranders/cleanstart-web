@@ -39,6 +39,22 @@ describe('sendEmail', () => {
     expect(JSON.stringify(vi.mocked(Sentry.captureException).mock.calls)).not.toContain('private body');
   });
 
+  it('sends a subject on one line with no control characters, cut to 200 characters', async () => {
+    const transport = new FakeEmailTransport();
+    await sendEmail({ ...message, subject: `Hi\u0000\r\nBcc: x ${'long '.repeat(100)}` }, transport);
+    const sent = transport.sent[0]?.subject ?? '';
+    expect(sent).not.toMatch(/\p{Cc}/u);
+    expect(sent.startsWith('Hi Bcc: x long')).toBe(true);
+    expect(sent.length).toBeLessThanOrEqual(200);
+  });
+
+  it('does not cut an emoji in half at the subject cap', async () => {
+    const transport = new FakeEmailTransport();
+    await sendEmail({ ...message, subject: `${'a'.repeat(196)}\u{1F600}${'b'.repeat(20)}` }, transport);
+    // encodeURIComponent throws URIError on a lone surrogate.
+    expect(() => encodeURIComponent(transport.sent[0]?.subject ?? '')).not.toThrow();
+  });
+
   it('uses the process wide transport when none is given, which skips when Brevo is not configured', async () => {
     expect((await sendEmail(message)).status).toBe('skipped');
   });

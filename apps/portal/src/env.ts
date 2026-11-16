@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isHttpsOrLoopback } from './server/security/app-url';
 
 const bool = z
   .enum(['true', 'false', '1', '0'])
@@ -16,19 +17,17 @@ const schema = z
     LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
 
     // Public origin of this app. Must match the dev port of the worktree (handoff table), no trailing slash.
-    APP_URL: z.string().url().default('http://localhost:3004'),
+    // Optional here so production can report an unset one with the other required variables; the transform applies the development default.
+    APP_URL: z.string().url().optional(),
 
     // Database: portal_app for the running app, portal_owner for migrations only.
-    DATABASE_URL: z.string().url(),
+    // Optional in the object so a missing one does not stop the production checks below from running: superRefine
+    // reports DATABASE_URL, AUTH_SECRET and the production variables together, and the transform restores the string type.
+    DATABASE_URL: z.string().url().optional(),
     DATABASE_OWNER_URL: z.string().url().optional(),
 
     // Auth (Better Auth)
-    AUTH_SECRET: z.string().min(32),
-    GOOGLE_CLIENT_ID: optionalString,
-    GOOGLE_CLIENT_SECRET: optionalString,
-    MICROSOFT_CLIENT_ID: optionalString,
-    MICROSOFT_CLIENT_SECRET: optionalString,
-    MICROSOFT_TENANT_ID: z.string().min(1).default('common'),
+    AUTH_SECRET: z.string().min(32).optional(),
 
     // Agreement. 'draft-0' is the placeholder until legal supplies the text (BUILD-HANDOFF).
     PARTNER_AGREEMENT_VERSION: z.string().min(1).default('draft-0'),
@@ -76,9 +75,19 @@ const schema = z
     PORTAL_TEST_OWNER_URL: z.string().url().optional(),
   })
   .superRefine((value, ctx) => {
+    for (const key of ['DATABASE_URL', 'AUTH_SECRET'] as const) {
+      if (!value[key]) ctx.addIssue({ code: z.ZodIssueCode.custom, path: [key], message: `${key} is required` });
+    }
     if (value.NODE_ENV !== 'production') return;
+    if (value.APP_URL !== undefined && !isHttpsOrLoopback(value.APP_URL)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['APP_URL'],
+        message: `APP_URL must start with https:// in production (got ${value.APP_URL}); cookies, invite links and reset links would travel in the clear. Loopback hosts (localhost, 127.0.0.1, [::1]) are the only exception.`,
+      });
+    }
     const required = [
-      'DATABASE_OWNER_URL', 'BREVO_API_KEY', 'BREVO_SENDER_EMAIL', 'R2_ENDPOINT', 'R2_BUCKET', 'R2_ACCESS_KEY_ID',
+      'APP_URL', 'DATABASE_OWNER_URL', 'BREVO_API_KEY', 'BREVO_SENDER_EMAIL', 'R2_ENDPOINT', 'R2_BUCKET', 'R2_ACCESS_KEY_ID',
       'R2_SECRET_ACCESS_KEY', 'HUBSPOT_PORTAL_TOKEN', 'HUBSPOT_PARTNER_PIPELINE_ID', 'HUBSPOT_WEBHOOK_SECRET',
       'TURNSTILE_SECRET_KEY', 'NEXT_PUBLIC_TURNSTILE_SITE_KEY', 'SENTRY_DSN',
     ] as const;
@@ -88,6 +97,10 @@ const schema = z
   })
   .transform((value) => ({
     ...value,
+    APP_URL: value.APP_URL ?? 'http://localhost:3004',
+    // superRefine has already failed the parse when either is missing, so these never fall back.
+    DATABASE_URL: value.DATABASE_URL ?? '',
+    AUTH_SECRET: value.AUTH_SECRET ?? '',
     TURNSTILE_SECRET_KEY:
       value.TURNSTILE_SECRET_KEY ?? (value.NODE_ENV === 'production' ? '' : TURNSTILE_TEST_SECRET_KEY),
     NEXT_PUBLIC_TURNSTILE_SITE_KEY:

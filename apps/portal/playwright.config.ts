@@ -11,6 +11,10 @@ import { E2E } from './e2e/support/env';
  * HubSpot is the in-memory FakeHubspot driven from the test process (e2e/support/hubspot.ts).
  *
  * localhost, never 127.0.0.1: a dev server reached by IP does not hydrate (see apps/portal docs).
+ *
+ * The specs share one seeded database and run in file order on one worker: global setup seeds once, and
+ * journey.spec.ts adds its own partner, deal and audit rows that the specs after it (security) can see. No spec
+ * reads another spec's rows; each scopes its checks to the seed or to rows it creates.
  */
 export default defineConfig({
   testDir: './e2e',
@@ -35,10 +39,12 @@ export default defineConfig({
   },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
-    { name: 'mobile', use: { ...devices['Pixel 7'] }, grep: /@a11y axe/ },
+    // Pixel 7 is 412 px wide in Playwright; the audit and A11Y-PASS promise 393 px, so the width is explicit.
+    { name: 'mobile', use: { ...devices['Pixel 7'], viewport: { width: 393, height: 851 } }, grep: /@a11y axe/ },
   ],
   webServer: {
-    command: `pnpm exec next dev --port ${E2E.port}`,
+    // Bound to localhost only: the run signs in with fixed test credentials and must not be reachable from the LAN.
+    command: `pnpm exec next dev --port ${E2E.port} --hostname localhost`,
     url: `${E2E.baseUrl}/api/health`,
     env: E2E.serverEnv,
     // Never reuse and never kill: if the port is busy the run stops with a clear error.
