@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { dealProperties } from './mappers';
 import {
-  COMPANY_PROPERTIES, DEAL_PROPERTIES, EXTERNAL_DEAL_PROPERTIES, PIPELINE_SPEC, withoutUniqueValues,
+  COMPANY_PROPERTIES, DEAL_PROPERTIES, EXTERNAL_DEAL_PROPERTIES, PIPELINE_SPEC,
 } from './schema-spec';
 import { STAGE_LABELS, type StageIds } from './types';
 
@@ -33,12 +33,9 @@ describe('schema spec', () => {
     );
   });
 
-  it('withoutUniqueValues keeps every property and drops only the unique flag', () => {
-    const plain = withoutUniqueValues(DEAL_PROPERTIES);
-    expect(plain.map((p) => p.name)).toEqual(DEAL_PROPERTIES.map((p) => p.name));
-    expect(plain.some((p) => p.hasUniqueValue)).toBe(false);
-    expect(plain.find((p) => p.name === 'portal_registration_id')).toMatchObject({ type: 'string', fieldType: 'text' });
+  it('makes the two portal ids unique-value properties (HUBSPOT-CAPABILITIES.md row d)', () => {
     expect(DEAL_PROPERTIES.find((p) => p.name === 'portal_registration_id')?.hasUniqueValue).toBe(true);
+    expect(COMPANY_PROPERTIES.find((p) => p.name === 'partner_portal_id')?.hasUniqueValue).toBe(true);
   });
 
   it('names every deal property the mapper writes that this spec does not create', () => {
