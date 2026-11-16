@@ -10,7 +10,10 @@ HUBSPOT_PORTAL_TOKEN=... pnpm --filter @cleanstart/portal exec tsx scripts/provi
 Flags:
 
 - `--apply`: write to HubSpot. Without it the script only prints what it would create.
-- `--no-unique`: create `portal_registration_id` and `partner_portal_id` as plain text properties. Use it when the account refuses unique-value properties (HUBSPOT-CAPABILITIES.md row d). Every create still searches by `portal_registration_id` first, so a retried create cannot duplicate a deal.
+
+There is no flag for unique-value properties: `portal_registration_id` and `partner_portal_id` are always created as unique-value properties (HUBSPOT-CAPABILITIES.md row d: allowed, reported by the product owner on 2026-11-16). Every create also searches by `portal_registration_id` first, so a retried create cannot duplicate a deal.
+
+The script also creates the deal to company labels "Partner" and "Customer". Keep `HUBSPOT_USE_ASSOCIATION_LABELS=false` (the build default): row a of the capability check passed in the HubSpot UI but has not been tried through a private app token, and turning the flag on is a later decision, once provisioning has run against this portal.
 
 ## partner_name must already exist
 
@@ -26,15 +29,11 @@ Executed only in master Task 5.7, after explicit approval. W2-f links to this fi
 4. Approve one test registration for a partner contact, watch it appear in the Partner deals pipeline, move its stage in HubSpot, and confirm the partner sees the change within 5 minutes. Then delete that deal.
 5. Check the health card shows 0 failed and a recent poll time before inviting partners.
 
-## Webhook subscription (optional, makes stage changes arrive in seconds)
+## Webhook subscription: not needed, do not subscribe
 
-The 5 minute poll is the safety net, so the portal works without the webhook. Set it up after step 2 of the runbook:
+Decided by the product owner on 2026-11-16: the portal polls HubSpot every 5 minutes and does not subscribe to webhooks (HUBSPOT-CAPABILITIES.md row b). The receiver route `/api/hubspot/webhook` stays built and deployed, and stays unsubscribed. Do not add a webhook subscription to the private app, do not add the Cloudflare skip rule for the path, and do not rely on `HUBSPOT_WEBHOOK_SECRET` signing anything.
 
-1. In the private app's Webhooks settings set the target URL to `https://partners.cleanstart.com/api/hubspot/webhook` and subscribe to `deal.propertyChange` for `dealstage` and for `protection_end_date`. Copy the app's client secret into the GitHub secret `HUBSPOT_WEBHOOK_SECRET`. The route answers 503 while that variable is unset, 401 for a bad signature and 413 for a body above 1 MB. Which secret signs a private app's webhooks, and the header names, are UNVERIFIED (HUBSPOT-CAPABILITIES.md): check them against HubSpot's current docs before relying on it.
-2. While developing, expose the local server with a Cloudflare Tunnel (`cloudflared`), not ngrok, whose interstitial page breaks requests.
-3. In production, add a Cloudflare WAF skip rule scoped to the path `/api/hubspot/webhook` so HubSpot's requests are not challenged. The signature check is the real gate.
-4. `/api/hubspot/webhook` must be exempt from the review password gate (`PORTAL_REVIEW_PASSWORD` in `proxy.ts`, which exists only while the mock is hosted and goes away in M5.4), the same way `/api/health` is, otherwise HubSpot gets a 401 from the gate. That exemption is made in `proxy.ts` by the orchestrator, not by track H.
-5. The deploy workflow that renders `/opt/cleanstart/portal.env` on the droplet (including `HUBSPOT_PORTAL_TOKEN`, `HUBSPOT_PARTNER_PIPELINE_ID` and `HUBSPOT_WEBHOOK_SECRET`) is `.github/workflows/deploy-portal.yml`.
+`HUBSPOT_WEBHOOK_SECRET` is still a required production variable today (`src/env.ts`), so the deploy still needs a value for it. Removing that requirement is a separate change. If webhooks are ever wanted, the old steps are in the git history of this file (commit before 2026-11-16), and which secret signs a private app's webhooks and the header names are still UNVERIFIED.
 
 ## Smoke script (development account only)
 

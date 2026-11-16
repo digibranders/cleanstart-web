@@ -106,15 +106,10 @@ jobs:
           HUBSPOT_PORTAL_ID: ${{ vars.HUBSPOT_PORTAL_ID }}
           PORTAL_JOBS_ENABLED: ${{ vars.PORTAL_JOBS_ENABLED }}
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PORTAL_TURNSTILE_SITE_KEY }}
-          MICROSOFT_TENANT_ID: ${{ vars.PORTAL_MICROSOFT_TENANT_ID }}
-          GOOGLE_CLIENT_ID: ${{ vars.PORTAL_GOOGLE_CLIENT_ID }}
-          MICROSOFT_CLIENT_ID: ${{ vars.PORTAL_MICROSOFT_CLIENT_ID }}
           # Secrets
           PORTAL_OWNER_DB_PASSWORD: ${{ secrets.PORTAL_OWNER_DB_PASSWORD }}
           PORTAL_APP_DB_PASSWORD: ${{ secrets.PORTAL_APP_DB_PASSWORD }}
           AUTH_SECRET: ${{ secrets.PORTAL_AUTH_SECRET }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.PORTAL_GOOGLE_CLIENT_SECRET }}
-          MICROSOFT_CLIENT_SECRET: ${{ secrets.PORTAL_MICROSOFT_CLIENT_SECRET }}
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
           R2_ACCESS_KEY_ID: ${{ secrets.PORTAL_R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.PORTAL_R2_SECRET_ACCESS_KEY }}
@@ -141,8 +136,8 @@ jobs:
             exit 1
           fi
 
-          # Secure cookies and the Better Auth origin need https; an http APP_URL would pass the health probe and
-          # fail only at the first sign-in.
+          # Secure cookies and the Better Auth origin need https. src/env.ts refuses an http APP_URL in production too;
+          # this check fails the deploy before the container is built and started.
           case "$APP_URL" in
             https://*) ;;
             *) echo "::error::PORTAL_APP_URL must start with https://"; exit 1 ;;
@@ -170,11 +165,6 @@ jobs:
             emit DATABASE_URL "postgres://portal_app:${PORTAL_APP_DB_PASSWORD}@postgres:5432/cleanstart_portal"
             emit DATABASE_OWNER_URL "postgres://portal_owner:${PORTAL_OWNER_DB_PASSWORD}@postgres:5432/cleanstart_portal"
             emit AUTH_SECRET "$AUTH_SECRET"
-            emit GOOGLE_CLIENT_ID "$GOOGLE_CLIENT_ID"
-            emit GOOGLE_CLIENT_SECRET "$GOOGLE_CLIENT_SECRET"
-            emit MICROSOFT_CLIENT_ID "$MICROSOFT_CLIENT_ID"
-            emit MICROSOFT_CLIENT_SECRET "$MICROSOFT_CLIENT_SECRET"
-            emit MICROSOFT_TENANT_ID "$MICROSOFT_TENANT_ID"
             emit PARTNER_AGREEMENT_VERSION "$PARTNER_AGREEMENT_VERSION"
             emit BREVO_API_KEY "$BREVO_API_KEY"
             emit BREVO_SENDER_EMAIL "$BREVO_SENDER_EMAIL"

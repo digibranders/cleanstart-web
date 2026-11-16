@@ -1,5 +1,7 @@
 # Partner portal admin, infrastructure and hardening Implementation Plan
 
+> **Update 2026-11-16:** Google and Microsoft sign-in were removed by decision of the product owner. Sign in is email and password with the optional second step. Every mention of Google, Microsoft, OAuth, social sign in, the `GOOGLE_*` and `MICROSOFT_*` variables or `PROVISIONAL (OAuth unverified)` below is historical and no longer applies; the code, `.env.example` and `deploy-portal.yml` no longer carry them (see `docs/partner-portal/AUTH-SPIKE.md`).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Give the partner portal its container image, CI and deploy workflows, the audit log screen with CSV export, the Ctrl K search, and then, once every track has merged, remove the mock scaffolding, add the browser test suite, and harden the app (security headers, rate limits, accessibility, retention, backups, runbook) so that a person can run the pilot.
@@ -6525,7 +6527,7 @@ Everything below needs a human, a credential, the droplet or a decision. None of
 4. **Real keys:** the private R2 bucket `cleanstart-partner-docs` with a token scoped to it only, the Sentry project and DSN, Brevo (verified sender, droplet address allowed), the CMS service user and its API key for the website intake job.
 5. **HubSpot:** the capability check (master task M0.1), the production private app, the provisioning dry run and then apply (`docs/partner-portal/HUBSPOT-PROVISIONING.md`), the webhook subscription, the pipeline id into a GitHub variable. Explicit go-ahead before anything touches production HubSpot.
 6. **Backups:** copy `infra/scripts/backup.sh` to `/opt/cleanstart/scripts/`, `DRY_RUN=1` then a real run, confirm both keys in R2 and the heartbeat ping, create the lifecycle rule for `portal-backups/` on the private bucket, run `restore-portal-drill.sh`, rehearse the real restore path (runbook section 9), add a line to `docs/operations/RESTORE-LOG.md`.
-7. **OAuth apps** for Google and Microsoft sign in (development and production). The provider code is behind environment variables and was never proven.
+7. ~~OAuth apps for Google and Microsoft sign in~~ Removed 2026-11-16: there is no OAuth sign in and no provider code.
 8. **Legal:** the partner agreement text and its version label (`PARTNER_AGREEMENT_VERSION`); until then invite screens show `draft-0`.
 9. **Decisions:** the deal rules the proposal lists as open (`src/lib/deal-rules.ts`); audit log retention; erasure requests (runbook section 10); who may add CleanStart teammates (the build gives it to the partner manager only).
 10. **Other apps:** `apps/cms` and `apps/web` are on Next.js 16.2.5 with the same critical advisories the portal had. Their owner decides the upgrade.

@@ -6,12 +6,9 @@ import {
   GROUP,
   PIPELINE_SPEC,
   type PropertySpec,
-  withoutUniqueValues,
 } from '../src/server/hubspot/schema-spec';
 
 const apply = process.argv.includes('--apply');
-// HUBSPOT-CAPABILITIES.md row (d): plain text properties for an account that refuses unique-value properties.
-const noUnique = process.argv.includes('--no-unique');
 const token = process.env.HUBSPOT_PORTAL_TOKEN;
 if (!token) throw new Error('HUBSPOT_PORTAL_TOKEN is required');
 const client = new Client({ accessToken: token, numberOfApiCallRetries: 3 });
@@ -40,15 +37,14 @@ const ensureProperties = async (object: 'companies' | 'deals', props: PropertySp
 
 const main = async (): Promise<void> => {
   console.info(apply ? 'APPLY mode' : 'DRY RUN (pass --apply to write)');
-  if (noUnique) console.info('--no-unique: unique-value properties are created as plain text properties');
   if (!apply) {
     console.warn(
       `WARNING: deal properties ${EXTERNAL_DEAL_PROPERTIES.join(', ')} are written by dealProperties but not created by this script. ` +
         'They must already exist in the HubSpot account (see HUBSPOT-PROVISIONING.md) before registration.create works.',
     );
   }
-  await ensureProperties('companies', noUnique ? withoutUniqueValues(COMPANY_PROPERTIES) : COMPANY_PROPERTIES);
-  await ensureProperties('deals', noUnique ? withoutUniqueValues(DEAL_PROPERTIES) : DEAL_PROPERTIES);
+  await ensureProperties('companies', COMPANY_PROPERTIES);
+  await ensureProperties('deals', DEAL_PROPERTIES);
 
   const existing = (await (await call('GET', '/crm/v3/pipelines/deals')).json()) as {
     results: Array<{ id: string; label: string }>;
@@ -63,7 +59,7 @@ const main = async (): Promise<void> => {
   } else console.info(`[dry-run] would create pipeline ${PIPELINE_SPEC.label}`);
 
   // Association labels (partner and customer on the deal to company link) need a plan that
-  // supports custom labels; HUBSPOT-CAPABILITIES.md records the answer (UNVERIFIED). Without labels the code falls
+  // supports custom labels; HUBSPOT-CAPABILITIES.md records the answer (row a: allowed in the HubSpot UI, not yet tried through a private app token). Without labels the code falls
   // back to the default association plus the partner_company_id deal property.
   for (const name of ['Partner', 'Customer']) {
     await ensure(`deal to company label ${name}`, '/crm/v4/associations/deals/companies/labels', {
