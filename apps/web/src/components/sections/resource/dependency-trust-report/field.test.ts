@@ -40,6 +40,10 @@ describe("dependency trust report pictures", () => {
     expect(Math.abs(rise - content.GLANCE.vulnerabilities.value)).toBeLessThanOrEqual(1);
   });
 
+  it("highlights the closing words of the quote", () => {
+    expect(content.VOICE.quote.endsWith(content.VOICE.highlight)).toBe(true);
+  });
+
   it("has no em or en dashes in any visible string", () => {
     expect(strings(content).filter((text) => /[–—]/.test(text))).toEqual([]);
   });
